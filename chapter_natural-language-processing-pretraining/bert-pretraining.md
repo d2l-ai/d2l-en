@@ -1,5 +1,7 @@
 # Pretraining BERT
 
+*This section is under construction.*
+
 ```{.python .input  n=1}
 import collections
 import d2l
@@ -264,30 +266,34 @@ mlm_loss = mx.gluon.loss.SoftmaxCELoss()
 def _get_batch_bert(batch, ctx):
     (input_id, masked_id, masked_position, masked_weight, \
      next_sentence_label, segment_id, valid_len) = batch
-
-    return (gluon.utils.split_and_load(input_id, ctx, even_split=False),
-            gluon.utils.split_and_load(masked_id, ctx, even_split=False),
-            gluon.utils.split_and_load(masked_position, ctx, even_split=False),
-            gluon.utils.split_and_load(masked_weight, ctx, even_split=False),
-            gluon.utils.split_and_load(next_sentence_label, ctx, even_split=False),
-            gluon.utils.split_and_load(segment_id, ctx, even_split=False),
-            gluon.utils.split_and_load(valid_len.astype('float32'), ctx, even_split=False))
+    split_and_load = gluon.utils.split_and_load
+    return (split_and_load(input_id, ctx, even_split=False),
+            split_and_load(masked_id, ctx, even_split=False),
+            split_and_load(masked_position, ctx, even_split=False),
+            split_and_load(masked_weight, ctx, even_split=False),
+            split_and_load(next_sentence_label, ctx, even_split=False),
+            split_and_load(segment_id, ctx, even_split=False),
+            split_and_load(valid_len.astype('float32'), ctx,
+                           even_split=False))
 ```
 
 ...
 
 ```{.python .input  n=17}
 # Saved in the d2l package for later use
-def batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_position,
-                    masked_weight, next_sentence_label, segment_id, valid_len, vocab_size):
+def batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id,
+                    masked_position, masked_weight, next_sentence_label,
+                    segment_id, valid_len, vocab_size):
     ls = []
     ls_mlm = []
     ls_nsp = []
-    for i_id, m_id, m_pos, m_w, nsl, s_i, v_l in zip(input_id, masked_id, masked_position, masked_weight,\
-                                                      next_sentence_label, segment_id, valid_len):
+    for i_id, m_id, m_pos, m_w, nsl, s_i, v_l in zip(
+        input_id, masked_id, masked_position, masked_weight,
+        next_sentence_label, segment_id, valid_len):
         num_masks = m_w.sum() + 1e-8
         _, decoded, classified = net(i_id, s_i, v_l.reshape(-1),m_pos)
-        l_mlm = mlm_loss(decoded.reshape((-1, vocab_size)),m_id.reshape(-1), m_w.reshape((-1, 1)))
+        l_mlm = mlm_loss(decoded.reshape((-1, vocab_size)),m_id.reshape(-1),
+                         m_w.reshape((-1, 1)))
         l_mlm = l_mlm.sum() / num_masks
         l_nsp = nsp_loss(classified, nsl)
         l_nsp = l_nsp.mean()
@@ -303,7 +309,8 @@ def batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_positio
 
 ```{.python .input  n=18}
 # Saved in the d2l package for later use
-def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx, log_interval, max_step):
+def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx,
+               log_interval, max_step):
     trainer = gluon.Trainer(net.collect_params(), 'adam')
     step_num = 0
     while step_num < max_step:
@@ -315,11 +322,15 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx, log_interval
         running_num_tks = 0
         for _, data_batch in enumerate(data_eval):
             (input_id, masked_id, masked_position, masked_weight, \
-             next_sentence_label, segment_id, valid_len) = _get_batch_bert(data_batch, ctx)
+             next_sentence_label, segment_id, valid_len) = _get_batch_bert(
+                data_batch, ctx)
 
             step_num += 1
             with autograd.record():
-                ls, ls_mlm, ls_nsp = batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_position, masked_weight, next_sentence_label, segment_id, valid_len, vocab_size)
+                ls, ls_mlm, ls_nsp = batch_loss_bert(
+                    net, nsp_loss, mlm_loss, input_id, masked_id,
+                    masked_position, masked_weight, next_sentence_label,
+                    segment_id, valid_len, vocab_size)
             for l in ls:
                 l.backward()
 

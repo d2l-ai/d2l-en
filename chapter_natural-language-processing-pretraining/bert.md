@@ -1,5 +1,7 @@
 # BERT
 
+*This section is under construction.*
+
 ```{.python .input  n=3}
 import d2l
 from mxnet import gluon, np, npx
@@ -8,8 +10,6 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-...
-![输入表示](../img/bert_inputs.svg)
 
 ...
 
@@ -51,13 +51,6 @@ segments = np.array([[0, 0, 0, 0, 1, 1, 1, 1],
 X = encoder(tokens, segments, None)
 X.shape
 ```
-
-...
-
-![双向语言模型](../img/biLM_Leakage.svg)
-
-...
-![遮蔽语言模型](../img/bert_mlm.svg)
 
 ...
 
@@ -105,7 +98,6 @@ mlm_l.shape
 ```
 
 ...
-![下一句预测](../img/bert_nsp.svg)
 
 ```{.python .input  n=13}
 # Saved in the d2l package for later use

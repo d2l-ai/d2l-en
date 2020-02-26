@@ -1,5 +1,7 @@
 # BERT-NLI
 
+*This section is under construction.*
+
 ![This section feeds pretrained BERT to an MLP-based architecture for natural
 language inference.](../img/nlp-map-nli-bert.svg)
 :label:`fig_nlp-map-nli-bert`
@@ -19,7 +21,8 @@ bert.initialize(init.Xavier(), ctx=ctx)
 nsp_loss = gluon.loss.SoftmaxCELoss()
 mlm_loss = gluon.loss.SoftmaxCELoss()
 
-d2l.train_bert(bert_train_iter, bert, nsp_loss, mlm_loss, len(vocab), ctx, 20, 2000)
+d2l.train_bert(bert_train_iter, bert, nsp_loss, mlm_loss, len(vocab), ctx, 20,
+               2000)
 ```
 
 ...
@@ -32,7 +35,8 @@ class SNLIBERTDataset(gluon.data.Dataset):
         h_tokens = d2l.tokenize(dataset[1], token='word')
         self.vocab = vocab
 
-        self.tokens, self.segment_ids, self.valid_lens = self.preprocess(p_tokens, h_tokens)
+        self.tokens, self.segment_ids, self.valid_lens = self.preprocess(
+            p_tokens, h_tokens)
         self.labels = np.array(dataset[2])
         print('read ' + str(len(self.tokens)) + ' examples')
     def preprocess(self, p_tokens, h_tokens):
@@ -42,8 +46,8 @@ class SNLIBERTDataset(gluon.data.Dataset):
         tokens, segment_ids, valid_lens = [], [], []
 
         for i in range(len(p_tokens)):
-            token, segment_id = d2l.get_tokens_and_segment(p_tokens[i][:self.num_steps],
-                                                           h_tokens[i][:self.num_steps])
+            token, segment_id = d2l.get_tokens_and_segments(
+                p_tokens[i][:self.num_steps], h_tokens[i][:self.num_steps])
             tokens.append(self.vocab[pad(token)])
             segment_ids.append(np.array(pad(segment_id)))
             valid_lens.append(np.array(len(token)))
@@ -52,7 +56,8 @@ class SNLIBERTDataset(gluon.data.Dataset):
 
 
     def __getitem__(self, idx):
-        return (self.tokens[idx], self.segment_ids[idx], self.valid_lens[idx]), self.labels[idx]
+        return (self.tokens[idx], self.segment_ids[idx],
+                self.valid_lens[idx]), self.labels[idx]
 
     def __len__(self):
         return len(self.tokens)
@@ -106,7 +111,8 @@ net.classifier.initialize(ctx=ctx)
 lr, num_epochs = 1e-4, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
-d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx, d2l.split_batch_multi_inputs)
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
+               d2l.split_batch_multi_inputs)
 ```
 
 ...
