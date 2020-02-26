@@ -238,16 +238,6 @@ for _, data_batch in enumerate(train_iter):
     break
 ```
 
-```{.json .output n=14}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(512, 128) (512, 20) (512, 20) (512, 20) (512,) (512, 128) (512,)\n"
- }
-]
-```
-
 ...
 
 ```{.python .input  n=15}
@@ -361,14 +351,4 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx,
 
 ```{.python .input  n=19}
 train_bert(train_iter, net, nsp_loss, mlm_loss, len(vocab), ctx, 20, 1)
-```
-
-```{.json .output n=19}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Eval mlm_loss=29.317\tnsp_loss=2.899\t\nEval cost=15.5s\n"
- }
-]
 ```
