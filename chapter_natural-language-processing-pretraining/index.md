@@ -46,8 +46,8 @@ glove
 subword-embedding
 similarity-analogy
 bert
-bert-pretraining.md
-natural-language-inference-bert.md
+bert-pretraining
+natural-language-inference-bert
 
 ```
 
