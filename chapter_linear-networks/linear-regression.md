@@ -188,7 +188,7 @@ linear regression can be solved analytically by applying a simple formula,
 yielding a global optimum.
 To start, we can subsume the bias $b$ into the parameter $\mathbf{w}$
 by appending a column to the design matrix consisting of all $1s$.
-Then our prediction problem is to minimize $||\mathbf{y} - X\mathbf{w}||$.
+Then our prediction problem is to minimize $||\mathbf{y} - \mathbf{X}\mathbf{w}||$.
 Because this expression has a quadratic form, it is convex,
 and so long as the problem is not degenerate
 (our features are linearly independent), it is strictly convex.
