@@ -17,16 +17,16 @@ npx.set_np()
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
 d2l.DATA_HUB['wikitext-2'] = (
-    'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip',
-    '3c914d17d80b1459be871a5039ac23e752a53cbe')
+    'https://s3.amazonaws.com/research.metamind.io/wikitext/'
+    'wikitext-2-v1.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
 
 # Saved in the d2l package for later use
 d2l.DATA_HUB['wikitext-103'] = (
-    'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip',
-    '0aec09a7537b58d4bb65362fee27650eeaba625a')
+    'https://s3.amazonaws.com/research.metamind.io/wikitext/'
+    'wikitext-103-v1.zip', '0aec09a7537b58d4bb65362fee27650eeaba625a')
 ```
 
-...
+We keep paragraphs with at least 2 sentences.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
@@ -35,51 +35,32 @@ def read_wiki(data_dir):
     with open(file_name, 'r') as f:
         raw = f.readlines()
     data = [line.strip().lower().split(' . ')
-            for line in raw if len(line.split(' . '))>=2]
+            for line in raw if len(line.split(' . ')) >= 2]
     random.shuffle(data)
     return data
 ```
 
-...
+## Prepare NSP data
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
-def get_next_sentence(sentence, next_sentence, all_documents):
+def get_next_sentence(sentence, next_sentence, all_docs):
     if random.random() < 0.5:
-        tokens_a = sentence
-        tokens_b = next_sentence
         is_next = True
     else:
-        random_sentence = random.choice(random.choice(all_documents))
-        tokens_a = sentence
-        tokens_b = random_sentence
+        # all_docs is a list of lists of lists
+        next_sentence = random.choice(random.choice(all_docs))
         is_next = False
-    return tokens_a, tokens_b, is_next
+    return sentence, next_sentence, is_next
 ```
 
 ...
 
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
-def get_tokens_and_segment(tokens_a, tokens_b):
-    tokens = [] 
-    segment_ids = [] 
-
-    tokens.append('[CLS]')
-    segment_ids.append(0)
-
-    for token in tokens_a:
-        tokens.append(token)
-        segment_ids.append(0)
-    tokens.append('[SEP]')
-    segment_ids.append(0)
-
-    for token in tokens_b:
-        tokens.append(token)
-        segment_ids.append(1)
-    tokens.append('[SEP]')
-    segment_ids.append(1)
-    
+def get_tokens_and_segments(tokens_a, tokens_b):
+    tokens = ['[CLS]'] + tokens_a + ['[SEP]'] + tokens_b + ['[SEP]']
+    segment_ids = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
     return tokens, segment_ids
 ```
 
@@ -87,70 +68,78 @@ def get_tokens_and_segment(tokens_a, tokens_b):
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
-def create_next_sentence(document, all_documents, vocab, max_length):
-    instances = []
-    for i in range(len(document)-1):
-        tokens_a, tokens_b, is_next = get_next_sentence(document[i], document[i+1], all_documents)
-        
+def get_nsp_data_from_doc(doc, all_docs, vocab, max_length):
+    nsp_data_from_doc = []
+    for i in range(len(doc) - 1):
+        tokens_a, tokens_b, is_next = get_next_sentence(
+            doc[i], doc[i + 1], all_docs)
+        # Consider 1 '[CLS]' token and 2 '[SEP]' tokens
         if len(tokens_a) + len(tokens_b) + 3 > max_length:
              continue
-        tokens, segment_ids = get_tokens_and_segment(tokens_a, tokens_b)
-        instances.append((tokens, segment_ids, is_next))
-    return instances
+        tokens, segment_ids = get_tokens_and_segments(tokens_a, tokens_b)
+        nsp_data_from_doc.append((tokens, segment_ids, is_next))
+    return nsp_data_from_doc
 ```
 
-...
+## Prepare MLM data
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
-def choice_mask_tokens(tokens, cand_indexes, num_to_predict, vocab):
-    output_tokens = list(tokens)
-    masked_lms = []
-    random.shuffle(cand_indexes)
-    for index_set in cand_indexes:
-        if len(masked_lms) >= num_to_predict:
-            break
-        if len(masked_lms) + len(index_set) > num_to_predict:
-            continue
-        for index in index_set:
-            masked_token = None
-            if random.random() < 0.8:
-                masked_token = '[MASK]'
-            else:
-                if random.random() < 0.5:
-                    masked_token = tokens[index]
-                else:
-                    masked_token = random.randint(0, len(vocab) - 1)
+def replace_mlm_tokens(tokens, candidate_mlm_pred_positions, num_mlm_preds,
+                       vocab):
+    # Make a new copy of tokens for the input of a masked language model,
+    # where the input may contain replaced '[MASK]' or random tokens
+    mlm_input_tokens = [token for token in tokens]
+    mlm_pred_positions_and_labels = []
+    # Shuffle for gettting 15% random tokens for prediction in the masked
+    # language model task
+    random.shuffle(candidate_mlm_pred_positions)
 
-            output_tokens[index] = masked_token
-            masked_lms.append((index, tokens[index]))
-    return output_tokens, masked_lms
+    for mlm_pred_position in candidate_mlm_pred_positions:
+        if len(mlm_pred_positions_and_labels) >= num_mlm_preds:
+            break
+        masked_token = None
+        # 80% of the time: replace the word with the '[MASK]' token
+        if random.random() < 0.8:
+            masked_token = '[MASK]'
+        else:
+            # 10% of the time: keep the word unchanged
+            if random.random() < 0.5:
+                masked_token = tokens[mlm_pred_position]
+            # 10% of the time: replace the word with a random word
+            else:
+                masked_token = random.randint(0, len(vocab) - 1)
+        mlm_input_tokens[mlm_pred_position] = masked_token
+        mlm_pred_positions_and_labels.append(
+            (mlm_pred_position, tokens[mlm_pred_position]))
+    return mlm_input_tokens, mlm_pred_positions_and_labels
 ```
 
 ...
 
 ```{.python .input  n=8}
 # Saved in the d2l package for later use
-def create_masked_lm(tokens, vocab):
-    cand_indexes = []
-    for (i, token) in enumerate(tokens):
+def create_mlm_data_from_tokens(tokens, vocab):
+    candidate_mlm_pred_positions = []
+    # tokens is a list of strings
+    for i, token in enumerate(tokens):
+        # Special tokens are not predicted in the masked language model task
         if token in ['[CLS]', '[SEP]']:
             continue
-        cand_indexes.append([i])
-        
-    num_to_predict = max(1, int(round(len(tokens) * 0.15)))
-    
-    output_tokens, masked_lms = choice_mask_tokens(tokens, cand_indexes,
-                                                   num_to_predict, vocab)
-            
-    masked_lms = sorted(masked_lms, key=lambda x: x[0])
-    masked_lm_positions = []
-    masked_lm_labels = []
-    for p in masked_lms:
-        masked_lm_positions.append(p[0])
-        masked_lm_labels.append(p[1])
-        
-    return vocab[output_tokens], masked_lm_positions, vocab[masked_lm_labels]
+        candidate_mlm_pred_positions.append(i)
+    # 15% of random tokens will be predicted in the masked language model task 
+    num_mlm_preds = max(1, int(round(len(tokens) * 0.15)))
+    output_tokens, mlm_pred_positions_and_labels = replace_mlm_tokens(
+        tokens, candidate_mlm_pred_positions, num_mlm_preds, vocab)
+
+    mlm_pred_positions_and_labels = sorted(mlm_pred_positions_and_labels,
+                                           key=lambda x: x[0])
+    mlm_pred_positions = []
+    mlm_pred_labels = []
+    for mlm_pred_position, mlm_pred_label in mlm_pred_positions_and_labels:
+        mlm_pred_positions.append(mlm_pred_position)
+        mlm_pred_labels.append(mlm_pred_label)
+    return vocab[output_tokens], mlm_pred_positions, vocab[mlm_pred_labels]
 ```
 
 ...
@@ -186,9 +175,9 @@ def convert_numpy(instances, max_length):
 # Saved in the d2l package for later use
 def create_training_instances(train_data, vocab, max_length):
     instances = []
-    for i, document in enumerate(train_data):
-        instances.extend(create_next_sentence(document, train_data, vocab, max_length))
-    instances = [(create_masked_lm(tokens, vocab) + (segment_ids, is_random_next))
+    for i, doc in enumerate(train_data):
+        instances.extend(get_nsp_data_from_doc(doc, train_data, vocab, max_length))
+    instances = [(create_mlm_data_from_tokens(tokens, vocab) + (segment_ids, is_random_next))
                  for (tokens, segment_ids, is_random_next) in instances]
     input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
            next_sentence_labels, segment_ids, valid_lengths = convert_numpy(instances, max_length)
