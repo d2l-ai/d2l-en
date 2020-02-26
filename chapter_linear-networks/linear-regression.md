@@ -198,7 +198,7 @@ and it corresponds to the global minimum.
 Taking the derivative of the loss with respect to $\mathbf{w}$
 and setting it equal to $0$ yields the analytic solution:
 
-$$\mathbf{w}^* = (\mathbf X^T \mathbf X)^{-1}\mathbf X^T y.$$
+$$\mathbf{w}^* = (\mathbf X^T \mathbf X)^{-1}\mathbf X^T \mathbf{y}.$$
 
 While simple problems like linear regression
 may admit analytic solutions,
