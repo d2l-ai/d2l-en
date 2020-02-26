@@ -394,8 +394,8 @@ First, we add them, one coordinate at a time,
 using a `for` loop.
 
 ```{.python .input  n=2}
-timer = Timer()
 c = np.zeros(n)
+timer = Timer()
 for i in range(n):
     c[i] = a[i] + b[i]
 '%.5f sec' % timer.stop()
