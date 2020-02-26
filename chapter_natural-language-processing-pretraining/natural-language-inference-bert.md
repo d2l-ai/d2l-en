@@ -31,28 +31,28 @@ class SNLIBERTDataset(gluon.data.Dataset):
         p_tokens = d2l.tokenize(dataset[0], token='word')
         h_tokens = d2l.tokenize(dataset[1], token='word')
         self.vocab = vocab
-        
-        self.tokens, self.segment_ids, self.valid_lengths = self.preprocess(p_tokens, h_tokens)
+
+        self.tokens, self.segment_ids, self.valid_lens = self.preprocess(p_tokens, h_tokens)
         self.labels = np.array(dataset[2])
         print('read ' + str(len(self.tokens)) + ' examples')
     def preprocess(self, p_tokens, h_tokens):
         def pad(data):
             return d2l.trim_pad(data, self.num_steps, 0)
-        
-        tokens, segment_ids, valid_lengths = [], [], []
-        
+
+        tokens, segment_ids, valid_lens = [], [], []
+
         for i in range(len(p_tokens)):
-            token, segment_id = d2l.get_tokens_and_segment(p_tokens[i][:self.num_steps], 
+            token, segment_id = d2l.get_tokens_and_segment(p_tokens[i][:self.num_steps],
                                                            h_tokens[i][:self.num_steps])
             tokens.append(self.vocab[pad(token)])
             segment_ids.append(np.array(pad(segment_id)))
-            valid_lengths.append(np.array(len(token)))
-            
-        return tokens, segment_ids, valid_lengths
-    
+            valid_lens.append(np.array(len(token)))
+
+        return tokens, segment_ids, valid_lens
+
 
     def __getitem__(self, idx):
-        return (self.tokens[idx], self.segment_ids[idx], self.valid_lengths[idx]), self.labels[idx]
+        return (self.tokens[idx], self.segment_ids[idx], self.valid_lens[idx]), self.labels[idx]
 
     def __len__(self):
         return len(self.tokens)

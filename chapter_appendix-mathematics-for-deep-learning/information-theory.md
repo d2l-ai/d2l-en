@@ -315,10 +315,10 @@ First, let's generate and sort three `ndarray`s of length $10,000$: an objective
 ```{.python .input}
 random.seed(1)
 
-nd_length = 10000
-p = np.random.normal(loc=0, scale=1, size=(nd_length, ))
-q1 = np.random.normal(loc=-1, scale=1, size=(nd_length, ))
-q2 = np.random.normal(loc=1, scale=1, size=(nd_length, ))
+nd_len = 10000
+p = np.random.normal(loc=0, scale=1, size=(nd_len, ))
+q1 = np.random.normal(loc=-1, scale=1, size=(nd_len, ))
+q2 = np.random.normal(loc=1, scale=1, size=(nd_len, ))
 
 p = np.array(sorted(p.asnumpy()))
 q1 = np.array(sorted(q1.asnumpy()))

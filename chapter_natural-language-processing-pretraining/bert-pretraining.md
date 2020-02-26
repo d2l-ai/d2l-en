@@ -126,7 +126,7 @@ def create_mlm_data_from_tokens(tokens, vocab):
         if token in ['[CLS]', '[SEP]']:
             continue
         candidate_mlm_pred_positions.append(i)
-    # 15% of random tokens will be predicted in the masked language model task 
+    # 15% of random tokens will be predicted in the masked language model task
     num_mlm_preds = max(1, int(round(len(tokens) * 0.15)))
     mlm_input_tokens, mlm_pred_positions_and_labels = replace_mlm_tokens(
         tokens, candidate_mlm_pred_positions, num_mlm_preds, vocab)
@@ -145,7 +145,7 @@ def create_mlm_data_from_tokens(tokens, vocab):
 # Saved in the d2l package for later use
 def convert_numpy(instances, max_len):
     input_ids, segment_ids, masked_lm_positions, masked_lm_ids = [], [], [], []
-    masked_lm_weights, next_sentence_labels, valid_lengths = [], [], []
+    masked_lm_weights, next_sentence_labels, valid_lens = [], [], []
     for instance in instances:
         input_id = instance[0] + [0] * (max_len - len(instance[0]))
         segment_id = instance[3] + [0] * (max_len - len(instance[3]))
@@ -153,7 +153,7 @@ def convert_numpy(instances, max_len):
         masked_lm_id = instance[2] + [0] * (20 - len(instance[2]))
         masked_lm_weight = [1.0] * len(instance[2]) + [0.0] * (20 - len(instance[1]))
         next_sentence_label = instance[4]
-        valid_length = len(instance[0])
+        valid_len = len(instance[0])
 
         input_ids.append(np.array(input_id, dtype='int32'))
         segment_ids.append(np.array(segment_id, dtype='int32'))
@@ -161,9 +161,9 @@ def convert_numpy(instances, max_len):
         masked_lm_ids.append(np.array(masked_lm_id, dtype='int32'))
         masked_lm_weights.append(np.array(masked_lm_weight, dtype='float32'))
         next_sentence_labels.append(np.array(next_sentence_label))
-        valid_lengths.append(np.array(valid_length))
+        valid_lens.append(np.array(valid_len))
     return input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
-           next_sentence_labels, segment_ids, valid_lengths
+           next_sentence_labels, segment_ids, valid_lens
 ```
 
 ...
@@ -177,9 +177,9 @@ def create_training_instances(train_data, vocab, max_len):
     instances = [(create_mlm_data_from_tokens(tokens, vocab) + (segment_ids, is_random_next))
                  for (tokens, segment_ids, is_random_next) in instances]
     input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
-           next_sentence_labels, segment_ids, valid_lengths = convert_numpy(instances, max_len)
+           next_sentence_labels, segment_ids, valid_lens = convert_numpy(instances, max_len)
     return input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
-           next_sentence_labels, segment_ids, valid_lengths
+           next_sentence_labels, segment_ids, valid_lens
 ```
 
 ...
@@ -189,18 +189,18 @@ def create_training_instances(train_data, vocab, max_len):
 class WikiDataset(gluon.data.Dataset):
     def __init__(self, dataset, max_len=128):
         train_tokens = [d2l.tokenize(row, token='word') for row in dataset]
-        
+
         text_list=[]
         [text_list.extend(row) for row in train_tokens]
-        self.vocab = d2l.Vocab(text_list, min_freq=5, 
+        self.vocab = d2l.Vocab(text_list, min_freq=5,
                                reserved_tokens=['[MASK]', '[CLS]', '[SEP]'])
         self.input_ids, self.masked_lm_ids, self.masked_lm_positions,\
         self.masked_lm_weights, self.next_sentence_labels, self.segment_ids,\
-        self.valid_lengths = create_training_instances(train_tokens, self.vocab, max_len)
+        self.valid_lens = create_training_instances(train_tokens, self.vocab, max_len)
 
     def __getitem__(self, idx):
         return self.input_ids[idx], self.masked_lm_ids[idx], self.masked_lm_positions[idx], self.masked_lm_weights[idx],\
-           self.next_sentence_labels[idx], self.segment_ids[idx], self.valid_lengths[idx]
+           self.next_sentence_labels[idx], self.segment_ids[idx], self.valid_lens[idx]
 
     def __len__(self):
         return len(self.input_ids)
@@ -230,9 +230,9 @@ train_iter, vocab = load_data_wiki(batch_size, 'wikitext-2')
 ```{.python .input  n=14}
 for _, data_batch in enumerate(train_iter):
     (input_id, masked_id, masked_position, masked_weight, \
-     next_sentence_label, segment_id, valid_length) = data_batch
+     next_sentence_label, segment_id, valid_len) = data_batch
     print(input_id.shape, masked_id.shape, masked_position.shape, masked_weight.shape,\
-          next_sentence_label.shape, segment_id.shape, valid_length.shape)
+          next_sentence_label.shape, segment_id.shape, valid_len.shape)
     break
 ```
 
@@ -249,7 +249,7 @@ for _, data_batch in enumerate(train_iter):
 ...
 
 ```{.python .input  n=15}
-net = d2l.BERTModel(len(vocab), embed_size=128, pw_num_hiddens=256, 
+net = d2l.BERTModel(len(vocab), embed_size=128, pw_num_hiddens=256,
                     num_heads=2, num_layers=2, dropout=0.2)
 ctx = d2l.try_all_gpus()
 net.initialize(init.Xavier(), ctx=ctx)
@@ -263,15 +263,15 @@ mlm_loss = mx.gluon.loss.SoftmaxCELoss()
 # Saved in the d2l package for later use
 def _get_batch_bert(batch, ctx):
     (input_id, masked_id, masked_position, masked_weight, \
-     next_sentence_label, segment_id, valid_length) = batch
-    
+     next_sentence_label, segment_id, valid_len) = batch
+
     return (gluon.utils.split_and_load(input_id, ctx, even_split=False),
             gluon.utils.split_and_load(masked_id, ctx, even_split=False),
             gluon.utils.split_and_load(masked_position, ctx, even_split=False),
             gluon.utils.split_and_load(masked_weight, ctx, even_split=False),
             gluon.utils.split_and_load(next_sentence_label, ctx, even_split=False),
             gluon.utils.split_and_load(segment_id, ctx, even_split=False),
-            gluon.utils.split_and_load(valid_length.astype('float32'), ctx, even_split=False))
+            gluon.utils.split_and_load(valid_len.astype('float32'), ctx, even_split=False))
 ```
 
 ...
@@ -279,12 +279,12 @@ def _get_batch_bert(batch, ctx):
 ```{.python .input  n=17}
 # Saved in the d2l package for later use
 def batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_position,
-                    masked_weight, next_sentence_label, segment_id, valid_length, vocab_size):
+                    masked_weight, next_sentence_label, segment_id, valid_len, vocab_size):
     ls = []
     ls_mlm = []
     ls_nsp = []
     for i_id, m_id, m_pos, m_w, nsl, s_i, v_l in zip(input_id, masked_id, masked_position, masked_weight,\
-                                                      next_sentence_label, segment_id, valid_length):
+                                                      next_sentence_label, segment_id, valid_len):
         num_masks = m_w.sum() + 1e-8
         _, decoded, classified = net(i_id, s_i, v_l.reshape(-1),m_pos)
         l_mlm = mlm_loss(decoded.reshape((-1, vocab_size)),m_id.reshape(-1), m_w.reshape((-1, 1)))
@@ -309,22 +309,22 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx, log_interval
     while step_num < max_step:
         eval_begin_time = time.time()
         begin_time = time.time()
-        
+
         running_mlm_loss = running_nsp_loss = 0
         total_mlm_loss = total_nsp_loss = 0
         running_num_tks = 0
         for _, data_batch in enumerate(data_eval):
             (input_id, masked_id, masked_position, masked_weight, \
-             next_sentence_label, segment_id, valid_length) = _get_batch_bert(data_batch, ctx)
-            
+             next_sentence_label, segment_id, valid_len) = _get_batch_bert(data_batch, ctx)
+
             step_num += 1
             with autograd.record():
-                ls, ls_mlm, ls_nsp = batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_position, masked_weight, next_sentence_label, segment_id, valid_length, vocab_size)
+                ls, ls_mlm, ls_nsp = batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_position, masked_weight, next_sentence_label, segment_id, valid_len, vocab_size)
             for l in ls:
                 l.backward()
-            
+
             trainer.step(1)
-            
+
             running_mlm_loss += sum([l for l in ls_mlm])
             running_nsp_loss += sum([l for l in ls_nsp])
 

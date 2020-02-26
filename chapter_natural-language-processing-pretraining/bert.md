@@ -27,13 +27,13 @@ class BERTEncoder(nn.Block):
             self.blks.add(d2l.EncoderBlock(
                 embed_size, pw_num_hiddens, num_heads, dropout))
 
-    def forward(self, tokens, segments, valid_length):
+    def forward(self, tokens, segments, valid_len):
         # Shape of X remains unchanged in the following code snippet:
         # (batch size, max sequence length, embed_size)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = self.pos_encoding(X)
         for blk in self.blks:
-            X = blk(X, valid_length)
+            X = blk(X, valid_len)
         return X
 ```
 
@@ -151,9 +151,9 @@ class BERTModel(nn.Block):
         self.nsp = NextSentencePred(embed_size)
         self.mlm = MaskLM(vocab_size, embed_size)
 
-    def forward(self, tokens, segments, valid_length=None,
+    def forward(self, tokens, segments, valid_len=None,
                 masked_positions=None):
-        X = self.encoder(tokens, segments, valid_length)
+        X = self.encoder(tokens, segments, valid_len)
         if masked_positions is not None:
             mlm_Y = self.mlm(X, masked_positions)
         else:

@@ -82,10 +82,10 @@ class MultiHeadAttention(nn.Block):
         self.W_v = nn.Dense(num_hiddens, use_bias=False, flatten=False)
         self.W_o = nn.Dense(num_hiddens, use_bias=False, flatten=False)
 
-    def forward(self, query, key, value, valid_length):
+    def forward(self, query, key, value, valid_len):
         # For self-attention, query, key, and value shape:
         # (batch_size, seq_len, dim), where seq_len is the length of input
-        # sequence. valid_length shape is either (batch_size, ) or
+        # sequence. valid_len shape is either (batch_size, ) or
         # (batch_size, seq_len).
 
         # Project and transpose query, key, and value from
@@ -95,16 +95,16 @@ class MultiHeadAttention(nn.Block):
         key = transpose_qkv(self.W_k(key), self.num_heads)
         value = transpose_qkv(self.W_v(value), self.num_heads)
 
-        if valid_length is not None:
-            # Copy valid_length by num_heads times
-            if valid_length.ndim == 1:
-                valid_length = np.tile(valid_length, self.num_heads)
+        if valid_len is not None:
+            # Copy valid_len by num_heads times
+            if valid_len.ndim == 1:
+                valid_len = np.tile(valid_len, self.num_heads)
             else:
-                valid_length = np.tile(valid_length, (self.num_heads, 1))
+                valid_len = np.tile(valid_len, (self.num_heads, 1))
 
         # For self-attention, output shape:
         # (batch_size * num_heads, seq_len, num_hiddens / num_heads)
-        output = self.attention(query, key, value, valid_length)
+        output = self.attention(query, key, value, valid_len)
 
         # output_concat shape: (batch_size, seq_len, num_hiddens)
         output_concat = transpose_output(output, self.num_heads)
@@ -118,7 +118,7 @@ Here are the definitions of the transpose functions `transpose_qkv` and `transpo
 def transpose_qkv(X, num_heads):
     # Input X shape: (batch_size, seq_len, num_hiddens).
     # Output X shape:
-    # (batch_size, seq_len, num_heads, num_hiddens / num_heads)    
+    # (batch_size, seq_len, num_heads, num_hiddens / num_heads)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
     # X shape: (batch_size, num_heads, seq_len, num_hiddens / num_heads)
@@ -143,8 +143,8 @@ Let's test the `MultiHeadAttention` model in the a toy example. Create a multi-h
 cell = MultiHeadAttention(90, 9, 0.5)
 cell.initialize()
 X = np.ones((2, 4, 5))
-valid_length = np.array([2, 3])
-cell(X, X, X, valid_length).shape
+valid_len = np.array([2, 3])
+cell(X, X, X, valid_len).shape
 ```
 
 ## Position-wise Feed-Forward Networks
@@ -276,8 +276,8 @@ class EncoderBlock(nn.Block):
         self.ffn = PositionWiseFFN(pw_num_hiddens, embed_size)
         self.addnorm2 = AddNorm(dropout)
 
-    def forward(self, X, valid_length):
-        Y = self.addnorm1(X, self.attention(X, X, X, valid_length))
+    def forward(self, X, valid_len):
+        Y = self.addnorm1(X, self.attention(X, X, X, valid_len))
         return self.addnorm2(Y, self.ffn(Y))
 ```
 
@@ -287,7 +287,7 @@ Due to the residual connections, this block will not change the input shape. It 
 X = np.ones((2, 100, 24))
 encoder_blk = EncoderBlock(24, 48, 8, 0.5)
 encoder_blk.initialize()
-encoder_blk(X, valid_length).shape
+encoder_blk(X, valid_len).shape
 ```
 
 Now it comes to the implementation of the entire Transformer encoder. With the Transformer encoder, $n$ blocks of `EncoderBlock` stack up one after another. Because of the residual connection, the embedding layer size $d$ is same as the Transformer block output size. Also note that we multiply the embedding output by $\sqrt{d}$ to prevent its values from being too small.
@@ -306,10 +306,10 @@ class TransformerEncoder(d2l.Encoder):
             self.blks.add(
                 EncoderBlock(embed_size, pw_num_hiddens, num_heads, dropout))
 
-    def forward(self, X, valid_length, *args):
+    def forward(self, X, valid_len, *args):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.embed_size))
         for blk in self.blks:
-            X = blk(X, valid_length)
+            X = blk(X, valid_len)
         return X
 ```
 
@@ -318,7 +318,7 @@ Let's create an encoder with two stacked  Transformer encoder blocks, whose hype
 ```{.python .input  n=15}
 encoder = TransformerEncoder(200, 24, 48, 8, 2, 0.5)
 encoder.initialize()
-encoder(np.ones((2, 100)), valid_length).shape
+encoder(np.ones((2, 100)), valid_len).shape
 ```
 
 ## Decoder
@@ -347,7 +347,7 @@ class DecoderBlock(nn.Block):
         self.addnorm3 = AddNorm(dropout)
 
     def forward(self, X, state):
-        enc_outputs, enc_valid_length = state[0], state[1]
+        enc_outputs, enc_valid_len = state[0], state[1]
         # state[2][i] contains the past queries for this block
         if state[2][self.i] is None:
             key_values = X
@@ -358,14 +358,14 @@ class DecoderBlock(nn.Block):
             batch_size, seq_len, _ = X.shape
             # Shape: (batch_size, seq_len), the values in the j-th column
             # are j+1
-            valid_length = np.tile(np.arange(1, seq_len+1, ctx=X.context),
+            valid_len = np.tile(np.arange(1, seq_len+1, ctx=X.context),
                                    (batch_size, 1))
         else:
-            valid_length = None
+            valid_len = None
 
-        X2 = self.attention1(X, key_values, key_values, valid_length)
+        X2 = self.attention1(X, key_values, key_values, valid_len)
         Y = self.addnorm1(X, X2)
-        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_length)
+        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_len)
         Z = self.addnorm2(Y, Y2)
         return self.addnorm3(Z, self.ffn(Z)), state
 ```
@@ -376,13 +376,13 @@ Similar to the  Transformer encoder block, `embed_size` should be equal to the l
 decoder_blk = DecoderBlock(24, 48, 8, 0.5, 0)
 decoder_blk.initialize()
 X = np.ones((2, 100, 24))
-state = [encoder_blk(X, valid_length), valid_length, [None]]
+state = [encoder_blk(X, valid_len), valid_len, [None]]
 decoder_blk(X, state)[0].shape
 ```
 
 The construction of the entire  Transformer decoder is identical to the  Transformer encoder, except for the additional dense layer to obtain the output confidence scores.
 
-Let's implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `embed_size`, the  Transformer decoder also needs the encoder Transformer's outputs `enc_outputs` and `env_valid_length`.
+Let's implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `embed_size`, the  Transformer decoder also needs the encoder Transformer's outputs `enc_outputs` and `env_valid_len`.
 
 ```{.python .input  n=18}
 class TransformerDecoder(d2l.Decoder):
@@ -400,8 +400,8 @@ class TransformerDecoder(d2l.Decoder):
                              dropout, i))
         self.dense = nn.Dense(vocab_size, flatten=False)
 
-    def init_state(self, enc_outputs, env_valid_length, *args):
-        return [enc_outputs, env_valid_length, [None]*self.num_layers]
+    def init_state(self, enc_outputs, env_valid_len, *args):
+        return [enc_outputs, env_valid_len, [None]*self.num_layers]
 
     def forward(self, X, state):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.embed_size))
