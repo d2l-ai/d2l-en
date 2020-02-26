@@ -311,7 +311,7 @@ We return to these topics throughout the book.
 
 
 Given the learned linear regression model
-$\hat{\mathbf{w}}^\top x + \hat{b}$,
+$\hat{\mathbf{w}}^\top \mathbf{x} + \hat{b}$,
 we can now estimate the price of a new house
 (not contained in the training data)
 given its area $x_1$ and age (year) $x_2$.
