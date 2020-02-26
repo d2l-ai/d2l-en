@@ -442,8 +442,6 @@ $$p(z) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (z - \m
 Below we define a Python function to compute the normal distribution.
 
 ```{.python .input}
-x = np.arange(-7, 7, 0.01)
-
 def normal(z, mu, sigma):
     p = 1 / math.sqrt(2 * math.pi * sigma**2)
     return p * np.exp(- 0.5 / sigma**2 * (z - mu)**2)
@@ -452,6 +450,8 @@ def normal(z, mu, sigma):
 We can now visualize the normal distributions.
 
 ```{.python .input  n=2}
+x = np.arange(-7, 7, 0.01)
+
 # Mean and variance pairs
 parameters = [(0, 1), (0, 2), (3, 1)]
 d2l.plot(x, [normal(x, mu, sigma) for mu, sigma in parameters], xlabel='z',
