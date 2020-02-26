@@ -68,13 +68,13 @@ def get_tokens_and_segments(tokens_a, tokens_b):
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
-def get_nsp_data_from_doc(doc, all_docs, vocab, max_length):
+def get_nsp_data_from_doc(doc, all_docs, vocab, max_len):
     nsp_data_from_doc = []
     for i in range(len(doc) - 1):
         tokens_a, tokens_b, is_next = get_next_sentence(
             doc[i], doc[i + 1], all_docs)
         # Consider 1 '[CLS]' token and 2 '[SEP]' tokens
-        if len(tokens_a) + len(tokens_b) + 3 > max_length:
+        if len(tokens_a) + len(tokens_b) + 3 > max_len:
              continue
         tokens, segment_ids = get_tokens_and_segments(tokens_a, tokens_b)
         nsp_data_from_doc.append((tokens, segment_ids, is_next))
@@ -94,7 +94,6 @@ def replace_mlm_tokens(tokens, candidate_mlm_pred_positions, num_mlm_preds,
     # Shuffle for gettting 15% random tokens for prediction in the masked
     # language model task
     random.shuffle(candidate_mlm_pred_positions)
-
     for mlm_pred_position in candidate_mlm_pred_positions:
         if len(mlm_pred_positions_and_labels) >= num_mlm_preds:
             break
@@ -129,29 +128,27 @@ def create_mlm_data_from_tokens(tokens, vocab):
         candidate_mlm_pred_positions.append(i)
     # 15% of random tokens will be predicted in the masked language model task 
     num_mlm_preds = max(1, int(round(len(tokens) * 0.15)))
-    output_tokens, mlm_pred_positions_and_labels = replace_mlm_tokens(
+    mlm_input_tokens, mlm_pred_positions_and_labels = replace_mlm_tokens(
         tokens, candidate_mlm_pred_positions, num_mlm_preds, vocab)
-
     mlm_pred_positions_and_labels = sorted(mlm_pred_positions_and_labels,
                                            key=lambda x: x[0])
-    mlm_pred_positions = []
-    mlm_pred_labels = []
-    for mlm_pred_position, mlm_pred_label in mlm_pred_positions_and_labels:
-        mlm_pred_positions.append(mlm_pred_position)
-        mlm_pred_labels.append(mlm_pred_label)
-    return vocab[output_tokens], mlm_pred_positions, vocab[mlm_pred_labels]
+    # e.g., [[1, 'an'], [12, 'car'], [25, '<unk>']] -> [1, 12, 25]
+    mlm_pred_positions = list(list(zip(*mlm_pred_positions_and_labels))[0])
+    # e.g., [[1, 'an'], [12, 'car'], [25, '<unk>']] -> ['an', 'car', '<unk>']
+    mlm_pred_labels = list(list(zip(*mlm_pred_positions_and_labels))[1])
+    return vocab[mlm_input_tokens], mlm_pred_positions, vocab[mlm_pred_labels]
 ```
 
 ...
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
-def convert_numpy(instances, max_length):
+def convert_numpy(instances, max_len):
     input_ids, segment_ids, masked_lm_positions, masked_lm_ids = [], [], [], []
     masked_lm_weights, next_sentence_labels, valid_lengths = [], [], []
     for instance in instances:
-        input_id = instance[0] + [0] * (max_length - len(instance[0]))
-        segment_id = instance[3] + [0] * (max_length - len(instance[3]))
+        input_id = instance[0] + [0] * (max_len - len(instance[0]))
+        segment_id = instance[3] + [0] * (max_len - len(instance[3]))
         masked_lm_position = instance[1] + [0] * (20 - len(instance[1]))
         masked_lm_id = instance[2] + [0] * (20 - len(instance[2]))
         masked_lm_weight = [1.0] * len(instance[2]) + [0.0] * (20 - len(instance[1]))
@@ -173,14 +170,14 @@ def convert_numpy(instances, max_length):
 
 ```{.python .input  n=10}
 # Saved in the d2l package for later use
-def create_training_instances(train_data, vocab, max_length):
+def create_training_instances(train_data, vocab, max_len):
     instances = []
     for i, doc in enumerate(train_data):
-        instances.extend(get_nsp_data_from_doc(doc, train_data, vocab, max_length))
+        instances.extend(get_nsp_data_from_doc(doc, train_data, vocab, max_len))
     instances = [(create_mlm_data_from_tokens(tokens, vocab) + (segment_ids, is_random_next))
                  for (tokens, segment_ids, is_random_next) in instances]
     input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
-           next_sentence_labels, segment_ids, valid_lengths = convert_numpy(instances, max_length)
+           next_sentence_labels, segment_ids, valid_lengths = convert_numpy(instances, max_len)
     return input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
            next_sentence_labels, segment_ids, valid_lengths
 ```
@@ -190,7 +187,7 @@ def create_training_instances(train_data, vocab, max_length):
 ```{.python .input  n=11}
 # Saved in the d2l package for later use
 class WikiDataset(gluon.data.Dataset):
-    def __init__(self, dataset, max_length = 128):
+    def __init__(self, dataset, max_len=128):
         train_tokens = [d2l.tokenize(row, token='word') for row in dataset]
         
         text_list=[]
@@ -199,7 +196,7 @@ class WikiDataset(gluon.data.Dataset):
                                reserved_tokens=['[MASK]', '[CLS]', '[SEP]'])
         self.input_ids, self.masked_lm_ids, self.masked_lm_positions,\
         self.masked_lm_weights, self.next_sentence_labels, self.segment_ids,\
-        self.valid_lengths = create_training_instances(train_tokens, self.vocab, max_length)
+        self.valid_lengths = create_training_instances(train_tokens, self.vocab, max_len)
 
     def __getitem__(self, idx):
         return self.input_ids[idx], self.masked_lm_ids[idx], self.masked_lm_positions[idx], self.masked_lm_weights[idx],\
@@ -209,7 +206,7 @@ class WikiDataset(gluon.data.Dataset):
         return len(self.input_ids)
 ```
 
-```{.python .input}
+```{.python .input  n=12}
 # Saved in the d2l package for later use
 def load_data_wiki(batch_size, data_set = 'wikitext-2', num_steps=128):
     data_dir = d2l.download_extract(data_set, data_set)
@@ -219,7 +216,7 @@ def load_data_wiki(batch_size, data_set = 'wikitext-2', num_steps=128):
     return train_iter, train_set.vocab
 ```
 
-```{.python .input}
+```{.python .input  n=13}
 batch_size = 512
 train_iter, vocab = load_data_wiki(batch_size, 'wikitext-2')
 ```
@@ -237,6 +234,16 @@ for _, data_batch in enumerate(train_iter):
     print(input_id.shape, masked_id.shape, masked_position.shape, masked_weight.shape,\
           next_sentence_label.shape, segment_id.shape, valid_length.shape)
     break
+```
+
+```{.json .output n=14}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "(512, 128) (512, 20) (512, 20) (512, 20) (512,) (512, 128) (512,)\n"
+ }
+]
 ```
 
 ...
@@ -343,4 +350,14 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx, log_interval
 
 ```{.python .input  n=19}
 train_bert(train_iter, net, nsp_loss, mlm_loss, len(vocab), ctx, 20, 1)
+```
+
+```{.json .output n=19}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "Eval mlm_loss=29.317\tnsp_loss=2.899\t\nEval cost=15.5s\n"
+ }
+]
 ```
