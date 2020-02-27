@@ -176,10 +176,6 @@ def convert_numpy(instances, max_len):
 ```{.python .input  n=10}
 # Saved in the d2l package for later use
 def create_training_instances(train_data, vocab, max_len):
-    #print('train_data[0]',train_data[0])
-    #print('max_len',max_len)
-    
-    
     instances = []
     for i, doc in enumerate(train_data):
         instances.extend(get_nsp_data_from_doc(doc, train_data, vocab, max_len))
@@ -246,16 +242,6 @@ for _, data_batch in enumerate(train_iter):
     print(input_id.shape, masked_id.shape, masked_position.shape, masked_weight.shape,\
           next_sentence_label.shape, segment_id.shape, valid_len.shape)
     break
-```
-
-```{.json .output n=14}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(512, 128) (512, 20) (512, 20) (512, 20) (512,) (512, 128) (512,)\n"
- }
-]
 ```
 
 ...
@@ -371,16 +357,6 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx,
 
 ```{.python .input  n=19}
 train_bert(train_iter, net, nsp_loss, mlm_loss, len(vocab), ctx, 20, 1)
-```
-
-```{.json .output n=19}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Eval mlm_loss=29.354\tnsp_loss=2.911\t\nEval cost=11.8s\n"
- }
-]
 ```
 
 ## Exercises
