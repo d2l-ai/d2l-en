@@ -109,7 +109,7 @@ and a linear predictor that acts upon that representation.
 
 ### Incorporating Hidden Layers
 
-We can over come these limitations of linear models
+We can overcome these limitations of linear models
 and handle a more general class of functions
 by incorporating one or more hidden layers.
 The easiest way to do this is to stack
@@ -141,7 +141,7 @@ every neuron in the output layer.
 
 ### From Linear to Nonlinear
 
-Formally, we calculate the each layer 
+Formally, we calculate each layer 
 in this one-hidden-layer MLP as follows:
 $$
 \begin{aligned}
@@ -211,10 +211,10 @@ to perform arbitrary computation,
 for instance, basic logic operations on a pair of inputs.
 Moreover, for certain choices of the activation function,
 it is widely known that MLPs are universal approximators.
-Even a single-hidden-layer network,
-given enough nodes (possibly absurdly manby), 
+Even with a single-hidden-layer network,
+given enough nodes (possibly absurdly many), 
 and the right set of weights,
-we can model any function at all.
+we can model any function.
 *Actually learning that function is the hard part.*
 You might think of your neural network 
 as being a bit like the C programming language. 
