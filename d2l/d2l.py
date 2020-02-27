@@ -1770,9 +1770,10 @@ d2l.DATA_HUB['wikitext-103'] = (
 def read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
-        raw = f.readlines()
+        lines = f.readlines()
+    # A line represents a paragragh.
     data = [line.strip().lower().split(' . ')
-            for line in raw if len(line.split(' . ')) >= 2]
+            for line in lines if len(line.split(' . ')) >= 2]
     random.shuffle(data)
     return data
 
@@ -1887,6 +1888,10 @@ def convert_numpy(instances, max_len):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def create_training_instances(train_data, vocab, max_len):
+    #print('train_data[0]',train_data[0])
+    #print('max_len',max_len)
+    
+    
     instances = []
     for i, doc in enumerate(train_data):
         instances.extend(get_nsp_data_from_doc(doc, train_data, vocab, max_len))
@@ -1901,15 +1906,18 @@ def create_training_instances(train_data, vocab, max_len):
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 class WikiDataset(gluon.data.Dataset):
     def __init__(self, dataset, max_len=128):
-        train_tokens = [d2l.tokenize(row, token='word') for row in dataset]
-
-        text_list=[]
-        [text_list.extend(row) for row in train_tokens]
-        self.vocab = d2l.Vocab(text_list, min_freq=5,
+        # dataset[i] is a list of sentence strings representing a paragraph
+        # paragraph_tokens[i] is a list of sentences representing a paragraph,
+        # where each sentence is a list of tokens
+        paragraph_tokens = [d2l.tokenize(
+            paragraph, token='word') for paragraph in dataset]
+        sentences = [sentence for paragraph in paragraph_tokens
+                     for sentence in paragraph]
+        self.vocab = d2l.Vocab(sentences, min_freq=5,
                                reserved_tokens=['[MASK]', '[CLS]', '[SEP]'])
         self.input_ids, self.masked_lm_ids, self.masked_lm_positions,\
         self.masked_lm_weights, self.next_sentence_labels, self.segment_ids,\
-        self.valid_lens = create_training_instances(train_tokens, self.vocab, max_len)
+        self.valid_lens = create_training_instances(paragraph_tokens, self.vocab, max_len)
 
     def __getitem__(self, idx):
         return self.input_ids[idx], self.masked_lm_ids[idx], self.masked_lm_positions[idx], self.masked_lm_weights[idx],\
@@ -1920,7 +1928,7 @@ class WikiDataset(gluon.data.Dataset):
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def load_data_wiki(batch_size, data_set = 'wikitext-2', num_steps=128):
+def load_data_wiki(batch_size, data_set='wikitext-2', num_steps=128):
     data_dir = d2l.download_extract(data_set, data_set)
     train_data = read_wiki(data_dir)
     train_set = WikiDataset(train_data, num_steps)
