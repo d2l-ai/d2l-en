@@ -16,8 +16,8 @@ then you are probably looking for a regression model.
 In practice, we are more often interested in classification: 
 asking not *how much?* but *which one?*
 
-* Does this email belong in the spam folder or the inbox*?
-* Is this customer more likely *to sign up* or *not to sign up* for a subscription service?*
+* Does this email belong in the spam folder or the inbox?
+* Is this customer more likely *to sign up* or *not to sign up* for a subscription service?
 * Does this image depict a donkey, a dog, a cat, or a rooster?
 * Which movie is Aston most likely to watch next?
 
