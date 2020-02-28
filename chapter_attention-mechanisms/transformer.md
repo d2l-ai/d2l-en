@@ -151,14 +151,14 @@ cell(X, X, X, valid_len).shape
 
 Another key component in the Transformer block is called *position-wise feed-forward network (FFN)*. It accepts a $3$-dimensional input with shape (batch size, sequence length, feature size). The position-wise FFN consists of two dense layers that applies to the last dimension. Since the same two dense layers are used for each position item in the sequence, we referred to it as *position-wise*. Indeed, it is equivalent to applying two $1 \times 1$ convolution layers.
 
-Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two dense layers of hidden size `pw_num_hiddens` and `pw_num_outputs`, respectively.
+Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two dense layers of hidden size `ffn_num_hiddens` and `pw_num_outputs`, respectively.
 
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
 class PositionWiseFFN(nn.Block):
-    def __init__(self, pw_num_hiddens, pw_num_outputs, **kwargs):
+    def __init__(self, ffn_num_hiddens, pw_num_outputs, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
-        self.dense1 = nn.Dense(pw_num_hiddens, flatten=False,
+        self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
                                activation='relu')
         self.dense2 = nn.Dense(pw_num_outputs, flatten=False)
 
@@ -236,13 +236,13 @@ for $i=0,\ldots, l-1$ and $j=0,\ldots,\lfloor(d-1)/2\rfloor$.
 ```{.python .input  n=10}
 # Saved in the d2l package for later use
 class PositionalEncoding(nn.Block):
-    def __init__(self, embed_size, dropout, max_len=1000):
+    def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enough P
-        self.P = np.zeros((1, max_len, embed_size))
+        self.P = np.zeros((1, max_len, num_hiddens))
         X = np.arange(0, max_len).reshape(-1, 1) / np.power(
-            10000, np.arange(0, embed_size, 2) / embed_size)
+            10000, np.arange(0, num_hiddens, 2) / num_hiddens)
         self.P[:, :, 0::2] = np.sin(X)
         self.P[:, :, 1::2] = np.cos(X)
 
@@ -263,17 +263,17 @@ d2l.plot(np.arange(100), Y[0, :, 4:8].T, figsize=(6, 2.5),
 
 ## Encoder
 
-Armed with all the essential components of Transformer, let's first build a Transformer encoder block. This encoder contains a multi-head attention layer, a position-wise feed-forward network, and two "add and norm" connection blocks. As shown in the code, for both of the attention model and the positional FFN model in the `EncoderBlock`, their outputs' dimension are equal to the `embed_size`. This is due to the nature of the residual block, as we need to add these outputs back to the original value during "add and norm".
+Armed with all the essential components of Transformer, let's first build a Transformer encoder block. This encoder contains a multi-head attention layer, a position-wise feed-forward network, and two "add and norm" connection blocks. As shown in the code, for both of the attention model and the positional FFN model in the `EncoderBlock`, their outputs' dimension are equal to the `num_hiddens`. This is due to the nature of the residual block, as we need to add these outputs back to the original value during "add and norm".
 
 ```{.python .input  n=12}
 # Saved in the d2l package for later use
 class EncoderBlock(nn.Block):
-    def __init__(self, embed_size, pw_num_hiddens, num_heads, dropout,
+    def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
                  **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = MultiHeadAttention(embed_size, num_heads, dropout)
+        self.attention = MultiHeadAttention(num_hiddens, num_heads, dropout)
         self.addnorm1 = AddNorm(dropout)
-        self.ffn = PositionWiseFFN(pw_num_hiddens, embed_size)
+        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(dropout)
 
     def forward(self, X, valid_len):
@@ -281,7 +281,7 @@ class EncoderBlock(nn.Block):
         return self.addnorm2(Y, self.ffn(Y))
 ```
 
-Due to the residual connections, this block will not change the input shape. It means that the `embed_size` argument should be equal to the input size of the last dimension. In our toy example below,  `embed_size` $= 24$, `pw_num_hiddens` $=48$, `num_heads` $= 8$, and `dropout` $= 0.5$.
+Due to the residual connections, this block will not change the input shape. It means that the `num_hiddens` argument should be equal to the input size of the last dimension. In our toy example below,  `num_hiddens` $= 24$, `ffn_num_hiddens` $=48$, `num_heads` $= 8$, and `dropout` $= 0.5$.
 
 ```{.python .input  n=13}
 X = np.ones((2, 100, 24))
@@ -295,19 +295,19 @@ Now it comes to the implementation of the entire Transformer encoder. With the T
 ```{.python .input  n=14}
 # Saved in the d2l package for later use
 class TransformerEncoder(d2l.Encoder):
-    def __init__(self, vocab_size, embed_size, pw_num_hiddens,
+    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
                  num_heads, num_layers, dropout, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
-        self.embed_size = embed_size
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.pos_encoding = PositionalEncoding(embed_size, dropout)
+        self.num_hiddens = num_hiddens
+        self.embedding = nn.Embedding(vocab_size, num_hiddens)
+        self.pos_encoding = PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(
-                EncoderBlock(embed_size, pw_num_hiddens, num_heads, dropout))
+                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout))
 
     def forward(self, X, valid_len, *args):
-        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.embed_size))
+        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
         for blk in self.blks:
             X = blk(X, valid_len)
         return X
@@ -335,15 +335,15 @@ During training, the output for the $t$-query could observe all the previous key
 ```{.python .input  n=16}
 class DecoderBlock(nn.Block):
     # i means it is the i-th block in the decoder
-    def __init__(self, embed_size, pw_num_hiddens, num_heads,
+    def __init__(self, num_hiddens, ffn_num_hiddens, num_heads,
                  dropout, i, **kwargs):
         super(DecoderBlock, self).__init__(**kwargs)
         self.i = i
-        self.attention1 = MultiHeadAttention(embed_size, num_heads, dropout)
+        self.attention1 = MultiHeadAttention(num_hiddens, num_heads, dropout)
         self.addnorm1 = AddNorm(dropout)
-        self.attention2 = MultiHeadAttention(embed_size, num_heads, dropout)
+        self.attention2 = MultiHeadAttention(num_hiddens, num_heads, dropout)
         self.addnorm2 = AddNorm(dropout)
-        self.ffn = PositionWiseFFN(pw_num_hiddens, embed_size)
+        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm3 = AddNorm(dropout)
 
     def forward(self, X, state):
@@ -370,7 +370,7 @@ class DecoderBlock(nn.Block):
         return self.addnorm3(Z, self.ffn(Z)), state
 ```
 
-Similar to the  Transformer encoder block, `embed_size` should be equal to the last dimension size of $X$.
+Similar to the  Transformer encoder block, `num_hiddens` should be equal to the last dimension size of $X$.
 
 ```{.python .input  n=17}
 decoder_blk = DecoderBlock(24, 48, 8, 0.5, 0)
@@ -382,21 +382,21 @@ decoder_blk(X, state)[0].shape
 
 The construction of the entire  Transformer decoder is identical to the  Transformer encoder, except for the additional dense layer to obtain the output confidence scores.
 
-Let's implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `embed_size`, the  Transformer decoder also needs the encoder Transformer's outputs `enc_outputs` and `env_valid_len`.
+Let's implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `num_hiddens`, the  Transformer decoder also needs the encoder Transformer's outputs `enc_outputs` and `env_valid_len`.
 
 ```{.python .input  n=18}
 class TransformerDecoder(d2l.Decoder):
-    def __init__(self, vocab_size, embed_size, pw_num_hiddens,
+    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
                  num_heads, num_layers, dropout, **kwargs):
         super(TransformerDecoder, self).__init__(**kwargs)
-        self.embed_size = embed_size
+        self.num_hiddens = num_hiddens
         self.num_layers = num_layers
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.pos_encoding = PositionalEncoding(embed_size, dropout)
+        self.embedding = nn.Embedding(vocab_size, num_hiddens)
+        self.pos_encoding = PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add(
-                DecoderBlock(embed_size, pw_num_hiddens, num_heads,
+                DecoderBlock(num_hiddens, ffn_num_hiddens, num_heads,
                              dropout, i))
         self.dense = nn.Dense(vocab_size, flatten=False)
 
@@ -404,7 +404,7 @@ class TransformerDecoder(d2l.Decoder):
         return [enc_outputs, env_valid_len, [None]*self.num_layers]
 
     def forward(self, X, state):
-        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.embed_size))
+        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
         for blk in self.blks:
             X, state = blk(X, state)
         return self.dense(X), state
@@ -416,18 +416,17 @@ Finally, we can build a encoder-decoder model with Transformer architecture.
 Similar to the seq2seq with attention model in :numref:`sec_seq2seq_attention`, we use the following hyperparameters: two Transformer blocks with both the embedding size and the block output size to be $32$. In addition, we use $4$ heads, and set the hidden size to be twice larger than the output size.
 
 ```{.python .input  n=19}
-embed_size, embed_size, num_layers, dropout = 32, 32, 2, 0.0
-batch_size, num_steps = 64, 10
+num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.0, 64, 10
 lr, num_epochs, ctx = 0.005, 100, d2l.try_gpu()
-num_hiddens, num_heads = 64, 4
+ffn_num_hiddens, num_heads = 64, 4
 
 src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
 
 encoder = TransformerEncoder(
-    len(src_vocab), embed_size, num_hiddens, num_heads, num_layers,
+    len(src_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,
     dropout)
 decoder = TransformerDecoder(
-    len(src_vocab), embed_size, num_hiddens, num_heads, num_layers,
+    len(src_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,
     dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
