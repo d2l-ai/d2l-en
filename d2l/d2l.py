@@ -225,8 +225,8 @@ class Accumulator(object):
     def reset(self):
         self.data = [0] * len(self.data)
 
-    def __getitem__(self, i):
-        return self.data[i]
+    def __getitem__(self, idx):
+        return self.data[idx]
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -1761,60 +1761,54 @@ d2l.DATA_HUB['wikitext-2'] = (
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-d2l.DATA_HUB['wikitext-103'] = (
-    'https://s3.amazonaws.com/research.metamind.io/wikitext/'
-    'wikitext-103-v1.zip', '0aec09a7537b58d4bb65362fee27650eeaba625a')
-
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
         lines = f.readlines()
     # A line represents a paragragh.
-    data = [line.strip().lower().split(' . ')
-            for line in lines if len(line.split(' . ')) >= 2]
-    random.shuffle(data)
-    return data
+    paragraghs = [line.strip().lower().split(' . ')
+                  for line in lines if len(line.split(' . ')) >= 2]
+    random.shuffle(paragraghs)
+    return paragraghs
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def get_next_sentence(sentence, next_sentence, all_docs):
+def get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
         is_next = True
     else:
-        # all_docs is a list of lists of lists
-        next_sentence = random.choice(random.choice(all_docs))
+        # paragraphs is a list of lists of lists
+        next_sentence = random.choice(random.choice(paragraphs))
         is_next = False
     return sentence, next_sentence, is_next
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def get_tokens_and_segments(tokens_a, tokens_b):
-    tokens = ['[CLS]'] + tokens_a + ['[SEP]'] + tokens_b + ['[SEP]']
+    tokens = ['<cls>'] + tokens_a + ['<sep>'] + tokens_b + ['<sep>']
     segment_ids = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
     return tokens, segment_ids
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def get_nsp_data_from_doc(doc, all_docs, vocab, max_len):
-    nsp_data_from_doc = []
-    for i in range(len(doc) - 1):
+def get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
+    nsp_data_from_paragraph = []
+    for i in range(len(paragraph) - 1):
         tokens_a, tokens_b, is_next = get_next_sentence(
-            doc[i], doc[i + 1], all_docs)
-        # Consider 1 '[CLS]' token and 2 '[SEP]' tokens
+            paragraph[i], paragraph[i + 1], paragraphs)
+        # Consider 1 '<cls>' token and 2 '<sep>' tokens
         if len(tokens_a) + len(tokens_b) + 3 > max_len:
              continue
         tokens, segment_ids = get_tokens_and_segments(tokens_a, tokens_b)
-        nsp_data_from_doc.append((tokens, segment_ids, is_next))
-    return nsp_data_from_doc
+        nsp_data_from_paragraph.append((tokens, segment_ids, is_next))
+    return nsp_data_from_paragraph
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def replace_mlm_tokens(tokens, candidate_mlm_pred_positions, num_mlm_preds,
                        vocab):
     # Make a new copy of tokens for the input of a masked language model,
-    # where the input may contain replaced '[MASK]' or random tokens
+    # where the input may contain replaced '<mask>' or random tokens
     mlm_input_tokens = [token for token in tokens]
     mlm_pred_positions_and_labels = []
     # Shuffle for gettting 15% random tokens for prediction in the masked
@@ -1824,9 +1818,9 @@ def replace_mlm_tokens(tokens, candidate_mlm_pred_positions, num_mlm_preds,
         if len(mlm_pred_positions_and_labels) >= num_mlm_preds:
             break
         masked_token = None
-        # 80% of the time: replace the word with the '[MASK]' token
+        # 80% of the time: replace the word with the '<mask>' token
         if random.random() < 0.8:
-            masked_token = '[MASK]'
+            masked_token = '<mask>'
         else:
             # 10% of the time: keep the word unchanged
             if random.random() < 0.5:
@@ -1841,12 +1835,12 @@ def replace_mlm_tokens(tokens, candidate_mlm_pred_positions, num_mlm_preds,
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def create_mlm_data_from_tokens(tokens, vocab):
+def get_mlm_data_from_tokens(tokens, vocab):
     candidate_mlm_pred_positions = []
     # tokens is a list of strings
     for i, token in enumerate(tokens):
         # Special tokens are not predicted in the masked language model task
-        if token in ['[CLS]', '[SEP]']:
+        if token in ['<cls>', '<sep>']:
             continue
         candidate_mlm_pred_positions.append(i)
     # 15% of random tokens will be predicted in the masked language model task
@@ -1863,104 +1857,99 @@ def create_mlm_data_from_tokens(tokens, vocab):
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def convert_numpy(instances, max_len):
-    input_ids, segment_ids, masked_lm_positions, masked_lm_ids = [], [], [], []
-    masked_lm_weights, next_sentence_labels, valid_lens = [], [], []
-    for instance in instances:
-        input_id = instance[0] + [0] * (max_len - len(instance[0]))
-        segment_id = instance[3] + [0] * (max_len - len(instance[3]))
-        masked_lm_position = instance[1] + [0] * (20 - len(instance[1]))
-        masked_lm_id = instance[2] + [0] * (20 - len(instance[2]))
-        masked_lm_weight = [1.0] * len(instance[2]) + [0.0] * (20 - len(instance[1]))
-        next_sentence_label = instance[4]
-        valid_len = len(instance[0])
-
-        input_ids.append(np.array(input_id, dtype='int32'))
-        segment_ids.append(np.array(segment_id, dtype='int32'))
-        masked_lm_positions.append(np.array(masked_lm_position, dtype='int32'))
-        masked_lm_ids.append(np.array(masked_lm_id, dtype='int32'))
-        masked_lm_weights.append(np.array(masked_lm_weight, dtype='float32'))
-        next_sentence_labels.append(np.array(next_sentence_label))
-        valid_lens.append(np.array(valid_len))
-    return input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
-           next_sentence_labels, segment_ids, valid_lens
-
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def create_training_instances(train_data, vocab, max_len):
-    #print('train_data[0]',train_data[0])
-    #print('max_len',max_len)
-    
-    
-    instances = []
-    for i, doc in enumerate(train_data):
-        instances.extend(get_nsp_data_from_doc(doc, train_data, vocab, max_len))
-    instances = [(create_mlm_data_from_tokens(tokens, vocab) + (segment_ids, is_random_next))
-                 for (tokens, segment_ids, is_random_next) in instances]
-    input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
-           next_sentence_labels, segment_ids, valid_lens = convert_numpy(instances, max_len)
-    return input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
-           next_sentence_labels, segment_ids, valid_lens
+def pad_bert_inputs(instances, max_len, vocab):
+    max_num_mlm_preds = int(round(max_len * 0.15))
+    X_mlm_tokens, Y_mlm, X_mlm_pred_positions = [], [], [] 
+    X_mlm_weights, Y_nsp, X_segments, valid_lens = [], [], [], []
+    for (mlm_input_ids, mlm_pred_positions, mlm_pred_label_ids, segment_ids,
+         is_next) in instances:
+        X_mlm_tokens.append(np.array(mlm_input_ids + [vocab['<pad>']] * (
+            max_len - len(mlm_input_ids)), dtype='int32'))
+        Y_mlm.append(np.array(mlm_pred_label_ids + [0] * (
+            20 - len(mlm_pred_label_ids)), dtype='int32'))
+        X_mlm_pred_positions.append(np.array(mlm_pred_positions + [0] * (
+            20 - len(mlm_pred_positions)), dtype='int32'))
+        # Predictions of padded tokens will be filtered out in the loss via
+        # multiplication of 0 weights
+        X_mlm_weights.append(np.array([1.0] * len(mlm_pred_label_ids) + [
+            0.0] * (20 - len(mlm_pred_positions)), dtype='float32'))
+        Y_nsp.append(np.array(is_next))
+        X_segments.append(np.array(segment_ids + [0] * (
+            max_len - len(segment_ids)), dtype='int32'))
+        valid_lens.append(np.array(len(mlm_input_ids)))
+    return (X_mlm_tokens, Y_mlm, X_mlm_pred_positions, X_mlm_weights, Y_nsp,
+            X_segments, valid_lens)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-class WikiDataset(gluon.data.Dataset):
-    def __init__(self, dataset, max_len=128):
-        # dataset[i] is a list of sentence strings representing a paragraph
-        # paragraph_tokens[i] is a list of sentences representing a paragraph,
-        # where each sentence is a list of tokens
-        paragraph_tokens = [d2l.tokenize(
-            paragraph, token='word') for paragraph in dataset]
-        sentences = [sentence for paragraph in paragraph_tokens
+class WikiTextDataset(gluon.data.Dataset):
+    def __init__(self, paragraghs, max_len=128):
+        # Input paragraghs[i] is a list of sentence strings representing a
+        # paragraph; while output paragraghs[i] is a list of sentences
+        # representing a paragraph, where each sentence is a list of tokens
+        paragraghs = [d2l.tokenize(
+            paragraph, token='word') for paragraph in paragraghs]
+        sentences = [sentence for paragraph in paragraghs
                      for sentence in paragraph]
-        self.vocab = d2l.Vocab(sentences, min_freq=5,
-                               reserved_tokens=['[MASK]', '[CLS]', '[SEP]'])
-        self.input_ids, self.masked_lm_ids, self.masked_lm_positions,\
-        self.masked_lm_weights, self.next_sentence_labels, self.segment_ids,\
-        self.valid_lens = create_training_instances(paragraph_tokens, self.vocab, max_len)
+        self.vocab = d2l.Vocab(sentences, min_freq=5, reserved_tokens=[
+            '<pad>', '<mask>', '<cls>', '<sep>'])
+        # Get data for the next sentence prediction task
+        instances = []
+        for paragraph in paragraghs:
+            instances.extend(get_nsp_data_from_paragraph(
+                paragraph, paragraghs, self.vocab, max_len))
+        # Get data for the masked language model task 
+        instances = [(get_mlm_data_from_tokens(tokens, self.vocab)
+                      + (segment_ids, is_next))
+                     for tokens, segment_ids, is_next in instances]
+        # Pad inputs
+        (self.X_mlm_tokens, self.Y_mlm, self.X_mlm_pred_positions,
+         self.X_mlm_weights, self.Y_nsp, self.X_segments,
+         self.valid_lens) = pad_bert_inputs(instances, max_len, self.vocab)
 
     def __getitem__(self, idx):
-        return self.input_ids[idx], self.masked_lm_ids[idx], self.masked_lm_positions[idx], self.masked_lm_weights[idx],\
-           self.next_sentence_labels[idx], self.segment_ids[idx], self.valid_lens[idx]
+        return (self.X_mlm_tokens[idx], self.Y_mlm[idx],
+                self.X_mlm_pred_positions[idx], self.X_mlm_weights[idx],
+                self.Y_nsp[idx], self.X_segments[idx], self.valid_lens[idx])
 
     def __len__(self):
-        return len(self.input_ids)
+        return len(self.X_mlm_tokens)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def load_data_wiki(batch_size, data_set='wikitext-2', num_steps=128):
-    data_dir = d2l.download_extract(data_set, data_set)
-    train_data = read_wiki(data_dir)
-    train_set = WikiDataset(train_data, num_steps)
+def load_data_wiki(batch_size, max_len):
+    data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
+    paragraghs = read_wiki(data_dir)
+    train_set = WikiTextDataset(paragraghs, max_len)
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
     return train_iter, train_set.vocab
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def _get_batch_bert(batch, ctx):
-    (input_id, masked_id, masked_position, masked_weight, \
-     next_sentence_label, segment_id, valid_len) = batch
+    (X_mlm_tokens, Y_mlm, X_mlm_pred_positions, X_mlm_weights, Y_nsp,
+     X_segments, valid_lens) = batch
     split_and_load = gluon.utils.split_and_load
-    return (split_and_load(input_id, ctx, even_split=False),
-            split_and_load(masked_id, ctx, even_split=False),
-            split_and_load(masked_position, ctx, even_split=False),
-            split_and_load(masked_weight, ctx, even_split=False),
-            split_and_load(next_sentence_label, ctx, even_split=False),
-            split_and_load(segment_id, ctx, even_split=False),
-            split_and_load(valid_len.astype('float32'), ctx,
+    return (split_and_load(X_mlm_tokens, ctx, even_split=False),
+            split_and_load(Y_mlm, ctx, even_split=False),
+            split_and_load(X_mlm_pred_positions, ctx, even_split=False),
+            split_and_load(X_mlm_weights, ctx, even_split=False),
+            split_and_load(Y_nsp, ctx, even_split=False),
+            split_and_load(X_segments, ctx, even_split=False),
+            split_and_load(valid_lens.astype('float32'), ctx,
                            even_split=False))
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id,
-                    masked_position, masked_weight, next_sentence_label,
-                    segment_id, valid_len, vocab_size):
+def batch_loss_bert(net, nsp_loss, mlm_loss, X_mlm_tokens, Y_mlm,
+                    X_mlm_pred_positions, X_mlm_weights, Y_nsp,
+                    X_segments, valid_lens, vocab_size):
     ls = []
     ls_mlm = []
     ls_nsp = []
     for i_id, m_id, m_pos, m_w, nsl, s_i, v_l in zip(
-        input_id, masked_id, masked_position, masked_weight,
-        next_sentence_label, segment_id, valid_len):
+        X_mlm_tokens, Y_mlm, X_mlm_pred_positions, X_mlm_weights,
+        Y_nsp, X_segments, valid_lens):
         num_masks = m_w.sum() + 1e-8
         _, decoded, classified = net(i_id, s_i, v_l.reshape(-1),m_pos)
         l_mlm = mlm_loss(decoded.reshape((-1, vocab_size)),m_id.reshape(-1),
@@ -1989,16 +1978,16 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx,
         total_mlm_loss = total_nsp_loss = 0
         running_num_tks = 0
         for _, data_batch in enumerate(data_eval):
-            (input_id, masked_id, masked_position, masked_weight, \
-             next_sentence_label, segment_id, valid_len) = _get_batch_bert(
+            (X_mlm_tokens, Y_mlm, X_mlm_pred_positions, X_mlm_weights, \
+             Y_nsp, X_segments, valid_lens) = _get_batch_bert(
                 data_batch, ctx)
 
             step_num += 1
             with autograd.record():
                 ls, ls_mlm, ls_nsp = batch_loss_bert(
-                    net, nsp_loss, mlm_loss, input_id, masked_id,
-                    masked_position, masked_weight, next_sentence_label,
-                    segment_id, valid_len, vocab_size)
+                    net, nsp_loss, mlm_loss, X_mlm_tokens, Y_mlm,
+                    X_mlm_pred_positions, X_mlm_weights, Y_nsp,
+                    X_segments, valid_lens, vocab_size)
             for l in ls:
                 l.backward()
 

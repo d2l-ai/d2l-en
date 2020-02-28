@@ -10,7 +10,6 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-
 ...
 
 ```{.python .input  n=3}
