@@ -183,7 +183,7 @@ All of these are random variables that occur jointly. When we deal with multiple
 
 The first is called the *joint probability* $P(A = a, B=b)$. Given any values $a$ and $b$, the joint probability lets us answer, what is the probability that $A=a$ and $B=b$ simultaneously?
 Note that for any values $a$ and $b$, $P(A=a, B=b) \leq P(A=a)$.
-This has to be the case, since for $A=a$ and $B=b$ to happen, $A=a$ has to happen *and* $B=b$ also has to happen (and vice versa). Thus, $A=a$ and $B=b$ cannot be more likely than $A=a$ or $B=b$ individually.
+This has to be the case, since for $A=a$ and $B=b$ to happen, $A=a$ has to happen and $B=b$ also has to happen (and vice versa). Thus, $A=a$ and $B=b$ cannot be more likely than $A=a$ or $B=b$ individually.
 
 
 ### Conditional Probability
