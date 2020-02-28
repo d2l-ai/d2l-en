@@ -119,7 +119,7 @@ that a given item belongs to class $k$.
 Then we can choose the class with the largest output value 
 as our prediction $\operatorname*{argmax}_k y_k$. 
 For example, if $\hat{y}_1$, $\hat{y}_2$, and $\hat{y}_3$ 
-are $0.1$, $.8$, and $0.1$, respectively,
+are $0.1$, $0.8$, and $0.1$, respectively,
 then we predict category $2$, which (in our example) represents "chicken".
 
 You might be tempted to suggest that we interpret 
