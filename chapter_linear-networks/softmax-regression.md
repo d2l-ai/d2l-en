@@ -135,7 +135,7 @@ we must guarantee that (even on new data),
 they will be nonnegative and sum up to 1. 
 Moreover, we need a training objective that encourages 
 the model to estimate faithfully *probabilities*.
-Of all instances when a classifier outputs $.5$,
+Of all instances when a classifier outputs $0.5$,
 we hope that half of those examples 
 will *actually* belong to the predicted class.
 This is a property called *calibration*.
