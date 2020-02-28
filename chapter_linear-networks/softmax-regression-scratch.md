@@ -101,7 +101,7 @@ is also sometimes called the partition function
 (and its logarithm is called the log-partition function).
 The origins of that name are in [statistical physics](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics))
 where a related equation models the distribution
-over an ensemble of particles).
+over an ensemble of particles.
 
 ```{.python .input  n=6}
 def softmax(X):
