@@ -142,7 +142,7 @@ the model training process is similar to that of AlexNet in the last section.
 ```{.python .input}
 lr, num_epochs, batch_size = 0.05, 10, 128,
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
-d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary

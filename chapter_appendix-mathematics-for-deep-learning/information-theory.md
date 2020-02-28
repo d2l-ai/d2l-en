@@ -163,7 +163,7 @@ Notice that this is the same *code* as before, but now we interpret it different
 
 ### Conditional Entropy
 
-The joint entropy defined above the amount of information contained in a pair of random variables.  This is useful, but often times it is not what we care about.  Consider the setting of machine learning.  Let's take $X$ to be the random variable (or vector of random variables) that describes the pixel values of an image, and $Y$ to be the random variable which is the class label.  $X$ should contain substantial information---a natural image is a complex thing.  However, the information contained in $Y$ once the image has been show should be low.  Indeed, the image of a digit should already contain the information about what digit it is unless the digit is illegible.  Thus, to continue to extend our vocabulary of information theory, we need to be able to reason about the information content in a random variable conditional on another.
+The joint entropy defined above the amount of information contained in a pair of random variables.  This is useful, but oftentimes it is not what we care about.  Consider the setting of machine learning.  Let's take $X$ to be the random variable (or vector of random variables) that describes the pixel values of an image, and $Y$ to be the random variable which is the class label.  $X$ should contain substantial information---a natural image is a complex thing.  However, the information contained in $Y$ once the image has been show should be low.  Indeed, the image of a digit should already contain the information about what digit it is unless the digit is illegible.  Thus, to continue to extend our vocabulary of information theory, we need to be able to reason about the information content in a random variable conditional on another.
 
 In the probability theory, we saw the definition of the *conditional probability* to measure the relationship between variables. We now want to analogously define the *conditional entropy* $H(Y \mid X)$.  We can write this as 
 
@@ -315,10 +315,10 @@ First, let's generate and sort three `ndarray`s of length $10,000$: an objective
 ```{.python .input}
 random.seed(1)
 
-nd_length = 10000
-p = np.random.normal(loc=0, scale=1, size=(nd_length, ))
-q1 = np.random.normal(loc=-1, scale=1, size=(nd_length, ))
-q2 = np.random.normal(loc=1, scale=1, size=(nd_length, ))
+nd_len = 10000
+p = np.random.normal(loc=0, scale=1, size=(nd_len, ))
+q1 = np.random.normal(loc=-1, scale=1, size=(nd_len, ))
+q2 = np.random.normal(loc=1, scale=1, size=(nd_len, ))
 
 p = np.array(sorted(p.asnumpy()))
 q1 = np.array(sorted(q1.asnumpy()))

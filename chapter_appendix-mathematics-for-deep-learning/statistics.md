@@ -124,8 +124,8 @@ To illustrate the equation of the bias-variance trade-off, let's simulate of nor
 ```{.python .input}
 theta_true = 1
 sigma = 4
-sample_length = 10000
-samples = np.random.normal(theta_true, sigma, sample_length)
+sample_len = 10000
+samples = np.random.normal(theta_true, sigma, sample_len)
 theta_est = np.mean(samples)
 theta_est
 ```

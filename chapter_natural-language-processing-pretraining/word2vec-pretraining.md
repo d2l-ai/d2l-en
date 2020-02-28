@@ -1,4 +1,4 @@
-# Implementation of Word2vec
+# Pretraining word2vec
 :label:`sec_word2vec_gluon`
 
 In this section, we will train a skip-gram model defined in
@@ -162,7 +162,7 @@ get_similar_tokens('chip', 3, net[0])
 
 ## Summary
 
-* We can use Gluon to train a skip-gram model through negative sampling.
+* We can pretrain a skip-gram model through negative sampling.
 
 
 ## Exercises
@@ -175,4 +175,4 @@ get_similar_tokens('chip', 3, net[0])
 
 ## [Discussions](https://discuss.mxnet.io/t/2387)
 
-![](../img/qr_word2vec-gluon.svg)
+![](../img/qr_word2vec-pretraining.svg)

@@ -41,9 +41,13 @@ We will cover them in :numref:`chap_nlp_app`.
 word2vec
 approx-training
 word2vec-dataset
-word2vec-gluon
+word2vec-pretraining
 glove
 subword-embedding
 similarity-analogy
+bert
+bert-pretraining
+natural-language-inference-bert
+
 ```
 

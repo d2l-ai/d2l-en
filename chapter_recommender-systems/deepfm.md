@@ -50,7 +50,7 @@ class DeepFM(nn.Block):
         num_inputs = int(sum(field_dims))
         self.embedding = nn.Embedding(num_inputs, num_factors)
         self.fc = nn.Embedding(num_inputs, 1)
-        self.linear_layer = gluon.nn.Dense(1, use_bias=True)
+        self.linear_layer = nn.Dense(1, use_bias=True)
         input_dim = self.embed_output_dim = len(field_dims) * num_factors
         self.mlp = nn.Sequential()
         for dim in mlp_dims:

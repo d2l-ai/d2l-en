@@ -101,7 +101,7 @@ test_iter = d2l.load_array((features[:n_train], labels[:n_train]),
 
 # Vanilla MLP architecture
 def get_net():
-    net = gluon.nn.Sequential()
+    net = nn.Sequential()
     net.add(nn.Dense(10, activation='relu'),
             nn.Dense(1))
     net.initialize(init.Xavier())

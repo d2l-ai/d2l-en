@@ -251,8 +251,8 @@ class Accumulator(object):
     def reset(self):
         self.data = [0] * len(self.data)
 
-    def __getitem__(self, i):
-        return self.data[i]
+    def __getitem__(self, idx):
+        return self.data[idx]
 ```
 
 Because we initialized the `net` model with random weights,

@@ -36,7 +36,7 @@ ctx = d2l.try_gpu()
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to "d2l.train_ch5" that defined in the lenet
+# The code is almost identical to "d2l.train_ch6" that defined in the lenet
 # section of chapter convolutional neural networks
 def train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())

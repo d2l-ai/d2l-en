@@ -155,10 +155,11 @@ class SeqDataset(gluon.data.Dataset):
     def __len__(self):
         return self.ns
     
-    def __getitem__(self, i):
-        neg = list(self.all_items - set(self.cand[int(self.seq_users[i])]))
-        idx = random.randint(0, len(neg) - 1)
-        return self.seq_users[i], self.seq_items[i], self.seq_tgt[i], neg[idx]
+    def __getitem__(self, idx):
+        neg = list(self.all_items - set(self.cand[int(self.seq_users[idx])]))
+        i = random.randint(0, len(neg) - 1)
+        return (self.seq_users[idx], self.seq_items[idx], self.seq_tgt[idx],
+                neg[i])
 ```
 
 ## Load the MovieLens 100K dataset
