@@ -1844,41 +1844,43 @@ def get_mlm_data_from_tokens(tokens, vocab):
             continue
         candidate_mlm_pred_positions.append(i)
     # 15% of random tokens will be predicted in the masked language model task
-    num_mlm_preds = max(1, int(round(len(tokens) * 0.15)))
+    num_mlm_preds = max(1, round(len(tokens) * 0.15))
     mlm_input_tokens, mlm_pred_positions_and_labels = replace_mlm_tokens(
         tokens, candidate_mlm_pred_positions, num_mlm_preds, vocab)
     mlm_pred_positions_and_labels = sorted(mlm_pred_positions_and_labels,
                                            key=lambda x: x[0])
+    
+    zipped_positions_and_labels = list(zip(*mlm_pred_positions_and_labels))
     # e.g., [[1, 'an'], [12, 'car'], [25, '<unk>']] -> [1, 12, 25]
-    mlm_pred_positions = list(list(zip(*mlm_pred_positions_and_labels))[0])
+    mlm_pred_positions = list(zipped_positions_and_labels[0])
     # e.g., [[1, 'an'], [12, 'car'], [25, '<unk>']] -> ['an', 'car', '<unk>']
-    mlm_pred_labels = list(list(zip(*mlm_pred_positions_and_labels))[1])
+    mlm_pred_labels = list(zipped_positions_and_labels[1])
     return vocab[mlm_input_tokens], mlm_pred_positions, vocab[mlm_pred_labels]
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def pad_bert_inputs(instances, max_len, vocab):
-    max_num_mlm_preds = int(round(max_len * 0.15))
-    X_mlm_tokens, Y_mlm, X_mlm_pred_positions = [], [], [] 
-    X_mlm_weights, Y_nsp, X_segments, valid_lens = [], [], [], []
+    max_num_mlm_preds = round(max_len * 0.15)
+    X_mlm_tokens, X_segments, valid_lens = [], [], []
+    X_mlm_pred_positions, X_mlm_weights, Y_mlm, y_nsp = [], [], [], []
     for (mlm_input_ids, mlm_pred_positions, mlm_pred_label_ids, segment_ids,
          is_next) in instances:
         X_mlm_tokens.append(np.array(mlm_input_ids + [vocab['<pad>']] * (
             max_len - len(mlm_input_ids)), dtype='int32'))
-        Y_mlm.append(np.array(mlm_pred_label_ids + [0] * (
-            20 - len(mlm_pred_label_ids)), dtype='int32'))
+        X_segments.append(np.array(segment_ids + [0] * (
+            max_len - len(segment_ids)), dtype='int32'))
+        valid_lens.append(np.array(len(mlm_input_ids)))
         X_mlm_pred_positions.append(np.array(mlm_pred_positions + [0] * (
             20 - len(mlm_pred_positions)), dtype='int32'))
         # Predictions of padded tokens will be filtered out in the loss via
         # multiplication of 0 weights
         X_mlm_weights.append(np.array([1.0] * len(mlm_pred_label_ids) + [
             0.0] * (20 - len(mlm_pred_positions)), dtype='float32'))
-        Y_nsp.append(np.array(is_next))
-        X_segments.append(np.array(segment_ids + [0] * (
-            max_len - len(segment_ids)), dtype='int32'))
-        valid_lens.append(np.array(len(mlm_input_ids)))
-    return (X_mlm_tokens, Y_mlm, X_mlm_pred_positions, X_mlm_weights, Y_nsp,
-            X_segments, valid_lens)
+        Y_mlm.append(np.array(mlm_pred_label_ids + [0] * (
+            20 - len(mlm_pred_label_ids)), dtype='int32'))
+        y_nsp.append(np.array(is_next))
+    return (X_mlm_tokens, X_segments, valid_lens, X_mlm_pred_positions,
+            X_mlm_weights, Y_mlm, y_nsp)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
@@ -1903,14 +1905,14 @@ class WikiTextDataset(gluon.data.Dataset):
                       + (segment_ids, is_next))
                      for tokens, segment_ids, is_next in instances]
         # Pad inputs
-        (self.X_mlm_tokens, self.Y_mlm, self.X_mlm_pred_positions,
-         self.X_mlm_weights, self.Y_nsp, self.X_segments,
-         self.valid_lens) = pad_bert_inputs(instances, max_len, self.vocab)
+        (self.X_mlm_tokens, self.X_segments, self.valid_lens,
+         self.X_mlm_pred_positions, self.X_mlm_weights, self.Y_mlm,
+         self.y_nsp) = pad_bert_inputs(instances, max_len, self.vocab)
 
     def __getitem__(self, idx):
-        return (self.X_mlm_tokens[idx], self.Y_mlm[idx],
-                self.X_mlm_pred_positions[idx], self.X_mlm_weights[idx],
-                self.Y_nsp[idx], self.X_segments[idx], self.valid_lens[idx])
+        return (self.X_mlm_tokens[idx], self.X_segments[idx],
+                self.valid_lens[idx], self.X_mlm_pred_positions[idx],
+                self.X_mlm_weights[idx], self.Y_mlm[idx], self.y_nsp[idx])
 
     def __len__(self):
         return len(self.X_mlm_tokens)
@@ -1927,35 +1929,43 @@ def load_data_wiki(batch_size, max_len):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def _get_batch_bert(batch, ctx):
-    (X_mlm_tokens, Y_mlm, X_mlm_pred_positions, X_mlm_weights, Y_nsp,
-     X_segments, valid_lens) = batch
+    (X_mlm_tokens, X_segments, valid_lens, X_mlm_pred_positions,
+     X_mlm_weights, Y_mlm, y_nsp) = batch
     split_and_load = gluon.utils.split_and_load
     return (split_and_load(X_mlm_tokens, ctx, even_split=False),
-            split_and_load(Y_mlm, ctx, even_split=False),
-            split_and_load(X_mlm_pred_positions, ctx, even_split=False),
-            split_and_load(X_mlm_weights, ctx, even_split=False),
-            split_and_load(Y_nsp, ctx, even_split=False),
             split_and_load(X_segments, ctx, even_split=False),
             split_and_load(valid_lens.astype('float32'), ctx,
-                           even_split=False))
+                           even_split=False),
+            split_and_load(X_mlm_pred_positions, ctx, even_split=False),
+            split_and_load(X_mlm_weights, ctx, even_split=False),
+            split_and_load(Y_mlm, ctx, even_split=False),
+            split_and_load(y_nsp, ctx, even_split=False))
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def batch_loss_bert(net, nsp_loss, mlm_loss, X_mlm_tokens, Y_mlm,
-                    X_mlm_pred_positions, X_mlm_weights, Y_nsp,
-                    X_segments, valid_lens, vocab_size):
+def batch_loss_bert(net, nsp_loss, mlm_loss, X_mlm_tokens_shards,
+                    X_segments_shards, valid_lens_shards,
+                    X_mlm_pred_positions_shards, X_mlm_weights_shards,
+                    Y_mlm_shards, y_nsp_shards, vocab_size):
     ls = []
     ls_mlm = []
     ls_nsp = []
-    for i_id, m_id, m_pos, m_w, nsl, s_i, v_l in zip(
-        X_mlm_tokens, Y_mlm, X_mlm_pred_positions, X_mlm_weights,
-        Y_nsp, X_segments, valid_lens):
-        num_masks = m_w.sum() + 1e-8
-        _, decoded, classified = net(i_id, s_i, v_l.reshape(-1),m_pos)
-        l_mlm = mlm_loss(decoded.reshape((-1, vocab_size)),m_id.reshape(-1),
-                         m_w.reshape((-1, 1)))
+    for (X_mlm_tokens_shard, X_segments_shard, valid_lens_shard,
+         X_mlm_pred_positions_shard, X_mlm_weights_shard, Y_mlm_shard,
+         y_nsp_shard) in zip(
+        X_mlm_tokens_shards, X_segments_shards, valid_lens_shards,
+        X_mlm_pred_positions_shards, X_mlm_weights_shards, Y_mlm_shards,
+        y_nsp_shards):
+
+        num_masks = X_mlm_weights_shard.sum() + 1e-8
+        _, decoded, classified = net(
+            X_mlm_tokens_shard, X_segments_shard,
+            valid_lens_shard.reshape(-1), X_mlm_pred_positions_shard)
+        l_mlm = mlm_loss(
+            decoded.reshape((-1, vocab_size)), Y_mlm_shard.reshape(-1),
+            X_mlm_weights_shard.reshape((-1, 1)))
         l_mlm = l_mlm.sum() / num_masks
-        l_nsp = nsp_loss(classified, nsl)
+        l_nsp = nsp_loss(classified, y_nsp_shard)
         l_nsp = l_nsp.mean()
         l = l_mlm + l_nsp
         ls.append(l)
@@ -1978,16 +1988,17 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx,
         total_mlm_loss = total_nsp_loss = 0
         running_num_tks = 0
         for _, data_batch in enumerate(data_eval):
-            (X_mlm_tokens, Y_mlm, X_mlm_pred_positions, X_mlm_weights, \
-             Y_nsp, X_segments, valid_lens) = _get_batch_bert(
-                data_batch, ctx)
+            (X_mlm_tokens_shards, X_segments_shards, valid_lens_shards,
+             X_mlm_pred_positions_shards, X_mlm_weights_shards,
+             Y_mlm_shards, y_nsp_shards) = _get_batch_bert(data_batch, ctx)
 
             step_num += 1
             with autograd.record():
                 ls, ls_mlm, ls_nsp = batch_loss_bert(
-                    net, nsp_loss, mlm_loss, X_mlm_tokens, Y_mlm,
-                    X_mlm_pred_positions, X_mlm_weights, Y_nsp,
-                    X_segments, valid_lens, vocab_size)
+                    net, nsp_loss, mlm_loss, X_mlm_tokens_shards,
+                    X_segments_shards, valid_lens_shards,
+                    X_mlm_pred_positions_shards, X_mlm_weights_shards,
+                    Y_mlm_shards, y_nsp_shards, vocab_size)
             for l in ls:
                 l.backward()
 
