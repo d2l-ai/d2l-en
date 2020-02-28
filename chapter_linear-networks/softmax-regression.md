@@ -334,7 +334,7 @@ If it is always easy for us to predict the next token,
 then this data is easy to compress! 
 Take the extreme example where every token in the stream always takes the same value.
 That is a very boring data stream! 
-And not only is it boring, but it is easy to predict. 
+And not only it is boring, but it is easy to predict. 
 Because they are always the same, we do not have to transmit any information 
 to communicate the contents of the stream.
 Easy to predict, easy to compress.
