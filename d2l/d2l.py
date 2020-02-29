@@ -1055,9 +1055,9 @@ def transpose_output(X, num_heads):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionWiseFFN(nn.Block):
-    def __init__(self, pw_num_hiddens, pw_num_outputs, **kwargs):
+    def __init__(self, ffn_num_hiddens, pw_num_outputs, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
-        self.dense1 = nn.Dense(pw_num_hiddens, flatten=False,
+        self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
                                activation='relu')
         self.dense2 = nn.Dense(pw_num_outputs, flatten=False)
 
@@ -1078,13 +1078,13 @@ class AddNorm(nn.Block):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionalEncoding(nn.Block):
-    def __init__(self, embed_size, dropout, max_len=1000):
+    def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enough P
-        self.P = np.zeros((1, max_len, embed_size))
+        self.P = np.zeros((1, max_len, num_hiddens))
         X = np.arange(0, max_len).reshape(-1, 1) / np.power(
-            10000, np.arange(0, embed_size, 2) / embed_size)
+            10000, np.arange(0, num_hiddens, 2) / num_hiddens)
         self.P[:, :, 0::2] = np.sin(X)
         self.P[:, :, 1::2] = np.cos(X)
 
@@ -1095,12 +1095,12 @@ class PositionalEncoding(nn.Block):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class EncoderBlock(nn.Block):
-    def __init__(self, embed_size, pw_num_hiddens, num_heads, dropout,
+    def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
                  **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = MultiHeadAttention(embed_size, num_heads, dropout)
+        self.attention = MultiHeadAttention(num_hiddens, num_heads, dropout)
         self.addnorm1 = AddNorm(dropout)
-        self.ffn = PositionWiseFFN(pw_num_hiddens, embed_size)
+        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(dropout)
 
     def forward(self, X, valid_len):
@@ -1110,19 +1110,19 @@ class EncoderBlock(nn.Block):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class TransformerEncoder(d2l.Encoder):
-    def __init__(self, vocab_size, embed_size, pw_num_hiddens,
+    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
                  num_heads, num_layers, dropout, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
-        self.embed_size = embed_size
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.pos_encoding = PositionalEncoding(embed_size, dropout)
+        self.num_hiddens = num_hiddens
+        self.embedding = nn.Embedding(vocab_size, num_hiddens)
+        self.pos_encoding = PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(
-                EncoderBlock(embed_size, pw_num_hiddens, num_heads, dropout))
+                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout))
 
     def forward(self, X, valid_len, *args):
-        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.embed_size))
+        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
         for blk in self.blks:
             X = blk(X, valid_len)
         return X
@@ -1673,24 +1673,24 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class BERTEncoder(nn.Block):
-    def __init__(self, vocab_size, embed_size, pw_num_hiddens, num_heads,
+    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                  num_layers, dropout, **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
-        self.token_embedding = nn.Embedding(vocab_size, embed_size)
-        self.segment_embedding = nn.Embedding(2, embed_size)
-        self.pos_encoding = d2l.PositionalEncoding(embed_size, dropout)
+        self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
+        self.segment_embedding = nn.Embedding(2, num_hiddens)
+        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(d2l.EncoderBlock(
-                embed_size, pw_num_hiddens, num_heads, dropout))
+                num_hiddens, ffn_num_hiddens, num_heads, dropout))
 
-    def forward(self, tokens, segments, valid_len):
+    def forward(self, tokens, segments, valid_lens):
         # Shape of X remains unchanged in the following code snippet:
-        # (batch size, max sequence length, embed_size)
+        # (batch size, max sequence length, num_hiddens)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = self.pos_encoding(X)
         for blk in self.blks:
-            X = blk(X, valid_len)
+            X = blk(X, valid_lens)
         return X
 
 
@@ -1704,16 +1704,16 @@ class MaskLM(nn.Block):
         self.mlp.add(nn.LayerNorm())
         self.mlp.add(nn.Dense(vocab_size, flatten=False))
 
-    def forward(self, X, masked_positions):
-        num_masked_positions = masked_positions.shape[1]
-        masked_positions = masked_positions.reshape(-1)
+    def forward(self, X, pred_positions):
+        num_pred_positions = pred_positions.shape[1]
+        pred_positions = pred_positions.reshape(-1)
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
-        # Suppose that batch_size = 2, num_masked_positions = 3,
+        # Suppose that batch_size = 2, num_pred_positions = 3,
         # batch_idx = np.array([0, 0, 0, 1, 1, 1])
-        batch_idx = np.repeat(batch_idx, num_masked_positions)
-        masked_X = X[batch_idx, masked_positions]
-        masked_X = masked_X.reshape((batch_size, num_masked_positions, -1))
+        batch_idx = np.repeat(batch_idx, num_pred_positions)
+        masked_X = X[batch_idx, pred_positions]
+        masked_X = masked_X.reshape((batch_size, num_pred_positions, -1))
         masked_preds = self.mlp(masked_X)
         return masked_preds
 
@@ -1729,25 +1729,25 @@ class NextSentencePred(nn.Block):
     def forward(self, X):
         # 0 is the index of the CLS token
         X = X[:, 0, :]
-        # X shape: (batch size, embed_size)
+        # X shape: (batch size, num_hiddens)
         return self.mlp(X)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class BERTModel(nn.Block):
-    def __init__(self, vocab_size, embed_size, pw_num_hiddens, num_heads,
+    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                  num_layers, dropout):
         super(BERTModel, self).__init__()
-        self.encoder = BERTEncoder(vocab_size, embed_size, pw_num_hiddens,
+        self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
                                    num_heads, num_layers, dropout)
-        self.nsp = NextSentencePred(embed_size)
-        self.mlm = MaskLM(vocab_size, embed_size)
+        self.nsp = NextSentencePred(num_hiddens)
+        self.mlm = MaskLM(vocab_size, num_hiddens)
 
-    def forward(self, tokens, segments, valid_len=None,
-                masked_positions=None):
-        X = self.encoder(tokens, segments, valid_len)
-        if masked_positions is not None:
-            mlm_Y = self.mlm(X, masked_positions)
+    def forward(self, tokens, segments, valid_lens=None,
+                pred_positions=None):
+        X = self.encoder(tokens, segments, valid_lens)
+        if pred_positions is not None:
+            mlm_Y = self.mlm(X, pred_positions)
         else:
             mlm_Y = None
         nsp_Y = self.nsp(X)
@@ -1805,17 +1805,17 @@ def get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def replace_mlm_tokens(tokens, candidate_mlm_pred_positions, num_mlm_preds,
+def replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                        vocab):
     # Make a new copy of tokens for the input of a masked language model,
     # where the input may contain replaced '<mask>' or random tokens
     mlm_input_tokens = [token for token in tokens]
-    mlm_pred_positions_and_labels = []
+    pred_positions_and_labels = []
     # Shuffle for gettting 15% random tokens for prediction in the masked
     # language model task
-    random.shuffle(candidate_mlm_pred_positions)
-    for mlm_pred_position in candidate_mlm_pred_positions:
-        if len(mlm_pred_positions_and_labels) >= num_mlm_preds:
+    random.shuffle(candidate_pred_positions)
+    for mlm_pred_position in candidate_pred_positions:
+        if len(pred_positions_and_labels) >= num_mlm_preds:
             break
         masked_token = None
         # 80% of the time: replace the word with the '<mask>' token
@@ -1829,57 +1829,57 @@ def replace_mlm_tokens(tokens, candidate_mlm_pred_positions, num_mlm_preds,
             else:
                 masked_token = random.randint(0, len(vocab) - 1)
         mlm_input_tokens[mlm_pred_position] = masked_token
-        mlm_pred_positions_and_labels.append(
+        pred_positions_and_labels.append(
             (mlm_pred_position, tokens[mlm_pred_position]))
-    return mlm_input_tokens, mlm_pred_positions_and_labels
+    return mlm_input_tokens, pred_positions_and_labels
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def get_mlm_data_from_tokens(tokens, vocab):
-    candidate_mlm_pred_positions = []
+    candidate_pred_positions = []
     # tokens is a list of strings
     for i, token in enumerate(tokens):
         # Special tokens are not predicted in the masked language model task
         if token in ['<cls>', '<sep>']:
             continue
-        candidate_mlm_pred_positions.append(i)
+        candidate_pred_positions.append(i)
     # 15% of random tokens will be predicted in the masked language model task
     num_mlm_preds = max(1, round(len(tokens) * 0.15))
-    mlm_input_tokens, mlm_pred_positions_and_labels = replace_mlm_tokens(
-        tokens, candidate_mlm_pred_positions, num_mlm_preds, vocab)
-    mlm_pred_positions_and_labels = sorted(mlm_pred_positions_and_labels,
+    mlm_input_tokens, pred_positions_and_labels = replace_mlm_tokens(
+        tokens, candidate_pred_positions, num_mlm_preds, vocab)
+    pred_positions_and_labels = sorted(pred_positions_and_labels,
                                            key=lambda x: x[0])
-    
-    zipped_positions_and_labels = list(zip(*mlm_pred_positions_and_labels))
+
+    zipped_positions_and_labels = list(zip(*pred_positions_and_labels))
     # e.g., [[1, 'an'], [12, 'car'], [25, '<unk>']] -> [1, 12, 25]
-    mlm_pred_positions = list(zipped_positions_and_labels[0])
+    pred_positions = list(zipped_positions_and_labels[0])
     # e.g., [[1, 'an'], [12, 'car'], [25, '<unk>']] -> ['an', 'car', '<unk>']
     mlm_pred_labels = list(zipped_positions_and_labels[1])
-    return vocab[mlm_input_tokens], mlm_pred_positions, vocab[mlm_pred_labels]
+    return vocab[mlm_input_tokens], pred_positions, vocab[mlm_pred_labels]
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def pad_bert_inputs(instances, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
-    X_mlm_tokens, X_segments, valid_lens = [], [], []
-    X_mlm_pred_positions, X_mlm_weights, Y_mlm, y_nsp = [], [], [], []
-    for (mlm_input_ids, mlm_pred_positions, mlm_pred_label_ids, segment_ids,
+    X_tokens, X_segments, x_valid_lens = [], [], []
+    X_pred_positions, X_mlm_weights, Y_mlm, y_nsp = [], [], [], []
+    for (mlm_input_ids, pred_positions, mlm_pred_label_ids, segment_ids,
          is_next) in instances:
-        X_mlm_tokens.append(np.array(mlm_input_ids + [vocab['<pad>']] * (
+        X_tokens.append(np.array(mlm_input_ids + [vocab['<pad>']] * (
             max_len - len(mlm_input_ids)), dtype='int32'))
         X_segments.append(np.array(segment_ids + [0] * (
             max_len - len(segment_ids)), dtype='int32'))
-        valid_lens.append(np.array(len(mlm_input_ids)))
-        X_mlm_pred_positions.append(np.array(mlm_pred_positions + [0] * (
-            20 - len(mlm_pred_positions)), dtype='int32'))
+        x_valid_lens.append(np.array(len(mlm_input_ids)))
+        X_pred_positions.append(np.array(pred_positions + [0] * (
+            20 - len(pred_positions)), dtype='int32'))
         # Predictions of padded tokens will be filtered out in the loss via
         # multiplication of 0 weights
         X_mlm_weights.append(np.array([1.0] * len(mlm_pred_label_ids) + [
-            0.0] * (20 - len(mlm_pred_positions)), dtype='float32'))
+            0.0] * (20 - len(pred_positions)), dtype='float32'))
         Y_mlm.append(np.array(mlm_pred_label_ids + [0] * (
             20 - len(mlm_pred_label_ids)), dtype='int32'))
         y_nsp.append(np.array(is_next))
-    return (X_mlm_tokens, X_segments, valid_lens, X_mlm_pred_positions,
+    return (X_tokens, X_segments, x_valid_lens, X_pred_positions,
             X_mlm_weights, Y_mlm, y_nsp)
 
 
@@ -1900,22 +1900,22 @@ class WikiTextDataset(gluon.data.Dataset):
         for paragraph in paragraghs:
             instances.extend(get_nsp_data_from_paragraph(
                 paragraph, paragraghs, self.vocab, max_len))
-        # Get data for the masked language model task 
+        # Get data for the masked language model task
         instances = [(get_mlm_data_from_tokens(tokens, self.vocab)
                       + (segment_ids, is_next))
                      for tokens, segment_ids, is_next in instances]
         # Pad inputs
-        (self.X_mlm_tokens, self.X_segments, self.valid_lens,
-         self.X_mlm_pred_positions, self.X_mlm_weights, self.Y_mlm,
+        (self.X_tokens, self.X_segments, self.x_valid_lens,
+         self.X_pred_positions, self.X_mlm_weights, self.Y_mlm,
          self.y_nsp) = pad_bert_inputs(instances, max_len, self.vocab)
 
     def __getitem__(self, idx):
-        return (self.X_mlm_tokens[idx], self.X_segments[idx],
-                self.valid_lens[idx], self.X_mlm_pred_positions[idx],
+        return (self.X_tokens[idx], self.X_segments[idx],
+                self.x_valid_lens[idx], self.X_pred_positions[idx],
                 self.X_mlm_weights[idx], self.Y_mlm[idx], self.y_nsp[idx])
 
     def __len__(self):
-        return len(self.X_mlm_tokens)
+        return len(self.X_tokens)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
@@ -1929,38 +1929,38 @@ def load_data_wiki(batch_size, max_len):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def _get_batch_bert(batch, ctx):
-    (X_mlm_tokens, X_segments, valid_lens, X_mlm_pred_positions,
-     X_mlm_weights, Y_mlm, y_nsp) = batch
+    (X_tokens, X_segments, x_valid_lens, X_pred_positions, X_mlm_weights,
+     Y_mlm, y_nsp) = batch
     split_and_load = gluon.utils.split_and_load
-    return (split_and_load(X_mlm_tokens, ctx, even_split=False),
+    return (split_and_load(X_tokens, ctx, even_split=False),
             split_and_load(X_segments, ctx, even_split=False),
-            split_and_load(valid_lens.astype('float32'), ctx,
+            split_and_load(x_valid_lens.astype('float32'), ctx,
                            even_split=False),
-            split_and_load(X_mlm_pred_positions, ctx, even_split=False),
+            split_and_load(X_pred_positions, ctx, even_split=False),
             split_and_load(X_mlm_weights, ctx, even_split=False),
             split_and_load(Y_mlm, ctx, even_split=False),
             split_and_load(y_nsp, ctx, even_split=False))
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def batch_loss_bert(net, nsp_loss, mlm_loss, X_mlm_tokens_shards,
-                    X_segments_shards, valid_lens_shards,
-                    X_mlm_pred_positions_shards, X_mlm_weights_shards,
+def batch_loss_bert(net, nsp_loss, mlm_loss, X_tokens_shards,
+                    X_segments_shards, x_valid_lens_shards,
+                    X_pred_positions_shards, X_mlm_weights_shards,
                     Y_mlm_shards, y_nsp_shards, vocab_size):
     ls = []
     ls_mlm = []
     ls_nsp = []
-    for (X_mlm_tokens_shard, X_segments_shard, valid_lens_shard,
-         X_mlm_pred_positions_shard, X_mlm_weights_shard, Y_mlm_shard,
+    for (X_tokens_shard, X_segments_shard, x_valid_lens_shard,
+         X_pred_positions_shard, X_mlm_weights_shard, Y_mlm_shard,
          y_nsp_shard) in zip(
-        X_mlm_tokens_shards, X_segments_shards, valid_lens_shards,
-        X_mlm_pred_positions_shards, X_mlm_weights_shards, Y_mlm_shards,
+        X_tokens_shards, X_segments_shards, x_valid_lens_shards,
+        X_pred_positions_shards, X_mlm_weights_shards, Y_mlm_shards,
         y_nsp_shards):
 
         num_masks = X_mlm_weights_shard.sum() + 1e-8
         _, decoded, classified = net(
-            X_mlm_tokens_shard, X_segments_shard,
-            valid_lens_shard.reshape(-1), X_mlm_pred_positions_shard)
+            X_tokens_shard, X_segments_shard, x_valid_lens_shard.reshape(-1),
+            X_pred_positions_shard)
         l_mlm = mlm_loss(
             decoded.reshape((-1, vocab_size)), Y_mlm_shard.reshape(-1),
             X_mlm_weights_shard.reshape((-1, 1)))
@@ -1988,16 +1988,16 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx,
         total_mlm_loss = total_nsp_loss = 0
         running_num_tks = 0
         for _, data_batch in enumerate(data_eval):
-            (X_mlm_tokens_shards, X_segments_shards, valid_lens_shards,
-             X_mlm_pred_positions_shards, X_mlm_weights_shards,
+            (X_tokens_shards, X_segments_shards, x_valid_lens_shards,
+             X_pred_positions_shards, X_mlm_weights_shards,
              Y_mlm_shards, y_nsp_shards) = _get_batch_bert(data_batch, ctx)
 
             step_num += 1
             with autograd.record():
                 ls, ls_mlm, ls_nsp = batch_loss_bert(
-                    net, nsp_loss, mlm_loss, X_mlm_tokens_shards,
-                    X_segments_shards, valid_lens_shards,
-                    X_mlm_pred_positions_shards, X_mlm_weights_shards,
+                    net, nsp_loss, mlm_loss, X_tokens_shards,
+                    X_segments_shards, x_valid_lens_shards,
+                    X_pred_positions_shards, X_mlm_weights_shards,
                     Y_mlm_shards, y_nsp_shards, vocab_size)
             for l in ls:
                 l.backward()

@@ -15,33 +15,33 @@ npx.set_np()
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
 class BERTEncoder(nn.Block):
-    def __init__(self, vocab_size, embed_size, pw_num_hiddens, num_heads,
+    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                  num_layers, dropout, **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
-        self.token_embedding = nn.Embedding(vocab_size, embed_size)
-        self.segment_embedding = nn.Embedding(2, embed_size)
-        self.pos_encoding = d2l.PositionalEncoding(embed_size, dropout)
+        self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
+        self.segment_embedding = nn.Embedding(2, num_hiddens)
+        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(d2l.EncoderBlock(
-                embed_size, pw_num_hiddens, num_heads, dropout))
+                num_hiddens, ffn_num_hiddens, num_heads, dropout))
 
-    def forward(self, tokens, segments, valid_len):
+    def forward(self, tokens, segments, valid_lens):
         # Shape of X remains unchanged in the following code snippet:
-        # (batch size, max sequence length, embed_size)
+        # (batch size, max sequence length, num_hiddens)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = self.pos_encoding(X)
         for blk in self.blks:
-            X = blk(X, valid_len)
+            X = blk(X, valid_lens)
         return X
 ```
 
 ...
 
 ```{.python .input  n=4}
-vocab_size, embed_size, pw_num_hiddens = 10000, 768, 1024
+vocab_size, num_hiddens, ffn_num_hiddens = 10000, 768, 1024
 num_heads, num_layers, dropout = 4, 2, 0.1
-encoder = BERTEncoder(vocab_size, embed_size, pw_num_hiddens, num_heads,
+encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                       num_layers, dropout)
 encoder.initialize()
 tokens = np.random.randint(0, 10000, (2, 8))
@@ -64,16 +64,16 @@ class MaskLM(nn.Block):
         self.mlp.add(nn.LayerNorm())
         self.mlp.add(nn.Dense(vocab_size, flatten=False))
 
-    def forward(self, X, masked_positions):
-        num_masked_positions = masked_positions.shape[1]
-        masked_positions = masked_positions.reshape(-1)
+    def forward(self, X, pred_positions):
+        num_pred_positions = pred_positions.shape[1]
+        pred_positions = pred_positions.reshape(-1)
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
-        # Suppose that batch_size = 2, num_masked_positions = 3,
+        # Suppose that batch_size = 2, num_pred_positions = 3,
         # batch_idx = np.array([0, 0, 0, 1, 1, 1])
-        batch_idx = np.repeat(batch_idx, num_masked_positions)
-        masked_X = X[batch_idx, masked_positions]
-        masked_X = masked_X.reshape((batch_size, num_masked_positions, -1))
+        batch_idx = np.repeat(batch_idx, num_pred_positions)
+        masked_X = X[batch_idx, pred_positions]
+        masked_X = masked_X.reshape((batch_size, num_pred_positions, -1))
         masked_preds = self.mlp(masked_X)
         return masked_preds
 ```
@@ -81,7 +81,7 @@ class MaskLM(nn.Block):
 ...
 
 ```{.python .input  n=30}
-mlm = MaskLM(vocab_size, embed_size)
+mlm = MaskLM(vocab_size, num_hiddens)
 mlm.initialize()
 mlm_positions = np.array([[0, 2, 1], [6, 5, 7]])
 mlm_preds = mlm(X, mlm_positions)
@@ -110,14 +110,14 @@ class NextSentencePred(nn.Block):
     def forward(self, X):
         # 0 is the index of the CLS token
         X = X[:, 0, :]
-        # X shape: (batch size, embed_size)
+        # X shape: (batch size, num_hiddens)
         return self.mlp(X)
 ```
 
 ...
 
 ```{.python .input  n=14}
-nsp = NextSentencePred(embed_size)
+nsp = NextSentencePred(num_hiddens)
 nsp.initialize()
 ns_pred = nsp(X)
 ns_pred.shape
@@ -134,19 +134,19 @@ ns_loss.shape
 ```{.python .input  n=10}
 # Saved in the d2l package for later use
 class BERTModel(nn.Block):
-    def __init__(self, vocab_size, embed_size, pw_num_hiddens, num_heads,
+    def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                  num_layers, dropout):
         super(BERTModel, self).__init__()
-        self.encoder = BERTEncoder(vocab_size, embed_size, pw_num_hiddens,
+        self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
                                    num_heads, num_layers, dropout)
-        self.nsp = NextSentencePred(embed_size)
-        self.mlm = MaskLM(vocab_size, embed_size)
+        self.nsp = NextSentencePred(num_hiddens)
+        self.mlm = MaskLM(vocab_size, num_hiddens)
 
-    def forward(self, tokens, segments, valid_len=None,
-                masked_positions=None):
-        X = self.encoder(tokens, segments, valid_len)
-        if masked_positions is not None:
-            mlm_Y = self.mlm(X, masked_positions)
+    def forward(self, tokens, segments, valid_lens=None,
+                pred_positions=None):
+        X = self.encoder(tokens, segments, valid_lens)
+        if pred_positions is not None:
+            mlm_Y = self.mlm(X, pred_positions)
         else:
             mlm_Y = None
         nsp_Y = self.nsp(X)

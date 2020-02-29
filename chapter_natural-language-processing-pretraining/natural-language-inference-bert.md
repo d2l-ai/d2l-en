@@ -15,7 +15,7 @@ npx.set_np()
 batch_size, max_len, ctx  = 512, 128, d2l.try_all_gpus()
 bert_train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 
-bert = d2l.BERTModel(len(vocab), embed_size=256, pw_num_hiddens=256,
+bert = d2l.BERTModel(len(vocab), num_hiddens=256, ffn_num_hiddens=256,
                      num_heads=4, num_layers=2, dropout=0.2)
 bert.initialize(init.Xavier(), ctx=ctx)
 nsp_loss = gluon.loss.SoftmaxCELoss()
