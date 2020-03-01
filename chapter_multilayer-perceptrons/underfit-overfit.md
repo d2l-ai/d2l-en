@@ -9,7 +9,7 @@ and not simply memorized our data.
 For example, imagine that we wanted to hunt 
 for patterns among genetic markers 
 linking patients to their dementia status,
-(let's the labels are drawn from the set
+(let's the labels be drawn from the set
 {*dementia*, *mild cognitive impairment*, *healthy*}).
 Because each person's genes identify them uniquely
 (ignoring identical siblings),
@@ -19,7 +19,7 @@ We don't want our model to say
 *"That's Bob! I remember him! He has dementia!*
 The reason why is simple. 
 When we deploy the model in the future,
-we will encounter patients  
+we will encounter patients
 that the model has never seen before.
 Our predictions will only be useful
 if our model has truly discovered a *general* pattern.
