@@ -4,7 +4,6 @@
 
 [Book website](https://d2l.ai/) | [STAT 157 Course at UC Berkeley, Spring 2019](http://courses.d2l.ai/berkeley-stat-157/index.html)
 
-
 <h5 align="center"><i>The best way to understand deep learning is learning by doing.</i></h5>
 
 <p align="center">
