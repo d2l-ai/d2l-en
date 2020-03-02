@@ -68,7 +68,7 @@ The mathemtatical foundations for
 the puzzling generalization properties
 of deep networks remain open research questions,
 and we encourage the theoretically-oriented 
-reader to dig deeperinto the topic.
+reader to dig deeper into the topic.
 For now, we turn to the more terrestrial investigation of 
 practical tools that tend (empirically)
 to improve the generalization of deep nets.
