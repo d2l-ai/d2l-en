@@ -30,7 +30,7 @@ gru
 lstm
 deep-rnn
 bi-rnn
-machine-translation
+machine-translation-and-dataset
 encoder-decoder
 seq2seq
 beam-search

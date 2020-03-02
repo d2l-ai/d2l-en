@@ -165,4 +165,4 @@ for X, X_vlen, Y, Y_vlen in train_iter:
 
 ## [Discussions](https://discuss.mxnet.io/t/machine-translation/2396)
 
-![](../img/qr_machine-translation.svg)
+![](../img/qr_machine-translation-and-dataset.svg)

@@ -720,19 +720,19 @@ class RNNModel(nn.Block):
         return self.rnn.begin_state(*args, **kwargs)
 
 
-# Defined in file: ./chapter_recurrent-modern/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
 
 
-# Defined in file: ./chapter_recurrent-modern/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def read_data_nmt():
     data_dir = d2l.download_extract('fra-eng')
     with open(data_dir + 'fra.txt', 'r') as f:
         return f.read()
 
 
-# Defined in file: ./chapter_recurrent-modern/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def preprocess_nmt(text):
     def no_space(char, prev_char):
         return char in set(',.!') and prev_char != ' '
@@ -743,7 +743,7 @@ def preprocess_nmt(text):
     return ''.join(out)
 
 
-# Defined in file: ./chapter_recurrent-modern/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def tokenize_nmt(text, num_examples=None):
     source, target = [], []
     for i, line in enumerate(text.split('\n')):
@@ -756,14 +756,14 @@ def tokenize_nmt(text, num_examples=None):
     return source, target
 
 
-# Defined in file: ./chapter_recurrent-modern/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def trim_pad(line, num_steps, padding_token):
     if len(line) > num_steps:
         return line[:num_steps]  # Trim
     return line + [padding_token] * (num_steps - len(line))  # Pad
 
 
-# Defined in file: ./chapter_recurrent-modern/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
     if not is_source:
@@ -773,7 +773,7 @@ def build_array(lines, vocab, num_steps, is_source):
     return array, valid_len
 
 
-# Defined in file: ./chapter_recurrent-modern/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
