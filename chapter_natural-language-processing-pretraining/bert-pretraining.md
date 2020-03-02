@@ -231,16 +231,6 @@ for (X_tokens, X_segments, x_valid_lens, X_pred_positions, X_mlm_weights,
     break
 ```
 
-```{.json .output n=13}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(512, 128) (512, 128) (512,) (512, 20) (512, 20) (512, 20) (512,)\n"
- }
-]
-```
-
 ## Training BERT
 
 ```{.python .input  n=14}
@@ -362,16 +352,6 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx,
 
 ```{.python .input  n=18}
 train_bert(train_iter, net, nsp_loss, mlm_loss, len(vocab), ctx, 20, 1)
-```
-
-```{.json .output n=18}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Eval mlm_loss=29.350\tnsp_loss=2.973\t\nEval cost=11.2s\n"
- }
-]
 ```
 
 ## Exercises
