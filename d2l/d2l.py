@@ -337,7 +337,7 @@ def download(name, cache_dir='../data'):
 def download_extract(name, folder=None):
     """Download and extract a zip/tar file."""
     fname = download(name)
-    base_dir = os.path.dirname(fname)
+    base_dir = os.path.dirname(fname) 
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
@@ -777,9 +777,9 @@ def build_array(lines, vocab, num_steps, is_source):
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3,
+    src_vocab = d2l.Vocab(source, min_freq=3, 
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=3,
+    tgt_vocab = d2l.Vocab(target, min_freq=3, 
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array(
         source, src_vocab, num_steps, True)
@@ -1230,10 +1230,10 @@ def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
 
 
 # Defined in file: ./chapter_computational-performance/hybridize.md
-class benchmark:
+class benchmark:    
     def __init__(self, description = 'Done in %.4f sec'):
         self.description = description
-
+        
     def __enter__(self):
         self.timer = d2l.Timer()
         return self
@@ -1282,25 +1282,29 @@ def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     ctx = list(net.collect_params().values())[0].list_ctx()
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
-        Xs, ys = split_f(features, labels, ctx)
-        pys = [net(X) for X in Xs]  # Run in parallel
-        metric.add(sum(float(d2l.accuracy(py, y)) for py, y in zip(pys, ys)),
-                   labels.size)
-    return metric[0]/metric[1]
+        X_shards, y_shards = split_f(features, labels, ctx)
+        # Run in parallel
+        pred_shards = [net(X_shard) for X_shard in X_shards]
+        metric.add(sum(float(d2l.accuracy(pred_shard, y_shard)) for
+                       pred_shard, y_shard in zip(
+                           pred_shards, y_shards)), labels.size)
+    return metric[0] / metric[1]
 
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
                      split_f=d2l.split_batch):
-    Xs, ys = split_f(features, labels, ctx_list)
+    X_shards, y_shards = split_f(features, labels, ctx_list)
     with autograd.record():
-        pys = [net(X) for X in Xs]
-        ls = [loss(py, y) for py, y in zip(pys, ys)]
+        pred_shards = [net(X_shard) for X_shard in X_shards]
+        ls = [loss(pred_shard, y_shard) for pred_shard, y_shard
+              in zip(pred_shards, y_shards)]
     for l in ls:
         l.backward()
     trainer.step(labels.shape[0])
     train_loss_sum = sum([float(l.sum()) for l in ls])
-    train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
+    train_acc_sum = sum(d2l.accuracy(pred_shard, y_shard)
+                        for pred_shard, y_shard in zip(pred_shards, y_shards))
     return train_loss_sum, train_acc_sum
 
 
@@ -1319,19 +1323,20 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                 net, features, labels, loss, trainer, ctx_list, split_f)
             metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
-            if (i+1) % (num_batches // 5) == 0:
-                animator.add(epoch+i/num_batches,
-                             (metric[0]/metric[2], metric[1]/metric[3], None))
+            if (i + 1) % (num_batches // 5) == 0:
+                animator.add(epoch + i / num_batches,
+                             (metric[0] / metric[2], metric[1] / metric[3],
+                              None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        metric[0]/metric[2], metric[1]/metric[3], test_acc))
+        metric[0] / metric[2], metric[1] / metric[3], test_acc))
     print('%.1f examples/sec on %s' % (
-        metric[2]*num_epochs/timer.sum(), ctx_list))
+        metric[2] * num_epochs / timer.sum(), ctx_list))
 
 
 # Defined in file: ./chapter_computer-vision/fine-tuning.md
-d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip',
+d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip', 
                          'fba480ffa8aa7e0febbb511d181409f899b9baa5')
 
 
@@ -1548,7 +1553,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def reorg_test(data_dir):
     for test_file in os.listdir(data_dir + 'test'):
-        copyfile(data_dir + 'test/' + test_file,
+        copyfile(data_dir + 'test/' + test_file, 
                  data_dir + 'train_valid_test/test/unknown/')
 
 
@@ -1558,7 +1563,7 @@ d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
-d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
+d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip', 
                        '319d85e578af0cdc590547f26231e4e31cdf1e42')
 
 
@@ -1849,20 +1854,16 @@ def get_mlm_data_from_tokens(tokens, vocab):
         tokens, candidate_pred_positions, num_mlm_preds, vocab)
     pred_positions_and_labels = sorted(pred_positions_and_labels,
                                            key=lambda x: x[0])
-
-    zipped_positions_and_labels = list(zip(*pred_positions_and_labels))
-    # e.g., [[1, 'an'], [12, 'car'], [25, '<unk>']] -> [1, 12, 25]
-    pred_positions = list(zipped_positions_and_labels[0])
-    # e.g., [[1, 'an'], [12, 'car'], [25, '<unk>']] -> ['an', 'car', '<unk>']
-    mlm_pred_labels = list(zipped_positions_and_labels[1])
+    pred_positions = [v[0] for v in pred_positions_and_labels]
+    mlm_pred_labels = [v[1] for v in pred_positions_and_labels]
     return vocab[mlm_input_tokens], pred_positions, vocab[mlm_pred_labels]
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def pad_bert_inputs(instances, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
-    X_tokens, X_segments, x_valid_lens = [], [], []
-    X_pred_positions, X_mlm_weights, Y_mlm, y_nsp = [], [], [], []
+    X_tokens, X_segments, x_valid_lens, X_pred_positions = [], [], [], []
+    X_mlm_weights, Y_mlm, y_nsp = [], [], []
     for (mlm_input_ids, pred_positions, mlm_pred_label_ids, segment_ids,
          is_next) in instances:
         X_tokens.append(np.array(mlm_input_ids + [vocab['<pad>']] * (
@@ -2080,7 +2081,7 @@ def read_snli(data_dir, is_train):
     """Read the SNLI dataset into premises, hypotheses, and labels."""
     def extract_text(s):
         # Remove information that will not be used by us
-        s = re.sub('\(', '', s)
+        s = re.sub('\(', '', s) 
         s = re.sub('\)', '', s)
         # Substitute two or more consecutive whitespace with space
         s = re.sub('\s{2,}', ' ', s)
@@ -2114,7 +2115,7 @@ class SNLIDataset(gluon.data.Dataset):
         print('read ' + str(len(self.premises)) + ' examples')
 
     def pad(self, lines):
-        return np.array([d2l.trim_pad(self.vocab[line], self.num_steps,
+        return np.array([d2l.trim_pad(self.vocab[line], self.num_steps, 
                                       self.vocab['<pad>']) for line in lines])
 
     def __getitem__(self, idx):
