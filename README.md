@@ -13,8 +13,7 @@
   <img width="200"  src="static/frontpage/_images/notebook.gif">
 </p>
 
-
-This open-source book represents our attempt to make deep learning approachable, teaching you the concepts, the context, and the code. 
+This open-source book represents our attempt to make deep learning approachable, teaching you the concepts, the context, and the code. The entire book is drafted in Jupyter notebooks, seamlessly integrating exposition figures, math, and interactive examples with self-contained code.
 
 Our goal is to offer a resource that could 
 1. be freely available for everyone; 
