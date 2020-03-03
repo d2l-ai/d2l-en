@@ -186,9 +186,9 @@ Its architecture is given by
 
 $$
 \begin{aligned}
-    h & = \sigma(W_1 x + b_1), \\
-    o & = W_2 h + b_2, \\
-    \hat{y} & = \mathrm{softmax}(o).
+    \mathbf{h} & = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1), \\
+    \mathbf{o} & = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2, \\
+    \hat{\mathbf{y}} & = \mathrm{softmax}(\mathbf{o}).
 \end{aligned}
 $$
 
