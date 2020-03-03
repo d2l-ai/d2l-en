@@ -14,7 +14,7 @@
 </p>
 
 
-This open-source book represents our attempt to make deep learning approachable, teaching you both the concepts, the context, and the code. 
+This open-source book represents our attempt to make deep learning approachable, teaching you the concepts, the context, and the code. 
 
 Our goal is to offer a resource that could 
 1. be freely available for everyone; 
