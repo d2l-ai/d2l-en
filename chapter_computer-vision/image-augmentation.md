@@ -190,7 +190,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                              (metric[0] / metric[2], metric[1] / metric[3],
                               None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)
-        animator.add(epoch+1, (None, None, test_acc))
+        animator.add(epoch + 1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
         metric[0] / metric[2], metric[1] / metric[3], test_acc))
     print('%.1f examples/sec on %s' % (

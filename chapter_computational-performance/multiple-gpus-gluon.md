@@ -57,8 +57,8 @@ Using the `split_and_load` function introduced in the previous section we can di
 
 ```{.python .input  n=4}
 x = np.random.uniform(size=(4, 1, 28, 28))
-gpu_x = gluon.utils.split_and_load(x, ctx)
-net(gpu_x[0]), net(gpu_x[1])
+x_shards = gluon.utils.split_and_load(x, ctx)
+net(x_shards[0]), net(x_shards[1])
 ```
 
 Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*. This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters don't even exist on the device. We can verify this by printing out the parameters and observing any errors that might arise.

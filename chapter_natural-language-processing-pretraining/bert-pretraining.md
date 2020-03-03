@@ -27,7 +27,7 @@ We keep paragraphs with at least 2 sentences.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
-def read_wiki(data_dir):
+def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
         lines = f.readlines()
@@ -42,7 +42,7 @@ def read_wiki(data_dir):
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
-def get_next_sentence(sentence, next_sentence, paragraphs):
+def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
         is_next = True
     else:
@@ -64,10 +64,10 @@ def get_tokens_and_segments(tokens_a, tokens_b):
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
-def get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
+def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     nsp_data_from_paragraph = []
     for i in range(len(paragraph) - 1):
-        tokens_a, tokens_b, is_next = get_next_sentence(
+        tokens_a, tokens_b, is_next = _get_next_sentence(
             paragraph[i], paragraph[i + 1], paragraphs)
         # Consider 1 '<cls>' token and 2 '<sep>' tokens
         if len(tokens_a) + len(tokens_b) + 3 > max_len:
@@ -81,8 +81,8 @@ def get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
-def replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
-                       vocab):
+def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
+                        vocab):
     # Make a new copy of tokens for the input of a masked language model,
     # where the input may contain replaced '<mask>' or random tokens
     mlm_input_tokens = [token for token in tokens]
@@ -114,7 +114,7 @@ def replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
 
 ```{.python .input  n=8}
 # Saved in the d2l package for later use
-def get_mlm_data_from_tokens(tokens, vocab):
+def _get_mlm_data_from_tokens(tokens, vocab):
     candidate_pred_positions = []
     # tokens is a list of strings
     for i, token in enumerate(tokens):
@@ -124,7 +124,7 @@ def get_mlm_data_from_tokens(tokens, vocab):
         candidate_pred_positions.append(i)
     # 15% of random tokens will be predicted in the masked language model task
     num_mlm_preds = max(1, round(len(tokens) * 0.15))
-    mlm_input_tokens, pred_positions_and_labels = replace_mlm_tokens(
+    mlm_input_tokens, pred_positions_and_labels = _replace_mlm_tokens(
         tokens, candidate_pred_positions, num_mlm_preds, vocab)
     pred_positions_and_labels = sorted(pred_positions_and_labels,
                                            key=lambda x: x[0])
@@ -139,35 +139,35 @@ def get_mlm_data_from_tokens(tokens, vocab):
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
-def pad_bert_inputs(instances, max_len, vocab):
+def _pad_bert_inputs(instances, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
-    X_tokens, X_segments, x_valid_lens, X_pred_positions = [], [], [], []
-    X_mlm_weights, Y_mlm, y_nsp = [], [], []
+    tokens_X, segments_X, valid_lens_x, pred_positions_X = [], [], [], []
+    mlm_weights_X, mlm_Y, nsp_y = [], [], []
     for (mlm_input_ids, pred_positions, mlm_pred_label_ids, segment_ids,
          is_next) in instances:
-        X_tokens.append(np.array(mlm_input_ids + [vocab['<pad>']] * (
+        tokens_X.append(np.array(mlm_input_ids + [vocab['<pad>']] * (
             max_len - len(mlm_input_ids)), dtype='int32'))
-        X_segments.append(np.array(segment_ids + [0] * (
+        segments_X.append(np.array(segment_ids + [0] * (
             max_len - len(segment_ids)), dtype='int32'))
-        x_valid_lens.append(np.array(len(mlm_input_ids)))
-        X_pred_positions.append(np.array(pred_positions + [0] * (
+        valid_lens_x.append(np.array(len(mlm_input_ids)))
+        pred_positions_X.append(np.array(pred_positions + [0] * (
             20 - len(pred_positions)), dtype='int32'))
         # Predictions of padded tokens will be filtered out in the loss via
         # multiplication of 0 weights
-        X_mlm_weights.append(np.array([1.0] * len(mlm_pred_label_ids) + [
+        mlm_weights_X.append(np.array([1.0] * len(mlm_pred_label_ids) + [
             0.0] * (20 - len(pred_positions)), dtype='float32'))
-        Y_mlm.append(np.array(mlm_pred_label_ids + [0] * (
+        mlm_Y.append(np.array(mlm_pred_label_ids + [0] * (
             20 - len(mlm_pred_label_ids)), dtype='int32'))
-        y_nsp.append(np.array(is_next))
-    return (X_tokens, X_segments, x_valid_lens, X_pred_positions,
-            X_mlm_weights, Y_mlm, y_nsp)
+        nsp_y.append(np.array(is_next))
+    return (tokens_X, segments_X, valid_lens_x, pred_positions_X,
+            mlm_weights_X, mlm_Y, nsp_y)
 ```
 
 ...
 
 ```{.python .input  n=10}
 # Saved in the d2l package for later use
-class WikiTextDataset(gluon.data.Dataset):
+class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraghs, max_len=128):
         # Input paragraghs[i] is a list of sentence strings representing a
         # paragraph; while output paragraghs[i] is a list of sentences
@@ -181,32 +181,32 @@ class WikiTextDataset(gluon.data.Dataset):
         # Get data for the next sentence prediction task
         instances = []
         for paragraph in paragraghs:
-            instances.extend(get_nsp_data_from_paragraph(
+            instances.extend(_get_nsp_data_from_paragraph(
                 paragraph, paragraghs, self.vocab, max_len))
         # Get data for the masked language model task
-        instances = [(get_mlm_data_from_tokens(tokens, self.vocab)
+        instances = [(_get_mlm_data_from_tokens(tokens, self.vocab)
                       + (segment_ids, is_next))
                      for tokens, segment_ids, is_next in instances]
         # Pad inputs
-        (self.X_tokens, self.X_segments, self.x_valid_lens,
-         self.X_pred_positions, self.X_mlm_weights, self.Y_mlm,
-         self.y_nsp) = pad_bert_inputs(instances, max_len, self.vocab)
+        (self.tokens_X, self.segments_X, self.valid_lens_x,
+         self.pred_positions_X, self.mlm_weights_X, self.mlm_Y,
+         self.nsp_y) = _pad_bert_inputs(instances, max_len, self.vocab)
 
     def __getitem__(self, idx):
-        return (self.X_tokens[idx], self.X_segments[idx],
-                self.x_valid_lens[idx], self.X_pred_positions[idx],
-                self.X_mlm_weights[idx], self.Y_mlm[idx], self.y_nsp[idx])
+        return (self.tokens_X[idx], self.segments_X[idx],
+                self.valid_lens_x[idx], self.pred_positions_X[idx],
+                self.mlm_weights_X[idx], self.mlm_Y[idx], self.nsp_y[idx])
 
     def __len__(self):
-        return len(self.X_tokens)
+        return len(self.tokens_X)
 ```
 
 ```{.python .input  n=11}
 # Saved in the d2l package for later use
 def load_data_wiki(batch_size, max_len):
     data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
-    paragraghs = read_wiki(data_dir)
-    train_set = WikiTextDataset(paragraghs, max_len)
+    paragraghs = _read_wiki(data_dir)
+    train_set = _WikiTextDataset(paragraghs, max_len)
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
     return train_iter, train_set.vocab
 ```
@@ -223,11 +223,11 @@ train_iter, vocab = load_data_wiki(batch_size, max_len)
 ...
 
 ```{.python .input  n=13}
-for (X_tokens, X_segments, x_valid_lens, X_pred_positions, X_mlm_weights,
-     Y_mlm, y_nsp) in train_iter:
-    print(X_tokens.shape, X_segments.shape, x_valid_lens.shape,
-          X_pred_positions.shape, X_mlm_weights.shape, Y_mlm.shape,
-          y_nsp.shape)
+for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
+     mlm_Y, nsp_y) in train_iter:
+    print(tokens_X.shape, segments_X.shape, valid_lens_x.shape,
+          pred_positions_X.shape, mlm_weights_X.shape, mlm_Y.shape,
+          nsp_y.shape)
     break
 ```
 
@@ -238,7 +238,7 @@ net = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,
                     num_heads=2, num_layers=2, dropout=0.2)
 ctx = d2l.try_all_gpus()
 net.initialize(init.Xavier(), ctx=ctx)
-nsp_loss, mlm_loss = gluon.loss.SoftmaxCELoss(), gluon.loss.SoftmaxCELoss()
+loss = gluon.loss.SoftmaxCELoss()
 ```
 
 ...
@@ -246,112 +246,98 @@ nsp_loss, mlm_loss = gluon.loss.SoftmaxCELoss(), gluon.loss.SoftmaxCELoss()
 ```{.python .input  n=15}
 # Saved in the d2l package for later use
 def _get_batch_bert(batch, ctx):
-    (X_tokens, X_segments, x_valid_lens, X_pred_positions, X_mlm_weights,
-     Y_mlm, y_nsp) = batch
+    (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
+     mlm_Y, nsp_y) = batch
     split_and_load = gluon.utils.split_and_load
-    return (split_and_load(X_tokens, ctx, even_split=False),
-            split_and_load(X_segments, ctx, even_split=False),
-            split_and_load(x_valid_lens.astype('float32'), ctx,
+    return (split_and_load(tokens_X, ctx, even_split=False),
+            split_and_load(segments_X, ctx, even_split=False),
+            split_and_load(valid_lens_x.astype('float32'), ctx,
                            even_split=False),
-            split_and_load(X_pred_positions, ctx, even_split=False),
-            split_and_load(X_mlm_weights, ctx, even_split=False),
-            split_and_load(Y_mlm, ctx, even_split=False),
-            split_and_load(y_nsp, ctx, even_split=False))
+            split_and_load(pred_positions_X, ctx, even_split=False),
+            split_and_load(mlm_weights_X, ctx, even_split=False),
+            split_and_load(mlm_Y, ctx, even_split=False),
+            split_and_load(nsp_y, ctx, even_split=False))
 ```
 
 ...
 
 ```{.python .input  n=16}
 # Saved in the d2l package for later use
-def batch_loss_bert(net, nsp_loss, mlm_loss, X_tokens_shards,
-                    X_segments_shards, x_valid_lens_shards,
-                    X_pred_positions_shards, X_mlm_weights_shards,
-                    Y_mlm_shards, y_nsp_shards, vocab_size):
-    ls = []
-    ls_mlm = []
-    ls_nsp = []
-    for (X_tokens_shard, X_segments_shard, x_valid_lens_shard,
-         X_pred_positions_shard, X_mlm_weights_shard, Y_mlm_shard,
-         y_nsp_shard) in zip(
-        X_tokens_shards, X_segments_shards, x_valid_lens_shards,
-        X_pred_positions_shards, X_mlm_weights_shards, Y_mlm_shards,
-        y_nsp_shards):
-
-        num_masks = X_mlm_weights_shard.sum() + 1e-8
-        _, decoded, classified = net(
-            X_tokens_shard, X_segments_shard, x_valid_lens_shard.reshape(-1),
-            X_pred_positions_shard)
-        l_mlm = mlm_loss(
-            decoded.reshape((-1, vocab_size)), Y_mlm_shard.reshape(-1),
-            X_mlm_weights_shard.reshape((-1, 1)))
-        l_mlm = l_mlm.sum() / num_masks
-        l_nsp = nsp_loss(classified, y_nsp_shard)
-        l_nsp = l_nsp.mean()
-        l = l_mlm + l_nsp
-        ls.append(l)
-        ls_mlm.append(l_mlm)
-        ls_nsp.append(l_nsp)
+def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
+                         segments_X_shards, valid_lens_x_shards,
+                         pred_positions_X_shards, mlm_weights_X_shards,
+                         mlm_Y_shards, nsp_y_shards):
+    mlm_ls, nsp_ls, ls = [], [], []
+    for (tokens_X_shard, segments_X_shard, valid_lens_x_shard,
+         pred_positions_X_shard, mlm_weights_X_shard, mlm_Y_shard,
+         nsp_y_shard) in zip(
+        tokens_X_shards, segments_X_shards, valid_lens_x_shards,
+        pred_positions_X_shards, mlm_weights_X_shards, mlm_Y_shards,
+        nsp_y_shards):
+        # Forward pass
+        _, mlm_Y_hat, nsp_Y_hat = net(
+            tokens_X_shard, segments_X_shard, valid_lens_x_shard.reshape(-1),
+            pred_positions_X_shard)
+        # Compute masked language model loss
+        mlm_l = loss(
+            mlm_Y_hat.reshape((-1, vocab_size)), mlm_Y_shard.reshape(-1),
+            mlm_weights_X_shard.reshape((-1, 1)))
+        mlm_l = mlm_l.sum() / (mlm_weights_X_shard.sum() + 1e-8)
+        # Compute next sentence prediction loss
+        nsp_l = loss(nsp_Y_hat, nsp_y_shard)
+        nsp_l = nsp_l.mean()
+        mlm_ls.append(mlm_l)
+        nsp_ls.append(nsp_l)
+        ls.append(mlm_l + nsp_l)
         npx.waitall()
-    return ls, ls_mlm, ls_nsp
+    return mlm_ls, nsp_ls, ls
 ```
 
 ...
 
 ```{.python .input  n=17}
 # Saved in the d2l package for later use
-def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx,
-               log_interval, max_step):
+def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
+               num_steps):
     trainer = gluon.Trainer(net.collect_params(), 'adam')
-    step_num = 0
-    while step_num < max_step:
-        eval_begin_time = time.time()
-        begin_time = time.time()
+    step, timer = 0, d2l.Timer()
+    animator = d2l.Animator(xlabel='step', ylabel='loss',
+                            xlim=[1, num_steps], legend=['mlm', 'nsp'])
+    # MLM loss, NSP loss, no. of sentence pairs, count
+    metric = d2l.Accumulator(4)
+    for batch in train_iter:
+        (tokens_X_shards, segments_X_shards, valid_lens_x_shards,
+         pred_positions_X_shards, mlm_weights_X_shards,
+         mlm_Y_shards, nsp_y_shards) = _get_batch_bert(batch, ctx)
+        timer.start()
+        with autograd.record():
+            mlm_ls, nsp_ls, ls = _get_batch_loss_bert(
+                net, loss, vocab_size, tokens_X_shards, segments_X_shards,
+                valid_lens_x_shards, pred_positions_X_shards,
+                mlm_weights_X_shards, mlm_Y_shards, nsp_y_shards)
+        for l in ls:
+            l.backward()
+        trainer.step(1)
+        mlm_l_mean = sum([float(l) for l in mlm_ls]) / len(mlm_ls)
+        nsp_l_mean = sum([float(l) for l in nsp_ls]) / len(nsp_ls)
+        metric.add(mlm_l_mean, nsp_l_mean, batch[0].shape[0], 1)
+        timer.stop()
+        if (step + 1) % log_interval == 0:
+            animator.add(step + 1,
+                         (metric[0] / metric[3], metric[1] / metric[3]))
+        step += 1
+        if step == num_steps:
+            break
 
-        running_mlm_loss = running_nsp_loss = 0
-        total_mlm_loss = total_nsp_loss = 0
-        running_num_tks = 0
-        for _, data_batch in enumerate(data_eval):
-            (X_tokens_shards, X_segments_shards, x_valid_lens_shards,
-             X_pred_positions_shards, X_mlm_weights_shards,
-             Y_mlm_shards, y_nsp_shards) = _get_batch_bert(data_batch, ctx)
-
-            step_num += 1
-            with autograd.record():
-                ls, ls_mlm, ls_nsp = batch_loss_bert(
-                    net, nsp_loss, mlm_loss, X_tokens_shards,
-                    X_segments_shards, x_valid_lens_shards,
-                    X_pred_positions_shards, X_mlm_weights_shards,
-                    Y_mlm_shards, y_nsp_shards, vocab_size)
-            for l in ls:
-                l.backward()
-
-            trainer.step(1)
-
-            running_mlm_loss += sum([l for l in ls_mlm])
-            running_nsp_loss += sum([l for l in ls_nsp])
-
-            if (step_num + 1) % (log_interval) == 0:
-                total_mlm_loss += running_mlm_loss
-                total_nsp_loss += running_nsp_loss
-                begin_time = time.time()
-                running_mlm_loss = running_nsp_loss = 0
-
-        eval_end_time = time.time()
-        if running_mlm_loss != 0:
-            total_mlm_loss += running_mlm_loss
-            total_nsp_loss += running_nsp_loss
-        total_mlm_loss /= step_num
-        total_nsp_loss /= step_num
-        print('Eval mlm_loss={:.3f}\tnsp_loss={:.3f}\t'
-                     .format(float(total_mlm_loss),
-                             float(total_nsp_loss)))
-        print('Eval cost={:.1f}s'.format(eval_end_time - eval_begin_time))
+    print('MLM loss %.3f, NSP loss %.3f'
+          % (metric[0] / metric[3], metric[1] / metric[3]))
+    print('%.1f sentence pairs/sec on %s' % (metric[2] / timer.sum(), ctx))
 ```
 
 ...
 
 ```{.python .input  n=18}
-train_bert(train_iter, net, nsp_loss, mlm_loss, len(vocab), ctx, 20, 1)
+train_bert(train_iter, net, loss, len(vocab), ctx, 1, 10)
 ```
 
 ## Exercises

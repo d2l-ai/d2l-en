@@ -18,11 +18,11 @@ bert_train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 bert = d2l.BERTModel(len(vocab), num_hiddens=256, ffn_num_hiddens=256,
                      num_heads=4, num_layers=2, dropout=0.2)
 bert.initialize(init.Xavier(), ctx=ctx)
-nsp_loss = gluon.loss.SoftmaxCELoss()
-mlm_loss = gluon.loss.SoftmaxCELoss()
+loss = gluon.loss.SoftmaxCELoss()
+```
 
-d2l.train_bert(bert_train_iter, bert, nsp_loss, mlm_loss, len(vocab), ctx, 20,
-               2000)
+```{.python .input}
+d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 2000)
 ```
 
 ...

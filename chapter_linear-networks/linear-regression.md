@@ -369,16 +369,16 @@ class Timer(object):
 
     def start(self):
         # Start the timer
-        self.start_time = time.time()
+        self.tik = time.time()
 
     def stop(self):
         # Stop the timer and record the time in a list
-        self.times.append(time.time() - self.start_time)
+        self.times.append(time.time() - self.tik)
         return self.times[-1]
 
     def avg(self):
         # Return the average time
-        return sum(self.times)/len(self.times)
+        return sum(self.times) / len(self.times)
 
     def sum(self):
         # Return the sum of time
