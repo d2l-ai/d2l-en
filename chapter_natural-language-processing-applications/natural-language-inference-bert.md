@@ -12,8 +12,8 @@ from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()
-batch_size, max_len, ctx  = 512, 128, d2l.try_all_gpus()
-bert_train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
+bert_batch_size, max_len, ctx  = 512, 128, d2l.try_all_gpus()
+bert_train_iter, vocab = d2l.load_data_wiki(bert_batch_size, max_len)
 
 bert = d2l.BERTModel(len(vocab), num_hiddens=256, ffn_num_hiddens=256,
                      num_heads=4, num_layers=2, dropout=0.2)
@@ -29,16 +29,17 @@ d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 2000)
 
 ```{.python .input  n=41}
 class SNLIBERTDataset(gluon.data.Dataset):
-    def __init__(self, dataset, vocab = None):
+    def __init__(self, dataset, vocab=None):
         self.num_steps = 50  # We fix the length of each sentence to 50.
-        p_tokens = d2l.tokenize(dataset[0], token='word')
-        h_tokens = d2l.tokenize(dataset[1], token='word')
+        p_tokens = d2l.tokenize(dataset[0])
+        h_tokens = d2l.tokenize(dataset[1])
         self.vocab = vocab
 
         self.tokens, self.segment_ids, self.valid_lens = self.preprocess(
             p_tokens, h_tokens)
         self.labels = np.array(dataset[2])
         print('read ' + str(len(self.tokens)) + ' examples')
+
     def preprocess(self, p_tokens, h_tokens):
         def pad(data):
             return d2l.trim_pad(data, self.num_steps, 0)

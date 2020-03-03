@@ -1984,29 +1984,32 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
                             xlim=[1, num_steps], legend=['mlm', 'nsp'])
     # MLM loss, NSP loss, no. of sentence pairs, count
     metric = d2l.Accumulator(4)
-    for batch in train_iter:
-        (tokens_X_shards, segments_X_shards, valid_lens_x_shards,
-         pred_positions_X_shards, mlm_weights_X_shards,
-         mlm_Y_shards, nsp_y_shards) = _get_batch_bert(batch, ctx)
-        timer.start()
-        with autograd.record():
-            mlm_ls, nsp_ls, ls = _get_batch_loss_bert(
-                net, loss, vocab_size, tokens_X_shards, segments_X_shards,
-                valid_lens_x_shards, pred_positions_X_shards,
-                mlm_weights_X_shards, mlm_Y_shards, nsp_y_shards)
-        for l in ls:
-            l.backward()
-        trainer.step(1)
-        mlm_l_mean = sum([float(l) for l in mlm_ls]) / len(mlm_ls)
-        nsp_l_mean = sum([float(l) for l in nsp_ls]) / len(nsp_ls)
-        metric.add(mlm_l_mean, nsp_l_mean, batch[0].shape[0], 1)
-        timer.stop()
-        if (step + 1) % log_interval == 0:
-            animator.add(step + 1,
-                         (metric[0] / metric[3], metric[1] / metric[3]))
-        step += 1
-        if step == num_steps:
-            break
+    num_steps_reached = False
+    while step < num_steps and not num_steps_reached:
+        for batch in train_iter:
+            (tokens_X_shards, segments_X_shards, valid_lens_x_shards,
+             pred_positions_X_shards, mlm_weights_X_shards,
+             mlm_Y_shards, nsp_y_shards) = _get_batch_bert(batch, ctx)
+            timer.start()
+            with autograd.record():
+                mlm_ls, nsp_ls, ls = _get_batch_loss_bert(
+                    net, loss, vocab_size, tokens_X_shards, segments_X_shards,
+                    valid_lens_x_shards, pred_positions_X_shards,
+                    mlm_weights_X_shards, mlm_Y_shards, nsp_y_shards)
+            for l in ls:
+                l.backward()
+            trainer.step(1)
+            mlm_l_mean = sum([float(l) for l in mlm_ls]) / len(mlm_ls)
+            nsp_l_mean = sum([float(l) for l in nsp_ls]) / len(nsp_ls)
+            metric.add(mlm_l_mean, nsp_l_mean, batch[0].shape[0], 1)
+            timer.stop()
+            if (step + 1) % log_interval == 0:
+                animator.add(step + 1,
+                             (metric[0] / metric[3], metric[1] / metric[3]))
+            step += 1
+            if step == num_steps:
+                num_steps_reached = True
+                break
 
     print('MLM loss %.3f, NSP loss %.3f'
           % (metric[0] / metric[3], metric[1] / metric[3]))
