@@ -111,7 +111,7 @@ class MultiHeadAttention(nn.Block):
         return self.W_o(output_concat)
 ```
 
-Here are the definitions of the transpose functions `transpose_qkv` and `transpose_output`, who are the inverse of each other.
+Here are the definitions of the transpose functions `transpose_qkv` and `transpose_output`, which are the inverse of each other.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
@@ -323,7 +323,7 @@ encoder(np.ones((2, 100)), valid_len).shape
 
 ## Decoder
 
-The Transformer decoder block looks similar to the Transformer encoder block. However, besides the two sub-layers---the multi-head attention layer and the positional encoding network, the decoder Transformer block contains a third sub-layer, which applies multi-head attention on the output of the encoder stack. Similar to the  Transformer encoder block, the  Transformer decoder block employs "add and norm", i.e., the residual connections and the layer normalization to connect each of the sub-layers.
+The Transformer decoder block looks similar to the Transformer encoder block. However, besides the two sub-layers (the multi-head attention layer and the positional encoding network), the decoder Transformer block contains a third sub-layer, which applies multi-head attention on the output of the encoder stack. Similar to the  Transformer encoder block, the  Transformer decoder block employs "add and norm", i.e., the residual connections and the layer normalization to connect each of the sub-layers.
 
 To be specific, at timestep $t$, assume that $\mathbf x_t$ is the current input, i.e., the query. As illustrated in :numref:`fig_self_attention_predict`, the keys and values of the self-attention layer consist of the current query with all the past queries $\mathbf x_1, \ldots, \mathbf x_{t-1}$.
 
@@ -382,7 +382,7 @@ decoder_blk(X, state)[0].shape
 
 The construction of the entire  Transformer decoder is identical to the  Transformer encoder, except for the additional dense layer to obtain the output confidence scores.
 
-Let's implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `num_hiddens`, the  Transformer decoder also needs the encoder Transformer's outputs `enc_outputs` and `env_valid_len`.
+Let's implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `num_hiddens`, the  Transformer decoder also needs the Transformer encoder's outputs `enc_outputs` and `env_valid_len`.
 
 ```{.python .input  n=18}
 class TransformerDecoder(d2l.Decoder):
@@ -412,7 +412,7 @@ class TransformerDecoder(d2l.Decoder):
 
 ## Training
 
-Finally, we can build a encoder-decoder model with Transformer architecture.
+Finally, we can build an encoder-decoder model with the Transformer architecture.
 Similar to the seq2seq with attention model in :numref:`sec_seq2seq_attention`, we use the following hyperparameters: two Transformer blocks with both the embedding size and the block output size to be $32$. In addition, we use $4$ heads, and set the hidden size to be twice larger than the output size.
 
 ```{.python .input  n=19}
