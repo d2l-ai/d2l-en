@@ -231,7 +231,7 @@ where the random variable takes value $1$ (keep)
 with probability $1-p$ and $0$ (drop) with probability $p$.
 One easy way to implement this is to first draw samples
 from the uniform distribution $U[0, 1]$.
-then we can keep those nodes for which the corresponding
+Then we can keep those nodes for which the corresponding
 sample is greater than $p$, dropping the rest.
 
 In the following code, we implement a `dropout_layer` function
