@@ -35,7 +35,7 @@ and playing a growing role in basic sciences---from astrophysics to biology.
 ## About This Book
 
 This book represents our attempt to make deep learning approachable,
-teaching you both the *concepts*, the *context*, and the *code*.
+teaching you the *concepts*, the *context*, and the *code*.
 
 ### One Medium Combining Code, Math, and HTML
 
