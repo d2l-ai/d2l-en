@@ -96,7 +96,7 @@ Collecting all features into a vector $\mathbf{x}$
 and all weights into a vector $\mathbf{w}$,
 we can express our model compactly using a dot product:
 
-$$\hat{y} = \mathbf{w}^T \mathbf{x} + b.$$
+$$\hat{y} = \mathbf{w}^\top \mathbf{x} + b.$$
 
 Here, the vector $\mathbf{x}$ corresponds to a single data point.
 We will often find it convenient
@@ -121,7 +121,7 @@ will (in expectation) predict the target $y_i$ with the lowest error.
 Even if we believe that the best model for
 predicting $y$ given $\mathbf{x}$ is linear,
 we would not expect to find real-world data where
-$y_i$ exactly equals $\mathbf{w}^T \mathbf{x}+b$
+$y_i$ exactly equals $\mathbf{w}^\top \mathbf{x}+b$
 for all points ($\mathbf{x}, y)$.
 For example, whatever instruments we use to observe
 the features $\mathbf{X}$ and labels $\mathbf{y}$
@@ -198,7 +198,7 @@ and it corresponds to the global minimum.
 Taking the derivative of the loss with respect to $\mathbf{w}$
 and setting it equal to $0$ yields the analytic solution:
 
-$$\mathbf{w}^* = (\mathbf X^T \mathbf X)^{-1}\mathbf X^T \mathbf{y}.$$
+$$\mathbf{w}^* = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf{y}.$$
 
 While simple problems like linear regression
 may admit analytic solutions,
