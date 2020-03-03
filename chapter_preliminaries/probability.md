@@ -240,7 +240,7 @@ it never fails to detect HIV if the patient actually has it. We use $D_1$ to ind
 |$P(D_1 = 0 \mid H)$|            0 |         0.99 |
 :label:`conditional_prob_D1`
 
-Note that the column sums are all $1$ (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let's work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' Theorem, we need to apply marginalization and the multiplication rule to determine
+Note that the column sums are all $1$ (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let's work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' theorem, we need to apply marginalization and the multiplication rule to determine
 
 $$\begin{aligned}
 &P(D_1 = 1) \\
@@ -270,7 +270,7 @@ test has different characteristics and it is not as good as the first one, as sh
 |$P(D_2 = 0 \mid H)$|            0.02 |         0.97 |
 :label:`conditional_prob_D2`
 
-Unfortunately, the second test comes back positive, too. Let's work out the requisite probabilities to invoke Bayes' Theorem by assuming the conditional independence:
+Unfortunately, the second test comes back positive, too. Let's work out the requisite probabilities to invoke Bayes' theorem by assuming the conditional independence:
 
 $$\begin{aligned}
 &P(D_1 = 1, D_2 = 1 \mid H = 0) \\
