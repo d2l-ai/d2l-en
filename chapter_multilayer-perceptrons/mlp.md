@@ -287,7 +287,7 @@ As stated above, the most popular choice,
 due to both simplicity of implementation
 its performance on a variety of predictive tasks 
 is the rectified linear unit (ReLU).
-ReLUs provide a very simple nonlinear transformation.
+ReLU provides a very simple nonlinear transformation.
 Given the element $z$, the function is defined
 as the maximum of that element and 0.
 

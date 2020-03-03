@@ -52,7 +52,7 @@ exponentiation can be a source of numerical stability issues
 (as discussed  in :numref:`sec_naive_bayes`).
 Recall that the softmax function calculates
 $\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$, 
-where $\hat y_j$ is the $j^\mathrm{th}$ element of ``yhat`` 
+where $\hat y_j$ is the $j^\mathrm{th}$ element of ``y_hat`` 
 and $z_j$ is the $j^\mathrm{th}$ element of the input
 ``y_linear`` variable, as computed by the softmax.
 
