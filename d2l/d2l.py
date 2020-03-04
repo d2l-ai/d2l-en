@@ -150,14 +150,14 @@ def load_array(data_arrays, batch_size, is_train=True):
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 
-# Defined in file: ./chapter_linear-networks/fashion-mnist.md
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def get_fashion_mnist_labels(labels):
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
 
 
-# Defined in file: ./chapter_linear-networks/fashion-mnist.md
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
@@ -172,7 +172,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     return axes
 
 
-# Defined in file: ./chapter_linear-networks/fashion-mnist.md
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def get_dataloader_workers(num_workers=4):
     # 0 means no additional process is used to speed up the reading of data.
     if sys.platform.startswith('win'):
@@ -181,7 +181,7 @@ def get_dataloader_workers(num_workers=4):
         return num_workers
 
 
-# Defined in file: ./chapter_linear-networks/fashion-mnist.md
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def load_data_fashion_mnist(batch_size, resize=None):
     """Download the Fashion-MNIST dataset and then load into memory."""
     dataset = gluon.data.vision
@@ -535,7 +535,7 @@ def load_corpus_time_machine(max_tokens=-1):
     return corpus, vocab
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 def seq_data_iter_random(corpus, batch_size, num_steps):
     # Offset the iterator over the data for uniform starts
     corpus = corpus[random.randint(0, num_steps):]
@@ -558,7 +558,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
         yield np.array(X), np.array(Y)
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
@@ -574,7 +574,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
         yield X, Y
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 class SeqDataLoader(object):
     """A iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
@@ -589,7 +589,7 @@ class SeqDataLoader(object):
         return self.data_iter_fn(self.corpus, self.batch_size, self.num_steps)
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
                            max_tokens=10000):
     data_iter = SeqDataLoader(
@@ -1565,12 +1565,12 @@ d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip', 
                        '319d85e578af0cdc590547f26231e4e31cdf1e42')
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
     with open(data_dir + 'ptb.train.txt') as f:
@@ -1578,7 +1578,7 @@ def read_ptb():
     return [line.split() for line in raw_text.split('\n')]
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def subsampling(sentences, vocab):
     # Map low frequency words into <unk>
     sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line]
@@ -1596,7 +1596,7 @@ def subsampling(sentences, vocab):
     return [[tk for tk in line if keep(tk)] for line in sentences]
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
@@ -1615,7 +1615,7 @@ def get_centers_and_contexts(corpus, max_window_size):
     return centers, contexts
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 class RandomGenerator(object):
     """Draw a random int in [0, n] according to n sampling weights."""
     def __init__(self, sampling_weights):
@@ -1633,7 +1633,7 @@ class RandomGenerator(object):
         return self.candidates[self.i-1]
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def get_negatives(all_contexts, corpus, K):
     counter = d2l.count_corpus(corpus)
     sampling_weights = [counter[i]**0.75 for i in range(len(counter))]
@@ -1649,7 +1649,7 @@ def get_negatives(all_contexts, corpus, K):
     return all_negatives
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def batchify(data):
     max_len = max(len(c) + len(n) for _, c, n in data)
     centers, contexts_negatives, masks, labels = [], [], [], []
@@ -1663,7 +1663,7 @@ def batchify(data):
             np.array(masks), np.array(labels))
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
@@ -1762,13 +1762,13 @@ class BERTModel(nn.Block):
         return encoded_X, mlm_Y_hat, nsp_Y_hat
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 d2l.DATA_HUB['wikitext-2'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/'
     'wikitext-2-v1.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
@@ -1780,7 +1780,7 @@ def _read_wiki(data_dir):
     return paragraghs
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
         is_next = True
@@ -1791,14 +1791,14 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
     return sentence, next_sentence, is_next
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def get_tokens_and_segments(tokens_a, tokens_b):
     tokens = ['<cls>'] + tokens_a + ['<sep>'] + tokens_b + ['<sep>']
     segments = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
     return tokens, segments
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     nsp_data_from_paragraph = []
     for i in range(len(paragraph) - 1):
@@ -1812,7 +1812,7 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     return nsp_data_from_paragraph
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                         vocab):
     # Make a new copy of tokens for the input of a masked language model,
@@ -1842,7 +1842,7 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
     return mlm_input_tokens, pred_positions_and_labels
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def _get_mlm_data_from_tokens(tokens, vocab):
     candidate_pred_positions = []
     # tokens is a list of strings
@@ -1862,7 +1862,7 @@ def _get_mlm_data_from_tokens(tokens, vocab):
     return vocab[mlm_input_tokens], pred_positions, vocab[mlm_pred_labels]
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def _pad_bert_inputs(instances, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
     all_token_ids, all_segments, valid_lens,  = [], [], []
@@ -1888,7 +1888,7 @@ def _pad_bert_inputs(instances, max_len, vocab):
             all_mlm_weights, all_mlm_labels, nsp_labels)
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraghs, max_len=128):
         # Input paragraghs[i] is a list of sentence strings representing a
@@ -1925,7 +1925,7 @@ class _WikiTextDataset(gluon.data.Dataset):
         return len(self.all_token_ids)
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def load_data_wiki(batch_size, max_len):
     data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
     paragraghs = _read_wiki(data_dir)
