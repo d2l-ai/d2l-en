@@ -131,21 +131,22 @@ class SNLIDataset(gluon.data.Dataset):
     """A customized dataset to load the SNLI dataset."""
     def __init__(self, dataset, num_steps, vocab=None):
         self.num_steps = num_steps
-        p_tokens = d2l.tokenize(dataset[0])
-        h_tokens = d2l.tokenize(dataset[1])
+        all_premise_tokens = d2l.tokenize(dataset[0])
+        all_hypothesis_tokens = d2l.tokenize(dataset[1])
         if vocab is None:
-            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5,
-                                   reserved_tokens=['<pad>'])
+            self.vocab = d2l.Vocab(all_premise_tokens + all_hypothesis_tokens,
+                                   min_freq=5, reserved_tokens=['<pad>'])
         else:
             self.vocab = vocab
-        self.premises = self.pad(p_tokens)
-        self.hypotheses = self.pad(h_tokens)
+        self.premises = self._pad(all_premise_tokens)
+        self.hypotheses = self._pad(all_hypothesis_tokens)
         self.labels = np.array(dataset[2])
         print('read ' + str(len(self.premises)) + ' examples')
 
-    def pad(self, lines):
-        return np.array([d2l.trim_pad(self.vocab[line], self.num_steps, 
-                                      self.vocab['<pad>']) for line in lines])
+    def _pad(self, lines):
+        return np.array([d2l.truncate_pad(
+            self.vocab[line], self.num_steps, self.vocab['<pad>'])
+                         for line in lines])
 
     def __getitem__(self, idx):
         return (self.premises[idx], self.hypotheses[idx]), self.labels[idx]

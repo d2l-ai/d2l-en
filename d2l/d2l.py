@@ -758,7 +758,7 @@ def tokenize_nmt(text, num_examples=None):
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def trim_pad(line, num_steps, padding_token):
+def truncate_pad(line, num_steps, padding_token):
     if len(line) > num_steps:
         return line[:num_steps]  # Trim
     return line + [padding_token] * (num_steps - len(line))  # Pad
@@ -769,7 +769,8 @@ def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
     if not is_source:
         lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
-    array = np.array([trim_pad(l, num_steps, vocab['<pad>']) for l in lines])
+    array = np.array([truncate_pad(
+        l, num_steps, vocab['<pad>']) for l in lines])
     valid_len = (array != vocab['<pad>']).sum(axis=1)
     return array, valid_len
 
@@ -914,7 +915,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_len = np.array([len(src_tokens)], ctx=ctx)
-    src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab['<pad>'])
+    src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
     enc_X = np.array(src_tokens, ctx=ctx)
     # Add the batch_size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
@@ -1409,11 +1410,12 @@ def read_voc_images(voc_dir, is_train=True):
         voc_dir, 'train.txt' if is_train else 'val.txt')
     with open(txt_fname, 'r') as f:
         images = f.read().split()
-    features, labels = [None] * len(images), [None] * len(images)
+    features, labels = [], []
     for i, fname in enumerate(images):
-        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (voc_dir, fname))
-        labels[i] = image.imread(
-            '%s/SegmentationClass/%s.png' % (voc_dir, fname))
+        features.append(image.imread('%s/JPEGImages/%s.jpg'
+                                     % (voc_dir, fname)))
+        labels.append(image.imread(
+            '%s/SegmentationClass/%s.png' % (voc_dir, fname)))
     return features, labels
 
 
@@ -1792,8 +1794,8 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def get_tokens_and_segments(tokens_a, tokens_b):
     tokens = ['<cls>'] + tokens_a + ['<sep>'] + tokens_b + ['<sep>']
-    segment_ids = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
-    return tokens, segment_ids
+    segments = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
+    return tokens, segments
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
@@ -1805,8 +1807,8 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
         # Consider 1 '<cls>' token and 2 '<sep>' tokens
         if len(tokens_a) + len(tokens_b) + 3 > max_len:
              continue
-        tokens, segment_ids = get_tokens_and_segments(tokens_a, tokens_b)
-        nsp_data_from_paragraph.append((tokens, segment_ids, is_next))
+        tokens, segments = get_tokens_and_segments(tokens_a, tokens_b)
+        nsp_data_from_paragraph.append((tokens, segments, is_next))
     return nsp_data_from_paragraph
 
 
@@ -1863,26 +1865,27 @@ def _get_mlm_data_from_tokens(tokens, vocab):
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def _pad_bert_inputs(instances, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
-    tokens_X, segments_X, valid_lens_x, pred_positions_X = [], [], [], []
-    mlm_weights_X, mlm_Y, nsp_y = [], [], []
-    for (mlm_input_ids, pred_positions, mlm_pred_label_ids, segment_ids,
+    all_token_ids, all_segments, valid_lens,  = [], [], []
+    all_pred_positions, all_mlm_weights, all_mlm_labels = [], [], []
+    nsp_labels = []
+    for (mlm_input_ids, pred_positions, mlm_pred_label_ids, segments,
          is_next) in instances:
-        tokens_X.append(np.array(mlm_input_ids + [vocab['<pad>']] * (
+        all_token_ids.append(np.array(mlm_input_ids + [vocab['<pad>']] * (
             max_len - len(mlm_input_ids)), dtype='int32'))
-        segments_X.append(np.array(segment_ids + [0] * (
-            max_len - len(segment_ids)), dtype='int32'))
-        valid_lens_x.append(np.array(len(mlm_input_ids)))
-        pred_positions_X.append(np.array(pred_positions + [0] * (
+        all_segments.append(np.array(segments + [0] * (
+            max_len - len(segments)), dtype='int32'))
+        valid_lens.append(np.array(len(mlm_input_ids)))
+        all_pred_positions.append(np.array(pred_positions + [0] * (
             20 - len(pred_positions)), dtype='int32'))
         # Predictions of padded tokens will be filtered out in the loss via
         # multiplication of 0 weights
-        mlm_weights_X.append(np.array([1.0] * len(mlm_pred_label_ids) + [
+        all_mlm_weights.append(np.array([1.0] * len(mlm_pred_label_ids) + [
             0.0] * (20 - len(pred_positions)), dtype='float32'))
-        mlm_Y.append(np.array(mlm_pred_label_ids + [0] * (
+        all_mlm_labels.append(np.array(mlm_pred_label_ids + [0] * (
             20 - len(mlm_pred_label_ids)), dtype='int32'))
-        nsp_y.append(np.array(is_next))
-    return (tokens_X, segments_X, valid_lens_x, pred_positions_X,
-            mlm_weights_X, mlm_Y, nsp_y)
+        nsp_labels.append(np.array(is_next))
+    return (all_token_ids, all_segments, valid_lens, all_pred_positions,
+            all_mlm_weights, all_mlm_labels, nsp_labels)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
@@ -1904,20 +1907,22 @@ class _WikiTextDataset(gluon.data.Dataset):
                 paragraph, paragraghs, self.vocab, max_len))
         # Get data for the masked language model task
         instances = [(_get_mlm_data_from_tokens(tokens, self.vocab)
-                      + (segment_ids, is_next))
-                     for tokens, segment_ids, is_next in instances]
+                      + (segments, is_next))
+                     for tokens, segments, is_next in instances]
         # Pad inputs
-        (self.tokens_X, self.segments_X, self.valid_lens_x,
-         self.pred_positions_X, self.mlm_weights_X, self.mlm_Y,
-         self.nsp_y) = _pad_bert_inputs(instances, max_len, self.vocab)
+        (self.all_token_ids, self.all_segments, self.valid_lens,
+         self.all_pred_positions, self.all_mlm_weights,
+         self.all_mlm_labels, self.nsp_labels) = _pad_bert_inputs(
+            instances, max_len, self.vocab)
 
     def __getitem__(self, idx):
-        return (self.tokens_X[idx], self.segments_X[idx],
-                self.valid_lens_x[idx], self.pred_positions_X[idx],
-                self.mlm_weights_X[idx], self.mlm_Y[idx], self.nsp_y[idx])
+        return (self.all_token_ids[idx], self.all_segments[idx],
+                self.valid_lens[idx], self.all_pred_positions[idx],
+                self.all_mlm_weights[idx], self.all_mlm_labels[idx],
+                self.nsp_labels[idx])
 
     def __len__(self):
-        return len(self.tokens_X)
+        return len(self.all_token_ids)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
@@ -2043,10 +2048,10 @@ def load_data_imdb(batch_size, num_steps=500):
     train_tokens = d2l.tokenize(train_data[0], token='word')
     test_tokens = d2l.tokenize(test_data[0], token='word')
     vocab = d2l.Vocab(train_tokens, min_freq=5)
-    train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
-                               for line in train_tokens])
-    test_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
-                              for line in test_tokens])
+    train_features = np.array([d2l.truncate_pad(
+        vocab[line], num_steps, vocab.unk) for line in train_tokens])
+    test_features = np.array([d2l.truncate_pad(
+        vocab[line], num_steps, vocab.unk) for line in test_tokens])
     train_iter = d2l.load_array((train_features, train_data[1]), batch_size)
     test_iter = d2l.load_array((test_features, test_data[1]), batch_size,
                                is_train=False)
@@ -2092,21 +2097,22 @@ class SNLIDataset(gluon.data.Dataset):
     """A customized dataset to load the SNLI dataset."""
     def __init__(self, dataset, num_steps, vocab=None):
         self.num_steps = num_steps
-        p_tokens = d2l.tokenize(dataset[0])
-        h_tokens = d2l.tokenize(dataset[1])
+        all_premise_tokens = d2l.tokenize(dataset[0])
+        all_hypothesis_tokens = d2l.tokenize(dataset[1])
         if vocab is None:
-            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5,
-                                   reserved_tokens=['<pad>'])
+            self.vocab = d2l.Vocab(all_premise_tokens + all_hypothesis_tokens,
+                                   min_freq=5, reserved_tokens=['<pad>'])
         else:
             self.vocab = vocab
-        self.premises = self.pad(p_tokens)
-        self.hypotheses = self.pad(h_tokens)
+        self.premises = self._pad(all_premise_tokens)
+        self.hypotheses = self._pad(all_hypothesis_tokens)
         self.labels = np.array(dataset[2])
         print('read ' + str(len(self.premises)) + ' examples')
 
-    def pad(self, lines):
-        return np.array([d2l.trim_pad(self.vocab[line], self.num_steps, 
-                                      self.vocab['<pad>']) for line in lines])
+    def _pad(self, lines):
+        return np.array([d2l.truncate_pad(
+            self.vocab[line], self.num_steps, self.vocab['<pad>'])
+                         for line in lines])
 
     def __getitem__(self, idx):
         return (self.premises[idx], self.hypotheses[idx]), self.labels[idx]

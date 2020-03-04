@@ -12,16 +12,15 @@ from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()
-bert_batch_size, max_len, ctx  = 512, 128, d2l.try_all_gpus()
+bert_batch_size, max_len = 512, 128
 bert_train_iter, vocab = d2l.load_data_wiki(bert_batch_size, max_len)
-
-bert = d2l.BERTModel(len(vocab), num_hiddens=256, ffn_num_hiddens=256,
-                     num_heads=4, num_layers=2, dropout=0.2)
-bert.initialize(init.Xavier(), ctx=ctx)
-loss = gluon.loss.SoftmaxCELoss()
 ```
 
 ```{.python .input}
+ctx, loss = d2l.try_all_gpus(), gluon.loss.SoftmaxCELoss()
+bert = d2l.BERTModel(len(vocab), num_hiddens=256, ffn_num_hiddens=256,
+                     num_heads=4, num_layers=2, dropout=0.2)
+bert.initialize(init.Xavier(), ctx=ctx)
 d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 2000)
 ```
 
@@ -29,39 +28,47 @@ d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 2000)
 
 ```{.python .input  n=41}
 class SNLIBERTDataset(gluon.data.Dataset):
-    def __init__(self, dataset, vocab=None):
-        self.num_steps = 50  # We fix the length of each sentence to 50.
-        p_tokens = d2l.tokenize(dataset[0])
-        h_tokens = d2l.tokenize(dataset[1])
-        self.vocab = vocab
-
-        self.tokens, self.segment_ids, self.valid_lens = self.preprocess(
-            p_tokens, h_tokens)
+    def __init__(self, dataset, max_len, vocab=None):
+        all_premise_tokens = d2l.tokenize(dataset[0])
+        all_hypothesis_tokens = d2l.tokenize(dataset[1])
         self.labels = np.array(dataset[2])
-        print('read ' + str(len(self.tokens)) + ' examples')
+        self.vocab = vocab
+        self.max_len = max_len
+        (self.all_token_ids, self.all_segments,
+         self.valid_lens) = self._preprocess(all_premise_tokens,
+                                             all_hypothesis_tokens)
+        print('read ' + str(len(self.all_token_ids)) + ' examples')
 
-    def preprocess(self, p_tokens, h_tokens):
-        def pad(data):
-            return d2l.trim_pad(data, self.num_steps, 0)
+    def _preprocess(self, all_premise_tokens, all_hypothesis_tokens):
+        all_token_ids, all_segments, valid_lens = [], [], []
+        for p_tokens, h_tokens in zip(
+            all_premise_tokens, all_hypothesis_tokens):
+            self._truncate_pair_of_tokens(p_tokens, h_tokens)
+            tokens, segments = d2l.get_tokens_and_segments(p_tokens, h_tokens)
+            all_token_ids.append(
+                np.array(self.vocab[tokens] + [self.vocab['<pad>']]
+                         * (self.max_len - len(tokens)), dtype='int32'))
+            all_segments.append(
+                np.array(segments + [0] * (self.max_len - len(segments)),
+                         dtype='int32'))
+            valid_lens.append(np.array(len(tokens)))
+        return all_token_ids, all_segments, valid_lens 
 
-        tokens, segment_ids, valid_lens = [], [], []
-
-        for i in range(len(p_tokens)):
-            token, segment_id = d2l.get_tokens_and_segments(
-                p_tokens[i][:self.num_steps], h_tokens[i][:self.num_steps])
-            tokens.append(self.vocab[pad(token)])
-            segment_ids.append(np.array(pad(segment_id)))
-            valid_lens.append(np.array(len(token)))
-
-        return tokens, segment_ids, valid_lens
-
+    def _truncate_pair_of_tokens(self, p_tokens, h_tokens):
+        # Reserve slots for '<CLS>', '<SEP>', and '<SEP>' tokens for the
+        # BERT input
+        while len(p_tokens) + len(h_tokens) > self.max_len - 3:
+            if len(p_tokens) > len(h_tokens):
+                p_tokens.pop()
+            else:
+                h_tokens.pop()
 
     def __getitem__(self, idx):
-        return (self.tokens[idx], self.segment_ids[idx],
+        return (self.all_token_ids[idx], self.all_segments[idx],
                 self.valid_lens[idx]), self.labels[idx]
 
     def __len__(self):
-        return len(self.tokens)
+        return len(self.all_token_ids)
 ```
 
 ...
@@ -70,8 +77,8 @@ class SNLIBERTDataset(gluon.data.Dataset):
 data_dir = d2l.download_extract('SNLI')
 train_data = d2l.read_snli(data_dir, True)
 test_data = d2l.read_snli(data_dir, False)
-train_set = SNLIBERTDataset(train_data, vocab)
-test_set = SNLIBERTDataset(test_data, vocab)
+train_set = SNLIBERTDataset(train_data, max_len, vocab)
+test_set = SNLIBERTDataset(test_data, max_len, vocab)
 ```
 
 ...
@@ -90,11 +97,11 @@ class BERTClassifier(nn.Block):
         super(BERTClassifier, self).__init__()
         self.bert = bert
         self.classifier = nn.Sequential()
-        self.classifier.add(nn.Dense(256, flatten=False, activation='relu'))
+        self.classifier.add(nn.Dense(256, activation='relu'))
         self.classifier.add(nn.Dense(num_classes))
 
     def forward(self, X):
-        inputs, segment_types, seq_len = X
+        inputs, segment_types, seq_len = X        
         seq_encoding, _, _ = self.bert(inputs, segment_types, seq_len)
         return self.classifier(seq_encoding[:, 0, :])
 ```
@@ -116,4 +123,6 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
                d2l.split_batch_multi_inputs)
 ```
 
-...
+## Exercises
+
+1. How to truncate a pair of sequences according to their ratio of length.

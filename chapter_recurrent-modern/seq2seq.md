@@ -231,7 +231,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_len = np.array([len(src_tokens)], ctx=ctx)
-    src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab['<pad>'])
+    src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
     enc_X = np.array(src_tokens, ctx=ctx)
     # Add the batch_size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),

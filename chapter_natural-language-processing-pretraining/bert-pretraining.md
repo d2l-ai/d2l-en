@@ -56,8 +56,8 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
 # Saved in the d2l package for later use
 def get_tokens_and_segments(tokens_a, tokens_b):
     tokens = ['<cls>'] + tokens_a + ['<sep>'] + tokens_b + ['<sep>']
-    segment_ids = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
-    return tokens, segment_ids
+    segments = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
+    return tokens, segments
 ```
 
 ...
@@ -72,8 +72,8 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
         # Consider 1 '<cls>' token and 2 '<sep>' tokens
         if len(tokens_a) + len(tokens_b) + 3 > max_len:
              continue
-        tokens, segment_ids = get_tokens_and_segments(tokens_a, tokens_b)
-        nsp_data_from_paragraph.append((tokens, segment_ids, is_next))
+        tokens, segments = get_tokens_and_segments(tokens_a, tokens_b)
+        nsp_data_from_paragraph.append((tokens, segments, is_next))
     return nsp_data_from_paragraph
 ```
 
@@ -141,26 +141,27 @@ def _get_mlm_data_from_tokens(tokens, vocab):
 # Saved in the d2l package for later use
 def _pad_bert_inputs(instances, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
-    tokens_X, segments_X, valid_lens_x, pred_positions_X = [], [], [], []
-    mlm_weights_X, mlm_Y, nsp_y = [], [], []
-    for (mlm_input_ids, pred_positions, mlm_pred_label_ids, segment_ids,
+    all_token_ids, all_segments, valid_lens,  = [], [], []
+    all_pred_positions, all_mlm_weights, all_mlm_labels = [], [], []
+    nsp_labels = []
+    for (token_ids, pred_positions, mlm_pred_label_ids, segments,
          is_next) in instances:
-        tokens_X.append(np.array(mlm_input_ids + [vocab['<pad>']] * (
-            max_len - len(mlm_input_ids)), dtype='int32'))
-        segments_X.append(np.array(segment_ids + [0] * (
-            max_len - len(segment_ids)), dtype='int32'))
-        valid_lens_x.append(np.array(len(mlm_input_ids)))
-        pred_positions_X.append(np.array(pred_positions + [0] * (
+        all_token_ids.append(np.array(token_ids + [vocab['<pad>']] * (
+            max_len - len(token_ids)), dtype='int32'))
+        all_segments.append(np.array(segments + [0] * (
+            max_len - len(segments)), dtype='int32'))
+        valid_lens.append(np.array(len(token_ids)))
+        all_pred_positions.append(np.array(pred_positions + [0] * (
             20 - len(pred_positions)), dtype='int32'))
         # Predictions of padded tokens will be filtered out in the loss via
         # multiplication of 0 weights
-        mlm_weights_X.append(np.array([1.0] * len(mlm_pred_label_ids) + [
+        all_mlm_weights.append(np.array([1.0] * len(mlm_pred_label_ids) + [
             0.0] * (20 - len(pred_positions)), dtype='float32'))
-        mlm_Y.append(np.array(mlm_pred_label_ids + [0] * (
+        all_mlm_labels.append(np.array(mlm_pred_label_ids + [0] * (
             20 - len(mlm_pred_label_ids)), dtype='int32'))
-        nsp_y.append(np.array(is_next))
-    return (tokens_X, segments_X, valid_lens_x, pred_positions_X,
-            mlm_weights_X, mlm_Y, nsp_y)
+        nsp_labels.append(np.array(is_next))
+    return (all_token_ids, all_segments, valid_lens, all_pred_positions,
+            all_mlm_weights, all_mlm_labels, nsp_labels)
 ```
 
 ...
@@ -185,20 +186,22 @@ class _WikiTextDataset(gluon.data.Dataset):
                 paragraph, paragraghs, self.vocab, max_len))
         # Get data for the masked language model task
         instances = [(_get_mlm_data_from_tokens(tokens, self.vocab)
-                      + (segment_ids, is_next))
-                     for tokens, segment_ids, is_next in instances]
+                      + (segments, is_next))
+                     for tokens, segments, is_next in instances]
         # Pad inputs
-        (self.tokens_X, self.segments_X, self.valid_lens_x,
-         self.pred_positions_X, self.mlm_weights_X, self.mlm_Y,
-         self.nsp_y) = _pad_bert_inputs(instances, max_len, self.vocab)
+        (self.all_token_ids, self.all_segments, self.valid_lens,
+         self.all_pred_positions, self.all_mlm_weights,
+         self.all_mlm_labels, self.nsp_labels) = _pad_bert_inputs(
+            instances, max_len, self.vocab)
 
     def __getitem__(self, idx):
-        return (self.tokens_X[idx], self.segments_X[idx],
-                self.valid_lens_x[idx], self.pred_positions_X[idx],
-                self.mlm_weights_X[idx], self.mlm_Y[idx], self.nsp_y[idx])
+        return (self.all_token_ids[idx], self.all_segments[idx],
+                self.valid_lens[idx], self.all_pred_positions[idx],
+                self.all_mlm_weights[idx], self.all_mlm_labels[idx],
+                self.nsp_labels[idx])
 
     def __len__(self):
-        return len(self.tokens_X)
+        return len(self.all_token_ids)
 ```
 
 ```{.python .input  n=11}
@@ -340,7 +343,7 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
 ...
 
 ```{.python .input  n=18}
-train_bert(train_iter, net, loss, len(vocab), ctx, 1, 10)
+train_bert(train_iter, net, loss, len(vocab), ctx, 1, 50)
 ```
 
 ## Exercises
