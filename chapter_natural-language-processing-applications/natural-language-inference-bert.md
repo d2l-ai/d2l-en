@@ -93,23 +93,24 @@ test_iter = gluon.data.DataLoader(test_set, batch_size)
 
 ```{.python .input  n=44}
 class BERTClassifier(nn.Block):
-    def __init__(self, bert, num_classes):
+    def __init__(self, bert):
         super(BERTClassifier, self).__init__()
         self.bert = bert
         self.classifier = nn.Sequential()
         self.classifier.add(nn.Dense(256, activation='relu'))
-        self.classifier.add(nn.Dense(num_classes))
+        # There are 3 possible outputs: entailment, contradiction, and neutral
+        self.classifier.add(nn.Dense(3))
 
-    def forward(self, X):
-        inputs, segment_types, seq_len = X
-        seq_encoding, _, _ = self.bert(inputs, segment_types, seq_len)
-        return self.classifier(seq_encoding[:, 0, :])
+    def forward(self, inputs):
+        tokens_X, segments_X, valid_lens_x = inputs
+        encoded_X, _, _ = self.bert(tokens_X, segments_X, valid_lens_x)
+        return self.classifier(encoded_X[:, 0, :])
 ```
 
 ...
 
 ```{.python .input  n=45}
-net = BERTClassifier(bert, 3)
+net = BERTClassifier(bert)
 net.classifier.initialize(ctx=ctx)
 ```
 

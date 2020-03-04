@@ -125,3 +125,39 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
 ```{.python .input  n=18}
 train_bert(train_iter, net, loss, len(vocab), ctx, 1, 50)
 ```
+
+## Representing text with BERT
+
+```{.python .input}
+def get_bert_encoding(bert, tokens_a, tokens_b=None):
+    tokens, segments = d2l.get_tokens_and_segments(tokens_a, tokens_b)
+    ctx = npx.gpu(0)
+    token_ids = np.expand_dims(np.array(vocab[tokens], ctx=ctx), axis=0)
+    segments = np.expand_dims(np.array(segments, ctx=ctx), axis=0)
+    valid_len = np.expand_dims(np.array(len(tokens), ctx=ctx), axis=0)
+    encoded_X, _, _ = net(token_ids, segments, valid_len)
+    return encoded_X
+```
+
+```{.python .input}
+tokens_a = ['a', 'crane', 'is', 'flying']
+encoded_text = get_bert_encoding(net, tokens_a)
+# Tokens: '<cls>', 'a', 'crane', 'is', 'flying', '<sep>'
+encoded_text_cls = encoded_text[:, 0, :]
+encoded_text_crane = encoded_text[:, 2, :]
+encoded_text.shape, encoded_text_cls.shape, encoded_text_crane[0][:3]
+```
+
+```{.python .input}
+tokens_a, tokens_b = ['a', 'crane', 'driver', 'came'], ['he', 'just', 'left']
+encoded_pair = get_bert_encoding(net, tokens_a, tokens_b)
+# Tokens: '<cls>', 'a', 'crane', 'driver', 'came', '<sep>', 'he', 'just',
+# 'left', '<sep>'
+encoded_pair_cls = encoded_pair[:, 0, :]
+encoded_pair_crane = encoded_pair[:, 2, :]
+encoded_pair.shape, encoded_pair_cls.shape, encoded_pair_crane[0][:3]
+```
+
+## Exercises
+
+1. Why MLM loss is significantly higher than NSP loss?

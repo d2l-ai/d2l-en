@@ -225,7 +225,7 @@ train_iter, test_iter, vocab = d2l.load_data_snli(batch_size, num_steps)
 ### Creating the Model
 
 We use the pretrained $100$-dimensional GloVe embedding to represent the input tokens.
-Thus, we predefine the dimension of vectors $\mathbf{a}_i$ and $\mathbf{b}_j$ in :eqlabel:`eq_nli_e` as $100$.
+Thus, we predefine the dimension of vectors $\mathbf{a}_i$ and $\mathbf{b}_j$ in :eqref:`eq_nli_e` as $100$.
 The output dimension of functions $f$ in :eqref:`eq_nli_e` and $g$ in :eqref:`eq_nli_v_ab` is set to $200$.
 Then we create a model instance, initialize its parameters,
 and load the GloVe embedding to initialize vectors of input tokens.

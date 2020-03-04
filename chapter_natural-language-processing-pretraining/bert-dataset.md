@@ -54,9 +54,13 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
 
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
-def get_tokens_and_segments(tokens_a, tokens_b):
-    tokens = ['<cls>'] + tokens_a + ['<sep>'] + tokens_b + ['<sep>']
-    segments = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
+def get_tokens_and_segments(tokens_a, tokens_b=None):
+    if tokens_b is None:
+        tokens = ['<cls>'] + tokens_a + ['<sep>']
+        segments = [0] * (len(tokens_a) + 2)
+    else:
+        tokens = ['<cls>'] + tokens_a + ['<sep>'] + tokens_b + ['<sep>']
+        segments = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
     return tokens, segments
 ```
 
@@ -127,7 +131,7 @@ def _get_mlm_data_from_tokens(tokens, vocab):
     mlm_input_tokens, pred_positions_and_labels = _replace_mlm_tokens(
         tokens, candidate_pred_positions, num_mlm_preds, vocab)
     pred_positions_and_labels = sorted(pred_positions_and_labels,
-                                           key=lambda x: x[0])
+                                       key=lambda x: x[0])
     pred_positions = [v[0] for v in pred_positions_and_labels]
     mlm_pred_labels = [v[1] for v in pred_positions_and_labels]
     return vocab[mlm_input_tokens], pred_positions, vocab[mlm_pred_labels]
