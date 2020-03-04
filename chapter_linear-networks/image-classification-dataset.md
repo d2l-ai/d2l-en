@@ -184,4 +184,4 @@ We are now ready to work with the FashionMNIST dataset in the sections that foll
 
 ## [Discussions](https://discuss.mxnet.io/t/2335)
 
-![](../img/qr_fashion-mnist.svg)
+![](../img/qr_image-classification-dataset.svg)
