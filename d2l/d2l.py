@@ -1868,13 +1868,13 @@ def _pad_bert_inputs(instances, max_len, vocab):
     all_token_ids, all_segments, valid_lens,  = [], [], []
     all_pred_positions, all_mlm_weights, all_mlm_labels = [], [], []
     nsp_labels = []
-    for (mlm_input_ids, pred_positions, mlm_pred_label_ids, segments,
+    for (token_ids, pred_positions, mlm_pred_label_ids, segments,
          is_next) in instances:
-        all_token_ids.append(np.array(mlm_input_ids + [vocab['<pad>']] * (
-            max_len - len(mlm_input_ids)), dtype='int32'))
+        all_token_ids.append(np.array(token_ids + [vocab['<pad>']] * (
+            max_len - len(token_ids)), dtype='int32'))
         all_segments.append(np.array(segments + [0] * (
             max_len - len(segments)), dtype='int32'))
-        valid_lens.append(np.array(len(mlm_input_ids)))
+        valid_lens.append(np.array(len(token_ids)))
         all_pred_positions.append(np.array(pred_positions + [0] * (
             20 - len(pred_positions)), dtype='int32'))
         # Predictions of padded tokens will be filtered out in the loss via
