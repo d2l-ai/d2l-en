@@ -361,7 +361,7 @@ to track the running time.
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
-class Timer(object):
+class Timer:
     """Record multiple running times."""
     def __init__(self):
         self.times = []
