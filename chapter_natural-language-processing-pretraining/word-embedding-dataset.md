@@ -275,4 +275,4 @@ for batch in data_iter:
 
 ## [Discussions](https://discuss.mxnet.io/t/4356)
 
-![](../img/qr_word2vec-dataset.svg)
+![](../img/qr_word-embedding-dataset.svg)
