@@ -16,7 +16,7 @@ Many of the examples for using recurrent networks are based on text data. Hence,
 
 sequence
 text-preprocessing
-lang-model
+language-models-and-dataset
 rnn
 rnn-scratch
 rnn-gluon

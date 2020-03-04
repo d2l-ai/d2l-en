@@ -1,4 +1,4 @@
-# The Dataset for Word2vec
+# The Dataset for Pretraining Word Embedding 
 :label:`sec_word2vec_data`
 
 In this section, we will introduce how to preprocess a dataset with

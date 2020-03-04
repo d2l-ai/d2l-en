@@ -1,4 +1,4 @@
-# The Image Classification Dataset (Fashion-MNIST)
+# The Image Classification Dataset
 :label:`sec_fashion_mnist`
 
 In :numref:`sec_naive_bayes`, we trained a naive Bayes classifier,

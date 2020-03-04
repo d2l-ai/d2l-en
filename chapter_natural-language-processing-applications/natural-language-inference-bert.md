@@ -12,7 +12,7 @@ from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()
-bert_batch_size, max_len = 512, 128
+bert_batch_size, max_len = 512, 64
 bert_train_iter, vocab = d2l.load_data_wiki(bert_batch_size, max_len)
 ```
 
@@ -101,7 +101,7 @@ class BERTClassifier(nn.Block):
         self.classifier.add(nn.Dense(num_classes))
 
     def forward(self, X):
-        inputs, segment_types, seq_len = X        
+        inputs, segment_types, seq_len = X
         seq_encoding, _, _ = self.bert(inputs, segment_types, seq_len)
         return self.classifier(seq_encoding[:, 0, :])
 ```

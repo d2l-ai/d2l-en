@@ -40,12 +40,13 @@ We will cover them in :numref:`chap_nlp_app`.
 
 word2vec
 approx-training
-word2vec-dataset
+word-embedding-dataset
 word2vec-pretraining
 glove
 subword-embedding
 similarity-analogy
 bert
+bert-dataset
 bert-pretraining
 
 ```
