@@ -280,4 +280,4 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 
 ## [Discussions](https://discuss.mxnet.io/t/2361)
 
-![](../img/qr_lang-model.svg)
+![](../img/qr_language-models-and-dataset.svg)
