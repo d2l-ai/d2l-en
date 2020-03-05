@@ -1665,6 +1665,7 @@ def batchify(data):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
+    num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
     subsampled = subsampling(sentences, vocab)
@@ -1675,7 +1676,8 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     dataset = gluon.data.ArrayDataset(
         all_centers, all_contexts, all_negatives)
     data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
-                                      batchify_fn=batchify)
+                                      batchify_fn=batchify,
+                                      num_workers=num_workers)
     return data_iter, vocab
 
 
@@ -1931,10 +1933,12 @@ class _WikiTextDataset(gluon.data.Dataset):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def load_data_wiki(batch_size, max_len):
+    num_workers = d2l.get_dataloader_workers()
     data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
     paragraghs = _read_wiki(data_dir)
     train_set = _WikiTextDataset(paragraghs, max_len)
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
+                                       #num_workers=num_workers)
     return train_iter, train_set.vocab
 
 
@@ -2128,13 +2132,16 @@ class SNLIDataset(gluon.data.Dataset):
 # Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-and-dataset.md
 def load_data_snli(batch_size, num_steps=50):
     """Download the SNLI dataset and return data iterators and vocabulary."""
+    num_workers = d2l.get_dataloader_workers()
     data_dir = d2l.download_extract('SNLI')
     train_data = read_snli(data_dir, True)
     test_data = read_snli(data_dir, False)
     train_set = SNLIDataset(train_data, num_steps)
     test_set = SNLIDataset(test_data, num_steps, train_set.vocab)
-    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
-    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
+                                       num_workers=num_workers)
+    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False,
+                                      num_workers=num_workers)
     return train_iter, test_iter, train_set.vocab
 
 

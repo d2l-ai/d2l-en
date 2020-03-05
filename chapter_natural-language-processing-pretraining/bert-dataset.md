@@ -211,15 +211,17 @@ class _WikiTextDataset(gluon.data.Dataset):
 ```{.python .input  n=11}
 # Saved in the d2l package for later use
 def load_data_wiki(batch_size, max_len):
+    num_workers = d2l.get_dataloader_workers()
     data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
     paragraghs = _read_wiki(data_dir)
     train_set = _WikiTextDataset(paragraghs, max_len)
-    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
+                                       num_workers=num_workers)
     return train_iter, train_set.vocab
 ```
 
 ```{.python .input  n=12}
-batch_size, max_len = 512, 16
+batch_size, max_len = 512, 64
 train_iter, vocab = load_data_wiki(batch_size, max_len)
 ```
 

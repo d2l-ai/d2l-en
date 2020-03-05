@@ -166,13 +166,16 @@ As a result, any new token from the testing set will be unknown to the model tra
 # Saved in the d2l package for later use
 def load_data_snli(batch_size, num_steps=50):
     """Download the SNLI dataset and return data iterators and vocabulary."""
+    num_workers = d2l.get_dataloader_workers()
     data_dir = d2l.download_extract('SNLI')
     train_data = read_snli(data_dir, True)
     test_data = read_snli(data_dir, False)
     train_set = SNLIDataset(train_data, num_steps)
     test_set = SNLIDataset(test_data, num_steps, train_set.vocab)
-    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
-    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
+                                       num_workers=num_workers)
+    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False,
+                                      num_workers=num_workers)
     return train_iter, test_iter, train_set.vocab
 ```
 

@@ -84,9 +84,11 @@ test_set = SNLIBERTDataset(test_data, max_len, vocab)
 ...
 
 ```{.python .input  n=43}
-batch_size = 512
-train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
-test_iter = gluon.data.DataLoader(test_set, batch_size)
+batch_size, num_workers = 512, d2l.get_dataloader_workers()
+train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
+                                   num_workers=num_workers)
+test_iter = gluon.data.DataLoader(test_set, batch_size,
+                                  num_workers=num_workers)
 ```
 
 ...
