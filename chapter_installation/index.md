@@ -86,7 +86,7 @@ to access GPUs before running larger models.
 pip install mxnet==1.6.0b20190926
 
 # For Linux and macOS users
-pip install mxnet==1.6.0b20191122
+pip install mxnet==1.6.0
 ```
 
 
@@ -149,7 +149,7 @@ with the following command:
 pip install mxnet-cu101==1.6.0b20190926
 
 # For Linux and macOS users
-pip install mxnet-cu101==1.6.0b20191122
+pip install mxnet-cu101==1.6.0
 ```
 
 
