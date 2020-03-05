@@ -340,7 +340,7 @@ which uses an unlabeled training set $X$ and test set $Z$:
 
 Note that this method relies on a crucial assumption.
 For this scheme to work, we need that each data point
-in the target (test time)distribution
+in the target (test time) distribution
 had nonzero probability of occurring at training time.
 If we find a point where $q(\mathbf{x}) > 0$ but $p(\mathbf{x}) = 0$,
 then the corresponding importance weight should be infinity.
