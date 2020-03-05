@@ -8,6 +8,7 @@ language inference.](../img/nlp-map-nli-bert.svg)
 
 ```{.python .input  n=40}
 import d2l
+import multiprocessing
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 
