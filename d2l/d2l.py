@@ -1937,8 +1937,8 @@ def load_data_wiki(batch_size, max_len):
     data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
     paragraghs = _read_wiki(data_dir)
     train_set = _WikiTextDataset(paragraghs, max_len)
-    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
-                                       #num_workers=num_workers)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
+                                       num_workers=num_workers)
     return train_iter, train_set.vocab
 
 
