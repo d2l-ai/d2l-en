@@ -1991,7 +1991,8 @@ def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
                num_steps):
-    trainer = gluon.Trainer(net.collect_params(), 'adam')
+    trainer = gluon.Trainer(net.collect_params(), 'adam',
+                            {'learning_rate': 1e-3})
     step, timer = 0, d2l.Timer()
     animator = d2l.Animator(xlabel='step', ylabel='loss',
                             xlim=[1, num_steps], legend=['mlm', 'nsp'])
