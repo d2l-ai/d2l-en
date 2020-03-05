@@ -306,7 +306,7 @@ In this case, there exists a very effective approach
 that will give almost as good results: logistic regression.
 This is all that is needed to compute estimate probability ratios.
 We learn a classifier to distinguish between data drawn from $p(\mathbf{x})$
-and data drawn from $q(x)$.
+and data drawn from $q(\mathbf{x})$.
 If it is impossible to distinguish between the two distributions
 then it means that the associated instances are equally likely
 to come from either one of the two distributions.
