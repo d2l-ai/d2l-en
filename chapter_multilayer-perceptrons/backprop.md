@@ -70,7 +70,7 @@ Assuming the parameters of the output layer
 only possess a weight of 
 $\mathbf{W}^{(2)} \in \mathbb{R}^{q \times h}$,
 we can obtain an output layer variable 
-with a vector length of $q$:
+with a vector of length $q$:
 
 $$\mathbf{o}= \mathbf{W}^{(2)} \mathbf{h}.$$
 
@@ -122,7 +122,7 @@ Backpropagation refers to the method of calculating
 the gradient of neural network parameters.
 In short, the method traverses the network in reverse order,
 from the output to the input layer,
-according ot the *chain rule* from calculus.
+according to the *chain rule* from calculus.
 The algorithm, stores any intermediate variables
 (partial derivatives)
 requried while calculating the gradient 
@@ -265,7 +265,7 @@ thus more intermediate activations need to be stored.
 
 ## Exercises
 
-1. Assume that the inputs $\mathbf{x}$ to some scalar function $f$ are $n \times m$ matrices. What is the dimensionality of the gradient of $f$ with respect to $\mathbf{x}?
+1. Assume that the inputs $\mathbf{x}$ to some scalar function $f$ are $n \times m$ matrices. What is the dimensionality of the gradient of $f$ with respect to $\mathbf{x}$?
 1. Add a bias to the hidden layer of the model described in this section.
     * Draw the corresponding compute graph.
     * Derive the forward and backward propagation equations.
