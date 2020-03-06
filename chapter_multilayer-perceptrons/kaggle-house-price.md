@@ -124,7 +124,7 @@ Each record includes the property value of the house
 and attributes such as street type, year of construction,
 roof type, basement condition, etc.
 The features represent multiple data types.
-Year of construction, for example, is represented with integers
+Year of construction, for example, is represented with an integer,
 roof type is a discrete categorical feature,
 other features are represented with floating point numbers.
 And here is where reality comes in:
