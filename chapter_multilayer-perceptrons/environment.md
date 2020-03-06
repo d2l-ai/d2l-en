@@ -134,7 +134,7 @@ which tends (in deep learning) to be a high-dimensional object.
 
 ### Concept Shift
 
-One more related problem arises is *concept shift*,
+One more related problem that arises is *concept shift*,
 the situation in which the very label definitions change.
 This sounds weird—after all, a *cat* is a *cat*.
 Indeed the definition of a cat might not change,
