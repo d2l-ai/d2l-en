@@ -49,7 +49,7 @@ Even when we have far more examples than features,
 deep neural networks are capable of overfitting.
 In 2017, a group of researchers demonstrated
 the extreme flexibility of neural networks
-by training deep nets on randomly-labeled images.
+by training deep nets on randomly-labeled images (:cite: 'please add the reference').
 Despite the absence of any true pattern
 linking the inputs to the outputs,
 they found that the neural network optimized by SGD,

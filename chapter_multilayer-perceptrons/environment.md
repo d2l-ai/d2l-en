@@ -134,7 +134,7 @@ which tends (in deep learning) to be a high-dimensional object.
 
 ### Concept Shift
 
-One more related problem arises in *concept shift*,
+One more related problem arises is *concept shift*,
 the situation in which the very label definitions change.
 This sounds weird—after all, a *cat* is a *cat*.
 Indeed the definition of a cat might not change,
@@ -306,7 +306,7 @@ In this case, there exists a very effective approach
 that will give almost as good results: logistic regression.
 This is all that is needed to compute estimate probability ratios.
 We learn a classifier to distinguish between data drawn from $p(\mathbf{x})$
-and data drawn from $q(x)$.
+and data drawn from $q(\mathbf{x})$.
 If it is impossible to distinguish between the two distributions
 then it means that the associated instances are equally likely
 to come from either one of the two distributions.
@@ -340,7 +340,7 @@ which uses an unlabeled training set $X$ and test set $Z$:
 
 Note that this method relies on a crucial assumption.
 For this scheme to work, we need that each data point
-in the target (test time)distribution
+in the target (test time) distribution
 had nonzero probability of occurring at training time.
 If we find a point where $q(\mathbf{x}) > 0$ but $p(\mathbf{x}) = 0$,
 then the corresponding importance weight should be infinity.
