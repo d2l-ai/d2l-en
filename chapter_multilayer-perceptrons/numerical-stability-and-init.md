@@ -253,7 +253,7 @@ Moreover, initialization continues to be a hot area of inquiry
 within research into the fundamental theory of neural network optimization.
 Some of these heuristics are especially suited
 for when parameters are tied
-(i.e., when parameters of different parts in the network are shared),
+(i.e., when parameters in different parts of the network are shared),
 for super-resolution, sequence models, and related problems.
 We recommend that the interested reader take a closer look
 at what is offered as part of this module,
