@@ -186,9 +186,9 @@ Its architecture is given by
 
 $$
 \begin{aligned}
-    h & = \sigma(W_1 x + b_1), \\
-    o & = W_2 h + b_2, \\
-    \hat{y} & = \mathrm{softmax}(o).
+    \mathbf{h} & = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1), \\
+    \mathbf{o} & = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2, \\
+    \hat{\mathbf{y}} & = \mathrm{softmax}(\mathbf{o}).
 \end{aligned}
 $$
 
@@ -231,7 +231,7 @@ where the random variable takes value $1$ (keep)
 with probability $1-p$ and $0$ (drop) with probability $p$.
 One easy way to implement this is to first draw samples
 from the uniform distribution $U[0, 1]$.
-then we can keep those nodes for which the corresponding
+Then we can keep those nodes for which the corresponding
 sample is greater than $p$, dropping the rest.
 
 In the following code, we implement a `dropout_layer` function
