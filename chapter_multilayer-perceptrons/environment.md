@@ -393,9 +393,9 @@ unless we invest in a complex real-time annotation pipeline.
 What we can do, however, is average all of our models predictions
 at test time together, yielding the mean model output $\mu_y$.
 
-It turns out that under some mild conditions---
-if our classifier was reasonably accurate in the first place,
-if the target data contains only classes of images that we have seen before,
+It turns out that under some mild conditions---if our classifier was
+reasonably accurate in the first place, if the target data contains only
+classes of images that we have seen before,
 and if the label shift assumption holds in the first place
 (far the strongest assumption here),
 then we can recover the test set label distribution by solving
