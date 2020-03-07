@@ -64,7 +64,7 @@ Note that some Blocks do not require any parameters at all!
 Finally a `Block` must possess a `backward` method,
 for purposes of calculating gradients.
 Fortunately, due to some behind-the-scenes magic
-supplied by the autograd  `autograd` package
+supplied by the `autograd` package
 (introduced in :numref:`chap_preliminaries`)
 when defining our own `Block` typically requires
 only that we worry about parameters and the `forward` function.
