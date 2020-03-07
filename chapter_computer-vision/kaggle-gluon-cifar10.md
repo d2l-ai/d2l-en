@@ -105,16 +105,16 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
     label_count = {}
     for train_file in os.listdir(data_dir + 'train'):
         label = labels[train_file.split('.')[0]]
-        fname = data_dir + 'train/' + train_file
+        fname = os.path.join(data_dir, 'train', train_file)
         # Copy to train_valid_test/train_valid with a subfolder per class
-        copyfile(fname, data_dir + 'train_valid_test/train_valid/' + label)
+        copyfile(fname, os.path.join(data_dir, 'train_valid_test','train_valid', label))
         if label not in label_count or label_count[label] < n_valid_per_label:
             # Copy to train_valid_test/valid
-            copyfile(fname, data_dir + 'train_valid_test/valid/' + label)
+            copyfile(fname, os.path.join(data_dir, 'train_valid_test', 'valid', label))
             label_count[label] = label_count.get(label, 0) + 1
         else:
             # Copy to train_valid_test/train
-            copyfile(fname, data_dir+'train_valid_test/train/' + label)
+            copyfile(fname, os.path.join(data_dir, 'train_valid_test', 'train', label))
     return n_valid_per_label
 ```
 
@@ -124,8 +124,8 @@ The `reorg_test` function below is used to organize the testing set to facilitat
 # Saved in the d2l package for later use    
 def reorg_test(data_dir):
     for test_file in os.listdir(data_dir + 'test'):
-        copyfile(data_dir + 'test/' + test_file, 
-                 data_dir + 'train_valid_test/test/unknown/')
+        copyfile(os.path.join(data_dir, 'test', test_file),
+                 os.path.join(data_dir, 'train_valid_test', 'test', 'unknown'))
 ```
 
 Finally, we use a function to call the previously defined `read_csv_labels`, `reorg_train_valid`, and `reorg_test` functions.

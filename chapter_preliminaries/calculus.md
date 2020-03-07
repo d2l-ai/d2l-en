@@ -191,10 +191,13 @@ since we will need to visualize many curves throughout the book.
 
 ```{.python .input}
 # Saved in the d2l package for later use
-def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
+def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
-         fmts=['-', 'm--', 'g-.', 'r:'], figsize=(3.5, 2.5), axes=None):
+         fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
     """Plot data points."""
+    if legend is None:
+        legend = []
+
     d2l.set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
 

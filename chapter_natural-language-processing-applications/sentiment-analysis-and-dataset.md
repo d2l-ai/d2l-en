@@ -35,13 +35,13 @@ Next, read the training and test datasets. Each example is a review and its corr
 # Saved in the d2l package for later use
 def read_imdb(data_dir, is_train):
     data, labels = [], []
-    for label in ['pos/', 'neg/']:
-        folder_name = data_dir + ('train/' if is_train else 'test/') + label
+    for label in ('pos', 'neg'):
+        folder_name = os.path.join(data_dir, 'train' if is_train else 'test', label)
         for file in os.listdir(folder_name):
             with open(folder_name + file, 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
-                labels.append(1 if label == 'pos/' else 0)
+                labels.append(1 if label == 'pos' else 0)
     return data, labels
 
 train_data = read_imdb(data_dir, is_train=True)

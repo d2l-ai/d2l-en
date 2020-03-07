@@ -31,11 +31,11 @@ def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
         lines = f.readlines()
-    # A line represents a paragragh.
-    paragraghs = [line.strip().lower().split(' . ')
+    # A line represents a paragraph.
+    paragraphs = [line.strip().lower().split(' . ')
                   for line in lines if len(line.split(' . ')) >= 2]
-    random.shuffle(paragraghs)
-    return paragraghs
+    random.shuffle(paragraphs)
+    return paragraphs
 ```
 
 ## Prepare NSP data
@@ -75,7 +75,7 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
             paragraph[i], paragraph[i + 1], paragraphs)
         # Consider 1 '<cls>' token and 2 '<sep>' tokens
         if len(tokens_a) + len(tokens_b) + 3 > max_len:
-             continue
+            continue
         tokens, segments = get_tokens_and_segments(tokens_a, tokens_b)
         nsp_data_from_paragraph.append((tokens, segments, is_next))
     return nsp_data_from_paragraph
@@ -91,7 +91,7 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
     # where the input may contain replaced '<mask>' or random tokens
     mlm_input_tokens = [token for token in tokens]
     pred_positions_and_labels = []
-    # Shuffle for gettting 15% random tokens for prediction in the masked
+    # Shuffle for getting 15% random tokens for prediction in the masked
     # language model task
     random.shuffle(candidate_pred_positions)
     for mlm_pred_position in candidate_pred_positions:
@@ -173,21 +173,21 @@ def _pad_bert_inputs(instances, max_len, vocab):
 ```{.python .input  n=10}
 # Saved in the d2l package for later use
 class _WikiTextDataset(gluon.data.Dataset):
-    def __init__(self, paragraghs, max_len=128):
-        # Input paragraghs[i] is a list of sentence strings representing a
-        # paragraph; while output paragraghs[i] is a list of sentences
+    def __init__(self, paragraphs, max_len=128):
+        # Input paragraphs[i] is a list of sentence strings representing a
+        # paragraph; while output paragraphs[i] is a list of sentences
         # representing a paragraph, where each sentence is a list of tokens
-        paragraghs = [d2l.tokenize(
-            paragraph, token='word') for paragraph in paragraghs]
-        sentences = [sentence for paragraph in paragraghs
+        paragraphs = [d2l.tokenize(
+            paragraph, token='word') for paragraph in paragraphs]
+        sentences = [sentence for paragraph in paragraphs
                      for sentence in paragraph]
         self.vocab = d2l.Vocab(sentences, min_freq=5, reserved_tokens=[
             '<pad>', '<mask>', '<cls>', '<sep>'])
         # Get data for the next sentence prediction task
         instances = []
-        for paragraph in paragraghs:
+        for paragraph in paragraphs:
             instances.extend(_get_nsp_data_from_paragraph(
-                paragraph, paragraghs, self.vocab, max_len))
+                paragraph, paragraphs, self.vocab, max_len))
         # Get data for the masked language model task
         instances = [(_get_mlm_data_from_tokens(tokens, self.vocab)
                       + (segments, is_next))
@@ -213,8 +213,8 @@ class _WikiTextDataset(gluon.data.Dataset):
 def load_data_wiki(batch_size, max_len):
     num_workers = d2l.get_dataloader_workers()
     data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
-    paragraghs = _read_wiki(data_dir)
-    train_set = _WikiTextDataset(paragraghs, max_len)
+    paragraphs = _read_wiki(data_dir)
+    train_set = _WikiTextDataset(paragraphs, max_len)
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
                                        num_workers=num_workers)
     return train_iter, train_set.vocab
