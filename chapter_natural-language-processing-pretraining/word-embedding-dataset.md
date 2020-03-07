@@ -11,6 +11,7 @@ First, import the packages and modules required for the experiment.
 import d2l
 import math
 from mxnet import gluon, np
+import os
 import random
 ```
 
