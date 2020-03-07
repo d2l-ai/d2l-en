@@ -8,6 +8,7 @@ Machine translation (MT) refers to the automatic translation of a segment of tex
 ```{.python .input  n=1}
 import d2l
 from mxnet import np, npx, gluon
+import os
 npx.set_np()
 ```
 
