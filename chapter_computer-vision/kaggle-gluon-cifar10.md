@@ -81,7 +81,7 @@ def read_csv_labels(fname):
     tokens = [l.rstrip().split(',') for l in lines]
     return dict(((name, label) for name, label in tokens))
 
-labels = read_csv_labels(data_dir + 'trainLabels.csv')
+labels = read_csv_labels(os.path.join(data_dir, 'trainLabels.csv'))
 print('# training examples:', len(labels))
 print('# classes:', len(set(labels.values())))
 ```
@@ -103,7 +103,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
     # The number of examples per class for the validation set
     n_valid_per_label = max(1, math.floor(n * valid_ratio))
     label_count = {}
-    for train_file in os.listdir(data_dir + 'train'):
+    for train_file in os.listdir(os.path.join(data_dir, 'train')):
         label = labels[train_file.split('.')[0]]
         fname = os.path.join(data_dir, 'train', train_file)
         # Copy to train_valid_test/train_valid with a subfolder per class
@@ -123,7 +123,7 @@ The `reorg_test` function below is used to organize the testing set to facilitat
 ```{.python .input  n=3}
 # Saved in the d2l package for later use    
 def reorg_test(data_dir):
-    for test_file in os.listdir(data_dir + 'test'):
+    for test_file in os.listdir(os.path.join(data_dir, 'test')):
         copyfile(os.path.join(data_dir, 'test', test_file),
                  os.path.join(data_dir, 'train_valid_test', 'test', 'unknown'))
 ```
@@ -132,7 +132,7 @@ Finally, we use a function to call the previously defined `read_csv_labels`, `re
 
 ```{.python .input  n=7}
 def reorg_cifar10_data(data_dir, valid_ratio):
-    labels = read_csv_labels(data_dir + 'trainLabels.csv')
+    labels = read_csv_labels(os.path.join(data_dir, 'trainLabels.csv'))
     reorg_train_valid(data_dir, labels, valid_ratio)
     reorg_test(data_dir)
 ```
@@ -181,7 +181,7 @@ Next, we can create the `ImageFolderDataset` instance to read the organized data
 
 ```{.python .input  n=10}
 train_ds, valid_ds, train_valid_ds, test_ds = [
-    gluon.data.vision.ImageFolderDataset(data_dir+'train_valid_test/'+folder)
+    gluon.data.vision.ImageFolderDataset(os.path.join(data_dir, 'train_valid_test', folder))
     for folder in ['train', 'valid', 'train_valid', 'test']]
 ```
 
