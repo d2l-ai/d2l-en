@@ -90,7 +90,7 @@ This approach is doomed to fail in a world
 where inverting an image preserves the category.
 
 
-And yet despite the apparent aburdity of linearity here,
+And yet despite the apparent absurdity of linearity here,
 as compared to our previous examples, 
 it's less obvious that we could address the problem
 with a simple preprocessing fix. 
