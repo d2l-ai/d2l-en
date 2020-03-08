@@ -308,7 +308,7 @@ class FancyMLP(nn.Block):
         return x.sum()
 ```
 
-In this `FancyMLP` model, we used constant weight `Rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`np.dot<`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let's see what happens if we construct it and feed data through it.
+In this `FancyMLP` model, we used constant weight `rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`np.dot`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let's see what happens if we construct it and feed data through it.
 
 ```{.python .input  n=6}
 net = FancyMLP()
