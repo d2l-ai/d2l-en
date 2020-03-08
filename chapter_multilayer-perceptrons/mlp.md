@@ -53,8 +53,9 @@ we might reasonably imagine that holding all else equal,
 an applicant with a higher income
 would always be more likely to repay 
 than one with a lower income.
-While monotonic this relationship likely 
-A increase in income from $0 to $50k 
+While monotonic, this relationship likely
+isn't linearly associated with the probability of 
+repayment. An increase in income from $0 to $50k 
 likely corresponds to a bigger increase 
 in likelihood of repayment 
 than an increase from $1M to $1.05M.
