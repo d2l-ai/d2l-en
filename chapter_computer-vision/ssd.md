@@ -301,8 +301,8 @@ for epoch in range(num_epochs):
     train_iter.reset()  # Read data from the start.
     for batch in train_iter:
         timer.start()
-        X = batch.data[0].as_in_context(ctx)
-        Y = batch.label[0].as_in_context(ctx)
+        X = batch.data[0].as_in_ctx(ctx)
+        Y = batch.label[0].as_in_ctx(ctx)
         with autograd.record():
             # Generate multiscale anchor boxes and predict the category and
             # offset of each
@@ -339,7 +339,7 @@ Using the `MultiBoxDetection` function, we predict the bounding boxes based on t
 
 ```{.python .input  n=21}
 def predict(X):
-    anchors, cls_preds, bbox_preds = net(X.as_in_context(ctx))
+    anchors, cls_preds, bbox_preds = net(X.as_in_ctx(ctx))
     cls_probs = npx.softmax(cls_preds).transpose(0, 2, 1)
     output = npx.multibox_detection(cls_probs, bbox_preds, anchors)
     idx = [i for i, row in enumerate(output[0]) if row[0] != -1]

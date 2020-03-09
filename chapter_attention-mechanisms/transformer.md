@@ -247,7 +247,7 @@ class PositionalEncoding(nn.Block):
         self.P[:, :, 1::2] = np.cos(X)
 
     def forward(self, X):
-        X = X + self.P[:, :X.shape[1], :].as_in_context(X.context)
+        X = X + self.P[:, :X.shape[1], :].as_in_ctx(X.context)
         return self.dropout(X)
 ```
 

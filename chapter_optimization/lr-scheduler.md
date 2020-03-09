@@ -45,7 +45,7 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx):
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
-            X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+            X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
             with autograd.record():
                 y_hat = net(X)
                 l = loss(y_hat, y)

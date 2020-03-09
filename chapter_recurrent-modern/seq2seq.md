@@ -185,7 +185,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # loss_sum, num_tokens
         for batch in data_iter:
-            X, X_vlen, Y, Y_vlen = [x.as_in_context(ctx) for x in batch]
+            X, X_vlen, Y, Y_vlen = [x.as_in_ctx(ctx) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
             with autograd.record():
                 Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)

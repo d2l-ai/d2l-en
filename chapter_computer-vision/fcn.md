@@ -158,7 +158,7 @@ During predicting, we need to standardize the input image in each channel and tr
 def predict(img):
     X = test_iter._dataset.normalize_image(img)
     X = np.expand_dims(X.transpose(2, 0, 1), axis=0)
-    pred = net(X.as_in_context(ctx[0])).argmax(axis=1)
+    pred = net(X.as_in_ctx(ctx[0])).argmax(axis=1)
     return pred.reshape(pred.shape[1], pred.shape[2])
 ```
 
