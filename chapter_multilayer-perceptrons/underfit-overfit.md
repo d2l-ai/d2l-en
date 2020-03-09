@@ -28,7 +28,7 @@ To recapitulate more formally,
 our goal is to discover patterns
 that capture regularities in the underlying population
 from which our training set was drawn.
-If we are successfull in this endeavor,
+If we are successful in this endeavor,
 then we could successfully assess risk
 even for individuals that we have never encountered before.
 This problem---how to discover patterns that *generalize*---is
