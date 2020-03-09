@@ -44,18 +44,18 @@ The masked softmax takes a 3-dimensional input and enables us to filter out some
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
-def masked_softmax(X, valid_length):
-    # X: 3-D tensor, valid_length: 1-D or 2-D tensor
-    if valid_length is None:
+def masked_softmax(X, valid_len):
+    # X: 3-D tensor, valid_len: 1-D or 2-D tensor
+    if valid_len is None:
         return npx.softmax(X)
     else:
         shape = X.shape
-        if valid_length.ndim == 1:
-            valid_length = valid_length.repeat(shape[1], axis=0)
+        if valid_len.ndim == 1:
+            valid_len = valid_len.repeat(shape[1], axis=0)
         else:
-            valid_length = valid_length.reshape(-1)
+            valid_len = valid_len.reshape(-1)
         # Fill masked elements with a large negative, whose exp is 0
-        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_length, True,
+        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_len, True,
                               axis=1, value=-1e6)
         return npx.softmax(X).reshape(shape)
 ```
@@ -66,7 +66,7 @@ To illustrate how this function works, we construct two $2 \times 4$ matrices as
 masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([2, 3]))
 ```
 
-Moreover, the second operator `batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively, and returns an output with shape $(b, n, k)$. To be specific, it computes $b$ dot products for $i= \{1,\ldots, b\}$, i.e., 
+Moreover, the second operator `batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively, and returns an output with shape $(b, n, k)$. To be specific, it computes $b$ dot products for $i= \{1,\ldots, b\}$, i.e.,
 
 $$Z[i,:,:] = X[i,:,:]  Y[i,:,:].$$
 
@@ -97,18 +97,18 @@ class DotProductAttention(nn.Block):
     # query: (batch_size, #queries, d)
     # key: (batch_size, #kv_pairs, d)
     # value: (batch_size, #kv_pairs, dim_v)
-    # valid_length: either (batch_size, ) or (batch_size, xx)
-    def forward(self, query, key, value, valid_length=None):
+    # valid_len: either (batch_size, ) or (batch_size, xx)
+    def forward(self, query, key, value, valid_len=None):
         d = query.shape[-1]
         # Set transpose_b=True to swap the last two dimensions of key
         scores = npx.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_length))
+        attention_weights = self.dropout(masked_softmax(scores, valid_len))
         return npx.batch_dot(attention_weights, value)
 ```
 
-Let's test the class `DotProductAttention` in a toy example. 
-First, create two batches, where each batch has one query and 10 key-value pairs.  
-Via the `valid_length` argument,
+Let's test the class `DotProductAttention` in a toy example.
+First, create two batches, where each batch has one query and 10 key-value pairs.
+Via the `valid_len` argument,
 we specify that we will check the first $2$ key-value pairs for the first batch and $6$ for the second one. Therefore, even though both batches have the same query and key-value pairs, we obtain different outputs.
 
 ```{.python .input  n=6}
@@ -127,7 +127,7 @@ we may resort to the multilayer perceptron attention.
 
 ## Multilayer Perceptron Attention
 
-In *multilayer perceptron attention*, we project both query and keys into $\mathbb R^{h}$ by learnable weights parameters. 
+In *multilayer perceptron attention*, we project both query and keys into $\mathbb R^{h}$ by learnable weights parameters.
 Assume that the learnable weights are $\mathbf W_k\in\mathbb R^{h\times d_k}$, $\mathbf W_q\in\mathbb R^{h\times d_q}$, and $\mathbf v\in\mathbb R^{h}$. Then the score function is defined by
 
 $$\alpha(\mathbf k, \mathbf q) = \mathbf v^\top \text{tanh}(\mathbf W_k \mathbf k + \mathbf W_q\mathbf q).$$
@@ -136,7 +136,7 @@ Intuitively, you can imagine $\mathbf W_k \mathbf k + \mathbf W_q\mathbf q$ as c
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
-class MLPAttention(nn.Block):  
+class MLPAttention(nn.Block):
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
         # Use flatten=True to keep query's and key's 3-D shapes
@@ -147,13 +147,13 @@ class MLPAttention(nn.Block):
         self.v = nn.Dense(1, use_bias=False, flatten=False)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, query, key, value, valid_length):
+    def forward(self, query, key, value, valid_len):
         query, key = self.W_k(query), self.W_q(key)
         # Expand query to (batch_size, #querys, 1, units), and key to
         # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast
         features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
         scores = np.squeeze(self.v(features), axis=-1)
-        attention_weights = self.dropout(masked_softmax(scores, valid_length))
+        attention_weights = self.dropout(masked_softmax(scores, valid_len))
         return npx.batch_dot(attention_weights, value)
 ```
 

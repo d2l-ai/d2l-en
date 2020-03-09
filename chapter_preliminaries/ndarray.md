@@ -150,6 +150,7 @@ Each of its elements is randomly sampled
 from a standard Gaussian (normal) distribution
 with a mean of $0$ and a standard deviation of $1$.
 
+
 ```{.python .input  n=10}
 np.random.normal(0, 1, size=(3, 4))
 ```

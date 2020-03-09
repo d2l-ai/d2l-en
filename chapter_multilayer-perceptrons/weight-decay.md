@@ -87,8 +87,8 @@ $$l(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \m
 Recall that $\mathbf{x}^{(i)}$ are the observations,
 $y^{(i)}$ are labels, and $(\mathbf{w}, b)$
 are the weight and bias parameters respectively.
-To penalizes the size of the weight vector,
-we must somehow add $||mathbf{w}||^2$ to the loss function,
+To penalize the size of the weight vector,
+we must somehow add $|| \mathbf{w} ||^2$ to the loss function,
 but how should the model trade off the 
 standard loss for this new additive penalty?
 In practice, we characterize this tradeoff

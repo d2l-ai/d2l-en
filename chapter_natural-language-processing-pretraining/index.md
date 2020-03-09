@@ -17,9 +17,9 @@ using word2vec, GloVe, or subword embedding models.
 After pretraining, representation of each token can be a vector,
 however, it remains the same no matter what the context is.
 For instance, the vector representation of "bank" is the same
-in both 
+in both
 "go to the bank to deposit some money"
-and 
+and
 "go to the bank to sit down".
 Thus, many more recent pretraining models adapt representation of the same token
 to different contexts.
@@ -40,11 +40,14 @@ We will cover them in :numref:`chap_nlp_app`.
 
 word2vec
 approx-training
-word2vec-dataset
-word2vec-gluon
+word-embedding-dataset
+word2vec-pretraining
 glove
 subword-embedding
 similarity-analogy
+bert
+bert-dataset
+bert-pretraining
 
 ```
 

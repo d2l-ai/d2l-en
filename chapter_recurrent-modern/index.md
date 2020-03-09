@@ -4,7 +4,7 @@
 Although we have learned the basics of recurrent neural networks,
 they are not sufficient for a practitioner to solve today's sequence learning problems.
 For instance, given the numerical unstability during gradient calculation,
-gated recurrent neural networks much more common in practice.
+gated recurrent neural networks are much more common in practice.
 We will begin by introducing two of such widely-used networks,
 namely gated recurrent units (GRUs) and long short term memory (LSTM),
 with illustrations using the same language modeling problem as introduced in :numref:`chap_rnn`.
@@ -30,7 +30,7 @@ gru
 lstm
 deep-rnn
 bi-rnn
-machine-translation
+machine-translation-and-dataset
 encoder-decoder
 seq2seq
 beam-search

@@ -1,4 +1,4 @@
-# The Dataset for Word2vec
+# The Dataset for Pretraining Word Embedding 
 :label:`sec_word2vec_data`
 
 In this section, we will introduce how to preprocess a dataset with
@@ -240,6 +240,7 @@ Last, we define the `load_data_ptb` function that read the PTB dataset and retur
 ```{.python .input  n=16}
 # Saved in the d2l package for later use
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
+    num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
     subsampled = subsampling(sentences, vocab)
@@ -250,7 +251,8 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     dataset = gluon.data.ArrayDataset(
         all_centers, all_contexts, all_negatives)
     data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
-                                      batchify_fn=batchify)
+                                      batchify_fn=batchify,
+                                      num_workers=num_workers)
     return data_iter, vocab
 ```
 
@@ -275,4 +277,4 @@ for batch in data_iter:
 
 ## [Discussions](https://discuss.mxnet.io/t/4356)
 
-![](../img/qr_word2vec-dataset.svg)
+![](../img/qr_word-embedding-dataset.svg)

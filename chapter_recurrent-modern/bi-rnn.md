@@ -14,7 +14,7 @@ Depending on the amount of information available, we might fill the blanks with 
 
 This section serves to illustrate the dynamic programming problem. The specific technical details do not matter for understanding the deep learning counterpart but they help in motivating why one might use deep learning and why one might pick specific architectures.
 
-If we want to solve the problem using graphical models we could for instance design a latent variable model as follows. We assume that there exists some latent variable $h_t$ which governs the emissions $x_t$ that we observe via $p(x_t \mid h_t)$. Moreover, the transitions $h_t \to h_{t+1}$ are given by some state transition probability $p(h_t+1 \mid h_{t})$. The graphical model then looks as :numref:`fig_hmm`.
+If we want to solve the problem using graphical models we could for instance design a latent variable model as follows. We assume that there exists some latent variable $h_t$ which governs the emissions $x_t$ that we observe via $p(x_t \mid h_t)$. Moreover, the transitions $h_t \to h_{t+1}$ are given by some state transition probability $p(h_t+1 \mid h_{t})$. The graphical model is then a Hidden Markov Model (HMM) as in :numref:`fig_hmm`.
 
 ![ Hidden Markov Model. ](../img/hmm.svg)
 :label:`fig_hmm`

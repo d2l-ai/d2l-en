@@ -173,7 +173,6 @@ Diagnostic criteria for mental illness,
 what passes for fashionable, and job titles,
 are all subject to considerable 
 amounts of *concept shift*.
-
 It turns out that if we navigate around the United States,
 shifting the source of our data by geography,
 we will find considerable concept shift regarding
@@ -356,7 +355,7 @@ that will give almost as good results: logistic regression.
 This is all that is needed to compute estimate probability ratios.
 We learn a classifier to distinguish 
 between data drawn from $p(\mathbf{x})$
-and data drawn from $q(x)$.
+and data drawn from $q(\mathbf{x})$.
 If it is impossible to distinguish 
 between the two distributions
 then it means that the associated instances 
@@ -456,14 +455,14 @@ at test time together, yielding the mean model output $\mu_y$.
 
 It turns out that under some mild conditions---if 
 our classifier was reasonably accurate in the first place,
-if the target data contains only classes of images 
+and if the target data contains only classes of images 
 that we have seen before,
 and if the label shift assumption holds in the first place
 (the strongest assumption here),
 then we can recover the test set label distribution
 by solving a simple linear system $C \cdot q(y) = \mu_y$.
 If our classifier is sufficiently accurate to begin with,
-then the confusion C will be invertible,
+then the confusion $C$ will be invertible,
 and we get a solution $q(y) = C^{-1} \mu_y$.
 Here we abuse notation a bit, using $q(y)$
 to denote the vector of label frequencies.

@@ -21,7 +21,7 @@ After logging into your AWS account, search for "SageMaker" (see :numref:`fig_sa
 Next, let's create a notebook instance as described in :numref:`fig_sagemaker-create`. 
 
 ![Create a SageMaker instance.](../img/sagemaker-create.png)
-:width:`300px`
+:width:`400px`
 :label:`fig_sagemaker-create`
 
 SageMaker provides multiple [instance types](https://aws.amazon.com/sagemaker/pricing/instance-types/) of different computational power and prices. 
@@ -29,13 +29,13 @@ When creating an instance, we can specify the instance name and choose its type.
 In :numref:`fig_sagemaker-create-2`, we choose `ml.p3.2xlarge`. With one Tesla V100 GPU and an 8-core CPU, this instance is powerful enough for most chapters.
 
 ![Choose the instance type.](../img/sagemaker-create-2.png)
-:width:`300px`
+:width:`400px`
 :label:`fig_sagemaker-create-2`
 
 A Jupyter notebook version of this book for fitting SageMaker is available at https://github.com/d2l-ai/d2l-en-sagemaker. We can specify this GitHub repository URL to let SageMaker clone this repository during instance creation, as shown in :numref:`fig_sagemaker-create-3`.
 
 ![Specify the GitHub repository.](../img/sagemaker-create-3.png)
-:width:`300px`
+:width:`400px`
 :label:`fig_sagemaker-create-3`
 
 
@@ -46,13 +46,13 @@ It may take a few minutes before the instance is ready.
 When it is ready, you can click on the "Open Jupyter" link as shown in :numref:`fig_sagemaker-open`.
 
 ![Open Jupyter on the created SageMaker instance.](../img/sagemaker-open.png)
-:width:`300px`
+:width:`400px`
 :label:`fig_sagemaker-open`
 
 Then, as shown in :numref:`fig_sagemaker-jupyter`, you may navigate through the Jupyter server running on this instance. 
 
 ![The Jupyter server running on the SageMaker instance.](../img/sagemaker-jupyter.png)
-:width:`300px`
+:width:`400px`
 :label:`fig_sagemaker-jupyter`
 
 Running and editing Jupyter notebooks on the SagaMaker instance is similar to what we have discussed in :numref:`sec_jupyter`.
@@ -79,6 +79,7 @@ cd SageMaker/d2l-en-sagemaker/
 git reset --hard
 git pull
 ```
+
 
 ## Summary
 

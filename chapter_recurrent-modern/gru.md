@@ -21,7 +21,7 @@ gradient anomalies mean in practice:
   symbols* in the latent state representation.
 * We might encounter situations where there is a logical break between parts of
   a sequence. For instance, there might be a transition between chapters in a
-  book, or a transition between a bear, and a bull market for securities. In
+  book, or a transition between a bear and a bull market for securities. In
   this case it would be nice to have a means of *resetting* our internal state
   representation.
 

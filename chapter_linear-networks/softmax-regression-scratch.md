@@ -101,7 +101,7 @@ is also sometimes called the partition function
 (and its logarithm is called the log-partition function).
 The origins of that name are in [statistical physics](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics))
 where a related equation models the distribution
-over an ensemble of particles).
+over an ensemble of particles.
 
 ```{.python .input  n=6}
 def softmax(X):
@@ -202,7 +202,8 @@ Taking the mean yields the desired result.
 # Saved in the d2l package for later use
 def accuracy(y_hat, y):
     if y_hat.shape[1] > 1:
-        return float((y_hat.argmax(axis=1) == y.astype('float32')).sum())
+        return float((y_hat.argmax(axis=1).astype('float32') == y.astype(
+            'float32')).sum())
     else:
         return float((y_hat.astype('int32') == y.astype('int32')).sum())
 ```
@@ -251,8 +252,8 @@ class Accumulator(object):
     def reset(self):
         self.data = [0] * len(self.data)
 
-    def __getitem__(self, i):
-        return self.data[i]
+    def __getitem__(self, idx):
+        return self.data[idx]
 ```
 
 Because we initialized the `net` model with random weights,

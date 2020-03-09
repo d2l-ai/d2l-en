@@ -90,7 +90,7 @@ This approach is doomed to fail in a world
 where inverting an image preserves the category.
 
 
-And yet despite the apparent aburdity of linearity here,
+And yet despite the apparent absurdity of linearity here,
 as compared to our previous examples, 
 it's less obvious that we could address the problem
 with a simple preprocessing fix. 
@@ -109,7 +109,7 @@ and a linear predictor that acts upon that representation.
 
 ### Incorporating Hidden Layers
 
-We can over come these limitations of linear models
+We can overcome these limitations of linear models
 and handle a more general class of functions
 by incorporating one or more hidden layers.
 The easiest way to do this is to stack
@@ -141,7 +141,7 @@ every neuron in the output layer.
 
 ### From Linear to Nonlinear
 
-Formally, we calculate the each layer 
+Formally, we calculate each layer 
 in this one-hidden-layer MLP as follows:
 $$
 \begin{aligned}
@@ -211,10 +211,10 @@ to perform arbitrary computation,
 for instance, basic logic operations on a pair of inputs.
 Moreover, for certain choices of the activation function,
 it is widely known that MLPs are universal approximators.
-Even a single-hidden-layer network,
-given enough nodes (possibly absurdly manby), 
+Even with a single-hidden-layer network,
+given enough nodes (possibly absurdly many), 
 and the right set of weights,
-we can model any function at all.
+we can model any function.
 *Actually learning that function is the hard part.*
 You might think of your neural network 
 as being a bit like the C programming language. 
@@ -287,7 +287,7 @@ As stated above, the most popular choice,
 due to both simplicity of implementation
 its performance on a variety of predictive tasks 
 is the rectified linear unit (ReLU).
-ReLUs provide a very simple nonlinear transformation.
+ReLU provides a very simple nonlinear transformation.
 Given the element $z$, the function is defined
 as the maximum of that element and 0.
 
@@ -297,7 +297,7 @@ Informally, the ReLU function retains only positive
 elements and discards all negative elements 
 (setting the corresponding activations to 0).
 To gain some intuition, we can plot the function.
-Because it is used so commonly, NDarray 
+Because it is used so commonly, `ndarray` 
 supports the `relu` function as a native operator.
 As you can see, the activation function is piecewise linear.
 

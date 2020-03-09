@@ -37,7 +37,7 @@ infers the missing input dimensions to each layer.
 The training loop is *exactly* the same
 as when we implemented softmax regression.
 This modularity enables us to separate 
-matterns concerning the model architecture
+matters concerning the model architecture
 from orthogonal considerations.
 
 ```{.python .input  n=6}

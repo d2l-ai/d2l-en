@@ -76,6 +76,6 @@ class EncoderDecoder(nn.Block):
 
 
 
-## [Discussions](https://discuss.mxnet.io/t/2396)
+## [Discussions](https://discuss.mxnet.io/t/2393)
 
 ![](../img/qr_encoder-decoder.svg)

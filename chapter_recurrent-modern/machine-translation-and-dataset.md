@@ -95,12 +95,12 @@ One way to solve this problem is that if a sentence is longer than `num_steps`, 
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
-def trim_pad(line, num_steps, padding_token):
+def truncate_pad(line, num_steps, padding_token):
     if len(line) > num_steps:
         return line[:num_steps]  # Trim
     return line + [padding_token] * (num_steps - len(line))  # Pad
 
-trim_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])
+truncate_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])
 ```
 
 Now we can convert a list of sentences into an `(num_example, num_steps)` index array. We also record the length of each sentence without the padding tokens, called *valid length*, which might be used by some models. In addition, we add the special “&lt;bos&gt;” and “&lt;eos&gt;” tokens to the target sentences so that our model will know the signals for starting and ending predicting.
@@ -111,7 +111,8 @@ def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
     if not is_source:
         lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
-    array = np.array([trim_pad(l, num_steps, vocab['<pad>']) for l in lines])
+    array = np.array([truncate_pad(
+        l, num_steps, vocab['<pad>']) for l in lines])
     valid_len = (array != vocab['<pad>']).sum(axis=1)
     return array, valid_len
 ```
@@ -165,4 +166,4 @@ for X, X_vlen, Y, Y_vlen in train_iter:
 
 ## [Discussions](https://discuss.mxnet.io/t/machine-translation/2396)
 
-![](../img/qr_machine-translation.svg)
+![](../img/qr_machine-translation-and-dataset.svg)

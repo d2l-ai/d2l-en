@@ -57,8 +57,8 @@ Using the `split_and_load` function introduced in the previous section we can di
 
 ```{.python .input  n=4}
 x = np.random.uniform(size=(4, 1, 28, 28))
-gpu_x = gluon.utils.split_and_load(x, ctx)
-net(gpu_x[0]), net(gpu_x[1])
+x_shards = gluon.utils.split_and_load(x, ctx)
+net(x_shards[0]), net(x_shards[1])
 ```
 
 Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*. This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters don't even exist on the device. We can verify this by printing out the parameters and observing any errors that might arise.
@@ -82,11 +82,13 @@ def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     ctx = list(net.collect_params().values())[0].list_ctx()
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
-        Xs, ys = split_f(features, labels, ctx)
-        pys = [net(X) for X in Xs]  # Run in parallel
-        metric.add(sum(float(d2l.accuracy(py, y)) for py, y in zip(pys, ys)),
-                   labels.size)
-    return metric[0]/metric[1]
+        X_shards, y_shards = split_f(features, labels, ctx)
+        # Run in parallel
+        pred_shards = [net(X_shard) for X_shard in X_shards]
+        metric.add(sum(float(d2l.accuracy(pred_shard, y_shard)) for
+                       pred_shard, y_shard in zip(
+                           pred_shards, y_shards)), labels.size)
+    return metric[0] / metric[1]
 ```
 
 ## Training
@@ -105,22 +107,24 @@ def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     ctx = [d2l.try_gpu(i) for i in range(num_gpus)]
     net.initialize(init=init.Normal(sigma=0.01), ctx=ctx, force_reinit=True)
-    trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
+    trainer = gluon.Trainer(net.collect_params(), 'sgd',
+                            {'learning_rate': lr})
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     timer, num_epochs = d2l.Timer(), 10
     animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])
     for epoch in range(num_epochs):
         timer.start()
         for features, labels in train_iter:
-            Xs, ys = d2l.split_batch(features, labels, ctx)
+            X_shards, y_shards = d2l.split_batch(features, labels, ctx)
             with autograd.record():
-                losses = [loss(net(X), y) for X, y in zip(Xs, ys)]
+                losses = [loss(net(X_shard), y_shard) for X_shard, y_shard
+                          in zip(X_shards, y_shards)]
             for l in losses:
                 l.backward()
             trainer.step(batch_size)
         npx.waitall()
         timer.stop()
-        animator.add(epoch+1, (evaluate_accuracy_gpus(net, test_iter),))
+        animator.add(epoch + 1, (evaluate_accuracy_gpus(net, test_iter),))
     print('test acc: %.2f, %.1f sec/epoch on %s' % (
         animator.Y[0][-1], timer.avg(), ctx))
 ```

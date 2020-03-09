@@ -16,8 +16,8 @@ then you are probably looking for a regression model.
 In practice, we are more often interested in classification: 
 asking not *how much?* but *which one?*
 
-* Does this email belong in the spam folder or the inbox*?
-* Is this customer more likely *to sign up* or *not to sign up* for a subscription service?*
+* Does this email belong in the spam folder or the inbox?
+* Is this customer more likely *to sign up* or *not to sign up* for a subscription service?
 * Does this image depict a donkey, a dog, a cat, or a rooster?
 * Which movie is Aston most likely to watch next?
 
@@ -119,7 +119,7 @@ that a given item belongs to class $k$.
 Then we can choose the class with the largest output value 
 as our prediction $\operatorname*{argmax}_k y_k$. 
 For example, if $\hat{y}_1$, $\hat{y}_2$, and $\hat{y}_3$ 
-are $0.1$, $.8$, and $0.1$, respectively,
+are $0.1$, $0.8$, and $0.1$, respectively,
 then we predict category $2$, which (in our example) represents "chicken".
 
 You might be tempted to suggest that we interpret 
@@ -135,7 +135,7 @@ we must guarantee that (even on new data),
 they will be nonnegative and sum up to 1. 
 Moreover, we need a training objective that encourages 
 the model to estimate faithfully *probabilities*.
-Of all instances when a classifier outputs $.5$,
+Of all instances when a classifier outputs $0.5$,
 we hope that half of those examples 
 will *actually* belong to the predicted class.
 This is a property called *calibration*.
@@ -334,7 +334,7 @@ If it is always easy for us to predict the next token,
 then this data is easy to compress! 
 Take the extreme example where every token in the stream always takes the same value.
 That is a very boring data stream! 
-And not only is it boring, but it is easy to predict. 
+And not only it is boring, but it is easy to predict. 
 Because they are always the same, we do not have to transmit any information 
 to communicate the contents of the stream.
 Easy to predict, easy to compress.
@@ -358,7 +358,7 @@ that one can ever be (in expectation).
 So if entropy is level of surprise experienced 
 by someone who knows the true probability, 
 then you might be wondering, *what is cross-entropy?* 
-The cross-entropy *from $p$ to $q$*, denoted H(p, q),
+The cross-entropy *from $p$ to $q$*, denoted $H(p, q)$,
 is the expected surprisal of an observer with subjective probabilities $q$
 upon seeing data that was actually generated according to probabilities $p$.
 The lowest possible cross-entropy is achieved when $p=q$. 
@@ -400,14 +400,13 @@ we can predict the probability of each output category.
 Normally, we use the category with the highest predicted probability as the output category. The prediction is correct if it is consistent with the actual category (label). 
 In the next part of the experiment,
 we will use accuracy to evaluate the model’s performance. 
-This is equal to the ratio between the number of correct predictions a
-nd the total number of predictions.
+This is equal to the ratio between the number of correct predictions and the total number of predictions.
 
 ## Summary
 
 * We introduced the softmax operation which takes a vector maps it into probabilities.
 * Softmax regression applies to classification problems. It uses the probability distribution of the output category in the softmax operation.
-* cross-entropy is a good measure of the difference between two probability distributions. It measures the number of bits needed to encode the data given our model.
+* Cross-entropy is a good measure of the difference between two probability distributions. It measures the number of bits needed to encode the data given our model.
 
 ## Exercises
 

@@ -38,5 +38,6 @@ sentiment-analysis-rnn
 sentiment-analysis-cnn
 natural-language-inference-and-dataset
 natural-language-inference-attention
+natural-language-inference-bert
 ```
 

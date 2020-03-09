@@ -51,11 +51,12 @@ def read_voc_images(voc_dir, is_train=True):
         voc_dir, 'train.txt' if is_train else 'val.txt')
     with open(txt_fname, 'r') as f:
         images = f.read().split()
-    features, labels = [None] * len(images), [None] * len(images)
+    features, labels = [], []
     for i, fname in enumerate(images):
-        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (voc_dir, fname))
-        labels[i] = image.imread(
-            '%s/SegmentationClass/%s.png' % (voc_dir, fname))
+        features.append(image.imread('%s/JPEGImages/%s.jpg'
+                                     % (voc_dir, fname)))
+        labels.append(image.imread(
+            '%s/SegmentationClass/%s.png' % (voc_dir, fname)))
     return features, labels
 
 train_features, train_labels = read_voc_images(voc_dir, True)
