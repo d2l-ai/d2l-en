@@ -324,15 +324,6 @@ we are probably doing (*real*) mathematics, not engineering.
 That conventional wisdom may apply here.
 We plot the derivative of the ReLU function plotted below.
 
-```{.python .input  n=8}
-x = np.arange(-4.0, 4.0, 0.1)
-x.attach_grad()
-with autograd.record():
-    y = npx.relu(x)
-d2l.set_figsize((4, 2.5))
-d2l.plot(x,y,'x','relu(x)')
-```
-
 ```{.python .input  n=9}
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of relu')
