@@ -2,11 +2,11 @@
 :label:`sec_numerical_stability`
 
 
-So far, for every model that we have implemented,
-we needed to initialize our parameters 
-according to some specified distribution.
-And until now, we glossed over the details,
-taking the initialization hyperparameters for granted.
+Thus far, every model that we have implemented
+required that initialize its parameters 
+according to some pre-specified distribution.
+Until now, we took the initialization scheme for granted,
+glossed over the details of how these these choices are made.
 You might have even gotten the impression that these choices
 are not especially important.
 However, the choice of initialization scheme
@@ -20,7 +20,7 @@ Poor choices here can cause us to encounter
 exploding or vanishing gradients while training.
 In this section, we delve into these topics with greater detail
 and discuss some useful heuristics
-that you will frequently use
+that you will frequently useful
 throughout your career in deep learning.
 
 
