@@ -54,7 +54,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
         # RNN needs first axes to be timestep, i.e., seq_len
         X = X.swapaxes(0, 1)
-        state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.context)
+        state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
         out, state = self.rnn(X, state)
         # out shape: (seq_len, batch_size, num_hiddens)
         # state shape: (num_layers, batch_size, num_hiddens),

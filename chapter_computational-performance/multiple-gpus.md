@@ -120,7 +120,7 @@ Since we didn't perform any computation yet, the gradient with regard to the bia
 ```{.python .input  n=14}
 def allreduce(data):
     for i in range(1, len(data)):
-        data[0][:] += data[i].copyto(data[0].context)
+        data[0][:] += data[i].copyto(data[0].ctx)
     for i in range(1, len(data)):
         data[0].copyto(data[i])
 ```

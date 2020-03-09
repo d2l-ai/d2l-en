@@ -359,7 +359,7 @@ def display(img, output, threshold):
         if score < threshold:
             continue
         h, w = img.shape[0:2]
-        bbox = [row[2:6] * np.array((w, h, w, h), ctx=row.context)]
+        bbox = [row[2:6] * np.array((w, h, w, h), ctx=row.ctx)]
         d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
 
 display(img, output, threshold=0.3)

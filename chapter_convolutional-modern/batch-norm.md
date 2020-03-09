@@ -294,9 +294,9 @@ class BatchNorm(nn.Block):
     def forward(self, X):
         # If X is not on the CPU, copy moving_mean and moving_var to the
         # device where X is located
-        if self.moving_mean.context != X.context:
-            self.moving_mean = self.moving_mean.copyto(X.context)
-            self.moving_var = self.moving_var.copyto(X.context)
+        if self.moving_mean.ctx != X.ctx:
+            self.moving_mean = self.moving_mean.copyto(X.ctx)
+            self.moving_var = self.moving_var.copyto(X.ctx)
         # Save the updated moving_mean and moving_var
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma.data(), self.beta.data(), self.moving_mean,

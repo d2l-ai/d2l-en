@@ -70,10 +70,10 @@ x = np.array([1, 2, 3])
 x
 ```
 
-We can use the `context` property of `ndarray` to view the device where the `ndarray` is located. It is important to note that whenever we want to operate on multiple terms they need to be in the same context. For instance, if we sum two variables, we need to make sure that both arguments are on the same device---otherwise MXNet would not know where to store the result or even how to decide where to perform the computation.
+We can use the `ctx` property of `ndarray` to view the device where the `ndarray` is located. It is important to note that whenever we want to operate on multiple terms they need to be in the same context. For instance, if we sum two variables, we need to make sure that both arguments are on the same device---otherwise MXNet would not know where to store the result or even how to decide where to perform the computation.
 
 ```{.python .input}
-x.context
+x.ctx
 ```
 
 ### Storage on the GPU
@@ -121,7 +121,7 @@ z = x.as_in_ctx(try_gpu(1))
 z
 ```
 
-It is important to note that, if the `context` of the source variable and the target variable are consistent, then the `as_in_ctx` function causes the target variable and the source variable to share the memory of the source variable.
+It is important to note that, if the `ctx` of the source variable and the target variable are consistent, then the `as_in_ctx` function causes the target variable and the source variable to share the memory of the source variable.
 
 ```{.python .input  n=8}
 y.as_in_ctx(try_gpu(1)) is y
