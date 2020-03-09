@@ -60,10 +60,6 @@ for param in params:
     param.attach_grad()
 ```
 
-```{.python .input  n=14}
-len(params)
-```
-
 ## Activation Function
 
 To make sure we know how everything works,
