@@ -26,7 +26,7 @@ is that the *entire model* and its *constituent layers*
 share the same basic structure.
 The model takes the true inputs (as stated in the problem formulation),
 outputs predictions of the true outputs,
-and possesses parameters (the combined set of all parameters from all layers)
+and possesses parameters (the combined set of all parameters from all layers).
 Likewise any individual constituent layer in a multilayer perceptron
 ingests inputs (supplied by the previous layer)
 generates outputs (which form the inputs to the subsequent layer),
