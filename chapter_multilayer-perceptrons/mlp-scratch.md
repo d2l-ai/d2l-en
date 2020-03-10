@@ -41,7 +41,7 @@ Typically, we choose layer widths in powers of $2$
 which tends to be computationally efficient because
 of how memory is alotted and addressed in hardware.
 
-Again, we will represent our parameters with several numpy arrays.
+Again, we will represent our parameters with several `ndarray`s.
 Note that *for every layer*, we must keep track of
 one weight matrix and one bias vector.
 As always, we call `attach_grad` to allocate memory
