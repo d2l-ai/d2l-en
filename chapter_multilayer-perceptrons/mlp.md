@@ -53,8 +53,9 @@ we might reasonably imagine that holding all else equal,
 an applicant with a higher income
 would always be more likely to repay 
 than one with a lower income.
-While monotonic this relationship likely 
-A increase in income from $0 to $50k 
+While monotonic, this relationship likely
+isn't linearly associated with the probability of 
+repayment. An increase in income from $0 to $50k 
 likely corresponds to a bigger increase 
 in likelihood of repayment 
 than an increase from $1M to $1.05M.
@@ -297,8 +298,7 @@ Informally, the ReLU function retains only positive
 elements and discards all negative elements 
 (setting the corresponding activations to 0).
 To gain some intuition, we can plot the function.
-Because it is used so commonly, `ndarray` 
-supports the `relu` function as a native operator.
+
 As you can see, the activation function is piecewise linear.
 
 ```{.python .input  n=2}
@@ -325,7 +325,7 @@ we are probably doing (*real*) mathematics, not engineering.
 That conventional wisdom may apply here.
 We plot the derivative of the ReLU function plotted below.
 
-```{.python .input  n=3}
+```{.python .input  n=9}
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of relu')
 ```
@@ -342,15 +342,15 @@ The reason for using the ReLU is that
 its derivatives are particularly well behaved: 
 either they vanish or they just let the argument through. 
 This makes optimization better behaved 
-and it mitigated well-documented problem 
+and it mitigated the well-documented problem 
 of *vanishing gradients* that plagued
 previous versions of neural networks (more on this later).
 
 ### Sigmoid Function
 
 The sigmoid function transforms its inputs,
-which values in the domain $\mathbb{R}$,
-to outputs that lie the interval $(0, 1)$.
+which values lie in the domain $\mathbb{R}$,
+to outputs that lie on the interval $(0, 1)$.
 For that reason, the sigmoid is 
 often called a *squashing* function:
 it *squashes* any input in the range (-inf, inf)
@@ -410,7 +410,7 @@ reaches a maximum of 0.25.
 As the input diverges from 0 in either direction, 
 the derivative approaches 0.
 
-```{.python .input  n=5}
+```{.python .input  n=11}
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of sigmoid')
 ```
@@ -425,7 +425,7 @@ $$\text{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
 We plot the tanh function blow. Note that as the input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system.
 
-```{.python .input  n=6}
+```{.python .input  n=12}
 with autograd.record():
     y = np.tanh(x)
 d2l.plot(x, y, 'x', 'tanh(x)')
@@ -442,7 +442,7 @@ And as we saw with the sigmoid function,
 as the input moves away from 0 in either direction,
 the derivative of the tanh function approaches 0.
 
-```{.python .input  n=7}
+```{.python .input  n=13}
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of tanh')
 ```

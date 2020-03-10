@@ -447,7 +447,7 @@ features[:2], poly_features[:2], labels[:2]
 
 Let's first implement a function to evaluate the loss on a given data.
 
-```{.python .input}
+```{.python .input  n=4}
 # Saved in the d2l package for later use
 def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset."""

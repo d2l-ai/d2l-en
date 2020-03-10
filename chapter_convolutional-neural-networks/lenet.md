@@ -26,8 +26,7 @@ for the purpose of recognizing handwritten digits in images—[LeNet5](http://ya
 In the 90s, their experiments with LeNet gave the first compelling evidence
 that it was possible to train convolutional neural networks
 by backpropagation.
-Their model achieved outstanding results at the time
-(only matched by Support Vector Machines at the time)
+Their model achieved outstanding results (only matched by Support Vector Machines at the time)
 and was adopted to recognize digits for processing deposits in ATM machines.
 Some ATMs still run the code
 that Yann and his colleague Leon Bottou wrote in the 1990s!
