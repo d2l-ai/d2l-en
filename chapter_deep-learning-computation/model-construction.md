@@ -299,6 +299,8 @@ class FancyMLP(nn.Block):
         # Reuse the fully connected layer. This is equivalent to sharing
         # parameters with two fully connected layers
         x = self.dense(x)
+        # Here in Control flow, we need to call asscalar to return the scalar
+        # for comparison
         while np.abs(x).sum() > 1:
             x /= 2
         if np.abs(x).sum() < 0.8:
@@ -350,16 +352,17 @@ the current chapter.
 
 ## Summary
 
-* Layers are blocks
-* Many layers can be a block
-* Many blocks can be a block
-* Code can be a block
+* Layers are blocks.
+* Many layers can be a block.
+* Many blocks can be a block.
+* Code can be a block.
 * Blocks take are of a lot of housekeeping, such as parameter initialization, backprop and related issues.
 * Sequential concatenations of layers and blocks are handled by the eponymous `Sequential` block.
 
 ## Exercises
 
 1. What kind of error message will you get when calling an `__init__` method whose parent class not in the `__init__` function of the parent class?
+1. What kinds of problems will occur if you remove the `asscalar` function in the `FancyMLP` class?
 1. What kinds of problems will occur if you change `self.net` defined by the Sequential instance in the `NestMLP` class to `self.net = [nn.Dense(64, activation='relu'), nn. Dense(32, activation='relu')]`?
 1. Implement a block that takes two blocks as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward pass (this is also called a parallel block).
 1. Assume that you want to concatenate multiple instances of the same network. Implement a factory function that generates multiple instances of the same block and build a larger network from it.
