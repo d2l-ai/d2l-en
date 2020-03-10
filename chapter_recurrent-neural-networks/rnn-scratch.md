@@ -90,7 +90,7 @@ Now we have all functions defined, next we create a class to wrap these function
 
 ```{.python .input}
 # Saved in the d2l package for later use
-class RNNModelScratch(object):
+class RNNModelScratch:
     """A RNN Model based on scratch implementations."""
 
     def __init__(self, vocab_size, num_hiddens, ctx,

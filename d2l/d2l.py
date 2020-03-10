@@ -90,7 +90,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression.md
-class Timer(object):
+class Timer:
     """Record multiple running times."""
     def __init__(self):
         self.times = []
@@ -214,7 +214,7 @@ def evaluate_accuracy(net, data_iter):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-class Accumulator(object):
+class Accumulator:
     """Sum a list of numbers over time."""
 
     def __init__(self, n):
@@ -248,7 +248,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-class Animator(object):
+class Animator:
     def __init__(self, xlabel=None, ylabel=None, legend=[], xlim=None,
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
                  nrows=1, ncols=1, figsize=(3.5, 2.5)):
@@ -402,7 +402,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
         ctx = list(net.collect_params().values())[0].list_ctx()[0]
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+        X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
         metric.add(d2l.accuracy(net(X), y), y.size)
     return metric[0]/metric[1]
 
@@ -421,7 +421,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         for i, (X, y) in enumerate(train_iter):
             timer.start()
             # Here is the only difference compared to train_epoch_ch3
-            X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+            X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
             with autograd.record():
                 y_hat = net(X)
                 l = loss(y_hat, y)
@@ -489,7 +489,7 @@ def tokenize(lines, token='word'):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-class Vocab(object):
+class Vocab:
     def __init__(self, tokens, min_freq=0, reserved_tokens=[]):
         # Sort according to frequencies
         counter = count_corpus(tokens)
@@ -575,7 +575,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-class SeqDataLoader(object):
+class SeqDataLoader:
     """A iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
@@ -598,7 +598,7 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-class RNNModelScratch(object):
+class RNNModelScratch:
     """A RNN Model based on scratch implementations."""
 
     def __init__(self, vocab_size, num_hiddens, ctx,
@@ -656,7 +656,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
             for s in state:
                 s.detach()
         y = Y.T.reshape(-1)
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+        X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
         with autograd.record():
             py, state = model(X, state)
             l = loss(py, y).mean()
@@ -841,7 +841,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
         # RNN needs first axes to be timestep, i.e., seq_len
         X = X.swapaxes(0, 1)
-        state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.context)
+        state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
         out, state = self.rnn(X, state)
         # out shape: (seq_len, batch_size, num_hiddens)
         # state shape: (num_layers, batch_size, num_hiddens),
@@ -894,7 +894,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # loss_sum, num_tokens
         for batch in data_iter:
-            X, X_vlen, Y, Y_vlen = [x.as_in_context(ctx) for x in batch]
+            X, X_vlen, Y, Y_vlen = [x.as_in_ctx(ctx) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
             with autograd.record():
                 Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
@@ -1091,7 +1091,7 @@ class PositionalEncoding(nn.Block):
         self.P[:, :, 1::2] = np.cos(X)
 
     def forward(self, X):
-        X = X + self.P[:, :X.shape[1], :].as_in_context(X.context)
+        X = X + self.P[:, :X.shape[1], :].as_in_ctx(X.ctx)
         return self.dropout(X)
 
 
@@ -1566,7 +1566,7 @@ d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
-d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip', 
+d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
                        '319d85e578af0cdc590547f26231e4e31cdf1e42')
 
 
@@ -1616,7 +1616,7 @@ def get_centers_and_contexts(corpus, max_window_size):
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
-class RandomGenerator(object):
+class RandomGenerator:
     """Draw a random int in [0, n] according to n sampling weights."""
     def __init__(self, sampling_weights):
         self.population = list(range(len(sampling_weights)))
@@ -2434,8 +2434,8 @@ class CTRDataset(gluon.data.Dataset):
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
     batch_size = X.shape[0]
-    ones = np.ones((batch_size,), ctx=X.context)
-    zeros = np.zeros((batch_size,), ctx=X.context)
+    ones = np.ones((batch_size,), ctx=X.ctx)
+    zeros = np.zeros((batch_size,), ctx=X.ctx)
     with autograd.record():
         real_Y = net_D(X)
         fake_X = net_G(Z)
@@ -2452,7 +2452,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     """Update generator."""
     batch_size = Z.shape[0]
-    ones = np.ones((batch_size,), ctx=Z.context)
+    ones = np.ones((batch_size,), ctx=Z.ctx)
     with autograd.record():
         # We could reuse fake_X from update_D to save computation.
         fake_X = net_G(Z)
