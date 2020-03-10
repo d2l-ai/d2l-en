@@ -299,8 +299,6 @@ class FancyMLP(nn.Block):
         # Reuse the fully connected layer. This is equivalent to sharing
         # parameters with two fully connected layers
         x = self.dense(x)
-        # Here in Control flow, we need to call asscalar to return the scalar
-        # for comparison
         while np.abs(x).sum() > 1:
             x /= 2
         if np.abs(x).sum() < 0.8:
@@ -308,7 +306,7 @@ class FancyMLP(nn.Block):
         return x.sum()
 ```
 
-In this `FancyMLP` model, we used constant weight `Rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`np.dot<`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let's see what happens if we construct it and feed data through it.
+In this `FancyMLP` model, we used constant weight `rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`np.dot`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let's see what happens if we construct it and feed data through it.
 
 ```{.python .input  n=6}
 net = FancyMLP()
@@ -362,7 +360,6 @@ the current chapter.
 ## Exercises
 
 1. What kind of error message will you get when calling an `__init__` method whose parent class not in the `__init__` function of the parent class?
-1. What kinds of problems will occur if you remove the `asscalar` function in the `FancyMLP` class?
 1. What kinds of problems will occur if you change `self.net` defined by the Sequential instance in the `NestMLP` class to `self.net = [nn.Dense(64, activation='relu'), nn. Dense(32, activation='relu')]`?
 1. Implement a block that takes two blocks as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward pass (this is also called a parallel block).
 1. Assume that you want to concatenate multiple instances of the same network. Implement a factory function that generates multiple instances of the same block and build a larger network from it.
