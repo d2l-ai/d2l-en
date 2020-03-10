@@ -103,8 +103,8 @@ First we define a function to update the discriminator.
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
     batch_size = X.shape[0]
-    ones = np.ones((batch_size,), ctx=X.context)
-    zeros = np.zeros((batch_size,), ctx=X.context)
+    ones = np.ones((batch_size,), ctx=X.ctx)
+    zeros = np.zeros((batch_size,), ctx=X.ctx)
     with autograd.record():
         real_Y = net_D(X)
         fake_X = net_G(Z)
@@ -124,7 +124,7 @@ The generator is updated similarly. Here we reuse the cross-entropy loss but cha
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     """Update generator."""
     batch_size = Z.shape[0]
-    ones = np.ones((batch_size,), ctx=Z.context)
+    ones = np.ones((batch_size,), ctx=Z.ctx)
     with autograd.record():
         # We could reuse fake_X from update_D to save computation.
         fake_X = net_G(Z)

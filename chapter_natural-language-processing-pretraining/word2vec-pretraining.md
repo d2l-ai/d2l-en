@@ -121,7 +121,7 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
         metric = d2l.Accumulator(2)  # loss_sum, num_tokens
         for i, batch in enumerate(data_iter):
             center, context_negative, mask, label = [
-                data.as_in_context(ctx) for data in batch]
+                data.as_in_ctx(ctx) for data in batch]
             with autograd.record():
                 pred = skip_gram(center, context_negative, net[0], net[1])
                 l = (loss(pred.reshape(label.shape), label, mask)

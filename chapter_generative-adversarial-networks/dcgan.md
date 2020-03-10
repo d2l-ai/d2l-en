@@ -209,7 +209,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         for X, _ in data_iter:
             batch_size = X.shape[0]
             Z = np.random.normal(0, 1, size=(batch_size, latent_dim, 1, 1))
-            X, Z = X.as_in_context(ctx), Z.as_in_context(ctx),
+            X, Z = X.as_in_ctx(ctx), Z.as_in_ctx(ctx),
             metric.add(d2l.update_D(X, Z, net_D, net_G, loss, trainer_D),
                        d2l.update_G(Z, net_D, net_G, loss, trainer_G),
                        batch_size)

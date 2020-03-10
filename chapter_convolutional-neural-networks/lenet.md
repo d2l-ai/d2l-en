@@ -185,7 +185,7 @@ to the `evaluate_accuracy` function that we described
 in :numref:`sec_softmax_scratch`.
 Since the full dataset lives on the CPU,
 we need to copy it to the GPU before we can compute our models.
-This is accomplished via the `as_in_context` function
+This is accomplished via the `as_in_ctx` function
 described in :numref:`sec_use_gpu`.
 
 ```{.python .input}
@@ -195,7 +195,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
         ctx = list(net.collect_params().values())[0].list_ctx()[0]
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+        X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
         metric.add(d2l.accuracy(net(X), y), y.size)
     return metric[0]/metric[1]
 ```
@@ -226,7 +226,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         for i, (X, y) in enumerate(train_iter):
             timer.start()
             # Here is the only difference compared to train_epoch_ch3
-            X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+            X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
             with autograd.record():
                 y_hat = net(X)
                 l = loss(y_hat, y)

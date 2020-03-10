@@ -54,7 +54,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
         # RNN needs first axes to be timestep, i.e., seq_len
         X = X.swapaxes(0, 1)
-        state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.context)
+        state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
         out, state = self.rnn(X, state)
         # out shape: (seq_len, batch_size, num_hiddens)
         # state shape: (num_layers, batch_size, num_hiddens),
@@ -185,7 +185,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # loss_sum, num_tokens
         for batch in data_iter:
-            X, X_vlen, Y, Y_vlen = [x.as_in_context(ctx) for x in batch]
+            X, X_vlen, Y, Y_vlen = [x.as_in_ctx(ctx) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
             with autograd.record():
                 Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
