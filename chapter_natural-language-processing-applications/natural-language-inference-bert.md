@@ -44,9 +44,9 @@ class SNLIBERTDataset(gluon.data.Dataset):
         pool = multiprocessing.Pool(4)  # Use 4 worker processes
         out = pool.map(self._mp_worker, all_premise_hypothesis_tokens)
         all_token_ids = [
-            tokens_ids for tokens_ids, segments, valid_len in out]
-        all_segments = [segments for tokens_ids, segments, valid_len in out]
-        valid_lens = [valid_len for tokens_ids, segments, valid_len in out]
+            token_ids for token_ids, segments, valid_len in out]
+        all_segments = [segments for token_ids, segments, valid_len in out]
+        valid_lens = [valid_len for token_ids, segments, valid_len in out]
         return (np.array(all_token_ids, dtype='int32'),
                 np.array(all_segments, dtype='int32'), 
                 np.array(valid_lens))
