@@ -12,7 +12,7 @@ For now, we can assume that we already have
 as much high-quality data as our resources permit
 and focus on regularization techniques.
 
-Recall that in our example
+Recall that in our
 polynomial curve-fitting example
 (:numref:`sec_model_selection`)
 we could limit our model's capacity
@@ -115,7 +115,7 @@ in the first place and not, say, the L1 norm.
 In fact, other choices are valid and 
 popular throughout statistics.
 While L2-regularized linear models constitute
-the classic *ridge regression* algorithm
+the classic *ridge regression* algorithm,
 L1-regularized linear regression
 is a similarly fundamental model in statistics
 (popularly known as *lasso regression*).
@@ -146,7 +146,7 @@ for L2-regularized regression follow:
 
 $$
 \begin{aligned}
-w & \leftarrow \left(1- \frac{\eta\lambda}{|\mathcal{B}|} \right) \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),
+\mathbf{w} & \leftarrow \left(1- \eta\lambda \right) \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),
 \end{aligned}
 $$
 
@@ -240,7 +240,7 @@ def l2_penalty(w):
 
 ### Defining the Train and Test Functions
 
-The following code fits a model on the test set
+The following code fits a model on the training set
 and evaluates it on the test set.
 The linear network and the squared loss
 have not changed since the previous chapter,
@@ -262,8 +262,8 @@ def train(lambd):
             l.backward()
             d2l.sgd([w, b], lr, batch_size)
         if epoch % 5 == 0:
-            animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss),
-                                   d2l.evaluate_loss(net, test_iter, loss)))
+            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
+                                 d2l.evaluate_loss(net, test_iter, loss)))
     print('l1 norm of w:', np.abs(w).sum())
 ```
 
@@ -340,8 +340,8 @@ def train_gluon(wd):
             l.backward()
             trainer.step(batch_size)
         if epoch % 5 == 0:
-            animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss),
-                                   d2l.evaluate_loss(net, test_iter, loss)))
+            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
+                                 d2l.evaluate_loss(net, test_iter, loss)))
     print('L1 norm of w:', np.abs(net[0].weight.data()).sum())
 ```
 
