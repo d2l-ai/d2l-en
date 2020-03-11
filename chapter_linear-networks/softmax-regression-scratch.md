@@ -300,7 +300,7 @@ Again, it aims to simplify the codes in later chapters.
 ```{.python .input  n=16}
 # Saved in the d2l package for later use
 class Animator:
-    def __init__(self, xlabel=None, ylabel=None, legend=[], xlim=None,
+    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
                  nrows=1, ncols=1, figsize=(3.5, 2.5)):
         """Incrementally plot multiple lines."""
