@@ -60,7 +60,7 @@ The string type of the token is inconvenient to be used by models, which take nu
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
-class Vocab(object):
+class Vocab:
     def __init__(self, tokens, min_freq=0, reserved_tokens=None):
         # Sort according to frequencies
         if reserved_tokens is None:
