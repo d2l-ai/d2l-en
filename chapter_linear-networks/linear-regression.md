@@ -385,7 +385,7 @@ class Timer:
         return sum(self.times)
 
     def cumsum(self):
-        # Return the accumuated times
+        # Return the accumulated times
         return np.array(self.times).cumsum().tolist()
 ```
 

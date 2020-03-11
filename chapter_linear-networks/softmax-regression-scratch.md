@@ -300,10 +300,12 @@ Again, it aims to simplify the codes in later chapters.
 ```{.python .input  n=16}
 # Saved in the d2l package for later use
 class Animator:
-    def __init__(self, xlabel=None, ylabel=None, legend=[], xlim=None,
+    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
                  nrows=1, ncols=1, figsize=(3.5, 2.5)):
         """Incrementally plot multiple lines."""
+        if legend is None:
+            legend = []
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1:

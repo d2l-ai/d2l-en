@@ -61,7 +61,7 @@ clogging up your internet with redundant downloads.
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
-def download(name, cache_dir='../data'):
+def download(name, cache_dir=os.path.join('..', 'data')):
     """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, "%s doesn't exist" % name
     url, sha1 = DATA_HUB[name]
@@ -83,15 +83,15 @@ def download_extract(name, folder=None):
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
-    elif ext == '.tar' or ext == '.gz':
+    elif ext in ('.tar', '.gz'):
         fp = tarfile.open(fname, 'r')
     else:
         assert False, 'Only zip/tar files can be extracted'
     fp.extractall(base_dir)
     if folder:
-        return base_dir + '/' + folder + '/'
+        return os.path.join(base_dir, folder)
     else:
-        return data_dir + '/'
+        return data_dir
 
 # Saved in the d2l package for later use
 def download_all():

@@ -126,7 +126,7 @@ def train_2d(trainer, steps=20):
     for i in range(steps):
         x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
-    print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
+        print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
 # Saved in the d2l package for later use

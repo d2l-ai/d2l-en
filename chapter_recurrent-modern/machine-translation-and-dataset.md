@@ -8,6 +8,7 @@ Machine translation (MT) refers to the automatic translation of a segment of tex
 ```{.python .input  n=1}
 import d2l
 from mxnet import np, npx, gluon
+import os
 npx.set_np()
 ```
 
@@ -23,7 +24,7 @@ d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
 # Saved in the d2l package for later use
 def read_data_nmt():
     data_dir = d2l.download_extract('fra-eng')
-    with open(data_dir + 'fra.txt', 'r') as f:
+    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
         return f.read()
 
 raw_text = read_data_nmt()

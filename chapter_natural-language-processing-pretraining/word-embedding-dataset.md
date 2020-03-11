@@ -11,6 +11,7 @@ First, import the packages and modules required for the experiment.
 import d2l
 import math
 from mxnet import gluon, np
+import os
 import random
 ```
 
@@ -26,7 +27,7 @@ d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
 # Saved in the d2l package for later use
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
-    with open(data_dir + 'ptb.train.txt') as f:
+    with open(os.path.join(data_dir, 'ptb.train.txt')) as f:
         raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
 
