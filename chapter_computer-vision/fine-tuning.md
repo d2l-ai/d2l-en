@@ -31,6 +31,7 @@ First, import the packages and modules required for the experiment.  Gluon's `mo
 import d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
+import os
 
 npx.set_np()
 ```
@@ -52,8 +53,10 @@ data_dir = d2l.download_extract('hotdog')
 We create two `ImageFolderDataset` instances to read all the image files in the training dataset and testing dataset, respectively.
 
 ```{.python .input  n=3}
-train_imgs = gluon.data.vision.ImageFolderDataset(data_dir + 'train')
-test_imgs = gluon.data.vision.ImageFolderDataset(data_dir + 'test')
+train_imgs = gluon.data.vision.ImageFolderDataset(
+    os.path.join(data_dir, 'train'))
+test_imgs = gluon.data.vision.ImageFolderDataset(
+    os.path.join(data_dir, 'test'))
 ```
 
 The first 8 positive examples and the last 8 negative images are shown below. As you can see, the images vary in size and aspect ratio.
