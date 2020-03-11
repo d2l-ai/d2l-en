@@ -202,7 +202,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
                             xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
                             legend=['discriminator', 'generator'])
     animator.fig.subplots_adjust(hspace=0.3)
-    for epoch in range(1, num_epochs+1):
+    for epoch in range(1, num_epochs + 1):
         # Train one epoch
         timer = d2l.Timer()
         metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
@@ -216,14 +216,14 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         # Show generated examples
         Z = np.random.normal(0, 1, size=(21, latent_dim, 1, 1), ctx=ctx)
         # Normalize the synthetic data to N(0, 1)
-        fake_x = net_G(Z).transpose(0, 2, 3, 1)/2+0.5
+        fake_x = net_G(Z).transpose(0, 2, 3, 1) / 2 + 0.5
         imgs = np.concatenate(
             [np.concatenate([fake_x[i * 7 + j] for j in range(7)], axis=1)
              for i in range(len(fake_x)//7)], axis=0)
         animator.axes[1].cla()
         animator.axes[1].imshow(imgs.asnumpy())
         # Show the losses
-        loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]
+        loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]
         animator.add(epoch, (loss_D, loss_G))
     print('loss_D %.3f, loss_G %.3f, %d examples/sec on %s' % (
         loss_D, loss_G, metric[2]/timer.stop(), ctx))

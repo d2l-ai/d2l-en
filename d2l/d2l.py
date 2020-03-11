@@ -1568,7 +1568,8 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
 def reorg_test(data_dir):
     for test_file in os.listdir(os.path.join(data_dir, 'test')):
         copyfile(os.path.join(data_dir, 'test', test_file),
-                 os.path.join(data_dir, 'train_valid_test', 'test', 'unknown'))
+                 os.path.join(data_dir, 'train_valid_test', 'test',
+                              'unknown'))
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-dog.md
@@ -2186,7 +2187,7 @@ d2l.DATA_HUB['ml-100k'] = (
 def read_data_ml100k():
     data_dir = d2l.download_extract('ml-100k')
     names = ['user_id', 'item_id', 'rating', 'timestamp']
-    data = pd.read_csv(data_dir + 'u.data', '\t', names=names,
+    data = pd.read_csv(os.path.join(data_dir, 'u.data'), '\t', names=names,
                        engine='python')
     num_users = data.user_id.unique().shape[0]
     num_items = data.item_id.unique().shape[0]
@@ -2195,9 +2196,9 @@ def read_data_ml100k():
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
 def split_data_ml100k(data, num_users, num_items,
-                      split_mode="random", test_ratio=0.1):
+                      split_mode='random', test_ratio=0.1):
     """Split the dataset in random mode or seq-aware mode."""
-    if split_mode == "seq-aware":
+    if split_mode == 'seq-aware':
         train_items, test_items, train_list = {}, {}, []
         for line in data.itertuples():
             u, i, rating, time = line[1], line[2], line[3], line[4]
@@ -2219,16 +2220,16 @@ def split_data_ml100k(data, num_users, num_items,
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
+def load_data_ml100k(data, num_users, num_items, feedback='explicit'):
     users, items, scores = [], [], []
-    inter = np.zeros((num_items, num_users)) if feedback == "explicit" else {}
+    inter = np.zeros((num_items, num_users)) if feedback == 'explicit' else {}
     for line in data.itertuples():
         user_index, item_index = int(line[1] - 1), int(line[2] - 1)
-        score = int(line[3]) if feedback == "explicit" else 1
+        score = int(line[3]) if feedback == 'explicit' else 1
         users.append(user_index)
         items.append(item_index)
         scores.append(score)
-        if feedback == "implicit":
+        if feedback == 'implicit':
             inter.setdefault(user_index, []).append(item_index)
         else:
             inter[item_index, user_index] = score
@@ -2236,7 +2237,7 @@ def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
+def split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',
                           test_ratio=0.1, batch_size=256):
     data, num_users, num_items = read_data_ml100k()
     train_data, test_data = split_data_ml100k(
@@ -2250,7 +2251,7 @@ def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
     test_set = gluon.data.ArrayDataset(
         np.array(test_u), np.array(test_i), np.array(test_r))
     train_iter = gluon.data.DataLoader(
-        train_set, shuffle=True, last_batch="rollover",
+        train_set, shuffle=True, last_batch='rollover',
         batch_size=batch_size)
     test_iter = gluon.data.DataLoader(
         test_set, batch_size=batch_size)
