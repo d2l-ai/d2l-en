@@ -107,14 +107,17 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
         label = labels[train_file.split('.')[0]]
         fname = os.path.join(data_dir, 'train', train_file)
         # Copy to train_valid_test/train_valid with a subfolder per class
-        copyfile(fname, os.path.join(data_dir, 'train_valid_test','train_valid', label))
+        copyfile(fname, os.path.join(data_dir, 'train_valid_test',
+                                     'train_valid', label))
         if label not in label_count or label_count[label] < n_valid_per_label:
             # Copy to train_valid_test/valid
-            copyfile(fname, os.path.join(data_dir, 'train_valid_test', 'valid', label))
+            copyfile(fname, os.path.join(data_dir, 'train_valid_test',
+                                         'valid', label))
             label_count[label] = label_count.get(label, 0) + 1
         else:
             # Copy to train_valid_test/train
-            copyfile(fname, os.path.join(data_dir, 'train_valid_test', 'train', label))
+            copyfile(fname, os.path.join(data_dir, 'train_valid_test',
+                                         'train', label))
     return n_valid_per_label
 ```
 
@@ -125,7 +128,8 @@ The `reorg_test` function below is used to organize the testing set to facilitat
 def reorg_test(data_dir):
     for test_file in os.listdir(os.path.join(data_dir, 'test')):
         copyfile(os.path.join(data_dir, 'test', test_file),
-                 os.path.join(data_dir, 'train_valid_test', 'test', 'unknown'))
+                 os.path.join(data_dir, 'train_valid_test', 'test',
+                              'unknown'))
 ```
 
 Finally, we use a function to call the previously defined `read_csv_labels`, `reorg_train_valid`, and `reorg_test` functions.
@@ -181,7 +185,8 @@ Next, we can create the `ImageFolderDataset` instance to read the organized data
 
 ```{.python .input  n=10}
 train_ds, valid_ds, train_valid_ds, test_ds = [
-    gluon.data.vision.ImageFolderDataset(os.path.join(data_dir, 'train_valid_test', folder))
+    gluon.data.vision.ImageFolderDataset(
+        os.path.join(data_dir, 'train_valid_test', folder))
     for folder in ['train', 'valid', 'train_valid', 'test']]
 ```
 

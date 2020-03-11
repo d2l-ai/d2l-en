@@ -60,10 +60,13 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
-def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
+def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
-         fmts=['-', 'm--', 'g-.', 'r:'], figsize=(3.5, 2.5), axes=None):
+         fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
     """Plot data points."""
+    if legend is None:
+        legend = []
+
     d2l.set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
 
@@ -114,7 +117,7 @@ class Timer:
         return sum(self.times)
 
     def cumsum(self):
-        # Return the accumuated times
+        # Return the accumulated times
         return np.array(self.times).cumsum().tolist()
 
 
@@ -249,10 +252,12 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Animator:
-    def __init__(self, xlabel=None, ylabel=None, legend=[], xlim=None,
+    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
                  nrows=1, ncols=1, figsize=(3.5, 2.5)):
         """Incrementally plot multiple lines."""
+        if legend is None:
+            legend = []
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1:
@@ -326,7 +331,7 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download(name, cache_dir='../data'):
+def download(name, cache_dir=os.path.join('..', 'data')):
     """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, "%s doesn't exist" % name
     url, sha1 = DATA_HUB[name]
@@ -342,15 +347,15 @@ def download_extract(name, folder=None):
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
-    elif ext == '.tar' or ext == '.gz':
+    elif ext in ('.tar', '.gz'):
         fp = tarfile.open(fname, 'r')
     else:
         assert False, 'Only zip/tar files can be extracted'
     fp.extractall(base_dir)
     if folder:
-        return base_dir + '/' + folder + '/'
+        return os.path.join(base_dir, folder)
     else:
-        return data_dir + '/'
+        return data_dir
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
@@ -490,7 +495,9 @@ def tokenize(lines, token='word'):
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 class Vocab:
-    def __init__(self, tokens, min_freq=0, reserved_tokens=[]):
+    def __init__(self, tokens, min_freq=0, reserved_tokens=None):
+        if reserved_tokens is None:
+            reserved_tokens = []
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
@@ -729,7 +736,7 @@ d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def read_data_nmt():
     data_dir = d2l.download_extract('fra-eng')
-    with open(data_dir + 'fra.txt', 'r') as f:
+    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
         return f.read()
 
 
@@ -1146,7 +1153,7 @@ def train_2d(trainer, steps=20):
     for i in range(steps):
         x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
-    print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
+        print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
 
@@ -1385,15 +1392,15 @@ def load_data_pikachu(batch_size, edge_size=256):
     """Load the pikachu dataset."""
     data_dir = d2l.download_extract('pikachu')
     train_iter = image.ImageDetIter(
-        path_imgrec=data_dir + 'train.rec',
-        path_imgidx=data_dir + 'train.idx',
+        path_imgrec=os.path.join(data_dir, 'train.rec'),
+        path_imgidx=os.path.join(data_dir, 'train.idx'),
         batch_size=batch_size,
         data_shape=(3, edge_size, edge_size),  # The shape of the output image
         shuffle=True,  # Read the dataset in random order
         rand_crop=1,  # The probability of random cropping is 1
         min_object_covered=0.95, max_attempts=200)
     val_iter = image.ImageDetIter(
-        path_imgrec=data_dir + 'val.rec', batch_size=batch_size,
+        path_imgrec=os.path.join(data_dir, 'val.rec'), batch_size=batch_size,
         data_shape=(3, edge_size, edge_size), shuffle=False)
     return train_iter, val_iter
 
@@ -1406,16 +1413,16 @@ d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def read_voc_images(voc_dir, is_train=True):
     """Read all VOC feature and label images."""
-    txt_fname = '%s/ImageSets/Segmentation/%s' % (
-        voc_dir, 'train.txt' if is_train else 'val.txt')
+    txt_fname = os.path.join(voc_dir, 'ImageSets', 'Segmentation',
+                             'train.txt' if is_train else 'val.txt')
     with open(txt_fname, 'r') as f:
         images = f.read().split()
     features, labels = [], []
     for i, fname in enumerate(images):
-        features.append(image.imread('%s/JPEGImages/%s.jpg'
-                                     % (voc_dir, fname)))
-        labels.append(image.imread(
-            '%s/SegmentationClass/%s.png' % (voc_dir, fname)))
+        features.append(image.imread(os.path.join(
+            voc_dir, 'JPEGImages', '%s.jpg' % fname)))
+        labels.append(image.imread(os.path.join(
+            voc_dir, 'SegmentationClass', '%s.png' % fname)))
     return features, labels
 
 
@@ -1497,7 +1504,8 @@ class VOCSegDataset(gluon.data.Dataset):
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def load_data_voc(batch_size, crop_size):
     """Download and load the VOC2012 semantic dataset."""
-    voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
+    voc_dir = d2l.download_extract('voc2012', os.path.join(
+        'VOCdevkit', 'VOC2012'))
     num_workers = d2l.get_dataloader_workers()
     train_iter = gluon.data.DataLoader(
         VOCSegDataset(True, crop_size, voc_dir), batch_size,
@@ -1538,26 +1546,29 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
     # The number of examples per class for the validation set
     n_valid_per_label = max(1, math.floor(n * valid_ratio))
     label_count = {}
-    for train_file in os.listdir(data_dir + 'train'):
+    for train_file in os.listdir(os.path.join(data_dir, 'train')):
         label = labels[train_file.split('.')[0]]
-        fname = data_dir + 'train/' + train_file
+        fname = os.path.join(data_dir, 'train', train_file)
         # Copy to train_valid_test/train_valid with a subfolder per class
-        copyfile(fname, data_dir + 'train_valid_test/train_valid/' + label)
+        copyfile(fname, os.path.join(data_dir, 'train_valid_test',
+                                     'train_valid', label))
         if label not in label_count or label_count[label] < n_valid_per_label:
             # Copy to train_valid_test/valid
-            copyfile(fname, data_dir + 'train_valid_test/valid/' + label)
+            copyfile(fname, os.path.join(data_dir, 'train_valid_test',
+                                         'valid', label))
             label_count[label] = label_count.get(label, 0) + 1
         else:
             # Copy to train_valid_test/train
-            copyfile(fname, data_dir+'train_valid_test/train/' + label)
+            copyfile(fname, os.path.join(data_dir, 'train_valid_test',
+                                         'train', label))
     return n_valid_per_label
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def reorg_test(data_dir):
-    for test_file in os.listdir(data_dir + 'test'):
-        copyfile(data_dir + 'test/' + test_file, 
-                 data_dir + 'train_valid_test/test/unknown/')
+    for test_file in os.listdir(os.path.join(data_dir, 'test')):
+        copyfile(os.path.join(data_dir, 'test', test_file),
+                 os.path.join(data_dir, 'train_valid_test', 'test', 'unknown'))
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-dog.md
@@ -1573,7 +1584,7 @@ d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
-    with open(data_dir + 'ptb.train.txt') as f:
+    with open(os.path.join(data_dir, 'ptb.train.txt')) as f:
         raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
 
@@ -1775,11 +1786,11 @@ def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
         lines = f.readlines()
-    # A line represents a paragragh.
-    paragraghs = [line.strip().lower().split(' . ')
+    # A line represents a paragraph.
+    paragraphs = [line.strip().lower().split(' . ')
                   for line in lines if len(line.split(' . ')) >= 2]
-    random.shuffle(paragraghs)
-    return paragraghs
+    random.shuffle(paragraphs)
+    return paragraphs
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
@@ -1812,7 +1823,7 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
             paragraph[i], paragraph[i + 1], paragraphs)
         # Consider 1 '<cls>' token and 2 '<sep>' tokens
         if len(tokens_a) + len(tokens_b) + 3 > max_len:
-             continue
+            continue
         tokens, segments = get_tokens_and_segments(tokens_a, tokens_b)
         nsp_data_from_paragraph.append((tokens, segments, is_next))
     return nsp_data_from_paragraph
@@ -1825,7 +1836,7 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
     # where the input may contain replaced '<mask>' or random tokens
     mlm_input_tokens = [token for token in tokens]
     pred_positions_and_labels = []
-    # Shuffle for gettting 15% random tokens for prediction in the masked
+    # Shuffle for getting 15% random tokens for prediction in the masked
     # language model task
     random.shuffle(candidate_pred_positions)
     for mlm_pred_position in candidate_pred_positions:
@@ -1896,21 +1907,21 @@ def _pad_bert_inputs(instances, max_len, vocab):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 class _WikiTextDataset(gluon.data.Dataset):
-    def __init__(self, paragraghs, max_len=128):
-        # Input paragraghs[i] is a list of sentence strings representing a
-        # paragraph; while output paragraghs[i] is a list of sentences
+    def __init__(self, paragraphs, max_len=128):
+        # Input paragraphs[i] is a list of sentence strings representing a
+        # paragraph; while output paragraphs[i] is a list of sentences
         # representing a paragraph, where each sentence is a list of tokens
-        paragraghs = [d2l.tokenize(
-            paragraph, token='word') for paragraph in paragraghs]
-        sentences = [sentence for paragraph in paragraghs
+        paragraphs = [d2l.tokenize(
+            paragraph, token='word') for paragraph in paragraphs]
+        sentences = [sentence for paragraph in paragraphs
                      for sentence in paragraph]
         self.vocab = d2l.Vocab(sentences, min_freq=5, reserved_tokens=[
             '<pad>', '<mask>', '<cls>', '<sep>'])
         # Get data for the next sentence prediction task
         instances = []
-        for paragraph in paragraghs:
+        for paragraph in paragraphs:
             instances.extend(_get_nsp_data_from_paragraph(
-                paragraph, paragraghs, self.vocab, max_len))
+                paragraph, paragraphs, self.vocab, max_len))
         # Get data for the masked language model task
         instances = [(_get_mlm_data_from_tokens(tokens, self.vocab)
                       + (segments, is_next))
@@ -1935,8 +1946,8 @@ class _WikiTextDataset(gluon.data.Dataset):
 def load_data_wiki(batch_size, max_len):
     num_workers = d2l.get_dataloader_workers()
     data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
-    paragraghs = _read_wiki(data_dir)
-    train_set = _WikiTextDataset(paragraghs, max_len)
+    paragraphs = _read_wiki(data_dir)
+    train_set = _WikiTextDataset(paragraphs, max_len)
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
                                        num_workers=num_workers)
     return train_iter, train_set.vocab
@@ -2039,13 +2050,14 @@ d2l.DATA_HUB['aclImdb'] = (
 # Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis-and-dataset.md
 def read_imdb(data_dir, is_train):
     data, labels = [], []
-    for label in ['pos/', 'neg/']:
-        folder_name = data_dir + ('train/' if is_train else 'test/') + label
+    for label in ('pos', 'neg'):
+        folder_name = os.path.join(data_dir, 'train' if is_train else 'test',
+                                   label)
         for file in os.listdir(folder_name):
-            with open(folder_name + file, 'rb') as f:
+            with open(os.path.join(folder_name, file), 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
-                labels.append(1 if label == 'pos/' else 0)
+                labels.append(1 if label == 'pos' else 0)
     return data, labels
 
 
@@ -2091,8 +2103,8 @@ def read_snli(data_dir, is_train):
         s = re.sub('\s{2,}', ' ', s)
         return s.strip()
     label_set = {'entailment': 0, 'contradiction': 1, 'neutral': 2}
-    file_name = (data_dir + 'snli_1.0_'+ ('train' if is_train else 'test')
-                 + '.txt')
+    file_name = os.path.join(data_dir, 'snli_1.0_train.txt'
+                             if is_train else 'snli_1.0_test.txt')
     with open(file_name, 'r') as f:
         rows = [row.split('\t') for row in f.readlines()[1:]]
     premises = [extract_text(row[1]) for row in rows if row[0] in label_set]

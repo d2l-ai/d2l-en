@@ -36,7 +36,8 @@ Next, read the training and test datasets. Each example is a review and its corr
 def read_imdb(data_dir, is_train):
     data, labels = [], []
     for label in ('pos', 'neg'):
-        folder_name = os.path.join(data_dir, 'train' if is_train else 'test', label)
+        folder_name = os.path.join(data_dir, 'train' if is_train else 'test',
+                                   label)
         for file in os.listdir(folder_name):
             with open(os.path.join(folder_name, file), 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
