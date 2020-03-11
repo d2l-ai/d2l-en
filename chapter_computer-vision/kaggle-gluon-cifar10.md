@@ -277,9 +277,9 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
         for X, y in train_iter:
-            y = y.astype('float32').as_in_context(ctx)
+            y = y.astype('float32').as_in_ctx(ctx)
             with autograd.record():
-                y_hat = net(X.as_in_context(ctx))
+                y_hat = net(X.as_in_ctx(ctx))
                 l = loss(y_hat, y).sum()
             l.backward()
             trainer.step(batch_size)
@@ -321,7 +321,7 @@ train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 
 for X, _ in test_iter:
-    y_hat = net(X.as_in_context(ctx))
+    y_hat = net(X.as_in_ctx(ctx))
     preds.extend(y_hat.argmax(axis=1).astype(int).asnumpy())
 sorted_ids = list(range(1, len(test_ds) + 1))
 sorted_ids.sort(key=lambda x: str(x))

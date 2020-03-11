@@ -3,9 +3,9 @@
 
 Now that we have characterized 
 multilayer perceptrons (MLPs) mathematically, 
-let's try to implement one ourselves. 
+let's try to implement one ourselves.
 
-```{.python .input  n=9}
+```{.python .input  n=1}
 import d2l
 from mxnet import gluon, np, npx
 npx.set_np()
@@ -124,7 +124,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
 To evaluate the learned model, 
 we apply it on some test data.
 
-```{.python .input}
+```{.python .input  n=8}
 d2l.predict_ch3(net, test_iter)
 ```
 

@@ -28,7 +28,7 @@ To recapitulate more formally,
 our goal is to discover patterns
 that capture regularities in the underlying population
 from which our training set was drawn.
-If we are successfull in this endeavor,
+If we are successful in this endeavor,
 then we could successfully assess risk
 even for individuals that we have never encountered before.
 This problem---how to discover patterns that *generalize*---is
@@ -447,7 +447,7 @@ features[:2], poly_features[:2], labels[:2]
 
 Let's first implement a function to evaluate the loss on a given data.
 
-```{.python .input}
+```{.python .input  n=4}
 # Saved in the d2l package for later use
 def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset."""

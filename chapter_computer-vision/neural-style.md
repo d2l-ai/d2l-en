@@ -56,7 +56,7 @@ def preprocess(img, image_shape):
     return np.expand_dims(img.transpose(2, 0, 1), axis=0)
 
 def postprocess(img):
-    img = img[0].as_in_context(rgb_std.context)
+    img = img[0].as_in_ctx(rgb_std.ctx)
     return (img.transpose(1, 2, 0) * rgb_std + rgb_mean).clip(0, 1)
 ```
 

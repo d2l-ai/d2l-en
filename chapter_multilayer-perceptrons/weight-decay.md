@@ -12,7 +12,7 @@ For now, we can assume that we already have
 as much high-quality data as our resources permit
 and focus on regularization techniques.
 
-Recall that in our example
+Recall that in our
 polynomial curve-fitting example
 (:numref:`sec_model_selection`)
 we could limit our model's capacity
@@ -115,7 +115,7 @@ in the first place and not, say, the L1 norm.
 In fact, other choices are valid and 
 popular throughout statistics.
 While L2-regularized linear models constitute
-the classic *ridge regression* algorithm
+the classic *ridge regression* algorithm,
 L1-regularized linear regression
 is a similarly fundamental model in statistics
 (popularly known as *lasso regression*).
@@ -146,7 +146,7 @@ for L2-regularized regression follow:
 
 $$
 \begin{aligned}
-w & \leftarrow \left(1- \frac{\eta\lambda}{|\mathcal{B}|} \right) \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),
+\mathbf{w} & \leftarrow \left(1- \eta\lambda \right) \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),
 \end{aligned}
 $$
 
@@ -187,7 +187,7 @@ To make the effects of overfitting pronounced,
 we can increase the dimensinoality of our problem to $d = 200$
 and work with a small training set containing only 20 example.
 
-```{.python .input  n=2}
+```{.python .input  n=1}
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -215,7 +215,7 @@ to randomly initialize our model parameters
 and run `attach_grad` on each to allocate 
 memory for the gradients we will calculate.
 
-```{.python .input  n=5}
+```{.python .input  n=2}
 def init_params():
     w = np.random.normal(scale=1, size=(num_inputs, 1))
     b = np.zeros(1)
@@ -233,21 +233,21 @@ We divide by $2$ by convention,
 the $2$ and $1/2$ cancel out, ensuring that the expression
 for the update looks nice and simple).
 
-```{.python .input  n=6}
+```{.python .input  n=3}
 def l2_penalty(w):
     return (w**2).sum() / 2
 ```
 
 ### Defining the Train and Test Functions
 
-The following code fits a model on the test set
+The following code fits a model on the training set
 and evaluates it on the test set.
 The linear network and the squared loss
 have not changed since the previous chapter,
 so we will just import them via `d2l.linreg` and `d2l.squared_loss`.
 The only change here is that our loss now includes the penalty term.
 
-```{.python .input  n=7}
+```{.python .input  n=4}
 def train(lambd):
     w, b = init_params()
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
@@ -262,8 +262,8 @@ def train(lambd):
             l.backward()
             d2l.sgd([w, b], lr, batch_size)
         if epoch % 5 == 0:
-            animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss),
-                                   d2l.evaluate_loss(net, test_iter, loss)))
+            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
+                                 d2l.evaluate_loss(net, test_iter, loss)))
     print('l1 norm of w:', np.abs(w).sum())
 ```
 
@@ -275,7 +275,7 @@ Note that we overfit badly,
 decreasing the training error but not the 
 test error---a textook case of overfitting.
 
-```{.python .input  n=8}
+```{.python .input  n=5}
 train(lambd=0)
 ```
 
@@ -290,7 +290,7 @@ As an exercise, you might want to check
 that the $\ell_2$ norm of the weights $\mathbf{w}$
 has actually decreased.
 
-```{.python .input  n=9}
+```{.python .input  n=6}
 train(lambd=3)
 ```
 
@@ -319,7 +319,7 @@ when updating model parameters.
 Thus, if we set `wd_mult` to $0$,
 the bias parameter $b$ will not decay.
 
-```{.python .input}
+```{.python .input  n=7}
 def train_gluon(wd):
     net = nn.Sequential()
     net.add(nn.Dense(1))
@@ -340,8 +340,8 @@ def train_gluon(wd):
             l.backward()
             trainer.step(batch_size)
         if epoch % 5 == 0:
-            animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss),
-                                   d2l.evaluate_loss(net, test_iter, loss)))
+            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
+                                 d2l.evaluate_loss(net, test_iter, loss)))
     print('L1 norm of w:', np.abs(net[0].weight.data()).sum())
 ```
 
@@ -352,11 +352,11 @@ and are easier to implement,
 a benefit that will become more
 pronounced for large problems.
 
-```{.python .input}
+```{.python .input  n=8}
 train_gluon(0)
 ```
 
-```{.python .input}
+```{.python .input  n=9}
 train_gluon(3)
 ```
 

@@ -178,8 +178,8 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 def evaluate_loss(data_iter, net, ctx):
     l_sum, n = 0.0, 0
     for X, y in data_iter:
-        y = y.as_in_context(ctx)
-        output_features = net.features(X.as_in_context(ctx))
+        y = y.as_in_ctx(ctx)
+        output_features = net.features(X.as_in_ctx(ctx))
         outputs = net.output_new(output_features)
         l_sum += float(loss(outputs, y).sum())
         n += y.size
@@ -201,8 +201,8 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
         for X, y in train_iter:
-            y = y.as_in_context(ctx)
-            output_features = net.features(X.as_in_context(ctx))
+            y = y.as_in_ctx(ctx)
+            output_features = net.features(X.as_in_ctx(ctx))
             with autograd.record():
                 outputs = net.output_new(output_features)
                 l = loss(outputs, y).sum()
@@ -245,7 +245,7 @@ train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
 
 preds = []
 for data, label in test_iter:
-    output_features = net.features(data.as_in_context(ctx))
+    output_features = net.features(data.as_in_ctx(ctx))
     output = npx.softmax(net.output_new(output_features))
     preds.extend(output.asnumpy())
 ids = sorted(os.listdir(data_dir + 'train_valid_test/test/unknown'))

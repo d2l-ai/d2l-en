@@ -70,10 +70,10 @@ x = np.array([1, 2, 3])
 x
 ```
 
-We can use the `context` property of `ndarray` to view the device where the `ndarray` is located. It is important to note that whenever we want to operate on multiple terms they need to be in the same context. For instance, if we sum two variables, we need to make sure that both arguments are on the same device---otherwise MXNet would not know where to store the result or even how to decide where to perform the computation.
+We can use the `ctx` property of `ndarray` to view the device where the `ndarray` is located. It is important to note that whenever we want to operate on multiple terms they need to be in the same context. For instance, if we sum two variables, we need to make sure that both arguments are on the same device---otherwise MXNet would not know where to store the result or even how to decide where to perform the computation.
 
 ```{.python .input}
-x.context
+x.ctx
 ```
 
 ### Storage on the GPU
@@ -114,17 +114,17 @@ y + z
 ```
 
 Imagine that your variable z already lives on your second GPU (gpu(1)). What happens if we call z.copyto(gpu(1))? It will make a copy and allocate new memory, even though that variable already lives on the desired device!
-There are times where depending on the environment our code is running in, two variables may already live on the same device. So we only want to make a copy if the variables currently lives on different contexts. In these cases, we can call `as_in_context()`. If the variable is already the specified context then this is a no-op. In fact, unless you specifically want to make a copy, `as_in_context()` is the method of choice.
+There are times where depending on the environment our code is running in, two variables may already live on the same device. So we only want to make a copy if the variables currently lives on different contexts. In these cases, we can call `as_in_ctx()`. If the variable is already the specified context then this is a no-op. In fact, unless you specifically want to make a copy, `as_in_ctx()` is the method of choice.
 
 ```{.python .input}
-z = x.as_in_context(try_gpu(1))
+z = x.as_in_ctx(try_gpu(1))
 z
 ```
 
-It is important to note that, if the `context` of the source variable and the target variable are consistent, then the `as_in_context` function causes the target variable and the source variable to share the memory of the source variable.
+It is important to note that, if the `ctx` of the source variable and the target variable are consistent, then the `as_in_ctx` function causes the target variable and the source variable to share the memory of the source variable.
 
 ```{.python .input  n=8}
-y.as_in_context(try_gpu(1)) is y
+y.as_in_ctx(try_gpu(1)) is y
 ```
 
 The `copyto` function always creates new memory for the target variable.

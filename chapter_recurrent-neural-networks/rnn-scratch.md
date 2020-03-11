@@ -90,7 +90,7 @@ Now we have all functions defined, next we create a class to wrap these function
 
 ```{.python .input}
 # Saved in the d2l package for later use
-class RNNModelScratch(object):
+class RNNModelScratch:
     """A RNN Model based on scratch implementations."""
 
     def __init__(self, vocab_size, num_hiddens, ctx,
@@ -114,7 +114,7 @@ num_hiddens, ctx = 512, d2l.try_gpu()
 model = RNNModelScratch(len(vocab), num_hiddens, ctx, get_params,
                         init_rnn_state, rnn)
 state = model.begin_state(X.shape[0], ctx)
-Y, new_state = model(X.as_in_context(ctx), state)
+Y, new_state = model(X.as_in_ctx(ctx), state)
 Y.shape, len(new_state), new_state[0].shape
 ```
 
@@ -210,7 +210,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
             for s in state:
                 s.detach()
         y = Y.T.reshape(-1)
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+        X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
         with autograd.record():
             py, state = model(X, state)
             l = loss(py, y).mean()

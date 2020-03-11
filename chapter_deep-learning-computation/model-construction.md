@@ -26,7 +26,7 @@ is that the *entire model* and its *constituent layers*
 share the same basic structure.
 The model takes the true inputs (as stated in the problem formulation),
 outputs predictions of the true outputs,
-and possesses parameters (the combined set of all parameters from all layers)
+and possesses parameters (the combined set of all parameters from all layers).
 Likewise any individual constituent layer in a multilayer perceptron
 ingests inputs (supplied by the previous layer)
 generates outputs (which form the inputs to the subsequent layer),
@@ -64,7 +64,7 @@ Note that some Blocks do not require any parameters at all!
 Finally a `Block` must possess a `backward` method,
 for purposes of calculating gradients.
 Fortunately, due to some behind-the-scenes magic
-supplied by the autograd  `autograd` package
+supplied by the `autograd` package
 (introduced in :numref:`chap_preliminaries`)
 when defining our own `Block` typically requires
 only that we worry about parameters and the `forward` function.
@@ -308,7 +308,7 @@ class FancyMLP(nn.Block):
         return x.sum()
 ```
 
-In this `FancyMLP` model, we used constant weight `Rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`np.dot<`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let's see what happens if we construct it and feed data through it.
+In this `FancyMLP` model, we used constant weight `rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`np.dot`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let's see what happens if we construct it and feed data through it.
 
 ```{.python .input  n=6}
 net = FancyMLP()
@@ -352,10 +352,10 @@ the current chapter.
 
 ## Summary
 
-* Layers are blocks
-* Many layers can be a block
-* Many blocks can be a block
-* Code can be a block
+* Layers are blocks.
+* Many layers can be a block.
+* Many blocks can be a block.
+* Code can be a block.
 * Blocks take are of a lot of housekeeping, such as parameter initialization, backprop and related issues.
 * Sequential concatenations of layers and blocks are handled by the eponymous `Sequential` block.
 

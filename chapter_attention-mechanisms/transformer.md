@@ -247,7 +247,7 @@ class PositionalEncoding(nn.Block):
         self.P[:, :, 1::2] = np.cos(X)
 
     def forward(self, X):
-        X = X + self.P[:, :X.shape[1], :].as_in_context(X.context)
+        X = X + self.P[:, :X.shape[1], :].as_in_ctx(X.ctx)
         return self.dropout(X)
 ```
 
@@ -358,7 +358,7 @@ class DecoderBlock(nn.Block):
             batch_size, seq_len, _ = X.shape
             # Shape: (batch_size, seq_len), the values in the j-th column
             # are j+1
-            valid_len = np.tile(np.arange(1, seq_len+1, ctx=X.context),
+            valid_len = np.tile(np.arange(1, seq_len+1, ctx=X.ctx),
                                    (batch_size, 1))
         else:
             valid_len = None

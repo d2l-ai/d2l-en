@@ -55,7 +55,7 @@ the pooling layers used to aggregate information
 across adjacent spatial regions,
 the use of multiple *channels* (also called *filters*) at each layer,
 and a careful discussion of the structure of modern architectures.
-We will conclude the chapter with a full working example of LeNet,
+We will conclude the chapter with a fully working example of LeNet,
 the first convolutional network successfully deployed,
 long before the rise of modern deep learning.
 In the next chapter we will dive into full implementations
