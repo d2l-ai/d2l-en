@@ -22,7 +22,7 @@ we will wind up with an output that is much smaller than our input.
 If we start with a $240 \times 240$ pixel image, $10$ layers of $5 \times 5$ convolutions
 reduce the image to $200 \times 200$ pixels, slicing off $30 \%$ of the image and with it obliterating any interesting information on the boundaries of the original image. *Padding* handles this issue.
 * In some cases, we want to reduce the resolution drastically if say we find our
-* original input resolution to be unwieldy. *Strides* can help in these instances.
+original input resolution to be unwieldy. *Strides* can help in these instances.
 
 ## Padding
 
