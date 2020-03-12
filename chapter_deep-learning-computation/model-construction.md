@@ -126,7 +126,7 @@ stored in a particular order.
 You might think of `nnSequential` as your first meta-Block.
 The `add` method simply facilitates
 the addition of each successive `Block` to the list.
-Note that each our layers are instances of the `Dense` class
+Note that each our layer is an instance of the `Dense` class
 which is itself a subclass of `Block`.
 The `forward` function is also remarkably simple:
 it chains each Block in the list together,
