@@ -138,7 +138,7 @@ This is actually just shorthand for `net.forward(X)`,
 a slick Python trick achieved via the Block class's `__call__` function.
 
 
-Before we dive in to implementing our own custom `Block`,
+Before we dive into implementing our own custom `Block`,
 we briefly summarize the basic functionality that each `Block` must perform the following duties:
 
 1. Ingest input data as arguments to its `forward` function.
