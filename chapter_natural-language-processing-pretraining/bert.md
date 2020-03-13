@@ -1,6 +1,17 @@
 # BERT
 
-*This section is under construction.*
+We have introduced several word embedding models for natural language understanding.
+For instance, word2vec and GloVe both assign the same pretrained vector to the same word regardless of the context of the word.
+This poses a challenge for modeling polysemy and complex semantics.
+For instance, the word "crane" in sentences
+"a crane is flying" and "a crane driver came" has completely different meanings;
+thus, the same word may be assigned different representations depending on contexts.
+
+In view of importance of contextualized word representations,
+by taking the entire sequence as the input,
+ELMo (Embeddings from Language Models) is a function based on bidirectional LSTM that assigns a representation to each word from the input sequence.
+
+
 
 ```{.python .input  n=1}
 import d2l
