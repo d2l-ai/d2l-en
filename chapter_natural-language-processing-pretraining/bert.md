@@ -1,17 +1,46 @@
 # BERT
 
 We have introduced several word embedding models for natural language understanding.
-For instance, word2vec and GloVe both assign the same pretrained vector to the same word regardless of the context of the word.
-This poses a challenge for modeling polysemy and complex semantics.
-For instance, the word "crane" in sentences
+After pretraining, the output can be thought of as a matrix
+where each row is a vector that represents a word of a predefined vocabulary.
+In fact, these word embedding models are all *context-independent*.
+Let's begin by illustrating this property.
+
+
+## From Context-Independent to Context-Sensitive
+
+Recall the experiments in :numref:`sec_word2vec_gluon` and :numref:`sec_synonyms`.
+For instance, word2vec and GloVe both assign the same pretrained vector to the same word regardless of the context of the word (if any).
+Given the abundance of polysemy and complex semantics in natural languages,
+context-independent representations have obvious limitations.
+For instance, the word "crane" in contexts
 "a crane is flying" and "a crane driver came" has completely different meanings;
 thus, the same word may be assigned different representations depending on contexts.
 
-In view of importance of contextualized word representations,
-by taking the entire sequence as the input,
-ELMo (Embeddings from Language Models) is a function based on bidirectional LSTM that assigns a representation to each word from the input sequence.
+This motivates the development of *context-sensitive* word representations,
+where the representation of words depend on their contexts.
+For example, by taking the entire sequence as the input,
+ELMo (Embeddings from Language Models) is a function that assigns a representation to each word from the input sequence :cite:`Peters.Neumann.Iyyer.ea.2018`.
 
 
+Specifically, ELMo combines all the intermediate layer representations from pretrained bidirectional LSTM as the output representation.
+Then the ELMo representation will be added to a downstream task's existing supervised model
+as additional features, such as by concatenating ELMo representation and the original representation (e.g., GloVe) of tokens in the existing model.
+On one hand,
+all the weights in the pretrained bidirectional LSTM model are frozen after ELMo representations are added.
+On the other hand,
+the existing supervised model is task specific.
+Leveraging different best models for different tasks at that time,
+adding ELMo improved the state of the art across $6$ NLP tasks.
+
+
+## From Task-Specific to Task-Agnostic
+
+Although ELMo has significantly improved solutions to diverse NLP tasks,
+each solution is still customized to each task.
+However, it is practically non-trivial to craft a specific architecture for every NLP task.
+The GPT (Generative Pre-Training) model represents an effort in designing
+a general task-agnostic model for context-sensitive representations :cite:`Radford.Narasimhan.Salimans.ea.2018`.
 
 ```{.python .input  n=1}
 import d2l
