@@ -70,7 +70,7 @@ along specific dimensions in an `ndarray`.
 Given a matrix `X` we can sum over all elements (default) or only
 over elements in the same axis, *i.e.*, the column (`axis=0`) or the same row (`axis=1`).
 Note that if `X` is an array with shape `(2, 3)`
-and we sum over the columns (`X.sum(axis=0`),
+and we sum over the columns (`X.sum(axis=0)`),
 the result will be a (1D) vector with shape `(3,)`.
 If we want to keep the number of axes in the original array
 (resulting in a 2D array with shape `(1, 3)`),
