@@ -86,8 +86,14 @@ while the additional output layer will be trained from scratch.
 BERT further improved the state of the art on $11$ NLP tasks
 under broad categories of i) single text classification (e.g., sentiment analysis), ii) text pair classification (e.g., natural language inference),
 iii) question answering, iv) single text tagging (e.g., named entity recognition).
-Since ELMo, GPT, and BERT were all proposed in 2018,
-this year has witnessed a breakthrough of deep representations for natural languages.
+All proposed in 2018,
+from context-sensitive ELMo to task-agnostic GPT and BERT,
+conceptually simple yet empirically powerful pretraining of deep representations for natural languages have reshaped solutions to various NLP tasks.
+
+In the rest of this chapter,
+we will dive into the pretraining of BERT.
+When NLP applications are explained in :numref:`chap_nlp_app`,
+we will illustrate fine-tuning of BERT for downstream applications.
 
 ```{.python .input  n=1}
 import d2l
