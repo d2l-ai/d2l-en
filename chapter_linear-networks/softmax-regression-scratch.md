@@ -211,7 +211,7 @@ We will continue to use the variables `y_hat` and `y`
 defined in the `pick` function,
 as the predicted probability distribution and label, respectively.
 We can see that the first example's prediction category is $2$
-(the largest element of the row is 0.6 with an index of $2$),
+(the largest element of the row is $0.6$ with an index of $2$),
 which is inconsistent with the actual label, $0$.
 The second example's prediction category is $2$
 (the largest element of the row is $0.5$ with an index of $2$),
