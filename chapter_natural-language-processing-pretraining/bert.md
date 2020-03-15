@@ -21,26 +21,73 @@ This motivates the development of *context-sensitive* word representations,
 where the representation of words depend on their contexts.
 For example, by taking the entire sequence as the input,
 ELMo (Embeddings from Language Models) is a function that assigns a representation to each word from the input sequence :cite:`Peters.Neumann.Iyyer.ea.2018`.
-
-
 Specifically, ELMo combines all the intermediate layer representations from pretrained bidirectional LSTM as the output representation.
 Then the ELMo representation will be added to a downstream task's existing supervised model
 as additional features, such as by concatenating ELMo representation and the original representation (e.g., GloVe) of tokens in the existing model.
 On one hand,
 all the weights in the pretrained bidirectional LSTM model are frozen after ELMo representations are added.
 On the other hand,
-the existing supervised model is task specific.
+the existing supervised model is specifically customized for a given task.
 Leveraging different best models for different tasks at that time,
-adding ELMo improved the state of the art across $6$ NLP tasks.
+adding ELMo improved the state of the art across $6$ NLP tasks:
+sentiment analysis, natural language inference,
+semantic role labeling, coreference resolution,
+named entity recognition, and question answering.
 
 
 ## From Task-Specific to Task-Agnostic
 
-Although ELMo has significantly improved solutions to diverse NLP tasks,
-each solution is still customized to each task.
+Although ELMo has significantly improved solutions to a diverse set of NLP tasks,
+each solution still hinges on a *task-specific* architecture.
 However, it is practically non-trivial to craft a specific architecture for every NLP task.
 The GPT (Generative Pre-Training) model represents an effort in designing
-a general task-agnostic model for context-sensitive representations :cite:`Radford.Narasimhan.Salimans.ea.2018`.
+a general *task-agnostic* model for context-sensitive representations :cite:`Radford.Narasimhan.Salimans.ea.2018`.
+Built on a Transformer decoder,
+GPT pretrains a language model that will be used to represent text sequences.
+When applying GPT to a downstream task,
+the output of the language model will be fed into an added linear output layer
+to predict the label of the task.
+In sharp contrast to ELMo that freezes parameters of the pretrained model,
+GPT fine-tunes *all* the parameters in the pretrained Transformer decoder
+during supervised learning of the downstream task.
+GPT was evaluated on $12$ tasks of natural language inference,
+question answering, sentence similarity, and classification,
+and improved the state of the art in $9$ of them with minimal changes
+to the model architecture.
+
+However, due to the autoregressive nature of language models,
+GPT only looks forward (left-to-right).
+In contexts "i went to the bank to deposit cash" and "i went to the bank to sit down",
+as "bank" is sensitive to the context to its left,
+GPT will return the same representation for "bank",
+though it has different meanings.
+
+
+## BERT: Combining the Best of Both Worlds
+
+As we have seen,
+ELMo encodes context bidirectionally but uses task-specific architectures;
+while GPT is task-agnostic but encodes context left-to-right.
+Combining the best of both worlds,
+BERT (Bidirectional Encoder Representations from Transformers)
+encodes context bidirectionally and requires minimal architecture changes
+for a wide range of NLP tasks :cite:`Devlin.Chang.Lee.ea.2018`.
+Using a pretrained Transformer encoder,
+BERT is able to represent any token based on its bidirectional context.
+During supervised learning of downstream tasks,
+BERT is similar to GPT in two aspects.
+One one hand, BERT representations will be fed into an added output layer,
+with minimal changes to the model architecture depending on nature of tasks,
+such as predicting for every token vs. predicting for the entire sequence.
+On the other hand,
+all the parameters of the pretrained Transformer encoder are fine-tuned,
+while the additional output layer will be trained from scratch.
+
+BERT further improved the state of the art on $11$ NLP tasks
+under broad categories of i) single text classification (e.g., sentiment analysis), ii) text pair classification (e.g., natural language inference),
+iii) question answering, iv) single text tagging (e.g., named entity recognition).
+Since ELMo, GPT, and BERT were all proposed in 2018,
+this year has witnessed a breakthrough of deep representations for natural languages.
 
 ```{.python .input  n=1}
 import d2l
