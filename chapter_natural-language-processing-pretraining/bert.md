@@ -29,7 +29,7 @@ CoVe (Context Vectors) :cite:`McCann.Bradbury.Xiong.ea.2017`,
 and ELMo (Embeddings from Language Models) :cite:`Peters.Neumann.Iyyer.ea.2018`.
 
 For example, by taking the entire sequence as the input,
-ELMo is a function that assigns a representation to each word from the input sequence .
+ELMo is a function that assigns a representation to each word from the input sequence.
 Specifically, ELMo combines all the intermediate layer representations from pretrained bidirectional LSTM as the output representation.
 Then the ELMo representation will be added to a downstream task's existing supervised model
 as additional features, such as by concatenating ELMo representation and the original representation (e.g., GloVe) of tokens in the existing model.
@@ -91,6 +91,12 @@ such as predicting for every token vs. predicting for the entire sequence.
 On the other hand,
 all the parameters of the pretrained Transformer encoder are fine-tuned,
 while the additional output layer will be trained from scratch.
+:numref:`fig_elmo_gpt_bert` depicts the differences among ELMo, GPT, and 
+
+
+![A comparison of ELMo, GPT, and BERT.](../img/elmo_gpt_bert.svg)
+:label:`fig_elmo_gpt_bert`
+
 
 BERT further improved the state of the art on $11$ NLP tasks
 under broad categories of i) single text classification (e.g., sentiment analysis), ii) text pair classification (e.g., natural language inference),
