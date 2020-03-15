@@ -11,6 +11,8 @@ Let's begin by illustrating this property.
 
 Recall the experiments in :numref:`sec_word2vec_gluon` and :numref:`sec_synonyms`.
 For instance, word2vec and GloVe both assign the same pretrained vector to the same word regardless of the context of the word (if any).
+Formally, a context-independent representation of any token $x$
+is a function $f(x)$ that only takes $x$ as its input.
 Given the abundance of polysemy and complex semantics in natural languages,
 context-independent representations have obvious limitations.
 For instance, the word "crane" in contexts
@@ -18,9 +20,16 @@ For instance, the word "crane" in contexts
 thus, the same word may be assigned different representations depending on contexts.
 
 This motivates the development of *context-sensitive* word representations,
-where the representation of words depend on their contexts.
+where representations of words depend on their contexts.
+Hence, a context-sensitive representation of token $x$ is a function $f(x, c(x))$
+depending on both $x$ and its context $c(x)$.
+Popular context-sensitive representations
+include TagLM (language-model-augmented sequence tagger) :cite:`Peters.Ammar.Bhagavatula.ea.2017`,
+CoVe (Context Vectors) :cite:`McCann.Bradbury.Xiong.ea.2017`,
+and ELMo (Embeddings from Language Models) :cite:`Peters.Neumann.Iyyer.ea.2018`.
+
 For example, by taking the entire sequence as the input,
-ELMo (Embeddings from Language Models) is a function that assigns a representation to each word from the input sequence :cite:`Peters.Neumann.Iyyer.ea.2018`.
+ELMo is a function that assigns a representation to each word from the input sequence .
 Specifically, ELMo combines all the intermediate layer representations from pretrained bidirectional LSTM as the output representation.
 Then the ELMo representation will be added to a downstream task's existing supervised model
 as additional features, such as by concatenating ELMo representation and the original representation (e.g., GloVe) of tokens in the existing model.
