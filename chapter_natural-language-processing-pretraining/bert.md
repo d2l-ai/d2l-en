@@ -91,8 +91,7 @@ such as predicting for every token vs. predicting for the entire sequence.
 On the other hand,
 all the parameters of the pretrained Transformer encoder are fine-tuned,
 while the additional output layer will be trained from scratch.
-:numref:`fig_elmo_gpt_bert` depicts the differences among ELMo, GPT, and 
-
+:numref:`fig_elmo_gpt_bert` depicts the differences among ELMo, GPT, and BERT.
 
 ![A comparison of ELMo, GPT, and BERT.](../img/elmo_gpt_bert.svg)
 :label:`fig_elmo_gpt_bert`
