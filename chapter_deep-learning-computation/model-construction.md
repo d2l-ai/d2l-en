@@ -405,7 +405,7 @@ class NestMLP(nn.Block):
         return self.dense(self.net(x))
 
 chimera = nn.Sequential()
-chimera.add(NestMLP(), nn.Dense(20), FancyMLP())
+chimera.add(NestMLP(), nn.Dense(20), FixedHiddenMLP())
 
 chimera.initialize()
 chimera(x)
