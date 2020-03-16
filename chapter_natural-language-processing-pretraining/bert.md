@@ -38,7 +38,7 @@ all the weights in the pretrained bidirectional LSTM model are frozen after ELMo
 On the other hand,
 the existing supervised model is specifically customized for a given task.
 Leveraging different best models for different tasks at that time,
-adding ELMo improved the state of the art across $6$ NLP tasks:
+adding ELMo improved the state of the art across 6 natural language processing tasks:
 sentiment analysis, natural language inference,
 semantic role labeling, coreference resolution,
 named entity recognition, and question answering.
@@ -46,9 +46,9 @@ named entity recognition, and question answering.
 
 ## From Task-Specific to Task-Agnostic
 
-Although ELMo has significantly improved solutions to a diverse set of NLP tasks,
+Although ELMo has significantly improved solutions to a diverse set of natural language processing tasks,
 each solution still hinges on a *task-specific* architecture.
-However, it is practically non-trivial to craft a specific architecture for every NLP task.
+However, it is practically non-trivial to craft a specific architecture for every natural language processing task.
 The GPT (Generative Pre-Training) model represents an effort in designing
 a general *task-agnostic* model for context-sensitive representations :cite:`Radford.Narasimhan.Salimans.ea.2018`.
 Built on a Transformer decoder,
@@ -59,9 +59,9 @@ to predict the label of the task.
 In sharp contrast to ELMo that freezes parameters of the pretrained model,
 GPT fine-tunes *all* the parameters in the pretrained Transformer decoder
 during supervised learning of the downstream task.
-GPT was evaluated on $12$ tasks of natural language inference,
+GPT was evaluated on 12 tasks of natural language inference,
 question answering, sentence similarity, and classification,
-and improved the state of the art in $9$ of them with minimal changes
+and improved the state of the art in 9 of them with minimal changes
 to the model architecture.
 
 However, due to the autoregressive nature of language models,
@@ -80,7 +80,7 @@ while GPT is task-agnostic but encodes context left-to-right.
 Combining the best of both worlds,
 BERT (Bidirectional Encoder Representations from Transformers)
 encodes context bidirectionally and requires minimal architecture changes
-for a wide range of NLP tasks :cite:`Devlin.Chang.Lee.ea.2018`.
+for a wide range of natural language processing tasks :cite:`Devlin.Chang.Lee.ea.2018`.
 Using a pretrained Transformer encoder,
 BERT is able to represent any token based on its bidirectional context.
 During supervised learning of downstream tasks,
@@ -97,16 +97,16 @@ while the additional output layer will be trained from scratch.
 :label:`fig_elmo_gpt_bert`
 
 
-BERT further improved the state of the art on $11$ NLP tasks
+BERT further improved the state of the art on 11 natural language processing tasks
 under broad categories of i) single text classification (e.g., sentiment analysis), ii) text pair classification (e.g., natural language inference),
 iii) question answering, iv) single text tagging (e.g., named entity recognition).
 All proposed in 2018,
 from context-sensitive ELMo to task-agnostic GPT and BERT,
-conceptually simple yet empirically powerful pretraining of deep representations for natural languages have reshaped solutions to various NLP tasks.
+conceptually simple yet empirically powerful pretraining of deep representations for natural languages have reshaped solutions to various natural language processing tasks.
 
 In the rest of this chapter,
 we will dive into the pretraining of BERT.
-When NLP applications are explained in :numref:`chap_nlp_app`,
+When natural language processing applications are explained in :numref:`chap_nlp_app`,
 we will illustrate fine-tuning of BERT for downstream applications.
 
 ```{.python .input  n=1}
@@ -117,7 +117,37 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-...
+## Input Representation
+
+In natural language processing,
+some tasks (e.g., sentiment analysis) take single text as the input,
+while in some other tasks (e.g., natural language inference),
+the input is a pair of text sequences.
+The BERT input sequence unambiguously represents both single text and text pairs.
+In the former,
+the BERT input sequence is the concatenation of
+the special classification token “&lt;cls&gt;”,
+tokens of a text sequence,
+and the special separation token “&lt;sep&gt;”.
+In the latter,
+the BERT input sequence is the concatenation of
+“&lt;cls&gt;”, tokens of the first text sequence,
+“&lt;sep&gt;”, tokens of the second text sequence, and “&lt;sep&gt;”.
+
+
+To distinguish text pairs,
+the learned segment embeddings $\mathbf{e}_A$ and $\mathbf{e}_B$
+are added to the token embeddings of the first sequence and the second sequence, respectively.
+For single text inputs, only $\mathbf{e}_A$ is used.
+BERT chooses the Transformer encoder as its bidirectional architecture.
+Common in the Transformer encoder,
+the learned positional embeddings are added at every position of the BERT input sequence.
+To sum up, :numref:`fig_` shows that
+the embeddings of the BERT input sequence are the sum
+of the token embeddings, segment embeddings, and positional embeddings.
+
+The following `BERTEncoder` class is similar to the `TransformerEncoder` class
+as implemented in :numref:`sec_transformer`.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
@@ -127,6 +157,7 @@ class BERTEncoder(nn.Block):
         super(BERTEncoder, self).__init__(**kwargs)
         self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
         self.segment_embedding = nn.Embedding(2, num_hiddens)
+        # To reduce parameters, positional encoding of Transformer is used
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
         for _ in range(num_layers):
