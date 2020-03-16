@@ -12,7 +12,7 @@ The data is fairly generic and does not exhibit exotic structure
 that might require specialized models (as audio or video might).
 This dataset, collected by Bart de Cock in 2011 :cite:`De-Cock.2011`,
 covers house prices in Ames, IA from the period of 2006-2010.
-It is considerably larger than the famous the [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978),
+It is considerably larger than the famous [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978),
 boasting both more examples and more features.
 
 
@@ -37,7 +37,8 @@ to verify the integrity of the file.
 All of our datasets are hosted on site
 whose address is assigned to `DATA_URL` below.
 
-```{.python .input  n=2}
+
+```{.python .input  n=1}
 import os
 from mxnet import gluon
 import zipfile
@@ -59,9 +60,9 @@ and its SHA-1 matches the one stored in `DATA_HUB`,
 our code will use the cached file to avoid 
 clogging up your internet with redundant downloads.
 
-```{.python .input  n=6}
+```{.python .input  n=2}
 # Saved in the d2l package for later use
-def download(name, cache_dir='../data'):
+def download(name, cache_dir=os.path.join('..', 'data')):
     """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, "%s doesn't exist" % name
     url, sha1 = DATA_HUB[name]
@@ -72,9 +73,9 @@ def download(name, cache_dir='../data'):
 We also implement two additional functions: 
 one is to download and extract a zip/tar file
 and the other to download all the files from `DATA_HUB`
-(most of the datasets used in this book) into the cache directory. 
+(most of the datasets used in this book) into the cache directory.
 
-```{.python .input  n=11}
+```{.python .input  n=3}
 # Saved in the d2l package for later use
 def download_extract(name, folder=None):
     """Download and extract a zip/tar file."""
@@ -83,15 +84,15 @@ def download_extract(name, folder=None):
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
-    elif ext == '.tar' or ext == '.gz':
+    elif ext in ('.tar', '.gz'):
         fp = tarfile.open(fname, 'r')
     else:
         assert False, 'Only zip/tar files can be extracted'
     fp.extractall(base_dir)
     if folder:
-        return base_dir + '/' + folder + '/'
+        return os.path.join(base_dir, folder)
     else:
-        return data_dir + '/'
+        return data_dir
 
 # Saved in the d2l package for later use
 def download_all():
@@ -170,7 +171,7 @@ before proceeding further.
 Fortunately, if you are reading in Jupyter,
 we can install pandas without even leaving the notebook.
 
-```{.python .input  n=3}
+```{.python .input  n=4}
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
 
@@ -186,7 +187,7 @@ For convenience, we can download and cache
 the Kaggle housing dataset 
 using the script we defined above.
 
-```{.python .input}
+```{.python .input  n=5}
 # Saved in the d2l package for later use        
 DATA_HUB['kaggle_house_train'] = (
     DATA_URL + 'kaggle_house_pred_train.csv',
@@ -201,7 +202,7 @@ DATA_HUB['kaggle_house_test'] = (
 To load the two csv files containing training 
 and test data respectively we use Pandas.
 
-```{.python .input  n=14}
+```{.python .input  n=6}
 train_data = pd.read_csv(download('kaggle_house_train'))
 test_data = pd.read_csv(download('kaggle_house_test'))
 ```
@@ -210,7 +211,7 @@ The training dataset includes $1460$ examples,
 $80$ features, and $1$ label, while the test data 
 contains $1459$ examples and $80$ features.
 
-```{.python .input  n=11}
+```{.python .input  n=7}
 print(train_data.shape)
 print(test_data.shape)
 ```
@@ -218,7 +219,7 @@ print(test_data.shape)
 Let’s take a look at the first $4$ and last $2$ features
 as well as the label (SalePrice) from the first $4$ examples:
 
-```{.python .input  n=28}
+```{.python .input  n=8}
 print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
@@ -229,7 +230,7 @@ any information for prediction purposes.
 Hence, we remove it from the dataset 
 before feeding the data into the network.
 
-```{.python .input  n=30}
+```{.python .input  n=9}
 all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 ```
 
@@ -256,9 +257,9 @@ First, it proves convenient for optimization.
 Second, because we do not know *a priori*
 which features will be relevant,
 we do not want to penalize coefficients
-assigned to one variable more than on any other. 
+assigned to one variable more than on any other.
 
-```{.python .input  n=6}
+```{.python .input  n=10}
 numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
 all_features[numeric_features] = all_features[numeric_features].apply(
     lambda x: (x - x.mean()) / (x.std()))
@@ -276,7 +277,7 @@ For instance, 'MSZoning' assumes the values 'RL' and 'RM'.
 These map onto vectors $(1, 0)$ and $(0, 1)$ respectively.
 Pandas does this automatically for us.
 
-```{.python .input  n=7}
+```{.python .input  n=11}
 # Dummy_na=True refers to a missing value being a legal eigenvalue, and
 # creates an indicative feature for it
 all_features = pd.get_dummies(all_features, dummy_na=True)
@@ -290,7 +291,7 @@ we can extract the NumPy format from the Pandas dataframe
 and convert it into MXNet's native `ndarray` 
 representation for training.
 
-```{.python .input  n=9}
+```{.python .input  n=12}
 n_train = train_data.shape[0]
 train_features = np.array(all_features[:n_train].values, dtype=np.float32)
 test_features = np.array(all_features[n_train:].values, dtype=np.float32)
@@ -348,7 +349,7 @@ This leads to the following loss function:
 
 $$L = \sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}.$$
 
-```{.python .input  n=11}
+```{.python .input  n=14}
 def log_rmse(net, features, labels):
     # To further stabilize the value when the logarithm is taken, set the
     # value less than 1 as 1
@@ -369,7 +370,7 @@ to the initial learning rate.
 This will be covered in further detail later on
 when we discuss the details in :numref:`chap_optimization`.
 
-```{.python .input  n=14}
+```{.python .input  n=15}
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
     train_ls, test_ls = [], []
@@ -408,7 +409,7 @@ if our dataset was considerably larger.
 But this added complexity might obfuscate our code unnecessarily
 so we can safely omit here owing to the simplicity of our problem.
 
-```{.python .input}
+```{.python .input  n=16}
 def get_k_fold_data(k, i, X, y):
     assert k > 1
     fold_size = X.shape[0] // k
@@ -429,7 +430,7 @@ def get_k_fold_data(k, i, X, y):
 The training and verification error averages are returned
 when we train $k$ times in the k-fold cross-validation.
 
-```{.python .input  n=15}
+```{.python .input  n=17}
 def k_fold(k, X_train, y_train, num_epochs,
            learning_rate, weight_decay, batch_size):
     train_l_sum, valid_l_sum = 0, 0
@@ -463,7 +464,7 @@ However, if we try an unreasonably large number of options
 we might just get lucky and find that our validation
 performance is no longer representative of the true error.
 
-```{.python .input  n=16}
+```{.python .input  n=18}
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
 train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
                           weight_decay, batch_size)
@@ -492,7 +493,7 @@ can then be applied to the test set.
 Saving the estimates in a CSV file
 will simplify uploading the results to Kaggle.
 
-```{.python .input  n=18}
+```{.python .input  n=19}
 def train_and_pred(train_features, test_feature, train_labels, test_data,
                    num_epochs, lr, weight_decay, batch_size):
     net = get_net()
@@ -516,7 +517,7 @@ If they do, it is time to upload them to Kaggle.
 The following code will generate a file called `submission.csv`
 (CSV is one of the file formats accepted by Kaggle):
 
-```{.python .input  n=19}
+```{.python .input  n=20}
 train_and_pred(train_features, test_features, train_labels, test_data,
                num_epochs, lr, weight_decay, batch_size)
 ```

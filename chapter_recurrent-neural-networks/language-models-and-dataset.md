@@ -230,7 +230,7 @@ Now we wrap the above two sampling functions to a class so that we can use it as
 
 ```{.python .input}
 # Saved in the d2l package for later use
-class SeqDataLoader(object):
+class SeqDataLoader:
     """A iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:

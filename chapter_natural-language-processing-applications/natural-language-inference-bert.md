@@ -8,11 +8,12 @@ language inference.](../img/nlp-map-nli-bert.svg)
 
 ```{.python .input  n=40}
 import d2l
+import multiprocessing
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()
-bert_batch_size, max_len = 512, 64
+bert_batch_size, max_len = 512, 128
 bert_train_iter, vocab = d2l.load_data_wiki(bert_batch_size, max_len)
 ```
 
@@ -21,7 +22,7 @@ ctx, loss = d2l.try_all_gpus(), gluon.loss.SoftmaxCELoss()
 bert = d2l.BERTModel(len(vocab), num_hiddens=256, ffn_num_hiddens=256,
                      num_heads=4, num_layers=2, dropout=0.2)
 bert.initialize(init.Xavier(), ctx=ctx)
-d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 2000)
+d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 3000)
 ```
 
 ...
@@ -29,30 +30,36 @@ d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 2000)
 ```{.python .input  n=41}
 class SNLIBERTDataset(gluon.data.Dataset):
     def __init__(self, dataset, max_len, vocab=None):
-        all_premise_tokens = d2l.tokenize(dataset[0])
-        all_hypothesis_tokens = d2l.tokenize(dataset[1])
+        all_premise_hypothesis_tokens = [[
+            p_tokens, h_tokens] for p_tokens, h_tokens in zip(
+            d2l.tokenize(dataset[0]), d2l.tokenize(dataset[1]))]
         self.labels = np.array(dataset[2])
         self.vocab = vocab
         self.max_len = max_len
         (self.all_token_ids, self.all_segments,
-         self.valid_lens) = self._preprocess(all_premise_tokens,
-                                             all_hypothesis_tokens)
+         self.valid_lens) = self._preprocess(all_premise_hypothesis_tokens)
         print('read ' + str(len(self.all_token_ids)) + ' examples')
 
-    def _preprocess(self, all_premise_tokens, all_hypothesis_tokens):
-        all_token_ids, all_segments, valid_lens = [], [], []
-        for p_tokens, h_tokens in zip(
-            all_premise_tokens, all_hypothesis_tokens):
-            self._truncate_pair_of_tokens(p_tokens, h_tokens)
-            tokens, segments = d2l.get_tokens_and_segments(p_tokens, h_tokens)
-            all_token_ids.append(
-                np.array(self.vocab[tokens] + [self.vocab['<pad>']]
-                         * (self.max_len - len(tokens)), dtype='int32'))
-            all_segments.append(
-                np.array(segments + [0] * (self.max_len - len(segments)),
-                         dtype='int32'))
-            valid_lens.append(np.array(len(tokens)))
-        return all_token_ids, all_segments, valid_lens 
+    def _preprocess(self, all_premise_hypothesis_tokens):
+        pool = multiprocessing.Pool(4)  # Use 4 worker processes
+        out = pool.map(self._mp_worker, all_premise_hypothesis_tokens)
+        all_token_ids = [
+            token_ids for token_ids, segments, valid_len in out]
+        all_segments = [segments for token_ids, segments, valid_len in out]
+        valid_lens = [valid_len for token_ids, segments, valid_len in out]
+        return (np.array(all_token_ids, dtype='int32'),
+                np.array(all_segments, dtype='int32'), 
+                np.array(valid_lens))
+    
+    def _mp_worker(self, premise_hypothesis_tokens):
+        p_tokens, h_tokens = premise_hypothesis_tokens
+        self._truncate_pair_of_tokens(p_tokens, h_tokens)
+        tokens, segments = d2l.get_tokens_and_segments(p_tokens, h_tokens)
+        token_ids = self.vocab[tokens] + [self.vocab['<pad>']] \
+                             * (self.max_len - len(tokens))
+        segments = segments + [0] * (self.max_len - len(segments))
+        valid_len = len(tokens)
+        return token_ids, segments, valid_len
 
     def _truncate_pair_of_tokens(self, p_tokens, h_tokens):
         # Reserve slots for '<CLS>', '<SEP>', and '<SEP>' tokens for the

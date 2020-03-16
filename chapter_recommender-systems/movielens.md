@@ -13,6 +13,7 @@ To begin with, let's import the packages required to run this section’s experi
 ```{.python .input  n=1}
 import d2l
 from mxnet import gluon, np
+import os
 import pandas as pd
 ```
 
@@ -28,7 +29,7 @@ d2l.DATA_HUB['ml-100k'] = (
 def read_data_ml100k():
     data_dir = d2l.download_extract('ml-100k')
     names = ['user_id', 'item_id', 'rating', 'timestamp']
-    data = pd.read_csv(data_dir + 'u.data', '\t', names=names,
+    data = pd.read_csv(os.path.join(data_dir, 'u.data'), '\t', names=names,
                        engine='python')
     num_users = data.user_id.unique().shape[0]
     num_items = data.item_id.unique().shape[0]
@@ -53,9 +54,9 @@ We then plot the distribution of the count of different ratings. As expected, it
 
 ```{.python .input  n=4}
 d2l.plt.hist(data['rating'], bins=5, ec='black')
-d2l.plt.xlabel("Rating")
-d2l.plt.ylabel("Count")
-d2l.plt.title("Distribution of Ratings in MovieLens 100K")
+d2l.plt.xlabel('Rating')
+d2l.plt.ylabel('Count')
+d2l.plt.title('Distribution of Ratings in MovieLens 100K')
 d2l.plt.show()
 ```
 
@@ -66,9 +67,9 @@ We split the dataset into training and test sets. The following function provide
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
 def split_data_ml100k(data, num_users, num_items,
-                      split_mode="random", test_ratio=0.1):
+                      split_mode='random', test_ratio=0.1):
     """Split the dataset in random mode or seq-aware mode."""
-    if split_mode == "seq-aware":
+    if split_mode == 'seq-aware':
         train_items, test_items, train_list = {}, {}, []
         for line in data.itertuples():
             u, i, rating, time = line[1], line[2], line[3], line[4]
@@ -97,16 +98,16 @@ After dataset splitting, we will convert the training set and test set into list
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
-def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
+def load_data_ml100k(data, num_users, num_items, feedback='explicit'):
     users, items, scores = [], [], []
-    inter = np.zeros((num_items, num_users)) if feedback == "explicit" else {}
+    inter = np.zeros((num_items, num_users)) if feedback == 'explicit' else {}
     for line in data.itertuples():
         user_index, item_index = int(line[1] - 1), int(line[2] - 1)
-        score = int(line[3]) if feedback == "explicit" else 1
+        score = int(line[3]) if feedback == 'explicit' else 1
         users.append(user_index)
         items.append(item_index)
         scores.append(score)
-        if feedback == "implicit":
+        if feedback == 'implicit':
             inter.setdefault(user_index, []).append(item_index)
         else:
             inter[item_index, user_index] = score
@@ -117,7 +118,7 @@ Afterwards, we put the above steps together and it will be used in the next sect
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
-def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
+def split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',
                           test_ratio=0.1, batch_size=256):
     data, num_users, num_items = read_data_ml100k()
     train_data, test_data = split_data_ml100k(
@@ -131,7 +132,7 @@ def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
     test_set = gluon.data.ArrayDataset(
         np.array(test_u), np.array(test_i), np.array(test_r))
     train_iter = gluon.data.DataLoader(
-        train_set, shuffle=True, last_batch="rollover",
+        train_set, shuffle=True, last_batch='rollover',
         batch_size=batch_size)
     test_iter = gluon.data.DataLoader(
         test_set, batch_size=batch_size)

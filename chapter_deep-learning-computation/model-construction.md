@@ -37,6 +37,7 @@ and possesses a set of tunable parameters that are updated
 according to the signal that flows backwards 
 from the subsequent layer.
 
+
 While you might think that neurons, layers, and models
 give us enough abstractions to go about our business,
 it turns out that we often find it convenient
@@ -48,7 +49,7 @@ which is wildly popular in computer vision,
 possesses hundreds of layers.
 These layers consist of repeating patterns of *groups of layers*. Implementing such a network one layer at a time can grow tedious.
 This concern is not just hypothetical---such 
-these design patterns are common in practice.
+design patterns are common in practice.
 The ResNet architecture mentioned above
 won the 2015 ImageNet and COCO computer vision competitions
 for both recognition and detection :cite:`He.Zhang.Ren.ea.2016`
@@ -93,8 +94,8 @@ To begin, we revisit the Blocks
 that we used to implement multilayer perceptrons
 (:numref:`sec_mlp_gluon`).
 The following code generates a network
-with one fully-connected hidden layer with 256 units
-and ReLU activation,
+with one fully-connected hidden layer 
+with 256 units and ReLU activation,
 followed by a fully-connected *output layer*
 with 10 units (no activation function).
 
@@ -112,19 +113,6 @@ net.initialize()
 net(x)
 ```
 
-```{.json .output n=33}
-[
- {
-  "data": {
-   "text/plain": "array([[ 0.00122338,  0.01780073, -0.05727761, -0.02031853,  0.00534845,\n        -0.01063692, -0.08061831, -0.05993003,  0.05566049,  0.01896864],\n       [ 0.00160775, -0.00586623, -0.07745256,  0.00031723,  0.01694585,\n        -0.00746834, -0.07344628, -0.06443159,  0.03348207,  0.03590746]])"
-  },
-  "execution_count": 33,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 In this example, we constructed
 our model by instantiating an `nn.Sequential`,
 assigning the returned object to the `net` variable.
@@ -135,7 +123,7 @@ In short, `nn.Sequential` defines a special kind of `Block`
 that mantains an ordered list of constituent `Blocks`.
 The `add` method simply facilitates
 the addition of each successive `Block` to the list.
-Note that each our layers are instances of the `Dense` class
+Note that each our layer is an instance of the `Dense` class
 which is itself a subclass of `Block`.
 The `forward` function is also remarkably simple:
 it chains each Block in the list together,
@@ -232,19 +220,6 @@ net.initialize()
 net(x)
 ```
 
-```{.json .output n=35}
-[
- {
-  "data": {
-   "text/plain": "array([[-0.00283358, -0.0001335 , -0.00657599, -0.08021715, -0.04908339,\n         0.00450018,  0.03988849,  0.03330025, -0.05078143, -0.01793484],\n       [ 0.01313063, -0.01528049, -0.00977739, -0.09383089, -0.01722571,\n        -0.01875286,  0.06153195,  0.02244817, -0.05873011,  0.00769111]])"
-  },
-  "execution_count": 35,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 A key virtue of the `Block` abstraction is its versatility.
 We can subclass `Block` to create layers
 (such as the `Dense` class provided by Gluon),
@@ -313,19 +288,6 @@ net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
 net.initialize()
 net(x)
-```
-
-```{.json .output n=37}
-[
- {
-  "data": {
-   "text/plain": "array([[ 1.6314276e-02,  5.9302434e-02,  1.0086000e-02, -2.8091740e-02,\n        -5.1017627e-02,  1.0890188e-02,  7.1975797e-02, -9.1638707e-02,\n        -6.6497326e-02,  2.8100654e-02],\n       [ 8.4829666e-03,  7.2621360e-02,  4.9038999e-02,  1.4956370e-03,\n        -3.7829582e-02, -2.1644304e-02,  6.5467075e-02, -6.2248398e-02,\n        -8.4860608e-02, -1.0916032e-05]])"
-  },
-  "execution_count": 37,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Note that this use of `MySequential`
@@ -417,25 +379,12 @@ Note that this particular operation may not be useful
 in any real world task. 
 Our point is only to show you how to integrate
 arbitrary code into the flow of your 
-neural network computations. 
+neural network computations.
 
 ```{.python .input  n=39}
 net = FixedHiddenMLP()
 net.initialize()
 net(x)
-```
-
-```{.json .output n=39}
-[
- {
-  "data": {
-   "text/plain": "array(0.85500616)"
-  },
-  "execution_count": 39,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 With Gluon, we can mix and match various 
@@ -460,19 +409,6 @@ chimera.add(NestMLP(), nn.Dense(20), FancyMLP())
 
 chimera.initialize()
 chimera(x)
-```
-
-```{.json .output n=40}
-[
- {
-  "data": {
-   "text/plain": "array(6.8135457)"
-  },
-  "execution_count": 40,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Compilation
@@ -504,12 +440,13 @@ to learn about compilation after finishing the current chapter.
 
 ## Summary
 
-* Layers are `Block`s.
-* Many layers can comprise a `Block`.
-* Many `Block`s can comprise a `Block`.
-* A `Block` can contain code.
+* Layers are Blocks.
+* Many layers can comprise a Block.
+* Many Blocks can comprise a Block.
+* A Block can contain code.
 * Blocks take care of lots of housekeeping, including parameter initialization and backpropagation.
-* Sequential concatenations of layers and blocks are handled by the `Sequential` block.
+* Sequential concatenations of layers and blocks are handled by the `Sequential` Block.
+
 
 ## Exercises
 

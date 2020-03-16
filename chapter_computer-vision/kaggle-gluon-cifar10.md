@@ -81,7 +81,7 @@ def read_csv_labels(fname):
     tokens = [l.rstrip().split(',') for l in lines]
     return dict(((name, label) for name, label in tokens))
 
-labels = read_csv_labels(data_dir + 'trainLabels.csv')
+labels = read_csv_labels(os.path.join(data_dir, 'trainLabels.csv'))
 print('# training examples:', len(labels))
 print('# classes:', len(set(labels.values())))
 ```
@@ -103,18 +103,21 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
     # The number of examples per class for the validation set
     n_valid_per_label = max(1, math.floor(n * valid_ratio))
     label_count = {}
-    for train_file in os.listdir(data_dir + 'train'):
+    for train_file in os.listdir(os.path.join(data_dir, 'train')):
         label = labels[train_file.split('.')[0]]
-        fname = data_dir + 'train/' + train_file
+        fname = os.path.join(data_dir, 'train', train_file)
         # Copy to train_valid_test/train_valid with a subfolder per class
-        copyfile(fname, data_dir + 'train_valid_test/train_valid/' + label)
+        copyfile(fname, os.path.join(data_dir, 'train_valid_test',
+                                     'train_valid', label))
         if label not in label_count or label_count[label] < n_valid_per_label:
             # Copy to train_valid_test/valid
-            copyfile(fname, data_dir + 'train_valid_test/valid/' + label)
+            copyfile(fname, os.path.join(data_dir, 'train_valid_test',
+                                         'valid', label))
             label_count[label] = label_count.get(label, 0) + 1
         else:
             # Copy to train_valid_test/train
-            copyfile(fname, data_dir+'train_valid_test/train/' + label)
+            copyfile(fname, os.path.join(data_dir, 'train_valid_test',
+                                         'train', label))
     return n_valid_per_label
 ```
 
@@ -123,16 +126,17 @@ The `reorg_test` function below is used to organize the testing set to facilitat
 ```{.python .input  n=3}
 # Saved in the d2l package for later use    
 def reorg_test(data_dir):
-    for test_file in os.listdir(data_dir + 'test'):
-        copyfile(data_dir + 'test/' + test_file, 
-                 data_dir + 'train_valid_test/test/unknown/')
+    for test_file in os.listdir(os.path.join(data_dir, 'test')):
+        copyfile(os.path.join(data_dir, 'test', test_file),
+                 os.path.join(data_dir, 'train_valid_test', 'test',
+                              'unknown'))
 ```
 
 Finally, we use a function to call the previously defined `read_csv_labels`, `reorg_train_valid`, and `reorg_test` functions.
 
 ```{.python .input  n=7}
 def reorg_cifar10_data(data_dir, valid_ratio):
-    labels = read_csv_labels(data_dir + 'trainLabels.csv')
+    labels = read_csv_labels(os.path.join(data_dir, 'trainLabels.csv'))
     reorg_train_valid(data_dir, labels, valid_ratio)
     reorg_test(data_dir)
 ```
@@ -181,7 +185,8 @@ Next, we can create the `ImageFolderDataset` instance to read the organized data
 
 ```{.python .input  n=10}
 train_ds, valid_ds, train_valid_ds, test_ds = [
-    gluon.data.vision.ImageFolderDataset(data_dir+'train_valid_test/'+folder)
+    gluon.data.vision.ImageFolderDataset(
+        os.path.join(data_dir, 'train_valid_test', folder))
     for folder in ['train', 'valid', 'train_valid', 'test']]
 ```
 
@@ -277,9 +282,9 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
         for X, y in train_iter:
-            y = y.astype('float32').as_in_context(ctx)
+            y = y.astype('float32').as_in_ctx(ctx)
             with autograd.record():
-                y_hat = net(X.as_in_context(ctx))
+                y_hat = net(X.as_in_ctx(ctx))
                 l = loss(y_hat, y).sum()
             l.backward()
             trainer.step(batch_size)
@@ -321,7 +326,7 @@ train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 
 for X, _ in test_iter:
-    y_hat = net(X.as_in_context(ctx))
+    y_hat = net(X.as_in_ctx(ctx))
     preds.extend(y_hat.argmax(axis=1).astype(int).asnumpy())
 sorted_ids = list(range(1, len(test_ds) + 1))
 sorted_ids.sort(key=lambda x: str(x))
