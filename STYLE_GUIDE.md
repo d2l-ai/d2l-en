@@ -39,6 +39,9 @@
         * minibatch stochastic gradient descent vs stochastic gradient descent
     * List
         * https://github.com/mli/gluon-tutorials-zh/blob/master/TERMINOLOGY.md
+* Acceptable abbreviations
+    * MLP, CNN, RNN, GRU, LSTM, model names (e.g., ELMo, GPT, BERT)
+    * We spell out full names in most cases to be clear (e.g., NLP -> natural language processing)
 
 ## Math
 
