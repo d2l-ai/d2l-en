@@ -54,6 +54,10 @@
     * e.g., comma and period
 * Assignment symbol
     * \leftarrow
+* Distiguish text numerals and mathematical numerals:
+    * According to [Donald E. Knuth](http://tug.org/TUGboat/tb10-1/tb23knut.pdf): 
+      * Text numerals are numbers that are essentially part of the English language: "1776", "Chapter 5", "2 ways"
+      * Mathematical numerals are numbers that are part of the mathematics: "$x$ is either $1$ or $-1$", "the greatest common divisor of $12$ and $18$ is $6$".
 
 ## Figure
 
