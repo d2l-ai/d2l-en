@@ -37,6 +37,7 @@ to verify the integrity of the file.
 All of our datasets are hosted on site
 whose address is assigned to `DATA_URL` below.
 
+
 ```{.python .input  n=1}
 import os
 from mxnet import gluon
