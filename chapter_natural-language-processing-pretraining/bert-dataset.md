@@ -2,6 +2,7 @@
 
 *This section is under construction.*
 
+
 ```{.python .input  n=1}
 import collections
 import d2l
