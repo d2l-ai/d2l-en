@@ -8,7 +8,7 @@ following the introduction of LeNet,
 they did not immediately dominate the field.
 Although LeNet achieved good results on early small datasets,
 the performance and feasability of training convolutional networks
-on larger, more realistic datasets had yet to be established
+on larger, more realistic datasets had yet to be established.
 In fact, for much of the intervening time between the early 1990s
 and the watershed results of 2012,
 neural networks were often surpassed by other machine learning methods,
