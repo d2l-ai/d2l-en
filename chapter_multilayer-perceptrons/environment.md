@@ -152,7 +152,7 @@ and covariate shift assumptions can hold simultaneously.
 For example, when the label is deterministic,
 then covariate shift assumption will be satisfied,
 even when $y$ causes $\mathbf{x}$.
-Interestingly, in these csaes,
+Interestingly, in these cases,
 it is often advantageous to work with the methods
 that flow from the label shift assumption.
 That is because these methods tend 
