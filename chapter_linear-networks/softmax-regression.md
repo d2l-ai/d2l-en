@@ -358,7 +358,7 @@ that one can ever be (in expectation).
 So if entropy is level of surprise experienced 
 by someone who knows the true probability, 
 then you might be wondering, *what is cross-entropy?* 
-The cross-entropy *from $p$ to $q$*, denoted $H(p, q)$,
+The cross-entropy *from* $p$ *to* $q$, denoted $H(p, q)$,
 is the expected surprisal of an observer with subjective probabilities $q$
 upon seeing data that was actually generated according to probabilities $p$.
 The lowest possible cross-entropy is achieved when $p=q$. 
