@@ -1,12 +1,13 @@
 # Numerical Stability and Initialization
 :label:`sec_numerical_stability`
 
-So far, for every model that we have implemented,
-we needed to initialize our parameters 
-according to some specified distribution.
-And until now, we glossed over the details,
-taking the initialization hyperparameters for granted.
-You might even have gotten the impression that these choices
+
+Thus far, every model that we have implemented
+required that initialize its parameters 
+according to some pre-specified distribution.
+Until now, we took the initialization scheme for granted,
+glossed over the details of how these these choices are made.
+You might have even gotten the impression that these choices
 are not especially important.
 However, the choice of initialization scheme
 plays a significant role in neural network learning,
@@ -15,67 +16,73 @@ Moreover, these choices can be tied up in interesting ways
 with the choice of the nonlinear activation function.
 Which function we choose and how we initialize parameters
 can determine how quickly our optimization algorithm converges.
-Failure to be mindful of these issues
-can lead to either exploding or vanishing gradients.
+Poor choices here can cause us to encounter
+exploding or vanishing gradients while training.
 In this section, we delve into these topics with greater detail
-and discuss some useful heuristics that you may use
-frequently throughout your career in deep learning.
+and discuss some useful heuristics
+that you will frequently useful
+throughout your career in deep learning.
 
 
 ## Vanishing and Exploding Gradients
 
-Consider a deep network with $d$ layers,
+Consider a deep network with $L$ layers,
 input $\mathbf{x}$ and output $\mathbf{o}$.
-Each layer satisfies:
+With each layer $l$ defined by a transformation $f_l$
+parameterized by weights $\mathbf{W}_l$
+our network can be expressed as:
 
-$$\mathbf{h}^{t+1} = f_t (\mathbf{h}^t) \text{ and thus } \mathbf{o} = f_d \circ \ldots, \circ f_1(\mathbf{x}).$$
+$$\mathbf{h}^{l+1} = f_l (\mathbf{h}^l) \text{ and thus } \mathbf{o} = f_L \circ \ldots, \circ f_1(\mathbf{x}).$$
 
 If all activations and inputs are vectors,
-we can write the gradient of $\mathbf{o}$
-with respect to any set of parameters $\mathbf{W}_t$
-associated with the function $f_t$ at layer $t$ simply as
+we can write the gradient of $\mathbf{o}$ with respect to 
+any set of parameters $\mathbf{W}_l$ as follows:
 
-$$\partial_{\mathbf{W}_t} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{d-1}} \mathbf{h}^d}_{:= \mathbf{M}_d} \cdot \ldots, \cdot \underbrace{\partial_{\mathbf{h}^{t}} \mathbf{h}^{t+1}}_{:= \mathbf{M}_t} \underbrace{\partial_{\mathbf{W}_t} \mathbf{h}^t}_{:= \mathbf{v}_t}.$$
+$$\partial_{\mathbf{W}_l} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{L-1}} \mathbf{h}^L}_{:= \mathbf{M}_L} \cdot \ldots \cdot \underbrace{\partial_{\mathbf{h}^{l}} \mathbf{h}^{l+1}}_{:= \mathbf{M}_l} \underbrace{\partial_{\mathbf{W}_l} \mathbf{h}^l}_{:= \mathbf{v}_l}.$$
 
-In other words, it is the product of $d-t$ matrices
-$\mathbf{M}_d \cdot \ldots, \cdot \mathbf{M}_t$
-and the gradient vector $\mathbf{v}_t$.
-What happens is similar to the situation
-when we experienced numerical underflow
-when multiplying too many probabilities.
-At the time, we were able to mitigate the problem
-by switching from into log-space, i.e., by shifting the problem
-from the mantissa to the exponent of the numerical representation. Unfortunately the problem outlined in the equation above is much more serious:
-initially the matrices $M_t$ may well have a wide variety of eigenvalues.
-They might be small, they might be large, and in particular,
-their product might well be *very large* or *very small*.
-This is not (only) a problem of numerical representation
-but it means that the optimization algorithm is bound to fail.
-It receives gradients that are either
-excessively large or excessively small.
-As a result the steps taken are either
-(i) excessively large (the *exploding* gradient problem),
-in which case the parameters blow up in magnitude rendering the model useless,
-or (ii) excessively small, (the *vanishing gradient problem*),
-in which case the parameters hardly move at all,
-and thus the learning process makes no progress.
+In other words, this gradient is
+the product of $L-l$ matrices
+$\mathbf{M}_L \cdot \ldots, \cdot \mathbf{M}_l$
+and the gradient vector $\mathbf{v}_l$.
+Thus we are susceptible to the same 
+problems of numerical underflow that often crop up 
+when multiplying together too many probabilities.
+When dealing with probabilities, a common trick is to
+switch into log-space, i.e., shifting 
+pressure from the mantissa to the exponent 
+of the numerical representation. 
+Unfortunately, our problem above is more serious:
+initially the matrices $M_l$ may have a wide variety of eigenvalues.
+They might be small or large, and 
+their product might be *very large* or *very small*.
+
+The risks posed by unstable gradients 
+goes beyond numerical representation.
+Gradients of unpredictable magnitude 
+also threaten the stability of our optimization algorithms.
+We may facing parameter updates that are either
+(i) excessively large, destroying our model
+(the *exploding* gradient problem);
+or (ii) excessively small, 
+(the *vanishing gradient problem*),
+rendering learning impossible as parameters 
+hardly move on each update.
 
 
 ### Vanishing Gradients
 
-One major culprit in the vanishing gradient problem
-is the choices of the activation functions $\sigma$
-that are interleaved with the linear operations in each layer.
-Historically, the sigmoid function $(1 + \exp(-x))$
-(introduced in :numref:`sec_mlp`)
-was a popular choice owing to its similarity to a thresholding function.
+One frequent culprit causing the vanishing gradient problem
+is the choice of the activation function $\sigma$
+that is appended following each layer's linear operations.
+Historically, the sigmoid function 
+$1/(1 + \exp(-x))$ (introduced in :numref:`sec_mlp`)
+was popular because it resembles a thresholding function.
 Since early artificial neural networks were inspired
 by biological neural networks,
-the idea of neurons that either fire or do not fire
-(biological neurons do not partially fire) seemed appealing.
-Let's take a closer look at the function
-to see why picking it might be problematic
-vis-a-vis vanishing gradients.
+the idea of neurons that either fire either *fully* or *not at all*
+(like biological neurons) seemed appealing.
+Let's take a closer look at the sigmoid
+to see why it can cause vanishing gradients.
 
 ```{.python .input}
 %matplotlib inline
@@ -92,19 +99,19 @@ y.backward()
 d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```
 
-As we can see, the gradient of the sigmoid vanishes
+As you can see, the sigmoid's gradient vanishes
 both when its inputs are large and when they are small.
-Moreover, when we execute backward propagation, due to the chain rule,
-this means that unless we are in the Goldilocks zone,
-where the inputs to most of the sigmoids are in the range of, say $[-4, 4]$,
+Moreover, when backpropagating through many layers,
+unless we are in the Goldilocks zone---where 
+the inputs to many of the sigmoids are close to zero,
 the gradients of the overall product may vanish.
-When we have many layers, unless we are especially careful,
-we are likely to find that our gradient is cut off at *some* layer.
-Before ReLUs ($\max(0, x)$) were proposed
-as an alternative to squashing functions,
-this problem used to plague deep network training.
-As a consequence, ReLUs have become
-the default choice when designing activation functions in deep networks.
+When our network boasts many layers,
+unless we are careful, the gradient 
+will likely be cut off at *some* layer.
+Indeed, this problem used to plague deep network training.
+Consequently, ReLUs which are more stable
+(but less neurally plausible) 
+have emerged as the default choice for practitioners.
 
 
 ### Exploding Gradients
@@ -117,8 +124,8 @@ and multiply them with some initial matrix.
 For the scale that we picked
 (the choice of the variance $\sigma^2=1$),
 the matrix product explodes.
-If this were to happen to us with a deep network,
-we would have no realistic chance of getting
+When this happens due to the initialization 
+of a deep network, we have no chance of getting
 a gradient descent optimizer to converge.
 
 ```{.python .input  n=5}
@@ -137,7 +144,8 @@ is the symmetry inherent in their parametrization.
 Assume that we have a deep network
 with one hidden layer with two units, say $h_1$ and $h_2$.
 In this case, we could permute the weights $\mathbf{W}_1$
-of the first layer and likewise permute the weights of the output layer
+of the first layer and likewise permute 
+the weights of the output layer
 to obtain the same function.
 There is nothing special differentiating
 the first hidden unit vs the second hidden unit.
@@ -146,28 +154,28 @@ among the hidden units of each layer.
 
 This is more than just a theoretical nuisance.
 Imagine what would happen if we initialized
-all of the parameters of some layer as $\mathbf{W}_l = c$
-for some constant $c$.
-In this case, the gradients for all dimensions are identical:
+all of the parameters of some layer 
+as $\mathbf{W}_l = c$ for some constant $c$.
+In this case, the gradients 
+for all dimensions are identical:
 thus not only would each unit take the same value,
 but it would receive the same update.
-Stochastic gradient descent would never break the symmetry on its own
-and we might never be able to realize the networks expressive power.
-The hidden layer would behave as if it had only a single unit.
-As an aside, note that while SGD would not break this symmetry,
+Stochastic gradient descent would 
+never break the symmetry on its own
+and we might never be able to realize
+the network's expressive power.
+The hidden layer would behave
+as if it had only a single unit.
+Note that while SGD would not break this symmetry,
 dropout regularization would!
-
 
 
 ## Parameter Initialization
 
-One way of addressing, or at least mitigating the issues raised above
-is through careful initialization of the weight vectors.
-This way we can ensure that (at least initially) the gradients do not vanish
-and that they maintain a reasonable scale
-where the network weights do not diverge.
-Additional care during optimization and suitable regularization
-ensures that things never get too bad.
+One way of addressing---or at least mitigating---the 
+issues raised above is through careful initialization.
+Additional care during optimization 
+and suitable regularization can further enhance stability.
 
 
 ### Default Initialization
@@ -177,27 +185,30 @@ we used `net.initialize(init.Normal(sigma=0.01))`
 to initialize the values of our weights.
 If the initialization method is not specified,
 such as `net.initialize()`,
-MXNet will use the default random initialization method:
-each element of the weight parameter is randomly sampled
-with a uniform distribution $U[-0.07, 0.07]$
-and the bias parameters are all set to $0$.
-Both choices tend to work well in practice for moderate problem sizes.
+MXNet will use the default random initialization method,
+sampling each weight parameter from 
+the uniform distribution $U[-0.07, 0.07]$
+and setting the bias parameters to $0$.
+Both choices tend to work well in practice 
+for moderate problem sizes.
 
 
 ### Xavier Initialization
 
-Let's look at the scale distribution of the activations of the hidden units $h_{i}$ for some layer. They are given by
+Let's look at the scale distribution of
+the activations of the hidden units $h_{i}$ for some layer. 
+They are given by
 
 $$h_{i} = \sum_{j=1}^{n_\mathrm{in}} W_{ij} x_j.$$
 
-The weights $W_{ij}$ are all drawn independently from the same distribution. Furthermore, let's assume that this distribution
+The weights $W_{ij}$ are all drawn 
+independently from the same distribution.
+Furthermore, let's assume that this distribution
 has zero mean and variance $\sigma^2$
 (this does not mean that the distribution has to be Gaussian,
 just that mean and variance need to exist).
-We do not really have much control
-over the inputs into the layer $x_j$
-but let's proceed with the somewhat unrealistic assumption
-that they also have zero mean and variance $\gamma^2$
+For now, let's assume that the inputs to layer $x_j$
+also have zero mean and variance $\gamma^2$
 and that they are independent of $\mathbf{W}$.
 In this case, we can compute mean and variance of $h_i$ as follows:
 
@@ -210,7 +221,8 @@ $$
 \end{aligned}
 $$
 
-One way to keep the variance fixed is to set $n_\mathrm{in} \sigma^2 = 1$.
+One way to keep the variance fixed 
+is to set $n_\mathrm{in} \sigma^2 = 1$.
 Now consider backpropagation.
 There we face a similar problem,
 albeit with gradients being propagated from the top layers.
@@ -231,48 +243,50 @@ $$
 \end{aligned}
 $$
 
-This is the reasoning underlying the eponymous Xavier initialization :cite:`Glorot.Bengio.2010`. 
-It works well enough in practice.
-For Gaussian random variables, the Xavier initialization
-picks a normal distribution with zero mean
-and variance $\sigma^2 = 2/(n_\mathrm{in} + n_\mathrm{out})$.
-For uniformly distributed random variables $U[-a, a]$,
-note that their variance is given by $a^2/3$.
-Plugging $a^2/3$ into the condition on $\sigma^2$ yields
-that we should initialize uniformly with
+This is the reasoning underlying the now-standard
+and practically beneficial *Xavier* initialization,
+named for its creator :cite:`Glorot.Bengio.2010`.
+Typically, the Xavier initialization
+samples weights from a Gaussian distribution
+with zero mean and variance
+$\sigma^2 = 2/(n_\mathrm{in} + n_\mathrm{out})$.
+We can also adapt Xavier's intuition to 
+choose the variance when sampling weights
+from a uniform distribution.
+Note the distribution $U[-a, a]$ has variance $a^2/3$.
+Plugging $a^2/3$ into our condition on $\sigma^2$, 
+yields the suggestion to initialize according to
 $U\left[-\sqrt{6/(n_\mathrm{in} + n_\mathrm{out})}, \sqrt{6/(n_\mathrm{in} + n_\mathrm{out})}\right]$.
 
 ### Beyond
 
 The reasoning above barely scratches the surface
 of modern approaches to parameter initialization.
-In fact, MXNet has an entire 
-[`mxnet.initializer`](https://mxnet.apache.org/api/python/docs/api/initializer/index.html) module
+In fact, MXNet has an entire `mxnet.initializer` module
 implementing over a dozen different heuristics.
-Moreover, initialization continues to be a hot area of inquiry
-within research into the fundamental theory of neural network optimization.
-Some of these heuristics are especially suited
-for when parameters are tied
-(i.e., when parameters of in different parts the network are shared),
-for super-resolution, sequence models, and related problems.
-We recommend that the interested reader take a closer look
-at what is offered as part of this module,
-and investigate the recent research on parameter initialization.
-Perhaps you may come across a recent clever idea
-and contribute its implementation to MXNet,
-or you may even invent your own scheme!
+Moreover, parameter initialization continues to be
+a hot area of fundamental research in deep learning.
+Among these are heuristics specialized for 
+tied (shared) parameters, super-resolution, 
+sequence models, and other situations.
+If the topic interests you we suggest 
+a deep dive into this module's offerings,
+reading the papers that proposed and analyzed each heuristic,
+and then exploring the latest publications on the topic.
+Perhaps you will stumble across (or even invent!) 
+a clever idea and contribute an implementation to MXNet.
 
 
 ## Summary
 
-* Vanishing and exploding gradients are common issues in very deep networks, unless great care is taking to ensure that gradients and parameters remain well controlled.
-* Initialization heuristics are needed to ensure that at least the initial gradients are neither too large nor too small.
-* The ReLU addresses one of the vanishing gradient problems, namely that gradients vanish for very large inputs. This can accelerate convergence significantly.
+* Vanishing and exploding gradients are common issues in deep networks. Great care in parameter initialization is required to ensure that gradients and parameters remain well controlled.
+* Initialization heuristics are needed to ensure that the initial gradients are neither too large nor too small.
+* ReLU activation functions mitigate the vanishing gradient problem. This can accelerate convergence.
 * Random initialization is key to ensure that symmetry is broken before optimization.
 
 ## Exercises
 
-1. Can you design other cases of symmetry breaking besides the permutation symmetry?
+1. Can you design other cases where a neural network might exhibit symmetry requiring breaking besides the permutation symmetry in a multilayer pereceptron's layers?
 1. Can we initialize all weight parameters in linear regression or in softmax regression to the same value?
 1. Look up analytic bounds on the eigenvalues of the product of two matrices. What does this tell you about ensuring that gradients are well conditioned?
 1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on LARS for inspiration :cite:`You.Gitman.Ginsburg.2017`.

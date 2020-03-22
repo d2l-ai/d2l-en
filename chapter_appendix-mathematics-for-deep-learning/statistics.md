@@ -66,7 +66,7 @@ This allows us to quantify the average squared deviation from the true value.  M
 
 ### Statistical Bias
 
-The MSE provides a natural metric, but we can easily imagine multiple different phenomena that might make it large.  Two that we will see are fundamentally important are the fluctuation in the estimator due to randomness in the dataset, and systematic error in the estimator due to the estimation procedure.  
+The MSE provides a natural metric, but we can easily imagine multiple different phenomena that might make it large.  Two fundamentally important are fluctuation in the estimator due to randomness in the dataset, and systematic error in the estimator due to the estimation procedure.  
 
 
 First, let's measure the systematic error. For an estimator $\hat{\theta}_n$, the mathematical illustration of *statistical bias* can be defined as
@@ -124,8 +124,8 @@ To illustrate the equation of the bias-variance trade-off, let's simulate of nor
 ```{.python .input}
 theta_true = 1
 sigma = 4
-sample_length = 10000
-samples = np.random.normal(theta_true, sigma, sample_length)
+sample_len = 10000
+samples = np.random.normal(theta_true, sigma, sample_len)
 theta_est = np.mean(samples)
 theta_est
 ```
@@ -156,7 +156,7 @@ First, you will need carefully random selected two groups of volunteers, so that
 
 Second, after a period of taking the medicine, you will need to measure the two groups' math understanding by the same metrics, such as letting the volunteers do the same tests after learning a new math formula. Then, you can collect their performance and compare the results.  In this case, our null hypothesis will be that there is no difference between the two groups, and our alternate will be that there is.  
 
-This is still not fully formal.  There are many details you have to think of carefully. For example, what is the suitable metrics to test their math understanding ability? How many volunteers for your test so you can be confident to claim the effectiveness of your medicine? How long should you run the test? How do you decided if there is a difference between the two groups?  Do you care about the average performance only, or do you also the range of variation of the scores. And so on.
+This is still not fully formal.  There are many details you have to think of carefully. For example, what is the suitable metrics to test their math understanding ability? How many volunteers for your test so you can be confident to claim the effectiveness of your medicine? How long should you run the test? How do you decide if there is a difference between the two groups?  Do you care about the average performance only, or do you also the range of variation of the scores. And so on.
 
 In this way, hypothesis testing provides framework for experimental design and reasoning about certainty in observed results.  If we can now show that the null hypothesis is very unlikely to be true, we may reject it with confidence.
 
@@ -165,7 +165,7 @@ To complete the story of how to work with hypothesis testing, we need to now int
 
 ### Statistical Significance 
 
-The *statistical significance* measures the probability of erroneously reject the null hypothesis, $H_0$, when it should not be rejected, i.e.,
+The *statistical significance* measures the probability of erroneously rejecting the null hypothesis, $H_0$, when it should not be rejected, i.e.,
 
 $$ \text{statistical significance }= 1 - \alpha = P(\text{reject } H_0 \mid H_0 \text{ is true} ).$$
 

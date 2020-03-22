@@ -36,6 +36,7 @@ To learn the FM model, we can use the MSE loss for regression task, the cross en
 import d2l
 from mxnet import init, gluon, np, npx
 from mxnet.gluon import nn
+import os
 import sys
 npx.set_np()
 ```
@@ -67,16 +68,16 @@ We use the CTR data wrapper from the last section to load the online advertising
 ```{.python .input  n=3}
 batch_size = 2048
 data_dir = d2l.download_extract('ctr')
-train_data = d2l.CTRDataset(data_dir + "train.csv")
-test_data = d2l.CTRDataset(data_dir + "test.csv",
+train_data = d2l.CTRDataset(os.path.join(data_dir, 'train.csv'))
+test_data = d2l.CTRDataset(os.path.join(data_dir, 'test.csv'),
                            feat_mapper=train_data.feat_mapper,
                            defaults=train_data.defaults)
-num_workers = 0 if sys.platform.startswith("win") else 4
+num_workers = 0 if sys.platform.startswith('win') else 4
 train_iter = gluon.data.DataLoader(
-    train_data, shuffle=True, last_batch="rollover", batch_size=batch_size,
+    train_data, shuffle=True, last_batch='rollover', batch_size=batch_size,
     num_workers=num_workers)
 test_iter = gluon.data.DataLoader(
-    test_data, shuffle=False, last_batch="rollover", batch_size=batch_size,
+    test_data, shuffle=False, last_batch='rollover', batch_size=batch_size,
     num_workers=num_workers)
 ```
 

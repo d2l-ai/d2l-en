@@ -22,12 +22,12 @@ we will wind up with an output that is much smaller than our input.
 If we start with a $240 \times 240$ pixel image, $10$ layers of $5 \times 5$ convolutions
 reduce the image to $200 \times 200$ pixels, slicing off $30 \%$ of the image and with it obliterating any interesting information on the boundaries of the original image. *Padding* handles this issue.
 * In some cases, we want to reduce the resolution drastically if say we find our
-* original input resolution to be unwieldy. *Strides* can help in these instances.
+original input resolution to be unwieldy. *Strides* can help in these instances.
 
 ## Padding
 
 As described above, one tricky issue when applying convolutional layers
-is that losing pixels on the perimeter of our image.
+is that of losing pixels on the perimeter of our image.
 Since we typically use small kernels,
 for any given convolution,
 we might only lose a few pixels,
@@ -35,7 +35,7 @@ but this can add up as we apply
 many successive convolutional layers.
 One straightforward solution to this problem
 is to add extra pixels of filler around the boundary of our input image,
-thus increasing the effective size of the image
+thus increasing the effective size of the image.
 Typically, we set the values of the extra pixels to $0$.
 In :numref:`img_conv_pad`, we pad a $3 \times 5$ input,
 increasing its size to $5 \times 7$.
@@ -59,9 +59,9 @@ In many cases, we will want to set $p_h=k_h-1$ and $p_w=k_w-1$
 to give the input and output the same height and width.
 This will make it easier to predict the output shape of each layer
 when constructing the network.
-Assuming that $k_h$ is odd here,
+Assuming that $k_h$ is even here,
 we will pad $p_h/2$ rows on both sides of the height.
-If $k_h$ is even, one possibility is to
+If $k_h$ is odd, one possibility is to
 pad $\lceil p_h/2\rceil$ rows on the top of the input
 and $\lfloor p_h/2\rfloor$ rows on the bottom.
 We will pad both sides of the width in the same way.

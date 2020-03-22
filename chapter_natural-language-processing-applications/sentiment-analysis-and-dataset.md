@@ -35,13 +35,14 @@ Next, read the training and test datasets. Each example is a review and its corr
 # Saved in the d2l package for later use
 def read_imdb(data_dir, is_train):
     data, labels = [], []
-    for label in ['pos/', 'neg/']:
-        folder_name = data_dir + ('train/' if is_train else 'test/') + label
+    for label in ('pos', 'neg'):
+        folder_name = os.path.join(data_dir, 'train' if is_train else 'test',
+                                   label)
         for file in os.listdir(folder_name):
-            with open(folder_name + file, 'rb') as f:
+            with open(os.path.join(folder_name, file), 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
-                labels.append(1 if label == 'pos/' else 0)
+                labels.append(1 if label == 'pos' else 0)
     return data, labels
 
 train_data = read_imdb(data_dir, is_train=True)
@@ -56,7 +57,7 @@ We use a word as a token, and then create a dictionary based on the training dat
 
 ```{.python .input  n=4}
 train_tokens = d2l.tokenize(train_data[0], token='word')
-vocab = d2l.Vocab(train_tokens, min_freq=5)
+vocab = d2l.Vocab(train_tokens, min_freq=5, reserved_tokens=['<pad>'])
 
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.hist([len(line) for line in train_tokens], bins=range(0, 1000, 50));
@@ -68,8 +69,8 @@ Because the reviews have different lengths, so they cannot be directly combined 
 
 ```{.python .input  n=5}
 num_steps = 500  # sequence length
-train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
-                           for line in train_tokens])
+train_features = np.array([d2l.truncate_pad(
+    vocab[line], num_steps, vocab['<pad>']) for line in train_tokens])
 train_features.shape
 ```
 
@@ -99,10 +100,10 @@ def load_data_imdb(batch_size, num_steps=500):
     train_tokens = d2l.tokenize(train_data[0], token='word')
     test_tokens = d2l.tokenize(test_data[0], token='word')
     vocab = d2l.Vocab(train_tokens, min_freq=5)
-    train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
-                               for line in train_tokens])
-    test_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
-                              for line in test_tokens])
+    train_features = np.array([d2l.truncate_pad(
+        vocab[line], num_steps, vocab.unk) for line in train_tokens])
+    test_features = np.array([d2l.truncate_pad(
+        vocab[line], num_steps, vocab.unk) for line in test_tokens])
     train_iter = d2l.load_array((train_features, train_data[1]), batch_size)
     test_iter = d2l.load_array((test_features, test_data[1]), batch_size,
                                is_train=False)

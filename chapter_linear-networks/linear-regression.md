@@ -96,7 +96,7 @@ Collecting all features into a vector $\mathbf{x}$
 and all weights into a vector $\mathbf{w}$,
 we can express our model compactly using a dot product:
 
-$$\hat{y} = \mathbf{w}^T \mathbf{x} + b.$$
+$$\hat{y} = \mathbf{w}^\top \mathbf{x} + b.$$
 
 Here, the vector $\mathbf{x}$ corresponds to a single data point.
 We will often find it convenient
@@ -114,14 +114,14 @@ Given a training dataset $\mathbf{X}$
 and corresponding (known) targets $\mathbf{y}$,
 the goal of linear regression is to find
 the *weight* vector $w$ and bias term $b$
-that given some a new data point $\mathbf{x}_i$,
+that given a new data point $\mathbf{x}_i$,
 sampled from the same distribution as the training data
 will (in expectation) predict the target $y_i$ with the lowest error.
 
 Even if we believe that the best model for
 predicting $y$ given $\mathbf{x}$ is linear,
 we would not expect to find real-world data where
-$y_i$ exactly equals $\mathbf{w}^T \mathbf{x}+b$
+$y_i$ exactly equals $\mathbf{w}^\top \mathbf{x}+b$
 for all points ($\mathbf{x}, y)$.
 For example, whatever instruments we use to observe
 the features $\mathbf{X}$ and labels $\mathbf{y}$
@@ -146,7 +146,7 @@ where smaller values are better
 and perfect predictions incur a loss of $0$.
 The most popular loss function in regression problems
 is the sum of squared errors.
-When our prediction for some example $i$ is $\hat{y}^{(i)}$
+When our prediction for an example $i$ is $\hat{y}^{(i)}$
 and the corresponding true label is $y^{(i)}$,
 the squared error is given by:
 
@@ -188,7 +188,7 @@ linear regression can be solved analytically by applying a simple formula,
 yielding a global optimum.
 To start, we can subsume the bias $b$ into the parameter $\mathbf{w}$
 by appending a column to the design matrix consisting of all $1s$.
-Then our prediction problem is to minimize $||\mathbf{y} - X\mathbf{w}||$.
+Then our prediction problem is to minimize $||\mathbf{y} - \mathbf{X}\mathbf{w}||$.
 Because this expression has a quadratic form, it is convex,
 and so long as the problem is not degenerate
 (our features are linearly independent), it is strictly convex.
@@ -198,7 +198,7 @@ and it corresponds to the global minimum.
 Taking the derivative of the loss with respect to $\mathbf{w}$
 and setting it equal to $0$ yields the analytic solution:
 
-$$\mathbf{w}^* = (\mathbf X^T \mathbf X)^{-1}\mathbf X^T y.$$
+$$\mathbf{w}^* = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf{y}.$$
 
 While simple problems like linear regression
 may admit analytic solutions,
@@ -311,7 +311,7 @@ We return to these topics throughout the book.
 
 
 Given the learned linear regression model
-$\hat{\mathbf{w}}^\top x + \hat{b}$,
+$\hat{\mathbf{w}}^\top \mathbf{x} + \hat{b}$,
 we can now estimate the price of a new house
 (not contained in the training data)
 given its area $x_1$ and age (year) $x_2$.
@@ -361,7 +361,7 @@ to track the running time.
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
-class Timer(object):
+class Timer:
     """Record multiple running times."""
     def __init__(self):
         self.times = []
@@ -369,23 +369,23 @@ class Timer(object):
 
     def start(self):
         # Start the timer
-        self.start_time = time.time()
+        self.tik = time.time()
 
     def stop(self):
         # Stop the timer and record the time in a list
-        self.times.append(time.time() - self.start_time)
+        self.times.append(time.time() - self.tik)
         return self.times[-1]
 
     def avg(self):
         # Return the average time
-        return sum(self.times)/len(self.times)
+        return sum(self.times) / len(self.times)
 
     def sum(self):
         # Return the sum of time
         return sum(self.times)
 
     def cumsum(self):
-        # Return the accumuated times
+        # Return the accumulated times
         return np.array(self.times).cumsum().tolist()
 ```
 
@@ -394,8 +394,8 @@ First, we add them, one coordinate at a time,
 using a `for` loop.
 
 ```{.python .input  n=2}
-timer = Timer()
 c = np.zeros(n)
+timer = Timer()
 for i in range(n):
     c[i] = a[i] + b[i]
 '%.5f sec' % timer.stop()
@@ -442,8 +442,6 @@ $$p(z) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (z - \m
 Below we define a Python function to compute the normal distribution.
 
 ```{.python .input}
-x = np.arange(-7, 7, 0.01)
-
 def normal(z, mu, sigma):
     p = 1 / math.sqrt(2 * math.pi * sigma**2)
     return p * np.exp(- 0.5 / sigma**2 * (z - mu)**2)
@@ -452,6 +450,8 @@ def normal(z, mu, sigma):
 We can now visualize the normal distributions.
 
 ```{.python .input  n=2}
+x = np.arange(-7, 7, 0.01)
+
 # Mean and variance pairs
 parameters = [(0, 1), (0, 2), (3, 1)]
 d2l.plot(x, [normal(x, mu, sigma) for mu, sigma in parameters], xlabel='z',

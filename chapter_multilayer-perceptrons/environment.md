@@ -1,84 +1,118 @@
 # Considering the Environment
 
-So far, we have worked through a number of hands-on implementations
-fitting machine learning models to a variety of datasets.
-And yet, until now we skated over the matter
-of where are data comes from in the first place,
-and what we plan to ultimately *do* with the outputs from our models.
-Too often in the practice of machine learning,
-developers rush ahead with the development of models
-tossing these fundamental considerations aside.
+In the previous chapters, we worked through 
+a number of hands-on applications of machine learning,
+fitting models to a variety of datasets.
+And yet, we never stopped to contemplate
+either where data comes from in the first place,
+or what we plan to ultimately *do* 
+with the outputs from our models.
+Too often, machine learning developers
+in possession of data rush to develop models
+without pausing to consider these fundamental issues.
 
-Many failed machine learning deployments can be traced back to this situation.
-Sometimes the model does well as evaluated by test accuracy
-only to fail catastrophically in the real world
+Many failed machine learning deployments 
+can be traced back to this pattern.
+Sometimes models appear to perform marvelously
+as measured by test set accuracy
+but fail catastrophically in deployment
 when the distribution of data suddenly shifts.
 More insidiously, sometimes the very deployment of a model
-can be the catalyst which perturbs the data distribution.
-Say for example that we trained a model to predict loan defaults,
-finding that the choice of footware was associated with risk of default
+can be the catalyst that perturbs the data distribution.
+Say, for example, that we trained a model 
+to predict who will repay vs default on a loan,
+finding that an applicant's choice of footware 
+was associated with the risk of default
 (Oxfords indicate repayment, sneakers indicate default).
 We might be inclined to thereafter grant loans
 to all applicants wearing Oxfords
 and to deny all applicants wearing sneakers.
-But our ill-conceived leap from pattern recognition to decision-making
-and our failure to think critically about the environment
+
+In this case, our ill-considered leap from 
+pattern recognition to decision-making
+and our failure to critically consider the environment
 might have disastrous consequences.
-For starters, as soon as we began making decisions based on footware,
+For starters, as soon as we began 
+making decisions based on footware,
 customers would catch on and change their behavior.
 Before long, all applicants would be wearing Oxfords,
-and yet there would be no coinciding improvement in credit-worthiness.
-Think about this deeply because similar issues abound in the application of machine learning: by introducing our model-based decisions to the environment,
+without any coinciding improvement in credit-worthiness.
+Take a minute to digest this because similar issues abound
+in many applications of machine learning: 
+by introducing our model-based decisions to the environment,
 we might break the model.
 
-In this section, we describe some common concerns
-and aim to get you started acquiring the critical thinking
-that you will need in order to detect these situations early,
-mitigate the damage, and use machine learning responsibly.
-Some of the solutions are simple (ask for the "right" data)
-some are technically difficult (implement a reinforcement learning system),
-and others require that we enter the realm of philosophy
-and grapple with difficult questions concerning ethics and informed consent.
+While we cannot possible give these topics 
+a complete treatment in one section,
+we aim here to expose some common concerns,
+and to stimulate the critical thinking
+required to detect these situations early,
+mitigate damage, and use machine learning responsibly.
+Some of the solutions are simple
+(ask for the "right" data)
+some are technically difficult
+(implement a reinforcement learning system),
+and others require that step outside the realm of
+statistical prediction altogether and 
+grapple with difficult philosophical questions
+concerning the ethical application of algorithms.
 
 
 ## Distribution Shift
 
-To begin, we return to the observational setting,
-putting aside for now the impacts of our actions
-on the environment.
-In the following sections, we take a deeper look
-at the various ways that data distributions might shift,
+To begin, we stick with the passive predictions setting
+considering the various ways that data distributions might shift
 and what might be done to salvage model performance.
-From the outset, we should warn that if
-the data-generating distribution $p(\mathbf{x},y)$
-can shift in arbitrary ways at any point in time,
-then learning a robust classifier is impossible.
-In the most pathological case, if the label definitions themselves
-can change at a moments notice: if suddenly
-what we called "cats" are now dogs
-and what we previously called "dogs" are now in fact cats,
-without any perceptible change in the distribution of inputs $p(\mathbf{x})$,
-then there is nothing we could do to detect the change
-or to correct our classifier at test time.
+In one classic setup, we assume that our training data
+was sampled from some distribution $p_S(\mathbf{x},y)$
+but that our test data will consist 
+of unlabeled examples drawn from 
+some different distribution $p_T(\mathbf{x},y)$.
+Already, we must confront a sobering reality.
+Absent any assumptions on how $p_S$ 
+and $p_T$ relate to each other,
+learning a robust classifier is impossible.
+
+Consider a binary classification problem,
+where we wish to distinguish between dogs and cats.
+If the distribution can can shift in arbitrary ways,
+then our setup permits the pathological case
+in which the distribution over inputs remained
+constant: $p_S(\mathbf{x}) = p_T(\mathbf{x})$
+but the labels are all flipped 
+$p_S(y | \mathbf{x}) = 1 - $p_T(y | \mathbf{x})$. 
+In other words, if God can suddenly decide
+that in the future all "cats" are now dogs
+and what we previously called "dogs" are now cats---without
+any change in the distribution of inputs $p(\mathbf{x})$,
+then we cannot possibly distinguish this setting 
+from one in which the distribution did not change at all. 
+
 Fortunately, under some restricted assumptions
 on the ways our data might change in the future,
-principled algorithms can detect shift and possibly even
-adapt, achieving higher accuracy
-than if we naively continued to rely on our original classifier.
-
-
+principled algorithms can detect shift 
+and sometimes even adapt on the fly, 
+improving on the accuracy of the original classifier.
 
 
 ### Covariate Shift
 
-One of the best-studied forms of distribution shift is *covariate shift*.
-Here we assume that although the distribution of inputs may change over time,
-the labeling function, i.e., the conditional distribution $P(y \mid \mathbf{x})$
-does not change.
-While this problem is easy to understand
-its also easy to overlook it in practice.
+Among categories of distribution shift,
+*covariate shift* may be the most widely studied.
+Here, we assume that while the distribution of inputs 
+may change over time, the labeling function, 
+i.e., the conditional distribution 
+$P(y \mid \mathbf{x})$ does not change.
+Statisticians call this *covariate shift*
+because the problem arises due to a 
+a shift in the distribution of the *covariates* (the features).
+While we can sometimes reason about distribution shift
+without invoking causality, we note that covariate shift
+is the natural assumption to invoke in settings
+where we believe that $\mathbf{x}$ causes $y$.
+
 Consider the challenge of distinguishing cats and dogs.
-Our training data consists of images of the following kind:
+Our training data might consist of images of the following kind:
 
 |cat|cat|dog|dog|
 |:---------------:|:---------------:|:---------------:|:---------------:|
@@ -90,59 +124,59 @@ At test time we are asked to classify the following images:
 |:---------------:|:---------------:|:---------------:|:---------------:|
 |![](../img/cat-cartoon1.png)|![](../img/cat-cartoon2.png)|![](../img/dog-cartoon1.png)|![](../img/dog-cartoon2.png)|
 
-Obviously this is unlikely to work well.
 The training set consists of photos,
 while the test set contains only cartoons.
-The colors are not even realistic.
-Training on a dataset that looks substantially different from the test set
-without some plan for how to adapt to the new domain is a bad idea.
-Unfortunately, this is a very common pitfall.
-Statisticians call this *covariate shift*
-because the root of the problem owed to
-a shift in the distribution of features (i.e., of *covariates*).
-Mathematically, we could say that $P(\mathbf{x})$ changes
-but that $P(y \mid \mathbf{x})$ remains unchanged.
-Although its usefulness is not restricted to this setting,
-when we believe $\mathbf{x}$ causes $y$, covariate shift is usually
-the right assumption to be working with.
+Training on a dataset with substantially different
+characteristics from the test set
+can spell trouble absent a coherent plan 
+for how to adapt to the new domain.
+
 
 ### Label Shift
-
-The converse problem emerges when we believe that what drives the shift
-is a change in the marginal distribution over the labels $P(y)$
-but that the class-conditional distributions are invariant $P(\mathbf{x} \mid y)$.
+ 
+*Label shift* describes the converse problem.
+Here, we assume that the label marginal $P(y)$
+can change (inducing a change in $P(\mathbf{x})$)
+but the class-conditional distribution 
+$P(\mathbf{x} \mid y)$ remains fixed across domains.
 Label shift is a reasonable assumption to make
 when we believe that $y$ causes $\mathbf{x}$.
-For example, commonly we want to predict a diagnosis given its manifestations.
-In this case we believe that the diagnosis causes the manifestations,
-i.e., diseases cause symptoms.
-Sometimes the label shift and covariate shift assumptions
-can hold simultaneously.
-For example, when the true labeling function is deterministic and unchanging,
-then covariate shift will always hold,
-including if label shift holds too.
-Interestingly, when we expect both label shift and covariate shift hold,
+For example, we may want to predict diagnoses 
+given their symptoms (or other manifestations),
+even as the relative prevalence of diagnoses 
+are changing over time.
+Label shift is the appropriate assumption here
+because diseases cause symptoms.
+In some degenerate cases the label shift 
+and covariate shift assumptions can hold simultaneously.
+For example, when the label is deterministic,
+then covariate shift assumption will be satisfied,
+even when $y$ causes $\mathbf{x}$.
+Interestingly, in these cases,
 it is often advantageous to work with the methods
 that flow from the label shift assumption.
-That is because these methods tend to involve manipulating objects
-that look like the label,
-which (in deep learning) tends to be comparatively easy
-compared to working with the objects that look like the input,
-which tends (in deep learning) to be a high-dimensional object.
+That is because these methods tend 
+to involve manipulating objects that look like the label
+(which is often low-dimensional),
+as opposed to objects that look like the input,
+which tends (in deep learning) tends to be high-dimensional.
 
 
 
 ### Concept Shift
 
-One more related problem arises in *concept shift*,
-the situation in which the very label definitions change.
-This sounds weird—after all, a *cat* is a *cat*.
-Indeed the definition of a cat might not change,
-but can we say the same about soft drinks?
+We may also encounter the related problem of *concept shift*,
+which arises when the very definitions of labels can change.
+This sounds weird---a *cat* is a *cat*, no?
+However, other categories are subject to changes in usage over time.
+Diagnostic criteria for mental illness,
+what passes for fashionable, and job titles,
+are all subject to considerable 
+amounts of *concept shift*.
 It turns out that if we navigate around the United States,
 shifting the source of our data by geography,
 we will find considerable concept shift regarding
-the definition of even this simple term 
+the distribution of names for *soft drinks*
 as shown in :numref:`fig_popvssoda`.
 
 ![Concept shift on soft drink names in the United States.](../img/popvssoda.png)
@@ -153,64 +187,72 @@ If we were to build a machine translation system,
 the distribution $P(y \mid x)$ might be different
 depending on our location.
 This problem can be tricky to spot.
-A saving grace is that often the $P(y \mid x)$ only shifts gradually.
+We might hope to exploit knowledge
+that shift only takes place gradually
+(either in a temporal or geographic sense).
 
 
 
 ### Examples
 
-Before we go into further detail and discuss remedies,
-we can discuss a number of situations where covariate and concept shift
-may not be so obvious.
+Before delving into formalism and algorithms,
+we can discuss a some concrete situations
+where covariate or concept shift might not be obvious.
 
 
 #### Medical Diagnostics
 
 Imagine that you want to design an algorithm to detect cancer.
-You collect data from healthy and sick people and you train your algorithm.
+You collect data from healthy and sick people
+and you train your algorithm.
 It works fine, giving you high accuracy
 and you conclude that you’re ready
 for a successful career in medical diagnostics.
-Not so fast...
+*Not so fast.*
 
-Many things could go wrong.
-In particular, the distributions that you work with
-for training and those that you encounter in the wild
-might differ considerably.
-This happened to an unfortunate startup,
-that Alex had the opportunity to consult for many years ago.
+The distributions that gave rise to the training data
+and those you will encounter in the wild might differ considerably.
+This happened to an unfortunate startup
+that one of us worked with years ago.
 They were developing a blood test for a disease
-that affects mainly older men and they’d managed to obtain
-a fair amount of blood samples from patients.
-It is considerably more difficult, though,
-to obtain blood samples from healthy men (mainly for ethical reasons).
-To compensate for that, they asked a large number of students on campus
-to donate blood and they performed their test.
-Then they asked me whether I could help them
-build a classifier to detect the disease.
-I told them that it would be very easy to distinguish
-between both datasets with near-perfect accuracy.
-After all, the test subjects differed in age, hormone levels,
+that predominantly affects older men 
+and hoped to study it using blood samples
+that they had collected from patients.
+However, it's considerably more difficult
+to obtain blood samples from healthy men 
+than sick patients already in the system.
+To compensate, the startup solicited
+blood donations from students on a university campus
+to serve as healthy controls in developing their test.
+Then they asked whether we could help them
+to build a classifier for detecting the disease.
+
+As we explained to them,
+it would indeed be easy to distinguish
+between the healthy and sick cohorts
+with near-perfect accuracy.
+However, that's because the test subjects 
+differed in age, hormone levels,
 physical activity, diet, alcohol consumption,
 and many more factors unrelated to the disease.
-This was unlikely to be the case with real patients:
-Their sampling procedure made it likely that
-an extreme case of covariate shift would arise
-between the *source* and *target* distributions,
-and at that, one that could not be corrected by conventional means.
-In other words, training and test data were so different
-that nothing useful could be done
-and they had wasted significant amounts of money.
+This was unlikely to be the case with real patients.
+Due to their sampling procedure,
+we could expect to encounter extreme covariate shift. 
+Moreover, this case was unlikely to be
+correctable via conventional methods.
+In short, they wasted a significant sum of money.
 
 #### Self Driving Cars
 
-Say a company wanted to build a machine learning system for self-driving cars.
-One of the key components is a roadside detector.
+Say a company wanted to leverage machine learning
+for developing self-driving cars.
+One key component here is a roadside detector.
 Since real annotated data is expensive to get,
 they had the (smart and questionable) idea
 to use synthetic data from a game rendering engine
 as additional training data.
-This worked really well on "test data" drawn from the rendering engine.
+This worked really well on "test data" 
+drawn from the rendering engine.
 Alas, inside a real car it was a disaster.
 As it turned out, the roadside had been rendered
 with a very simplistic texture.
@@ -221,21 +263,25 @@ learned about this "feature" very quickly.
 A similar thing happened to the US Army
 when they first tried to detect tanks in the forest.
 They took aerial photographs of the forest without tanks,
-then drove the tanks into the forest and took another set of pictures.
-The so-trained classifier worked "perfectly".
-Unfortunately, all it had learned was to distinguish trees
-with shadows from trees without shadows---the
-first set of pictures was taken in the early morning, the second one at noon.
+then drove the tanks into the forest
+and took another set of pictures.
+The classifier appeared to work *perfectly*.
+Unfortunately, it had merely learned
+how to distinguish trees with shadows
+from trees without shadows---the first set
+of pictures was taken in the early morning,
+the second one at noon.
 
 #### Nonstationary distributions
 
-A much more subtle situation arises when the distribution changes slowly
+A much more subtle situation arises
+when the distribution changes slowly
 and the model is not updated adequately.
 Here are some typical cases:
 
 * We train a computational advertising model and then fail to update it frequently (e.g., we forget to incorporate that an obscure new device called an iPad was just launched).
 * We build a spam filter. It works well at detecting all spam that we have seen so far. But then the spammers wisen up and craft new messages that look unlike anything we have seen before.
-* We build a product recommendation system. It works throughout the winter... but then it keeps on recommending Santa hats long after Christmas.
+* We build a product recommendation system. It works throughout the winter but then continues to recommend Santa hats long after Christmas.
 
 #### More Anecdotes
 
@@ -243,7 +289,8 @@ Here are some typical cases:
 * We build a web search engine for the USA market and want to deploy it in the UK.
 * We train an image classifier by compiling a large dataset where each among a large set of classes is equally represented in the dataset, say 1000 categories, represented by 1000 images each. Then we deploy the system in the real world, where the actual label distribution of photographs is decidedly non-uniform.
 
-In short, there are many cases where training and test distributions
+In short, there are many cases 
+where training and test distributions
 $p(\mathbf{x}, y)$ are different.
 In some cases, we get lucky and the models work
 despite covariate, label, or concept shift.
@@ -255,7 +302,8 @@ as this material is not prerequisite to subsequent concepts.
 
 ### Covariate Shift Correction
 
-Assume that we want to estimate some dependency $P(y \mid \mathbf{x})$
+Assume that we want to estimate 
+some dependency $P(y \mid \mathbf{x})$
 for which we have labeled data $(\mathbf{x}_i, y_i)$.
 Unfortunately, the observations $x_i$ are drawn
 from some *target* distribution $q(\mathbf{x})$
@@ -305,29 +353,39 @@ we do not to access labels $y \sim q(y)$.
 In this case, there exists a very effective approach
 that will give almost as good results: logistic regression.
 This is all that is needed to compute estimate probability ratios.
-We learn a classifier to distinguish between data drawn from $p(\mathbf{x})$
-and data drawn from $q(x)$.
-If it is impossible to distinguish between the two distributions
-then it means that the associated instances are equally likely
-to come from either one of the two distributions.
-On the other hand, any instances that can be well discriminated
-should be significantly overweighted or underweighted accordingly.
-For simplicity’s sake assume that we have an equal number of instances
-from both distributions, denoted by $\mathbf{x}_i \sim p(\mathbf{x})$ and $\mathbf{x}_i' \sim q(\mathbf{x})$ respectively.
+We learn a classifier to distinguish 
+between data drawn from $p(\mathbf{x})$
+and data drawn from $q(\mathbf{x})$.
+If it is impossible to distinguish 
+between the two distributions
+then it means that the associated instances 
+are equally likely to come from 
+either one of the two distributions.
+On the other hand, any instances 
+that can be well discriminated
+should be significantly overweighted 
+or underweighted accordingly.
+For simplicity’s sake assume that we have 
+an equal number of instances from both distributions, 
+denoted by $\mathbf{x}_i \sim p(\mathbf{x})$ 
+and $\mathbf{x}_i' \sim q(\mathbf{x})$, respectively.
 Now denote by $z_i$ labels which are 1
 for data drawn from $p$ and -1 for data drawn from $q$.
 Then the probability in a mixed dataset is given by
 
 $$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
 
-Hence, if we use a logistic regression approach where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-f(\mathbf{x}))}$ it follows that
+Hence, if we use a logistic regression approach,
+where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-f(\mathbf{x}))}$.
+it follows that
 
 $$
 \beta(\mathbf{x}) = \frac{1/(1 + \exp(-f(\mathbf{x})))}{\exp(-f(\mathbf{x}))/(1 + \exp(-f(\mathbf{x})))} = \exp(f(\mathbf{x})).
 $$
 
 As a result, we need to solve two problems:
-first one to distinguish between data drawn from both distributions,
+first one to distinguish between
+data drawn from both distributions,
 and then a reweighted minimization problem
 where we weigh terms by $\beta$, e.g., via the head gradients.
 Here's a prototypical algorithm for that purpose
@@ -340,7 +398,7 @@ which uses an unlabeled training set $X$ and test set $Z$:
 
 Note that this method relies on a crucial assumption.
 For this scheme to work, we need that each data point
-in the target (test time)distribution
+in the target (test time) distribution
 had nonzero probability of occurring at training time.
 If we find a point where $q(\mathbf{x}) > 0$ but $p(\mathbf{x}) = 0$,
 then the corresponding importance weight should be infinity.
@@ -352,40 +410,42 @@ that cannot be distinguished
 from examples sampled from a reference dataset.
 In these approaches, we use one network, $f$
 to distinguish real versus fake data
-and a second network $g$ that tries to fool the discriminator $f$
+and a second network $g$ that tries 
+to fool the discriminator $f$
 into accepting fake data as real.
 We will discuss this in much more detail later.
 
 
 ### Label Shift Correction
 
-For the discussion of label shift,
-we will assume for now that we are dealing
-with a $k$-way multiclass classification task.
-When the distribution of labels shifts over time $p(y) \neq q(y)$
-but the class-conditional distributions stay the same
-$p(\mathbf{x})=q(\mathbf{x})$,
-our importance weights will correspond to the
+Assume that we are dealing with a 
+$k$-way multiclass classification task.
+When the distribution of labels shifts over time,
+$p(y) \neq q(y)$ but the class-conditional distributions 
+stay the same $p(\mathbf{x})=q(\mathbf{x})$.
+Here, our importance weights will correspond to the
 label likelihood ratios $q(y)/p(y)$.
 One nice thing about label shift is that
-if we have a reasonably good model (on the source distribution)
+if we have a reasonably good model 
+(on the source distribution)
 then we can get consistent estimates of these weights
 without ever having to deal with the ambient dimension
-(in deep learning, the inputs are often high-dimensional perceptual objects like images, while the labels are often easier to work,
-say vectors whose length corresponds to the number of classes).
+In deep learning, the inputs tend 
+to be high-dimensional objects like images,
+while the labels are often simpler objects like categories.
 
 To estimate calculate the target label distribution,
 we first take our reasonably good off the shelf classifier
 (typically trained on the training data)
 and compute its confusion matrix using the validation set
 (also from the training distribution).
-The confusion matrix C, is simply a $k \times k$ matrix
+The confusion matrix C, is simply a $k \times k$ matrix,
 where each column corresponds to the *actual* label
 and each row corresponds to our model's predicted label.
 Each cell's value $c_{ij}$ is the fraction of predictions
 where the true label was $j$ *and* our model predicted $y$.
 
-Now we cannot calculate the confusion matrix
+Now, we cannot calculate the confusion matrix
 on the target data directly,
 because we do not get to see the labels for the examples
 that we see in the wild,
@@ -393,15 +453,16 @@ unless we invest in a complex real-time annotation pipeline.
 What we can do, however, is average all of our models predictions
 at test time together, yielding the mean model output $\mu_y$.
 
-It turns out that under some mild conditions---
-if our classifier was reasonably accurate in the first place,
-if the target data contains only classes of images that we have seen before,
+It turns out that under some mild conditions---if 
+our classifier was reasonably accurate in the first place,
+and if the target data contains only classes of images 
+that we have seen before,
 and if the label shift assumption holds in the first place
-(far the strongest assumption here),
-then we can recover the test set label distribution by solving
-a simple linear system $C \cdot q(y) = \mu_y$.
+(the strongest assumption here),
+then we can recover the test set label distribution
+by solving a simple linear system $C \cdot q(y) = \mu_y$.
 If our classifier is sufficiently accurate to begin with,
-then the confusion C will be invertible,
+then the confusion $C$ will be invertible,
 and we get a solution $q(y) = C^{-1} \mu_y$.
 Here we abuse notation a bit, using $q(y)$
 to denote the vector of label frequencies.
@@ -426,7 +487,8 @@ Fortunately, in practice, such extreme shifts are rare.
 Instead, what usually happens is that the task keeps on changing slowly.
 To make things more concrete, here are some examples:
 
-* In computational advertising, new products are launched, old products become less popular. This means that the distribution over ads and their popularity changes gradually and any click-through rate predictor needs to change gradually with it.
+* In computational advertising, new products are launched, 
+old products become less popular. This means that the distribution over ads and their popularity changes gradually and any click-through rate predictor needs to change gradually with it.
 * Traffic cameras lenses degrade gradually due to environmental wear, affecting image quality progressively.
 * News content changes gradually (i.e., most of the news remains unchanged but new stories appear).
 
@@ -460,37 +522,65 @@ One key distinction between the different situations above is that the same stra
 
 Finally, it is important to remember
 that when you deploy machine learning systems
-you are not simply minimizing negative log likelihood
-or maximizing accuracy---you are automating some kind of decision process.
-Often the automated decision-making systems that we deploy
-can have consequences for those subject to its decisions.
+you are not merely optimizing a predictive model---you 
+are typically providing a tool that will
+be used to (partially or fully) automate decisions.
+This technical systems can impact the lives
+of individuals subject to the resulting decisions.
+The leap from considering predictions to decisions
+raises not only new technical questions,
+but also a slew of ethical questions 
+that must be carefully considered.
 If we are deploying a medical diagnostic system,
-we need to know for which populations it may work and which it may not.
-Overlooking foreseeable risks to the welfare of a subpopulation
-would run afoul of basic ethical principles.
-Moreover, "accuracy" is seldom the right metric.
-When translating predictions in to actions
-we will often want to take into account the potential cost sensitivity
-of erring in various ways.
-If one way that you might classify an image could be perceived as a racial sleight, while misclassification to a different category
-would be harmless, then you might want to adjust your thresholds
-accordingly, accounting for societal values
+we need to know for which populations 
+it may work and which it may not.
+Overlooking foreseeable risks to the welfare of 
+a subpopulation could cause us to administer inferior care.
+Moreover, once we contemplate decision-making systems,
+we must step back and reconsider how we evaluate our technology.
+Among other consequences of this change of scope,
+we will find that *accuracy* is seldom the right metric.
+For instance, when translating predictions into actions,
+we will often want to take into account 
+the potential cost sensitivity of erring in various ways.
+If one way of misclassifying an image 
+could be perceived as a racial sleight,
+while misclassification to a different category
+would be harmless, then we might want to adjust 
+our thresholds accordingly, accounting for societal values
 in designing the decision-making protocol.
-We also want to be careful about how prediction systems
-can lead to feedback loops.
-For example, if prediction systems are applied naively to predictive policing,
-allocating patrol officers accordingly, a vicious cycle might emerge.
-Neighborhoods that have more crimes, get more patrols, get more crimes discovered, get more training data, get yet more confident predictions, leading to even more patrols, even more crimes discovered, etc.
-Additionally, we want to be careful about whether we are addressing the right problem in the first place. Predictive algorithms now play an outsize role in mediating the dissemination of information.
-Should what news someone is exposed to be determined by which Facebook pages they have *Liked*? These are just a few among the many profound ethical dilemmas that you might encounter in a career in machine learning.
+We also want to be careful about 
+how prediction systems can lead to feedback loops.
+For example, consider predictive policing systems,
+which allocate patrol officers 
+to areas with high forecasted crime.
+It's easy to see how a worrying pattern can emerge:
+
+ 1. Neighborhoods with more crime get more patrols. 
+ 1. Consequently, more crimes are discovered in these neighborhoods, entering the training data available for future iterations.
+ 1. Exposed to more positives, the model predicts yet more crime in these neighborhoods.
+ 1. In the next iteration, the updated model targets the same neighborhood even more heavily leading to yet more crimes discovered, etc.
+
+Often, the various mechanisms by which 
+a model's predictions become coupled to its training data 
+are unaccounted for in the modeling process. 
+This can lead to what researchers call "runaway feedback loops." 
+Additionally, we want to be careful about 
+whether we are addressing the right problem in the first place. 
+Predictive algorithms now play an outsize role 
+in mediating the dissemination of information.
+Should the news that an individual encounters
+be determined by the set of Facebook pages they have *Liked*? 
+These are just a few among the many pressing ethical dilemmas
+that you might encounter in a career in machine learning.
 
 
 
 ## Summary
 
 * In many cases training and test set do not come from the same distribution. This is called covariate shift.
-* Covariate shift can be detected and corrected if the shift is not too severe. Failure to do so leads to nasty surprises at test time.
-* In some cases the environment *remembers* what we did and will respond in unexpected ways. We need to account for that when building models.
+* Under the corresponding assumptions, *covariate* and *label* shift can be detected and corrected for at test time. Failure to account for this bias can become problematic at test time.
+* In some cases, the environment may *remember* automated actions and respond in surprising ways. We must account for this possibility when building models and continue to monitor live systems, open to the possibility that our models and the environment will become entangled in unanticipated ways.
 
 ## Exercises
 

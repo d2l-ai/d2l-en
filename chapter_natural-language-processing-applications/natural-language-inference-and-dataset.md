@@ -80,14 +80,14 @@ def read_snli(data_dir, is_train):
     """Read the SNLI dataset into premises, hypotheses, and labels."""
     def extract_text(s):
         # Remove information that will not be used by us
-        s = re.sub('\(', '', s) 
-        s = re.sub('\)', '', s)
+        s = re.sub('\\(', '', s) 
+        s = re.sub('\\)', '', s)
         # Substitute two or more consecutive whitespace with space
-        s = re.sub('\s{2,}', ' ', s)
+        s = re.sub('\\s{2,}', ' ', s)
         return s.strip()
     label_set = {'entailment': 0, 'contradiction': 1, 'neutral': 2}
-    file_name = (data_dir + 'snli_1.0_'+ ('train' if is_train else 'test')
-                 + '.txt')
+    file_name = os.path.join(data_dir, 'snli_1.0_train.txt'
+                             if is_train else 'snli_1.0_test.txt')
     with open(file_name, 'r') as f:
         rows = [row.split('\t') for row in f.readlines()[1:]]
     premises = [extract_text(row[1]) for row in rows if row[0] in label_set]
@@ -131,21 +131,22 @@ class SNLIDataset(gluon.data.Dataset):
     """A customized dataset to load the SNLI dataset."""
     def __init__(self, dataset, num_steps, vocab=None):
         self.num_steps = num_steps
-        p_tokens = d2l.tokenize(dataset[0])
-        h_tokens = d2l.tokenize(dataset[1])
+        all_premise_tokens = d2l.tokenize(dataset[0])
+        all_hypothesis_tokens = d2l.tokenize(dataset[1])
         if vocab is None:
-            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5,
-                                   reserved_tokens=['<pad>'])
+            self.vocab = d2l.Vocab(all_premise_tokens + all_hypothesis_tokens,
+                                   min_freq=5, reserved_tokens=['<pad>'])
         else:
             self.vocab = vocab
-        self.premises = self.pad(p_tokens)
-        self.hypotheses = self.pad(h_tokens)
+        self.premises = self._pad(all_premise_tokens)
+        self.hypotheses = self._pad(all_hypothesis_tokens)
         self.labels = np.array(dataset[2])
         print('read ' + str(len(self.premises)) + ' examples')
 
-    def pad(self, lines):
-        return np.array([d2l.trim_pad(self.vocab[line], self.num_steps, 
-                                      self.vocab['<pad>']) for line in lines])
+    def _pad(self, lines):
+        return np.array([d2l.truncate_pad(
+            self.vocab[line], self.num_steps, self.vocab['<pad>'])
+                         for line in lines])
 
     def __getitem__(self, idx):
         return (self.premises[idx], self.hypotheses[idx]), self.labels[idx]
@@ -165,13 +166,16 @@ As a result, any new token from the testing set will be unknown to the model tra
 # Saved in the d2l package for later use
 def load_data_snli(batch_size, num_steps=50):
     """Download the SNLI dataset and return data iterators and vocabulary."""
+    num_workers = d2l.get_dataloader_workers()
     data_dir = d2l.download_extract('SNLI')
     train_data = read_snli(data_dir, True)
     test_data = read_snli(data_dir, False)
     train_set = SNLIDataset(train_data, num_steps)
     test_set = SNLIDataset(test_data, num_steps, train_set.vocab)
-    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
-    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
+                                       num_workers=num_workers)
+    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False,
+                                      num_workers=num_workers)
     return train_iter, test_iter, train_set.vocab
 ```
 

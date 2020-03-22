@@ -10,7 +10,7 @@ and the code needed to run the book itself.
 
 The simplest way to get going will be to install
 [Miniconda](https://conda.io/en/latest/miniconda.html). The Python 3.x version
-is recommended. You can skip the following steps if conda has already been installed.
+is required. You can skip the following steps if conda has already been installed.
 Download the corresponding Miniconda sh file from the website
 and then execute the installation from the command line
 using `sh <FILENAME> -b`. For macOS users:
@@ -82,11 +82,7 @@ through the first few chapters but you will want
 to access GPUs before running larger models.
 
 ```bash
-# For Windows users
-pip install mxnet==1.6.0b20190926
-
-# For Linux and macOS users
-pip install mxnet==1.6.0b20191122
+pip install mxnet==1.6.0
 ```
 
 
@@ -149,7 +145,7 @@ with the following command:
 pip install mxnet-cu101==1.6.0b20190926
 
 # For Linux and macOS users
-pip install mxnet-cu101==1.6.0b20191122
+pip install mxnet-cu101==1.6.0
 ```
 
 

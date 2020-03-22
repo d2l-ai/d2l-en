@@ -9,7 +9,7 @@ data/
 build/README.md
 build/environment.yml
 *egg-info*
-dist*
+dist/*
 build/chapter*
 build/_build
 build/img

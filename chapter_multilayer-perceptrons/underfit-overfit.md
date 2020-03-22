@@ -9,7 +9,7 @@ and not simply memorized our data.
 For example, imagine that we wanted to hunt 
 for patterns among genetic markers 
 linking patients to their dementia status,
-(let's the labels are drawn from the set
+(let's the labels be drawn from the set
 {*dementia*, *mild cognitive impairment*, *healthy*}).
 Because each person's genes identify them uniquely
 (ignoring identical siblings),
@@ -19,7 +19,7 @@ We don't want our model to say
 *"That's Bob! I remember him! He has dementia!*
 The reason why is simple. 
 When we deploy the model in the future,
-we will encounter patients  
+we will encounter patients
 that the model has never seen before.
 Our predictions will only be useful
 if our model has truly discovered a *general* pattern.
@@ -28,7 +28,7 @@ To recapitulate more formally,
 our goal is to discover patterns
 that capture regularities in the underlying population
 from which our training set was drawn.
-If we are successfull in this endeavor,
+If we are successful in this endeavor,
 then we could successfully assess risk
 even for individuals that we have never encountered before.
 This problem---how to discover patterns that *generalize*---is
@@ -385,7 +385,7 @@ For many tasks, deep learning only outperforms linear models
 when many thousands of training examples are available.
 In part, the current success of deep learning
 owes to the current abundance of massive datasets
-due to internet companies, cheap storage, connected devices,
+due to Internet companies, cheap storage, connected devices,
 and the broad digitization of the economy.
 
 ## Polynomial Regression
@@ -447,7 +447,7 @@ features[:2], poly_features[:2], labels[:2]
 
 Let's first implement a function to evaluate the loss on a given data.
 
-```{.python .input}
+```{.python .input  n=4}
 # Saved in the d2l package for later use
 def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset."""

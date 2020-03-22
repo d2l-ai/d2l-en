@@ -1,10 +1,10 @@
-# The Image Classification Dataset (Fashion-MNIST)
+# The Image Classification Dataset
 :label:`sec_fashion_mnist`
 
 In :numref:`sec_naive_bayes`, we trained a naive Bayes classifier,
 using the MNIST dataset introduced in 1998 :cite:`LeCun.Bottou.Bengio.ea.1998`. 
 While MNIST had a good run as a benchmark dataset, 
-even simple models by today's standards achieve classification accuracy over 95%.
+even simple models by today's standards achieve classification accuracy over 95%
 making it unsuitable for distinguishing between stronger models and weaker ones. 
 Today, MNIST serves as more of sanity checks than as a benchmark.
 To up the ante just a bit, we will focus our discussion in the coming sections
@@ -184,4 +184,4 @@ We are now ready to work with the FashionMNIST dataset in the sections that foll
 
 ## [Discussions](https://discuss.mxnet.io/t/2335)
 
-![](../img/qr_fashion-mnist.svg)
+![](../img/qr_image-classification-dataset.svg)

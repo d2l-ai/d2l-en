@@ -30,7 +30,7 @@ is a remarkable cognitive feat.
 And when you are able to devise solutions that work $100\%$ of the time,
 *you should not be using machine learning*.
 
-Fortunately for the growing community of ML scientists,
+Fortunately for the growing community of machine learning (ML) scientists,
 many tasks that we would like to automate
 do not bend so easily to human ingenuity.
 Imagine huddling around the whiteboard with the smartest minds you know,
@@ -55,7 +55,7 @@ and abstract categories) may be too complicated,
 requiring thousands or millions of computations
 that are beyond our conscious understanding
 (even if our eyes manage the task effortlessly).
-Machine learning (ML) is the study of powerful
+ML is the study of powerful
 techniques that can *learn* from *experience*.
 As ML algorithm accumulates more experience,
 typically in the form of observational data or
@@ -546,7 +546,7 @@ our outputs and targets as real-valued numbers.
 
 
 We denote any individual target $y_i$
-(corresponding to example $\mathbf{x}_i$)
+(corresponding to example $\mathbf{x}i$)
 and the set of all targets $\mathbf{y}$
 (corresponding to all examples $X$).
 When our targets take on arbitrary values in some range,

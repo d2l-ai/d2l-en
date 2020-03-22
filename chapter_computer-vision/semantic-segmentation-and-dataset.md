@@ -47,15 +47,16 @@ The `ImageSets/Segmentation` path contains text files that specify the training 
 # Saved in the d2l package for later use
 def read_voc_images(voc_dir, is_train=True):
     """Read all VOC feature and label images."""
-    txt_fname = '%s/ImageSets/Segmentation/%s' % (
-        voc_dir, 'train.txt' if is_train else 'val.txt')
+    txt_fname = os.path.join(voc_dir, 'ImageSets', 'Segmentation',
+                             'train.txt' if is_train else 'val.txt')
     with open(txt_fname, 'r') as f:
         images = f.read().split()
-    features, labels = [None] * len(images), [None] * len(images)
+    features, labels = [], []
     for i, fname in enumerate(images):
-        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (voc_dir, fname))
-        labels[i] = image.imread(
-            '%s/SegmentationClass/%s.png' % (voc_dir, fname))
+        features.append(image.imread(os.path.join(
+            voc_dir, 'JPEGImages', '%s.jpg' % fname)))
+        labels.append(image.imread(os.path.join(
+            voc_dir, 'SegmentationClass', '%s.png' % fname)))
     return features, labels
 
 train_features, train_labels = read_voc_images(voc_dir, True)
@@ -201,7 +202,8 @@ Finally, we define a function `load_data_voc` that  downloads and loads this dat
 # Saved in the d2l package for later use
 def load_data_voc(batch_size, crop_size):
     """Download and load the VOC2012 semantic dataset."""
-    voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
+    voc_dir = d2l.download_extract('voc2012', os.path.join(
+        'VOCdevkit', 'VOC2012'))
     num_workers = d2l.get_dataloader_workers()
     train_iter = gluon.data.DataLoader(
         VOCSegDataset(True, crop_size, voc_dir), batch_size,

@@ -55,7 +55,7 @@ demo = True
 if demo:
     data_dir = d2l.download_extract('dog_tiny')
 else:
-    data_dir = '../data/dog-breed-identification'
+    data_dir = os.path.join('..', 'data', 'dog-breed-identification')
 ```
 
 ### Organizing the Dataset
@@ -66,7 +66,7 @@ The `reorg_dog_data` function below is used to read the training data labels, se
 
 ```{.python .input  n=2}
 def reorg_dog_data(data_dir, valid_ratio):
-    labels = d2l.read_csv_labels(data_dir + 'labels.csv')
+    labels = d2l.read_csv_labels(os.path.join(data_dir, 'labels.csv'))
     d2l.reorg_train_valid(data_dir, labels, valid_ratio)
     d2l.reorg_test(data_dir)
     
@@ -119,8 +119,8 @@ As in the previous section, we can create an `ImageFolderDataset` instance to re
 ```{.python .input  n=5}
 train_ds, valid_ds, train_valid_ds, test_ds = [
     gluon.data.vision.ImageFolderDataset(
-        data_dir + 'train_valid_test/' + folder)
-    for folder in ['train', 'valid', 'train_valid', 'test']]
+        os.path.join(data_dir, 'train_valid_test', folder))
+    for folder in ('train', 'valid', 'train_valid', 'test')]
 ```
 
 Here, we create `DataLoader` instances, just like in :numref:`sec_kaggle_cifar10`.
@@ -178,8 +178,8 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 def evaluate_loss(data_iter, net, ctx):
     l_sum, n = 0.0, 0
     for X, y in data_iter:
-        y = y.as_in_context(ctx)
-        output_features = net.features(X.as_in_context(ctx))
+        y = y.as_in_ctx(ctx)
+        output_features = net.features(X.as_in_ctx(ctx))
         outputs = net.output_new(output_features)
         l_sum += float(loss(outputs, y).sum())
         n += y.size
@@ -201,8 +201,8 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
         for X, y in train_iter:
-            y = y.as_in_context(ctx)
-            output_features = net.features(X.as_in_context(ctx))
+            y = y.as_in_ctx(ctx)
+            output_features = net.features(X.as_in_ctx(ctx))
             with autograd.record():
                 outputs = net.output_new(output_features)
                 l = loss(outputs, y).sum()
@@ -245,10 +245,11 @@ train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
 
 preds = []
 for data, label in test_iter:
-    output_features = net.features(data.as_in_context(ctx))
+    output_features = net.features(data.as_in_ctx(ctx))
     output = npx.softmax(net.output_new(output_features))
     preds.extend(output.asnumpy())
-ids = sorted(os.listdir(data_dir + 'train_valid_test/test/unknown'))
+ids = sorted(os.listdir(
+    os.path.join(data_dir, 'train_valid_test', 'test', 'unknown')))
 with open('submission.csv', 'w') as f:
     f.write('id,' + ','.join(train_valid_ds.synsets) + '\n')
     for i, output in zip(ids, preds):

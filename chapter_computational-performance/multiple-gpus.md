@@ -120,7 +120,7 @@ Since we didn't perform any computation yet, the gradient with regard to the bia
 ```{.python .input  n=14}
 def allreduce(data):
     for i in range(1, len(data)):
-        data[0][:] += data[i].copyto(data[0].context)
+        data[0][:] += data[i].copyto(data[0].ctx)
     for i in range(1, len(data)):
         data[0].copyto(data[i])
 ```
@@ -163,18 +163,19 @@ def split_batch(X, y, ctx_list):
 Now we can implement multi-GPU training on a single minibatch. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs. Note that we don't need to write any specific code to achieve parallelism. Since the compute graph doesn't have any dependencies across devices within a minibatch, it is executed in parallel *automatically*.
 
 ```{.python .input  n=10}
-def train_batch(X, y, gpu_params, ctx_list, lr):
-    gpu_Xs, gpu_ys = split_batch(X, y, ctx_list)
+def train_batch(X, y, ctx_params, ctx_list, lr):
+    X_shards, y_shards = split_batch(X, y, ctx_list)
     with autograd.record():  # Loss is calculated separately on each GPU
-        losses = [loss(lenet(gpu_X, gpu_W), gpu_y)
-                  for gpu_X, gpu_y, gpu_W in zip(gpu_Xs, gpu_ys, gpu_params)]
+        losses = [loss(lenet(X_shard, ctx_W), y_shard)
+                  for X_shard, y_shard, ctx_W in zip(
+                      X_shards, y_shards, ctx_params)]
     for l in losses:  # Back Propagation is performed separately on each GPU
         l.backward()
     # Sum all gradients from each GPU and broadcast them to all GPUs
-    for i in range(len(gpu_params[0])):
-        allreduce([gpu_params[c][i].grad for c in range(len(ctx_list))])
+    for i in range(len(ctx_params[0])):
+        allreduce([ctx_params[c][i].grad for c in range(len(ctx_list))])
     # The model parameters are updated separately on each GPU
-    for param in gpu_params:
+    for param in ctx_params:
         d2l.sgd(param, lr, X.shape[0])  # Here, we use a full-size batch
 ```
 
@@ -185,7 +186,7 @@ def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     ctx_list = [d2l.try_gpu(i) for i in range(num_gpus)]
     # Copy model parameters to num_gpus GPUs
-    gpu_params = [get_params(params, c) for c in ctx_list]
+    ctx_params = [get_params(params, c) for c in ctx_list]
     # num_epochs, times, acces = 10, [], []
     num_epochs = 10
     animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])
@@ -194,12 +195,12 @@ def train(num_gpus, batch_size, lr):
         timer.start()
         for X, y in train_iter:
             # Perform multi-GPU training for a single minibatch
-            train_batch(X, y, gpu_params, ctx_list, lr)
+            train_batch(X, y, ctx_params, ctx_list, lr)
             npx.waitall()
         timer.stop()
         # Verify the model on GPU 0
-        animator.add(epoch+1, (d2l.evaluate_accuracy_gpu(
-            lambda x: lenet(x, gpu_params[0]), test_iter, ctx[0]),))
+        animator.add(epoch + 1, (d2l.evaluate_accuracy_gpu(
+            lambda x: lenet(x, ctx_params[0]), test_iter, ctx[0]),))
     print('test acc: %.2f, %.1f sec/epoch on %s' % (
         animator.Y[0][-1], timer.avg(), ctx_list))
 ```

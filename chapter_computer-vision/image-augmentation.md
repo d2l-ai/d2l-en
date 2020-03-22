@@ -155,15 +155,17 @@ Next, we define the training function to train and evaluate the model using mult
 # Saved in the d2l package for later use
 def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
                      split_f=d2l.split_batch):
-    Xs, ys = split_f(features, labels, ctx_list)
+    X_shards, y_shards = split_f(features, labels, ctx_list)
     with autograd.record():
-        pys = [net(X) for X in Xs]
-        ls = [loss(py, y) for py, y in zip(pys, ys)]
+        pred_shards = [net(X_shard) for X_shard in X_shards]
+        ls = [loss(pred_shard, y_shard) for pred_shard, y_shard
+              in zip(pred_shards, y_shards)]
     for l in ls:
         l.backward()
     trainer.step(labels.shape[0])
     train_loss_sum = sum([float(l.sum()) for l in ls])
-    train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
+    train_acc_sum = sum(d2l.accuracy(pred_shard, y_shard)
+                        for pred_shard, y_shard in zip(pred_shards, y_shards))
     return train_loss_sum, train_acc_sum
 ```
 
@@ -183,15 +185,16 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                 net, features, labels, loss, trainer, ctx_list, split_f)
             metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
-            if (i+1) % (num_batches // 5) == 0:
-                animator.add(epoch+i/num_batches,
-                             (metric[0]/metric[2], metric[1]/metric[3], None))
+            if (i + 1) % (num_batches // 5) == 0:
+                animator.add(epoch + i / num_batches,
+                             (metric[0] / metric[2], metric[1] / metric[3],
+                              None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)
-        animator.add(epoch+1, (None, None, test_acc))
+        animator.add(epoch + 1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        metric[0]/metric[2], metric[1]/metric[3], test_acc))
+        metric[0] / metric[2], metric[1] / metric[3], test_acc))
     print('%.1f examples/sec on %s' % (
-        metric[2]*num_epochs/timer.sum(), ctx_list))
+        metric[2] * num_epochs / timer.sum(), ctx_list))
 ```
 
 Now, we can define the `train_with_data_aug` function to use image augmentation to train the model. This function obtains all available GPUs and uses Adam as the optimization algorithm for training. It then applies image augmentation to the training dataset, and finally calls the `train` function just defined to train and evaluate the model.

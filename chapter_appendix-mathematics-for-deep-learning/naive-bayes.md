@@ -19,11 +19,11 @@ d2l.use_svg_display()
 MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
 
 Gluon provides a `MNIST` class in the `data.vision` module to
-automatically retrieve the dataset from the internet.
+automatically retrieve the dataset from the Internet.
 Subsequently, Gluon will use the already-downloaded local copy.
 We specify whether we are requesting the training set or the test set
 by setting the value of the parameter `train` to `True` or `False`, respectively.
-Each image is a grayscale image with both width and height of $28$ with shape ($28$,$28$,$1$). We use a customized transformation to remove the last channel dimension. In addition, the dataset represents each pixel by a unsigned $8$-bit integer.  We quantize them into binary features to simplify the problem.
+Each image is a grayscale image with both width and height of $28$ with shape ($28$,$28$,$1$). We use a customized transformation to remove the last channel dimension. In addition, the dataset represents each pixel by an unsigned $8$-bit integer.  We quantize them into binary features to simplify the problem.
 
 ```{.python .input}
 def transform(data, label):

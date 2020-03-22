@@ -187,14 +187,14 @@ To make the effects of overfitting pronounced,
 we can increase the dimensinoality of our problem to $d = 200$
 and work with a small training set containing only 20 example.
 
-```{.python .input  n=2}
+```{.python .input  n=1}
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-n_train, n_test, num_inputs, batch_size = 20, 100, 200, 1
+n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5
 true_w, true_b = np.ones((num_inputs, 1)) * 0.01, 0.05
 train_data = d2l.synthetic_data(true_w, true_b, n_train)
 train_iter = d2l.load_array(train_data, batch_size)
@@ -215,7 +215,7 @@ to randomly initialize our model parameters
 and run `attach_grad` on each to allocate 
 memory for the gradients we will calculate.
 
-```{.python .input  n=5}
+```{.python .input  n=2}
 def init_params():
     w = np.random.normal(scale=1, size=(num_inputs, 1))
     b = np.zeros(1)
@@ -233,7 +233,7 @@ We divide by $2$ by convention,
 the $2$ and $1/2$ cancel out, ensuring that the expression
 for the update looks nice and simple).
 
-```{.python .input  n=6}
+```{.python .input  n=3}
 def l2_penalty(w):
     return (w**2).sum() / 2
 ```
@@ -247,7 +247,7 @@ have not changed since the previous chapter,
 so we will just import them via `d2l.linreg` and `d2l.squared_loss`.
 The only change here is that our loss now includes the penalty term.
 
-```{.python .input  n=7}
+```{.python .input  n=4}
 def train(lambd):
     w, b = init_params()
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
@@ -257,7 +257,8 @@ def train(lambd):
     for epoch in range(1, num_epochs + 1):
         for X, y in train_iter:
             with autograd.record():
-                # The L2 norm penalty term has been added
+                # The L2 norm penalty term has been added, and broadcasting
+                # makes l2_penalty(w) a vector whose length is batch_size
                 l = loss(net(X), y) + lambd * l2_penalty(w)
             l.backward()
             d2l.sgd([w, b], lr, batch_size)
@@ -275,7 +276,7 @@ Note that we overfit badly,
 decreasing the training error but not the 
 test error---a textook case of overfitting.
 
-```{.python .input  n=8}
+```{.python .input  n=5}
 train(lambd=0)
 ```
 
@@ -290,7 +291,7 @@ As an exercise, you might want to check
 that the $\ell_2$ norm of the weights $\mathbf{w}$
 has actually decreased.
 
-```{.python .input  n=9}
+```{.python .input  n=6}
 train(lambd=3)
 ```
 
@@ -319,7 +320,7 @@ when updating model parameters.
 Thus, if we set `wd_mult` to $0$,
 the bias parameter $b$ will not decay.
 
-```{.python .input}
+```{.python .input  n=7}
 def train_gluon(wd):
     net = nn.Sequential()
     net.add(nn.Dense(1))
@@ -352,11 +353,11 @@ and are easier to implement,
 a benefit that will become more
 pronounced for large problems.
 
-```{.python .input}
+```{.python .input  n=8}
 train_gluon(0)
 ```
 
-```{.python .input}
+```{.python .input  n=9}
 train_gluon(3)
 ```
 

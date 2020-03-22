@@ -1,9 +1,9 @@
-# The Dataset for Word2vec
+# The Dataset for Pretraining Word Embedding
 :label:`sec_word2vec_data`
 
 In this section, we will introduce how to preprocess a dataset with
 negative sampling :numref:`sec_approx_train` and load into minibatches for
-word2vec training. The dataset we use is [Penn Tree Bank (PTB)]( https://catalog.ldc.upenn.edu/LDC99T42), which is a small but commonly-used corpus. It takes samples from Wall Street Journal articles and includes training sets, validation sets, and test sets. 
+word2vec training. The dataset we use is [Penn Tree Bank (PTB)]( https://catalog.ldc.upenn.edu/LDC99T42), which is a small but commonly-used corpus. It takes samples from Wall Street Journal articles and includes training sets, validation sets, and test sets.
 
 First, import the packages and modules required for the experiment.
 
@@ -11,6 +11,7 @@ First, import the packages and modules required for the experiment.
 import d2l
 import math
 from mxnet import gluon, np
+import os
 import random
 ```
 
@@ -20,13 +21,13 @@ This dataset has already been preprocessed. Each line of the dataset acts as a s
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
-d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip', 
+d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
                        '319d85e578af0cdc590547f26231e4e31cdf1e42')
 
 # Saved in the d2l package for later use
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
-    with open(data_dir + 'ptb.train.txt') as f:
+    with open(os.path.join(data_dir, 'ptb.train.txt')) as f:
         raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
 
@@ -157,7 +158,7 @@ We first define a class to draw a candidate according to the sampling weights. I
 
 ```{.python .input  n=12}
 # Saved in the d2l package for later use
-class RandomGenerator(object):
+class RandomGenerator:
     """Draw a random int in [0, n] according to n sampling weights."""
     def __init__(self, sampling_weights):
         self.population = list(range(len(sampling_weights)))
@@ -231,7 +232,7 @@ for name, data in zip(names, batch):
     print(name, '=', data)
 ```
 
-We use the `batchify` function just defined to specify the minibatch reading method in the `DataLoader` instance. 
+We use the `batchify` function just defined to specify the minibatch reading method in the `DataLoader` instance.
 
 ## Putting All Things Together
 
@@ -240,6 +241,7 @@ Last, we define the `load_data_ptb` function that read the PTB dataset and retur
 ```{.python .input  n=16}
 # Saved in the d2l package for later use
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
+    num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
     subsampled = subsampling(sentences, vocab)
@@ -250,7 +252,8 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     dataset = gluon.data.ArrayDataset(
         all_centers, all_contexts, all_negatives)
     data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
-                                      batchify_fn=batchify)
+                                      batchify_fn=batchify,
+                                      num_workers=num_workers)
     return data_iter, vocab
 ```
 
@@ -275,4 +278,4 @@ for batch in data_iter:
 
 ## [Discussions](https://discuss.mxnet.io/t/4356)
 
-![](../img/qr_word2vec-dataset.svg)
+![](../img/qr_word-embedding-dataset.svg)

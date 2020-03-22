@@ -189,7 +189,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
 ```
 
 Let's generate an artificial sequence from 0 to 30. We assume that
-the batch size and numbers of timesteps are 2 and 5
+the batch size and numbers of timesteps are 2 and 6
 respectively. This means that depending on the offset we can generate between 4 and 5 $(x, y)$ pairs. With a minibatch size of 2, we only get 2 minibatches.
 
 ```{.python .input  n=6}
@@ -230,7 +230,7 @@ Now we wrap the above two sampling functions to a class so that we can use it as
 
 ```{.python .input}
 # Saved in the d2l package for later use
-class SeqDataLoader(object):
+class SeqDataLoader:
     """A iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
@@ -280,4 +280,4 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 
 ## [Discussions](https://discuss.mxnet.io/t/2361)
 
-![](../img/qr_lang-model.svg)
+![](../img/qr_language-models-and-dataset.svg)
