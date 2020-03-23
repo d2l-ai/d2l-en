@@ -1,8 +1,10 @@
 # Natural Language Inference: Fine Tuning BERT
 
-*This section is under construction.*
+*This section is under
+construction.*
 
-![This section feeds pretrained BERT to an MLP-based architecture for natural
+![This section feeds pretrained BERT to an MLP-based
+architecture for natural
 language inference.](../img/nlp-map-nli-bert.svg)
 :label:`fig_nlp-map-nli-bert`
 
@@ -13,16 +15,16 @@ from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()
-bert_batch_size, max_len = 512, 128
+bert_batch_size, max_len = 256, 128
 bert_train_iter, vocab = d2l.load_data_wiki(bert_batch_size, max_len)
 ```
 
 ```{.python .input}
 ctx, loss = d2l.try_all_gpus(), gluon.loss.SoftmaxCELoss()
-bert = d2l.BERTModel(len(vocab), num_hiddens=256, ffn_num_hiddens=256,
-                     num_heads=4, num_layers=2, dropout=0.2)
+bert = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=128,
+                     num_heads=2, num_layers=2, dropout=0.2)
 bert.initialize(init.Xavier(), ctx=ctx)
-d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 3000)
+d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 4000)
 ```
 
 ...
@@ -91,7 +93,7 @@ test_set = SNLIBERTDataset(test_data, max_len, vocab)
 ...
 
 ```{.python .input  n=43}
-batch_size, num_workers = 512, d2l.get_dataloader_workers()
+batch_size, num_workers = 256, d2l.get_dataloader_workers()
 train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
                                    num_workers=num_workers)
 test_iter = gluon.data.DataLoader(test_set, batch_size,
@@ -135,4 +137,5 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
 
 ## Exercises
 
-1. How to truncate a pair of sequences according to their ratio of length.
+1. How to truncate a pair of sequences according to their ratio of
+length.
