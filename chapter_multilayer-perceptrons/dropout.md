@@ -115,7 +115,7 @@ into each layer of the network
 before calculating the subsequent layer during training.
 They realized that when training 
 a deep network with many layers,
-enforcing smoothness just on the input-output mapping.
+using input noise enforces smoothness just on the input-output mapping.
 
 Their idea, called *dropout*, involves 
 injecting noise while computing 
@@ -145,8 +145,8 @@ break up co-adapted genes.
 
 The key challenge then is *how* to inject this noise.
 One idea is to inject the noise in an *unbiased* manner
-so that the expected value of each layer---fixing 
-the others equal to the value it would have taken absent noise.
+so that the expected value of each layer---while fixing 
+the others--- equal to the value it would have taken absent noise.
 
 In Bishop's work, he added Gaussian noise 
 to the inputs to a linear model:
