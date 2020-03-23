@@ -30,7 +30,8 @@ The basic building block of classic convolutional networks
 is a sequence of the following layers:
 (i) a convolutional layer
 (with padding to maintain the resolution),
-(ii) a nonlinearity such as a ReLU,
+(ii) a nonlinearity such as a ReLU, (iii) a pooling layer such 
+as a max pooling layer. 
 One VGG block consists of a sequence of convolutional layers,
 followed by a max pooling layer for spatial downsampling.
 In the original VGG paper :cite:`Simonyan.Zisserman.2014`,
