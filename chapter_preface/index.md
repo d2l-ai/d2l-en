@@ -103,13 +103,13 @@ Moreover, too many resources are hidden behind the paywalls
 of commercial course providers.
 
 We set out to create a resource that could
-(1) be freely available for everyone;
-(2) offer sufficient technical depth to provide a starting point on the path
+(i) be freely available for everyone;
+(ii) offer sufficient technical depth to provide a starting point on the path
 to actually becoming an applied machine learning scientist;
-(3) include runnable code, showing readers *how* to solve problems in practice;
-(4) that allowed for rapid updates, both by us
+(iii) include runnable code, showing readers *how* to solve problems in practice;
+(iv) allow for rapid updates, both by us
 and also by the community at large;
-and (5) be complemented by a [forum](http://discuss.mxnet.io)
+and (v) be complemented by a [forum](http://discuss.mxnet.io)
 for interactive discussion of technical details and to answer questions.
 
 These goals were often in conflict.
