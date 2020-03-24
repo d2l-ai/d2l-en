@@ -1310,7 +1310,9 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
               in zip(pred_shards, y_shards)]
     for l in ls:
         l.backward()
-    trainer.step(labels.shape[0], ignore_stale_grad = True)
+    # The True flag allows parameters with stale gradients, which is useful
+    # later (e.g., in fine-tuning BERT)
+    trainer.step(labels.shape[0], ignore_stale_grad=True)
     train_loss_sum = sum([float(l.sum()) for l in ls])
     train_acc_sum = sum(d2l.accuracy(pred_shard, y_shard)
                         for pred_shard, y_shard in zip(pred_shards, y_shards))
@@ -1700,6 +1702,7 @@ class BERTEncoder(nn.Block):
         super(BERTEncoder, self).__init__(**kwargs)
         self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
         self.segment_embedding = nn.Embedding(2, num_hiddens)
+        # To reduce parameters, positional encoding of Transformer is used
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
         for _ in range(num_layers):

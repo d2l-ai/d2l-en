@@ -125,7 +125,9 @@ net = BERTClassifier(bert)
 net.classifier.initialize(ctx=ctx)
 ```
 
-...
+Note that parameters in the fully-connected layers for both masked language model loss and next sentence prediction loss are not updated when BERT is fine-tuned.
+To allow parameters with stale gradients,
+the flag `ignore_stale_grad=True` is set in the `step` function of `d2l.train_batch_ch13`.
 
 ```{.python .input  n=46}
 lr, num_epochs = 1e-4, 5
