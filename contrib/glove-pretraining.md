@@ -1,8 +1,7 @@
 # Pretraining GloVe
 :label:`sec_GloVe_gluon`
 
-In this section, we will
-train a
+In this section, we will train a
 GloVe model defined in
 :numref:`sec_glove`.
 
