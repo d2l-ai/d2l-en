@@ -346,7 +346,7 @@ using a minimum-norm or a maximum entropy principle.
 Note that for any such approach, we need samples
 drawn from both distributions---the "true" $p$, e.g.,
 by access to training data, and the one used
-for generating the test set $q$ (the latter is trivially available).
+for generating the training set $q$ (the latter is trivially available).
 Note however, that we only need samples $\mathbf{x} \sim q(\mathbf{x})$;
 we do not to access labels $y \sim q(y)$.
 
