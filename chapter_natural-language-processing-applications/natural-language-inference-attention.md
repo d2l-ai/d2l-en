@@ -1,9 +1,9 @@
 # Natural Language Inference: Using Attention
 :label:`sec_natural-language-inference-attention`
 
-We introduced the natural language inference (NLI) task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address NLI with attention mechanisms and called it a "decomposable attention model" :cite:`Parikh.Tackstrom.Das.ea.2016`.
+We introduced the natural language inference task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address natural language inference with attention mechanisms and called it a "decomposable attention model" :cite:`Parikh.Tackstrom.Das.ea.2016`.
 This results in a model without recurrent or convolutional layers, achieving the best result at the time on the SNLI dataset with much fewer parameters.
-In this section, we will describe and implement this attention-based method (with MLPs) for NLI, as depicted in :numref:`fig_nlp-map-nli-attention`.
+In this section, we will describe and implement this attention-based method (with MLPs) for natural language inference, as depicted in :numref:`fig_nlp-map-nli-attention`.
 
 ![This section feeds pretrained GloVe to an architecture based on attention and MLPs for natural language inference.](../img/nlp-map-nli-attention.svg)
 :label:`fig_nlp-map-nli-attention`
@@ -22,7 +22,7 @@ can be neatly accomplished by attention mechanisms.
 ![NLI using attention mechanisms. ](../img/nli_attention.svg)
 :label:`fig_nli_attention`
 
-:numref:`fig_nli_attention` depicts the NLI method using attention mechanisms.
+:numref:`fig_nli_attention` depicts the natural language inference method using attention mechanisms.
 At a high level, it consists of three jointly trained steps: attending, comparing, and aggregating.
 We will illustrate them step by step in the following.
 
@@ -279,7 +279,7 @@ def predict_snli(net, premise, hypothesis):
             else 'neutral'
 ```
 
-We can use the trained model to obtain the NLI result for a sample pair of sentences.
+We can use the trained model to obtain the natural language inference result for a sample pair of sentences.
 
 ```{.python .input  n=15}
 predict_snli(net, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
@@ -290,13 +290,13 @@ predict_snli(net, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 * The decomposable attention model consists of three steps for predicting the logical relationships between premises and hypotheses: attending, comparing, and aggregating.
 * With attention mechanisms, we can align words in one text sequence to every word in the other, and vice versa. Such alignment is soft using weighted average, where ideally large weights are associated with the words to be aligned.
 * The decomposition trick leads to a more desirable linear complexity than quadratic complexity when computing attention weights.
-* We can use pretrained word embedding as the input representation for downstream NLP task such as NLI.
+* We can use pretrained word embedding as the input representation for downstream natural language processing task such as natural language inference.
 
 
 ## Exercises
 
 1. Train the model with other combinations of hyperparameters. Can you get better accuracy on the test set?
-1. What are major drawbacks of the decomposable attention model for NLI?
+1. What are major drawbacks of the decomposable attention model for natural language inference?
 1. Suppose that we want to get the level of semantical similarity (e.g., a continuous value between $0$ and $1$) for any pair of sentences. How shall we collect and label the dataset? Can you design a model with attention mechanisms?
 
 

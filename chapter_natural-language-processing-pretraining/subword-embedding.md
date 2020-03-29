@@ -40,7 +40,7 @@ Starting from symbols of length $1$,
 BPE iteratively merges the most frequent pair of consecutive symbols to produce new longer symbols.
 Note that for efficiency, pairs crossing word boundaries are not considered.
 In the end, we can use such symbols as subwords to segment words.
-BPE and its variants has been used for input representations in popular NLP pretraining models such as GPT-2 :cite:`Radford.Wu.Child.ea.2019` and RoBERTa :cite:`Liu.Ott.Goyal.ea.2019`.
+BPE and its variants has been used for input representations in popular natural language processing pretraining models such as GPT-2 :cite:`Radford.Wu.Child.ea.2019` and RoBERTa :cite:`Liu.Ott.Goyal.ea.2019`.
 In the following, we will illustrate how BPE works.
 
 First, we initialize the vocabulary of symbols as all the English lowercase characters, a special end-of-word symbol `'_'`, and a special unknown symbol `'[UNK]'`.

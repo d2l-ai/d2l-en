@@ -80,7 +80,7 @@ $$
 
 Its computation obtains the conditional probability for all the words in the dictionary given the central target word $w_c$. We then use the same method to obtain the gradients for other word vectors.
 
-After the training, for any word in the dictionary with index $i$, we are going to get its two word vector sets $\mathbf{v}_i$ and $\mathbf{u}_i$.  In applications of natural language processing (NLP), the central target word vector in the skip-gram model is generally used as the representation vector of a word.
+After the training, for any word in the dictionary with index $i$, we are going to get its two word vector sets $\mathbf{v}_i$ and $\mathbf{u}_i$.  In applications of natural language processing, the central target word vector in the skip-gram model is generally used as the representation vector of a word.
 
 
 ## The Continuous Bag of Words (CBOW) Model

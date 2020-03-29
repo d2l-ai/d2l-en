@@ -13,16 +13,16 @@ It results in
 
 ## Natural Language Inference
 
-*Natural language inference* (NLI) studies whether a *hypothesis*
+*Natural language inference* studies whether a *hypothesis*
 can be inferred from a *premise*, where both are a text sequence.
-In other words, NLI determines the logical relationship between a pair of text sequences.
+In other words, natural language inference determines the logical relationship between a pair of text sequences.
 Such relationships usually fall into three types:
 
 * *Entailment*: the hypothesis can be inferred from the premise.
 * *Contradiction*: the negation of the hypothesis can be inferred from the premise.
 * *Neutral*: all the other cases.
 
-NLI is also known as the recognizing textual entailment task.
+Natural language inference is also known as the recognizing textual entailment task.
 For example, the following pair will be labeled as *entailment* because "showing affection" in the hypothesis can be inferred from "hugging one another" in the premise.
 
 > Premise: Two women are hugging each other.
@@ -41,10 +41,10 @@ The third example shows a *neutrality* relationship because neither "famous" nor
 
 > Hypothesis: The musicians are famous.
 
-NLI has been a central topic for understanding natural language.
+Natural language inference has been a central topic for understanding natural language.
 It enjoys wide applications ranging from
 information retrieval to open-domain question answering.
-To study this problem, we will begin by investigating a popular NLI benchmark dataset.
+To study this problem, we will begin by investigating a popular natural language inference benchmark dataset.
 
 
 ## The Stanford Natural Language Inference (SNLI) Dataset
@@ -202,14 +202,14 @@ for X, Y in train_iter:
 
 ## Summary
 
-* Natural language inference (NLI) studies whether a hypothesis can be inferred from a premise, where both are a text sequence.
-* In NLI, relationships between premises and hypotheses include entailment, contradiction, and neutral.
-* Stanford Natural Language Inference (SNLI) Corpus is a popular benchmark dataset of NLI.
+* Natural language inference studies whether a hypothesis can be inferred from a premise, where both are a text sequence.
+* In natural language inference, relationships between premises and hypotheses include entailment, contradiction, and neutral.
+* Stanford Natural Language Inference (SNLI) Corpus is a popular benchmark dataset of natural language inference.
 
 
 ## Exercises
 
-1. Machine translation has long been evaluated based on superficial $n$-gram matching between an output translation and a ground-truth translation. Can you design a measure for evaluating machine translation results by using NLI?
+1. Machine translation has long been evaluated based on superficial $n$-gram matching between an output translation and a ground-truth translation. Can you design a measure for evaluating machine translation results by using natural language inference?
 1. How can we change hyperparameters to reduce the vocabulary size? 
 
 
