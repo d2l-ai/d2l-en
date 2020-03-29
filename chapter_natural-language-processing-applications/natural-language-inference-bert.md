@@ -64,8 +64,8 @@ class SNLIBERTDataset(gluon.data.Dataset):
         return token_ids, segments, valid_len
 
     def _truncate_pair_of_tokens(self, p_tokens, h_tokens):
-        # Reserve slots for '<CLS>', '<SEP>', and '<SEP>' tokens for the
-        # BERT input
+        # Reserve slots for '<CLS>', '<SEP>', and '<SEP>' tokens for the BERT
+        # input
         while len(p_tokens) + len(h_tokens) > self.max_len - 3:
             if len(p_tokens) > len(h_tokens):
                 p_tokens.pop()

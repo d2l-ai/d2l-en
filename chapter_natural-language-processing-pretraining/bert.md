@@ -153,22 +153,25 @@ as implemented in :numref:`sec_transformer`.
 # Saved in the d2l package for later use
 class BERTEncoder(nn.Block):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, **kwargs):
+                 num_layers, dropout, max_len=1000, **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
         self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
         self.segment_embedding = nn.Embedding(2, num_hiddens)
-        # To reduce parameters, positional encoding of Transformer is used
-        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
+        
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(d2l.EncoderBlock(
                 num_hiddens, ffn_num_hiddens, num_heads, dropout))
+        # In BERT, positional embedding is learned from scratch, thus we
+        # create a parameter of positional embedding that is long enough
+        self.pos_embedding = self.params.get('pos_embedding',
+                                             shape=(1, max_len, num_hiddens))
 
     def forward(self, tokens, segments, valid_lens):
         # Shape of X remains unchanged in the following code snippet:
         # (batch size, max sequence length, num_hiddens)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
-        X = self.pos_encoding(X)
+        X = X + self.pos_embedding.data(ctx=X.ctx)[:, :X.shape[1], :]
         for blk in self.blks:
             X = blk(X, valid_lens)
         return X
@@ -272,10 +275,10 @@ nsp_l.shape
 # Saved in the d2l package for later use
 class BERTModel(nn.Block):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
-                 num_layers, dropout):
+                 num_layers, dropout, max_len=1000):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
-                                   num_heads, num_layers, dropout)
+                                   num_heads, num_layers, dropout, max_len)
         self.nsp = NextSentencePred(num_hiddens)
         self.mlm = MaskLM(vocab_size, num_hiddens)
 
