@@ -102,7 +102,7 @@ under broad categories of i) single text classification (e.g., sentiment analysi
 iii) question answering, iv) single text tagging (e.g., named entity recognition).
 All proposed in 2018,
 from context-sensitive ELMo to task-agnostic GPT and BERT,
-conceptually simple yet empirically powerful pretraining of deep representations for natural languages have reshaped solutions to various natural language processing tasks.
+conceptually simple yet empirically powerful pretraining of deep representations for natural languages have revolutionized solutions to various natural language processing tasks.
 
 In the rest of this chapter,
 we will dive into the pretraining of BERT.
@@ -141,10 +141,16 @@ are added to the token embeddings of the first sequence and the second sequence,
 For single text inputs, only $\mathbf{e}_A$ is used.
 BERT chooses the Transformer encoder as its bidirectional architecture.
 Common in the Transformer encoder,
-the learned positional embeddings are added at every position of the BERT input sequence.
-To sum up, :numref:`fig_` shows that
+positional embeddings are added at every position of the BERT input sequence.
+However, different from the original Transformer encoder,
+BERT uses *learnable* positional embeddings.
+To sum up, :numref:`fig_bert-input` shows that
 the embeddings of the BERT input sequence are the sum
 of the token embeddings, segment embeddings, and positional embeddings.
+
+![The embeddings of the BERT input sequence are the sum
+of the token embeddings, segment embeddings, and positional embeddings.](../img/bert-input.svg)
+:label:`fig_bert-input`
 
 The following `BERTEncoder` class is similar to the `TransformerEncoder` class
 as implemented in :numref:`sec_transformer`.
@@ -162,8 +168,8 @@ class BERTEncoder(nn.Block):
         for _ in range(num_layers):
             self.blks.add(d2l.EncoderBlock(
                 num_hiddens, ffn_num_hiddens, num_heads, dropout))
-        # In BERT, positional embedding is learned from scratch, thus we
-        # create a parameter of positional embedding that is long enough
+        # In BERT, positional embedding is learnable, thus we create a
+        # parameter of positional embedding that is long enough
         self.pos_embedding = self.params.get('pos_embedding',
                                              shape=(1, max_len, num_hiddens))
 
