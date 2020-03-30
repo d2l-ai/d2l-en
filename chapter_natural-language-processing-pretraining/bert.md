@@ -1,4 +1,5 @@
 # BERT
+:label:`sec_bert`
 
 We have introduced several word embedding models for natural language understanding.
 After pretraining, the output can be thought of as a matrix
@@ -133,7 +134,9 @@ In the latter,
 the BERT input sequence is the concatenation of
 “&lt;cls&gt;”, tokens of the first text sequence,
 “&lt;sep&gt;”, tokens of the second text sequence, and “&lt;sep&gt;”.
-
+We will consistently distinguish the terminology "BERT input sequence"
+from other types of "sequences".
+For instance, 1 *BERT input sequence* may include either 1 *text sequence* or 2 *text sequences*.
 
 To distinguish text pairs,
 the learned segment embeddings $\mathbf{e}_A$ and $\mathbf{e}_B$
@@ -190,7 +193,7 @@ To demonstrate forward inference of `BERTEncoder`,
 let's create an instance of it and initialize its parameters.
 
 ```{.python .input  n=3}
-vocab_size, num_hiddens, ffn_num_hiddens, num_heads,  = 10000, 768, 1024, 4
+vocab_size, num_hiddens, ffn_num_hiddens, num_heads = 10000, 768, 1024, 4
 num_layers, dropout = 2, 0.2
 encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                       num_layers, dropout)
@@ -202,18 +205,61 @@ where each token is an index of the vocabulary.
 The forward inference of `BERTEncoder` with the input `tokens`
 returns the encoded result where each token is represented by a vector
 whose length is predefined by the hyperparameter `num_hiddens`.
+This hyperparameter is usually referred to as the *hidden size*
+(number of hidden units) of the Transformer encoder.
 
 ```{.python .input}
 tokens = np.random.randint(0, vocab_size, (2, 8))
+# 0 and 1 are marking segment A and B, respectively
 segments = np.array([[0, 0, 0, 0, 1, 1, 1, 1],
                      [0, 0, 0, 1, 1, 1, 1, 1]])
 encoded_X = encoder(tokens, segments, None)
 encoded_X.shape
 ```
 
-## Pretraining Tasks 
+## Pretraining Tasks
 
-### Masked Language Modeling
+The forward inference of `BERTEncoder` gives the BERT representation
+of each token of the input text and the inserted
+special tokens “&lt;cls&gt;” and “&lt;seq&gt;”. 
+Next, we will use these representations to compute the loss function
+for pretraining BERT.
+The pretraining is composed of the following 2 tasks:
+masked language modeling and next sentence prediction.
+
+### A Masked Language Model
+:label:`subsec_mlm`
+
+As illustrated in :numref:`sec_language_model`,
+a language model predicts a token using the context on its left.
+To encode context bidirectionally for representing each token,
+BERT randomly masks tokens and uses tokens from the bidirectional context to
+predict the masked tokens.
+This task is referred to as a *masked language model*.
+
+In this pretraining task,
+15% of tokens will be selected at random as the masked tokens for prediction.
+To predict a masked token without cheating by using the label,
+one straightforward approach is to always replace it with a special “&lt;mask&gt;” token in the BERT input sequence.
+However, the artificial special token “&lt;mask&gt;” will never appear
+in fine-tuning.
+To avoid such a mismatch between pretraining and fine-tuning,
+if a token is masked for prediction (e.g., "great" is selected to be masked and predicted in "this movie is great"),
+in the input it will be replaced with:
+
+* a special “&lt;mask&gt;” token for 80% of the time (e.g., "this movie is great" becomes "this movie is &lt;mask&gt;");
+* a random token for 10% of the time (e.g., "this movie is great" becomes "this movie is drink");
+* the unchanged label token for 10% of the time (e.g., "this movie is great" becomes "this movie is great").
+
+Note that for 10% of 15% time a random token is inserted.
+This occasional noise encourages BERT to be less biased towards the masked token (especially when the label token remains unchanged) in its bidirectional context encoding.
+
+We implement the following `MaskLM` class to predict masked tokens
+in the masked language model task of BERT pretraining.
+The prediction uses a multilayer perceptron with 1 hidden layer (`self.mlp`).
+In forward inference, it takes 2 inputs:
+the encoded result of `BERTEncoder` and the token positions for prediction.
+The output is the prediction results at these positions.
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
@@ -231,8 +277,8 @@ class MaskLM(nn.Block):
         pred_positions = pred_positions.reshape(-1)
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
-        # Suppose that batch_size = 2, num_pred_positions = 3,
-        # batch_idx = np.array([0, 0, 0, 1, 1, 1])
+        # Suppose that batch_size = 2, num_pred_positions = 3, then batch_idx
+        # is np.array([0, 0, 0, 1, 1, 1])
         batch_idx = np.repeat(batch_idx, num_pred_positions)
         masked_X = X[batch_idx, pred_positions]
         masked_X = masked_X.reshape((batch_size, num_pred_positions, -1))
@@ -240,18 +286,28 @@ class MaskLM(nn.Block):
         return mlm_Y_hat
 ```
 
-...
+To demonstrate the forward inference of `MaskLM`,
+we create its instance `mlm` and initialize it.
+Recall that `encoded_X` from the forward inference of `BERTEncoder`
+represents 2 BERT input sequences.
+We define `mlm_positions` as the 3 indices to predict in either BERT input sequence of `encoded_X`.
+The forward inference of `mlm` returns prediction results `mlm_Y_hat`
+at all the masked positions `mlm_positions` of `encoded_X`.
+For each prediction, the size of the result is equal to the vocabulary size.
 
 ```{.python .input  n=5}
 mlm = MaskLM(vocab_size, num_hiddens)
 mlm.initialize()
-mlm_positions = np.array([[0, 2, 1], [6, 5, 7]])
+mlm_positions = np.array([[1, 3, 2], [6, 5, 7]])
 mlm_Y_hat = mlm(encoded_X, mlm_positions)
 mlm_Y_hat.shape
 ```
 
+With the ground truth labels `mlm_Y` of the predicted tokens under masks `mlm_Y_hat`,
+we can calculate the cross entropy loss of the masked language model task in BERT pretraining.
+
 ```{.python .input  n=6}
-mlm_Y = np.array([[1, 3, 5], [10, 20, 30]])
+mlm_Y = np.array([[7, 8, 9], [10, 20, 30]])
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 mlm_l = loss(mlm_Y_hat.reshape((-1, vocab_size)), mlm_Y.reshape(-1))
 mlm_l.shape
@@ -290,7 +346,9 @@ nsp_l = loss(nsp_Y_hat, nsp_y)
 nsp_l.shape
 ```
 
-## Putting All Things Together 
+## Putting All Things Together
+
+highlight unsupervised learning for pretraining.
 
 ```{.python .input  n=10}
 # Saved in the d2l package for later use
@@ -315,3 +373,9 @@ class BERTModel(nn.Block):
 ```
 
 ...
+
+
+## Exercises
+
+1. All other things being equal, will a masked language model require more or fewer pretraining steps to converge than a left-to-right language model? Why?
+1. In the original implementation of BERT, the position-wise feed-forward network in `BERTEncoder` (via `d2l.EncoderBlock`) and the fully-connected layer in `MaskLM` both use the Gaussian error linear unit (GELU) :cite:`Hendrycks.Gimpel.2016` as the activation function. Research into the difference between GELU and ReLU.

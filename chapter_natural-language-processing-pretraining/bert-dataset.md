@@ -82,6 +82,9 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
 ```
 
 ## Prepare MLM data
+:label:`subsec_prepare_mlm_data`
+
+It follows the procedure described in :numref:`subsec_mlm`.
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
