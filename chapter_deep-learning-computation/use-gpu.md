@@ -296,7 +296,7 @@ When the input is an `ndarray` on the GPU, Gluon will calculate the result on th
 net(x)
 ```
 
-Let's confirm that the model parameters are stored on the same GPU.
+Let us confirm that the model parameters are stored on the same GPU.
 
 ```{.python .input  n=14}
 net[0].weight.data().ctx

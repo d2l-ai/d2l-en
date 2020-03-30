@@ -40,7 +40,7 @@ data_iter = gluon.data.DataLoader(
     shuffle=True, num_workers=d2l.get_dataloader_workers())
 ```
 
-Let's visualize the first 20 images.
+Let us visualize the first 20 images.
 
 ```{.python .input  n=4}
 d2l.set_figsize((4, 4))
@@ -229,7 +229,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         loss_D, loss_G, metric[2]/timer.stop(), ctx))
 ```
 
-Now let's train the model.
+Now let us train the model.
 
 ```{.python .input  n=21}
 latent_dim, lr, num_epochs = 100, 0.005, 40

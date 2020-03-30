@@ -39,7 +39,7 @@ Next, we go deeper into the mechanics of initialization.
 
 ## Instantiating a Network
 
-To begin, let's instantiate an MLP. 
+To begin, let us instantiate an MLP. 
 
 ```{.python .input}
 from mxnet import init, np, npx
@@ -73,7 +73,7 @@ that the parameters dimension remains unknown.
 At this point attempts to access `net[0].weight.data()`
 would trigger a runtime error stating that the network
 must be initialized before the parameters can be accessed.
-Now let's see what happens when we attempt to initialze
+Now let us see what happens when we attempt to initialze
 parameters via the `initialize` method.
 
 ```{.python .input}
@@ -116,7 +116,7 @@ MXNet can finally initialize the parameters.
 ## Deferred Initialization in Practice
 
 Now that we know how it works in theory, 
-let's see when the initialization is actually triggered.
+let us see when the initialization is actually triggered.
 In order to do so, we mock up an initializer 
 which does nothing but report a debug message 
 stating when it was invoked and with which parameters.
@@ -204,7 +204,7 @@ net.initialize(init=MyInit())
 ## Summary
 
 * Deferred initialization can be convenient, allowing Gluon to infer parameter shapes automatically, making it easy to modify architectures and eliminating one common source of errors.
-* We don't need deferred initialization when we specify all variables explicitly.
+* We do not need deferred initialization when we specify all variables explicitly.
 * We can forcibly re-initialize a network's parameters by invoking initalize with the `force_reinit=True` flag.
 
 

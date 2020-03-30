@@ -64,7 +64,7 @@ clogging up your internet with redundant downloads.
 # Saved in the d2l package for later use
 def download(name, cache_dir=os.path.join('..', 'data')):
     """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, "%s doesn't exist" % name
+    assert name in DATA_HUB, "%s does not exist" % name
     url, sha1 = DATA_HUB[name]
     d2l.mkdir_if_not_exist(cache_dir)
     return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
@@ -114,7 +114,7 @@ fostering both collaboration and competition.
 While leaderboard chasing often spirals out of control,
 with researchers focusing myopically on pre-processing steps
 rather than asking fundamental questions,
-there's also tremendous value in the objectivity of a platform
+there is also tremendous value in the objectivity of a platform
 that facillitates direct quantitative comparisons
 between competing approaches as well as code sharing
 so that everyone can learn what did and did not work.
@@ -237,8 +237,8 @@ all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 ## Data Preprocessing
 
 As stated above, we have a wide variety of data types.
-We'll need to process the data before we can start modeling.
-Let's start with the numerical features.
+We will need to process the data before we can start modeling.
+Let us start with the numerical features.
 First, we apply a heuristic, 
 replacing all missing values 
 by the corresponding variable's mean.

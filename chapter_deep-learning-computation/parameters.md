@@ -7,7 +7,7 @@ where our goal is to find parameter values
 that minimize our objective function. 
 After training, we will need these parameters 
 in order to make future predictions.
-Additionally, we'll sometimes wish 
+Additionally, we will sometimes wish 
 to extract the parameters 
 either to reuse them in some other context,
 to save our model to disk so that 
@@ -15,7 +15,7 @@ it may be exectuted in other software,
 or for examination in the hopes of 
 gaining scientific understanding.
 
-Most of the time, we'll be able 
+Most of the time, we will be able 
 to ignore the nitty-gritty details
 of how parameters are declared
 and manipulated, relying on Gluon
@@ -48,7 +48,7 @@ net(x)  # Forward computation
 
 ## Parameter Access
 
-Let's start with how to access parameters
+Let us start with how to access parameters
 from the models that you already know.
 When a model is defined via the Sequential class,
 we can first access any layer by indexing 
@@ -132,7 +132,7 @@ net[0].weight.grad()
 When we need to perform operations on all parameters,
 accessing them one-by-one can grow tedious.
 The situation can grow especially unwieldy
-when we work with more complex Blocks, (e.g. nested Blocks),
+when we work with more complex Blocks, (e.g., nested Blocks),
 since we would need to recurse 
 through the entire tree in to extact
 each sub-Block's parameters.
@@ -170,7 +170,7 @@ print(net.collect_params('dense0.*'))
 
 ### Collecting Parameters from Nested Blocks
 
-Let's see how the parameter naming conventions work 
+Let us see how the parameter naming conventions work 
 if we nest multiple blocks inside each other. 
 For that we first define a function that produces Blocks 
 (a Block factory, so to speak) and then 
@@ -197,7 +197,7 @@ rgnet(x)
 ```
 
 Now that we have designed the network, 
-let's see how it is organized.
+let us see how it is organized.
 Notice below that while `collect_params()`
 produces a list of named parameters,
 invoking `collect_params` as an attribute
@@ -223,7 +223,7 @@ rgnet[0][1][0].bias.data()
 ## Parameter Initialization
 
 Now that we know how to access the parameters,
-let's look at how to initialize them properly.
+let us look at how to initialize them properly.
 We discussed the need for initialization in :numref:`sec_numerical_stability`. 
 By default, MXNet initializes weight matrices
 uniformly by drawing from $U[-0.07, 0.07]$ 
@@ -237,7 +237,7 @@ we need to do some extra work.
 
 ### Built-in Initialization
 
-Let's begin by calling on built-in initializers. 
+Let us begin by calling on built-in initializers. 
 The code below initializes all parameters 
 as Gaussian random variables 
 with standard deviation $.01$.
@@ -320,11 +320,11 @@ net[0].weight.data()[0]
 ## Tied Parameters
 
 Often, we want to share parameters across multiple layers.
-Later we'll see that when learning word embeddings,
+Later we will see that when learning word embeddings,
 it might be sensible to use the same parameters
 both for encoding and decoding words. 
 We discussed one such case when we introduced :numref:`sec_model_construction`. 
-Let's see how to do this a bit more elegantly. 
+Let us see how to do this a bit more elegantly. 
 In the following we allocate a dense layer 
 and then use its parameters specifically 
 to set those of another layer.

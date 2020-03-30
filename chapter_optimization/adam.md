@@ -1,7 +1,7 @@
 # Adam
 :label:`sec_adam`
 
-In the discussions leading up to this section we encountered a number of techniques for efficient optimization. Let's recap them in detail here:
+In the discussions leading up to this section we encountered a number of techniques for efficient optimization. Let us recap them in detail here:
 
 * We saw that :numref:`sec_sgd` is more effective than Gradient Descent when solving optimization problems, e.g., due to its inherent resilience to redundant data. 
 * We saw that :numref:`sec_minibatch_sgd` affords significant additional efficiency arising from vectorization, using larger sets of observations in one minibatch. This is the key to efficient multi-machine, multi-GPU and overall parallel processing. 
@@ -9,7 +9,7 @@ In the discussions leading up to this section we encountered a number of techniq
 * :numref:`sec_adagrad` used per-coordinate scaling to allow for a computationally efficient preconditioner. 
 * :numref:`sec_rmsprop` decoupled per-coordinate scaling from a learning rate adjustment. 
 
-Adam :cite:`Kingma.Ba.2014` combines all these techniques into one efficient learning algorithm. As expected, this is an algorithm that has become rather popular as one of the more robust and effective optimization algorithms to use in deep learning. It is not without issues, though. In particular, :cite:`Reddi.Kale.Kumar.2019` show that there are situations where Adam can diverge due to poor variance control. In a follow-up work :cite:`Zaheer.Reddi.Sachan.ea.2018` proposed a hotfix to Adam, called Yogi which addresses these issues. More on this later. For now let's review the Adam algorithm. 
+Adam :cite:`Kingma.Ba.2014` combines all these techniques into one efficient learning algorithm. As expected, this is an algorithm that has become rather popular as one of the more robust and effective optimization algorithms to use in deep learning. It is not without issues, though. In particular, :cite:`Reddi.Kale.Kumar.2019` show that there are situations where Adam can diverge due to poor variance control. In a follow-up work :cite:`Zaheer.Reddi.Sachan.ea.2018` proposed a hotfix to Adam, called Yogi which addresses these issues. More on this later. For now let us review the Adam algorithm. 
 
 ## The Algorithm
 
@@ -28,7 +28,7 @@ Armed with the proper estimates we can now write out the update equations. First
 
 $$\mathbf{g}_t' = \frac{\eta \hat{\mathbf{v}}_t}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}.$$
 
-Unlike RMSProp our update uses the momentum $\hat{\mathbf{v}}_t$ rather than the gradient itself. Moreover, there's a slight cosmetic difference as the rescaling happens using $\frac{1}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}$ instead of $\frac{1}{\sqrt{\hat{\mathbf{s}}_t + \epsilon}}$. The former works arguably slightly better in practice, hence the deviation from RMSProp. Typically we pick $\epsilon = 10^{-6}$ for a good trade-off between numerical stability and fidelity. 
+Unlike RMSProp our update uses the momentum $\hat{\mathbf{v}}_t$ rather than the gradient itself. Moreover, there is a slight cosmetic difference as the rescaling happens using $\frac{1}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}$ instead of $\frac{1}{\sqrt{\hat{\mathbf{s}}_t + \epsilon}}$. The former works arguably slightly better in practice, hence the deviation from RMSProp. Typically we pick $\epsilon = 10^{-6}$ for a good trade-off between numerical stability and fidelity. 
 
 Now we have all the pieces in place to compute updates. This is slightly anticlimactic and we have a simple update of the form
 
@@ -38,7 +38,7 @@ Reviewing the design of Adam its inspiration is clear. Momentum and scale are cl
 
 ## Implementation 
 
-Implementing Adam from scratch isn't very daunting. For convenience we store the timestep counter $t$ in the `hyperparams` dictionary. Beyond that all is straightforward.
+Implementing Adam from scratch is not very daunting. For convenience we store the timestep counter $t$ in the `hyperparams` dictionary. Beyond that all is straightforward.
 
 ```{.python .input  n=2}
 %matplotlib inline
@@ -78,7 +78,7 @@ d2l.train_gluon_ch11('adam', {'learning_rate': 0.01}, data_iter)
 
 ## Yogi
 
-One of the problems of Adam is that it can fail to converge even in convex settings when the second moment estimate in $\mathbf{s}_t$ blows up. As a fix :cite:`Zaheer.Reddi.Sachan.ea.2018` proposed a refined update (and initialization) for $\mathbf{s}_t$. To understand what's going on, let's rewrite the Adam update as follows:
+One of the problems of Adam is that it can fail to converge even in convex settings when the second moment estimate in $\mathbf{s}_t$ blows up. As a fix :cite:`Zaheer.Reddi.Sachan.ea.2018` proposed a refined update (and initialization) for $\mathbf{s}_t$. To understand what's going on, let us rewrite the Adam update as follows:
 
 $$\mathbf{s}_t \leftarrow \mathbf{s}_{t-1} + (1 - \beta_2) \left(\mathbf{g}_t^2 - \mathbf{s}_{t-1}\right).$$
 
@@ -115,7 +115,7 @@ d2l.train_ch11(yogi, init_adam_states(feature_dim),
 ## Exercises
 
 1. Adjust the learning rate and observe and analyze the experimental results.
-1. Can you rewrite momentum and second moment updates such that it doesn't require bias correction?
+1. Can you rewrite momentum and second moment updates such that it does not require bias correction?
 1. Why do you need to reduce the learning rate $\eta$ as we converge?
 1. Try to construct a case for which Adam diverges and Yogi converges?
 

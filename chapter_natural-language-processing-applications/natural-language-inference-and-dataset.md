@@ -96,7 +96,7 @@ def read_snli(data_dir, is_train):
     return premises, hypotheses, labels
 ```
 
-Now let's print the first $3$ pairs of premise and hypothesis, as well as their labels ("0", "1", and "2" correspond to "entailment", "contradiction", and "neutral", respectively ).
+Now let us print the first $3$ pairs of premise and hypothesis, as well as their labels ("0", "1", and "2" correspond to "entailment", "contradiction", and "neutral", respectively ).
 
 ```{.python .input  n=70}
 train_data = read_snli(data_dir, is_train=True)

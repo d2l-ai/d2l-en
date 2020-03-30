@@ -76,7 +76,7 @@ to improve the generalization of deep nets.
 
 ## Robustness through Perturbations
 
-Let's think briefly about what we 
+Let us think briefly about what we 
 expect from a good predictive model.
 We want it to peform well on unseen data.
 Classical generalization theory

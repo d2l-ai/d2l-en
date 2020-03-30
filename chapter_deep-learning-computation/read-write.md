@@ -10,7 +10,7 @@ Additionally, when running a long training process,
 the best practice is to periodically save intermediate results (checkpointing)
 to ensure that we do not lose several days worth of computation
 if we trip over the power cord of our server.
-Thus it's time we learned how to load and store 
+Thus it is time we learned how to load and store 
 both individual weight vectors and entire models. 
 This section addresses both issues.
 
@@ -83,7 +83,7 @@ and then load the parameters from disk.
 The deferred initialization (:numref:`sec_deferred_init`) 
 is advantageous here since we can simply define a model
 without the need to put actual values in place. 
-Let's start with our familiar MLP.
+Let us start with our familiar MLP.
 
 ```{.python .input  n=6}
 class MLP(nn.Block):
@@ -124,7 +124,7 @@ clone.load_parameters('mlp.params')
 
 Since both instances have the same model parameters, 
 the computation result of the same input `x` should be the same. 
-Let's verify this.
+Let us verify this.
 
 ```{.python .input}
 yclone = clone(x)

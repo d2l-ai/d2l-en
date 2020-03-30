@@ -184,7 +184,7 @@ class MLP(nn.Block):
         return self.output(self.hidden(x))
 ```
 
-To begin, let's focus on the `forward` method.
+To begin, let us focus on the `forward` method.
 Note that it takes `x` as input,
 calculates the hidden representation (`self.hidden(x)`),
 and outputs its logits (`self.output( ... )`).
@@ -212,7 +212,7 @@ Note that unless we implement a new operator,
 we need not worry about backpropagation (the `backward` method)
 or parameter initialization (the `initialize` method).
 Gluon will generate these methods automatically.
-Let's try this out:
+Let us try this out:
 
 ```{.python .input  n=35}
 net = MLP()
@@ -328,7 +328,7 @@ that is not updated during optimization.
 
 Declaring constants explicitly (via `get_constant`)
 makes this clear helps Gluon to speed up execution.
-In the following code, we'll implement a model
+In the following code, we will implement a model
 that could not easily be assembled
 using only predefined layers and `Sequential`.
 

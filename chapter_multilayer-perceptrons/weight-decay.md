@@ -78,7 +78,7 @@ on minimizing the weight norm $|| \mathbf{w} ||^2$
 versus minimizing the training error.
 That is exactly what we want.
 To illustrate things in code, 
-let's revive our previous example
+let us revive our previous example
 from :numref:`sec_linear_regression` for linear regression.
 There, our loss was given by
 

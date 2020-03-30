@@ -23,7 +23,7 @@ npx.set_np()
 ## Encoder
 
 Recall that the encoder of seq2seq can transform the inputs of variable length to a fixed-length context vector $\mathbf{c}$ by encoding the sequence information into $\mathbf{c}$. We usually use RNN layers within the encoder.
-Suppose that we have an input sequence $x_1, \ldots, x_T$, where $x_t$ is the $t^\mathrm{th}$ word. At timestep $t$, the RNN will have two vectors as the input: the feature vector $\mathbf{x}_t$ of $x_t$ and the hidden state of the last timestep $\mathbf{h}_{t-1}$. Let's denote the transformation of the RNN's hidden states by a function $f$:
+Suppose that we have an input sequence $x_1, \ldots, x_T$, where $x_t$ is the $t^\mathrm{th}$ word. At timestep $t$, the RNN will have two vectors as the input: the feature vector $\mathbf{x}_t$ of $x_t$ and the hidden state of the last timestep $\mathbf{h}_{t-1}$. Let us denote the transformation of the RNN's hidden states by a function $f$:
 
 $$\mathbf{h}_t = f (\mathbf{x}_t, \mathbf{h}_{t-1}).$$
 
@@ -35,7 +35,7 @@ For example, if we choose $q$ as $q (\mathbf{h}_1, \ldots, \mathbf{h}_T) = \math
 
 So far what we describe above is a unidirectional RNN, where each timestep's hidden state depends only on the previous timesteps'. We can also use other forms of RNNs such as GRUs, LSTMs, and bidirectional RNNs to encode the sequential input.
 
-Now let's implement the seq2seq's encoder.
+Now let us implement the seq2seq's encoder.
 Here we use the word embedding layer to obtain the feature vector
 according to the word index of the input language.
 Those feature vectors will be fed to a multi-layer LSTM.
@@ -86,7 +86,7 @@ As we just introduced, the context vector $\mathbf{c}$ encodes the information f
 
 $$P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}).$$
 
-Hence, we can use another RNN as the decoder. At timestep $t'$, the decoder will update its hidden state $\mathbf{s}_{t'}$ using three inputs: the feature vector $\mathbf{y}_{t'-1}$ of $y_{t'-1}$, the context vector $\mathbf{c}$, and the hidden state of the last timestep $\mathbf{s}_{t'-1}$. Let's denote the transformation of the RNN's hidden states within the decoder by a function $g$:
+Hence, we can use another RNN as the decoder. At timestep $t'$, the decoder will update its hidden state $\mathbf{s}_{t'}$ using three inputs: the feature vector $\mathbf{y}_{t'-1}$ of $y_{t'-1}$, the context vector $\mathbf{c}$, and the hidden state of the last timestep $\mathbf{s}_{t'-1}$. Let us denote the transformation of the RNN's hidden states within the decoder by a function $g$:
 
 $$\mathbf{s}_{t'} = g(\mathbf{y}_{t'-1}, \mathbf{c}, \mathbf{s}_{t'-1}).$$
 

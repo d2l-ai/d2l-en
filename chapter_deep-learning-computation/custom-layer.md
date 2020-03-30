@@ -38,7 +38,7 @@ class CenteredLayer(nn.Block):
         return x - x.mean()
 ```
 
-Let's verify that our layer works as intended by feeding some data through it.
+Let us verify that our layer works as intended by feeding some data through it.
 
 ```{.python .input  n=2}
 layer = CenteredLayer()
@@ -68,7 +68,7 @@ y.mean()
 ## Layers with Parameters
 
 Now that we know how to define simple layers
-let's move on to defining layers with parameters
+let us move on to defining layers with parameters
 that can be adjusted through training. 
 To automate some of the routine work
 the `Parameter` class and the `ParameterDict` dictionary 

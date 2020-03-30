@@ -5,7 +5,7 @@ We have introduced several word embedding models for natural language understand
 After pretraining, the output can be thought of as a matrix
 where each row is a vector that represents a word of a predefined vocabulary.
 In fact, these word embedding models are all *context-independent*.
-Let's begin by illustrating this property.
+Let us begin by illustrating this property.
 
 
 ## From Context-Independent to Context-Sensitive
@@ -190,7 +190,7 @@ class BERTEncoder(nn.Block):
 
 Suppose that the vocabulary size is 10,000.
 To demonstrate forward inference of `BERTEncoder`,
-let's create an instance of it and initialize its parameters.
+let us create an instance of it and initialize its parameters.
 
 ```{.python .input  n=3}
 vocab_size, num_hiddens, ffn_num_hiddens, num_heads = 10000, 768, 1024, 4
