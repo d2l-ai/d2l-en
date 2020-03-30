@@ -51,18 +51,8 @@ Once these preparations are complete,
 the `nvidia-smi` command can be used
 to view the graphics card information.
 
-```{.python .input  n=7}
+```{.python .input  n=1}
 !nvidia-smi
-```
-
-```{.json .output n=7}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "/bin/sh: nvidia-smi: command not found\r\n"
- }
-]
 ```
 
 Next, we need to confirm that 
@@ -103,7 +93,7 @@ If there are multiple GPUs, we use `gpu(i)`
 to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0). 
 Also, `gpu(0)` and `gpu()` are equivalent.
 
-```{.python .input  n=8}
+```{.python .input}
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -111,42 +101,16 @@ npx.set_np()
 npx.cpu(), npx.gpu(), npx.gpu(1)
 ```
 
-```{.json .output n=8}
-[
- {
-  "data": {
-   "text/plain": "(cpu(0), gpu(0), gpu(1))"
-  },
-  "execution_count": 8,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 We can query the number of available GPUs through `num_gpus()`.
 
-```{.python .input  n=9}
+```{.python .input}
 npx.num_gpus()
-```
-
-```{.json .output n=9}
-[
- {
-  "data": {
-   "text/plain": "0"
-  },
-  "execution_count": 9,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Now we define two convenient functions that allow us 
 to run codes even if the requested GPUs do not exist.
 
-```{.python .input  n=10}
+```{.python .input}
 # Saved in the d2l package for later use
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
@@ -161,41 +125,15 @@ def try_all_gpus():
 try_gpu(), try_gpu(3), try_all_gpus()
 ```
 
-```{.json .output n=10}
-[
- {
-  "data": {
-   "text/plain": "(cpu(0), cpu(0), [cpu(0)])"
-  },
-  "execution_count": 10,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ## `ndarray` and GPUs
 
 By default, `ndarray` objects are created on the CPU.
 We can use the `ctx` property of `ndarray` 
 to view the device where the `ndarray` is located.
 
-```{.python .input  n=11}
+```{.python .input  n=4}
 x = np.array([1, 2, 3])
 x.ctx
-```
-
-```{.json .output n=11}
-[
- {
-  "data": {
-   "text/plain": "cpu(0)"
-  },
-  "execution_count": 11,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 It is important to note that whenever we want
@@ -219,42 +157,16 @@ We can use the `nvidia-smi` command to view GPU memory usage.
 In general, we need to make sure we do not 
 create data that exceeds the GPU memory limit.
 
-```{.python .input  n=12}
+```{.python .input  n=5}
 x = np.ones((2, 3), ctx=try_gpu())
 x
 ```
 
-```{.json .output n=12}
-[
- {
-  "data": {
-   "text/plain": "array([[1., 1., 1.],\n       [1., 1., 1.]])"
-  },
-  "execution_count": 12,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 Assuming you have at least two GPUs, the following code will create a random array on `gpu(1)`.
 
-```{.python .input  n=13}
+```{.python .input}
 y = np.random.uniform(size=(2, 3), ctx=try_gpu(1))
 y
-```
-
-```{.json .output n=13}
-[
- {
-  "data": {
-   "text/plain": "array([[0.5488135 , 0.5928446 , 0.71518934],\n       [0.84426576, 0.60276335, 0.8579456 ]])"
-  },
-  "execution_count": 13,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ### Copying
@@ -276,20 +188,10 @@ it cannot find data on the same device and it fails.
 Since $\mathbf{y}$ lives on the second GPU,
 we need to move $\mathbf{x}$ there before we can add the two.
 
-```{.python .input  n=15}
+```{.python .input  n=7}
 z = x.copyto(try_gpu(1))
 print(x)
 print(z)
-```
-
-```{.json .output n=15}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "[[1. 1. 1.]\n [1. 1. 1.]]\n[[1. 1. 1.]\n [1. 1. 1.]]\n"
- }
-]
 ```
 
 Now that the data is on the same GPU 
@@ -299,21 +201,8 @@ In such cases, MXNet places the result
 on the same device as its constituents.
 In our case, that is `@gpu(1)`.
 
-```{.python .input  n=16}
+```{.python .input}
 y + z
-```
-
-```{.json .output n=16}
-[
- {
-  "data": {
-   "text/plain": "array([[1.5488136, 1.5928446, 1.7151893],\n       [1.8442657, 1.6027634, 1.8579457]])"
-  },
-  "execution_count": 16,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Imagine that your variable z already lives on your second GPU (gpu(1)).
@@ -330,22 +219,9 @@ then this is a no-op.
 Unless you specifically want to make a copy, 
 `as_in_ctx()` is the method of choice.
 
-```{.python .input  n=17}
+```{.python .input}
 z = x.as_in_ctx(try_gpu(1))
 z
-```
-
-```{.json .output n=17}
-[
- {
-  "data": {
-   "text/plain": "array([[1., 1., 1.],\n       [1., 1., 1.]])"
-  },
-  "execution_count": 17,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 It is important to note that, 
@@ -359,21 +235,8 @@ y.as_in_ctx(try_gpu(1)) is y
 
 The `copyto` function always creates new memory for the target variable.
 
-```{.python .input  n=18}
+```{.python .input}
 y.copyto(try_gpu(1)) is y
-```
-
-```{.json .output n=18}
-[
- {
-  "data": {
-   "text/plain": "False"
-  },
-  "execution_count": 18,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ### Side Notes
@@ -421,7 +284,7 @@ The following code initializes the model parameters on the GPU
 how to run models on GPUs in the following, 
 simply since they will become somewhat more compute intensive).
 
-```{.python .input  n=19}
+```{.python .input  n=12}
 net = nn.Sequential()
 net.add(nn.Dense(1))
 net.initialize(ctx=try_gpu())
@@ -429,40 +292,14 @@ net.initialize(ctx=try_gpu())
 
 When the input is an `ndarray` on the GPU, Gluon will calculate the result on the same GPU.
 
-```{.python .input  n=20}
+```{.python .input  n=13}
 net(x)
-```
-
-```{.json .output n=20}
-[
- {
-  "data": {
-   "text/plain": "array([[0.04421056],\n       [0.04421056]])"
-  },
-  "execution_count": 20,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Let's confirm that the model parameters are stored on the same GPU.
 
-```{.python .input  n=22}
+```{.python .input  n=14}
 net[0].weight.data().ctx
-```
-
-```{.json .output n=22}
-[
- {
-  "data": {
-   "text/plain": "cpu(0)"
-  },
-  "execution_count": 22,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 In short, as long as all data and parameters are on the same device, we can learn models efficiently. In the following we will see several such examples.
@@ -500,7 +337,3 @@ In short, as long as all data and parameters are on the same device, we can lear
 ## [Discussions](https://discuss.mxnet.io/t/2330)
 
 ![](../img/qr_use-gpu.svg)
-
-```{.python .input}
-
-```
