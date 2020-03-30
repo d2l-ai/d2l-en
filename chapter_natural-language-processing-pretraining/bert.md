@@ -154,6 +154,8 @@ of the token embeddings, segment embeddings, and positional embeddings.](../img/
 
 The following `BERTEncoder` class is similar to the `TransformerEncoder` class
 as implemented in :numref:`sec_transformer`.
+Different from `TransformerEncoder`, `BERTEncoder` uses
+segment embeddings and learnable positional embeddings.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
@@ -168,8 +170,8 @@ class BERTEncoder(nn.Block):
         for _ in range(num_layers):
             self.blks.add(d2l.EncoderBlock(
                 num_hiddens, ffn_num_hiddens, num_heads, dropout))
-        # In BERT, positional embedding is learnable, thus we create a
-        # parameter of positional embedding that is long enough
+        # In BERT, positional embeddings are learnable, thus we create a
+        # parameter of positional embeddings that are long enough
         self.pos_embedding = self.params.get('pos_embedding',
                                              shape=(1, max_len, num_hiddens))
 
@@ -183,22 +185,35 @@ class BERTEncoder(nn.Block):
         return X
 ```
 
-...
+Suppose that the vocabulary size is 10,000.
+To demonstrate forward inference of `BERTEncoder`,
+let's create an instance of it and initialize its parameters.
 
 ```{.python .input  n=3}
-vocab_size, num_hiddens, ffn_num_hiddens = 10000, 768, 1024
-num_heads, num_layers, dropout = 4, 2, 0.1
+vocab_size, num_hiddens, ffn_num_hiddens, num_heads,  = 10000, 768, 1024, 4
+num_layers, dropout = 2, 0.2
 encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                       num_layers, dropout)
 encoder.initialize()
-tokens = np.random.randint(0, 10000, (2, 8))
+```
+
+We define `tokens` to be 2 BERT input sequences of length 8,
+where each token is an index of the vocabulary.
+The forward inference of `BERTEncoder` with the input `tokens`
+returns the encoded result where each token is represented by a vector
+whose length is predefined by the hyperparameter `num_hiddens`.
+
+```{.python .input}
+tokens = np.random.randint(0, vocab_size, (2, 8))
 segments = np.array([[0, 0, 0, 0, 1, 1, 1, 1],
                      [0, 0, 0, 1, 1, 1, 1, 1]])
 encoded_X = encoder(tokens, segments, None)
 encoded_X.shape
 ```
 
-...
+## Pretraining Tasks 
+
+### Masked Language Modeling
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
@@ -242,7 +257,7 @@ mlm_l = loss(mlm_Y_hat.reshape((-1, vocab_size)), mlm_Y.reshape(-1))
 mlm_l.shape
 ```
 
-...
+### Next Sentence Prediction
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
@@ -275,7 +290,7 @@ nsp_l = loss(nsp_Y_hat, nsp_y)
 nsp_l.shape
 ```
 
-...
+## Putting All Things Together 
 
 ```{.python .input  n=10}
 # Saved in the d2l package for later use
