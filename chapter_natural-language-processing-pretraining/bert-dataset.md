@@ -26,15 +26,15 @@ import zipfile
 npx.set_np()
 ```
 
-The WikiText-2 dataset has been slightly preprocessed:
+In the WikiText-2 dataset,
 each line represents a paragraph where
-space is inserted between punctuation and its preceding token.
+space is inserted between any punctuation and its preceding token.
 Paragraphs with at least two sentences are retained.
 To split sentences, we only use the period as the delimiter for simplicity.
 We leave discussions of more complex sentence splitting techniques in the exercises
 at the end of this section.
 
-```{.python .input  n=3}
+```{.python .input  n=2}
 # Saved in the d2l package for later use
 d2l.DATA_HUB['wikitext-2'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/'
@@ -62,7 +62,11 @@ into the the dataset of the ideal format to pretrain BERT.
 
 ### Generating the Next Sentence Prediction Task
 
-```{.python .input  n=4}
+According to descriptions of :label:`subsec_nsp`,
+the `_get_next_sentence` function generates a training example
+for the binary classification task.
+
+```{.python .input  n=3}
 # Saved in the d2l package for later use
 def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
@@ -74,21 +78,12 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
     return sentence, next_sentence, is_next
 ```
 
-```{.python .input  n=5}
-# Saved in the d2l package for later use
-def get_tokens_and_segments(tokens_a, tokens_b=None):
-    if tokens_b is None:
-        tokens = ['<cls>'] + tokens_a + ['<sep>']
-        segments = [0] * (len(tokens_a) + 2)
-    else:
-        tokens = ['<cls>'] + tokens_a + ['<sep>'] + tokens_b + ['<sep>']
-        segments = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
-    return tokens, segments
-```
+The following function generates training examples for next sentence prediction
+from the input `paragraph` by invoking the `_get_next_sentence` function.
+Here `paragraph` is a list of sentences, where each sentence is a list of tokens.
+The argument `max_len` specifies the maximum length of a BERT input sequence during pretraining.
 
-...
-
-```{.python .input  n=6}
+```{.python .input  n=4}
 # Saved in the d2l package for later use
 def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     nsp_data_from_paragraph = []
@@ -98,7 +93,7 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
         # Consider 1 '<cls>' token and 2 '<sep>' tokens
         if len(tokens_a) + len(tokens_b) + 3 > max_len:
             continue
-        tokens, segments = get_tokens_and_segments(tokens_a, tokens_b)
+        tokens, segments = d2l.get_tokens_and_segments(tokens_a, tokens_b)
         nsp_data_from_paragraph.append((tokens, segments, is_next))
     return nsp_data_from_paragraph
 ```
@@ -108,7 +103,7 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
 
 It follows the procedure described in :numref:`subsec_mlm`.
 
-```{.python .input  n=7}
+```{.python .input  n=5}
 # Saved in the d2l package for later use
 def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                         vocab):
@@ -141,7 +136,7 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
 
 ...
 
-```{.python .input  n=8}
+```{.python .input  n=6}
 # Saved in the d2l package for later use
 def _get_mlm_data_from_tokens(tokens, vocab):
     candidate_pred_positions = []
@@ -166,7 +161,7 @@ def _get_mlm_data_from_tokens(tokens, vocab):
 
 ...
 
-```{.python .input  n=9}
+```{.python .input  n=7}
 # Saved in the d2l package for later use
 def _pad_bert_inputs(instances, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
@@ -195,7 +190,7 @@ def _pad_bert_inputs(instances, max_len, vocab):
 
 ...
 
-```{.python .input  n=10}
+```{.python .input  n=8}
 # Saved in the d2l package for later use
 class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraphs, max_len=128):
@@ -233,7 +228,7 @@ class _WikiTextDataset(gluon.data.Dataset):
         return len(self.all_token_ids)
 ```
 
-```{.python .input  n=11}
+```{.python .input  n=9}
 # Saved in the d2l package for later use
 def load_data_wiki(batch_size, max_len):
     num_workers = d2l.get_dataloader_workers()
@@ -245,18 +240,28 @@ def load_data_wiki(batch_size, max_len):
     return train_iter, train_set.vocab
 ```
 
-```{.python .input  n=12}
+```{.python .input  n=10}
 batch_size, max_len = 512, 64
 train_iter, vocab = load_data_wiki(batch_size, max_len)
 ```
 
-```{.python .input  n=13}
+```{.python .input  n=11}
 for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
      mlm_Y, nsp_y) in train_iter:
     print(tokens_X.shape, segments_X.shape, valid_lens_x.shape,
           pred_positions_X.shape, mlm_weights_X.shape, mlm_Y.shape,
           nsp_y.shape)
     break
+```
+
+```{.json .output n=11}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "(512, 64) (512, 64) (512,) (512, 20) (512, 20) (512, 20) (512,)\n"
+ }
+]
 ```
 
 ## Summary

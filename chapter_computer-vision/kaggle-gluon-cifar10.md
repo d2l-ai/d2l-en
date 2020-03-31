@@ -181,7 +181,7 @@ transform_test = gluon.data.vision.transforms.Compose([
 
 ## Reading the Dataset
 
-Next, we can create the `ImageFolderDataset` instance to read the organized dataset containing the original image files, where each data instance includes the image and label.
+Next, we can create the `ImageFolderDataset` instance to read the organized dataset containing the original image files, where each example includes the image and label.
 
 ```{.python .input  n=10}
 train_ds, valid_ds, train_valid_ds, test_ds = [

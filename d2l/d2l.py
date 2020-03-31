@@ -333,7 +333,7 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download(name, cache_dir=os.path.join('..', 'data')):
     """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, "%s doesn't exist" % name
+    assert name in DATA_HUB, "%s does not exist" % name
     url, sha1 = DATA_HUB[name]
     d2l.mkdir_if_not_exist(cache_dir)
     return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
@@ -1696,6 +1696,17 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
+def get_tokens_and_segments(tokens_a, tokens_b=None):
+    tokens = ['<cls>'] + tokens_a + ['<sep>']
+    # 0 and 1 are marking segment A and B, respectively
+    segments = [0] * (len(tokens_a) + 2)
+    if tokens_b is not None:
+        tokens += tokens_b + ['<sep>']
+        segments += [1] * (len(tokens_b) + 1)
+    return tokens, segments
+
+
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class BERTEncoder(nn.Block):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                  num_layers, dropout, max_len=1000, **kwargs):
@@ -1707,8 +1718,8 @@ class BERTEncoder(nn.Block):
         for _ in range(num_layers):
             self.blks.add(d2l.EncoderBlock(
                 num_hiddens, ffn_num_hiddens, num_heads, dropout))
-        # In BERT, positional embedding is learned from scratch, thus we
-        # create a parameter of positional embedding that is long enough
+        # In BERT, positional embeddings are learnable, thus we create a
+        # parameter of positional embeddings that are long enough
         self.pos_embedding = self.params.get('pos_embedding',
                                              shape=(1, max_len, num_hiddens))
 
@@ -1737,8 +1748,8 @@ class MaskLM(nn.Block):
         pred_positions = pred_positions.reshape(-1)
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
-        # Suppose that batch_size = 2, num_pred_positions = 3,
-        # batch_idx = np.array([0, 0, 0, 1, 1, 1])
+        # Suppose that batch_size = 2, num_pred_positions = 3, then batch_idx
+        # is np.array([0, 0, 0, 1, 1, 1])
         batch_idx = np.repeat(batch_idx, num_pred_positions)
         masked_X = X[batch_idx, pred_positions]
         masked_X = masked_X.reshape((batch_size, num_pred_positions, -1))
@@ -1768,11 +1779,10 @@ class BERTModel(nn.Block):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
                                    num_heads, num_layers, dropout, max_len)
-        self.nsp = NextSentencePred(num_hiddens)
         self.mlm = MaskLM(vocab_size, num_hiddens)
+        self.nsp = NextSentencePred(num_hiddens)
 
-    def forward(self, tokens, segments, valid_lens=None,
-                pred_positions=None):
+    def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)
         if pred_positions is not None:
             mlm_Y_hat = self.mlm(encoded_X, pred_positions)
@@ -1793,7 +1803,6 @@ def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
         lines = f.readlines()
-    # A line represents a paragraph.
     paragraphs = [line.strip().lower().split(' . ')
                   for line in lines if len(line.split(' . ')) >= 2]
     random.shuffle(paragraphs)
@@ -1805,21 +1814,11 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
         is_next = True
     else:
-        # paragraphs is a list of lists of lists
+        # paragraphs is a list of lists of lists, where a paragraph is a list
+        # of sentences, and a sentence is a list of tokens
         next_sentence = random.choice(random.choice(paragraphs))
         is_next = False
     return sentence, next_sentence, is_next
-
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
-def get_tokens_and_segments(tokens_a, tokens_b=None):
-    if tokens_b is None:
-        tokens = ['<cls>'] + tokens_a + ['<sep>']
-        segments = [0] * (len(tokens_a) + 2)
-    else:
-        tokens = ['<cls>'] + tokens_a + ['<sep>'] + tokens_b + ['<sep>']
-        segments = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
-    return tokens, segments
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
@@ -1831,7 +1830,7 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
         # Consider 1 '<cls>' token and 2 '<sep>' tokens
         if len(tokens_a) + len(tokens_b) + 3 > max_len:
             continue
-        tokens, segments = get_tokens_and_segments(tokens_a, tokens_b)
+        tokens, segments = d2l.get_tokens_and_segments(tokens_a, tokens_b)
         nsp_data_from_paragraph.append((tokens, segments, is_next))
     return nsp_data_from_paragraph
 

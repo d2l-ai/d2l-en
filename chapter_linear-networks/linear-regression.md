@@ -42,18 +42,18 @@ we would need to get our hands on a dataset
 consisting of sales for which we know
 the sale price, area and age for each home.
 In the terminology of machine learning,
-the dataset is called a *training data* or *training set*,
+the dataset is called a *training data set* or *training set*,
 and each row (here the data corresponding to one sale)
-is called an *instance* or *example*.
+is called an *example* (or *data instance*, "data point", *sample*).
 The thing we are trying to predict (here, the price)
-is called a *target* or *label*.
+is called a *label* (or *target*).
 The variables (here *age* and *area*)
 upon which the predictions are based
 are called *features* or *covariates*.
 
 Typically, we will use $n$ to denote
 the number of examples in our dataset.
-We index the samples by $i$, denoting each input data point
+We index the data instances by $i$, denoting each input
 as $x^{(i)} = [x_1^{(i)}, x_2^{(i)}]$
 and the corresponding label as $y^{(i)}$.
 
@@ -175,7 +175,7 @@ the losses on the training set.
 $$L(\mathbf{w}, b) =\frac{1}{n}\sum_{i=1}^n l^{(i)}(\mathbf{w}, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
 When training the model, we want to find parameters ($\mathbf{w}^*, b^*$)
-that minimize the total loss across all training samples:
+that minimize the total loss across all training examples:
 
 $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).$$
 
@@ -237,7 +237,7 @@ every time we need to compute the update,
 a variant called *stochastic gradient descent*.
 
 In each iteration, we first randomly sample a minibatch $\mathcal{B}$
-consisting of a fixed number of training data examples.
+consisting of a fixed number of training examples.
 We then compute the derivative (gradient) of the average loss
 on the mini batch with regard to the model parameters.
 Finally, we multiply the gradient by a predetermined step size $\eta > 0$

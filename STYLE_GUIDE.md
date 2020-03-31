@@ -34,6 +34,7 @@
         * weight, bias, label
         * model training, model prediction (model inference)
         * training/testing/validation dataset
+        * data point/data instance/training example/testing example/example of the dataset
     * Distinguish：
         * hyperparameter vs parameter
         * minibatch stochastic gradient descent vs stochastic gradient descent

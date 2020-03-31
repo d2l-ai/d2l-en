@@ -119,6 +119,7 @@ npx.set_np()
 ```
 
 ## Input Representation
+:label:`subsec_bert_input_rep`
 
 In natural language processing,
 some tasks (e.g., sentiment analysis) take single text as the input,
@@ -142,6 +143,23 @@ To distinguish text pairs,
 the learned segment embeddings $\mathbf{e}_A$ and $\mathbf{e}_B$
 are added to the token embeddings of the first sequence and the second sequence, respectively.
 For single text inputs, only $\mathbf{e}_A$ is used.
+
+The following `get_tokens_and_segments` takes either one sentence or two sentences
+as the input, then returns tokens of the BERT input sequence
+and their corresponding segment IDs.
+
+```{.python .input}
+# Saved in the d2l package for later use
+def get_tokens_and_segments(tokens_a, tokens_b=None):
+    tokens = ['<cls>'] + tokens_a + ['<sep>']
+    # 0 and 1 are marking segment A and B, respectively
+    segments = [0] * (len(tokens_a) + 2)
+    if tokens_b is not None:
+        tokens += tokens_b + ['<sep>']
+        segments += [1] * (len(tokens_b) + 1)
+    return tokens, segments
+```
+
 BERT chooses the Transformer encoder as its bidirectional architecture.
 Common in the Transformer encoder,
 positional embeddings are added at every position of the BERT input sequence.
@@ -210,9 +228,7 @@ This hyperparameter is usually referred to as the *hidden size*
 
 ```{.python .input}
 tokens = np.random.randint(0, vocab_size, (2, 8))
-# 0 and 1 are marking segment A and B, respectively
-segments = np.array([[0, 0, 0, 0, 1, 1, 1, 1],
-                     [0, 0, 0, 1, 1, 1, 1, 1]])
+segments = np.array([[0, 0, 0, 0, 1, 1, 1, 1], [0, 0, 0, 1, 1, 1, 1, 1]])
 encoded_X = encoder(tokens, segments, None)
 encoded_X.shape
 ```
@@ -315,6 +331,7 @@ mlm_l.shape
 ```
 
 ### Next Sentence Prediction
+:label:`subsec_nsp`
 
 Although masked language modeling is able to encode bidirectional context
 for representing words, it does not explicitly model the logical relationship
