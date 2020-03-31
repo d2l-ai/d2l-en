@@ -159,6 +159,12 @@ encoded_pair_crane = encoded_pair[:, 2, :]
 encoded_pair.shape, encoded_pair_cls.shape, encoded_pair_crane[0][:3]
 ```
 
+## Summary
+
 ## Exercises
 
 1. Why MLM loss is significantly higher than NSP loss?
+
+## [Discussions](https://discuss.mxnet.io/t/5869)
+
+![](../img/qr_bert-pretraining.svg)

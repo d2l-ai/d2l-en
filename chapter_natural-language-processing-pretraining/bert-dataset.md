@@ -237,6 +237,12 @@ for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
     break
 ```
 
+## Summary
+
 ## Exercises
 
 1. Try other sentence segmentation methods, such as `spaCy` and `nltk.tokenize.sent_tokenize`. For instance, after installing `nltk`, you need to run `import nltk` and `nltk.download('punkt')` first.
+
+## [Discussions](https://discuss.mxnet.io/t/5868)
+
+![](../img/qr_bert-dataset.svg)

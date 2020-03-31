@@ -39,6 +39,8 @@
         * minibatch stochastic gradient descent vs stochastic gradient descent
     * List
         * https://github.com/mli/gluon-tutorials-zh/blob/master/TERMINOLOGY.md
+* Writing numbers: text or numerals?
+    * Use numerals when they are explaining or part of code or math. Otherwise refer to [OWL](https://owl.purdue.edu/owl/general_writing/grammar/writing_numbers.html)
 * Acceptable abbreviations
     * MLP, CNN, RNN, GRU, LSTM, model names (e.g., ELMo, GPT, BERT)
     * We spell out full names in most cases to be clear (e.g., NLP -> natural language processing)
@@ -55,7 +57,7 @@
 * Assignment symbol
     * \leftarrow
 * Distiguish text numerals and mathematical numerals:
-    * According to [Donald E. Knuth](http://tug.org/TUGboat/tb10-1/tb23knut.pdf): 
+    * According to [Donald E. Knuth](http://tug.org/TUGboat/tb10-1/tb23knut.pdf):
       * Text numerals are numbers that are essentially part of the English language: "1776", "Chapter 5", "2 ways"
       * Mathematical numerals are numbers that are part of the mathematics: "$x$ is either $1$ or $-1$", "the greatest common divisor of $12$ and $18$ is $6$".
 
@@ -185,6 +187,6 @@
 ```
 5. In the text, use the following to cite the added paper:
 ```
-:cite:`Wood.Gasthaus.Archambeau.ea.2011` 
+:cite:`Wood.Gasthaus.Archambeau.ea.2011`
 ```
 

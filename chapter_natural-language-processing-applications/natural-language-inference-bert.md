@@ -137,7 +137,14 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
                d2l.split_batch_multi_inputs)
 ```
 
+## Summary
+
 ## Exercises
 
 1. How to truncate a pair of sequences according to their ratio of
 length.
+
+
+## [Discussions](https://discuss.mxnet.io/t/5870)
+
+![](../img/qr_natural-language-inference-bert.svg)

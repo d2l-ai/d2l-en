@@ -1,4 +1,4 @@
-# BERT
+# Bidirectional Encoder Representations from Transformers (BERT)
 :label:`sec_bert`
 
 We have introduced several word embedding models for natural language understanding.
@@ -39,7 +39,7 @@ all the weights in the pretrained bidirectional LSTM model are frozen after ELMo
 On the other hand,
 the existing supervised model is specifically customized for a given task.
 Leveraging different best models for different tasks at that time,
-adding ELMo improved the state of the art across 6 natural language processing tasks:
+adding ELMo improved the state of the art across six natural language processing tasks:
 sentiment analysis, natural language inference,
 semantic role labeling, coreference resolution,
 named entity recognition, and question answering.
@@ -60,9 +60,9 @@ to predict the label of the task.
 In sharp contrast to ELMo that freezes parameters of the pretrained model,
 GPT fine-tunes *all* the parameters in the pretrained Transformer decoder
 during supervised learning of the downstream task.
-GPT was evaluated on 12 tasks of natural language inference,
+GPT was evaluated on twelve tasks of natural language inference,
 question answering, sentence similarity, and classification,
-and improved the state of the art in 9 of them with minimal changes
+and improved the state of the art in nine of them with minimal changes
 to the model architecture.
 
 However, due to the autoregressive nature of language models,
@@ -98,7 +98,7 @@ while the additional output layer will be trained from scratch.
 :label:`fig_elmo_gpt_bert`
 
 
-BERT further improved the state of the art on 11 natural language processing tasks
+BERT further improved the state of the art on eleven natural language processing tasks
 under broad categories of i) single text classification (e.g., sentiment analysis), ii) text pair classification (e.g., natural language inference),
 iii) question answering, iv) single text tagging (e.g., named entity recognition).
 All proposed in 2018,
@@ -136,7 +136,7 @@ the BERT input sequence is the concatenation of
 “&lt;sep&gt;”, tokens of the second text sequence, and “&lt;sep&gt;”.
 We will consistently distinguish the terminology "BERT input sequence"
 from other types of "sequences".
-For instance, 1 *BERT input sequence* may include either 1 *text sequence* or 2 *text sequences*.
+For instance, one *BERT input sequence* may include either one *text sequence* or two *text sequences*.
 
 To distinguish text pairs,
 the learned segment embeddings $\mathbf{e}_A$ and $\mathbf{e}_B$
@@ -224,10 +224,10 @@ of each token of the input text and the inserted
 special tokens “&lt;cls&gt;” and “&lt;seq&gt;”. 
 Next, we will use these representations to compute the loss function
 for pretraining BERT.
-The pretraining is composed of the following 2 tasks:
+The pretraining is composed of the following two tasks:
 masked language modeling and next sentence prediction.
 
-### A Masked Language Model
+### Masked Language Modeling
 :label:`subsec_mlm`
 
 As illustrated in :numref:`sec_language_model`,
@@ -256,8 +256,8 @@ This occasional noise encourages BERT to be less biased towards the masked token
 
 We implement the following `MaskLM` class to predict masked tokens
 in the masked language model task of BERT pretraining.
-The prediction uses a multilayer perceptron with 1 hidden layer (`self.mlp`).
-In forward inference, it takes 2 inputs:
+The prediction uses a MLP with one hidden layer (`self.mlp`).
+In forward inference, it takes two inputs:
 the encoded result of `BERTEncoder` and the token positions for prediction.
 The output is the prediction results at these positions.
 
@@ -315,6 +315,23 @@ mlm_l.shape
 
 ### Next Sentence Prediction
 
+Although masked language modeling is able to encode bidirectional context
+for representing words, it does not explicitly model the logical relationship
+between text pairs.
+To help understand the relationship between two text sequences,
+BERT considers a binary classification task, *next sentence prediction*, in its pretraining.
+When generating sentence pairs for pretraining,
+for half of the time they are indeed consecutive sentences with the label "True";
+while for the other half of the time the second sentence is randomly sampled from the corpus with the label "False".
+
+The following `NextSentencePred` class uses an MLP with one hidden layer
+to predict whether the second sentence is the next sentence of the first
+in the BERT input sequence.
+Due to self-attention in the Transformer encoder,
+the BERT representation of the special token “&lt;cls&gt;”
+encodes both the two sentences from the input.
+Hence, the MLP classifier (`self.mlp`) takes the encoded “&lt;cls&gt;” token as the input.
+
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
 class NextSentencePred(nn.Block):
@@ -331,7 +348,8 @@ class NextSentencePred(nn.Block):
         return self.mlp(X)
 ```
 
-...
+We can see that the forward inference of an `NextSentencePred` instance
+returns binary predictions for each BERT input sequence.
 
 ```{.python .input  n=8}
 nsp = NextSentencePred(num_hiddens)
@@ -340,15 +358,31 @@ nsp_Y_hat = nsp(encoded_X)
 nsp_Y_hat.shape
 ```
 
+The cross-entropy loss of the 2 binary classifications can also be computed.
+
 ```{.python .input  n=9}
 nsp_y = np.array([0, 1])
 nsp_l = loss(nsp_Y_hat, nsp_y)
 nsp_l.shape
 ```
 
+It is noteworthy that all the labels in both the aforementioned pretraining tasks
+can be trivially obtained from the pretraining corpus without manual labeling effort.
+The original BERT has been pretrained on the concatenation of BookCorpus :cite:`Zhu.Kiros.Zemel.ea.2015`
+and English Wikipedia.
+These two text corpora are huge:
+they have 800 million words and 2.5 billion words, respectively.
+
+
 ## Putting All Things Together
 
-highlight unsupervised learning for pretraining.
+When pretraining BERT, the final loss function is a linear combination of
+both the loss functions for masked language modeling and next sentence prediction.
+Now we can define the `BERTModel` class by instantiating the three classes
+`BERTEncoder`, `MaskLM`, and `NextSentencePred`.
+The forward inference returns the encoded BERT representations `encoded_X`,
+predictions of masked language modeling `mlm_Y_hat`,
+and next sentence predictions `nsp_Y_hat`.
 
 ```{.python .input  n=10}
 # Saved in the d2l package for later use
@@ -358,11 +392,10 @@ class BERTModel(nn.Block):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
                                    num_heads, num_layers, dropout, max_len)
-        self.nsp = NextSentencePred(num_hiddens)
         self.mlm = MaskLM(vocab_size, num_hiddens)
+        self.nsp = NextSentencePred(num_hiddens)
 
-    def forward(self, tokens, segments, valid_lens=None,
-                pred_positions=None):
+    def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)
         if pred_positions is not None:
             mlm_Y_hat = self.mlm(encoded_X, pred_positions)
@@ -372,10 +405,21 @@ class BERTModel(nn.Block):
         return encoded_X, mlm_Y_hat, nsp_Y_hat
 ```
 
-...
+## Summary
+
+* Word embedding models such as word2vec and GloVe are context-independent. They assign the same pretrained vector to the same word regardless of the context of the word (if any). It is hard for them to handle well polysemy or complex semantics in natural languages.
+* For context-sensitive word representations such as ELMo and GPT, representations of words depend on their contexts.
+* ELMo encodes context bidirectionally but uses task-specific architectures (however, it is practically non-trivial to craft a specific architecture for every natural language processing task); while GPT is task-agnostic but encodes context left-to-right. 
+* BERT combines the best of both worlds: it encodes context bidirectionally and requires minimal architecture changes for a wide range of natural language processing tasks.
+* The embeddings of the BERT input sequence are the sum of the token embeddings, segment embeddings, and positional embeddings.
+* Pretraining BERT is composed of two tasks: masked language modeling and next sentence prediction. The former is able to encode bidirectional context for representing words, while the later explicitly models the logical relationship between text pairs.
 
 
 ## Exercises
 
 1. All other things being equal, will a masked language model require more or fewer pretraining steps to converge than a left-to-right language model? Why?
 1. In the original implementation of BERT, the position-wise feed-forward network in `BERTEncoder` (via `d2l.EncoderBlock`) and the fully-connected layer in `MaskLM` both use the Gaussian error linear unit (GELU) :cite:`Hendrycks.Gimpel.2016` as the activation function. Research into the difference between GELU and ReLU.
+
+## [Discussions](https://discuss.mxnet.io/t/5867)
+
+![](../img/qr_bert.svg)
