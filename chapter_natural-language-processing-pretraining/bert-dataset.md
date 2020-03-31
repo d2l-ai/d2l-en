@@ -196,6 +196,7 @@ def _pad_bert_inputs(examples, max_len, vocab):
             max_len - len(token_ids)), dtype='int32'))
         all_segments.append(np.array(segments + [0] * (
             max_len - len(segments)), dtype='int32'))
+        # `valid_lens` excludes count of '<pad>' tokens
         valid_lens.append(np.array(len(token_ids)))
         all_pred_positions.append(np.array(pred_positions + [0] * (
             max_num_mlm_preds - len(pred_positions)), dtype='int32'))
@@ -257,6 +258,10 @@ class _WikiTextDataset(gluon.data.Dataset):
         return len(self.all_token_ids)
 ```
 
+By using the `_read_wiki` function and the `_WikiTextDataset` class,
+we define the following `load_data_wiki` to download and WikiText-2 dataset
+and generate pretraining examples from it.
+
 ```{.python .input  n=11}
 # Saved in the d2l package for later use
 def load_data_wiki(batch_size, max_len):
@@ -269,12 +274,15 @@ def load_data_wiki(batch_size, max_len):
     return train_iter, train_set.vocab
 ```
 
-```{.python .input  n=12}
-batch_size, max_len = 512, 64
-train_iter, vocab = load_data_wiki(batch_size, max_len)
-```
+Setting the batch size to 512 and the maximum length of a BERT input sequence to be 64,
+we print out the shapes of a minibatch of BERT pretraining examples.
+Note that in each BERT input sequence,
+$10$ ($64 \times 0.15$) positions are predicted for the masked language modeling task.
 
 ```{.python .input  n=13}
+batch_size, max_len = 512, 64
+train_iter, vocab = load_data_wiki(batch_size, max_len)
+
 for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
      mlm_Y, nsp_y) in train_iter:
     print(tokens_X.shape, segments_X.shape, valid_lens_x.shape,
@@ -284,6 +292,8 @@ for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
 ```
 
 ## Summary
+
+
 
 ## Exercises
 
