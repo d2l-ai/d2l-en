@@ -1724,7 +1724,7 @@ class BERTEncoder(nn.Block):
                                              shape=(1, max_len, num_hiddens))
 
     def forward(self, tokens, segments, valid_lens):
-        # Shape of X remains unchanged in the following code snippet:
+        # Shape of `X` remains unchanged in the following code snippet:
         # (batch size, max sequence length, num_hiddens)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = X + self.pos_embedding.data(ctx=X.ctx)[:, :X.shape[1], :]
@@ -1748,8 +1748,8 @@ class MaskLM(nn.Block):
         pred_positions = pred_positions.reshape(-1)
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
-        # Suppose that batch_size = 2, num_pred_positions = 3, then batch_idx
-        # is np.array([0, 0, 0, 1, 1, 1])
+        # Suppose that `batch_size` = 2, `num_pred_positions` = 3, then
+        # `batch_idx` is np.array([0, 0, 0, 1, 1, 1])
         batch_idx = np.repeat(batch_idx, num_pred_positions)
         masked_X = X[batch_idx, pred_positions]
         masked_X = masked_X.reshape((batch_size, num_pred_positions, -1))
@@ -1768,7 +1768,7 @@ class NextSentencePred(nn.Block):
     def forward(self, X):
         # 0 is the index of the CLS token
         X = X[:, 0, :]
-        # X shape: (batch size, num_hiddens)
+        # X shape: (batch size, `num_hiddens`)
         return self.mlp(X)
 
 
@@ -1814,8 +1814,7 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
         is_next = True
     else:
-        # paragraphs is a list of lists of lists, where a paragraph is a list
-        # of sentences, and a sentence is a list of tokens
+        # paragraphs is a list of lists of lists
         next_sentence = random.choice(random.choice(paragraphs))
         is_next = False
     return sentence, next_sentence, is_next
@@ -1843,7 +1842,7 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
     mlm_input_tokens = [token for token in tokens]
     pred_positions_and_labels = []
     # Shuffle for getting 15% random tokens for prediction in the masked
-    # language model task
+    # language modeling task
     random.shuffle(candidate_pred_positions)
     for mlm_pred_position in candidate_pred_positions:
         if len(pred_positions_and_labels) >= num_mlm_preds:
@@ -1868,13 +1867,14 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def _get_mlm_data_from_tokens(tokens, vocab):
     candidate_pred_positions = []
-    # tokens is a list of strings
+    # `tokens` is a list of strings
     for i, token in enumerate(tokens):
-        # Special tokens are not predicted in the masked language model task
+        # Special tokens are not predicted in the masked language modeling
+        # task
         if token in ['<cls>', '<sep>']:
             continue
         candidate_pred_positions.append(i)
-    # 15% of random tokens will be predicted in the masked language model task
+    # 15% of random tokens are predicted in the masked language modeling task
     num_mlm_preds = max(1, round(len(tokens) * 0.15))
     mlm_input_tokens, pred_positions_and_labels = _replace_mlm_tokens(
         tokens, candidate_pred_positions, num_mlm_preds, vocab)
@@ -1886,26 +1886,27 @@ def _get_mlm_data_from_tokens(tokens, vocab):
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
-def _pad_bert_inputs(instances, max_len, vocab):
+def _pad_bert_inputs(examples, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
     all_token_ids, all_segments, valid_lens,  = [], [], []
     all_pred_positions, all_mlm_weights, all_mlm_labels = [], [], []
     nsp_labels = []
     for (token_ids, pred_positions, mlm_pred_label_ids, segments,
-         is_next) in instances:
+         is_next) in examples:
         all_token_ids.append(np.array(token_ids + [vocab['<pad>']] * (
             max_len - len(token_ids)), dtype='int32'))
         all_segments.append(np.array(segments + [0] * (
             max_len - len(segments)), dtype='int32'))
         valid_lens.append(np.array(len(token_ids)))
         all_pred_positions.append(np.array(pred_positions + [0] * (
-            20 - len(pred_positions)), dtype='int32'))
+            max_num_mlm_preds - len(pred_positions)), dtype='int32'))
         # Predictions of padded tokens will be filtered out in the loss via
         # multiplication of 0 weights
-        all_mlm_weights.append(np.array([1.0] * len(mlm_pred_label_ids) + [
-            0.0] * (20 - len(pred_positions)), dtype='float32'))
+        all_mlm_weights.append(
+            np.array([1.0] * len(mlm_pred_label_ids) + [0.0] * (
+                max_num_mlm_preds - len(pred_positions)), dtype='float32'))
         all_mlm_labels.append(np.array(mlm_pred_label_ids + [0] * (
-            20 - len(mlm_pred_label_ids)), dtype='int32'))
+            max_num_mlm_preds - len(mlm_pred_label_ids)), dtype='int32'))
         nsp_labels.append(np.array(is_next))
     return (all_token_ids, all_segments, valid_lens, all_pred_positions,
             all_mlm_weights, all_mlm_labels, nsp_labels)
@@ -1924,19 +1925,19 @@ class _WikiTextDataset(gluon.data.Dataset):
         self.vocab = d2l.Vocab(sentences, min_freq=5, reserved_tokens=[
             '<pad>', '<mask>', '<cls>', '<sep>'])
         # Get data for the next sentence prediction task
-        instances = []
+        examples = []
         for paragraph in paragraphs:
-            instances.extend(_get_nsp_data_from_paragraph(
+            examples.extend(_get_nsp_data_from_paragraph(
                 paragraph, paragraphs, self.vocab, max_len))
         # Get data for the masked language model task
-        instances = [(_get_mlm_data_from_tokens(tokens, self.vocab)
+        examples = [(_get_mlm_data_from_tokens(tokens, self.vocab)
                       + (segments, is_next))
-                     for tokens, segments, is_next in instances]
+                     for tokens, segments, is_next in examples]
         # Pad inputs
         (self.all_token_ids, self.all_segments, self.valid_lens,
          self.all_pred_positions, self.all_mlm_weights,
          self.all_mlm_labels, self.nsp_labels) = _pad_bert_inputs(
-            instances, max_len, self.vocab)
+            examples, max_len, self.vocab)
 
     def __getitem__(self, idx):
         return (self.all_token_ids[idx], self.all_segments[idx],

@@ -126,6 +126,7 @@
         * DataLoader instance：`train_iter`, `test_iter`, `data_iter`
 * Comments
     * Add period at the end of comments.
+    * For clarity, surround variable names with accents, e.g.,  # shape of `X`
 * imports
     * import alphabetically
     * `from mxnet.gluon import data as gdata, loss as gloss, nn, utils as gutils`

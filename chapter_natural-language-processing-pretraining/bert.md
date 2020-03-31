@@ -197,7 +197,7 @@ class BERTEncoder(nn.Block):
                                              shape=(1, max_len, num_hiddens))
 
     def forward(self, tokens, segments, valid_lens):
-        # Shape of X remains unchanged in the following code snippet:
+        # Shape of `X` remains unchanged in the following code snippet:
         # (batch size, max sequence length, num_hiddens)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = X + self.pos_embedding.data(ctx=X.ctx)[:, :X.shape[1], :]
@@ -294,8 +294,8 @@ class MaskLM(nn.Block):
         pred_positions = pred_positions.reshape(-1)
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
-        # Suppose that batch_size = 2, num_pred_positions = 3, then batch_idx
-        # is np.array([0, 0, 0, 1, 1, 1])
+        # Suppose that `batch_size` = 2, `num_pred_positions` = 3, then
+        # `batch_idx` is np.array([0, 0, 0, 1, 1, 1])
         batch_idx = np.repeat(batch_idx, num_pred_positions)
         masked_X = X[batch_idx, pred_positions]
         masked_X = masked_X.reshape((batch_size, num_pred_positions, -1))
@@ -315,7 +315,7 @@ For each prediction, the size of the result is equal to the vocabulary size.
 ```{.python .input  n=5}
 mlm = MaskLM(vocab_size, num_hiddens)
 mlm.initialize()
-mlm_positions = np.array([[1, 3, 2], [6, 5, 7]])
+mlm_positions = np.array([[1, 5, 2], [6, 1, 5]])
 mlm_Y_hat = mlm(encoded_X, mlm_positions)
 mlm_Y_hat.shape
 ```
@@ -362,7 +362,7 @@ class NextSentencePred(nn.Block):
     def forward(self, X):
         # 0 is the index of the CLS token
         X = X[:, 0, :]
-        # X shape: (batch size, num_hiddens)
+        # X shape: (batch size, `num_hiddens`)
         return self.mlp(X)
 ```
 

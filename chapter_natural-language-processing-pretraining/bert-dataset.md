@@ -34,7 +34,7 @@ To split sentences, we only use the period as the delimiter for simplicity.
 We leave discussions of more complex sentence splitting techniques in the exercises
 at the end of this section.
 
-```{.python .input  n=2}
+```{.python .input  n=3}
 # Saved in the d2l package for later use
 d2l.DATA_HUB['wikitext-2'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/'
@@ -66,7 +66,7 @@ According to descriptions of :label:`subsec_nsp`,
 the `_get_next_sentence` function generates a training example
 for the binary classification task.
 
-```{.python .input  n=3}
+```{.python .input}
 # Saved in the d2l package for later use
 def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
@@ -83,7 +83,7 @@ from the input `paragraph` by invoking the `_get_next_sentence` function.
 Here `paragraph` is a list of sentences, where each sentence is a list of tokens.
 The argument `max_len` specifies the maximum length of a BERT input sequence during pretraining.
 
-```{.python .input  n=4}
+```{.python .input  n=6}
 # Saved in the d2l package for later use
 def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     nsp_data_from_paragraph = []
@@ -101,9 +101,21 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
 ### Generating the Masked Language Modeling Task
 :label:`subsec_prepare_mlm_data`
 
-It follows the procedure described in :numref:`subsec_mlm`.
+In order to generate training examples
+for the masked language modeling task
+from a BERT input sequence,
+we define the following `_replace_mlm_tokens` function.
+In its inputs, `tokens` is a list of tokens representing a BERT input sequence,
+`candidate_pred_positions` is a list of token indices of the BERT input sequence
+excluding those of special tokens (special tokens are not predicted in the masked language modeling task),
+and `num_mlm_preds` indicates the number of predictions (recall 15% random tokens to predict).
+Following the definition of the masked language modeling task in :numref:`subsec_mlm`,
+at each prediction position, the input may be replaced by
+a special “&lt;mask&gt;” token or a random token, or remain unchanged.
+In the end, the function returns the input tokens after possible replacement,
+the token indices where predictions take place and labels for these predictions.
 
-```{.python .input  n=5}
+```{.python .input  n=7}
 # Saved in the d2l package for later use
 def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                         vocab):
@@ -112,7 +124,7 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
     mlm_input_tokens = [token for token in tokens]
     pred_positions_and_labels = []
     # Shuffle for getting 15% random tokens for prediction in the masked
-    # language model task
+    # language modeling task
     random.shuffle(candidate_pred_positions)
     for mlm_pred_position in candidate_pred_positions:
         if len(pred_positions_and_labels) >= num_mlm_preds:
@@ -134,19 +146,25 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
     return mlm_input_tokens, pred_positions_and_labels
 ```
 
-...
+By invoking the aforementioned `_replace_mlm_tokens` function,
+the following function takes a BERT input sequence (`tokens`)
+as an input and returns indices of the input tokens
+(after possible token replacement as described in :numref:`subsec_mlm`),
+the token indices where predictions take place,
+and label indices for these predictions.
 
-```{.python .input  n=6}
+```{.python .input  n=8}
 # Saved in the d2l package for later use
 def _get_mlm_data_from_tokens(tokens, vocab):
     candidate_pred_positions = []
-    # tokens is a list of strings
+    # `tokens` is a list of strings
     for i, token in enumerate(tokens):
-        # Special tokens are not predicted in the masked language model task
+        # Special tokens are not predicted in the masked language modeling
+        # task
         if token in ['<cls>', '<sep>']:
             continue
         candidate_pred_positions.append(i)
-    # 15% of random tokens will be predicted in the masked language model task
+    # 15% of random tokens are predicted in the masked language modeling task
     num_mlm_preds = max(1, round(len(tokens) * 0.15))
     mlm_input_tokens, pred_positions_and_labels = _replace_mlm_tokens(
         tokens, candidate_pred_positions, num_mlm_preds, vocab)
@@ -157,40 +175,51 @@ def _get_mlm_data_from_tokens(tokens, vocab):
     return vocab[mlm_input_tokens], pred_positions, vocab[mlm_pred_labels]
 ```
 
-## Transforming the Raw Corpus into the Pretraining Dataset
+## Transforming Text into the Pretraining Dataset
 
-...
+Now we are almost ready to customize a `Dataset` class for pretraining BERT.
+Before that, 
+we still need to define a helper function `_pad_bert_inputs`
+to append the special “&lt;mask&gt;” tokens to the inputs.
+Its argument `examples` contain the outputs from the helper functions `_get_nsp_data_from_paragraph` and `_get_mlm_data_from_tokens` for the two pretraining tasks.
 
-```{.python .input  n=7}
+```{.python .input  n=9}
 # Saved in the d2l package for later use
-def _pad_bert_inputs(instances, max_len, vocab):
+def _pad_bert_inputs(examples, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
     all_token_ids, all_segments, valid_lens,  = [], [], []
     all_pred_positions, all_mlm_weights, all_mlm_labels = [], [], []
     nsp_labels = []
     for (token_ids, pred_positions, mlm_pred_label_ids, segments,
-         is_next) in instances:
+         is_next) in examples:
         all_token_ids.append(np.array(token_ids + [vocab['<pad>']] * (
             max_len - len(token_ids)), dtype='int32'))
         all_segments.append(np.array(segments + [0] * (
             max_len - len(segments)), dtype='int32'))
         valid_lens.append(np.array(len(token_ids)))
         all_pred_positions.append(np.array(pred_positions + [0] * (
-            20 - len(pred_positions)), dtype='int32'))
+            max_num_mlm_preds - len(pred_positions)), dtype='int32'))
         # Predictions of padded tokens will be filtered out in the loss via
         # multiplication of 0 weights
-        all_mlm_weights.append(np.array([1.0] * len(mlm_pred_label_ids) + [
-            0.0] * (20 - len(pred_positions)), dtype='float32'))
+        all_mlm_weights.append(
+            np.array([1.0] * len(mlm_pred_label_ids) + [0.0] * (
+                max_num_mlm_preds - len(pred_positions)), dtype='float32'))
         all_mlm_labels.append(np.array(mlm_pred_label_ids + [0] * (
-            20 - len(mlm_pred_label_ids)), dtype='int32'))
+            max_num_mlm_preds - len(mlm_pred_label_ids)), dtype='int32'))
         nsp_labels.append(np.array(is_next))
     return (all_token_ids, all_segments, valid_lens, all_pred_positions,
             all_mlm_weights, all_mlm_labels, nsp_labels)
 ```
 
-...
+Putting the helper functions for
+generating training examples of the two pretraining tasks,
+and the helper function for padding inputs together,
+we customize the following `_WikiTextDataset` class as the WikiText-2 dataset for pretraining BERT.
+By implementing the `__getitem__ `function,
+we can arbitrarily access the pretraining (masked language modeling and next sentence prediction) examples 
+generated from a pair of sentences from the WikiText-2 corpus.
 
-```{.python .input  n=8}
+```{.python .input  n=10}
 # Saved in the d2l package for later use
 class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraphs, max_len=128):
@@ -204,19 +233,19 @@ class _WikiTextDataset(gluon.data.Dataset):
         self.vocab = d2l.Vocab(sentences, min_freq=5, reserved_tokens=[
             '<pad>', '<mask>', '<cls>', '<sep>'])
         # Get data for the next sentence prediction task
-        instances = []
+        examples = []
         for paragraph in paragraphs:
-            instances.extend(_get_nsp_data_from_paragraph(
+            examples.extend(_get_nsp_data_from_paragraph(
                 paragraph, paragraphs, self.vocab, max_len))
         # Get data for the masked language model task
-        instances = [(_get_mlm_data_from_tokens(tokens, self.vocab)
+        examples = [(_get_mlm_data_from_tokens(tokens, self.vocab)
                       + (segments, is_next))
-                     for tokens, segments, is_next in instances]
+                     for tokens, segments, is_next in examples]
         # Pad inputs
         (self.all_token_ids, self.all_segments, self.valid_lens,
          self.all_pred_positions, self.all_mlm_weights,
          self.all_mlm_labels, self.nsp_labels) = _pad_bert_inputs(
-            instances, max_len, self.vocab)
+            examples, max_len, self.vocab)
 
     def __getitem__(self, idx):
         return (self.all_token_ids[idx], self.all_segments[idx],
@@ -228,7 +257,7 @@ class _WikiTextDataset(gluon.data.Dataset):
         return len(self.all_token_ids)
 ```
 
-```{.python .input  n=9}
+```{.python .input  n=11}
 # Saved in the d2l package for later use
 def load_data_wiki(batch_size, max_len):
     num_workers = d2l.get_dataloader_workers()
@@ -240,28 +269,18 @@ def load_data_wiki(batch_size, max_len):
     return train_iter, train_set.vocab
 ```
 
-```{.python .input  n=10}
+```{.python .input  n=12}
 batch_size, max_len = 512, 64
 train_iter, vocab = load_data_wiki(batch_size, max_len)
 ```
 
-```{.python .input  n=11}
+```{.python .input  n=13}
 for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
      mlm_Y, nsp_y) in train_iter:
     print(tokens_X.shape, segments_X.shape, valid_lens_x.shape,
           pred_positions_X.shape, mlm_weights_X.shape, mlm_Y.shape,
           nsp_y.shape)
     break
-```
-
-```{.json .output n=11}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(512, 64) (512, 64) (512,) (512, 20) (512, 20) (512, 20) (512,)\n"
- }
-]
 ```
 
 ## Summary
