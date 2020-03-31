@@ -118,7 +118,7 @@ and the gradient of the loss function for each example can also be taken in para
 GPUs allow us to process hundreds of examples in scarcely more time
 than it might take to process just a single example.
 
-To build some intuition, let's read and print
+To build some intuition, let us read and print
 the first small batch of data examples.
 The shape of the features in each minibatch tells us
 both the minibatch size and the number of input features.
@@ -139,8 +139,8 @@ it is inefficient in ways that might get us in trouble on real problems.
 For example, it requires that we load all data in memory
 and that we perform lots of random memory access.
 The built-in iterators implemented in Apache MXNet
-are considerably efficient and they can deal
-both with data stored on file and data fed via a data stream.
+are considerably more efficient and they can deal
+both with data stored in file and data fed via a data stream.
 
 ## Initializing Model Parameters
 

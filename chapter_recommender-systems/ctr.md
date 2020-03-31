@@ -13,6 +13,7 @@ Click-through rate is an important signal that indicates the effectiveness of pr
 from collections import defaultdict
 import d2l
 from mxnet import gluon, np
+import os
 ```
 
 ## An Online Advertising Dataset
@@ -81,7 +82,7 @@ class CTRDataset(gluon.data.Dataset):
 The following example loads the training data and print out the first record.
 
 ```{.python .input  n=16}
-train_data = CTRDataset(data_path=data_dir + "train.csv")
+train_data = CTRDataset(os.path.join(data_dir, 'train.csv'))
 train_data[0]
 ```
 

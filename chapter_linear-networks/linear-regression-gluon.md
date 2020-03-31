@@ -69,7 +69,7 @@ for X, y in data_iter:
 ## Defining the Model
 
 When we implemented linear regression from scratch
-(in :numref`sec_linear_scratch`),
+(in :numref:`sec_linear_scratch`),
 we defined our model parameters explicitly
 and coded up the calculations to produce output
 using basic linear algebra operations.
@@ -174,7 +174,7 @@ we cannot access or manipulate them.
 ## Defining the Loss Function
 
 In Gluon, the `loss` module defines various loss functions.
-We will the imported module `loss` with the pseudonym `gloss`,
+We will use the imported module `loss` with the pseudonym `gloss`,
 to avoid confusing it for the variable
 holding our chosen loss function.
 In this example, we will use the Gluon

@@ -5,7 +5,7 @@ In order to get anything done, we need some way to store and manipulate data.
 Generally, there are two important things we need to do with data: 
 (i) acquire them; and (ii) process them once they are inside the computer. 
 There is no point in acquiring data without some way to store it, 
-so let's get our hands dirty first by playing with synthetic data. 
+so let us get our hands dirty first by playing with synthetic data. 
 To start, we introduce the $n$-dimensional array (`ndarray`), 
 MXNet's primary tool for storing and transforming data.
 In MXNet, `ndarray` is a class and we call any instance "an `ndarray`".
@@ -28,12 +28,12 @@ we are referring to MXNet's `ndarray` unless otherwise stated.
 ## Getting Started
 
 In this section, we aim to get you up and running,
-equipping you with the the basic math and numerical computing tools
+equipping you with the basic math and numerical computing tools
 that you will build on as you progress through the book. 
 Do not worry if you struggle to grok some of 
 the mathematical concepts or library functions. 
 The following sections will revisit this material 
-in the context practical examples and it will sink. 
+in the context of practical examples and it will sink. 
 On the other hand, if you already have some background 
 and want to go deeper into the mathematical content, just skip this section.
 
@@ -139,16 +139,17 @@ Similarly, we can create tensors with each element set to 1 as follows:
 np.ones((2, 3, 4))
 ```
 
-Often, we want to randomly sample the values 
-for each element in an `ndarray` 
-from some probability distribution. 
-For example, when we construct arrays to serve 
+Often, we want to randomly sample the values
+for each element in an `ndarray`
+from some probability distribution.
+For example, when we construct arrays to serve
 as parameters in a neural network, we will
-typically inititialize their values randomly. 
-The following snippet creates an `ndarray` with shape ($3$, $4$). 
-Each of its elements is randomly sampled 
-from a standard Gaussian (normal) distribution 
+typically initialize their values randomly.
+The following snippet creates an `ndarray` with shape ($3$, $4$).
+Each of its elements is randomly sampled
+from a standard Gaussian (normal) distribution
 with a mean of $0$ and a standard deviation of $1$.
+
 
 ```{.python .input  n=10}
 np.random.normal(0, 1, size=(3, 4))
@@ -181,7 +182,7 @@ that maps from a scalar to a scalar.
 In mathematical notation, we would denote such
 a *unary* scalar operator (taking one input)
 by the signature $f: \mathbb{R} \rightarrow \mathbb{R}$.
-This just mean that the function is mapping
+This just means that the function is mapping
 from any real number ($\mathbb{R}$) onto another.
 Likewise, we denote a *binary* scalar operator
 (taking two real inputs, and yielding one output)
@@ -258,7 +259,7 @@ Summing all the elements in the `ndarray` yields an `ndarray` with only one elem
 x.sum()
 ```
 
-For stylistic convenience, we can write `x.sum()`as `np.sum(x)`.
+For stylistic convenience, we can write `x.sum()` as `np.sum(x)`.
 
 ## Broadcasting Mechanism
 
@@ -266,7 +267,7 @@ In the above section, we saw how to perform elementwise operations
 on two `ndarray`s of the same shape. Under certain conditions, 
 even when shapes differ, we can still perform elementwise operations
 by invoking the *broadcasting mechanism*.
-These mechanisms work in the following way:
+This mechanism works in the following way:
 First, expand one or both arrays
 by copying elements appropriately 
 so that after this transformation, 

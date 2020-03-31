@@ -53,8 +53,9 @@ we might reasonably imagine that holding all else equal,
 an applicant with a higher income
 would always be more likely to repay 
 than one with a lower income.
-While monotonic this relationship likely 
-A increase in income from $0 to $50k 
+While monotonic, this relationship likely
+is not linearly associated with the probability of 
+repayment. An increase in income from $0 to $50k 
 likely corresponds to a bigger increase 
 in likelihood of repayment 
 than an increase from $1M to $1.05M.
@@ -90,9 +91,9 @@ This approach is doomed to fail in a world
 where inverting an image preserves the category.
 
 
-And yet despite the apparent aburdity of linearity here,
+And yet despite the apparent absurdity of linearity here,
 as compared to our previous examples, 
-it's less obvious that we could address the problem
+it is less obvious that we could address the problem
 with a simple preprocessing fix. 
 That is because the significance of any pixel
 depends in complex ways on its context 
@@ -109,7 +110,7 @@ and a linear predictor that acts upon that representation.
 
 ### Incorporating Hidden Layers
 
-We can over come these limitations of linear models
+We can overcome these limitations of linear models
 and handle a more general class of functions
 by incorporating one or more hidden layers.
 The easiest way to do this is to stack
@@ -141,7 +142,7 @@ every neuron in the output layer.
 
 ### From Linear to Nonlinear
 
-Formally, we calculate the each layer 
+Formally, we calculate each layer 
 in this one-hidden-layer MLP as follows:
 $$
 \begin{aligned}
@@ -211,10 +212,10 @@ to perform arbitrary computation,
 for instance, basic logic operations on a pair of inputs.
 Moreover, for certain choices of the activation function,
 it is widely known that MLPs are universal approximators.
-Even a single-hidden-layer network,
-given enough nodes (possibly absurdly manby), 
+Even with a single-hidden-layer network,
+given enough nodes (possibly absurdly many), 
 and the right set of weights,
-we can model any function at all.
+we can model any function.
 *Actually learning that function is the hard part.*
 You might think of your neural network 
 as being a bit like the C programming language. 
@@ -230,8 +231,8 @@ to solve all of your problems
 with single-layer networks.
 In fact, we can approximate many functions
 much more compactly by using deeper (vs wider) networks.
-We'll touch upon more rigorous arguments in subsequent chapters,
-but first let's actually build an MLP in code.
+We will touch upon more rigorous arguments in subsequent chapters,
+but first let us actually build an MLP in code.
 In this example, we’ll implement an MLP
 with two hidden layers and one output layer.
 
@@ -274,8 +275,12 @@ npx.set_np()
 
 ## Activation Functions
 
-Because they are so fundamental to deep learning, 
-let briefly survey some common activation functions.
+Activation functions decide whether a neuron should be activated or not by 
+calculating the weighted sum and further adding bias with it. 
+They are differentiable operators to transform input signals to outputs, 
+while most of them add non-linearity.
+Because activation functions are fundamental to deep learning, 
+let us briefly survey some common activation functions.
 
 ### ReLU Function
 
@@ -283,7 +288,7 @@ As stated above, the most popular choice,
 due to both simplicity of implementation
 its performance on a variety of predictive tasks 
 is the rectified linear unit (ReLU).
-ReLUs provide a very simple nonlinear transformation.
+ReLU provides a very simple nonlinear transformation.
 Given the element $z$, the function is defined
 as the maximum of that element and 0.
 
@@ -293,7 +298,7 @@ Informally, the ReLU function retains only positive
 elements and discards all negative elements 
 (setting the corresponding activations to 0).
 To gain some intuition, we can plot the function.
-Because it is used so commonly, NDarray 
+Because it is used so commonly, `ndarray` 
 supports the `relu` function as a native operator.
 As you can see, the activation function is piecewise linear.
 
@@ -321,7 +326,7 @@ we are probably doing (*real*) mathematics, not engineering.
 That conventional wisdom may apply here.
 We plot the derivative of the ReLU function plotted below.
 
-```{.python .input  n=3}
+```{.python .input  n=9}
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of relu')
 ```
@@ -338,15 +343,15 @@ The reason for using the ReLU is that
 its derivatives are particularly well behaved: 
 either they vanish or they just let the argument through. 
 This makes optimization better behaved 
-and it mitigated well-documented problem 
+and it mitigated the well-documented problem 
 of *vanishing gradients* that plagued
 previous versions of neural networks (more on this later).
 
 ### Sigmoid Function
 
 The sigmoid function transforms its inputs,
-which values in the domain $\mathbb{R}$,
-to outputs that lie the interval $(0, 1)$.
+which values lie in the domain $\mathbb{R}$,
+to outputs that lie on the interval $(0, 1)$.
 For that reason, the sigmoid is 
 often called a *squashing* function:
 it *squashes* any input in the range (-inf, inf)
@@ -406,7 +411,7 @@ reaches a maximum of 0.25.
 As the input diverges from 0 in either direction, 
 the derivative approaches 0.
 
-```{.python .input  n=5}
+```{.python .input  n=11}
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of sigmoid')
 ```
@@ -421,7 +426,7 @@ $$\text{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
 We plot the tanh function blow. Note that as the input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system.
 
-```{.python .input  n=6}
+```{.python .input  n=12}
 with autograd.record():
     y = np.tanh(x)
 d2l.plot(x, y, 'x', 'tanh(x)')
@@ -438,7 +443,7 @@ And as we saw with the sigmoid function,
 as the input moves away from 0 in either direction,
 the derivative of the tanh function approaches 0.
 
-```{.python .input  n=7}
+```{.python .input  n=13}
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of tanh')
 ```

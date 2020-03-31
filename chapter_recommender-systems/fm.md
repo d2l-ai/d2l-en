@@ -36,6 +36,7 @@ To learn the FM model, we can use the MSE loss for regression task, the cross en
 import d2l
 from mxnet import init, gluon, np, npx
 from mxnet.gluon import nn
+import os
 import sys
 npx.set_np()
 ```
@@ -47,10 +48,10 @@ The following code implement the factorization machines. It is clear to see that
 class FM(nn.Block):
     def __init__(self, field_dims, num_factors):
         super(FM, self).__init__()
-        input_size = int(sum(field_dims))
-        self.embedding = nn.Embedding(input_size, num_factors)
-        self.fc = nn.Embedding(input_size, 1)
-        self.linear_layer = gluon.nn.Dense(1, use_bias=True)
+        num_inputs = int(sum(field_dims))
+        self.embedding = nn.Embedding(num_inputs, num_factors)
+        self.fc = nn.Embedding(num_inputs, 1)
+        self.linear_layer = nn.Dense(1, use_bias=True)
         
     def forward(self, x):
         square_of_sum = np.sum(self.embedding(x), axis=1) ** 2
@@ -67,16 +68,16 @@ We use the CTR data wrapper from the last section to load the online advertising
 ```{.python .input  n=3}
 batch_size = 2048
 data_dir = d2l.download_extract('ctr')
-train_data = d2l.CTRDataset(data_dir + "train.csv")
-test_data = d2l.CTRDataset(data_dir + "test.csv",
+train_data = d2l.CTRDataset(os.path.join(data_dir, 'train.csv'))
+test_data = d2l.CTRDataset(os.path.join(data_dir, 'test.csv'),
                            feat_mapper=train_data.feat_mapper,
                            defaults=train_data.defaults)
-num_workers = 0 if sys.platform.startswith("win") else 4
+num_workers = 0 if sys.platform.startswith('win') else 4
 train_iter = gluon.data.DataLoader(
-    train_data, shuffle=True, last_batch="rollover", batch_size=batch_size,
+    train_data, shuffle=True, last_batch='rollover', batch_size=batch_size,
     num_workers=num_workers)
 test_iter = gluon.data.DataLoader(
-    test_data, shuffle=False, last_batch="rollover", batch_size=batch_size,
+    test_data, shuffle=False, last_batch='rollover', batch_size=batch_size,
     num_workers=num_workers)
 ```
 

@@ -21,7 +21,7 @@ class Encoder(nn.Block):
     def __init__(self, **kwargs):
         super(Encoder, self).__init__(**kwargs)
 
-    def forward(self, X):
+    def forward(self, X, *args):
         raise NotImplementedError
 ```
 
@@ -45,7 +45,7 @@ class Decoder(nn.Block):
 
 ## Model
 
-The encoder-decoder model contains both an encoder and an decoder. We implement its forward method for training. It takes both encoder inputs and decoder inputs, with optional additional arguments. During computation, it first compute encoder outputs to initialize the decoder state, and then returns the decoder outputs.
+The encoder-decoder model contains both an encoder and a decoder. We implement its forward method for training. It takes both encoder inputs and decoder inputs, with optional additional arguments. During computation, it first computes encoder outputs to initialize the decoder state, and then returns the decoder outputs.
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
@@ -65,7 +65,7 @@ class EncoderDecoder(nn.Block):
 ## Summary
 
 * An encoder-decoder architecture is a neural network design pattern mainly in natural language processing.
-* An encoder is a network (FC, CNN, RNN, etc.) that takes the input, and output a feature map, a vector or a tensor.
+* An encoder is a network (FC, CNN, RNN, etc.) that takes the input, and outputs a feature map, a vector or a tensor.
 * An decoder is a network (usually the same network structure as encoder) that takes the feature vector from the encoder, and gives the best closest match to the actual input or intended output.
 
 
@@ -76,6 +76,6 @@ class EncoderDecoder(nn.Block):
 
 
 
-## [Discussions](https://discuss.mxnet.io/t/2396)
+## [Discussions](https://discuss.mxnet.io/t/2393)
 
 ![](../img/qr_encoder-decoder.svg)

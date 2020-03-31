@@ -35,7 +35,7 @@ and playing a growing role in basic sciences---from astrophysics to biology.
 ## About This Book
 
 This book represents our attempt to make deep learning approachable,
-teaching you both the *concepts*, the *context*, and the *code*.
+teaching you the *concepts*, the *context*, and the *code*.
 
 ### One Medium Combining Code, Math, and HTML
 
@@ -103,13 +103,13 @@ Moreover, too many resources are hidden behind the paywalls
 of commercial course providers.
 
 We set out to create a resource that could
-(1) be freely available for everyone;
-(2) offer sufficient technical depth to provide a starting point on the path
+(i) be freely available for everyone;
+(ii) offer sufficient technical depth to provide a starting point on the path
 to actually becoming an applied machine learning scientist;
-(3) include runnable code, showing readers *how* to solve problems in practice;
-(4) that allowed for rapid updates, both by us
+(iii) include runnable code, showing readers *how* to solve problems in practice;
+(iv) allow for rapid updates, both by us
 and also by the community at large;
-and (5) be complemented by a [forum](http://discuss.mxnet.io)
+and (v) be complemented by a [forum](http://discuss.mxnet.io)
 for interactive discussion of technical details and to answer questions.
 
 These goals were often in conflict.
@@ -118,7 +118,7 @@ Code is best described in Python.
 And webpages are native in HTML and JavaScript.
 Furthermore, we want the content to be
 accessible both as executable code, as a physical book,
-as a downloadable PDF, and on the internet as a website.
+as a downloadable PDF, and on the Internet as a website.
 At present there exist no tools and no workflow
 perfectly suited to these demands, so we had to assemble our own.
 We describe our approach in detail in :numref:`sec_how_to_contribute`.
@@ -235,10 +235,12 @@ we discuss several common optimization algorithms
 used to train deep learning models.
 The next chapter, :numref:`chap_performance` examines several key factors
 that influence the computational performance of your deep learning code.
-In :numref:`chap_cv` and :numref:`chap_nlp`, we illustrate
-major applications of deep learning in computer vision
-and natural language processing, respectively.
-
+In :numref:`chap_cv`,
+we illustrate
+major applications of deep learning in computer vision.
+In :numref:`chap_nlp_pretrain` and :numref:`chap_nlp_app`,
+we show how to pretrain language representation models and apply
+them to natural language processing tasks.
 
 
 ### Code
@@ -351,7 +353,7 @@ cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu,
 Rahul Agarwal, Mohamed Ali Jamaoui, Michael (Stu) Stewart, Mike Müller,
 NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki,
 topecongiro, tpdi, vermicelli, Vishaal Kapoor, Vishwesh Ravi Shrimali, YaYaB, Yuhong Chen,
-Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, Ha Nguyen, pmuens,
+Evgeniy Smirnov, lgov, Simon Corston-Oliver, Igor Dzreyev, Ha Nguyen, pmuens,
 alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta,
 uwsd, DomKM, Lisa Oakley, Bowen Li, Aarush Ahuja, Prasanth Buddareddygari, brianhendee,
 mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya,
@@ -361,7 +363,9 @@ Maximilian Böther, Rakib Islam, Leonard Lausen, Abhinav Upadhyay, rongruosong,
 Steve Sedlmeyer, ruslo, Rafael Schlatter, liusy182, Giannis Pappas, ruslo,
 ati-ozgur, qbaza, dchoi77, Adam Gerson, Phuc Le, Mark Atwood, christabella, vn09,
 Haibin Lin, jjangga0214, RichyChen, noelo, hansent, Giel Dops, dvincent1337, WhiteD3vil,
-Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk.
+Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk, heytitle, Peter Goetz, rigtorp,
+tiepvupsu, sfilip, mlxd, KaleabTessera, Sanjar Adilov, MatteoFerrara, hsneto,
+Katarzyna Biesialska, Gregory Bruss, duythanhvn, paulaurel, graytowne, minhduc0711.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.

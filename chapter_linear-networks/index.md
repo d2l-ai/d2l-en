@@ -10,7 +10,8 @@ linear-regression
 linear-regression-scratch
 linear-regression-gluon
 softmax-regression
-fashion-mnist
+image-classification-dataset
 softmax-regression-scratch
 softmax-regression-gluon
 ```
+

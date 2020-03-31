@@ -18,7 +18,7 @@ rcnn
 ssd
 rcnn
 semantic-segmentation-and-dataset
-tranposed-conv
+transposed-conv
 fcn
 neural-style
 kaggle-gluon-cifar10

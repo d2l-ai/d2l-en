@@ -26,8 +26,7 @@ for the purpose of recognizing handwritten digits in images—[LeNet5](http://ya
 In the 90s, their experiments with LeNet gave the first compelling evidence
 that it was possible to train convolutional neural networks
 by backpropagation.
-Their model achieved outstanding results at the time
-(only matched by Support Vector Machines at the time)
+Their model achieved outstanding results (only matched by Support Vector Machines at the time)
 and was adopted to recognize digits for processing deposits in ATM machines.
 Some ATMs still run the code
 that Yann and his colleague Leon Bottou wrote in the 1990s!
@@ -37,9 +36,9 @@ that Yann and his colleague Leon Bottou wrote in the 1990s!
 In a rough sense, we can think LeNet as consisting of two parts:
 (i) a block of convolutional layers; and
 (ii) a block of fully-connected layers.
-Before getting into the weeds, let's briefly review the model in :numref:`img_lenet`.
+Before getting into the weeds, let us briefly review the model in :numref:`img_lenet`.
 
-![Data flow in LeNet 5. The input is a handwritten digit, the output a probabilitiy over 10 possible outcomes.](../img/lenet.svg)
+![Data flow in LeNet 5. The input is a handwritten digit, the output a probability over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
 
 The basic units in the convolutional block are a convolutional layer
@@ -120,7 +119,7 @@ significantly more convenient to train.
 Other than that, this network matches
 the historical definition of LeNet5.
 
-Next, let's take a look of an example.
+Next, let us take a look of an example.
 As shown in :numref:`img_lenet_vert`, we feed 
 a single-channel example
 of size $28 \times 28$ into the network
@@ -139,11 +138,12 @@ for layer in net:
 Note that the height and width of the representation
 at each layer throughout the convolutional block is reduced
 (compared to the previous layer).
-The convolutional layer uses a kernel
-with a height and width of 5,
-which with only $2$ pixels of padding in the first convolutional layer
-and none in the second convolutional layer
-leads to reductions in both height and width by 2 and 4 pixels, respectively.
+The first convolutional layer uses a kernel
+with a height and width of $5$, and then a $2$ pixels of padding 
+which compensates the reduction in its original shape.
+While the second convolutional layer applies the same shape of 
+$5 x 5$ kernel without padding, resulting in reductions 
+in both height and width by $4$ pixels.
 Moreover each pooling layer halves the height and width.
 However, as we go up the stack of layers,
 the number of channels increases layer-over-layer
@@ -185,7 +185,7 @@ to the `evaluate_accuracy` function that we described
 in :numref:`sec_softmax_scratch`.
 Since the full dataset lives on the CPU,
 we need to copy it to the GPU before we can compute our models.
-This is accomplished via the `as_in_context` function
+This is accomplished via the `as_in_ctx` function
 described in :numref:`sec_use_gpu`.
 
 ```{.python .input}
@@ -195,7 +195,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
         ctx = list(net.collect_params().values())[0].list_ctx()[0]
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+        X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
         metric.add(d2l.accuracy(net(X), y), y.size)
     return metric[0]/metric[1]
 ```
@@ -204,7 +204,7 @@ We also need to update our training function to deal with GPUs.
 Unlike the `train_epoch_ch3` defined in :numref:`sec_softmax_scratch`, we now need to move each batch of data to our designated context (hopefully, the GPU)
 prior to making the forward and backward passes.
 
-The training function `train_ch5` is also very similar to `train_ch3` defined in :numref:`sec_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. We initialize the model parameters on the device indicated by `ctx`,
+The training function `train_ch6` is also very similar to `train_ch3` defined in :numref:`sec_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. We initialize the model parameters on the device indicated by `ctx`,
 this time using the Xavier initializer.
 The loss function and the training algorithm
 still use the cross-entropy loss function
@@ -213,7 +213,7 @@ seconds to run, we visualize the training loss in a finer granularity.
 
 ```{.python .input}
 # Saved in the d2l package for later use
-def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
+def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
@@ -226,7 +226,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         for i, (X, y) in enumerate(train_iter):
             timer.start()
             # Here is the only difference compared to train_epoch_ch3
-            X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+            X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
             with autograd.record():
                 y_hat = net(X)
                 l = loss(y_hat, y)
@@ -245,11 +245,11 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     print('%.1f examples/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
 ```
 
-Now let's train the model.
+Now let us train the model.
 
 ```{.python .input}
 lr, num_epochs = 0.9, 10
-train_ch5(net, train_iter, test_iter, num_epochs, lr)
+train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary

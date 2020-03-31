@@ -2,7 +2,7 @@
 
 In previous sections, we abstract the recommendation task as a matrix completion problem without considering users' short-term behaviors. In this section, we will introduce a recommendation model that takes  the sequentially-ordered user interaction logs into account.  It is a sequence-aware recommender :cite:`Quadrana.Cremonesi.Jannach.2018` where the input is an ordered and often timestamped list of past user actions.  A number of recent literatures have demonstrated the usefulness of incorporating such information in modeling users' temporal behavioral patterns and discovering their interest drift.  
 
-The model we will introduce, Caser :cite:`Sedhain.Menon.Sanner.ea.2015`, short for convolutional sequence embedding recommendation model, adopts convolutional neural networks capture the dynamic pattern influences of users' recent activities. The main component of Caser consists of a horizontal convolutional network and a vertical convolutional network, aiming to uncover the union-level and point-level sequence patterns, respectively.  Point-level pattern indicates the impact of single item in the historical sequence on the target item, while union level pattern implies the influences of several previous actions on the subsequent target. For example, buying both milk and butter together leads to higher probability of buying flour than just buying one of them. Moreover, users' general interests, or long term preferences are also modeled in the last fully-connected layers, resulting in a more comprehensive modeling of user interests. Details of the model are described as follows.
+The model we will introduce, Caser :cite:`Tang.Wang.2018`, short for convolutional sequence embedding recommendation model, adopts convolutional neural networks capture the dynamic pattern influences of users' recent activities. The main component of Caser consists of a horizontal convolutional network and a vertical convolutional network, aiming to uncover the union-level and point-level sequence patterns, respectively.  Point-level pattern indicates the impact of single item in the historical sequence on the target item, while union level pattern implies the influences of several previous actions on the subsequent target. For example, buying both milk and butter together leads to higher probability of buying flour than just buying one of them. Moreover, users' general interests, or long term preferences are also modeled in the last fully-connected layers, resulting in a more comprehensive modeling of user interests. Details of the model are described as follows.
 
 ## Model Architectures
 
@@ -155,10 +155,11 @@ class SeqDataset(gluon.data.Dataset):
     def __len__(self):
         return self.ns
     
-    def __getitem__(self, i):
-        neg = list(self.all_items - set(self.cand[int(self.seq_users[i])]))
-        idx = random.randint(0, len(neg) - 1)
-        return self.seq_users[i], self.seq_items[i], self.seq_tgt[i], neg[idx]
+    def __getitem__(self, idx):
+        neg = list(self.all_items - set(self.cand[int(self.seq_users[idx])]))
+        i = random.randint(0, len(neg) - 1)
+        return (self.seq_users[idx], self.seq_items[idx], self.seq_tgt[idx],
+                neg[i])
 ```
 
 ## Load the MovieLens 100K dataset
@@ -187,7 +188,7 @@ train_seq_data[0]
 The training data structure is shown above. The first element is the user identity, the next list indicates the last five items this user liked, and the last element is the item this user liked after the five items.
 
 ## Train the Model
-Now, let's train the model. We use the same setting as NeuMF, including learning rate, optimizer, and $k$, in the last section so that the results are comparable.
+Now, let us train the model. We use the same setting as NeuMF, including learning rate, optimizer, and $k$, in the last section so that the results are comparable.
 
 ```{.python .input  n=7}
 ctx = d2l.try_all_gpus()

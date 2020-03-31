@@ -14,7 +14,7 @@ to routinely train networks with over 100 layers.
 
 ## Training Deep Networks
 
-To motivate batch normalization, let's review 
+To motivate batch normalization, let us review 
 a few practical challenges that arise 
 when training ML models and neural nets in particular.
 
@@ -294,9 +294,9 @@ class BatchNorm(nn.Block):
     def forward(self, X):
         # If X is not on the CPU, copy moving_mean and moving_var to the
         # device where X is located
-        if self.moving_mean.context != X.context:
-            self.moving_mean = self.moving_mean.copyto(X.context)
-            self.moving_var = self.moving_var.copyto(X.context)
+        if self.moving_mean.ctx != X.ctx:
+            self.moving_mean = self.moving_mean.copyto(X.ctx)
+            self.moving_var = self.moving_var.copyto(X.ctx)
         # Save the updated moving_mean and moving_var
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma.data(), self.beta.data(), self.moving_mean,
@@ -338,10 +338,10 @@ The main difference is the considerably larger learning rate.
 ```{.python .input  n=77}
 lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-Let's have a look at the scale parameter `gamma`
+Let us have a look at the scale parameter `gamma`
 and the shift parameter `beta` learned
 from the first batch normalization layer.
 
@@ -385,7 +385,7 @@ because its code has been compiled to C++/CUDA
 while our custom implementation must be interpreted by Python.
 
 ```{.python .input}
-d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Controversy

@@ -1,7 +1,7 @@
 # Concise Implementation for Multiple GPUs
 :label:`sec_multi_gpu_gluon`
 
-Implementing parallelism from scratch for every new model is no fun. Moreover, there's significant benefit in optimizing synchronization tools for high performance. In the following we'll show how to do this using Gluon. The math and the algorithms are the same as in :numref:`sec_multi_gpu`. As before we begin by importing the required modules (quite unsurprisingly you'll need at least two GPUs to run this notebook).
+Implementing parallelism from scratch for every new model is no fun. Moreover, there is significant benefit in optimizing synchronization tools for high performance. In the following we will show how to do this using Gluon. The math and the algorithms are the same as in :numref:`sec_multi_gpu`. As before we begin by importing the required modules (quite unsurprisingly you will need at least two GPUs to run this notebook).
 
 ```{.python .input  n=1}
 import d2l
@@ -12,7 +12,7 @@ npx.set_np()
 
 ## A Toy Network
 
-Let's use a slightly more meaningful network than LeNet from the previous section that's still sufficiently easy and quick to train. We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference to :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning. Moreover, we remove the max-pooling layer.
+Let us use a slightly more meaningful network than LeNet from the previous section that's still sufficiently easy and quick to train. We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference to :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning. Moreover, we remove the max-pooling layer.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
@@ -43,7 +43,7 @@ def resnet18(num_classes):
 
 ## Parameter Initialization and Logistics
 
-The `initialize` method allows us to set initial defaults for parameters on a device of our choice. For a refresher see :numref:`sec_numerical_stability`. What is particularly convenient is that it also lets us initialize the network on *multiple* devices simultaneously. Let's try how this works in practice.
+The `initialize` method allows us to set initial defaults for parameters on a device of our choice. For a refresher see :numref:`sec_numerical_stability`. What is particularly convenient is that it also lets us initialize the network on *multiple* devices simultaneously. Let us try how this works in practice.
 
 ```{.python .input  n=3}
 net = resnet18(10)
@@ -57,11 +57,11 @@ Using the `split_and_load` function introduced in the previous section we can di
 
 ```{.python .input  n=4}
 x = np.random.uniform(size=(4, 1, 28, 28))
-gpu_x = gluon.utils.split_and_load(x, ctx)
-net(gpu_x[0]), net(gpu_x[1])
+x_shards = gluon.utils.split_and_load(x, ctx)
+net(x_shards[0]), net(x_shards[1])
 ```
 
-Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*. This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters don't even exist on the device. We can verify this by printing out the parameters and observing any errors that might arise.
+Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*. This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters do not even exist on the device. We can verify this by printing out the parameters and observing any errors that might arise.
 
 ```{.python .input  n=5}
 weight = net[0].params.get('weight')
@@ -73,7 +73,7 @@ except RuntimeError:
 weight.data(ctx[0])[0], weight.data(ctx[1])[0]
 ```
 
-Lastly let's replace the code to evaluate the accuracy by one that works in parallel across multiple devices. This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a batch before invoking the network. All else is essentially identical.
+Lastly let us replace the code to evaluate the accuracy by one that works in parallel across multiple devices. This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a batch before invoking the network. All else is essentially identical.
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
@@ -82,11 +82,13 @@ def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     ctx = list(net.collect_params().values())[0].list_ctx()
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
-        Xs, ys = split_f(features, labels, ctx)
-        pys = [net(X) for X in Xs]  # Run in parallel
-        metric.add(sum(float(d2l.accuracy(py, y)) for py, y in zip(pys, ys)),
-                   labels.size)
-    return metric[0]/metric[1]
+        X_shards, y_shards = split_f(features, labels, ctx)
+        # Run in parallel
+        pred_shards = [net(X_shard) for X_shard in X_shards]
+        metric.add(sum(float(d2l.accuracy(pred_shard, y_shard)) for
+                       pred_shard, y_shard in zip(
+                           pred_shards, y_shards)), labels.size)
+    return metric[0] / metric[1]
 ```
 
 ## Training
@@ -105,29 +107,31 @@ def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     ctx = [d2l.try_gpu(i) for i in range(num_gpus)]
     net.initialize(init=init.Normal(sigma=0.01), ctx=ctx, force_reinit=True)
-    trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
+    trainer = gluon.Trainer(net.collect_params(), 'sgd',
+                            {'learning_rate': lr})
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     timer, num_epochs = d2l.Timer(), 10
     animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])
     for epoch in range(num_epochs):
         timer.start()
         for features, labels in train_iter:
-            Xs, ys = d2l.split_batch(features, labels, ctx)
+            X_shards, y_shards = d2l.split_batch(features, labels, ctx)
             with autograd.record():
-                losses = [loss(net(X), y) for X, y in zip(Xs, ys)]
+                losses = [loss(net(X_shard), y_shard) for X_shard, y_shard
+                          in zip(X_shards, y_shards)]
             for l in losses:
                 l.backward()
             trainer.step(batch_size)
         npx.waitall()
         timer.stop()
-        animator.add(epoch+1, (evaluate_accuracy_gpus(net, test_iter),))
+        animator.add(epoch + 1, (evaluate_accuracy_gpus(net, test_iter),))
     print('test acc: %.2f, %.1f sec/epoch on %s' % (
         animator.Y[0][-1], timer.avg(), ctx))
 ```
 
 ## Experiments
 
-Let's see how this works in practice. As a warmup we train the network on a single GPU.
+Let us see how this works in practice. As a warmup we train the network on a single GPU.
 
 ```{.python .input  n=8}
 train(num_gpus=1, batch_size=256, lr=0.1)

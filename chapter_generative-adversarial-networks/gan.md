@@ -40,7 +40,7 @@ $$min_D max_G \{ -E_{x \sim \text{Data}} log D(\mathbf x) - E_{z \sim \text{Nois
 
 
 
-Many of the GANs applications are in the context of images. As a demonstration purpose, we are going to content ourselves with fitting a much simpler distribution first. We will illustrate what happens if we use GANs to build the world's most inefficient estimator of parameters for a Gaussian. Let's get started.
+Many of the GANs applications are in the context of images. As a demonstration purpose, we are going to content ourselves with fitting a much simpler distribution first. We will illustrate what happens if we use GANs to build the world's most inefficient estimator of parameters for a Gaussian. Let us get started.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -61,7 +61,7 @@ b = np.array([1, 2])
 data = X.dot(A) + b
 ```
 
-Let's see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
+Let us see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
 
 ```{.python .input  n=3}
 d2l.set_figsize((3.5, 2.5))
@@ -103,8 +103,8 @@ First we define a function to update the discriminator.
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
     batch_size = X.shape[0]
-    ones = np.ones((batch_size,), ctx=X.context)
-    zeros = np.zeros((batch_size,), ctx=X.context)
+    ones = np.ones((batch_size,), ctx=X.ctx)
+    zeros = np.zeros((batch_size,), ctx=X.ctx)
     with autograd.record():
         real_Y = net_D(X)
         fake_X = net_G(Z)
@@ -124,7 +124,7 @@ The generator is updated similarly. Here we reuse the cross-entropy loss but cha
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     """Update generator."""
     batch_size = Z.shape[0]
-    ones = np.ones((batch_size,), ctx=Z.context)
+    ones = np.ones((batch_size,), ctx=Z.ctx)
     with autograd.record():
         # We could reuse fake_X from update_D to save computation.
         fake_X = net_G(Z)

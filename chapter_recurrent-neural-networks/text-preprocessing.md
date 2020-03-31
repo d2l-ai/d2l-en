@@ -4,9 +4,9 @@
 Text is an important example of sequence data. An article can be simply viewed as a sequence of words, or a sequence of characters. Given text data is a major data format besides images we are using in this book, this section will dedicate to explain the common preprocessing steps for text data. Such preprocessing often consists of four steps:
 
 1. Load text as strings into memory.
-1. Split strings into tokens, where a token could be a word or a character. 
-1. Build a vocabulary for these tokens to map them into numerical indices. 
-1. Map all the tokens in data into indices for ease of feeding into models. 
+1. Split strings into tokens, where a token could be a word or a character.
+1. Build a vocabulary for these tokens to map them into numerical indices.
+1. Map all the tokens in data into indices for ease of feeding into models.
 
 
 ## Reading the Dataset
@@ -56,12 +56,14 @@ tokens[0:2]
 
 ## Vocabulary
 
-The string type of the token is inconvenient to be used by models, which take numerical inputs. Now let's build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0. To do so, we first count the unique tokens in all documents, called *corpus*, and then assign a numerical index to each unique token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token does not exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add a list of reserved tokens, such as “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
+The string type of the token is inconvenient to be used by models, which take numerical inputs. Now let us build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0. To do so, we first count the unique tokens in all documents, called *corpus*, and then assign a numerical index to each unique token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token does not exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add a list of reserved tokens, such as “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
-class Vocab(object):
-    def __init__(self, tokens, min_freq=0, reserved_tokens=[]):
+class Vocab:
+    def __init__(self, tokens, min_freq=0, reserved_tokens=None):
+        if reserved_tokens is None:
+            reserved_tokens = []
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
@@ -135,7 +137,7 @@ len(corpus), len(vocab)
 
 ## Exercises
 
-1. Tokenization is a key preprocessing step. It varies for different languages. Try to find another 3 commonly used methods to tokenize sentences. 
+1. Tokenization is a key preprocessing step. It varies for different languages. Try to find another 3 commonly used methods to tokenize sentences.
 
 ## [Discussions](https://discuss.mxnet.io/t/2363)
 

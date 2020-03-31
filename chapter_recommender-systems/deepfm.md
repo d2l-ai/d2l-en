@@ -36,6 +36,7 @@ It is worth noting that DeepFM is not the only way to combine deep neural networ
 import d2l
 from mxnet import init, gluon, np, npx
 from mxnet.gluon import nn
+import os
 import sys
 npx.set_np()
 ```
@@ -47,10 +48,10 @@ The implementation of DeepFM is similar to that of FM. We keep the FM part uncha
 class DeepFM(nn.Block):
     def __init__(self, field_dims, num_factors, mlp_dims, drop_rate=0.1):
         super(DeepFM, self).__init__()
-        input_size = int(sum(field_dims))
-        self.embedding = nn.Embedding(input_size, num_factors)
-        self.fc = nn.Embedding(input_size, 1)
-        self.linear_layer = gluon.nn.Dense(1, use_bias=True)
+        num_inputs = int(sum(field_dims))
+        self.embedding = nn.Embedding(num_inputs, num_factors)
+        self.fc = nn.Embedding(num_inputs, 1)
+        self.linear_layer = nn.Dense(1, use_bias=True)
         input_dim = self.embed_output_dim = len(field_dims) * num_factors
         self.mlp = nn.Sequential()
         for dim in mlp_dims:
@@ -77,18 +78,18 @@ The data loading process is the same as that of FM. We set the MLP component of 
 ```{.python .input  n=4}
 batch_size = 2048
 data_dir = d2l.download_extract('ctr')
-train_data = d2l.CTRDataset(data_dir + "train.csv")
-test_data = d2l.CTRDataset(data_dir + "test.csv",
+train_data = d2l.CTRDataset(os.path.join(data_dir, 'train.csv'))
+test_data = d2l.CTRDataset(os.path.join(data_dir, 'test.csv'),
                            feat_mapper=train_data.feat_mapper,
                            defaults=train_data.defaults)
 field_dims = train_data.field_dims
-num_workers = 0 if sys.platform.startswith("win") else 4
+num_workers = 0 if sys.platform.startswith('win') else 4
 train_iter = gluon.data.DataLoader(train_data, shuffle=True,
-                                   last_batch="rollover",
+                                   last_batch='rollover',
                                    batch_size=batch_size,
                                    num_workers=num_workers)
 test_iter = gluon.data.DataLoader(test_data, shuffle=False,
-                                  last_batch="rollover",
+                                  last_batch='rollover',
                                   batch_size=batch_size,
                                   num_workers=num_workers)
 ctx = d2l.try_all_gpus()

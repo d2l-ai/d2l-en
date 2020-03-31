@@ -33,7 +33,7 @@ of the inputs $\textbf{x}$,
 give or take some noise on the observations.
 Second, we assume that any noise is well-behaved
 (following a Gaussian distribution).
-To motivate the approach, let's start with a running example.
+To motivate the approach, let us start with a running example.
 Suppose that we wish to estimate the prices of houses (in dollars)
 based on their area (in square feet) and age (in years).
 
@@ -42,18 +42,18 @@ we would need to get our hands on a dataset
 consisting of sales for which we know
 the sale price, area and age for each home.
 In the terminology of machine learning,
-the dataset is called a *training data* or *training set*,
+the dataset is called a *training data set* or *training set*,
 and each row (here the data corresponding to one sale)
-is called an *instance* or *example*.
+is called an *example* (or *data instance*, "data point", *sample*).
 The thing we are trying to predict (here, the price)
-is called a *target* or *label*.
+is called a *label* (or *target*).
 The variables (here *age* and *area*)
 upon which the predictions are based
 are called *features* or *covariates*.
 
 Typically, we will use $n$ to denote
 the number of examples in our dataset.
-We index the samples by $i$, denoting each input data point
+We index the data instances by $i$, denoting each input
 as $x^{(i)} = [x_1^{(i)}, x_2^{(i)}]$
 and the corresponding label as $y^{(i)}$.
 
@@ -79,7 +79,7 @@ limit the expressivity of our linear model.
 
 Given a dataset, our goal is to choose
 the weights $w$ and bias $b$ such that on average,
-the predictions made according our  model
+the predictions made according to our model
 best fit the true prices observed in the data.
 
 In disciplines where it is common to focus
@@ -96,41 +96,41 @@ Collecting all features into a vector $\mathbf{x}$
 and all weights into a vector $\mathbf{w}$,
 we can express our model compactly using a dot product:
 
-$$\hat{y} = \mathbf{w}^T \mathbf{x} + b.$$
+$$\hat{y} = \mathbf{w}^\top \mathbf{x} + b.$$
 
 Here, the vector $\mathbf{x}$ corresponds to a single data point.
 We will often find it convenient
-to refer to our entire dataset via the *design matrix* $X$.
-Here, $X$ contains one row for every example
+to refer to our entire dataset via the *design matrix* $\mathbf{X}$.
+Here, $\mathbf{X}$ contains one row for every example
 and one column for every feature.
 
 For a collection of data points $\mathbf{X}$,
 the predictions $\hat{\mathbf{y}}$
 can be expressed via the matrix-vector product:
 
-$${\hat{\mathbf{y}}} = \mathbf X \mathbf{w} + b.$$
+$${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b.$$
 
-Given a training dataset $X$
+Given a training dataset $\mathbf{X}$
 and corresponding (known) targets $\mathbf{y}$,
 the goal of linear regression is to find
 the *weight* vector $w$ and bias term $b$
-that given some a new data point $\mathbf{x}_i$,
+that given a new data point $\mathbf{x}_i$,
 sampled from the same distribution as the training data
 will (in expectation) predict the target $y_i$ with the lowest error.
 
 Even if we believe that the best model for
-predicting $y$ given  $\mathbf{x}$ is linear,
+predicting $y$ given $\mathbf{x}$ is linear,
 we would not expect to find real-world data where
-$y_i$ exactly equals $\mathbf{w}^T \mathbf{x}+b$
+$y_i$ exactly equals $\mathbf{w}^\top \mathbf{x}+b$
 for all points ($\mathbf{x}, y)$.
 For example, whatever instruments we use to observe
-the features $X$ and labels $\mathbf{y}$
+the features $\mathbf{X}$ and labels $\mathbf{y}$
 might suffer small amount of measurement error.
 Thus, even when we are confident
 that the underlying relationship is linear,
 we will incorporate a noise term to account for such errors.
 
-Before we can go about searching for the best parameters $w$ and $b$,
+Before we can go about searching for the best parameters $\mathbf{w}$ and $b$,
 we will need two more things:
 (i) a quality measure for some given model;
 and (ii) a procedure for updating the model to improve its quality.
@@ -146,7 +146,7 @@ where smaller values are better
 and perfect predictions incur a loss of $0$.
 The most popular loss function in regression problems
 is the sum of squared errors.
-When our prediction for some example $i$ is $\hat{y}^{(i)}$
+When our prediction for an example $i$ is $\hat{y}^{(i)}$
 and the corresponding true label is $y^{(i)}$,
 the squared error is given by:
 
@@ -175,7 +175,7 @@ the losses on the training set.
 $$L(\mathbf{w}, b) =\frac{1}{n}\sum_{i=1}^n l^{(i)}(\mathbf{w}, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
 When training the model, we want to find parameters ($\mathbf{w}^*, b^*$)
-that minimize the total loss across all training samples:
+that minimize the total loss across all training examples:
 
 $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).$$
 
@@ -188,7 +188,7 @@ linear regression can be solved analytically by applying a simple formula,
 yielding a global optimum.
 To start, we can subsume the bias $b$ into the parameter $\mathbf{w}$
 by appending a column to the design matrix consisting of all $1s$.
-Then our prediction problem is to minimize $||\mathbf{y} - X\mathbf{w}||$.
+Then our prediction problem is to minimize $||\mathbf{y} - \mathbf{X}\mathbf{w}||$.
 Because this expression has a quadratic form, it is convex,
 and so long as the problem is not degenerate
 (our features are linearly independent), it is strictly convex.
@@ -198,7 +198,7 @@ and it corresponds to the global minimum.
 Taking the derivative of the loss with respect to $\mathbf{w}$
 and setting it equal to $0$ yields the analytic solution:
 
-$$\mathbf{w}^* = (\mathbf X^T \mathbf X)^{-1}\mathbf X^T y.$$
+$$\mathbf{w}^* = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf{y}.$$
 
 While simple problems like linear regression
 may admit analytic solutions,
@@ -233,11 +233,11 @@ on every single example in the dataset.
 In practice, this can be extremely slow.
 We must pass over the entire dataset before making a single update.
 Thus, we will often settle for sampling a random minibatch of examples
-every time we need to computer the update,
+every time we need to compute the update,
 a variant called *stochastic gradient descent*.
 
 In each iteration, we first randomly sample a minibatch $\mathcal{B}$
-consisting of a fixed number of training data examples.
+consisting of a fixed number of training examples.
 We then compute the derivative (gradient) of the average loss
 on the mini batch with regard to the model parameters.
 Finally, we multiply the gradient by a predetermined step size $\eta > 0$
@@ -251,7 +251,7 @@ $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i 
 
 To summarize, steps of the algorithm are the following:
 (i) we initialize the values of the model parameters, typically at random;
-(ii) we iteratively sample random batches from the the data (many times),
+(ii) we iteratively sample random batches from the data (many times),
 updating the parameters in the direction of the negative gradient.
 
 For quadratic losses and linear functions,
@@ -264,7 +264,7 @@ say $w_1, w_2, \ldots, w_d$.
 $$
 \begin{aligned}
 \mathbf{w} &\leftarrow \mathbf{w} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) && =
-w - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\
+\mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\
 b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  && =
 b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right).
 \end{aligned}
@@ -311,7 +311,7 @@ We return to these topics throughout the book.
 
 
 Given the learned linear regression model
-$\hat{\mathbf{w}}^\top x + \hat{b}$,
+$\hat{\mathbf{w}}^\top \mathbf{x} + \hat{b}$,
 we can now estimate the price of a new house
 (not contained in the training data)
 given its area $x_1$ and age (year) $x_2$.
@@ -338,7 +338,7 @@ rather than writing costly for-loops in Python.
 
 To illustrate why this matters so much,
 we can consider two methods for adding vectors.
-To start we instantiate two $100000$-dimensional vectors
+To start we instantiate two $10000$-dimensional vectors
 containing all ones.
 In one method we will loop over the vectors with a Python `for` loop.
 In the other method we will rely on a single call to `np`.
@@ -356,12 +356,12 @@ b = np.ones(n)
 ```
 
 Since we will benchmark the running time frequently in this book,
-let's define a timer (hereafter accessed via the `d2l` package
+let us define a timer (hereafter accessed via the `d2l` package
 to track the running time.
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
-class Timer(object):
+class Timer:
     """Record multiple running times."""
     def __init__(self):
         self.times = []
@@ -369,23 +369,23 @@ class Timer(object):
 
     def start(self):
         # Start the timer
-        self.start_time = time.time()
+        self.tik = time.time()
 
     def stop(self):
         # Stop the timer and record the time in a list
-        self.times.append(time.time() - self.start_time)
+        self.times.append(time.time() - self.tik)
         return self.times[-1]
 
     def avg(self):
         # Return the average time
-        return sum(self.times)/len(self.times)
+        return sum(self.times) / len(self.times)
 
     def sum(self):
         # Return the sum of time
         return sum(self.times)
 
     def cumsum(self):
-        # Return the accumuated times
+        # Return the accumulated times
         return np.array(self.times).cumsum().tolist()
 ```
 
@@ -394,8 +394,8 @@ First, we add them, one coordinate at a time,
 using a `for` loop.
 
 ```{.python .input  n=2}
-timer = Timer()
 c = np.zeros(n)
+timer = Timer()
 for i in range(n):
     c[i] = a[i] + b[i]
 '%.5f sec' % timer.stop()
@@ -442,8 +442,6 @@ $$p(z) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (z - \m
 Below we define a Python function to compute the normal distribution.
 
 ```{.python .input}
-x = np.arange(-7, 7, 0.01)
-
 def normal(z, mu, sigma):
     p = 1 / math.sqrt(2 * math.pi * sigma**2)
     return p * np.exp(- 0.5 / sigma**2 * (z - mu)**2)
@@ -452,6 +450,8 @@ def normal(z, mu, sigma):
 We can now visualize the normal distributions.
 
 ```{.python .input  n=2}
+x = np.arange(-7, 7, 0.01)
+
 # Mean and variance pairs
 parameters = [(0, 1), (0, 2), (3, 1)]
 d2l.plot(x, [normal(x, mu, sigma) for mu, sigma in parameters], xlabel='z',
@@ -508,8 +508,8 @@ of a linear model under the assumption of additive Gaussian noise.
 So far we only talked about linear functions.
 While neural networks cover a much richer family of models,
 we can begin thinking of the linear model
-as a neural network by expressing it the language of neural networks.
-To begin, let's start by rewriting things in a 'layer' notation.
+as a neural network by expressing it in the language of neural networks.
+To begin, let us start by rewriting things in a 'layer' notation.
 
 ### Neural Network Diagram
 
@@ -582,7 +582,7 @@ We invoke Stuart Russell and Peter Norvig who,
 in their classic AI text book
 *Artificial Intelligence: A Modern Approach* :cite:`Russell.Norvig.2016`,
 pointed out that although airplanes might have been *inspired* by birds,
-orninthology has not been the primary driver
+ornithology has not been the primary driver
 of aeronautics innovation for some centuries.
 Likewise, inspiration in deep learning these days
 comes in equal or greater measure from mathematics,

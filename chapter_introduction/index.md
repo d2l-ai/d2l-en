@@ -30,7 +30,7 @@ is a remarkable cognitive feat.
 And when you are able to devise solutions that work $100\%$ of the time,
 *you should not be using machine learning*.
 
-Fortunately for the growing community of ML scientists,
+Fortunately for the growing community of machine learning (ML) scientists,
 many tasks that we would like to automate
 do not bend so easily to human ingenuity.
 Imagine huddling around the whiteboard with the smartest minds you know,
@@ -55,7 +55,7 @@ and abstract categories) may be too complicated,
 requiring thousands or millions of computations
 that are beyond our conscious understanding
 (even if our eyes manage the task effortlessly).
-Machine learning (ML) is the study of powerful
+ML is the study of powerful
 techniques that can *learn* from *experience*.
 As ML algorithm accumulates more experience,
 typically in the form of observational data or
@@ -546,7 +546,7 @@ our outputs and targets as real-valued numbers.
 
 
 We denote any individual target $y_i$
-(corresponding to example $\mathbf{x_i}$)
+(corresponding to example $\mathbf{x}i$)
 and the set of all targets $\mathbf{y}$
 (corresponding to all examples $X$).
 When our targets take on arbitrary values in some range,
@@ -847,7 +847,7 @@ or the probability of purchase, given a user $u_i$ and product $p_j$.
 
 Given such a model, then for any given user,
 we could retrieve the set of objects with the largest scores $y_{ij}$,
-which are could then be recommended to the customer.
+which could then be recommended to the customer.
 Production systems are considerably more advanced and take
 detailed user activity and item characteristics into account
 when computing such scores. :numref:`fig_deeplearning_amazon` is an example
@@ -1032,7 +1032,7 @@ how they are related simply based on empirical data?
 The fields concerned with *causality* and
 *probabilistic graphical models* address this problem.
 * Another important and exciting recent development in unsupervised learning
-is the advent of *generative adversarial networks*.
+is the advent of *generative adversarial networks* (GANs).
 These give us a procedural way to synthesize data,
 even complicated structured data like images and audio.
 The underlying statistical mechanisms are tests
@@ -1365,7 +1365,7 @@ over the past decade.
   to be modified repeatedly, thus carrying out subsequent steps
   in a chain of reasoning, similar to how a processor
   can modify memory for a computation.
-* Another key development was the invention of GANS
+* Another key development was the invention of GANs
   :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`.
   Traditionally, statistical methods for density estimation
   and generative models focused on finding proper probability distributions
@@ -1375,11 +1375,16 @@ over the past decade.
   The crucial innovation in GANs was to replace the sampler
   by an arbitrary algorithm with differentiable parameters.
   These are then adjusted in such a way that the discriminator
-  (effectively a two-sample test) cannot distinguish fake from real data. Through the ability to use arbitrary algorithms to generate data,
+  (effectively a two-sample test) cannot distinguish fake from real data.
+  Through the ability to use arbitrary algorithms to generate data,
   it opened up density estimation to a wide variety of techniques.
   Examples of galloping Zebras :cite:`Zhu.Park.Isola.ea.2017`
-  and of fake celebrity faces :cite:`Karras.Aila.Laine.ea.2017`
+  and of fake celebrity faces :cite:`Karras.Aila.Laine.ea.2017` 
   are both testimony to this progress.
+  Even amateur doodlers can produce
+  photorealistic images based on just sketches that describe
+  how the layout of a scene looks like :cite:`Park.Liu.Wang.ea.2019`.
+ 
 * In many cases, a single GPU is insufficient to process
   the large amounts of data available for training.
   Over the past decade the ability to build parallel
@@ -1403,7 +1408,7 @@ over the past decade.
   simulations (e.g., using MuJoCo). See e.g.,
   :cite:`Silver.Huang.Maddison.ea.2016` for a description
   of how to achieve this in AlphaGo. In a nutshell,
-  reinforcement learning works best if plenty of (state, action, reward)triples are available, i.e., whenever it is possible to try out lots of things to learn how they relate to each
+  reinforcement learning works best if plenty of (state, action, reward) triples are available, i.e., whenever it is possible to try out lots of things to learn how they relate to each
   other. Simulation provides such an avenue.
 * Deep Learning frameworks have played a crucial role
   in disseminating ideas. The first generation of frameworks
@@ -1469,7 +1474,7 @@ solutions to problems that were considered intractable previously.
   algorithmic and computational progress has led to algorithms
   for a wide range of applications. Unlike Backgammon,
   chess has a much more complex state space and set of actions.
-  DeepBlue beat Gary Kasparov, Campbell et al.
+  DeepBlue beat Garry Kasparov, Campbell et al.
   :cite:`Campbell.Hoane-Jr.Hsu.2002`, using massive parallelism,
   special purpose hardware and efficient search through the game tree.
   Go is more difficult still, due to its huge state space.
