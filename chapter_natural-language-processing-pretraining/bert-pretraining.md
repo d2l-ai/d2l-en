@@ -14,7 +14,10 @@ batch_size, max_len = 512, 64
 train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 ```
 
-## Training BERT
+## Pretraining BERT
+
+The original BERT has two versions.
+They are too big to run.
 
 ```{.python .input  n=14}
 net = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,

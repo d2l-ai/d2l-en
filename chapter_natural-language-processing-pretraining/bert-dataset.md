@@ -1,6 +1,16 @@
 # The Dataset for Pretraining BERT
 
-*This section is under construction.*
+To pretrain the BERT model as implemented in :numref:`sec_bert`,
+we need to generate the dataset in the ideal format to facilitate
+the two pretraining tasks:
+masked language modeling and next sentence prediction.
+The original BERT model is pretrained on two huge corpora (see :numref:`subsec_bert_pretraining_tasks`),
+making it hard to run for most readers of this book.
+To facilitate the demonstration of BERT pretraining,
+we use a smaller corpus WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016`.
+
+Comparing with the PTB dataset used for pretraining word2vec in :numref:`sec_word2vec_data`,
+WikiText-2 i) retains the original punctuation, making it suitable for next sentence prediction; ii) retrains the original case and numbers; iii) is over twice larger.
 
 ```{.python .input  n=1}
 import collections
@@ -16,29 +26,41 @@ import zipfile
 npx.set_np()
 ```
 
-```{.python .input  n=2}
+The WikiText-2 dataset has been slightly preprocessed:
+each line represents a paragraph where
+space is inserted between punctuation and its preceding token.
+Paragraphs with at least two sentences are retained.
+To split sentences, we only use the period as the delimiter for simplicity.
+We leave discussions of more complex sentence splitting techniques in the exercises
+at the end of this section.
+
+```{.python .input  n=3}
 # Saved in the d2l package for later use
 d2l.DATA_HUB['wikitext-2'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/'
     'wikitext-2-v1.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
-```
 
-We keep paragraphs with at least 2 sentences.
-
-```{.python .input  n=3}
 # Saved in the d2l package for later use
 def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
         lines = f.readlines()
-    # A line represents a paragraph.
     paragraphs = [line.strip().lower().split(' . ')
                   for line in lines if len(line.split(' . ')) >= 2]
     random.shuffle(paragraphs)
     return paragraphs
 ```
 
-## Prepare NSP data
+## Defining Helper Functions for Pretraining Tasks
+
+In the following,
+we begin by implementing helper functions for the two BERT pretraining tasks:
+next sentence prediction and masked language modeling.
+These helper functions will be invoked later
+when transforming the raw text corpus
+into the the dataset of the ideal format to pretrain BERT.
+
+### Generating the Next Sentence Prediction Task
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
@@ -81,7 +103,7 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     return nsp_data_from_paragraph
 ```
 
-## Prepare MLM data
+### Generating the Masked Language Modeling Task
 :label:`subsec_prepare_mlm_data`
 
 It follows the procedure described in :numref:`subsec_mlm`.
@@ -140,7 +162,7 @@ def _get_mlm_data_from_tokens(tokens, vocab):
     return vocab[mlm_input_tokens], pred_positions, vocab[mlm_pred_labels]
 ```
 
-## Prepare Training Data
+## Transforming the Raw Corpus into the Pretraining Dataset
 
 ...
 
@@ -241,7 +263,7 @@ for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
 
 ## Exercises
 
-1. Try other sentence segmentation methods, such as `spaCy` and `nltk.tokenize.sent_tokenize`. For instance, after installing `nltk`, you need to run `import nltk` and `nltk.download('punkt')` first.
+1. Try other sentence splitting methods, such as `spaCy` and `nltk.tokenize.sent_tokenize`. For instance, after installing `nltk`, you need to run `import nltk` and `nltk.download('punkt')` first.
 
 ## [Discussions](https://discuss.mxnet.io/t/5868)
 
