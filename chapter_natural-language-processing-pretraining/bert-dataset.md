@@ -45,6 +45,7 @@ def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
         lines = f.readlines()
+    # Uppercase letters are converted to lowercase ones
     paragraphs = [line.strip().lower().split(' . ')
                   for line in lines if len(line.split(' . ')) >= 2]
     random.shuffle(paragraphs)
@@ -220,6 +221,12 @@ By implementing the `__getitem__ `function,
 we can arbitrarily access the pretraining (masked language modeling and next sentence prediction) examples 
 generated from a pair of sentences from the WikiText-2 corpus.
 
+The original BERT model uses WordPiece embeddings whose vocabulary size is 30,000 :cite:`Wu.Schuster.Chen.ea.2016`.
+The tokenization method of WordPiece is a slight modification of
+the original byte pair encoding algorithm in :numref:`subsec_Byte_Pair_Encoding`.
+For simplicity, we use the `d2l.tokenize` function for tokenization.
+Infrequent tokens that appear less than five times are filtered out.
+
 ```{.python .input  n=10}
 # Saved in the d2l package for later use
 class _WikiTextDataset(gluon.data.Dataset):
@@ -291,13 +298,25 @@ for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
     break
 ```
 
+In the end, let us take a look at the vocabulary size.
+Even after filtering out infrequent tokens,
+it is still over twice larger than that of the PTB dataset.
+
+```{.python .input}
+len(vocab)
+```
+
 ## Summary
 
+* Comparing with the PTB dataset, the WikiText-2 dateset retains the original punctuation, case and numbers, and is over twice larger.
+* We can arbitrarily access the pretraining (masked language modeling and next sentence prediction) examples generated from a pair of sentences from the WikiText-2 corpus.
 
 
 ## Exercises
 
-1. Try other sentence splitting methods, such as `spaCy` and `nltk.tokenize.sent_tokenize`. For instance, after installing `nltk`, you need to run `import nltk` and `nltk.download('punkt')` first.
+1. For simplicity, the period is used as the only delimiter for splitting sentences. Try other sentence splitting techniques, such as the spaCy and NLTK. Take NLTK as an example. You need to install NLTK first: `pip install nltk`. In the code, first `import nltk`. Then, download the Punkt sentence tokenizer: `nltk.download('punkt')`. To split sentences such as `sentences = 'This is great ! Why not ?'`, invoking `nltk.tokenize.sent_tokenize(sentences)` will return a list of two sentence strings: `['This is great !', 'Why not ?']`.
+1. What is the vocabulary size if we do not filter out any infrequent token?
+
 
 ## [Discussions](https://discuss.mxnet.io/t/5868)
 
