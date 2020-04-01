@@ -1766,7 +1766,7 @@ class NextSentencePred(nn.Block):
         self.mlp.add(nn.Dense(2))
 
     def forward(self, X):
-        # 0 is the index of the CLS token
+        # 0 is the index of the '<cls>' token
         X = X[:, 0, :]
         # X shape: (batch size, `num_hiddens`)
         return self.mlp(X)
@@ -1803,6 +1803,7 @@ def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
         lines = f.readlines()
+    # Uppercase letters are converted to lowercase ones
     paragraphs = [line.strip().lower().split(' . ')
                   for line in lines if len(line.split(' . ')) >= 2]
     random.shuffle(paragraphs)
@@ -1897,6 +1898,7 @@ def _pad_bert_inputs(examples, max_len, vocab):
             max_len - len(token_ids)), dtype='int32'))
         all_segments.append(np.array(segments + [0] * (
             max_len - len(segments)), dtype='int32'))
+        # `valid_lens` excludes count of '<pad>' tokens
         valid_lens.append(np.array(len(token_ids)))
         all_pred_positions.append(np.array(pred_positions + [0] * (
             max_num_mlm_preds - len(pred_positions)), dtype='int32'))
@@ -1914,7 +1916,7 @@ def _pad_bert_inputs(examples, max_len, vocab):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 class _WikiTextDataset(gluon.data.Dataset):
-    def __init__(self, paragraphs, max_len=128):
+    def __init__(self, paragraphs, max_len):
         # Input paragraphs[i] is a list of sentence strings representing a
         # paragraph; while output paragraphs[i] is a list of sentences
         # representing a paragraph, where each sentence is a list of tokens
@@ -2014,7 +2016,8 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
     step, timer = 0, d2l.Timer()
     animator = d2l.Animator(xlabel='step', ylabel='loss',
                             xlim=[1, num_steps], legend=['mlm', 'nsp'])
-    # MLM loss, NSP loss, no. of sentence pairs, count
+    # Masked language modeling loss, next sentence prediction loss,
+    # no. of sentence pairs, count
     metric = d2l.Accumulator(4)
     num_steps_reached = False
     while step < num_steps and not num_steps_reached:

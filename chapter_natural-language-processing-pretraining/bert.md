@@ -360,7 +360,7 @@ class NextSentencePred(nn.Block):
         self.mlp.add(nn.Dense(2))
 
     def forward(self, X):
-        # 0 is the index of the CLS token
+        # 0 is the index of the '<cls>' token
         X = X[:, 0, :]
         # X shape: (batch size, `num_hiddens`)
         return self.mlp(X)

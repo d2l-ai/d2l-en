@@ -1,4 +1,5 @@
 # The Dataset for Pretraining BERT
+:label:`sec_bert-dataset`
 
 To pretrain the BERT model as implemented in :numref:`sec_bert`,
 we need to generate the dataset in the ideal format to facilitate
@@ -34,7 +35,7 @@ To split sentences, we only use the period as the delimiter for simplicity.
 We leave discussions of more complex sentence splitting techniques in the exercises
 at the end of this section.
 
-```{.python .input  n=3}
+```{.python .input  n=2}
 # Saved in the d2l package for later use
 d2l.DATA_HUB['wikitext-2'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/'
@@ -67,7 +68,7 @@ According to descriptions of :label:`subsec_nsp`,
 the `_get_next_sentence` function generates a training example
 for the binary classification task.
 
-```{.python .input}
+```{.python .input  n=3}
 # Saved in the d2l package for later use
 def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
@@ -84,7 +85,7 @@ from the input `paragraph` by invoking the `_get_next_sentence` function.
 Here `paragraph` is a list of sentences, where each sentence is a list of tokens.
 The argument `max_len` specifies the maximum length of a BERT input sequence during pretraining.
 
-```{.python .input  n=6}
+```{.python .input  n=4}
 # Saved in the d2l package for later use
 def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     nsp_data_from_paragraph = []
@@ -116,7 +117,7 @@ a special “&lt;mask&gt;” token or a random token, or remain unchanged.
 In the end, the function returns the input tokens after possible replacement,
 the token indices where predictions take place and labels for these predictions.
 
-```{.python .input  n=7}
+```{.python .input  n=5}
 # Saved in the d2l package for later use
 def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                         vocab):
@@ -154,7 +155,7 @@ as an input and returns indices of the input tokens
 the token indices where predictions take place,
 and label indices for these predictions.
 
-```{.python .input  n=8}
+```{.python .input  n=6}
 # Saved in the d2l package for later use
 def _get_mlm_data_from_tokens(tokens, vocab):
     candidate_pred_positions = []
@@ -184,7 +185,7 @@ we still need to define a helper function `_pad_bert_inputs`
 to append the special “&lt;mask&gt;” tokens to the inputs.
 Its argument `examples` contain the outputs from the helper functions `_get_nsp_data_from_paragraph` and `_get_mlm_data_from_tokens` for the two pretraining tasks.
 
-```{.python .input  n=9}
+```{.python .input  n=7}
 # Saved in the d2l package for later use
 def _pad_bert_inputs(examples, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
@@ -227,10 +228,10 @@ the original byte pair encoding algorithm in :numref:`subsec_Byte_Pair_Encoding`
 For simplicity, we use the `d2l.tokenize` function for tokenization.
 Infrequent tokens that appear less than five times are filtered out.
 
-```{.python .input  n=10}
+```{.python .input  n=8}
 # Saved in the d2l package for later use
 class _WikiTextDataset(gluon.data.Dataset):
-    def __init__(self, paragraphs, max_len=128):
+    def __init__(self, paragraphs, max_len):
         # Input paragraphs[i] is a list of sentence strings representing a
         # paragraph; while output paragraphs[i] is a list of sentences
         # representing a paragraph, where each sentence is a list of tokens
@@ -269,7 +270,7 @@ By using the `_read_wiki` function and the `_WikiTextDataset` class,
 we define the following `load_data_wiki` to download and WikiText-2 dataset
 and generate pretraining examples from it.
 
-```{.python .input  n=11}
+```{.python .input  n=9}
 # Saved in the d2l package for later use
 def load_data_wiki(batch_size, max_len):
     num_workers = d2l.get_dataloader_workers()
@@ -286,7 +287,7 @@ we print out the shapes of a minibatch of BERT pretraining examples.
 Note that in each BERT input sequence,
 $10$ ($64 \times 0.15$) positions are predicted for the masked language modeling task.
 
-```{.python .input  n=13}
+```{.python .input  n=10}
 batch_size, max_len = 512, 64
 train_iter, vocab = load_data_wiki(batch_size, max_len)
 
@@ -298,12 +299,35 @@ for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
     break
 ```
 
+```{.json .output n=10}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "(512, 64) (512, 64) (512,) (512, 10) (512, 10) (512, 10) (512,)\n"
+ }
+]
+```
+
 In the end, let us take a look at the vocabulary size.
 Even after filtering out infrequent tokens,
 it is still over twice larger than that of the PTB dataset.
 
-```{.python .input}
+```{.python .input  n=11}
 len(vocab)
+```
+
+```{.json .output n=11}
+[
+ {
+  "data": {
+   "text/plain": "20256"
+  },
+  "execution_count": 11,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Summary
