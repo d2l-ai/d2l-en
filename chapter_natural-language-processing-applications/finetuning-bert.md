@@ -1,17 +1,20 @@
-# BERT Fine-Tune
+# Fine-Tuning BERT for Sequence-Level and Token-Level Tasks
 
 ...
 
 
-![single sentence](../img/bert_single_sentence.svg)
+![Fine-tuning BERT for single text classification tasks, such as sentiment analysis.](../img/bert-one-seq.svg)
+:label:`fig_bert-one-seq`
 
 ...
-![sentence pair](../img/bert_sentence_pair.svg)
+![Fine-tuning BERT for text pair classification tasks, such as natural language inference.](../img/bert-two-seqs.svg)
+:label:`fig_bert-two-seqs`
 
 ...
-![question answering](../img/bert_question_answering.svg)
+![Fine-tuning BERT for question answering](../img/bert-qa.svg)
+:label:`fig_bert-qa`
 
 ...
-![named entity recognition](../img/bert_named_entity_recognition.svg)
-
+![Fine-tuning BERT for text tagging tasks, such as part-of-speech tagging](../img/bert-tagging.svg)
+:label:`fig_bert-tagging`
 ...

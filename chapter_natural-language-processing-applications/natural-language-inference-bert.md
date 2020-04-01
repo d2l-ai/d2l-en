@@ -1,4 +1,4 @@
-# Natural Language Inference: Fine Tuning BERT
+# Natural Language Inference: Fine-Tuning BERT
 
 *This section is under
 construction.*
