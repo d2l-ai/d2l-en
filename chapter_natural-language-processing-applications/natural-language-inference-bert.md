@@ -1,11 +1,8 @@
 # Natural Language Inference: Fine-Tuning BERT
 
-*This section is under
-construction.*
+*This section is under construction.*
 
-![This section feeds pretrained BERT to an MLP-based
-architecture for natural
-language inference.](../img/nlp-map-nli-bert.svg)
+![This section feeds pretrained BERT to an MLP-based architecture for natural language inference.](../img/nlp-map-nli-bert.svg)
 :label:`fig_nlp-map-nli-bert`
 
 ```{.python .input  n=40}
