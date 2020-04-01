@@ -299,35 +299,12 @@ for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
     break
 ```
 
-```{.json .output n=10}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(512, 64) (512, 64) (512,) (512, 10) (512, 10) (512, 10) (512,)\n"
- }
-]
-```
-
 In the end, let us take a look at the vocabulary size.
 Even after filtering out infrequent tokens,
 it is still over twice larger than that of the PTB dataset.
 
 ```{.python .input  n=11}
 len(vocab)
-```
-
-```{.json .output n=11}
-[
- {
-  "data": {
-   "text/plain": "20256"
-  },
-  "execution_count": 11,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Summary
