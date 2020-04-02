@@ -12,7 +12,7 @@ making it hard to run for most readers of this book.
 On the other hand,
 the off-the-shelf pretrained BERT model
 may not fit for applications from specific domains like medicine.
-Thus, it is getting popular to pretrain BERT from scratch on a customized dataset.
+Thus, it is getting popular to pretrain BERT on a customized dataset.
 To facilitate the demonstration of BERT pretraining,
 we use a smaller corpus WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016`.
 

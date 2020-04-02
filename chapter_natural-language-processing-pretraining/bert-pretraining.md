@@ -84,7 +84,8 @@ Invoking the two aforementioned helper functions,
 the following `train_bert` function
 defines the procedure to pretrain BERT (`net`) on the WikiText-2 (`train_iter`) dataset.
 Training BERT can take very long.
-Instead of specifying number of epochs for training,
+Instead of specifying the number of epochs for training
+as in the `train_ch13` function (see :numref:`sec_image_augmentation`),
 the input `num_steps` of the following function
 specifies the number of iteration steps for training.
 

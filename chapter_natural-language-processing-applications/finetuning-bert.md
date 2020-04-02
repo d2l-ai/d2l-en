@@ -32,11 +32,26 @@ which we have already examined.
 On the token level, we will briefly introduce new applications
 such as text tagging and question answering
 and shed light on how BERT can fit in their problem settings.
+During fine-tuning,
+the "minimal architecture changes" required by BERT across different applications
+are the extra fully-connected layers.
+
 
 ## Single Text Classification
 
-![Fine-tuning BERT for single text classification applications, such as sentiment analysis.](../img/bert-one-seq.svg)
+Single text classification takes a single text sequence as the input and returns its classification result as the output.
+Besides sentiment analysis,
+the Corpus of Linguistic Acceptability (CoLA)
+is a dataset for judging
+whether a given sentence is grammatically acceptable or not :cite:`Warstadt.Singh.Bowman.2019`.
+For instance, "I should study." is acceptable but "I should studying." is not.
+
+![Fine-tuning BERT for single text classification applications, such as sentiment analysis and testing linguistic acceptability.](../img/bert-one-seq.svg)
 :label:`fig_bert-one-seq`
+
+
+
+
 
 
 ## Text Pair Classification
@@ -63,7 +78,7 @@ and shed light on how BERT can fit in their problem settings.
 
 ## Exercises
 
-1. Suppose that we want to design a search engine algorithm for news articles. When the system receives an query (e.g., "oil industry in coronavirus crisis"), it should return a ranked list of news articles that are most relevant to the query. What data do you need to collect? How can we use BERT in the algorithm design?
+1. Let us design a search engine algorithm for news articles. When the system receives an query (e.g., "oil industry during the coronavirus outbreak"), it should return a ranked list of news articles that are most relevant to the query. Suppose that we have a huge pool of news articles and a large number of queries. To simplify the problem, suppose that the most relevant article has been labeled for each query. How can we apply negative sampling (see :numref:`subsec_negative-sampling`) and BERT in the algorithm design?
 1. How can we leverage BERT in text generation tasks such as machine translation?
 
 
