@@ -1,4 +1,5 @@
 # Pretraining BERT
+:label:`sec_bert-pretraining`
 
 With the BERT model implemented in :numref:`sec_bert`
 and the pretraining examples generated from the WikiText-2 dataset in :numref:`sec_bert-dataset`, we will pretrain BERT on the WikiText-2 dataset in this section.

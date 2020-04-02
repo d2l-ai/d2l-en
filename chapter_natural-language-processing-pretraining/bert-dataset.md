@@ -5,8 +5,14 @@ To pretrain the BERT model as implemented in :numref:`sec_bert`,
 we need to generate the dataset in the ideal format to facilitate
 the two pretraining tasks:
 masked language modeling and next sentence prediction.
-The original BERT model is pretrained on two huge corpora (see :numref:`subsec_bert_pretraining_tasks`),
+On one hand,
+the original BERT model is pretrained on the concatenation of
+two huge corpora BookCorpus and English Wikipedia (see :numref:`subsec_bert_pretraining_tasks`),
 making it hard to run for most readers of this book.
+On the other hand,
+the off-the-shelf pretrained BERT model
+may not fit for applications from specific domains like medicine.
+Thus, it is getting popular to pretrain BERT from scratch on a customized dataset.
 To facilitate the demonstration of BERT pretraining,
 we use a smaller corpus WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016`.
 

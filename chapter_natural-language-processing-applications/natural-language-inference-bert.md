@@ -5,6 +5,8 @@
 ![This section feeds pretrained BERT to an MLP-based architecture for natural language inference.](../img/nlp-map-nli-bert.svg)
 :label:`fig_nlp-map-nli-bert`
 
+## Pretraining BERT
+
 ```{.python .input  n=40}
 import d2l
 import multiprocessing
@@ -24,7 +26,7 @@ bert.initialize(init.Xavier(), ctx=ctx)
 d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 4000)
 ```
 
-...
+## The Dataset for Fine-Tuning BERT
 
 ```{.python .input  n=41}
 class SNLIBERTDataset(gluon.data.Dataset):
@@ -97,7 +99,7 @@ test_iter = gluon.data.DataLoader(test_set, batch_size,
                                   num_workers=num_workers)
 ```
 
-...
+## Fine-Tuning BERT
 
 ```{.python .input  n=44}
 class BERTClassifier(nn.Block):

@@ -35,6 +35,17 @@ and a token level (text tagging and question answering).
 As a concrete empirical case,
 we will fine-tune BERT for natural language processing.
 
+As we have introduced in :numref:`sec_bert`,
+BERT requires minimal architecture changes
+for a wide range of natural language processing applications.
+However, this benefit comes at the cost of fine-tuning
+a huge number of BERT parameters for the downstream applications.
+When space or time is limited,
+those crafted models based on MLPs, CNNs, RNNs, and attention
+are more feasible.
+In the following, we start by the sentiment analysis application
+and illustrate the model design based on RNNs and CNNs, respectively.
+
 ```toc
 :maxdepth: 2
 

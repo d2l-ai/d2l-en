@@ -86,10 +86,10 @@ Using a pretrained Transformer encoder,
 BERT is able to represent any token based on its bidirectional context.
 During supervised learning of downstream tasks,
 BERT is similar to GPT in two aspects.
-One one hand, BERT representations will be fed into an added output layer,
+First, BERT representations will be fed into an added output layer,
 with minimal changes to the model architecture depending on nature of tasks,
 such as predicting for every token vs. predicting for the entire sequence.
-On the other hand,
+Second,
 all the parameters of the pretrained Transformer encoder are fine-tuned,
 while the additional output layer will be trained from scratch.
 :numref:`fig_elmo-gpt-bert` depicts the differences among ELMo, GPT, and BERT.
@@ -273,7 +273,7 @@ This occasional noise encourages BERT to be less biased towards the masked token
 
 We implement the following `MaskLM` class to predict masked tokens
 in the masked language model task of BERT pretraining.
-The prediction uses a MLP with one hidden layer (`self.mlp`).
+The prediction uses an MLP with one hidden layer (`self.mlp`).
 In forward inference, it takes two inputs:
 the encoded result of `BERTEncoder` and the token positions for prediction.
 The output is the prediction results at these positions.
