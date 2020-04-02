@@ -85,6 +85,7 @@ More generally we want to define a scheduler. When invoked with the number of up
 ```{.python .input}
 class SquareRootScheduler:
     def __init__(self, lr=0.1):
+        self.base_lr = lr
         self.lr = lr
 
     def __call__(self, num_update):
