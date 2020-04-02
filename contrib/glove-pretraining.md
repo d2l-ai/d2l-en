@@ -20,7 +20,7 @@ npx.set_np()
 ```
 
 ## Preprocessing Dataset
-We will train GloVe model on PTB dataset. 
+We will train GloVe model on PTB dataset.
 
 First, we
 read the PTB dataset, build a vocabulary with words and map each token into an
@@ -56,7 +56,7 @@ def get_coocurrence_counts(corpus, window_size):
         centers += line
         for i in range(len(line)):  # Context window centered at i
             left_indices = list(range(max(0, i - window_size), i))
-            right_indices = list(range(i + 1, 
+            right_indices = list(range(i + 1,
                                        min(len(line), i + 1 + window_size)))
             left_context = [line[idx] for idx in left_indices]
             right_context = [line[idx] for idx in right_indices]
@@ -77,7 +77,7 @@ cooccurrence counts of all the central target words and context words.
 tiny_dataset = [list(range(5)), list(range(5, 7))]
 print('dataset', tiny_dataset)
 for center, context, coocurrence in get_coocurrence_counts(tiny_dataset, 4):
-        print('center: %s, context: %s, coocurrence: %.2f' % 
+        print('center: %s, context: %s, coocurrence: %.2f' %
           (center, context, coocurrence))
 ```
 
@@ -160,7 +160,7 @@ target words and context words when the $x_{max}$ set to 2 and $\alpha$ to 0.75
 
 ```{.python .input  n=19}
 for center, context, coocurrence in get_coocurrence_counts(tiny_dataset, 4)[:5]:
-    print('center: %s, context: %s, coocurrence: %.2f, weight: %.2f' % 
+    print('center: %s, context: %s, coocurrence: %.2f, weight: %.2f' %
           (center, context, coocurrence, compute_weight(coocurrence, x_max = 2, alpha = 0.75)))
 ```
 
@@ -337,8 +337,4 @@ get_similar_tokens('chip', 3, net[0], net[1])
 
 
 
-##
-[Discussions](https://discuss.mxnet.io/t/2387)
-
-![](../img/qr_word2vec-
-pretraining.svg)
+## Discussions
