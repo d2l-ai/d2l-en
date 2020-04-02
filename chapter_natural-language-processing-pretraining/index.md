@@ -27,12 +27,12 @@ Among them is BERT, a much deeper model based on the Transformer encoder.
 In this chapter, we will focus on how to pretrain such representations for text,
 as highlighted in :numref:`fig_nlp-map-pretrain`.
 
-![Pretrained text representation can be fed to various deep learning architectures for different downstream natural language processing tasks. This chapter focuses on the upstream text representation pretraining.](../img/nlp-map-pretrain.svg)
+![Pretrained text representations can be fed to various deep learning architectures for different downstream natural language processing applications. This chapter focuses on the upstream text representation pretraining.](../img/nlp-map-pretrain.svg)
 :label:`fig_nlp-map-pretrain`
 
 As shown in :numref:`fig_nlp-map-pretrain`,
-the pretrained text representation can be fed to
-a variety of deep learning architectures for different downstream natural language processing tasks.
+the pretrained text representations can be fed to
+a variety of deep learning architectures for different downstream natural language processing applications.
 We will cover them in :numref:`chap_nlp_app`.
 
 ```toc

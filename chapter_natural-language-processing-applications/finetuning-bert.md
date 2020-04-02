@@ -1,7 +1,8 @@
-# Fine-Tuning BERT for Sequence-Level and Token-Level Tasks
+# Fine-Tuning BERT for Sequence-Level and Token-Level Applications
 :label:`sec_finetuning-bert`
 
 *This section is under construction.*
+
 
 
 ![Fine-tuning BERT for single text classification tasks, such as sentiment analysis.](../img/bert-one-seq.svg)

@@ -213,6 +213,10 @@ encoded_pair_crane = encoded_pair[:, 2, :]
 encoded_pair.shape, encoded_pair_cls.shape, encoded_pair_crane[0][:3]
 ```
 
+In :numref:`chap_nlp_app`, we will fine-tune a pretrained BERT model
+for downstream natural language processing applications.
+
+
 ## Summary
 
 * The original BERT has two versions, where the base model has 110 million parameters and the large model has 340 million parameters.
