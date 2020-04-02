@@ -40,29 +40,7 @@ loss = gluon.loss.SoftmaxCELoss()
 ```
 
 Before defining the training loop,
-we define two helper functions.
-The first is the `_get_batch_bert` function, splitting
-a minibatch of training examples (`batch`) across all the devices specified in `ctx`.
-It is useful for training on multiple GPUs:
-a minibatch is splitted into shards and each shard is processed on one GPU.
-
-```{.python .input  n=15}
-# Saved in the d2l package for later use
-def _get_batch_bert(batch, ctx):
-    (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
-     mlm_Y, nsp_y) = batch
-    split_and_load = gluon.utils.split_and_load
-    return (split_and_load(tokens_X, ctx, even_split=False),
-            split_and_load(segments_X, ctx, even_split=False),
-            split_and_load(valid_lens_x.astype('float32'), ctx,
-                           even_split=False),
-            split_and_load(pred_positions_X, ctx, even_split=False),
-            split_and_load(mlm_weights_X, ctx, even_split=False),
-            split_and_load(mlm_Y, ctx, even_split=False),
-            split_and_load(nsp_y, ctx, even_split=False))
-```
-
-The second helper function is `_get_batch_loss_bert`.
+we define a helper function `_get_batch_loss_bert`.
 Given the shard of training examples,
 this function computes the loss for both the masked language modeling and next sentence prediction tasks.
 Note that the final loss of BERT pretraining
@@ -126,7 +104,8 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
         for batch in train_iter:
             (tokens_X_shards, segments_X_shards, valid_lens_x_shards,
              pred_positions_X_shards, mlm_weights_X_shards,
-             mlm_Y_shards, nsp_y_shards) = _get_batch_bert(batch, ctx)
+             mlm_Y_shards, nsp_y_shards) = [gluon.utils.split_and_load(
+                elem, ctx, even_split=False) for elem in batch]
             timer.start()
             with autograd.record():
                 mlm_ls, nsp_ls, ls = _get_batch_loss_bert(

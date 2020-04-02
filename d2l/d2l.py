@@ -1899,7 +1899,7 @@ def _pad_bert_inputs(examples, max_len, vocab):
         all_segments.append(np.array(segments + [0] * (
             max_len - len(segments)), dtype='int32'))
         # `valid_lens` excludes count of '<pad>' tokens
-        valid_lens.append(np.array(len(token_ids)))
+        valid_lens.append(np.array(len(token_ids), dtype='float32'))
         all_pred_positions.append(np.array(pred_positions + [0] * (
             max_num_mlm_preds - len(pred_positions)), dtype='int32'))
         # Predictions of padded tokens will be filtered out in the loss via
@@ -1963,21 +1963,6 @@ def load_data_wiki(batch_size, max_len):
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def _get_batch_bert(batch, ctx):
-    (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
-     mlm_Y, nsp_y) = batch
-    split_and_load = gluon.utils.split_and_load
-    return (split_and_load(tokens_X, ctx, even_split=False),
-            split_and_load(segments_X, ctx, even_split=False),
-            split_and_load(valid_lens_x.astype('float32'), ctx,
-                           even_split=False),
-            split_and_load(pred_positions_X, ctx, even_split=False),
-            split_and_load(mlm_weights_X, ctx, even_split=False),
-            split_and_load(mlm_Y, ctx, even_split=False),
-            split_and_load(nsp_y, ctx, even_split=False))
-
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
 def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
                          segments_X_shards, valid_lens_x_shards,
                          pred_positions_X_shards, mlm_weights_X_shards,
@@ -2024,7 +2009,8 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
         for batch in train_iter:
             (tokens_X_shards, segments_X_shards, valid_lens_x_shards,
              pred_positions_X_shards, mlm_weights_X_shards,
-             mlm_Y_shards, nsp_y_shards) = _get_batch_bert(batch, ctx)
+             mlm_Y_shards, nsp_y_shards) = [gluon.utils.split_and_load(
+                elem, ctx, even_split=False) for elem in batch]
             timer.start()
             with autograd.record():
                 mlm_ls, nsp_ls, ls = _get_batch_loss_bert(

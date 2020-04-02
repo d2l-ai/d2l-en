@@ -199,7 +199,7 @@ def _pad_bert_inputs(examples, max_len, vocab):
         all_segments.append(np.array(segments + [0] * (
             max_len - len(segments)), dtype='int32'))
         # `valid_lens` excludes count of '<pad>' tokens
-        valid_lens.append(np.array(len(token_ids)))
+        valid_lens.append(np.array(len(token_ids), dtype='float32'))
         all_pred_positions.append(np.array(pred_positions + [0] * (
             max_num_mlm_preds - len(pred_positions)), dtype='int32'))
         # Predictions of padded tokens will be filtered out in the loss via
