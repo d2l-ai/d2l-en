@@ -65,7 +65,7 @@ in single text classification applications,
 the BERT representation of the special classification token 
 “&lt;cls&gt;” encodes the information of the entire input text sequence.
 As the representation of the input single text,
-it will be fed into a small MLP made of fully-connected (dense) layers
+it will be fed into a small MLP consisting of fully-connected (dense) layers
 to output the distribution of all the discrete label values.
 
 
@@ -128,8 +128,8 @@ such as a part-of-speech tag.
 
 ## Question Answering
 
-The final token-level application to consider is question answering,
-which often reflects capabilities of reading comprehension.
+As another token-level application,
+*question answering* reflects capabilities of reading comprehension.
 For example,
 the Stanford Question Answering Dataset (SQuAD v1.1)
 consists of reading passages and questions,
@@ -138,23 +138,58 @@ is just a segment of text (text span) from the passage that the question is abou
 To explain,
 consider a passage
 "Some experts report that a mask's efficacy is inconclusive. However, mask makers insist that their products, such as N95 respirator masks, can guard against the virus."
-and a question "Who say that N95 respirator masks can guard against the virus?"
+and a question "Who say that N95 respirator masks can guard against the virus?".
 The answer should be the text span "mask makers" in the passage.
-Thus, the goal in SQuAD v1.1 is to predict the beginning and end of the text span in the passage given a pair of question and passage.
+Thus, the goal in SQuAD v1.1 is to predict the start and end of the text span in the passage given a pair of question and passage.
 
 ![Fine-tuning BERT for question answering. Suppose that the input text pair has two and three tokens.](../img/bert-qa.svg)
 :label:`fig_bert-qa`
 
+To fine-tune BERT for question answering,
+the question and passage are packed as
+the first and second text sequence, respectively,
+in the input of BERT.
+To predict the position of the start of the text span,
+the same additional fully-connected layer will transform
+the BERT representation of any token from the passage of position $i$
+into a scalar score $s_i$.
+Such scores of all the passage tokens
+are further transformed by the softmax operation
+into a probability distribution,
+so that each token position $i$ in the passage is assigned
+a probability $p_i$ of being the start of the text span.
+Predicting the end of the text span
+is the same as above, except that
+parameters in its additional fully-connected layer
+are independent from those for predicting the start.
+When predicting the end,
+any passage token of position $i$
+is transformed by the same fully-connected layer
+into a scalar score $e_i$.
+:numref:`fig_bert-qa`
+depicts fine-tuning BERT for question answering.
+
+For question answering,
+the supervised learning's training objective is as straightforward as
+maximizing the log-likelihoods of the ground-truth start and end positions.
+When predicting the span,
+we can compute the score $s_i + e_j$ for a valid span
+from position $i$ to position $j$ ($i \leq j$),
+and output the span with the highest score.
+
 
 ## Summary
 
-* Fine-tune BERT.
+* BERT requires minimal architecture changes (extra fully-connected layers) for sequence-level and token-level natural language processing applications, such as single text classification (e.g., sentiment analysis and testing linguistic acceptability), text pair classification or regression (e.g., natural language inference and semantic textual similarity), text tagging (e.g., part-of-speech tagging), and question answering.
+* During supervised learning of a downstream application, parameters of the extra layers are learned from scratch while all the parameters in the pretrained BERT model are fine-tuned.
+
+
 
 ## Exercises
 
 1. Let us design a search engine algorithm for news articles. When the system receives an query (e.g., "oil industry during the coronavirus outbreak"), it should return a ranked list of news articles that are most relevant to the query. Suppose that we have a huge pool of news articles and a large number of queries. To simplify the problem, suppose that the most relevant article has been labeled for each query. How can we apply negative sampling (see :numref:`subsec_negative-sampling`) and BERT in the algorithm design?
-1. How can we leverage BERT in text generation tasks such as machine translation?
-
+1. How can we leverage BERT in training language models?
+1. Can we leverage BERT in machine translation?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/5882)
