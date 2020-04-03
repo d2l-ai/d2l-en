@@ -66,7 +66,7 @@ and is packed into one BERT input sequence as depicted in :numref:`fig_bert-two-
 Recall :numref:`subsec_bert_input_rep` that segment IDs
 are used to distinguish the premise and the hypothesis in a BERT input sequence.
 With the predefined maximum length of a BERT input sequence (`max_len`),
-the last token of the longer of the input text pair keeps being removed until
+the last token of the longer of the input text pair keeps getting removed until
 `max_len` is met.
 To accelerate generation of the SNLI dataset
 for fine-tuning BERT,
@@ -143,7 +143,14 @@ test_iter = gluon.data.DataLoader(test_set, batch_size,
 
 ## Fine-Tuning BERT
 
-
+As :numref:`fig_bert-two-seqs` indicates,
+fine-tuning BERT for natural language inference
+requires only an extra MLP consisting of two fully-connected layers.
+This MLP transforms the
+BERT representation of the special “&lt;cls&gt;” token,
+which encodes the information of both the premise and the hypothesis,
+into three outputs of natural language inference:
+entailment, contradiction, and neutral.
 
 ```{.python .input  n=44}
 class BERTClassifier(nn.Block):
@@ -152,7 +159,6 @@ class BERTClassifier(nn.Block):
         self.bert = bert
         self.classifier = nn.Sequential()
         self.classifier.add(nn.Dense(256, activation='relu'))
-        # There are 3 possible outputs: entailment, contradiction, and neutral
         self.classifier.add(nn.Dense(3))
 
     def forward(self, inputs):
@@ -161,16 +167,38 @@ class BERTClassifier(nn.Block):
         return self.classifier(encoded_X[:, 0, :])
 ```
 
-...
+In the following,
+the pretrained BERT model `bert` becomes part of the model (`net`) for
+the downstream application.
+However, only the parameters of the additional MLP (`net.classifier`) will be learned from scratch.
+All the parameters of the pretrained BERT will be fine-tuned.
 
-```{.python .input  n=45}
+```{.python .input}
 net = BERTClassifier(bert)
 net.classifier.initialize(ctx=ctx)
 ```
 
-Note that parameters in the fully-connected layers for both masked language model loss and next sentence prediction loss are not updated when BERT is fine-tuned.
+Recall that
+in :numref:`sec_bert`
+both the `MaskLM` class and the `NextSentencePred` class
+have parameters in their employed MLPs.
+These parameters are part of those in the pretrained BERT model
+`bert`, and thus part of parameters in `net`.
+However, these parameters are only for computing
+the masked language modeling loss
+and the next sentence prediction loss
+during pretraining.
+These two loss functions are irrelevant to fine-tuning downstream applications,
+thus the parameters of the employed MLPs in 
+`MaskLM` and `NextSentencePred` are not updated (staled) when BERT is fine-tuned.
+
 To allow parameters with stale gradients,
 the flag `ignore_stale_grad=True` is set in the `step` function of `d2l.train_batch_ch13`.
+We use this function to train and evaluate the model `net` using the training set
+(`train_iter`) and the testing set (`test_iter`) of SNLI.
+Due to the limited computational resources, pretraining corpora,
+and training time, the training and testing accuracy
+can be further improved: we leave its discussions in the exercises.
 
 ```{.python .input  n=46}
 lr, num_epochs = 1e-4, 5
@@ -182,10 +210,15 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
 
 ## Summary
 
+* We can pretrain BERT and fine-tune the pretrained BERT model for downstream applications, such as natural language inference on the SNLI dataset.
+* During fine-tuning, the BERT model becomes part of the model for the downstream application. Parameters that are only related to pretraining loss will not be updated during fine-tuning. 
+
+
 ## Exercises
 
-1. How to truncate a pair of sequences according to their ratio of
-length.
+1. How to truncate a pair of sequences according to their ratio of length? Compare this pair truncation method and the one used in the `SNLIBERTDataset` class. What are their pros and cons?
+2. If your computational resource allows, increase the model size such as setting `ffn_num_hiddens=256`, `num_heads=4`, and `num_layers=4`. By increasing pretraining steps and fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.75? Improve the sentence splitting technique by using those as described in the exercises of :numref:`sec_bert-dataset`. Does it lead to better testing accuracy?
+3. If your computational resource allows, use a much larger pretraining corpus and a much larger BERT. Can you get a much better testing accuracy? How long do the pretraining and fine-tuning take?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/5870)
