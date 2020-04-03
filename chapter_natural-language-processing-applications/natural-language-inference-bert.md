@@ -1,11 +1,34 @@
 # Natural Language Inference: Fine-Tuning BERT
 
-*This section is under construction.*
+In earlier sections of this chapter,
+we have designed an attention-based architecture
+(in :numref:`sec_natural-language-inference-attention`)
+for the natural language inference task
+on the SNLI dataset (as described in :numref:`sec_natural-language-inference-and-dataset`).
+Now we revisit this task by fine-tuning BERT.
+As discussed in :numref:`sec_finetuning-bert`,
+natural language inference is a sequence-level text pair classification problem,
+and fine-tuning BERT only requires an additional MLP-based architecture,
+as illustrated in :numref:`fig_nlp-map-nli-bert`.
 
 ![This section feeds pretrained BERT to an MLP-based architecture for natural language inference.](../img/nlp-map-nli-bert.svg)
 :label:`fig_nlp-map-nli-bert`
 
+In this section,
+we will pretrain a small version of BERT,
+then fine-tune the pretrained BERT model
+for natural language inference on the SNLI dataset.
+
+
 ## Pretraining BERT
+
+We have explained how to pretrain BERT on the WikiText-2 dataset in
+:numref:`sec_bert-dataset` and :numref:`sec_bert-pretraining`
+(note that the original BERT model is pretrained on much bigger corpora).
+In the following,
+we load the WikiText-2 dataset as minibatches
+of pretraining examples with the batch size being 256
+and the maximum length of a BERT input sequence being 128.
 
 ```{.python .input  n=40}
 import d2l
@@ -14,9 +37,16 @@ from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()
+# In the original BERT model, `max_len` = 512
 bert_batch_size, max_len = 256, 128
 bert_train_iter, vocab = d2l.load_data_wiki(bert_batch_size, max_len)
 ```
+
+As discussed in :numref:`sec_bert-pretraining`,
+the original BERT model has hundreds of millions of parameters.
+To facilitate demonstration,
+we define a small BERT of 2 layers, 128 hidden units, and 2 self-attention heads.
+We pretrain BERT on the WikiText-2 dataset for 4,000 iteration steps.
 
 ```{.python .input}
 ctx, loss = d2l.try_all_gpus(), gluon.loss.SoftmaxCELoss()
@@ -27,6 +57,20 @@ d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 4000)
 ```
 
 ## The Dataset for Fine-Tuning BERT
+
+For the downstream task natural language inference on the SNLI dataset,
+we define a customized dataset class `SNLIBERTDataset`.
+In each example,
+the premise and hypothesis form a pair of text sequence
+and is packed into one BERT input sequence as depicted in :numref:`fig_bert-two-seqs`.
+Recall :numref:`subsec_bert_input_rep` that segment IDs
+are used to distinguish the premise and the hypothesis in a BERT input sequence.
+With the predefined maximum length of a BERT input sequence (`max_len`),
+the last token of the longer of the input text pair keeps being removed until
+`max_len` is met.
+To accelerate generation of the SNLI dataset
+for fine-tuning BERT,
+we use 4 worker processes to generate training or testing examples in parallel.
 
 ```{.python .input  n=41}
 class SNLIBERTDataset(gluon.data.Dataset):
@@ -51,7 +95,7 @@ class SNLIBERTDataset(gluon.data.Dataset):
         return (np.array(all_token_ids, dtype='int32'),
                 np.array(all_segments, dtype='int32'), 
                 np.array(valid_lens))
-    
+
     def _mp_worker(self, premise_hypothesis_tokens):
         p_tokens, h_tokens = premise_hypothesis_tokens
         self._truncate_pair_of_tokens(p_tokens, h_tokens)
@@ -79,19 +123,16 @@ class SNLIBERTDataset(gluon.data.Dataset):
         return len(self.all_token_ids)
 ```
 
-...
+After downloading the SNLI dataset,
+we generate training and testing examples
+by instantiating the `SNLIBERTDataset` class.
+Such examples will be read in batches of size 512 during training and testing
+of natural language inference.
 
 ```{.python .input  n=42}
 data_dir = d2l.download_extract('SNLI')
-train_data = d2l.read_snli(data_dir, True)
-test_data = d2l.read_snli(data_dir, False)
-train_set = SNLIBERTDataset(train_data, max_len, vocab)
-test_set = SNLIBERTDataset(test_data, max_len, vocab)
-```
-
-...
-
-```{.python .input  n=43}
+train_set = SNLIBERTDataset(d2l.read_snli(data_dir, True), max_len, vocab)
+test_set = SNLIBERTDataset(d2l.read_snli(data_dir, False), max_len, vocab)
 # Reduce `batch_size` if there is an out of memory error
 batch_size, num_workers = 512, d2l.get_dataloader_workers()
 train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
@@ -101,6 +142,8 @@ test_iter = gluon.data.DataLoader(test_set, batch_size,
 ```
 
 ## Fine-Tuning BERT
+
+
 
 ```{.python .input  n=44}
 class BERTClassifier(nn.Block):
