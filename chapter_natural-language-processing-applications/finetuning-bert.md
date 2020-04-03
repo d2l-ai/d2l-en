@@ -27,19 +27,24 @@ In the following,
 we generalize a subset of natural language processing applications
 as sequence-level and token-level.
 On the sequence level,
-we introduce how to fine-tune BERT for single text classification and text pair classification, such as sentiment analysis and natural language inference,
-which we have already examined.
+we introduce how to transform the BERT representation of the text input
+to the output label
+in single text classification
+and text pair classification or regression.
 On the token level, we will briefly introduce new applications
 such as text tagging and question answering
-and shed light on how BERT can fit in their problem settings.
+and shed light on how BERT can represent their inputs and get transformed into output labels.
 During fine-tuning,
 the "minimal architecture changes" required by BERT across different applications
 are the extra fully-connected layers.
+During supervised learning of a downstream application,
+parameters of the extra layers are learned from scratch while
+all the parameters in the pretrained BERT model are fine-tuned.
 
 
 ## Single Text Classification
 
-Single text classification takes a single text sequence as the input and outputs its classification result.
+*Single text classification* takes a single text sequence as the input and outputs its classification result.
 Besides sentiment analysis that we have studied in this chapter,
 the Corpus of Linguistic Acceptability (CoLA)
 is also a dataset for single text classification,
@@ -77,6 +82,12 @@ For instance, in the Semantic Textual Similarity Benchmark dataset,
 the similarity score of a pair of sentences
 is an ordinal scale ranging from 0 (no meaning overlap) to 5 (meaning equivalence) :cite:`Cer.Diab.Agirre.ea.2017`.
 The goal is to predict these scores.
+Examples from the Semantic Textual Similarity Benchmark dataset include (sentence 1, sentence 2, similarity score):
+
+* "A plane is taking off.", "An air plane is taking off.", 5.000;
+* "A woman is eating something.", "A woman is eating meat.", 3.000;
+* "A woman is dancing.", "A man is talking.", 0.000.
+
 
 ![Fine-tuning BERT for text pair classification or regression applications, such as natural language inference and semantic textual similarity. Suppose that the input text pair has two and three tokens.](../img/bert-two-seqs.svg)
 :label:`fig_bert-two-seqs`
@@ -91,11 +102,45 @@ and using the mean squared loss: they are common for regression.
 
 ## Text Tagging
 
+Now let us consider token-level tasks, such as *text tagging*,
+where each token is assigned a label.
+Among text tagging tasks,
+*part-of-speech tagging* assigns each word a part-of-speech tag (e.g., adjective and determiner)
+according to the role of the word in the sentence.
+For example,
+according to the Penn Treebank II tag set,
+the sentence "John Smith 's car is new"
+should be tagged as
+"NNP (noun, proper singular) NNP POS (possessive ending) NN (noun, singular or mass) VB (verb, base form) JJ (adjective)".
+
 ![Fine-tuning BERT for text tagging applications, such as part-of-speech tagging. Suppose that the input single text has six tokens.](../img/bert-tagging.svg)
 :label:`fig_bert-tagging`
 
+Fine-tuning BERT for text tagging applications
+is illustrated in :numref:`fig_bert-tagging`.
+Comparing with :numref:`fig_bert-one-seq`,
+the only distinction lies in that
+in text tagging, the BERT representation of *every token* of the input text
+is fed into the same extra fully-connected layers to output the label of the token,
+such as a part-of-speech tag.
+
+
 
 ## Question Answering
+
+The final token-level application to consider is question answering,
+which often reflects capabilities of reading comprehension.
+For example,
+the Stanford Question Answering Dataset (SQuAD v1.1)
+consists of reading passages and questions,
+where the answer to every question
+is just a segment of text (text span) from the passage that the question is about :cite:`Rajpurkar.Zhang.Lopyrev.ea.2016`.
+To explain,
+consider a passage
+"Some experts report that a mask's efficacy is inconclusive. However, mask makers insist that their products, such as N95 respirator masks, can guard against the virus."
+and a question "Who say that N95 respirator masks can guard against the virus?"
+The answer should be the text span "mask makers" in the passage.
+Thus, the goal in SQuAD v1.1 is to predict the beginning and end of the text span in the passage given a pair of question and passage.
 
 ![Fine-tuning BERT for question answering. Suppose that the input text pair has two and three tokens.](../img/bert-qa.svg)
 :label:`fig_bert-qa`
