@@ -14,7 +14,7 @@ to routinely train networks with over 100 layers.
 
 ## Training Deep Networks
 
-To motivate batch normalization, let's review 
+To motivate batch normalization, let us review 
 a few practical challenges that arise 
 when training ML models and neural nets in particular.
 
@@ -341,7 +341,7 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-Let's have a look at the scale parameter `gamma`
+Let us have a look at the scale parameter `gamma`
 and the shift parameter `beta` learned
 from the first batch normalization layer.
 

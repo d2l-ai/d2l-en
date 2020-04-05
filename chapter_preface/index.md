@@ -103,13 +103,13 @@ Moreover, too many resources are hidden behind the paywalls
 of commercial course providers.
 
 We set out to create a resource that could
-(1) be freely available for everyone;
-(2) offer sufficient technical depth to provide a starting point on the path
+(i) be freely available for everyone;
+(ii) offer sufficient technical depth to provide a starting point on the path
 to actually becoming an applied machine learning scientist;
-(3) include runnable code, showing readers *how* to solve problems in practice;
-(4) that allowed for rapid updates, both by us
+(iii) include runnable code, showing readers *how* to solve problems in practice;
+(iv) allow for rapid updates, both by us
 and also by the community at large;
-and (5) be complemented by a [forum](http://discuss.mxnet.io)
+and (v) be complemented by a [forum](http://discuss.mxnet.io)
 for interactive discussion of technical details and to answer questions.
 
 These goals were often in conflict.
@@ -364,8 +364,8 @@ Steve Sedlmeyer, ruslo, Rafael Schlatter, liusy182, Giannis Pappas, ruslo,
 ati-ozgur, qbaza, dchoi77, Adam Gerson, Phuc Le, Mark Atwood, christabella, vn09,
 Haibin Lin, jjangga0214, RichyChen, noelo, hansent, Giel Dops, dvincent1337, WhiteD3vil,
 Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk, heytitle, Peter Goetz, rigtorp,
-tiepvupsu, sfilip, mlxd, KaleabTessera, Sanjar Adilov, MatteoFerrara, hsneto,
-Katarzyna Biesialska, Gregory Bruss, duythanhvn.
+tiepvupsu, sfilip, mlxd, Kale-ab Tessera, Sanjar Adilov, MatteoFerrara, hsneto,
+Katarzyna Biesialska, Gregory Bruss, duythanhvn, paulaurel, graytowne, minhduc0711.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.

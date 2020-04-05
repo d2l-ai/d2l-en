@@ -38,7 +38,6 @@ If you find this book useful, please star (★) this repository or cite this boo
 }
 ```
 
-
 ## Endorsements
 
 > <p>"In less than a decade, the AI revolution has swept from research labs to broad industries to every corner of our daily life.  Dive into Deep Learning is an excellent text on deep learning and deserves attention from anyone who wants to learn why deep learning has ignited the AI revolution: the most powerful technology force of our time."</p>

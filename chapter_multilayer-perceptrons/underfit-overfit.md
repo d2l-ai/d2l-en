@@ -9,13 +9,13 @@ and not simply memorized our data.
 For example, imagine that we wanted to hunt 
 for patterns among genetic markers 
 linking patients to their dementia status,
-(let's the labels be drawn from the set
+(let us the labels be drawn from the set
 {*dementia*, *mild cognitive impairment*, *healthy*}).
 Because each person's genes identify them uniquely
 (ignoring identical siblings),
-it's possible to memorize the entire dataset.
+it is possible to memorize the entire dataset.
 
-We don't want our model to say 
+We do not want our model to say 
 *"That's Bob! I remember him! He has dementia!*
 The reason why is simple. 
 When we deploy the model in the future,
@@ -445,7 +445,7 @@ features[:2], poly_features[:2], labels[:2]
 
 ### Training and Testing Model
 
-Let's first implement a function to evaluate the loss on a given data.
+Let us first implement a function to evaluate the loss on a given data.
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
@@ -521,7 +521,7 @@ train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
 
 ### Insufficient Training (Overfitting)
 
-Now let's try to train the model
+Now let us try to train the model
 using a polynomial of too high degree.
 Here, there is insufficient data to learn that
 the higher-degree coefficients should have values close to zero.

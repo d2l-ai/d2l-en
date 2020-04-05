@@ -8,7 +8,7 @@ following the introduction of LeNet,
 they did not immediately dominate the field.
 Although LeNet achieved good results on early small datasets,
 the performance and feasability of training convolutional networks
-on larger, more realistic datasets had yet to be established
+on larger, more realistic datasets had yet to be established.
 In fact, for much of the intervening time between the early 1990s
 and the watershed results of 2012,
 neural networks were often surpassed by other machine learning methods,
@@ -188,7 +188,7 @@ Hence, for the power budget of a CPU core that runs 4x faster (a typical number)
 you can use 16 GPU cores at 1/4 the speed,
 which yields 16 x 1/4 = 4x the performance.
 Furthermore, GPU cores are much simpler
-(in fact, for a long time they weren't even *able*
+(in fact, for a long time they were not even *able*
 to execute general purpose code),
 which makes them more energy efficient.
 Last, many operations in deep learning require high memory bandwidth.
@@ -231,7 +231,7 @@ First, AlexNet is much deeper than the comparatively small LeNet5.
 AlexNet consists of eight layers: five convolutional layers,
 two fully-connected hidden layers, and one fully-connected output layer. Second, AlexNet used the ReLU instead of the sigmoid
 as its activation function.
-Let's delve into the details below.
+Let us delve into the details below.
 
 ### Architecture
 

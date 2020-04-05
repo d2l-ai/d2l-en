@@ -38,7 +38,7 @@ If all activations and inputs are vectors,
 we can write the gradient of $\mathbf{o}$ with respect to 
 any set of parameters $\mathbf{W}_l$ as follows:
 
-$$\partial_{\mathbf{W}_l} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{L-1}} \mathbf{h}^L}_{:= \mathbf{M}_L} \cdot \ldots \cdot \underbrace{\partial_{\mathbf{h}^{l}} \mathbf{h}^{l+1}}_{:= \mathbf{M}_l} \underbrace{\partial_{\mathbf{W}_l} \mathbf{h}^l}_{:= \mathbf{v}_l}.$$
+$$\partial_{\mathbf{W}_l} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{L-1}} \mathbf{h}^L}_{:= \mathbf{M}_L} \cdot \ldots, \cdot \underbrace{\partial_{\mathbf{h}^{l}} \mathbf{h}^{l+1}}_{:= \mathbf{M}_l} \underbrace{\partial_{\mathbf{W}_l} \mathbf{h}^l}_{:= \mathbf{v}_l}.$$
 
 In other words, this gradient is
 the product of $L-l$ matrices
@@ -81,7 +81,7 @@ Since early artificial neural networks were inspired
 by biological neural networks,
 the idea of neurons that either fire either *fully* or *not at all*
 (like biological neurons) seemed appealing.
-Let's take a closer look at the sigmoid
+Let us take a closer look at the sigmoid
 to see why it can cause vanishing gradients.
 
 ```{.python .input}
@@ -195,7 +195,7 @@ for moderate problem sizes.
 
 ### Xavier Initialization
 
-Let's look at the scale distribution of
+Let us look at the scale distribution of
 the activations of the hidden units $h_{i}$ for some layer. 
 They are given by
 
@@ -203,11 +203,11 @@ $$h_{i} = \sum_{j=1}^{n_\mathrm{in}} W_{ij} x_j.$$
 
 The weights $W_{ij}$ are all drawn 
 independently from the same distribution.
-Furthermore, let's assume that this distribution
+Furthermore, let us assume that this distribution
 has zero mean and variance $\sigma^2$
 (this does not mean that the distribution has to be Gaussian,
 just that mean and variance need to exist).
-For now, let's assume that the inputs to layer $x_j$
+For now, let us assume that the inputs to layer $x_j$
 also have zero mean and variance $\gamma^2$
 and that they are independent of $\mathbf{W}$.
 In this case, we can compute mean and variance of $h_i$ as follows:

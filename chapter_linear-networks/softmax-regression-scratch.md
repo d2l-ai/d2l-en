@@ -7,7 +7,7 @@ is similarly fundamental and you ought to know
 the gory details of how to implement it yourself.
 As with linear regression, after doing things by hand
 we will breeze through an implementation in Gluon for comparison.
-To begin, let's import the familiar packages.
+To begin, let us import the familiar packages.
 
 ```{.python .input  n=2}
 import d2l
@@ -65,7 +65,7 @@ b.attach_grad()
 ## The Softmax
 
 Before implementing the softmax regression model,
-let's briefly review how operators such as `sum` work
+let us briefly review how operators such as `sum` work
 along specific dimensions in an `ndarray`.
 Given a matrix `X` we can sum over all elements (default) or only
 over elements in the same axis, *i.e.*, the column (`axis=0`) or the same row (`axis=1`).
@@ -89,7 +89,7 @@ Then, we sum over each row (we have one row per example in the batch)
 to get the normalization constants for each example.
 Finally, we divide each row by its normalization constant,
 ensuring that the result sums to $1$.
-Before looking at the code, let's recall
+Before looking at the code, let us recall
 what this looks expressed as an equation:
 
 $$
@@ -411,7 +411,7 @@ have similar training procedures.
 1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. What problems might this cause (hint: try to calculate the size of $\exp(50)$)?
 1. The function `cross_entropy` in this section is implemented according to the definition of the cross-entropy loss function.  What could be the problem with this implementation (hint: consider the domain of the logarithm)?
 1. What solutions you can think of to fix the two problems above?
-1. Is it always a good idea to return the most likely label. E.g. would you do this for medical diagnosis?
+1. Is it always a good idea to return the most likely label. E.g., would you do this for medical diagnosis?
 1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
 
 ## [Discussions](https://discuss.mxnet.io/t/2336)

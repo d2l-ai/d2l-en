@@ -3,7 +3,7 @@
 
 Now that we have characterized 
 multilayer perceptrons (MLPs) mathematically, 
-let's try to implement one ourselves.
+let us try to implement one ourselves.
 
 ```{.python .input  n=1}
 import d2l

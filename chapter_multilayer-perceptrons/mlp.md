@@ -54,7 +54,7 @@ an applicant with a higher income
 would always be more likely to repay 
 than one with a lower income.
 While monotonic, this relationship likely
-isn't linearly associated with the probability of 
+is not linearly associated with the probability of 
 repayment. An increase in income from $0 to $50k 
 likely corresponds to a bigger increase 
 in likelihood of repayment 
@@ -93,7 +93,7 @@ where inverting an image preserves the category.
 
 And yet despite the apparent absurdity of linearity here,
 as compared to our previous examples, 
-it's less obvious that we could address the problem
+it is less obvious that we could address the problem
 with a simple preprocessing fix. 
 That is because the significance of any pixel
 depends in complex ways on its context 
@@ -231,8 +231,8 @@ to solve all of your problems
 with single-layer networks.
 In fact, we can approximate many functions
 much more compactly by using deeper (vs wider) networks.
-We'll touch upon more rigorous arguments in subsequent chapters,
-but first let's actually build an MLP in code.
+We will touch upon more rigorous arguments in subsequent chapters,
+but first let us actually build an MLP in code.
 In this example, we’ll implement an MLP
 with two hidden layers and one output layer.
 
@@ -280,7 +280,7 @@ calculating the weighted sum and further adding bias with it.
 They are differentiable operators to transform input signals to outputs, 
 while most of them add non-linearity.
 Because activation functions are fundamental to deep learning, 
-let's briefly survey some common activation functions.
+let us briefly survey some common activation functions.
 
 ### ReLU Function
 

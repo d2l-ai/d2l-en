@@ -18,8 +18,8 @@ and now to blocks, repeating patterns of layers.
 
 The idea of using blocks first emerged from the
 [Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) (VGG)
-at Oxford University.
-In their eponymously-named VGG network,
+at Oxford University,
+in their eponymously-named VGG network.
 It is easy to implement these repeated structures in code
 with any modern deep learning framework by using loops and subroutines.
 
@@ -30,7 +30,8 @@ The basic building block of classic convolutional networks
 is a sequence of the following layers:
 (i) a convolutional layer
 (with padding to maintain the resolution),
-(ii) a nonlinearity such as a ReLU,
+(ii) a nonlinearity such as a ReLU, (iii) a pooling layer such 
+as a max pooling layer. 
 One VGG block consists of a sequence of convolutional layers,
 followed by a max pooling layer for spatial downsampling.
 In the original VGG paper :cite:`Simonyan.Zisserman.2014`,

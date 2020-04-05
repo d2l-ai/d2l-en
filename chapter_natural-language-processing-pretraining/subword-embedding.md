@@ -28,20 +28,21 @@ The rest of the fastText process is consistent with the skip-gram model, so it i
 
 
 ## Byte Pair Encoding
+:label:`subsec_Byte_Pair_Encoding`
 
 In fastText, all the extracted subwords have to be of the specified lengths, such as $3$ to $6$, thus the vocabulary size cannot be predefined.
 To allow for variable-length subwords in a fixed-size vocabulary,
 we can apply a compression algorithm
 called *byte pair encoding* (BPE) to extract subwords :cite:`Sennrich.Haddow.Birch.2015`.
 
-BPE performs a statistical analysis of the training dataset to discover common symbols within a word,
+Byte pair encoding performs a statistical analysis of the training dataset to discover common symbols within a word,
 such as consecutive characters of arbitrary length.
 Starting from symbols of length $1$,
-BPE iteratively merges the most frequent pair of consecutive symbols to produce new longer symbols.
+byte pair encoding iteratively merges the most frequent pair of consecutive symbols to produce new longer symbols.
 Note that for efficiency, pairs crossing word boundaries are not considered.
 In the end, we can use such symbols as subwords to segment words.
-BPE and its variants has been used for input representations in popular NLP pretraining models such as GPT-2 :cite:`Radford.Wu.Child.ea.2019` and RoBERTa :cite:`Liu.Ott.Goyal.ea.2019`.
-In the following, we will illustrate how BPE works.
+Byte pair encoding and its variants has been used for input representations in popular natural language processing pretraining models such as GPT-2 :cite:`Radford.Wu.Child.ea.2019` and RoBERTa :cite:`Liu.Ott.Goyal.ea.2019`.
+In the following, we will illustrate how byte pair encoding works.
 
 First, we initialize the vocabulary of symbols as all the English lowercase characters, a special end-of-word symbol `'_'`, and a special unknown symbol `'[UNK]'`.
 
@@ -86,7 +87,7 @@ def get_max_freq_pair(token_freqs):
 ```
 
 As a greedy approach based on frequency of consecutive symbols,
-BPE will use the following `merge_symbols` function to merge the most frequent pair of consecutive symbols to produce new symbols.
+byte pair encoding will use the following `merge_symbols` function to merge the most frequent pair of consecutive symbols to produce new symbols.
 
 ```{.python .input}
 def merge_symbols(max_freq_pair, token_freqs, symbols):
@@ -99,7 +100,7 @@ def merge_symbols(max_freq_pair, token_freqs, symbols):
     return new_token_freqs
 ```
 
-Now we iteratively perform the BPE algorithm over the keys of the dictionary `token_freqs`. In the first iteration, the most frequent pair of consecutive symbols are `'t'` and `'a'`, thus BPE merges them to produce a new symbol `'ta'`. In the second iteration, BPE continues to merge `'ta'` and `'l'` to result in another new symbol `'tal'`.
+Now we iteratively perform the byte pair encoding algorithm over the keys of the dictionary `token_freqs`. In the first iteration, the most frequent pair of consecutive symbols are `'t'` and `'a'`, thus byte pair encoding merges them to produce a new symbol `'ta'`. In the second iteration, byte pair encoding continues to merge `'ta'` and `'l'` to result in another new symbol `'tal'`.
 
 ```{.python .input}
 num_merges = 10
@@ -109,7 +110,7 @@ for i in range(num_merges):
     print("merge #%d:" % (i + 1), max_freq_pair)
 ```
 
-After 10 iterations of BPE, we can see that list `symbols` now contains 10 more symbols that are iteratively merged from other symbols.
+After 10 iterations of byte pair encoding, we can see that list `symbols` now contains 10 more symbols that are iteratively merged from other symbols.
 
 ```{.python .input}
 print(symbols)
@@ -117,14 +118,14 @@ print(symbols)
 
 For the same dataset specified in the keys of the dictionary `raw_token_freqs`,
 each word in the dataset is now segmented by subwords "fast_", "fast", "er_", "tall_", and "tall"
-as a result of the BPE algorithm.
+as a result of the byte pair encoding algorithm.
 For instance, words "faster_" and "taller_" are segmented as "fast er_" and "tall er_", respectively.
 
 ```{.python .input}
 print(list(token_freqs.keys()))
 ```
 
-Note that the result of BPE depends on the dataset being used.
+Note that the result of byte pair encoding depends on the dataset being used.
 We can also use the subwords learned from one dataset
 to segment words of another dataset.
 As a greedy approach, the following `segment_BPE` function tries to break words into the longest possible subwords from the input argument `symbols`.
@@ -161,7 +162,7 @@ print(segment_BPE(tokens, symbols))
 
 * FastText proposes a subword embedding method. Based on the skip-gram model in word2vec, it represents the central word vector as the sum of the subword vectors of the word.
 * Subword embedding utilizes the principles of morphology, which usually improves the quality of representations of uncommon words.
-* BPE performs a statistical analysis of the training dataset to discover common symbols within a word. As a greedy approach, BPE iteratively merges the most frequent pair of consecutive symbols.
+* Byte pair encoding performs a statistical analysis of the training dataset to discover common symbols within a word. As a greedy approach, byte pair encoding iteratively merges the most frequent pair of consecutive symbols.
 
 
 ## Exercises
@@ -169,7 +170,7 @@ print(segment_BPE(tokens, symbols))
 1. When there are too many subwords (for example, 6 words in English result in about $3\times 10^8$ combinations), what problems arise? Can you think of any methods to solve them? Hint: Refer to the end of section 3.2 of the fastText paper[1].
 1. How can you design a subword embedding model based on the continuous bag-of-words model?
 1. To get a vocabulary of size $m$, how many merging operations are needed when the initial symbol vocabulary size is $n$?
-1. How can we extend the idea of BPE to extract phrases?
+1. How can we extend the idea of byte pair encoding to extract phrases?
 
 
 

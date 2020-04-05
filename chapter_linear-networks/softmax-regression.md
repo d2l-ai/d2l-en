@@ -35,12 +35,12 @@ we still use models that make soft assignments.
 
 ## Classification Problems
 
-To get our feet wet, let's start off with 
+To get our feet wet, let us start off with 
 a simple image classification problem. 
 Here, each input consists of a $2\times2$ grayscale image. 
 We can represent each pixel value with a single scalar, 
 giving us four features $x_1, x_2, x_3, x_4$. 
-Further, let's assume that each image belongs to one 
+Further, let us assume that each image belongs to one 
 among the categories "cat", "chicken" and "dog".
 
 Next, we have to choose how to represent the labels. 
@@ -358,7 +358,7 @@ that one can ever be (in expectation).
 So if entropy is level of surprise experienced 
 by someone who knows the true probability, 
 then you might be wondering, *what is cross-entropy?* 
-The cross-entropy *from $p$ to $q$*, denoted $H(p, q)$,
+The cross-entropy *from* $p$ *to* $q$, denoted $H(p, q)$,
 is the expected surprisal of an observer with subjective probabilities $q$
 upon seeing data that was actually generated according to probabilities $p$.
 The lowest possible cross-entropy is achieved when $p=q$. 

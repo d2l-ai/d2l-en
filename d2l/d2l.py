@@ -333,7 +333,7 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download(name, cache_dir=os.path.join('..', 'data')):
     """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, "%s doesn't exist" % name
+    assert name in DATA_HUB, "%s does not exist" % name
     url, sha1 = DATA_HUB[name]
     d2l.mkdir_if_not_exist(cache_dir)
     return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
@@ -1310,7 +1310,9 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
               in zip(pred_shards, y_shards)]
     for l in ls:
         l.backward()
-    trainer.step(labels.shape[0])
+    # The True flag allows parameters with stale gradients, which is useful
+    # later (e.g., in fine-tuning BERT)
+    trainer.step(labels.shape[0], ignore_stale_grad=True)
     train_loss_sum = sum([float(l.sum()) for l in ls])
     train_acc_sum = sum(d2l.accuracy(pred_shard, y_shard)
                         for pred_shard, y_shard in zip(pred_shards, y_shards))
@@ -1694,23 +1696,38 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
+def get_tokens_and_segments(tokens_a, tokens_b=None):
+    tokens = ['<cls>'] + tokens_a + ['<sep>']
+    # 0 and 1 are marking segment A and B, respectively
+    segments = [0] * (len(tokens_a) + 2)
+    if tokens_b is not None:
+        tokens += tokens_b + ['<sep>']
+        segments += [1] * (len(tokens_b) + 1)
+    return tokens, segments
+
+
+# Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class BERTEncoder(nn.Block):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, **kwargs):
+                 num_layers, dropout, max_len=1000, **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
         self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
         self.segment_embedding = nn.Embedding(2, num_hiddens)
-        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
+        
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(d2l.EncoderBlock(
                 num_hiddens, ffn_num_hiddens, num_heads, dropout))
+        # In BERT, positional embeddings are learnable, thus we create a
+        # parameter of positional embeddings that are long enough
+        self.pos_embedding = self.params.get('pos_embedding',
+                                             shape=(1, max_len, num_hiddens))
 
     def forward(self, tokens, segments, valid_lens):
-        # Shape of X remains unchanged in the following code snippet:
+        # Shape of `X` remains unchanged in the following code snippet:
         # (batch size, max sequence length, num_hiddens)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
-        X = self.pos_encoding(X)
+        X = X + self.pos_embedding.data(ctx=X.ctx)[:, :X.shape[1], :]
         for blk in self.blks:
             X = blk(X, valid_lens)
         return X
@@ -1731,8 +1748,8 @@ class MaskLM(nn.Block):
         pred_positions = pred_positions.reshape(-1)
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
-        # Suppose that batch_size = 2, num_pred_positions = 3,
-        # batch_idx = np.array([0, 0, 0, 1, 1, 1])
+        # Suppose that `batch_size` = 2, `num_pred_positions` = 3, then
+        # `batch_idx` is np.array([0, 0, 0, 1, 1, 1])
         batch_idx = np.repeat(batch_idx, num_pred_positions)
         masked_X = X[batch_idx, pred_positions]
         masked_X = masked_X.reshape((batch_size, num_pred_positions, -1))
@@ -1749,24 +1766,23 @@ class NextSentencePred(nn.Block):
         self.mlp.add(nn.Dense(2))
 
     def forward(self, X):
-        # 0 is the index of the CLS token
+        # 0 is the index of the '<cls>' token
         X = X[:, 0, :]
-        # X shape: (batch size, num_hiddens)
+        # X shape: (batch size, `num_hiddens`)
         return self.mlp(X)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class BERTModel(nn.Block):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
-                 num_layers, dropout):
+                 num_layers, dropout, max_len=1000):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
-                                   num_heads, num_layers, dropout)
-        self.nsp = NextSentencePred(num_hiddens)
+                                   num_heads, num_layers, dropout, max_len)
         self.mlm = MaskLM(vocab_size, num_hiddens)
+        self.nsp = NextSentencePred(num_hiddens)
 
-    def forward(self, tokens, segments, valid_lens=None,
-                pred_positions=None):
+    def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)
         if pred_positions is not None:
             mlm_Y_hat = self.mlm(encoded_X, pred_positions)
@@ -1787,7 +1803,7 @@ def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
         lines = f.readlines()
-    # A line represents a paragraph.
+    # Uppercase letters are converted to lowercase ones
     paragraphs = [line.strip().lower().split(' . ')
                   for line in lines if len(line.split(' . ')) >= 2]
     random.shuffle(paragraphs)
@@ -1806,17 +1822,6 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
-def get_tokens_and_segments(tokens_a, tokens_b=None):
-    if tokens_b is None:
-        tokens = ['<cls>'] + tokens_a + ['<sep>']
-        segments = [0] * (len(tokens_a) + 2)
-    else:
-        tokens = ['<cls>'] + tokens_a + ['<sep>'] + tokens_b + ['<sep>']
-        segments = [0] * (len(tokens_a) + 2) + [1] * (len(tokens_b) + 1)
-    return tokens, segments
-
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     nsp_data_from_paragraph = []
     for i in range(len(paragraph) - 1):
@@ -1825,7 +1830,7 @@ def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
         # Consider 1 '<cls>' token and 2 '<sep>' tokens
         if len(tokens_a) + len(tokens_b) + 3 > max_len:
             continue
-        tokens, segments = get_tokens_and_segments(tokens_a, tokens_b)
+        tokens, segments = d2l.get_tokens_and_segments(tokens_a, tokens_b)
         nsp_data_from_paragraph.append((tokens, segments, is_next))
     return nsp_data_from_paragraph
 
@@ -1838,7 +1843,7 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
     mlm_input_tokens = [token for token in tokens]
     pred_positions_and_labels = []
     # Shuffle for getting 15% random tokens for prediction in the masked
-    # language model task
+    # language modeling task
     random.shuffle(candidate_pred_positions)
     for mlm_pred_position in candidate_pred_positions:
         if len(pred_positions_and_labels) >= num_mlm_preds:
@@ -1863,13 +1868,14 @@ def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def _get_mlm_data_from_tokens(tokens, vocab):
     candidate_pred_positions = []
-    # tokens is a list of strings
+    # `tokens` is a list of strings
     for i, token in enumerate(tokens):
-        # Special tokens are not predicted in the masked language model task
+        # Special tokens are not predicted in the masked language modeling
+        # task
         if token in ['<cls>', '<sep>']:
             continue
         candidate_pred_positions.append(i)
-    # 15% of random tokens will be predicted in the masked language model task
+    # 15% of random tokens are predicted in the masked language modeling task
     num_mlm_preds = max(1, round(len(tokens) * 0.15))
     mlm_input_tokens, pred_positions_and_labels = _replace_mlm_tokens(
         tokens, candidate_pred_positions, num_mlm_preds, vocab)
@@ -1881,26 +1887,28 @@ def _get_mlm_data_from_tokens(tokens, vocab):
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
-def _pad_bert_inputs(instances, max_len, vocab):
+def _pad_bert_inputs(examples, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
     all_token_ids, all_segments, valid_lens,  = [], [], []
     all_pred_positions, all_mlm_weights, all_mlm_labels = [], [], []
     nsp_labels = []
     for (token_ids, pred_positions, mlm_pred_label_ids, segments,
-         is_next) in instances:
+         is_next) in examples:
         all_token_ids.append(np.array(token_ids + [vocab['<pad>']] * (
             max_len - len(token_ids)), dtype='int32'))
         all_segments.append(np.array(segments + [0] * (
             max_len - len(segments)), dtype='int32'))
-        valid_lens.append(np.array(len(token_ids)))
+        # `valid_lens` excludes count of '<pad>' tokens
+        valid_lens.append(np.array(len(token_ids), dtype='float32'))
         all_pred_positions.append(np.array(pred_positions + [0] * (
-            20 - len(pred_positions)), dtype='int32'))
+            max_num_mlm_preds - len(pred_positions)), dtype='int32'))
         # Predictions of padded tokens will be filtered out in the loss via
         # multiplication of 0 weights
-        all_mlm_weights.append(np.array([1.0] * len(mlm_pred_label_ids) + [
-            0.0] * (20 - len(pred_positions)), dtype='float32'))
+        all_mlm_weights.append(
+            np.array([1.0] * len(mlm_pred_label_ids) + [0.0] * (
+                max_num_mlm_preds - len(pred_positions)), dtype='float32'))
         all_mlm_labels.append(np.array(mlm_pred_label_ids + [0] * (
-            20 - len(mlm_pred_label_ids)), dtype='int32'))
+            max_num_mlm_preds - len(mlm_pred_label_ids)), dtype='int32'))
         nsp_labels.append(np.array(is_next))
     return (all_token_ids, all_segments, valid_lens, all_pred_positions,
             all_mlm_weights, all_mlm_labels, nsp_labels)
@@ -1908,7 +1916,7 @@ def _pad_bert_inputs(instances, max_len, vocab):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 class _WikiTextDataset(gluon.data.Dataset):
-    def __init__(self, paragraphs, max_len=128):
+    def __init__(self, paragraphs, max_len):
         # Input paragraphs[i] is a list of sentence strings representing a
         # paragraph; while output paragraphs[i] is a list of sentences
         # representing a paragraph, where each sentence is a list of tokens
@@ -1919,19 +1927,19 @@ class _WikiTextDataset(gluon.data.Dataset):
         self.vocab = d2l.Vocab(sentences, min_freq=5, reserved_tokens=[
             '<pad>', '<mask>', '<cls>', '<sep>'])
         # Get data for the next sentence prediction task
-        instances = []
+        examples = []
         for paragraph in paragraphs:
-            instances.extend(_get_nsp_data_from_paragraph(
+            examples.extend(_get_nsp_data_from_paragraph(
                 paragraph, paragraphs, self.vocab, max_len))
         # Get data for the masked language model task
-        instances = [(_get_mlm_data_from_tokens(tokens, self.vocab)
+        examples = [(_get_mlm_data_from_tokens(tokens, self.vocab)
                       + (segments, is_next))
-                     for tokens, segments, is_next in instances]
+                     for tokens, segments, is_next in examples]
         # Pad inputs
         (self.all_token_ids, self.all_segments, self.valid_lens,
          self.all_pred_positions, self.all_mlm_weights,
          self.all_mlm_labels, self.nsp_labels) = _pad_bert_inputs(
-            instances, max_len, self.vocab)
+            examples, max_len, self.vocab)
 
     def __getitem__(self, idx):
         return (self.all_token_ids[idx], self.all_segments[idx],
@@ -1952,21 +1960,6 @@ def load_data_wiki(batch_size, max_len):
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
                                        num_workers=num_workers)
     return train_iter, train_set.vocab
-
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def _get_batch_bert(batch, ctx):
-    (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
-     mlm_Y, nsp_y) = batch
-    split_and_load = gluon.utils.split_and_load
-    return (split_and_load(tokens_X, ctx, even_split=False),
-            split_and_load(segments_X, ctx, even_split=False),
-            split_and_load(valid_lens_x.astype('float32'), ctx,
-                           even_split=False),
-            split_and_load(pred_positions_X, ctx, even_split=False),
-            split_and_load(mlm_weights_X, ctx, even_split=False),
-            split_and_load(mlm_Y, ctx, even_split=False),
-            split_and_load(nsp_y, ctx, even_split=False))
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
@@ -2008,14 +2001,16 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
     step, timer = 0, d2l.Timer()
     animator = d2l.Animator(xlabel='step', ylabel='loss',
                             xlim=[1, num_steps], legend=['mlm', 'nsp'])
-    # MLM loss, NSP loss, no. of sentence pairs, count
+    # Masked language modeling loss, next sentence prediction loss,
+    # no. of sentence pairs, count
     metric = d2l.Accumulator(4)
     num_steps_reached = False
     while step < num_steps and not num_steps_reached:
         for batch in train_iter:
             (tokens_X_shards, segments_X_shards, valid_lens_x_shards,
              pred_positions_X_shards, mlm_weights_X_shards,
-             mlm_Y_shards, nsp_y_shards) = _get_batch_bert(batch, ctx)
+             mlm_Y_shards, nsp_y_shards) = [gluon.utils.split_and_load(
+                elem, ctx, even_split=False) for elem in batch]
             timer.start()
             with autograd.record():
                 mlm_ls, nsp_ls, ls = _get_batch_loss_bert(
