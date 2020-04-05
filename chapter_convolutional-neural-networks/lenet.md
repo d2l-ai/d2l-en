@@ -160,14 +160,9 @@ until emitting an output that matches the number of image classes.
 Now that we have implemented the model,
 we might as well run some experiments
 to see what we can accomplish with the LeNet model.
-While it might serve nostalgia
-to train LeNet on the original MNIST dataset,
-that dataset has become too easy,
-with MLPs getting over 98% accuracy,
-so it would be hard to see the benefits of convolutional networks.
-Thus we will stick with Fashion-MNIST as our dataset
-because while it has the same shape ($28\times28$ images),
-this dataset is notably more challenging.
+We will use Fashion-MNIST as our dataset.
+It is more challenging than the original MNIST dataset
+while it has the same shape ($28\times28$ images).
 
 ```{.python .input}
 batch_size = 256
