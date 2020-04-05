@@ -193,7 +193,7 @@ both layers are instance variables.
 To see why this is reasonable, imagine
 instantiating two MLPs, `net1` and `net2`,
 and training them on different data.
-Naturally, we would expect them them
+Naturally, we would expect them
 to represent two different learned models.
 
 We instantiate the MLP's layers

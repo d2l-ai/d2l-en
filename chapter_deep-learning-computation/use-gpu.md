@@ -157,6 +157,7 @@ We can use the `nvidia-smi` command to view GPU memory usage.
 In general, we need to make sure we do not 
 create data that exceeds the GPU memory limit.
 
+
 ```{.python .input  n=5}
 x = np.ones((2, 3), ctx=try_gpu())
 x
