@@ -83,8 +83,8 @@ and hidden representations similarly organized
 as $h \times w$ matrices / 2D arrays.
 Let $x[i, j]$ and $h[i, j]$ denote pixel location $(i, j)$
 in an image and hidden representation, respectively.
-Consequently, to have each of the $hw$ hidden nodes receive input
-from each of the $hw$ inputs,
+Consequently, to have each of the $h \times w$ hidden nodes receive input
+from each of the $h \times w$ input nodes,
 we would switch from using weight matrices
 (as we did previously in MLPs)
 to representing our parameters
