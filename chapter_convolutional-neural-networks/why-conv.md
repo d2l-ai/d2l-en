@@ -184,7 +184,7 @@ We will come back to this in the following section.
 ## Waldo Revisited
 
 Let us see what this looks like if we want to build an improved Waldo detector. The convolutional layer picks windows of a given size
-and weighs intensities according to the mask $V$, as demonstrated in :numref:`fig_waldo_mask`.
+and weight intensities according to the mask $V$, as demonstrated in :numref:`fig_waldo_mask`.
  We expect that wherever the "waldoness" is highest,
  we will also find a peak in the hidden layer activations.
 
