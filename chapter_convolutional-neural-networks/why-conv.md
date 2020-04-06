@@ -216,7 +216,7 @@ corresponding to each spatial location.
 We could think of the hidden representation as comprising a number of 2D grids stacked on top of each other.
 These are sometimes called *channels* or *feature maps*.
 Intuitively you might imagine that at lower layers,
-some channels specialize to recognizing edges,
+some channels specialize to recognizing edges.
 We can take care of this by adding a fourth coordinate to $V$
 via $V[a, b, c, d]$. Putting all together we have:
 
