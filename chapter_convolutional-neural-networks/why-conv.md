@@ -51,7 +51,7 @@ Ideally we could learn a system
 that would somehow exploit this knowledge.
 Pigs usually do not fly and planes usually do not swim.
 Nonetheless, we could still recognize a flying pig were one to appear.
-This ideas is taken to an extreme in the children's game 'Where's Waldo', an
+This idea is taken to an extreme in the children's game 'Where's Waldo', an
 example is shown in :numref:`img_waldo`.
 The game consists of a number of chaotic scenes bursting with activity
 and Waldo shows up somewhere in each
