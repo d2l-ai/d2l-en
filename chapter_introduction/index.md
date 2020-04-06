@@ -598,7 +598,7 @@ the high-level idea behind linear regression
 In this case, we could produce the parameters
 that exactly matched the contractor's prices.
 Sometimes that is not possible, e.g., if some of
-the variances owes to some factors besides your two features.
+the variance owes to some factors besides your two features.
 In these cases, we will try to learn models
 that minimize the distance between our predictions and the observed values.
 In most of our chapters, we will focus on one of two very common losses,
