@@ -191,10 +191,10 @@ Deep learning is just one among many popular methods
 for solving machine learning problems.
 Thus far, we have only talked about machine learning broadly
 and not deep learning. To see why deep learning is important,
-we should pause for a moment to highlight a couple crucial points.
+we should pause for a moment to highlight a couple of crucial points.
 
 First, the problems that we have discussed thus far---learning
-from raw audio signal, the raw pixel values of images,
+from the raw audio signal, the raw pixel values of images,
 or mapping between sentences of arbitrary lengths and
 their counterparts in foreign languages---are problems
 where deep learning excels and where traditional ML methods faltered.
@@ -240,9 +240,9 @@ that will follow us around, no matter what kind of ML problem we take on:
 
 It might go without saying that you cannot do data science without data.
 We could lose hundreds of pages pondering what precisely constitutes data,
-but for now we will err on the practical side
+but for now, we will err on the practical side
 and focus on the key properties to be concerned with.
-Generally we are concerned with a collection of *examples*
+Generally, we are concerned with a collection of *examples*
 (also called *data points*, *samples*, or *instances*).
 In order to work with data usefully, we typically
 need to come up with a suitable numerical representation.
@@ -270,11 +270,11 @@ When every example is characterized by the same number of numerical values,
 we say that the data consists of *fixed-length* vectors
 and we describe the (constant) length of the vectors
 as the *dimensionality* of the data.
-As you might imagine, fixed length can be a convenient property.
+As you might imagine, fixed-length can be a convenient property.
 If we wanted to train a model to recognize cancer in microscopy images,
-fixed-length inputs means we have one less thing to worry about.
+fixed-length inputs mean we have one less thing to worry about.
 
-However, not all data can easily be represented as fixed length vectors.
+However, not all data can easily be represented as fixed-length vectors.
 While we might expect microscope images to come from standard equipment,
 we cannot expect images mined from the Internet
 to all show up with the same resolution or shape.
@@ -298,7 +298,7 @@ To drive the point home, many of the most exciting models in deep learning do no
 Some others work in the low-data regime,
 but are no better than traditional approaches.
 
-Finally it is not enough to have lots of data and to process it cleverly.
+Finally, it is not enough to have lots of data and to process it cleverly.
 We need the *right* data. If the data is full of mistakes,
 or if the chosen features are not predictive
 of the target quantity of interest, learning is going to fail.
@@ -312,9 +312,9 @@ are unrepresented in the training data.
 Imagine applying a skin cancer recognition system in the wild
 that had never seen black skin before.
 Failure can also occur when the data
-does not merely under-represent some groups,
+does not merely under-represent some groups
 but reflects societal prejudices.
-For example if past hiring decisions are used to train a predictive model
+For example, if past hiring decisions are used to train a predictive model
 that will be used to screen resumes,
 then machine learning models could inadvertently
 capture and automate historical injustices.
@@ -439,7 +439,7 @@ predicting *targets* given *inputs*.
 The targets, which we often call *labels*, are generally denoted by *y*.
 The input data, also called the *features* or covariates,
 are typically denoted $\mathbf{x}$.
-Each (input, target) pair is called an *examples* or an *instances*.
+Each (input, target) pair is called *examples* or *instances*.
 Some times, when the context is clear, we may use the term examples,
 to refer to a collection of inputs,
 even when the corresponding targets are unknown.
@@ -511,12 +511,12 @@ The full process in drawn in :numref:`fig_supervised_learning`.
 
 Perhaps the simplest supervised learning task
 to wrap your head around is *regression*.
-Consider, for example a set of data harvested
+Consider, for example, a set of data harvested
 from a database of home sales.
 We might construct a table, where each row corresponds to a different house,
 and each column corresponds to some relevant attribute,
 such as the square footage of a house, the number of bedrooms, the number of bathrooms, and the number of minutes (walking) to the center of town.
-In this dataset each *example* would be a specific house,
+In this dataset, each *example* would be a specific house,
 and the corresponding *feature vector* would be one row in the table.
 
 If you live in New York or San Francisco,
@@ -598,7 +598,7 @@ the high-level idea behind linear regression
 In this case, we could produce the parameters
 that exactly matched the contractor's prices.
 Sometimes that is not possible, e.g., if some of
-the variance owes to some factors besides your two features.
+the variances owes to some factors besides your two features.
 In these cases, we will try to learn models
 that minimize the distance between our predictions and the observed values.
 In most of our chapters, we will focus on one of two very common losses,
@@ -622,7 +622,7 @@ of noise from a Laplace distribution.
 
 While regression models are great for addressing *how many?* questions,
 lots of problems do not bend comfortably to this template.
-For example, a bank wants to add check scanning to their mobile app.
+For example, a bank wants to add check scanning to its mobile app.
 This would involve the customer snapping a photo of a check
 with their smart phone's camera
 and the machine learning model would need to be able
@@ -743,12 +743,12 @@ Nonetheless, no matter how accurate our model gets,
 we might find ourselves in trouble when the classifier
 encounters an image of the Town Musicians of Bremen.
 
-![A cat, a roster, a dog and a donkey](../img/stackedanimals.jpg)
+![A cat, a rooster, a dog and a donkey](../img/stackedanimals.jpg)
 :width:`300px`
 
 
 As you can see, there is a cat in the picture,
-and a rooster, a dog, a donkey and a bird,
+and a rooster, a dog, a donkey, and a bird,
 with some trees in the background.
 Depending on what we want to do with our model
 ultimately, treating this as a binary classification problem
@@ -910,7 +910,7 @@ and they are instances of *sequence learning*.
 They require a model to either ingest sequences of inputs
 or to emit sequences of outputs (or both!).
 These latter problems are sometimes referred to as ``seq2seq`` problems.  Language translation is a ``seq2seq`` problem.
-Transcribing text from spoken speech is also a ``seq2seq`` problem.
+Transcribing text from the spoken speech is also a ``seq2seq`` problem.
 While it is impossible to consider all types of sequence transformations,
 a number of special cases are worth mentioning:
 
@@ -1046,7 +1046,7 @@ So far, we have not discussed where data actually comes from,
 or what actually *happens* when a machine learning model generates an output.
 That is because supervised learning and unsupervised learning
 do not address these issues in a very sophisticated way.
-In either case, we grab a big pile of data up front,
+In either case, we grab a big pile of data upfront,
 then set our pattern recognition machines in motion
 without ever interacting with the environment again.
 Because all of the learning takes place
@@ -1200,7 +1200,7 @@ In fact, much of natural science has its roots in this.
 For instance, the Bernoulli distribution is named after
 [Jacob Bernoulli (1655-1705)](https://en.wikipedia.org/wiki/Jacob_Bernoulli), and the Gaussian distribution was discovered
 by [Carl Friedrich Gauss (1777-1855)](https://en.wikipedia.org/wiki/Carl_Friedrich_Gauss).
-He invented for instance the least mean squares algorithm,
+He invented, for instance, the least mean squares algorithm,
 which is still used today for countless problems
 from insurance calculations to medical diagnostics.
 These tools gave rise to an experimental approach
@@ -1245,7 +1245,7 @@ in his famous paper [Computing machinery and intelligence](https://en.wikipedia.
 In what he described as the Turing test, a machine
 can be considered intelligent if it is difficult
 for a human evaluator to distinguish between the replies
-from a machine and a human based on textual interactions.
+from a machine and a human-based on textual interactions.
 
 Another influence can be found in neuroscience and psychology.
 After all, humans clearly exhibit intelligent behavior.
@@ -1295,7 +1295,7 @@ and provided predictable results with strong theoretical guarantees.
 Much of this changed with the ready availability of large amounts of data,
 due to the World Wide Web, the advent of companies serving
 hundreds of millions of users online, a dissemination of cheap,
-high quality sensors, cheap data storage (Kryder's law),
+high-quality sensors, cheap data storage (Kryder's law),
 and cheap computation (Moore's law), in particular in the form of GPUs, originally engineered for computer gaming.
 Suddenly algorithms and models that seemed computationally infeasible
 became relevant (and vice versa).
@@ -1320,7 +1320,7 @@ This means that statistical models needed to become more memory efficient
 (this is typically achieved by adding nonlinearities)
 while simultaneously being able to spend more time
 on optimizing these parameters, due to an increased compute budget.
-Consequently the sweet spot in machine learning and statistics
+Consequently, the sweet spot in machine learning and statistics
 moved from (generalized) linear models and kernel methods to deep networks.
 This is also one of the reasons why many of the mainstays
 of deep learning, such as multilayer perceptrons
@@ -1443,7 +1443,7 @@ that would be difficult to accomplish otherwise.
 For instance, mail is sorted using optical character recognition.
 These systems have been deployed since the 90s
 (this is, after all, the source of the famous MNIST and USPS sets of handwritten digits).
-The same applies to reading checks for bank deposits and scoring
+The same applies to read checks for bank deposits and scoring
 creditworthiness of applicants.
 Financial transactions are checked for fraud automatically.
 This forms the backbone of many e-commerce payment systems,
@@ -1466,7 +1466,7 @@ solutions to problems that were considered intractable previously.
 * Object recognition likewise has come a long way. Estimating the object in a
   picture was a fairly challenging task in 2010. On the ImageNet benchmark
   :cite:`Lin.Lv.Zhu.ea.2010` achieved a top-5 error rate of 28%. By 2017,
-  :cite:`Hu.Shen.Sun.2018` reduced this error rate to 2.25%. Similarly stunning
+  :cite:`Hu.Shen.Sun.2018` reduced this error rate to 2.25%. Similarly, stunning
   results have been achieved for identifying birds, or diagnosing skin cancer.
 * Games used to be a bastion of human intelligence.
   Starting from TDGammon [23], a program for playing Backgammon
