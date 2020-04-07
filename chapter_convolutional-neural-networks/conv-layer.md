@@ -88,7 +88,7 @@ def corr2d(X, K):
 
 We can construct the input array `X` and the kernel array `K`
 from the figure above
-to validate the output of the above implementations
+to validate the output of the above implementation
 of the two-dimensional cross-correlation operation.
 
 ```{.python .input}
