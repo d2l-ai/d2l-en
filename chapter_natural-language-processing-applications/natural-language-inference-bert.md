@@ -27,7 +27,7 @@ We have explained how to pretrain BERT on the WikiText-2 dataset in
 (note that the original BERT model is pretrained on much bigger corpora).
 In the following,
 we load the WikiText-2 dataset as minibatches
-of pretraining examples with the batch size being 256
+of pretraining examples with the batch size being 512
 and the maximum length of a BERT input sequence being 128.
 
 ```{.python .input  n=40}
@@ -37,23 +37,24 @@ from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()
-# In the original BERT model, `max_len` = 512
-bert_batch_size, max_len = 256, 128
-bert_train_iter, vocab = d2l.load_data_wiki(bert_batch_size, max_len)
+# Reduce `batch_size` if there is an out of memory error. In the original BERT
+# model, `max_len` = 512
+batch_size, max_len = 512, 128
+bert_train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 ```
 
 As discussed in :numref:`sec_bert-pretraining`,
 the original BERT model has hundreds of millions of parameters.
 To facilitate demonstration,
 we define a small BERT of 2 layers, 128 hidden units, and 2 self-attention heads.
-We pretrain BERT on the WikiText-2 dataset for 4,000 iteration steps.
+We pretrain BERT on the WikiText-2 dataset for 3,000 iteration steps.
 
 ```{.python .input}
 ctx, loss = d2l.try_all_gpus(), gluon.loss.SoftmaxCELoss()
 bert = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=128,
                      num_heads=2, num_layers=2, dropout=0.2)
 bert.initialize(init.Xavier(), ctx=ctx)
-d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 4000)
+d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 3000)
 ```
 
 ## The Dataset for Fine-Tuning BERT
@@ -126,14 +127,13 @@ class SNLIBERTDataset(gluon.data.Dataset):
 After downloading the SNLI dataset,
 we generate training and testing examples
 by instantiating the `SNLIBERTDataset` class.
-Such examples will be read in batches of size 512 during training and testing
+Such examples will be read in minibatches during training and testing
 of natural language inference.
 
 ```{.python .input  n=42}
 data_dir = d2l.download_extract('SNLI')
 train_set = SNLIBERTDataset(d2l.read_snli(data_dir, True), max_len, vocab)
 test_set = SNLIBERTDataset(d2l.read_snli(data_dir, False), max_len, vocab)
-# Reduce `batch_size` if there is an out of memory error
 batch_size, num_workers = 512, d2l.get_dataloader_workers()
 train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
                                    num_workers=num_workers)
