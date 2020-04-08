@@ -95,7 +95,7 @@ the softmax function from scratch
 (:numref:`sec_softmax_scratch`),
 we leverage Gluon's integrated function
 for calculating the softmax and cross-entropy loss.
-Recall our easlier discussion of these intricacies 
+Recall our earlier discussion of these intricacies 
 (:numref:`sec_mlp`).
 We encourage the interested reader 
 to examine the source code for `mxnet.gluon.loss.SoftmaxCrossEntropyLoss`
