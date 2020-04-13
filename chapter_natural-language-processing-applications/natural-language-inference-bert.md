@@ -41,7 +41,7 @@ npx.set_np()
 # Reduce `batch_size` if there is an out of memory error. In the original BERT
 # model, `max_len` = 512
 batch_size, max_len = 512, 128
-bert_train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
+bert_train_iter, vocab = d2l.load_data_wiki(batch_size, max_len, 'wikitext-2')
 ```
 
 As discussed in :numref:`sec_bert-pretraining`,
@@ -218,7 +218,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
 ## Exercises
 
 1. How to truncate a pair of sequences according to their ratio of length? Compare this pair truncation method and the one used in the `SNLIBERTDataset` class. What are their pros and cons?
-2. If your computational resource allows, increase the model size such as setting `ffn_num_hiddens=256`, `num_heads=4`, and `num_layers=4`. By increasing pretraining steps and fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.75? Improve the sentence splitting technique by using those as described in the exercises of :numref:`sec_bert-dataset`. Does it lead to better testing accuracy?
+2. If your computational resource allows, increase the model size such as setting `num_hiddens=256`, `ffn_num_hiddens=256`, `num_heads=4`, and `num_layers=4`. By increasing pretraining steps and fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.75? Improve the sentence splitting technique by using those as described in the exercises of :numref:`sec_bert-dataset`. Does it lead to better testing accuracy?
 3. If your computational resource allows, use a much larger pretraining corpus and a much larger BERT. Can you get a much better testing accuracy? How long do the pretraining and fine-tuning take?
 
 
