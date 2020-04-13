@@ -1,9 +1,9 @@
 # Padding and Stride
 :label:`sec_padding`
 
-In the previous example, our input had a height and width of $3$
-and a convolution kernel with a height and width of $2$,
-yielding an output with a height and a width of $2$.
+In the previous example, our input had both a height and width of $3$
+and our convolution kernel had both a height and width of $2$,
+yielding an output representation with dimension $2\times2$.
 In general, assuming the input shape is $n_h\times n_w$
 and the convolution kernel window shape is $k_h\times k_w$,
 then the output shape will be
@@ -14,20 +14,30 @@ Therefore, the output shape of the convolutional layer
 is determined by the shape of the input
 and the shape of the convolution kernel window.
 
-In several cases we might want to incorporate particular techniques---padding and strides, regarding the size of the output:
+In several cases, we incorporate techniques,
+including padding and strided convolutions, 
+that affect the size of the output.
+As motivation, note that since kernels generally 
+have width and height greater than $1$,
+after applying many successive convolutions,
+we tend to wind up with outputs that are 
+considerably smaller than our input.
+If we start with a $240 \times 240$ pixel image, 
+$10$ layers of $5 \times 5$ convolutions
+reduce the image to $200 \times 200$ pixels, 
+slicing off $30 \%$ of the image and with it 
+obliterating any interesting information 
+on the boundaries of the original image. 
+*Padding* is the most popular tool for handling this issue.
 
-* In general, since kernels generally have width and height greater than $1$,
-that means that after applying many successive convolutions,
-we will wind up with an output that is much smaller than our input.
-If we start with a $240 \times 240$ pixel image, $10$ layers of $5 \times 5$ convolutions
-reduce the image to $200 \times 200$ pixels, slicing off $30 \%$ of the image and with it obliterating any interesting information on the boundaries of the original image. *Padding* handles this issue.
-* In some cases, we want to reduce the resolution drastically if say we find our
-original input resolution to be unwieldy. *Strides* can help in these instances.
+In other cases, we may want to reduce the dimensionality drastically,
+e.g., if we find the original input resolution to be unwieldy. 
+*Strided convolutions* are a popular technique that can help in these instances.
 
 ## Padding
 
 As described above, one tricky issue when applying convolutional layers
-is that of losing pixels on the perimeter of our image.
+is that we tend to lose pixels on the perimeter of our image.
 Since we typically use small kernels,
 for any given convolution,
 we might only lose a few pixels,
@@ -53,7 +63,7 @@ the output shape will be
 $$(n_h-k_h+p_h+1)\times(n_w-k_w+p_w+1).$$
 
 This means that the height and width of the output
- will increase by $p_h$ and $p_w$ respectively.
+will increase by $p_h$ and $p_w$ respectively.
 
 In many cases, we will want to set $p_h=k_h-1$ and $p_w=k_w-1$
 to give the input and output the same height and width.
@@ -89,7 +99,7 @@ In the following example, we create a two-dimensional convolutional layer
 with a height and width of $3$
 and apply $1$ pixel of padding on all sides.
 Given an input with a height and width of $8$,
- we find that the height and width of the output is also $8$.
+we find that the height and width of the output is also $8$.
 
 ```{.python .input  n=1}
 from mxnet import np, npx
@@ -118,7 +128,8 @@ comp_conv2d(conv2d, X).shape
 ```
 
 When the height and width of the convolution kernel are different,
-we can make the output and input have the same height and width by setting different padding numbers for height and width.
+we can make the output and input have the same height and width 
+by setting different padding numbers for height and width.
 
 ```{.python .input  n=2}
 # Here, we use a convolution kernel with a height of 5 and a width of 3. The
@@ -150,14 +161,15 @@ We can see that when the second element of the first column is output,
 the convolution window slides down three rows.
 The convolution window slides two columns to the right
 when the second element of the first row is output.
-When the convolution window slides three columns to the right on the input, there is no output because the input element cannot fill the window (unless we add another column of padding).
+When the convolution window slides three columns to the right on the input, 
+there is no output because the input element cannot fill the window 
+(unless we add another column of padding).
 
 ![Cross-correlation with strides of 3 and 2 for height and width respectively. The shaded portions are the output element and the input and core array elements used in its computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$. ](../img/conv-stride.svg)
 :label:`img_conv_stride`
 
 In general, when the stride for the height is $s_h$
-and the stride for the width is $s_w$,
-the output shape is
+and the stride for the width is $s_w$, the output shape is
 
 $$\lfloor(n_h-k_h+p_h+s_h)/s_h\rfloor \times \lfloor(n_w-k_w+p_w+s_w)/s_w\rfloor.$$
 
@@ -190,7 +202,7 @@ When the strides on the height and width are $s_h$ and $s_w$, respectively,
 we call the stride $(s_h, s_w)$.
 Specifically, when $s_h = s_w = s$, the stride is $s$.
 By default, the padding is $0$ and the stride is $1$.
-In practice we rarely use inhomogeneous strides or padding,
+In practice, we rarely use inhomogeneous strides or padding,
 i.e., we usually have $p_h = p_w$ and $s_h = s_w$.
 
 ## Summary
