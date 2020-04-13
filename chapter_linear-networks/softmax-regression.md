@@ -370,10 +370,10 @@ Our loss is lower-bounded by the entropy given by the
 actual conditional distributions $P(\mathbf{y} \mid \mathbf{x})$.
 
 
-### Kullback Leibler Divergence
+### Kullback-Leibler Divergence
 
 Perhaps the most common way to measure the distance between two distributions
-is to calculate the *Kullback Leibler divergence* $D(p\|q)$. 
+is to calculate the *Kullback-Leibler divergence* $D(p\|q)$. 
 This is simply the difference between the cross-entropy and the entropy,
 i.e., the additional cross-entropy incurred over the irreducible minimum value it could take:
 
