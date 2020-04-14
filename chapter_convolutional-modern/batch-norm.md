@@ -68,7 +68,7 @@ according to the following expression:
 $$\mathrm{BN}(\mathbf{x}) = \mathbf{\gamma} \odot \frac{\mathbf{x} - \hat{\mathbf{\mu}}}{\hat\sigma} + \mathbf{\beta}$$
 
 Here, $\hat{\mathbf{\mu}}$ is the minibatch sample mean 
-and $\hat{\mathbf{\sigma}}$ is the minibatch sample variance.
+and $\hat{\mathbf{\sigma}}$ is the minibatch sample standard deviation.
 After applying BN, the resulting minibatch of activations 
 has zero mean and unit variance.
 Because the choice of unit variance 
