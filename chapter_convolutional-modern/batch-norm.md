@@ -48,7 +48,7 @@ In each training iteration,
 for each layer, we first compute its activations as usual.
 Then, we normalize the activations of each node 
 by subtracting its mean and dividing by its standard deviation 
-estimating both quantities based on the statistics of the current the current minibatch.  
+estimating both quantities based on the statistics of the current minibatch.  
 It is precisely due to this *normalization* based on *batch* statistics 
 that *batch normalization* derives its name.
 
