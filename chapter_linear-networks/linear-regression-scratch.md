@@ -96,7 +96,7 @@ In the following code, we define a `data_iter` function
 to demonstrate one possible implementation of this functionality.
 The function takes a batch size, a design matrix,
 and a vector of labels, yielding minibatches of size `batch_size`.
-Each minibatch consists of an tuple of features and labels.
+Each minibatch consists of a tuple of features and labels.
 
 ```{.python .input  n=5}
 def data_iter(batch_size, features, labels):

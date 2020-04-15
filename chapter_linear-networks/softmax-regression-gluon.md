@@ -52,9 +52,8 @@ exponentiation can be a source of numerical stability issues
 (as discussed  in :numref:`sec_naive_bayes`).
 Recall that the softmax function calculates
 $\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$, 
-where $\hat y_j$ is the $j^\mathrm{th}$ element of ``y_hat`` 
-and $z_j$ is the $j^\mathrm{th}$ element of the input
-``y_linear`` variable, as computed by the softmax.
+where $\hat y_j$ is the $j^\mathrm{th}$ element of $\hat{\mathbf{y}}$
+and $z_j$ is the $j^\mathrm{th}$ element of the (linear) input variable $\mathbf{z}$.
 
 If some of the $z_i$ are very large (i.e., very positive),
 then $e^{z_i}$ might be larger than the largest number
@@ -85,8 +84,8 @@ By combining these two operators
 (``softmax`` and ``cross_entropy``) together,
 we can escape the numerical stability issues
 that might otherwise plague us during backpropagation.
-As shown in the equation below, we avoided calculating $e^{z_j}$
-and can instead $z_j$ directly due to the canceling in $\log(\exp(\cdot))$.
+As shown in the equation below, we can avoid calculating $e^{z_j}$
+and instead use $z_j$ directly due to the canceling in $\log(\exp(\cdot))$.
 
 $$
 \begin{aligned}

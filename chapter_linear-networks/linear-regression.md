@@ -573,7 +573,7 @@ Certainly, the high-level idea that many such units
 could be cobbled together with the right connectivity
 and right learning algorithm,
 to produce far more interesting and complex behavior
-than any one neuron along could express
+than any one neuron alone could express
 owes to our study of real biological neural systems.
 
 At the same time, most research in deep learning today
