@@ -24,7 +24,6 @@ import collections
 import d2l
 import mxnet as mx
 from mxnet import autograd, gluon, init, np, npx
-from mxnet.contrib import text
 import os
 import random
 import time
