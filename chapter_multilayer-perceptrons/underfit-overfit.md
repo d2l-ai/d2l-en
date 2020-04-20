@@ -9,7 +9,7 @@ and not simply memorized our data.
 For example, imagine that we wanted to hunt 
 for patterns among genetic markers 
 linking patients to their dementia status,
-(let us the labels be drawn from the set
+(let the labels be drawn from the set
 {*dementia*, *mild cognitive impairment*, *healthy*}).
 Because each person's genes identify them uniquely
 (ignoring identical siblings),
@@ -64,7 +64,7 @@ were we to apply it to an infinite stream of additional data points
 drawn from the same underlying data distribution as our original sample.
 
 Problematically, *we can never calculate the generalization error exactly*.
-That is because the imaginary stream of infinite data is an imaginary object.
+That is because the stream of infinite data is an imaginary object.
 In practice, we must *estimate* the generalization error
 by applying our model to an independent test set
 constituted of a random selection of data points
@@ -72,7 +72,7 @@ that were withheld from our training set.
 
 The following three thought experiments
 will help illustrate this situation better.
-Consider a college student trying to prepare for his final exam.
+Consider a college student trying to prepare for her final exam.
 A diligent student will strive to practice well
 and test her abilities using exams from previous years.
 Nonetheless, doing well on past exams is no guarantee
@@ -86,19 +86,19 @@ the reasons for giving certain answers.
 In most cases, the latter student will do much better.
 
 Likewise, consider a model that simply uses a lookup table to answer questions. If the set of allowable inputs is discrete and reasonably small, then perhaps after viewing *many* training examples, this approach would perform well. Still this model has no ability to do better than random guessing when faced with examples that it has never seen before.
-In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ gray scale values, then there are $256^{784}$ possible images. That means that there are far more low-res grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter this data, we could never afford to store the lookup table.
+In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ grayscale values, then there are $256^{784}$ possible images. That means that there are far more low-res grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter this data, we could never afford to store the lookup table.
 
 Last, consider the problem of trying
 to classify the outcomes of coin tosses (class 0: heads, class 1: tails)
 based on some contextual features that might be available.
 No matter what algorithm we come up with,
-because the generalization error will always be $\frac{1}{2}$.
+the generalization error will always be $\frac{1}{2}$.
 However, for most algorithms,
 we should expect our training error to be considerably lower,
 depending on the luck of the draw,
 even if we did not have any features!
 Consider the dataset {0, 1, 1, 1, 0, 1}.
-Our feature-less would have to fall back on always predicting
+Our feature-less algorithm would have to fall back on always predicting
 the *majority class*, which appears from our limited sample to be *1*.
 In this case, the model that always predicts class 1
 will incur an error of $\frac{1}{3}$,
@@ -123,7 +123,7 @@ extended this theory to more general classes of functions.
 This work laid the foundations of [Statistical Learning Theory](https://en.wikipedia.org/wiki/Statistical_learning_theory).
 
 
-In the *standard supervised learning setting*, which we have addressed up until now and will stick throughout most of this book,
+In the *standard supervised learning setting*, which we have addressed up until now and will stick with throughout most of this book,
 we assume that both the training data and the test data
 are drawn *independently* from *identical* distributions
 (commonly called the i.i.d. assumption).
@@ -141,7 +141,7 @@ These distributions are simply not identical.
 Moreover, draws might be correlated in time.
 What if we are classifying the topics of Tweets.
 The news cycle would create temporal dependencies
-in the topics being discussed violating any assumptions of independence.
+in the topics being discussed, violating any assumptions of independence.
 
 Sometimes we can get away with minor violations of the i.i.d. assumption
 and our models will continue to work remarkably well.
@@ -151,7 +151,7 @@ and yet we have useful tools for face recognition,
 speech recognition, language translation, etc.
 
 Other violations are sure to cause trouble.
-Imagine, for example, if we tried to train
+Imagine, for example, if we try to train
 a face recognition system by training it
 exclusively on university students
 and then want to deploy it as a tool
@@ -165,12 +165,12 @@ For now, even taking the i.i.d. assumption for granted,
 understanding generalization is a formidable problem.
 Moreover, elucidating the precise theoretical foundations
 that might explain why deep neural networks generalize as well as they do
-continues to vexes the greatest minds in learning theory.
+continues to vex the greatest minds in learning theory.
 
-When we train our models, we attempt searching for a function
+When we train our models, we attempt to search for a function
 that fits the training data as well as possible.
 If the function is so flexible that it can catch on to spurious patterns
-just as easily as to the true associations,
+just as easily as to true associations,
 then it might perform *too well* without producing a model
 that generalizes well to unseen data.
 This is precisely what we want to avoid (or at least control).
@@ -204,7 +204,7 @@ is probably closer to the truth.
 In philosophy, this is closely related to Popper’s
 criterion of [falsifiability](https://en.wikipedia.org/wiki/Falsifiability)
 of a scientific theory: a theory is good if it fits data
-and if there are specific tests which can be used to disprove it.
+and if there are specific tests that can be used to disprove it.
 This is important since all statistical estimation is
 [post hoc](https://en.wikipedia.org/wiki/Post_hoc),
 i.e., we estimate after we observe the facts,
@@ -216,7 +216,7 @@ we’ll focus on a few factors that tend
 to influence the generalizability of a model class:
 
 1. The number of tunable parameters. When the number of tunable parameters, sometimes called the *degrees of freedom*, is large, models tend to be more susceptible to overfitting.
-1. The values taken by the parameters. When weights can take a wider range of values, models can be more susceptible to over fitting.
+1. The values taken by the parameters. When weights can take a wider range of values, models can be more susceptible to overfitting.
 1. The number of training examples. It’s trivially easy to overfit a dataset containing only one or two examples even if your model is simple. But overfitting a dataset with millions of examples requires an extremely flexible model.
 
 
@@ -232,7 +232,7 @@ At other times, we are comparing
 members of the same class of models
 that have been trained with different hyperparameter settings.
 
-With multilayer perceptrons for example,
+With multilayer perceptrons, for example,
 we may wish to compare models with
 different numbers of hidden layers,
 different numbers of hidden units,
@@ -336,7 +336,7 @@ two topics that we discuss below.
 
 To illustrate some classical intuition
 about overfitting and model complexity,
-we given an example using polynomials.
+we give an example using polynomials.
 Given training data consisting of a single feature $x$
 and a corresponding real-valued label $y$,
 we try to find the polynomial of degree $d$
@@ -346,7 +346,7 @@ $$\hat{y}= \sum_{i=0}^d x^i w_i$$
 to estimate the labels $y$.
 This is just a linear regression problem
 where our features are given by the powers of $x$,
-the $w_i$ given the model’s weights,
+the $w_i$ give the model’s weights,
 and the bias is given by $w_0$ since $x^0 = 1$ for all $x$.
 Since this is just a linear regression problem,
 we can use the squared error as our loss function.
