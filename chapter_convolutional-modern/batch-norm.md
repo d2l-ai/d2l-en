@@ -248,7 +248,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
 ```
 
 We can now create a proper `BatchNorm` layer.
-Our layer will maintain poper parameters 
+Our layer will maintain proper parameters 
 corresponding for scale `gamma` and shift `beta`,
 both of which will be updated in the course of training.
 Additionally, our layer will maintain 
