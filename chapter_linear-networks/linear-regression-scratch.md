@@ -73,7 +73,7 @@ and that each row in `labels` consists of a 1-dimensional target value (a scalar
 print('features:', features[0],'\nlabel:', labels[0])
 ```
 
-By generating a scatter plot using the second `features[:, 1]` and `labels`, 
+By generating a scatter plot using the second feature `features[:, 1]` and `labels`, 
 we can clearly observe the linear correlation between the two.
 
 ```{.python .input  n=18}

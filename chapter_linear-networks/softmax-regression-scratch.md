@@ -236,7 +236,7 @@ def evaluate_accuracy(net, data_iter):
     return metric[0] / metric[1]
 ```
 
-Here `Accumulator` is a utility class to accumulated sum over multiple numbers.
+Here `Accumulator` is a utility class to accumulate the sum over multiple numbers.
 
 ```{.python .input}
 # Saved in the d2l package for later use

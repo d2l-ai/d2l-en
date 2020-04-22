@@ -79,7 +79,7 @@ we might desire.
 np.random.multinomial(10, fair_probs)
 ```
 
-We can also conduct, say $3$, groups of experiments, where each group draws $10$ samples, all at once.
+We can also conduct, say, $3$ groups of experiments, where each group draws $10$ samples, all at once.
 
 ```{.python .input  n=4}
 counts = np.random.multinomial(10, fair_probs, size=3)
@@ -215,7 +215,7 @@ which is also known as the *sum rule*. The probability or distribution as a resu
 ### Independence
 
 Another useful property to check for is *dependence* vs. *independence*.
-Two random variables $A$ and $B$ are independent
+If Two random variables $A$ and $B$ are independent, this
 means that the occurrence of one event of $A$
 does not reveal any information about the occurrence of an event of $B$.
 In this case $P(B \mid A) = P(B)$. Statisticians typically express this as $A \perp  B$. From Bayes' theorem, it follows immediately that also $P(A \mid B) = P(A)$.
