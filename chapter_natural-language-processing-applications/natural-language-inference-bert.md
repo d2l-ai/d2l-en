@@ -52,8 +52,8 @@ We pretrain BERT on the WikiText-2 dataset for 3,000 iteration steps.
 
 ```{.python .input}
 ctx, loss = d2l.try_all_gpus(), gluon.loss.SoftmaxCELoss()
-bert = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=128,
-                     num_heads=2, num_layers=2, dropout=0.2)
+bert = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,
+                     num_heads=2, num_layers=2, dropout=0.1)
 bert.initialize(init.Xavier(), ctx=ctx)
 d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 3000)
 ```
@@ -79,7 +79,9 @@ class SNLIBERTDataset(gluon.data.Dataset):
     def __init__(self, dataset, max_len, vocab=None):
         all_premise_hypothesis_tokens = [[
             p_tokens, h_tokens] for p_tokens, h_tokens in zip(
-            d2l.tokenize(dataset[0]), d2l.tokenize(dataset[1]))]
+            *[d2l.tokenize([s.lower() for s in sentences])
+              for sentences in dataset[:2]])]
+        
         self.labels = np.array(dataset[2])
         self.vocab = vocab
         self.max_len = max_len
