@@ -3,13 +3,13 @@
 
 
 Thus far, every model that we have implemented
-required that initialize its parameters 
+required us to initialize its parameters 
 according to some pre-specified distribution.
-Until now, we took the initialization scheme for granted,
+Until now, we took the initialization scheme for granted and
 glossed over the details of how these these choices are made.
 You might have even gotten the impression that these choices
 are not especially important.
-However, the choice of initialization scheme
+To the contrary, the choice of initialization scheme
 plays a significant role in neural network learning,
 and can be crucial for maintaining numerical stability.
 Moreover, these choices can be tied up in interesting ways
@@ -60,7 +60,7 @@ The risks posed by unstable gradients
 goes beyond numerical representation.
 Gradients of unpredictable magnitude 
 also threaten the stability of our optimization algorithms.
-We may facing parameter updates that are either
+We may be facing parameter updates that are either
 (i) excessively large, destroying our model
 (the *exploding* gradient problem);
 or (ii) excessively small, 
@@ -210,7 +210,7 @@ just that mean and variance need to exist).
 For now, let us assume that the inputs to layer $x_j$
 also have zero mean and variance $\gamma^2$
 and that they are independent of $\mathbf{W}$.
-In this case, we can compute mean and variance of $h_i$ as follows:
+In this case, we can compute the mean and variance of $h_i$ as follows:
 
 $$
 \begin{aligned}
