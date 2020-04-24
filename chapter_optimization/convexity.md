@@ -67,7 +67,7 @@ for ax, func in zip(axes, [f, g, h]):
     d2l.plot([x, segment], [func(x), func(segment)], axes=ax)
 ```
 
-As expected, the cosine function is nonconvex, whereas the parabola and the exponential function are. Note that the requirement that $X$ is necessary for the condition to make sense. Otherwise the outcome of $f(\lambda x + (1-\lambda) x')$ might not be well defined. Convex functions have a number of desirable properties.
+As expected, the cosine function is nonconvex, whereas the parabola and the exponential function are. Note that the requirement that $X$ is a convex set is necessary for the condition to make sense. Otherwise the outcome of $f(\lambda x + (1-\lambda) x')$ might not be well defined. Convex functions have a number of desirable properties.
 
 ### Jensen's Inequality
 
