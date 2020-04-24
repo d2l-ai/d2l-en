@@ -76,10 +76,10 @@ One of the most useful tools is Jensen's inequality. It amounts to a generalizat
 $$\begin{aligned}
     \sum_i \alpha_i f(x_i) & \geq f\left(\sum_i \alpha_i x_i\right)
     \text{ and }
-    E_x[f(x)] & \geq f\left(E_x[x]\right).
+    E_x[f(x)] & \geq f\left(E_x[x]\right),
 \end{aligned}$$
 
-In other words, the expectation of a convex function is larger than the convex function of an expectation. To prove the first inequality we repeatedly apply the definition of convexity to one term in the sum at a time. The expectation can be proven by taking the limit over finite segments.  
+where $\alpha_i$ are nonnegative real numbers such that $\sum_i \alpha_i = 1$. In other words, the expectation of a convex function is larger than the convex function of an expectation. To prove the first inequality we repeatedly apply the definition of convexity to one term in the sum at a time. The expectation can be proven by taking the limit over finite segments.  
 
 One of the common applications of Jensen's inequality is with regard to the log-likelihood of partially observed random variables. That is, we use
 
