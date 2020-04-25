@@ -110,8 +110,8 @@ Let us see how this translates into mathematics.
 To start off, we can consider an MLP 
 with $h \times w$ images as inputs
 (represented as matrices in math, and as 2D arrays in code),
-and hidden representations ***similarly organized
-as $h \times w$ matrices / 2D arrays***.
+and hidden representations **similarly organized
+as** $h \times w$ **matrices / 2D arrays**.
 Let that sink in, we now conceive of not only the inputs but 
 also the hidden representations as possessing spatial structure.
 Let $x[i, j]$ and $h[i, j]$ denote pixel location $(i, j)$
