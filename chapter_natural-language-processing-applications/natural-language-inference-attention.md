@@ -19,7 +19,7 @@ Similar to alignment of words between source and target sentences in machine tra
 the alignment of words between premises and hypotheses
 can be neatly accomplished by attention mechanisms.
 
-![NLI using attention mechanisms. ](../img/nli_attention.svg)
+![Natural language inference using attention mechanisms. ](../img/nli_attention.svg)
 :label:`fig_nli_attention`
 
 :numref:`fig_nli_attention` depicts the natural language inference method using attention mechanisms.
