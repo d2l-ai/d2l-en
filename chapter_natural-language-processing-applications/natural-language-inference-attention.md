@@ -234,9 +234,8 @@ and load the GloVe embedding to initialize vectors of input tokens.
 embed_size, num_hiddens, ctx = 100, 200, d2l.try_all_gpus()
 net = DecomposableAttention(vocab, embed_size, num_hiddens)
 net.initialize(init.Xavier(), ctx=ctx)
-glove_embedding = text.embedding.create(
-    'glove', pretrained_file_name='glove.6B.100d.txt')
-embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
+glove_embedding = d2l.Embedding('GloVe.6B.100d')
+embeds = glove_embedding[vocab.idx_to_token]
 net.embedding.weight.set_data(embeds)
 ```
 

@@ -16,24 +16,66 @@ language processing (see the [GluonNLP](https://gluon-nlp.mxnet.io/) tool packag
 let us check out names of the provided pre-trained word embeddings.
 
 ```{.python .input}
+import d2l
 from mxnet import np, npx
-from mxnet.contrib import text
-npx.set_np()
+import os
 
-text.embedding.get_pretrained_file_names().keys()
+npx.set_np()
 ```
 
 Given the name of the word embedding, we can see which pre-trained models are provided by the word embedding. The word vector dimensions of each model may be different or obtained by pre-training on different datasets.
 
 ```{.python .input  n=35}
-print(text.embedding.get_pretrained_file_names('glove'))
+# Saved in the d2l package for later use
+d2l.DATA_HUB['GloVe.6B.50d'] = ('http://www.seal.ac.cn/glove.6B.50d.zip',
+                       '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
+
+# Saved in the d2l package for later use
+d2l.DATA_HUB['GloVe.6B.100d'] = ('http://www.seal.ac.cn/glove.6B.100d.zip',
+                       'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
+
+# Saved in the d2l package for later use
+d2l.DATA_HUB['GloVe.42B.300d'] = ('http://www.seal.ac.cn/glove.42B.300d.zip',
+                       '99af83e02ad44850374880549768d89b66c1e0d1')
+
+# Saved in the d2l package for later use
+d2l.DATA_HUB['fastText.crawl'] = ('http://www.seal.ac.cn/crawl-300d-2M.zip',
+                       '9898cc74f433d4da01cd04942aef57afc7710b7c')
+```
+
+```{.python .input}
+# Saved in the d2l package for later use
+class Embedding:
+    def __init__(self, embedding_name):
+        self.idx_to_token, self.idx_to_vec = self._load_embedding(embedding_name)
+        self.unknown_idx = 0
+        self.token_to_idx = {token : idx for idx, token in 
+                             enumerate(self.idx_to_token)}
+    def _load_embedding(self, embedding_name):
+        idx_to_token, idx_to_vec = [], []
+        data_dir = d2l.download_extract(embedding_name)
+        with open(os.path.join(data_dir, 'vec.txt'), 'r') as f:
+            for line in f:
+                elems = line.rstrip().split(' ')
+                token, elems = elems[0], [float(i) for i in elems[1:]]
+                idx_to_token.append(token)
+                idx_to_vec.append(elems)
+        idx_to_token = ['<unk>'] + idx_to_token
+        idx_to_vec = [[0] * len(idx_to_vec[0])] + idx_to_vec
+        return idx_to_token, np.array(idx_to_vec)
+    def __getitem__(self, tokens):
+        indices = [self.token_to_idx.get(token, self.unknown_idx)
+                   for token in tokens]
+        vecs = self.idx_to_vec[np.array(indices)]
+        return vecs
+    def __len__(self):
+        return len(self.idx_to_token)
 ```
 
 The general naming conventions for pre-trained GloVe models are "model.(dataset.)number of words in dataset.word vector dimension.txt". For more information, please refer to the GloVe and fastText project sites [2, 3]. Below, we use a 50-dimensional GloVe word vector based on Wikipedia subset pre-training. The corresponding word vector is automatically downloaded the first time we create a pre-trained word vector instance.
 
 ```{.python .input  n=11}
-glove_6b50d = text.embedding.create(
-    'glove', pretrained_file_name='glove.6B.50d.txt')
+glove_6b50d = Embedding('GloVe.6B.50d')
 ```
 
 Print the dictionary size. The dictionary contains $400,000$ words and a special unknown token.
@@ -75,7 +117,7 @@ Then, we search for synonyms by pre-training the word vector instance `embed`.
 ```{.python .input}
 def get_similar_tokens(query_token, k, embed):
     topk, cos = knn(embed.idx_to_vec,
-                    embed.get_vecs_by_tokens([query_token]), k+1)
+                    embed[[query_token]], k+1)
     for i, c in zip(topk[1:], cos[1:]):  # Remove input words
         print('cosine sim=%.3f: %s' % (c, (embed.idx_to_token[int(i)])))
 ```
@@ -102,7 +144,7 @@ In addition to seeking synonyms, we can also use the pre-trained word vector to 
 
 ```{.python .input}
 def get_analogy(token_a, token_b, token_c, embed):
-    vecs = embed.get_vecs_by_tokens([token_a, token_b, token_c])
+    vecs = embed[[token_a, token_b, token_c]]
     x = vecs[1] - vecs[0] + vecs[2]
     topk, cos = knn(embed.idx_to_vec, x, 1)
     return embed.idx_to_token[int(topk[0])]  # Remove unknown words

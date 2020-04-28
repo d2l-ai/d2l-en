@@ -2478,3 +2478,48 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 
+# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
+d2l.DATA_HUB['GloVe.6B.50d'] = ('http://www.seal.ac.cn/glove.6B.50d.zip',
+                       '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
+
+
+# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
+d2l.DATA_HUB['GloVe.6B.100d'] = ('http://www.seal.ac.cn/glove.6B.100d.zip',
+                       'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
+
+
+# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
+d2l.DATA_HUB['GloVe.42B.300d'] = ('http://www.seal.ac.cn/glove.42B.300d.zip',
+                       '99af83e02ad44850374880549768d89b66c1e0d1')
+
+
+# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
+d2l.DATA_HUB['fastText.crawl'] = ('http://www.seal.ac.cn/crawl-300d-2M.zip',
+                       '9898cc74f433d4da01cd04942aef57afc7710b7c')
+
+
+# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
+class Embedding:
+    def __init__(self, embedding_name):
+        self.idx_to_token, self.idx_to_vec = self._load_embedding(embedding_name)
+        self.unknown_idx = 0
+        self.token_to_idx = {token : idx for idx, token in enumerate(self.idx_to_token)}
+    def _load_embedding(self, embedding_name):
+        idx_to_token, idx_to_vec = [], []
+        data_dir = d2l.download_extract(embedding_name)
+        with open(os.path.join(data_dir, 'vec.txt'), 'r') as f:
+            for line in f:
+                elems = line.rstrip().split(' ')
+                token, elems = elems[0], [float(i) for i in elems[1:]]
+                idx_to_token.append(token)
+                idx_to_vec.append(elems)
+        idx_to_token = ['<unk>'] + idx_to_token
+        idx_to_vec = [[0] * len(idx_to_vec[0])] + idx_to_vec
+        return idx_to_token, np.array(idx_to_vec)
+    def __getitem__(self, tokens):
+        indices = [self.token_to_idx.get(token, self.unknown_idx) for token in tokens]
+        vecs = npx.embedding(np.array(indices), self.idx_to_vec, self.idx_to_vec.shape[0],
+                                    self.idx_to_vec.shape[1])
+        return vecs
+    def __len__(self):
+        return len(self.idx_to_token)
