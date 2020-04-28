@@ -3,15 +3,15 @@
 
 
 Thus far, every model that we have implemented
-required that initialize its parameters 
+required that we initialize its parameters 
 according to some pre-specified distribution.
 Until now, we took the initialization scheme for granted,
-glossed over the details of how these these choices are made.
+glossing over the details of how these these choices are made.
 You might have even gotten the impression that these choices
 are not especially important.
 However, the choice of initialization scheme
 plays a significant role in neural network learning,
-and can be crucial for maintaining numerical stability.
+and it can be crucial for maintaining numerical stability.
 Moreover, these choices can be tied up in interesting ways
 with the choice of the nonlinear activation function.
 Which function we choose and how we initialize parameters
@@ -20,7 +20,7 @@ Poor choices here can cause us to encounter
 exploding or vanishing gradients while training.
 In this section, we delve into these topics with greater detail
 and discuss some useful heuristics
-that you will frequently useful
+that you will find useful
 throughout your career in deep learning.
 
 
@@ -57,13 +57,13 @@ They might be small or large, and
 their product might be *very large* or *very small*.
 
 The risks posed by unstable gradients 
-goes beyond numerical representation.
+go beyond numerical representation.
 Gradients of unpredictable magnitude 
 also threaten the stability of our optimization algorithms.
-We may facing parameter updates that are either
+We may be facing parameter updates that are either
 (i) excessively large, destroying our model
 (the *exploding* gradient problem);
-or (ii) excessively small, 
+or (ii) excessively small 
 (the *vanishing gradient problem*),
 rendering learning impossible as parameters 
 hardly move on each update.
@@ -79,7 +79,7 @@ $1/(1 + \exp(-x))$ (introduced in :numref:`sec_mlp`)
 was popular because it resembles a thresholding function.
 Since early artificial neural networks were inspired
 by biological neural networks,
-the idea of neurons that either fire either *fully* or *not at all*
+the idea of neurons that fire either *fully* or *not at all*
 (like biological neurons) seemed appealing.
 Let us take a closer look at the sigmoid
 to see why it can cause vanishing gradients.
@@ -102,15 +102,15 @@ d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 As you can see, the sigmoid's gradient vanishes
 both when its inputs are large and when they are small.
 Moreover, when backpropagating through many layers,
-unless we are in the Goldilocks zone---where 
-the inputs to many of the sigmoids are close to zero,
+unless we are in the Goldilocks zone, where 
+the inputs to many of the sigmoids are close to zero, 
 the gradients of the overall product may vanish.
 When our network boasts many layers,
 unless we are careful, the gradient 
 will likely be cut off at *some* layer.
 Indeed, this problem used to plague deep network training.
-Consequently, ReLUs which are more stable
-(but less neurally plausible) 
+Consequently, ReLUs, which are more stable
+(but less neurally plausible), 
 have emerged as the default choice for practitioners.
 
 
@@ -142,7 +142,7 @@ print('After multiplying 100 matrices', M)
 Another problem in deep network design
 is the symmetry inherent in their parametrization.
 Assume that we have a deep network
-with one hidden layer with two units, say $h_1$ and $h_2$.
+with one hidden layer and two units, say $h_1$ and $h_2$.
 In this case, we could permute the weights $\mathbf{W}_1$
 of the first layer and likewise permute 
 the weights of the output layer
@@ -206,11 +206,11 @@ independently from the same distribution.
 Furthermore, let us assume that this distribution
 has zero mean and variance $\sigma^2$
 (this does not mean that the distribution has to be Gaussian,
-just that mean and variance need to exist).
+just that the mean and variance need to exist).
 For now, let us assume that the inputs to layer $x_j$
 also have zero mean and variance $\gamma^2$
 and that they are independent of $\mathbf{W}$.
-In this case, we can compute mean and variance of $h_i$ as follows:
+In this case, we can compute the mean and variance of $h_i$ as follows:
 
 $$
 \begin{aligned}
@@ -226,7 +226,7 @@ is to set $n_\mathrm{in} \sigma^2 = 1$.
 Now consider backpropagation.
 There we face a similar problem,
 albeit with gradients being propagated from the top layers.
-That is, instead of $\mathbf{W} \mathbf{w}$,
+That is, instead of $\mathbf{W} \mathbf{x}$,
 we need to deal with $\mathbf{W}^\top \mathbf{g}$,
 where $\mathbf{g}$ is the incoming gradient from the layer above.
 Using the same reasoning as for forward propagation,
@@ -254,7 +254,7 @@ We can also adapt Xavier's intuition to
 choose the variance when sampling weights
 from a uniform distribution.
 Note the distribution $U[-a, a]$ has variance $a^2/3$.
-Plugging $a^2/3$ into our condition on $\sigma^2$, 
+Plugging $a^2/3$ into our condition on $\sigma^2$ 
 yields the suggestion to initialize according to
 $U\left[-\sqrt{6/(n_\mathrm{in} + n_\mathrm{out})}, \sqrt{6/(n_\mathrm{in} + n_\mathrm{out})}\right]$.
 
