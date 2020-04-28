@@ -4,7 +4,7 @@ In the previous chapters, we worked through
 a number of hands-on applications of machine learning,
 fitting models to a variety of datasets.
 And yet, we never stopped to contemplate
-either where data comes from in the first place,
+either where data comes from in the first place
 or what we plan to ultimately *do* 
 with the outputs from our models.
 Too often, machine learning developers
@@ -42,17 +42,17 @@ in many applications of machine learning:
 by introducing our model-based decisions to the environment,
 we might break the model.
 
-While we cannot possible give these topics 
+While we cannot possibly give these topics 
 a complete treatment in one section,
 we aim here to expose some common concerns,
 and to stimulate the critical thinking
 required to detect these situations early,
 mitigate damage, and use machine learning responsibly.
 Some of the solutions are simple
-(ask for the "right" data)
+(ask for the "right" data),
 some are technically difficult
 (implement a reinforcement learning system),
-and others require that step outside the realm of
+and others require that we step outside the realm of
 statistical prediction altogether and 
 grapple with difficult philosophical questions
 concerning the ethical application of algorithms.
@@ -75,9 +75,9 @@ learning a robust classifier is impossible.
 
 Consider a binary classification problem,
 where we wish to distinguish between dogs and cats.
-If the distribution can can shift in arbitrary ways,
+If the distribution can shift in arbitrary ways,
 then our setup permits the pathological case
-in which the distribution over inputs remained
+in which the distribution over inputs remains
 constant: $p_S(\mathbf{x}) = p_T(\mathbf{x})$
 but the labels are all flipped 
 $p_S(y | \mathbf{x}) = 1 - $p_T(y | \mathbf{x})$. 
@@ -150,16 +150,16 @@ because diseases cause symptoms.
 In some degenerate cases the label shift 
 and covariate shift assumptions can hold simultaneously.
 For example, when the label is deterministic,
-then covariate shift assumption will be satisfied,
+the covariate shift assumption will be satisfied,
 even when $y$ causes $\mathbf{x}$.
 Interestingly, in these cases,
-it is often advantageous to work with the methods
+it is often advantageous to work with methods
 that flow from the label shift assumption.
 That is because these methods tend 
 to involve manipulating objects that look like the label
 (which is often low-dimensional),
 as opposed to objects that look like the input,
-which tends (in deep learning) tends to be high-dimensional.
+which (in deep learning) tends to be high-dimensional.
 
 
 
@@ -196,7 +196,7 @@ that shift only takes place gradually
 ### Examples
 
 Before delving into formalism and algorithms,
-we can discuss a some concrete situations
+we can discuss some concrete situations
 where covariate or concept shift might not be obvious.
 
 
@@ -369,7 +369,7 @@ For simplicity’s sake assume that we have
 an equal number of instances from both distributions, 
 denoted by $\mathbf{x}_i \sim p(\mathbf{x})$ 
 and $\mathbf{x}_i' \sim q(\mathbf{x})$, respectively.
-Now denote by $z_i$ labels which are 1
+Now denote by $z_i$ labels that are 1
 for data drawn from $p$ and -1 for data drawn from $q$.
 Then the probability in a mixed dataset is given by
 
@@ -434,16 +434,16 @@ In deep learning, the inputs tend
 to be high-dimensional objects like images,
 while the labels are often simpler objects like categories.
 
-To estimate calculate the target label distribution,
+To estimate the target label distribution,
 we first take our reasonably good off the shelf classifier
 (typically trained on the training data)
 and compute its confusion matrix using the validation set
 (also from the training distribution).
-The confusion matrix C, is simply a $k \times k$ matrix,
+The confusion matrix, C, is simply a $k \times k$ matrix,
 where each column corresponds to the *actual* label
 and each row corresponds to our model's predicted label.
 Each cell's value $c_{ij}$ is the fraction of predictions
-where the true label was $j$ *and* our model predicted $y$.
+where the true label was $j$ *and* our model predicted $i$.
 
 Now, we cannot calculate the confusion matrix
 on the target data directly,
@@ -489,14 +489,14 @@ To make things more concrete, here are some examples:
 
 * In computational advertising, new products are launched, 
 old products become less popular. This means that the distribution over ads and their popularity changes gradually and any click-through rate predictor needs to change gradually with it.
-* Traffic cameras lenses degrade gradually due to environmental wear, affecting image quality progressively.
+* Traffic camera lenses degrade gradually due to environmental wear, affecting image quality progressively.
 * News content changes gradually (i.e., most of the news remains unchanged but new stories appear).
 
 In such cases, we can use the same approach that we used for training networks to make them adapt to the change in the data. In other words, we use the existing network weights and simply perform a few update steps with the new data rather than training from scratch.
 
 ## A Taxonomy of Learning Problems
 
-Armed with knowledge about how to deal with changes in $p(x)$ and in $P(y \mid x)$, we can now consider some other aspects of machine learning problems formulation.
+Armed with knowledge about how to deal with changes in $p(x)$ and in $P(y \mid x)$, we can now consider some other aspects of machine learning problem formulation.
 
 
 * **Batch Learning.** Here we have access to training data and labels $\{(x_1, y_1), \ldots, (x_n, y_n)\}$, which we use to train a network $f(x, w)$. Later on, we deploy this network to score new data $(x, y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
@@ -525,7 +525,7 @@ that when you deploy machine learning systems
 you are not merely optimizing a predictive model---you 
 are typically providing a tool that will
 be used to (partially or fully) automate decisions.
-This technical systems can impact the lives
+These technical systems can impact the lives
 of individuals subject to the resulting decisions.
 The leap from considering predictions to decisions
 raises not only new technical questions,
@@ -578,7 +578,7 @@ that you might encounter in a career in machine learning.
 
 ## Summary
 
-* In many cases training and test set do not come from the same distribution. This is called covariate shift.
+* In many cases training and test sets do not come from the same distribution. This is called covariate shift.
 * Under the corresponding assumptions, *covariate* and *label* shift can be detected and corrected for at test time. Failure to account for this bias can become problematic at test time.
 * In some cases, the environment may *remember* automated actions and respond in surprising ways. We must account for this possibility when building models and continue to monitor live systems, open to the possibility that our models and the environment will become entangled in unanticipated ways.
 
@@ -587,7 +587,7 @@ that you might encounter in a career in machine learning.
 1. What could happen when we change the behavior of a search engine? What might the users do? What about the advertisers?
 1. Implement a covariate shift detector. Hint: build a classifier.
 1. Implement a covariate shift corrector.
-1. What could go wrong if training and test set are very different? What would happen to the sample weights?
+1. What could go wrong if training and test sets are very different? What would happen to the sample weights?
 
 ## [Discussions](https://discuss.mxnet.io/t/2347)
 
