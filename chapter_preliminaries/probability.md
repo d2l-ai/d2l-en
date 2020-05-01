@@ -15,13 +15,13 @@ As shown in :numref:`fig_cat_dog`,
 while it is easy for humans to recognize cats and dogs at the resolution of $160 \times 160$ pixels,
 it becomes challenging at $40 \times 40$ pixels and next to impossible at $10 \times 10$ pixels. In
 other words, our ability to tell cats and dogs apart at a large distance (and thus low resolution) might approach uninformed guessing. Probability gives us a
-formal way of reasoning about our level of certainty. 
+formal way of reasoning about our level of certainty.
 If we are completely sure
-that the image depicts a cat, we say that the *probability* that the corresponding label $y$ is "cat", denoted $P(y=$ "cat"$)$ equals $1$. 
+that the image depicts a cat, we say that the *probability* that the corresponding label $y$ is "cat", denoted $P(y=$ "cat"$)$ equals $1$.
 If we had no evidence to suggest that $y =$ "cat" or that $y =$ "dog", then we might say that the two possibilities were equally
-*likely*, expressing this as <nobr>$P(y=$ "cat"$)$</nobr> $=$ <nobr>$P(y=$ "dog"$)$</nobr> $= 0.5$. If we were reasonably
+*likely* expressing this as $P(y=$ "cat"$) = P(y=$ "dog"$) = 0.5$. If we were reasonably
 confident, but not sure that the image depicted a cat, we might assign a
-probability $0.5 <$ <nobr>$P(y=$ "cat"$)$</nobr> <nobr>$< 1$.</nobr>
+probability $0.5  < P(y=$ "cat"$) < 1$.
 
 Now consider the second case: given some weather monitoring data, we want to predict the probability that it will rain in Taipei tomorrow. If it is summertime, the rain might come with probability $0.5$.
 
@@ -97,7 +97,7 @@ counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
 counts / 1000  # Relative frequency as the estimate
 ```
 
-Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good. 
+Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good.
 
 We can also visualize how these probabilities converge over time towards the true probability.
 Let us conduct $500$ groups of experiments where each group draws $10$ samples.
@@ -153,7 +153,7 @@ In our random experiment of casting a die, we introduced the notion of a *random
 Consider a random variable $X$ whose value is in the sample space $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ of rolling a die. We can denote the event "seeing a $5$" as $\{X = 5\}$ or $X = 5$, and its probability as $P(\{X = 5\})$ or $P(X = 5)$.
 By $P(X = a)$, we make a distinction between the random variable $X$ and the values (e.g., $a$) that $X$ can take.
 However, such pedantry results in a cumbersome notation.
-For a compact notation, 
+For a compact notation,
 on one hand, we can just denote $P(X)$ as the *distribution* over the random variable $X$:
 the distribution tells us the probability that $X$ takes any value.
 On the other hand,
@@ -299,8 +299,8 @@ $$
 In the end, the probability of the patient having AIDS given both positive tests is
 
 $$\begin{aligned}
-&P(H = 1 \mid D_1 = 1, D_2 = 1)\\ 
-=& \frac{P(D_1 = 1, D_2 = 1 \mid H=1) P(H=1)}{P(D_1 = 1, D_2 = 1)} \\ 
+&P(H = 1 \mid D_1 = 1, D_2 = 1)\\
+=& \frac{P(D_1 = 1, D_2 = 1 \mid H=1) P(H=1)}{P(D_1 = 1, D_2 = 1)} \\
 =& 0.8307.
 \end{aligned}
 $$
@@ -339,7 +339,7 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 ## Summary
 
 * We can use MXNet to sample from probability distributions.
-* We can analyze multiple random variables using joint distribution, conditional distribution, Bayes' theorem, marginalization, and independence assumptions.  
+* We can analyze multiple random variables using joint distribution, conditional distribution, Bayes' theorem, marginalization, and independence assumptions.
 * Expectation and variance offer useful measures to summarize key characteristics of probability distributions.
 
 
