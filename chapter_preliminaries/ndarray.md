@@ -150,7 +150,6 @@ Each of its elements is randomly sampled
 from a standard Gaussian (normal) distribution
 with a mean of $0$ and a standard deviation of $1$.
 
-
 ```{.python .input  n=10}
 np.random.normal(0, 1, size=(3, 4))
 ```
@@ -231,7 +230,7 @@ and tell the system along which axis to concatenate.
 The example below shows what happens when we concatenate 
 two matrices along rows (axis $0$, the first element of the shape)
 vs. columns (axis $1$, the second element of the shape).
-We can see that, the first output `ndarray`'s axis-$0$ length ($6$)
+We can see that the first output `ndarray`'s axis-$0$ length ($6$)
 is the sum of the two input `ndarray`s' axis-$0$ lengths ($3 + 3$);
 while the second output `ndarray`'s axis-$1$ length ($8$)
 is the sum of the two input `ndarray`s' axis-$1$ lengths ($4 + 4$).
@@ -406,7 +405,7 @@ b = np.array(a)
 type(a), type(b)
 ```
 
-To convert a size-$1$ `ndarray` to a Python scalar, 
+To convert a size-one `ndarray` to a Python scalar, 
 we can invoke the `item` function or Python's built-in functions.
 
 ```{.python .input}

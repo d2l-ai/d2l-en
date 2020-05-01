@@ -68,7 +68,7 @@ with $(1, 0, 0)$ corresponding to "cat", $(0, 1, 0)$ to "chicken" and $(0, 0, 1)
 
 ### Network Architecture
 
-In order to estimate the conditional probabilities associated with each classes, 
+In order to estimate the conditional probabilities associated with each class, 
 we need a model with multiple outputs, one per class. 
 To address classification with linear models, 
 we will need as many linear functions as we have outputs.
@@ -364,8 +364,7 @@ upon seeing data that was actually generated according to probabilities $p$.
 The lowest possible cross-entropy is achieved when $p=q$. 
 In this case, the cross-entropy from $p$ to $q$ is $H(p, p)= H(p)$.
 Relating this back to our classification objective,
-even if we get the best possible predictions, 
-if the best possible possible, then we will never be perfect. 
+even if we get the best possible predictions, we will never be perfect. 
 Our loss is lower-bounded by the entropy given by the 
 actual conditional distributions $P(\mathbf{y} \mid \mathbf{x})$.
 
@@ -404,7 +403,7 @@ This is equal to the ratio between the number of correct predictions and the tot
 
 ## Summary
 
-* We introduced the softmax operation which takes a vector maps it into probabilities.
+* We introduced the softmax operation which takes a vector and maps it into probabilities.
 * Softmax regression applies to classification problems. It uses the probability distribution of the output category in the softmax operation.
 * Cross-entropy is a good measure of the difference between two probability distributions. It measures the number of bits needed to encode the data given our model.
 

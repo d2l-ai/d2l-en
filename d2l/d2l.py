@@ -227,7 +227,7 @@ class Accumulator:
         self.data = [a+float(b) for a, b in zip(self.data, args)]
 
     def reset(self):
-        self.data = [0] * len(self.data)
+        self.data = [0.0] * len(self.data)
 
     def __getitem__(self, idx):
         return self.data[idx]
