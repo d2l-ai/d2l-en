@@ -398,10 +398,12 @@ which uses an unlabeled training set $X$ and test set $Z$:
 
 Note that this method relies on a crucial assumption.
 For this scheme to work, we need that each data point
-in the target (test time) distribution
-had nonzero probability of occurring at training time.
-If we find a point where $q(\mathbf{x}) > 0$ but $p(\mathbf{x}) = 0$,
-then the corresponding importance weight should be infinity.
+in the target (test time) distribution, $p(x)$,
+has a nonzero probability of occurring at training time, i.e. we require that 
+$q(\mathbf{x}) > 0$ whenever $p(\mathbf{x}) > 0$. This ensures that $q(\mathbf{x})$ does not
+ignore any states that have non-zero probability to $p(x)$.
+It is natural to be curious about what will happen for $x$ with $q(x) = 0$ in the denominator. 
+The answer is that luckily we will never see one when sampling $X \sim q$.
 
 *Generative Adversarial Networks*
 use a very similar idea to that described above
