@@ -47,9 +47,9 @@ One straightforward solution to this problem
 is to add extra pixels of filler around the boundary of our input image,
 thus increasing the effective size of the image.
 Typically, we set the values of the extra pixels to $0$.
-In :numref:`img_conv_pad`, we pad a $3 \times 5$ input,
-increasing its size to $5 \times 7$.
-The corresponding output then increases to a $4 \times 6$ matrix.
+In :numref:`img_conv_pad`, we pad a $3 \times 3$ input,
+increasing its size to $5 \times 5$.
+The corresponding output then increases to a $4 \times 4$ matrix.
 
 ![Two-dimensional cross-correlation with padding. The shaded portions are the input and kernel array elements used by the first output element: $0\times0+0\times1+0\times2+0\times3=0$. ](../img/conv-pad.svg)
 :label:`img_conv_pad`
@@ -161,9 +161,7 @@ We can see that when the second element of the first column is output,
 the convolution window slides down three rows.
 The convolution window slides two columns to the right
 when the second element of the first row is output.
-When the convolution window slides three columns to the right on the input, 
-there is no output because the input element cannot fill the window 
-(unless we add another column of padding).
+When the convolution window slides two columns to the right on the input, there is no output because the input element cannot fill the window (unless we add another column of padding).
 
 ![Cross-correlation with strides of 3 and 2 for height and width respectively. The shaded portions are the output element and the input and core array elements used in its computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$. ](../img/conv-stride.svg)
 :label:`img_conv_stride`

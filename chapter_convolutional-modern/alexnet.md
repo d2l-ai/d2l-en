@@ -41,7 +41,7 @@ classical pipelines looked more like this:
 1. Obtain an interesting dataset. In early days, these datasets required expensive sensors (at the time, 1 megapixel images were state of the art).
 2. Preprocess the dataset with hand-crafted features based on some knowledge of optics, geometry, other analytic tools, and occasionally on the serendipitous discoveries of lucky graduate students.
 3. Feed the data through a standard set of feature extractors such as [SIFT](https://en.wikipedia.org/wiki/Scale-invariant_feature_transform), the Scale-Invariant Feature Transform, or [SURF](https://en.wikipedia.org/wiki/Speeded_up_robust_features), the Speeded-Up Robust Features, or any number of other hand-tuned pipelines.
-4. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to learn a classifier.
+4. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to train a classifier.
 
 If you spoke to machine learning researchers,
 they believed that machine learning was both important and beautiful.
@@ -329,7 +329,7 @@ even on a modern GPU.
 One of the problems with applying AlexNet directly on Fashion-MNIST
 is that our images are lower resolution ($28 \times 28$ pixels)
 than ImageNet images.
-To make things work, we upsample them to $244 \times 244$
+To make things work, we upsample them to $224 \times 224$
 (generally not a smart practice,
 but we do it here to be faithful to the AlexNet architecture).
 We perform this resizing with the `resize` argument in `load_data_fashion_mnist`.

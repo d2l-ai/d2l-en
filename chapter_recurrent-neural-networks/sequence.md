@@ -26,7 +26,7 @@ In short, we need statistical tools and new deep neural networks architectures t
 :width:`400px`
 :label:`fig_ftse100`
 
-Let us denote the prices by $x_t \geq 0$, i.e., at time $t \in \mathbb{N}$ we observe some price $x_t$. For a trader to do well in the stock market on day $t$ he should want to predict $x_t$ via
+Let us denote the prices by $x_t \geq 0$, i.e., at time $t \in \mathbb{N}$ we observe price $x_t$. For a trader to do well in the stock market on day $t$ he should want to predict $x_t$ via
 
 $$x_t \sim p(x_t \mid x_{t-1}, \ldots, x_1).$$
 

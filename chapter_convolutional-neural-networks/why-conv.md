@@ -62,16 +62,12 @@ we use to recognize objects should not be overly concerned
 with the precise *location* of the object in the image.
 Ideally, our system should exploit this knowledge.
 Pigs usually do not fly and planes usually do not swim.
-Nonetheless, we should still recognize
-a pig were one to appear at the top of the image.
-
-We can draw some inspiration here 
-from the children's game 'Where's Waldo'
-(depicted in :numref:`img_waldo`).
-The game consists of a number of chaotic scenes 
-bursting with activity.
-Waldo shows up somewhere in each,
-typically lurking in some unlikely location.
+Nonetheless, we could still recognize a flying pig were one to appear.
+This idea is taken to an extreme in the children's game 'Where's Waldo', an
+example is shown in :numref:`img_waldo`.
+The game consists of a number of chaotic scenes bursting with activity
+and Waldo shows up somewhere in each
+(typically lurking in some unlikely location).
 The reader's goal is to locate him.
 Despite his characteristic outfit, 
 this can be surprisingly difficult,
@@ -116,8 +112,8 @@ Let that sink in, we now conceive of not only the inputs but
 also the hidden representations as possessing spatial structure.
 Let $x[i, j]$ and $h[i, j]$ denote pixel location $(i, j)$
 in the input image and hidden representation, respectively.
-Consequently, to have each of the $hw$ hidden nodes 
-receive input from each of the $hw$ inputs,
+Consequently, to have each of the $h \times w$ hidden nodes 
+receive input from each of the $h \times w$ inputs,
 we would switch from using weight matrices
 (as we did previously in MLPs)
 to representing our parameters

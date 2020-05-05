@@ -48,7 +48,7 @@ In each training iteration,
 for each layer, we first compute its activations as usual.
 Then, we normalize the activations of each node 
 by subtracting its mean and dividing by its standard deviation 
-estimating both quantities based on the statistics of the current the current minibatch.  
+estimating both quantities based on the statistics of the current minibatch.  
 It is precisely due to this *normalization* based on *batch* statistics 
 that *batch normalization* derives its name.
 
@@ -68,7 +68,7 @@ according to the following expression:
 $$\mathrm{BN}(\mathbf{x}) = \mathbf{\gamma} \odot \frac{\mathbf{x} - \hat{\mathbf{\mu}}}{\hat\sigma} + \mathbf{\beta}$$
 
 Here, $\hat{\mathbf{\mu}}$ is the minibatch sample mean 
-and $\hat{\mathbf{\sigma}}$ is the minibatch sample variance.
+and $\hat{\mathbf{\sigma}}$ is the minibatch sample standard deviation.
 After applying BN, the resulting minibatch of activations 
 has zero mean and unit variance.
 Because the choice of unit variance 
