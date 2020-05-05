@@ -34,7 +34,7 @@ A number of recommendation tasks have been investigated in the past decades.  Ba
 ## Summary
 
 * Recommender systems are important for individual users and industries. Collaborative filtering is a key concept in recommendation.
-* There are two types of feedbacks: implicit feedback and explicit feedback.  A number recommendation tasks have been explored during the last decade.
+* There are two types of feedbacks: implicit feedback and explicit feedback.  A number of recommendation tasks have been explored during the last decade.
 
 ## Exercises
 
