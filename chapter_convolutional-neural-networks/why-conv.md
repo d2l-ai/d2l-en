@@ -62,12 +62,15 @@ we use to recognize objects should not be overly concerned
 with the precise *location* of the object in the image.
 Ideally, our system should exploit this knowledge.
 Pigs usually do not fly and planes usually do not swim.
-Nonetheless, we could still recognize a flying pig were one to appear.
-This idea is taken to an extreme in the children's game 'Where's Waldo', an
-example is shown in :numref:`img_waldo`.
-The game consists of a number of chaotic scenes bursting with activity
-and Waldo shows up somewhere in each
-(typically lurking in some unlikely location).
+Nonetheless, we should still recognize	
+a pig were one to appear at the top of the image.
+We can draw some inspiration here 	
+from the children's game 'Where's Waldo'	
+(depicted in :numref:`img_waldo`).	
+The game consists of a number of chaotic scenes 	
+bursting with activity.	
+Waldo shows up somewhere in each,	
+typically lurking in some unlikely location.
 The reader's goal is to locate him.
 Despite his characteristic outfit, 
 this can be surprisingly difficult,
