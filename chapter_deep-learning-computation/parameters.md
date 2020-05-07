@@ -23,7 +23,7 @@ to do the heavy lifting.
 However, when we move away from 
 stacked architectures with standard layers, 
 we will sometimes need to get into the weeds
-of declaring and manipulate parameters. 
+of declaring and manipulating parameters. 
 In this section, we cover the following:
 
 * Accessing parameters for debugging, diagnostics, and visualiziations.
@@ -70,14 +70,14 @@ corresponding to that layer's
 weights and biases, respectively.
 Both are stored as single precision floats.
 Note that the names of the parameters
-are allow us to *uniquely* identify
+allow us to *uniquely* identify
 each layer's parameters,
-even in a network contains hundreds of layers.
+even in a network containing hundreds of layers.
 
 
 ### Targeted Parameters
 
-Note that each parameters is represented
+Note that each parameter is represented
 as an instance of the `Parameter` class.
 To do anything useful with the parameters,
 we first need to access the underlying numerical values. 
@@ -106,7 +106,7 @@ since it was initialized.
 We can also access each parameter by name,
 e.g., `dense0_weight` as follows. 
 Under the hood this is possible because
-each layer contains a parameter dictionary. 
+each layer contains a parameter dictionary.
 
 ```{.python .input  n=4}
 print(net[0].params['dense0_weight'])
@@ -134,7 +134,7 @@ accessing them one-by-one can grow tedious.
 The situation can grow especially unwieldy
 when we work with more complex Blocks, (e.g., nested Blocks),
 since we would need to recurse 
-through the entire tree in to extact
+through the entire tree in order to extract
 each sub-Block's parameters.
 To avoid this, each Block comes 
 with a `collect_params`  method 
@@ -258,7 +258,7 @@ net.initialize(init=init.Constant(1), force_reinit=True)
 net[0].weight.data()[0]
 ```
 
-We can also apply different initialziers for certain Blocks.
+We can also apply different initializers for certain Blocks.
 For example, below we initialize the first layer
 with the `Xavier` initializer
 and initialize the second layer 
@@ -276,7 +276,7 @@ print(net[1].weight.data()[0, 0])
 Sometimes, the initialization methods we need 
 are not provided in the `init` module. 
 In these cases, we can define a subclass of `Initializer`. 
-Usually, we only need to implement the `_init_weight` function
+Usually, we only need to implement the `_init_weight` function,
 which takes an `ndarray` argument (`data`) 
 and assigns to it the desired initialized values. 
 In the example below, we define an initializer
