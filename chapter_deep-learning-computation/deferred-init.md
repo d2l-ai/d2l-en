@@ -4,7 +4,7 @@
 So far, it might seem that we got away
 with being sloppy in setting up our networks.
 Specifically, we did the following unintuitive things,
-which not might seem like they should work:
+which might not seem like they should work:
 
 * We defined the network architectures 
   without specifying the input dimensionality.
@@ -22,8 +22,8 @@ waiting until the first time we pass data through the model,
 to infer the sizes of each layer *on the fly*.
 
 
-Later on, when working with convolutional neural networks
-this technique will become even more convenient,
+Later on, when working with convolutional neural networks,
+this technique will become even more convenient
 since the input dimensionality 
 (i.e., the resolution of an image) 
 will affect the dimensionality 
@@ -39,7 +39,7 @@ Next, we go deeper into the mechanics of initialization.
 
 ## Instantiating a Network
 
-To begin, let us instantiate an MLP. 
+To begin, let us instantiate an MLP.
 
 ```{.python .input}
 from mxnet import init, np, npx
@@ -67,10 +67,10 @@ print(net.collect_params())
 ```
 
 Note that while the Parameter objects exist,
-the input dimension to each layer to listed as `-1`.
+the input dimension to each layer is listed as `-1`.
 MXNet uses the special value `-1` to indicate
 that the parameters dimension remains unknown.
-At this point attempts to access `net[0].weight.data()`
+At this point, attempts to access `net[0].weight.data()`
 would trigger a runtime error stating that the network
 must be initialized before the parameters can be accessed.
 Now let us see what happens when we attempt to initialze
@@ -89,7 +89,7 @@ Instead, this call registers to MXNet that we wish
 to initialize the parameters. 
 Only once we pass data through the network
 will MXNet finally initialize parameters 
-and we will see a difference.
+and will we see a difference.
 
 ```{.python .input}
 x = np.random.uniform(size=(2, 20))
@@ -99,13 +99,13 @@ net.collect_params()
 ```
 
 As soon as we knew the input dimensionality, 
-$\mathbf{x} \in \mathbb{R}^{20}$ 
-MXNet can identify the shape of the first layer's weight matrix, 
+$\mathbf{x} \in \mathbb{R}^{20}$, 
+MXNet could identify the shape of the first layer's weight matrix, 
 i.e., $\mathbf{W}_1 \in \mathbb{R}^{256 \times 20}$.
-Having recognized the first layer shape, MXNet proceeds
+Having recognized the first layer shape, MXNet proceeded
 to the second layer, whose dimensionality is $10 \times 256$
 and so on through the computational graph
-until all shapes are known.
+until all shapes were known.
 Note that in this case, 
 only the first layer required deferred initialization,
 but MXNet initializes sequentially. 
@@ -163,10 +163,10 @@ y = net(x)
 ```
 
 As mentioned at the beginning of this section,
-deferred initialization can be source of confusion.
+deferred initialization can be a source of confusion.
 Before the first forward calculation,
-we were unable to directly manipulate the model parameters,
-for example, we could not use
+we were unable to directly manipulate the model parameters.
+For example, we could not use
 the `data` and `set_data` functions
 to get and modify the parameters.
 Therefore, we often force initialization
