@@ -1,6 +1,6 @@
 # Custom Layers
 
-One of factors behind deep learnings success
+One factor behind deep learning's success
 is the availability of a wide range of layers
 that can be composed in creative ways
 to design architectures suitable
@@ -10,7 +10,7 @@ specifically for handling images, text,
 looping over sequential data,
 performing dynamic programming, etc.
 Sooner or later you will encounter (or invent)
-a layer that does not exist yet in Gluon,
+a layer that does not exist yet in Gluon.
 In these cases, you must build a custom layer.
 In this section, we show you how.
 
@@ -67,14 +67,14 @@ y.mean()
 
 ## Layers with Parameters
 
-Now that we know how to define simple layers
+Now that we know how to define simple layers,
 let us move on to defining layers with parameters
 that can be adjusted through training. 
-To automate some of the routine work
+To automate some of the routine work,
 the `Parameter` class and the `ParameterDict` dictionary 
 provide some basic housekeeping functionality.
 In particular, they govern access, initialization, 
-sharing, saving and loading model parameters. 
+sharing, saving, and loading model parameters. 
 This way, among other benefits, we will not need to write
 custom serialization routines for every custom layer.
 
@@ -82,7 +82,7 @@ The `Block` class contains a `params` variable
 of the `ParameterDict` type. 
 This dictionary maps strings representing parameter names
 to model parameters (of the `Parameter` type). 
-The `ParameterDict` also supplied a `get` function
+The `ParameterDict` also supplies a `get` function
 that makes it easy to generate a new parameter
 with a specified name and shape.
 
@@ -139,7 +139,7 @@ We can also construct models using custom layers.
 Once we have that we can use it just like the built-in dense layer.
 The only exception is that in our case,
 shape inference is not automatic. 
-If you are interested in these bells and whisteles,
+If you are interested in these bells and whistles,
 please consult the [MXNet documentation](http://www.mxnet.io)
 for details on how to implement shape inference in custom layers.
 
@@ -155,7 +155,7 @@ net(np.random.uniform(size=(2, 64)))
 
 * We can design custom layers via the Block class. This allows us to define flexible new layers that behave differently from any existing layers in the library.
 * Once defined, custom layers can be invoked in arbitrary contexts and architectures.
-* Blocks can have local parameters, which are stored as a `ParameterDict` object in each Blovk's `params` attribute.
+* Blocks can have local parameters, which are stored in a `ParameterDict` object in each Block's `params` attribute.
 
 
 ## Exercises
