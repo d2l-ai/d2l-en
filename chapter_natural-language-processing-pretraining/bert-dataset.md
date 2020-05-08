@@ -35,10 +35,12 @@ npx.set_np()
 In the WikiText-2 dataset,
 each line represents a paragraph where
 space is inserted between any punctuation and its preceding token.
-WikiText-103 is a much larger dataset (over 110 times larger than PTB)
-of the same format of WikiText-2: it can be used for pretraining in the future exercises.
+Paragraphs with at least two sentences are retained.
+To split sentences, we only use the period as the delimiter for simplicity.
+We leave discussions of more complex sentence splitting techniques in the exercises
+at the end of this section.
 
-```{.python .input}
+```{.python .input  n=2}
 # Saved in the d2l package for later use
 d2l.DATA_HUB['wikitext-2'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/'
@@ -48,14 +50,7 @@ d2l.DATA_HUB['wikitext-2'] = (
 d2l.DATA_HUB['wikitext-103'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/'
     'wikitext-103-v1.zip', '0aec09a7537b58d4bb65362fee27650eeaba625a')
-```
 
-Paragraphs with at least two sentences are retained.
-To split sentences, we only use the period as the delimiter for simplicity.
-We leave discussions of more complex sentence splitting techniques in the exercises
-at the end of this section.
-
-```{.python .input  n=2}
 # Saved in the d2l package for later use
 def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
