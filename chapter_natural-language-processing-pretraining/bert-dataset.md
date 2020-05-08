@@ -47,11 +47,6 @@ d2l.DATA_HUB['wikitext-2'] = (
     'wikitext-2-v1.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
 
 # Saved in the d2l package for later use
-d2l.DATA_HUB['wikitext-103'] = (
-    'https://s3.amazonaws.com/research.metamind.io/wikitext/'
-    'wikitext-103-v1.zip', '0aec09a7537b58d4bb65362fee27650eeaba625a')
-
-# Saved in the d2l package for later use
 def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
@@ -282,9 +277,9 @@ and generate pretraining examples from it.
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
-def load_data_wiki(batch_size, max_len, dataset='wikitext-2'):
+def load_data_wiki(batch_size, max_len):
     num_workers = d2l.get_dataloader_workers()
-    data_dir = d2l.download_extract(dataset, dataset)
+    data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
     paragraphs = _read_wiki(data_dir)
     train_set = _WikiTextDataset(paragraphs, max_len)
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
