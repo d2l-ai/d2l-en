@@ -352,15 +352,11 @@ Hence, the MLP classifier (`self.mlp`) takes the encoded “&lt;cls&gt;” token
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
 class NextSentencePred(nn.Block):
-    def __init__(self, num_hiddens, **kwargs):
+    def __init__(self, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
-        self.mlp = nn.Sequential()
-        self.mlp.add(nn.Dense(num_hiddens, activation='tanh'))
-        self.mlp.add(nn.Dense(2))
+        self.mlp = nn.Dense(2)
 
     def forward(self, X):
-        # 0 is the index of the '<cls>' token
-        X = X[:, 0, :]
         # X shape: (batch size, `num_hiddens`)
         return self.mlp(X)
 ```
@@ -369,7 +365,7 @@ We can see that the forward inference of an `NextSentencePred` instance
 returns binary predictions for each BERT input sequence.
 
 ```{.python .input  n=8}
-nsp = NextSentencePred(num_hiddens)
+nsp = NextSentencePred()
 nsp.initialize()
 nsp_Y_hat = nsp(encoded_X)
 nsp_Y_hat.shape
@@ -409,6 +405,7 @@ class BERTModel(nn.Block):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
                                    num_heads, num_layers, dropout, max_len)
+        self.pooler = nn.Dense(num_hiddens, flatten=False, activation='tanh')
         self.mlm = MaskLM(vocab_size, num_hiddens)
         self.nsp = NextSentencePred(num_hiddens)
 
@@ -418,7 +415,8 @@ class BERTModel(nn.Block):
             mlm_Y_hat = self.mlm(encoded_X, pred_positions)
         else:
             mlm_Y_hat = None
-        nsp_Y_hat = self.nsp(encoded_X)
+        pooled_out = self.pooler(encoded_X[:, 0, :])
+        nsp_Y_hat = self.nsp(pooled_out)
         return encoded_X, mlm_Y_hat, nsp_Y_hat
 ```
 
