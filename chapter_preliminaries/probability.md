@@ -218,33 +218,18 @@ Another useful property to check for is *dependence* vs. *independence*.
 Two random variables $A$ and $B$ being independent
 means that the occurrence of one event of $A$
 does not reveal any information about the occurrence of an event of $B$.
-In this case $P(B \mid A) = P(B)$. 
-Statisticians typically express this as $A \perp  B$. 
-From Bayes' theorem, it follows immediately that also $P(A \mid B) = P(A)$.
-In all the other cases we call $A$ and $B$ dependent.
-For instance, two successive rolls of a die are independent.
-In contrast, the position of a light switch and the brightness in the room are not 
-(they are not perfectly deterministic, though, since we could always have 
-a broken light bulb, power failure, or a broken switch).
+In this case $P(B \mid A) = P(B)$. Statisticians typically express this as $A \perp  B$. From Bayes' theorem, it follows immediately that also $P(A \mid B) = P(A)$.
+In all the other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. In contrast, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken light bulb, power failure, or a broken switch).
 
-Since $P(A \mid B) = \frac{P(A, B)}{P(B)} = P(A)$ is equivalent to $P(A, B) = P(A)P(B)$,
-two random variables are independent if and only if their joint distribution
-is the product of their individual distributions.
-Likewise, two random variables $A$ and $B$ are
-*conditionally independent* given another random variable $C$
-if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$.
-This is expressed as $A \perp B \mid C$.
+Since $P(A \mid B) = \frac{P(A, B)}{P(B)} = P(A)$ is equivalent to $P(A, B) = P(A)P(B)$, two random variables are independent if and only if their joint distribution is the product of their individual distributions.
+Likewise, two random variables $A$ and $B$ are *conditionally independent* given another random variable $C$
+if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$. This is expressed as $A \perp B \mid C$.
 
 ### Application
 :label:`subsec_probability_hiv_app`
 
-Let us put our skills to the test. 
-Assume that a doctor administers an AIDS test to a patient. 
-This test is fairly accurate and it fails only with $1\%$ probability 
-if the patient is healthy but reporting him as diseased.
-Moreover, it never fails to detect HIV if the patient actually has it.
-We use $D_1$ to indicate the diagnosis ($1$ if positive and $0$ if negative)
-and $H$ to denote the HIV status ($1$ if positive and $0$ if negative).
+Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with $1\%$ probability if the patient is healthy but reporting him as diseased. Moreover,
+it never fails to detect HIV if the patient actually has it. We use $D_1$ to indicate the diagnosis ($1$ if positive and $0$ if negative) and $H$ to denote the HIV status ($1$ if positive and $0$ if negative).
 :numref:`conditional_prob_D1` lists such conditional probabilities.
 
 :Conditional probability of $P(D_1 \mid H)$.
@@ -255,14 +240,7 @@ and $H$ to denote the HIV status ($1$ if positive and $0$ if negative).
 |$P(D_1 = 0 \mid H)$|            0 |         0.99 |
 :label:`conditional_prob_D1`
 
-Note that the column sums are all $1$ (but the row sums are not),
-since the conditional probability needs to sum up to $1$, just like the probability. 
-Let's work out the probability of the patient having AIDS 
-if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$.
-This is going to depend on how common the disease is,
-since it affects the number of false alarms. 
-Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. 
-To apply Bayes' theorem, we need to apply marginalization and the multiplication rule to determine
+Note that the column sums are all $1$ (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' theorem, we need to apply marginalization and the multiplication rule to determine
 
 $$\begin{aligned}
 &P(D_1 = 1) \\
@@ -281,10 +259,9 @@ In other words, there is only a 13.06% chance that the patient
 actually has AIDS, despite using a very accurate test. 
 As we can see, probability can be counterintuitive.
 
-What should a patient do upon receiving such terrifying news?
-Likely, the patient would ask the physician to administer another test to get clarity. 
-The second test has different characteristics and it is not as good as the first one, 
-as shown in :numref:`conditional_prob_D2`.
+What should a patient do upon receiving such terrifying news? Likely, the patient
+would ask the physician to administer another test to get clarity. The second
+test has different characteristics and it is not as good as the first one, as shown in :numref:`conditional_prob_D2`.
 
 
 :Conditional probability of $P(D_2 \mid H)$.
