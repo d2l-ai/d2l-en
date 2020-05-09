@@ -192,7 +192,7 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 
 ## Exercises
 
-1. Test the fastText results.
+1. Test the fastText results using `TokenEmbedding('wiki.en')`.
 1. If the dictionary is extremely large, how can we accelerate finding synonyms and analogies?
 
 
