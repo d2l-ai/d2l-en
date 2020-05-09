@@ -3,17 +3,11 @@
 
 In :numref:`sec_word2vec_gluon` we trained a word2vec word embedding model
 on a small-scale dataset and searched for synonyms using the cosine similarity
-of word vectors. In practice, word vectors pre-trained on a large-scale corpus
+of word vectors. In practice, word vectors pretrained on a large-scale corpus
 can often be applied to downstream natural language processing tasks. This
-section will demonstrate how to use these pre-trained word vectors to find
-synonyms and analogies. We will continue to apply pre-trained word vectors in
+section will demonstrate how to use these pretrained word vectors to find
+synonyms and analogies. We will continue to apply pretrained word vectors in
 subsequent sections.
-
-## Using Pre-Trained Word Vectors
-
-MXNet's `contrib.text` package provides functions and classes related to natural
-language processing (see the [GluonNLP](https://gluon-nlp.mxnet.io/) tool package for more details). Next,
-let us check out names of the provided pre-trained word embeddings.
 
 ```{.python .input}
 import d2l
@@ -23,62 +17,78 @@ import os
 npx.set_np()
 ```
 
-Given the name of the word embedding, we can see which pre-trained models are provided by the word embedding. The word vector dimensions of each model may be different or obtained by pre-training on different datasets.
+## Using Pretrained Word Vectors
+
+Below lists pretrained GloVe embeddings of dimensions 50, 100, and 300,
+which can be downloaded from the [GloVe website](https://nlp.stanford.edu/projects/glove/).
+The pretrained fastText embeddings are available in multiple languages.
+Here we consider one English version (300-dimensional "wiki.en") that can be downloaded from the
+[fastText website](https://fasttext.cc/).
 
 ```{.python .input  n=35}
 # Saved in the d2l package for later use
-d2l.DATA_HUB['GloVe.6B.50d'] = ('http://www.seal.ac.cn/glove.6B.50d.zip',
+d2l.DATA_HUB['glove.6b.50d'] = (d2l.DATA_URL + 'glove.6B.50d.zip',
                        '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
 
 # Saved in the d2l package for later use
-d2l.DATA_HUB['GloVe.6B.100d'] = ('http://www.seal.ac.cn/glove.6B.100d.zip',
+d2l.DATA_HUB['glove.6b.100d'] = (d2l.DATA_URL + 'glove.6B.100d.zip',
                        'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
 
 # Saved in the d2l package for later use
-d2l.DATA_HUB['GloVe.42B.300d'] = ('http://www.seal.ac.cn/glove.42B.300d.zip',
-                       '99af83e02ad44850374880549768d89b66c1e0d1')
+d2l.DATA_HUB['glove.42b.300d'] = (d2l.DATA_URL + 'glove.42B.300d.zip',
+                       'b5116e234e9eb9076672cfeabf5469f3eec904fa')
 
 # Saved in the d2l package for later use
-d2l.DATA_HUB['fastText.crawl'] = ('http://www.seal.ac.cn/crawl-300d-2M.zip',
-                       '9898cc74f433d4da01cd04942aef57afc7710b7c')
+d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
+                       'c1816da3821ae9f43899be655002f6c723e91b88')
 ```
+
+We define the following `TokenEmbedding` class to load the above pretrained Glove and fastText embeddings.
 
 ```{.python .input}
 # Saved in the d2l package for later use
-class Embedding:
+class TokenEmbedding:
+    """Token Embedding."""
     def __init__(self, embedding_name):
-        self.idx_to_token, self.idx_to_vec = self._load_embedding(embedding_name)
+        self.idx_to_token, self.idx_to_vec = self._load_embedding(
+            embedding_name)
         self.unknown_idx = 0
-        self.token_to_idx = {token : idx for idx, token in 
+        self.token_to_idx = {token: idx for idx, token in 
                              enumerate(self.idx_to_token)}
+
     def _load_embedding(self, embedding_name):
-        idx_to_token, idx_to_vec = [], []
+        idx_to_token, idx_to_vec = ['<unk>'], []
         data_dir = d2l.download_extract(embedding_name)
+        # GloVe website: https://nlp.stanford.edu/projects/glove/
+        # fastText website: https://fasttext.cc/
         with open(os.path.join(data_dir, 'vec.txt'), 'r') as f:
             for line in f:
                 elems = line.rstrip().split(' ')
-                token, elems = elems[0], [float(i) for i in elems[1:]]
-                idx_to_token.append(token)
-                idx_to_vec.append(elems)
-        idx_to_token = ['<unk>'] + idx_to_token
+                token, elems = elems[0], [float(elem) for elem in elems[1:]]
+                # Skip header information, such as the top row in fastText
+                if len(elems) > 1:
+                    idx_to_token.append(token)
+                    idx_to_vec.append(elems)
         idx_to_vec = [[0] * len(idx_to_vec[0])] + idx_to_vec
         return idx_to_token, np.array(idx_to_vec)
+
     def __getitem__(self, tokens):
         indices = [self.token_to_idx.get(token, self.unknown_idx)
                    for token in tokens]
         vecs = self.idx_to_vec[np.array(indices)]
         return vecs
+
     def __len__(self):
         return len(self.idx_to_token)
 ```
 
-The general naming conventions for pre-trained GloVe models are "model.(dataset.)number of words in dataset.word vector dimension.txt". For more information, please refer to the GloVe and fastText project sites [2, 3]. Below, we use a 50-dimensional GloVe word vector based on Wikipedia subset pre-training. The corresponding word vector is automatically downloaded the first time we create a pre-trained word vector instance.
+Next, we use 50-dimensional GloVe embeddings pretrained on a subset of the Wikipedia. The corresponding word embedding is automatically downloaded the first time we create a pretrained word embedding instance.
 
 ```{.python .input  n=11}
-glove_6b50d = Embedding('GloVe.6B.50d')
+glove_6b50d = TokenEmbedding('glove.6b.50d')
 ```
 
-Print the dictionary size. The dictionary contains $400,000$ words and a special unknown token.
+Output the dictionary size. The dictionary contains $400,000$ words and a special unknown token.
 
 ```{.python .input}
 len(glove_6b50d)
@@ -90,9 +100,9 @@ We can use a word to get its index in the dictionary, or we can get the word fro
 glove_6b50d.token_to_idx['beautiful'], glove_6b50d.idx_to_token[3367]
 ```
 
-## Applying Pre-Trained Word Vectors
+## Applying Pretrained Word Vectors
 
-Below, we demonstrate the application of pre-trained word vectors, using GloVe as an example.
+Below, we demonstrate the application of pretrained word vectors, using GloVe as an example.
 
 ### Finding Synonyms
 
@@ -122,7 +132,7 @@ def get_similar_tokens(query_token, k, embed):
         print('cosine sim=%.3f: %s' % (c, (embed.idx_to_token[int(i)])))
 ```
 
-The dictionary of pre-trained word vector instance `glove_6b50d` already created contains 400,000 words and a special unknown token. Excluding input words and unknown words, we search for the three words that are the most similar in meaning to "chip".
+The dictionary of pretrained word vector instance `glove_6b50d` already created contains 400,000 words and a special unknown token. Excluding input words and unknown words, we search for the three words that are the most similar in meaning to "chip".
 
 ```{.python .input}
 get_similar_tokens('chip', 3, glove_6b50d)
@@ -140,7 +150,7 @@ get_similar_tokens('beautiful', 3, glove_6b50d)
 
 ### Finding Analogies
 
-In addition to seeking synonyms, we can also use the pre-trained word vector to seek the analogies between words. For example, “man”:“woman”::“son”:“daughter” is an example of analogy, “man” is to “woman” as “son” is to “daughter”. The problem of seeking analogies can be defined as follows: for four words in the analogical relationship $a : b :: c : d$, given the first three words, $a$, $b$ and $c$, we want to find $d$. Assume the word vector for the word $w$ is $\text{vec}(w)$. To solve the analogy problem, we need to find the word vector that is most similar to the result vector of $\text{vec}(c)+\text{vec}(b)-\text{vec}(a)$.
+In addition to seeking synonyms, we can also use the pretrained word vector to seek the analogies between words. For example, “man”:“woman”::“son”:“daughter” is an example of analogy, “man” is to “woman” as “son” is to “daughter”. The problem of seeking analogies can be defined as follows: for four words in the analogical relationship $a : b :: c : d$, given the first three words, $a$, $b$ and $c$, we want to find $d$. Assume the word vector for the word $w$ is $\text{vec}(w)$. To solve the analogy problem, we need to find the word vector that is most similar to the result vector of $\text{vec}(c)+\text{vec}(b)-\text{vec}(a)$.
 
 ```{.python .input}
 def get_analogy(token_a, token_b, token_c, embed):
