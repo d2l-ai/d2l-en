@@ -89,9 +89,9 @@ def corr2d(X, K):
     return Y
 ```
 
-We can construct the input array `X` 
-and the kernel array `K` from the figure above
-to validate the output of the above implementations
+We can construct the input array `X` and the kernel array `K`
+from the figure above
+to validate the output of the above implementation
 of the two-dimensional cross-correlation operation.
 
 ```{.python .input}
@@ -204,7 +204,7 @@ conv2d = nn.Conv2D(1, kernel_size=(1, 2))
 conv2d.initialize()
 
 # The two-dimensional convolutional layer uses four-dimensional input and
-# output in the format of (example channel, height, width), where the batch
+# output in the format of (example, channel, height, width), where the batch
 # size (number of examples in the batch) and the number of channels are both 1
 X = X.reshape(1, 1, 6, 8)
 Y = Y.reshape(1, 1, 6, 7)

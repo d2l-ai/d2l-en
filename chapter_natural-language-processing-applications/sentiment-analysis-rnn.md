@@ -80,14 +80,13 @@ net.initialize(init.Xavier(), ctx=ctx)
 Because the training dataset for sentiment classification is not very large, in order to deal with overfitting, we will directly use word vectors pre-trained on a larger corpus as the feature vectors of all words. Here, we load a 100-dimensional GloVe word vector for each word in the dictionary `vocab`.
 
 ```{.python .input}
-glove_embedding = text.embedding.create(
-    'glove', pretrained_file_name='glove.6B.100d.txt')
+glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
 ```
 
 Query the word vectors that in our vocabulary.
 
 ```{.python .input}
-embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
+embeds = glove_embedding[vocab.idx_to_token]
 embeds.shape
 ```
 

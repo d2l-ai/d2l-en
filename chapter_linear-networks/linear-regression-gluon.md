@@ -174,7 +174,7 @@ we cannot access or manipulate them.
 ## Defining the Loss Function
 
 In Gluon, the `loss` module defines various loss functions.
-We will use the imported module `loss` with the pseudonym `gloss`,
+We will use the imported module `loss` with the pseudonym `gloss`
 to avoid confusing it for the variable
 holding our chosen loss function.
 In this example, we will use the Gluon

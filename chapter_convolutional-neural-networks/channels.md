@@ -174,7 +174,7 @@ You could think of the $1\times 1$ convolutional layer
 as constituting a fully-connected layer applied at every single pixel location
 to transform the $c_i$ corresponding input values into $c_o$ output values.
 Because this is still a convolutional layer,
-the weights are tied across pixel location
+the weights are tied across pixel location.
 Thus the $1\times 1$ convolutional layer requires $c_o\times c_i$ weights
 (plus the bias terms).
 

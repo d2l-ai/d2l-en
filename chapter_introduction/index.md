@@ -219,7 +219,7 @@ offering a unified set of tools for tackling diverse problems.
 ## The Key Components: Data, Models, and Algorithms
 
 In our *wake-word* example, we described a dataset
-consisting of audio snippets and binary labels
+consisting of audio snippets and binary labels, and we
 gave a hand-wavy sense of how we might *train*
 a model to approximate a mapping from snippets to classifications.
 This sort of problem, where we try to predict a designated unknown *label*
@@ -290,9 +290,9 @@ is the comparative grace with which modern models
 can handle *varying-length* data.
 
 Generally, the more data we have, the easier our job becomes.
-When we have more data, we can train more powerful models,
+When we have more data, we can train more powerful models
 and rely less heavily on pre-conceived assumptions.
-The regime change from (comparatively small) to big data
+The regime change from (comparatively) small to big data
 is a major contributor to the success of modern deep learning.
 To drive the point home, many of the most exciting models in deep learning do not work without large datasets.
 Some others work in the low-data regime,
@@ -439,8 +439,8 @@ predicting *targets* given *inputs*.
 The targets, which we often call *labels*, are generally denoted by *y*.
 The input data, also called the *features* or covariates,
 are typically denoted $\mathbf{x}$.
-Each (input, target) pair is called *examples* or *instances*.
-Some times, when the context is clear, we may use the term examples,
+Each (input, target) pair is called an *example* or *instance*.
+Sometimes, when the context is clear, we may use the term examples,
 to refer to a collection of inputs,
 even when the corresponding targets are unknown.
 We denote any particular instance with a subscript, typically $i$,

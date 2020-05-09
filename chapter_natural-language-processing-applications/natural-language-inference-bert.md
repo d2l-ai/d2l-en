@@ -52,8 +52,8 @@ We pretrain BERT on the WikiText-2 dataset for 3,000 iteration steps.
 
 ```{.python .input}
 ctx, loss = d2l.try_all_gpus(), gluon.loss.SoftmaxCELoss()
-bert = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=128,
-                     num_heads=2, num_layers=2, dropout=0.2)
+bert = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,
+                     num_heads=2, num_layers=2, dropout=0.1)
 bert.initialize(init.Xavier(), ctx=ctx)
 d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 3000)
 ```
@@ -79,7 +79,9 @@ class SNLIBERTDataset(gluon.data.Dataset):
     def __init__(self, dataset, max_len, vocab=None):
         all_premise_hypothesis_tokens = [[
             p_tokens, h_tokens] for p_tokens, h_tokens in zip(
-            d2l.tokenize(dataset[0]), d2l.tokenize(dataset[1]))]
+            *[d2l.tokenize([s.lower() for s in sentences])
+              for sentences in dataset[:2]])]
+        
         self.labels = np.array(dataset[2])
         self.vocab = vocab
         self.max_len = max_len
@@ -218,7 +220,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
 ## Exercises
 
 1. How to truncate a pair of sequences according to their ratio of length? Compare this pair truncation method and the one used in the `SNLIBERTDataset` class. What are their pros and cons?
-2. If your computational resource allows, increase the model size such as setting `ffn_num_hiddens=256`, `num_heads=4`, and `num_layers=4`. By increasing pretraining steps and fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.75? Improve the sentence splitting technique by using those as described in the exercises of :numref:`sec_bert-dataset`. Does it lead to better testing accuracy?
+2. If your computational resource allows, increase the model size such as setting `num_hiddens=256`, `ffn_num_hiddens=256`, `num_heads=4`, and `num_layers=4`. By increasing pretraining steps and fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.75? Improve the sentence splitting technique by using those as described in the exercises of :numref:`sec_bert-dataset`. Does it lead to better testing accuracy?
 3. If your computational resource allows, use a much larger pretraining corpus and a much larger BERT. Can you get a much better testing accuracy? How long do the pretraining and fine-tuning take?
 
 

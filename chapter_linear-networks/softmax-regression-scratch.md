@@ -9,7 +9,7 @@ As with linear regression, after doing things by hand
 we will breeze through an implementation in Gluon for comparison.
 To begin, let us import the familiar packages.
 
-```{.python .input  n=2}
+```{.python .input  n=1}
 import d2l
 from mxnet import autograd, np, npx, gluon
 from IPython import display
@@ -30,7 +30,7 @@ As in our linear regression example,
 each example here will be represented by a fixed-length vector.
 Each example in the raw data is a $28 \times 28$ image.
 In this section, we will flatten each image,
-treating them as $784$ 1D vectors.
+treating them as $784$-long 1D vectors.
 In the future, we will talk about more sophisticated strategies
 for exploiting the spatial structure in images,
 but for now we treat each pixel location as just another feature.
@@ -90,7 +90,7 @@ to get the normalization constants for each example.
 Finally, we divide each row by its normalization constant,
 ensuring that the result sums to $1$.
 Before looking at the code, let us recall
-what this looks expressed as an equation:
+how this looks expressed as an equation:
 
 $$
 \mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(X_{ij})}{\sum_k \exp(X_{ik})}.
@@ -116,7 +116,7 @@ Moreover, each row sums up to 1,
 as is required for a probability.
 Note that while this looks correct mathematically,
 we were a bit sloppy in our implementation
-because failed to take precautions against numerical overflow or underflow
+because we failed to take precautions against numerical overflow or underflow
 due to large (or very small) elements of the matrix,
 as we did in :numref:`sec_naive_bayes`.
 
@@ -189,7 +189,7 @@ and we will nearly always report it when training classifiers.
 To compute accuracy we do the following:
 First, we execute `y_hat.argmax(axis=1)`
 to gather the predicted classes
-(given by the indices for the largest entires each row).
+(given by the indices for the largest entries in each row).
 The result has the same shape as the variable `y`.
 Now we just need to check how frequently the two match.
 Since the equality operator `==` is datatype-sensitive
@@ -236,9 +236,10 @@ def evaluate_accuracy(net, data_iter):
     return metric[0] / metric[1]
 ```
 
-Here `Accumulator` is a utility class to accumulate the sum over multiple numbers.
 
-```{.python .input}
+Here `Accumulator` is a utility class to accumulate sums over multiple numbers.
+
+```{.python .input  n=14}
 # Saved in the d2l package for later use
 class Accumulator:
     """Sum a list of numbers over time."""
@@ -250,7 +251,7 @@ class Accumulator:
         self.data = [a+float(b) for a, b in zip(self.data, args)]
 
     def reset(self):
-        self.data = [0] * len(self.data)
+        self.data = [0.0] * len(self.data)
 
     def __getitem__(self, idx):
         return self.data[idx]
@@ -260,7 +261,7 @@ Because we initialized the `net` model with random weights,
 the accuracy of this model should be close to random guessing,
 i.e., $0.1$ for $10$ classes.
 
-```{.python .input  n=14}
+```{.python .input  n=15}
 evaluate_accuracy(net, test_iter)
 ```
 
@@ -275,7 +276,7 @@ Note that `updater` is general function to update the model parameters,
 which accepts the batch size as an argument.
 It can be either a wrapper of `d2l.sgd` or a Gluon trainer.
 
-```{.python .input  n=15}
+```{.python .input  n=16}
 # Saved in the d2l package for later use
 def train_epoch_ch3(net, train_iter, loss, updater):
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
@@ -294,10 +295,10 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 ```
 
 Before showing the implementation of the training function,
-we define a utility class that draw data in animation.
-Again, it aims to simplify the codes in later chapters.
+we define a utility class that draws data in animation.
+Again, it aims to simplify the code in later chapters.
 
-```{.python .input  n=16}
+```{.python .input  n=17}
 # Saved in the d2l package for later use
 class Animator:
     def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
@@ -342,7 +343,7 @@ class Animator:
 
 The training function then runs multiple epochs and visualize the training progress.
 
-```{.python .input  n=17}
+```{.python .input  n=18}
 # Saved in the d2l package for later use
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
