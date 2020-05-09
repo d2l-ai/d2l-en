@@ -537,14 +537,13 @@ in the next chapter on multilayer perceptrons.
 
 ### Biology
 
-Although linear regression (invented in 1795)
-predates computational neuroscience,
-so it might seem anachronistic to describe
+Since linear regression (invented in 1795)
+predates computational neuroscience, 
+it might seem anachronistic to describe
 linear regression as a neural network.
 To see why linear models were a natural place to begin
 when the cyberneticists/neurophysiologists
-Warren McCulloch and Walter Pitts
-looked when they began to develop
+Warren McCulloch and Walter Pitts began to develop 
 models of artificial neurons,
 consider the cartoonish picture
 of a biological neuron in :numref:`fig_Neuron`, consisting of
