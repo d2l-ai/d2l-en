@@ -1814,17 +1814,13 @@ class MaskLM(nn.Block):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class NextSentencePred(nn.Block):
-    def __init__(self, num_hiddens, **kwargs):
+    def __init__(self, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
-        self.mlp = nn.Sequential()
-        self.mlp.add(nn.Dense(num_hiddens, activation='tanh'))
-        self.mlp.add(nn.Dense(2))
+        self.output = nn.Dense(2)
 
     def forward(self, X):
-        # 0 is the index of the '<cls>' token
-        X = X[:, 0, :]
         # X shape: (batch size, `num_hiddens`)
-        return self.mlp(X)
+        return self.output(X)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
@@ -1834,8 +1830,9 @@ class BERTModel(nn.Block):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
                                    num_heads, num_layers, dropout, max_len)
+        self.hidden = nn.Dense(num_hiddens, activation='tanh')
         self.mlm = MaskLM(vocab_size, num_hiddens)
-        self.nsp = NextSentencePred(num_hiddens)
+        self.nsp = NextSentencePred()
 
     def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)
@@ -1843,7 +1840,9 @@ class BERTModel(nn.Block):
             mlm_Y_hat = self.mlm(encoded_X, pred_positions)
         else:
             mlm_Y_hat = None
-        nsp_Y_hat = self.nsp(encoded_X)
+        # The hidden layer of the MLP classifier for next sentence prediction.
+        # 0 is the index of the '<cls>' token
+        nsp_Y_hat = self.nsp(self.hidden(encoded_X[:, 0, :]))
         return encoded_X, mlm_Y_hat, nsp_Y_hat
 
 

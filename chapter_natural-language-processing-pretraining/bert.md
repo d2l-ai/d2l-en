@@ -347,18 +347,19 @@ in the BERT input sequence.
 Due to self-attention in the Transformer encoder,
 the BERT representation of the special token “&lt;cls&gt;”
 encodes both the two sentences from the input.
-Hence, the MLP classifier (`self.mlp`) takes the encoded “&lt;cls&gt;” token as the input.
+Hence, the output layer (`self.output`) of the MLP classifier takes `X` as the input,
+where `X` is the output of the MLP hidden layer whose input is the encoded “&lt;cls&gt;” token.
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
 class NextSentencePred(nn.Block):
     def __init__(self, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
-        self.mlp = nn.Dense(2)
+        self.output = nn.Dense(2)
 
     def forward(self, X):
         # X shape: (batch size, `num_hiddens`)
-        return self.mlp(X)
+        return self.output(X)
 ```
 
 We can see that the forward inference of an `NextSentencePred` instance
@@ -405,9 +406,9 @@ class BERTModel(nn.Block):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
                                    num_heads, num_layers, dropout, max_len)
-        self.pooler = nn.Dense(num_hiddens, flatten=False, activation='tanh')
+        self.hidden = nn.Dense(num_hiddens, activation='tanh')
         self.mlm = MaskLM(vocab_size, num_hiddens)
-        self.nsp = NextSentencePred(num_hiddens)
+        self.nsp = NextSentencePred()
 
     def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)
@@ -415,8 +416,9 @@ class BERTModel(nn.Block):
             mlm_Y_hat = self.mlm(encoded_X, pred_positions)
         else:
             mlm_Y_hat = None
-        pooled_out = self.pooler(encoded_X[:, 0, :])
-        nsp_Y_hat = self.nsp(pooled_out)
+        # The hidden layer of the MLP classifier for next sentence prediction.
+        # 0 is the index of the '<cls>' token
+        nsp_Y_hat = self.nsp(self.hidden(encoded_X[:, 0, :]))
         return encoded_X, mlm_Y_hat, nsp_Y_hat
 ```
 
