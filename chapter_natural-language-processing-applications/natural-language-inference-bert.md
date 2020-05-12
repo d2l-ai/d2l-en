@@ -31,31 +31,75 @@ we load the WikiText-2 dataset as minibatches
 of pretraining examples with the batch size being 512
 and the maximum length of a BERT input sequence being 128.
 
-```{.python .input  n=40}
+```{.python .input  n=1}
 import d2l
+import json
 import multiprocessing
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
+import os
 
 npx.set_np()
-# Reduce `batch_size` if there is an out of memory error. In the original BERT
-# model, `max_len` = 512
-batch_size, max_len = 512, 128
-bert_train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 ```
 
 As discussed in :numref:`sec_bert-pretraining`,
 the original BERT model has hundreds of millions of parameters.
 To facilitate demonstration,
-we define a small BERT of 2 layers, 128 hidden units, and 2 self-attention heads.
-We pretrain BERT on the WikiText-2 dataset for 3,000 iteration steps.
+we provide a small pretrained BERT of 2 layers, 256 hidden units, 512 feed forward hidden units, and 4 self-attention heads.
 
-```{.python .input}
-ctx, loss = d2l.try_all_gpus(), gluon.loss.SoftmaxCELoss()
-bert = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,
-                     num_heads=2, num_layers=2, dropout=0.1)
-bert.initialize(init.Xavier(), ctx=ctx)
-d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 3000)
+'bert.base' is a much larger BERT (same size as original BERT): it can be used for pretraining in the future exercises.
+
+```{.python .input  n=2}
+d2l.DATA_HUB['bert.small'] = (
+    'http://www.seal.ac.cn/bert.small.zip',
+    'eb01f1d59b198d88634c9d1b28338f47369df164')
+
+d2l.DATA_HUB['bert.base'] = (
+    'http://www.seal.ac.cn/bert.base.zip',
+    '9a4b594f657f76a8730b21ee33e090c331e09ef6')
+```
+
+```{.python .input  n=4}
+def load_pretrained_model(pretrained_model, ctx):
+    data_dir = d2l.download_extract(pretrained_model)
+    # Define an empty vocabulary and load the predefined vocabulary
+    vocab = d2l.Vocab([])
+    vocab.idx_to_token = json.load(open(os.path.join(data_dir, 'vocab.json'), 'r'))
+    vocab.token_to_idx = {token : idx for idx, token in enumerate(vocab.idx_to_token)}
+    # Load model hyper-parameters
+    config = json.load(open(os.path.join(data_dir, 'config.json'), 'r'))
+    print('num_hiddens=%d, ffn_num_hiddens=%d, num_heads=%d, '\
+          'num_layers=%d, dropout=%.2f, max_len=%d' % \
+          (config['num_hiddens'], config['ffn_num_hiddens'],
+           config['num_heads'], config['num_layers'],
+           config['dropout'], config['max_len']))
+    bert = d2l.BERTModel(len(vocab),
+                         num_hiddens=config['num_hiddens'],
+                         ffn_num_hiddens=config['ffn_num_hiddens'],
+                         num_heads=config['num_heads'], 
+                         num_layers=config['num_layers'],
+                         dropout=config['dropout'],
+                         max_len=config['max_len'])
+    # Load model pretrained parameters
+    bert.load_parameters(os.path.join(data_dir, 'pretrained.params'), ctx=ctx)
+    return bert, vocab
+```
+
+Now, we load the pretrained BERT.
+
+```{.python .input  n=5}
+ctx = d2l.try_all_gpus()
+bert, vocab = load_pretrained_model('bert.small', ctx=ctx)
+```
+
+```{.json .output n=5}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "num_hiddens=256, ffn_num_hiddens=512, num_heads=4, num_layers=2, dropout=0.10, max_len=512\n"
+ }
+]
 ```
 
 ## The Dataset for Fine-Tuning BERT
@@ -134,10 +178,14 @@ Such examples will be read in minibatches during training and testing
 of natural language inference.
 
 ```{.python .input  n=42}
+# Reduce `batch_size` if there is an out of memory error. In the original BERT
+# model, `max_len` = 512
+batch_size, max_len, num_workers = 512, 128, d2l.get_dataloader_workers()
+
 data_dir = d2l.download_extract('SNLI')
 train_set = SNLIBERTDataset(d2l.read_snli(data_dir, True), max_len, vocab)
 test_set = SNLIBERTDataset(d2l.read_snli(data_dir, False), max_len, vocab)
-batch_size, num_workers = 512, d2l.get_dataloader_workers()
+
 train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
                                    num_workers=num_workers)
 test_iter = gluon.data.DataLoader(test_set, batch_size,
@@ -159,15 +207,14 @@ entailment, contradiction, and neutral.
 class BERTClassifier(nn.Block):
     def __init__(self, bert):
         super(BERTClassifier, self).__init__()
-        self.bert = bert
-        self.classifier = nn.Sequential()
-        self.classifier.add(nn.Dense(256, activation='relu'))
-        self.classifier.add(nn.Dense(3))
+        self.bert_encoder = bert.encoder
+        self.bert_pooler = bert.pooler
+        self.classifier = nn.Dense(3)
 
     def forward(self, inputs):
         tokens_X, segments_X, valid_lens_x = inputs
-        encoded_X, _, _ = self.bert(tokens_X, segments_X, valid_lens_x)
-        return self.classifier(encoded_X[:, 0, :])
+        encoded_X = self.bert_encoder(tokens_X, segments_X, valid_lens_x)
+        return self.classifier(self.bert_pooler(encoded_X))
 ```
 
 In the following,
