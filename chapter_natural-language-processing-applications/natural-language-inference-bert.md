@@ -59,7 +59,7 @@ d2l.DATA_HUB['bert.base'] = (
     '9a4b594f657f76a8730b21ee33e090c331e09ef6')
 ```
 
-```{.python .input  n=4}
+```{.python .input  n=3}
 def load_pretrained_model(pretrained_model, ctx):
     data_dir = d2l.download_extract(pretrained_model)
     # Define an empty vocabulary and load the predefined vocabulary
@@ -87,19 +87,9 @@ def load_pretrained_model(pretrained_model, ctx):
 
 Now, we load the pretrained BERT.
 
-```{.python .input  n=5}
+```{.python .input  n=4}
 ctx = d2l.try_all_gpus()
 bert, vocab = load_pretrained_model('bert.small', ctx=ctx)
-```
-
-```{.json .output n=5}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "num_hiddens=256, ffn_num_hiddens=512, num_heads=4, num_layers=2, dropout=0.10, max_len=512\n"
- }
-]
 ```
 
 ## The Dataset for Fine-Tuning BERT
