@@ -21,7 +21,6 @@ First, import the packages and modules required for the experiment.
 ```{.python .input  n=1}
 import d2l
 from mxnet import gluon, init, np, npx
-from mxnet.contrib import text
 from mxnet.gluon import nn
 npx.set_np()
 
