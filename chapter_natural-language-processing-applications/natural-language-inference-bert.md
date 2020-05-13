@@ -52,34 +52,28 @@ we provide a small pretrained BERT of 2 layers, 256 hidden units, 512 feed forwa
 ```{.python .input  n=2}
 d2l.DATA_HUB['bert.small'] = (
     'http://www.seal.ac.cn/bert.small.zip',
-    'eb01f1d59b198d88634c9d1b28338f47369df164')
+    'a4e718a47137ccd1809c9107ab4f5edd317bae2c')
 
 d2l.DATA_HUB['bert.base'] = (
     'http://www.seal.ac.cn/bert.base.zip',
-    '9a4b594f657f76a8730b21ee33e090c331e09ef6')
+    '7b3820b35da691042e5d34c0971ac3edbd80d3f4')
 ```
 
 ```{.python .input  n=3}
-def load_pretrained_model(pretrained_model, ctx):
+def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
+                          num_heads, num_layers, dropout, max_len, ctx):
     data_dir = d2l.download_extract(pretrained_model)
     # Define an empty vocabulary and load the predefined vocabulary
     vocab = d2l.Vocab([])
     vocab.idx_to_token = json.load(open(os.path.join(data_dir, 'vocab.json'), 'r'))
     vocab.token_to_idx = {token : idx for idx, token in enumerate(vocab.idx_to_token)}
-    # Load model hyper-parameters
-    config = json.load(open(os.path.join(data_dir, 'config.json'), 'r'))
-    print('num_hiddens=%d, ffn_num_hiddens=%d, num_heads=%d, '\
-          'num_layers=%d, dropout=%.2f, max_len=%d' % \
-          (config['num_hiddens'], config['ffn_num_hiddens'],
-           config['num_heads'], config['num_layers'],
-           config['dropout'], config['max_len']))
     bert = d2l.BERTModel(len(vocab),
-                         num_hiddens=config['num_hiddens'],
-                         ffn_num_hiddens=config['ffn_num_hiddens'],
-                         num_heads=config['num_heads'], 
-                         num_layers=config['num_layers'],
-                         dropout=config['dropout'],
-                         max_len=config['max_len'])
+                         num_hiddens=num_hiddens,
+                         ffn_num_hiddens=ffn_num_hiddens,
+                         num_heads=num_heads, 
+                         num_layers=num_layers,
+                         dropout=dropout,
+                         max_len=max_len)
     # Load model pretrained parameters
     bert.load_parameters(os.path.join(data_dir, 'pretrained.params'), ctx=ctx)
     return bert, vocab
@@ -89,7 +83,10 @@ Now, we load the pretrained BERT.
 
 ```{.python .input  n=4}
 ctx = d2l.try_all_gpus()
-bert, vocab = load_pretrained_model('bert.small', ctx=ctx)
+bert, vocab = load_pretrained_model('bert.small', num_hiddens=256,
+                                    ffn_num_hiddens=512, num_heads=4,
+                                    num_layers=2, dropout=0.1, max_len=512,
+                                    ctx=ctx)
 ```
 
 ## The Dataset for Fine-Tuning BERT
@@ -108,7 +105,7 @@ To accelerate generation of the SNLI dataset
 for fine-tuning BERT,
 we use 4 worker processes to generate training or testing examples in parallel.
 
-```{.python .input  n=41}
+```{.python .input  n=5}
 class SNLIBERTDataset(gluon.data.Dataset):
     def __init__(self, dataset, max_len, vocab=None):
         all_premise_hypothesis_tokens = [[
@@ -167,10 +164,10 @@ by instantiating the `SNLIBERTDataset` class.
 Such examples will be read in minibatches during training and testing
 of natural language inference.
 
-```{.python .input  n=42}
+```{.python .input  n=6}
 # Reduce `batch_size` if there is an out of memory error. In the original BERT
 # model, `max_len` = 512
-batch_size, max_len, num_workers = 512, 128, d2l.get_dataloader_workers()
+batch_size, max_len, num_workers = 256, 128, d2l.get_dataloader_workers()
 
 data_dir = d2l.download_extract('SNLI')
 train_set = SNLIBERTDataset(d2l.read_snli(data_dir, True), max_len, vocab)
@@ -193,18 +190,18 @@ which encodes the information of both the premise and the hypothesis,
 into three outputs of natural language inference:
 entailment, contradiction, and neutral.
 
-```{.python .input  n=44}
+```{.python .input  n=7}
 class BERTClassifier(nn.Block):
     def __init__(self, bert):
         super(BERTClassifier, self).__init__()
-        self.bert_encoder = bert.encoder
-        self.bert_pooler = bert.pooler
-        self.classifier = nn.Dense(3)
+        self.encoder = bert.encoder
+        self.hidden = bert.hidden
+        self.output = nn.Dense(3)
 
     def forward(self, inputs):
         tokens_X, segments_X, valid_lens_x = inputs
-        encoded_X = self.bert_encoder(tokens_X, segments_X, valid_lens_x)
-        return self.classifier(self.bert_pooler(encoded_X))
+        encoded_X = self.encoder(tokens_X, segments_X, valid_lens_x)
+        return self.output(self.hidden(encoded_X[:,0,:]))
 ```
 
 In the following,
@@ -213,9 +210,9 @@ the downstream application.
 However, only the parameters of the additional MLP (`net.classifier`) will be learned from scratch.
 All the parameters of the pretrained BERT will be fine-tuned.
 
-```{.python .input}
+```{.python .input  n=8}
 net = BERTClassifier(bert)
-net.classifier.initialize(ctx=ctx)
+net.output.initialize(ctx=ctx)
 ```
 
 Recall that

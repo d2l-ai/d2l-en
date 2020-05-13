@@ -73,14 +73,14 @@ Now we can implement the multi-head attention. Assume that the multi-head attent
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
 class MultiHeadAttention(nn.Block):
-    def __init__(self, num_hiddens, num_heads, dropout, **kwargs):
+    def __init__(self, num_hiddens, num_heads, dropout, use_bias=False, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
-        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
-        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
-        self.W_v = nn.Dense(num_hiddens, use_bias=False, flatten=False)
-        self.W_o = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_q = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
+        self.W_k = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
+        self.W_v = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
+        self.W_o = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
 
     def forward(self, query, key, value, valid_len):
         # For self-attention, query, key, and value shape:
@@ -269,9 +269,10 @@ Armed with all the essential components of Transformer, let us first build a Tra
 # Saved in the d2l package for later use
 class EncoderBlock(nn.Block):
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
-                 **kwargs):
+                 use_bias=False, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = MultiHeadAttention(num_hiddens, num_heads, dropout)
+        self.attention = MultiHeadAttention(num_hiddens, num_heads, dropout,
+                                            use_bias)
         self.addnorm1 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(dropout)
@@ -296,7 +297,7 @@ Now it comes to the implementation of the entire Transformer encoder. With the T
 # Saved in the d2l package for later use
 class TransformerEncoder(d2l.Encoder):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, **kwargs):
+                 num_heads, num_layers, dropout, use_bias=False,**kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
@@ -304,7 +305,7 @@ class TransformerEncoder(d2l.Encoder):
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(
-                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout))
+                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout, use_bias))
 
     def forward(self, X, valid_len, *args):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
