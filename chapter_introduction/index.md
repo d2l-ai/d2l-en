@@ -501,7 +501,7 @@ a function that takes as input a dataset
 and outputs another function, *the learned model*.
 Finally, we can feed previously unseen inputs to the learned model,
 using its outputs as predictions of the corresponding label.
-The full process in drawn in :numref:`fig_supervised_learning`.
+The full process is drawn in :numref:`fig_supervised_learning`.
 
 ![Supervised learning.](../img/supervised-learning.svg)
 :label:`fig_supervised_learning`
