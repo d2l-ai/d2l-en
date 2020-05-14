@@ -268,7 +268,7 @@ as well as many colleges and companies.
 All of the code in this book has passed tests under the newest MXNet version.
 However, due to the rapid development of deep learning, some code
 *in the print edition* may not work properly in future versions of MXNet.
-However, we plan to keep the online version remain up-to-date.
+However, we plan to keep the online version up-to-date.
 In case you encounter any such problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
