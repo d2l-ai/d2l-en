@@ -366,7 +366,8 @@ Haibin Lin, jjangga0214, RichyChen, noelo, hansent, Giel Dops, dvincent1337, Whi
 Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk, heytitle, Peter Goetz, rigtorp,
 tiepvupsu, sfilip, mlxd, Kale-ab Tessera, Sanjar Adilov, MatteoFerrara, hsneto,
 Katarzyna Biesialska, Gregory Bruss, duythanhvn, paulaurel, graytowne, minhduc0711,
-sl7423, Jaedong Hwang, Yida Wang, cys4, clhm, JeanKaddour, austinmw, trebeljahr, tbaums.
+sl7423, Jaedong Hwang, Yida Wang, cys4, clhm, JeanKaddour, austinmw, trebeljahr, tbaums,
+cuongvng, pavelkomarov, vzlamal, NotAnotherSystem, J-Arun-Mani.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.
