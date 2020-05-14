@@ -27,9 +27,33 @@ def mkdir_if_not_exist(path):
         os.makedirs(path)
 ```
 
+```{.python .input}
+#@tab pytorch
+import os
+
+# Saved in the d2l package for later use
+def mkdir_if_not_exist(path):
+    if not isinstance(path, str):
+        path = os.path.join(*path)
+    if not os.path.exists(path):
+        os.makedirs(path)
+```
+
 Below we write the dataset row by row into a csv file.
 
 ```{.python .input}
+data_file = '../data/house_tiny.csv'
+mkdir_if_not_exist('../data')
+with open(data_file, 'w') as f:
+    f.write('NumRooms,Alley,Price\n')  # Column names
+    f.write('NA,Pave,127500\n')  # Each row is a data point
+    f.write('2,NA,106000\n')
+    f.write('4,NA,178100\n')
+    f.write('NA,NA,140000\n')
+```
+
+```{.python .input}
+#@tab pytorch
 data_file = '../data/house_tiny.csv'
 mkdir_if_not_exist('../data')
 with open(data_file, 'w') as f:
@@ -45,6 +69,16 @@ we import the `pandas` package and invoke the `read_csv` function.
 This dataset has $4$ rows and $3$ columns, where each row describes the number of rooms ("NumRooms"), the alley type ("Alley"), and the price ("Price") of a house.
 
 ```{.python .input}
+# If pandas is not installed, just uncomment the following line:
+# !pip install pandas
+import pandas as pd
+
+data = pd.read_csv(data_file)
+print(data)
+```
+
+```{.python .input}
+#@tab pytorch
 # If pandas is not installed, just uncomment the following line:
 # !pip install pandas
 import pandas as pd
@@ -70,6 +104,13 @@ inputs = inputs.fillna(inputs.mean())
 print(inputs)
 ```
 
+```{.python .input}
+#@tab pytorch
+inputs, outputs = data.iloc[:, 0:2], data.iloc[:, 2]
+inputs = inputs.fillna(inputs.mean())
+print(inputs)
+```
+
 For categorical or discrete values in `inputs`, we consider "NaN" as a category.
 Since the "Alley" column only takes 2 types of categorical values "Pave" and "NaN",
 `pandas` can automatically convert this column to 2 columns "Alley_Pave" and "Alley_nan".
@@ -77,6 +118,12 @@ A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan"
 A row with a missing alley type will set their values to $0$ and $1$.
 
 ```{.python .input}
+inputs = pd.get_dummies(inputs, dummy_na=True)
+print(inputs)
+```
+
+```{.python .input}
+#@tab pytorch
 inputs = pd.get_dummies(inputs, dummy_na=True)
 print(inputs)
 ```
@@ -90,6 +137,14 @@ Once data are in this format, they can be further manipulated with those `ndarra
 from mxnet import np
 
 X, y = np.array(inputs.values), np.array(outputs.values)
+X, y
+```
+
+```{.python .input}
+#@tab pytorch
+import torch
+
+X, y = torch.tensor(inputs.values), torch.tensor(outputs.values)
 X, y
 ```
 
