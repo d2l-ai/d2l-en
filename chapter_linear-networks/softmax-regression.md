@@ -414,7 +414,7 @@ This is equal to the ratio between the number of correct predictions and the tot
 1. We can explore the connection between exponential families and the softmax in some more depth
     * Compute the second derivative of the cross-entropy loss $l(y,\hat{y})$ for the softmax.
     * Compute the variance of the distribution given by $\mathrm{softmax}(o)$ and show that it matches the second derivative computed above.
-1. Assume that we three classes which occur with equal probability, i.e., the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
+1. Assume that we have three classes which occur with equal probability, i.e., the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
     * What is the problem if we try to design a binary code for it? Can we match the entropy lower bound on the number of bits?
     * Can you design a better code. Hint: what happens if we try to encode two independent observations? What if we encode $n$ observations jointly?
 1. Softmax is a misnomer for the mapping introduced above (but everyone in deep learning uses it). The real softmax is defined as $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
