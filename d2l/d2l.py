@@ -1120,7 +1120,7 @@ class EncoderBlock(nn.Block):
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class TransformerEncoder(d2l.Encoder):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, use_bias=False,**kwargs):
+                 num_heads, num_layers, dropout, use_bias=False, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)

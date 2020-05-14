@@ -297,7 +297,7 @@ Now it comes to the implementation of the entire Transformer encoder. With the T
 # Saved in the d2l package for later use
 class TransformerEncoder(d2l.Encoder):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, use_bias=False,**kwargs):
+                 num_heads, num_layers, dropout, use_bias=False, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
