@@ -68,7 +68,7 @@ stage("Build and Publish") {
       [ -e _build/data_tmp ] && mv _build/data_tmp _build/eval/data
       """
 */
-      if (env.BRANCH_NAME == 'pytorch) {
+      if (env.BRANCH_NAME == 'pytorch') {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
         d2lbook deploy html
