@@ -302,6 +302,14 @@ import time
 import zipfile
 ```
 
+```{.python .input  n=1}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
+import sys
+d2l = sys.modules[__name__]
+__version__ = '0.5.0'
+```
+
 We offer a detailed overview of these functions and classes in :numref:`sec_d2l`.
 
 

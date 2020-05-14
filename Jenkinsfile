@@ -24,7 +24,7 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}-pytorch
       pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
       pip install git+https://github.com/d2l-ai/d2l-book
-      python setup.py develop
+      cd d2l_pytorch; python setup.py develop
       pip list
       nvidia-smi
       """
