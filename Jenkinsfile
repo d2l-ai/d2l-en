@@ -19,7 +19,7 @@ stage("Build and Publish") {
       """
 
       sh label: "Build Environment [Pytorch]", script: """set -ex
-      rm -rf ~/miniconda3/envs/${ENV_NAME}
+      rm -rf ~/miniconda3/envs/${ENV_NAME}-pytorch
       conda create -n ${ENV_NAME}-pytorch pip python=3.7 -y
       conda activate ${ENV_NAME}-pytorch
       pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
