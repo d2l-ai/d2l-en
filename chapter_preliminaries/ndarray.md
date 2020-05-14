@@ -332,8 +332,8 @@ x
 
 ## Saving Memory
 
-In the previous example, every time we ran an operation,
-we allocated new memory to host its results. 
+Running operations can cause new memory to be
+allocated to host results. 
 For example, if we write `y = x + y`, 
 we will dereference the `ndarray` that `y` used to point to 
 and instead point `y` at the newly allocated memory. 
@@ -358,9 +358,8 @@ hundreds of megabytes of parameters
 and update all of them multiple times per second. 
 Typically, we will want to perform these updates *in place*. 
 Second, we might point at the same parameters from multiple variables. 
-If we do not update in place, this could cause that
-discarded memory is not released,
-and make it possible for parts of our code
+If we do not update in place, other references will still point to
+the old memory location, making it possible for parts of our code
 to inadvertently reference stale parameters.
 
 Fortunately, performing in-place operations in MXNet is easy. 
