@@ -1,5 +1,5 @@
 stage("Build and Publish") {
-  def TASK = "d2l-en"
+  def TASK = "d2l-pytorch"
   node {
     ws("workspace/${TASK}") {
       checkout scm
