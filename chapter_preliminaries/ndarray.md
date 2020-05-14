@@ -45,9 +45,14 @@ developed to empower deep learning within a NumPy-like environment.
 When using `ndarray`, we almost always invoke the `set_np` function: 
 this is for compatibility of `ndarray` processing by other components of MXNet.
 
-```{.python .input  n=1}
+```{.python .input}
 from mxnet import np, npx
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+import torch
 ```
 
 An `ndarray` represents a (possibly multi-dimensional) array of numerical values.
@@ -64,15 +69,26 @@ For instance, there are $12$ elements in the `ndarray` `x`.
 Unless otherwise specified, a new `ndarray` 
 will be stored in main memory and designated for CPU-based computation.
 
-```{.python .input  n=2}
+```{.python .input}
 x = np.arange(12)
+x
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.arange(12)
 x
 ```
 
 We can access an `ndarray`'s *shape* (the length along each axis)
 by inspecting its `shape` property.
 
-```{.python .input  n=3}
+```{.python .input}
+x.shape
+```
+
+```{.python .input}
+#@tab pytorch
 x.shape
 ```
 
@@ -82,8 +98,13 @@ we can inspect its `size` property.
 Because we are dealing with a vector here, 
 the single element of its `shape` is identical to its `size`.
 
-```{.python .input  n=4}
+```{.python .input}
 x.size
+```
+
+```{.python .input}
+#@tab pytorch
+x.size()
 ```
 
 To change the shape of an `ndarray` without altering 
@@ -97,8 +118,14 @@ To reiterate, although the shape has changed,
 the elements in `x` have not. 
 Note that the `size` is unaltered by reshaping.
 
-```{.python .input  n=5}
+```{.python .input}
 x = x.reshape(3, 4)
+x
+```
+
+```{.python .input}
+#@tab pytorch
+x = x.reshape((3, 4))
 x
 ```
 
@@ -119,8 +146,13 @@ without bothering to change the value of any of its entries.
 This is remarkably efficient but we must be careful because 
 the entries might take arbitrary values, including very big ones!
 
-```{.python .input  n=6}
+```{.python .input}
 np.empty((3, 4))
+```
+
+```{.python .input}
+#@tab pytorch
+torch.empty(2, 3)
 ```
 
 Typically, we will want our matrices initialized 
@@ -129,14 +161,24 @@ or numbers randomly sampled from a specific distribution.
 We can create an `ndarray` representing a tensor with all elements 
 set to $0$ and a shape of ($2$, $3$, $4$) as follows:
 
-```{.python .input  n=7}
+```{.python .input}
 np.zeros((2, 3, 4))
+```
+
+```{.python .input}
+#@tab pytorch
+torch.zeros(2, 3, 4)
 ```
 
 Similarly, we can create tensors with each element set to 1 as follows:
 
-```{.python .input  n=8}
+```{.python .input}
 np.ones((2, 3, 4))
+```
+
+```{.python .input}
+#@tab pytorch
+torch.ones((2, 3, 4))
 ```
 
 Often, we want to randomly sample the values
@@ -150,16 +192,26 @@ Each of its elements is randomly sampled
 from a standard Gaussian (normal) distribution
 with a mean of $0$ and a standard deviation of $1$.
 
-```{.python .input  n=10}
+```{.python .input}
 np.random.normal(0, 1, size=(3, 4))
+```
+
+```{.python .input}
+#@tab pytorch
+torch.randn(3, 4)
 ```
 
 We can also specify the exact values for each element in the desired `ndarray`
 by supplying a Python list (or list of lists) containing the numerical values.
 Here, the outermost list corresponds to axis $0$, and the inner list to axis $1$.
 
-```{.python .input  n=9}
+```{.python .input}
 np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
+```
+
+```{.python .input}
+#@tab pytorch
+torch.tensor([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
 
 ## Operations
@@ -204,17 +256,29 @@ We can call elementwise operations on any two tensors of the same shape.
 In the following example, we use commas to formulate a $5$-element tuple,
 where each element is the result of an elementwise operation.
 
-```{.python .input  n=11}
+```{.python .input}
 x = np.array([1, 2, 4, 8])
 y = np.array([2, 2, 2, 2])
+x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.tensor([1.0, 2, 4, 8])
+y = torch.tensor([2, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 ```
 
 Many more operations can be applied elementwise,
 including unary operators like exponentiation.
 
-```{.python .input  n=12}
+```{.python .input}
 np.exp(x)
+```
+
+```{.python .input}
+#@tab pytorch
+torch.exp(x)
 ```
 
 In addition to elementwise computations, 
@@ -235,10 +299,17 @@ is the sum of the two input `ndarray`s' axis-$0$ lengths ($3 + 3$);
 while the second output `ndarray`'s axis-$1$ length ($8$)
 is the sum of the two input `ndarray`s' axis-$1$ lengths ($4 + 4$).
 
-```{.python .input  n=14}
+```{.python .input}
 x = np.arange(12).reshape(3, 4)
 y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 np.concatenate([x, y], axis=0), np.concatenate([x, y], axis=1)
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.arange(12, dtype=torch.float32).reshape((3,4))
+y = torch.tensor([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
+torch.cat((x, y), dim=0), torch.cat((x, y), dim=1)
 ```
 
 Sometimes, we want to construct a binary `ndarray` via *logical statements*. 
@@ -248,13 +319,23 @@ the corresponding entry in the new `ndarray` takes a value of $1$,
 meaning that the logical statement `x == y` is true at that position;
 otherwise that position takes $0$.
 
-```{.python .input  n=15}
+```{.python .input}
+x == y
+```
+
+```{.python .input}
+#@tab pytorch
 x == y
 ```
 
 Summing all the elements in the `ndarray` yields an `ndarray` with only one element.
 
-```{.python .input  n=16}
+```{.python .input}
+x.sum()
+```
+
+```{.python .input}
+#@tab pytorch
 x.sum()
 ```
 
@@ -277,9 +358,16 @@ on the resulting arrays.
 In most cases, we broadcast along an axis where an array
 initially only has length $1$, such as in the following example:
 
-```{.python .input  n=17}
+```{.python .input}
 a = np.arange(3).reshape(3, 1)
 b = np.arange(2).reshape(1, 2)
+a, b
+```
+
+```{.python .input}
+#@tab pytorch
+a = torch.arange(3).reshape((3, 1))
+b = torch.arange(2).reshape((1, 2))
 a, b
 ```
 
@@ -290,7 +378,12 @@ for matrix `a` it replicates the columns
 and for matrix `b` it replicates the rows
 before adding up both elementwise.
 
-```{.python .input  n=18}
+```{.python .input}
+a + b
+```
+
+```{.python .input}
+#@tab pytorch
 a + b
 ```
 
@@ -306,13 +399,24 @@ by using negative indices.
 Thus, `[-1]` selects the last element and `[1:3]` 
 selects the second and the third elements as follows:
 
-```{.python .input  n=19}
+```{.python .input}
+x[-1], x[1:3]
+```
+
+```{.python .input}
+#@tab pytorch
 x[-1], x[1:3]
 ```
 
 Beyond reading, we can also write elements of a matrix by specifying indices.
 
-```{.python .input  n=20}
+```{.python .input}
+x[1, 2] = 9
+x
+```
+
+```{.python .input}
+#@tab pytorch
 x[1, 2] = 9
 x
 ```
@@ -325,7 +429,13 @@ While we discussed indexing for matrices,
 this obviously also works for vectors 
 and for tensors of more than $2$ dimensions.
 
-```{.python .input  n=21}
+```{.python .input}
+x[0:2, :] = 12
+x
+```
+
+```{.python .input}
+#@tab pytorch
 x[0:2, :] = 12
 x
 ```
@@ -344,7 +454,14 @@ That is because Python first evaluates `y + x`,
 allocating new memory for the result and then makes `y` 
 point to this new location in memory.
 
-```{.python .input  n=22}
+```{.python .input}
+before = id(y)
+y = y + x
+id(y) == before
+```
+
+```{.python .input}
+#@tab pytorch
 before = id(y)
 y = y + x
 id(y) == before
@@ -370,8 +487,16 @@ To illustrate this concept, we first create a new matrix `z`
 with the same shape as another `y`, 
 using `zeros_like` to allocate a block of $0$ entries.
 
-```{.python .input  n=23}
+```{.python .input}
 z = np.zeros_like(y)
+print('id(z):', id(z))
+z[:] = x + y
+print('id(z):', id(z))
+```
+
+```{.python .input}
+#@tab pytorch
+z = torch.zeros_like(y)
 print('id(z):', id(z))
 z[:] = x + y
 print('id(z):', id(z))
@@ -381,7 +506,14 @@ If the value of `x` is not reused in subsequent computations,
 we can also use `x[:] = x + y` or `x += y`
 to reduce the memory overhead of the operation.
 
-```{.python .input  n=24}
+```{.python .input}
+before = id(x)
+x += y
+id(x) == before
+```
+
+```{.python .input}
+#@tab pytorch 
 before = id(x)
 x += y
 id(x) == before
@@ -398,9 +530,16 @@ whether the NumPy package of Python might want to be doing something else
 with the same chunk of memory. 
 The `array` and `asnumpy` functions do the trick.
 
-```{.python .input  n=25}
+```{.python .input}
 a = x.asnumpy()
 b = np.array(a)
+type(a), type(b)
+```
+
+```{.python .input}
+#@tab pytorch
+a = x.numpy()
+b = torch.tensor(a)
 type(a), type(b)
 ```
 
@@ -409,6 +548,12 @@ we can invoke the `item` function or Python's built-in functions.
 
 ```{.python .input}
 a = np.array([3.5])
+a, a.item(), float(a), int(a)
+```
+
+```{.python .input}
+#@tab pytorch
+a = torch.tensor([3.5])
 a, a.item(), float(a), int(a)
 ```
 
