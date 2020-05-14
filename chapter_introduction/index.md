@@ -57,9 +57,9 @@ that are beyond our conscious understanding
 (even if our eyes manage the task effortlessly).
 ML is the study of powerful
 techniques that can *learn* from *experience*.
-As ML algorithm accumulates more experience,
+As an ML algorithm accumulates more experience,
 typically in the form of observational data or
-interactions with an environment, their performance improves.
+interactions with an environment, its performance improves.
 Contrast this with our deterministic e-commerce platform,
 which performs according to the same business logic,
 no matter how much experience accrues,
