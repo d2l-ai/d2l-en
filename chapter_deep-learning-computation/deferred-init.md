@@ -82,7 +82,7 @@ net.collect_params()
 ```
 
 As we can see, nothing has changed. 
-When input dimensions are known, 
+When input dimensions are unknown, 
 calls to initialize do not truly initalize the parameters.
 Instead, this call registers to MXNet that we wish 
 (and optionally, according to which distribution)
