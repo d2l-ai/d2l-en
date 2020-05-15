@@ -31,31 +31,62 @@ we load the WikiText-2 dataset as minibatches
 of pretraining examples with the batch size being 512
 and the maximum length of a BERT input sequence being 128.
 
-```{.python .input  n=40}
+```{.python .input  n=1}
 import d2l
+import json
 import multiprocessing
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
+import os
 
 npx.set_np()
-# Reduce `batch_size` if there is an out of memory error. In the original BERT
-# model, `max_len` = 512
-batch_size, max_len = 512, 128
-bert_train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 ```
 
 As discussed in :numref:`sec_bert-pretraining`,
 the original BERT model has hundreds of millions of parameters.
 To facilitate demonstration,
-we define a small BERT of 2 layers, 128 hidden units, and 2 self-attention heads.
-We pretrain BERT on the WikiText-2 dataset for 3,000 iteration steps.
+we provide a small pretrained BERT of 2 layers, 256 hidden units, 512 feed forward hidden units, and 4 self-attention heads.
 
-```{.python .input}
-ctx, loss = d2l.try_all_gpus(), gluon.loss.SoftmaxCELoss()
-bert = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,
-                     num_heads=2, num_layers=2, dropout=0.1)
-bert.initialize(init.Xavier(), ctx=ctx)
-d2l.train_bert(bert_train_iter, bert, loss, len(vocab), ctx, 20, 3000)
+'bert.base' is a much larger BERT (same size as original BERT): it can be used for pretraining in the future exercises.
+
+```{.python .input  n=2}
+d2l.DATA_HUB['bert.small'] = (
+    'http://www.seal.ac.cn/bert.small.zip',
+    'a4e718a47137ccd1809c9107ab4f5edd317bae2c')
+
+d2l.DATA_HUB['bert.base'] = (
+    'http://www.seal.ac.cn/bert.base.zip',
+    '7b3820b35da691042e5d34c0971ac3edbd80d3f4')
+```
+
+```{.python .input  n=3}
+def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
+                          num_heads, num_layers, dropout, max_len, ctx):
+    data_dir = d2l.download_extract(pretrained_model)
+    # Define an empty vocabulary and load the predefined vocabulary
+    vocab = d2l.Vocab([])
+    vocab.idx_to_token = json.load(open(os.path.join(data_dir, 'vocab.json'), 'r'))
+    vocab.token_to_idx = {token : idx for idx, token in enumerate(vocab.idx_to_token)}
+    bert = d2l.BERTModel(len(vocab),
+                         num_hiddens=num_hiddens,
+                         ffn_num_hiddens=ffn_num_hiddens,
+                         num_heads=num_heads, 
+                         num_layers=num_layers,
+                         dropout=dropout,
+                         max_len=max_len)
+    # Load model pretrained parameters
+    bert.load_parameters(os.path.join(data_dir, 'pretrained.params'), ctx=ctx)
+    return bert, vocab
+```
+
+Now, we load the pretrained BERT.
+
+```{.python .input  n=4}
+ctx = d2l.try_all_gpus()
+bert, vocab = load_pretrained_model('bert.small', num_hiddens=256,
+                                    ffn_num_hiddens=512, num_heads=4,
+                                    num_layers=2, dropout=0.1, max_len=512,
+                                    ctx=ctx)
 ```
 
 ## The Dataset for Fine-Tuning BERT
@@ -74,7 +105,7 @@ To accelerate generation of the SNLI dataset
 for fine-tuning BERT,
 we use 4 worker processes to generate training or testing examples in parallel.
 
-```{.python .input  n=41}
+```{.python .input  n=5}
 class SNLIBERTDataset(gluon.data.Dataset):
     def __init__(self, dataset, max_len, vocab=None):
         all_premise_hypothesis_tokens = [[
@@ -133,11 +164,15 @@ by instantiating the `SNLIBERTDataset` class.
 Such examples will be read in minibatches during training and testing
 of natural language inference.
 
-```{.python .input  n=42}
+```{.python .input  n=6}
+# Reduce `batch_size` if there is an out of memory error. In the original BERT
+# model, `max_len` = 512
+batch_size, max_len, num_workers = 512, 128, d2l.get_dataloader_workers()
+
 data_dir = d2l.download_extract('SNLI')
 train_set = SNLIBERTDataset(d2l.read_snli(data_dir, True), max_len, vocab)
 test_set = SNLIBERTDataset(d2l.read_snli(data_dir, False), max_len, vocab)
-batch_size, num_workers = 512, d2l.get_dataloader_workers()
+
 train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
                                    num_workers=num_workers)
 test_iter = gluon.data.DataLoader(test_set, batch_size,
@@ -155,19 +190,18 @@ which encodes the information of both the premise and the hypothesis,
 into three outputs of natural language inference:
 entailment, contradiction, and neutral.
 
-```{.python .input  n=44}
+```{.python .input  n=7}
 class BERTClassifier(nn.Block):
     def __init__(self, bert):
         super(BERTClassifier, self).__init__()
-        self.bert = bert
-        self.classifier = nn.Sequential()
-        self.classifier.add(nn.Dense(256, activation='relu'))
-        self.classifier.add(nn.Dense(3))
+        self.encoder = bert.encoder
+        self.hidden = bert.hidden
+        self.output = nn.Dense(3)
 
     def forward(self, inputs):
         tokens_X, segments_X, valid_lens_x = inputs
-        encoded_X, _, _ = self.bert(tokens_X, segments_X, valid_lens_x)
-        return self.classifier(encoded_X[:, 0, :])
+        encoded_X = self.encoder(tokens_X, segments_X, valid_lens_x)
+        return self.output(self.hidden(encoded_X[:,0,:]))
 ```
 
 In the following,
@@ -176,9 +210,9 @@ the downstream application.
 However, only the parameters of the additional MLP (`net.classifier`) will be learned from scratch.
 All the parameters of the pretrained BERT will be fine-tuned.
 
-```{.python .input}
+```{.python .input  n=8}
 net = BERTClassifier(bert)
-net.classifier.initialize(ctx=ctx)
+net.output.initialize(ctx=ctx)
 ```
 
 Recall that
@@ -220,7 +254,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
 ## Exercises
 
 1. How to truncate a pair of sequences according to their ratio of length? Compare this pair truncation method and the one used in the `SNLIBERTDataset` class. What are their pros and cons?
-2. If your computational resource allows, increase the model size such as setting `num_hiddens=256`, `ffn_num_hiddens=256`, `num_heads=4`, and `num_layers=4`. By increasing pretraining steps and fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.75? Improve the sentence splitting technique by using those as described in the exercises of :numref:`sec_bert-dataset`. Does it lead to better testing accuracy?
+2. Increasing the model size such as setting `num_hiddens=768`, `ffn_num_hiddens=3072`, `num_heads=12`, and `num_layers=12`. By increasing pretraining steps and fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.86? Improve the sentence splitting technique by using those as described in the exercises of :numref:`sec_bert-dataset`. Does it lead to better testing accuracy?
 3. If your computational resource allows, use a much larger pretraining corpus and a much larger BERT. Can you get a much better testing accuracy? How long do the pretraining and fine-tuning take?
 
 
