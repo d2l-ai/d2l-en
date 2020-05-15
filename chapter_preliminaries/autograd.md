@@ -23,9 +23,14 @@ to subsequently backpropagate gradients on command.
 Here, *backpropagate* simply means to trace through the *computational graph*, 
 filling in the partial derivatives with respect to each parameter.
 
-```{.python .input  n=1}
+```{.python .input}
 from mxnet import autograd, np, npx
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+import torch
 ```
 
 ## A Simple Example
@@ -36,8 +41,15 @@ $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to the column vector $\mathbf{x}$. 
 To start, let us create the variable `x` and assign it an initial value.
 
-```{.python .input  n=2}
+```{.python .input}
 x = np.arange(4)
+x
+```
+
+```{.python .input}
+#@tab pytorch
+# Only Tensors of floating point dtype can require gradients
+x = torch.arange(4.0)
 x
 ```
 
@@ -59,8 +71,16 @@ as an attribute of the `ndarray` `x` itself.
 We allocate memory for an `ndarray`'s gradient
 by invoking its `attach_grad` method.
 
-```{.python .input  n=3}
+```{.python .input}
 x.attach_grad()
+```
+
+```{.python .input}
+#@tab pytorch
+x.requires_grad_(True)
+
+# Alternatively, requires_grad=True can be set while defining the tensor in the last step.
+# x = torch.arange(4.0, requires_grad=True)
 ```
 
 After we calculate a gradient taken with respect to `x`, 
@@ -75,8 +95,15 @@ we ensure that any update accidentally executed
 before a gradient has actually been calculated
 will not alter the parameters' value.
 
-```{.python .input  n=4}
+```{.python .input}
 x.grad
+```
+
+```{.python .input}
+#@tab pytorch
+# Even if requires_grad is True in PyTorch, it will hold a None value,
+# unless .backward() function is called from some other node.
+print(x.grad)
 ```
 
 Now let us calculate $y$. 
@@ -91,9 +118,15 @@ So MXNet will only build the graph when explicitly told to do so.
 We can invoke this behavior by placing our code 
 inside an `autograd.record` scope.
 
-```{.python .input  n=5}
+```{.python .input}
 with autograd.record():
     y = 2 * np.dot(x, x)
+y
+```
+
+```{.python .input}
+#@tab pytorch
+y = 2*torch.dot(x,x)
 y
 ```
 
@@ -104,13 +137,23 @@ Next, we can automatically calculate the gradient of `y`
 with respect to each component of `x` 
 by calling `y`'s `backward` function.
 
-```{.python .input  n=6}
+```{.python .input}
+y.backward()
+```
+
+```{.python .input}
+#@tab pytorch
 y.backward()
 ```
 
 If we recheck the value of `x.grad`, we will find its contents overwritten by the newly calculated gradient.
 
-```{.python .input  n=7}
+```{.python .input}
+x.grad
+```
+
+```{.python .input}
+#@tab pytorch
 x.grad
 ```
 
@@ -120,7 +163,12 @@ Let us quickly verify that our desired gradient was calculated correctly.
 If the two `ndarray`s are indeed the same, 
 then the equality between them holds at every position.
 
-```{.python .input  n=8}
+```{.python .input}
+x.grad == 4 * x
+```
+
+```{.python .input}
+#@tab pytorch
 x.grad == 4 * x
 ```
 
@@ -128,9 +176,20 @@ If we subsequently compute the gradient of another variable
 whose value was calculated as a function of `x`, 
 the contents of `x.grad` will be overwritten.
 
-```{.python .input  n=9}
+```{.python .input}
 with autograd.record():
     y = x.sum()
+y.backward()
+x.grad
+```
+
+```{.python .input}
+#@tab pytorch
+# PyTorch won't overwrite, instead it accumulates and adds the gradient.
+# Before running backpropagation again, we can clear it, setting back to zero.
+x.grad.zero_()
+
+y = x.sum()
 y.backward()
 x.grad
 ```
@@ -159,7 +218,7 @@ In short, MXNet will create a new scalar variable
 by summing the elements in `y`,
 and compute the gradient of that scalar variable with respect to `x`.
 
-```{.python .input  n=10}
+```{.python .input}
 with autograd.record():
     y = x * x  # y is a vector
 y.backward()
@@ -168,6 +227,22 @@ u = x.copy()
 u.attach_grad()
 with autograd.record():
     v = (u * u).sum()  # v is a scalar
+v.backward()
+
+x.grad == u.grad
+```
+
+```{.python .input}
+#@tab pytorch
+x.grad.zero_()
+y = x * x  # y is a vector
+
+# In PyTorch, grad can be implicitly created only for scalar outputs.
+# For a vector we need to pass a head gradient as an input to backward
+y.backward(torch.ones(4))
+
+u = torch.arange(4.0, requires_grad=True)
+v = (u * u).sum()  # v is a scalar
 v.backward()
 
 x.grad == u.grad
@@ -196,7 +271,7 @@ Thus, the following `backward` function computes
 the partial derivative of `z = u * x` with respect to `x` while treating `u` as a constant,
 instead of the partial derivative of `z = x * x * x` with respect to `x`.
 
-```{.python .input  n=11}
+```{.python .input}
 with autograd.record():
     y = x * x
     u = y.detach()
@@ -205,11 +280,29 @@ z.backward()
 x.grad == u
 ```
 
+```{.python .input}
+#@tab pytorch
+x.grad.zero_()
+y = x * x
+u = y.detach()
+z = u * x
+
+z.sum().backward()
+x.grad == u
+```
+
 Since the computation of `y` was recorded, 
 we can subsequently call `y.backward()` to get the derivative of `y = x * x` with respect to `x`, which is `2 * x`.
 
-```{.python .input  n=12}
+```{.python .input}
 y.backward()
+x.grad == 2 * x
+```
+
+```{.python .input}
+#@tab pytorch
+x.grad.zero_()
+y.sum().backward()
 x.grad == 2 * x
 ```
 
@@ -217,7 +310,7 @@ Note that attaching gradients to a variable `x` implicitly calls `x = x.detach()
 If `x` is computed based on other variables, 
 this part of computation will not be used in the `backward` function.
 
-```{.python .input  n=13}
+```{.python .input}
 y = np.ones(4) * 2
 y.attach_grad()
 with autograd.record():
@@ -225,6 +318,21 @@ with autograd.record():
     u.attach_grad()  # Implicitly run u = u.detach()
     z = 5 * u - x
 z.backward()
+x.grad, u.grad, y.grad
+```
+
+```{.python .input}
+#@tab pytorch
+# PyTorch by design computes backpropagation differently and once a variable is
+# detached from the graph, the gradients don't flow for intermediate variables
+# like u and u.grad is not saved even when retain_grad is set true.
+x.grad.zero_()
+y = torch.ones(4, requires_grad=True) * 2
+u = x * y
+u.retain_grad()
+u.detach_()
+z = 5 * u - x
+z.sum().backward()
 x.grad, u.grad, y.grad
 ```
 
@@ -240,7 +348,7 @@ the number of iterations of the `while` loop
 and the evaluation of the `if` statement
 both depend on the value of the input `a`.
 
-```{.python .input  n=16}
+```{.python .input}
 def f(a):
     b = a * 2
     while np.linalg.norm(b) < 1000:
@@ -252,14 +360,34 @@ def f(a):
     return c
 ```
 
+```{.python .input}
+#@tab pytorch
+def f(a):
+    b = a * 2
+    while b.norm().item() < 1000:
+        b = b * 2
+    if b.sum().item() > 0:
+        c = b
+    else:
+        c = 100 * b
+    return c
+```
+
 Again to compute gradients, we just need to `record` the calculation
 and then call the `backward` function.
 
-```{.python .input  n=17}
+```{.python .input}
 a = np.random.normal()
 a.attach_grad()
 with autograd.record():
     d = f(a)
+d.backward()
+```
+
+```{.python .input}
+#@tab pytorch
+a = torch.randn(size=(1,), requires_grad=True)
+d = f(a)
 d.backward()
 ```
 
@@ -269,8 +397,13 @@ In other words, for any `a` there exists some constant scalar `k`
 such that `f(a) = k * a`, where the value of `k` depends on the input `a`. 
 Consequently `d / a` allows us to verify that the gradient is correct.
 
-```{.python .input  n=18}
+```{.python .input}
 a.grad == d / a
+```
+
+```{.python .input}
+#@tab pytorch
+a.grad == (d / a)
 ```
 
 ## Training Mode and Prediction Mode
@@ -282,10 +415,17 @@ Additionally, `autograd.record` will change
 the running mode from *prediction mode* to *training mode*. 
 We can verify this behavior by calling the `is_training` function.
 
-```{.python .input  n=19}
+```{.python .input}
 print(autograd.is_training())
 with autograd.record():
     print(autograd.is_training())
+```
+
+```{.python .input}
+#@tab pytorch
+# In pytorch such change in training mode and testing mode are 
+# defined by setting model.train() or model.eval() which we'll cover
+# in the later sections of the book.
 ```
 
 When we get to complicated deep learning models,
