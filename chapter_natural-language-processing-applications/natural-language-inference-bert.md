@@ -16,20 +16,9 @@ as illustrated in :numref:`fig_nlp-map-nli-bert`.
 :label:`fig_nlp-map-nli-bert`
 
 In this section,
-we will pretrain a small version of BERT,
-then fine-tune the pretrained BERT model
+we will download a pretrained small version of BERT,
+then fine-tune it
 for natural language inference on the SNLI dataset.
-
-
-## Pretraining BERT
-
-We have explained how to pretrain BERT on the WikiText-2 dataset in
-:numref:`sec_bert-dataset` and :numref:`sec_bert-pretraining`
-(note that the original BERT model is pretrained on much bigger corpora).
-In the following,
-we load the WikiText-2 dataset as minibatches
-of pretraining examples with the batch size being 512
-and the maximum length of a BERT input sequence being 128.
 
 ```{.python .input  n=1}
 import d2l
@@ -42,51 +31,54 @@ import os
 npx.set_np()
 ```
 
+## Loading Pretrained BERT
+
+We have explained how to pretrain BERT on the WikiText-2 dataset in
+:numref:`sec_bert-dataset` and :numref:`sec_bert-pretraining`
+(note that the original BERT model is pretrained on much bigger corpora).
 As discussed in :numref:`sec_bert-pretraining`,
 the original BERT model has hundreds of millions of parameters.
-To facilitate demonstration,
-we provide a small pretrained BERT of 2 layers, 256 hidden units, 512 feed forward hidden units, and 4 self-attention heads.
-
-'bert.base' is a much larger BERT (same size as original BERT): it can be used for pretraining in the future exercises.
+In the following,
+we provide two versions of pretrained BERT:
+"bert.base" is about as big as the original BERT base model that requires a lot of computational resources to fine-tune,
+while "bert.small" is a small version to facilitate demonstration.
 
 ```{.python .input  n=2}
-d2l.DATA_HUB['bert.small'] = (
-    'http://www.seal.ac.cn/bert.small.zip',
-    'a4e718a47137ccd1809c9107ab4f5edd317bae2c')
-
-d2l.DATA_HUB['bert.base'] = (
-    'http://www.seal.ac.cn/bert.base.zip',
-    '7b3820b35da691042e5d34c0971ac3edbd80d3f4')
+d2l.DATA_HUB['bert.base'] = (d2l.DATA_URL + 'bert.base.zip',
+                             '7b3820b35da691042e5d34c0971ac3edbd80d3f4')
+d2l.DATA_HUB['bert.small'] = (d2l.DATA_URL + 'bert.small.zip',
+                              'a4e718a47137ccd1809c9107ab4f5edd317bae2c')
 ```
+
+Either pretrained BERT model contains a "vocab.json" file that defines the vocabulary set
+and a "pretrained.params" file of the pretrained parameters.
+We implement the following `load_pretrained_model` function to load pretrained BERT parameters.
 
 ```{.python .input  n=3}
 def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
                           num_heads, num_layers, dropout, max_len, ctx):
     data_dir = d2l.download_extract(pretrained_model)
-    # Define an empty vocabulary and load the predefined vocabulary
+    # Define an empty vocabulary to load the predefined vocabulary
     vocab = d2l.Vocab([])
-    vocab.idx_to_token = json.load(open(os.path.join(data_dir, 'vocab.json'), 'r'))
-    vocab.token_to_idx = {token : idx for idx, token in enumerate(vocab.idx_to_token)}
-    bert = d2l.BERTModel(len(vocab),
-                         num_hiddens=num_hiddens,
-                         ffn_num_hiddens=ffn_num_hiddens,
-                         num_heads=num_heads, 
-                         num_layers=num_layers,
-                         dropout=dropout,
-                         max_len=max_len)
-    # Load model pretrained parameters
+    vocab.idx_to_token = json.load(open(os.path.join(data_dir, 'vocab.json')))
+    vocab.token_to_idx = {token: idx for idx, token in enumerate(
+        vocab.idx_to_token)}
+    bert = d2l.BERTModel(len(vocab), num_hiddens, ffn_num_hiddens, num_heads, 
+                         num_layers, dropout, max_len)
+    # Load pretrained BERT parameters
     bert.load_parameters(os.path.join(data_dir, 'pretrained.params'), ctx=ctx)
     return bert, vocab
 ```
 
-Now, we load the pretrained BERT.
+To facilitate demonstration on most of machines,
+we will load and fine-tune the small version ("bert.small") of the pretrained BERT in this section.
+In the exercise, we will show how to fine-tune the much larger "bert.base" to significantly improve the testing accuracy.
 
 ```{.python .input  n=4}
 ctx = d2l.try_all_gpus()
-bert, vocab = load_pretrained_model('bert.small', num_hiddens=256,
-                                    ffn_num_hiddens=512, num_heads=4,
-                                    num_layers=2, dropout=0.1, max_len=512,
-                                    ctx=ctx)
+bert, vocab = load_pretrained_model(
+    'bert.small', num_hiddens=256, ffn_num_hiddens=512, num_heads=4,
+    num_layers=2, dropout=0.1, max_len=512, ctx=ctx)
 ```
 
 ## The Dataset for Fine-Tuning BERT
@@ -168,11 +160,9 @@ of natural language inference.
 # Reduce `batch_size` if there is an out of memory error. In the original BERT
 # model, `max_len` = 512
 batch_size, max_len, num_workers = 512, 128, d2l.get_dataloader_workers()
-
 data_dir = d2l.download_extract('SNLI')
 train_set = SNLIBERTDataset(d2l.read_snli(data_dir, True), max_len, vocab)
 test_set = SNLIBERTDataset(d2l.read_snli(data_dir, False), max_len, vocab)
-
 train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True,
                                    num_workers=num_workers)
 test_iter = gluon.data.DataLoader(test_set, batch_size,
@@ -183,7 +173,8 @@ test_iter = gluon.data.DataLoader(test_set, batch_size,
 
 As :numref:`fig_bert-two-seqs` indicates,
 fine-tuning BERT for natural language inference
-requires only an extra MLP consisting of two fully-connected layers.
+requires only an extra MLP consisting of two fully-connected layers
+(see `self.hidden` and `self.output` in the following `BERTClassifier` class).
 This MLP transforms the
 BERT representation of the special “&lt;cls&gt;” token,
 which encodes the information of both the premise and the hypothesis,
@@ -201,14 +192,15 @@ class BERTClassifier(nn.Block):
     def forward(self, inputs):
         tokens_X, segments_X, valid_lens_x = inputs
         encoded_X = self.encoder(tokens_X, segments_X, valid_lens_x)
-        return self.output(self.hidden(encoded_X[:,0,:]))
+        return self.output(self.hidden(encoded_X[:, 0, :]))
 ```
 
 In the following,
-the pretrained BERT model `bert` becomes part of the model (`net`) for
+the pretrained BERT model `bert` is fed into the `BERTClassifier` instance `net` for
 the downstream application.
-However, only the parameters of the additional MLP (`net.classifier`) will be learned from scratch.
-All the parameters of the pretrained BERT will be fine-tuned.
+In common implementations of BERT fine-tuning,
+only the parameters of the output layer of the additional MLP (`net.output`) will be learned from scratch.
+All the parameters of the pretrained BERT encoder (`net.encoder`) and the hidden layer of the additional MLP (net.hidden) will be fine-tuned.
 
 ```{.python .input  n=8}
 net = BERTClassifier(bert)
@@ -221,7 +213,7 @@ both the `MaskLM` class and the `NextSentencePred` class
 have parameters in their employed MLPs.
 These parameters are part of those in the pretrained BERT model
 `bert`, and thus part of parameters in `net`.
-However, these parameters are only for computing
+However, such parameters are only for computing
 the masked language modeling loss
 and the next sentence prediction loss
 during pretraining.
@@ -233,8 +225,7 @@ To allow parameters with stale gradients,
 the flag `ignore_stale_grad=True` is set in the `step` function of `d2l.train_batch_ch13`.
 We use this function to train and evaluate the model `net` using the training set
 (`train_iter`) and the testing set (`test_iter`) of SNLI.
-Due to the limited computational resources, pretraining corpora,
-and training time, the training and testing accuracy
+Due to the limited computational resources, the training and testing accuracy
 can be further improved: we leave its discussions in the exercises.
 
 ```{.python .input  n=46}
@@ -247,15 +238,14 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
 
 ## Summary
 
-* We can pretrain BERT and fine-tune the pretrained BERT model for downstream applications, such as natural language inference on the SNLI dataset.
+* We can fine-tune the pretrained BERT model for downstream applications, such as natural language inference on the SNLI dataset.
 * During fine-tuning, the BERT model becomes part of the model for the downstream application. Parameters that are only related to pretraining loss will not be updated during fine-tuning. 
 
 
 ## Exercises
 
+1. Fine-tune a much larger pretrained BERT model that is about as big as the original BERT base model if your computational resource allows. Set arguments in the `load_pretrained_model` function as: replacing 'bert.small' with 'bert.base', increasing values of `num_hiddens=256`, `ffn_num_hiddens=512`, `num_heads=4`, `num_layers=2` to `768`, `3072`, `12`, `12`, respectively. By increasing fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.86?
 1. How to truncate a pair of sequences according to their ratio of length? Compare this pair truncation method and the one used in the `SNLIBERTDataset` class. What are their pros and cons?
-2. Increasing the model size such as setting `num_hiddens=768`, `ffn_num_hiddens=3072`, `num_heads=12`, and `num_layers=12`. By increasing pretraining steps and fine-tuning epochs (and possibly tuning other hyperparameters), can you get a testing accuracy higher than 0.86? Improve the sentence splitting technique by using those as described in the exercises of :numref:`sec_bert-dataset`. Does it lead to better testing accuracy?
-3. If your computational resource allows, use a much larger pretraining corpus and a much larger BERT. Can you get a much better testing accuracy? How long do the pretraining and fine-tuning take?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/5870)

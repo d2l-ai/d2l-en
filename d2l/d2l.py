@@ -1036,7 +1036,7 @@ class MultiHeadAttention(nn.Block):
         # output_concat shape: (batch_size, seq_len, num_hiddens)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
-    
+
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 def transpose_qkv(X, num_heads):
@@ -1051,6 +1051,7 @@ def transpose_qkv(X, num_heads):
     # output shape: (batch_size * num_heads, seq_len, num_hiddens / num_heads)
     output = X.reshape(-1, X.shape[2], X.shape[3])
     return output
+
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
