@@ -306,6 +306,9 @@ import zipfile
 #@tab pytorch
 # Saved in the d2l_pytorch package for later use
 import sys
+from matplotlib import pyplot as plt
+from IPython import display
+
 d2l = sys.modules[__name__]
 __version__ = '0.5.0'
 ```

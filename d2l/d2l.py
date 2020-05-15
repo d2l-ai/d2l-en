@@ -32,6 +32,14 @@ def mkdir_if_not_exist(path):
         os.makedirs(path)
 
 
+# Defined in file: ./chapter_preliminaries/pandas.md
+def mkdir_if_not_exist(path):
+    if not isinstance(path, str):
+        path = os.path.join(*path)
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
 # Defined in file: ./chapter_preliminaries/calculus.md
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter."""
@@ -67,7 +75,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
     if legend is None:
         legend = []
 
-    d2l.set_figsize(figsize)
+    set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
 
     # Return True if X (ndarray or list) has 1 axis
