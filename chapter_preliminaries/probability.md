@@ -41,12 +41,21 @@ large numbers* tell us that as the number of tosses grows this estimate will dra
 
 To start, let us import the necessary packages.
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
 import d2l
 from mxnet import np, npx
 import random
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+import d2l_pytorch as d2l
+import torch
+import numpy as np
+from torch.distributions.multinomial import Multinomial
 ```
 
 Next, we will want to be able to cast the die. In statistics we call this process
@@ -63,9 +72,15 @@ To draw a single sample, we simply pass in a vector of probabilities.
 The output of the `np.random.multinomial` function is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
 
-```{.python .input  n=2}
+```{.python .input}
 fair_probs = [1.0 / 6] * 6
 np.random.multinomial(1, fair_probs)
+```
+
+```{.python .input}
+#@tab pytorch
+fair_probs = torch.ones([6]) / 6
+Multinomial(1, fair_probs).sample()
 ```
 
 If you run the sampler a bunch of times, you will find that you get out random
@@ -75,14 +90,28 @@ do this with a Python `for` loop, so `random.multinomial` supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
 
-```{.python .input  n=3}
+```{.python .input}
 np.random.multinomial(10, fair_probs)
+```
+
+```{.python .input}
+#@tab pytorch
+Multinomial(10, fair_probs).sample()
 ```
 
 We can also conduct, say, $3$ groups of experiments, where each group draws $10$ samples, all at once.
 
-```{.python .input  n=4}
+```{.python .input}
 counts = np.random.multinomial(10, fair_probs, size=3)
+counts
+```
+
+```{.python .input}
+#@tab pytorch
+# PyTorch's Multinomial distribution doesn't offer the functionality 
+# for conducting multiple experiments at once. In such case we can always
+# use numpy and later convert the ndarray to a torch tensor
+counts = torch.from_numpy(np.random.multinomial(10, fair_probs, size=3))
 counts
 ```
 
@@ -91,9 +120,16 @@ can then go through and count, after each of the 1000 rolls, how many times each
 number was rolled.
 Specifically, we calculate the relative frequency as the estimate of the true probability.
 
-```{.python .input  n=5}
+```{.python .input}
 # Store the results as 32-bit floats for division
 counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
+counts / 1000  # Relative frequency as the estimate
+```
+
+```{.python .input}
+#@tab pytorch
+# Store the results as 32-bit floats for division
+counts = Multinomial(1000, fair_probs).sample().type(torch.float32)
 counts / 1000  # Relative frequency as the estimate
 ```
 
@@ -102,7 +138,7 @@ Because we generated the data from a fair die, we know that each outcome has tru
 We can also visualize how these probabilities converge over time towards the true probability.
 Let us conduct $500$ groups of experiments where each group draws $10$ samples.
 
-```{.python .input  n=6}
+```{.python .input}
 counts = np.random.multinomial(10, fair_probs, size=500)
 cum_counts = counts.astype(np.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
@@ -110,6 +146,22 @@ estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 d2l.set_figsize((6, 4.5))
 for i in range(6):
     d2l.plt.plot(estimates[:, i].asnumpy(),
+                 label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Groups of experiments')
+d2l.plt.gca().set_ylabel('Estimated probability')
+d2l.plt.legend();
+```
+
+```{.python .input}
+#@tab pytorch
+counts = torch.from_numpy(np.random.multinomial(10, fair_probs, size=500))
+cum_counts = counts.type(torch.float32).cumsum(axis=0)
+estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
+
+d2l.set_figsize((6, 4.5))
+for i in range(6):
+    d2l.plt.plot(estimates[:, i].numpy(),
                  label=("P(die=" + str(i + 1) + ")"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Groups of experiments')
