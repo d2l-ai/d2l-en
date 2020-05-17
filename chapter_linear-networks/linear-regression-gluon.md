@@ -21,7 +21,7 @@ concisely by using Gluon.
 
 To start, we will generate the same dataset as in the previous section.
 
-```{.python .input  n=2}
+```{.python .input}
 import d2l
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
@@ -29,6 +29,19 @@ npx.set_np()
 true_w = np.array([2, -3.4])
 true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
+```
+
+```{.python .input}
+#@tab pytorch
+import d2l_pytorch as d2l
+import numpy as np
+import torch
+from torch.utils.data import TensorDataset, DataLoader
+
+true_w = torch.Tensor([2, -3.4])
+true_b = 4.2
+features, labels = d2l.synthetic_data(true_w, true_b, 1000)
+labels = labels.reshape(-1,1)
 ```
 
 ## Reading the Dataset
@@ -44,7 +57,7 @@ and specify a Boolean value `shuffle` indicating whether or not
 we want the `DataLoader` to shuffle the data
 on each epoch (pass through the dataset).
 
-```{.python .input  n=3}
+```{.python .input}
 # Saved in the d2l package for later use
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a Gluon data loader"""
@@ -55,12 +68,32 @@ batch_size = 10
 data_iter = load_array((features, labels), batch_size)
 ```
 
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
+def load_array(data_arrays, batch_size, is_train=True):
+    """Construct a PyTorch data loader"""
+    dataset = TensorDataset(*data_arrays)
+    dataloader = DataLoader(dataset, batch_size, shuffle=is_train)
+    return dataloader
+
+batch_size = 10
+data_iter = load_array((features, labels), batch_size)
+```
+
 Now we can use `data_iter` in much the same way as we called
 the `data_iter` function in the previous section.
 To verify that it is working, we can read and print
 the first minibatch of instances.
 
-```{.python .input  n=5}
+```{.python .input}
+for X, y in data_iter:
+    print(X, '\n', y)
+    break
+```
+
+```{.python .input}
+#@tab pytorch
 for X, y in data_iter:
     print(X, '\n', y)
     break
@@ -104,9 +137,14 @@ will involve multiple layers,
 we will use it anyway just to familiarize you
 with the most standard workflow.
 
-```{.python .input  n=5}
+```{.python .input}
 from mxnet.gluon import nn
 net = nn.Sequential()
+```
+
+```{.python .input}
+#@tab pytorch
+from torch import nn
 ```
 
 Recall the architecture of a single-layer network as shown in :numref:`fig_singleneuron`.
@@ -120,8 +158,14 @@ we set that number to $1$.
 ![Linear regression is a single-layer neural network. ](../img/singleneuron.svg)
 :label:`fig_singleneuron`
 
-```{.python .input  n=6}
+```{.python .input}
 net.add(nn.Dense(1))
+```
+
+```{.python .input}
+#@tab pytorch
+net = nn.Sequential(nn.Linear(2, 1))
+net
 ```
 
 It is worth noting that, for convenience,
@@ -151,9 +195,15 @@ with mean $0$ and standard deviation $0.01$.
 The *bias* parameter will be initialized to zero by default.
 Both the weight vector and bias will have attached gradients.
 
-```{.python .input  n=7}
+```{.python .input}
 from mxnet import init
 net.initialize(init.Normal(sigma=0.01))
+```
+
+```{.python .input}
+#@tab pytorch
+net[0].weight.data = torch.Tensor(np.random.normal(size=(1,2), scale=0.01, loc=0))
+net[0].bias.data = torch.Tensor([0])
 ```
 
 The code above may look straightforward but you should note
@@ -180,9 +230,14 @@ holding our chosen loss function.
 In this example, we will use the Gluon
 implementation of squared loss (`L2Loss`).
 
-```{.python .input  n=8}
+```{.python .input}
 from mxnet.gluon import loss as gloss
 loss = gloss.L2Loss()  # The squared loss is also known as the L2 norm loss
+```
+
+```{.python .input}
+#@tab pytorch
+loss = nn.MSELoss(reduction = "sum") # The squared loss is also known as the L2 norm loss
 ```
 
 ## Defining the Optimization Algorithm
@@ -200,9 +255,14 @@ required by our optimization algorithm.
 SGD just requires that we set the value `learning_rate`,
 (here we set it to 0.03).
 
-```{.python .input  n=9}
+```{.python .input}
 from mxnet import gluon
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})
+```
+
+```{.python .input}
+#@tab pytorch
+trainer = torch.optim.SGD(net.parameters(), lr = 0.03) 
 ```
 
 ## Training
@@ -229,7 +289,7 @@ For each minibatch, we go through the following ritual:
 
 For good measure, we compute the loss after each epoch and print it to monitor progress.
 
-```{.python .input  n=10}
+```{.python .input}
 num_epochs = 3
 for epoch in range(1, num_epochs + 1):
     for X, y in data_iter:
@@ -239,6 +299,19 @@ for epoch in range(1, num_epochs + 1):
         trainer.step(batch_size)
     l = loss(net(features), labels)
     print('epoch %d, loss: %f' % (epoch, l.mean().asnumpy()))
+```
+
+```{.python .input}
+#@tab pytorch
+num_epochs = 3
+for epoch in range(1, num_epochs + 1): 
+    for X, y in data_iter:
+        l = loss(net(X) ,y)
+        trainer.zero_grad() 
+        l.backward() 
+        trainer.step()
+    l = loss(net(features), labels) 
+    print('epoch {}, loss {}'.format(epoch, l)) 
 ```
 
 Below, we compare the model parameters learned by training on finite data
@@ -252,10 +325,18 @@ As in our from-scratch implementation,
 note that our estimated parameters are
 close to their ground truth counterparts.
 
-```{.python .input  n=12}
+```{.python .input}
 w = net[0].weight.data()
 print('Error in estimating w', true_w.reshape(w.shape) - w)
 b = net[0].bias.data()
+print('Error in estimating b', true_b - b)
+```
+
+```{.python .input}
+#@tab pytorch
+w = list(net.parameters())[0][0]
+print('Error in estimating w', true_w.reshape(w.shape) - w)
+b = list(net.parameters())[1][0]
 print('Error in estimating b', true_b - b)
 ```
 
