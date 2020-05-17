@@ -17,12 +17,20 @@ Afterwards, we will introduce a more compact implementation,
 taking advantage of Gluon's bells and whistles.
 To start off, we import the few required packages.
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
 import d2l
 from mxnet import autograd, np, npx
 import random
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+import d2l_pytorch as d2l
+import torch
+import random
 ```
 
 ## Generating the Dataset
@@ -52,7 +60,7 @@ that $\epsilon$ obeys a normal distribution with mean of $0$.
 To make our problem easy, we will set its standard deviation to $0.01$.
 The following code generates our synthetic dataset:
 
-```{.python .input  n=2}
+```{.python .input}
 # Saved in the d2l package for later use
 def synthetic_data(w, b, num_examples):
     """Generate y = X w + b + noise."""
@@ -66,19 +74,45 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
+def synthetic_data(w, b, num_examples):
+    """Generate y = X w + b + noise."""
+    X = torch.zeros(size=(num_examples, len(w))).normal_()
+    y = torch.matmul(X, w) + b
+    y += torch.zeros(size=y.shape).normal_(std=0.01)
+    return X, y
+
+true_w = torch.tensor([2, -3.4])
+true_b = 4.2
+features, labels = synthetic_data(true_w, true_b, 1000)
+```
+
 Note that each row in `features` consists of a 2-dimensional data point 
 and that each row in `labels` consists of a 1-dimensional target value (a scalar).
 
-```{.python .input  n=3}
+```{.python .input}
+print('features:', features[0],'\nlabel:', labels[0])
+```
+
+```{.python .input}
+#@tab pytorch
 print('features:', features[0],'\nlabel:', labels[0])
 ```
 
 By generating a scatter plot using the second feature `features[:, 1]` and `labels`, 
 we can clearly observe the linear correlation between the two.
 
-```{.python .input  n=18}
+```{.python .input}
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
+```
+
+```{.python .input}
+#@tab pytorch
+d2l.set_figsize((3.5, 2.5))
+d2l.plt.scatter(features[:, 1].numpy(), labels.numpy(), 1);
 ```
 
 ## Reading the Dataset
@@ -98,7 +132,7 @@ The function takes a batch size, a design matrix,
 and a vector of labels, yielding minibatches of size `batch_size`.
 Each minibatch consists of a tuple of features and labels.
 
-```{.python .input  n=5}
+```{.python .input}
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
     indices = list(range(num_examples))
@@ -108,6 +142,18 @@ def data_iter(batch_size, features, labels):
         batch_indices = np.array(
             indices[i: min(i + batch_size, num_examples)])
         yield features[batch_indices], labels[batch_indices]
+```
+
+```{.python .input}
+#@tab pytorch
+def data_iter(batch_size, features, labels):
+    num_examples = len(features)
+    indices = list(range(num_examples))
+    # The examples are read at random, in no particular order
+    random.shuffle(indices)
+    for i in range(0, num_examples, batch_size):
+        j = torch.tensor(indices[i: min(i + batch_size, num_examples)])
+        yield features[j], labels[j]
 ```
 
 In general, note that we want to use reasonably sized minibatches
@@ -124,7 +170,16 @@ The shape of the features in each minibatch tells us
 both the minibatch size and the number of input features.
 Likewise, our minibatch of labels will have a shape given by `batch_size`.
 
-```{.python .input  n=6}
+```{.python .input}
+batch_size = 10
+
+for X, y in data_iter(batch_size, features, labels):
+    print(X, '\n', y)
+    break
+```
+
+```{.python .input}
+#@tab pytorch
 batch_size = 10
 
 for X, y in data_iter(batch_size, features, labels):
@@ -150,9 +205,15 @@ In the following code, we initialize weights by sampling
 random numbers from a normal distribution with mean 0
 and a standard deviation of $0.01$, setting the bias $b$ to $0$.
 
-```{.python .input  n=7}
+```{.python .input}
 w = np.random.normal(0, 0.01, (2, 1))
 b = np.zeros(1)
+```
+
+```{.python .input}
+#@tab pytorch
+w = torch.empty((2, 1)).normal_(0, 0.01)
+b = torch.zeros(1)
 ```
 
 Now that we have initialized our parameters,
@@ -174,9 +235,15 @@ that it should store a gradient for our parameters,
 we need to invoke the `attach_grad` function,
 allocating memory to store the gradients that we plan to take.
 
-```{.python .input  n=8}
+```{.python .input}
 w.attach_grad()
 b.attach_grad()
+```
+
+```{.python .input}
+#@tab pytorch
+w.requires_grad_(True)
+b.requires_grad_(True)
 ```
 
 ## Defining the Model
@@ -191,10 +258,17 @@ Note that below `np.dot(X, w)` is a vector and `b` is a scalar.
 Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
-```{.python .input  n=9}
+```{.python .input}
 # Saved in the d2l package for later use
 def linreg(X, w, b):
     return np.dot(X, w) + b
+```
+
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
+def linreg(X, w, b):
+    return torch.matmul(X, w) + b
 ```
 
 ## Defining the Loss Function
@@ -209,8 +283,15 @@ into the predicted value's shape `y_hat`.
 The result returned by the following function
 will also be the same as the `y_hat` shape.
 
-```{.python .input  n=10}
+```{.python .input}
 # Saved in the d2l package for later use
+def squared_loss(y_hat, y):
+    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
+```
+
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
 def squared_loss(y_hat, y):
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
@@ -239,11 +320,20 @@ we normalize our step size by the batch size (`batch_size`),
 so that the magnitude of a typical step size
 does not depend heavily on our choice of the batch size.
 
-```{.python .input  n=11}
+```{.python .input}
 # Saved in the d2l package for later use
 def sgd(params, lr, batch_size):
     for param in params:
         param[:] = param - lr * param.grad / batch_size
+```
+
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
+def sgd(params, lr, batch_size):
+    for param in params:
+        param.data.sub_(lr*param.grad/batch_size)
+        param.grad.data.zero_()
 ```
 
 ## Training
@@ -291,7 +381,7 @@ We elide these details for now but revise them
 later in
 :numref:`chap_optimization`.
 
-```{.python .input  n=12}
+```{.python .input}
 lr = 0.03  # Learning rate
 num_epochs = 3  # Number of iterations
 net = linreg  # Our fancy linear model
@@ -311,6 +401,27 @@ for epoch in range(num_epochs):
     print('epoch %d, loss %f' % (epoch + 1, train_l.mean().asnumpy()))
 ```
 
+```{.python .input}
+#@tab pytorch
+lr = 0.03  # Learning rate
+num_epochs = 3  # Number of iterations
+net = linreg  # Our fancy linear model
+loss = squared_loss  # 0.5 (y-y')^2
+
+for epoch in range(num_epochs):
+    # Assuming the number of examples can be divided by the batch size, all
+    # the examples in the training data set are used once in one epoch
+    # iteration. The features and tags of mini-batch examples are given by X
+    # and y respectively
+    for X, y in data_iter(batch_size, features, labels):
+        l = loss(net(X, w, b), y)  # Minibatch loss in X and y
+        l.mean().backward()  # Compute gradient on l with respect to [w,b]
+        sgd([w, b], lr, batch_size)  # Update parameters using their gradient
+    with torch.no_grad():
+        train_l = loss(net(features, w, b), labels)
+        print('epoch %d, loss %f' % (epoch + 1, train_l.mean().numpy()))
+```
+
 In this case, because we synthesized the data ourselves,
 we know precisely what the true parameters are. 
 Thus, we can evaluate our success in training 
@@ -318,7 +429,13 @@ by comparing the true parameters
 with those that we learned through our training loop. 
 Indeed they turn out to be very close to each other.
 
-```{.python .input  n=13}
+```{.python .input}
+print('Error in estimating w', true_w - w.reshape(true_w.shape))
+print('Error in estimating b', true_b - b)
+```
+
+```{.python .input}
+#@tab pytorch
 print('Error in estimating w', true_w - w.reshape(true_w.shape))
 print('Error in estimating b', true_b - b)
 ```
