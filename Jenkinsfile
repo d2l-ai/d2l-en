@@ -23,6 +23,7 @@ stage("Build and Publish") {
       conda create -n ${ENV_NAME}-pytorch pip python=3.7 -y
       conda activate ${ENV_NAME}-pytorch
       pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+      pip install torchvision
       pip install git+https://github.com/d2l-ai/d2l-book
       cd d2l_pytorch; python setup.py develop
       pip list
