@@ -306,8 +306,24 @@ import zipfile
 #@tab pytorch
 # Saved in the d2l_pytorch package for later use
 import sys
+import collections
+from collections import defaultdict
 from matplotlib import pyplot as plt
 from IPython import display
+import math
+import torch
+from torch.utils.data import TensorDataset, DataLoader
+from torch import nn
+import numpy as np
+import os
+import pandas as pd
+import random
+import re
+import shutil
+import sys
+import tarfile
+import time
+import zipfile
 
 d2l = sys.modules[__name__]
 __version__ = '0.5.0'
