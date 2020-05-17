@@ -321,3 +321,80 @@ def predict_ch3(net, test_iter, n=6):
     d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
 
 
+# Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
+def evaluate_loss(net, data_iter, loss):
+    """Evaluate the loss of a model on the given dataset."""
+    metric = d2l.Accumulator(2)  # sum_loss, num_examples
+    for X, y in data_iter:
+        metric.add(loss(net(X), y).sum(), y.size)
+    return metric[0] / metric[1]
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_HUB = dict()
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def download(name, cache_dir=os.path.join('..', 'data')):
+    """Download a file inserted into DATA_HUB, return the local filename."""
+    assert name in DATA_HUB, "%s does not exist" % name
+    url, sha1 = DATA_HUB[name]
+    d2l.mkdir_if_not_exist(cache_dir)
+    return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def download_extract(name, folder=None):
+    """Download and extract a zip/tar file."""
+    fname = download(name)
+    base_dir = os.path.dirname(fname) 
+    data_dir, ext = os.path.splitext(fname)
+    if ext == '.zip':
+        fp = zipfile.ZipFile(fname, 'r')
+    elif ext in ('.tar', '.gz'):
+        fp = tarfile.open(fname, 'r')
+    else:
+        assert False, 'Only zip/tar files can be extracted'
+    fp.extractall(base_dir)
+    if folder:
+        return os.path.join(base_dir, folder)
+    else:
+        return data_dir
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def download_all():
+    """Download all files in the DATA_HUB"""
+    for name in DATA_HUB:
+        download(name)
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_HUB['kaggle_house_train'] = (
+    DATA_URL + 'kaggle_house_pred_train.csv',
+    '585e9cc93e70b39160e7921475f9bcd7d31219ce')
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_HUB['kaggle_house_test'] = (
+    DATA_URL + 'kaggle_house_pred_test.csv',
+    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_gpu(i=0):
+    """Return gpu(i) if exists, otherwise return cpu()."""
+    return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_all_gpus():
+    """Return all available GPUs, or [cpu(),] if no GPU exists."""
+    ctxes = [npx.gpu(i) for i in range(npx.num_gpus())]
+    return ctxes if ctxes else [npx.cpu()]
+
+
