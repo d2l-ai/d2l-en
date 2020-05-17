@@ -201,4 +201,3 @@ def load_data_fashion_mnist(batch_size, resize=None):
             DataLoader(mnist_test, batch_size, shuffle=False,
                        num_workers=get_dataloader_workers()))
 
-

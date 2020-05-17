@@ -355,12 +355,57 @@ a = np.ones(n)
 b = np.ones(n)
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+import d2l_pytorch as d2l
+import math
+import torch
+import numpy as np
+import time
+
+n = 10000
+a = torch.ones(n)
+b = torch.ones(n)
+```
+
 Since we will benchmark the running time frequently in this book,
 let us define a timer (hereafter accessed via the `d2l` package
 to track the running time.
 
-```{.python .input  n=1}
+```{.python .input}
 # Saved in the d2l package for later use
+class Timer:
+    """Record multiple running times."""
+    def __init__(self):
+        self.times = []
+        self.start()
+
+    def start(self):
+        # Start the timer
+        self.tik = time.time()
+
+    def stop(self):
+        # Stop the timer and record the time in a list
+        self.times.append(time.time() - self.tik)
+        return self.times[-1]
+
+    def avg(self):
+        # Return the average time
+        return sum(self.times) / len(self.times)
+
+    def sum(self):
+        # Return the sum of time
+        return sum(self.times)
+
+    def cumsum(self):
+        # Return the accumulated times
+        return np.array(self.times).cumsum().tolist()
+```
+
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
 class Timer:
     """Record multiple running times."""
     def __init__(self):
@@ -393,8 +438,17 @@ Now we can benchmark the workloads.
 First, we add them, one coordinate at a time,
 using a `for` loop.
 
-```{.python .input  n=2}
+```{.python .input}
 c = np.zeros(n)
+timer = Timer()
+for i in range(n):
+    c[i] = a[i] + b[i]
+'%.5f sec' % timer.stop()
+```
+
+```{.python .input}
+#@tab pytorch
+c = torch.zeros(n)
 timer = Timer()
 for i in range(n):
     c[i] = a[i] + b[i]
@@ -403,7 +457,14 @@ for i in range(n):
 
 Alternatively, we rely on `np` to compute the elementwise sum:
 
-```{.python .input  n=3}
+```{.python .input}
+timer.start()
+d = a + b
+'%.5f sec' % timer.stop()
+```
+
+```{.python .input}
+#@tab pytorch
 timer.start()
 d = a + b
 '%.5f sec' % timer.stop()
@@ -447,9 +508,29 @@ def normal(z, mu, sigma):
     return p * np.exp(- 0.5 / sigma**2 * (z - mu)**2)
 ```
 
+```{.python .input}
+#@tab pytorch
+# We utilize numpy here as we need to plot visualizations later.
+def normal(z, mu, sigma):
+    p = 1 / math.sqrt(2 * math.pi * sigma**2)
+    return p * np.exp(- 0.5 / sigma**2 * (z - mu)**2)
+```
+
 We can now visualize the normal distributions.
 
-```{.python .input  n=2}
+```{.python .input}
+x = np.arange(-7, 7, 0.01)
+
+# Mean and variance pairs
+parameters = [(0, 1), (0, 2), (3, 1)]
+d2l.plot(x, [normal(x, mu, sigma) for mu, sigma in parameters], xlabel='z',
+         ylabel='p(z)', figsize=(4.5, 2.5),
+         legend=['mean %d, var %d' % (mu, sigma) for mu, sigma in parameters])
+```
+
+```{.python .input}
+#@tab pytorch
+# Using numpy again for visualizations.
 x = np.arange(-7, 7, 0.01)
 
 # Mean and variance pairs
