@@ -80,7 +80,7 @@ features, labels = synthetic_data(true_w, true_b, 1000)
 def synthetic_data(w, b, num_examples):
     """Generate y = X w + b + noise."""
     X = torch.zeros(size=(num_examples, len(w))).normal_()
-    y = torch.matmul(X, true_w) + true_b
+    y = torch.matmul(X, w) + b
     y += torch.zeros(size=y.shape).normal_(std=0.01)
     return X, y
 
