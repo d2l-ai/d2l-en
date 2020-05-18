@@ -70,10 +70,8 @@ solutions all in one place presents formidable challenges.
 Our goal in this book is to present a unified resource
 to bring would-be practitioners up to speed.
 
-
-We started this book project in July 2017 when we needed
-to explain MXNet's (then new) Gluon interface to our users.
-At the time, there were no resources that simultaneously
+At the time we started this book project,
+there were no resources that simultaneously
 (i) were up to date; (ii) covered the full breadth
 of modern machine learning with substantial technical depth;
 and (iii) interleaved exposition of the quality one expects
