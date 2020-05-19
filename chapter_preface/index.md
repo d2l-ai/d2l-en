@@ -312,8 +312,10 @@ from matplotlib import pyplot as plt
 from IPython import display
 import math
 import torch
-from torch.utils.data import TensorDataset, DataLoader
+import torchvision
 from torch import nn
+from torch.utils.data import TensorDataset, DataLoader
+from torchvision import transforms
 import numpy as np
 import os
 import pandas as pd

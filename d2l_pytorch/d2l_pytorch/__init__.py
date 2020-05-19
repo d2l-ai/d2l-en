@@ -13,8 +13,10 @@ from matplotlib import pyplot as plt
 from IPython import display
 import math
 import torch
-from torch.utils.data import TensorDataset, DataLoader
+import torchvision
 from torch import nn
+from torch.utils.data import TensorDataset, DataLoader
+from torchvision import transforms
 import numpy as np
 import os
 import pandas as pd
@@ -152,5 +154,51 @@ def load_array(data_arrays, batch_size, is_train=True):
     dataset = TensorDataset(*data_arrays)
     dataloader = DataLoader(dataset, batch_size, shuffle=is_train)
     return dataloader
+
+
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+def get_fashion_mnist_labels(labels):
+    text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
+                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
+    return [text_labels[int(i)] for i in labels]
+
+
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
+    """Plot a list of images."""
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        ax.imshow(img.numpy())
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    return axes
+
+
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+def get_dataloader_workers(num_workers=4):
+    # 0 means no additional process is used to speed up the reading of data.
+    if sys.platform.startswith('win'):
+        return 0
+    else:
+        return num_workers
+
+
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+def load_data_fashion_mnist(batch_size, resize=None):
+    """Download the Fashion-MNIST dataset and then load into memory."""
+    trans = [transforms.Resize(resize)] if resize else []
+    trans.append(transforms.ToTensor())
+    trans = transforms.Compose(trans)
+    
+    mnist_train = torchvision.datasets.FashionMNIST(root="./", train=True, transform=trans, target_transform=None, download=True)
+    mnist_test = torchvision.datasets.FashionMNIST(root="./", train=False, transform=trans, target_transform=None, download=True)
+    return (DataLoader(mnist_train, batch_size, shuffle=True,
+                       num_workers=get_dataloader_workers()),
+            DataLoader(mnist_test, batch_size, shuffle=False,
+                       num_workers=get_dataloader_workers()))
 
 
