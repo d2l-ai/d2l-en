@@ -30,9 +30,9 @@ But there is a key difference between the two cases. In this first case, the ima
 
 ## Basic Probability Theory
 
-Say that we cast a die and want to know what the chance is of seeing a $1$ rather than another digit. If the die is fair, all the $6$ outcomes $\{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in one out of six cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
+Say that we cast a dice and want to know what the chance is of seeing a $1$ rather than another digit. If the dice is fair, all the $6$ outcomes $\{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in one out of six cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
 
-For a real die that we receive from a factory, we might not know those proportions and we would need to check whether it is tainted. The only way to investigate the die is by casting it many times and recording the outcomes. For each cast of the die, we will observe a value in $\{1, \ldots, 6\}$. Given these outcomes, we want to investigate the probability of observing each outcome.
+For a real dice that we receive from a factory, we might not know those proportions and we would need to check whether it is tainted. The only way to investigate the dice is by casting it many times and recording the outcomes. For each cast of the dice, we will observe a value in $\{1, \ldots, 6\}$. Given these outcomes, we want to investigate the probability of observing each outcome.
 
 One natural approach for each value is to take the
 individual count for that value and to divide it by the total number of tosses.
@@ -49,7 +49,7 @@ import random
 npx.set_np()
 ```
 
-Next, we will want to be able to cast the die. In statistics we call this process
+Next, we will want to be able to cast the dice. In statistics we call this process
 of drawing examples from probability distributions *sampling*.
 The distribution
 that assigns probabilities to a number of discrete choices is called the
@@ -69,7 +69,7 @@ np.random.multinomial(1, fair_probs)
 ```
 
 If you run the sampler a bunch of times, you will find that you get out random
-values each time. As with estimating the fairness of a die, we often want to
+values each time. As with estimating the fairness of a dice, we often want to
 generate many samples from the same distribution. It would be unbearably slow to
 do this with a Python `for` loop, so `random.multinomial` supports drawing
 multiple samples at once, returning an array of independent samples in any shape
@@ -86,7 +86,7 @@ counts = np.random.multinomial(10, fair_probs, size=3)
 counts
 ```
 
-Now that we know how to sample rolls of a die, we can simulate 1000 rolls. We
+Now that we know how to sample rolls of a dice, we can simulate 1000 rolls. We
 can then go through and count, after each of the 1000 rolls, how many times each
 number was rolled.
 Specifically, we calculate the relative frequency as the estimate of the true probability.
@@ -97,7 +97,7 @@ counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
 counts / 1000  # Relative frequency as the estimate
 ```
 
-Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good.
+Because we generated the data from a fair dice, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good.
 
 We can also visualize how these probabilities converge over time towards the true probability.
 Let us conduct $500$ groups of experiments where each group draws $10$ samples.
@@ -110,27 +110,27 @@ estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 d2l.set_figsize((6, 4.5))
 for i in range(6):
     d2l.plt.plot(estimates[:, i].asnumpy(),
-                 label=("P(die=" + str(i + 1) + ")"))
+                 label=("P(dice=" + str(i + 1) + ")"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Groups of experiments')
 d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
 
-Each solid curve corresponds to one of the six values of the die and gives our estimated probability that the die turns up that value as assessed after each group of experiments.
+Each solid curve corresponds to one of the six values of the dice and gives our estimated probability that the dice turns up that value as assessed after each group of experiments.
 The dashed black line gives the true underlying probability.
 As we get more data by conducting more experiments,
 the $6$ solid curves converge towards the true probability.
 
 ### Axioms of Probability Theory
 
-When dealing with the rolls of a die,
+When dealing with the rolls of a dice,
 we call the set $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ the *sample space* or *outcome space*, where each element is an *outcome*.
 An *event* is a set of outcomes from a given sample space.
-For instance, "seeing a $5$" ($\{5\}$) and "seeing an odd number" ($\{1, 3, 5\}$) are both valid events of rolling a die.
+For instance, "seeing a $5$" ($\{5\}$) and "seeing an odd number" ($\{1, 3, 5\}$) are both valid events of rolling a dice.
 Note that if the outcome of a random experiment is in event $\mathcal{A}$,
 then event $\mathcal{A}$ has occurred.
-That is to say, if $3$ dots faced up after rolling a die, since $3 \in \{1, 3, 5\}$,
+That is to say, if $3$ dots faced up after rolling a dice, since $3 \in \{1, 3, 5\}$,
 we can say that the event "seeing an odd number" has occurred.
 
 Formally, *probability* can be thought of a function that maps a set to a real value.
@@ -149,8 +149,8 @@ For instance, by letting event $\mathcal{A}_1$ be the entire sample space and $\
 
 ### Random Variables
 
-In our random experiment of casting a die, we introduced the notion of a *random variable*. A random variable can be pretty much any quantity and is not deterministic. It could take one value among a set of possibilities in a random experiment.
-Consider a random variable $X$ whose value is in the sample space $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ of rolling a die. We can denote the event "seeing a $5$" as $\{X = 5\}$ or $X = 5$, and its probability as $P(\{X = 5\})$ or $P(X = 5)$.
+In our random experiment of casting a dice, we introduced the notion of a *random variable*. A random variable can be pretty much any quantity and is not deterministic. It could take one value among a set of possibilities in a random experiment.
+Consider a random variable $X$ whose value is in the sample space $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ of rolling a dice. We can denote the event "seeing a $5$" as $\{X = 5\}$ or $X = 5$, and its probability as $P(\{X = 5\})$ or $P(X = 5)$.
 By $P(X = a)$, we make a distinction between the random variable $X$ and the values (e.g., $a$) that $X$ can take.
 However, such pedantry results in a cumbersome notation.
 For a compact notation,
@@ -163,7 +163,7 @@ we can specify a range of values for a random variable to take.
 For example, $P(1 \leq X \leq 3)$ denotes the probability of the event $\{1 \leq X \leq 3\}$,
 which means $\{X = 1, 2, \text{or}, 3\}$. Equivalently, $P(1 \leq X \leq 3)$ represents the probability that the random variable $X$ can take a value from $\{1, 2, 3\}$.
 
-Note that there is a subtle difference between *discrete* random variables, like the sides of a die, and *continuous* ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
+Note that there is a subtle difference between *discrete* random variables, like the sides of a dice, and *continuous* ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
 that someone is $1.80139278291028719210196740527486202$ meters tall. Given the world population of humans the probability is virtually $0$. It makes more sense in this case to ask whether someone's height falls into a given interval, say between $1.79$ and $1.81$ meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly $1.80$ meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
 In the rest of this section, we consider probability in discrete space.
 For probability over continuous random variables, you may refer to :numref:`sec_random_variables`.
@@ -219,7 +219,7 @@ Two random variables $A$ and $B$ being independent
 means that the occurrence of one event of $A$
 does not reveal any information about the occurrence of an event of $B$.
 In this case $P(B \mid A) = P(B)$. Statisticians typically express this as $A \perp  B$. From Bayes' theorem, it follows immediately that also $P(A \mid B) = P(A)$.
-In all the other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. In contrast, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken light bulb, power failure, or a broken switch).
+In all the other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a dice are independent. In contrast, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken light bulb, power failure, or a broken switch).
 
 Since $P(A \mid B) = \frac{P(A, B)}{P(B)} = P(A)$ is equivalent to $P(A, B) = P(A)P(B)$, two random variables are independent if and only if their joint distribution is the product of their individual distributions.
 Likewise, two random variables $A$ and $B$ are *conditionally independent* given another random variable $C$
