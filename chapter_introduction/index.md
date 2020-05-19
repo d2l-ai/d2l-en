@@ -1443,7 +1443,7 @@ that would be difficult to accomplish otherwise.
 For instance, mail is sorted using optical character recognition.
 These systems have been deployed since the 90s
 (this is, after all, the source of the famous MNIST and USPS sets of handwritten digits).
-The same applies to read checks for bank deposits and scoring
+The same applies to reading checks for bank deposits and scoring
 creditworthiness of applicants.
 Financial transactions are checked for fraud automatically.
 This forms the backbone of many e-commerce payment systems,
