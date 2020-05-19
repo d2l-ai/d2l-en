@@ -1383,7 +1383,7 @@ over the past decade.
   are both testimony to this progress.
   Even amateur doodlers can produce
   photorealistic images based on just sketches that describe
-  how the layout of a scene looks like :cite:`Park.Liu.Wang.ea.2019`.
+  how the layout of a scene looks :cite:`Park.Liu.Wang.ea.2019`.
  
 * In many cases, a single GPU is insufficient to process
   the large amounts of data available for training.
