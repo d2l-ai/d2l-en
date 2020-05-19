@@ -16,7 +16,6 @@ negative emotion.
 import d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn, rnn
-from mxnet.contrib import text
 npx.set_np()
 
 batch_size = 64
