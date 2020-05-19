@@ -1234,7 +1234,7 @@ are still in frequent use today (even the Iris dataset
 that he released in 1936 is still used sometimes
 to illustrate machine learning algorithms).
 Fisher was also a proponent of eugenics,
-which should remind us that the morally dubious use data science
+which should remind us that the morally dubious use of data science
 has as long and enduring a history as its productive use
 in industry and the natural sciences.
 
