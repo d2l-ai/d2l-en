@@ -526,7 +526,7 @@ feature vector for your home might look something like: $[100, 0, .5, 60]$.
 However, if you live in Pittsburgh, it might look more like $[3000, 4, 3, 10]$.
 Feature vectors like this are essential
 for most classic machine learning algorithms.
-We will continue to denote the feature vector correspond
+We will continue to denote the feature vector corresponding
 to any example $i$ as $\mathbf{x}_i$ and we can compactly refer
 to the full table containing all of the feature vectors as $X$.
 
