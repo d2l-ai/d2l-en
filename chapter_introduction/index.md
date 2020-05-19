@@ -1245,7 +1245,7 @@ in his famous paper [Computing machinery and intelligence](https://en.wikipedia.
 In what he described as the Turing test, a machine
 can be considered intelligent if it is difficult
 for a human evaluator to distinguish between the replies
-from a machine and a human-based on textual interactions.
+from a machine and a human based on textual interactions.
 
 Another influence can be found in neuroscience and psychology.
 After all, humans clearly exhibit intelligent behavior.
