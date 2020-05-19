@@ -140,9 +140,9 @@ class MLPAttention(nn.Block):
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
         # Use flatten=True to keep query's and key's 3-D shapes
-        self.W_k = nn.Dense(units, activation='linear',
+        self.W_k = nn.Dense(units, activation='tanh',
                             use_bias=False, flatten=False)
-        self.W_q = nn.Dense(units, activation='linear',
+        self.W_q = nn.Dense(units, activation='tanh',
                             use_bias=False, flatten=False)
         self.v = nn.Dense(1, use_bias=False, flatten=False)
         self.dropout = nn.Dropout(dropout)
