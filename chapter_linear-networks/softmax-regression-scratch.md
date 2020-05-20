@@ -9,17 +9,31 @@ As with linear regression, after doing things by hand
 we will breeze through an implementation in Gluon for comparison.
 To begin, let us import the familiar packages.
 
-```{.python .input  n=1}
+```{.python .input}
 import d2l
 from mxnet import autograd, np, npx, gluon
 from IPython import display
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+import d2l_pytorch as d2l
+import torch
+from torch.distributions import normal
+from IPython import display
+```
+
 We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
 setting up an iterator with batch size $256$.
 
-```{.python .input  n=2}
+```{.python .input}
+batch_size = 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+```
+
+```{.python .input}
+#@tab pytorch
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
@@ -44,7 +58,7 @@ and the biases will constitute a $1 \times 10$ vector.
 As with linear regression, we will initialize our weights $W$
 with Gaussian noise and our biases to take the initial value $0$.
 
-```{.python .input  n=3}
+```{.python .input}
 num_inputs = 784
 num_outputs = 10
 
@@ -52,14 +66,29 @@ W = np.random.normal(0, 0.01, (num_inputs, num_outputs))
 b = np.zeros(num_outputs)
 ```
 
+```{.python .input}
+#@tab pytorch
+num_inputs = 784
+num_outputs = 10
+
+W = normal.Normal(loc = 0, scale = 0.01).sample((num_inputs, num_outputs))
+b = torch.zeros(num_outputs)
+```
+
 Recall that we need to *attach gradients* to the model parameters.
 More literally, we are allocating memory for future gradients to be stored
 and notifiying MXNet that we will want to calculate gradients
 with respect to these parameters in the future.
 
-```{.python .input  n=4}
+```{.python .input}
 W.attach_grad()
 b.attach_grad()
+```
+
+```{.python .input}
+#@tab pytorch
+W.requires_grad_(True)
+b.requires_grad_(True)
 ```
 
 ## The Softmax
@@ -77,9 +106,15 @@ If we want to keep the number of axes in the original array
 rather than collapsing out the dimension that we summed over
 we can specify `keepdims=True` when invoking `sum`.
 
-```{.python .input  n=5}
+```{.python .input}
 X = np.array([[1, 2, 3], [4, 5, 6]])
 print(X.sum(axis=0, keepdims=True), '\n', X.sum(axis=1, keepdims=True))
+```
+
+```{.python .input}
+#@tab pytorch
+X = torch.tensor([[1., 2., 3.], [4., 5., 6.]])
+torch.sum(X, dim=0, keepdim=True), torch.sum(X, dim=1, keepdim=True)
 ```
 
 We are now ready to implement the softmax function.
@@ -103,10 +138,18 @@ The origins of that name are in [statistical physics](https://en.wikipedia.org/w
 where a related equation models the distribution
 over an ensemble of particles.
 
-```{.python .input  n=6}
+```{.python .input}
 def softmax(X):
     X_exp = np.exp(X)
     partition = X_exp.sum(axis=1, keepdims=True)
+    return X_exp / partition  # The broadcast mechanism is applied here
+```
+
+```{.python .input}
+#@tab pytorch
+def softmax(X):
+    X_exp = torch.exp(X)
+    partition = torch.sum(X_exp, dim=1, keepdim=True)
     return X_exp / partition  # The broadcast mechanism is applied here
 ```
 
@@ -120,10 +163,17 @@ because we failed to take precautions against numerical overflow or underflow
 due to large (or very small) elements of the matrix,
 as we did in :numref:`sec_naive_bayes`.
 
-```{.python .input  n=7}
+```{.python .input}
 X = np.random.normal(size=(2, 5))
 X_prob = softmax(X)
 X_prob, X_prob.sum(axis=1)
+```
+
+```{.python .input}
+#@tab pytorch
+X = normal.Normal(loc = 0, scale = 1).sample((2, 5))
+X_prob = softmax(X)
+X_prob, torch.sum(X_prob, dim=1)
 ```
 
 ## The Model
@@ -135,9 +185,15 @@ Note that we flatten each original image in the batch
 into a vector with length `num_inputs` with the `reshape` function
 before passing the data through our model.
 
-```{.python .input  n=8}
+```{.python .input}
 def net(X):
     return softmax(np.dot(X.reshape(-1, num_inputs), W) + b)
+```
+
+```{.python .input}
+#@tab pytorch
+def net(X):
+    return softmax(torch.matmul(X.reshape((-1, num_inputs)), W) + b)
 ```
 
 ## The Loss Function
@@ -158,16 +214,28 @@ from the matrix of softmax entries.
 Below, we illustrate the `pick` function on a toy example,
 with $3$ categories and $2$ examples.
 
-```{.python .input  n=9}
+```{.python .input}
 y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
+y_hat[[0, 1], [0, 2]]
+```
+
+```{.python .input}
+#@tab pytorch
+y_hat = torch.tensor([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 y_hat[[0, 1], [0, 2]]
 ```
 
 Now we can implement the cross-entropy loss function efficiently with just one line of code.
 
-```{.python .input  n=10}
+```{.python .input}
 def cross_entropy(y_hat, y):
     return - np.log(y_hat[range(len(y_hat)), y])
+```
+
+```{.python .input}
+#@tab pytorch
+def cross_entropy(y_hat, y):
+    return - torch.log(y_hat[range(len(y_hat)), y])
 ```
 
 ## Classification Accuracy
@@ -198,12 +266,22 @@ we also need to convert both to the same type (we pick `float32`).
 The result is an `ndarray` containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
 
-```{.python .input  n=11}
+```{.python .input}
 # Saved in the d2l package for later use
 def accuracy(y_hat, y):
     if y_hat.shape[1] > 1:
         return float((y_hat.argmax(axis=1).astype('float32') == y.astype(
             'float32')).sum())
+    else:
+        return float((y_hat.astype('int32') == y.astype('int32')).sum())
+```
+
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
+def accuracy(y_hat, y):
+    if y_hat.shape[1] > 1:
+        return float((y_hat.argmax(axis=1).type(torch.float32) == y.type(torch.float32)).sum())
     else:
         return float((y_hat.astype('int32') == y.astype('int32')).sum())
 ```
@@ -219,15 +297,21 @@ The second example's prediction category is $2$
 which is consistent with the actual label, $2$.
 Therefore, the classification accuracy rate for these two examples is $0.5$.
 
-```{.python .input  n=12}
+```{.python .input}
 y = np.array([0, 2])
+accuracy(y_hat, y) / len(y)
+```
+
+```{.python .input}
+#@tab pytorch
+y = torch.tensor([0, 2])
 accuracy(y_hat, y) / len(y)
 ```
 
 Similarly, we can evaluate the accuracy for model `net` on the dataset
 (accessed via `data_iter`).
 
-```{.python .input  n=13}
+```{.python .input}
 # Saved in the d2l package for later use
 def evaluate_accuracy(net, data_iter):
     metric = Accumulator(2)  # num_corrected_examples, num_examples
@@ -236,11 +320,39 @@ def evaluate_accuracy(net, data_iter):
     return metric[0] / metric[1]
 ```
 
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
+def evaluate_accuracy(net, data_iter):
+    metric = Accumulator(2)  # num_corrected_examples, num_examples
+    for X, y in data_iter:
+        metric.add(accuracy(net(X), y), y.numpy().size)
+    return metric[0] / metric[1]
+```
 
 Here `Accumulator` is a utility class to accumulate sums over multiple numbers.
 
-```{.python .input  n=14}
+```{.python .input}
 # Saved in the d2l package for later use
+class Accumulator:
+    """Sum a list of numbers over time."""
+
+    def __init__(self, n):
+        self.data = [0.0] * n
+
+    def add(self, *args):
+        self.data = [a+float(b) for a, b in zip(self.data, args)]
+
+    def reset(self):
+        self.data = [0.0] * len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx]
+```
+
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
 class Accumulator:
     """Sum a list of numbers over time."""
 
@@ -261,7 +373,12 @@ Because we initialized the `net` model with random weights,
 the accuracy of this model should be close to random guessing,
 i.e., $0.1$ for $10$ classes.
 
-```{.python .input  n=15}
+```{.python .input}
+evaluate_accuracy(net, test_iter)
+```
+
+```{.python .input}
+#@tab pytorch
 evaluate_accuracy(net, test_iter)
 ```
 
@@ -276,7 +393,7 @@ Note that `updater` is general function to update the model parameters,
 which accepts the batch size as an argument.
 It can be either a wrapper of `d2l.sgd` or a Gluon trainer.
 
-```{.python .input  n=16}
+```{.python .input}
 # Saved in the d2l package for later use
 def train_epoch_ch3(net, train_iter, loss, updater):
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
@@ -294,12 +411,74 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
 
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
+def train_epoch_ch3(net, train_iter, loss, updater):
+    metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
+    if isinstance(updater, torch.optim.Optimizer):
+        updater = updater.step
+    for X, y in train_iter:
+        # Compute gradients and update parameters
+        y_hat = net(X)
+        l = loss(y_hat, y)
+        l.sum().backward()
+        updater(X.shape[0])
+        metric.add(float(l.sum()), accuracy(y_hat, y), y.numpy().size)
+    # Return training loss and training accuracy
+    return metric[0]/metric[2], metric[1]/metric[2]
+```
+
 Before showing the implementation of the training function,
 we define a utility class that draws data in animation.
 Again, it aims to simplify the code in later chapters.
 
-```{.python .input  n=17}
+```{.python .input}
 # Saved in the d2l package for later use
+class Animator:
+    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
+                 ylim=None, xscale='linear', yscale='linear', fmts=None,
+                 nrows=1, ncols=1, figsize=(3.5, 2.5)):
+        """Incrementally plot multiple lines."""
+        if legend is None:
+            legend = []
+        d2l.use_svg_display()
+        self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
+        if nrows * ncols == 1:
+            self.axes = [self.axes, ]
+        # Use a lambda to capture arguments
+        self.config_axes = lambda: d2l.set_axes(
+            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+        self.X, self.Y, self.fmts = None, None, fmts
+
+    def add(self, x, y):
+        """Add multiple data points into the figure."""
+        if not hasattr(y, "__len__"):
+            y = [y]
+        n = len(y)
+        if not hasattr(x, "__len__"):
+            x = [x] * n
+        if not self.X:
+            self.X = [[] for _ in range(n)]
+        if not self.Y:
+            self.Y = [[] for _ in range(n)]
+        if not self.fmts:
+            self.fmts = ['-'] * n
+        for i, (a, b) in enumerate(zip(x, y)):
+            if a is not None and b is not None:
+                self.X[i].append(a)
+                self.Y[i].append(b)
+        self.axes[0].cla()
+        for x, y, fmt in zip(self.X, self.Y, self.fmts):
+            self.axes[0].plot(x, y, fmt)
+        self.config_axes()
+        display.display(self.fig)
+        display.clear_output(wait=True)
+```
+
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
 class Animator:
     def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
@@ -343,8 +522,21 @@ class Animator:
 
 The training function then runs multiple epochs and visualize the training progress.
 
-```{.python .input  n=18}
+```{.python .input}
 # Saved in the d2l package for later use
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
+                        ylim=[0.3, 0.9],
+                        legend=['train loss', 'train acc', 'test acc'])
+    for epoch in range(num_epochs):
+        train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
+        test_acc = evaluate_accuracy(net, test_iter)
+        animator.add(epoch+1, train_metrics+(test_acc,))
+```
+
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
                         ylim=[0.3, 0.9],
@@ -366,7 +558,17 @@ into training, validation, and test data,
 using the validation data to choose
 the best values of our hyperparameters.
 
-```{.python .input  n=18}
+```{.python .input}
+num_epochs, lr = 10, 0.1
+
+def updater(batch_size):
+    return d2l.sgd([W, b], lr, batch_size)
+
+train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
+```
+
+```{.python .input}
+#@tab pytorch
 num_epochs, lr = 10, 0.1
 
 def updater(batch_size):
@@ -385,8 +587,22 @@ we will compare their actual labels
 and the model predictions
 (second line of text output).
 
-```{.python .input  n=19}
+```{.python .input}
 # Saved in the d2l package for later use
+def predict_ch3(net, test_iter, n=6):
+    for X, y in test_iter:
+        break
+    trues = d2l.get_fashion_mnist_labels(y)
+    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
+    titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
+    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+
+predict_ch3(net, test_iter)
+```
+
+```{.python .input}
+#@tab pytorch
+# Saved in the d2l_pytorch package for later use
 def predict_ch3(net, test_iter, n=6):
     for X, y in test_iter:
         break
