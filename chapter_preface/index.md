@@ -261,6 +261,8 @@ We are hopeful that as the theory of deep learning progresses,
 future editions of this book will be able to provide insights
 in places the present edition cannot.
 
+:begin_tab:`mxnet`
+
 Most of the code in this book is based on Apache MXNet.
 MXNet is an open-source framework for deep learning
 and the preferred choice of AWS (Amazon Web Services),
@@ -281,6 +283,31 @@ to be saved in the package, we will mark it with
 `# Saved in the d2l package for later use`.
 The `d2l` package is light-weight and only requires
 the following packages and modules as dependencies:
+
+:end_tab:
+
+:begin_tab:`pytorch`
+
+Most of the code in this book is based on PyTorch.
+Pytorch is an open-source framework for deep learning.
+All of the code in this book has passed tests under the the newest PyTorch.
+However, due to the rapid development of deep learning, some code
+*in the print edition* may not work properly in future versions of PyTorch.
+However, we plan to keep the online version up-to-date.
+In case you encounter any such problems,
+please consult :ref:`chap_installation`
+to update your code and runtime environment.
+
+At times, to avoid unnecessary repetition, we encapsulate
+the frequently-imported and referred-to functions, classes, etc.
+in this book in the `d2l_pytorch` package.
+For any block such as a function, a class, or multiple imports
+to be saved in the package, we will mark it with
+`# Saved in the d2l_pytorch package for later use`.
+The `d2l_pytorch` package is light-weight and only requires
+the following packages and modules as dependencies:
+
+:end_tab:
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
