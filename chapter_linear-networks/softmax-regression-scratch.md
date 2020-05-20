@@ -10,8 +10,6 @@ we will breeze through an implementation in Gluon for comparison.
 To begin, let us import the familiar packages.
 
 ```{.python .input}
-import sys
-sys.path.insert(0, "../")
 import d2l
 from mxnet import autograd, np, npx, gluon
 from IPython import display
@@ -281,12 +279,6 @@ def accuracy(y_hat, y):
 ```{.python .input}
 #@tab pytorch
 # Saved in the d2l_pytorch package for later use
-# def accuracy(y_hat, y):
-#     if y_hat.shape[1] > 1:
-#         return (y_hat.argmax(dim=1) == y).float().mean().item()
-#     else:
-#         return float((y_hat.int() == y.int)).sum()
-    
 def accuracy(y_hat, y):
     if y_hat.shape[1] > 1:
         return float((y_hat.argmax(axis=1).type(torch.float32) == y.type(torch.float32)).sum())
@@ -428,7 +420,6 @@ def train_epoch_ch3(net, train_iter, loss, updater):
         updater = updater.step
     for X, y in train_iter:
         # Compute gradients and update parameters
-        
         y_hat = net(X)
         l = loss(y_hat, y)
         l.sum().backward()

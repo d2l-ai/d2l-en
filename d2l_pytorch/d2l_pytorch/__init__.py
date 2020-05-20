@@ -203,7 +203,11 @@ def load_data_fashion_mnist(batch_size, resize=None):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-# def accuracy(y_hat, y):
+def accuracy(y_hat, y):
+    if y_hat.shape[1] > 1:
+        return float((y_hat.argmax(axis=1).type(torch.float32) == y.type(torch.float32)).sum())
+    else:
+        return float((y_hat.astype('int32') == y.astype('int32')).sum())
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -238,7 +242,6 @@ def train_epoch_ch3(net, train_iter, loss, updater):
         updater = updater.step
     for X, y in train_iter:
         # Compute gradients and update parameters
-        
         y_hat = net(X)
         l = loss(y_hat, y)
         l.sum().backward()
