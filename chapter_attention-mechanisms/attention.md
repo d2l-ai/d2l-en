@@ -148,7 +148,7 @@ class MLPAttention(nn.Block):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, query, key, value, valid_len):
-        query, key = self.W_k(query), self.W_q(key)
+        query, key = self.W_q(query), self.W_k(key)
         # Expand query to (batch_size, #querys, 1, units), and key to
         # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast
         features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
