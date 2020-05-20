@@ -161,7 +161,6 @@
 1. Run `pip install git+https://github.com/d2l-ai/d2l-book`
 1. Use bibtool to generate consistent keys for bibtex entries. Install it by `brew install bib-tool`
 1. Add an bibtex entry to `d2l.bib` on the root directory. Say the original entry is
-
 ```
 @article{wood2011sequence,
   title={The sequence memoizer},
@@ -174,10 +173,7 @@
   publisher={ACM}
 }
 ```
-
-
 4. Run `bibtool -s -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`. Now the added entry will have consistent keys. And as a side-effect, it'll appear in alphabetically sorted order relative to all other papers in the file:
-
 ```
 @Article{	  Wood.Gasthaus.Archambeau.ea.2011,
   title		= {The sequence memoizer},
@@ -191,10 +187,7 @@
   publisher	= {ACM}
 }
 ```
-
-
 5. In the text, use the following to cite the added paper:
-
 ```
 :cite:`Wood.Gasthaus.Archambeau.ea.2011`
 ```
