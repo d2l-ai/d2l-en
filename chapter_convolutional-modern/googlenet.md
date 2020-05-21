@@ -99,7 +99,7 @@ The architecture is depicted below.
 :label:`fig_inception_full`
 
 We can now implement GoogLeNet piece by piece.
-The first component uses a 64-channel 7×7 convolutional layer.
+The first component uses a 64-channel $7\times 7$ convolutional layer.
 
 ```{.python .input  n=2}
 b1 = nn.Sequential()
