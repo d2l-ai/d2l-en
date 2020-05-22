@@ -13,7 +13,7 @@ the circle. This process is also known as the *method of exhaustion*.
 :label:`fig_circle_area`
 
 In fact, the method of exhaustion is where *integral calculus* (will be described in :numref:`sec_integral_calculus`) originates from.
-More than $2,000$ years later, 
+More than $2,000$ years later,
 the other branch of calculus, *differential calculus*,
 was invented.
 Among the most critical applications of differential calculus,
@@ -21,13 +21,13 @@ optimization problems consider how to do something *the best*.
 As discussed in :numref:`subsec_norms_and_objectives`,
 such problems are ubiquitous in deep learning.
 
-In deep learning, we *train* models, updating them successively 
-so that they get better and better as they see more and more data. 
-Usually, getting better means minimizing a *loss function*, 
+In deep learning, we *train* models, updating them successively
+so that they get better and better as they see more and more data.
+Usually, getting better means minimizing a *loss function*,
 a score that answers the question "how *bad* is our model?"
 This question is more subtle than it appears.
-Ultimately, what we really care about 
-is producing a model that performs well on data 
+Ultimately, what we really care about
+is producing a model that performs well on data
 that we have never seen before.
 But we can only fit the model to data that we can actually see.
 Thus we can decompose the task of fitting models into two key concerns:
@@ -46,9 +46,9 @@ that is commonly used in deep learning.
 
 We begin by addressing the calculation of derivatives,
 a crucial step in nearly all deep learning optimization algorithms.
-In deep learning, we typically choose loss functions 
+In deep learning, we typically choose loss functions
 that are differentiable with respect to our model's parameters.
-Put simply, this means that for each parameter, 
+Put simply, this means that for each parameter,
 we can determine how rapidly the loss would increase or decrease,
 were we to *increase* or *decrease* that parameter
 by an infinitesimally small amount.
@@ -97,7 +97,7 @@ def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
-By setting $x=1$ and letting $h$ approach $0$, 
+By setting $x=1$ and letting $h$ approach $0$,
 the numerical result of $\frac{f(x+h) - f(x)}{h}$
 in :eqref:`eq_derivative` approaches $2$.
 Though this experiment is not a mathematical proof,
@@ -129,7 +129,7 @@ Given $y = f(x)$, where $x$ and $y$ are the independent variable and the depende
 
 $$f'(x) = y' = \frac{dy}{dx} = \frac{df}{dx} = \frac{d}{dx} f(x) = Df(x) = D_x f(x),$$
 
-where symbols $\frac{d}{dx}$ and $D$ are *differentiation operators* that indicate operation of *differentiation*. 
+where symbols $\frac{d}{dx}$ and $D$ are *differentiation operators* that indicate operation of *differentiation*.
 We can use the following rules to differentiate common functions:
 
 * $DC = 0$ ($C$ is a constant),
@@ -156,7 +156,7 @@ and the *quotient rule*
 
 $$\frac{d}{dx} \left[\frac{f(x)}{g(x)}\right] = \frac{g(x) \frac{d}{dx} [f(x)] - f(x) \frac{d}{dx} [g(x)]}{[g(x)]^2}.$$
 
-Now we can apply a few of the above rules to find 
+Now we can apply a few of the above rules to find
 $u' = f'(x) = 3 \frac{d}{dx} x^2-4\frac{d}{dx}x = 6x-4$.
 Thus, by setting $x = 1$, we have $u' = 2$:
 this is supported by our earlier experiment in this section
@@ -361,7 +361,7 @@ Let $\mathbf{x}$ be an $n$-dimensional vector, the following rules are often use
 * For all  $\mathbf{A} \in \mathbb{R}^{n \times n}$, $\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A} \mathbf{x}  = (\mathbf{A} + \mathbf{A}^\top)\mathbf{x}$,
 * $\nabla_{\mathbf{x}} \|\mathbf{x} \|^2 = \nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{x} = 2\mathbf{x}$.
 
-Similarly, for any matrix $\mathbf{X}$, we have $\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}$. As we will see later, gradients are useful for designing optimization algorithms in deep learning. 
+Similarly, for any matrix $\mathbf{X}$, we have $\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}$. As we will see later, gradients are useful for designing optimization algorithms in deep learning.
 
 
 ## Chain Rule
@@ -407,7 +407,10 @@ for any $i = 1, 2, \ldots, n$.
 1. What is the gradient of the function $f(\mathbf{x}) = \|\mathbf{x}\|_2$?
 1. Can you write out the chain rule for the case where $u = f(x, y, z)$ and $x = x(a, b)$, $y = y(a, b)$, and $z = z(a, b)$?
 
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/32)
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/5008)
-
-![](../img/qr_calculus.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/33)
+:end_tab:

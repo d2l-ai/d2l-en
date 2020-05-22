@@ -13,8 +13,29 @@ We will cover more data preprocessing techniques in later chapters.
 
 ## Reading the Dataset
 
-As an example, we begin by creating an artificial dataset that is stored in a csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other formats may be processed in similar ways. The following `mkdir_if_not_exist` function ensures that the directory `../data` exists. The comment `# Saved in the d2l package for later use` is a special mark where the following function, class, or import statements
-are also saved in the `d2l` package so that we can directly invoke `d2l.mkdir_if_not_exist()` later.
+As an example, we begin by creating an artificial dataset that is stored in a
+csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other
+formats may be processed in similar ways.
+
+:begin_tab:`mxnet`
+
+The following `mkdir_if_not_exist`
+function ensures that the directory `../data` exists. The comment `# Saved in
+the d2l package for later use` is a special mark where the following function,
+class, or import statements are also saved in the `d2l` package so that we can
+directly invoke `d2l.mkdir_if_not_exist()` later.
+
+:end_tab:
+
+:begin_tab:`pytorch`
+
+The following `mkdir_if_not_exist`
+function ensures that the directory `../data` exists. The comment `# Saved in
+the d2l_pytorch package for later use` is a special mark where the following function,
+class, or import statements are also saved in the `d2l_pytorch` package so that we can
+directly invoke `d2l.mkdir_if_not_exist()` later.
+
+:end_tab:
 
 ```{.python .input}
 import os
@@ -31,7 +52,7 @@ def mkdir_if_not_exist(path):
 #@tab pytorch
 import os
 
-# Saved in the d2l package for later use
+# Saved in the d2l_pytorch package for later use
 def mkdir_if_not_exist(path):
     if not isinstance(path, str):
         path = os.path.join(*path)
@@ -162,6 +183,10 @@ Create a raw dataset with more rows and columns.
 2. Convert the preprocessed dataset to the `ndarray` format.
 
 
-## [Discussions](https://discuss.mxnet.io/t/4973)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/28)
+:end_tab:
 
-![](../img/qr_pandas.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/29)
+:end_tab:

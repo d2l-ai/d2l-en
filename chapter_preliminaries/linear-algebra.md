@@ -44,7 +44,7 @@ Analogously, we could write $x, y \in \{0, 1\}$
 to state that $x$ and $y$ are numbers
 whose value can only be $0$ or $1$.
 
-In MXNet code, a scalar is represented by an `ndarray` with just one element.
+A scalar is represented by an `ndarray` with just one element.
 In the next snippet, we instantiate two scalars
 and perform some familiar arithmetic operations with them,
 namely addition, multiplication, division, and exponentiation.
@@ -87,7 +87,7 @@ cholesterol levels, minutes of exercise per day, etc.
 In math notation, we will usually denote vectors as bold-faced,
 lower-cased letters (e.g., $\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z})$.
 
-In MXNet, we work with vectors via $1$-dimensional `ndarray`s.
+We work with vectors via $1$-dimensional `ndarray`s.
 In general `ndarray`s can have arbitrary lengths,
 subject to the memory limits of your machine.
 
@@ -195,7 +195,7 @@ is ($m$, $n$) or $m \times n$.
 Specifically, when a matrix has the same number of rows and columns,
 its shape becomes a square; thus, it is called a *square matrix*.
 
-We can create an $m \times n$ matrix in MXNet
+We can create an $m \times n$ matrix
 by specifying a shape with two components $m$ and $n$
 when calling any of our favorite functions for instantiating an `ndarray`.
 
@@ -873,7 +873,10 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 
 
 
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/30)
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/2317)
-
-![](../img/qr_linear-algebra.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/31)
+:end_tab:
