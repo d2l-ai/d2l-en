@@ -55,7 +55,7 @@ npx.set_np()
 import d2l_pytorch as d2l
 import torch
 import numpy as np
-from torch.distributions.multinomial import Multinomial
+from torch.distributions import multinomial
 ```
 
 Next, we will want to be able to cast the die. In statistics we call this process
@@ -64,13 +64,34 @@ The distribution
 that assigns probabilities to a number of discrete choices is called the
 *multinomial distribution*. We will give a more formal definition of
 *distribution* later, but at a high level, think of it as just an assignment of
-probabilities to events. In MXNet, we can sample from the multinomial
+probabilities to events.
+
+
+:begin_tab:`mxnet`
+
+In MXNet, we can sample from the multinomial
 distribution via the aptly named `np.random.multinomial` function.
 The function
 can be called in many ways, but we will focus on the simplest.
 To draw a single sample, we simply pass in a vector of probabilities.
 The output of the `np.random.multinomial` function is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
+
+:end_tab:
+
+:begin_tab:`pytorch`
+
+In PyTorch, we can sample from the multinomial
+distribution via the class `Multinomial` defined in the
+`distributions.multinomial` module.
+The class
+can be called in many ways, but we will focus on the simplest.
+To draw a single sample, we simply pass in a vector of probabilities.
+The output of the `sample` method of this class  is another vector of the same length:
+its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
+
+:end_tab:
+
 
 ```{.python .input}
 fair_probs = [1.0 / 6] * 6
@@ -80,13 +101,13 @@ np.random.multinomial(1, fair_probs)
 ```{.python .input}
 #@tab pytorch
 fair_probs = torch.ones([6]) / 6
-Multinomial(1, fair_probs).sample()
+multinomial.Multinomial(1, fair_probs).sample()
 ```
 
 If you run the sampler a bunch of times, you will find that you get out random
 values each time. As with estimating the fairness of a die, we often want to
 generate many samples from the same distribution. It would be unbearably slow to
-do this with a Python `for` loop, so `random.multinomial` supports drawing
+do this with a Python `for` loop, it supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
 
@@ -96,7 +117,7 @@ np.random.multinomial(10, fair_probs)
 
 ```{.python .input}
 #@tab pytorch
-Multinomial(10, fair_probs).sample()
+multinomial.Multinomial(10, fair_probs).sample()
 ```
 
 We can also conduct, say, $3$ groups of experiments, where each group draws $10$ samples, all at once.
@@ -129,7 +150,7 @@ counts / 1000  # Relative frequency as the estimate
 ```{.python .input}
 #@tab pytorch
 # Store the results as 32-bit floats for division
-counts = Multinomial(1000, fair_probs).sample().type(torch.float32)
+counts = multinomial.Multinomial(1000, fair_probs).sample().type(torch.float32)
 counts / 1000  # Relative frequency as the estimate
 ```
 
@@ -394,7 +415,7 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 
 ## Summary
 
-* We can use MXNet to sample from probability distributions.
+* We sample numbers from probability distributions.
 * We can analyze multiple random variables using joint distribution, conditional distribution, Bayes' theorem, marginalization, and independence assumptions.
 * Expectation and variance offer useful measures to summarize key characteristics of probability distributions.
 

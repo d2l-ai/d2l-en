@@ -184,7 +184,6 @@ def use_svg_display():
 # Saved in the d2l_pytorch package for later use
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter."""
-    print(display)
     display.set_matplotlib_formats('svg')
 ```
 

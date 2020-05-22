@@ -32,10 +32,17 @@ d2l = sys.modules[__name__]
 __version__ = '0.5.0'
 
 
+# Defined in file: ./chapter_preliminaries/pandas.md
+def mkdir_if_not_exist(path):
+    if not isinstance(path, str):
+        path = os.path.join(*path)
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
 # Defined in file: ./chapter_preliminaries/calculus.md
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter."""
-    print(display)
     display.set_matplotlib_formats('svg')
 
 
