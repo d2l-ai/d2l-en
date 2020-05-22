@@ -38,19 +38,6 @@ As a toy example, say that we are interested
 in differentiating the function
 $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to the column vector $\mathbf{x}$.
-To start, let us create the variable `x` and assign it an initial value.
-
-```{.python .input}
-x = np.arange(4.0)
-x
-```
-
-```{.python .input}
-#@tab pytorch
-# Only Tensors of floating point dtype can require gradients
-x = torch.arange(4.0)
-x
-```
 
 Note that before we even calculate the gradient
 of $y$ with respect to $\mathbf{x}$,
@@ -67,21 +54,24 @@ is itself vector-valued and has the same shape as $\mathbf{x}$.
 Thus it is intuitive that in code,
 we will access a gradient taken with respect to `x`
 as an attribute of the `ndarray` `x` itself.
-We allocate memory for an `ndarray`'s gradient
-by invoking its `attach_grad` method.
+
+To start, let us create the variable `x` and assign it an initial value.
 
 ```{.python .input}
-x.attach_grad()
+x = np.arange(4.0)
+x
 ```
 
 ```{.python .input}
 #@tab pytorch
-x.requires_grad_(True)
-
-# Alternatively, requires_grad=True can be set while defining the tensor in the last step.
-# x = torch.arange(4.0, requires_grad=True)
+x = torch.arange(4.0, requires_grad=True)
+x
 ```
 
+:begin_tab:`mxnet`
+
+We allocate memory for an `ndarray`'s gradient
+by invoking its `attach_grad` method.
 After we calculate a gradient taken with respect to `x`,
 we will be able to access it via the `grad` attribute.
 As a safe default, `x.grad` is initialized as an array containing all zeros.
@@ -94,28 +84,38 @@ we ensure that any update accidentally executed
 before a gradient has actually been calculated
 will not alter the parameters' value.
 
+:end_tab:
+
+:begin_tab:`pytorch`
+
+Note the `requires_grad=True` argument when creating $x$, it tells the framework
+we need allocate gradient space for $x$ in the future.
+
+:end_tab:
+
+
 ```{.python .input}
+x.attach_grad()
 x.grad
 ```
 
 ```{.python .input}
 #@tab pytorch
-# Even if requires_grad is True in PyTorch, it will hold a None value,
-# unless .backward() function is called from some other node.
-print(x.grad)
+x.grad
 ```
 
-Now let us calculate $y$.
-Because we wish to subsequently calculate gradients,
-we want MXNet to generate a computational graph on the fly.
-We could imagine that MXNet would be turning on a recording device
-to capture the exact path by which each variable is generated.
 
-Note that building the computational graph
-requires a nontrivial amount of computation.
-So MXNet will only build the graph when explicitly told to do so.
-We can invoke this behavior by placing our code
+
+
+:begin_tab:`mxnet`
+Now let us calculate $y$. Note that MXNet will only record the computation
 inside an `autograd.record` scope.
+:end_tab:
+
+:begin_tab:`pytorch`
+Now let us calculate $y$.
+:end_tab:
+
 
 ```{.python .input}
 with autograd.record():
@@ -130,7 +130,7 @@ y
 ```
 
 Since `x` is an `ndarray` of length 4,
-`np.dot` will perform an inner product of `x` and `x`,
+`dot` will perform an inner product of `x` and `x`,
 yielding the scalar output that we assign to `y`.
 Next, we can automatically calculate the gradient of `y`
 with respect to each component of `x`
@@ -171,9 +171,22 @@ x.grad == 4 * x
 x.grad == 4 * x
 ```
 
+:begin_tab:`mxnet`
+
 If we subsequently compute the gradient of another variable
 whose value was calculated as a function of `x`,
 the contents of `x.grad` will be overwritten.
+
+:end_tab:
+
+:begin_tab:`pytorch`
+
+If we subsequently compute the gradient of another variable
+whose value was calculated as a function of `x`, we need to clear the previous
+values in `x.grad` first, as PyTorch accumulates and adds the gradient in default.
+
+:end_tab:
+
 
 ```{.python .input}
 with autograd.record():
@@ -184,16 +197,13 @@ x.grad
 
 ```{.python .input}
 #@tab pytorch
-# PyTorch won't overwrite, instead it accumulates and adds the gradient.
-# Before running backpropagation again, we can clear it, setting back to zero.
 x.grad.zero_()
-
 y = x.sum()
 y.backward()
 x.grad
 ```
 
-## Backward for Non-Scalar Variables
+:begin_tab:`mxnet`
 
 Technically, when `y` is not a scalar,
 the most natural interpretation of the differentiation of a vector `y`
@@ -217,6 +227,8 @@ In short, MXNet will create a new scalar variable
 by summing the elements in `y`,
 and compute the gradient of that scalar variable with respect to `x`.
 
+:end_tab:
+
 ```{.python .input}
 with autograd.record():
     y = x * x  # y is a vector
@@ -231,21 +243,6 @@ v.backward()
 x.grad == u.grad
 ```
 
-```{.python .input}
-#@tab pytorch
-x.grad.zero_()
-y = x * x  # y is a vector
-
-# In PyTorch, grad can be implicitly created only for scalar outputs.
-# For a vector we need to pass a head gradient as an input to backward
-y.backward(torch.ones(4))
-
-u = torch.arange(4.0, requires_grad=True)
-v = (u * u).sum()  # v is a scalar
-v.backward()
-
-x.grad == u.grad
-```
 
 ## Detaching Computation
 
@@ -303,36 +300,6 @@ x.grad == 2 * x
 x.grad.zero_()
 y.sum().backward()
 x.grad == 2 * x
-```
-
-Note that attaching gradients to a variable `x` implicitly calls `x = x.detach()`.
-If `x` is computed based on other variables,
-this part of computation will not be used in the `backward` function.
-
-```{.python .input}
-y = np.ones(4) * 2
-y.attach_grad()
-with autograd.record():
-    u = x * y
-    u.attach_grad()  # Implicitly run u = u.detach()
-    z = 5 * u - x
-z.backward()
-x.grad, u.grad, y.grad
-```
-
-```{.python .input}
-#@tab pytorch
-# PyTorch by design computes backpropagation differently and once a variable is
-# detached from the graph, the gradients don't flow for intermediate variables
-# like u and u.grad is not saved even when retain_grad is set true.
-x.grad.zero_()
-y = torch.ones(4, requires_grad=True) * 2
-u = x * y
-u.retain_grad()
-u.detach_()
-z = 5 * u - x
-z.sum().backward()
-x.grad, u.grad, y.grad
 ```
 
 ## Computing the Gradient of Python Control Flow
@@ -407,12 +374,27 @@ a.grad == (d / a)
 
 ## Training Mode and Prediction Mode
 
-As we have seen, after we call `autograd.record`,
-MXNet logs the operations in the following block.
-There is one more subtle detail to be aware of.
-Additionally, `autograd.record` will change
-the running mode from *prediction mode* to *training mode*.
-We can verify this behavior by calling the `is_training` function.
+When we get to complicated deep learning models,
+we will encounter some algorithms where the model
+behaves differently during training and
+when we subsequently use it to make predictions.
+
+:begin_tab:`mxnet`
+
+We can often distinguish the training mode with the prediction mode by
+ calling the `is_training` function, which indicates if we are in the
+`autograd.record` scope or not.
+
+:end_tab:
+
+:begin_tab:`pytorch`
+
+In PyTorch, we can set `model.train()` or `model.eval()` to distinguish the
+training mode and prediction mode, which we'll cover in the later sections of
+the book.
+
+:end_tab:
+
 
 ```{.python .input}
 print(autograd.is_training())
@@ -420,25 +402,12 @@ with autograd.record():
     print(autograd.is_training())
 ```
 
-```{.python .input}
-#@tab pytorch
-# In pytorch such change in training mode and testing mode are
-# defined by setting model.train() or model.eval() which we'll cover
-# in the later sections of the book.
-```
-
-When we get to complicated deep learning models,
-we will encounter some algorithms where the model
-behaves differently during training and
-when we subsequently use it to make predictions.
-We will cover these differences in detail in later chapters.
-
 
 ## Summary
 
-* MXNet provides the `autograd` package to automate the calculation of derivatives. To use it, we first attach gradients to those variables with respect to which we desire partial derivatives. We then record the computation of our target value, execute its `backward` function, and access the resulting gradient via our variable's `grad` attribute.
+* Deep learning frameworks can automate the calculation of derivatives. To use it, we first attach gradients to those variables with respect to which we desire partial derivatives. We then record the computation of our target value, execute its `backward` function, and access the resulting gradient via our variable's `grad` attribute.
 * We can detach gradients to control the part of the computation that will be used in the `backward` function.
-* The running modes of MXNet include training mode and prediction mode. We can determine the running mode by calling the `is_training` function.
+* There are training mode and prediction mode.
 
 
 ## Exercises
@@ -448,7 +417,6 @@ We will cover these differences in detail in later chapters.
 1. In the control flow example where we calculate the derivative of `d` with respect to `a`, what would happen if we changed the variable `a` to a random vector or matrix. At this point, the result of the calculation `f(a)` is no longer a scalar. What happens to the result? How do we analyze this?
 1. Redesign an example of finding the gradient of the control flow. Run and analyze the result.
 1. Let $f(x) = \sin(x)$. Plot $f(x)$ and $\frac{df(x)}{dx}$, where the latter is computed without exploiting that $f'(x) = \cos(x)$.
-1. In a second-price auction (such as in eBay or in computational advertising), the winning bidder pays the second-highest price. Compute the gradient of the final price with respect to the winning bidder's bid using `autograd`. What does the result tell you about the mechanism? If you are curious to learn more about second-price auctions, check out the paper by Edelman et al. :cite:`Edelman.Ostrovsky.Schwarz.2007`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/34)
