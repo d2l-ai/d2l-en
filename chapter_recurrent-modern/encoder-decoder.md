@@ -66,7 +66,7 @@ class EncoderDecoder(nn.Block):
 
 * An encoder-decoder architecture is a neural network design pattern mainly in natural language processing.
 * An encoder is a network (FC, CNN, RNN, etc.) that takes the input, and outputs a feature map, a vector or a tensor.
-* An decoder is a network (usually the same network structure as encoder) that takes the feature vector from the encoder, and gives the best closest match to the actual input or intended output.
+* A decoder is a network (usually the same network structure as encoder) that takes the feature vector from the encoder, and gives the best closest match to the actual input or intended output.
 
 
 ## Exercises
