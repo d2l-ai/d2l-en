@@ -108,7 +108,7 @@ counts
 
 ```{.python .input}
 #@tab pytorch
-# PyTorch's Multinomial distribution doesn't offer the functionality 
+# PyTorch's Multinomial distribution doesn't offer the functionality
 # for conducting multiple experiments at once. In such case we can always
 # use numpy and later convert the ndarray to a torch tensor
 counts = torch.from_numpy(np.random.multinomial(10, fair_probs, size=3))
@@ -308,7 +308,7 @@ $$\begin{aligned}
 &P(H = 1 \mid D_1 = 1)\\ =& \frac{P(D_1=1 \mid H=1) P(H=1)}{P(D_1=1)} \\ =& 0.1306 \end{aligned}.$$
 
 In other words, there is only a 13.06% chance that the patient
-actually has AIDS, despite using a very accurate test. 
+actually has AIDS, despite using a very accurate test.
 As we can see, probability can be counterintuitive.
 
 What should a patient do upon receiving such terrifying news? Likely, the patient
@@ -324,8 +324,8 @@ test has different characteristics and it is not as good as the first one, as sh
 |$P(D_2 = 0 \mid H)$|            0.02 |         0.97 |
 :label:`conditional_prob_D2`
 
-Unfortunately, the second test comes back positive, too. 
-Let us work out the requisite probabilities to invoke Bayes' theorem 
+Unfortunately, the second test comes back positive, too.
+Let us work out the requisite probabilities to invoke Bayes' theorem
 by assuming the conditional independence:
 
 $$\begin{aligned}
@@ -407,6 +407,10 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 1. In :numref:`subsec_probability_hiv_app`, the first test is more accurate. Why not just run the first test a second time?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2319)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/36)
+:end_tab:
 
-![](../img/qr_probability.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/37)
+:end_tab:
