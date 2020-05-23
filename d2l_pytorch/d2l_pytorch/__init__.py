@@ -214,7 +214,7 @@ def accuracy(y_hat, y):
     if y_hat.shape[1] > 1:
         return float((y_hat.argmax(axis=1).type(torch.float32) == y.type(torch.float32)).sum())
     else:
-        return float((y_hat.astype('int32') == y.astype('int32')).sum())
+        return float((y_hat.type(torch.int32) == y.type(torch.int32)).sum())
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -245,15 +245,27 @@ class Accumulator:
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_epoch_ch3(net, train_iter, loss, updater):
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
+    pt_optimizer=False
     if isinstance(updater, torch.optim.Optimizer):
-        updater = updater.step
+        pt_optimizer=True
     for X, y in train_iter:
         # Compute gradients and update parameters
         y_hat = net(X)
         l = loss(y_hat, y)
-        l.sum().backward()
-        updater(X.shape[0])
-        metric.add(float(l.sum()), accuracy(y_hat, y), y.numpy().size)
+        if pt_optimizer:
+            updater.zero_grad()
+            l.backward()
+            updater.step()
+            # When using the concise implementation and pytorch's in house
+            # CrossEntropyLoss, it uses mean as reduction method over 
+            # crossentropy. Thus we need to scale the loss back, to get l_sum.
+            l_sum = float(l)*len(y)
+            metric.add(l_sum, float(accuracy(y_hat, y)), len(y))
+        else:
+            l.sum().backward()
+            updater(X.shape[0])
+            l_sum = float(l.sum())
+            metric.add(l_sum, accuracy(y_hat, y), y.numpy().size)
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 
