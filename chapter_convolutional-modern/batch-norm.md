@@ -271,7 +271,7 @@ keeping track of running averages (here for mean and variance), etc.
 This pattern enables a clean separation of math from boilerplate code.
 Also note that for the sake of convenience
 we did not worry about automatically inferring the input shape here,
-thus our need to specify the number of features throughout.
+thus we need to specify the number of features throughout.
 Do not worry, the Gluon `BatchNorm` layer will care of this for us.
 
 ```{.python .input  n=73}
