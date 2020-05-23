@@ -266,11 +266,18 @@ without looking at the values taken by the other hidden units.
 This is true for most activation functions
 (the batch normalization operation will be introduced in :numref:`sec_batch_norm` is a notable exception to that rule).
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
 import d2l
 from mxnet import autograd, np, npx
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+import d2l_pytorch as d2l
+import torch
 ```
 
 ## Activation Functions
@@ -302,13 +309,21 @@ Because it is used so commonly, `ndarray`
 supports the `relu` function as a native operator.
 As you can see, the activation function is piecewise linear.
 
-```{.python .input  n=2}
+```{.python .input}
 x = np.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
     y = npx.relu(x)
 d2l.set_figsize((4, 2.5))
 d2l.plot(x, y, 'x', 'relu(x)')
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.arange(-8.0, 8.0, 0.1, requires_grad=True)
+y = torch.relu(x)
+d2l.set_figsize((4, 2.5))
+d2l.plot(x.detach(), y.detach(), 'x', 'relu(x)')
 ```
 
 When the input is negative, 
@@ -326,9 +341,15 @@ we are probably doing (*real*) mathematics, not engineering.
 That conventional wisdom may apply here.
 We plot the derivative of the ReLU function plotted below.
 
-```{.python .input  n=9}
+```{.python .input}
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of relu')
+```
+
+```{.python .input}
+#@tab pytorch
+y.backward(torch.ones_like(x), retain_graph=True)
+d2l.plot(x.detach(), x.grad, 'x', 'grad of relu')
 ```
 
 Note that there are many variants to the ReLU function, 
@@ -393,10 +414,16 @@ Note that when the input is close to 0,
 the sigmoid function approaches 
 a linear transformation.
 
-```{.python .input  n=4}
+```{.python .input}
 with autograd.record():
     y = npx.sigmoid(x)
 d2l.plot(x, y, 'x', 'sigmoid(x)')
+```
+
+```{.python .input}
+#@tab pytorch
+y = torch.sigmoid(x)
+d2l.plot(x.detach(), y.detach(), 'x', 'sigmoid(x)')
 ```
 
 The derivative of sigmoid function is given by the following equation:
@@ -411,9 +438,17 @@ reaches a maximum of 0.25.
 As the input diverges from 0 in either direction, 
 the derivative approaches 0.
 
-```{.python .input  n=11}
+```{.python .input}
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of sigmoid')
+```
+
+```{.python .input}
+#@tab pytorch
+# Clear out previous gradients.
+x.grad.data.zero_()
+y.backward(torch.ones_like(x),retain_graph=True)
+d2l.plot(x.detach(), x.grad, 'x', 'grad of sigmoid')
 ```
 
 ### Tanh Function
@@ -426,10 +461,16 @@ $$\text{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
 We plot the tanh function blow. Note that as the input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system.
 
-```{.python .input  n=12}
+```{.python .input}
 with autograd.record():
     y = np.tanh(x)
 d2l.plot(x, y, 'x', 'tanh(x)')
+```
+
+```{.python .input}
+#@tab pytorch
+y = torch.tanh(x)
+d2l.plot(x.detach(), y.detach(), 'x', 'tanh(x)')
 ```
 
 The derivative of the Tanh function is:
@@ -443,9 +484,17 @@ And as we saw with the sigmoid function,
 as the input moves away from 0 in either direction,
 the derivative of the tanh function approaches 0.
 
-```{.python .input  n=13}
+```{.python .input}
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of tanh')
+```
+
+```{.python .input}
+#@tab pytorch
+# Clear out previous gradients.
+x.grad.data.zero_()
+y.backward(torch.ones_like(x),retain_graph=True)
+d2l.plot(x.detach(), x.grad, 'x', 'grad of tanh')
 ```
 
 In summary, we now know how to incorporate nonlinearities
