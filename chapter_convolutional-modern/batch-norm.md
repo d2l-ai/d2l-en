@@ -379,7 +379,7 @@ net.add(nn.Conv2D(6, kernel_size=5),
         nn.Dense(10))
 ```
 
-Below, we use the same hyper-parameters to train out model.
+Below, we use the same hyper-parameters to train our model.
 Note that as usual, the Gluon variant runs much faster
 because its code has been compiled to C++/CUDA
 while our custom implementation must be interpreted by Python.
