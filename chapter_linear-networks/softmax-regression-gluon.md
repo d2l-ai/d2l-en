@@ -7,17 +7,30 @@ we will find it similarly (or possibly more)
 convenient for implementing classification models.
 Again, we begin with our import ritual.
 
-```{.python .input  n=1}
+```{.python .input}
 import d2l
 from mxnet import gluon, init, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+import d2l_pytorch as d2l
+import torch
+import torch.nn as nn
+```
+
 Let us stick with the Fashion-MNIST dataset 
 and keep the batch size at $256$ as in the last section.
 
-```{.python .input  n=2}
+```{.python .input}
+batch_size = 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+```
+
+```{.python .input}
+#@tab pytorch
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
@@ -36,10 +49,27 @@ when implementing deep models.
 Again, we initialize the weights at random
 with zero mean and standard deviation $0.01$.
 
-```{.python .input  n=3}
+```{.python .input}
 net = nn.Sequential()
 net.add(nn.Dense(10))
 net.initialize(init.Normal(sigma=0.01))
+```
+
+```{.python .input}
+#@tab pytorch
+# PyTorch doesn't implicitly reshape the inputs.
+# Thus we define a layer to reshape the inputs in our network.
+class Reshape(torch.nn.Module):
+    def forward(self, x):
+        return x.view(-1,784)
+    
+net = nn.Sequential(Reshape(), nn.Linear(784, 10))
+
+def init_weights(m):
+    if type(m) == nn.Linear:
+        torch.nn.init.normal_(m.weight, std=0.01)
+
+net.apply(init_weights)
 ```
 
 ## The Softmax
@@ -103,8 +133,15 @@ we will just pass the logits and compute the softmax and its log
 all at once inside the softmax_cross_entropy loss function,
 which does smart things like the log-sum-exp trick ([see on Wikipedia](https://en.wikipedia.org/wiki/LogSumExp)).
 
-```{.python .input  n=4}
+```{.python .input}
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
+```
+
+```{.python .input}
+#@tab pytorch
+# By default the reduction method used in PyTorch implementation
+# of CrossEntropyLoss is 'mean'.
+loss = nn.CrossEntropyLoss()
 ```
 
 ## Optimization Algorithm
@@ -114,15 +151,26 @@ with a learning rate of $0.1$ as the optimization algorithm.
 Note that this is the same as we applied in the linear regression example
 and it illustrates the general applicability of the optimizers.
 
-```{.python .input  n=5}
+```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})
+```
+
+```{.python .input}
+#@tab pytorch
+trainer = torch.optim.SGD(net.parameters(), lr=0.1)
 ```
 
 ## Training
 
 Next we call the training function defined in the last section to train a model.
 
-```{.python .input  n=6}
+```{.python .input}
+num_epochs = 10
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+```
+
+```{.python .input}
+#@tab pytorch
 num_epochs = 10
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
