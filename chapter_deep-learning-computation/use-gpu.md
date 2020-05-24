@@ -18,8 +18,8 @@ a significant need to provide such performance.
 |2020|1 T (social network)|100 GB|1 PF (NVIDIA DGX-2)|
 
 In this section, we begin to discuss how to harness 
-this compute performance for your research. 
-First by using single GPUs and at a later point,
+this compute performance for your research 
+by using single GPUs.   At a later point, we show
 how to use multiple GPUs and multiple servers (with multiple GPUs). 
 You might have noticed that MXNet `ndarray` 
 looks almost identical to NumPy. 
@@ -157,7 +157,6 @@ We can use the `nvidia-smi` command to view GPU memory usage.
 In general, we need to make sure we do not 
 create data that exceeds the GPU memory limit.
 
-
 ```{.python .input  n=5}
 x = np.ones((2, 3), ctx=try_gpu())
 x
@@ -210,12 +209,12 @@ Imagine that your variable z already lives on your second GPU (gpu(1)).
 What happens if we call z.copyto(gpu(1))? 
 It will make a copy and allocate new memory,
 even though that variable already lives on the desired device!
-There are times where depending on the environment our code is running in,
+There are times where, depending on the environment our code is running in,
 two variables may already live on the same device.
 So we only want to make a copy if the variables 
-currently lives on different contexts.
+currently live on different contexts.
 In these cases, we can call `as_in_ctx()`.
-If the variable already live in the specified context
+If the variables already live in the specified context
 then this is a no-op. 
 Unless you specifically want to make a copy, 
 `as_in_ctx()` is the method of choice.

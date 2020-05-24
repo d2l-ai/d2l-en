@@ -61,16 +61,16 @@ mydict2
 
 ## Gluon Model Parameters
 
-Saving individual weight vectors (or other `ndarray` tensors) is useful 
+Saving individual weight vectors (or other `ndarray` tensors) is useful, 
 but it gets very tedious if we want to save 
 (and later load) an entire model.
 After all, we might have hundreds of 
 parameter groups sprinkled throughout. 
-For this reason Gluon provides built-in functionality 
+For this reason, Gluon provides built-in functionality 
 to load and save entire networks.
 An important detail to note is that this 
 saves model *parameters* and not the entire model. 
-For example, if we have a 3 layer MLP,
+For example, if we have a 3-layer MLP,
 we need to specify the *architecture* separately. 
 The reason for this is that the models themselves can contain arbitrary code, 
 hence they cannot be serialized as naturally 
@@ -104,7 +104,7 @@ y = net(x)
 Next, we store the parameters of the model as a file with the name `mlp.params`.
 Gluon Blocks support a `save_parameters` method 
 that writes all parameters to disk given 
-a string for the file name. 
+a string for the file name.
 
 ```{.python .input}
 net.save_parameters('mlp.params')
@@ -115,7 +115,7 @@ of the original MLP model.
 Instead of randomly initializing the model parameters, 
 we read the parameters stored in the file directly.
 Conveniently we can load parameters into Blocks
-via their `load_parameters` method. 
+via their `load_parameters` method.
 
 ```{.python .input  n=8}
 clone = MLP()
