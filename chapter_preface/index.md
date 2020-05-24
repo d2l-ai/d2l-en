@@ -70,10 +70,8 @@ solutions all in one place presents formidable challenges.
 Our goal in this book is to present a unified resource
 to bring would-be practitioners up to speed.
 
-
-We started this book project in July 2017 when we needed
-to explain MXNet's (then new) Gluon interface to our users.
-At the time, there were no resources that simultaneously
+At the time we started this book project,
+there were no resources that simultaneously
 (i) were up to date; (ii) covered the full breadth
 of modern machine learning with substantial technical depth;
 and (iii) interleaved exposition of the quality one expects
@@ -268,7 +266,7 @@ as well as many colleges and companies.
 All of the code in this book has passed tests under the newest MXNet version.
 However, due to the rapid development of deep learning, some code
 *in the print edition* may not work properly in future versions of MXNet.
-However, we plan to keep the online version remain up-to-date.
+However, we plan to keep the online version up-to-date.
 In case you encounter any such problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
@@ -366,7 +364,8 @@ Haibin Lin, jjangga0214, RichyChen, noelo, hansent, Giel Dops, dvincent1337, Whi
 Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk, heytitle, Peter Goetz, rigtorp,
 tiepvupsu, sfilip, mlxd, Kale-ab Tessera, Sanjar Adilov, MatteoFerrara, hsneto,
 Katarzyna Biesialska, Gregory Bruss, duythanhvn, paulaurel, graytowne, minhduc0711,
-sl7423, Jaedong Hwang.
+sl7423, Jaedong Hwang, Yida Wang, cys4, clhm, JeanKaddour, austinmw, trebeljahr, tbaums,
+cuongvng, pavelkomarov, vzlamal, NotAnotherSystem, J-Arun-Mani, jancio, eldarkurtic.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.

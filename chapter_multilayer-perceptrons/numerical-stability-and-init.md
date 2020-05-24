@@ -9,7 +9,7 @@ Until now, we took the initialization scheme for granted,
 glossing over the details of how these these choices are made.
 You might have even gotten the impression that these choices
 are not especially important.
-However, the choice of initialization scheme
+To the contrary, the choice of initialization scheme
 plays a significant role in neural network learning,
 and it can be crucial for maintaining numerical stability.
 Moreover, these choices can be tied up in interesting ways

@@ -227,7 +227,7 @@ class Accumulator:
         self.data = [a+float(b) for a, b in zip(self.data, args)]
 
     def reset(self):
-        self.data = [0] * len(self.data)
+        self.data = [0.0] * len(self.data)
 
     def __getitem__(self, idx):
         return self.data[idx]
@@ -1000,14 +1000,14 @@ class MLPAttention(nn.Block):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class MultiHeadAttention(nn.Block):
-    def __init__(self, num_hiddens, num_heads, dropout, **kwargs):
+    def __init__(self, num_hiddens, num_heads, dropout, use_bias=False, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
-        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
-        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
-        self.W_v = nn.Dense(num_hiddens, use_bias=False, flatten=False)
-        self.W_o = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_q = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
+        self.W_k = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
+        self.W_v = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
+        self.W_o = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
 
     def forward(self, query, key, value, valid_len):
         # For self-attention, query, key, and value shape:
@@ -1105,9 +1105,10 @@ class PositionalEncoding(nn.Block):
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class EncoderBlock(nn.Block):
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
-                 **kwargs):
+                 use_bias=False, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = MultiHeadAttention(num_hiddens, num_heads, dropout)
+        self.attention = MultiHeadAttention(num_hiddens, num_heads, dropout,
+                                            use_bias)
         self.addnorm1 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(dropout)
@@ -1120,7 +1121,7 @@ class EncoderBlock(nn.Block):
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class TransformerEncoder(d2l.Encoder):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
-                 num_heads, num_layers, dropout, **kwargs):
+                 num_heads, num_layers, dropout, use_bias=False, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
@@ -1128,7 +1129,7 @@ class TransformerEncoder(d2l.Encoder):
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(
-                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout))
+                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout, use_bias))
 
     def forward(self, X, valid_len, *args):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
@@ -1695,6 +1696,62 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     return data_iter, vocab
 
 
+# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
+d2l.DATA_HUB['glove.6b.50d'] = (d2l.DATA_URL + 'glove.6B.50d.zip',
+                       '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
+
+
+# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
+d2l.DATA_HUB['glove.6b.100d'] = (d2l.DATA_URL + 'glove.6B.100d.zip',
+                       'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
+
+
+# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
+d2l.DATA_HUB['glove.42b.300d'] = (d2l.DATA_URL + 'glove.42B.300d.zip',
+                       'b5116e234e9eb9076672cfeabf5469f3eec904fa')
+
+
+# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
+d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
+                       'c1816da3821ae9f43899be655002f6c723e91b88')
+
+
+# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
+class TokenEmbedding:
+    """Token Embedding."""
+    def __init__(self, embedding_name):
+        self.idx_to_token, self.idx_to_vec = self._load_embedding(
+            embedding_name)
+        self.unknown_idx = 0
+        self.token_to_idx = {token: idx for idx, token in 
+                             enumerate(self.idx_to_token)}
+
+    def _load_embedding(self, embedding_name):
+        idx_to_token, idx_to_vec = ['<unk>'], []
+        data_dir = d2l.download_extract(embedding_name)
+        # GloVe website: https://nlp.stanford.edu/projects/glove/
+        # fastText website: https://fasttext.cc/
+        with open(os.path.join(data_dir, 'vec.txt'), 'r') as f:
+            for line in f:
+                elems = line.rstrip().split(' ')
+                token, elems = elems[0], [float(elem) for elem in elems[1:]]
+                # Skip header information, such as the top row in fastText
+                if len(elems) > 1:
+                    idx_to_token.append(token)
+                    idx_to_vec.append(elems)
+        idx_to_vec = [[0] * len(idx_to_vec[0])] + idx_to_vec
+        return idx_to_token, np.array(idx_to_vec)
+
+    def __getitem__(self, tokens):
+        indices = [self.token_to_idx.get(token, self.unknown_idx)
+                   for token in tokens]
+        vecs = self.idx_to_vec[np.array(indices)]
+        return vecs
+
+    def __len__(self):
+        return len(self.idx_to_token)
+
+
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 def get_tokens_and_segments(tokens_a, tokens_b=None):
     tokens = ['<cls>'] + tokens_a + ['<sep>']
@@ -1713,11 +1770,10 @@ class BERTEncoder(nn.Block):
         super(BERTEncoder, self).__init__(**kwargs)
         self.token_embedding = nn.Embedding(vocab_size, num_hiddens)
         self.segment_embedding = nn.Embedding(2, num_hiddens)
-        
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(d2l.EncoderBlock(
-                num_hiddens, ffn_num_hiddens, num_heads, dropout))
+                num_hiddens, ffn_num_hiddens, num_heads, dropout, True))
         # In BERT, positional embeddings are learnable, thus we create a
         # parameter of positional embeddings that are long enough
         self.pos_embedding = self.params.get('pos_embedding',
@@ -1759,17 +1815,13 @@ class MaskLM(nn.Block):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class NextSentencePred(nn.Block):
-    def __init__(self, num_hiddens, **kwargs):
+    def __init__(self, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
-        self.mlp = nn.Sequential()
-        self.mlp.add(nn.Dense(num_hiddens, activation='tanh'))
-        self.mlp.add(nn.Dense(2))
+        self.output = nn.Dense(2)
 
     def forward(self, X):
-        # 0 is the index of the '<cls>' token
-        X = X[:, 0, :]
         # X shape: (batch size, `num_hiddens`)
-        return self.mlp(X)
+        return self.output(X)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
@@ -1779,8 +1831,9 @@ class BERTModel(nn.Block):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, num_hiddens, ffn_num_hiddens,
                                    num_heads, num_layers, dropout, max_len)
+        self.hidden = nn.Dense(num_hiddens, activation='tanh')
         self.mlm = MaskLM(vocab_size, num_hiddens)
-        self.nsp = NextSentencePred(num_hiddens)
+        self.nsp = NextSentencePred()
 
     def forward(self, tokens, segments, valid_lens=None, pred_positions=None):
         encoded_X = self.encoder(tokens, segments, valid_lens)
@@ -1788,7 +1841,9 @@ class BERTModel(nn.Block):
             mlm_Y_hat = self.mlm(encoded_X, pred_positions)
         else:
             mlm_Y_hat = None
-        nsp_Y_hat = self.nsp(encoded_X)
+        # The hidden layer of the MLP classifier for next sentence prediction.
+        # 0 is the index of the '<cls>' token
+        nsp_Y_hat = self.nsp(self.hidden(encoded_X[:, 0, :]))
         return encoded_X, mlm_Y_hat, nsp_Y_hat
 
 

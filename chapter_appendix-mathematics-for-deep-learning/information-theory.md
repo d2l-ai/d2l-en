@@ -210,7 +210,7 @@ $$
 
 Indeed, this is a valid definition for the mutual information.  If we expand out the definitions of these terms and combine them, a little algebra shows that this is the same as
 
-$$I(X, Y) = −E_{x} E_{y} \left\{ p_{X, Y}(x, y) \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$
+$$I(X, Y) = E_{x} E_{y} \left\{ p_{X, Y}(x, y) \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$
 :eqlabel:`eq_mut_ent_def` 
 
 
@@ -231,7 +231,7 @@ Now, let us implement mutual information from scratch.
 ```{.python .input}
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
-    mutual = -p_xy * np.log2(p)
+    mutual = p_xy * np.log2(p)
     # nansum will sum up the non-nan number
     out = nansum(mutual.as_nd_ndarray())
     return out

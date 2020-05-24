@@ -57,9 +57,9 @@ that are beyond our conscious understanding
 (even if our eyes manage the task effortlessly).
 ML is the study of powerful
 techniques that can *learn* from *experience*.
-As ML algorithm accumulates more experience,
+As an ML algorithm accumulates more experience,
 typically in the form of observational data or
-interactions with an environment, their performance improves.
+interactions with an environment, its performance improves.
 Contrast this with our deterministic e-commerce platform,
 which performs according to the same business logic,
 no matter how much experience accrues,
@@ -219,7 +219,7 @@ offering a unified set of tools for tackling diverse problems.
 ## The Key Components: Data, Models, and Algorithms
 
 In our *wake-word* example, we described a dataset
-consisting of audio snippets and binary labels
+consisting of audio snippets and binary labels, and we
 gave a hand-wavy sense of how we might *train*
 a model to approximate a mapping from snippets to classifications.
 This sort of problem, where we try to predict a designated unknown *label*
@@ -290,9 +290,9 @@ is the comparative grace with which modern models
 can handle *varying-length* data.
 
 Generally, the more data we have, the easier our job becomes.
-When we have more data, we can train more powerful models,
+When we have more data, we can train more powerful models
 and rely less heavily on pre-conceived assumptions.
-The regime change from (comparatively small) to big data
+The regime change from (comparatively) small to big data
 is a major contributor to the success of modern deep learning.
 To drive the point home, many of the most exciting models in deep learning do not work without large datasets.
 Some others work in the low-data regime,
@@ -439,8 +439,8 @@ predicting *targets* given *inputs*.
 The targets, which we often call *labels*, are generally denoted by *y*.
 The input data, also called the *features* or covariates,
 are typically denoted $\mathbf{x}$.
-Each (input, target) pair is called *examples* or *instances*.
-Some times, when the context is clear, we may use the term examples,
+Each (input, target) pair is called an *example* or *instance*.
+Sometimes, when the context is clear, we may use the term examples,
 to refer to a collection of inputs,
 even when the corresponding targets are unknown.
 We denote any particular instance with a subscript, typically $i$,
@@ -501,7 +501,7 @@ a function that takes as input a dataset
 and outputs another function, *the learned model*.
 Finally, we can feed previously unseen inputs to the learned model,
 using its outputs as predictions of the corresponding label.
-The full process in drawn in :numref:`fig_supervised_learning`.
+The full process is drawn in :numref:`fig_supervised_learning`.
 
 ![Supervised learning.](../img/supervised-learning.svg)
 :label:`fig_supervised_learning`
@@ -526,7 +526,7 @@ feature vector for your home might look something like: $[100, 0, .5, 60]$.
 However, if you live in Pittsburgh, it might look more like $[3000, 4, 3, 10]$.
 Feature vectors like this are essential
 for most classic machine learning algorithms.
-We will continue to denote the feature vector correspond
+We will continue to denote the feature vector corresponding
 to any example $i$ as $\mathbf{x}_i$ and we can compactly refer
 to the full table containing all of the feature vectors as $X$.
 
@@ -1234,7 +1234,7 @@ are still in frequent use today (even the Iris dataset
 that he released in 1936 is still used sometimes
 to illustrate machine learning algorithms).
 Fisher was also a proponent of eugenics,
-which should remind us that the morally dubious use data science
+which should remind us that the morally dubious use of data science
 has as long and enduring a history as its productive use
 in industry and the natural sciences.
 
@@ -1245,7 +1245,7 @@ in his famous paper [Computing machinery and intelligence](https://en.wikipedia.
 In what he described as the Turing test, a machine
 can be considered intelligent if it is difficult
 for a human evaluator to distinguish between the replies
-from a machine and a human-based on textual interactions.
+from a machine and a human based on textual interactions.
 
 Another influence can be found in neuroscience and psychology.
 After all, humans clearly exhibit intelligent behavior.
@@ -1383,7 +1383,7 @@ over the past decade.
   are both testimony to this progress.
   Even amateur doodlers can produce
   photorealistic images based on just sketches that describe
-  how the layout of a scene looks like :cite:`Park.Liu.Wang.ea.2019`.
+  how the layout of a scene looks :cite:`Park.Liu.Wang.ea.2019`.
  
 * In many cases, a single GPU is insufficient to process
   the large amounts of data available for training.
@@ -1443,7 +1443,7 @@ that would be difficult to accomplish otherwise.
 For instance, mail is sorted using optical character recognition.
 These systems have been deployed since the 90s
 (this is, after all, the source of the famous MNIST and USPS sets of handwritten digits).
-The same applies to read checks for bank deposits and scoring
+The same applies to reading checks for bank deposits and scoring
 creditworthiness of applicants.
 Financial transactions are checked for fraud automatically.
 This forms the backbone of many e-commerce payment systems,

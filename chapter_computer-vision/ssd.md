@@ -69,7 +69,7 @@ convolutional layer remain unchanged.
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import autograd, contrib, gluon, image, init, np, npx
+from mxnet import autograd, gluon, image, init, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()

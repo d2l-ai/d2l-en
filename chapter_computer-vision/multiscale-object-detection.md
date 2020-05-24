@@ -9,7 +9,7 @@ To demonstrate how to generate anchor boxes on multiple scales, let us read an i
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import contrib, image, np, npx
+from mxnet import image, np, npx
 
 npx.set_np()
 

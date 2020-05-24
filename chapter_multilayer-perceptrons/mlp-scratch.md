@@ -92,7 +92,7 @@ def net(X):
 To ensure numerical stability,
 and because we already implemented
 the softmax function from scratch
-(:numref:`sec_softmax_scratch`),
+(:numref:`sec_softmax_scratch`)),
 we leverage Gluon's integrated function
 for calculating the softmax and cross-entropy loss.
 Recall our earlier discussion of these intricacies 

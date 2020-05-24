@@ -142,7 +142,7 @@ The first convolutional layer uses a kernel
 with a height and width of $5$, and then a $2$ pixels of padding 
 which compensates the reduction in its original shape.
 While the second convolutional layer applies the same shape of 
-$5 x 5$ kernel without padding, resulting in reductions 
+$5 \times 5$ kernel without padding, resulting in reductions 
 in both height and width by $4$ pixels.
 Moreover each pooling layer halves the height and width.
 However, as we go up the stack of layers,

@@ -73,7 +73,7 @@ and that each row in `labels` consists of a 1-dimensional target value (a scalar
 print('features:', features[0],'\nlabel:', labels[0])
 ```
 
-By generating a scatter plot using the second `features[:, 1]` and `labels`, 
+By generating a scatter plot using the second feature `features[:, 1]` and `labels`, 
 we can clearly observe the linear correlation between the two.
 
 ```{.python .input  n=18}
@@ -96,7 +96,7 @@ In the following code, we define a `data_iter` function
 to demonstrate one possible implementation of this functionality.
 The function takes a batch size, a design matrix,
 and a vector of labels, yielding minibatches of size `batch_size`.
-Each minibatch consists of an tuple of features and labels.
+Each minibatch consists of a tuple of features and labels.
 
 ```{.python .input  n=5}
 def data_iter(batch_size, features, labels):
