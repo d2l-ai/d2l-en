@@ -11,7 +11,7 @@ that weights take values from
 a Gaussian distribution with mean $0$.
 More intuitively, we might argue
 that we encouraged the model to spread out its weights
-among many features and rather than depending too much
+among many features rather than depending too much
 on a small number of potentially spurious associations.
 
 ## Overfitting Revisited
@@ -37,7 +37,7 @@ across different random samples of the data).
 
 Deep neural networks inhabit the opposite 
 end of the bias-variance spectrum.
-Unlike linear models, neural networks,
+Unlike linear models, neural networks
 are not confined to looking at each feature individually.
 They can learn interactions among groups of features.
 For example, they might infer that 
@@ -94,7 +94,7 @@ the (inverse) norm of the parameters
 represents another useful measure of simplicity.
 Another useful notion of simplicity is smoothness,
 i.e., that the function should not be sensitive
-to small changed to its inputs.
+to small changes to its inputs.
 For instance, when we classify images,
 we would expect that adding some random noise
 to the pixels should be mostly harmless.
@@ -379,7 +379,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 1. Increase the number of epochs and compare the results obtained when using dropout with those when not using it.
 1. What is the variance of the activations in each hidden layer when dropout is and is not applied? Draw a plot to show how this quantity evolves over time for both models. 
 1. Why is dropout not typically used at test time?
-1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What happens when dropout and weight decay are used at the same time? Are the results additive, are their diminish returns or (worse), do they cancel each other out?
+1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What happens when dropout and weight decay are used at the same time? Are the results additive, are there diminished returns or (worse), do they cancel each other out?
 1. What happens if we apply dropout to the individual weights of the weight matrix rather than the activations?
 1. Invent another technique for injecting random noise at each layer that is different from the standard dropout technique. Can you develop a method that outperforms dropout on the FashionMNIST dataset (for a fixed architecture)?
 
