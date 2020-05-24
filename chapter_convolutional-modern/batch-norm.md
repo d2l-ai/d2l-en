@@ -44,13 +44,14 @@ when training ML models and neural nets in particular.
    
 Batch normalization is applied to individual layers
 (optionally, to all of them) and works as follows:
-In each training iteration,
-for each layer, we first compute its activations as usual.
-Then, we normalize the activations of each node 
-by subtracting its mean and dividing by its standard deviation 
-estimating both quantities based on the statistics of the current minibatch.  
-It is precisely due to this *normalization* based on *batch* statistics 
-that *batch normalization* derives its name.
+In each training iteration, within each minibatch,
+we first normalize the inputs by subtracting its mean and 
+dividing by its standard error. 
+Next, we apply a scaling coefficient and a scaling offset 
+on the normalized inputs, for the purpose of easier training.
+Last, we compute the outputs by the given activation function.
+Due to the above *normalization* based on *batch* statistics, 
+*batch normalization* derives its name.
 
 Note that if we tried to apply BN with minibatches of size $1$, 
 we would not be able to learn anything.
