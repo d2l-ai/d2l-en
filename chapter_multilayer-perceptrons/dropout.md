@@ -1,7 +1,7 @@
 # Dropout
 :label:`sec_dropout`
 
-Just now, in :numref:`sec_weight_decay`,
+In :numref:`sec_weight_decay`,
 we introduced the classical approach
 to regularizing statistical models 
 by penalizing the $\ell_2$ norm of the weights.
@@ -84,11 +84,11 @@ suggests that to close the gap between
 train and test performance, 
 we should aim for a *simple* model.
 Simplicity can come in the form
-of a small number of dimensions,
-as we explored when discussing 
-linear models monomial basis functions
+of a small number of dimensions. We 
+explored this while discussing the
+monomial basis functions of linear models
 :numref:`sec_model_selection`.
-As we saw when discussing weight decay 
+Additionally, as we saw with weight decay 
 ($\ell_2$ regularization) :numref:`sec_weight_decay`,
 the (inverse) norm of the parameters 
 represents another useful measure of simplicity.
