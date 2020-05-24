@@ -5,13 +5,13 @@ Now that we have characterized
 multilayer perceptrons (MLPs) mathematically, 
 let us try to implement one ourselves.
 
-```{.python .input  n=1}
+```{.python .input}
 import d2l
 from mxnet import gluon, np, npx
 npx.set_np()
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab pytorch
 import d2l_pytorch as d2l
 import torch
@@ -25,12 +25,12 @@ we will continue work with
 the Fashion-MNIST image classification dataset 
 (:numref:`sec_fashion_mnist`).
 
-```{.python .input  n=2}
+```{.python .input}
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 #@tab pytorch
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
@@ -60,7 +60,7 @@ one weight matrix and one bias vector.
 As always, we call `attach_grad` to allocate memory
 for the gradients (of the loss) with respect to these parameters.
 
-```{.python .input  n=3}
+```{.python .input}
 num_inputs, num_outputs, num_hiddens = 784, 10, 256
 
 W1 = np.random.normal(scale=0.01, size=(num_inputs, num_hiddens))
@@ -73,7 +73,7 @@ for param in params:
     param.attach_grad()
 ```
 
-```{.python .input  n=15}
+```{.python .input}
 #@tab pytorch
 num_inputs, num_outputs, num_hiddens = 784, 10, 256
 
@@ -92,12 +92,12 @@ we will implement the ReLU activation ourselves
 using the `maximum` function rather than 
 invoking `npx.relu` directly.
 
-```{.python .input  n=4}
+```{.python .input}
 def relu(X):
     return np.maximum(X, 0)
 ```
 
-```{.python .input  n=16}
+```{.python .input}
 #@tab pytorch
 def relu(X):
     a=torch.zeros_like(X)
@@ -112,14 +112,14 @@ a flat vector of length  `num_inputs`.
 Finally, we implement our model 
 with just a few lines of code.
 
-```{.python .input  n=5}
+```{.python .input}
 def net(X):
     X = X.reshape(-1, num_inputs)
     H = relu(np.dot(X, W1) + b1)
     return np.dot(H, W2) + b2
 ```
 
-```{.python .input  n=17}
+```{.python .input}
 #@tab pytorch
 def net(X):
     X = X.reshape((-1, num_inputs))
@@ -141,11 +141,11 @@ We encourage the interested reader
 to examine the source code for `mxnet.gluon.loss.SoftmaxCrossEntropyLoss`
 to deepen their knowledge of implementation details.
 
-```{.python .input  n=6}
+```{.python .input}
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```
 
-```{.python .input  n=18}
+```{.python .input}
 #@tab pytorch
 loss = nn.CrossEntropyLoss()
 ```
@@ -160,13 +160,13 @@ we call the `train_ch3` function
 setting the number of epochs to $10$ 
 and the learning rate to $0.5$.
 
-```{.python .input  n=7}
+```{.python .input}
 num_epochs, lr = 10, 0.5
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
               lambda batch_size: d2l.sgd(params, lr, batch_size))
 ```
 
-```{.python .input  n=19}
+```{.python .input}
 #@tab pytorch
 num_epochs, lr = 10, 0.5
 updater = torch.optim.SGD(params, lr=lr)
@@ -176,11 +176,11 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
 To evaluate the learned model, 
 we apply it on some test data.
 
-```{.python .input  n=8}
+```{.python .input}
 d2l.predict_ch3(net, test_iter)
 ```
 
-```{.python .input  n=20}
+```{.python .input}
 #@tab pytorch
 d2l.predict_ch3(net, test_iter)
 ```
