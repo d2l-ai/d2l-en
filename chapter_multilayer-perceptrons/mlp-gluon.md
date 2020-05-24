@@ -11,6 +11,13 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+import d2l_pytorch as d2l
+import torch
+import torch.nn as nn
+```
+
 ## The Model
 
 As compared to our gluon implementation 
@@ -24,11 +31,29 @@ which contains *256* hidden units
 and applies the ReLU activation function.
 The second, is our output layer.
 
-```{.python .input  n=5}
+```{.python .input}
 net = nn.Sequential()
 net.add(nn.Dense(256, activation='relu'),
         nn.Dense(10))
 net.initialize(init.Normal(sigma=0.01))
+```
+
+```{.python .input}
+#@tab pytorch
+class Reshape(torch.nn.Module):
+    def forward(self, x):
+        return x.view(-1,784)
+    
+net = nn.Sequential(Reshape(),
+                    nn.Linear(784, 256),
+                    nn.ReLU(),
+                    nn.Linear(256, 10))
+
+def init_weights(m):
+    if type(m) == nn.Linear:
+        torch.nn.init.normal_(m.weight, std=0.01)
+
+net.apply(init_weights)
 ```
 
 Note that Gluon, as usual, automatically
@@ -40,11 +65,20 @@ This modularity enables us to separate
 matters concerning the model architecture
 from orthogonal considerations.
 
-```{.python .input  n=6}
+```{.python .input}
 batch_size, num_epochs = 256, 10
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.5})
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+```
+
+```{.python .input}
+#@tab pytorch
+num_epochs, lr, batch_size = 10, 0.5, 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+loss = nn.CrossEntropyLoss()
+trainer = torch.optim.SGD(net.parameters(), lr=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
