@@ -12,7 +12,7 @@ Given the fact that there is a lot of detail needed to manage learning rates, mo
 
 ## Toy Problem
 
-We begin with a toy problem that is cheap enough to compute easily, yet sufficiently nontrivial to illustrate some of the key aspects. For that we pick a slightly modernized version of LeNet (`relu` instead of `sigmoid` activation, MaxPooling rather than AveragePooling), as applied to Fashion MNIST. Moreover, we hybridize the network for performance. Since most of the code is standard we just introduce the basics without further detailed discussion. See :numref:`chap_cnn` for a refresher as needed.
+We begin with a toy problem that is cheap enough to compute easily, yet sufficiently nontrivial to illustrate some of the key aspects. For that we pick a slightly modernized version of LeNet (`relu` instead of `sigmoid` activation, MaxPooling rather than AveragePooling), as applied to Fashion-MNIST. Moreover, we hybridize the network for performance. Since most of the code is standard we just introduce the basics without further detailed discussion. See :numref:`chap_cnn` for a refresher as needed.
 
 ```{.python .input}
 %matplotlib inline
@@ -98,7 +98,7 @@ scheduler = SquareRootScheduler(lr=1.0)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
-Now let us see how this plays out for training on FashionMNIST. We simply provide the scheduler as an additional argument to the training algorithm.
+Now let us see how this plays out for training on Fashion-MNIST. We simply provide the scheduler as an additional argument to the training algorithm.
 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
