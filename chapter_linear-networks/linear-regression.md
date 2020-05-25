@@ -373,40 +373,10 @@ Since we will benchmark the running time frequently in this book,
 let us define a timer (hereafter accessed via the `d2l` package
 to track the running time.
 
-```{.python .input}
-# Saved in the d2l package for later use
-class Timer:
-    """Record multiple running times."""
-    def __init__(self):
-        self.times = []
-        self.start()
-
-    def start(self):
-        # Start the timer
-        self.tik = time.time()
-
-    def stop(self):
-        # Stop the timer and record the time in a list
-        self.times.append(time.time() - self.tik)
-        return self.times[-1]
-
-    def avg(self):
-        # Return the average time
-        return sum(self.times) / len(self.times)
-
-    def sum(self):
-        # Return the sum of time
-        return sum(self.times)
-
-    def cumsum(self):
-        # Return the accumulated times
-        return np.array(self.times).cumsum().tolist()
-```
 
 ```{.python .input}
-#@tab pytorch
-# Saved in the d2l_pytorch package for later use
-class Timer:
+#@tab all
+class Timer:  #@save
     """Record multiple running times."""
     def __init__(self):
         self.times = []
@@ -619,12 +589,12 @@ in the next chapter on multilayer perceptrons.
 ### Biology
 
 Since linear regression (invented in 1795)
-predates computational neuroscience, 
+predates computational neuroscience,
 it might seem anachronistic to describe
 linear regression as a neural network.
 To see why linear models were a natural place to begin
 when the cyberneticists/neurophysiologists
-Warren McCulloch and Walter Pitts began to develop 
+Warren McCulloch and Walter Pitts began to develop
 models of artificial neurons,
 consider the cartoonish picture
 of a biological neuron in :numref:`fig_Neuron`, consisting of

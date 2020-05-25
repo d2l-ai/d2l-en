@@ -40,20 +40,20 @@ according to a linear model with additive noise.
 Out task will be to recover this model's parameters
 using the finite set of examples contained in our dataset.
 We will keep the data low-dimensional so we can visualize it easily.
-In the following code snippet, we generated a dataset 
+In the following code snippet, we generated a dataset
 containing $1000$ examples, each consisting of $2$ features
 sampled from a standard normal distribution.
 Thus our synthetic dataset will be an object
 $\mathbf{X}\in \mathbb{R}^{1000 \times 2}$.
 
-The true parameters generating our data will be 
+The true parameters generating our data will be
 $\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$
-and our synthetic labels will be assigned according 
+and our synthetic labels will be assigned according
 to the following linear model with noise term $\epsilon$:
 
 $$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon.$$
 
-You could think of $\epsilon$ as capturing potential 
+You could think of $\epsilon$ as capturing potential
 measurement errors on the features and labels.
 We will assume that the standard assumptions hold and thus
 that $\epsilon$ obeys a normal distribution with mean of $0$.
@@ -61,8 +61,7 @@ To make our problem easy, we will set its standard deviation to $0.01$.
 The following code generates our synthetic dataset:
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def synthetic_data(w, b, num_examples):
+def synthetic_data(w, b, num_examples):  #@save
     """Generate y = X w + b + noise."""
     X = np.random.normal(0, 1, (num_examples, len(w)))
     y = np.dot(X, w) + b
@@ -76,8 +75,7 @@ features, labels = synthetic_data(true_w, true_b, 1000)
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def synthetic_data(w, b, num_examples):
+def synthetic_data(w, b, num_examples):  #@save
     """Generate y = X w + b + noise."""
     X = torch.zeros(size=(num_examples, len(w))).normal_()
     y = torch.matmul(X, w) + b
@@ -89,7 +87,7 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
-Note that each row in `features` consists of a 2-dimensional data point 
+Note that each row in `features` consists of a 2-dimensional data point
 and that each row in `labels` consists of a 1-dimensional target value (a scalar).
 
 ```{.python .input}
@@ -101,7 +99,7 @@ print('features:', features[0],'\nlabel:', labels[0])
 print('features:', features[0],'\nlabel:', labels[0])
 ```
 
-By generating a scatter plot using the second feature `features[:, 1]` and `labels`, 
+By generating a scatter plot using the second feature `features[:, 1]` and `labels`,
 we can clearly observe the linear correlation between the two.
 
 ```{.python .input}
@@ -117,16 +115,16 @@ d2l.plt.scatter(features[:, 1].numpy(), labels.numpy(), 1);
 
 ## Reading the Dataset
 
-Recall that training models consists of 
-making multiple passes over the dataset, 
+Recall that training models consists of
+making multiple passes over the dataset,
 grabbing one minibatch of examples at a time,
-and using them to update our model. 
-Since this process is so fundamental 
-to training machine learning algorithms, 
-its worth defining a utility function 
+and using them to update our model.
+Since this process is so fundamental
+to training machine learning algorithms,
+its worth defining a utility function
 to shuffle the data and access it in minibatches.
 
-In the following code, we define a `data_iter` function 
+In the following code, we define a `data_iter` function
 to demonstrate one possible implementation of this functionality.
 The function takes a batch size, a design matrix,
 and a vector of labels, yielding minibatches of size `batch_size`.
@@ -187,7 +185,7 @@ for X, y in data_iter(batch_size, features, labels):
     break
 ```
 
-As we run the iterator, we obtain distinct minibatches 
+As we run the iterator, we obtain distinct minibatches
 successively until all the data has been exhausted (try this).
 While the iterator implemented above is good for didactic purposes,
 it is inefficient in ways that might get us in trouble on real problems.
@@ -217,7 +215,7 @@ b = torch.zeros(1)
 ```
 
 Now that we have initialized our parameters,
-our next task is to update them until 
+our next task is to update them until
 they fit our data sufficiently well.
 Each update requires taking the gradient
 (a multi-dimensional derivative)
@@ -259,40 +257,36 @@ Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def linreg(X, w, b):
+def linreg(X, w, b):  #@save
     return np.dot(X, w) + b
 ```
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def linreg(X, w, b):
+def linreg(X, w, b):  #@save
     return torch.matmul(X, w) + b
 ```
 
 ## Defining the Loss Function
 
-Since updating our model requires taking 
+Since updating our model requires taking
 the gradient of our loss function,
 we ought to define the loss function first.
 Here we will use the squared loss function
 as described in the previous section.
-In the implementation, we need to transform the true value `y` 
+In the implementation, we need to transform the true value `y`
 into the predicted value's shape `y_hat`.
 The result returned by the following function
 will also be the same as the `y_hat` shape.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def squared_loss(y_hat, y):
+def squared_loss(y_hat, y):  #@save
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def squared_loss(y_hat, y):
+def squared_loss(y_hat, y):  #@save
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
 
@@ -321,16 +315,14 @@ so that the magnitude of a typical step size
 does not depend heavily on our choice of the batch size.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def sgd(params, lr, batch_size):
+def sgd(params, lr, batch_size):  #@save
     for param in params:
         param[:] = param - lr * param.grad / batch_size
 ```
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def sgd(params, lr, batch_size):
+def sgd(params, lr, batch_size):  #@save
     for param in params:
         param.data.sub_(lr*param.grad/batch_size)
         param.grad.data.zero_()
@@ -347,7 +339,7 @@ over and over again throughout your career in deep learning.
 In each iteration, we will grab minibatches of models,
 first passing them through our model to obtain a set of predictions.
 After calculating the loss, we call the `backward` function
-to initiate the backwards pass through the network, 
+to initiate the backwards pass through the network,
 storing the gradients with respect to each parameter
 in its corresponding `.grad` attribute.
 Finally, we will call the optimization algorithm `sgd`
@@ -373,8 +365,8 @@ we will iterate through the entire dataset
 (using the `data_iter` function) once
 passing through every examples in the training dataset
 (assuming the number of examples is divisible by the batch size).
-The number of epochs `num_epochs` and the learning rate `lr` are both hyper-parameters, 
-which we set here to $3$ and $0.03$, respectively. 
+The number of epochs `num_epochs` and the learning rate `lr` are both hyper-parameters,
+which we set here to $3$ and $0.03$, respectively.
 Unfortunately, setting hyper-parameters is tricky
 and requires some adjustment by trial and error.
 We elide these details for now but revise them
@@ -423,10 +415,10 @@ for epoch in range(num_epochs):
 ```
 
 In this case, because we synthesized the data ourselves,
-we know precisely what the true parameters are. 
-Thus, we can evaluate our success in training 
+we know precisely what the true parameters are.
+Thus, we can evaluate our success in training
 by comparing the true parameters
-with those that we learned through our training loop. 
+with those that we learned through our training loop.
 Indeed they turn out to be very close to each other.
 
 ```{.python .input}
@@ -446,8 +438,8 @@ This only happens for a special category problems:
 strongly convex optimization problems with "enough" data to ensure
 that the noisy samples allow us to recover the underlying dependency.
 In most cases this is *not* the case.
-In fact, the parameters of a deep network 
-are rarely the same (or even close) between two different runs, 
+In fact, the parameters of a deep network
+are rarely the same (or even close) between two different runs,
 unless all conditions are identical,
 including the order in which the data is traversed.
 However, in machine learning, we are typically less concerned
@@ -456,7 +448,7 @@ and more concerned with parameters that lead to accurate prediction.
 Fortunately, even on difficult optimization problems,
 stochastic gradient descent can often find remarkably good solutions,
 owing partly to the fact that, for deep networks,
-there exist many configurations of the parameters 
+there exist many configurations of the parameters
 that lead to accurate prediction.
 
 ## Summary

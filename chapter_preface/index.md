@@ -308,7 +308,7 @@ the following packages and modules as dependencies:
 :end_tab:
 
 ```{.python .input  n=1}
-# Saved in the d2l package for later use
+#@save
 import collections
 from collections import defaultdict
 from IPython import display
@@ -325,11 +325,13 @@ import sys
 import tarfile
 import time
 import zipfile
+
+d2l = sys.modules[__name__]
 ```
 
 ```{.python .input  n=1}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
+#@save
 import sys
 import collections
 from collections import defaultdict

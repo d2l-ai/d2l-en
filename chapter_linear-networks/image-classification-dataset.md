@@ -2,13 +2,13 @@
 :label:`sec_fashion_mnist`
 
 In :numref:`sec_naive_bayes`, we trained a naive Bayes classifier,
-using the MNIST dataset introduced in 1998 :cite:`LeCun.Bottou.Bengio.ea.1998`. 
-While MNIST had a good run as a benchmark dataset, 
+using the MNIST dataset introduced in 1998 :cite:`LeCun.Bottou.Bengio.ea.1998`.
+While MNIST had a good run as a benchmark dataset,
 even simple models by today's standards achieve classification accuracy over 95%
-making it unsuitable for distinguishing between stronger models and weaker ones. 
+making it unsuitable for distinguishing between stronger models and weaker ones.
 Today, MNIST serves as more of sanity checks than as a benchmark.
 To up the ante just a bit, we will focus our discussion in the coming sections
-on the qualitatively similar, but comparatively complex Fashion-MNIST 
+on the qualitatively similar, but comparatively complex Fashion-MNIST
 dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017.
 
 ```{.python .input}
@@ -35,7 +35,7 @@ d2l.use_svg_display()
 ## Getting the Dataset
 
 Just as with MNIST, Gluon makes it easy to download and load the FashionMNIST dataset into memory via the `FashionMNIST` class contained in `gluon.data.vision`.
-We briefly work through the mechanics of loading and exploring the dataset below. 
+We briefly work through the mechanics of loading and exploring the dataset below.
 Please refer to :numref:`sec_naive_bayes` for more details on loading data.
 
 ```{.python .input}
@@ -53,9 +53,9 @@ mnist_train = torchvision.datasets.FashionMNIST(root="./", train=True, transform
 mnist_test = torchvision.datasets.FashionMNIST(root="./", train=False, transform=trans, target_transform=None, download=True)
 ```
 
-FashionMNIST consists of images from 10 categories, each represented 
-by 6k images in the training set and by 1k in the test set. 
-Consequently the training set and the test set 
+FashionMNIST consists of images from 10 categories, each represented
+by 6k images in the training set and by 1k in the test set.
+Consequently the training set and the test set
 contain 60k and 10k images, respectively.
 
 ```{.python .input}
@@ -67,22 +67,13 @@ len(mnist_train), len(mnist_test)
 len(mnist_train), len(mnist_test)
 ```
 
-The images in Fashion-MNIST are associated with the following categories: 
-t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag and ankle boot. 
+The images in Fashion-MNIST are associated with the following categories:
+t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag and ankle boot.
 The following function converts between numeric label indices and their names in text.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def get_fashion_mnist_labels(labels):
-    text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
-                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
-    return [text_labels[int(i)] for i in labels]
-```
-
-```{.python .input}
-#@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def get_fashion_mnist_labels(labels):
+#@tab all
+def get_fashion_mnist_labels(labels):  #@save
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
@@ -91,8 +82,7 @@ def get_fashion_mnist_labels(labels):
 We can now create a function to visualize these examples.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
@@ -108,8 +98,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
@@ -140,24 +129,24 @@ show_images(X.reshape(18, 28, 28), 2, 9, titles=get_fashion_mnist_labels(y));
 ## Reading a Minibatch
 
 To make our life easier when reading from the training and test sets,
-we use a `DataLoader` rather than creating one from scratch, 
-as we did in :numref:`sec_linear_scratch`. 
-Recall that at each iteration, a `DataLoader` 
+we use a `DataLoader` rather than creating one from scratch,
+as we did in :numref:`sec_linear_scratch`.
+Recall that at each iteration, a `DataLoader`
 reads a minibatch of data with size `batch_size` each time.
 
-During training, reading data can be a significant performance bottleneck, 
-especially when our model is simple or when our computer is fast. 
-A handy feature of Gluon's `DataLoader` is the ability 
+During training, reading data can be a significant performance bottleneck,
+especially when our model is simple or when our computer is fast.
+A handy feature of Gluon's `DataLoader` is the ability
 to use multiple processes to speed up data reading.
 For instance, we can set aside 4 processes to read the data (via `num_workers`).
 Because this feature is not currently supported on Windows
 the following code checks the platform to make sure
-that we do not saddle our Windows-using friends 
+that we do not saddle our Windows-using friends
 with error messages later on.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def get_dataloader_workers(num_workers=4):
+#@tab all
+def get_dataloader_workers(num_workers=4):  #@save
     # 0 means no additional process is used to speed up the reading of data.
     if sys.platform.startswith('win'):
         return 0
@@ -165,26 +154,15 @@ def get_dataloader_workers(num_workers=4):
         return num_workers
 ```
 
-```{.python .input}
-#@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def get_dataloader_workers(num_workers=4):
-    # 0 means no additional process is used to speed up the reading of data.
-    if sys.platform.startswith('win'):
-        return 0
-    else:
-        return num_workers
-```
-
-Below, we convert the image data from uint8 to 32-bit 
+Below, we convert the image data from uint8 to 32-bit
 floating point numbers using the `ToTensor` class.
-Additionally, the transformer will divide all numbers by 255 
-so that all pixels have values between 0 and 1. 
-The `ToTensor` class also moves the image channel 
-from the last dimension to the first dimension 
-to facilitate the convolutional neural network calculations introduced later. 
-Through the `transform_first` function of the dataset, 
-we apply the transformation of `ToTensor` 
+Additionally, the transformer will divide all numbers by 255
+so that all pixels have values between 0 and 1.
+The `ToTensor` class also moves the image channel
+from the last dimension to the first dimension
+to facilitate the convolutional neural network calculations introduced later.
+Through the `transform_first` function of the dataset,
+we apply the transformation of `ToTensor`
 to the first element of each instance (image and label).
 
 ```{.python .input}
@@ -218,16 +196,15 @@ for X, y in train_iter:
 '%.2f sec' % timer.stop()
 ```
 
-## Putting All Things Together 
+## Putting All Things Together
 
-Now we define the `load_data_fashion_mnist` function 
-that obtains and reads the Fashion-MNIST dataset. 
-It returns the data iterators for both the training set and validation set. 
+Now we define the `load_data_fashion_mnist` function
+that obtains and reads the Fashion-MNIST dataset.
+It returns the data iterators for both the training set and validation set.
 In addition, it accepts an optional argument to resize images to another shape.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def load_data_fashion_mnist(batch_size, resize=None):
+def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     dataset = gluon.data.vision
     trans = [dataset.transforms.Resize(resize)] if resize else []
@@ -243,13 +220,12 @@ def load_data_fashion_mnist(batch_size, resize=None):
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def load_data_fashion_mnist(batch_size, resize=None):
+def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     trans = [transforms.Resize(resize)] if resize else []
     trans.append(transforms.ToTensor())
     trans = transforms.Compose(trans)
-    
+
     mnist_train = torchvision.datasets.FashionMNIST(root="./", train=True, transform=trans, target_transform=None, download=True)
     mnist_test = torchvision.datasets.FashionMNIST(root="./", train=False, transform=trans, target_transform=None, download=True)
     return (DataLoader(mnist_train, batch_size, shuffle=True,
@@ -279,7 +255,7 @@ We are now ready to work with the FashionMNIST dataset in the sections that foll
 
 ## Summary
 
-* Fashion-MNIST is an apparel classification dataset consisting of images representing 10 categories. 
+* Fashion-MNIST is an apparel classification dataset consisting of images representing 10 categories.
  * We will use this dataset in subsequent sections and chapters to evaluate various classification algorithms.
 * We store the shape of each image with height $h$ width $w$ pixels as $h \times w$ or `(h, w)`.
 * Data iterators are a key component for efficient performance. Rely on well-implemented iterators that exploit multi-threading to avoid slowing down your training loop.

@@ -104,17 +104,7 @@ Though this experiment is not a mathematical proof,
 we will see later that the derivative $u'$ is $2$ when $x=1$.
 
 ```{.python .input}
-def numerical_lim(f, x, h):
-    return (f(x + h) - f(x)) / h
-
-h = 0.1
-for i in range(5):
-    print('h=%.5f, numerical limit=%.5f' % (h, numerical_lim(f, 1, h)))
-    h *= 0.1
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 def numerical_lim(f, x, h):
     return (f(x + h) - f(x)) / h
 
@@ -173,16 +163,8 @@ In the following,
 the `use_svg_display` function specifies the `matplotlib` package to output the svg figures for sharper images.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def use_svg_display():
-    """Use the svg format to display a plot in Jupyter."""
-    display.set_matplotlib_formats('svg')
-```
-
-```{.python .input}
-#@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def use_svg_display():
+#@tab all
+def use_svg_display():  #@save
     """Use the svg format to display a plot in Jupyter."""
     display.set_matplotlib_formats('svg')
 ```
@@ -190,17 +172,8 @@ def use_svg_display():
 We define the `set_figsize` function to specify the figure sizes. Note that here we directly use `d2l.plt` since the import statement `from matplotlib import pyplot as plt` has been marked for being saved in the `d2l` package in the preface.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def set_figsize(figsize=(3.5, 2.5)):
-    """Set the figure size for matplotlib."""
-    use_svg_display()
-    d2l.plt.rcParams['figure.figsize'] = figsize
-```
-
-```{.python .input}
-#@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def set_figsize(figsize=(3.5, 2.5)):
+#@tab all
+def set_figsize(figsize=(3.5, 2.5)):  #@save
     """Set the figure size for matplotlib."""
     use_svg_display()
     d2l.plt.rcParams['figure.figsize'] = figsize
@@ -208,25 +181,10 @@ def set_figsize(figsize=(3.5, 2.5)):
 
 The following `set_axes` function sets properties of axes of figures produced by `matplotlib`.
 
-```{.python .input}
-# Saved in the d2l package for later use
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
-    """Set the axes for matplotlib."""
-    axes.set_xlabel(xlabel)
-    axes.set_ylabel(ylabel)
-    axes.set_xscale(xscale)
-    axes.set_yscale(yscale)
-    axes.set_xlim(xlim)
-    axes.set_ylim(ylim)
-    if legend:
-        axes.legend(legend)
-    axes.grid()
-```
 
 ```{.python .input}
-#@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
+#@tab all
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):  #@save
     """Set the axes for matplotlib."""
     axes.set_xlabel(xlabel)
     axes.set_ylabel(ylabel)
@@ -244,43 +202,10 @@ we define the `plot` function
 to plot multiple curves succinctly
 since we will need to visualize many curves throughout the book.
 
-```{.python .input}
-# Saved in the d2l package for later use
-def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
-         ylim=None, xscale='linear', yscale='linear',
-         fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
-    """Plot data points."""
-    if legend is None:
-        legend = []
-
-    set_figsize(figsize)
-    axes = axes if axes else d2l.plt.gca()
-
-    # Return True if X (ndarray or list) has 1 axis
-    def has_one_axis(X):
-        return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
-                and not hasattr(X[0], "__len__"))
-
-    if has_one_axis(X):
-        X = [X]
-    if Y is None:
-        X, Y = [[]] * len(X), X
-    elif has_one_axis(Y):
-        Y = [Y]
-    if len(X) != len(Y):
-        X = X * len(Y)
-    axes.cla()
-    for x, y, fmt in zip(X, Y, fmts):
-        if len(x):
-            axes.plot(x, y, fmt)
-        else:
-            axes.plot(y, fmt)
-    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
-```
 
 ```{.python .input}
-#@tab pytorch
-# Saved in the d2l_pytorch package for later use
+#@tab all
+#@save
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
@@ -316,12 +241,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
 Now we can plot the function $u = f(x)$ and its tangent line $y = 2x - 3$ at $x=1$, where the coefficient $2$ is the slope of the tangent line.
 
 ```{.python .input}
-x = np.arange(0, 3, 0.1)
-plot(x, [f(x), 2 * x - 3], 'x', 'f(x)', legend=['f(x)', 'Tangent line (x=1)'])
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 x = np.arange(0, 3, 0.1)
 plot(x, [f(x), 2 * x - 3], 'x', 'f(x)', legend=['f(x)', 'Tangent line (x=1)'])
 ```

@@ -270,8 +270,7 @@ The result is an `ndarray` containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def accuracy(y_hat, y):
+def accuracy(y_hat, y):  #@save
     if y_hat.shape[1] > 1:
         return float((y_hat.argmax(axis=1).astype('float32') == y.astype(
             'float32')).sum())
@@ -281,8 +280,7 @@ def accuracy(y_hat, y):
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def accuracy(y_hat, y):
+def accuracy(y_hat, y):  #@save
     if y_hat.shape[1] > 1:
         return float((y_hat.argmax(axis=1).type(torch.float32) == y.type(torch.float32)).sum())
     else:
@@ -315,8 +313,7 @@ Similarly, we can evaluate the accuracy for model `net` on the dataset
 (accessed via `data_iter`).
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def evaluate_accuracy(net, data_iter):
+def evaluate_accuracy(net, data_iter):  #@save
     metric = Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         metric.add(accuracy(net(X), y), y.size)
@@ -325,8 +322,7 @@ def evaluate_accuracy(net, data_iter):
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def evaluate_accuracy(net, data_iter):
+def evaluate_accuracy(net, data_iter):  #@save
     metric = Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         metric.add(accuracy(net(X), y), y.numpy().size)
@@ -336,27 +332,8 @@ def evaluate_accuracy(net, data_iter):
 Here `Accumulator` is a utility class to accumulate sums over multiple numbers.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-class Accumulator:
-    """Sum a list of numbers over time."""
-
-    def __init__(self, n):
-        self.data = [0.0] * n
-
-    def add(self, *args):
-        self.data = [a+float(b) for a, b in zip(self.data, args)]
-
-    def reset(self):
-        self.data = [0.0] * len(self.data)
-
-    def __getitem__(self, idx):
-        return self.data[idx]
-```
-
-```{.python .input}
-#@tab pytorch
-# Saved in the d2l_pytorch package for later use
-class Accumulator:
+#@tab all
+class Accumulator:  #@save
     """Sum a list of numbers over time."""
 
     def __init__(self, n):
@@ -397,8 +374,7 @@ which accepts the batch size as an argument.
 It can be either a wrapper of `d2l.sgd` or a Gluon trainer.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def train_epoch_ch3(net, train_iter, loss, updater):
+def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     if isinstance(updater, gluon.Trainer):
         updater = updater.step
@@ -416,8 +392,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def train_epoch_ch3(net, train_iter, loss, updater):
+def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     pt_optimizer=False
     if isinstance(updater, torch.optim.Optimizer):
@@ -431,7 +406,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
             l.backward()
             updater.step()
             # When using the concise implementation and pytorch's in house
-            # CrossEntropyLoss, it uses mean as reduction method over 
+            # CrossEntropyLoss, it uses mean as reduction method over
             # crossentropy. Thus we need to scale the loss back, to get l_sum.
             l_sum = float(l)*len(y)
             metric.add(l_sum, float(accuracy(y_hat, y)), len(y))
@@ -449,52 +424,8 @@ we define a utility class that draws data in animation.
 Again, it aims to simplify the code in later chapters.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-class Animator:
-    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
-                 ylim=None, xscale='linear', yscale='linear', fmts=None,
-                 nrows=1, ncols=1, figsize=(3.5, 2.5)):
-        """Incrementally plot multiple lines."""
-        if legend is None:
-            legend = []
-        d2l.use_svg_display()
-        self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
-        if nrows * ncols == 1:
-            self.axes = [self.axes, ]
-        # Use a lambda to capture arguments
-        self.config_axes = lambda: d2l.set_axes(
-            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
-        self.X, self.Y, self.fmts = None, None, fmts
-
-    def add(self, x, y):
-        """Add multiple data points into the figure."""
-        if not hasattr(y, "__len__"):
-            y = [y]
-        n = len(y)
-        if not hasattr(x, "__len__"):
-            x = [x] * n
-        if not self.X:
-            self.X = [[] for _ in range(n)]
-        if not self.Y:
-            self.Y = [[] for _ in range(n)]
-        if not self.fmts:
-            self.fmts = ['-'] * n
-        for i, (a, b) in enumerate(zip(x, y)):
-            if a is not None and b is not None:
-                self.X[i].append(a)
-                self.Y[i].append(b)
-        self.axes[0].cla()
-        for x, y, fmt in zip(self.X, self.Y, self.fmts):
-            self.axes[0].plot(x, y, fmt)
-        self.config_axes()
-        display.display(self.fig)
-        display.clear_output(wait=True)
-```
-
-```{.python .input}
-#@tab pytorch
-# Saved in the d2l_pytorch package for later use
-class Animator:
+#@tab all
+class Animator:  #@save
     def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
                  nrows=1, ncols=1, figsize=(3.5, 2.5)):
@@ -538,7 +469,7 @@ class Animator:
 The training function then runs multiple epochs and visualize the training progress.
 
 ```{.python .input}
-# Saved in the d2l package for later use
+#@save
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
                         ylim=[0.3, 0.9],
@@ -551,7 +482,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
+#@save
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
                         ylim=[0.3, 0.9],

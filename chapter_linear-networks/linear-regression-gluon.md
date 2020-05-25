@@ -58,8 +58,7 @@ we want the `DataLoader` to shuffle the data
 on each epoch (pass through the dataset).
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def load_array(data_arrays, batch_size, is_train=True):
+def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a Gluon data loader"""
     dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
@@ -70,8 +69,7 @@ data_iter = load_array((features, labels), batch_size)
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def load_array(data_arrays, batch_size, is_train=True):
+def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data loader"""
     dataset = TensorDataset(*data_arrays)
     dataloader = DataLoader(dataset, batch_size, shuffle=is_train)
@@ -262,7 +260,7 @@ trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})
 
 ```{.python .input}
 #@tab pytorch
-trainer = torch.optim.SGD(net.parameters(), lr = 0.03) 
+trainer = torch.optim.SGD(net.parameters(), lr = 0.03)
 ```
 
 ## Training
@@ -304,14 +302,14 @@ for epoch in range(1, num_epochs + 1):
 ```{.python .input}
 #@tab pytorch
 num_epochs = 3
-for epoch in range(1, num_epochs + 1): 
+for epoch in range(1, num_epochs + 1):
     for X, y in data_iter:
         l = loss(net(X) ,y)
-        trainer.zero_grad() 
-        l.backward() 
+        trainer.zero_grad()
+        l.backward()
         trainer.step()
-    l = loss(net(features), labels) 
-    print('epoch {}, loss {}'.format(epoch, l)) 
+    l = loss(net(features), labels)
+    print('epoch {}, loss {}'.format(epoch, l))
 ```
 
 Below, we compare the model parameters learned by training on finite data
