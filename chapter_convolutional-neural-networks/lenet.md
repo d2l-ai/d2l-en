@@ -54,7 +54,7 @@ Note that while ReLUs and max-pooling work better,
 these discoveries had not yet been made in the 90s. 
 Each convolutional layer uses a $5\times 5$ kernel
 and a sigmoid activation function.
-These layers maps spatially arranged inputs
+These layers map spatially arranged inputs
 to a number of 2D feature maps, typically 
 increasing the number of channels.
 The first convolutional layer has 6 output channels,
@@ -191,7 +191,7 @@ prior to making the forward and backward passes.
 
 The training function `train_ch6` is also similar 
 to `train_ch3` defined in :numref:`sec_softmax_scratch`. 
-Since we will be implement networks with many layers 
+Since we will be implementing networks with many layers 
 going forward, we will rely primarily on Gluon.
 The following train function assumes a Gluon model 
 as input and is optimized accordingly. 
