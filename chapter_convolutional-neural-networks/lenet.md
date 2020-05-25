@@ -1,96 +1,90 @@
 # Convolutional Neural Networks (LeNet)
 :label:`sec_lenet`
 
-We are now ready to put all of the tools together
-to deploy your first fully-functional convolutional neural network.
-In our first encounter with image data we applied a multilayer perceptron (:numref:`sec_mlp_scratch`)
+We now have all the ingredients required to assemble
+a fully-functional convolutional neural network.
+In our first encounter with image data,
+we applied a multilayer perceptron (:numref:`sec_mlp_scratch`)
 to pictures of clothing in the Fashion-MNIST dataset.
-Each image in Fashion-MNIST consisted of
-a two-dimensional $28 \times 28$ matrix.
-To make this data amenable to multilayer perceptrons
-which anticipate receiving inputs as one-dimensional fixed-length vectors,
-we first flattened each image, yielding vectors of length 784,
-before processing them with a series of fully-connected layers.
+To make this data amenable to multilayer perceptrons,
+we first flattened each image from a $28\times28$ matrix
+into a fixed-length $784$-dimensional vector,
+and thereafter processed them with fully-connected layers.
+Now that we have a handle on convolutional layers,
+we can retain the spatial structure in our images.
+As an additional benefit of replacing dense layers with convolutional layers, 
+we will enjoy more parsimonious models (requiring far fewer parameters).
 
-Now that we have introduced convolutional layers,
-we can keep the image in its original spatially-organized grid,
-processing it with a series of successive convolutional layers.
-Moreover, because we are using convolutional layers,
-we can enjoy a considerable savings in the number of parameters required.
-
-In this section, we will introduce one of the first
-published convolutional neural networks
-whose benefit was first demonstrated by Yann Lecun,
+In this section, we will introduce LeNet,
+among the first published convolutional neural networks
+to capture wide attention for its performance on computer vision tasks.
+The model was introduced (and named for) Yann Lecun,
 then a researcher at AT&T Bell Labs,
-for the purpose of recognizing handwritten digits in images—[LeNet5](http://yann.lecun.com/exdb/lenet/).
-In the 90s, their experiments with LeNet gave the first compelling evidence
-that it was possible to train convolutional neural networks
-by backpropagation.
-Their model achieved outstanding results (only matched by Support Vector Machines at the time)
-and was adopted to recognize digits for processing deposits in ATM machines.
-Some ATMs still run the code
+for the purpose of recognizing handwritten digits in images 
+[LeNet5](http://yann.lecun.com/exdb/lenet/).
+This work represented the culmination
+of a decade of research developing the technology.
+In 1989, LeCun published the first study to successfully
+train convolutional neural networks via backpropagation. 
+
+
+At the time LeNet achieved outstanding results 
+matching the performance of Support Vector Machines (SVMs),
+then a dominant approach in supervised learning.
+LeNet was eventually adapted to recognize digits 
+for processing deposits in ATM machines.
+To this day, some ATMs still run the code 
 that Yann and his colleague Leon Bottou wrote in the 1990s!
+
 
 ## LeNet
 
-In a rough sense, we can think LeNet as consisting of two parts:
-(i) a block of convolutional layers; and
-(ii) a block of fully-connected layers.
-Before getting into the weeds, let us briefly review the model in :numref:`img_lenet`.
+At a high level, LeNet consists of three parts:
+(i) a convolutional encoder consisting of two convolutional layers; and
+(ii) a dense block consisting of three fully-connected layers;
+The architecture is summarized in :numref:`img_lenet`.
 
 ![Data flow in LeNet 5. The input is a handwritten digit, the output a probability over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
 
-The basic units in the convolutional block are a convolutional layer
-and a subsequent average pooling layer
-(note that max-pooling works better,
-but it had not been invented in the 90s yet).
-The convolutional layer is used to recognize
-the spatial patterns in the image,
-such as lines and the parts of objects,
-and the subsequent average pooling layer
-is used to reduce the dimensionality.
-The convolutional layer block is composed of
-repeated stacks of these two basic units.
+The basic units in each convolutional block 
+are a convolutional layer, a sigmoid activation function,
+and a subsequent average pooling operation.
+Note that while ReLUs and max-pooling work better,
+these discoveries had not yet been made in the 90s. 
 Each convolutional layer uses a $5\times 5$ kernel
-and processes each output with a sigmoid activation function
-(again, note that ReLUs are now known to work more reliably,
-but had not been invented yet).
+and a sigmoid activation function.
+These layers maps spatially arranged inputs
+to a number of 2D feature maps, typically 
+increasing the number of channels.
 The first convolutional layer has 6 output channels,
-and second convolutional layer increases channel depth further to 16.
-
-However, coinciding with this increase in the number of channels,
-the height and width are shrunk considerably.
-Therefore, increasing the number of output channels
-makes the parameter sizes of the two convolutional layers similar.
-The two average pooling layers are of size $2\times 2$ and take stride 2
-(note that this means they are non-overlapping).
-In other words, the pooling layer downsamples the representation
-to be precisely *one quarter* the pre-pooling size.
-
+while th second has 16.
+Each $2\times2$ pooling operation (stride 2) 
+reduces dimensionality by a factor of $4$ via spatial downsampling.
 The convolutional block emits an output with size given by
 (batch size, channel, height, width).
-Before we can pass the convolutional block's output
-to the fully-connected block, we must flatten
-each example in the minibatch.
-In other words, we take this 4D input and transform it into the 2D
-input expected by fully-connected layers:
-as a reminder, the first dimension indexes the examples in the minibatch
-and the second gives the flat vector representation of each example.
+
+In order to pass output from the convolutional block
+to the fully-connected block, 
+we must flatten each example in the minibatch.
+In other words, we take this 4D input and transform it
+into the 2D input expected by fully-connected layers:
+as a reminder, the 2D representation that we desire
+has uses the first dimension to index examples in the minibatch
+and the second to give the flat vector representation of each example.
 LeNet's fully-connected layer block has three fully-connected layers,
 with 120, 84, and 10 outputs, respectively.
 Because we are still performing classification,
-the 10 dimensional output layer corresponds
+the 10-dimensional output layer corresponds
 to the number of possible output classes.
 
-While getting to the point
-where you truly understand
-what is going on inside LeNet
-may have taken a bit of work,
-you can see below that implementing it
-in a modern deep learning library
-is remarkably simple.
-Again, we will rely on the Sequential class.
+While getting to the point where you truly understand
+what is going on inside LeNet may have taken a bit of work,
+hopefully the following code snippet will convince you
+that implementing such models with modern deep learning libraries 
+is remarkably simple. 
+We need only to instantiate a `Sequential` Block 
+and chain together the appropriate layers.
 
 ```{.python .input}
 import d2l
@@ -111,21 +105,17 @@ net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
         nn.Dense(10))
 ```
 
-As compared to the original network,
-we took the liberty of replacing
-the Gaussian activation in the last layer
-by a regular dense layer, which tends to be
-significantly more convenient to train.
+We took a small liberty with the original model,
+removing the Gaussian activation in the final layer.
 Other than that, this network matches
-the historical definition of LeNet5.
+the original LeNet5 architecture.
 
-Next, let us take a look of an example.
-As shown in :numref:`img_lenet_vert`, we feed 
-a single-channel example
-of size $28 \times 28$ into the network
-and perform a forward computation layer by layer
-printing the output shape at each layer
-to make sure we understand what is happening here.
+By passing a single-channel (black and white)
+$28 \times 28$ image through the net
+and printing the output shape at each layer,
+we can inspect the model to make sure 
+that its operations line up with 
+what we expect from :numref:`img_lenet_vert`.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 28, 28))
@@ -136,21 +126,21 @@ for layer in net:
 ```
 
 Note that the height and width of the representation
-at each layer throughout the convolutional block is reduced
-(compared to the previous layer).
-The first convolutional layer uses a kernel
-with a height and width of $5$, and then a $2$ pixels of padding 
-which compensates the reduction in its original shape.
-While the second convolutional layer applies the same shape of 
-$5 \times 5$ kernel without padding, resulting in reductions 
-in both height and width by $4$ pixels.
-Moreover each pooling layer halves the height and width.
-However, as we go up the stack of layers,
+at each layer throughout the convolutional block 
+is reduced (compared to the previous layer).
+The first convolutional layer uses $2$ pixels of padding 
+to compensate for the the reduction in height and width
+that would otherwise result from using a $5 \times 5$ kernel.
+In contrast, the second convolutional layer foregoes padding, 
+and thus the height and width are both reduced by $4$ pixels.
+As we go up the stack of layers,
 the number of channels increases layer-over-layer
 from 1 in the input to 6 after the first convolutional layer
 and 16 after the second layer.
-Then, the fully-connected layer reduces dimensionality layer by layer,
-until emitting an output that matches the number of image classes.
+However, each pooling layer halves the height and width.
+Finally, each fully-connected layer reduces dimensionality,
+finally emitting an output whose dimension 
+matches the number of classes.
 
 ![Compressed notation for LeNet5](../img/lenet-vert.svg)
 :label:`img_lenet_vert`
@@ -158,21 +148,19 @@ until emitting an output that matches the number of image classes.
 ## Data Acquisition and Training
 
 Now that we have implemented the model,
-we might as well run some experiments
-to see what we can accomplish with the LeNet model.
-We will use Fashion-MNIST as our dataset.
-It is more challenging than the original MNIST dataset
-while it has the same shape ($28\times28$ images).
+let's run an experiment to see how LeNet fares on Fashion-MNIST.
 
 ```{.python .input}
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 ```
 
-While convolutional networks may have few parameters,
-they can still be significantly more expensive
-to compute than a similarly deep multilayer perceptron
-so if you have access to a GPU, this might be a good time
+While convolutional networks have few parameters,
+they can still be more expensive to compute
+than similarly deep multilayer perceptrons
+because each parameter participates in many more
+multiplications.
+If you have access to a GPU, this might be a good time
 to put it into action to speed up training.
 
 For evaluation, we need to make a slight modification
@@ -196,15 +184,24 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
 ```
 
 We also need to update our training function to deal with GPUs.
-Unlike the `train_epoch_ch3` defined in :numref:`sec_softmax_scratch`, we now need to move each batch of data to our designated context (hopefully, the GPU)
+Unlike the `train_epoch_ch3` defined in :numref:`sec_softmax_scratch`, 
+we now need to move each batch of data 
+to our designated context (hopefully, the GPU)
 prior to making the forward and backward passes.
 
-The training function `train_ch6` is also very similar to `train_ch3` defined in :numref:`sec_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. We initialize the model parameters on the device indicated by `ctx`,
-this time using the Xavier initializer.
-The loss function and the training algorithm
-still use the cross-entropy loss function
-and minibatch stochastic gradient descent. Since each epoch takes tens of
-seconds to run, we visualize the training loss in a finer granularity.
+The training function `train_ch6` is also similar 
+to `train_ch3` defined in :numref:`sec_softmax_scratch`. 
+Since we will be implement networks with many layers 
+going forward, we will rely primarily on Gluon.
+The following train function assumes a Gluon model 
+as input and is optimized accordingly. 
+We initialize the model parameters 
+on the device indicated by `ctx`
+using the Xavier initializer.
+Just as with MLPs, our loss function is cross-entropy,
+and we minimize it via minibatch stochastic gradient descent. 
+Since each epoch takes tens of seconds to run, 
+we visualize the training loss more frequently.
 
 ```{.python .input}
 # Saved in the d2l package for later use
@@ -249,10 +246,11 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 ## Summary
 
-* A convolutional neural network (in short, ConvNet) is a network using convolutional layers.
-* In a ConvNet we alternate between convolutions, nonlinearities and often also pooling operations.
-* Ultimately the resolution is reduced prior to emitting an output via one (or more) dense layers.
-* LeNet was the first successful deployment of such a network.
+* A ConvNet is a network that employs convolutional layers.
+* In a ConvNet, we interleave convolutions, nonlinearities, and (often) pooling operations.
+* These convolutional blocks are typically arranged so that they gradually decrease the spatial resolution of the representations, while increasing the number of channels.
+* In traditional ConvNets, the representations encoded by the convolutional blocks are processed by one (or more) dense layers prior to emitting output.
+* LeNet was arguably the first successful deployment of such a network.
 
 ## Exercises
 
