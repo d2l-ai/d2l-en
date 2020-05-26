@@ -534,8 +534,7 @@ and the model predictions
 (second line of text output).
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def predict_ch3(net, test_iter, n=6):
+def predict_ch3(net, test_iter, n=6): #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
@@ -548,8 +547,7 @@ predict_ch3(net, test_iter)
 
 ```{.python .input}
 #@tab pytorch
-# Saved in the d2l_pytorch package for later use
-def predict_ch3(net, test_iter, n=6):
+def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)

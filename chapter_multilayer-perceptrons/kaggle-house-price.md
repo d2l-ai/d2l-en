@@ -44,10 +44,10 @@ from mxnet import gluon
 import zipfile
 import tarfile
 
-# Saved in the d2l package for later use
+#@save
 DATA_HUB = dict()
 
-# Saved in the d2l package for later use
+#@save
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 ```
 
@@ -61,7 +61,7 @@ our code will use the cached file to avoid
 clogging up your internet with redundant downloads.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 def download(name, cache_dir=os.path.join('..', 'data')):
     """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, "%s does not exist" % name
@@ -76,7 +76,7 @@ and the other to download all the files from `DATA_HUB`
 (most of the datasets used in this book) into the cache directory.
 
 ```{.python .input  n=3}
-# Saved in the d2l package for later use
+#@save
 def download_extract(name, folder=None):
     """Download and extract a zip/tar file."""
     fname = download(name)
@@ -94,7 +94,7 @@ def download_extract(name, folder=None):
     else:
         return data_dir
 
-# Saved in the d2l package for later use
+#@save
 def download_all():
     """Download all files in the DATA_HUB"""
     for name in DATA_HUB:
@@ -188,12 +188,12 @@ the Kaggle housing dataset
 using the script we defined above.
 
 ```{.python .input  n=5}
-# Saved in the d2l package for later use        
+#@save        
 DATA_HUB['kaggle_house_train'] = (
     DATA_URL + 'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
 
-# Saved in the d2l package for later use  
+#@save  
 DATA_HUB['kaggle_house_test'] = (
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
