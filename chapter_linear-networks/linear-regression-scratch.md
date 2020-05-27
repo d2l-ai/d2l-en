@@ -12,9 +12,9 @@ to make sure that you really know what you are doing.
 Moreover, when it comes time to customize models,
 defining our own layers, loss functions, etc.,
 understanding how things work under the hood will prove handy.
-In this section, we will rely only on `ndarray` and `autograd`.
+In this section, we will rely only on `ndarray` and auto differentiation.
 Afterwards, we will introduce a more compact implementation,
-taking advantage of Gluon's bells and whistles.
+taking advantage of framework's bells and whistles.
 To start off, we import the few required packages.
 
 ```{.python .input}
@@ -206,15 +206,17 @@ and a standard deviation of $0.01$, setting the bias $b$ to $0$.
 ```{.python .input}
 w = np.random.normal(0, 0.01, (2, 1))
 b = np.zeros(1)
+w.attach_grad()
+b.attach_grad()
 ```
 
 ```{.python .input}
 #@tab pytorch
-w = torch.empty((2, 1)).normal_(0, 0.01)
-b = torch.zeros(1)
+w = torch.empty((2, 1), requires_grad=True).normal_(0, 0.01)
+b = torch.zeros(1, requires_grad=True)
 ```
 
-Now that we have initialized our parameters,
+After initialized our parameters,
 our next task is to update them until
 they fit our data sufficiently well.
 Each update requires taking the gradient
@@ -228,21 +230,9 @@ Since nobody wants to compute gradients explicitly
 we use automatic differentiation to compute the gradient.
 See :numref:`sec_autograd` for more details.
 Recall from the autograd chapter
-that in order for `autograd` to know
-that it should store a gradient for our parameters,
-we need to invoke the `attach_grad` function,
-allocating memory to store the gradients that we plan to take.
-
-```{.python .input}
-w.attach_grad()
-b.attach_grad()
-```
-
-```{.python .input}
-#@tab pytorch
-w.requires_grad_(True)
-b.requires_grad_(True)
-```
+that in order for the system to know
+that it should store a gradient for our parameters, we specified to attach
+gradients to both $w$ and $b$ on the above codes.
 
 ## Defining the Model
 
@@ -252,7 +242,7 @@ Recall that to calculate the output of the linear model,
 we simply take the matrix-vector dot product
 of the examples $\mathbf{X}$ and the models weights $w$,
 and add the offset $b$ to each example.
-Note that below `np.dot(X, w)` is a vector and `b` is a scalar.
+Note that below $Xw$  is a vector and $b$ is a scalar.
 Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
@@ -390,7 +380,7 @@ for epoch in range(num_epochs):
         l.backward()  # Compute gradient on l with respect to [w, b]
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
-    print('epoch %d, loss %f' % (epoch + 1, train_l.mean().asnumpy()))
+    print(f'epoch {epoch+1}, loss {float(train_l.mean())}')
 ```
 
 ```{.python .input}
@@ -411,7 +401,7 @@ for epoch in range(num_epochs):
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     with torch.no_grad():
         train_l = loss(net(features, w, b), labels)
-        print('epoch %d, loss %f' % (epoch + 1, train_l.mean().numpy()))
+        print(f'epoch {epoch+1}, loss {float(train_l.mean())}')
 ```
 
 In this case, because we synthesized the data ourselves,
@@ -454,7 +444,7 @@ that lead to accurate prediction.
 ## Summary
 
 We saw how a deep network can be implemented
-and optimized from scratch, using just `ndarray` and `autograd`,
+and optimized from scratch, using just `ndarray` and auto differentiation,
 without any need for defining layers, fancy optimizers, etc.
 This only scratches the surface of what is possible.
 In the following sections, we will describe additional models
@@ -464,9 +454,11 @@ and learn how to implement them more concisely.
 ## Exercises
 
 1. What would happen if we were to initialize the weights $\mathbf{w} = 0$. Would the algorithm still work?
-1. Assume that you are [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up with a model between voltage and current. Can you use `autograd` to learn the parameters of your model.
+1. Assume that you are
+   [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up
+   with a model between voltage and current. Can you use auto differentiation to learn the parameters of your model.
 1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object using spectral energy density?
-1. What are the problems you might encounter if you wanted to extend `autograd` to second derivatives? How would you fix them?
+1. What are the problems you might encounter if you wanted to  compute the second derivatives? How would you fix them?
 1.  Why is the `reshape` function needed in the `squared_loss` function?
 1. Experiment using different learning rates to find out how fast the loss function value drops.
 1. If the number of examples cannot be divided by the batch size, what happens to the `data_iter` function's behavior?
