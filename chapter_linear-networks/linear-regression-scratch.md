@@ -471,6 +471,10 @@ and learn how to implement them more concisely.
 1. Experiment using different learning rates to find out how fast the loss function value drops.
 1. If the number of examples cannot be divided by the batch size, what happens to the `data_iter` function's behavior?
 
-## [Discussions](https://discuss.mxnet.io/t/2332)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/42)
+:end_tab:
 
-![](../img/qr_linear-regression-scratch.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/43)
+:end_tab:
