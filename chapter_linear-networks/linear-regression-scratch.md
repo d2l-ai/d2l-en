@@ -212,7 +212,7 @@ b.attach_grad()
 
 ```{.python .input}
 #@tab pytorch
-w = torch.empty((2, 1), requires_grad=True).normal_(0, 0.01)
+w = torch.normal(0, 0.01, size=(2,1), requires_grad=True)
 b = torch.zeros(1, requires_grad=True)
 ```
 

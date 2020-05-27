@@ -11,20 +11,13 @@ stage("Build and Publish") {
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip python=3.7 -y
       conda activate ${ENV_NAME}
+      # mxnet
       pip install mxnet-cu101==1.6.0
       pip install git+https://github.com/d2l-ai/d2l-book
       python setup.py develop
-      pip list
-      nvidia-smi
-      """
-
-      sh label: "Build Environment [Pytorch]", script: """set -ex
-      rm -rf ~/miniconda3/envs/${ENV_NAME}-pytorch
-      conda create -n ${ENV_NAME}-pytorch pip python=3.7 -y
-      conda activate ${ENV_NAME}-pytorch
+      # pytorch
       pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
       pip install torchvision
-      pip install git+https://github.com/d2l-ai/d2l-book
       cd d2l_pytorch; python setup.py develop
       pip list
       nvidia-smi
@@ -43,7 +36,7 @@ stage("Build and Publish") {
       """
 
       sh label: "Execute Notebooks [Pytorch]", script: """set -ex
-      conda activate ${ENV_NAME}-pytorch
+      conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       d2lbook build eval --tab pytorch
