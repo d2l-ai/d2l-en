@@ -277,7 +277,7 @@ the frequently-imported and referred-to functions, classes, etc.
 in this book in the `d2l` package.
 For any block such as a function, a class, or multiple imports
 to be saved in the package, we will mark it with
-`# Saved in the d2l package for later use`.
+`#@save`.
 The `d2l` package is light-weight and only requires
 the following packages and modules as dependencies:
 
@@ -300,8 +300,7 @@ At times, to avoid unnecessary repetition, we encapsulate
 the frequently-imported and referred-to functions, classes, etc.
 in this book in the `d2l_pytorch` package.
 For any block such as a function, a class, or multiple imports
-to be saved in the package, we will mark it with
-`# Saved in the d2l_pytorch package for later use`.
+to be saved in the package, we will mark it with `#@save`.
 The `d2l_pytorch` package is light-weight and only requires
 the following packages and modules as dependencies:
 
