@@ -8,20 +8,20 @@ for automating the repetitive work of implementing
 gradient-based learning algorithms.
 In the previous section, we relied only on
 (i) `ndarray` for data storage and linear algebra;
-and (ii) `autograd` for calculating derivatives.
+and (ii) auto differentiation for calculating derivatives.
 In practice, because data iterators, loss functions, optimizers,
 and neural network layers (and some whole architectures)
 are so common, modern libraries implement these components for us as well.
 
 In this section, we will show you how to implement
 the linear regression model from :numref:`sec_linear_scratch`
-concisely by using Gluon.
+concisely by using framework's high-level APIs.
 
 ## Generating the Dataset
 
 To start, we will generate the same dataset as in the previous section.
 
-```{.python .input}
+```python
 import d2l
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
@@ -31,12 +31,13 @@ true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 import d2l_pytorch as d2l
 import numpy as np
 import torch
-from torch.utils.data import TensorDataset, DataLoader
+from torch.utils import data
 
 true_w = torch.Tensor([2, -3.4])
 true_b = 4.2
@@ -47,7 +48,7 @@ labels = labels.reshape(-1,1)
 ## Reading the Dataset
 
 Rather than rolling our own iterator,
-we can call upon Gluon's `data` module to read data.
+we can call upon the `data` module to read data.
 The first step will be to instantiate an `ArrayDataset`.
 This object's constructor takes one or more `ndarray`s as arguments.
 Here, we pass in `features` and `labels` as arguments.
@@ -57,9 +58,9 @@ and specify a Boolean value `shuffle` indicating whether or not
 we want the `DataLoader` to shuffle the data
 on each epoch (pass through the dataset).
 
-```{.python .input}
+```python
 def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a Gluon data loader"""
+    """Construct a Gluon data loader."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
@@ -67,13 +68,13 @@ batch_size = 10
 data_iter = load_array((features, labels), batch_size)
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data loader"""
-    dataset = TensorDataset(*data_arrays)
-    dataloader = DataLoader(dataset, batch_size, shuffle=is_train)
-    return dataloader
+    dataset = data.TensorDataset(*data_arrays)
+    return data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 batch_size = 10
 data_iter = load_array((features, labels), batch_size)
@@ -82,19 +83,16 @@ data_iter = load_array((features, labels), batch_size)
 Now we can use `data_iter` in much the same way as we called
 the `data_iter` function in the previous section.
 To verify that it is working, we can read and print
-the first minibatch of instances.
+the first minibatch of instances. Comparing to :numref:`sec_linear_scratch`, here we use `iter` to construct an Python iterator and then use `next` to obtain the first item from the iterator.
 
-```{.python .input}
-for X, y in data_iter:
-    print(X, '\n', y)
-    break
+```python
+next(iter(data_iter))
 ```
+
 
 ```{.python .input}
 #@tab pytorch
-for X, y in data_iter:
-    print(X, '\n', y)
-    break
+next(iter(data_iter))
 ```
 
 ## Defining the Model
@@ -114,7 +112,7 @@ but you would be a lousy web developer
 if every time you needed a blog you spent a month
 reinventing the wheel.
 
-For standard operations, we can use Gluon's predefined layers,
+For standard operations, we can use the framework's predefined layers,
 which allow us to focus especially
 on the layers used to construct the model
 rather than having to focus on the implementation.
@@ -123,7 +121,7 @@ which defines a large number of neural network layers
 (note that "nn" is an abbreviation for neural networks).
 We will first define a model variable `net`,
 which will refer to an instance of the `Sequential` class.
-In Gluon, `Sequential` defines a container
+The `Sequential` class defines a container
 for several layers that will be chained together.
 Given input data, a `Sequential` passes it through
 the first layer, in turn passing the output
@@ -135,36 +133,31 @@ will involve multiple layers,
 we will use it anyway just to familiarize you
 with the most standard workflow.
 
-```{.python .input}
-from mxnet.gluon import nn
-net = nn.Sequential()
-```
-
-```{.python .input}
-#@tab pytorch
-from torch import nn
-```
-
 Recall the architecture of a single-layer network as shown in :numref:`fig_singleneuron`.
 The layer is said to be *fully-connected*
 because each of its inputs are connected to each of its outputs
 by means of a matrix-vector multiplication.
-In Gluon, the fully-connected layer is defined in the `Dense` class.
-Since we only want to generate a single scalar output,
-we set that number to $1$.
 
 ![Linear regression is a single-layer neural network. ](../img/singleneuron.svg)
 :label:`fig_singleneuron`
 
-```{.python .input}
+```python
+from mxnet.gluon import nn
+net = nn.Sequential()
 net.add(nn.Dense(1))
 ```
 
+
 ```{.python .input}
 #@tab pytorch
+from torch import nn
 net = nn.Sequential(nn.Linear(2, 1))
-net
 ```
+
+:begin_tab:`mxnet`
+In Gluon, the fully-connected layer is defined in the `Dense` class.
+Since we only want to generate a single scalar output,
+we set that number to $1$.
 
 It is worth noting that, for convenience,
 Gluon does not require us to specify
@@ -176,12 +169,18 @@ e.g., when we execute `net(X)` later,
 Gluon will automatically infer the number of inputs to each layer.
 We will describe how this works in more detail
 in the chapter "Deep Learning Computation".
+:end_tab:
 
+:begin_tab:`pytorch`
+In Gluon, the fully-connected layer is defined in the `Linear` class. Note that we passed two arguments into `nn.Linear`. The first one specifies the input feature dimension, which is 2, and the second one is the output feature dimension, which is a single scalar and therefore 1. 
+:end_tab:
 
 ## Initializing Model Parameters
 
 Before using `net`, we need to initialize the model parameters,
 such as the weights and biases in the linear regression model.
+
+:begin_tab:`mxnet`
 We will import the `initializer` module from MXNet.
 This module provides various methods for model parameter initialization.
 Gluon makes `init` available as a shortcut (abbreviation)
@@ -192,18 +191,25 @@ should be randomly sampled from a normal distribution
 with mean $0$ and standard deviation $0.01$.
 The *bias* parameter will be initialized to zero by default.
 Both the weight vector and bias will have attached gradients.
+:end_tab:
 
-```{.python .input}
+:begin_tab:`pytorch`
+As we have specified the input and output dimensions when constructing `nn.Linear`. Now we access the parameters directly to specify there initial values. We first locate the layer by `net[0]`, which is the first layer in the network, and then use the `weight.data` and `bias.data` methods to access the parameters. Next we use the replace methods `uniform_` and `fill_` to overwrite parameter values. 
+:end_tab:
+
+```python
 from mxnet import init
 net.initialize(init.Normal(sigma=0.01))
 ```
 
+
 ```{.python .input}
 #@tab pytorch
-net[0].weight.data = torch.Tensor(np.random.normal(size=(1,2), scale=0.01, loc=0))
-net[0].bias.data = torch.Tensor([0])
+net[0].weight.data.uniform_(0.0, 0.01)
+net[0].bias.data.fill_(0)
 ```
 
+:begin_tab:`mxnet`
 The code above may look straightforward but you should note
 that something strange is happening here.
 We are initializing parameters for a network
@@ -217,29 +223,41 @@ when we for the first time attempt to pass data through the network.
 Just be careful to remember that since the parameters
 have not been initialized yet,
 we cannot access or manipulate them.
+:end_tab:
 
+:begin_tab:`pytorch`
+
+:end_tab:
 
 ## Defining the Loss Function
 
+:begin_tab:`mxnet`
 In Gluon, the `loss` module defines various loss functions.
 We will use the imported module `loss` with the pseudonym `gloss`
 to avoid confusing it for the variable
 holding our chosen loss function.
 In this example, we will use the Gluon
 implementation of squared loss (`L2Loss`).
+:end_tab:
 
-```{.python .input}
+:begin_tab:`pytorch`
+The `MSELoss` class compute the mean squared error, also known as squared L2 norm. In default it returns the averaged loss over examples. 
+:end_tab:
+
+```python
 from mxnet.gluon import loss as gloss
-loss = gloss.L2Loss()  # The squared loss is also known as the L2 norm loss
+loss = gloss.L2Loss()
 ```
+
 
 ```{.python .input}
 #@tab pytorch
-loss = nn.MSELoss(reduction = "sum") # The squared loss is also known as the L2 norm loss
+loss = nn.MSELoss()
 ```
 
 ## Defining the Optimization Algorithm
 
+:begin_tab:`mxnet`
 Minibatch SGD and related variants
 are standard tools for optimizing neural networks
 and thus Gluon supports SGD alongside a number of
@@ -252,15 +270,30 @@ and a dictionary of hyper-parameters
 required by our optimization algorithm.
 SGD just requires that we set the value `learning_rate`,
 (here we set it to 0.03).
+:end_tab:
 
-```{.python .input}
+:begin_tab:`pytorch`
+Minibatch SGD and related variants
+are standard tools for optimizing neural networks
+and thus PyTorch supports SGD alongside a number of
+variations on this algorithm in the `optim` module. 
+When we instantiate a SGD instance,
+we will specify the parameters to optimize over
+(obtainable from our net via `net.parameters()`), with a dictionary of hyper-parameters
+required by our optimization algorithm.
+SGD just requires that we set the value `learning_rate`,
+(here we set it to 0.03).
+:end_tab:
+
+```python
 from mxnet import gluon
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})
 ```
 
+
 ```{.python .input}
 #@tab pytorch
-trainer = torch.optim.SGD(net.parameters(), lr = 0.03)
+trainer = torch.optim.SGD(net.parameters(), lr = .03)
 ```
 
 ## Training
@@ -287,7 +320,7 @@ For each minibatch, we go through the following ritual:
 
 For good measure, we compute the loss after each epoch and print it to monitor progress.
 
-```{.python .input}
+```python
 num_epochs = 3
 for epoch in range(1, num_epochs + 1):
     for X, y in data_iter:
@@ -299,6 +332,7 @@ for epoch in range(1, num_epochs + 1):
     print('epoch %d, loss: %f' % (epoch, l.mean().asnumpy()))
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 num_epochs = 3
@@ -308,7 +342,7 @@ for epoch in range(1, num_epochs + 1):
         trainer.zero_grad()
         l.backward()
         trainer.step()
-    l = loss(net(features), labels)
+    l = loss(net(features), labels) 
     print('epoch {}, loss {}'.format(epoch, l))
 ```
 
@@ -323,35 +357,57 @@ As in our from-scratch implementation,
 note that our estimated parameters are
 close to their ground truth counterparts.
 
-```{.python .input}
+```python
 w = net[0].weight.data()
 print('Error in estimating w', true_w.reshape(w.shape) - w)
 b = net[0].bias.data()
 print('Error in estimating b', true_b - b)
 ```
 
+
 ```{.python .input}
 #@tab pytorch
-w = list(net.parameters())[0][0]
+w = net[0].weight.data
 print('Error in estimating w', true_w.reshape(w.shape) - w)
-b = list(net.parameters())[1][0]
+b = net[0].bias.data
 print('Error in estimating b', true_b - b)
 ```
 
 ## Summary
 
+:begin_tab:`mxnet`
 * Using Gluon, we can implement models much more succinctly.
 * In Gluon, the `data` module provides tools for data processing, the `nn` module defines a large number of neural network layers, and the `loss` module defines many common loss functions.
 * MXNet's module `initializer` provides various methods for model parameter initialization.
 * Dimensionality and storage are automatically inferred (but be careful not to attempt to access parameters before they have been initialized).
+:end_tab:
 
+:begin_tab:`pytorch`
+* Using PyTorch's high-level APIs, we can implement models much more succinctly.
+* In PyTorch, the `data` module provides tools for data processing, the `nn` module defines a large number of neural network layers and common loss functions.
+* We can initialize the parameters by replacing their values with methods ending with `_`. 
+* 
+:end_tab:
 
 ## Exercises
 
+:begin_tab:`mxnet`
 1. If we replace `l = loss(output, y)` with `l = loss(output, y).mean()`, we need to change `trainer.step(batch_size)` to `trainer.step(1)` for the code to behave identically. Why?
 1. Review the MXNet documentation to see what loss functions and initialization methods are provided in the modules `gluon.loss` and `init`. Replace the loss by Huber's loss.
 1. How do you access the gradient of `dense.weight`?
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/2333)
+:begin_tab:`pytorch`
+1. If we replace `nn.MSELoss()` with `nn.MSELoss(reduction='mean')`, how can we change the learning rate for the code to behave identically. Why?
+1. Review the PyTorch documentation to see what loss functions and initialization methods are provided. Replace the loss by Huber's loss.
+1. How do you access the gradient of `net[0].weight`?
 
-![](../img/qr_linear-regression-gluon.svg)
+:end_tab:
+
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/44)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/45)
+:end_tab:
