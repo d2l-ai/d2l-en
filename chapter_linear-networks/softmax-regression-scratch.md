@@ -21,7 +21,6 @@ npx.set_np()
 #@tab pytorch
 import d2l_pytorch as d2l
 import torch
-from torch.distributions import normal
 from IPython import display
 ```
 
@@ -275,7 +274,7 @@ def accuracy(y_hat, y):  #@save
 #@tab pytorch
 def accuracy(y_hat, y):  #@save
     if y_hat.shape[1] > 1:
-        return float((y_hat.argmax(axis=1).type(torch.float32) == 
+        return float((y_hat.argmax(axis=1).type(torch.float32) ==
                       y.type(torch.float32)).sum())
     else:
         return float((y_hat.type(torch.int32) == y.type(torch.int32)).sum())
