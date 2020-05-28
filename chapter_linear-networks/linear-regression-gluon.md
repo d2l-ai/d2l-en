@@ -21,7 +21,7 @@ concisely by using framework's high-level APIs.
 
 To start, we will generate the same dataset as in the previous section.
 
-```python
+```{.python .input}
 import d2l
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
@@ -58,7 +58,7 @@ and specify a Boolean value `shuffle` indicating whether or not
 we want the `DataLoader` to shuffle the data
 on each epoch (pass through the dataset).
 
-```python
+```{.python .input}
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a Gluon data loader."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
@@ -85,7 +85,7 @@ the `data_iter` function in the previous section.
 To verify that it is working, we can read and print
 the first minibatch of instances. Comparing to :numref:`sec_linear_scratch`, here we use `iter` to construct an Python iterator and then use `next` to obtain the first item from the iterator.
 
-```python
+```{.python .input}
 next(iter(data_iter))
 ```
 
@@ -141,7 +141,7 @@ by means of a matrix-vector multiplication.
 ![Linear regression is a single-layer neural network. ](../img/singleneuron.svg)
 :label:`fig_singleneuron`
 
-```python
+```{.python .input}
 from mxnet.gluon import nn
 net = nn.Sequential()
 net.add(nn.Dense(1))
@@ -197,7 +197,7 @@ Both the weight vector and bias will have attached gradients.
 As we have specified the input and output dimensions when constructing `nn.Linear`. Now we access the parameters directly to specify there initial values. We first locate the layer by `net[0]`, which is the first layer in the network, and then use the `weight.data` and `bias.data` methods to access the parameters. Next we use the replace methods `uniform_` and `fill_` to overwrite parameter values. 
 :end_tab:
 
-```python
+```{.python .input}
 from mxnet import init
 net.initialize(init.Normal(sigma=0.01))
 ```
@@ -244,7 +244,7 @@ implementation of squared loss (`L2Loss`).
 The `MSELoss` class compute the mean squared error, also known as squared L2 norm. In default it returns the averaged loss over examples. 
 :end_tab:
 
-```python
+```{.python .input}
 from mxnet.gluon import loss as gloss
 loss = gloss.L2Loss()
 ```
@@ -285,7 +285,7 @@ SGD just requires that we set the value `learning_rate`,
 (here we set it to 0.03).
 :end_tab:
 
-```python
+```{.python .input}
 from mxnet import gluon
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})
 ```
@@ -320,7 +320,7 @@ For each minibatch, we go through the following ritual:
 
 For good measure, we compute the loss after each epoch and print it to monitor progress.
 
-```python
+```{.python .input}
 num_epochs = 3
 for epoch in range(1, num_epochs + 1):
     for X, y in data_iter:
@@ -357,7 +357,7 @@ As in our from-scratch implementation,
 note that our estimated parameters are
 close to their ground truth counterparts.
 
-```python
+```{.python .input}
 w = net[0].weight.data()
 print('Error in estimating w', true_w.reshape(w.shape) - w)
 b = net[0].bias.data()
