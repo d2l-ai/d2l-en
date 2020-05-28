@@ -21,7 +21,7 @@ import torch
 import torch.nn as nn
 ```
 
-Let us stick with the Fashion-MNIST dataset 
+Let us stick with the Fashion-MNIST dataset
 and keep the batch size at $256$ as in the last section.
 
 ```{.python .input}
@@ -38,10 +38,10 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ## Initializing Model Parameters
 
 As mentioned in :numref:`sec_softmax`,
-the output layer of softmax regression 
-is a fully-connected (`Dense`) layer.
+the output layer of softmax regression
+is a fully-connected layer.
 Therefore, to implement our model,
-we just need to add one `Dense` layer 
+we just need to add one fully-connected layer
 with 10 outputs to our `Sequential`.
 Again, here, the `Sequential` is not really necessary,
 but we might as well form the habit since it will be ubiquitous
@@ -62,7 +62,7 @@ net.initialize(init.Normal(sigma=0.01))
 class Reshape(torch.nn.Module):
     def forward(self, x):
         return x.view(-1,784)
-    
+
 net = nn.Sequential(Reshape(), nn.Linear(784, 10))
 
 def init_weights(m):
@@ -77,21 +77,21 @@ net.apply(init_weights)
 In the previous example, we calculated our model's output
 and then ran this output through the cross-entropy loss.
 Mathematically, that is a perfectly reasonable thing to do.
-However, from a computational perspective, 
+However, from a computational perspective,
 exponentiation can be a source of numerical stability issues
 (as discussed  in :numref:`sec_naive_bayes`).
 Recall that the softmax function calculates
-$\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$, 
-where $\hat y_j$ is the $j^\mathrm{th}$ element of ``y_hat`` 
+$\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$,
+where $\hat y_j$ is the $j^\mathrm{th}$ element of ``y_hat``
 and $z_j$ is the $j^\mathrm{th}$ element of the input
 ``y_linear`` variable, as computed by the softmax.
 
 If some of the $z_i$ are very large (i.e., very positive),
 then $e^{z_i}$ might be larger than the largest number
 we can have for certain types of ``float`` (i.e., overflow).
-This would make the denominator (and/or numerator) ``inf`` 
+This would make the denominator (and/or numerator) ``inf``
 and we wind up encountering either $0$, ``inf``, or ``nan`` for $\hat y_j$.
-In these situations we do not get a well-defined 
+In these situations we do not get a well-defined
 return value for ``cross_entropy``.
 One trick to get around this is to first subtract $\text{max}(z_i)$
 from all $z_i$ before proceeding with the ``softmax`` calculation.
@@ -104,14 +104,14 @@ and thus that the corresponding $e^{z_j}$ will take values close to zero.
 These might be rounded to zero due to finite precision (i.e underflow),
 making $\hat y_j$ zero and giving us ``-inf`` for $\text{log}(\hat y_j)$.
 A few steps down the road in backpropagation,
-we might find ourselves faced with a screenful 
+we might find ourselves faced with a screenful
 of the dreaded not-a-number (``nan``) results.
 
-Fortunately, we are saved by the fact that 
-even though we are computing exponential functions, 
-we ultimately intend to take their log 
+Fortunately, we are saved by the fact that
+even though we are computing exponential functions,
+we ultimately intend to take their log
 (when calculating the cross-entropy loss).
-By combining these two operators 
+By combining these two operators
 (``softmax`` and ``cross_entropy``) together,
 we can escape the numerical stability issues
 that might otherwise plague us during backpropagation.
@@ -139,8 +139,6 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
 ```{.python .input}
 #@tab pytorch
-# By default the reduction method used in PyTorch implementation
-# of CrossEntropyLoss is 'mean'.
 loss = nn.CrossEntropyLoss()
 ```
 
@@ -188,6 +186,10 @@ if we tried to code all of our models from scratch in practice.
 1. Try adjusting the hyper-parameters, such as batch size, epoch, and learning rate, to see what the results are.
 1. Why might the test accuracy decrease again after a while? How could we fix this?
 
-## [Discussions](https://discuss.mxnet.io/t/2337)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/52)
+:end_tab:
 
-![](../img/qr_softmax-regression-gluon.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/53)
+:end_tab:

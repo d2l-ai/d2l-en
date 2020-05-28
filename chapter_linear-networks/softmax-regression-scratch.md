@@ -16,6 +16,7 @@ from IPython import display
 npx.set_np()
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 import d2l_pytorch as d2l
@@ -31,6 +32,7 @@ setting up an iterator with batch size $256$.
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
+
 
 ```{.python .input}
 #@tab pytorch
@@ -64,31 +66,18 @@ num_outputs = 10
 
 W = np.random.normal(0, 0.01, (num_inputs, num_outputs))
 b = np.zeros(num_outputs)
+W.attach_grad()
+b.attach_grad()
 ```
+
 
 ```{.python .input}
 #@tab pytorch
 num_inputs = 784
 num_outputs = 10
 
-W = normal.Normal(loc = 0, scale = 0.01).sample((num_inputs, num_outputs))
-b = torch.zeros(num_outputs)
-```
-
-Recall that we need to *attach gradients* to the model parameters.
-More literally, we are allocating memory for future gradients to be stored
-and notifiying MXNet that we will want to calculate gradients
-with respect to these parameters in the future.
-
-```{.python .input}
-W.attach_grad()
-b.attach_grad()
-```
-
-```{.python .input}
-#@tab pytorch
-W.requires_grad_(True)
-b.requires_grad_(True)
+W = torch.normal(0, 0.01, size=(num_inputs, num_outputs), requires_grad=True)
+b = torch.zeros(num_outputs, requires_grad=True)
 ```
 
 ## The Softmax
@@ -110,6 +99,7 @@ we can specify `keepdims=True` when invoking `sum`.
 X = np.array([[1, 2, 3], [4, 5, 6]])
 print(X.sum(axis=0, keepdims=True), '\n', X.sum(axis=1, keepdims=True))
 ```
+
 
 ```{.python .input}
 #@tab pytorch
@@ -145,6 +135,7 @@ def softmax(X):
     return X_exp / partition  # The broadcast mechanism is applied here
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 def softmax(X):
@@ -169,9 +160,10 @@ X_prob = softmax(X)
 X_prob, X_prob.sum(axis=1)
 ```
 
+
 ```{.python .input}
 #@tab pytorch
-X = normal.Normal(loc = 0, scale = 1).sample((2, 5))
+X = torch.normal(0, 1, size=(2, 5))
 X_prob = softmax(X)
 X_prob, torch.sum(X_prob, dim=1)
 ```
@@ -189,6 +181,7 @@ before passing the data through our model.
 def net(X):
     return softmax(np.dot(X.reshape(-1, num_inputs), W) + b)
 ```
+
 
 ```{.python .input}
 #@tab pytorch
@@ -219,6 +212,7 @@ y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 y_hat[[0, 1], [0, 2]]
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 y_hat = torch.tensor([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
@@ -232,11 +226,9 @@ def cross_entropy(y_hat, y):
     return - np.log(y_hat[range(len(y_hat)), y])
 ```
 
+
 ```{.python .input}
 #@tab pytorch
-# Note: PyTorch's implementation of CrossEntropyLoss,
-#       by default uses 'mean' as a reduction method.
-#       Here we don't use any reduction methods.
 def cross_entropy(y_hat, y):
     return - torch.log(y_hat[range(len(y_hat)), y])
 ```
@@ -278,11 +270,13 @@ def accuracy(y_hat, y):  #@save
         return float((y_hat.astype('int32') == y.astype('int32')).sum())
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 def accuracy(y_hat, y):  #@save
     if y_hat.shape[1] > 1:
-        return float((y_hat.argmax(axis=1).type(torch.float32) == y.type(torch.float32)).sum())
+        return float((y_hat.argmax(axis=1).type(torch.float32) == 
+                      y.type(torch.float32)).sum())
     else:
         return float((y_hat.type(torch.int32) == y.type(torch.int32)).sum())
 ```
@@ -303,6 +297,7 @@ y = np.array([0, 2])
 accuracy(y_hat, y) / len(y)
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 y = torch.tensor([0, 2])
@@ -320,6 +315,7 @@ def evaluate_accuracy(net, data_iter):  #@save
     return metric[0] / metric[1]
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 def evaluate_accuracy(net, data_iter):  #@save
@@ -335,7 +331,6 @@ Here `Accumulator` is a utility class to accumulate sums over multiple numbers.
 #@tab all
 class Accumulator:  #@save
     """Sum a list of numbers over time."""
-
     def __init__(self, n):
         self.data = [0.0] * n
 
@@ -356,6 +351,7 @@ i.e., $0.1$ for $10$ classes.
 ```{.python .input}
 evaluate_accuracy(net, test_iter)
 ```
+
 
 ```{.python .input}
 #@tab pytorch
@@ -390,6 +386,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 def train_epoch_ch3(net, train_iter, loss, updater):  #@save
@@ -405,11 +402,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater.zero_grad()
             l.backward()
             updater.step()
-            # When using the concise implementation and pytorch's in house
-            # CrossEntropyLoss, it uses mean as reduction method over
-            # crossentropy. Thus we need to scale the loss back, to get l_sum.
-            l_sum = float(l)*len(y)
-            metric.add(l_sum, float(accuracy(y_hat, y)), len(y))
+            metric.add(float(l)*len(y), float(accuracy(y_hat, y)), len(y))
         else:
             l.sum().backward()
             updater(X.shape[0])
@@ -480,6 +473,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         animator.add(epoch+1, train_metrics+(test_acc,))
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 #@save
@@ -513,6 +507,7 @@ def updater(batch_size):
 train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 num_epochs, lr = 10, 0.1
@@ -545,6 +540,7 @@ def predict_ch3(net, test_iter, n=6): #@save
 predict_ch3(net, test_iter)
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 def predict_ch3(net, test_iter, n=6):  #@save
@@ -575,6 +571,11 @@ have similar training procedures.
 1. Is it always a good idea to return the most likely label. E.g., would you do this for medical diagnosis?
 1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
 
-## [Discussions](https://discuss.mxnet.io/t/2336)
 
-![](../img/qr_softmax-regression-scratch.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/50)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/51)
+:end_tab:
