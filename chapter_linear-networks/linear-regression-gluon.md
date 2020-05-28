@@ -172,7 +172,7 @@ in the chapter "Deep Learning Computation".
 :end_tab:
 
 :begin_tab:`pytorch`
-In Gluon, the fully-connected layer is defined in the `Linear` class. Note that we passed two arguments into `nn.Linear`. The first one specifies the input feature dimension, which is 2, and the second one is the output feature dimension, which is a single scalar and therefore 1. 
+In Gluon, the fully-connected layer is defined in the `Linear` class. Note that we passed two arguments into `nn.Linear`. The first one specifies the input feature dimension, which is 2, and the second one is the output feature dimension, which is a single scalar and therefore 1.
 :end_tab:
 
 ## Initializing Model Parameters
@@ -194,7 +194,7 @@ Both the weight vector and bias will have attached gradients.
 :end_tab:
 
 :begin_tab:`pytorch`
-As we have specified the input and output dimensions when constructing `nn.Linear`. Now we access the parameters directly to specify there initial values. We first locate the layer by `net[0]`, which is the first layer in the network, and then use the `weight.data` and `bias.data` methods to access the parameters. Next we use the replace methods `uniform_` and `fill_` to overwrite parameter values. 
+As we have specified the input and output dimensions when constructing `nn.Linear`. Now we access the parameters directly to specify there initial values. We first locate the layer by `net[0]`, which is the first layer in the network, and then use the `weight.data` and `bias.data` methods to access the parameters. Next we use the replace methods `uniform_` and `fill_` to overwrite parameter values.
 :end_tab:
 
 ```{.python .input}
@@ -241,7 +241,7 @@ implementation of squared loss (`L2Loss`).
 :end_tab:
 
 :begin_tab:`pytorch`
-The `MSELoss` class compute the mean squared error, also known as squared L2 norm. In default it returns the averaged loss over examples. 
+The `MSELoss` class compute the mean squared error, also known as squared L2 norm. In default it returns the averaged loss over examples.
 :end_tab:
 
 ```{.python .input}
@@ -276,7 +276,7 @@ SGD just requires that we set the value `learning_rate`,
 Minibatch SGD and related variants
 are standard tools for optimizing neural networks
 and thus PyTorch supports SGD alongside a number of
-variations on this algorithm in the `optim` module. 
+variations on this algorithm in the `optim` module.
 When we instantiate a SGD instance,
 we will specify the parameters to optimize over
 (obtainable from our net via `net.parameters()`), with a dictionary of hyper-parameters
@@ -342,7 +342,7 @@ for epoch in range(1, num_epochs + 1):
         trainer.zero_grad()
         l.backward()
         trainer.step()
-    l = loss(net(features), labels) 
+    l = loss(net(features), labels)
     print('epoch {}, loss {}'.format(epoch, l))
 ```
 
@@ -385,8 +385,7 @@ print('Error in estimating b', true_b - b)
 :begin_tab:`pytorch`
 * Using PyTorch's high-level APIs, we can implement models much more succinctly.
 * In PyTorch, the `data` module provides tools for data processing, the `nn` module defines a large number of neural network layers and common loss functions.
-* We can initialize the parameters by replacing their values with methods ending with `_`. 
-* 
+* We can initialize the parameters by replacing their values with methods ending with `_`.
 :end_tab:
 
 ## Exercises
@@ -395,6 +394,8 @@ print('Error in estimating b', true_b - b)
 1. If we replace `l = loss(output, y)` with `l = loss(output, y).mean()`, we need to change `trainer.step(batch_size)` to `trainer.step(1)` for the code to behave identically. Why?
 1. Review the MXNet documentation to see what loss functions and initialization methods are provided in the modules `gluon.loss` and `init`. Replace the loss by Huber's loss.
 1. How do you access the gradient of `dense.weight`?
+
+[Discussions](https://discuss.d2l.ai/t/44)
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -402,12 +403,5 @@ print('Error in estimating b', true_b - b)
 1. Review the PyTorch documentation to see what loss functions and initialization methods are provided. Replace the loss by Huber's loss.
 1. How do you access the gradient of `net[0].weight`?
 
-:end_tab:
-
-:begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/44)
-:end_tab:
-
-:begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/45)
 :end_tab:
