@@ -99,7 +99,7 @@ in :numref:`sec_conv_layer`.
 However, here we have no kernel, computing the output
 as either the max or the average of each region in the input..
 
-```{.python .input  n=3}
+```{.python .input}
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -116,17 +116,49 @@ def pool2d(X, pool_size, mode='max'):
     return Y
 ```
 
+
+```{.python .input}
+#@tab pytorch
+import torch
+import torch.nn as nn
+
+def pool2d(X, pool_size, mode='max'):
+    p_h, p_w = pool_size
+    Y = torch.zeros((X.shape[0] - p_h + 1, X.shape[1] - p_w + 1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            if mode == 'max':
+                Y[i, j] = X[i: i + p_h, j: j + p_w].max()
+            elif mode == 'avg':
+                Y[i, j] = X[i: i + p_h, j: j + p_w].mean()
+    return Y
+```
+
 We can construct the input array `X` in the above diagram to validate the output of the two-dimensional maximum pooling layer.
 
-```{.python .input  n=4}
+```{.python .input}
 X = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
+pool2d(X, (2, 2))
+```
+
+
+```{.python .input}
+#@tab pytorch
+X = torch.tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=torch.float32)
 pool2d(X, (2, 2))
 ```
 
 At the same time, we experiment with the average pooling layer.
 
-```{.python .input  n=14}
+```{.python .input}
 pool2d(X, (2, 2), 'avg')
+```
+
+
+```{.python .input}
+#@tab pytorch
+pool2d(X, (2, 2), 'avg')
+
 ```
 
 ## Padding and Stride
@@ -141,9 +173,16 @@ shipped in MXNet Gluon's `nn` module.
 We first construct an input data of shape `(1, 1, 4, 4)`,
 where the first two dimensions are batch and channel.
 
-```{.python .input  n=15}
+```{.python .input}
 X = np.arange(16).reshape(1, 1, 4, 4)
 X
+```
+
+
+```{.python .input}
+#@tab pytorch
+X = torch.arange(16, dtype=torch.float32).reshape((1, 1, 4, 4))
+print(X)
 ```
 
 By default, the stride in the `MaxPool2D` class
@@ -151,25 +190,46 @@ has the same shape as the pooling window.
 Below, we use a pooling window of shape `(3, 3)`,
 so we get a stride shape of `(3, 3)` by default.
 
-```{.python .input  n=16}
+```{.python .input}
 pool2d = nn.MaxPool2D(3)
 # Because there are no model parameters in the pooling layer, we do not need
 # to call the parameter initialization function
 pool2d(X)
 ```
 
+
+```{.python .input}
+#@tab pytorch
+pool2d = nn.MaxPool2d(3)
+pool2d(X)
+```
+
 The stride and padding can be manually specified.
 
-```{.python .input  n=7}
+```{.python .input}
 pool2d = nn.MaxPool2D(3, padding=1, strides=2)
+pool2d(X)
+```
+
+
+```{.python .input}
+#@tab pytorch
+pool2d = nn.MaxPool2d(3, padding=1, stride=2)
 pool2d(X)
 ```
 
 Of course, we can specify an arbitrary rectangular pooling window
 and specify the padding and stride for height and width, respectively.
 
-```{.python .input  n=8}
+```{.python .input}
 pool2d = nn.MaxPool2D((2, 3), padding=(1, 2), strides=(2, 3))
+pool2d(X)
+```
+
+
+```{.python .input}
+#@tab pytorch
+pool2d = nn.MaxPool2d((2, 3), padding=(1, 1), stride=(2, 3))
 pool2d(X)
 ```
 
@@ -184,15 +244,29 @@ is the same as the number of input channels.
 Below, we will concatenate arrays `X` and `X+1`
 on the channel dimension to construct an input with 2 channels.
 
-```{.python .input  n=9}
+```{.python .input}
 X = np.concatenate((X, X + 1), axis=1)
+X
+```
+
+
+```{.python .input}
+#@tab pytorch
+X = torch.cat((X, X + 1), dim=1)
 X
 ```
 
 As we can see, the number of output channels is still 2 after pooling.
 
-```{.python .input  n=10}
+```{.python .input}
 pool2d = nn.MaxPool2D(3, padding=1, strides=2)
+pool2d(X)
+```
+
+
+```{.python .input}
+#@tab pytorch
+pool2d = nn.MaxPool2d(3, padding=1, stride=2)
 pool2d(X)
 ```
 
@@ -214,6 +288,10 @@ pool2d(X)
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
 1. Is there another operation between average and maximum pooling that you could consider (hint: recall the softmax)? Why might it not be so popular?
 
-## [Discussions](https://discuss.mxnet.io/t/2352)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/71)
+:end_tab:
 
-![](../img/qr_pooling.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/72)
+:end_tab:
