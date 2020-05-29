@@ -31,7 +31,6 @@ Once these preparations are complete,
 the `nvidia-smi` command can be used
 to view the graphics card information.
 
-
 ```{.python .input}
 #@tab all
 !nvidia-smi
@@ -217,6 +216,7 @@ x.ctx
 
 
 ```{.python .input}
+#@tab pytorch
 x = torch.tensor([1, 2, 3])
 x.device
 ```
@@ -310,6 +310,7 @@ y + z
 
 
 ```{.python .input}
+#@tab pytorch
 y + z
 ```
 
@@ -411,6 +412,7 @@ net(x)
 
 
 ```{.python .input}
+#@tab pytorch
 net(x)
 ```
 
@@ -422,6 +424,7 @@ net[0].weight.data().ctx
 
 
 ```{.python .input}
+#@tab pytorch
 net[0].weight.data.device
 ```
 
