@@ -111,7 +111,6 @@ net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
         nn.Dense(10))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 import d2l_pytorch as d2l
@@ -163,7 +162,6 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.randn(size=(1, 1, 28, 28), dtype=torch.float32)
@@ -206,7 +204,6 @@ batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 batch_size = 256
@@ -237,7 +234,6 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
         metric.add(d2l.accuracy(net(X), y), y.size)
     return metric[0]/metric[1]
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -296,7 +292,6 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     print('%.1f examples/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 #@save
@@ -317,6 +312,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
+            timer.start()
             net.train()            
             optimizer.zero_grad()
             X, y = X.to(device), y.to(device) 
@@ -345,7 +341,6 @@ Now let us train the model.
 lr, num_epochs = 0.9, 10
 train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
