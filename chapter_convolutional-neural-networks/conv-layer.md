@@ -103,7 +103,6 @@ def corr2d(X, K):  #@save
     return Y
 ```
 
-
 We can construct the input array `X` and the kernel array `K`
 from the figure above
 to validate the output of the above implementation
@@ -121,7 +120,6 @@ X = torch.Tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
 K = torch.Tensor([[0, 1], [2, 3]])
 corr2d(X, K)
 ```
-
 
 ## Convolutional Layers
 
@@ -166,7 +164,6 @@ class Conv2D(nn.Module):
         return corr2d(x, self.weight) + self.bias
 ```
 
-
 ## Object Edge Detection in Images
 
 Let's take a moment to parse a simple application of a convolutional layer:
@@ -188,7 +185,6 @@ X[:, 2:6] = 0
 X
 ```
 
-
 Next, we construct a kernel `K` with a height of $1$ and width of $2$.
 When we perform the cross-correlation operation with the input,
 if the horizontally adjacent elements are the same,
@@ -202,7 +198,6 @@ K = np.array([[1, -1]])
 #@tab pytorch
 K = torch.Tensor([[1, -1]])
 ```
-
 
 We are ready to perform the cross-correlation operation
 with arguments `X` (our input) and `K` (our kernel).
@@ -221,7 +216,6 @@ Y = corr2d(X, K)
 Y
 ```
 
-
 We can now apply the kernel to the transposed image.
 As expected, it vanishes. The kernel `K` only detects vertical edges.
 
@@ -233,7 +227,6 @@ corr2d(X.T, K)
 #@tab pytorch
 corr2d(X.t(), K)
 ```
-
 
 ## Learning a Kernel
 
@@ -307,7 +300,6 @@ for i in range(10):
         print(f'batch {i+1}, loss {l.sum():.3f}')
 ```
 
-
 Note that the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel array we learned.
 
 ```{.python .input}
@@ -318,7 +310,6 @@ conv2d.weight.data().reshape(1, 2)
 #@tab pytorch
 conv2d.weight.data.reshape((1, 2))
 ```
-
 
 Indeed, the learned kernel array is remarkably close
 to the kernel array `K` we defined earlier.

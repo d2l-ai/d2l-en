@@ -127,7 +127,6 @@ X = np.random.uniform(size=(8, 8))
 comp_conv2d(conv2d, X).shape
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 import torch
@@ -162,7 +161,6 @@ by setting different padding numbers for height and width.
 conv2d = nn.Conv2D(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -222,7 +220,6 @@ conv2d = nn.Conv2D(1, kernel_size=3, padding=1, strides=2)
 comp_conv2d(conv2d, X).shape
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 conv2d = nn.Conv2d(1, 1, kernel_size=3, padding=1, stride=2)
@@ -235,7 +232,6 @@ Next, we will look at a slightly more complicated example.
 conv2d = nn.Conv2D(1, kernel_size=(3, 5), padding=(0, 1), strides=(3, 4))
 comp_conv2d(conv2d, X).shape
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -266,6 +262,10 @@ i.e., we usually have $p_h = p_w$ and $s_h = s_w$.
 1. For audio signals, what does a stride of $2$ correspond to?
 1. What are the computational benefits of a stride larger than $1$.
 
-## [Discussions](https://discuss.mxnet.io/t/2350)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/67)
+:end_tab:
 
-![](../img/qr_padding-and-strides.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/68)
+:end_tab:

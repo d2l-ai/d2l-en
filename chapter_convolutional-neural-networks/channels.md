@@ -57,26 +57,46 @@ we can implement cross-correlation operations with multiple input channels ourse
 Notice that all we are doing is performing one cross-correlation operation
 per channel and then adding up the results using the `add_n` function.
 
-```{.python .input  n=1}
+```{.python .input}
 import d2l
 from mxnet import np, npx
 npx.set_np()
 
 def corr2d_multi_in(X, K):
     # First, traverse along the 0th dimension (channel dimension) of X and K.
-    # Then, add them together by using * to turn the result list into a
-    # positional argument of the add_n function
+    # Then, add them together.
     return sum(d2l.corr2d(x, k) for x, k in zip(X, K))
+```
+
+```{.python .input}
+#@tab pytorch
+import d2l_pytorch as d2l
+import torch
+
+def corr2d_multi_in(X, K):
+    # First, traverse along the 0th dimension (channel dimension) of X and K. 
+    # Then, add them together.
+    return sum([d2l.corr2d(x, k) for x, k in zip(X, K)])
 ```
 
 We can construct the input array `X` and the kernel array `K`
 corresponding to the values in the above diagram
 to validate the output of the cross-correlation operation.
 
-```{.python .input  n=2}
+```{.python .input}
 X = np.array([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
               [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
 K = np.array([[[0, 1], [2, 3]], [[1, 2], [3, 4]]])
+
+corr2d_multi_in(X, K)
+```
+
+```{.python .input}
+#@tab pytorch
+X = torch.tensor([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
+                  [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
+K = torch.tensor([[[0, 1], [2, 3]],
+                  [[1, 2], [3, 4]]])
 
 corr2d_multi_in(X, K)
 ```
@@ -116,7 +136,7 @@ and takes input from all channels in the input array.
 We implement a cross-correlation function
 to calculate the output of multiple channels as shown below.
 
-```{.python .input  n=3}
+```{.python .input}
 def corr2d_multi_in_out(X, K):
     # Traverse along the 0th dimension of K, and each time, perform
     # cross-correlation operations with input X. All of the results are merged
@@ -124,12 +144,27 @@ def corr2d_multi_in_out(X, K):
     return np.stack([corr2d_multi_in(X, k) for k in K])
 ```
 
+```{.python .input}
+#@tab pytorch
+def corr2d_multi_in_out(X, K):
+    # Traverse along the 0th dimension of K, and each time, perform
+    # cross-correlation operations with input X. All of the results are merged
+    # together using the stack function
+    return torch.stack([corr2d_multi_in(X, k) for k in K], dim=0)
+```
+
 We construct a convolution kernel with 3 output channels
 by concatenating the kernel array `K` with `K+1`
 (plus one for each element in `K`) and `K+2`.
 
-```{.python .input  n=4}
+```{.python .input}
 K = np.stack((K, K + 1, K + 2))
+K.shape
+```
+
+```{.python .input}
+#@tab pytorch
+K = torch.stack([K, K + 1, K + 2], dim=0)
 K.shape
 ```
 
@@ -141,7 +176,12 @@ with the result of the previous input array `X`
 and the multi-input channel,
 single-output channel kernel.
 
-```{.python .input  n=5}
+```{.python .input}
+corr2d_multi_in_out(X, K)
+```
+
+```{.python .input}
+#@tab pytorch
 corr2d_multi_in_out(X, K)
 ```
 
@@ -188,7 +228,7 @@ using a fully-connected layer.
 The only thing is that we need to make some adjustments
 to the data shape before and after the matrix multiplication.
 
-```{.python .input  n=6}
+```{.python .input}
 def corr2d_multi_in_out_1x1(X, K):
     c_i, h, w = X.shape
     c_o = K.shape[0]
@@ -198,11 +238,22 @@ def corr2d_multi_in_out_1x1(X, K):
     return Y.reshape(c_o, h, w)
 ```
 
+```{.python .input}
+#@tab pytorch
+def corr2d_multi_in_out_1x1(X, K):
+    c_i, h, w = X.shape
+    c_o = K.shape[0]
+    X = X.reshape((c_i, h * w))
+    K = K.reshape((c_o, c_i))
+    Y = torch.mm(K, X)  # Matrix multiplication in the fully connected layer
+    return Y.reshape((c_o, h, w))
+```
+
 When performing $1\times 1$ convolution,
 the above function is equivalent to the previously implemented cross-correlation function `corr2d_multi_in_out`.
 Let us check this with some reference data.
 
-```{.python .input  n=7}
+```{.python .input}
 X = np.random.uniform(size=(3, 3, 3))
 K = np.random.uniform(size=(2, 3, 1, 1))
 
@@ -210,6 +261,17 @@ Y1 = corr2d_multi_in_out_1x1(X, K)
 Y2 = corr2d_multi_in_out(X, K)
 
 np.abs(Y1 - Y2).sum() < 1e-6
+```
+
+```{.python .input}
+#@tab pytorch
+X = torch.randn(size=(3, 3, 3))
+K = torch.randn(size=(2, 3, 1, 1))
+
+Y1 = corr2d_multi_in_out_1x1(X, K)
+Y2 = corr2d_multi_in_out(X, K)
+
+(Y1 - Y2).norm().item() < 1e-6
 ```
 
 ## Summary
@@ -235,6 +297,10 @@ np.abs(Y1 - Y2).sum() < 1e-6
 1. Are the variables `Y1` and `Y2` in the last example of this section exactly the same? Why?
 1. How would you implement convolutions using matrix multiplication when the convolution window is not $1\times 1$?
 
-## [Discussions](https://discuss.mxnet.io/t/2351)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/69)
+:end_tab:
 
-![](../img/qr_channels.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/70)
+:end_tab:
