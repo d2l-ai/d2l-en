@@ -17,7 +17,7 @@ This section addresses both issues.
 ## Loading and Saving `ndarray`s
 
 For individual `ndarray`s, we can directly 
-invoke their `load` and `save` functions 
+invoke the `load` and `save` functions 
 to read and write them respectively. 
 Both functions require that we supply a name,
 and `save` requires as input the variable to be saved.
@@ -31,6 +31,16 @@ x = np.arange(4)
 npx.save('x-file', x)
 ```
 
+```{.python .input}
+#@tab pytorch
+import torch
+from torch import nn
+import torch.nn.functional as F
+
+x = torch.arange(4)
+torch.save(x,"x-file")
+```
+
 We can now read this data from the stored file back into memory.
 
 ```{.python .input}
@@ -38,12 +48,26 @@ x2 = npx.load('x-file')
 x2
 ```
 
-MXNet also allows us to store a list of `ndarray`s and read them back into memory.
+```{.python .input}
+#@tab pytorch
+x2 = torch.load("x-file")
+x2
+```
 
-```{.python .input  n=2}
+We can store a list of `ndarray`s and read them back into memory.
+
+```{.python .input}
 y = np.zeros(4)
 npx.save('x-files', [x, y])
 x2, y2 = npx.load('x-files')
+(x2, y2)
+```
+
+```{.python .input}
+#@tab pytorch
+y = torch.zeros(4)
+torch.save([x, y],'x-files')
+x2, y2 = torch.load('x-files')
 (x2, y2)
 ```
 
@@ -52,21 +76,29 @@ from strings to `ndarray`s.
 This is convenient when we want 
 to read or write all the weights in a model.
 
-```{.python .input  n=4}
+```{.python .input}
 mydict = {'x': x, 'y': y}
 npx.save('mydict', mydict)
 mydict2 = npx.load('mydict')
 mydict2
 ```
 
-## Gluon Model Parameters
+```{.python .input}
+#@tab pytorch
+mydict = {'x': x, 'y': y}
+torch.save(mydict, 'mydict')
+mydict2 = torch.load('mydict')
+mydict2
+```
+
+## Model Parameters
 
 Saving individual weight vectors (or other `ndarray` tensors) is useful 
 but it gets very tedious if we want to save 
 (and later load) an entire model.
 After all, we might have hundreds of 
 parameter groups sprinkled throughout. 
-For this reason Gluon provides built-in functionality 
+For this reason the framework provides built-in functionality 
 to load and save entire networks.
 An important detail to note is that this 
 saves model *parameters* and not the entire model. 
@@ -74,18 +106,12 @@ For example, if we have a 3 layer MLP,
 we need to specify the *architecture* separately. 
 The reason for this is that the models themselves can contain arbitrary code, 
 hence they cannot be serialized as naturally 
-(and there is a way to do this for compiled models: 
-please refer to the [MXNet documentation](http://www.mxnet.io)
-for technical details). 
 Thus, in order to reinstate a model, we need 
 to generate the architecture in code 
 and then load the parameters from disk. 
-The deferred initialization (:numref:`sec_deferred_init`) 
-is advantageous here since we can simply define a model
-without the need to put actual values in place. 
 Let us start with our familiar MLP.
 
-```{.python .input  n=6}
+```{.python .input}
 class MLP(nn.Block):
     def __init__(self, **kwargs):
         super(MLP, self).__init__(**kwargs)
@@ -101,25 +127,48 @@ x = np.random.uniform(size=(2, 20))
 y = net(x)
 ```
 
+```{.python .input}
+#@tab pytorch
+class MLP(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.hidden = nn.Linear(20, 256)
+        self.output = nn.Linear(256, 10)
+        
+    def forward(self, x):
+        return self.output(F.relu(self.hidden(x)))
+
+net = MLP()
+x = torch.randn(size=(2, 20))
+y = net(x)
+```
+
 Next, we store the parameters of the model as a file with the name `mlp.params`.
-Gluon Blocks support a `save_parameters` method 
-that writes all parameters to disk given 
-a string for the file name. 
 
 ```{.python .input}
 net.save_parameters('mlp.params')
+```
+
+```{.python .input}
+#@tab pytorch
+torch.save(net.state_dict(), 'mlp.params')
 ```
 
 To recover the model, we instantiate a clone 
 of the original MLP model.
 Instead of randomly initializing the model parameters, 
 we read the parameters stored in the file directly.
-Conveniently we can load parameters into Blocks
-via their `load_parameters` method. 
 
-```{.python .input  n=8}
+```{.python .input}
 clone = MLP()
 clone.load_parameters('mlp.params')
+```
+
+```{.python .input}
+#@tab pytorch
+clone = MLP()
+clone.load_state_dict(torch.load("mlp.params"))
+clone.eval()
 ```
 
 Since both instances have the same model parameters, 
@@ -131,10 +180,16 @@ yclone = clone(x)
 yclone == y
 ```
 
+```{.python .input}
+#@tab pytorch
+yclone = clone(x)
+yclone == y
+```
+
 ## Summary
 
 * The `save` and `load` functions can be used to perform File I/O for `ndarray` objects.
-* The `load_parameters` and `save_parameters` functions allow us to save entire sets of parameters for a network in Gluon.
+* We can save and load the entire sets of parameters for a network via a parameter dictionary. 
 * Saving the architecture has to be done in code rather than in parameters.
 
 ## Exercises
@@ -143,6 +198,10 @@ yclone == y
 1. Assume that we want to reuse only parts of a network to be incorporated into a network of a *different* architecture. How would you go about using, say the first two layers from a previous network in a new network.
 1. How would you go about saving network architecture and parameters? What restrictions would you impose on the architecture?
 
-## [Discussions](https://discuss.mxnet.io/t/2329)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/60)
+:end_tab:
 
-![](../img/qr_read-write.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/61)
+:end_tab:
