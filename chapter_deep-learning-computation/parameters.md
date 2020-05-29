@@ -56,7 +56,6 @@ x = torch.randn(2, 4)
 net(x)
 ```
 
-
 ## Parameter Access
 
 Let us start with how to access parameters
@@ -77,7 +76,6 @@ print(net[1].params)
 #@tab pytorch
 print(net[2].state_dict())  
 ```
-
 
 The output tells us a few important things.
 First, each fully-connected layer 
@@ -119,7 +117,6 @@ print(net[2].bias)
 print(net[2].bias.data)
 ```
 
-
 Parameters are complex objects,
 containing data, gradients,
 and additional information.
@@ -135,7 +132,6 @@ net[0].weight.grad()
 #@tab pytorch
 net[0].weight.grad == None
 ```
-
 
 ### All Parameters at Once
 
@@ -162,7 +158,6 @@ print(net[0].state_dict())
 print(net.state_dict())
 ```
 
-
 This provides us with another way of accessing the parameters of the network:
 
 ```{.python .input}
@@ -173,7 +168,6 @@ net.collect_params()['dense1_bias'].data()
 #@tab pytorch
 net.state_dict()['2.bias'].data
 ```
-
 
 :begin_tab:`mxnet`
 Throughout the book we encounter Blocks 
@@ -233,7 +227,6 @@ def block2():
 rgnet = nn.Sequential(block2(), nn.Linear(4, 1))
 rgnet(x)
 ```
-
 
 Now that we have designed the network, 
 let us see how it is organized.
@@ -318,7 +311,6 @@ net.apply(init_normal)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
 
-
 We can also initialize all parameters 
 to a given constant value (say, $1$).
 
@@ -336,7 +328,6 @@ def init_normal(m):
 net.apply(init_normal)    
 net[0].weight.data[0], net[0].bias.data[0]
 ```
-
 
 We can also apply different initialziers for certain blocks.
 For example, below we initialize the first layer
@@ -365,7 +356,6 @@ net[2].apply(init_42)
 print(net[0].weight.data[0])
 print(net[2].weight.data)
 ```
-
 
 ### Custom Initialization
 
@@ -419,7 +409,6 @@ net.apply(my_init)
 net[0].weight[0:2]
 ```
 
-
 Note that we always have the option 
 of setting parameters directly by calling `data` 
 to access the underlying data. 
@@ -443,7 +432,6 @@ net[0].weight.data[:] += 1
 net[0].weight.data[0, 0] = 42
 net[0].weight.data[0]
 ```
-
 
 ## Tied Parameters
 
@@ -496,7 +484,6 @@ net[2].weight.data[0, 0] = 100
 # same value
 print(net[2].weight.data[0] == net[4].weight.data[0])
 ```
-
 
 This example shows that the parameters 
 of the second and third layer are tied. 
