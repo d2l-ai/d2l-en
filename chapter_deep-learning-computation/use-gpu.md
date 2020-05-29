@@ -69,7 +69,6 @@ you can install the MXNet version
 that supports CUDA 9.0 via `pip install mxnet-cu90`.
 To run the programs in this section,
 you need at least two GPUs.
-:end:
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -98,7 +97,7 @@ you can install the MXNet version
 that supports CUDA 9.0 via `pip install torch-cu90`.
 To run the programs in this section,
 you need at least two GPUs.
-:end:
+:end_tab:
 
 
 Note that this might be extravagant for most desktop computers
