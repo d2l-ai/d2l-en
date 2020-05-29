@@ -49,7 +49,7 @@ net(x)  # Forward computation
 ```{.python .input}
 #@tab pytorch
 import torch
-import torch.nn as nn
+from torch import nn
 
 net = nn.Sequential(nn.Linear(4, 8), nn.ReLU(), nn.Linear(8, 1))
 x = torch.randn(2, 4)

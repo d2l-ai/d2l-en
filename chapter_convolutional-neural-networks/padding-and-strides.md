@@ -130,7 +130,7 @@ comp_conv2d(conv2d, X).shape
 ```{.python .input}
 #@tab pytorch
 import torch
-import torch.nn as nn
+from torch import nn
 # We define a convenience function to calculate the convolutional layer. This 
 # function initializes the convolutional layer weights and performs
 # corresponding dimensionality elevations and reductions on the input and

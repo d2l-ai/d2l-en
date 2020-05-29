@@ -316,7 +316,7 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
 #@tab pytorch
 import d2l_pytorch as d2l
 import torch
-import torch.nn as nn
+from torch import nn
 
 net = nn.Sequential(
     nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=1), nn.ReLU(),

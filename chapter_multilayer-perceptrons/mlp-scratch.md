@@ -15,7 +15,7 @@ npx.set_np()
 #@tab pytorch
 import d2l_pytorch as d2l
 import torch
-import torch.nn as nn
+from torch import nn
 ```
 
 To compare against our previous results

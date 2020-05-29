@@ -152,7 +152,7 @@ npx.cpu(), npx.gpu(), npx.gpu(1)
 ```{.python .input}
 #@tab pytorch
 import torch
-import torch.nn as nn
+from torch import nn
 
 torch.device('cpu'), torch.cuda.device('cuda'), torch.cuda.device('cuda:1')
 ```

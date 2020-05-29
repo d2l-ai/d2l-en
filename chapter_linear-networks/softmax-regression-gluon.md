@@ -18,7 +18,7 @@ npx.set_np()
 #@tab pytorch
 import d2l_pytorch as d2l
 import torch
-import torch.nn as nn
+from torch import nn
 ```
 
 Let us stick with the Fashion-MNIST dataset

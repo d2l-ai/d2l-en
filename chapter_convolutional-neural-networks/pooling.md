@@ -120,7 +120,7 @@ def pool2d(X, pool_size, mode='max'):
 ```{.python .input}
 #@tab pytorch
 import torch
-import torch.nn as nn
+from torch import nn
 
 def pool2d(X, pool_size, mode='max'):
     p_h, p_w = pool_size
