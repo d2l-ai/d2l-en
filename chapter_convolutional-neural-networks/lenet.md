@@ -118,10 +118,6 @@ import torch
 from torch import nn
 from dataclasses import dataclass
 
-class Flatten(torch.nn.Module):
-    def forward(self, x):
-        return x.view(x.shape[0], -1)
-
 class Reshape(torch.nn.Module):
     def forward(self, x):
         return x.view(-1,1,28,28)
@@ -132,7 +128,7 @@ net = torch.nn.Sequential(
     nn.AvgPool2d(kernel_size=2, stride=2),
     nn.Conv2d(6, 16, kernel_size=5), nn.Sigmoid(),
     nn.AvgPool2d(kernel_size=2, stride=2),
-    Flatten(),
+    nn.Flatten(),
     nn.Linear(16*5*5, 120), nn.Sigmoid(),
     nn.Linear(120, 84), nn.Sigmoid(),
     nn.Linear(84, 10))

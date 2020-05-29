@@ -386,6 +386,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
+            timer.start()
             net.train()            
             optimizer.zero_grad()
             X, y = X.to(device), y.to(device) 
