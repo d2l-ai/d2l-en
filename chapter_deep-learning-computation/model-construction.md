@@ -138,7 +138,6 @@ net.initialize()
 net(x)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 import torch
@@ -240,7 +239,6 @@ class MLP(nn.Block):
         return self.output(self.hidden(x))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 class MLP(nn.Module):
@@ -299,7 +297,6 @@ net.initialize()
 net(x)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 net = MLP()
@@ -349,7 +346,6 @@ class MySequential(nn.Block):
             x = block(x)
         return x
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -411,7 +407,6 @@ net.add(nn.Dense(10))
 net.initialize()
 net(x)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -486,7 +481,6 @@ class FixedHiddenMLP(nn.Block):
         return x.sum()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 class FixedHiddenMLP(nn.Module):
@@ -542,7 +536,6 @@ net.initialize()
 net(x)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 net = FixedHiddenMLP()
@@ -572,7 +565,6 @@ chimera.add(NestMLP(), nn.Dense(20), FixedHiddenMLP())
 chimera.initialize()
 chimera(x)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -641,4 +633,3 @@ to learn about compilation after finishing the current chapter.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/55)
 :end_tab:
-
