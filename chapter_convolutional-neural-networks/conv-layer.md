@@ -88,7 +88,6 @@ def corr2d(X, K):  #@save
     return Y
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 import torch
@@ -104,6 +103,7 @@ def corr2d(X, K):  #@save
     return Y
 ```
 
+
 We can construct the input array `X` and the kernel array `K`
 from the figure above
 to validate the output of the above implementation
@@ -115,13 +115,13 @@ K = np.array([[0, 1], [2, 3]])
 corr2d(X, K)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.Tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
 K = torch.Tensor([[0, 1], [2, 3]])
 corr2d(X, K)
 ```
+
 
 ## Convolutional Layers
 
@@ -154,7 +154,6 @@ class Conv2D(nn.Block):
         return corr2d(x, self.weight.data()) + self.bias.data()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 class Conv2D(nn.Module):
@@ -166,6 +165,7 @@ class Conv2D(nn.Module):
     def forward(self, x):
         return corr2d(x, self.weight) + self.bias
 ```
+
 
 ## Object Edge Detection in Images
 
@@ -181,13 +181,13 @@ X[:, 2:6] = 0
 X
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.ones(6, 8)
 X[:, 2:6] = 0
 X
 ```
+
 
 Next, we construct a kernel `K` with a height of $1$ and width of $2$.
 When we perform the cross-correlation operation with the input,
@@ -198,11 +198,11 @@ the output is 0. Otherwise, the output is non-zero.
 K = np.array([[1, -1]])
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 K = torch.Tensor([[1, -1]])
 ```
+
 
 We are ready to perform the cross-correlation operation
 with arguments `X` (our input) and `K` (our kernel).
@@ -215,12 +215,12 @@ Y = corr2d(X, K)
 Y
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 Y = corr2d(X, K)
 Y
 ```
+
 
 We can now apply the kernel to the transposed image.
 As expected, it vanishes. The kernel `K` only detects vertical edges.
@@ -229,11 +229,11 @@ As expected, it vanishes. The kernel `K` only detects vertical edges.
 corr2d(X.T, K)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 corr2d(X.t(), K)
 ```
+
 
 ## Learning a Kernel
 
@@ -280,9 +280,8 @@ for i in range(10):
     # For the sake of simplicity, we ignore the bias here
     conv2d.weight.data()[:] -= 3e-2 * conv2d.weight.grad()
     if (i + 1) % 2 == 0:
-        print(f'batch {i+1}, loss {l.sum():.3f}')
+        print(f'batch {i+1}, loss {float(l.sum()):.3f}')
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -308,17 +307,18 @@ for i in range(10):
         print(f'batch {i+1}, loss {l.sum():.3f}')
 ```
 
+
 Note that the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel array we learned.
 
 ```{.python .input}
 conv2d.weight.data().reshape(1, 2)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 conv2d.weight.data.reshape((1, 2))
 ```
+
 
 Indeed, the learned kernel array is remarkably close
 to the kernel array `K` we defined earlier.
