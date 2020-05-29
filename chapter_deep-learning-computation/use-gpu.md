@@ -149,7 +149,6 @@ npx.set_np()
 npx.cpu(), npx.gpu(), npx.gpu(1)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 import torch
@@ -163,7 +162,6 @@ We can query the number of available GPUs.
 ```{.python .input}
 npx.num_gpus()
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -185,7 +183,6 @@ def try_all_gpus():  #@save
 
 try_gpu(), try_gpu(3), try_all_gpus()
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -213,7 +210,6 @@ We can query the device where the `ndarray` is located.
 x = np.array([1, 2, 3])
 x.ctx
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -246,7 +242,6 @@ x = np.ones((2, 3), ctx=try_gpu())
 x
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 x = torch.ones(2, 3, device=try_gpu())
@@ -259,7 +254,6 @@ Assuming you have at least two GPUs, the following code will create a random arr
 y = np.random.uniform(size=(2, 3), ctx=try_gpu(1))
 y
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -292,7 +286,6 @@ print(x)
 print(z)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 z = x.cuda(1)
@@ -307,7 +300,6 @@ we can add them up.
 ```{.python .input}
 y + z
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -340,7 +332,6 @@ It will returns `z` instead of make a copy and allocate new memory.
 ```{.python .input}
 z.as_in_ctx(try_gpu(1)) is z
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -397,7 +388,6 @@ net.add(nn.Dense(1))
 net.initialize(ctx=try_gpu())
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(nn.Linear(3, 1))
@@ -410,7 +400,6 @@ When the input is an `ndarray` on the GPU, Gluon will calculate the result on th
 net(x)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 net(x)
@@ -421,7 +410,6 @@ Let us confirm that the model parameters are stored on the same GPU.
 ```{.python .input}
 net[0].weight.data().ctx
 ```
-
 
 ```{.python .input}
 #@tab pytorch

@@ -13,6 +13,7 @@ import torch
 import torchvision
 from torch import nn
 from torch.utils.data import TensorDataset, DataLoader
+from torch.utils import data
 from torchvision import transforms
 import numpy as np
 import os
@@ -105,24 +106,24 @@ class Timer:  #@save
         self.start()
 
     def start(self):
-        # Start the timer
+        """Start the timer."""
         self.tik = time.time()
 
     def stop(self):
-        # Stop the timer and record the time in a list
+        """Stop the timer and record the time in a list."""
         self.times.append(time.time() - self.tik)
         return self.times[-1]
 
     def avg(self):
-        # Return the average time
+        """Return the average time."""
         return sum(self.times) / len(self.times)
 
     def sum(self):
-        # Return the sum of time
+        """Return the sum of time."""
         return sum(self.times)
 
     def cumsum(self):
-        # Return the accumulated times
+        """Return the accumulated times."""
         return np.array(self.times).cumsum().tolist()
 
 
@@ -155,9 +156,8 @@ def sgd(params, lr, batch_size):  #@save
 # Defined in file: ./chapter_linear-networks/linear-regression-gluon.md
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data loader"""
-    dataset = TensorDataset(*data_arrays)
-    dataloader = DataLoader(dataset, batch_size, shuffle=is_train)
-    return dataloader
+    dataset = data.TensorDataset(*data_arrays)
+    return data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
@@ -173,8 +173,10 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):
-        ax.imshow(img.numpy())
+    for i, (ax, img) in enumerate(zip(axes, imgs)):        
+        if 'asnumpy' in dir(img): img = img.asnumpy() 
+        if 'numpy' in dir(img): img = img.numpy()
+        ax.imshow(img)
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
         if titles:
@@ -198,18 +200,21 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
     trans.append(transforms.ToTensor())
     trans = transforms.Compose(trans)
 
-    mnist_train = torchvision.datasets.FashionMNIST(root="./", train=True, transform=trans, target_transform=None, download=True)
-    mnist_test = torchvision.datasets.FashionMNIST(root="./", train=False, transform=trans, target_transform=None, download=True)
-    return (DataLoader(mnist_train, batch_size, shuffle=True,
-                       num_workers=get_dataloader_workers()),
-            DataLoader(mnist_test, batch_size, shuffle=False,
-                       num_workers=get_dataloader_workers()))
+    mnist_train = torchvision.datasets.FashionMNIST(
+        root="../data", train=True, transform=trans, download=True)
+    mnist_test = torchvision.datasets.FashionMNIST(
+        root="../data", train=False, transform=trans, download=True)
+    return (data.DataLoader(mnist_train, batch_size, shuffle=True,
+                            num_workers=get_dataloader_workers()),
+            data.DataLoader(mnist_test, batch_size, shuffle=False,
+                            num_workers=get_dataloader_workers()))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):  #@save
     if y_hat.shape[1] > 1:
-        return float((y_hat.argmax(axis=1).type(torch.float32) == y.type(torch.float32)).sum())
+        return float((y_hat.argmax(axis=1).type(torch.float32) ==
+                      y.type(torch.float32)).sum())
     else:
         return float((y_hat.type(torch.int32) == y.type(torch.int32)).sum())
 
@@ -225,7 +230,6 @@ def evaluate_accuracy(net, data_iter):  #@save
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Accumulator:  #@save
     """Sum a list of numbers over time."""
-
     def __init__(self, n):
         self.data = [0.0] * n
 
@@ -253,11 +257,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater.zero_grad()
             l.backward()
             updater.step()
-            # When using the concise implementation and pytorch's in house
-            # CrossEntropyLoss, it uses mean as reduction method over
-            # crossentropy. Thus we need to scale the loss back, to get l_sum.
-            l_sum = float(l)*len(y)
-            metric.add(l_sum, float(accuracy(y_hat, y)), len(y))
+            metric.add(float(l)*len(y), float(accuracy(y_hat, y)), len(y))
         else:
             l.sum().backward()
             updater(X.shape[0])
@@ -328,5 +328,32 @@ def predict_ch3(net, test_iter, n=6):  #@save
     preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
     titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_gpu(i=0):  #@save
+    """Return gpu(i) if exists, otherwise return cpu()."""
+    if torch.cuda.device_count() >= i + 1:
+        return torch.device(f'cuda:{i}')
+    return torch.device('cpu')
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_all_gpus():  #@save
+    """Return all available GPUs, or [cpu(),] if no GPU exists."""
+    ctxes = [torch.device(f'cuda:{i}')
+             for i in range(torch.cuda.device_count())]
+    return ctxes if ctxes else [torch.device('cpu')]
+
+
+# Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
+def corr2d(X, K):  #@save
+    """Compute 2D cross-correlation."""
+    h, w = K.shape
+    Y = torch.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
+    return Y
 
 

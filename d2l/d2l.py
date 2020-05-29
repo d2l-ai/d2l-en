@@ -99,24 +99,24 @@ class Timer:  #@save
         self.start()
 
     def start(self):
-        # Start the timer
+        """Start the timer."""
         self.tik = time.time()
 
     def stop(self):
-        # Stop the timer and record the time in a list
+        """Stop the timer and record the time in a list."""
         self.times.append(time.time() - self.tik)
         return self.times[-1]
 
     def avg(self):
-        # Return the average time
+        """Return the average time."""
         return sum(self.times) / len(self.times)
 
     def sum(self):
-        # Return the sum of time
+        """Return the sum of time."""
         return sum(self.times)
 
     def cumsum(self):
-        # Return the accumulated times
+        """Return the accumulated times."""
         return np.array(self.times).cumsum().tolist()
 
 
@@ -147,7 +147,7 @@ def sgd(params, lr, batch_size):  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-gluon.md
 def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a Gluon data loader"""
+    """Construct a Gluon data loader."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
@@ -165,8 +165,10 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):
-        ax.imshow(img.asnumpy())
+    for i, (ax, img) in enumerate(zip(axes, imgs)):        
+        if 'asnumpy' in dir(img): img = img.asnumpy() 
+        if 'numpy' in dir(img): img = img.numpy()
+        ax.imshow(img)
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
         if titles:
@@ -218,7 +220,6 @@ def evaluate_accuracy(net, data_iter):  #@save
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Accumulator:  #@save
     """Sum a list of numbers over time."""
-
     def __init__(self, n):
         self.data = [0.0] * n
 
@@ -374,5 +375,29 @@ DATA_HUB['kaggle_house_train'] = (
 DATA_HUB['kaggle_house_test'] = (
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_gpu(i=0):  #@save
+    """Return gpu(i) if exists, otherwise return cpu()."""
+    return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_all_gpus():  #@save
+    """Return all available GPUs, or [cpu(),] if no GPU exists."""
+    ctxes = [npx.gpu(i) for i in range(npx.num_gpus())]
+    return ctxes if ctxes else [npx.cpu()]
+
+
+# Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
+def corr2d(X, K):  #@save
+    """Compute 2D cross-correlation."""
+    h, w = K.shape
+    Y = np.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
+    return Y
 
 

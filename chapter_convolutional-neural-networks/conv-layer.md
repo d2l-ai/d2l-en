@@ -78,11 +78,26 @@ from mxnet import autograd, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-# Saved in the d2l package for later use
-def corr2d(X, K):
+def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
     h, w = K.shape
     Y = np.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
+    return Y
+```
+
+
+```{.python .input}
+#@tab pytorch
+import torch
+from torch import nn
+
+def corr2d(X, K):  #@save
+    """Compute 2D cross-correlation."""
+    h, w = K.shape
+    Y = torch.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
             Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
@@ -97,6 +112,14 @@ of the two-dimensional cross-correlation operation.
 ```{.python .input}
 X = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
 K = np.array([[0, 1], [2, 3]])
+corr2d(X, K)
+```
+
+
+```{.python .input}
+#@tab pytorch
+X = torch.Tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
+K = torch.Tensor([[0, 1], [2, 3]])
 corr2d(X, K)
 ```
 
@@ -120,15 +143,28 @@ As with $h \times w$ cross-correlation
 we also refer to convolutional layers
 as $h \times w$ convolutions.
 
-```{.python .input  n=70}
+```{.python .input}
 class Conv2D(nn.Block):
     def __init__(self, kernel_size, **kwargs):
-        super(Conv2D, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.weight = self.params.get('weight', shape=kernel_size)
         self.bias = self.params.get('bias', shape=(1,))
 
     def forward(self, x):
         return corr2d(x, self.weight.data()) + self.bias.data()
+```
+
+
+```{.python .input}
+#@tab pytorch
+class Conv2D(nn.Module):
+    def __init__(self, kernel_size):
+        super().__init__()
+        self.weight = nn.Parameter(torch.rand(kernel_size))
+        self.bias = nn.Parameter(torch.zeros(1))
+
+    def forward(self, x):
+        return corr2d(x, self.weight) + self.bias
 ```
 
 ## Object Edge Detection in Images
@@ -139,8 +175,16 @@ by finding the location of the pixel change.
 First, we construct an 'image' of $6\times 8$ pixels.
 The middle four columns are black (0) and the rest are white (1).
 
-```{.python .input  n=66}
+```{.python .input}
 X = np.ones((6, 8))
+X[:, 2:6] = 0
+X
+```
+
+
+```{.python .input}
+#@tab pytorch
+X = torch.ones(6, 8)
 X[:, 2:6] = 0
 X
 ```
@@ -150,8 +194,14 @@ When we perform the cross-correlation operation with the input,
 if the horizontally adjacent elements are the same,
 the output is 0. Otherwise, the output is non-zero.
 
-```{.python .input  n=67}
+```{.python .input}
 K = np.array([[1, -1]])
+```
+
+
+```{.python .input}
+#@tab pytorch
+K = torch.Tensor([[1, -1]])
 ```
 
 We are ready to perform the cross-correlation operation
@@ -160,7 +210,14 @@ As you can see, we detect 1 for the edge from white to black
 and -1 for the edge from black to white.
 All other outputs take value $0$.
 
-```{.python .input  n=69}
+```{.python .input}
+Y = corr2d(X, K)
+Y
+```
+
+
+```{.python .input}
+#@tab pytorch
 Y = corr2d(X, K)
 Y
 ```
@@ -170,6 +227,12 @@ As expected, it vanishes. The kernel `K` only detects vertical edges.
 
 ```{.python .input}
 corr2d(X.T, K)
+```
+
+
+```{.python .input}
+#@tab pytorch
+corr2d(X.t(), K)
 ```
 
 ## Learning a Kernel
@@ -193,10 +256,10 @@ we will ignore the bias.
 
 We previously constructed the `Conv2D` class.
 However, since we used single-element assignments,
-Gluon has some trouble finding the gradient.
-Instead, we use the built-in `Conv2D` class provided by Gluon below.
+`autograd` has some trouble finding the gradient.
+Instead, we use the built-in `Conv2D` class.
 
-```{.python .input  n=83}
+```{.python .input}
 # Construct a convolutional layer with 1 output channel
 # (channels will be introduced in the following section)
 # and a kernel array shape of (1, 2)
@@ -217,13 +280,44 @@ for i in range(10):
     # For the sake of simplicity, we ignore the bias here
     conv2d.weight.data()[:] -= 3e-2 * conv2d.weight.grad()
     if (i + 1) % 2 == 0:
-        print('batch %d, loss %.3f' % (i + 1, l.sum()))
+        print(f'batch {i+1}, loss {l.sum():.3f}')
+```
+
+
+```{.python .input}
+#@tab pytorch
+# Construct a convolutional layer with 1 input channel and 1 output channel
+# (channels will be introduced in the following section)
+# and a kernel array shape of (1, 2). For sake of simplicity we ignore bias.
+conv2d = nn.Conv2d(1,1, kernel_size=(1, 2), bias=False)
+
+# The two-dimensional convolutional layer uses four-dimensional input and
+# output in the format of (example channel, height, width), where the batch
+# size (number of examples in the batch) and the number of channels are both 1
+X = X.reshape((1, 1, 6, 8))
+Y = Y.reshape((1, 1, 6, 7))
+
+
+for i in range(10):
+    Y_hat = conv2d(X)
+    l = (Y_hat - Y) ** 2
+    conv2d.zero_grad()
+    l.sum().backward()
+    conv2d.weight.data[:] -= 3e-2 * conv2d.weight.grad
+    if (i + 1) % 2 == 0:
+        print(f'batch {i+1}, loss {l.sum():.3f}')
 ```
 
 Note that the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel array we learned.
 
 ```{.python .input}
 conv2d.weight.data().reshape(1, 2)
+```
+
+
+```{.python .input}
+#@tab pytorch
+conv2d.weight.data.reshape((1, 2))
 ```
 
 Indeed, the learned kernel array is remarkably close
@@ -261,6 +355,10 @@ as a convolution even though, strictly-speaking, it is slightly different.
     * What is the kernel for an integral?
     * What is the minimum size of a kernel to obtain a derivative of degree $d$?
 
-## [Discussions](https://discuss.mxnet.io/t/2349)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/65)
+:end_tab:
 
-![](../img/qr_conv-layer.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/66)
+:end_tab:
