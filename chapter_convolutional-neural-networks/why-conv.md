@@ -305,6 +305,5 @@ We turn to these issues in the remainder of the chapter.
    Why or why not?
 1. Prove that $f \circledast g = g \circledast f$.
 
-## [Discussions](https://discuss.mxnet.io/t/2348)
+[Discussions](https://discuss.d2l.ai/t/64)
 
-![](../img/qr_why-conv.svg)
