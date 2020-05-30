@@ -84,11 +84,11 @@ suggests that to close the gap between
 train and test performance, 
 we should aim for a *simple* model.
 Simplicity can come in the form
-of a small number of dimensions. We 
-explored this while discussing the
+of a small number of dimensions.
+We explored this when discussing the
 monomial basis functions of linear models
 :numref:`sec_model_selection`.
-Additionally, as we saw with weight decay 
+Additionally, as we saw when discussing weight decay 
 ($\ell_2$ regularization) :numref:`sec_weight_decay`,
 the (inverse) norm of the parameters 
 represents another useful measure of simplicity.
