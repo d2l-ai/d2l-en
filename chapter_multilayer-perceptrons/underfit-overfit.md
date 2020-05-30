@@ -346,7 +346,7 @@ $$\hat{y}= \sum_{i=0}^d x^i w_i$$
 to estimate the labels $y$.
 This is just a linear regression problem
 where our features are given by the powers of $x$,
-the $w_i$ give the model’s weights,
+the model's weights are given by $w_i$,
 and the bias is given by $w_0$ since $x^0 = 1$ for all $x$.
 Since this is just a linear regression problem,
 we can use the squared error as our loss function.
@@ -419,7 +419,7 @@ true_w = np.zeros(maxdegree)  # Allocate lots of empty space
 true_w[0:4] = np.array([5, 1.2, -3.4, 5.6])
 
 features = np.random.normal(size=(n_train + n_test, 1))
-np.random.shuffle(features)
+features = np.random.shuffle(features)
 poly_features = np.power(features, np.arange(maxdegree).reshape(1, -1))
 poly_features = poly_features / (
     npx.gamma(np.arange(maxdegree) + 1).reshape(1, -1))

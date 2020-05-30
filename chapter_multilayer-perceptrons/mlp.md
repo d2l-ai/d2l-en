@@ -264,7 +264,7 @@ That means that after computing the linear portion of the layer,
 we can calculate each nodes activation 
 without looking at the values taken by the other hidden units.
 This is true for most activation functions
-(the batch normalization operation introduced in :numref:`sec_batch_norm` is a notable exception to that rule).
+(the batch normalization operation to be introduced in :numref:`sec_batch_norm` is a notable exception to that rule).
 
 ```{.python .input  n=1}
 %matplotlib inline
