@@ -47,7 +47,7 @@ conda create --name d2l -y
 ## Downloading the D2L Notebooks
 
 Next, we need to download the code of this book. You can use the
-[link](https://d2l.ai/d2l-en-0.7.1.zip) to download and unzip the code.
+[link](https://d2l.ai/d2l-en-0.8.0.zip) to download and unzip the code.
 Alternatively, if you have `unzip` (otherwise run `sudo apt install unzip`) available:
 
 ```bash
