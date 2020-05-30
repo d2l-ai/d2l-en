@@ -107,7 +107,7 @@ is much slower than the seq2seq model without attention.
 ```{.python .input  n=5}
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_steps = 64, 10
-lr, num_epochs, ctx = 0.005, 300, d2l.try_gpu()
+lr, num_epochs, ctx = 0.005, 200, d2l.try_gpu()
 
 src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
 encoder = d2l.Seq2SeqEncoder(

@@ -981,18 +981,18 @@ class MLPAttention(nn.Block):
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
         # Use flatten=True to keep query's and key's 3-D shapes
-        self.W_k = nn.Dense(units, activation='tanh',
-                            use_bias=False, flatten=False)
-        self.W_q = nn.Dense(units, activation='tanh',
-                            use_bias=False, flatten=False)
+        self.W_k = nn.Dense(units, use_bias=False, flatten=False)
+        self.W_q = nn.Dense(units, use_bias=False, flatten=False)
         self.v = nn.Dense(1, use_bias=False, flatten=False)
         self.dropout = nn.Dropout(dropout)
 
+
     def forward(self, query, key, value, valid_len):
-        query, key = self.W_k(query), self.W_q(key)
+        query, key = self.W_q(query), self.W_k(key)
         # Expand query to (batch_size, #querys, 1, units), and key to
         # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast
         features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
+        features = np.tanh(features)
         scores = np.squeeze(self.v(features), axis=-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
         return npx.batch_dot(attention_weights, value)

@@ -10,7 +10,7 @@ In :numref:`sec_seq2seq`, we encode the source sequence input information in the
 :label:`fig_attention`
 
 
-The full process of attention mechanism is expressed in :numref:`fig_attention_output`. To compute the output of attention, we first use a score function $\alpha$ that measures the similarity between the query and a key. So for each key $\mathbf{k}_1, \ldots, \mathbf{k}_n$, we compute the scores $a_1, \ldots, a_n$ by
+The full process of attention mechanism is expressed in :numref:`fig_attention_output`. To compute the output of attention, we first use a score function $\alpha$ that measures the similarity between the query and the key. So for each key $\mathbf{k}_1, \ldots, \mathbf{k}_n$, we compute the scores $a_1, \ldots, a_n$ by
 
 $$a_i = \alpha(\mathbf q, \mathbf k_i).$$
 
@@ -44,7 +44,7 @@ The masked softmax takes a 3-dimensional input and enables us to filter out some
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
-def masked_softmax(X, valid_len=None):
+def masked_softmax(X, valid_len):
     # X: 3-D tensor, valid_len: 1-D or 2-D tensor
     if valid_len is None:
         return npx.softmax(X)
