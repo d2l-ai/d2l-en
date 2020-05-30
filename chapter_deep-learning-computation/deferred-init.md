@@ -98,16 +98,16 @@ net(x)  # Forward computation
 net.collect_params()
 ```
 
-As soon as we knew the input dimensionality, 
+As soon as we know the input dimensionality, 
 $\mathbf{x} \in \mathbb{R}^{20}$, 
-MXNet could identify the shape of the first layer's weight matrix, 
+MXNet can identify the shape of the first layer's weight matrix, 
 i.e., $\mathbf{W}_1 \in \mathbb{R}^{256 \times 20}$.
-Having recognized the first layer shape, MXNet proceeded
+Having recognized the first layer shape, MXNet proceeds
 to the second layer, whose dimensionality is $10 \times 256$
 and so on through the computational graph
-until all shapes were known.
+until all shapes are known.
 Note that in this case, 
-only the first layer required deferred initialization,
+only the first layer requires deferred initialization,
 but MXNet initializes sequentially. 
 Once all parameter shapes are known, 
 MXNet can finally initialize the parameters. 
