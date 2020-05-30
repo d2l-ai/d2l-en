@@ -4,7 +4,7 @@ In the previous chapters, we worked through
 a number of hands-on applications of machine learning,
 fitting models to a variety of datasets.
 And yet, we never stopped to contemplate
-either where data comes from in the first place,
+either where data comes from in the first place
 or what we plan to ultimately *do* 
 with the outputs from our models.
 Too often, machine learning developers
@@ -42,17 +42,17 @@ in many applications of machine learning:
 by introducing our model-based decisions to the environment,
 we might break the model.
 
-While we cannot possible give these topics 
+While we cannot possibly give these topics 
 a complete treatment in one section,
 we aim here to expose some common concerns,
 and to stimulate the critical thinking
 required to detect these situations early,
 mitigate damage, and use machine learning responsibly.
 Some of the solutions are simple
-(ask for the "right" data)
+(ask for the "right" data),
 some are technically difficult
 (implement a reinforcement learning system),
-and others require that step outside the realm of
+and others require that we step outside the realm of
 statistical prediction altogether and 
 grapple with difficult philosophical questions
 concerning the ethical application of algorithms.
@@ -75,9 +75,9 @@ learning a robust classifier is impossible.
 
 Consider a binary classification problem,
 where we wish to distinguish between dogs and cats.
-If the distribution can can shift in arbitrary ways,
+If the distribution can shift in arbitrary ways,
 then our setup permits the pathological case
-in which the distribution over inputs remained
+in which the distribution over inputs remains
 constant: $p_S(\mathbf{x}) = p_T(\mathbf{x})$
 but the labels are all flipped 
 $p_S(y | \mathbf{x}) = 1 - $p_T(y | \mathbf{x})$. 
@@ -150,16 +150,16 @@ because diseases cause symptoms.
 In some degenerate cases the label shift 
 and covariate shift assumptions can hold simultaneously.
 For example, when the label is deterministic,
-then covariate shift assumption will be satisfied,
+the covariate shift assumption will be satisfied,
 even when $y$ causes $\mathbf{x}$.
 Interestingly, in these cases,
-it is often advantageous to work with the methods
+it is often advantageous to work with methods
 that flow from the label shift assumption.
 That is because these methods tend 
 to involve manipulating objects that look like the label
 (which is often low-dimensional),
 as opposed to objects that look like the input,
-which tends (in deep learning) tends to be high-dimensional.
+which (in deep learning) tends to be high-dimensional.
 
 
 
@@ -196,7 +196,7 @@ that shift only takes place gradually
 ### Examples
 
 Before delving into formalism and algorithms,
-we can discuss a some concrete situations
+we can discuss some concrete situations
 where covariate or concept shift might not be obvious.
 
 
@@ -218,7 +218,7 @@ They were developing a blood test for a disease
 that predominantly affects older men 
 and hoped to study it using blood samples
 that they had collected from patients.
-However, it's considerably more difficult
+However, it is considerably more difficult
 to obtain blood samples from healthy men 
 than sick patients already in the system.
 To compensate, the startup solicited
@@ -369,7 +369,7 @@ For simplicity’s sake assume that we have
 an equal number of instances from both distributions, 
 denoted by $\mathbf{x}_i \sim p(\mathbf{x})$ 
 and $\mathbf{x}_i' \sim q(\mathbf{x})$, respectively.
-Now denote by $z_i$ labels which are 1
+Now denote by $z_i$ labels that are 1
 for data drawn from $p$ and -1 for data drawn from $q$.
 Then the probability in a mixed dataset is given by
 
@@ -434,16 +434,16 @@ In deep learning, the inputs tend
 to be high-dimensional objects like images,
 while the labels are often simpler objects like categories.
 
-To estimate calculate the target label distribution,
+To estimate the target label distribution,
 we first take our reasonably good off the shelf classifier
 (typically trained on the training data)
 and compute its confusion matrix using the validation set
 (also from the training distribution).
-The confusion matrix C, is simply a $k \times k$ matrix,
+The confusion matrix, C, is simply a $k \times k$ matrix,
 where each column corresponds to the *actual* label
 and each row corresponds to our model's predicted label.
 Each cell's value $c_{ij}$ is the fraction of predictions
-where the true label was $j$ *and* our model predicted $y$.
+where the true label was $j$ *and* our model predicted $i$.
 
 Now, we cannot calculate the confusion matrix
 on the target data directly,
@@ -489,18 +489,18 @@ To make things more concrete, here are some examples:
 
 * In computational advertising, new products are launched, 
 old products become less popular. This means that the distribution over ads and their popularity changes gradually and any click-through rate predictor needs to change gradually with it.
-* Traffic cameras lenses degrade gradually due to environmental wear, affecting image quality progressively.
+* Traffic camera lenses degrade gradually due to environmental wear, affecting image quality progressively.
 * News content changes gradually (i.e., most of the news remains unchanged but new stories appear).
 
 In such cases, we can use the same approach that we used for training networks to make them adapt to the change in the data. In other words, we use the existing network weights and simply perform a few update steps with the new data rather than training from scratch.
 
 ## A Taxonomy of Learning Problems
 
-Armed with knowledge about how to deal with changes in $p(x)$ and in $P(y \mid x)$, we can now consider some other aspects of machine learning problems formulation.
+Armed with knowledge about how to deal with changes in $p(x)$ and in $P(y \mid x)$, we can now consider some other aspects of machine learning problem formulation.
 
 
 * **Batch Learning.** Here we have access to training data and labels $\{(x_1, y_1), \ldots, (x_n, y_n)\}$, which we use to train a network $f(x, w)$. Later on, we deploy this network to score new data $(x, y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
-* **Online Learning.** Now imagine that the data $(x_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $x_i$, then we need to come up with an estimate $f(x_i, w)$ and only once we have done this, we observe $y_i$ and with it, we receive a reward (or incur a loss), given our decision. Many real problems fall into this category. E.g. we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, we have the following cycle where we are continuously improving our model given new observations.
+* **Online Learning.** Now imagine that the data $(x_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $x_i$, then we need to come up with an estimate $f(x_i, w)$ and only once we have done this, we observe $y_i$ and with it, we receive a reward (or incur a loss), given our decision. Many real problems fall into this category. E.g., we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, we have the following cycle where we are continuously improving our model given new observations.
 
 $$
 \mathrm{model} ~ f_t \longrightarrow
@@ -512,7 +512,7 @@ $$
 $$
 
 * **Bandits.** They are a *special case* of the problem above. While in most learning problems we have a continuously parametrized function $f$ where we want to learn its parameters (e.g., a deep network), in a bandit problem we only have a finite number of arms that we can pull (i.e., a finite number of actions that we can take). It is not very surprising that for this simpler problem stronger theoretical guarantees in terms of optimality can be obtained. We list it mainly since this problem is often (confusingly) treated as if it were a distinct learning setting.
-* **Control (and nonadversarial Reinforcement Learning).** In many cases the environment remembers what we did. Not necessarily in an adversarial manner but it'll just remember and the response will depend on what happened before. E.g. a coffee boiler controller will observe different temperatures depending on whether it was heating the boiler previously. PID (proportional integral derivative) controller algorithms are a popular choice there. Likewise, a user's behavior on a news site will depend on what we showed him previously (e.g., he will read most news only once). Many such algorithms form a model of the environment in which they act such as to make their decisions appear less random (i.e., to reduce variance).
+* **Control (and nonadversarial Reinforcement Learning).** In many cases the environment remembers what we did. Not necessarily in an adversarial manner but it will just remember and the response will depend on what happened before. E.g., a coffee boiler controller will observe different temperatures depending on whether it was heating the boiler previously. PID (proportional integral derivative) controller algorithms are a popular choice there. Likewise, a user's behavior on a news site will depend on what we showed him previously (e.g., he will read most news only once). Many such algorithms form a model of the environment in which they act such as to make their decisions appear less random (i.e., to reduce variance).
 * **Reinforcement Learning.** In the more general case of an environment with memory, we may encounter situations where the environment is trying to *cooperate* with us (cooperative games, in particular for non-zero-sum games), or others where the environment will try to *win*. Chess, Go, Backgammon or StarCraft are some of the cases. Likewise, we might want to build a good controller for autonomous cars. The other cars are likely to respond to the autonomous car's driving style in nontrivial ways, e.g., trying to avoid it, trying to cause an accident, trying to cooperate with it, etc.
 
 One key distinction between the different situations above is that the same strategy that might have worked throughout in the case of a stationary environment, might not work throughout when the environment can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once he starts exploiting it. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we *know* that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist to deal with concept shift, i.e., when the problem that he is trying to solve changes over time.
@@ -525,7 +525,7 @@ that when you deploy machine learning systems
 you are not merely optimizing a predictive model---you 
 are typically providing a tool that will
 be used to (partially or fully) automate decisions.
-This technical systems can impact the lives
+These technical systems can impact the lives
 of individuals subject to the resulting decisions.
 The leap from considering predictions to decisions
 raises not only new technical questions,
@@ -554,7 +554,7 @@ how prediction systems can lead to feedback loops.
 For example, consider predictive policing systems,
 which allocate patrol officers 
 to areas with high forecasted crime.
-It's easy to see how a worrying pattern can emerge:
+It is easy to see how a worrying pattern can emerge:
 
  1. Neighborhoods with more crime get more patrols. 
  1. Consequently, more crimes are discovered in these neighborhoods, entering the training data available for future iterations.
@@ -578,7 +578,7 @@ that you might encounter in a career in machine learning.
 
 ## Summary
 
-* In many cases training and test set do not come from the same distribution. This is called covariate shift.
+* In many cases training and test sets do not come from the same distribution. This is called covariate shift.
 * Under the corresponding assumptions, *covariate* and *label* shift can be detected and corrected for at test time. Failure to account for this bias can become problematic at test time.
 * In some cases, the environment may *remember* automated actions and respond in surprising ways. We must account for this possibility when building models and continue to monitor live systems, open to the possibility that our models and the environment will become entangled in unanticipated ways.
 
@@ -587,7 +587,7 @@ that you might encounter in a career in machine learning.
 1. What could happen when we change the behavior of a search engine? What might the users do? What about the advertisers?
 1. Implement a covariate shift detector. Hint: build a classifier.
 1. Implement a covariate shift corrector.
-1. What could go wrong if training and test set are very different? What would happen to the sample weights?
+1. What could go wrong if training and test sets are very different? What would happen to the sample weights?
 
 ## [Discussions](https://discuss.mxnet.io/t/2347)
 

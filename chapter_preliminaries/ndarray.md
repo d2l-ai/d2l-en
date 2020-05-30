@@ -5,7 +5,7 @@ In order to get anything done, we need some way to store and manipulate data.
 Generally, there are two important things we need to do with data: 
 (i) acquire them; and (ii) process them once they are inside the computer. 
 There is no point in acquiring data without some way to store it, 
-so let's get our hands dirty first by playing with synthetic data. 
+so let us get our hands dirty first by playing with synthetic data. 
 To start, we introduce the $n$-dimensional array (`ndarray`), 
 MXNet's primary tool for storing and transforming data.
 In MXNet, `ndarray` is a class and we call any instance "an `ndarray`".
@@ -150,7 +150,6 @@ Each of its elements is randomly sampled
 from a standard Gaussian (normal) distribution
 with a mean of $0$ and a standard deviation of $1$.
 
-
 ```{.python .input  n=10}
 np.random.normal(0, 1, size=(3, 4))
 ```
@@ -231,7 +230,7 @@ and tell the system along which axis to concatenate.
 The example below shows what happens when we concatenate 
 two matrices along rows (axis $0$, the first element of the shape)
 vs. columns (axis $1$, the second element of the shape).
-We can see that, the first output `ndarray`'s axis-$0$ length ($6$)
+We can see that the first output `ndarray`'s axis-$0$ length ($6$)
 is the sum of the two input `ndarray`s' axis-$0$ lengths ($3 + 3$);
 while the second output `ndarray`'s axis-$1$ length ($8$)
 is the sum of the two input `ndarray`s' axis-$1$ lengths ($4 + 4$).
@@ -333,8 +332,8 @@ x
 
 ## Saving Memory
 
-In the previous example, every time we ran an operation,
-we allocated new memory to host its results. 
+Running operations can cause new memory to be
+allocated to host results. 
 For example, if we write `y = x + y`, 
 we will dereference the `ndarray` that `y` used to point to 
 and instead point `y` at the newly allocated memory. 
@@ -359,9 +358,8 @@ hundreds of megabytes of parameters
 and update all of them multiple times per second. 
 Typically, we will want to perform these updates *in place*. 
 Second, we might point at the same parameters from multiple variables. 
-If we do not update in place, this could cause that
-discarded memory is not released,
-and make it possible for parts of our code
+If we do not update in place, other references will still point to
+the old memory location, making it possible for parts of our code
 to inadvertently reference stale parameters.
 
 Fortunately, performing in-place operations in MXNet is easy. 
@@ -406,7 +404,7 @@ b = np.array(a)
 type(a), type(b)
 ```
 
-To convert a size-$1$ `ndarray` to a Python scalar, 
+To convert a size-one `ndarray` to a Python scalar, 
 we can invoke the `item` function or Python's built-in functions.
 
 ```{.python .input}

@@ -54,7 +54,7 @@ an applicant with a higher income
 would always be more likely to repay 
 than one with a lower income.
 While monotonic, this relationship likely
-isn't linearly associated with the probability of 
+is not linearly associated with the probability of 
 repayment. An increase in income from $0 to $50k 
 likely corresponds to a bigger increase 
 in likelihood of repayment 
@@ -93,7 +93,7 @@ where inverting an image preserves the category.
 
 And yet despite the apparent absurdity of linearity here,
 as compared to our previous examples, 
-it's less obvious that we could address the problem
+it is less obvious that we could address the problem
 with a simple preprocessing fix. 
 That is because the significance of any pixel
 depends in complex ways on its context 
@@ -231,8 +231,8 @@ to solve all of your problems
 with single-layer networks.
 In fact, we can approximate many functions
 much more compactly by using deeper (vs wider) networks.
-We'll touch upon more rigorous arguments in subsequent chapters,
-but first let's actually build an MLP in code.
+We will touch upon more rigorous arguments in subsequent chapters,
+but first let us actually build an MLP in code.
 In this example, we’ll implement an MLP
 with two hidden layers and one output layer.
 
@@ -264,7 +264,7 @@ That means that after computing the linear portion of the layer,
 we can calculate each nodes activation 
 without looking at the values taken by the other hidden units.
 This is true for most activation functions
-(the batch normalization operation will be introduced in :numref:`sec_batch_norm` is a notable exception to that rule).
+(the batch normalization operation to be introduced in :numref:`sec_batch_norm` is a notable exception to that rule).
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -280,7 +280,7 @@ calculating the weighted sum and further adding bias with it.
 They are differentiable operators to transform input signals to outputs, 
 while most of them add non-linearity.
 Because activation functions are fundamental to deep learning, 
-let's briefly survey some common activation functions.
+let us briefly survey some common activation functions.
 
 ### ReLU Function
 
@@ -312,9 +312,9 @@ d2l.plot(x, y, 'x', 'relu(x)')
 ```
 
 When the input is negative, 
-the derivative of ReLU function is 0
+the derivative of the ReLU function is 0,
 and when the input is positive, 
-the derivative of ReLU function is 1.
+the derivative of the ReLU function is 1.
 Note that the ReLU function is not differentiable
 when the input takes value precisely equal to 0.
 In these cases, we default to the left-hand-side (LHS) 
@@ -350,7 +350,7 @@ previous versions of neural networks (more on this later).
 ### Sigmoid Function
 
 The sigmoid function transforms its inputs,
-which values lie in the domain $\mathbb{R}$,
+for which values lie in the domain $\mathbb{R}$,
 to outputs that lie on the interval $(0, 1)$.
 For that reason, the sigmoid is 
 often called a *squashing* function:
@@ -399,12 +399,12 @@ with autograd.record():
 d2l.plot(x, y, 'x', 'sigmoid(x)')
 ```
 
-The derivative of sigmoid function is given by the following equation:
+The derivative of the sigmoid function is given by the following equation:
 
 $$\frac{d}{dx} \mathrm{sigmoid}(x) = \frac{\exp(-x)}{(1 + \exp(-x))^2} = \mathrm{sigmoid}(x)\left(1-\mathrm{sigmoid}(x)\right).$$
 
 
-The derivative of sigmoid function is plotted below.
+The derivative of the sigmoid function is plotted below.
 Note that when the input is 0, 
 the derivative of the sigmoid function
 reaches a maximum of 0.25. 
@@ -420,7 +420,7 @@ d2l.plot(x, x.grad, 'x', 'grad of sigmoid')
 
 Like the sigmoid function, the tanh (Hyperbolic Tangent)
 function also squashes its inputs,
-transforms them into elements on the interval between -1 and 1:
+transforming them into elements on the interval between -1 and 1:
 
 $$\text{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
@@ -454,7 +454,7 @@ As a side note, your knowledge already
 puts you in command of a similar toolkit 
 to a practitioner circa 1990.
 In some ways, you have an advantage 
-over anyone working the 1990s,
+over anyone working in the 1990s,
 because you can leverage powerful 
 open-source deep learning frameworks
 to build models rapidly, using only a few lines of code.
@@ -473,7 +473,7 @@ thousands of lines of C and Fortran.
 1. Compute the derivative of the tanh and the pReLU activation function.
 1. Show that a multilayer perceptron using only ReLU (or pReLU) constructs a continuous piecewise linear function.
 1. Show that $\mathrm{tanh}(x) + 1 = 2 \mathrm{sigmoid}(2x)$.
-1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers had only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron.
+1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers has only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron.
 1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems do you expect this to cause?
 
 ## [Discussions](https://discuss.mxnet.io/t/2338)

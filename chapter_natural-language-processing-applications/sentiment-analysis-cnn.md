@@ -21,7 +21,6 @@ First, import the packages and modules required for the experiment.
 ```{.python .input  n=1}
 import d2l
 from mxnet import gluon, init, np, npx
-from mxnet.contrib import text
 from mxnet.gluon import nn
 npx.set_np()
 
@@ -31,7 +30,7 @@ train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 
 ## One-Dimensional Convolutional Layer
 
-Before introducing the model, let's explain how a one-dimensional convolutional layer works. Like a two-dimensional convolutional layer, a one-dimensional convolutional layer uses a one-dimensional cross-correlation operation. In the one-dimensional cross-correlation operation, the convolution window starts from the leftmost side of the input array and slides on the input array from left to right successively. When the convolution window slides to a certain position, the input subarray in the window and kernel array are multiplied and summed by element to get the element at the corresponding location in the output array. As shown in :numref:`fig_conv1d`, the input is a one-dimensional array with a width of 7 and the width of the kernel array is 2. As we can see, the output width is $7-2+1=6$ and the first element is obtained by performing multiplication by element on the leftmost input subarray with a width of 2 and kernel array and then summing the results.
+Before introducing the model, let us explain how a one-dimensional convolutional layer works. Like a two-dimensional convolutional layer, a one-dimensional convolutional layer uses a one-dimensional cross-correlation operation. In the one-dimensional cross-correlation operation, the convolution window starts from the leftmost side of the input array and slides on the input array from left to right successively. When the convolution window slides to a certain position, the input subarray in the window and kernel array are multiplied and summed by element to get the element at the corresponding location in the output array. As shown in :numref:`fig_conv1d`, the input is a one-dimensional array with a width of 7 and the width of the kernel array is 2. As we can see, the output width is $7-2+1=6$ and the first element is obtained by performing multiplication by element on the leftmost input subarray with a width of 2 and kernel array and then summing the results.
 
 ![One-dimensional cross-correlation operation. The shaded parts are the first output element as well as the input and kernel array elements used in its calculation: $0\times1+1\times2=2$. ](../img/conv1d.svg)
 :label:`fig_conv1d`
@@ -164,9 +163,8 @@ net.initialize(init.Xavier(), ctx=ctx)
 As in the previous section, load pre-trained 100-dimensional GloVe word vectors and initialize the embedding layers `embedding` and `constant_embedding`. Here, the former participates in training while the latter has a fixed weight.
 
 ```{.python .input  n=7}
-glove_embedding = text.embedding.create(
-    'glove', pretrained_file_name='glove.6B.100d.txt')
-embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
+glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
+embeds = glove_embedding[vocab.idx_to_token]
 net.embedding.weight.set_data(embeds)
 net.constant_embedding.weight.set_data(embeds)
 net.constant_embedding.collect_params().setattr('grad_req', 'null')

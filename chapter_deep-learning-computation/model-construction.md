@@ -54,7 +54,7 @@ The ResNet architecture mentioned above
 won the 2015 ImageNet and COCO computer vision competitions
 for both recognition and detection :cite:`He.Zhang.Ren.ea.2016`
 and remains a go-to architecture for many vision tasks.
-Similar patterns are in which layers are arranged 
+Similar architectures in which layers are arranged 
 in various repeating patterns 
 are now ubiquitous in other domains,
 including natural language processing and speech.
@@ -123,7 +123,7 @@ In short, `nn.Sequential` defines a special kind of `Block`
 that mantains an ordered list of constituent `Blocks`.
 The `add` method simply facilitates
 the addition of each successive `Block` to the list.
-Note that each our layer is an instance of the `Dense` class
+Note that each layer is an instance of the `Dense` class
 which is itself a subclass of `Block`.
 The `forward` function is also remarkably simple:
 it chains each Block in the list together,
@@ -184,7 +184,7 @@ class MLP(nn.Block):
         return self.output(self.hidden(x))
 ```
 
-To begin, let's focus on the `forward` method.
+To begin, let us focus on the `forward` method.
 Note that it takes `x` as input,
 calculates the hidden representation (`self.hidden(x)`),
 and outputs its logits (`self.output( ... )`).
@@ -193,7 +193,7 @@ both layers are instance variables.
 To see why this is reasonable, imagine
 instantiating two MLPs, `net1` and `net2`,
 and training them on different data.
-Naturally, we would expect them them
+Naturally, we would expect them
 to represent two different learned models.
 
 We instantiate the MLP's layers
@@ -203,7 +203,7 @@ on each call to the `forward` method.
 Note a few key details.
 First, our customized `__init__` method 
 invokes the parent class's `__init__` method
-via `super(MLP, self).__init__(**kwargs)`
+via `super(MLP, self).__init__(**kwargs)`,
 sparing us the pain of restating
 boilerplate code applicable to most Blocks.
 We then instantiate our two `Dense` layers,
@@ -212,7 +212,7 @@ Note that unless we implement a new operator,
 we need not worry about backpropagation (the `backward` method)
 or parameter initialization (the `initialize` method).
 Gluon will generate these methods automatically.
-Let's try this out:
+Let us try this out:
 
 ```{.python .input  n=35}
 net = MLP()
@@ -300,11 +300,11 @@ for the Gluon `Sequential` class
 
 The `nn.Sequential` class makes model construction easy,
 allowing us to assemble new architectures
-without having to defined our own class.
+without having to define our own class.
 However, not all architectures are simple daisy chains.
 When greater flexibility is required,
 we will want to define our own `Block`s.
-For example, we might want to exectute 
+For example, we might want to execute 
 Python's control flow within the forward method.
 Moreover we might want to perform
 arbitrary mathematical operations,
@@ -315,8 +315,8 @@ all of the operations in our networks
 have acted upon our network's activations
 and its parameters. 
 Sometimes, however, we might want to 
-incorporate terms constant terms 
-which are neither the result of previous layers
+incorporate terms 
+that are neither the result of previous layers
 nor updatable parameters. 
 In Gluon, we call these *constant* parameters. 
 Say for example that we want a layer
@@ -327,8 +327,8 @@ and $c$ is some specified constant
 that is not updated during optimization.
 
 Declaring constants explicitly (via `get_constant`)
-makes this clear helps Gluon to speed up execution.
-In the following code, we'll implement a model
+makes this clear and helps Gluon to speed up execution.
+In the following code, we will implement a model
 that could not easily be assembled
 using only predefined layers and `Sequential`.
 
@@ -372,7 +372,7 @@ We ran a `while` loop, testing
 on the condition `np.abs(x).sum() > 1`,
 and dividing our output vector by $2$ 
 until it satisfied the condition.
-Finally, we outputed the sum of the entries in `x`.
+Finally, we returned the sum of the entries in `x`.
 To our knowledge, no standard neural network
 performs this operation.
 Note that this particular operation may not be useful
@@ -432,7 +432,7 @@ The Gluon runtime records what is happening
 and the next time around it short-circuits calls to Python.
 This can accelerate things considerably in some cases
 but care needs to be taken when control flow (as above)
-lead down different branches on different passes through the net.
+leads down different branches on different passes through the net.
 We recommend that the interested reader check out 
 the hybridization section (:numref:`sec_hybridize`)
 to learn about compilation after finishing the current chapter.
@@ -441,8 +441,8 @@ to learn about compilation after finishing the current chapter.
 ## Summary
 
 * Layers are Blocks.
-* Many layers can comprise a Block.
-* Many Blocks can comprise a Block.
+* A Block can contain many layers.
+* A Block can contain many Blocks.
 * A Block can contain code.
 * Blocks take care of lots of housekeeping, including parameter initialization and backpropagation.
 * Sequential concatenations of layers and blocks are handled by the `Sequential` Block.
@@ -451,7 +451,7 @@ to learn about compilation after finishing the current chapter.
 ## Exercises
 
 1. What kinds of problems will occur if you remove the `asscalar` function in the `FixedHiddenMLP` class?
-1. What kinds of problems will occur if you change `self.net` defined by the Sequential instance in the `NestMLP` class to `self.net = [nn.Dense(64, activation='relu'), nn. Dense(32, activation='relu')]`?
+1. What kinds of problems will occur if you change `self.net` defined by the Sequential instance in the `NestMLP` class to `self.net = [nn.Dense(64, activation='relu'), nn.Dense(32, activation='relu')]`?
 1. Implement a block that takes two blocks as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward pass (this is also called a parallel block).
 1. Assume that you want to concatenate multiple instances of the same network. Implement a factory function that generates multiple instances of the same block and build a larger network from it.
 

@@ -1,7 +1,7 @@
 # Concise Implementation for Multiple GPUs
 :label:`sec_multi_gpu_gluon`
 
-Implementing parallelism from scratch for every new model is no fun. Moreover, there's significant benefit in optimizing synchronization tools for high performance. In the following we'll show how to do this using Gluon. The math and the algorithms are the same as in :numref:`sec_multi_gpu`. As before we begin by importing the required modules (quite unsurprisingly you'll need at least two GPUs to run this notebook).
+Implementing parallelism from scratch for every new model is no fun. Moreover, there is significant benefit in optimizing synchronization tools for high performance. In the following we will show how to do this using Gluon. The math and the algorithms are the same as in :numref:`sec_multi_gpu`. As before we begin by importing the required modules (quite unsurprisingly you will need at least two GPUs to run this notebook).
 
 ```{.python .input  n=1}
 import d2l
@@ -12,7 +12,7 @@ npx.set_np()
 
 ## A Toy Network
 
-Let's use a slightly more meaningful network than LeNet from the previous section that's still sufficiently easy and quick to train. We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference to :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning. Moreover, we remove the max-pooling layer.
+Let us use a slightly more meaningful network than LeNet from the previous section that's still sufficiently easy and quick to train. We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference to :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning. Moreover, we remove the max-pooling layer.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
@@ -43,7 +43,7 @@ def resnet18(num_classes):
 
 ## Parameter Initialization and Logistics
 
-The `initialize` method allows us to set initial defaults for parameters on a device of our choice. For a refresher see :numref:`sec_numerical_stability`. What is particularly convenient is that it also lets us initialize the network on *multiple* devices simultaneously. Let's try how this works in practice.
+The `initialize` method allows us to set initial defaults for parameters on a device of our choice. For a refresher see :numref:`sec_numerical_stability`. What is particularly convenient is that it also lets us initialize the network on *multiple* devices simultaneously. Let us try how this works in practice.
 
 ```{.python .input  n=3}
 net = resnet18(10)
@@ -61,7 +61,7 @@ x_shards = gluon.utils.split_and_load(x, ctx)
 net(x_shards[0]), net(x_shards[1])
 ```
 
-Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*. This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters don't even exist on the device. We can verify this by printing out the parameters and observing any errors that might arise.
+Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*. This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters do not even exist on the device. We can verify this by printing out the parameters and observing any errors that might arise.
 
 ```{.python .input  n=5}
 weight = net[0].params.get('weight')
@@ -73,7 +73,7 @@ except RuntimeError:
 weight.data(ctx[0])[0], weight.data(ctx[1])[0]
 ```
 
-Lastly let's replace the code to evaluate the accuracy by one that works in parallel across multiple devices. This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a batch before invoking the network. All else is essentially identical.
+Lastly let us replace the code to evaluate the accuracy by one that works in parallel across multiple devices. This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a batch before invoking the network. All else is essentially identical.
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
@@ -131,7 +131,7 @@ def train(num_gpus, batch_size, lr):
 
 ## Experiments
 
-Let's see how this works in practice. As a warmup we train the network on a single GPU.
+Let us see how this works in practice. As a warmup we train the network on a single GPU.
 
 ```{.python .input  n=8}
 train(num_gpus=1, batch_size=256, lr=0.1)

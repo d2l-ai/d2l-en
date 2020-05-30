@@ -16,6 +16,7 @@ Because the softmax operation has considered that the context word could be any 
 
 
 ## Negative Sampling
+:label:`subsec_negative-sampling`
 
 Negative sampling modifies the original objective function. Given a context window for the central target word $w_c$, we will treat it as an event for context word $w_o$ to appear in the context window and compute the probability of this event from
 

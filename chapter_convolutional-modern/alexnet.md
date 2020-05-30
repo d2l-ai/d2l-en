@@ -7,8 +7,8 @@ in the computer vision and machine learning communities
 following the introduction of LeNet,
 they did not immediately dominate the field.
 Although LeNet achieved good results on early small datasets,
-the performance and feasability of training convolutional networks
-on larger, more realistic datasets had yet to be established
+the performance and feasibility of training convolutional networks
+on larger, more realistic datasets had yet to be established.
 In fact, for much of the intervening time between the early 1990s
 and the watershed results of 2012,
 neural networks were often surpassed by other machine learning methods,
@@ -41,7 +41,7 @@ classical pipelines looked more like this:
 1. Obtain an interesting dataset. In early days, these datasets required expensive sensors (at the time, 1 megapixel images were state of the art).
 2. Preprocess the dataset with hand-crafted features based on some knowledge of optics, geometry, other analytic tools, and occasionally on the serendipitous discoveries of lucky graduate students.
 3. Feed the data through a standard set of feature extractors such as [SIFT](https://en.wikipedia.org/wiki/Scale-invariant_feature_transform), the Scale-Invariant Feature Transform, or [SURF](https://en.wikipedia.org/wiki/Speeded_up_robust_features), the Speeded-Up Robust Features, or any number of other hand-tuned pipelines.
-4. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to learn a classifier.
+4. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to train a classifier.
 
 If you spoke to machine learning researchers,
 they believed that machine learning was both important and beautiful.
@@ -188,7 +188,7 @@ Hence, for the power budget of a CPU core that runs 4x faster (a typical number)
 you can use 16 GPU cores at 1/4 the speed,
 which yields 16 x 1/4 = 4x the performance.
 Furthermore, GPU cores are much simpler
-(in fact, for a long time they weren't even *able*
+(in fact, for a long time they were not even *able*
 to execute general purpose code),
 which makes them more energy efficient.
 Last, many operations in deep learning require high memory bandwidth.
@@ -231,7 +231,7 @@ First, AlexNet is much deeper than the comparatively small LeNet5.
 AlexNet consists of eight layers: five convolutional layers,
 two fully-connected hidden layers, and one fully-connected output layer. Second, AlexNet used the ReLU instead of the sigmoid
 as its activation function.
-Let's delve into the details below.
+Let us delve into the details below.
 
 ### Architecture
 
@@ -329,7 +329,7 @@ even on a modern GPU.
 One of the problems with applying AlexNet directly on Fashion-MNIST
 is that our images are lower resolution ($28 \times 28$ pixels)
 than ImageNet images.
-To make things work, we upsample them to $244 \times 244$
+To make things work, we upsample them to $224 \times 224$
 (generally not a smart practice,
 but we do it here to be faithful to the AlexNet architecture).
 We perform this resizing with the `resize` argument in `load_data_fashion_mnist`.

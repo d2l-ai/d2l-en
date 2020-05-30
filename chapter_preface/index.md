@@ -70,10 +70,8 @@ solutions all in one place presents formidable challenges.
 Our goal in this book is to present a unified resource
 to bring would-be practitioners up to speed.
 
-
-We started this book project in July 2017 when we needed
-to explain MXNet's (then new) Gluon interface to our users.
-At the time, there were no resources that simultaneously
+At the time we started this book project,
+there were no resources that simultaneously
 (i) were up to date; (ii) covered the full breadth
 of modern machine learning with substantial technical depth;
 and (iii) interleaved exposition of the quality one expects
@@ -103,13 +101,13 @@ Moreover, too many resources are hidden behind the paywalls
 of commercial course providers.
 
 We set out to create a resource that could
-(1) be freely available for everyone;
-(2) offer sufficient technical depth to provide a starting point on the path
+(i) be freely available for everyone;
+(ii) offer sufficient technical depth to provide a starting point on the path
 to actually becoming an applied machine learning scientist;
-(3) include runnable code, showing readers *how* to solve problems in practice;
-(4) that allowed for rapid updates, both by us
+(iii) include runnable code, showing readers *how* to solve problems in practice;
+(iv) allow for rapid updates, both by us
 and also by the community at large;
-and (5) be complemented by a [forum](http://discuss.mxnet.io)
+and (v) be complemented by a [forum](http://discuss.mxnet.io)
 for interactive discussion of technical details and to answer questions.
 
 These goals were often in conflict.
@@ -268,7 +266,7 @@ as well as many colleges and companies.
 All of the code in this book has passed tests under the newest MXNet version.
 However, due to the rapid development of deep learning, some code
 *in the print edition* may not work properly in future versions of MXNet.
-However, we plan to keep the online version remain up-to-date.
+However, we plan to keep the online version up-to-date.
 In case you encounter any such problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
@@ -364,8 +362,11 @@ Steve Sedlmeyer, ruslo, Rafael Schlatter, liusy182, Giannis Pappas, ruslo,
 ati-ozgur, qbaza, dchoi77, Adam Gerson, Phuc Le, Mark Atwood, christabella, vn09,
 Haibin Lin, jjangga0214, RichyChen, noelo, hansent, Giel Dops, dvincent1337, WhiteD3vil,
 Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk, heytitle, Peter Goetz, rigtorp,
-tiepvupsu, sfilip, mlxd, KaleabTessera, Sanjar Adilov, MatteoFerrara, hsneto,
-Katarzyna Biesialska, Gregory Bruss, duythanhvn, paulaurel.
+tiepvupsu, sfilip, mlxd, Kale-ab Tessera, Sanjar Adilov, MatteoFerrara, hsneto,
+Katarzyna Biesialska, Gregory Bruss, duythanhvn, paulaurel, graytowne, minhduc0711,
+sl7423, Jaedong Hwang, Yida Wang, cys4, clhm, JeanKaddour, austinmw, trebeljahr, tbaums,
+cuongvng, pavelkomarov, vzlamal, NotAnotherSystem, J-Arun-Mani, jancio, eldarkurtic,
+the-great-shazbot.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.

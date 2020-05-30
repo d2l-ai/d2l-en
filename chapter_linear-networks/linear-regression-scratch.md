@@ -73,7 +73,7 @@ and that each row in `labels` consists of a 1-dimensional target value (a scalar
 print('features:', features[0],'\nlabel:', labels[0])
 ```
 
-By generating a scatter plot using the second `features[:, 1]` and `labels`, 
+By generating a scatter plot using the second feature `features[:, 1]` and `labels`, 
 we can clearly observe the linear correlation between the two.
 
 ```{.python .input  n=18}
@@ -96,7 +96,7 @@ In the following code, we define a `data_iter` function
 to demonstrate one possible implementation of this functionality.
 The function takes a batch size, a design matrix,
 and a vector of labels, yielding minibatches of size `batch_size`.
-Each minibatch consists of an tuple of features and labels.
+Each minibatch consists of a tuple of features and labels.
 
 ```{.python .input  n=5}
 def data_iter(batch_size, features, labels):
@@ -118,7 +118,7 @@ and the gradient of the loss function for each example can also be taken in para
 GPUs allow us to process hundreds of examples in scarcely more time
 than it might take to process just a single example.
 
-To build some intuition, let's read and print
+To build some intuition, let us read and print
 the first small batch of data examples.
 The shape of the features in each minibatch tells us
 both the minibatch size and the number of input features.

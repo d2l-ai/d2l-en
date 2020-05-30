@@ -5,7 +5,7 @@ Convexity plays a vital role in the design of optimization algorithms. This is l
 
 ## Basics
 
-Let's begin with the basics.
+Let us begin with the basics.
 
 ### Sets
 
@@ -37,7 +37,7 @@ Now that we have convex sets we can introduce convex functions $f$. Given a conv
 
 $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
-To illustrate this let's plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
+To illustrate this let us plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -47,7 +47,7 @@ from mxnet import np, npx
 npx.set_np()
 ```
 
-Let's define a few functions, both convex and nonconvex.
+Let us define a few functions, both convex and nonconvex.
 
 ```{.python .input}
 def f(x):
@@ -67,7 +67,7 @@ for ax, func in zip(axes, [f, g, h]):
     d2l.plot([x, segment], [func(x), func(segment)], axes=ax)
 ```
 
-As expected, the cosine function is nonconvex, whereas the parabola and the exponential function are. Note that the requirement that $X$ is necessary for the condition to make sense. Otherwise the outcome of $f(\lambda x + (1-\lambda) x')$ might not be well defined. Convex functions have a number of desirable properties.
+As expected, the cosine function is nonconvex, whereas the parabola and the exponential function are. Note that the requirement that $X$ is a convex set is necessary for the condition to make sense. Otherwise the outcome of $f(\lambda x + (1-\lambda) x')$ might not be well defined. Convex functions have a number of desirable properties.
 
 ### Jensen's Inequality
 
@@ -76,10 +76,10 @@ One of the most useful tools is Jensen's inequality. It amounts to a generalizat
 $$\begin{aligned}
     \sum_i \alpha_i f(x_i) & \geq f\left(\sum_i \alpha_i x_i\right)
     \text{ and }
-    E_x[f(x)] & \geq f\left(E_x[x]\right).
+    E_x[f(x)] & \geq f\left(E_x[x]\right),
 \end{aligned}$$
 
-In other words, the expectation of a convex function is larger than the convex function of an expectation. To prove the first inequality we repeatedly apply the definition of convexity to one term in the sum at a time. The expectation can be proven by taking the limit over finite segments.  
+where $\alpha_i$ are nonnegative real numbers such that $\sum_i \alpha_i = 1$. In other words, the expectation of a convex function is larger than the convex function of an expectation. To prove the first inequality we repeatedly apply the definition of convexity to one term in the sum at a time. The expectation can be proven by taking the limit over finite segments.  
 
 One of the common applications of Jensen's inequality is with regard to the log-likelihood of partially observed random variables. That is, we use
 
@@ -96,7 +96,7 @@ Convex functions have a few useful properties. We describe them as follows.
 
 ### No Local Minima
 
-In particular, convex functions do not have local minima. Let's assume the contrary and prove it wrong. If $x \in X$ is a local minimum there exists some neighborhood of $x$ for which $f(x)$ is the smallest value. Since $x$ is only a local minimum there has to be another $x' \in X$ for which $f(x') < f(x)$. However, by convexity the function values on the entire *line* $\lambda x + (1-\lambda) x'$ have to be less than $f(x')$ since for $\lambda \in [0, 1)$ 
+In particular, convex functions do not have local minima. Let us assume the contrary and prove it wrong. If $x \in X$ is a local minimum there exists some neighborhood of $x$ for which $f(x)$ is the smallest value. Since $x$ is only a local minimum there has to be another $x' \in X$ for which $f(x') < f(x)$. However, by convexity the function values on the entire *line* $\lambda x + (1-\lambda) x'$ have to be less than $f(x')$ since for $\lambda \in [0, 1)$ 
 
 $$f(x) > \lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
@@ -118,7 +118,7 @@ Convex functions define convex sets as *below-sets*. They are defined as
 
 $$S_b := \{x | x \in X \text{ and } f(x) \leq b\}.$$
 
-Such sets are convex. Let's prove this quickly. Remember that for any $x, x' \in S_b$ we need to show that $\lambda x + (1-\lambda) x' \in S_b$ as long as $\lambda \in [0, 1]$. But this follows directly from the definition of convexity since $f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b$. 
+Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \in S_b$ we need to show that $\lambda x + (1-\lambda) x' \in S_b$ as long as $\lambda \in [0, 1]$. But this follows directly from the definition of convexity since $f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b$. 
 
 Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
 

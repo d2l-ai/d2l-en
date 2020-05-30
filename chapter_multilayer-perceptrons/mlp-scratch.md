@@ -3,7 +3,7 @@
 
 Now that we have characterized 
 multilayer perceptrons (MLPs) mathematically, 
-let's try to implement one ourselves.
+let us try to implement one ourselves.
 
 ```{.python .input  n=1}
 import d2l
@@ -37,8 +37,8 @@ with one hidden layer and $256$ hidden units.
 Note that we can regard both of these quantities
 as *hyperparameters* and ought in general
 to set them based on performance on validation data.
-Typically, we choose layer widths in powers of $2$
-which tends to be computationally efficient because
+Typically, we choose layer widths in powers of $2$,
+which tend to be computationally efficient because
 of how memory is alotted and addressed in hardware.
 
 Again, we will represent our parameters with several `ndarray`s.
@@ -89,13 +89,13 @@ def net(X):
 
 ## The Loss Function
 
-To ensure numerical stability
-(and because we already implemented
+To ensure numerical stability,
+and because we already implemented
 the softmax function from scratch
 (:numref:`sec_softmax_scratch`),
 we leverage Gluon's integrated function
 for calculating the softmax and cross-entropy loss.
-Recall our easlier discussion of these intricacies 
+Recall our earlier discussion of these intricacies 
 (:numref:`sec_mlp`).
 We encourage the interested reader 
 to examine the source code for `mxnet.gluon.loss.SoftmaxCrossEntropyLoss`
@@ -129,7 +129,7 @@ d2l.predict_ch3(net, test_iter)
 ```
 
 This looks a bit better than our previous result,
-using simple linear models and gives us 
+which used simple linear models, and it gives us 
 some signal that we are on the right path.
 
 ## Summary

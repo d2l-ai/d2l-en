@@ -22,7 +22,7 @@ d2l.use_svg_display()
 
 ## Getting the Dataset
 
-Just as with MNIST, Gluon makes it easy to download and load the FashionMNIST dataset into memory via the `FashionMNIST` class contained in `gluon.data.vision`.
+Just as with MNIST, Gluon makes it easy to download and load the Fashion-MNIST dataset into memory via the `FashionMNIST` class contained in `gluon.data.vision`.
 We briefly work through the mechanics of loading and exploring the dataset below. 
 Please refer to :numref:`sec_naive_bayes` for more details on loading data.
 
@@ -31,7 +31,7 @@ mnist_train = gluon.data.vision.FashionMNIST(train=True)
 mnist_test = gluon.data.vision.FashionMNIST(train=False)
 ```
 
-FashionMNIST consists of images from 10 categories, each represented 
+Fashion-MNIST consists of images from 10 categories, each represented 
 by 6k images in the training set and by 1k in the test set. 
 Consequently the training set and the test set 
 contain 60k and 10k images, respectively.
@@ -125,7 +125,7 @@ train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
                                    num_workers=get_dataloader_workers())
 ```
 
-Let's look at the time it takes to read the training data.
+Let us look at the time it takes to read the training data.
 
 ```{.python .input}
 timer = d2l.Timer()
@@ -166,7 +166,7 @@ for X, y in train_iter:
     break
 ```
 
-We are now ready to work with the FashionMNIST dataset in the sections that follow.
+We are now ready to work with the Fashion-MNIST dataset in the sections that follow.
 
 ## Summary
 

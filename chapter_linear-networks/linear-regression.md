@@ -33,7 +33,7 @@ of the inputs $\textbf{x}$,
 give or take some noise on the observations.
 Second, we assume that any noise is well-behaved
 (following a Gaussian distribution).
-To motivate the approach, let's start with a running example.
+To motivate the approach, let us start with a running example.
 Suppose that we wish to estimate the prices of houses (in dollars)
 based on their area (in square feet) and age (in years).
 
@@ -42,18 +42,18 @@ we would need to get our hands on a dataset
 consisting of sales for which we know
 the sale price, area and age for each home.
 In the terminology of machine learning,
-the dataset is called a *training data* or *training set*,
+the dataset is called a *training data set* or *training set*,
 and each row (here the data corresponding to one sale)
-is called an *instance* or *example*.
+is called an *example* (or *data instance*, "data point", *sample*).
 The thing we are trying to predict (here, the price)
-is called a *target* or *label*.
+is called a *label* (or *target*).
 The variables (here *age* and *area*)
 upon which the predictions are based
 are called *features* or *covariates*.
 
 Typically, we will use $n$ to denote
 the number of examples in our dataset.
-We index the samples by $i$, denoting each input data point
+We index the data instances by $i$, denoting each input
 as $x^{(i)} = [x_1^{(i)}, x_2^{(i)}]$
 and the corresponding label as $y^{(i)}$.
 
@@ -175,7 +175,7 @@ the losses on the training set.
 $$L(\mathbf{w}, b) =\frac{1}{n}\sum_{i=1}^n l^{(i)}(\mathbf{w}, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
 When training the model, we want to find parameters ($\mathbf{w}^*, b^*$)
-that minimize the total loss across all training samples:
+that minimize the total loss across all training examples:
 
 $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).$$
 
@@ -237,7 +237,7 @@ every time we need to compute the update,
 a variant called *stochastic gradient descent*.
 
 In each iteration, we first randomly sample a minibatch $\mathcal{B}$
-consisting of a fixed number of training data examples.
+consisting of a fixed number of training examples.
 We then compute the derivative (gradient) of the average loss
 on the mini batch with regard to the model parameters.
 Finally, we multiply the gradient by a predetermined step size $\eta > 0$
@@ -356,7 +356,7 @@ b = np.ones(n)
 ```
 
 Since we will benchmark the running time frequently in this book,
-let's define a timer (hereafter accessed via the `d2l` package
+let us define a timer (hereafter accessed via the `d2l` package
 to track the running time.
 
 ```{.python .input  n=1}
@@ -509,7 +509,7 @@ So far we only talked about linear functions.
 While neural networks cover a much richer family of models,
 we can begin thinking of the linear model
 as a neural network by expressing it in the language of neural networks.
-To begin, let's start by rewriting things in a 'layer' notation.
+To begin, let us start by rewriting things in a 'layer' notation.
 
 ### Neural Network Diagram
 
@@ -537,14 +537,13 @@ in the next chapter on multilayer perceptrons.
 
 ### Biology
 
-Although linear regression (invented in 1795)
-predates computational neuroscience,
-so it might seem anachronistic to describe
+Since linear regression (invented in 1795)
+predates computational neuroscience, 
+it might seem anachronistic to describe
 linear regression as a neural network.
 To see why linear models were a natural place to begin
 when the cyberneticists/neurophysiologists
-Warren McCulloch and Walter Pitts
-looked when they began to develop
+Warren McCulloch and Walter Pitts began to develop 
 models of artificial neurons,
 consider the cartoonish picture
 of a biological neuron in :numref:`fig_Neuron`, consisting of
@@ -573,7 +572,7 @@ Certainly, the high-level idea that many such units
 could be cobbled together with the right connectivity
 and right learning algorithm,
 to produce far more interesting and complex behavior
-than any one neuron along could express
+than any one neuron alone could express
 owes to our study of real biological neural systems.
 
 At the same time, most research in deep learning today

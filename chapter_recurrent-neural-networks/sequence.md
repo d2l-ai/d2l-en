@@ -13,7 +13,7 @@ In short, ratings are anything but stationary. Using temporal dynamics helped :c
 movies more accurately. But it is not just about movies.
 
 * Many users have highly particular behavior when it comes to the time when they open apps. For instance, social media apps are much more popular after school with students. Stock market trading apps are more commonly used when the markets are open.
-* It is much harder to predict tomorrow's stock prices than to fill in the blanks for a stock price we missed yesterday, even though both are just a matter of estimating one number. After all, hindsight is so much easier than foresight. In statistics the former is called *extrapolation* whereas the latter is called *interpolation*.
+* It is much harder to predict tomorrow's stock prices than to fill in the blanks for a stock price we missed yesterday, even though both are just a matter of estimating one number. After all, foresight is so much harder than hindsight. In statistics, the former (predicting beyond the known observations) is called *extrapolation* whereas the latter (estimating between the existing observations) is called *interpolation*.
 * Music, speech, text, movies, steps, etc. are all sequential in nature. If we were to permute them they would make little sense. The headline *dog bites man* is much less surprising than *man bites dog*, even though the words are identical.
 * Earthquakes are strongly correlated, i.e., after a massive earthquake there are very likely several smaller aftershocks, much more so than without the strong quake. In fact, earthquakes are spatiotemporally correlated, i.e., the aftershocks typically occur within a short time span and in close proximity.
 * Humans interact with each other in a sequential nature, as can be seen in Twitter fights, dance patterns and debates.
@@ -26,7 +26,7 @@ In short, we need statistical tools and new deep neural networks architectures t
 :width:`400px`
 :label:`fig_ftse100`
 
-Let's denote the prices by $x_t \geq 0$, i.e., at time $t \in \mathbb{N}$ we observe some price $x_t$. For a trader to do well in the stock market on day $t$ he should want to predict $x_t$ via
+Let us denote the prices by $x_t \geq 0$, i.e., at time $t \in \mathbb{N}$ we observe price $x_t$. For a trader to do well in the stock market on day $t$ he should want to predict $x_t$ via
 
 $$x_t \sim p(x_t \mid x_{t-1}, \ldots, x_1).$$
 
@@ -35,7 +35,7 @@ $$x_t \sim p(x_t \mid x_{t-1}, \ldots, x_1).$$
 In order to achieve this, our trader could use a regressor such as the one we trained in :numref:`sec_linear_gluon`. There is just a major problem: the number of inputs, $x_{t-1}, \ldots, x_1$ varies, depending on $t$. That is, the number increases with the amount of data that we encounter, and we will need an approximation to make this computationally tractable. Much of what follows in this chapter will revolve around how to estimate $p(x_t \mid x_{t-1}, \ldots, x_1)$ efficiently. In a nutshell it boils down to two strategies:
 
 1. Assume that the potentially rather long sequence $x_{t-1}, \ldots, x_1$ is not really necessary. In this case we might content ourselves with some timespan $\tau$ and only use $x_{t-1}, \ldots, x_{t-\tau}$ observations. The immediate benefit is that now the number of arguments is always the same, at least for $t > \tau$. This allows us to train a deep network as indicated above. Such models will be called *autoregressive* models, as they quite literally perform regression on themselves.
-1. Another strategy, shown in :numref:`fig_sequence-model`, is to try and keep some summary $h_t$ of the past observations, at the same time update $h_t$ in addition to the prediction $\hat{x_t}$. This leads to models that estimate $x_t$ with $\hat{x_t} = p(x_t \mid x_{t-1}, h_{t})$ and moreover updates of the form  $h_t = g(h_{t-1}, x_{t-1})$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*. LSTMs and GRUs are examples of this.
+1. Another strategy, shown in :numref:`fig_sequence-model`, is to try and keep some summary $h_t$ of the past observations, at the same time update $h_t$ in addition to the prediction $\hat{x}_t$. This leads to models that estimate $x_t$ with $\hat{x}_t = p(x_t \mid x_{t-1}, h_{t})$ and moreover updates of the form  $h_t = g(h_{t-1}, x_{t-1})$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*. LSTMs and GRUs are examples of this.
 
 ![A latent autoregressive model. ](../img/sequence-model.svg)
 :label:`fig_sequence-model`
@@ -69,7 +69,7 @@ In fact, if we have a Markov model, we can obtain a reverse conditional probabil
 
 ## A Toy Example
 
-After so much theory, let's try this out in practice. Let's begin by generating some data. To keep things simple we generate our time series by using a sine function with some additive noise.
+After so much theory, let us try this out in practice. Let us begin by generating some data. To keep things simple we generate our time series by using a sine function with some additive noise.
 
 ```{.python .input}
 %matplotlib inline
@@ -132,7 +132,7 @@ train_net(net, train_iter, loss, 10, 0.01)
 
 ## Predictions
 
-Since both training and test loss are small, we would expect our model to work well. Let's see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
+Since both training and test loss are small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
 
 ```{.python .input}
 estimates = net(features)
@@ -148,7 +148,7 @@ x_{602} & = f(x_{601}, \ldots, x_{598}), \\
 x_{603} & = f(x_{602}, \ldots, x_{599}).
 \end{aligned}$$
 
-In other words, we will have to use our own predictions to make future predictions. Let's see how well this goes.
+In other words, we will have to use our own predictions to make future predictions. Let us see how well this goes.
 
 ```{.python .input}
 predictions = np.zeros(T)
@@ -161,9 +161,9 @@ d2l.plot([time, time[tau:], time[n_train:]],
          legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))
 ```
 
-As the above example shows, this is a spectacular failure. The estimates decay to a constant pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that the errors build up. Let's say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon. For instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that the accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
+As the above example shows, this is a spectacular failure. The estimates decay to a constant pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that the errors build up. Let us say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon. For instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that the accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
 
-Let's verify this observation by computing the $k$-step predictions on the entire sequence.
+Let us verify this observation by computing the $k$-step predictions on the entire sequence.
 
 ```{.python .input}
 k = 33  # Look up to k - tau steps ahead

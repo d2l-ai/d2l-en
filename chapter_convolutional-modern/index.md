@@ -10,8 +10,10 @@ which has served as a barometer of progress
 on supervised learning in computer vision since 2010.
 
 These models include AlexNet, the first large-scale network deployed to beat conventional computer vision methods on a large-scale vision challenge;
-the VGG network, which makes use of a number of repeating blocks of elements; the network in network (NiN) which convolves whole neural networks patch-wise over inputs; the GoogLeNet, which makes use of networks with parallel
-concatenations (GoogLeNet); residual networks (ResNet) which are currently the most popular go-to architecture today, and densely connected networks (DenseNet), which are expensive to compute but have set some recent benchmarks.
+the VGG network, which makes use of a number of repeating blocks of elements; the network in network (NiN) which convolves whole neural networks
+patch-wise over inputs; the GoogLeNet, which makes use of networks with parallel concatenations;
+residual networks (ResNet), which are the
+most popular go-to architecture today, and densely connected networks (DenseNet), which are expensive to compute but have set some recent benchmarks.
 
 ```toc
 :maxdepth: 2
