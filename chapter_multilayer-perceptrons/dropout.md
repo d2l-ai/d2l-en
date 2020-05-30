@@ -262,7 +262,7 @@ def dropout_layer(X, dropout):
 #@tab pytorch
 import d2l_pytorch as d2l
 import torch
-import torch.nn as nn
+from torch import nn
 
 def dropout_layer(X, dropout):
     assert 0 <= dropout <= 1

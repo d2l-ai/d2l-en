@@ -35,7 +35,7 @@ npx.save('x-file', x)
 #@tab pytorch
 import torch
 from torch import nn
-import torch.nn.functional as F
+from torch.nn import functional as F
 
 x = torch.arange(4)
 torch.save(x,"x-file")

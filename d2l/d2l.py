@@ -445,3 +445,26 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     print('%.1f examples/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
 
 
+# Defined in file: ./chapter_convolutional-modern/resnet.md
+class Residual(nn.Block):  #@save
+    def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
+        super().__init__(**kwargs)
+        self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1,
+                               strides=strides)
+        self.conv2 = nn.Conv2D(num_channels, kernel_size=3, padding=1)
+        if use_1x1conv:
+            self.conv3 = nn.Conv2D(num_channels, kernel_size=1,
+                                   strides=strides)
+        else:
+            self.conv3 = None
+        self.bn1 = nn.BatchNorm()
+        self.bn2 = nn.BatchNorm()
+
+    def forward(self, X):
+        Y = npx.relu(self.bn1(self.conv1(X)))
+        Y = self.bn2(self.conv2(Y))
+        if self.conv3:
+            X = self.conv3(X)
+        return npx.relu(Y + X)
+
+

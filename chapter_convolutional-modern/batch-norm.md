@@ -252,7 +252,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
 #@tab pytorch
 import d2l_pytorch as d2l
 import torch
-import torch.nn as nn
+from torch import nn
 
 def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     # Use torch.is_grad_enabled() to determine whether the current mode is 

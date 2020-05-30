@@ -80,8 +80,8 @@ class Inception(nn.Block):
 #@tab pytorch
 import d2l_pytorch as d2l
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
+from torch import nn
+from torch.nn import functional as F
 
 class Inception(nn.Module):
     # c1 - c4 are the number of output channels for each layer in the path
