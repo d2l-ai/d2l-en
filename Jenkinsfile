@@ -18,7 +18,6 @@ stage("Build and Publish") {
       # pytorch
       pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
       pip install torchvision
-      pip install scipy
       cd d2l_pytorch; python setup.py develop
       pip list
       nvidia-smi
