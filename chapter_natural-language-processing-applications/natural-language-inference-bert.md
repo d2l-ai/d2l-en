@@ -21,7 +21,7 @@ then fine-tune it
 for natural language inference on the SNLI dataset.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 import json
 import multiprocessing
 from mxnet import autograd, gluon, init, np, npx

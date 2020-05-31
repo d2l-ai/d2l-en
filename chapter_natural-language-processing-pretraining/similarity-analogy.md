@@ -10,7 +10,7 @@ synonyms and analogies. We will continue to apply pretrained word vectors in
 subsequent sections.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 import os
 
@@ -26,19 +26,19 @@ Here we consider one English version (300-dimensional "wiki.en") that can be dow
 [fastText website](https://fasttext.cc/).
 
 ```{.python .input  n=35}
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['glove.6b.50d'] = (d2l.DATA_URL + 'glove.6B.50d.zip',
                        '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
 
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['glove.6b.100d'] = (d2l.DATA_URL + 'glove.6B.100d.zip',
                        'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
 
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['glove.42b.300d'] = (d2l.DATA_URL + 'glove.42B.300d.zip',
                        'b5116e234e9eb9076672cfeabf5469f3eec904fa')
 
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
                        'c1816da3821ae9f43899be655002f6c723e91b88')
 ```
@@ -46,7 +46,7 @@ d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
 We define the following `TokenEmbedding` class to load the above pretrained Glove and fastText embeddings.
 
 ```{.python .input}
-# Saved in the d2l package for later use
+#@save
 class TokenEmbedding:
     """Token Embedding."""
     def __init__(self, embedding_name):

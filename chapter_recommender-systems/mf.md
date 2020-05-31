@@ -38,7 +38,7 @@ An intuitive illustration of the matrix factorization model is shown below:
 In the rest of this section, we will explain the implementation of matrix factorization and train the model on the MovieLens dataset.
 
 ```{.python .input  n=2}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
@@ -97,7 +97,7 @@ def evaluator(net, test_iter, ctx):
 In the training function, we adopt the $L_2$ loss with weight decay. The weight decay mechanism has the same effect as the $L_2$ regularization.
 
 ```{.python .input  n=4}
-# Saved in the d2l package for later use
+#@save
 def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                         ctx_list=d2l.try_all_gpus(), evaluator=None,
                         **kwargs):

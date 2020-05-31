@@ -46,7 +46,7 @@ For our example, the plot of $P(X \mid \theta)$ is as follows:
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
 npx.set_np()
 

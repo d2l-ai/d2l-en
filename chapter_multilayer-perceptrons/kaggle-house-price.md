@@ -255,7 +255,7 @@ we can install pandas without even leaving the notebook.
 # !pip install pandas
 
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, init, np, npx
 from mxnet.gluon import nn
 import pandas as pd
@@ -268,7 +268,7 @@ npx.set_np()
 # !pip install pandas
 
 %matplotlib inline
-import d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 import torch.nn as nn
 import pandas as pd

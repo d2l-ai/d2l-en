@@ -28,7 +28,7 @@ For simplicity we choose the objective function $f(x)=x^2$ to illustrate how to 
 
 ```{.python .input  n=3}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 
@@ -116,7 +116,7 @@ $\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f(\mathbf{x}).$
 To see how the algorithm behaves in practice let us construct an objective function $f(\mathbf{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\mathbf{x} = [x_1, x_2]^\top$ as input and a scalar as output. The gradient is given by $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. We will observe the trajectory of $\mathbf{x}$ by gradient descent from the initial position $[-5, -2]$. We need two more helper functions. The first uses an update function and applies it $20$ times to the initial value. The second helper visualizes the trajectory of $\mathbf{x}$.
 
 ```{.python .input  n=1}
-# Saved in the d2l package for later use
+#@save
 def train_2d(trainer, steps=20):
     """Optimize a 2-dim objective function with a customized trainer."""
     # s1 and s2 are internal state variables and will
@@ -129,7 +129,7 @@ def train_2d(trainer, steps=20):
         print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
-# Saved in the d2l package for later use
+#@save
 def show_trace_2d(f, results):
     """Show the trace of 2D variables during optimization."""
     d2l.set_figsize((3.5, 2.5))

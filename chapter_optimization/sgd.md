@@ -5,7 +5,7 @@ In this section, we are going to introduce the basic principles of stochastic gr
 
 ```{.python .input  n=2}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 import math
 from mxnet import np, npx
 npx.set_np()

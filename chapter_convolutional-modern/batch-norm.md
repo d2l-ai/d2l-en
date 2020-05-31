@@ -212,7 +212,7 @@ Recall that dropout also exhibits this characteristic.
 Below, we implement a batch normalization layer with `ndarray`s from scratch:
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, init
 from mxnet.gluon import nn
 npx.set_np()
@@ -251,7 +251,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
 
 ```{.python .input}
 #@tab pytorch
-import d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 from torch import nn
 

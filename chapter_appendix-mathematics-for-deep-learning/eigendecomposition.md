@@ -91,7 +91,7 @@ We can check this in code using the built-in `numpy.linalg.eig` routine.
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from IPython import display
 import numpy as np
 

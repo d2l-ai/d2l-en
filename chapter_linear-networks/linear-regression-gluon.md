@@ -22,7 +22,7 @@ concisely by using framework's high-level APIs.
 To start, we will generate the same dataset as in the previous section.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
 
@@ -34,7 +34,7 @@ features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 
 ```{.python .input}
 #@tab pytorch
-import d2l_pytorch as d2l
+from d2l import torch as d2l
 import numpy as np
 import torch
 from torch.utils import data

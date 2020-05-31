@@ -19,7 +19,7 @@ convolutional neural networks to sentiment analysis: textCNN :cite:`Kim.2014`.
 First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()

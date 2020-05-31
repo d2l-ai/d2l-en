@@ -46,7 +46,7 @@ The convolution width of the first layer is typically set by the user.
 The subsequent widths are fixed to $1 \times 1$.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -63,7 +63,7 @@ def nin_block(num_channels, kernel_size, strides, padding):
 
 ```{.python .input}
 #@tab pytorch
-import d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 from torch import nn
 

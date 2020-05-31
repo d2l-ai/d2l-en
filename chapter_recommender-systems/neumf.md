@@ -37,7 +37,7 @@ The following figure illustrates the model architecture of NeuMF.
 ![Illustration of the NeuMF model](../img/rec-neumf.svg)
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
@@ -115,7 +115,7 @@ where $\mathcal{I}$ is the item set. $S_u$ is the candidate items of user $u$. N
 The following function calculates the hit counts and AUC for each user.
 
 ```{.python .input  n=4}
-# Saved in the d2l package for later use
+#@save
 def hit_and_auc(rankedlist, test_matrix, k):
     hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k])
               if val in set(test_matrix)]
@@ -129,7 +129,7 @@ def hit_and_auc(rankedlist, test_matrix, k):
 Then, the overall Hit rate and AUC are calculated as follows.
 
 ```{.python .input  n=5}
-# Saved in the d2l package for later use
+#@save
 def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
                      ctx):
     ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
@@ -166,7 +166,7 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 The training function is defined below. We train the model in the pairwise manner.
 
 ```{.python .input  n=6}
-# Saved in the d2l package for later use
+#@save
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                   num_users, num_items, num_epochs, ctx_list, evaluator, 
                   candidates, eval_step=1):

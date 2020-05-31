@@ -345,7 +345,7 @@ In the other method we will rely on a single call to `+`.
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 import math
 from mxnet import np
 import time
@@ -358,7 +358,7 @@ b = np.ones(n)
 ```{.python .input}
 #@tab pytorch
 %matplotlib inline
-import d2l_pytorch as d2l
+from d2l import torch as d2l
 import math
 import torch
 import numpy as np

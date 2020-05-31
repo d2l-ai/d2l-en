@@ -5,7 +5,7 @@ Now that we have learned how to work with probability in both the discrete and t
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from IPython import display
 from math import erf, factorial
 import numpy as np

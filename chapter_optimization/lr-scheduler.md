@@ -16,7 +16,7 @@ We begin with a toy problem that is cheap enough to compute easily, yet sufficie
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, lr_scheduler, np, npx
 from mxnet.gluon import nn
 npx.set_np()

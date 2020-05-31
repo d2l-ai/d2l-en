@@ -10,7 +10,7 @@ we will breeze through an implementation in Gluon for comparison.
 To begin, let us import the familiar packages.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon
 from IPython import display
 npx.set_np()
@@ -19,7 +19,7 @@ npx.set_np()
 
 ```{.python .input}
 #@tab pytorch
-import d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 from IPython import display
 ```

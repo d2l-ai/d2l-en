@@ -7,7 +7,7 @@ convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec
 ```{.python .input  n=13}
 from mxnet import np, npx, init
 from mxnet.gluon import nn
-import d2l
+from d2l import mxnet as d2l
 
 npx.set_np()
 ```

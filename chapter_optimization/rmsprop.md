@@ -29,7 +29,7 @@ As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots, = \f
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 import math
 from mxnet import np, npx
 

@@ -6,7 +6,7 @@ So far we see how to use recurrent neural networks for language models, in which
 Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. Solving this problem with neural networks is often called neural machine translation (NMT). Compared to language models (:numref:`sec_language_model`), in which the corpus only contains a single language, machine translation dataset has at least two languages, the source language and the target language. In addition, each sentence in the source language is mapped to the according translation in the target language. Therefore, the data preprocessing for machine translation data is different to the one for language models. This section is dedicated to demonstrate how to pre-process such a dataset and then load into a set of minibatches.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx, gluon
 import os
 npx.set_np()
@@ -17,11 +17,11 @@ npx.set_np()
 We first download a dataset that contains a set of English sentences with the corresponding French translations. As can be seen that each line contains an English sentence with its French translation, which are separated by a `TAB`.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
 
-# Saved in the d2l package for later use
+#@save
 def read_data_nmt():
     data_dir = d2l.download_extract('fra-eng')
     with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
@@ -34,7 +34,7 @@ print(raw_text[0:106])
 We perform several preprocessing steps on the raw text data, including ignoring cases, replacing UTF-8 non-breaking space with space, and adding space between words and punctuation marks.
 
 ```{.python .input  n=3}
-# Saved in the d2l package for later use
+#@save
 def preprocess_nmt(text):
     def no_space(char, prev_char):
         return char in set(',.!') and prev_char != ' '
@@ -53,7 +53,7 @@ print(text[0:95])
 Different to using character tokens in :numref:`sec_language_model`, here a token is either a word or a punctuation mark. The following function tokenizes the text data to return `source` and `target`. Each one is a list of token list, with `source[i]` is the $i^\mathrm{th}$ sentence in the source language and `target[i]` is the $i^\mathrm{th}$ sentence in the target language. To make the latter training faster, we sample the first `num_examples` sentences pairs.
 
 ```{.python .input  n=4}
-# Saved in the d2l package for later use
+#@save
 def tokenize_nmt(text, num_examples=None):
     source, target = [], []
     for i, line in enumerate(text.split('\n')):
@@ -95,7 +95,7 @@ In language models, each example is a `num_steps` length sequence from the corpu
 One way to solve this problem is that if a sentence is longer than `num_steps`, we trim its length, otherwise pad with a special &lt;pad&gt; token to meet the length. Therefore we could transform any sentence to a fixed length.
 
 ```{.python .input  n=7}
-# Saved in the d2l package for later use
+#@save
 def truncate_pad(line, num_steps, padding_token):
     if len(line) > num_steps:
         return line[:num_steps]  # Trim
@@ -107,7 +107,7 @@ truncate_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])
 Now we can convert a list of sentences into an `(num_example, num_steps)` index array. We also record the length of each sentence without the padding tokens, called *valid length*, which might be used by some models. In addition, we add the special “&lt;bos&gt;” and “&lt;eos&gt;” tokens to the target sentences so that our model will know the signals for starting and ending predicting.
 
 ```{.python .input  n=8}
-# Saved in the d2l package for later use
+#@save
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
     if not is_source:
@@ -125,7 +125,7 @@ Then we can construct minibatches based on these arrays.
 Finally, we define the function `load_data_nmt` to return the data iterator with the vocabularies for source language and target language.
 
 ```{.python .input  n=9}
-# Saved in the d2l package for later use
+#@save
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)

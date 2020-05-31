@@ -10,7 +10,7 @@ In the next few sections, we will introduce multiple deep learning models used f
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import image, npx
 
 npx.set_np()
@@ -36,7 +36,7 @@ dog_bbox, cat_bbox = [60, 45, 378, 516], [400, 112, 655, 493]
 We can draw the bounding box in the image to check if it is accurate. Before drawing the box, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of `matplotlib`.
 
 ```{.python .input  n=3}
-# Saved in the d2l package for later use
+#@save
 def bbox_to_rect(bbox, color):
     """Convert bounding box to matplotlib format."""
     # Convert the bounding box (top-left x, top-left y, bottom-right x,

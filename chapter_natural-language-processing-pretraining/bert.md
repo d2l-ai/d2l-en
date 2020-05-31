@@ -111,7 +111,7 @@ When natural language processing applications are explained in :numref:`chap_nlp
 we will illustrate fine-tuning of BERT for downstream applications.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 
@@ -149,7 +149,7 @@ as the input, then returns tokens of the BERT input sequence
 and their corresponding segment IDs.
 
 ```{.python .input}
-# Saved in the d2l package for later use
+#@save
 def get_tokens_and_segments(tokens_a, tokens_b=None):
     tokens = ['<cls>'] + tokens_a + ['<sep>']
     # 0 and 1 are marking segment A and B, respectively
@@ -179,7 +179,7 @@ Different from `TransformerEncoder`, `BERTEncoder` uses
 segment embeddings and learnable positional embeddings.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 class BERTEncoder(nn.Block):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                  num_layers, dropout, max_len=1000, **kwargs):
@@ -278,7 +278,7 @@ the encoded result of `BERTEncoder` and the token positions for prediction.
 The output is the prediction results at these positions.
 
 ```{.python .input  n=4}
-# Saved in the d2l package for later use
+#@save
 class MaskLM(nn.Block):
     def __init__(self, vocab_size, num_hiddens, **kwargs):
         super(MaskLM, self).__init__(**kwargs)
@@ -351,7 +351,7 @@ Hence, the output layer (`self.output`) of the MLP classifier takes `X` as the i
 where `X` is the output of the MLP hidden layer whose input is the encoded “&lt;cls&gt;” token.
 
 ```{.python .input  n=7}
-# Saved in the d2l package for later use
+#@save
 class NextSentencePred(nn.Block):
     def __init__(self, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
@@ -399,7 +399,7 @@ predictions of masked language modeling `mlm_Y_hat`,
 and next sentence predictions `nsp_Y_hat`.
 
 ```{.python .input  n=10}
-# Saved in the d2l package for later use
+#@save
 class BERTModel(nn.Block):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                  num_layers, dropout, max_len=1000):

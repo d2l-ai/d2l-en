@@ -142,7 +142,7 @@ As a simple example, let us see how to compute the angle between a pair of vecto
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from IPython import display
 from mxnet import gluon, np, npx
 npx.set_np()

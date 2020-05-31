@@ -7,7 +7,7 @@ KVStore is a place for data sharing. Think of it as a single object shared acros
 Let’s consider a simple example: initializing a (int, NDArray) pair into the store, and then pulling the value out:
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx, kv
 npx.set_np()
 ```

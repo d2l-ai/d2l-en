@@ -16,7 +16,7 @@ Let us take $x$ and try to understand what happens when we change it by a small 
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from IPython import display
 from mxnet import np, npx
 npx.set_np()

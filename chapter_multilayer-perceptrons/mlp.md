@@ -268,7 +268,7 @@ This is true for most activation functions
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
 npx.set_np()
 ```
@@ -276,7 +276,7 @@ npx.set_np()
 ```{.python .input}
 #@tab pytorch
 %matplotlib inline
-import d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 ```
 

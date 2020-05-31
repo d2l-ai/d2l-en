@@ -276,7 +276,7 @@ This makes the model more robust and the larger sample size effectively reduces 
 We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -314,7 +314,7 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
 
 ```{.python .input}
 #@tab pytorch
-import d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 from torch import nn
 

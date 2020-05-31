@@ -6,7 +6,7 @@ Text classification is a common task in natural language processing, which trans
 This section will focus on loading data for one of the sub-questions in this field: using text sentiment classification to analyze the emotions of the text's author. This problem is also called sentiment analysis and has a wide range of applications. For example, we can analyze user reviews of products to obtain user satisfaction statistics, or analyze user sentiments about market conditions and use it to predict future trends.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 import os
 npx.set_np()
@@ -21,7 +21,7 @@ We use Stanford's [Large Movie Review Dataset](https://ai.stanford.edu/~amaas/da
 We first download this dataset to the "../data" path and extract it to "../data/aclImdb".
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['aclImdb'] = (
     'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
     '01ada507287d82875905620988597833ad4e0903')
@@ -32,7 +32,7 @@ data_dir = d2l.download_extract('aclImdb', 'aclImdb')
 Next, read the training and test datasets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
 
 ```{.python .input  n=3}
-# Saved in the d2l package for later use
+#@save
 def read_imdb(data_dir, is_train):
     data, labels = [], []
     for label in ('pos', 'neg'):
@@ -92,7 +92,7 @@ for X, y in train_iter:
 Last, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
 
 ```{.python .input  n=7}
-# Saved in the d2l package for later use
+#@save
 def load_data_imdb(batch_size, num_steps=500):
     data_dir = d2l.download_extract('aclImdb', 'aclImdb')
     train_data = read_imdb(data_dir, True)

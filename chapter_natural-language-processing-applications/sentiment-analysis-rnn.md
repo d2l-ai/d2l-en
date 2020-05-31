@@ -13,7 +13,7 @@ negative emotion.
 :label:`fig_nlp-map-sa-rnn`
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn, rnn
 npx.set_np()
@@ -110,7 +110,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 Finally, define the prediction function.
 
 ```{.python .input  n=49}
-# Saved in the d2l package for later use
+#@save
 def predict_sentiment(net, vocab, sentence):
     sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
     label = np.argmax(net(sentence.reshape(1, -1)), axis=1)

@@ -9,13 +9,13 @@ The Pikachu dataset in RecordIO format can be downloaded directly from the Inter
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, image, np, npx
 import os
 
 npx.set_np()
 
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['pikachu'] = (d2l.DATA_URL + 'pikachu.zip',
                            '68ab1bd42143c5966785eb0d7b2839df8d570190')
 ```
@@ -25,7 +25,7 @@ d2l.DATA_HUB['pikachu'] = (d2l.DATA_URL + 'pikachu.zip',
 We are going to read the object detection dataset by creating the instance `ImageDetIter`. The "Det" in the name refers to Detection. We will read the training dataset in random order. Since the format of the dataset is RecordIO, we need the image index file `'train.idx'` to read random minibatches. In addition, for each image of the training set, we will use random cropping and require the cropped image to cover at least 95% of each object. Since the cropping is random, this requirement is not always satisfied. We preset the maximum number of random cropping attempts to 200. If none of them meets the requirement, the image will not be cropped. To ensure the certainty of the output, we will not randomly crop the images in the test dataset. We also do not need to read the test dataset in random order.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 def load_data_pikachu(batch_size, edge_size=256):
     """Load the pikachu dataset."""
     data_dir = d2l.download_extract('pikachu')

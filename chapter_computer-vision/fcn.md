@@ -17,7 +17,7 @@ explain the transposed convolution layer.
 
 ```{.python .input  n=2}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, image, init, np, npx
 from mxnet.gluon import nn
 

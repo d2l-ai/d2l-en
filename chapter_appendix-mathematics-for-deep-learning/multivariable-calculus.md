@@ -70,7 +70,7 @@ We can test this in code to see how good the approximation is.
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from IPython import display
 from mpl_toolkits import mplot3d
 from mxnet import autograd, np, npx

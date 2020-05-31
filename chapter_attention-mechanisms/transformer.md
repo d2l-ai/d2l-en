@@ -31,7 +31,7 @@ On the flip side, Transformer differs from the seq2seq with attention model in t
 In the rest of this section, we will equip you with each new component introduced by Transformer, and get you up and running to construct a machine translation model.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 import math
 from mxnet import autograd, np, npx
 from mxnet.gluon import nn
@@ -71,7 +71,7 @@ $$\mathbf o = \mathbf W_o \begin{bmatrix}\mathbf o^{(1)}\\\vdots\\\mathbf o^{(h)
 Now we can implement the multi-head attention. Assume that the multi-head attention contain the number heads `num_heads` $=h$, the hidden size `num_hiddens` $=p_q=p_k=p_v$ are the same for the query,  key, and value dense layers. In addition, since the multi-head attention keeps the same dimensionality between its input and its output, we have the output feature size $d_o =$ `num_hiddens` as well.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 class MultiHeadAttention(nn.Block):
     def __init__(self, num_hiddens, num_heads, dropout, use_bias=False, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
@@ -114,7 +114,7 @@ class MultiHeadAttention(nn.Block):
 Here are the definitions of the transpose functions `transpose_qkv` and `transpose_output`, which are the inverse of each other.
 
 ```{.python .input  n=3}
-# Saved in the d2l package for later use
+#@save
 def transpose_qkv(X, num_heads):
     # Input X shape: (batch_size, seq_len, num_hiddens).
     # Output X shape:
@@ -129,7 +129,7 @@ def transpose_qkv(X, num_heads):
     return output
 
 
-# Saved in the d2l package for later use
+#@save
 def transpose_output(X, num_heads):
     # A reversed version of transpose_qkv
     X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
@@ -154,7 +154,7 @@ Another key component in the Transformer block is called *position-wise feed-for
 Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two dense layers of hidden size `ffn_num_hiddens` and `pw_num_outputs`, respectively.
 
 ```{.python .input  n=5}
-# Saved in the d2l package for later use
+#@save
 class PositionWiseFFN(nn.Block):
     def __init__(self, ffn_num_hiddens, pw_num_outputs, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
@@ -194,7 +194,7 @@ with autograd.record():
 Now let us implement the connection block `AddNorm` together. `AddNorm` accepts two inputs $X$ and $Y$. We can deem $X$ as the original input in the residual network, and $Y$ as the outputs from either the multi-head attention layer or the position-wise FFN network. In addition, we apply dropout on $Y$ for regularization.
 
 ```{.python .input  n=8}
-# Saved in the d2l package for later use
+#@save
 class AddNorm(nn.Block):
     def __init__(self, dropout, **kwargs):
         super(AddNorm, self).__init__(**kwargs)
@@ -234,7 +234,7 @@ for $i=0,\ldots, l-1$ and $j=0,\ldots,\lfloor(d-1)/2\rfloor$.
 :label:`fig_positional_encoding`
 
 ```{.python .input  n=10}
-# Saved in the d2l package for later use
+#@save
 class PositionalEncoding(nn.Block):
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
@@ -266,7 +266,7 @@ d2l.plot(np.arange(100), Y[0, :, 4:8].T, figsize=(6, 2.5),
 Armed with all the essential components of Transformer, let us first build a Transformer encoder block. This encoder contains a multi-head attention layer, a position-wise feed-forward network, and two "add and norm" connection blocks. As shown in the code, for both of the attention model and the positional FFN model in the `EncoderBlock`, their outputs' dimension are equal to the `num_hiddens`. This is due to the nature of the residual block, as we need to add these outputs back to the original value during "add and norm".
 
 ```{.python .input  n=12}
-# Saved in the d2l package for later use
+#@save
 class EncoderBlock(nn.Block):
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
                  use_bias=False, **kwargs):
@@ -294,7 +294,7 @@ encoder_blk(X, valid_len).shape
 Now it comes to the implementation of the entire Transformer encoder. With the Transformer encoder, $n$ blocks of `EncoderBlock` stack up one after another. Because of the residual connection, the embedding layer size $d$ is same as the Transformer block output size. Also note that we multiply the embedding output by $\sqrt{d}$ to prevent its values from being too small.
 
 ```{.python .input  n=14}
-# Saved in the d2l package for later use
+#@save
 class TransformerEncoder(d2l.Encoder):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
                  num_heads, num_layers, dropout, use_bias=False, **kwargs):

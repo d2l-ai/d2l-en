@@ -40,7 +40,7 @@ npx.set_np()
 The implementation of BPR loss is as follows.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 class BPRLoss(gluon.loss.Loss):
     def __init__(self, weight=None, batch_axis=0, **kwargs):
         super(BPRLoss, self).__init__(weight=None, batch_axis=0, **kwargs)
@@ -62,7 +62,7 @@ $$
 where $m$ is the safety margin size. It aims to push negative items away from positive items. Similar to BPR, it aims to optimize for relevant distance between positive and negative samples instead of absolute outputs, making it well suited to recommender systems.
 
 ```{.python .input  n=3}
-# Saved in the d2l package for later use
+#@save
 class HingeLossbRec(gluon.loss.Loss):
     def __init__(self, weight=None, batch_axis=0, **kwargs):
         super(HingeLossbRec, self).__init__(weight=None, batch_axis=0,

@@ -43,7 +43,7 @@ As before $f$ has its minimum at $(0, 0)$. This function is *very* flat in the d
 
 ```{.python .input  n=3}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 

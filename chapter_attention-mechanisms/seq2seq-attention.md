@@ -22,7 +22,7 @@ To illustrate the overall architecture of seq2seq with attention model, the laye
 :label:`fig_s2s_attention_details`
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn, nn
 npx.set_np()

@@ -241,7 +241,7 @@ rescaling the remainder as described above
 (dividing the survivors by `1.0-dropout`).
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -260,7 +260,7 @@ def dropout_layer(X, dropout):
 
 ```{.python .input}
 #@tab pytorch
-import d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 from torch import nn
 

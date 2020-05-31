@@ -92,7 +92,7 @@ The probability formulae that involve one, two, and three variables are typicall
 Let us see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`sec_text_preprocessing` and print the top $10$ most frequent words.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 import random
 npx.set_np()
@@ -165,7 +165,7 @@ The following code randomly generates a minibatch from the data each time. Here,
 In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random minibatches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
 
 ```{.python .input  n=1}
-# Saved in the d2l package for later use
+#@save
 def seq_data_iter_random(corpus, batch_size, num_steps):
     # Offset the iterator over the data for uniform starts
     corpus = corpus[random.randint(0, num_steps):]
@@ -203,7 +203,7 @@ for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=6):
 In addition to random sampling of the original sequence, we can also make the positions of two adjacent random minibatches adjacent in the original sequence.
 
 ```{.python .input  n=7}
-# Saved in the d2l package for later use
+#@save
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
@@ -229,7 +229,7 @@ for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
 Now we wrap the above two sampling functions to a class so that we can use it as a Gluon data iterator later.
 
 ```{.python .input}
-# Saved in the d2l package for later use
+#@save
 class SeqDataLoader:
     """A iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
@@ -247,7 +247,7 @@ class SeqDataLoader:
 Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix.
 
 ```{.python .input}
-# Saved in the d2l package for later use
+#@save
 def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
                            max_tokens=10000):
     data_iter = SeqDataLoader(

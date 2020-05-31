@@ -10,7 +10,7 @@ Suppose that we have a function $f(x)$.  For simplicity, let us assume that $f(x
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from IPython import display
 from mpl_toolkits import mplot3d
 from mxnet import np, npx
