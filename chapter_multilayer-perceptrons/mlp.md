@@ -276,7 +276,7 @@ npx.set_np()
 ```{.python .input}
 #@tab pytorch
 %matplotlib inline
-from d2l import mxnet as d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 ```
 

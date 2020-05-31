@@ -102,7 +102,7 @@ d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```{.python .input}
 #@tab pytorch
 %matplotlib inline
-from d2l import mxnet as d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 
 x = torch.arange(-8.0, 8.0, 0.1, requires_grad=True)

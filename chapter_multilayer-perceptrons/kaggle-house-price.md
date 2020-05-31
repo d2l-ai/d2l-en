@@ -268,7 +268,7 @@ npx.set_np()
 # !pip install pandas
 
 %matplotlib inline
-from d2l import mxnet as d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 import torch.nn as nn
 import pandas as pd

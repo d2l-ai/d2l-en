@@ -251,7 +251,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
 
 ```{.python .input}
 #@tab pytorch
-from d2l import mxnet as d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 from torch import nn
 

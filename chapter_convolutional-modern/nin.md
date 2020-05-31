@@ -63,7 +63,7 @@ def nin_block(num_channels, kernel_size, strides, padding):
 
 ```{.python .input}
 #@tab pytorch
-from d2l import mxnet as d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 from torch import nn
 

@@ -63,7 +63,7 @@ class Residual(nn.Block):  #@save
 
 ```{.python .input}
 #@tab pytorch
-from d2l import mxnet as d2l_pytorch as d2l
+from d2l import torch as d2l
 import torch
 from torch import nn
 from torch.nn import functional as F

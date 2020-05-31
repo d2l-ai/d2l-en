@@ -4,7 +4,8 @@
 Today's computers are highly parallel systems, consisting of multiple CPU cores (often multiple threads per core), multiple processing elements per GPU and often multiple GPUs per device. In short, we can process many different things at the same time, often on different devices. Unfortunately Python is not a great way of writing parallel and asynchronous code, at least not with some extra help. After all, Python is single-threaded and this is unlikely to change in the future. Deep learning frameworks such as MXNet and TensorFlow utilize an asynchronous programming model to improve performance (PyTorch uses Python's own scheduler leading to a different performance trade-off). Hence, understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and mutual dependencies. This allows us to reduce memory overhead and increase processor utilization. We begin by importing the necessary libraries.
 
 ```{.python .input  n=1}
-from d2l import mxnet as d2l, numpy, os, subprocess
+from d2l import mxnet as d2l
+import numpy, os, subprocess
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -23,7 +24,7 @@ with d2l.benchmark('numpy   : %.4f sec'):
 with d2l.benchmark('mxnet.np: %.4f sec'):
     for _ in range(10):
         a = np.random.normal(size=(1000, 1000))
-        b = np.dot(a, a)       
+        b = np.dot(a, a)
 ```
 
 This is orders of magnitude faster. At least it seems to be so. Since both are executed on the same processor something else must be going on. Forcing MXNet to finish all computation prior to returning shows what happened previously: computation is being executed by the backend while the frontend returns control to Python.
@@ -32,7 +33,7 @@ This is orders of magnitude faster. At least it seems to be so. Since both are e
 with d2l.benchmark():
     for _ in range(10):
         a = np.random.normal(size=(1000, 1000))
-        b = np.dot(a, a)       
+        b = np.dot(a, a)
     npx.waitall()
 ```
 
@@ -67,13 +68,13 @@ Whenever the Python frontend thread executes one of the first three statements, 
 
 There are a number of operations that will force Python to wait for completion:
 * Most obviously `npx.waitall()` waits until all computation has completed, regardless of when the compute instructions were issued. In practice it is a bad idea to use this operator unless absolutely necessary since it can lead to poor performance.
-* If we just want to wait until a specific variable is available we can call `z.wait_to_read()`. In this case MXNet blocks return to Python until the variable `z` has been computed. Other computation may well continue afterwards. 
+* If we just want to wait until a specific variable is available we can call `z.wait_to_read()`. In this case MXNet blocks return to Python until the variable `z` has been computed. Other computation may well continue afterwards.
 
 Let us see how this works in practice:
 
 ```{.python .input  n=5}
 with d2l.benchmark('waitall     : %.4f sec'):
-    b = np.dot(a, a)       
+    b = np.dot(a, a)
     npx.waitall()
 
 with d2l.benchmark('wait_to_read: %.4f sec'):
@@ -85,11 +86,11 @@ Both operations take approximately the same time to complete. Besides the obviou
 
 ```{.python .input  n=7}
 with d2l.benchmark('numpy  conversion: %.4f sec'):
-    b = np.dot(a, a)       
+    b = np.dot(a, a)
     b.asnumpy()
 
 with d2l.benchmark('scalar conversion: %.4f sec'):
-    b = np.dot(a, a)       
+    b = np.dot(a, a)
     b.sum().item()
 ```
 

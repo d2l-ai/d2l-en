@@ -34,7 +34,7 @@ features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 
 ```{.python .input}
 #@tab pytorch
-from d2l import mxnet as d2l_pytorch as d2l
+from d2l import torch as d2l
 import numpy as np
 import torch
 from torch.utils import data
