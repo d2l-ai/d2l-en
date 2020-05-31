@@ -51,21 +51,12 @@ Notebooks" tab on the top of any HTML page to download and unzip the code.
 Alternatively, if you have `unzip` (otherwise run `sudo apt install unzip`) available:
 
 
-:begin_tab:`mxnet`
 ```bash
 mkdir d2l-en && cd d2l-en
 curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
-:end_tab:
 
-:begin_tab:`pytorch`
-```bash
-mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en-pytorch.zip -o d2l-en.zip
-unzip d2l-en.zip && rm d2l-en.zip
-```
-:end_tab:
 
 Now we will want to activate the `d2l` environment and install `pip`.
 Enter `y` for the queries that follow this command.
@@ -110,12 +101,6 @@ functions and classes in this book.
 :begin_tab:`mxnet`
 ```bash
 pip install git+https://github.com/d2l-ai/d2l-en
-```
-:end_tab:
-
-:begin_tab:`pytorch`
-```bash
-pip install -e "git+https://github.com/d2l-ai/d2l-en@pytorch#egg=d2l_pytorch&subdirectory=d2l_pytorch"
 ```
 :end_tab:
 
