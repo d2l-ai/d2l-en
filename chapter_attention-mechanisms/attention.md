@@ -10,7 +10,7 @@ In :numref:`sec_seq2seq`, we encode the source sequence input information in the
 :label:`fig_attention`
 
 
-The full process of attention mechanism is expressed in :numref:`fig_attention_output`. To compute the output of attention, we first use a score function $\alpha$ that measures the similarity between the query and key. Then for each key $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_n, \mathbf{v}_n)$, we compute the scores $a_1, \ldots, a_n$ by
+The full process of attention mechanism is expressed in :numref:`fig_attention_output`. To compute the output of attention, we first use a score function $\alpha$ that measures the similarity between the query and the key. So for each key $\mathbf{k}_1, \ldots, \mathbf{k}_n$, we compute the scores $a_1, \ldots, a_n$ by
 
 $$a_i = \alpha(\mathbf q, \mathbf k_i).$$
 
@@ -30,7 +30,7 @@ $$\mathbf o = \sum_{i=1}^n b_i \mathbf v_i.$$
 
 
 
-Different choices of the score function lead to different attention layers. Below, we introduce two commonly used attention layers. Before diving into the implementation, we first express two operators to get you up and running: a masked version of the softmax operator `masked_softmax` and a specialized dot operator `batched_dot`.
+Different choices of the score function lead to different attention layers. Below, we introduce two commonly used attention layers. Before diving into the implementation, we first express two operators to get you up and running: a masked version of the softmax operator `masked_softmax` and a specialized dot operator `batch_dot`.
 
 ```{.python .input  n=1}
 import math
@@ -66,7 +66,7 @@ To illustrate how this function works, we construct two $2 \times 4$ matrices as
 masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([2, 3]))
 ```
 
-Moreover, the second operator `batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively, and returns an output with shape $(b, n, k)$. To be specific, it computes $b$ dot products for $i= \{1,\ldots, b\}$, i.e.,
+Moreover, the second operator `batch_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively, and returns an output with shape $(b, n, k)$. To be specific, it computes $b$ dot products for $i= \{1,\ldots, b\}$, i.e.,
 
 $$Z[i,:,:] = X[i,:,:]  Y[i,:,:].$$
 
@@ -76,7 +76,7 @@ npx.batch_dot(np.ones((2, 1, 3)), np.ones((2, 3, 2)))
 
 ## Dot Product Attention
 
-Equipped with the above two operators: `masked_softmax` and `batched_dot`, let us dive into the details of two widely used attentions layers. The first one is the *dot product attention*: it assumes that the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. The dot product attention computes the scores by an dot product between the query and a key, which is then divided by $\sqrt{d}$ to minimize the unrelated influence of the dimension $d$ on the scores. In other words,
+Equipped with the above two operators: `masked_softmax` and `batch_dot`, let us dive into the details of two widely used attention layers. The first one is the *dot product attention*: it assumes that the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. The dot product attention computes the scores by a dot product between the query and a key, which is then divided by $\sqrt{d}$ to minimize the unrelated influence of the dimension $d$ on the scores. In other words,
 
 $$\alpha(\mathbf q, \mathbf k) = \langle \mathbf q, \mathbf k \rangle /\sqrt{d}.$$
 
@@ -140,18 +140,18 @@ class MLPAttention(nn.Block):
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
         # Use flatten=True to keep query's and key's 3-D shapes
-        self.W_k = nn.Dense(units, activation='tanh',
-                            use_bias=False, flatten=False)
-        self.W_q = nn.Dense(units, activation='tanh',
-                            use_bias=False, flatten=False)
+        self.W_k = nn.Dense(units, use_bias=False, flatten=False)
+        self.W_q = nn.Dense(units, use_bias=False, flatten=False)
         self.v = nn.Dense(1, use_bias=False, flatten=False)
         self.dropout = nn.Dropout(dropout)
 
+
     def forward(self, query, key, value, valid_len):
-        query, key = self.W_k(query), self.W_q(key)
+        query, key = self.W_q(query), self.W_k(key)
         # Expand query to (batch_size, #querys, 1, units), and key to
         # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast
         features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
+        features = np.tanh(features)
         scores = np.squeeze(self.v(features), axis=-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
         return npx.batch_dot(attention_weights, value)

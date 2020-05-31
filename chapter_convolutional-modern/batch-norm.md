@@ -45,11 +45,12 @@ when training ML models and neural nets in particular.
 Batch normalization is applied to individual layers
 (optionally, to all of them) and works as follows:
 In each training iteration,
-for each layer, we first compute its activations as usual.
-Then, we normalize the activations of each node 
-by subtracting its mean and dividing by its standard deviation 
-estimating both quantities based on the statistics of the current minibatch.  
-It is precisely due to this *normalization* based on *batch* statistics 
+we first normalize the inputs (of batch normalization)
+by subtracting their mean and 
+dividing by their standard deviation,
+where both are estimated based on the statistics of the current minibatch.
+Next, we apply a scaling coefficient and a scaling offset.
+It is precisely due to this *normalization* based on *batch* statistics 	
 that *batch normalization* derives its name.
 
 Note that if we tried to apply BN with minibatches of size $1$, 
@@ -309,7 +310,7 @@ keeping track of running averages (here for mean and variance), etc.
 This pattern enables a clean separation of math from boilerplate code.
 Also note that for the sake of convenience
 we did not worry about automatically inferring the input shape here,
-thus our need to specify the number of features throughout.
+thus we need to specify the number of features throughout.
 Do not worry, the Gluon `BatchNorm` layer will care of this for us.
 
 ```{.python .input}

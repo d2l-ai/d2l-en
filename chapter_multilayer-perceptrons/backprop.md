@@ -60,7 +60,7 @@ is the weight parameter of the hidden layer.
 After running the intermediate variable 
 $\mathbf{z}\in \mathbb{R}^h$ through the 
 activation function $\phi$ 
-we obtain our hidden activations vector of length $h$,
+we obtain our hidden activation vector of length $h$,
 
 $$\mathbf{h}= \phi (\mathbf{z}).$$
 
@@ -123,7 +123,7 @@ the gradient of neural network parameters.
 In short, the method traverses the network in reverse order,
 from the output to the input layer,
 according to the *chain rule* from calculus.
-The algorithm, stores any intermediate variables
+The algorithm stores any intermediate variables
 (partial derivatives)
 requried while calculating the gradient 
 with respect to some parameters.
@@ -142,7 +142,7 @@ $$\frac{\partial \mathsf{Z}}{\partial \mathsf{X}} = \text{prod}\left(\frac{\part
 Here we use the $\text{prod}$ operator
 to multiply its arguments 
 after the necessary operations,
-such as transposition and swapping input positions 
+such as transposition and swapping input positions, 
 have been carried out.
 For vectors, this is straightforward:
 it is simply matrix-matrix multiplication.

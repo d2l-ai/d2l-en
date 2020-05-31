@@ -248,7 +248,7 @@ for X, y in train_iter:
     break
 ```
 
-We are now ready to work with the FashionMNIST dataset in the sections that follow.
+We are now ready to work with the Fashion-MNIST dataset in the sections that follow.
 
 ## Summary
 

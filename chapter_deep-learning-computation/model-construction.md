@@ -54,7 +54,7 @@ The ResNet architecture mentioned above
 won the 2015 ImageNet and COCO computer vision competitions
 for both recognition and detection :cite:`He.Zhang.Ren.ea.2016`
 and remains a go-to architecture for many vision tasks.
-Similar patterns are in which layers are arranged 
+Similar architectures in which layers are arranged 
 in various repeating patterns 
 are now ubiquitous in other domains,
 including natural language processing and speech.
@@ -161,7 +161,7 @@ In short, `nn.Sequential` defines a special kind of `Block`
 that maintains an ordered list of constituent `Blocks`.
 The `add` method simply facilitates
 the addition of each successive `Block` to the list.
-Note that each our layer is an instance of the `Dense` class
+Note that each layer is an instance of the `Dense` class
 which is itself a subclass of `Block`.
 The `forward` function is also remarkably simple:
 it chains each Block in the list together,
@@ -238,6 +238,7 @@ class MLP(nn.Block):
     def forward(self, x):
         return self.output(self.hidden(x))
 ```
+
 
 ```{.python .input}
 #@tab pytorch
@@ -424,7 +425,7 @@ for the `nn.Sequential` class
 
 The `nn.Sequential` class makes model construction easy,
 allowing us to assemble new architectures
-without having to defined our own class.
+without having to define our own class.
 However, not all architectures are simple daisy chains.
 When greater flexibility is required,
 we will want to define our own blocks.
@@ -439,8 +440,8 @@ all of the operations in our networks
 have acted upon our network's activations
 and its parameters. 
 Sometimes, however, we might want to 
-incorporate terms constant terms 
-which are neither the result of previous layers
+incorporate terms 
+that are neither the result of previous layers
 nor updatable parameters. 
 We call these *constant* parameters. 
 Say for example that we want a layer
@@ -451,7 +452,7 @@ and $c$ is some specified constant
 that is not updated during optimization.
 
 Declaring constants explicitly (via `get_constant`)
-makes this clear helps Gluon to speed up execution.
+makes this clear and helps Gluon to speed up execution.
 In the following code, we will implement a model
 that could not easily be assembled
 using only predefined layers and `Sequential`.
@@ -521,7 +522,7 @@ We ran a `while` loop, testing
 on the condition `np.abs(x).sum() > 1`,
 and dividing our output vector by $2$ 
 until it satisfied the condition.
-Finally, we outputed the sum of the entries in `x`.
+Finally, we returned the sum of the entries in `x`.
 To our knowledge, no standard neural network
 performs this operation.
 Note that this particular operation may not be useful
@@ -604,7 +605,7 @@ The Gluon runtime records what is happening
 and the next time around it short-circuits calls to Python.
 This can accelerate things considerably in some cases
 but care needs to be taken when control flow (as above)
-lead down different branches on different passes through the net.
+leads down different branches on different passes through the net.
 We recommend that the interested reader check out 
 the hybridization section (:numref:`sec_hybridize`)
 to learn about compilation after finishing the current chapter.

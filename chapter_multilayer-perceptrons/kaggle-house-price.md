@@ -187,7 +187,7 @@ that hosts machine learning competitions.
 Each competition centers on a dataset and many
 are sponsored by stakeholders who offer prizes
 to the winning solutions.
-The platform helps users to share interact 
+The platform helps users to interact 
 via forums and shared code, 
 fostering both collaboration and competition.
 While leaderboard chasing often spirals out of control,
@@ -595,7 +595,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
 If you are reading in a linear fashion,
 you might recall that we introduced k-fold cross-validation
 in the section where we discussed how to deal
-with model section (:numref:`sec_model_selection`).
+with model selection (:numref:`sec_model_selection`).
 We will put this to good use to select the model design
 and to adjust the hyperparameters.
 We first need a function that returns
@@ -607,7 +607,7 @@ Note that this is not the most efficient way of handling data
 and we would definitely do something much smarter
 if our dataset was considerably larger.
 But this added complexity might obfuscate our code unnecessarily
-so we can safely omit here owing to the simplicity of our problem.
+so we can safely omit it here owing to the simplicity of our problem.
 
 ```{.python .input}
 def get_k_fold_data(k, i, X, y):
@@ -697,7 +697,7 @@ and leave it up to the reader to improve the model.
 Finding a good choice can take time,
 depending on how many variables one optimizes over.
 With a large enough dataset, 
-and the normal sorts of hyperparameters reason,
+and the normal sorts of hyperparameters,
 k-fold cross-validation tends to be 
 reasonably resilient against multiple testing.
 However, if we try an unreasonably large number of options

@@ -39,6 +39,7 @@ to view the graphics card information.
 :begin_tab:`mxnet`
 You might have noticed that MXNet `ndarray`
 looks almost identical to NumPy.
+
 But there are a few crucial differences.
 One of the key features that distinguishes MXNet
 from NumPy is its support for diverse hardware devices.
@@ -312,7 +313,7 @@ Imagine that your variable `z` already lives on your second GPU.
 What happens if we call still `z.copyto(gpu(1))`?
 It will make a copy and allocate new memory,
 even though that variable already lives on the desired device!
-There are times where depending on the environment our code is running in,
+There are times where, depending on the environment our code is running in,
 two variables may already live on the same device.
 So we only want to make a copy if the variables
 currently lives on different contexts.

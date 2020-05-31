@@ -526,7 +526,7 @@ feature vector for your home might look something like: $[100, 0, .5, 60]$.
 However, if you live in Pittsburgh, it might look more like $[3000, 4, 3, 10]$.
 Feature vectors like this are essential
 for most classic machine learning algorithms.
-We will continue to denote the feature vector correspond
+We will continue to denote the feature vector corresponding
 to any example $i$ as $\mathbf{x}_i$ and we can compactly refer
 to the full table containing all of the feature vectors as $X$.
 
@@ -1233,7 +1233,7 @@ are still in frequent use today (even the Iris dataset
 that he released in 1936 is still used sometimes
 to illustrate machine learning algorithms).
 Fisher was also a proponent of eugenics,
-which should remind us that the morally dubious use data science
+which should remind us that the morally dubious use of data science
 has as long and enduring a history as its productive use
 in industry and the natural sciences.
 
@@ -1244,7 +1244,7 @@ in his famous paper [Computing machinery and intelligence](https://en.wikipedia.
 In what he described as the Turing test, a machine
 can be considered intelligent if it is difficult
 for a human evaluator to distinguish between the replies
-from a machine and a human-based on textual interactions.
+from a machine and a human based on textual interactions.
 
 Another influence can be found in neuroscience and psychology.
 After all, humans clearly exhibit intelligent behavior.
@@ -1383,7 +1383,6 @@ over the past decade.
   Even amateur doodlers can produce
   photorealistic images based on just sketches that describe
   how the layout of a scene looks like :cite:`Park.Liu.Wang.ea.2019`.
-
 * In many cases, a single GPU is insufficient to process
   the large amounts of data available for training.
   Over the past decade the ability to build parallel
@@ -1442,7 +1441,7 @@ that would be difficult to accomplish otherwise.
 For instance, mail is sorted using optical character recognition.
 These systems have been deployed since the 90s
 (this is, after all, the source of the famous MNIST and USPS sets of handwritten digits).
-The same applies to read checks for bank deposits and scoring
+The same applies to reading checks for bank deposits and scoring
 creditworthiness of applicants.
 Financial transactions are checked for fraud automatically.
 This forms the backbone of many e-commerce payment systems,

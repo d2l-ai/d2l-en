@@ -23,7 +23,7 @@ to do the heavy lifting.
 However, when we move away from 
 stacked architectures with standard layers, 
 we will sometimes need to get into the weeds
-of declaring and manipulate parameters. 
+of declaring and manipulating parameters. 
 In this section, we cover the following:
 
 * Accessing parameters for debugging, diagnostics, and visualizations.
@@ -85,13 +85,15 @@ corresponding to that layer's
 weights and biases, respectively.
 Both are stored as single precision floats.
 Note that the names of the parameters
-are allow us to *uniquely* identify
+allow us to *uniquely* identify
 each layer's parameters,
-even in a network contains hundreds of layers.
+even in a network containing hundreds of layers.
 
 
 ### Targeted Parameters
 
+Note that each parameter is represented
+as an instance of the `Parameter` class.
 To do anything useful with the parameters,
 we first need to access the underlying numerical values. 
 There are several ways to do this.
@@ -122,6 +124,7 @@ containing data, gradients,
 and additional information.
 That's why we need to request the data explicitly.
 
+
 In addition to `data`, each `Parameter` also provides a `grad` method for accessing the gradient. Because we have not invoked backpropagation for this network yet, it is in its initial state.
 
 ```{.python .input}
@@ -140,6 +143,8 @@ accessing them one-by-one can grow tedious.
 The situation can grow especially unwieldy
 when we work with more complex blocks, (e.g., nested Blocks),
 since we would need to recurse 
+
+
 through the entire tree in to extract
 each sub-block's parameters.
 
@@ -329,7 +334,7 @@ net.apply(init_normal)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
 
-We can also apply different initialziers for certain blocks.
+We can also apply different initializers for certain Blocks.
 For example, below we initialize the first layer
 with the `Xavier` initializer
 and initialize the second layer 

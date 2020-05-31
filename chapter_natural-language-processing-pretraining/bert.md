@@ -189,7 +189,7 @@ class BERTEncoder(nn.Block):
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(d2l.EncoderBlock(
-                num_hiddens, ffn_num_hiddens, num_heads, dropout))
+                num_hiddens, ffn_num_hiddens, num_heads, dropout, True))
         # In BERT, positional embeddings are learnable, thus we create a
         # parameter of positional embeddings that are long enough
         self.pos_embedding = self.params.get('pos_embedding',

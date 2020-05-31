@@ -93,7 +93,7 @@ mydict2
 
 ## Model Parameters
 
-Saving individual weight vectors (or other `ndarray` tensors) is useful 
+Saving individual weight vectors (or other `ndarray` tensors) is useful, 
 but it gets very tedious if we want to save 
 (and later load) an entire model.
 After all, we might have hundreds of 
@@ -102,7 +102,7 @@ For this reason the framework provides built-in functionality
 to load and save entire networks.
 An important detail to note is that this 
 saves model *parameters* and not the entire model. 
-For example, if we have a 3 layer MLP,
+For example, if we have a 3-layer MLP,
 we need to specify the *architecture* separately. 
 The reason for this is that the models themselves can contain arbitrary code, 
 hence they cannot be serialized as naturally 

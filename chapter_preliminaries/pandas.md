@@ -70,7 +70,7 @@ where imputation replaces missing values with substituted ones,
 while deletion ignores missing values. Here we will consider imputation.
 
 By integer-location based indexing (`iloc`), we split `data` into `inputs` and `outputs`,
-where the former takes the first 2 columns while the later only keeps the last column.
+where the former takes the first 2 columns while the latter only keeps the last column.
 For numerical values in `inputs` that are missing, we replace the "NaN" entries with the mean value of the same column.
 
 ```{.python .input}

@@ -29,7 +29,7 @@ the only difference is that we add
 The first is our hidden layer, 
 which contains *256* hidden units
 and applies the ReLU activation function.
-The second, is our output layer.
+The second is our output layer.
 
 ```{.python .input}
 net = nn.Sequential()

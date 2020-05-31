@@ -202,7 +202,7 @@ say $f, g: \mathbb{R}^d \to R$ is defined as
 $$[f \circledast g](x) = \int_{\mathbb{R}^d} f(z) g(x-z) dz.$$
 
 That is, we measure the overlap between $f$ and $g$
-when both functions are shifted by $x$ and "flipped".
+when one function is "flipped" and shifted by $x$.
 Whenever we have discrete objects, the integral turns into a sum.
 For instance, for vectors defined on $\ell_2$, i.e.,
 the set of square summable infinite dimensional vectors

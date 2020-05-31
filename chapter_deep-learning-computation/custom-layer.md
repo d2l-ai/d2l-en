@@ -1,6 +1,6 @@
 # Custom Layers
 
-One of factors behind deep learnings success
+One factor behind deep learning's success
 is the availability of a wide range of layers
 that can be composed in creative ways
 to design architectures suitable
@@ -100,14 +100,14 @@ y.mean()
 
 ## Layers with Parameters
 
-Now that we know how to define simple layers
+Now that we know how to define simple layers,
 let us move on to defining layers with parameters
 that can be adjusted through training. 
 To automate some of the routine work
 the `Parameter` class 
 provide some basic housekeeping functionality.
 In particular, they govern access, initialization, 
-sharing, saving and loading model parameters. 
+sharing, saving, and loading model parameters. 
 This way, among other benefits, we will not need to write
 custom serialization routines for every custom layer.
 
@@ -116,7 +116,7 @@ The `Block` class contains a `params` variable
 of the `ParameterDict` type. 
 This dictionary maps strings representing parameter names
 to model parameters (of the `Parameter` type). 
-The `ParameterDict` also supplied a `get` function
+The `ParameterDict` also supplies a `get` function
 that makes it easy to generate a new parameter
 with a specified name and shape.
 :end_tab:
@@ -223,7 +223,7 @@ net(torch.randn(2, 64))
 
 * We can design custom layers via the Block class. This allows us to define flexible new layers that behave differently from any existing layers in the library.
 * Once defined, custom layers can be invoked in arbitrary contexts and architectures.
-* Blocks can have local parameters, which are stored as a `Parameter` object.
+* Blocks can have local parameters, which are stored in a `ParameterDict` object in each Block's `params` attribute.
 
 
 ## Exercises

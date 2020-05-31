@@ -70,10 +70,8 @@ solutions all in one place presents formidable challenges.
 Our goal in this book is to present a unified resource
 to bring would-be practitioners up to speed.
 
-
-We started this book project in July 2017 when we needed
-to explain MXNet's (then new) Gluon interface to our users.
-At the time, there were no resources that simultaneously
+At the time we started this book project,
+there were no resources that simultaneously
 (i) were up to date; (ii) covered the full breadth
 of modern machine learning with substantial technical depth;
 and (iii) interleaved exposition of the quality one expects
@@ -424,7 +422,8 @@ Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk, heytitle, Peter Goetz
 tiepvupsu, sfilip, mlxd, Kale-ab Tessera, Sanjar Adilov, MatteoFerrara, hsneto,
 Katarzyna Biesialska, Gregory Bruss, duythanhvn, paulaurel, graytowne, minhduc0711,
 sl7423, Jaedong Hwang, Yida Wang, cys4, clhm, JeanKaddour, austinmw, trebeljahr, tbaums,
-cuongvng, pavelkomarov, vzlamal, NotAnotherSystem, J-Arun-Mani, jancio.
+cuongvng, pavelkomarov, vzlamal, NotAnotherSystem, J-Arun-Mani, jancio, eldarkurtic,
+the-great-shazbot.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.
