@@ -394,11 +394,20 @@ We can now explore these concepts interactively
 by fitting polynomials to data.
 To get started we will import our usual packages.
 
-```{.python .input  n=1}
+```{.python .input}
 import d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+import d2l_pytorch as d2l
+import torch
+from torch import nn
+import numpy as np
+import math
 ```
 
 ### Generating the Dataset
@@ -412,7 +421,7 @@ The noise term $\epsilon$ obeys a normal distribution
 with a mean of 0 and a standard deviation of 0.1.
 We will synthesize 100 samples each for the training set and test set.
 
-```{.python .input  n=2}
+```{.python .input}
 maxdegree = 20  # Maximum degree of the polynomial
 n_train, n_test = 100, 100  # Training and test dataset sizes
 true_w = np.zeros(maxdegree)  # Allocate lots of empty space
@@ -427,6 +436,28 @@ labels = np.dot(poly_features, true_w)
 labels += np.random.normal(scale=0.1, size=labels.shape)
 ```
 
+```{.python .input}
+#@tab pytorch
+maxdegree = 20  # Maximum degree of the polynomial
+n_train, n_test = 100, 100  # Training and test dataset sizes
+true_w = torch.zeros(maxdegree)  # Allocate lots of empty space
+true_w[0:4] = torch.tensor([5, 1.2, -3.4, 5.6])
+
+features = np.random.normal(size=(n_train + n_test, 1))
+np.random.shuffle(features)
+poly_features = np.power(features, np.arange(maxdegree).reshape(1, -1))
+gamma = np.vectorize(math.gamma)  # Use math.gamma function for numpy array
+poly_features = poly_features / (
+    gamma(np.arange(maxdegree) + 1).reshape(1, -1))
+
+labels = np.dot(poly_features, true_w)
+labels += np.random.normal(scale=0.1)
+
+features = torch.from_numpy(features).type(torch.float32)
+poly_features = torch.from_numpy(poly_features).type(torch.float32)
+labels = torch.from_numpy(labels).type(torch.float32)
+```
+
 For optimization, we typically want to avoid
 very large values of gradients, losses, etc.
 This is why the monomials stored in `poly_features`
@@ -439,7 +470,12 @@ Take a look at the first 2 samples from the generated dataset.
 The value 1 is technically a feature,
 namely the constant feature corresponding to the bias.
 
-```{.python .input  n=3}
+```{.python .input}
+features[:2], poly_features[:2], labels[:2]
+```
+
+```{.python .input}
+#@tab pytorch
 features[:2], poly_features[:2], labels[:2]
 ```
 
@@ -447,9 +483,8 @@ features[:2], poly_features[:2], labels[:2]
 
 Let us first implement a function to evaluate the loss on a given data.
 
-```{.python .input  n=4}
-# Saved in the d2l package for later use
-def evaluate_loss(net, data_iter, loss):
+```{.python .input}
+def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
@@ -457,9 +492,23 @@ def evaluate_loss(net, data_iter, loss):
     return metric[0] / metric[1]
 ```
 
+```{.python .input}
+#@tab pytorch
+def evaluate_loss(net, data_iter, loss):  #@save
+    """Evaluate the loss of a model on the given dataset."""
+    metric = d2l.Accumulator(2)  # sum_loss, num_examples
+    for X, y in data_iter:
+        l = loss(net(X), y)
+        if l.nelement() != 1:
+            metric.add(l.sum(), y.numpy().size)
+        else:
+            metric.add(l*len(y), y.numpy().size)
+    return metric[0] / metric[1]
+```
+
 Now define the training function.
 
-```{.python .input  n=5}
+```{.python .input}
 def train(train_features, test_features, train_labels, test_labels,
           num_epochs=1000):
     loss = gluon.loss.L2Loss()
@@ -485,6 +534,31 @@ def train(train_features, test_features, train_labels, test_labels,
     print('weight:', net[0].weight.data().asnumpy())
 ```
 
+```{.python .input}
+#@tab pytorch
+def train(train_features, test_features, train_labels, test_labels,
+          num_epochs=1000):
+    loss = nn.MSELoss()
+    input_shape = train_features.shape[-1]
+    # Switch off the bias since we already catered for it in the polynomial
+    # features
+    net = nn.Sequential(nn.Linear(input_shape, 1, bias=False))
+    batch_size = min(10, train_labels.shape[0])
+    train_iter = d2l.load_array((train_features, train_labels), batch_size)
+    test_iter = d2l.load_array((test_features, test_labels), batch_size,
+                               is_train=False)
+    trainer = torch.optim.SGD(net.parameters(), lr=0.01)
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], ylim=[1e-3, 1e2],
+                            legend=['train', 'test'])
+    for epoch in range(1, num_epochs+1):
+        d2l.train_epoch_ch3(net, train_iter, loss, trainer)
+        if epoch % 50 == 0:
+            animator.add(epoch, (evaluate_loss(net, train_iter, loss),
+                                 evaluate_loss(net, test_iter, loss)))
+    print('weight:', net[0].weight.data.numpy())
+```
+
 ### Third-Order Polynomial Function Fitting (Normal)
 
 We will begin by first using a third-order polynomial function
@@ -494,11 +568,19 @@ when using the testing dataset is low.
 The trained model parameters are also close
 to the true values $w = [5, 1.2, -3.4, 5.6]$.
 
-```{.python .input  n=6}
+```{.python .input}
 # Pick the first four dimensions, i.e., 1, x, x^2, x^3 from the polynomial
 # features
 train(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
       labels[:n_train], labels[n_train:])
+```
+
+```{.python .input}
+#@tab pytorch
+# Pick the first four dimensions, i.e., 1, x, x^2, x^3 from the polynomial
+# features
+train(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
+      labels[:n_train].reshape(-1,1), labels[n_train:].reshape(-1,1))
 ```
 
 ### Linear Function Fitting (Underfitting)
@@ -513,10 +595,17 @@ When used to fit non-linear patterns
 (like the third-order polynomial function here)
 linear models are liable to underfit.
 
-```{.python .input  n=7}
+```{.python .input}
 # Pick the first four dimensions, i.e., 1, x from the polynomial features
 train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
       labels[:n_train], labels[n_train:])
+```
+
+```{.python .input}
+#@tab pytorch
+# Pick the first four dimensions, i.e., 1, x from the polynomial features
+train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
+      labels[:n_train].reshape(-1,1), labels[n_train:].reshape(-1,1))
 ```
 
 ### Insufficient Training (Overfitting)
@@ -536,12 +625,21 @@ Try out different model complexities (`n_degree`)
 and training set sizes (`n_subset`)
 to gain some intuition of what is happening.
 
-```{.python .input  n=8}
+```{.python .input}
 n_subset = 100  # Subset of data to train on
 n_degree = 20  # Degree of polynomials
 train(poly_features[1:n_subset, 0:n_degree],
       poly_features[n_train:, 0:n_degree], labels[1:n_subset],
       labels[n_train:])
+```
+
+```{.python .input}
+#@tab pytorch
+n_subset = 100  # Subset of data to train on
+n_degree = 20  # Degree of polynomials
+train(poly_features[1:n_subset, 0:n_degree],
+      poly_features[n_train:, 0:n_degree], labels[1:n_subset].reshape(-1,1),
+      labels[n_train:].reshape(-1,1))
 ```
 
 In later chapters, we will continue
@@ -569,6 +667,11 @@ such as weight decay and dropout.
 1. What degree of polynomial do you need to reduce the training error to 0?
 1. Can you ever expect to see 0 generalization error?
 
-## [Discussions](https://discuss.mxnet.io/t/2341)
 
-![](../img/qr_underfit-overfit.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/96)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/97)
+:end_tab:

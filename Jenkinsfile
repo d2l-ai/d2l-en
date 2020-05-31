@@ -1,5 +1,5 @@
 stage("Build and Publish") {
-  def TASK = "d2l-en"
+  def TASK = "d2l-pytorch"
   node {
     ws("workspace/${TASK}") {
       checkout scm
@@ -11,9 +11,14 @@ stage("Build and Publish") {
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip python=3.7 -y
       conda activate ${ENV_NAME}
+      # mxnet
       pip install mxnet-cu101==1.6.0
       pip install git+https://github.com/d2l-ai/d2l-book
       python setup.py develop
+      # pytorch
+      pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+      pip install torchvision
+      cd d2l_pytorch; python setup.py develop
       pip list
       nvidia-smi
       """
@@ -30,11 +35,19 @@ stage("Build and Publish") {
       d2lbook build eval
       """
 
+      sh label: "Execute Notebooks [Pytorch]", script: """set -ex
+      conda activate ${ENV_NAME}
+      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
+      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
+      d2lbook build eval --tab pytorch
+      """
+
       sh label:"Build HTML", script:"""set -ex
       conda activate ${ENV_NAME}
       ./static/build_html.sh
       """
 
+/*
       sh label:"Build PDF", script:"""set -ex
       conda activate ${ENV_NAME}
       d2lbook build pdf
@@ -48,14 +61,13 @@ stage("Build and Publish") {
       d2lbook build pkg
       [ -e _build/data_tmp ] && mv _build/data_tmp _build/eval/data
       """
-
-      if (env.BRANCH_NAME == 'master') {
+*/
+      if (env.BRANCH_NAME == 'pytorch') {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
-        d2lbook deploy html pdf pkg
+        d2lbook deploy html
       """
       }
     }
   }
 }
-

@@ -341,7 +341,7 @@ we can consider two methods for adding vectors.
 To start we instantiate two $10000$-dimensional vectors
 containing all ones.
 In one method we will loop over the vectors with a Python `for` loop.
-In the other method we will rely on a single call to `np`.
+In the other method we will rely on a single call to `+`.
 
 ```{.python .input}
 %matplotlib inline
@@ -355,37 +355,52 @@ a = np.ones(n)
 b = np.ones(n)
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+import d2l_pytorch as d2l
+import math
+import torch
+import numpy as np
+import time
+
+n = 10000
+a = torch.ones(n)
+b = torch.ones(n)
+```
+
 Since we will benchmark the running time frequently in this book,
 let us define a timer (hereafter accessed via the `d2l` package
 to track the running time.
 
-```{.python .input  n=1}
-# Saved in the d2l package for later use
-class Timer:
+
+```{.python .input}
+#@tab all
+class Timer:  #@save
     """Record multiple running times."""
     def __init__(self):
         self.times = []
         self.start()
 
     def start(self):
-        # Start the timer
+        """Start the timer."""
         self.tik = time.time()
 
     def stop(self):
-        # Stop the timer and record the time in a list
+        """Stop the timer and record the time in a list."""
         self.times.append(time.time() - self.tik)
         return self.times[-1]
 
     def avg(self):
-        # Return the average time
+        """Return the average time."""
         return sum(self.times) / len(self.times)
 
     def sum(self):
-        # Return the sum of time
+        """Return the sum of time."""
         return sum(self.times)
 
     def cumsum(self):
-        # Return the accumulated times
+        """Return the accumulated times."""
         return np.array(self.times).cumsum().tolist()
 ```
 
@@ -393,20 +408,36 @@ Now we can benchmark the workloads.
 First, we add them, one coordinate at a time,
 using a `for` loop.
 
-```{.python .input  n=2}
+```{.python .input}
 c = np.zeros(n)
 timer = Timer()
 for i in range(n):
     c[i] = a[i] + b[i]
-'%.5f sec' % timer.stop()
+f'{timer.stop():.5f} sec'
 ```
 
-Alternatively, we rely on `np` to compute the elementwise sum:
+```{.python .input}
+#@tab pytorch
+c = torch.zeros(n)
+timer = Timer()
+for i in range(n):
+    c[i] = a[i] + b[i]
+f'{timer.stop():.5f} sec'
+```
 
-```{.python .input  n=3}
+Alternatively, we rely on the reloaded `+` operator to compute the elementwise sum:
+
+```{.python .input}
 timer.start()
 d = a + b
-'%.5f sec' % timer.stop()
+f'{timer.stop():.5f} sec'
+```
+
+```{.python .input}
+#@tab pytorch
+timer.start()
+d = a + b
+f'{timer.stop():.5f} sec'
 ```
 
 You probably noticed that the second method
@@ -442,6 +473,7 @@ $$p(z) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (z - \m
 Below we define a Python function to compute the normal distribution.
 
 ```{.python .input}
+#@tab all
 def normal(z, mu, sigma):
     p = 1 / math.sqrt(2 * math.pi * sigma**2)
     return p * np.exp(- 0.5 / sigma**2 * (z - mu)**2)
@@ -449,7 +481,9 @@ def normal(z, mu, sigma):
 
 We can now visualize the normal distributions.
 
-```{.python .input  n=2}
+```{.python .input}
+#@tab all
+# Using numpy again for visualizations.
 x = np.arange(-7, 7, 0.01)
 
 # Mean and variance pairs
@@ -538,12 +572,12 @@ in the next chapter on multilayer perceptrons.
 ### Biology
 
 Since linear regression (invented in 1795)
-predates computational neuroscience, 
+predates computational neuroscience,
 it might seem anachronistic to describe
 linear regression as a neural network.
 To see why linear models were a natural place to begin
 when the cyberneticists/neurophysiologists
-Warren McCulloch and Walter Pitts began to develop 
+Warren McCulloch and Walter Pitts began to develop
 models of artificial neurons,
 consider the cartoonish picture
 of a biological neuron in :numref:`fig_Neuron`, consisting of
@@ -609,6 +643,10 @@ statistics, and computer science.
     * Can you find a closed form solution?
     * Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint - what happens near the stationary point as we keep on updating the parameters). Can you fix this?
 
-## [Discussions](https://discuss.mxnet.io/t/2331)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/40)
+:end_tab:
 
-![](../img/qr_linear-regression.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/41)
+:end_tab:

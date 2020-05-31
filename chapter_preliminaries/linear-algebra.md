@@ -44,12 +44,12 @@ Analogously, we could write $x, y \in \{0, 1\}$
 to state that $x$ and $y$ are numbers
 whose value can only be $0$ or $1$.
 
-In MXNet code, a scalar is represented by an `ndarray` with just one element.
+A scalar is represented by an `ndarray` with just one element.
 In the next snippet, we instantiate two scalars
 and perform some familiar arithmetic operations with them,
 namely addition, multiplication, division, and exponentiation.
 
-```{.python .input  n=1}
+```{.python .input}
 from mxnet import np, npx
 npx.set_np()
 
@@ -57,6 +57,16 @@ x = np.array(3.0)
 y = np.array(2.0)
 
 x + y, x * y, x / y, x ** y
+```
+
+```{.python .input}
+#@tab pytorch
+import torch
+
+x = torch.tensor([3.0])
+y = torch.tensor([2.0])
+
+x + y, x * y, x / y, x**y
 ```
 
 ## Vectors
@@ -77,12 +87,18 @@ cholesterol levels, minutes of exercise per day, etc.
 In math notation, we will usually denote vectors as bold-faced,
 lower-cased letters (e.g., $\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z})$.
 
-In MXNet, we work with vectors via $1$-dimensional `ndarray`s.
+We work with vectors via $1$-dimensional `ndarray`s.
 In general `ndarray`s can have arbitrary lengths,
 subject to the memory limits of your machine.
 
-```{.python .input  n=2}
+```{.python .input}
 x = np.arange(4)
+x
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.arange(4)
 x
 ```
 
@@ -101,7 +117,12 @@ $$\mathbf{x} =\begin{bmatrix}x_{1}  \\x_{2}  \\ \vdots  \\x_{n}\end{bmatrix},$$
 where $x_1, \ldots, x_n$ are elements of the vector.
 In code, we access any element by indexing into the `ndarray`.
 
-```{.python .input  n=3}
+```{.python .input}
+x[3]
+```
+
+```{.python .input}
+#@tab pytorch
 x[3]
 ```
 
@@ -118,7 +139,12 @@ The length of a vector is commonly called the *dimension* of the vector.
 As with an ordinary Python array, we can access the length of an `ndarray`
 by calling Python's built-in `len()` function.
 
-```{.python .input  n=4}
+```{.python .input}
+len(x)
+```
+
+```{.python .input}
+#@tab pytorch
 len(x)
 ```
 
@@ -128,7 +154,12 @@ The shape is a tuple that lists the length (dimensionality)
 along each axis of the `ndarray`.
 For `ndarray`s with just one axis, the shape has just one element.
 
-```{.python .input  n=5}
+```{.python .input}
+x.shape
+```
+
+```{.python .input}
+#@tab pytorch
 x.shape
 ```
 
@@ -164,12 +195,18 @@ is ($m$, $n$) or $m \times n$.
 Specifically, when a matrix has the same number of rows and columns,
 its shape becomes a square; thus, it is called a *square matrix*.
 
-We can create an $m \times n$ matrix in MXNet
+We can create an $m \times n$ matrix
 by specifying a shape with two components $m$ and $n$
 when calling any of our favorite functions for instantiating an `ndarray`.
 
-```{.python .input  n=6}
+```{.python .input}
 A = np.arange(20).reshape(5, 4)
+A
+```
+
+```{.python .input}
+#@tab pytorch
+A = torch.arange(20).reshape(5, 4)
 A
 ```
 
@@ -203,7 +240,12 @@ $$
 
 In code, we access a matrix's transpose via the `T` attribute.
 
-```{.python .input  n=7}
+```{.python .input}
+A.T
+```
+
+```{.python .input}
+#@tab pytorch
 A.T
 ```
 
@@ -217,6 +259,17 @@ B
 ```
 
 ```{.python .input}
+#@tab pytorch
+B = torch.tensor([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
+B
+```
+
+```{.python .input}
+B == B.T
+```
+
+```{.python .input}
+#@tab pytorch
 B == B.T
 ```
 
@@ -245,8 +298,14 @@ and their indexing mechanism (e.g., $x_{ijk}$ and $[\mathsf{X}]_{1, 2i-1, 3}$) i
 
 Tensors will become more important when we start working with images, which arrive as `ndarray`s with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
 
-```{.python .input  n=9}
+```{.python .input}
 X = np.arange(24).reshape(2, 3, 4)
+X
+```
+
+```{.python .input}
+#@tab pytorch
+X = torch.arange(24).reshape(2, 3, 4)
 X
 ```
 
@@ -269,6 +328,13 @@ B = A.copy()  # Assign a copy of A to B by allocating new memory
 A, A + B
 ```
 
+```{.python .input}
+#@tab pytorch
+A = torch.arange(20, dtype = torch.float32).reshape(5, 4)
+B = A.clone()  # Assign a copy of A to B by allocating new memory
+A, A + B
+```
+
 Specifically, elementwise multiplication of two matrices is called their *Hadamard product* (math notation $\odot$).
 Consider matrix $\mathbf{B} \in \mathbb{R}^{m \times n}$ whose element of row $i$ and column $j$ is $b_{ij}$. The Hadamard product of matrices $\mathbf{A}$ (defined in :eqref:`eq_matrix_def`) and $\mathbf{B}$
 
@@ -286,12 +352,24 @@ $$
 A * B
 ```
 
+```{.python .input}
+#@tab pytorch
+A * B
+```
+
 Multiplying or adding a tensor by a scalar also does not change the shape of the tensor,
 where each element of the operand tensor will be added or multiplied by the scalar.
 
 ```{.python .input}
 a = 2
 X = np.arange(24).reshape(2, 3, 4)
+a + X, (a * X).shape
+```
+
+```{.python .input}
+#@tab pytorch
+a = 2
+X = torch.arange(24).reshape(2, 3, 4)
 a + X, (a * X).shape
 ```
 
@@ -303,15 +381,26 @@ In mathematical notation, we express sums using the $\sum$ symbol.
 To express the sum of the elements in a vector $\mathbf{x}$ of length $d$,
 we write $\sum_{i=1}^d x_i$. In code, we can just call the `sum` function.
 
-```{.python .input  n=11}
+```{.python .input}
 x = np.arange(4)
+x, x.sum()
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.arange(4, dtype = torch.float32)
 x, x.sum()
 ```
 
 We can express sums over the elements of tensors of arbitrary shape.
 For example, the sum of the elements of an $m \times n$ matrix $\mathbf{A}$ could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
-```{.python .input  n=12}
+```{.python .input}
+A.shape, A.sum()
+```
+
+```{.python .input}
+#@tab pytorch
 A.shape, A.sum()
 ```
 
@@ -328,10 +417,22 @@ A_sum_axis0 = A.sum(axis=0)
 A_sum_axis0, A_sum_axis0.shape
 ```
 
+```{.python .input}
+#@tab pytorch
+A_sum_axis0 = A.sum(axis=0)
+A_sum_axis0, A_sum_axis0.shape
+```
+
 Specifying `axis=1` will reduce the column dimension (axis $1$) by summing up elements of all the columns.
 Thus, the dimension of axis $1$ of the input is lost in the output shape.
 
 ```{.python .input}
+A_sum_axis1 = A.sum(axis=1)
+A_sum_axis1, A_sum_axis1.shape
+```
+
+```{.python .input}
+#@tab pytorch
 A_sum_axis1 = A.sum(axis=1)
 A_sum_axis1, A_sum_axis1.shape
 ```
@@ -343,17 +444,32 @@ is equivalent to summing up all the elements of the matrix.
 A.sum(axis=[0, 1])  # Same as A.sum()
 ```
 
+```{.python .input}
+#@tab pytorch
+A.sum(axis=[0, 1])  # Same as A.sum()
+```
+
 A related quantity is the *mean*, which is also called the *average*.
 We calculate the mean by dividing the sum by the total number of elements.
 In code, we could just call `mean` on tensors of arbitrary shape.
 
-```{.python .input  n=13}
+```{.python .input}
 A.mean(), A.sum() / A.size
+```
+
+```{.python .input}
+#@tab pytorch
+A.mean(), A.sum() / A.numel()
 ```
 
 Like `sum`, `mean` can also reduce a tensor along the specified axes.
 
 ```{.python .input}
+A.mean(axis=0), A.sum(axis=0) / A.shape[0]
+```
+
+```{.python .input}
+#@tab pytorch
 A.mean(axis=0), A.sum(axis=0) / A.shape[0]
 ```
 
@@ -366,9 +482,20 @@ sum_A = A.sum(axis=1, keepdims=True)
 sum_A
 ```
 
+```{.python .input}
+#@tab pytorch
+sum_A = A.sum(axis=1, keepdims=True)
+sum_A
+```
+
 For instance, since `sum_A` still keeps its $2$ axes after summing each row, we can divide `A` by `sum_A` with broadcasting.
 
 ```{.python .input}
+A / sum_A
+```
+
+```{.python .input}
+#@tab pytorch
 A / sum_A
 ```
 
@@ -379,19 +506,35 @@ we can call the `cumsum` function. This function will not reduce the input tenso
 A.cumsum(axis=0)
 ```
 
+```{.python .input}
+#@tab pytorch
+A.cumsum(axis=0)
+```
+
 ## Dot Products
 
 So far, we have only performed elementwise operations, sums, and averages. And if this was all we could do, linear algebra probably would not deserve its own section. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$, their *dot product* $\mathbf{x}^\top \mathbf{y}$ (or $\langle \mathbf{x}, \mathbf{y}  \rangle$) is a sum over the products of the elements at the same position: $\mathbf{x}^\top \mathbf{y} = \sum_{i=1}^{d} x_i y_i$.
 
-```{.python .input  n=14}
+```{.python .input}
 y = np.ones(4)
 x, y, np.dot(x, y)
 ```
 
+```{.python .input}
+#@tab pytorch
+y = torch.ones(4, dtype = torch.float32)
+x, y, torch.dot(x, y)
+```
+
 Note that we can express the dot product of two vectors equivalently by performing an elementwise multiplication and then a sum:
 
-```{.python .input  n=15}
+```{.python .input}
 np.sum(x * y)
+```
+
+```{.python .input}
+#@tab pytorch
+torch.sum(x * y)
 ```
 
 Dot products are useful in a wide range of contexts.
@@ -467,8 +610,13 @@ the matrix-vector product is performed.
 Note that the column dimension of `A` (its length along axis $1$)
 must be the same as the dimension of `x` (its length).
 
-```{.python .input  n=16}
+```{.python .input}
 A.shape, x.shape, np.dot(A, x)
+```
+
+```{.python .input}
+#@tab pytorch
+A.shape, x.shape, torch.mv(A, x)
 ```
 
 ## Matrix-Matrix Multiplication
@@ -536,9 +684,15 @@ Here, `A` is a matrix with $5$ rows and $4$ columns,
 and `B` is a matrix with $4$ rows and $3$ columns.
 After multiplication, we obtain a matrix with $5$ rows and $3$ columns.
 
-```{.python .input  n=17}
+```{.python .input}
 B = np.ones(shape=(4, 3))
 np.dot(A, B)
+```
+
+```{.python .input}
+#@tab pytorch
+B = torch.ones(4, 3)
+torch.mm(A, B)
 ```
 
 Matrix-matrix multiplication can be simply called *matrix multiplication*, and should not be confused with the Hadamard product.
@@ -593,9 +747,15 @@ $$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2},$$
 
 where the subscript $2$ is often omitted in $\ell_2$ norms, i.e., $\|\mathbf{x}\|$ is equivalent to $\|\mathbf{x}\|_2$. In code, we can calculate the $\ell_2$ norm of a vector by calling `linalg.norm`.
 
-```{.python .input  n=18}
+```{.python .input}
 u = np.array([3, -4])
 np.linalg.norm(u)
+```
+
+```{.python .input}
+#@tab pytorch
+u = torch.tensor([3.0, -4.0])
+torch.norm(u)
 ```
 
 In deep learning, we work more often
@@ -610,8 +770,13 @@ it is less influenced by outliers.
 To calculate the $\ell_1$ norm, we compose
 the absolute value function with a sum over the elements.
 
-```{.python .input  n=19}
+```{.python .input}
 np.abs(u).sum()
+```
+
+```{.python .input}
+#@tab pytorch
+torch.abs(u).sum()
 ```
 
 Both the $\ell_2$ norm and the $\ell_1$ norm
@@ -630,6 +795,11 @@ It behaves as if it were an $\ell_2$ norm of a matrix-shaped vector. Invoking `l
 
 ```{.python .input}
 np.linalg.norm(np.ones((4, 9)))
+```
+
+```{.python .input}
+#@tab pytorch
+torch.norm(torch.ones((4, 9)))
 ```
 
 ### Norms and Objectives
@@ -703,7 +873,10 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 
 
 
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/30)
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/2317)
-
-![](../img/qr_linear-algebra.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/31)
+:end_tab:

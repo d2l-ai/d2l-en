@@ -99,6 +99,20 @@ y.backward()
 d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+import d2l_pytorch as d2l
+import torch
+
+x = torch.arange(-8.0, 8.0, 0.1, requires_grad=True)
+y = torch.sigmoid(x)
+y.backward(torch.ones_like(x))
+
+d2l.plot(x.detach().numpy(), [y.detach().numpy(), x.grad.numpy()],
+         legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
+```
+
 As you can see, the sigmoid's gradient vanishes
 both when its inputs are large and when they are small.
 Moreover, when backpropagating through many layers,
@@ -128,13 +142,23 @@ When this happens due to the initialization
 of a deep network, we have no chance of getting
 a gradient descent optimizer to converge.
 
-```{.python .input  n=5}
+```{.python .input}
 M = np.random.normal(size=(4, 4))
 print('A single matrix', M)
 for i in range(100):
     M = np.dot(M, np.random.normal(size=(4, 4)))
 
 print('After multiplying 100 matrices', M)
+```
+
+```{.python .input}
+#@tab pytorch
+M = torch.normal(0, 1, size=(4,4))
+print('A single matrix \n',M)
+for i in range(100):
+    M = torch.mm(M,torch.normal(0, 1, size=(4,4)))
+
+print('After multiplying 100 matrices\n',M)
 ```
 
 ### Symmetry
@@ -291,6 +315,11 @@ a clever idea and contribute an implementation to MXNet.
 1. Look up analytic bounds on the eigenvalues of the product of two matrices. What does this tell you about ensuring that gradients are well conditioned?
 1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on LARS for inspiration :cite:`You.Gitman.Ginsburg.2017`.
 
-## [Discussions](https://discuss.mxnet.io/t/2345)
 
-![](../img/qr_numerical-stability-and-init.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/103)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/104)
+:end_tab:

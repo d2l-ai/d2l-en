@@ -105,6 +105,30 @@ net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
         nn.Dense(10))
 ```
 
+```{.python .input}
+#@tab pytorch
+import d2l_pytorch as d2l
+import torch
+from torch import nn
+from dataclasses import dataclass
+
+class Reshape(torch.nn.Module):
+    def forward(self, x):
+        return x.view(-1,1,28,28)
+    
+net = torch.nn.Sequential(
+    Reshape(),
+    nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.Sigmoid(),
+    nn.AvgPool2d(kernel_size=2, stride=2),
+    nn.Conv2d(6, 16, kernel_size=5), nn.Sigmoid(),
+    nn.AvgPool2d(kernel_size=2, stride=2),
+    nn.Flatten(),
+    nn.Linear(16*5*5, 120), nn.Sigmoid(),
+    nn.Linear(120, 84), nn.Sigmoid(),
+    nn.Linear(84, 10))
+```
+
+
 We took a small liberty with the original model,
 removing the Gaussian activation in the final layer.
 Other than that, this network matches
@@ -123,6 +147,14 @@ net.initialize()
 for layer in net:
     X = layer(X)
     print(layer.name, 'output shape:\t', X.shape)
+```
+
+```{.python .input}
+#@tab pytorch
+X = torch.randn(size=(1, 1, 28, 28), dtype=torch.float32)
+for layer in net:
+    X = layer(X)
+    print(layer.__class__.__name__,'output shape: \t',X.shape)
 ```
 
 Note that the height and width of the representation
@@ -155,6 +187,12 @@ batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 ```
 
+```{.python .input}
+#@tab pytorch
+batch_size = 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
+```
+
 While convolutional networks have few parameters,
 they can still be more expensive to compute
 than similarly deep multilayer perceptrons
@@ -172,8 +210,7 @@ This is accomplished via the `as_in_ctx` function
 described in :numref:`sec_use_gpu`.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def evaluate_accuracy_gpu(net, data_iter, ctx=None):
+def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
     if not ctx:  # Query the first device the first parameter is on
         ctx = list(net.collect_params().values())[0].list_ctx()[0]
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
@@ -181,6 +218,18 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
         X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
         metric.add(d2l.accuracy(net(X), y), y.size)
     return metric[0]/metric[1]
+```
+
+```{.python .input}
+#@tab pytorch
+def evaluate_accuracy_gpu(net, data_iter, device=None): #@save        
+    if not device:
+        device = next(iter(net.parameters())).device
+    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
+    for X, y in data_iter:
+        X, y = X.to(device), y.to(device)
+        metric.add(d2l.accuracy(net(X), y), sum(y.shape))
+    return metric[0] / metric[1]
 ```
 
 We also need to update our training function to deal with GPUs.
@@ -204,7 +253,7 @@ Since each epoch takes tens of seconds to run,
 we visualize the training loss more frequently.
 
 ```{.python .input}
-# Saved in the d2l package for later use
+#@save
 def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -237,9 +286,58 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     print('%.1f examples/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def train_ch6(net, train_iter, test_iter, num_epochs, lr, 
+              device=d2l.try_gpu()):
+    """Train and evaluate a model with CPU or GPU."""    
+    def init_weights(m):
+        if type(m) == nn.Linear or type(m) == nn.Conv2d:
+            torch.nn.init.xavier_uniform_(m.weight)
+    net.apply(init_weights)
+    print('training on', device)
+    net.to(device)
+    optimizer = torch.optim.SGD(net.parameters(), lr=lr)
+    loss = nn.CrossEntropyLoss()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+                            legend=['train loss', 'train acc', 'test acc'])
+    timer = d2l.Timer()
+    for epoch in range(num_epochs):
+        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
+        for i, (X, y) in enumerate(train_iter):
+            timer.start()
+            net.train()            
+            optimizer.zero_grad()
+            X, y = X.to(device), y.to(device) 
+            y_hat = net(X)
+            l = loss(y_hat, y)
+            l.backward()
+            optimizer.step()
+            with torch.no_grad():
+                metric.add(l*X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
+            timer.stop()
+            train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
+            if (i+1) % 50 == 0:
+                animator.add(epoch + i/len(train_iter),
+                             (train_loss, train_acc, None))
+        test_acc = evaluate_accuracy_gpu(net, test_iter)
+        animator.add(epoch+1, (None, None, test_acc))
+    print('loss %.3f, train acc %.3f, test acc %.3f' % (
+        train_loss, train_acc, test_acc))
+    print('%.1f examples/sec on %s' % (
+        metric[2]*num_epochs/timer.sum(), device))
+```
+
 Now let us train the model.
 
 ```{.python .input}
+lr, num_epochs = 0.9, 10
+train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+```{.python .input}
+#@tab pytorch
 lr, num_epochs = 0.9, 10
 train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
@@ -265,7 +363,10 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr)
 1. Try out the improved network on the original MNIST dataset.
 1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters, coats).
 
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/73)
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/2353)
-
-![](../img/qr_lenet.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/74)
+:end_tab:

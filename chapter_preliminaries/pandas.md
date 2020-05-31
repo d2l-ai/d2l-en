@@ -13,14 +13,21 @@ We will cover more data preprocessing techniques in later chapters.
 
 ## Reading the Dataset
 
-As an example, we begin by creating an artificial dataset that is stored in a csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other formats may be processed in similar ways. The following `mkdir_if_not_exist` function ensures that the directory `../data` exists. The comment `# Saved in the d2l package for later use` is a special mark where the following function, class, or import statements
-are also saved in the `d2l` package so that we can directly invoke `d2l.mkdir_if_not_exist()` later.
+As an example, we begin by creating an artificial dataset that is stored in a
+csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other
+formats may be processed in similar ways.
+
+The following `mkdir_if_not_exist`
+function ensures that the directory `../data` exists. The comment `#@save`
+s a special mark where the following function,
+class, or import statements are also saved in the `d2l` package so that we can
+directly invoke `d2l.mkdir_if_not_exist()` later.
 
 ```{.python .input}
+#@tab all
 import os
 
-# Saved in the d2l package for later use
-def mkdir_if_not_exist(path):
+def mkdir_if_not_exist(path):  #@save
     if not isinstance(path, str):
         path = os.path.join(*path)
     if not os.path.exists(path):
@@ -30,6 +37,7 @@ def mkdir_if_not_exist(path):
 Below we write the dataset row by row into a csv file.
 
 ```{.python .input}
+#@tab all
 data_file = '../data/house_tiny.csv'
 mkdir_if_not_exist('../data')
 with open(data_file, 'w') as f:
@@ -45,6 +53,7 @@ we import the `pandas` package and invoke the `read_csv` function.
 This dataset has $4$ rows and $3$ columns, where each row describes the number of rooms ("NumRooms"), the alley type ("Alley"), and the price ("Price") of a house.
 
 ```{.python .input}
+#@tab all
 # If pandas is not installed, just uncomment the following line:
 # !pip install pandas
 import pandas as pd
@@ -65,6 +74,7 @@ where the former takes the first 2 columns while the latter only keeps the last 
 For numerical values in `inputs` that are missing, we replace the "NaN" entries with the mean value of the same column.
 
 ```{.python .input}
+#@tab all
 inputs, outputs = data.iloc[:, 0:2], data.iloc[:, 2]
 inputs = inputs.fillna(inputs.mean())
 print(inputs)
@@ -77,6 +87,7 @@ A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan"
 A row with a missing alley type will set their values to $0$ and $1$.
 
 ```{.python .input}
+#@tab all
 inputs = pd.get_dummies(inputs, dummy_na=True)
 print(inputs)
 ```
@@ -90,6 +101,14 @@ Once data are in this format, they can be further manipulated with those `ndarra
 from mxnet import np
 
 X, y = np.array(inputs.values), np.array(outputs.values)
+X, y
+```
+
+```{.python .input}
+#@tab pytorch
+import torch
+
+X, y = torch.tensor(inputs.values), torch.tensor(outputs.values)
 X, y
 ```
 
@@ -107,6 +126,10 @@ Create a raw dataset with more rows and columns.
 2. Convert the preprocessed dataset to the `ndarray` format.
 
 
-## [Discussions](https://discuss.mxnet.io/t/4973)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/28)
+:end_tab:
 
-![](../img/qr_pandas.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/29)
+:end_tab:

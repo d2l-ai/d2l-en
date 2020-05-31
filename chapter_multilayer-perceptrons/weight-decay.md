@@ -187,7 +187,7 @@ To make the effects of overfitting pronounced,
 we can increase the dimensionality of our problem to $d = 200$
 and work with a small training set containing only 20 examples.
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -196,6 +196,21 @@ npx.set_np()
 
 n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5
 true_w, true_b = np.ones((num_inputs, 1)) * 0.01, 0.05
+train_data = d2l.synthetic_data(true_w, true_b, n_train)
+train_iter = d2l.load_array(train_data, batch_size)
+test_data = d2l.synthetic_data(true_w, true_b, n_test)
+test_iter = d2l.load_array(test_data, batch_size, is_train=False)
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+import d2l_pytorch as d2l
+import torch
+import torch.nn as nn
+
+n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5
+true_w, true_b = torch.ones((num_inputs, 1)) * 0.01, 0.05
 train_data = d2l.synthetic_data(true_w, true_b, n_train)
 train_iter = d2l.load_array(train_data, batch_size)
 test_data = d2l.synthetic_data(true_w, true_b, n_test)
@@ -212,15 +227,23 @@ to the original target function.
 
 First, we will define a function 
 to randomly initialize our model parameters 
-and run `attach_grad` on each to allocate 
+and allocate 
 memory for the gradients we will calculate.
 
-```{.python .input  n=2}
+```{.python .input}
 def init_params():
     w = np.random.normal(scale=1, size=(num_inputs, 1))
     b = np.zeros(1)
     w.attach_grad()
     b.attach_grad()
+    return [w, b]
+```
+
+```{.python .input}
+#@tab pytorch
+def init_params():
+    w = torch.normal(0, 1, size=(num_inputs, 1), requires_grad=True)
+    b = torch.zeros(1, requires_grad=True)
     return [w, b]
 ```
 
@@ -233,9 +256,15 @@ We divide by $2$ by convention
 the $2$ and $1/2$ cancel out, ensuring that the expression
 for the update looks nice and simple).
 
-```{.python .input  n=3}
+```{.python .input}
 def l2_penalty(w):
     return (w**2).sum() / 2
+```
+
+```{.python .input}
+#@tab pytorch
+def l2_penalty(w):
+    return torch.sum(w.pow(2)) / 2
 ```
 
 ### Defining the Train and Test Functions
@@ -247,7 +276,7 @@ have not changed since the previous chapter,
 so we will just import them via `d2l.linreg` and `d2l.squared_loss`.
 The only change here is that our loss now includes the penalty term.
 
-```{.python .input  n=4}
+```{.python .input}
 def train(lambd):
     w, b = init_params()
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
@@ -268,6 +297,28 @@ def train(lambd):
     print('l1 norm of w:', np.abs(w).sum())
 ```
 
+```{.python .input}
+#@tab pytorch
+def train(lambd):
+    w, b = init_params()
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+    num_epochs, lr = 100, 0.003
+    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], legend=['train', 'test'])
+    for epoch in range(1, num_epochs + 1):
+        for X, y in train_iter:
+            with torch.enable_grad():
+                # The L2 norm penalty term has been added, and broadcasting
+                # makes l2_penalty(w) a vector whose length is batch_size
+                l = loss(net(X), y) + lambd * l2_penalty(w)
+            l.sum().backward()
+            d2l.sgd([w, b], lr, batch_size)
+        if epoch % 5 == 0:
+            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
+                                 d2l.evaluate_loss(net, test_iter, loss)))
+    print('l1 norm of w:', torch.norm(w).item())
+```
+
 ### Training without Regularization
 
 We now run this code with `lambd = 0`, 
@@ -276,7 +327,12 @@ Note that we overfit badly,
 decreasing the training error but not the 
 test error---a textook case of overfitting.
 
-```{.python .input  n=5}
+```{.python .input}
+train(lambd=0)
+```
+
+```{.python .input}
+#@tab pytorch
 train(lambd=0)
 ```
 
@@ -291,7 +347,12 @@ As an exercise, you might want to check
 that the $\ell_2$ norm of the weights $\mathbf{w}$
 has actually decreased.
 
-```{.python .input  n=6}
+```{.python .input}
+train(lambd=3)
+```
+
+```{.python .input}
+#@tab pytorch
 train(lambd=3)
 ```
 
@@ -309,6 +370,7 @@ Since the weight decay portion of the update
 depends only on the current value of each parameter,
 and the optimizer must touch each parameter once anyway.
 
+:begin_tab:`mxnet`
 In the following code, we specify
 the weight decay hyperparameter directly
 through `wd` when instantiating our `Trainer`.
@@ -319,8 +381,19 @@ will be multiplied by `wd_mult`
 when updating model parameters. 
 Thus, if we set `wd_mult` to $0$,
 the bias parameter $b$ will not decay.
+:end_tab:
 
-```{.python .input  n=7}
+:begin_tab:`pytorch`
+In the following code, we specify
+the weight decay hyperparameter directly
+through `weight_decay` when instantiating our optimizer.
+By default, PyTorch decays both 
+weights and biases simultaneously. Here we only set `weight_decay` for 
+the weight, so the bias parameter $b$ will not decay.
+:end_tab:
+
+
+```{.python .input}
 def train_gluon(wd):
     net = nn.Sequential()
     net.add(nn.Dense(1))
@@ -346,6 +419,34 @@ def train_gluon(wd):
     print('L1 norm of w:', np.abs(net[0].weight.data()).sum())
 ```
 
+```{.python .input}
+#@tab pytorch
+def train_torch(wd):
+    net = nn.Sequential(nn.Linear(num_inputs, 1))
+    for param in net.parameters():
+        param.data.normal_()
+    loss = nn.MSELoss()
+    num_epochs, lr = 100, 0.003
+    # The bias parameter has not decayed. Bias names generally end with "bias"
+    trainer = torch.optim.SGD([
+        {"params":net[0].weight,'weight_decay': wd},
+        {"params":net[0].bias}], lr=lr)
+    
+    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], legend=['train', 'test'])
+    for epoch in range(1, num_epochs+1):
+        for X, y in train_iter:
+            with torch.enable_grad():
+                trainer.zero_grad()
+                l = loss(net(X), y)
+            l.backward()
+            trainer.step()
+        if epoch % 5 == 0:
+            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
+                                 d2l.evaluate_loss(net, test_iter, loss)))
+    print('L1 norm of w:', net[0].weight.norm().item())
+```
+
 The plots look identical to those when 
 we implemented weight decay from scratch.
 However, they run appreciably faster 
@@ -353,12 +454,22 @@ and are easier to implement,
 a benefit that will become more
 pronounced for large problems.
 
-```{.python .input  n=8}
+```{.python .input}
 train_gluon(0)
 ```
 
-```{.python .input  n=9}
+```{.python .input}
+#@tab pytorch
+train_torch(0)
+```
+
+```{.python .input}
 train_gluon(3)
+```
+
+```{.python .input}
+#@tab pytorch
+train_torch(3)
 ```
 
 So far, we only touched upon one notion of
@@ -390,6 +501,11 @@ of applying weight decay on all layers of a deep network.
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?
 
-## [Discussions](https://discuss.mxnet.io/t/2342)
 
-![](../img/qr_weight-decay.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/98)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/99)
+:end_tab:

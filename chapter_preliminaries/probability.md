@@ -41,12 +41,21 @@ large numbers* tell us that as the number of tosses grows this estimate will dra
 
 To start, let us import the necessary packages.
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
 import d2l
 from mxnet import np, npx
 import random
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+import d2l_pytorch as d2l
+import torch
+import numpy as np
+from torch.distributions import multinomial
 ```
 
 Next, we will want to be able to cast the die. In statistics we call this process
@@ -55,7 +64,12 @@ The distribution
 that assigns probabilities to a number of discrete choices is called the
 *multinomial distribution*. We will give a more formal definition of
 *distribution* later, but at a high level, think of it as just an assignment of
-probabilities to events. In MXNet, we can sample from the multinomial
+probabilities to events.
+
+
+:begin_tab:`mxnet`
+
+In MXNet, we can sample from the multinomial
 distribution via the aptly named `np.random.multinomial` function.
 The function
 can be called in many ways, but we will focus on the simplest.
@@ -63,26 +77,62 @@ To draw a single sample, we simply pass in a vector of probabilities.
 The output of the `np.random.multinomial` function is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
 
-```{.python .input  n=2}
+:end_tab:
+
+:begin_tab:`pytorch`
+
+In PyTorch, we can sample from the multinomial
+distribution via the class `Multinomial` defined in the
+`distributions.multinomial` module.
+The class
+can be called in many ways, but we will focus on the simplest.
+To draw a single sample, we simply pass in a vector of probabilities.
+The output of the `sample` method of this class  is another vector of the same length:
+its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
+
+:end_tab:
+
+
+```{.python .input}
 fair_probs = [1.0 / 6] * 6
 np.random.multinomial(1, fair_probs)
+```
+
+```{.python .input}
+#@tab pytorch
+fair_probs = torch.ones([6]) / 6
+multinomial.Multinomial(1, fair_probs).sample()
 ```
 
 If you run the sampler a bunch of times, you will find that you get out random
 values each time. As with estimating the fairness of a die, we often want to
 generate many samples from the same distribution. It would be unbearably slow to
-do this with a Python `for` loop, so `random.multinomial` supports drawing
+do this with a Python `for` loop, it supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
 
-```{.python .input  n=3}
+```{.python .input}
 np.random.multinomial(10, fair_probs)
+```
+
+```{.python .input}
+#@tab pytorch
+multinomial.Multinomial(10, fair_probs).sample()
 ```
 
 We can also conduct, say, $3$ groups of experiments, where each group draws $10$ samples, all at once.
 
-```{.python .input  n=4}
+```{.python .input}
 counts = np.random.multinomial(10, fair_probs, size=3)
+counts
+```
+
+```{.python .input}
+#@tab pytorch
+# PyTorch's Multinomial distribution doesn't offer the functionality
+# for conducting multiple experiments at once. In such case we can always
+# use numpy and later convert the ndarray to a torch tensor
+counts = torch.from_numpy(np.random.multinomial(10, fair_probs, size=3))
 counts
 ```
 
@@ -91,9 +141,16 @@ can then go through and count, after each of the 1000 rolls, how many times each
 number was rolled.
 Specifically, we calculate the relative frequency as the estimate of the true probability.
 
-```{.python .input  n=5}
+```{.python .input}
 # Store the results as 32-bit floats for division
 counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
+counts / 1000  # Relative frequency as the estimate
+```
+
+```{.python .input}
+#@tab pytorch
+# Store the results as 32-bit floats for division
+counts = multinomial.Multinomial(1000, fair_probs).sample().type(torch.float32)
 counts / 1000  # Relative frequency as the estimate
 ```
 
@@ -102,7 +159,7 @@ Because we generated the data from a fair die, we know that each outcome has tru
 We can also visualize how these probabilities converge over time towards the true probability.
 Let us conduct $500$ groups of experiments where each group draws $10$ samples.
 
-```{.python .input  n=6}
+```{.python .input}
 counts = np.random.multinomial(10, fair_probs, size=500)
 cum_counts = counts.astype(np.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
@@ -110,6 +167,22 @@ estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 d2l.set_figsize((6, 4.5))
 for i in range(6):
     d2l.plt.plot(estimates[:, i].asnumpy(),
+                 label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Groups of experiments')
+d2l.plt.gca().set_ylabel('Estimated probability')
+d2l.plt.legend();
+```
+
+```{.python .input}
+#@tab pytorch
+counts = torch.from_numpy(np.random.multinomial(10, fair_probs, size=500))
+cum_counts = counts.type(torch.float32).cumsum(axis=0)
+estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
+
+d2l.set_figsize((6, 4.5))
+for i in range(6):
+    d2l.plt.plot(estimates[:, i].numpy(),
                  label=("P(die=" + str(i + 1) + ")"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Groups of experiments')
@@ -256,7 +329,7 @@ $$\begin{aligned}
 &P(H = 1 \mid D_1 = 1)\\ =& \frac{P(D_1=1 \mid H=1) P(H=1)}{P(D_1=1)} \\ =& 0.1306 \end{aligned}.$$
 
 In other words, there is only a 13.06% chance that the patient
-actually has AIDS, despite using a very accurate test. 
+actually has AIDS, despite using a very accurate test.
 As we can see, probability can be counterintuitive.
 
 What should a patient do upon receiving such terrifying news? Likely, the patient
@@ -272,8 +345,8 @@ test has different characteristics and it is not as good as the first one, as sh
 |$P(D_2 = 0 \mid H)$|            0.02 |         0.97 |
 :label:`conditional_prob_D2`
 
-Unfortunately, the second test comes back positive, too. 
-Let us work out the requisite probabilities to invoke Bayes' theorem 
+Unfortunately, the second test comes back positive, too.
+Let us work out the requisite probabilities to invoke Bayes' theorem
 by assuming the conditional independence:
 
 $$\begin{aligned}
@@ -342,7 +415,7 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 
 ## Summary
 
-* We can use MXNet to sample from probability distributions.
+* We sample numbers from probability distributions.
 * We can analyze multiple random variables using joint distribution, conditional distribution, Bayes' theorem, marginalization, and independence assumptions.
 * Expectation and variance offer useful measures to summarize key characteristics of probability distributions.
 
@@ -355,6 +428,10 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 1. In :numref:`subsec_probability_hiv_app`, the first test is more accurate. Why not just run the first test a second time?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2319)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/36)
+:end_tab:
 
-![](../img/qr_probability.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/37)
+:end_tab:

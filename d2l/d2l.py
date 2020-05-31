@@ -2,9 +2,6 @@
 #    d2lbook build lib
 # Don't edit it directly
 
-import sys
-d2l = sys.modules[__name__]
-
 # Defined in file: ./chapter_preface/index.md
 import collections
 from collections import defaultdict
@@ -23,9 +20,11 @@ import tarfile
 import time
 import zipfile
 
+d2l = sys.modules[__name__]
+
 
 # Defined in file: ./chapter_preliminaries/pandas.md
-def mkdir_if_not_exist(path):
+def mkdir_if_not_exist(path):  #@save
     if not isinstance(path, str):
         path = os.path.join(*path)
     if not os.path.exists(path):
@@ -33,20 +32,20 @@ def mkdir_if_not_exist(path):
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
-def use_svg_display():
+def use_svg_display():  #@save
     """Use the svg format to display a plot in Jupyter."""
     display.set_matplotlib_formats('svg')
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
-def set_figsize(figsize=(3.5, 2.5)):
+def set_figsize(figsize=(3.5, 2.5)):  #@save
     """Set the figure size for matplotlib."""
     use_svg_display()
     d2l.plt.rcParams['figure.figsize'] = figsize
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):  #@save
     """Set the axes for matplotlib."""
     axes.set_xlabel(xlabel)
     axes.set_ylabel(ylabel)
@@ -67,7 +66,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
     if legend is None:
         legend = []
 
-    d2l.set_figsize(figsize)
+    set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
 
     # Return True if X (ndarray or list) has 1 axis
@@ -93,36 +92,36 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression.md
-class Timer:
+class Timer:  #@save
     """Record multiple running times."""
     def __init__(self):
         self.times = []
         self.start()
 
     def start(self):
-        # Start the timer
+        """Start the timer."""
         self.tik = time.time()
 
     def stop(self):
-        # Stop the timer and record the time in a list
+        """Stop the timer and record the time in a list."""
         self.times.append(time.time() - self.tik)
         return self.times[-1]
 
     def avg(self):
-        # Return the average time
+        """Return the average time."""
         return sum(self.times) / len(self.times)
 
     def sum(self):
-        # Return the sum of time
+        """Return the sum of time."""
         return sum(self.times)
 
     def cumsum(self):
-        # Return the accumulated times
+        """Return the accumulated times."""
         return np.array(self.times).cumsum().tolist()
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def synthetic_data(w, b, num_examples):
+def synthetic_data(w, b, num_examples):  #@save
     """Generate y = X w + b + noise."""
     X = np.random.normal(0, 1, (num_examples, len(w)))
     y = np.dot(X, w) + b
@@ -131,43 +130,45 @@ def synthetic_data(w, b, num_examples):
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def linreg(X, w, b):
+def linreg(X, w, b):  #@save
     return np.dot(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def squared_loss(y_hat, y):
+def squared_loss(y_hat, y):  #@save
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def sgd(params, lr, batch_size):
+def sgd(params, lr, batch_size):  #@save
     for param in params:
         param[:] = param - lr * param.grad / batch_size
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-gluon.md
-def load_array(data_arrays, batch_size, is_train=True):
-    """Construct a Gluon data loader"""
+def load_array(data_arrays, batch_size, is_train=True):  #@save
+    """Construct a Gluon data loader."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_fashion_mnist_labels(labels):
+def get_fashion_mnist_labels(labels):  #@save
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):
-        ax.imshow(img.asnumpy())
+    for i, (ax, img) in enumerate(zip(axes, imgs)):        
+        if 'asnumpy' in dir(img): img = img.asnumpy() 
+        if 'numpy' in dir(img): img = img.numpy()
+        ax.imshow(img)
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
         if titles:
@@ -176,7 +177,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_dataloader_workers(num_workers=4):
+def get_dataloader_workers(num_workers=4):  #@save
     # 0 means no additional process is used to speed up the reading of data.
     if sys.platform.startswith('win'):
         return 0
@@ -185,7 +186,7 @@ def get_dataloader_workers(num_workers=4):
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def load_data_fashion_mnist(batch_size, resize=None):
+def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     dataset = gluon.data.vision
     trans = [dataset.transforms.Resize(resize)] if resize else []
@@ -200,7 +201,7 @@ def load_data_fashion_mnist(batch_size, resize=None):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def accuracy(y_hat, y):
+def accuracy(y_hat, y):  #@save
     if y_hat.shape[1] > 1:
         return float((y_hat.argmax(axis=1).astype('float32') == y.astype(
             'float32')).sum())
@@ -209,7 +210,7 @@ def accuracy(y_hat, y):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def evaluate_accuracy(net, data_iter):
+def evaluate_accuracy(net, data_iter):  #@save
     metric = Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         metric.add(accuracy(net(X), y), y.size)
@@ -217,9 +218,8 @@ def evaluate_accuracy(net, data_iter):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-class Accumulator:
+class Accumulator:  #@save
     """Sum a list of numbers over time."""
-
     def __init__(self, n):
         self.data = [0.0] * n
 
@@ -234,7 +234,7 @@ class Accumulator:
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def train_epoch_ch3(net, train_iter, loss, updater):
+def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     if isinstance(updater, gluon.Trainer):
         updater = updater.step
@@ -251,7 +251,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-class Animator:
+class Animator:  #@save
     def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
                  nrows=1, ncols=1, figsize=(3.5, 2.5)):
@@ -304,7 +304,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def predict_ch3(net, test_iter, n=6):
+def predict_ch3(net, test_iter, n=6): #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
@@ -378,20 +378,20 @@ DATA_HUB['kaggle_house_test'] = (
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
-def try_gpu(i=0):
+def try_gpu(i=0):  #@save
     """Return gpu(i) if exists, otherwise return cpu()."""
     return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
-def try_all_gpus():
+def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
     ctxes = [npx.gpu(i) for i in range(npx.num_gpus())]
     return ctxes if ctxes else [npx.cpu()]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
-def corr2d(X, K):
+def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
     h, w = K.shape
     Y = np.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
@@ -402,7 +402,7 @@ def corr2d(X, K):
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def evaluate_accuracy_gpu(net, data_iter, ctx=None):
+def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
     if not ctx:  # Query the first device the first parameter is on
         ctx = list(net.collect_params().values())[0].list_ctx()[0]
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
@@ -446,9 +446,9 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
-class Residual(nn.Block):
+class Residual(nn.Block):  #@save
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
-        super(Residual, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1,
                                strides=strides)
         self.conv2 = nn.Conv2D(num_channels, kernel_size=3, padding=1)
@@ -2531,5 +2531,4 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
 # Defined in file: ./chapter_generative-adversarial-networks/dcgan.md
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
-
 
