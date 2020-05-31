@@ -11,14 +11,15 @@ stage("Build and Publish") {
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip python=3.7 -y
       conda activate ${ENV_NAME}
+      # d2l
+      python setup.py develop
       # mxnet
       pip install mxnet-cu101==1.6.0
       pip install git+https://github.com/d2l-ai/d2l-book
-      python setup.py develop
       # pytorch
       pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
       pip install torchvision
-      cd d2l_pytorch; python setup.py develop
+      # check
       pip list
       nvidia-smi
       """
