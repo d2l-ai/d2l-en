@@ -48,7 +48,6 @@ stage("Build and Publish") {
       ./static/build_html.sh
       """
 
-/*
       sh label:"Build PDF", script:"""set -ex
       conda activate ${ENV_NAME}
       d2lbook build pdf
@@ -62,8 +61,8 @@ stage("Build and Publish") {
       d2lbook build pkg
       [ -e _build/data_tmp ] && mv _build/data_tmp _build/eval/data
       """
-*/
-      if (env.BRANCH_NAME == 'pytorch') {
+
+      if (env.BRANCH_NAME == 'master) {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
         d2lbook deploy html
