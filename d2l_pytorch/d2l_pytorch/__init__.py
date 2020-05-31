@@ -12,6 +12,7 @@ import math
 import torch
 import torchvision
 from torch import nn
+from torch.nn import functional as F
 from torch.utils.data import TensorDataset, DataLoader
 from torch.utils import data
 from torchvision import transforms
@@ -328,6 +329,19 @@ def predict_ch3(net, test_iter, n=6):  #@save
     preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
     titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
+def evaluate_loss(net, data_iter, loss):
+    """Evaluate the loss of a model on the given dataset."""
+    metric = d2l.Accumulator(2)  # sum_loss, num_examples
+    for X, y in data_iter:
+        l = loss(net(X), y)
+        if l.nelement() != 1:
+            metric.add(l.sum(), y.numpy().size)
+        else:
+            metric.add(l*len(y), y.numpy().size)
+    return metric[0] / metric[1]
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
