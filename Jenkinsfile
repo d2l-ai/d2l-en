@@ -62,7 +62,7 @@ stage("Build and Publish") {
       [ -e _build/data_tmp ] && mv _build/data_tmp _build/eval/data
       """
 
-      if (env.BRANCH_NAME == 'master) {
+      if (env.BRANCH_NAME == 'master') {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
         d2lbook deploy html
