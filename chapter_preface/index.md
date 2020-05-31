@@ -339,7 +339,6 @@ import torch
 import torchvision
 from torch import nn
 from torch.nn import functional as F
-from torch.utils.data import TensorDataset, DataLoader
 from torch.utils import data
 from torchvision import transforms
 import numpy as np
@@ -354,7 +353,6 @@ import time
 import zipfile
 
 d2l = sys.modules[__name__]
-__version__ = '0.5.0'
 ```
 
 We offer a detailed overview of these functions and classes in :numref:`sec_d2l`.
