@@ -500,7 +500,11 @@ def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
-        metric.add(loss(net(X), y)*len(y), y.numpy().size)
+        l = loss(net(X), y)
+        if l.nelement() != 1:
+            metric.add(l.sum(), y.numpy().size)
+        else:
+            metric.add(l*len(y), y.numpy().size)
     return metric[0] / metric[1]
 ```
 
