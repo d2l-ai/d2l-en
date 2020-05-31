@@ -829,6 +829,11 @@ The steps are quite simple:
 1. Improve the score by improving the model (layers, regularization, dropout).
 1. What happens if we do not standardize the continuous numerical features like we have done in this section?
 
-## [Discussions](https://discuss.mxnet.io/t/2346)
 
-![](../img/qr_kaggle-house-price.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/106)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/107)
+:end_tab:

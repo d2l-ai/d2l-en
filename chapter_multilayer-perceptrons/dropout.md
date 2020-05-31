@@ -333,7 +333,7 @@ A common trend is to set
 a lower dropout probability closer to the input layer.
 Below we set it to 0.2 and 0.5 for the first 
 and second hidden layer respectively.
- By using the `is_training` function described in :numref:`sec_autograd`,
+By checking `is_training` described in :numref:`sec_autograd`,
  we can ensure that dropout is only active during training.
 
 ```{.python .input}
@@ -486,6 +486,11 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 1. Invent another technique for injecting random noise at each layer that is different from the standard dropout technique. Can you develop a method that outperforms dropout on the FashionMNIST dataset (for a fixed architecture)?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2343)
 
-![](../img/qr_dropout.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/100)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/101)
+:end_tab:

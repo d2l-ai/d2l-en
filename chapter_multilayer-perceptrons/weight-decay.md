@@ -227,7 +227,7 @@ to the original target function.
 
 First, we will define a function 
 to randomly initialize our model parameters 
-and run `attach_grad` on each to allocate 
+and allocate 
 memory for the gradients we will calculate.
 
 ```{.python .input}
@@ -370,6 +370,7 @@ Since the weight decay portion of the update
 depends only on the current value of each parameter,
 and the optimizer must to touch each parameter once anyway.
 
+:begin_tab:`mxnet`
 In the following code, we specify
 the weight decay hyperparameter directly
 through `wd` when instantiating our `Trainer`.
@@ -380,6 +381,17 @@ will be multiplied by `wd_mult`
 when updating model parameters. 
 Thus, if we set `wd_mult` to $0$,
 the bias parameter $b$ will not decay.
+:end_tab:
+
+:begin_tab:`pytorch`
+In the following code, we specify
+the weight decay hyperparameter directly
+through `weight_decay` when instantiating our optimizer.
+By default, PyTorch decays both 
+weights and biases simultaneously. Here we only set `weight_decay` for 
+the weight, so the bias parameter $b$ will not decay.
+:end_tab:
+
 
 ```{.python .input}
 def train_gluon(wd):
@@ -489,6 +501,11 @@ of applying weight decay on all layers of a deep network.
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?
 
-## [Discussions](https://discuss.mxnet.io/t/2342)
 
-![](../img/qr_weight-decay.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/98)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/99)
+:end_tab:

@@ -589,6 +589,6 @@ that you might encounter in a career in machine learning.
 1. Implement a covariate shift corrector.
 1. What could go wrong if training and test set are very different? What would happen to the sample weights?
 
-## [Discussions](https://discuss.mxnet.io/t/2347)
+[Discussions](https://discuss.d2l.ai/t/105)
 
-![](../img/qr_environment.svg)
+

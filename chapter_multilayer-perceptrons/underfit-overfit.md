@@ -484,8 +484,7 @@ features[:2], poly_features[:2], labels[:2]
 Let us first implement a function to evaluate the loss on a given data.
 
 ```{.python .input}
-#@save
-def evaluate_loss(net, data_iter, loss):
+def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
@@ -495,8 +494,7 @@ def evaluate_loss(net, data_iter, loss):
 
 ```{.python .input}
 #@tab pytorch
-#@save
-def evaluate_loss(net, data_iter, loss):
+def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
@@ -669,6 +667,11 @@ such as weight decay and dropout.
 1. What degree of polynomial do you need to reduce the training error to 0?
 1. Can you ever expect to see 0 generalization error?
 
-## [Discussions](https://discuss.mxnet.io/t/2341)
 
-![](../img/qr_underfit-overfit.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/96)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/97)
+:end_tab:

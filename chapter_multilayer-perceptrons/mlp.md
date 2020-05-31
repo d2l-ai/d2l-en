@@ -55,10 +55,10 @@ would always be more likely to repay
 than one with a lower income.
 While monotonic, this relationship likely
 is not linearly associated with the probability of 
-repayment. An increase in income from $0 to $50k 
+repayment. An increase in income from 0 to 50k 
 likely corresponds to a bigger increase 
 in likelihood of repayment 
-than an increase from $1M to $1.05M.
+than an increase from 1M to 1.05M.
 One way to handle this might be to pre-process
 our data such that linearity becomes more plausible, 
 say, by using the logarithm of income as our feature.
@@ -525,6 +525,11 @@ thousands of lines of C and Fortran.
 1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers had only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron.
 1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems do you expect this to cause?
 
-## [Discussions](https://discuss.mxnet.io/t/2338)
 
-![](../img/qr_mlp.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/90)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/91)
+:end_tab:

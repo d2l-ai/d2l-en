@@ -57,7 +57,7 @@ of how memory is alotted and addressed in hardware.
 Again, we will represent our parameters with several `ndarray`s.
 Note that *for every layer*, we must keep track of
 one weight matrix and one bias vector.
-As always, we call `attach_grad` to allocate memory
+As always, we allocate memory
 for the gradients (of the loss) with respect to these parameters.
 
 ```{.python .input}
@@ -89,8 +89,8 @@ params = [W1, b1, W2, b2]
 
 To make sure we know how everything works,
 we will implement the ReLU activation ourselves
-using the `maximum` function rather than 
-invoking `npx.relu` directly.
+using the maximum function rather than 
+invoking `relu` directly.
 
 ```{.python .input}
 def relu(X):
@@ -138,7 +138,7 @@ for calculating the softmax and cross-entropy loss.
 Recall our earlier discussion of these intricacies 
 (:numref:`sec_mlp`).
 We encourage the interested reader 
-to examine the source code for `mxnet.gluon.loss.SoftmaxCrossEntropyLoss`
+to examine the source code for loss function
 to deepen their knowledge of implementation details.
 
 ```{.python .input}
@@ -206,6 +206,11 @@ this can still get messy
 1. Describe why it is much more challenging to deal with multiple hyperparameters. 
 1. What is the smartest strategy you can think of for structuring a search over multiple hyperparameters?
 
-## [Discussions](https://discuss.mxnet.io/t/2339)
 
-![](../img/qr_mlp-scratch.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/92)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/93)
+:end_tab:
