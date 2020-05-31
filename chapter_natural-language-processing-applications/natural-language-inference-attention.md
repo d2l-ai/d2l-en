@@ -27,7 +27,7 @@ At a high level, it consists of three jointly trained steps: attending, comparin
 We will illustrate them step by step in the following.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 import mxnet as mx
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
@@ -244,7 +244,7 @@ In contrast to the `split_batch` function in :numref:`sec_multi_gpu` that takes 
 we define a `split_batch_multi_inputs` function to take multiple inputs such as premises and hypotheses in minibatches.
 
 ```{.python .input  n=10}
-# Saved in the d2l package for later use
+#@save
 def split_batch_multi_inputs(X, y, ctx_list):
     """Split multi-input X and y into multiple devices specified by ctx"""
     X = list(zip(*[gluon.utils.split_and_load(
@@ -267,7 +267,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
 Finally, define the prediction function to output the logical relationship between a pair of premise and hypothesis.
 
 ```{.python .input  n=14}
-# Saved in the d2l package for later use
+#@save
 def predict_snli(net, premise, hypothesis):
     premise = np.array(vocab[premise], ctx=d2l.try_gpu())
     hypothesis = np.array(vocab[hypothesis], ctx=d2l.try_gpu())

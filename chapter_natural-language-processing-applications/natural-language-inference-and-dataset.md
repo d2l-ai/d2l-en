@@ -54,7 +54,7 @@ We download and store the extracted SNLI dataset in the path `../data/snli_1.0`.
 
 ```{.python .input  n=28}
 import collections
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 import os
 import re
@@ -62,7 +62,7 @@ import zipfile
 
 npx.set_np()
 
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['SNLI'] = (
     'https://nlp.stanford.edu/projects/snli/snli_1.0.zip',
     '9fcde07509c7e87ec61c640c1b2753d9041758e4')
@@ -75,7 +75,7 @@ data_dir = d2l.download_extract('SNLI')
 The original SNLI dataset contains much richer information than what we really need in our experiments. Thus, we define a function `read_snli` to only extract part of the dataset, then return lists of premises, hypotheses, and their labels.
 
 ```{.python .input  n=66}
-# Saved in the d2l package for later use
+#@save
 def read_snli(data_dir, is_train):
     """Read the SNLI dataset into premises, hypotheses, and labels."""
     def extract_text(s):
@@ -126,7 +126,7 @@ tokens after the first `num_steps` ones in longer sequence are trimmed, while sp
 By implementing the `__getitem__` function, we can arbitrarily access the premise, hypothesis, and label with the index `idx`.
 
 ```{.python .input  n=115}
-# Saved in the d2l package for later use
+#@save
 class SNLIDataset(gluon.data.Dataset):
     """A customized dataset to load the SNLI dataset."""
     def __init__(self, dataset, num_steps, vocab=None):
@@ -163,7 +163,7 @@ as that of the testing set.
 As a result, any new token from the testing set will be unknown to the model trained on the training set.
 
 ```{.python .input  n=114}
-# Saved in the d2l package for later use
+#@save
 def load_data_snli(batch_size, num_steps=50):
     """Download the SNLI dataset and return data iterators and vocabulary."""
     num_workers = d2l.get_dataloader_workers()

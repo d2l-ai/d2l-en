@@ -42,7 +42,7 @@ Implementing Adam from scratch is not very daunting. For convenience we store th
 
 ```{.python .input  n=2}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 

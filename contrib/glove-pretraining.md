@@ -11,7 +11,7 @@ modules required for the experiment.
 
 ```{.python .input  n=1}
 from collections import defaultdict
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx, cpu
 from mxnet.gluon import nn
 import random

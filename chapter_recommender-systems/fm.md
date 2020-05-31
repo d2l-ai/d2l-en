@@ -33,7 +33,7 @@ With this reformulation, the model complexity are decreased greatly. Moreover, f
 To learn the FM model, we can use the MSE loss for regression task, the cross entropy loss for classification tasks, and the BPR loss for ranking task. Standard optimizers such as SGD and Adam are viable for optimization.
 
 ```{.python .input  n=2}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import init, gluon, np, npx
 from mxnet.gluon import nn
 import os

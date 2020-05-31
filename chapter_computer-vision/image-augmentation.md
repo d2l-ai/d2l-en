@@ -21,7 +21,7 @@ First, import the packages or modules required for the experiment in this sectio
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, image, init, np, npx
 from mxnet.gluon import nn
 
@@ -152,7 +152,7 @@ CIFAR-10 dataset. We will also apply the methods described in
 Next, we define the training function to train and evaluate the model using multiple GPUs.
 
 ```{.python .input  n=14}
-# Saved in the d2l package for later use
+#@save
 def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
                      split_f=d2l.split_batch):
     X_shards, y_shards = split_f(features, labels, ctx_list)
@@ -172,7 +172,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
 ```
 
 ```{.python .input  n=16}
-# Saved in the d2l package for later use
+#@save
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                ctx_list=d2l.try_all_gpus(), split_f=d2l.split_batch):
     num_batches, timer = len(train_iter), d2l.Timer()

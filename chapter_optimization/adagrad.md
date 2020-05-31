@@ -66,7 +66,7 @@ We are going to implement Adagrad using the same learning rate previously, i.e.,
 
 ```{.python .input  n=6}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 import math
 from mxnet import np, npx
 npx.set_np()

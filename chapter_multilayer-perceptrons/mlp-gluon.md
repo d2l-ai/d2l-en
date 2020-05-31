@@ -5,7 +5,7 @@ As you might expect, by relying on the high-level interface,
 we can implement MLPs even more concisely.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, init, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -13,7 +13,7 @@ npx.set_np()
 
 ```{.python .input}
 #@tab pytorch
-import d2l_pytorch as d2l
+from d2l import mxnet as d2l_pytorch as d2l
 import torch
 from torch import nn
 ```

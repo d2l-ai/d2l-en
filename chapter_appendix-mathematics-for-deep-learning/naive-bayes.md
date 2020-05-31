@@ -7,7 +7,7 @@ Learning is all about making assumptions. If we want to classify a new data poin
 
 ```{.python .input  n=72}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 import math
 from mxnet import gluon, np, npx
 npx.set_np()

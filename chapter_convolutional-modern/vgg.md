@@ -46,7 +46,7 @@ corresponding to the number of convolutional layers `num_convs`
 and the number of output channels `num_channels`.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -63,7 +63,7 @@ def vgg_block(num_convs, num_channels):
 
 ```{.python .input}
 #@tab pytorch
-import d2l_pytorch as d2l
+from d2l import mxnet as d2l_pytorch as d2l
 import torch
 from torch import nn
 

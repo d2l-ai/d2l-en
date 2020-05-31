@@ -51,7 +51,7 @@ In what follows we will use :numref:`sec_lenet` as the toy network to illustrate
 
 ```{.python .input  n=2}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
 ```
@@ -150,7 +150,7 @@ print('output:', split)
 For later reuse we define a `split_batch` function which splits both data and labels.
 
 ```{.python .input  n=9}
-# Saved in the d2l package for later use
+#@save
 def split_batch(X, y, ctx_list):
     """Split X and y into multiple devices specified by ctx."""
     assert X.shape[0] == y.shape[0]

@@ -14,7 +14,7 @@ The layers in the encoder and the decoder are illustrated in :numref:`fig_seq2se
 In this section we will explain and implement the seq2seq model to train on the machine translation dataset.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx, init, gluon, autograd
 from mxnet.gluon import nn, rnn
 npx.set_np()
@@ -42,7 +42,7 @@ Those feature vectors will be fed to a multi-layer LSTM.
 The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). The encoder returns both the LSTM outputs, i.e., hidden states of all the timesteps, as well as the hidden state and the memory cell of the final timestep.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 class Seq2SeqEncoder(d2l.Encoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -95,7 +95,7 @@ When implementing the decoder, we directly use the hidden state of the encoder i
 The LSTM forward calculation of the decoder is similar to that of the encoder. The only difference is that we add a dense layer after the LSTM layers, where the hidden size is the vocabulary size. The dense layer will predict the confidence score for each word.
 
 ```{.python .input  n=5}
-# Saved in the d2l package for later use
+#@save
 class Seq2SeqDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -148,7 +148,7 @@ npx.sequence_mask(X, np.array([1, 2]), True, value=-1, axis=1)
 Now we can implement the masked version of the softmax cross-entropy loss. Note that each Gluon loss function allows to specify per-example weights, in default they are 1s. Then we can just use a zero weight for each example we would like to remove. So our customized loss function accepts an additional `valid_len` argument to ignore some failing elements in each sequence.
 
 ```{.python .input  n=9}
-# Saved in the d2l package for later use
+#@save
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # pred shape: (batch_size, seq_len, vocab_size)
     # label shape: (batch_size, seq_len)
@@ -173,7 +173,7 @@ loss(np.ones((3, 4, 10)), np.ones((3, 4)), np.array([4, 2, 0]))
 During training, if the target sequence has length $n$, we feed the first $n-1$ tokens into the decoder as inputs, and the last $n-1$ tokens are used as ground truth label.
 
 ```{.python .input  n=11}
-# Saved in the d2l package for later use
+#@save
 def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
     model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
     trainer = gluon.Trainer(model.collect_params(),
@@ -226,7 +226,7 @@ sequence. As illustrated in :numref:`fig_seq2seq_predict`, during predicting, we
 :label:`fig_seq2seq_predict`
 
 ```{.python .input  n=16}
-# Saved in the d2l package for later use
+#@save
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]

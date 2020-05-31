@@ -40,7 +40,7 @@ The commonly-tuned parameters of the Inception block
 are the number of output channels per layer.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -78,7 +78,7 @@ class Inception(nn.Block):
 
 ```{.python .input}
 #@tab pytorch
-import d2l_pytorch as d2l
+from d2l import mxnet as d2l_pytorch as d2l
 import torch
 from torch import nn
 from torch.nn import functional as F

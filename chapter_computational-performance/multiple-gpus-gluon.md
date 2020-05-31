@@ -4,7 +4,7 @@
 Implementing parallelism from scratch for every new model is no fun. Moreover, there is significant benefit in optimizing synchronization tools for high performance. In the following we will show how to do this using Gluon. The math and the algorithms are the same as in :numref:`sec_multi_gpu`. As before we begin by importing the required modules (quite unsurprisingly you will need at least two GPUs to run this notebook).
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -15,7 +15,7 @@ npx.set_np()
 Let us use a slightly more meaningful network than LeNet from the previous section that's still sufficiently easy and quick to train. We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference to :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning. Moreover, we remove the max-pooling layer.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 def resnet18(num_classes):
     """A slightly modified ResNet-18 model."""
     def resnet_block(num_channels, num_residuals, first_block=False):
@@ -76,7 +76,7 @@ weight.data(ctx[0])[0], weight.data(ctx[1])[0]
 Lastly let us replace the code to evaluate the accuracy by one that works in parallel across multiple devices. This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a batch before invoking the network. All else is essentially identical.
 
 ```{.python .input  n=6}
-# Saved in the d2l package for later use
+#@save
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     # Query the list of devices
     ctx = list(net.collect_params().values())[0].list_ctx()

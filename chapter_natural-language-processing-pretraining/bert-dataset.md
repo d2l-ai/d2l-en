@@ -21,7 +21,7 @@ WikiText-2 i) retains the original punctuation, making it suitable for next sent
 
 ```{.python .input  n=1}
 import collections
-import d2l
+from d2l import mxnet as d2l
 import mxnet as mx
 from mxnet import autograd, gluon, init, np, npx
 import os
@@ -41,12 +41,12 @@ We leave discussions of more complex sentence splitting techniques in the exerci
 at the end of this section.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['wikitext-2'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/'
     'wikitext-2-v1.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
 
-# Saved in the d2l package for later use
+#@save
 def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
@@ -74,7 +74,7 @@ the `_get_next_sentence` function generates a training example
 for the binary classification task.
 
 ```{.python .input  n=3}
-# Saved in the d2l package for later use
+#@save
 def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
         is_next = True
@@ -91,7 +91,7 @@ Here `paragraph` is a list of sentences, where each sentence is a list of tokens
 The argument `max_len` specifies the maximum length of a BERT input sequence during pretraining.
 
 ```{.python .input  n=4}
-# Saved in the d2l package for later use
+#@save
 def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     nsp_data_from_paragraph = []
     for i in range(len(paragraph) - 1):
@@ -123,7 +123,7 @@ In the end, the function returns the input tokens after possible replacement,
 the token indices where predictions take place and labels for these predictions.
 
 ```{.python .input  n=5}
-# Saved in the d2l package for later use
+#@save
 def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                         vocab):
     # Make a new copy of tokens for the input of a masked language model,
@@ -161,7 +161,7 @@ the token indices where predictions take place,
 and label indices for these predictions.
 
 ```{.python .input  n=6}
-# Saved in the d2l package for later use
+#@save
 def _get_mlm_data_from_tokens(tokens, vocab):
     candidate_pred_positions = []
     # `tokens` is a list of strings
@@ -191,7 +191,7 @@ to append the special “&lt;mask&gt;” tokens to the inputs.
 Its argument `examples` contain the outputs from the helper functions `_get_nsp_data_from_paragraph` and `_get_mlm_data_from_tokens` for the two pretraining tasks.
 
 ```{.python .input  n=7}
-# Saved in the d2l package for later use
+#@save
 def _pad_bert_inputs(examples, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
     all_token_ids, all_segments, valid_lens,  = [], [], []
@@ -234,7 +234,7 @@ For simplicity, we use the `d2l.tokenize` function for tokenization.
 Infrequent tokens that appear less than five times are filtered out.
 
 ```{.python .input  n=8}
-# Saved in the d2l package for later use
+#@save
 class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraphs, max_len):
         # Input paragraphs[i] is a list of sentence strings representing a
@@ -276,7 +276,7 @@ we define the following `load_data_wiki` to download and WikiText-2 dataset
 and generate pretraining examples from it.
 
 ```{.python .input  n=9}
-# Saved in the d2l package for later use
+#@save
 def load_data_wiki(batch_size, max_len):
     num_workers = d2l.get_dataloader_workers()
     data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')

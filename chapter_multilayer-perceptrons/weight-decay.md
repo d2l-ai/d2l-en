@@ -189,7 +189,7 @@ and work with a small training set containing only 20 examples.
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -205,7 +205,7 @@ test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 ```{.python .input}
 #@tab pytorch
 %matplotlib inline
-import d2l_pytorch as d2l
+from d2l import mxnet as d2l_pytorch as d2l
 import torch
 import torch.nn as nn
 

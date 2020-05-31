@@ -10,7 +10,7 @@ Typically, a single operator will use all the computational resources on all CPU
 We begin by importing the required packages and modules. Note that we need at least one GPU to run the experiments in this section.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 ```

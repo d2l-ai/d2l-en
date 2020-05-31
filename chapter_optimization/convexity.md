@@ -41,7 +41,7 @@ To illustrate this let us plot a few functions and check which ones satisfy the 
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mpl_toolkits import mplot3d
 from mxnet import np, npx
 npx.set_np()

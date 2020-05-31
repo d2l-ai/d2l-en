@@ -42,7 +42,7 @@ Indeed, :eqref:`eq_pdf_deriv` precisely defines the *probability density functio
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from IPython import display
 from mxnet import np, npx
 npx.set_np()

@@ -58,7 +58,7 @@ Notice that all we are doing is performing one cross-correlation operation
 per channel and then adding up the results using the `add_n` function.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 
@@ -70,7 +70,7 @@ def corr2d_multi_in(X, K):
 
 ```{.python .input}
 #@tab pytorch
-import d2l_pytorch as d2l
+from d2l import mxnet as d2l_pytorch as d2l
 import torch
 
 def corr2d_multi_in(X, K):

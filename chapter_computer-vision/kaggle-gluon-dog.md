@@ -17,7 +17,7 @@ First, import the packages or modules required for the competition.
 
 ```{.python .input}
 import collections
-import d2l
+from d2l import mxnet as d2l
 import math
 from mxnet import autograd, gluon, init, npx
 from mxnet.gluon import nn
@@ -45,7 +45,7 @@ You may have noticed that the above structure is quite similar to that of the CI
 Similarly, to make it easier to get started, we provide a small-scale sample of the dataset mentioned above, "train_valid_test_tiny.zip". If you are going to use the full dataset for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
 
 ```{.python .input  n=1}
-# Saved in the d2l package for later use 
+#@save 
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 

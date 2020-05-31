@@ -43,7 +43,7 @@ To start, let us import the necessary packages.
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 import random
 npx.set_np()
@@ -52,7 +52,7 @@ npx.set_np()
 ```{.python .input}
 #@tab pytorch
 %matplotlib inline
-import d2l_pytorch as d2l
+from d2l import mxnet as d2l_pytorch as d2l
 import torch
 import numpy as np
 from torch.distributions import multinomial

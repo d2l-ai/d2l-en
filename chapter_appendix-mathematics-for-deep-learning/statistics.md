@@ -26,7 +26,7 @@ We have seen simple examples of estimators before in section :numref:`sec_maximu
 As an example, we show below the true density of a Gaussian random variable with mean zero and variance one, along with a collection samples from that Gaussian.  We constructed the $y$ coordinate so every point is visible and the relationship to the original density is clearer.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 import random
 npx.set_np()

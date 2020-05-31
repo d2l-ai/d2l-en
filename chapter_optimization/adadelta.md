@@ -22,7 +22,7 @@ Adadelta needs to maintain two state variables for each variable, $\mathbf{s}_t$
 
 ```{.python .input  n=11}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 

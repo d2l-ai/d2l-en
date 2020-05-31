@@ -7,7 +7,7 @@ First, import the packages or modules required for this section. Here, we have m
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, image, np, npx
 
 np.set_printoptions(2)
@@ -46,7 +46,7 @@ boxes[250, 250, 0, :]
 In order to describe all anchor boxes centered on one pixel in the image, we first define the `show_bboxes` function to draw multiple bounding boxes on the image.
 
 ```{.python .input  n=5}
-# Saved in the d2l package for later use
+#@save
 def show_bboxes(axes, bboxes, labels=None, colors=None):
     """Show bounding boxes."""
     def _make_list(obj, default_values=None):

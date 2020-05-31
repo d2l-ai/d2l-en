@@ -19,7 +19,7 @@ To start off, we import the few required packages.
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
 import random
 npx.set_np()
@@ -28,7 +28,7 @@ npx.set_np()
 ```{.python .input}
 #@tab pytorch
 %matplotlib inline
-import d2l_pytorch as d2l
+from d2l import mxnet as d2l_pytorch as d2l
 import torch
 import random
 ```

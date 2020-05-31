@@ -314,7 +314,7 @@ def predict_ch3(net, test_iter, n=6): #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
-def evaluate_loss(net, data_iter, loss):
+def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
@@ -2531,4 +2531,5 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
 # Defined in file: ./chapter_generative-adversarial-networks/dcgan.md
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
+
 

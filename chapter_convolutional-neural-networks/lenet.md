@@ -87,7 +87,7 @@ We need only to instantiate a `Sequential` Block
 and chain together the appropriate layers.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -107,7 +107,7 @@ net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
 
 ```{.python .input}
 #@tab pytorch
-import d2l_pytorch as d2l
+from d2l import mxnet as d2l_pytorch as d2l
 import torch
 from torch import nn
 from dataclasses import dataclass

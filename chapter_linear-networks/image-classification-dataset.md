@@ -12,7 +12,7 @@ dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017.
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon
 import sys
 
@@ -23,7 +23,7 @@ d2l.use_svg_display()
 ```{.python .input}
 #@tab pytorch
 %matplotlib inline
-import d2l_pytorch as d2l
+from d2l import mxnet as d2l_pytorch as d2l
 import torch
 import torchvision
 from torchvision import transforms

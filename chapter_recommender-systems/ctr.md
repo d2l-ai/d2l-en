@@ -11,7 +11,7 @@ Click-through rate is an important signal that indicates the effectiveness of pr
 
 ```{.python .input}
 from collections import defaultdict
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, np
 import os
 ```
@@ -23,7 +23,7 @@ With the considerable advancements of Internet and mobile technology, online adv
 The following code downloads the dataset from our server and saves it into the local data folder.
 
 ```{.python .input  n=15}
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['ctr'] = (d2l.DATA_URL + 'ctr.zip',
                        'e18327c48c8e8e5c23da714dd614e390d369843f')
 
@@ -37,7 +37,7 @@ There are a training set and a test set, consisting of 15000 and 3000 samples/li
 For the convenience of data loading, we implement a `CTRDataset` which loads the advertising dataset from the CSV file and can be used by `DataLoader`.
 
 ```{.python .input  n=13}
-# Saved in the d2l package for later use
+#@save
 class CTRDataset(gluon.data.Dataset):
     def __init__(self, data_path, feat_mapper=None, defaults=None,
                  min_threshold=4, num_feat=34):

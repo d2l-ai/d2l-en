@@ -73,7 +73,7 @@ After so much theory, let us try this out in practice. Let us begin by generatin
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon, init
 from mxnet.gluon import nn
 npx.set_np()

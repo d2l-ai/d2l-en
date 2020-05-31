@@ -5,7 +5,7 @@ With the BERT model implemented in :numref:`sec_bert`
 and the pretraining examples generated from the WikiText-2 dataset in :numref:`sec_bert-dataset`, we will pretrain BERT on the WikiText-2 dataset in this section.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 
 npx.set_np()
@@ -49,7 +49,7 @@ is just the sum of both the masked language modeling loss
 and the next sentence prediction loss.
 
 ```{.python .input  n=16}
-# Saved in the d2l package for later use
+#@save
 def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
                          segments_X_shards, valid_lens_x_shards,
                          pred_positions_X_shards, mlm_weights_X_shards,
@@ -90,7 +90,7 @@ the input `num_steps` of the following function
 specifies the number of iteration steps for training.
 
 ```{.python .input  n=17}
-# Saved in the d2l package for later use
+#@save
 def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
                num_steps):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
