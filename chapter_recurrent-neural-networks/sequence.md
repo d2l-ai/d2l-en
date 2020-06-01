@@ -182,8 +182,7 @@ def train_net(net, train_iter, loss, epochs, lr):
     for epoch in range(1, epochs + 1):
         for X, y in train_iter:
             trainer.zero_grad()
-            out = net(X)
-            l = loss(out, y.reshape(-1, 1))
+            l = loss(net(X), y.reshape(-1, 1))
             l.backward()
             trainer.step()
         print('epoch %d, loss: %f' % (
