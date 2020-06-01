@@ -25,6 +25,7 @@ import sys
 import tarfile
 import time
 import zipfile
+import requests
 
 d2l = sys.modules[__name__]
 
