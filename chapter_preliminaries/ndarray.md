@@ -64,6 +64,7 @@ npx.set_np()
 import torch
 ```
 
+
 An `ndarray` represents a (possibly multi-dimensional) array of numerical values.
 With one axis, an `ndarray` corresponds (in math) to a *vector*.
 With two axes, an `ndarray` corresponds to a *matrix*.
@@ -89,6 +90,7 @@ x = torch.arange(12)
 x
 ```
 
+
 We can access an `ndarray`'s *shape* (the length along each axis)
 by inspecting its `shape` property.
 
@@ -100,6 +102,7 @@ x.shape
 #@tab pytorch
 x.shape
 ```
+
 
 If we just want to know the total number of elements in an `ndarray`,
 i.e., the product of all of the shape elements,
@@ -115,6 +118,7 @@ x.size
 #@tab pytorch
 x.size()
 ```
+
 
 To change the shape of an `ndarray` without altering
 either the number of elements or their values,
@@ -137,6 +141,7 @@ x
 x = x.reshape((3, 4))
 x
 ```
+
 
 Reshaping by manually specifying every dimension is unnecessary.
 If our target shape is a matrix with shape (height, width),
@@ -164,6 +169,7 @@ np.empty((3, 4))
 torch.empty(2, 3)
 ```
 
+
 Typically, we will want our matrices initialized
 either with zeros, ones, some other constants,
 or numbers randomly sampled from a specific distribution.
@@ -179,6 +185,7 @@ np.zeros((2, 3, 4))
 torch.zeros(2, 3, 4)
 ```
 
+
 Similarly, we can create tensors with each element set to 1 as follows:
 
 ```{.python .input}
@@ -189,6 +196,7 @@ np.ones((2, 3, 4))
 #@tab pytorch
 torch.ones((2, 3, 4))
 ```
+
 
 Often, we want to randomly sample the values
 for each element in an `ndarray`
@@ -210,6 +218,7 @@ np.random.normal(0, 1, size=(3, 4))
 torch.randn(3, 4)
 ```
 
+
 We can also specify the exact values for each element in the desired `ndarray`
 by supplying a Python list (or list of lists) containing the numerical values.
 Here, the outermost list corresponds to axis $0$, and the inner list to axis $1$.
@@ -222,6 +231,7 @@ np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 #@tab pytorch
 torch.tensor([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
+
 
 ## Operations
 
@@ -278,6 +288,7 @@ y = torch.tensor([2, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 ```
 
+
 Many more operations can be applied elementwise,
 including unary operators like exponentiation.
 
@@ -289,6 +300,7 @@ np.exp(x)
 #@tab pytorch
 torch.exp(x)
 ```
+
 
 In addition to elementwise computations,
 we can also perform linear algebra operations,
@@ -321,6 +333,7 @@ y = torch.tensor([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 torch.cat((x, y), dim=0), torch.cat((x, y), dim=1)
 ```
 
+
 Sometimes, we want to construct a binary `ndarray` via *logical statements*.
 Take `x == y` as an example.
 For each position, if `x` and `y` are equal at that position,
@@ -337,6 +350,7 @@ x == y
 x == y
 ```
 
+
 Summing all the elements in the `ndarray` yields an `ndarray` with only one element.
 
 ```{.python .input}
@@ -347,6 +361,7 @@ x.sum()
 #@tab pytorch
 x.sum()
 ```
+
 
 For stylistic convenience, we can write `x.sum()` as `np.sum(x)`.
 
@@ -380,6 +395,7 @@ b = torch.arange(2).reshape((1, 2))
 a, b
 ```
 
+
 Since `a` and `b` are $3\times1$ and $1\times2$ matrices respectively,
 their shapes do not match up if we want to add them.
 We *broadcast* the entries of both matrices into a larger $3\times2$ matrix as follows:
@@ -395,6 +411,7 @@ a + b
 #@tab pytorch
 a + b
 ```
+
 
 ## Indexing and Slicing
 
@@ -417,6 +434,7 @@ x[-1], x[1:3]
 x[-1], x[1:3]
 ```
 
+
 Beyond reading, we can also write elements of a matrix by specifying indices.
 
 ```{.python .input}
@@ -429,6 +447,7 @@ x
 x[1, 2] = 9
 x
 ```
+
 
 If we want to assign multiple elements the same value,
 we simply index all of them and then assign them the value.
@@ -448,6 +467,7 @@ x
 x[0:2, :] = 12
 x
 ```
+
 
 ## Saving Memory
 
@@ -475,6 +495,7 @@ before = id(y)
 y = y + x
 id(y) == before
 ```
+
 
 This might be undesirable for two reasons.
 First, we do not want to run around
@@ -511,6 +532,7 @@ z[:] = x + y
 print('id(z):', id(z))
 ```
 
+
 If the value of `x` is not reused in subsequent computations,
 we can also use `x[:] = x + y` or `x += y`
 to reduce the memory overhead of the operation.
@@ -527,6 +549,7 @@ before = id(x)
 x += y
 id(x) == before
 ```
+
 
 ## Conversion to Other Python Objects
 
@@ -551,6 +574,7 @@ b = torch.tensor(a)
 type(a), type(b)
 ```
 
+
 To convert a size-one `ndarray` to a Python scalar,
 we can invoke the `item` function or Python's built-in functions.
 
@@ -564,6 +588,7 @@ a, a.item(), float(a), int(a)
 a = torch.tensor([3.5])
 a, a.item(), float(a), int(a)
 ```
+
 
 ## Summary
 
