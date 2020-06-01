@@ -219,7 +219,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
         yield X, Y
 ```
 
-Using the same settings, print input `X` and label `Y` for each minibatch of examples read by random sampling. The positions of two adjacent minibatches on the original sequence are adjacent.
+Using the same settings, print input `X` and label `Y` for each minibatch of examples read by sequential partitioning. The positions of two adjacent minibatches on the original sequence are adjacent.
 
 ```{.python .input  n=8}
 for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
