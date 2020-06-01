@@ -124,7 +124,7 @@ bigram_vocab = d2l.Vocab(bigram_tokens)
 print(bigram_vocab.token_freqs[:10])
 ```
 
-There is one thing notable here. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
+One thing is notable here. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
 
 ```{.python .input  n=4}
 trigram_tokens = [[triple for triple in zip(line[:-2], line[1:-1], line[2:])]
