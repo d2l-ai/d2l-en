@@ -84,6 +84,19 @@ x = np.sin(0.01 * time) + 0.2 * np.random.normal(size=T)
 d2l.plot(time, [x])
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+import torch.nn as nn
+
+T = 1000        # Generate a total of 1000 points
+time = torch.arange(0.0, T)
+x = torch.sin(0.01 * time) + 0.2*torch.randn(T)
+d2l.plot(time, [x])
+```
+
 Next we need to turn this time series into features and labels that the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots, x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer data points, since we do not have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple. A few layers of a fully connected network, ReLU activation and $\ell_2$ loss. Since much of the modeling is identical to the previous sections when we built regression estimators in Gluon, we will not delve into much detail.
 
 ```{.python .input}
@@ -111,6 +124,37 @@ def get_net():
 loss = gluon.loss.L2Loss()
 ```
 
+```{.python .input}
+#@tab pytorch
+tau = 4
+features = torch.zeros((T-tau, tau))
+for i in range(tau):
+    features[:, i] = x[i: T-tau+i]
+labels = x[tau:]
+
+batch_size, n_train = 16, 600
+train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
+                            batch_size, is_train=True)
+test_iter = d2l.load_array((features[:n_train], labels[:n_train]),
+                           batch_size, is_train=False)
+
+# Function for initializing the weights of net
+def init_weights(m):
+    if type(m) == nn.Linear:
+        torch.nn.init.xavier_uniform_(m.weight)
+
+# Vanilla MLP architecture
+def get_net():
+    net = nn.Sequential(nn.Linear(4, 10),
+                        nn.ReLU(),
+                        nn.Linear(10, 1))
+    net.apply(init_weights)
+    return net
+
+# Least mean squares loss
+loss = nn.MSELoss()
+```
+
 Now we are ready to train.
 
 ```{.python .input}
@@ -130,6 +174,23 @@ net = get_net()
 train_net(net, train_iter, loss, 10, 0.01)
 ```
 
+```{.python .input}
+#@tab pytorch
+def train_net(net, train_iter, loss, epochs, lr):
+    trainer = torch.optim.Adam(net.parameters(), lr)
+    for epoch in range(1, epochs + 1):
+        for X, y in train_iter:
+            trainer.zero_grad()
+            l = loss(net(X), y.reshape(-1, 1))
+            l.backward()
+            trainer.step()
+        print('epoch %d, loss: %f' % (
+            epoch, d2l.evaluate_loss(net, train_iter, loss)))
+
+net = get_net()
+train_net(net, train_iter, loss, 10, 0.01)
+```
+
 ## Predictions
 
 Since both training and test loss are small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
@@ -137,6 +198,13 @@ Since both training and test loss are small, we would expect our model to work w
 ```{.python .input}
 estimates = net(features)
 d2l.plot([time, time[tau:]], [x, estimates],
+         legend=['data', 'estimate'])
+```
+
+```{.python .input}
+#@tab pytorch
+estimates = net(features)
+d2l.plot([time, time[tau:]], [x, estimates.detach()],
          legend=['data', 'estimate'])
 ```
 
@@ -161,6 +229,18 @@ d2l.plot([time, time[tau:], time[n_train:]],
          legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))
 ```
 
+```{.python .input}
+#@tab pytorch
+predictions = torch.zeros(T)
+predictions[:n_train] = x[:n_train]
+for i in range(n_train, T):
+    predictions[i] = net(
+        predictions[(i-tau):i].reshape(1, -1)).reshape(1)
+d2l.plot([time, time[tau:], time[n_train:]],
+         [x, estimates.detach(), predictions[n_train:].detach()],
+         legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))
+```
+
 As the above example shows, this is a spectacular failure. The estimates decay to a constant pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that the errors build up. Let us say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon. For instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that the accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
 
 Let us verify this observation by computing the $k$-step predictions on the entire sequence.
@@ -177,6 +257,22 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
 
 steps = (4, 8, 16, 32)
 d2l.plot([time[i:T-k+i] for i in steps], [features[i] for i in steps],
+         legend=['step %d' % i for i in steps], figsize=(4.5, 2.5))
+```
+
+```{.python .input}
+#@tab pytorch
+k = 33  # Look up to k - tau steps ahead
+
+features = torch.zeros((k, T-k))
+for i in range(tau):  # Copy the first tau features from x
+    features[i] = x[i:T-k+i]
+
+for i in range(tau, k):  # Predict the (i-tau)-th step
+    features[i] = net(features[(i-tau):i].T).T
+
+steps = (4, 8, 16, 32)
+d2l.plot([time[i:T-k+i] for i in steps], [features[i].detach() for i in steps],
          legend=['step %d' % i for i in steps], figsize=(4.5, 2.5))
 ```
 
