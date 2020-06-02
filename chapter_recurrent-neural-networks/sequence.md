@@ -145,10 +145,9 @@ def init_weights(m):
 
 # Vanilla MLP architecture
 def get_net():
-    net = nn.Sequential()
-    net.add_module('Linear_1', nn.Linear(4, 10))
-    net.add_module('ReLU', nn.ReLU())
-    net.add_module('Linear_2', nn.Linear(10, 1))
+    net = nn.Sequential(nn.Linear(4, 10),
+                        nn.ReLU(),
+                        nn.Linear(10, 1))
     net.apply(init_weights)
     return net
 
