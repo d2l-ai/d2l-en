@@ -1420,8 +1420,8 @@ over the past decade.
   often used via its high level API [Keras](https://github.com/keras-team/keras), [CNTK](https://github.com/Microsoft/CNTK), [Caffe 2](https://github.com/caffe2/caffe2), and [Apache MxNet](https://github.com/apache/incubator-mxnet). The third generation of tools, namely imperative tools for deep learning,
   was arguably spearheaded by [Chainer](https://github.com/chainer/chainer),
   which used a syntax similar to Python NumPy to describe models.
-  This idea was adopted by [PyTorch](https://github.com/pytorch/pytorch)
-  and the [Gluon API](https://github.com/apache/incubator-mxnet) of MXNet.
+  This idea was adopted by both [PyTorch](https://github.com/pytorch/pytorch),
+  the [Gluon API](https://github.com/apache/incubator-mxnet) of MXNet, and [Jax](https://github.com/google/jax).
   It is the latter group that this course uses to teach deep learning.
 
 The division of labor between systems researchers building better tools
