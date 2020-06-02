@@ -141,7 +141,7 @@ def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
-We test the `predict_rnn` function first. Given that we did not train the network, it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
+We test the `predict_ch8` function first. Given that we did not train the network, it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
 
 ```{.python .input  n=9}
 predict_ch8('time traveller ', 10, model, vocab, ctx)
