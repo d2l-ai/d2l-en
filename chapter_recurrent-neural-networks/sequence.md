@@ -298,6 +298,10 @@ This clearly illustrates how the quality of the estimates changes as we try to p
 1. Does causality also apply to text? To which extent?
 1. Give an example for when a latent autoregressive model might be needed to capture the dynamic of the data.
 
-## [Discussions](https://discuss.mxnet.io/t/2860)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/113)
+:end_tab:
 
-![](../img/qr_sequence.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/114)
+:end_tab:
