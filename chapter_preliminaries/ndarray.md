@@ -7,7 +7,7 @@ them; and (ii) process them once they are inside the computer.  There is no
 point in acquiring data without some way to store it, so let us get our hands
 dirty first by playing with synthetic data.  To start, we introduce the
 $n$-dimensional array. In Numpy and MXNet, such an array is called `ndarray`,
-while it called Tensor in PyTorch and TensorFlow. Through this book, we use the
+while it is called Tensor in PyTorch and TensorFlow. Through this book, we use the
 `ndarray` name convention, and `ndarray` is a class and we call any instance "an
 `ndarray`".
 

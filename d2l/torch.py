@@ -25,6 +25,7 @@ import sys
 import tarfile
 import time
 import zipfile
+import requests
 
 d2l = sys.modules[__name__]
 
@@ -334,7 +335,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
-        l = loss(net(X), y)
+        l = loss(net(X), y.reshape(-1, 1))
         if l.nelement() != 1:
             metric.add(l.sum(), y.numpy().size)
         else:
