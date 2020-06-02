@@ -10,7 +10,7 @@ requirements = [
 ]
 
 # don't import d2l to get __version__ since it has deps
-ver_re = re.compile("__version__ = \'([\.\d]+).*")
+ver_re = re.compile("__version__ = \"([\.\d]+).*")
 with open(os.path.join('d2l','__init__.py')) as f:
     lines = f.readlines()
 for l in lines:
