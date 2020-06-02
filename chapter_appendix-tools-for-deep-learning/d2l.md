@@ -8,7 +8,7 @@ The implementations of the following members of the `d2l` package and sections w
 
 ```eval_rst
 
-.. automodule:: d2l
+.. automodule:: d2l.mxnet
    :members:
    :imported-members:
 
@@ -20,7 +20,7 @@ The implementations of the following members of the `d2l` package and sections w
 
 ```eval_rst
 
-.. automodule:: d2l_pytorch
+.. automodule:: d2l.torch
    :members:
    :imported-members:
 
