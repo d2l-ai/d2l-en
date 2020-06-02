@@ -65,6 +65,10 @@ stage("Build and Publish") {
       sh label:"Build Package", script:"""set -ex
       conda activate ${ENV_NAME}
       d2lbook build pkg
+
+      pip install setuptools wheel
+      python setup.py sdist bdist_wheel
+      cp dist/* _build/html/
       """
 
       if (env.BRANCH_NAME == 'master') {
