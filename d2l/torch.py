@@ -539,7 +539,7 @@ d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def read_time_machine():
+def read_time_machine():  #@save
     """Load the time machine book into a list of sentences."""
     with open(d2l.download('time_machine'), 'r') as f:
         lines = f.readlines()
@@ -548,7 +548,7 @@ def read_time_machine():
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def tokenize(lines, token='word'):
+def tokenize(lines, token='word'):  #@save
     """Split sentences into word or char tokens."""
     if token == 'word':
         return [line.split(' ') for line in lines]
@@ -559,7 +559,7 @@ def tokenize(lines, token='word'):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-class Vocab:
+class Vocab:  #@save
     def __init__(self, tokens, min_freq=0, reserved_tokens=None):
         if reserved_tokens is None:
             reserved_tokens = []
@@ -590,14 +590,14 @@ class Vocab:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def count_corpus(sentences):
+def count_corpus(sentences):  #@save
     # Flatten a list of token lists into a list of tokens
     tokens = [tk for line in sentences for tk in line]
     return collections.Counter(tokens)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def load_corpus_time_machine(max_tokens=-1):
+def load_corpus_time_machine(max_tokens=-1):  #@save
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)

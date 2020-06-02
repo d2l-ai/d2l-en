@@ -99,7 +99,7 @@ We also install the `d2l` package that encapsulates frequently used
 functions and classes in this book.
 
 ```bash
-pip install git+https://github.com/d2l-ai/d2l-en
+pip install -U d2l -f https://d2l.ai/whl.html
 ```
 
 
