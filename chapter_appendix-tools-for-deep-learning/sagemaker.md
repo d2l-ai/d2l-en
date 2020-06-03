@@ -35,6 +35,7 @@ In :numref:`fig_sagemaker-create-2`, we choose `ml.p3.2xlarge`. With one Tesla V
 :begin_tab:`mxnet`
 A Jupyter notebook version of this book for fitting SageMaker is available at https://github.com/d2l-ai/d2l-en-sagemaker. We can specify this GitHub repository URL to let SageMaker clone this repository during instance creation, as shown in :numref:`fig_sagemaker-create-3`.
 :end_tab:
+
 :begin_tab:`pytorch`
 A Jupyter notebook version of this book for fitting SageMaker is available at https://github.com/d2l-ai/d2l-pytorch-sagemaker. We can specify this GitHub repository URL to let SageMaker clone this repository during instance creation, as shown in :numref:`fig_sagemaker-create-3`.
 :end_tab:
