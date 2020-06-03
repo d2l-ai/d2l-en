@@ -106,6 +106,7 @@ do this with a Python `for` loop, so `random.multinomial` supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
 :end_tab:
+
 :begin_tab:`pytorch`
 If you run the sampler a bunch of times, you will find that you get out random
 values each time. As with estimating the fairness of a die, we often want to
