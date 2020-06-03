@@ -1,7 +1,7 @@
 # Using Amazon SageMaker
 :label:`sec_sagemaker`
 
-Many deep learning applications require a significant amount of computation. Your local machine might be too slow to solve these problems in a reasonable amount of time. Cloud computing services give you access to more powerful computers to run the GPU-intensive portions of this book. This tutorial will guide you through Amazon SageMaker: a service that allows you to run this book easily. 
+Many deep learning applications require a significant amount of computation. Your local machine might be too slow to solve these problems in a reasonable amount of time. Cloud computing services give you access to more powerful computers to run the GPU-intensive portions of this book. This tutorial will guide you through Amazon SageMaker: a service that allows you to run this book easily.
 
 
 ## Registering and Logging In
@@ -18,13 +18,13 @@ After logging into your AWS account, search for "SageMaker" (see :numref:`fig_sa
 
 ## Creating a SageMaker Instance
 
-Next, let us create a notebook instance as described in :numref:`fig_sagemaker-create`. 
+Next, let us create a notebook instance as described in :numref:`fig_sagemaker-create`.
 
 ![Create a SageMaker instance.](../img/sagemaker-create.png)
 :width:`400px`
 :label:`fig_sagemaker-create`
 
-SageMaker provides multiple [instance types](https://aws.amazon.com/sagemaker/pricing/instance-types/) of different computational power and prices. 
+SageMaker provides multiple [instance types](https://aws.amazon.com/sagemaker/pricing/instance-types/) of different computational power and prices.
 When creating an instance, we can specify the instance name and choose its type.
 In :numref:`fig_sagemaker-create-2`, we choose `ml.p3.2xlarge`. With one Tesla V100 GPU and an 8-core CPU, this instance is powerful enough for most chapters.
 
@@ -32,7 +32,14 @@ In :numref:`fig_sagemaker-create-2`, we choose `ml.p3.2xlarge`. With one Tesla V
 :width:`400px`
 :label:`fig_sagemaker-create-2`
 
+:begin_tab:`mxnet`
 A Jupyter notebook version of this book for fitting SageMaker is available at https://github.com/d2l-ai/d2l-en-sagemaker. We can specify this GitHub repository URL to let SageMaker clone this repository during instance creation, as shown in :numref:`fig_sagemaker-create-3`.
+:end_tab:
+
+
+:begin_tab:`pytorch`
+A Jupyter notebook version of this book for fitting SageMaker is available at https://github.com/d2l-ai/d2l-pytorch-sagemaker. We can specify this GitHub repository URL to let SageMaker clone this repository during instance creation, as shown in :numref:`fig_sagemaker-create-3`.
+:end_tab:
 
 ![Specify the GitHub repository.](../img/sagemaker-create-3.png)
 :width:`400px`
@@ -49,7 +56,7 @@ When it is ready, you can click on the "Open Jupyter" link as shown in :numref:`
 :width:`400px`
 :label:`fig_sagemaker-open`
 
-Then, as shown in :numref:`fig_sagemaker-jupyter`, you may navigate through the Jupyter server running on this instance. 
+Then, as shown in :numref:`fig_sagemaker-jupyter`, you may navigate through the Jupyter server running on this instance.
 
 ![The Jupyter server running on the SageMaker instance.](../img/sagemaker-jupyter.png)
 :width:`400px`
@@ -65,7 +72,7 @@ After finishing your work, do not forget to stop the instance to avoid further c
 
 ## Updating Notebooks
 
-We will regularly update the notebooks in the [d2l-ai/d2l-en-sagemaker](https://github.com/d2l-ai/d2l-en-sagemaker) GitHub repository. You can simply use the `git pull` command to update to the latest version. 
+We will regularly update the notebooks in the [d2l-ai/d2l-en-sagemaker](https://github.com/d2l-ai/d2l-en-sagemaker) GitHub repository. You can simply use the `git pull` command to update to the latest version.
 First, you need to open a terminal as shown in :numref:`fig_sagemaker-terminal`.
 
 ![Open a terminal on the SageMaker instance.](../img/sagemaker-terminal.png)
@@ -74,12 +81,21 @@ First, you need to open a terminal as shown in :numref:`fig_sagemaker-terminal`.
 
 You may want to commit your local changes before pulling the updates. Alternatively, you can simply ignore all your local changes with the following commands in the terminal.
 
+:begin_tab:`mxnet`
 ```bash
 cd SageMaker/d2l-en-sagemaker/
 git reset --hard
 git pull
 ```
+:end_tab:
 
+:begin_tab:`pytorch`
+```bash
+cd SageMaker/d2l-pytorch-sagemaker/
+git reset --hard
+git pull
+```
+:end_tab:
 
 ## Summary
 
@@ -90,7 +106,7 @@ git pull
 ## Exercises
 
 1. Try to edit and run the code in this book using Amazon SageMaker.
-1. Access the `SageMaker/d2l-en-sagemaker/` directory via the terminal.
+1. Access the source code directory via the terminal.
 
 
 ## [Discussions](https://discuss.mxnet.io/t/5640)
