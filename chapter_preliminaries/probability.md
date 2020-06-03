@@ -66,9 +66,7 @@ that assigns probabilities to a number of discrete choices is called the
 *distribution* later, but at a high level, think of it as just an assignment of
 probabilities to events.
 
-
 :begin_tab:`mxnet`
-
 In MXNet, we can sample from the multinomial
 distribution via the aptly named `np.random.multinomial` function.
 The function
@@ -76,11 +74,9 @@ can be called in many ways, but we will focus on the simplest.
 To draw a single sample, we simply pass in a vector of probabilities.
 The output of the `np.random.multinomial` function is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
-
 :end_tab:
 
 :begin_tab:`pytorch`
-
 In PyTorch, we can sample from the multinomial
 distribution via the class `Multinomial` defined in the
 `distributions.multinomial` module.
@@ -89,9 +85,7 @@ can be called in many ways, but we will focus on the simplest.
 To draw a single sample, we simply pass in a vector of probabilities.
 The output of the `sample` method of this class  is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
-
 :end_tab:
-
 
 ```{.python .input}
 fair_probs = [1.0 / 6] * 6
@@ -104,12 +98,23 @@ fair_probs = torch.ones([6]) / 6
 multinomial.Multinomial(1, fair_probs).sample()
 ```
 
+:begin_tab:`mxnet`
 If you run the sampler a bunch of times, you will find that you get out random
 values each time. As with estimating the fairness of a die, we often want to
 generate many samples from the same distribution. It would be unbearably slow to
-do this with a Python `for` loop, it supports drawing
+do this with a Python `for` loop, so `random.multinomial` supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
+:end_tab:
+
+:begin_tab:`pytorch`
+If you run the sampler a bunch of times, you will find that you get out random
+values each time. As with estimating the fairness of a die, we often want to
+generate many samples from the same distribution. It would be unbearably slow to
+do this with a Python `for` loop, so `multinomial.Multinomial` supports drawing
+multiple samples at once, returning an array of independent samples in any shape
+we might desire.
+:end_tab:
 
 ```{.python .input}
 np.random.multinomial(10, fair_probs)
@@ -415,7 +420,7 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 
 ## Summary
 
-* We sample numbers from probability distributions.
+* We can sample from probability distributions.
 * We can analyze multiple random variables using joint distribution, conditional distribution, Bayes' theorem, marginalization, and independence assumptions.
 * Expectation and variance offer useful measures to summarize key characteristics of probability distributions.
 

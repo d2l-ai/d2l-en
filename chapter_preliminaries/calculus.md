@@ -181,7 +181,6 @@ def set_figsize(figsize=(3.5, 2.5)):  #@save
 
 The following `set_axes` function sets properties of axes of figures produced by `matplotlib`.
 
-
 ```{.python .input}
 #@tab all
 def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):  #@save
@@ -201,7 +200,6 @@ With these $3$ functions for figure configurations,
 we define the `plot` function
 to plot multiple curves succinctly
 since we will need to visualize many curves throughout the book.
-
 
 ```{.python .input}
 #@tab all

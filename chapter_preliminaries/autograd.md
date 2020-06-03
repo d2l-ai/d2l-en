@@ -8,19 +8,40 @@ requiring only some basic calculus,
 for complex models, working out the updates by hand
 can be a pain (and often error-prone).
 
-Every deep learning framework can automatically calculate derivatives, i.e., *automatic differentiation*.
+
+:begin_tab:`mxnet`
+The `autograd` package expedites this work 
+by automatically calculating derivatives, i.e., *automatic differentiation*. 
+And while many other libraries require 
+that we compile a symbolic graph to take automatic derivatives, 
+`autograd` allows us to take derivatives 
+while writing ordinary imperative code. 
+Every time we pass data through our model, 
+`autograd` builds a graph on the fly, 
+tracking which data combined through 
+which operations to produce the output. 
+This graph enables `autograd` 
+to subsequently backpropagate gradients on command. 
+Here, *backpropagate* simply means to trace through the *computational graph*,
+filling in the partial derivatives with respect to each parameter.
+:end_tab:
+
+:begin_tab:`pytorch`
+Deep learning frameworks can expedite this work
+by automatically calculating derivatives, i.e., *automatic differentiation*.
 And while many other libraries require
 that we compile a symbolic graph to take automatic derivatives,
-both MXNet and PyTorch allow us to take derivatives
-while writing  ordinary imperative code.
+PyTorch allows us to take derivatives
+while writing ordinary imperative code.
 Every time we pass data through our model,
 they build a graph on the fly,
 tracking which data combined through
 which operations to produce the output.
-This graph enables
+This graph enables PyTorch
 to subsequently backpropagate gradients on command.
 Here, *backpropagate* simply means to trace through the *computational graph*,
 filling in the partial derivatives with respect to each parameter.
+:end_tab:
 
 ```{.python .input}
 from mxnet import autograd, np, npx
@@ -38,6 +59,18 @@ As a toy example, say that we are interested
 in differentiating the function
 $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to the column vector $\mathbf{x}$.
+To start, let us create the variable `x` and assign it an initial value.
+
+```{.python .input}
+x = np.arange(4.0)
+x
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.arange(4.0, requires_grad=True)
+x
+```
 
 Note that before we even calculate the gradient
 of $y$ with respect to $\mathbf{x}$,
@@ -54,19 +87,6 @@ is itself vector-valued and has the same shape as $\mathbf{x}$.
 Thus it is intuitive that in code,
 we will access a gradient taken with respect to `x`
 as an attribute of the `ndarray` `x` itself.
-
-To start, let us create the variable `x` and assign it an initial value.
-
-```{.python .input}
-x = np.arange(4.0)
-x
-```
-
-```{.python .input}
-#@tab pytorch
-x = torch.arange(4.0, requires_grad=True)
-x
-```
 
 :begin_tab:`mxnet`
 
@@ -88,11 +108,10 @@ will not alter the parameters' value.
 
 :begin_tab:`pytorch`
 
-Note the `requires_grad=True` argument when creating $x$, it tells the framework
-we need allocate gradient space for $x$ in the future.
+Note the `requires_grad=True` argument when creating `x`, it tells the framework
+we need allocate gradient space for `x` in the future.
 
 :end_tab:
-
 
 ```{.python .input}
 x.attach_grad()
@@ -104,18 +123,23 @@ x.grad
 x.grad
 ```
 
-
-
-
 :begin_tab:`mxnet`
-Now let us calculate $y$. Note that MXNet will only record the computation
+Now let us calculate $y$.
+Because we wish to subsequently calculate gradients,
+we want MXNet to generate a computational graph on the fly.
+We could imagine that MXNet would be turning on a recording device
+to capture the exact path by which each variable is generated.
+
+Note that building the computational graph
+requires a nontrivial amount of computation.
+So MXNet will only build the graph when explicitly told to do so.
+We can invoke this behavior by placing our code
 inside an `autograd.record` scope.
 :end_tab:
 
 :begin_tab:`pytorch`
 Now let us calculate $y$.
 :end_tab:
-
 
 ```{.python .input}
 with autograd.record():
@@ -125,12 +149,12 @@ y
 
 ```{.python .input}
 #@tab pytorch
-y = 2*torch.dot(x,x)
+y = 2 * torch.dot(x, x)
 y
 ```
 
 Since `x` is an `ndarray` of length 4,
-`dot` will perform an inner product of `x` and `x`,
+the `dot` operator will perform an inner product of `x` and `x`,
 yielding the scalar output that we assign to `y`.
 Next, we can automatically calculate the gradient of `y`
 with respect to each component of `x`
@@ -187,7 +211,6 @@ values in `x.grad` first, as PyTorch accumulates and adds the gradient in defaul
 
 :end_tab:
 
-
 ```{.python .input}
 with autograd.record():
     y = x.sum()
@@ -204,6 +227,8 @@ x.grad
 ```
 
 :begin_tab:`mxnet`
+
+## Backward for Non-Scalar Variables
 
 Technically, when `y` is not a scalar,
 the most natural interpretation of the differentiation of a vector `y`
@@ -242,7 +267,6 @@ v.backward()
 
 x.grad == u.grad
 ```
-
 
 ## Detaching Computation
 
@@ -381,9 +405,9 @@ when we subsequently use it to make predictions.
 
 :begin_tab:`mxnet`
 
-We can often distinguish the training mode with the prediction mode by
- calling the `is_training` function, which indicates if we are in the
-`autograd.record` scope or not.
+The running mode can be either *training mode* or *prediction mode*.
+This can be told when the `is_training` function is called,
+which indicates if we are in the `autograd.record` scope or not.
 
 :end_tab:
 
@@ -395,19 +419,17 @@ the book.
 
 :end_tab:
 
-
 ```{.python .input}
 print(autograd.is_training())
 with autograd.record():
     print(autograd.is_training())
 ```
 
-
 ## Summary
 
 * Deep learning frameworks can automate the calculation of derivatives. To use it, we first attach gradients to those variables with respect to which we desire partial derivatives. We then record the computation of our target value, execute its `backward` function, and access the resulting gradient via our variable's `grad` attribute.
 * We can detach gradients to control the part of the computation that will be used in the `backward` function.
-* There are training mode and prediction mode.
+* The running modes include training mode and prediction mode.
 
 
 ## Exercises
