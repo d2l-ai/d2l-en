@@ -16,12 +16,11 @@ We will cover more data preprocessing techniques in later chapters.
 As an example, we begin by creating an artificial dataset that is stored in a
 csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other
 formats may be processed in similar ways.
-
 The following `mkdir_if_not_exist`
 function ensures that the directory `../data` exists. The comment `#@save`
-s a special mark where the following function,
-class, or import statements are also saved in the `d2l` package so that we can
-directly invoke `d2l.mkdir_if_not_exist()` later.
+is a special mark where the following function,
+class, or import statements are also saved in the `d2l` package so that later we can
+directly invoke the `mkdir_if_not_exist` function without redefining it.
 
 ```{.python .input}
 #@tab all

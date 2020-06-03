@@ -6,7 +6,7 @@ Due to constraints on the length of this book, we cannot possibly introduce ever
 
 In order to know which functions and classes can be called in a module, we
 invoke the `dir` function. For instance, we can query all properties in the
-module to generate random numbers:
+module for generating random numbers:
 
 ```{.python .input  n=1}
 from mxnet import np
@@ -95,13 +95,16 @@ For further details on the API details check the PyTorch website at
 
 ## Exercises
 
-1. Look up `ones_like` on the website.
-
-
 :begin_tab:`mxnet`
+1. Look up `ones_like` and `autograd` on the MXNet website.
+2. What are all the possible outputs after running `np.random.choice(4, 2)`?
+3. Can you rewrite `np.random.choice(4, 2)` by using the `np.random.randint` function?
+
 [Discussions](https://discuss.d2l.ai/t/38)
 :end_tab:
 
 :begin_tab:`pytorch`
+1. Look up `ones_like` on the MXNet website.
+
 [Discussions](https://discuss.d2l.ai/t/39)
 :end_tab:
