@@ -65,6 +65,7 @@ that assigns probabilities to a number of discrete choices is called the
 *multinomial distribution*. We will give a more formal definition of
 *distribution* later, but at a high level, think of it as just an assignment of
 probabilities to events.
+
 :begin_tab:`mxnet`
 In MXNet, we can sample from the multinomial
 distribution via the aptly named `np.random.multinomial` function.
@@ -74,6 +75,7 @@ To draw a single sample, we simply pass in a vector of probabilities.
 The output of the `np.random.multinomial` function is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
 :end_tab:
+
 :begin_tab:`pytorch`
 In PyTorch, we can sample from the multinomial
 distribution via the class `Multinomial` defined in the
