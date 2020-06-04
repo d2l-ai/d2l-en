@@ -256,13 +256,13 @@ and compute the gradient of that scalar variable with respect to `x`.
 
 ```{.python .input}
 with autograd.record():
-    y = x * x  # y is a vector
+    y = x * x  # `y` is a vector
 y.backward()
 
 u = x.copy()
 u.attach_grad()
 with autograd.record():
-    v = (u * u).sum()  # v is a scalar
+    v = (u * u).sum()  # `v` is a scalar
 v.backward()
 
 x.grad == u.grad

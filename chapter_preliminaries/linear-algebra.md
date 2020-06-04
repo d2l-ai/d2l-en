@@ -324,14 +324,14 @@ performs elementwise addition over these two matrices.
 
 ```{.python .input}
 A = np.arange(20).reshape(5, 4)
-B = A.copy()  # Assign a copy of A to B by allocating new memory
+B = A.copy()  # Assign a copy of `A` to `B` by allocating new memory
 A, A + B
 ```
 
 ```{.python .input}
 #@tab pytorch
 A = torch.arange(20, dtype = torch.float32).reshape(5, 4)
-B = A.clone()  # Assign a copy of A to B by allocating new memory
+B = A.clone()  # Assign a copy of `A` to `B` by allocating new memory
 A, A + B
 ```
 
