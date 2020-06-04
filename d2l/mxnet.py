@@ -45,7 +45,7 @@ def set_figsize(figsize=(3.5, 2.5)):  #@save
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):  #@save
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
     axes.set_xlabel(xlabel)
     axes.set_ylabel(ylabel)
@@ -62,14 +62,14 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):  #@save
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
-    """Plot data points."""
+    """Plot data instances."""
     if legend is None:
         legend = []
 
     set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
 
-    # Return True if X (ndarray or list) has 1 axis
+    # Return True if `X` (ndarray or list) has 1 axis
     def has_one_axis(X):
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))
@@ -145,7 +145,7 @@ def sgd(params, lr, batch_size):  #@save
         param[:] = param - lr * param.grad / batch_size
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression-gluon.md
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a Gluon data loader."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
@@ -707,7 +707,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
     print(predict('traveller'))
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/rnn-gluon.md
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
 class RNNModel(nn.Block):
     def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
@@ -1260,7 +1260,7 @@ def split_batch(X, y, ctx_list):
             gluon.utils.split_and_load(y, ctx_list))
 
 
-# Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
+# Defined in file: ./chapter_computational-performance/multiple-gpus-concise.md
 def resnet18(num_classes):
     """A slightly modified ResNet-18 model."""
     def resnet_block(num_channels, num_residuals, first_block=False):
@@ -1286,7 +1286,7 @@ def resnet18(num_classes):
     return net
 
 
-# Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
+# Defined in file: ./chapter_computational-performance/multiple-gpus-concise.md
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     # Query the list of devices
     ctx = list(net.collect_params().values())[0].list_ctx()
@@ -1519,12 +1519,12 @@ def load_data_voc(batch_size, crop_size):
     return train_iter, test_iter
 
 
-# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
+# Defined in file: ./chapter_computer-vision/kaggle-cifar10.md
 d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL + 'kaggle_cifar10_tiny.zip',
                                 '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')
 
 
-# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
+# Defined in file: ./chapter_computer-vision/kaggle-cifar10.md
 def read_csv_labels(fname):
     """Read fname to return a name to label dictionary."""
     with open(fname, 'r') as f:
@@ -1534,14 +1534,14 @@ def read_csv_labels(fname):
     return dict(((name, label) for name, label in tokens))
 
 
-# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
+# Defined in file: ./chapter_computer-vision/kaggle-cifar10.md
 def copyfile(filename, target_dir):
     """Copy a file into a target directory."""
     d2l.mkdir_if_not_exist(target_dir)
     shutil.copy(filename, target_dir)
 
 
-# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
+# Defined in file: ./chapter_computer-vision/kaggle-cifar10.md
 def reorg_train_valid(data_dir, labels, valid_ratio):
     # The number of examples of the class with the least examples in the
     # training dataset
@@ -1567,7 +1567,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
     return n_valid_per_label
 
 
-# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
+# Defined in file: ./chapter_computer-vision/kaggle-cifar10.md
 def reorg_test(data_dir):
     for test_file in os.listdir(os.path.join(data_dir, 'test')):
         copyfile(os.path.join(data_dir, 'test', test_file),
@@ -1575,7 +1575,7 @@ def reorg_test(data_dir):
                               'unknown'))
 
 
-# Defined in file: ./chapter_computer-vision/kaggle-gluon-dog.md
+# Defined in file: ./chapter_computer-vision/kaggle-dog.md
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 

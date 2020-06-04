@@ -52,7 +52,7 @@ def set_figsize(figsize=(3.5, 2.5)):  #@save
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):  #@save
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
     axes.set_xlabel(xlabel)
     axes.set_ylabel(ylabel)
@@ -69,14 +69,14 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):  #@save
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
-    """Plot data points."""
+    """Plot data instances."""
     if legend is None:
         legend = []
 
     set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
 
-    # Return True if X (ndarray or list) has 1 axis
+    # Return True if `X` (ndarray or list) has 1 axis
     def has_one_axis(X):
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))
@@ -153,7 +153,7 @@ def sgd(params, lr, batch_size):  #@save
         param.grad.data.zero_()
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression-gluon.md
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data loader"""
     dataset = data.TensorDataset(*data_arrays)
