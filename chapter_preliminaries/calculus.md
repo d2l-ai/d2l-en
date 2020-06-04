@@ -2,7 +2,7 @@
 :label:`sec_calculus`
 
 Finding the area of a polygon had remained mysterious
-until at least $2,500$ years ago, when ancient Greeks divided a polygon into triangles and summed their areas.
+until at least 2,500 years ago, when ancient Greeks divided a polygon into triangles and summed their areas.
 To find the area of curved shapes, such as a circle,
 ancient Greeks inscribed polygons in such shapes.
 As shown in :numref:`fig_circle_area`,
@@ -13,7 +13,7 @@ the circle. This process is also known as the *method of exhaustion*.
 :label:`fig_circle_area`
 
 In fact, the method of exhaustion is where *integral calculus* (will be described in :numref:`sec_integral_calculus`) originates from.
-More than $2,000$ years later,
+More than 2,000 years later,
 the other branch of calculus, *differential calculus*,
 was invented.
 Among the most critical applications of differential calculus,
@@ -197,7 +197,7 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     axes.grid()
 ```
 
-With these $3$ functions for figure configurations,
+With these three functions for figure configurations,
 we define the `plot` function
 to plot multiple curves succinctly
 since we will need to visualize many curves throughout the book.

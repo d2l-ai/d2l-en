@@ -71,10 +71,10 @@ Arrays with more than two axes do not have special
 mathematical names---we simply call them *tensors*.
 
 To start, we can use `arange` to create a row vector `x`
-containing the first $12$ integers starting with $0$,
+containing the first 12 integers starting with 0,
 though they are created as floats by default.
 Each of the values in an `ndarray` is called an *element* of the `ndarray`.
-For instance, there are $12$ elements in the `ndarray` `x`.
+For instance, there are 12 elements in the `ndarray` `x`.
 Unless otherwise specified, a new `ndarray`
 will be stored in main memory and designated for CPU-based computation.
 
@@ -120,9 +120,9 @@ To change the shape of an `ndarray` without altering
 either the number of elements or their values,
 we can invoke the `reshape` function.
 For example, we can transform our `ndarray`, `x`,
-from a row vector with shape ($12$,) to a matrix with shape ($3$, $4$).
+from a row vector with shape (12,) to a matrix with shape (3, 4).
 This new `ndarray` contains the exact same values,
-but views them as a matrix organized as $3$ rows and $4$ columns.
+but views them as a matrix organized as 3 rows and 4 columns.
 To reiterate, although the shape has changed,
 the elements in `x` have not.
 Note that the `size` is unaltered by reshaping.
@@ -142,8 +142,8 @@ Reshaping by manually specifying every dimension is unnecessary.
 If our target shape is a matrix with shape (height, width),
 then after we know the width, the height is given implicitly.
 Why should we have to perform the division ourselves?
-In the example above, to get a matrix with $3$ rows,
-we specified both that it should have $3$ rows and $4$ columns.
+In the example above, to get a matrix with 3 rows,
+we specified both that it should have 3 rows and 4 columns.
 Fortunately, `ndarray` can automatically work out one dimension given the rest.
 We invoke this capability by placing `-1` for the dimension
 that we would like `ndarray` to automatically infer.
@@ -168,7 +168,7 @@ Typically, we will want our matrices initialized
 either with zeros, ones, some other constants,
 or numbers randomly sampled from a specific distribution.
 We can create an `ndarray` representing a tensor with all elements
-set to $0$ and a shape of ($2$, $3$, $4$) as follows:
+set to 0 and a shape of (2, 3, 4) as follows:
 
 ```{.python .input}
 np.zeros((2, 3, 4))
@@ -196,10 +196,10 @@ from some probability distribution.
 For example, when we construct arrays to serve
 as parameters in a neural network, we will
 typically initialize their values randomly.
-The following snippet creates an `ndarray` with shape ($3$, $4$).
+The following snippet creates an `ndarray` with shape (3, 4).
 Each of its elements is randomly sampled
 from a standard Gaussian (normal) distribution
-with a mean of $0$ and a standard deviation of $1$.
+with a mean of 0 and a standard deviation of 1.
 
 ```{.python .input}
 np.random.normal(0, 1, size=(3, 4))
@@ -212,7 +212,7 @@ torch.randn(3, 4)
 
 We can also specify the exact values for each element in the desired `ndarray`
 by supplying a Python list (or list of lists) containing the numerical values.
-Here, the outermost list corresponds to axis $0$, and the inner list to axis $1$.
+Here, the outermost list corresponds to axis 0, and the inner list to axis 1.
 
 ```{.python .input}
 np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
@@ -262,7 +262,7 @@ The common standard arithmetic operators
 have all been *lifted* to elementwise operations
 for any identically-shaped tensors of arbitrary shape.
 We can call elementwise operations on any two tensors of the same shape.
-In the following example, we use commas to formulate a $5$-element tuple,
+In the following example, we use commas to formulate a 5-element tuple,
 where each element is the result of an elementwise operation.
 
 ```{.python .input}
@@ -301,12 +301,12 @@ stacking them end-to-end to form a larger `ndarray`.
 We just need to provide a list of `ndarray`s
 and tell the system along which axis to concatenate.
 The example below shows what happens when we concatenate
-two matrices along rows (axis $0$, the first element of the shape)
-vs. columns (axis $1$, the second element of the shape).
-We can see that the first output `ndarray`'s axis-$0$ length ($6$)
-is the sum of the two input `ndarray`s' axis-$0$ lengths ($3 + 3$);
-while the second output `ndarray`'s axis-$1$ length ($8$)
-is the sum of the two input `ndarray`s' axis-$1$ lengths ($4 + 4$).
+two matrices along rows (axis 0, the first element of the shape)
+vs. columns (axis 1, the second element of the shape).
+We can see that the first output `ndarray`'s axis-0 length ($6$)
+is the sum of the two input `ndarray`s' axis-0 lengths ($3 + 3$);
+while the second output `ndarray`'s axis-1 length ($8$)
+is the sum of the two input `ndarray`s' axis-1 lengths ($4 + 4$).
 
 ```{.python .input}
 x = np.arange(12).reshape(3, 4)
@@ -324,9 +324,9 @@ torch.cat((x, y), dim=0), torch.cat((x, y), dim=1)
 Sometimes, we want to construct a binary `ndarray` via *logical statements*.
 Take `x == y` as an example.
 For each position, if `x` and `y` are equal at that position,
-the corresponding entry in the new `ndarray` takes a value of $1$,
+the corresponding entry in the new `ndarray` takes a value of 1,
 meaning that the logical statement `x == y` is true at that position;
-otherwise that position takes $0$.
+otherwise that position takes 0.
 
 ```{.python .input}
 x == y
@@ -365,7 +365,7 @@ Second, carry out the elementwise operations
 on the resulting arrays.
 
 In most cases, we broadcast along an axis where an array
-initially only has length $1$, such as in the following example:
+initially only has length 1, such as in the following example:
 
 ```{.python .input}
 a = np.arange(3).reshape(3, 1)
@@ -399,7 +399,7 @@ a + b
 ## Indexing and Slicing
 
 Just as in any other Python array, elements in an `ndarray` can be accessed by index.
-As in any Python array, the first element has index $0$
+As in any Python array, the first element has index 0
 and ranges are specified to include the first but *before* the last element.
 As in standard Python lists, we can access elements
 according to their relative position to the end of the list
@@ -433,10 +433,10 @@ x
 If we want to assign multiple elements the same value,
 we simply index all of them and then assign them the value.
 For instance, `[0:2, :]` accesses the first and second rows,
-where `:` takes all the elements along axis $1$ (column).
+where `:` takes all the elements along axis 1 (column).
 While we discussed indexing for matrices,
 this obviously also works for vectors
-and for tensors of more than $2$ dimensions.
+and for tensors of more than 2 dimensions.
 
 ```{.python .input}
 x[0:2, :] = 12
@@ -567,10 +567,7 @@ a, a.item(), float(a), int(a)
 
 ## Summary
 
-* $n$-dimensional array, called `ndarray` or tensor, is the main interface to
-  store and manipulate data. It provides a variety of functionalities including
-  basic mathematics operations, broadcasting, indexing, slicing, memory saving,
-  and conversion to other Python objects.
+* The main interface to store and manipulate data for deep learning is the $n$-dimensional array. It provides a variety of functionalities including basic mathematics operations, broadcasting, indexing, slicing, memory saving, and conversion to other Python objects.
 
 
 ## Exercises
