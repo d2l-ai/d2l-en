@@ -8,10 +8,10 @@ Before we get into the details of deep neural networks, we need to cover the bas
 
 linear-regression
 linear-regression-scratch
-linear-regression-gluon
+linear-regression-concise
 softmax-regression
 image-classification-dataset
 softmax-regression-scratch
-softmax-regression-gluon
+softmax-regression-concise
 ```
 
