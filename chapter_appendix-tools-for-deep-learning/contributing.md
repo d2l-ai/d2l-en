@@ -15,15 +15,16 @@ After you are done, fill in your change descriptions in the "Propose file change
 
 ## Propose a Major Change
 
-If you plan to update a large portion of text or codes, then you need to know a little bit more about the format this book is using. The source file is based on the [markdown format](https://daringfireball.net/projects/markdown/syntax) with a set of extensions through [the `d2lbook` package](http://book.d2l.ai/user/markdown.html) such as referring to equations, images, chapters, and citations. You can use any Markdown editors to open these files and make your changes. 
+If you plan to update a large portion of text or code, then you need to know a little bit more about the format this book is using. The source file is based on the [markdown format](https://daringfireball.net/projects/markdown/syntax) with a set of extensions through [the `d2lbook` package](http://book.d2l.ai/user/markdown.html) such as referring to equations, images, chapters, and citations. You can use any Markdown editors to open these files and make your changes. 
 
-If you would like to change the codes, we recommend you to use Jupyter to open these Markdown files as described in :numref:`sec_jupyter`. So that you can run and test your changes. Please remember to clear all outputs before submitting your changes, our CI system will execute the sections you updated to generate outputs.   
+If you would like to change the code, we recommend you to use Jupyter to open these Markdown files as described in :numref:`sec_jupyter`. So that you can run and test your changes. Please remember to clear all outputs before submitting your changes, our CI system will execute the sections you updated to generate outputs.   
 
-Some sections may support multiple framework implementations, you can use `d2lbook` to activate a particular framework, so others framework implementations become markdown code blocks and will not be executed when you "Run All" in Jupyter. In other words, first install `d2lbook` by 
+Some sections may support multiple framework implementations, you can use `d2lbook` to activate a particular framework, so others framework implementations become markdown code blocks and will not be executed when you "Run All" in Jupyter. In other words, first install `d2lbook` by
 
 ```bash
 pip install git+https://github.com/d2l-ai/d2l-book
 ```
+
 
 Then in the root directory of `d2l-en`, you can activate a particular implementation by running one of the following commands:
 
@@ -32,21 +33,23 @@ d2lbook activate mxnet chapter_multilayer-perceptrons/mlp-scratch.md
 d2lbook activate pytorch chapter_multilayer-perceptrons/mlp-scratch.md 
 ```
 
-Before submitting your changes, please clear all code block outputs and activate all by 
+
+Before submitting your changes, please clear all code block outputs and activate all by
 
 ```bash
 d2lbook activate all chapter_multilayer-perceptrons/mlp-scratch.md
 ```
 
+
 If you add a new code block not for the default implementation, which is MXNet. Please use `#@tab` to mark this block on the beginning line. For exmaple, `#@tab pytorch` for a PyTorch code block, or `#@tab all` a shared code block for all implementations. You may refer to [d2lbook](http://book.d2l.ai/user/code_tabs.html) for more information. 
 
 ## Adding a New Section or a New Framework Implementation
 
-If you want to create a new chapter, e.g. reinforcement learning, or add a new implementation, such as TensorFlow, please contact the authors first, either by emailing or using [github issues](https://github.com/d2l-ai/d2l-en/issues). 
+If you want to create a new chapter, e.g. reinforcement learning, or add implementations of new frameworks, such as TensorFlow, please contact the authors first, either by emailing or using [github issues](https://github.com/d2l-ai/d2l-en/issues). 
 
 ## Submitting a Major Change
 
-we suggest you to use the standard `git` process to submit a major change. In a nutshell the process works as described in :numref:`fig_contribute`.
+We suggest you to use the standard `git` process to submit a major change. In a nutshell the process works as described in :numref:`fig_contribute`.
 
 ![Contributing to the book.](../img/contribute.svg)
 :label:`fig_contribute`
@@ -84,6 +87,7 @@ To clone the repository (i.e., to make a local copy) we need to get its reposito
 # Replace your_github_username with your GitHub username
 git clone https://github.com/your_github_username/d2l-en.git
 ```
+
 
 ### Editing the Book and Push
 
