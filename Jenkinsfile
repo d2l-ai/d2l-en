@@ -33,23 +33,19 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
-      rm -rf _build/eval/data
-      [ -e _build/data_tmp ] && mv _build/data_tmp _build/eval/data
+      ./static/cache.sh restore _build/eval/data _build/data_tmp
       ./static/clean_eval.sh
       d2lbook build eval
-      rm -rf _build/data_tmp
-      mv _build/eval/data _build/data_tmp
+      ./static/cache.sh store _build/eval/data _build/data_tmp
       """
 
       sh label: "Execute Notebooks [Pytorch]", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
-      rm -rf _build/eval_pytorch/data
-      [ -e _build/data_pytorch_tmp ] && mv _build/data_pytorch_tmp _build/eval_pytorch/data
+      ./static/cache.sh restore _build/eval_pytorch/data _build/data_pytorch_tmp
       d2lbook build eval --tab pytorch
-      rm -rf _build/data_pytorch_tmp
-      mv _build/eval_pytorch/data _build/data_pytorch_tmp
+      ./static/cache.sh store _build/eval_pytorch/data _build/data_pytorch_tmp
       """
 
       sh label:"Build HTML", script:"""set -ex
