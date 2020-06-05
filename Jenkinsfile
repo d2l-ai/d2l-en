@@ -1,5 +1,5 @@
 stage("Build and Publish") {
-  def TASK = "d2l-en"
+  def TASK = "d2l-tf"
   node {
     ws("workspace/${TASK}") {
       checkout scm
@@ -19,6 +19,8 @@ stage("Build and Publish") {
       # pytorch
       pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
       pip install torchvision
+      # tensorflow
+      pip install tensorflow
       # check
       pip list
       nvidia-smi
@@ -48,6 +50,15 @@ stage("Build and Publish") {
       ./static/cache.sh store _build/eval_pytorch/data _build/data_pytorch_tmp
       """
 
+      sh label: "Execute Notebooks [Tensorflow]", script: """set -ex
+      conda activate ${ENV_NAME}
+      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
+      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
+      ./static/cache.sh restore _build/eval_tensorflow/data _build/data_tensorflow_tmp
+      d2lbook build eval --tab tensorflow
+      ./static/cache.sh store _build/eval_tensorflow/data _build/data_tensorflow_tmp
+      """
+
       sh label:"Build HTML", script:"""set -ex
       conda activate ${ENV_NAME}
       ./static/build_html.sh
@@ -64,7 +75,7 @@ stage("Build and Publish") {
       ./static/build_whl.sh
       """
 
-      if (env.BRANCH_NAME == 'master') {
+      if (env.BRANCH_NAME == 'tensorflow') {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
         d2lbook deploy html pdf pkg
