@@ -91,7 +91,7 @@ The probability formulae that involve one, two, and three variables are typicall
 
 Let us see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`sec_text_preprocessing` and print the top $10$ most frequent words.
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import np, npx
 import random
@@ -102,9 +102,22 @@ vocab = d2l.Vocab(tokens)
 print(vocab.token_freqs[:10])
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+import numpy as np
+import random
+
+tokens = d2l.tokenize(d2l.read_time_machine())
+vocab = d2l.Vocab(tokens)
+print(vocab.token_freqs[:10])
+```
+
 As we can see, the most popular words are actually quite boring to look at. They are often referred to as [stop words](https://en.wikipedia.org/wiki/Stop_words) and thus filtered out. That said, they still carry meaning and we will use them nonetheless. However, one thing that is quite clear is that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea we plot the graph of the word frequency.
 
-```{.python .input  n=2}
+```{.python .input}
+#@tab all
 freqs = [freq for token, freq in vocab.token_freqs]
 d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
          xscale='log', yscale='log')
@@ -117,7 +130,8 @@ $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
 
 This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But what about the other word combinations (such as bigrams, trigrams, and beyond)? Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
 
-```{.python .input  n=3}
+```{.python .input}
+#@tab all
 bigram_tokens = [[pair for pair in zip(
     line[:-1], line[1:])] for line in tokens]
 bigram_vocab = d2l.Vocab(bigram_tokens)
@@ -126,7 +140,8 @@ print(bigram_vocab.token_freqs[:10])
 
 One thing is notable here. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
 
-```{.python .input  n=4}
+```{.python .input}
+#@tab all
 trigram_tokens = [[triple for triple in zip(line[:-2], line[1:-1], line[2:])]
                   for line in tokens]
 trigram_vocab = d2l.Vocab(trigram_tokens)
@@ -135,7 +150,8 @@ print(trigram_vocab.token_freqs[:10])
 
 Last, let us visualize the token frequency among these three gram models: unigrams, bigrams, and trigrams.
 
-```{.python .input  n=5}
+```{.python .input}
+#@tab all
 bigram_freqs = [freq for token, freq in bigram_vocab.token_freqs]
 trigram_freqs = [freq for token, freq in trigram_vocab.token_freqs]
 d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token',
@@ -164,7 +180,7 @@ Hence, which one should we pick? In fact, all of them are equally good. But if w
 The following code randomly generates a minibatch from the data each time. Here, the batch size `batch_size` indicates the number of examples in each minibatch and `num_steps` is the length of the sequence (or timesteps if we have a time series) included in each example.
 In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random minibatches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
 
-```{.python .input  n=1}
+```{.python .input}
 #@save
 def seq_data_iter_random(corpus, batch_size, num_steps):
     # Offset the iterator over the data for uniform starts
@@ -188,11 +204,37 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
         yield np.array(X), np.array(Y)
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def seq_data_iter_random(corpus, batch_size, num_steps):
+    # Offset the iterator over the data for uniform starts
+    corpus = corpus[random.randint(0, num_steps):]
+    # Subtract 1 extra since we need to account for label
+    num_examples = ((len(corpus) - 1) // num_steps)
+    example_indices = list(range(0, num_examples * num_steps, num_steps))
+    random.shuffle(example_indices)
+
+    def data(pos):
+        # This returns a sequence of the length num_steps starting from pos
+        return corpus[pos: pos + num_steps]
+
+    # Discard half empty batches
+    num_batches = num_examples // batch_size
+    for i in range(0, batch_size * num_batches, batch_size):
+        # Batch_size indicates the random examples read each time
+        batch_indices = example_indices[i:(i+batch_size)]
+        X = [data(j) for j in batch_indices]
+        Y = [data(j + 1) for j in batch_indices]
+        yield torch.Tensor(X), torch.Tensor(Y)
+```
+
 Let us generate an artificial sequence from 0 to 30. We assume that
 the batch size and numbers of timesteps are 2 and 6
 respectively. This means that depending on the offset we can generate between 4 and 5 $(x, y)$ pairs. With a minibatch size of 2, we only get 2 minibatches.
 
-```{.python .input  n=6}
+```{.python .input}
+#@tab all
 my_seq = list(range(30))
 for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y)
@@ -202,7 +244,7 @@ for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=6):
 
 In addition to random sampling of the original sequence, we can also make the positions of two adjacent random minibatches adjacent in the original sequence.
 
-```{.python .input  n=7}
+```{.python .input}
 #@save
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
@@ -219,9 +261,28 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
         yield X, Y
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def seq_data_iter_consecutive(corpus, batch_size, num_steps):
+    # Offset for the iterator over the data for uniform starts
+    offset = random.randint(0, num_steps)
+    # Slice out data - ignore num_steps and just wrap around
+    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = torch.Tensor(corpus[offset:offset+num_indices])
+    Ys = torch.Tensor(corpus[offset+1:offset+1+num_indices])
+    Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
+    num_batches = Xs.shape[1] // num_steps
+    for i in range(0, num_batches * num_steps, num_steps):
+        X = Xs[:, i:(i+num_steps)]
+        Y = Ys[:, i:(i+num_steps)]
+        yield X, Y
+```
+
 Using the same settings, print input `X` and label `Y` for each minibatch of examples read by sequential partitioning. The positions of two adjacent minibatches on the original sequence are adjacent.
 
-```{.python .input  n=8}
+```{.python .input}
+#@tab all
 for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y)
 ```
@@ -229,6 +290,7 @@ for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
 Now we wrap the above two sampling functions to a class so that we can use it as a Gluon data iterator later.
 
 ```{.python .input}
+#@tab all
 #@save
 class SeqDataLoader:
     """A iterator to load sequence data."""
@@ -247,6 +309,7 @@ class SeqDataLoader:
 Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix.
 
 ```{.python .input}
+#@tab all
 #@save
 def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
                            max_tokens=10000):
