@@ -351,6 +351,7 @@ x.sum()
 For stylistic convenience, we can write `x.sum()` as `np.sum(x)`.
 
 ## Broadcasting Mechanism
+:label:`subsec_broadcasting`
 
 In the above section, we saw how to perform elementwise operations
 on two `ndarray`s of the same shape. Under certain conditions,
