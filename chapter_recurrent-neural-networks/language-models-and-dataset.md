@@ -106,7 +106,6 @@ print(vocab.token_freqs[:10])
 #@tab pytorch
 from d2l import torch as d2l
 import torch
-import numpy as np
 import random
 
 tokens = d2l.tokenize(d2l.read_time_machine())
