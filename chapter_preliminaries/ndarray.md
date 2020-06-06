@@ -142,7 +142,7 @@ x.size()
 
 ```{.python .input}
 #@tab tensorflow
-sum(x.shape)
+tf.size(x)
 ```
 
 To change the shape of an `ndarray` without altering
