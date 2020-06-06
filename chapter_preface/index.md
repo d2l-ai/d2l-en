@@ -356,6 +356,29 @@ import requests
 d2l = sys.modules[__name__]
 ```
 
+```{.python .input  n=1}
+#@tab tensorflow
+#@save
+import collections
+from collections import defaultdict
+from matplotlib import pyplot as plt
+from IPython import display
+import math
+import tensorflow as tf
+import numpy as np
+import os
+import pandas as pd
+import random
+import re
+import shutil
+import sys
+import tarfile
+import time
+import zipfile
+import requests
+
+d2l = sys.modules[__name__]
+```
 We offer a detailed overview of these functions and classes in :numref:`sec_d2l`.
 
 
@@ -388,7 +411,7 @@ you may want to peruse this [Python tutorial](http://learnpython.org/).
 Associated with this book, we have launched a discussion forum,
 located at [discuss.d2l.ai](https://discuss.d2l.ai/).
 When you have questions on any section of the book,
-you can find the associated discussion page link at the end of each chapter. 
+you can find the associated discussion page link at the end of each chapter.
 
 
 ## Acknowledgments
