@@ -10,18 +10,18 @@ can be a pain (and often error-prone).
 
 
 :begin_tab:`mxnet`
-The `autograd` package expedites this work 
-by automatically calculating derivatives, i.e., *automatic differentiation*. 
-And while many other libraries require 
-that we compile a symbolic graph to take automatic derivatives, 
-`autograd` allows us to take derivatives 
-while writing ordinary imperative code. 
-Every time we pass data through our model, 
-`autograd` builds a graph on the fly, 
-tracking which data combined through 
-which operations to produce the output. 
-This graph enables `autograd` 
-to subsequently backpropagate gradients on command. 
+The `autograd` package expedites this work
+by automatically calculating derivatives, i.e., *automatic differentiation*.
+And while many other libraries require
+that we compile a symbolic graph to take automatic derivatives,
+`autograd` allows us to take derivatives
+while writing ordinary imperative code.
+Every time we pass data through our model,
+`autograd` builds a graph on the fly,
+tracking which data combined through
+which operations to produce the output.
+This graph enables `autograd`
+to subsequently backpropagate gradients on command.
 Here, *backpropagate* simply means to trace through the *computational graph*,
 filling in the partial derivatives with respect to each parameter.
 :end_tab:
@@ -53,6 +53,11 @@ npx.set_np()
 import torch
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+```
+
 ## A Simple Example
 
 As a toy example, say that we are interested
@@ -69,6 +74,12 @@ x
 ```{.python .input}
 #@tab pytorch
 x = torch.arange(4.0, requires_grad=True)
+x
+```
+
+```{.python .input}
+#@tab tensorflow
+x = tf.constant(range(4), dtype=tf.float32)
 x
 ```
 
@@ -123,6 +134,12 @@ x.grad
 x.grad
 ```
 
+```{.python .input}
+#@tab tensorflow
+with tf.GradientTape() as t:
+    t.watch(x)
+```
+
 :begin_tab:`mxnet`
 Now let us calculate $y$.
 Because we wish to subsequently calculate gradients,
@@ -153,6 +170,14 @@ y = 2 * torch.dot(x, x)
 y
 ```
 
+```{.python .input}
+#@tab tensorflow
+with tf.GradientTape(persistent=True) as t:
+    t.watch(x)
+    y = 2 * tf.tensordot(x, x, 1)
+y
+```
+
 Since `x` is a tensor of length 4,
 the `dot` operator will perform an inner product of `x` and `x`,
 yielding the scalar output that we assign to `y`.
@@ -169,6 +194,11 @@ y.backward()
 y.backward()
 ```
 
+```{.python .input}
+#@tab tensorflow
+t.gradient(y, x)
+```
+
 If we recheck the value of `x.grad`, we will find its contents overwritten by the newly calculated gradient.
 
 ```{.python .input}
@@ -178,6 +208,11 @@ x.grad
 ```{.python .input}
 #@tab pytorch
 x.grad
+```
+
+```{.python .input}
+#@tab tensorflow
+t.gradient(y, x)
 ```
 
 The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$
@@ -193,6 +228,11 @@ x.grad == 4 * x
 ```{.python .input}
 #@tab pytorch
 x.grad == 4 * x
+```
+
+```{.python .input}
+#@tab tensorflow
+t.gradient(y, x) == 4 * x
 ```
 
 :begin_tab:`mxnet`
@@ -363,6 +403,20 @@ def f(a):
     return c
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+def f(a):
+    b = a * 2
+    while tf.norm(b) < 1000:
+        b = b * 2
+    if tf.reduce_sum(b) > 0:
+        c = b
+    else:
+        c = 100 * b
+    return c
+```
+
 Again to compute gradients, we just need to `record` the calculation
 and then call the `backward` function.
 
@@ -381,6 +435,15 @@ d = f(a)
 d.backward()
 ```
 
+```{.python .input}
+#@tab tensorflow
+a = tf.random.normal((1, 1),dtype=tf.float32)
+with tf.GradientTape(persistent=True) as t:
+    t.watch(a)
+    d = f(a)
+t.gradient(d, a)
+```
+
 We can now analyze the `f` function defined above.
 Note that it is piecewise linear in its input `a`.
 In other words, for any `a` there exists some constant scalar `k`
@@ -394,6 +457,11 @@ a.grad == d / a
 ```{.python .input}
 #@tab pytorch
 a.grad == (d / a)
+```
+
+```{.python .input}
+#@tab tensorflow
+t.gradient(d, a) == (d / a)
 ```
 
 ## Training Mode and Prediction Mode

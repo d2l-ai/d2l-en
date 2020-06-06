@@ -99,6 +99,7 @@ x
 ```{.python .input}
 #@tab tensorflow
 x = tf.constant(range(12))
+x
 ```
 
 We can access a tensor's *shape* (the length along each axis)
@@ -135,6 +136,10 @@ x.size
 x.size()
 ```
 
+```{.python .input}
+#@tab tensorflow
+tf.size(x)
+```
 To change the shape of a tensor without altering
 either the number of elements or their values,
 we can invoke the `reshape` function.
@@ -161,7 +166,7 @@ x
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.reshape(x, (3,4))
+x = tf.reshape(x, (3, 4))
 x
 ```
 
@@ -193,6 +198,11 @@ torch.empty(2, 3)
 ```
 
 
+```{.python .input}
+#@tab tensorflow
+tf.zeros((2, 3))
+```
+
 Typically, we will want our matrices initialized
 either with zeros, ones, some other constants,
 or numbers randomly sampled from a specific distribution.
@@ -210,6 +220,12 @@ torch.zeros(2, 3, 4)
 ```
 
 
+```{.python .input}
+#@tab tensorflow
+tf.zeros((2, 3, 4))
+```
+
+
 Similarly, we can create tensors with each element set to 1 as follows:
 
 ```{.python .input}
@@ -220,6 +236,11 @@ np.ones((2, 3, 4))
 ```{.python .input}
 #@tab pytorch
 torch.ones((2, 3, 4))
+```
+
+```{.python .input}
+#@tab tensorflow
+tf.ones((2, 3, 4))
 ```
 
 
@@ -244,6 +265,12 @@ np.random.normal(0, 1, size=(3, 4))
 torch.randn(3, 4)
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+tf.random.normal(shape=[3,4])
+```
+
 We can also specify the exact values for each element in the desired tensor
 by supplying a Python list (or list of lists) containing the numerical values.
 Here, the outermost list corresponds to axis 0, and the inner list to axis 1.
@@ -256,6 +283,12 @@ np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```{.python .input}
 #@tab pytorch
 torch.tensor([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
+```
+
+
+```{.python .input}
+#@tab tensorflow
+tf.constant([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
 
 
@@ -316,6 +349,14 @@ x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 ```
 
 
+```{.python .input}
+#@tab tensorflow
+x = tf.constant([1, 2, 4, 8])
+y = tf.constant([2, 2, 2, 2])
+x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
+```
+
+
 Many more operations can be applied elementwise,
 including unary operators like exponentiation.
 
@@ -327,6 +368,12 @@ np.exp(x)
 ```{.python .input}
 #@tab pytorch
 torch.exp(x)
+```
+
+
+```{.python .input}
+#@tab tensorflow
+tf.exp(tf.cast(x, tf.float32))
 ```
 
 
@@ -362,6 +409,13 @@ y = torch.tensor([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 torch.cat((x, y), dim=0), torch.cat((x, y), dim=1)
 ```
 
+```{.python .input}
+#@tab tensorflow
+x = tf.constant(range(12), dtype=tf.float32, shape=(3, 4))
+y = tf.constant([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
+tf.concat([x, y], axis=0), tf.concat([x, y], axis=1)
+```
+
 Sometimes, we want to construct a binary tensor via *logical statements*.
 Take `x == y` as an example.
 For each position, if `x` and `y` are equal at that position,
@@ -379,6 +433,11 @@ x == y
 x == y
 ```
 
+```{.python .input}
+#@tab tensorflow
+x == y
+```
+
 Summing all the elements in the tensor yields a tensor with only one element.
 
 ```{.python .input}
@@ -389,6 +448,12 @@ x.sum()
 ```{.python .input}
 #@tab pytorch
 x.sum()
+```
+
+
+```{.python .input}
+#@tab tensorflow
+tf.reduce_sum(x)
 ```
 
 
@@ -427,6 +492,14 @@ a, b
 ```
 
 
+```{.python .input}
+#@tab tensorflow
+a = tf.constant(range(3), shape=(3, 1))
+b = tf.constant(range(2), shape=(1, 2))
+a, b
+```
+
+
 Since `a` and `b` are $3\times1$ and $1\times2$ matrices respectively,
 their shapes do not match up if we want to add them.
 We *broadcast* the entries of both matrices into a larger $3\times2$ matrix as follows:
@@ -441,6 +514,12 @@ a + b
 
 ```{.python .input}
 #@tab pytorch
+a + b
+```
+
+
+```{.python .input}
+#@tab tensorflow
 a + b
 ```
 
@@ -468,6 +547,12 @@ x[-1], x[1:3]
 ```
 
 
+```{.python .input}
+#@tab tensorflow
+x[-1], x[1:3]
+```
+
+
 Beyond reading, we can also write elements of a matrix by specifying indices.
 
 ```{.python .input}
@@ -482,6 +567,12 @@ x[1, 2] = 9
 x
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+x = tf.convert_to_tensor(tf.Variable(x)[1, 2].assign(9))
+x
+```
 
 If we want to assign multiple elements the same value,
 we simply index all of them and then assign them the value.
@@ -500,6 +591,15 @@ x
 ```{.python .input}
 #@tab pytorch
 x[0:2, :] = 12
+x
+```
+
+
+```{.python .input}
+#@tab tensorflow
+x_var = tf.Variable(x)
+x_var[1:2,:].assign(tf.ones(x_var[1:2,:].shape, dtype = tf.float32)*12)
+x = tf.convert_to_tensor(x_var)
 x
 ```
 
@@ -527,6 +627,14 @@ id(y) == before
 
 ```{.python .input}
 #@tab pytorch
+before = id(y)
+y = y + x
+id(y) == before
+```
+
+
+```{.python .input}
+#@tab tensorflow
 before = id(y)
 y = y + x
 id(y) == before
@@ -570,6 +678,15 @@ print('id(z):', id(z))
 ```
 
 
+```{.python .input}
+#@tab tensorflow
+z = tf.Variable(tf.zeros_like(y))
+print('id(z):', id(z))
+z[:].assign(x + y)
+print('id(z):', id(z))
+```
+
+
 If the value of `x` is not reused in subsequent computations,
 we can also use `x[:] = x + y` or `x += y`
 to reduce the memory overhead of the operation.
@@ -585,6 +702,13 @@ id(x) == before
 #@tab pytorch
 before = id(x)
 x += y
+id(x) == before
+```
+
+```{.python .input}
+#@tab tensorflow
+before = id(x)
+tf.Variable(x).assign(x + y)
 id(x) == before
 ```
 
@@ -613,6 +737,14 @@ b = torch.tensor(a)
 type(a), type(b)
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+a = x.numpy()
+b = tf.constant(a)
+type(a), type(b)
+```
+
 To convert a size-1 tensor to a Python scalar,
 we can invoke the `item` function or Python's built-in functions.
 
@@ -627,6 +759,14 @@ a, a.item(), float(a), int(a)
 a = torch.tensor([3.5])
 a, a.item(), float(a), int(a)
 ```
+
+
+```{.python .input}
+#@tab tensorflow
+a = tf.constant([3.5]).numpy()
+a, a.item(), float(a), int(a)
+```
+
 
 
 ## Summary
