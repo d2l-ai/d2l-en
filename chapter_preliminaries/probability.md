@@ -58,6 +58,14 @@ import numpy as np
 from torch.distributions import multinomial
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import torch as d2l
+import tensorflow as tf
+import numpy as np
+```
+
 Next, we will want to be able to cast the die. In statistics we call this process
 of drawing examples from probability distributions *sampling*.
 The distribution
@@ -98,6 +106,12 @@ fair_probs = torch.ones([6]) / 6
 multinomial.Multinomial(1, fair_probs).sample()
 ```
 
+```{.python .input}
+#@tab tensorflow
+fair_probs = tf.ones([6]) / 6
+tf.random.categorical(tf.reshape(fair_probs, (1, 6)), 1)
+```
+
 :begin_tab:`mxnet`
 If you run the sampler a bunch of times, you will find that you get out random
 values each time. As with estimating the fairness of a die, we often want to
@@ -123,6 +137,11 @@ np.random.multinomial(10, fair_probs)
 ```{.python .input}
 #@tab pytorch
 multinomial.Multinomial(10, fair_probs).sample()
+```
+
+```{.python .input}
+#@tab tensorflow
+tf.random.categorical(tf.reshape(fair_probs, (1, 6)), 10)
 ```
 
 We can also conduct, say, 3 groups of experiments, where each group draws 10 samples, all at once.
@@ -159,6 +178,13 @@ counts = multinomial.Multinomial(1000, fair_probs).sample().type(torch.float32)
 counts / 1000  # Relative frequency as the estimate
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Store the results as 32-bit floats for division
+counts = tf.random.categorical(tf.reshape(fair_probs, (1, 6)), 10)
+counts / 1000  # Relative frequency as the estimate
+```
+
 Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good.
 
 We can also visualize how these probabilities converge over time towards the true probability.
@@ -184,6 +210,22 @@ d2l.plt.legend();
 counts = torch.from_numpy(np.random.multinomial(10, fair_probs, size=500))
 cum_counts = counts.type(torch.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
+
+d2l.set_figsize((6, 4.5))
+for i in range(6):
+    d2l.plt.plot(estimates[:, i].numpy(),
+                 label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Groups of experiments')
+d2l.plt.gca().set_ylabel('Estimated probability')
+d2l.plt.legend();
+```
+
+```{.python .input}
+#@tab tensorflow
+counts = tf.random.categorical(tf.reshape(fair_probs, (1, 6)), 10)
+cum_counts = tf.cumsum(counts, axis=0)
+estimates = cum_counts / tf.reduce_sum(cum_counts, axis=1, keepdims=True)
 
 d2l.set_figsize((6, 4.5))
 for i in range(6):
