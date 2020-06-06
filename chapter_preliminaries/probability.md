@@ -61,7 +61,7 @@ from torch.distributions import multinomial
 ```{.python .input}
 #@tab tensorflow
 %matplotlib inline
-from d2l import torch as d2l
+from d2l import tensorflow as d2l
 import tensorflow as tf
 import numpy as np
 ```
