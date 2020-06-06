@@ -22,12 +22,6 @@ print(dir(torch.distributions))
 ```{.python .input  n=1}
 #@tab tensorflow
 import tensorflow as tf
-print(dir(torch.distributions))
-```
-
-```{.python .input  n=1}
-#@tab tensorflow
-import tensorflow as tf
 print(dir(tf.random))
 ```
 
