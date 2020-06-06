@@ -69,6 +69,16 @@ y = torch.tensor([2.0])
 x + y, x * y, x / y, x**y
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+x = tf.constant([3.0])
+y = tf.constant([2.0])
+
+x + y, x * y, x / y, x**y
+```
+
 ## Vectors
 
 You can think of a vector as simply a list of scalar values.
@@ -102,6 +112,12 @@ x = torch.arange(4)
 x
 ```
 
+```{.python .input}
+#@tab tensorflow
+x = tf.constant(range(4))
+x
+```
+
 We can refer to any element of a vector by using a subscript.
 For example, we can refer to the $i^\mathrm{th}$ element of $\mathbf{x}$ by $x_i$.
 Note that the element $x_i$ is a scalar,
@@ -123,6 +139,11 @@ x[3]
 
 ```{.python .input}
 #@tab pytorch
+x[3]
+```
+
+```{.python .input}
+#@tab tensorflow
 x[3]
 ```
 
@@ -148,6 +169,11 @@ len(x)
 len(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+tf.size(x)
+```
+
 When an `ndarray` represents a vector (with precisely one axis),
 we can also access its length via the `.shape` attribute.
 The shape is a tuple that lists the length (dimensionality)
@@ -160,6 +186,11 @@ x.shape
 
 ```{.python .input}
 #@tab pytorch
+x.shape
+```
+
+```{.python .input}
+#@tab tensorflow
 x.shape
 ```
 
@@ -210,6 +241,12 @@ A = torch.arange(20).reshape(5, 4)
 A
 ```
 
+```{.python .input}
+#@tab tensorflow
+A = tf.reshape(tf.constant(range(20)), (5, 4))
+A
+```
+
 We can access the scalar element $a_{ij}$ of a matrix $\mathbf{A}$ in :eqref:`eq_matrix_def`
 by specifying the indices for the row ($i$) and column ($j$),
 such as $[\mathbf{A}]_{ij}$.
@@ -249,6 +286,11 @@ A.T
 A.T
 ```
 
+```{.python .input}
+#@tab tensorflow
+tf.transpose(A)
+```
+
 As a special type of the square matrix,
 a *symmetric matrix* $\mathbf{A}$ is equal to its transpose:
 $\mathbf{A} = \mathbf{A}^\top$.
@@ -265,12 +307,23 @@ B
 ```
 
 ```{.python .input}
+#@tab tensorflow
+B = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
+B
+```
+
+```{.python .input}
 B == B.T
 ```
 
 ```{.python .input}
 #@tab pytorch
 B == B.T
+```
+
+```{.python .input}
+#@tab tensorflow
+B == tf.transpose(B)
 ```
 
 Matrices are useful data structures:
@@ -309,6 +362,12 @@ X = torch.arange(24).reshape(2, 3, 4)
 X
 ```
 
+```{.python .input}
+#@tab tensorflow
+X = tf.reshape(tf.constant(range(24)), (2, 3, 4))
+X
+```
+
 ## Basic Properties of Tensor Arithmetic
 
 Scalars, vectors, matrices, and tensors of an arbitrary number of axes
@@ -335,6 +394,13 @@ B = A.clone()  # Assign a copy of `A` to `B` by allocating new memory
 A, A + B
 ```
 
+```{.python .input}
+#@tab tensorflow
+A = tf.reshape(tf.constant(range(20), dtype=tf.float32), (5, 4))
+B = tf.identity(A)  # Assign a copy of `A` to `B` by allocating new memory
+A, A + B
+```
+
 Specifically, elementwise multiplication of two matrices is called their *Hadamard product* (math notation $\odot$).
 Consider matrix $\mathbf{B} \in \mathbb{R}^{m \times n}$ whose element of row $i$ and column $j$ is $b_{ij}$. The Hadamard product of matrices $\mathbf{A}$ (defined in :eqref:`eq_matrix_def`) and $\mathbf{B}$
 
@@ -357,6 +423,11 @@ A * B
 A * B
 ```
 
+```{.python .input}
+#@tab tensorflow
+A * B
+```
+
 Multiplying or adding a tensor by a scalar also does not change the shape of the tensor,
 where each element of the operand tensor will be added or multiplied by the scalar.
 
@@ -370,6 +441,13 @@ a + X, (a * X).shape
 #@tab pytorch
 a = 2
 X = torch.arange(24).reshape(2, 3, 4)
+a + X, (a * X).shape
+```
+
+```{.python .input}
+#@tab tensorflow
+a = 2
+X = tf.reshape(tf.constant(range(24)), (2, 3, 4))
 a + X, (a * X).shape
 ```
 
@@ -392,6 +470,12 @@ x = torch.arange(4, dtype = torch.float32)
 x, x.sum()
 ```
 
+```{.python .input}
+#@tab tensorflow
+x = tf.constant(range(4), dtype=tf.float32)
+x, tf.reduce_sum(x)
+```
+
 We can express sums over the elements of tensors of arbitrary shape.
 For example, the sum of the elements of an $m \times n$ matrix $\mathbf{A}$ could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
@@ -402,6 +486,11 @@ A.shape, A.sum()
 ```{.python .input}
 #@tab pytorch
 A.shape, A.sum()
+```
+
+```{.python .input}
+#@tab tensorflow
+A.shape, tf.reduce_sum(A)
 ```
 
 By default, invoking the `sum` function *reduces* a tensor along all its axes to a scalar.
@@ -423,6 +512,12 @@ A_sum_axis0 = A.sum(axis=0)
 A_sum_axis0, A_sum_axis0.shape
 ```
 
+```{.python .input}
+#@tab tensorflow
+A_sum_axis0 = tf.reduce_sum(A, axis=0)
+A_sum_axis0, A_sum_axis0.shape
+```
+
 Specifying `axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.
 Thus, the dimension of axis 1 of the input is lost in the output shape.
 
@@ -434,6 +529,12 @@ A_sum_axis1, A_sum_axis1.shape
 ```{.python .input}
 #@tab pytorch
 A_sum_axis1 = A.sum(axis=1)
+A_sum_axis1, A_sum_axis1.shape
+```
+
+```{.python .input}
+#@tab tensorflow
+A_sum_axis1 = tf.reduce_sum(A, axis=1)
 A_sum_axis1, A_sum_axis1.shape
 ```
 
@@ -449,6 +550,11 @@ A.sum(axis=[0, 1])  # Same as A.sum()
 A.sum(axis=[0, 1])  # Same as A.sum()
 ```
 
+```{.python .input}
+#@tab tensorflow
+tf.reduce_sum(A, axis=[0, 1])
+```
+
 A related quantity is the *mean*, which is also called the *average*.
 We calculate the mean by dividing the sum by the total number of elements.
 In code, we could just call `mean` on tensors of arbitrary shape.
@@ -462,6 +568,11 @@ A.mean(), A.sum() / A.size
 A.mean(), A.sum() / A.numel()
 ```
 
+```{.python .input}
+#@tab tensorflow
+tf.reduce_mean(A), tf.reduce_sum(A) / tf.size(A).numpy()
+```
+
 Like `sum`, `mean` can also reduce a tensor along the specified axes.
 
 ```{.python .input}
@@ -471,6 +582,11 @@ A.mean(axis=0), A.sum(axis=0) / A.shape[0]
 ```{.python .input}
 #@tab pytorch
 A.mean(axis=0), A.sum(axis=0) / A.shape[0]
+```
+
+```{.python .input}
+#@tab tensorflow
+tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 ```
 
 ### Non-Reduction Sum
@@ -488,6 +604,12 @@ sum_A = A.sum(axis=1, keepdims=True)
 sum_A
 ```
 
+```{.python .input}
+#@tab tensorflow
+sum_A = tf.reduce_sum(A, axis=1, keepdims=True)
+sum_A
+```
+
 For instance, since `sum_A` still keeps its two axes after summing each row, we can divide `A` by `sum_A` with broadcasting.
 
 ```{.python .input}
@@ -496,6 +618,11 @@ A / sum_A
 
 ```{.python .input}
 #@tab pytorch
+A / sum_A
+```
+
+```{.python .input}
+#@tab tensorflow
 A / sum_A
 ```
 
@@ -509,6 +636,11 @@ A.cumsum(axis=0)
 ```{.python .input}
 #@tab pytorch
 A.cumsum(axis=0)
+```
+
+```{.python .input}
+#@tab tensorflow
+tf.cumsum(A, axis=0)
 ```
 
 ## Dot Products
@@ -526,6 +658,12 @@ y = torch.ones(4, dtype = torch.float32)
 x, y, torch.dot(x, y)
 ```
 
+```{.python .input}
+#@tab tensorflow
+y = tf.ones(4, dtype=tf.float32)
+x, y, tf.tensordot(x, y, 1)
+```
+
 Note that we can express the dot product of two vectors equivalently by performing an elementwise multiplication and then a sum:
 
 ```{.python .input}
@@ -535,6 +673,12 @@ np.sum(x * y)
 ```{.python .input}
 #@tab pytorch
 torch.sum(x * y)
+```
+
+```{.python .input}
+#@tab tensorflow
+y = tf.ones(4, dtype=tf.float32)
+tf.reduce_sum(x * y)
 ```
 
 Dot products are useful in a wide range of contexts.
@@ -619,6 +763,11 @@ A.shape, x.shape, np.dot(A, x)
 A.shape, x.shape, torch.mv(A, x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+A.shape, x.shape, tf.linalg.matvec(A, x)
+```
+
 ## Matrix-Matrix Multiplication
 
 If you have gotten the hang of dot products and matrix-vector products,
@@ -695,6 +844,12 @@ B = torch.ones(4, 3)
 torch.mm(A, B)
 ```
 
+```{.python .input}
+#@tab tensorflow
+B = tf.ones((4, 3), tf.float32)
+tf.matmul(A, B)
+```
+
 Matrix-matrix multiplication can be simply called *matrix multiplication*, and should not be confused with the Hadamard product.
 
 
@@ -758,6 +913,12 @@ u = torch.tensor([3.0, -4.0])
 torch.norm(u)
 ```
 
+```{.python .input}
+#@tab tensorflow
+u = tf.constant([3.0, -4.0])
+tf.norm(u)
+```
+
 In deep learning, we work more often
 with the squared $\ell_2$ norm.
 You will also frequently encounter the $\ell_1$ *norm*,
@@ -777,6 +938,11 @@ np.abs(u).sum()
 ```{.python .input}
 #@tab pytorch
 torch.abs(u).sum()
+```
+
+```{.python .input}
+#@tab tensorflow
+sum(tf.abs(u))
 ```
 
 Both the $\ell_2$ norm and the $\ell_1$ norm
@@ -800,6 +966,11 @@ np.linalg.norm(np.ones((4, 9)))
 ```{.python .input}
 #@tab pytorch
 torch.norm(torch.ones((4, 9)))
+```
+
+```{.python .input}
+#@tab tensorflow
+tf.norm(tf.ones((4, 9)))
 ```
 
 ### Norms and Objectives
