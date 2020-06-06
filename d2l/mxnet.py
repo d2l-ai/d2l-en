@@ -165,8 +165,8 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):        
-        if 'asnumpy' in dir(img): img = img.asnumpy() 
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        if 'asnumpy' in dir(img): img = img.asnumpy()
         if 'numpy' in dir(img): img = img.numpy()
         ax.imshow(img)
         ax.axes.get_xaxis().set_visible(False)
@@ -343,7 +343,7 @@ def download(name, cache_dir=os.path.join('..', 'data')):
 def download_extract(name, folder=None):
     """Download and extract a zip/tar file."""
     fname = download(name)
-    base_dir = os.path.dirname(fname) 
+    base_dir = os.path.dirname(fname)
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
@@ -786,9 +786,9 @@ def build_array(lines, vocab, num_steps, is_source):
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, 
+    src_vocab = d2l.Vocab(source, min_freq=3,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+    tgt_vocab = d2l.Vocab(target, min_freq=3,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array(
         source, src_vocab, num_steps, True)
@@ -1240,10 +1240,10 @@ def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
 
 
 # Defined in file: ./chapter_computational-performance/hybridize.md
-class benchmark:    
+class benchmark:
     def __init__(self, description = 'Done in %.4f sec'):
         self.description = description
-        
+
     def __enter__(self):
         self.timer = d2l.Timer()
         return self
@@ -1348,7 +1348,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
 
 
 # Defined in file: ./chapter_computer-vision/fine-tuning.md
-d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip', 
+d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip',
                          'fba480ffa8aa7e0febbb511d181409f899b9baa5')
 
 
@@ -1723,7 +1723,7 @@ class TokenEmbedding:
         self.idx_to_token, self.idx_to_vec = self._load_embedding(
             embedding_name)
         self.unknown_idx = 0
-        self.token_to_idx = {token: idx for idx, token in 
+        self.token_to_idx = {token: idx for idx, token in
                              enumerate(self.idx_to_token)}
 
     def _load_embedding(self, embedding_name):
@@ -2148,7 +2148,7 @@ def read_snli(data_dir, is_train):
     """Read the SNLI dataset into premises, hypotheses, and labels."""
     def extract_text(s):
         # Remove information that will not be used by us
-        s = re.sub('\\(', '', s) 
+        s = re.sub('\\(', '', s)
         s = re.sub('\\)', '', s)
         # Substitute two or more consecutive whitespace with space
         s = re.sub('\\s{2,}', ' ', s)
@@ -2395,11 +2395,11 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
             x.append(seq[user_ids, :])
         x.extend([np.array(item_ids)])
         test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x),
-                                               shuffle=False, 
-                                               last_batch="keep", 
-                                               batch_size=1024) 
+                                               shuffle=False,
+                                               last_batch="keep",
+                                               batch_size=1024)
         for index, values in enumerate(test_data_iter):
-            x = [gluon.utils.split_and_load(v, ctx, even_split=False) 
+            x = [gluon.utils.split_and_load(v, ctx, even_split=False)
                  for v in values]
             scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
         scores = [item for sublist in scores for item in sublist]
@@ -2414,7 +2414,7 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx_list, evaluator, 
+                  num_users, num_items, num_epochs, ctx_list, evaluator,
                   candidates, eval_step=1):
     timer, hit_rate, auc = d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
@@ -2427,7 +2427,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                 input_data.append(gluon.utils.split_and_load(v, ctx_list))
             with autograd.record():
                 p_pos = [net(*t) for t in zip(*input_data[0:-1])]
-                p_neg = [net(*t) for t in zip(*input_data[0:-2], 
+                p_neg = [net(*t) for t in zip(*input_data[0:-2],
                                               input_data[-1])]
                 ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]
@@ -2484,10 +2484,10 @@ class CTRDataset(gluon.data.Dataset):
             self.field_dims[i - 1] = len(fm) + 1
         self.offsets = np.array((0, *np.cumsum(self.field_dims).asnumpy()
                                  [:-1]))
-        
+
     def __len__(self):
         return self.count
-    
+
     def __getitem__(self, idx):
         feat = np.array([self.feat_mapper[i + 1].get(v, self.defaults[i + 1])
                          for i, v in enumerate(self.data[idx]['x'])])
@@ -2531,5 +2531,4 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
 # Defined in file: ./chapter_generative-adversarial-networks/dcgan.md
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
-
 

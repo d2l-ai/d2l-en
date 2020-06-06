@@ -174,8 +174,8 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):        
-        if 'asnumpy' in dir(img): img = img.asnumpy() 
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        if 'asnumpy' in dir(img): img = img.asnumpy()
         if 'numpy' in dir(img): img = img.numpy()
         ax.imshow(img)
         ax.axes.get_xaxis().set_visible(False)
@@ -372,7 +372,7 @@ def util_download(url, path=None, verify_ssl=True):
         warnings.warn(
             'Unverified HTTPS request is being made (verify_ssl=False). '
             'Adding certificate verification is strongly advised.')
-    
+
     print('Downloading {} from {}...'.format(fname, url))
     r = requests.get(url, stream=True, verify=verify_ssl)
     with open(fname, 'wb') as f:
@@ -394,7 +394,7 @@ def download(name, cache_dir=os.path.join('..', 'data')):
 def download_extract(name, folder=None):
     """Download and extract a zip/tar file."""
     fname = download(name)
-    base_dir = os.path.dirname(fname) 
+    base_dir = os.path.dirname(fname)
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
@@ -456,7 +456,7 @@ def corr2d(X, K):  #@save
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def evaluate_accuracy_gpu(net, data_iter, device=None): #@save        
+def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     if not device:
         device = next(iter(net.parameters())).device
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
@@ -467,9 +467,9 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch6(net, train_iter, test_iter, num_epochs, lr, 
+def train_ch6(net, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
-    """Train and evaluate a model with CPU or GPU."""    
+    """Train and evaluate a model with CPU or GPU."""
     def init_weights(m):
         if type(m) == nn.Linear or type(m) == nn.Conv2d:
             torch.nn.init.xavier_uniform_(m.weight)
@@ -485,9 +485,9 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
             timer.start()
-            net.train()            
+            net.train()
             optimizer.zero_grad()
-            X, y = X.to(device), y.to(device) 
+            X, y = X.to(device), y.to(device)
             y_hat = net(X)
             l = loss(y_hat, y)
             l.backward()
@@ -509,15 +509,15 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
 class Residual(nn.Module):  #@save
-    def __init__(self, input_channels, num_channels, 
+    def __init__(self, input_channels, num_channels,
                  use_1x1conv=False, strides=1):
         super().__init__()
         self.conv1 = nn.Conv2d(input_channels, num_channels,
                                kernel_size=3, padding=1, stride=strides)
-        self.conv2 = nn.Conv2d(num_channels, num_channels, 
+        self.conv2 = nn.Conv2d(num_channels, num_channels,
                                kernel_size=3, padding=1)
         if use_1x1conv:
-            self.conv3 = nn.Conv2d(input_channels, num_channels, 
+            self.conv3 = nn.Conv2d(input_channels, num_channels,
                                    kernel_size=1, stride=strides)
         else:
             self.conv3 = None
@@ -525,7 +525,7 @@ class Residual(nn.Module):  #@save
         self.bn2 = nn.BatchNorm2d(num_channels)
         self.relu = nn.ReLU(inplace=True)
 
-    def forward(self, X):    
+    def forward(self, X):
         Y = F.relu(self.bn1(self.conv1(X)))
         Y = self.bn2(self.conv2(Y))
         if self.conv3:
@@ -668,5 +668,4 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
     return data_iter, data_iter.vocab
-
 
