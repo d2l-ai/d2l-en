@@ -111,6 +111,15 @@ X, y = torch.tensor(inputs.values), torch.tensor(outputs.values)
 X, y
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+X, y = tf.constant(inputs.values), tf.constant(outputs.values)
+X, y
+```
+
+
 ## Summary
 
 * Like many other extension packages in the vast ecosystem of Python, `pandas` can work together with `ndarray`.

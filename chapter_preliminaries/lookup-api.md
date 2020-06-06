@@ -19,6 +19,12 @@ import torch
 print(dir(torch.distributions))
 ```
 
+```{.python .input  n=1}
+#@tab tensorflow
+import tensorflow as tf
+print(dir(tf.random))
+```
+
 Generally, we can ignore functions that start and end with `__` (special objects in Python) or functions that start with a single `_`(usually internal functions). Based on the remaining function or attribute names, we might hazard a guess that this module offers various methods for generating random numbers, including sampling from the uniform distribution (`uniform`), normal distribution (`normal`), and multinomial distribution  (`multinomial`).
 
 ## Finding the Usage of Specific Functions and Classes
@@ -34,6 +40,11 @@ help(np.ones_like)
 help(torch.ones_like)
 ```
 
+```{.python .input}
+#@tab tensorflow
+help(tf.ones)
+```
+
 From the documentation, we can see that the `ones_like` function creates a new array with the same shape as the supplied `ndarray` and sets all the elements to the value of 1. Whenever possible, you should run a quick test to confirm your interpretation:
 
 ```{.python .input}
@@ -45,6 +56,11 @@ np.ones_like(x)
 #@tab pytorch
 x = torch.tensor([[0., 0., 0.], [2., 2., 2.]])
 torch.ones_like(x)
+```
+
+```{.python .input}
+#@tab tensorflow
+tf.ones([2,3], tf.int32)
 ```
 
 :begin_tab:`mxnet`
