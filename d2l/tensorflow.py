@@ -204,8 +204,8 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):  #@save
-    #return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
-    return np.mean((tf.argmax(y_hat, axis=1) == y))
+    return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
+    # return np.mean((tf.argmax(y_hat, axis=1) == y))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -234,21 +234,20 @@ class Accumulator:  #@save
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def train_epoch_ch3(net, train_iter, loss, updater=None, params=None, lr=None):  #@save
+def train_epoch_ch3(net, train_iter, loss, updater, params=None, lr=None):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     for X, y in train_iter:
         # Compute gradients and update parameters
-        with tf.GradientTape(persistent=True) as g:
+        with tf.GradientTape(persistent=True) as tape:
             y_hat = net(X)
             l = loss(y_hat, y)
+            l = tf.where(tf.math.is_nan(l), tf.zeros_like(l), l)
             l_sum = tf.reduce_sum(l)
-        grads = tape.gradient(l_sum, params)
-        if updater is None:
-            d2l.sgd(params, grads, lr, batch_size)
-        else:
-            updater.apply_gradients(zip([grad / batch_size for grad in grads], params))
+        grads = tape.gradient(l_sum, [W, b])
+        updater = tf.keras.optimizers.SGD(0.1)
+        updater.apply_gradients(zip([grad / batch_size for grad in grads], [W, b]))
         y = tf.cast(y, dtype=tf.float32)
-        metric.add(float(l)*len(y), float(accuracy(y_hat, y)), len(y))
+        metric.add(l_sum, float(accuracy(y_hat, y)), len(y))
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 
@@ -313,6 +312,6 @@ def predict_ch3(net, test_iter, n=6):  #@save
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(tf.argmax(net(X), axis=1))
     titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+    d2l.show_images(tf.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 

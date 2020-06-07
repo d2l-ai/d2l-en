@@ -208,7 +208,8 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 #@tab tensorflow
 net.compile(optimizer=trainer, loss=loss, metrics=['accuracy'])
 num_epochs = 10
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+net.fit(train_iter, epochs=num_epochs)
+# d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
 As before, this algorithm converges to a solution

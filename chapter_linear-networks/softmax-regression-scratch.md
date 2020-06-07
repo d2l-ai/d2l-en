@@ -234,7 +234,7 @@ def net(X):
 ```{.python .input}
 #@tab tensorflow
 def net(X):
-    return softmax(tf.matmul(tf.reshape(X, shape=(-1, W.shape[0])), W) + b)
+    return softmax(tf.matmul(tf.cast(tf.reshape(X, shape=(-1, W.shape[0])), dtype=tf.float32), W) + b)
 ```
 
 
@@ -270,7 +270,7 @@ y_hat[[0, 1], [0, 2]]
 
 ```{.python .input}
 #@tab tensorflow
-y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
+y_hat = tf.constant([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 tf.boolean_mask(y_hat, tf.one_hot([0, 2], depth=3))
 ```
 
@@ -291,10 +291,10 @@ def cross_entropy(y_hat, y):
 ```{.python .input}
 #@tab tensorflow
 def cross_entropy(y_hat, y):
-        y = tf.cast(tf.reshape(y, shape=[-1, 1]))
+        y = tf.cast(tf.reshape(y, shape=[-1, 1]), dtype=tf.int32)
         y = tf.one_hot(y, depth=y_hat.shape[-1])
-        y = tf.cast(tf.reshape(y, shape=[-1, y_hat.shape[-1]]))
-        return -tf.math.log(tf.boolean_mask(y_hat, y))
+        y = tf.cast(tf.reshape(y, shape=[-1, y_hat.shape[-1]]), dtype=tf.int32)
+        return -tf.math.log(tf.boolean_mask(y_hat, y)+1e-8) # +1e-8 here to avoid inf values
 ```
 
 ## Classification Accuracy
@@ -348,8 +348,8 @@ def accuracy(y_hat, y):  #@save
 ```{.python .input}
 #@tab tensorflow
 def accuracy(y_hat, y):  #@save
-    #return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
-    return np.mean((tf.argmax(y_hat, axis=1) == y))
+    return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
+    # return np.mean((tf.argmax(y_hat, axis=1) == y))
 ```
 
 We will continue to use the variables `y_hat` and `y`
@@ -506,19 +506,18 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
 
 ```{.python .input}
 #@tab tensorflow
-def train_epoch_ch3(net, train_iter, loss, updater=None, params=None, lr=None):  #@save
+def train_epoch_ch3(net, train_iter, loss, updater, params=None, lr=None):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     for X, y in train_iter:
         # Compute gradients and update parameters
-        with tf.GradientTape(persistent=True) as g:
+        with tf.GradientTape(persistent=True) as tape:
             y_hat = net(X)
             l = loss(y_hat, y)
+            l = tf.where(tf.math.is_nan(l), tf.zeros_like(l), l)
             l_sum = tf.reduce_sum(l)
-        grads = tape.gradient(l_sum, params)
-        if updater is None:
-            d2l.sgd(params, grads, lr, batch_size)
-        else:
-            updater.apply_gradients(zip([grad / batch_size for grad in grads], params))
+        grads = tape.gradient(l_sum, [W, b])
+        updater = tf.keras.optimizers.SGD(0.1)
+        updater.apply_gradients(zip([grad / batch_size for grad in grads], [W, b]))
         y = tf.cast(y, dtype=tf.float32)
         metric.add(l_sum, float(accuracy(y_hat, y)), len(y))
     # Return training loss and training accuracy
@@ -649,7 +648,7 @@ train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 num_epochs, lr = 10, 0.1
 
 def updater(batch_size):
-    return d2l.sgd([W, b], lr, batch_size)
+    return d2l.sgd([W, b], grads, lr, batch_size)
 
 train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 ```
@@ -699,7 +698,7 @@ def predict_ch3(net, test_iter, n=6):  #@save
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(tf.argmax(net(X), axis=1))
     titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+    d2l.show_images(tf.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 predict_ch3(net, test_iter)
 ```
