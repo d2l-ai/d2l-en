@@ -435,6 +435,14 @@ b = net[0].bias.data
 print('Error in estimating b', true_b - b)
 ```
 
+```{.python .input}
+#@tab tensorflow
+w = net.get_weights()[0]
+print('Error in estimating w', tf.reshape(true_w, w.shape) - w)
+b = net.get_weights()[1]
+print('Error in estimating b', true_b - b)
+```
+
 ## Summary
 
 :begin_tab:`mxnet`
