@@ -187,7 +187,7 @@ def grad_clipping(model, theta):
 
 Let us first define the function to train the model on one data epoch. It differs from the models training of :numref:`sec_softmax_scratch` in three places:
 
-1. Different sampling methods for sequential data (independent sampling and
+1. Different sampling methods for sequential data (random sampling and
    sequential partitioning) will result in differences in the initialization of
    hidden states.
 1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process, and it effectively reduces the step size automatically.
@@ -292,7 +292,7 @@ While implementing the above RNN model from scratch is instructive, it is not co
     * What happens?
     * Bias the model towards more likely outputs, e.g., by sampling from $q(w_t \mid w_{t-1}, \ldots, w_1) \propto p^\alpha(w_t \mid w_{t-1}, \ldots, w_1)$ for $\alpha > 1$.
 1. Run the code in this section without clipping the gradient. What happens?
-1. Change adjacent sampling so that it does not separate hidden states from the computational graph. Does the running time change? How about the accuracy?
+1. Change sequential partitioning so that it does not separate hidden states from the computational graph. Does the running time change? How about the accuracy?
 1. Replace the activation function used in this section with ReLU and repeat the experiments in this section.
 1. Prove that the perplexity is the inverse of the harmonic mean of the conditional word probabilities.
 
