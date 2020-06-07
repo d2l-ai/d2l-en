@@ -206,7 +206,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 ```{.python .input}
 #@tab tensorflow
-net.compile(optimizer=optimizer, loss= loss, metrics=['accuracy'])
+net.compile(optimizer=trainer, loss=loss, metrics=['accuracy'])
 num_epochs = 10
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```

@@ -348,7 +348,8 @@ def accuracy(y_hat, y):  #@save
 ```{.python .input}
 #@tab tensorflow
 def accuracy(y_hat, y):  #@save
-    return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
+    #return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
+    return np.mean((tf.argmax(y_hat, axis=1) == y))
 ```
 
 We will continue to use the variables `y_hat` and `y`
@@ -405,8 +406,9 @@ def evaluate_accuracy(net, data_iter):  #@save
 #@tab tensorflow
 def evaluate_accuracy(net, data_iter):  #@save
     metric = Accumulator(2)  # num_corrected_examples, num_examples
-    for X, y in data_iter:
-        metric.add(accuracy(net(X), y), y.numpy().size)
+    for X, y in enumerate(data_iter):
+        y = tf.cast(y,dtype=tf.int64)
+        metric.add(np.sum(tf.cast(tf.argmax(net(X), axis=1), dtype=tf.int64) == y), y.shape[0])
     return metric[0] / metric[1]
 ```
 
@@ -504,15 +506,21 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
 
 ```{.python .input}
 #@tab tensorflow
-def train_epoch_ch3(net, train_iter, loss, updater):  #@save
+def train_epoch_ch3(net, train_iter, loss, updater=None, params=None, lr=None):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     for X, y in train_iter:
         # Compute gradients and update parameters
         with tf.GradientTape(persistent=True) as g:
             y_hat = net(X)
             l = loss(y_hat, y)
-            l = tf.reduce_mean(l)
-        metric.add(float(l)*len(y), float(accuracy(y_hat, y)), len(y))
+            l_sum = tf.reduce_sum(l)
+        grads = tape.gradient(l_sum, params)
+        if updater is None:
+            d2l.sgd(params, grads, lr, batch_size)
+        else:
+            updater.apply_gradients(zip([grad / batch_size for grad in grads], params))
+        y = tf.cast(y, dtype=tf.float32)
+        metric.add(l_sum, float(accuracy(y_hat, y)), len(y))
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
