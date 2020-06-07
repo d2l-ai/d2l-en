@@ -294,7 +294,7 @@ def cross_entropy(y_hat, y):
         y = tf.cast(tf.reshape(y, shape=[-1, 1]), dtype=tf.int32)
         y = tf.one_hot(y, depth=y_hat.shape[-1])
         y = tf.cast(tf.reshape(y, shape=[-1, y_hat.shape[-1]]), dtype=tf.int32)
-        return -tf.math.log(tf.boolean_mask(y_hat, y)+1e-8) # +1e-8 here to avoid inf values
+        return -tf.math.log(tf.boolean_mask(y_hat, y))
 ```
 
 ## Classification Accuracy
@@ -348,8 +348,11 @@ def accuracy(y_hat, y):  #@save
 ```{.python .input}
 #@tab tensorflow
 def accuracy(y_hat, y):  #@save
-    return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
-    # return np.mean((tf.argmax(y_hat, axis=1) == y))
+    if y_hat.shape[1] > 1:
+        y = tf.cast(y, dtype=tf.int32)
+        return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
+    else:
+        return tf.cast(tf.cast(y_hat, dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
 ```
 
 We will continue to use the variables `y_hat` and `y`
@@ -406,9 +409,10 @@ def evaluate_accuracy(net, data_iter):  #@save
 #@tab tensorflow
 def evaluate_accuracy(net, data_iter):  #@save
     metric = Accumulator(2)  # num_corrected_examples, num_examples
-    for X, y in enumerate(data_iter):
-        y = tf.cast(y,dtype=tf.int64)
-        metric.add(np.sum(tf.cast(tf.argmax(net(X), axis=1), dtype=tf.int64) == y), y.shape[0])
+    for _, (X, y) in enumerate(data_iter):
+        y = tf.cast(y, dtype=tf.int32)
+        X = tf.cast(X, dtype=tf.int32)
+        metric.add(accuracy(net(X), y), y.numpy().size)
     return metric[0] / metric[1]
 ```
 
@@ -506,7 +510,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
 
 ```{.python .input}
 #@tab tensorflow
-def train_epoch_ch3(net, train_iter, loss, updater, params=None, lr=None):  #@save
+def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     for X, y in train_iter:
         # Compute gradients and update parameters
