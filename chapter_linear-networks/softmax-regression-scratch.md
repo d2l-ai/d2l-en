@@ -403,7 +403,6 @@ def evaluate_accuracy(net, data_iter):  #@save
 
 ```{.python .input}
 #@tab tensorflow
-# TODO: Unfinished
 def evaluate_accuracy(net, data_iter):  #@save
     metric = Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
@@ -441,6 +440,11 @@ evaluate_accuracy(net, test_iter)
 
 ```{.python .input}
 #@tab pytorch
+evaluate_accuracy(net, test_iter)
+```
+
+```{.python .input}
+#@tab tensorflow
 evaluate_accuracy(net, test_iter)
 ```
 
@@ -494,6 +498,21 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater(X.shape[0])
             l_sum = float(l.sum())
             metric.add(l_sum, accuracy(y_hat, y), y.numpy().size)
+    # Return training loss and training accuracy
+    return metric[0]/metric[2], metric[1]/metric[2]
+```
+
+```{.python .input}
+#@tab tensorflow
+def train_epoch_ch3(net, train_iter, loss, updater):  #@save
+    metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
+    for X, y in train_iter:
+        # Compute gradients and update parameters
+        with tf.GradientTape(persistent=True) as g:
+            y_hat = net(X)
+            l = loss(y_hat, y)
+            l = tf.reduce_mean(l)
+        metric.add(float(l)*len(y), float(accuracy(y_hat, y)), len(y))
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
@@ -573,6 +592,19 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         animator.add(epoch+1, train_metrics+(test_acc,))
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
+                        ylim=[0.3, 0.9],
+                        legend=['train loss', 'train acc', 'test acc'])
+    for epoch in range(num_epochs):
+        train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
+        test_acc = evaluate_accuracy(net, test_iter)
+        animator.add(epoch+1, train_metrics+(test_acc,))
+```
+
 Again, we use the minibatch stochastic gradient descent
 to optimize the loss function of the model.
 Note that the number of epochs (`num_epochs`),
@@ -596,6 +628,16 @@ train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 
 ```{.python .input}
 #@tab pytorch
+num_epochs, lr = 10, 0.1
+
+def updater(batch_size):
+    return d2l.sgd([W, b], lr, batch_size)
+
+train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
+```
+
+```{.python .input}
+#@tab tensorflow
 num_epochs, lr = 10, 0.1
 
 def updater(batch_size):
@@ -634,6 +676,20 @@ def predict_ch3(net, test_iter, n=6):  #@save
         break
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
+    titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
+    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+
+predict_ch3(net, test_iter)
+```
+
+
+```{.python .input}
+#@tab tensorflow
+def predict_ch3(net, test_iter, n=6):  #@save
+    for X, y in test_iter:
+        break
+    trues = d2l.get_fashion_mnist_labels(y)
+    preds = d2l.get_fashion_mnist_labels(tf.argmax(net(X), axis=1))
     titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
 
