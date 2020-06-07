@@ -45,6 +45,18 @@ features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 labels = labels.reshape(-1,1)
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import numpy as np
+import tensorflow as tf
+
+true_w = tf.constant([2, -3.4], shape=(2, 1))
+true_b = 4.2
+features, labels = d2l.synthetic_data(true_w, true_b, 1000)
+labels = tf.reshape(labels, (-1, 1))
+```
+
 ## Reading the Dataset
 
 Rather than rolling our own iterator,
@@ -80,6 +92,20 @@ batch_size = 10
 data_iter = load_array((features, labels), batch_size)
 ```
 
+```{.python .input}
+#@tab tensorflow
+def load_array(data_arrays, batch_size, is_train=True):  #@save
+    """Construct a TensorFlow data loader"""
+    dataset = tf.data.Dataset.from_tensor_slices(data_arrays)
+    if is_train:
+        dataset = dataset.shuffle(buffer_size=1000)
+    dataset = dataset.batch(batch_size)
+    return dataset
+
+batch_size = 10
+data_iter = load_array((features, labels), batch_size)
+```
+
 Now we can use `data_iter` in much the same way as we called
 the `data_iter` function in the previous section.
 To verify that it is working, we can read and print
@@ -92,6 +118,11 @@ next(iter(data_iter))
 
 ```{.python .input}
 #@tab pytorch
+next(iter(data_iter))
+```
+
+```{.python .input}
+#@tab tensorflow
 next(iter(data_iter))
 ```
 
@@ -152,6 +183,12 @@ net.add(nn.Dense(1))
 #@tab pytorch
 from torch import nn
 net = nn.Sequential(nn.Linear(2, 1))
+```
+
+```{.python .input}
+#@tab tensorflow
+net = tf.keras.Sequential()
+net.add(tf.keras.layers.Dense(1, kernel_initializer=tf.initializers.RandomNormal(stddev=0.01)))
 ```
 
 :begin_tab:`mxnet`
@@ -255,6 +292,11 @@ loss = gloss.L2Loss()
 loss = nn.MSELoss()
 ```
 
+```{.python .input}
+#@tab tensorflow
+loss = tf.keras.losses.MeanSquaredError()
+```
+
 ## Defining the Optimization Algorithm
 
 :begin_tab:`mxnet`
@@ -294,6 +336,12 @@ trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})
 ```{.python .input}
 #@tab pytorch
 trainer = torch.optim.SGD(net.parameters(), lr = .03)
+```
+
+
+```{.python .input}
+#@tab tensorflow
+trainer = tf.keras.optimizers.SGD(learning_rate=.03)
 ```
 
 ## Training
@@ -344,6 +392,20 @@ for epoch in range(1, num_epochs + 1):
         trainer.step()
     l = loss(net(features), labels)
     print('epoch {}, loss {}'.format(epoch, l))
+```
+
+
+```{.python .input}
+#@tab tensorflow
+num_epochs = 3
+for epoch in range(1, num_epochs + 1):
+    for X, y in data_iter:
+        with tf.GradientTape(persistent=True) as tape:
+            l = loss(net(X, training=True), y)
+        grads = tape.gradient(l, net.trainable_variables)
+        trainer.apply_gradients(zip(grads, net.trainable_variables))
+    l = loss(net(features), labels)
+    print('epoch %d, loss: %f' % (epoch, l))
 ```
 
 Below, we compare the model parameters learned by training on finite data
