@@ -410,6 +410,14 @@ import numpy as np
 import math
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import numpy as np
+import math
+```
+
 ### Generating the Dataset
 
 First we need data. Given $x$, we will use the following cubic polynomial to generate the labels on training and test data:
@@ -458,6 +466,19 @@ poly_features = torch.from_numpy(poly_features).type(torch.float32)
 labels = torch.from_numpy(labels).type(torch.float32)
 ```
 
+```{.python .input}
+#@tab tensorflow
+maxdegree = 20  # Maximum degree of the polynomial
+n_train, n_test = 100, 100  # Training and test dataset sizes
+true_w, true_b = [1.2, -3.4, 5.6], 5
+
+features = tf.random.normal(shape=(n_train + n_test, 1))
+poly_features = tf.concat([features, tf.pow(features, 2), tf.pow(features, 3)], axis=1)
+
+labels = (true_w[0] * poly_features[:, 0] + true_w[1] * poly_features[:, 1] + true_w[2] * poly_features[:, 2] + true_b)
+labels += tf.random.normal(labels.shape, stddev=0.1)
+```
+
 For optimization, we typically want to avoid
 very large values of gradients, losses, etc.
 This is why the monomials stored in `poly_features`
@@ -476,6 +497,11 @@ features[:2], poly_features[:2], labels[:2]
 
 ```{.python .input}
 #@tab pytorch
+features[:2], poly_features[:2], labels[:2]
+```
+
+```{.python .input}
+#@tab tensorflow
 features[:2], poly_features[:2], labels[:2]
 ```
 
@@ -501,6 +527,20 @@ def evaluate_loss(net, data_iter, loss):  #@save
         l = loss(net(X), y.reshape(-1, 1))
         if l.nelement() != 1:
             metric.add(l.sum(), y.numpy().size)
+        else:
+            metric.add(l*len(y), y.numpy().size)
+    return metric[0] / metric[1]
+```
+
+```{.python .input}
+#@tab tensorflow
+def evaluate_loss(net, data_iter, loss):  #@save
+    """Evaluate the loss of a model on the given dataset."""
+    metric = d2l.Accumulator(2)  # sum_loss, num_examples
+    for X, y in data_iter:
+        l = loss(net(X), tf.reshape(y, (-1, 1))
+        if len(l) != 1:
+            metric.add(tf.reduce_sum(l), y.numpy().size)
         else:
             metric.add(l*len(y), y.numpy().size)
     return metric[0] / metric[1]
@@ -559,6 +599,32 @@ def train(train_features, test_features, train_labels, test_labels,
     print('weight:', net[0].weight.data.numpy())
 ```
 
+```{.python .input}
+#@tab tensorflow
+def train(train_features, test_features, train_labels, test_labels,
+          num_epochs=1000):
+    loss = tf.losses.MeanSquaredError()
+    input_shape = train_features.shape[-1]
+    # Switch off the bias since we already catered for it in the polynomial
+    # features
+    net = tf.keras.Sequential()
+    net.add(tf.keras.layers.Dense(1))
+    batch_size = min(10, train_labels.shape[0])
+    train_iter = d2l.load_array((train_features, train_labels), batch_size)
+    test_iter = d2l.load_array((test_features, test_labels), batch_size,
+                               is_train=False)
+    trainer = tf.keras.optimizers.SGD(learning_rate=.01)
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], ylim=[1e-3, 1e2],
+                            legend=['train', 'test'])
+    for epoch in range(1, num_epochs+1):
+        d2l.train_epoch_ch3(net, train_iter, loss, trainer)
+        if epoch % 50 == 0:
+            animator.add(epoch, (evaluate_loss(net, train_iter, loss),
+                                 evaluate_loss(net, test_iter, loss)))
+    print('weight:', get_weights()[0])
+```
+
 ### Third-Order Polynomial Function Fitting (Normal)
 
 We will begin by first using a third-order polynomial function
@@ -581,6 +647,14 @@ train(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
 # features
 train(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
       labels[:n_train].reshape(-1,1), labels[n_train:].reshape(-1,1))
+```
+
+```{.python .input}
+#@tab tensorflow
+# Pick the first four dimensions, i.e., 1, x, x^2, x^3 from the polynomial
+# features
+train(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
+      tf.reshape(labels[:n_train], (-1, 1)), tf.reshape(labels[n_train:], (-1, 1)))
 ```
 
 ### Linear Function Fitting (Underfitting)
@@ -606,6 +680,13 @@ train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
 # Pick the first four dimensions, i.e., 1, x from the polynomial features
 train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
       labels[:n_train].reshape(-1,1), labels[n_train:].reshape(-1,1))
+```
+
+```{.python .input}
+#@tab tensorflow
+# Pick the first four dimensions, i.e., 1, x from the polynomial features
+train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
+      tf.reshape(labels[:n_train], (-1, 1)), tf.reshape(labels[n_train:], (-1, 1)))
 ```
 
 ### Insufficient Training (Overfitting)
@@ -640,6 +721,16 @@ n_degree = 20  # Degree of polynomials
 train(poly_features[1:n_subset, 0:n_degree],
       poly_features[n_train:, 0:n_degree], labels[1:n_subset].reshape(-1,1),
       labels[n_train:].reshape(-1,1))
+```
+
+```{.python .input}
+#@tab tensorflow
+n_subset = 100  # Subset of data to train on
+n_degree = 20  # Degree of polynomials
+train(poly_features[1:n_subset, 0:n_degree],
+      poly_features[n_train:, 0:n_degree],
+      tf.reshape(labels[1:n_subset], (-1, 1)),
+      tf.reshape(labels[n_train:], (-1, 1)))
 ```
 
 In later chapters, we will continue
