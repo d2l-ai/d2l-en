@@ -575,6 +575,32 @@ class FixedHiddenMLP(nn.Module):
         return x.sum()
 ```
 
+```{.python .input}
+#@tab tensorflow
+class FixedHiddenMLP(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        self.flatten = tf.keras.layers.Flatten()
+        # Random weight parameters that will not compute gradients and 
+        # and therefore keep constant during training.
+        self.rand_weight = tf.constant(tf.random.uniform((20, 20)))
+        self.dense = tf.keras.layers.Dense(20, activation=tf.nn.relu)
+
+    def call(self, inputs):
+        x = self.flatten(inputs)
+        # Use the constant parameters created, as well as the relu
+        # and dot functions
+        x = tf.nn.relu(tf.matmul(x, self.rand_weight) + 1)
+        # Reuse the fully connected layer. This is equivalent to sharing
+        # parameters with two fully connected layers
+        x = self.dense(x)
+        # Here in Control flow, we need to call asscalar to return the scalar
+        # for comparison
+        while tf.norm(x) > 1:
+            x /= 2
+        return tf.reduce_sum(x)
+```
+
 In this `FixedHiddenMLP` model,
 we implement a hidden layer whose weights 
 (`self.rand_weight`) are initialized randomly
@@ -607,6 +633,12 @@ net(x)
 
 ```{.python .input}
 #@tab pytorch
+net = FixedHiddenMLP()
+net(x)
+```
+
+```{.python .input}
+#@tab tensorflow
 net = FixedHiddenMLP()
 net(x)
 ```
@@ -648,6 +680,27 @@ class NestMLP(nn.Module):
         return self.linear(self.net(x))
 
 chimera = nn.Sequential(NestMLP(), nn.Linear(16, 20), FixedHiddenMLP())
+chimera(x)
+```
+
+```{.python .input}
+#@tab tensorflow
+class NestMLP(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        self.net = tf.keras.Sequential()
+        self.net.add(tf.keras.layers.Flatten())
+        self.net.add(tf.keras.layers.Dense(64, activation=tf.nn.relu))
+        self.net.add(tf.keras.layers.Dense(32, activation=tf.nn.relu))
+        self.dense = tf.keras.layers.Dense(16, activation=tf.nn.relu)
+
+    def call(self, inputs):
+        return self.dense(self.net(inputs))
+
+chimera = tf.keras.Sequential()
+chimera.add(NestMLP())
+chimera.add(tf.keras.layers.Dense(20))
+chimera.add(FixedHiddenMLP())
 chimera(x)
 ```
 

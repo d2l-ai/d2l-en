@@ -56,6 +56,21 @@ x = torch.randn(2, 4)
 net(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(4, activation=tf.nn.relu),
+    tf.keras.layers.Dense(1),
+])
+
+x = tf.random.uniform((2, 4))
+net(x)
+```
+
 ## Parameter Access
 
 Let us start with how to access parameters
@@ -75,6 +90,11 @@ print(net[1].params)
 ```{.python .input}
 #@tab pytorch
 print(net[2].state_dict())  
+```
+
+```{.python .input}
+#@tab tensorflow
+print(net.layers[2].weights)  
 ```
 
 The output tells us a few important things.
@@ -119,6 +139,13 @@ print(net[2].bias)
 print(net[2].bias.data)
 ```
 
+```{.python .input}
+#@tab tensorflow
+print(type(net.layers[2].weights[0]))
+print(net.layers[2].weights[0])
+print(net.layers[2].weights[0].numpy())
+```
+
 Parameters are complex objects,
 containing data, gradients,
 and additional information.
@@ -134,6 +161,11 @@ net[0].weight.grad()
 ```{.python .input}
 #@tab pytorch
 net[0].weight.grad == None
+```
+
+```{.python .input}
+#@tab tensorflow
+net.layers[0].weights == []
 ```
 
 ### All Parameters at Once
@@ -163,6 +195,15 @@ print(net[0].state_dict())
 print(net.state_dict())
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+# parameters only for the first layer
+print(net.layers[1].weights)
+# parameters of the entire network
+print(net.get_weights())
+```
+
 This provides us with another way of accessing the parameters of the network:
 
 ```{.python .input}
@@ -172,6 +213,11 @@ net.collect_params()['dense1_bias'].data()
 ```{.python .input}
 #@tab pytorch
 net.state_dict()['2.bias'].data
+```
+
+```{.python .input}
+#@tab tensorflow
+net.get_weights()[1]
 ```
 
 :begin_tab:`mxnet`
@@ -230,6 +276,26 @@ def block2():
     return net
 
 rgnet = nn.Sequential(block2(), nn.Linear(4, 1))
+rgnet(x)
+```
+
+```{.python .input}
+#@tab tensorflow
+def block1(name):
+    return tf.keras.Sequential([
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(4, activation=tf.nn.relu)],
+        name=name)
+
+def block2():
+    net = tf.keras.Sequential()
+    for i in range(4):
+        net.add(block1(name=f'block-{i}'))
+    return net
+
+rgnet = tf.keras.Sequential()
+rgnet.add(block2())
+rgnet.add(tf.keras.layers.Dense(1))
 rgnet(x)
 ```
 
