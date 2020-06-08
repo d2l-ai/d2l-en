@@ -33,6 +33,14 @@ import torch
 import random
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import random
+```
+
 ## Generating the Dataset
 
 To keep things simple, we will construct an artificial dataset
@@ -87,6 +95,22 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
+```{.python .input}
+#@tab tensorflow
+def synthetic_data(w, b, num_examples):  #@save
+    """Generate y = X w + b + noise."""
+    X = tf.zeros(shape=(num_examples, w.shape[0]))
+    X += tf.random.normal(shape=X.shape)
+    y = tf.matmul(X, w) + b
+    y += tf.random.normal(shape=y.shape, stddev=0.01)
+    y = tf.reshape(y, [num_examples])
+    return X, y
+
+true_w = tf.constant([2, -3.4], shape=(2, 1))
+true_b = 4.2
+features, labels = synthetic_data(true_w, true_b, 1000)
+```
+
 Note that each row in `features` consists of a 2-dimensional data point
 and that each row in `labels` consists of a 1-dimensional target value (a scalar).
 
@@ -96,6 +120,11 @@ print('features:', features[0],'\nlabel:', labels[0])
 
 ```{.python .input}
 #@tab pytorch
+print('features:', features[0],'\nlabel:', labels[0])
+```
+
+```{.python .input}
+#@tab tensorflow
 print('features:', features[0],'\nlabel:', labels[0])
 ```
 
@@ -109,6 +138,12 @@ d2l.plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
 
 ```{.python .input}
 #@tab pytorch
+d2l.set_figsize((3.5, 2.5))
+d2l.plt.scatter(features[:, 1].numpy(), labels.numpy(), 1);
+```
+
+```{.python .input}
+#@tab tensorflow
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.scatter(features[:, 1].numpy(), labels.numpy(), 1);
 ```
@@ -154,6 +189,18 @@ def data_iter(batch_size, features, labels):
         yield features[j], labels[j]
 ```
 
+```{.python .input}
+#@tab tensorflow
+def data_iter(batch_size, features, labels):
+    num_examples = len(features)
+    indices = list(range(num_examples))
+    # The examples are read at random, in no particular order
+    random.shuffle(indices)
+    for i in range(0, num_examples, batch_size):
+        j = tf.constant(indices[i: min(i + batch_size, num_examples)])
+        yield tf.gather(features, j), tf.gather(labels, j)
+```
+
 In general, note that we want to use reasonably sized minibatches
 to take advantage of the GPU hardware,
 which excels at parallelizing operations.
@@ -178,6 +225,15 @@ for X, y in data_iter(batch_size, features, labels):
 
 ```{.python .input}
 #@tab pytorch
+batch_size = 10
+
+for X, y in data_iter(batch_size, features, labels):
+    print(X, '\n', y)
+    break
+```
+
+```{.python .input}
+#@tab tensorflow
 batch_size = 10
 
 for X, y in data_iter(batch_size, features, labels):
@@ -214,6 +270,12 @@ b.attach_grad()
 #@tab pytorch
 w = torch.normal(0, 0.01, size=(2,1), requires_grad=True)
 b = torch.zeros(1, requires_grad=True)
+```
+
+```{.python .input}
+#@tab tensorflow
+w = tf.Variable(tf.random.normal(shape=(2, 1), mean=0, stddev=0.01), trainable=True)
+b = tf.Variable(tf.zeros(1), trainable=True)
 ```
 
 After initialized our parameters,
@@ -257,6 +319,12 @@ def linreg(X, w, b):  #@save
     return torch.matmul(X, w) + b
 ```
 
+```{.python .input}
+#@tab tensorflow
+def linreg(X, w, b):  #@save
+    return tf.matmul(X, w) + b
+```
+
 ## Defining the Loss Function
 
 Since updating our model requires taking
@@ -278,6 +346,12 @@ def squared_loss(y_hat, y):  #@save
 #@tab pytorch
 def squared_loss(y_hat, y):  #@save
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
+```
+
+```{.python .input}
+#@tab tensorflow
+def squared_loss(y_hat, y):  #@save
+    return (y_hat - tf.reshape(y, y_hat.shape)) ** 2 / 2
 ```
 
 ## Defining the Optimization Algorithm
@@ -316,6 +390,13 @@ def sgd(params, lr, batch_size):  #@save
     for param in params:
         param.data.sub_(lr*param.grad/batch_size)
         param.grad.data.zero_()
+```
+
+```{.python .input}
+#@tab tensorflow
+def sgd(params, grads, lr, batch_size):  #@save
+    for param, grad in zip(params, grads):
+        param.assign_sub(lr*grad/batch_size)
 ```
 
 ## Training
@@ -404,6 +485,29 @@ for epoch in range(num_epochs):
         print(f'epoch {epoch+1}, loss {float(train_l.mean())}')
 ```
 
+```{.python .input}
+#@tab tensorflow
+lr = 0.03  # Learning rate
+num_epochs = 3  # Number of iterations
+net = linreg  # Our fancy linear model
+loss = squared_loss  # 0.5 (y-y')^2
+for epoch in range(num_epochs):
+    # Assuming the number of examples can be divided by the batch size, all
+    # the examples in the training data set are used once in one epoch
+    # iteration. The features and tags of mini-batch examples are given by X
+    # and y respectively
+    for X, y in data_iter(batch_size, features, labels):
+        with tf.GradientTape(persistent=True) as g:
+            l = loss(net(X, w, b), y)    # Minibatch loss in X and y
+            l = tf.reduce_mean(l)
+        # Compute gradient on l with respect to [w,b]
+        dl_dw = g.gradient(l, w)
+        dl_db = g.gradient(l, b)
+        sgd([w, b], [dl_dw, dl_db], lr, batch_size)     # Update parameters using their gradient
+    train_l = loss(net(features, w, b), labels)
+    print(f'epoch {epoch+1}, loss {float(tf.reduce_mean(train_l))}')
+```
+
 In this case, because we synthesized the data ourselves,
 we know precisely what the true parameters are.
 Thus, we can evaluate our success in training
@@ -419,6 +523,12 @@ print('Error in estimating b', true_b - b)
 ```{.python .input}
 #@tab pytorch
 print('Error in estimating w', true_w - w.reshape(true_w.shape))
+print('Error in estimating b', true_b - b)
+```
+
+```{.python .input}
+#@tab tensorflow
+print('Error in estimating w', true_w - tf.reshape(w, true_w.shape))
 print('Error in estimating b', true_b - b)
 ```
 

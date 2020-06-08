@@ -32,6 +32,15 @@ import sys
 d2l.use_svg_display()
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import sys
+d2l.use_svg_display()
+```
+
 ## Getting the Dataset
 
 We can download and load the FashionMNIST dataset into memory via the the build-in functions in the framework.
@@ -54,6 +63,12 @@ mnist_test = torchvision.datasets.FashionMNIST(
     root="../data", train=False, transform=trans, download=True)
 ```
 
+```{.python .input}
+#@tab tensorflow
+(mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
+```
+
+
 FashionMNIST consists of images from 10 categories, each represented
 by 6k images in the training set and by 1k in the test set.
 Consequently the training set and the test set
@@ -67,6 +82,12 @@ len(mnist_train), len(mnist_test)
 ```{.python .input}
 #@tab pytorch
 len(mnist_train), len(mnist_test)
+```
+
+
+```{.python .input}
+#@tab tensorflow
+len(mnist_train_x), len(mnist_test_x)
 ```
 
 The images in Fashion-MNIST are associated with the following categories:
@@ -114,6 +135,15 @@ show_images(X.squeeze(axis=-1), 2, 9, titles=get_fashion_mnist_labels(y));
 #@tab pytorch
 X, y = next(iter(data.DataLoader(mnist_train, batch_size=18)))
 show_images(X.reshape(18, 28, 28), 2, 9, titles=get_fashion_mnist_labels(y));
+```
+
+```{.python .input}
+#@tab tensorflow
+X, y = [], []
+for i in range(18):
+    X.append(mnist_train_x[i])
+    y.append(mnist_train_y[i])
+show_images(tf.constant(X, shape=(18, 28, 28)), 2, 9, titles=get_fashion_mnist_labels(y));
 ```
 
 ## Reading a Minibatch
@@ -171,6 +201,13 @@ train_iter = data.DataLoader(mnist_train, batch_size, shuffle=True,
                              num_workers=get_dataloader_workers())
 ```
 
+```{.python .input}
+#@tab tensorflow
+batch_size = 256
+train_iter = tf.data.Dataset.from_tensor_slices((mnist_train_x, mnist_train_y)).batch(batch_size).shuffle(len(mnist_train_x))
+```
+
+
 Let us look at the time it takes to read the training data.
 
 ```{.python .input}
@@ -183,6 +220,14 @@ f'{timer.stop():.2f} sec'
 
 ```{.python .input}
 #@tab pytorch
+timer = d2l.Timer()
+for X, y in train_iter:
+    continue
+f'{timer.stop():.2f} sec'
+```
+
+```{.python .input}
+#@tab tensorflow
 timer = d2l.Timer()
 for X, y in train_iter:
     continue
@@ -230,6 +275,19 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                             num_workers=get_dataloader_workers()))
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+def load_data_fashion_mnist(batch_size, resize=None):  #@save
+    """Download the Fashion-MNIST dataset and then load into memory."""
+    # TODO: Resize
+    (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
+    return (
+        tf.data.Dataset.from_tensor_slices(
+            (mnist_train_x, mnist_train_y)).batch(batch_size).shuffle(len(mnist_train_x)),
+        tf.data.Dataset.from_tensor_slices((mnist_test_x, mnist_test_y)).batch(batch_size))
+```
+
 Below, we verify that image resizing works.
 
 ```{.python .input}
@@ -242,6 +300,14 @@ for X, y in train_iter:
 
 ```{.python .input}
 #@tab pytorch
+train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
+for X, y in train_iter:
+    print(X.shape)
+    break
+```
+
+```{.python .input}
+#@tab tensorflow
 train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
 for X, y in train_iter:
     print(X.shape)

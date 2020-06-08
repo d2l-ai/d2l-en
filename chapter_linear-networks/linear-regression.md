@@ -373,6 +373,20 @@ a = torch.ones(n)
 b = torch.ones(n)
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import math
+import tensorflow as tf
+import numpy as np
+import time
+
+n = 10000
+a = tf.ones(n)
+b = tf.ones(n)
+```
+
 Since we will benchmark the running time frequently in this book,
 let us define a timer (hereafter accessed via the `d2l` package
 to track the running time.
@@ -428,6 +442,15 @@ for i in range(n):
 f'{timer.stop():.5f} sec'
 ```
 
+```{.python .input}
+#@tab tensorflow
+c = tf.Variable(tf.zeros(n))
+timer = Timer()
+for i in range(n):
+    c[i].assign(a[i] + b[i])
+f'{timer.stop():.5f} sec'
+```
+
 Alternatively, we rely on the reloaded `+` operator to compute the elementwise sum:
 
 ```{.python .input}
@@ -438,6 +461,13 @@ f'{timer.stop():.5f} sec'
 
 ```{.python .input}
 #@tab pytorch
+timer.start()
+d = a + b
+f'{timer.stop():.5f} sec'
+```
+
+```{.python .input}
+#@tab tensorflow
 timer.start()
 d = a + b
 f'{timer.stop():.5f} sec'
