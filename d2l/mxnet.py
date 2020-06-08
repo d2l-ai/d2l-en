@@ -377,3 +377,16 @@ DATA_HUB['kaggle_house_test'] = (
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
 
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_gpu(i=0):  #@save
+    """Return gpu(i) if exists, otherwise return cpu()."""
+    return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_all_gpus():  #@save
+    """Return all available GPUs, or [cpu(),] if no GPU exists."""
+    ctxes = [npx.gpu(i) for i in range(npx.num_gpus())]
+    return ctxes if ctxes else [npx.cpu()]
+
+

@@ -239,7 +239,8 @@ dense.weight
 
 ```{.python .input}
 #@tab tensorflow
-dense = MyDense(5, 3)
+dense = MyDense(3)
+dense(tf.random.uniform((2, 5)))
 dense.get_weights()
 ```
 
@@ -281,7 +282,7 @@ net(torch.randn(2, 64))
 
 ```{.python .input}
 #@tab tensorflow
-net = tf.keras.models.Sequential(MyDense(64, 8), MyDense(8, 1))
+net = tf.keras.models.Sequential([MyDense(8), MyDense(1)])
 net(tf.random.uniform((2, 64)))
 ```
 

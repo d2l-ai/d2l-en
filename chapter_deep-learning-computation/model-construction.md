@@ -290,14 +290,14 @@ class MLP(tf.keras.Model):
         super().__init__()
         self.flatten = tf.keras.layers.Flatten()
         self.hidden = tf.keras.layers.Dense(units=256, activation=tf.nn.relu)  # Hidden layer
-        self.output = tf.keras.layers.Dense(units=10)  # Output layer
+        self.out = tf.keras.layers.Dense(units=10)  # Output layer
 
     # Define the forward computation of the model, that is, how to return the
     # required model output based on the input x
     def call(self, inputs):
         x = self.flatten(inputs)
         x = self.hidden(x)
-        return self.output(x)
+        return self.out(x)
 ```
 
 To begin, let us focus on the `forward` method.
