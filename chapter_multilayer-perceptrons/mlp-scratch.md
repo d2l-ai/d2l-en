@@ -131,7 +131,7 @@ def relu(X):
 ```{.python .input}
 #@tab tensorflow
 def relu(X):
-    return tf.math.maximum(x, 0)
+    return tf.math.maximum(X, 0)
 ```
 
 ## The model
@@ -161,7 +161,7 @@ def net(X):
 #@tab tensorflow
 def net(X):
     X = tf.reshape(X, shape=[-1, num_inputs])
-    H = relu(tf.matmul(X, W1) + b1)
+    H = relu(tf.matmul(tf.cast(X, dtype=tf.float32), W1) + b1)
     return tf.math.softmax(tf.matmul(H, W2) + b2)
 ```
 
@@ -221,7 +221,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
 #@tab tensorflow
 num_epochs, lr = 10, 0.5
 updater = tf.keras.optimizers.SGD(learning_rate=lr)
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater, params=[W1, W2, b1, b2])
 ```
 
 To evaluate the learned model, 

@@ -547,8 +547,8 @@ def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
-        l = loss(net(X), tf.reshape(y, (-1, 1))
-        if len(l) != 1:
+        l = loss(net(X), tf.reshape(y, (-1, 1)))
+        if l.shape != []:
             metric.add(tf.reduce_sum(l), y.numpy().size)
         else:
             metric.add(l*len(y), y.numpy().size)
