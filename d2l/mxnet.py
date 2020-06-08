@@ -2532,4 +2532,570 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+#d2l.DATA_HUB['faces-casia'] = (
+#    'https://s3.amazonaws.com/research.metamind.io/facerecognition/'
+#    'faces-casia.zip', '6435a11cd3e6c036ba6a7c329f4f0684377b912c')
+
+d2l.DATA_HUB['faces-casia-small'] = (
+    'http://d2l-data.s3-accelerate.amazonaws.com/'
+    'faces-casia-small.zip', 'b2eed95fd98296c25af65623b8aaa3ee87f982ff')
+
+d2l.DATA_HUB['faces-casia-ultrasmall'] = (
+    'http://d2l-data.s3-accelerate.amazonaws.com/'
+    'faces-casia-ultrasmall.zip', '352b9a33ca089307a07cec80c23b1765d304e95a')
+    
+#d2l.DATA_HUB['faces-ms1mv2'] = (
+#    'https://s3.amazonaws.com/research.metamind.io/facerecognition/'
+#    'ms1m-v2.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
+    
+#d2l.DATA_HUB['faces-ms1mv3'] = (
+#    'https://s3.amazonaws.com/research.metamind.io/facerecognition/'
+#    'ms1m-v3.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
+
+def read_facerec_meta(data_dir):
+    file_name = os.path.join(data_dir, 'property')
+    line = open(file_name, 'r').readlines()[0]
+    vals = [int(x) for x in line.split(',')]
+    return (vals[1], vals[2]), vals[0]
+
+class FaceDataset(gluon.data.Dataset):
+    def __init__(self, data_dir):
+
+        from mxnet.gluon.data.vision import transforms
+        import glob
+        image_size, num_classes = read_facerec_meta(data_dir)
+        self.transform = transforms.Compose([
+            transforms.RandomFlipLeftRight(),
+            transforms.ToTensor()
+        ])
+
+        self.seq = []
+        for i in range(num_classes):
+            id_dir = os.path.join(data_dir, "%08d"%i)
+            image_path_list = glob.glob(os.path.join(id_dir, "*.jpg"))
+            for image_path in image_path_list:
+                self.seq.append( (image_path, i))
+
+    def __len__(self):
+        return len(self.seq)
+
+    def __getitem__(self, idx):
+        item = self.seq[idx]
+        with open(item[0], 'rb') as fp:
+            str_image = fp.read()
+        img = image.imdecode(str_image)
+        label = item[1]
+        img = self.transform(img)
+        return img, label
+
+def load_data_face_rec(data_dir, load_val=['lfw'], batch_size=512):
+    
+    ds = FaceDataset(data_dir) 
+    loader = gluon.data.DataLoader(ds, batch_size=batch_size, shuffle=True, num_workers = d2l.get_dataloader_workers(), last_batch='discard')
+    val_set = {}
+    if load_val:
+        from mxnet.gluon.data.vision import transforms
+        import pickle
+        transform = transforms.Compose([
+            transforms.ToTensor()
+        ])
+        image_size, num_classes = read_facerec_meta(data_dir)
+        for val_name in load_val:
+            val_file = os.path.join(data_dir, "%s.bin"%val_name)
+            with open(val_file, 'rb') as f:
+                bins, issame_list = pickle.load(f, encoding='bytes') #py3
+            data_list = []
+            for flip in [0,1]:
+                data = np.zeros((len(issame_list)*2, 3, image_size[1], image_size[0]), dtype=np.float32)
+                data_list.append(data)
+            for i in range(len(issame_list)*2):
+                _bin = bins[i]
+                img = image.imdecode(_bin)
+                img = transform(img)
+                #img = 2*img - 1
+                for flip in [0,1]:
+                    if flip==1:
+                        img = img[:,:,::-1]
+                    data_list[flip][i][:] = img
+                if i%1000==0:
+                    print('loading bin %s %d'%(val_name, i))
+            print(data_list[0].shape)
+            val_set[val_name] = (data_list, issame_list)
+            #return (data_list, issame_list)
+    return loader, val_set
+
+class BasicBlockV3(nn.Block):
+
+    # Helpers
+    def _conv3x3(self, channels, stride, in_channels):
+        return nn.Conv2D(channels, kernel_size=3, strides=stride, padding=1,
+            use_bias=False, in_channels=in_channels)
+
+    def _act(self):
+        if self.act_type=='prelu':
+            return nn.PReLU()
+        else:
+            return nn.Activation(self.act_type)
+
+    def __init__(self, channels, stride, downsample=False, in_channels=0, act_type = 'relu', **kwargs):
+        super(BasicBlockV3, self).__init__(**kwargs)
+        self.act_type = act_type
+        self.body = nn.Sequential(prefix='')
+        self.body.add(nn.BatchNorm(epsilon=2e-5))
+        self.body.add(self._conv3x3(channels, 1, in_channels))
+        self.body.add(nn.BatchNorm(epsilon=2e-5))
+        self.body.add(self._act())
+        self.body.add(self._conv3x3(channels, stride, channels))
+        self.body.add(nn.BatchNorm(epsilon=2e-5))
+        if downsample:
+            self.downsample = nn.Sequential(prefix='')
+            self.downsample.add(nn.Conv2D(channels, kernel_size=1, 
+                strides=stride, use_bias=False, in_channels=in_channels))
+            self.downsample.add(nn.BatchNorm(epsilon=2e-5))
+        else:
+            self.downsample = None
+
+    def forward(self, x):
+        residual = x
+        x = self.body(x)
+        if self.downsample:
+            residual = self.downsample(residual)
+        x = x+residual
+        return x
+
+class FaceResNet(nn.Block):    
+
+
+    def _conv3x3(self, channels, stride, in_channels):
+        return nn.Conv2D(channels, kernel_size=3, strides=stride, padding=1,
+            use_bias=False, in_channels=in_channels)
+
+    def _act(self):
+        if self.act_type=='prelu':
+            return nn.PReLU()
+        else:
+            return nn.Activation(self.act_type)
+
+
+    def __init__(self, layers, channels, classes, use_dropout, **kwargs):
+
+        super(FaceResNet,self).__init__(**kwargs)
+        assert len(layers)==len(channels)-1
+        self.act_type = 'prelu'
+        block = BasicBlockV3
+        #print('use_dropout:', use_dropout)
+        with self.name_scope():
+            self.features = nn.Sequential(prefix='')
+            self.features.add(self._conv3x3(channels[0], 1, 0))
+            self.features.add(nn.BatchNorm(epsilon=2e-5))
+            self.features.add(self._act())
+            in_channels = channels[0]
+            for i, num_layer in enumerate(layers):
+                stride = 2
+                self.features.add(self._make_layer(block, num_layer, channels[i+1],
+                                                   stride, i+1, in_channels=in_channels))
+                in_channels = channels[i+1]
+            self.features.add(nn.BatchNorm(epsilon=2e-5))
+            if use_dropout:
+                self.features.add(nn.Dropout(0.4))
+            self.features.add(nn.Flatten())
+            self.features.add(nn.Dense(classes))
+
+    def _make_layer(self, block, layers, channels, stride, stage_index, in_channels=0):
+        layer = nn.Sequential(prefix='stage%d_'%stage_index)
+        with layer.name_scope():
+            layer.add(block(channels, stride, True, in_channels=in_channels, act_type = self.act_type,
+                            prefix=''))
+            for _ in range(layers-1):
+                layer.add(block(channels, 1, False, in_channels=channels, act_type = self.act_type, prefix=''))
+        return layer
+
+    def forward(self, x):
+        x = self.features(x)
+        return x
+
+faceresnet_spec = {18: ('basic_block', [2, 2, 2, 2], [64, 64, 128, 256, 512]),
+                   34: ('basic_block', [3, 4, 6, 3], [64, 64, 128, 256, 512]),
+                   50: ('basic_block', [3, 4, 14, 3], [64, 64, 128, 256, 512]),
+                   100: ('basic_block', [3, 13, 30, 3], [64, 64, 128, 256, 512])}
+
+# Constructor
+def get_faceresnet(num_layers, num_classes, use_dropout=False, do_init=True):
+    assert num_layers in faceresnet_spec, \
+        "Invalid number of layers: %d. Options are %s"%(
+            num_layers, str(faceresnet_spec.keys()))
+    block_type, layers, channels = faceresnet_spec[num_layers]
+    net = FaceResNet(layers, channels, num_classes, use_dropout)
+    if do_init:
+        initializer = init.Xavier(rnd_type='gaussian', factor_type="out", magnitude=2)
+        net.initialize(initializer)
+    return net
+
+class ArcMarginBlock(nn.Block):
+    def __init__(self, emb_size, num_classes, margin_s=64.0, margin_m=0.5, margin_a=1.0, margin_b=0.0, **kwargs):
+        super(ArcMarginBlock, self).__init__(**kwargs)
+        self.margin_s = margin_s
+        self.margin_m = margin_m
+        self.margin_a = margin_a
+        self.margin_b = margin_b
+        self.num_classes = num_classes
+        assert(self.num_classes>0)
+        self.emb_size = emb_size
+        #print('in arc margin', self.num_classes, self.emb_size)
+        with self.name_scope():
+            self.fc7_weight = self.params.get('fc7_weight', shape=(self.num_classes, self.emb_size))
+            self.fc7_weight.initialize(init=init.Normal(0.01))
+    
+    #def emb_size(self):
+    #    return self.emb_size
+
+    #def num_classes(self):
+    #    return self.num_classes
+        
+    def forward(self, x, y):
+
+        xnorm = np.linalg.norm(x, 'fro', 1, True) + 0.00001
+        nx = x / xnorm
+
+        fc7_weight = self.fc7_weight.data(x.ctx)
+
+        wnorm = np.linalg.norm(fc7_weight, 'fro', 1, True) + 0.00001
+        nw = fc7_weight / wnorm
+
+        fc7 = npx.fully_connected(nx, nw, no_bias = True, num_hidden=self.num_classes, name='fc7')
+
+        if self.margin_a!=1.0 or self.margin_m!=0.0 or self.margin_b!=0.0:
+            gt_one_hot = npx.one_hot(y, depth = self.num_classes, on_value = 1.0, off_value = 0.0)
+            if self.margin_a==1.0 and self.margin_m==0.0:
+                _onehot = gt_one_hot*self.margin_b
+                fc7 = fc7-_onehot
+            else:
+                fc7_onehot = fc7 * gt_one_hot
+                cos_t = fc7_onehot
+                t = np.arccos(cos_t)
+                if self.margin_a!=1.0:
+                    t = t*self.margin_a
+                if self.margin_m>0.0:
+                    t = t+self.margin_m
+                margin_cos = np.cos(t)
+                if self.margin_b>0.0:
+                    margin_cos = margin_cos - self.margin_b
+                margin_fc7 = margin_cos
+                margin_fc7_onehot = margin_fc7 * gt_one_hot
+                diff = margin_fc7_onehot - fc7_onehot
+                fc7 = fc7+diff
+        fc7 = fc7*self.margin_s
+        return fc7
+
+class ClsAccMetric(gluon.metric.EvalMetric):
+  def __init__(self):
+      self.axis = 1
+      super(ClsAccMetric, self).__init__(
+          'acc', axis=self.axis,
+          output_names=None, label_names=None)
+
+  def update(self, labels, preds):
+      for label, pred_label in zip(labels, preds):
+          if pred_label.shape != label.shape:
+              pred_label = np.argmax(pred_label, axis=self.axis)
+          #pred_label = pred_label.asnumpy().astype('int32').flatten()
+          #label = label.asnumpy()
+          #print(pred_label.shape, label.shape)
+          pred_label = pred_label.astype('int32').asnumpy()
+          label = label.astype('int32').asnumpy()
+          assert label.shape==pred_label.shape
+          self.sum_metric += (pred_label == label).sum()
+          self.num_inst += len(pred_label)
+
+def train_ch_facerec(net, loader, loss, trainer, num_epochs, ctx):
+    from mxnet.gluon.metric import CompositeEvalMetric
+    import logging
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    metric = CompositeEvalMetric([ClsAccMetric()])
+    g_batch_idx = 0
+    for epoch in range(num_epochs):
+        tic = time.time()
+        metric.reset()
+        btic = time.time()
+        for batch_idx, (x, y) in enumerate(loader):
+            data = gluon.utils.split_and_load(x, ctx_list=ctx, batch_axis=0)
+            label = gluon.utils.split_and_load(y, ctx_list=ctx, batch_axis=0)
+            outputs = []
+            losses = []
+            with autograd.record():
+                for _data, _label in zip(data, label):
+                    #print(y.asnumpy())
+                    fc7 = net(_data, _label)
+                    #print(z[0].shape, z[1].shape)
+                    losses.append(loss(fc7, _label))
+                    outputs.append(fc7)
+            for l in losses:
+                l.backward()
+            n = x.shape[0]
+            trainer.step(n)
+            metric.update(label, outputs)
+            i = batch_idx
+            if i>0 and i%20==0:
+                name, acc = metric.get()
+                if len(name)==2:
+                  logger.info('Epoch[%d] Batch [%d]\tSpeed: %f samples/sec\t%s=%f, %s=%f'%(
+                                 epoch, i, n/(time.time()-btic), name[0], acc[0], name[1], acc[1]))
+                else:
+                  logger.info('Epoch[%d] Batch [%d]\tSpeed: %f samples/sec\t%s=%f'%(
+                                 epoch, i, n/(time.time()-btic), name[0], acc[0]))
+                #metric.reset()
+            btic = time.time()
+            g_batch_idx+=1
+
+        epoch_time = time.time()-tic
+
+        # First epoch will usually be much slower than the subsequent epics,
+        # so don't factor into the average
+        #if epoch > 0:
+        #  total_time = total_time + epoch_time
+
+        #name, acc = metric.get()
+        #logger.info('[Epoch %d] training: %s=%f, %s=%f'%(num_epochs, name[0], acc[0], name[1], acc[1]))
+        logger.info('[Epoch %d] time cost: %f'%(epoch, epoch_time))
+
+def test_face_11(data_set, net, ctx, batch_size):
+    import numpy
+    data_list = data_set[0]
+    issame_list = data_set[1]
+    embeddings = None
+    for i in range( len(data_list) ):
+        data = data_list[i]
+        cx = np.zeros( (batch_size,)+data.shape[1:] )
+        ba = 0
+        while ba<data.shape[0]:
+            bb = min(ba+batch_size, data.shape[0])
+            count = bb-ba
+            cx[:count,:,:,:] = data[ba:bb, :,:,:]
+            xs = gluon.utils.split_and_load(cx, ctx_list=ctx, batch_axis=0)
+            embs = [net(x).asnumpy() for x in xs]
+            embs = numpy.concatenate(embs, axis=0)
+            if embeddings is None:
+                embeddings = numpy.zeros( (data.shape[0], embs.shape[1]) )
+            embeddings[ba:bb,:] += embs[:count,:]
+            ba = bb
+    embeddings /= len(data_list)
+    xnorm = embeddings*embeddings
+    xnorm = numpy.sum(xnorm, axis=1, keepdims=True)
+    xnorm = numpy.sqrt(xnorm)
+    embeddings /= xnorm
+    xnorm = numpy.mean(xnorm)
+    emb1 = embeddings[0::2]
+    emb2 = embeddings[1::2]
+    sim = emb1 * emb2
+    sim = numpy.sum(sim, 1)
+    thresholds = numpy.arange(0, 1, 0.0025)
+    actual_issame = issame_list
+    acc_max = 0.0
+    thresh = 0.0
+    for threshold in thresholds:
+        predict_issame = numpy.greater(sim, threshold)
+        tp = numpy.sum(numpy.logical_and(predict_issame, actual_issame))
+        fp = numpy.sum(numpy.logical_and(predict_issame, numpy.logical_not(actual_issame)))
+        tn = numpy.sum(numpy.logical_and(numpy.logical_not(predict_issame), numpy.logical_not(actual_issame)))
+        fn = numpy.sum(numpy.logical_and(numpy.logical_not(predict_issame), actual_issame))
+    
+        tpr = 0 if (tp+fn==0) else float(tp) / float(tp+fn)
+        fpr = 0 if (fp+tn==0) else float(fp) / float(fp+tn)
+        acc = float(tp+tn)/predict_issame.size
+        if acc>acc_max:
+            acc_max = acc
+            thresh = threshold
+    return xnorm, acc_max, thresh
+
+class NPCache():
+  def __init__(self):
+    self._cache = {}
+
+  def get(self, context, name, shape):
+    key = "%s_%s"%(name, context)
+    #print(key)
+    if not key in self._cache:
+      v = np.zeros( shape=shape, ctx = context)
+      self._cache[key] = v
+    else:
+      v = self._cache[key]
+    return v
+
+  def get2(self, context, name, arr):
+    key = "%s_%s"%(name, context)
+    #print(key)
+    if not key in self._cache:
+      v = np.zeros( shape=arr.shape, ctx = context)
+      self._cache[key] = v
+    else:
+      v = self._cache[key]
+    arr.copyto(v)
+    #mx.np.copy(arr, out=v)
+    return v
+
+def train_ch_facerec_parall(net, cls_nets, loader, num_epochs, ctx):
+    num_ctx = len(ctx)
+    ctx_num_classes = cls_nets[0].num_classes
+    emb_size = cls_nets[0].emb_size
+    ctx_class_start = []
+    for i in range(num_ctx):
+        _c = i*ctx_num_classes
+        ctx_class_start.append(_c)
+
+    
+    lr, wd = 0.1, 5e-4
+    trainer = gluon.Trainer(net.collect_params(), 'sgd', 
+            {'learning_rate': lr, 'wd': wd, 'momentum': 0.9, 'multi_precision': True},
+            )
+
+    cls_trainers = []
+    for i in range(num_ctx):
+        _trainer = gluon.Trainer(cls_nets[i].collect_params(), 'sgd', 
+                {'learning_rate': lr, 'wd': wd, 'momentum': 0.9, 'multi_precision': True},
+                )
+        cls_trainers.append(_trainer)
+
+    cache = NPCache()
+    cpu_ctx = npx.cpu()
+    import logging
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    #from mxnet.gluon.metric import CompositeEvalMetric
+    #metric = CompositeEvalMetric([ClsAccMetric()])
+
+
+    def forward_emb(data, label):
+        fc1_out_list = []
+        fc1_list_cpu = []
+        with autograd.record():
+            for _data, _label in zip(data, label):
+                #print(y.asnumpy())
+                fc1 = net(_data)
+                fc1_out_list.append(fc1)
+                #fc1_list.append(fc1)
+        for _fc1 in fc1_out_list:
+            #fc1_cpu = cache.get2(cpu_ctx, 'fc1_cpu', _fc1)
+            fc1_cpu = _fc1.as_in_ctx(cpu_ctx)
+            fc1_list_cpu.append(fc1_cpu)
+        aggr_fc1 = cache.get(cpu_ctx, 'aggr_fc1_cpu', (batch_size, emb_size))
+        np.concatenate(fc1_list_cpu, axis=0, out=aggr_fc1)
+        return aggr_fc1, fc1_out_list
+
+    def forward_logits(aggr_fc1, y):
+        fc1_list = []
+        fc7_list = []
+        _xlist = []
+        _ylist = []
+        for i, cls_net in enumerate(cls_nets):
+            _ctx = ctx[i]
+            _y = cache.get2(_ctx, 'ctxy', y)
+            _y -= ctx_class_start[i]
+            _x = cache.get2(_ctx, 'ctxfc1', aggr_fc1)
+            _xlist.append(_x)
+            _ylist.append(_y)
+        with autograd.record():
+            for i, cls_net in enumerate(cls_nets):
+                _ctx = ctx[i]
+                _x = _xlist[i]
+                _y = _ylist[i]
+                _x.attach_grad()
+                _fc7 = cls_net(_x, _y)
+                fc7_list.append(_fc7)
+                fc1_list.append(_x)
+        return fc1_list, fc7_list
+
+
+    for epoch in range(num_epochs):
+        tic = time.time()
+        #metric.reset()
+        btic = time.time()
+        for batch_idx, (x, y) in enumerate(loader):
+            y = y.astype(np.float32)
+            batch_size = len(y)
+            data = gluon.utils.split_and_load(x, ctx_list=ctx, batch_axis=0)
+            label = gluon.utils.split_and_load(y, ctx_list=ctx, batch_axis=0)
+            aggr_fc1, fc1_out_list = forward_emb(data, label)
+            fc1_list, fc7_list = forward_logits(aggr_fc1, y)
+            #print('log A')
+            fc7_grads = [None] * num_ctx
+            ctx_fc7_max = cache.get(cpu_ctx, 'gctxfc7max', (batch_size, num_ctx))
+            ctx_fc7_max[:,:] = 0.0
+            for i, cls_net in enumerate(cls_nets):
+                _fc7 = fc7_list[i]
+                _max = cache.get(_fc7.context, 'ctxfc7max', (batch_size,))
+                np.max(_fc7, axis=1, out=_max)
+                _cpumax = _max.as_in_ctx(cpu_ctx)
+                ctx_fc7_max[:, i] = _cpumax
+                fc7_grads[i] = cache.get2(_fc7.context, 'fc7grad', _fc7)
+            #nd.max(ctx_fc7_max, axis=1, keepdims=True, out=local_fc7_max)
+            global_fc7_max = cache.get(cpu_ctx, 'globalfc7max', (batch_size, 1))
+            np.max(ctx_fc7_max, axis=1, keepdims=True, out=global_fc7_max)
+            local_fc7_sum = cache.get(cpu_ctx, 'local_fc7_sum', (batch_size, 1))
+            local_fc7_sum[:,:] = 0.0
+
+            for i, cls_net in enumerate(cls_nets):
+                _ctx = ctx[i]
+                _max = cache.get2(_ctx, 'fc7maxgpu', global_fc7_max)
+                fc7_grads[i] -= _max
+                fc7_grads[i] = np.exp(fc7_grads[i])
+                _sum = cache.get(_ctx, 'ctxfc7sum', (batch_size, 1))
+                np.sum(fc7_grads[i], axis=1, keepdims=True, out=_sum)
+                _cpusum = _sum.as_in_ctx(cpu_ctx)
+                local_fc7_sum += _cpusum
+            global_fc7_sum = local_fc7_sum
+
+            #print('log B')
+            local_fc1_grad = cache.get(cpu_ctx, 'localfc1grad', (batch_size, emb_size))
+            local_fc1_grad[:,:] = 0.0
+
+            for i, cls_net in enumerate(cls_nets):
+                _ctx = ctx[i]
+                _sum = cache.get2(_ctx, 'globalfc7sumgpu', global_fc7_sum)
+                fc7_grads[i] /= _sum
+                a = i*ctx_num_classes
+                b = (i+1)*ctx_num_classes
+                _y = cache.get2(_ctx, 'ctxy2', y)
+                _y -= ctx_class_start[i]
+                _yonehot = cache.get(_ctx, 'yonehot', (batch_size, ctx_num_classes))
+                npx.one_hot(_y, depth=ctx_num_classes, on_value=1.0, off_value=0.0, out=_yonehot)
+                fc7_grads[i] -= _yonehot
+                fc7_list[i].backward(fc7_grads[i])
+                fc1 = fc1_list[i]
+                #fc1_grad = cache.get2(cpu_ctx, 'fc1gradcpu', fc1.grad)
+                fc1_grad = fc1.grad.as_in_ctx(cpu_ctx)
+                #print(fc1.grad.dtype, fc1.grad.shape)
+                #print(fc1.grad[0:5,0:5])
+                local_fc1_grad += fc1_grad
+                cls_trainers[i].step(batch_size)
+            #print('log C')
+            for i in range(num_ctx):
+                _ctx = ctx[i]
+                p = batch_size//num_ctx
+                a = p*i
+                b = p*(i+1)
+                _fc1_grad = local_fc1_grad[a:b, :]
+                _grad = cache.get2(_ctx, 'fc1gradgpu', _fc1_grad)
+                fc1_out_list[i].backward(_grad)
+            #print('log D')
+            trainer.step(batch_size)
+            #print('after step')
+            npx.waitall()
+            #metric.update(label, outputs)
+            i = batch_idx
+            if i>0 and i%20==0:
+                logger.info('Epoch[%d] Batch [%d]\tSpeed: %f samples/sec'%(
+                             epoch, i, batch_size/(time.time()-btic)))
+                #name, acc = metric.get()
+                #if len(name)==2:
+                #  logger.info('Epoch[%d] Batch [%d]\tSpeed: %f samples/sec\t%s=%f, %s=%f'%(
+                #                 epoch, i, batch_size/(time.time()-btic), name[0], acc[0], name[1], acc[1]))
+                #else:
+                #  logger.info('Epoch[%d] Batch [%d]\tSpeed: %f samples/sec\t%s=%f'%(
+                #                 epoch, i, batch_size/(time.time()-btic), name[0], acc[0]))
+                #metric.reset()
+            btic = time.time()
+
+        epoch_time = time.time()-tic
+        logger.info('[Epoch %d] time cost: %f'%(epoch, epoch_time))
 
