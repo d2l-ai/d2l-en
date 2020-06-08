@@ -204,8 +204,8 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):  #@save
+    y = tf.cast(y, dtype=tf.int32)
     if y_hat.shape[1] > 1:
-        y = tf.cast(y, dtype=tf.int32)
         return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
     else:
         return tf.cast(tf.cast(y_hat, dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
@@ -238,7 +238,7 @@ class Accumulator:  #@save
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def train_epoch_ch3(net, train_iter, loss, updater):  #@save
+def train_epoch_ch3(net, train_iter, loss, updater, params=None):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     for X, y in train_iter:
         # Compute gradients and update parameters
@@ -247,9 +247,11 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             l = loss(y_hat, y)
             l = tf.where(tf.math.is_nan(l), tf.zeros_like(l), l)
             l_sum = tf.reduce_sum(l)
-        grads = tape.gradient(l_sum, [W, b])
+        if params is None:
+            params = net.trainable_variables
+        grads = tape.gradient(l_sum, params)
         updater = tf.keras.optimizers.SGD(0.1)
-        updater.apply_gradients(zip([grad / batch_size for grad in grads], [W, b]))
+        updater.apply_gradients(zip([grad / X.shape[0] for grad in grads], params))
         y = tf.cast(y, dtype=tf.float32)
         metric.add(l_sum, float(accuracy(y_hat, y)), len(y))
     # Return training loss and training accuracy
@@ -299,12 +301,12 @@ class Animator:  #@save
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater, params=None):
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
                         ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
-        train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
+        train_metrics = train_epoch_ch3(net, train_iter, loss, updater, params)
         test_acc = evaluate_accuracy(net, test_iter)
         animator.add(epoch+1, train_metrics+(test_acc,))
 
@@ -317,5 +319,18 @@ def predict_ch3(net, test_iter, n=6):  #@save
     preds = d2l.get_fashion_mnist_labels(tf.argmax(net(X), axis=1))
     titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
     d2l.show_images(tf.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
+def evaluate_loss(net, data_iter, loss):  #@save
+    """Evaluate the loss of a model on the given dataset."""
+    metric = d2l.Accumulator(2)  # sum_loss, num_examples
+    for X, y in data_iter:
+        l = loss(net(X), tf.reshape(y, (-1, 1)))
+        if l.shape != []:
+            metric.add(tf.reduce_sum(l), y.numpy().size)
+        else:
+            metric.add(l*len(y), y.numpy().size)
+    return metric[0] / metric[1]
 
 

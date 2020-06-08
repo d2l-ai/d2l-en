@@ -18,6 +18,12 @@ import torch
 from torch import nn
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
 ## The Model
 
 As compared to our gluon implementation 
@@ -56,6 +62,15 @@ def init_weights(m):
 net.apply(init_weights)
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+net = tf.keras.models.Sequential([
+	tf.keras.layers.Flatten(input_shape=(28, 28)),
+	tf.keras.layers.Dense(256, activation='relu'),
+	tf.keras.layers.Dense(10, activation='softmax')])
+```
+
 The training loop is *exactly* the same
 as when we implemented softmax regression.
 This modularity enables us to separate 
@@ -77,6 +92,16 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 loss = nn.CrossEntropyLoss()
 trainer = torch.optim.SGD(net.parameters(), lr=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+```
+
+```{.python .input}
+#@tab tensorflow
+num_epochs, lr, batch_size = 10, 0.5, 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+trainer = tf.keras.optimizers.SGD(learning_rate=lr)
+net.compile(optimizer=trainer, loss=loss, metrics=['accuracy'])
+net.fit(train_iter, epochs=num_epochs)
 ```
 
 ## Exercises

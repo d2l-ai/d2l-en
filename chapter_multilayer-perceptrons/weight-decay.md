@@ -217,6 +217,20 @@ test_data = d2l.synthetic_data(true_w, true_b, n_test)
 test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5
+true_w, true_b = tf.ones((num_inputs, 1)) * 0.01, 0.05
+train_data = d2l.synthetic_data(true_w, true_b, n_train)
+train_iter = d2l.load_array(train_data, batch_size)
+test_data = d2l.synthetic_data(true_w, true_b, n_test)
+test_iter = d2l.load_array(test_data, batch_size, is_train=False)
+```
+
 ## Implementation from Scratch
 
 Next, we will implement weight decay from scratch,
@@ -247,6 +261,14 @@ def init_params():
     return [w, b]
 ```
 
+```{.python .input}
+#@tab tensorflow
+def init_params():
+    w = tf.Variable(tf.random.normal(mean=1, shape=(num_inputs, 1)))
+    b = tf.Variable(tf.zeros(shape=(1, )))
+    return [w, b]
+```
+
 ### Defining $\ell_2$ Norm Penalty
 
 Perhaps the most convenient way to implement this penalty
@@ -265,6 +287,12 @@ def l2_penalty(w):
 #@tab pytorch
 def l2_penalty(w):
     return torch.sum(w.pow(2)) / 2
+```
+
+```{.python .input}
+#@tab tensorflow
+def l2_penalty(w):
+    return tf.reduce_sum(tf.pow(w, 2)) / 2
 ```
 
 ### Defining the Train and Test Functions
@@ -319,6 +347,28 @@ def train(lambd):
     print('l1 norm of w:', torch.norm(w).item())
 ```
 
+```{.python .input}
+#@tab tensorflow
+def train(lambd):
+    w, b = init_params()
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+    num_epochs, lr = 100, 0.003
+    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], legend=['train', 'test'])
+    for epoch in range(1, num_epochs + 1):
+        for X, y in train_iter:
+            with tf.GradientTape(persistent=True) as tape:
+                # The L2 norm penalty term has been added, and broadcasting
+                # makes l2_penalty(w) a vector whose length is batch_size
+                l = loss(net(X), y) + lambd * l2_penalty(w)
+            grads = tape.gradient(l, [w, b])
+            d2l.sgd([w, b], grads, lr, batch_size)
+        if epoch % 5 == 0:
+            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
+                                 d2l.evaluate_loss(net, test_iter, loss)))
+    print('l1 norm of w:', tf.norm(w).numpy())
+```
+
 ### Training without Regularization
 
 We now run this code with `lambd = 0`, 
@@ -333,6 +383,11 @@ train(lambd=0)
 
 ```{.python .input}
 #@tab pytorch
+train(lambd=0)
+```
+
+```{.python .input}
+#@tab tensorflow
 train(lambd=0)
 ```
 
@@ -353,6 +408,11 @@ train(lambd=3)
 
 ```{.python .input}
 #@tab pytorch
+train(lambd=3)
+```
+
+```{.python .input}
+#@tab tensorflow
 train(lambd=3)
 ```
 
@@ -447,6 +507,34 @@ def train_torch(wd):
     print('L1 norm of w:', net[0].weight.norm().item())
 ```
 
+```{.python .input}
+#@tab tensorflow
+def train_tensorflow(wd):
+    net = tf.keras.models.Sequential()
+    net.add(tf.keras.layers.Dense(1))
+    net.build(input_shape=(1, num_inputs))
+    w, b = net.trainable_variables
+    loss = tf.keras.losses.MeanSquaredError()
+    num_epochs, lr = 100, 0.003
+    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+        initial_learning_rate=lr, decay_steps=num_epochs, decay_rate=wd)
+    trainer = tf.keras.optimizers.SGD(learning_rate=lr_schedule)
+
+    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], legend=['train', 'test'])
+    for epoch in range(1, num_epochs+1):
+        for X, y in train_iter:
+            with tf.GradientTape() as tape:
+                l = loss(net(X), y) + wd * l2_penalty(w)
+            grads = tape.gradient(l, net.trainable_variables)
+            trainer.apply_gradients(zip(grads, net.trainable_variables))
+        if epoch % 5 == 0:
+            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
+                                 d2l.evaluate_loss(net, test_iter, loss)))
+    print('L1 norm of w:', tf.norm(net.get_weights()[0]).numpy())
+```
+
+
 The plots look identical to those when 
 we implemented weight decay from scratch.
 However, they run appreciably faster 
@@ -464,12 +552,22 @@ train_torch(0)
 ```
 
 ```{.python .input}
+#@tab tensorflow
+train_tensorflow(0)
+```
+
+```{.python .input}
 train_gluon(3)
 ```
 
 ```{.python .input}
 #@tab pytorch
 train_torch(3)
+```
+
+```{.python .input}
+#@tab tensorflow
+train_tensorflow(3)
 ```
 
 So far, we only touched upon one notion of

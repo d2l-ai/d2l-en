@@ -280,6 +280,13 @@ from d2l import torch as d2l
 import torch
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
 ## Activation Functions
 
 Activation functions decide whether a neuron should be activated or not by 
@@ -326,6 +333,14 @@ d2l.set_figsize((4, 2.5))
 d2l.plot(x.detach(), y.detach(), 'x', 'relu(x)')
 ```
 
+```{.python .input}
+#@tab tensorflow
+x = tf.Variable(tf.range(-8.0, 8.0, 0.1), dtype=tf.float32)
+y = tf.nn.relu(x)
+d2l.set_figsize((4, 2.5))
+d2l.plot(x.numpy(), y.numpy(), 'x', 'relu(x)')
+```
+
 When the input is negative, 
 the derivative of the ReLU function is 0,
 and when the input is positive, 
@@ -350,6 +365,15 @@ d2l.plot(x, x.grad, 'x', 'grad of relu')
 #@tab pytorch
 y.backward(torch.ones_like(x), retain_graph=True)
 d2l.plot(x.detach(), x.grad, 'x', 'grad of relu')
+```
+
+```{.python .input}
+#@tab tensorflow
+with tf.GradientTape() as t:
+    t.watch(x)
+    y = tf.nn.relu(x)
+x_grad = t.gradient(y, x)
+d2l.plot(x.numpy(), x_grad.numpy(), 'x', 'grad of relu')
 ```
 
 Note that there are many variants to the ReLU function, 
@@ -426,6 +450,12 @@ y = torch.sigmoid(x)
 d2l.plot(x.detach(), y.detach(), 'x', 'sigmoid(x)')
 ```
 
+```{.python .input}
+#@tab tensorflow
+y = tf.nn.sigmoid(x)
+d2l.plot(x.numpy(), y.numpy(), 'x', 'sigmoid(x)')
+```
+
 The derivative of the sigmoid function is given by the following equation:
 
 $$\frac{d}{dx} \mathrm{sigmoid}(x) = \frac{\exp(-x)}{(1 + \exp(-x))^2} = \mathrm{sigmoid}(x)\left(1-\mathrm{sigmoid}(x)\right).$$
@@ -451,6 +481,15 @@ y.backward(torch.ones_like(x),retain_graph=True)
 d2l.plot(x.detach(), x.grad, 'x', 'grad of sigmoid')
 ```
 
+```{.python .input}
+#@tab tensorflow
+with tf.GradientTape() as t:
+    t.watch(x)
+    y = tf.nn.sigmoid(x)
+x_grad = t.gradient(y, x)
+d2l.plot(x.numpy(), x_grad.numpy(), 'x', 'grad of sigmoid')
+```
+
 ### Tanh Function
 
 Like the sigmoid function, the tanh (Hyperbolic Tangent)
@@ -471,6 +510,12 @@ d2l.plot(x, y, 'x', 'tanh(x)')
 #@tab pytorch
 y = torch.tanh(x)
 d2l.plot(x.detach(), y.detach(), 'x', 'tanh(x)')
+```
+
+```{.python .input}
+#@tab tensorflow
+y = tf.nn.tanh(x)
+d2l.plot(x.numpy(), y.numpy(), 'x', 'tanh(x)')
 ```
 
 The derivative of the Tanh function is:
@@ -495,6 +540,15 @@ d2l.plot(x, x.grad, 'x', 'grad of tanh')
 x.grad.data.zero_()
 y.backward(torch.ones_like(x),retain_graph=True)
 d2l.plot(x.detach(), x.grad, 'x', 'grad of tanh')
+```
+
+```{.python .input}
+#@tab tensorflow
+with tf.GradientTape() as t:
+    t.watch(x)
+    y = tf.nn.tanh(x)
+x_grad = t.gradient(y, x)
+d2l.plot(x.numpy(), x_grad.numpy(), 'x', 'grad of tanh')
 ```
 
 In summary, we now know how to incorporate nonlinearities
