@@ -2218,7 +2218,8 @@ def split_batch_multi_inputs(X, y, ctx_list):
 
 
 # Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-attention.md
-def predict_snli(net, premise, hypothesis):
+def predict_snli(net, premise, hypothesis, batch_size = 256, num_steps = 50):
+    _, _, vocab = load_data_snli(batch_size, num_steps)
     premise = np.array(vocab[premise], ctx=d2l.try_gpu())
     hypothesis = np.array(vocab[hypothesis], ctx=d2l.try_gpu())
     label = np.argmax(net([premise.reshape((1, -1)),
