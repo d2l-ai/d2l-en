@@ -21,6 +21,12 @@ import torch
 from torch import nn
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
 Let us stick with the Fashion-MNIST dataset
 and keep the batch size at $256$ as in the last section.
 
@@ -31,6 +37,12 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 ```{.python .input}
 #@tab pytorch
+batch_size = 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+```
+
+```{.python .input}
+#@tab tensorflow
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
@@ -70,6 +82,14 @@ def init_weights(m):
         torch.nn.init.normal_(m.weight, std=0.01)
 
 net.apply(init_weights)
+```
+
+```{.python .input}
+#@tab tensorflow
+net = tf.keras.models.Sequential()
+net.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
+weight_initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.01)
+net.add(tf.keras.layers.Dense(10, kernel_initializer= weight_initializer))
 ```
 
 ## The Softmax
@@ -142,6 +162,12 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 loss = nn.CrossEntropyLoss()
 ```
 
+```{.python .input}
+#@tab tensorflow
+net.add(tf.keras.layers.Softmax())
+loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+```
+
 ## Optimization Algorithm
 
 Here, we use minibatch stochastic gradient descent
@@ -158,6 +184,11 @@ trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})
 trainer = torch.optim.SGD(net.parameters(), lr=0.1)
 ```
 
+```{.python .input}
+#@tab tensorflow
+trainer = tf.keras.optimizers.SGD(learning_rate=.1)
+```
+
 ## Training
 
 Next we call the training function defined in the last section to train a model.
@@ -171,6 +202,13 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 #@tab pytorch
 num_epochs = 10
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+```
+
+```{.python .input}
+#@tab tensorflow
+net.compile(optimizer=trainer, loss=loss, metrics=['accuracy'])
+num_epochs = 10
+net.fit(train_iter, epochs=num_epochs)
 ```
 
 As before, this algorithm converges to a solution

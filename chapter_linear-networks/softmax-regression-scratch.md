@@ -24,6 +24,13 @@ import torch
 from IPython import display
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+from IPython import display
+```
+
 We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
 setting up an iterator with batch size $256$.
 
@@ -35,6 +42,12 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 ```{.python .input}
 #@tab pytorch
+batch_size = 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+```
+
+```{.python .input}
+#@tab tensorflow
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
@@ -79,6 +92,15 @@ W = torch.normal(0, 0.01, size=(num_inputs, num_outputs), requires_grad=True)
 b = torch.zeros(num_outputs, requires_grad=True)
 ```
 
+```{.python .input}
+#@tab tensorflow
+num_inputs = 784
+num_outputs = 10
+
+W = tf.Variable(tf.random.normal(shape=(num_inputs, num_outputs), mean=0, stddev=0.01, dtype=tf.float32))
+b = tf.Variable(tf.zeros(num_outputs, dtype=tf.float32))
+```
+
 ## The Softmax
 
 Before implementing the softmax regression model,
@@ -104,6 +126,12 @@ print(X.sum(axis=0, keepdims=True), '\n', X.sum(axis=1, keepdims=True))
 #@tab pytorch
 X = torch.tensor([[1., 2., 3.], [4., 5., 6.]])
 torch.sum(X, dim=0, keepdim=True), torch.sum(X, dim=1, keepdim=True)
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.constant([[1., 2., 3.], [4., 5., 6.]])
+tf.reduce_sum(X, axis=0, keepdims=True), tf.reduce_sum(X, axis=1, keepdims=True)
 ```
 
 We are now ready to implement the softmax function.
@@ -143,6 +171,14 @@ def softmax(X):
     return X_exp / partition  # The broadcast mechanism is applied here
 ```
 
+```{.python .input}
+#@tab tensorflow
+def softmax(X):
+    X_exp = tf.exp(X)
+    partition = tf.reduce_sum(X_exp, -1, keepdims=True)
+    return X_exp / partition  # The broadcast mechanism is applied here
+```
+
 As you can see, for any random input,
 we turn each element into a non-negative number.
 Moreover, each row sums up to 1,
@@ -167,6 +203,13 @@ X_prob = softmax(X)
 X_prob, torch.sum(X_prob, dim=1)
 ```
 
+```{.python .input}
+#@tab tensorflow
+X = tf.random.normal(shape=(2, 5))
+X_prob = softmax(X)
+X_prob, tf.reduce_sum(X_prob, axis=1)
+```
+
 ## The Model
 
 Now that we have defined the softmax operation,
@@ -187,6 +230,13 @@ def net(X):
 def net(X):
     return softmax(torch.matmul(X.reshape((-1, num_inputs)), W) + b)
 ```
+
+```{.python .input}
+#@tab tensorflow
+def net(X):
+    return softmax(tf.matmul(tf.cast(tf.reshape(X, shape=(-1, W.shape[0])), dtype=tf.float32), W) + b)
+```
+
 
 ## The Loss Function
 
@@ -218,6 +268,12 @@ y_hat = torch.tensor([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 y_hat[[0, 1], [0, 2]]
 ```
 
+```{.python .input}
+#@tab tensorflow
+y_hat = tf.constant([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
+tf.boolean_mask(y_hat, tf.one_hot([0, 2], depth=3))
+```
+
 Now we can implement the cross-entropy loss function efficiently with just one line of code.
 
 ```{.python .input}
@@ -230,6 +286,15 @@ def cross_entropy(y_hat, y):
 #@tab pytorch
 def cross_entropy(y_hat, y):
     return - torch.log(y_hat[range(len(y_hat)), y])
+```
+
+```{.python .input}
+#@tab tensorflow
+def cross_entropy(y_hat, y):
+        y = tf.cast(tf.reshape(y, shape=[-1, 1]), dtype=tf.int32)
+        y = tf.one_hot(y, depth=y_hat.shape[-1])
+        y = tf.cast(tf.reshape(y, shape=[-1, y_hat.shape[-1]]), dtype=tf.int32)
+        return -tf.math.log(tf.boolean_mask(y_hat, y))
 ```
 
 ## Classification Accuracy
@@ -280,6 +345,16 @@ def accuracy(y_hat, y):  #@save
         return float((y_hat.type(torch.int32) == y.type(torch.int32)).sum())
 ```
 
+```{.python .input}
+#@tab tensorflow
+def accuracy(y_hat, y):  #@save
+    if y_hat.shape[1] > 1:
+        y = tf.cast(y, dtype=tf.int32)
+        return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
+    else:
+        return tf.cast(tf.cast(y_hat, dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
+```
+
 We will continue to use the variables `y_hat` and `y`
 defined in the `pick` function,
 as the predicted probability distribution and label, respectively.
@@ -303,6 +378,12 @@ y = torch.tensor([0, 2])
 accuracy(y_hat, y) / len(y)
 ```
 
+```{.python .input}
+#@tab tensorflow
+y = tf.constant([0, 2])
+accuracy(y_hat, y) / len(y)
+```
+
 Similarly, we can evaluate the accuracy for model `net` on the dataset
 (accessed via `data_iter`).
 
@@ -320,6 +401,17 @@ def evaluate_accuracy(net, data_iter):  #@save
 def evaluate_accuracy(net, data_iter):  #@save
     metric = Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
+        metric.add(accuracy(net(X), y), y.numpy().size)
+    return metric[0] / metric[1]
+```
+
+```{.python .input}
+#@tab tensorflow
+def evaluate_accuracy(net, data_iter):  #@save
+    metric = Accumulator(2)  # num_corrected_examples, num_examples
+    for _, (X, y) in enumerate(data_iter):
+        y = tf.cast(y, dtype=tf.int32)
+        X = tf.cast(X, dtype=tf.int32)
         metric.add(accuracy(net(X), y), y.numpy().size)
     return metric[0] / metric[1]
 ```
@@ -354,6 +446,11 @@ evaluate_accuracy(net, test_iter)
 
 ```{.python .input}
 #@tab pytorch
+evaluate_accuracy(net, test_iter)
+```
+
+```{.python .input}
+#@tab tensorflow
 evaluate_accuracy(net, test_iter)
 ```
 
@@ -407,6 +504,26 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater(X.shape[0])
             l_sum = float(l.sum())
             metric.add(l_sum, accuracy(y_hat, y), y.numpy().size)
+    # Return training loss and training accuracy
+    return metric[0]/metric[2], metric[1]/metric[2]
+```
+
+```{.python .input}
+#@tab tensorflow
+def train_epoch_ch3(net, train_iter, loss, updater):  #@save
+    metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
+    for X, y in train_iter:
+        # Compute gradients and update parameters
+        with tf.GradientTape(persistent=True) as tape:
+            y_hat = net(X)
+            l = loss(y_hat, y)
+            l = tf.where(tf.math.is_nan(l), tf.zeros_like(l), l)
+            l_sum = tf.reduce_sum(l)
+        grads = tape.gradient(l_sum, [W, b])
+        updater = tf.keras.optimizers.SGD(0.1)
+        updater.apply_gradients(zip([grad / batch_size for grad in grads], [W, b]))
+        y = tf.cast(y, dtype=tf.float32)
+        metric.add(l_sum, float(accuracy(y_hat, y)), len(y))
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
@@ -486,6 +603,19 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         animator.add(epoch+1, train_metrics+(test_acc,))
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
+                        ylim=[0.3, 0.9],
+                        legend=['train loss', 'train acc', 'test acc'])
+    for epoch in range(num_epochs):
+        train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
+        test_acc = evaluate_accuracy(net, test_iter)
+        animator.add(epoch+1, train_metrics+(test_acc,))
+```
+
 Again, we use the minibatch stochastic gradient descent
 to optimize the loss function of the model.
 Note that the number of epochs (`num_epochs`),
@@ -513,6 +643,16 @@ num_epochs, lr = 10, 0.1
 
 def updater(batch_size):
     return d2l.sgd([W, b], lr, batch_size)
+
+train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
+```
+
+```{.python .input}
+#@tab tensorflow
+num_epochs, lr = 10, 0.1
+
+def updater(batch_size):
+    return d2l.sgd([W, b], grads, lr, batch_size)
 
 train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 ```
@@ -549,6 +689,20 @@ def predict_ch3(net, test_iter, n=6):  #@save
     preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
     titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+
+predict_ch3(net, test_iter)
+```
+
+
+```{.python .input}
+#@tab tensorflow
+def predict_ch3(net, test_iter, n=6):  #@save
+    for X, y in test_iter:
+        break
+    trues = d2l.get_fashion_mnist_labels(y)
+    preds = d2l.get_fashion_mnist_labels(tf.argmax(net(X), axis=1))
+    titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
+    d2l.show_images(tf.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 predict_ch3(net, test_iter)
 ```
