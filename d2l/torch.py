@@ -24,9 +24,9 @@ import shutil
 import sys
 import tarfile
 import time
-import warnings
 import zipfile
 import requests
+import warnings
 
 d2l = sys.modules[__name__]
 

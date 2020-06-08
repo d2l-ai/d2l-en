@@ -352,6 +352,7 @@ import tarfile
 import time
 import zipfile
 import requests
+import warnings
 
 d2l = sys.modules[__name__]
 ```
