@@ -38,7 +38,6 @@ class CenteredLayer(nn.Block):
         return x - x.mean()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 import torch
@@ -58,7 +57,6 @@ layer = CenteredLayer()
 layer(np.array([1, 2, 3, 4, 5]))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 layer = CenteredLayer()
@@ -73,7 +71,6 @@ net = nn.Sequential()
 net.add(nn.Dense(128), CenteredLayer())
 net.initialize()
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -90,7 +87,6 @@ due to quantization.
 y = net(np.random.uniform(size=(4, 8)))
 y.mean()
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -121,13 +117,11 @@ that makes it easy to generate a new parameter
 with a specified name and shape.
 :end_tab:
 
-
 ```{.python .input}
 params = gluon.ParameterDict()
 params.get('param2', shape=(2, 3))
 params
 ```
-
 
 :begin_tab:`mxnet`
 We now have all the basic ingredients that we need
@@ -157,10 +151,9 @@ class MyDense(nn.Block):
         self.bias = self.params.get('bias', shape=(units,))
 
     def forward(self, x):
-        linear = np.dot(x, self.weight.data()) + self.bias.data()
+        linear = np.dot(x, self.weight.data(ctx=x.ctx)) + self.bias.data(ctx=x.ctx)
         return npx.relu(linear)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -181,7 +174,6 @@ dense = MyDense(units=3, in_units=5)
 dense.params
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 dense = MyLinear(5, 3)
@@ -194,7 +186,6 @@ We can directly carry out forward calculations using custom layers.
 dense.initialize()
 dense(np.random.uniform(size=(2, 5)))
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -211,7 +202,6 @@ net.add(MyDense(8, in_units=64),
 net.initialize()
 net(np.random.uniform(size=(2, 64)))
 ```
-
 
 ```{.python .input}
 #@tab pytorch
