@@ -1,5 +1,5 @@
 stage("Build and Publish") {
-  def TASK = "d2l-en"
+  def TASK = "d2l-face"
   node {
     ws("workspace/${TASK}") {
       checkout scm
@@ -14,11 +14,11 @@ stage("Build and Publish") {
       # d2l
       python setup.py develop
       # mxnet
-      pip install mxnet-cu101==1.6.0
+      pip install mxnet-cu101==2.0.0b20200528 -f https://dist.mxnet.io/python/all
       pip install git+https://github.com/d2l-ai/d2l-book
       # pytorch
-      pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
-      pip install torchvision
+      # pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+      # pip install torchvision
       # check
       pip list
       nvidia-smi
@@ -64,7 +64,7 @@ stage("Build and Publish") {
       ./static/build_whl.sh
       """
 
-      if (env.BRANCH_NAME == 'master') {
+      if (env.BRANCH_NAME == 'face') {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
         d2lbook deploy html pdf pkg
