@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 rm -rf _build/rst _build/html
 d2lbook build rst --tab all
 cp static/frontpage/frontpage.html _build/rst_all/
