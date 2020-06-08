@@ -44,9 +44,10 @@ torch.save(x,"x-file")
 ```{.python .input}
 #@tab tensorflow
 import tensorflow as tf
+import numpy as np
 
 x = tf.constant(range(4))
-tf.io.write_file("x-file", tf.io.serialize_tensor(x))
+np.save("x-file.npy", x)
 ```
 
 We can now read this data from the stored file back into memory.
@@ -64,7 +65,7 @@ x2
 
 ```{.python .input}
 #@tab tensorflow
-x2 = tf.io.parse_tensor(tf.io.read_file("x-file"), out_type=tf.int32)
+x2 = np.load("x-file.npy", allow_pickle=True)
 x2
 ```
 
@@ -87,7 +88,10 @@ x2, y2 = torch.load('x-files')
 
 ```{.python .input}
 #@tab tensorflow
-# TODO: Write intro to TFRecords?
+y = tf.zeros(4)
+np.save('xy-files.npy', [x, y])
+x2, y2 = np.load('xy-files.npy', allow_pickle=True)
+(x2, y2)
 ```
 
 We can even write and read a dictionary that maps 
@@ -107,6 +111,14 @@ mydict2
 mydict = {'x': x, 'y': y}
 torch.save(mydict, 'mydict')
 mydict2 = torch.load('mydict')
+mydict2
+```
+
+```{.python .input}
+#@tab tensorflow
+mydict = {'x': x, 'y': y}
+np.save('mydict.npy', mydict)
+mydict2 = np.load('mydict.npy', allow_pickle=True)
 mydict2
 ```
 
