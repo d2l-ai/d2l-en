@@ -157,7 +157,7 @@ class MyDense(nn.Block):
         self.bias = self.params.get('bias', shape=(units,))
 
     def forward(self, x):
-        linear = np.dot(x, self.weight.data()) + self.bias.data()
+        linear = np.dot(x, self.weight.data(ctx=x.ctx)) + self.bias.data(ctx=x.ctx)
         return npx.relu(linear)
 ```
 
