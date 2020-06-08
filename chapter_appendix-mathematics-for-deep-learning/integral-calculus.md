@@ -316,7 +316,7 @@ ax.dist = 12
 ```
 
 ```{.python .input}
-#tab pytorch
+#@tab pytorch
 # Construct grid and compute function
 x, y = torch.meshgrid(torch.linspace(-2, 2, 101), torch.linspace(-2, 2, 101))
 z = torch.exp(- x**2 - y**2)
