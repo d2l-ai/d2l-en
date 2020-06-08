@@ -19,6 +19,7 @@ as either points or directions in space.
 Fundamentally, a vector is a list of numbers such as the Python list below.
 
 ```{.python .input}
+#@tab all
 v = [1, 7, 0, 1]
 ```
 
@@ -151,6 +152,21 @@ def angle(v, w):
     return np.arccos(v.dot(w) / (np.linalg.norm(v) * np.linalg.norm(w)))
 
 angle(np.array([0, 1, 2]), np.array([2, 3, 4]))
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+from IPython import display
+import torch
+from torchvision import transforms
+import torchvision
+
+def angle(v, w):
+    return torch.acos(v.dot(w) / (torch.norm(v) * torch.norm(w)))
+
+angle(torch.tensor([0, 1, 2], dtype=torch.float32), torch.tensor([2.0, 3, 4]))
 ```
 
 We will not use it right now, but it is useful to know 
@@ -288,9 +304,35 @@ ave_0 = np.mean(X_train_0, axis=0)
 ave_1 = np.mean(X_train_1, axis=0)
 ```
 
+```{.python .input}
+#@tab pytorch
+# Load in the dataset
+trans = []
+trans.append(transforms.ToTensor())
+trans = transforms.Compose(trans)
+train = torchvision.datasets.FashionMNIST(root="../data", transform=trans,
+                                          train=True, download=True)
+test = torchvision.datasets.FashionMNIST(root="../data", transform=trans,
+                                         train=False, download=True)
+
+X_train_0 = torch.stack(
+    [x[0]*256 for x in train if x[1] == 0]).type(torch.float32)
+X_train_1 = torch.stack(
+    [x[0]*256 for x in train if x[1] == 1]).type(torch.float32)
+X_test = torch.stack(
+    [x[0]*256 for x in test if x[1] == 0 or x[1] == 1]).type(torch.float32)
+y_test = torch.stack([torch.tensor(x[1]) for x in test
+                      if x[1] == 0 or x[1] == 1]).type(torch.float32)
+
+# Compute averages
+ave_0 = torch.mean(X_train_0, axis=0)
+ave_1 = torch.mean(X_train_1, axis=0)
+```
+
 It can be informative to examine these averages in detail, so let us plot what they look like.  In this case, we see that the average indeed resembles a blurry image of a t-shirt.
 
 ```{.python .input}
+#@tab all
 # Plot average t-shirt
 d2l.set_figsize()
 d2l.plt.imshow(ave_0.reshape(28, 28).tolist(), cmap='Greys')
@@ -300,6 +342,7 @@ d2l.plt.show()
 In the second case, we again see that the average resembles a blurry image of trousers.
 
 ```{.python .input}
+#@tab all
 # Plot average trousers
 d2l.plt.imshow(ave_1.reshape(28, 28).tolist(), cmap='Greys')
 d2l.plt.show()
@@ -314,6 +357,17 @@ predictions = X_test.reshape(2000, -1).dot(w.flatten()) > -1500000
 
 # Accuracy
 np.mean(predictions.astype(y_test.dtype) == y_test, dtype=np.float64)
+```
+
+```{.python .input}
+#@tab pytorch
+# Print test set accuracy with eyeballed threshold
+w = (ave_1 - ave_0).T
+# '@' is Matrix Multiplication operator in pytorch.
+predictions = X_test.reshape(2000, -1) @ (w.flatten()) > -1500000
+
+# Accuracy
+torch.mean(predictions.type(y_test.dtype) == y_test, dtype=torch.float64)
 ```
 
 ## Geometry of Linear Transformations
@@ -573,6 +627,13 @@ M_inv = np.array([[2, -1], [-0.5, 0.5]])
 M_inv.dot(M)
 ```
 
+```{.python .input}
+#@tab pytorch
+M = torch.tensor([[1, 2], [1, 4]], dtype=torch.float32)
+M_inv = torch.tensor([[2, -1], [-0.5, 0.5]])
+M_inv @ M
+```
+
 ### Numerical Issues
 While the inverse of a matrix is useful in theory, 
 we must say that most of the time we do not wish 
@@ -651,6 +712,11 @@ Let us check this quickly with some example code.
 ```{.python .input}
 import numpy as np
 np.linalg.det(np.array([[1, -1], [2, 3]]))
+```
+
+```{.python .input}
+#@tab pytorch
+torch.det(torch.tensor([[1, -1], [2, 3]], dtype=torch.float32))
 ```
 
 The eagle-eyed amongst us will notice 
@@ -769,6 +835,17 @@ v = np.array([1, 2])
 A.shape, B.shape, v.shape
 ```
 
+```{.python .input}
+#@tab pytorch
+# Define tensors
+B = torch.tensor([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
+A = torch.tensor([[1, 2], [3, 4]])
+v = torch.tensor([1, 2])
+
+# Print out the shapes
+A.shape, B.shape, v.shape
+```
+
 Einstein summation has been implemented directly  via ```np.einsum```. 
 The indices that occurs in the Einstein summation can be passed as a string, 
 followed by the tensors that are being acted upon.
@@ -780,6 +857,12 @@ and strip out the indices themselves to get the implementation:
 ```{.python .input}
 # Reimplement matrix multiplication
 np.einsum("ij, j -> i", A, v), A.dot(v)
+```
+
+```{.python .input}
+#@tab pytorch
+# Reimplement matrix multiplication
+torch.einsum("ij, j -> i", A, v), A@v
 ```
 
 This is a highly flexible notation.
@@ -796,6 +879,11 @@ it can be implemented via Einstein summation as:
 np.einsum("ijk, il, j -> kl", B, A, v)
 ```
 
+```{.python .input}
+#@tab pytorch
+torch.einsum("ijk, il, j -> kl", B, A, v)
+```
+
 This notation is readable and efficient for humans,
 however bulky if for whatever reason 
 we need to generate a tensor contraction programmatically.
@@ -805,6 +893,11 @@ For example, the same tensor contraction can also be written as:
 
 ```{.python .input}
 np.einsum(B, [0, 1, 2], A, [0, 3], v, [1], [2, 3])
+```
+
+```{.python .input}
+#@tab pytorch
+# PyTorch doesn't support this type of notation.
 ```
 
 Either notation allows for concise and efficient representation of tensor contractions in code.
