@@ -176,7 +176,6 @@ class MyLinear(nn.Module):
 Next, we instantiate the `MyDense` class 
 and access its model parameters.
 
-
 ```{.python .input}
 dense = MyDense(units=3, in_units=5)
 dense.params
