@@ -224,7 +224,7 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 
 n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5
-true_w, true_b = torch.ones((num_inputs, 1)) * 0.01, 0.05
+true_w, true_b = tf.ones((num_inputs, 1)) * 0.01, 0.05
 train_data = d2l.synthetic_data(true_w, true_b, n_train)
 train_iter = d2l.load_array(train_data, batch_size)
 test_data = d2l.synthetic_data(true_w, true_b, n_test)
@@ -360,9 +360,9 @@ def train(lambd):
             with tf.GradientTape(persistent=True) as tape:
                 # The L2 norm penalty term has been added, and broadcasting
                 # makes l2_penalty(w) a vector whose length is batch_size
-                l = loss(net(X, w, b), y) + lambd * l2_penalty(w)
+                l = loss(net(X), y) + lambd * l2_penalty(w)
             grads = tape.gradient(l, [w, b])
-            d2l.sgd([w, b], lr, batch_size)
+            d2l.sgd([w, b], grads, lr, batch_size)
         if epoch % 5 == 0:
             animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
                                  d2l.evaluate_loss(net, test_iter, loss)))

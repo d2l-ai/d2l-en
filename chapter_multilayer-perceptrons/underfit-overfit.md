@@ -631,7 +631,7 @@ def train(train_features, test_features, train_labels, test_labels,
         if epoch % 50 == 0:
             animator.add(epoch, (evaluate_loss(net, train_iter, loss),
                                  evaluate_loss(net, test_iter, loss)))
-    print('weight:', net.get_weights()[0].numpy())
+    print('weight:', net.get_weights()[0])
 ```
 
 ### Third-Order Polynomial Function Fitting (Normal)
