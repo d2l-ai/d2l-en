@@ -88,6 +88,29 @@ true_value = f(0 + epsilon[0], np.log(2) + epsilon[1])
 "Approximation: {}, True Value: {}".format(grad_approx, true_value)
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+from IPython import display
+from mpl_toolkits import mplot3d
+import torch
+import numpy as np
+
+def f(x, y):
+    return torch.log(torch.exp(x) + torch.exp(y))
+def grad_f(x, y):
+    return torch.tensor([torch.exp(x) / (torch.exp(x) + torch.exp(y)),
+                     torch.exp(y) / (torch.exp(x) + torch.exp(y))])
+
+epsilon = torch.tensor([0.01, -0.03])
+grad_approx = f(torch.tensor([0.]), torch.log(torch.tensor([2.]))) + epsilon.dot(
+    grad_f(torch.tensor([0.]), torch.log(torch.tensor(2.))))
+true_value = f(torch.tensor([0.]) + epsilon[0], torch.log(
+    torch.tensor([2.])) + epsilon[1])
+"Approximation: {}, True Value: {}".format(grad_approx, true_value)
+```
+
 ## Geometry of Gradients and Gradient Descent
 Consider the again :eqref:`eq_nabla_use`: 
 
@@ -150,6 +173,14 @@ The only possible location of minima are at $x = -1, 0, 2$, where the function t
 
 ```{.python .input}
 x = np.arange(-2, 3, 0.01)
+f = (3 * x**4) - (4 * x**3) - (12 * x**2)
+
+d2l.plot(x, f, 'x', 'f(x)')
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.arange(-2, 3, 0.01)
 f = (3 * x**4) - (4 * x**3) - (12 * x**2)
 
 d2l.plot(x, f, 'x', 'f(x)')
@@ -254,6 +285,7 @@ $$
 If we write this out into code this becomes a fairly manageable expression.
 
 ```{.python .input}
+#@tab all
 # Compute the value of the function from inputs to outputs
 w, x, y, z = -1, 0, -2, 1
 a, b = (w + x + y + z)**2, (w + x - y - z)**2
@@ -297,12 +329,13 @@ $$
 and then keeping track of how $f$ changes when we change *any* node in the entire network.  Let us implement it.
 
 ```{.python .input}
+#@tab all
 # Compute the value of the function from inputs to outputs
 w, x, y, z = -1, 0, -2, 1
 a, b = (w + x + y + z)**2, (w + x - y - z)**2
 u, v = (a + b)**2, (a - b)**2
 f = (u + v)**2
-print("    f at {}, {}, {}, {} is {}".format(w, x, y, z, f))
+print(f"f at {w}, {x}, {y}, {z} is {f}")
 
 # Compute the derivative using the decomposition above
 # First compute the single step partials
@@ -317,10 +350,11 @@ da_dz, db_dz = 2*(w + x + y + z), -2*(w + x - y - z)
 df_da, df_db = df_du*du_da + df_dv*dv_da, df_du*du_db + df_dv*dv_db
 df_dw, df_dx = df_da*da_dw + df_db*db_dw, df_da*da_dx + df_db*db_dx
 df_dy, df_dz = df_da*da_dy + df_db*db_dy, df_da*da_dz + df_db*db_dz
-print("df/dw at {}, {}, {}, {} is {}".format(w, x, y, z, df_dw))
-print("df/dx at {}, {}, {}, {} is {}".format(w, x, y, z, df_dx))
-print("df/dy at {}, {}, {}, {} is {}".format(w, x, y, z, df_dy))
-print("df/dz at {}, {}, {}, {} is {}".format(w, x, y, z, df_dz))
+
+print(f"df/dw at {w}, {x}, {y}, {z} is {df_dw}")
+print(f"df/dx at {w}, {x}, {y}, {z} is {df_dx}")
+print(f"df/dy at {w}, {x}, {y}, {z} is {df_dy}")
+print(f"df/dz at {w}, {x}, {y}, {z} is {df_dz}")
 ```
 
 The fact that we compute derivatives from $f$ back towards the inputs rather than from the inputs forward to the outputs (as we did in the first code snippet above) is what gives this algorithm its name: *backpropagation*.  Note that there are two steps:
@@ -349,10 +383,35 @@ with autograd.record():
 # Execute backward pass
 f.backward()
 
-print("df/dw at {}, {}, {}, {} is {}".format(w, x, y, z, w.grad))
-print("df/dx at {}, {}, {}, {} is {}".format(w, x, y, z, x.grad))
-print("df/dy at {}, {}, {}, {} is {}".format(w, x, y, z, y.grad))
-print("df/dz at {}, {}, {}, {} is {}".format(w, x, y, z, z.grad))
+print(f"df/dw at {w}, {x}, {y}, {z} is {w.grad}")
+print(f"df/dx at {w}, {x}, {y}, {z} is {x.grad}")
+print(f"df/dy at {w}, {x}, {y}, {z} is {y.grad}")
+print(f"df/dz at {w}, {x}, {y}, {z} is {z.grad}")
+```
+
+```{.python .input}
+#@tab pytorch
+# Initialize as ndarrays, then attach gradients
+w = torch.tensor([-1.], requires_grad=True)
+x = torch.tensor([0.], requires_grad=True) 
+y = torch.tensor([-2.], requires_grad=True)
+z = torch.tensor([1.], requires_grad=True)
+# Do the computation like usual, tracking gradients
+a, b = (w + x + y + z)**2, (w + x - y - z)**2
+u, v = (a + b)**2, (a - b)**2
+f = (u + v)**2
+
+# Execute backward pass
+f.backward()
+
+print(f"df/dw at {w.data.item()}, {x.data.item()}, {y.data.item()},\
+      {z.data.item()} is {y.grad.data.item()}")
+print(f"df/dx at {w.data.item()}, {x.data.item()}, {y.data.item()},\
+      {z.data.item()} is {x.grad.data.item()}")
+print(f"df/dy at {w.data.item()}, {x.data.item()}, {y.data.item()},\
+      {z.data.item()} is {x.grad.data.item()}")
+print(f"df/dz at {w.data.item()}, {x.data.item()}, {y.data.item()},\
+      {z.data.item()} is {x.grad.data.item()}")
 ```
 
 All of what we did above can be done automatically by calling `f.backwards()`.
@@ -434,6 +493,32 @@ w = np.exp(-1)*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.plot_wireframe(x, y, w, **{'rstride': 10, 'cstride': 10}, color='purple')
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y')
+d2l.set_figsize()
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+ax.set_zlim(-1, 1)
+ax.dist = 12
+```
+
+```{.python .input}
+#@tab pytorch
+# Construct grid and compute function
+x, y = torch.meshgrid(torch.linspace(-2, 2, 101),
+                   torch.linspace(-2, 2, 101))
+
+z = x*torch.exp(- x**2 - y**2)
+
+# Compute gradient and Hessian at (1, 0)
+w = torch.exp(torch.tensor([-1.]))*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
+
+# Plot function
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_wireframe(x.numpy(), y.numpy(), z.numpy(),
+                  **{'rstride': 10, 'cstride': 10})
+ax.plot_wireframe(x.numpy(), y.numpy(), w.numpy(),
+                  **{'rstride': 10, 'cstride': 10}, color='purple')
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
 d2l.set_figsize()
