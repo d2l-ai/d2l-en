@@ -470,13 +470,22 @@ labels = torch.from_numpy(labels).type(torch.float32)
 #@tab tensorflow
 maxdegree = 20  # Maximum degree of the polynomial
 n_train, n_test = 100, 100  # Training and test dataset sizes
-true_w, true_b = [1.2, -3.4, 5.6], 5
+true_w = tf.Variable(tf.zeros(maxdegree))  # Allocate lots of empty space
+true_w[0:4].assign([5, 1.2, -3.4, 5.6])
 
-features = tf.random.normal(shape=(n_train + n_test, 1))
-poly_features = tf.concat([features, tf.pow(features, 2), tf.pow(features, 3)], axis=1)
+features = np.random.normal(size=(n_train + n_test, 1))
+np.random.shuffle(features)
+poly_features = np.power(features, np.arange(maxdegree).reshape(1, -1))
+gamma = np.vectorize(math.gamma)  # Use math.gamma function for numpy array
+poly_features = poly_features / (
+    gamma(np.arange(maxdegree) + 1).reshape(1, -1))
 
-labels = (true_w[0] * poly_features[:, 0] + true_w[1] * poly_features[:, 1] + true_w[2] * poly_features[:, 2] + true_b)
-labels += tf.random.normal(labels.shape, stddev=0.1)
+labels = np.dot(poly_features, true_w.numpy())
+labels += np.random.normal(scale=0.1)
+
+features = tf.constant(features, dtype=tf.float32)
+poly_features = tf.constant(poly_features, dtype=tf.float32)
+labels = tf.constant(labels, dtype=tf.float32)
 ```
 
 For optimization, we typically want to avoid
