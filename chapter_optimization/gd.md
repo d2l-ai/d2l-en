@@ -263,7 +263,7 @@ This algorithm converges rapidly (for an analysis and proof see e.g., :cite:`Boy
 
 * Learning rates matter. Too large and we diverge, too small and we do not make progress.
 * Gradient descent can get stuck in local minima.
-* In high dimensions adjusting learning the learning rate is complicated.
+* In high dimensions adjusting the learning rate is complicated.
 * Preconditioning can help with scale adjustment.
 * Newton's method is a lot faster *once* it has started working properly in convex problems.
 * Beware of using Newton's method without any adjustments for nonconvex problems. 
