@@ -312,6 +312,11 @@ print(rgnet.collect_params())
 print(rgnet)
 ```
 
+```{.python .input}
+#@tab tensorflow
+print(rgnet.summary())
+```
+
 Since the layers are hierarchically nested,
 we can also access them as though 
 indexing through nested lists. 
@@ -327,6 +332,11 @@ rgnet[0][1][0].bias.data()
 ```{.python .input}
 #@tab pytorch
 rgnet[0][1][0].bias.data
+```
+
+```{.python .input}
+#@tab tensorflow
+rgnet.layers[0].layers[1].layers[1].weights[1]
 ```
 
 ## Parameter Initialization
@@ -382,6 +392,23 @@ net.apply(init_normal)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
 
+
+```{.python .input}
+#@tab tensorflow 
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(
+        4,
+        activation=tf.nn.relu,
+        kernel_initializer=tf.random_normal_initializer(mean=0, stddev=0.01),
+        bias_initializer=tf.zeros_initializer()),
+    tf.keras.layers.Dense(1),
+])
+
+net(x)
+net.weights[0], net.weights[1]
+```
+
 We can also initialize all parameters 
 to a given constant value (say, $1$).
 
@@ -398,6 +425,22 @@ def init_normal(m):
         nn.init.zeros_(net[0].bias)
 net.apply(init_normal)    
 net[0].weight.data[0], net[0].bias.data[0]
+```
+
+```{.python .input}
+#@tab tensorflow
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(
+        4,
+        activation=tf.nn.relu,
+        kernel_initializer=tf.keras.initializers.Constant(1),
+        bias_initializer=tf.zeros_initializer()),
+    tf.keras.layers.Dense(1),
+])
+
+net(x)
+net.weights[0], net.weights[1]
 ```
 
 We can also apply different initializers for certain Blocks.
@@ -427,6 +470,24 @@ net[2].apply(init_42)
 print(net[0].weight.data[0])
 print(net[2].weight.data)
 ```
+
+```{.python .input}
+#@tab tensorflow
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(
+        4,
+        activation=tf.nn.relu,
+        kernel_initializer=tf.keras.initializers.GlorotUniform()),
+    tf.keras.layers.Dense(
+        1, kernel_initializer=tf.keras.initializers.Constant(1)),
+])
+
+net(x)
+print(net.layers[1].weights[0])
+print(net.layers[2].weights[0])
+```
+
 
 ### Custom Initialization
 
@@ -480,6 +541,24 @@ net.apply(my_init)
 net[0].weight[0:2]
 ```
 
+```{.python .input}
+#@tab tensorflow
+def my_init(m):
+    return tf.constant(m)
+
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(
+        4,
+        activation=tf.nn.relu,
+        kernel_initializer=my_init(np.random.uniform(-10, 10, (2, 4)))),
+    tf.keras.layers.Dense(1),
+])
+
+net(x)
+print(net.layers[1].weights[0])
+```
+
 Note that we always have the option 
 of setting parameters directly by calling `data` 
 to access the underlying data. 
@@ -502,6 +581,13 @@ net[0].weight.data()[0]
 net[0].weight.data[:] += 1
 net[0].weight.data[0, 0] = 42
 net[0].weight.data[0]
+```
+
+```{.python .input}
+#@tab tensorflow
+net.layers[1].weights[0][:].assign(net.layers[1].weights[0] + 1)
+net.layers[1].weights[0][0, 0].assign(42)
+net.layers[1].weights[0]
 ```
 
 ## Tied Parameters
@@ -554,6 +640,22 @@ net[2].weight.data[0, 0] = 100
 # Make sure that they are actually the same object rather than just having the
 # same value
 print(net[2].weight.data[0] == net[4].weight.data[0])
+```
+
+```{.python .input}
+#@tab tensorflow
+# tf.keras behaves a bit differently. It removes the duplicate layer automatically.
+shared = tf.keras.layers.Dense(4, activation=tf.nn.relu)
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    shared,
+    shared,
+    tf.keras.layers.Dense(1),
+])
+
+net(x)
+# Check whether the parameters are different
+print(len(net.layers) == 3)
 ```
 
 This example shows that the parameters 
