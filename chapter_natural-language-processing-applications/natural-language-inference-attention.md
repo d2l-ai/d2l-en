@@ -268,7 +268,7 @@ Finally, define the prediction function to output the logical relationship betwe
 
 ```{.python .input  n=14}
 #@save
-def predict_snli(net, premise, hypothesis):
+def predict_snli(net, vocab, premise, hypothesis):
     premise = np.array(vocab[premise], ctx=d2l.try_gpu())
     hypothesis = np.array(vocab[hypothesis], ctx=d2l.try_gpu())
     label = np.argmax(net([premise.reshape((1, -1)),
@@ -280,7 +280,7 @@ def predict_snli(net, premise, hypothesis):
 We can use the trained model to obtain the natural language inference result for a sample pair of sentences.
 
 ```{.python .input  n=15}
-predict_snli(net, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
+predict_snli(net, vocab, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 ```
 
 ## Summary
