@@ -41,6 +41,14 @@ x = torch.arange(4)
 torch.save(x,"x-file")
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+x = tf.constant(range(4))
+tf.io.write_file("x-file", tf.io.serialize_tensor(x))
+```
+
 We can now read this data from the stored file back into memory.
 
 ```{.python .input}
@@ -51,6 +59,12 @@ x2
 ```{.python .input}
 #@tab pytorch
 x2 = torch.load("x-file")
+x2
+```
+
+```{.python .input}
+#@tab tensorflow
+x2 = tf.io.parse_tensor(tf.io.read_file("x-file"), out_type=tf.int32)
 x2
 ```
 
@@ -69,6 +83,11 @@ y = torch.zeros(4)
 torch.save([x, y],'x-files')
 x2, y2 = torch.load('x-files')
 (x2, y2)
+```
+
+```{.python .input}
+#@tab tensorflow
+# TODO: Write intro to TFRecords?
 ```
 
 We can even write and read a dictionary that maps 
@@ -143,6 +162,25 @@ x = torch.randn(size=(2, 20))
 y = net(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+class MLP(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        self.flatten = tf.keras.layers.Flatten()
+        self.hidden = tf.keras.layers.Dense(units=256, activation=tf.nn.relu)
+        self.out = tf.keras.layers.Dense(units=10)
+        
+    def call(self, inputs):
+        x = self.flatten(inputs)
+        x = self.hidden(x)
+        return self.out(x)
+
+net = MLP()
+x = tf.random.uniform((2, 20))
+y = net(x)
+```
+
 Next, we store the parameters of the model as a file with the name `mlp.params`.
 
 ```{.python .input}
@@ -152,6 +190,11 @@ net.save_parameters('mlp.params')
 ```{.python .input}
 #@tab pytorch
 torch.save(net.state_dict(), 'mlp.params')
+```
+
+```{.python .input}
+#@tab tensorflow
+net.save_weights('mlp.params')
 ```
 
 To recover the model, we instantiate a clone 
@@ -171,6 +214,12 @@ clone.load_state_dict(torch.load("mlp.params"))
 clone.eval()
 ```
 
+```{.python .input}
+#@tab tensorflow
+clone = MLP()
+clone.load_weights("mlp.params")
+```
+
 Since both instances have the same model parameters, 
 the computation result of the same input `x` should be the same. 
 Let us verify this.
@@ -182,6 +231,12 @@ yclone == y
 
 ```{.python .input}
 #@tab pytorch
+yclone = clone(x)
+yclone == y
+```
+
+```{.python .input}
+#@tab tensorflow
 yclone = clone(x)
 yclone == y
 ```
