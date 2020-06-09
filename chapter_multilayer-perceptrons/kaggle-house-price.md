@@ -64,6 +64,20 @@ DATA_HUB = dict()
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 ```
 
+```{.python .input}
+#@tab tensorflow
+import os
+import requests
+import zipfile
+import tarfile
+
+#@save
+DATA_HUB = dict()
+
+#@save
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+```
+
 The following `download` function downloads the dataset,
 caching it in a local directory (in `../data` by default)
 and returns the name of the downloaded file.
@@ -85,6 +99,45 @@ def download(name, cache_dir=os.path.join('..', 'data')):
 
 ```{.python .input}
 #@tab pytorch
+#@save
+def util_download(url, path=None, verify_ssl=True):
+    """Download a given URL
+    """
+    if path is None:
+        fname = url.split('/')[-1]
+        # Empty filenames are invalid
+        assert fname, 'Can\'t construct file-name from this URL. ' \
+            'Please set the `path` option manually.'
+    else:
+        path = os.path.expanduser(path)
+        if os.path.isdir(path):
+            fname = os.path.join(path, url.split('/')[-1])
+        else:
+            fname = path
+
+    if not verify_ssl:
+        warnings.warn(
+            'Unverified HTTPS request is being made (verify_ssl=False). '
+            'Adding certificate verification is strongly advised.')
+    
+    print('Downloading {} from {}...'.format(fname, url))
+    r = requests.get(url, stream=True, verify=verify_ssl)
+    with open(fname, 'wb') as f:
+        f.write(r.content)
+
+    return fname
+
+#@save
+def download(name, cache_dir=os.path.join('..', 'data')):
+    """Download a file inserted into DATA_HUB, return the local filename."""
+    assert name in DATA_HUB, "%s does not exist" % name
+    url, sha1 = DATA_HUB[name]
+    d2l.mkdir_if_not_exist(cache_dir)
+    return util_download(url)
+```
+
+```{.python .input}
+#@tab tensorflow
 #@save
 def util_download(url, path=None, verify_ssl=True):
     """Download a given URL
@@ -155,6 +208,33 @@ def download_all():
 
 ```{.python .input}
 #@tab pytorch
+#@save
+def download_extract(name, folder=None):
+    """Download and extract a zip/tar file."""
+    fname = download(name)
+    base_dir = os.path.dirname(fname) 
+    data_dir, ext = os.path.splitext(fname)
+    if ext == '.zip':
+        fp = zipfile.ZipFile(fname, 'r')
+    elif ext in ('.tar', '.gz'):
+        fp = tarfile.open(fname, 'r')
+    else:
+        assert False, 'Only zip/tar files can be extracted'
+    fp.extractall(base_dir)
+    if folder:
+        return os.path.join(base_dir, folder)
+    else:
+        return data_dir
+
+#@save
+def download_all():
+    """Download all files in the DATA_HUB"""
+    for name in DATA_HUB:
+        download(name)
+```
+
+```{.python .input}
+#@tab tensorflow
 #@save
 def download_extract(name, folder=None):
     """Download and extract a zip/tar file."""
@@ -275,6 +355,18 @@ import pandas as pd
 import numpy as np
 ```
 
+```{.python .input}
+#@tab tensorflow
+# If pandas is not installed, please uncomment the following line:
+# !pip install pandas
+
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import pandas as pd
+import numpy as np
+```
+
 For convenience, we can download and cache 
 the Kaggle housing dataset 
 using the script we defined above.
@@ -304,6 +396,19 @@ DATA_HUB['kaggle_house_test'] = (
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save        
+DATA_HUB['kaggle_house_train'] = (
+    DATA_URL + 'kaggle_house_pred_train.csv',
+    '585e9cc93e70b39160e7921475f9bcd7d31219ce')
+
+#@save  
+DATA_HUB['kaggle_house_test'] = (
+    DATA_URL + 'kaggle_house_pred_test.csv',
+    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
+```
+
 To load the two csv files containing training 
 and test data respectively we use Pandas.
 
@@ -314,6 +419,12 @@ test_data = pd.read_csv(download('kaggle_house_test'))
 
 ```{.python .input}
 #@tab pytorch
+train_data = pd.read_csv(download('kaggle_house_train'))
+test_data = pd.read_csv(download('kaggle_house_test'))
+```
+
+```{.python .input}
+#@tab tensorflow
 train_data = pd.read_csv(download('kaggle_house_train'))
 test_data = pd.read_csv(download('kaggle_house_test'))
 ```
@@ -333,6 +444,12 @@ print(train_data.shape)
 print(test_data.shape)
 ```
 
+```{.python .input}
+#@tab tensorflow
+print(train_data.shape)
+print(test_data.shape)
+```
+
 Let’s take a look at the first $4$ and last $2$ features
 as well as the label (SalePrice) from the first $4$ examples:
 
@@ -342,6 +459,11 @@ print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
 
 ```{.python .input}
 #@tab pytorch
+print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
+```
+
+```{.python .input}
+#@tab tensorflow
 print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
@@ -358,6 +480,11 @@ all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 
 ```{.python .input}
 #@tab pytorch
+all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
+```
+
+```{.python .input}
+#@tab tensorflow
 all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 ```
 
@@ -405,6 +532,16 @@ all_features[numeric_features] = all_features[numeric_features].apply(
 all_features[numeric_features] = all_features[numeric_features].fillna(0)
 ```
 
+```{.python .input}
+#@tab tensorflow
+numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
+all_features[numeric_features] = all_features[numeric_features].apply(
+    lambda x: (x - x.mean()) / (x.std()))
+# After standardizing the data all means vanish, hence we can set missing
+# values to 0
+all_features[numeric_features] = all_features[numeric_features].fillna(0)
+```
+
 Next we deal with discrete values.
 This includes variables such as 'MSZoning'.
 We replace them by a one-hot encoding
@@ -423,6 +560,14 @@ all_features.shape
 
 ```{.python .input}
 #@tab pytorch
+# Dummy_na=True refers to a missing value being a legal eigenvalue, and
+# creates an indicative feature for it
+all_features = pd.get_dummies(all_features, dummy_na=True)
+all_features.shape
+```
+
+```{.python .input}
+#@tab tensorflow
 # Dummy_na=True refers to a missing value being a legal eigenvalue, and
 # creates an indicative feature for it
 all_features = pd.get_dummies(all_features, dummy_na=True)
@@ -453,6 +598,14 @@ test_features = torch.tensor(all_features[n_train:].values,
                              dtype=torch.float32)
 train_labels = torch.tensor(train_data.SalePrice.values,
                             dtype=torch.float32).reshape(-1, 1)
+```
+
+```{.python .input}
+#@tab tensorflow
+n_train = train_data.shape[0]
+train_features = np.array(all_features[:n_train].values, dtype=np.float)
+test_features = np.array(all_features[n_train:].values, dtype=np.float)
+train_labels = np.array(train_data.SalePrice.values.reshape(-1, 1), dtype=np.float)
 ```
 
 ## Training
@@ -487,6 +640,16 @@ in_features = train_features.shape[1]
 
 def get_net():
     net = nn.Sequential(nn.Linear(in_features,1))
+    return net
+```
+
+```{.python .input}
+#@tab tensorflow
+loss = tf.keras.losses.mse
+
+def get_net():
+    net = tf.keras.models.Sequential()
+    net.add(tf.keras.layers.Dense(1))
     return net
 ```
 
@@ -532,6 +695,12 @@ def log_rmse(net,features,labels):
     rmse = torch.sqrt(torch.mean(loss(torch.log(clipped_preds),
                                        torch.log(labels))))
     return rmse.item()
+```
+
+
+```{.python .input}
+#@tab tensorflow
+log_rmse = tf.keras.losses.mean_squared_logarithmic_error
 ```
 
 Unlike in previous sections, our training functions 
@@ -590,6 +759,28 @@ def train(net, train_features, train_labels, test_features, test_labels,
     return train_ls, test_ls
 ```
 
+```{.python .input}
+#@tab tensorflow
+def train(net, train_features, train_labels, test_features, test_labels,
+          num_epochs, learning_rate, weight_decay, batch_size):
+    train_iter = d2l.load_array((train_features, train_labels), batch_size)
+    test_iter, test_ls = None, []
+    if test_features is not None:
+        test_iter = d2l.load_array((test_features, test_labels), batch_size, is_train=False)
+    # The Adam optimization algorithm is used here
+    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+        initial_learning_rate=float(learning_rate), decay_steps=num_epochs, decay_rate=float(weight_decay))
+    optimizer = tf.keras.optimizers.Adam(lr_schedule)
+    net.compile(loss=log_rmse, optimizer=optimizer)
+    history = net.fit(train_iter, validation_data=test_iter, epochs=num_epochs, batch_size=batch_size, validation_freq=1)
+    train_ls = history.history['loss']
+    if test_features is not None:
+        test_ls = history.history['val_loss']
+    return train_ls, test_ls
+```
+
+
+
 ## k-Fold Cross-Validation
 
 If you are reading in a linear fashion,
@@ -646,6 +837,25 @@ def get_k_fold_data(k, i, X, y):
     return X_train, y_train, X_valid, y_valid
 ```
 
+```{.python .input}
+#@tab tensorflow
+def get_k_fold_data(k, i, X, y):
+    assert k > 1
+    fold_size = X.shape[0] // k
+    X_train, y_train = None, None
+    for j in range(k):
+        idx = slice(j * fold_size, (j + 1) * fold_size)
+        X_part, y_part = X[idx, :], y[idx]
+        if j == i:
+            X_valid, y_valid = X_part, y_part
+        elif X_train is None:
+            X_train, y_train = X_part, y_part
+        else:
+            X_train = tf.concat([X_train, X_part], axis=0)
+            y_train = tf.concat([y_train, y_part], axis=0)
+    return X_train, y_train, X_valid, y_valid
+```
+
 The training and verification error averages are returned
 when we train $k$ times in the k-fold cross-validation.
 
@@ -690,6 +900,27 @@ def k_fold(k, X_train, y_train, num_epochs,
     return train_l_sum / k, valid_l_sum / k
 ```
 
+```{.python .input}
+#@tab tensorflow
+def k_fold(k, X_train, y_train, num_epochs,
+           learning_rate, weight_decay, batch_size):
+    train_l_sum, valid_l_sum = 0, 0
+    for i in range(k):
+        data = get_k_fold_data(k, i, X_train, y_train)
+        net = get_net()
+        train_ls, valid_ls = train(net, *data, num_epochs, learning_rate,
+                                   weight_decay, batch_size)
+        train_l_sum += train_ls[-1]
+        valid_l_sum += valid_ls[-1]
+        if i == 0:
+            d2l.plot(list(range(1, num_epochs+1)), [train_ls, valid_ls],
+                     xlabel='epoch', ylabel='rmse',
+                     legend=['train', 'valid'], yscale='log')
+        print('fold %d, train rmse: %f, valid rmse: %f' % (
+            i, train_ls[-1], valid_ls[-1]))
+    return train_l_sum / k, valid_l_sum / k
+```
+
 ## Model Selection
 
 In this example, we pick an untuned set of hyperparameters
@@ -714,6 +945,15 @@ print('%d-fold validation: avg train rmse: %f, avg valid rmse: %f'
 
 ```{.python .input}
 #@tab pytorch
+k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
+train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
+                          weight_decay, batch_size)
+print('%d-fold validation: avg train rmse: %f, avg valid rmse: %f'
+      % (k, train_l, valid_l))
+```
+
+```{.python .input}
+#@tab tensorflow
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
 train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
                           weight_decay, batch_size)
@@ -777,6 +1017,24 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     submission.to_csv('submission.csv', index=False)
 ```
 
+```{.python .input}
+#@tab tensorflow
+def train_and_pred(train_features, test_feature, train_labels, test_data,
+                   num_epochs, lr, weight_decay, batch_size):
+    net = get_net()
+    train_ls, _ = train(net, train_features, train_labels, None, None,
+                        num_epochs, lr, weight_decay, batch_size)
+    d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',
+             ylabel='rmse', yscale='log')
+    print('train rmse %f' % train_ls[-1])
+    # Apply the network to the test set
+    preds = net(test_features).numpy()
+    # Reformat it for export to Kaggle
+    test_data['SalePrice'] = pd.Series(preds.reshape(1, -1)[0])
+    submission = pd.concat([test_data['Id'], test_data['SalePrice']], axis=1)
+    submission.to_csv('submission.csv', index=False)
+```
+
 One nice sanity check is to see
 whether the predictions on the test set
 resemble those of the k-fold cross-validation process.
@@ -791,6 +1049,12 @@ train_and_pred(train_features, test_features, train_labels, test_data,
 
 ```{.python .input}
 #@tab pytorch
+train_and_pred(train_features, test_features, train_labels, test_data,
+               num_epochs, lr, weight_decay, batch_size)
+```
+
+```{.python .input}
+#@tab tensorflow
 train_and_pred(train_features, test_features, train_labels, test_data,
                num_epochs, lr, weight_decay, batch_size)
 ```
