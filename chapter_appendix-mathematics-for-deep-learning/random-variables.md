@@ -304,7 +304,7 @@ plot_chebychev(0.0, 0.2)
 ```
 
 ```{.python .input}
-#tab pytorch
+#@tab pytorch
 # Define a helper to plot these figures
 def plot_chebychev(a, p):
     d2l.set_figsize()
@@ -333,7 +333,7 @@ plot_chebychev(0.0, 0.125)
 ```
 
 ```{.python .input}
-#tab pytorch
+#@tab pytorch
 # Plot interval when p = 1/8
 plot_chebychev(0.0, torch.tensor(0.125))
 ```
@@ -346,7 +346,7 @@ plot_chebychev(0.0, 0.05)
 ```
 
 ```{.python .input}
-#tab pytorch
+#@tab pytorch
 # Plot interval when p < 1/8
 plot_chebychev(0.0, torch.tensor(0.05))
 ```
@@ -410,7 +410,7 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
 ```{.python .input}
-#tab pytorch
+#@tab pytorch
 # Plot the Cauchy distribution p.d.f.
 x = torch.arange(-5, 5, 0.01)
 p = 1 / (1 + x**2)
