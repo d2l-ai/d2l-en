@@ -215,15 +215,16 @@ def GloVe(center, context, coocurrence, embed_v, embed_u,
     v = embed_v(center)
     # Shape of u: (batch_size, embed_size)
     u = embed_u(context)
-    # Shape of b: (batch_size, 1)
-    b = bias_v(center)
-    # Shape of c: (batch_size, 1)
-    c = bias_u(context)
+    # Shape of b: (batch_size, )
+    b = bias_v(center).squeeze()
+    # Shape of c: (batch_size, )
+    c = bias_u(context).squeeze()
     # Shape of embed_products: (batch_size,)
-    embed_products = np.sum(v * u, axis=1)
+    embed_products = npx.batch_dot(np.expand_dims(v, 1),
+                                   np.expand_dims(u, 2)).squeeze()
     # Shape of distance_expr: (batch_size,)
-    distance_expr = np.power(embed_products + b.reshape(-1) +
-                     c.reshape(-1) - np.log(coocurrence), 2)
+    distance_expr = np.power(embed_products + b +
+                     c - np.log(coocurrence), 2)
     # Shape of weight: (batch_size,)
     weight = compute_weight(coocurrence)
     return weight * distance_expr
@@ -296,7 +297,7 @@ def train(net, data_iter, lr, num_epochs, x_max, alpha, ctx=d2l.try_gpu()):
 Now, we can train a GloVe model.
 
 ```{.python .input  n=12}
-lr, num_epochs = 0.05, 5
+lr, num_epochs = 0.1, 5
 x_max, alpha = 100, 0.75
 train(net, data_iter, lr, num_epochs, x_max, alpha)
 ```
