@@ -8,7 +8,6 @@ point in acquiring data without some way to store it, so let us get our hands
 dirty first by playing with synthetic data.  To start, we introduce the
 $n$-dimensional array, which is also called the *tensor*.
 
-:begin_tab:`mxnet`
 If you have worked with NumPy, the most widely-used
 scientific computing package in Python,
 then you will find this section familiar.
