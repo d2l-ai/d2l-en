@@ -1,14 +1,14 @@
 # Data Preprocessing
 :label:`sec_pandas`
 
-So far we have introduced a variety of techniques for manipulating data that are already stored in `ndarray`s.
+So far we have introduced a variety of techniques for manipulating data that are already stored in tensors.
 To apply deep learning to solving real-world problems,
-we often begin with preprocessing raw data, rather than those nicely prepared data in the `ndarray` format.
+we often begin with preprocessing raw data, rather than those nicely prepared data in the tensor format.
 Among popular data analytic tools in Python, the `pandas` package is commonly used.
 Like many other extension packages in the vast ecosystem of Python,
-`pandas` can work together with `ndarray`.
+`pandas` can work together with tensors.
 So, we will briefly walk through steps for preprocessing raw data with `pandas`
-and converting them into the `ndarray` format.
+and converting them into the tensor format.
 We will cover more data preprocessing techniques in later chapters.
 
 ## Reading the Dataset
@@ -91,10 +91,10 @@ inputs = pd.get_dummies(inputs, dummy_na=True)
 print(inputs)
 ```
 
-## Conversion to the  `ndarray` Format
+## Conversion to the Tensor Format
 
-Now that all the entries in `inputs` and `outputs` are numerical, they can be converted to the `ndarray` format.
-Once data are in this format, they can be further manipulated with those `ndarray` functionalities that we have introduced in :numref:`sec_ndarray`.
+Now that all the entries in `inputs` and `outputs` are numerical, they can be converted to the tensor format.
+Once data are in this format, they can be further manipulated with those tensor functionalities that we have introduced in :numref:`sec_ndarray`.
 
 ```{.python .input}
 from mxnet import np
@@ -113,7 +113,7 @@ X, y
 
 ## Summary
 
-* Like many other extension packages in the vast ecosystem of Python, `pandas` can work together with `ndarray`.
+* Like many other extension packages in the vast ecosystem of Python, `pandas` can work together with tensors.
 * Imputation and deletion can be used to handle missing data.
 
 
@@ -122,7 +122,7 @@ X, y
 Create a raw dataset with more rows and columns.
 
 1. Delete the column with the most missing values.
-2. Convert the preprocessed dataset to the `ndarray` format.
+2. Convert the preprocessed dataset to the tensor format.
 
 
 :begin_tab:`mxnet`

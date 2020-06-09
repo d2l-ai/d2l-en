@@ -86,11 +86,11 @@ with respect to a vector $\mathbf{x}$
 is itself vector-valued and has the same shape as $\mathbf{x}$.
 Thus it is intuitive that in code,
 we will access a gradient taken with respect to `x`
-as an attribute of the `ndarray` `x` itself.
+as an attribute of the tensor `x` itself.
 
 :begin_tab:`mxnet`
 
-We allocate memory for an `ndarray`'s gradient
+We allocate memory for a tensor's gradient
 by invoking its `attach_grad` method.
 After we calculate a gradient taken with respect to `x`,
 we will be able to access it via the `grad` attribute.
@@ -153,7 +153,7 @@ y = 2 * torch.dot(x, x)
 y
 ```
 
-Since `x` is an `ndarray` of length 4,
+Since `x` is a tensor of length 4,
 the `dot` operator will perform an inner product of `x` and `x`,
 yielding the scalar output that we assign to `y`.
 Next, we can automatically calculate the gradient of `y`
@@ -183,7 +183,7 @@ x.grad
 The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to $\mathbf{x}$ should be $4\mathbf{x}$.
 Let us quickly verify that our desired gradient was calculated correctly.
-If the two `ndarray`s are indeed the same,
+If the two tensors are indeed the same,
 then the equality between them holds at every position.
 
 ```{.python .input}
