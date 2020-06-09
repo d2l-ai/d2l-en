@@ -10,7 +10,7 @@ packages and modules required for the experiment, and load the PTB dataset.
 
 ```{.python .input  n=1}
 from collections import defaultdict
-import d2l
+from d2l import mxnet as d2l
 from functools import partial
 from mxnet import autograd, gluon, init, np, npx, cpu
 from mxnet.gluon import nn
