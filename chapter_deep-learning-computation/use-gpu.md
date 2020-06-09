@@ -37,7 +37,7 @@ to view the graphics card information.
 ```
 
 :begin_tab:`mxnet`
-You might have noticed that MXNet `ndarray`
+You might have noticed that MXNet tensor
 looks almost identical to NumPy.
 
 But there are a few crucial differences.
@@ -111,7 +111,7 @@ how data flows between different devices.
 
 We can specify devices, such as CPUs and GPUs,
 for storage and calculation.
-By default, ndarrays are created in the main memory
+By default, tensors are created in the main memory
 and then uses the CPU to calculate it.
 
 :begin_tab:`mxnet`
@@ -202,10 +202,10 @@ def try_all_gpus():  #@save
 try_gpu(), try_gpu(3), try_all_gpus()
 ```
 
-## `ndarray` and GPUs
+## Tensors and GPUs
 
-By default, `ndarray` objects are created on the CPU.
-We can query the device where the `ndarray` is located.
+By default, tensors are created on the CPU.
+We can query the device where the tensor is located.
 
 ```{.python .input}
 x = np.array([1, 2, 3])
@@ -221,7 +221,7 @@ x.device
 It is important to note that whenever we want
 to operate on multiple terms,
 they need to be in the same context.
-For instance, if we sum two ndarrays,
+For instance, if we sum two tensors,
 we need to make sure that both arguments
 live on the same device---otherwise the framework
 would not know where to store the result
@@ -229,11 +229,11 @@ or even how to decide where to perform the computation.
 
 ### Storage on the GPU
 
-There are several ways to store an `ndarray` on the GPU.
-For example, we can specify a storage device when creating an `ndarray`.
-Next, we create the `ndarray` variable `a` on the first `gpu`.
+There are several ways to store a tensor on the GPU.
+For example, we can specify a storage device when creating a tensor.
+Next, we create the tensor variable `a` on the first `gpu`.
 Notice that when printing `a`, the device information changed.
-The `ndarray` created on a GPU only consumes the memory of this GPU.
+The tensor created on a GPU only consumes the memory of this GPU.
 We can use the `nvidia-smi` command to view GPU memory usage.
 In general, we need to make sure we do not
 create data that exceeds the GPU memory limit.
@@ -367,7 +367,7 @@ It is a bit like ordering your coffee in a queue
 rather than pre-ordering it by phone
 and finding out that it is ready when you are.
 
-Last, when we print `ndarray`s or convert `ndarray`s to the NumPy format,
+Last, when we print tensors or convert tensors to the NumPy format,
 if the data is not in main memory,
 the framework will copy it to the main memory first,
 resulting in additional transmission overhead.
@@ -395,7 +395,7 @@ net = nn.Sequential(nn.Linear(3, 1))
 net = net.to(device=try_gpu())
 ```
 
-When the input is an `ndarray` on the GPU, Gluon will calculate the result on the same GPU.
+When the input is a tensor on the GPU, Gluon will calculate the result on the same GPU.
 
 ```{.python .input}
 net(x)

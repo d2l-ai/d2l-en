@@ -54,7 +54,7 @@ Typically, we choose layer widths in powers of $2$,
 which tend to be computationally efficient because
 of how memory is alotted and addressed in hardware.
 
-Again, we will represent our parameters with several `ndarray`s.
+Again, we will represent our parameters with several tensors.
 Note that *for every layer*, we must keep track of
 one weight matrix and one bias vector.
 As always, we allocate memory

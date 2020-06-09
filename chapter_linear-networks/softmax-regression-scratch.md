@@ -16,7 +16,6 @@ from IPython import display
 npx.set_np()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
@@ -31,7 +30,6 @@ setting up an iterator with batch size $256$.
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -69,7 +67,6 @@ W.attach_grad()
 b.attach_grad()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 num_inputs = 784
@@ -83,7 +80,7 @@ b = torch.zeros(num_outputs, requires_grad=True)
 
 Before implementing the softmax regression model,
 let us briefly review how operators such as `sum` work
-along specific dimensions in an `ndarray`.
+along specific dimensions in a tensor.
 Given a matrix `X` we can sum over all elements (default) or only
 over elements in the same axis, *i.e.*, the column (`axis=0`) or the same row (`axis=1`).
 Note that if `X` is an array with shape `(2, 3)`
@@ -98,7 +95,6 @@ we can specify `keepdims=True` when invoking `sum`.
 X = np.array([[1, 2, 3], [4, 5, 6]])
 print(X.sum(axis=0, keepdims=True), '\n', X.sum(axis=1, keepdims=True))
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -134,7 +130,6 @@ def softmax(X):
     return X_exp / partition  # The broadcast mechanism is applied here
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 def softmax(X):
@@ -159,7 +154,6 @@ X_prob = softmax(X)
 X_prob, X_prob.sum(axis=1)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.normal(0, 1, size=(2, 5))
@@ -180,7 +174,6 @@ before passing the data through our model.
 def net(X):
     return softmax(np.dot(X.reshape(-1, num_inputs), W) + b)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -211,7 +204,6 @@ y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 y_hat[[0, 1], [0, 2]]
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 y_hat = torch.tensor([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
@@ -224,7 +216,6 @@ Now we can implement the cross-entropy loss function efficiently with just one l
 def cross_entropy(y_hat, y):
     return - np.log(y_hat[range(len(y_hat)), y])
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -257,7 +248,7 @@ Now we just need to check how frequently the two match.
 Since the equality operator `==` is datatype-sensitive
 (e.g., an `int` and a `float32` are never equal),
 we also need to convert both to the same type (we pick `float32`).
-The result is an `ndarray` containing entries of 0 (false) and 1 (true).
+The result is a tensor containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
 
 ```{.python .input}
@@ -268,7 +259,6 @@ def accuracy(y_hat, y):  #@save
     else:
         return float((y_hat.astype('int32') == y.astype('int32')).sum())
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -296,7 +286,6 @@ y = np.array([0, 2])
 accuracy(y_hat, y) / len(y)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 y = torch.tensor([0, 2])
@@ -313,7 +302,6 @@ def evaluate_accuracy(net, data_iter):  #@save
         metric.add(accuracy(net(X), y), y.size)
     return metric[0] / metric[1]
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -351,7 +339,6 @@ i.e., $0.1$ for $10$ classes.
 evaluate_accuracy(net, test_iter)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 evaluate_accuracy(net, test_iter)
@@ -384,7 +371,6 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -472,7 +458,6 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         animator.add(epoch+1, train_metrics+(test_acc,))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 #@save
@@ -506,7 +491,6 @@ def updater(batch_size):
 train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 num_epochs, lr = 10, 0.1
@@ -538,7 +522,6 @@ def predict_ch3(net, test_iter, n=6): #@save
 
 predict_ch3(net, test_iter)
 ```
-
 
 ```{.python .input}
 #@tab pytorch

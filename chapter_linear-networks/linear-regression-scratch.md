@@ -12,7 +12,7 @@ to make sure that you really know what you are doing.
 Moreover, when it comes time to customize models,
 defining our own layers, loss functions, etc.,
 understanding how things work under the hood will prove handy.
-In this section, we will rely only on `ndarray` and auto differentiation.
+In this section, we will rely only on tensors and auto differentiation.
 Afterwards, we will introduce a more compact implementation,
 taking advantage of framework's bells and whistles.
 To start off, we import the few required packages.
@@ -444,7 +444,7 @@ that lead to accurate prediction.
 ## Summary
 
 We saw how a deep network can be implemented
-and optimized from scratch, using just `ndarray` and auto differentiation,
+and optimized from scratch, using just tensors and auto differentiation,
 without any need for defining layers, fancy optimizers, etc.
 This only scratches the surface of what is possible.
 In the following sections, we will describe additional models

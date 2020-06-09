@@ -305,8 +305,8 @@ Informally, the ReLU function retains only positive
 elements and discards all negative elements 
 (setting the corresponding activations to 0).
 To gain some intuition, we can plot the function.
-Because it is used so commonly, `ndarray` 
-supports the `relu` function as a native operator.
+Because it is used so commonly, tensors 
+support the `relu` function as a native operator.
 As you can see, the activation function is piecewise linear.
 
 ```{.python .input}

@@ -383,7 +383,7 @@ $$
 
 Here we define a subclass of `Initializer`. 
 Usually, we only need to implement the `_init_weight` function
-which takes an `ndarray` argument (`data`) 
+which takes a tensor argument (`data`) 
 and assigns to it the desired initialized values. 
 
 :end_tab:
@@ -493,7 +493,7 @@ print(net[2].weight.data[0] == net[4].weight.data[0])
 This example shows that the parameters 
 of the second and third layer are tied. 
 They are not just equal, they are 
-represented by the same exact ndarray. 
+represented by the same exact tensor. 
 Thus, if we change one of the parameters,
 the other one changes, too. 
 You might wonder, 

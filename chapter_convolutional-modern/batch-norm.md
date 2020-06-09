@@ -209,7 +209,7 @@ Recall that dropout also exhibits this characteristic.
 
 ## Implementation from Scratch
 
-Below, we implement a batch normalization layer with `ndarray`s from scratch:
+Below, we implement a batch normalization layer with tensors from scratch:
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -247,7 +247,6 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     Y = gamma * X_hat + beta  # Scale and shift
     return Y, moving_mean, moving_var
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -343,7 +342,6 @@ class BatchNorm(nn.Block):
         return Y
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 class BatchNorm(nn.Module):
@@ -402,7 +400,6 @@ net.add(nn.Conv2D(6, kernel_size=5),
         nn.Dense(10))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(
@@ -425,7 +422,6 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 lr, num_epochs, batch_size = 1.0, 10, 256
@@ -440,7 +436,6 @@ from the first batch normalization layer.
 ```{.python .input}
 net[1].gamma.data().reshape(-1,), net[1].beta.data().reshape(-1,)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -478,7 +473,6 @@ net.add(nn.Conv2D(6, kernel_size=5),
         nn.Dense(10))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 
@@ -500,7 +494,6 @@ while our custom implementation must be interpreted by Python.
 ```{.python .input}
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
-
 
 ```{.python .input}
 #@tab pytorch

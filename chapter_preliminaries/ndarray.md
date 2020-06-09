@@ -15,7 +15,6 @@ then you will find this section familiar.
 In MXNet, `ndarray` is a class and any tensor ($n$-dimensional array)
 is an `ndarray` instance.
 
-
 MXNet's tensors are an extension to NumPy's tensors ($n$-dimensional arrays) with a few killer features.
 First, MXNet's tensors support asynchronous computation
 on CPU, GPU, and distributed cloud architectures,
@@ -23,7 +22,7 @@ whereas NumPy only supports CPU computation.
 Second, MXNet's tensors support automatic differentiation.
 These properties make MXNet's tensors suitable for deep learning.
 Throughout the book, when we say tensors,
-we are referring to MXNet's tensors unless otherwise stated.
+we are referring to MXNet's `ndarray` instances unless otherwise stated.
 :end_tab:
 
 

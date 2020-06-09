@@ -433,7 +433,7 @@ You can see that this conversion increases
 the number of features from 79 to 331.
 Finally, via the `values` attribute,
 we can extract the NumPy format from the Pandas dataframe
-and convert it into MXNet's native `ndarray` 
+and convert it into MXNet's native tensor 
 representation for training.
 
 ```{.python .input}

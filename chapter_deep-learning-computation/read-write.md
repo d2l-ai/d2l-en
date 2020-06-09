@@ -14,9 +14,9 @@ Thus it is time we learned how to load and store
 both individual weight vectors and entire models. 
 This section addresses both issues.
 
-## Loading and Saving `ndarray`s
+## Loading and Saving Tensors
 
-For individual `ndarray`s, we can directly 
+For individual tensors, we can directly 
 invoke the `load` and `save` functions 
 to read and write them respectively. 
 Both functions require that we supply a name,
@@ -54,7 +54,7 @@ x2 = torch.load("x-file")
 x2
 ```
 
-We can store a list of `ndarray`s and read them back into memory.
+We can store a list of tensors and read them back into memory.
 
 ```{.python .input}
 y = np.zeros(4)
@@ -72,7 +72,7 @@ x2, y2 = torch.load('x-files')
 ```
 
 We can even write and read a dictionary that maps 
-from strings to `ndarray`s. 
+from strings to tensors. 
 This is convenient when we want 
 to read or write all the weights in a model.
 
@@ -93,7 +93,7 @@ mydict2
 
 ## Model Parameters
 
-Saving individual weight vectors (or other `ndarray` tensors) is useful, 
+Saving individual weight vectors (or other tensors) is useful, 
 but it gets very tedious if we want to save 
 (and later load) an entire model.
 After all, we might have hundreds of 
@@ -188,7 +188,7 @@ yclone == y
 
 ## Summary
 
-* The `save` and `load` functions can be used to perform File I/O for `ndarray` objects.
+* The `save` and `load` functions can be used to perform File I/O for tensor objects.
 * We can save and load the entire sets of parameters for a network via a parameter dictionary. 
 * Saving the architecture has to be done in code rather than in parameters.
 

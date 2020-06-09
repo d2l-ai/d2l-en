@@ -7,7 +7,7 @@ to develop a variety of mature open source frameworks
 for automating the repetitive work of implementing
 gradient-based learning algorithms.
 In the previous section, we relied only on
-(i) `ndarray` for data storage and linear algebra;
+(i) tensors for data storage and linear algebra;
 and (ii) auto differentiation for calculating derivatives.
 In practice, because data iterators, loss functions, optimizers,
 and neural network layers (and some whole architectures)
@@ -31,7 +31,6 @@ true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
@@ -50,7 +49,7 @@ labels = labels.reshape(-1,1)
 Rather than rolling our own iterator,
 we can call upon the `data` module to read data.
 The first step will be to instantiate an `ArrayDataset`.
-This object's constructor takes one or more `ndarray`s as arguments.
+This object's constructor takes one or more tensors as arguments.
 Here, we pass in `features` and `labels` as arguments.
 Next, we will use the `ArrayDataset` to instantiate a `DataLoader`,
 which also requires that we specify a `batch_size`
@@ -67,7 +66,6 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
 batch_size = 10
 data_iter = load_array((features, labels), batch_size)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -88,7 +86,6 @@ the first minibatch of instances. Comparing to :numref:`sec_linear_scratch`, her
 ```{.python .input}
 next(iter(data_iter))
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -147,7 +144,6 @@ net = nn.Sequential()
 net.add(nn.Dense(1))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from torch import nn
@@ -202,7 +198,6 @@ from mxnet import init
 net.initialize(init.Normal(sigma=0.01))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 net[0].weight.data.uniform_(0.0, 0.01)
@@ -249,7 +244,6 @@ from mxnet.gluon import loss as gloss
 loss = gloss.L2Loss()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 loss = nn.MSELoss()
@@ -289,7 +283,6 @@ SGD just requires that we set the value `learning_rate`,
 from mxnet import gluon
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -332,7 +325,6 @@ for epoch in range(1, num_epochs + 1):
     print('epoch %d, loss: %f' % (epoch, l.mean().asnumpy()))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 num_epochs = 3
@@ -351,7 +343,7 @@ and the actual parameters that generated our dataset.
 To access parameters with Gluon,
 we first access the layer that we need from `net`
 and then access that layer's weight (`weight`) and bias (`bias`).
-To access each parameter's values as an `ndarray`,
+To access each parameter's values as a tensor,
 we invoke its `data` method.
 As in our from-scratch implementation,
 note that our estimated parameters are
@@ -363,7 +355,6 @@ print('Error in estimating w', true_w.reshape(w.shape) - w)
 b = net[0].bias.data()
 print('Error in estimating b', true_b - b)
 ```
-
 
 ```{.python .input}
 #@tab pytorch

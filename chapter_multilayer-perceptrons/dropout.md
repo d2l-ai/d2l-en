@@ -235,7 +235,7 @@ Then we can keep those nodes for which the corresponding
 sample is greater than $p$, dropping the rest.
 
 In the following code, we implement a `dropout_layer` function
-that drops out the elements in the `ndarray` input `X`
+that drops out the elements in the tensor input `X`
 with probability `dropout`,
 rescaling the remainder as described above
 (dividing the survivors by `1.0-dropout`).
