@@ -304,7 +304,7 @@ the following packages and modules as dependencies:
 
 :end_tab:
 
-:begin_tab:`pytorch`
+:begin_tab:`tensorflow`
 
 Most of the code in this book is based on TensorFlow.
 TensorFlow is an open-source framework for deep learning, which is extremely
@@ -496,6 +496,6 @@ Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writ
 [Discussions](https://discuss.d2l.ai/t/20)
 :end_tab:
 
-:begin_tab:`tesorflow`
+:begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/186)
 :end_tab:

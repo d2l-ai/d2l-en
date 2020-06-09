@@ -12,19 +12,17 @@ $n$-dimensional array, which is also called the *tensor*.
 If you have worked with NumPy, the most widely-used
 scientific computing package in Python,
 then you will find this section familiar.
-In MXNet, `ndarray` is a class and any tensor ($n$-dimensional array)
-is an `ndarray` instance.
-
-MXNet's tensors are an extension to NumPy's tensors ($n$-dimensional arrays) with a few killer features.
-First, MXNet's tensors support asynchronous computation
-on CPU, GPU, and distributed cloud architectures,
+No matter which framework you use,
+its *tensor class* (`ndarray` in MXNet,
+`Tensor` in both PyTorch and TensorFlow) is similar to NumPy's `ndarray` with
+a few killer features.
+First, GPU is well-supported to accelerate the computation
 whereas NumPy only supports CPU computation.
-Second, MXNet's tensors support automatic differentiation.
-These properties make MXNet's tensors suitable for deep learning.
+Second, the tensor class
+supports automatic differentiation.
+These properties make the tensor class suitable for deep learning.
 Throughout the book, when we say tensors,
-we are referring to MXNet's `ndarray` instances unless otherwise stated.
-:end_tab:
-
+we are referring to instances of the tensor class unless otherwise stated.
 
 ## Getting Started
 
@@ -53,11 +51,15 @@ To start, we import `torch`. Note that though it's called PyTorch, we should
 import `torch` instead of `pytorch`.
 :end_tab:
 
+:begin_tab:`tensorflow`
+To start, we import `tesnorflow`. As the name is a little long, we often import
+it with a short alias `tf`.
+:end_tab:
+
 ```{.python .input}
 from mxnet import np, npx
 npx.set_np()
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -72,8 +74,8 @@ import tensorflow as tf
 A tensor represents a (possibly multi-dimensional) array of numerical values.
 With one axis, a tensor corresponds (in math) to a *vector*.
 With two axes, a tensor corresponds to a *matrix*.
-Arrays with more than two axes do not have special
-mathematical names---we simply call them *tensors* (algebraic objects here).
+Tensors with more than two axes do not have special
+mathematical names.
 
 To start, we can use `arange` to create a row vector `x`
 containing the first 12 integers starting with 0,
@@ -122,7 +124,7 @@ x.shape
 
 If we just want to know the total number of elements in a tensor,
 i.e., the product of all of the shape elements,
-we can inspect its `size` property.
+we use `size`.
 Because we are dealing with a vector here,
 the single element of its `shape` is identical to its `size`.
 
@@ -140,6 +142,7 @@ x.size()
 #@tab tensorflow
 tf.size(x)
 ```
+
 To change the shape of a tensor without altering
 either the number of elements or their values,
 we can invoke the `reshape` function.
@@ -182,19 +185,17 @@ that we would like tensors to automatically infer.
 In our case, instead of calling `x.reshape(3, 4)`,
 we could have equivalently called `x.reshape(-1, 4)` or `x.reshape(3, -1)`.
 
-The `empty` method grabs a chunk of memory and hands us back a matrix
-without bothering to change the value of any of its entries.
-This is remarkably efficient but we must be careful because
-the entries might take arbitrary values, including very big ones!
+The `zero` method grabs a chunk of memory and hands us back a matrix
+with initializing all entries with zeros.
 
 ```{.python .input}
-np.empty((3, 4))
+np.zeros((2, 3))
 ```
 
 
 ```{.python .input}
 #@tab pytorch
-torch.empty(2, 3)
+torch.zeros(2, 3)
 ```
 
 
@@ -268,7 +269,7 @@ torch.randn(3, 4)
 
 ```{.python .input}
 #@tab tensorflow
-tf.random.normal(shape=[3,4])
+tf.random.normal(shape=[3, 4])
 ```
 
 We can also specify the exact values for each element in the desired tensor
@@ -351,7 +352,7 @@ x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.constant([1, 2, 4, 8])
+x = tf.constant([1.0, 2, 4, 8])
 y = tf.constant([2, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 ```
@@ -373,7 +374,7 @@ torch.exp(x)
 
 ```{.python .input}
 #@tab tensorflow
-tf.exp(tf.cast(x, tf.float32))
+tf.exp(x)
 ```
 
 
@@ -455,9 +456,6 @@ x.sum()
 #@tab tensorflow
 tf.reduce_sum(x)
 ```
-
-
-For stylistic convenience, we can write `x.sum()` as `np.sum(x)`.
 
 ## Broadcasting Mechanism
 :label:`subsec_broadcasting`
@@ -786,4 +784,8 @@ a, a.item(), float(a), int(a)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/27)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/187)
 :end_tab:
