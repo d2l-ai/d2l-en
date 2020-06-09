@@ -444,8 +444,8 @@ def net(X, is_training=False):
     if is_training:
         # Add a dropout layer after the second fully connected layer
         H2 = dropout(H2, drop_prob2)
-    res = tf.math.softmax(tf.matmul(H2, W3) + b3)
-    return tf.reduce_mean(res, axis=1)
+    res = tf.nn.softmax(tf.matmul(H2, W3) + b3)
+    return tf.reduce_mean(res, axis=1) # TODO: Need double check
 ```
 
 ### Training and Testing
@@ -554,7 +554,10 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```{.python .input}
 #@tab tensorflow
 trainer = tf.keras.optimizers.SGD(learning_rate=lr)
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+net.compile(optimizer=trainer,
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+              metrics=['accuracy'])
+net.fit(train_iter, epochs=num_epochs, batch_size=batch_size)
 ```
 
 ## Summary
