@@ -141,3 +141,7 @@ Create a raw dataset with more rows and columns.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/29)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/195)
+:end_tab:
