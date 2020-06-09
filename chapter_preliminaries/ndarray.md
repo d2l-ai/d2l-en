@@ -333,7 +333,7 @@ x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 ```{.python .input}
 #@tab tensorflow
 x = tf.constant([1.0, 2, 4, 8])
-y = tf.constant([2, 2, 2, 2])
+y = tf.constant([2.0, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 ```
 
