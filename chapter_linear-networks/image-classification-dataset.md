@@ -277,15 +277,30 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 
 
 ```{.python .input}
-#@tab tensorflow
+#tab tensorflow
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     # TODO: Resize
     (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
-    return (
+    if(resize==None):
+      return (
         tf.data.Dataset.from_tensor_slices(
             (mnist_train_x, mnist_train_y)).batch(batch_size).shuffle(len(mnist_train_x)),
         tf.data.Dataset.from_tensor_slices((mnist_test_x, mnist_test_y)).batch(batch_size))
+    else:
+      mnist_train = tf.data.Dataset.from_tensor_slices((mnist_train_x, mnist_train_y))
+      mnist_test = tf.data.Dataset.from_tensor_slices((mnist_test_x, mnist_test_y))
+      def map_fn(img,label):
+        img = tf.reshape(img, (28,28,1))
+        img =  tf.image.resize(img, (resize))
+        return (img,label)
+      mnist_train = mnist_train.map(map_fn)
+      mnist_train = mnist_train.shuffle(len(mnist_train_x))
+      mnist_test = mnist_test.map(map_fn)
+      mnist_train = mnist_train.batch(batch_size)
+      mnist_test = mnist_test.batch(batch_size)
+      return mnist_train,mnist_test
+
 ```
 
 Below, we verify that image resizing works.
