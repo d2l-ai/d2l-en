@@ -334,3 +334,19 @@ def evaluate_loss(net, data_iter, loss):  #@save
     return metric[0] / metric[1]
 
 
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_gpu(i=0):  #@save
+    """Return gpu(i) if exists, otherwise return cpu()."""
+    if len(tf.config.experimental.list_physical_devices('GPU')) >= i + 1:
+        return tf.device(f'/GPU:{i}')
+    return tf.device('/CPU:0')
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_all_gpus():  #@save
+    """Return all available GPUs, or [cpu(),] if no GPU exists."""
+    num_gpus = len(tf.config.experimental.list_physical_devices('GPU'))
+    ctxes = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]
+    return ctxes if ctxes else [tf.device('/CPU:0')]
+
+

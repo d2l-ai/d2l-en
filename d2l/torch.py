@@ -427,3 +427,19 @@ DATA_HUB['kaggle_house_test'] = (
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
 
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_gpu(i=0):  #@save
+    """Return gpu(i) if exists, otherwise return cpu()."""
+    if torch.cuda.device_count() >= i + 1:
+        return torch.device(f'cuda:{i}')
+    return torch.device('cpu')
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_all_gpus():  #@save
+    """Return all available GPUs, or [cpu(),] if no GPU exists."""
+    ctxes = [torch.device(f'cuda:{i}')
+             for i in range(torch.cuda.device_count())]
+    return ctxes if ctxes else [torch.device('cpu')]
+
+

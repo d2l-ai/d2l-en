@@ -51,6 +51,19 @@ class CenteredLayer(nn.Module):
         return x - x.mean()
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+class CenteredLayer(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+
+    def call(self, inputs):
+        return inputs - tf.reduce_mean(inputs)
+```
+
 Let us verify that our layer works as intended by feeding some data through it.
 
 ```{.python .input}
@@ -63,6 +76,12 @@ layer(np.array([1, 2, 3, 4, 5]))
 #@tab pytorch
 layer = CenteredLayer()
 layer(torch.FloatTensor([1, 2, 3, 4, 5]))
+```
+
+```{.python .input}
+#@tab tensorflow
+layer = CenteredLayer()
+layer(tf.constant([1, 2, 3, 4, 5]))
 ```
 
 We can now incorporate our layer as a component
@@ -78,6 +97,11 @@ net.initialize()
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(nn.Linear(8, 128), CenteredLayer())
+```
+
+```{.python .input}
+#@tab tensorflow
+net = tf.keras.Sequential([tf.keras.layers.Flatten(), tf.keras.layers.Dense(128), CenteredLayer()])
 ```
 
 As an extra sanity check, we can send random data 
@@ -96,6 +120,12 @@ y.mean()
 #@tab pytorch
 y = net(torch.rand(4, 8))
 y.mean()
+```
+
+```{.python .input}
+#@tab tensorflow
+y = net(tf.random.uniform((4, 8)))
+tf.reduce_mean(y)
 ```
 
 ## Layers with Parameters
@@ -173,6 +203,25 @@ class MyLinear(nn.Module):
         return torch.matmul(x, self.weight.data) + self.bias.data
 ```
 
+```{.python .input}
+#@tab tensorflow
+class MyDense(tf.keras.Model):
+    def __init__(self, units):
+        super().__init__()
+        self.units = units
+
+    def build(self, input_shape):
+        self.w = self.add_weight(
+            name='w',
+            shape=[input_shape[-1], self.units], initializer=tf.random_normal_initializer())
+        self.b = self.add_weight(
+            name='b',
+            shape=[self.units], initializer=tf.zeros_initializer())
+
+    def call(self, inputs):
+        return tf.matmul(inputs, self.w) + self.b
+```
+
 Next, we instantiate the `MyDense` class 
 and access its model parameters.
 
@@ -188,6 +237,13 @@ dense = MyLinear(5, 3)
 dense.weight
 ```
 
+```{.python .input}
+#@tab tensorflow
+dense = MyDense(3)
+dense(tf.random.uniform((2, 5)))
+dense.get_weights()
+```
+
 We can directly carry out forward calculations using custom layers.
 
 ```{.python .input}
@@ -199,6 +255,11 @@ dense(np.random.uniform(size=(2, 5)))
 ```{.python .input}
 #@tab pytorch
 dense(torch.randn(2, 5))
+```
+
+```{.python .input}
+#@tab tensorflow
+dense(tf.random.uniform((2, 5)))
 ```
 
 We can also construct models using custom layers.
@@ -218,6 +279,13 @@ net(np.random.uniform(size=(2, 64)))
 net = nn.Sequential(MyLinear(64, 8), nn.ReLU(), MyLinear(8, 1))
 net(torch.randn(2, 64))
 ```
+
+```{.python .input}
+#@tab tensorflow
+net = tf.keras.models.Sequential([MyDense(8), MyDense(1)])
+net(tf.random.uniform((2, 64)))
+```
+
 
 ## Summary
 

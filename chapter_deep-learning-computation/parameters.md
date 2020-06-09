@@ -59,6 +59,7 @@ net(x)
 ```{.python .input}
 #@tab tensorflow
 import tensorflow as tf
+import numpy as np
 
 
 net = tf.keras.models.Sequential([
@@ -544,14 +545,14 @@ net[0].weight[0:2]
 ```{.python .input}
 #@tab tensorflow
 def my_init(m):
-    return tf.constant(m)
+    return tf.keras.initializers.Constant(m)
 
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(
         4,
         activation=tf.nn.relu,
-        kernel_initializer=my_init(np.random.uniform(-10, 10, (2, 4)))),
+        kernel_initializer=my_init(2)),
     tf.keras.layers.Dense(1),
 ])
 
