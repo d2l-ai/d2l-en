@@ -263,7 +263,7 @@ def plot_chebychev(a, p):
                    a + 4 * np.sqrt(2 * p), 'black', lw=4)
     d2l.plt.vlines(a - 4 * np.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
     d2l.plt.vlines(a + 4 * np.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
-    d2l.plt.title("p > 1/8")
+    d2l.plt.title(f"p > {p}")
 
     d2l.plt.show()
 
