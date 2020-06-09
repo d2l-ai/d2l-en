@@ -343,3 +343,7 @@ for any $i = 1, 2, \ldots, n$.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/33)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/197)
+:end_tab:
