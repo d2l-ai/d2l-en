@@ -106,7 +106,7 @@ the dot operator will perform an inner product of `x` and `x`,
 yielding the scalar output that we assign to `y`.
 Next, we can automatically calculate the gradient of `y`
 with respect to each component of `x`
-by calling the backward function and print the gradient. 
+by calling the backward function and print the gradient.
 
 ```{.python .input}
 y.backward()
@@ -121,7 +121,8 @@ x.grad
 
 ```{.python .input}
 #@tab tensorflow
-t.gradient(y, x)
+x_grad = t.gradient(y, x)
+x_grad
 ```
 
 The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$
@@ -139,7 +140,7 @@ x.grad == 4 * x
 
 ```{.python .input}
 #@tab tensorflow
-t.gradient(y, x) == 4 * x
+x_grad == 4 * x
 ```
 
 Let's calculate another function of `x`.
@@ -317,7 +318,7 @@ def f(a):
     return c
 ```
 
-Let's compute the gradient. 
+Let's compute the gradient.
 
 ```{.python .input}
 a = np.random.normal()
@@ -340,7 +341,8 @@ a = tf.random.normal((1, 1),dtype=tf.float32)
 with tf.GradientTape() as t:
     t.watch(a)
     d = f(a)
-t.gradient(d, a)
+d_grad = t.gradient(d, a)
+d_grad
 ```
 
 We can now analyze the `f` function defined above.
@@ -360,7 +362,7 @@ a.grad == (d / a)
 
 ```{.python .input}
 #@tab tensorflow
-t.gradient(d, a) == (d / a)
+d_grad == (d / a)
 ```
 
 ## Summary
