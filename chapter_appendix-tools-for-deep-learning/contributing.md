@@ -19,7 +19,7 @@ If you plan to update a large portion of text or code, then you need to know a l
 
 If you would like to change the code, we recommend you to use Jupyter to open these Markdown files as described in :numref:`sec_jupyter`. So that you can run and test your changes. Please remember to clear all outputs before submitting your changes, our CI system will execute the sections you updated to generate outputs.   
 
-Some sections may support multiple framework implementations, you can use `d2lbook` to activate a particular framework, so others framework implementations become markdown code blocks and will not be executed when you "Run All" in Jupyter. In other words, first install `d2lbook` by
+Some sections may support multiple framework implementations, you can use `d2lbook` to activate a particular framework, so other framework implementations become Markdown code blocks and will not be executed when you "Run All" in Jupyter. In other words, first install `d2lbook` by running
 
 ```bash
 pip install git+https://github.com/d2l-ai/d2l-book
@@ -41,7 +41,7 @@ d2lbook activate all chapter_multilayer-perceptrons/mlp-scratch.md
 ```
 
 
-If you add a new code block not for the default implementation, which is MXNet. Please use `#@tab` to mark this block on the beginning line. For exmaple, `#@tab pytorch` for a PyTorch code block, or `#@tab all` a shared code block for all implementations. You may refer to [d2lbook](http://book.d2l.ai/user/code_tabs.html) for more information. 
+If you add a new code block not for the default implementation, which is MXNet, please use `#@tab` to mark this block on the beginning line. For exmaple, `#@tab pytorch` for a PyTorch code block, or `#@tab all` a shared code block for all implementations. You may refer to [d2lbook](http://book.d2l.ai/user/code_tabs.html) for more information. 
 
 ## Adding a New Section or a New Framework Implementation
 
