@@ -766,6 +766,4 @@ tens of thousands of citations.
 [Discussions](https://discuss.d2l.ai/t/84)
 :end_tab:
 
-:begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/？)
-:end_tab:
+
