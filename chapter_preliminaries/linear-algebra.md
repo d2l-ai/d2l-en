@@ -171,8 +171,9 @@ len(x)
 
 ```{.python .input}
 #@tab tensorflow
-tf.size(x)
+tf.size(x)  # TensorFlow doesn't have a len function.
 ```
+
 When a tensor represents a vector (with precisely one axis),
 we can also access its length via the `.shape` attribute.
 The shape is a tuple that lists the length (dimensionality)
@@ -274,7 +275,7 @@ $$
 \end{bmatrix}.
 $$
 
-In code, we access a matrix's transpose via the `T` attribute.
+In code, we access a matrix's transpose via
 
 ```{.python .input}
 A.T
@@ -292,7 +293,7 @@ tf.transpose(A)
 
 As a special type of the square matrix,
 a *symmetric matrix* $\mathbf{A}$ is equal to its transpose:
-$\mathbf{A} = \mathbf{A}^\top$.
+$\mathbf{A} = \mathbf{A}^\top$. Here we construst a symmetric matrix `B`
 
 ```{.python .input}
 B = np.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
@@ -310,6 +311,8 @@ B
 B = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 B
 ```
+
+and then compare `B` to its transpose:
 
 ```{.python .input}
 B == B.T
@@ -389,7 +392,7 @@ A, A + B
 
 ```{.python .input}
 #@tab pytorch
-A = torch.arange(20, dtype = torch.float32).reshape(5, 4)
+A = torch.arange(20, dtype=torch.float32).reshape(5, 4)
 B = A.clone()  # Assign a copy of `A` to `B` by allocating new memory
 A, A + B
 ```
@@ -457,7 +460,7 @@ One useful operation that we can perform with arbitrary tensors
 is to calculate the sum of their elements.
 In mathematical notation, we express sums using the $\sum$ symbol.
 To express the sum of the elements in a vector $\mathbf{x}$ of length $d$,
-we write $\sum_{i=1}^d x_i$. In code, we can just call the `sum` function.
+we write $\sum_{i=1}^d x_i$. In code, we can just call the sum function.
 
 ```{.python .input}
 x = np.arange(4)
@@ -466,7 +469,7 @@ x, x.sum()
 
 ```{.python .input}
 #@tab pytorch
-x = torch.arange(4, dtype = torch.float32)
+x = torch.arange(4, dtype=torch.float32)
 x, x.sum()
 ```
 
@@ -493,11 +496,11 @@ A.shape, A.sum()
 A.shape, tf.reduce_sum(A)
 ```
 
-By default, invoking the `sum` function *reduces* a tensor along all its axes to a scalar.
+By default, invoking the sum function *reduces* a tensor along all its axes to a scalar.
 We can also specify the axes along which the tensor is reduced via summation.
 Take matrices as an example.
 To reduce the row dimension (axis 0) by summing up elements of all the rows,
-we specify `axis=0` when invoking `sum`.
+we specify `axis=0` when invoking sum.
 Since the input matrix reduces along axis 0 to generate the output vector,
 the dimension of axis 0 of the input is lost in the output shape.
 
@@ -552,12 +555,12 @@ A.sum(axis=[0, 1])  # Same as A.sum()
 
 ```{.python .input}
 #@tab tensorflow
-tf.reduce_sum(A, axis=[0, 1])
+tf.reduce_sum(A, axis=[0, 1])  # Same as tf.reduce_sum(A)
 ```
 
 A related quantity is the *mean*, which is also called the *average*.
 We calculate the mean by dividing the sum by the total number of elements.
-In code, we could just call `mean` on tensors of arbitrary shape.
+In code, we could just call mean on tensors of arbitrary shape.
 
 ```{.python .input}
 A.mean(), A.sum() / A.size
@@ -573,7 +576,7 @@ A.mean(), A.sum() / A.numel()
 tf.reduce_mean(A), tf.reduce_sum(A) / tf.size(A).numpy()
 ```
 
-Like `sum`, `mean` can also reduce a tensor along the specified axes.
+Like sum, mean can also reduce a tensor along the specified axes.
 
 ```{.python .input}
 A.mean(axis=0), A.sum(axis=0) / A.shape[0]
@@ -591,7 +594,7 @@ tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 
 ### Non-Reduction Sum
 
-However, sometimes it can be useful to keep the number of axes unchanged when invoking `sum` or `mean` by setting `keepdims=True`.
+However, sometimes it can be useful to keep the number of axes unchanged when invoking sum or mean by setting `keepdims=True`.
 
 ```{.python .input}
 sum_A = A.sum(axis=1, keepdims=True)
@@ -661,7 +664,7 @@ x, y, torch.dot(x, y)
 ```{.python .input}
 #@tab tensorflow
 y = tf.ones(4, dtype=tf.float32)
-x, y, tf.tensordot(x, y, 1)
+x, y, tf.tensordot(x, y, axes=1)
 ```
 
 Note that we can express the dot product of two vectors equivalently by performing an elementwise multiplication and then a sum:
@@ -677,7 +680,6 @@ torch.sum(x * y)
 
 ```{.python .input}
 #@tab tensorflow
-y = tf.ones(4, dtype=tf.float32)
 tf.reduce_sum(x * y)
 ```
 
@@ -827,7 +829,7 @@ $$\mathbf{C} = \mathbf{AB} = \begin{bmatrix}
 \end{bmatrix}.
 $$
 
-We can think of the matrix-matrix multiplication $\mathbf{AB}$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix. Just as with ordinary dot products and matrix-vector products, we can compute matrix-matrix multiplication by using the `dot` function.
+We can think of the matrix-matrix multiplication $\mathbf{AB}$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix.
 In the following snippet, we perform matrix multiplication on `A` and `B`.
 Here, `A` is a matrix with 5 rows and 4 columns,
 and `B` is a matrix with 4 rows and 3 columns.
@@ -900,7 +902,7 @@ The $\ell_2$ *norm* of $\mathbf{x}$ is the square root of the sum of the squares
 
 $$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2},$$
 
-where the subscript $2$ is often omitted in $\ell_2$ norms, i.e., $\|\mathbf{x}\|$ is equivalent to $\|\mathbf{x}\|_2$. In code, we can calculate the $\ell_2$ norm of a vector by calling `linalg.norm`.
+where the subscript $2$ is often omitted in $\ell_2$ norms, i.e., $\|\mathbf{x}\|$ is equivalent to $\|\mathbf{x}\|_2$. In code, we can calculate the $\ell_2$ norm of a vector by calling `norm`.
 
 ```{.python .input}
 u = np.array([3, -4])
@@ -957,7 +959,7 @@ is the square root of the sum of the squares of the matrix elements:
 $$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$
 
 The Frobenius norm satisfies all the properties of vector norms.
-It behaves as if it were an $\ell_2$ norm of a matrix-shaped vector. Invoking `linalg.norm` will calculate the Frobenius norm of a matrix.
+It behaves as if it were an $\ell_2$ norm of a matrix-shaped vector. Invoking `norm` will calculate the Frobenius norm of a matrix.
 
 ```{.python .input}
 np.linalg.norm(np.ones((4, 9)))
@@ -1029,7 +1031,6 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 * In deep learning, we often work with norms such as the $\ell_1$ norm, the $\ell_2$ norm, and the Frobenius norm.
 * We can perform a variety of operations over scalars, vectors, matrices, and tensors.
 
-
 ## Exercises
 
 1. Prove that the transpose of a matrix $\mathbf{A}$'s transpose is $\mathbf{A}$: $(\mathbf{A}^\top)^\top = \mathbf{A}$.
@@ -1043,7 +1044,6 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 1. Feed a tensor with 3 or more axes to the `linalg.norm` function and observe its output. What does this function compute for tensors of arbitrary shape?
 
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/30)
 :end_tab:
@@ -1051,3 +1051,8 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/31)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/196)
+:end_tab:
+
