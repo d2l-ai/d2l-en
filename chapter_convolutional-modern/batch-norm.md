@@ -285,6 +285,42 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     Y = gamma * X_hat + beta  # Scale and shift
     return Y, moving_mean, moving_var
 ```
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow
+from tensorflow.keras.layers import Layer 
+
+def batch_norm(is_training,X, gamma, beta, moving_mean, moving_var, eps, momentum):
+    # Use torch.is_grad_enabled() to determine whether the current mode is 
+    # training mode or prediction mode
+    if not is_training:
+         # If it is the prediction mode, directly use the mean and variance
+        # obtained from the incoming moving average
+        X_hat = (X - moving_mean) / np.sqrt(moving_var + eps)
+    else:
+        assert len(X.shape) in (2, 4)
+        if len(X.shape) == 2:
+            # When using a fully connected layer, calculate the mean and
+            # variance on the feature dimension
+            mean = X.mean(axis=0)
+            var = ((X - mean) ** 2).mean(axis=0)
+        else:
+            # When using a two-dimensional convolutional layer, calculate the
+            # mean and variance on the channel dimension (axis=1). Here we
+            # need to maintain the shape of X, so that the broadcast operation
+            # can be carried out later
+            mean = X.mean(axis=(0, 2, 3), keepdims=True)
+            var = ((X - mean) ** 2).mean(axis=(0, 2, 3), keepdims=True)
+        # In training mode, the current mean and variance are used for the
+        # standardization
+        X_hat = (X - mean) / np.sqrt(var + eps)
+        # Update the mean and variance of the moving average
+        moving_mean = momentum * moving_mean + (1.0 - momentum) * mean
+        moving_var = momentum * moving_var + (1.0 - momentum) * var
+    Y = gamma * X_hat + beta  # Scale and shift
+    return Y, moving_mean, moving_var
+```
 
 We can now create a proper `BatchNorm` layer.
 Our layer will maintain proper parameters 
@@ -375,6 +411,66 @@ class BatchNorm(nn.Module):
         return Y
 ```
 
+
+
+
+```{.python .input}
+#@tab tensorflow
+class BatchNormalization(Layer):
+    def __init__(self, decay=0.9, epsilon=1e-5, **kwargs):
+        self.decay = decay
+        self.epsilon = epsilon
+        super(BatchNormalization, self).__init__(**kwargs)
+
+    def build(self, input_shape):
+        self.gamma = self.add_weight(name='gamma',
+                                     shape=[input_shape[-1], ],
+                                     initializer=tf.initializers.ones,
+                                     trainable=True)
+        self.beta = self.add_weight(name='beta',
+                                    shape=[input_shape[-1], ],
+                                    initializer=tf.initializers.zeros,
+                                    trainable=True)
+        self.moving_mean = self.add_weight(name='moving_mean',
+                                           shape=[input_shape[-1], ],
+                                           initializer=tf.initializers.zeros,
+                                           trainable=False)
+        self.moving_variance = self.add_weight(name='moving_variance',
+                                               shape=[input_shape[-1], ],
+                                               initializer=tf.initializers.ones,
+                                               trainable=False)
+        super(BatchNormalization, self).build(input_shape)
+
+    def assign_moving_average(self, variable, value):
+        """
+        variable = variable * decay + value * (1 - decay)
+        """
+        delta = variable * self.decay + value * (1 - self.decay)
+        return variable.assign(delta)
+
+    @tf.function
+    def call(self, inputs, training):
+        if training:
+            batch_mean, batch_variance = tf.nn.moments(inputs, list(range(len(inputs.shape) - 1)))
+            mean_update = self.assign_moving_average(self.moving_mean, batch_mean)
+            variance_update = self.assign_moving_average(self.moving_variance, batch_variance)
+            self.add_update(mean_update)
+            self.add_update(variance_update)
+            mean, variance = batch_mean, batch_variance
+        else:
+            mean, variance = self.moving_mean, self.moving_variance
+        output = tf.nn.batch_normalization(inputs,
+                                           mean=mean,
+                                           variance=variance,
+                                           offset=self.beta,
+                                           scale=self.gamma,
+                                           variance_epsilon=self.epsilon)
+        return output
+
+    def compute_output_shape(self, input_shape):
+        return input_shape
+```
+
 ## Using a Batch Normalization LeNet
 
 To see how to apply `BatchNorm` in context, 
@@ -415,6 +511,28 @@ net = nn.Sequential(
     nn.Linear(84, 10))
 ```
 
+```{.python .input}
+#@tab tensorflow
+net = tf.keras.models.Sequential(
+    [tf.keras.layers.Conv2D(filters=6,kernel_size=5),
+    BatchNormalization(),
+    tf.keras.layers.Activation('sigmoid'),
+    tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+    tf.keras.layers.Conv2D(filters=16,kernel_size=5),
+    BatchNormalization(),
+    tf.keras.layers.Activation('sigmoid'),
+    tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(120),
+    BatchNormalization(),
+    tf.keras.layers.Activation('sigmoid'),
+    tf.keras.layers.Dense(84),
+    BatchNormalization(),
+    tf.keras.layers.Activation('sigmoid'),
+    tf.keras.layers.Dense(10,activation='sigmoid')]
+)
+```
+
 As before, we will train our network on the Fashion-MNIST dataset.
 This code is virtually identical to that when we first trained LeNet (:numref:`sec_lenet`).
 The main difference is the considerably larger learning rate.
@@ -433,6 +551,15 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
+```{.python .input}
+#@tab tensorflow
+lr, num_epochs, batch_size = 1.0, 10, 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+
+
 Let us have a look at the scale parameter `gamma`
 and the shift parameter `beta` learned
 from the first batch normalization layer.
@@ -445,6 +572,12 @@ net[1].gamma.data().reshape(-1,), net[1].beta.data().reshape(-1,)
 ```{.python .input}
 #@tab pytorch
 net[1].gamma.reshape((-1,)), net[1].beta.reshape((-1,))
+
+```
+
+```{.python .input}
+#@tab tensorflow
+net.get_layer(index=1).gamma,net.get_layer(index=1).beta
 
 ```
 
@@ -492,6 +625,29 @@ net = nn.Sequential(
     nn.Linear(84, 10))
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+
+net = tf.keras.models.Sequential()
+net.add(tf.keras.layers.Conv2D(filters=6,kernel_size=5))
+net.add(tf.keras.layers.BatchNormalization())
+net.add(tf.keras.layers.Activation('sigmoid'))
+net.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
+net.add(tf.keras.layers.Conv2D(filters=16,kernel_size=5))
+net.add(tf.keras.layers.BatchNormalization())
+net.add(tf.keras.layers.Activation('sigmoid'))
+net.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
+net.add(tf.keras.layers.Flatten())
+net.add(tf.keras.layers.Dense(120))
+net.add(tf.keras.layers.BatchNormalization())
+net.add(tf.keras.layers.Activation('sigmoid'))
+net.add(tf.keras.layers.Dense(84))
+net.add(tf.keras.layers.BatchNormalization())
+net.add(tf.keras.layers.Activation('sigmoid'))
+net.add(tf.keras.layers.Dense(10,activation='sigmoid'))
+```
+
 Below, we use the same hyper-parameters to train out model.
 Note that as usual, the Gluon variant runs much faster
 because its code has been compiled to C++/CUDA
@@ -504,6 +660,13 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 ```{.python .input}
 #@tab pytorch
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+
+
+```{.python .input}
+#@tab tensorflow
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
@@ -601,4 +764,8 @@ tens of thousands of citations.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/84)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/？)
 :end_tab:
