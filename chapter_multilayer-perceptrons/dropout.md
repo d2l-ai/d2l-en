@@ -361,6 +361,8 @@ W2 = tf.Variable(tf.random.normal(stddev=.1, shape=(num_hiddens1, num_hiddens2))
 b2 = tf.Variable(tf.zeros(num_hiddens2))
 W3 = tf.Variable(tf.random.truncated_normal(stddev=.01, shape=(num_hiddens2, num_outputs)))
 b3 = tf.Variable(tf.zeros(num_outputs))
+
+params = [W1, b1, W2, b2, W3, b3]
 ```
 
 ### Defining the Model
@@ -442,7 +444,8 @@ def net(X, is_training=False):
     if is_training:
         # Add a dropout layer after the second fully connected layer
         H2 = dropout(H2, drop_prob2)
-    return tf.math.softmax(tf.matmul(H2, W3) + b3)
+    res = tf.math.softmax(tf.matmul(H2, W3) + b3)
+    return tf.reduce_mean(res, axis=1)
 ```
 
 ### Training and Testing
@@ -472,7 +475,7 @@ num_epochs, lr, batch_size = 10, 0.5, 256
 loss = tf.keras.losses.CategoricalCrossentropy()
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 trainer = tf.keras.optimizers.SGD(learning_rate=lr)
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer, params=params)
 ```
 
 ## Concise Implementation
@@ -523,15 +526,15 @@ net.apply(init_weights)
 
 ```{.python .input}
 #@tab tensorflow
-model = tf.keras.models.Sequential([
+net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(input_shape=(28, 28)),
-    tf.keras.layers.Dense(256, activation='relu'),
+    tf.keras.layers.Dense(256, activation=tf.nn.relu),
     # Add a dropout layer after the first fully connected layer
     tf.keras.layers.Dropout(dropout1),
-    tf.keras.layers.Dense(256, activation='relu'),
+    tf.keras.layers.Dense(256, activation=tf.nn.relu),
     # Add a dropout layer after the second fully connected layer
     tf.keras.layers.Dropout(dropout2),
-    tf.keras.layers.Dense(10, activation=tf.nn.softmax)
+    tf.keras.layers.Dense(10, activation=tf.nn.relu),
 ])
 ```
 

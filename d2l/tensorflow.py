@@ -205,7 +205,7 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):  #@save
     y = tf.cast(y, dtype=tf.int32)
-    if y_hat.shape[1] > 1:
+    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
         return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
     else:
         return tf.cast(tf.cast(y_hat, dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
@@ -244,7 +244,7 @@ def train_epoch_ch3(net, train_iter, loss, updater, params=None):  #@save
         # Compute gradients and update parameters
         with tf.GradientTape(persistent=True) as tape:
             y_hat = net(X)
-            l = loss(y_hat, y)
+            l = loss(y_hat, tf.cast(y, dtype=tf.float32))
             l = tf.where(tf.math.is_nan(l), tf.zeros_like(l), l)
             l_sum = tf.reduce_sum(l)
         if params is None:
