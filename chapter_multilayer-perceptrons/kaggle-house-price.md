@@ -768,15 +768,18 @@ def train(net, train_features, train_labels, test_features, test_labels,
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
     train_iter = d2l.load_array((train_features, train_labels), batch_size)
-    test_iter = d2l.load_array((test_features, test_labels), batch_size)
+    test_iter, test_ls = None, []
+    if test_features is not None:
+        test_iter = d2l.load_array((test_features, test_labels), batch_size, is_train=False)
     # The Adam optimization algorithm is used here
-    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-        initial_learning_rate=learning_rate, decay_steps=num_epochs, decay_rate=weight_decay)
-    optimizer = tf.keras.optimizers.Adam(lr_schedule)
+    #lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+    #    initial_learning_rate=learning_rate, decay_steps=num_epochs, decay_rate=weight_decay)
+    optimizer = tf.keras.optimizers.Adam(learning_rate)
     net.compile(loss=log_rmse, optimizer=optimizer)
     history = net.fit(train_iter, validation_data=test_iter, epochs=num_epochs, batch_size=batch_size, validation_freq=1)
     train_ls = history.history['loss']
-    test_ls = history.history['val_loss']
+    if test_features is not None:
+        test_ls = history.history['val_loss']
     return train_ls, test_ls
 ```
 
