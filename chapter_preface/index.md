@@ -284,7 +284,7 @@ the following packages and modules as dependencies:
 :begin_tab:`pytorch`
 
 Most of the code in this book is based on PyTorch.
-Pytorch is an open-source framework for deep learning, which is extremely
+PyTorch is an open-source framework for deep learning, which is extremely
 popular in the research community.
 All of the code in this book has passed tests under the the newest PyTorch.
 However, due to the rapid development of deep learning, some code
@@ -297,6 +297,29 @@ to update your code and runtime environment.
 At times, to avoid unnecessary repetition, we encapsulate
 the frequently-imported and referred-to functions, classes, etc.
 in this book in the `d2l.torch` module.
+For any block such as a function, a class, or multiple imports
+to be saved in the package, we will mark it with `#@save`.
+The `d2l` package is light-weight and only requires
+the following packages and modules as dependencies:
+
+:end_tab:
+
+:begin_tab:`pytorch`
+
+Most of the code in this book is based on TensorFlow.
+TensorFlow is an open-source framework for deep learning, which is extremely
+popular in both the research community and industrial.
+All of the code in this book has passed tests under the the newest TensorFlow.
+However, due to the rapid development of deep learning, some code
+*in the print edition* may not work properly in future versions of TensorFlow.
+However, we plan to keep the online version up-to-date.
+In case you encounter any such problems,
+please consult :ref:`chap_installation`
+to update your code and runtime environment.
+
+At times, to avoid unnecessary repetition, we encapsulate
+the frequently-imported and referred-to functions, classes, etc.
+in this book in the `d2l.tensorflow` module.
 For any block such as a function, a class, or multiple imports
 to be saved in the package, we will mark it with `#@save`.
 The `d2l` package is light-weight and only requires
@@ -380,6 +403,7 @@ import requests
 
 d2l = sys.modules[__name__]
 ```
+
 We offer a detailed overview of these functions and classes in :numref:`sec_d2l`.
 
 
@@ -470,4 +494,8 @@ Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writ
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/20)
+:end_tab:
+
+:begin_tab:`tesorflow`
+[Discussions](https://discuss.d2l.ai/t/186)
 :end_tab:
