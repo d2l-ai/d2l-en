@@ -205,7 +205,7 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):  #@save
     y = tf.cast(y, dtype=tf.int32)
-    if y_hat.shape[1] > 1:
+    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
         return tf.cast(tf.cast(tf.argmax(y_hat, axis=1), dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
     else:
         return tf.cast(tf.cast(y_hat, dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
@@ -244,7 +244,7 @@ def train_epoch_ch3(net, train_iter, loss, updater, params=None):  #@save
         # Compute gradients and update parameters
         with tf.GradientTape(persistent=True) as tape:
             y_hat = net(X)
-            l = loss(y_hat, y)
+            l = loss(y_hat, tf.cast(y, dtype=tf.float32))
             l = tf.where(tf.math.is_nan(l), tf.zeros_like(l), l)
             l_sum = tf.reduce_sum(l)
         if params is None:
@@ -332,6 +332,90 @@ def evaluate_loss(net, data_iter, loss):  #@save
         else:
             metric.add(l*len(y), y.numpy().size)
     return metric[0] / metric[1]
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_HUB = dict()
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def util_download(url, path=None, verify_ssl=True):
+    """Download a given URL
+    """
+    if path is None:
+        fname = url.split('/')[-1]
+        # Empty filenames are invalid
+        assert fname, 'Can\'t construct file-name from this URL. ' \
+            'Please set the `path` option manually.'
+    else:
+        path = os.path.expanduser(path)
+        if os.path.isdir(path):
+            fname = os.path.join(path, url.split('/')[-1])
+        else:
+            fname = path
+
+    if not verify_ssl:
+        warnings.warn(
+            'Unverified HTTPS request is being made (verify_ssl=False). '
+            'Adding certificate verification is strongly advised.')
+    
+    print('Downloading {} from {}...'.format(fname, url))
+    r = requests.get(url, stream=True, verify=verify_ssl)
+    with open(fname, 'wb') as f:
+        f.write(r.content)
+
+    return fname
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def download(name, cache_dir=os.path.join('..', 'data')):
+    """Download a file inserted into DATA_HUB, return the local filename."""
+    assert name in DATA_HUB, "%s does not exist" % name
+    url, sha1 = DATA_HUB[name]
+    d2l.mkdir_if_not_exist(cache_dir)
+    return util_download(url)
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def download_extract(name, folder=None):
+    """Download and extract a zip/tar file."""
+    fname = download(name)
+    base_dir = os.path.dirname(fname) 
+    data_dir, ext = os.path.splitext(fname)
+    if ext == '.zip':
+        fp = zipfile.ZipFile(fname, 'r')
+    elif ext in ('.tar', '.gz'):
+        fp = tarfile.open(fname, 'r')
+    else:
+        assert False, 'Only zip/tar files can be extracted'
+    fp.extractall(base_dir)
+    if folder:
+        return os.path.join(base_dir, folder)
+    else:
+        return data_dir
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def download_all():
+    """Download all files in the DATA_HUB"""
+    for name in DATA_HUB:
+        download(name)
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_HUB['kaggle_house_train'] = (
+    DATA_URL + 'kaggle_house_pred_train.csv',
+    '585e9cc93e70b39160e7921475f9bcd7d31219ce')
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_HUB['kaggle_house_test'] = (
+    DATA_URL + 'kaggle_house_pred_test.csv',
+    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
