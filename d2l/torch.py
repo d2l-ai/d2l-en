@@ -670,3 +670,58 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
     return data_iter, data_iter.vocab
 
 
+# Defined in file: ./chapter_attention-mechanisms/attention.md
+def masked_softmax(X, valid_len):
+    # X: 3-D tensor, valid_len: 1-D or 2-D tensor
+    if valid_len is None:
+        return nn.functional.softmax(X, dim=-1)
+    else:
+        shape = X.shape
+        if valid_len.dim() == 1:
+            valid_len = torch.repeat_interleave(valid_len, repeats=shape[1], dim=0)
+        else:
+            valid_len = valid_len.reshape(-1)
+        # Fill masked elements with a large negative, whose exp is 0
+        X = X.reshape(-1, shape[-1])
+        for count, row in enumerate(X):
+            row[int(valid_len[count]):]=-1e6
+        return nn.functional.softmax(X.reshape(shape), dim=-1)
+
+
+# Defined in file: ./chapter_attention-mechanisms/attention.md
+class DotProductAttention(nn.Module):
+    def __init__(self, dropout, **kwargs):
+        super(DotProductAttention, self).__init__(**kwargs)
+        self.dropout = nn.Dropout(dropout)
+
+    # query: (batch_size, #queries, d)
+    # key: (batch_size, #kv_pairs, d)
+    # value: (batch_size, #kv_pairs, dim_v)
+    # valid_len: either (batch_size, ) or (batch_size, xx)
+    def forward(self, query, key, value, valid_len=None):
+        d = query.shape[-1]
+        # set transpose_b=True to swap the last two dimensions of key
+        scores = torch.bmm(query, key.transpose(1,2)) / math.sqrt(d)
+        attention_weights = self.dropout(masked_softmax(scores, valid_len))
+        return torch.bmm(attention_weights, value)
+
+
+# Defined in file: ./chapter_attention-mechanisms/attention.md
+class MLPAttention(nn.Module):
+    def __init__(self, key_size, query_size, units, dropout, **kwargs):
+        super(MLPAttention, self).__init__(**kwargs)
+        self.W_k = nn.Linear(key_size, units, bias=False)
+        self.W_q = nn.Linear(query_size, units, bias=False)
+        self.v = nn.Linear(units, 1, bias=False)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, query, key, value, valid_len):
+        query, key = self.W_k(query), self.W_q(key)
+        # expand query to (batch_size, #querys, 1, units), and key to
+        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast.
+        features = query.unsqueeze(2) + key.unsqueeze(1)
+        scores = self.v(features).squeeze(-1)
+        attention_weights = self.dropout(masked_softmax(scores, valid_len))
+        return torch.bmm(attention_weights, value)
+
+
