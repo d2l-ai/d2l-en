@@ -70,6 +70,11 @@ import torch
 import tensorflow as tf
 ```
 
+```{.python .input}
+#@tab jax
+from jax import numpy as np
+```
+
 A tensor represents a (possibly multi-dimensional) array of numerical values.
 With one axis, a tensor corresponds (in math) to a *vector*.
 With two axes, a tensor corresponds to a *matrix*.
@@ -101,6 +106,12 @@ x = tf.constant(range(12))
 x
 ```
 
+```{.python .input}
+#@tab jax
+x = np.arange(12)
+x
+```
+
 We can access a tensor's *shape* (the length along each axis)
 by inspecting its `shape` property.
 
@@ -115,6 +126,11 @@ x.shape
 
 ```{.python .input}
 #@tab tensorflow
+x.shape
+```
+
+```{.python .input}
+#@tab jax
 x.shape
 ```
 

@@ -387,6 +387,19 @@ a = tf.ones(n)
 b = tf.ones(n)
 ```
 
+```{.python .input}
+#@tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import math
+import numpy as np
+import time
+
+n = 10000
+a = np.ones(n)
+b = np.ones(n)
+```
+
 Since we will benchmark the running time frequently in this book,
 let us define a timer (hereafter accessed via the `d2l` package
 to track the running time.
