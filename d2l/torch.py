@@ -2,35 +2,7 @@
 #    d2lbook build lib
 # Don't edit it directly
 
-# Defined in file: ./chapter_preface/index.md
-import sys
-import collections
-from collections import defaultdict
-from matplotlib import pyplot as plt
-from IPython import display
-import math
-import torch
-import torchvision
-from torch import nn
-from torch.nn import functional as F
-from torch.utils import data
-from torchvision import transforms
-import numpy as np
-import os
-import pandas as pd
-import random
-import re
-import shutil
-import sys
-import tarfile
-import time
-import zipfile
-import requests
-
-d2l = sys.modules[__name__]
-
-
-# Defined in file: ./chapter_preliminaries/pandas.md
+# Defined in file: .\chapter_preliminaries\pandas.md
 def mkdir_if_not_exist(path):  #@save
     if not isinstance(path, str):
         path = os.path.join(*path)
@@ -38,20 +10,20 @@ def mkdir_if_not_exist(path):  #@save
         os.makedirs(path)
 
 
-# Defined in file: ./chapter_preliminaries/calculus.md
+# Defined in file: .\chapter_preliminaries\calculus.md
 def use_svg_display():  #@save
     """Use the svg format to display a plot in Jupyter."""
     display.set_matplotlib_formats('svg')
 
 
-# Defined in file: ./chapter_preliminaries/calculus.md
+# Defined in file: .\chapter_preliminaries\calculus.md
 def set_figsize(figsize=(3.5, 2.5)):  #@save
     """Set the figure size for matplotlib."""
     use_svg_display()
     d2l.plt.rcParams['figure.figsize'] = figsize
 
 
-# Defined in file: ./chapter_preliminaries/calculus.md
+# Defined in file: .\chapter_preliminaries\calculus.md
 def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
     axes.set_xlabel(xlabel)
@@ -65,7 +37,7 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     axes.grid()
 
 
-# Defined in file: ./chapter_preliminaries/calculus.md
+# Defined in file: .\chapter_preliminaries\calculus.md
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
@@ -98,7 +70,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression.md
+# Defined in file: .\chapter_linear-networks\linear-regression.md
 class Timer:  #@save
     """Record multiple running times."""
     def __init__(self):
@@ -127,7 +99,7 @@ class Timer:  #@save
         return np.array(self.times).cumsum().tolist()
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+# Defined in file: .\chapter_linear-networks\linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = X w + b + noise."""
     X = torch.zeros(size=(num_examples, len(w))).normal_()
@@ -136,38 +108,38 @@ def synthetic_data(w, b, num_examples):  #@save
     return X, y
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+# Defined in file: .\chapter_linear-networks\linear-regression-scratch.md
 def linreg(X, w, b):  #@save
     return torch.matmul(X, w) + b
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+# Defined in file: .\chapter_linear-networks\linear-regression-scratch.md
 def squared_loss(y_hat, y):  #@save
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+# Defined in file: .\chapter_linear-networks\linear-regression-scratch.md
 def sgd(params, lr, batch_size):  #@save
     for param in params:
         param.data.sub_(lr*param.grad/batch_size)
         param.grad.data.zero_()
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+# Defined in file: .\chapter_linear-networks\linear-regression-concise.md
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data loader"""
     dataset = data.TensorDataset(*data_arrays)
     return data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+# Defined in file: .\chapter_linear-networks\image-classification-dataset.md
 def get_fashion_mnist_labels(labels):  #@save
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
 
 
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+# Defined in file: .\chapter_linear-networks\image-classification-dataset.md
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
@@ -184,7 +156,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     return axes
 
 
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+# Defined in file: .\chapter_linear-networks\image-classification-dataset.md
 def get_dataloader_workers(num_workers=4):  #@save
     # 0 means no additional process is used to speed up the reading of data.
     if sys.platform.startswith('win'):
@@ -193,7 +165,7 @@ def get_dataloader_workers(num_workers=4):  #@save
         return num_workers
 
 
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+# Defined in file: .\chapter_linear-networks\image-classification-dataset.md
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     trans = [transforms.Resize(resize)] if resize else []
@@ -210,7 +182,7 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                             num_workers=get_dataloader_workers()))
 
 
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+# Defined in file: .\chapter_linear-networks\softmax-regression-scratch.md
 def accuracy(y_hat, y):  #@save
     if y_hat.shape[1] > 1:
         return float((y_hat.argmax(axis=1).type(torch.float32) ==
@@ -219,7 +191,7 @@ def accuracy(y_hat, y):  #@save
         return float((y_hat.type(torch.int32) == y.type(torch.int32)).sum())
 
 
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+# Defined in file: .\chapter_linear-networks\softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):  #@save
     metric = Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
@@ -227,7 +199,7 @@ def evaluate_accuracy(net, data_iter):  #@save
     return metric[0] / metric[1]
 
 
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+# Defined in file: .\chapter_linear-networks\softmax-regression-scratch.md
 class Accumulator:  #@save
     """Sum a list of numbers over time."""
     def __init__(self, n):
@@ -243,7 +215,7 @@ class Accumulator:  #@save
         return self.data[idx]
 
 
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+# Defined in file: .\chapter_linear-networks\softmax-regression-scratch.md
 def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     pt_optimizer=False
@@ -267,7 +239,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     return metric[0]/metric[2], metric[1]/metric[2]
 
 
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+# Defined in file: .\chapter_linear-networks\softmax-regression-scratch.md
 class Animator:  #@save
     def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
@@ -309,7 +281,7 @@ class Animator:  #@save
         display.clear_output(wait=True)
 
 
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+# Defined in file: .\chapter_linear-networks\softmax-regression-scratch.md
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
                         ylim=[0.3, 0.9],
@@ -320,7 +292,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         animator.add(epoch+1, train_metrics+(test_acc,))
 
 
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+# Defined in file: .\chapter_linear-networks\softmax-regression-scratch.md
 def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
@@ -330,7 +302,7 @@ def predict_ch3(net, test_iter, n=6):  #@save
     d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
 
 
-# Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
+# Defined in file: .\chapter_multilayer-perceptrons\underfit-overfit.md
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
@@ -343,15 +315,15 @@ def evaluate_loss(net, data_iter, loss):  #@save
     return metric[0] / metric[1]
 
 
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+# Defined in file: .\chapter_multilayer-perceptrons\kaggle-house-price.md
 DATA_HUB = dict()
 
 
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+# Defined in file: .\chapter_multilayer-perceptrons\kaggle-house-price.md
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
 
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+# Defined in file: .\chapter_multilayer-perceptrons\kaggle-house-price.md
 def util_download(url, path=None, verify_ssl=True):
     """Download a given URL
     """
@@ -380,7 +352,7 @@ def util_download(url, path=None, verify_ssl=True):
     return fname
 
 
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+# Defined in file: .\chapter_multilayer-perceptrons\kaggle-house-price.md
 def download(name, cache_dir=os.path.join('..', 'data')):
     """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, "%s does not exist" % name
@@ -389,7 +361,7 @@ def download(name, cache_dir=os.path.join('..', 'data')):
     return util_download(url)
 
 
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+# Defined in file: .\chapter_multilayer-perceptrons\kaggle-house-price.md
 def download_extract(name, folder=None):
     """Download and extract a zip/tar file."""
     fname = download(name)
@@ -408,26 +380,26 @@ def download_extract(name, folder=None):
         return data_dir
 
 
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+# Defined in file: .\chapter_multilayer-perceptrons\kaggle-house-price.md
 def download_all():
     """Download all files in the DATA_HUB"""
     for name in DATA_HUB:
         download(name)
 
 
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+# Defined in file: .\chapter_multilayer-perceptrons\kaggle-house-price.md
 DATA_HUB['kaggle_house_train'] = (
     DATA_URL + 'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
 
 
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+# Defined in file: .\chapter_multilayer-perceptrons\kaggle-house-price.md
 DATA_HUB['kaggle_house_test'] = (
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
 
-# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+# Defined in file: .\chapter_deep-learning-computation\use-gpu.md
 def try_gpu(i=0):  #@save
     """Return gpu(i) if exists, otherwise return cpu()."""
     if torch.cuda.device_count() >= i + 1:
@@ -435,7 +407,7 @@ def try_gpu(i=0):  #@save
     return torch.device('cpu')
 
 
-# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+# Defined in file: .\chapter_deep-learning-computation\use-gpu.md
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
     ctxes = [torch.device(f'cuda:{i}')
