@@ -19,25 +19,6 @@ Automatic differentiation enables the system to subsequently backpropagate gradi
 Here, *backpropagate* simply means to trace through the computational graph,
 filling in the partial derivatives with respect to each parameter.
 
-
-And while many other libraries require
-that we compile a symbolic graph to take automatic derivatives,
-`autograd` allows us to take derivatives
-while writing ordinary imperative code.
-Every time we pass data through our model,
-`autograd` builds a graph on the fly,
-tracking which data combined through
-which operations to produce the output.
-This graph enables `autograd`
-to subsequently backpropagate gradients on command.
-Here, *backpropagate* simply means to trace through the *computational graph*,
-filling in the partial derivatives with respect to each parameter.
-
-
-
-
-There are two distinct modes in autograd, forward mode and reverse mode. Deep learning frameworks in default use the reverse mode, which is straightforward to implement the [backpropagation](https://en.wikipedia.org/wiki/Backpropagation) for training neural networks.
-
 ```{.python .input}
 from mxnet import autograd, np, npx
 npx.set_np()
