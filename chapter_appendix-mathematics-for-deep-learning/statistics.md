@@ -52,6 +52,36 @@ d2l.plt.title("Sample Mean: {:.2f}".format(float(np.mean(xs))))
 d2l.plt.show()
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+
+torch.pi = torch.acos(torch.zeros(1)) * 2  #define pi in torch
+
+# Sample datapoints and create y coordinate
+epsilon = 0.1
+torch.manual_seed(8675309)
+xs = torch.randn(size=(300,))
+
+ys = torch.tensor(
+    [torch.sum(torch.exp(-(xs[0:i] - xs[i])**2 / (2 * epsilon**2))\
+               / torch.sqrt(2*torch.pi*epsilon**2)) / len(xs)\
+     for i in range(len(xs))])
+
+# Compute true density
+xd = torch.arange(torch.min(xs), torch.max(xs), 0.01)
+yd = torch.exp(-xd**2/2) / torch.sqrt(2 * torch.pi)
+
+# Plot the results
+d2l.plot(xd, yd, 'x', 'density')
+d2l.plt.scatter(xs, ys)
+d2l.plt.axvline(x=0)
+d2l.plt.axvline(x=torch.mean(xs), linestyle='--', color='purple')
+d2l.plt.title("Sample Mean: {:.2f}".format(float(torch.mean(xs).item())))
+d2l.plt.show()
+```
+
 There can be many ways to compute an estimator of a parameter $\hat{\theta}_n$.  In this section, we introduce three common methods to evaluate and compare estimators: the mean squared error, the standard deviation, and statistical bias. 
 
 ### Mean Squared Error
@@ -107,7 +137,7 @@ We refer the above formula as *bias-variance trade-off*. The mean squared error 
 
 ### Evaluating Estimators in Code
 
-Since the standard deviation of an estimator has been implementing in MXNet by simply calling `a.std()` for a tensor `a`, we will skip it but implement the statistical bias and the mean squared error in MXNet.
+Since the standard deviation of an estimator has been implementing in MXNet by simply calling `a.std()` for a `ndarray` "a", we will skip it but implement the statistical bias and the mean squared error in MXNet.
 
 ```{.python .input}
 # Statistical bias
@@ -117,6 +147,17 @@ def stat_bias(true_theta, est_theta):
 # Mean squared error
 def mse(data, true_theta):
     return(np.mean(np.square(data - true_theta)))
+```
+
+```{.python .input}
+#@tab pytorch
+# Statistical bias
+def stat_bias(true_theta, est_theta):
+    return(torch.mean(est_theta) - true_theta)
+
+# Mean squared error
+def mse(data, true_theta):
+    return(torch.mean(torch.square(data - true_theta)))
 ```
 
 To illustrate the equation of the bias-variance trade-off, let us simulate of normal distribution $\mathcal{N}(\theta, \sigma^2)$ with $10,000$ samples. Here, we use a $\theta = 1$ and $\sigma = 4$. As the estimator is a function of the given samples, here we use the mean of the samples as an estimator for true $\theta$ in this normal distribution $\mathcal{N}(\theta, \sigma^2)$ .
@@ -130,9 +171,24 @@ theta_est = np.mean(samples)
 theta_est
 ```
 
+```{.python .input}
+#@tab pytorch
+theta_true = 1
+sigma = 4
+sample_len = 10000
+samples = torch.normal(theta_true, sigma, size=(sample_len, 1))
+theta_est = torch.mean(samples)
+theta_est
+```
+
 Let us validate the trade-off equation by calculating the summation of the squared bias and the variance of our estimator. First, calculate the MSE of our estimator.
 
 ```{.python .input}
+mse(samples, theta_true)
+```
+
+```{.python .input}
+#@tab pytorch
 mse(samples, theta_true)
 ```
 
@@ -141,6 +197,12 @@ Next, we calculate $\mathrm{Var} (\hat{\theta}_n) + [\mathrm{bias} (\hat{\theta}
 ```{.python .input}
 bias = stat_bias(theta_true, theta_est)
 np.square(samples.std()) + np.square(bias)
+```
+
+```{.python .input}
+#@tab pytorch
+bias = stat_bias(theta_true, theta_est)
+torch.square(samples.std(unbiased=False)) + torch.square(bias)
 ```
 
 ## Conducting Hypothesis Tests
@@ -308,6 +370,28 @@ t_star = 1.96
 mu_hat = np.mean(samples)
 sigma_hat = samples.std(ddof=1)
 (mu_hat - t_star*sigma_hat/np.sqrt(N), mu_hat + t_star*sigma_hat/np.sqrt(N))
+```
+
+```{.python .input}
+#@tab pytorch
+# Note: PyTorch uses Bessel's correction by default, which means the use of
+#       ddof=1 instead of default ddof=0 in numpy.
+#       We can use unbiased=False to imitate ddof=0.
+
+# Number of samples
+N = 1000
+
+# Sample dataset
+samples = torch.normal(0, 1, size=(N,))
+
+# Lookup Students's t-distribution c.d.f.
+t_star = 1.96
+
+# Construct interval
+mu_hat = torch.mean(samples)
+sigma_hat = samples.std(unbiased=True)
+(mu_hat - t_star*sigma_hat/torch.sqrt(torch.tensor(N, dtype=torch.float32)),\
+ mu_hat + t_star*sigma_hat/torch.sqrt(torch.tensor(N, dtype=torch.float32)))
 ```
 
 ## Summary
