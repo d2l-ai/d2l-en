@@ -249,6 +249,17 @@ z.sum().backward()
 x.grad == u
 ```
 
+```{.python .input}
+#@tab tensorflow
+with tf.GradientTape() as t:
+    y = x * x
+    u = tf.stop_gradient(y)
+    z = u * x
+
+x_grad = t.gradient(z, x)
+x_grad == u
+```
+
 Since the computation of `y` was recorded,
 we can subsequently call `y.backward()` to get the derivative of `y = x * x` with respect to `x`, which is `2 * x`.
 
