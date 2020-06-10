@@ -62,6 +62,15 @@ stage("Build and Publish") {
       ./static/cache.sh store _build/eval_tensorflow/data _build/data_tensorflow_tmp
       """
 
+      sh label: "Execute Notebooks [Jax]", script: """set -ex
+      conda activate ${ENV_NAME}
+      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
+      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
+      ./static/cache.sh restore _build/eval_jax/data _build/data_jax_tmp
+      d2lbook build eval --tab jax
+      ./static/cache.sh store _build/eval_jax/data _build/data_jax_tmp
+      """
+
       sh label:"Build HTML", script:"""set -ex
       conda activate ${ENV_NAME}
       ./static/build_html.sh
