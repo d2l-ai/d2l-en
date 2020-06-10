@@ -10,7 +10,7 @@ To up the ante just a bit, we will focus our discussion in the coming sections
 on the qualitatively similar, but comparatively complex Fashion-MNIST
 dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon
@@ -19,7 +19,7 @@ import sys
 d2l.use_svg_display()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -44,12 +44,12 @@ d2l.use_svg_display()
 
 We can download and load the FashionMNIST dataset into memory via the the build-in functions in the framework.
 
-```python
+```{.python .input}
 mnist_train = gluon.data.vision.FashionMNIST(train=True)
 mnist_test = gluon.data.vision.FashionMNIST(train=False)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # By default pytorch torchvision datasets are of type PIL.
 # Define a transform "trans" to change the PIL to Tensor format.
@@ -71,11 +71,11 @@ by 6k images in the training set and by 1k in the test set.
 Consequently the training set and the test set
 contain 60k and 10k images, respectively.
 
-```python
+```{.python .input}
 len(mnist_train), len(mnist_test)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 len(mnist_train), len(mnist_test)
 ```
@@ -120,12 +120,12 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
 Here are the images and their corresponding labels (in text)
 for the first few examples in the training dataset.
 
-```python
+```{.python .input}
 X, y = mnist_train[:18]
 show_images(X.squeeze(axis=-1), 2, 9, titles=get_fashion_mnist_labels(y));
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 X, y = next(iter(data.DataLoader(mnist_train, batch_size=18)))
 show_images(X.reshape(18, 28, 28), 2, 9, titles=get_fashion_mnist_labels(y));
@@ -179,7 +179,7 @@ Through the `transform_first` function of the dataset,
 we apply the transformation of `ToTensor`
 to the first element of each instance (image and label).
 
-```python
+```{.python .input}
 batch_size = 256
 transformer = gluon.data.vision.transforms.ToTensor()
 train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
@@ -187,7 +187,7 @@ train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
                                    num_workers=get_dataloader_workers())
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 batch_size = 256
 train_iter = data.DataLoader(mnist_train, batch_size, shuffle=True, 
@@ -202,14 +202,14 @@ train_iter = tf.data.Dataset.from_tensor_slices((mnist_train_x, mnist_train_y)).
 
 Let us look at the time it takes to read the training data.
 
-```python
+```{.python .input}
 timer = d2l.Timer()
 for X, y in train_iter:
     continue
 f'{timer.stop():.2f} sec'
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 timer = d2l.Timer()
 for X, y in train_iter:
@@ -232,7 +232,7 @@ that obtains and reads the Fashion-MNIST dataset.
 It returns the data iterators for both the training set and validation set.
 In addition, it accepts an optional argument to resize images to another shape.
 
-```python
+```{.python .input}
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     dataset = gluon.data.vision
@@ -247,7 +247,7 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                                   num_workers=get_dataloader_workers()))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
@@ -289,14 +289,14 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 
 Below, we verify that image resizing works.
 
-```python
+```{.python .input}
 train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
 for X, y in train_iter:
     print(X.shape)
     break
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
 for X, y in train_iter:
