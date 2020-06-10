@@ -85,7 +85,7 @@ len(mnist_train), len(mnist_test)
 len(mnist_train_x), len(mnist_test_x)
 ```
 
-```{.json .output n=3}
+```{.json .output n=None}
 [
  {
   "data": {
@@ -153,7 +153,7 @@ for i in range(18):
 show_images(tf.constant(X, shape=(18, 28, 28)), 2, 9, titles=get_fashion_mnist_labels(y));
 ```
 
-```{.json .output n=5}
+```{.json .output n=None}
 [
  {
   "ename": "NameError",
@@ -254,7 +254,7 @@ for X, y in train_iter:
 f'{timer.stop():.2f} sec'
 ```
 
-```{.json .output n=7}
+```{.json .output n=None}
 [
  {
   "data": {
@@ -353,7 +353,7 @@ for X, y in train_iter:
     break
 ```
 
-```{.json .output n=9}
+```{.json .output n=None}
 [
  {
   "name": "stdout",
