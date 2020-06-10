@@ -437,7 +437,7 @@ we will iterate through the entire dataset
 passing through every examples in the training dataset
 (assuming the number of examples is divisible by the batch size).
 The number of epochs `num_epochs` and the learning rate `lr` are both hyper-parameters,
-which we set here to $3$ and $0.03$, respectively.
+which we set here to $3$ and $0.03$, respectively. 
 Unfortunately, setting hyper-parameters is tricky
 and requires some adjustment by trial and error.
 We elide these details for now but revise them
@@ -445,16 +445,12 @@ later in
 :numref:`chap_optimization`.
 
 ```{.python .input}
-lr = 0.03  # Learning rate
-num_epochs = 3  # Number of iterations
-net = linreg  # Our fancy linear model
-loss = squared_loss  # 0.5 (y-y')^2
+lr = 0.03
+num_epochs = 3
+net = linreg
+loss = squared_loss
 
 for epoch in range(num_epochs):
-    # Assuming the number of examples can be divided by the batch size, all
-    # the examples in the training dataset are used once in one epoch
-    # iteration. The features and tags of minibatch examples are given by X
-    # and y respectively
     for X, y in data_iter(batch_size, features, labels):
         with autograd.record():
             l = loss(net(X, w, b), y)  # Minibatch loss in X and y
@@ -466,19 +462,15 @@ for epoch in range(num_epochs):
 
 ```{.python .input}
 #@tab pytorch
-lr = 0.03  # Learning rate
-num_epochs = 3  # Number of iterations
-net = linreg  # Our fancy linear model
-loss = squared_loss  # 0.5 (y-y')^2
+lr = 0.03
+num_epochs = 3
+net = linreg
+loss = squared_loss
 
 for epoch in range(num_epochs):
-    # Assuming the number of examples can be divided by the batch size, all
-    # the examples in the training data set are used once in one epoch
-    # iteration. The features and tags of mini-batch examples are given by X
-    # and y respectively
     for X, y in data_iter(batch_size, features, labels):
         l = loss(net(X, w, b), y)  # Minibatch loss in X and y
-        l.mean().backward()  # Compute gradient on l with respect to [w,b]
+        l.sum().backward()  # Compute gradient on l with respect to [w,b]
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     with torch.no_grad():
         train_l = loss(net(features, w, b), labels)
@@ -487,23 +479,18 @@ for epoch in range(num_epochs):
 
 ```{.python .input}
 #@tab tensorflow
-lr = 0.03  # Learning rate
-num_epochs = 3  # Number of iterations
-net = linreg  # Our fancy linear model
-loss = squared_loss  # 0.5 (y-y')^2
+lr = 0.03 
+num_epochs = 3
+net = linreg
+loss = squared_loss
+
 for epoch in range(num_epochs):
-    # Assuming the number of examples can be divided by the batch size, all
-    # the examples in the training data set are used once in one epoch
-    # iteration. The features and tags of mini-batch examples are given by X
-    # and y respectively
     for X, y in data_iter(batch_size, features, labels):
-        with tf.GradientTape(persistent=True) as g:
+        with tf.GradientTape() as g:
             l = loss(net(X, w, b), y)    # Minibatch loss in X and y
-            l = tf.reduce_mean(l)
         # Compute gradient on l with respect to [w,b]
-        dl_dw = g.gradient(l, w)
-        dl_db = g.gradient(l, b)
-        sgd([w, b], [dl_dw, dl_db], lr, batch_size)     # Update parameters using their gradient
+        dw, db = g.gradient(l, [w, b])
+        sgd([w, b], [dw, db], lr, batch_size)     # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
     print(f'epoch {epoch+1}, loss {float(tf.reduce_mean(train_l))}')
 ```
@@ -579,4 +566,8 @@ and learn how to implement them more concisely.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/43)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/201)
 :end_tab:
