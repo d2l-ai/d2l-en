@@ -85,19 +85,6 @@ len(mnist_train), len(mnist_test)
 len(mnist_train_x), len(mnist_test_x)
 ```
 
-```{.json .output n=None}
-[
- {
-  "data": {
-   "text/plain": "(60000, 10000)"
-  },
-  "execution_count": 3,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 The images in Fashion-MNIST are associated with the following categories:
 t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag and ankle boot.
 The following function converts between numeric label indices and their names in text.
@@ -151,22 +138,6 @@ for i in range(18):
     X.append(mnist_train_x[i])
     y.append(mnist_train_y[i])
 show_images(tf.constant(X, shape=(18, 28, 28)), 2, 9, titles=get_fashion_mnist_labels(y));
-```
-
-```{.json .output n=None}
-[
- {
-  "ename": "NameError",
-  "evalue": "name 'get_fashion_mnist_labels' is not defined",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[1;31mNameError\u001b[0m                                 Traceback (most recent call last)",
-   "\u001b[1;32m<ipython-input-5-18c304d17ed6>\u001b[0m in \u001b[0;36m<module>\u001b[1;34m\u001b[0m\n\u001b[0;32m      4\u001b[0m     \u001b[0mX\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mmnist_train_x\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mi\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      5\u001b[0m     \u001b[0my\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mmnist_train_y\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mi\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m----> 6\u001b[1;33m \u001b[0mshow_images\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mtf\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mconstant\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mshape\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;36m18\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m28\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m28\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m2\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m9\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtitles\u001b[0m\u001b[1;33m=\u001b[0m\u001b[0mget_fashion_mnist_labels\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0my\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m;\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m",
-   "\u001b[1;31mNameError\u001b[0m: name 'get_fashion_mnist_labels' is not defined"
-  ]
- }
-]
 ```
 
 ## Reading a Minibatch
@@ -254,19 +225,6 @@ for X, y in train_iter:
 f'{timer.stop():.2f} sec'
 ```
 
-```{.json .output n=None}
-[
- {
-  "data": {
-   "text/plain": "'0.87 sec'"
-  },
-  "execution_count": 7,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ## Putting All Things Together
 
 Now we define the `load_data_fashion_mnist` function
@@ -352,16 +310,6 @@ train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
 for X, y in train_iter:
     print(X.shape)
     break
-```
-
-```{.json .output n=None}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(32, 64, 64, 1)\n"
- }
-]
 ```
 
 We are now ready to work with the Fashion-MNIST dataset in the sections that follow.
