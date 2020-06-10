@@ -103,6 +103,20 @@ def corr2d(X, K):  #@save
     return Y
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+def corr2d(X, K):  #@save
+    """Compute 2D cross-correlation."""
+    h, w = K.shape
+    Y = tf.Variable(tf.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1)))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            Y[i, j].assign(tf.cast(tf.reduce_sum(X[i: i + h, j: j + w] * K), dtype=tf.float32))
+    return Y
+```
+
 We can construct the input array `X` and the kernel array `K`
 from the figure above
 to validate the output of the above implementation
@@ -118,6 +132,13 @@ corr2d(X, K)
 #@tab pytorch
 X = torch.Tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
 K = torch.Tensor([[0, 1], [2, 3]])
+corr2d(X, K)
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.constant([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
+K = tf.constant([[0, 1], [2, 3]])
 corr2d(X, K)
 ```
 
@@ -164,6 +185,21 @@ class Conv2D(nn.Module):
         return corr2d(x, self.weight) + self.bias
 ```
 
+```{.python .input}
+#@tab tensorflow
+class Conv2D(tf.keras.layers.Layer):
+    def __init__(self):
+        super().__init__()
+
+    def build(self, kernel_size):
+        initializer = tf.random_normal_initializer()
+        self.w = self.add_weight(name='w', shape=kernel_size, initializer=initializer)
+        self.b = self.add_weight(name='b', shape=(1, ), initializer=initializer)
+
+    def call(self, inputs):
+        return corr2d(inputs, self.w) + self.b
+```
+
 ## Object Edge Detection in Images
 
 Let's take a moment to parse a simple application of a convolutional layer:
@@ -185,6 +221,13 @@ X[:, 2:6] = 0
 X
 ```
 
+```{.python .input}
+#@tab tensorflow
+X = tf.Variable(tf.ones((6, 8)))
+X[:, 2:6].assign(tf.zeros(X[:, 2:6].shape))
+X
+```
+
 Next, we construct a kernel `K` with a height of $1$ and width of $2$.
 When we perform the cross-correlation operation with the input,
 if the horizontally adjacent elements are the same,
@@ -197,6 +240,11 @@ K = np.array([[1, -1]])
 ```{.python .input}
 #@tab pytorch
 K = torch.Tensor([[1, -1]])
+```
+
+```{.python .input}
+#@tab tensorflow
+K = tf.constant([[1., -1.]])
 ```
 
 We are ready to perform the cross-correlation operation
@@ -216,6 +264,12 @@ Y = corr2d(X, K)
 Y
 ```
 
+```{.python .input}
+#@tab tensorflow
+Y = corr2d(X, K)
+Y
+```
+
 We can now apply the kernel to the transposed image.
 As expected, it vanishes. The kernel `K` only detects vertical edges.
 
@@ -226,6 +280,11 @@ corr2d(X.T, K)
 ```{.python .input}
 #@tab pytorch
 corr2d(X.t(), K)
+```
+
+```{.python .input}
+#@tab tensorflow
+corr2d(tf.transpose(X), K)
 ```
 
 ## Learning a Kernel
@@ -300,6 +359,35 @@ for i in range(10):
         print(f'batch {i+1}, loss {l.sum():.3f}')
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Construct a convolutional layer with 1 input channel and 1 output channel
+# (channels will be introduced in the following section)
+# and a kernel array shape of (1, 2). For sake of simplicity we ignore bias.
+conv2d = tf.keras.layers.Conv2D(1, (1, 2), use_bias=False)
+
+# The two-dimensional convolutional layer uses four-dimensional input and
+# output in the format of (example channel, height, width), where the batch
+# size (number of examples in the batch) and the number of channels are both 1
+X = tf.reshape(X, (1, 6, 8, 1))
+Y = tf.reshape(Y, (1, 6, 7, 1))
+
+
+Y_hat = conv2d(X)
+for i in range(10):
+    with tf.GradientTape(watch_accessed_variables=False) as g:
+        g.watch(conv2d.weights[0])
+        Y_hat = conv2d(X)
+        l = (abs(Y_hat - Y)) ** 2
+        update = tf.multiply(3e-2, g.gradient(l, conv2d.weights[0]))
+        weights = conv2d.get_weights()
+        weights[0] = conv2d.weights[0] - update
+        conv2d.set_weights(weights)  
+        
+        if (i + 1) % 2 == 0:
+            print(f'batch {i+1}, loss {tf.reduce_sum(l):.3f}')
+```
+
 Note that the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel array we learned.
 
 ```{.python .input}
@@ -310,6 +398,12 @@ conv2d.weight.data().reshape(1, 2)
 #@tab pytorch
 conv2d.weight.data.reshape((1, 2))
 ```
+
+```{.python .input}
+#@tab tensorflow
+tf.reshape(conv2d.get_weights()[0], (1, 2))
+```
+
 
 Indeed, the learned kernel array is remarkably close
 to the kernel array `K` we defined earlier.

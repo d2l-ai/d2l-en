@@ -134,6 +134,22 @@ def pool2d(X, pool_size, mode='max'):
     return Y
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+def pool2d(X, pool_size, mode='max'):
+    p_h, p_w = pool_size
+    Y = tf.Variable(tf.zeros((X.shape[0] - p_h + 1, X.shape[1] - p_w +1)))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            if mode == 'max':
+                Y[i, j].assign(tf.reduce_max(X[i: i + p_h, j: j + p_w]))
+            elif mode =='avg':
+                Y[i, j].assign(tf.reduce_mean(X[i: i + p_h, j: j + p_w]))
+    return Y
+```
+
 We can construct the input array `X` in the above diagram to validate the output of the two-dimensional maximum pooling layer.
 
 ```{.python .input}
@@ -148,6 +164,12 @@ X = torch.tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=torch.float32)
 pool2d(X, (2, 2))
 ```
 
+```{.python .input}
+#@tab tensorflow
+X = tf.constant([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=tf.float32)
+pool2d(X, (2, 2))
+```
+
 At the same time, we experiment with the average pooling layer.
 
 ```{.python .input}
@@ -157,6 +179,12 @@ pool2d(X, (2, 2), 'avg')
 
 ```{.python .input}
 #@tab pytorch
+pool2d(X, (2, 2), 'avg')
+
+```
+
+```{.python .input}
+#@tab tensorflow
 pool2d(X, (2, 2), 'avg')
 
 ```
@@ -185,6 +213,15 @@ X = torch.arange(16, dtype=torch.float32).reshape((1, 1, 4, 4))
 print(X)
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Note that TensorFlow has default data format "channels_last" which corresponds to inputs
+# with shape " so here the shape (batch_size, height, width, channels) so here the shape
+# should be (1, 4, 4, 1) instead of (1, 1, 4, 4).
+X = tf.reshape(tf.constant(range(16), dtype=tf.float32), (1, 4, 4, 1))
+X
+```
+
 By default, the stride in the `MaxPool2D` class
 has the same shape as the pooling window.
 Below, we use a pooling window of shape `(3, 3)`,
@@ -204,6 +241,12 @@ pool2d = nn.MaxPool2d(3)
 pool2d(X)
 ```
 
+```{.python .input}
+#@tab tensorflow
+pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3])
+pool2d(X)
+```
+
 The stride and padding can be manually specified.
 
 ```{.python .input}
@@ -215,6 +258,12 @@ pool2d(X)
 ```{.python .input}
 #@tab pytorch
 pool2d = nn.MaxPool2d(3, padding=1, stride=2)
+pool2d(X)
+```
+
+```{.python .input}
+#@tab tensorflow
+pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='same', strides=2)
 pool2d(X)
 ```
 
@@ -230,6 +279,12 @@ pool2d(X)
 ```{.python .input}
 #@tab pytorch
 pool2d = nn.MaxPool2d((2, 3), padding=(1, 1), stride=(2, 3))
+pool2d(X)
+```
+
+```{.python .input}
+#@tab tensorflow
+pool2d = tf.keras.layers.MaxPool2D(pool_size=[2, 3], padding='same', strides=(2, 3))
 pool2d(X)
 ```
 
@@ -256,6 +311,11 @@ X = torch.cat((X, X + 1), dim=1)
 X
 ```
 
+```{.python .input}
+#@tab tensorflow
+X = tf.reshape(tf.stack([X, X+1], axis=0), (1, 2, 4, 4))
+```
+
 As we can see, the number of output channels is still 2 after pooling.
 
 ```{.python .input}
@@ -267,6 +327,12 @@ pool2d(X)
 ```{.python .input}
 #@tab pytorch
 pool2d = nn.MaxPool2d(3, padding=1, stride=2)
+pool2d(X)
+```
+
+```{.python .input}
+#@tab tensorflow
+pool2d = tf.keras.layers.MaxPool2D(3, padding='same', strides=2)
 pool2d(X)
 ```
 
