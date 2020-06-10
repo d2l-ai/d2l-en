@@ -137,7 +137,7 @@ We refer the above formula as *bias-variance trade-off*. The mean squared error 
 
 ### Evaluating Estimators in Code
 
-Since the standard deviation of an estimator has been implementing in MXNet by simply calling `a.std()` for a `ndarray` "a", we will skip it but implement the statistical bias and the mean squared error in MXNet.
+Since the standard deviation of an estimator has been implementing in MXNet by simply calling `a.std()` for a tensor `a`, we will skip it but implement the statistical bias and the mean squared error in MXNet.
 
 ```{.python .input}
 # Statistical bias
