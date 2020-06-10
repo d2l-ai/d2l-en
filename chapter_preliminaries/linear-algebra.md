@@ -275,7 +275,7 @@ $$
 \end{bmatrix}.
 $$
 
-In code, we access a matrix's transpose via
+Now we access a matrix's transpose in code.
 
 ```{.python .input}
 A.T
@@ -293,7 +293,8 @@ tf.transpose(A)
 
 As a special type of the square matrix,
 a *symmetric matrix* $\mathbf{A}$ is equal to its transpose:
-$\mathbf{A} = \mathbf{A}^\top$. Here we construst a symmetric matrix `B`
+$\mathbf{A} = \mathbf{A}^\top$.
+Here we define a symmetric matrix `B`.
 
 ```{.python .input}
 B = np.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
@@ -312,7 +313,7 @@ B = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 B
 ```
 
-and then compare `B` to its transpose:
+Now we compare `B` with its transpose.
 
 ```{.python .input}
 B == B.T
@@ -460,7 +461,8 @@ One useful operation that we can perform with arbitrary tensors
 is to calculate the sum of their elements.
 In mathematical notation, we express sums using the $\sum$ symbol.
 To express the sum of the elements in a vector $\mathbf{x}$ of length $d$,
-we write $\sum_{i=1}^d x_i$. In code, we can just call the sum function.
+we write $\sum_{i=1}^d x_i$. 
+In code, we can just call the function for calculating the sum.
 
 ```{.python .input}
 x = np.arange(4)
@@ -496,11 +498,12 @@ A.shape, A.sum()
 A.shape, tf.reduce_sum(A)
 ```
 
-By default, invoking the sum function *reduces* a tensor along all its axes to a scalar.
+By default, invoking the function for calculating the sum
+*reduces* a tensor along all its axes to a scalar.
 We can also specify the axes along which the tensor is reduced via summation.
 Take matrices as an example.
 To reduce the row dimension (axis 0) by summing up elements of all the rows,
-we specify `axis=0` when invoking sum.
+we specify `axis=0` when invoking the function.
 Since the input matrix reduces along axis 0 to generate the output vector,
 the dimension of axis 0 of the input is lost in the output shape.
 
@@ -560,7 +563,8 @@ tf.reduce_sum(A, axis=[0, 1])  # Same as tf.reduce_sum(A)
 
 A related quantity is the *mean*, which is also called the *average*.
 We calculate the mean by dividing the sum by the total number of elements.
-In code, we could just call mean on tensors of arbitrary shape.
+In code, we could just call the function for calculating the mean
+on tensors of arbitrary shape.
 
 ```{.python .input}
 A.mean(), A.sum() / A.size
@@ -576,7 +580,7 @@ A.mean(), A.sum() / A.numel()
 tf.reduce_mean(A), tf.reduce_sum(A) / tf.size(A).numpy()
 ```
 
-Like sum, mean can also reduce a tensor along the specified axes.
+Likewise, the function for calculating the mean can also reduce a tensor along the specified axes.
 
 ```{.python .input}
 A.mean(axis=0), A.sum(axis=0) / A.shape[0]
@@ -594,7 +598,8 @@ tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 
 ### Non-Reduction Sum
 
-However, sometimes it can be useful to keep the number of axes unchanged when invoking sum or mean by setting `keepdims=True`.
+However, sometimes it can be useful to keep the number of axes unchanged
+when invoking the function for calculating the sum or mean by setting `keepdims=True`.
 
 ```{.python .input}
 sum_A = A.sum(axis=1, keepdims=True)
@@ -902,7 +907,7 @@ The $\ell_2$ *norm* of $\mathbf{x}$ is the square root of the sum of the squares
 
 $$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2},$$
 
-where the subscript $2$ is often omitted in $\ell_2$ norms, i.e., $\|\mathbf{x}\|$ is equivalent to $\|\mathbf{x}\|_2$. In code, we can calculate the $\ell_2$ norm of a vector by calling `norm`.
+where the subscript $2$ is often omitted in $\ell_2$ norms, i.e., $\|\mathbf{x}\|$ is equivalent to $\|\mathbf{x}\|_2$. In code, we can calculate the $\ell_2$ norm of a vector as follows.
 
 ```{.python .input}
 u = np.array([3, -4])
@@ -959,7 +964,8 @@ is the square root of the sum of the squares of the matrix elements:
 $$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$
 
 The Frobenius norm satisfies all the properties of vector norms.
-It behaves as if it were an $\ell_2$ norm of a matrix-shaped vector. Invoking `norm` will calculate the Frobenius norm of a matrix.
+It behaves as if it were an $\ell_2$ norm of a matrix-shaped vector.
+Invoking the following function will calculate the Frobenius norm of a matrix.
 
 ```{.python .input}
 np.linalg.norm(np.ones((4, 9)))
@@ -1055,4 +1061,3 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/196)
 :end_tab:
-
