@@ -1,53 +1,65 @@
 stage("Build and Publish") {
-  // such as d2l-en and d2l-zh
-  def REPO_NAME = env.JOB_NAME.split('/')[0]
-  // such as en and zh
-  def LANG = REPO_NAME.split('-')[1]
-  // The current branch or the branch this PR will merge into
-  def TARGET_BRANCH = env.CHANGE_TARGET ? env.CHANGE_TARGET : env.BRANCH_NAME
-  // such as d2l-en-master
-  def TASK = REPO_NAME + '-' + TARGET_BRANCH
+  def TASK = "d2l-jax"
   node {
     ws("workspace/${TASK}") {
       checkout scm
-      // conda environment
       def ENV_NAME = "${TASK}-${EXECUTOR_NUMBER}";
+      def EID = EXECUTOR_NUMBER.toInteger()
+      def CUDA_VISIBLE_DEVICES=(EID*2).toString() + ',' + (EID*2+1).toString();
 
       sh label: "Build Environment", script: """set -ex
-      conda env update -n ${ENV_NAME} -f static/build.yml
+      rm -rf ~/miniconda3/envs/${ENV_NAME}
+      conda create -n ${ENV_NAME} pip python=3.7 -y
       conda activate ${ENV_NAME}
-      pip uninstall -y d2lbook
+      # d2l
+      python setup.py develop
+      # mxnet
+      pip install mxnet-cu101==1.6.0
       pip install git+https://github.com/d2l-ai/d2l-book
+      # pytorch
+      pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+      pip install torchvision
+      # tensorflow
+      pip install tensorflow
+      # jax
+      pip install https://storage.googleapis.com/jax-releases/cuda101/jaxlib-0.1.47-cp37-none-linux_x86_64.whl
+      pip install jax
+      # check
       pip list
       nvidia-smi
       """
 
-      sh label: "Sanity Check", script: """set -ex
+      sh label: "Check Execution Output", script: """set -ex
       conda activate ${ENV_NAME}
-      d2lbook build outputcheck tabcheck
+      d2lbook build outputcheck
       """
 
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
-      ./static/cache.sh restore _build/eval/data
+      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
+      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
+      ./static/cache.sh restore _build/eval/data _build/data_tmp
+      ./static/clean_eval.sh
       d2lbook build eval
-      ./static/cache.sh store _build/eval/data
+      ./static/cache.sh store _build/eval/data _build/data_tmp
       """
 
-      sh label: "Execute Notebooks [PyTorch]", script: """set -ex
+      sh label: "Execute Notebooks [Pytorch]", script: """set -ex
       conda activate ${ENV_NAME}
-      ./static/cache.sh restore _build/eval_pytorch/data
+      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
+      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
+      ./static/cache.sh restore _build/eval_pytorch/data _build/data_pytorch_tmp
       d2lbook build eval --tab pytorch
-      d2lbook build slides --tab pytorch
-      ./static/cache.sh store _build/eval_pytorch/data
+      ./static/cache.sh store _build/eval_pytorch/data _build/data_pytorch_tmp
       """
 
-      sh label: "Execute Notebooks [TensorFlow]", script: """set -ex
+      sh label: "Execute Notebooks [Tensorflow]", script: """set -ex
       conda activate ${ENV_NAME}
-      ./static/cache.sh restore _build/eval_tensorflow/data
-      export TF_CPP_MIN_LOG_LEVEL=3
+      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
+      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
+      ./static/cache.sh restore _build/eval_tensorflow/data _build/data_tensorflow_tmp
       d2lbook build eval --tab tensorflow
-      ./static/cache.sh store _build/eval_tensorflow/data
+      ./static/cache.sh store _build/eval_tensorflow/data _build/data_tensorflow_tmp
       """
 
       sh label:"Build HTML", script:"""set -ex
@@ -60,27 +72,17 @@ stage("Build and Publish") {
       d2lbook build pdf
       """
 
-      if (env.BRANCH_NAME == 'release') {
-        sh label:"Release", script:"""set -ex
-        conda activate ${ENV_NAME}
-        d2lbook build pkg
-        d2lbook deploy html pdf pkg colab sagemaker slides --s3 s3://en.d2l.ai/
-        """
+      sh label:"Build Package", script:"""set -ex
+      conda activate ${ENV_NAME}
+      d2lbook build pkg
+      ./static/build_whl.sh
+      """
 
-        sh label:"Release d2l", script:"""set -ex
-        conda activate ${ENV_NAME}
-        pip install setuptools wheel twine
-        python setup.py bdist_wheel
-        # twine upload dist/*
-        """
-      } else {
+      if (env.BRANCH_NAME == 'jax') {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
-        d2lbook deploy html pdf slides --s3 s3://preview.d2l.ai/${JOB_NAME}/
-        """
-        if (env.BRANCH_NAME.startsWith("PR-")) {
-            pullRequest.comment("Job ${JOB_NAME}/${BUILD_NUMBER} is complete. \nCheck the results at http://preview.d2l.ai/${JOB_NAME}/")
-        }
+        d2lbook deploy html pdf pkg
+      """
       }
     }
   }
