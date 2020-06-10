@@ -1,5 +1,5 @@
 stage("Build and Publish") {
-  def TASK = "d2l-tf"
+  def TASK = "d2l-jax"
   node {
     ws("workspace/${TASK}") {
       checkout scm
@@ -21,6 +21,9 @@ stage("Build and Publish") {
       pip install torchvision
       # tensorflow
       pip install tensorflow
+      # jax
+      pip install https://storage.googleapis.com/jax-releases/cuda101/jaxlib-0.1.47-cp37-none-linux_x86_64.whl
+      pip install jax
       # check
       pip list
       nvidia-smi
@@ -75,7 +78,7 @@ stage("Build and Publish") {
       ./static/build_whl.sh
       """
 
-      if (env.BRANCH_NAME == 'tensorflow') {
+      if (env.BRANCH_NAME == 'jax') {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
         d2lbook deploy html pdf pkg

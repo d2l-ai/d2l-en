@@ -327,6 +327,10 @@ the following packages and modules as dependencies:
 
 :end_tab:
 
+:begin_tab:`jax`
+Most of the code in this book is based on TensorFlow.
+:end_tab:
+
 ```{.python .input  n=1}
 #@save
 import collections
@@ -389,6 +393,30 @@ from matplotlib import pyplot as plt
 from IPython import display
 import math
 import tensorflow as tf
+import numpy as np
+import os
+import pandas as pd
+import random
+import re
+import shutil
+import sys
+import tarfile
+import time
+import zipfile
+import requests
+
+d2l = sys.modules[__name__]
+```
+
+```{.python .input  n=1}
+#@tab jax
+#@save
+import collections
+from collections import defaultdict
+from matplotlib import pyplot as plt
+from IPython import display
+import math
+import jax
 import numpy as np
 import os
 import pandas as pd
