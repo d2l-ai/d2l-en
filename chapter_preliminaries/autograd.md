@@ -8,8 +8,35 @@ requiring only some basic calculus,
 for complex models, working out the updates by hand
 can be a pain (and often error-prone).
 
-Deep learning frameworks can expedite this work
-by automatically calculating derivatives, i.e., [*automatic differentiation*](https://en.wikipedia.org/wiki/Automatic_differentiation), which is also called *AD*, *autodiff* or *autograd*. There are two distinct modes in autograd, forward mode and reverse mode. Deep learning frameworks in default use the reverse mode, which is straightforward to implement the [backpropagation](https://en.wikipedia.org/wiki/Backpropagation) for training neural networks.
+Deep learning frameworks expedite this work
+by automatically calculating derivatives, i.e., *automatic differentiation*.
+In practice,
+based on our designed model
+the system builds a *computational graph*,
+tracking which data combined through
+which operations to produce the output.
+Automatic differentiation enables the system to subsequently backpropagate gradients.
+Here, *backpropagate* simply means to trace through the computational graph,
+filling in the partial derivatives with respect to each parameter.
+
+
+And while many other libraries require
+that we compile a symbolic graph to take automatic derivatives,
+`autograd` allows us to take derivatives
+while writing ordinary imperative code.
+Every time we pass data through our model,
+`autograd` builds a graph on the fly,
+tracking which data combined through
+which operations to produce the output.
+This graph enables `autograd`
+to subsequently backpropagate gradients on command.
+Here, *backpropagate* simply means to trace through the *computational graph*,
+filling in the partial derivatives with respect to each parameter.
+
+
+
+
+There are two distinct modes in autograd, forward mode and reverse mode. Deep learning frameworks in default use the reverse mode, which is straightforward to implement the [backpropagation](https://en.wikipedia.org/wiki/Backpropagation) for training neural networks.
 
 ```{.python .input}
 from mxnet import autograd, np, npx
@@ -59,10 +86,17 @@ every time we take a derivative with respect to a parameter
 because we will often update the same parameters
 thousands or millions of times
 and could quickly run out of memory.
+Note that a gradient of a scalar-valued function
+with respect to a vector $\mathbf{x}$
+is itself vector-valued and has the same shape as $\mathbf{x}$.
 
 ```{.python .input}
+# We allocate memory for a tensor's gradient by invoking its `attach_grad`
+# method
 x.attach_grad()
-x.grad  # Values are initialized with 0s.
+# After we calculate a gradient taken with respect to `x`, we will be able to
+# access it via the `grad` attribute, whose values are initialized with 0s
+x.grad
 ```
 
 ```{.python .input}
@@ -79,7 +113,8 @@ x = tf.Variable(x)
 Now let us calculate $y$.
 
 ```{.python .input}
-# Record all computations in the autograd scope.
+# Place our code inside an `autograd.record` scope to build the computational
+# graph
 with autograd.record():
     y = 2 * np.dot(x, x)
 y
@@ -100,11 +135,11 @@ y
 ```
 
 Since `x` is a vector of length 4,
-the dot operator will perform an inner product of `x` and `x`,
+an inner product of `x` and `x` is performed,
 yielding the scalar output that we assign to `y`.
 Next, we can automatically calculate the gradient of `y`
 with respect to each component of `x`
-by calling the backward function and print the gradient.
+by calling the function for backpropagation and printing the gradient.
 
 ```{.python .input}
 y.backward()
@@ -141,7 +176,7 @@ x.grad == 4 * x
 x_grad == 4 * x
 ```
 
-Let's calculate another function of `x`.
+Now let us calculate another function of `x`.
 
 ```{.python .input}
 with autograd.record():
@@ -185,10 +220,13 @@ but rather the sum of the partial derivatives
 computed individually for each example in the batch.
 
 ```{.python .input}
+# When we invoke `backward` on a vector-valued variable `y` (function of `x`),
+# a new scalar variable is created by summing the elements in `y`. Then the
+# gradient of that scalar variable with respect to `x` is computed
 with autograd.record():
     y = x * x  # `y` is a vector
-y.backward()  
-x.grad  # Equals to y = sum(x*x)
+y.backward()
+x.grad  # Equals to y = sum(x * x)
 ```
 
 ```{.python .input}
@@ -203,7 +241,7 @@ x.grad
 #@tab tensorflow
 with tf.GradientTape() as t:
     y = x * x
-t.gradient(y, x)  # Equals to y = tf.reduce_sum(x*x)
+t.gradient(y, x)  # Equals to y = tf.reduce_sum(x * x)
 ```
 
 ## Detaching Computation
@@ -266,7 +304,7 @@ x.grad == 2 * x
 
 ## Computing the Gradient of Python Control Flow
 
-One benefit of using autograd
+One benefit of using automatic differentiation
 is that even if building the computational graph of a function
 required passing through a maze of Python control flow
 (e.g., conditionals, loops, and arbitrary function calls),
@@ -314,7 +352,7 @@ def f(a):
     return c
 ```
 
-Let's compute the gradient.
+Let us compute the gradient.
 
 ```{.python .input}
 a = np.random.normal()
@@ -362,13 +400,13 @@ d_grad == (d / a)
 
 ## Summary
 
-* Deep learning frameworks can automate the calculation of derivatives. To use it, we first attach gradients to those variables with respect to which we desire partial derivatives. We then record the computation of our target value, execute its backward function, and access the resulting gradient.
+* Deep learning frameworks can automate the calculation of derivatives. To use it, we first attach gradients to those variables with respect to which we desire partial derivatives. We then record the computation of our target value, execute its function for backpropagation, and access the resulting gradient.
 
 
 ## Exercises
 
 1. Why is the second derivative much more expensive to compute than the first derivative?
-1. After running the backward function, immediately run it again and see what happens.
+1. After running the function for backpropagation, immediately run it again and see what happens.
 1. In the control flow example where we calculate the derivative of `d` with respect to `a`, what would happen if we changed the variable `a` to a random vector or matrix. At this point, the result of the calculation `f(a)` is no longer a scalar. What happens to the result? How do we analyze this?
 1. Redesign an example of finding the gradient of the control flow. Run and analyze the result.
 1. Let $f(x) = \sin(x)$. Plot $f(x)$ and $\frac{df(x)}{dx}$, where the latter is computed without exploiting that $f'(x) = \cos(x)$.
