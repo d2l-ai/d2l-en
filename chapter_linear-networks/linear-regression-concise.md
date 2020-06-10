@@ -144,9 +144,6 @@ For standard operations, we can use the framework's predefined layers,
 which allow us to focus especially
 on the layers used to construct the model
 rather than having to focus on the implementation.
-To define a linear model, we first import the `nn` module,
-which defines a large number of neural network layers
-(note that "nn" is an abbreviation for neural networks).
 We will first define a model variable `net`,
 which will refer to an instance of the `Sequential` class.
 The `Sequential` class defines a container
@@ -170,6 +167,7 @@ by means of a matrix-vector multiplication.
 :label:`fig_singleneuron`
 
 ```{.python .input}
+# nn is an abbreviation for neural networks.
 from mxnet.gluon import nn
 net = nn.Sequential()
 net.add(nn.Dense(1))
@@ -177,14 +175,16 @@ net.add(nn.Dense(1))
 
 ```{.python .input}
 #@tab pytorch
+# nn is an abbreviation for neural networks.
 from torch import nn
 net = nn.Sequential(nn.Linear(2, 1))
 ```
 
 ```{.python .input}
 #@tab tensorflow
+# Keras is the high-leve API for TensorFlow 2.0
 net = tf.keras.Sequential()
-net.add(tf.keras.layers.Dense(1, kernel_initializer=tf.initializers.RandomNormal(stddev=0.01)))
+net.add(tf.keras.layers.Dense(1))
 ```
 
 :begin_tab:`mxnet`
@@ -200,34 +200,51 @@ how many inputs go into this linear layer.
 When we first try to pass data through our model,
 e.g., when we execute `net(X)` later,
 Gluon will automatically infer the number of inputs to each layer.
-We will describe how this works in more detail
-in the chapter "Deep Learning Computation".
+We will describe how this works in more detail later.
 :end_tab:
 
 :begin_tab:`pytorch`
-In Gluon, the fully-connected layer is defined in the `Linear` class. Note that we passed two arguments into `nn.Linear`. The first one specifies the input feature dimension, which is 2, and the second one is the output feature dimension, which is a single scalar and therefore 1.
+In PyTorch, the fully-connected layer is defined in the `Linear` class. Note that we passed two arguments into `nn.Linear`. The first one specifies the input feature dimension, which is 2, and the second one is the output feature dimension, which is a single scalar and therefore 1.
 :end_tab:
+
+:begin_tab:`tensorflow`
+In Keras, the fully-connected layer is defined in the `Dense` class. Since we only want to generate a single scalar output, we set that number to $1$.
+
+It is worth noting that, for convenience,
+Keras does not require us to specify
+the input shape for each layer.
+So here, we do not need to tell Keras
+how many inputs go into this linear layer.
+When we first try to pass data through our model,
+e.g., when we execute `net(X)` later,
+Keras will automatically infer the number of inputs to each layer.
+We will describe how this works in more detail later.
+:end_tab:
+
 
 ## Initializing Model Parameters
 
 Before using `net`, we need to initialize the model parameters,
-such as the weights and biases in the linear regression model.
+such as the weights and biases in the linear regression model. The framework often has a pre-defined way to initialize the parameters. Here we specify that each *weight* parameter
+should be randomly sampled from a normal distribution
+with mean $0$ and standard deviation $0.01$.
+The *bias* parameter will be initialized to zero.
 
 :begin_tab:`mxnet`
 We will import the `initializer` module from MXNet.
 This module provides various methods for model parameter initialization.
 Gluon makes `init` available as a shortcut (abbreviation)
 to access the `initializer` package.
-By calling `init.Normal(sigma=0.01)`,
-we specify that each *weight* parameter
-should be randomly sampled from a normal distribution
-with mean $0$ and standard deviation $0.01$.
-The *bias* parameter will be initialized to zero by default.
-Both the weight vector and bias will have attached gradients.
+By calling `init.Normal(sigma=0.01)`. Bias parameters are initialized to zero in default, 
+we only to specify how to initialize the weight. 
 :end_tab:
 
 :begin_tab:`pytorch`
 As we have specified the input and output dimensions when constructing `nn.Linear`. Now we access the parameters directly to specify there initial values. We first locate the layer by `net[0]`, which is the first layer in the network, and then use the `weight.data` and `bias.data` methods to access the parameters. Next we use the replace methods `uniform_` and `fill_` to overwrite parameter values.
+:end_tab:
+
+:begin_tab:`keras`
+The `initializers` module in TensorFlow provides various methods for model parameter initialization. The easiest way to specify the initialization method in Keras is when creating the layer by specifying `kernel_initializer`. Here we recreate `net` again.  
 :end_tab:
 
 ```{.python .input}
@@ -239,6 +256,13 @@ net.initialize(init.Normal(sigma=0.01))
 #@tab pytorch
 net[0].weight.data.uniform_(0.0, 0.01)
 net[0].bias.data.fill_(0)
+```
+
+```{.python .input}
+#@tab tensorflow
+initializer = tf.initializers.RandomNormal(stddev=0.01)
+net = tf.keras.Sequential()
+net.add(tf.keras.layers.Dense(1, kernel_initializer=initializer))
 ```
 
 :begin_tab:`mxnet`
@@ -261,6 +285,23 @@ we cannot access or manipulate them.
 
 :end_tab:
 
+:begin_tab:`tensorflow`
+The code above may look straightforward but you should note
+that something strange is happening here.
+We are initializing parameters for a network
+even though Keras does not yet know
+how many dimensions the input will have!
+It might be $2$ as in our example or it might be $2000$.
+Keras lets us get away with this because behind the scenes,
+the initialization is actually *deferred*.
+The real initialization will take place only
+when we for the first time attempt to pass data through the network.
+Just be careful to remember that since the parameters
+have not been initialized yet,
+we cannot access or manipulate them.
+:end_tab:
+
+
 ## Defining the Loss Function
 
 :begin_tab:`mxnet`
@@ -274,6 +315,10 @@ implementation of squared loss (`L2Loss`).
 
 :begin_tab:`pytorch`
 The `MSELoss` class compute the mean squared error, also known as squared L2 norm. In default it returns the averaged loss over examples.
+:end_tab:
+
+:begin_tab:`tensorflow`
+The `MeanSquaredError` class compute the mean squared error, also known as squared L2 norm. In default it returns the averaged loss over examples.
 :end_tab:
 
 ```{.python .input}
@@ -321,6 +366,15 @@ SGD just requires that we set the value `learning_rate`,
 (here we set it to 0.03).
 :end_tab:
 
+:begin_tab:`tensorflow`
+Minibatch SGD and related variants
+are standard tools for optimizing neural networks
+and thus Keras supports SGD alongside a number of
+variations on this algorithm in the `optimizers` module.
+SGD just requires that we set the value `learning_rate`,
+(here we set it to 0.03).
+:end_tab:
+
 ```{.python .input}
 from mxnet import gluon
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})
@@ -328,9 +382,8 @@ trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})
 
 ```{.python .input}
 #@tab pytorch
-trainer = torch.optim.SGD(net.parameters(), lr = .03)
+trainer = torch.optim.SGD(net.parameters(), lr=.03)
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -356,8 +409,8 @@ and the corresponding ground-truth labels.
 For each minibatch, we go through the following ritual:
 
 * Generate predictions by calling `net(X)` and calculate the loss `l` (the forward pass).
-* Calculate gradients by calling `l.backward()` (the backward pass).
-* Update the model parameters by invoking our SGD optimizer (note that `trainer` already knows which parameters to optimize over, so we just need to pass in the minibatch size.
+* Calculate gradients by run the backward pass.
+* Update the model parameters by invoking our SGD optimizer.
 
 For good measure, we compute the loss after each epoch and print it to monitor progress.
 
@@ -385,7 +438,6 @@ for epoch in range(1, num_epochs + 1):
     l = loss(net(features), labels)
     print('epoch {}, loss {}'.format(epoch, l))
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -449,6 +501,14 @@ print('Error in estimating b', true_b - b)
 * We can initialize the parameters by replacing their values with methods ending with `_`.
 :end_tab:
 
+:begin_tab:`tensorflow`
+* Using TensorFlow's high-level APIs, we can implement models much more succinctly.
+* In TensorFlow, the `data` module provides tools for data processing, the `keras` module defines a large number of neural network layers and common loss functions.
+* TensorFlow's module `initializers` provides various methods for model parameter initialization.
+* Dimensionality and storage are automatically inferred (but be careful not to attempt to access parameters before they have been initialized).
+:end_tab:
+
+
 ## Exercises
 
 :begin_tab:`mxnet`
@@ -465,4 +525,8 @@ print('Error in estimating b', true_b - b)
 1. How do you access the gradient of `net[0].weight`?
 
 [Discussions](https://discuss.d2l.ai/t/45)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/204)
 :end_tab:

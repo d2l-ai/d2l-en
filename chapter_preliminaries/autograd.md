@@ -24,12 +24,10 @@ from mxnet import autograd, np, npx
 npx.set_np()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 import torch
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -49,13 +47,11 @@ x = np.arange(4.0)
 x
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 x = torch.arange(4.0)
 x
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -84,13 +80,11 @@ x.attach_grad()
 x.grad
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 x.requires_grad_(True)  # Equals to x = torch.arange(4.0, requires_grad=True)
 x.grad  # The default value is None
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -107,13 +101,11 @@ with autograd.record():
 y
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 y = 2 * torch.dot(x, x)
 y
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -135,13 +127,11 @@ y.backward()
 x.grad
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 y.backward()
 x.grad
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -157,12 +147,10 @@ Let us quickly verify that our desired gradient was calculated correctly.
 x.grad == 4 * x
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 x.grad == 4 * x
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -178,7 +166,6 @@ y.backward()
 x.grad  # Overwritten by the newly calculated gradient.
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 # PyTorch accumulates the gradient in default, we need to clear the previous 
@@ -188,7 +175,6 @@ y = x.sum()
 y.backward()
 x.grad
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -224,7 +210,6 @@ y.backward()
 x.grad  # Equals to y = sum(x * x)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 x.grad.zero_()
@@ -232,7 +217,6 @@ y = x * x
 y.sum().backward()  # Backward only supports for scalars. 
 x.grad
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -273,7 +257,6 @@ z.backward()
 x.grad == u
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 x.grad.zero_()
@@ -285,9 +268,9 @@ z.sum().backward()
 x.grad == u
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
+# Set the persistent=True to run t.gradient more than once.
 with tf.GradientTape(persistent=True) as t:
     y = x * x
     u = tf.stop_gradient(y)
@@ -305,14 +288,12 @@ y.backward()
 x.grad == 2 * x
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 x.grad.zero_()
 y.sum().backward()
 x.grad == 2 * x
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -343,7 +324,6 @@ def f(a):
     return c
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 def f(a):
@@ -356,7 +336,6 @@ def f(a):
         c = 100 * b
     return c
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -381,14 +360,12 @@ with autograd.record():
 d.backward()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 a = torch.randn(size=(1,), requires_grad=True)
 d = f(a)
 d.backward()
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -409,12 +386,10 @@ Consequently `d / a` allows us to verify that the gradient is correct.
 a.grad == d / a
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 a.grad == (d / a)
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
