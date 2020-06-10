@@ -76,7 +76,7 @@ def masked_softmax(X, valid_len):
         return nn.functional.softmax(X, dim=-1)
     else:
         shape = X.shape
-        if valid_len.ndimension() == 1:
+        if valid_len.dim() == 1:
             valid_len = torch.repeat_interleave(valid_len, repeats=shape[1], dim=0)
         else:
             valid_len = valid_len.reshape(-1)
@@ -95,7 +95,7 @@ masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([2, 3]))
 
 ```{.python .input}
 #@tab pytorch
-masked_softmax(torch.rand(2, 2, 4), torch.Tensor([2, 3]))
+masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3]))
 ```
 
 Moreover, the second operator `batch_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively, and returns an output with shape $(b, n, k)$. To be specific, it computes $b$ dot products for $i= \{1,\ldots, b\}$, i.e.,
@@ -108,7 +108,7 @@ npx.batch_dot(np.ones((2, 1, 3)), np.ones((2, 3, 2)))
 
 ```{.python .input}
 #@tab pytorch
-torch.bmm(torch.ones((2,1,3)), torch.ones((2,3,2)))
+torch.bmm(torch.ones(2,1,3), torch.ones(2,3,2))
 ```
 
 ## Dot Product Attention
@@ -179,9 +179,10 @@ atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
 ```{.python .input}
 #@tab pytorch
 atten = DotProductAttention(dropout=0.5)
-keys = torch.ones((2,10,2))
-values = torch.arange((40), dtype=torch.float).reshape(1,10,4).repeat(2,1,1)
-atten(torch.ones((2,1,2)), keys, values, torch.Tensor([2, 6]))
+atten.eval()
+keys = torch.ones(2,10,2)
+values = torch.arange(40, dtype=torch.float32).reshape(1,10,4).repeat(2,1,1)
+atten(torch.ones(2,1,2), keys, values, torch.tensor([2, 6]))
 ```
 
 As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension.
@@ -254,7 +255,8 @@ atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
 ```{.python .input}
 #@tab pytorch
 atten = MLPAttention(key_size=2, query_size=2, units=8, dropout=0.1)
-atten(torch.ones((2,1,2)), keys, values, torch.Tensor([2, 6]))
+atten.eval()
+atten(torch.ones(2,1,2), keys, values, torch.tensor([2, 6]))
 ```
 
 ## Summary
