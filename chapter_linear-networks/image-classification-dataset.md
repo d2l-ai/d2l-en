@@ -19,7 +19,6 @@ import sys
 d2l.use_svg_display()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 %matplotlib inline
@@ -50,7 +49,6 @@ mnist_train = gluon.data.vision.FashionMNIST(train=True)
 mnist_test = gluon.data.vision.FashionMNIST(train=False)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 # By default pytorch torchvision datasets are of type PIL.
@@ -68,7 +66,6 @@ mnist_test = torchvision.datasets.FashionMNIST(
 (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
 ```
 
-
 FashionMNIST consists of images from 10 categories, each represented
 by 6k images in the training set and by 1k in the test set.
 Consequently the training set and the test set
@@ -78,16 +75,27 @@ contain 60k and 10k images, respectively.
 len(mnist_train), len(mnist_test)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 len(mnist_train), len(mnist_test)
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 len(mnist_train_x), len(mnist_test_x)
+```
+
+```{.json .output n=3}
+[
+ {
+  "data": {
+   "text/plain": "(60000, 10000)"
+  },
+  "execution_count": 3,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 The images in Fashion-MNIST are associated with the following categories:
@@ -130,7 +138,6 @@ X, y = mnist_train[:18]
 show_images(X.squeeze(axis=-1), 2, 9, titles=get_fashion_mnist_labels(y));
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X, y = next(iter(data.DataLoader(mnist_train, batch_size=18)))
@@ -144,6 +151,22 @@ for i in range(18):
     X.append(mnist_train_x[i])
     y.append(mnist_train_y[i])
 show_images(tf.constant(X, shape=(18, 28, 28)), 2, 9, titles=get_fashion_mnist_labels(y));
+```
+
+```{.json .output n=5}
+[
+ {
+  "ename": "NameError",
+  "evalue": "name 'get_fashion_mnist_labels' is not defined",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[1;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+   "\u001b[1;32m<ipython-input-5-18c304d17ed6>\u001b[0m in \u001b[0;36m<module>\u001b[1;34m\u001b[0m\n\u001b[0;32m      4\u001b[0m     \u001b[0mX\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mmnist_train_x\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mi\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      5\u001b[0m     \u001b[0my\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mmnist_train_y\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mi\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m----> 6\u001b[1;33m \u001b[0mshow_images\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mtf\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mconstant\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mshape\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;36m18\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m28\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m28\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m2\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m9\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtitles\u001b[0m\u001b[1;33m=\u001b[0m\u001b[0mget_fashion_mnist_labels\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0my\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m;\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m",
+   "\u001b[1;31mNameError\u001b[0m: name 'get_fashion_mnist_labels' is not defined"
+  ]
+ }
+]
 ```
 
 ## Reading a Minibatch
@@ -193,7 +216,6 @@ train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
                                    num_workers=get_dataloader_workers())
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 batch_size = 256
@@ -207,7 +229,6 @@ batch_size = 256
 train_iter = tf.data.Dataset.from_tensor_slices((mnist_train_x, mnist_train_y)).batch(batch_size).shuffle(len(mnist_train_x))
 ```
 
-
 Let us look at the time it takes to read the training data.
 
 ```{.python .input}
@@ -216,7 +237,6 @@ for X, y in train_iter:
     continue
 f'{timer.stop():.2f} sec'
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -232,6 +252,19 @@ timer = d2l.Timer()
 for X, y in train_iter:
     continue
 f'{timer.stop():.2f} sec'
+```
+
+```{.json .output n=7}
+[
+ {
+  "data": {
+   "text/plain": "'0.87 sec'"
+  },
+  "execution_count": 7,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Putting All Things Together
@@ -256,7 +289,6 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                                   num_workers=get_dataloader_workers()))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
@@ -275,22 +307,21 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                             num_workers=get_dataloader_workers()))
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
-    if(resize is None):
+    if resize is None:
       return (
         tf.data.Dataset.from_tensor_slices(
             (mnist_train_x, mnist_train_y)).batch(batch_size).shuffle(len(mnist_train_x)),
         tf.data.Dataset.from_tensor_slices((mnist_test_x, mnist_test_y)).batch(batch_size))
     else:
-      def map_fn(img,label):
+      def map_fn(img, label):
         img = tf.reshape(img, (28,28,1))
         img =  tf.image.resize(img, (resize))
-        return (img,label)
+        return img, label
       return (
         tf.data.Dataset.from_tensor_slices(
             (mnist_train_x, mnist_train_y)).map(map_fn).batch(batch_size).shuffle(len(mnist_train_x)),
@@ -306,7 +337,6 @@ for X, y in train_iter:
     break
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
@@ -321,6 +351,16 @@ train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
 for X, y in train_iter:
     print(X.shape)
     break
+```
+
+```{.json .output n=9}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "(32, 64, 64, 1)\n"
+ }
+]
 ```
 
 We are now ready to work with the Fashion-MNIST dataset in the sections that follow.
