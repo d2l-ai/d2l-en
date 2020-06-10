@@ -369,8 +369,8 @@ conv2d = tf.keras.layers.Conv2D(1, (1, 2), use_bias=False)
 # The two-dimensional convolutional layer uses four-dimensional input and
 # output in the format of (example channel, height, width), where the batch
 # size (number of examples in the batch) and the number of channels are both 1
-X = tf.reshape(X, (1, 1, 6, 8))
-Y = tf.reshape(Y, (1, 1, 6, 7))
+X = tf.reshape(X, (1, 6, 8, 1))
+Y = tf.reshape(Y, (1, 6, 7, 1))
 
 
 Y_hat = conv2d(X)
