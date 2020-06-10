@@ -243,7 +243,7 @@ we only to specify how to initialize the weight.
 As we have specified the input and output dimensions when constructing `nn.Linear`. Now we access the parameters directly to specify there initial values. We first locate the layer by `net[0]`, which is the first layer in the network, and then use the `weight.data` and `bias.data` methods to access the parameters. Next we use the replace methods `uniform_` and `fill_` to overwrite parameter values.
 :end_tab:
 
-:begin_tab:`keras`
+:begin_tab:`tensorflow`
 The `initializers` module in TensorFlow provides various methods for model parameter initialization. The easiest way to specify the initialization method in Keras is when creating the layer by specifying `kernel_initializer`. Here we recreate `net` again.  
 :end_tab:
 
