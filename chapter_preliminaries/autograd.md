@@ -241,10 +241,7 @@ Here, we can detach `y` to return a new variable `u`
 that has the same value as `y` but discards any information
 about how `y` was computed in the computational graph.
 In other words, the gradient will not flow backwards through `u` to `x`.
-This will provide the same functionality as if we had
-calculated `u` as a function of `x` outside of the scope,
-yielding a `u` that will be treated as a constant in any backward call.
-Thus, the following backward function computes
+Thus, the following backpropagation function computes
 the partial derivative of `z = u * x` with respect to `x` while treating `u` as a constant,
 instead of the partial derivative of `z = x * x * x` with respect to `x`.
 
@@ -281,7 +278,7 @@ x_grad == u
 ```
 
 Since the computation of `y` was recorded,
-we can subsequently call backward function on `y` to get the derivative of `y = x * x` with respect to `x`, which is `2 * x`.
+we can subsequently invoke backpropagation on `y` to get the derivative of `y = x * x` with respect to `x`, which is `2 * x`.
 
 ```{.python .input}
 y.backward()
