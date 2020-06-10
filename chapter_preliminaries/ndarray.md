@@ -120,9 +120,9 @@ x.shape
 
 If we just want to know the total number of elements in a tensor,
 i.e., the product of all of the shape elements,
-we can inspect its `size` property..
+we can inspect its size.
 Because we are dealing with a vector here,
-the single element of its `shape` is identical to its `size`.
+the single element of its `shape` is identical to its size.
 
 ```{.python .input}
 x.size
@@ -147,7 +147,7 @@ This new tensor contains the exact same values,
 but views them as a matrix organized as 3 rows and 4 columns.
 To reiterate, although the shape has changed,
 the elements in `x` have not.
-Note that the `size` is unaltered by reshaping.
+Note that the size is unaltered by reshaping.
 
 ```{.python .input}
 x = x.reshape(3, 4)
