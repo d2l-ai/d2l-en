@@ -56,6 +56,18 @@ p = theta**9 * (1 - theta)**4.
 d2l.plot(theta, p, 'theta', 'likelihood')
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+
+theta = torch.arange(0, 1, 0.001)
+p = theta**9 * (1 - theta)**4.
+
+d2l.plot(theta, p, 'theta', 'likelihood')
+```
+
 This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the function is flat.  Thus, we could find the maximum likelihood estimate :eqref:`eq_max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
 
 $$
@@ -115,6 +127,28 @@ for iter in range(10):
         loss = -(n_H * np.log(theta) + n_T * np.log(1 - theta))
     loss.backward()
     theta -= lr * theta.grad
+
+# Check output
+theta, n_H / (n_H + n_T)
+```
+
+```{.python .input}
+#@tab pytorch
+# Set up our data
+n_H = 8675309
+n_T = 25624
+
+# Initialize our paramteres
+theta = torch.tensor(0.5, requires_grad=True)
+
+# Perform gradient descent
+lr = 0.00000000001
+for iter in range(10):
+    loss = -(n_H * torch.log(theta) + n_T * torch.log(1 - theta))
+    loss.backward()
+    with torch.no_grad():
+        theta -= lr * theta.grad
+    theta.grad.zero_()
 
 # Check output
 theta, n_H / (n_H + n_T)
