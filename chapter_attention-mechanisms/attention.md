@@ -43,7 +43,7 @@ npx.set_np()
 #@tab pytorch
 import math
 import torch
-import torch.nn as nn
+from torch import nn
 ```
 
 The masked softmax takes a 3-dimensional input and enables us to filter out some elements by specifying a valid length for the last dimension. (Refer to
