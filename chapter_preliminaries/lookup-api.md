@@ -29,7 +29,7 @@ Generally, we can ignore functions that start and end with `__` (special objects
 
 ## Finding the Usage of Specific Functions and Classes
 
-For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let us explore the usage instructions for tensor's `ones` function.
+For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let us explore the usage instructions for tensors' `ones` function.
 
 ```{.python .input}
 help(np.ones)
@@ -45,7 +45,7 @@ help(torch.ones)
 help(tf.ones)
 ```
 
-From the documentation, we can see that the `ones` function creates a new tensor with specified shape and sets all the elements to the value of 1. Whenever possible, you should run a quick test to confirm your interpretation:
+From the documentation, we can see that the `ones` function creates a new tensor with the specified shape and sets all the elements to the value of 1. Whenever possible, you should run a quick test to confirm your interpretation:
 
 ```{.python .input}
 np.ones(4)
@@ -72,12 +72,13 @@ displayed.
 ## Summary
 
 * The official documentation provides plenty of descriptions and examples that are beyond this book.
-* We can look up documentation for the usage of an API by calling the `dir` and `help` functions, or `?` and `??` in Jupyter notebook.
+* We can look up documentation for the usage of an API by calling the `dir` and `help` functions, or `?` and `??` in Jupyter notebooks.
 
 
 ## Exercises
 
-1. Find a function and a class in the deep learning framework and then look up their documents, also check the documents on the official website. 
+1. Look up the documentation for any function or class in the deep learning framework. Can you also find the documentation on the official website of the framework?
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/38)
@@ -90,4 +91,3 @@ displayed.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/199)
 :end_tab:
-
