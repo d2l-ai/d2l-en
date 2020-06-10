@@ -73,8 +73,7 @@ x.grad  # The default value is None
 
 ```{.python .input}
 #@tab tensorflow
-with tf.GradientTape() as t:
-    t.watch(x)
+x = tf.Variable(x)
 ```
 
 Now let us calculate $y$.
@@ -96,7 +95,6 @@ y
 #@tab tensorflow
 # Record all computations onto a tape. 
 with tf.GradientTape() as t:
-    t.watch(x)
     y = 2 * tf.tensordot(x, x, axes=1)
 y
 ```
@@ -165,7 +163,6 @@ x.grad
 ```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
-    t.watch(x)
     y = tf.reduce_sum(x)
 t.gradient(y, x)  # Overwritten by the newly calculated gradient.
 ```
@@ -205,7 +202,6 @@ x.grad
 ```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
-    t.watch(x)
     y = x * x
 t.gradient(y, x)  # Equals to y = tf.reduce_sum(x*x)
 ```
@@ -337,9 +333,8 @@ d.backward()
 
 ```{.python .input}
 #@tab tensorflow
-a = tf.random.normal((1, 1),dtype=tf.float32)
+a = tf.Variable(tf.random.normal((1, 1),dtype=tf.float32))
 with tf.GradientTape() as t:
-    t.watch(a)
     d = f(a)
 d_grad = t.gradient(d, a)
 d_grad
