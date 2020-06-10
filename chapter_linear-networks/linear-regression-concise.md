@@ -182,7 +182,7 @@ net = nn.Sequential(nn.Linear(2, 1))
 
 ```{.python .input}
 #@tab tensorflow
-# Keras is the high-leve API for TensorFlow 2.0
+# Keras is the high-level API for TensorFlow
 net = tf.keras.Sequential()
 net.add(tf.keras.layers.Dense(1))
 ```
