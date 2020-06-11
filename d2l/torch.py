@@ -25,6 +25,7 @@ import sys
 import tarfile
 import time
 import zipfile
+import requests
 
 d2l = sys.modules[__name__]
 
@@ -51,7 +52,7 @@ def set_figsize(figsize=(3.5, 2.5)):  #@save
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):  #@save
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
     axes.set_xlabel(xlabel)
     axes.set_ylabel(ylabel)
@@ -68,14 +69,14 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):  #@save
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
-    """Plot data points."""
+    """Plot data instances."""
     if legend is None:
         legend = []
 
     set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
 
-    # Return True if X (ndarray or list) has 1 axis
+    # Return True if `X` (ndarray or list) has 1 axis
     def has_one_axis(X):
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))
@@ -152,7 +153,7 @@ def sgd(params, lr, batch_size):  #@save
         param.grad.data.zero_()
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression-gluon.md
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data loader"""
     dataset = data.TensorDataset(*data_arrays)
@@ -334,7 +335,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
-        l = loss(net(X), y)
+        l = loss(net(X), y.reshape(-1, 1))
         if l.nelement() != 1:
             metric.add(l.sum(), y.numpy().size)
         else:
@@ -530,5 +531,79 @@ class Residual(nn.Module):  #@save
             X = self.conv3(X)
         Y += X
         return F.relu(Y)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
+                                '090b5e7e70c295757f55df93cb0a180b9691891a')
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def read_time_machine():  #@save
+    """Load the time machine book into a list of sentences."""
+    with open(d2l.download('time_machine'), 'r') as f:
+        lines = f.readlines()
+    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
+            for line in lines]
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def tokenize(lines, token='word'):  #@save
+    """Split sentences into word or char tokens."""
+    if token == 'word':
+        return [line.split(' ') for line in lines]
+    elif token == 'char':
+        return [list(line) for line in lines]
+    else:
+        print('ERROR: unknown token type '+token)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+class Vocab:  #@save
+    def __init__(self, tokens, min_freq=0, reserved_tokens=None):
+        if reserved_tokens is None:
+            reserved_tokens = []
+        # Sort according to frequencies
+        counter = count_corpus(tokens)
+        self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
+        self.token_freqs.sort(key=lambda x: x[1], reverse=True)
+        self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
+        uniq_tokens += [token for token, freq in self.token_freqs
+                        if freq >= min_freq and token not in uniq_tokens]
+        self.idx_to_token, self.token_to_idx = [], dict()
+        for token in uniq_tokens:
+            self.idx_to_token.append(token)
+            self.token_to_idx[token] = len(self.idx_to_token) - 1
+
+    def __len__(self):
+        return len(self.idx_to_token)
+
+    def __getitem__(self, tokens):
+        if not isinstance(tokens, (list, tuple)):
+            return self.token_to_idx.get(tokens, self.unk)
+        return [self.__getitem__(token) for token in tokens]
+
+    def to_tokens(self, indices):
+        if not isinstance(indices, (list, tuple)):
+            return self.idx_to_token[indices]
+        return [self.idx_to_token[index] for index in indices]
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def count_corpus(sentences):  #@save
+    # Flatten a list of token lists into a list of tokens
+    tokens = [tk for line in sentences for tk in line]
+    return collections.Counter(tokens)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def load_corpus_time_machine(max_tokens=-1):  #@save
+    lines = read_time_machine()
+    tokens = tokenize(lines, 'char')
+    vocab = Vocab(tokens)
+    corpus = [vocab[tk] for line in tokens for tk in line]
+    if max_tokens > 0:
+        corpus = corpus[:max_tokens]
+    return corpus, vocab
 
 

@@ -98,11 +98,9 @@ pip install torch==1.5.0 torchvision
 We also install the `d2l` package that encapsulates frequently used
 functions and classes in this book.
 
-:begin_tab:`mxnet`
 ```bash
-pip install git+https://github.com/d2l-ai/d2l-en
+pip install -U d2l -f https://d2l.ai/whl.html
 ```
-:end_tab:
 
 
 Once they are installed, we now open the Jupyter notebook by running:

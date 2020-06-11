@@ -87,7 +87,7 @@ cholesterol levels, minutes of exercise per day, etc.
 In math notation, we will usually denote vectors as bold-faced,
 lower-cased letters (e.g., $\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z})$.
 
-We work with vectors via $1$-dimensional `ndarray`s.
+We work with vectors via one-dimensional `ndarray`s.
 In general `ndarray`s can have arbitrary lengths,
 subject to the memory limits of your machine.
 
@@ -175,11 +175,11 @@ will be the length of that axis.
 
 ## Matrices
 
-Just as vectors generalize scalars from order $0$ to order $1$,
-matrices generalize vectors from order $1$ to order $2$.
+Just as vectors generalize scalars from order zero to order one,
+matrices generalize vectors from order one to order two.
 Matrices, which we will typically denote with bold-faced, capital letters
 (e.g., $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$),
-are represented in code as `ndarray`s with $2$ axes.
+are represented in code as `ndarray`s with two axes.
 
 In math notation, we use $\mathbf{A} \in \mathbb{R}^{m \times n}$
 to express that the matrix $\mathbf{A}$ consists of $m$ rows and $n$ columns of real-valued scalars.
@@ -275,18 +275,18 @@ B == B.T
 
 Matrices are useful data structures:
 they allow us to organize data that have different modalities of variation.
-For example, rows in our matrix might correspond to different houses (data points),
+For example, rows in our matrix might correspond to different houses (data instances or data points),
 while columns might correspond to different attributes.
 This should sound familiar if you have ever used spreadsheet software or
 have read :numref:`sec_pandas`.
 Thus, although the default orientation of a single vector is a column vector,
 in a matrix that represents a tabular dataset,
-it is more conventional to treat each data point as a row vector in the matrix.
+it is more conventional to treat each data instance as a row vector in the matrix.
 And, as we will see in later chapters,
 this convention will enable common deep learning practices.
 For example, along the outermost axis of an `ndarray`,
-we can access or enumerate minibatches of data points,
-or just data points if no minibatch exists.
+we can access or enumerate minibatches of data instances,
+or just data instances if no minibatch exists.
 
 
 ## Tensors
@@ -324,14 +324,14 @@ performs elementwise addition over these two matrices.
 
 ```{.python .input}
 A = np.arange(20).reshape(5, 4)
-B = A.copy()  # Assign a copy of A to B by allocating new memory
+B = A.copy()  # Assign a copy of `A` to `B` by allocating new memory
 A, A + B
 ```
 
 ```{.python .input}
 #@tab pytorch
 A = torch.arange(20, dtype = torch.float32).reshape(5, 4)
-B = A.clone()  # Assign a copy of A to B by allocating new memory
+B = A.clone()  # Assign a copy of `A` to `B` by allocating new memory
 A, A + B
 ```
 
@@ -407,10 +407,10 @@ A.shape, A.sum()
 By default, invoking the `sum` function *reduces* a tensor along all its axes to a scalar.
 We can also specify the axes along which the tensor is reduced via summation.
 Take matrices as an example.
-To reduce the row dimension (axis $0$) by summing up elements of all the rows,
+To reduce the row dimension (axis 0) by summing up elements of all the rows,
 we specify `axis=0` when invoking `sum`.
-Since the input matrix reduces along axis $0$ to generate the output vector,
-the dimension of axis $0$ of the input is lost in the output shape.
+Since the input matrix reduces along axis 0 to generate the output vector,
+the dimension of axis 0 of the input is lost in the output shape.
 
 ```{.python .input}
 A_sum_axis0 = A.sum(axis=0)
@@ -423,8 +423,8 @@ A_sum_axis0 = A.sum(axis=0)
 A_sum_axis0, A_sum_axis0.shape
 ```
 
-Specifying `axis=1` will reduce the column dimension (axis $1$) by summing up elements of all the columns.
-Thus, the dimension of axis $1$ of the input is lost in the output shape.
+Specifying `axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.
+Thus, the dimension of axis 1 of the input is lost in the output shape.
 
 ```{.python .input}
 A_sum_axis1 = A.sum(axis=1)
@@ -488,7 +488,7 @@ sum_A = A.sum(axis=1, keepdims=True)
 sum_A
 ```
 
-For instance, since `sum_A` still keeps its $2$ axes after summing each row, we can divide `A` by `sum_A` with broadcasting.
+For instance, since `sum_A` still keeps its two axes after summing each row, we can divide `A` by `sum_A` with broadcasting.
 
 ```{.python .input}
 A / sum_A
@@ -607,7 +607,7 @@ Expressing matrix-vector products in code with `ndarray`s,
 we use the same `dot` function as for dot products.
 When we call `np.dot(A, x)` with a matrix `A` and a vector `x`,
 the matrix-vector product is performed.
-Note that the column dimension of `A` (its length along axis $1$)
+Note that the column dimension of `A` (its length along axis 1)
 must be the same as the dimension of `x` (its length).
 
 ```{.python .input}
@@ -680,9 +680,9 @@ $$
 
 We can think of the matrix-matrix multiplication $\mathbf{AB}$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix. Just as with ordinary dot products and matrix-vector products, we can compute matrix-matrix multiplication by using the `dot` function.
 In the following snippet, we perform matrix multiplication on `A` and `B`.
-Here, `A` is a matrix with $5$ rows and $4$ columns,
-and `B` is a matrix with $4$ rows and $3$ columns.
-After multiplication, we obtain a matrix with $5$ rows and $3$ columns.
+Here, `A` is a matrix with 5 rows and 4 columns,
+and `B` is a matrix with 4 rows and 3 columns.
+After multiplication, we obtain a matrix with 5 rows and 3 columns.
 
 ```{.python .input}
 B = np.ones(shape=(4, 3))
@@ -852,7 +852,7 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 
 * Scalars, vectors, matrices, and tensors are basic mathematical objects in linear algebra.
 * Vectors generalize scalars, and matrices generalize vectors.
-* In the `ndarray` representation, scalars, vectors, matrices, and tensors have 0, 1, 2, and an arbitrary number of axes, respectively.
+* In the `ndarray` representation, scalars, vectors, matrices, and tensors have zero, one, two, and an arbitrary number of axes, respectively.
 * A tensor can be reduced along the specified axes by `sum` and `mean`.
 * Elementwise multiplication of two matrices is called their Hadamard product. It is different from matrix multiplication.
 * In deep learning, we often work with norms such as the $\ell_1$ norm, the $\ell_2$ norm, and the Frobenius norm.
@@ -864,11 +864,11 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 1. Prove that the transpose of a matrix $\mathbf{A}$'s transpose is $\mathbf{A}$: $(\mathbf{A}^\top)^\top = \mathbf{A}$.
 1. Given two matrices $\mathbf{A}$ and $\mathbf{B}$, show that the sum of transposes is equal to the transpose of a sum: $\mathbf{A}^\top + \mathbf{B}^\top = (\mathbf{A} + \mathbf{B})^\top$.
 1. Given any square matrix $\mathbf{A}$, is $\mathbf{A} + \mathbf{A}^\top$ always symmetric? Why?
-1. We defined the tensor `X` of shape ($2$, $3$, $4$) in this section. What is the output of `len(X)`?
+1. We defined the tensor `X` of shape (2, 3, 4) in this section. What is the output of `len(X)`?
 1. For a tensor `X` of arbitrary shape, does `len(X)` always correspond to the length of a certain axis of `X`? What is that axis?
 1. Run `A / A.sum(axis=1)` and see what happens. Can you analyze the reason?
 1. When traveling between two points in Manhattan, what is the distance that you need to cover in terms of the coordinates, i.e., in terms of avenues and streets? Can you travel diagonally?
-1. Consider a tensor with shape ($2$, $3$, $4$). What are the shapes of the summation outputs along axis $0$, $1$, and $2$?
+1. Consider a tensor with shape (2, 3, 4). What are the shapes of the summation outputs along axis 0, 1, and 2?
 1. Feed a tensor with 3 or more axes to the `linalg.norm` function and observe its output. What does this function compute for `ndarray`s of arbitrary shape?
 
 

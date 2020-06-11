@@ -8,22 +8,30 @@ Text is an important example of sequence data. An article can be simply viewed a
 1. Build a vocabulary for these tokens to map them into numerical indices.
 1. Map all the tokens in data into indices for ease of feeding into models.
 
+```{.python .input}
+import collections
+from d2l import mxnet as d2l
+import re
+```
+
+```{.python .input}
+#@tab pytorch
+import collections
+from d2l import torch as d2l
+import re
+```
 
 ## Reading the Dataset
 
 To get started we load text from H. G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over $30,000$ words, but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. The following function reads the dataset into a list of sentences, each sentence is a string. Here we ignore punctuation and capitalization.
 
 ```{.python .input}
-import collections
-from d2l import mxnet as d2l
-import re
-
+#@tab all
 #@save
 d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
                                 '090b5e7e70c295757f55df93cb0a180b9691891a')
 
-#@save
-def read_time_machine():
+def read_time_machine():  #@save
     """Load the time machine book into a list of sentences."""
     with open(d2l.download('time_machine'), 'r') as f:
         lines = f.readlines()
@@ -40,8 +48,8 @@ For each sentence, we split it into a list of tokens. A token is a data point
 the model will train and predict. The following function supports splitting a sentence into words or characters, and returns a list of split strings.
 
 ```{.python .input}
-#@save
-def tokenize(lines, token='word'):
+#@tab all
+def tokenize(lines, token='word'):  #@save
     """Split sentences into word or char tokens."""
     if token == 'word':
         return [line.split(' ') for line in lines]
@@ -58,9 +66,9 @@ tokens[0:2]
 
 The string type of the token is inconvenient to be used by models, which take numerical inputs. Now let us build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0. To do so, we first count the unique tokens in all documents, called *corpus*, and then assign a numerical index to each unique token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token does not exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add a list of reserved tokens, such as “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
 
-```{.python .input  n=9}
-#@save
-class Vocab:
+```{.python .input}
+#@tab all
+class Vocab:  #@save
     def __init__(self, tokens, min_freq=0, reserved_tokens=None):
         if reserved_tokens is None:
             reserved_tokens = []
@@ -89,23 +97,26 @@ class Vocab:
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
 
-#@save
-def count_corpus(sentences):
+def count_corpus(sentences):  #@save
     # Flatten a list of token lists into a list of tokens
     tokens = [tk for line in sentences for tk in line]
     return collections.Counter(tokens)
 ```
 
+
 We construct a vocabulary with the time machine dataset as the corpus, and then print the map between a few tokens and their indices.
 
-```{.python .input  n=23}
+```{.python .input}
+#@tab all
 vocab = Vocab(tokens)
 print(list(vocab.token_to_idx.items())[0:10])
 ```
 
 After that, we can convert each sentence into a list of numerical indices. To illustrate in detail, we print two sentences with their corresponding indices.
 
-```{.python .input  n=25}
+
+```{.python .input}
+#@tab all
 for i in range(8, 10):
     print('words:', tokens[i])
     print('indices:', vocab[tokens[i]])
@@ -115,9 +126,10 @@ for i in range(8, 10):
 
 Using the above functions, we package everything into the `load_corpus_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of the time machine corpus. The modification we did here is that `corpus` is a single list, not a list of token lists, since we do not keep the sequence information in the following models. Besides, we use character tokens to simplify the training in later sections.
 
+
 ```{.python .input}
-#@save
-def load_corpus_time_machine(max_tokens=-1):
+#@tab all
+def load_corpus_time_machine(max_tokens=-1):  #@save
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)
@@ -139,6 +151,4 @@ len(corpus), len(vocab)
 
 1. Tokenization is a key preprocessing step. It varies for different languages. Try to find another 3 commonly used methods to tokenize sentences.
 
-## [Discussions](https://discuss.mxnet.io/t/2363)
-
-![](../img/qr_lang-model-dataset.svg)
+[Discussions](https://discuss.d2l.ai/t/115)

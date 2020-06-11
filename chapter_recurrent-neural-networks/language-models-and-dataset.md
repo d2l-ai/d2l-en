@@ -124,7 +124,7 @@ bigram_vocab = d2l.Vocab(bigram_tokens)
 print(bigram_vocab.token_freqs[:10])
 ```
 
-Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
+One thing is notable here. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
 
 ```{.python .input  n=4}
 trigram_tokens = [[triple for triple in zip(line[:-2], line[1:-1], line[2:])]
@@ -219,7 +219,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
         yield X, Y
 ```
 
-Using the same settings, print input `X` and label `Y` for each minibatch of examples read by random sampling. The positions of two adjacent minibatches on the original sequence are adjacent.
+Using the same settings, print input `X` and label `Y` for each minibatch of examples read by sequential partitioning. The positions of two adjacent minibatches on the original sequence are adjacent.
 
 ```{.python .input  n=8}
 for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):

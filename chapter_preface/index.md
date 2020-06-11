@@ -272,7 +272,7 @@ to update your code and runtime environment.
 
 At times, to avoid unnecessary repetition, we encapsulate
 the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l` package.
+in this book in the `d2l.mxnet` module.
 For any block such as a function, a class, or multiple imports
 to be saved in the package, we will mark it with
 `#@save`.
@@ -296,10 +296,10 @@ to update your code and runtime environment.
 
 At times, to avoid unnecessary repetition, we encapsulate
 the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l_pytorch` package.
+in this book in the `d2l.torch` module.
 For any block such as a function, a class, or multiple imports
 to be saved in the package, we will mark it with `#@save`.
-The `d2l_pytorch` package is light-weight and only requires
+The `d2l` package is light-weight and only requires
 the following packages and modules as dependencies:
 
 :end_tab:
@@ -351,6 +351,7 @@ import sys
 import tarfile
 import time
 import zipfile
+import requests
 
 d2l = sys.modules[__name__]
 ```
@@ -385,12 +386,9 @@ you may want to peruse this [Python tutorial](http://learnpython.org/).
 ### Forum
 
 Associated with this book, we have launched a discussion forum,
-located at [discuss.mxnet.io](https://discuss.mxnet.io/).
+located at [discuss.d2l.ai](https://discuss.d2l.ai/).
 When you have questions on any section of the book,
-you can find the associated discussion page by scanning the QR code
-at the end of the section to participate in its discussions.
-The authors of this book and broader MXNet developer community
-frequently participate in forum discussions.
+you can find the associated discussion page link at the end of each chapter. 
 
 
 ## Acknowledgments
@@ -421,7 +419,7 @@ tiepvupsu, sfilip, mlxd, Kale-ab Tessera, Sanjar Adilov, MatteoFerrara, hsneto,
 Katarzyna Biesialska, Gregory Bruss, duythanhvn, paulaurel, graytowne, minhduc0711,
 sl7423, Jaedong Hwang, Yida Wang, cys4, clhm, JeanKaddour, austinmw, trebeljahr, tbaums,
 cuongvng, pavelkomarov, vzlamal, NotAnotherSystem, J-Arun-Mani, jancio, eldarkurtic,
-the-great-shazbot.
+the-great-shazbot, doctorcolossus, gducharme.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.

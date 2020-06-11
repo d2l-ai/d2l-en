@@ -261,7 +261,7 @@ We could think of the hidden representation as comprising
 a number of 2D grids stacked on top of each other.
 As in the inputs, these are sometimes called *channels*.
 They are also sometimes called *feature maps*,
-as each provides a set of spatialized set
+as each provides a spatialized set
 of learned features to the subsequent layer.
 Intuitively, you might imagine that at lower layers,
 some channels could become specialized to recognize edges,

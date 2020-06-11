@@ -2,7 +2,7 @@
 :label:`sec_calculus`
 
 Finding the area of a polygon had remained mysterious
-until at least $2,500$ years ago, when ancient Greeks divided a polygon into triangles and summed their areas.
+until at least 2,500 years ago, when ancient Greeks divided a polygon into triangles and summed their areas.
 To find the area of curved shapes, such as a circle,
 ancient Greeks inscribed polygons in such shapes.
 As shown in :numref:`fig_circle_area`,
@@ -13,7 +13,7 @@ the circle. This process is also known as the *method of exhaustion*.
 :label:`fig_circle_area`
 
 In fact, the method of exhaustion is where *integral calculus* (will be described in :numref:`sec_integral_calculus`) originates from.
-More than $2,000$ years later,
+More than 2,000 years later,
 the other branch of calculus, *differential calculus*,
 was invented.
 Among the most critical applications of differential calculus,
@@ -34,7 +34,7 @@ Thus we can decompose the task of fitting models into two key concerns:
 i) *optimization*: the process of fitting our models to observed data;
 ii) *generalization*: the mathematical principles and practitioners' wisdom
 that guide as to how to produce models whose validity extends
-beyond the exact set of data points used to train them.
+beyond the exact set of data instances used to train them.
 
 To help you understand
 optimization problems and methods in later chapters,
@@ -181,10 +181,10 @@ def set_figsize(figsize=(3.5, 2.5)):  #@save
 
 The following `set_axes` function sets properties of axes of figures produced by `matplotlib`.
 
-
 ```{.python .input}
 #@tab all
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):  #@save
+#@save
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
     axes.set_xlabel(xlabel)
     axes.set_ylabel(ylabel)
@@ -197,11 +197,10 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):  #@save
     axes.grid()
 ```
 
-With these $3$ functions for figure configurations,
+With these three functions for figure configurations,
 we define the `plot` function
 to plot multiple curves succinctly
 since we will need to visualize many curves throughout the book.
-
 
 ```{.python .input}
 #@tab all
@@ -209,14 +208,14 @@ since we will need to visualize many curves throughout the book.
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
-    """Plot data points."""
+    """Plot data instances."""
     if legend is None:
         legend = []
 
     set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
 
-    # Return True if X (ndarray or list) has 1 axis
+    # Return True if `X` (ndarray or list) has 1 axis
     def has_one_axis(X):
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))

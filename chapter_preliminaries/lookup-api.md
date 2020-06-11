@@ -6,7 +6,7 @@ Due to constraints on the length of this book, we cannot possibly introduce ever
 
 In order to know which functions and classes can be called in a module, we
 invoke the `dir` function. For instance, we can query all properties in the
-module to generate random numbers:
+module for generating random numbers:
 
 ```{.python .input  n=1}
 from mxnet import np
@@ -34,7 +34,7 @@ help(np.ones_like)
 help(torch.ones_like)
 ```
 
-From the documentation, we can see that the `ones_like` function creates a new array with the same shape as the supplied `ndarray` and sets all the elements to `1`. Whenever possible, you should run a quick test to confirm your interpretation:
+From the documentation, we can see that the `ones_like` function creates a new array with the same shape as the supplied `ndarray` and sets all the elements to the value of 1. Whenever possible, you should run a quick test to confirm your interpretation:
 
 ```{.python .input}
 x = np.array([[0, 0, 0], [2, 2, 2]])
@@ -95,13 +95,16 @@ For further details on the API details check the PyTorch website at
 
 ## Exercises
 
-1. Look up `ones_like` on the website.
-
-
 :begin_tab:`mxnet`
+1. Look up `ones_like` and `autograd` on the MXNet website.
+2. What are all the possible outputs after running `np.random.choice(4, 2)`?
+3. Can you rewrite `np.random.choice(4, 2)` by using the `np.random.randint` function?
+
 [Discussions](https://discuss.d2l.ai/t/38)
 :end_tab:
 
 :begin_tab:`pytorch`
+1. Look up `ones_like` on the MXNet website.
+
 [Discussions](https://discuss.d2l.ai/t/39)
 :end_tab:

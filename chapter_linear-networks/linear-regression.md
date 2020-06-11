@@ -1,9 +1,9 @@
 # Linear Regression
 :label:`sec_linear_regression`
 
-Regression refers to a set of methods for modeling
-the relationship between data points $\mathbf{x}$
-and corresponding real-valued targets $y$.
+*Regression* refers to a set of methods for modeling
+the relationship between one or more independent variables
+and a dependent variable.
 In the natural sciences and social sciences,
 the purpose of regression is most often to
 *characterize* the relationship between the inputs and outputs.
@@ -14,10 +14,9 @@ Regression problems pop up whenever we want to predict a numerical value.
 Common examples include predicting prices (of homes, stocks, etc.),
 predicting length of stay (for patients in the hospital),
 demand forecasting (for retail sales), among countless others.
-Not every prediction problem is a classic *regression* problem.
+Not every prediction problem is a classic regression problem.
 In subsequent sections, we will introduce classification problems,
 where the goal is to predict membership among a set of categories.
-
 
 
 ## Basic Elements of Linear Regression
@@ -27,34 +26,34 @@ and most popular among the standard tools to regression.
 Dating back to the dawn of the 19th century,
 linear regression flows from a few simple assumptions.
 First, we assume that the relationship between
-the *features* $\mathbf{x}$ and targets $y$ is linear,
+the independent variables $\mathbf{x}$ and the dependent variable $y$ is linear,
 i.e., that $y$ can be expressed as a weighted sum
-of the inputs $\textbf{x}$,
-give or take some noise on the observations.
+of the elements in $\mathbf{x}$,
+given some noise on the observations.
 Second, we assume that any noise is well-behaved
 (following a Gaussian distribution).
+
 To motivate the approach, let us start with a running example.
 Suppose that we wish to estimate the prices of houses (in dollars)
 based on their area (in square feet) and age (in years).
-
 To actually fit a model for predicting house prices,
 we would need to get our hands on a dataset
 consisting of sales for which we know
-the sale price, area and age for each home.
+the sale price, area, and age for each home.
 In the terminology of machine learning,
 the dataset is called a *training data set* or *training set*,
 and each row (here the data corresponding to one sale)
-is called an *example* (or *data instance*, "data point", *sample*).
-The thing we are trying to predict (here, the price)
+is called an *example* (or *data instance*, *data point*, *sample*).
+The thing we are trying to predict (price)
 is called a *label* (or *target*).
-The variables (here *age* and *area*)
+The independent variables (age and area)
 upon which the predictions are based
-are called *features* or *covariates*.
+are called *features* (or *covariates*).
 
 Typically, we will use $n$ to denote
 the number of examples in our dataset.
 We index the data instances by $i$, denoting each input
-as $x^{(i)} = [x_1^{(i)}, x_2^{(i)}]$
+as $\mathbf{x}^{(i)} = [x_1^{(i)}, x_2^{(i)}]^\top$
 and the corresponding label as $y^{(i)}$.
 
 
@@ -64,65 +63,70 @@ The linearity assumption just says that the target (price)
 can be expressed as a weighted sum of the features (area and age):
 
 $$\mathrm{price} = w_{\mathrm{area}} \cdot \mathrm{area} + w_{\mathrm{age}} \cdot \mathrm{age} + b.$$
+:eqlabel:`eq:price-area`
 
-Here, $w_{\mathrm{area}}$ and $w_{\mathrm{age}}$
+In :eqref:`eq:price-area`, $w_{\mathrm{area}}$ and $w_{\mathrm{age}}$
 are called *weights*, and $b$ is called a *bias*
 (also called an *offset* or *intercept*).
 The weights determine the influence of each feature
 on our prediction and the bias just says
 what value the predicted price should take
-when all of the features take value $0$.
+when all of the features take value 0.
 Even if we will never see any homes with zero area,
 or that are precisely zero years old,
 we still need the intercept or else we will
 limit the expressivity of our linear model.
 
 Given a dataset, our goal is to choose
-the weights $w$ and bias $b$ such that on average,
+the weights $\mathbf{w}$ and the bias $b$ such that on average,
 the predictions made according to our model
 best fit the true prices observed in the data.
 
 In disciplines where it is common to focus
 on datasets with just a few features,
 explicitly expressing models long-form like this is common.
-In ML, we usually work with high-dimensional datasets,
+In machine learning, we usually work with high-dimensional datasets,
 so it is more convenient to employ linear algebra notation.
 When our inputs consist of $d$ features,
 we express our prediction $\hat{y}$ as
 
-$$\hat{y} = w_1 \cdot x_1 + ... + w_d \cdot x_d + b.$$
+$$\hat{y} = w_1  x_1 + ... + w_d  x_d + b.$$
 
-Collecting all features into a vector $\mathbf{x}$
-and all weights into a vector $\mathbf{w}$,
+Collecting all features into a vector $\mathbf{x} \in \mathbb{R}^d$
+and all weights into a vector $\mathbf{w} \in \mathbb{R}^d$,
 we can express our model compactly using a dot product:
 
 $$\hat{y} = \mathbf{w}^\top \mathbf{x} + b.$$
+:eqlabel:`eq:linreg-y`
 
-Here, the vector $\mathbf{x}$ corresponds to a single data point.
+In :eqref:`eq:linreg-y`, the vector $\mathbf{x}$ corresponds to features of a single data instance.
 We will often find it convenient
-to refer to our entire dataset via the *design matrix* $\mathbf{X}$.
+to refer to features of our entire dataset of $n$ examples
+via the *design matrix* $\mathbf{X} \in \mathbb{R}^{n \times d}$.
 Here, $\mathbf{X}$ contains one row for every example
 and one column for every feature.
 
-For a collection of data points $\mathbf{X}$,
-the predictions $\hat{\mathbf{y}}$
+For a collection of features $\mathbf{X}$,
+the predictions $\hat{\mathbf{y}} \in \mathbb{R}^n$
 can be expressed via the matrix-vector product:
 
-$${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b.$$
+$${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b,$$
 
-Given a training dataset $\mathbf{X}$
-and corresponding (known) targets $\mathbf{y}$,
+where broadcasting (see :numref:`subsec_broadcasting`) is applied during the summation.
+Given features of a training dataset $\mathbf{X}$
+and corresponding (known) labels $\mathbf{y}$,
 the goal of linear regression is to find
-the *weight* vector $w$ and bias term $b$
-that given a new data point $\mathbf{x}_i$,
-sampled from the same distribution as the training data
-will (in expectation) predict the target $y_i$ with the lowest error.
+the weight vector $\mathbf{w}$ and the bias term $b$
+that given features of a new data instance
+sampled from the same distribution as $\mathbf{X}$,
+the new data instance's label will (in expectation) be predicted with the lowest error.
+
 
 Even if we believe that the best model for
 predicting $y$ given $\mathbf{x}$ is linear,
-we would not expect to find real-world data where
-$y_i$ exactly equals $\mathbf{w}^\top \mathbf{x}+b$
-for all points ($\mathbf{x}, y)$.
+we would not expect to find a real-world dataset of $n$ examples where
+$y^{(i)}$ exactly equals $\mathbf{w}^\top \mathbf{x}^{(i)}+b$
+for all $1 \leq i \leq n$.
 For example, whatever instruments we use to observe
 the features $\mathbf{X}$ and labels $\mathbf{y}$
 might suffer small amount of measurement error.
@@ -372,7 +376,6 @@ b = torch.ones(n)
 Since we will benchmark the running time frequently in this book,
 let us define a timer (hereafter accessed via the `d2l` package
 to track the running time.
-
 
 ```{.python .input}
 #@tab all

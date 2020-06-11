@@ -16,12 +16,11 @@ We will cover more data preprocessing techniques in later chapters.
 As an example, we begin by creating an artificial dataset that is stored in a
 csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other
 formats may be processed in similar ways.
-
 The following `mkdir_if_not_exist`
 function ensures that the directory `../data` exists. The comment `#@save`
-s a special mark where the following function,
-class, or import statements are also saved in the `d2l` package so that we can
-directly invoke `d2l.mkdir_if_not_exist()` later.
+is a special mark where the following function,
+class, or import statements are also saved in the `d2l` package so that later we can
+directly invoke the `mkdir_if_not_exist` function without redefining it.
 
 ```{.python .input}
 #@tab all
@@ -42,7 +41,7 @@ data_file = '../data/house_tiny.csv'
 mkdir_if_not_exist('../data')
 with open(data_file, 'w') as f:
     f.write('NumRooms,Alley,Price\n')  # Column names
-    f.write('NA,Pave,127500\n')  # Each row is a data point
+    f.write('NA,Pave,127500\n')  # Each row is a data instance
     f.write('2,NA,106000\n')
     f.write('4,NA,178100\n')
     f.write('NA,NA,140000\n')
@@ -50,7 +49,7 @@ with open(data_file, 'w') as f:
 
 To load the raw dataset from the created csv file,
 we import the `pandas` package and invoke the `read_csv` function.
-This dataset has $4$ rows and $3$ columns, where each row describes the number of rooms ("NumRooms"), the alley type ("Alley"), and the price ("Price") of a house.
+This dataset has four rows and three columns, where each row describes the number of rooms ("NumRooms"), the alley type ("Alley"), and the price ("Price") of a house.
 
 ```{.python .input}
 #@tab all
@@ -70,7 +69,7 @@ where imputation replaces missing values with substituted ones,
 while deletion ignores missing values. Here we will consider imputation.
 
 By integer-location based indexing (`iloc`), we split `data` into `inputs` and `outputs`,
-where the former takes the first 2 columns while the latter only keeps the last column.
+where the former takes the first two columns while the latter only keeps the last column.
 For numerical values in `inputs` that are missing, we replace the "NaN" entries with the mean value of the same column.
 
 ```{.python .input}
@@ -81,10 +80,10 @@ print(inputs)
 ```
 
 For categorical or discrete values in `inputs`, we consider "NaN" as a category.
-Since the "Alley" column only takes 2 types of categorical values "Pave" and "NaN",
-`pandas` can automatically convert this column to 2 columns "Alley_Pave" and "Alley_nan".
-A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan" to $1$ and $0$.
-A row with a missing alley type will set their values to $0$ and $1$.
+Since the "Alley" column only takes two types of categorical values "Pave" and "NaN",
+`pandas` can automatically convert this column to two columns "Alley_Pave" and "Alley_nan".
+A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan" to 1 and 0.
+A row with a missing alley type will set their values to 0 and 1.
 
 ```{.python .input}
 #@tab all

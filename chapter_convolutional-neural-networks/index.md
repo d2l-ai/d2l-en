@@ -14,7 +14,7 @@ through a (fully connected) MLP.
 Because these networks invariant to the order
 of the features we could get similar results
 regardless of whether we preserve an order 
-corresponding ot the spatial structure of the pixels
+corresponding to the spatial structure of the pixels
 or if we permute the columns of our design matrix
 before fitting the MLP's parameters.
 Preferably, we would leverage our prior knowledge
@@ -61,7 +61,7 @@ the first convolutional network successfully deployed,
 long before the rise of modern deep learning.
 In the next chapter, we will dive into full implementations
 of some popular and comparatively recent CNN architectures
-whose designs representat most of the techniques
+whose designs represent most of the techniques
 commonly used by modern practitioners.
 
 ```toc
