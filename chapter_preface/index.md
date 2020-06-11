@@ -328,10 +328,29 @@ the following packages and modules as dependencies:
 :end_tab:
 
 :begin_tab:`jax`
-Most of the code in this book is based on TensorFlow.
+
+Most of the code in this book is based on JAX.
+JAX is an new open-source framework enabling composable function transformations such as differentiation of arbitrary Python and NumPy functions, as well as JIT compliation, vectorization and much more! It's becoming popular in the machine learning research space and has an easy-to-learn NumPy-like API. Actually, JAX tries to achieve 1:1 parity with NumPy, so switching your code could be as simple as changing a single import statement!
+
+All of the code in this book has passed tests under the the newest version of JAX.
+However, due to the rapid development of deep learning, some code
+*in the print edition* may not work properly in future versions of JAX.
+However, we plan to keep the online version up-to-date.
+In case you encounter any such problems,
+please consult :ref:`chap_installation`
+to update your code and runtime environment.
+
+At times, to avoid unnecessary repetition, we encapsulate
+the frequently-imported and referred-to functions, classes, etc.
+in this book in the `d2l.tensorflow` module.
+For any block such as a function, a class, or multiple imports
+to be saved in the package, we will mark it with `#@save`.
+The `d2l` package is light-weight and only requires
+the following packages and modules as dependencies:
+
 :end_tab:
 
-```{.python .input  n=1}
+```{.python .input}
 #@save
 import collections
 from collections import defaultdict
@@ -353,7 +372,8 @@ import zipfile
 d2l = sys.modules[__name__]
 ```
 
-```{.python .input  n=1}
+
+```{.python .input}
 #@tab pytorch
 #@save
 import sys
@@ -384,7 +404,8 @@ import warnings
 d2l = sys.modules[__name__]
 ```
 
-```{.python .input  n=1}
+
+```{.python .input}
 #@tab tensorflow
 #@save
 import collections
@@ -408,7 +429,8 @@ import requests
 d2l = sys.modules[__name__]
 ```
 
-```{.python .input  n=1}
+
+```{.python .input}
 #@tab jax
 #@save
 import collections
