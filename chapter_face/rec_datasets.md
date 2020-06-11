@@ -13,7 +13,6 @@ import os
 import random
 import time
 import zipfile
-import cv2
 import glob
 
 
@@ -69,7 +68,8 @@ def _facerec_vis_id(data_dir, person_id):
     image_path_list = glob.glob(os.path.join(folder, '*.jpg'))
     img_list = []
     for image_path in image_path_list:
-        img = cv2.imread(image_path)
+        img = npx.image.imread(image_path).asnumpy()[:,:,::-1]
+        #print(img.__class__)
         #print(img.shape)
         img_list.append(img)
     return img_list
@@ -119,8 +119,7 @@ class FaceDataset(Dataset):
 
     def __getitem__(self, idx):
         item = self.seq[idx]
-        image = cv2.imread(item[0])[:,:,::-1]#to rgb
-        image = np.array(image)
+        image = npx.image.imread(item[0])
         label = item[1]
         image = self.transform(image)
         return image, label
@@ -151,6 +150,7 @@ Given the five facial landmarks (eye corners, nose tip, and mouth corners) on th
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
 def _face_align(image, landmark):
+    import cv2
     from skimage import transform as trans
     tform = trans.SimilarityTransform()
     assert landmark.shape==(5,2)
@@ -172,3 +172,11 @@ def _face_align(image, landmark):
 * Introduction of common face recognition datasets.
 * How to visualize and read datasets.
 * How to generate normalised face crops by using facial landmarks.
+
+```{.python .input}
+
+```
+
+```{.python .input}
+
+```
