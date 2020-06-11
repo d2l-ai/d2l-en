@@ -2532,9 +2532,9 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
-#d2l.DATA_HUB['faces-casia'] = (
-#    'https://s3.amazonaws.com/research.metamind.io/facerecognition/'
-#    'faces-casia.zip', '6435a11cd3e6c036ba6a7c329f4f0684377b912c')
+d2l.DATA_HUB['faces-casia'] = (
+    'https://s3.amazonaws.com/research.metamind.io/facerecognition/'
+    'faces-casia.zip', '6435a11cd3e6c036ba6a7c329f4f0684377b912c')
 
 d2l.DATA_HUB['faces-casia-small'] = (
     'http://d2l-data.s3-accelerate.amazonaws.com/'
@@ -2544,14 +2544,6 @@ d2l.DATA_HUB['faces-casia-ultrasmall'] = (
     'http://d2l-data.s3-accelerate.amazonaws.com/'
     'faces-casia-ultrasmall.zip', '352b9a33ca089307a07cec80c23b1765d304e95a')
     
-#d2l.DATA_HUB['faces-ms1mv2'] = (
-#    'https://s3.amazonaws.com/research.metamind.io/facerecognition/'
-#    'ms1m-v2.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
-    
-#d2l.DATA_HUB['faces-ms1mv3'] = (
-#    'https://s3.amazonaws.com/research.metamind.io/facerecognition/'
-#    'ms1m-v3.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
-
 def read_facerec_meta(data_dir):
     file_name = os.path.join(data_dir, 'property')
     line = open(file_name, 'r').readlines()[0]
@@ -2677,7 +2669,7 @@ class FaceResNet(nn.Block):
             return nn.Activation(self.act_type)
 
 
-    def __init__(self, layers, channels, classes, use_dropout, **kwargs):
+    def __init__(self, layers, channels, classes, use_dropout, bn_after_emb, **kwargs):
 
         super(FaceResNet,self).__init__(**kwargs)
         assert len(layers)==len(channels)-1
@@ -2700,6 +2692,8 @@ class FaceResNet(nn.Block):
                 self.features.add(nn.Dropout(0.4))
             self.features.add(nn.Flatten())
             self.features.add(nn.Dense(classes))
+            if bn_after_emb:
+                self.features.add(nn.BatchNorm(epsilon=2e-5))
 
     def _make_layer(self, block, layers, channels, stride, stage_index, in_channels=0):
         layer = nn.Sequential(prefix='stage%d_'%stage_index)
@@ -2720,12 +2714,12 @@ faceresnet_spec = {18: ('basic_block', [2, 2, 2, 2], [64, 64, 128, 256, 512]),
                    100: ('basic_block', [3, 13, 30, 3], [64, 64, 128, 256, 512])}
 
 # Constructor
-def get_faceresnet(num_layers, num_classes, use_dropout=False, do_init=True):
+def get_faceresnet(num_layers, num_classes, use_dropout=False, bn_after_emb=False, do_init=True):
     assert num_layers in faceresnet_spec, \
         "Invalid number of layers: %d. Options are %s"%(
             num_layers, str(faceresnet_spec.keys()))
     block_type, layers, channels = faceresnet_spec[num_layers]
-    net = FaceResNet(layers, channels, num_classes, use_dropout)
+    net = FaceResNet(layers, channels, num_classes, use_dropout, bn_after_emb)
     if do_init:
         initializer = init.Xavier(rnd_type='gaussian', factor_type="out", magnitude=2)
         net.initialize(initializer)
@@ -2746,12 +2740,6 @@ class ArcMarginBlock(nn.Block):
             self.fc7_weight = self.params.get('fc7_weight', shape=(self.num_classes, self.emb_size))
             self.fc7_weight.initialize(init=init.Normal(0.01))
     
-    #def emb_size(self):
-    #    return self.emb_size
-
-    #def num_classes(self):
-    #    return self.num_classes
-        
     def forward(self, x, y):
 
         xnorm = np.linalg.norm(x, 'fro', 1, True) + 0.00001

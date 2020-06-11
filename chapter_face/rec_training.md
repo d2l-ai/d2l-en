@@ -20,7 +20,7 @@ To conduct a fast experiment, we just load a subset of `CASIA`, which contains 0
 ```{.python .input  n=2}
 dataset = "faces-casia-ultrasmall"
 data_dir = d2l.download_extract(dataset, dataset)
-batch_size = 512
+batch_size = 128
 image_size, num_classes = d2l.read_facerec_meta(data_dir)
 loader, val_set = d2l.load_data_face_rec(data_dir, ['lfw_small'], batch_size)
 print('image_size:', image_size)
@@ -69,11 +69,11 @@ net = TrainBlock(18, 256, num_classes, use_dropout)
 
 Now we can start training the model. 
 The loss function and accuracy calculation here are similar to those used in image classification.
-For a fast experiment, we just train 5 epochs. 
+For a fast experiment, we just train 3 epochs. 
 We can train more epochs on a larger dataset to achieve better performance.
 
 ```{.python .input  n=5}
-num_epochs, lr, wd, ctx = 5, 0.1, 5e-4, d2l.try_all_gpus()
+num_epochs, lr, wd, ctx = 3, 0.1, 5e-4, d2l.try_all_gpus()
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 net.collect_params().reset_ctx(ctx)
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
@@ -181,7 +181,7 @@ print('LFW-Small Accuracy:', lfw_acc)
 
 ## Exercises
 
-1. Train for more epochs and use learning-rate decay. Check the final verification accuracy.
+1. Train for more epochs, larger batch-size and use learning-rate decay. Check the final verification accuracy.
 2. Use larger datasets (e.g. `CASIA-Webface`) for training,  and check the verification result on the full `LFW` dataset.
 3. Use larger networks (e.g. `FaceResNet-50`) for training, and check the verification accuracy.
 4. Use different loss functions (e.g. Softmax, SphereFace and CosFace) for training, and check the verification accuracy.

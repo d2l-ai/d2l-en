@@ -1,7 +1,7 @@
 # Model Parallelism of Training ArcFace
 :label:`sec_facerecognition_paralltraining`\
 
-```{.python .input  n=2}
+```{.python .input  n=1}
 %matplotlib inline
 from d2l import mxnet as d2l
 import mxnet as mx
@@ -26,10 +26,10 @@ For example, if we have `N=1M` classes and 8 GPU cards, each GPU card will only 
 As we split the whole classification matrix into several sub-matrixs across the GPUs, 
 we need to implement some forward/backward methods by ourselves instead of calling the off-the-shelf functions.
 
-```{.python .input  n=3}
+```{.python .input  n=2}
 dataset = "faces-casia-ultrasmall"
 data_dir = d2l.download_extract(dataset, dataset)
-batch_size = 512
+batch_size = 128
 image_size, num_classes = d2l.read_facerec_meta(data_dir)
 loader, val_set = d2l.load_data_face_rec(data_dir, ['lfw_small'], batch_size)
 print('image_size:', image_size)
@@ -40,7 +40,7 @@ assert 'lfw_small' in val_set
 
 Initialize all GPU contexts, determine the number of classes per device, and calculate the class offset of each device:
 
-```{.python .input  n=5}
+```{.python .input  n=3}
 ctx = d2l.try_all_gpus()
 num_ctx = len(ctx)
 if num_classes % num_ctx==0:
@@ -60,13 +60,13 @@ print('class offsets:', ctx_class_start)
 
 Define the feature extraction block and initialize a network of 18 layers:
 
-```{.python .input  n=6}
+```{.python .input  n=4}
 class FeatBlock(nn.Block):
     def __init__(self, num_layers, emb_size, use_dropout, is_train, **kwargs):
         super(FeatBlock, self).__init__(**kwargs)
         with self.name_scope():
             self.feat_net = nn.Sequential(prefix='')
-            self.feat_net.add(d2l.get_faceresnet(num_layers, emb_size, use_dropout, do_init=is_train))
+            self.feat_net.add(d2l.get_faceresnet(num_layers, emb_size, use_dropout, bn_after_emb=False, do_init=is_train))
             self.is_train = is_train
 
     def forward(self, x):
@@ -90,7 +90,7 @@ net.collect_params().reset_ctx(ctx)
 
 To split the whole classification matrix into smaller ones over all GPU devices, we define one `ArcMarginBlock` per device:
 
-```{.python .input  n=8}
+```{.python .input  n=5}
 
 cls_nets = []
 for i in range(num_ctx):
@@ -102,7 +102,7 @@ for i in range(num_ctx):
 
 Use a MxNet NumPy array cache container:
 
-```{.python .input  n=9}
+```{.python .input  n=6}
 class NPCache():
     def __init__(self):
         self._cache = {}
@@ -140,7 +140,7 @@ Now we can start training the model and split the whole process into the followi
 
 We show sample codes below. For the detailed parallel training process, please check the d2l python package.
 
-```{.python .input  n=10}
+```{.python .input  n=7}
 tmp_ctx = ctx[0]
 cpu_ctx = mx.cpu()
 def forward_emb(data, label):
@@ -161,7 +161,7 @@ def forward_emb(data, label):
 
 To get partial logits from each device:
 
-```{.python .input  n=11}
+```{.python .input  n=8}
 def forward_logits(global_fc7, y):
     _xlist = []
     _ylist = []
@@ -188,8 +188,8 @@ def forward_logits(global_fc7, y):
 
 Start training the model. (Some detail parall training code was omitted here, please check d2l python package). For a large number of classes, we can significantly save GPU memory and the training time.
 
-```{.python .input  n=12}
-num_epochs = 5
+```{.python .input  n=9}
+num_epochs = 3
 
 d2l.train_ch_facerec_parall(net, cls_nets, loader, num_epochs, ctx)
 ```
@@ -198,13 +198,17 @@ d2l.train_ch_facerec_parall(net, cls_nets, loader, num_epochs, ctx)
 
 Face verification accuracy on `lfw_small`:
 
-```{.python .input  n=14}
+```{.python .input  n=10}
 test_net = FeatBlock(18, emb_size, use_dropout, is_train=False, params=net.collect_params())
 lfw_xnorm, lfw_acc, lfw_thresh = d2l.test_face_11(val_set['lfw_small'], test_net, ctx, batch_size)
-print('LFW-Small Accuracy:', lfw_acc)
+print('LFW-Small Accuracy:', lfw_acc, lfw_thresh, lfw_xnorm)
 ```
 
 ## Summary
 
 1. How to train ArcFace model by model parallelism.
 2. Model parallelism can significantly save GPU memory and speed up the training process.
+
+## Exercises
+
+1. Read the complete parall training codes in d2l python package.
