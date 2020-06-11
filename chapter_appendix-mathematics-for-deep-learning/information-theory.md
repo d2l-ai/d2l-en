@@ -53,6 +53,21 @@ def self_information(p):
 self_information(1/64)
 ```
 
+```{.python .input}
+#@tab pytorch
+import torch
+from torch.nn import NLLLoss
+
+def nansum(x):
+    # Define nansum, as pytorch doesn't offer it inbuilt.
+    return x[~torch.isnan(x)].sum()
+
+def self_information(p):
+    return -torch.log2(torch.tensor(p)).item()
+
+self_information(1/64)
+```
+
 ## Entropy 
 
 As self-information only measures the information of a single discrete event, we need a more generalized measure for any random variable of either discrete or continuous distribution. 
@@ -91,6 +106,17 @@ def entropy(p):
     return out
 
 entropy(np.array([0.1, 0.5, 0.1, 0.3]))
+```
+
+```{.python .input}
+#@tab pytorch
+def entropy(p):
+    entropy = - p * torch.log2(p)
+    # nansum will sum up the non-nan number
+    out = nansum(entropy)
+    return out
+
+entropy(torch.tensor([0.1, 0.5, 0.1, 0.3]))
 ```
 
 ### Interpretations
@@ -158,6 +184,17 @@ def joint_entropy(p_xy):
 joint_entropy(np.array([[0.1, 0.5], [0.1, 0.3]]))
 ```
 
+```{.python .input}
+#@tab pytorch
+def joint_entropy(p_xy):
+    joint_ent = -p_xy * torch.log2(p_xy)
+    # nansum will sum up the non-nan number
+    out = nansum(joint_ent)
+    return out
+
+joint_entropy(torch.tensor([[0.1, 0.5], [0.1, 0.3]]))
+```
+
 Notice that this is the same *code* as before, but now we interpret it differently as working on the joint distribution of the two random variables.
 
 
@@ -196,6 +233,19 @@ def conditional_entropy(p_xy, p_x):
     return out
 
 conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2, 0.8]))
+```
+
+```{.python .input}
+#@tab pytorch
+def conditional_entropy(p_xy, p_x):
+    p_y_given_x = p_xy/p_x
+    cond_ent = -p_xy * torch.log2(p_y_given_x)
+    # nansum will sum up the non-nan number
+    out = nansum(cond_ent)
+    return out
+
+conditional_entropy(torch.tensor([[0.1, 0.5], [0.2, 0.3]]), 
+                    torch.tensor([0.2, 0.8]))
 ```
 
 ### Mutual Information
@@ -239,6 +289,20 @@ def mutual_information(p_xy, p_x, p_y):
 mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]),
                    np.array([0.2, 0.8]),
                    np.array([[0.75, 0.25]]))
+```
+
+```{.python .input}
+#@tab pytorch
+def mutual_information(p_xy, p_x, p_y):
+    p = p_xy / (p_x * p_y)
+    mutual = p_xy * torch.log2(p)
+    # nansum will sum up the non-nan number
+    out = nansum(mutual)
+    return out
+
+mutual_information(torch.tensor([[0.1, 0.5], [0.1, 0.3]]),
+                   torch.tensor([0.2, 0.8]),
+                   torch.tensor([[0.75, 0.25]]))
 ```
 
 ### Properties of Mutual Information
@@ -291,6 +355,14 @@ def kl_divergence(p, q):
     return out.abs().asscalar()
 ```
 
+```{.python .input}
+#@tab pytorch
+def kl_divergence(p, q):
+    kl = p * torch.log2(p / q)
+    out = nansum(kl)
+    return out.abs().item()
+```
+
 ### KL Divergence Properties
 
 Let us take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
@@ -325,6 +397,20 @@ q1 = np.array(sorted(q1.asnumpy()))
 q2 = np.array(sorted(q2.asnumpy()))
 ```
 
+```{.python .input}
+#@tab pytorch
+torch.manual_seed(1)
+
+tensor_len = 10000
+p = torch.normal(0, 1, (tensor_len, ))
+q1 = torch.normal(-1, 1, (tensor_len, ))
+q2 = torch.normal(1, 1, (tensor_len, ))
+
+p = torch.sort(p)[0]
+q1 = torch.sort(q1)[0]
+q2 = torch.sort(q2)[0]
+```
+
 Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (i.e., $x=0$), we expect a similar value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. As you can see below, there is only a 1% off between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$.
 
 ```{.python .input}
@@ -335,9 +421,26 @@ similar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100
 kl_pq1, kl_pq2, similar_percentage
 ```
 
+```{.python .input}
+#@tab pytorch
+kl_pq1 = kl_divergence(p, q1)
+kl_pq2 = kl_divergence(p, q2)
+similar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100
+
+kl_pq1, kl_pq2, similar_percentage
+```
+
 In contrast, you may find that $D_{\mathrm{KL}}(q_2 \|p)$ and $D_{\mathrm{KL}}(p \| q_2)$ are off a lot, with around 40% off as shown below.
 
 ```{.python .input}
+kl_q2p = kl_divergence(q2, p)
+differ_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100
+
+kl_q2p, differ_percentage
+```
+
+```{.python .input}
+#@tab pytorch
 kl_q2p = kl_divergence(q2, p)
 differ_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100
 
@@ -383,11 +486,26 @@ def cross_entropy(y_hat, y):
     return ce.mean()
 ```
 
+```{.python .input}
+#@tab pytorch
+def cross_entropy(y_hat, y):
+    ce = -torch.log(y_hat[range(len(y_hat)), y])
+    return ce.mean()
+```
+
 Now define two tensors for the labels and predictions, and calculate the cross entropy loss of them.
 
 ```{.python .input}
 labels = np.array([0, 2])
 preds = np.array([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
+
+cross_entropy(preds, labels)
+```
+
+```{.python .input}
+#@tab pytorch
+labels = torch.tensor([0, 2])
+preds = torch.tensor([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
 
 cross_entropy(preds, labels)
 ```
@@ -450,6 +568,15 @@ To test the above proof, let us apply the built-in measure `NegativeLogLikelihoo
 nll_loss = NegativeLogLikelihood()
 nll_loss.update(labels.as_nd_ndarray(), preds.as_nd_ndarray())
 nll_loss.get()
+```
+
+```{.python .input}
+#@tab pytorch
+# Implementation of CrossEntropy loss in pytorch 
+# combines nn.LogSoftmax() and nn.NLLLoss().
+nll_loss = NLLLoss()
+loss = nll_loss(torch.log(preds), labels)
+loss
 ```
 
 ## Summary
