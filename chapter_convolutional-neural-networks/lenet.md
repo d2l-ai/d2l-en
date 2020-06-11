@@ -133,7 +133,6 @@ net = torch.nn.Sequential(
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
 # Note that we define this as a function so we can reuse later
 # and run it within `tf.distribute.MirroredStrategy`'s scope to
@@ -229,7 +228,7 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 ```{.python .input}
 #@tab tensorflow
 batch_size = 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size, append_last_dim=True)
 ```
 
 While convolutional networks have few parameters,
@@ -391,19 +390,16 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
     timer = d2l.Timer()
     timer.start()
-    history = net.fit(train_iter, epochs=5)
+    history = net.fit(train_iter, epochs=2).history
     train_loss = history['loss']
     train_acc = history['accuracy']
     test_acc = net.evaluate(test_iter, return_dict=True)['accuracy']
     timer.stop()
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
-    for i in range(train_loss):
+    for i in range(len(train_loss)):
         animator.add(i, (train_loss[i], train_acc[i], None))
-    for acc in test_acc:
-        animator.add(i, (None, None, acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_loss, train_acc, test_acc))
+    animator.add(i, (None, None, test_acc))
 ```
 
 Now let us train the model.
@@ -415,6 +411,12 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 ```{.python .input}
 #@tab pytorch
+lr, num_epochs = 0.9, 10
+train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+```{.python .input}
+#@tab tensorflow
 lr, num_epochs = 0.9, 10
 train_ch6(build_model, train_iter, test_iter, num_epochs, lr)
 ```

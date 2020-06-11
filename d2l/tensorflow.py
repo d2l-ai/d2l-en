@@ -192,10 +192,15 @@ def get_dataloader_workers(num_workers=4):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def load_data_fashion_mnist(batch_size, resize=None):  #@save
+def load_data_fashion_mnist(batch_size, resize=None, append_last_dim=False):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     # TODO: Resize
     (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
+    if append_last_dim:
+        mnist_train_x = tf.reshape(
+            mnist_train_x, (mnist_train_x.shape[0], mnist_train_x.shape[1], mnist_train_x.shape[2], 1))
+        mnist_test_x = tf.reshape(
+            mnist_test_x, (mnist_test_x.shape[0], mnist_test_x.shape[1], mnist_test_x.shape[2], 1))
     return (
         tf.data.Dataset.from_tensor_slices(
             (mnist_train_x, mnist_train_y)).batch(batch_size).shuffle(len(mnist_train_x)),
@@ -461,18 +466,15 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
     timer = d2l.Timer()
     timer.start()
-    history = net.fit(train_iter, epochs=5)
+    history = net.fit(train_iter, epochs=2).history
     train_loss = history['loss']
     train_acc = history['accuracy']
     test_acc = net.evaluate(test_iter, return_dict=True)['accuracy']
     timer.stop()
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
-    for i in range(train_loss):
+    for i in range(len(train_loss)):
         animator.add(i, (train_loss[i], train_acc[i], None))
-    for acc in test_acc:
-        animator.add(i, (None, None, acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_loss, train_acc, test_acc))
+    animator.add(i, (None, None, test_acc))
 
 
