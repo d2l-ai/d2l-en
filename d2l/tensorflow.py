@@ -445,3 +445,34 @@ def corr2d(X, K):  #@save
     return Y
 
 
+# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
+def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, 
+              device=d2l.try_gpu()):
+    """Train and evaluate a model with CPU or GPU."""
+    device_name = device._device_name
+    print('training on', device_name)
+    strategy = tf.distribute.MirroredStrategy(devices=[device_name])
+    with strategy.scope():
+        optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()
+        # Model building/compiling need to be within `strategy.scope()`
+        # in order to utilize the CPU/GPU devices that we have.
+        net = net_fn()
+        net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    timer = d2l.Timer()
+    timer.start()
+    history = net.fit(train_iter, epochs=5)
+    train_loss = history['loss']
+    train_acc = history['accuracy']
+    test_acc = net.evaluate(test_iter, return_dict=True)['accuracy']
+    timer.stop()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+                            legend=['train loss', 'train acc', 'test acc'])
+    for i in range(train_loss):
+        animator.add(i, (train_loss[i], train_acc[i], None))
+    for acc in test_acc:
+        animator.add(i, (None, None, acc))
+    print('loss %.3f, train acc %.3f, test acc %.3f' % (
+        train_loss, train_acc, test_acc))
+
+
