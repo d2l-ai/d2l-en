@@ -228,7 +228,7 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 ```{.python .input}
 #@tab tensorflow
 batch_size = 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size, append_last_dim=True)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 ```
 
 While convolutional networks have few parameters,
@@ -390,7 +390,7 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
     timer = d2l.Timer()
     timer.start()
-    history = net.fit(train_iter, epochs=2).history
+    history = net.fit(train_iter, epochs=num_epochs).history
     train_loss = history['loss']
     train_acc = history['accuracy']
     test_acc = net.evaluate(test_iter, return_dict=True)['accuracy']
