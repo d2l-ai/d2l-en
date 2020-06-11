@@ -486,8 +486,11 @@ net = nn.Sequential(
 ```{.python .input}
 #@tab tensorflow
 def net():
-    return tf.keras.models.Sequential(
-        [tf.keras.layers.Conv2D(filters=6, kernel_size=5),
+    # Note that this has to be a function that will be passed to `d2l.train_ch6()`
+    # so that model building/compiling need to be within `strategy.scope()`
+    # in order to utilize the CPU/GPU devices that we have.
+    return tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(filters=6, kernel_size=5, input_shape=(28, 28, 1)),
         BatchNorm(),
         tf.keras.layers.Activation('sigmoid'),
         tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
@@ -527,7 +530,10 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 #@tab tensorflow
 lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-# d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+# Note that here we set `mirrored=False` to disable the use
+# of `tf.distribute.MirroredStrategy` since our own `BatchNorm`
+# implementation does not support that yet. 
+net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, mirrored=False)
 ```
 
 Let us have a look at the scale parameter `gamma`
@@ -546,7 +552,7 @@ net[1].gamma.reshape((-1,)), net[1].beta.reshape((-1,))
 
 ```{.python .input}
 #@tab tensorflow
-# tf.reshape(net.layers[1].gamma, (-1,)), tf.reshape(net.layers[1].beta, (-1,))
+tf.reshape(net.layers[1].gamma, (-1,)), tf.reshape(net.layers[1].beta, (-1,))
 ```
 
 ## Concise Implementation
@@ -597,7 +603,7 @@ net = nn.Sequential(
 #@tab tensorflow
 
 def net():
-    net = tf.keras.models.Sequential([
+    return tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(filters=6, kernel_size=5, input_shape=(28, 28, 1)),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Activation('sigmoid'),
@@ -615,7 +621,6 @@ def net():
         tf.keras.layers.Activation('sigmoid'),
         tf.keras.layers.Dense(10, activation='sigmoid'),
     ])
-    return net
 ```
 
 Below, we use the same hyper-parameters to train out model.
@@ -634,7 +639,7 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 ```{.python .input}
 #@tab tensorflow
-#d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Controversy

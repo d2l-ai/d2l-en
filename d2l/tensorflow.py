@@ -192,15 +192,14 @@ def get_dataloader_workers(num_workers=4):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def load_data_fashion_mnist(batch_size, resize=None, append_last_dim=False):  #@save
+def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     # TODO: Resize
     (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
-    if append_last_dim:
-        mnist_train_x = tf.reshape(
-            mnist_train_x, (mnist_train_x.shape[0], mnist_train_x.shape[1], mnist_train_x.shape[2], 1))
-        mnist_test_x = tf.reshape(
-            mnist_test_x, (mnist_test_x.shape[0], mnist_test_x.shape[1], mnist_test_x.shape[2], 1))
+    mnist_train_x = tf.reshape(
+        mnist_train_x, (mnist_train_x.shape[0], mnist_train_x.shape[1], mnist_train_x.shape[2], 1))
+    mnist_test_x = tf.reshape(
+        mnist_test_x, (mnist_test_x.shape[0], mnist_test_x.shape[1], mnist_test_x.shape[2], 1))
     return (
         tf.data.Dataset.from_tensor_slices(
             (mnist_train_x, mnist_train_y)).batch(batch_size).shuffle(len(mnist_train_x)),
@@ -452,21 +451,29 @@ def corr2d(X, K):  #@save
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, 
-              device=d2l.try_gpu()):
+              device=d2l.try_gpu(), mirrored=True):
     """Train and evaluate a model with CPU or GPU."""
     device_name = device._device_name
     print('training on', device_name)
     strategy = tf.distribute.MirroredStrategy(devices=[device_name])
-    with strategy.scope():
+    # Model building/compiling need to be within `strategy.scope()`
+    # in order to utilize the CPU/GPU devices that we have
+    # if we want to perform training across multiple replicas on one
+    # machine using `tf.distribute.MirroredStrategy`.
+    if mirrored:
+        with strategy.scope():
+            optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+            loss = tf.keras.losses.SparseCategoricalCrossentropy()
+            net = net_fn()
+            net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    else:
         optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
         loss = tf.keras.losses.SparseCategoricalCrossentropy()
-        # Model building/compiling need to be within `strategy.scope()`
-        # in order to utilize the CPU/GPU devices that we have.
         net = net_fn()
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
     timer = d2l.Timer()
     timer.start()
-    history = net.fit(train_iter, epochs=2).history
+    history = net.fit(train_iter, epochs=num_epochs).history
     train_loss = history['loss']
     train_acc = history['accuracy']
     test_acc = net.evaluate(test_iter, return_dict=True)['accuracy']
@@ -476,5 +483,6 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
     for i in range(len(train_loss)):
         animator.add(i, (train_loss[i], train_acc[i], None))
     animator.add(i, (None, None, test_acc))
+    return net
 
 

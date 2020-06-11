@@ -282,10 +282,6 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     # TODO: Resize
     (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
-    mnist_train_x = tf.cast(mnist_train_x, dtype=tf.float32)
-    mnist_train_y = tf.cast(mnist_train_x, dtype=tf.float32)
-    #mnist_test_x = tf.cast(mnist_train_x, dtype=tf.int32)
-    #mnist_test_y = tf.cast(mnist_train_x, dtype=tf.int32)
     mnist_train_x = tf.reshape(
         mnist_train_x, (mnist_train_x.shape[0], mnist_train_x.shape[1], mnist_train_x.shape[2], 1))
     mnist_test_x = tf.reshape(

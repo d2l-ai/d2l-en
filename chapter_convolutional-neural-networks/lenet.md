@@ -376,16 +376,24 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
 #@tab tensorflow
 #@save
 def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, 
-              device=d2l.try_gpu()):
+              device=d2l.try_gpu(), mirrored=True):
     """Train and evaluate a model with CPU or GPU."""
     device_name = device._device_name
     print('training on', device_name)
     strategy = tf.distribute.MirroredStrategy(devices=[device_name])
-    with strategy.scope():
+    # Model building/compiling need to be within `strategy.scope()`
+    # in order to utilize the CPU/GPU devices that we have
+    # if we want to perform training across multiple replicas on one
+    # machine using `tf.distribute.MirroredStrategy`.
+    if mirrored:
+        with strategy.scope():
+            optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+            loss = tf.keras.losses.SparseCategoricalCrossentropy()
+            net = net_fn()
+            net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    else:
         optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
         loss = tf.keras.losses.SparseCategoricalCrossentropy()
-        # Model building/compiling need to be within `strategy.scope()`
-        # in order to utilize the CPU/GPU devices that we have.
         net = net_fn()
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
     timer = d2l.Timer()
@@ -400,6 +408,9 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
     for i in range(len(train_loss)):
         animator.add(i, (train_loss[i], train_acc[i], None))
     animator.add(i, (None, None, test_acc))
+    # Note that we have to return the trained model here since we built
+    # and compiled the model inside this function.
+    return net
 ```
 
 Now let us train the model.
