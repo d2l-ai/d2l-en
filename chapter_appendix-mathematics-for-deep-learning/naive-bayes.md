@@ -45,7 +45,8 @@ mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 
 ```{.python .input}
 #@tab pytorch
-data_transform = torchvision.transforms.Compose([transforms.ToTensor()])
+data_transform = torchvision.transforms.Compose(
+    [torchvision.transforms.ToTensor()])
 
 mnist_train = torchvision.datasets.MNIST(root='./temp', train=True,
                                          transform=data_transform, 
