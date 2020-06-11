@@ -2669,7 +2669,7 @@ class FaceResNet(nn.Block):
             return nn.Activation(self.act_type)
 
 
-    def __init__(self, layers, channels, classes, use_dropout, **kwargs):
+    def __init__(self, layers, channels, classes, use_dropout, bn_after_emb, **kwargs):
 
         super(FaceResNet,self).__init__(**kwargs)
         assert len(layers)==len(channels)-1
@@ -2692,6 +2692,8 @@ class FaceResNet(nn.Block):
                 self.features.add(nn.Dropout(0.4))
             self.features.add(nn.Flatten())
             self.features.add(nn.Dense(classes))
+            if bn_after_emb:
+                self.features.add(nn.BatchNorm(epsilon=2e-5))
 
     def _make_layer(self, block, layers, channels, stride, stage_index, in_channels=0):
         layer = nn.Sequential(prefix='stage%d_'%stage_index)
@@ -2712,12 +2714,12 @@ faceresnet_spec = {18: ('basic_block', [2, 2, 2, 2], [64, 64, 128, 256, 512]),
                    100: ('basic_block', [3, 13, 30, 3], [64, 64, 128, 256, 512])}
 
 # Constructor
-def get_faceresnet(num_layers, num_classes, use_dropout=False, do_init=True):
+def get_faceresnet(num_layers, num_classes, use_dropout=False, bn_after_emb=False, do_init=True):
     assert num_layers in faceresnet_spec, \
         "Invalid number of layers: %d. Options are %s"%(
             num_layers, str(faceresnet_spec.keys()))
     block_type, layers, channels = faceresnet_spec[num_layers]
-    net = FaceResNet(layers, channels, num_classes, use_dropout)
+    net = FaceResNet(layers, channels, num_classes, use_dropout, bn_after_emb)
     if do_init:
         initializer = init.Xavier(rnd_type='gaussian', factor_type="out", magnitude=2)
         net.initialize(initializer)

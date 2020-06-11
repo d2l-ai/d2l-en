@@ -29,7 +29,7 @@ we need to implement some forward/backward methods by ourselves instead of calli
 ```{.python .input  n=2}
 dataset = "faces-casia-ultrasmall"
 data_dir = d2l.download_extract(dataset, dataset)
-batch_size = 512
+batch_size = 128
 image_size, num_classes = d2l.read_facerec_meta(data_dir)
 loader, val_set = d2l.load_data_face_rec(data_dir, ['lfw_small'], batch_size)
 print('image_size:', image_size)
@@ -66,7 +66,7 @@ class FeatBlock(nn.Block):
         super(FeatBlock, self).__init__(**kwargs)
         with self.name_scope():
             self.feat_net = nn.Sequential(prefix='')
-            self.feat_net.add(d2l.get_faceresnet(num_layers, emb_size, use_dropout, do_init=is_train))
+            self.feat_net.add(d2l.get_faceresnet(num_layers, emb_size, use_dropout, bn_after_emb=False, do_init=is_train))
             self.is_train = is_train
 
     def forward(self, x):
@@ -189,7 +189,7 @@ def forward_logits(global_fc7, y):
 Start training the model. (Some detail parall training code was omitted here, please check d2l python package). For a large number of classes, we can significantly save GPU memory and the training time.
 
 ```{.python .input  n=9}
-num_epochs = 5
+num_epochs = 3
 
 d2l.train_ch_facerec_parall(net, cls_nets, loader, num_epochs, ctx)
 ```
@@ -201,7 +201,7 @@ Face verification accuracy on `lfw_small`:
 ```{.python .input  n=10}
 test_net = FeatBlock(18, emb_size, use_dropout, is_train=False, params=net.collect_params())
 lfw_xnorm, lfw_acc, lfw_thresh = d2l.test_face_11(val_set['lfw_small'], test_net, ctx, batch_size)
-print('LFW-Small Accuracy:', lfw_acc)
+print('LFW-Small Accuracy:', lfw_acc, lfw_thresh, lfw_xnorm)
 ```
 
 ## Summary
