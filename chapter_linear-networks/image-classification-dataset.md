@@ -204,7 +204,12 @@ train_iter = data.DataLoader(mnist_train, batch_size, shuffle=True,
 ```{.python .input}
 #@tab tensorflow
 batch_size = 256
-train_iter = tf.data.Dataset.from_tensor_slices((mnist_train_x, mnist_train_y)).batch(batch_size).shuffle(len(mnist_train_x))
+
+train_iter = (tf.data.Dataset.from_tensor_slices(
+    (mnist_train_x, mnist_train_y))
+    .batch(batch_size)
+    .shuffle(len(mnist_train_x))
+    .map(lambda x, y: (x, y), num_parallel_calls=get_dataloader_workers()))
 ```
 
 
