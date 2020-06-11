@@ -23,12 +23,13 @@ stage("Build and Publish") {
       pip list
       nvidia-smi
       """
-
-      sh label: "Check Execution Output", script: """set -ex
+      
+      sh label: "Sanity Check", script: """set -ex
       conda activate ${ENV_NAME}
       d2lbook build outputcheck
+      d2lbook build tabcheck
       """
-
+      
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
