@@ -340,6 +340,9 @@ net = nn.Sequential(
 from d2l import tensorflow as d2l
 import tensorflow as tf
 
+# Note that this has to be a function that will be passed to `d2l.train_ch6()`
+# so that model building/compiling need to be within `strategy.scope()`
+# in order to utilize the CPU/GPU devices that we have.
 def net():
     return tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4, activation='relu'),
@@ -440,7 +443,7 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```{.python .input}
 #@tab tensorflow
 lr, num_epochs = 0.01, 10
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+#d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary

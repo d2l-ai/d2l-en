@@ -200,11 +200,14 @@ def load_data_fashion_mnist(batch_size, resize=None):   #@save
     mnist_test_x = tf.reshape(
         mnist_test_x, (mnist_test_x.shape[0], mnist_test_x.shape[1], mnist_test_x.shape[2], 1))
     def map_fn(x, y):
-        if isinstance(resize, (list, tuple)) and len(resize) == 2:
-            height, width = resize[0], resize[1]
+        if resize is not None:
+            if isinstance(resize, (list, tuple)) and len(resize) == 2:
+                height, width = resize[0], resize[1]
+            else:
+                height = width = resize
+            return tf.image.resize_with_pad(x, height, width), y
         else:
-            height = width = resize
-        return tf.image.resize_with_pad(x, height, width), y
+            return (x, y)
     return (
         tf.data.Dataset.from_tensor_slices(
             (mnist_train_x, mnist_train_y)).batch(batch_size).map(map_fn),

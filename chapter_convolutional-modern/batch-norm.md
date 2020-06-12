@@ -485,10 +485,10 @@ net = nn.Sequential(
 
 ```{.python .input}
 #@tab tensorflow
+# Recall that this has to be a function that will be passed to `d2l.train_ch6()`
+# so that model building/compiling need to be within `strategy.scope()`
+# in order to utilize the CPU/GPU devices that we have.
 def net():
-    # Note that this has to be a function that will be passed to `d2l.train_ch6()`
-    # so that model building/compiling need to be within `strategy.scope()`
-    # in order to utilize the CPU/GPU devices that we have.
     return tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(filters=6, kernel_size=5, input_shape=(28, 28, 1)),
         BatchNorm(),
