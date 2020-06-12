@@ -3,7 +3,7 @@
 
 Now that we have learned how to work with probability in both the discrete and the continuous setting, let us get to know some of the common distributions encountered.  Depending on the area of machine learning, we may need to be familiar with vastly more of these, or for some areas of deep learning potentially none at all.  This is, however, a good basic list to be familiar with.  Let us first import some common libraries.
 
-```{.python .input  n=5}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -11,7 +11,7 @@ from math import erf, factorial
 import numpy as np
 ```
 
-```{.python .input  n=17}
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -37,7 +37,7 @@ $$F(x) = \begin{cases} 0 & x < 0, \\ 1-p & 0 \le x < 1, \\ 1 & x >= 1 . \end{cas
 
 The probability mass function is plotted below.
 
-```{.python .input  n=18}
+```{.python .input}
 #@tab all
 p = 0.3
 
@@ -50,7 +50,7 @@ d2l.plt.show()
 
 Now, let us plot the cumulative distribution function :eqref:`eq_bernoulli_cdf`.
 
-```{.python .input  n=6}
+```{.python .input}
 x = np.arange(-1, 2, 0.01)
 
 def F(x):
@@ -59,7 +59,7 @@ def F(x):
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-```{.python .input  n=19}
+```{.python .input}
 #@tab pytorch
 x = torch.arange(-1, 2, 0.01)
 
@@ -76,11 +76,11 @@ If $X \sim \mathrm{Bernoulli}(p)$, then:
 
 We can sample an array of arbitrary shape from a Bernoulli random variable as follows.
 
-```{.python .input  n=10}
+```{.python .input}
 1*(np.random.rand(10, 10) < p)
 ```
 
-```{.python .input  n=20}
+```{.python .input}
 #@tab pytorch
 1*(torch.randn(10, 10) < p)
 ```
@@ -100,7 +100,7 @@ $$F(x) = \begin{cases} 0 & x < 1, \\ \frac{k}{n} & k \le x < k+1 \text{ with } 1
 
 Let us first plot the probability mass function.
 
-```{.python .input  n=21}
+```{.python .input}
 #@tab all
 n = 5
 
@@ -121,7 +121,7 @@ def F(x):
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-```{.python .input  n=22}
+```{.python .input}
 #@tab pytorch
 x = torch.arange(-1, 6, 0.01)
 
@@ -138,11 +138,11 @@ If $X \sim \mathrm{Uniform}(n)$, then:
 
 We can sample an array of arbitrary shape from a discrete uniform random variable as follows.
 
-```{.python .input  n=14}
+```{.python .input}
 np.random.randint(1, n, size=(10, 10))
 ```
 
-```{.python .input  n=23}
+```{.python .input}
 #@tab pytorch
 torch.randint(1, n, size=(10, 10))
 ```
@@ -167,7 +167,7 @@ $$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a, b], \\ 1 & x >=
 
 Let us first plot the probability density function :eqref:`eq_cont_uniform_pdf`.
 
-```{.python .input  n=27}
+```{.python .input}
 a, b = 1, 3
 
 x = np.arange(0, 4, 0.01)
@@ -176,7 +176,7 @@ p = (x > a)*(x < b)/(b - a)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-```{.python .input  n=29}
+```{.python .input}
 #@tab pytorch
 a, b = 1, 3
 
@@ -187,14 +187,14 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 
 Now, let us plot the cumulative distribution function :eqref:`eq_cont_uniform_cdf`.
 
-```{.python .input  n=31}
+```{.python .input}
 def F(x):
     return 0 if x < a else 1 if x > b else (x - a) / (b - a)
 
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-```{.python .input  n=30}
+```{.python .input}
 #@tab pytorch
 def F(x):
     return 0 if x < a else 1 if x > b else (x - a) / (b - a)
@@ -213,7 +213,7 @@ We can sample an array of arbitrary shape from a uniform random variable as foll
 (b - a) * np.random.rand(10, 10) + a
 ```
 
-```{.python .input  n=32}
+```{.python .input}
 #@tab pytorch
 (b - a) * torch.randn(10, 10) + a
 ```
@@ -259,7 +259,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-```{.python .input  n=33}
+```{.python .input}
 #@tab pytorch
 n, p = 10, 0.2
 
@@ -280,7 +280,7 @@ d2l.plt.show()
 
 Now, let us plot the cumulative distribution function :eqref:`eq_binomial_cdf`.
 
-```{.python .input  n=36}
+```{.python .input}
 x = np.arange(-1, 11, 0.01)
 cmf = np.cumsum(pmf)
 
@@ -290,7 +290,7 @@ def F(x):
 d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
 
-```{.python .input  n=35}
+```{.python .input}
 #@tab pytorch
 x = torch.arange(-1, 11, 0.01)
 cmf = torch.cumsum(pmf, dim=0)
@@ -308,11 +308,11 @@ While this result is not simple, the means and variances are.  If $X \sim \mathr
 
 This can be sampled as follows.
 
-```{.python .input  n=40}
+```{.python .input}
 np.random.binomial(n, p, size=(10, 10))
 ```
 
-```{.python .input  n=42}
+```{.python .input}
 #@tab pytorch
 m = torch.distributions.binomial.Binomial(n, p)
 m.sample(sample_shape=(10, 10))
@@ -364,7 +364,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-```{.python .input  n=43}
+```{.python .input}
 #@tab pytorch
 lam = 5.0
 
@@ -389,7 +389,7 @@ def F(x):
 d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
 
-```{.python .input  n=44}
+```{.python .input}
 #@tab pytorch
 x = torch.arange(-1, 21, 0.01)
 cmf = torch.cumsum(pmf, dim=0)
