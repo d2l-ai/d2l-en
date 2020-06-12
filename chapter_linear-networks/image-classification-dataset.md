@@ -197,7 +197,7 @@ In addition, it accepts an optional argument to resize images to another shape.
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     dataset = gluon.data.vision
-        trans = [dataset.transforms.ToTensor()]
+    trans = [dataset.transforms.ToTensor()]
     if resize:
         trans.insert(0, dataset.transforms.Resize(resize))
     trans = dataset.transforms.Compose(trans)
