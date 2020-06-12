@@ -178,7 +178,7 @@ for layer in net:
 ```
 
 ```{.python .input}
-#@tab pytorch
+#@tab tensorflow
 X = tf.random.uniform((1, 224, 224, 1))
 for layer in net().layers:
     X = layer(X)
