@@ -192,19 +192,26 @@ def get_dataloader_workers(num_workers=4):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def load_data_fashion_mnist(batch_size, resize=None, append_last_dim=False):  #@save
+def load_data_fashion_mnist(batch_size, resize=None):   #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
-    # TODO: Resize
     (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
-    if append_last_dim:
-        mnist_train_x = tf.reshape(
-            mnist_train_x, (mnist_train_x.shape[0], mnist_train_x.shape[1], mnist_train_x.shape[2], 1))
-        mnist_test_x = tf.reshape(
-            mnist_test_x, (mnist_test_x.shape[0], mnist_test_x.shape[1], mnist_test_x.shape[2], 1))
+    mnist_train_x = tf.reshape(
+        mnist_train_x, (mnist_train_x.shape[0], mnist_train_x.shape[1], mnist_train_x.shape[2], 1))
+    mnist_test_x = tf.reshape(
+        mnist_test_x, (mnist_test_x.shape[0], mnist_test_x.shape[1], mnist_test_x.shape[2], 1))
+    def map_fn(x, y):
+        if resize is not None:
+            if isinstance(resize, (list, tuple)) and len(resize) == 2:
+                height, width = resize[0], resize[1]
+            else:
+                height = width = resize
+            return tf.image.resize_with_pad(x, height, width), y
+        else:
+            return (x, y)
     return (
         tf.data.Dataset.from_tensor_slices(
-            (mnist_train_x, mnist_train_y)).batch(batch_size).shuffle(len(mnist_train_x)),
-        tf.data.Dataset.from_tensor_slices((mnist_test_x, mnist_test_y)).batch(batch_size))
+            (mnist_train_x, mnist_train_y)).batch(batch_size).map(map_fn),
+        tf.data.Dataset.from_tensor_slices((mnist_test_x, mnist_test_y)).batch(batch_size).map(map_fn))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -452,21 +459,29 @@ def corr2d(X, K):  #@save
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, 
-              device=d2l.try_gpu()):
+              device=d2l.try_gpu(), mirrored=True):
     """Train and evaluate a model with CPU or GPU."""
     device_name = device._device_name
     print('training on', device_name)
     strategy = tf.distribute.MirroredStrategy(devices=[device_name])
-    with strategy.scope():
+    # Model building/compiling need to be within `strategy.scope()`
+    # in order to utilize the CPU/GPU devices that we have
+    # if we want to perform training across multiple replicas on one
+    # machine using `tf.distribute.MirroredStrategy`.
+    if mirrored:
+        with strategy.scope():
+            optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+            loss = tf.keras.losses.SparseCategoricalCrossentropy()
+            net = net_fn()
+            net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    else:
         optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
         loss = tf.keras.losses.SparseCategoricalCrossentropy()
-        # Model building/compiling need to be within `strategy.scope()`
-        # in order to utilize the CPU/GPU devices that we have.
         net = net_fn()
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
     timer = d2l.Timer()
     timer.start()
-    history = net.fit(train_iter, epochs=2).history
+    history = net.fit(train_iter, epochs=num_epochs).history
     train_loss = history['loss']
     train_acc = history['accuracy']
     test_acc = net.evaluate(test_iter, return_dict=True)['accuracy']
@@ -476,5 +491,32 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
     for i in range(len(train_loss)):
         animator.add(i, (train_loss[i], train_acc[i], None))
     animator.add(i, (None, None, test_acc))
+    # Note that we have to return the trained model here since we built
+    # and compiled the model inside this function.
+    return net
+
+
+# Defined in file: ./chapter_convolutional-modern/resnet.md
+class Residual(tf.keras.Model):  #@save
+    def __init__(self, num_channels, use_1x1conv=False, strides=1):
+        super().__init__()
+        self.conv1 = tf.keras.layers.Conv2D(
+            num_channels, padding='same', kernel_size=3, strides=strides)
+        self.conv2 = tf.keras.layers.Conv2D(
+            num_channels, kernel_size=3,padding='same')
+        self.conv3 = None
+        if use_1x1conv:
+            self.conv3 = tf.keras.layers.Conv2D(
+                num_channels, kernel_size=1, strides=strides)
+        self.bn1 = tf.keras.layers.BatchNormalization()
+        self.bn2 = tf.keras.layers.BatchNormalization()
+
+    def call(self, X):
+        Y = tf.keras.activations.relu(self.bn1(self.conv1(X)))
+        Y = self.bn2(self.conv2(Y))
+        if self.conv3 is not None:
+            X = self.conv3(X)
+        Y += X
+        return tf.keras.activations.relu(Y + X)
 
 
