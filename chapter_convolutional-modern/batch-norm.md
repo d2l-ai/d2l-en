@@ -285,6 +285,18 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     return Y, moving_mean, moving_var
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+# TODO: Check whether it's necessary to re-implement from scatch here.
+def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
+    return tf.nn.batch_normalization(
+        X, mean=moving_mean, variance=moving_var,
+        offset=beta, scale=gamma, variance_epsilon=eps)
+```
+
 We can now create a proper `BatchNorm` layer.
 Our layer will maintain proper parameters 
 corresponding for scale `gamma` and shift `beta`,
@@ -373,6 +385,65 @@ class BatchNorm(nn.Module):
         return Y
 ```
 
+```{.python .input}
+#@tab tensorflow
+class BatchNorm(tf.keras.layers.Layer):
+    def __init__(self, **kwargs):
+        super(BatchNorm, self).__init__(**kwargs)
+
+    def build(self, input_shape):
+        weight_shape = [input_shape[-1], ]
+        self.gamma = self.add_weight(
+            name='gamma',
+            shape=weight_shape,
+            initializer=tf.initializers.ones,
+            trainable=True)
+        self.beta = self.add_weight(
+            name='beta',
+            shape=weight_shape,
+            initializer=tf.initializers.zeros,
+            trainable=True)
+        self.moving_mean = self.add_weight(
+            name='moving_mean',
+            shape=weight_shape,
+            initializer=tf.initializers.zeros,
+            trainable=False)
+        self.moving_variance = self.add_weight(
+            name='moving_variance',
+            shape=weight_shape,
+            initializer=tf.initializers.ones,
+            trainable=False)
+        super(BatchNorm, self).build(input_shape)
+
+    def assign_moving_average(self, variable, value):
+        decay = 0.9
+        delta = variable * decay + value * (1 - decay)
+        return variable.assign(delta)
+
+    @tf.function
+    def call(self, inputs, training):
+        if training:
+            batch_mean, batch_variance = tf.nn.moments(
+                inputs, list(range(len(inputs.shape) - 1)))
+            mean_update = self.assign_moving_average(
+                self.moving_mean, batch_mean)
+            variance_update = self.assign_moving_average(
+                self.moving_variance, batch_variance)
+            self.add_update(mean_update)
+            self.add_update(variance_update)
+            mean, variance = batch_mean, batch_variance
+        else:
+            mean, variance = self.moving_mean, self.moving_variance
+        output = tf.nn.batch_normalization(
+            inputs,
+            mean=mean,
+            variance=variance,
+            offset=self.beta,
+            scale=self.gamma,
+            variance_epsilon=1e-5)
+        return output
+```
+
 ## Using a Batch Normalization LeNet
 
 To see how to apply `BatchNorm` in context, 
@@ -412,6 +483,32 @@ net = nn.Sequential(
     nn.Linear(84, 10))
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Recall that this has to be a function that will be passed to `d2l.train_ch6()`
+# so that model building/compiling need to be within `strategy.scope()`
+# in order to utilize the CPU/GPU devices that we have.
+def net():
+    return tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(filters=6, kernel_size=5, input_shape=(28, 28, 1)),
+        BatchNorm(),
+        tf.keras.layers.Activation('sigmoid'),
+        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.Conv2D(filters=16, kernel_size=5),
+        BatchNorm(),
+        tf.keras.layers.Activation('sigmoid'),
+        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(120),
+        BatchNorm(),
+        tf.keras.layers.Activation('sigmoid'),
+        tf.keras.layers.Dense(84),
+        BatchNorm(),
+        tf.keras.layers.Activation('sigmoid'),
+        tf.keras.layers.Dense(10, activation='sigmoid')]
+    )
+```
+
 As before, we will train our network on the Fashion-MNIST dataset.
 This code is virtually identical to that when we first trained LeNet (:numref:`sec_lenet`).
 The main difference is the considerably larger learning rate.
@@ -429,6 +526,16 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
+```{.python .input}
+#@tab tensorflow
+lr, num_epochs, batch_size = 1.0, 10, 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+# Note that here we set `mirrored=False` to disable the use
+# of `tf.distribute.MirroredStrategy` since our own `BatchNorm`
+# implementation does not support that yet. 
+net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, mirrored=False)
+```
+
 Let us have a look at the scale parameter `gamma`
 and the shift parameter `beta` learned
 from the first batch normalization layer.
@@ -441,6 +548,11 @@ net[1].gamma.data().reshape(-1,), net[1].beta.data().reshape(-1,)
 #@tab pytorch
 net[1].gamma.reshape((-1,)), net[1].beta.reshape((-1,))
 
+```
+
+```{.python .input}
+#@tab tensorflow
+tf.reshape(net.layers[1].gamma, (-1,)), tf.reshape(net.layers[1].beta, (-1,))
 ```
 
 ## Concise Implementation
@@ -486,6 +598,31 @@ net = nn.Sequential(
     nn.Linear(84, 10))
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+
+def net():
+    return tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(filters=6, kernel_size=5, input_shape=(28, 28, 1)),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Activation('sigmoid'),
+        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.Conv2D(filters=16, kernel_size=5),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Activation('sigmoid'),
+        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(120),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Activation('sigmoid'),
+        tf.keras.layers.Dense(84),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Activation('sigmoid'),
+        tf.keras.layers.Dense(10, activation='sigmoid'),
+    ])
+```
+
 Below, we use the same hyper-parameters to train out model.
 Note that as usual, the Gluon variant runs much faster
 because its code has been compiled to C++/CUDA
@@ -497,6 +634,11 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 ```{.python .input}
 #@tab pytorch
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+```{.python .input}
+#@tab tensorflow
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
