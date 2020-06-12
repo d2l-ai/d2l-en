@@ -397,7 +397,7 @@ for epoch in range(num_epochs):
     # and y respectively
     for X, y in data_iter(batch_size, features, labels):
         l = loss(net(X, w, b), y)  # Minibatch loss in X and y
-        l.mean().backward()  # Compute gradient on l with respect to [w,b]
+        l.sum().backward()  # Compute gradient on l with respect to [w,b]
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     with torch.no_grad():
         train_l = loss(net(features, w, b), labels)
