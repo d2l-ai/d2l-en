@@ -110,16 +110,7 @@ To verify that it is working, we can read and print
 the first minibatch of instances. Comparing to :numref:`sec_linear_scratch`, here we use `iter` to construct an Python iterator and then use `next` to obtain the first item from the iterator.
 
 ```{.python .input}
-next(iter(data_iter))
-```
-
-```{.python .input}
-#@tab pytorch
-next(iter(data_iter))
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 next(iter(data_iter))
 ```
 

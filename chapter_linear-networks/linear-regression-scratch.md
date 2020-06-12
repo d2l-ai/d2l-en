@@ -115,16 +115,7 @@ Note that each row in `features` consists of a 2-dimensional data point
 and that each row in `labels` consists of a 1-dimensional target value (a scalar).
 
 ```{.python .input}
-print('features:', features[0],'\nlabel:', labels[0])
-```
-
-```{.python .input}
-#@tab pytorch
-print('features:', features[0],'\nlabel:', labels[0])
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 print('features:', features[0],'\nlabel:', labels[0])
 ```
 
@@ -132,20 +123,9 @@ By generating a scatter plot using the second feature `features[:, 1]` and `labe
 we can clearly observe the linear correlation between the two.
 
 ```{.python .input}
+#@tab all
 d2l.set_figsize((3.5, 2.5))
-d2l.plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
-```
-
-```{.python .input}
-#@tab pytorch
-d2l.set_figsize((3.5, 2.5))
-d2l.plt.scatter(features[:, 1].numpy(), labels.numpy(), 1);
-```
-
-```{.python .input}
-#@tab tensorflow
-d2l.set_figsize((3.5, 2.5))
-d2l.plt.scatter(features[:, 1].numpy(), labels.numpy(), 1);
+d2l.plt.scatter(d2l.numpy(features[:, 1]), d2l.numpy(labels), 1);
 ```
 
 ## Reading the Dataset
@@ -216,24 +196,7 @@ both the minibatch size and the number of input features.
 Likewise, our minibatch of labels will have a shape given by `batch_size`.
 
 ```{.python .input}
-batch_size = 10
-
-for X, y in data_iter(batch_size, features, labels):
-    print(X, '\n', y)
-    break
-```
-
-```{.python .input}
-#@tab pytorch
-batch_size = 10
-
-for X, y in data_iter(batch_size, features, labels):
-    print(X, '\n', y)
-    break
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 batch_size = 10
 
 for X, y in data_iter(batch_size, features, labels):
@@ -338,12 +301,7 @@ The result returned by the following function
 will also be the same as the `y_hat` shape.
 
 ```{.python .input}
-def squared_loss(y_hat, y):  #@save
-    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 def squared_loss(y_hat, y):  #@save
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
@@ -503,12 +461,7 @@ with those that we learned through our training loop.
 Indeed they turn out to be very close to each other.
 
 ```{.python .input}
-print('Error in estimating w', true_w - w.reshape(true_w.shape))
-print('Error in estimating b', true_b - b)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 print('Error in estimating w', true_w - w.reshape(true_w.shape))
 print('Error in estimating b', true_b - b)
 ```

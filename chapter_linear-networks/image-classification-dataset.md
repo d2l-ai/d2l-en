@@ -103,9 +103,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
     for i, (ax, img) in enumerate(zip(axes, imgs)):        
-        if 'asnumpy' in dir(img): img = img.asnumpy() 
-        if 'numpy' in dir(img): img = img.numpy()
-        ax.imshow(img)
+        ax.imshow(d2l.numpy(img))
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
         if titles:

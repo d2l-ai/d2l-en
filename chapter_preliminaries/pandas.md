@@ -17,10 +17,7 @@ As an example, we begin by creating an artificial dataset that is stored in a
 csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other
 formats may be processed in similar ways.
 The following `mkdir_if_not_exist`
-function ensures that the directory `../data` exists. The comment `#@save`
-is a special mark where the following function,
-class, or import statements are also saved in the `d2l` package so that later we can
-directly invoke the `mkdir_if_not_exist` function without redefining it.
+function ensures that the directory `../data` exists. 
 
 ```{.python .input}
 #@tab all
@@ -118,7 +115,6 @@ import tensorflow as tf
 X, y = tf.constant(inputs.values), tf.constant(outputs.values)
 X, y
 ```
-
 
 ## Summary
 

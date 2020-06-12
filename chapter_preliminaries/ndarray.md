@@ -109,7 +109,6 @@ by inspecting its `shape` property.
 x.shape
 ```
 
-
 If we just want to know the total number of elements in a tensor,
 i.e., the product of all of the shape elements,
 we can inspect its size.
@@ -452,9 +451,7 @@ selects the second and the third elements as follows:
 x[-1], x[1:3]
 ```
 
-
 Beyond reading, we can also write elements of a matrix by specifying indices.
-
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -578,7 +575,7 @@ Converting to a NumPy tensor, or vice versa, is easy.
 The converted result does not share memory.
 This minor inconvenience is actually quite important:
 when you perform operations on the CPU or on GPUs,
-you do not want MXNet to halt computation, waiting to see
+you do not want to halt computation, waiting to see
 whether the NumPy package of Python might want to be doing something else
 with the same chunk of memory.
 
@@ -600,6 +597,18 @@ type(a), type(b)
 a = x.numpy()
 b = tf.constant(a)
 type(a), type(b)
+```
+
+We define the `numpy` method converts a tensor into a NumPy ndarray.
+The comment `#@save` is a special mark where the following function,
+class, or import statements are also saved in the `d2l` package so that later we can
+directly invoke the `d2l.numpy` function without redefining it.
+
+```{.python .input}
+#@tab all
+def numpy(a):  #@save
+    """Convert a tensor into a NumPy ndarray"""
+    return a.numpy() if 'numpy' in dir(a) else a.asnumpy()
 ```
 
 To convert a size-1 tensor to a Python scalar,

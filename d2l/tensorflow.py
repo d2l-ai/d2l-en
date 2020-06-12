@@ -23,7 +23,12 @@ import requests
 
 d2l = sys.modules[__name__]
 
-
+# Defined in file: ./chapter_preliminaries/ndarray.md
+def numpy(a):  #@save
+    """Convert a tensor into a NumPy ndarray"""
+    if 'numpy' in dir(a): return a.numpy()
+    if 'asnumpy' in dir(a): return a.asnumpy()
+    
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
     if not isinstance(path, str):
