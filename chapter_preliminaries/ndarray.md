@@ -105,18 +105,10 @@ We can access a tensor's *shape* (the length along each axis)
 by inspecting its `shape` property.
 
 ```{.python .input}
+#@tab all
 x.shape
 ```
 
-```{.python .input}
-#@tab pytorch
-x.shape
-```
-
-```{.python .input}
-#@tab tensorflow
-x.shape
-```
 
 If we just want to know the total number of elements in a tensor,
 i.e., the product of all of the shape elements,
@@ -150,13 +142,8 @@ the elements in `x` have not.
 Note that the size is unaltered by reshaping.
 
 ```{.python .input}
+#@tab mxnet, pytorch
 x = x.reshape(3, 4)
-x
-```
-
-```{.python .input}
-#@tab pytorch
-x = x.reshape((3, 4))
 x
 ```
 
@@ -382,27 +369,14 @@ meaning that the logical statement `x == y` is true at that position;
 otherwise that position takes 0.
 
 ```{.python .input}
-x == y
-```
-
-```{.python .input}
-#@tab pytorch
-x == y
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 x == y
 ```
 
 Summing all the elements in the tensor yields a tensor with only one element.
 
 ```{.python .input}
-x.sum()
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 x.sum()
 ```
 
@@ -457,16 +431,7 @@ and for matrix `b` it replicates the rows
 before adding up both elementwise.
 
 ```{.python .input}
-a + b
-```
-
-```{.python .input}
-#@tab pytorch
-a + b
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 a + b
 ```
 
@@ -483,28 +448,16 @@ Thus, `[-1]` selects the last element and `[1:3]`
 selects the second and the third elements as follows:
 
 ```{.python .input}
+#@tab all
 x[-1], x[1:3]
 ```
 
-```{.python .input}
-#@tab pytorch
-x[-1], x[1:3]
-```
-
-```{.python .input}
-#@tab tensorflow
-x[-1], x[1:3]
-```
 
 Beyond reading, we can also write elements of a matrix by specifying indices.
 
-```{.python .input}
-x[1, 2] = 9
-x
-```
 
 ```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 x[1, 2] = 9
 x
 ```
@@ -524,12 +477,7 @@ this obviously also works for vectors
 and for tensors of more than 2 dimensions.
 
 ```{.python .input}
-x[0:2, :] = 12
-x
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 x[0:2, :] = 12
 x
 ```
@@ -557,20 +505,7 @@ allocating new memory for the result and then makes `y`
 point to this new location in memory.
 
 ```{.python .input}
-before = id(y)
-y = y + x
-id(y) == before
-```
-
-```{.python .input}
-#@tab pytorch
-before = id(y)
-y = y + x
-id(y) == before
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 before = id(y)
 y = y + x
 id(y) == before
@@ -624,13 +559,7 @@ we can also use `x[:] = x + y` or `x += y`
 to reduce the memory overhead of the operation.
 
 ```{.python .input}
-before = id(x)
-x += y
-id(x) == before
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 before = id(x)
 x += y
 id(x) == before
