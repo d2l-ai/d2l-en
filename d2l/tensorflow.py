@@ -183,35 +183,20 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_dataloader_workers(num_workers=4):  #@save
-    # 0 means no additional process is used to speed up the reading of data.
-    if sys.platform.startswith('win'):
-        return 0
-    else:
-        return num_workers
-
-
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def load_data_fashion_mnist(batch_size, resize=None):   #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
-    (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
-    mnist_train_x = tf.reshape(
-        mnist_train_x, (mnist_train_x.shape[0], mnist_train_x.shape[1], mnist_train_x.shape[2], 1))
-    mnist_test_x = tf.reshape(
-        mnist_test_x, (mnist_test_x.shape[0], mnist_test_x.shape[1], mnist_test_x.shape[2], 1))
-    def map_fn(x, y):
-        if resize is not None:
-            if isinstance(resize, (list, tuple)) and len(resize) == 2:
-                height, width = resize[0], resize[1]
-            else:
-                height = width = resize
-            return tf.image.resize_with_pad(x, height, width), y
-        else:
-            return (x, y)
+    mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
+    # Divides all numbers by 255 so that all pixel values are between 
+    # 0 and 1, add a batch dimension at the last. And cast label to int32.
+    process = lambda X, y: (tf.expand_dims(X, axis=3)/255, 
+                            tf.cast(y, dtype='int32'))
+    resize_fn = lambda X, y: (
+        tf.image.resize_with_pad(X, resize, resize) if resize else X, y)
     return (
-        tf.data.Dataset.from_tensor_slices(
-            (mnist_train_x, mnist_train_y)).batch(batch_size).map(map_fn),
-        tf.data.Dataset.from_tensor_slices((mnist_test_x, mnist_test_y)).batch(batch_size).map(map_fn))
+        tf.data.Dataset.from_tensor_slices(process(*mnist_train)).batch(
+            batch_size).shuffle(len(mnist_train[0])).map(resize_fn),
+        tf.data.Dataset.from_tensor_slices(process(*mnist_test)).batch(
+            batch_size).map(resize_fn))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md

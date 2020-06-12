@@ -232,15 +232,16 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 def load_data_fashion_mnist(batch_size, resize=None):   #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
-    # Add a batch dimension at the last.
-    mnist_train = (tf.expand_dims(mnist_train[0], axis=3), mnist_train[1])
-    mnist_test = (tf.expand_dims(mnist_test[0], axis=3), mnist_test[1])    
-    resize_fn = lambda x, y: (
-        tf.image.resize_with_pad(x, resize, resize) if resize else x, y)
+    # Divides all numbers by 255 so that all pixel values are between 
+    # 0 and 1, add a batch dimension at the last. And cast label to int32.
+    process = lambda X, y: (tf.expand_dims(X, axis=3)/255, 
+                            tf.cast(y, dtype='int32'))
+    resize_fn = lambda X, y: (
+        tf.image.resize_with_pad(X, resize, resize) if resize else X, y)
     return (
-        tf.data.Dataset.from_tensor_slices(mnist_train).batch(
+        tf.data.Dataset.from_tensor_slices(process(*mnist_train)).batch(
             batch_size).shuffle(len(mnist_train[0])).map(resize_fn),
-        tf.data.Dataset.from_tensor_slices(mnist_test).batch(
+        tf.data.Dataset.from_tensor_slices(process(*mnist_test)).batch(
             batch_size).map(resize_fn))
 ```
 
