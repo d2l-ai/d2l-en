@@ -27,17 +27,15 @@ import torch
 import torchvision
 from torchvision import transforms
 from torch.utils import data
-import sys
 
 d2l.use_svg_display()
 ```
 
-```{.python .input  n=14}
+```{.python .input  n=1}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
-import sys
 
 d2l.use_svg_display()
 ```
@@ -116,7 +114,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
 ```
 
 Here are the images and their corresponding labels (in text)
-for the first few examples in the training dataset. 
+for the first few examples in the training dataset.
 
 ```{.python .input}
 X, y = mnist_train[:18]
@@ -142,7 +140,7 @@ To make our life easier when reading from the training and test sets,
 we use build-in data loaders rather than creating one from scratch,
 as we did in :numref:`sec_linear_scratch`.
 Recall that at each iteration, a load loader
-reads a minibatch of data with size `batch_size` each time. We also randomly shuffle the examples for the training data loader. 
+reads a minibatch of data with size `batch_size` each time. We also randomly shuffle the examples for the training data loader.
 
 ```{.python .input}
 batch_size = 256
@@ -188,12 +186,6 @@ for X, y in train_iter:
 f'{timer.stop():.2f} sec'
 ```
 
-And check the data shape and type for one minibatch. 
-
-```{.python .input}
-X.shape, X.dtype, y.shape, y.dtype
-```
-
 ## Putting All Things Together
 
 Now we define the `load_data_fashion_mnist` function
@@ -235,53 +227,41 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                             num_workers=get_dataloader_workers()))
 ```
 
-```{.python .input}
+```{.python .input  n=6}
 #@tab tensorflow
 def load_data_fashion_mnist(batch_size, resize=None):   #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
-    (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
-    mnist_train_x = tf.reshape(
-        mnist_train_x, (mnist_train_x.shape[0], mnist_train_x.shape[1], mnist_train_x.shape[2], 1))
-    mnist_test_x = tf.reshape(
-        mnist_test_x, (mnist_test_x.shape[0], mnist_test_x.shape[1], mnist_test_x.shape[2], 1))
-    def map_fn(x, y):
-        if resize is not None:
-            if isinstance(resize, (list, tuple)) and len(resize) == 2:
-                height, width = resize[0], resize[1]
-            else:
-                height = width = resize
-            return tf.image.resize_with_pad(x, height, width), y
-        else:
-            return (x, y)
+    mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
+    # Add a batch dimension at the last.
+    mnist_train = (tf.expand_dims(mnist_train[0], axis=3), mnist_train[1])
+    mnist_test = (tf.expand_dims(mnist_test[0], axis=3), mnist_test[1])    
+    resize_fn = lambda x, y: (
+        tf.image.resize_with_pad(x, resize, resize) if resize else x, y)
     return (
-        tf.data.Dataset.from_tensor_slices(
-            (mnist_train_x, mnist_train_y)).batch(batch_size).map(map_fn),
-        tf.data.Dataset.from_tensor_slices((mnist_test_x, mnist_test_y)).batch(batch_size).map(map_fn))
+        tf.data.Dataset.from_tensor_slices(mnist_train).batch(
+            batch_size).shuffle(len(mnist_train[0])).map(resize_fn),
+        tf.data.Dataset.from_tensor_slices(mnist_test).batch(
+            batch_size).map(resize_fn))
 ```
 
 Below, we verify that image resizing works.
 
-```{.python .input}
-train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
+```{.python .input  n=8}
+#@tab all
+train_iter, test_iter = load_data_fashion_mnist(32, resize=64)
 for X, y in train_iter:
-    print(X.shape)
+    print(X.shape, X.dtype, y.shape, y.dtype)
     break
 ```
 
-```{.python .input}
-#@tab pytorch
-train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
-for X, y in train_iter:
-    print(X.shape)
-    break
-```
-
-```{.python .input}
-#@tab tensorflow
-train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
-for X, y in train_iter:
-    print(X.shape)
-    break
+```{.json .output n=8}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "(32, 64, 64, 1) <dtype: 'float32'> (32,) <dtype: 'uint8'>\n"
+ }
+]
 ```
 
 We are now ready to work with the Fashion-MNIST dataset in the sections that follow.
@@ -296,7 +276,7 @@ We are now ready to work with the Fashion-MNIST dataset in the sections that fol
 ## Exercises
 
 1. Does reducing the `batch_size` (for instance, to 1) affect read performance?
-1. For non-Windows users, try modifying `num_workers` to see how it affects read performance. Plot the performance against the number of works employed.
+1. The data loader performance is important. Do you think the current implementation is fast enough? Explore various options to improve it.
 1. Use the framework's API document website to see which other datasets are available. 
 
 
@@ -306,4 +286,8 @@ We are now ready to work with the Fashion-MNIST dataset in the sections that fol
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/49)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/224)
 :end_tab:
