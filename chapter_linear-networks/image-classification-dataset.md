@@ -31,7 +31,7 @@ from torch.utils import data
 d2l.use_svg_display()
 ```
 
-```{.python .input  n=1}
+```{.python .input  n=14}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -227,7 +227,7 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                             num_workers=get_dataloader_workers()))
 ```
 
-```{.python .input  n=6}
+```{.python .input}
 #@tab tensorflow
 def load_data_fashion_mnist(batch_size, resize=None):   #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
@@ -246,22 +246,12 @@ def load_data_fashion_mnist(batch_size, resize=None):   #@save
 
 Below, we verify that image resizing works.
 
-```{.python .input  n=8}
+```{.python .input}
 #@tab all
 train_iter, test_iter = load_data_fashion_mnist(32, resize=64)
 for X, y in train_iter:
     print(X.shape, X.dtype, y.shape, y.dtype)
     break
-```
-
-```{.json .output n=8}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(32, 64, 64, 1) <dtype: 'float32'> (32,) <dtype: 'uint8'>\n"
- }
-]
 ```
 
 We are now ready to work with the Fashion-MNIST dataset in the sections that follow.
