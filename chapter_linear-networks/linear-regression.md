@@ -139,6 +139,7 @@ we will need two more things:
 (i) a quality measure for some given model;
 and (ii) a procedure for updating the model to improve its quality.
 
+
 ### Loss Function
 
 Before we start thinking about how *to fit* our model,
@@ -147,9 +148,9 @@ The *loss function* quantifies the distance
 between the *real* and *predicted* value of the target.
 The loss will usually be a non-negative number
 where smaller values are better
-and perfect predictions incur a loss of $0$.
+and perfect predictions incur a loss of 0.
 The most popular loss function in regression problems
-is the sum of squared errors.
+is the squared error.
 When our prediction for an example $i$ is $\hat{y}^{(i)}$
 and the corresponding true label is $y^{(i)}$,
 the squared error is given by:
