@@ -84,7 +84,7 @@ of $11\times 11$, $5\times 5$, and $3\times 3$,
 and the corresponding numbers of output channels are the same as in AlexNet. Each NiN block is followed by a maximum pooling layer
 with a stride of 2 and a window shape of $3\times 3$.
 
-Once significant difference between NiN and AlexNet
+One significant difference between NiN and AlexNet
 is that NiN avoids dense connections altogether.
 Instead, NiN uses an NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
 yielding a vector of [logits](https://en.wikipedia.org/wiki/Logit).
