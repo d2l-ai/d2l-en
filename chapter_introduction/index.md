@@ -546,7 +546,7 @@ our outputs and targets as real-valued numbers.
 
 
 We denote any individual target $y_i$
-(corresponding to example $\mathbf{x}i$)
+(corresponding to example $\mathbf{x}_i$)
 and the set of all targets $\mathbf{y}$
 (corresponding to all examples $X$).
 When our targets take on arbitrary values in some range,
