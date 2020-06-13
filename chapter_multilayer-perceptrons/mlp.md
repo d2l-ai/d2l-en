@@ -370,10 +370,8 @@ d2l.plot(x.detach(), x.grad, 'x', 'grad of relu')
 ```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
-    t.watch(x)
     y = tf.nn.relu(x)
-x_grad = t.gradient(y, x)
-d2l.plot(x.numpy(), x_grad.numpy(), 'x', 'grad of relu')
+d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of relu')
 ```
 
 Note that there are many variants to the ReLU function, 
@@ -484,10 +482,8 @@ d2l.plot(x.detach(), x.grad, 'x', 'grad of sigmoid')
 ```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
-    t.watch(x)
     y = tf.nn.sigmoid(x)
-x_grad = t.gradient(y, x)
-d2l.plot(x.numpy(), x_grad.numpy(), 'x', 'grad of sigmoid')
+d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of sigmoid')
 ```
 
 ### Tanh Function
@@ -545,10 +541,8 @@ d2l.plot(x.detach(), x.grad, 'x', 'grad of tanh')
 ```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
-    t.watch(x)
     y = tf.nn.tanh(x)
-x_grad = t.gradient(y, x)
-d2l.plot(x.numpy(), x_grad.numpy(), 'x', 'grad of tanh')
+d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of tanh')
 ```
 
 In summary, we now know how to incorporate nonlinearities
@@ -579,11 +573,14 @@ thousands of lines of C and Fortran.
 1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers has only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron.
 1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems do you expect this to cause?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/90)
 :end_tab:
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/91)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/226)
 :end_tab:
