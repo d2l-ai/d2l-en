@@ -41,7 +41,7 @@ we would need to get our hands on a dataset
 consisting of sales for which we know
 the sale price, area, and age for each home.
 In the terminology of machine learning,
-the dataset is called a *training data set* or *training set*,
+the dataset is called a *training dataset* or *training set*,
 and each row (here the data corresponding to one sale)
 is called an *example* (or *data instance*, *data point*, *sample*).
 The thing we are trying to predict (price)
@@ -88,7 +88,7 @@ explicitly expressing models long-form like this is common.
 In machine learning, we usually work with high-dimensional datasets,
 so it is more convenient to employ linear algebra notation.
 When our inputs consist of $d$ features,
-we express our prediction $\hat{y}$ as
+we express our prediction $\hat{y}$ (in general the "hat" symbol denotes estimates) as
 
 $$\hat{y} = w_1  x_1 + ... + w_d  x_d + b.$$
 
@@ -134,7 +134,7 @@ Thus, even when we are confident
 that the underlying relationship is linear,
 we will incorporate a noise term to account for such errors.
 
-Before we can go about searching for the best parameters $\mathbf{w}$ and $b$,
+Before we can go about searching for the best *parameters* (or *model parameters*) $\mathbf{w}$ and $b$,
 we will need two more things:
 (i) a quality measure for some given model;
 and (ii) a procedure for updating the model to improve its quality.
@@ -159,7 +159,7 @@ $$l^{(i)}(\mathbf{w}, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2.$$
 
 The constant $1/2$ makes no real difference
 but will prove notationally convenient,
-cancelling out when we take the derivative of the loss.
+canceling out when we take the derivative of the loss.
 Since the training dataset is given to us, and thus out of our control,
 the empirical error is only a function of the model parameters.
 To make things more concrete, consider the example below
@@ -189,17 +189,12 @@ $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).
 
 Linear regression happens to be an unusually simple optimization problem.
 Unlike most other models that we will encounter in this book,
-linear regression can be solved analytically by applying a simple formula,
-yielding a global optimum.
+linear regression can be solved analytically by applying a simple formula.
 To start, we can subsume the bias $b$ into the parameter $\mathbf{w}$
-by appending a column to the design matrix consisting of all $1s$.
-Then our prediction problem is to minimize $||\mathbf{y} - \mathbf{X}\mathbf{w}||$.
-Because this expression has a quadratic form, it is convex,
-and so long as the problem is not degenerate
-(our features are linearly independent), it is strictly convex.
-
-Thus there is just one critical point on the loss surface
-and it corresponds to the global minimum.
+by appending a column to the design matrix consisting of all $1$s.
+Then our prediction problem is to minimize $\|\mathbf{y} - \mathbf{X}\mathbf{w}\|^2$.
+There is just one critical point on the loss surface
+and it corresponds to the minimum of the loss over the entire domain.
 Taking the derivative of the loss with respect to $\mathbf{w}$
 and setting it equal to $0$ yields the analytic solution:
 
@@ -212,12 +207,12 @@ Although analytic solutions allow for nice mathematical analysis,
 the requirement of an analytic solution is so restrictive
 that it would exclude all of deep learning.
 
-### Gradient descent
+
+### Gradient Descent
 
 Even in cases where we cannot solve the models analytically,
-and even when the loss surfaces are high-dimensional and nonconvex,
 it turns out that we can still train models effectively in practice.
-Moreover, for many tasks, these difficult-to-optimize models
+Moreover, for many tasks, those difficult-to-optimize models
 turn out to be so much better that figuring out how to train them
 ends up being well worth the trouble.
 
@@ -227,89 +222,84 @@ consists of iteratively reducing the error
 by updating the parameters in the direction
 that incrementally lowers the loss function.
 This algorithm is called *gradient descent*.
-On convex loss surfaces, it will eventually converge to a global minimum,
-and while the same cannot be said for nonconvex surfaces,
-it will at least lead towards a (hopefully good) local minimum.
 
 The most naive application of gradient descent
-consists of taking the derivative of the true loss,
+consists of taking the derivative of the loss function,
 which is an average of the losses computed
 on every single example in the dataset.
-In practice, this can be extremely slow.
-We must pass over the entire dataset before making a single update.
+In practice, this can be extremely slow:
+we must pass over the entire dataset before making a single update.
 Thus, we will often settle for sampling a random minibatch of examples
 every time we need to compute the update,
-a variant called *stochastic gradient descent*.
+a variant called *minibatch stochastic gradient descent*.
 
 In each iteration, we first randomly sample a minibatch $\mathcal{B}$
 consisting of a fixed number of training examples.
 We then compute the derivative (gradient) of the average loss
-on the mini batch with regard to the model parameters.
-Finally, we multiply the gradient by a predetermined step size $\eta > 0$
+on the minibatch with regard to the model parameters.
+Finally, we multiply the gradient by a predetermined positive value $\eta$
 and subtract the resulting term from the current parameter values.
 
 We can express the update mathematically as follows
-($\partial$ denotes the partial derivative) :
+($\partial$ denotes the partial derivative):
 
 $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{(\mathbf{w},b)} l^{(i)}(\mathbf{w},b).$$
 
 
 To summarize, steps of the algorithm are the following:
 (i) we initialize the values of the model parameters, typically at random;
-(ii) we iteratively sample random batches from the data (many times),
+(ii) we iteratively sample random minibatches from the data,
 updating the parameters in the direction of the negative gradient.
-
 For quadratic losses and linear functions,
 we can write this out explicitly as follows:
+
+$$
+\begin{aligned}
+\mathbf{w} &\leftarrow \mathbf{w} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) =
+\mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\
+b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  =
+b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right).
+\end{aligned}
+$$
+:eqlabel:`eq:linreg-update`
+
 Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors.
 Here, the more elegant vector notation makes the math
 much more readable than expressing things in terms of coefficients,
 say $w_1, w_2, \ldots, w_d$.
-
-$$
-\begin{aligned}
-\mathbf{w} &\leftarrow \mathbf{w} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) && =
-\mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\
-b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  && =
-b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right).
-\end{aligned}
-$$
-
-In the above equation, $|\mathcal{B}|$ represents
+In :eqref:`eq:linreg-update`, $|\mathcal{B}|$ represents
 the number of examples in each minibatch (the *batch size*)
 and $\eta$ denotes the *learning rate*.
 We emphasize that the values of the batch size and learning rate
 are manually pre-specified and not typically learned through model training.
 These parameters that are tunable but not updated
-in the training loop are called *hyper-parameters*.
-*Hyperparameter tuning* is the process by which these are chosen,
-and typically requires that we adjust the hyperparameters
-based on the results of the inner (training) loop
-as assessed on a separate *validation* split of the data.
+in the training loop are called *hyperparameters*.
+*Hyperparameter tuning* is the process by which hyperparameters are chosen,
+and typically requires that we adjust them
+based on the results of the training loop
+as assessed on a separate *validation dataset* (or *validation set*).
 
 After training for some predetermined number of iterations
-(or until some other stopping criteria is met),
+(or until some other stopping criteria are met),
 we record the estimated model parameters,
-denoted $\hat{\mathbf{w}}, \hat{b}$
-(in general the "hat" symbol denotes estimates).
+denoted $\hat{\mathbf{w}}, \hat{b}$.
 Note that even if our function is truly linear and noiseless,
 these parameters will not be the exact minimizers of the loss
-because, although the algorithm converges slowly towards a local minimum
+because, although the algorithm converges slowly towards the minimizers
 it cannot achieve it exactly in a finite number of steps.
 
-Linear regression happens to be a convex learning problem,
-and thus there is only one (global) minimum.
+Linear regression happens to be a learning problem where there is only one minimum
+over the entire domain.
 However, for more complicated models, like deep networks,
 the loss surfaces contain many minima.
 Fortunately, for reasons that are not yet fully understood,
 deep learning practitioners seldom struggle to find parameters
-that minimize the loss *on training data*.
+that minimize the loss *on training sets*.
 The more formidable task is to find parameters
 that will achieve low loss on data
 that we have not seen before,
 a challenge called *generalization*.
 We return to these topics throughout the book.
-
 
 
 ### Making Predictions with the Learned Model
@@ -319,9 +309,9 @@ Given the learned linear regression model
 $\hat{\mathbf{w}}^\top \mathbf{x} + \hat{b}$,
 we can now estimate the price of a new house
 (not contained in the training data)
-given its area $x_1$ and age (year) $x_2$.
+given its area $x_1$ and age $x_2$.
 Estimating targets given features is
-commonly called *prediction* and *inference*.
+commonly called *prediction* or *inference*.
 
 We will try to stick with *prediction* because
 calling this step *inference*,
