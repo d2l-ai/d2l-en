@@ -517,7 +517,7 @@ def updater(batch_size):
 
 ```{.python .input}
 #@tab tensorflow
-class Updater():
+class Updater():  #@save
     def __init__(self, params, lr):
         self.params = params
         self.lr = lr

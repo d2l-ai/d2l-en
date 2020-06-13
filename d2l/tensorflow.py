@@ -300,6 +300,15 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+class Updater():  #@save
+    def __init__(self, params, lr):
+        self.params = params
+        self.lr = lr
+    def __call__(self, batch_size, grads):
+        d2l.sgd(self.params, grads, self.lr, batch_size)
+
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
