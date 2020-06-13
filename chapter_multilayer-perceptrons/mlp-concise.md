@@ -100,8 +100,7 @@ num_epochs, lr, batch_size = 10, 0.5, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 trainer = tf.keras.optimizers.SGD(learning_rate=lr)
-net.compile(optimizer=trainer, loss=loss, metrics=['accuracy'])
-net.fit(train_iter, epochs=num_epochs)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
 ## Exercises

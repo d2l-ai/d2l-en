@@ -194,18 +194,7 @@ trainer = tf.keras.optimizers.SGD(learning_rate=.1)
 Next we call the training function defined in the last section to train a model.
 
 ```{.python .input}
-num_epochs = 10
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
-```
-
-```{.python .input}
-#@tab pytorch
-num_epochs = 10
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 num_epochs = 10
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
