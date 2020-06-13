@@ -89,7 +89,7 @@ net.apply(init_weights)
 net = tf.keras.models.Sequential()
 net.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
 weight_initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.01)
-net.add(tf.keras.layers.Dense(10, kernel_initializer= weight_initializer))
+net.add(tf.keras.layers.Dense(10, kernel_initializer=weight_initializer))
 ```
 
 ## The Softmax
@@ -194,21 +194,9 @@ trainer = tf.keras.optimizers.SGD(learning_rate=.1)
 Next we call the training function defined in the last section to train a model.
 
 ```{.python .input}
+#@tab all
 num_epochs = 10
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
-```
-
-```{.python .input}
-#@tab pytorch
-num_epochs = 10
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
-```
-
-```{.python .input}
-#@tab tensorflow
-net.compile(optimizer=trainer, loss=loss, metrics=['accuracy'])
-num_epochs = 10
-net.fit(train_iter, epochs=num_epochs)
 ```
 
 As before, this algorithm converges to a solution
