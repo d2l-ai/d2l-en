@@ -22,11 +22,12 @@ import zipfile
 
 d2l = sys.modules[__name__]
 
+
 # Defined in file: ./chapter_preliminaries/ndarray.md
 def numpy(a):  #@save
     """Convert a tensor into a NumPy ndarray"""
-    if 'numpy' in dir(a): return a.numpy()
-    if 'asnumpy' in dir(a): return a.asnumpy()
+    return a.numpy() if 'numpy' in dir(a) else a.asnumpy()
+
 
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
@@ -171,9 +172,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
     for i, (ax, img) in enumerate(zip(axes, imgs)):        
-        if 'asnumpy' in dir(img): img = img.asnumpy() 
-        if 'numpy' in dir(img): img = img.numpy()
-        ax.imshow(img)
+        ax.imshow(d2l.numpy(img))
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
         if titles:
@@ -205,18 +204,16 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):  #@save
-    if y_hat.shape[1] > 1:
-        return float((y_hat.argmax(axis=1).astype('float32') == y.astype(
-            'float32')).sum())
-    else:
-        return float((y_hat.astype('int32') == y.astype('int32')).sum())
+    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
+        y_hat = y_hat.argmax(axis=1)
+    return float((y_hat.astype(y.dtype) == y).sum())
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):  #@save
     metric = Accumulator(2)  # num_corrected_examples, num_examples
-    for X, y in data_iter:
-        metric.add(accuracy(net(X), y), y.size)
+    for _, (X, y) in enumerate(data_iter):
+        metric.add(accuracy(net(X), y), sum(y.shape))
     return metric[0] / metric[1]
 
 
@@ -259,12 +256,10 @@ class Animator:  #@save
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
                  nrows=1, ncols=1, figsize=(3.5, 2.5)):
         """Incrementally plot multiple lines."""
-        if legend is None:
-            legend = []
+        if legend is None: legend = []
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
-        if nrows * ncols == 1:
-            self.axes = [self.axes, ]
+        if nrows * ncols == 1: self.axes = [self.axes, ]
         # Use a lambda to capture arguments
         self.config_axes = lambda: d2l.set_axes(
             self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
@@ -272,17 +267,12 @@ class Animator:  #@save
 
     def add(self, x, y):
         """Add multiple data points into the figure."""
-        if not hasattr(y, "__len__"):
-            y = [y]
+        if not hasattr(y, "__len__"): y = [y]
         n = len(y)
-        if not hasattr(x, "__len__"):
-            x = [x] * n
-        if not self.X:
-            self.X = [[] for _ in range(n)]
-        if not self.Y:
-            self.Y = [[] for _ in range(n)]
-        if not self.fmts:
-            self.fmts = ['-'] * n
+        if not hasattr(x, "__len__"): x = [x] * n
+        if not self.X: self.X = [[] for _ in range(n)]
+        if not self.Y: self.Y = [[] for _ in range(n)]
+        if not self.fmts: self.fmts = ['-'] * n
         for i, (a, b) in enumerate(zip(x, y)):
             if a is not None and b is not None:
                 self.X[i].append(a)
@@ -296,9 +286,8 @@ class Animator:  #@save
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
-    animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
-                        ylim=[0.3, 0.9],
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9], 
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
@@ -307,7 +296,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def predict_ch3(net, test_iter, n=6): #@save
+def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
