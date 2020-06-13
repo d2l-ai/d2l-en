@@ -31,16 +31,6 @@ import jax
 print(dir(jax.random))
 ```
 
-```{.json .output n=1}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "['Optional', 'PRNGKey', 'Sequence', 'Union', '_UINT_DTYPES', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', '_bernoulli', '_beta', '_bit_stats', '_bivariate_coef', '_cauchy', '_check_shape', '_constant_like', '_dirichlet', '_exponential', '_fold_in', '_gamma', '_gamma_batching_rule', '_gamma_grad', '_gamma_grad_one', '_gamma_impl', '_gamma_one', '_gumbel', '_is_prng_key', '_laplace', '_logistic', '_make_rotate_left', '_multivariate_normal', '_normal', '_pareto', '_poisson', '_poisson_knuth', '_poisson_rejection', '_randint', '_random_bits', '_shuffle', '_split', '_t', '_threefry2x32_abstract_eval', '_threefry2x32_gpu_translation_rule', '_threefry2x32_lowering', '_truncated_normal', '_uniform', 'abstract_arrays', 'ad', 'apply_round', 'asarray', 'batching', 'bernoulli', 'beta', 'categorical', 'cauchy', 'cholesky', 'core', 'cuda_prng', 'dirichlet', 'dtypes', 'exponential', 'fold_in', 'gamma', 'gumbel', 'jit', 'jnp', 'laplace', 'lax', 'logistic', 'multivariate_normal', 'normal', 'np', 'pareto', 'partial', 'permutation', 'poisson', 'prod', 'randint', 'random_gamma_p', 'rolled_loop_step', 'rotate_left', 'rotate_list', 'shuffle', 'split', 't', 'threefry2x32_p', 'threefry_2x32', 'truncated_normal', 'uniform', 'vmap', 'warnings', 'xla', 'xla_bridge', 'xla_client']\n"
- }
-]
-```
-
 Generally, we can ignore functions that start and end with `__` (special objects in Python) or functions that start with a single `_`(usually internal functions). Based on the remaining function or attribute names, we might hazard a guess that this module offers various methods for generating random numbers, including sampling from the uniform distribution (`uniform`), normal distribution (`normal`), and multinomial distribution  (`multinomial`).
 
 ## Finding the Usage of Specific Functions and Classes
@@ -66,16 +56,6 @@ help(tf.ones)
 help(jax.numpy.ones)
 ```
 
-```{.json .output n=2}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Help on function ones in module jax.numpy.lax_numpy:\n\nones(shape, dtype=None)\n    Return a new array of given shape and type, filled with ones.\n    \n    LAX-backend implementation of :func:`ones`.\n    Original docstring below.\n    \n    Parameters\n    ----------\n    shape : int or sequence of ints\n        Shape of the new array, e.g., ``(2, 3)`` or ``2``.\n    dtype : data-type, optional\n        The desired data-type for the array, e.g., `numpy.int8`.  Default is\n        `numpy.float64`.\n    \n    Returns\n    -------\n    out : ndarray\n        Array of ones with the given shape, dtype, and order.\n    \n    See Also\n    --------\n    ones_like : Return an array of ones with shape and type of input.\n    empty : Return a new uninitialized array.\n    zeros : Return a new array setting values to zero.\n    full : Return a new array of given shape filled with value.\n    \n    \n    Examples\n    --------\n    >>> np.ones(5)\n    array([1., 1., 1., 1., 1.])\n    \n    >>> np.ones((5,), dtype=int)\n    array([1, 1, 1, 1, 1])\n    \n    >>> np.ones((2, 1))\n    array([[1.],\n           [1.]])\n    \n    >>> s = (2,2)\n    >>> np.ones(s)\n    array([[1.,  1.],\n           [1.,  1.]])\n\n"
- }
-]
-```
-
 From the documentation, we can see that the `ones` function creates a new tensor with the specified shape and sets all the elements to the value of 1. Whenever possible, you should run a quick test to confirm your interpretation:
 
 ```{.python .input}
@@ -95,24 +75,6 @@ tf.ones(4)
 ```{.python .input}
 #@tab jax
 jax.numpy.ones(4)
-```
-
-```{.json .output n=3}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "/Users/georgioskaissis/opt/miniconda3/envs/d2l/lib/python3.7/site-packages/jax/lib/xla_bridge.py:125: UserWarning: No GPU/TPU found, falling back to CPU.\n  warnings.warn('No GPU/TPU found, falling back to CPU.')\n"
- },
- {
-  "data": {
-   "text/plain": "DeviceArray([1., 1., 1., 1.], dtype=float32)"
-  },
-  "execution_count": 3,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 In the Jupyter notebook, we can use `?` to display the document in another
@@ -148,7 +110,3 @@ displayed.
 :begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/199)
 :end_tab:
-
-```{.python .input}
-
-```

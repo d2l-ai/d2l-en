@@ -60,22 +60,6 @@ from mxnet import np, npx
 npx.set_np()
 ```
 
-```{.json .output n=1}
-[
- {
-  "ename": "ModuleNotFoundError",
-  "evalue": "No module named 'mxnet'",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[0;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
-   "\u001b[0;32m<ipython-input-1-625401281ac8>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;32mfrom\u001b[0m \u001b[0mmxnet\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mnpx\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m \u001b[0mnpx\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mset_np\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;31mModuleNotFoundError\u001b[0m: No module named 'mxnet'"
-  ]
- }
-]
-```
-
 ```{.python .input}
 #@tab pytorch
 import torch

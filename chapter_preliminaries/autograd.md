@@ -79,19 +79,6 @@ x = np.arange(4., dtype=np.float32)
 x
 ```
 
-```{.json .output n=2}
-[
- {
-  "data": {
-   "text/plain": "DeviceArray([0., 1., 2., 3.], dtype=float32)"
-  },
-  "execution_count": 2,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 Before we even calculate the gradient
 of $y$ with respect to $\mathbf{x}$,
 we will need a place to store it.
@@ -166,19 +153,6 @@ y = f(x)
 y
 ```
 
-```{.json .output n=9}
-[
- {
-  "data": {
-   "text/plain": "DeviceArray(28., dtype=float32)"
-  },
-  "execution_count": 9,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 Since `x` is a vector of length 4,
 an inner product of `x` and `x` is performed,
 yielding the scalar output that we assign to `y`.
@@ -213,19 +187,6 @@ x_grad = grad(f)(x)
 x_grad
 ```
 
-```{.json .output n=10}
-[
- {
-  "data": {
-   "text/plain": "DeviceArray([ 0.,  4.,  8., 12.], dtype=float32)"
-  },
-  "execution_count": 10,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to $\mathbf{x}$ should be $4\mathbf{x}$.
 Let us quickly verify that our desired gradient was calculated correctly.
@@ -250,19 +211,6 @@ x_grad == 4 * x
 ```{.python .input  n=18}
 #@tab jax
 x_grad == 4 * x
-```
-
-```{.json .output n=18}
-[
- {
-  "data": {
-   "text/plain": "DeviceArray([ True,  True,  True,  True], dtype=bool)"
-  },
-  "execution_count": 18,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Now let us calculate another function of `x`.
@@ -300,19 +248,6 @@ f = lambda x: np.sum(x)
 
 y = f(x)
 grad(f)(x)
-```
-
-```{.json .output n=20}
-[
- {
-  "data": {
-   "text/plain": "DeviceArray([1., 1., 1., 1.], dtype=float32)"
-  },
-  "execution_count": 20,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Backward for Non-Scalar Variables
@@ -368,19 +303,6 @@ f = lambda x: np.sum(x*x)
 
 y = f(x)
 grad(f)(x)
-```
-
-```{.json .output n=21}
-[
- {
-  "data": {
-   "text/plain": "DeviceArray([0., 2., 4., 6.], dtype=float32)"
-  },
-  "execution_count": 21,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Detaching Computation
@@ -455,19 +377,6 @@ z = (lambda a: np.sum(y*a))
 grad(z)(x)
 ```
 
-```{.json .output n=56}
-[
- {
-  "data": {
-   "text/plain": "DeviceArray([0., 2., 4., 6.], dtype=float32)"
-  },
-  "execution_count": 56,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ```{.python .input  n=59}
 #@tab jax
 y = (lambda a: a*2)(x)
@@ -476,19 +385,6 @@ z = (lambda a: np.sum(y*a))
 
 x_grad = grad(z)(x)
 x_grad
-```
-
-```{.json .output n=59}
-[
- {
-  "data": {
-   "text/plain": "DeviceArray([0., 2., 4., 6.], dtype=float32)"
-  },
-  "execution_count": 59,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Since the computation of `y` was recorded,
@@ -517,19 +413,6 @@ t.gradient(y, x) == 2 * x
 ```{.python .input  n=60}
 #@tab jax
 x_grad == 2 * x
-```
-
-```{.json .output n=60}
-[
- {
-  "data": {
-   "text/plain": "DeviceArray([ True,  True,  True,  True], dtype=bool)"
-  },
-  "execution_count": 60,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Computing the Gradient of Python Control Flow
@@ -635,19 +518,6 @@ d_grad = grad(f)(a)
 d_grad
 ```
 
-```{.json .output n=68}
-[
- {
-  "data": {
-   "text/plain": "DeviceArray(819200., dtype=float32)"
-  },
-  "execution_count": 68,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 We can now analyze the `f` function defined above.
 Note that it is piecewise linear in its input `a`.
 In other words, for any `a` there exists some constant scalar `k`
@@ -674,19 +544,6 @@ d_grad == (d / a)
 ```{.python .input  n=69}
 #@tab jax
 d_grad == d / a
-```
-
-```{.json .output n=69}
-[
- {
-  "data": {
-   "text/plain": "DeviceArray(True, dtype=bool)"
-  },
-  "execution_count": 69,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Summary
