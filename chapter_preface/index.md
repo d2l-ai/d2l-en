@@ -257,7 +257,6 @@ future editions of this book will be able to provide insights
 in places the present edition cannot.
 
 :begin_tab:`mxnet`
-
 Most of the code in this book is based on Apache MXNet.
 MXNet is an open-source framework for deep learning
 and the preferred choice of AWS (Amazon Web Services),
@@ -278,11 +277,9 @@ to be saved in the package, we will mark it with
 `#@save`.
 The `d2l` package is light-weight and only requires
 the following packages and modules as dependencies:
-
 :end_tab:
 
 :begin_tab:`pytorch`
-
 Most of the code in this book is based on PyTorch.
 PyTorch is an open-source framework for deep learning, which is extremely
 popular in the research community.
@@ -301,11 +298,9 @@ For any block such as a function, a class, or multiple imports
 to be saved in the package, we will mark it with `#@save`.
 The `d2l` package is light-weight and only requires
 the following packages and modules as dependencies:
-
 :end_tab:
 
 :begin_tab:`tensorflow`
-
 Most of the code in this book is based on TensorFlow.
 TensorFlow is an open-source framework for deep learning, which is extremely
 popular in both the research community and industrial.
@@ -324,11 +319,9 @@ For any block such as a function, a class, or multiple imports
 to be saved in the package, we will mark it with `#@save`.
 The `d2l` package is light-weight and only requires
 the following packages and modules as dependencies:
-
 :end_tab:
 
 :begin_tab:`jax`
-
 Most of the code in this book is based on JAX.
 JAX is an new open-source framework enabling composable function transformations such as differentiation of arbitrary Python and NumPy functions, as well as JIT compliation, vectorization and much more! It's becoming popular in the machine learning research space and has an easy-to-learn NumPy-like API. Actually, JAX tries to achieve 1:1 parity with NumPy, so switching your code could be as simple as changing a single import statement!
 
@@ -342,12 +335,11 @@ to update your code and runtime environment.
 
 At times, to avoid unnecessary repetition, we encapsulate
 the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l.tensorflow` module.
+in this book in the `d2l.jax` module.
 For any block such as a function, a class, or multiple imports
 to be saved in the package, we will mark it with `#@save`.
 The `d2l` package is light-weight and only requires
 the following packages and modules as dependencies:
-
 :end_tab:
 
 ```{.python .input}
@@ -371,7 +363,6 @@ import zipfile
 
 d2l = sys.modules[__name__]
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -404,7 +395,6 @@ import warnings
 d2l = sys.modules[__name__]
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 #@save
@@ -428,7 +418,6 @@ import requests
 
 d2l = sys.modules[__name__]
 ```
-
 
 ```{.python .input}
 #@tab jax
@@ -549,3 +538,11 @@ Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writ
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/186)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/186)
+:end_tab:
+
+```{.python .input}
+
+```

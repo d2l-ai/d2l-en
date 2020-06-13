@@ -60,6 +60,22 @@ from mxnet import np, npx
 npx.set_np()
 ```
 
+```{.json .output n=1}
+[
+ {
+  "ename": "ModuleNotFoundError",
+  "evalue": "No module named 'mxnet'",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[0;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
+   "\u001b[0;32m<ipython-input-1-625401281ac8>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;32mfrom\u001b[0m \u001b[0mmxnet\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mnpx\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m \u001b[0mnpx\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mset_np\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;31mModuleNotFoundError\u001b[0m: No module named 'mxnet'"
+  ]
+ }
+]
+```
+
 ```{.python .input}
 #@tab pytorch
 import torch
@@ -718,7 +734,6 @@ a, a.item(), float(a), int(a)
 
 1. Run the code in this section. Change the conditional statement `x == y` in this section to `x < y` or `x > y`, and then see what kind of tensor you can get.
 1. Replace the two tensors that operate by element in the broadcasting mechanism with other shapes, e.g., 3-dimensional tensors. Is the result the same as expected?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/26)

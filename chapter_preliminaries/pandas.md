@@ -61,6 +61,16 @@ data = pd.read_csv(data_file)
 print(data)
 ```
 
+```{.json .output n=3}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "   NumRooms Alley   Price\n0       NaN  Pave  127500\n1       2.0   NaN  106000\n2       4.0   NaN  178100\n3       NaN   NaN  140000\n"
+ }
+]
+```
+
 ## Handling Missing Data
 
 Note that "NaN" entries are missing values.
@@ -79,6 +89,16 @@ inputs = inputs.fillna(inputs.mean())
 print(inputs)
 ```
 
+```{.json .output n=4}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "   NumRooms Alley\n0       3.0  Pave\n1       2.0   NaN\n2       4.0   NaN\n3       3.0   NaN\n"
+ }
+]
+```
+
 For categorical or discrete values in `inputs`, we consider "NaN" as a category.
 Since the "Alley" column only takes two types of categorical values "Pave" and "NaN",
 `pandas` can automatically convert this column to two columns "Alley_Pave" and "Alley_nan".
@@ -89,6 +109,16 @@ A row with a missing alley type will set their values to 0 and 1.
 #@tab all
 inputs = pd.get_dummies(inputs, dummy_na=True)
 print(inputs)
+```
+
+```{.json .output n=5}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "   NumRooms  Alley_Pave  Alley_nan\n0       3.0           1          0\n1       2.0           0          1\n2       4.0           0          1\n3       3.0           0          1\n"
+ }
+]
 ```
 
 ## Conversion to the Tensor Format
@@ -119,6 +149,31 @@ X, y = tf.constant(inputs.values), tf.constant(outputs.values)
 X, y
 ```
 
+```{.python .input}
+#@tab jax
+import jax.numpy as np
+
+X, y = np.array(inputs.values), np.array(outputs.values)
+X, y
+```
+
+```{.json .output n=6}
+[
+ {
+  "name": "stderr",
+  "output_type": "stream",
+  "text": "/Users/georgioskaissis/opt/miniconda3/envs/d2l/lib/python3.7/site-packages/jax/lib/xla_bridge.py:125: UserWarning: No GPU/TPU found, falling back to CPU.\n  warnings.warn('No GPU/TPU found, falling back to CPU.')\n"
+ },
+ {
+  "data": {
+   "text/plain": "(DeviceArray([[3., 1., 0.],\n              [2., 0., 1.],\n              [4., 0., 1.],\n              [3., 0., 1.]], dtype=float32),\n DeviceArray([127500, 106000, 178100, 140000], dtype=int32))"
+  },
+  "execution_count": 6,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
 
 ## Summary
 
@@ -133,7 +188,6 @@ Create a raw dataset with more rows and columns.
 1. Delete the column with the most missing values.
 2. Convert the preprocessed dataset to the tensor format.
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/28)
 :end_tab:
@@ -145,3 +199,11 @@ Create a raw dataset with more rows and columns.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/195)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/195)
+:end_tab:
+
+```{.python .input}
+
+```
