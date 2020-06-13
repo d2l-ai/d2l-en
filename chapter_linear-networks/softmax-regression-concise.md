@@ -89,7 +89,7 @@ net.apply(init_weights)
 net = tf.keras.models.Sequential()
 net.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
 weight_initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.01)
-net.add(tf.keras.layers.Dense(10, kernel_initializer= weight_initializer))
+net.add(tf.keras.layers.Dense(10, kernel_initializer=weight_initializer))
 ```
 
 ## The Softmax
@@ -206,9 +206,8 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 ```{.python .input}
 #@tab tensorflow
-net.compile(optimizer=trainer, loss=loss, metrics=['accuracy'])
 num_epochs = 10
-net.fit(train_iter, epochs=num_epochs)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
 As before, this algorithm converges to a solution

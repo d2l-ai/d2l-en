@@ -241,7 +241,13 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         # Compute gradients and update parameters
         with tf.GradientTape() as tape:
             y_hat = net(X)
-            l = loss(y_hat, y)
+            # tf.Keras' implementations for loss takes (labels, predictions)
+            # instead of (predictions, labels) that users might implement
+            # in this book, e.g. `cross_entropy()` that we implemented above.
+            if isinstance(loss, tf.keras.losses.Loss):
+                l = loss(y, y_hat)
+            else:
+                l = loss(y_hat, y)
         if isinstance(updater, tf.keras.optimizers.Optimizer):
             params = net.trainable_variables
             grads = tape.gradient(l, params)
