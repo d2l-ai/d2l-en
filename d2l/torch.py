@@ -34,7 +34,7 @@ d2l = sys.modules[__name__]
 # Defined in file: ./chapter_preliminaries/ndarray.md
 numpy = lambda a: a.detach().numpy()
 size = lambda a: a.numel()
-reshape = lambda a, *args: a.reshape(args)
+reshape = lambda a, *args: a.reshape(*args)
 ones = torch.ones
 zeros = torch.zeros
 

@@ -26,7 +26,7 @@ d2l = sys.modules[__name__]
 # Defined in file: ./chapter_preliminaries/ndarray.md
 numpy = lambda a: a.asnumpy()
 size = lambda a: a.size
-reshape = lambda a, *args: a.reshape(args)
+reshape = lambda a, *args: a.reshape(*args)
 ones = np.ones
 zeros = np.zeros
 

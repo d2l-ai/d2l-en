@@ -633,7 +633,7 @@ class, or statements are saved in the `d2l` package.
 #@save
 numpy = lambda a: a.asnumpy()
 size = lambda a: a.size
-reshape = lambda a, *args: a.reshape(args)
+reshape = lambda a, *args: a.reshape(*args)
 ones = np.ones
 zeros = np.zeros
 ```
@@ -643,7 +643,7 @@ zeros = np.zeros
 #@save
 numpy = lambda a: a.detach().numpy()
 size = lambda a: a.numel()
-reshape = lambda a, *args: a.reshape(args)
+reshape = lambda a, *args: a.reshape(*args)
 ones = torch.ones
 zeros = torch.zeros
 ```
