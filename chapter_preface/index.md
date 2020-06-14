@@ -1,4 +1,5 @@
 # Preface
+:label:`chapter_preface`
 
 Just a few years ago, there were no legions of deep learning scientists
 developing intelligent products and services at major companies and startups.
@@ -346,7 +347,6 @@ import tarfile
 import time
 import zipfile
 import hashlib
-
 d2l = sys.modules[__name__]
 ```
 
@@ -378,7 +378,6 @@ import zipfile
 import requests
 import warnings
 import hashlib
-
 d2l = sys.modules[__name__]
 ```
 
@@ -403,7 +402,6 @@ import time
 import zipfile
 import requests
 import hashlib
-
 d2l = sys.modules[__name__]
 ```
 

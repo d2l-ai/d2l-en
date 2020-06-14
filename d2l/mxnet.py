@@ -19,14 +19,16 @@ import sys
 import tarfile
 import time
 import zipfile
-
+import hashlib
 d2l = sys.modules[__name__]
 
 
 # Defined in file: ./chapter_preliminaries/ndarray.md
-def numpy(a):  #@save
-    """Convert a tensor into a NumPy ndarray"""
-    return a.numpy() if 'numpy' in dir(a) else a.asnumpy()
+numpy = lambda a: a.asnumpy()
+size = lambda a: a.size
+reshape = lambda a, *args: a.reshape(args)
+ones = np.ones
+zeros = np.zeros
 
 
 # Defined in file: ./chapter_preliminaries/pandas.md
@@ -142,7 +144,7 @@ def linreg(X, w, b):  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def squared_loss(y_hat, y):  #@save
-    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
+    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -315,24 +317,39 @@ def evaluate_loss(net, data_iter, loss):  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB = dict()
+DATA_HUB = dict()  #@save
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download(name, cache_dir=os.path.join('..', 'data')):
+def download(name, cache_dir=os.path.join('..', 'data')):  #@save
     """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, "%s does not exist" % name
-    url, sha1 = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)
-    return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
+    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
+    url, sha1_hash = DATA_HUB[name]
+    d2l.mkdir_if_not_exist(cache_dir)    
+    fname = os.path.join(cache_dir, url.split('/')[-1])
+    if os.path.exists(fname):        
+        sha1 = hashlib.sha1()
+        with open(fname, 'rb') as f:
+            while True:
+                data = f.read(1048576)
+                if not data: break
+                sha1.update(data)
+        if sha1.hexdigest() == sha1_hash:
+            return fname # Hit cache
+    print(f'Downloading {fname} from {url}...')
+    r = requests.get(url, stream=True, verify=True)
+    with open(fname, 'wb') as f:
+        f.write(r.content)
+    return fname
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download_extract(name, folder=None):
+def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
     fname = download(name)
     base_dir = os.path.dirname(fname) 
@@ -344,27 +361,24 @@ def download_extract(name, folder=None):
     else:
         assert False, 'Only zip/tar files can be extracted'
     fp.extractall(base_dir)
-    if folder:
-        return os.path.join(base_dir, folder)
-    else:
-        return data_dir
+    return os.path.join(base_dir, folder) if folder else data_dir
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download_all():
+def download_all():  #@save
     """Download all files in the DATA_HUB"""
     for name in DATA_HUB:
         download(name)
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_train'] = (
+DATA_HUB['kaggle_house_train'] = (  #@save
     DATA_URL + 'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_test'] = (
+DATA_HUB['kaggle_house_test'] = (  #@save  
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 

@@ -301,15 +301,9 @@ The result returned by the following function
 will also be the same as the `y_hat` shape.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab all
 def squared_loss(y_hat, y):  #@save
-    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
-```
-
-```{.python .input}
-#@tab tensorflow
-def squared_loss(y_hat, y):  #@save
-    return (y_hat - tf.reshape(y, y_hat.shape)) ** 2 / 2
+    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
 ```
 
 ## Defining the Optimization Algorithm
@@ -395,7 +389,7 @@ we will iterate through the entire dataset
 passing through every examples in the training dataset
 (assuming the number of examples is divisible by the batch size).
 The number of epochs `num_epochs` and the learning rate `lr` are both hyper-parameters,
-which we set here to $3$ and $0.03$, respectively. 
+which we set here to $3$ and $0.03$, respectively.
 Unfortunately, setting hyper-parameters is tricky
 and requires some adjustment by trial and error.
 We elide these details for now but revise them
@@ -437,7 +431,7 @@ for epoch in range(num_epochs):
 
 ```{.python .input}
 #@tab tensorflow
-lr = 0.03 
+lr = 0.03
 num_epochs = 3
 net = linreg
 loss = squared_loss
@@ -461,16 +455,11 @@ with those that we learned through our training loop.
 Indeed they turn out to be very close to each other.
 
 ```{.python .input}
-#@tab mxnet, pytorch
-print('Error in estimating w', true_w - w.reshape(true_w.shape))
+#@tab all
+print('Error in estimating w', true_w - d2l.reshape(w, true_w.shape))
 print('Error in estimating b', true_b - b)
 ```
 
-```{.python .input}
-#@tab tensorflow
-print('Error in estimating w', true_w - tf.reshape(w, true_w.shape))
-print('Error in estimating b', true_b - b)
-```
 
 Note that we should not take it for granted
 that we are able to recover the parameters accurately.

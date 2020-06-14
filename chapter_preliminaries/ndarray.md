@@ -121,7 +121,7 @@ x.size
 
 ```{.python .input}
 #@tab pytorch
-x.size()
+x.numel()
 ```
 
 ```{.python .input}
@@ -599,19 +599,6 @@ b = tf.constant(a)
 type(a), type(b)
 ```
 
-We define the `numpy` method converts a tensor into a NumPy ndarray.
-The comment `#@save` is a special mark where the following function,
-class, or import statements are also saved in the `d2l` package so that later we can
-directly invoke the `d2l.numpy` function without redefining it.
-
-```{.python .input}
-#@tab all
-def numpy(a):  #@save
-    """Convert a tensor into a NumPy ndarray"""
-    if 'detach' in dir(a): a = a.detach()
-    return a.numpy() if 'numpy' in dir(a) else a.asnumpy()
-```
-
 To convert a size-1 tensor to a Python scalar,
 we can invoke the `item` function or Python's built-in functions.
 
@@ -630,6 +617,45 @@ a, a.item(), float(a), int(a)
 #@tab tensorflow
 a = tf.constant([3.5]).numpy()
 a, a.item(), float(a), int(a)
+```
+
+## Framework Agnostic Library
+
+As we mentioned in :numref:`chapter_preface`, we will provide algorithm implementations
+in multiple framework through this book. In addition, we will make these implementations
+as consistent as possible to make it easy for you to learn another framework.
+Here we uniform a few methods in the `d2l` package so that we can call them in a
+consistent way, for exmaple `d2l.numpy(a)` will convert tensor `a` into a NumPy
+ndarray. The comment `#@save` is a special mark where the following function,
+class, or statements are saved in the `d2l` package.
+
+```{.python .input}
+#@save
+numpy = lambda a: a.asnumpy()
+size = lambda a: a.size
+reshape = lambda a, *args: a.reshape(args)
+ones = np.ones
+zeros = np.zeros
+```
+
+```{.python .input}
+#@tab pytorch
+#@save
+numpy = lambda a: a.detach().numpy()
+size = lambda a: a.numel()
+reshape = lambda a, *args: a.reshape(args)
+ones = torch.ones
+zeros = torch.zeros
+```
+
+```{.python .input}
+#@tab tensorflow
+#@save
+numpy = lambda a: a.numpy()
+size = lambda a: tf.size(a).numpy()
+reshape = tf.reshape
+ones = tf.ones
+zeros = tf.zeros
 ```
 
 ## Summary

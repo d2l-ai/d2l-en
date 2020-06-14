@@ -20,14 +20,16 @@ import tarfile
 import time
 import zipfile
 import requests
-
+import hashlib
 d2l = sys.modules[__name__]
 
 
 # Defined in file: ./chapter_preliminaries/ndarray.md
-def numpy(a):  #@save
-    """Convert a tensor into a NumPy ndarray"""
-    return a.numpy() if 'numpy' in dir(a) else a.asnumpy()
+numpy = lambda a: a.numpy()
+size = lambda a: tf.size(a).numpy()
+reshape = tf.reshape
+ones = tf.ones
+zeros = tf.zeros
 
 
 # Defined in file: ./chapter_preliminaries/pandas.md
@@ -145,7 +147,7 @@ def linreg(X, w, b):  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def squared_loss(y_hat, y):  #@save
-    return (y_hat - tf.reshape(y, y_hat.shape)) ** 2 / 2
+    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -329,62 +331,45 @@ def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
-        l = loss(net(X), tf.reshape(y, (-1, 1)))
-        if l.shape != []:
-            metric.add(tf.reduce_sum(l), y.numpy().size)
-        else:
-            metric.add(l*len(y), y.numpy().size)
+        l = loss(net(X), y)
+        metric.add(tf.reduce_sum(l), tf.size(l).numpy())
     return metric[0] / metric[1]
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB = dict()
+DATA_HUB = dict()  #@save
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def util_download(url, path=None, verify_ssl=True):
-    """Download a given URL
-    """
-    if path is None:
-        fname = url.split('/')[-1]
-        # Empty filenames are invalid
-        assert fname, 'Can\'t construct file-name from this URL. ' \
-            'Please set the `path` option manually.'
-    else:
-        path = os.path.expanduser(path)
-        if os.path.isdir(path):
-            fname = os.path.join(path, url.split('/')[-1])
-        else:
-            fname = path
-
-    if not verify_ssl:
-        warnings.warn(
-            'Unverified HTTPS request is being made (verify_ssl=False). '
-            'Adding certificate verification is strongly advised.')
-    
-    print('Downloading {} from {}...'.format(fname, url))
-    r = requests.get(url, stream=True, verify=verify_ssl)
+def download(name, cache_dir=os.path.join('..', 'data')):  #@save
+    """Download a file inserted into DATA_HUB, return the local filename."""
+    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
+    url, sha1_hash = DATA_HUB[name]
+    d2l.mkdir_if_not_exist(cache_dir)    
+    fname = os.path.join(cache_dir, url.split('/')[-1])
+    if os.path.exists(fname):        
+        sha1 = hashlib.sha1()
+        with open(fname, 'rb') as f:
+            while True:
+                data = f.read(1048576)
+                if not data: break
+                sha1.update(data)
+        if sha1.hexdigest() == sha1_hash:
+            return fname # Hit cache
+    print(f'Downloading {fname} from {url}...')
+    r = requests.get(url, stream=True, verify=True)
     with open(fname, 'wb') as f:
         f.write(r.content)
-
     return fname
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download(name, cache_dir=os.path.join('..', 'data')):
-    """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, "%s does not exist" % name
-    url, sha1 = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)
-    return util_download(url)
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download_extract(name, folder=None):
+def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
     fname = download(name)
     base_dir = os.path.dirname(fname) 
@@ -396,27 +381,24 @@ def download_extract(name, folder=None):
     else:
         assert False, 'Only zip/tar files can be extracted'
     fp.extractall(base_dir)
-    if folder:
-        return os.path.join(base_dir, folder)
-    else:
-        return data_dir
+    return os.path.join(base_dir, folder) if folder else data_dir
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download_all():
+def download_all():  #@save
     """Download all files in the DATA_HUB"""
     for name in DATA_HUB:
         download(name)
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_train'] = (
+DATA_HUB['kaggle_house_train'] = (  #@save
     DATA_URL + 'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_test'] = (
+DATA_HUB['kaggle_house_test'] = (  #@save  
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
