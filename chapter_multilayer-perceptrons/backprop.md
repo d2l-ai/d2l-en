@@ -1,14 +1,13 @@
 # Forward Propagation, Backward Propagation, and Computational Graphs
 :label:`sec_backprop`
 
-So far, we have trained our models 
+So far, we have trained our models
 with minibatch stochastic gradient descent.
 However, when we implemented the algorithm,
 we only worried about the calculations involved
 in *forward propagation* through the model.
 When it came time to calculate the gradients,
-we just invoked the `backward` function,
-relying on the `autograd` module to know what to do.
+we just invoked the back propagation function provided by the framework.
 
 The automatic calculation of gradients profoundly simplifies
 the implementation of deep learning algorithms.
@@ -17,21 +16,21 @@ even small changes to complicated models required
 recalculating complicated derivatives by hand.
 Surprisingly often, academic papers had to allocate
 numerous pages to deriving update rules.
-While we must continue to rely on `autograd`
+While we must continue to rely on autograd
 so we can focus on the interesting parts,
 you ought to *know* how these gradients
 are calculated under the hood
-if you want to go beyond a shallow 
+if you want to go beyond a shallow
 understanding of deep learning.
 
-In this section, we take a deep dive 
-into the details of backward propagation 
+In this section, we take a deep dive
+into the details of backward propagation
 (more commonly called *backpropagation* or *backprop*).
-To convey some insight for both the 
+To convey some insight for both the
 techniques and their implementations,
 we rely on some basic mathematics and computational graphs.
 To start, we focus our exposition on
-a three layer (one hidden) multilayer perceptron 
+a three layer (one hidden) multilayer perceptron
 with weight decay ($\ell_2$ regularization).
 
 
@@ -39,12 +38,12 @@ with weight decay ($\ell_2$ regularization).
 
 Forward propagation refers to the calculation and storage
 of intermediate variables (including outputs)
-for the neural network in order 
+for the neural network in order
 from the input layer to the output layer.
 We now work step-by-step through the mechanics
 of a deep network with one hidden layer.
 This may seem tedious but in the eternal words
-of funk virtuoso James Brown, 
+of funk virtuoso James Brown,
 you must "pay the cost to be the boss".
 
 
@@ -57,26 +56,26 @@ $$\mathbf{z}= \mathbf{W}^{(1)} \mathbf{x},$$
 
 where $\mathbf{W}^{(1)} \in \mathbb{R}^{h \times d}$
 is the weight parameter of the hidden layer.
-After running the intermediate variable 
-$\mathbf{z}\in \mathbb{R}^h$ through the 
-activation function $\phi$ 
+After running the intermediate variable
+$\mathbf{z}\in \mathbb{R}^h$ through the
+activation function $\phi$
 we obtain our hidden activation vector of length $h$,
 
 $$\mathbf{h}= \phi (\mathbf{z}).$$
 
-The hidden variable $\mathbf{h}$ 
+The hidden variable $\mathbf{h}$
 is also an intermediate variable.
 Assuming the parameters of the output layer
-only possess a weight of 
+only possess a weight of
 $\mathbf{W}^{(2)} \in \mathbb{R}^{q \times h}$,
-we can obtain an output layer variable 
+we can obtain an output layer variable
 with a vector of length $q$:
 
 $$\mathbf{o}= \mathbf{W}^{(2)} \mathbf{h}.$$
 
-Assuming the loss function is $l$ 
+Assuming the loss function is $l$
 and the example label is $y$,
-we can then calculate the loss term 
+we can then calculate the loss term
 for a single data example,
 
 $$L = l(\mathbf{o}, y).$$
@@ -87,28 +86,28 @@ the regularization term is
 
 $$s = \frac{\lambda}{2} \left(\|\mathbf{W}^{(1)}\|_F^2 + \|\mathbf{W}^{(2)}\|_F^2\right),$$
 
-where the Frobenius norm of the matrix 
-is simply the $L_2$ norm applied 
+where the Frobenius norm of the matrix
+is simply the $L_2$ norm applied
 after flattening the matrix into a vector.
 Finally, the model's regularized loss
 on a given data example is:
 
 $$J = L + s.$$
 
-We refer to $J$ the *objective function* 
+We refer to $J$ the *objective function*
 in the following discussion.
 
 
 ## Computational Graph of Forward Propagation
 
 Plotting computational graphs helps us visualize
-the dependencies of operators 
+the dependencies of operators
 and variables within the calculation.
 :numref:`fig_forward` contains the graph associated
 with the simple network described above.
 The lower-left corner signifies the input
 and the upper right corner the output.
-Notice that the direction of the arrows 
+Notice that the direction of the arrows
 (which illustrate data flow)
 are primarily rightward and upward.
 
@@ -125,24 +124,24 @@ from the output to the input layer,
 according to the *chain rule* from calculus.
 The algorithm stores any intermediate variables
 (partial derivatives)
-requried while calculating the gradient 
+requried while calculating the gradient
 with respect to some parameters.
-Assume that we have functions 
+Assume that we have functions
 $\mathsf{Y}=f(\mathsf{X})$
 and $\mathsf{Z}=g(\mathsf{Y}) = g \circ f(\mathsf{X})$,
 in which the input and the output
 $\mathsf{X}, \mathsf{Y}, \mathsf{Z}$
 are tensors of arbitrary shapes.
-By using the chain rule, 
-we can compute the derivative 
+By using the chain rule,
+we can compute the derivative
 of $\mathsf{Z}$ wrt. $\mathsf{X}$ via
 
 $$\frac{\partial \mathsf{Z}}{\partial \mathsf{X}} = \text{prod}\left(\frac{\partial \mathsf{Z}}{\partial \mathsf{Y}}, \frac{\partial \mathsf{Y}}{\partial \mathsf{X}}\right).$$
 
 Here we use the $\text{prod}$ operator
-to multiply its arguments 
+to multiply its arguments
 after the necessary operations,
-such as transposition and swapping input positions, 
+such as transposition and swapping input positions,
 have been carried out.
 For vectors, this is straightforward:
 it is simply matrix-matrix multiplication.
@@ -180,7 +179,7 @@ $$
 \in \mathbb{R}^q.
 $$
 
-Next, we calculate the gradients 
+Next, we calculate the gradients
 of the regularization term
 with respect to both parameters.
 
@@ -237,8 +236,8 @@ $$
 
 ## Training a Model
 
-When training networks, 
-forward and backward propagation depend on each other. 
+When training networks,
+forward and backward propagation depend on each other.
 In particular, for forward propagation,
 we traverse the compute graph in the direction of dependencies
 and compute all the variables on its path.
@@ -248,7 +247,7 @@ One of the consequences is that we need to retain
 the intermediate values until backpropagation is complete.
 This is also one of the reasons why backpropagation
 requires significantly more memory than plain prediction.
-We compute tensors as gradients and 
+We compute tensors as gradients and
 need to retain all the intermediate variables
 to invoke the chain rule.
 Another reason is that we typically train
