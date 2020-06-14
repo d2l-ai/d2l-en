@@ -125,8 +125,6 @@ in :eqref:`eq_derivative` approaches $2$.
 Though this experiment is not a mathematical proof,
 we will see later that the derivative $u'$ is $2$ when $x=1$.
 
-`JAX` has an inbuilt way to check derivatives numerically as well:
-
 ```{.python .input}
 #@tab all
 def numerical_lim(f, x, h):
