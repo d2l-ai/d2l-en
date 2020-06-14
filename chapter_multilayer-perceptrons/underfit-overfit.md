@@ -575,7 +575,7 @@ def train(train_features, test_features, train_labels, test_labels,
     # Switch off the bias since we already catered for it in the polynomial
     # features
     net = tf.keras.Sequential()
-    net.add(tf.keras.layers.Dense(1))
+    net.add(tf.keras.layers.Dense(1, use_bias=False))
     batch_size = min(10, train_labels.shape[0])
     train_iter = d2l.load_array((train_features, train_labels), batch_size)
     test_iter = d2l.load_array((test_features, test_labels), batch_size,
@@ -589,7 +589,7 @@ def train(train_features, test_features, train_labels, test_labels,
         if epoch % 50 == 0:
             animator.add(epoch, (evaluate_loss(net, train_iter, loss),
                                  evaluate_loss(net, test_iter, loss)))
-    print('weight:', net.get_weights()[0].numpy())
+    print('weight:', net.get_weights()[0].T)
 ```
 
 ### Third-Order Polynomial Function Fitting (Normal)

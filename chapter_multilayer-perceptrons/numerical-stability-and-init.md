@@ -119,12 +119,10 @@ d2l.plot(x.detach().numpy(), [y.detach().numpy(), x.grad.numpy()],
 from d2l import tensorflow as d2l
 import tensorflow as tf
 
-x = tf.range(-8.0, 8.0, 0.1)
+x = tf.Variable(tf.range(-8.0, 8.0, 0.1))
 with tf.GradientTape() as t:
-    t.watch(x)
     y = tf.nn.sigmoid(x)
-x_grad = t.gradient(y, x)
-d2l.plot(x.numpy(), [y.numpy(), x_grad.numpy()],
+d2l.plot(x.numpy(), [y.numpy(), t.gradient(y, x).numpy()],
          legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```
 
@@ -183,7 +181,7 @@ print('A single matrix \n', M)
 for i in range(100):
     M = tf.matmul(M, tf.random.normal((4, 4)))
 
-print('After multiplying 100 matrices\n', M)
+print('After multiplying 100 matrices\n', M.numpy())
 ```
 
 ### Symmetry
@@ -230,15 +228,10 @@ and suitable regularization can further enhance stability.
 ### Default Initialization
 
 In the previous sections, e.g., in :numref:`sec_linear_gluon`,
-we used `net.initialize(init.Normal(sigma=0.01))`
+we used a normal distribution with 0 mean and 0.01 variance
 to initialize the values of our weights.
-If the initialization method is not specified,
-such as `net.initialize()`,
-MXNet will use the default random initialization method,
-sampling each weight parameter from 
-the uniform distribution $U[-0.07, 0.07]$
-and setting the bias parameters to $0$.
-Both choices tend to work well in practice 
+If we don't specify the initialization method, the framework will 
+use a default random initialization method, which often works well in practice 
 for moderate problem sizes.
 
 
@@ -311,8 +304,7 @@ $U\left[-\sqrt{6/(n_\mathrm{in} + n_\mathrm{out})}, \sqrt{6/(n_\mathrm{in} + n_\
 
 The reasoning above barely scratches the surface
 of modern approaches to parameter initialization.
-In fact, MXNet has an entire `mxnet.initializer` module
-implementing over a dozen different heuristics.
+A deep learning framework often implements over a dozen different heuristics.
 Moreover, parameter initialization continues to be
 a hot area of fundamental research in deep learning.
 Among these are heuristics specialized for 
@@ -323,7 +315,7 @@ a deep dive into this module's offerings,
 reading the papers that proposed and analyzed each heuristic,
 and then exploring the latest publications on the topic.
 Perhaps you will stumble across (or even invent!) 
-a clever idea and contribute an implementation to MXNet.
+a clever idea and contribute an implementation to deep learning frameworks.
 
 
 ## Summary
@@ -347,4 +339,8 @@ a clever idea and contribute an implementation to MXNet.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/104)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/235)
 :end_tab:
