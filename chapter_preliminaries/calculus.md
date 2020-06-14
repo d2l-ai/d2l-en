@@ -113,7 +113,7 @@ def f(x):
 %matplotlib inline
 from d2l import jax as d2l
 from IPython import display
-import numpy as np
+import jax.numpy as np
 
 def f(x):
     return 3 * x ** 2 - 4 * x
@@ -124,6 +124,8 @@ the numerical result of $\frac{f(x+h) - f(x)}{h}$
 in :eqref:`eq_derivative` approaches $2$.
 Though this experiment is not a mathematical proof,
 we will see later that the derivative $u'$ is $2$ when $x=1$.
+
+`JAX` has an inbuilt way to check derivatives numerically as well:
 
 ```{.python .input}
 #@tab all

@@ -39,7 +39,8 @@ import tensorflow as tf
 import jax.numpy as np
 from jax import grad
 from jax import random
-key = random.PRNGKey(42) #randomness works a bit differently in JAX
+key = random.PRNGKey(42) #randomness works a bit differently in JAX, see the
+                         #ndarray chapter
 ```
 
 ## A Simple Example
@@ -108,6 +109,7 @@ x = tf.Variable(x)
 ```{.python .input}
 #@tab jax
 # Jax doesn't store gradients in objects but has a functional API instead
+# See below
 ```
 
 Now let us calculate $y$.
@@ -271,7 +273,9 @@ with tf.GradientTape() as t:
 t.gradient(y, x)  # Equals to y = tf.reduce_sum(x * x)
 ```
 
-JAX only supports scalar-value functions, hence for non-scalar variables we have to perform a reductive summation.
+:begin_tab:`jax`
+`JAX` only supports scalar-value functions, hence for non-scalar variables we have to perform a reductive summation.
+:end_tab:
 
 ```{.python .input}
 #@tab jax
@@ -336,7 +340,9 @@ x_grad = t.gradient(z, x)
 x_grad == u
 ```
 
-JAX does not require any detachment of computation since it relies on side-effect-free functions which don't mutate global state. You have to explicitly define which function to differentiate and with respect to which argument.
+:begin_tab:`jax`
+`JAX` does not require any detachment of computation since it relies on side-effect-free functions which don't mutate global state. You have to explicitly define which function to differentiate and with respect to which argument.
+:end_tab:
 
 ```{.python .input}
 #@tab jax
@@ -350,6 +356,9 @@ x_grad
 
 Since the computation of `y` was recorded,
 we can subsequently call backward function on `y` to get the derivative of `y = x * x` with respect to `x`, which is `2 * x`.
+
+:begin_tab:`jax`
+In `JAX`, we get a `grad` object as a result of a function call owing to the functional API style.
 
 ```{.python .input}
 y.backward()
@@ -519,3 +528,11 @@ d_grad == d / a
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/200)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/200)
+:end_tab:
+
+```{.python .input}
+
+```

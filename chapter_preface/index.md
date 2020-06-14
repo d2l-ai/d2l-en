@@ -542,7 +542,3 @@ Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writ
 :begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/186)
 :end_tab:
-
-```{.python .input}
-
-```
