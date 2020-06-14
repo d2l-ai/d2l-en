@@ -34,6 +34,7 @@ d2l = sys.modules[__name__]
 # Defined in file: ./chapter_preliminaries/ndarray.md
 def numpy(a):  #@save
     """Convert a tensor into a NumPy ndarray"""
+    if 'detach' in dir(a): return a.detach().numpy()
     return a.numpy() if 'numpy' in dir(a) else a.asnumpy()
 
 

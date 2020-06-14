@@ -38,44 +38,15 @@ All of our datasets are hosted on site
 whose address is assigned to `DATA_URL` below.
 
 ```{.python .input}
-import os
-from mxnet import gluon
-import zipfile
-import tarfile
-
-#@save
-DATA_HUB = dict()
-
-#@save
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 import os
 import requests
 import zipfile
 import tarfile
+import hashlib
 
-#@save
-DATA_HUB = dict()
-
-#@save
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
-```
-
-```{.python .input}
-#@tab tensorflow
-import os
-import requests
-import zipfile
-import tarfile
-
-#@save
-DATA_HUB = dict()
-
-#@save
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+DATA_HUB = dict()  #@save
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
 ```
 
 The following `download` function downloads the dataset,
@@ -88,91 +59,27 @@ our code will use the cached file to avoid
 clogging up your internet with redundant downloads.
 
 ```{.python .input}
-#@save
-def download(name, cache_dir=os.path.join('..', 'data')):
+#@tab all
+def download(name, cache_dir=os.path.join('..', 'data')):  #@save
     """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, "%s does not exist" % name
-    url, sha1 = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)
-    return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
-```
-
-```{.python .input}
-#@tab pytorch
-#@save
-def util_download(url, path=None, verify_ssl=True):
-    """Download a given URL
-    """
-    if path is None:
-        fname = url.split('/')[-1]
-        # Empty filenames are invalid
-        assert fname, 'Can\'t construct file-name from this URL. ' \
-            'Please set the `path` option manually.'
-    else:
-        path = os.path.expanduser(path)
-        if os.path.isdir(path):
-            fname = os.path.join(path, url.split('/')[-1])
-        else:
-            fname = path
-
-    if not verify_ssl:
-        warnings.warn(
-            'Unverified HTTPS request is being made (verify_ssl=False). '
-            'Adding certificate verification is strongly advised.')
-    
-    print('Downloading {} from {}...'.format(fname, url))
-    r = requests.get(url, stream=True, verify=verify_ssl)
+    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
+    url, sha1_hash = DATA_HUB[name]
+    d2l.mkdir_if_not_exist(cache_dir)    
+    fname = os.path.join(cache_dir, url.split('/')[-1])
+    if os.path.exists(fname):        
+        sha1 = hashlib.sha1()
+        with open(fname, 'rb') as f:
+            while True:
+                data = f.read(1048576)
+                if not data: break
+                sha1.update(data)
+        if sha1.hexdigest() == sha1_hash:
+            return fname # Hit cache
+    print(f'Downloading {fname} from {url}...')
+    r = requests.get(url, stream=True, verify=True)
     with open(fname, 'wb') as f:
         f.write(r.content)
-
     return fname
-
-#@save
-def download(name, cache_dir=os.path.join('..', 'data')):
-    """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, "%s does not exist" % name
-    url, sha1 = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)
-    return util_download(url)
-```
-
-```{.python .input}
-#@tab tensorflow
-#@save
-def util_download(url, path=None, verify_ssl=True):
-    """Download a given URL
-    """
-    if path is None:
-        fname = url.split('/')[-1]
-        # Empty filenames are invalid
-        assert fname, 'Can\'t construct file-name from this URL. ' \
-            'Please set the `path` option manually.'
-    else:
-        path = os.path.expanduser(path)
-        if os.path.isdir(path):
-            fname = os.path.join(path, url.split('/')[-1])
-        else:
-            fname = path
-
-    if not verify_ssl:
-        warnings.warn(
-            'Unverified HTTPS request is being made (verify_ssl=False). '
-            'Adding certificate verification is strongly advised.')
-    
-    print('Downloading {} from {}...'.format(fname, url))
-    r = requests.get(url, stream=True, verify=verify_ssl)
-    with open(fname, 'wb') as f:
-        f.write(r.content)
-
-    return fname
-
-#@save
-def download(name, cache_dir=os.path.join('..', 'data')):
-    """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, "%s does not exist" % name
-    url, sha1 = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)
-    return util_download(url)
 ```
 
 We also implement two additional functions: 
@@ -181,8 +88,8 @@ and the other to download all the files from `DATA_HUB`
 (most of the datasets used in this book) into the cache directory.
 
 ```{.python .input}
-#@save
-def download_extract(name, folder=None):
+#@tab all
+def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
     fname = download(name)
     base_dir = os.path.dirname(fname) 
@@ -194,67 +101,9 @@ def download_extract(name, folder=None):
     else:
         assert False, 'Only zip/tar files can be extracted'
     fp.extractall(base_dir)
-    if folder:
-        return os.path.join(base_dir, folder)
-    else:
-        return data_dir
+    return os.path.join(base_dir, folder) if folder else data_dir
 
-#@save
-def download_all():
-    """Download all files in the DATA_HUB"""
-    for name in DATA_HUB:
-        download(name)
-```
-
-```{.python .input}
-#@tab pytorch
-#@save
-def download_extract(name, folder=None):
-    """Download and extract a zip/tar file."""
-    fname = download(name)
-    base_dir = os.path.dirname(fname) 
-    data_dir, ext = os.path.splitext(fname)
-    if ext == '.zip':
-        fp = zipfile.ZipFile(fname, 'r')
-    elif ext in ('.tar', '.gz'):
-        fp = tarfile.open(fname, 'r')
-    else:
-        assert False, 'Only zip/tar files can be extracted'
-    fp.extractall(base_dir)
-    if folder:
-        return os.path.join(base_dir, folder)
-    else:
-        return data_dir
-
-#@save
-def download_all():
-    """Download all files in the DATA_HUB"""
-    for name in DATA_HUB:
-        download(name)
-```
-
-```{.python .input}
-#@tab tensorflow
-#@save
-def download_extract(name, folder=None):
-    """Download and extract a zip/tar file."""
-    fname = download(name)
-    base_dir = os.path.dirname(fname) 
-    data_dir, ext = os.path.splitext(fname)
-    if ext == '.zip':
-        fp = zipfile.ZipFile(fname, 'r')
-    elif ext in ('.tar', '.gz'):
-        fp = tarfile.open(fname, 'r')
-    else:
-        assert False, 'Only zip/tar files can be extracted'
-    fp.extractall(base_dir)
-    if folder:
-        return os.path.join(base_dir, folder)
-    else:
-        return data_dir
-
-#@save
-def download_all():
+def download_all():  #@save
     """Download all files in the DATA_HUB"""
     for name in DATA_HUB:
         download(name)
@@ -336,7 +185,7 @@ we can install pandas without even leaving the notebook.
 
 %matplotlib inline
 from d2l import mxnet as d2l
-from mxnet import autograd, init, np, npx
+from mxnet import gluon, autograd, init, np, npx
 from mxnet.gluon import nn
 import pandas as pd
 npx.set_np()
@@ -372,39 +221,12 @@ the Kaggle housing dataset
 using the script we defined above.
 
 ```{.python .input}
-#@save        
-DATA_HUB['kaggle_house_train'] = (
+#@tab all
+DATA_HUB['kaggle_house_train'] = (  #@save
     DATA_URL + 'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
 
-#@save  
-DATA_HUB['kaggle_house_test'] = (
-    DATA_URL + 'kaggle_house_pred_test.csv',
-    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
-```
-
-```{.python .input}
-#@tab pytorch
-#@save        
-DATA_HUB['kaggle_house_train'] = (
-    DATA_URL + 'kaggle_house_pred_train.csv',
-    '585e9cc93e70b39160e7921475f9bcd7d31219ce')
-
-#@save  
-DATA_HUB['kaggle_house_test'] = (
-    DATA_URL + 'kaggle_house_pred_test.csv',
-    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
-```
-
-```{.python .input}
-#@tab tensorflow
-#@save        
-DATA_HUB['kaggle_house_train'] = (
-    DATA_URL + 'kaggle_house_pred_train.csv',
-    '585e9cc93e70b39160e7921475f9bcd7d31219ce')
-
-#@save  
-DATA_HUB['kaggle_house_test'] = (
+DATA_HUB['kaggle_house_test'] = (  #@save  
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 ```
@@ -413,18 +235,7 @@ To load the two csv files containing training
 and test data respectively we use Pandas.
 
 ```{.python .input}
-train_data = pd.read_csv(download('kaggle_house_train'))
-test_data = pd.read_csv(download('kaggle_house_test'))
-```
-
-```{.python .input}
-#@tab pytorch
-train_data = pd.read_csv(download('kaggle_house_train'))
-test_data = pd.read_csv(download('kaggle_house_test'))
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 train_data = pd.read_csv(download('kaggle_house_train'))
 test_data = pd.read_csv(download('kaggle_house_test'))
 ```
@@ -434,18 +245,7 @@ $80$ features, and $1$ label, while the test data
 contains $1459$ examples and $80$ features.
 
 ```{.python .input}
-print(train_data.shape)
-print(test_data.shape)
-```
-
-```{.python .input}
-#@tab pytorch
-print(train_data.shape)
-print(test_data.shape)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 print(train_data.shape)
 print(test_data.shape)
 ```
@@ -454,16 +254,7 @@ Let’s take a look at the first $4$ and last $2$ features
 as well as the label (SalePrice) from the first $4$ examples:
 
 ```{.python .input}
-print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
-```
-
-```{.python .input}
-#@tab pytorch
-print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
@@ -475,16 +266,7 @@ Hence, we remove it from the dataset
 before feeding the data into the network.
 
 ```{.python .input}
-all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
-```
-
-```{.python .input}
-#@tab pytorch
-all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 ```
 
@@ -514,26 +296,7 @@ we do not want to penalize coefficients
 assigned to one variable more than on any other.
 
 ```{.python .input}
-numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
-all_features[numeric_features] = all_features[numeric_features].apply(
-    lambda x: (x - x.mean()) / (x.std()))
-# After standardizing the data all means vanish, hence we can set missing
-# values to 0
-all_features[numeric_features] = all_features[numeric_features].fillna(0)
-```
-
-```{.python .input}
-#@tab pytorch
-numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
-all_features[numeric_features] = all_features[numeric_features].apply(
-    lambda x: (x - x.mean()) / (x.std()))
-# After standardizing the data all means vanish, hence we can set missing
-# values to 0
-all_features[numeric_features] = all_features[numeric_features].fillna(0)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
 all_features[numeric_features] = all_features[numeric_features].apply(
     lambda x: (x - x.mean()) / (x.std()))
@@ -552,22 +315,7 @@ These map onto vectors $(1, 0)$ and $(0, 1)$ respectively.
 Pandas does this automatically for us.
 
 ```{.python .input}
-# Dummy_na=True refers to a missing value being a legal eigenvalue, and
-# creates an indicative feature for it
-all_features = pd.get_dummies(all_features, dummy_na=True)
-all_features.shape
-```
-
-```{.python .input}
-#@tab pytorch
-# Dummy_na=True refers to a missing value being a legal eigenvalue, and
-# creates an indicative feature for it
-all_features = pd.get_dummies(all_features, dummy_na=True)
-all_features.shape
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 # Dummy_na=True refers to a missing value being a legal eigenvalue, and
 # creates an indicative feature for it
 all_features = pd.get_dummies(all_features, dummy_na=True)
@@ -605,7 +353,8 @@ train_labels = torch.tensor(train_data.SalePrice.values,
 n_train = train_data.shape[0]
 train_features = np.array(all_features[:n_train].values, dtype=np.float)
 test_features = np.array(all_features[n_train:].values, dtype=np.float)
-train_labels = np.array(train_data.SalePrice.values.reshape(-1, 1), dtype=np.float)
+train_labels = np.array(train_data.SalePrice.values.reshape(-1, 1), 
+                        dtype=np.float)
 ```
 
 ## Training
@@ -697,7 +446,6 @@ def log_rmse(net,features,labels):
     return rmse.item()
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 log_rmse = tf.keras.losses.mean_squared_logarithmic_error
@@ -779,8 +527,6 @@ def train(net, train_features, train_labels, test_features, test_labels,
     return train_ls, test_ls
 ```
 
-
-
 ## k-Fold Cross-Validation
 
 If you are reading in a linear fashion,
@@ -860,48 +606,7 @@ The training and verification error averages are returned
 when we train $k$ times in the k-fold cross-validation.
 
 ```{.python .input}
-def k_fold(k, X_train, y_train, num_epochs,
-           learning_rate, weight_decay, batch_size):
-    train_l_sum, valid_l_sum = 0, 0
-    for i in range(k):
-        data = get_k_fold_data(k, i, X_train, y_train)
-        net = get_net()
-        train_ls, valid_ls = train(net, *data, num_epochs, learning_rate,
-                                   weight_decay, batch_size)
-        train_l_sum += train_ls[-1]
-        valid_l_sum += valid_ls[-1]
-        if i == 0:
-            d2l.plot(list(range(1, num_epochs+1)), [train_ls, valid_ls],
-                     xlabel='epoch', ylabel='rmse',
-                     legend=['train', 'valid'], yscale='log')
-        print('fold %d, train rmse: %f, valid rmse: %f' % (
-            i, train_ls[-1], valid_ls[-1]))
-    return train_l_sum / k, valid_l_sum / k
-```
-
-```{.python .input}
-#@tab pytorch
-def k_fold(k, X_train, y_train, num_epochs,
-           learning_rate, weight_decay, batch_size):
-    train_l_sum, valid_l_sum = 0, 0
-    for i in range(k):
-        data = get_k_fold_data(k, i, X_train, y_train)
-        net = get_net()
-        train_ls, valid_ls = train(net, *data, num_epochs, learning_rate,
-                                   weight_decay, batch_size)
-        train_l_sum += train_ls[-1]
-        valid_l_sum += valid_ls[-1]
-        if i == 0:
-            d2l.plot(list(range(1, num_epochs+1)), [train_ls, valid_ls],
-                     xlabel='epoch', ylabel='rmse',
-                     legend=['train', 'valid'], yscale='log')
-        print('fold %d, train rmse: %f, valid rmse: %f' % (
-            i, train_ls[-1], valid_ls[-1]))
-    return train_l_sum / k, valid_l_sum / k
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 def k_fold(k, X_train, y_train, num_epochs,
            learning_rate, weight_decay, batch_size):
     train_l_sum, valid_l_sum = 0, 0
@@ -936,24 +641,7 @@ we might just get lucky and find that our validation
 performance is no longer representative of the true error.
 
 ```{.python .input}
-k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
-train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
-                          weight_decay, batch_size)
-print('%d-fold validation: avg train rmse: %f, avg valid rmse: %f'
-      % (k, train_l, valid_l))
-```
-
-```{.python .input}
-#@tab pytorch
-k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
-train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
-                          weight_decay, batch_size)
-print('%d-fold validation: avg train rmse: %f, avg valid rmse: %f'
-      % (k, train_l, valid_l))
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
 train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
                           weight_decay, batch_size)
@@ -983,6 +671,7 @@ Saving the estimates in a CSV file
 will simplify uploading the results to Kaggle.
 
 ```{.python .input}
+#@tab all
 def train_and_pred(train_features, test_feature, train_labels, test_data,
                    num_epochs, lr, weight_decay, batch_size):
     net = get_net()
@@ -992,43 +681,7 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
              ylabel='rmse', yscale='log')
     print('train rmse %f' % train_ls[-1])
     # Apply the network to the test set
-    preds = net(test_features).asnumpy()
-    # Reformat it for export to Kaggle
-    test_data['SalePrice'] = pd.Series(preds.reshape(1, -1)[0])
-    submission = pd.concat([test_data['Id'], test_data['SalePrice']], axis=1)
-    submission.to_csv('submission.csv', index=False)
-```
-
-```{.python .input}
-#@tab pytorch
-def train_and_pred(train_features, test_feature, train_labels, test_data,
-                   num_epochs, lr, weight_decay, batch_size):
-    net = get_net()
-    train_ls, _ = train(net, train_features, train_labels, None, None,
-                        num_epochs, lr, weight_decay, batch_size)
-    d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',
-             ylabel='rmse', yscale='log')
-    print('train rmse %f' % train_ls[-1])
-    # Apply the network to the test set
-    preds = net(test_features).detach().numpy()
-    # Reformat it for export to Kaggle
-    test_data['SalePrice'] = pd.Series(preds.reshape(1, -1)[0])
-    submission = pd.concat([test_data['Id'], test_data['SalePrice']], axis=1)
-    submission.to_csv('submission.csv', index=False)
-```
-
-```{.python .input}
-#@tab tensorflow
-def train_and_pred(train_features, test_feature, train_labels, test_data,
-                   num_epochs, lr, weight_decay, batch_size):
-    net = get_net()
-    train_ls, _ = train(net, train_features, train_labels, None, None,
-                        num_epochs, lr, weight_decay, batch_size)
-    d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',
-             ylabel='rmse', yscale='log')
-    print('train rmse %f' % train_ls[-1])
-    # Apply the network to the test set
-    preds = net(test_features).numpy()
+    preds = d2l.numpy(net(test_features))
     # Reformat it for export to Kaggle
     test_data['SalePrice'] = pd.Series(preds.reshape(1, -1)[0])
     submission = pd.concat([test_data['Id'], test_data['SalePrice']], axis=1)
@@ -1043,18 +696,7 @@ The following code will generate a file called `submission.csv`
 (CSV is one of the file formats accepted by Kaggle):
 
 ```{.python .input}
-train_and_pred(train_features, test_features, train_labels, test_data,
-               num_epochs, lr, weight_decay, batch_size)
-```
-
-```{.python .input}
-#@tab pytorch
-train_and_pred(train_features, test_features, train_labels, test_data,
-               num_epochs, lr, weight_decay, batch_size)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 train_and_pred(train_features, test_features, train_labels, test_data,
                num_epochs, lr, weight_decay, batch_size)
 ```
@@ -1093,11 +735,14 @@ The steps are quite simple:
 1. Improve the score by improving the model (layers, regularization, dropout).
 1. What happens if we do not standardize the continuous numerical features like we have done in this section?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/106)
 :end_tab:
 
 :begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/107)
+:end_tab:
+
+:begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/107)
 :end_tab:

@@ -345,6 +345,7 @@ import sys
 import tarfile
 import time
 import zipfile
+import hashlib
 
 d2l = sys.modules[__name__]
 ```
@@ -376,6 +377,7 @@ import time
 import zipfile
 import requests
 import warnings
+import hashlib
 
 d2l = sys.modules[__name__]
 ```
@@ -400,6 +402,7 @@ import tarfile
 import time
 import zipfile
 import requests
+import hashlib
 
 d2l = sys.modules[__name__]
 ```
