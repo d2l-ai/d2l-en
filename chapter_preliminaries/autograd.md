@@ -19,25 +19,22 @@ Automatic differentiation enables the system to subsequently backpropagate gradi
 Here, *backpropagate* simply means to trace through the computational graph,
 filling in the partial derivatives with respect to each parameter.
 
-```python
+```{.python .input}
 from mxnet import autograd, np, npx
 npx.set_np()
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 import torch
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 import tensorflow as tf
 ```
 
-
-```{.python .input  n=63}
+```{.python .input}
 #@tab jax
 import jax.numpy as np
 from jax import grad
@@ -53,27 +50,24 @@ $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to the column vector $\mathbf{x}$.
 To start, let us create the variable `x` and assign it an initial value.
 
-```python
+```{.python .input}
 x = np.arange(4.0)
 x
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 x = torch.arange(4.0)
 x
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 x = tf.constant(range(4), dtype=tf.float32)
 x
 ```
 
-
-```{.python .input  n=2}
+```{.python .input}
 #@tab jax
 x = np.arange(4., dtype=np.float32)
 x
@@ -91,7 +85,7 @@ Note that a gradient of a scalar-valued function
 with respect to a vector $\mathbf{x}$
 is itself vector-valued and has the same shape as $\mathbf{x}$.
 
-```python
+```{.python .input}
 # We allocate memory for a tensor's gradient by invoking its `attach_grad`
 # method
 x.attach_grad()
@@ -100,28 +94,25 @@ x.attach_grad()
 x.grad
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 x.requires_grad_(True)  # Equals to x = torch.arange(4.0, requires_grad=True)
 x.grad  # The default value is None
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 x = tf.Variable(x)
 ```
 
-
-```{.python .input  n=3}
+```{.python .input}
 #@tab jax
 # Jax doesn't store gradients in objects but has a functional API instead
 ```
 
 Now let us calculate $y$.
 
-```python
+```{.python .input}
 # Place our code inside an `autograd.record` scope to build the computational
 # graph
 with autograd.record():
@@ -129,15 +120,13 @@ with autograd.record():
 y
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 y = 2 * torch.dot(x, x)
 y
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 # Record all computations onto a tape. 
 with tf.GradientTape() as t:
@@ -145,8 +134,7 @@ with tf.GradientTape() as t:
 y
 ```
 
-
-```{.python .input  n=9}
+```{.python .input}
 #@tab jax
 f = lambda x: 2*np.dot(x,x)
 y = f(x)
@@ -160,27 +148,24 @@ Next, we can automatically calculate the gradient of `y`
 with respect to each component of `x`
 by calling the function for backpropagation and printing the gradient.
 
-```python
+```{.python .input}
 y.backward()
 x.grad
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 y.backward()
 x.grad
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 x_grad = t.gradient(y, x)
 x_grad
 ```
 
-
-```{.python .input  n=10}
+```{.python .input}
 #@tab jax
 #Take the gradient of y w.r.t. the first argument
 x_grad = grad(f)(x)
@@ -191,39 +176,35 @@ The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to $\mathbf{x}$ should be $4\mathbf{x}$.
 Let us quickly verify that our desired gradient was calculated correctly.
 
-```python
+```{.python .input}
 x.grad == 4 * x
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 x.grad == 4 * x
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 x_grad == 4 * x
 ```
 
-
-```{.python .input  n=18}
+```{.python .input}
 #@tab jax
 x_grad == 4 * x
 ```
 
 Now let us calculate another function of `x`.
 
-```python
+```{.python .input}
 with autograd.record():
     y = x.sum()
 y.backward()
 x.grad  # Overwritten by the newly calculated gradient.
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 # PyTorch accumulates the gradient in default, we need to clear the previous 
 # values.
@@ -233,16 +214,14 @@ y.backward()
 x.grad
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
     y = tf.reduce_sum(x)
 t.gradient(y, x)  # Overwritten by the newly calculated gradient.
 ```
 
-
-```{.python .input  n=20}
+```{.python .input}
 #@tab jax
 f = lambda x: np.sum(x)
 
@@ -267,7 +246,7 @@ Here, our intent is not to calculate the differentiation matrix
 but rather the sum of the partial derivatives
 computed individually for each example in the batch.
 
-```python
+```{.python .input}
 # When we invoke `backward` on a vector-valued variable `y` (function of `x`),
 # a new scalar variable is created by summing the elements in `y`. Then the
 # gradient of that scalar variable with respect to `x` is computed
@@ -277,8 +256,7 @@ y.backward()
 x.grad  # Equals to y = sum(x * x)
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 x.grad.zero_()
 y = x * x
@@ -286,18 +264,16 @@ y.sum().backward()  # Backward only supports for scalars.
 x.grad
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
     y = x * x
 t.gradient(y, x)  # Equals to y = tf.reduce_sum(x * x)
 ```
 
-
 JAX only supports scalar-value functions, hence for non-scalar variables we have to perform a reductive summation.
 
-```{.python .input  n=21}
+```{.python .input}
 #@tab jax
 f = lambda x: np.sum(x*x)
 
@@ -328,7 +304,7 @@ Thus, the following backward function computes
 the partial derivative of `z = u * x` with respect to `x` while treating `u` as a constant,
 instead of the partial derivative of `z = x * x * x` with respect to `x`.
 
-```python
+```{.python .input}
 with autograd.record():
     y = x * x
     u = y.detach()
@@ -337,8 +313,7 @@ z.backward()
 x.grad == u
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 x.grad.zero_()
 y = x * x
@@ -349,8 +324,7 @@ z.sum().backward()
 x.grad == u
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 # Set the persistent=True to run t.gradient more than once.
 with tf.GradientTape(persistent=True) as t:
@@ -362,22 +336,9 @@ x_grad = t.gradient(z, x)
 x_grad == u
 ```
 
-
 JAX does not require any detachment of computation since it relies on side-effect-free functions which don't mutate global state. You have to explicitly define which function to differentiate and with respect to which argument.
 
-```{.python .input  n=37}
-y = (lambda a: a*2)(x)
-```
-
-```{.python .input  n=53}
-z = (lambda a: np.sum(y*a))
-```
-
-```{.python .input  n=56}
-grad(z)(x)
-```
-
-```{.python .input  n=59}
+```{.python .input}
 #@tab jax
 y = (lambda a: a*2)(x)
 
@@ -390,27 +351,24 @@ x_grad
 Since the computation of `y` was recorded,
 we can subsequently call backward function on `y` to get the derivative of `y = x * x` with respect to `x`, which is `2 * x`.
 
-```python
+```{.python .input}
 y.backward()
 x.grad == 2 * x
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 x.grad.zero_()
 y.sum().backward()
 x.grad == 2 * x
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 t.gradient(y, x) == 2 * x
 ```
 
-
-```{.python .input  n=60}
+```{.python .input}
 #@tab jax
 x_grad == 2 * x
 ```
@@ -427,7 +385,7 @@ the number of iterations of the `while` loop
 and the evaluation of the `if` statement
 both depend on the value of the input `a`.
 
-```python
+```{.python .input}
 def f(a):
     b = a * 2
     while np.linalg.norm(b) < 1000:
@@ -439,8 +397,7 @@ def f(a):
     return c
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 def f(a):
     b = a * 2
@@ -453,8 +410,7 @@ def f(a):
     return c
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def f(a):
     b = a * 2
@@ -467,8 +423,7 @@ def f(a):
     return c
 ```
 
-
-```{.python .input  n=61}
+```{.python .input}
 #@tab jax
 def f(a):
     b = a * 2
@@ -483,7 +438,7 @@ def f(a):
 
 Let us compute the gradient.
 
-```python
+```{.python .input}
 a = np.random.normal()
 a.attach_grad()
 with autograd.record():
@@ -491,16 +446,14 @@ with autograd.record():
 d.backward()
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 a = torch.randn(size=(1,), requires_grad=True)
 d = f(a)
 d.backward()
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 a = tf.Variable(tf.random.normal((1, 1),dtype=tf.float32))
 with tf.GradientTape() as t:
@@ -509,8 +462,7 @@ d_grad = t.gradient(d, a)
 d_grad
 ```
 
-
-```{.python .input  n=68}
+```{.python .input}
 #@tab jax
 a = random.normal(key, dtype=np.float32) #JAX requires a random key
 d = f(a)
@@ -524,24 +476,21 @@ In other words, for any `a` there exists some constant scalar `k`
 such that `f(a) = k * a`, where the value of `k` depends on the input `a`.
 Consequently `d / a` allows us to verify that the gradient is correct.
 
-```python
+```{.python .input}
 a.grad == d / a
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 a.grad == (d / a)
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 d_grad == (d / a)
 ```
 
-
-```{.python .input  n=69}
+```{.python .input}
 #@tab jax
 d_grad == d / a
 ```
