@@ -744,5 +744,5 @@ The steps are quite simple:
 :end_tab:
 
 :begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/107)
+[Discussions](https://discuss.d2l.ai/t/237)
 :end_tab:
