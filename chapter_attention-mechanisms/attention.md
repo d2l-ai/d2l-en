@@ -205,7 +205,7 @@ Intuitively, you can imagine $\mathbf W_k \mathbf k + \mathbf W_q\mathbf q$ as c
 class MLPAttention(nn.Block):
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
-        # Use flatten=True to keep query's and key's 3-D shapes
+        # Use flatten=False to keep query's and key's 3-D shapes
         self.W_k = nn.Dense(units, use_bias=False, flatten=False)
         self.W_q = nn.Dense(units, use_bias=False, flatten=False)
         self.v = nn.Dense(1, use_bias=False, flatten=False)
