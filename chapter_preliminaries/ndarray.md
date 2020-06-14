@@ -608,6 +608,7 @@ directly invoke the `d2l.numpy` function without redefining it.
 #@tab all
 def numpy(a):  #@save
     """Convert a tensor into a NumPy ndarray"""
+    if 'detach' in dir(a): a = a.detach()
     return a.numpy() if 'numpy' in dir(a) else a.asnumpy()
 ```
 
