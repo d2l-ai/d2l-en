@@ -165,6 +165,32 @@ net = getnet()
 net.initialize(init=MyInit())
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+class MyInit(tf.keras.initializers.Initializer):
+    def __call__(self, shape, dtype=None):
+        print('Init', shape)
+        # For custom tf.keras initializer, the actual
+        # initialization logic cannot be omitted here.
+        return tf.random.uniform(shape, dtype=dtype)
+
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(
+        4,
+        activation=tf.nn.relu,
+        kernel_initializer=MyInit()),
+    tf.keras.layers.Dense(1),
+])
+
+# Unlike other framework, this will actually print
+# since we already specified the input shape and
+# implemented the initialization logic in the
+# custom initializer.
+net.build(input_shape=(2, 20))
+```
+
 Note that, although `MyInit` will print information 
 about the model parameters when it is called, 
 the above `initialize` function does not print 
@@ -175,6 +201,12 @@ Next, we define the input and perform a forward calculation.
 
 ```{.python .input  n=25}
 x = np.random.uniform(size=(2, 20))
+y = net(x)
+```
+
+```{.python .input}
+#@tab tensorflow
+x = tf.random.uniform((2, 20))
 y = net(x)
 ```
 
@@ -193,6 +225,7 @@ when we run the forward calculation `net(x)`,
 so the output of the `MyInit` instance will not be generated again.
 
 ```{.python .input}
+#@tab all
 y = net(x)
 ```
 
