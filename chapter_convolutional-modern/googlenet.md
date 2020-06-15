@@ -282,6 +282,7 @@ b4 = nn.Sequential(Inception(480, 192, (96, 208), (16, 48), 64),
 ```
 
 ```{.python .input  n=5}
+#@tab tensorflow
 b4 = tf.keras.Sequential()
 b4.add(Inception(192, (96, 208), (16, 48), 64))
 b4.add(Inception(160, (112, 224), (24, 64), 64))
