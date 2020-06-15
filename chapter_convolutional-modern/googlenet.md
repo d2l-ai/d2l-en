@@ -367,16 +367,6 @@ for layer in net().layers:
     print(layer.__class__.__name__, 'Output shape:\t', X.shape)
 ```
 
-```{.json .output n=7}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Sequential Output shape:\t (1, 24, 24, 64)\nSequential Output shape:\t (1, 12, 12, 192)\nSequential Output shape:\t (1, 6, 6, 544)\nSequential Output shape:\t (1, 3, 3, 960)\nSequential Output shape:\t (1, 1280)\nDense Output shape:\t (1, 10)\n"
- }
-]
-```
-
 ## Data Acquisition and Training
 
 As before, we train our model using the Fashion-MNIST dataset.
@@ -400,23 +390,7 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 #@tab tensorflow
 lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.json .output n=8}
-[
- {
-  "ename": "NameError",
-  "evalue": "name 'load_data_fashion_mnist' is not defined",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[1;31mNameError\u001b[0m                                 Traceback (most recent call last)",
-   "\u001b[1;32m<ipython-input-8-50124fdac844>\u001b[0m in \u001b[0;36m<module>\u001b[1;34m\u001b[0m\n\u001b[0;32m      1\u001b[0m \u001b[1;31m#@tab tensorflow\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      2\u001b[0m \u001b[0mlr\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mnum_epochs\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mbatch_size\u001b[0m \u001b[1;33m=\u001b[0m \u001b[1;36m0.1\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m10\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m128\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m----> 3\u001b[1;33m \u001b[0mtrain_iter\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtest_iter\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mload_data_fashion_mnist\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mbatch_size\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mresize\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;36m96\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0;32m      4\u001b[0m \u001b[0mtrain_ch6\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mnet\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtrain_iter\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtest_iter\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mnum_epochs\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mlr\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n",
-   "\u001b[1;31mNameError\u001b[0m: name 'load_data_fashion_mnist' is not defined"
-  ]
- }
-]
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary
