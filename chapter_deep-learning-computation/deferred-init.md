@@ -225,7 +225,11 @@ when we run the forward calculation `net(x)`,
 so the output of the `MyInit` instance will not be generated again.
 
 ```{.python .input}
-#@tab all
+y = net(x)
+```
+
+```{.python .input}
+#@tab tensorflow
 y = net(x)
 ```
 
