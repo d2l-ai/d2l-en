@@ -267,11 +267,11 @@ in addition to the training and test sets.
 
 
 In practical applications, the picture gets muddier.
-While ideally we would only touch the test data once,
+While ideally we would only touch the validation data once,
 to assess the very best model or to compare
 a small number of models to each other,
-real-world test data is seldom discarded after just one use.
-We can seldom afford a new test set for each round of experiments.
+real-world validation data is seldom discarded after just one use.
+We can seldom afford a new validation set for each round of experiments.
 
 The result is a murky practice where the boundaries
 between validation and test data are worryingly ambiguous.
