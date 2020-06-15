@@ -444,8 +444,7 @@ def net(X, is_training=False):
     if is_training:
         # Add a dropout layer after the second fully connected layer
         H2 = dropout(H2, drop_prob2)
-    res = tf.nn.softmax(tf.matmul(H2, W3) + b3)
-    return tf.reduce_mean(res, axis=1) # TODO: Need double check
+    return tf.nn.softmax(tf.matmul(H2, W3) + b3)
 ```
 
 ### Training and Testing
