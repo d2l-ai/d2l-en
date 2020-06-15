@@ -239,7 +239,8 @@ In this case, we can compute the mean and variance of $h_i$ as follows:
 $$
 \begin{aligned}
     E[h_i] & = \sum_{j=1}^{n_\mathrm{in}} E[W_{ij} x_j] = 0, \\
-    E[h_i^2] & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij} x^2_j] \\
+    Var[h_i] & = E[h_i^2] - (E[h_i])^2 \\
+        & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij} x^2_j] - 0 \\
         & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij}] E[x^2_j] \\
         & = n_\mathrm{in} \sigma^2 \gamma^2.
 \end{aligned}
