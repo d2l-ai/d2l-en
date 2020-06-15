@@ -720,7 +720,7 @@ def build_array(lines, vocab, num_steps, is_source):
         lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
     array = torch.tensor([truncate_pad(
         l, num_steps, vocab['<pad>']) for l in lines])
-    valid_len = (array != vocab['<pad>']).sum(axis=1)
+    valid_len = (array != vocab['<pad>']).sum(dim=1)
     return array, valid_len
 
 
