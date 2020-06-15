@@ -500,9 +500,20 @@ class Animator:  #@save
 The training function then runs multiple epochs and visualize the training progress.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet, pytorch
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
+                        legend=['train loss', 'train acc', 'test acc'])
+    for epoch in range(num_epochs):
+        train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
+        test_acc = evaluate_accuracy(net, test_iter)
+        animator.add(epoch+1, train_metrics+(test_acc,))
+```
+
+```{.python .input}
+#@tab tensorflow
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater, params=None): #@save
-    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9], 
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater, params)

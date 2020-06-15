@@ -472,10 +472,11 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```{.python .input}
 #@tab tensorflow
 num_epochs, lr, batch_size = 10, 0.5, 256
-loss = tf.keras.losses.CategoricalCrossentropy()
+loss = tf.keras.losses.SparseCategoricalCrossentropy()
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 trainer = tf.keras.optimizers.SGD(learning_rate=lr)
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer, params=params)
+d2l.train_ch3(net, train_iter, test_iter, loss,
+              num_epochs, trainer, params=params)
 ```
 
 ## Concise Implementation
@@ -553,7 +554,6 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 ```{.python .input}
 #@tab tensorflow
-loss = tf.keras.losses.SparseCategoricalCrossentropy()
 trainer = tf.keras.optimizers.SGD(learning_rate=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
