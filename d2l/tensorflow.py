@@ -253,8 +253,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         if isinstance(updater, tf.keras.optimizers.Optimizer):
             params = net.trainable_variables
             grads = tape.gradient(l, params)
-            updater.apply_gradients(
-                zip([grad / X.shape[0] for grad in grads], params))
+            updater.apply_gradients(zip(grads, params))
         else:
             updater(X.shape[0], tape.gradient(l, updater.params))
         metric.add(tf.reduce_sum(l), accuracy(y_hat, y), tf.size(y))
@@ -299,7 +298,7 @@ class Animator:  #@save
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
-    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9], 
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)

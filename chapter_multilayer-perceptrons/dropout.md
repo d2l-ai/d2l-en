@@ -444,8 +444,7 @@ def net(X, is_training=False):
     if is_training:
         # Add a dropout layer after the second fully connected layer
         H2 = dropout(H2, drop_prob2)
-    res = tf.nn.softmax(tf.matmul(H2, W3) + b3)
-    return tf.reduce_mean(res, axis=1) # TODO: Need double check
+    return tf.nn.softmax(tf.matmul(H2, W3) + b3)
 ```
 
 ### Training and Testing
@@ -472,10 +471,10 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```{.python .input}
 #@tab tensorflow
 num_epochs, lr, batch_size = 10, 0.5, 256
-loss = tf.keras.losses.CategoricalCrossentropy()
+loss = tf.keras.losses.SparseCategoricalCrossentropy()
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-trainer = tf.keras.optimizers.SGD(learning_rate=lr)
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer, params=params)
+d2l.train_ch3(net, train_iter, test_iter, loss,
+              num_epochs, d2l.Updater(params, lr))
 ```
 
 ## Concise Implementation
@@ -527,14 +526,14 @@ net.apply(init_weights)
 ```{.python .input}
 #@tab tensorflow
 net = tf.keras.models.Sequential([
-    tf.keras.layers.Flatten(input_shape=(28, 28)),
+    tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(256, activation=tf.nn.relu),
     # Add a dropout layer after the first fully connected layer
     tf.keras.layers.Dropout(dropout1),
     tf.keras.layers.Dense(256, activation=tf.nn.relu),
     # Add a dropout layer after the second fully connected layer
     tf.keras.layers.Dropout(dropout2),
-    tf.keras.layers.Dense(10, activation=tf.nn.relu),
+    tf.keras.layers.Dense(10, activation=tf.nn.softmax),
 ])
 ```
 
@@ -554,10 +553,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```{.python .input}
 #@tab tensorflow
 trainer = tf.keras.optimizers.SGD(learning_rate=lr)
-net.compile(optimizer=trainer,
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-              metrics=['accuracy'])
-net.fit(train_iter, epochs=num_epochs, batch_size=batch_size)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
 ## Summary

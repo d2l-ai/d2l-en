@@ -164,7 +164,6 @@ loss = nn.CrossEntropyLoss()
 
 ```{.python .input}
 #@tab tensorflow
-net.add(tf.keras.layers.Softmax())
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 ```
 
