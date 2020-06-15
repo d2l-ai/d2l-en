@@ -75,7 +75,6 @@ class Inception(nn.Block):
         return np.concatenate((p1, p2, p3, p4), axis=1)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
@@ -111,6 +110,34 @@ class Inception(nn.Module):
         return torch.cat((p1, p2, p3, p4), dim=1)
 ```
 
+```{.python .input  n=1}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+class Inception(tf.keras.Model):
+  def __init__(self, c1, c2, c3, c4, **kwargs):
+    super(Inception, self).__init__(**kwargs)
+    self.p1_1 = tf.keras.layers.Conv2D(c1, 1, activation='relu')
+
+    self.p2_1 = tf.keras.layers.Conv2D(c2[0], 1, activation='relu')
+    self.p2_2 = tf.keras.layers.Conv2D(c2[1], 3, padding='same', activation='relu')
+
+    self.p3_1 = tf.keras.layers.Conv2D(c3[0], 1, activation='relu')
+    self.p3_2 = tf.keras.layers.Conv2D(c3[1], 5, padding='same', activation='relu')
+
+    self.p4_1 = tf.keras.layers.MaxPool2D(3, 1, padding='same')
+    self.p4_2 =  tf.keras.layers.Conv2D(c1, 1, padding='same', activation='relu')
+ 
+  
+  def call(self, x):
+    p1 = self.p1_1(x)
+    p2 = self.p2_2(self.p2_1(x))
+    p3 = self.p3_2(self.p3_1(x))
+    p4 = self.p4_2(self.p4_1(x))
+    return tf.keras.layers.Concatenate()([p1, p2, p3, p4])
+```
+
 To gain some intuition for why this network works so well,
 consider the combination of the filters.
 They explore the image in varying ranges.
@@ -143,12 +170,18 @@ b1.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3, activation='relu'),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
                    nn.ReLU(), 
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+```
+
+```{.python .input  n=2}
+#@tab tensorflow
+b1 = tf.keras.models.Sequential()
+b1.add(tf.keras.layers.Conv2D(64, 7, strides=2, padding='same', activation='relu'))
+b1.add(tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same'))
 ```
 
 The second component uses two convolutional layers:
@@ -162,13 +195,20 @@ b2.add(nn.Conv2D(64, kernel_size=1, activation='relu'),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b2 = nn.Sequential(nn.Conv2d(64, 64, kernel_size=1),
                    nn.ReLU(),
                    nn.Conv2d(64, 192, kernel_size=3, padding=1),
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+```
+
+```{.python .input  n=3}
+#@tab tensorflow
+b2 = tf.keras.Sequential()
+b2.add(tf.keras.layers.Conv2D(64, 1, padding='same', activation='relu'))
+b2.add(tf.keras.layers.Conv2D(192, 3, padding='same', activation='relu'))
+b2.add(tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same'))
 ```
 
 The third component connects two complete Inception blocks in series.
@@ -190,12 +230,19 @@ b3.add(Inception(64, (96, 128), (16, 32), 32),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b3 = nn.Sequential(Inception(192, 64, (96, 128), (16, 32), 32),
                    Inception(256, 128, (128, 192), (32, 96), 64),
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+```
+
+```{.python .input  n=4}
+#@tab tensorflow
+b3 = tf.keras.models.Sequential()
+b3.add(Inception(64, (96, 128), (16, 32), 32))
+b3.add(Inception(128, (128, 192), (32, 96), 64))
+b3.add(tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same'))
 ```
 
 The fourth block is more complicated.
@@ -224,7 +271,6 @@ b4.add(Inception(192, (96, 208), (16, 48), 64),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b4 = nn.Sequential(Inception(480, 192, (96, 208), (16, 48), 64),
@@ -233,6 +279,16 @@ b4 = nn.Sequential(Inception(480, 192, (96, 208), (16, 48), 64),
                    Inception(512, 112, (144, 288), (32, 64), 64),
                    Inception(528, 256, (160, 320), (32, 128), 128),
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+```
+
+```{.python .input  n=5}
+b4 = tf.keras.Sequential()
+b4.add(Inception(192, (96, 208), (16, 48), 64))
+b4.add(Inception(160, (112, 224), (24, 64), 64))
+b4.add(Inception(128, (128, 256), (24, 64), 64))
+b4.add(Inception(112, (144, 288), (32, 64), 64))
+b4.add(Inception(256, (160, 320), (32, 128), 128))
+b4.add(tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same'))
 ```
 
 The fifth block has two Inception blocks with $256+320+128+128=832$
@@ -257,7 +313,6 @@ net = nn.Sequential()
 net.add(b1, b2, b3, b4, b5, nn.Dense(10))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b5 = nn.Sequential(Inception(832, 256, (160, 320), (32, 128), 128),
@@ -266,6 +321,17 @@ b5 = nn.Sequential(Inception(832, 256, (160, 320), (32, 128), 128),
                    nn.Flatten())
 
 net = nn.Sequential(b1, b2, b3, b4, b5, nn.Linear(1024, 10))
+```
+
+```{.python .input  n=6}
+#@tab tensorflow
+b5 = tf.keras.Sequential()
+b5.add(Inception(256, (160, 320), (32, 128), 128))
+b5.add(Inception(384, (192, 384), (48, 128), 128))
+b5.add(tf.keras.layers.GlobalAvgPool2D())
+
+def net():
+  return tf.keras.models.Sequential([b1, b2, b3, b4, b5, tf.keras.layers.Dense(10)])
 ```
 
 The GoogLeNet model is computationally complex,
@@ -284,13 +350,30 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.rand(size=(1, 1, 96, 96))
 for layer in net:
     X = layer(X)
     print(layer.__class__.__name__,'output shape:\t', X.shape)
+```
+
+```{.python .input  n=7}
+#@tab tensorflow
+X = tf.random.uniform(shape=(1, 96, 96, 1))
+for layer in net().layers:
+    X = layer(X)
+    print(layer.__class__.__name__, 'Output shape:\t', X.shape)
+```
+
+```{.json .output n=7}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "Sequential Output shape:\t (1, 24, 24, 64)\nSequential Output shape:\t (1, 12, 12, 192)\nSequential Output shape:\t (1, 6, 6, 544)\nSequential Output shape:\t (1, 3, 3, 960)\nSequential Output shape:\t (1, 1280)\nDense Output shape:\t (1, 10)\n"
+ }
+]
 ```
 
 ## Data Acquisition and Training
@@ -305,12 +388,34 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+```{.python .input  n=8}
+#@tab tensorflow
+lr, num_epochs, batch_size = 0.1, 10, 128
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
+train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+```{.json .output n=8}
+[
+ {
+  "ename": "NameError",
+  "evalue": "name 'load_data_fashion_mnist' is not defined",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[1;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+   "\u001b[1;32m<ipython-input-8-50124fdac844>\u001b[0m in \u001b[0;36m<module>\u001b[1;34m\u001b[0m\n\u001b[0;32m      1\u001b[0m \u001b[1;31m#@tab tensorflow\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      2\u001b[0m \u001b[0mlr\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mnum_epochs\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mbatch_size\u001b[0m \u001b[1;33m=\u001b[0m \u001b[1;36m0.1\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m10\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;36m128\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m----> 3\u001b[1;33m \u001b[0mtrain_iter\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtest_iter\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mload_data_fashion_mnist\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mbatch_size\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mresize\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;36m96\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0;32m      4\u001b[0m \u001b[0mtrain_ch6\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mnet\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtrain_iter\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtest_iter\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mnum_epochs\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mlr\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n",
+   "\u001b[1;31mNameError\u001b[0m: name 'load_data_fashion_mnist' is not defined"
+  ]
+ }
+]
 ```
 
 ## Summary
