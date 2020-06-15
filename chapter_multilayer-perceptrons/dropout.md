@@ -527,14 +527,14 @@ net.apply(init_weights)
 ```{.python .input}
 #@tab tensorflow
 net = tf.keras.models.Sequential([
-    tf.keras.layers.Flatten(input_shape=(28, 28)),
+    tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(256, activation=tf.nn.relu),
     # Add a dropout layer after the first fully connected layer
     tf.keras.layers.Dropout(dropout1),
     tf.keras.layers.Dense(256, activation=tf.nn.relu),
     # Add a dropout layer after the second fully connected layer
     tf.keras.layers.Dropout(dropout2),
-    tf.keras.layers.Dense(10, activation=tf.nn.relu),
+    tf.keras.layers.Dense(10, activation=tf.nn.softmax),
 ])
 ```
 
@@ -553,11 +553,9 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 ```{.python .input}
 #@tab tensorflow
+loss = tf.keras.losses.SparseCategoricalCrossentropy()
 trainer = tf.keras.optimizers.SGD(learning_rate=lr)
-net.compile(optimizer=trainer,
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-              metrics=['accuracy'])
-net.fit(train_iter, epochs=num_epochs, batch_size=batch_size)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
 ## Summary

@@ -432,7 +432,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
 
 ```{.python .input}
 #@tab tensorflow
-def train_epoch_ch3(net, train_iter, loss, updater):  #@save
+def train_epoch_ch3(net, train_iter, loss, updater, params=None):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     for X, y in train_iter:
         # Compute gradients and update parameters
@@ -446,7 +446,8 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             else:
                 l = loss(y_hat, y)
         if isinstance(updater, tf.keras.optimizers.Optimizer):
-            params = net.trainable_variables
+            if isinstance(net, tf.keras.models.Model) and params is None:
+                params = net.trainable_variables
             grads = tape.gradient(l, params)
             updater.apply_gradients(zip(grads, params))
         else:
@@ -500,11 +501,11 @@ The training function then runs multiple epochs and visualize the training progr
 
 ```{.python .input}
 #@tab all
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater, params=None): #@save
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9], 
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
-        train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
+        train_metrics = train_epoch_ch3(net, train_iter, loss, updater, params)
         test_acc = evaluate_accuracy(net, test_iter)
         animator.add(epoch+1, train_metrics+(test_acc,))
 ```
