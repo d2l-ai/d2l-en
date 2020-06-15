@@ -66,7 +66,7 @@ net.apply(init_weights)
 ```{.python .input}
 #@tab tensorflow
 net = tf.keras.models.Sequential([
-	tf.keras.layers.Flatten(input_shape=(28, 28)),
+	tf.keras.layers.Flatten(),
 	tf.keras.layers.Dense(256, activation='relu'),
 	tf.keras.layers.Dense(10, activation='softmax')])
 ```
