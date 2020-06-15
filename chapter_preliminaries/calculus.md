@@ -113,7 +113,7 @@ def f(x):
 %matplotlib inline
 from d2l import jax as d2l
 from IPython import display
-import numpy as np
+import jax.numpy as np
 
 def f(x):
     return 3 * x ** 2 - 4 * x

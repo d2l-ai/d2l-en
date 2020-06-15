@@ -79,6 +79,16 @@ y = tf.constant([2.0])
 x + y, x * y, x / y, x**y
 ```
 
+```{.python .input}
+#@tab jax
+import jax.numpy as np
+
+x = np.array(3.0)
+y = np.array(2.0)
+
+x + y, x * y, x / y, x ** y
+```
+
 ## Vectors
 
 You can think of a vector as simply a list of scalar values.
@@ -118,6 +128,12 @@ x = tf.constant(range(4))
 x
 ```
 
+```{.python .input}
+#@tab jax
+x = np.arange(4)
+x
+```
+
 We can refer to any element of a vector by using a subscript.
 For example, we can refer to the $i^\mathrm{th}$ element of $\mathbf{x}$ by $x_i$.
 Note that the element $x_i$ is a scalar,
@@ -144,6 +160,11 @@ x[3]
 
 ```{.python .input}
 #@tab tensorflow
+x[3]
+```
+
+```{.python .input}
+#@tab jax
 x[3]
 ```
 
@@ -174,6 +195,11 @@ len(x)
 tf.size(x)  # TensorFlow doesn't have a len function.
 ```
 
+```{.python .input}
+#@tab jax
+len(x)
+```
+
 When a tensor represents a vector (with precisely one axis),
 we can also access its length via the `.shape` attribute.
 The shape is a tuple that lists the length (dimensionality)
@@ -191,6 +217,11 @@ x.shape
 
 ```{.python .input}
 #@tab tensorflow
+x.shape
+```
+
+```{.python .input}
+#@tab jax
 x.shape
 ```
 
@@ -247,6 +278,12 @@ A = tf.reshape(tf.constant(range(20)), (5, 4))
 A
 ```
 
+```{.python .input}
+#@tab jax
+A = np.arange(20).reshape(5, 4)
+A
+```
+
 We can access the scalar element $a_{ij}$ of a matrix $\mathbf{A}$ in :eqref:`eq_matrix_def`
 by specifying the indices for the row ($i$) and column ($j$),
 such as $[\mathbf{A}]_{ij}$.
@@ -291,6 +328,11 @@ A.T
 tf.transpose(A)
 ```
 
+```{.python .input}
+#@tab jax
+A.T
+```
+
 As a special type of the square matrix,
 a *symmetric matrix* $\mathbf{A}$ is equal to its transpose:
 $\mathbf{A} = \mathbf{A}^\top$.
@@ -313,6 +355,12 @@ B = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 B
 ```
 
+```{.python .input}
+#@tab jax
+B = np.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
+B
+```
+
 Now we compare `B` with its transpose.
 
 ```{.python .input}
@@ -327,6 +375,11 @@ B == B.T
 ```{.python .input}
 #@tab tensorflow
 B == tf.transpose(B)
+```
+
+```{.python .input}
+#@tab jax
+B == B.T
 ```
 
 Matrices are useful data structures:
@@ -371,6 +424,12 @@ X = tf.reshape(tf.constant(range(24)), (2, 3, 4))
 X
 ```
 
+```{.python .input}
+#@tab jax
+X = np.arange(24).reshape(2, 3, 4)
+X
+```
+
 ## Basic Properties of Tensor Arithmetic
 
 Scalars, vectors, matrices, and tensors ("tensors" in this subsection refer to algebraic objects)
@@ -405,6 +464,13 @@ B = tf.identity(A)  # Assign a copy of `A` to `B` by allocating new memory
 A, A + B
 ```
 
+```{.python .input}
+#@tab jax
+A = np.arange(20).reshape(5, 4)
+B = A.copy()  # Assign a copy of `A` to `B` by allocating new memory
+A, A + B
+```
+
 Specifically, elementwise multiplication of two matrices is called their *Hadamard product* (math notation $\odot$).
 Consider matrix $\mathbf{B} \in \mathbb{R}^{m \times n}$ whose element of row $i$ and column $j$ is $b_{ij}$. The Hadamard product of matrices $\mathbf{A}$ (defined in :eqref:`eq_matrix_def`) and $\mathbf{B}$
 
@@ -432,6 +498,11 @@ A * B
 A * B
 ```
 
+```{.python .input}
+#@tab jax
+A * B
+```
+
 Multiplying or adding a tensor by a scalar also does not change the shape of the tensor,
 where each element of the operand tensor will be added or multiplied by the scalar.
 
@@ -452,6 +523,13 @@ a + X, (a * X).shape
 #@tab tensorflow
 a = 2
 X = tf.reshape(tf.constant(range(24)), (2, 3, 4))
+a + X, (a * X).shape
+```
+
+```{.python .input}
+#@tab jax
+a = 2
+X = np.arange(24).reshape(2, 3, 4)
 a + X, (a * X).shape
 ```
 
@@ -481,6 +559,12 @@ x = tf.constant(range(4), dtype=tf.float32)
 x, tf.reduce_sum(x)
 ```
 
+```{.python .input}
+#@tab jax
+x = np.arange(4)
+x, x.sum()
+```
+
 We can express sums over the elements of tensors of arbitrary shape.
 For example, the sum of the elements of an $m \times n$ matrix $\mathbf{A}$ could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
@@ -496,6 +580,11 @@ A.shape, A.sum()
 ```{.python .input}
 #@tab tensorflow
 A.shape, tf.reduce_sum(A)
+```
+
+```{.python .input}
+#@tab jax
+A.shape, A.sum()
 ```
 
 By default, invoking the function for calculating the sum
@@ -524,6 +613,12 @@ A_sum_axis0 = tf.reduce_sum(A, axis=0)
 A_sum_axis0, A_sum_axis0.shape
 ```
 
+```{.python .input}
+#@tab jax
+A_sum_axis0 = A.sum(axis=0)
+A_sum_axis0, A_sum_axis0.shape
+```
+
 Specifying `axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.
 Thus, the dimension of axis 1 of the input is lost in the output shape.
 
@@ -544,6 +639,12 @@ A_sum_axis1 = tf.reduce_sum(A, axis=1)
 A_sum_axis1, A_sum_axis1.shape
 ```
 
+```{.python .input}
+#@tab jax
+A_sum_axis1 = A.sum(axis=1)
+A_sum_axis1, A_sum_axis1.shape
+```
+
 Reducing a matrix along both rows and columns via summation
 is equivalent to summing up all the elements of the matrix.
 
@@ -559,6 +660,11 @@ A.sum(axis=[0, 1])  # Same as A.sum()
 ```{.python .input}
 #@tab tensorflow
 tf.reduce_sum(A, axis=[0, 1])  # Same as tf.reduce_sum(A)
+```
+
+```{.python .input}
+#@tab jax
+A.sum(axis=[0, 1])  # Same as A.sum()
 ```
 
 A related quantity is the *mean*, which is also called the *average*.
@@ -580,6 +686,11 @@ A.mean(), A.sum() / A.numel()
 tf.reduce_mean(A), tf.reduce_sum(A) / tf.size(A).numpy()
 ```
 
+```{.python .input}
+#@tab jax
+A.mean(), A.sum() / A.size
+```
+
 Likewise, the function for calculating the mean can also reduce a tensor along the specified axes.
 
 ```{.python .input}
@@ -594,6 +705,11 @@ A.mean(axis=0), A.sum(axis=0) / A.shape[0]
 ```{.python .input}
 #@tab tensorflow
 tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
+```
+
+```{.python .input}
+#@tab jax
+A.mean(axis=0), A.sum(axis=0) / A.shape[0]
 ```
 
 ### Non-Reduction Sum
@@ -618,6 +734,12 @@ sum_A = tf.reduce_sum(A, axis=1, keepdims=True)
 sum_A
 ```
 
+```{.python .input}
+#@tab jax
+sum_A = A.sum(axis=1, keepdims=True)
+sum_A
+```
+
 For instance, since `sum_A` still keeps its two axes after summing each row, we can divide `A` by `sum_A` with broadcasting.
 
 ```{.python .input}
@@ -631,6 +753,11 @@ A / sum_A
 
 ```{.python .input}
 #@tab tensorflow
+A / sum_A
+```
+
+```{.python .input}
+#@tab jax
 A / sum_A
 ```
 
@@ -649,6 +776,11 @@ A.cumsum(axis=0)
 ```{.python .input}
 #@tab tensorflow
 tf.cumsum(A, axis=0)
+```
+
+```{.python .input}
+#@tab jax
+A.cumsum(axis=0)
 ```
 
 ## Dot Products
@@ -672,6 +804,12 @@ y = tf.ones(4, dtype=tf.float32)
 x, y, tf.tensordot(x, y, axes=1)
 ```
 
+```{.python .input}
+#@tab jax
+y = np.ones(4)
+x, y, np.dot(x, y)
+```
+
 Note that we can express the dot product of two vectors equivalently by performing an elementwise multiplication and then a sum:
 
 ```{.python .input}
@@ -686,6 +824,11 @@ torch.sum(x * y)
 ```{.python .input}
 #@tab tensorflow
 tf.reduce_sum(x * y)
+```
+
+```{.python .input}
+#@tab jax
+np.sum(x * y)
 ```
 
 Dot products are useful in a wide range of contexts.
@@ -775,6 +918,11 @@ A.shape, x.shape, torch.mv(A, x)
 A.shape, x.shape, tf.linalg.matvec(A, x)
 ```
 
+```{.python .input}
+#@tab jax
+A.shape, x.shape, np.dot(A, x)
+```
+
 ## Matrix-Matrix Multiplication
 
 If you have gotten the hang of dot products and matrix-vector products,
@@ -857,6 +1005,12 @@ B = tf.ones((4, 3), tf.float32)
 tf.matmul(A, B)
 ```
 
+```{.python .input}
+#@tab jax
+B = np.ones(shape=(4, 3))
+np.dot(A, B)
+```
+
 Matrix-matrix multiplication can be simply called *matrix multiplication*, and should not be confused with the Hadamard product.
 
 
@@ -926,6 +1080,12 @@ u = tf.constant([3.0, -4.0])
 tf.norm(u)
 ```
 
+```{.python .input}
+#@tab jax
+u = np.array([3, -4])
+np.linalg.norm(u)
+```
+
 In deep learning, we work more often
 with the squared $\ell_2$ norm.
 You will also frequently encounter the $\ell_1$ *norm*,
@@ -950,6 +1110,11 @@ torch.abs(u).sum()
 ```{.python .input}
 #@tab tensorflow
 sum(tf.abs(u))
+```
+
+```{.python .input}
+#@tab jax
+np.abs(u).sum()
 ```
 
 Both the $\ell_2$ norm and the $\ell_1$ norm
@@ -979,6 +1144,11 @@ torch.norm(torch.ones((4, 9)))
 ```{.python .input}
 #@tab tensorflow
 tf.norm(tf.ones((4, 9)))
+```
+
+```{.python .input}
+#@tab jax
+np.linalg.norm(np.ones((4, 9)))
 ```
 
 ### Norms and Objectives
@@ -1049,7 +1219,6 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 1. Consider a tensor with shape (2, 3, 4). What are the shapes of the summation outputs along axis 0, 1, and 2?
 1. Feed a tensor with 3 or more axes to the `linalg.norm` function and observe its output. What does this function compute for tensors of arbitrary shape?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/30)
 :end_tab:
@@ -1059,5 +1228,9 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 :end_tab:
 
 :begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/196)
+:end_tab:
+
+:begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/196)
 :end_tab:

@@ -8,21 +8,27 @@ In order to know which functions and classes can be called in a module, we
 invoke the `dir` function. For instance, we can query all properties in the
 module for generating random numbers:
 
-```{.python .input  n=1}
+```{.python .input}
 from mxnet import np
 print(dir(np.random))
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab pytorch
 import torch
 print(dir(torch.distributions))
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab tensorflow
 import tensorflow as tf
 print(dir(tf.random))
+```
+
+```{.python .input}
+#@tab jax
+import jax
+print(dir(jax.random))
 ```
 
 Generally, we can ignore functions that start and end with `__` (special objects in Python) or functions that start with a single `_`(usually internal functions). Based on the remaining function or attribute names, we might hazard a guess that this module offers various methods for generating random numbers, including sampling from the uniform distribution (`uniform`), normal distribution (`normal`), and multinomial distribution  (`multinomial`).
@@ -45,6 +51,11 @@ help(torch.ones)
 help(tf.ones)
 ```
 
+```{.python .input}
+#@tab jax
+help(jax.numpy.ones)
+```
+
 From the documentation, we can see that the `ones` function creates a new tensor with the specified shape and sets all the elements to the value of 1. Whenever possible, you should run a quick test to confirm your interpretation:
 
 ```{.python .input}
@@ -59,6 +70,11 @@ torch.ones(4)
 ```{.python .input}
 #@tab tensorflow
 tf.ones(4)
+```
+
+```{.python .input}
+#@tab jax
+jax.numpy.ones(4)
 ```
 
 In the Jupyter notebook, we can use `?` to display the document in another
@@ -79,7 +95,6 @@ displayed.
 
 1. Look up the documentation for any function or class in the deep learning framework. Can you also find the documentation on the official website of the framework?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/38)
 :end_tab:
@@ -89,5 +104,9 @@ displayed.
 :end_tab:
 
 :begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/199)
+:end_tab:
+
+:begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/199)
 :end_tab:

@@ -66,6 +66,15 @@ import tensorflow as tf
 import numpy as np
 ```
 
+```{.python .input}
+#@tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax.numpy as np
+import jax
+import numpy as onp
+```
+
 Next, we will want to be able to cast the die. In statistics we call this process
 of drawing examples from probability distributions *sampling*.
 The distribution
@@ -95,6 +104,12 @@ fair_probs = tf.ones([6, 1]) / 6
 tf.random.categorical(fair_probs, 1)
 ```
 
+```{.python .input}
+#@tab jax
+fair_probs = [1.0 / 6] * 6
+onp.random.multinomial(1, fair_probs)
+```
+
 If you run the sampler a bunch of times, you will find that you get out random
 values each time. As with estimating the fairness of a die, we often want to
 generate many samples from the same distribution. It would be unbearably slow to
@@ -116,6 +131,11 @@ multinomial.Multinomial(10, fair_probs).sample()
 tf.random.categorical(fair_probs, 10)
 ```
 
+```{.python .input}
+#@tab jax
+onp.random.multinomial(10, fair_probs)
+```
+
 Now that we know how to sample rolls of a die, we can simulate 1000 rolls. We
 can then go through and count, after each of the 1000 rolls, how many times each
 number was rolled.
@@ -135,6 +155,12 @@ counts / 1000
 ```{.python .input}
 #@tab tensorflow
 counts = tf.random.categorical(fair_probs, 1000)
+counts / 1000
+```
+
+```{.python .input}
+#@tab jax
+counts = onp.random.multinomial(1000, fair_probs).astype(np.float32)
 counts / 1000
 ```
 
@@ -183,6 +209,22 @@ estimates = cum_counts / tf.reduce_sum(cum_counts, axis=1, keepdims=True)
 d2l.set_figsize((6, 4.5))
 for i in range(6):
     d2l.plt.plot(estimates[:, i].numpy(),
+                 label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Groups of experiments')
+d2l.plt.gca().set_ylabel('Estimated probability')
+d2l.plt.legend();
+```
+
+```{.python .input}
+#@tab jax
+counts = onp.random.multinomial(10, fair_probs, size=500)
+cum_counts = counts.astype(onp.float32).cumsum(axis=0)
+estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
+
+d2l.set_figsize((6, 4.5))
+for i in range(6):
+    d2l.plt.plot(estimates[:, i],
                  label=("P(die=" + str(i + 1) + ")"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Groups of experiments')
@@ -427,7 +469,6 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 1. Assume that we have a sequence of random variables, say $A$, $B$, and $C$, where $B$ only depends on $A$, and $C$ only depends on $B$, can you simplify the joint probability $P(A, B, C)$? (Hint: this is a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain).)
 1. In :numref:`subsec_probability_hiv_app`, the first test is more accurate. Why not just run the first test a second time?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/36)
 :end_tab:
@@ -437,5 +478,9 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 :end_tab:
 
 :begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/198)
+:end_tab:
+
+:begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/198)
 :end_tab:

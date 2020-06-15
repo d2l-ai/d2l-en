@@ -34,6 +34,15 @@ import torch
 import tensorflow as tf
 ```
 
+```{.python .input}
+#@tab jax
+import jax.numpy as np
+from jax import grad
+from jax import random
+key = random.PRNGKey(42) #randomness works a bit differently in JAX, see the
+                         #ndarray chapter
+```
+
 ## A Simple Example
 
 As a toy example, say that we are interested
@@ -56,6 +65,12 @@ x
 ```{.python .input}
 #@tab tensorflow
 x = tf.constant(range(4), dtype=tf.float32)
+x
+```
+
+```{.python .input}
+#@tab jax
+x = np.arange(4., dtype=np.float32)
 x
 ```
 
@@ -91,6 +106,12 @@ x.grad  # The default value is None
 x = tf.Variable(x)
 ```
 
+```{.python .input}
+#@tab jax
+# Jax doesn't store gradients in objects but has a functional API instead
+# See below
+```
+
 Now let us calculate $y$.
 
 ```{.python .input}
@@ -112,6 +133,13 @@ y
 # Record all computations onto a tape. 
 with tf.GradientTape() as t:
     y = 2 * tf.tensordot(x, x, axes=1)
+y
+```
+
+```{.python .input}
+#@tab jax
+f = lambda x: 2*np.dot(x,x)
+y = f(x)
 y
 ```
 
@@ -139,6 +167,13 @@ x_grad = t.gradient(y, x)
 x_grad
 ```
 
+```{.python .input}
+#@tab jax
+#Take the gradient of y w.r.t. the first argument
+x_grad = grad(f)(x)
+x_grad
+```
+
 The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to $\mathbf{x}$ should be $4\mathbf{x}$.
 Let us quickly verify that our desired gradient was calculated correctly.
@@ -154,6 +189,11 @@ x.grad == 4 * x
 
 ```{.python .input}
 #@tab tensorflow
+x_grad == 4 * x
+```
+
+```{.python .input}
+#@tab jax
 x_grad == 4 * x
 ```
 
@@ -181,6 +221,14 @@ x.grad
 with tf.GradientTape() as t:
     y = tf.reduce_sum(x)
 t.gradient(y, x)  # Overwritten by the newly calculated gradient.
+```
+
+```{.python .input}
+#@tab jax
+f = lambda x: np.sum(x)
+
+y = f(x)
+grad(f)(x)
 ```
 
 ## Backward for Non-Scalar Variables
@@ -223,6 +271,18 @@ x.grad
 with tf.GradientTape() as t:
     y = x * x
 t.gradient(y, x)  # Equals to y = tf.reduce_sum(x * x)
+```
+
+:begin_tab:`jax`
+`JAX` only supports scalar-value functions, hence for non-scalar variables we have to perform a reductive summation.
+:end_tab:
+
+```{.python .input}
+#@tab jax
+f = lambda x: np.sum(x*x)
+
+y = f(x)
+grad(f)(x)
 ```
 
 ## Detaching Computation
@@ -280,8 +340,25 @@ x_grad = t.gradient(z, x)
 x_grad == u
 ```
 
+:begin_tab:`jax`
+`JAX` does not require any detachment of computation since it relies on side-effect-free functions which don't mutate global state. You have to explicitly define which function to differentiate and with respect to which argument.
+:end_tab:
+
+```{.python .input}
+#@tab jax
+y = (lambda a: a*2)(x)
+
+z = (lambda a: np.sum(y*a))
+
+x_grad = grad(z)(x)
+x_grad
+```
+
 Since the computation of `y` was recorded,
 we can subsequently call backward function on `y` to get the derivative of `y = x * x` with respect to `x`, which is `2 * x`.
+
+:begin_tab:`jax`
+In `JAX`, we get a `grad` object as a result of a function call owing to the functional API style.
 
 ```{.python .input}
 y.backward()
@@ -298,6 +375,11 @@ x.grad == 2 * x
 ```{.python .input}
 #@tab tensorflow
 t.gradient(y, x) == 2 * x
+```
+
+```{.python .input}
+#@tab jax
+x_grad == 2 * x
 ```
 
 ## Computing the Gradient of Python Control Flow
@@ -350,6 +432,19 @@ def f(a):
     return c
 ```
 
+```{.python .input}
+#@tab jax
+def f(a):
+    b = a * 2
+    while np.linalg.norm(b) < 1000:
+        b = b * 2
+    if b.sum() > 0:
+        c = b
+    else:
+        c = 100 * b
+    return c
+```
+
 Let us compute the gradient.
 
 ```{.python .input}
@@ -376,6 +471,14 @@ d_grad = t.gradient(d, a)
 d_grad
 ```
 
+```{.python .input}
+#@tab jax
+a = random.normal(key, dtype=np.float32) #JAX requires a random key
+d = f(a)
+d_grad = grad(f)(a)
+d_grad
+```
+
 We can now analyze the `f` function defined above.
 Note that it is piecewise linear in its input `a`.
 In other words, for any `a` there exists some constant scalar `k`
@@ -394,6 +497,11 @@ a.grad == (d / a)
 ```{.python .input}
 #@tab tensorflow
 d_grad == (d / a)
+```
+
+```{.python .input}
+#@tab jax
+d_grad == d / a
 ```
 
 ## Summary
@@ -420,3 +528,11 @@ d_grad == (d / a)
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/200)
 :end_tab:
+
+:begin_tab:`jax`
+[Discussions](https://discuss.d2l.ai/t/200)
+:end_tab:
+
+```{.python .input}
+
+```

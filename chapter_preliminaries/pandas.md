@@ -119,6 +119,13 @@ X, y = tf.constant(inputs.values), tf.constant(outputs.values)
 X, y
 ```
 
+```{.python .input}
+#@tab jax
+import jax.numpy as np
+
+X, y = np.array(inputs.values), np.array(outputs.values)
+X, y
+```
 
 ## Summary
 
@@ -133,7 +140,6 @@ Create a raw dataset with more rows and columns.
 1. Delete the column with the most missing values.
 2. Convert the preprocessed dataset to the tensor format.
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/28)
 :end_tab:
@@ -143,5 +149,9 @@ Create a raw dataset with more rows and columns.
 :end_tab:
 
 :begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/195)
+:end_tab:
+
+:begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/195)
 :end_tab:
