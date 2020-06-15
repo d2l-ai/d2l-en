@@ -55,6 +55,18 @@ def getnet():
 net = getnet()
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(256, activation=tf.nn.relu),
+    tf.keras.layers.Dense(10),
+])
+```
+
 At this point, the network cannot possibly know
 the dimensions of the input layer's weights
 because the input dimension remains unknown.
@@ -64,6 +76,14 @@ We confirm by attempting to access the parameters below.
 ```{.python .input}
 print(net.collect_params)
 print(net.collect_params())
+```
+
+```{.python .input}
+#@tab tensorflow
+# Note that each layer objects exist but the weights are empty.
+# `net.get_weights()` would through an error since the weights
+# have not been initialized yet.
+[net.layers[i].get_weights() for i in range(len(net.layers))]
 ```
 
 Note that while the Parameter objects exist,
@@ -81,6 +101,12 @@ net.initialize()
 net.collect_params()
 ```
 
+```{.python .input}
+#@tab tensorflow
+net.build(input_shape=(2, 20))
+net.get_weights()
+```
+
 As we can see, nothing has changed. 
 When input dimensions are unknown, 
 calls to initialize do not truly initalize the parameters.
@@ -96,6 +122,14 @@ x = np.random.uniform(size=(2, 20))
 net(x)  # Forward computation
 
 net.collect_params()
+```
+
+```{.python .input}
+#@tab tensorflow
+x = tf.random.uniform((2, 20))
+net(x)  # Forward computation
+
+net.get_weights()
 ```
 
 As soon as we know the input dimensionality, 
