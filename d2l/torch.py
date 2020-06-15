@@ -670,6 +670,114 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
     return data_iter, data_iter.vocab
 
 
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
+                           '94646ad1522d915e7b0f9296181140edcf86a4f5')
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def read_data_nmt():
+    data_dir = d2l.download_extract('fra-eng')
+    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
+        return f.read()
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def preprocess_nmt(text):
+    def no_space(char, prev_char):
+        return char in set(',.!') and prev_char != ' '
+
+    text = text.replace('\u202f', ' ').replace('\xa0', ' ').lower()
+    out = [' ' + char if i > 0 and no_space(char, text[i-1]) else char
+           for i, char in enumerate(text)]
+    return ''.join(out)
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def tokenize_nmt(text, num_examples=None):
+    source, target = [], []
+    for i, line in enumerate(text.split('\n')):
+        if num_examples and i > num_examples:
+            break
+        parts = line.split('\t')
+        if len(parts) == 2:
+            source.append(parts[0].split(' '))
+            target.append(parts[1].split(' '))
+    return source, target
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def truncate_pad(line, num_steps, padding_token):
+    if len(line) > num_steps:
+        return line[:num_steps]  # Trim
+    return line + [padding_token] * (num_steps - len(line))  # Pad
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def build_array(lines, vocab, num_steps, is_source):
+    lines = [vocab[l] for l in lines]
+    if not is_source:
+        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
+    array = torch.tensor([truncate_pad(
+        l, num_steps, vocab['<pad>']) for l in lines])
+    valid_len = (array != vocab['<pad>']).sum(dim=1)
+    return array, valid_len
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def load_data_nmt(batch_size, num_steps, num_examples=1000):
+    text = preprocess_nmt(read_data_nmt())
+    source, target = tokenize_nmt(text, num_examples)
+    src_vocab = d2l.Vocab(source, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
+    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
+    src_array, src_valid_len = build_array(
+        source, src_vocab, num_steps, True)
+    tgt_array, tgt_valid_len = build_array(
+        target, tgt_vocab, num_steps, False)
+    data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
+    data_iter = d2l.load_array(data_arrays, batch_size)
+    return src_vocab, tgt_vocab, data_iter
+
+
+# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
+class Encoder(nn.Module):
+    """The base encoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(Encoder, self).__init__(**kwargs)
+
+    def forward(self, X, *args):
+        raise NotImplementedError
+
+
+# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
+class Decoder(nn.Module):
+    """The base decoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(Decoder, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+
+
+# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
+class EncoderDecoder(nn.Module):
+    """The base class for the encoder-decoder architecture."""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoder, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state)
+
+
 # Defined in file: ./chapter_attention-mechanisms/attention.md
 def masked_softmax(X, valid_len):
     # X: 3-D tensor, valid_len: 1-D or 2-D tensor
