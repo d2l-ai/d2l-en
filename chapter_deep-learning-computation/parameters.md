@@ -544,15 +544,16 @@ net[0].weight[0:2]
 
 ```{.python .input}
 #@tab tensorflow
-def my_init(m):
-    return tf.keras.initializers.Constant(m)
+class MyInit(tf.keras.initializers.Initializer):
+    def __call__(self, shape, dtype=None):
+        return tf.random.uniform(shape, dtype=dtype)
 
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(
         4,
         activation=tf.nn.relu,
-        kernel_initializer=my_init(2)),
+        kernel_initializer=MyInit()),
     tf.keras.layers.Dense(1),
 ])
 
