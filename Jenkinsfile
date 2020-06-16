@@ -69,7 +69,7 @@ stage("Build and Publish") {
       } else {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
-        d2lbook deploy html pdf --s3 s3://preview.d2.ai/${JOB_NAME}/
+        d2lbook deploy html pdf --s3 s3://preview.d2l.ai/${JOB_NAME}/
         if [[ ${BRANCH_NAME} == PR-* ]]; then
           pullRequest.comment("Job ${env.JOB_NAME}/${env.BUILD_NUMBER} is complete. \nCheck the results at http://preview.d2l.ai/${JOB_NAME}/index.html")
         fi
