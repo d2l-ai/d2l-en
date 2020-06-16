@@ -664,7 +664,7 @@ zeros = tf.zeros
 
 In the rest of the book,
 we often define more complicated functions or classes.
-For those that are commonly used,
+For those that can be used later,
 we will also save them in the `d2l` package
 so later they can be directly invoked without being redefined.
 
