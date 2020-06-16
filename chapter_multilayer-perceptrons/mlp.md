@@ -292,7 +292,7 @@ let us briefly survey some common activation functions.
 ### ReLU Function
 
 As stated above, the most popular choice,
-due to both simplicity of implementation
+due to both simplicity of implementation and
 its performance on a variety of predictive tasks 
 is the rectified linear unit (ReLU).
 ReLU provides a very simple nonlinear transformation.
