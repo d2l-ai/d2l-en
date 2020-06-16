@@ -17,7 +17,7 @@ As an example, we begin by creating an artificial dataset that is stored in a
 csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other
 formats may be processed in similar ways.
 The following `mkdir_if_not_exist`
-function ensures that the directory `../data` exists. 
+function ensures that the directory `../data` exists.
 
 ```{.python .input}
 #@tab all

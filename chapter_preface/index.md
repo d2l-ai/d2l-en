@@ -1,5 +1,4 @@
 # Preface
-:label:`chapter_preface`
 
 Just a few years ago, there were no legions of deep learning scientists
 developing intelligent products and services at major companies and startups.

@@ -619,15 +619,19 @@ a = tf.constant([3.5]).numpy()
 a, a.item(), float(a), int(a)
 ```
 
-## Framework Agnostic Library
+## The `d2l` Package
 
-As we mentioned in :numref:`chapter_preface`, we will provide algorithm implementations
-in multiple framework through this book. In addition, we will make these implementations
-as consistent as possible to make it easy for you to learn another framework.
-Here we uniform a few methods in the `d2l` package so that we can call them in a
-consistent way, for exmaple `d2l.numpy(a)` will convert tensor `a` into a NumPy
-ndarray. The comment `#@save` is a special mark where the following function,
+Throughout the online version of this book,
+we will provide implementations of multiple frameworks.
+However, different frameworks may be different in their API names or usage.
+To better reuse the same code block across multiple frameworks,
+we unify a few commonly-used functions in the `d2l` package.
+The comment `#@save` is a special mark where the following function,
 class, or statements are saved in the `d2l` package.
+For instance, later we can directly invoke
+`d2l.numpy(a)` to convert a tensor `a`,
+which can be defined in any supported framework,
+into a NumPy tensor.
 
 ```{.python .input}
 #@save
@@ -657,6 +661,13 @@ reshape = tf.reshape
 ones = tf.ones
 zeros = tf.zeros
 ```
+
+In the rest of the book,
+we often define more complicated functions or classes.
+For those that are commonly used,
+we will also save them in the `d2l` package
+so later they can be directly invoked without being redefined.
+
 
 ## Summary
 
