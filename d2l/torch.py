@@ -801,3 +801,4 @@ class MLPAttention(nn.Module):
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
         return torch.bmm(attention_weights, value)
 
+
