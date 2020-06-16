@@ -247,7 +247,7 @@ the network adds maximum pooling layers
 with a window shape of $3\times3$ and a stride of 2.
 Moreover, AlexNet has ten times more convolution channels than LeNet.
 
-After the last convolutional layer are two fully-connected layers
+After the last convolutional layer there are two fully-connected layers
 with 4096 outputs.
 These two huge fully-connected layers produce model parameters of nearly 1 GB.
 Due to the limited memory in early GPUs,

@@ -5,12 +5,22 @@ Throughout the previous sections, we learned about the theory of probability and
 
 Learning is all about making assumptions. If we want to classify a new data point that we have never seen before we have to make some assumptions about which data points are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent from each other to simplify the computation. In this section, we will apply this model to recognize characters in images.
 
-```{.python .input  n=72}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
 from mxnet import gluon, np, npx
 npx.set_np()
+d2l.use_svg_display()
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import math
+import torch
+import torchvision
 d2l.use_svg_display()
 ```
 
@@ -33,9 +43,28 @@ mnist_train = gluon.data.vision.MNIST(train=True, transform=transform)
 mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 ```
 
+```{.python .input}
+#@tab pytorch
+data_transform = torchvision.transforms.Compose(
+    [torchvision.transforms.ToTensor()])
+
+mnist_train = torchvision.datasets.MNIST(root='./temp', train=True,
+                                         transform=data_transform, 
+                                         download=True)
+mnist_test = torchvision.datasets.MNIST(root='./temp', train=False,
+                                        transform=data_transform, 
+                                        download=True)
+```
+
 We can access a particular example, which contains the image and the corresponding label.
 
 ```{.python .input}
+image, label = mnist_train[2]
+image.shape, label
+```
+
+```{.python .input}
+#@tab pytorch
 image, label = mnist_train[2]
 image.shape, label
 ```
@@ -46,10 +75,20 @@ Our example, stored here in the variable `image`, corresponds to an image with a
 image.shape, image.dtype
 ```
 
+```{.python .input}
+#@tab pytorch
+image.shape, image.dtype
+```
+
 Our code stores the label of each image as a scalar. Its type is a $32$-bit integer.
 
 ```{.python .input}
 label, type(label), label.dtype
+```
+
+```{.python .input}
+#@tab pytorch
+label, type(label)
 ```
 
 We can also access multiple examples at the same time.
@@ -59,9 +98,22 @@ images, labels = mnist_train[10:38]
 images.shape, labels.shape
 ```
 
+```{.python .input}
+#@tab pytorch
+images = torch.stack([mnist_train[i][0] for i in range(10,38)], 
+                     dim=1).squeeze(0)
+labels = torch.tensor([mnist_train[i][1] for i in range(10,38)])
+images.shape, labels.shape
+```
+
 Let us visualize these examples.
 
 ```{.python .input}
+d2l.show_images(images, 2, 9);
+```
+
+```{.python .input}
+#@tab pytorch
 d2l.show_images(images, 2, 9);
 ```
 
@@ -105,7 +157,7 @@ for any $y$. So our assumption of conditional independence has taken the complex
 
 The problem now is that we do not know $P_{xy}$ and $P_y$. So we need to estimate their values given some training data first. This is *training* the model. Estimating $P_y$ is not too hard. Since we are only dealing with $10$ classes, we may count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5,800$ times and we have a total of $n = 60,000$ images, the probability estimate is $p(y=8) = 0.0967$.
 
-```{.python .input  n=50}
+```{.python .input}
 X, Y = mnist_train[:]  # All training examples
 
 n_y = np.zeros((10))
@@ -115,12 +167,35 @@ P_y = n_y / n_y.sum()
 P_y
 ```
 
+```{.python .input}
+#@tab pytorch
+X = torch.stack([mnist_train[i][0] for i in range(len(mnist_train))], 
+                dim=1).squeeze(0)
+Y = torch.tensor([mnist_train[i][1] for i in range(len(mnist_train))])
+
+n_y = torch.zeros(10)
+for y in range(10):
+    n_y[y] = (Y == y).sum()
+P_y = n_y / n_y.sum()
+P_y
+```
+
 Now on to slightly more difficult things $P_{xy}$. Since we picked black and white images, $p(x_i  \mid  y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of $y$, i.e., $n_y$. But there is something slightly troubling: certain pixels may never be black (e.g., for well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called *Laplace Smoothing*.  It may seem ad-hoc, however it may be well motivated from a Bayesian point-of-view.
 
-```{.python .input  n=66}
+```{.python .input}
 n_x = np.zeros((10, 28, 28))
 for y in range(10):
     n_x[y] = np.array(X.asnumpy()[Y.asnumpy() == y].sum(axis=0))
+P_xy = (n_x + 1) / (n_y + 1).reshape(10, 1, 1)
+
+d2l.show_images(P_xy, 2, 5);
+```
+
+```{.python .input}
+#@tab pytorch
+n_x = torch.zeros((10, 28, 28))
+for y in range(10):
+    n_x[y] = torch.tensor(X.numpy()[Y.numpy() == y].sum(axis=0))
 P_xy = (n_x + 1) / (n_y + 1).reshape(10, 1, 1)
 
 d2l.show_images(P_xy, 2, 5);
@@ -141,12 +216,31 @@ image, label = mnist_test[0]
 bayes_pred(image)
 ```
 
+```{.python .input}
+#@tab pytorch
+def bayes_pred(x):
+    x = x.unsqueeze(0)  # (28, 28) -> (1, 28, 28)
+    p_xy = P_xy * x + (1 - P_xy)*(1 - x)
+    p_xy = p_xy.reshape(10, -1).prod(dim=1)  # p(x|y)
+    return p_xy * P_y
+
+image, label = mnist_test[0]
+bayes_pred(image)
+```
+
 This went horribly wrong! To find out why, let us look at the per pixel probabilities. They are typically numbers between $0.001$ and $1$. We are multiplying $784$ of them. At this point it is worth mentioning that we are calculating these numbers on a computer, hence with a fixed range for the exponent. What happens is that we experience *numerical underflow*, i.e., multiplying all the small numbers leads to something even smaller until it is rounded down to zero.  We discussed this as a theoretical issue in :numref:`sec_maximum_likelihood`, but we see the phenomena clearly here in practice.
 
 As discussed in that section, we fix this by use the fact that $\log a b = \log a + \log b$, i.e., we switch to summing logarithms.
 Even if both $a$ and $b$ are small numbers, the logarithm values should be in a proper range.
 
 ```{.python .input}
+a = 0.1
+print('underflow:', a**784)
+print('logarithm is normal:', 784*math.log(a))
+```
+
+```{.python .input}
+#@tab pytorch
 a = 0.1
 print('underflow:', a**784)
 print('logarithm is normal:', 784*math.log(a))
@@ -173,12 +267,33 @@ py = bayes_pred_stable(image)
 py
 ```
 
+```{.python .input}
+#@tab pytorch
+log_P_xy = torch.log(P_xy)
+log_P_xy_neg = torch.log(1 - P_xy)
+log_P_y = torch.log(P_y)
+
+def bayes_pred_stable(x):
+    x = x.unsqueeze(0)  # (28, 28) -> (1, 28, 28)
+    p_xy = log_P_xy * x + log_P_xy_neg * (1 - x)
+    p_xy = p_xy.reshape(10, -1).sum(axis=1)  # p(x|y)
+    return p_xy + log_P_y
+
+py = bayes_pred_stable(image)
+py
+```
+
 We may now check if the prediction is correct.
 
 ```{.python .input}
 # Convert label which is a scalar tensor of int32 dtype
 # to a Python scalar integer for comparison
 py.argmax(axis=0) == int(label)
+```
+
+```{.python .input}
+#@tab pytorch
+py.argmax(dim=0) == label
 ```
 
 If we now predict a few validation examples, we can see the Bayes
@@ -193,11 +308,32 @@ preds = predict(X)
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
+```{.python .input}
+#@tab pytorch
+def predict(X):
+    return [bayes_pred_stable(x).argmax(dim=0).type(torch.int32).item() 
+            for x in X]
+
+X = torch.stack([mnist_train[i][0] for i in range(10,38)], dim=1).squeeze(0)
+y = torch.tensor([mnist_train[i][1] for i in range(10,38)])
+preds = predict(X)
+d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
+```
+
 Finally, let us compute the overall accuracy of the classifier.
 
 ```{.python .input}
 X, y = mnist_test[:]
 preds = np.array(predict(X), dtype=np.int32)
+float((preds == y).sum()) / len(y)  # Validation accuracy
+```
+
+```{.python .input}
+#@tab pytorch
+X = torch.stack([mnist_train[i][0] for i in range(len(mnist_test))], 
+                dim=1).squeeze(0)
+y = torch.tensor([mnist_train[i][1] for i in range(len(mnist_test))])
+preds = torch.tensor(predict(X), dtype=torch.int32)
 float((preds == y).sum()) / len(y)  # Validation accuracy
 ```
 

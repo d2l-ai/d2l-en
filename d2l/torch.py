@@ -503,3 +503,301 @@ class Residual(nn.Module):  #@save
         return F.relu(Y)
 
 
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
+                                '090b5e7e70c295757f55df93cb0a180b9691891a')
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def read_time_machine():  #@save
+    """Load the time machine book into a list of sentences."""
+    with open(d2l.download('time_machine'), 'r') as f:
+        lines = f.readlines()
+    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
+            for line in lines]
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def tokenize(lines, token='word'):  #@save
+    """Split sentences into word or char tokens."""
+    if token == 'word':
+        return [line.split(' ') for line in lines]
+    elif token == 'char':
+        return [list(line) for line in lines]
+    else:
+        print('ERROR: unknown token type '+token)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+class Vocab:  #@save
+    def __init__(self, tokens, min_freq=0, reserved_tokens=None):
+        if reserved_tokens is None:
+            reserved_tokens = []
+        # Sort according to frequencies
+        counter = count_corpus(tokens)
+        self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
+        self.token_freqs.sort(key=lambda x: x[1], reverse=True)
+        self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
+        uniq_tokens += [token for token, freq in self.token_freqs
+                        if freq >= min_freq and token not in uniq_tokens]
+        self.idx_to_token, self.token_to_idx = [], dict()
+        for token in uniq_tokens:
+            self.idx_to_token.append(token)
+            self.token_to_idx[token] = len(self.idx_to_token) - 1
+
+    def __len__(self):
+        return len(self.idx_to_token)
+
+    def __getitem__(self, tokens):
+        if not isinstance(tokens, (list, tuple)):
+            return self.token_to_idx.get(tokens, self.unk)
+        return [self.__getitem__(token) for token in tokens]
+
+    def to_tokens(self, indices):
+        if not isinstance(indices, (list, tuple)):
+            return self.idx_to_token[indices]
+        return [self.idx_to_token[index] for index in indices]
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def count_corpus(sentences):  #@save
+    # Flatten a list of token lists into a list of tokens
+    tokens = [tk for line in sentences for tk in line]
+    return collections.Counter(tokens)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def load_corpus_time_machine(max_tokens=-1):  #@save
+    lines = read_time_machine()
+    tokens = tokenize(lines, 'char')
+    vocab = Vocab(tokens)
+    corpus = [vocab[tk] for line in tokens for tk in line]
+    if max_tokens > 0:
+        corpus = corpus[:max_tokens]
+    return corpus, vocab
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
+def seq_data_iter_random(corpus, batch_size, num_steps):
+    # Offset the iterator over the data for uniform starts
+    corpus = corpus[random.randint(0, num_steps):]
+    # Subtract 1 extra since we need to account for label
+    num_examples = ((len(corpus) - 1) // num_steps)
+    example_indices = list(range(0, num_examples * num_steps, num_steps))
+    random.shuffle(example_indices)
+
+    def data(pos):
+        # This returns a sequence of the length num_steps starting from pos
+        return corpus[pos: pos + num_steps]
+
+    # Discard half empty batches
+    num_batches = num_examples // batch_size
+    for i in range(0, batch_size * num_batches, batch_size):
+        # Batch_size indicates the random examples read each time
+        batch_indices = example_indices[i:(i+batch_size)]
+        X = [data(j) for j in batch_indices]
+        Y = [data(j + 1) for j in batch_indices]
+        yield torch.Tensor(X), torch.Tensor(Y)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
+def seq_data_iter_consecutive(corpus, batch_size, num_steps):
+    # Offset for the iterator over the data for uniform starts
+    offset = random.randint(0, num_steps)
+    # Slice out data - ignore num_steps and just wrap around
+    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = torch.Tensor(corpus[offset:offset+num_indices])
+    Ys = torch.Tensor(corpus[offset+1:offset+1+num_indices])
+    Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
+    num_batches = Xs.shape[1] // num_steps
+    for i in range(0, num_batches * num_steps, num_steps):
+        X = Xs[:, i:(i+num_steps)]
+        Y = Ys[:, i:(i+num_steps)]
+        yield X, Y
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
+class SeqDataLoader:
+    """A iterator to load sequence data."""
+    def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
+        if use_random_iter:
+            self.data_iter_fn = d2l.seq_data_iter_random
+        else:
+            self.data_iter_fn = d2l.seq_data_iter_consecutive
+        self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
+        self.batch_size, self.num_steps = batch_size, num_steps
+
+    def __iter__(self):
+        return self.data_iter_fn(self.corpus, self.batch_size, self.num_steps)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
+def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
+                           max_tokens=10000):
+    data_iter = SeqDataLoader(
+        batch_size, num_steps, use_random_iter, max_tokens)
+    return data_iter, data_iter.vocab
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
+                           '94646ad1522d915e7b0f9296181140edcf86a4f5')
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def read_data_nmt():
+    data_dir = d2l.download_extract('fra-eng')
+    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
+        return f.read()
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def preprocess_nmt(text):
+    def no_space(char, prev_char):
+        return char in set(',.!') and prev_char != ' '
+
+    text = text.replace('\u202f', ' ').replace('\xa0', ' ').lower()
+    out = [' ' + char if i > 0 and no_space(char, text[i-1]) else char
+           for i, char in enumerate(text)]
+    return ''.join(out)
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def tokenize_nmt(text, num_examples=None):
+    source, target = [], []
+    for i, line in enumerate(text.split('\n')):
+        if num_examples and i > num_examples:
+            break
+        parts = line.split('\t')
+        if len(parts) == 2:
+            source.append(parts[0].split(' '))
+            target.append(parts[1].split(' '))
+    return source, target
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def truncate_pad(line, num_steps, padding_token):
+    if len(line) > num_steps:
+        return line[:num_steps]  # Trim
+    return line + [padding_token] * (num_steps - len(line))  # Pad
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def build_array(lines, vocab, num_steps, is_source):
+    lines = [vocab[l] for l in lines]
+    if not is_source:
+        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
+    array = torch.tensor([truncate_pad(
+        l, num_steps, vocab['<pad>']) for l in lines])
+    valid_len = (array != vocab['<pad>']).sum(dim=1)
+    return array, valid_len
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def load_data_nmt(batch_size, num_steps, num_examples=1000):
+    text = preprocess_nmt(read_data_nmt())
+    source, target = tokenize_nmt(text, num_examples)
+    src_vocab = d2l.Vocab(source, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
+    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
+    src_array, src_valid_len = build_array(
+        source, src_vocab, num_steps, True)
+    tgt_array, tgt_valid_len = build_array(
+        target, tgt_vocab, num_steps, False)
+    data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
+    data_iter = d2l.load_array(data_arrays, batch_size)
+    return src_vocab, tgt_vocab, data_iter
+
+
+# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
+class Encoder(nn.Module):
+    """The base encoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(Encoder, self).__init__(**kwargs)
+
+    def forward(self, X, *args):
+        raise NotImplementedError
+
+
+# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
+class Decoder(nn.Module):
+    """The base decoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(Decoder, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+
+
+# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
+class EncoderDecoder(nn.Module):
+    """The base class for the encoder-decoder architecture."""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoder, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state)
+
+
+# Defined in file: ./chapter_attention-mechanisms/attention.md
+def masked_softmax(X, valid_len):
+    # X: 3-D tensor, valid_len: 1-D or 2-D tensor
+    if valid_len is None:
+        return nn.functional.softmax(X, dim=-1)
+    else:
+        shape = X.shape
+        if valid_len.dim() == 1:
+            valid_len = torch.repeat_interleave(valid_len, repeats=shape[1], dim=0)
+        else:
+            valid_len = valid_len.reshape(-1)
+        # Fill masked elements with a large negative, whose exp is 0
+        X = X.reshape(-1, shape[-1])
+        for count, row in enumerate(X):
+            row[int(valid_len[count]):]=-1e6
+        return nn.functional.softmax(X.reshape(shape), dim=-1)
+
+
+# Defined in file: ./chapter_attention-mechanisms/attention.md
+class DotProductAttention(nn.Module):
+    def __init__(self, dropout, **kwargs):
+        super(DotProductAttention, self).__init__(**kwargs)
+        self.dropout = nn.Dropout(dropout)
+
+    # query: (batch_size, #queries, d)
+    # key: (batch_size, #kv_pairs, d)
+    # value: (batch_size, #kv_pairs, dim_v)
+    # valid_len: either (batch_size, ) or (batch_size, xx)
+    def forward(self, query, key, value, valid_len=None):
+        d = query.shape[-1]
+        # set transpose_b=True to swap the last two dimensions of key
+        scores = torch.bmm(query, key.transpose(1,2)) / math.sqrt(d)
+        attention_weights = self.dropout(masked_softmax(scores, valid_len))
+        return torch.bmm(attention_weights, value)
+
+
+# Defined in file: ./chapter_attention-mechanisms/attention.md
+class MLPAttention(nn.Module):
+    def __init__(self, key_size, query_size, units, dropout, **kwargs):
+        super(MLPAttention, self).__init__(**kwargs)
+        self.W_k = nn.Linear(key_size, units, bias=False)
+        self.W_q = nn.Linear(query_size, units, bias=False)
+        self.v = nn.Linear(units, 1, bias=False)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, query, key, value, valid_len):
+        query, key = self.W_k(query), self.W_q(key)
+        # expand query to (batch_size, #querys, 1, units), and key to
+        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast.
+        features = query.unsqueeze(2) + key.unsqueeze(1)
+        scores = self.v(features).squeeze(-1)
+        attention_weights = self.dropout(masked_softmax(scores, valid_len))
+        return torch.bmm(attention_weights, value)
+

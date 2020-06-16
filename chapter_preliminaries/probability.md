@@ -54,7 +54,6 @@ npx.set_np()
 %matplotlib inline
 from d2l import torch as d2l
 import torch
-import numpy as np
 from torch.distributions import multinomial
 ```
 
@@ -129,8 +128,9 @@ counts / 1000
 
 ```{.python .input}
 #@tab pytorch
-counts = multinomial.Multinomial(1000, fair_probs).sample().type(torch.float32)
-counts / 1000
+# Store the results as 32-bit floats for division
+counts = multinomial.Multinomial(1000, fair_probs).sample()
+counts / 1000  # Relative frequency as the estimate
 ```
 
 ```{.python .input}
@@ -161,9 +161,9 @@ d2l.plt.legend();
 
 ```{.python .input}
 #@tab pytorch
-counts = torch.from_numpy(np.random.multinomial(10, fair_probs, size=500))
-cum_counts = counts.type(torch.float32).cumsum(axis=0)
-estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
+counts = multinomial.Multinomial(10, fair_probs).sample((500,))
+cum_counts = counts.cumsum(dim=0)
+estimates = cum_counts / cum_counts.sum(dim=1, keepdims=True)
 
 d2l.set_figsize((6, 4.5))
 for i in range(6):

@@ -511,7 +511,7 @@ print('Error in estimating b', true_b - b)
 :end_tab:
 
 :begin_tab:`pytorch`
-1. If we replace `nn.MSELoss()` with `nn.MSELoss(reduction='mean')`, how can we change the learning rate for the code to behave identically. Why?
+1. If we replace `nn.MSELoss(reduction='sum')` with `nn.MSELoss()`, how can we change the learning rate for the code to behave identically. Why?
 1. Review the PyTorch documentation to see what loss functions and initialization methods are provided. Replace the loss by Huber's loss.
 1. How do you access the gradient of `net[0].weight`?
 

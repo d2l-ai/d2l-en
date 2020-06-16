@@ -12,11 +12,19 @@ import os
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+import os
+```
+
 ## Reading and Preprocessing the Dataset
 
 We first download a dataset that contains a set of English sentences with the corresponding French translations. As can be seen that each line contains an English sentence with its French translation, which are separated by a `TAB`.
 
 ```{.python .input  n=2}
+#@tab all
 #@save
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
@@ -34,6 +42,7 @@ print(raw_text[0:106])
 We perform several preprocessing steps on the raw text data, including ignoring cases, replacing UTF-8 non-breaking space with space, and adding space between words and punctuation marks.
 
 ```{.python .input  n=3}
+#@tab all
 #@save
 def preprocess_nmt(text):
     def no_space(char, prev_char):
@@ -53,6 +62,7 @@ print(text[0:95])
 Different to using character tokens in :numref:`sec_language_model`, here a token is either a word or a punctuation mark. The following function tokenizes the text data to return `source` and `target`. Each one is a list of token list, with `source[i]` is the $i^\mathrm{th}$ sentence in the source language and `target[i]` is the $i^\mathrm{th}$ sentence in the target language. To make the latter training faster, we sample the first `num_examples` sentences pairs.
 
 ```{.python .input  n=4}
+#@tab all
 #@save
 def tokenize_nmt(text, num_examples=None):
     source, target = [], []
@@ -72,6 +82,7 @@ source[0:3], target[0:3]
 We visualize the histogram of the number of tokens per sentence in the following figure. As can be seen, a sentence in average contains 5 tokens, and most of the sentences have less than 10 tokens.
 
 ```{.python .input  n=5}
+#@tab all
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.hist([[len(l) for l in source], [len(l) for l in target]],
              label=['source', 'target'])
@@ -83,6 +94,7 @@ d2l.plt.legend(loc='upper right');
 Since the tokens in the source language could be different to the ones in the target language, we need to build a vocabulary for each of them. Since we are using words instead of characters  as tokens, it makes the vocabulary size significantly large. Here we map every token that appears less than 3 times into the &lt;unk&gt; token :numref:`sec_text_preprocessing`. In addition, we need other special tokens such as padding and sentence beginnings.
 
 ```{.python .input  n=6}
+#@tab all
 src_vocab = d2l.Vocab(source, min_freq=3, 
                       reserved_tokens=['<pad>', '<bos>', '<eos>'])
 len(src_vocab)
@@ -95,6 +107,7 @@ In language models, each example is a `num_steps` length sequence from the corpu
 One way to solve this problem is that if a sentence is longer than `num_steps`, we trim its length, otherwise pad with a special &lt;pad&gt; token to meet the length. Therefore we could transform any sentence to a fixed length.
 
 ```{.python .input  n=7}
+#@tab all
 #@save
 def truncate_pad(line, num_steps, padding_token):
     if len(line) > num_steps:
@@ -118,6 +131,19 @@ def build_array(lines, vocab, num_steps, is_source):
     return array, valid_len
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def build_array(lines, vocab, num_steps, is_source):
+    lines = [vocab[l] for l in lines]
+    if not is_source:
+        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
+    array = torch.tensor([truncate_pad(
+        l, num_steps, vocab['<pad>']) for l in lines])
+    valid_len = (array != vocab['<pad>']).sum(dim=1)
+    return array, valid_len
+```
+
 Then we can construct minibatches based on these arrays. 
 
 ## Putting All Things Together
@@ -125,6 +151,7 @@ Then we can construct minibatches based on these arrays.
 Finally, we define the function `load_data_nmt` to return the data iterator with the vocabularies for source language and target language.
 
 ```{.python .input  n=9}
+#@tab all
 #@save
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
@@ -150,6 +177,17 @@ for X, X_vlen, Y, Y_vlen in train_iter:
     print('X:', X.astype('int32'))
     print('Valid lengths for X:', X_vlen)
     print('Y:', Y.astype('int32'))
+    print('Valid lengths for Y:', Y_vlen)
+    break
+```
+
+```{.python .input}
+#@tab pytorch
+src_vocab, tgt_vocab, train_iter = load_data_nmt(batch_size=2, num_steps=8)
+for X, X_vlen, Y, Y_vlen in train_iter:
+    print('X:', X.type(torch.int32))
+    print('Valid lengths for X:', X_vlen)
+    print('Y:', Y.type(torch.int32))
     print('Valid lengths for Y:', Y_vlen)
     break
 ```
