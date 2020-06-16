@@ -529,7 +529,7 @@ train_concise(0)
 ```
 
 ```{.python .input}
-#@tab pytorch
+#@tab all
 train_concise(3)
 ```
 
