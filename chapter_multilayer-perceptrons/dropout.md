@@ -289,7 +289,8 @@ def dropout_layer(X, dropout):
     # In this case, all elements are kept
     if dropout == 0:
         return X
-    mask = tf.cast(tf.random.uniform(shape=X.shape, minval=0, maxval=1) < 1 - dropout, dtype=tf.float32)
+    mask = tf.cast(tf.random.uniform(shape=tf.shape(X),
+        minval=0, maxval=1) < 1 - dropout, dtype=tf.float32)
     return mask * tf.cast(X, dtype=tf.float32) / (1.0 - dropout)
 ```
 
@@ -350,19 +351,9 @@ for param in params:
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
-num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
-
-W1 = tf.Variable(tf.random.normal(stddev=.01, shape=(num_inputs, num_hiddens1)))
-b1 = tf.Variable(tf.zeros(num_hiddens1))
-W2 = tf.Variable(tf.random.normal(stddev=.1, shape=(num_hiddens1, num_hiddens2)))
-b2 = tf.Variable(tf.zeros(num_hiddens2))
-W3 = tf.Variable(tf.random.truncated_normal(stddev=.01, shape=(num_hiddens2, num_outputs)))
-b3 = tf.Variable(tf.zeros(num_outputs))
-
-params = [W1, b1, W2, b2, W3, b3]
+num_outputs, num_hiddens1, num_hiddens2 = 10, 256, 256
 ```
 
 ### Defining the Model
@@ -433,18 +424,26 @@ net = Net(num_inputs, num_outputs, num_hiddens1, num_hiddens2)
 #@tab tensorflow
 dropout1, dropout2 = 0.2, 0.5
 
-def net(X, is_training=False):
-    X = tf.reshape(X, shape=(-1, num_inputs))
-    H1 = tf.nn.relu(tf.matmul(tf.cast(X, dtype=tf.float32), W1) + b1)
-    # Use dropout only when training the model
-    if is_training:
-        # Add a dropout layer after the first fully connected layer
-        H1 = dropout(H1, drop_prob1)
-    H2 = tf.nn.relu(tf.matmul(H1, W2) + b2)
-    if is_training:
-        # Add a dropout layer after the second fully connected layer
-        H2 = dropout(H2, drop_prob2)
-    return tf.nn.softmax(tf.matmul(H2, W3) + b3)
+class Net(tf.keras.Model):
+    def __init__(self, num_outputs, num_hiddens1, num_hiddens2):
+        super().__init__()
+        self.input_layer = tf.keras.layers.Flatten()
+        self.hidden1 = tf.keras.layers.Dense(num_hiddens1, activation='relu')
+        self.hidden2 = tf.keras.layers.Dense(num_hiddens2, activation='relu')
+        self.output_layer = tf.keras.layers.Dense(num_outputs, activation='softmax')
+
+    def call(self, inputs, training=None):
+        x = self.input_layer(inputs)
+        x = self.hidden1(x)
+        if training:
+            x = dropout_layer(x, dropout1)
+        x = self.hidden2(x)
+        if training:
+            x = dropout_layer(x, dropout2)
+        x = self.output_layer(x)
+        return x
+
+net = Net(num_outputs, num_hiddens1, num_hiddens2)
 ```
 
 ### Training and Testing
@@ -473,8 +472,8 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 num_epochs, lr, batch_size = 10, 0.5, 256
 loss = tf.keras.losses.SparseCategoricalCrossentropy()
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-d2l.train_ch3(net, train_iter, test_iter, loss,
-              num_epochs, d2l.Updater(params, lr))
+trainer = tf.keras.optimizers.SGD(learning_rate=lr)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
 ## Concise Implementation
