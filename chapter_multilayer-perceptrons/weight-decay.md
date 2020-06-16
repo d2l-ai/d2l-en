@@ -492,21 +492,22 @@ def train_concise(wd):
 #@tab tensorflow
 def train_concise(wd):
     net = tf.keras.models.Sequential()
-    net.add(tf.keras.layers.Dense(1))
+    net.add(tf.keras.layers.Dense(
+        1, kernel_regularizer=tf.keras.regularizers.l2(wd)))
     net.build(input_shape=(1, num_inputs))
     w, b = net.trainable_variables
     loss = tf.keras.losses.MeanSquaredError()
     num_epochs, lr = 100, 0.003
-    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-        initial_learning_rate=lr, decay_steps=num_epochs, decay_rate=wd)
-    trainer = tf.keras.optimizers.SGD(learning_rate=lr_schedule)
+    trainer = tf.keras.optimizers.SGD(learning_rate=lr)
 
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
                             xlim=[1, num_epochs], legend=['train', 'test'])
     for epoch in range(1, num_epochs+1):
         for X, y in train_iter:
             with tf.GradientTape() as tape:
-                l = loss(net(X), y) + wd * l2_penalty(w)
+                # tf.keras requires retrieving and adding the losses from
+                # layers manually for custom training loop.
+                l = loss(net(X), y) + net.losses
             grads = tape.gradient(l, net.trainable_variables)
             trainer.apply_gradients(zip(grads, net.trainable_variables))
         if epoch % 5 == 0:
@@ -528,7 +529,7 @@ train_concise(0)
 ```
 
 ```{.python .input}
-#@tab pytorch
+#@tab all
 train_concise(3)
 ```
 
