@@ -81,3 +81,8 @@ stage("Build and Publish") {
         """
         if (env.BRANCH_NAME.startsWith("PR-")) {
             pullRequest.comment("Job ${JOB_NAME}/${BUILD_NUMBER} is complete. \nCheck the results at http://preview.d2l.ai/${JOB_NAME}/")
+        }
+      }
+    }
+  }
+}
