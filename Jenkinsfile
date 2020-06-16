@@ -20,7 +20,7 @@ stage("Build and Publish") {
       pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
       pip install torchvision
       # tensorflow
-      pip install tensorflow
+      pip install tensorflow tensorflow-probability
       # check
       pip list
       nvidia-smi

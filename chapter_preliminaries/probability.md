@@ -63,6 +63,7 @@ from torch.distributions import multinomial
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
+import tensorflow_probability as tfp
 import numpy as np
 ```
 
@@ -91,8 +92,8 @@ multinomial.Multinomial(1, fair_probs).sample()
 
 ```{.python .input}
 #@tab tensorflow
-fair_probs = tf.ones([6, 1]) / 6
-tf.random.categorical(fair_probs, 1)
+fair_probs = tf.ones(6) / 6
+tfp.distributions.Multinomial(1, fair_probs).sample()
 ```
 
 If you run the sampler a bunch of times, you will find that you get out random
@@ -113,7 +114,7 @@ multinomial.Multinomial(10, fair_probs).sample()
 
 ```{.python .input}
 #@tab tensorflow
-tf.random.categorical(fair_probs, 10)
+tfp.distributions.Multinomial(10, fair_probs).sample()
 ```
 
 Now that we know how to sample rolls of a die, we can simulate 1000 rolls. We
@@ -134,7 +135,7 @@ counts / 1000
 
 ```{.python .input}
 #@tab tensorflow
-counts = tf.random.categorical(fair_probs, 1000)
+counts = tfp.distributions.Multinomial(1000, fair_probs).sample()
 counts / 1000
 ```
 
@@ -176,7 +177,7 @@ d2l.plt.legend();
 
 ```{.python .input}
 #@tab tensorflow
-counts = tf.random.categorical(fair_probs, 10)
+counts = tfp.distributions.Multinomial(10, fair_probs).sample(500)
 cum_counts = tf.cumsum(counts, axis=0)
 estimates = cum_counts / tf.reduce_sum(cum_counts, axis=1, keepdims=True)
 
