@@ -3,19 +3,11 @@
 # Don't edit it directly
 
 # Defined in file: ./chapter_preface/index.md
-import sys
 import collections
 from collections import defaultdict
-from matplotlib import pyplot as plt
 from IPython import display
 import math
-import torch
-import torchvision
-from torch import nn
-from torch.nn import functional as F
-from torch.utils import data
-from torchvision import transforms
-import numpy as np
+from matplotlib import pyplot as plt
 import os
 import pandas as pd
 import random
@@ -24,11 +16,19 @@ import shutil
 import sys
 import tarfile
 import time
-import zipfile
 import requests
-import warnings
+import zipfile
 import hashlib
 d2l = sys.modules[__name__]
+
+
+# Defined in file: ./chapter_preface/index.md
+import torch
+import torchvision
+from torch import nn
+from torch.nn import functional as F
+from torch.utils import data
+from torchvision import transforms
 
 
 # Defined in file: ./chapter_preliminaries/ndarray.md

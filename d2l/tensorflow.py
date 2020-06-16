@@ -5,11 +5,9 @@
 # Defined in file: ./chapter_preface/index.md
 import collections
 from collections import defaultdict
-from matplotlib import pyplot as plt
 from IPython import display
 import math
-import tensorflow as tf
-import numpy as np
+from matplotlib import pyplot as plt
 import os
 import pandas as pd
 import random
@@ -18,10 +16,14 @@ import shutil
 import sys
 import tarfile
 import time
-import zipfile
 import requests
+import zipfile
 import hashlib
 d2l = sys.modules[__name__]
+
+
+# Defined in file: ./chapter_preface/index.md
+import tensorflow as tf
 
 
 # Defined in file: ./chapter_preliminaries/ndarray.md

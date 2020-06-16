@@ -256,6 +256,37 @@ We are hopeful that as the theory of deep learning progresses,
 future editions of this book will be able to provide insights
 in places the present edition cannot.
 
+At times, to avoid unnecessary repetition, we encapsulate
+the frequently-imported and referred-to functions, classes, etc.
+in this book in the `d2l` package.
+For any block such as a function, a class, or multiple imports
+to be saved in the package, we will mark it with
+`#@save`. We offer a detailed overview of these functions and classes in :numref:`sec_d2l`.
+The `d2l` package is light-weight and only requires
+the following packages and modules as dependencies:
+
+```{.python .input  n=1}
+#@tab all
+#@save
+import collections
+from collections import defaultdict
+from IPython import display
+import math
+from matplotlib import pyplot as plt
+import os
+import pandas as pd
+import random
+import re
+import shutil
+import sys
+import tarfile
+import time
+import requests
+import zipfile
+import hashlib
+d2l = sys.modules[__name__]
+```
+
 :begin_tab:`mxnet`
 
 Most of the code in this book is based on Apache MXNet.
@@ -270,15 +301,7 @@ In case you encounter any such problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
 
-At times, to avoid unnecessary repetition, we encapsulate
-the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l.mxnet` module.
-For any block such as a function, a class, or multiple imports
-to be saved in the package, we will mark it with
-`#@save`.
-The `d2l` package is light-weight and only requires
-the following packages and modules as dependencies:
-
+Here is how we import modules from MXNet.
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -294,14 +317,7 @@ In case you encounter any such problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
 
-At times, to avoid unnecessary repetition, we encapsulate
-the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l.torch` module.
-For any block such as a function, a class, or multiple imports
-to be saved in the package, we will mark it with `#@save`.
-The `d2l` package is light-weight and only requires
-the following packages and modules as dependencies:
-
+Here is how we import modules from PyTorch.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -317,95 +333,32 @@ In case you encounter any such problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
 
-At times, to avoid unnecessary repetition, we encapsulate
-the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l.tensorflow` module.
-For any block such as a function, a class, or multiple imports
-to be saved in the package, we will mark it with `#@save`.
-The `d2l` package is light-weight and only requires
-the following packages and modules as dependencies:
-
+Here is how we import modules from TensorFlow.
 :end_tab:
 
 ```{.python .input  n=1}
 #@save
-import collections
-from collections import defaultdict
-from IPython import display
-import math
-from matplotlib import pyplot as plt
 from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
-import os
-import pandas as pd
-import random
-import re
-import shutil
-import sys
-import tarfile
-import time
-import zipfile
-import hashlib
-d2l = sys.modules[__name__]
 ```
+
 
 ```{.python .input  n=1}
 #@tab pytorch
 #@save
-import sys
-import collections
-from collections import defaultdict
-from matplotlib import pyplot as plt
-from IPython import display
-import math
 import torch
 import torchvision
 from torch import nn
 from torch.nn import functional as F
 from torch.utils import data
 from torchvision import transforms
-import numpy as np
-import os
-import pandas as pd
-import random
-import re
-import shutil
-import sys
-import tarfile
-import time
-import zipfile
-import requests
-import warnings
-import hashlib
-d2l = sys.modules[__name__]
 ```
 
 ```{.python .input  n=1}
 #@tab tensorflow
 #@save
-import collections
-from collections import defaultdict
-from matplotlib import pyplot as plt
-from IPython import display
-import math
 import tensorflow as tf
-import numpy as np
-import os
-import pandas as pd
-import random
-import re
-import shutil
-import sys
-import tarfile
-import time
-import zipfile
-import requests
-import hashlib
-d2l = sys.modules[__name__]
 ```
-
-We offer a detailed overview of these functions and classes in :numref:`sec_d2l`.
-
 
 ### Target Audience
 

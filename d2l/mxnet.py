@@ -8,8 +8,6 @@ from collections import defaultdict
 from IPython import display
 import math
 from matplotlib import pyplot as plt
-from mxnet import autograd, context, gluon, image, init, np, npx
-from mxnet.gluon import nn, rnn
 import os
 import pandas as pd
 import random
@@ -18,9 +16,15 @@ import shutil
 import sys
 import tarfile
 import time
+import requests
 import zipfile
 import hashlib
 d2l = sys.modules[__name__]
+
+
+# Defined in file: ./chapter_preface/index.md
+from mxnet import autograd, context, gluon, image, init, np, npx
+from mxnet.gluon import nn, rnn
 
 
 # Defined in file: ./chapter_preliminaries/ndarray.md
