@@ -17,7 +17,6 @@ stage("Build and Publish") {
       def CUDA_VISIBLE_DEVICES=(EID*2).toString() + ',' + (EID*2+1).toString();
 
       sh label: "Build Environment", script: """set -ex
-      rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda env update -n ${ENV_NAME} -f static/build.yml
       nvidia-smi
       """
