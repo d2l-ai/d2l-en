@@ -229,10 +229,12 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         loss_D, loss_G, metric[2]/timer.stop(), ctx))
 ```
 
-Now let us train the model.
+We train the model with a small number of epochs just for demonstration.
+For better performance,
+the variable `num_epochs` can be set to a larger number.
 
 ```{.python .input  n=21}
-latent_dim, lr, num_epochs = 100, 0.005, 40
+latent_dim, lr, num_epochs = 100, 0.005, 20
 train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ```
 

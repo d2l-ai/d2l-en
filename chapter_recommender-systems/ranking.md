@@ -56,7 +56,7 @@ class BPRLoss(gluon.loss.Loss):
 The Hinge loss for ranking has different form to the [hinge loss](https://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.HingeLoss) provided within the gluon library that is often used in classifiers such as SVMs.  The loss used for ranking in recommender systems has the following form.
 
 $$
- \sum_{(u, i, j \in D)} (\max( m - \hat{y}_{ui} + \hat{y}_{uj}), 0)
+ \sum_{(u, i, j \in D)} \max( m - \hat{y}_{ui} + \hat{y}_{uj}, 0)
 $$
 
 where $m$ is the safety margin size. It aims to push negative items away from positive items. Similar to BPR, it aims to optimize for relevant distance between positive and negative samples instead of absolute outputs, making it well suited to recommender systems.
