@@ -396,9 +396,10 @@ def get_net():
 #@tab tensorflow
 loss = tf.keras.losses.mse
 
-def get_net():
+def get_net(weight_decay):
     net = tf.keras.models.Sequential()
-    net.add(tf.keras.layers.Dense(1))
+    net.add(tf.keras.layers.Dense(
+        1, kernel_regularizer=tf.keras.regularizers.l2(weight_decay)))
     return net
 ```
 
@@ -516,11 +517,10 @@ def train(net, train_features, train_labels, test_features, test_labels,
     if test_features is not None:
         test_iter = d2l.load_array((test_features, test_labels), batch_size, is_train=False)
     # The Adam optimization algorithm is used here
-    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-        initial_learning_rate=float(learning_rate), decay_steps=num_epochs, decay_rate=float(weight_decay))
-    optimizer = tf.keras.optimizers.Adam(lr_schedule)
+    optimizer = tf.keras.optimizers.Adam(learning_rate)
     net.compile(loss=log_rmse, optimizer=optimizer)
-    history = net.fit(train_iter, validation_data=test_iter, epochs=num_epochs, batch_size=batch_size, validation_freq=1)
+    history = net.fit(train_iter, validation_data=test_iter,
+        epochs=num_epochs, batch_size=batch_size, validation_freq=1)
     train_ls = history.history['loss']
     if test_features is not None:
         test_ls = history.history['val_loss']
@@ -612,7 +612,7 @@ def k_fold(k, X_train, y_train, num_epochs,
     train_l_sum, valid_l_sum = 0, 0
     for i in range(k):
         data = get_k_fold_data(k, i, X_train, y_train)
-        net = get_net()
+        net = get_net(weight_decay)
         train_ls, valid_ls = train(net, *data, num_epochs, learning_rate,
                                    weight_decay, batch_size)
         train_l_sum += train_ls[-1]
@@ -674,7 +674,7 @@ will simplify uploading the results to Kaggle.
 #@tab all
 def train_and_pred(train_features, test_feature, train_labels, test_data,
                    num_epochs, lr, weight_decay, batch_size):
-    net = get_net()
+    net = get_net(weight_decay)
     train_ls, _ = train(net, train_features, train_labels, None, None,
                         num_epochs, lr, weight_decay, batch_size)
     d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',
