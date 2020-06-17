@@ -150,7 +150,7 @@ We will want to keep the conventional softmax function handy
 in case we ever want to evaluate the probabilities output by our model.
 But instead of passing softmax probabilities into our new loss function,
 we will just pass the logits and compute the softmax and its log
-all at once inside the softmax_cross_entropy loss function,
+all at once inside the cross entropy loss function,
 which does smart things like the log-sum-exp trick ([see on Wikipedia](https://en.wikipedia.org/wiki/LogSumExp)).
 
 ```{.python .input}
@@ -201,7 +201,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 As before, this algorithm converges to a solution
 that achieves an accuracy of 83.7%,
 albeit this time with fewer lines of code than before.
-Note that in many cases, Gluon takes additional precautions
+Note that in many cases, the deep learning framework takes additional precautions
 beyond these most well-known tricks to ensure numerical stability,
 saving us from even more pitfalls that we would encounter
 if we tried to code all of our models from scratch in practice.
@@ -217,4 +217,8 @@ if we tried to code all of our models from scratch in practice.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/53)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/260)
 :end_tab:
