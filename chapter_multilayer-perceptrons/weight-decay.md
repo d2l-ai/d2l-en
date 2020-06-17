@@ -402,7 +402,7 @@ train(lambd=3)
 
 Because weight decay is ubiquitous
 in neural network optimization,
-Gluon makes it especially convenient,
+the deep learning framework makes it especially convenient,
 integrating weight decay into the optimization algorithm itself
 for easy use in combination with any loss function.
 Moreover, this integration serves a computational benefit,
@@ -432,6 +432,12 @@ through `weight_decay` when instantiating our optimizer.
 By default, PyTorch decays both
 weights and biases simultaneously. Here we only set `weight_decay` for
 the weight, so the bias parameter $b$ will not decay.
+:end_tab:
+
+:begin_tab:`tensorflow`
+In the following code, we create a `l2` regularizer with
+the weight decay hyperparameter `wd` and apply it to the layer
+through the `kernel_regularizer` argument.
 :end_tab:
 
 ```{.python .input}
