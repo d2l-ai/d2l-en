@@ -16,9 +16,9 @@ Recall that in our
 polynomial curve-fitting example
 (:numref:`sec_model_selection`)
 we could limit our model's capacity
-simply by tweaking the degree 
+simply by tweaking the degree
 of the fitted polynomial.
-Indeed, limiting the number of features 
+Indeed, limiting the number of features
 is a popular technique to avoid overfitting.
 However, simply tossing aside features
 can be too blunt an instrument for the job.
@@ -26,15 +26,15 @@ Sticking with the polynomial curve-fitting
 example, consider what might happen
 with high-dimensional inputs.
 The natural extensions of polynomials
-to multivariate data are called *monomials*, 
+to multivariate data are called *monomials*,
 which are simply products of powers of variables.
 The degree of a monomial is the sum of the powers.
-For example, $x_1^2 x_2$, and $x_3 x_5^2$ 
+For example, $x_1^2 x_2$, and $x_3 x_5^2$
 are both monomials of degree $3$.
 
 Note that the number of terms with degree $d$
 blows up rapidly as $d$ grows larger.
-Given $k$ variables, the number of monomials 
+Given $k$ variables, the number of monomials
 of degree $d$ is ${k - 1 + d} \choose {k - 1}$.
 Even small changes in degree, say from $2$ to $3$,
 dramatically increase the complexity of our model.
@@ -48,20 +48,20 @@ might be the most widely-used technique
 for regularizing parametric machine learning models.
 The technique is motivated by the basic intuition
 that among all functions $f$,
-the function $f = 0$ 
-(assigning the value $0$ to all inputs) 
+the function $f = 0$
+(assigning the value $0$ to all inputs)
 is in some sense the *simplest*,
-and that we can measure the complexity 
+and that we can measure the complexity
 of a function by its distance from zero.
 But how precisely should we measure
 the distance between a function and zero?
 There is no single right answer.
 In fact, entire branches of mathematics,
-including parts of functional analysis 
+including parts of functional analysis
 and the theory of Banach spaces,
 are devoted to answering this issue.
 
-One simple interpretation might be 
+One simple interpretation might be
 to measure the complexity of a linear function
 $f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$
 by some norm of its weight vector, e.g., $|| \mathbf{w} ||^2$.
@@ -73,11 +73,11 @@ Thus we replace our original objective,
 with new objective,
 *minimize the sum of the prediction loss and the penalty term*.
 Now, if our weight vector grows too large,
-our learning algorithm might *focus* 
+our learning algorithm might *focus*
 on minimizing the weight norm $|| \mathbf{w} ||^2$
 versus minimizing the training error.
 That is exactly what we want.
-To illustrate things in code, 
+To illustrate things in code,
 let us revive our previous example
 from :numref:`sec_linear_regression` for linear regression.
 There, our loss was given by
@@ -89,11 +89,11 @@ $y^{(i)}$ are labels, and $(\mathbf{w}, b)$
 are the weight and bias parameters respectively.
 To penalize the size of the weight vector,
 we must somehow add $|| \mathbf{w} ||^2$ to the loss function,
-but how should the model trade off the 
+but how should the model trade off the
 standard loss for this new additive penalty?
 In practice, we characterize this tradeoff
-via the *regularization constant* $\lambda > 0$, 
-a non-negative hyperparameter 
+via the *regularization constant* $\lambda > 0$,
+a non-negative hyperparameter
 that we fit using validation data:
 
 $$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2.$$
@@ -103,16 +103,16 @@ For $\lambda > 0$, we restrict the size of $|| \mathbf{w} ||$.
 The astute reader might wonder why we work with the squared
 norm and not the standard norm (i.e., the Euclidean distance).
 We do this for computational convenience.
-By squaring the L2 norm, we remove the square root, 
-leaving the sum of squares of 
+By squaring the L2 norm, we remove the square root,
+leaving the sum of squares of
 each component of the weight vector.
 This makes the derivative of the penalty easy to compute
 (the sum of derivatives equals the derivative of the sum).
 
-Moreover, you might ask why we work with the L2 norm 
+Moreover, you might ask why we work with the L2 norm
 in the first place and not, say, the L1 norm.
 
-In fact, other choices are valid and 
+In fact, other choices are valid and
 popular throughout statistics.
 While L2-regularized linear models constitute
 the classic *ridge regression* algorithm,
@@ -120,10 +120,10 @@ L1-regularized linear regression
 is a similarly fundamental model in statistics
 (popularly known as *lasso regression*).
 
-More generally, the $\ell_2$ is just one 
+More generally, the $\ell_2$ is just one
 among an infinite class of norms call p-norms,
 many of which you might encounter in the future.
-In general, for some number $p$, 
+In general, for some number $p$,
 the $\ell_p$ norm is defined as
 
 $$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p.$$
@@ -132,16 +132,16 @@ $$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p.$$
 One reason to work with the L2 norm
 is that it places and outsize penalty
 on large components of the weight vector.
-This biases our learning algorithm 
-towards models that distribute weight evenly 
+This biases our learning algorithm
+towards models that distribute weight evenly
 across a larger number of features.
 In practice, this might make them more robust
 to measurement error in a single variable.
 By contrast, L1 penalties lead to models
 that concentrate weight on a small set of features,
-which may be desirable for other reasons. 
+which may be desirable for other reasons.
 
-The stochastic gradient descent updates 
+The stochastic gradient descent updates
 for L2-regularized regression follow:
 
 $$
@@ -150,7 +150,7 @@ $$
 \end{aligned}
 $$
 
-As before, we update $\mathbf{w}$ based on the amount 
+As before, we update $\mathbf{w}$ based on the amount
 by which our estimate differs from the observation.
 However, we also shrink the size of $\mathbf{w}$ towards $0$.
 That is why the method is sometimes called "weight decay":
@@ -160,20 +160,20 @@ the weight at each step of training.
 In contrast to feature selection,
 weight decay offers us a continuous mechanism
 for adjusting the complexity of $f$.
-Small values of $\lambda$ correspond 
+Small values of $\lambda$ correspond
 to unconstrained $\mathbf{w}$,
-whereas large values of $\lambda$ 
+whereas large values of $\lambda$
 constrain $\mathbf{w}$ considerably.
-Whether we include a corresponding bias penalty $b^2$ 
-can vary across implementations, 
+Whether we include a corresponding bias penalty $b^2$
+can vary across implementations,
 and may vary across layers of a neural network.
 Often, we do not regularize the bias term
 of a network's output layer.
- 
+
 
 ## High-Dimensional Linear Regression
 
-We can illustrate the benefits of 
+We can illustrate the benefits of
 weight decay over feature selection
 through a simple synthetic example.
 First, we generate some data as before
@@ -217,6 +217,20 @@ test_data = d2l.synthetic_data(true_w, true_b, n_test)
 test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5
+true_w, true_b = tf.ones((num_inputs, 1)) * 0.01, 0.05
+train_data = d2l.synthetic_data(true_w, true_b, n_train)
+train_iter = d2l.load_array(train_data, batch_size)
+test_data = d2l.synthetic_data(true_w, true_b, n_test)
+test_iter = d2l.load_array(test_data, batch_size, is_train=False)
+```
+
 ## Implementation from Scratch
 
 Next, we will implement weight decay from scratch,
@@ -225,9 +239,9 @@ to the original target function.
 
 ### Initializing Model Parameters
 
-First, we will define a function 
-to randomly initialize our model parameters 
-and allocate 
+First, we will define a function
+to randomly initialize our model parameters
+and allocate
 memory for the gradients we will calculate.
 
 ```{.python .input}
@@ -244,6 +258,14 @@ def init_params():
 def init_params():
     w = torch.normal(0, 1, size=(num_inputs, 1), requires_grad=True)
     b = torch.zeros(1, requires_grad=True)
+    return [w, b]
+```
+
+```{.python .input}
+#@tab tensorflow
+def init_params():
+    w = tf.Variable(tf.random.normal(mean=1, shape=(num_inputs, 1)))
+    b = tf.Variable(tf.zeros(shape=(1, )))
     return [w, b]
 ```
 
@@ -265,6 +287,12 @@ def l2_penalty(w):
 #@tab pytorch
 def l2_penalty(w):
     return torch.sum(w.pow(2)) / 2
+```
+
+```{.python .input}
+#@tab tensorflow
+def l2_penalty(w):
+    return tf.reduce_sum(tf.pow(w, 2)) / 2
 ```
 
 ### Defining the Train and Test Functions
@@ -319,20 +347,38 @@ def train(lambd):
     print('l1 norm of w:', torch.norm(w).item())
 ```
 
+```{.python .input}
+#@tab tensorflow
+def train(lambd):
+    w, b = init_params()
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+    num_epochs, lr = 100, 0.003
+    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], legend=['train', 'test'])
+    for epoch in range(1, num_epochs + 1):
+        for X, y in train_iter:
+            with tf.GradientTape(persistent=True) as tape:
+                # The L2 norm penalty term has been added, and broadcasting
+                # makes l2_penalty(w) a vector whose length is batch_size
+                l = loss(net(X), y) + lambd * l2_penalty(w)
+            grads = tape.gradient(l, [w, b])
+            d2l.sgd([w, b], grads, lr, batch_size)
+        if epoch % 5 == 0:
+            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
+                                 d2l.evaluate_loss(net, test_iter, loss)))
+    print('l1 norm of w:', tf.norm(w).numpy())
+```
+
 ### Training without Regularization
 
-We now run this code with `lambd = 0`, 
+We now run this code with `lambd = 0`,
 disabling weight decay.
-Note that we overfit badly, 
-decreasing the training error but not the 
+Note that we overfit badly,
+decreasing the training error but not the
 test error---a textook case of overfitting.
 
 ```{.python .input}
-train(lambd=0)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 train(lambd=0)
 ```
 
@@ -341,24 +387,20 @@ train(lambd=0)
 Below, we run with substantial weight decay.
 Note that the training error increases
 but the test error decreases.
-This is precisely the effect 
+This is precisely the effect
 we expect from regularization.
 As an exercise, you might want to check
 that the $\ell_2$ norm of the weights $\mathbf{w}$
 has actually decreased.
 
 ```{.python .input}
-train(lambd=3)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 train(lambd=3)
 ```
 
 ## Concise Implementation
 
-Because weight decay is ubiquitous 
+Because weight decay is ubiquitous
 in neural network optimization,
 Gluon makes it especially convenient,
 integrating weight decay into the optimization algorithm itself
@@ -374,11 +416,11 @@ and the optimizer must touch each parameter once anyway.
 In the following code, we specify
 the weight decay hyperparameter directly
 through `wd` when instantiating our `Trainer`.
-By default, Gluon decays both 
+By default, Gluon decays both
 weights and biases simultaneously.
-Note that the hyperparameter `wd` 
+Note that the hyperparameter `wd`
 will be multiplied by `wd_mult`
-when updating model parameters. 
+when updating model parameters.
 Thus, if we set `wd_mult` to $0$,
 the bias parameter $b$ will not decay.
 :end_tab:
@@ -387,14 +429,13 @@ the bias parameter $b$ will not decay.
 In the following code, we specify
 the weight decay hyperparameter directly
 through `weight_decay` when instantiating our optimizer.
-By default, PyTorch decays both 
-weights and biases simultaneously. Here we only set `weight_decay` for 
+By default, PyTorch decays both
+weights and biases simultaneously. Here we only set `weight_decay` for
 the weight, so the bias parameter $b$ will not decay.
 :end_tab:
 
-
 ```{.python .input}
-def train_gluon(wd):
+def train_concise(wd):
     net = nn.Sequential()
     net.add(nn.Dense(1))
     net.initialize(init.Normal(sigma=1))
@@ -404,7 +445,7 @@ def train_gluon(wd):
                             {'learning_rate': lr, 'wd': wd})
     # The bias parameter has not decayed. Bias names generally end with "bias"
     net.collect_params('.*bias').setattr('wd_mult', 0)
-    
+
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
                             xlim=[1, num_epochs], legend=['train', 'test'])
     for epoch in range(1, num_epochs+1):
@@ -421,7 +462,7 @@ def train_gluon(wd):
 
 ```{.python .input}
 #@tab pytorch
-def train_torch(wd):
+def train_concise(wd):
     net = nn.Sequential(nn.Linear(num_inputs, 1))
     for param in net.parameters():
         param.data.normal_()
@@ -431,7 +472,7 @@ def train_torch(wd):
     trainer = torch.optim.SGD([
         {"params":net[0].weight,'weight_decay': wd},
         {"params":net[0].bias}], lr=lr)
-    
+
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
                             xlim=[1, num_epochs], legend=['train', 'test'])
     for epoch in range(1, num_epochs+1):
@@ -447,29 +488,49 @@ def train_torch(wd):
     print('L1 norm of w:', net[0].weight.norm().item())
 ```
 
-The plots look identical to those when 
+```{.python .input}
+#@tab tensorflow
+def train_concise(wd):
+    net = tf.keras.models.Sequential()
+    net.add(tf.keras.layers.Dense(
+        1, kernel_regularizer=tf.keras.regularizers.l2(wd)))
+    net.build(input_shape=(1, num_inputs))
+    w, b = net.trainable_variables
+    loss = tf.keras.losses.MeanSquaredError()
+    num_epochs, lr = 100, 0.003
+    trainer = tf.keras.optimizers.SGD(learning_rate=lr)
+
+    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], legend=['train', 'test'])
+    for epoch in range(1, num_epochs+1):
+        for X, y in train_iter:
+            with tf.GradientTape() as tape:
+                # tf.keras requires retrieving and adding the losses from
+                # layers manually for custom training loop.
+                l = loss(net(X), y) + net.losses
+            grads = tape.gradient(l, net.trainable_variables)
+            trainer.apply_gradients(zip(grads, net.trainable_variables))
+        if epoch % 5 == 0:
+            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
+                                 d2l.evaluate_loss(net, test_iter, loss)))
+    print('L1 norm of w:', tf.norm(net.get_weights()[0]).numpy())
+```
+
+The plots look identical to those when
 we implemented weight decay from scratch.
-However, they run appreciably faster 
+However, they run appreciably faster
 and are easier to implement,
 a benefit that will become more
 pronounced for large problems.
 
 ```{.python .input}
-train_gluon(0)
+#@tab all
+train_concise(0)
 ```
 
 ```{.python .input}
-#@tab pytorch
-train_torch(0)
-```
-
-```{.python .input}
-train_gluon(3)
-```
-
-```{.python .input}
-#@tab pytorch
-train_torch(3)
+#@tab all
+train_concise(3)
 ```
 
 So far, we only touched upon one notion of
@@ -477,7 +538,7 @@ what constitutes a simple *linear* function.
 Moreover, what constitutes a simple *nonlinear* function
 can be an even more complex question.
 For instance, [Reproducing Kernel Hilbert Spaces (RKHS)](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space)
-allows one to apply tools introduced 
+allows one to apply tools introduced
 for linear functions in a nonlinear context.
 Unfortunately, RKHS-based algorithms
 tend to scale purely to large, high-dimensional data.
@@ -508,4 +569,8 @@ of applying weight decay on all layers of a deep network.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/99)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/236)
 :end_tab:

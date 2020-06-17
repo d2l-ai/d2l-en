@@ -29,18 +29,26 @@ stage("Build and Publish") {
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
-      ./static/cache.sh restore _build/eval/data _build/data_tmp
+      ./static/cache.sh restore _build/eval/data
       ./static/clean_eval.sh
       d2lbook build eval
-      ./static/cache.sh store _build/eval/data _build/data_tmp
+      ./static/cache.sh store _build/eval/data
       """
 
       sh label: "Execute Notebooks [Pytorch]", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
-      ./static/cache.sh restore _build/eval_pytorch/data _build/data_pytorch_tmp
+      ./static/cache.sh restore _build/eval_pytorch/data
       d2lbook build eval --tab pytorch
-      ./static/cache.sh store _build/eval_pytorch/data _build/data_pytorch_tmp
+      ./static/cache.sh store _build/eval_pytorch/data
+      """
+
+      sh label: "Execute Notebooks [Tensorflow]", script: """set -ex
+      conda activate ${ENV_NAME}
+      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
+      ./static/cache.sh restore _build/eval_tensorflow/data
+      d2lbook build eval --tab tensorflow
+      ./static/cache.sh store _build/eval_tensorflow/data
       """
 
       sh label:"Build HTML", script:"""set -ex
@@ -72,7 +80,7 @@ stage("Build and Publish") {
         d2lbook deploy html pdf --s3 s3://preview.d2l.ai/${JOB_NAME}/
         """
         if (env.BRANCH_NAME.startsWith("PR-")) {
-            pullRequest.comment("Job ${JOB_NAME}/${BUILD_NUMBER} is complete. \nCheck the results at http://preview.d2l.ai/${JOB_NAME}/index.html");
+            pullRequest.comment("Job ${JOB_NAME}/${BUILD_NUMBER} is complete. \nCheck the results at http://preview.d2l.ai/${JOB_NAME}/")
         }
       }
     }

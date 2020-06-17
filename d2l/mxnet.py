@@ -8,8 +8,6 @@ from collections import defaultdict
 from IPython import display
 import math
 from matplotlib import pyplot as plt
-from mxnet import autograd, context, gluon, image, init, np, npx
-from mxnet.gluon import nn, rnn
 import os
 import pandas as pd
 import random
@@ -18,9 +16,23 @@ import shutil
 import sys
 import tarfile
 import time
+import requests
 import zipfile
-
+import hashlib
 d2l = sys.modules[__name__]
+
+
+# Defined in file: ./chapter_preface/index.md
+from mxnet import autograd, context, gluon, image, init, np, npx
+from mxnet.gluon import nn, rnn
+
+
+# Defined in file: ./chapter_preliminaries/ndarray.md
+numpy = lambda a: a.asnumpy()
+size = lambda a: a.size
+reshape = lambda a, *args: a.reshape(*args)
+ones = np.ones
+zeros = np.zeros
 
 
 # Defined in file: ./chapter_preliminaries/pandas.md
@@ -136,7 +148,7 @@ def linreg(X, w, b):  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def squared_loss(y_hat, y):  #@save
-    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
+    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -166,9 +178,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
     for i, (ax, img) in enumerate(zip(axes, imgs)):        
-        if 'asnumpy' in dir(img): img = img.asnumpy() 
-        if 'numpy' in dir(img): img = img.numpy()
-        ax.imshow(img)
+        ax.imshow(d2l.numpy(img))
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
         if titles:
@@ -177,20 +187,18 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_dataloader_workers(num_workers=4):  #@save
-    # 0 means no additional process is used to speed up the reading of data.
-    if sys.platform.startswith('win'):
-        return 0
-    else:
-        return num_workers
+def get_dataloader_workers():  #@save
+    """Use 4 processes to read the data expect for Windows."""
+    return 0 if sys.platform.startswith('win') else 4
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
     dataset = gluon.data.vision
-    trans = [dataset.transforms.Resize(resize)] if resize else []
-    trans.append(dataset.transforms.ToTensor())
+    trans = [dataset.transforms.ToTensor()]
+    if resize:
+        trans.insert(0, dataset.transforms.Resize(resize))
     trans = dataset.transforms.Compose(trans)
     mnist_train = dataset.FashionMNIST(train=True).transform_first(trans)
     mnist_test = dataset.FashionMNIST(train=False).transform_first(trans)
@@ -202,18 +210,16 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):  #@save
-    if y_hat.shape[1] > 1:
-        return float((y_hat.argmax(axis=1).astype('float32') == y.astype(
-            'float32')).sum())
-    else:
-        return float((y_hat.astype('int32') == y.astype('int32')).sum())
+    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
+        y_hat = y_hat.argmax(axis=1)
+    return float((y_hat.astype(y.dtype) == y).sum())
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):  #@save
     metric = Accumulator(2)  # num_corrected_examples, num_examples
-    for X, y in data_iter:
-        metric.add(accuracy(net(X), y), y.size)
+    for _, (X, y) in enumerate(data_iter):
+        metric.add(accuracy(net(X), y), sum(y.shape))
     return metric[0] / metric[1]
 
 
@@ -256,12 +262,10 @@ class Animator:  #@save
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
                  nrows=1, ncols=1, figsize=(3.5, 2.5)):
         """Incrementally plot multiple lines."""
-        if legend is None:
-            legend = []
+        if legend is None: legend = []
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
-        if nrows * ncols == 1:
-            self.axes = [self.axes, ]
+        if nrows * ncols == 1: self.axes = [self.axes, ]
         # Use a lambda to capture arguments
         self.config_axes = lambda: d2l.set_axes(
             self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
@@ -269,17 +273,12 @@ class Animator:  #@save
 
     def add(self, x, y):
         """Add multiple data points into the figure."""
-        if not hasattr(y, "__len__"):
-            y = [y]
+        if not hasattr(y, "__len__"): y = [y]
         n = len(y)
-        if not hasattr(x, "__len__"):
-            x = [x] * n
-        if not self.X:
-            self.X = [[] for _ in range(n)]
-        if not self.Y:
-            self.Y = [[] for _ in range(n)]
-        if not self.fmts:
-            self.fmts = ['-'] * n
+        if not hasattr(x, "__len__"): x = [x] * n
+        if not self.X: self.X = [[] for _ in range(n)]
+        if not self.Y: self.Y = [[] for _ in range(n)]
+        if not self.fmts: self.fmts = ['-'] * n
         for i, (a, b) in enumerate(zip(x, y)):
             if a is not None and b is not None:
                 self.X[i].append(a)
@@ -293,9 +292,8 @@ class Animator:  #@save
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
-    animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
-                        ylim=[0.3, 0.9],
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
@@ -304,7 +302,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def predict_ch3(net, test_iter, n=6): #@save
+def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
@@ -323,24 +321,39 @@ def evaluate_loss(net, data_iter, loss):  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB = dict()
+DATA_HUB = dict()  #@save
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download(name, cache_dir=os.path.join('..', 'data')):
+def download(name, cache_dir=os.path.join('..', 'data')):  #@save
     """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, "%s does not exist" % name
-    url, sha1 = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)
-    return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
+    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
+    url, sha1_hash = DATA_HUB[name]
+    d2l.mkdir_if_not_exist(cache_dir)    
+    fname = os.path.join(cache_dir, url.split('/')[-1])
+    if os.path.exists(fname):        
+        sha1 = hashlib.sha1()
+        with open(fname, 'rb') as f:
+            while True:
+                data = f.read(1048576)
+                if not data: break
+                sha1.update(data)
+        if sha1.hexdigest() == sha1_hash:
+            return fname # Hit cache
+    print(f'Downloading {fname} from {url}...')
+    r = requests.get(url, stream=True, verify=True)
+    with open(fname, 'wb') as f:
+        f.write(r.content)
+    return fname
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download_extract(name, folder=None):
+def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
     fname = download(name)
     base_dir = os.path.dirname(fname) 
@@ -352,27 +365,24 @@ def download_extract(name, folder=None):
     else:
         assert False, 'Only zip/tar files can be extracted'
     fp.extractall(base_dir)
-    if folder:
-        return os.path.join(base_dir, folder)
-    else:
-        return data_dir
+    return os.path.join(base_dir, folder) if folder else data_dir
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download_all():
+def download_all():  #@save
     """Download all files in the DATA_HUB"""
     for name in DATA_HUB:
         download(name)
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_train'] = (
+DATA_HUB['kaggle_house_train'] = (  #@save
     DATA_URL + 'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_test'] = (
+DATA_HUB['kaggle_house_test'] = (  #@save  
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
@@ -980,7 +990,7 @@ class DotProductAttention(nn.Block):
 class MLPAttention(nn.Block):
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
-        # Use flatten=True to keep query's and key's 3-D shapes
+        # Use flatten=False to keep query's and key's 3-D shapes
         self.W_k = nn.Dense(units, use_bias=False, flatten=False)
         self.W_q = nn.Dense(units, use_bias=False, flatten=False)
         self.v = nn.Dense(1, use_bias=False, flatten=False)

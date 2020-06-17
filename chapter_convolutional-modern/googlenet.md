@@ -75,7 +75,6 @@ class Inception(nn.Block):
         return np.concatenate((p1, p2, p3, p4), axis=1)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
@@ -111,6 +110,40 @@ class Inception(nn.Module):
         return torch.cat((p1, p2, p3, p4), dim=1)
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+class Inception(tf.keras.Model):
+  # c1 - c4 are the number of output channels for each layer in the path
+  def __init__(self, c1, c2, c3, c4, **kwargs):
+    super(Inception, self).__init__(**kwargs)
+    # Path 1 is a single 1 x 1 convolutional layer
+    self.p1_1 = tf.keras.layers.Conv2D(c1, 1, activation='relu')
+    # Path 2 is a 1 x 1 convolutional layer followed by a 3 x 3
+    # convolutional layer
+    self.p2_1 = tf.keras.layers.Conv2D(c2[0], 1, activation='relu')
+    self.p2_2 = tf.keras.layers.Conv2D(c2[1], 3, padding='same', activation='relu')
+    # Path 3 is a 1 x 1 convolutional layer followed by a 5 x 5
+    # convolutional layer
+    self.p3_1 = tf.keras.layers.Conv2D(c3[0], 1, activation='relu')
+    self.p3_2 = tf.keras.layers.Conv2D(c3[1], 5, padding='same', activation='relu')
+    # Path 4 is a 3 x 3 maximum pooling layer followed by a 1 x 1
+    # convolutional layer
+    self.p4_1 = tf.keras.layers.MaxPool2D(3, 1, padding='same')
+    self.p4_2 =  tf.keras.layers.Conv2D(c1, 1, activation='relu')
+ 
+  
+  def call(self, x):
+    p1 = self.p1_1(x)
+    p2 = self.p2_2(self.p2_1(x))
+    p3 = self.p3_2(self.p3_1(x))
+    p4 = self.p4_2(self.p4_1(x))
+    # Concatenate the outputs on the channel dimension
+    return tf.keras.layers.Concatenate()([p1, p2, p3, p4])
+```
+
 To gain some intuition for why this network works so well,
 consider the combination of the filters.
 They explore the image in varying ranges.
@@ -143,12 +176,19 @@ b1.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3, activation='relu'),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
                    nn.ReLU(), 
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+```
+
+```{.python .input}
+#@tab tensorflow
+def b1():
+    return tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(64, 7, strides=2, padding='same', activation='relu'),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
 The second component uses two convolutional layers:
@@ -162,13 +202,21 @@ b2.add(nn.Conv2D(64, kernel_size=1, activation='relu'),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b2 = nn.Sequential(nn.Conv2d(64, 64, kernel_size=1),
                    nn.ReLU(),
                    nn.Conv2d(64, 192, kernel_size=3, padding=1),
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+```
+
+```{.python .input}
+#@tab tensorflow
+def b2():
+    return tf.keras.Sequential([
+        tf.keras.layers.Conv2D(64, 1, activation='relu'),
+        tf.keras.layers.Conv2D(192, 3, padding='same', activation='relu'),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
 The third component connects two complete Inception blocks in series.
@@ -190,12 +238,20 @@ b3.add(Inception(64, (96, 128), (16, 32), 32),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b3 = nn.Sequential(Inception(192, 64, (96, 128), (16, 32), 32),
                    Inception(256, 128, (128, 192), (32, 96), 64),
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+```
+
+```{.python .input}
+#@tab tensorflow
+def b3():
+    return tf.keras.models.Sequential([
+        Inception(64, (96, 128), (16, 32), 32),
+        Inception(128, (128, 192), (32, 96), 64),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
 The fourth block is more complicated.
@@ -224,7 +280,6 @@ b4.add(Inception(192, (96, 208), (16, 48), 64),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b4 = nn.Sequential(Inception(480, 192, (96, 208), (16, 48), 64),
@@ -233,6 +288,18 @@ b4 = nn.Sequential(Inception(480, 192, (96, 208), (16, 48), 64),
                    Inception(512, 112, (144, 288), (32, 64), 64),
                    Inception(528, 256, (160, 320), (32, 128), 128),
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+```
+
+```{.python .input}
+#@tab tensorflow
+def b4():
+    return tf.keras.Sequential([
+        Inception(192, (96, 208), (16, 48), 64),
+        Inception(160, (112, 224), (24, 64), 64),
+        Inception(128, (128, 256), (24, 64), 64),
+        Inception(112, (144, 288), (32, 64), 64),
+        Inception(256, (160, 320), (32, 128), 128),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
 The fifth block has two Inception blocks with $256+320+128+128=832$
@@ -257,7 +324,6 @@ net = nn.Sequential()
 net.add(b1, b2, b3, b4, b5, nn.Dense(10))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b5 = nn.Sequential(Inception(832, 256, (160, 320), (32, 128), 128),
@@ -266,6 +332,21 @@ b5 = nn.Sequential(Inception(832, 256, (160, 320), (32, 128), 128),
                    nn.Flatten())
 
 net = nn.Sequential(b1, b2, b3, b4, b5, nn.Linear(1024, 10))
+```
+
+```{.python .input}
+#@tab tensorflow
+def b5():
+    return tf.keras.Sequential([
+        Inception(256, (160, 320), (32, 128), 128),
+        Inception(384, (192, 384), (48, 128), 128),
+        tf.keras.layers.GlobalAvgPool2D()
+    ])
+# Recall that this has to be a function that will be passed to `d2l.train_ch6()`
+# so that model building/compiling need to be within `strategy.scope()`
+# in order to utilize the CPU/GPU devices that we have.
+def net():
+    return tf.keras.Sequential([b1(), b2(), b3(), b4(), b5(), tf.keras.layers.Dense(10)])
 ```
 
 The GoogLeNet model is computationally complex,
@@ -284,13 +365,20 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.rand(size=(1, 1, 96, 96))
 for layer in net:
     X = layer(X)
     print(layer.__class__.__name__,'output shape:\t', X.shape)
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.random.uniform(shape=(1, 96, 96, 1))
+for layer in net().layers:
+    X = layer(X)
+    print(layer.__class__.__name__, 'Output shape:\t', X.shape)
 ```
 
 ## Data Acquisition and Training
@@ -305,9 +393,15 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
+lr, num_epochs, batch_size = 0.1, 10, 128
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+```{.python .input}
+#@tab tensorflow
 lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)

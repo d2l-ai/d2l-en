@@ -56,6 +56,22 @@ x = torch.randn(2, 4)
 net(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+import numpy as np
+
+
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(4, activation=tf.nn.relu),
+    tf.keras.layers.Dense(1),
+])
+
+x = tf.random.uniform((2, 4))
+net(x)
+```
+
 ## Parameter Access
 
 Let us start with how to access parameters
@@ -75,6 +91,11 @@ print(net[1].params)
 ```{.python .input}
 #@tab pytorch
 print(net[2].state_dict())  
+```
+
+```{.python .input}
+#@tab tensorflow
+print(net.layers[2].weights)  
 ```
 
 The output tells us a few important things.
@@ -119,6 +140,13 @@ print(net[2].bias)
 print(net[2].bias.data)
 ```
 
+```{.python .input}
+#@tab tensorflow
+print(type(net.layers[2].weights[0]))
+print(net.layers[2].weights[0])
+print(net.layers[2].weights[0].numpy())
+```
+
 Parameters are complex objects,
 containing data, gradients,
 and additional information.
@@ -134,6 +162,11 @@ net[0].weight.grad()
 ```{.python .input}
 #@tab pytorch
 net[0].weight.grad == None
+```
+
+```{.python .input}
+#@tab tensorflow
+net.layers[0].weights == []
 ```
 
 ### All Parameters at Once
@@ -163,6 +196,15 @@ print(net[0].state_dict())
 print(net.state_dict())
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+# parameters only for the first layer
+print(net.layers[1].weights)
+# parameters of the entire network
+print(net.get_weights())
+```
+
 This provides us with another way of accessing the parameters of the network:
 
 ```{.python .input}
@@ -172,6 +214,11 @@ net.collect_params()['dense1_bias'].data()
 ```{.python .input}
 #@tab pytorch
 net.state_dict()['2.bias'].data
+```
+
+```{.python .input}
+#@tab tensorflow
+net.get_weights()[1]
 ```
 
 :begin_tab:`mxnet`
@@ -233,6 +280,26 @@ rgnet = nn.Sequential(block2(), nn.Linear(4, 1))
 rgnet(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+def block1(name):
+    return tf.keras.Sequential([
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(4, activation=tf.nn.relu)],
+        name=name)
+
+def block2():
+    net = tf.keras.Sequential()
+    for i in range(4):
+        net.add(block1(name=f'block-{i}'))
+    return net
+
+rgnet = tf.keras.Sequential()
+rgnet.add(block2())
+rgnet.add(tf.keras.layers.Dense(1))
+rgnet(x)
+```
+
 Now that we have designed the network, 
 let us see how it is organized.
 
@@ -244,6 +311,11 @@ print(rgnet.collect_params())
 ```{.python .input}
 #@tab pytorch
 print(rgnet)
+```
+
+```{.python .input}
+#@tab tensorflow
+print(rgnet.summary())
 ```
 
 Since the layers are hierarchically nested,
@@ -261,6 +333,11 @@ rgnet[0][1][0].bias.data()
 ```{.python .input}
 #@tab pytorch
 rgnet[0][1][0].bias.data
+```
+
+```{.python .input}
+#@tab tensorflow
+rgnet.layers[0].layers[1].layers[1].weights[1]
 ```
 
 ## Parameter Initialization
@@ -316,6 +393,23 @@ net.apply(init_normal)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
 
+
+```{.python .input}
+#@tab tensorflow 
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(
+        4,
+        activation=tf.nn.relu,
+        kernel_initializer=tf.random_normal_initializer(mean=0, stddev=0.01),
+        bias_initializer=tf.zeros_initializer()),
+    tf.keras.layers.Dense(1),
+])
+
+net(x)
+net.weights[0], net.weights[1]
+```
+
 We can also initialize all parameters 
 to a given constant value (say, $1$).
 
@@ -332,6 +426,22 @@ def init_normal(m):
         nn.init.zeros_(net[0].bias)
 net.apply(init_normal)    
 net[0].weight.data[0], net[0].bias.data[0]
+```
+
+```{.python .input}
+#@tab tensorflow
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(
+        4,
+        activation=tf.nn.relu,
+        kernel_initializer=tf.keras.initializers.Constant(1),
+        bias_initializer=tf.zeros_initializer()),
+    tf.keras.layers.Dense(1),
+])
+
+net(x)
+net.weights[0], net.weights[1]
 ```
 
 We can also apply different initializers for certain Blocks.
@@ -361,6 +471,24 @@ net[2].apply(init_42)
 print(net[0].weight.data[0])
 print(net[2].weight.data)
 ```
+
+```{.python .input}
+#@tab tensorflow
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(
+        4,
+        activation=tf.nn.relu,
+        kernel_initializer=tf.keras.initializers.GlorotUniform()),
+    tf.keras.layers.Dense(
+        1, kernel_initializer=tf.keras.initializers.Constant(1)),
+])
+
+net(x)
+print(net.layers[1].weights[0])
+print(net.layers[2].weights[0])
+```
+
 
 ### Custom Initialization
 
@@ -414,6 +542,25 @@ net.apply(my_init)
 net[0].weight[0:2]
 ```
 
+```{.python .input}
+#@tab tensorflow
+class MyInit(tf.keras.initializers.Initializer):
+    def __call__(self, shape, dtype=None):
+        return tf.random.uniform(shape, dtype=dtype)
+
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(
+        4,
+        activation=tf.nn.relu,
+        kernel_initializer=MyInit()),
+    tf.keras.layers.Dense(1),
+])
+
+net(x)
+print(net.layers[1].weights[0])
+```
+
 Note that we always have the option 
 of setting parameters directly by calling `data` 
 to access the underlying data. 
@@ -436,6 +583,13 @@ net[0].weight.data()[0]
 net[0].weight.data[:] += 1
 net[0].weight.data[0, 0] = 42
 net[0].weight.data[0]
+```
+
+```{.python .input}
+#@tab tensorflow
+net.layers[1].weights[0][:].assign(net.layers[1].weights[0] + 1)
+net.layers[1].weights[0][0, 0].assign(42)
+net.layers[1].weights[0]
 ```
 
 ## Tied Parameters
@@ -488,6 +642,22 @@ net[2].weight.data[0, 0] = 100
 # Make sure that they are actually the same object rather than just having the
 # same value
 print(net[2].weight.data[0] == net[4].weight.data[0])
+```
+
+```{.python .input}
+#@tab tensorflow
+# tf.keras behaves a bit differently. It removes the duplicate layer automatically.
+shared = tf.keras.layers.Dense(4, activation=tf.nn.relu)
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    shared,
+    shared,
+    tf.keras.layers.Dense(1),
+])
+
+net(x)
+# Check whether the parameters are different
+print(len(net.layers) == 3)
 ```
 
 This example shows that the parameters 

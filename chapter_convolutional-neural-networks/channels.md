@@ -79,6 +79,17 @@ def corr2d_multi_in(X, K):
     return sum([d2l.corr2d(x, k) for x, k in zip(X, K)])
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+def corr2d_multi_in(X, K):
+    # First, traverse along the 0th dimension (channel dimension) of X and K. 
+    # Then, add them together.
+    return tf.reduce_sum([d2l.corr2d(x, k) for x, k in zip(X, K)], axis=0)
+```
+
 We can construct the input array `X` and the kernel array `K`
 corresponding to the values in the above diagram
 to validate the output of the cross-correlation operation.
@@ -97,6 +108,16 @@ X = torch.tensor([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
                   [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
 K = torch.tensor([[[0, 1], [2, 3]],
                   [[1, 2], [3, 4]]])
+
+corr2d_multi_in(X, K)
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.constant([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
+                 [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
+K = tf.constant([[[0, 1], [2, 3]],
+                 [[1, 2], [3, 4]]])
 
 corr2d_multi_in(X, K)
 ```
@@ -153,6 +174,15 @@ def corr2d_multi_in_out(X, K):
     return torch.stack([corr2d_multi_in(X, k) for k in K], dim=0)
 ```
 
+```{.python .input}
+#@tab tensorflow
+def corr2d_multi_in_out(X, K):
+    # Traverse along the 0th dimension of K, and each time, perform
+    # cross-correlation operations with input X. All of the results are merged
+    # together using the stack function
+    return tf.stack([corr2d_multi_in(X, k) for k in K], axis=0)
+```
+
 We construct a convolution kernel with 3 output channels
 by concatenating the kernel array `K` with `K+1`
 (plus one for each element in `K`) and `K+2`.
@@ -165,6 +195,12 @@ K.shape
 ```{.python .input}
 #@tab pytorch
 K = torch.stack([K, K + 1, K + 2], dim=0)
+K.shape
+```
+
+```{.python .input}
+#@tab tensorflow
+K = tf.stack([K, K + 1, K + 2], axis=0)
 K.shape
 ```
 
@@ -182,6 +218,11 @@ corr2d_multi_in_out(X, K)
 
 ```{.python .input}
 #@tab pytorch
+corr2d_multi_in_out(X, K)
+```
+
+```{.python .input}
+#@tab tensorflow
 corr2d_multi_in_out(X, K)
 ```
 
@@ -249,6 +290,17 @@ def corr2d_multi_in_out_1x1(X, K):
     return Y.reshape((c_o, h, w))
 ```
 
+```{.python .input}
+#@tab tensorflow
+def corr2d_multi_in_out_1x1(X, K):
+    c_i, h, w = X.shape
+    c_o = K.shape[0]
+    X = tf.reshape(X, (c_i, h * w))
+    K = tf.reshape(K, (c_o, c_i))
+    Y = tf.matmul(K, X)  # Matrix multiplication in the fully connected layer
+    return tf.reshape(Y, (c_o, h, w))
+```
+
 When performing $1\times 1$ convolution,
 the above function is equivalent to the previously implemented cross-correlation function `corr2d_multi_in_out`.
 Let us check this with some reference data.
@@ -272,6 +324,17 @@ Y1 = corr2d_multi_in_out_1x1(X, K)
 Y2 = corr2d_multi_in_out(X, K)
 
 (Y1 - Y2).norm().item() < 1e-6
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.random.uniform((3, 3, 3))
+K = tf.random.uniform((2, 3, 1, 1))
+
+Y1 = corr2d_multi_in_out_1x1(X, K)
+Y2 = corr2d_multi_in_out(X, K)
+
+tf.norm(Y1 - Y2) < 1e-6
 ```
 
 ## Summary

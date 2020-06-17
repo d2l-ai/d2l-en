@@ -97,6 +97,17 @@ def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from IPython import display
+import numpy as np
+
+def f(x):
+    return 3 * x ** 2 - 4 * x
+```
+
 By setting $x=1$ and letting $h$ approach $0$,
 the numerical result of $\frac{f(x+h) - f(x)}{h}$
 in :eqref:`eq_derivative` approaches $2$.
@@ -331,4 +342,8 @@ for any $i = 1, 2, \ldots, n$.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/33)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/197)
 :end_tab:

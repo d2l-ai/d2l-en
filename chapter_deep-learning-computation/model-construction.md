@@ -150,6 +150,20 @@ net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
 net(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(256, activation=tf.nn.relu),
+    tf.keras.layers.Dense(10),
+])
+
+x = tf.random.uniform((2, 20))
+net(x)
+```
+
 :begin_tab:`mxnet`
 In this example, we constructed
 our model by instantiating an `nn.Sequential`,
@@ -262,6 +276,30 @@ class MLP(nn.Module):
         return self.output(F.relu(self.hidden(x)))
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+class MLP(tf.keras.Model):
+    # Declare a layer with model parameters. Here, we declare two fully
+    # connected layers
+    def __init__(self):
+        # Call the constructor of the MLP parent class Block to perform the
+        # necessary initialization. In this way, other function parameters can
+        # also be specified when constructing an instance, such as the model
+        # parameter, params, described in the following sections
+        super().__init__()
+        self.flatten = tf.keras.layers.Flatten()
+        self.hidden = tf.keras.layers.Dense(units=256, activation=tf.nn.relu)  # Hidden layer
+        self.out = tf.keras.layers.Dense(units=10)  # Output layer
+
+    # Define the forward computation of the model, that is, how to return the
+    # required model output based on the input x
+    def call(self, inputs):
+        x = self.flatten(inputs)
+        x = self.hidden(x)
+        return self.out(x)
+```
+
 To begin, let us focus on the `forward` method.
 Note that it takes `x` as input,
 calculates the hidden representation (`self.hidden(x)`) with the activation function applied,
@@ -303,6 +341,13 @@ net(x)
 net = MLP()
 net(x)
 ```
+
+```{.python .input}
+#@tab tensorflow
+net = MLP()
+net(x)
+```
+
 
 A key virtue of the block abstraction is its versatility.
 We can subclass the block class to create layers
@@ -367,6 +412,20 @@ class MySequential(nn.Module):
         return x
 ```
 
+```{.python .input}
+#@tab tensorflow
+class MySequential(tf.keras.Model):
+    def __init__(self, *args):
+        super().__init__()
+        self.module = tf.keras.Sequential()
+        for block in args:
+            # Here, block is an instance of a Module subclass.
+            self.module.add(block)
+
+    def call(self, inputs):
+        return self.module(x)
+```
+
 :begin_tab:`mxnet`
 The `add` method adds a single Block 
 to the ordered dictionary `_children`. 
@@ -412,6 +471,15 @@ net(x)
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
+net(x)
+```
+
+```{.python .input}
+#@tab tensorflow
+net = MySequential(
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(units=256, activation=tf.nn.relu),
+    tf.keras.layers.Dense(10, activation=tf.nn.relu))
 net(x)
 ```
 
@@ -507,6 +575,32 @@ class FixedHiddenMLP(nn.Module):
         return x.sum()
 ```
 
+```{.python .input}
+#@tab tensorflow
+class FixedHiddenMLP(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        self.flatten = tf.keras.layers.Flatten()
+        # Random weight parameters that will not compute gradients and 
+        # and therefore keep constant during training.
+        self.rand_weight = tf.constant(tf.random.uniform((20, 20)))
+        self.dense = tf.keras.layers.Dense(20, activation=tf.nn.relu)
+
+    def call(self, inputs):
+        x = self.flatten(inputs)
+        # Use the constant parameters created, as well as the relu
+        # and dot functions
+        x = tf.nn.relu(tf.matmul(x, self.rand_weight) + 1)
+        # Reuse the fully connected layer. This is equivalent to sharing
+        # parameters with two fully connected layers
+        x = self.dense(x)
+        # Here in Control flow, we need to call asscalar to return the scalar
+        # for comparison
+        while tf.norm(x) > 1:
+            x /= 2
+        return tf.reduce_sum(x)
+```
+
 In this `FixedHiddenMLP` model,
 we implement a hidden layer whose weights 
 (`self.rand_weight`) are initialized randomly
@@ -539,6 +633,12 @@ net(x)
 
 ```{.python .input}
 #@tab pytorch
+net = FixedHiddenMLP()
+net(x)
+```
+
+```{.python .input}
+#@tab tensorflow
 net = FixedHiddenMLP()
 net(x)
 ```
@@ -580,6 +680,27 @@ class NestMLP(nn.Module):
         return self.linear(self.net(x))
 
 chimera = nn.Sequential(NestMLP(), nn.Linear(16, 20), FixedHiddenMLP())
+chimera(x)
+```
+
+```{.python .input}
+#@tab tensorflow
+class NestMLP(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        self.net = tf.keras.Sequential()
+        self.net.add(tf.keras.layers.Flatten())
+        self.net.add(tf.keras.layers.Dense(64, activation=tf.nn.relu))
+        self.net.add(tf.keras.layers.Dense(32, activation=tf.nn.relu))
+        self.dense = tf.keras.layers.Dense(16, activation=tf.nn.relu)
+
+    def call(self, inputs):
+        return self.dense(self.net(inputs))
+
+chimera = tf.keras.Sequential()
+chimera.add(NestMLP())
+chimera.add(tf.keras.layers.Dense(20))
+chimera.add(FixedHiddenMLP())
 chimera(x)
 ```
 

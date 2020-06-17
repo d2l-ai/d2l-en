@@ -57,6 +57,15 @@ import torch
 from torch.distributions import multinomial
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import tensorflow_probability as tfp
+import numpy as np
+```
+
 Next, we will want to be able to cast the die. In statistics we call this process
 of drawing examples from probability distributions *sampling*.
 The distribution
@@ -65,26 +74,9 @@ that assigns probabilities to a number of discrete choices is called the
 *distribution* later, but at a high level, think of it as just an assignment of
 probabilities to events.
 
-:begin_tab:`mxnet`
-In MXNet, we can sample from the multinomial
-distribution via the aptly named `np.random.multinomial` function.
-The function
-can be called in many ways, but we will focus on the simplest.
 To draw a single sample, we simply pass in a vector of probabilities.
-The output of the `np.random.multinomial` function is another vector of the same length:
+The output is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
-:end_tab:
-
-:begin_tab:`pytorch`
-In PyTorch, we can sample from the multinomial
-distribution via the class `Multinomial` defined in the
-`distributions.multinomial` module.
-The class
-can be called in many ways, but we will focus on the simplest.
-To draw a single sample, we simply pass in a vector of probabilities.
-The output of the `sample` method of this class  is another vector of the same length:
-its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
-:end_tab:
 
 ```{.python .input}
 fair_probs = [1.0 / 6] * 6
@@ -97,23 +89,18 @@ fair_probs = torch.ones([6]) / 6
 multinomial.Multinomial(1, fair_probs).sample()
 ```
 
-:begin_tab:`mxnet`
-If you run the sampler a bunch of times, you will find that you get out random
-values each time. As with estimating the fairness of a die, we often want to
-generate many samples from the same distribution. It would be unbearably slow to
-do this with a Python `for` loop, so `random.multinomial` supports drawing
-multiple samples at once, returning an array of independent samples in any shape
-we might desire.
-:end_tab:
+```{.python .input}
+#@tab tensorflow
+fair_probs = tf.ones(6) / 6
+tfp.distributions.Multinomial(1, fair_probs).sample()
+```
 
-:begin_tab:`pytorch`
 If you run the sampler a bunch of times, you will find that you get out random
 values each time. As with estimating the fairness of a die, we often want to
 generate many samples from the same distribution. It would be unbearably slow to
-do this with a Python `for` loop, so `multinomial.Multinomial` supports drawing
+do this with a Python `for` loop, so the function we are using supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
-:end_tab:
 
 ```{.python .input}
 np.random.multinomial(10, fair_probs)
@@ -124,17 +111,9 @@ np.random.multinomial(10, fair_probs)
 multinomial.Multinomial(10, fair_probs).sample()
 ```
 
-We can also conduct, say, 3 groups of experiments, where each group draws 10 samples, all at once.
-
 ```{.python .input}
-counts = np.random.multinomial(10, fair_probs, size=3)
-counts
-```
-
-```{.python .input}
-#@tab pytorch
-counts = multinomial.Multinomial(10, fair_probs).sample((3,))
-counts
+#@tab tensorflow
+tfp.distributions.Multinomial(10, fair_probs).sample()
 ```
 
 Now that we know how to sample rolls of a die, we can simulate 1000 rolls. We
@@ -143,9 +122,8 @@ number was rolled.
 Specifically, we calculate the relative frequency as the estimate of the true probability.
 
 ```{.python .input}
-# Store the results as 32-bit floats for division
 counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
-counts / 1000  # Relative frequency as the estimate
+counts / 1000
 ```
 
 ```{.python .input}
@@ -153,6 +131,12 @@ counts / 1000  # Relative frequency as the estimate
 # Store the results as 32-bit floats for division
 counts = multinomial.Multinomial(1000, fair_probs).sample()
 counts / 1000  # Relative frequency as the estimate
+```
+
+```{.python .input}
+#@tab tensorflow
+counts = tfp.distributions.Multinomial(1000, fair_probs).sample()
+counts / 1000
 ```
 
 Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good.
@@ -180,6 +164,22 @@ d2l.plt.legend();
 counts = multinomial.Multinomial(10, fair_probs).sample((500,))
 cum_counts = counts.cumsum(dim=0)
 estimates = cum_counts / cum_counts.sum(dim=1, keepdims=True)
+
+d2l.set_figsize((6, 4.5))
+for i in range(6):
+    d2l.plt.plot(estimates[:, i].numpy(),
+                 label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Groups of experiments')
+d2l.plt.gca().set_ylabel('Estimated probability')
+d2l.plt.legend();
+```
+
+```{.python .input}
+#@tab tensorflow
+counts = tfp.distributions.Multinomial(10, fair_probs).sample(500)
+cum_counts = tf.cumsum(counts, axis=0)
+estimates = cum_counts / tf.reduce_sum(cum_counts, axis=1, keepdims=True)
 
 d2l.set_figsize((6, 4.5))
 for i in range(6):
@@ -435,4 +435,8 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/37)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/198)
 :end_tab:

@@ -276,6 +276,24 @@ def dropout_layer(X, dropout):
     return mask * X / (1.0-dropout)
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+def dropout_layer(X, dropout):
+    assert 0 <= dropout <= 1
+    # In this case, all elements are dropped out
+    if dropout == 1:
+        return tf.zeros_like(X)
+    # In this case, all elements are kept
+    if dropout == 0:
+        return X
+    mask = tf.cast(tf.random.uniform(shape=tf.shape(X),
+        minval=0, maxval=1) < 1 - dropout, dtype=tf.float32)
+    return mask * tf.cast(X, dtype=tf.float32) / (1.0 - dropout)
+```
+
 We can test out the `dropout_layer` function on a few examples.
 In the following lines of code, 
 we pass our input `X` through the dropout operation,
@@ -291,6 +309,15 @@ print(dropout_layer(X, 1))
 ```{.python .input}
 #@tab pytorch
 X= torch.arange(16, dtype = torch.float32).reshape((2, 8))
+print(X)
+print(dropout_layer(X, 0.))
+print(dropout_layer(X, 0.5))
+print(dropout_layer(X, 1.))
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.reshape(tf.constant(range(16), dtype=tf.float32), (2, 8))
 print(X)
 print(dropout_layer(X, 0.))
 print(dropout_layer(X, 0.5))
@@ -322,6 +349,11 @@ for param in params:
 ```{.python .input}
 #@tab pytorch
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
+```
+
+```{.python .input}
+#@tab tensorflow
+num_outputs, num_hiddens1, num_hiddens2 = 10, 256, 256
 ```
 
 ### Defining the Model
@@ -388,6 +420,32 @@ class Net(nn.Module):
 net = Net(num_inputs, num_outputs, num_hiddens1, num_hiddens2)
 ```
 
+```{.python .input}
+#@tab tensorflow
+dropout1, dropout2 = 0.2, 0.5
+
+class Net(tf.keras.Model):
+    def __init__(self, num_outputs, num_hiddens1, num_hiddens2):
+        super().__init__()
+        self.input_layer = tf.keras.layers.Flatten()
+        self.hidden1 = tf.keras.layers.Dense(num_hiddens1, activation='relu')
+        self.hidden2 = tf.keras.layers.Dense(num_hiddens2, activation='relu')
+        self.output_layer = tf.keras.layers.Dense(num_outputs, activation='softmax')
+
+    def call(self, inputs, training=None):
+        x = self.input_layer(inputs)
+        x = self.hidden1(x)
+        if training:
+            x = dropout_layer(x, dropout1)
+        x = self.hidden2(x)
+        if training:
+            x = dropout_layer(x, dropout2)
+        x = self.output_layer(x)
+        return x
+
+net = Net(num_outputs, num_hiddens1, num_hiddens2)
+```
+
 ### Training and Testing
 
 This is similar to the training and testing of multilayer perceptrons described previously.
@@ -406,6 +464,15 @@ num_epochs, lr, batch_size = 10, 0.5, 256
 loss = nn.CrossEntropyLoss()
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 trainer = torch.optim.SGD(net.parameters(), lr=lr)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+```
+
+```{.python .input}
+#@tab tensorflow
+num_epochs, lr, batch_size = 10, 0.5, 256
+loss = tf.keras.losses.SparseCategoricalCrossentropy()
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+trainer = tf.keras.optimizers.SGD(learning_rate=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
@@ -455,6 +522,20 @@ def init_weights(m):
 net.apply(init_weights)
 ```
 
+```{.python .input}
+#@tab tensorflow
+net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(256, activation=tf.nn.relu),
+    # Add a dropout layer after the first fully connected layer
+    tf.keras.layers.Dropout(dropout1),
+    tf.keras.layers.Dense(256, activation=tf.nn.relu),
+    # Add a dropout layer after the second fully connected layer
+    tf.keras.layers.Dropout(dropout2),
+    tf.keras.layers.Dense(10, activation=tf.nn.softmax),
+])
+```
+
 Next, we train and test the model.
 
 ```{.python .input}
@@ -465,6 +546,12 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```{.python .input}
 #@tab pytorch
 trainer = torch.optim.SGD(net.parameters(), lr=lr)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+```
+
+```{.python .input}
+#@tab tensorflow
+trainer = tf.keras.optimizers.SGD(learning_rate=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 

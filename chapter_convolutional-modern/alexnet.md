@@ -335,6 +335,33 @@ net = nn.Sequential(
     nn.Linear(4096, 10))
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+# Note that this has to be a function that will be passed to `d2l.train_ch6()`
+# so that model building/compiling need to be within `strategy.scope()`
+# in order to utilize the CPU/GPU devices that we have.
+def net():
+    return tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4, activation='relu'),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+        tf.keras.layers.Conv2D(filters=256, kernel_size=5, padding='same', activation='relu'),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same', activation='relu'),
+        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same', activation='relu'),
+        tf.keras.layers.Conv2D(filters=256, kernel_size=3, padding='same', activation='relu'),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(4096, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(4096, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(10, activation='sigmoid')
+    ])
+```
+
 We construct a single-channel data instance with both height and width of 224 to observe the output shape of each layer. It matches our diagram above.
 
 ```{.python .input}
@@ -352,6 +379,14 @@ X = torch.randn(1, 1, 224, 224)
 for layer in net:
     X=layer(X)
     print(layer.__class__.__name__,'Output shape:\t',X.shape)
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.random.uniform((1, 224, 224, 1))
+for layer in net().layers:
+    X = layer(X)
+    print(layer.__class__.__name__, 'Output shape:\t', X.shape)
 ```
 
 ## Reading the Dataset
@@ -379,6 +414,12 @@ batch_size = 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 ```
 
+```{.python .input}
+#@tab tensorflow
+batch_size = 128
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
+```
+
 ## Training
 
 Now, we can start training AlexNet.
@@ -395,6 +436,12 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 ```{.python .input}
 #@tab pytorch
+lr, num_epochs = 0.01, 10
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+```{.python .input}
+#@tab tensorflow
 lr, num_epochs = 0.01, 10
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```

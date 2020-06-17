@@ -23,20 +23,15 @@ d2l = sys.modules[__name__]
 
 
 # Defined in file: ./chapter_preface/index.md
-import torch
-import torchvision
-from torch import nn
-from torch.nn import functional as F
-from torch.utils import data
-from torchvision import transforms
+import tensorflow as tf
 
 
 # Defined in file: ./chapter_preliminaries/ndarray.md
-numpy = lambda a: a.detach().numpy()
-size = lambda a: a.numel()
-reshape = lambda a, *args: a.reshape(*args)
-ones = torch.ones
-zeros = torch.zeros
+numpy = lambda a: a.numpy()
+size = lambda a: tf.size(a).numpy()
+reshape = tf.reshape
+ones = tf.ones
+zeros = tf.zeros
 
 
 # Defined in file: ./chapter_preliminaries/pandas.md
@@ -139,15 +134,17 @@ class Timer:  #@save
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = X w + b + noise."""
-    X = torch.zeros(size=(num_examples, len(w))).normal_()
-    y = torch.matmul(X, w) + b
-    y += torch.zeros(size=y.shape).normal_(std=0.01)
+    X = tf.zeros(shape=(num_examples, w.shape[0]))
+    X += tf.random.normal(shape=X.shape)
+    y = tf.matmul(X, w) + b
+    y += tf.random.normal(shape=y.shape, stddev=0.01)
+    y = tf.reshape(y, [num_examples])
     return X, y
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):  #@save
-    return torch.matmul(X, w) + b
+    return tf.matmul(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -156,17 +153,19 @@ def squared_loss(y_hat, y):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def sgd(params, lr, batch_size):  #@save
-    for param in params:
-        param.data.sub_(lr*param.grad/batch_size)
-        param.grad.data.zero_()
+def sgd(params, grads, lr, batch_size):  #@save
+    for param, grad in zip(params, grads):
+        param.assign_sub(lr*grad/batch_size)
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a PyTorch data loader"""
-    dataset = data.TensorDataset(*data_arrays)
-    return data.DataLoader(dataset, batch_size, shuffle=is_train)
+    """Construct a TensorFlow data loader"""
+    dataset = tf.data.Dataset.from_tensor_slices(data_arrays)
+    if is_train:
+        dataset = dataset.shuffle(buffer_size=1000)
+    dataset = dataset.batch(batch_size)
+    return dataset
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
@@ -192,33 +191,27 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_dataloader_workers():  #@save
-    """Use 4 processes to read the data."""
-    return 4
-
-
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def load_data_fashion_mnist(batch_size, resize=None):  #@save
+def load_data_fashion_mnist(batch_size, resize=None):   #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
-    trans = [transforms.ToTensor()]
-    if resize:
-        trans.insert(0, transforms.Resize(resize))
-    trans = transforms.Compose(trans)
-    mnist_train = torchvision.datasets.FashionMNIST(
-        root="../data", train=True, transform=trans, download=True)
-    mnist_test = torchvision.datasets.FashionMNIST(
-        root="../data", train=False, transform=trans, download=True)
-    return (data.DataLoader(mnist_train, batch_size, shuffle=True,
-                            num_workers=get_dataloader_workers()),
-            data.DataLoader(mnist_test, batch_size, shuffle=False,
-                            num_workers=get_dataloader_workers()))
+    mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
+    # Divides all numbers by 255 so that all pixel values are between 
+    # 0 and 1, add a batch dimension at the last. And cast label to int32.
+    process = lambda X, y: (tf.expand_dims(X, axis=3)/255, 
+                            tf.cast(y, dtype='int32'))
+    resize_fn = lambda X, y: (
+        tf.image.resize_with_pad(X, resize, resize) if resize else X, y)
+    return (
+        tf.data.Dataset.from_tensor_slices(process(*mnist_train)).batch(
+            batch_size).shuffle(len(mnist_train[0])).map(resize_fn),
+        tf.data.Dataset.from_tensor_slices(process(*mnist_test)).batch(
+            batch_size).map(resize_fn))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):  #@save
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = y_hat.argmax(axis=1)
-    return float((y_hat.type(y.dtype) == y).sum())
+        y_hat = tf.argmax(y_hat, axis=1)
+    return float((tf.cast(y_hat, dtype=y.dtype) == y).numpy().sum())
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -250,17 +243,22 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     for X, y in train_iter:
         # Compute gradients and update parameters
-        y_hat = net(X)
-        l = loss(y_hat, y)
-        if isinstance(updater, torch.optim.Optimizer):
-            updater.zero_grad()
-            l.backward()
-            updater.step()
-            metric.add(float(l)*len(y), accuracy(y_hat, y), y.size().numel())
+        with tf.GradientTape() as tape:
+            y_hat = net(X)
+            # tf.Keras' implementations for loss takes (labels, predictions)
+            # instead of (predictions, labels) that users might implement
+            # in this book, e.g. `cross_entropy()` that we implemented above.
+            if isinstance(loss, tf.keras.losses.Loss):
+                l = loss(y, y_hat)
+            else:
+                l = loss(y_hat, y)
+        if isinstance(updater, tf.keras.optimizers.Optimizer):
+            params = net.trainable_variables
+            grads = tape.gradient(l, params)
+            updater.apply_gradients(zip(grads, params))
         else:
-            l.sum().backward()
-            updater(X.shape[0])
-            metric.add(float(l.sum()), accuracy(y_hat, y), y.size().numel())
+            updater(X.shape[0], tape.gradient(l, updater.params))
+        metric.add(tf.reduce_sum(l), accuracy(y_hat, y), tf.size(y))
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 
@@ -311,13 +309,22 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+class Updater():  #@save
+    def __init__(self, params, lr):
+        self.params = params
+        self.lr = lr
+    def __call__(self, batch_size, grads):
+        d2l.sgd(self.params, grads, self.lr, batch_size)
+
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
-    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
+    preds = d2l.get_fashion_mnist_labels(tf.argmax(net(X), axis=1))
     titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+    d2l.show_images(tf.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
@@ -326,7 +333,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
         l = loss(net(X), y)
-        metric.add(l.sum(), l.numel())
+        metric.add(tf.reduce_sum(l), tf.size(l).numpy())
     return metric[0] / metric[1]
 
 
@@ -400,107 +407,91 @@ DATA_HUB['kaggle_house_test'] = (  #@save
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):  #@save
     """Return gpu(i) if exists, otherwise return cpu()."""
-    if torch.cuda.device_count() >= i + 1:
-        return torch.device(f'cuda:{i}')
-    return torch.device('cpu')
+    if len(tf.config.experimental.list_physical_devices('GPU')) >= i + 1:
+        return tf.device(f'/GPU:{i}')
+    return tf.device('/CPU:0')
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    ctxes = [torch.device(f'cuda:{i}')
-             for i in range(torch.cuda.device_count())]
-    return ctxes if ctxes else [torch.device('cpu')]
+    num_gpus = len(tf.config.experimental.list_physical_devices('GPU'))
+    ctxes = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]
+    return ctxes if ctxes else [tf.device('/CPU:0')]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
 def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
     h, w = K.shape
-    Y = torch.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    Y = tf.Variable(tf.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1)))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
+            Y[i, j].assign(tf.cast(tf.reduce_sum(X[i: i + h, j: j + w] * K), dtype=tf.float32))
     return Y
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def evaluate_accuracy_gpu(net, data_iter, device=None): #@save        
-    if not device:
-        device = next(iter(net.parameters())).device
-    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
-    for X, y in data_iter:
-        X, y = X.to(device), y.to(device)
-        metric.add(d2l.accuracy(net(X), y), sum(y.shape))
-    return metric[0] / metric[1]
-
-
-# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch6(net, train_iter, test_iter, num_epochs, lr, 
-              device=d2l.try_gpu()):
-    """Train and evaluate a model with CPU or GPU."""    
-    def init_weights(m):
-        if type(m) == nn.Linear or type(m) == nn.Conv2d:
-            torch.nn.init.xavier_uniform_(m.weight)
-    net.apply(init_weights)
-    print('training on', device)
-    net.to(device)
-    optimizer = torch.optim.SGD(net.parameters(), lr=lr)
-    loss = nn.CrossEntropyLoss()
+def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, 
+              device=d2l.try_gpu(), mirrored=True):
+    """Train and evaluate a model with CPU or GPU."""
+    device_name = device._device_name
+    print('training on', device_name)
+    strategy = tf.distribute.MirroredStrategy(devices=[device_name])
+    # Model building/compiling need to be within `strategy.scope()`
+    # in order to utilize the CPU/GPU devices that we have
+    # if we want to perform training across multiple replicas on one
+    # machine using `tf.distribute.MirroredStrategy`.
+    if mirrored:
+        with strategy.scope():
+            optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+            loss = tf.keras.losses.SparseCategoricalCrossentropy()
+            net = net_fn()
+            net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    else:
+        optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()
+        net = net_fn()
+        net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    timer = d2l.Timer()
+    timer.start()
+    history = net.fit(train_iter, epochs=num_epochs).history
+    train_loss = history['loss']
+    train_acc = history['accuracy']
+    test_acc = net.evaluate(test_iter, return_dict=True)['accuracy']
+    timer.stop()
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
-    timer = d2l.Timer()
-    for epoch in range(num_epochs):
-        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
-        for i, (X, y) in enumerate(train_iter):
-            timer.start()
-            net.train()            
-            optimizer.zero_grad()
-            X, y = X.to(device), y.to(device) 
-            y_hat = net(X)
-            l = loss(y_hat, y)
-            l.backward()
-            optimizer.step()
-            with torch.no_grad():
-                metric.add(l*X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
-            timer.stop()
-            train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
-            if (i+1) % 50 == 0:
-                animator.add(epoch + i/len(train_iter),
-                             (train_loss, train_acc, None))
-        test_acc = evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch+1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_loss, train_acc, test_acc))
-    print('%.1f examples/sec on %s' % (
-        metric[2]*num_epochs/timer.sum(), device))
+    for i in range(len(train_loss)):
+        animator.add(i, (train_loss[i], train_acc[i], None))
+    animator.add(i, (None, None, test_acc))
+    # Note that we have to return the trained model here since we built
+    # and compiled the model inside this function.
+    return net
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
-class Residual(nn.Module):  #@save
-    def __init__(self, input_channels, num_channels, 
-                 use_1x1conv=False, strides=1):
+class Residual(tf.keras.Model):  #@save
+    def __init__(self, num_channels, use_1x1conv=False, strides=1):
         super().__init__()
-        self.conv1 = nn.Conv2d(input_channels, num_channels,
-                               kernel_size=3, padding=1, stride=strides)
-        self.conv2 = nn.Conv2d(num_channels, num_channels, 
-                               kernel_size=3, padding=1)
+        self.conv1 = tf.keras.layers.Conv2D(
+            num_channels, padding='same', kernel_size=3, strides=strides)
+        self.conv2 = tf.keras.layers.Conv2D(
+            num_channels, kernel_size=3,padding='same')
+        self.conv3 = None
         if use_1x1conv:
-            self.conv3 = nn.Conv2d(input_channels, num_channels, 
-                                   kernel_size=1, stride=strides)
-        else:
-            self.conv3 = None
-        self.bn1 = nn.BatchNorm2d(num_channels)
-        self.bn2 = nn.BatchNorm2d(num_channels)
-        self.relu = nn.ReLU(inplace=True)
+            self.conv3 = tf.keras.layers.Conv2D(
+                num_channels, kernel_size=1, strides=strides)
+        self.bn1 = tf.keras.layers.BatchNormalization()
+        self.bn2 = tf.keras.layers.BatchNormalization()
 
-    def forward(self, X):    
-        Y = F.relu(self.bn1(self.conv1(X)))
+    def call(self, X):
+        Y = tf.keras.activations.relu(self.bn1(self.conv1(X)))
         Y = self.bn2(self.conv2(Y))
-        if self.conv3:
+        if self.conv3 is not None:
             X = self.conv3(X)
         Y += X
-        return F.relu(Y)
+        return tf.keras.activations.relu(Y + X)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
@@ -578,45 +569,6 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_random(corpus, batch_size, num_steps):
-    # Offset the iterator over the data for uniform starts
-    corpus = corpus[random.randint(0, num_steps):]
-    # Subtract 1 extra since we need to account for label
-    num_examples = ((len(corpus) - 1) // num_steps)
-    example_indices = list(range(0, num_examples * num_steps, num_steps))
-    random.shuffle(example_indices)
-
-    def data(pos):
-        # This returns a sequence of the length num_steps starting from pos
-        return corpus[pos: pos + num_steps]
-
-    # Discard half empty batches
-    num_batches = num_examples // batch_size
-    for i in range(0, batch_size * num_batches, batch_size):
-        # Batch_size indicates the random examples read each time
-        batch_indices = example_indices[i:(i+batch_size)]
-        X = [data(j) for j in batch_indices]
-        Y = [data(j + 1) for j in batch_indices]
-        yield torch.Tensor(X), torch.Tensor(Y)
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):
-    # Offset for the iterator over the data for uniform starts
-    offset = random.randint(0, num_steps)
-    # Slice out data - ignore num_steps and just wrap around
-    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = torch.Tensor(corpus[offset:offset+num_indices])
-    Ys = torch.Tensor(corpus[offset+1:offset+1+num_indices])
-    Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
-    num_batches = Xs.shape[1] // num_steps
-    for i in range(0, num_batches * num_steps, num_steps):
-        X = Xs[:, i:(i+num_steps)]
-        Y = Ys[:, i:(i+num_steps)]
-        yield X, Y
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 class SeqDataLoader:
     """A iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
@@ -683,17 +635,6 @@ def truncate_pad(line, num_steps, padding_token):
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def build_array(lines, vocab, num_steps, is_source):
-    lines = [vocab[l] for l in lines]
-    if not is_source:
-        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
-    array = torch.tensor([truncate_pad(
-        l, num_steps, vocab['<pad>']) for l in lines])
-    valid_len = (array != vocab['<pad>']).sum(dim=1)
-    return array, valid_len
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
@@ -708,97 +649,5 @@ def load_data_nmt(batch_size, num_steps, num_examples=1000):
     data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
     data_iter = d2l.load_array(data_arrays, batch_size)
     return src_vocab, tgt_vocab, data_iter
-
-
-# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
-class Encoder(nn.Module):
-    """The base encoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Encoder, self).__init__(**kwargs)
-
-    def forward(self, X, *args):
-        raise NotImplementedError
-
-
-# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
-class Decoder(nn.Module):
-    """The base decoder interface for the encoder-decoder architecture."""
-    def __init__(self, **kwargs):
-        super(Decoder, self).__init__(**kwargs)
-
-    def init_state(self, enc_outputs, *args):
-        raise NotImplementedError
-
-    def forward(self, X, state):
-        raise NotImplementedError
-
-
-# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
-class EncoderDecoder(nn.Module):
-    """The base class for the encoder-decoder architecture."""
-    def __init__(self, encoder, decoder, **kwargs):
-        super(EncoderDecoder, self).__init__(**kwargs)
-        self.encoder = encoder
-        self.decoder = decoder
-
-    def forward(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args)
-        dec_state = self.decoder.init_state(enc_outputs, *args)
-        return self.decoder(dec_X, dec_state)
-
-
-# Defined in file: ./chapter_attention-mechanisms/attention.md
-def masked_softmax(X, valid_len):
-    # X: 3-D tensor, valid_len: 1-D or 2-D tensor
-    if valid_len is None:
-        return nn.functional.softmax(X, dim=-1)
-    else:
-        shape = X.shape
-        if valid_len.dim() == 1:
-            valid_len = torch.repeat_interleave(valid_len, repeats=shape[1], dim=0)
-        else:
-            valid_len = valid_len.reshape(-1)
-        # Fill masked elements with a large negative, whose exp is 0
-        X = X.reshape(-1, shape[-1])
-        for count, row in enumerate(X):
-            row[int(valid_len[count]):]=-1e6
-        return nn.functional.softmax(X.reshape(shape), dim=-1)
-
-
-# Defined in file: ./chapter_attention-mechanisms/attention.md
-class DotProductAttention(nn.Module):
-    def __init__(self, dropout, **kwargs):
-        super(DotProductAttention, self).__init__(**kwargs)
-        self.dropout = nn.Dropout(dropout)
-
-    # query: (batch_size, #queries, d)
-    # key: (batch_size, #kv_pairs, d)
-    # value: (batch_size, #kv_pairs, dim_v)
-    # valid_len: either (batch_size, ) or (batch_size, xx)
-    def forward(self, query, key, value, valid_len=None):
-        d = query.shape[-1]
-        # set transpose_b=True to swap the last two dimensions of key
-        scores = torch.bmm(query, key.transpose(1,2)) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return torch.bmm(attention_weights, value)
-
-
-# Defined in file: ./chapter_attention-mechanisms/attention.md
-class MLPAttention(nn.Module):
-    def __init__(self, key_size, query_size, units, dropout, **kwargs):
-        super(MLPAttention, self).__init__(**kwargs)
-        self.W_k = nn.Linear(key_size, units, bias=False)
-        self.W_q = nn.Linear(query_size, units, bias=False)
-        self.v = nn.Linear(units, 1, bias=False)
-        self.dropout = nn.Dropout(dropout)
-
-    def forward(self, query, key, value, valid_len):
-        query, key = self.W_k(query), self.W_q(key)
-        # expand query to (batch_size, #querys, 1, units), and key to
-        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast.
-        features = query.unsqueeze(2) + key.unsqueeze(1)
-        scores = self.v(features).squeeze(-1)
-        attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return torch.bmm(attention_weights, value)
 
 

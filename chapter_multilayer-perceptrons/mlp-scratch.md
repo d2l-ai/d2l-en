@@ -18,6 +18,12 @@ import torch
 from torch import nn
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
 To compare against our previous results
 achieved with (linear) softmax regression
 (:numref:`sec_softmax_scratch`),
@@ -26,12 +32,7 @@ the Fashion-MNIST image classification dataset
 (:numref:`sec_fashion_mnist`).
 
 ```{.python .input}
-batch_size = 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
@@ -85,6 +86,20 @@ b2 = nn.Parameter(torch.zeros(num_outputs, requires_grad=True))
 params = [W1, b1, W2, b2]
 ```
 
+```{.python .input}
+#@tab tensorflow
+num_inputs, num_outputs, num_hiddens = 784, 10, 256
+
+W1 = tf.Variable(tf.random.normal(
+    shape=(num_inputs, num_hiddens), mean=0, stddev=.01))
+b1 = tf.Variable(tf.zeros(num_hiddens))
+W2 = tf.Variable(tf.random.normal(
+    shape=(num_hiddens, num_outputs), mean=0, stddev=.01))
+b2 = tf.Variable(tf.random.normal([num_outputs], stddev=.1))
+
+params = [W1, b1, W2, b2]
+```
+
 ## Activation Function
 
 To make sure we know how everything works,
@@ -100,8 +115,14 @@ def relu(X):
 ```{.python .input}
 #@tab pytorch
 def relu(X):
-    a=torch.zeros_like(X)
+    a = torch.zeros_like(X)
     return torch.max(X, a)
+```
+
+```{.python .input}
+#@tab tensorflow
+def relu(X):
+    return tf.math.maximum(X, 0)
 ```
 
 ## The model
@@ -127,6 +148,14 @@ def net(X):
     return (H@W2 + b2)
 ```
 
+```{.python .input}
+#@tab tensorflow
+def net(X):
+    X = tf.reshape(X, shape=[-1, num_inputs])
+    H = relu(tf.matmul(X, W1) + b1)
+    return tf.math.softmax(tf.matmul(H, W2) + b2)
+```
+
 ## The Loss Function
 
 To ensure numerical stability,
@@ -148,6 +177,12 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```{.python .input}
 #@tab pytorch
 loss = nn.CrossEntropyLoss()
+```
+
+```{.python .input}
+#@tab tensorflow
+def loss(y_hat, y):
+    return tf.losses.sparse_categorical_crossentropy(y, y_hat)
 ```
 
 ## Training
@@ -173,15 +208,18 @@ updater = torch.optim.SGD(params, lr=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
 ```
 
+```{.python .input}
+#@tab tensorflow
+num_epochs, lr = 10, 0.5
+updater = d2l.Updater([W1, W2, b1, b2], lr)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
+```
+
 To evaluate the learned model, 
 we apply it on some test data.
 
 ```{.python .input}
-d2l.predict_ch3(net, test_iter)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 d2l.predict_ch3(net, test_iter)
 ```
 
@@ -206,11 +244,14 @@ this can still get messy
 1. Describe why it is much more challenging to deal with multiple hyperparameters. 
 1. What is the smartest strategy you can think of for structuring a search over multiple hyperparameters?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/92)
 :end_tab:
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/93)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/227)
 :end_tab:

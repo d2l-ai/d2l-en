@@ -129,6 +129,30 @@ net = torch.nn.Sequential(
 ```
 
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+# Note that we define this as a function so we can reuse later
+# and run it within `tf.distribute.MirroredStrategy`'s scope to
+# utilize various computational resources, e.g. GPUs.
+def build_model():
+    return tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid', input_shape=(28, 28, 1)),
+        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.Conv2D(filters=16, kernel_size=5, activation='sigmoid'),
+        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(120, activation='sigmoid'),
+        tf.keras.layers.Dense(84, activation='sigmoid'),
+        tf.keras.layers.Dense(10, activation='sigmoid')
+    ])
+
+net = build_model()
+```
+
+
 We took a small liberty with the original model,
 removing the Gaussian activation in the final layer.
 Other than that, this network matches
@@ -155,6 +179,14 @@ X = torch.randn(size=(1, 1, 28, 28), dtype=torch.float32)
 for layer in net:
     X = layer(X)
     print(layer.__class__.__name__,'output shape: \t',X.shape)
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.random.uniform((1, 28, 28, 1))
+for layer in net.layers:
+    X = layer(X)
+    print(layer.__class__.__name__, 'output shape: \t', X.shape)
 ```
 
 Note that the height and width of the representation
@@ -189,6 +221,12 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
 ```{.python .input}
 #@tab pytorch
+batch_size = 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
+```
+
+```{.python .input}
+#@tab tensorflow
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 ```
@@ -230,6 +268,11 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
         X, y = X.to(device), y.to(device)
         metric.add(d2l.accuracy(net(X), y), sum(y.shape))
     return metric[0] / metric[1]
+```
+
+```{.python .input}
+#@tab tensorflow
+# TODO: Update text as this is not neccessary when using tf.keras API.
 ```
 
 We also need to update our training function to deal with GPUs.
@@ -329,6 +372,47 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
         metric[2]*num_epochs/timer.sum(), device))
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, 
+              device=d2l.try_gpu(), mirrored=True):
+    """Train and evaluate a model with CPU or GPU."""
+    device_name = device._device_name
+    print('training on', device_name)
+    strategy = tf.distribute.MirroredStrategy(devices=[device_name])
+    # Model building/compiling need to be within `strategy.scope()`
+    # in order to utilize the CPU/GPU devices that we have
+    # if we want to perform training across multiple replicas on one
+    # machine using `tf.distribute.MirroredStrategy`.
+    if mirrored:
+        with strategy.scope():
+            optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+            loss = tf.keras.losses.SparseCategoricalCrossentropy()
+            net = net_fn()
+            net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    else:
+        optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()
+        net = net_fn()
+        net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    timer = d2l.Timer()
+    timer.start()
+    history = net.fit(train_iter, epochs=num_epochs).history
+    train_loss = history['loss']
+    train_acc = history['accuracy']
+    test_acc = net.evaluate(test_iter, return_dict=True)['accuracy']
+    timer.stop()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+                            legend=['train loss', 'train acc', 'test acc'])
+    for i in range(len(train_loss)):
+        animator.add(i, (train_loss[i], train_acc[i], None))
+    animator.add(i, (None, None, test_acc))
+    # Note that we have to return the trained model here since we built
+    # and compiled the model inside this function.
+    return net
+```
+
 Now let us train the model.
 
 ```{.python .input}
@@ -340,6 +424,12 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr)
 #@tab pytorch
 lr, num_epochs = 0.9, 10
 train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+```{.python .input}
+#@tab tensorflow
+lr, num_epochs = 0.9, 10
+train_ch6(build_model, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary

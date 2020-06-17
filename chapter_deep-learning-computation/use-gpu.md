@@ -158,6 +158,13 @@ from torch import nn
 torch.device('cpu'), torch.cuda.device('cuda'), torch.cuda.device('cuda:1')
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+tf.device('/CPU:0'), tf.device('/GPU:0'), tf.device('/GPU:1')
+```
+
 We can query the number of available GPUs.
 
 ```{.python .input}
@@ -167,6 +174,11 @@ npx.num_gpus()
 ```{.python .input}
 #@tab pytorch
 torch.cuda.device_count()
+```
+
+```{.python .input}
+#@tab tensorflow
+len(tf.config.experimental.list_physical_devices('GPU'))
 ```
 
 Now we define two convenient functions that allow us
@@ -202,6 +214,23 @@ def try_all_gpus():  #@save
 try_gpu(), try_gpu(3), try_all_gpus()
 ```
 
+```{.python .input}
+#@tab tensorflow
+def try_gpu(i=0):  #@save
+    """Return gpu(i) if exists, otherwise return cpu()."""
+    if len(tf.config.experimental.list_physical_devices('GPU')) >= i + 1:
+        return tf.device(f'/GPU:{i}')
+    return tf.device('/CPU:0')
+
+def try_all_gpus():  #@save
+    """Return all available GPUs, or [cpu(),] if no GPU exists."""
+    num_gpus = len(tf.config.experimental.list_physical_devices('GPU'))
+    ctxes = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]
+    return ctxes if ctxes else [tf.device('/CPU:0')]
+
+try_gpu(), try_gpu(3), try_all_gpus()
+```
+
 ## Tensors and GPUs
 
 By default, tensors are created on the CPU.
@@ -215,6 +244,12 @@ x.ctx
 ```{.python .input}
 #@tab pytorch
 x = torch.tensor([1, 2, 3])
+x.device
+```
+
+```{.python .input}
+#@tab tensorflow
+x = tf.constant([1, 2, 3])
 x.device
 ```
 
@@ -249,6 +284,13 @@ x = torch.ones(2, 3, device=try_gpu())
 x
 ```
 
+```{.python .input}
+#@tab tensorflow
+with try_gpu():
+  x = tf.ones((2, 3))
+x
+```
+
 Assuming you have at least two GPUs, the following code will create a random array on the second GPU.
 
 ```{.python .input}
@@ -261,6 +303,14 @@ y
 y = torch.randn(2, 3, device=try_gpu(1))
 y
 ```
+
+```{.python .input}
+#@tab tensorflow
+with try_gpu(1):
+  y = tf.random.uniform((2, 3))
+y
+```
+
 
 ### Copying
 
@@ -294,6 +344,15 @@ print(x)
 print(z)
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@tab tensorflow
+with try_gpu(1):
+  z = x
+print(x)
+print(z)
+```
+
 Now that the data is on the same GPU
 (both $\mathbf{z}$ and $\mathbf{y}$ are),
 we can add them up.
@@ -304,6 +363,12 @@ y + z
 
 ```{.python .input}
 #@tab pytorch
+y + z
+```
+
+
+```{.python .input}
+#@tab tensorflow
 y + z
 ```
 
@@ -337,6 +402,13 @@ z.as_in_ctx(try_gpu(1)) is z
 ```{.python .input}
 #@tab pytorch
 z.cuda(1) is z
+```
+
+```{.python .input}
+#@tab tensorflow
+with try_gpu(1):
+  z2 = z
+z2 is z
 ```
 
 ### Side Notes
@@ -395,6 +467,16 @@ net = nn.Sequential(nn.Linear(3, 1))
 net = net.to(device=try_gpu())
 ```
 
+```{.python .input}
+#@tab tensorflow
+strategy = tf.distribute.MirroredStrategy()
+with strategy.scope():
+  net = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(3, activation=tf.nn.relu),
+    tf.keras.layers.Dense(1)])
+```
+
 When the input is a tensor on the GPU, Gluon will calculate the result on the same GPU.
 
 ```{.python .input}
@@ -403,6 +485,11 @@ net(x)
 
 ```{.python .input}
 #@tab pytorch
+net(x)
+```
+
+```{.python .input}
+#@tab tensorflow
 net(x)
 ```
 
@@ -415,6 +502,11 @@ net[0].weight.data().ctx
 ```{.python .input}
 #@tab pytorch
 net[0].weight.data.device
+```
+
+```{.python .input}
+#@tab tensorflow
+net.layers[1].weights[0].device, net.layers[1].weights[1].device
 ```
 
 In short, as long as all data and parameters are on the same device, we can learn models efficiently. In the following we will see several such examples.
