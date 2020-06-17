@@ -253,21 +253,16 @@ updating the parameters in the direction of the negative gradient.
 For quadratic losses and linear functions,
 we can write this out explicitly as follows:
 
-$$
-\begin{aligned}
-\mathbf{w} &\leftarrow \mathbf{w} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) =
-\mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\
-b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  =
-b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right).
-\end{aligned}
-$$
-:eqlabel:`eq_linreg-update`
+$$\begin{aligned} \mathbf{w} &\leftarrow \mathbf{w} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\ b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
+:eqlabel:`eq_linreg_batch_update`
 
-Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors.
+
+Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors in :eqref:`eq_linreg_batch_update`.
 Here, the more elegant vector notation makes the math
 much more readable than expressing things in terms of coefficients,
 say $w_1, w_2, \ldots, w_d$.
-In :eqref:`eq_linreg-update`, $|\mathcal{B}|$ represents
+The set cardinality
+$|\mathcal{B}|$ represents
 the number of examples in each minibatch (the *batch size*)
 and $\eta$ denotes the *learning rate*.
 We emphasize that the values of the batch size and learning rate
