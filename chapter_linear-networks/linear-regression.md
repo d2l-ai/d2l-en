@@ -63,9 +63,9 @@ The linearity assumption just says that the target (price)
 can be expressed as a weighted sum of the features (area and age):
 
 $$\mathrm{price} = w_{\mathrm{area}} \cdot \mathrm{area} + w_{\mathrm{age}} \cdot \mathrm{age} + b.$$
-:eqlabel:`eq:price-area`
+:eqlabel:`eq_price-area`
 
-In :eqref:`eq:price-area`, $w_{\mathrm{area}}$ and $w_{\mathrm{age}}$
+In :eqref:`eq_price-area`, $w_{\mathrm{area}}$ and $w_{\mathrm{age}}$
 are called *weights*, and $b$ is called a *bias*
 (also called an *offset* or *intercept*).
 The weights determine the influence of each feature
@@ -97,9 +97,9 @@ and all weights into a vector $\mathbf{w} \in \mathbb{R}^d$,
 we can express our model compactly using a dot product:
 
 $$\hat{y} = \mathbf{w}^\top \mathbf{x} + b.$$
-:eqlabel:`eq:linreg-y`
+:eqlabel:`eq_linreg-y`
 
-In :eqref:`eq:linreg-y`, the vector $\mathbf{x}$ corresponds to features of a single data instance.
+In :eqref:`eq_linreg-y`, the vector $\mathbf{x}$ corresponds to features of a single data instance.
 We will often find it convenient
 to refer to features of our entire dataset of $n$ examples
 via the *design matrix* $\mathbf{X} \in \mathbb{R}^{n \times d}$.
@@ -261,13 +261,13 @@ b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_
 b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right).
 \end{aligned}
 $$
-:eqlabel:`eq:linreg-update`
+:eqlabel:`eq_linreg-update`
 
 Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors.
 Here, the more elegant vector notation makes the math
 much more readable than expressing things in terms of coefficients,
 say $w_1, w_2, \ldots, w_d$.
-In :eqref:`eq:linreg-update`, $|\mathcal{B}|$ represents
+In :eqref:`eq_linreg-update`, $|\mathcal{B}|$ represents
 the number of examples in each minibatch (the *batch size*)
 and $\eta$ denotes the *learning rate*.
 We emphasize that the values of the batch size and learning rate
