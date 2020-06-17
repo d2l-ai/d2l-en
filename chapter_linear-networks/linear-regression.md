@@ -331,13 +331,6 @@ Doing this efficiently requires that we vectorize the calculations
 and leverage fast linear algebra libraries
 rather than writing costly for-loops in Python.
 
-To illustrate why this matters so much,
-we can consider two methods for adding vectors.
-To start we instantiate two 10000-dimensional vectors
-containing all ones.
-In one method we will loop over the vectors with a Python for-loop.
-In the other method we will rely on a single call to `+`.
-
 ```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -365,6 +358,13 @@ import tensorflow as tf
 import numpy as np
 import time
 ```
+
+To illustrate why this matters so much,
+we can consider two methods for adding vectors.
+To start we instantiate two 10000-dimensional vectors
+containing all ones.
+In one method we will loop over the vectors with a Python for-loop.
+In the other method we will rely on a single call to `+`.
 
 ```{.python .input}
 #@tab all
