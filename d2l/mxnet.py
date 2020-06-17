@@ -128,7 +128,7 @@ class Timer:  #@save
         return sum(self.times)
 
     def cumsum(self):
-        """Return the accumulated times."""
+        """Return the accumulated time."""
         return np.array(self.times).cumsum().tolist()
 
 
