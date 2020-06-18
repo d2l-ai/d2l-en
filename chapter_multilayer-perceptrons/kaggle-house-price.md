@@ -394,9 +394,7 @@ def get_net():
 
 ```{.python .input}
 #@tab tensorflow
-loss = tf.keras.losses.mse
-
-def get_net(weight_decay):
+def get_net():
     net = tf.keras.models.Sequential()
     net.add(tf.keras.layers.Dense(
         1, kernel_regularizer=tf.keras.regularizers.l2(weight_decay)))
@@ -612,7 +610,7 @@ def k_fold(k, X_train, y_train, num_epochs,
     train_l_sum, valid_l_sum = 0, 0
     for i in range(k):
         data = get_k_fold_data(k, i, X_train, y_train)
-        net = get_net(weight_decay)
+        net = get_net()
         train_ls, valid_ls = train(net, *data, num_epochs, learning_rate,
                                    weight_decay, batch_size)
         train_l_sum += train_ls[-1]
@@ -674,7 +672,7 @@ will simplify uploading the results to Kaggle.
 #@tab all
 def train_and_pred(train_features, test_feature, train_labels, test_data,
                    num_epochs, lr, weight_decay, batch_size):
-    net = get_net(weight_decay)
+    net = get_net()
     train_ls, _ = train(net, train_features, train_labels, None, None,
                         num_epochs, lr, weight_decay, batch_size)
     d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',
