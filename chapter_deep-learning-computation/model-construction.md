@@ -99,7 +99,7 @@ with 256 units and ReLU activation,
 followed by a fully-connected *output layer*
 with 10 units (no activation function).
 
-```python
+```{.python .input}
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -113,8 +113,7 @@ net.initialize()
 net(x)
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 import torch
 from torch import nn
@@ -125,7 +124,6 @@ x = torch.randn(2,20)
 net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
 net(x)
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -230,7 +228,7 @@ Note that the `MLP` class below inherits the class represents a block.
 We will rely heavily on the parent class's methods,
 supplying only our own `__init__` and forward methods.
 
-```python
+```{.python .input}
 class MLP(nn.Block):
     # Declare a layer with model parameters. Here, we declare two fully
     # connected layers
@@ -249,8 +247,7 @@ class MLP(nn.Block):
         return self.out(self.hidden(x))
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 class MLP(nn.Module):
     # Declare a layer with model parameters. Here, we declare two fully
@@ -271,7 +268,6 @@ class MLP(nn.Module):
         # nn.functional module.
         return self.out(F.relu(self.hidden(x)))
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -323,19 +319,17 @@ or parameter initialization.
 The system will generate these methods automatically.
 Let us try this out:
 
-```python
+```{.python .input}
 net = MLP()
 net.initialize()
 net(x)
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 net = MLP()
 net(x)
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -369,7 +363,7 @@ we just need to define two key methods:
 The following `MySequential` class delivers the same
 functionality the default `Sequential` class:
 
-```python
+```{.python .input}
 class MySequential(nn.Block):
     def add(self, block):
         # Here, block is an instance of a Block subclass, and we assume it has
@@ -387,8 +381,7 @@ class MySequential(nn.Block):
         return x
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 class MySequential(nn.Module):
     def __init__(self, *args):
@@ -406,7 +399,6 @@ class MySequential(nn.Module):
             x = block(x)
         return x
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -460,7 +452,7 @@ in the order in which they were added.
 We can now reimplement an MLP
 using our `MySequential` class.
 
-```python
+```{.python .input}
 net = MySequential()
 net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
@@ -468,13 +460,11 @@ net.initialize()
 net(x)
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
 net(x)
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -520,7 +510,7 @@ where $\mathbf{x}$ is the input, $\mathbf{w}$ is our parameter,
 and $c$ is some specified constant
 that is not updated during optimization.
 
-```python
+```{.python .input}
 class FixedHiddenMLP(nn.Block):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -545,8 +535,7 @@ class FixedHiddenMLP(nn.Block):
         return x.sum()
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 class FixedHiddenMLP(nn.Module):
     def __init__(self):
@@ -570,7 +559,6 @@ class FixedHiddenMLP(nn.Module):
             x /= 2
         return x.sum()
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -622,12 +610,11 @@ Our point is only to show you how to integrate
 arbitrary code into the flow of your
 neural network computations.
 
-```python
+```{.python .input}
 net = FixedHiddenMLP()
 net.initialize()
 net(x)
 ```
-
 
 ```{.python .input}
 #@tab pytorch, tensorflow
@@ -640,7 +627,7 @@ ways of assembling blocks together.
 In the following example, we nest blocks
 in some creative ways.
 
-```python
+```{.python .input}
 class NestMLP(nn.Block):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -659,8 +646,7 @@ chimera.initialize()
 chimera(x)
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 class NestMLP(nn.Module):
     def __init__(self):
@@ -675,7 +661,6 @@ class NestMLP(nn.Module):
 chimera = nn.Sequential(NestMLP(), nn.Linear(16, 20), FixedHiddenMLP())
 chimera(x)
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
