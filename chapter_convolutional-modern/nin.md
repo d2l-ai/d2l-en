@@ -154,6 +154,7 @@ def net():
         tf.keras.layers.Dropout(0.5),
         nin_block(10, kernel_size=3, strides=1, padding='same'),
         tf.keras.layers.GlobalAveragePooling2D(),
+        tf.keras.layers.Reshape((1, 1, 10)),
         tf.keras.layers.Flatten(),
         ])
 ```
