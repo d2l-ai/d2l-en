@@ -394,11 +394,10 @@ def get_net():
 
 ```{.python .input}
 #@tab tensorflow
-loss = tf.keras.losses.mse
-
 def get_net():
     net = tf.keras.models.Sequential()
-    net.add(tf.keras.layers.Dense(1))
+    net.add(tf.keras.layers.Dense(
+        1, kernel_regularizer=tf.keras.regularizers.l2(weight_decay)))
     return net
 ```
 
@@ -516,11 +515,10 @@ def train(net, train_features, train_labels, test_features, test_labels,
     if test_features is not None:
         test_iter = d2l.load_array((test_features, test_labels), batch_size, is_train=False)
     # The Adam optimization algorithm is used here
-    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-        initial_learning_rate=float(learning_rate), decay_steps=num_epochs, decay_rate=float(weight_decay))
-    optimizer = tf.keras.optimizers.Adam(lr_schedule)
+    optimizer = tf.keras.optimizers.Adam(learning_rate)
     net.compile(loss=log_rmse, optimizer=optimizer)
-    history = net.fit(train_iter, validation_data=test_iter, epochs=num_epochs, batch_size=batch_size, validation_freq=1)
+    history = net.fit(train_iter, validation_data=test_iter,
+        epochs=num_epochs, batch_size=batch_size, validation_freq=1)
     train_ls = history.history['loss']
     if test_features is not None:
         test_ls = history.history['val_loss']
