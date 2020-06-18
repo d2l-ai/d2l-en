@@ -55,7 +55,7 @@ $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$
 To make sure we really understand what is going on here,
 we can implement cross-correlation operations with multiple input channels ourselves.
 Notice that all we are doing is performing one cross-correlation operation
-per channel and then adding up the results using the `add_n` function.
+per channel and then adding up the results.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -213,16 +213,7 @@ and the multi-input channel,
 single-output channel kernel.
 
 ```{.python .input}
-corr2d_multi_in_out(X, K)
-```
-
-```{.python .input}
-#@tab pytorch
-corr2d_multi_in_out(X, K)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 corr2d_multi_in_out(X, K)
 ```
 
@@ -366,4 +357,8 @@ tf.norm(Y1 - Y2) < 1e-6
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/70)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/273)
 :end_tab:

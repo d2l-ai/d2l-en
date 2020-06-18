@@ -312,3 +312,7 @@ i.e., we usually have $p_h = p_w$ and $s_h = s_w$.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/68)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/272)
+:end_tab:
