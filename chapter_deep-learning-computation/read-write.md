@@ -47,7 +47,7 @@ import tensorflow as tf
 import numpy as np
 
 x = tf.constant(range(4))
-np.save("x-file.npy", x)
+tf.io.write_file("x-file", tf.io.serialize_tensor(x))
 ```
 
 We can now read this data from the stored file back into memory.
@@ -65,7 +65,11 @@ x2
 
 ```{.python .input}
 #@tab tensorflow
-x2 = np.load("x-file.npy", allow_pickle=True)
+# Note that the out_type here is the type of the serialized
+# tensor that we wrote to a file previously. It must match the
+# type of the serialized tensor and no implicit conversion
+# will take place. 
+x2 = tf.io.parse_tensor(tf.io.read_file("x-file"), out_type=tf.int32)
 x2
 ```
 
