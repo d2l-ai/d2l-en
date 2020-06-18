@@ -437,6 +437,6 @@ train_ch6(build_model, train_iter, test_iter, num_epochs, lr)
 [Discussions](https://discuss.d2l.ai/t/74)
 :end_tab:
 
-:begin_tab:`pytorch`
+:begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/275)
 :end_tab:

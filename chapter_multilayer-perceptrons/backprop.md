@@ -94,7 +94,7 @@ on a given data example is:
 
 $$J = L + s.$$
 
-We refer to $J$ the *objective function*
+We refer to $J$ as the *objective function*
 in the following discussion.
 
 
