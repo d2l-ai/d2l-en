@@ -486,7 +486,7 @@ net[0].weight.data.device
 
 ```{.python .input}
 #@tab tensorflow
-net.layers[1].weights[0].device, net.layers[1].weights[1].device
+net.layers[0].weights[0].device, net.layers[0].weights[1].device
 ```
 
 In short, as long as all data and parameters are on the same device, we can learn models efficiently. In the following we will see several such examples.
