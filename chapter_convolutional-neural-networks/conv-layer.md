@@ -113,7 +113,7 @@ def corr2d(X, K):  #@save
     Y = tf.Variable(tf.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1)))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j].assign(tf.cast(tf.reduce_sum(X[i: i + h, j: j + w] * K), dtype=tf.float32))
+            Y[i, j].assign(tf.reduce_sum(X[i: i + h, j: j + w] * K))
     return Y
 ```
 
@@ -137,8 +137,8 @@ corr2d(X, K)
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.constant([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
-K = tf.constant([[0, 1], [2, 3]])
+X = tf.constant([[0.0, 1, 2], [3, 4, 5], [6, 7, 8]])
+K = tf.constant([[0.0, 1], [2, 3]])
 corr2d(X, K)
 ```
 
@@ -156,7 +156,7 @@ We are now ready to implement a two-dimensional convolutional layer
 based on the `corr2d` function defined above.
 In the `__init__` constructor function,
 we declare `weight` and `bias` as the two model parameters.
-The forward computation function `forward`
+The forward computation function 
 calls the `corr2d` function and adds the bias.
 As with $h \times w$ cross-correlation
 we also refer to convolutional layers
@@ -193,11 +193,11 @@ class Conv2D(tf.keras.layers.Layer):
 
     def build(self, kernel_size):
         initializer = tf.random_normal_initializer()
-        self.w = self.add_weight(name='w', shape=kernel_size, initializer=initializer)
-        self.b = self.add_weight(name='b', shape=(1, ), initializer=initializer)
+        self.weight = self.add_weight(name='w', shape=kernel_size, initializer=initializer)
+        self.bias = self.add_weight(name='b', shape=(1, ), initializer=initializer)
 
     def call(self, inputs):
-        return corr2d(inputs, self.w) + self.b
+        return corr2d(inputs, self.weight) + self.bias
 ```
 
 ## Object Edge Detection in Images
@@ -254,18 +254,7 @@ and -1 for the edge from black to white.
 All other outputs take value $0$.
 
 ```{.python .input}
-Y = corr2d(X, K)
-Y
-```
-
-```{.python .input}
-#@tab pytorch
-Y = corr2d(X, K)
-Y
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 Y = corr2d(X, K)
 Y
 ```
@@ -372,7 +361,6 @@ conv2d = tf.keras.layers.Conv2D(1, (1, 2), use_bias=False)
 X = tf.reshape(X, (1, 6, 8, 1))
 Y = tf.reshape(Y, (1, 6, 7, 1))
 
-
 Y_hat = conv2d(X)
 for i in range(10):
     with tf.GradientTape(watch_accessed_variables=False) as g:
@@ -403,7 +391,6 @@ conv2d.weight.data.reshape((1, 2))
 #@tab tensorflow
 tf.reshape(conv2d.get_weights()[0], (1, 2))
 ```
-
 
 Indeed, the learned kernel array is remarkably close
 to the kernel array `K` we defined earlier.
@@ -446,4 +433,8 @@ as a convolution even though, strictly-speaking, it is slightly different.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/66)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/271)
 :end_tab:
