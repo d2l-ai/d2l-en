@@ -44,7 +44,7 @@ assumption of *monotonicity*:
 that any increase in our feature must
 either always cause an increase in our model's output 
 (if the corresponding weight is positive),
-or always always cause a decrease in our model's output
+or always cause a decrease in our model's output
 (if the corresponding weight is negative).
 Sometimes that makes sense. 
 For example, if we were trying to predict 
