@@ -55,7 +55,6 @@ This open source book has benefited from pedagogical suggestions, typo correctio
 
 **Dear [D2L contributors](https://github.com/d2l-ai/d2l-en/graphs/contributors), please email your GitHub ID and name to d2lbook.en@gmail.com so your name will appear on the [acknowledgments](https://d2l.ai/chapter_preface/index.html#Acknowledgments). Thanks.**
 
-[Chinese version](https://github.com/d2l-ai/d2l-zh) | [Discuss and report issues](https://discuss.mxnet.io/)
 
 ## License Summary
 
@@ -63,4 +62,4 @@ This open source book is made available under the Creative Commons Attribution-S
 
 The sample and reference code within this open source book is made available under a modified MIT license. See the LICENSE-SAMPLECODE file.
 
-[Other Information](INFO.md)
+[Chinese version](https://github.com/d2l-ai/d2l-zh) | [Discuss and report issues](https://discuss.mxnet.io/) | [Other Information](INFO.md)
