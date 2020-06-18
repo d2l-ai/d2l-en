@@ -99,7 +99,6 @@ To run the programs in this section,
 you need at least two GPUs.
 :end_tab:
 
-
 Note that this might be extravagant for most desktop computers
 but it is easily available in the cloud, e.g.,
 by using the AWS EC2 multi-GPU instances.
@@ -139,7 +138,6 @@ and the corresponding memory.
 If there are multiple GPUs, we use `torch.cuda.device(f'cuda{i}')`
 to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0).
 Also, `gpu:0` and `gpu` are equivalent.
-
 :end_tab:
 
 ```{.python .input}
@@ -287,7 +285,7 @@ x
 ```{.python .input}
 #@tab tensorflow
 with try_gpu():
-  x = tf.ones((2, 3))
+    x = tf.ones((2, 3))
 x
 ```
 
@@ -307,10 +305,9 @@ y
 ```{.python .input}
 #@tab tensorflow
 with try_gpu(1):
-  y = tf.random.uniform((2, 3))
+    y = tf.random.uniform((2, 3))
 y
 ```
-
 
 ### Copying
 
@@ -346,9 +343,8 @@ print(z)
 
 ```{.python .input}
 #@tab tensorflow
-#@tab tensorflow
 with try_gpu(1):
-  z = x
+    z = x
 print(x)
 print(z)
 ```
@@ -358,22 +354,11 @@ Now that the data is on the same GPU
 we can add them up.
 
 ```{.python .input}
-y + z
-```
-
-```{.python .input}
-#@tab pytorch
-y + z
-```
-
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 y + z
 ```
 
 :begin_tab:`mxnet`
-
 Imagine that your variable `z` already lives on your second GPU.
 What happens if we call still `z.copyto(gpu(1))`?
 It will make a copy and allocate new memory,
@@ -395,6 +380,12 @@ What happens if we call still `z.cuda(1)`?
 It will returns `z` instead of make a copy and allocate new memory.
 :end_tab:
 
+:begin_tab:`pytorch`
+Imagine that your variable `z` already lives on your second GPU.
+What happens if we call still `z2 = z` under the same device scope?
+It will returns `z` instead of make a copy and allocate new memory.
+:end_tab:
+
 ```{.python .input}
 z.as_in_ctx(try_gpu(1)) is z
 ```
@@ -407,7 +398,7 @@ z.cuda(1) is z
 ```{.python .input}
 #@tab tensorflow
 with try_gpu(1):
-  z2 = z
+    z2 = z
 z2 is z
 ```
 
@@ -471,25 +462,14 @@ net = net.to(device=try_gpu())
 #@tab tensorflow
 strategy = tf.distribute.MirroredStrategy()
 with strategy.scope():
-  net = tf.keras.models.Sequential([
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(3, activation=tf.nn.relu),
-    tf.keras.layers.Dense(1)])
+    net = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(1)])
 ```
 
 When the input is a tensor on the GPU, Gluon will calculate the result on the same GPU.
 
 ```{.python .input}
-net(x)
-```
-
-```{.python .input}
-#@tab pytorch
-net(x)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 net(x)
 ```
 
@@ -547,4 +527,8 @@ In short, as long as all data and parameters are on the same device, we can lear
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/63)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/270)
 :end_tab:
