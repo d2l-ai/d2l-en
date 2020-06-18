@@ -128,7 +128,6 @@ net = torch.nn.Sequential(
     nn.Linear(84, 10))
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 from d2l import tensorflow as d2l
@@ -139,19 +138,18 @@ import tensorflow as tf
 # utilize various computational resources, e.g. GPUs.
 def build_model():
     return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid', input_shape=(28, 28, 1)),
+        tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid', 
+                               input_shape=(28, 28, 1)),
         tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
         tf.keras.layers.Conv2D(filters=16, kernel_size=5, activation='sigmoid'),
         tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(120, activation='sigmoid'),
         tf.keras.layers.Dense(84, activation='sigmoid'),
-        tf.keras.layers.Dense(10, activation='sigmoid')
-    ])
+        tf.keras.layers.Dense(10, activation='sigmoid')])
 
 net = build_model()
 ```
-
 
 We took a small liberty with the original model,
 removing the Gaussian activation in the final layer.
@@ -215,18 +213,7 @@ Now that we have implemented the model,
 let's run an experiment to see how LeNet fares on Fashion-MNIST.
 
 ```{.python .input}
-batch_size = 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
-```
-
-```{.python .input}
-#@tab pytorch
-batch_size = 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 ```
@@ -239,13 +226,13 @@ multiplications.
 If you have access to a GPU, this might be a good time
 to put it into action to speed up training.
 
+:begin_tab:`mxnet, pytorch`
 For evaluation, we need to make a slight modification
 to the `evaluate_accuracy` function that we described
 in :numref:`sec_softmax_scratch`.
 Since the full dataset lives on the CPU,
 we need to copy it to the GPU before we can compute our models.
-This is accomplished via the `as_in_ctx` function
-described in :numref:`sec_use_gpu`.
+:end_tab:
 
 ```{.python .input}
 def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
@@ -270,11 +257,6 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     return metric[0] / metric[1]
 ```
 
-```{.python .input}
-#@tab tensorflow
-# TODO: Update text as this is not neccessary when using tf.keras API.
-```
-
 We also need to update our training function to deal with GPUs.
 Unlike the `train_epoch_ch3` defined in :numref:`sec_softmax_scratch`, 
 we now need to move each batch of data 
@@ -288,8 +270,7 @@ going forward, we will rely primarily on Gluon.
 The following train function assumes a Gluon model 
 as input and is optimized accordingly. 
 We initialize the model parameters 
-on the device indicated by `ctx`
-using the Xavier initializer.
+on the device indicated by the device.
 Just as with MLPs, our loss function is cross-entropy,
 and we minimize it via minibatch stochastic gradient descent. 
 Since each epoch takes tens of seconds to run, 
@@ -416,12 +397,7 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
 Now let us train the model.
 
 ```{.python .input}
-lr, num_epochs = 0.9, 10
-train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab pytorch, mxnet
 lr, num_epochs = 0.9, 10
 train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
@@ -459,4 +435,8 @@ train_ch6(build_model, train_iter, test_iter, num_epochs, lr)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/74)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/275)
 :end_tab:
