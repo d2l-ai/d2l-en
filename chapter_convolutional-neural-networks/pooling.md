@@ -342,6 +342,6 @@ pool2d(X)
 [Discussions](https://discuss.d2l.ai/t/72)
 :end_tab:
 
-:begin_tab:`pytorch`
+:begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/274)
 :end_tab:
