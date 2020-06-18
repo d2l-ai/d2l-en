@@ -405,13 +405,16 @@ class MySequential(nn.Module):
 class MySequential(tf.keras.Model):
     def __init__(self, *args):
         super().__init__()
-        self._modules = tf.keras.Sequential()
+        self.modules = []
         for block in args:
-            # Here, block is an instance of a Model subclass.
-            self._modules.add(block)
+            # Here, block is an instance of a
+            # tf.keras.layers.Layer subclass.
+            self.modules.append(block)
 
     def call(self, x):
-        return self._modules(x)
+        for module in self.modules:
+            x = module(x)
+        return x
 ```
 
 :begin_tab:`mxnet`
