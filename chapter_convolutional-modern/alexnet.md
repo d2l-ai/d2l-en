@@ -403,19 +403,7 @@ but we do it here to be faithful to the AlexNet architecture).
 We perform this resizing with the `resize` argument in `load_data_fashion_mnist`.
 
 ```{.python .input}
-batch_size = 128
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
-```
-
-
-```{.python .input}
-#@tab pytorch
-batch_size = 128
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 batch_size = 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 ```
@@ -428,20 +416,9 @@ the main change here is the use of a smaller learning rate
 and much slower training due to the deeper and wider network,
 the higher image resolution and the more costly convolutions.
 
-```{.python .input}
-lr, num_epochs = 0.01, 10
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
 
 ```{.python .input}
-#@tab pytorch
-lr, num_epochs = 0.01, 10
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 lr, num_epochs = 0.01, 10
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
@@ -472,4 +449,8 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/76)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/276)
 :end_tab:
