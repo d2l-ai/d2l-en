@@ -473,7 +473,7 @@ net(x)
 #@tab tensorflow
 net = MySequential(
     tf.keras.layers.Dense(units=256, activation=tf.nn.relu),
-    tf.keras.layers.Dense(10, activation=tf.nn.relu))
+    tf.keras.layers.Dense(10))
 net(x)
 ```
 
