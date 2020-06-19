@@ -73,7 +73,7 @@ Next, we implement this process in the `corr2d` function,
 which accepts the input array `X` and kernel array `K`
 and returns the output array `Y`.
 
-```{.python .input  n=47}
+```{.python .input}
 from mxnet import autograd, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -88,7 +88,7 @@ def corr2d(X, K):  #@save
     return Y
 ```
 
-```{.python .input  n=29}
+```{.python .input}
 #@tab pytorch
 import torch
 from torch import nn
@@ -103,7 +103,7 @@ def corr2d(X, K):  #@save
     return Y
 ```
 
-```{.python .input  n=38}
+```{.python .input}
 #@tab tensorflow
 import tensorflow as tf
 
@@ -123,7 +123,7 @@ from the figure above
 to validate the output of the above implementation
 of the two-dimensional cross-correlation operation.
 
-```{.python .input  n=48}
+```{.python .input}
 X = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
 K = np.array([[0, 1], [2, 3]])
 corr2d(X, K)
@@ -142,7 +142,7 @@ corr2d(X, K)
 ]
 ```
 
-```{.python .input  n=30}
+```{.python .input}
 #@tab pytorch
 X = torch.tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=torch.float32)
 K = torch.tensor([[0, 1], [2, 3]], dtype=torch.float32)
@@ -162,7 +162,7 @@ corr2d(X, K)
 ]
 ```
 
-```{.python .input  n=39}
+```{.python .input}
 #@tab tensorflow
 X = tf.constant([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=tf.float32)
 K = tf.constant([[0, 1], [2, 3]], dtype=tf.float32)
@@ -202,7 +202,7 @@ As with $h \times w$ cross-correlation
 we also refer to convolutional layers
 as $h \times w$ convolutions.
 
-```{.python .input  n=49}
+```{.python .input}
 class Conv2D(nn.Block):
     def __init__(self, kernel_size, **kwargs):
         super().__init__(**kwargs)
@@ -213,7 +213,7 @@ class Conv2D(nn.Block):
         return corr2d(x, self.weight.data()) + self.bias.data()
 ```
 
-```{.python .input  n=31}
+```{.python .input}
 #@tab pytorch
 class Conv2D(nn.Module):
     def __init__(self, kernel_size):
@@ -225,7 +225,7 @@ class Conv2D(nn.Module):
         return corr2d(x, self.weight) + self.bias
 ```
 
-```{.python .input  n=40}
+```{.python .input}
 #@tab tensorflow
 class Conv2D(tf.keras.layers.Layer):
     def __init__(self):
@@ -248,7 +248,7 @@ by finding the location of the pixel change.
 First, we construct an 'image' of $6\times 8$ pixels.
 The middle four columns are black (0) and the rest are white (1).
 
-```{.python .input  n=50}
+```{.python .input}
 X = np.ones((6, 8))
 X[:, 2:6] = 0
 X
@@ -267,7 +267,7 @@ X
 ]
 ```
 
-```{.python .input  n=32}
+```{.python .input}
 #@tab pytorch
 X = torch.ones(6, 8)
 X[:, 2:6] = 0
@@ -287,7 +287,7 @@ X
 ]
 ```
 
-```{.python .input  n=41}
+```{.python .input}
 #@tab tensorflow
 X = tf.Variable(tf.ones((6, 8)))
 X[:, 2:6].assign(tf.zeros(X[:, 2:6].shape))
@@ -312,16 +312,16 @@ When we perform the cross-correlation operation with the input,
 if the horizontally adjacent elements are the same,
 the output is 0. Otherwise, the output is non-zero.
 
-```{.python .input  n=51}
+```{.python .input}
 K = np.array([[1, -1]])
 ```
 
-```{.python .input  n=33}
+```{.python .input}
 #@tab pytorch
 K = torch.tensor([[1, -1]], dtype=torch.float32)
 ```
 
-```{.python .input  n=42}
+```{.python .input}
 #@tab tensorflow
 K = tf.constant([[1, -1]], dtype=tf.float32)
 ```
@@ -332,7 +332,7 @@ As you can see, we detect 1 for the edge from white to black
 and -1 for the edge from black to white.
 All other outputs take value $0$.
 
-```{.python .input  n=52}
+```{.python .input}
 #@tab all
 Y = corr2d(X, K)
 Y
@@ -354,7 +354,7 @@ Y
 We can now apply the kernel to the transposed image.
 As expected, it vanishes. The kernel `K` only detects vertical edges.
 
-```{.python .input  n=53}
+```{.python .input}
 corr2d(X.T, K)
 ```
 
@@ -371,7 +371,7 @@ corr2d(X.T, K)
 ]
 ```
 
-```{.python .input  n=43}
+```{.python .input}
 #@tab pytorch
 corr2d(X.t(), K)
 ```
@@ -392,7 +392,7 @@ corr2d(X.t(), K)
 ]
 ```
 
-```{.python .input  n=44}
+```{.python .input}
 #@tab tensorflow
 corr2d(tf.transpose(X), K)
 ```
@@ -434,7 +434,7 @@ However, since we used single-element assignments,
 `autograd` has some trouble finding the gradient.
 Instead, we use the built-in `Conv2D` class.
 
-```{.python .input  n=54}
+```{.python .input}
 # Construct a convolutional layer with 1 output channel
 # (channels will be introduced in the following section)
 # and a kernel array shape of (1, 2)
@@ -468,7 +468,7 @@ for i in range(10):
 ]
 ```
 
-```{.python .input  n=36}
+```{.python .input}
 #@tab pytorch
 # Construct a convolutional layer with 1 input channel and 1 output channel
 # (channels will be introduced in the following section)
@@ -502,7 +502,7 @@ for i in range(10):
 ]
 ```
 
-```{.python .input  n=45}
+```{.python .input}
 #@tab tensorflow
 # Construct a convolutional layer with 1 input channel and 1 output channel
 # (channels will be introduced in the following section)
@@ -542,7 +542,7 @@ for i in range(10):
 
 Note that the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel array we learned.
 
-```{.python .input  n=55}
+```{.python .input}
 conv2d.weight.data().reshape(1, 2)
 ```
 
@@ -559,7 +559,7 @@ conv2d.weight.data().reshape(1, 2)
 ]
 ```
 
-```{.python .input  n=37}
+```{.python .input}
 #@tab pytorch
 conv2d.weight.data.reshape((1, 2))
 ```
@@ -577,7 +577,7 @@ conv2d.weight.data.reshape((1, 2))
 ]
 ```
 
-```{.python .input  n=46}
+```{.python .input}
 #@tab tensorflow
 tf.reshape(conv2d.get_weights()[0], (1, 2))
 ```
