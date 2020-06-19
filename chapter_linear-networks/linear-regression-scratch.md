@@ -5,17 +5,16 @@ Now that you understand the key ideas behind linear regression,
 we can begin to work through a hands-on implementation in code.
 In this section, we will implement the entire method from scratch,
 including the data pipeline, the model,
-the loss function, and the gradient descent optimizer.
+the loss function, and the minibatch stochastic gradient descent optimizer.
 While modern deep learning frameworks can automate nearly all of this work,
-implementing things from scratch is the only
+implementing things from scratch is the only way
 to make sure that you really know what you are doing.
 Moreover, when it comes time to customize models,
-defining our own layers, loss functions, etc.,
+defining our own layers or loss functions,
 understanding how things work under the hood will prove handy.
 In this section, we will rely only on tensors and auto differentiation.
-Afterwards, we will introduce a more compact implementation,
-taking advantage of framework's bells and whistles.
-To start off, we import the few required packages.
+Afterwards, we will introduce a more concise implementation,
+taking advantage of bells and whistles of the deep learning framework.
 
 ```{.python .input}
 %matplotlib inline
@@ -48,29 +47,29 @@ according to a linear model with additive noise.
 Out task will be to recover this model's parameters
 using the finite set of examples contained in our dataset.
 We will keep the data low-dimensional so we can visualize it easily.
-In the following code snippet, we generated a dataset
-containing $1000$ examples, each consisting of $2$ features
+In the following code snippet, we generate a dataset
+containing 1000 examples, each consisting of 2 features
 sampled from a standard normal distribution.
-Thus our synthetic dataset will be an object
+Thus our synthetic dataset will be a matrix
 $\mathbf{X}\in \mathbb{R}^{1000 \times 2}$.
 
-The true parameters generating our data will be
-$\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$
+The true parameters generating our dataset will be
+$\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$,
 and our synthetic labels will be assigned according
-to the following linear model with noise term $\epsilon$:
+to the following linear model with the noise term $\epsilon$:
 
 $$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon.$$
 
 You could think of $\epsilon$ as capturing potential
 measurement errors on the features and labels.
 We will assume that the standard assumptions hold and thus
-that $\epsilon$ obeys a normal distribution with mean of $0$.
-To make our problem easy, we will set its standard deviation to $0.01$.
-The following code generates our synthetic dataset:
+that $\epsilon$ obeys a normal distribution with mean of 0.
+To make our problem easy, we will set its standard deviation to 0.01.
+The following code generates our synthetic dataset.
 
 ```{.python .input}
 def synthetic_data(w, b, num_examples):  #@save
-    """Generate y = X w + b + noise."""
+    """Generate y = Xw + b + noise."""
     X = np.random.normal(0, 1, (num_examples, len(w)))
     y = np.dot(X, w) + b
     y += np.random.normal(0, 0.01, y.shape)
@@ -111,8 +110,8 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
-Note that each row in `features` consists of a 2-dimensional data point
-and that each row in `labels` consists of a 1-dimensional target value (a scalar).
+Note that each row in `features` consists of a 2-dimensional data instance
+and that each row in `labels` consists of a 1-dimensional label value (a scalar).
 
 ```{.python .input}
 #@tab all
@@ -124,7 +123,8 @@ we can clearly observe the linear correlation between the two.
 
 ```{.python .input}
 #@tab all
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
+# The semicolon is for displaying the plot only
 d2l.plt.scatter(d2l.numpy(features[:, 1]), d2l.numpy(labels), 1);
 ```
 
@@ -459,7 +459,6 @@ Indeed they turn out to be very close to each other.
 print('Error in estimating w', true_w - d2l.reshape(w, true_w.shape))
 print('Error in estimating b', true_b - b)
 ```
-
 
 Note that we should not take it for granted
 that we are able to recover the parameters accurately.
