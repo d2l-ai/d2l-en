@@ -133,10 +133,7 @@ net = torch.nn.Sequential(
 from d2l import tensorflow as d2l
 import tensorflow as tf
 
-# Note that we define this as a function so we can reuse later
-# and run it within `tf.distribute.MirroredStrategy`'s scope to
-# utilize various computational resources, e.g. GPUs.
-def build_model():
+def net():
     return tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid', 
                                input_shape=(28, 28, 1)),
@@ -147,8 +144,6 @@ def build_model():
         tf.keras.layers.Dense(120, activation='sigmoid'),
         tf.keras.layers.Dense(84, activation='sigmoid'),
         tf.keras.layers.Dense(10, activation='sigmoid')])
-
-net = build_model()
 ```
 
 We took a small liberty with the original model,
@@ -182,7 +177,7 @@ for layer in net:
 ```{.python .input}
 #@tab tensorflow
 X = tf.random.uniform((1, 28, 28, 1))
-for layer in net.layers:
+for layer in net().layers:
     X = layer(X)
     print(layer.__class__.__name__, 'output shape: \t', X.shape)
 ```
@@ -357,55 +352,32 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
 #@tab tensorflow
 #@save
 def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, 
-              device=d2l.try_gpu(), mirrored=True):
+              device=d2l.try_gpu()):
     """Train and evaluate a model with CPU or GPU."""
     device_name = device._device_name
-    print('training on', device_name)
     strategy = tf.distribute.MirroredStrategy(devices=[device_name])
-    # Model building/compiling need to be within `strategy.scope()`
-    # in order to utilize the CPU/GPU devices that we have
-    # if we want to perform training across multiple replicas on one
-    # machine using `tf.distribute.MirroredStrategy`.
-    if mirrored:
-        with strategy.scope():
-            optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
-            loss = tf.keras.losses.SparseCategoricalCrossentropy()
-            net = net_fn()
-            net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-    else:
+    with strategy.scope():
         optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
         loss = tf.keras.losses.SparseCategoricalCrossentropy()
         net = net_fn()
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
     timer = d2l.Timer()
-    timer.start()
-    history = net.fit(train_iter, epochs=num_epochs).history
-    train_loss = history['loss']
-    train_acc = history['accuracy']
-    test_acc = net.evaluate(test_iter, return_dict=True)['accuracy']
-    timer.stop()
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
-                            legend=['train loss', 'train acc', 'test acc'])
-    for i in range(len(train_loss)):
-        animator.add(i, (train_loss[i], train_acc[i], None))
-    animator.add(i, (None, None, test_acc))
-    # Note that we have to return the trained model here since we built
-    # and compiled the model inside this function.
-    return net
+                        legend=['train loss', 'train acc', 'test acc'])
+    class Callback(tf.keras.callbacks.Callback):
+        def on_epoch_end(self, epoch, logs):
+            test_acc = net.evaluate(
+                test_iter, verbose=0, return_dict=True)['accuracy']
+            animator.add(epoch+1, (logs['loss'], logs['accuracy'], test_acc))
+    net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[Callback()],)
 ```
 
 Now let us train the model.
 
 ```{.python .input}
-#@tab pytorch, mxnet
+#@tab all
 lr, num_epochs = 0.9, 10
 train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab tensorflow
-lr, num_epochs = 0.9, 10
-train_ch6(build_model, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary

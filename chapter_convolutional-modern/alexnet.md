@@ -311,7 +311,6 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
         nn.Dense(10))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
@@ -340,9 +339,6 @@ net = nn.Sequential(
 from d2l import tensorflow as d2l
 import tensorflow as tf
 
-# Note that this has to be a function that will be passed to `d2l.train_ch6()`
-# so that model building/compiling need to be within `strategy.scope()`
-# in order to utilize the CPU/GPU devices that we have.
 def net():
     return tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4, activation='relu'),
@@ -371,7 +367,6 @@ for layer in net:
     X = layer(X)
     print(layer.name, 'output shape:\t', X.shape)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -415,7 +410,6 @@ Compared to LeNet in the previous section,
 the main change here is the use of a smaller learning rate
 and much slower training due to the deeper and wider network,
 the higher image resolution and the more costly convolutions.
-
 
 ```{.python .input}
 #@tab all
