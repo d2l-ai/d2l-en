@@ -462,7 +462,7 @@ net(x)
 
 ```{.python .input}
 #@tab pytorch
-net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
+net = MySequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
 net(x)
 ```
 
