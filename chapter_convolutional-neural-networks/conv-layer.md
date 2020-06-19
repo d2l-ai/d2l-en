@@ -129,19 +129,6 @@ K = np.array([[0, 1], [2, 3]])
 corr2d(X, K)
 ```
 
-```{.json .output n=48}
-[
- {
-  "data": {
-   "text/plain": "array([[19., 25.],\n       [37., 43.]])"
-  },
-  "execution_count": 48,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ```{.python .input}
 #@tab pytorch
 X = torch.tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=torch.float32)
@@ -149,37 +136,11 @@ K = torch.tensor([[0, 1], [2, 3]], dtype=torch.float32)
 corr2d(X, K)
 ```
 
-```{.json .output n=30}
-[
- {
-  "data": {
-   "text/plain": "tensor([[19., 25.],\n        [37., 43.]])"
-  },
-  "execution_count": 30,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ```{.python .input}
 #@tab tensorflow
 X = tf.constant([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=tf.float32)
 K = tf.constant([[0, 1], [2, 3]], dtype=tf.float32)
 corr2d(X, K)
-```
-
-```{.json .output n=39}
-[
- {
-  "data": {
-   "text/plain": "<tf.Variable 'Variable:0' shape=(2, 2) dtype=float32, numpy=\narray([[19., 25.],\n       [37., 43.]], dtype=float32)>"
-  },
-  "execution_count": 39,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Convolutional Layers
@@ -254,19 +215,6 @@ X[:, 2:6] = 0
 X
 ```
 
-```{.json .output n=50}
-[
- {
-  "data": {
-   "text/plain": "array([[1., 1., 0., 0., 0., 0., 1., 1.],\n       [1., 1., 0., 0., 0., 0., 1., 1.],\n       [1., 1., 0., 0., 0., 0., 1., 1.],\n       [1., 1., 0., 0., 0., 0., 1., 1.],\n       [1., 1., 0., 0., 0., 0., 1., 1.],\n       [1., 1., 0., 0., 0., 0., 1., 1.]])"
-  },
-  "execution_count": 50,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ```{.python .input}
 #@tab pytorch
 X = torch.ones(6, 8)
@@ -274,37 +222,11 @@ X[:, 2:6] = 0
 X
 ```
 
-```{.json .output n=32}
-[
- {
-  "data": {
-   "text/plain": "tensor([[1., 1., 0., 0., 0., 0., 1., 1.],\n        [1., 1., 0., 0., 0., 0., 1., 1.],\n        [1., 1., 0., 0., 0., 0., 1., 1.],\n        [1., 1., 0., 0., 0., 0., 1., 1.],\n        [1., 1., 0., 0., 0., 0., 1., 1.],\n        [1., 1., 0., 0., 0., 0., 1., 1.]])"
-  },
-  "execution_count": 32,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ```{.python .input}
 #@tab tensorflow
 X = tf.Variable(tf.ones((6, 8)))
 X[:, 2:6].assign(tf.zeros(X[:, 2:6].shape))
 X
-```
-
-```{.json .output n=41}
-[
- {
-  "data": {
-   "text/plain": "<tf.Variable 'Variable:0' shape=(6, 8) dtype=float32, numpy=\narray([[1., 1., 0., 0., 0., 0., 1., 1.],\n       [1., 1., 0., 0., 0., 0., 1., 1.],\n       [1., 1., 0., 0., 0., 0., 1., 1.],\n       [1., 1., 0., 0., 0., 0., 1., 1.],\n       [1., 1., 0., 0., 0., 0., 1., 1.],\n       [1., 1., 0., 0., 0., 0., 1., 1.]], dtype=float32)>"
-  },
-  "execution_count": 41,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Next, we construct a kernel `K` with a height of $1$ and width of $2$.
@@ -338,19 +260,6 @@ Y = corr2d(X, K)
 Y
 ```
 
-```{.json .output n=52}
-[
- {
-  "data": {
-   "text/plain": "array([[ 0.,  1.,  0.,  0.,  0., -1.,  0.],\n       [ 0.,  1.,  0.,  0.,  0., -1.,  0.],\n       [ 0.,  1.,  0.,  0.,  0., -1.,  0.],\n       [ 0.,  1.,  0.,  0.,  0., -1.,  0.],\n       [ 0.,  1.,  0.,  0.,  0., -1.,  0.],\n       [ 0.,  1.,  0.,  0.,  0., -1.,  0.]])"
-  },
-  "execution_count": 52,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 We can now apply the kernel to the transposed image.
 As expected, it vanishes. The kernel `K` only detects vertical edges.
 
@@ -358,56 +267,14 @@ As expected, it vanishes. The kernel `K` only detects vertical edges.
 corr2d(X.T, K)
 ```
 
-```{.json .output n=53}
-[
- {
-  "data": {
-   "text/plain": "array([[0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.]])"
-  },
-  "execution_count": 53,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ```{.python .input}
 #@tab pytorch
 corr2d(X.t(), K)
 ```
 
-```{.json .output n=43}
-[
- {
-  "ename": "AttributeError",
-  "evalue": "'ResourceVariable' object has no attribute 't'",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
-   "\u001b[0;32m<ipython-input-43-e776c5839792>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;31m#@tab pytorch\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 2\u001b[0;31m \u001b[0mcorr2d\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mt\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mK\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
-   "\u001b[0;31mAttributeError\u001b[0m: 'ResourceVariable' object has no attribute 't'"
-  ]
- }
-]
-```
-
 ```{.python .input}
 #@tab tensorflow
 corr2d(tf.transpose(X), K)
-```
-
-```{.json .output n=44}
-[
- {
-  "data": {
-   "text/plain": "<tf.Variable 'Variable:0' shape=(8, 5) dtype=float32, numpy=\narray([[0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0.]], dtype=float32)>"
-  },
-  "execution_count": 44,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Learning a Kernel
@@ -458,16 +325,6 @@ for i in range(10):
         print(f'batch {i+1}, loss {float(l.sum()):.3f}')
 ```
 
-```{.json .output n=54}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "batch 2, loss 4.949\nbatch 4, loss 0.831\nbatch 6, loss 0.140\nbatch 8, loss 0.024\nbatch 10, loss 0.004\n"
- }
-]
-```
-
 ```{.python .input}
 #@tab pytorch
 # Construct a convolutional layer with 1 input channel and 1 output channel
@@ -490,16 +347,6 @@ for i in range(10):
     conv2d.weight.data[:] -= 3e-2 * conv2d.weight.grad
     if (i + 1) % 2 == 0:
         print(f'batch {i+1}, loss {l.sum():.3f}')
-```
-
-```{.json .output n=36}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "batch 2, loss 9.349\nbatch 4, loss 1.570\nbatch 6, loss 0.264\nbatch 8, loss 0.044\nbatch 10, loss 0.008\n"
- }
-]
 ```
 
 ```{.python .input}
@@ -530,33 +377,10 @@ for i in range(10):
             print(f'batch {i+1}, loss {tf.reduce_sum(l):.3f}')
 ```
 
-```{.json .output n=45}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "batch 2, loss 1.837\nbatch 4, loss 0.663\nbatch 6, loss 0.257\nbatch 8, loss 0.103\nbatch 10, loss 0.042\n"
- }
-]
-```
-
 Note that the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel array we learned.
 
 ```{.python .input}
 conv2d.weight.data().reshape(1, 2)
-```
-
-```{.json .output n=55}
-[
- {
-  "data": {
-   "text/plain": "array([[ 0.9895   , -0.9873705]])"
-  },
-  "execution_count": 55,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -564,35 +388,9 @@ conv2d.weight.data().reshape(1, 2)
 conv2d.weight.data.reshape((1, 2))
 ```
 
-```{.json .output n=37}
-[
- {
-  "data": {
-   "text/plain": "tensor([[ 0.9830, -0.9853]])"
-  },
-  "execution_count": 37,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ```{.python .input}
 #@tab tensorflow
 tf.reshape(conv2d.get_weights()[0], (1, 2))
-```
-
-```{.json .output n=46}
-[
- {
-  "data": {
-   "text/plain": "<tf.Tensor: shape=(1, 2), dtype=float32, numpy=array([[ 0.9758461, -1.0178485]], dtype=float32)>"
-  },
-  "execution_count": 46,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Indeed, the learned kernel array is remarkably close
