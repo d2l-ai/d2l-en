@@ -139,7 +139,7 @@ class Timer:  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):  #@save
-    """Generate y = X w + b + noise."""
+    """Generate y = Xw + b + noise."""
     X = torch.zeros(size=(num_examples, len(w))).normal_()
     y = torch.matmul(X, w) + b
     y += torch.zeros(size=y.shape).normal_(std=0.01)
@@ -165,7 +165,7 @@ def sgd(params, lr, batch_size):  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a PyTorch data loader"""
+    """Construct a PyTorch data loader."""
     dataset = data.TensorDataset(*data_arrays)
     return data.DataLoader(dataset, batch_size, shuffle=is_train)
 

@@ -2,24 +2,25 @@
 :label:`sec_linear_gluon`
 
 Broad and intense interest in deep learning for the past several years
-has inspired both companies, academics, and hobbyists
+has inspired companies, academics, and hobbyists
 to develop a variety of mature open source frameworks
 for automating the repetitive work of implementing
 gradient-based learning algorithms.
-In the previous section, we relied only on
+In :numref:`sec_linear_scratch`, we relied only on
 (i) tensors for data storage and linear algebra;
-and (ii) auto differentiation for calculating derivatives.
+and (ii) auto differentiation for calculating gradients.
 In practice, because data iterators, loss functions, optimizers,
-and neural network layers (and some whole architectures)
+and neural network layers
 are so common, modern libraries implement these components for us as well.
 
 In this section, we will show you how to implement
 the linear regression model from :numref:`sec_linear_scratch`
-concisely by using framework's high-level APIs.
+concisely by using high-level APIs of a deep learning framework.
+
 
 ## Generating the Dataset
 
-To start, we will generate the same dataset as in the previous section.
+To start, we will generate the same dataset as in :numref:`sec_linear_scratch`.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -59,14 +60,12 @@ labels = tf.reshape(labels, (-1, 1))
 ## Reading the Dataset
 
 Rather than rolling our own iterator,
-we can call upon the `data` module to read data.
-The first step will be to instantiate an `ArrayDataset`.
-This object's constructor takes one or more tensors as arguments.
-Here, we pass in `features` and `labels` as arguments.
-Next, we will use the `ArrayDataset` to instantiate a `DataLoader`,
-which also requires that we specify a `batch_size`
-and specify a Boolean value `shuffle` indicating whether or not
-we want the `DataLoader` to shuffle the data
+we can call upon the existing API in a framework to read data.
+We pass in `features` and `labels` as arguments and specify `batch_size`
+when instantiating a data loader object.
+Besides, the boolean value `is_train`
+indicates whether or not
+we want the data loader object to shuffle the data
 on each epoch (pass through the dataset).
 
 ```{.python .input}
@@ -82,7 +81,7 @@ data_iter = load_array((features, labels), batch_size)
 ```{.python .input}
 #@tab pytorch
 def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a PyTorch data loader"""
+    """Construct a PyTorch data loader."""
     dataset = data.TensorDataset(*data_arrays)
     return data.DataLoader(dataset, batch_size, shuffle=is_train)
 
@@ -93,7 +92,7 @@ data_iter = load_array((features, labels), batch_size)
 ```{.python .input}
 #@tab tensorflow
 def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a TensorFlow data loader"""
+    """Construct a TensorFlow data loader."""
     dataset = tf.data.Dataset.from_tensor_slices(data_arrays)
     if is_train:
         dataset = dataset.shuffle(buffer_size=1000)
@@ -105,9 +104,11 @@ data_iter = load_array((features, labels), batch_size)
 ```
 
 Now we can use `data_iter` in much the same way as we called
-the `data_iter` function in the previous section.
+the `data_iter` function in :numref:`sec_linear_scratch`.
 To verify that it is working, we can read and print
-the first minibatch of instances. Comparing to :numref:`sec_linear_scratch`, here we use `iter` to construct an Python iterator and then use `next` to obtain the first item from the iterator.
+the first minibatch of examples.
+Comparing with :numref:`sec_linear_scratch`,
+here we use `iter` to construct a Python iterator and use `next` to obtain the first item from the iterator.
 
 ```{.python .input}
 #@tab all
@@ -117,7 +118,7 @@ next(iter(data_iter))
 ## Defining the Model
 
 When we implemented linear regression from scratch
-(in :numref:`sec_linear_scratch`),
+in :numref:`sec_linear_scratch`,
 we defined our model parameters explicitly
 and coded up the calculations to produce output
 using basic linear algebra operations.
@@ -131,7 +132,7 @@ but you would be a lousy web developer
 if every time you needed a blog you spent a month
 reinventing the wheel.
 
-For standard operations, we can use the framework's predefined layers,
+For standard operations, we can use a framework's predefined layers,
 which allow us to focus especially
 on the layers used to construct the model
 rather than having to focus on the implementation.
@@ -139,7 +140,7 @@ We will first define a model variable `net`,
 which will refer to an instance of the `Sequential` class.
 The `Sequential` class defines a container
 for several layers that will be chained together.
-Given input data, a `Sequential` passes it through
+Given input data, a `Sequential` instance passes it through
 the first layer, in turn passing the output
 as the second layer's input and so forth.
 In the following example, our model consists of only one layer,
@@ -151,14 +152,11 @@ with the most standard workflow.
 
 Recall the architecture of a single-layer network as shown in :numref:`fig_singleneuron`.
 The layer is said to be *fully-connected*
-because each of its inputs are connected to each of its outputs
+because each of its inputs is connected to each of its outputs
 by means of a matrix-vector multiplication.
 
-![Linear regression is a single-layer neural network. ](../img/singleneuron.svg)
-:label:`fig_singleneuron`
-
 ```{.python .input}
-# nn is an abbreviation for neural networks.
+# `nn` is an abbreviation for neural networks
 from mxnet.gluon import nn
 net = nn.Sequential()
 net.add(nn.Dense(1))
@@ -166,14 +164,14 @@ net.add(nn.Dense(1))
 
 ```{.python .input}
 #@tab pytorch
-# nn is an abbreviation for neural networks.
+# `nn` is an abbreviation for neural networks
 from torch import nn
 net = nn.Sequential(nn.Linear(2, 1))
 ```
 
 ```{.python .input}
 #@tab tensorflow
-# Keras is the high-level API for TensorFlow
+# `keras` is the high-level API for TensorFlow
 net = tf.keras.Sequential()
 net.add(tf.keras.layers.Dense(1))
 ```
@@ -181,7 +179,7 @@ net.add(tf.keras.layers.Dense(1))
 :begin_tab:`mxnet`
 In Gluon, the fully-connected layer is defined in the `Dense` class.
 Since we only want to generate a single scalar output,
-we set that number to $1$.
+we set that number to 1.
 
 It is worth noting that, for convenience,
 Gluon does not require us to specify
@@ -199,7 +197,7 @@ In PyTorch, the fully-connected layer is defined in the `Linear` class. Note tha
 :end_tab:
 
 :begin_tab:`tensorflow`
-In Keras, the fully-connected layer is defined in the `Dense` class. Since we only want to generate a single scalar output, we set that number to $1$.
+In Keras, the fully-connected layer is defined in the `Dense` class. Since we only want to generate a single scalar output, we set that number to 1.
 
 It is worth noting that, for convenience,
 Keras does not require us to specify
@@ -211,7 +209,6 @@ e.g., when we execute `net(X)` later,
 Keras will automatically infer the number of inputs to each layer.
 We will describe how this works in more detail later.
 :end_tab:
-
 
 ## Initializing Model Parameters
 
@@ -291,7 +288,6 @@ Just be careful to remember that since the parameters
 have not been initialized yet,
 we cannot access or manipulate them.
 :end_tab:
-
 
 ## Defining the Loss Function
 
@@ -499,7 +495,6 @@ print('Error in estimating b', true_b - b)
 * Dimensionality and storage are automatically inferred (but be careful not to attempt to access parameters before they have been initialized).
 :end_tab:
 
-
 ## Exercises
 
 :begin_tab:`mxnet`
@@ -521,4 +516,3 @@ print('Error in estimating b', true_b - b)
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/204)
 :end_tab:
-
