@@ -105,7 +105,7 @@ from d2l import torch as d2l
 from IPython import display
 import torch
 
-torch.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64))
+torch.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64), eigenvectors=True)
 ```
 
 Note that `numpy` normalizes the eigenvectors to be of length one,
@@ -521,7 +521,7 @@ for i in range(1, 100):
 d2l.plot(torch.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
-We can also plot the ration between consecutive norms as before and see that indeed it stabilizes.
+We can also plot the ratio between consecutive norms as before and see that indeed it stabilizes.
 
 ```{.python .input}
 # Also plot the ratio
