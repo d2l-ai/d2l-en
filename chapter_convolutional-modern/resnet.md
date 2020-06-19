@@ -107,7 +107,7 @@ class Residual(tf.keras.Model):  #@save
         self.conv1 = tf.keras.layers.Conv2D(
             num_channels, padding='same', kernel_size=3, strides=strides)
         self.conv2 = tf.keras.layers.Conv2D(
-            num_channels, kernel_size=3,padding='same')
+            num_channels, kernel_size=3, padding='same')
         self.conv3 = None
         if use_1x1conv:
             self.conv3 = tf.keras.layers.Conv2D(
@@ -121,7 +121,7 @@ class Residual(tf.keras.Model):  #@save
         if self.conv3 is not None:
             X = self.conv3(X)
         Y += X
-        return tf.keras.activations.relu(Y + X)
+        return tf.keras.activations.relu(Y)
 ```
 
 This code generates two types of networks: one where we add the input to the output before applying the ReLU nonlinearity whenever `use_1x1conv=True`, and one where we adjust channels and resolution by means of a $1 \times 1$ convolution before adding. :numref:`fig_resnet_block` illustrates this:
@@ -294,13 +294,18 @@ net = nn.Sequential(b1, b2, b3, b4, b5,
 #@tab tensorflow
 # Recall that we define this as a function so we can reuse later
 # and run it within `tf.distribute.MirroredStrategy`'s scope to
-# utilize various computational resources, e.g. GPUs.
+# utilize various computational resources, e.g. GPUs. Also note
+# that even though we have created b1, b2, b3, b4, b5 but we
+# will recreate them inside this function's scope instead.
 def net():
     return tf.keras.Sequential([
+        # The following layers are the same as b1 that we created earlier.
         tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, padding='same'),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Activation('relu'),
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same'),
+        # The following layers are the same as b2, b3, b4, and b5 that we
+        # created earlier.
         ResnetBlock(64, 2, first_block=True),
         ResnetBlock(128, 2),
         ResnetBlock(256, 2),
