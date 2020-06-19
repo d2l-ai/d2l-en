@@ -342,10 +342,10 @@ from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
 ```
 
-
 ```{.python .input  n=1}
 #@tab pytorch
 #@save
+import numpy as np
 import torch
 import torchvision
 from torch import nn
@@ -357,6 +357,7 @@ from torchvision import transforms
 ```{.python .input  n=1}
 #@tab tensorflow
 #@save
+import numpy as np
 import tensorflow as tf
 ```
 

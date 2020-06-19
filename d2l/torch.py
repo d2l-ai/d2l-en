@@ -10,7 +10,6 @@ import math
 from matplotlib import pyplot as plt
 import os
 import pandas as pd
-import numpy as np
 import random
 import re
 import shutil
@@ -24,6 +23,7 @@ d2l = sys.modules[__name__]
 
 
 # Defined in file: ./chapter_preface/index.md
+import numpy as np
 import torch
 import torchvision
 from torch import nn
