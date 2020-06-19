@@ -23,6 +23,7 @@ d2l = sys.modules[__name__]
 
 
 # Defined in file: ./chapter_preface/index.md
+import numpy as np
 import tensorflow as tf
 
 
