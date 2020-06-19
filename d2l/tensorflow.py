@@ -428,8 +428,8 @@ def corr2d(X, K):  #@save
     Y = tf.Variable(tf.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1)))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j].assign(tf.cast(tf.reduce_sum(
-                X[i: i + h, j: j + w] * K), dtype=tf.float32))
+            Y[i, j].assign(tf.reduce_sum(
+                X[i: i + h, j: j + w] * K))
     return Y
 
 
@@ -479,7 +479,7 @@ class Residual(tf.keras.Model):  #@save
         self.conv1 = tf.keras.layers.Conv2D(
             num_channels, padding='same', kernel_size=3, strides=strides)
         self.conv2 = tf.keras.layers.Conv2D(
-            num_channels, kernel_size=3,padding='same')
+            num_channels, kernel_size=3, padding='same')
         self.conv3 = None
         if use_1x1conv:
             self.conv3 = tf.keras.layers.Conv2D(
@@ -493,6 +493,6 @@ class Residual(tf.keras.Model):  #@save
         if self.conv3 is not None:
             X = self.conv3(X)
         Y += X
-        return tf.keras.activations.relu(Y + X)
+        return tf.keras.activations.relu(Y)
 
 
