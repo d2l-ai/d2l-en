@@ -62,6 +62,32 @@ def conv_block(input_channels, num_channels):
         nn.Conv2d(input_channels, num_channels, kernel_size=3, padding=1))
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+class ConvBlock(tf.keras.layers.Layer):
+    def __init__(self, num_channels):
+        super(ConvBlock, self).__init__()
+        self.bn = tf.keras.layers.BatchNormalization()
+        self.relu = tf.keras.layers.ReLU()
+        self.conv = tf.keras.layers.Conv2D(filters=num_channels,
+                                            kernel_size=(3, 3),
+                                            padding="same")
+        
+        self.listLayers = [self.bn,
+                           self.relu,
+                           self.conv]
+
+    def call(self, x):
+        y = x
+        for layer in self.listLayers.layers:
+            y = layer(y)
+        y = tf.keras.layers.concatenate([x,y], axis=-1)
+        return y
+```
+
 A dense block consists of multiple `conv_block` units, each using the same number of output channels. In the forward computation, however, we concatenate the input and output of each block on the channel dimension.
 
 ```{.python .input}
@@ -100,6 +126,21 @@ class DenseBlock(nn.Module):
         return X
 ```
 
+```{.python .input}
+#@tab tensorflow
+class DenseBlock(tf.keras.layers.Layer):
+    def __init__(self, num_convs, num_channels):
+        super(DenseBlock, self).__init__()
+        self.listLayers = []
+        for _ in range(num_convs):
+            self.listLayers.append(ConvBlock(num_channels))
+
+    def call(self, x):
+        for layer in self.listLayers.layers:
+            x = layer(x)
+        return x
+```
+
 In the following example, we define a convolution block (`DenseBlock`) with two blocks of 10 output channels. When using an input with 3 channels, we will get an output with the $3+2\times 10=23$ channels. The number of convolution block channels controls the increase in the number of output channels relative to the number of input channels. This is also referred to as the growth rate.
 
 ```{.python .input}
@@ -114,6 +155,14 @@ Y.shape
 #@tab pytorch
 blk = DenseBlock(2, 3, 10)
 X = torch.randn(4, 3, 8, 8)
+Y = blk(X)
+Y.shape
+```
+
+```{.python .input}
+#@tab tensorflow
+blk = DenseBlock(2, 10)
+X = tf.random.uniform((4, 8, 8, 3))
 Y = blk(X)
 Y.shape
 ```
@@ -140,6 +189,23 @@ def transition_block(input_channels, num_channels):
         nn.AvgPool2d(kernel_size=2, stride=2))
 ```
 
+```{.python .input}
+#@tab tensorflow
+class TransitionBlock(tf.keras.layers.Layer):
+  def __init__(self, num_channels, **kwargs):
+    super(TransitionBlock, self).__init__(**kwargs)
+    self.batch_norm = tf.keras.layers.BatchNormalization()
+    self.relu = tf.keras.layers.ReLU()
+    self.conv = tf.keras.layers.Conv2D(num_channels, kernel_size=1)
+    self.avg_pool = tf.keras.layers.AvgPool2D(pool_size=2, strides=2)
+  
+  def call(self, x):
+    x =  self.batch_norm(x)
+    x =  self.relu(x)
+    x =  self.conv(x)
+    return self.avg_pool(x)
+```
+
 Apply a transition layer with 10 channels to the output of the dense block in the previous example.  This reduces the number of output channels to 10, and halves the height and width.
 
 ```{.python .input}
@@ -151,6 +217,12 @@ blk(Y).shape
 ```{.python .input}
 #@tab pytorch
 blk = transition_block(23, 10)
+blk(Y).shape
+```
+
+```{.python .input}
+#@tab tensorflow
+blk = TransitionBlock(10)
 blk(Y).shape
 ```
 
@@ -171,6 +243,16 @@ b1 = nn.Sequential(
     nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
     nn.BatchNorm2d(64), nn.ReLU(),
     nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
+```
+
+```{.python .input}
+#@tab tensorflow
+def block_1():
+  return tf.keras.Sequential([
+       tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, padding='same'),
+       tf.keras.layers.BatchNormalization(),
+       tf.keras.layers.ReLU(),
+       tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
 Then, similar to the four residual blocks that ResNet uses, DenseNet uses four dense blocks. Similar to ResNet, we can set the number of convolutional layers used in each dense block. Here, we set it to 4, consistent with the ResNet-18 in the previous section. Furthermore, we set the number of channels (i.e., growth rate) for the convolutional layers in the dense block to 32, so 128 channels will be added to each dense block.
@@ -209,6 +291,25 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
         num_channels = num_channels // 2
 ```
 
+```{.python .input}
+#@tab tensorflow
+def block_2():
+  net = block_1()
+  num_channels, growth_rate = 64, 32
+  num_convs_in_dense_blocks = [4, 4, 4, 4]
+
+  for i, num_convs in enumerate(num_convs_in_dense_blocks):
+    net.add(DenseBlock(num_convs, growth_rate))
+    # This is the number of output channels in the previous dense block
+    num_channels += num_convs * growth_rate
+    # A transition layer that haves the number of channels is added between
+    # the dense blocks
+    if i != len(num_convs_in_dense_blocks) - 1:
+      num_channels //= 2
+      net.add(TransitionBlock(num_channels))
+    return net
+```
+
 Similar to ResNet, a global pooling layer and fully connected layer are connected at the end to produce the output.
 
 ```{.python .input}
@@ -228,6 +329,26 @@ net = nn.Sequential(
     nn.Linear(num_channels, 10))
 ```
 
+```{.python .input}
+#@tab tensorflow
+def block_3():
+  net = block_2()
+  net.add(tf.keras.layers.BatchNormalization())
+  net.add(tf.keras.layers.ReLU())
+  net.add(tf.keras.layers.GlobalAvgPool2D())
+  net.add(tf.keras.layers.Flatten())
+  net.add(tf.keras.layers.Dense(10, activation='softmax'))
+  return net
+# Recall that we define this as a function so we can reuse later
+# and run it within `tf.distribute.MirroredStrategy`'s scope to
+# utilize various computational resources, e.g. GPUs.
+def net():
+  net = block_1()
+  net = block_2()
+  net = block_3()
+  return net
+```
+
 ## Data Acquisition and Training
 
 Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
@@ -240,6 +361,13 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 ```{.python .input}
 #@tab pytorch
+lr, num_epochs, batch_size = 0.1, 10, 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+```{.python .input}
+#@tab tensorflow
 lr, num_epochs, batch_size = 0.1, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
