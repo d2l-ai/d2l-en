@@ -521,7 +521,7 @@ for i in range(1, 100):
 d2l.plot(torch.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
-We can also plot the ration between consecutive norms as before and see that indeed it stabilizes.
+We can also plot the ratio between consecutive norms as before and see that indeed it stabilizes.
 
 ```{.python .input}
 # Also plot the ratio
