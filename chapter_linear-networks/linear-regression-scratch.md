@@ -399,7 +399,7 @@ for epoch in range(num_epochs):
         l.backward()
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
-    print(f'epoch {epoch+1}, loss {float(train_l.mean())}')
+    print(f'epoch {epoch + 1}, loss {float(train_l.mean()):f}')
 ```
 
 ```{.python .input}
@@ -416,7 +416,7 @@ for epoch in range(num_epochs):
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     with torch.no_grad():
         train_l = loss(net(features, w, b), labels)
-        print(f'epoch {epoch+1}, loss {float(train_l.mean())}')
+        print(f'epoch {epoch + 1}, loss {float(train_l.mean()):f}')
 ```
 
 ```{.python .input}
@@ -434,7 +434,7 @@ for epoch in range(num_epochs):
         dw, db = g.gradient(l, [w, b])
         sgd([w, b], [dw, db], lr, batch_size)  # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
-    print(f'epoch {epoch+1}, loss {float(tf.reduce_mean(train_l))}')
+    print(f'epoch {epoch + 1}, loss {float(tf.reduce_mean(train_l)):f}')
 ```
 
 In this case, because we synthesized the dataset ourselves,
@@ -446,8 +446,8 @@ Indeed they turn out to be very close to each other.
 
 ```{.python .input}
 #@tab all
-print('Error in estimating w:', true_w - d2l.reshape(w, true_w.shape))
-print('Error in estimating b:', true_b - b)
+print(f'error in estimating w: {true_w - d2l.reshape(w, true_w.shape)}')
+print(f'error in estimating b: {true_b - b}')
 ```
 
 Note that we should not take it for granted
@@ -470,7 +470,7 @@ that lead to highly accurate prediction.
 
 ## Exercises
 
-1. What would happen if we were to initialize the weights as zero. Would the algorithm still work?
+1. What would happen if we were to initialize the weights to zero. Would the algorithm still work?
 1. Assume that you are
    [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up
    with a model between voltage and current. Can you use auto differentiation to learn the parameters of your model?
