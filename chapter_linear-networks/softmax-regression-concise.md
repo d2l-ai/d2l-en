@@ -222,3 +222,4 @@ if we tried to code all of our models from scratch in practice.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/260)
 :end_tab:
+

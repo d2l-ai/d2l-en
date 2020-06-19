@@ -451,7 +451,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater.apply_gradients(zip(grads, params))
         else:
             updater(X.shape[0], tape.gradient(l, updater.params))
-        metric.add(tf.reduce_sum(l), accuracy(y_hat, y), tf.size(y))
+        metric.add(tf.reduce_sum(l), accuracy(y_hat, y), tf.size(l))
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
