@@ -356,38 +356,28 @@ It is crucial that you understand this code
 because you will see nearly identical training loops
 over and over again throughout your career in deep learning.
 
-In each iteration, we will grab minibatches of models,
-first passing them through our model to obtain a set of predictions.
-After calculating the loss, we call the `backward` function
-to initiate the backwards pass through the network,
-storing the gradients with respect to each parameter
-in its corresponding `.grad` attribute.
+In each iteration, we will grab a minibatch of training examples,
+and pass them through our model to obtain a set of predictions.
+After calculating the loss, we initiate the backwards pass through the network,
+storing the gradients with respect to each parameter.
 Finally, we will call the optimization algorithm `sgd`
 to update the model parameters.
-Since we previously set the batch size `batch_size` to $10$,
-the loss shape `l` for each minibatch is ($10$, $1$).
 
 In summary, we will execute the following loop:
 
 * Initialize parameters $(\mathbf{w}, b)$
 * Repeat until done
-    * Compute gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{\mathcal{B}} \sum_{i \in \mathcal{B}} l(\mathbf{x}^i, y^i, \mathbf{w}, b)$
+    * Compute gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
     * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
-
-In the code below, `l` is a vector of the losses
-for each example in the minibatch.
-Because `l` is not a scalar variable,
-running `l.backward()` adds together the elements in `l`
-to obtain the new variable and then calculates the gradient.
 
 In each epoch (a pass through the data),
 we will iterate through the entire dataset
 (using the `data_iter` function) once
-passing through every examples in the training dataset
-(assuming the number of examples is divisible by the batch size).
-The number of epochs `num_epochs` and the learning rate `lr` are both hyper-parameters,
-which we set here to $3$ and $0.03$, respectively.
-Unfortunately, setting hyper-parameters is tricky
+passing through every example in the training dataset
+(assuming that the number of examples is divisible by the batch size).
+The number of epochs `num_epochs` and the learning rate `lr` are both hyperparameters,
+which we set here to 3 and 0.03, respectively.
+Unfortunately, setting hyperparameters is tricky
 and requires some adjustment by trial and error.
 We elide these details for now but revise them
 later in
@@ -402,8 +392,11 @@ loss = squared_loss
 for epoch in range(num_epochs):
     for X, y in data_iter(batch_size, features, labels):
         with autograd.record():
-            l = loss(net(X, w, b), y)  # Minibatch loss in X and y
-        l.backward()  # Compute gradient on l with respect to [w, b]
+            l = loss(net(X, w, b), y)  # Minibatch loss in `X` and `y`
+        # Because `l` has a shape (`batch_size`, 1) and is not a scalar
+        # variable, the elements in `l` are added together to obtain a new
+        # variable, on which gradients with respect to [`w`, `b`] are computed
+        l.backward()
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
     print(f'epoch {epoch+1}, loss {float(train_l.mean())}')
@@ -418,8 +411,8 @@ loss = squared_loss
 
 for epoch in range(num_epochs):
     for X, y in data_iter(batch_size, features, labels):
-        l = loss(net(X, w, b), y)  # Minibatch loss in X and y
-        l.sum().backward()  # Compute gradient on l with respect to [w,b]
+        l = loss(net(X, w, b), y)  # Minibatch loss in `X` and `y`
+        l.sum().backward()  # Compute gradient on `l` with respect to [`w`, `b`]
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     with torch.no_grad():
         train_l = loss(net(features, w, b), labels)
@@ -436,15 +429,15 @@ loss = squared_loss
 for epoch in range(num_epochs):
     for X, y in data_iter(batch_size, features, labels):
         with tf.GradientTape() as g:
-            l = loss(net(X, w, b), y)    # Minibatch loss in X and y
-        # Compute gradient on l with respect to [w,b]
+            l = loss(net(X, w, b), y)  # Minibatch loss in `X` and `y`
+        # Compute gradient on l with respect to [`w`, `b`]
         dw, db = g.gradient(l, [w, b])
-        sgd([w, b], [dw, db], lr, batch_size)     # Update parameters using their gradient
+        sgd([w, b], [dw, db], lr, batch_size)  # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
     print(f'epoch {epoch+1}, loss {float(tf.reduce_mean(train_l))}')
 ```
 
-In this case, because we synthesized the data ourselves,
+In this case, because we synthesized the dataset ourselves,
 we know precisely what the true parameters are.
 Thus, we can evaluate our success in training
 by comparing the true parameters
@@ -453,45 +446,34 @@ Indeed they turn out to be very close to each other.
 
 ```{.python .input}
 #@tab all
-print('Error in estimating w', true_w - d2l.reshape(w, true_w.shape))
-print('Error in estimating b', true_b - b)
+print('Error in estimating w:', true_w - d2l.reshape(w, true_w.shape))
+print('Error in estimating b:', true_b - b)
 ```
 
 Note that we should not take it for granted
-that we are able to recover the parameters accurately.
-This only happens for a special category problems:
-strongly convex optimization problems with "enough" data to ensure
-that the noisy samples allow us to recover the underlying dependency.
-In most cases this is *not* the case.
-In fact, the parameters of a deep network
-are rarely the same (or even close) between two different runs,
-unless all conditions are identical,
-including the order in which the data is traversed.
+that we are able to recover the parameters perfectly.
 However, in machine learning, we are typically less concerned
 with recovering true underlying parameters,
-and more concerned with parameters that lead to accurate prediction.
+and more concerned with parameters that lead to highly accurate prediction.
 Fortunately, even on difficult optimization problems,
 stochastic gradient descent can often find remarkably good solutions,
 owing partly to the fact that, for deep networks,
 there exist many configurations of the parameters
-that lead to accurate prediction.
+that lead to highly accurate prediction.
+
 
 ## Summary
 
-We saw how a deep network can be implemented
-and optimized from scratch, using just tensors and auto differentiation,
-without any need for defining layers, fancy optimizers, etc.
-This only scratches the surface of what is possible.
-In the following sections, we will describe additional models
-based on the concepts that we have just introduced
-and learn how to implement them more concisely.
+* We saw how a deep network can be implemented and optimized from scratch, using just tensors and auto differentiation, without any need for defining layers or fancy optimizers.
+* This section only scratches the surface of what is possible. In the following sections, we will describe additional models based on the concepts that we have just introduced and learn how to implement them more concisely.
+
 
 ## Exercises
 
-1. What would happen if we were to initialize the weights $\mathbf{w} = 0$. Would the algorithm still work?
+1. What would happen if we were to initialize the weights as zero. Would the algorithm still work?
 1. Assume that you are
    [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up
-   with a model between voltage and current. Can you use auto differentiation to learn the parameters of your model.
+   with a model between voltage and current. Can you use auto differentiation to learn the parameters of your model?
 1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object using spectral energy density?
 1. What are the problems you might encounter if you wanted to  compute the second derivatives? How would you fix them?
 1.  Why is the `reshape` function needed in the `squared_loss` function?
