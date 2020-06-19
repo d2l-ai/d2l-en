@@ -258,7 +258,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater.apply_gradients(zip(grads, params))
         else:
             updater(X.shape[0], tape.gradient(l, updater.params))
-        metric.add(tf.reduce_sum(l), accuracy(y_hat, y), tf.size(y))
+        metric.add(tf.reduce_sum(l), accuracy(y_hat, y), tf.size(l))
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 
@@ -427,7 +427,7 @@ def corr2d(X, K):  #@save
     Y = tf.Variable(tf.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1)))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j].assign(tf.cast(tf.reduce_sum(X[i: i + h, j: j + w] * K), dtype=tf.float32))
+            Y[i, j].assign(tf.reduce_sum(X[i: i + h, j: j + w] * K))
     return Y
 
 
@@ -492,162 +492,5 @@ class Residual(tf.keras.Model):  #@save
             X = self.conv3(X)
         Y += X
         return tf.keras.activations.relu(Y + X)
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
-                                '090b5e7e70c295757f55df93cb0a180b9691891a')
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def read_time_machine():  #@save
-    """Load the time machine book into a list of sentences."""
-    with open(d2l.download('time_machine'), 'r') as f:
-        lines = f.readlines()
-    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
-            for line in lines]
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def tokenize(lines, token='word'):  #@save
-    """Split sentences into word or char tokens."""
-    if token == 'word':
-        return [line.split(' ') for line in lines]
-    elif token == 'char':
-        return [list(line) for line in lines]
-    else:
-        print('ERROR: unknown token type '+token)
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-class Vocab:  #@save
-    def __init__(self, tokens, min_freq=0, reserved_tokens=None):
-        if reserved_tokens is None:
-            reserved_tokens = []
-        # Sort according to frequencies
-        counter = count_corpus(tokens)
-        self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
-        self.token_freqs.sort(key=lambda x: x[1], reverse=True)
-        self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
-        uniq_tokens += [token for token, freq in self.token_freqs
-                        if freq >= min_freq and token not in uniq_tokens]
-        self.idx_to_token, self.token_to_idx = [], dict()
-        for token in uniq_tokens:
-            self.idx_to_token.append(token)
-            self.token_to_idx[token] = len(self.idx_to_token) - 1
-
-    def __len__(self):
-        return len(self.idx_to_token)
-
-    def __getitem__(self, tokens):
-        if not isinstance(tokens, (list, tuple)):
-            return self.token_to_idx.get(tokens, self.unk)
-        return [self.__getitem__(token) for token in tokens]
-
-    def to_tokens(self, indices):
-        if not isinstance(indices, (list, tuple)):
-            return self.idx_to_token[indices]
-        return [self.idx_to_token[index] for index in indices]
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def count_corpus(sentences):  #@save
-    # Flatten a list of token lists into a list of tokens
-    tokens = [tk for line in sentences for tk in line]
-    return collections.Counter(tokens)
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def load_corpus_time_machine(max_tokens=-1):  #@save
-    lines = read_time_machine()
-    tokens = tokenize(lines, 'char')
-    vocab = Vocab(tokens)
-    corpus = [vocab[tk] for line in tokens for tk in line]
-    if max_tokens > 0:
-        corpus = corpus[:max_tokens]
-    return corpus, vocab
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-class SeqDataLoader:
-    """A iterator to load sequence data."""
-    def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
-        if use_random_iter:
-            self.data_iter_fn = d2l.seq_data_iter_random
-        else:
-            self.data_iter_fn = d2l.seq_data_iter_consecutive
-        self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
-        self.batch_size, self.num_steps = batch_size, num_steps
-
-    def __iter__(self):
-        return self.data_iter_fn(self.corpus, self.batch_size, self.num_steps)
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
-                           max_tokens=10000):
-    data_iter = SeqDataLoader(
-        batch_size, num_steps, use_random_iter, max_tokens)
-    return data_iter, data_iter.vocab
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
-                           '94646ad1522d915e7b0f9296181140edcf86a4f5')
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def read_data_nmt():
-    data_dir = d2l.download_extract('fra-eng')
-    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
-        return f.read()
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def preprocess_nmt(text):
-    def no_space(char, prev_char):
-        return char in set(',.!') and prev_char != ' '
-
-    text = text.replace('\u202f', ' ').replace('\xa0', ' ').lower()
-    out = [' ' + char if i > 0 and no_space(char, text[i-1]) else char
-           for i, char in enumerate(text)]
-    return ''.join(out)
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def tokenize_nmt(text, num_examples=None):
-    source, target = [], []
-    for i, line in enumerate(text.split('\n')):
-        if num_examples and i > num_examples:
-            break
-        parts = line.split('\t')
-        if len(parts) == 2:
-            source.append(parts[0].split(' '))
-            target.append(parts[1].split(' '))
-    return source, target
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def truncate_pad(line, num_steps, padding_token):
-    if len(line) > num_steps:
-        return line[:num_steps]  # Trim
-    return line + [padding_token] * (num_steps - len(line))  # Pad
-
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def load_data_nmt(batch_size, num_steps, num_examples=1000):
-    text = preprocess_nmt(read_data_nmt())
-    source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, 
-                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=3, 
-                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    src_array, src_valid_len = build_array(
-        source, src_vocab, num_steps, True)
-    tgt_array, tgt_valid_len = build_array(
-        target, tgt_vocab, num_steps, False)
-    data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
-    data_iter = d2l.load_array(data_arrays, batch_size)
-    return src_vocab, tgt_vocab, data_iter
 
 

@@ -226,8 +226,8 @@ We will import the `initializer` module from MXNet.
 This module provides various methods for model parameter initialization.
 Gluon makes `init` available as a shortcut (abbreviation)
 to access the `initializer` package.
-By calling `init.Normal(sigma=0.01)`. Bias parameters are initialized to zero in default, 
-we only to specify how to initialize the weight. 
+By calling `init.Normal(sigma=0.01)`. Bias parameters are initialized to zero in default,
+we only to specify how to initialize the weight.
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -235,7 +235,7 @@ As we have specified the input and output dimensions when constructing `nn.Linea
 :end_tab:
 
 :begin_tab:`tensorflow`
-The `initializers` module in TensorFlow provides various methods for model parameter initialization. The easiest way to specify the initialization method in Keras is when creating the layer by specifying `kernel_initializer`. Here we recreate `net` again.  
+The `initializers` module in TensorFlow provides various methods for model parameter initialization. The easiest way to specify the initialization method in Keras is when creating the layer by specifying `kernel_initializer`. Here we recreate `net` again.
 :end_tab:
 
 ```{.python .input}
@@ -521,3 +521,4 @@ print('Error in estimating b', true_b - b)
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/204)
 :end_tab:
+
