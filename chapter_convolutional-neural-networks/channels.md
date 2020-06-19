@@ -105,9 +105,9 @@ corr2d_multi_in(X, K)
 ```{.python .input}
 #@tab pytorch
 X = torch.tensor([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
-                  [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
+                  [[1, 2, 3], [4, 5, 6], [7, 8, 9]]], dtype=torch.float32)
 K = torch.tensor([[[0, 1], [2, 3]],
-                  [[1, 2], [3, 4]]])
+                  [[1, 2], [3, 4]]], dtype=torch.float32)
 
 corr2d_multi_in(X, K)
 ```
@@ -115,9 +115,9 @@ corr2d_multi_in(X, K)
 ```{.python .input}
 #@tab tensorflow
 X = tf.constant([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
-                 [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
+                 [[1, 2, 3], [4, 5, 6], [7, 8, 9]]], dtype=tf.float32)
 K = tf.constant([[[0, 1], [2, 3]],
-                 [[1, 2], [3, 4]]])
+                 [[1, 2], [3, 4]]], dtype=tf.float32)
 
 corr2d_multi_in(X, K)
 ```

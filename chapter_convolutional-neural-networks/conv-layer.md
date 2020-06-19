@@ -113,8 +113,8 @@ def corr2d(X, K):  #@save
     Y = tf.Variable(tf.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1)))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j].assign(tf.cast(tf.reduce_sum(
-                X[i: i + h, j: j + w] * K), dtype=tf.float32))
+            Y[i, j].assign(tf.reduce_sum(
+                X[i: i + h, j: j + w] * K))
     return Y
 ```
 
@@ -131,15 +131,15 @@ corr2d(X, K)
 
 ```{.python .input}
 #@tab pytorch
-X = torch.Tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
-K = torch.Tensor([[0, 1], [2, 3]])
+X = torch.tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=torch.float32)
+K = torch.tensor([[0, 1], [2, 3]], dtype=torch.float32)
 corr2d(X, K)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.constant([[0.0, 1, 2], [3, 4, 5], [6, 7, 8]])
-K = tf.constant([[0.0, 1], [2, 3]])
+X = tf.constant([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=tf.float32)
+K = tf.constant([[0, 1], [2, 3]], dtype=tf.float32)
 corr2d(X, K)
 ```
 
@@ -240,12 +240,12 @@ K = np.array([[1, -1]])
 
 ```{.python .input}
 #@tab pytorch
-K = torch.Tensor([[1, -1]])
+K = torch.tensor([[1, -1]], dtype=torch.float32)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-K = tf.constant([[1., -1.]])
+K = tf.constant([[1, -1]], dtype=tf.float32)
 ```
 
 We are ready to perform the cross-correlation operation
