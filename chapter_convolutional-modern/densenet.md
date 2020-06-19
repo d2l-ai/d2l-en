@@ -62,7 +62,7 @@ def conv_block(input_channels, num_channels):
         nn.Conv2d(input_channels, num_channels, kernel_size=3, padding=1))
 ```
 
-```{.python .input}
+```{.python .input  n=1}
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -126,7 +126,7 @@ class DenseBlock(nn.Module):
         return X
 ```
 
-```{.python .input}
+```{.python .input  n=2}
 #@tab tensorflow
 class DenseBlock(tf.keras.layers.Layer):
     def __init__(self, num_convs, num_channels):
@@ -159,12 +159,25 @@ Y = blk(X)
 Y.shape
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 #@tab tensorflow
 blk = DenseBlock(2, 10)
 X = tf.random.uniform((4, 8, 8, 3))
 Y = blk(X)
 Y.shape
+```
+
+```{.json .output n=3}
+[
+ {
+  "data": {
+   "text/plain": "TensorShape([4, 8, 8, 23])"
+  },
+  "execution_count": 3,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Transition Layers
@@ -189,7 +202,7 @@ def transition_block(input_channels, num_channels):
         nn.AvgPool2d(kernel_size=2, stride=2))
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 #@tab tensorflow
 class TransitionBlock(tf.keras.layers.Layer):
   def __init__(self, num_channels, **kwargs):
@@ -220,10 +233,23 @@ blk = transition_block(23, 10)
 blk(Y).shape
 ```
 
-```{.python .input}
+```{.python .input  n=5}
 #@tab tensorflow
 blk = TransitionBlock(10)
 blk(Y).shape
+```
+
+```{.json .output n=5}
+[
+ {
+  "data": {
+   "text/plain": "TensorShape([4, 4, 4, 10])"
+  },
+  "execution_count": 5,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## DenseNet Model
@@ -245,8 +271,8 @@ b1 = nn.Sequential(
     nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
 ```
 
-```{.python .input}
-#tab tensorflow
+```{.python .input  n=10}
+#@tab tensorflow
 def block_1():
   return tf.keras.Sequential([
        tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, padding='same'),
@@ -291,7 +317,8 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
         num_channels = num_channels // 2
 ```
 
-```{.python .input}
+```{.python .input  n=11}
+#@tab tensorflow
 def block_2():
   net = block_1()
   num_channels, growth_rate = 64, 32
@@ -328,7 +355,8 @@ net = nn.Sequential(
     nn.Linear(num_channels, 10))
 ```
 
-```{.python .input}
+```{.python .input  n=12}
+#@tab tensorflow
 def block_3():
   net = block_2()
   net.add(tf.keras.layers.BatchNormalization())
@@ -344,8 +372,6 @@ def net():
   net = block_1()
   net = block_2()
   net = block_3()
-  initialize = tf.random.uniform((256, 96, 96, 1))
-  net(initialize)
   return net
 ```
 
@@ -371,6 +397,16 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 lr, num_epochs, batch_size = 0.1, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
+
+```{.json .output n=None}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "training on /CPU:0\nWARNING:tensorflow:There is non-GPU devices in `tf.distribute.Strategy`, not using nccl allreduce.\nEpoch 1/10\n      2/Unknown - 17s 9s/step - loss: 2.5467 - accuracy: 0.0957 "
+ }
+]
 ```
 
 ## Summary
