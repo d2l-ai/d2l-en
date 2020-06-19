@@ -251,7 +251,7 @@ class PositionalEncoding(nn.Block):
         return self.dropout(X)
 ```
 
-Now we test the `PositionalEncoding` class with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset. The $5^{\mathrm{th}}$ and $6^{\mathrm{th}}$ dimensions have a lower frequency.
+Now we test the `PositionalEncoding` class with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset (i.e. phase) because one is produced by a sine function and the other is produced by a cosine function. The $6^{\mathrm{th}}$ and $7^{\mathrm{th}}$ dimensions have lower frequency.
 
 ```{.python .input  n=11}
 pe = PositionalEncoding(20, 0)
