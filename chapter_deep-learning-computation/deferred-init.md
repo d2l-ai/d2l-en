@@ -15,9 +15,9 @@ which might not seem like they should work:
   how many parameters our models should contain.
 
 You might be surprised that our code runs at all.
-After all, there is no way MXNeta and TensorFlow
+After all, there is no way MXNet and TensorFlow
 could tell what the input dimensionality of a network would be.
-The trick here is that both framework *defers initialization*,
+The trick here is that both frameworks *defer initialization*,
 waiting until the first time we pass data through the model,
 to infer the sizes of each layer *on the fly*.
 
