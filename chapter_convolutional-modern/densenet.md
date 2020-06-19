@@ -167,19 +167,6 @@ Y = blk(X)
 Y.shape
 ```
 
-```{.json .output n=3}
-[
- {
-  "data": {
-   "text/plain": "TensorShape([4, 8, 8, 23])"
-  },
-  "execution_count": 3,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ## Transition Layers
 
 Since each dense block will increase the number of channels, adding too many of them will lead to an excessively complex model. A transition layer is used to control the complexity of the model. It reduces the number of channels by using the $1\times 1$ convolutional layer and halves the height and width of the average pooling layer with a stride of 2, further reducing the complexity of the model.
@@ -237,19 +224,6 @@ blk(Y).shape
 #@tab tensorflow
 blk = TransitionBlock(10)
 blk(Y).shape
-```
-
-```{.json .output n=5}
-[
- {
-  "data": {
-   "text/plain": "TensorShape([4, 4, 4, 10])"
-  },
-  "execution_count": 5,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## DenseNet Model
@@ -397,16 +371,6 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 lr, num_epochs, batch_size = 0.1, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.json .output n=None}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "training on /CPU:0\nWARNING:tensorflow:There is non-GPU devices in `tf.distribute.Strategy`, not using nccl allreduce.\nEpoch 1/10\n      2/Unknown - 17s 9s/step - loss: 2.5467 - accuracy: 0.0957 "
- }
-]
 ```
 
 ## Summary
