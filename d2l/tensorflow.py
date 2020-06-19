@@ -259,7 +259,10 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater.apply_gradients(zip(grads, params))
         else:
             updater(X.shape[0], tape.gradient(l, updater.params))
-        metric.add(tf.reduce_sum(l), accuracy(y_hat, y), tf.size(l))
+        # Keras loss in default returns the average loss in a batch.
+        l_sum = l * float(tf.size(l)) if isinstance(
+            loss, tf.keras.losses.Loss) else tf.reduce_sum(l)
+        metric.add(l_sum, accuracy(y_hat, y), tf.size(l))
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 
@@ -306,7 +309,9 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
-        animator.add(epoch+1, train_metrics+(test_acc,))
+        metrics = train_metrics+(test_acc,)
+        animator.add(epoch+1, metrics)
+    assert metrics[0]<0.4 and metrics[1]>0.7 and metrics[2]>0.7, metrics
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -479,7 +484,7 @@ class Residual(tf.keras.Model):  #@save
         self.conv1 = tf.keras.layers.Conv2D(
             num_channels, padding='same', kernel_size=3, strides=strides)
         self.conv2 = tf.keras.layers.Conv2D(
-            num_channels, kernel_size=3,padding='same')
+            num_channels, kernel_size=3, padding='same')
         self.conv3 = None
         if use_1x1conv:
             self.conv3 = tf.keras.layers.Conv2D(
@@ -493,6 +498,6 @@ class Residual(tf.keras.Model):  #@save
         if self.conv3 is not None:
             X = self.conv3(X)
         Y += X
-        return tf.keras.activations.relu(Y + X)
+        return tf.keras.activations.relu(Y)
 
 

@@ -308,7 +308,9 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
-        animator.add(epoch+1, train_metrics+(test_acc,))
+        metrics = train_metrics+(test_acc,)
+        animator.add(epoch+1, metrics)
+    assert metrics[0]<0.4 and metrics[1]>0.7 and metrics[2]>0.7, metrics
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md

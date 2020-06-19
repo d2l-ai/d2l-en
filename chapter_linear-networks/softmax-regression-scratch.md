@@ -81,7 +81,7 @@ b = torch.zeros(num_outputs, requires_grad=True)
 num_inputs = 784
 num_outputs = 10
 
-W = tf.Variable(tf.random.normal(shape=(num_inputs, num_outputs), 
+W = tf.Variable(tf.random.normal(shape=(num_inputs, num_outputs),
                                  mean=0, stddev=0.01))
 b = tf.Variable(tf.zeros(num_outputs))
 ```
@@ -230,7 +230,7 @@ Recall that cross-entropy takes the negative log likelihood
 of the predicted probability assigned to the true label $-\log P(y \mid x)$.
 Rather than iterating over the predictions with a Python `for` loop
 (which tends to be inefficient),
-we can pick all elements by a single operator. 
+we can pick all elements by a single operator.
 Below, we create a toy data `y_hat`
 with $3$ categories and $2$ examples, then pick the first category in the first example and the third category in the second example.
 
@@ -273,7 +273,7 @@ cross_entropy(y_hat, y)
 
 ```{.python .input}
 #@tab tensorflow
-def cross_entropy(y_hat, y):    
+def cross_entropy(y_hat, y):
     return -tf.math.log(tf.boolean_mask(
         y_hat, tf.one_hot(y, depth=y_hat.shape[-1])))
 
@@ -297,8 +297,8 @@ it is often the performance metric that we care most about,
 and we will nearly always report it when training classifiers.
 
 To compute accuracy we do the following:
-First, if `y` is a matrix, we assume the second dimension is prediction scores for each class. We use `argmax` to compute predicted class by the indices for the largest entries in each row). Then we compare predicted class to `y` elementwise. 
-Since the equality operator `==` is datatype-sensitive, we convert `y_hat`'s data type to match `y`. 
+First, if `y` is a matrix, we assume the second dimension is prediction scores for each class. We use `argmax` to compute predicted class by the indices for the largest entries in each row). Then we compare predicted class to `y` elementwise.
+Since the equality operator `==` is datatype-sensitive, we convert `y_hat`'s data type to match `y`.
 The result is a tensor containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
 
@@ -326,7 +326,7 @@ def accuracy(y_hat, y):  #@save
 ```
 
 We will continue to use the variables `y_hat` and `y`
-defined before 
+defined before
 as the predicted probability distribution and label, respectively.
 We can see that the first example's prediction category is $2$
 (the largest element of the row is $0.6$ with an index of $2$),
@@ -451,7 +451,10 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater.apply_gradients(zip(grads, params))
         else:
             updater(X.shape[0], tape.gradient(l, updater.params))
-        metric.add(tf.reduce_sum(l), accuracy(y_hat, y), tf.size(l))
+        # Keras loss in default returns the average loss in a batch.
+        l_sum = l * float(tf.size(l)) if isinstance(
+            loss, tf.keras.losses.Loss) else tf.reduce_sum(l)
+        metric.add(l_sum, accuracy(y_hat, y), tf.size(l))
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
@@ -506,7 +509,9 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
-        animator.add(epoch+1, train_metrics+(test_acc,))
+        metrics = train_metrics+(test_acc,)
+        animator.add(epoch+1, metrics)
+    assert metrics[0]<0.4 and metrics[1]>0.7 and metrics[2]>0.7, metrics
 ```
 
 Again, we use the minibatch stochastic gradient descent we defined in :numref:`sec_linear_scratch`
