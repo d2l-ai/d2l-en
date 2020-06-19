@@ -340,13 +340,14 @@ def b5():
     return tf.keras.Sequential([
         Inception(256, (160, 320), (32, 128), 128),
         Inception(384, (192, 384), (48, 128), 128),
-        tf.keras.layers.GlobalAvgPool2D()
+        tf.keras.layers.GlobalAvgPool2D(),
+        tf.keras.layers.Flatten()
     ])
 # Recall that this has to be a function that will be passed to `d2l.train_ch6()`
 # so that model building/compiling need to be within `strategy.scope()`
 # in order to utilize the CPU/GPU devices that we have.
 def net():
-    return tf.keras.Sequential([b1(), b2(), b3(), b4(), b5(), tf.keras.layers.Dense(10)])
+    return tf.keras.Sequential([b1(), b2(), b3(), b4(), b5(), tf.keras.layers.Dense(10, activation='softmax')])
 ```
 
 The GoogLeNet model is computationally complex,
