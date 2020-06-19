@@ -196,7 +196,7 @@ Then our prediction problem is to minimize $\|\mathbf{y} - \mathbf{X}\mathbf{w}\
 There is just one critical point on the loss surface
 and it corresponds to the minimum of the loss over the entire domain.
 Taking the derivative of the loss with respect to $\mathbf{w}$
-and setting it equal to zero yields the analytic solution:
+and setting it equal to zero yields the analytic (closed-form) solution:
 
 $$\mathbf{w}^* = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf{y}.$$
 
@@ -208,7 +208,7 @@ the requirement of an analytic solution is so restrictive
 that it would exclude all of deep learning.
 
 
-### Gradient Descent
+### Minibatch Stochastic Gradient Descent
 
 Even in cases where we cannot solve the models analytically,
 it turns out that we can still train models effectively in practice.
@@ -482,7 +482,7 @@ d2l.plot(x, [normal(x, mu, sigma) for mu, sigma in params], xlabel='x',
 As we can see, changing the mean corresponds to a shift along the $x$-axis,
 and increasing the variance spreads the distribution out, lowering its peak.
 
-One way to motivate linear regression with the mean squared error loss function
+One way to motivate linear regression with the mean squared error loss function (or simply square loss)
 is to formally assume that observations arise from noisy observations,
 where the noise is normally distributed as follows:
 
@@ -519,7 +519,7 @@ it does not depend on $\mathbf{w}$ or $b$.
 Now the second term is identical to the squared error loss introduced earlier,
 except for the multiplicative constant $\frac{1}{\sigma^2}$.
 Fortunately, the solution does not depend on $\sigma$.
-It follows that minimizing squared error
+It follows that minimizing the mean squared error
 is equivalent to maximum likelihood estimation
 of a linear model under the assumption of additive Gaussian noise.
 
@@ -630,12 +630,12 @@ statistics, and computer science.
 ## Exercises
 
 1. Assume that we have some data $x_1, \ldots, x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
-    * Find a closed-form solution for the optimal value of $b$.
+    * Find a analytic solution for the optimal value of $b$.
     * How does this problem and its solution relate to the normal distribution?
-1. Derive the closed-form solution to the optimization problem for linear regression with squared error. To keep things simple, you can omit the bias $b$ from the problem (we can do this in principled fashion by adding one column to $\mathbf X$ consisting of all ones).
+1. Derive the analytic solution to the optimization problem for linear regression with squared error. To keep things simple, you can omit the bias $b$ from the problem (we can do this in principled fashion by adding one column to $\mathbf X$ consisting of all ones).
     * Write out the optimization problem in matrix and vector notation (treat all the data as a single matrix, and all the target values as a single vector).
     * Compute the gradient of the loss with respect to $w$.
-    * Find the closed-form solution by setting the gradient equal to zero and solving the matrix equation.
+    * Find the analytic solution by setting the gradient equal to zero and solving the matrix equation.
     * When might this be better than using stochastic gradient descent? When might this method break?
 1. Assume that the noise model governing the additive noise $\epsilon$ is the exponential distribution. That is, $p(\epsilon) = \frac{1}{2} \exp(-|\epsilon|)$.
     * Write out the negative log-likelihood of the data under the model $-\log P(\mathbf y \mid \mathbf X)$.

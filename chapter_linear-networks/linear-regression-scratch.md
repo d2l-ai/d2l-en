@@ -136,13 +136,13 @@ grabbing one minibatch of examples at a time,
 and using them to update our model.
 Since this process is so fundamental
 to training machine learning algorithms,
-its worth defining a utility function
-to shuffle the data and access it in minibatches.
+it is worth defining a utility function
+to shuffle the dataset and access it in minibatches.
 
-In the following code, we define a `data_iter` function
+In the following code, we define the `data_iter` function
 to demonstrate one possible implementation of this functionality.
-The function takes a batch size, a design matrix,
-and a vector of labels, yielding minibatches of size `batch_size`.
+The function takes a batch size, a matrix of features,
+and a vector of labels, yielding minibatches of the size `batch_size`.
 Each minibatch consists of a tuple of features and labels.
 
 ```{.python .input}
@@ -204,23 +204,24 @@ for X, y in data_iter(batch_size, features, labels):
     break
 ```
 
-As we run the iterator, we obtain distinct minibatches
-successively until all the data has been exhausted (try this).
-While the iterator implemented above is good for didactic purposes,
+As we run the iteration, we obtain distinct minibatches
+successively until the entire dataset has been exhausted (try this).
+While the iteration implemented above is good for didactic purposes,
 it is inefficient in ways that might get us in trouble on real problems.
-For example, it requires that we load all data in memory
+For example, it requires that we load all the data in memory
 and that we perform lots of random memory access.
-The built-in iterators implemented in Apache MXNet
+The built-in iterators implemented in the deep learning framework
 are considerably more efficient and they can deal
-both with data stored in file and data fed via a data stream.
+with both data stored in files and data fed via data streams.
+
 
 ## Initializing Model Parameters
 
-Before we can begin optimizing our model's parameters by gradient descent,
+Before we can begin optimizing our model's parameters by minibatch stochastic gradient descent,
 we need to have some parameters in the first place.
 In the following code, we initialize weights by sampling
 random numbers from a normal distribution with mean 0
-and a standard deviation of $0.01$, setting the bias $b$ to $0$.
+and a standard deviation of 0.01, and setting the bias to 0.
 
 ```{.python .input}
 w = np.random.normal(0, 0.01, (2, 1))
@@ -241,23 +242,19 @@ w = tf.Variable(tf.random.normal(shape=(2, 1), mean=0, stddev=0.01), trainable=T
 b = tf.Variable(tf.zeros(1), trainable=True)
 ```
 
-After initialized our parameters,
+After initializing our parameters,
 our next task is to update them until
 they fit our data sufficiently well.
 Each update requires taking the gradient
-(a multi-dimensional derivative)
 of our loss function with respect to the parameters.
 Given this gradient, we can update each parameter
-in the direction that reduces the loss.
+in the direction that may reduce the loss.
 
 Since nobody wants to compute gradients explicitly
 (this is tedious and error prone),
-we use automatic differentiation to compute the gradient.
-See :numref:`sec_autograd` for more details.
-Recall from the autograd chapter
-that in order for the system to know
-that it should store a gradient for our parameters, we specified to attach
-gradients to both $w$ and $b$ on the above codes.
+we use automatic differentiation,
+as introduced in :numref:`sec_autograd`, to compute the gradient.
+
 
 ## Defining the Model
 
@@ -265,10 +262,11 @@ Next, we must define our model,
 relating its inputs and parameters to its outputs.
 Recall that to calculate the output of the linear model,
 we simply take the matrix-vector dot product
-of the examples $\mathbf{X}$ and the models weights $w$,
+of the input features $\mathbf{X}$ and the model weights $\mathbf{w}$,
 and add the offset $b$ to each example.
-Note that below $Xw$  is a vector and $b$ is a scalar.
-Recall that when we add a vector and a scalar,
+Note that below $\mathbf{Xw}$  is a vector and $b$ is a scalar.
+Recall the broadcasting mechanism as described in :numref:`subsec_broadcasting`.
+When we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
 ```{.python .input}
@@ -294,11 +292,11 @@ Since updating our model requires taking
 the gradient of our loss function,
 we ought to define the loss function first.
 Here we will use the squared loss function
-as described in the previous section.
+as described in :numref:`sec_linear_regression`.
 In the implementation, we need to transform the true value `y`
 into the predicted value's shape `y_hat`.
 The result returned by the following function
-will also be the same as the `y_hat` shape.
+will also have the same shape as `y_hat`.
 
 ```{.python .input}
 #@tab all
@@ -308,24 +306,23 @@ def squared_loss(y_hat, y):  #@save
 
 ## Defining the Optimization Algorithm
 
-As we discussed in the previous section,
+As we discussed in :numref:`sec_linear_regression`,
 linear regression has a closed-form solution.
-However, this is not a book about linear regression,
+However, this is not a book about linear regression:
 it is a book about deep learning.
 Since none of the other models that this book introduces
-can be solved analytically, we will take this opportunity to introduce your first working example of stochastic gradient descent (SGD).
+can be solved analytically, we will take this opportunity to introduce your first working example of 
+minibatch stochastic gradient descent.
 
 
-At each step, using one batch randomly drawn from our dataset,
+At each step, using one minibatch randomly drawn from our dataset,
 we will estimate the gradient of the loss with respect to our parameters.
-Next, we will update our parameters (a small amount)
-in the direction that reduces the loss.
-Recall from :numref:`sec_autograd` that after we call `backward`
-each parameter (`param`) will have its gradient stored in `param.grad`.
-The following code applies the SGD update,
+Next, we will update our parameters
+in the direction that may reduce the loss.
+The following code applies the minibatch stochastic gradient descent update,
 given a set of parameters, a learning rate, and a batch size.
 The size of the update step is determined by the learning rate `lr`.
-Because our loss is calculated as a sum over the batch of examples,
+Because our loss is calculated as a sum over the minibatch of examples,
 we normalize our step size by the batch size (`batch_size`),
 so that the magnitude of a typical step size
 does not depend heavily on our choice of the batch size.
