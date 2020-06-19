@@ -105,21 +105,47 @@ corr2d_multi_in(X, K)
 ```{.python .input}
 #@tab pytorch
 X = torch.tensor([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
-                  [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
+                  [[1, 2, 3], [4, 5, 6], [7, 8, 9]]], dtype=torch.float32)
 K = torch.tensor([[[0, 1], [2, 3]],
-                  [[1, 2], [3, 4]]])
+                  [[1, 2], [3, 4]]], dtype=torch.float32)
 
 corr2d_multi_in(X, K)
+```
+
+```{.json .output n=12}
+[
+ {
+  "data": {
+   "text/plain": "tensor([[ 56.,  72.],\n        [104., 120.]])"
+  },
+  "execution_count": 12,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ```{.python .input}
 #@tab tensorflow
 X = tf.constant([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
-                 [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
+                 [[1, 2, 3], [4, 5, 6], [7, 8, 9]]], dtype=tf.float32)
 K = tf.constant([[[0, 1], [2, 3]],
-                 [[1, 2], [3, 4]]])
+                 [[1, 2], [3, 4]]], dtype=tf.float32)
 
 corr2d_multi_in(X, K)
+```
+
+```{.json .output n=5}
+[
+ {
+  "data": {
+   "text/plain": "<tf.Tensor: shape=(2, 2), dtype=float32, numpy=\narray([[ 56.,  72.],\n       [104., 120.]], dtype=float32)>"
+  },
+  "execution_count": 5,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Multiple Output Channels
@@ -198,10 +224,36 @@ K = torch.stack([K, K + 1, K + 2], dim=0)
 K.shape
 ```
 
+```{.json .output n=14}
+[
+ {
+  "data": {
+   "text/plain": "torch.Size([3, 2, 2, 2])"
+  },
+  "execution_count": 14,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 ```{.python .input}
 #@tab tensorflow
 K = tf.stack([K, K + 1, K + 2], axis=0)
 K.shape
+```
+
+```{.json .output n=7}
+[
+ {
+  "data": {
+   "text/plain": "TensorShape([3, 2, 2, 2])"
+  },
+  "execution_count": 7,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 Below, we perform cross-correlation operations
@@ -215,6 +267,19 @@ single-output channel kernel.
 ```{.python .input}
 #@tab all
 corr2d_multi_in_out(X, K)
+```
+
+```{.json .output n=15}
+[
+ {
+  "data": {
+   "text/plain": "tensor([[[ 56.,  72.],\n         [104., 120.]],\n\n        [[ 76., 100.],\n         [148., 172.]],\n\n        [[ 96., 128.],\n         [192., 224.]]])"
+  },
+  "execution_count": 15,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## $1\times 1$ Convolutional Layer
@@ -317,6 +382,19 @@ Y2 = corr2d_multi_in_out(X, K)
 (Y1 - Y2).norm().item() < 1e-6
 ```
 
+```{.json .output n=17}
+[
+ {
+  "data": {
+   "text/plain": "True"
+  },
+  "execution_count": 17,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 ```{.python .input}
 #@tab tensorflow
 X = tf.random.uniform((3, 3, 3))
@@ -326,6 +404,19 @@ Y1 = corr2d_multi_in_out_1x1(X, K)
 Y2 = corr2d_multi_in_out(X, K)
 
 tf.norm(Y1 - Y2) < 1e-6
+```
+
+```{.json .output n=10}
+[
+ {
+  "data": {
+   "text/plain": "<tf.Tensor: shape=(), dtype=bool, numpy=True>"
+  },
+  "execution_count": 10,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Summary
