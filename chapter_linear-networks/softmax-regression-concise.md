@@ -206,6 +206,7 @@ beyond these most well-known tricks to ensure numerical stability,
 saving us from even more pitfalls that we would encounter
 if we tried to code all of our models from scratch in practice.
 
+
 ## Exercises
 
 1. Try adjusting the hyper-parameters, such as batch size, epoch, and learning rate, to see what the results are.

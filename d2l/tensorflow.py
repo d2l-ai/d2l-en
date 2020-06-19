@@ -260,9 +260,9 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         else:
             updater(X.shape[0], tape.gradient(l, updater.params))
         # Keras loss in default returns the average loss in a batch.
-        l_sum = l * float(tf.size(l)) if isinstance(
+        l_sum = l * float(tf.size(y)) if isinstance(
             loss, tf.keras.losses.Loss) else tf.reduce_sum(l)
-        metric.add(l_sum, accuracy(y_hat, y), tf.size(l))
+        metric.add(l_sum, accuracy(y_hat, y), tf.size(y))
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 
@@ -309,9 +309,11 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
-        metrics = train_metrics+(test_acc,)
-        animator.add(epoch+1, metrics)
-    assert metrics[0]<0.5 and metrics[1]>0.7 and metrics[2]>0.7, metrics
+        animator.add(epoch+1, train_metrics+(test_acc,))
+    train_loss, train_acc = train_metrics
+    assert train_loss < 0.5, train_loss
+    assert train_acc <= 1 and train_acc > 0.7, train_acc
+    assert test_acc <= 1 and test_acc > 0.7, test_acc
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
