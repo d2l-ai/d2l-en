@@ -36,7 +36,7 @@ architecture of ResNet (see the exercise in :numref:`sec_resnet`).
 First, we implement this architecture in the
 `conv_block` function.
 
-```python
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
@@ -50,7 +50,7 @@ def conv_block(num_channels):
     return blk
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -90,7 +90,7 @@ class ConvBlock(tf.keras.layers.Layer):
 
 A dense block consists of multiple `conv_block` units, each using the same number of output channels. In the forward computation, however, we concatenate the input and output of each block on the channel dimension.
 
-```python
+```{.python .input}
 class DenseBlock(nn.Block):
     def __init__(self, num_convs, num_channels, **kwargs):
         super().__init__(**kwargs)
@@ -107,7 +107,7 @@ class DenseBlock(nn.Block):
         return X
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 class DenseBlock(nn.Module):
     def __init__(self, num_convs, input_channels, num_channels):
@@ -143,7 +143,7 @@ class DenseBlock(tf.keras.layers.Layer):
 
 In the following example, we define a convolution block (`DenseBlock`) with two blocks of 10 output channels. When using an input with 3 channels, we will get an output with the $3+2\times 10=23$ channels. The number of convolution block channels controls the increase in the number of output channels relative to the number of input channels. This is also referred to as the growth rate.
 
-```python
+```{.python .input}
 blk = DenseBlock(2, 10)
 blk.initialize()
 X = np.random.uniform(size=(4, 3, 8, 8))
@@ -151,7 +151,7 @@ Y = blk(X)
 Y.shape
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 blk = DenseBlock(2, 3, 10)
 X = torch.randn(4, 3, 8, 8)
@@ -171,7 +171,7 @@ Y.shape
 
 Since each dense block will increase the number of channels, adding too many of them will lead to an excessively complex model. A transition layer is used to control the complexity of the model. It reduces the number of channels by using the $1\times 1$ convolutional layer and halves the height and width of the average pooling layer with a stride of 2, further reducing the complexity of the model.
 
-```python
+```{.python .input}
 def transition_block(num_channels):
     blk = nn.Sequential()
     blk.add(nn.BatchNorm(), nn.Activation('relu'),
@@ -180,7 +180,7 @@ def transition_block(num_channels):
     return blk
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def transition_block(input_channels, num_channels):
     return nn.Sequential(
@@ -208,13 +208,13 @@ class TransitionBlock(tf.keras.layers.Layer):
 
 Apply a transition layer with 10 channels to the output of the dense block in the previous example.  This reduces the number of output channels to 10, and halves the height and width.
 
-```python
+```{.python .input}
 blk = transition_block(10)
 blk.initialize()
 blk(Y).shape
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 blk = transition_block(23, 10)
 blk(Y).shape
@@ -230,14 +230,14 @@ blk(Y).shape
 
 Next, we will construct a DenseNet model. DenseNet first uses the same single convolutional layer and maximum pooling layer as ResNet.
 
-```python
+```{.python .input}
 net = nn.Sequential()
 net.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3),
         nn.BatchNorm(), nn.Activation('relu'),
         nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 b1 = nn.Sequential(
     nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
@@ -259,7 +259,7 @@ Then, similar to the four residual blocks that ResNet uses, DenseNet uses four d
 
 In ResNet, the height and width are reduced between each module by a residual block with a stride of 2. Here, we use the transition layer to halve the height and width and halve the number of channels.
 
-```python
+```{.python .input}
 # Num_channels: the current number of channels
 num_channels, growth_rate = 64, 32
 num_convs_in_dense_blocks = [4, 4, 4, 4]
@@ -275,7 +275,7 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
         net.add(transition_block(num_channels))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 num_channels, growth_rate = 64, 32
 num_convs_in_dense_blocks = [4, 4, 4, 4]
@@ -312,14 +312,14 @@ def block_2():
 
 Similar to ResNet, a global pooling layer and fully connected layer are connected at the end to produce the output.
 
-```python
+```{.python .input}
 net.add(nn.BatchNorm(),
         nn.Activation('relu'),
         nn.GlobalAvgPool2D(),
         nn.Dense(10))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 net = nn.Sequential(
     b1, *blks, 
@@ -353,13 +353,13 @@ def net():
 
 Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
 
-```python
+```{.python .input}
 lr, num_epochs, batch_size = 0.1, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 lr, num_epochs, batch_size = 0.1, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
