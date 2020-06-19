@@ -19,7 +19,7 @@ npx.set_np()
 Next, we will load the sample images that will be used in this section. We can see there is a dog on the left side of the image and a cat on the right. They are the two main targets in this image.
 
 ```{.python .input}
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 img = image.imread('../img/catdog.jpg').asnumpy()
 d2l.plt.imshow(img);
 ```

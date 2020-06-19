@@ -26,7 +26,7 @@ The function `display_anchors` is defined below.  We are going to generate ancho
 
 ```{.python .input  n=2}
 def display_anchors(fmap_w, fmap_h, s):
-    d2l.set_figsize((3.5, 2.5))
+    d2l.set_figsize()
     # The values from the first two dimensions will not affect the output
     fmap = np.zeros((1, 10, fmap_w, fmap_h))
     anchors = npx.multibox_prior(fmap, sizes=s, ratios=[1, 2, 0.5])

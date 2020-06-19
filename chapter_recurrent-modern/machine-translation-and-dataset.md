@@ -83,7 +83,7 @@ We visualize the histogram of the number of tokens per sentence in the following
 
 ```{.python .input  n=5}
 #@tab all
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 d2l.plt.hist([[len(l) for l in source], [len(l) for l in target]],
              label=['source', 'target'])
 d2l.plt.legend(loc='upper right');

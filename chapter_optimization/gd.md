@@ -60,7 +60,7 @@ The progress of optimizing over $x$ can be plotted as follows.
 def show_trace(res):
     n = max(abs(min(res)), abs(max(res)))
     f_line = np.arange(-n, n, 0.01)
-    d2l.set_figsize((3.5, 2.5))
+    d2l.set_figsize()
     d2l.plot([f_line, res], [[f(x) for x in f_line], [f(x) for x in res]],
              'x', 'f(x)', fmts=['-', '-o'])
 
@@ -132,7 +132,7 @@ def train_2d(trainer, steps=20):
 #@save
 def show_trace_2d(f, results):
     """Show the trace of 2D variables during optimization."""
-    d2l.set_figsize((3.5, 2.5))
+    d2l.set_figsize()
     d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
     x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')

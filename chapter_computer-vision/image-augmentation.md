@@ -33,7 +33,7 @@ npx.set_np()
 In this experiment, we will use an image with a shape of $400\times 500$ as an example.
 
 ```{.python .input  n=2}
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 img = image.imread('../img/cat1.jpg')
 d2l.plt.imshow(img.asnumpy());
 ```

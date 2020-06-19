@@ -32,7 +32,7 @@ from mxnet.gluon import nn
 
 npx.set_np()
 
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 content_img = image.imread('../img/rainier.jpg')
 d2l.plt.imshow(content_img.asnumpy());
 ```

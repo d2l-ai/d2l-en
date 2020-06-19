@@ -64,7 +64,7 @@ data = X.dot(A) + b
 Let us see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
 
 ```{.python .input  n=3}
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 d2l.plt.scatter(data[:100, 0].asnumpy(), data[:100, 1].asnumpy());
 print("The covariance matrix is\n%s" % np.dot(A.T, A))
 ```

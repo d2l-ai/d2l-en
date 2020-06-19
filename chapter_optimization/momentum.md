@@ -102,8 +102,8 @@ Note that we can combine momentum with SGD and in particular, minibatch-SGD. The
 Recall that $\mathbf{v}_t = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}$. In the limit the terms add up to $\sum_{\tau=0}^\infty \beta^\tau = \frac{1}{1-\beta}$. In other words, rather than taking a step of size $\eta$ in GD or SGD we take a step of size $\frac{\eta}{1-\beta}$ while at the same time, dealing with a potentially much better behaved descent direction. These are two benefits in one. To illustrate how weighting behaves for different choices of $\beta$ consider the diagram below.
 
 ```{.python .input}
+d2l.set_figsize()
 gammas = [0.95, 0.9, 0.6, 0]
-d2l.set_figsize((3.5, 2.5))
 for gamma in gammas:
     x = np.arange(40).asnumpy()
     d2l.plt.plot(x, gamma ** x, label='gamma = %.2f' % gamma)

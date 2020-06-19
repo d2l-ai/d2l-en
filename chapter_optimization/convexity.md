@@ -106,7 +106,7 @@ This contradicts the assumption that $f(x)$ is a local minimum. For instance, th
 def f(x):
     return (x-1)**2 * (x+1)
 
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 d2l.plot([x, segment], [f(x), f(segment)], 'x', 'f(x)')
 ```
 
@@ -178,7 +178,7 @@ def f(x):
 x = np.arange(-2, 2, 0.01)
 axb, ab = np.array([-1.5, -0.5, 1]), np.array([-1.5, 1])
 
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
 d2l.annotate('a', (-1.5, f(-1.5)), (-1.5, 1.5))
 d2l.annotate('b', (1, f(1)), (1, 1.5))

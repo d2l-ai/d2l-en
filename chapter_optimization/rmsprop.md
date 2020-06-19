@@ -34,8 +34,8 @@ import math
 from mxnet import np, npx
 
 npx.set_np()
-d2l.set_figsize((3.5, 2.5))
 
+d2l.set_figsize()
 gammas = [0.95, 0.9, 0.8, 0.7]
 for gamma in gammas:
     x = np.arange(40).asnumpy()
