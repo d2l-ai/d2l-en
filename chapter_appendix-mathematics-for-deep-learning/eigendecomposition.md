@@ -105,7 +105,7 @@ from d2l import torch as d2l
 from IPython import display
 import torch
 
-torch.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64))
+torch.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64), eigenvectors=True)
 ```
 
 Note that `numpy` normalizes the eigenvectors to be of length one,
