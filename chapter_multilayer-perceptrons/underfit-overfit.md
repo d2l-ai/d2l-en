@@ -260,11 +260,6 @@ for model selection either because
 we cannot estimate the generalization error
 on the very data that we use to train the model.
 
-The common practice to address this problem
-is to split our data three ways,
-incorporating a *validation set*
-in addition to the training and test sets.
-
 
 In practical applications, the picture gets muddier.
 While ideally we would only touch the test data once,
@@ -272,6 +267,11 @@ to assess the very best model or to compare
 a small number of models to each other,
 real-world test data is seldom discarded after just one use.
 We can seldom afford a new test set for each round of experiments.
+
+The common practice to address this problem
+is to split our data three ways,
+incorporating a *validation set*
+in addition to the training and test sets.
 
 The result is a murky practice where the boundaries
 between validation and test data are worryingly ambiguous.
