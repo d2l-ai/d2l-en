@@ -109,8 +109,6 @@ labels = x[tau:]
 batch_size, n_train = 16, 600
 train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
-test_iter = d2l.load_array((features[:n_train], labels[:n_train]),
-                           batch_size, is_train=False)
 
 # Vanilla MLP architecture
 def get_net():
@@ -135,8 +133,6 @@ labels = x[tau:]
 batch_size, n_train = 16, 600
 train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
-test_iter = d2l.load_array((features[:n_train], labels[:n_train]),
-                           batch_size, is_train=False)
 
 # Function for initializing the weights of net
 def init_weights(m):
@@ -193,7 +189,7 @@ train_net(net, train_iter, loss, 10, 0.01)
 
 ## Predictions
 
-Since both training and test loss are small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
+Since training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
 
 ```{.python .input}
 estimates = net(features)
