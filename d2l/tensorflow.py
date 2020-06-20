@@ -441,7 +441,37 @@ def corr2d(X, K):  #@save
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, 
+class TrainCallback(tf.keras.callbacks.Callback):  #@save
+    """A callback to visiualize the training progress."""
+    def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
+        self.timer = d2l.Timer()
+        self.animator = d2l.Animator(
+            xlabel='epoch', xlim=[0, num_epochs], legend=[
+                'train loss', 'train acc', 'test acc'])
+        self.net = net
+        self.train_iter = train_iter
+        self.test_iter = test_iter
+        self.num_epochs = num_epochs
+        self.device_name = device_name
+    def on_epoch_begin(self, epoch, logs=None):
+        self.timer.start()
+    def on_epoch_end(self, epoch, logs):
+        self.timer.stop()
+        test_acc = self.net.evaluate(
+            self.test_iter, verbose=0, return_dict=True)['accuracy']
+        metrics = (logs['loss'], logs['accuracy'], test_acc)
+        self.animator.add(epoch+1, metrics)
+        if epoch == self.num_epochs - 1:
+            batch_size = next(iter(self.train_iter))[0].shape[0]
+            num_examples = batch_size * tf.data.experimental.cardinality(
+                self.train_iter).numpy()
+            print('loss %.3f, train acc %.3f, test acc %.3f' % metrics)
+            print('%.1f examples/sec on %s' % (
+                num_examples/self.timer.avg(), self.device_name))
+
+
+# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
+def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
     """Train and evaluate a model with CPU or GPU."""
     device_name = device._device_name
@@ -451,15 +481,9 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
         loss = tf.keras.losses.SparseCategoricalCrossentropy()
         net = net_fn()
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-    timer = d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
-                        legend=['train loss', 'train acc', 'test acc'])
-    class Callback(tf.keras.callbacks.Callback):
-        def on_epoch_end(self, epoch, logs):
-            test_acc = net.evaluate(
-                test_iter, verbose=0, return_dict=True)['accuracy']
-            animator.add(epoch+1, (logs['loss'], logs['accuracy'], test_acc))
-    net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[Callback()],)
+    callback = TrainCallback(net, train_iter, test_iter, num_epochs,
+                             device_name)
+    net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md

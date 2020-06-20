@@ -430,7 +430,7 @@ def corr2d(X, K):  #@save
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def evaluate_accuracy_gpu(net, data_iter, device=None): #@save        
+def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     if not device:
         device = next(iter(net.parameters())).device
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
@@ -441,9 +441,9 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch6(net, train_iter, test_iter, num_epochs, lr, 
+def train_ch6(net, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
-    """Train and evaluate a model with CPU or GPU."""    
+    """Train and evaluate a model with CPU or GPU."""
     def init_weights(m):
         if type(m) == nn.Linear or type(m) == nn.Conv2d:
             torch.nn.init.xavier_uniform_(m.weight)
@@ -459,9 +459,9 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
             timer.start()
-            net.train()            
+            net.train()
             optimizer.zero_grad()
-            X, y = X.to(device), y.to(device) 
+            X, y = X.to(device), y.to(device)
             y_hat = net(X)
             l = loss(y_hat, y)
             l.backward()

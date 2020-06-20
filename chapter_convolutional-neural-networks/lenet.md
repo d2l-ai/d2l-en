@@ -12,7 +12,7 @@ into a fixed-length $784$-dimensional vector,
 and thereafter processed them with fully-connected layers.
 Now that we have a handle on convolutional layers,
 we can retain the spatial structure in our images.
-As an additional benefit of replacing dense layers with convolutional layers, 
+As an additional benefit of replacing dense layers with convolutional layers,
 we will enjoy more parsimonious models (requiring far fewer parameters).
 
 In this section, we will introduce LeNet,
@@ -20,20 +20,20 @@ among the first published convolutional neural networks
 to capture wide attention for its performance on computer vision tasks.
 The model was introduced (and named for) Yann Lecun,
 then a researcher at AT&T Bell Labs,
-for the purpose of recognizing handwritten digits in images 
+for the purpose of recognizing handwritten digits in images
 [LeNet5](http://yann.lecun.com/exdb/lenet/).
 This work represented the culmination
 of a decade of research developing the technology.
 In 1989, LeCun published the first study to successfully
-train convolutional neural networks via backpropagation. 
+train convolutional neural networks via backpropagation.
 
 
-At the time LeNet achieved outstanding results 
+At the time LeNet achieved outstanding results
 matching the performance of Support Vector Machines (SVMs),
 then a dominant approach in supervised learning.
-LeNet was eventually adapted to recognize digits 
+LeNet was eventually adapted to recognize digits
 for processing deposits in ATM machines.
-To this day, some ATMs still run the code 
+To this day, some ATMs still run the code
 that Yann and his colleague Leon Bottou wrote in the 1990s!
 
 
@@ -47,25 +47,25 @@ The architecture is summarized in :numref:`img_lenet`.
 ![Data flow in LeNet 5. The input is a handwritten digit, the output a probability over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
 
-The basic units in each convolutional block 
+The basic units in each convolutional block
 are a convolutional layer, a sigmoid activation function,
 and a subsequent average pooling operation.
 Note that while ReLUs and max-pooling work better,
-these discoveries had not yet been made in the 90s. 
+these discoveries had not yet been made in the 90s.
 Each convolutional layer uses a $5\times 5$ kernel
 and a sigmoid activation function.
 These layers map spatially arranged inputs
-to a number of 2D feature maps, typically 
+to a number of 2D feature maps, typically
 increasing the number of channels.
 The first convolutional layer has 6 output channels,
 while th second has 16.
-Each $2\times2$ pooling operation (stride 2) 
+Each $2\times2$ pooling operation (stride 2)
 reduces dimensionality by a factor of $4$ via spatial downsampling.
 The convolutional block emits an output with size given by
 (batch size, channel, height, width).
 
 In order to pass output from the convolutional block
-to the fully-connected block, 
+to the fully-connected block,
 we must flatten each example in the minibatch.
 In other words, we take this 4D input and transform it
 into the 2D input expected by fully-connected layers:
@@ -81,9 +81,9 @@ to the number of possible output classes.
 While getting to the point where you truly understand
 what is going on inside LeNet may have taken a bit of work,
 hopefully the following code snippet will convince you
-that implementing such models with modern deep learning libraries 
-is remarkably simple. 
-We need only to instantiate a `Sequential` Block 
+that implementing such models with modern deep learning libraries
+is remarkably simple.
+We need only to instantiate a `Sequential` Block
 and chain together the appropriate layers.
 
 ```{.python .input}
@@ -115,7 +115,7 @@ from dataclasses import dataclass
 class Reshape(torch.nn.Module):
     def forward(self, x):
         return x.view(-1,1,28,28)
-    
+
 net = torch.nn.Sequential(
     Reshape(),
     nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.Sigmoid(),
@@ -135,11 +135,11 @@ import tensorflow as tf
 
 def net():
     return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid', 
-                               input_shape=(28, 28, 1)),
-        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid',
+                               padding='same'),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Conv2D(filters=16, kernel_size=5, activation='sigmoid'),
-        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(120, activation='sigmoid'),
         tf.keras.layers.Dense(84, activation='sigmoid'),
@@ -154,8 +154,8 @@ the original LeNet5 architecture.
 By passing a single-channel (black and white)
 $28 \times 28$ image through the net
 and printing the output shape at each layer,
-we can inspect the model to make sure 
-that its operations line up with 
+we can inspect the model to make sure
+that its operations line up with
 what we expect from :numref:`img_lenet_vert`.
 
 ```{.python .input}
@@ -183,12 +183,12 @@ for layer in net().layers:
 ```
 
 Note that the height and width of the representation
-at each layer throughout the convolutional block 
+at each layer throughout the convolutional block
 is reduced (compared to the previous layer).
-The first convolutional layer uses $2$ pixels of padding 
+The first convolutional layer uses $2$ pixels of padding
 to compensate for the the reduction in height and width
 that would otherwise result from using a $5 \times 5$ kernel.
-In contrast, the second convolutional layer foregoes padding, 
+In contrast, the second convolutional layer foregoes padding,
 and thus the height and width are both reduced by $4$ pixels.
 As we go up the stack of layers,
 the number of channels increases layer-over-layer
@@ -196,7 +196,7 @@ from 1 in the input to 6 after the first convolutional layer
 and 16 after the second layer.
 However, each pooling layer halves the height and width.
 Finally, each fully-connected layer reduces dimensionality,
-finally emitting an output whose dimension 
+finally emitting an output whose dimension
 matches the number of classes.
 
 ![Compressed notation for LeNet5](../img/lenet-vert.svg)
@@ -242,7 +242,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
 
 ```{.python .input}
 #@tab pytorch
-def evaluate_accuracy_gpu(net, data_iter, device=None): #@save        
+def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     if not device:
         device = next(iter(net.parameters())).device
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
@@ -253,22 +253,22 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
 ```
 
 We also need to update our training function to deal with GPUs.
-Unlike the `train_epoch_ch3` defined in :numref:`sec_softmax_scratch`, 
-we now need to move each batch of data 
+Unlike the `train_epoch_ch3` defined in :numref:`sec_softmax_scratch`,
+we now need to move each batch of data
 to our designated context (hopefully, the GPU)
 prior to making the forward and backward passes.
 
-The training function `train_ch6` is also similar 
-to `train_ch3` defined in :numref:`sec_softmax_scratch`. 
-Since we will be implementing networks with many layers 
+The training function `train_ch6` is also similar
+to `train_ch3` defined in :numref:`sec_softmax_scratch`.
+Since we will be implementing networks with many layers
 going forward, we will rely primarily on Gluon.
-The following train function assumes a Gluon model 
-as input and is optimized accordingly. 
-We initialize the model parameters 
+The following train function assumes a Gluon model
+as input and is optimized accordingly.
+We initialize the model parameters
 on the device indicated by the device.
 Just as with MLPs, our loss function is cross-entropy,
-and we minimize it via minibatch stochastic gradient descent. 
-Since each epoch takes tens of seconds to run, 
+and we minimize it via minibatch stochastic gradient descent.
+Since each epoch takes tens of seconds to run,
 we visualize the training loss more frequently.
 
 ```{.python .input}
@@ -308,9 +308,9 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
 ```{.python .input}
 #@tab pytorch
 #@save
-def train_ch6(net, train_iter, test_iter, num_epochs, lr, 
+def train_ch6(net, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
-    """Train and evaluate a model with CPU or GPU."""    
+    """Train and evaluate a model with CPU or GPU."""
     def init_weights(m):
         if type(m) == nn.Linear or type(m) == nn.Conv2d:
             torch.nn.init.xavier_uniform_(m.weight)
@@ -326,9 +326,9 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
             timer.start()
-            net.train()            
+            net.train()
             optimizer.zero_grad()
-            X, y = X.to(device), y.to(device) 
+            X, y = X.to(device), y.to(device)
             y_hat = net(X)
             l = loss(y_hat, y)
             l.backward()
@@ -350,8 +350,36 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
 
 ```{.python .input}
 #@tab tensorflow
+class TrainCallback(tf.keras.callbacks.Callback):  #@save
+    """A callback to visiualize the training progress."""
+    def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
+        self.timer = d2l.Timer()
+        self.animator = d2l.Animator(
+            xlabel='epoch', xlim=[0, num_epochs], legend=[
+                'train loss', 'train acc', 'test acc'])
+        self.net = net
+        self.train_iter = train_iter
+        self.test_iter = test_iter
+        self.num_epochs = num_epochs
+        self.device_name = device_name
+    def on_epoch_begin(self, epoch, logs=None):
+        self.timer.start()
+    def on_epoch_end(self, epoch, logs):
+        self.timer.stop()
+        test_acc = self.net.evaluate(
+            self.test_iter, verbose=0, return_dict=True)['accuracy']
+        metrics = (logs['loss'], logs['accuracy'], test_acc)
+        self.animator.add(epoch+1, metrics)
+        if epoch == self.num_epochs - 1:
+            batch_size = next(iter(self.train_iter))[0].shape[0]
+            num_examples = batch_size * tf.data.experimental.cardinality(
+                self.train_iter).numpy()
+            print('loss %.3f, train acc %.3f, test acc %.3f' % metrics)
+            print('%.1f examples/sec on %s' % (
+                num_examples/self.timer.avg(), self.device_name))
+
 #@save
-def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, 
+def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
     """Train and evaluate a model with CPU or GPU."""
     device_name = device._device_name
@@ -361,15 +389,9 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
         loss = tf.keras.losses.SparseCategoricalCrossentropy()
         net = net_fn()
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-    timer = d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
-                        legend=['train loss', 'train acc', 'test acc'])
-    class Callback(tf.keras.callbacks.Callback):
-        def on_epoch_end(self, epoch, logs):
-            test_acc = net.evaluate(
-                test_iter, verbose=0, return_dict=True)['accuracy']
-            animator.add(epoch+1, (logs['loss'], logs['accuracy'], test_acc))
-    net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[Callback()],)
+    callback = TrainCallback(net, train_iter, test_iter, num_epochs,
+                             device_name)
+    net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
 ```
 
 Now let us train the model.
