@@ -342,7 +342,7 @@ The `d2l` package is light-weight and only requires
 the following packages and modules as dependencies:
 :end_tab:
 
-```{.python .input}
+```python
 #@save
 import collections
 from collections import defaultdict
@@ -364,7 +364,7 @@ import zipfile
 d2l = sys.modules[__name__]
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 #@save
 import sys
@@ -395,7 +395,7 @@ import warnings
 d2l = sys.modules[__name__]
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 #@save
 import collections
