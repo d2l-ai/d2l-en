@@ -14,7 +14,7 @@ defining our own layers or loss functions,
 understanding how things work under the hood will prove handy.
 In this section, we will rely only on tensors and auto differentiation.
 Afterwards, we will introduce a more concise implementation,
-taking advantage of bells and whistles of the deep learning framework.
+taking advantage of bells and whistles of deep learning frameworks.
 
 ```{.python .input}
 %matplotlib inline
@@ -83,7 +83,7 @@ features, labels = synthetic_data(true_w, true_b, 1000)
 ```{.python .input}
 #@tab pytorch
 def synthetic_data(w, b, num_examples):  #@save
-    """Generate y = X w + b + noise."""
+    """Generate y = Xw + b + noise."""
     X = torch.zeros(size=(num_examples, len(w))).normal_()
     y = torch.matmul(X, w) + b
     y += torch.zeros(size=y.shape).normal_(std=0.01)
@@ -97,7 +97,7 @@ features, labels = synthetic_data(true_w, true_b, 1000)
 ```{.python .input}
 #@tab tensorflow
 def synthetic_data(w, b, num_examples):  #@save
-    """Generate y = X w + b + noise."""
+    """Generate y = Xw + b + noise."""
     X = tf.zeros(shape=(num_examples, w.shape[0]))
     X += tf.random.normal(shape=X.shape)
     y = tf.matmul(X, w) + b
@@ -210,7 +210,7 @@ While the iteration implemented above is good for didactic purposes,
 it is inefficient in ways that might get us in trouble on real problems.
 For example, it requires that we load all the data in memory
 and that we perform lots of random memory access.
-The built-in iterators implemented in the deep learning framework
+The built-in iterators implemented in a deep learning framework
 are considerably more efficient and they can deal
 with both data stored in files and data fed via data streams.
 
@@ -370,7 +370,7 @@ In summary, we will execute the following loop:
     * Compute gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
     * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
 
-In each epoch (a pass through the data),
+In each *epoch*,
 we will iterate through the entire dataset
 (using the `data_iter` function) once
 passing through every example in the training dataset
@@ -399,7 +399,7 @@ for epoch in range(num_epochs):
         l.backward()
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
-    print(f'epoch {epoch+1}, loss {float(train_l.mean())}')
+    print(f'epoch {epoch + 1}, loss {float(train_l.mean()):f}')
 ```
 
 ```{.python .input}
@@ -416,7 +416,7 @@ for epoch in range(num_epochs):
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     with torch.no_grad():
         train_l = loss(net(features, w, b), labels)
-        print(f'epoch {epoch+1}, loss {float(train_l.mean())}')
+        print(f'epoch {epoch + 1}, loss {float(train_l.mean()):f}')
 ```
 
 ```{.python .input}
@@ -434,7 +434,7 @@ for epoch in range(num_epochs):
         dw, db = g.gradient(l, [w, b])
         sgd([w, b], [dw, db], lr, batch_size)  # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
-    print(f'epoch {epoch+1}, loss {float(tf.reduce_mean(train_l))}')
+    print(f'epoch {epoch + 1}, loss {float(tf.reduce_mean(train_l)):f}')
 ```
 
 In this case, because we synthesized the dataset ourselves,
@@ -446,8 +446,8 @@ Indeed they turn out to be very close to each other.
 
 ```{.python .input}
 #@tab all
-print('Error in estimating w:', true_w - d2l.reshape(w, true_w.shape))
-print('Error in estimating b:', true_b - b)
+print(f'error in estimating w: {true_w - d2l.reshape(w, true_w.shape)}')
+print(f'error in estimating b: {true_b - b}')
 ```
 
 Note that we should not take it for granted
@@ -470,7 +470,7 @@ that lead to highly accurate prediction.
 
 ## Exercises
 
-1. What would happen if we were to initialize the weights as zero. Would the algorithm still work?
+1. What would happen if we were to initialize the weights to zero. Would the algorithm still work?
 1. Assume that you are
    [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up
    with a model between voltage and current. Can you use auto differentiation to learn the parameters of your model?

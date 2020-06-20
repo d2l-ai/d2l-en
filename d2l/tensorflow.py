@@ -134,7 +134,7 @@ class Timer:  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):  #@save
-    """Generate y = X w + b + noise."""
+    """Generate y = Xw + b + noise."""
     X = tf.zeros(shape=(num_examples, w.shape[0]))
     X += tf.random.normal(shape=X.shape)
     y = tf.matmul(X, w) + b
@@ -161,7 +161,7 @@ def sgd(params, grads, lr, batch_size):  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a TensorFlow data loader"""
+    """Construct a TensorFlow data loader."""
     dataset = tf.data.Dataset.from_tensor_slices(data_arrays)
     if is_train:
         dataset = dataset.shuffle(buffer_size=1000)
@@ -435,8 +435,8 @@ def corr2d(X, K):  #@save
     Y = tf.Variable(tf.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1)))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j].assign(tf.cast(tf.reduce_sum(
-                X[i: i + h, j: j + w] * K), dtype=tf.float32))
+            Y[i, j].assign(tf.reduce_sum(
+                X[i: i + h, j: j + w] * K))
     return Y
 
 
