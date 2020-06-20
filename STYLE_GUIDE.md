@@ -11,10 +11,6 @@
     * Be consistent in the structure of each section
         * Summary
         * Exercises
-        * Scan the QR Code to Access Discussions
-        * References (if any)
-* Environments
-    * Use double quotes
 * Quotes
     * Use double quotes
 * Symbol Descriptions
@@ -24,9 +20,9 @@
         * Consider these as words without accents (``)
     * Sequential class/instance, HybridSequential class/instance
         * Without accents (``)
-    * `backward`function
+    * `backward` function
         * not `backward()` function
-    * for loop
+    * for-loop
 * Terminologies
     * Consistently use
         * function (not method)
@@ -47,11 +43,7 @@
 
 ## Math
 
-* Be consistent in math format
-    * https://github.com/goodfeli/dlbook_notation/blob/master/notation_example.pdf
-* Reference
-    * the equation above/below (Equation numbering is to be consolidated by the Press)
-    * the N equations above/below
+* Be consistent in [math notation](chapter_notation/index.md)
 * Place punctuations within equations if necessary
     * e.g., comma and period
 * Assignment symbol
@@ -83,15 +75,11 @@
             * Light：B2D9FF
             * (Try to avoid) Extra Light: CFF4FF
 * Be careful about copyright
-* Reference
-    * e.g., Figure 7.1 (manually)
 * matplotlib
 
 ## Code
 
 * Each line must have <=78 characters (limited by page width)
-* Use utils.py to encapsulate classes/functions that are repetitively used
-    * Give full implementation when it is used for the first time
 * Python
     * PEP8
         * e.g., (https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-after-a-binary-operator)
@@ -121,7 +109,7 @@
         * labels：`labels`
         * DataLoader instance：`train_iter`, `test_iter`, `data_iter`
 * Comments
-    * Add period at the end of comments.
+    * No period at the end of comments.
     * For clarity, surround variable names with accents, e.g.,  # shape of `X`
 * imports
     * import alphabetically
@@ -133,6 +121,7 @@
     * if possible use `x, y` instead of `print('x:', x, 'y:', y)` at the end of the code block
 * String
     * Use single quotes
+    * Use f-strings. To break a long f-string into multi-lines, just use one f-string per line.
 * Other items
     * `nd.f(x)` → `x.nd`
     * `random_normal` → `random.normal`
