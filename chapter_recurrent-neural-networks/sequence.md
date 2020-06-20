@@ -93,7 +93,7 @@ import torch.nn as nn
 
 T = 1000  # Generate a total of 1000 points
 time = torch.arange(0.0, T)
-x = torch.sin(0.01 * time) + 0.2*torch.randn(T)
+x = torch.sin(0.01 * time) + 0.2 * torch.randn(T)
 d2l.plot(time, [x])
 ```
 
@@ -132,7 +132,7 @@ labels = x[tau:]
 
 batch_size, n_train = 16, 600
 train_iter = d2l.load_array((features[:n_train], 
-                             labels[:n_train].reshape(-1,1)), 
+                             labels[:n_train].reshape(-1, 1)),
                             batch_size, is_train=True)
 
 # Function for initializing the weights of net
