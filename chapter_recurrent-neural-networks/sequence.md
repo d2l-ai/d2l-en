@@ -164,8 +164,8 @@ def train_net(net, train_iter, loss, epochs, lr):
                 l = loss(net(X), y)
             l.backward()
             trainer.step(batch_size)
-        print('epoch %d, loss: %f' % (
-            epoch, d2l.evaluate_loss(net, train_iter, loss)))
+        print(f'epoch {epoch},\
+        loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
 train_net(net, train_iter, loss, 10, 0.01)
@@ -181,8 +181,8 @@ def train_net(net, train_iter, loss, epochs, lr):
             l = loss(net(X), y)
             l.backward()
             trainer.step()
-        print('epoch %d, loss: %f' % (
-            epoch, d2l.evaluate_loss(net, train_iter, loss)))
+        print(f'epoch {epoch},\
+        loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
 train_net(net, train_iter, loss, 10, 0.01)
