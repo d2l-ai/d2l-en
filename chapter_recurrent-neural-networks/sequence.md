@@ -107,7 +107,7 @@ for i in range(tau):
 labels = x[tau:]
 
 batch_size, n_train = 16, 600
-train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
+train_iter = d2l.load_array((features[:n_train], labels[:n_train]), 
                             batch_size, is_train=True)
 
 # Vanilla MLP architecture
@@ -132,7 +132,7 @@ labels = x[tau:]
 
 batch_size, n_train = 16, 600
 train_iter = d2l.load_array((features[:n_train], 
-                             labels[:n_train].reshape(-1,1)),
+                             labels[:n_train].reshape(-1,1)), 
                             batch_size, is_train=True)
 
 # Function for initializing the weights of net
