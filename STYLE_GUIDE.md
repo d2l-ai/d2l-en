@@ -133,6 +133,7 @@
     * if possible use `x, y` instead of `print('x:', x, 'y:', y)` at the end of the code block
 * String
     * Use single quotes
+    * Use f-strings. To break a long f-string into multi-lines, just use one f-string per line.
 * Other items
     * `nd.f(x)` → `x.nd`
     * `random_normal` → `random.normal`
