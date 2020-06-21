@@ -123,7 +123,7 @@ as our linear predictor.
 This architecture is commonly called 
 a *multilayer perceptron*,
 often abbreviated as *MLP*.
-Below, we depict an MLP diagramtically (:numref:`fig_nlp`).
+Below, we depict an MLP diagrammatically (:numref:`fig_nlp`).
 
 ![Multilayer perceptron with hidden layers. This example contains a hidden layer with 5 hidden units in it. ](../img/mlp.svg)
 :label:`fig_nlp`
