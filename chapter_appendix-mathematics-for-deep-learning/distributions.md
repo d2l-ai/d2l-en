@@ -215,7 +215,7 @@ We can sample an array of arbitrary shape from a uniform random variable as foll
 
 ```{.python .input}
 #@tab pytorch
-(b - a) * torch.randn(10, 10) + a
+(b - a) * torch.rand(10, 10) + a
 ```
 
 ## Binomial
