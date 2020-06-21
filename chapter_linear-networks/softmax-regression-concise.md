@@ -27,6 +27,12 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+```{.python .input}
+#@tab jax
+from d2l import jax as d2l
+import jax.numpy as np
+```
+
 Let us stick with the Fashion-MNIST dataset
 and keep the batch size at $256$ as in the last section.
 

@@ -392,7 +392,8 @@ b = tf.ones(n)
 %matplotlib inline
 from d2l import jax as d2l
 import math
-import numpy as np
+from jax import numpy as np
+import numpy as onp
 import time
 
 n = 10000
@@ -464,6 +465,15 @@ for i in range(n):
 f'{timer.stop():.5f} sec'
 ```
 
+```{.python .input}
+#@tab jax
+c = onp.zeros(n)
+timer = Timer()
+for i in range(n):
+    c[i] = a[i] + b[i]
+f'{timer.stop():.5f} sec'
+```
+
 Alternatively, we rely on the reloaded `+` operator to compute the elementwise sum:
 
 ```{.python .input}
@@ -481,6 +491,13 @@ f'{timer.stop():.5f} sec'
 
 ```{.python .input}
 #@tab tensorflow
+timer.start()
+d = a + b
+f'{timer.stop():.5f} sec'
+```
+
+```{.python .input}
+#@tab jax 
 timer.start()
 d = a + b
 f'{timer.stop():.5f} sec'
