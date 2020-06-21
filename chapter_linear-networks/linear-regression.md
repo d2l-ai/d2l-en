@@ -546,15 +546,15 @@ but not the values taken by the weights or biases.
 
 For the neural network shown in :numref:`fig_single_neuron`,
 the inputs are $x_1, \ldots, x_d$,
-so the number of inputs in the input layer is $d$.
+so the *number of inputs* (or *feature dimensionality*) in the input layer is $d$.
 The output of the network in :numref:`fig_single_neuron` is $o_1$,
-so the number of outputs in the output layer is 1.
+so the *number of outputs* in the output layer is 1.
 Note that the input values are all *given*
 and there is just a single *computed* neuron.
 Focusing on where computation takes place,
 conventionally we do not consider the input layer when counting layers.
 That is to say,
-the number of layers for the neural network in :numref:`fig_single_neuron` is 1.
+the *number of layers* for the neural network in :numref:`fig_single_neuron` is 1.
 We can think of linear regression models as neural networks
 consisting of just a single artificial neuron,
 or as single-layer neural networks.

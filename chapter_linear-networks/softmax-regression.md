@@ -113,41 +113,43 @@ is to interpret the outputs of our model as probabilities.
 We will optimize our parameters to produce probabilities
 that maximize the likelihood of the observed data.
 Then, to generate predictions, we will set a threshold,
-for example, choosing the *argmax* of the predicted probabilities.
+for example, choosing the label with the maximum predicted probabilities.
 
-Put formally, we would like outputs $\hat{y}_k$
-that we can interpret as the probability
+Put formally, we would like any output $\hat{y}_k$
+to be interpreted as the probability
 that a given item belongs to class $k$.
 Then we can choose the class with the largest output value
 as our prediction $\operatorname*{argmax}_k y_k$.
 For example, if $\hat{y}_1$, $\hat{y}_2$, and $\hat{y}_3$
-are $0.1$, $0.8$, and $0.1$, respectively,
-then we predict category $2$, which (in our example) represents "chicken".
+are 0.1, 0.8, and 0.1, respectively,
+then we predict category 2, which (in our example) represents "chicken".
 
 You might be tempted to suggest that we interpret
 the logits $o$ directly as our outputs of interest.
 However, there are some problems with directly
 interpreting the output of the linear layer as a probability.
-Nothing constrains these numbers to sum to 1.
-Moreover, depending on the inputs, they can take negative values.
+On one hand,
+nothing constrains these numbers to sum to 1.
+On the other hand, depending on the inputs, they can take negative values.
 These violate basic axioms of probability presented in :numref:`sec_prob`
 
 To interpret our outputs as probabilities,
 we must guarantee that (even on new data),
 they will be nonnegative and sum up to 1.
 Moreover, we need a training objective that encourages
-the model to estimate faithfully *probabilities*.
-Of all instances when a classifier outputs $0.5$,
+the model to estimate faithfully probabilities.
+Of all instances when a classifier outputs 0.5,
 we hope that half of those examples
-will *actually* belong to the predicted class.
+will actually belong to the predicted class.
 This is a property called *calibration*.
 
 The *softmax function*, invented in 1959 by the social scientist
-R Duncan Luce in the context of *choice models* does precisely this.
-To transform our logits such that they become nonnegative and sum to $1$,
+R. Duncan Luce in the context of *choice models*,
+does precisely this.
+To transform our logits such that they become nonnegative and sum to 1,
 while requiring that the model remains differentiable,
 we first exponentiate each logit (ensuring non-negativity)
-and then divide by their sum (ensuring that they sum to $1$).
+and then divide by their sum (ensuring that they sum to 1):
 
 $$
 \hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o})\quad \text{where}\quad
@@ -156,20 +158,17 @@ $$
 
 It is easy to see $\hat{y}_1 + \hat{y}_2 + \hat{y}_3 = 1$
 with $0 \leq \hat{y}_i \leq 1$ for all $i$.
-Thus, $\hat{y}$ is a proper probability distribution
-and the values of $\hat{\mathbf{y}}$ can be interpreted accordingly.
-Note that the softmax operation does not change the ordering among the logits,
-and thus we can still pick out the most likely class by:
+Thus, $\hat{\mathbf{y}}$ is a proper probability distribution
+whose element values can be interpreted accordingly.
+Note that the softmax operation does not change the ordering among the logits $\mathbf{o}$,
+which are simply the pre-softmax values
+that determine the probabilities assigned to each class.
+Therefore, during prediction we can still pick out the most likely class by
 
 $$
-\hat{\imath}(\mathbf{o}) = \operatorname*{argmax}_i o_i = \operatorname*{argmax}_i \hat y_i.
+\operatorname*{argmax}_i \hat y_i = \operatorname*{argmax}_i o_i,
 $$
 
-The logits $\mathbf{o}$ then are simply the pre-softmax values
-that determining the probabilities assigned to each category.
-Summarizing it all in vector notation we get
-${\mathbf{o}}^{(i)} = \mathbf{W} {\mathbf{x}}^{(i)} + {\mathbf{b}}$,
-where ${\hat{\mathbf{y}}}^{(i)} = \mathrm{softmax}({\mathbf{o}}^{(i)})$.
 
 
 ## Vectorization for Minibatches
@@ -177,26 +176,26 @@ where ${\hat{\mathbf{y}}}^{(i)} = \mathrm{softmax}({\mathbf{o}}^{(i)})$.
 To improve computational efficiency and take advantage of GPUs,
 we typically carry out vector calculations for minibatches of data.
 Assume that we are given a minibatch $\mathbf{X}$ of examples
-with dimensionality $d$ and batch size $n$.
-Moreover, assume that we have $q$ categories (outputs).
+with feature dimensionality (number of inputs) $d$ and batch size $n$.
+Moreover, assume that we have $q$ categories in the output.
 Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$,
 weights $\mathbf{W} \in \mathbb{R}^{d \times q}$,
 and the bias satisfies $\mathbf{b} \in \mathbb{R}^q$.
 
-$$
-\begin{aligned}
-\mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\
-\hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}).
-\end{aligned}
-$$
+$$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
+:eqlabel:`eq_minibatch_softmax_reg`
 
 This accelerates the dominant operation into
-a matrix-matrix product $\mathbf{W} \mathbf{X}$
-vs the matrix-vector products we would be executing
+a matrix-matrix product $\mathbf{X} \mathbf{W}$
+versus the matrix-vector products we would be executing
 if we processed one example at a time.
-The softmax itself can be computed
+The softmax operation itself can be computed
 by exponentiating all entries in $\mathbf{O}$
 and then normalizing them by the sum.
+Triggering broadcasting during the summation $\mathbf{X} \mathbf{W} + \mathbf{b}$ in :eqref:`eq_minibatch_softmax_reg`,
+both the minibatch logits $\mathbf{O}$ and output probabilities $\hat{\mathbf{Y}}$
+are $n \times q$ matrices.
+
 
 
 ## Loss Function
