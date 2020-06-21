@@ -15,7 +15,7 @@ are so common, modern libraries implement these components for us as well.
 
 In this section, we will show you how to implement
 the linear regression model from :numref:`sec_linear_scratch`
-concisely by using high-level APIs of a deep learning framework.
+concisely by using high-level APIs of deep learning frameworks.
 
 
 ## Generating the Dataset

@@ -3,18 +3,19 @@
 
 In :numref:`sec_linear_regression`, we introduced linear regression,
 working through implementations from scratch in :numref:`sec_linear_scratch`
-and again using Gluon in :numref:`sec_linear_gluon` to do the heavy lifting.
+and again using high-level APIs of deep learning frameworks
+in :numref:`sec_linear_gluon` to do the heavy lifting.
 
 Regression is the hammer we reach for when
 we want to answer *how much?* or *how many?* questions.
-If you want to predict the number of dollars (the *price*)
+If you want to predict the number of dollars (price)
 at which a house will be sold,
 or the number of wins a baseball team might have,
 or the number of days that a patient will remain hospitalized before being discharged,
 then you are probably looking for a regression model.
 
-In practice, we are more often interested in classification:
-asking not *how much?* but *which one?*
+In practice, we are more often interested in *classification*:
+asking not "how much" but "which one":
 
 * Does this email belong in the spam folder or the inbox?
 * Is this customer more likely *to sign up* or *not to sign up* for a subscription service?
@@ -25,9 +26,9 @@ Colloquially, machine learning practitioners
 overload the word *classification*
 to describe two subtly different problems:
 (i) those where we are interested only in
-*hard* assignments of examples to categories;
-and (ii) those where we wish to make *soft assignments*,
-i.e., to assess the *probability* that each category applies.
+hard assignments of examples to categories (classes);
+and (ii) those where we wish to make soft assignments,
+i.e., to assess the probability that each category applies.
 The distinction tends to get blurred, in part,
 because often, even when we only care about hard assignments,
 we still use models that make soft assignments.
@@ -41,7 +42,7 @@ Here, each input consists of a $2\times2$ grayscale image.
 We can represent each pixel value with a single scalar,
 giving us four features $x_1, x_2, x_3, x_4$.
 Further, let us assume that each image belongs to one
-among the categories "cat", "chicken" and "dog".
+among the categories "cat", "chicken", and "dog".
 
 Next, we have to choose how to represent the labels.
 We have two obvious choices.
@@ -55,27 +56,27 @@ and keep the labels in this format.
 
 But general classification problems do not come with natural orderings among the classes.
 Fortunately, statisticians long ago invented a simple way
-to represent categorical data: the *one hot encoding*.
+to represent categorical data: the *one-hot encoding*.
 A one-hot encoding is a vector with as many components as we have categories.
 The component corresponding to particular instance's category is set to 1
 and all other components are set to 0.
+In our case, a label $y$ would be a three-dimensional vector,
+with $(1, 0, 0)$ corresponding to "cat", $(0, 1, 0)$ to "chicken",
+and $(0, 0, 1)$ to "dog":
 
 $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}.$$
 
-In our case, $y$ would be a three-dimensional vector,
-with $(1, 0, 0)$ corresponding to "cat", $(0, 1, 0)$ to "chicken" and $(0, 0, 1)$ to "dog".
 
+## Network Architecture
 
-### Network Architecture
-
-In order to estimate the conditional probabilities associated with each class,
+In order to estimate the conditional probabilities associated with all the possible classes,
 we need a model with multiple outputs, one per class.
 To address classification with linear models,
 we will need as many linear functions as we have outputs.
 Each output will correspond to its own linear function.
 In our case, since we have 4 features and 3 possible output categories,
-we will need 12 scalars to represent the weights,
-($w$ with subscripts) and 3 scalars to represent the biases ($b$ with subscripts).
+we will need 12 scalars to represent the weights ($w$ with subscripts),
+and 3 scalars to represent the biases ($b$ with subscripts).
 We compute these three *logits*, $o_1, o_2$, and $o_3$, for each input:
 
 $$
@@ -92,19 +93,20 @@ And since the calculation of each output, $o_1, o_2$, and $o_3$,
 depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$,
 the output layer of softmax regression can also be described as fully-connected layer.
 
-![Softmax regression is a single-layer neural network.  ](../img/softmaxreg.svg)
+![Softmax regression is a single-layer neural network.](../img/softmaxreg.svg)
 :label:`fig_softmaxreg`
 
 To express the model more compactly, we can use linear algebra notation.
-In vector form, we arrive at $\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$,
+In vector form, we arrive at 
+$\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$,
 a form better suited both for mathematics, and for writing code.
-Note that we have gathered all of our weights into a $3\times4$ matrix
-and that for a given example $\mathbf{x}$,
-our outputs are given by a matrix-vector product of our weights by our inputs
+Note that we have gathered all of our weights into a $3 \times 4$ matrix
+and that for features of a given data instance $\mathbf{x}$,
+our outputs are given by a matrix-vector product of our weights by our input features
 plus our biases $\mathbf{b}$.
 
 
-### Softmax Operation
+## Softmax Operation
 
 The main approach that we are going to take here
 is to interpret the outputs of our model as probabilities.
@@ -170,7 +172,7 @@ ${\mathbf{o}}^{(i)} = \mathbf{W} {\mathbf{x}}^{(i)} + {\mathbf{b}}$,
 where ${\hat{\mathbf{y}}}^{(i)} = \mathrm{softmax}({\mathbf{o}}^{(i)})$.
 
 
-### Vectorization for Minibatches
+## Vectorization for Minibatches
 
 To improve computational efficiency and take advantage of GPUs,
 we typically carry out vector calculations for minibatches of data.
