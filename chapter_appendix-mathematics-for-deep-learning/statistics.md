@@ -220,7 +220,7 @@ Second, after a period of taking the medicine, you will need to measure the two 
 
 This is still not fully formal.  There are many details you have to think of carefully. For example, what is the suitable metrics to test their math understanding ability? How many volunteers for your test so you can be confident to claim the effectiveness of your medicine? How long should you run the test? How do you decide if there is a difference between the two groups?  Do you care about the average performance only, or do you also the range of variation of the scores. And so on.
 
-In this way, hypothesis testing provides framework for experimental design and reasoning about certainty in observed results.  If we can now show that the null hypothesis is very unlikely to be true, we may reject it with confidence.
+In this way, hypothesis testing provides a framework for experimental design and reasoning about certainty in observed results.  If we can now show that the null hypothesis is very unlikely to be true, we may reject it with confidence.
 
 To complete the story of how to work with hypothesis testing, we need to now introduce some additional terminology and make some of our concepts above formal.
 
