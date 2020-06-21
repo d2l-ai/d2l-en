@@ -10,7 +10,6 @@ import math
 from matplotlib import pyplot as plt
 import os
 import pandas as pd
-import numpy as np
 import random
 import re
 import shutil
