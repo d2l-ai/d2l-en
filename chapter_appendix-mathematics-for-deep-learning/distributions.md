@@ -82,9 +82,7 @@ We can sample an array of arbitrary shape from a Bernoulli random variable as fo
 
 ```{.python .input}
 #@tab pytorch
-# Bernoulli distribution
-bernoulli = torch.distributions.bernoulli.Bernoulli(p)
-bernoulli.sample(sample_shape=(10,10))
+1*(torch.rand(10, 10) < p)
 ```
 
 ## Discrete Uniform
