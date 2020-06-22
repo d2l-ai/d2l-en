@@ -475,7 +475,7 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
     """Train and evaluate a model with CPU or GPU."""
     device_name = device._device_name
-    strategy = tf.distribute.MirroredStrategy(devices=[device_name])
+    strategy = tf.distribute.OneDeviceStrategy(device_name)
     with strategy.scope():
         optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -484,6 +484,7 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
     callback = TrainCallback(net, train_iter, test_iter, num_epochs,
                              device_name)
     net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
+    return net
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md

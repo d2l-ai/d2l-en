@@ -430,7 +430,7 @@ class Net(tf.keras.Model):
         self.input_layer = tf.keras.layers.Flatten()
         self.hidden1 = tf.keras.layers.Dense(num_hiddens1, activation='relu')
         self.hidden2 = tf.keras.layers.Dense(num_hiddens2, activation='relu')
-        self.output_layer = tf.keras.layers.Dense(num_outputs, activation='softmax')
+        self.output_layer = tf.keras.layers.Dense(num_outputs)
 
     def call(self, inputs, training=None):
         x = self.input_layer(inputs)
@@ -470,7 +470,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```{.python .input}
 #@tab tensorflow
 num_epochs, lr, batch_size = 10, 0.5, 256
-loss = tf.keras.losses.SparseCategoricalCrossentropy()
+loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 trainer = tf.keras.optimizers.SGD(learning_rate=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
@@ -531,7 +531,7 @@ net = tf.keras.models.Sequential([
     tf.keras.layers.Dense(256, activation=tf.nn.relu),
     # Add a dropout layer after the second fully connected layer
     tf.keras.layers.Dropout(dropout2),
-    tf.keras.layers.Dense(10, activation=tf.nn.softmax),
+    tf.keras.layers.Dense(10),
 ])
 ```
 
