@@ -287,6 +287,15 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
+```{.python .input}
+#@tab jax
+%matplotlib inline
+from d2l import jax as d2l
+from jax import numpy as np
+import jax
+from jax import grad, vmap
+```
+
 ## Activation Functions
 
 Activation functions decide whether a neuron should be activated or not by 
@@ -341,6 +350,14 @@ d2l.set_figsize((4, 2.5))
 d2l.plot(x.numpy(), y.numpy(), 'x', 'relu(x)')
 ```
 
+```{.python .input}
+#@tab jax
+x = np.arange(-8.0, 8.0, 0.1)
+y = jax.nn.relu(x)
+d2l.set_figsize((4, 2.5))
+d2l.plot(x, y, 'x', 'relu(x)')
+```
+
 When the input is negative, 
 the derivative of the ReLU function is 0,
 and when the input is positive, 
@@ -355,6 +372,10 @@ There is an old adage that if subtle boundary conditions matter,
 we are probably doing (*real*) mathematics, not engineering.
 That conventional wisdom may apply here.
 We plot the derivative of the ReLU function plotted below.
+
+:begin_tab:`jax`
+Since `JAX` cannot take gradients of non-scalar value functions, we introduce a new trick here: `vmap`. This function maps the gradient over a sequence of inputs and returns a sequence of computed gradients.
+:end_tab:
 
 ```{.python .input}
 y.backward()
@@ -374,6 +395,11 @@ with tf.GradientTape() as t:
     y = tf.nn.relu(x)
 x_grad = t.gradient(y, x)
 d2l.plot(x.numpy(), x_grad.numpy(), 'x', 'grad of relu')
+```
+
+```{.python .input}
+#@tab jax
+d2l.plot(x, vmap(grad(jax.nn.relu))(x), 'x', 'grad of relu')
 ```
 
 Note that there are many variants to the ReLU function, 
@@ -456,6 +482,12 @@ y = tf.nn.sigmoid(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'sigmoid(x)')
 ```
 
+```{.python .input}
+#@tab jax
+y = jax.nn.sigmoid(x)
+d2l.plot(x, y, 'x', 'sigmoid(x)')
+```
+
 The derivative of the sigmoid function is given by the following equation:
 
 $$\frac{d}{dx} \mathrm{sigmoid}(x) = \frac{\exp(-x)}{(1 + \exp(-x))^2} = \mathrm{sigmoid}(x)\left(1-\mathrm{sigmoid}(x)\right).$$
@@ -490,6 +522,11 @@ x_grad = t.gradient(y, x)
 d2l.plot(x.numpy(), x_grad.numpy(), 'x', 'grad of sigmoid')
 ```
 
+```{.python .input}
+#@tab jax
+d2l.plot(x, vmap(grad(jax.nn.sigmoid))(x), 'x', 'grad of sigmoid')
+```
+
 ### Tanh Function
 
 Like the sigmoid function, the tanh (Hyperbolic Tangent)
@@ -516,6 +553,12 @@ d2l.plot(x.detach(), y.detach(), 'x', 'tanh(x)')
 #@tab tensorflow
 y = tf.nn.tanh(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'tanh(x)')
+```
+
+```{.python .input}
+#@tab jax
+y = np.tanh(x) #tanh is in the numpy package
+d2l.plot(x, y, 'x', 'tanh(x)')
 ```
 
 The derivative of the Tanh function is:
@@ -551,6 +594,11 @@ x_grad = t.gradient(y, x)
 d2l.plot(x.numpy(), x_grad.numpy(), 'x', 'grad of tanh')
 ```
 
+```{.python .input}
+#@tab jax
+d2l.plot(x, vmap(grad(np.tanh))(x), 'x', 'grad of tanh')
+```
+
 In summary, we now know how to incorporate nonlinearities
 to build expressive multilayer neural network architectures.
 As a side note, your knowledge already
@@ -579,11 +627,14 @@ thousands of lines of C and Fortran.
 1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers has only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron.
 1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems do you expect this to cause?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/90)
 :end_tab:
 
 :begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/91)
+:end_tab:
+
+:begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/91)
 :end_tab:
