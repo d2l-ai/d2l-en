@@ -34,7 +34,7 @@ because often, even when we only care about hard assignments,
 we still use models that make soft assignments.
 
 
-## Classification Problems
+## Classification Problem
 
 To get our feet wet, let us start off with
 a simple image classification problem.
@@ -151,10 +151,8 @@ while requiring that the model remains differentiable,
 we first exponentiate each logit (ensuring non-negativity)
 and then divide by their sum (ensuring that they sum to 1):
 
-$$
-\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o})\quad \text{where}\quad
-\hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}.
-$$
+$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o})\quad \text{where}\quad \hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}. $$
+:eqlabel:`eq_softmax_y_and_o`
 
 It is easy to see $\hat{y}_1 + \hat{y}_2 + \hat{y}_3 = 1$
 with $0 \leq \hat{y}_i \leq 1$ for all $i$.
@@ -180,7 +178,7 @@ with feature dimensionality (number of inputs) $d$ and batch size $n$.
 Moreover, assume that we have $q$ categories in the output.
 Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$,
 weights $\mathbf{W} \in \mathbb{R}^{d \times q}$,
-and the bias satisfies $\mathbf{b} \in \mathbb{R}^q$.
+and the bias satisfies $\mathbf{b} \in \mathbb{R}^{1\times q}$.
 
 $$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
 :eqlabel:`eq_minibatch_softmax_reg`
@@ -196,57 +194,60 @@ Triggering broadcasting during the summation $\mathbf{X} \mathbf{W} + \mathbf{b}
 both the minibatch logits $\mathbf{O}$ and output probabilities $\hat{\mathbf{Y}}$
 are $n \times q$ matrices.
 
-
-
 ## Loss Function
-:label:`section_cross_entropy`
 
-Next, we need a *loss function* to measure
+Next, we need a loss function to measure
 the quality of our predicted probabilities.
-We will rely on *likelihood maximization*,
+We will rely on maximum likelihood estimation,
 the very same concept that we encountered
 when providing a probabilistic justification
-for the least squares objective in linear regression
-(:numref:`sec_linear_regression`).
+for the mean squared error objective in linear regression
+(:numref:`subsec_normal_distribution_and_squared_loss`).
+
 
 ### Log-Likelihood
 
 The softmax function gives us a vector $\hat{\mathbf{y}}$,
 which we can interpret as estimated conditional probabilities
-of each class given the input $x$, e.g.,
-$\hat{y}_1$ = $\hat{P}(y=\mathrm{cat} \mid \mathbf{x})$.
+of each class given any input $\mathbf{x}$, e.g.,
+$\hat{y}_1$ = $P(y=\text{cat} \mid \mathbf{x})$.
+Suppose that the entire dataset $\{\mathbf{X}, \mathbf{Y}\}$ has $n$ examples,
+whose $i^{\text{th}}$ example
+consists of a feature vector $\mathbf{x}^{(i)}$ and a one-hot label vector $\mathbf{y}^{(i)}$.
 We can compare the estimates with reality
-by checking how probable the *actual* classes are
-according to our model, given the features.
+by checking how probable the actual classes are
+according to our model, given the features:
 
 $$
-P(Y \mid X) = \prod_{i=1}^n P(y^{(i)} \mid x^{(i)})
-\text{ and thus }
--\log P(Y \mid X) = \sum_{i=1}^n -\log P(y^{(i)} \mid x^{(i)}).
+P(\mathbf{Y} \mid \mathbf{X}) = \prod_{i=1}^n P(\mathbf{y}^{(i)} \mid \mathbf{x}^{(i)}).
 $$
 
-
-Maximizing $P(Y \mid X)$ (and thus equivalently minimizing $-\log P(Y \mid X)$)
-corresponds to predicting the label well.
-This yields the loss function
-(we dropped the superscript $(i)$ to avoid notation clutter):
+According to maximum likelihood estimation,
+we maximize $P(\mathbf{Y} \mid \mathbf{X})$,
+which is 
+equivalent to minimizing the negative log-likelihood:
 
 $$
-l = -\log P(y \mid x) = - \sum_j y_j \log \hat{y}_j.
+-\log P(\mathbf{Y} \mid \mathbf{X}) = \sum_{i=1}^n -\log P(\mathbf{y}^{(i)} \mid \mathbf{x}^{(i)})
+= \sum_{i=1}^n l(\mathbf{y}^{(i)}, \hat{\mathbf{y}}^{(i)}),
 $$
 
-For reasons explained later on, this loss function
-is commonly called the *cross-entropy* loss.
-Here, we used that by construction $\hat{y}$
-is a discrete probability distribution
-and that the vector $\mathbf{y}$ is a one-hot vector.
-Hence the sum over all coordinates $j$ vanishes for all but one term.
-Since all $\hat{y}_j$ are probabilities,
+where for any pair of label $\mathbf{y}$ and model prediction $\hat{\mathbf{y}}$ over $q$ classes,
+the loss function $l$ is
+
+$$ l(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_{j=1}^q y_j \log \hat{y}_j. $$
+:eqlabel:`eq_l_cross_entropy`
+
+For reasons explained later on, the loss function in :eqref:`eq_l_cross_entropy`
+is commonly called the *cross-entropy loss*.
+Since $\mathbf{y}$ is a one-hot vector of length $q$,
+the sum over all its coordinates $j$ vanishes for all but one term.
+Since all $\hat{y}_j$ are predicted probabilities,
 their logarithm is never larger than $0$.
 Consequently, the loss function cannot be minimized any further
-if we correctly predict $y$ with *certainty*,
-i.e., if $P(y \mid x) = 1$ for the correct label.
-Note that this is often not possible.
+if we correctly predict the actual label with *certainty*,
+i.e., if the predicted probability $P(\mathbf{y} \mid \mathbf{x}) = 1$ for the actual label $\mathbf{y}$.
+Note that this is often impossible.
 For example, there might be label noise in the dataset
 (some examples may be mislabeled).
 It may also not be possible when the input features
@@ -256,8 +257,8 @@ to classify every example perfectly.
 ### Softmax and Derivatives
 
 Since the softmax and the corresponding loss are so common,
-it is worth while understanding a bit better how it is computed.
-Plugging $o$ into the definition of the loss $l$
+it is worth understanding a bit better how it is computed.
+Plugging :eqref:`eq_softmax_y_and_o` into the definition of the loss $l$
 and using the definition of the softmax we obtain:
 
 $$

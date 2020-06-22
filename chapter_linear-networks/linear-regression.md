@@ -173,7 +173,7 @@ Note that large differences between
 estimates $\hat{y}^{(i)}$ and observations $y^{(i)}$
 lead to even larger contributions to the loss,
 due to the quadratic dependence.
-To measure the quality of a model on the entire dataset,
+To measure the quality of a model on the entire dataset of $n$ examples,
 we simply average (or equivalently, sum)
 the losses on the training set.
 
@@ -440,6 +440,7 @@ and need not write as many calculations ourselves,
 reducing the potential for errors.
 
 ## The Normal Distribution and Squared Loss
+:label:`subsec_normal_distribution_and_squared_loss`
 
 While you can already get your hands dirty using only the information above,
 in the following we can more formally motivate the square loss objective
