@@ -354,7 +354,7 @@ def net():
         tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(4096, activation='relu'),
         tf.keras.layers.Dropout(0.5),
-        tf.keras.layers.Dense(10, activation='sigmoid')
+        tf.keras.layers.Dense(10)
     ])
 ```
 
