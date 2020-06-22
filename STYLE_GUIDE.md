@@ -183,4 +183,5 @@
 1. Say we want to edit and test MXNet code in xx.md, run `d2lbook activate default xx.md`. Then code of other frameworks is deactivated in xx.md.
 2. Open xx.md using Jupyter notebook, edit code and use "Kernel -> Restart & Run All" to test code.
 3. Run `d2lbook activate all xx.md` to re-activate code of all the frameworks. Then git push.
-4. Likewise, `d2lbook activate pytorch xx.md` will only activate PyTorch code in xx.md.
+
+Likewise, `d2lbook activate pytorch/tensorflow xx.md` will only activate PyTorch/TensorFlow code in xx.md.
