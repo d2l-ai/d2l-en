@@ -11,7 +11,7 @@ Continuous random variables are a significantly more subtle topic than discrete 
 
 To understand the additional technical challenges encountered when working with continuous random variables, let us perform a thought experiment.  Suppose that we are throwing a dart at the dart board, and we want to know the probability that it hits exactly $2 \text{cm}$ from the center of the board.
 
-To start with, we imagine measuring to a single digit of accuracy, that is to say with bins for $0 \text{cm}$, $1 \text{cm}$, $2 \text{cm}$, and so on.  We throw say $100$ darts at the dart board, and if $20$ of them fall into the bin for $2\text{cm}$ we conclude that $20\%$ of the darts we throw hit the board $2 \text{cm}$ away from the center.
+To start with, we imagine measuring a single digit of accuracy, that is to say with bins for $0 \text{cm}$, $1 \text{cm}$, $2 \text{cm}$, and so on.  We throw say $100$ darts at the dart board, and if $20$ of them fall into the bin for $2\text{cm}$ we conclude that $20\%$ of the darts we throw hit the board $2 \text{cm}$ away from the center.
 
 However, when we look closer, this does not match our question!  We wanted exact equality, whereas these bins hold all that fell between say $1.5\text{cm}$ and $2.5\text{cm}$.  
 
@@ -114,7 +114,7 @@ $$
 P(X\in(a, b]) = \int _ {a}^{b} p(x) \; dx.
 $$
 
-We may approximate this is code by using the same discrete approximation methods as before.  In this case we can approximate the probability of falling in the blue region.
+We may approximate this in code by using the same discrete approximation methods as before.  In this case we can approximate the probability of falling in the blue region.
 
 ```{.python .input}
 # Approximate probability using numerical integration
@@ -265,14 +265,14 @@ The properties we had for the variance can be restated for the standard deviatio
 * For any random variable $X$ and numbers $a$ and $b$, we have that $\sigma_{aX+b} = |a|\sigma_{X}$
 * If we have two *independent* random variables $X$ and $Y$, we have $\sigma_{X+Y} = \sqrt{\sigma_{X}^2 + \sigma_{Y}^2}$.
 
-It is natural at this moment to ask, "If the standard deviation is in the units of our original random variable, does it represent something we can draw with regards to that random variable?"  The answer is a resounding yes!  Indeed much like the mean told we the typical location of our random variable, the standard deviation gives the typical range of variation of that random variable.  We can make this rigorous with what is known as Chebychev's inequality:
+It is natural at this moment to ask, "If the standard deviation is in the units of our original random variable, does it represent something we can draw with regards to that random variable?"  The answer is a resounding yes!  Indeed much like the mean told we the typical location of our random variable, the standard deviation gives the typical range of variation of that random variable.  We can make this rigorous with what is known as Chebyshev's inequality:
 
 $$P\left(X \not\in [\mu_X - \alpha\sigma_X, \mu_X + \alpha\sigma_X]\right) \le \frac{1}{\alpha^2}.$$
-:eqlabel:`eq_chebychev`
+:eqlabel:`eq_chebyshev`
 
 Or to state it verbally in the case of $\alpha=10$, $99\%$ of the samples from any random variable fall within $10$ standard deviations of the mean.  This gives an immediate interpretation to our standard summary statistics.
 
-To see how this statement is rather subtle, let us take a look at our running example again where  $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We saw that the mean was $a$ and the standard deviation was $2\sqrt{2p}$.  This means, if we take Chebychev's inequality :eqref:`eq_chebychev` with $\alpha = 2$, we see that the expression is
+To see how this statement is rather subtle, let us take a look at our running example again where  $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We saw that the mean was $a$ and the standard deviation was $2\sqrt{2p}$.  This means, if we take Chebyshev's inequality :eqref:`eq_chebyshev` with $\alpha = 2$, we see that the expression is
 
 $$
 P\left(X \not\in [a - 4\sqrt{2p}, a + 4\sqrt{2p}]\right) \le \frac{1}{4}.
@@ -284,7 +284,7 @@ Let us visualize this.  We will show the probability of getting the three values
 
 ```{.python .input}
 # Define a helper to plot these figures
-def plot_chebychev(a, p):
+def plot_chebyshev(a, p):
     d2l.set_figsize()
     d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
     d2l.plt.xlim([-4, 4])
@@ -300,13 +300,13 @@ def plot_chebychev(a, p):
     d2l.plt.show()
 
 # Plot interval when p > 1/8
-plot_chebychev(0.0, 0.2)
+plot_chebyshev(0.0, 0.2)
 ```
 
 ```{.python .input}
 #@tab pytorch
 # Define a helper to plot these figures
-def plot_chebychev(a, p):
+def plot_chebyshev(a, p):
     d2l.set_figsize()
     d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
     d2l.plt.xlim([-4, 4])
@@ -322,33 +322,33 @@ def plot_chebychev(a, p):
     d2l.plt.show()
 
 # Plot interval when p > 1/8
-plot_chebychev(0.0, torch.tensor(0.2))
+plot_chebyshev(0.0, torch.tensor(0.2))
 ```
 
 The second shows that at $p = 1/8$, the interval exactly touches the two points.  This shows that the inequality is *sharp*, since no smaller interval could be taken while keeping the inequality true.
 
 ```{.python .input}
 # Plot interval when p = 1/8
-plot_chebychev(0.0, 0.125)
+plot_chebyshev(0.0, 0.125)
 ```
 
 ```{.python .input}
 #@tab pytorch
 # Plot interval when p = 1/8
-plot_chebychev(0.0, torch.tensor(0.125))
+plot_chebyshev(0.0, torch.tensor(0.125))
 ```
 
 The third shows that for $p < 1/8$ the interval only contains the center.  This does not invalidate the inequality since we only needed to ensure that no more than $1/4$ of the probability falls outside the interval, which means that once $p < 1/8$, the two points at $a-2$ and $a+2$ can be discarded.
 
 ```{.python .input}
 # Plot interval when p < 1/8
-plot_chebychev(0.0, 0.05)
+plot_chebyshev(0.0, 0.05)
 ```
 
 ```{.python .input}
 #@tab pytorch
 # Plot interval when p < 1/8
-plot_chebychev(0.0, torch.tensor(0.05))
+plot_chebyshev(0.0, torch.tensor(0.05))
 ```
 
 ### Means and Variances in the Continuum
@@ -374,7 +374,7 @@ $$
 \sigma^2_X = E[X^2] - \mu_X^2 = \int_{-\infty}^\infty x^2p_X(x) \; dx - \left(\int_{-\infty}^\infty xp_X(x) \; dx\right)^2.
 $$
 
-Everything stated above about the mean, the variance, and the standard deviation above still apply in this case.  For instance, if we consider the random variable with density 
+Everything stated above about the mean, the variance, and the standard deviation still applies in this case.  For instance, if we consider the random variable with density 
 
 $$
 p(x) = \begin{cases}
@@ -724,7 +724,7 @@ Indeed if we think of norms as being related to standard deviations, and correla
 * The mean is the average value of a random variable.
 * The variance is the expected square of the difference between the random variable and its mean.
 * The standard deviation is the square root of the variance.  It can be thought of as measuring the range of values the random variable may take.
-* Chebychev's inequality allows us to make this intuition rigorous by giving an explicit interval that contains the random variable most of the time.
+* Chebyshev's inequality allows us to make this intuition rigorous by giving an explicit interval that contains the random variable most of the time.
 * Joint densities allow us to work with correlated random variables.  We may marginalize joint densities by integrating over unwanted random variables to get the distribution of the desired random variable.
 * The covariance and correlation coefficient provide a way to measure any linear relationship between two correlated random variables.
 
