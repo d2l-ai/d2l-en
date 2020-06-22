@@ -505,7 +505,7 @@ def net():
         tf.keras.layers.Dense(84),
         BatchNorm(),
         tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.Dense(10, activation='sigmoid')]
+        tf.keras.layers.Dense(10)]
     )
 ```
 
@@ -533,7 +533,7 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 # Note that here we set `mirrored=False` to disable the use
 # of `tf.distribute.MirroredStrategy` since our own `BatchNorm`
 # implementation does not support that yet. 
-net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, mirrored=False)
+net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 Let us have a look at the scale parameter `gamma`
@@ -619,7 +619,7 @@ def net():
         tf.keras.layers.Dense(84),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.Dense(10, activation='sigmoid'),
+        tf.keras.layers.Dense(10),
     ])
 ```
 

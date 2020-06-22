@@ -311,7 +311,7 @@ def net():
         ResnetBlock(256, 2),
         ResnetBlock(512, 2),
         tf.keras.layers.GlobalAvgPool2D(),
-        tf.keras.layers.Dense(units=10, activation=tf.keras.activations.softmax)])
+        tf.keras.layers.Dense(units=10)])
 ```
 
 There are 4 convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first convolutional layer and the final fully connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18. By configuring different numbers of channels and residual blocks in the module, we can create different ResNet models, such as the deeper 152-layer ResNet-152. Although the main architecture of ResNet is similar to that of GoogLeNet, ResNet's structure is simpler and easier to modify. All these factors have resulted in the rapid and widespread use of ResNet. :numref:`fig_ResNetFull` is a diagram of the full ResNet-18.

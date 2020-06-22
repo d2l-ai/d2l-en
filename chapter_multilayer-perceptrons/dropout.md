@@ -430,7 +430,7 @@ class Net(tf.keras.Model):
         self.input_layer = tf.keras.layers.Flatten()
         self.hidden1 = tf.keras.layers.Dense(num_hiddens1, activation='relu')
         self.hidden2 = tf.keras.layers.Dense(num_hiddens2, activation='relu')
-        self.output_layer = tf.keras.layers.Dense(num_outputs, activation='softmax')
+        self.output_layer = tf.keras.layers.Dense(num_outputs)
 
     def call(self, inputs, training=None):
         x = self.input_layer(inputs)
@@ -531,7 +531,7 @@ net = tf.keras.models.Sequential([
     tf.keras.layers.Dense(256, activation=tf.nn.relu),
     # Add a dropout layer after the second fully connected layer
     tf.keras.layers.Dropout(dropout2),
-    tf.keras.layers.Dense(10, activation=tf.nn.softmax),
+    tf.keras.layers.Dense(10),
 ])
 ```
 
