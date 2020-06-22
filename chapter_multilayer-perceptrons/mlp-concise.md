@@ -68,7 +68,7 @@ net.apply(init_weights)
 net = tf.keras.models.Sequential([
 	tf.keras.layers.Flatten(),
 	tf.keras.layers.Dense(256, activation='relu'),
-	tf.keras.layers.Dense(10, activation='softmax')])
+	tf.keras.layers.Dense(10)])
 ```
 
 The training loop is *exactly* the same

@@ -143,7 +143,7 @@ def net():
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(120, activation='sigmoid'),
         tf.keras.layers.Dense(84, activation='sigmoid'),
-        tf.keras.layers.Dense(10, activation='sigmoid')])
+        tf.keras.layers.Dense(10)])
 ```
 
 We took a small liberty with the original model,
@@ -386,7 +386,7 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
     strategy = tf.distribute.MirroredStrategy(devices=[device_name])
     with strategy.scope():
         optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
-        loss = tf.keras.losses.SparseCategoricalCrossentropy()
+        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         net = net_fn()
         net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
     callback = TrainCallback(net, train_iter, test_iter, num_epochs,
