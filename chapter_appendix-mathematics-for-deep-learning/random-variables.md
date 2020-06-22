@@ -268,11 +268,11 @@ The properties we had for the variance can be restated for the standard deviatio
 It is natural at this moment to ask, "If the standard deviation is in the units of our original random variable, does it represent something we can draw with regards to that random variable?"  The answer is a resounding yes!  Indeed much like the mean told we the typical location of our random variable, the standard deviation gives the typical range of variation of that random variable.  We can make this rigorous with what is known as Chebyshev's inequality:
 
 $$P\left(X \not\in [\mu_X - \alpha\sigma_X, \mu_X + \alpha\sigma_X]\right) \le \frac{1}{\alpha^2}.$$
-:eqlabel:`eq_chebychev`
+:eqlabel:`eq_chebyshev`
 
 Or to state it verbally in the case of $\alpha=10$, $99\%$ of the samples from any random variable fall within $10$ standard deviations of the mean.  This gives an immediate interpretation to our standard summary statistics.
 
-To see how this statement is rather subtle, let us take a look at our running example again where  $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We saw that the mean was $a$ and the standard deviation was $2\sqrt{2p}$.  This means, if we take Chebyshev's inequality :eqref:`eq_chebychev` with $\alpha = 2$, we see that the expression is
+To see how this statement is rather subtle, let us take a look at our running example again where  $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We saw that the mean was $a$ and the standard deviation was $2\sqrt{2p}$.  This means, if we take Chebyshev's inequality :eqref:`eq_chebyshev` with $\alpha = 2$, we see that the expression is
 
 $$
 P\left(X \not\in [a - 4\sqrt{2p}, a + 4\sqrt{2p}]\right) \le \frac{1}{4}.
@@ -724,7 +724,7 @@ Indeed if we think of norms as being related to standard deviations, and correla
 * The mean is the average value of a random variable.
 * The variance is the expected square of the difference between the random variable and its mean.
 * The standard deviation is the square root of the variance.  It can be thought of as measuring the range of values the random variable may take.
-* Chebychev's inequality allows us to make this intuition rigorous by giving an explicit interval that contains the random variable most of the time.
+* Chebyshev's inequality allows us to make this intuition rigorous by giving an explicit interval that contains the random variable most of the time.
 * Joint densities allow us to work with correlated random variables.  We may marginalize joint densities by integrating over unwanted random variables to get the distribution of the desired random variable.
 * The covariance and correlation coefficient provide a way to measure any linear relationship between two correlated random variables.
 
