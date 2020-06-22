@@ -380,11 +380,21 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
 
 #@save
 def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
-              device=d2l.try_gpu()):
+              device=d2l.try_gpu(), mirrored=True):
     """Train and evaluate a model with CPU or GPU."""
     device_name = device._device_name
-    strategy = tf.distribute.MirroredStrategy(devices=[device_name])
-    with strategy.scope():
+    # Model building/compiling need to be within `strategy.scope()`
+    # in order to utilize the CPU/GPU devices that we have
+    # if we want to perform training across multiple replicas on one
+    # machine using `tf.distribute.MirroredStrategy`.
+    if mirrored:
+        strategy = tf.distribute.MirroredStrategy(devices=[device_name])
+        with strategy.scope():
+            optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+            loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+            net = net_fn()
+            net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    else:
         optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         net = net_fn()
