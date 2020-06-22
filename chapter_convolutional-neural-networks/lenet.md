@@ -384,8 +384,7 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
     """Train and evaluate a model with CPU or GPU."""
     device_name = device._device_name
-    strategy = MirroredStrategy(devices=device_name) if len(
-        [device_name]) > 1 else OneDeviceStrategy(device_name)
+    strategy = tf.distribute.OneDeviceStrategy(device_name)
     with strategy.scope():
         optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
