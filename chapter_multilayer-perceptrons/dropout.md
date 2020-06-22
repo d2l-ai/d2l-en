@@ -470,7 +470,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```{.python .input}
 #@tab tensorflow
 num_epochs, lr, batch_size = 10, 0.5, 256
-loss = tf.keras.losses.SparseCategoricalCrossentropy()
+loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 trainer = tf.keras.optimizers.SGD(learning_rate=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
