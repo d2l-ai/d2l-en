@@ -25,6 +25,7 @@ d2l = sys.modules[__name__]
 # Defined in file: ./chapter_preface/index.md
 import numpy as np
 import tensorflow as tf
+from tensorflow.distribute import MirroredStrategy, OneDeviceStrategy
 
 
 # Defined in file: ./chapter_preliminaries/ndarray.md
@@ -472,21 +473,12 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
-              device=d2l.try_gpu(), mirrored=True):
+              device=d2l.try_gpu()):
     """Train and evaluate a model with CPU or GPU."""
     device_name = device._device_name
-    # Model building/compiling need to be within `strategy.scope()`
-    # in order to utilize the CPU/GPU devices that we have
-    # if we want to perform training across multiple replicas on one
-    # machine using `tf.distribute.MirroredStrategy`.
-    if mirrored:
-        strategy = tf.distribute.MirroredStrategy(devices=[device_name])
-        with strategy.scope():
-            optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
-            loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-            net = net_fn()
-            net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-    else:
+    strategy = MirroredStrategy(devices=device_name) if len(
+        [device_name]) > 1 else OneDeviceStrategy(device_name)
+    with strategy.scope():
         optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         net = net_fn()
@@ -494,6 +486,7 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
     callback = TrainCallback(net, train_iter, test_iter, num_epochs,
                              device_name)
     net.fit(train_iter, epochs=num_epochs, verbose=0, callbacks=[callback])
+    return net
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md

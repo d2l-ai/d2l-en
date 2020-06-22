@@ -359,6 +359,7 @@ from torchvision import transforms
 #@save
 import numpy as np
 import tensorflow as tf
+from tensorflow.distribute import MirroredStrategy, OneDeviceStrategy
 ```
 
 ### Target Audience

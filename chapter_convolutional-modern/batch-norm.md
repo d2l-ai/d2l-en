@@ -530,10 +530,7 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 #@tab tensorflow
 lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-# Note that here we set `mirrored=False` to disable the use
-# of `tf.distribute.MirroredStrategy` since our own `BatchNorm`
-# implementation does not support that yet. 
-net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, mirrored=False)
+net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 Let us have a look at the scale parameter `gamma`
