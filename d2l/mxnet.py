@@ -20,8 +20,6 @@ import tarfile
 import time
 import zipfile
 
-d2l = sys.modules[__name__]
-
 
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
@@ -120,38 +118,6 @@ class Timer:  #@save
         return np.array(self.times).cumsum().tolist()
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def synthetic_data(w, b, num_examples):  #@save
-    """Generate y = X w + b + noise."""
-    X = np.random.normal(0, 1, (num_examples, len(w)))
-    y = np.dot(X, w) + b
-    y += np.random.normal(0, 0.01, y.shape)
-    return X, y
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def linreg(X, w, b):  #@save
-    return np.dot(X, w) + b
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def squared_loss(y_hat, y):  #@save
-    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def sgd(params, lr, batch_size):  #@save
-    for param in params:
-        param[:] = param - lr * param.grad / batch_size
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
-def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a Gluon data loader."""
-    dataset = gluon.data.ArrayDataset(*data_arrays)
-    return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
-
-
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def get_fashion_mnist_labels(labels):  #@save
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
@@ -186,18 +152,18 @@ def get_dataloader_workers(num_workers=4):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def load_data_fashion_mnist(batch_size, resize=None):  #@save
+def load_data_fashion_mnist(batch_size, resize=None): #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
-    dataset = gluon.data.vision
-    trans = [dataset.transforms.Resize(resize)] if resize else []
-    trans.append(dataset.transforms.ToTensor())
-    trans = dataset.transforms.Compose(trans)
-    mnist_train = dataset.FashionMNIST(train=True).transform_first(trans)
-    mnist_test = dataset.FashionMNIST(train=False).transform_first(trans)
-    return (gluon.data.DataLoader(mnist_train, batch_size, shuffle=True,
-                                  num_workers=get_dataloader_workers()),
-            gluon.data.DataLoader(mnist_test, batch_size, shuffle=False,
-                                  num_workers=get_dataloader_workers()))
+    # TODO: Resize
+    rng_key = random.PRNGKey(24)
+    fashion_mnist = fetch_openml(name="Fashion-MNIST")
+    mnist_train_x, mnist_test_x, mnist_train_y, mnist_test_y = train_test_split(fashion_mnist['data'],
+                                                                            fashion_mnist['target'],
+                                                                            test_size=10000,
+                                                                         )
+    return (
+        data_loader(mnist_train_x, mnist_train_y, batch_size, rng_key), data_loader(
+        mnist_test_x, mnist_test_y, batch_size, rng_key))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md

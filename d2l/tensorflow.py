@@ -21,8 +21,6 @@ import time
 import zipfile
 import requests
 
-d2l = sys.modules[__name__]
-
 
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
@@ -119,87 +117,6 @@ class Timer:  #@save
     def cumsum(self):
         """Return the accumulated times."""
         return np.array(self.times).cumsum().tolist()
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def synthetic_data(w, b, num_examples):  #@save
-    """Generate y = X w + b + noise."""
-    X = tf.zeros(shape=(num_examples, w.shape[0]))
-    X += tf.random.normal(shape=X.shape)
-    y = tf.matmul(X, w) + b
-    y += tf.random.normal(shape=y.shape, stddev=0.01)
-    y = tf.reshape(y, [num_examples])
-    return X, y
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def linreg(X, w, b):  #@save
-    return tf.matmul(X, w) + b
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def squared_loss(y_hat, y):  #@save
-    return (y_hat - tf.reshape(y, y_hat.shape)) ** 2 / 2
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def sgd(params, grads, lr, batch_size):  #@save
-    for param, grad in zip(params, grads):
-        param.assign_sub(lr*grad/batch_size)
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
-def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a TensorFlow data loader"""
-    dataset = tf.data.Dataset.from_tensor_slices(data_arrays)
-    if is_train:
-        dataset = dataset.shuffle(buffer_size=1000)
-    dataset = dataset.batch(batch_size)
-    return dataset
-
-
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_fashion_mnist_labels(labels):  #@save
-    text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
-                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
-    return [text_labels[int(i)] for i in labels]
-
-
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
-    """Plot a list of images."""
-    figsize = (num_cols * scale, num_rows * scale)
-    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
-    axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):        
-        if 'asnumpy' in dir(img): img = img.asnumpy() 
-        if 'numpy' in dir(img): img = img.numpy()
-        ax.imshow(img)
-        ax.axes.get_xaxis().set_visible(False)
-        ax.axes.get_yaxis().set_visible(False)
-        if titles:
-            ax.set_title(titles[i])
-    return axes
-
-
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_dataloader_workers(num_workers=4):  #@save
-    # 0 means no additional process is used to speed up the reading of data.
-    if sys.platform.startswith('win'):
-        return 0
-    else:
-        return num_workers
-
-
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def load_data_fashion_mnist(batch_size, resize=None):  #@save
-    """Download the Fashion-MNIST dataset and then load into memory."""
-    # TODO: Resize
-    (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
-    return (
-        tf.data.Dataset.from_tensor_slices(
-            (mnist_train_x, mnist_train_y)).batch(batch_size).shuffle(len(mnist_train_x)),
-        tf.data.Dataset.from_tensor_slices((mnist_test_x, mnist_test_y)).batch(batch_size))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md

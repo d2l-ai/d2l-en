@@ -428,7 +428,8 @@ from matplotlib import pyplot as plt
 from IPython import display
 import math
 import jax
-import numpy as np
+from jax import numpy as np
+import numpy as onp
 import os
 import pandas as pd
 import random
