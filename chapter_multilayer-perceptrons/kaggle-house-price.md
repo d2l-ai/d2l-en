@@ -394,6 +394,8 @@ def get_net():
 
 ```{.python .input}
 #@tab tensorflow
+loss = tf.keras.losses.MeanSquaredError()
+
 def get_net():
     net = tf.keras.models.Sequential()
     net.add(tf.keras.layers.Dense(
@@ -447,7 +449,12 @@ def log_rmse(net,features,labels):
 
 ```{.python .input}
 #@tab tensorflow
-log_rmse = tf.keras.losses.mean_squared_logarithmic_error
+def log_rmse(y_true, y_pred):
+    # To further stabilize the value when the logarithm is taken, set the
+    # value less than 1 as 1
+    clipped_preds = tf.clip_by_value(y_pred, 1, float('inf'))
+    return tf.sqrt(tf.reduce_sum(loss(
+        tf.math.log(y_true), tf.math.log(clipped_preds))) / batch_size)
 ```
 
 Unlike in previous sections, our training functions 
