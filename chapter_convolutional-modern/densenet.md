@@ -62,7 +62,7 @@ def conv_block(input_channels, num_channels):
         nn.Conv2d(input_channels, num_channels, kernel_size=3, padding=1))
 ```
 
-```{.python .input}
+```{.python .input  n=1}
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -126,7 +126,7 @@ class DenseBlock(nn.Module):
         return X
 ```
 
-```{.python .input}
+```{.python .input  n=2}
 #@tab tensorflow
 class DenseBlock(tf.keras.layers.Layer):
     def __init__(self, num_convs, num_channels):
@@ -159,12 +159,25 @@ Y = blk(X)
 Y.shape
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 #@tab tensorflow
 blk = DenseBlock(2, 10)
 X = tf.random.uniform((4, 8, 8, 3))
 Y = blk(X)
 Y.shape
+```
+
+```{.json .output n=3}
+[
+ {
+  "data": {
+   "text/plain": "TensorShape([4, 8, 8, 23])"
+  },
+  "execution_count": 3,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Transition Layers
@@ -189,7 +202,7 @@ def transition_block(input_channels, num_channels):
         nn.AvgPool2d(kernel_size=2, stride=2))
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 #@tab tensorflow
 class TransitionBlock(tf.keras.layers.Layer):
   def __init__(self, num_channels, **kwargs):
@@ -245,7 +258,7 @@ b1 = nn.Sequential(
     nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
 ```
 
-```{.python .input}
+```{.python .input  n=5}
 #@tab tensorflow
 def block_1():
   return tf.keras.Sequential([
@@ -291,7 +304,7 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
         num_channels = num_channels // 2
 ```
 
-```{.python .input}
+```{.python .input  n=6}
 #@tab tensorflow
 def block_2():
   net = block_1()
@@ -329,7 +342,7 @@ net = nn.Sequential(
     nn.Linear(num_channels, 10))
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 #@tab tensorflow
 def block_3():
   net = block_2()
@@ -341,12 +354,9 @@ def block_3():
   return net
 # Recall that we define this as a function so we can reuse later
 # and run it within `tf.distribute.MirroredStrategy`'s scope to
-# utilize various computational resources, e.g. GPUs.
+# utilize various computational resources, e.g. GPUs
 def net():
-  net = block_1()
-  net = block_2()
-  net = block_3()
-  return net
+    return block_3()
 ```
 
 ## Data Acquisition and Training
