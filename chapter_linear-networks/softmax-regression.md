@@ -303,7 +303,9 @@ just that the interpretation is slightly more general.
 It is the expected value of the loss for a distribution over labels.
 This loss is called the *cross-entropy loss* and it is
 one of the most commonly used losses for classification problems.
-We can demystify the name by introducing the basics of information theory.
+We can demystify the name by introducing just the basics of information theory.
+If you wish to understand more details of information theory,
+you may further refer to the [online appendix on information theory](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/information-theory.html).
 
 ## Information Theory Basics
 
@@ -347,7 +349,6 @@ Easy to predict, easy to compress.
 However if we cannot perfectly predict every event,
 then we might some times be surprised.
 Our surprise is greater when we assigned an event lower probability.
-For reasons that we will elaborate in the [online appendix on mathematics](../chapter_appendix-mathematics-for-deep-learning/index.md),
 Claude Shannon settled on $\log(1/p(j)) = -\log p(j)$
 to quantify one's *surprisal* at observing an event $j$
 having assigned it a (subjective) probability $p(j)$.

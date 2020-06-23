@@ -44,7 +44,7 @@ Thus, this chapter provides a rapid introduction to
 basic and frequently-used mathematics to allow anyone to understand
 at least *most* of the mathematical content of the book.
 If you wish to understand *all* of the mathematical content,
-further reviewing the [online appendix on mathematics](../chapter_appendix-mathematics-for-deep-learning/index.md) should be sufficient.
+further reviewing the [online appendix on mathematics](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/index.html) should be sufficient.
 
 ```toc
 :maxdepth: 2
