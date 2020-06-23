@@ -17,7 +17,6 @@ stage("Build and Publish") {
       def CUDA_VISIBLE_DEVICES=(EID*2).toString() + ',' + (EID*2+1).toString();
 
       sh label: "Build Environment", script: """set -ex
-      pip uninstall mxnet-cu100
       conda env update -n ${ENV_NAME} -f static/build.yml
       nvidia-smi
       """
