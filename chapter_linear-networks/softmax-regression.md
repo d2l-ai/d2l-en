@@ -164,7 +164,7 @@ that determine the probabilities assigned to each class.
 Therefore, during prediction we can still pick out the most likely class by
 
 $$
-\operatorname*{argmax}_i \hat y_i = \operatorname*{argmax}_i o_i,
+\operatorname*{argmax}_i \hat y_i = \operatorname*{argmax}_i o_i.
 $$
 
 
@@ -212,7 +212,7 @@ which we can interpret as estimated conditional probabilities
 of each class given any input $\mathbf{x}$, e.g.,
 $\hat{y}_1$ = $P(y=\text{cat} \mid \mathbf{x})$.
 Suppose that the entire dataset $\{\mathbf{X}, \mathbf{Y}\}$ has $n$ examples,
-whose $i^{\text{th}}$ example
+where the example indexed by $i$
 consists of a feature vector $\mathbf{x}^{(i)}$ and a one-hot label vector $\mathbf{y}^{(i)}$.
 We can compare the estimates with reality
 by checking how probable the actual classes are
@@ -258,28 +258,33 @@ to classify every example perfectly.
 
 Since the softmax and the corresponding loss are so common,
 it is worth understanding a bit better how it is computed.
-Plugging :eqref:`eq_softmax_y_and_o` into the definition of the loss $l$
+Plugging :eqref:`eq_softmax_y_and_o` into the definition of the loss
+in :eqref:`eq_l_cross_entropy`
 and using the definition of the softmax we obtain:
 
 $$
-l = -\sum_j y_j \log \hat{y}_j = \sum_j y_j \log \sum_k \exp(o_k) - \sum_j y_j o_j
-= \log \sum_k \exp(o_k) - \sum_j y_j o_j.
+\begin{aligned}
+l(\mathbf{y}, \hat{\mathbf{y}}) &=  - \sum_{j=1}^q y_j \log \frac{\exp(o_j)}{\sum_{k=1}^q \exp(o_k)} \\
+&= \sum_{j=1}^q y_j \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j\\
+&= \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j.
+\end{aligned}
 $$
 
 To understand a bit better what is going on,
-consider the derivative with respect to $o$. We get
+consider the derivative with respect to any logit $o_j$. We get
 
 $$
-\partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j = P(y = j \mid x) - y_j.
+\partial_{o_j} l(\mathbf{y}, \hat{\mathbf{y}}) = \frac{\exp(o_j)}{\sum_{k=1}^q \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j.
 $$
 
-In other words, the gradient is the difference
-between the probability assigned to the true class by our model,
-as expressed by the probability $P(y \mid x)$,
-and what actually happened, as expressed by $y$.
+In other words, the derivative is the difference
+between the probability assigned by our model,
+as expressed by the softmax operation,
+and what actually happened, as expressed by elements in the one-hot label vector.
 In this sense, it is very similar to what we saw in regression,
 where the gradient was the difference
-between the observation $y$ and estimate $\hat{y}$. This is not coincidence.
+between the observation $y$ and estimate $\hat{y}$.
+This is not coincidence.
 In any [exponential family](https://en.wikipedia.org/wiki/Exponential_family) model,
 the gradients of the log-likelihood are given by precisely this term.
 This fact makes computing gradients easy in practice.
@@ -288,19 +293,16 @@ This fact makes computing gradients easy in practice.
 
 Now consider the case where we observe not just a single outcome
 but an entire distribution over outcomes.
-We can use the same representation as before for $y$.
+We can use the same representation as before for the label $\mathbf{y}$.
 The only difference is that rather than a vector containing only binary entries,
 say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$.
-The math that we used previously to define the loss $l$ still works out fine,
+The math that we used previously to define the loss $l$ 
+in :eqref:`eq_l_cross_entropy`
+still works out fine,
 just that the interpretation is slightly more general.
 It is the expected value of the loss for a distribution over labels.
-
-$$
-l(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_j y_j \log \hat{y}_j.
-$$
-
-This loss is called the cross-entropy loss and it is
-one of the most commonly used losses for multiclass classification.
+This loss is called the *cross-entropy loss* and it is
+one of the most commonly used losses for classification problems.
 We can demystify the name by introducing the basics of information theory.
 
 ## Information Theory Basics
