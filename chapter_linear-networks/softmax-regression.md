@@ -307,14 +307,15 @@ We can demystify the name by introducing the basics of information theory.
 
 ## Information Theory Basics
 
-Information theory deals with the problem of encoding, decoding, transmitting
+*Information theory* deals with the problem of encoding, decoding, transmitting,
 and manipulating information (also known as data) in as concise form as possible.
+
 
 ### Entropy
 
 The central idea in information theory is to quantify the information content in data.
 This quantity places a hard limit on our ability to compress the data.
-In information theory, this quantity is called the [entropy](https://en.wikipedia.org/wiki/Entropy) of a distribution $p$,
+In information theory, this quantity is called the *entropy* of a distribution $p$,
 and it is captured by the following equation:
 
 $$
@@ -346,7 +347,7 @@ Easy to predict, easy to compress.
 However if we cannot perfectly predict every event,
 then we might some times be surprised.
 Our surprise is greater when we assigned an event lower probability.
-For reasons that we will elaborate in the appendix,
+For reasons that we will elaborate in the [online appendix on mathematics](../chapter_appendix-mathematics-for-deep-learning/index.md),
 Claude Shannon settled on $\log(1/p(j)) = -\log p(j)$
 to quantify one's *surprisal* at observing an event $j$
 having assigned it a (subjective) probability $p(j)$.
