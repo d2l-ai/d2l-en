@@ -6,11 +6,11 @@ with being sloppy in setting up our networks.
 Specifically, we did the following unintuitive things,
 which might not seem like they should work:
 
-* We defined the network architectures 
+* We defined the network architectures
   without specifying the input dimensionality.
 * We added layers without specifying
   the output dimension of the previous layer.
-* We even "initialized" these parameters 
+* We even "initialized" these parameters
   before providing enough information to determine
   how many parameters our models should contain.
 
@@ -24,16 +24,16 @@ to infer the sizes of each layer *on the fly*.
 
 Later on, when working with convolutional neural networks,
 this technique will become even more convenient
-since the input dimensionality 
-(i.e., the resolution of an image) 
-will affect the dimensionality 
-of each subsequent layer. 
-Hence, the ability to set parameters 
+since the input dimensionality
+(i.e., the resolution of an image)
+will affect the dimensionality
+of each subsequent layer.
+Hence, the ability to set parameters
 without the need to know,
-at the time of writing the code, 
-what the dimensionality is 
-can greatly simplify the task of specifying 
-and subsequently modifying our models. 
+at the time of writing the code,
+what the dimensionality is
+can greatly simplify the task of specifying
+and subsequently modifying our models.
 Next, we go deeper into the mechanics of initialization.
 
 
@@ -105,10 +105,10 @@ net.collect_params()
 ```
 
 :begin_tab:`mxnet`
-As we can see, nothing has changed. 
-When input dimensions are unknown, 
+As we can see, nothing has changed.
+When input dimensions are unknown,
 calls to initialize do not truly initalize the parameters.
-Instead, this call registers to MXNet that we wish 
+Instead, this call registers to MXNet that we wish
 (and optionally, according to which distribution)
 to initialize the parameters.
 :end_tab:
@@ -130,19 +130,19 @@ net(x)
 [w.shape for w in net.get_weights()]
 ```
 
-As soon as we know the input dimensionality, 
-$\mathbf{x} \in \mathbb{R}^{20}$, 
-the framework can identify the shape of the first layer's weight matrix, 
+As soon as we know the input dimensionality,
+$\mathbf{x} \in \mathbb{R}^{20}$,
+the framework can identify the shape of the first layer's weight matrix,
 i.e., $\mathbf{W}_1 \in \mathbb{R}^{256 \times 20}$.
 Having recognized the first layer shape, the framework proceeds
 to the second layer, whose dimensionality is $10 \times 256$
 and so on through the computational graph
 until all shapes are known.
-Note that in this case, 
+Note that in this case,
 only the first layer requires deferred initialization,
-but the framework initializes sequentially. 
-Once all parameter shapes are known, 
-the framework can finally initialize the parameters. 
+but the framework initializes sequentially.
+Once all parameter shapes are known,
+the framework can finally initialize the parameters.
 
 ## Summary
 
@@ -153,7 +153,7 @@ the framework can finally initialize the parameters.
 
 1. What happens if you specify the input dimensions to the first layer but not to subsequent layers? Do you get immediate initialization?
 1. What happens if you specify mismatching dimensions?
-1. What would you need to do if you have input of varying dimensionality? Hint - look at parameter tying.
+1. What would you need to do if you have input of varying dimensionality? Hint: look at parameter tying.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/280)

@@ -320,17 +320,15 @@ This quantity places a hard limit on our ability to compress the data.
 In information theory, this quantity is called the *entropy* of a distribution $p$,
 and it is captured by the following equation:
 
-$$
-H[p] = \sum_j - p(j) \log p(j).
-$$
+$$H[p] = \sum_j - p(j) \log p(j).$$
+:eqlabel:`eq_softmax_reg_entropy`
 
 One of the fundamental theorems of information theory states
 that in order to encode data drawn randomly from the distribution $p$,
 we need at least $H[p]$ "nats" to encode it.
 If you wonder what a "nat" is, it is the equivalent of bit
 but when using a code with base $e$ rather than one with base 2.
-One nat is $\frac{1}{\log(2)} \approx 1.44$ bit.
-$H[p] / 2$ is often also called the binary entropy.
+Thus, one nat is $\frac{1}{\log(2)} \approx 1.44$ bit.
 
 
 ### Surprisal
@@ -341,88 +339,64 @@ If it is always easy for us to predict the next token,
 then this data is easy to compress!
 Take the extreme example where every token in the stream always takes the same value.
 That is a very boring data stream!
-And not only it is boring, but it is easy to predict.
+And not only it is boring, but it is also easy to predict.
 Because they are always the same, we do not have to transmit any information
 to communicate the contents of the stream.
 Easy to predict, easy to compress.
 
 However if we cannot perfectly predict every event,
-then we might some times be surprised.
+then we might sometimes be surprised.
 Our surprise is greater when we assigned an event lower probability.
-Claude Shannon settled on $\log(1/p(j)) = -\log p(j)$
+Claude Shannon settled on $\log \frac{1}{P(j)} = -\log P(j)$
 to quantify one's *surprisal* at observing an event $j$
-having assigned it a (subjective) probability $p(j)$.
-The entropy is then the *expected surprisal*
+having assigned it a (subjective) probability $P(j)$.
+The entropy defined in :eqref:`eq_softmax_reg_entropy` is then the *expected surprisal*
 when one assigned the correct probabilities
-(that truly match the data-generating process).
-The entropy of the data is then the least surprised
-that one can ever be (in expectation).
+that truly match the data-generating process.
 
 
 ### Cross-Entropy Revisited
 
 So if entropy is level of surprise experienced
 by someone who knows the true probability,
-then you might be wondering, *what is cross-entropy?*
+then you might be wondering, what is cross-entropy?
 The cross-entropy *from* $p$ *to* $q$, denoted $H(p, q)$,
 is the expected surprisal of an observer with subjective probabilities $q$
-upon seeing data that was actually generated according to probabilities $p$.
+upon seeing data that were actually generated according to probabilities $p$.
 The lowest possible cross-entropy is achieved when $p=q$.
 In this case, the cross-entropy from $p$ to $q$ is $H(p, p)= H(p)$.
-Relating this back to our classification objective,
-even if we get the best possible predictions, we will never be perfect.
-Our loss is lower-bounded by the entropy given by the
-actual conditional distributions $P(\mathbf{y} \mid \mathbf{x})$.
-
-
-### Kullback-Leibler Divergence
-
-Perhaps the most common way to measure the distance between two distributions
-is to calculate the *Kullback-Leibler divergence* $D(p\|q)$.
-This is simply the difference between the cross-entropy and the entropy,
-i.e., the additional cross-entropy incurred over the irreducible minimum value it could take:
-
-$$
-D(p\|q) = H(p, q) - H[p] = \sum_j p(j) \log \frac{p(j)}{q(j)}.
-$$
-
-Note that in classification, we do not know the true $p$,
-so we cannot compute the entropy directly.
-However, because the entropy is out of our control,
-minimizing $D(p\|q)$ with respect to $q$
-is equivalent to minimizing the cross-entropy loss.
 
 In short, we can think of the cross-entropy classification objective
 in two ways: (i) as maximizing the likelihood of the observed data;
-and (ii) as minimizing our surprise (and thus the number of bits)
+and (ii) as minimizing our surprisal (and thus the number of bits)
 required to communicate the labels.
 
 
 ## Model Prediction and Evaluation
 
 After training the softmax regression model, given any example features,
-we can predict the probability of each output category.
-Normally, we use the category with the highest predicted probability as the output category. The prediction is correct if it is consistent with the actual category (label).
+we can predict the probability of each output class.
+Normally, we use the class with the highest predicted probability as the output class.
+The prediction is correct if it is consistent with the actual class (label).
 In the next part of the experiment,
-we will use accuracy to evaluate the model’s performance.
+we will use *accuracy* to evaluate the model’s performance.
 This is equal to the ratio between the number of correct predictions and the total number of predictions.
+
 
 ## Summary
 
-* We introduced the softmax operation which takes a vector and maps it into probabilities.
-* Softmax regression applies to classification problems. It uses the probability distribution of the output category in the softmax operation.
+* The softmax operation takes a vector and maps it into probabilities.
+* Softmax regression applies to classification problems. It uses the probability distribution of the output class in the softmax operation.
 * Cross-entropy is a good measure of the difference between two probability distributions. It measures the number of bits needed to encode the data given our model.
 
 ## Exercises
 
-1. Show that the Kullback-Leibler divergence $D(p\|q)$ is nonnegative for all distributions $p$ and $q$. Hint: use Jensen's inequality, i.e., use the fact that $-\log x$ is a convex function.
-1. Show that $\log \sum_j \exp(o_j)$ is a convex function in $o$.
-1. We can explore the connection between exponential families and the softmax in some more depth
-    * Compute the second derivative of the cross-entropy loss $l(y,\hat{y})$ for the softmax.
-    * Compute the variance of the distribution given by $\mathrm{softmax}(o)$ and show that it matches the second derivative computed above.
+1. We can explore the connection between exponential families and the softmax in some more depth.
+    * Compute the second derivative of the cross-entropy loss $l(\mathbf{y},\hat{\mathbf{y}})$ for the softmax.
+    * Compute the variance of the distribution given by $\mathrm{softmax}(\mathbf{o})$ and show that it matches the second derivative computed above.
 1. Assume that we have three classes which occur with equal probability, i.e., the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
-    * What is the problem if we try to design a binary code for it? Can we match the entropy lower bound on the number of bits?
-    * Can you design a better code. Hint: what happens if we try to encode two independent observations? What if we encode $n$ observations jointly?
+    * What is the problem if we try to design a binary code for it?
+    * Can you design a better code? Hint: what happens if we try to encode two independent observations? What if we encode $n$ observations jointly?
 1. Softmax is a misnomer for the mapping introduced above (but everyone in deep learning uses it). The real softmax is defined as $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
     * Prove that $\mathrm{RealSoftMax}(a, b) > \mathrm{max}(a, b)$.
     * Prove that this holds for $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b)$, provided that $\lambda > 0$.
