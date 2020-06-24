@@ -555,7 +555,7 @@ of applying weight decay on all layers of a deep network.
 
 * Regularization is a common method for dealing with overfitting. It adds a penalty term to the loss function on the training set to reduce the complexity of the learned model.
 * One particular choice for keeping the model simple is weight decay using an $\ell_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
-* Gluon provides automatic weight decay functionality in the optimizer by setting the hyperparameter `wd`.
+* The weight decay functionality is provided in optimizers from deep learning frameworks.
 * You can have different optimizers within the same training loop, e.g., for different sets of parameters.
 
 

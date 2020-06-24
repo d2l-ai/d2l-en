@@ -322,7 +322,7 @@ This pattern enables a clean separation of math from boilerplate code.
 Also note that for the sake of convenience
 we did not worry about automatically inferring the input shape here,
 thus we need to specify the number of features throughout.
-Do not worry, the Gluon `BatchNorm` layer will care of this for us.
+Do not worry, the `BatchNorm` layer will care of this for us.
 
 ```{.python .input}
 class BatchNorm(nn.Block):
@@ -556,8 +556,8 @@ tf.reshape(net.layers[1].gamma, (-1,)), tf.reshape(net.layers[1].beta, (-1,))
 
 Compared with the `BatchNorm` class, 
 which we just defined ourselves,
-the `BatchNorm` class defined by the `nn` model in Gluon is easier to use.
-In Gluon, we do not have to worry about `num_features` or `num_dims`.
+the `BatchNorm` class defined in high-level APIs is easier to use.
+In high-level APIs, we do not have to worry about `num_features` or `num_dims`.
 Instead, these parameter values will be 
 inferred automatically via delayed initialization.
 Otherwise, the code looks virtually identical
@@ -595,7 +595,6 @@ net = nn.Sequential(
     nn.Linear(84, 10))
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 
@@ -621,7 +620,7 @@ def net():
 ```
 
 Below, we use the same hyper-parameters to train out model.
-Note that as usual, the Gluon variant runs much faster
+Note that as usual, the high-level API variant runs much faster
 because its code has been compiled to C++/CUDA
 while our custom implementation must be interpreted by Python.
 
@@ -724,7 +723,7 @@ tens of thousands of citations.
 1. Do we need Batch Normalization in every layer? Experiment with it?
 1. Can you replace Dropout by Batch Normalization? How does the behavior change?
 1. Fix the coefficients `beta` and `gamma` , and observe and analyze the results.
-1. Review the Gluon documentation for `BatchNorm` to see the other applications for Batch Normalization.
+1. Review the online documentation for `BatchNorm` to see the other applications for Batch Normalization.
 1. Research ideas: think of other normalization transforms that you can apply? Can you apply the probability integral transform? How about a full rank covariance estimate?
 
 :begin_tab:`mxnet`

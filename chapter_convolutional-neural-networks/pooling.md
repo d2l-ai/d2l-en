@@ -182,8 +182,7 @@ can also change the output shape.
 And as before, we can alter the operation to achieve a desired output shape
 by padding the input and adjusting the stride.
 We can demonstrate the use of padding and strides
-in pooling layers via the two-dimensional maximum pooling layer MaxPool2D
-shipped in MXNet Gluon's `nn` module.
+in pooling layers via the two-dimensional maximum pooling layer `MaxPool2D`.
 We first construct an input data of shape `(1, 1, 4, 4)`,
 where the first two dimensions are batch and channel.
 

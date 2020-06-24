@@ -699,8 +699,11 @@ we worry that our extremely fast GPU(s)
 might have to wait until a puny CPU
 runs Python code before it gets another job to run.
 The best way to speed up Python is by avoiding it altogether.
+:end_tab:
+
+:begin_tab:`mxnet`
 One way that Gluon does this by allowing for
-Hybridization (:numref:`sec_hybridize`).
+hybridization (:numref:`sec_hybridize`).
 Here, the Python interpreter executes a Block
 the first time it is invoked.
 The Gluon runtime records what is happening

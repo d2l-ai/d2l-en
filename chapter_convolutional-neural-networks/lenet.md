@@ -262,8 +262,8 @@ prior to making the forward and backward passes.
 The training function `train_ch6` is also similar
 to `train_ch3` defined in :numref:`sec_softmax_scratch`.
 Since we will be implementing networks with many layers
-going forward, we will rely primarily on Gluon.
-The following train function assumes a Gluon model
+going forward, we will rely primarily on high-level APIs.
+The following train function assumes a model created from high-level APIs
 as input and is optimized accordingly.
 We initialize the model parameters
 on the device indicated by the device.
