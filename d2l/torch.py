@@ -165,7 +165,7 @@ def sgd(params, lr, batch_size):  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a PyTorch data loader."""
+    """Construct a PyTorch data iterator."""
     dataset = data.TensorDataset(*data_arrays)
     return data.DataLoader(dataset, batch_size, shuffle=is_train)
 
@@ -183,7 +183,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):        
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
         ax.imshow(d2l.numpy(img))
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
@@ -200,7 +200,7 @@ def get_dataloader_workers():  #@save
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
-    """Download the Fashion-MNIST dataset and then load into memory."""
+    """Download the Fashion-MNIST dataset and then load it into memory."""
     trans = [transforms.ToTensor()]
     if resize:
         trans.insert(0, transforms.Resize(resize))
@@ -216,15 +216,8 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def accuracy(y_hat, y):  #@save
-    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = y_hat.argmax(axis=1)
-    return float((y_hat.type(y.dtype) == y).sum())
-
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):  #@save
-    metric = Accumulator(2)  # num_corrected_examples, num_examples
+    metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
         metric.add(accuracy(net(X), y), sum(y.shape))
     return metric[0] / metric[1]
@@ -232,38 +225,18 @@ def evaluate_accuracy(net, data_iter):  #@save
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Accumulator:  #@save
-    """Sum a list of numbers over time."""
+    """Accumulate sums over multiple variables."""
     def __init__(self, n):
         self.data = [0.0] * n
 
     def add(self, *args):
-        self.data = [a+float(b) for a, b in zip(self.data, args)]
+        self.data = [a + float(b) for a, b in zip(self.data, args)]
 
     def reset(self):
         self.data = [0.0] * len(self.data)
 
     def __getitem__(self, idx):
         return self.data[idx]
-
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def train_epoch_ch3(net, train_iter, loss, updater):  #@save
-    metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
-    for X, y in train_iter:
-        # Compute gradients and update parameters
-        y_hat = net(X)
-        l = loss(y_hat, y)
-        if isinstance(updater, torch.optim.Optimizer):
-            updater.zero_grad()
-            l.backward()
-            updater.step()
-            metric.add(float(l)*len(y), accuracy(y_hat, y), y.size().numel())
-        else:
-            l.sum().backward()
-            updater(X.shape[0])
-            metric.add(float(l.sum()), accuracy(y_hat, y), y.size().numel())
-    # Return training loss and training accuracy
-    return metric[0]/metric[2], metric[1]/metric[2]
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md

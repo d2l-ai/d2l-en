@@ -51,8 +51,8 @@ mnist_test = gluon.data.vision.FashionMNIST(train=False)
 
 ```{.python .input}
 #@tab pytorch
-# `ToTensor` converts the image data from PIL type to 32-bit floating point 
-# tensors. It divides all numbers by 255 so that all pixel values are between 
+# `ToTensor` converts the image data from PIL type to 32-bit floating point
+# tensors. It divides all numbers by 255 so that all pixel values are between
 # 0 and 1
 trans = transforms.ToTensor()
 mnist_train = torchvision.datasets.FashionMNIST(
@@ -117,7 +117,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):        
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
         ax.imshow(d2l.numpy(img))
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
@@ -150,10 +150,10 @@ show_images(X, 2, 9, titles=get_fashion_mnist_labels(y));
 ## Reading a Minibatch
 
 To make our life easier when reading from the training and test sets,
-we use the built-in data loader rather than creating one from scratch.
+we use the built-in data iterator rather than creating one from scratch.
 Recall that at each iteration, a load loader
 reads a minibatch of data with size `batch_size` each time.
-We also randomly shuffle the examples for the training data loader.
+We also randomly shuffle the examples for the training data iterator.
 
 ```{.python .input}
 batch_size = 256
@@ -162,7 +162,7 @@ def get_dataloader_workers():  #@save
     """Use 4 processes to read the data expect for Windows."""
     return 0 if sys.platform.startswith('win') else 4
 
-# `ToTensor` converts the image data from uint8 to 32-bit floating point. It 
+# `ToTensor` converts the image data from uint8 to 32-bit floating point. It
 # divides all numbers by 255 so that all pixel values are between 0 and 1
 transformer = gluon.data.vision.transforms.ToTensor()
 train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
@@ -203,7 +203,7 @@ f'{timer.stop():.2f} sec'
 
 Now we define the `load_data_fashion_mnist` function
 that obtains and reads the Fashion-MNIST dataset.
-It returns the data loaders for both the training set and validation set.
+It returns the data iterators for both the training set and validation set.
 In addition, it accepts an optional argument to resize images to another shape.
 
 ```{.python .input}
@@ -245,9 +245,9 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 def load_data_fashion_mnist(batch_size, resize=None):   #@save
     """Download the Fashion-MNIST dataset and then load it into memory."""
     mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
-    # Divide all numbers by 255 so that all pixel values are between 
+    # Divide all numbers by 255 so that all pixel values are between
     # 0 and 1, add a batch dimension at the last. And cast label to int32
-    process = lambda X, y: (tf.expand_dims(X, axis=3) / 255, 
+    process = lambda X, y: (tf.expand_dims(X, axis=3) / 255,
                             tf.cast(y, dtype='int32'))
     resize_fn = lambda X, y: (
         tf.image.resize_with_pad(X, resize, resize) if resize else X, y)
@@ -275,13 +275,13 @@ We are now ready to work with the Fashion-MNIST dataset in the sections that fol
 
 * Fashion-MNIST is an apparel classification dataset consisting of images representing 10 categories. We will use this dataset in subsequent sections and chapters to evaluate various classification algorithms.
 * We store the shape of any image with height $h$ width $w$ pixels as $h \times w$ or ($h$, $w$).
-* Data loaders are a key component for efficient performance. Rely on well-implemented data loaders that exploit high-performance computing to avoid slowing down your training loop.
+* Data iterators are a key component for efficient performance. Rely on well-implemented data iterators that exploit high-performance computing to avoid slowing down your training loop.
 
 
 ## Exercises
 
 1. Does reducing the `batch_size` (for instance, to 1) affect the reading performance?
-1. The data loader performance is important. Do you think the current implementation is fast enough? Explore various options to improve it.
+1. The data iterator performance is important. Do you think the current implementation is fast enough? Explore various options to improve it.
 1. Check out the framework's online API documentation. Which other datasets are available?
 
 :begin_tab:`mxnet`

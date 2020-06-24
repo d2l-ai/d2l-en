@@ -456,6 +456,7 @@ a + X, (a * X).shape
 ```
 
 ## Reduction
+:label:`subseq_lin-alg-reduction`
 
 One useful operation that we can perform with arbitrary tensors
 is to calculate the sum of their elements.
@@ -597,9 +598,10 @@ tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 ```
 
 ### Non-Reduction Sum
+:label:`subseq_lin-alg-non-reduction`
 
 However, sometimes it can be useful to keep the number of axes unchanged
-when invoking the function for calculating the sum or mean by setting `keepdims=True`.
+when invoking the function for calculating the sum or mean.
 
 ```{.python .input}
 sum_A = A.sum(axis=1, keepdims=True)

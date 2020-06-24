@@ -236,7 +236,7 @@ We use the `batchify` function just defined to specify the minibatch reading met
 
 ## Putting All Things Together
 
-Last, we define the `load_data_ptb` function that read the PTB dataset and return the data loader.
+Last, we define the `load_data_ptb` function that read the PTB dataset and return the data iterator.
 
 ```{.python .input  n=16}
 #@save

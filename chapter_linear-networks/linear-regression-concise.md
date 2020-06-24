@@ -62,15 +62,15 @@ labels = tf.reshape(labels, (-1, 1))
 Rather than rolling our own iterator,
 we can call upon the existing API in a framework to read data.
 We pass in `features` and `labels` as arguments and specify `batch_size`
-when instantiating a data loader object.
+when instantiating a data iterator object.
 Besides, the boolean value `is_train`
 indicates whether or not
-we want the data loader object to shuffle the data
+we want the data iterator object to shuffle the data
 on each epoch (pass through the dataset).
 
 ```{.python .input}
 def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a Gluon data loader."""
+    """Construct a Gluon data iterator."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
@@ -81,7 +81,7 @@ data_iter = load_array((features, labels), batch_size)
 ```{.python .input}
 #@tab pytorch
 def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a PyTorch data loader."""
+    """Construct a PyTorch data iterator."""
     dataset = data.TensorDataset(*data_arrays)
     return data.DataLoader(dataset, batch_size, shuffle=is_train)
 
@@ -92,7 +92,7 @@ data_iter = load_array((features, labels), batch_size)
 ```{.python .input}
 #@tab tensorflow
 def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a TensorFlow data loader."""
+    """Construct a TensorFlow data iterator."""
     dataset = tf.data.Dataset.from_tensor_slices(data_arrays)
     if is_train:
         dataset = dataset.shuffle(buffer_size=1000)
@@ -379,7 +379,7 @@ trainer = tf.keras.optimizers.SGD(learning_rate=0.03)
 
 ## Training
 
-You might have noticed that expressing our model through 
+You might have noticed that expressing our model through
 high-level APIs of a deep learning framework
 requires comparatively few lines of code.
 We did not have to individually allocate parameters,
