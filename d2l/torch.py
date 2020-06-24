@@ -216,6 +216,13 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+def accuracy(y_hat, y):  #@save
+    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
+        y_hat = y_hat.argmax(axis=1)
+    return float((y_hat.type(y.dtype) == y).sum())
+
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):  #@save
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
@@ -237,6 +244,26 @@ class Accumulator:  #@save
 
     def __getitem__(self, idx):
         return self.data[idx]
+
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+def train_epoch_ch3(net, train_iter, loss, updater):  #@save
+    metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
+    for X, y in train_iter:
+        # Compute gradients and update parameters
+        y_hat = net(X)
+        l = loss(y_hat, y)
+        if isinstance(updater, torch.optim.Optimizer):
+            updater.zero_grad()
+            l.backward()
+            updater.step()
+            metric.add(float(l)*len(y), accuracy(y_hat, y), y.size().numel())
+        else:
+            l.sum().backward()
+            updater(X.shape[0])
+            metric.add(float(l.sum()), accuracy(y_hat, y), y.size().numel())
+    # Return training loss and training accuracy
+    return metric[0]/metric[2], metric[1]/metric[2]
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md

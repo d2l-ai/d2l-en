@@ -13,21 +13,19 @@ from IPython import display
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
 from IPython import display
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 from IPython import display
 ```
-
 
 We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
 setting up a data iterator with batch size 256.
@@ -68,7 +66,7 @@ W.attach_grad()
 b.attach_grad()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 num_inputs = 784
 num_outputs = 10
@@ -77,8 +75,7 @@ W = torch.normal(0, 0.01, size=(num_inputs, num_outputs), requires_grad=True)
 b = torch.zeros(num_outputs, requires_grad=True)
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 num_inputs = 784
 num_outputs = 10
@@ -87,7 +84,6 @@ W = tf.Variable(tf.random.normal(shape=(num_inputs, num_outputs),
                                  mean=0, stddev=0.01))
 b = tf.Variable(tf.zeros(num_outputs))
 ```
-
 
 ## Defining the Softmax Operation
 
@@ -111,19 +107,17 @@ X = np.array([[1, 2, 3], [4, 5, 6]])
 X.sum(axis=0, keepdims=True), '\n', X.sum(axis=1, keepdims=True)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 X = torch.tensor([[1., 2., 3.], [4., 5., 6.]])
 torch.sum(X, dim=0, keepdim=True), torch.sum(X, dim=1, keepdim=True)
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 X = tf.constant([[1., 2., 3.], [4., 5., 6.]])
 [tf.reduce_sum(X, axis=i, keepdims=True) for i in range(0, 1)]
 ```
-
 
 We are now ready to implement the softmax operation.
 Recall that softmax consists of three steps:
@@ -153,7 +147,7 @@ def softmax(X):
     return X_exp / partition  # The broadcasting mechanism is applied here
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def softmax(X):
     X_exp = torch.exp(X)
@@ -161,15 +155,13 @@ def softmax(X):
     return X_exp / partition  # The broadcasting mechanism is applied here
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def softmax(X):
     X_exp = tf.exp(X)
     partition = tf.reduce_sum(X_exp, -1, keepdims=True)
     return X_exp / partition  # The broadcasting mechanism is applied here
 ```
-
 
 As you can see, for any random input,
 we turn each element into a non-negative number.
@@ -182,21 +174,19 @@ X_prob = softmax(X)
 X_prob, X_prob.sum(axis=1)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 X = torch.normal(0, 1, size=(2, 5))
 X_prob = softmax(X)
 X_prob, torch.sum(X_prob, dim=1)
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 X = tf.random.normal(shape=(2, 5))
 X_prob = softmax(X)
 X_prob, tf.reduce_sum(X_prob, axis=1)
 ```
-
 
 Note that while this looks correct mathematically,
 we were a bit sloppy in our implementation
@@ -217,19 +207,17 @@ def net(X):
     return softmax(np.dot(X.reshape(-1, W.shape[0]), W) + b)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def net(X):
     return softmax(torch.matmul(X.reshape(-1, W.shape[0]), W) + b)
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def net(X):
     return softmax(tf.matmul(tf.reshape(X, shape=(-1, W.shape[0])), W) + b)
 ```
-
 
 ## Defining the Loss Function
 
@@ -255,21 +243,19 @@ y = np.array([0, 2])
 y_hat[[0, 1], y]
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 y = torch.tensor([0, 2])
 y_hat = torch.tensor([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 y_hat[[0, 1], y]
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 y_hat = tf.constant([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 y = tf.constant([0, 2])
 tf.boolean_mask(y_hat, tf.one_hot(y, depth=y_hat.shape[-1]))
 ```
-
 
 Now we can implement the cross-entropy loss function efficiently with just one line of code.
 
@@ -280,7 +266,7 @@ def cross_entropy(y_hat, y):
 cross_entropy(y_hat, y)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def cross_entropy(y_hat, y):
     return - torch.log(y_hat[range(len(y_hat)), y])
@@ -288,8 +274,7 @@ def cross_entropy(y_hat, y):
 cross_entropy(y_hat, y)
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def cross_entropy(y_hat, y):
     return -tf.math.log(tf.boolean_mask(
@@ -297,7 +282,6 @@ def cross_entropy(y_hat, y):
 
 cross_entropy(y_hat, y)
 ```
-
 
 ## Classification Accuracy
 
@@ -332,7 +316,7 @@ def accuracy(y_hat, y):  #@save
     return float((y_hat.astype(y.dtype) == y).sum())
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def accuracy(y_hat, y):  #@save
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
@@ -340,15 +324,13 @@ def accuracy(y_hat, y):  #@save
     return float((y_hat.type(y.dtype) == y).sum())
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def accuracy(y_hat, y):  #@save
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
         y_hat = tf.argmax(y_hat, axis=1)
     return float((tf.cast(y_hat, dtype=y.dtype) == y).numpy().sum())
 ```
-
 
 We will continue to use the variables `y_hat` and `y`
 defined before
@@ -438,7 +420,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
@@ -459,8 +441,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
@@ -488,7 +469,6 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
-
 
 Before showing the implementation of the training function,
 we define a utility class that draws data in animation.
@@ -558,7 +538,7 @@ def updater(batch_size):
     return d2l.sgd([W, b], lr, batch_size)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 class Updater():  #@save
     def __init__(self, params, lr):
@@ -569,7 +549,6 @@ class Updater():  #@save
 
 updater = Updater([W, b], lr=0.1)
 ```
-
 
 Now we train the model with 10 data epochs. Note that both the number of epochs (`num_epochs`),
 and learning rate (`lr`) are both adjustable hyper-parameters.
@@ -609,7 +588,7 @@ def predict_ch3(net, test_iter, n=6):  #@save
 predict_ch3(net, test_iter)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
@@ -621,7 +600,6 @@ def predict_ch3(net, test_iter, n=6):  #@save
 
 predict_ch3(net, test_iter)
 ```
-
 
 ## Summary
 
