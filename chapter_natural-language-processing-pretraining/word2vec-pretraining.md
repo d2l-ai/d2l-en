@@ -119,7 +119,7 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
                             xlim=[0, num_epochs])
     for epoch in range(num_epochs):
         timer = d2l.Timer()
-        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
+        metric = d2l.Accumulator(2)  # Sum of losses, no. of tokens
         for i, batch in enumerate(data_iter):
             center, context_negative, mask, label = [
                 data.as_in_ctx(ctx) for data in batch]

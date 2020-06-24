@@ -98,8 +98,8 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
     step, timer = 0, d2l.Timer()
     animator = d2l.Animator(xlabel='step', ylabel='loss',
                             xlim=[1, num_steps], legend=['mlm', 'nsp'])
-    # Masked language modeling loss, next sentence prediction loss,
-    # no. of sentence pairs, count
+    # Sum of masked language modeling losses, sum of next sentence prediction
+    # losses, no. of sentence pairs, count
     metric = d2l.Accumulator(4)
     num_steps_reached = False
     while step < num_steps and not num_steps_reached:
