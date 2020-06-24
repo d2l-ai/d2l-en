@@ -115,11 +115,11 @@ that maximize the likelihood of the observed data.
 Then, to generate predictions, we will set a threshold,
 for example, choosing the label with the maximum predicted probabilities.
 
-Put formally, we would like any output $\hat{y}_k$
+Put formally, we would like any output $\hat{y}_j$
 to be interpreted as the probability
-that a given item belongs to class $k$.
+that a given item belongs to class $j$.
 Then we can choose the class with the largest output value
-as our prediction $\operatorname*{argmax}_k y_k$.
+as our prediction $\operatorname*{argmax}_j y_j$.
 For example, if $\hat{y}_1$, $\hat{y}_2$, and $\hat{y}_3$
 are 0.1, 0.8, and 0.1, respectively,
 then we predict category 2, which (in our example) represents "chicken".
@@ -151,11 +151,11 @@ while requiring that the model remains differentiable,
 we first exponentiate each logit (ensuring non-negativity)
 and then divide by their sum (ensuring that they sum to 1):
 
-$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o})\quad \text{where}\quad \hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}. $$
+$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o})\quad \text{where}\quad \hat{y}_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}. $$
 :eqlabel:`eq_softmax_y_and_o`
 
 It is easy to see $\hat{y}_1 + \hat{y}_2 + \hat{y}_3 = 1$
-with $0 \leq \hat{y}_i \leq 1$ for all $i$.
+with $0 \leq \hat{y}_j \leq 1$ for all $j$.
 Thus, $\hat{\mathbf{y}}$ is a proper probability distribution
 whose element values can be interpreted accordingly.
 Note that the softmax operation does not change the ordering among the logits $\mathbf{o}$,
@@ -164,7 +164,7 @@ that determine the probabilities assigned to each class.
 Therefore, during prediction we can still pick out the most likely class by
 
 $$
-\operatorname*{argmax}_i \hat y_i = \operatorname*{argmax}_i o_i.
+\operatorname*{argmax}_j \hat y_j = \operatorname*{argmax}_j o_j.
 $$
 
 
