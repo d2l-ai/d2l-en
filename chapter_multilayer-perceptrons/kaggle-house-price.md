@@ -351,10 +351,10 @@ train_labels = torch.tensor(train_data.SalePrice.values,
 ```{.python .input}
 #@tab tensorflow
 n_train = train_data.shape[0]
-train_features = np.array(all_features[:n_train].values, dtype=np.float)
-test_features = np.array(all_features[n_train:].values, dtype=np.float)
+train_features = np.array(all_features[:n_train].values, dtype=np.float32)
+test_features = np.array(all_features[n_train:].values, dtype=np.float32)
 train_labels = np.array(train_data.SalePrice.values.reshape(-1, 1), 
-                        dtype=np.float)
+                        dtype=np.float32)
 ```
 
 ## Training
@@ -525,7 +525,8 @@ def train(net, train_features, train_labels, test_features, test_labels,
     optimizer = tf.keras.optimizers.Adam(learning_rate)
     net.compile(loss=log_rmse, optimizer=optimizer)
     history = net.fit(train_iter, validation_data=test_iter,
-        epochs=num_epochs, batch_size=batch_size, validation_freq=1)
+        epochs=num_epochs, batch_size=batch_size,
+        validation_freq=1, verbose=0)
     train_ls = history.history['loss']
     if test_features is not None:
         test_ls = history.history['val_loss']
