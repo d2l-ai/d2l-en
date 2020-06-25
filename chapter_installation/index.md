@@ -69,6 +69,7 @@ conda install python=3.7 pip -y
 
 ## Installing the Framework and the `d2l` Package
 
+:begin_tab:`mxnet,pytorch`
 Before installing the deep learning framework, please first check
 whether or not you have proper GPUs on your machine
 (the GPUs that power the display on a standard laptop
@@ -81,6 +82,8 @@ Otherwise, you can install the CPU version.
 That will be more than enough horsepower to get you
 through the first few chapters but you will want
 to access GPUs before running larger models.
+:end_tab:
+
 
 :begin_tab:`mxnet`
 ```bash
@@ -91,6 +94,14 @@ pip install mxnet==1.6.0
 :begin_tab:`pytorch`
 ```bash
 pip install torch==1.5.0 torchvision
+```
+:end_tab:
+
+:begin_tab:`tensorflow`
+You can install TensorFlow with both CPU and GPU support via the following:
+
+```bash
+pip install tensorflow==2.2.0 tensorflow-probability==0.10.0
 ```
 :end_tab:
 
@@ -116,6 +127,7 @@ before running the code of the book or updating the deep learning framework or t
 To exit the environment, run `conda deactivate`.
 
 
+:begin_tab:`mxnet,pytorch`
 ## GPU Support
 
 :label:`subsec_gpu`
@@ -127,6 +139,7 @@ If your computer has NVIDIA graphics cards and has installed [CUDA](https://deve
 then you should install a GPU-enabled version.
 If you have installed the CPU-only version,
 you may need to remove it first by running:
+:end_tab:
 
 
 :begin_tab:`mxnet`
@@ -141,12 +154,12 @@ pip uninstall torch
 ```
 :end_tab:
 
-
+:begin_tab:`mxnet,pytorch`
 Then we need to find the CUDA version you installed.
 You may check it through `nvcc --version` or `cat /usr/local/cuda/version.txt`.
 Assume that you have installed CUDA 10.1,
 then you can install with the following command:
-
+:end_tab:
 
 :begin_tab:`mxnet`
 ```bash
@@ -161,10 +174,13 @@ pip install mxnet-cu101==1.6.0
 :begin_tab:`pytorch`
 ```bash
 pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+```
 :end_tab:
 
+:begin_tab:`mxnet,pytorch`
 You may change the last digits according to your CUDA version, e.g., `cu100` for
 CUDA 10.0 and `cu90` for CUDA 9.0.
+:end_tab:
 
 ## Exercises
 
