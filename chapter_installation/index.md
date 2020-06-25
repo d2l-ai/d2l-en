@@ -112,7 +112,7 @@ jupyter notebook
 
 At this point, you can open http://localhost:8888 (it usually opens automatically) in your Web browser. Then we can run the code for each section of the book.
 Please always execute `conda activate d2l` to activate the runtime environment
-before running the code of the book or updating MXNet or the `d2l` package.
+before running the code of the book or updating the deep learning framework or the `d2l` package.
 To exit the environment, run `conda deactivate`.
 
 
