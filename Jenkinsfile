@@ -35,7 +35,7 @@ stage("Build and Publish") {
       ./static/cache.sh store _build/eval/data
       """
 
-      sh label: "Execute Notebooks [Pytorch]", script: """set -ex
+      sh label: "Execute Notebooks [PyTorch]", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       ./static/cache.sh restore _build/eval_pytorch/data
@@ -43,7 +43,7 @@ stage("Build and Publish") {
       ./static/cache.sh store _build/eval_pytorch/data
       """
 
-      sh label: "Execute Notebooks [Tensorflow]", script: """set -ex
+      sh label: "Execute Notebooks [TensorFlow]", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       ./static/cache.sh restore _build/eval_tensorflow/data
