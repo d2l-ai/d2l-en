@@ -74,4 +74,3 @@ channels
 pooling
 lenet
 ```
-

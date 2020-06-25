@@ -38,7 +38,6 @@ class CenteredLayer(nn.Block):
         return x - x.mean()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 import torch
@@ -50,7 +49,6 @@ class CenteredLayer(nn.Module):
     def forward(self, x):
         return x - x.mean()
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -70,7 +68,6 @@ Let us verify that our layer works as intended by feeding some data through it.
 layer = CenteredLayer()
 layer(np.array([1, 2, 3, 4, 5]))
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -93,7 +90,6 @@ net.add(nn.Dense(128), CenteredLayer())
 net.initialize()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(nn.Linear(8, 128), CenteredLayer())
@@ -114,7 +110,6 @@ due to quantization.
 y = net(np.random.uniform(size=(4, 8)))
 y.mean()
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -151,13 +146,11 @@ that makes it easy to generate a new parameter
 with a specified name and shape.
 :end_tab:
 
-
 ```{.python .input}
 params = gluon.ParameterDict()
 params.get('param2', shape=(2, 3))
 params
 ```
-
 
 :begin_tab:`mxnet`
 We now have all the basic ingredients that we need
@@ -190,7 +183,6 @@ class MyDense(nn.Block):
         linear = np.dot(x, self.weight.data(ctx=x.ctx)) + self.bias.data(ctx=x.ctx)
         return npx.relu(linear)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -230,7 +222,6 @@ dense = MyDense(units=3, in_units=5)
 dense.params
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 dense = MyLinear(5, 3)
@@ -250,7 +241,6 @@ We can directly carry out forward calculations using custom layers.
 dense.initialize()
 dense(np.random.uniform(size=(2, 5)))
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -273,7 +263,6 @@ net.initialize()
 net(np.random.uniform(size=(2, 64)))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(MyLinear(64, 8), nn.ReLU(), MyLinear(8, 1))
@@ -285,7 +274,6 @@ net(torch.randn(2, 64))
 net = tf.keras.models.Sequential([MyDense(8), MyDense(1)])
 net(tf.random.uniform((2, 64)))
 ```
-
 
 ## Summary
 
@@ -299,8 +287,7 @@ net(tf.random.uniform((2, 64)))
 1. Design a layer that learns an affine transform of the data.
 1. Design a layer that takes an input and computes a tensor reduction, 
    i.e., it returns $y_k = \sum_{i, j} W_{ijk} x_i x_j$.
-1. Design a layer that returns the leading half of the Fourier coefficients of the data. 
-
+1. Design a layer that returns the leading half of the Fourier coefficients of the data.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/58)

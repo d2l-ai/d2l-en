@@ -26,7 +26,7 @@ can be neatly accomplished by attention mechanisms.
 At a high level, it consists of three jointly trained steps: attending, comparing, and aggregating.
 We will illustrate them step by step in the following.
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 import mxnet as mx
 from mxnet import autograd, gluon, init, np, npx
@@ -61,7 +61,7 @@ $$e_{ij} = f(\mathbf{a}_i)^\top f(\mathbf{b}_j),$$
 where the function $f$ is a multilayer perceptron defined in the following `mlp` function.
 The output dimension of $f$ is specified by the `num_hiddens` argument of `mlp`.
 
-```{.python .input  n=2}
+```{.python .input}
 def mlp(num_hiddens, flatten):
     net = nn.Sequential()
     net.add(nn.Dropout(0.2))
@@ -93,7 +93,7 @@ $$
 
 Below we define the `Attend` class to compute the soft alignment of hypotheses (`beta`) with input premises `A` and soft alignment of premises (`alpha`) with input hypotheses `B`.
 
-```{.python .input  n=3}
+```{.python .input}
 class Attend(nn.Block):
     def __init__(self, num_hiddens, **kwargs):
         super(Attend, self).__init__(**kwargs)
@@ -135,7 +135,7 @@ In :eqref:`eq_nli_v_ab`, $\mathbf{v}_{A,i}$ is the comparison between word $i$ i
 while $\mathbf{v}_{B,j}$ is the comparison between word $j$ in the hypothesis and all the premise words that are softly aligned with word $j$.
 The following `Compare` class defines such as comparing step.
 
-```{.python .input  n=4}
+```{.python .input}
 class Compare(nn.Block):
     def __init__(self, num_hiddens, **kwargs):
         super(Compare, self).__init__(**kwargs)
@@ -165,7 +165,7 @@ $$
 
 The aggregation step is defined in the following `Aggregate` class.
 
-```{.python .input  n=5}
+```{.python .input}
 class Aggregate(nn.Block):
     def __init__(self, num_hiddens, num_outputs, **kwargs):
         super(Aggregate, self).__init__(**kwargs)
@@ -186,7 +186,7 @@ class Aggregate(nn.Block):
 By putting the attending, comparing, and aggregating steps together,
 we define the decomposable attention model to jointly train these three steps.
 
-```{.python .input  n=6}
+```{.python .input}
 class DecomposableAttention(nn.Block):
     def __init__(self, vocab, embed_size, num_hiddens, **kwargs):
         super(DecomposableAttention, self).__init__(**kwargs)
@@ -216,7 +216,7 @@ We begin by reading the dataset.
 
 We download and read the SNLI dataset using the function defined in :numref:`sec_natural-language-inference-and-dataset`. The batch size and sequence length are set to $256$ and $50$, respectively.
 
-```{.python .input  n=7}
+```{.python .input}
 batch_size, num_steps = 256, 50
 train_iter, test_iter, vocab = d2l.load_data_snli(batch_size, num_steps)
 ```
@@ -229,7 +229,7 @@ The output dimension of functions $f$ in :eqref:`eq_nli_e` and $g$ in :eqref:`eq
 Then we create a model instance, initialize its parameters,
 and load the GloVe embedding to initialize vectors of input tokens.
 
-```{.python .input  n=8}
+```{.python .input}
 embed_size, num_hiddens, ctx = 100, 200, d2l.try_all_gpus()
 net = DecomposableAttention(vocab, embed_size, num_hiddens)
 net.initialize(init.Xavier(), ctx=ctx)
@@ -243,7 +243,7 @@ net.embedding.weight.set_data(embeds)
 In contrast to the `split_batch` function in :numref:`sec_multi_gpu` that takes single inputs such as text sequences (or images),
 we define a `split_batch_multi_inputs` function to take multiple inputs such as premises and hypotheses in minibatches.
 
-```{.python .input  n=10}
+```{.python .input}
 #@save
 def split_batch_multi_inputs(X, y, ctx_list):
     """Split multi-input X and y into multiple devices specified by ctx"""
@@ -254,7 +254,7 @@ def split_batch_multi_inputs(X, y, ctx_list):
 
 Now we can train and evaluate the model on the SNLI dataset.
 
-```{.python .input  n=11}
+```{.python .input}
 lr, num_epochs = 0.001, 4
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -266,7 +266,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
 
 Finally, define the prediction function to output the logical relationship between a pair of premise and hypothesis.
 
-```{.python .input  n=14}
+```{.python .input}
 #@save
 def predict_snli(net, vocab, premise, hypothesis):
     premise = np.array(vocab[premise], ctx=d2l.try_gpu())
@@ -279,7 +279,7 @@ def predict_snli(net, vocab, premise, hypothesis):
 
 We can use the trained model to obtain the natural language inference result for a sample pair of sentences.
 
-```{.python .input  n=15}
+```{.python .input}
 predict_snli(net, vocab, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 ```
 

@@ -25,7 +25,7 @@ The pretrained fastText embeddings are available in multiple languages.
 Here we consider one English version (300-dimensional "wiki.en") that can be downloaded from the
 [fastText website](https://fasttext.cc/).
 
-```{.python .input  n=35}
+```{.python .input}
 #@save
 d2l.DATA_HUB['glove.6b.50d'] = (d2l.DATA_URL + 'glove.6B.50d.zip',
                        '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
@@ -84,7 +84,7 @@ class TokenEmbedding:
 
 Next, we use 50-dimensional GloVe embeddings pretrained on a subset of the Wikipedia. The corresponding word embedding is automatically downloaded the first time we create a pretrained word embedding instance.
 
-```{.python .input  n=11}
+```{.python .input}
 glove_6b50d = TokenEmbedding('glove.6b.50d')
 ```
 
@@ -96,7 +96,7 @@ len(glove_6b50d)
 
 We can use a word to get its index in the dictionary, or we can get the word from its index.
 
-```{.python .input  n=12}
+```{.python .input}
 glove_6b50d.token_to_idx['beautiful'], glove_6b50d.idx_to_token[3367]
 ```
 
@@ -162,25 +162,25 @@ def get_analogy(token_a, token_b, token_c, embed):
 
 Verify the "male-female" analogy.
 
-```{.python .input  n=18}
+```{.python .input}
 get_analogy('man', 'woman', 'son', glove_6b50d)
 ```
 
 “Capital-country” analogy: "beijing" is to "china" as "tokyo" is to what? The answer should be "japan".
 
-```{.python .input  n=19}
+```{.python .input}
 get_analogy('beijing', 'china', 'tokyo', glove_6b50d)
 ```
 
 "Adjective-superlative adjective" analogy: "bad" is to "worst" as "big" is to what? The answer should be "biggest".
 
-```{.python .input  n=20}
+```{.python .input}
 get_analogy('bad', 'worst', 'big', glove_6b50d)
 ```
 
 "Present tense verb-past tense verb" analogy: "do" is to "did" as "go" is to what? The answer should be "went".
 
-```{.python .input  n=21}
+```{.python .input}
 get_analogy('do', 'did', 'go', glove_6b50d)
 ```
 

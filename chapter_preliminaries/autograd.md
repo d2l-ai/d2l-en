@@ -358,9 +358,9 @@ Since the computation of `y` was recorded,
 we can subsequently call backward function on `y` to get the derivative of `y = x * x` with respect to `x`, which is `2 * x`.
 
 :begin_tab:`jax`
-In `JAX`, we get a `grad` object as a result of a function call owing to the functional API style.
+In `JAX`, we get a `grad` object as a result of a function call owing to the functional API style. :end_tab:
 
-```{.python .input}
+```{.python .input  n=10}
 y.backward()
 x.grad == 2 * x
 ```
@@ -377,7 +377,7 @@ x.grad == 2 * x
 t.gradient(y, x) == 2 * x
 ```
 
-```{.python .input}
+```{.python .input  n=38}
 #@tab jax
 x_grad == 2 * x
 ```
@@ -397,7 +397,8 @@ both depend on the value of the input `a`.
 ```{.python .input}
 def f(a):
     b = a * 2
-    while np.linalg.norm(b) < 1000:
+    while np.li
+    nalg.norm(b) < 1000:
         b = b * 2
     if b.sum() > 0:
         c = b
@@ -432,7 +433,7 @@ def f(a):
     return c
 ```
 
-```{.python .input}
+```{.python .input  n=40}
 #@tab jax
 def f(a):
     b = a * 2
@@ -471,7 +472,7 @@ d_grad = t.gradient(d, a)
 d_grad
 ```
 
-```{.python .input}
+```{.python .input  n=41}
 #@tab jax
 a = random.normal(key, dtype=np.float32) #JAX requires a random key
 d = f(a)
@@ -499,7 +500,7 @@ a.grad == (d / a)
 d_grad == (d / a)
 ```
 
-```{.python .input}
+```{.python .input  n=43}
 #@tab jax
 d_grad == d / a
 ```
@@ -516,6 +517,7 @@ d_grad == d / a
 1. In the control flow example where we calculate the derivative of `d` with respect to `a`, what would happen if we changed the variable `a` to a random vector or matrix. At this point, the result of the calculation `f(a)` is no longer a scalar. What happens to the result? How do we analyze this?
 1. Redesign an example of finding the gradient of the control flow. Run and analyze the result.
 1. Let $f(x) = \sin(x)$. Plot $f(x)$ and $\frac{df(x)}{dx}$, where the latter is computed without exploiting that $f'(x) = \cos(x)$.
+:end_tab:
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/34)
@@ -532,7 +534,3 @@ d_grad == d / a
 :begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/200)
 :end_tab:
-
-```{.python .input}
-
-```

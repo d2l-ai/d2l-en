@@ -90,12 +90,12 @@ print(net[1].params)
 
 ```{.python .input}
 #@tab pytorch
-print(net[2].state_dict())  
+print(net[2].state_dict())
 ```
 
 ```{.python .input}
 #@tab tensorflow
-print(net.layers[2].weights)  
+print(net.layers[2].weights)
 ```
 
 The output tells us a few important things.
@@ -195,7 +195,6 @@ print(net[0].state_dict())
 # parameters of the entire network
 print(net.state_dict())
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -344,7 +343,7 @@ rgnet.layers[0].layers[1].layers[1].weights[1]
 
 Now that we know how to access the parameters,
 let us look at how to initialize them properly.
-We discussed the need for initialization in :numref:`sec_numerical_stability`. 
+We discussed the need for initialization in :numref:`sec_numerical_stability`.
 
 :begin_tab:`mxnet`
 By default, MXNet initializes weight matrices
@@ -392,7 +391,6 @@ def init_normal(m):
 net.apply(init_normal)    
 net[0].weight.data[0], net[0].bias.data[0]
 ```
-
 
 ```{.python .input}
 #@tab tensorflow 
@@ -489,7 +487,6 @@ print(net.layers[1].weights[0])
 print(net.layers[2].weights[0])
 ```
 
-
 ### Custom Initialization
 
 Sometimes, the initialization methods we need 
@@ -508,12 +505,10 @@ $$
 $$
 
 :begin_tab:`mxnet`
-
 Here we define a subclass of `Initializer`. 
 Usually, we only need to implement the `_init_weight` function
 which takes a tensor argument (`data`) 
-and assigns to it the desired initialized values. 
-
+and assigns to it the desired initialized values.
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -562,7 +557,7 @@ print(net.layers[1].weights[0])
 
 Note that we always have the option 
 of setting parameters directly by calling `data` 
-to access the underlying data. 
+to access the underlying data.
 
 :begin_tab:`mxnet`
 A note for advanced users: 

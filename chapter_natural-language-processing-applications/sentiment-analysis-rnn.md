@@ -12,7 +12,7 @@ negative emotion.
 ![This section feeds pretrained GloVe to an RNN-based architecture for sentiment analysis.](../img/nlp-map-sa-rnn.svg)
 :label:`fig_nlp-map-sa-rnn`
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn, rnn
@@ -35,7 +35,7 @@ the `BiRNN` class implemented below, the `Embedding` instance is the embedding
 layer, the `LSTM` instance is the hidden layer for sequence encoding, and the
 `Dense` instance is the output layer for generated classification results.
 
-```{.python .input  n=46}
+```{.python .input}
 class BiRNN(nn.Block):
     def __init__(self, vocab_size, embed_size, num_hiddens,
                  num_layers, **kwargs):
@@ -91,7 +91,7 @@ embeds.shape
 
 Then, we will use these word vectors as feature vectors for each word in the reviews. Note that the dimensions of the pre-trained word vectors need to be consistent with the embedding layer output size `embed_size` in the created model. In addition, we no longer update these word vectors during training.
 
-```{.python .input  n=47}
+```{.python .input}
 net.embedding.weight.set_data(embeds)
 net.embedding.collect_params().setattr('grad_req', 'null')
 ```
@@ -100,7 +100,7 @@ net.embedding.collect_params().setattr('grad_req', 'null')
 
 Now, we can start training.
 
-```{.python .input  n=48}
+```{.python .input}
 lr, num_epochs = 0.01, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -109,7 +109,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 
 Finally, define the prediction function.
 
-```{.python .input  n=49}
+```{.python .input}
 #@save
 def predict_sentiment(net, vocab, sentence):
     sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
@@ -119,7 +119,7 @@ def predict_sentiment(net, vocab, sentence):
 
 Then, use the trained model to classify the sentiments of two simple sentences.
 
-```{.python .input  n=50}
+```{.python .input}
 predict_sentiment(net, vocab, 'this movie is so great')
 ```
 

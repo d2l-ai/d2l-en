@@ -121,7 +121,7 @@ In order to do so, we mock up an initializer
 which does nothing but report a debug message 
 stating when it was invoked and with which parameters.
 
-```{.python .input  n=22}
+```{.python .input}
 class MyInit(init.Initializer):
     def _init_weight(self, name, data):
         print('Init', name, data.shape)
@@ -139,7 +139,7 @@ Therefore there is no real initialization parameter
 when calling the `initialize` function. 
 Next, we define the input and perform a forward calculation.
 
-```{.python .input  n=25}
+```{.python .input}
 x = np.random.uniform(size=(2, 20))
 y = net(x)
 ```

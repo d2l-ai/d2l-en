@@ -340,7 +340,6 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 Now, let us plot the cumulative distribution function.  It is beyond the scope of this appendix, but the Gaussian c.d.f. does not have a closed-form formula in terms of more elementary functions.  We will use `erf` which provides a way to compute this integral numerically.
 
 ```{.python .input}
-
 def phi(x):
     return (1.0 + erf((x - mu) / (sigma * np.sqrt(2)))) / 2.0
 

@@ -697,7 +697,6 @@ def log_rmse(net,features,labels):
     return rmse.item()
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 log_rmse = tf.keras.losses.mean_squared_logarithmic_error
@@ -778,8 +777,6 @@ def train(net, train_features, train_labels, test_features, test_labels,
         test_ls = history.history['val_loss']
     return train_ls, test_ls
 ```
-
-
 
 ## k-Fold Cross-Validation
 
@@ -1092,7 +1089,6 @@ The steps are quite simple:
 1. Improve the score on Kaggle by tuning the hyperparameters through k-fold cross-validation.
 1. Improve the score by improving the model (layers, regularization, dropout).
 1. What happens if we do not standardize the continuous numerical features like we have done in this section?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/106)

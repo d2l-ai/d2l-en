@@ -262,7 +262,6 @@ this can still get messy
 1. Describe why it is much more challenging to deal with multiple hyperparameters. 
 1. What is the smartest strategy you can think of for structuring a search over multiple hyperparameters?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/92)
 :end_tab:

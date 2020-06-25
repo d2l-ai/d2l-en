@@ -28,14 +28,14 @@ d2l.plt.imshow(img);
 
 In object detection, we usually use a bounding box to describe the target location. The bounding box is a rectangular box that can be determined by the $x$ and $y$ axis coordinates in the upper-left corner and the $x$ and $y$ axis coordinates in the lower-right corner of the rectangle. We will define the bounding boxes of the dog and the cat in the image based on the coordinate information in the above image. The origin of the coordinates in the above image is the upper left corner of the image, and to the right and down are the positive directions of the $x$ axis and the $y$ axis, respectively.
 
-```{.python .input  n=2}
+```{.python .input}
 # bbox is the abbreviation for bounding box
 dog_bbox, cat_bbox = [60, 45, 378, 516], [400, 112, 655, 493]
 ```
 
 We can draw the bounding box in the image to check if it is accurate. Before drawing the box, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of `matplotlib`.
 
-```{.python .input  n=3}
+```{.python .input}
 #@save
 def bbox_to_rect(bbox, color):
     """Convert bounding box to matplotlib format."""

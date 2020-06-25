@@ -440,7 +440,6 @@ net[1].gamma.data().reshape(-1,), net[1].beta.data().reshape(-1,)
 ```{.python .input}
 #@tab pytorch
 net[1].gamma.reshape((-1,)), net[1].beta.reshape((-1,))
-
 ```
 
 ## Concise Implementation

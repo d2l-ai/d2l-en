@@ -6,21 +6,21 @@ KVStore is a place for data sharing. Think of it as a single object shared acros
 ## Initialization
 Let’s consider a simple example: initializing a (int, NDArray) pair into the store, and then pulling the value out:
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import np, npx, kv
 npx.set_np()
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 np.ones((2,3))
 ```
 
-```{.python .input  n=11}
+```{.python .input}
 help(kv)
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 kv = kv.create('local') # create a local kv store.
 shape = (2,3)
 kv.init(3, np.ones(shape)*2)
@@ -33,7 +33,7 @@ print(a)
 
 For any key that has been initialized, you can push a new value with the same shape to the key:
 
-```{.python .input  n=4}
+```{.python .input}
 kv.push(3, np.ones(shape)*8)
 kv.pull(3, out = a) # pull out the value
 print(a.asnumpy())
@@ -41,7 +41,7 @@ print(a.asnumpy())
 
 The data for pushing can be stored on any device. Furthermore, you can push multiple values into the same key, where KVStore will first sum all of these values and then push the aggregated value. Here we will just demonstrate pushing a list of values on CPU. Please note summation only happens if the value list is longer than one
 
-```{.python .input  n=5}
+```{.python .input}
 contexts = [npx.cpu(i) for i in range(4)]
 b = [np.ones(shape, ctx=ctx) for ctx in contexts]
 kv.push(3, b)
@@ -51,7 +51,7 @@ print(a)
 
 For each push, KVStore combines the pushed value with the value stored using an updater. The default updater is ASSIGN. You can replace the default to control how data is merged:
 
-```{.python .input  n=6}
+```{.python .input}
 def update(key, input, stored):
     print("update on key: %d" % key)
     stored += input * 2
@@ -60,7 +60,7 @@ kv.pull(3, out=a)
 print(a)
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 kv.push(3, np.ones(shape))
 kv.pull(3, out=a)
 print(a)
@@ -70,7 +70,7 @@ print(a)
 
 You’ve already seen how to pull a single key-value pair. Similarly, to push, you can pull the value onto several devices with a single call:
 
-```{.python .input  n=8}
+```{.python .input}
 b = [np.ones(shape, ctx=ctx) for ctx in contexts]
 kv.pull(3, out = b)
 print(b[1])
@@ -82,7 +82,7 @@ All operations introduced so far involve a single key. KVStore also provides an 
 
 For a single device:
 
-```{.python .input  n=9}
+```{.python .input}
 keys = [5, 7, 9]
 kv.init(keys, [np.ones(shape)]*len(keys))
 kv.push(keys, [np.ones(shape)]*len(keys))
@@ -93,7 +93,7 @@ print(b[1])
 
 For multiple devices:
 
-```{.python .input  n=10}
+```{.python .input}
 b = [[np.ones(shape, ctx=ctx) for ctx in contexts]] * len(keys)
 kv.push(keys, b)
 kv.pull(keys, out = b)

@@ -36,7 +36,7 @@ The following figure illustrates the model architecture of NeuMF.
 
 ![Illustration of the NeuMF model](../img/rec-neumf.svg)
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
@@ -49,7 +49,7 @@ npx.set_np()
 ## Model Implementation
 The following code implements the NeuMF model. It consists of a generalized matrix factorization model and a multi-layered perceptron with different user and item embedding vectors. The structure of the MLP is controlled with the parameter `nums_hiddens`. ReLU is used as the default activation function.
 
-```{.python .input  n=2}
+```{.python .input}
 class NeuMF(nn.Block):
     def __init__(self, num_factors, num_users, num_items, nums_hiddens,
                  **kwargs):
@@ -78,7 +78,7 @@ class NeuMF(nn.Block):
 
 For pairwise ranking loss, an important step is negative sampling. For each user, the items that a user has not interacted with are candidate items (unobserved entries). The following function takes users identity and candidate items as input, and samples negative items randomly for each user from the candidate set of that user. During the training stage, the model ensures that the items that a user likes to be ranked higher than items she dislikes or has not interacted with.
 
-```{.python .input  n=3}
+```{.python .input}
 class PRDataset(gluon.data.Dataset):
     def __init__(self, users, items, candidates, num_items):
         self.users = users
@@ -114,7 +114,7 @@ where $\mathcal{I}$ is the item set. $S_u$ is the candidate items of user $u$. N
 
 The following function calculates the hit counts and AUC for each user.
 
-```{.python .input  n=4}
+```{.python .input}
 #@save
 def hit_and_auc(rankedlist, test_matrix, k):
     hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k])
@@ -128,7 +128,7 @@ def hit_and_auc(rankedlist, test_matrix, k):
 
 Then, the overall Hit rate and AUC are calculated as follows.
 
-```{.python .input  n=5}
+```{.python .input}
 #@save
 def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
                      ctx):
@@ -165,7 +165,7 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 
 The training function is defined below. We train the model in the pairwise manner.
 
-```{.python .input  n=6}
+```{.python .input}
 #@save
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                   num_users, num_items, num_epochs, ctx_list, evaluator, 
@@ -203,7 +203,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
 
 Now, we can load the MovieLens 100k dataset and train the model. Since there are only ratings in the MovieLens dataset, with some losses of accuracy, we binarize these ratings to zeros and ones. If a user rated an item, we consider the implicit feedback as one, otherwise as zero. The action of rating an item can be treated as a form of providing implicit feedback.  Here, we split the dataset in the `seq-aware` mode where users' latest interacted items are left out for test.
 
-```{.python .input  n=11}
+```{.python .input}
 batch_size = 1024
 df, num_users, num_items = d2l.read_data_ml100k()
 train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items,
@@ -222,7 +222,7 @@ train_iter = gluon.data.DataLoader(PRDataset(users_train, items_train,
 
 We then create and initialize the model. we use a three-layer MLP with constant hidden size 10.
 
-```{.python .input  n=8}
+```{.python .input}
 ctx = d2l.try_all_gpus()
 net = NeuMF(10, num_users, num_items, nums_hiddens=[10, 10, 10])
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
@@ -230,7 +230,7 @@ net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 
 The following code trains the model.
 
-```{.python .input  n=12}
+```{.python .input}
 lr, num_epochs, wd, optimizer = 0.01, 10, 1e-5, 'adam'
 loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer,

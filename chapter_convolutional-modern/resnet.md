@@ -193,7 +193,6 @@ b2 = nn.Sequential(*resnet_block(64, 64, 2, first_block=True))
 b3 = nn.Sequential(*resnet_block(64, 128, 2))
 b4 = nn.Sequential(*resnet_block(128, 256, 2))
 b5 = nn.Sequential(*resnet_block(256, 512, 2))
-
 ```
 
 Finally, just like GoogLeNet, we add a global average pooling layer, followed by the fully connected layer output.

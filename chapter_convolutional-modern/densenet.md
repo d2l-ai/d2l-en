@@ -262,7 +262,6 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 1. Why do we not need to concatenate terms if we are just interested in $\mathbf{x}$ and $f(\mathbf{x})$ for ResNet? Why do we need this for more than two layers in DenseNet?
 1. Design a DenseNet for fully connected networks and apply it to the Housing Price prediction task.
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/87)
 :end_tab:

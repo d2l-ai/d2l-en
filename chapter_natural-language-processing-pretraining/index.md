@@ -48,6 +48,4 @@ similarity-analogy
 bert
 bert-dataset
 bert-pretraining
-
 ```
-

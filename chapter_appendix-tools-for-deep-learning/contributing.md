@@ -25,21 +25,18 @@ Some sections may support multiple framework implementations, you can use `d2lbo
 pip install git+https://github.com/d2l-ai/d2l-book
 ```
 
-
 Then in the root directory of `d2l-en`, you can activate a particular implementation by running one of the following commands:
 
 ```bash
 d2lbook activate mxnet chapter_multilayer-perceptrons/mlp-scratch.md
-d2lbook activate pytorch chapter_multilayer-perceptrons/mlp-scratch.md 
+d2lbook activate pytorch chapter_multilayer-perceptrons/mlp-scratch.md
 ```
-
 
 Before submitting your changes, please clear all code block outputs and activate all by
 
 ```bash
 d2lbook activate all chapter_multilayer-perceptrons/mlp-scratch.md
 ```
-
 
 If you add a new code block not for the default implementation, which is MXNet, please use `#@tab` to mark this block on the beginning line. For exmaple, `#@tab pytorch` for a PyTorch code block, or `#@tab all` a shared code block for all implementations. You may refer to [d2lbook](http://book.d2l.ai/user/code_tabs.html) for more information. 
 
@@ -88,7 +85,6 @@ To clone the repository (i.e., to make a local copy) we need to get its reposito
 git clone https://github.com/your_github_username/d2l-en.git
 ```
 
-
 ### Editing the Book and Push
 
 Now it is time to edit the book. It is best to edit the notebooks in Jupyter following instructions in :numref:`sec_jupyter`. Make the changes and check that they are OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix_tools/how-to-contribute.md`.
@@ -108,7 +104,6 @@ Changes not staged for commit:
 	modified:   chapter_appendix_tools/how-to-contribute.md
 ```
 
-
 After confirming that this is what you want, execute the following command:
 
 ```
@@ -116,7 +111,6 @@ git add chapter_appendix_tools/how-to-contribute.md
 git commit -m 'fix typo in git documentation'
 git push
 ```
-
 
 The changed code will then be in your personal fork of the repository. To request the addition of your change, you have to create a pull request for the official repository of the book.
 

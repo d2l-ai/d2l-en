@@ -37,4 +37,3 @@ naive-bayes
 statistics
 information-theory
 ```
-

@@ -17,7 +17,7 @@ Afterwards, we will introduce a more compact implementation,
 taking advantage of framework's bells and whistles.
 To start off, we import the few required packages.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
@@ -25,8 +25,7 @@ import random
 npx.set_np()
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -34,8 +33,7 @@ import torch
 import random
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -43,18 +41,17 @@ import tensorflow as tf
 import random
 ```
 
-
-```{.python .input  n=5}
+```{.python .input}
 #@tab jax
 %matplotlib inline
 from d2l import jax as d2l
 import jax.numpy as np
 import jax
 from jax import grad
-from jax import random
 import numpy as onp
 import random as pyrandom
-key = random.PRNGKey(42)
+
+key = jax.random.PRNGKey(42)
 ```
 
 ## Generating the Dataset
@@ -84,7 +81,7 @@ that $\epsilon$ obeys a normal distribution with mean of $0$.
 To make our problem easy, we will set its standard deviation to $0.01$.
 The following code generates our synthetic dataset:
 
-```python
+```{.python .input}
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = X w + b + noise."""
     X = np.random.normal(0, 1, (num_examples, len(w)))
@@ -97,8 +94,7 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = X w + b + noise."""
@@ -112,8 +108,7 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = X w + b + noise."""
@@ -129,20 +124,19 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
-
-```{.python .input  n=8}
+```{.python .input}
 #@tab jax
-def synthetic_data(w, b, num_examples):  #@save
+def synthetic_data(w, b, num_examples, rng_key):  #@save
     """Generate y = X w + b + noise."""
-    X = random.normal(key, (num_examples, len(w)))
+    X = jax.random.normal(rng_key, (num_examples, len(w)))
     y = np.dot(X, w) + b
-    y += random.normal(key, (y.shape)) * 0.01 # Jax.random only has a standard normal sampler so we need to scale,
-                                              # See explanation below
+    y += jax.random.normal(rng_key, (y.shape)) * 0.01 # Jax.random only has a standard normal sampler so we need to scale,
+                                                  # See explanation below
     return X, y
 
 true_w = np.array([2, -3.4])
 true_b = 4.2
-features, labels = synthetic_data(true_w, true_b, 1000)
+features, labels = synthetic_data(true_w, true_b, 1000, key)
 ```
 
 :begin_tab:`jax`
@@ -171,7 +165,7 @@ print('features:', features[0],'\nlabel:', labels[0])
 ```
 
 
-```{.python .input}
+```{.python .input  n=4}
 #@tab jax
 print('features:', features[0],'\nlabel:', labels[0])
 ```
@@ -199,7 +193,7 @@ d2l.plt.scatter(features[:, 1].numpy(), labels.numpy(), 1);
 ```
 
 
-```{.python .input}
+```{.python .input  n=5}
 #@tab jax
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.scatter(features[:, 1], labels, 1);
@@ -261,7 +255,7 @@ def data_iter(batch_size, features, labels):
 ```
 
 
-```{.python .input}
+```{.python .input  n=6}
 #@tab jax
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
@@ -317,7 +311,7 @@ for X, y in data_iter(batch_size, features, labels):
 ```
 
 
-```{.python .input}
+```{.python .input  n=7}
 #@tab jax
 batch_size = 10
 
@@ -366,9 +360,9 @@ b = tf.Variable(tf.zeros(1), trainable=True)
 ```
 
 
-```{.python .input}
+```{.python .input  n=8}
 #@tab jax
-w = random.normal(key, (2, 1)) * 0.01 #Jax samples from a standard normal distribution so we need to scale
+w = jax.random.normal(key, (2, 1)) * 0.01 #Jax samples from a standard normal distribution so we need to scale
 b = np.zeros(1)
 ```
 
@@ -422,7 +416,7 @@ def linreg(X, w, b):  #@save
 ```
 
 
-```{.python .input}
+```{.python .input  n=9}
 #@tab jax
 def linreg(X, w, b):  #@save
     return np.dot(X, w) + b
@@ -460,7 +454,7 @@ def squared_loss(y_hat, y):  #@save
 ```
 
 
-```{.python .input}
+```{.python .input  n=10}
 #@tab jax
 squared_loss = (lambda y_hat, y: np.mean((y_hat - y.reshape(y_hat.shape))**2)) #@save
 ```
@@ -513,7 +507,7 @@ def sgd(params, grads, lr, batch_size):  #@save
 ```
 
 
-```{.python .input}
+```{.python .input  n=11}
 #@tab jax
 from jax import vmap
 def sgd(params, grads, lr, batch_size):  #@save
@@ -623,7 +617,7 @@ for epoch in range(num_epochs):
 ```
 
 
-```{.python .input}
+```{.python .input  n=12}
 #@tab jax
 from jax import value_and_grad
 lr = 0.03 
@@ -669,7 +663,7 @@ print('Error in estimating b', true_b - b)
 ```
 
 
-```{.python .input}
+```{.python .input  n=13}
 #@tab jax
 print('Error in estimating w', true_w - w.reshape(true_w.shape))
 print('Error in estimating b', true_b - b)
@@ -715,6 +709,7 @@ and learn how to implement them more concisely.
 1.  Why is the `reshape` function needed in the `squared_loss` function?
 1. Experiment using different learning rates to find out how fast the loss function value drops.
 1. If the number of examples cannot be divided by the batch size, what happens to the `data_iter` function's behavior?
+:end_tab:
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/42)

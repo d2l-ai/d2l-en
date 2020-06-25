@@ -122,7 +122,6 @@ Now, copy the ssh command in the lower red box of :numref:`fig_chmod` and paste 
 ssh -i "D2L_key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com
 ```
 
-
 When the command line prompts "Are you sure you want to continue connecting (yes/no)", enter "yes" and press Enter to log into the instance.
 
 Your server is ready now.
@@ -135,7 +134,6 @@ Before installing CUDA, be sure to update the instance with the latest drivers.
 ```bash
 sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
-
 
 Here we download CUDA 10.1. Visit NVIDIA's [official repository](https://developer.nvidia.com/cuda-downloads) to find the download link of CUDA 10.1 as shown in :numref:`fig_cuda`.
 
@@ -157,20 +155,17 @@ sudo apt-get update
 sudo apt-get -y install cuda
 ```
 
-
 After installing the program, run the following command to view the GPUs.
 
 ```bash
 nvidia-smi
 ```
 
-
 Finally, add CUDA to the library path to help other libraries find it.
 
 ```bash
 echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64" >> ~/.bashrc
 ```
-
 
 ## Installing MXNet and Downloading the D2L Notebooks
 
@@ -186,14 +181,12 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 sh Miniconda3-latest-Linux-x86_64.sh -b
 ```
 
-
 After the Miniconda installation, run the following command to activate CUDA and conda.
 
 ```bash
 ~/miniconda3/bin/conda init
 source ~/.bashrc
 ```
-
 
 Next, download the code for this book.
 
@@ -204,13 +197,11 @@ curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
-
 Then create the conda `d2l` environment and enter `y` to proceed with the installation.
 
 ```bash
 conda create --name d2l -y
 ```
-
 
 After creating the `d2l` environment, activate it and install `pip`.
 
@@ -219,15 +210,12 @@ conda activate d2l
 conda install python=3.7 pip -y
 ```
 
-
 Finally, install MXNet and the `d2l` package. The postfix `cu101` means that this is the CUDA 10.1 variant. For different versions, say only CUDA 10.0, you would want to choose `cu100` instead.
 
 ```bash
 pip install mxnet-cu101==1.6.0
 pip install git+https://github.com/d2l-ai/d2l-en
-
 ```
-
 
 You can quickly test whether everything went well as follows:
 
@@ -236,7 +224,6 @@ $ python
 >>> from mxnet import np, npx
 >>> np.zeros((1024, 1024), ctx=npx.gpu())
 ```
-
 
 ## Running Jupyter
 
@@ -248,7 +235,6 @@ ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com -L 8
 conda activate d2l
 jupyter notebook
 ```
-
 
 :numref:`fig_jupyter` shows the possible output after you run Jupyter Notebook. The last row is the URL for port 8888.
 

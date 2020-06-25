@@ -767,7 +767,6 @@ such as weight decay and dropout.
 1. What degree of polynomial do you need to reduce the training error to 0?
 1. Can you ever expect to see 0 generalization error?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/96)
 :end_tab:

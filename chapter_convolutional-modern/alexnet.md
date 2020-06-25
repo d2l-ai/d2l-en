@@ -311,7 +311,6 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
         nn.Dense(10))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
@@ -345,7 +344,6 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.randn(1, 1, 224, 224)
@@ -372,7 +370,6 @@ batch_size = 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 batch_size = 128
@@ -391,7 +388,6 @@ the higher image resolution and the more costly convolutions.
 lr, num_epochs = 0.01, 10
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
-
 
 ```{.python .input}
 #@tab pytorch

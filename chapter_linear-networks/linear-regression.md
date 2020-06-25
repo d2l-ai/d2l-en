@@ -392,7 +392,7 @@ b = tf.ones(n)
 %matplotlib inline
 from d2l import jax as d2l
 import math
-import numpy as np
+import jax.numpy as np
 import time
 
 n = 10000

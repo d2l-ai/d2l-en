@@ -23,4 +23,3 @@ neural-style
 kaggle-cifar10
 kaggle-dog
 ```
-

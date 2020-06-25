@@ -99,7 +99,6 @@ To run the programs in this section,
 you need at least two GPUs.
 :end_tab:
 
-
 Note that this might be extravagant for most desktop computers
 but it is easily available in the cloud, e.g.,
 by using the AWS EC2 multi-GPU instances.
@@ -139,7 +138,6 @@ and the corresponding memory.
 If there are multiple GPUs, we use `torch.cuda.device(f'cuda{i}')`
 to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0).
 Also, `gpu:0` and `gpu` are equivalent.
-
 :end_tab:
 
 ```{.python .input}
@@ -311,7 +309,6 @@ with try_gpu(1):
 y
 ```
 
-
 ### Copying
 
 If we want to compute $\mathbf{x} + \mathbf{y}$,
@@ -366,14 +363,12 @@ y + z
 y + z
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 y + z
 ```
 
 :begin_tab:`mxnet`
-
 Imagine that your variable `z` already lives on your second GPU.
 What happens if we call still `z.copyto(gpu(1))`?
 It will make a copy and allocate new memory,

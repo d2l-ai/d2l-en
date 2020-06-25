@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from IPython import display
 import math
 import jax
-from jax import numpy as np
+import jax.numpy as np
 import numpy as onp
 import os
 import pandas as pd
@@ -21,6 +21,7 @@ import tarfile
 import time
 import zipfile
 import requests
+d2l = sys.modules[__name__]
 
 
 # Defined in file: ./chapter_preliminaries/pandas.md
@@ -121,12 +122,12 @@ class Timer:  #@save
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def synthetic_data(w, b, num_examples):  #@save
+def synthetic_data(w, b, num_examples, rng_key):  #@save
     """Generate y = X w + b + noise."""
-    X = random.normal(key, (num_examples, len(w)))
+    X = jax.random.normal(rng_key, (num_examples, len(w)))
     y = np.dot(X, w) + b
-    y += random.normal(key, (y.shape)) * 0.01 # Jax.random only has a standard normal sampler so we need to scale,
-                                              # See explanation below
+    y += jax.random.normal(rng_key, (y.shape)) * 0.01 # Jax.random only has a standard normal sampler so we need to scale,
+                                                  # See explanation below
     return X, y
 
 
@@ -187,13 +188,28 @@ def data_loader(data, targets, b_size, rng_key): #@save
         targets = targets[..., None]
     while True:
         # Generate new subkey every time to not sample the same minibatch data over and over
-        rng_key, subkey = random.split(rng_key)
-        data = random.permutation(subkey, data)
-        targets = random.permutation(subkey, targets) # Shuffle data and targets in unison by using the same key
+        rng_key, subkey = jax.random.split(rng_key)
+        data = jax.random.permutation(subkey, data)
+        targets = jax.random.permutation(subkey, targets) # Shuffle data and targets in unison by using the same key
 
         n_samples = data.shape[0]
         idxs = onp.random.choice(n_samples, size=batch_size, replace=False)
         yield data[idxs], targets[idxs]
     
+
+
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+def load_data_fashion_mnist(batch_size, resize=None): #@save
+    """Download the Fashion-MNIST dataset and then load into memory."""
+    # TODO: Resize
+    rng_key = jax.random.PRNGKey(24)
+    fashion_mnist = fetch_openml(name="Fashion-MNIST")
+    mnist_train_x, mnist_test_x, mnist_train_y, mnist_test_y = train_test_split(fashion_mnist['data'],
+                                                                            fashion_mnist['target'],
+                                                                            test_size=10000,
+                                                                         )
+    return (
+        data_loader(mnist_train_x, mnist_train_y, batch_size, rng_key), data_loader(
+        mnist_test_x, mnist_test_y, batch_size, rng_key))
 
 

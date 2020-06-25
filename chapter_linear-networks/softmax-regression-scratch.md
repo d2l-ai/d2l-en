@@ -230,7 +230,6 @@ def net(X):
     return softmax(tf.matmul(tf.cast(tf.reshape(X, shape=(-1, W.shape[0])), dtype=tf.float32), W) + b)
 ```
 
-
 ## The Loss Function
 
 Next, we need to implement the cross-entropy loss function,
@@ -678,7 +677,6 @@ def predict_ch3(net, test_iter, n=6):  #@save
 predict_ch3(net, test_iter)
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 def predict_ch3(net, test_iter, n=6):  #@save
@@ -708,7 +706,6 @@ have similar training procedures.
 1. What solutions you can think of to fix the two problems above?
 1. Is it always a good idea to return the most likely label. E.g., would you do this for medical diagnosis?
 1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/50)
