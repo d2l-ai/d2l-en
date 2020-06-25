@@ -60,7 +60,6 @@ def nin_block(num_channels, kernel_size, strides, padding):
     return blk
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
@@ -75,7 +74,6 @@ def nin_block(in_channels, out_channels, kernel_size, strides, padding):
         nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU())
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 from d2l import tensorflow as d2l
@@ -83,9 +81,12 @@ import tensorflow as tf
 
 def nin_block(num_channels, kernel_size, strides, padding):
     return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(num_channels, kernel_size, strides=strides, padding=padding, activation='relu'),
-        tf.keras.layers.Conv2D(num_channels, kernel_size=1, activation='relu'),
-        tf.keras.layers.Conv2D(num_channels, kernel_size=1, activation='relu')])
+        tf.keras.layers.Conv2D(num_channels, kernel_size, strides=strides,
+                               padding=padding, activation='relu'),
+        tf.keras.layers.Conv2D(num_channels, kernel_size=1,
+                               activation='relu'),
+        tf.keras.layers.Conv2D(num_channels, kernel_size=1,
+                               activation='relu')])
 ```
 
 ## NiN Model
@@ -124,7 +125,6 @@ net.add(nin_block(96, kernel_size=11, strides=4, padding=0),
         # with a shape of (batch size, 10)
         nn.Flatten())
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -169,7 +169,6 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.rand(size=(1, 1, 224, 224))
@@ -197,7 +196,6 @@ lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
