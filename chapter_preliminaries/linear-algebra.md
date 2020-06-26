@@ -171,7 +171,7 @@ len(x)
 
 ```{.python .input}
 #@tab tensorflow
-tf.size(x)  # TensorFlow doesn't have a len function.
+tf.size(x)  # TensorFlow doesn't have a `len` function.
 ```
 
 When a tensor represents a vector (with precisely one axis),
@@ -549,17 +549,17 @@ Reducing a matrix along both rows and columns via summation
 is equivalent to summing up all the elements of the matrix.
 
 ```{.python .input}
-A.sum(axis=[0, 1])  # Same as A.sum()
+A.sum(axis=[0, 1])  # Same as `A.sum()`
 ```
 
 ```{.python .input}
 #@tab pytorch
-A.sum(axis=[0, 1])  # Same as A.sum()
+A.sum(axis=[0, 1])  # Same as `A.sum()`
 ```
 
 ```{.python .input}
 #@tab tensorflow
-tf.reduce_sum(A, axis=[0, 1])  # Same as tf.reduce_sum(A)
+tf.reduce_sum(A, axis=[0, 1])  # Same as `tf.reduce_sum(A)`
 ```
 
 A related quantity is the *mean*, which is also called the *average*.

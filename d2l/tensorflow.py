@@ -478,9 +478,10 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
             batch_size = next(iter(self.train_iter))[0].shape[0]
             num_examples = batch_size * tf.data.experimental.cardinality(
                 self.train_iter).numpy()
-            print('loss %.3f, train acc %.3f, test acc %.3f' % metrics)
-            print('%.1f examples/sec on %s' % (
-                num_examples/self.timer.avg(), self.device_name))
+            print(f'loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '
+                  f'test acc {metrics[2]:.3f}')
+            print(f'{num_examples / self.timer.avg():.1f} examples/sec on 
+                  f'{str(self.device_name)}')
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md

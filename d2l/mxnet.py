@@ -451,7 +451,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
             timer.start()
-            # Here is the only difference compared to train_epoch_ch3
+            # Here is the only difference compared with `d2l.train_epoch_ch3`
             X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
             with autograd.record():
                 y_hat = net(X)
@@ -466,9 +466,10 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_loss, train_acc, test_acc))
-    print('%.1f examples/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
+    print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(ctx)}')
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
@@ -1371,10 +1372,10 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                               None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)
         animator.add(epoch + 1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        metric[0] / metric[2], metric[1] / metric[3], test_acc))
-    print('%.1f examples/sec on %s' % (
-        metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'loss {metric[0] / metric[2]:.3f}, train acc '
+          f'{metric[1] / metric[3]:.3f}, test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec on '
+          f'{str(ctx_list)}')
 
 
 # Defined in file: ./chapter_computer-vision/fine-tuning.md
@@ -1453,9 +1454,9 @@ def read_voc_images(voc_dir, is_train=True):
     features, labels = [], []
     for i, fname in enumerate(images):
         features.append(image.imread(os.path.join(
-            voc_dir, 'JPEGImages', '%s.jpg' % fname)))
+            voc_dir, 'JPEGImages', f'{fname}.jpg')))
         labels.append(image.imread(os.path.join(
-            voc_dir, 'SegmentationClass', '%s.png' % fname)))
+            voc_dir, 'SegmentationClass', f'{fname}.png')))
     return features, labels
 
 

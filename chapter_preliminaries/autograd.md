@@ -72,8 +72,7 @@ with respect to a vector $\mathbf{x}$
 is itself vector-valued and has the same shape as $\mathbf{x}$.
 
 ```{.python .input}
-# We allocate memory for a tensor's gradient by invoking its `attach_grad`
-# method
+# We allocate memory for a tensor's gradient by invoking `attach_grad`
 x.attach_grad()
 # After we calculate a gradient taken with respect to `x`, we will be able to
 # access it via the `grad` attribute, whose values are initialized with 0s
@@ -180,7 +179,7 @@ x.grad
 #@tab tensorflow
 with tf.GradientTape() as t:
     y = tf.reduce_sum(x)
-t.gradient(y, x)  # Overwritten by the newly calculated gradient.
+t.gradient(y, x)  # Overwritten by the newly calculated gradient
 ```
 
 ## Backward for Non-Scalar Variables
@@ -267,7 +266,7 @@ x.grad == u
 
 ```{.python .input}
 #@tab tensorflow
-# Set the persistent=True to run t.gradient more than once.
+# Set the persistent=True to run t.gradient more than once
 with tf.GradientTape(persistent=True) as t:
     y = x * x
     u = tf.stop_gradient(y)

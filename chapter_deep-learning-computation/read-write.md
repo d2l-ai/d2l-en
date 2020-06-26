@@ -38,7 +38,7 @@ from torch import nn
 from torch.nn import functional as F
 
 x = torch.arange(4)
-torch.save(x,"x-file")
+torch.save(x, 'x-file')
 ```
 
 ```{.python .input}
@@ -47,7 +47,7 @@ import tensorflow as tf
 import numpy as np
 
 x = tf.constant(range(4))
-np.save("x-file.npy", x)
+np.save('x-file.npy', x)
 ```
 
 We can now read this data from the stored file back into memory.
@@ -65,7 +65,7 @@ x2
 
 ```{.python .input}
 #@tab tensorflow
-x2 = np.load("x-file.npy", allow_pickle=True)
+x2 = np.load('x-file.npy', allow_pickle=True)
 x2
 ```
 

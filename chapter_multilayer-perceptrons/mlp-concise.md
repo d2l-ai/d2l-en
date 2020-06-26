@@ -62,13 +62,12 @@ def init_weights(m):
 net.apply(init_weights)
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 net = tf.keras.models.Sequential([
-	tf.keras.layers.Flatten(),
-	tf.keras.layers.Dense(256, activation='relu'),
-	tf.keras.layers.Dense(10)])
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(256, activation='relu'),
+    tf.keras.layers.Dense(10)])
 ```
 
 The training loop is *exactly* the same

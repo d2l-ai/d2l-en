@@ -238,7 +238,8 @@ b = torch.zeros(1, requires_grad=True)
 
 ```{.python .input}
 #@tab tensorflow
-w = tf.Variable(tf.random.normal(shape=(2, 1), mean=0, stddev=0.01), trainable=True)
+w = tf.Variable(tf.random.normal(shape=(2, 1), mean=0, stddev=0.01),
+                trainable=True)
 b = tf.Variable(tf.zeros(1), trainable=True)
 ```
 
@@ -412,7 +413,8 @@ loss = squared_loss
 for epoch in range(num_epochs):
     for X, y in data_iter(batch_size, features, labels):
         l = loss(net(X, w, b), y)  # Minibatch loss in `X` and `y`
-        l.sum().backward()  # Compute gradient on `l` with respect to [`w`, `b`]
+        # Compute gradient on `l` with respect to [`w`, `b`]
+        l.sum().backward()
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     with torch.no_grad():
         train_l = loss(net(features, w, b), labels)
@@ -432,7 +434,8 @@ for epoch in range(num_epochs):
             l = loss(net(X, w, b), y)  # Minibatch loss in `X` and `y`
         # Compute gradient on l with respect to [`w`, `b`]
         dw, db = g.gradient(l, [w, b])
-        sgd([w, b], [dw, db], lr, batch_size)  # Update parameters using their gradient
+        # Update parameters using their gradient
+        sgd([w, b], [dw, db], lr, batch_size)
     train_l = loss(net(features, w, b), labels)
     print(f'epoch {epoch + 1}, loss {float(tf.reduce_mean(train_l)):f}')
 ```

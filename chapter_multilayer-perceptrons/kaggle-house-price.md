@@ -181,7 +181,7 @@ we can install pandas without even leaving the notebook.
 
 ```{.python .input}
 # If pandas is not installed, please uncomment the following line:
-# !pip install pandas
+# `!pip install pandas`
 
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -194,7 +194,7 @@ npx.set_np()
 ```{.python .input}
 #@tab pytorch
 # If pandas is not installed, please uncomment the following line:
-# !pip install pandas
+# `!pip install pandas`
 
 %matplotlib inline
 from d2l import torch as d2l
@@ -207,7 +207,7 @@ import numpy as np
 ```{.python .input}
 #@tab tensorflow
 # If pandas is not installed, please uncomment the following line:
-# !pip install pandas
+# `!pip install pandas`
 
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -316,7 +316,7 @@ Pandas does this automatically for us.
 
 ```{.python .input}
 #@tab all
-# Dummy_na=True refers to a missing value being a legal eigenvalue, and
+# `Dummy_na=True` refers to a missing value being a legal eigenvalue, and
 # creates an indicative feature for it
 all_features = pd.get_dummies(all_features, dummy_na=True)
 all_features.shape
@@ -627,8 +627,8 @@ def k_fold(k, X_train, y_train, num_epochs,
             d2l.plot(list(range(1, num_epochs+1)), [train_ls, valid_ls],
                      xlabel='epoch', ylabel='rmse',
                      legend=['train', 'valid'], yscale='log')
-        print('fold %d, train rmse: %f, valid rmse: %f' % (
-            i, train_ls[-1], valid_ls[-1]))
+        print(f'fold {i}, train rmse {train_ls[-1]:f}, '
+              f'valid rmse {valid_ls[-1]:f}')
     return train_l_sum / k, valid_l_sum / k
 ```
 
@@ -651,8 +651,8 @@ performance is no longer representative of the true error.
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
 train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
                           weight_decay, batch_size)
-print('%d-fold validation: avg train rmse: %f, avg valid rmse: %f'
-      % (k, train_l, valid_l))
+print(f'{k}-fold validation: avg train rmse: {train_l:f}, '
+      f'avg valid rmse: {valid_l:f}')
 ```
 
 Notice that someimes the number of training errors
@@ -685,7 +685,7 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
                         num_epochs, lr, weight_decay, batch_size)
     d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',
              ylabel='rmse', yscale='log')
-    print('train rmse %f' % train_ls[-1])
+    print(f'train rmse {train_ls[-1]:f}')
     # Apply the network to the test set
     preds = d2l.numpy(net(test_features))
     # Reformat it for export to Kaggle
