@@ -378,7 +378,7 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
                 self.train_iter).numpy()
             print(f'loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '
                   f'test acc {metrics[2]:.3f}')
-            print(f'{num_examples / self.timer.avg():.1f} examples/sec on 
+            print(f'{num_examples / self.timer.avg():.1f} examples/sec on '
                   f'{str(self.device_name)}')
 
 #@save
