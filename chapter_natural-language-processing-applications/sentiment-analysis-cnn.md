@@ -62,9 +62,9 @@ Now, we reproduce the results of the one-dimensional cross-correlation operation
 
 ```{.python .input  n=4}
 def corr1d_multi_in(X, K):
-    # First, we traverse along the 0th dimension (channel dimension) of X and
-    # K. Then, we add them together by using * to turn the result list into a
-    # positional argument of the add_n function
+    # First, we traverse along the 0th dimension (channel dimension) of `X`
+    # and `K`. Then, we add them together by using * to turn the result list
+    # into a positional argument of the `add_n` function
     return sum(corr1d(x, k) for x, k in zip(X, K))
 
 X = np.array([[0, 1, 2, 3, 4, 5, 6],
@@ -129,7 +129,7 @@ class TextCNN(nn.Block):
 
     def forward(self, inputs):
         # Concatenate the output of two embedding layers with shape of
-        # (batch size, number of words, word vector dimension) by word vector
+        # (batch size, no. of words, word vector dimension) by word vector
         embeddings = np.concatenate((
             self.embedding(inputs), self.constant_embedding(inputs)), axis=2)
         # According to the input format required by Conv1D, the word vector

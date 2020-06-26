@@ -133,8 +133,8 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
             if (i+1) % 50 == 0:
                 animator.add(epoch+(i+1)/len(data_iter),
                              (metric[0]/metric[1],))
-    print('loss %.3f, %d tokens/sec on %s ' % (
-        metric[0]/metric[1], metric[1]/timer.stop(), ctx))
+    print(f'loss {metric[0] / metric[1]:.3f}, '
+          f'{metric[1] / timer.stop():.1f} tokens/sec on {str(ctx)}')
 ```
 
 Now, we can train a skip-gram model using negative sampling.
@@ -156,7 +156,7 @@ def get_similar_tokens(query_token, k, embed):
     cos = np.dot(W, x) / np.sqrt(np.sum(W * W, axis=1) * np.sum(x * x) + 1e-9)
     topk = npx.topk(cos, k=k+1, ret_typ='indices').asnumpy().astype('int32')
     for i in topk[1:]:  # Remove the input words
-        print('cosine sim=%.3f: %s' % (cos[i], (vocab.idx_to_token[i])))
+        print(f'cosine sim={float(cos[i]):.3f}: {vocab.idx_to_token[i]}')
 
 get_similar_tokens('chip', 3, net[0])
 ```

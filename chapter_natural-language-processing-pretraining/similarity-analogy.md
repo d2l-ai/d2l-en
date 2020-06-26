@@ -28,19 +28,19 @@ Here we consider one English version (300-dimensional "wiki.en") that can be dow
 ```{.python .input  n=35}
 #@save
 d2l.DATA_HUB['glove.6b.50d'] = (d2l.DATA_URL + 'glove.6B.50d.zip',
-                       '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
+                                '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
 
 #@save
 d2l.DATA_HUB['glove.6b.100d'] = (d2l.DATA_URL + 'glove.6B.100d.zip',
-                       'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
+                                 'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
 
 #@save
 d2l.DATA_HUB['glove.42b.300d'] = (d2l.DATA_URL + 'glove.42B.300d.zip',
-                       'b5116e234e9eb9076672cfeabf5469f3eec904fa')
+                                  'b5116e234e9eb9076672cfeabf5469f3eec904fa')
 
 #@save
 d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
-                       'c1816da3821ae9f43899be655002f6c723e91b88')
+                           'c1816da3821ae9f43899be655002f6c723e91b88')
 ```
 
 We define the following `TokenEmbedding` class to load the above pretrained Glove and fastText embeddings.
@@ -126,10 +126,9 @@ Then, we search for synonyms by pre-training the word vector instance `embed`.
 
 ```{.python .input}
 def get_similar_tokens(query_token, k, embed):
-    topk, cos = knn(embed.idx_to_vec,
-                    embed[[query_token]], k+1)
+    topk, cos = knn(embed.idx_to_vec, embed[[query_token]], k + 1)
     for i, c in zip(topk[1:], cos[1:]):  # Remove input words
-        print('cosine sim=%.3f: %s' % (c, (embed.idx_to_token[int(i)])))
+        print(f'cosine sim={float(c):.3f}: {embed.idx_to_token[int(i)]}')
 ```
 
 The dictionary of pretrained word vector instance `glove_6b50d` already created contains 400,000 words and a special unknown token. Excluding input words and unknown words, we search for the three words that are the most similar in meaning to "chip".

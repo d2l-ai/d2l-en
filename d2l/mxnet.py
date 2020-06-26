@@ -350,9 +350,9 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
     """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
     url, sha1_hash = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)    
+    d2l.mkdir_if_not_exist(cache_dir)
     fname = os.path.join(cache_dir, url.split('/')[-1])
-    if os.path.exists(fname):        
+    if os.path.exists(fname):
         sha1 = hashlib.sha1()
         with open(fname, 'rb') as f:
             while True:
@@ -372,7 +372,7 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
 def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
     fname = download(name)
-    base_dir = os.path.dirname(fname) 
+    base_dir = os.path.dirname(fname)
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
@@ -398,7 +398,7 @@ DATA_HUB['kaggle_house_train'] = (  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_test'] = (  #@save  
+DATA_HUB['kaggle_house_test'] = (  #@save
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
@@ -1646,8 +1646,8 @@ def subsampling(sentences, vocab):
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a
-        # "central target word - context word" pair
+        # Each sentence needs at least 2 words to form a "central target word
+        # - context word" pair
         if len(line) < 2:
             continue
         centers += line
@@ -1729,22 +1729,22 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['glove.6b.50d'] = (d2l.DATA_URL + 'glove.6B.50d.zip',
-                       '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
+                                '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['glove.6b.100d'] = (d2l.DATA_URL + 'glove.6B.100d.zip',
-                       'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
+                                 'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['glove.42b.300d'] = (d2l.DATA_URL + 'glove.42B.300d.zip',
-                       'b5116e234e9eb9076672cfeabf5469f3eec904fa')
+                                  'b5116e234e9eb9076672cfeabf5469f3eec904fa')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
-                       'c1816da3821ae9f43899be655002f6c723e91b88')
+                           'c1816da3821ae9f43899be655002f6c723e91b88')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
@@ -1812,7 +1812,7 @@ class BERTEncoder(nn.Block):
 
     def forward(self, tokens, segments, valid_lens):
         # Shape of `X` remains unchanged in the following code snippet:
-        # (batch size, max sequence length, num_hiddens)
+        # (batch size, max sequence length, `num_hiddens`)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = X + self.pos_embedding.data(ctx=X.ctx)[:, :X.shape[1], :]
         for blk in self.blks:
@@ -1836,7 +1836,7 @@ class MaskLM(nn.Block):
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
         # Suppose that `batch_size` = 2, `num_pred_positions` = 3, then
-        # `batch_idx` is np.array([0, 0, 0, 1, 1, 1])
+        # `batch_idx` is `np.array([0, 0, 0, 1, 1, 1])`
         batch_idx = np.repeat(batch_idx, num_pred_positions)
         masked_X = X[batch_idx, pred_positions]
         masked_X = masked_X.reshape((batch_size, num_pred_positions, -1))
@@ -1851,7 +1851,7 @@ class NextSentencePred(nn.Block):
         self.output = nn.Dense(2)
 
     def forward(self, X):
-        # X shape: (batch size, `num_hiddens`)
+        # `X` shape: (batch size, `num_hiddens`)
         return self.output(X)
 
 
@@ -1901,7 +1901,7 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
         is_next = True
     else:
-        # paragraphs is a list of lists of lists
+        # `paragraphs` is a list of lists of lists
         next_sentence = random.choice(random.choice(paragraphs))
         is_next = False
     return sentence, next_sentence, is_next
@@ -2003,8 +2003,8 @@ def _pad_bert_inputs(examples, max_len, vocab):
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraphs, max_len):
-        # Input paragraphs[i] is a list of sentence strings representing a
-        # paragraph; while output paragraphs[i] is a list of sentences
+        # Input `paragraphs[i]` is a list of sentence strings representing a
+        # paragraph; while output `paragraphs[i]` is a list of sentences
         # representing a paragraph, where each sentence is a list of tokens
         paragraphs = [d2l.tokenize(
             paragraph, token='word') for paragraph in paragraphs]
@@ -2118,9 +2118,9 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
                 num_steps_reached = True
                 break
 
-    print('MLM loss %.3f, NSP loss %.3f'
-          % (metric[0] / metric[3], metric[1] / metric[3]))
-    print('%.1f sentence pairs/sec on %s' % (metric[2] / timer.sum(), ctx))
+    print(f'MLM loss {metric[0] / metric[3]:.3f}, '
+          f'NSP loss {metric[1] / metric[3]:.3f}')
+    print(f'{metric[2] / timer.sum():.1f} sentence pairs/sec on {str(ctx)}')
 
 
 # Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis-and-dataset.md
@@ -2242,7 +2242,7 @@ def load_data_snli(batch_size, num_steps=50):
 
 # Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-attention.md
 def split_batch_multi_inputs(X, y, ctx_list):
-    """Split multi-input X and y into multiple devices specified by ctx"""
+    """Split multi-input `X` and `y` into multiple devices."""
     X = list(zip(*[gluon.utils.split_and_load(
         feature, ctx_list, even_split=False) for feature in X]))
     return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))

@@ -129,9 +129,9 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
                 num_steps_reached = True
                 break
 
-    print('MLM loss %.3f, NSP loss %.3f'
-          % (metric[0] / metric[3], metric[1] / metric[3]))
-    print('%.1f sentence pairs/sec on %s' % (metric[2] / timer.sum(), ctx))
+    print(f'MLM loss {metric[0] / metric[3]:.3f}, '
+          f'NSP loss {metric[1] / metric[3]:.3f}')
+    print(f'{metric[2] / timer.sum():.1f} sentence pairs/sec on {str(ctx)}')
 ```
 
 We can plot both the masked language modeling loss and the next sentence prediction loss
