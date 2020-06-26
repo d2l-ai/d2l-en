@@ -83,30 +83,30 @@ class MultiHeadAttention(nn.Block):
         self.W_o = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
 
     def forward(self, query, key, value, valid_len):
-        # For self-attention, query, key, and value shape:
-        # (batch_size, seq_len, dim), where seq_len is the length of input
-        # sequence. valid_len shape is either (batch_size, ) or
-        # (batch_size, seq_len).
+        # For self-attention, `query`, `key`, and `value` shape:
+        # (`batch_size`, `seq_len`, `dim`), where `seq_len` is the length of
+        # input sequence. `valid_len` shape is either (`batch_size`, ) or
+        # (`batch_size`, `seq_len`).
 
-        # Project and transpose query, key, and value from
-        # (batch_size, seq_len, num_hiddens) to
-        # (batch_size * num_heads, seq_len, num_hiddens / num_heads).
+        # Project and transpose `query`, `key`, and `value` from
+        # (`batch_size`, `seq_len`, `num_hiddens`) to
+        # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
         query = transpose_qkv(self.W_q(query), self.num_heads)
         key = transpose_qkv(self.W_k(key), self.num_heads)
         value = transpose_qkv(self.W_v(value), self.num_heads)
 
         if valid_len is not None:
-            # Copy valid_len by num_heads times
+            # Copy `valid_len` by `num_heads` times
             if valid_len.ndim == 1:
                 valid_len = np.tile(valid_len, self.num_heads)
             else:
                 valid_len = np.tile(valid_len, (self.num_heads, 1))
 
-        # For self-attention, output shape:
-        # (batch_size * num_heads, seq_len, num_hiddens / num_heads)
+        # For self-attention, `output` shape:
+        # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
         output = self.attention(query, key, value, valid_len)
 
-        # output_concat shape: (batch_size, seq_len, num_hiddens)
+        # `output_concat` shape: (`batch_size`, `seq_len`, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 ```
@@ -116,22 +116,24 @@ Here are the definitions of the transpose functions `transpose_qkv` and `transpo
 ```{.python .input  n=3}
 #@save
 def transpose_qkv(X, num_heads):
-    # Input X shape: (batch_size, seq_len, num_hiddens).
-    # Output X shape:
-    # (batch_size, seq_len, num_heads, num_hiddens / num_heads)
+    # Input `X` shape: (`batch_size`, `seq_len`, `num_hiddens`).
+    # Output `X` shape:
+    # (`batch_size`, `seq_len`, `num_heads`, `num_hiddens` / `num_heads`)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
-    # X shape: (batch_size, num_heads, seq_len, num_hiddens / num_heads)
+    # `X` shape:
+    # (`batch_size`, `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
     X = X.transpose(0, 2, 1, 3)
 
-    # output shape: (batch_size * num_heads, seq_len, num_hiddens / num_heads)
+    # `output` shape:
+    # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
     output = X.reshape(-1, X.shape[2], X.shape[3])
     return output
 
 
 #@save
 def transpose_output(X, num_heads):
-    # A reversed version of transpose_qkv
+    # A reversed version of `transpose_qkv`
     X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
     X = X.transpose(0, 2, 1, 3)
     return X.reshape(X.shape[0], X.shape[1], -1)
@@ -186,7 +188,7 @@ layer.initialize()
 batch = nn.BatchNorm()
 batch.initialize()
 X = np.array([[1, 2], [2, 3]])
-# Compute mean and variance from X in the training mode
+# Compute mean and variance from `X` in the training mode
 with autograd.record():
     print('layer norm:', layer(X), '\nbatch norm:', batch(X))
 ```
@@ -239,7 +241,7 @@ class PositionalEncoding(nn.Block):
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
-        # Create a long enough P
+        # Create a long enough `P`
         self.P = np.zeros((1, max_len, num_hiddens))
         X = np.arange(0, max_len).reshape(-1, 1) / np.power(
             10000, np.arange(0, num_hiddens, 2) / num_hiddens)
@@ -305,7 +307,8 @@ class TransformerEncoder(d2l.Encoder):
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(
-                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout, use_bias))
+                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout,
+                             use_bias))
 
     def forward(self, X, valid_len, *args):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
@@ -335,7 +338,7 @@ During training, the output for the $t$-query could observe all the previous key
 
 ```{.python .input  n=16}
 class DecoderBlock(nn.Block):
-    # i means it is the i-th block in the decoder
+    # `i` means it is the i-th block in the decoder
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads,
                  dropout, i, **kwargs):
         super(DecoderBlock, self).__init__(**kwargs)
@@ -349,7 +352,7 @@ class DecoderBlock(nn.Block):
 
     def forward(self, X, state):
         enc_outputs, enc_valid_len = state[0], state[1]
-        # state[2][i] contains the past queries for this block
+        # `state[2][i]` contains the past queries for this block
         if state[2][self.i] is None:
             key_values = X
         else:

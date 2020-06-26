@@ -52,6 +52,7 @@ The masked softmax takes a 3-dimensional input and enables us to filter out some
 ```{.python .input  n=6}
 #@save
 def masked_softmax(X, valid_len):
+    """Perform softmax by filtering out some elements."""
     # X: 3-D tensor, valid_len: 1-D or 2-D tensor
     if valid_len is None:
         return npx.softmax(X)
@@ -71,13 +72,15 @@ def masked_softmax(X, valid_len):
 #@tab pytorch
 #@save
 def masked_softmax(X, valid_len):
+    """Perform softmax by filtering out some elements."""
     # X: 3-D tensor, valid_len: 1-D or 2-D tensor
     if valid_len is None:
         return nn.functional.softmax(X, dim=-1)
     else:
         shape = X.shape
         if valid_len.dim() == 1:
-            valid_len = torch.repeat_interleave(valid_len, repeats=shape[1], dim=0)
+            valid_len = torch.repeat_interleave(valid_len, repeats=shape[1],
+                                                dim=0)
         else:
             valid_len = valid_len.reshape(-1)
         # Fill masked elements with a large negative, whose exp is 0
@@ -131,10 +134,10 @@ class DotProductAttention(nn.Block):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # query: (batch_size, #queries, d)
-    # key: (batch_size, #kv_pairs, d)
-    # value: (batch_size, #kv_pairs, dim_v)
-    # valid_len: either (batch_size, ) or (batch_size, xx)
+    # `query`: (`batch_size`, #queries, `d`)
+    # `key`: (`batch_size`, #kv_pairs, `d`)
+    # `value`: (`batch_size`, #kv_pairs, `dim_v`)
+    # `valid_len`: either (`batch_size`, ) or (`batch_size`, xx)
     def forward(self, query, key, value, valid_len=None):
         d = query.shape[-1]
         # Set transpose_b=True to swap the last two dimensions of key
@@ -151,13 +154,13 @@ class DotProductAttention(nn.Module):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # query: (batch_size, #queries, d)
-    # key: (batch_size, #kv_pairs, d)
-    # value: (batch_size, #kv_pairs, dim_v)
-    # valid_len: either (batch_size, ) or (batch_size, xx)
+    # `query`: (`batch_size`, #queries, `d`)
+    # `key`: (`batch_size`, #kv_pairs, `d`)
+    # `value`: (`batch_size`, #kv_pairs, `dim_v`)
+    # `valid_len`: either (`batch_size`, ) or (`batch_size`, xx)
     def forward(self, query, key, value, valid_len=None):
         d = query.shape[-1]
-        # set transpose_b=True to swap the last two dimensions of key
+        # Set transpose_b=True to swap the last two dimensions of key
         scores = torch.bmm(query, key.transpose(1,2)) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
         return torch.bmm(attention_weights, value)
@@ -214,8 +217,8 @@ class MLPAttention(nn.Block):
 
     def forward(self, query, key, value, valid_len):
         query, key = self.W_q(query), self.W_k(key)
-        # Expand query to (batch_size, #querys, 1, units), and key to
-        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast
+        # Expand query to (`batch_size`, #queries, 1, units), and key to
+        # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
         features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
         features = np.tanh(features)
         scores = np.squeeze(self.v(features), axis=-1)
@@ -236,8 +239,8 @@ class MLPAttention(nn.Module):
 
     def forward(self, query, key, value, valid_len):
         query, key = self.W_k(query), self.W_q(key)
-        # expand query to (batch_size, #querys, 1, units), and key to
-        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast.
+        # Expand query to (`batch_size`, #queries, 1, units), and key to
+        # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
         features = query.unsqueeze(2) + key.unsqueeze(1)
         scores = self.v(features).squeeze(-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
@@ -256,7 +259,7 @@ atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
 #@tab pytorch
 atten = MLPAttention(key_size=2, query_size=2, units=8, dropout=0.1)
 atten.eval()
-atten(torch.ones(2,1,2), keys, values, torch.tensor([2, 6]))
+atten(torch.ones(2, 1, 2), keys, values, torch.tensor([2, 6]))
 ```
 
 ## Summary
