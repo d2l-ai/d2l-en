@@ -1185,7 +1185,7 @@ def train_2d(trainer, steps=20):
     for i in range(steps):
         x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
-        print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
+        print(f'epoch {i + 1}, x1 {x1:f}, x2 {x2:f}')
     return results
 
 
@@ -1240,12 +1240,12 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
+def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     # Initialization
     net = nn.Sequential()
     net.add(nn.Dense(1))
@@ -1267,7 +1267,7 @@ def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 
 
 # Defined in file: ./chapter_computational-performance/hybridize.md

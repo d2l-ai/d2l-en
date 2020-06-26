@@ -36,7 +36,7 @@ ctx = d2l.try_gpu()
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to "d2l.train_ch6" that defined in the lenet
+# The code is almost identical to `d2l.train_ch6` that defined in the lenet
 # section of chapter convolutional neural networks
 def train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
@@ -52,14 +52,15 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx):
             l.backward()
             trainer.step(X.shape[0])
             metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
-            train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
-            if (i+1) % 50 == 0:
-                animator.add(epoch + i/len(train_iter),
+            train_loss = metric[0] / metric[2]
+            train_acc = metric[1] / metric[2]
+            if (i + 1) % 50 == 0:
+                animator.add(epoch + i / len(train_iter),
                              (train_loss, train_acc, None))
         test_acc = d2l.evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch+1, (None, None, test_acc))
-    print('train loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_loss, train_acc, test_acc))
+        animator.add(epoch + 1, (None, None, test_acc))
+    print(f'train loss {train_loss:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
 ```
 
 Let us have a look at what happens if we invoke this algorithm with default settings, such as a learning rate of $0.3$ and train for $30$ iterations. Note how the training accuracy keeps on increasing while progress in terms of test accuracy stalls beyond a point. The gap between both curves indicates overfitting.
@@ -77,7 +78,7 @@ One way of adjusting the learning rate is to set it explicitly at each step. Thi
 
 ```{.python .input}
 trainer.set_learning_rate(0.1)
-print('Learning rate is now %.2f' % trainer.learning_rate)
+print(f'learning rate is now {trainer.learning_rate:.2f}')
 ```
 
 More generally we want to define a scheduler. When invoked with the number of updates it returns the appropriate value of the learning rate. Let us define a simple one that sets the learning rate to $\eta = \eta_0 (t + 1)^{-\frac{1}{2}}$.

@@ -73,7 +73,7 @@ d2l.train_ch11(adam, init_adam_states(feature_dim),
 A more concise implementation is straightforward since `adam` is one of the algorithms provided as part of the Gluon `trainer` optimization library. Hence we only need to pass configuration parameters for an implementation in Gluon.
 
 ```{.python .input  n=11}
-d2l.train_gluon_ch11('adam', {'learning_rate': 0.01}, data_iter)
+d2l.train_concise_ch11('adam', {'learning_rate': 0.01}, data_iter)
 ```
 
 ## Yogi
