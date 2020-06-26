@@ -329,7 +329,7 @@ PyTorch's `nn.init` module provides a variety
 of preset initialization methods.
 :end_tab:
 
-:begin_tab:`pytorch`
+:begin_tab:`tensorflow`
 By default, Keras initializes weight matrices uniformly by drawing from a range that is computed according to the input and output dimension, and the bias parameters are all set to $0$.
 TensorFlow provides a variety of initialization methods both in the root module and the `keras.initializers` module. :end_tab:
 
@@ -341,15 +341,14 @@ The code below initializes all weight parameters
 as Gaussian random variables 
 with standard deviation $.01$, while bias parameters set to 0.
 
-```python
+```{.python .input}
 # force_reinit ensures that variables are freshly initialized
 # even if they were already initialized previously
 net.initialize(init=init.Normal(sigma=0.01), force_reinit=True)
 net[0].weight.data()[0]
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch 
 def init_normal(m):
     if type(m) == nn.Linear:
@@ -358,7 +357,6 @@ def init_normal(m):
 net.apply(init_normal)    
 net[0].weight.data[0], net[0].bias.data[0]
 ```
-
 
 ```{.python .input}
 #@tab tensorflow 
@@ -377,22 +375,20 @@ net.weights[0], net.weights[1]
 We can also initialize all parameters 
 to a given constant value (say, $1$).
 
-```python
+```{.python .input}
 net.initialize(init=init.Constant(1), force_reinit=True)
 net[0].weight.data()[0]
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
-def init_normal(m):
+def init_constant(m):
     if type(m) == nn.Linear:
         nn.init.constant_(net[0].weight, 1)
         nn.init.zeros_(net[0].bias)
-net.apply(init_normal)    
+net.apply(init_constant)    
 net[0].weight.data[0], net[0].bias.data[0]
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -415,15 +411,14 @@ with the `Xavier` initializer
 and initialize the second layer 
 to a constant value of 42.
 
-```python
+```{.python .input}
 net[0].weight.initialize(init=init.Xavier(), force_reinit=True)
 net[1].initialize(init=init.Constant(42), force_reinit=True)
 print(net[0].weight.data()[0])
 print(net[1].weight.data())
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 def xavier(m):
     if type(m) == nn.Linear:
@@ -437,7 +432,6 @@ net[2].apply(init_42)
 print(net[0].weight.data[0])
 print(net[2].weight.data)
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
