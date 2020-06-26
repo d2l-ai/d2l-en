@@ -39,7 +39,7 @@ def read_time_machine():  #@save
             for line in lines]
 
 lines = read_time_machine()
-'# sentences %d' % len(lines)
+f'# sentences {len(lines)}'
 ```
 
 ## Tokenization
@@ -103,7 +103,6 @@ def count_corpus(sentences):  #@save
     return collections.Counter(tokens)
 ```
 
-
 We construct a vocabulary with the time machine dataset as the corpus, and then print the map between a few tokens and their indices.
 
 ```{.python .input}
@@ -113,7 +112,6 @@ print(list(vocab.token_to_idx.items())[0:10])
 ```
 
 After that, we can convert each sentence into a list of numerical indices. To illustrate in detail, we print two sentences with their corresponding indices.
-
 
 ```{.python .input}
 #@tab all
@@ -125,7 +123,6 @@ for i in range(8, 10):
 ## Putting All Things Together
 
 Using the above functions, we package everything into the `load_corpus_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of the time machine corpus. The modification we did here is that `corpus` is a single list, not a list of token lists, since we do not keep the sequence information in the following models. Besides, we use character tokens to simplify the training in later sections.
-
 
 ```{.python .input}
 #@tab all

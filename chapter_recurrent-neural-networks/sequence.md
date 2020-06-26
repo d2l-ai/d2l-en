@@ -254,7 +254,7 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
 
 steps = (4, 8, 16, 32)
 d2l.plot([time[i:T-k+i] for i in steps], [features[i] for i in steps],
-         legend=['step %d' % i for i in steps], figsize=(4.5, 2.5))
+         legend=[f'step {i}' for i in steps], figsize=(4.5, 2.5))
 ```
 
 ```{.python .input}
@@ -270,7 +270,7 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
 
 steps = (4, 8, 16, 32)
 d2l.plot([time[i:T-k+i] for i in steps], [features[i].detach() for i in steps],
-         legend=['step %d' % i for i in steps], figsize=(4.5, 2.5))
+         legend=[f'step {i}' for i in steps], figsize=(4.5, 2.5))
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.

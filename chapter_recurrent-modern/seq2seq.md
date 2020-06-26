@@ -51,13 +51,14 @@ class Seq2SeqEncoder(d2l.Encoder):
         self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
 
     def forward(self, X, *args):
-        X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
-        # RNN needs first axes to be timestep, i.e., seq_len
+        # `X` shape: (`batch_size`, `seq_len`, `embed_size`)
+        X = self.embedding(X)
+        # RNN needs first axes to be timestep, i.e., `seq_len`
         X = X.swapaxes(0, 1)
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
         out, state = self.rnn(X, state)
-        # out shape: (seq_len, batch_size, num_hiddens)
-        # state shape: (num_layers, batch_size, num_hiddens),
+        # `out` shape: (`seq_len`, `batch_size`, `num_hiddens`)
+        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`),
         # where "state" contains the hidden state and the memory cell
         return out, state
 ```
@@ -150,9 +151,9 @@ Now we can implement the masked version of the softmax cross-entropy loss. Note 
 ```{.python .input  n=9}
 #@save
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
-    # pred shape: (batch_size, seq_len, vocab_size)
-    # label shape: (batch_size, seq_len)
-    # valid_len shape: (batch_size, )
+    # `pred` shape: (`batch_size`, `seq_len`, `vocab_size`)
+    # `label` shape: (`batch_size`, `seq_len`)
+    # `valid_len` shape: (`batch_size`, )
     def forward(self, pred, label, valid_len):
         # weights shape: (batch_size, seq_len, 1)
         weights = np.expand_dims(np.ones_like(label), axis=-1)
@@ -197,8 +198,8 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
             metric.add(l.sum(), num_tokens)
         if epoch % 10 == 0:
             animator.add(epoch, (metric[0]/metric[1],))
-    print('loss %.3f, %d tokens/sec on %s ' % (
-        metric[0]/metric[1], metric[1]/timer.stop(), ctx))
+    print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
+          f'tokens/sec on {str(ctx)}')
 ```
 
 Next, we create a model instance and set hyper-parameters. Then, we can train the model.
@@ -233,7 +234,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     enc_valid_len = np.array([len(src_tokens)], ctx=ctx)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
     enc_X = np.array(src_tokens, ctx=ctx)
-    # Add the batch_size dimension
+    # Add the  batch size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)

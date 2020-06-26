@@ -579,13 +579,13 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
     random.shuffle(example_indices)
 
     def data(pos):
-        # This returns a sequence of the length num_steps starting from pos
+        # This returns a sequence of length `num_steps` starting from `pos`
         return corpus[pos: pos + num_steps]
 
     # Discard half empty batches
     num_batches = num_examples // batch_size
     for i in range(0, batch_size * num_batches, batch_size):
-        # Batch_size indicates the random examples read each time
+        # `batch_size` indicates the random examples read each time
         batch_indices = example_indices[i:(i+batch_size)]
         X = [data(j) for j in batch_indices]
         Y = [data(j + 1) for j in batch_indices]
@@ -596,7 +596,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
-    # Slice out data - ignore num_steps and just wrap around
+    # Slice out data: ignore `num_steps` and just wrap around
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
     Xs = np.array(corpus[offset:offset+num_indices])
     Ys = np.array(corpus[offset+1:offset+1+num_indices])
@@ -729,7 +729,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
         if epoch % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch+1, [ppl])
-    print('Perplexity %.1f, %d tokens/sec on %s' % (ppl, speed, ctx))
+    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(ctx)}')
     print(predict('time traveller'))
     print(predict('traveller'))
 
@@ -745,9 +745,9 @@ class RNNModel(nn.Block):
     def forward(self, inputs, state):
         X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
-        # The fully connected layer will first change the shape of Y to
-        # (num_steps * batch_size, num_hiddens). Its output shape is
-        # (num_steps * batch_size, vocab_size).
+        # The fully connected layer will first change the shape of `Y` to
+        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
+        # (`num_steps` * `batch_size`, `vocab_size`).
         output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 
@@ -872,13 +872,14 @@ class Seq2SeqEncoder(d2l.Encoder):
         self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
 
     def forward(self, X, *args):
-        X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
-        # RNN needs first axes to be timestep, i.e., seq_len
+        # `X` shape: (`batch_size`, `seq_len`, `embed_size`)
+        X = self.embedding(X)
+        # RNN needs first axes to be timestep, i.e., `seq_len`
         X = X.swapaxes(0, 1)
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
         out, state = self.rnn(X, state)
-        # out shape: (seq_len, batch_size, num_hiddens)
-        # state shape: (num_layers, batch_size, num_hiddens),
+        # `out` shape: (`seq_len`, `batch_size`, `num_hiddens`)
+        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`),
         # where "state" contains the hidden state and the memory cell
         return out, state
 
@@ -906,9 +907,9 @@ class Seq2SeqDecoder(d2l.Decoder):
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
-    # pred shape: (batch_size, seq_len, vocab_size)
-    # label shape: (batch_size, seq_len)
-    # valid_len shape: (batch_size, )
+    # `pred` shape: (`batch_size`, `seq_len`, `vocab_size`)
+    # `label` shape: (`batch_size`, `seq_len`)
+    # `valid_len` shape: (`batch_size`, )
     def forward(self, pred, label, valid_len):
         # weights shape: (batch_size, seq_len, 1)
         weights = np.expand_dims(np.ones_like(label), axis=-1)
@@ -940,8 +941,8 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
             metric.add(l.sum(), num_tokens)
         if epoch % 10 == 0:
             animator.add(epoch, (metric[0]/metric[1],))
-    print('loss %.3f, %d tokens/sec on %s ' % (
-        metric[0]/metric[1], metric[1]/timer.stop(), ctx))
+    print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
+          f'tokens/sec on {str(ctx)}')
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
@@ -951,7 +952,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     enc_valid_len = np.array([len(src_tokens)], ctx=ctx)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
     enc_X = np.array(src_tokens, ctx=ctx)
-    # Add the batch_size dimension
+    # Add the  batch size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
