@@ -969,6 +969,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
 
 # Defined in file: ./chapter_attention-mechanisms/attention.md
 def masked_softmax(X, valid_len):
+    """Perform softmax by filtering out some elements."""
     # X: 3-D tensor, valid_len: 1-D or 2-D tensor
     if valid_len is None:
         return npx.softmax(X)
@@ -990,10 +991,10 @@ class DotProductAttention(nn.Block):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # query: (batch_size, #queries, d)
-    # key: (batch_size, #kv_pairs, d)
-    # value: (batch_size, #kv_pairs, dim_v)
-    # valid_len: either (batch_size, ) or (batch_size, xx)
+    # `query`: (`batch_size`, #queries, `d`)
+    # `key`: (`batch_size`, #kv_pairs, `d`)
+    # `value`: (`batch_size`, #kv_pairs, `dim_v`)
+    # `valid_len`: either (`batch_size`, ) or (`batch_size`, xx)
     def forward(self, query, key, value, valid_len=None):
         d = query.shape[-1]
         # Set transpose_b=True to swap the last two dimensions of key
@@ -1015,8 +1016,8 @@ class MLPAttention(nn.Block):
 
     def forward(self, query, key, value, valid_len):
         query, key = self.W_q(query), self.W_k(key)
-        # Expand query to (batch_size, #querys, 1, units), and key to
-        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast
+        # Expand query to (`batch_size`, #queries, 1, units), and key to
+        # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
         features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
         features = np.tanh(features)
         scores = np.squeeze(self.v(features), axis=-1)
@@ -1036,45 +1037,47 @@ class MultiHeadAttention(nn.Block):
         self.W_o = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
 
     def forward(self, query, key, value, valid_len):
-        # For self-attention, query, key, and value shape:
-        # (batch_size, seq_len, dim), where seq_len is the length of input
-        # sequence. valid_len shape is either (batch_size, ) or
-        # (batch_size, seq_len).
+        # For self-attention, `query`, `key`, and `value` shape:
+        # (`batch_size`, `seq_len`, `dim`), where `seq_len` is the length of
+        # input sequence. `valid_len` shape is either (`batch_size`, ) or
+        # (`batch_size`, `seq_len`).
 
-        # Project and transpose query, key, and value from
-        # (batch_size, seq_len, num_hiddens) to
-        # (batch_size * num_heads, seq_len, num_hiddens / num_heads).
+        # Project and transpose `query`, `key`, and `value` from
+        # (`batch_size`, `seq_len`, `num_hiddens`) to
+        # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
         query = transpose_qkv(self.W_q(query), self.num_heads)
         key = transpose_qkv(self.W_k(key), self.num_heads)
         value = transpose_qkv(self.W_v(value), self.num_heads)
 
         if valid_len is not None:
-            # Copy valid_len by num_heads times
+            # Copy `valid_len` by `num_heads` times
             if valid_len.ndim == 1:
                 valid_len = np.tile(valid_len, self.num_heads)
             else:
                 valid_len = np.tile(valid_len, (self.num_heads, 1))
 
-        # For self-attention, output shape:
-        # (batch_size * num_heads, seq_len, num_hiddens / num_heads)
+        # For self-attention, `output` shape:
+        # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
         output = self.attention(query, key, value, valid_len)
 
-        # output_concat shape: (batch_size, seq_len, num_hiddens)
+        # `output_concat` shape: (`batch_size`, `seq_len`, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 def transpose_qkv(X, num_heads):
-    # Input X shape: (batch_size, seq_len, num_hiddens).
-    # Output X shape:
-    # (batch_size, seq_len, num_heads, num_hiddens / num_heads)
+    # Input `X` shape: (`batch_size`, `seq_len`, `num_hiddens`).
+    # Output `X` shape:
+    # (`batch_size`, `seq_len`, `num_heads`, `num_hiddens` / `num_heads`)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
-    # X shape: (batch_size, num_heads, seq_len, num_hiddens / num_heads)
+    # `X` shape:
+    # (`batch_size`, `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
     X = X.transpose(0, 2, 1, 3)
 
-    # output shape: (batch_size * num_heads, seq_len, num_hiddens / num_heads)
+    # `output` shape:
+    # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
     output = X.reshape(-1, X.shape[2], X.shape[3])
     return output
 
@@ -1082,7 +1085,7 @@ def transpose_qkv(X, num_heads):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 def transpose_output(X, num_heads):
-    # A reversed version of transpose_qkv
+    # A reversed version of `transpose_qkv`
     X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
     X = X.transpose(0, 2, 1, 3)
     return X.reshape(X.shape[0], X.shape[1], -1)
@@ -1116,7 +1119,7 @@ class PositionalEncoding(nn.Block):
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
-        # Create a long enough P
+        # Create a long enough `P`
         self.P = np.zeros((1, max_len, num_hiddens))
         X = np.arange(0, max_len).reshape(-1, 1) / np.power(
             10000, np.arange(0, num_hiddens, 2) / num_hiddens)
@@ -1155,7 +1158,8 @@ class TransformerEncoder(d2l.Encoder):
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(
-                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout, use_bias))
+                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout,
+                             use_bias))
 
     def forward(self, X, valid_len, *args):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
@@ -1266,8 +1270,8 @@ def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
 
 
 # Defined in file: ./chapter_computational-performance/hybridize.md
-class benchmark:    
-    def __init__(self, description = 'Done in %.4f sec'):
+class Benchmark:    
+    def __init__(self, description='Done'):
         self.description = description
         
     def __enter__(self):
@@ -1275,7 +1279,7 @@ class benchmark:
         return self
 
     def __exit__(self, *args):
-        print(self.description % self.timer.stop())
+        print(f'{self.description}: {self.timer.stop():.4f} sec')
 
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md

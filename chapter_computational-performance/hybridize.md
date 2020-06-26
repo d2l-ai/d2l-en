@@ -108,8 +108,8 @@ To demonstrate the performance improvement gained by compilation we compare the 
 
 ```{.python .input}
 #@save
-class benchmark:    
-    def __init__(self, description = 'Done in %.4f sec'):
+class Benchmark:    
+    def __init__(self, description='Done'):
         self.description = description
         
     def __enter__(self):
@@ -117,19 +117,19 @@ class benchmark:
         return self
 
     def __exit__(self, *args):
-        print(self.description % self.timer.stop())
+        print(f'{self.description}: {self.timer.stop():.4f} sec')
 ```
 
 Now we can invoke the network twice, once with and once without hybridization.
 
 ```{.python .input  n=5}
 net = get_net()
-with benchmark('Without hybridization: %.4f sec'):
+with Benchmark('Without hybridization'):
     for i in range(1000): net(x)
     npx.waitall()
 
 net.hybridize()
-with benchmark('With    hybridization: %.4f sec'):
+with Benchmark('With hybridization'):
     for i in range(1000): net(x)
     npx.waitall()
 ```

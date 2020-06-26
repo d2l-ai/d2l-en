@@ -126,7 +126,7 @@ def train(num_gpus, batch_size, lr):
         timer.stop()
         animator.add(epoch + 1, (evaluate_accuracy_gpus(net, test_iter),))
     print(f'test acc: {animator.Y[0][-1]:.2f}, {timer.avg():.1f} sec/epoch '
-          f'on {ctx:s}')
+          f'on {str(ctx)}')
 ```
 
 ## Experiments
