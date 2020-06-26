@@ -72,13 +72,12 @@ train_data = d2l.CTRDataset(os.path.join(data_dir, 'train.csv'))
 test_data = d2l.CTRDataset(os.path.join(data_dir, 'test.csv'),
                            feat_mapper=train_data.feat_mapper,
                            defaults=train_data.defaults)
-num_workers = 0 if sys.platform.startswith('win') else 4
 train_iter = gluon.data.DataLoader(
     train_data, shuffle=True, last_batch='rollover', batch_size=batch_size,
-    num_workers=num_workers)
+    num_workers=d2l.get_dataloader_workers())
 test_iter = gluon.data.DataLoader(
     test_data, shuffle=False, last_batch='rollover', batch_size=batch_size,
-    num_workers=num_workers)
+    num_workers=d2l.get_dataloader_workers())
 ```
 
 ## Train the Model

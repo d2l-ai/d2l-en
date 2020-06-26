@@ -177,10 +177,9 @@ users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
     test_data, num_users, num_items, feedback="implicit")
 train_seq_data = SeqDataset(users_train, items_train, L, num_users,
                             num_items, candidates)
-num_workers = 0 if sys.platform.startswith("win") else 4
 train_iter = gluon.data.DataLoader(train_seq_data, batch_size, True,
                                    last_batch="rollover",
-                                   num_workers=num_workers)
+                                   num_workers=d2l.get_dataloader_workers())
 test_seq_iter = train_seq_data.test_seq
 train_seq_data[0]
 ```

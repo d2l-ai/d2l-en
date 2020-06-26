@@ -43,8 +43,8 @@ Let us load up the data and inspect the first five records manually. It is an ef
 ```{.python .input  n=3}
 data, num_users, num_items = read_data_ml100k()
 sparsity = 1 - len(data) / (num_users * num_items)
-print('number of users: %d, number of items: %d.' % (num_users, num_items))
-print('matrix sparsity: %f' % sparsity)
+print(f'number of users: {num_users}, number of items: {num_items}')
+print(f'matrix sparsity: {sparsity:f}')
 print(data.head(5))
 ```
 
