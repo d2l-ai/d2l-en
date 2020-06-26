@@ -46,8 +46,8 @@ torch.save(x, 'x-file')
 import tensorflow as tf
 import numpy as np
 
-x = tf.constant(range(4))
-np.save('x-file.npy', x)
+x = tf.range(4)
+np.save("x-file.npy", x)
 ```
 
 We can now read this data from the stored file back into memory.

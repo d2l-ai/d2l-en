@@ -432,7 +432,7 @@ for epoch in range(num_epochs):
 num_epochs = 3
 for epoch in range(num_epochs):
     for X, y in data_iter:
-        with tf.GradientTape(persistent=True) as tape:
+        with tf.GradientTape() as tape:
             l = loss(net(X, training=True), y)
         grads = tape.gradient(l, net.trainable_variables)
         trainer.apply_gradients(zip(grads, net.trainable_variables))

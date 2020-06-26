@@ -55,7 +55,7 @@ x
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.constant(range(4), dtype=tf.float32)
+x = tf.range(4, dtype=tf.float32)
 x
 ```
 

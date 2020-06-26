@@ -114,7 +114,7 @@ x
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.constant(range(4))
+x = tf.range(4)
 x
 ```
 
@@ -171,7 +171,7 @@ len(x)
 
 ```{.python .input}
 #@tab tensorflow
-tf.size(x)  # TensorFlow doesn't have a `len` function.
+len(x)
 ```
 
 When a tensor represents a vector (with precisely one axis),
@@ -243,7 +243,7 @@ A
 
 ```{.python .input}
 #@tab tensorflow
-A = tf.reshape(tf.constant(range(20)), (5, 4))
+A = tf.reshape(tf.range(20), (5, 4))
 A
 ```
 
@@ -367,7 +367,7 @@ X
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.reshape(tf.constant(range(24)), (2, 3, 4))
+X = tf.reshape(tf.range(24), (2, 3, 4))
 X
 ```
 
@@ -400,8 +400,8 @@ A, A + B
 
 ```{.python .input}
 #@tab tensorflow
-A = tf.reshape(tf.constant(range(20), dtype=tf.float32), (5, 4))
-B = tf.identity(A)  # Assign a copy of `A` to `B` by allocating new memory
+A = tf.reshape(tf.range(20, dtype=tf.float32), (5, 4))
+B = A  # No cloning of `A` to `B` by allocating new memory
 A, A + B
 ```
 
@@ -451,7 +451,7 @@ a + X, (a * X).shape
 ```{.python .input}
 #@tab tensorflow
 a = 2
-X = tf.reshape(tf.constant(range(24)), (2, 3, 4))
+X = tf.reshape(tf.range(24), (2, 3, 4))
 a + X, (a * X).shape
 ```
 
@@ -478,7 +478,7 @@ x, x.sum()
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.constant(range(4), dtype=tf.float32)
+x = tf.range(4, dtype=tf.float32)
 x, tf.reduce_sum(x)
 ```
 
@@ -951,7 +951,7 @@ torch.abs(u).sum()
 
 ```{.python .input}
 #@tab tensorflow
-sum(tf.abs(u))
+tf.reduce_sum(tf.abs(u))
 ```
 
 Both the $\ell_2$ norm and the $\ell_1$ norm
