@@ -127,8 +127,9 @@ before running the code of the book or updating the deep learning framework or t
 To exit the environment, run `conda deactivate`.
 
 
-:begin_tab:`mxnet,pytorch`
 ## GPU Support
+
+:begin_tab:`mxnet,pytorch`
 
 :label:`subsec_gpu`
 
