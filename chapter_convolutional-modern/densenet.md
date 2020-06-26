@@ -72,13 +72,10 @@ class ConvBlock(tf.keras.layers.Layer):
         super(ConvBlock, self).__init__()
         self.bn = tf.keras.layers.BatchNormalization()
         self.relu = tf.keras.layers.ReLU()
-        self.conv = tf.keras.layers.Conv2D(filters=num_channels,
-                                            kernel_size=(3, 3),
-                                            padding="same")
+        self.conv = tf.keras.layers.Conv2D(
+            filters=num_channels, kernel_size=(3, 3), padding='same')
         
-        self.listLayers = [self.bn,
-                           self.relu,
-                           self.conv]
+        self.listLayers = [self.bn, self.relu, self.conv]
 
     def call(self, x):
         y = x
@@ -198,11 +195,11 @@ class TransitionBlock(tf.keras.layers.Layer):
     self.relu = tf.keras.layers.ReLU()
     self.conv = tf.keras.layers.Conv2D(num_channels, kernel_size=1)
     self.avg_pool = tf.keras.layers.AvgPool2D(pool_size=2, strides=2)
-  
+
   def call(self, x):
-    x =  self.batch_norm(x)
-    x =  self.relu(x)
-    x =  self.conv(x)
+    x = self.batch_norm(x)
+    x = self.relu(x)
+    x = self.conv(x)
     return self.avg_pool(x)
 ```
 
@@ -339,9 +336,9 @@ def block_3():
   net.add(tf.keras.layers.Flatten())
   net.add(tf.keras.layers.Dense(10, activation='softmax'))
   return net
-# Recall that we define this as a function so we can reuse later
-# and run it within `tf.distribute.MirroredStrategy`'s scope to
-# utilize various computational resources, e.g. GPUs.
+# Recall that we define this as a function so we can reuse later and run it
+# within `tf.distribute.MirroredStrategy`'s scope to utilize various
+# computational resources, e.g., GPUs.
 def net():
   net = block_1()
   net = block_2()
