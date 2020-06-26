@@ -133,8 +133,8 @@ class Inception(tf.keras.Model):
     # convolutional layer
     self.p4_1 = tf.keras.layers.MaxPool2D(3, 1, padding='same')
     self.p4_2 =  tf.keras.layers.Conv2D(c1, 1, activation='relu')
- 
-  
+
+
   def call(self, x):
     p1 = self.p1_1(x)
     p2 = self.p2_2(self.p2_1(x))
@@ -179,7 +179,7 @@ b1.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3, activation='relu'),
 ```{.python .input}
 #@tab pytorch
 b1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
-                   nn.ReLU(), 
+                   nn.ReLU(),
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
 ```
 
@@ -438,4 +438,8 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/82)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/316)
 :end_tab:
