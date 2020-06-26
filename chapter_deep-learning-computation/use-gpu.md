@@ -90,10 +90,10 @@ the GPU version of PyTorch is installed.
 If a CPU version of PyTorch is already installed,
 we need to uninstall it first.
 For example, use the `pip uninstall torch` command,
-then install the corresponding MXNet version
+then install the corresponding PyTorch version
 according to your CUDA version.
 Assuming you have CUDA 9.0 installed,
-you can install the MXNet version
+you can install the PyTorch version
 that supports CUDA 9.0 via `pip install torch-cu90`.
 To run the programs in this section,
 you need at least two GPUs.
