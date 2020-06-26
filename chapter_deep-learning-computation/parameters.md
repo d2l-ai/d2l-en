@@ -331,8 +331,8 @@ of preset initialization methods.
 
 :begin_tab:`tensorflow`
 By default, Keras initializes weight matrices uniformly by drawing from a range that is computed according to the input and output dimension, and the bias parameters are all set to $0$.
-TensorFlow provides a variety of initialization methods both in the root module and the `keras.initializers` module. :end_tab:
-
+TensorFlow provides a variety of initialization methods both in the root module and the `keras.initializers` module.
+:end_tab:
 
 ### Built-in Initialization
 
@@ -466,7 +466,6 @@ $$
     \end{cases}
 \end{aligned}
 $$
-:end_tab:
 
 :begin_tab:`mxnet`
 Here we define a subclass of `Initializer`. 
