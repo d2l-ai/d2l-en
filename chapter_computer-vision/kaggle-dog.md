@@ -210,14 +210,13 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
             trainer.step(batch_size)
             train_l_sum += float(l)
             n += y.size
-        time_s = "time %.2f sec" % (time.time() - start)
+        time_s = f'time {time.time() - start:.2f} sec'
         if valid_iter is not None:
             valid_loss = evaluate_loss(valid_iter, net, ctx)
-            epoch_s = ("epoch %d, train loss %f, valid loss %f, "
-                       % (epoch + 1, train_l_sum / n, valid_loss))
+            epoch_s = (f'epoch {epoch + 1}, train loss {train_l_sum / n:f}, '
+                       f'valid loss {valid_loss:f}, ')
         else:
-            epoch_s = ("epoch %d, train loss %f, "
-                       % (epoch + 1, train_l_sum / n))
+            epoch_s = f'epoch {epoch + 1}, train loss {train_l_sum / n:f}, '
         print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
 ```
 

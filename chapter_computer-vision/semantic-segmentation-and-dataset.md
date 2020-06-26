@@ -54,9 +54,9 @@ def read_voc_images(voc_dir, is_train=True):
     features, labels = [], []
     for i, fname in enumerate(images):
         features.append(image.imread(os.path.join(
-            voc_dir, 'JPEGImages', '%s.jpg' % fname)))
+            voc_dir, 'JPEGImages', f'{fname}.jpg')))
         labels.append(image.imread(os.path.join(
-            voc_dir, 'SegmentationClass', '%s.png' % fname)))
+            voc_dir, 'SegmentationClass', f'{fname}.png')))
     return features, labels
 
 train_features, train_labels = read_voc_images(voc_dir, True)
