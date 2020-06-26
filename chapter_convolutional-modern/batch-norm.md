@@ -290,11 +290,13 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
 from d2l import tensorflow as d2l
 import tensorflow as tf
 
-# TODO: Check whether it's necessary to re-implement from scatch here.
-def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
-    return tf.nn.batch_normalization(
-        X, mean=moving_mean, variance=moving_var,
-        offset=beta, scale=gamma, variance_epsilon=eps)
+def batch_norm(X, gamma, beta, moving_mean, moving_var, eps):
+    # Compute reciprocal of square root of the moving variance element-wise
+    inv = tf.cast(tf.math.rsqrt(moving_var + eps), X.dtype)
+    # Scaling and shift
+    inv *= gamma
+    Y = X * inv + (beta - moving_mean * inv)
+    return Y
 ```
 
 We can now create a proper `BatchNorm` layer.
@@ -416,8 +418,8 @@ class BatchNorm(tf.keras.layers.Layer):
         super(BatchNorm, self).build(input_shape)
 
     def assign_moving_average(self, variable, value):
-        decay = 0.9
-        delta = variable * decay + value * (1 - decay)
+        momentum = 0.9
+        delta = variable * momentum + value * (1 - momentum)
         return variable.assign(delta)
 
     @tf.function
@@ -434,13 +436,13 @@ class BatchNorm(tf.keras.layers.Layer):
             mean, variance = batch_mean, batch_variance
         else:
             mean, variance = self.moving_mean, self.moving_variance
-        output = tf.nn.batch_normalization(
+        output = batch_norm(
             inputs,
-            mean=mean,
-            variance=variance,
-            offset=self.beta,
-            scale=self.gamma,
-            variance_epsilon=1e-5)
+            moving_mean=mean,
+            moving_var=variance,
+            beta=self.beta,
+            gamma=self.gamma,
+            eps=1e-5)
         return output
 ```
 
