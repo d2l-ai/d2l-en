@@ -21,9 +21,9 @@ help(kv)
 ```
 
 ```{.python .input  n=3}
-kv = kv.create('local') # create a local kv store.
+kv = kv.create('local')  # Create a local kv store.
 shape = (2,3)
-kv.init(3, np.ones(shape)*2)
+kv.init(3, np.ones(shape) * 2)
 a = np.zeros(shape)
 kv.pull(3, out = a)
 print(a)
@@ -35,7 +35,7 @@ For any key that has been initialized, you can push a new value with the same sh
 
 ```{.python .input  n=4}
 kv.push(3, np.ones(shape)*8)
-kv.pull(3, out = a) # pull out the value
+kv.pull(3, out = a)  # Pull out the value
 print(a.asnumpy())
 ```
 
@@ -53,7 +53,7 @@ For each push, KVStore combines the pushed value with the value stored using an 
 
 ```{.python .input  n=6}
 def update(key, input, stored):
-    print("update on key: %d" % key)
+    print(f'update on key: {key:d}')
     stored += input * 2
 kv._set_updater(update)
 kv.pull(3, out=a)

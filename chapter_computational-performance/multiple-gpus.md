@@ -201,8 +201,8 @@ def train(num_gpus, batch_size, lr):
         # Verify the model on GPU 0
         animator.add(epoch + 1, (d2l.evaluate_accuracy_gpu(
             lambda x: lenet(x, ctx_params[0]), test_iter, ctx[0]),))
-    print('test acc: %.2f, %.1f sec/epoch on %s' % (
-        animator.Y[0][-1], timer.avg(), ctx_list))
+    print(f'test acc: {animator.Y[0][-1]:.2f}, {timer.avg():.1f} sec/epoch '
+          f'on {ctx_list:s}')
 ```
 
 ## Experiment

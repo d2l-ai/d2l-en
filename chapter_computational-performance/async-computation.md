@@ -99,12 +99,12 @@ with d2l.benchmark('scalar conversion: %.4f sec'):
 On a heavily multithreaded system (even regular laptops have 4 threads or more and on multi-socket servers this number can exceed 256) the overhead of scheduling operations can become significant. This is why it is highly desirable to have computation and scheduling occur asynchronously and in parallel. To illustrate the benefit of doing this let us see what happens if we increment a variable by 1 multiple times, both in sequence or asynchronously. We simulate synchronous execution by inserting a `wait_to_read()` barrier in between each addition.
 
 ```{.python .input  n=9}
-with d2l.benchmark('Synchronous : %.4f sec'):
+with d2l.benchmark('synchronous : %.4f sec'):
     for _ in range(1000):
         y = x + 1
         y.wait_to_read()
 
-with d2l.benchmark('Asynchronous: %.4f sec'):
+with d2l.benchmark('asynchronous: %.4f sec'):
     for _ in range(1000):
         y = x + 1
     y.wait_to_read()
@@ -133,7 +133,7 @@ def data_iter():
         y = np.ones((batch_size,))
         yield X, y
         if (i + 1) % 50 == 0:
-            print('batch %d, time %.4f sec' % (i + 1, timer.stop()))
+            print(f'batch {i + 1:d}, time {timer.stop():.4f} sec')
 
 net = nn.Sequential()
 net.add(nn.Dense(2048, activation='relu'),
@@ -163,29 +163,29 @@ To ensure that we do not overflow the task buffer on the backend we insert a `wa
 
 ```{.python .input  n=14}
 mem = get_mem()
-with d2l.benchmark('Time per epoch: %.4f sec'):
+with d2l.benchmark('time per epoch: %.4f sec'):
     for X, y in data_iter():
         with autograd.record():
             l = loss(y, net(X))
         l.backward()
         trainer.step(X.shape[0])
-        l.wait_to_read() # barrier before new batch
+        l.wait_to_read()  # Barrier before a new batch
     npx.waitall()
-print('increased memory: %f MB' % (get_mem() - mem))
+print(f'increased memory: {get_mem() - mem:f} MB')
 ```
 
 As we see, the timing of the minibatches lines up quite nicely with the overall runtime of the optimization code. Moreover, memory footprint only increases slightly. Now let us see what happens if we drop the barrier at the end of each minibatch.
 
 ```{.python .input  n=14}
 mem = get_mem()
-with d2l.benchmark('Time per epoch: %.4f sec'):
+with d2l.benchmark('time per epoch: %.4f sec'):
     for X, y in data_iter():
         with autograd.record():
             l = loss(y, net(X))
         l.backward()
         trainer.step(X.shape[0])
     npx.waitall()
-print('increased memory: %f MB' % (get_mem() - mem))
+print(f'increased memory: {get_mem() - mem:f} MB')
 ```
 
 Even though the time to issue instructions for the backend is an order of magnitude smaller, we still need to perform computation. Consequently a large amount of intermediate results cannot be released and may pile up in memory. While this didn't cause any issues in the toy example above, it might well have resulted in out of memory situations when left unchecked in real world scenarios.
