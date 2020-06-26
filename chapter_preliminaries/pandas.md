@@ -51,7 +51,7 @@ This dataset has four rows and three columns, where each row describes the numbe
 ```{.python .input}
 #@tab all
 # If pandas is not installed, just uncomment the following line:
-# `!pip install pandas`
+# !pip install pandas
 import pandas as pd
 
 data = pd.read_csv(data_file)
