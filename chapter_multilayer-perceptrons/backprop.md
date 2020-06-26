@@ -124,7 +124,7 @@ from the output to the input layer,
 according to the *chain rule* from calculus.
 The algorithm stores any intermediate variables
 (partial derivatives)
-requried while calculating the gradient
+required while calculating the gradient
 with respect to some parameters.
 Assume that we have functions
 $\mathsf{Y}=f(\mathsf{X})$
