@@ -191,7 +191,7 @@ import pandas as pd
 npx.set_np()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
@@ -204,7 +204,8 @@ import pandas as pd
 import numpy as np
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
@@ -215,6 +216,7 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 ```
+
 
 For convenience, we can download and cache
 the Kaggle housing dataset
@@ -337,7 +339,7 @@ train_labels = np.array(train_data.SalePrice.values,
                         dtype=np.float32).reshape(-1, 1)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 n_train = train_data.shape[0]
 train_features = torch.tensor(all_features[:n_train].values,
@@ -348,7 +350,8 @@ train_labels = torch.tensor(train_data.SalePrice.values,
                             dtype=torch.float32).reshape(-1, 1)
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 n_train = train_data.shape[0]
 train_features = np.array(all_features[:n_train].values, dtype=np.float32)
@@ -356,6 +359,7 @@ test_features = np.array(all_features[n_train:].values, dtype=np.float32)
 train_labels = np.array(train_data.SalePrice.values.reshape(-1, 1),
                         dtype=np.float32)
 ```
+
 
 ## Training
 
@@ -382,7 +386,7 @@ def get_net():
     return net
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 loss = nn.MSELoss()
 in_features = train_features.shape[1]
@@ -392,7 +396,8 @@ def get_net():
     return net
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 loss = tf.keras.losses.MeanSquaredError()
 
@@ -402,6 +407,7 @@ def get_net():
         1, kernel_regularizer=tf.keras.regularizers.l2(weight_decay)))
     return net
 ```
+
 
 With house prices, as with stock prices,
 we care about relative quantities
@@ -436,7 +442,7 @@ def log_rmse(net, features, labels):
     return np.sqrt(2 * loss(np.log(clipped_preds), np.log(labels)).mean())
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def log_rmse(net,features,labels):
     # To further stabilize the value when the logarithm is taken, set the
@@ -447,7 +453,8 @@ def log_rmse(net,features,labels):
     return rmse.item()
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 def log_rmse(y_true, y_pred):
     # To further stabilize the value when the logarithm is taken, set the
@@ -456,6 +463,7 @@ def log_rmse(y_true, y_pred):
     return tf.sqrt(tf.reduce_sum(loss(
         tf.math.log(y_true), tf.math.log(clipped_preds))) / batch_size)
 ```
+
 
 Unlike in previous sections, our training functions
 will rely on the Adam optimizer
@@ -490,7 +498,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
     return train_ls, test_ls
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
@@ -513,7 +521,8 @@ def train(net, train_features, train_labels, test_features, test_labels,
     return train_ls, test_ls
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
@@ -532,6 +541,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
         test_ls = history.history['val_loss']
     return train_ls, test_ls
 ```
+
 
 ## k-Fold Cross-Validation
 
@@ -570,7 +580,7 @@ def get_k_fold_data(k, i, X, y):
     return X_train, y_train, X_valid, y_valid
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def get_k_fold_data(k, i, X, y):
     assert k > 1
@@ -589,7 +599,8 @@ def get_k_fold_data(k, i, X, y):
     return X_train, y_train, X_valid, y_valid
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 def get_k_fold_data(k, i, X, y):
     assert k > 1
@@ -607,6 +618,7 @@ def get_k_fold_data(k, i, X, y):
             y_train = tf.concat([y_train, y_part], axis=0)
     return X_train, y_train, X_valid, y_valid
 ```
+
 
 The training and verification error averages are returned
 when we train $k$ times in the k-fold cross-validation.
@@ -627,8 +639,8 @@ def k_fold(k, X_train, y_train, num_epochs,
             d2l.plot(list(range(1, num_epochs+1)), [train_ls, valid_ls],
                      xlabel='epoch', ylabel='rmse',
                      legend=['train', 'valid'], yscale='log')
-        print(f'fold {i}, train rmse {train_ls[-1]:f}, '
-              f'valid rmse {valid_ls[-1]:f}')
+        print(f'fold {i}, train rmse {float(train_ls[-1]):f}, '
+              f'valid rmse {float(valid_ls[-1]):f}')
     return train_l_sum / k, valid_l_sum / k
 ```
 
@@ -651,8 +663,8 @@ performance is no longer representative of the true error.
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
 train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
                           weight_decay, batch_size)
-print(f'{k}-fold validation: avg train rmse: {train_l:f}, '
-      f'avg valid rmse: {valid_l:f}')
+print(f'{k}-fold validation: avg train rmse: {float(train_l):f}, '
+      f'avg valid rmse: {float(valid_l):f}')
 ```
 
 Notice that someimes the number of training errors
@@ -685,7 +697,7 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
                         num_epochs, lr, weight_decay, batch_size)
     d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',
              ylabel='rmse', yscale='log')
-    print(f'train rmse {train_ls[-1]:f}')
+    print(f'train rmse {float(train_ls[-1]):f}')
     # Apply the network to the test set
     preds = d2l.numpy(net(test_features))
     # Reformat it for export to Kaggle
