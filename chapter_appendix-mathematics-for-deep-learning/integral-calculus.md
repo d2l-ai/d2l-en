@@ -96,7 +96,7 @@ d2l.plt.plot(x, f, color='black')
 d2l.plt.ylim([0, 1])
 d2l.plt.show()
 
-"Approximation: {}, Truth: {}".format(approx, true)
+f'approximation: {approx}, truth: {true}'
 ```
 
 ```{.python .input}
@@ -117,7 +117,7 @@ d2l.plt.plot(x, f, color='black')
 d2l.plt.ylim([0, 1])
 d2l.plt.show()
 
-"Approximation: {}, Truth: {}".format(approx, true)
+f'approximation: {approx}, truth: {true}'
 ```
 
 The issue is that while it can be done numerically, we can do this approach analytically for only the simplest functions like

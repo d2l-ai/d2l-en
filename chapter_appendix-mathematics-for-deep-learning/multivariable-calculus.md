@@ -85,7 +85,7 @@ def grad_f(x, y):
 epsilon = np.array([0.01, -0.03])
 grad_approx = f(0, np.log(2)) + epsilon.dot(grad_f(0, np.log(2)))
 true_value = f(0 + epsilon[0], np.log(2) + epsilon[1])
-"Approximation: {}, True Value: {}".format(grad_approx, true_value)
+f'approximation: {grad_approx}, true Value: {true_value}'
 ```
 
 ```{.python .input}
@@ -108,7 +108,7 @@ grad_approx = f(torch.tensor([0.]), torch.log(torch.tensor([2.]))) + epsilon.dot
     grad_f(torch.tensor([0.]), torch.log(torch.tensor(2.))))
 true_value = f(torch.tensor([0.]) + epsilon[0], torch.log(
     torch.tensor([2.])) + epsilon[1])
-"Approximation: {}, True Value: {}".format(grad_approx, true_value)
+f'approximation: {grad_approx}, true Value: {true_value}'
 ```
 
 ## Geometry of Gradients and Gradient Descent
@@ -291,7 +291,7 @@ w, x, y, z = -1, 0, -2, 1
 a, b = (w + x + y + z)**2, (w + x - y - z)**2
 u, v = (a + b)**2, (a - b)**2
 f = (u + v)**2
-print("    f at {}, {}, {}, {} is {}".format(w, x, y, z, f))
+print(f'    f at {w}, {x}, {y}, {z} is {f}')
 
 # Compute the single step partials
 df_du, df_dv = 2*(u + v), 2*(u + v)
@@ -301,7 +301,7 @@ da_dw, db_dw = 2*(w + x + y + z), 2*(w + x - y - z)
 # Compute the final result from inputs to outputs
 du_dw, dv_dw = du_da*da_dw + du_db*db_dw, dv_da*da_dw + dv_db*db_dw
 df_dw = df_du*du_dw + df_dv*dv_dw
-print("df/dw at {}, {}, {}, {} is {}".format(w, x, y, z, df_dw))
+print(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')
 ```
 
 However, note that this still does not make it easy to compute something like $\frac{\partial f}{\partial x}$.  The reason for that is the *way* we chose to apply the chain rule.  If we look at what we did above, we always kept $\partial w$ in the denominator when we could.  In this way, we chose to apply the chain rule seeing how $w$ changed every other variable.  If that is what we wanted, this would be a good idea.  However, think back to our motivation from deep learning: we want to see how every parameter changes the *loss*.  In essence, we want to apply the chain rule keeping $\partial f$ in the numerator whenever we can!
@@ -335,7 +335,7 @@ w, x, y, z = -1, 0, -2, 1
 a, b = (w + x + y + z)**2, (w + x - y - z)**2
 u, v = (a + b)**2, (a - b)**2
 f = (u + v)**2
-print(f"f at {w}, {x}, {y}, {z} is {f}")
+print(f'f at {w}, {x}, {y}, {z} is {f}')
 
 # Compute the derivative using the decomposition above
 # First compute the single step partials
@@ -351,10 +351,10 @@ df_da, df_db = df_du*du_da + df_dv*dv_da, df_du*du_db + df_dv*dv_db
 df_dw, df_dx = df_da*da_dw + df_db*db_dw, df_da*da_dx + df_db*db_dx
 df_dy, df_dz = df_da*da_dy + df_db*db_dy, df_da*da_dz + df_db*db_dz
 
-print(f"df/dw at {w}, {x}, {y}, {z} is {df_dw}")
-print(f"df/dx at {w}, {x}, {y}, {z} is {df_dx}")
-print(f"df/dy at {w}, {x}, {y}, {z} is {df_dy}")
-print(f"df/dz at {w}, {x}, {y}, {z} is {df_dz}")
+print(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')
+print(f'df/dx at {w}, {x}, {y}, {z} is {df_dx}')
+print(f'df/dy at {w}, {x}, {y}, {z} is {df_dy}')
+print(f'df/dz at {w}, {x}, {y}, {z} is {df_dz}')
 ```
 
 The fact that we compute derivatives from $f$ back towards the inputs rather than from the inputs forward to the outputs (as we did in the first code snippet above) is what gives this algorithm its name: *backpropagation*.  Note that there are two steps:
@@ -383,10 +383,10 @@ with autograd.record():
 # Execute backward pass
 f.backward()
 
-print(f"df/dw at {w}, {x}, {y}, {z} is {w.grad}")
-print(f"df/dx at {w}, {x}, {y}, {z} is {x.grad}")
-print(f"df/dy at {w}, {x}, {y}, {z} is {y.grad}")
-print(f"df/dz at {w}, {x}, {y}, {z} is {z.grad}")
+print(f'df/dw at {w}, {x}, {y}, {z} is {w.grad}')
+print(f'df/dx at {w}, {x}, {y}, {z} is {x.grad}')
+print(f'df/dy at {w}, {x}, {y}, {z} is {y.grad}')
+print(f'df/dz at {w}, {x}, {y}, {z} is {z.grad}')
 ```
 
 ```{.python .input}
@@ -404,14 +404,14 @@ f = (u + v)**2
 # Execute backward pass
 f.backward()
 
-print(f"df/dw at {w.data.item()}, {x.data.item()}, {y.data.item()},\
-      {z.data.item()} is {y.grad.data.item()}")
-print(f"df/dx at {w.data.item()}, {x.data.item()}, {y.data.item()},\
-      {z.data.item()} is {x.grad.data.item()}")
-print(f"df/dy at {w.data.item()}, {x.data.item()}, {y.data.item()},\
-      {z.data.item()} is {x.grad.data.item()}")
-print(f"df/dz at {w.data.item()}, {x.data.item()}, {y.data.item()},\
-      {z.data.item()} is {x.grad.data.item()}")
+print(f'df/dw at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
+      f'{z.data.item()} is {y.grad.data.item()}')
+print(f'df/dx at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
+      f'{z.data.item()} is {x.grad.data.item()}')
+print(f'df/dy at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
+      f'{z.data.item()} is {x.grad.data.item()}')
+print(f'df/dz at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
+      f'{z.data.item()} is {x.grad.data.item()}')
 ```
 
 All of what we did above can be done automatically by calling `f.backwards()`.

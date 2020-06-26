@@ -48,12 +48,10 @@ mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 data_transform = torchvision.transforms.Compose(
     [torchvision.transforms.ToTensor()])
 
-mnist_train = torchvision.datasets.MNIST(root='./temp', train=True,
-                                         transform=data_transform, 
-                                         download=True)
-mnist_test = torchvision.datasets.MNIST(root='./temp', train=False,
-                                        transform=data_transform, 
-                                        download=True)
+mnist_train = torchvision.datasets.MNIST(
+    root='./temp', train=True, transform=data_transform, download=True)
+mnist_test = torchvision.datasets.MNIST(
+    root='./temp', train=False, transform=data_transform, download=True)
 ```
 
 We can access a particular example, which contains the image and the corresponding label.

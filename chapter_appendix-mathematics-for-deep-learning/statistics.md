@@ -48,7 +48,7 @@ d2l.plot(xd, yd, 'x', 'density')
 d2l.plt.scatter(xs, ys)
 d2l.plt.axvline(x=0)
 d2l.plt.axvline(x=np.mean(xs), linestyle='--', color='purple')
-d2l.plt.title("Sample Mean: {:.2f}".format(float(np.mean(xs))))
+d2l.plt.title(f'sample mean: {float(np.mean(xs)):.2f}')
 d2l.plt.show()
 ```
 
@@ -78,7 +78,7 @@ d2l.plot(xd, yd, 'x', 'density')
 d2l.plt.scatter(xs, ys)
 d2l.plt.axvline(x=0)
 d2l.plt.axvline(x=torch.mean(xs), linestyle='--', color='purple')
-d2l.plt.title("Sample Mean: {:.2f}".format(float(torch.mean(xs).item())))
+d2l.plt.title(f'sample mean: {float(torch.mean(xs).item()):.2f}')
 d2l.plt.show()
 ```
 
@@ -374,9 +374,9 @@ sigma_hat = samples.std(ddof=1)
 
 ```{.python .input}
 #@tab pytorch
-# Note: PyTorch uses Bessel's correction by default, which means the use of
-#       ddof=1 instead of default ddof=0 in numpy.
-#       We can use unbiased=False to imitate ddof=0.
+# PyTorch uses Bessel's correction by default, which means the use of ddof=1
+# instead of default ddof=0 in numpy. We can use unbiased=False to imitate
+# ddof=0.
 
 # Number of samples
 N = 1000

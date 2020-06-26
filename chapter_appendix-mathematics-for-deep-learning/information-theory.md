@@ -50,7 +50,7 @@ import random
 def self_information(p):
     return -np.log2(p)
 
-self_information(1/64)
+self_information(1 / 64)
 ```
 
 ```{.python .input}
@@ -65,7 +65,7 @@ def nansum(x):
 def self_information(p):
     return -torch.log2(torch.tensor(p)).item()
 
-self_information(1/64)
+self_information(1 / 64)
 ```
 
 ## Entropy 
@@ -101,7 +101,7 @@ In MXNet, we can define entropy as below.
 ```{.python .input}
 def entropy(p):
     entropy = - p * np.log2(p)
-    # nansum will sum up the non-nan number
+    # Operator nansum will sum up the non-nan number
     out = nansum(entropy.as_nd_ndarray())
     return out
 
@@ -112,7 +112,7 @@ entropy(np.array([0.1, 0.5, 0.1, 0.3]))
 #@tab pytorch
 def entropy(p):
     entropy = - p * torch.log2(p)
-    # nansum will sum up the non-nan number
+    # Operator nansum will sum up the non-nan number
     out = nansum(entropy)
     return out
 
@@ -177,7 +177,7 @@ Let us implement joint entropy from scratch in MXNet.
 ```{.python .input}
 def joint_entropy(p_xy):
     joint_ent = -p_xy * np.log2(p_xy)
-    # nansum will sum up the non-nan number
+    # Operator nansum will sum up the non-nan number
     out = nansum(joint_ent.as_nd_ndarray())
     return out
 
@@ -228,7 +228,7 @@ Now, let us implement conditional entropy :eqref:`eq_cond_ent_def` from scratch 
 def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * np.log2(p_y_given_x)
-    # nansum will sum up the non-nan number
+    # Operator nansum will sum up the non-nan number
     out = nansum(cond_ent.as_nd_ndarray())
     return out
 
@@ -282,13 +282,12 @@ Now, let us implement mutual information from scratch.
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = p_xy * np.log2(p)
-    # nansum will sum up the non-nan number
+    # Operator nansum will sum up the non-nan number
     out = nansum(mutual.as_nd_ndarray())
     return out
 
 mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]),
-                   np.array([0.2, 0.8]),
-                   np.array([[0.75, 0.25]]))
+                   np.array([0.2, 0.8]), np.array([[0.75, 0.25]]))
 ```
 
 ```{.python .input}
@@ -296,13 +295,12 @@ mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]),
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = p_xy * torch.log2(p)
-    # nansum will sum up the non-nan number
+    # Operator nansum will sum up the non-nan number
     out = nansum(mutual)
     return out
 
 mutual_information(torch.tensor([[0.1, 0.5], [0.1, 0.3]]),
-                   torch.tensor([0.2, 0.8]),
-                   torch.tensor([[0.75, 0.25]]))
+                   torch.tensor([0.2, 0.8]), torch.tensor([[0.75, 0.25]]))
 ```
 
 ### Properties of Mutual Information
@@ -572,8 +570,8 @@ nll_loss.get()
 
 ```{.python .input}
 #@tab pytorch
-# Implementation of CrossEntropy loss in pytorch 
-# combines nn.LogSoftmax() and nn.NLLLoss().
+# Implementation of CrossEntropy loss in pytorch combines nn.LogSoftmax() and
+# nn.NLLLoss()
 nll_loss = NLLLoss()
 loss = nll_loss(torch.log(preds), labels)
 loss

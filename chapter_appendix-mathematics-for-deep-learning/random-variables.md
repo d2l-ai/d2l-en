@@ -61,7 +61,7 @@ d2l.plot(x, p, 'x', 'Density')
 from d2l import torch as d2l
 from IPython import display
 import torch
-torch.pi = torch.acos(torch.zeros(1)).item() * 2  #define pi in torch
+torch.pi = torch.acos(torch.zeros(1)).item() * 2  # Define pi in torch
 
 # Plot the probability density function for some random variable
 x = torch.arange(-5, 5, 0.01)
@@ -128,7 +128,7 @@ d2l.plt.plot(x, p, color='black')
 d2l.plt.fill_between(x.tolist()[300:800], p.tolist()[300:800])
 d2l.plt.show()
 
-"Approximate Probability: {}".format(np.sum(epsilon*p[300:800]))
+f'approximate Probability: {np.sum(epsilon*p[300:800])}'
 ```
 
 ```{.python .input}
@@ -144,7 +144,7 @@ d2l.plt.plot(x, p, color='black')
 d2l.plt.fill_between(x.tolist()[300:800], p.tolist()[300:800])
 d2l.plt.show()
 
-"Approximate Probability: {}".format(torch.sum(epsilon*p[300:800]))
+f'approximate Probability: {torch.sum(epsilon*p[300:800])}'
 ```
 
 It turns out that these two properties describe exactly the space of possible probability density functions (or *p.d.f.*'s for the commonly encountered abbreviation).  They are non-negative functions $p(x) \ge 0$ such that
@@ -295,7 +295,7 @@ def plot_chebyshev(a, p):
                    a + 4 * np.sqrt(2 * p), 'black', lw=4)
     d2l.plt.vlines(a - 4 * np.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
     d2l.plt.vlines(a + 4 * np.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
-    d2l.plt.title(f"p = {p:.3f}")
+    d2l.plt.title(f'p = {p:.3f}')
 
     d2l.plt.show()
 
@@ -317,7 +317,7 @@ def plot_chebyshev(a, p):
                    a + 4 * torch.sqrt(2 * p), 'black', lw=4)
     d2l.plt.vlines(a - 4 * torch.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
     d2l.plt.vlines(a + 4 * torch.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
-    d2l.plt.title(f"p = {p:.3f}")
+    d2l.plt.title(f'p = {p:.3f}')
 
     d2l.plt.show()
 
@@ -587,7 +587,7 @@ for i in range(3):
     d2l.plt.scatter(X.asnumpy(), Y.asnumpy())
     d2l.plt.xlabel('X')
     d2l.plt.ylabel('Y')
-    d2l.plt.title("cov = {}".format(covs[i]))
+    d2l.plt.title(f'cov = {covs[i]}')
 d2l.plt.show()
 ```
 
@@ -604,7 +604,7 @@ for i in range(3):
     d2l.plt.scatter(X.numpy(), Y.numpy())
     d2l.plt.xlabel('X')
     d2l.plt.ylabel('Y')
-    d2l.plt.title("cov = {}".format(covs[i]))
+    d2l.plt.title(f'cov = {covs[i]}')
 d2l.plt.show()
 ```
 
@@ -675,7 +675,7 @@ for i in range(3):
     d2l.plt.scatter(X.asnumpy(), Y.asnumpy())
     d2l.plt.xlabel('X')
     d2l.plt.ylabel('Y')
-    d2l.plt.title("cor = {}".format(cors[i]))
+    d2l.plt.title(f'cor = {cors[i]}')
 d2l.plt.show()
 ```
 
@@ -693,7 +693,7 @@ for i in range(3):
     d2l.plt.scatter(X.numpy(), Y.numpy())
     d2l.plt.xlabel('X')
     d2l.plt.ylabel('Y')
-    d2l.plt.title("cor = {}".format(cors[i]))
+    d2l.plt.title(f'cor = {cors[i]}')
 d2l.plt.show()
 ```
 

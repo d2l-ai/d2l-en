@@ -33,7 +33,7 @@ d2l.plot(x_big, ys, 'x', 'f(x)')
 from d2l import torch as d2l
 from IPython import display
 import torch
-torch.pi = torch.acos(torch.zeros(1)).item() * 2  #define pi in torch
+torch.pi = torch.acos(torch.zeros(1)).item() * 2  # Define pi in torch
 
 # Plot a function in a normal range
 x_big = torch.arange(0.01, 3.01, 0.01)
@@ -93,8 +93,7 @@ def L(x):
 
 # Print the difference divided by epsilon for several epsilon
 for epsilon in [0.1, 0.001, 0.0001, 0.00001]:
-    print("epsilon = {:.5f} -> {:.5f}".format(
-        epsilon, (L(4+epsilon) - L(4)) / epsilon))
+    print(f'epsilon = {epsilon:.5f} -> {(L(4+epsilon) - L(4)) / epsilon:.5f}')
 ```
 
 Now, if we are observant, we will notice that the output of this number is suspiciously close to $8$.  Indeed, if we decrease $\epsilon$, we will see value becomes progressively closer to $8$.  Thus we may conclude, correctly, that the value we seek (the degree a change in the input changes the output) should be $8$ at the point $x=4$.  The way that a mathematician encodes this fact is
@@ -238,7 +237,7 @@ approximates the value of $f$ by a line which passes through the point $(x, f(x)
 xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
 
-# Compute some linear approximations. Use d(sin(x))/dx = cos(x)
+# Compute some linear approximations. Use d(sin(x)) / dx = cos(x)
 for x0 in [-1.5, 0, 2]:
     plots.append(np.sin(x0) + (xs - x0) * np.cos(x0))
 
@@ -306,7 +305,7 @@ If we have some original function $f(x)$ in mind, we may compute the first two d
 xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
 
-# Compute some quadratic approximations. Use d(sin(x))/dx = cos(x)
+# Compute some quadratic approximations. Use d(sin(x)) / dx = cos(x)
 for x0 in [-1.5, 0, 2]:
     plots.append(np.sin(x0) + (xs - x0) * np.cos(x0) -
                               (xs - x0)**2 * np.sin(x0) / 2)
@@ -320,7 +319,7 @@ d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 xs = torch.arange(-torch.pi, torch.pi, 0.01)
 plots = [torch.sin(xs)]
 
-# Compute some quadratic approximations. Use d(sin(x))/dx = cos(x)
+# Compute some quadratic approximations. Use d(sin(x)) / dx = cos(x)
 for x0 in [-1.5, 0.0, 2.0]:
     plots.append(torch.sin(torch.tensor(x0)) + (xs - x0) * 
                  torch.cos(torch.tensor(x0)) - (xs - x0)**2 *

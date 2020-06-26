@@ -19,7 +19,7 @@ from IPython import display
 from math import erf, factorial
 import torch
 
-torch.pi = torch.acos(torch.zeros(1)) * 2  #define pi in torch
+torch.pi = torch.acos(torch.zeros(1)) * 2  # Define pi in torch
 ```
 
 ## Bernoulli
@@ -369,8 +369,8 @@ d2l.plt.show()
 lam = 5.0
 
 xs = [i for i in range(20)]
-pmf = torch.tensor([torch.exp(torch.tensor(-lam)) 
-                * lam**k / factorial(k) for k in xs])
+pmf = torch.tensor([torch.exp(torch.tensor(-lam)) * lam**k
+                    / factorial(k) for k in xs])
 
 d2l.plt.stem(xs, pmf, use_line_collection=True)
 d2l.plt.xlabel('x')
