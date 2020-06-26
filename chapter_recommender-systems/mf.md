@@ -122,17 +122,17 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             trainer.step(values[0].shape[0])
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
-        if len(kwargs) > 0:  # it will be used in section AutoRec.
+        if len(kwargs) > 0:  # It will be used in section AutoRec
             test_rmse = evaluator(net, test_iter, kwargs['inter_mat'],
                                   ctx_list)
         else:
             test_rmse = evaluator(net, test_iter, ctx_list)
         train_l = l / (i + 1)
         animator.add(epoch + 1, (train_l, test_rmse))
-    print('train loss %.3f, test RMSE %.3f'
-          % (metric[0] / metric[1], test_rmse))
-    print('%.1f examples/sec on %s'
-          % (metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'train loss {metric[0] / metric[1]:.3f}, '
+          f'test RMSE {test_rmse:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(ctx_list)}')
 ```
 
 Finally, let us put all things together and train the model. Here, we set the latent factor dimension to 30.

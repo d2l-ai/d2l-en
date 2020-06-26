@@ -53,7 +53,7 @@ For each push, KVStore combines the pushed value with the value stored using an 
 
 ```{.python .input  n=6}
 def update(key, input, stored):
-    print(f'update on key: {key:d}')
+    print(f'update on key: {key}')
     stored += input * 2
 kv._set_updater(update)
 kv.pull(3, out=a)

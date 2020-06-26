@@ -361,9 +361,9 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
     """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
     url, sha1_hash = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)    
+    d2l.mkdir_if_not_exist(cache_dir)
     fname = os.path.join(cache_dir, url.split('/')[-1])
-    if os.path.exists(fname):        
+    if os.path.exists(fname):
         sha1 = hashlib.sha1()
         with open(fname, 'rb') as f:
             while True:
@@ -383,7 +383,7 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
 def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
     fname = download(name)
-    base_dir = os.path.dirname(fname) 
+    base_dir = os.path.dirname(fname)
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
@@ -409,7 +409,7 @@ DATA_HUB['kaggle_house_train'] = (  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_test'] = (  #@save  
+DATA_HUB['kaggle_house_test'] = (  #@save
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
@@ -487,10 +487,10 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_loss, train_acc, test_acc))
-    print('%.1f examples/sec on %s' % (
-        metric[2]*num_epochs/timer.sum(), device))
+    print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(device)}')
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
@@ -604,13 +604,13 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
     random.shuffle(example_indices)
 
     def data(pos):
-        # This returns a sequence of the length num_steps starting from pos
+        # This returns a sequence of length `num_steps` starting from `pos`
         return corpus[pos: pos + num_steps]
 
     # Discard half empty batches
     num_batches = num_examples // batch_size
     for i in range(0, batch_size * num_batches, batch_size):
-        # Batch_size indicates the random examples read each time
+        # `batch_size` indicates the random examples read each time
         batch_indices = example_indices[i:(i+batch_size)]
         X = [data(j) for j in batch_indices]
         Y = [data(j + 1) for j in batch_indices]
@@ -621,7 +621,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
-    # Slice out data - ignore num_steps and just wrap around
+    # Slice out data: ignore `num_steps` and just wrap around
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
     Xs = torch.Tensor(corpus[offset:offset+num_indices])
     Ys = torch.Tensor(corpus[offset+1:offset+1+num_indices])

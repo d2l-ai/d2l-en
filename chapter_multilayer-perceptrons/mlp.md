@@ -473,7 +473,7 @@ d2l.plot(x, x.grad, 'x', 'grad of sigmoid')
 
 ```{.python .input}
 #@tab pytorch
-# Clear out previous gradients.
+# Clear out previous gradients
 x.grad.data.zero_()
 y.backward(torch.ones_like(x),retain_graph=True)
 d2l.plot(x.detach(), x.grad, 'x', 'grad of sigmoid')

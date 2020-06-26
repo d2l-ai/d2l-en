@@ -234,8 +234,8 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
         else:
             # When using a two-dimensional convolutional layer, calculate the
             # mean and variance on the channel dimension (axis=1). Here we
-            # need to maintain the shape of X, so that the broadcast operation
-            # can be carried out later
+            # need to maintain the shape of `X`, so that the broadcast
+            # operation can be carried out later
             mean = X.mean(axis=(0, 2, 3), keepdims=True)
             var = ((X - mean) ** 2).mean(axis=(0, 2, 3), keepdims=True)
         # In training mode, the current mean and variance are used for the
@@ -271,8 +271,8 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
         else:
             # When using a two-dimensional convolutional layer, calculate the
             # mean and variance on the channel dimension (axis=1). Here we
-            # need to maintain the shape of X, so that the broadcast operation
-            # can be carried out later
+            # need to maintain the shape of `X`, so that the broadcast
+            # operation can be carried out later
             mean = X.mean(dim=(0, 2, 3), keepdim=True)
             var = ((X - mean) ** 2).mean(dim=(0, 2, 3), keepdim=True)
         # In training mode, the current mean and variance are used for the
@@ -342,12 +342,12 @@ class BatchNorm(nn.Block):
         self.moving_var = np.zeros(shape)
 
     def forward(self, X):
-        # If X is not on the CPU, copy moving_mean and moving_var to the
-        # device where X is located
+        # If X is not on the CPU, copy `moving_mean` and `moving_var` to the
+        # device where `X` is located
         if self.moving_mean.ctx != X.ctx:
             self.moving_mean = self.moving_mean.copyto(X.ctx)
             self.moving_var = self.moving_var.copyto(X.ctx)
-        # Save the updated moving_mean and moving_var
+        # Save the updated `moving_mean` and `moving_var`
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma.data(), self.beta.data(), self.moving_mean,
             self.moving_var, eps=1e-12, momentum=0.9)
@@ -373,12 +373,12 @@ class BatchNorm(nn.Module):
         self.moving_var = torch.zeros(shape)
 
     def forward(self, X):
-        # If X is not on the CPU, copy moving_mean and moving_var to the
-        # device where X is located
+        # If X is not on the CPU, copy `moving_mean` and `moving_var` to the
+        # device where `X` is located
         if self.moving_mean.device != X.device:
             self.moving_mean = self.moving_mean.to(X.device)
             self.moving_var = self.moving_var.to(X.device)
-        # Save the updated moving_mean and moving_var
+        # Save the updated `moving_mean` and `moving_var`
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma, self.beta, self.moving_mean,
             self.moving_var, eps=1e-5, momentum=0.9)
@@ -485,12 +485,13 @@ net = nn.Sequential(
 
 ```{.python .input}
 #@tab tensorflow
-# Recall that this has to be a function that will be passed to `d2l.train_ch6()`
-# so that model building/compiling need to be within `strategy.scope()`
-# in order to utilize the CPU/GPU devices that we have.
+# Recall that this has to be a function that will be passed to
+# `d2l.train_ch6()` so that model building/compiling need to be within
+# `strategy.scope()` in order to utilize the CPU/GPU devices that we have.
 def net():
     return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=6, kernel_size=5, input_shape=(28, 28, 1)),
+        tf.keras.layers.Conv2D(filters=6, kernel_size=5,
+                               input_shape=(28, 28, 1)),
         BatchNorm(),
         tf.keras.layers.Activation('sigmoid'),
         tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
@@ -600,7 +601,8 @@ net = nn.Sequential(
 
 def net():
     return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=6, kernel_size=5, input_shape=(28, 28, 1)),
+        tf.keras.layers.Conv2D(filters=6, kernel_size=5,
+                               input_shape=(28, 28, 1)),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Activation('sigmoid'),
         tf.keras.layers.MaxPool2D(pool_size=2, strides=2),

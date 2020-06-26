@@ -52,7 +52,7 @@ d2l.train_ch11(adadelta, init_adadelta_states(feature_dim),
 For a concise implementation we simply use the `adadelta` algorithm from the `Trainer` class. This yields the following one-liner for a much more compact invocation.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch11('adadelta', {'rho': 0.9}, data_iter)
+d2l.train_concise_ch11('adadelta', {'rho': 0.9}, data_iter)
 ```
 
 ## Summary

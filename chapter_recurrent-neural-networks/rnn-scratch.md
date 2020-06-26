@@ -252,7 +252,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
         if epoch % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch+1, [ppl])
-    print('Perplexity %.1f, %d tokens/sec on %s' % (ppl, speed, ctx))
+    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(ctx)}')
     print(predict('time traveller'))
     print(predict('traveller'))
 ```

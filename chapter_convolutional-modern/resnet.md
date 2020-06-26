@@ -146,7 +146,6 @@ Y = blk(X)
 Y.shape
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 blk = Residual(3)
@@ -174,7 +173,6 @@ blk(X).shape
 blk = Residual(6, use_1x1conv=True, strides=2)
 blk(X).shape
 ```
-
 
 ## ResNet Model
 
@@ -265,9 +263,7 @@ b2 = nn.Sequential(*resnet_block(64, 64, 2, first_block=True))
 b3 = nn.Sequential(*resnet_block(64, 128, 2))
 b4 = nn.Sequential(*resnet_block(128, 256, 2))
 b5 = nn.Sequential(*resnet_block(256, 512, 2))
-
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -305,7 +301,7 @@ def net():
         tf.keras.layers.Activation('relu'),
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same'),
         # The following layers are the same as b2, b3, b4, and b5 that we
-        # created earlier.
+        # created earlier
         ResnetBlock(64, 2, first_block=True),
         ResnetBlock(128, 2),
         ResnetBlock(256, 2),

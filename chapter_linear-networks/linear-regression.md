@@ -477,7 +477,7 @@ x = np.arange(-7, 7, 0.01)
 params = [(0, 1), (0, 2), (3, 1)]
 d2l.plot(x, [normal(x, mu, sigma) for mu, sigma in params], xlabel='x',
          ylabel='p(x)', figsize=(4.5, 2.5),
-         legend=['mean %d, std %d' % (mu, sigma) for mu, sigma in params])
+         legend=[f'mean {mu}, std {sigma}' for mu, sigma in params])
 ```
 
 As we can see, changing the mean corresponds to a shift along the $x$-axis,
@@ -642,7 +642,6 @@ statistics, and computer science.
     * Write out the negative log-likelihood of the data under the model $-\log P(\mathbf y \mid \mathbf X)$.
     * Can you find a closed form solution?
     * Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint: what happens near the stationary point as we keep on updating the parameters)? Can you fix this?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/40)

@@ -193,10 +193,10 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                               None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)
         animator.add(epoch + 1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        metric[0] / metric[2], metric[1] / metric[3], test_acc))
-    print('%.1f examples/sec on %s' % (
-        metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'loss {metric[0] / metric[2]:.3f}, train acc '
+          f'{metric[1] / metric[3]:.3f}, test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec on '
+          f'{str(ctx_list)}')
 ```
 
 Now, we can define the `train_with_data_aug` function to use image augmentation to train the model. This function obtains all available GPUs and uses Adam as the optimization algorithm for training. It then applies image augmentation to the training dataset, and finally calls the `train` function just defined to train and evaluate the model.

@@ -608,7 +608,8 @@ print(net[2].weight.data[0] == net[4].weight.data[0])
 
 ```{.python .input}
 #@tab tensorflow
-# tf.keras behaves a bit differently. It removes the duplicate layer automatically.
+# tf.keras behaves a bit differently. It removes the duplicate layer
+# automatically
 shared = tf.keras.layers.Dense(4, activation=tf.nn.relu)
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),

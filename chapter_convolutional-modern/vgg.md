@@ -60,7 +60,6 @@ def vgg_block(num_convs, num_channels):
     return blk
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
@@ -142,7 +141,6 @@ def vgg(conv_arch):
 net = vgg(conv_arch)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 def vgg(conv_arch):
@@ -193,7 +191,6 @@ for blk in net:
     print(blk.name, 'output shape:\t', X.shape)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.randn(size=(1, 1, 224, 224))
@@ -221,7 +218,6 @@ Since VGG-11 is more computationally-heavy than AlexNet
 we construct a network with a smaller number of channels.
 This is more than sufficient for training on Fashion-MNIST.
 
-
 ```{.python .input}
 #@tab mxnet, pytorch
 ratio = 4
@@ -248,7 +244,6 @@ lr, num_epochs, batch_size = 0.05, 10, 128,
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
-
 
 ## Summary
 

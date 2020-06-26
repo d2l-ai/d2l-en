@@ -39,7 +39,7 @@ C = np.random.normal(0, 1, (256, 256))
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
 
 ```{.python .input  n=2}
-# Compute A = B C one element at a time
+# Compute A = BC one element at a time
 timer.start()
 for i in range(256):
     for j in range(256):
@@ -51,7 +51,7 @@ timer.stop()
 A faster strategy is to perform column-wise assignment.
 
 ```{.python .input  n=3}
-# Compute A = B C one column at a time
+# Compute A = BC one column at a time
 timer.start()
 for j in range(256):
     A[:, j] = np.dot(B, C[:, j])
@@ -62,7 +62,7 @@ timer.stop()
 Last, the most effective manner is to perform the entire operation in one block. Let us see what the respective speed of the operations is.
 
 ```{.python .input  n=4}
-# Compute A = B C in one go
+# Compute A = BC in one go
 timer.start()
 A = np.dot(B, C)
 A.wait_to_read()
@@ -70,8 +70,8 @@ timer.stop()
 
 # Multiply and add count as separate operations (fused in practice)
 gigaflops = [2/i for i in timer.times]
-print("Performance in Gigaflops: element {:.3f}, \
-      column {:.3f}, full {:.3f}".format(*gigaflops))
+print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
+      f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
 
 ## Minibatches 
@@ -95,7 +95,7 @@ timer.start()
 for j in range(0, 256, 64):
     A[:, j:j+64] = np.dot(B, C[:, j:j+64])
 timer.stop()
-print("Performance in Gigaflops: block {:.3f}".format(2/timer.times[3]))
+print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
 As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :numref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms. 
@@ -161,7 +161,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 ```
 
@@ -210,7 +210,7 @@ In Gluon, we can use the `Trainer` class to call optimization algorithms. This i
 
 ```{.python .input  n=9}
 #@save
-def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
+def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     # Initialization
     net = nn.Sequential()
     net.add(nn.Dense(1))
@@ -232,14 +232,14 @@ def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
 
 Using Gluon to repeat the last experiment shows identical behavior.
 
 ```{.python .input  n=10}
 data_iter, _ = get_data_ch11(10)
-train_gluon_ch11('sgd', {'learning_rate': 0.05}, data_iter)
+train_concise_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 ```
 
 ## Summary

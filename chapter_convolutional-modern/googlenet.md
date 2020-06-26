@@ -347,7 +347,9 @@ def b5():
 # so that model building/compiling need to be within `strategy.scope()`
 # in order to utilize the CPU/GPU devices that we have.
 def net():
-    return tf.keras.Sequential([b1(), b2(), b3(), b4(), b5(), tf.keras.layers.Dense(10, activation='softmax')])
+    return tf.keras.Sequential([b1(), b2(), b3(), b4(), b5(),
+                                tf.keras.layers.Dense(
+                                    10, activation='softmax')])
 ```
 
 The GoogLeNet model is computationally complex,
@@ -379,7 +381,7 @@ for layer in net:
 X = tf.random.uniform(shape=(1, 96, 96, 1))
 for layer in net().layers:
     X = layer(X)
-    print(layer.__class__.__name__, 'Output shape:\t', X.shape)
+    print(layer.__class__.__name__, 'output shape:\t', X.shape)
 ```
 
 ## Data Acquisition and Training

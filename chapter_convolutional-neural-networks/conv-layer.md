@@ -194,8 +194,10 @@ class Conv2D(tf.keras.layers.Layer):
 
     def build(self, kernel_size):
         initializer = tf.random_normal_initializer()
-        self.weight = self.add_weight(name='w', shape=kernel_size, initializer=initializer)
-        self.bias = self.add_weight(name='b', shape=(1, ), initializer=initializer)
+        self.weight = self.add_weight(name='w', shape=kernel_size,
+                                      initializer=initializer)
+        self.bias = self.add_weight(name='b', shape=(1, ),
+                                    initializer=initializer)
 
     def call(self, inputs):
         return corr2d(inputs, self.weight) + self.bias
@@ -302,9 +304,8 @@ However, since we used single-element assignments,
 Instead, we use the built-in `Conv2D` class.
 
 ```{.python .input}
-# Construct a convolutional layer with 1 output channel
-# (channels will be introduced in the following section)
-# and a kernel array shape of (1, 2)
+# Construct a convolutional layer with 1 output channel (channels will be
+# introduced in the following section) and a kernel array shape of (1, 2)
 conv2d = nn.Conv2D(1, kernel_size=(1, 2))
 conv2d.initialize()
 
@@ -329,7 +330,7 @@ for i in range(10):
 #@tab pytorch
 # Construct a convolutional layer with 1 input channel and 1 output channel
 # (channels will be introduced in the following section)
-# and a kernel array shape of (1, 2). For sake of simplicity we ignore bias.
+# and a kernel array shape of (1, 2). For sake of simplicity we ignore bias
 conv2d = nn.Conv2d(1,1, kernel_size=(1, 2), bias=False)
 
 # The two-dimensional convolutional layer uses four-dimensional input and
@@ -353,7 +354,7 @@ for i in range(10):
 #@tab tensorflow
 # Construct a convolutional layer with 1 input channel and 1 output channel
 # (channels will be introduced in the following section)
-# and a kernel array shape of (1, 2). For sake of simplicity we ignore bias.
+# and a kernel array shape of (1, 2). For sake of simplicity we ignore bias
 conv2d = tf.keras.layers.Conv2D(1, (1, 2), use_bias=False)
 
 # The two-dimensional convolutional layer uses four-dimensional input and

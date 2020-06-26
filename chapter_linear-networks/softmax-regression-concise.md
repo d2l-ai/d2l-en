@@ -69,8 +69,8 @@ net.initialize(init.Normal(sigma=0.01))
 
 ```{.python .input}
 #@tab pytorch
-# PyTorch doesn't implicitly reshape the inputs.
-# Thus we define a layer to reshape the inputs in our network.
+# PyTorch doesn't implicitly reshape the inputs. Thus we define a layer to
+# reshape the inputs in our network
 class Reshape(torch.nn.Module):
     def forward(self, x):
         return x.view(-1,784)

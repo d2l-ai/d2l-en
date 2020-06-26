@@ -121,7 +121,7 @@ def numerical_lim(f, x, h):
 
 h = 0.1
 for i in range(5):
-    print('h=%.5f, numerical limit=%.5f' % (h, numerical_lim(f, 1, h)))
+    print(f'h={h:.5f}, numerical limit={numerical_lim(f, 1, h):.5f}')
     h *= 0.1
 ```
 

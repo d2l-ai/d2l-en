@@ -41,26 +41,26 @@ class BiRNN(nn.Block):
                  num_layers, **kwargs):
         super(BiRNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        # Set Bidirectional to True to get a bidirectional recurrent neural
+        # Set `bidirectional` to True to get a bidirectional recurrent neural
         # network
         self.encoder = rnn.LSTM(num_hiddens, num_layers=num_layers,
                                 bidirectional=True, input_size=embed_size)
         self.decoder = nn.Dense(2)
 
     def forward(self, inputs):
-        # The shape of inputs is (batch size, number of words). Because LSTM
+        # The shape of `inputs` is (batch size, no. of words). Because LSTM
         # needs to use sequence as the first dimension, the input is
         # transformed and the word feature is then extracted. The output shape
-        # is (number of words, batch size, word vector dimension).
+        # is (no. of words, batch size, word vector dimension).
         embeddings = self.embedding(inputs.T)
         # Since the input (embeddings) is the only argument passed into
         # rnn.LSTM, it only returns the hidden states of the last hidden layer
-        # at different timestep (outputs). The shape of outputs is
-        # (number of words, batch size, 2 * number of hidden units).
+        # at different timestep (outputs). The shape of `outputs` is
+        # (no. of words, batch size, 2 * no. of hidden units).
         outputs = self.encoder(embeddings)
         # Concatenate the hidden states of the initial timestep and final
         # timestep to use as the input of the fully connected layer. Its
-        # shape is (batch size, 4 * number of hidden units)
+        # shape is (batch size, 4 * no. of hidden units)
         encoding = np.concatenate((outputs[0], outputs[-1]), axis=1)
         outs = self.decoder(encoding)
         return outs

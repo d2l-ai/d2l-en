@@ -242,7 +242,7 @@ class MLP(nn.Block):
         self.out = nn.Dense(10)  # Output layer
 
     # Define the forward computation of the model, that is, how to return the
-    # required model output based on the input x
+    # required model output based on the input `x`
     def forward(self, x):
         return self.out(self.hidden(x))
 ```
@@ -262,7 +262,7 @@ class MLP(nn.Module):
         self.out = nn.Linear(256,10)  # Output layer
 
     # Define the forward computation of the model, that is, how to return the
-    # required model output based on the input x
+    # required model output based on the input `x`
     def forward(self, x):
         # Note here we use the funtional version of ReLU defined in the
         # nn.functional module.
@@ -280,11 +280,12 @@ class MLP(tf.keras.Model):
         # also be specified when constructing an instance, such as the model
         # parameter, params, described in the following sections
         super().__init__()
-        self.hidden = tf.keras.layers.Dense(units=256, activation=tf.nn.relu)  # Hidden layer
+        # Hidden layer
+        self.hidden = tf.keras.layers.Dense(units=256, activation=tf.nn.relu)
         self.out = tf.keras.layers.Dense(units=10)  # Output layer
 
     # Define the forward computation of the model, that is, how to return the
-    # required model output based on the input x
+    # required model output based on the input `x`
     def call(self, x):
         return self.out(self.hidden((x)))
 ```
@@ -370,7 +371,7 @@ class MySequential(nn.Block):
         # a unique name. We save it in the member variable _children of the
         # Block class, and its type is OrderedDict. When the MySequential
         # instance calls the initialize function, the system automatically
-        # initializes all members of _children
+        # initializes all members of `_children`
         self._children[block.name] = block
 
     def forward(self, x):
@@ -387,9 +388,9 @@ class MySequential(nn.Module):
     def __init__(self, *args):
         super().__init__()
         for block in args:
-            # Here, block is an instance of a Module subclass. We save it in the
-            # member variable _modules of the Module class, and its type is
-            # OrderedDict.
+            # Here, block is an instance of a Module subclass. We save it in
+            # the member variable _modules of the Module class, and its type
+            # is OrderedDict
             self._modules[block] = block
 
     def forward(self, x):
@@ -407,8 +408,7 @@ class MySequential(tf.keras.Model):
         super().__init__()
         self.modules = []
         for block in args:
-            # Here, block is an instance of a
-            # tf.keras.layers.Layer subclass.
+            # Here, block is an instance of a tf.keras.layers.Layer subclass
             self.modules.append(block)
 
     def call(self, x):
@@ -525,8 +525,8 @@ class FixedHiddenMLP(nn.Block):
 
     def forward(self, x):
         x = self.dense(x)
-        # Use the constant parameters created, as well as the relu
-        # and dot functions
+        # Use the constant parameters created, as well as the relu and dot
+        # functions
         x = npx.relu(np.dot(x, self.rand_weight.data()) + 1)
         # Reuse the fully connected layer. This is equivalent to sharing
         # parameters with two fully connected layers
@@ -544,14 +544,14 @@ class FixedHiddenMLP(nn.Module):
     def __init__(self):
         super().__init__()
         # Random weight parameters that will not compute gradients and
-        # and therefore keep constant during training.
+        # therefore keep constant during training
         self.rand_weight = torch.rand((20, 20), requires_grad=False)
         self.linear = nn.Linear(20, 20)
 
     def forward(self, x):
         x = self.linear(x)
-        # Use the constant parameters created, as well as the relu
-        # and dot functions
+        # Use the constant parameters created, as well as the relu and dot
+        # functions
         x = F.relu(torch.mm(x, self.rand_weight) + 1)
         # Reuse the fully connected layer. This is equivalent to sharing
         # parameters with two fully connected layers
@@ -570,14 +570,14 @@ class FixedHiddenMLP(tf.keras.Model):
         super().__init__()
         self.flatten = tf.keras.layers.Flatten()
         # Random weight parameters that will not compute gradients and
-        # and therefore keep constant during training.
+        # therefore keep constant during training
         self.rand_weight = tf.constant(tf.random.uniform((20, 20)))
         self.dense = tf.keras.layers.Dense(20, activation=tf.nn.relu)
 
     def call(self, inputs):
         x = self.flatten(inputs)
-        # Use the constant parameters created, as well as the relu
-        # and dot functions
+        # Use the constant parameters created, as well as the relu and dot
+        # functions
         x = tf.nn.relu(tf.matmul(x, self.rand_weight) + 1)
         # Reuse the fully connected layer. This is equivalent to sharing
         # parameters with two fully connected layers
