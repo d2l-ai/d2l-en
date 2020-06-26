@@ -202,7 +202,7 @@ print(X)
 # Note that TensorFlow has default data format "channels_last" which corresponds to inputs
 # with shape " so here the shape (batch_size, height, width, channels) so here the shape
 # should be (1, 4, 4, 1) instead of (1, 1, 4, 4).
-X = tf.reshape(tf.constant(range(16), dtype=tf.float32), (1, 4, 4, 1))
+X = tf.reshape(tf.range(16, dtype=tf.float32), (1, 4, 4, 1))
 X
 ```
 

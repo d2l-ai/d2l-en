@@ -46,7 +46,7 @@ torch.save(x,"x-file")
 import tensorflow as tf
 import numpy as np
 
-x = tf.constant(range(4))
+x = tf.range(4)
 np.save("x-file.npy", x)
 ```
 

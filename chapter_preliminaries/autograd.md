@@ -55,7 +55,7 @@ x
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.constant(range(4), dtype=tf.float32)
+x = tf.range(4, dtype=tf.float32)
 x
 ```
 
@@ -180,7 +180,7 @@ x.grad
 #@tab tensorflow
 with tf.GradientTape() as t:
     y = tf.reduce_sum(x)
-t.gradient(y, x)  # Overwritten by the newly calculated gradient.
+t.gradient(y, x)
 ```
 
 ## Backward for Non-Scalar Variables

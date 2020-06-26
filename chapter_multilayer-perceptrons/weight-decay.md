@@ -357,7 +357,7 @@ def train(lambd):
                             xlim=[1, num_epochs], legend=['train', 'test'])
     for epoch in range(1, num_epochs + 1):
         for X, y in train_iter:
-            with tf.GradientTape(persistent=True) as tape:
+            with tf.GradientTape() as tape:
                 # The L2 norm penalty term has been added, and broadcasting
                 # makes l2_penalty(w) a vector whose length is batch_size
                 l = loss(net(X), y) + lambd * l2_penalty(w)

@@ -317,7 +317,7 @@ print(dropout_layer(X, 1.))
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.reshape(tf.constant(range(16), dtype=tf.float32), (2, 8))
+X = tf.reshape(tf.range(16, dtype=tf.float32), (2, 8))
 print(X)
 print(dropout_layer(X, 0.))
 print(dropout_layer(X, 0.5))
