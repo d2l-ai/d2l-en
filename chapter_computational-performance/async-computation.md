@@ -133,7 +133,7 @@ def data_iter():
         y = np.ones((batch_size,))
         yield X, y
         if (i + 1) % 50 == 0:
-            print(f'batch {i + 1:d}, time {timer.stop():.4f} sec')
+            print(f'batch {i + 1}, time {timer.stop():.4f} sec')
 
 net = nn.Sequential()
 net.add(nn.Dense(2048, activation='relu'),
