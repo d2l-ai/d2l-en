@@ -128,11 +128,9 @@ To exit the environment, run `conda deactivate`.
 
 
 ## GPU Support
-
-:begin_tab:`mxnet,pytorch`
-
 :label:`subsec_gpu`
 
+:begin_tab:`mxnet,pytorch`
 By default, the deep learning framework is installed without GPU support
 to ensure that it will run on any computer (including most laptops).
 Part of this book requires or recommends running with GPU.
@@ -142,6 +140,11 @@ If you have installed the CPU-only version,
 you may need to remove it first by running:
 :end_tab:
 
+:begin_tab:`tensorflow`
+By default, TensorFlow is installed with GPU support.
+If your computer has NVIDIA graphics cards and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
+then you are all set.
+:end_tab:
 
 :begin_tab:`mxnet`
 ```bash
