@@ -141,7 +141,7 @@ you may need to remove it first by running:
 :end_tab:
 
 :begin_tab:`tensorflow`
-By default, the TensorFlow is installed with GPU support.
+By default, TensorFlow is installed with GPU support.
 If your computer has NVIDIA graphics cards and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
 then you are all set.
 :end_tab:
