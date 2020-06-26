@@ -425,8 +425,14 @@ class BatchNorm(tf.keras.layers.Layer):
     @tf.function
     def call(self, inputs, training):
         if training:
-            batch_mean, batch_variance = tf.nn.moments(
-                inputs, list(range(len(inputs.shape) - 1)))
+            axes = list(range(len(inputs.shape) - 1))
+            batch_mean = tf.reduce_mean(inputs, axes, keepdims=True)
+            batch_variance = tf.reduce_mean(
+                tf.math.squared_difference(
+                    inputs, tf.stop_gradient(batch_mean)),
+                axes, keepdims=True)
+            batch_mean = tf.squeeze(batch_mean, axes)
+            batch_variance = tf.squeeze(batch_variance, axes)
             mean_update = self.assign_moving_average(
                 self.moving_mean, batch_mean)
             variance_update = self.assign_moving_average(
