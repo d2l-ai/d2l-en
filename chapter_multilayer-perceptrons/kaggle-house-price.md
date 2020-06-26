@@ -191,7 +191,7 @@ import pandas as pd
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
@@ -204,8 +204,7 @@ import pandas as pd
 import numpy as np
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
@@ -216,7 +215,6 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 ```
-
 
 For convenience, we can download and cache
 the Kaggle housing dataset
@@ -339,7 +337,7 @@ train_labels = np.array(train_data.SalePrice.values,
                         dtype=np.float32).reshape(-1, 1)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 n_train = train_data.shape[0]
 train_features = torch.tensor(all_features[:n_train].values,
@@ -350,8 +348,7 @@ train_labels = torch.tensor(train_data.SalePrice.values,
                             dtype=torch.float32).reshape(-1, 1)
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 n_train = train_data.shape[0]
 train_features = np.array(all_features[:n_train].values, dtype=np.float32)
@@ -359,7 +356,6 @@ test_features = np.array(all_features[n_train:].values, dtype=np.float32)
 train_labels = np.array(train_data.SalePrice.values.reshape(-1, 1),
                         dtype=np.float32)
 ```
-
 
 ## Training
 
@@ -386,7 +382,7 @@ def get_net():
     return net
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 loss = nn.MSELoss()
 in_features = train_features.shape[1]
@@ -396,8 +392,7 @@ def get_net():
     return net
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 loss = tf.keras.losses.MeanSquaredError()
 
@@ -407,7 +402,6 @@ def get_net():
         1, kernel_regularizer=tf.keras.regularizers.l2(weight_decay)))
     return net
 ```
-
 
 With house prices, as with stock prices,
 we care about relative quantities
@@ -442,7 +436,7 @@ def log_rmse(net, features, labels):
     return np.sqrt(2 * loss(np.log(clipped_preds), np.log(labels)).mean())
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def log_rmse(net,features,labels):
     # To further stabilize the value when the logarithm is taken, set the
@@ -453,8 +447,7 @@ def log_rmse(net,features,labels):
     return rmse.item()
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def log_rmse(y_true, y_pred):
     # To further stabilize the value when the logarithm is taken, set the
@@ -463,7 +456,6 @@ def log_rmse(y_true, y_pred):
     return tf.sqrt(tf.reduce_sum(loss(
         tf.math.log(y_true), tf.math.log(clipped_preds))) / batch_size)
 ```
-
 
 Unlike in previous sections, our training functions
 will rely on the Adam optimizer
@@ -498,7 +490,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
     return train_ls, test_ls
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
@@ -521,8 +513,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
     return train_ls, test_ls
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
@@ -541,7 +532,6 @@ def train(net, train_features, train_labels, test_features, test_labels,
         test_ls = history.history['val_loss']
     return train_ls, test_ls
 ```
-
 
 ## k-Fold Cross-Validation
 
@@ -580,7 +570,7 @@ def get_k_fold_data(k, i, X, y):
     return X_train, y_train, X_valid, y_valid
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def get_k_fold_data(k, i, X, y):
     assert k > 1
@@ -599,8 +589,7 @@ def get_k_fold_data(k, i, X, y):
     return X_train, y_train, X_valid, y_valid
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def get_k_fold_data(k, i, X, y):
     assert k > 1
@@ -618,7 +607,6 @@ def get_k_fold_data(k, i, X, y):
             y_train = tf.concat([y_train, y_part], axis=0)
     return X_train, y_train, X_valid, y_valid
 ```
-
 
 The training and verification error averages are returned
 when we train $k$ times in the k-fold cross-validation.
