@@ -395,25 +395,15 @@ class BatchNorm(tf.keras.layers.Layer):
 
     def build(self, input_shape):
         weight_shape = [input_shape[-1], ]
-        self.gamma = self.add_weight(
-            name='gamma',
-            shape=weight_shape,
-            initializer=tf.initializers.ones,
-            trainable=True)
-        self.beta = self.add_weight(
-            name='beta',
-            shape=weight_shape,
-            initializer=tf.initializers.zeros,
-            trainable=True)
-        self.moving_mean = self.add_weight(
-            name='moving_mean',
-            shape=weight_shape,
-            initializer=tf.initializers.zeros,
+        self.gamma = self.add_weight(name='gamma', shape=weight_shape,
+            initializer=tf.initializers.ones, trainable=True)
+        self.beta = self.add_weight(name='beta', shape=weight_shape,
+            initializer=tf.initializers.zeros, trainable=True)
+        self.moving_mean = self.add_weight(name='moving_mean',
+            shape=weight_shape, initializer=tf.initializers.zeros,
             trainable=False)
-        self.moving_variance = self.add_weight(
-            name='moving_variance',
-            shape=weight_shape,
-            initializer=tf.initializers.ones,
+        self.moving_variance = self.add_weight(name='moving_variance',
+            shape=weight_shape, initializer=tf.initializers.ones,
             trainable=False)
         super(BatchNorm, self).build(input_shape)
 
@@ -427,10 +417,8 @@ class BatchNorm(tf.keras.layers.Layer):
         if training:
             axes = list(range(len(inputs.shape) - 1))
             batch_mean = tf.reduce_mean(inputs, axes, keepdims=True)
-            batch_variance = tf.reduce_mean(
-                tf.math.squared_difference(
-                    inputs, tf.stop_gradient(batch_mean)),
-                axes, keepdims=True)
+            batch_variance = tf.reduce_mean(tf.math.squared_difference(
+                inputs, tf.stop_gradient(batch_mean)), axes, keepdims=True)
             batch_mean = tf.squeeze(batch_mean, axes)
             batch_variance = tf.squeeze(batch_variance, axes)
             mean_update = self.assign_moving_average(
@@ -442,13 +430,8 @@ class BatchNorm(tf.keras.layers.Layer):
             mean, variance = batch_mean, batch_variance
         else:
             mean, variance = self.moving_mean, self.moving_variance
-        output = batch_norm(
-            inputs,
-            moving_mean=mean,
-            moving_var=variance,
-            beta=self.beta,
-            gamma=self.gamma,
-            eps=1e-5)
+        output = batch_norm(inputs, moving_mean=mean, moving_var=variance,
+            beta=self.beta, gamma=self.gamma, eps=1e-5)
         return output
 ```
 
