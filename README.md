@@ -62,4 +62,4 @@ This open source book is made available under the Creative Commons Attribution-S
 
 The sample and reference code within this open source book is made available under a modified MIT license. See the LICENSE-SAMPLECODE file.
 
-[Chinese version](https://github.com/d2l-ai/d2l-zh) | [Discuss and report issues](https://discuss.mxnet.io/) | [Other Information](INFO.md)
+[Chinese version](https://github.com/d2l-ai/d2l-zh) | [Discuss and report issues](https://discuss.d2l.ai/) | [Discuss (old version)](https://discuss.mxnet.io/) | [Other Information](INFO.md)
