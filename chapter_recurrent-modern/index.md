@@ -35,4 +35,3 @@ encoder-decoder
 seq2seq
 beam-search
 ```
-

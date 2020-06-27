@@ -203,7 +203,6 @@ via the construction `net(X)` to obtain their outputs.
 This is actually just shorthand for `net.forward(X)`,
 a slick Python trick achieved via 
 the Block class's `__call__` function.
-
 :end_tab:
 
 ## A Custom Block
@@ -253,7 +252,6 @@ class MLP(nn.Block):
         return self.output(self.hidden(x))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 class MLP(nn.Module):
@@ -275,7 +273,6 @@ class MLP(nn.Module):
         # nn.functional module.
         return self.output(F.relu(self.hidden(x)))
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -347,7 +344,6 @@ net(x)
 net = MLP()
 net(x)
 ```
-
 
 A key virtue of the block abstraction is its versatility.
 We can subclass the block class to create layers

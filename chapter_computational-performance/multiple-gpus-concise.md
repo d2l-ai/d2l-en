@@ -3,7 +3,7 @@
 
 Implementing parallelism from scratch for every new model is no fun. Moreover, there is significant benefit in optimizing synchronization tools for high performance. In the following we will show how to do this using Gluon. The math and the algorithms are the same as in :numref:`sec_multi_gpu`. As before we begin by importing the required modules (quite unsurprisingly you will need at least two GPUs to run this notebook).
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
@@ -14,7 +14,7 @@ npx.set_np()
 
 Let us use a slightly more meaningful network than LeNet from the previous section that's still sufficiently easy and quick to train. We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference to :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning. Moreover, we remove the max-pooling layer.
 
-```{.python .input  n=2}
+```{.python .input}
 #@save
 def resnet18(num_classes):
     """A slightly modified ResNet-18 model."""
@@ -45,7 +45,7 @@ def resnet18(num_classes):
 
 The `initialize` method allows us to set initial defaults for parameters on a device of our choice. For a refresher see :numref:`sec_numerical_stability`. What is particularly convenient is that it also lets us initialize the network on *multiple* devices simultaneously. Let us try how this works in practice.
 
-```{.python .input  n=3}
+```{.python .input}
 net = resnet18(10)
 # get a list of GPUs
 ctx = d2l.try_all_gpus()
@@ -55,7 +55,7 @@ net.initialize(init=init.Normal(sigma=0.01), ctx=ctx)
 
 Using the `split_and_load` function introduced in the previous section we can divide a minibatch of data and copy portions to the list of devices provided by the context variable. The network object *automatically* uses the appropriate GPU to compute the value of the forward pass. As before we generate 4 observations and split them over the GPUs.
 
-```{.python .input  n=4}
+```{.python .input}
 x = np.random.uniform(size=(4, 1, 28, 28))
 x_shards = gluon.utils.split_and_load(x, ctx)
 net(x_shards[0]), net(x_shards[1])
@@ -63,7 +63,7 @@ net(x_shards[0]), net(x_shards[1])
 
 Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*. This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters do not even exist on the device. We can verify this by printing out the parameters and observing any errors that might arise.
 
-```{.python .input  n=5}
+```{.python .input}
 weight = net[0].params.get('weight')
 
 try:
@@ -75,7 +75,7 @@ weight.data(ctx[0])[0], weight.data(ctx[1])[0]
 
 Lastly let us replace the code to evaluate the accuracy by one that works in parallel across multiple devices. This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a batch before invoking the network. All else is essentially identical.
 
-```{.python .input  n=6}
+```{.python .input}
 #@save
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     # Query the list of devices
@@ -102,7 +102,7 @@ As before, the training code needs to perform a number of basic functions for ef
 
 In the end we compute the accuracy (again in parallel) to report the final value of the network. The training routine is quite similar to implementations in previous chapters, except that we need to split and aggregate data.
 
-```{.python .input  n=7}
+```{.python .input}
 def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     ctx = [d2l.try_gpu(i) for i in range(num_gpus)]
@@ -133,13 +133,13 @@ def train(num_gpus, batch_size, lr):
 
 Let us see how this works in practice. As a warmup we train the network on a single GPU.
 
-```{.python .input  n=8}
+```{.python .input}
 train(num_gpus=1, batch_size=256, lr=0.1)
 ```
 
 Next we use 2 GPUs for training. Compared to LeNet the model for ResNet-18 is considerably more complex. This is where parallelization shows its advantage. The time for computation is meaningfully larger than the time for synchronizing parameters. This improves scalability since the overhead for parallelization is less relevant.
 
-```{.python .input  n=9}
+```{.python .input}
 train(num_gpus=2, batch_size=512, lr=0.2)
 ```
 

@@ -22,4 +22,3 @@ image-classification-dataset
 softmax-regression-scratch
 softmax-regression-concise
 ```
-

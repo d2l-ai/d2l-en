@@ -360,7 +360,6 @@ import sys
 import tarfile
 import time
 import zipfile
-
 d2l = sys.modules[__name__]
 ```
 
@@ -391,7 +390,6 @@ import time
 import zipfile
 import requests
 import warnings
-
 d2l = sys.modules[__name__]
 ```
 
@@ -415,7 +413,6 @@ import tarfile
 import time
 import zipfile
 import requests
-
 d2l = sys.modules[__name__]
 ```
 
@@ -428,7 +425,8 @@ from matplotlib import pyplot as plt
 from IPython import display
 import math
 import jax
-import numpy as np
+import jax.numpy as np
+import numpy as onp
 import os
 import pandas as pd
 import random
@@ -439,7 +437,6 @@ import tarfile
 import time
 import zipfile
 import requests
-
 d2l = sys.modules[__name__]
 ```
 

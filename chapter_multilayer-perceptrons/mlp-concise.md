@@ -62,7 +62,6 @@ def init_weights(m):
 net.apply(init_weights)
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 net = tf.keras.models.Sequential([
@@ -109,7 +108,6 @@ net.fit(train_iter, epochs=num_epochs)
 1. Try adding different numbers of hidden layers. What setting (keeping other parameters and hyperparameters constant) works best? 
 1. Try out different activation functions. Which ones work best?
 1. Try different schemes for initializing the weights. What method works best?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/94)

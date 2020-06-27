@@ -497,7 +497,7 @@ f'{timer.stop():.5f} sec'
 ```
 
 ```{.python .input}
-#@tab jax 
+#@tab jax
 timer.start()
 d = a + b
 f'{timer.stop():.5f} sec'

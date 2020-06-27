@@ -60,7 +60,6 @@ def nin_block(num_channels, kernel_size, strides, padding):
     return blk
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
@@ -112,7 +111,6 @@ net.add(nin_block(96, kernel_size=11, strides=4, padding=0),
         nn.Flatten())
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(
@@ -138,7 +136,6 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.rand(size=(1, 1, 224, 224))
@@ -158,7 +155,6 @@ lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
-
 
 ```{.python .input}
 #@tab pytorch

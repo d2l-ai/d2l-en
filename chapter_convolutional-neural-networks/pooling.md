@@ -116,7 +116,6 @@ def pool2d(X, pool_size, mode='max'):
     return Y
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 import torch
@@ -141,7 +140,6 @@ X = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
 pool2d(X, (2, 2))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=torch.float32)
@@ -154,11 +152,9 @@ At the same time, we experiment with the average pooling layer.
 pool2d(X, (2, 2), 'avg')
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 pool2d(X, (2, 2), 'avg')
-
 ```
 
 ## Padding and Stride
@@ -178,7 +174,6 @@ X = np.arange(16).reshape(1, 1, 4, 4)
 X
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.arange(16, dtype=torch.float32).reshape((1, 1, 4, 4))
@@ -197,7 +192,6 @@ pool2d = nn.MaxPool2D(3)
 pool2d(X)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 pool2d = nn.MaxPool2d(3)
@@ -210,7 +204,6 @@ The stride and padding can be manually specified.
 pool2d = nn.MaxPool2D(3, padding=1, strides=2)
 pool2d(X)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -225,7 +218,6 @@ and specify the padding and stride for height and width, respectively.
 pool2d = nn.MaxPool2D((2, 3), padding=(1, 2), strides=(2, 3))
 pool2d(X)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -249,7 +241,6 @@ X = np.concatenate((X, X + 1), axis=1)
 X
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.cat((X, X + 1), dim=1)
@@ -262,7 +253,6 @@ As we can see, the number of output channels is still 2 after pooling.
 pool2d = nn.MaxPool2D(3, padding=1, strides=2)
 pool2d(X)
 ```
-
 
 ```{.python .input}
 #@tab pytorch

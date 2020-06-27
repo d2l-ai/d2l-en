@@ -22,4 +22,3 @@ rnn-scratch
 rnn-concise
 bptt
 ```
-

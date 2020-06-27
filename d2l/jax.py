@@ -9,7 +9,8 @@ from matplotlib import pyplot as plt
 from IPython import display
 import math
 import jax
-import numpy as np
+import jax.numpy as np
+import numpy as onp
 import os
 import pandas as pd
 import random
@@ -20,7 +21,6 @@ import tarfile
 import time
 import zipfile
 import requests
-
 d2l = sys.modules[__name__]
 
 
@@ -121,6 +121,34 @@ class Timer:  #@save
         return np.array(self.times).cumsum().tolist()
 
 
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+def synthetic_data(w, b, num_examples, rng_key):  #@save
+    """Generate y = X w + b + noise."""
+    X = jax.random.normal(rng_key, (num_examples, len(w)))
+    y = np.dot(X, w) + b
+    y += jax.random.normal(rng_key, (y.shape)) * 0.01 # Jax.random only has a standard normal sampler so we need to scale,
+                                                  # See explanation below
+    return X, y
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+def linreg(X, w, b):  #@save
+    return np.dot(X, w) + b
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+squared_loss = (lambda y_hat, y: np.mean((y_hat - y.reshape(y_hat.shape))**2)) #@save
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+def sgd(params, grads, lr, batch_size):  #@save
+    new_params = []
+    for param, delta in zip(params, grads):
+        new_params.append(param - (lr * delta/batch_size)) # Jax arrays are immutable so we need to return
+                                                           # our changed parameters 
+    return new_params[0], new_params[1]
+
+
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def get_fashion_mnist_labels(labels):  #@save
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
@@ -154,61 +182,34 @@ def get_dataloader_workers(num_workers=4):  #@save
         return num_workers
 
 
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-class Accumulator:  #@save
-    """Sum a list of numbers over time."""
-    def __init__(self, n):
-        self.data = [0.0] * n
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+def data_loader(data, targets, b_size, rng_key): #@save
+    if len(targets.shape) == 1:
+        targets = targets[..., None]
+    while True:
+        # Generate new subkey every time to not sample the same minibatch data over and over
+        rng_key, subkey = jax.random.split(rng_key)
+        data = jax.random.permutation(subkey, data)
+        targets = jax.random.permutation(subkey, targets) # Shuffle data and targets in unison by using the same key
 
-    def add(self, *args):
-        self.data = [a+float(b) for a, b in zip(self.data, args)]
-
-    def reset(self):
-        self.data = [0.0] * len(self.data)
-
-    def __getitem__(self, idx):
-        return self.data[idx]
+        n_samples = data.shape[0]
+        idxs = onp.random.choice(n_samples, size=batch_size, replace=False)
+        yield data[idxs], targets[idxs]
+    
 
 
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-class Animator:  #@save
-    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
-                 ylim=None, xscale='linear', yscale='linear', fmts=None,
-                 nrows=1, ncols=1, figsize=(3.5, 2.5)):
-        """Incrementally plot multiple lines."""
-        if legend is None:
-            legend = []
-        d2l.use_svg_display()
-        self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
-        if nrows * ncols == 1:
-            self.axes = [self.axes, ]
-        # Use a lambda to capture arguments
-        self.config_axes = lambda: d2l.set_axes(
-            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
-        self.X, self.Y, self.fmts = None, None, fmts
-
-    def add(self, x, y):
-        """Add multiple data points into the figure."""
-        if not hasattr(y, "__len__"):
-            y = [y]
-        n = len(y)
-        if not hasattr(x, "__len__"):
-            x = [x] * n
-        if not self.X:
-            self.X = [[] for _ in range(n)]
-        if not self.Y:
-            self.Y = [[] for _ in range(n)]
-        if not self.fmts:
-            self.fmts = ['-'] * n
-        for i, (a, b) in enumerate(zip(x, y)):
-            if a is not None and b is not None:
-                self.X[i].append(a)
-                self.Y[i].append(b)
-        self.axes[0].cla()
-        for x, y, fmt in zip(self.X, self.Y, self.fmts):
-            self.axes[0].plot(x, y, fmt)
-        self.config_axes()
-        display.display(self.fig)
-        display.clear_output(wait=True)
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+def load_data_fashion_mnist(batch_size, resize=None): #@save
+    """Download the Fashion-MNIST dataset and then load into memory."""
+    # TODO: Resize
+    rng_key = jax.random.PRNGKey(24)
+    fashion_mnist = fetch_openml(name="Fashion-MNIST")
+    mnist_train_x, mnist_test_x, mnist_train_y, mnist_test_y = train_test_split(fashion_mnist['data'],
+                                                                            fashion_mnist['target'],
+                                                                            test_size=10000,
+                                                                         )
+    return (
+        data_loader(mnist_train_x, mnist_train_y, batch_size, rng_key), data_loader(
+        mnist_test_x, mnist_test_y, batch_size, rng_key))
 
 

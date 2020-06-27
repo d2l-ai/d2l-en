@@ -590,5 +590,3 @@ that you might encounter in a career in machine learning.
 1. What could go wrong if training and test sets are very different? What would happen to the sample weights?
 
 [Discussions](https://discuss.d2l.ai/t/105)
-
-

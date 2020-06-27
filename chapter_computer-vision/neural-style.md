@@ -24,7 +24,7 @@ Next, we will perform an experiment to help us better understand the technical d
 
 First, we read the content and style images. By printing out the image coordinate axes, we can see that they have different dimensions.
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, image, init, np, npx
@@ -37,7 +37,7 @@ content_img = image.imread('../img/rainier.jpg')
 d2l.plt.imshow(content_img.asnumpy());
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 style_img = image.imread('../img/autumn_oak.jpg')
 d2l.plt.imshow(style_img.asnumpy());
 ```
@@ -46,7 +46,7 @@ d2l.plt.imshow(style_img.asnumpy());
 
 Below, we define the functions for image preprocessing and postprocessing. The `preprocess` function normalizes each of the three RGB channels of the input images and transforms the results to a format that can be input to the CNN. The `postprocess` function restores the pixel values in the output image to their original values before normalization. Because the image printing function requires that each pixel has a floating point value from 0 to 1, we use the `clip` function to replace values smaller than 0 or greater than 1 with 0 or 1, respectively.
 
-```{.python .input  n=3}
+```{.python .input}
 rgb_mean = np.array([0.485, 0.456, 0.406])
 rgb_std = np.array([0.229, 0.224, 0.225])
 
@@ -64,19 +64,19 @@ def postprocess(img):
 
 We use the VGG-19 model pre-trained on the ImageNet dataset to extract image features[1].
 
-```{.python .input  n=4}
+```{.python .input}
 pretrained_net = gluon.model_zoo.vision.vgg19(pretrained=True)
 ```
 
 To extract image content and style features, we can select the outputs of certain layers in the VGG network. In general, the closer an output is to the input layer, the easier it is to extract image detail information. The farther away an output is, the easier it is to extract global information. To prevent the composite image from retaining too many details from the content image, we select a VGG network layer near the output layer to output the image content features. This layer is called the content layer. We also select the outputs of different layers from the VGG network for matching local and global styles. These are called the style layers. As we mentioned in :numref:`sec_vgg`, VGG networks have five convolutional blocks. In this experiment, we select the last convolutional layer of the fourth convolutional block as the content layer and the first layer of each block as style layers. We can obtain the indexes for these layers by printing the `pretrained_net` instance.
 
-```{.python .input  n=5}
+```{.python .input}
 style_layers, content_layers = [0, 5, 10, 19, 28], [25]
 ```
 
 During feature extraction, we only need to use all the VGG layers from the input layer to the content or style layer nearest the output layer. Below, we build a new network, `net`, which only retains the layers in the VGG network we need to use. We then use `net` to extract features.
 
-```{.python .input  n=6}
+```{.python .input}
 net = nn.Sequential()
 for i in range(max(content_layers + style_layers) + 1):
     net.add(pretrained_net.features[i])
@@ -84,7 +84,7 @@ for i in range(max(content_layers + style_layers) + 1):
 
 Given input `X`, if we simply call the forward computation `net(X)`, we can only obtain the output of the last layer. Because we also need the outputs of the intermediate layers, we need to perform layer-by-layer computation and retain the content and style layer outputs.
 
-```{.python .input  n=7}
+```{.python .input}
 def extract_features(X, content_layers, style_layers):
     contents = []
     styles = []
@@ -99,7 +99,7 @@ def extract_features(X, content_layers, style_layers):
 
 Next, we define two functions: The `get_contents` function obtains the content features extracted from the content image, while the `get_styles` function obtains the style features extracted from the style image. Because we do not need to change the parameters of the pre-trained VGG model during training, we can extract the content features from the content image and style features from the style image before the start of training. As the composite image is the model parameter that must be updated during style transfer, we can only call the `extract_features` function during training to extract the content and style features of the composite image.
 
-```{.python .input  n=8}
+```{.python .input}
 def get_contents(image_shape, ctx):
     content_X = preprocess(content_img, image_shape).copyto(ctx)
     contents_Y, _ = extract_features(content_X, content_layers, style_layers)
@@ -119,7 +119,7 @@ Next, we will look at the loss function used for style transfer. The loss functi
 
 Similar to the loss function used in linear regression, content loss uses a square error function to measure the difference in content features between the composite image and content image. The two inputs of the square error function are both content layer outputs obtained from the `extract_features` function.
 
-```{.python .input  n=10}
+```{.python .input}
 def content_loss(Y_hat, Y):
     return np.square(Y_hat - Y).mean()
 ```
@@ -128,7 +128,7 @@ def content_loss(Y_hat, Y):
 
 Style loss, similar to content loss, uses a square error function to measure the difference in style between the composite image and style image. To express the styles output by the style layers, we first use the `extract_features` function to compute the style layer output. Assuming that the output has 1 example, $c$ channels, and a height and width of $h$ and $w$, we can transform the output into the matrix $\mathbf{X}$, which has $c$ rows and $h \cdot w$ columns. You can think of matrix $\mathbf{X}$ as the combination of the $c$ vectors $\mathbf{x}_1, \ldots, \mathbf{x}_c$, which have a length of $hw$. Here, the vector $\mathbf{x}_i$ represents the style feature of channel $i$. In the Gram matrix of these vectors $\mathbf{X}\mathbf{X}^\top \in \mathbb{R}^{c \times c}$, element $x_{ij}$ in row $i$ column $j$ is the inner product of vectors $\mathbf{x}_i$ and $\mathbf{x}_j$. It represents the correlation of the style features of channels $i$ and $j$. We use this type of Gram matrix to represent the style output by the style layers. You must note that, when the $h \cdot w$ value is large, this often leads to large values in the Gram matrix. In addition, the height and width of the Gram matrix are both the number of channels $c$. To ensure that the style loss is not affected by the size of these values, we define the `gram` function below to divide the Gram matrix by the number of its elements, i.e., $c \cdot h \cdot w$.
 
-```{.python .input  n=11}
+```{.python .input}
 def gram(X):
     num_channels, n = X.shape[1], X.size // X.shape[1]
     X = X.reshape(num_channels, n)
@@ -137,7 +137,7 @@ def gram(X):
 
 Naturally, the two Gram matrix inputs of the square error function for style loss are taken from the composite image and style image style layer outputs. Here, we assume that the Gram matrix of the style image, `gram_Y`, has been computed in advance.
 
-```{.python .input  n=12}
+```{.python .input}
 def style_loss(Y_hat, gram_Y):
     return np.square(gram(Y_hat) - gram_Y).mean()
 ```
@@ -150,7 +150,7 @@ $$\sum_{i, j} \left|x_{i, j} - x_{i+1, j}\right| + \left|x_{i, j} - x_{i, j+1}\r
 
 We try to make the values of neighboring pixels as similar as possible.
 
-```{.python .input  n=13}
+```{.python .input}
 def tv_loss(Y_hat):
     return 0.5 * (np.abs(Y_hat[:, :, 1:, :] - Y_hat[:, :, :-1, :]).mean() +
                   np.abs(Y_hat[:, :, :, 1:] - Y_hat[:, :, :, :-1]).mean())
@@ -160,7 +160,7 @@ def tv_loss(Y_hat):
 
 The loss function for style transfer is the weighted sum of the content loss, style loss, and total variance loss. By adjusting these weight hyper-parameters, we can balance the retained content, transferred style, and noise reduction in the composite image according to their relative importance.
 
-```{.python .input  n=14}
+```{.python .input}
 content_weight, style_weight, tv_weight = 1, 1e3, 10
 
 def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
@@ -179,7 +179,7 @@ def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
 
 In style transfer, the composite image is the only variable that needs to be updated. Therefore, we can define a simple model, `GeneratedImage`, and treat the composite image as a model parameter. In the model, forward computation only returns the model parameter.
 
-```{.python .input  n=15}
+```{.python .input}
 class GeneratedImage(nn.Block):
     def __init__(self, img_shape, **kwargs):
         super(GeneratedImage, self).__init__(**kwargs)
@@ -191,7 +191,7 @@ class GeneratedImage(nn.Block):
 
 Next, we define the `get_inits` function. This function creates a composite image model instance and initializes it to the image `X`. The Gram matrix for the various style layers of the style image, `styles_Y_gram`, is computed prior to training.
 
-```{.python .input  n=16}
+```{.python .input}
 def get_inits(X, ctx, lr, styles_Y):
     gen_img = GeneratedImage(X.shape)
     gen_img.initialize(init.Constant(X), ctx=ctx, force_reinit=True)
@@ -210,7 +210,7 @@ results in :numref:`sec_async`. Because we only call the `asscalar` synchronizat
 epochs, the process may occupy a great deal of memory. Therefore, we call the
 `waitall` synchronization function during every epoch.
 
-```{.python .input  n=17}
+```{.python .input}
 def train(X, contents_Y, styles_Y, ctx, lr, num_epochs, lr_decay_epoch):
     X, styles_Y_gram, trainer = get_inits(X, ctx, lr, styles_Y)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
@@ -238,7 +238,7 @@ def train(X, contents_Y, styles_Y, ctx, lr, num_epochs, lr_decay_epoch):
 
 Next, we start to train the model. First, we set the height and width of the content and style images to 150 by 225 pixels. We use the content image to initialize the composite image.
 
-```{.python .input  n=18}
+```{.python .input}
 ctx, image_shape = d2l.try_gpu(), (225, 150)
 net.collect_params().reset_ctx(ctx)
 content_X, contents_Y = get_contents(image_shape, ctx)
@@ -250,7 +250,7 @@ As you can see, the composite image retains the scenery and objects of the conte
 
 To obtain a clearer composite image, we train the model using a larger image size: $900 \times 600$. We increase the height and width of the image used before by a factor of four and initialize a larger composite image.
 
-```{.python .input  n=19}
+```{.python .input}
 image_shape = (900, 600)
 _, content_Y = get_contents(image_shape, ctx)
 _, style_Y = get_styles(image_shape, ctx)

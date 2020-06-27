@@ -128,7 +128,6 @@ net = torch.nn.Sequential(
     nn.Linear(84, 10))
 ```
 
-
 We took a small liberty with the original model,
 removing the Gaussian activation in the final layer.
 Other than that, this network matches

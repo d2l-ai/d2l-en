@@ -10,7 +10,7 @@ The MovieLens dataset is hosted by the [GroupLens](https://grouplens.org/dataset
 
 To begin with, let us import the packages required to run this section’s experiments.
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import gluon, np
 import os
@@ -19,7 +19,7 @@ import pandas as pd
 
 Then, we download the MovieLens 100k dataset and load the interactions as `DataFrame`.
 
-```{.python .input  n=2}
+```{.python .input}
 #@save
 d2l.DATA_HUB['ml-100k'] = (
     'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
@@ -40,7 +40,7 @@ def read_data_ml100k():
 
 Let us load up the data and inspect the first five records manually. It is an effective way to learn the data structure and verify that they have been loaded properly.
 
-```{.python .input  n=3}
+```{.python .input}
 data, num_users, num_items = read_data_ml100k()
 sparsity = 1 - len(data) / (num_users * num_items)
 print('number of users: %d, number of items: %d.' % (num_users, num_items))
@@ -52,7 +52,7 @@ We can see that each line consists of four columns, including "user id" 1-943, "
 
 We then plot the distribution of the count of different ratings. As expected, it appears to be a normal distribution, with most ratings centered at 3-4.
 
-```{.python .input  n=4}
+```{.python .input}
 d2l.plt.hist(data['rating'], bins=5, ec='black')
 d2l.plt.xlabel('Rating')
 d2l.plt.ylabel('Count')
@@ -64,7 +64,7 @@ d2l.plt.show()
 
 We split the dataset into training and test sets. The following function provides two split modes including `random` and `seq-aware`. In the `random` mode, the function splits the 100k interactions randomly without considering timestamp and uses the 90% of the data as training samples and the rest 10% as test samples by default. In the `seq-aware` mode, we leave out the item that a user rated most recently for test, and users' historical interactions as training set.  User historical interactions are sorted from oldest to newest based on timestamp. This mode will be used in the sequence-aware recommendation section.
 
-```{.python .input  n=5}
+```{.python .input}
 #@save
 def split_data_ml100k(data, num_users, num_items,
                       split_mode='random', test_ratio=0.1):
@@ -96,7 +96,7 @@ Note that it is good practice to use a validation set in practice, apart from on
 
 After dataset splitting, we will convert the training set and test set into lists and dictionaries/matrix for the sake of convenience. The following function reads the dataframe line by line and enumerates the index of users/items start from zero. The function then returns lists of users, items, ratings and a dictionary/matrix that records the interactions. We can specify the type of feedback to either `explicit` or `implicit`.
 
-```{.python .input  n=6}
+```{.python .input}
 #@save
 def load_data_ml100k(data, num_users, num_items, feedback='explicit'):
     users, items, scores = [], [], []
@@ -116,7 +116,7 @@ def load_data_ml100k(data, num_users, num_items, feedback='explicit'):
 
 Afterwards, we put the above steps together and it will be used in the next section. The results are wrapped with `Dataset` and `DataLoader`. Note that the `last_batch` of `DataLoader` for training data is set to the `rollover` mode (The remaining samples are rolled over to the next epoch.) and orders are shuffled.
 
-```{.python .input  n=7}
+```{.python .input}
 #@save
 def split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',
                           test_ratio=0.1, batch_size=256):

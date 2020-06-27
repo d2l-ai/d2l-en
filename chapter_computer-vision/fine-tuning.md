@@ -26,7 +26,7 @@ Next, we will use a specific example for practice: hot dog recognition. We will 
 
 First, import the packages and modules required for the experiment.  Gluon's `model_zoo` package provides a common pre-trained model. If you want to get more pre-trained models for computer vision, you can use the [GluonCV Toolkit](https://gluon-cv.mxnet.io).
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
@@ -42,7 +42,7 @@ The hot dog dataset we use was taken from online images and contains $1,400$ pos
 
 We first download the compressed dataset and get two folders `hotdog/train` and `hotdog/test`. Both folders have `hotdog` and `not-hotdog` category subfolders, each of which has corresponding image files.
 
-```{.python .input  n=2}
+```{.python .input}
 #@save
 d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip', 
                          'fba480ffa8aa7e0febbb511d181409f899b9baa5')
@@ -52,7 +52,7 @@ data_dir = d2l.download_extract('hotdog')
 
 We create two `ImageFolderDataset` instances to read all the image files in the training dataset and testing dataset, respectively.
 
-```{.python .input  n=3}
+```{.python .input}
 train_imgs = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, 'train'))
 test_imgs = gluon.data.vision.ImageFolderDataset(
@@ -61,7 +61,7 @@ test_imgs = gluon.data.vision.ImageFolderDataset(
 
 The first 8 positive examples and the last 8 negative images are shown below. As you can see, the images vary in size and aspect ratio.
 
-```{.python .input  n=4}
+```{.python .input}
 hotdogs = [train_imgs[i][0] for i in range(8)]
 not_hotdogs = [train_imgs[-i - 1][0] for i in range(8)]
 d2l.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
@@ -69,7 +69,7 @@ d2l.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
 
 During training, we first crop a random area with random size and random aspect ratio from the image and then scale the area to an input with a height and width of 224 pixels. During testing, we scale the height and width of images to 256 pixels, and then crop the center area with height and width of 224 pixels to use as the input. In addition, we normalize the values of the three RGB (red, green, and blue) color channels. The average of all values of the channel is subtracted from each value and then the result is divided by the standard deviation of all values of the channel to produce the output.
 
-```{.python .input  n=5}
+```{.python .input}
 # We specify the mean and variance of the three RGB channels to normalize the
 # image channel
 normalize = gluon.data.vision.transforms.Normalize(
@@ -92,19 +92,19 @@ test_augs = gluon.data.vision.transforms.Compose([
 
 We use ResNet-18, which was pre-trained on the ImageNet dataset, as the source model. Here, we specify `pretrained=True` to automatically download and load the pre-trained model parameters. The first time they are used, the model parameters need to be downloaded from the Internet.
 
-```{.python .input  n=6}
+```{.python .input}
 pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
 ```
 
 The pre-trained source model instance contains two member variables: `features` and `output`. The former contains all layers of the model, except the output layer, and the latter is the output layer of the model. The main purpose of this division is to facilitate the fine tuning of the model parameters of all layers except the output layer. The member variable `output` of source model is given below. As a fully connected layer, it transforms ResNet's final global average pooling layer output into 1000 class output on the ImageNet dataset.
 
-```{.python .input  n=7}
+```{.python .input}
 pretrained_net.output
 ```
 
 We then build a new neural network to use as the target model. It is defined in the same way as the pre-trained source model, but the final number of outputs is equal to the number of categories in the target dataset. In the code below, the model parameters in the member variable `features` of the target model instance `finetune_net` are initialized to model parameters of the corresponding layer of the source model. Because the model parameters in `features` are obtained by pre-training on the ImageNet dataset, it is good enough. Therefore, we generally only need to use small learning rates to "fine-tune" these parameters. In contrast, model parameters in the member variable `output` are randomly initialized and generally require a larger learning rate to learn from scratch. Assume the learning rate in the `Trainer` instance is $\eta$ and use a learning rate of $10\eta$ to update the model parameters in the member variable `output`.
 
-```{.python .input  n=8}
+```{.python .input}
 finetune_net = gluon.model_zoo.vision.resnet18_v2(classes=2)
 finetune_net.features = pretrained_net.features
 finetune_net.output.initialize(init.Xavier())
@@ -117,7 +117,7 @@ finetune_net.output.collect_params().setattr('lr_mult', 10)
 
 We first define a training function `train_fine_tuning` that uses fine tuning so it can be called multiple times.
 
-```{.python .input  n=9}
+```{.python .input}
 def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
     train_iter = gluon.data.DataLoader(
         train_imgs.transform_first(train_augs), batch_size, shuffle=True)
@@ -134,13 +134,13 @@ def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
 
 We set the learning rate in the `Trainer` instance to a smaller value, such as 0.01, in order to fine-tune the model parameters obtained in pretraining. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.
 
-```{.python .input  n=10}
+```{.python .input}
 train_fine_tuning(finetune_net, 0.01)
 ```
 
 For comparison, we define an identical model, but initialize all of its model parameters to random values. Since the entire model needs to be trained from scratch, we can use a larger learning rate.
 
-```{.python .input  n=12}
+```{.python .input}
 scratch_net = gluon.model_zoo.vision.resnet18_v2(classes=2)
 scratch_net.initialize(init=init.Xavier())
 train_fine_tuning(scratch_net, 0.1)
@@ -169,7 +169,7 @@ finetune_net.features.collect_params().setattr('grad_req', 'null')
 
 4. In fact, there is also a "hotdog" class in the `ImageNet` dataset. Its corresponding weight parameter at the output layer can be obtained by using the following code. How can we use this parameter?
 
-```{.python .input  n=13}
+```{.python .input}
 weight = pretrained_net.output.weight
 hotdog_w = np.split(weight.data(), 1000, axis=0)[713]
 hotdog_w.shape

@@ -20,7 +20,6 @@ using `sh <FILENAME> -b`. For macOS users:
 sh Miniconda3-latest-MacOSX-x86_64.sh -b
 ```
 
-
 For Linux users:
 
 ```bash
@@ -28,13 +27,11 @@ For Linux users:
 sh Miniconda3-latest-Linux-x86_64.sh -b
 ```
 
-
 Next, initialize the shell so we can run `conda` directly.
 
 ```bash
 ~/miniconda3/bin/conda init
 ```
-
 
 Now close and re-open your current shell. You should be able to create a new
 environment as following:
@@ -43,20 +40,17 @@ environment as following:
 conda create --name d2l -y
 ```
 
-
 ## Downloading the D2L Notebooks
 
 Next, we need to download the code of this book. You can click the "All
 Notebooks" tab on the top of any HTML page to download and unzip the code.
 Alternatively, if you have `unzip` (otherwise run `sudo apt install unzip`) available:
 
-
 ```bash
 mkdir d2l-en && cd d2l-en
 curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
-
 
 Now we will want to activate the `d2l` environment and install `pip`.
 Enter `y` for the queries that follow this command.
@@ -65,7 +59,6 @@ Enter `y` for the queries that follow this command.
 conda activate d2l
 conda install python=3.7 pip -y
 ```
-
 
 ## Installing the Framework and the `d2l` Package
 
@@ -94,7 +87,6 @@ pip install torch==1.5.0 torchvision
 ```
 :end_tab:
 
-
 We also install the `d2l` package that encapsulates frequently used
 functions and classes in this book.
 
@@ -102,13 +94,11 @@ functions and classes in this book.
 pip install -U d2l -f https://d2l.ai/whl.html
 ```
 
-
 Once they are installed, we now open the Jupyter notebook by running:
 
 ```bash
 jupyter notebook
 ```
-
 
 At this point, you can open http://localhost:8888 (it usually opens automatically) in your Web browser. Then we can run the code for each section of the book.
 Please always execute `conda activate d2l` to activate the runtime environment
@@ -128,7 +118,6 @@ then you should install a GPU-enabled version.
 If you have installed the CPU-only version,
 you may need to remove it first by running:
 
-
 :begin_tab:`mxnet`
 ```bash
 pip uninstall mxnet
@@ -141,12 +130,10 @@ pip uninstall torch
 ```
 :end_tab:
 
-
 Then we need to find the CUDA version you installed.
 You may check it through `nvcc --version` or `cat /usr/local/cuda/version.txt`.
 Assume that you have installed CUDA 10.1,
 then you can install with the following command:
-
 
 :begin_tab:`mxnet`
 ```bash

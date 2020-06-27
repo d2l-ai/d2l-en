@@ -75,7 +75,6 @@ class Inception(nn.Block):
         return np.concatenate((p1, p2, p3, p4), axis=1)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
@@ -143,7 +142,6 @@ b1.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3, activation='relu'),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
@@ -161,7 +159,6 @@ b2.add(nn.Conv2D(64, kernel_size=1, activation='relu'),
        nn.Conv2D(192, kernel_size=3, padding=1, activation='relu'),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -189,7 +186,6 @@ b3.add(Inception(64, (96, 128), (16, 32), 32),
        Inception(128, (128, 192), (32, 96), 64),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -224,7 +220,6 @@ b4.add(Inception(192, (96, 208), (16, 48), 64),
        nn.MaxPool2D(pool_size=3, strides=2, padding=1))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b4 = nn.Sequential(Inception(480, 192, (96, 208), (16, 48), 64),
@@ -257,7 +252,6 @@ net = nn.Sequential()
 net.add(b1, b2, b3, b4, b5, nn.Dense(10))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 b5 = nn.Sequential(Inception(832, 256, (160, 320), (32, 128), 128),
@@ -284,7 +278,6 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X = torch.rand(size=(1, 1, 96, 96))
@@ -304,7 +297,6 @@ lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
-
 
 ```{.python .input}
 #@tab pytorch

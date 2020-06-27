@@ -37,7 +37,7 @@ An intuitive illustration of the matrix factorization model is shown below:
 
 In the rest of this section, we will explain the implementation of matrix factorization and train the model on the MovieLens dataset.
 
-```{.python .input  n=2}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
@@ -49,7 +49,7 @@ npx.set_np()
 
 First, we implement the matrix factorization model described above. The user and item latent factors can be created with the `nn.Embedding`. The `input_dim` is the number of items/users and the (`output_dim`) is the dimension of the latent factors ($k$).  We can also use `nn.Embedding` to create the user/item biases by setting the `output_dim` to one. In the `forward` function, user and item ids are used to look up the embeddings.
 
-```{.python .input  n=4}
+```{.python .input}
 class MF(nn.Block):
     def __init__(self, num_factors, num_users, num_items, **kwargs):
         super(MF, self).__init__(**kwargs)
@@ -77,7 +77,7 @@ $$
 
 where $\mathcal{T}$ is the set consisting of pairs of users and items that you want to evaluate on. $|\mathcal{T}|$ is the size of this set. We can use the RMSE function provided by `mx.metric`.
 
-```{.python .input  n=3}
+```{.python .input}
 def evaluator(net, test_iter, ctx):
     rmse = mx.metric.RMSE()  # Get the RMSE
     rmse_list = []
@@ -96,7 +96,7 @@ def evaluator(net, test_iter, ctx):
 
 In the training function, we adopt the $L_2$ loss with weight decay. The weight decay mechanism has the same effect as the $L_2$ regularization.
 
-```{.python .input  n=4}
+```{.python .input}
 #@save
 def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                         ctx_list=d2l.try_all_gpus(), evaluator=None,
@@ -137,7 +137,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 
 Finally, let us put all things together and train the model. Here, we set the latent factor dimension to 30.
 
-```{.python .input  n=5}
+```{.python .input}
 ctx = d2l.try_all_gpus()
 num_users, num_items, train_iter, test_iter = d2l.split_and_load_ml100k(
     test_ratio=0.1, batch_size=512)
@@ -153,7 +153,7 @@ train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 
 Below, we use the trained model to predict the rating that a user (ID 20) might give to an item (ID 30).
 
-```{.python .input  n=6}
+```{.python .input}
 scores = net(np.array([20], dtype='int', ctx=d2l.try_gpu()),
              np.array([30], dtype='int', ctx=d2l.try_gpu()))
 scores

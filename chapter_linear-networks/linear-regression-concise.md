@@ -56,6 +56,19 @@ features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 labels = tf.reshape(labels, (-1, 1))
 ```
 
+```{.python .input}
+#@tab jax
+from d2l import jax as d2l
+import jax.numpy as np
+from jax import random
+import numpy as onp
+key = random.PRNGKey(42)
+
+true_w = np.array([2, -3.4])
+true_b = 4.2
+features, labels = d2l.synthetic_data(true_w, true_b, 1000, key)
+```
+
 ## Reading the Dataset
 
 Rather than rolling our own iterator,
@@ -104,6 +117,29 @@ batch_size = 10
 data_iter = load_array((features, labels), batch_size)
 ```
 
+```{.python .input}
+#@tab jax
+def data_loader(data, targets, b_size, rng_key):
+    if len(targets.shape) == 1:
+        targets = targets[..., None]
+    while True:
+        # Generate new subkey every time to not sample the same minibatch data over and over
+        rng_key, subkey = random.split(rng_key)
+        data = random.permutation(subkey, data)
+        targets = random.permutation(subkey, targets) # Shuffle data and targets in unison by using the same key
+
+        n_samples = data.shape[0]
+        idxs = onp.random.choice(n_samples, size=batch_size, replace=False)
+        yield data[idxs], targets[idxs]
+
+def load_array(data_arrays, batch_size, is_train=True):  # save
+    """Construct a custom data loader."""
+    return data_loader(data_arrays[0], data_arrays[1], batch_size, key)
+
+batch_size = 10
+data_iter = load_array((features, labels), batch_size)
+```
+
 Now we can use `data_iter` in much the same way as we called
 the `data_iter` function in the previous section.
 To verify that it is working, we can read and print
@@ -120,6 +156,11 @@ next(iter(data_iter))
 
 ```{.python .input}
 #@tab tensorflow
+next(iter(data_iter))
+```
+
+```{.python .input}
+#@tab jax
 next(iter(data_iter))
 ```
 
@@ -187,6 +228,11 @@ net = tf.keras.Sequential()
 net.add(tf.keras.layers.Dense(1))
 ```
 
+```{.python .input}
+#@tab jax
+# Jax provides no high-level API, please see the chapter: 'Linear Regression Implementation from Scratch'
+```
+
 :begin_tab:`mxnet`
 In Gluon, the fully-connected layer is defined in the `Dense` class.
 Since we only want to generate a single scalar output,
@@ -221,7 +267,6 @@ Keras will automatically infer the number of inputs to each layer.
 We will describe how this works in more detail later.
 :end_tab:
 
-
 ## Initializing Model Parameters
 
 Before using `net`, we need to initialize the model parameters,
@@ -236,7 +281,7 @@ This module provides various methods for model parameter initialization.
 Gluon makes `init` available as a shortcut (abbreviation)
 to access the `initializer` package.
 By calling `init.Normal(sigma=0.01)`. Bias parameters are initialized to zero in default, 
-we only to specify how to initialize the weight. 
+we only to specify how to initialize the weight.
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -244,7 +289,7 @@ As we have specified the input and output dimensions when constructing `nn.Linea
 :end_tab:
 
 :begin_tab:`tensorflow`
-The `initializers` module in TensorFlow provides various methods for model parameter initialization. The easiest way to specify the initialization method in Keras is when creating the layer by specifying `kernel_initializer`. Here we recreate `net` again.  
+The `initializers` module in TensorFlow provides various methods for model parameter initialization. The easiest way to specify the initialization method in Keras is when creating the layer by specifying `kernel_initializer`. Here we recreate `net` again.
 :end_tab:
 
 ```{.python .input}
@@ -263,6 +308,11 @@ net[0].bias.data.fill_(0)
 initializer = tf.initializers.RandomNormal(stddev=0.01)
 net = tf.keras.Sequential()
 net.add(tf.keras.layers.Dense(1, kernel_initializer=initializer))
+```
+
+```{.python .input}
+#@tab jax
+# Jax provides no high-level API, please see the chapter: 'Linear Regression Implementation from Scratch'
 ```
 
 :begin_tab:`mxnet`
@@ -301,7 +351,6 @@ have not been initialized yet,
 we cannot access or manipulate them.
 :end_tab:
 
-
 ## Defining the Loss Function
 
 :begin_tab:`mxnet`
@@ -334,6 +383,11 @@ loss = nn.MSELoss()
 ```{.python .input}
 #@tab tensorflow
 loss = tf.keras.losses.MeanSquaredError()
+```
+
+```{.python .input}
+#@tab jax
+loss = lambda y_true, y_pred: np.mean((y_true - y_pred)**2)
 ```
 
 ## Defining the Optimization Algorithm
@@ -388,6 +442,11 @@ trainer = torch.optim.SGD(net.parameters(), lr=.03)
 ```{.python .input}
 #@tab tensorflow
 trainer = tf.keras.optimizers.SGD(learning_rate=.03)
+```
+
+```{.python .input}
+#@tab jax
+# Jax provides no high-level API, please see the chapter: 'Linear Regression Implementation from Scratch'
 ```
 
 ## Training
@@ -452,6 +511,11 @@ for epoch in range(1, num_epochs + 1):
     print('epoch %d, loss: %f' % (epoch, l))
 ```
 
+```{.python .input}
+#@tab jax
+# Jax provides no high-level API, please see the chapter: 'Linear Regression Implementation from Scratch'
+```
+
 Below, we compare the model parameters learned by training on finite data
 and the actual parameters that generated our dataset.
 To access parameters with Gluon,
@@ -486,6 +550,11 @@ b = net.get_weights()[1]
 print('Error in estimating b', true_b - b)
 ```
 
+```{.python .input}
+#@tab jax
+# Jax provides no high-level API, please see the chapter: 'Linear Regression Implementation from Scratch'
+```
+
 ## Summary
 
 :begin_tab:`mxnet`
@@ -508,7 +577,6 @@ print('Error in estimating b', true_b - b)
 * Dimensionality and storage are automatically inferred (but be careful not to attempt to access parameters before they have been initialized).
 :end_tab:
 
-
 ## Exercises
 
 :begin_tab:`mxnet`
@@ -528,5 +596,9 @@ print('Error in estimating b', true_b - b)
 :end_tab:
 
 :begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/204)
+:end_tab:
+
+:begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/204)
 :end_tab:

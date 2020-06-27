@@ -425,3 +425,7 @@ This is equal to the ratio between the number of correct predictions and the tot
     * Extend this to more than two numbers.
 
 [Discussions](https://discuss.d2l.ai/t/46)
+
+```{.python .input}
+
+```

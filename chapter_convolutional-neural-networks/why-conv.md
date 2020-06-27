@@ -306,4 +306,3 @@ We turn to these issues in the remainder of the chapter.
 1. Prove that $f \circledast g = g \circledast f$.
 
 [Discussions](https://discuss.d2l.ai/t/64)
-

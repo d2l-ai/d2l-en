@@ -4,7 +4,7 @@
 With the BERT model implemented in :numref:`sec_bert`
 and the pretraining examples generated from the WikiText-2 dataset in :numref:`sec_bert-dataset`, we will pretrain BERT on the WikiText-2 dataset in this section.
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 
@@ -16,7 +16,7 @@ of pretraining examples for masked language modeling and next sentence predictio
 The batch size is 512 and the maximum length of a BERT input sequence is 64.
 Note that in the original BERT model, the maximum length is 512.
 
-```{.python .input  n=12}
+```{.python .input}
 batch_size, max_len = 512, 64
 train_iter, vocab = d2l.load_data_wiki(batch_size, max_len)
 ```
@@ -32,7 +32,7 @@ Notably, the former has 110 million parameters while the latter has 340 million 
 For demonstration with ease,
 we define a small BERT, using 2 layers, 128 hidden units, and 2 self-attention heads.
 
-```{.python .input  n=14}
+```{.python .input}
 net = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,
                     num_heads=2, num_layers=2, dropout=0.2)
 ctx = d2l.try_all_gpus()
@@ -48,7 +48,7 @@ Note that the final loss of BERT pretraining
 is just the sum of both the masked language modeling loss
 and the next sentence prediction loss.
 
-```{.python .input  n=16}
+```{.python .input}
 #@save
 def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
                          segments_X_shards, valid_lens_x_shards,
@@ -89,7 +89,7 @@ as in the `train_ch13` function (see :numref:`sec_image_augmentation`),
 the input `num_steps` of the following function
 specifies the number of iteration steps for training.
 
-```{.python .input  n=17}
+```{.python .input}
 #@save
 def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
                num_steps):
@@ -137,7 +137,7 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
 We can plot both the masked language modeling loss and the next sentence prediction loss
 during BERT pretraining.
 
-```{.python .input  n=18}
+```{.python .input}
 train_bert(train_iter, net, loss, len(vocab), ctx, 1, 50)
 ```
 

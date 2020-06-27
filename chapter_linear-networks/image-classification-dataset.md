@@ -19,7 +19,6 @@ import sys
 d2l.use_svg_display()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 %matplotlib inline
@@ -41,6 +40,18 @@ import sys
 d2l.use_svg_display()
 ```
 
+```{.python .input}
+#@tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax.numpy as np
+import jax
+import numpy as onp
+import sys
+key = jax.random.PRNGKey(42) #randomness works a bit differently in JAX, see the #ndarray chapter
+d2l.use_svg_display()
+```
+
 ## Getting the Dataset
 
 We can download and load the FashionMNIST dataset into memory via the the build-in functions in the framework.
@@ -49,7 +60,6 @@ We can download and load the FashionMNIST dataset into memory via the the build-
 mnist_train = gluon.data.vision.FashionMNIST(train=True)
 mnist_test = gluon.data.vision.FashionMNIST(train=False)
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -68,6 +78,16 @@ mnist_test = torchvision.datasets.FashionMNIST(
 (mnist_train_x, mnist_train_y), (mnist_test_x, mnist_test_y) = tf.keras.datasets.fashion_mnist.load_data()
 ```
 
+```{.python .input}
+#@tab jax
+from sklearn.datasets import fetch_openml # Jax has no built-in function to load FashionMNIST so we need to fetch it over sklearn
+from sklearn.model_selection import train_test_split
+fashion_mnist = fetch_openml(name="Fashion-MNIST")
+mnist_train_x, mnist_test_x, mnist_train_y, mnist_test_y = train_test_split(fashion_mnist['data'],
+                                                                            fashion_mnist['target'],
+                                                                            test_size=10000,
+                                                                           )
+```
 
 FashionMNIST consists of images from 10 categories, each represented
 by 6k images in the training set and by 1k in the test set.
@@ -78,15 +98,18 @@ contain 60k and 10k images, respectively.
 len(mnist_train), len(mnist_test)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 len(mnist_train), len(mnist_test)
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
+len(mnist_train_x), len(mnist_test_x)
+```
+
+```{.python .input}
+#@tab jax 
 len(mnist_train_x), len(mnist_test_x)
 ```
 
@@ -130,7 +153,6 @@ X, y = mnist_train[:18]
 show_images(X.squeeze(axis=-1), 2, 9, titles=get_fashion_mnist_labels(y));
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 X, y = next(iter(data.DataLoader(mnist_train, batch_size=18)))
@@ -144,6 +166,12 @@ for i in range(18):
     X.append(mnist_train_x[i])
     y.append(mnist_train_y[i])
 show_images(tf.constant(X, shape=(18, 28, 28)), 2, 9, titles=get_fashion_mnist_labels(y));
+```
+
+```{.python .input}
+#@tab jax
+X, y = mnist_train_x[:18], mnist_train_y[:18]
+show_images(X.reshape(18, 28, 28), 2, 9, titles=get_fashion_mnist_labels(y));
 ```
 
 ## Reading a Minibatch
@@ -193,7 +221,6 @@ train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
                                    num_workers=get_dataloader_workers())
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 batch_size = 256
@@ -207,6 +234,25 @@ batch_size = 256
 train_iter = tf.data.Dataset.from_tensor_slices((mnist_train_x, mnist_train_y)).batch(batch_size).shuffle(len(mnist_train_x))
 ```
 
+```{.python .input}
+#@tab jax
+# TODO: decide whether to use this or the prebuilt tensorflow functions
+batch_size = 256
+def data_loader(data, targets, b_size, rng_key): #@save
+    if len(targets.shape) == 1:
+        targets = targets[..., None]
+    while True:
+        # Generate new subkey every time to not sample the same minibatch data over and over
+        rng_key, subkey = jax.random.split(rng_key)
+        data = jax.random.permutation(subkey, data)
+        targets = jax.random.permutation(subkey, targets) # Shuffle data and targets in unison by using the same key
+
+        n_samples = data.shape[0]
+        idxs = onp.random.choice(n_samples, size=batch_size, replace=False)
+        yield data[idxs], targets[idxs]
+    
+train_iter = data_loader(mnist_train_x, mnist_train_y, batch_size, key)
+```
 
 Let us look at the time it takes to read the training data.
 
@@ -216,7 +262,6 @@ for X, y in train_iter:
     continue
 f'{timer.stop():.2f} sec'
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -231,6 +276,14 @@ f'{timer.stop():.2f} sec'
 timer = d2l.Timer()
 for X, y in train_iter:
     continue
+f'{timer.stop():.2f} sec'
+```
+
+```{.python .input}
+#@tab jax
+timer = d2l.Timer()
+for X, y in train_iter:
+    break
 f'{timer.stop():.2f} sec'
 ```
 
@@ -256,7 +309,6 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                                   num_workers=get_dataloader_workers()))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
@@ -275,7 +327,6 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                             num_workers=get_dataloader_workers()))
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
@@ -288,6 +339,22 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
         tf.data.Dataset.from_tensor_slices((mnist_test_x, mnist_test_y)).batch(batch_size))
 ```
 
+```{.python .input}
+#@tab jax
+def load_data_fashion_mnist(batch_size, resize=None): #@save
+    """Download the Fashion-MNIST dataset and then load into memory."""
+    # TODO: Resize
+    rng_key = jax.random.PRNGKey(24)
+    fashion_mnist = fetch_openml(name="Fashion-MNIST")
+    mnist_train_x, mnist_test_x, mnist_train_y, mnist_test_y = train_test_split(fashion_mnist['data'],
+                                                                            fashion_mnist['target'],
+                                                                            test_size=10000,
+                                                                         )
+    return (
+        data_loader(mnist_train_x, mnist_train_y, batch_size, rng_key), data_loader(
+        mnist_test_x, mnist_test_y, batch_size, rng_key))
+```
+
 Below, we verify that image resizing works.
 
 ```{.python .input}
@@ -296,7 +363,6 @@ for X, y in train_iter:
     print(X.shape)
     break
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -308,6 +374,14 @@ for X, y in train_iter:
 
 ```{.python .input}
 #@tab tensorflow
+train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
+for X, y in train_iter:
+    print(X.shape)
+    break
+```
+
+```{.python .input}
+#@tab jax
 train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
 for X, y in train_iter:
     print(X.shape)
@@ -327,13 +401,20 @@ We are now ready to work with the Fashion-MNIST dataset in the sections that fol
 
 1. Does reducing the `batch_size` (for instance, to 1) affect read performance?
 1. For non-Windows users, try modifying `num_workers` to see how it affects read performance. Plot the performance against the number of works employed.
-1. Use the framework's API document website to see which other datasets are available. 
-
+1. Use the framework's API document website to see which other datasets are available.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/48)
 :end_tab:
 
 :begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/49)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/49)
+:end_tab:
+
+:begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/49)
 :end_tab:

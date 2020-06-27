@@ -350,7 +350,6 @@ for param in params:
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
@@ -576,8 +575,6 @@ net.fit(train_iter, epochs=num_epochs, batch_size=batch_size)
 1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What happens when dropout and weight decay are used at the same time? Are the results additive, are there diminished returns or (worse), do they cancel each other out?
 1. What happens if we apply dropout to the individual weights of the weight matrix rather than the activations?
 1. Invent another technique for injecting random noise at each layer that is different from the standard dropout technique. Can you develop a method that outperforms dropout on the Fashion-MNIST dataset (for a fixed architecture)?
-
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/100)

@@ -40,7 +40,7 @@ Reviewing the design of Adam its inspiration is clear. Momentum and scale are cl
 
 Implementing Adam from scratch is not very daunting. For convenience we store the timestep counter $t$ in the `hyperparams` dictionary. Beyond that all is straightforward.
 
-```{.python .input  n=2}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -64,7 +64,7 @@ def adam(params, states, hyperparams):
 
 We are ready to use Adam to train the model. We use a learning rate of $\eta = 0.01$.
 
-```{.python .input  n=5}
+```{.python .input}
 data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 d2l.train_ch11(adam, init_adam_states(feature_dim),
                {'lr': 0.01, 't': 1}, data_iter, feature_dim);
@@ -72,7 +72,7 @@ d2l.train_ch11(adam, init_adam_states(feature_dim),
 
 A more concise implementation is straightforward since `adam` is one of the algorithms provided as part of the Gluon `trainer` optimization library. Hence we only need to pass configuration parameters for an implementation in Gluon.
 
-```{.python .input  n=11}
+```{.python .input}
 d2l.train_gluon_ch11('adam', {'learning_rate': 0.01}, data_iter)
 ```
 

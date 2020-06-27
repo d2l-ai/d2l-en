@@ -6,7 +6,8 @@ requirements = [
     'jupyter',
     'numpy',
     'matplotlib',
-    'pandas'
+    'pandas',
+    'scikit-learn',
 ]
 
 # don't import d2l to get __version__ since it has deps

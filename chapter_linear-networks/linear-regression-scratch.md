@@ -41,6 +41,19 @@ import tensorflow as tf
 import random
 ```
 
+```{.python .input}
+#@tab jax
+%matplotlib inline
+from d2l import jax as d2l
+import jax.numpy as np
+import jax
+from jax import grad
+import numpy as onp
+import random as pyrandom
+
+key = jax.random.PRNGKey(42)
+```
+
 ## Generating the Dataset
 
 To keep things simple, we will construct an artificial dataset
@@ -111,41 +124,79 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
+```{.python .input}
+#@tab jax
+def synthetic_data(w, b, num_examples, rng_key):  #@save
+    """Generate y = X w + b + noise."""
+    X = jax.random.normal(rng_key, (num_examples, len(w)))
+    y = np.dot(X, w) + b
+    y += jax.random.normal(rng_key, (y.shape)) * 0.01 # Jax.random only has a standard normal sampler so we need to scale,
+                                                  # See explanation below
+    return X, y
+
+true_w = np.array([2, -3.4])
+true_b = 4.2
+features, labels = synthetic_data(true_w, true_b, 1000, key)
+```
+
+:begin_tab:`jax`
+Jax only provides sampling from a standard normal distribution, so we need to scale our results as follows:
+$$\mathbf{X}=(\mathbf{Z}+\mu)\odot\sigma$$
+
+where Z are the draws from the standard normal distribution, $\mu$ the mean and $\sigma$ the standard deviation of the wanted distribution. :end_tab:
+
 Note that each row in `features` consists of a 2-dimensional data point
 and that each row in `labels` consists of a 1-dimensional target value (a scalar).
 
-```{.python .input}
+```python
 print('features:', features[0],'\nlabel:', labels[0])
 ```
 
-```{.python .input}
+
+```python
 #@tab pytorch
 print('features:', features[0],'\nlabel:', labels[0])
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
+print('features:', features[0],'\nlabel:', labels[0])
+```
+
+
+```{.python .input  n=4}
+#@tab jax
 print('features:', features[0],'\nlabel:', labels[0])
 ```
 
 By generating a scatter plot using the second feature `features[:, 1]` and `labels`,
 we can clearly observe the linear correlation between the two.
 
-```{.python .input}
+```python
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
 ```
 
-```{.python .input}
+
+```python
 #@tab pytorch
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.scatter(features[:, 1].numpy(), labels.numpy(), 1);
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.scatter(features[:, 1].numpy(), labels.numpy(), 1);
+```
+
+
+```{.python .input  n=5}
+#@tab jax
+d2l.set_figsize((3.5, 2.5))
+d2l.plt.scatter(features[:, 1], labels, 1);
 ```
 
 ## Reading the Dataset
@@ -165,7 +216,7 @@ The function takes a batch size, a design matrix,
 and a vector of labels, yielding minibatches of size `batch_size`.
 Each minibatch consists of a tuple of features and labels.
 
-```{.python .input}
+```python
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
     indices = list(range(num_examples))
@@ -177,7 +228,8 @@ def data_iter(batch_size, features, labels):
         yield features[batch_indices], labels[batch_indices]
 ```
 
-```{.python .input}
+
+```python
 #@tab pytorch
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
@@ -189,7 +241,8 @@ def data_iter(batch_size, features, labels):
         yield features[j], labels[j]
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
@@ -199,6 +252,20 @@ def data_iter(batch_size, features, labels):
     for i in range(0, num_examples, batch_size):
         j = tf.constant(indices[i: min(i + batch_size, num_examples)])
         yield tf.gather(features, j), tf.gather(labels, j)
+```
+
+
+```{.python .input  n=6}
+#@tab jax
+def data_iter(batch_size, features, labels):
+    num_examples = len(features)
+    indices = list(range(num_examples))
+    # The examples are read at random, in no particular order
+    pyrandom.shuffle(indices)
+    for i in range(0, num_examples, batch_size):
+        batch_indices = np.array(
+            indices[i: min(i + batch_size, num_examples)])
+        yield features[batch_indices], labels[batch_indices]
 ```
 
 In general, note that we want to use reasonably sized minibatches
@@ -215,7 +282,7 @@ The shape of the features in each minibatch tells us
 both the minibatch size and the number of input features.
 Likewise, our minibatch of labels will have a shape given by `batch_size`.
 
-```{.python .input}
+```python
 batch_size = 10
 
 for X, y in data_iter(batch_size, features, labels):
@@ -223,7 +290,8 @@ for X, y in data_iter(batch_size, features, labels):
     break
 ```
 
-```{.python .input}
+
+```python
 #@tab pytorch
 batch_size = 10
 
@@ -232,8 +300,19 @@ for X, y in data_iter(batch_size, features, labels):
     break
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
+batch_size = 10
+
+for X, y in data_iter(batch_size, features, labels):
+    print(X, '\n', y)
+    break
+```
+
+
+```{.python .input  n=7}
+#@tab jax
 batch_size = 10
 
 for X, y in data_iter(batch_size, features, labels):
@@ -259,26 +338,35 @@ In the following code, we initialize weights by sampling
 random numbers from a normal distribution with mean 0
 and a standard deviation of $0.01$, setting the bias $b$ to $0$.
 
-```{.python .input}
+```python
 w = np.random.normal(0, 0.01, (2, 1))
 b = np.zeros(1)
 w.attach_grad()
 b.attach_grad()
 ```
 
-```{.python .input}
+
+```python
 #@tab pytorch
 w = torch.normal(0, 0.01, size=(2,1), requires_grad=True)
 b = torch.zeros(1, requires_grad=True)
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 w = tf.Variable(tf.random.normal(shape=(2, 1), mean=0, stddev=0.01), trainable=True)
 b = tf.Variable(tf.zeros(1), trainable=True)
 ```
 
-After initialized our parameters,
+
+```{.python .input  n=8}
+#@tab jax
+w = jax.random.normal(key, (2, 1)) * 0.01 #Jax samples from a standard normal distribution so we need to scale
+b = np.zeros(1)
+```
+
+After initializing our parameters,
 our next task is to update them until
 they fit our data sufficiently well.
 Each update requires taking the gradient
@@ -308,21 +396,30 @@ Note that below $Xw$  is a vector and $b$ is a scalar.
 Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
-```{.python .input}
+```python
 def linreg(X, w, b):  #@save
     return np.dot(X, w) + b
 ```
 
-```{.python .input}
+
+```python
 #@tab pytorch
 def linreg(X, w, b):  #@save
     return torch.matmul(X, w) + b
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 def linreg(X, w, b):  #@save
     return tf.matmul(X, w) + b
+```
+
+
+```{.python .input  n=9}
+#@tab jax
+def linreg(X, w, b):  #@save
+    return np.dot(X, w) + b
 ```
 
 ## Defining the Loss Function
@@ -337,21 +434,29 @@ into the predicted value's shape `y_hat`.
 The result returned by the following function
 will also be the same as the `y_hat` shape.
 
-```{.python .input}
+```python
 def squared_loss(y_hat, y):  #@save
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
 
-```{.python .input}
+
+```python
 #@tab pytorch
 def squared_loss(y_hat, y):  #@save
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 def squared_loss(y_hat, y):  #@save
     return (y_hat - tf.reshape(y, y_hat.shape)) ** 2 / 2
+```
+
+
+```{.python .input  n=10}
+#@tab jax
+squared_loss = (lambda y_hat, y: np.mean((y_hat - y.reshape(y_hat.shape))**2)) #@save
 ```
 
 ## Defining the Optimization Algorithm
@@ -378,13 +483,14 @@ we normalize our step size by the batch size (`batch_size`),
 so that the magnitude of a typical step size
 does not depend heavily on our choice of the batch size.
 
-```{.python .input}
+```python
 def sgd(params, lr, batch_size):  #@save
     for param in params:
         param[:] = param - lr * param.grad / batch_size
 ```
 
-```{.python .input}
+
+```python
 #@tab pytorch
 def sgd(params, lr, batch_size):  #@save
     for param in params:
@@ -392,11 +498,24 @@ def sgd(params, lr, batch_size):  #@save
         param.grad.data.zero_()
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 def sgd(params, grads, lr, batch_size):  #@save
     for param, grad in zip(params, grads):
         param.assign_sub(lr*grad/batch_size)
+```
+
+
+```{.python .input  n=11}
+#@tab jax
+from jax import vmap
+def sgd(params, grads, lr, batch_size):  #@save
+    new_params = []
+    for param, delta in zip(params, grads):
+        new_params.append(param - (lr * delta/batch_size)) # Jax arrays are immutable so we need to return
+                                                           # our changed parameters 
+    return new_params[0], new_params[1]
 ```
 
 ## Training
@@ -444,7 +563,7 @@ We elide these details for now but revise them
 later in
 :numref:`chap_optimization`.
 
-```{.python .input}
+```python
 lr = 0.03
 num_epochs = 3
 net = linreg
@@ -460,7 +579,8 @@ for epoch in range(num_epochs):
     print(f'epoch {epoch+1}, loss {float(train_l.mean())}')
 ```
 
-```{.python .input}
+
+```python
 #@tab pytorch
 lr = 0.03
 num_epochs = 3
@@ -477,7 +597,8 @@ for epoch in range(num_epochs):
         print(f'epoch {epoch+1}, loss {float(train_l.mean())}')
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 lr = 0.03 
 num_epochs = 3
@@ -495,6 +616,26 @@ for epoch in range(num_epochs):
     print(f'epoch {epoch+1}, loss {float(tf.reduce_mean(train_l))}')
 ```
 
+
+```{.python .input  n=12}
+#@tab jax
+from jax import value_and_grad
+lr = 0.03 
+num_epochs = 3
+net = linreg
+loss = lambda x, w, b, y: squared_loss(net(x, w, b), y)
+
+
+for epoch in range(num_epochs):
+    for X, y in data_iter(batch_size, features, labels):
+        # Compute gradient on loss with respect to [w,b]
+        grads = grad(loss, argnums=(1, 2))(X, w, b, y)
+        w, b = sgd([w, b], grads, lr, batch_size)     # Update parameters using their gradient
+    y_hat = net(features, w, b)
+    train_l = squared_loss(y_hat, labels)
+    print(f'epoch {epoch+1}, loss {float(train_l)}')
+```
+
 In this case, because we synthesized the data ourselves,
 we know precisely what the true parameters are.
 Thus, we can evaluate our success in training
@@ -502,20 +643,29 @@ by comparing the true parameters
 with those that we learned through our training loop.
 Indeed they turn out to be very close to each other.
 
-```{.python .input}
+```python
 print('Error in estimating w', true_w - w.reshape(true_w.shape))
 print('Error in estimating b', true_b - b)
 ```
 
-```{.python .input}
+
+```python
 #@tab pytorch
 print('Error in estimating w', true_w - w.reshape(true_w.shape))
 print('Error in estimating b', true_b - b)
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 print('Error in estimating w', true_w - tf.reshape(w, true_w.shape))
+print('Error in estimating b', true_b - b)
+```
+
+
+```{.python .input  n=13}
+#@tab jax
+print('Error in estimating w', true_w - w.reshape(true_w.shape))
 print('Error in estimating b', true_b - b)
 ```
 
@@ -559,6 +709,7 @@ and learn how to implement them more concisely.
 1.  Why is the `reshape` function needed in the `squared_loss` function?
 1. Experiment using different learning rates to find out how fast the loss function value drops.
 1. If the number of examples cannot be divided by the batch size, what happens to the `data_iter` function's behavior?
+:end_tab:
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/42)
@@ -568,6 +719,10 @@ and learn how to implement them more concisely.
 [Discussions](https://discuss.d2l.ai/t/43)
 :end_tab:
 
-:begin_tab:`pytorch`
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/201)
+:end_tab:
+
+:begin_tab:`jax`
 [Discussions](https://discuss.d2l.ai/t/201)
 :end_tab:

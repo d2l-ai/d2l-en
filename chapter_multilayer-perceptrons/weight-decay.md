@@ -452,7 +452,6 @@ weights and biases simultaneously. Here we only set `weight_decay` for
 the weight, so the bias parameter $b$ will not decay.
 :end_tab:
 
-
 ```{.python .input}
 def train_gluon(wd):
     net = nn.Sequential()
@@ -534,7 +533,6 @@ def train_tensorflow(wd):
     print('L1 norm of w:', tf.norm(net.get_weights()[0]).numpy())
 ```
 
-
 The plots look identical to those when 
 we implemented weight decay from scratch.
 However, they run appreciably faster 
@@ -598,7 +596,6 @@ of applying weight decay on all layers of a deep network.
 1. We know that $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Can you find a similar equation for matrices (mathematicians call this the [Frobenius norm](https://en.wikipedia.org/wiki/Matrix_norm#Frobenius_norm))?
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/98)

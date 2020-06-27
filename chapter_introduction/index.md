@@ -928,7 +928,6 @@ Tom has dinner in Washington with Sally.
 Ent  -    -    -     Ent      -    Ent
 ```
 
-
 **Automatic Speech Recognition**. With speech recognition, the input sequence $x$
 is an audio recording of a speaker (shown in :numref:`fig_speech`), and the output $y$
 is the textual transcript of what the speaker said.
@@ -964,7 +963,6 @@ German:           Haben Sie sich schon dieses grossartige Lehrwerk angeschaut?
 English:          Did you already check out this excellent tutorial?
 Wrong alignment:  Did you yourself already this excellent tutorial looked-at?
 ```
-
 
 Many related problems pop up in other learning tasks.
 For instance, determining the order in which a user

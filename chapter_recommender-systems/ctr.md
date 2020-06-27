@@ -22,7 +22,7 @@ With the considerable advancements of Internet and mobile technology, online adv
 
 The following code downloads the dataset from our server and saves it into the local data folder.
 
-```{.python .input  n=15}
+```{.python .input}
 #@save
 d2l.DATA_HUB['ctr'] = (d2l.DATA_URL + 'ctr.zip',
                        'e18327c48c8e8e5c23da714dd614e390d369843f')
@@ -36,7 +36,7 @@ There are a training set and a test set, consisting of 15000 and 3000 samples/li
 
 For the convenience of data loading, we implement a `CTRDataset` which loads the advertising dataset from the CSV file and can be used by `DataLoader`.
 
-```{.python .input  n=13}
+```{.python .input}
 #@save
 class CTRDataset(gluon.data.Dataset):
     def __init__(self, data_path, feat_mapper=None, defaults=None,
@@ -81,7 +81,7 @@ class CTRDataset(gluon.data.Dataset):
 
 The following example loads the training data and print out the first record.
 
-```{.python .input  n=16}
+```{.python .input}
 train_data = CTRDataset(os.path.join(data_dir, 'train.csv'))
 train_data[0]
 ```

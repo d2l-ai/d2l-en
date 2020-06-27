@@ -12,7 +12,7 @@ In this section, we will show an interface to implement this encoder-decoder arc
 
 The encoder is a normal neural network that takes inputs, e.g., a source sentence, to return outputs.
 
-```{.python .input  n=2}
+```{.python .input}
 from mxnet.gluon import nn
 
 #@save
@@ -29,7 +29,7 @@ class Encoder(nn.Block):
 
 The decoder has an additional method `init_state` to parse the outputs of the encoder with possible additional information, e.g., the valid lengths of inputs, to return the state it needs. In the forward method, the decoder takes both inputs, e.g., a target sentence and the state. It returns outputs, with potentially modified state if the encoder contains RNN layers.
 
-```{.python .input  n=3}
+```{.python .input}
 #@save
 class Decoder(nn.Block):
     """The base decoder interface for the encoder-decoder architecture."""
@@ -47,7 +47,7 @@ class Decoder(nn.Block):
 
 The encoder-decoder model contains both an encoder and a decoder. We implement its forward method for training. It takes both encoder inputs and decoder inputs, with optional additional arguments. During computation, it first computes encoder outputs to initialize the decoder state, and then returns the decoder outputs.
 
-```{.python .input  n=4}
+```{.python .input}
 #@save
 class EncoderDecoder(nn.Block):
     """The base class for the encoder-decoder architecture."""
