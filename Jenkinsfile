@@ -18,12 +18,12 @@ stage("Build and Publish") {
 
       sh label: "Build Environment", script: """set -ex
       conda env update -n ${ENV_NAME} -f static/build.yml
+      pip list
       nvidia-smi
       """
 
       sh label: "Sanity Check", script: """set -ex
       conda activate ${ENV_NAME}
-      d2lbook clear
       d2lbook build outputcheck tabcheck
       """
 
