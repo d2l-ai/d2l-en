@@ -352,8 +352,8 @@ net[0].weight.data()[0]
 #@tab pytorch 
 def init_normal(m):
     if type(m) == nn.Linear:
-        nn.init.normal_(net[0].weight, mean=0, std=0.01)
-        nn.init.zeros_(net[0].bias)
+        nn.init.normal_(m.weight, mean=0, std=0.01)
+        nn.init.zeros_(m.bias)
 net.apply(init_normal)    
 net[0].weight.data[0], net[0].bias.data[0]
 ```
@@ -384,8 +384,8 @@ net[0].weight.data()[0]
 #@tab pytorch
 def init_constant(m):
     if type(m) == nn.Linear:
-        nn.init.constant_(net[0].weight, 1)
-        nn.init.zeros_(net[0].bias)
+        nn.init.constant_(m.weight, 1)
+        nn.init.zeros_(m.bias)
 net.apply(init_constant)    
 net[0].weight.data[0], net[0].bias.data[0]
 ```
