@@ -15,11 +15,11 @@
 
 This open-source book represents our attempt to make deep learning approachable, teaching you the concepts, the context, and the code. The entire book is drafted in Jupyter notebooks, seamlessly integrating exposition figures, math, and interactive examples with self-contained code.
 
-Our goal is to offer a resource that could 
-1. be freely available for everyone; 
-1. offer sufficient technical depth to provide a starting point on the path to actually becoming an applied machine learning scientist; 
-1. include runnable code, showing readers how to solve problems in practice; 
-1. allow for rapid updates, both by us and also by the community at large; 
+Our goal is to offer a resource that could
+1. be freely available for everyone;
+1. offer sufficient technical depth to provide a starting point on the path to actually becoming an applied machine learning scientist;
+1. include runnable code, showing readers how to solve problems in practice;
+1. allow for rapid updates, both by us and also by the community at large;
 1. be complemented by a forum for interactive discussion of technical details and to answer questions.
 
 <h5 align="center">Universities that use D2L as a textbook or a reference book</h5>
@@ -63,4 +63,4 @@ This open source book is made available under the Creative Commons Attribution-S
 
 The sample and reference code within this open source book is made available under a modified MIT license. See the LICENSE-SAMPLECODE file.
 
-[Chinese version](https://github.com/d2l-ai/d2l-zh) | [Discuss and report issues](https://discuss.d2l.ai/) | [Discuss (old version)](https://discuss.mxnet.io/) | [Other Information](INFO.md)
+[Chinese version](https://github.com/d2l-ai/d2l-zh) | [Discuss and report issues](https://discuss.d2l.ai/) | [Other Information](INFO.md)
