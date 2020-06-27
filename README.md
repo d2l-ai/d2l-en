@@ -1,4 +1,4 @@
-# Dive into Deep Learning (D2L Book) 
+# Dive into Deep Learning (D2L Book)
 
 [![Build Status](http://ci.d2l.ai/job/d2l-en/job/master/badge/icon)](http://ci.d2l.ai/job/d2l-en/job/master/)
 
@@ -15,11 +15,11 @@
 
 This open-source book represents our attempt to make deep learning approachable, teaching you the concepts, the context, and the code. The entire book is drafted in Jupyter notebooks, seamlessly integrating exposition figures, math, and interactive examples with self-contained code.
 
-Our goal is to offer a resource that could 
-1. be freely available for everyone; 
-1. offer sufficient technical depth to provide a starting point on the path to actually becoming an applied machine learning scientist; 
-1. include runnable code, showing readers how to solve problems in practice; 
-1. allow for rapid updates, both by us and also by the community at large; 
+Our goal is to offer a resource that could
+1. be freely available for everyone;
+1. offer sufficient technical depth to provide a starting point on the path to actually becoming an applied machine learning scientist;
+1. include runnable code, showing readers how to solve problems in practice;
+1. allow for rapid updates, both by us and also by the community at large;
 1. be complemented by a forum for interactive discussion of technical details and to answer questions.
 
 <h5 align="center">Universities that use D2L as a textbook or a reference book</h5>
