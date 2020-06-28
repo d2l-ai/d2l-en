@@ -339,7 +339,10 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
     * What would you have to do to make things even more uniform?
 1. If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in minibatch sampling? Why would we want to do this anyway?
 
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/117)
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/2361)
-
-![](../img/qr_language-models-and-dataset.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/118)
+:end_tab:
