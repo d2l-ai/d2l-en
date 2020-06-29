@@ -259,6 +259,6 @@ train_concise_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 1. An evil genie replicates your dataset without telling you (i.e., each observation occurs twice and your dataset grows to twice its original size, but nobody told you). How does the behavior of SGD, minibatch SGD and that of gradient descent change?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2373)
-
-![](../img/qr_minibatch-sgd.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/353)
+:end_tab:

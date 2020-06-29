@@ -462,6 +462,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 1. Compare layer normalization and batch normalization, when shall we apply which?
 
 
-## [Discussions](https://discuss.mxnet.io/t/4344)
-
-![](../img/qr_transformer.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/348)
+:end_tab:

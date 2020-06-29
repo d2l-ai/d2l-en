@@ -101,6 +101,4 @@ By hiding all the complexity about synchronization behind a simple push and pull
 1. Tree aggregation. Can you do it faster?
 1. Other reductions (commutative semiring).
 
-## [Discussions](https://discuss.mxnet.io/t/5319)
-
-![](../img/qr_parameterserver.svg)
+[Discussions](https://discuss.d2l.ai/t/366)

@@ -152,7 +152,6 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
     * Why is this hard?
     * Can you exploit this effect also for optimization algorithms?
 
-
-## [Discussions](https://discuss.mxnet.io/t/2371)
-
-![](../img/qr_optimization-intro.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/349)
+:end_tab:

@@ -272,6 +272,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 1. If we do not use the `SequenceMask` in the loss function, what may happen?
 
 
-## [Discussions](https://discuss.mxnet.io/t/4357)
-
-![](../img/qr_seq2seq.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/345)
+:end_tab:

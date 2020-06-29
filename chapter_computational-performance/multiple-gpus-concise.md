@@ -156,6 +156,6 @@ train(num_gpus=2, batch_size=512, lr=0.2)
 1. Sometimes, different devices provide different computing power. We could use the GPUs and the CPU at the same time. How should we divide the work? Is it worth the effort? Why? Why not?
 1. What happens if we drop `npx.waitall()`? How would you modify training such that you have an overlap of up to two steps for parallelism? 
 
-## [Discussions](https://discuss.mxnet.io/t/2384)
-
-![](../img/qr_multiple-gpus-gluon.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/365)
+:end_tab:

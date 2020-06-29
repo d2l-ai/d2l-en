@@ -137,6 +137,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 1. Can you think of any use cases where `Seq2SeqAttentionDecoder` will outperform `Seq2seqDecoder`?
 
 
-## [Discussions](https://discuss.mxnet.io/t/seq2seq-attention/4345)
-
-![](../img/qr_seq2seq-attention.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/347)
+:end_tab:

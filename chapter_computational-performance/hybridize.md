@@ -212,6 +212,6 @@ This is quite different from what we saw previously. All print statements, as de
 1. What happens if we add control flow, i.e., the Python statements `if` and `for` in the `hybrid_forward` function?
 1. Review the models that interest you in the previous chapters and use the HybridBlock class or HybridSequential class to implement them.
 
-## [Discussions](https://discuss.mxnet.io/t/2380)
-
-![](../img/qr_hybridize.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/360)
+:end_tab:

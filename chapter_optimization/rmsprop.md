@@ -110,6 +110,6 @@ d2l.train_concise_ch11('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
 1. Would you want to adjust $\gamma$ as optimization progresses? How sensitive is RMSProp to this?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2376)
-
-![](../img/qr_rmsprop.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/356)
+:end_tab:

@@ -105,6 +105,6 @@ Compared with the last section, this model achieves comparable perplexity, albei
     * How many bits do you need?
     * Why does not everyone use this model for text compression? Hint: what about the compressor itself?
 
-## [Discussions](https://discuss.mxnet.io/t/2365)
-
-![](../img/qr_rnn-gluon.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/335)
+:end_tab:

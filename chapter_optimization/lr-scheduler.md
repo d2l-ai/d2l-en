@@ -212,6 +212,6 @@ Warmup can be applied to any scheduler (not just cosine). For a more detailed di
 1. How long should warmup last?
 1. Can you connect optimization and sampling? Start by using results from :cite:`Welling.Teh.2011` on Stochastic Gradient Langevin Dynamics.
 
-## [Discussions](https://discuss.mxnet.io/t/5183)
-
-![](../img/qr_lr-scheduler.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/359)
+:end_tab:

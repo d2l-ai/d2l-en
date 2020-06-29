@@ -68,6 +68,6 @@ d2l.train_concise_ch11('adadelta', {'rho': 0.9}, data_iter)
 1. Is Adadelta really learning rate free? Could you find optimization problems that break Adadelta?
 1. Compare Adadelta to Adagrad and RMS prop to discuss their convergence behavior.
 
-## [Discussions](https://discuss.mxnet.io/t/2377)
-
-![](../img/qr_adadelta.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/357)
+:end_tab:

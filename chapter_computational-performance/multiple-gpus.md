@@ -233,6 +233,6 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 1. Implement a more efficient allreduce that aggregates different parameters on different GPUs (why is this more efficient in the first place). 
 1. Implement multi-GPU test accuracy computation. 
 
-## [Discussions](https://discuss.mxnet.io/t/2383)
-
-![](../img/qr_multiple-gpus.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/364)
+:end_tab:

@@ -101,6 +101,6 @@ We conclude with an illustration of the computational graph and its dependencies
 1. Use a debugger such as NVIDIA's Nsight to verify that your code is efficient. 
 1. Designing computation tasks that include more complex data dependencies, and run experiments to see if you can obtain the correct results while improving performance.
 
-## [Discussions](https://discuss.mxnet.io/t/2382)
-
-![](../img/qr_auto-parallelism.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/362)
+:end_tab:

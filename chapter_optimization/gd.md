@@ -281,6 +281,6 @@ This algorithm converges rapidly (for an analysis and proof see e.g., :cite:`Boy
     * Apply this to the problem above.
 1. Apply the algorithm above to a number of objective functions (convex or not). What happens if you rotate coordinates by $45$ degrees?
 
-## [Discussions](https://discuss.mxnet.io/t/5197)
-
-![](../img/qr_gd.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/351)
+:end_tab:
