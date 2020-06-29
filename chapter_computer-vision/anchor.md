@@ -239,6 +239,6 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 1. Modify the variable `anchors` in the "Labeling Training Set Anchor Boxes" and "Output Bounding Boxes for Prediction" sections. How do the results change?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2445)
-
-![](../img/qr_anchor.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/370)
+:end_tab:

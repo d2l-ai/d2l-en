@@ -174,6 +174,6 @@ print(segment_BPE(tokens, symbols))
 
 
 
-## [Discussions](https://discuss.mxnet.io/t/2388)
-
-![](../img/qr_subword-embedding.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/386)
+:end_tab:

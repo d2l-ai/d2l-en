@@ -232,6 +232,6 @@ train_with_data_aug(train_augs, test_augs, net)
 1. Add different image augmentation methods in model training based on the CIFAR-10 dataset. Observe the implementation results.
 1. With reference to the MXNet documentation, what other image augmentation methods are provided in Gluon's `transforms` module?
 
-## [Discussions](https://discuss.mxnet.io/t/2442)
-
-![](../img/qr_image-augmentation.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/367)
+:end_tab:

@@ -205,6 +205,6 @@ d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 1. Can you further improve the accuracy of the model on the test set by using the three methods introduced in the previous section: tuning hyper-parameters, using larger pre-trained word vectors, and using the spaCy word tokenization tool?
 1. What other natural language processing tasks can you use textCNN for?
 
-## [Discussions](https://discuss.mxnet.io/t/2392)
-
-![](../img/qr_sentiment-analysis-cnn.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/393)
+:end_tab:

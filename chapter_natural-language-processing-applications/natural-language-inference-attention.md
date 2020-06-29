@@ -301,6 +301,6 @@ predict_snli(net, vocab, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 1. Suppose that we want to get the level of semantical similarity (e.g., a continuous value between $0$ and $1$) for any pair of sentences. How shall we collect and label the dataset? Can you design a model with attention mechanisms?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5518)
-
-![](../img/qr_natural-language-inference-attention.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/395)
+:end_tab:

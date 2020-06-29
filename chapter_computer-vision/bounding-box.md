@@ -64,6 +64,6 @@ fig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));
 1. Find some images and try to label a bounding box that contains the target. Compare the difference between the time it takes to label the bounding box and label the category.
 
 
-## [Discussions](https://discuss.mxnet.io/t/2444)
-
-![](../img/qr_bounding-box.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/369)
+:end_tab:

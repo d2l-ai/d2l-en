@@ -428,9 +428,8 @@ d2l.plt.legend();
 2. When an object is relatively large compared to the image, the model normally adopts a larger input image size.
 3. This generally produces a large number of negative anchor boxes when labeling anchor box categories. We can sample the negative anchor boxes to better balance the data categories. To do this, we can set the `MultiBoxTarget` function's `negative_mining_ratio` parameter.
 4. Assign hyper-parameters with different weights to the anchor box category loss and positive anchor box offset loss in the loss function.
-5. Refer to the SSD paper. What methods can be used to evaluate the precision of
-  object detection models :cite:`Liu.Anguelov.Erhan.ea.2016`?
+5. Refer to the SSD paper. What methods can be used to evaluate the precision of object detection models :cite:`Liu.Anguelov.Erhan.ea.2016`?
 
-## [Discussions](https://discuss.mxnet.io/t/2453)
-
-![](../img/qr_ssd.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/373)
+:end_tab:

@@ -351,6 +351,6 @@ for submitting results is similar to method in :numref:`sec_kaggle_house`.
 1. What accuracy can you achieve when not using image augmentation?
 1. Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
-## [Discussions](https://discuss.mxnet.io/t/2450)
-
-![](../img/qr_kaggle-gluon-cifar10.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/379)
+:end_tab:

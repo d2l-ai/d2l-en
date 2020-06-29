@@ -195,6 +195,6 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 1. If the dictionary is extremely large, how can we accelerate finding synonyms and analogies?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2390)
-
-![](../img/qr_similarity-analogy.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/387)
+:end_tab:

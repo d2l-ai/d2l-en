@@ -210,6 +210,6 @@ for downstream natural language processing applications.
 1. Set the maximum length of a BERT input sequence to be 512 (same as the original BERT model). Use the configurations of the original BERT model such as $\text{BERT}_{\text{LARGE}}$. Do you encounter any error when running this section? Why?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5869)
-
-![](../img/qr_bert-pretraining.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/390)
+:end_tab:

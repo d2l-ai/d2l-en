@@ -212,7 +212,6 @@ for X, Y in train_iter:
 1. How can we change hyperparameters to reduce the vocabulary size? 
 
 
-
-## [Discussions](https://discuss.mxnet.io/t/5517)
-
-![](../img/qr_natural-language-inference-and-dataset.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/394)
+:end_tab:
