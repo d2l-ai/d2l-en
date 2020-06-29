@@ -272,3 +272,8 @@ yclone == y
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/61)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/327)
+:end_tab:
+

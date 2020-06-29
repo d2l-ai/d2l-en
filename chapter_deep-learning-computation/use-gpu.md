@@ -529,6 +529,6 @@ In short, as long as all data and parameters are on the same device, we can lear
 [Discussions](https://discuss.d2l.ai/t/63)
 :end_tab:
 
-:begin_tab:`pytorch`
+:begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/270)
 :end_tab:

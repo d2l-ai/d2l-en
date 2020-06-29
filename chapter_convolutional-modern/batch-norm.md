@@ -726,3 +726,7 @@ tens of thousands of citations.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/84)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/330)
+:end_tab:
