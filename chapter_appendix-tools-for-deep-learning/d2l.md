@@ -27,3 +27,16 @@ The implementations of the following members of the `d2l` package and sections w
 ```
 
 :end_tab:
+
+
+:begin_tab:`tensorflow`
+
+```eval_rst
+
+.. automodule:: d2l.tensorflow
+   :members:
+   :imported-members:
+
+```
+
+:end_tab:
