@@ -81,7 +81,7 @@ x.grad
 
 ```{.python .input}
 #@tab pytorch
-x.requires_grad_(True)  # Equals to x = torch.arange(4.0, requires_grad=True)
+x.requires_grad_(True)  # Same as `x = torch.arange(4.0, requires_grad=True)`
 x.grad  # The default value is None
 ```
 
@@ -108,7 +108,7 @@ y
 
 ```{.python .input}
 #@tab tensorflow
-# Record all computations onto a tape. 
+# Record all computations onto a tape
 with tf.GradientTape() as t:
     y = 2 * tf.tensordot(x, x, axes=1)
 y
@@ -162,13 +162,13 @@ Now let us calculate another function of `x`.
 with autograd.record():
     y = x.sum()
 y.backward()
-x.grad  # Overwritten by the newly calculated gradient.
+x.grad  # Overwritten by the newly calculated gradient
 ```
 
 ```{.python .input}
 #@tab pytorch
 # PyTorch accumulates the gradient in default, we need to clear the previous 
-# values.
+# values
 x.grad.zero_() 
 y = x.sum()
 y.backward()
@@ -213,7 +213,7 @@ x.grad  # Equals to y = sum(x * x)
 #@tab pytorch
 x.grad.zero_()
 y = x * x
-y.sum().backward()  # Backward only supports for scalars. 
+y.sum().backward()  # `backward` only supports for scalars
 x.grad
 ```
 
@@ -221,7 +221,7 @@ x.grad
 #@tab tensorflow
 with tf.GradientTape() as t:
     y = x * x
-t.gradient(y, x)  # Equals to y = tf.reduce_sum(x * x)
+t.gradient(y, x)  # Same as `y = tf.reduce_sum(x * x)`
 ```
 
 ## Detaching Computation
@@ -266,7 +266,7 @@ x.grad == u
 
 ```{.python .input}
 #@tab tensorflow
-# Set the persistent=True to run t.gradient more than once
+# Set `persistent=True` to run `t.gradient` more than once
 with tf.GradientTape(persistent=True) as t:
     y = x * x
     u = tf.stop_gradient(y)

@@ -460,9 +460,9 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         # Compute gradients and update parameters
         with tf.GradientTape() as tape:
             y_hat = net(X)
-            # tf.Keras' implementations for loss takes (labels, predictions)
+            # Keras implementations for loss takes (labels, predictions)
             # instead of (predictions, labels) that users might implement
-            # in this book, e.g. `cross_entropy()` that we implemented above
+            # in this book, e.g. `cross_entropy` that we implemented above
             if isinstance(loss, tf.keras.losses.Loss):
                 l = loss(y, y_hat)
             else:
@@ -473,7 +473,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater.apply_gradients(zip(grads, params))
         else:
             updater(X.shape[0], tape.gradient(l, updater.params))
-        # Keras loss in default returns the average loss in a batch
+        # Keras loss by default returns the average loss in a batch
         l_sum = l * float(tf.size(y)) if isinstance(
             loss, tf.keras.losses.Loss) else tf.reduce_sum(l)
         metric.add(l_sum, accuracy(y_hat, y), tf.size(y))
