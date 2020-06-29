@@ -111,6 +111,7 @@ cd /Downloads  ## if D2L_key.pem is stored in Downloads folder
 chmod 400 D2L_key.pem
 ```
 
+
 ![View instance access and startup method.](../img/chmod.png)
 :width:`400px`
 :label:`fig_chmod`
@@ -289,6 +290,4 @@ environments.
 1. Experiment with multi-GPU servers. How well can you scale things up?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2399)
-
-![](../img/qr_aws.svg)
+[Discussions](https://discuss.d2l.ai/t/423)

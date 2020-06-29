@@ -165,13 +165,13 @@ scores
 * We can implement and train matrix factorization for recommender systems.
 
 
-## Exercise
+## Exercises
 
 * Vary the size of latent factors. How does the size of latent factors influence the model performance?
 * Try different optimizers, learning rates, and weight decay rates.
 * Check the predicted rating scores of other users for a specific movie.
 
 
-## [Discussions](https://discuss.mxnet.io/t/5160)
-
-![](../img/qr_mf.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/)
+:end_tab:

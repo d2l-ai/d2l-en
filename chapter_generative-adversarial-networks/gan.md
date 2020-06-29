@@ -193,6 +193,6 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
 * Does an equilibrium exist where the generator wins, *i.e.* the discriminator ends up unable to distinguish the two distributions on finite samples?
 
 
-## [Discussions](https://discuss.mxnet.io/t/4353)
-
-![](../img/qr_gan.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/408)
+:end_tab:

@@ -567,6 +567,6 @@ torch.normal(mu, sigma, size=(10, 10))
 3. What is the probability mass function for a sum of two discrete uniform random variables on $n$ elements?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5154)
-
-![](../img/qr_distributions.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/417)
+:end_tab:

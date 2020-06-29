@@ -251,6 +251,6 @@ train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 * Apply DCGAN on Fashion-MNIST and see which category works well and which does not.
 
 
-## [Discussions](https://discuss.mxnet.io/t/dcgan-discussion/4354)
-
-![](../img/qr_dcgan.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/409)
+:end_tab:

@@ -150,6 +150,6 @@ def split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',
 * What other similar recommendation datasets can you find?
 * Go through the [https://movielens.org/](https://movielens.org/) site for more information about MovieLens.
 
-## [Discussions](https://discuss.mxnet.io/t/5159)
-
-![](../img/qr_movielens.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/399)
+:end_tab:

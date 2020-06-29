@@ -106,10 +106,11 @@ Compared with FM, DeepFM converges faster and achieves better performance.
 * Integrating neural networks to FM enables it to model complex and high-order interactions. 
 * DeepFM outperforms the original FM on the advertising dataset.
 
-## Exercise
+## Exercises
+
 * Vary the structure of the MLP to check its impact on model performance.
 * Change the dataset to Criteo and compare it with the original FM model.
 
-## [Discussions](https://discuss.mxnet.io/t/5168)
-
-![](../img/qr_deepfm.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/407)
+:end_tab:

@@ -247,6 +247,6 @@ Thus, we see that the maximum likelihood point of view can operate with continuo
 2. Suppose that you have a dataset of samples $\{x_i\}_{i=1}^N$ drawn from a Gaussian with unknown mean, but variance $1$.  What is the maximum likelihood estimate for the mean?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5153)
-
-![](../img/qr_maximum-likelihood.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/416)
+:end_tab:

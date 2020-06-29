@@ -735,6 +735,6 @@ Indeed if we think of norms as being related to standard deviations, and correla
 4. Suppose that you have two random variables $X, Y$, with joint density given by $p_{XY}(x, y) = 4xy$ for $x, y \in [0,1]$ and $p_{XY}(x, y) = 0$ otherwise.  What is the covariance of $X$ and $Y$?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5152)
-
-![](../img/qr_random-variables.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/415)
+:end_tab:

@@ -118,6 +118,6 @@ d2l.train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 * Try to add more hidden layers. Is it helpful to improve the model performance?
 * Can you find a better combination of decoder and encoder activation functions?
 
-## [Discussions](https://discuss.mxnet.io/t/5162)
-
-![](../img/qr_autorec.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/401)
+:end_tab:

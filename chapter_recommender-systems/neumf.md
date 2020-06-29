@@ -247,6 +247,6 @@ train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users,
 * Try different optimizers, learning rate and weight decay rate.
 * Try to use hinge loss defined in the last section to optimize this model.
 
-## [Discussions](https://discuss.mxnet.io/t/5164)
-
-![](../img/qr_neumf.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/403)
+:end_tab:
