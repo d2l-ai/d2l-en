@@ -30,8 +30,8 @@ npx.one_hot(np.array([0, 2]), len(vocab))
 The shape of the minibatch we sample each time is (batch size, timestep). The `one_hot` function transforms such a minibatch into a 3-D tensor with the last dimension equals to the vocabulary size. We often transpose the input so that we will obtain a (timestep, batch size, vocabulary size) output that fits into a sequence model easier.
 
 ```{.python .input  n=18}
-X = np.arange(batch_size * num_steps).reshape(batch_size, num_steps)
-npx.one_hot(X.T, len(vocab)).shape
+X = np.arange(10).reshape(2, 5)
+npx.one_hot(X.T, 28).shape
 ```
 
 ## Initializing the Model Parameters
