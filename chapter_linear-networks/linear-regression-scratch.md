@@ -272,18 +272,21 @@ the scalar is added to each component of the vector.
 
 ```{.python .input}
 def linreg(X, w, b):  #@save
+    """The linear regression model."""
     return np.dot(X, w) + b
 ```
 
 ```{.python .input}
 #@tab pytorch
 def linreg(X, w, b):  #@save
+    """The linear regression model."""
     return torch.matmul(X, w) + b
 ```
 
 ```{.python .input}
 #@tab tensorflow
 def linreg(X, w, b):  #@save
+    """The linear regression model."""
     return tf.matmul(X, w) + b
 ```
 
@@ -302,6 +305,7 @@ will also have the same shape as `y_hat`.
 ```{.python .input}
 #@tab all
 def squared_loss(y_hat, y):  #@save
+    """Squared loss."""
     return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
 ```
 
@@ -330,6 +334,7 @@ does not depend heavily on our choice of the batch size.
 
 ```{.python .input}
 def sgd(params, lr, batch_size):  #@save
+    """Minibatch stochastic gradient descent."""
     for param in params:
         param[:] = param - lr * param.grad / batch_size
 ```
@@ -337,6 +342,7 @@ def sgd(params, lr, batch_size):  #@save
 ```{.python .input}
 #@tab pytorch
 def sgd(params, lr, batch_size):  #@save
+    """Minibatch stochastic gradient descent."""
     for param in params:
         param.data.sub_(lr*param.grad/batch_size)
         param.grad.data.zero_()
@@ -345,6 +351,7 @@ def sgd(params, lr, batch_size):  #@save
 ```{.python .input}
 #@tab tensorflow
 def sgd(params, grads, lr, batch_size):  #@save
+    """Minibatch stochastic gradient descent."""
     for param, grad in zip(params, grads):
         param.assign_sub(lr*grad/batch_size)
 ```

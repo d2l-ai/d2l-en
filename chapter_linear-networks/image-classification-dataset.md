@@ -103,6 +103,7 @@ The following function converts between numeric label indices and their names in
 ```{.python .input}
 #@tab all
 def get_fashion_mnist_labels(labels):  #@save
+    """Return text labels for the FashionMNIST dataset."""
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]

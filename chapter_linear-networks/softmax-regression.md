@@ -3,7 +3,7 @@
 
 In :numref:`sec_linear_regression`, we introduced linear regression,
 working through implementations from scratch in :numref:`sec_linear_scratch`
-and again using high-level APIs of deep learning frameworks
+and again using high-level APIs of a deep learning framework
 in :numref:`sec_linear_gluon` to do the heavy lifting.
 
 Regression is the hammer we reach for when

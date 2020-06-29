@@ -567,6 +567,7 @@ def updater(batch_size):
 ```{.python .input}
 #@tab tensorflow
 class Updater():  #@save
+    """For updating parameters using minibatch stochastic gradient descent."""
     def __init__(self, params, lr):
         self.params = params
         self.lr = lr
@@ -602,6 +603,7 @@ and the predictions from the model
 ```{.python .input}
 #@tab mxnet, pytorch
 def predict_ch3(net, test_iter, n=6):  #@save
+    """Predict labels (defined in Chapter 3)."""
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
@@ -615,6 +617,7 @@ predict_ch3(net, test_iter)
 ```{.python .input}
 #@tab tensorflow
 def predict_ch3(net, test_iter, n=6):  #@save
+    """Predict labels (defined in Chapter 3)."""
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
