@@ -662,6 +662,116 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
     return data_iter, data_iter.vocab
 
 
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+class RNNModelScratch:
+    """A RNN Model based on scratch implementations."""
+
+    def __init__(self, vocab_size, num_hiddens, device,
+                 get_params, init_state, forward):
+        self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
+        self.params = get_params(vocab_size, num_hiddens, device)
+        self.init_state, self.forward_fn = init_state, forward
+
+    def __call__(self, X, state):
+        X = F.one_hot(X.T.long(), self.vocab_size).type(torch.float32)
+        return self.forward_fn(X, state, self.params)
+
+    def begin_state(self, batch_size, device):
+        return self.init_state(batch_size, self.num_hiddens, device)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def predict_ch8(prefix, num_predicts, model, vocab, device):
+    state = model.begin_state(batch_size=1, device=device)
+    outputs = [vocab[prefix[0]]]
+
+    def get_input():
+        return torch.tensor([outputs[-1]], device=device).reshape(1, 1)
+    for y in prefix[1:]:  # Warmup state with prefix
+        _, state = model(get_input(), state)
+        outputs.append(vocab[y])
+    for _ in range(num_predicts):  # Predict num_predicts steps
+        Y, state = model(get_input(), state)
+        outputs.append(int(Y.argmax(dim=1).reshape(1)))
+    return ''.join([vocab.idx_to_token[i] for i in outputs])
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def grad_clipping(model, theta):
+    if isinstance(model, nn.Module):
+        params = [p.data for p in model.parameters() if p.requires_grad]
+    else:
+        params = model.params
+    
+    norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in params))
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def train_epoch_ch8(model, train_iter, loss, updater, device,
+                    use_random_iter):
+    state, timer = None, d2l.Timer()
+    metric = d2l.Accumulator(2)  # loss_sum, num_examples
+    for X, Y in train_iter:
+        if state is None or use_random_iter:
+            # Initialize state when either it is the first iteration or
+            # using random sampling.
+            state = model.begin_state(batch_size=X.shape[0], device=device)
+        else:
+            for s in state:
+                s.detach_()
+        y = Y.T.reshape(-1)
+        X, y = X.to(device), y.to(device)
+        py, state = model(X, state)
+        l = loss(py, y.long()).mean()
+        
+        if isinstance(updater, torch.optim.Optimizer):
+            updater.zero_grad()
+            l.backward()
+            grad_clipping(model, 1)
+            updater.step()
+        else:
+            l.backward()
+            grad_clipping(model, 1)
+            updater(batch_size=1)  # Since used mean already
+
+        metric.add(l * d2l.size(y), d2l.size(y))
+    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
+              use_random_iter=False):
+    # Initialize
+    loss = nn.CrossEntropyLoss()
+    animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
+                            legend=['train'], xlim=[1, num_epochs])
+    if isinstance(model, nn.Module):
+        trainer = torch.optim.SGD(model.parameters(), lr)
+
+        def updater(batch_size):
+            return trainer.step()
+    else:
+        def updater(batch_size):
+            return d2l.sgd(model.params, lr, batch_size)
+
+    def predict(prefix):
+        return predict_ch8(prefix, 50, model, vocab, device)
+
+    # Train and check the progress.
+    for epoch in range(num_epochs):
+        ppl, speed = train_epoch_ch8(
+            model, train_iter, loss, updater, device, use_random_iter)
+        if epoch % 10 == 0:
+            print(predict('time traveller'))
+            animator.add(epoch+1, [ppl])
+    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
+    print(predict('time traveller'))
+    print(predict('traveller'))
+
+
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
