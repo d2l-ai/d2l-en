@@ -478,6 +478,7 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
 ```
 
 ```{.python .input}
+#@tab pytorch
 train_ch8(model, train_iter, vocab, lr, num_epochs, device,
           use_random_iter=True)
 ```
