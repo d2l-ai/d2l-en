@@ -247,8 +247,8 @@ train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 
 ## Exercises
 
-* What will happen if we use standard ReLU activation rather than leaky ReLU?
-* Apply DCGAN on Fashion-MNIST and see which category works well and which does not.
+1. What will happen if we use standard ReLU activation rather than leaky ReLU?
+1. Apply DCGAN on Fashion-MNIST and see which category works well and which does not.
 
 
 :begin_tab:`mxnet`
