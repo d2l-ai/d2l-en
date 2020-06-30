@@ -74,13 +74,23 @@ what value the predicted price should take
 when all of the features take value 0.
 Even if we will never see any homes with zero area,
 or that are precisely zero years old,
-we still need the intercept or else we will
-limit the expressivity of our linear model.
+we still need the bias or else we will
+limit the expressivity of our model.
+Strictly speaking, :eqref:`eq_price-area` is an *affine transformation*
+of input features,
+which is characterized by
+a *linear transformation* of features via weighted sum, combined with 
+a *translation* via the added bias.
 
 Given a dataset, our goal is to choose
 the weights $\mathbf{w}$ and the bias $b$ such that on average,
 the predictions made according to our model
 best fit the true prices observed in the data.
+Models whose output prediction
+is determined by the affine transformation of input features
+are *linear models*,
+where the affine transformation is specified by the chosen weights and bias.
+
 
 In disciplines where it is common to focus
 on datasets with just a few features,
@@ -250,7 +260,7 @@ To summarize, steps of the algorithm are the following:
 (i) we initialize the values of the model parameters, typically at random;
 (ii) we iteratively sample random minibatches from the data,
 updating the parameters in the direction of the negative gradient.
-For quadratic losses and linear functions,
+For quadratic losses and affine transformations,
 we can write this out explicitly as follows:
 
 $$\begin{aligned} \mathbf{w} &\leftarrow \mathbf{w} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\ b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
@@ -526,7 +536,7 @@ of a linear model under the assumption of additive Gaussian noise.
 
 ## From Linear Regression to Deep Networks
 
-So far we only talked about linear functions.
+So far we only talked about linear models.
 While neural networks cover a much richer family of models,
 we can begin thinking of the linear model
 as a neural network by expressing it in the language of neural networks.

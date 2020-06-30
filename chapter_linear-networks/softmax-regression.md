@@ -72,8 +72,8 @@ $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}.$$
 In order to estimate the conditional probabilities associated with all the possible classes,
 we need a model with multiple outputs, one per class.
 To address classification with linear models,
-we will need as many linear functions as we have outputs.
-Each output will correspond to its own linear function.
+we will need as many affine transformations as we have outputs.
+Each output will correspond to its own affine transformation.
 In our case, since we have 4 features and 3 possible output categories,
 we will need 12 scalars to represent the weights ($w$ with subscripts),
 and 3 scalars to represent the biases ($b$ with subscripts).
@@ -166,6 +166,11 @@ Therefore, during prediction we can still pick out the most likely class by
 $$
 \operatorname*{argmax}_j \hat y_j = \operatorname*{argmax}_j o_j.
 $$
+
+Although softmax is a nonlinear function,
+the output of softmax regression is still determined by
+the affine transformation of input features;
+thus, softmax regression is a linear model.
 
 
 
