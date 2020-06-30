@@ -1,9 +1,9 @@
 # Concise Implementation of Softmax Regression
-:label:`sec_softmax_gluon`
+:label:`sec_softmax_concise`
 
 Just as high-level APIs of deep learning frameworks
 made it much easier
-to implement linear regression in :numref:`sec_linear_gluon`,
+to implement linear regression in :numref:`sec_linear_concise`,
 we will find it similarly (or possibly more)
 convenient for implementing classification models.
 

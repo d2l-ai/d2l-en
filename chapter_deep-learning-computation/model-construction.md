@@ -92,7 +92,7 @@ and the forward function.
 
 To begin, we revisit the codes
 that we used to implement multilayer perceptrons
-(:numref:`sec_mlp_gluon`).
+(:numref:`sec_mlp_concise`).
 The following code generates a network
 with one fully-connected hidden layer
 with 256 units and ReLU activation,
@@ -480,7 +480,7 @@ net(x)
 Note that this use of `MySequential`
 is identical to the code we previously wrote
 for the `Sequential` class
-(as described in :numref:`sec_mlp_gluon`).
+(as described in :numref:`sec_mlp_concise`).
 
 
 ## Executing Code in the forward Method

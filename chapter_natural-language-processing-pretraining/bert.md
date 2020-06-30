@@ -10,7 +10,7 @@ Let us begin by illustrating this property.
 
 ## From Context-Independent to Context-Sensitive
 
-Recall the experiments in :numref:`sec_word2vec_gluon` and :numref:`sec_synonyms`.
+Recall the experiments in :numref:`sec_word2vec_pretraining` and :numref:`sec_synonyms`.
 For instance, word2vec and GloVe both assign the same pretrained vector to the same word regardless of the context of the word (if any).
 Formally, a context-independent representation of any token $x$
 is a function $f(x)$ that only takes $x$ as its input.
@@ -237,7 +237,7 @@ encoded_X.shape
 
 The forward inference of `BERTEncoder` gives the BERT representation
 of each token of the input text and the inserted
-special tokens “&lt;cls&gt;” and “&lt;seq&gt;”. 
+special tokens “&lt;cls&gt;” and “&lt;seq&gt;”.
 Next, we will use these representations to compute the loss function
 for pretraining BERT.
 The pretraining is composed of the following two tasks:
@@ -426,7 +426,7 @@ class BERTModel(nn.Block):
 
 * Word embedding models such as word2vec and GloVe are context-independent. They assign the same pretrained vector to the same word regardless of the context of the word (if any). It is hard for them to handle well polysemy or complex semantics in natural languages.
 * For context-sensitive word representations such as ELMo and GPT, representations of words depend on their contexts.
-* ELMo encodes context bidirectionally but uses task-specific architectures (however, it is practically non-trivial to craft a specific architecture for every natural language processing task); while GPT is task-agnostic but encodes context left-to-right. 
+* ELMo encodes context bidirectionally but uses task-specific architectures (however, it is practically non-trivial to craft a specific architecture for every natural language processing task); while GPT is task-agnostic but encodes context left-to-right.
 * BERT combines the best of both worlds: it encodes context bidirectionally and requires minimal architecture changes for a wide range of natural language processing tasks.
 * The embeddings of the BERT input sequence are the sum of the token embeddings, segment embeddings, and positional embeddings.
 * Pretraining BERT is composed of two tasks: masked language modeling and next sentence prediction. The former is able to encode bidirectional context for representing words, while the later explicitly models the logical relationship between text pairs.

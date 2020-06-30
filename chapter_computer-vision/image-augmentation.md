@@ -147,7 +147,7 @@ def load_cifar10(is_train, augs, batch_size):
 
 We train the ResNet-18 model described in :numref:`sec_resnet` on the
 CIFAR-10 dataset. We will also apply the methods described in
-:numref:`sec_multi_gpu_gluon` and use a multi-GPU training model.
+:numref:`sec_multi_gpu_concise` and use a multi-GPU training model.
 
 Next, we define the training function to train and evaluate the model using multiple GPUs.
 

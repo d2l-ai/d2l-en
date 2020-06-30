@@ -4,7 +4,7 @@
 In :numref:`sec_linear_regression`, we introduced linear regression,
 working through implementations from scratch in :numref:`sec_linear_scratch`
 and again using high-level APIs of a deep learning framework
-in :numref:`sec_linear_gluon` to do the heavy lifting.
+in :numref:`sec_linear_concise` to do the heavy lifting.
 
 Regression is the hammer we reach for when
 we want to answer *how much?* or *how many?* questions.
@@ -97,7 +97,7 @@ the output layer of softmax regression can also be described as fully-connected 
 :label:`fig_softmaxreg`
 
 To express the model more compactly, we can use linear algebra notation.
-In vector form, we arrive at 
+In vector form, we arrive at
 $\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$,
 a form better suited both for mathematics, and for writing code.
 Note that we have gathered all of our weights into a $3 \times 4$ matrix
@@ -224,7 +224,7 @@ $$
 
 According to maximum likelihood estimation,
 we maximize $P(\mathbf{Y} \mid \mathbf{X})$,
-which is 
+which is
 equivalent to minimizing the negative log-likelihood:
 
 $$
@@ -296,7 +296,7 @@ but an entire distribution over outcomes.
 We can use the same representation as before for the label $\mathbf{y}$.
 The only difference is that rather than a vector containing only binary entries,
 say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$.
-The math that we used previously to define the loss $l$ 
+The math that we used previously to define the loss $l$
 in :eqref:`eq_l_cross_entropy`
 still works out fine,
 just that the interpretation is slightly more general.

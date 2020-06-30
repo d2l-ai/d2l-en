@@ -1,7 +1,7 @@
 # Finding Synonyms and Analogies
 :label:`sec_synonyms`
 
-In :numref:`sec_word2vec_gluon` we trained a word2vec word embedding model
+In :numref:`sec_word2vec_pretraining` we trained a word2vec word embedding model
 on a small-scale dataset and searched for synonyms using the cosine similarity
 of word vectors. In practice, word vectors pretrained on a large-scale corpus
 can often be applied to downstream natural language processing tasks. This
@@ -53,7 +53,7 @@ class TokenEmbedding:
         self.idx_to_token, self.idx_to_vec = self._load_embedding(
             embedding_name)
         self.unknown_idx = 0
-        self.token_to_idx = {token: idx for idx, token in 
+        self.token_to_idx = {token: idx for idx, token in
                              enumerate(self.idx_to_token)}
 
     def _load_embedding(self, embedding_name):

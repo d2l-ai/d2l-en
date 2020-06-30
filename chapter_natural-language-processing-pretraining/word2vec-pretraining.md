@@ -1,5 +1,5 @@
 # Pretraining word2vec
-:label:`sec_word2vec_gluon`
+:label:`sec_word2vec_pretraining`
 
 In this section, we will train a skip-gram model defined in
 :numref:`sec_word2vec`.

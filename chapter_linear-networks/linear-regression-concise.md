@@ -1,5 +1,5 @@
 # Concise Implementation of Linear Regression
-:label:`sec_linear_gluon`
+:label:`sec_linear_concise`
 
 Broad and intense interest in deep learning for the past several years
 has inspired companies, academics, and hobbyists
