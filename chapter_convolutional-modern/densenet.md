@@ -189,18 +189,18 @@ def transition_block(input_channels, num_channels):
 ```{.python .input}
 #@tab tensorflow
 class TransitionBlock(tf.keras.layers.Layer):
-  def __init__(self, num_channels, **kwargs):
-    super(TransitionBlock, self).__init__(**kwargs)
-    self.batch_norm = tf.keras.layers.BatchNormalization()
-    self.relu = tf.keras.layers.ReLU()
-    self.conv = tf.keras.layers.Conv2D(num_channels, kernel_size=1)
-    self.avg_pool = tf.keras.layers.AvgPool2D(pool_size=2, strides=2)
+    def __init__(self, num_channels, **kwargs):
+        super(TransitionBlock, self).__init__(**kwargs)
+        self.batch_norm = tf.keras.layers.BatchNormalization()
+        self.relu = tf.keras.layers.ReLU()
+        self.conv = tf.keras.layers.Conv2D(num_channels, kernel_size=1)
+        self.avg_pool = tf.keras.layers.AvgPool2D(pool_size=2, strides=2)
 
-  def call(self, x):
-    x = self.batch_norm(x)
-    x = self.relu(x)
-    x = self.conv(x)
-    return self.avg_pool(x)
+    def call(self, x):
+        x = self.batch_norm(x)
+        x = self.relu(x)
+        x = self.conv(x)
+        return self.avg_pool(x)
 ```
 
 Apply a transition layer with 10 channels to the output of the dense block in the previous example.  This reduces the number of output channels to 10, and halves the height and width.
@@ -245,7 +245,7 @@ b1 = nn.Sequential(
 ```{.python .input}
 #@tab tensorflow
 def block_1():
-  return tf.keras.Sequential([
+    return tf.keras.Sequential([
        tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, padding='same'),
        tf.keras.layers.BatchNormalization(),
        tf.keras.layers.ReLU(),
@@ -291,20 +291,20 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
 ```{.python .input}
 #@tab tensorflow
 def block_2():
-  net = block_1()
-  num_channels, growth_rate = 64, 32
-  num_convs_in_dense_blocks = [4, 4, 4, 4]
+    net = block_1()
+    num_channels, growth_rate = 64, 32
+    num_convs_in_dense_blocks = [4, 4, 4, 4]
 
-  for i, num_convs in enumerate(num_convs_in_dense_blocks):
-    net.add(DenseBlock(num_convs, growth_rate))
-    # This is the number of output channels in the previous dense block
-    num_channels += num_convs * growth_rate
-    # A transition layer that haves the number of channels is added between
-    # the dense blocks
-    if i != len(num_convs_in_dense_blocks) - 1:
-      num_channels //= 2
-      net.add(TransitionBlock(num_channels))
-    return net
+    for i, num_convs in enumerate(num_convs_in_dense_blocks):
+        net.add(DenseBlock(num_convs, growth_rate))
+        # This is the number of output channels in the previous dense block
+        num_channels += num_convs * growth_rate
+        # A transition layer that haves the number of channels is added between
+        # the dense blocks
+        if i != len(num_convs_in_dense_blocks) - 1:
+            num_channels //= 2
+            net.add(TransitionBlock(num_channels))
+        return net
 ```
 
 Similar to ResNet, a global pooling layer and fully connected layer are connected at the end to produce the output.
@@ -329,13 +329,13 @@ net = nn.Sequential(
 ```{.python .input}
 #@tab tensorflow
 def net():
-  net = block_2()
-  net.add(tf.keras.layers.BatchNormalization())
-  net.add(tf.keras.layers.ReLU())
-  net.add(tf.keras.layers.GlobalAvgPool2D())
-  net.add(tf.keras.layers.Flatten())
-  net.add(tf.keras.layers.Dense(10, activation='softmax'))
-  return net
+    net = block_2()
+    net.add(tf.keras.layers.BatchNormalization())
+    net.add(tf.keras.layers.ReLU())
+    net.add(tf.keras.layers.GlobalAvgPool2D())
+    net.add(tf.keras.layers.Flatten())
+    net.add(tf.keras.layers.Dense(10, activation='softmax'))
+    return net
 ```
 
 ## Data Acquisition and Training
@@ -365,7 +365,6 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 1. Implement the various DenseNet versions presented in Table 1 of :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
 1. Why do we not need to concatenate terms if we are just interested in $\mathbf{x}$ and $f(\mathbf{x})$ for ResNet? Why do we need this for more than two layers in DenseNet?
 1. Design a DenseNet for fully connected networks and apply it to the Housing Price prediction task.
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/87)
