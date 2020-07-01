@@ -103,9 +103,9 @@ exponentiation can be a source of numerical stability issues.
 
 Recall that the softmax function calculates
 $\hat y_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}$,
-where $\hat y_j$ is the $j^\text{th}$ element of
+where $\hat y_j$ is the $j^\mathrm{th}$ element of
 the predicted probability distribution $\hat{\mathbf{y}}$
-and $o_j$ is the $j^\text{th}$ element of the logits
+and $o_j$ is the $j^\mathrm{th}$ element of the logits
 $\mathbf{o}$.
 If some of the $o_k$ are very large (i.e., very positive),
 then $\exp(o_k)$ might be larger than the largest number
@@ -143,7 +143,7 @@ and can use instead $o_j$ directly due to the canceling in $\log(\exp(\cdot))$.
 $$
 \begin{aligned}
 \log{(\hat y_j)} & = \log\left( \frac{\exp(o_j)}{\sum_k \exp(o_k)}\right) \\
-& = \log{(\exp(o_j))}-\text{log}{\left( \sum_k \exp(o_k) \right)} \\
+& = \log{(\exp(o_j))}-\log{\left( \sum_k \exp(o_k) \right)} \\
 & = o_j -\log{\left( \sum_k \exp(o_k) \right)}.
 \end{aligned}
 $$

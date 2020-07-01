@@ -291,22 +291,20 @@ let us briefly survey some common activation functions.
 
 ### ReLU Function
 
-As stated above, the most popular choice,
+The most popular choice,
 due to both simplicity of implementation and
-its performance on a variety of predictive tasks
-is the rectified linear unit (ReLU).
+its good performance on a variety of predictive tasks,
+is the *rectified linear unit* (*ReLU*).
 ReLU provides a very simple nonlinear transformation.
-Given the element $z$, the function is defined
-as the maximum of that element and 0.
+Given an element $x$, the function is defined
+as the maximum of that element and $0$:
 
-$$\mathrm{ReLU}(z) = \max(z, 0).$$
+$$\operatorname{ReLU}(x) = \max(x, 0).$$
 
 Informally, the ReLU function retains only positive
 elements and discards all negative elements
-(setting the corresponding activations to 0).
+by setting the corresponding activations to 0.
 To gain some intuition, we can plot the function.
-Because it is used so commonly, tensors
-support the `relu` function as a native operator.
 As you can see, the activation function is piecewise linear.
 
 ```{.python .input}
@@ -314,24 +312,21 @@ x = np.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
     y = npx.relu(x)
-d2l.set_figsize((4, 2.5))
-d2l.plot(x, y, 'x', 'relu(x)')
+d2l.plot(x, y, 'x', 'relu(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
 #@tab pytorch
 x = torch.arange(-8.0, 8.0, 0.1, requires_grad=True)
 y = torch.relu(x)
-d2l.set_figsize((4, 2.5))
-d2l.plot(x.detach(), y.detach(), 'x', 'relu(x)')
+d2l.plot(x.detach(), y.detach(), 'x', 'relu(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
 #@tab tensorflow
 x = tf.Variable(tf.range(-8.0, 8.0, 0.1), dtype=tf.float32)
 y = tf.nn.relu(x)
-d2l.set_figsize((4, 2.5))
-d2l.plot(x.numpy(), y.numpy(), 'x', 'relu(x)')
+d2l.plot(x.numpy(), y.numpy(), 'x', 'relu(x)', figsize=(5, 2.5))
 ```
 
 When the input is negative,
@@ -340,7 +335,7 @@ and when the input is positive,
 the derivative of the ReLU function is 1.
 Note that the ReLU function is not differentiable
 when the input takes value precisely equal to 0.
-In these cases, we default to the left-hand-side (LHS)
+In these cases, we default to the left-hand-side
 derivative and say that the derivative is 0 when the input is 0.
 We can get away with this because
 the input may never actually be zero.
@@ -351,49 +346,50 @@ We plot the derivative of the ReLU function plotted below.
 
 ```{.python .input}
 y.backward()
-d2l.plot(x, x.grad, 'x', 'grad of relu')
+d2l.plot(x, x.grad, 'x', 'grad of relu', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
 #@tab pytorch
 y.backward(torch.ones_like(x), retain_graph=True)
-d2l.plot(x.detach(), x.grad, 'x', 'grad of relu')
+d2l.plot(x.detach(), x.grad, 'x', 'grad of relu', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
     y = tf.nn.relu(x)
-d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of relu')
+d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of relu',
+         figsize=(5, 2.5))
 ```
 
-Note that there are many variants to the ReLU function,
-including the parameterized ReLU (pReLU) of [He et al., 2015](https://arxiv.org/abs/1502.01852).
-This variation adds a linear term to the ReLU,
-so some information still gets through,
-even when the argument is negative.
-
-$$\mathrm{pReLU}(x) = \max(0, x) + \alpha \min(0, x).$$
-
-The reason for using the ReLU is that
+The reason for using ReLU is that
 its derivatives are particularly well behaved:
 either they vanish or they just let the argument through.
 This makes optimization better behaved
 and it mitigated the well-documented problem
-of *vanishing gradients* that plagued
+of vanishing gradients that plagued
 previous versions of neural networks (more on this later).
+
+Note that there are many variants to the ReLU function,
+including the *parameterized ReLU* (*pReLU*) function :cite:`He.Zhang.Ren.ea.2015`.
+This variation adds a linear term to ReLU,
+so some information still gets through,
+even when the argument is negative:
+
+$$\operatorname{pReLU}(x) = \max(0, x) + \alpha \min(0, x).$$
 
 ### Sigmoid Function
 
-The sigmoid function transforms its inputs,
+The *sigmoid function* transforms its inputs,
 for which values lie in the domain $\mathbb{R}$,
-to outputs that lie on the interval $(0, 1)$.
+to outputs that lie on the interval (0, 1).
 For that reason, the sigmoid is
-often called a *squashing* function:
-it *squashes* any input in the range (-inf, inf)
-to some value in the range (0, 1).
+often called a *squashing function*:
+it squashes any input in the range (-inf, inf)
+to some value in the range (0, 1):
 
-$$\mathrm{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
+$$\operatorname{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
 
 In the earliest neural networks, scientists
 were interested in modeling biological neurons
@@ -402,9 +398,9 @@ Thus the pioneers of this field,
 going all the way back to McCulloch and Pitts,
 the inventors of the artificial neuron,
 focused on thresholding units.
-A thresholding activation takes value $0$
+A thresholding activation takes value 0
 when its input is below some threshold
-and value $1$ when the input exceeds the threshold.
+and value 1 when the input exceeds the threshold.
 
 
 When attention shifted to gradient based learning,
@@ -419,8 +415,7 @@ for binary classification problems
 However, the sigmoid has mostly been replaced
 by the simpler and more easily trainable ReLU
 for most use in hidden layers.
-In the "Recurrent Neural Network" chapter
-(:numref:`sec_plain_rnn`),
+In later chapters on recurrent neural networks,
 we will describe architectures that leverage sigmoid units
 to control the flow of information across time.
 
@@ -432,24 +427,24 @@ a linear transformation.
 ```{.python .input}
 with autograd.record():
     y = npx.sigmoid(x)
-d2l.plot(x, y, 'x', 'sigmoid(x)')
+d2l.plot(x, y, 'x', 'sigmoid(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
 #@tab pytorch
 y = torch.sigmoid(x)
-d2l.plot(x.detach(), y.detach(), 'x', 'sigmoid(x)')
+d2l.plot(x.detach(), y.detach(), 'x', 'sigmoid(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
 #@tab tensorflow
 y = tf.nn.sigmoid(x)
-d2l.plot(x.numpy(), y.numpy(), 'x', 'sigmoid(x)')
+d2l.plot(x.numpy(), y.numpy(), 'x', 'sigmoid(x)', figsize=(5, 2.5))
 ```
 
 The derivative of the sigmoid function is given by the following equation:
 
-$$\frac{d}{dx} \mathrm{sigmoid}(x) = \frac{\exp(-x)}{(1 + \exp(-x))^2} = \mathrm{sigmoid}(x)\left(1-\mathrm{sigmoid}(x)\right).$$
+$$\frac{d}{dx} \operatorname{sigmoid}(x) = \frac{\exp(-x)}{(1 + \exp(-x))^2} = \operatorname{sigmoid}(x)\left(1-\operatorname{sigmoid}(x)\right).$$
 
 
 The derivative of the sigmoid function is plotted below.
@@ -461,7 +456,7 @@ the derivative approaches 0.
 
 ```{.python .input}
 y.backward()
-d2l.plot(x, x.grad, 'x', 'grad of sigmoid')
+d2l.plot(x, x.grad, 'x', 'grad of sigmoid', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
@@ -469,47 +464,49 @@ d2l.plot(x, x.grad, 'x', 'grad of sigmoid')
 # Clear out previous gradients
 x.grad.data.zero_()
 y.backward(torch.ones_like(x),retain_graph=True)
-d2l.plot(x.detach(), x.grad, 'x', 'grad of sigmoid')
+d2l.plot(x.detach(), x.grad, 'x', 'grad of sigmoid', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
     y = tf.nn.sigmoid(x)
-d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of sigmoid')
+d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of sigmoid',
+         figsize=(5, 2.5))
 ```
 
 ### Tanh Function
 
-Like the sigmoid function, the tanh (Hyperbolic Tangent)
+Like the sigmoid function, the tanh (hyperbolic tangent)
 function also squashes its inputs,
 transforming them into elements on the interval between -1 and 1:
 
-$$\text{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
+$$\operatorname{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
-We plot the tanh function blow. Note that as the input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system.
+We plot the tanh function below.
+Note that as the input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to that of the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system.
 
 ```{.python .input}
 with autograd.record():
     y = np.tanh(x)
-d2l.plot(x, y, 'x', 'tanh(x)')
+d2l.plot(x, y, 'x', 'tanh(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
 #@tab pytorch
 y = torch.tanh(x)
-d2l.plot(x.detach(), y.detach(), 'x', 'tanh(x)')
+d2l.plot(x.detach(), y.detach(), 'x', 'tanh(x)', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
 #@tab tensorflow
 y = tf.nn.tanh(x)
-d2l.plot(x.numpy(), y.numpy(), 'x', 'tanh(x)')
+d2l.plot(x.numpy(), y.numpy(), 'x', 'tanh(x)', figsize=(5, 2.5))
 ```
 
-The derivative of the Tanh function is:
+The derivative of the tanh function is:
 
-$$\frac{d}{dx} \mathrm{tanh}(x) = 1 - \mathrm{tanh}^2(x).$$
+$$\frac{d}{dx} \operatorname{tanh}(x) = 1 - \operatorname{tanh}^2(x).$$
 
 The derivative of tanh function is plotted below.
 As the input nears 0,
@@ -520,7 +517,7 @@ the derivative of the tanh function approaches 0.
 
 ```{.python .input}
 y.backward()
-d2l.plot(x, x.grad, 'x', 'grad of tanh')
+d2l.plot(x, x.grad, 'x', 'grad of tanh', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
@@ -528,14 +525,15 @@ d2l.plot(x, x.grad, 'x', 'grad of tanh')
 # Clear out previous gradients.
 x.grad.data.zero_()
 y.backward(torch.ones_like(x),retain_graph=True)
-d2l.plot(x.detach(), x.grad, 'x', 'grad of tanh')
+d2l.plot(x.detach(), x.grad, 'x', 'grad of tanh', figsize=(5, 2.5))
 ```
 
 ```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
     y = tf.nn.tanh(x)
-d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of tanh')
+d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of tanh',
+         figsize=(5, 2.5))
 ```
 
 In summary, we now know how to incorporate nonlinearities
@@ -548,22 +546,21 @@ over anyone working in the 1990s,
 because you can leverage powerful
 open-source deep learning frameworks
 to build models rapidly, using only a few lines of code.
-Previously, getting these nets training
+Previously, training these networks
 required researchers to code up
 thousands of lines of C and Fortran.
 
 ## Summary
 
-* The multilayer perceptron adds one or multiple fully-connected hidden layers between the output and input layers and transforms the output of the hidden layer via an activation function.
+* MLP adds one or multiple fully-connected hidden layers between the output and input layers and transforms the output of the hidden layer via an activation function.
 * Commonly-used activation functions include the ReLU function, the sigmoid function, and the tanh function.
 
 
 ## Exercises
 
-1. Compute the derivative of the tanh and the pReLU activation function.
-1. Show that a multilayer perceptron using only ReLU (or pReLU) constructs a continuous piecewise linear function.
-1. Show that $\mathrm{tanh}(x) + 1 = 2 \mathrm{sigmoid}(2x)$.
-1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers has only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron.
+1. Compute the derivative of the pReLU activation function.
+1. Show that an MLP using only ReLU (or pReLU) constructs a continuous piecewise linear function.
+1. Show that $\operatorname{tanh}(x) + 1 = 2 \operatorname{sigmoid}(2x)$.
 1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems do you expect this to cause?
 
 :begin_tab:`mxnet`
