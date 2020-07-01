@@ -1760,7 +1760,7 @@ class TokenEmbedding:
         self.idx_to_token, self.idx_to_vec = self._load_embedding(
             embedding_name)
         self.unknown_idx = 0
-        self.token_to_idx = {token: idx for idx, token in 
+        self.token_to_idx = {token: idx for idx, token in
                              enumerate(self.idx_to_token)}
 
     def _load_embedding(self, embedding_name):
