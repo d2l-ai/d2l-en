@@ -74,7 +74,7 @@ class ConvBlock(tf.keras.layers.Layer):
         self.relu = tf.keras.layers.ReLU()
         self.conv = tf.keras.layers.Conv2D(
             filters=num_channels, kernel_size=(3, 3), padding='same')
-        
+
         self.listLayers = [self.bn, self.relu, self.conv]
 
     def call(self, x):
@@ -319,7 +319,7 @@ net.add(nn.BatchNorm(),
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(
-    b1, *blks, 
+    b1, *blks,
     nn.BatchNorm2d(num_channels), nn.ReLU(),
     nn.AdaptiveMaxPool2d((1,1)),
     nn.Flatten(),
@@ -351,20 +351,7 @@ def net():
 Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
 
 ```{.python .input}
-lr, num_epochs, batch_size = 0.1, 10, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab pytorch
-lr, num_epochs, batch_size = 0.1, 10, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 lr, num_epochs, batch_size = 0.1, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)

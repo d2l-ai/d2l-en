@@ -197,3 +197,7 @@ CUDA 10.0 and `cu90` for CUDA 9.0.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/24)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/436)
+:end_tab:
