@@ -1,7 +1,7 @@
 # Multilayer Perceptrons
 :label:`sec_mlp`
 
-In the previous chapter, we introduced
+In :numref:`chap_linear`, we introduced
 softmax regression (:numref:`sec_softmax`),
 implementing the algorithm from scratch
 (:numref:`sec_softmax_scratch`) and using high-level APIs
@@ -18,25 +18,24 @@ we can launch our exploration of deep neural networks,
 the comparatively rich class of models
 with which this book is primarily concerned.
 
+
 ## Hidden Layers
 
+We have described the affine transformation in
+:numref:`subsec_linear_model`,
+which is a linear transformation added by a bias.
 To begin, recall the model architecture
 corresponding to our softmax regression example,
-illustrated in  :numref:`fig_singlelayer` below.
+illustrated in  :numref:`fig_softmaxreg`.
 This model mapped our inputs directly to our outputs
-via a single linear transformation:
-
-$$
-\hat{\mathbf{o}} = \mathrm{softmax}(\mathbf{W} \mathbf{x} + \mathbf{b}).
-$$
-
-![Single layer perceptron with 5 output units.](../img/singlelayer.svg)
-:label:`fig_singlelayer`
-
+via a single affine transformation,
+followed by a softmax operation.
 If our labels truly were related
-to our input data by a linear function,
+to our input data by an affine transformation,
 then this approach would be sufficient.
-But linearity is a *strong assumption*.
+But linearity in affine transformations is a *strong* assumption.
+
+### Linear Models May Go Wrong
 
 For example, linearity implies the *weaker*
 assumption of *monotonicity*:
@@ -54,27 +53,27 @@ would always be more likely to repay
 than one with a lower income.
 While monotonic, this relationship likely
 is not linearly associated with the probability of
-repayment. An increase in income from 0 to 50k
+repayment. An increase in income from 0 to 50 thousand
 likely corresponds to a bigger increase
 in likelihood of repayment
-than an increase from 1M to 1.05M.
-One way to handle this might be to pre-process
+than an increase from 1 million to 1.05 million.
+One way to handle this might be to preprocess
 our data such that linearity becomes more plausible,
 say, by using the logarithm of income as our feature.
 
 
 Note that we can easily come up with examples
-that violate *monotonicity*.
+that violate monotonicity.
 Say for example that we want to predict probability
 of death based on body temperature.
 For individuals with a body temperature
 above 37°C (98.6°F),
-higher termperatures indicate greater risk.
-However, for individuals with body termperatures
-below 37° C, higher temperatures indicate *lower* risk!
+higher temperatures indicate greater risk.
+However, for individuals with body temperatures
+below 37° C, higher temperatures indicate lower risk!
 In this case too, we might resolve the problem
 with some clever preprocessing.
-Namely, we might use the *distance* from 37°C as our feature.
+Namely, we might use the distance from 37°C as our feature.
 
 
 But what about classifying images of cats and dogs?
@@ -82,7 +81,7 @@ Should increasing the intensity
 of the pixel at location (13, 17)
 always increase (or always decrease)
 the likelihood that the image depicts a dog?
-Reliance on a linear model corrsponds to the (implicit)
+Reliance on a linear model corresponds to the implicit
 assumption that the only requirement
 for differentiating cats vs. dogs is to assess
 the brightness of individual pixels.
@@ -91,7 +90,7 @@ where inverting an image preserves the category.
 
 
 And yet despite the apparent absurdity of linearity here,
-as compared to our previous examples,
+as compared with our previous examples,
 it is less obvious that we could address the problem
 with a simple preprocessing fix.
 That is because the significance of any pixel
@@ -99,11 +98,11 @@ depends in complex ways on its context
 (the values of the surrounding pixels).
 While there might exist a representation of our data
 that would take into account
-the relevant interactions among our features
-(and on top of which a linear model would be suitable),
+the relevant interactions among our features,
+on top of which a linear model would be suitable,
 we simply do not know how to calculate it by hand.
 With deep neural networks, we used observational data
-to jointly learn both a representation (via hidden layers)
+to jointly learn both a representation via hidden layers
 and a linear predictor that acts upon that representation.
 
 
@@ -115,7 +114,7 @@ by incorporating one or more hidden layers.
 The easiest way to do this is to stack
 many fully-connected layers on top of each other.
 Each layer feeds into the layer above it,
-until we generate an output.
+until we generate outputs.
 We can think of the first $L-1$ layers
 as our representation and the final layer
 as our linear predictor.
@@ -124,84 +123,112 @@ a *multilayer perceptron*,
 often abbreviated as *MLP*.
 Below, we depict an MLP diagrammatically (:numref:`fig_nlp`).
 
-![Multilayer perceptron with hidden layers. This example contains a hidden layer with 5 hidden units in it. ](../img/mlp.svg)
+![An MLP with a hidden layer of 5 hidden units. ](../img/mlp.svg)
 :label:`fig_nlp`
 
-This multilayer perceptron has 4 inputs, 3 outputs,
+This MLP has 4 inputs, 3 outputs,
 and its hidden layer contains 5 hidden units.
 Since the input layer does not involve any calculations,
 producing outputs with this network
 requires implementing the computations
-for each of the 2 layers (hidden and output).
+for both the hidden and output layers;
+thus, the number of layers in this MLP is 2.
 Note that these layers are both fully connected.
 Every input influences every neuron in the hidden layer,
 and each of these in turn influences
 every neuron in the output layer.
 
-
 ### From Linear to Nonlinear
 
-Formally, we calculate each layer
-in this one-hidden-layer MLP as follows:
+
+As before, by the matrix $\mathbf{X} \in \mathbb{R}^{n \times d}$,
+we denote a minibatch of $n$ examples where each example has $d$ inputs (features).
+For a one-hidden-layer MLP whose hidden layer has $h$ hidden units,
+denote by $\mathbf{H} \in \mathbb{R}^{n \times h}$
+the outputs of the hidden layer.
+Here, $\mathbf{H}$ is also known as a *hidden-layer variable* or a *hidden variable*.
+Since the hidden and output layers are both fully connected,
+we have hidden-layer weights $\mathbf{W}_1 \in \mathbb{R}^{d \times h}$ and biases $\mathbf{b}_1 \in \mathbb{R}^{1 \times h}$
+and output-layer weights $\mathbf{W}_2 \in \mathbb{R}^{h \times q}$ and biases $\mathbf{b}_2 \in \mathbb{R}^{1 \times q}$.
+Formally, we calculate the outputs $\mathbf{X} \in \mathbb{R}^{n \times q}$
+of the one-hidden-layer MLP as follows:
+
 $$
 \begin{aligned}
-    \mathbf{h} & = \mathbf{W}_1 \mathbf{x} + \mathbf{b}_1, \\
-    \mathbf{o} & = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2, \\
-    \hat{\mathbf{y}} & = \mathrm{softmax}(\mathbf{o}).
+    \mathbf{H} & = \mathbf{X} \mathbf{W}_1 + \mathbf{b}_1, \\
+    \mathbf{O} & = \mathbf{H}\mathbf{W}_2 + \mathbf{b}_2.
 \end{aligned}
 $$
 
-Note that after adding this layer,
+
+
+Note that after adding the hidden layer,
 our model now requires us to track and update
-two additional sets of parameters.
+additional sets of parameters.
 So what have we gained in exchange?
 You might be surprised to find out
 that---in the model defined above---*we
-gain nothing for our troubles!*
+gain nothing for our troubles*!
 The reason is plain.
 The hidden units above are given by
-a linear function of the inputs,
+an affine function of the inputs,
 and the outputs (pre-softmax) are just
-a linear function of the hidden units.
-A linear function of a linear function
-is itself a linear function.
+an affine function of the hidden units.
+An affine function of an affine function
+is itself an affine function.
 Moreover, our linear model was already
-capable of representing any linear function.
+capable of representing any affine function.
 
 
 We can view the equivalence formally
 by proving that for any values of the weights,
 we can just collapse out the hidden layer,
-yielding an equivalent single-layer model with paramters
-$\mathbf{W} = \mathbf{W}_2 \mathbf{W}_1$ and $\mathbf{b} = \mathbf{W}_2 \mathbf{b}_1 + \mathbf{b}_2$.
+yielding an equivalent single-layer model with parameters
+$\mathbf{W} = \mathbf{W}_1\mathbf{W}_2$ and $\mathbf{b} = \mathbf{b}_1 \mathbf{W}_2 + \mathbf{b}_2$:
 
-$$\mathbf{o} = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2 = \mathbf{W}_2 (\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1) + \mathbf{b}_2 = (\mathbf{W}_2 \mathbf{W}_1) \mathbf{x} + (\mathbf{W}_2 \mathbf{b}_1 + \mathbf{b}_2) = \mathbf{W} \mathbf{x} + \mathbf{b}.$$
+$$
+\mathbf{O} = (\mathbf{X} \mathbf{W}_1 + \mathbf{b}_1)\mathbf{W}_2 + \mathbf{b}_2 = \mathbf{X} \mathbf{W}_1\mathbf{W}_2 + \mathbf{b}_1 \mathbf{W}_2 + \mathbf{b}_2 = \mathbf{X} \mathbf{W} + \mathbf{b}.
+$$
+
 
 In order to realize the potential of multilayer architectures,
-we need one more key ingredient---an
-elementwise *nonlinear activation function* $\sigma$
+we need one more key ingredient: a
+nonlinear *activation function* $\sigma$
 to be applied to each hidden unit
-(following the linear transformation).
-The most popular choice for the nonlinearity
-these days is the rectified linear unit (ReLU)
-$\mathrm{max}(x, 0)$.
-In general, with these activation functions in place,
-it is no longer possible to collapse our MLP into a linear model.
+following the affine transformation.
+In general, with activation functions in place,
+it is no longer possible to collapse our MLP into a linear model:
+
 
 $$
 \begin{aligned}
-    \mathbf{h} & = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1), \\
-    \mathbf{o} & = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2, \\
-    \hat{\mathbf{y}} & = \mathrm{softmax}(\mathbf{o}).
+    \mathbf{H} & = \sigma(\mathbf{X} \mathbf{W}_1 + \mathbf{b}_1), \\
+    \mathbf{O} & = \mathbf{H}\mathbf{W}_2 + \mathbf{b}_2.\\
 \end{aligned}
 $$
 
+Since each row in $\mathbf{X}$ corresponds to an example in the minibatch,
+with some abuse of notation, we define the nonlinearity
+$\sigma$ to apply to its inputs in a rowwise fashion,
+i.e., one example at a time.
+Note that we used the notation for softmax
+in the same way to denote a rowwise operation in :numref:`subsec_softmax_vectorization`.
+Often, as in this section, the activation functions
+that we apply to hidden layers are not merely rowwise,
+but elementwise.
+That means that after computing the linear portion of the layer,
+we can calculate each activation result
+without looking at the values taken by the other hidden units.
+This is true for most activation functions.
+
+
 To build more general MLPs, we can continue stacking
 such hidden layers,
-e.g., $\mathbf{h}_1 = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1)$
-and $\mathbf{h}_2 = \sigma(\mathbf{W}_2 \mathbf{h}_1 + \mathbf{b}_2)$,
-one atop another, yielding ever more expressive models
-(assuming fixed width).
+e.g., $\mathbf{H}_1 = \sigma_1(\mathbf{X} \mathbf{W}_1 + \mathbf{b}_1)$
+and $\mathbf{H}_2 = \sigma_2(\mathbf{H}_1 \mathbf{W}_2 + \mathbf{b}_2)$,
+one atop another, yielding ever more expressive models.
+
+### Universal Approximators
 
 MLPs can capture complex interactions
 among our inputs via their hidden neurons,
@@ -214,8 +241,8 @@ it is widely known that MLPs are universal approximators.
 Even with a single-hidden-layer network,
 given enough nodes (possibly absurdly many),
 and the right set of weights,
-we can model any function.
-*Actually learning that function is the hard part.*
+we can model any function,
+though actually learning that function is the hard part.
 You might think of your neural network
 as being a bit like the C programming language.
 The language, like any other modern language,
@@ -223,47 +250,14 @@ is capable of expressing any computable program.
 But actually coming up with a program
 that meets your specifications is the hard part.
 
-Moreover, just because a single-layer network
+Moreover, just because a single-hidden-layer network
 *can* learn any function
 does not mean that you should try
 to solve all of your problems
-with single-layer networks.
+with single-hidden-layer networks.
 In fact, we can approximate many functions
-much more compactly by using deeper (vs wider) networks.
-We will touch upon more rigorous arguments in subsequent chapters,
-but first let us actually build an MLP in code.
-In this example, we’ll implement an MLP
-with two hidden layers and one output layer.
-
-### Vectorization and Minibatch
-
-As before, by the matrix $\mathbf{X}$,
-we denote a minibatch of inputs.
-The calculations to produce outputs
-from an MLP with two hidden layers
-can thus be expressed:
-
-$$
-\begin{aligned}
-    \mathbf{H}_1 & = \sigma(\mathbf{W}_1 \mathbf{X} + \mathbf{b}_1), \\
-    \mathbf{H}_2 & = \sigma(\mathbf{W}_2 \mathbf{H}_1 + \mathbf{b}_2), \\
-    \mathbf{O} & = \mathrm{softmax}(\mathbf{W}_3 \mathbf{H}_2 + \mathbf{b}_3).
-\end{aligned}
-$$
-
-With some abuse of notation, we define the nonlinearity
-$\sigma$ to apply to its inputs in a row-wise fashion,
-i.e., one observation at a time.
-Note that we are also using the notation for *softmax*
-in the same way to denote a row-wise operation.
-Often, as in this section, the activation functions
-that we apply to hidden layers are not merely row-wise,
-but component wise.
-That means that after computing the linear portion of the layer,
-we can calculate each nodes activation
-without looking at the values taken by the other hidden units.
-This is true for most activation functions
-(the batch normalization operation to be introduced in :numref:`sec_batch_norm` is a notable exception to that rule).
+much more compactly by using deeper (vs. wider) networks.
+We will touch upon more rigorous arguments in subsequent chapters.
 
 ```{.python .input}
 %matplotlib inline

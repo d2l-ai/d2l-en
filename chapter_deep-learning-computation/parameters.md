@@ -4,26 +4,26 @@ Once we have chosen an architecture
 and set our hyperparameters,
 we proceed to the training loop,
 where our goal is to find parameter values
-that minimize our objective function. 
-After training, we will need these parameters 
+that minimize our objective function.
+After training, we will need these parameters
 in order to make future predictions.
-Additionally, we will sometimes wish 
-to extract the parameters 
+Additionally, we will sometimes wish
+to extract the parameters
 either to reuse them in some other context,
-to save our model to disk so that 
+to save our model to disk so that
 it may be executed in other software,
-or for examination in the hopes of 
+or for examination in the hopes of
 gaining scientific understanding.
 
-Most of the time, we will be able 
+Most of the time, we will be able
 to ignore the nitty-gritty details
 of how parameters are declared
 and manipulated, relying on the framework
 to do the heavy lifting.
-However, when we move away from 
-stacked architectures with standard layers, 
+However, when we move away from
+stacked architectures with standard layers,
 we will sometimes need to get into the weeds
-of declaring and manipulating parameters. 
+of declaring and manipulating parameters.
 In this section, we cover the following:
 
 * Accessing parameters for debugging, diagnostics, and visualizations.
@@ -76,10 +76,10 @@ net(x)
 Let us start with how to access parameters
 from the models that you already know.
 When a model is defined via the `Sequential` class,
-we can first access any layer by indexing 
+we can first access any layer by indexing
 into the model as though it were a list.
-Each layer's parameters are conveniently 
-located in its attribute. 
+Each layer's parameters are conveniently
+located in its attribute.
 We can inspect the parameters of the second fully-connected layer as follows.
 
 ```{.python .input}
@@ -97,9 +97,9 @@ print(net.layers[2].weights)
 ```
 
 The output tells us a few important things.
-First, this fully-connected layer 
-contains two parameters, 
-corresponding to that layer's 
+First, this fully-connected layer
+contains two parameters,
+corresponding to that layer's
 weights and biases, respectively.
 Both are stored as single precision floats.
 Note that the names of the parameters
@@ -113,11 +113,11 @@ even in a network containing hundreds of layers.
 Note that each parameter is represented
 as an instance of the parameter class.
 To do anything useful with the parameters,
-we first need to access the underlying numerical values. 
+we first need to access the underlying numerical values.
 There are several ways to do this.
 Some are simpler while others are more general.
 The following code extracts the bias
-from the second neural network layer, which returns a parameter class instance, and 
+from the second neural network layer, which returns a parameter class instance, and
 and further access that parameter's value.
 
 ```{.python .input}
@@ -164,9 +164,9 @@ When we need to perform operations on all parameters,
 accessing them one-by-one can grow tedious.
 The situation can grow especially unwieldy
 when we work with more complex blocks, (e.g., nested blocks),
-since we would need to recurse 
+since we would need to recurse
 through the entire tree in to extract
-each sub-block's parameters. Below we demonstrate accessing the parameters of the first fully-connected layer versus accessing all layers.
+each sub-block's parameters. Below we demonstrate accessing the parameters of the first fully-connected layer vs. accessing all layers.
 
 ```{.python .input}
 print(net[0].collect_params())
@@ -203,10 +203,10 @@ net.get_weights()[1]
 
 ### Collecting Parameters from Nested Blocks
 
-Let us see how the parameter naming conventions work 
-if we nest multiple blocks inside each other. 
-For that we first define a function that produces blocks 
-(a block factory, so to speak) and then 
+Let us see how the parameter naming conventions work
+if we nest multiple blocks inside each other.
+For that we first define a function that produces blocks
+(a block factory, so to speak) and then
 combine these inside yet larger blocks.
 
 ```{.python .input}
@@ -265,7 +265,7 @@ rgnet.add(tf.keras.layers.Dense(1))
 rgnet(x)
 ```
 
-Now that we have designed the network, 
+Now that we have designed the network,
 let us see how it is organized.
 
 ```{.python .input}
@@ -284,10 +284,10 @@ print(rgnet.summary())
 ```
 
 Since the layers are hierarchically nested,
-we can also access them as though 
-indexing through nested lists. 
-For instance, we can access the first major block, 
-within it the second subblock, 
+we can also access them as though
+indexing through nested lists.
+For instance, we can access the first major block,
+within it the second subblock,
 and within that the bias of the first layer,
 with as follows:
 
@@ -310,22 +310,22 @@ rgnet.layers[0].layers[1].layers[1].weights[1]
 Now that we know how to access the parameters,
 let us look at how to initialize them properly.
 We discussed the need for initialization in :numref:`sec_numerical_stability`.
-The framework provides default random initializations to its layers. 
+The framework provides default random initializations to its layers.
 However, we often want to initialize our weights
-according to various other protocols. The framework provides most commonly 
+according to various other protocols. The framework provides most commonly
 used protocols, and also allows to create a customer initializer.
 
 :begin_tab:`mxnet`
 By default, MXNet initializes weight matrices
-uniformly by drawing from $U[-0.07, 0.07]$ 
-MXNet's `init` module provides a variety 
+uniformly by drawing from $U[-0.07, 0.07]$
+MXNet's `init` module provides a variety
 of preset initialization methods.
 :end_tab:
 
 :begin_tab:`pytorch`
 By default, PyTorch initializes weight and bias matrices
-uniformly by drawing from a range that is computed according to the input and output dimension. 
-PyTorch's `nn.init` module provides a variety 
+uniformly by drawing from a range that is computed according to the input and output dimension.
+PyTorch's `nn.init` module provides a variety
 of preset initialization methods.
 :end_tab:
 
@@ -336,9 +336,9 @@ TensorFlow provides a variety of initialization methods both in the root module 
 
 ### Built-in Initialization
 
-Let us begin by calling on built-in initializers. 
-The code below initializes all weight parameters 
-as Gaussian random variables 
+Let us begin by calling on built-in initializers.
+The code below initializes all weight parameters
+as Gaussian random variables
 with standard deviation $.01$, while bias parameters set to 0.
 
 ```{.python .input}
@@ -349,17 +349,17 @@ net[0].weight.data()[0]
 ```
 
 ```{.python .input}
-#@tab pytorch 
+#@tab pytorch
 def init_normal(m):
     if type(m) == nn.Linear:
         nn.init.normal_(m.weight, mean=0, std=0.01)
         nn.init.zeros_(m.bias)
-net.apply(init_normal)    
+net.apply(init_normal)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
 
 ```{.python .input}
-#@tab tensorflow 
+#@tab tensorflow
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(
@@ -372,7 +372,7 @@ net(x)
 net.weights[0], net.weights[1]
 ```
 
-We can also initialize all parameters 
+We can also initialize all parameters
 to a given constant value (say, $1$).
 
 ```{.python .input}
@@ -386,7 +386,7 @@ def init_constant(m):
     if type(m) == nn.Linear:
         nn.init.constant_(m.weight, 1)
         nn.init.zeros_(m.bias)
-net.apply(init_constant)    
+net.apply(init_constant)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
 
@@ -408,7 +408,7 @@ net.weights[0], net.weights[1]
 We can also apply different initializers for certain Blocks.
 For example, below we initialize the first layer
 with the `Xavier` initializer
-and initialize the second layer 
+and initialize the second layer
 to a constant value of 42.
 
 ```{.python .input}
@@ -426,7 +426,7 @@ def xavier(m):
 def init_42(m):
     if type(m) == nn.Linear:
         torch.nn.init.constant_(m.weight, 42)
-        
+
 net[0].apply(xavier)
 net[2].apply(init_42)
 print(net[0].weight.data[0])
@@ -452,8 +452,8 @@ print(net.layers[2].weights[0])
 
 ### Custom Initialization
 
-Sometimes, the initialization methods we need 
-are not provided by the framework. 
+Sometimes, the initialization methods we need
+are not provided by the framework.
 In the example below, we define an initializer
 for the following strange distribution:
 
@@ -468,9 +468,9 @@ $$
 $$
 
 :begin_tab:`mxnet`
-Here we define a subclass of `Initializer`. 
+Here we define a subclass of `Initializer`.
 Usually, we only need to implement the `_init_weight` function
-which takes a tensor argument (`data`) 
+which takes a tensor argument (`data`)
 and assigns to it the desired initialized values.
 :end_tab:
 
@@ -479,7 +479,7 @@ Again, we implement a `my_init` function to apply to `net`.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Here we define a subclass of `Initializer` and implement the `__call__` 
+Here we define a subclass of `Initializer` and implement the `__call__`
 function that return a desired tensor given the shape and data type.
 :end_tab:
 
@@ -499,8 +499,8 @@ net[0].weight.data()[0:2]
 def my_init(m):
     if type(m) == nn.Linear:
         nn.init.uniform_(m.weight, -10, 10)
-        m.weight.data *= m.weight.data.abs() >= 5    
-    
+        m.weight.data *= m.weight.data.abs() >= 5
+
 net.apply(my_init)
 net[0].weight[0:2]
 ```
@@ -524,13 +524,13 @@ net(x)
 print(net.layers[1].weights[0])
 ```
 
-Note that we always have the option 
+Note that we always have the option
 of setting parameters directly.
 
 :begin_tab:`mxnet`
-A note for advanced users: 
+A note for advanced users:
 if you want to adjust parameters within an `autograd` scope,
-you need to use `set_data` to avoid confusing 
+you need to use `set_data` to avoid confusing
 the automatic differentiation mechanics.
 :end_tab:
 
@@ -559,11 +559,11 @@ net.layers[1].weights[0]
 Often, we want to share parameters across multiple layers.
 Later we will see that when learning word embeddings,
 it might be sensible to use the same parameters
-both for encoding and decoding words. 
-We discussed one such case when we introduced :numref:`sec_model_construction`. 
-Let us see how to do this a bit more elegantly. 
-In the following we allocate a dense layer 
-and then use its parameters specifically 
+both for encoding and decoding words.
+We discussed one such case when we introduced :numref:`sec_model_construction`.
+Let us see how to do this a bit more elegantly.
+In the following we allocate a dense layer
+and then use its parameters specifically
 to set those of another layer.
 
 ```{.python .input}
@@ -593,9 +593,9 @@ print(net[1].weight.data()[0] == net[2].weight.data()[0])
 # We need to give the shared layer a name such that we can reference its
 # parameters
 shared = nn.Linear(8, 8)
-net = nn.Sequential(nn.Linear(4, 8), nn.ReLU(), 
-                    shared, nn.ReLU(), 
-                    shared, nn.ReLU(), 
+net = nn.Sequential(nn.Linear(4, 8), nn.ReLU(),
+                    shared, nn.ReLU(),
+                    shared, nn.ReLU(),
                     nn.Linear(8, 1))
 net(x)
 # Check whether the parameters are the same
@@ -623,13 +623,13 @@ net(x)
 print(len(net.layers) == 3)
 ```
 
-This example shows that the parameters 
-of the second and third layer are tied. 
-They are not just equal, they are 
-represented by the same exact tensor. 
+This example shows that the parameters
+of the second and third layer are tied.
+They are not just equal, they are
+represented by the same exact tensor.
 Thus, if we change one of the parameters,
-the other one changes, too. 
-You might wonder, 
+the other one changes, too.
+You might wonder,
 *when parameters are tied
 what happens to the gradients?*
 Since the model parameters contain gradients,

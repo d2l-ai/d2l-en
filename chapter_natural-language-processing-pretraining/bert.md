@@ -272,7 +272,7 @@ This occasional noise encourages BERT to be less biased towards the masked token
 
 We implement the following `MaskLM` class to predict masked tokens
 in the masked language model task of BERT pretraining.
-The prediction uses an MLP with one hidden layer (`self.mlp`).
+The prediction uses a one-hidden-layer MLP (`self.mlp`).
 In forward inference, it takes two inputs:
 the encoded result of `BERTEncoder` and the token positions for prediction.
 The output is the prediction results at these positions.
@@ -341,7 +341,7 @@ When generating sentence pairs for pretraining,
 for half of the time they are indeed consecutive sentences with the label "True";
 while for the other half of the time the second sentence is randomly sampled from the corpus with the label "False".
 
-The following `NextSentencePred` class uses an MLP with one hidden layer
+The following `NextSentencePred` class uses a one-hidden-layer MLP
 to predict whether the second sentence is the next sentence of the first
 in the BERT input sequence.
 Due to self-attention in the Transformer encoder,

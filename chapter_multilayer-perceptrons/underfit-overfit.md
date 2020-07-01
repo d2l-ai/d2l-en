@@ -194,7 +194,7 @@ and one subject to *early stopping* as less complex.
 
 It can be difficult to compare the complexity among members
 of substantially different model classes
-(say a decision tree versus a neural network).
+(say a decision tree vs. a neural network).
 For now, a simple rule of thumb is quite useful:
 A model that can readily explain arbitrary facts
 is what statisticians view as complex,

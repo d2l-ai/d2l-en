@@ -75,7 +75,7 @@ with new objective,
 Now, if our weight vector grows too large,
 our learning algorithm might *focus*
 on minimizing the weight norm $|| \mathbf{w} ||^2$
-versus minimizing the training error.
+vs. minimizing the training error.
 That is exactly what we want.
 To illustrate things in code,
 let us revive our previous example

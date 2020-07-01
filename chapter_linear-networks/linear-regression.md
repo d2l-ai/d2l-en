@@ -58,6 +58,7 @@ and the corresponding label as $y^{(i)}$.
 
 
 ### Linear Model
+:label:`subsec_linear_model`
 
 The linearity assumption just says that the target (price)
 can be expressed as a weighted sum of the features (area and age):
