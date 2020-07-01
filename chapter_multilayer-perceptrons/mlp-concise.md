@@ -24,16 +24,16 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## The Model
+## Model
 
-As compared to our concise implementation
+As compared with our concise implementation
 of softmax regression implementation
 (:numref:`sec_softmax_concise`),
 the only difference is that we add
 *two* fully-connected layers
 (previously, we added *one*).
 The first is our hidden layer,
-which contains *256* hidden units
+which contains 256 hidden units
 and applies the ReLU activation function.
 The second is our output layer.
 
@@ -70,7 +70,7 @@ net = tf.keras.models.Sequential([
     tf.keras.layers.Dense(10)])
 ```
 
-The training loop is *exactly* the same
+The training loop is exactly the same
 as when we implemented softmax regression.
 This modularity enables us to separate
 matters concerning the model architecture
@@ -102,12 +102,16 @@ trainer = tf.keras.optimizers.SGD(learning_rate=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
+## Summary
+
+* Using high-level APIs, we can implement MLPs much more concisely.
+* For the same classification problem, the implementation of an MLP is the same as that of softmax regression except for additional hidden layers with activation functions.
+
 ## Exercises
 
-1. Try adding different numbers of hidden layers. What setting (keeping other parameters and hyperparameters constant) works best?
-1. Try out different activation functions. Which ones work best?
+1. Try adding different numbers of hidden layers. What setting (keeping other hyperparameters constant) works best?
+1. Try out different activation functions. Which one works best?
 1. Try different schemes for initializing the weights. What method works best?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/94)

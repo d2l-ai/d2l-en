@@ -204,11 +204,12 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 As before, this algorithm converges to a solution
 that achieves a decent accuracy,
 albeit this time with fewer lines of code than before.
-Note that in many cases, a deep learning framework takes additional precautions
-beyond these most well-known tricks to ensure numerical stability,
-saving us from even more pitfalls that we would encounter
-if we tried to code all of our models from scratch in practice.
 
+
+## Summary
+
+* Using high-level APIs, we can implement softmax regression much more concisely.
+* From a computational perspective, implementing softmax regression has intricacies. Note that in many cases, a deep learning framework takes additional precautions beyond these most well-known tricks to ensure numerical stability, saving us from even more pitfalls that we would encounter if we tried to code all of our models from scratch in practice.
 
 ## Exercises
 
