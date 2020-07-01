@@ -328,21 +328,13 @@ net = nn.Sequential(
 
 ```{.python .input}
 #@tab tensorflow
-def block_3():
+def net():
   net = block_2()
   net.add(tf.keras.layers.BatchNormalization())
   net.add(tf.keras.layers.ReLU())
   net.add(tf.keras.layers.GlobalAvgPool2D())
   net.add(tf.keras.layers.Flatten())
   net.add(tf.keras.layers.Dense(10, activation='softmax'))
-  return net
-# Recall that we define this as a function so we can reuse later and run it
-# within `tf.distribute.MirroredStrategy`'s scope to utilize various
-# computational resources, e.g., GPUs.
-def net():
-  net = block_1()
-  net = block_2()
-  net = block_3()
   return net
 ```
 
