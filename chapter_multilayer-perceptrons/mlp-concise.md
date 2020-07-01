@@ -1,7 +1,7 @@
-# Concise Implementation of Multilayer Perceptron
+# Concise Implementation of Multilayer Perceptrons
 :label:`sec_mlp_concise`
 
-As you might expect, by relying on the high-level interface,
+As you might expect, by relying on the high-level APIs,
 we can implement MLPs even more concisely.
 
 ```{.python .input}

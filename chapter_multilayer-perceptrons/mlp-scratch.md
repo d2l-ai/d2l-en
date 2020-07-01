@@ -1,4 +1,4 @@
-# Implementation of Multilayer Perceptron from Scratch
+# Implementation of Multilayer Perceptrons from Scratch
 :label:`sec_mlp_scratch`
 
 Now that we have characterized 
@@ -25,9 +25,9 @@ import tensorflow as tf
 ```
 
 To compare against our previous results
-achieved with (linear) softmax regression
+achieved with softmax regression
 (:numref:`sec_softmax_scratch`),
-we will continue work with 
+we will continue to work with 
 the Fashion-MNIST image classification dataset 
 (:numref:`sec_fashion_mnist`).
 
@@ -39,27 +39,26 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 ## Initializing Model Parameters
 
-Recall that Fashion-MNIST contains $10$ classes,
+Recall that Fashion-MNIST contains 10 classes,
 and that each image consists of a $28 \times 28 = 784$
-grid of (black and white) pixel values.
+grid of grayscale pixel values.
 Again, we will disregard the spatial structure
-among the pixels (for now),
+among the pixels for now,
 so we can think of this as simply a classification dataset
-with $784$ input features and $10$ classes.
+with 784 input features and 10 classes.
 To begin, we will implement an MLP
-with one hidden layer and $256$ hidden units.
+with one hidden layer and 256 hidden units.
 Note that we can regard both of these quantities
-as *hyperparameters* and ought in general
-to set them based on performance on validation data.
-Typically, we choose layer widths in powers of $2$,
+as hyperparameters.
+Typically, we choose layer widths in powers of 2,
 which tend to be computationally efficient because
-of how memory is alotted and addressed in hardware.
+of how memory is allocated and addressed in hardware.
 
 Again, we will represent our parameters with several tensors.
 Note that *for every layer*, we must keep track of
 one weight matrix and one bias vector.
 As always, we allocate memory
-for the gradients (of the loss) with respect to these parameters.
+for the gradients of the loss with respect to these parameters.
 
 ```{.python .input}
 num_inputs, num_outputs, num_hiddens = 784, 10, 256
@@ -107,7 +106,7 @@ params = [W1, b1, W2, b2]
 To make sure we know how everything works,
 we will implement the ReLU activation ourselves
 using the maximum function rather than 
-invoking `relu` directly.
+invoking the built-in `relu` function directly.
 
 ```{.python .input}
 def relu(X):
@@ -127,17 +126,17 @@ def relu(X):
     return tf.math.maximum(X, 0)
 ```
 
-## The model
+## Model
 
 Because we are disregarding spatial structure, 
-we `reshape` each 2D image into 
+we `reshape` each two-dimensional image into 
 a flat vector of length  `num_inputs`.
 Finally, we implement our model 
 with just a few lines of code.
 
 ```{.python .input}
 def net(X):
-    X = X.reshape(-1, num_inputs)
+    X = d2l.reshape(X, (-1, num_inputs))
     H = relu(np.dot(X, W1) + b1)
     return np.dot(H, W2) + b2
 ```
@@ -145,20 +144,20 @@ def net(X):
 ```{.python .input}
 #@tab pytorch
 def net(X):
-    X = X.reshape((-1, num_inputs))
-    H = relu(X@W1 + b1)  # Here '@' stands for dot product operation
+    X = d2l.reshape(X, (-1, num_inputs))
+    H = relu(X@W1 + b1)  # Here '@' stands for matrix multiplication
     return (H@W2 + b2)
 ```
 
 ```{.python .input}
 #@tab tensorflow
 def net(X):
-    X = tf.reshape(X, shape=[-1, num_inputs])
+    X = d2l.reshape(X, (-1, num_inputs))
     H = relu(tf.matmul(X, W1) + b1)
     return tf.matmul(H, W2) + b2
 ```
 
-## The Loss Function
+## Loss Function
 
 To ensure numerical stability,
 and because we already implemented
@@ -167,9 +166,9 @@ the softmax function from scratch
 we leverage the integrated function from high-level APIs
 for calculating the softmax and cross-entropy loss.
 Recall our earlier discussion of these intricacies 
-(:numref:`sec_mlp`).
+in :numref:`subsec_softmax-implementation-revisited`.
 We encourage the interested reader 
-to examine the source code for loss function
+to examine the source code for the loss function
 to deepen their knowledge of implementation details.
 
 ```{.python .input}
@@ -195,8 +194,8 @@ is exactly the same as for softmax regression.
 Leveraging the `d2l` package again, 
 we call the `train_ch3` function  
 (see :numref:`sec_softmax_scratch`),
-setting the number of epochs to $10$ 
-and the learning rate to $0.5$.
+setting the number of epochs to 10
+and the learning rate to 0.5.
 
 ```{.python .input}
 num_epochs, lr = 10, 0.5
@@ -226,24 +225,18 @@ we apply it on some test data.
 d2l.predict_ch3(net, test_iter)
 ```
 
-This looks a bit better than our previous result,
-which used simple linear models, and it gives us 
-some signal that we are on the right path.
-
 ## Summary
 
-We saw that implementing a simple MLP is easy, 
-even when done manually.
-That said, with a large number of layers, 
-this can still get messy 
-(e.g., naming and keeping track of our model's parameters, etc).
+* We saw that implementing a simple MLP is easy, even when done manually.
+* However, with a large number of layers, implementing MLPs from scratch can still get messy (e.g., naming and keeping track of our model's parameters).
+
 
 ## Exercises
 
 1. Change the value of the hyperparameter `num_hiddens` and see how this hyperparameter influences your results. Determine the best value of this hyperparameter, keeping all others constant.
 1. Try adding an additional hidden layer to see how it affects the results.
 1. How does changing the learning rate alter your results? Fixing the model architecture and other hyperparameters (including number of epochs), what learning rate gives you the best results? 
-1. What is the best result you can get by optimizing over all the parameters (learning rate, iterations, number of hidden layers, number of hidden units per layer) jointly? 
+1. What is the best result you can get by optimizing over all the hyperparameters (learning rate, number of epochs, number of hidden layers, number of hidden units per layer) jointly? 
 1. Describe why it is much more challenging to deal with multiple hyperparameters. 
 1. What is the smartest strategy you can think of for structuring a search over multiple hyperparameters?
 

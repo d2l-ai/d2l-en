@@ -93,6 +93,7 @@ net.add(tf.keras.layers.Dense(10, kernel_initializer=weight_initializer))
 ```
 
 ## Softmax Implementation Revisited
+:label:`subsec_softmax-implementation-revisited`
 
 In the previous example of :numref:`sec_softmax_scratch`,
 we calculated our model's output
