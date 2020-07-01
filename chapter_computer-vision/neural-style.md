@@ -278,6 +278,6 @@ As you can see, each epoch takes more time due to the larger image size. As show
 1. Adjust the weight hyper-parameters in the loss function. Does the output retain more content or have less noise?
 1. Use different content and style images. Can you create more interesting composite images?
 
-## [Discussions](https://discuss.mxnet.io/t/2449)
-
-![](../img/qr_neural-style.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/378)
+:end_tab:

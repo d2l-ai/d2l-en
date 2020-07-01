@@ -63,8 +63,8 @@ from mxnet import np, npx
 npx.set_np()
 
 def corr2d_multi_in(X, K):
-    # First, traverse along the 0th dimension (channel dimension) of X and K.
-    # Then, add them together.
+    # First, traverse along the 0th dimension (channel dimension) of `X` and
+    # `K`. Then, add them together
     return sum(d2l.corr2d(x, k) for x, k in zip(X, K))
 ```
 
@@ -74,8 +74,8 @@ from d2l import torch as d2l
 import torch
 
 def corr2d_multi_in(X, K):
-    # First, traverse along the 0th dimension (channel dimension) of X and K. 
-    # Then, add them together.
+    # First, traverse along the 0th dimension (channel dimension) of `X` and
+    # `K`. Then, add them together
     return sum([d2l.corr2d(x, k) for x, k in zip(X, K)])
 ```
 
@@ -85,8 +85,8 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 
 def corr2d_multi_in(X, K):
-    # First, traverse along the 0th dimension (channel dimension) of X and K. 
-    # Then, add them together.
+    # First, traverse along the 0th dimension (channel dimension) of `X` and
+    # `K`. Then, add them together
     return tf.reduce_sum([d2l.corr2d(x, k) for x, k in zip(X, K)], axis=0)
 ```
 
@@ -159,27 +159,27 @@ to calculate the output of multiple channels as shown below.
 
 ```{.python .input}
 def corr2d_multi_in_out(X, K):
-    # Traverse along the 0th dimension of K, and each time, perform
-    # cross-correlation operations with input X. All of the results are merged
-    # together using the stack function
+    # Traverse along the 0th dimension of `K`, and each time, perform
+    # cross-correlation operations with input `X`. All of the results are
+    # merged together using the stack function
     return np.stack([corr2d_multi_in(X, k) for k in K])
 ```
 
 ```{.python .input}
 #@tab pytorch
 def corr2d_multi_in_out(X, K):
-    # Traverse along the 0th dimension of K, and each time, perform
-    # cross-correlation operations with input X. All of the results are merged
-    # together using the stack function
+    # Traverse along the 0th dimension of `K`, and each time, perform
+    # cross-correlation operations with input `X`. All of the results are
+    # merged together using the stack function
     return torch.stack([corr2d_multi_in(X, k) for k in K], dim=0)
 ```
 
 ```{.python .input}
 #@tab tensorflow
 def corr2d_multi_in_out(X, K):
-    # Traverse along the 0th dimension of K, and each time, perform
-    # cross-correlation operations with input X. All of the results are merged
-    # together using the stack function
+    # Traverse along the 0th dimension of `K`, and each time, perform
+    # cross-correlation operations with input `X`. All of the results are
+    # merged together using the stack function
     return tf.stack([corr2d_multi_in(X, k) for k in K], axis=0)
 ```
 

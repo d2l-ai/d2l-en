@@ -262,8 +262,8 @@ prior to making the forward and backward passes.
 The training function `train_ch6` is also similar
 to `train_ch3` defined in :numref:`sec_softmax_scratch`.
 Since we will be implementing networks with many layers
-going forward, we will rely primarily on Gluon.
-The following train function assumes a Gluon model
+going forward, we will rely primarily on high-level APIs.
+The following train function assumes a model created from high-level APIs
 as input and is optimized accordingly.
 We initialize the model parameters
 on the device indicated by the device.
@@ -286,7 +286,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
             timer.start()
-            # Here is the only difference compared to train_epoch_ch3
+            # Here is the only difference compared with `d2l.train_epoch_ch3`
             X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
             with autograd.record():
                 y_hat = net(X)
@@ -301,9 +301,10 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_loss, train_acc, test_acc))
-    print('%.1f examples/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
+    print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(ctx)}')
 ```
 
 ```{.python .input}
@@ -343,10 +344,10 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_loss, train_acc, test_acc))
-    print('%.1f examples/sec on %s' % (
-        metric[2]*num_epochs/timer.sum(), device))
+    print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(device)}')
 ```
 
 ```{.python .input}
@@ -375,9 +376,10 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
             batch_size = next(iter(self.train_iter))[0].shape[0]
             num_examples = batch_size * tf.data.experimental.cardinality(
                 self.train_iter).numpy()
-            print('loss %.3f, train acc %.3f, test acc %.3f' % metrics)
-            print('%.1f examples/sec on %s' % (
-                num_examples/self.timer.avg(), self.device_name))
+            print(f'loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '
+                  f'test acc {metrics[2]:.3f}')
+            print(f'{num_examples / self.timer.avg():.1f} examples/sec on '
+                  f'{str(self.device_name)}')
 
 #@save
 def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,

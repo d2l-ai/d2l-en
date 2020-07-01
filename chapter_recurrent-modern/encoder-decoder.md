@@ -121,6 +121,6 @@ class EncoderDecoder(nn.Module):
 
 
 
-## [Discussions](https://discuss.mxnet.io/t/2393)
-
-![](../img/qr_encoder-decoder.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/341)
+:end_tab:

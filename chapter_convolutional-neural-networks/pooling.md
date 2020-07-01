@@ -182,8 +182,7 @@ can also change the output shape.
 And as before, we can alter the operation to achieve a desired output shape
 by padding the input and adjusting the stride.
 We can demonstrate the use of padding and strides
-in pooling layers via the two-dimensional maximum pooling layer MaxPool2D
-shipped in MXNet Gluon's `nn` module.
+in pooling layers via the two-dimensional maximum pooling layer `MaxPool2D`.
 We first construct an input data of shape `(1, 1, 4, 4)`,
 where the first two dimensions are batch and channel.
 
@@ -200,10 +199,11 @@ print(X)
 
 ```{.python .input}
 #@tab tensorflow
-# Note that TensorFlow has default data format "channels_last" which corresponds to inputs
-# with shape " so here the shape (batch_size, height, width, channels) so here the shape
-# should be (1, 4, 4, 1) instead of (1, 1, 4, 4).
-X = tf.reshape(tf.constant(range(16), dtype=tf.float32), (1, 4, 4, 1))
+# Note that TensorFlow has default data format "channels_last" which
+# corresponds to inputs with shape " so here the shape (batch_size, height,
+# width, channels) so here the shape should be (1, 4, 4, 1) instead of
+# (1, 1, 4, 4).
+X = tf.reshape(tf.range(16, dtype=tf.float32), (1, 4, 4, 1))
 X
 ```
 
@@ -246,7 +246,8 @@ pool2d(X)
 
 ```{.python .input}
 #@tab tensorflow
-pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='same', strides=2)
+pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='same',
+                                   strides=2)
 pool2d(X)
 ```
 
@@ -266,7 +267,8 @@ pool2d(X)
 
 ```{.python .input}
 #@tab tensorflow
-pool2d = tf.keras.layers.MaxPool2D(pool_size=[2, 3], padding='same', strides=(2, 3))
+pool2d = tf.keras.layers.MaxPool2D(pool_size=[2, 3], padding='same',
+                                   strides=(2, 3))
 pool2d(X)
 ```
 

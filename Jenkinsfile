@@ -18,6 +18,7 @@ stage("Build and Publish") {
 
       sh label: "Build Environment", script: """set -ex
       conda env update -n ${ENV_NAME} -f static/build.yml
+      pip list
       nvidia-smi
       """
 
@@ -35,7 +36,7 @@ stage("Build and Publish") {
       ./static/cache.sh store _build/eval/data
       """
 
-      sh label: "Execute Notebooks [Pytorch]", script: """set -ex
+      sh label: "Execute Notebooks [PyTorch]", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       ./static/cache.sh restore _build/eval_pytorch/data
@@ -43,10 +44,11 @@ stage("Build and Publish") {
       ./static/cache.sh store _build/eval_pytorch/data
       """
 
-      sh label: "Execute Notebooks [Tensorflow]", script: """set -ex
+      sh label: "Execute Notebooks [TensorFlow]", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       ./static/cache.sh restore _build/eval_tensorflow/data
+      export TF_CPP_MIN_LOG_LEVEL=3
       d2lbook build eval --tab tensorflow
       ./static/cache.sh store _build/eval_tensorflow/data
       """

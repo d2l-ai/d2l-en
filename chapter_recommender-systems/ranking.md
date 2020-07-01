@@ -86,6 +86,6 @@ These two losses are interchangeable for personalized ranking in recommendation.
 - Are there any variants of BPR and hinge loss available?
 - Can you find any recommendation models that use BPR or hinge loss?
 
-## [Discussions](https://discuss.mxnet.io/t/5163)
-
-![](../img/qr_ranking.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/402)
+:end_tab:

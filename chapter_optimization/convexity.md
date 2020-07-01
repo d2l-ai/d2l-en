@@ -259,6 +259,6 @@ In the context of deep learning the main purpose of convex functions is to motiv
 
 
 
-## [Discussions](https://discuss.mxnet.io/t/convexity-discussion/4368)
-
-![](../img/qr_convexity.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/350)
+:end_tab:

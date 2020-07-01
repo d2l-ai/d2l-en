@@ -100,19 +100,22 @@ class Attend(nn.Block):
         self.f = mlp(num_hiddens=num_hiddens, flatten=False)
 
     def forward(self, A, B):
-        # Shape of A/B: (batch_size, #words in sequence A/B, embed_size)
-        # Shape of f_A/f_B: (batch_size, #words in sequence A/B, num_hiddens)
+        # Shape of `A`/`B`: (b`atch_size`, no. of words in sequence A/B,
+        # `embed_size`)
+        # Shape of `f_A`/`f_B`: (`batch_size`, no. of words in sequence A/B,
+        # `num_hiddens`)
         f_A = self.f(A)
         f_B = self.f(B)
-        # Shape of e: (batch_size, #words in sequence A, #words in sequence B)
+        # Shape of `e`: (`batch_size`, no. of words in sequence A,
+        # no. of words in sequence B)
         e = npx.batch_dot(f_A, f_B, transpose_b=True)
-        # Shape of beta: (batch_size, #words in sequence A, embed_size), where
-        # sequence B is softly aligned with each word (axis 1 of beta) in
-        # sequence A
+        # Shape of `beta`: (`batch_size`, no. of words in sequence A,
+        # `embed_size`), where sequence B is softly aligned with each word
+        # (axis 1 of `beta`) in sequence A
         beta = npx.batch_dot(npx.softmax(e), B)
-        # Shape of alpha: (batch_size, #words in sequence B, embed_size),
-        # where sequence A is softly aligned with each word (axis 1 of alpha)
-        # in sequence B
+        # Shape of `alpha`: (`batch_size`, no. of words in sequence B,
+        # `embed_size`), where sequence A is softly aligned with each word
+        # (axis 1 of `alpha`) in sequence B
         alpha = npx.batch_dot(npx.softmax(e.transpose(0, 2, 1)), A)
         return beta, alpha
 ```
@@ -246,7 +249,7 @@ we define a `split_batch_multi_inputs` function to take multiple inputs such as 
 ```{.python .input  n=10}
 #@save
 def split_batch_multi_inputs(X, y, ctx_list):
-    """Split multi-input X and y into multiple devices specified by ctx"""
+    """Split multi-input `X` and `y` into multiple devices."""
     X = list(zip(*[gluon.utils.split_and_load(
         feature, ctx_list, even_split=False) for feature in X]))
     return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
@@ -298,6 +301,6 @@ predict_snli(net, vocab, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 1. Suppose that we want to get the level of semantical similarity (e.g., a continuous value between $0$ and $1$) for any pair of sentences. How shall we collect and label the dataset? Can you design a model with attention mechanisms?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5518)
-
-![](../img/qr_natural-language-inference-attention.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/395)
+:end_tab:

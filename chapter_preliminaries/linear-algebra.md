@@ -114,7 +114,7 @@ x
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.constant(range(4))
+x = tf.range(4)
 x
 ```
 
@@ -171,7 +171,7 @@ len(x)
 
 ```{.python .input}
 #@tab tensorflow
-tf.size(x)  # TensorFlow doesn't have a len function.
+len(x)
 ```
 
 When a tensor represents a vector (with precisely one axis),
@@ -243,7 +243,7 @@ A
 
 ```{.python .input}
 #@tab tensorflow
-A = tf.reshape(tf.constant(range(20)), (5, 4))
+A = tf.reshape(tf.range(20), (5, 4))
 A
 ```
 
@@ -367,7 +367,7 @@ X
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.reshape(tf.constant(range(24)), (2, 3, 4))
+X = tf.reshape(tf.range(24), (2, 3, 4))
 X
 ```
 
@@ -400,8 +400,8 @@ A, A + B
 
 ```{.python .input}
 #@tab tensorflow
-A = tf.reshape(tf.constant(range(20), dtype=tf.float32), (5, 4))
-B = tf.identity(A)  # Assign a copy of `A` to `B` by allocating new memory
+A = tf.reshape(tf.range(20, dtype=tf.float32), (5, 4))
+B = A  # No cloning of `A` to `B` by allocating new memory
 A, A + B
 ```
 
@@ -451,11 +451,12 @@ a + X, (a * X).shape
 ```{.python .input}
 #@tab tensorflow
 a = 2
-X = tf.reshape(tf.constant(range(24)), (2, 3, 4))
+X = tf.reshape(tf.range(24), (2, 3, 4))
 a + X, (a * X).shape
 ```
 
 ## Reduction
+:label:`subseq_lin-alg-reduction`
 
 One useful operation that we can perform with arbitrary tensors
 is to calculate the sum of their elements.
@@ -477,7 +478,7 @@ x, x.sum()
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.constant(range(4), dtype=tf.float32)
+x = tf.range(4, dtype=tf.float32)
 x, tf.reduce_sum(x)
 ```
 
@@ -548,17 +549,17 @@ Reducing a matrix along both rows and columns via summation
 is equivalent to summing up all the elements of the matrix.
 
 ```{.python .input}
-A.sum(axis=[0, 1])  # Same as A.sum()
+A.sum(axis=[0, 1])  # Same as `A.sum()`
 ```
 
 ```{.python .input}
 #@tab pytorch
-A.sum(axis=[0, 1])  # Same as A.sum()
+A.sum(axis=[0, 1])  # Same as `A.sum()`
 ```
 
 ```{.python .input}
 #@tab tensorflow
-tf.reduce_sum(A, axis=[0, 1])  # Same as tf.reduce_sum(A)
+tf.reduce_sum(A, axis=[0, 1])  # Same as `tf.reduce_sum(A)`
 ```
 
 A related quantity is the *mean*, which is also called the *average*.
@@ -597,9 +598,10 @@ tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 ```
 
 ### Non-Reduction Sum
+:label:`subseq_lin-alg-non-reduction`
 
 However, sometimes it can be useful to keep the number of axes unchanged
-when invoking the function for calculating the sum or mean by setting `keepdims=True`.
+when invoking the function for calculating the sum or mean.
 
 ```{.python .input}
 sum_A = A.sum(axis=1, keepdims=True)
@@ -949,7 +951,7 @@ torch.abs(u).sum()
 
 ```{.python .input}
 #@tab tensorflow
-sum(tf.abs(u))
+tf.reduce_sum(tf.abs(u))
 ```
 
 Both the $\ell_2$ norm and the $\ell_1$ norm

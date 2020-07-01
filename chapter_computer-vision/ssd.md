@@ -204,18 +204,17 @@ class TinySSD(nn.Block):
         self.num_classes = num_classes
         for i in range(5):
             # The assignment statement is self.blk_i = get_blk(i)
-            setattr(self, 'blk_%d' % i, get_blk(i))
-            setattr(self, 'cls_%d' % i, cls_predictor(num_anchors,
-                                                      num_classes))
-            setattr(self, 'bbox_%d' % i, bbox_predictor(num_anchors))
+            setattr(self, f'blk_{i}', get_blk(i))
+            setattr(self, f'cls_{i}', cls_predictor(num_anchors, num_classes))
+            setattr(self, f'bbox_{i}', bbox_predictor(num_anchors))
 
     def forward(self, X):
         anchors, cls_preds, bbox_preds = [None] * 5, [None] * 5, [None] * 5
         for i in range(5):
             # getattr(self, 'blk_%d' % i) accesses self.blk_i
             X, anchors[i], cls_preds[i], bbox_preds[i] = blk_forward(
-                X, getattr(self, 'blk_%d' % i), sizes[i], ratios[i],
-                getattr(self, 'cls_%d' % i), getattr(self, 'bbox_%d' % i))
+                X, getattr(self, f'blk_{i}'), sizes[i], ratios[i],
+                getattr(self, f'cls_{i}'), getattr(self, f'bbox_{i}'))
         # In the reshape function, 0 indicates that the batch size remains
         # unchanged
         anchors = np.concatenate(anchors, axis=1)
@@ -321,8 +320,8 @@ for epoch in range(num_epochs):
                    bbox_labels.size)
     cls_err, bbox_mae = 1-metric[0]/metric[1], metric[2]/metric[3]
     animator.add(epoch+1, (cls_err, bbox_mae))
-print('class err %.2e, bbox mae %.2e' % (cls_err, bbox_mae))
-print('%.1f examples/sec on %s' % (train_iter.num_image/timer.stop(), ctx))
+print(f'class err {cls_err:.2e}, bbox mae {bbox_mae:.2e}')
+print(f'{train_iter.num_image/timer.stop():.1f} examples/sec on {str(ctx)}')
 ```
 
 ## Prediction
@@ -429,9 +428,8 @@ d2l.plt.legend();
 2. When an object is relatively large compared to the image, the model normally adopts a larger input image size.
 3. This generally produces a large number of negative anchor boxes when labeling anchor box categories. We can sample the negative anchor boxes to better balance the data categories. To do this, we can set the `MultiBoxTarget` function's `negative_mining_ratio` parameter.
 4. Assign hyper-parameters with different weights to the anchor box category loss and positive anchor box offset loss in the loss function.
-5. Refer to the SSD paper. What methods can be used to evaluate the precision of
-  object detection models :cite:`Liu.Anguelov.Erhan.ea.2016`?
+5. Refer to the SSD paper. What methods can be used to evaluate the precision of object detection models :cite:`Liu.Anguelov.Erhan.ea.2016`?
 
-## [Discussions](https://discuss.mxnet.io/t/2453)
-
-![](../img/qr_ssd.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/373)
+:end_tab:

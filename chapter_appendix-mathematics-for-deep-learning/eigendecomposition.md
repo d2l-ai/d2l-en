@@ -105,7 +105,8 @@ from d2l import torch as d2l
 from IPython import display
 import torch
 
-torch.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64), eigenvectors=True)
+torch.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64),
+          eigenvectors=True)
 ```
 
 Note that `numpy` normalizes the eigenvectors to be of length one,
@@ -366,7 +367,7 @@ Let us see what happens when we repeatedly multiply our matrix $\mathbf{A}$
 against a random input vector, and keep track of the norm.
 
 ```{.python .input}
-# Calculate the sequence of norms after repeatedly applying A
+# Calculate the sequence of norms after repeatedly applying `A`
 v_in = np.random.randn(k, 1)
 
 norm_list = [np.linalg.norm(v_in)]
@@ -379,7 +380,7 @@ d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 
 ```{.python .input}
 #@tab pytorch
-# Calculate the sequence of norms after repeatedly applying A
+# Calculate the sequence of norms after repeatedly applying `A`
 v_in = torch.randn(k, 1, dtype=torch.float64)
 
 norm_list = [torch.norm(v_in).item()]
@@ -435,7 +436,7 @@ we can measure that stretching factor. Let us also sort them.
 eigs = np.linalg.eigvals(A).tolist()
 norm_eigs = [np.absolute(x) for x in eigs]
 norm_eigs.sort()
-print("Norms of eigenvalues: {}".format(norm_eigs))
+print(f'norms of eigenvalues: {norm_eigs}')
 ```
 
 ```{.python .input}
@@ -444,7 +445,7 @@ print("Norms of eigenvalues: {}".format(norm_eigs))
 eigs = torch.eig(A)[0][:,0].tolist()
 norm_eigs = [torch.abs(torch.tensor(x)) for x in eigs]
 norm_eigs.sort()
-print("Norms of eigenvalues: {}".format(norm_eigs))
+print(f'norms of eigenvalues: {norm_eigs}')
 ```
 
 ### An Observation
@@ -491,7 +492,7 @@ so that the largest eigenvalue is instead now just one.
 Let us see what happens in this case.
 
 ```{.python .input}
-# Rescale the matrix A
+# Rescale the matrix `A`
 A /= norm_eigs[-1]
 
 # Do the same experiment again
@@ -507,7 +508,7 @@ d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 
 ```{.python .input}
 #@tab pytorch
-# Rescale the matrix A
+# Rescale the matrix `A`
 A /= norm_eigs[-1]
 
 # Do the same experiment again
@@ -589,6 +590,6 @@ $$
 \end{bmatrix}.
 $$
 
-## [Discussions](https://discuss.mxnet.io/t/5148)
-
-![](../img/qr_eigendecomposition.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/411)
+:end_tab:

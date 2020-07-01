@@ -52,7 +52,7 @@ class AutoRec(nn.Block):
     def forward(self, input):
         hidden = self.dropout(self.encoder(input))
         pred = self.decoder(hidden)
-        if autograd.is_training():  # mask the gradient during training.
+        if autograd.is_training():  # Mask the gradient during training
             return pred * np.sign(input)
         else:
             return pred
@@ -69,7 +69,7 @@ def evaluator(network, inter_matrix, test_data, ctx):
         feat = gluon.utils.split_and_load(values, ctx, even_split=False)
         scores.extend([network(i).asnumpy() for i in feat])
     recons = np.array([item for sublist in scores for item in sublist])
-    # Calculate the test RMSE.
+    # Calculate the test RMSE
     rmse = np.sqrt(np.sum(np.square(test_data - np.sign(test_data) * recons))
                    / np.sum(np.sign(test_data)))
     return float(rmse)
@@ -88,13 +88,12 @@ _, _, _, train_inter_mat = d2l.load_data_ml100k(train_data, num_users,
                                                 num_items)
 _, _, _, test_inter_mat = d2l.load_data_ml100k(test_data, num_users,
                                                num_items)
-num_workers = 0 if sys.platform.startswith("win") else 4
 train_iter = gluon.data.DataLoader(train_inter_mat, shuffle=True,
                                    last_batch="rollover", batch_size=256,
-                                   num_workers=num_workers)
+                                   num_workers=d2l.get_dataloader_workers())
 test_iter = gluon.data.DataLoader(np.array(train_inter_mat), shuffle=False,
                                   last_batch="keep", batch_size=1024,
-                                  num_workers=num_workers)
+                                  num_workers=d2l.get_dataloader_workers())
 # Model initialization, training, and evaluation
 net = AutoRec(500, num_users)
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
@@ -119,6 +118,6 @@ d2l.train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 * Try to add more hidden layers. Is it helpful to improve the model performance?
 * Can you find a better combination of decoder and encoder activation functions?
 
-## [Discussions](https://discuss.mxnet.io/t/5162)
-
-![](../img/qr_autorec.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/401)
+:end_tab:

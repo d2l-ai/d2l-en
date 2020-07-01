@@ -106,6 +106,5 @@ It can be best understood as the harmonic mean of the number of real choices tha
 1. What happens to the gradient if you backpropagate through a long sequence?
 1. What are some of the problems associated with the simple sequence model described above?
 
-## [Discussions](https://discuss.mxnet.io/t/2362)
 
-![](../img/qr_rnn.svg)
+[Discussions](https://discuss.d2l.ai/t/337)

@@ -38,7 +38,7 @@ from torch import nn
 from torch.nn import functional as F
 
 x = torch.arange(4)
-torch.save(x,"x-file")
+torch.save(x, 'x-file')
 ```
 
 ```{.python .input}
@@ -46,7 +46,7 @@ torch.save(x,"x-file")
 import tensorflow as tf
 import numpy as np
 
-x = tf.constant(range(4))
+x = tf.range(4)
 np.save("x-file.npy", x)
 ```
 
@@ -65,7 +65,7 @@ x2
 
 ```{.python .input}
 #@tab tensorflow
-x2 = np.load("x-file.npy", allow_pickle=True)
+x2 = np.load('x-file.npy', allow_pickle=True)
 x2
 ```
 
@@ -272,3 +272,8 @@ yclone == y
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/61)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/327)
+:end_tab:
+

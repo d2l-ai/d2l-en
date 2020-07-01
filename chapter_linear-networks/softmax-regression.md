@@ -3,8 +3,8 @@
 
 In :numref:`sec_linear_regression`, we introduced linear regression,
 working through implementations from scratch in :numref:`sec_linear_scratch`
-and again using high-level APIs of deep learning frameworks
-in :numref:`sec_linear_gluon` to do the heavy lifting.
+and again using high-level APIs of a deep learning framework
+in :numref:`sec_linear_concise` to do the heavy lifting.
 
 Regression is the hammer we reach for when
 we want to answer *how much?* or *how many?* questions.
@@ -72,8 +72,8 @@ $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}.$$
 In order to estimate the conditional probabilities associated with all the possible classes,
 we need a model with multiple outputs, one per class.
 To address classification with linear models,
-we will need as many linear functions as we have outputs.
-Each output will correspond to its own linear function.
+we will need as many affine functions as we have outputs.
+Each output will correspond to its own affine function.
 In our case, since we have 4 features and 3 possible output categories,
 we will need 12 scalars to represent the weights ($w$ with subscripts),
 and 3 scalars to represent the biases ($b$ with subscripts).
@@ -97,7 +97,7 @@ the output layer of softmax regression can also be described as fully-connected 
 :label:`fig_softmaxreg`
 
 To express the model more compactly, we can use linear algebra notation.
-In vector form, we arrive at 
+In vector form, we arrive at
 $\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$,
 a form better suited both for mathematics, and for writing code.
 Note that we have gathered all of our weights into a $3 \times 4$ matrix
@@ -115,11 +115,11 @@ that maximize the likelihood of the observed data.
 Then, to generate predictions, we will set a threshold,
 for example, choosing the label with the maximum predicted probabilities.
 
-Put formally, we would like any output $\hat{y}_k$
+Put formally, we would like any output $\hat{y}_j$
 to be interpreted as the probability
-that a given item belongs to class $k$.
+that a given item belongs to class $j$.
 Then we can choose the class with the largest output value
-as our prediction $\operatorname*{argmax}_k y_k$.
+as our prediction $\operatorname*{argmax}_j y_j$.
 For example, if $\hat{y}_1$, $\hat{y}_2$, and $\hat{y}_3$
 are 0.1, 0.8, and 0.1, respectively,
 then we predict category 2, which (in our example) represents "chicken".
@@ -151,11 +151,11 @@ while requiring that the model remains differentiable,
 we first exponentiate each logit (ensuring non-negativity)
 and then divide by their sum (ensuring that they sum to 1):
 
-$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o})\quad \text{where}\quad \hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}. $$
+$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o})\quad \text{where}\quad \hat{y}_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}. $$
 :eqlabel:`eq_softmax_y_and_o`
 
 It is easy to see $\hat{y}_1 + \hat{y}_2 + \hat{y}_3 = 1$
-with $0 \leq \hat{y}_i \leq 1$ for all $i$.
+with $0 \leq \hat{y}_j \leq 1$ for all $j$.
 Thus, $\hat{\mathbf{y}}$ is a proper probability distribution
 whose element values can be interpreted accordingly.
 Note that the softmax operation does not change the ordering among the logits $\mathbf{o}$,
@@ -164,12 +164,18 @@ that determine the probabilities assigned to each class.
 Therefore, during prediction we can still pick out the most likely class by
 
 $$
-\operatorname*{argmax}_i \hat y_i = \operatorname*{argmax}_i o_i.
+\operatorname*{argmax}_j \hat y_j = \operatorname*{argmax}_j o_j.
 $$
+
+Although softmax is a nonlinear function,
+the outputs of softmax regression are still *determined* by
+an affine transformation of input features;
+thus, softmax regression is a linear model.
 
 
 
 ## Vectorization for Minibatches
+:label:`subsec_softmax_vectorization`
 
 To improve computational efficiency and take advantage of GPUs,
 we typically carry out vector calculations for minibatches of data.
@@ -185,11 +191,11 @@ $$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\ma
 
 This accelerates the dominant operation into
 a matrix-matrix product $\mathbf{X} \mathbf{W}$
-versus the matrix-vector products we would be executing
+vs. the matrix-vector products we would be executing
 if we processed one example at a time.
-The softmax operation itself can be computed
-by exponentiating all entries in $\mathbf{O}$
-and then normalizing them by the sum.
+Since each row in $\mathbf{X}$ is a data instance,
+the softmax operation itself can be computed *rowwise*:
+for each row of $\mathbf{O}$, exponentiate all entries and then normalize them by the sum.
 Triggering broadcasting during the summation $\mathbf{X} \mathbf{W} + \mathbf{b}$ in :eqref:`eq_minibatch_softmax_reg`,
 both the minibatch logits $\mathbf{O}$ and output probabilities $\hat{\mathbf{Y}}$
 are $n \times q$ matrices.
@@ -224,7 +230,7 @@ $$
 
 According to maximum likelihood estimation,
 we maximize $P(\mathbf{Y} \mid \mathbf{X})$,
-which is 
+which is
 equivalent to minimizing the negative log-likelihood:
 
 $$
@@ -296,38 +302,39 @@ but an entire distribution over outcomes.
 We can use the same representation as before for the label $\mathbf{y}$.
 The only difference is that rather than a vector containing only binary entries,
 say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$.
-The math that we used previously to define the loss $l$ 
+The math that we used previously to define the loss $l$
 in :eqref:`eq_l_cross_entropy`
 still works out fine,
 just that the interpretation is slightly more general.
 It is the expected value of the loss for a distribution over labels.
 This loss is called the *cross-entropy loss* and it is
 one of the most commonly used losses for classification problems.
-We can demystify the name by introducing the basics of information theory.
+We can demystify the name by introducing just the basics of information theory.
+If you wish to understand more details of information theory,
+you may further refer to the [online appendix on information theory](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/information-theory.html).
 
 ## Information Theory Basics
 
-Information theory deals with the problem of encoding, decoding, transmitting
+*Information theory* deals with the problem of encoding, decoding, transmitting,
 and manipulating information (also known as data) in as concise form as possible.
+
 
 ### Entropy
 
 The central idea in information theory is to quantify the information content in data.
 This quantity places a hard limit on our ability to compress the data.
-In information theory, this quantity is called the [entropy](https://en.wikipedia.org/wiki/Entropy) of a distribution $p$,
+In information theory, this quantity is called the *entropy* of a distribution $p$,
 and it is captured by the following equation:
 
-$$
-H[p] = \sum_j - p(j) \log p(j).
-$$
+$$H[p] = \sum_j - p(j) \log p(j).$$
+:eqlabel:`eq_softmax_reg_entropy`
 
 One of the fundamental theorems of information theory states
 that in order to encode data drawn randomly from the distribution $p$,
 we need at least $H[p]$ "nats" to encode it.
 If you wonder what a "nat" is, it is the equivalent of bit
 but when using a code with base $e$ rather than one with base 2.
-One nat is $\frac{1}{\log(2)} \approx 1.44$ bit.
-$H[p] / 2$ is often also called the binary entropy.
+Thus, one nat is $\frac{1}{\log(2)} \approx 1.44$ bit.
 
 
 ### Surprisal
@@ -338,89 +345,64 @@ If it is always easy for us to predict the next token,
 then this data is easy to compress!
 Take the extreme example where every token in the stream always takes the same value.
 That is a very boring data stream!
-And not only it is boring, but it is easy to predict.
+And not only it is boring, but it is also easy to predict.
 Because they are always the same, we do not have to transmit any information
 to communicate the contents of the stream.
 Easy to predict, easy to compress.
 
 However if we cannot perfectly predict every event,
-then we might some times be surprised.
+then we might sometimes be surprised.
 Our surprise is greater when we assigned an event lower probability.
-For reasons that we will elaborate in the appendix,
-Claude Shannon settled on $\log(1/p(j)) = -\log p(j)$
+Claude Shannon settled on $\log \frac{1}{P(j)} = -\log P(j)$
 to quantify one's *surprisal* at observing an event $j$
-having assigned it a (subjective) probability $p(j)$.
-The entropy is then the *expected surprisal*
+having assigned it a (subjective) probability $P(j)$.
+The entropy defined in :eqref:`eq_softmax_reg_entropy` is then the *expected surprisal*
 when one assigned the correct probabilities
-(that truly match the data-generating process).
-The entropy of the data is then the least surprised
-that one can ever be (in expectation).
+that truly match the data-generating process.
 
 
 ### Cross-Entropy Revisited
 
 So if entropy is level of surprise experienced
 by someone who knows the true probability,
-then you might be wondering, *what is cross-entropy?*
+then you might be wondering, what is cross-entropy?
 The cross-entropy *from* $p$ *to* $q$, denoted $H(p, q)$,
 is the expected surprisal of an observer with subjective probabilities $q$
-upon seeing data that was actually generated according to probabilities $p$.
+upon seeing data that were actually generated according to probabilities $p$.
 The lowest possible cross-entropy is achieved when $p=q$.
 In this case, the cross-entropy from $p$ to $q$ is $H(p, p)= H(p)$.
-Relating this back to our classification objective,
-even if we get the best possible predictions, we will never be perfect.
-Our loss is lower-bounded by the entropy given by the
-actual conditional distributions $P(\mathbf{y} \mid \mathbf{x})$.
-
-
-### Kullback-Leibler Divergence
-
-Perhaps the most common way to measure the distance between two distributions
-is to calculate the *Kullback-Leibler divergence* $D(p\|q)$.
-This is simply the difference between the cross-entropy and the entropy,
-i.e., the additional cross-entropy incurred over the irreducible minimum value it could take:
-
-$$
-D(p\|q) = H(p, q) - H[p] = \sum_j p(j) \log \frac{p(j)}{q(j)}.
-$$
-
-Note that in classification, we do not know the true $p$,
-so we cannot compute the entropy directly.
-However, because the entropy is out of our control,
-minimizing $D(p\|q)$ with respect to $q$
-is equivalent to minimizing the cross-entropy loss.
 
 In short, we can think of the cross-entropy classification objective
 in two ways: (i) as maximizing the likelihood of the observed data;
-and (ii) as minimizing our surprise (and thus the number of bits)
+and (ii) as minimizing our surprisal (and thus the number of bits)
 required to communicate the labels.
 
 
 ## Model Prediction and Evaluation
 
 After training the softmax regression model, given any example features,
-we can predict the probability of each output category.
-Normally, we use the category with the highest predicted probability as the output category. The prediction is correct if it is consistent with the actual category (label).
+we can predict the probability of each output class.
+Normally, we use the class with the highest predicted probability as the output class.
+The prediction is correct if it is consistent with the actual class (label).
 In the next part of the experiment,
-we will use accuracy to evaluate the model’s performance.
+we will use *accuracy* to evaluate the model’s performance.
 This is equal to the ratio between the number of correct predictions and the total number of predictions.
+
 
 ## Summary
 
-* We introduced the softmax operation which takes a vector and maps it into probabilities.
-* Softmax regression applies to classification problems. It uses the probability distribution of the output category in the softmax operation.
+* The softmax operation takes a vector and maps it into probabilities.
+* Softmax regression applies to classification problems. It uses the probability distribution of the output class in the softmax operation.
 * Cross-entropy is a good measure of the difference between two probability distributions. It measures the number of bits needed to encode the data given our model.
 
 ## Exercises
 
-1. Show that the Kullback-Leibler divergence $D(p\|q)$ is nonnegative for all distributions $p$ and $q$. Hint: use Jensen's inequality, i.e., use the fact that $-\log x$ is a convex function.
-1. Show that $\log \sum_j \exp(o_j)$ is a convex function in $o$.
-1. We can explore the connection between exponential families and the softmax in some more depth
-    * Compute the second derivative of the cross-entropy loss $l(y,\hat{y})$ for the softmax.
-    * Compute the variance of the distribution given by $\mathrm{softmax}(o)$ and show that it matches the second derivative computed above.
+1. We can explore the connection between exponential families and the softmax in some more depth.
+    * Compute the second derivative of the cross-entropy loss $l(\mathbf{y},\hat{\mathbf{y}})$ for the softmax.
+    * Compute the variance of the distribution given by $\mathrm{softmax}(\mathbf{o})$ and show that it matches the second derivative computed above.
 1. Assume that we have three classes which occur with equal probability, i.e., the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
-    * What is the problem if we try to design a binary code for it? Can we match the entropy lower bound on the number of bits?
-    * Can you design a better code. Hint: what happens if we try to encode two independent observations? What if we encode $n$ observations jointly?
+    * What is the problem if we try to design a binary code for it?
+    * Can you design a better code? Hint: what happens if we try to encode two independent observations? What if we encode $n$ observations jointly?
 1. Softmax is a misnomer for the mapping introduced above (but everyone in deep learning uses it). The real softmax is defined as $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
     * Prove that $\mathrm{RealSoftMax}(a, b) > \mathrm{max}(a, b)$.
     * Prove that this holds for $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b)$, provided that $\lambda > 0$.

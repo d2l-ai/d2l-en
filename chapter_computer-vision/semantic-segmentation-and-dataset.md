@@ -28,8 +28,8 @@ import os
 npx.set_np()
 ```
 
-The original site might be unstable, so we download the data from a mirror site. 
-The archive is about 2 GB, so it will take some time to download. 
+The original site might be unstable, so we download the data from a mirror site.
+The archive is about 2 GB, so it will take some time to download.
 After you decompress the archive, the dataset is located in the `../data/VOCdevkit/VOC2012` path.
 
 ```{.python .input  n=2}
@@ -40,7 +40,7 @@ d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
 voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
 ```
 
-Go to `../data/VOCdevkit/VOC2012` to see the different parts of the dataset. 
+Go to `../data/VOCdevkit/VOC2012` to see the different parts of the dataset.
 The `ImageSets/Segmentation` path contains text files that specify the training and testing examples. The `JPEGImages` and `SegmentationClass` paths contain the example input images and labels, respectively. These labels are also in image format, with the same dimensions as the input images to which they correspond. In the labels, pixels with the same color belong to the same semantic category. The `read_voc_images` function defined below reads all input images and labels to the memory.
 
 ```{.python .input  n=3}
@@ -54,9 +54,9 @@ def read_voc_images(voc_dir, is_train=True):
     features, labels = [], []
     for i, fname in enumerate(images):
         features.append(image.imread(os.path.join(
-            voc_dir, 'JPEGImages', '%s.jpg' % fname)))
+            voc_dir, 'JPEGImages', f'{fname}.jpg')))
         labels.append(image.imread(os.path.join(
-            voc_dir, 'SegmentationClass', '%s.png' % fname)))
+            voc_dir, 'SegmentationClass', f'{fname}.png')))
     return features, labels
 
 train_features, train_labels = read_voc_images(voc_dir, True)
@@ -196,7 +196,7 @@ for X, Y in train_iter:
 
 ### Putting All Things Together
 
-Finally, we define a function `load_data_voc` that  downloads and loads this dataset, and then returns the data loaders.
+Finally, we define a function `load_data_voc` that  downloads and loads this dataset, and then returns the data iterators.
 
 ```{.python .input  n=12}
 #@save
@@ -225,6 +225,6 @@ def load_data_voc(batch_size, crop_size):
 1. Recall the content we covered in :numref:`sec_image_augmentation`. Which of the image augmentation methods used in image classification would be hard to use in semantic segmentation?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2448)
-
-![](../img/qr_semantic-segmentation-and-dataset.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/375)
+:end_tab:

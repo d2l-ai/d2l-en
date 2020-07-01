@@ -70,15 +70,15 @@ from torch.nn import functional as F
 
 
 class Residual(nn.Module):  #@save
-    def __init__(self, input_channels, num_channels, 
+    def __init__(self, input_channels, num_channels,
                  use_1x1conv=False, strides=1):
         super().__init__()
         self.conv1 = nn.Conv2d(input_channels, num_channels,
                                kernel_size=3, padding=1, stride=strides)
-        self.conv2 = nn.Conv2d(num_channels, num_channels, 
+        self.conv2 = nn.Conv2d(num_channels, num_channels,
                                kernel_size=3, padding=1)
         if use_1x1conv:
-            self.conv3 = nn.Conv2d(input_channels, num_channels, 
+            self.conv3 = nn.Conv2d(input_channels, num_channels,
                                    kernel_size=1, stride=strides)
         else:
             self.conv3 = None
@@ -86,7 +86,7 @@ class Residual(nn.Module):  #@save
         self.bn2 = nn.BatchNorm2d(num_channels)
         self.relu = nn.ReLU(inplace=True)
 
-    def forward(self, X):    
+    def forward(self, X):
         Y = F.relu(self.bn1(self.conv1(X)))
         Y = self.bn2(self.conv2(Y))
         if self.conv3:
@@ -146,7 +146,6 @@ Y = blk(X)
 Y.shape
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 blk = Residual(3)
@@ -174,7 +173,6 @@ blk(X).shape
 blk = Residual(6, use_1x1conv=True, strides=2)
 blk(X).shape
 ```
-
 
 ## ResNet Model
 
@@ -220,12 +218,12 @@ def resnet_block(num_channels, num_residuals, first_block=False):
 
 ```{.python .input}
 #@tab pytorch
-def resnet_block(input_channels, num_channels, num_residuals, 
+def resnet_block(input_channels, num_channels, num_residuals,
                  first_block=False):
     blk = []
     for i in range(num_residuals):
         if i == 0 and not first_block:
-            blk.append(Residual(input_channels, num_channels, 
+            blk.append(Residual(input_channels, num_channels,
                                 use_1x1conv=True, strides=2))
         else:
             blk.append(Residual(num_channels, num_channels))
@@ -265,9 +263,7 @@ b2 = nn.Sequential(*resnet_block(64, 64, 2, first_block=True))
 b3 = nn.Sequential(*resnet_block(64, 128, 2))
 b4 = nn.Sequential(*resnet_block(128, 256, 2))
 b5 = nn.Sequential(*resnet_block(256, 512, 2))
-
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -286,7 +282,7 @@ net.add(nn.GlobalAvgPool2D(), nn.Dense(10))
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(b1, b2, b3, b4, b5,
-                    nn.AdaptiveMaxPool2d((1,1)), 
+                    nn.AdaptiveMaxPool2d((1,1)),
                     nn.Flatten(), nn.Linear(512, 10))
 ```
 
@@ -305,7 +301,7 @@ def net():
         tf.keras.layers.Activation('relu'),
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same'),
         # The following layers are the same as b2, b3, b4, and b5 that we
-        # created earlier.
+        # created earlier
         ResnetBlock(64, 2, first_block=True),
         ResnetBlock(128, 2),
         ResnetBlock(256, 2),
@@ -350,20 +346,7 @@ for layer in net().layers:
 We train ResNet on the Fashion-MNIST dataset, just like before. The only thing that has changed is the learning rate that decreased again, due to the more complex architecture.
 
 ```{.python .input}
-lr, num_epochs, batch_size = 0.05, 10, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab pytorch
-lr, num_epochs, batch_size = 0.05, 10, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 lr, num_epochs, batch_size = 0.05, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
@@ -397,4 +380,8 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/86)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/333)
 :end_tab:

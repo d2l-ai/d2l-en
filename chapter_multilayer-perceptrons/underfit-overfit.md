@@ -194,7 +194,7 @@ and one subject to *early stopping* as less complex.
 
 It can be difficult to compare the complexity among members
 of substantially different model classes
-(say a decision tree versus a neural network).
+(say a decision tree vs. a neural network).
 For now, a simple rule of thumb is quite useful:
 A model that can readily explain arbitrary facts
 is what statisticians view as complex,
@@ -260,11 +260,6 @@ for model selection either because
 we cannot estimate the generalization error
 on the very data that we use to train the model.
 
-The common practice to address this problem
-is to split our data three ways,
-incorporating a *validation set*
-in addition to the training and test sets.
-
 
 In practical applications, the picture gets muddier.
 While ideally we would only touch the test data once,
@@ -272,6 +267,11 @@ to assess the very best model or to compare
 a small number of models to each other,
 real-world test data is seldom discarded after just one use.
 We can seldom afford a new test set for each round of experiments.
+
+The common practice to address this problem
+is to split our data three ways,
+incorporating a *validation set*
+in addition to the training and test sets.
 
 The result is a murky practice where the boundaries
 between validation and test data are worryingly ambiguous.
@@ -465,14 +465,14 @@ features[:2], poly_features[:2], labels[:2]
 
 ```{.python .input}
 #@tab pytorch
-# Convert from NumPy to PyTorch tensors.
+# Convert from NumPy to PyTorch tensors
 true_w, features, poly_features, labels = [torch.from_numpy(x).type(
     torch.float32) for x in [true_w, features, poly_features, labels]]
 ```
 
 ```{.python .input}
 #@tab tensorflow
-# Convert from NumPy to TensorFlow tensors.
+# Convert from NumPy to TensorFlow tensors
 true_w, features, poly_features, labels = [tf.constant(x, dtype=tf.float32)
     for x in [true_w, features, poly_features, labels]]
 ```

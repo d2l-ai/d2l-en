@@ -304,8 +304,8 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
         # Here, the number of outputs of the fully connected layer is several
         # times larger than that in LeNet. Use the dropout layer to mitigate
         # overfitting
-        nn.Dense(4096, activation="relu"), nn.Dropout(0.5),
-        nn.Dense(4096, activation="relu"), nn.Dropout(0.5),
+        nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
+        nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
         # Output layer. Since we are using Fashion-MNIST, the number of
         # classes is 10, instead of 1000 as in the paper
         nn.Dense(10))
@@ -341,13 +341,18 @@ import tensorflow as tf
 
 def net():
     return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4, activation='relu'),
+        tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4,
+                               activation='relu'),
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
-        tf.keras.layers.Conv2D(filters=256, kernel_size=5, padding='same', activation='relu'),
+        tf.keras.layers.Conv2D(filters=256, kernel_size=5, padding='same',
+                               activation='relu'),
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
-        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same', activation='relu'),
-        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same', activation='relu'),
-        tf.keras.layers.Conv2D(filters=256, kernel_size=3, padding='same', activation='relu'),
+        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same',
+                               activation='relu'),
+        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same',
+                               activation='relu'),
+        tf.keras.layers.Conv2D(filters=256, kernel_size=3, padding='same',
+                               activation='relu'),
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(4096, activation='relu'),

@@ -171,6 +171,4 @@ A number of things follow from this potentially very intimidating expression. Fi
 1. What does the above result mean for gradients in a recurrent neural network?
 1. Besides gradient clipping, can you think of any other methods to cope with gradient explosion in recurrent neural networks?
 
-## [Discussions](https://discuss.mxnet.io/t/2366)
-
-![](../img/qr_bptt.svg)
+[Discussions](https://discuss.d2l.ai/t/334)

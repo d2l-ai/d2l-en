@@ -32,14 +32,14 @@ def read_ptb():
     return [line.split() for line in raw_text.split('\n')]
 
 sentences = read_ptb()
-'# sentences: %d' % len(sentences)
+f'# sentences: {len(sentences)}'
 ```
 
 Next we build a vocabulary with words appeared not greater than 10 times mapped into a "&lt;unk&gt;" token. Note that the preprocessed PTB data also contains "&lt;unk&gt;" tokens presenting rare words.
 
 ```{.python .input  n=3}
 vocab = d2l.Vocab(sentences, min_freq=10)
-'vocab size: %d' % len(vocab)
+f'vocab size: {len(vocab)}' 
 ```
 
 ## Subsampling
@@ -86,9 +86,9 @@ For individual tokens, the sampling rate of the high-frequency word "the" is les
 
 ```{.python .input  n=6}
 def compare_counts(token):
-    return '# of "%s": before=%d, after=%d' % (token, sum(
-        [line.count(token) for line in sentences]), sum(
-        [line.count(token) for line in subsampled]))
+    return (f'# of "{token}": '
+            f'before={sum([line.count(token) for line in sentences])}, '
+            f'after={sum([line.count(token) for line in subsampled])}')
 
 compare_counts('the')
 ```
@@ -119,8 +119,8 @@ We use words with a distance from the central target word not exceeding the cont
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a
-        # "central target word - context word" pair
+        # Each sentence needs at least 2 words to form a "central target word
+        # - context word" pair
         if len(line) < 2:
             continue
         centers += line
@@ -147,7 +147,7 @@ We set the maximum context window size to 5. The following extracts all the cent
 
 ```{.python .input  n=11}
 all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
-'# center-context pairs: %d' % len(all_centers)
+f'# center-context pairs: {len(all_centers)}' 
 ```
 
 ### Negative Sampling
@@ -236,7 +236,7 @@ We use the `batchify` function just defined to specify the minibatch reading met
 
 ## Putting All Things Together
 
-Last, we define the `load_data_ptb` function that read the PTB dataset and return the data loader.
+Last, we define the `load_data_ptb` function that read the PTB dataset and return the data iterator.
 
 ```{.python .input  n=16}
 #@save
@@ -276,6 +276,6 @@ for batch in data_iter:
 
 1. We use the `batchify` function to specify the minibatch reading method in the `DataLoader` instance and print the shape of each variable in the first batch read. How should these shapes be calculated?
 
-## [Discussions](https://discuss.mxnet.io/t/4356)
-
-![](../img/qr_word-embedding-dataset.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/383)
+:end_tab:

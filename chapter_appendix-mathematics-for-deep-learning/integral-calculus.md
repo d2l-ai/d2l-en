@@ -96,7 +96,7 @@ d2l.plt.plot(x, f, color='black')
 d2l.plt.ylim([0, 1])
 d2l.plt.show()
 
-"Approximation: {}, Truth: {}".format(approx, true)
+f'approximation: {approx}, truth: {true}'
 ```
 
 ```{.python .input}
@@ -117,7 +117,7 @@ d2l.plt.plot(x, f, color='black')
 d2l.plt.ylim([0, 1])
 d2l.plt.show()
 
-"Approximation: {}, Truth: {}".format(approx, true)
+f'approximation: {approx}, truth: {true}'
 ```
 
 The issue is that while it can be done numerically, we can do this approach analytically for only the simplest functions like
@@ -464,6 +464,6 @@ We will meet this integral again when we study continuous random variables in :n
 3. What is $\int_{[0,1]^2} xy \;dx\;dy$?
 4. Use the change of variables formula to compute $\int_0^2\int_0^1xy(x^2-y^2)/(x^2+y^2)^3\;dy\;dx$ and $\int_0^1\int_0^2f(x, y) = xy(x^2-y^2)/(x^2+y^2)^3\;dx\;dy$ to see they are different.
 
-## [Discussions](https://discuss.mxnet.io/t/5151)
-
-![](../img/qr_integral-calculus.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/414)
+:end_tab:

@@ -1,5 +1,5 @@
 # Pretraining word2vec
-:label:`sec_word2vec_gluon`
+:label:`sec_word2vec_pretraining`
 
 In this section, we will train a skip-gram model defined in
 :numref:`sec_word2vec`.
@@ -119,7 +119,7 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
                             xlim=[0, num_epochs])
     for epoch in range(num_epochs):
         timer = d2l.Timer()
-        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
+        metric = d2l.Accumulator(2)  # Sum of losses, no. of tokens
         for i, batch in enumerate(data_iter):
             center, context_negative, mask, label = [
                 data.as_in_ctx(ctx) for data in batch]
@@ -133,8 +133,8 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
             if (i+1) % 50 == 0:
                 animator.add(epoch+(i+1)/len(data_iter),
                              (metric[0]/metric[1],))
-    print('loss %.3f, %d tokens/sec on %s ' % (
-        metric[0]/metric[1], metric[1]/timer.stop(), ctx))
+    print(f'loss {metric[0] / metric[1]:.3f}, '
+          f'{metric[1] / timer.stop():.1f} tokens/sec on {str(ctx)}')
 ```
 
 Now, we can train a skip-gram model using negative sampling.
@@ -156,7 +156,7 @@ def get_similar_tokens(query_token, k, embed):
     cos = np.dot(W, x) / np.sqrt(np.sum(W * W, axis=1) * np.sum(x * x) + 1e-9)
     topk = npx.topk(cos, k=k+1, ret_typ='indices').asnumpy().astype('int32')
     for i in topk[1:]:  # Remove the input words
-        print('cosine sim=%.3f: %s' % (cos[i], (vocab.idx_to_token[i])))
+        print(f'cosine sim={float(cos[i]):.3f}: {vocab.idx_to_token[i]}')
 
 get_similar_tokens('chip', 3, net[0])
 ```
@@ -174,6 +174,6 @@ get_similar_tokens('chip', 3, net[0])
 1. When the dataset is large, we usually sample the context words and the noise words for the central target word in the current minibatch only when updating the model parameters. In other words, the same central target word may have different context words or noise words in different epochs. What are the benefits of this sort of training? Try to implement this training method.
 
 
-## [Discussions](https://discuss.mxnet.io/t/2387)
-
-![](../img/qr_word2vec-pretraining.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/384)
+:end_tab:

@@ -135,6 +135,4 @@ We then use the same method to obtain the gradients for other word vectors. Unli
 
 
 
-## [Discussions](https://discuss.mxnet.io/t/2385)
-
-![](../img/qr_word2vec.svg)
+[Discussions](https://discuss.d2l.ai/t/381)

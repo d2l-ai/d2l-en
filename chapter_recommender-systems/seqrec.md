@@ -177,10 +177,9 @@ users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
     test_data, num_users, num_items, feedback="implicit")
 train_seq_data = SeqDataset(users_train, items_train, L, num_users,
                             num_items, candidates)
-num_workers = 0 if sys.platform.startswith("win") else 4
 train_iter = gluon.data.DataLoader(train_seq_data, batch_size, True,
                                    last_batch="rollover",
-                                   num_workers=num_workers)
+                                   num_workers=d2l.get_dataloader_workers())
 test_seq_iter = train_seq_data.test_seq
 train_seq_data[0]
 ```
@@ -209,11 +208,12 @@ d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
 * Convolutional neural networks can be utilized to capture users' short-term interests from sequential interactions.
 
 ## Exercises
+
 * Conduct an ablation study by removing one of the horizontal and vertical convolutional networks, which component is the more important ?
 * Vary the hyper-parameter $L$. Does longer historical interactions bring higher accuracy?
 * Apart from the sequence-aware recommendation task we introduced above, there is another type of sequence-aware recommendation task called session-based recommendation :cite:`Hidasi.Karatzoglou.Baltrunas.ea.2015`. Can you explain the differences between these two tasks?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5165)
-
-![](../img/qr_seqrec.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/404)
+:end_tab:

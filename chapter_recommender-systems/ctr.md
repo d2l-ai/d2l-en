@@ -92,9 +92,10 @@ As can be seen, all the 34 fields are categorical features. Each value represent
 * Click-through rate is an important metric that is used to measure the effectiveness of advertising systems and recommender systems.
 * Click-through rate prediction is usually converted to a binary classification problem. The target is to predict whether an ad/item will be clicked or not based on given features.
 
-## Exercise
+## Exercises
+
 * Can you load the Criteo and Avazu dataset with the provided `CTRDataset`. It is worth noting that the Criteo dataset consisting of real-valued features so you may have to revise the code a bit.
 
-## [Discussions](https://discuss.mxnet.io/t/5166)
-
-![](../img/qr_ctr.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/405)
+:end_tab:

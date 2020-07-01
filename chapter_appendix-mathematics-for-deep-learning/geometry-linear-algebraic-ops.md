@@ -316,11 +316,11 @@ test = torchvision.datasets.FashionMNIST(root="../data", transform=trans,
                                          train=False, download=True)
 
 X_train_0 = torch.stack(
-    [x[0]*256 for x in train if x[1] == 0]).type(torch.float32)
+    [x[0] * 256 for x in train if x[1] == 0]).type(torch.float32)
 X_train_1 = torch.stack(
-    [x[0]*256 for x in train if x[1] == 1]).type(torch.float32)
+    [x[0] * 256 for x in train if x[1] == 1]).type(torch.float32)
 X_test = torch.stack(
-    [x[0]*256 for x in test if x[1] == 0 or x[1] == 1]).type(torch.float32)
+    [x[0] * 256 for x in test if x[1] == 0 or x[1] == 1]).type(torch.float32)
 y_test = torch.stack([torch.tensor(x[1]) for x in test
                       if x[1] == 0 or x[1] == 1]).type(torch.float32)
 
@@ -938,6 +938,6 @@ $$
 7. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation for an arbitrary matrix $A$?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5147)
-
-![](../img/qr_geometry-linear-algebraic-ops.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/410)
+:end_tab:

@@ -2,10 +2,9 @@
 :label:`sec_softmax_scratch`
 
 Just as we implemented linear regression from scratch,
-we believe that multiclass logistic (softmax) regression
+we believe that softmax regression
 is similarly fundamental and you ought to know
 the gory details of how to implement it yourself.
-To begin, let us import the familiar packages.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -29,7 +28,7 @@ from IPython import display
 ```
 
 We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
-setting up an iterator with batch size $256$.
+setting up a data iterator with batch size 256.
 
 ```{.python .input}
 #@tab all
@@ -41,21 +40,21 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 As in our linear regression example,
 each example here will be represented by a fixed-length vector.
-Each example in the raw data is a $28 \times 28$ image.
+Each example in the raw dataset is a $28 \times 28$ image.
 In this section, we will flatten each image,
-treating them as $784$-long 1D vectors.
+treating them as vectors of length 784.
 In the future, we will talk about more sophisticated strategies
 for exploiting the spatial structure in images,
 but for now we treat each pixel location as just another feature.
 
 Recall that in softmax regression,
-we have as many outputs as there are categories.
-Because our dataset has $10$ categories,
-our network will have an output dimension of $10$.
+we have as many outputs as there are classes.
+Because our dataset has 10 classes,
+our network will have an output dimension of 10.
 Consequently, our weights will constitute a $784 \times 10$ matrix
-and the biases will constitute a $1 \times 10$ vector.
-As with linear regression, we will initialize our weights $W$
-with Gaussian noise and our biases to take the initial value $0$.
+and the biases will constitute a $1 \times 10$ row vector.
+As with linear regression, we will initialize our weights `W`
+with Gaussian noise and our biases to take the initial value 0.
 
 ```{.python .input}
 num_inputs = 784
@@ -86,20 +85,22 @@ W = tf.Variable(tf.random.normal(shape=(num_inputs, num_outputs),
 b = tf.Variable(tf.zeros(num_outputs))
 ```
 
-## The Softmax
+## Defining the Softmax Operation
 
 Before implementing the softmax regression model,
 let us briefly review how the sum operator work
-along specific dimensions in a tensor.
-Given a matrix `X` we can sum over all elements (default) or only
-over elements in the same axis, *i.e.*, the column (`0`) or the same row (`1`).
-Note that if `X` is an array with shape `(2, 3)`
+along specific dimensions in a tensor,
+as discussed in :numref:`subseq_lin-alg-reduction` and :numref:`subseq_lin-alg-non-reduction`.
+Given a matrix `X` we can sum over all elements (by default) or only
+over elements in the same axis, 
+i.e., the same column (axis 0) or the same row (axis 1).
+Note that if `X` is an tensor with shape (2, 3)
 and we sum over the columns,
-the result will be a (1D) vector with shape `(3,)`.
-If we want to keep the number of axes in the original array
-(resulting in a 2D array with shape `(1, 3)`),
-rather than collapsing out the dimension that we summed over
-we can specify `keepdims=True` when invoking the operator.
+the result will be a vector with shape (3,).
+When invoking the sum operator,
+we can specify to keep the number of axes in the original tensor,
+rather than collapsing out the dimension that we summed over.
+This will result in a two-dimensional tensor with shape (1, 3).
 
 ```{.python .input}
 X = np.array([[1, 2, 3], [4, 5, 6]])
@@ -115,25 +116,25 @@ torch.sum(X, dim=0, keepdim=True), torch.sum(X, dim=1, keepdim=True)
 ```{.python .input}
 #@tab tensorflow
 X = tf.constant([[1., 2., 3.], [4., 5., 6.]])
-[tf.reduce_sum(X, axis=i, keepdims=True) for i in range(0,1)]
+[tf.reduce_sum(X, axis=i, keepdims=True) for i in range(0, 1)]
 ```
 
-We are now ready to implement the softmax function.
-Recall that softmax consists of two steps:
-First, we exponentiate each term (using `exp`).
-Then, we sum over each row (we have one row per example in the batch)
-to get the normalization constants for each example.
-Finally, we divide each row by its normalization constant,
-ensuring that the result sums to $1$.
+We are now ready to implement the softmax operation.
+Recall that softmax consists of three steps:
+i) we exponentiate each term (using `exp`);
+ii) we sum over each row (we have one row per example in the batch)
+to get the normalization constant for each example;
+iii) we divide each row by its normalization constant,
+ensuring that the result sums to 1.
 Before looking at the code, let us recall
 how this looks expressed as an equation:
 
 $$
-\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(X_{ij})}{\sum_k \exp(X_{ik})}.
+\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.
 $$
 
 The denominator, or normalization constant,
-is also sometimes called the partition function
+is also sometimes called the *partition function*
 (and its logarithm is called the log-partition function).
 The origins of that name are in [statistical physics](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics))
 where a related equation models the distribution
@@ -143,7 +144,7 @@ over an ensemble of particles.
 def softmax(X):
     X_exp = np.exp(X)
     partition = X_exp.sum(axis=1, keepdims=True)
-    return X_exp / partition  # The broadcast mechanism is applied here
+    return X_exp / partition  # The broadcasting mechanism is applied here
 ```
 
 ```{.python .input}
@@ -151,7 +152,7 @@ def softmax(X):
 def softmax(X):
     X_exp = torch.exp(X)
     partition = torch.sum(X_exp, dim=1, keepdim=True)
-    return X_exp / partition  # The broadcast mechanism is applied here
+    return X_exp / partition  # The broadcasting mechanism is applied here
 ```
 
 ```{.python .input}
@@ -159,18 +160,13 @@ def softmax(X):
 def softmax(X):
     X_exp = tf.exp(X)
     partition = tf.reduce_sum(X_exp, -1, keepdims=True)
-    return X_exp / partition  # The broadcast mechanism is applied here
+    return X_exp / partition  # The broadcasting mechanism is applied here
 ```
 
 As you can see, for any random input,
 we turn each element into a non-negative number.
 Moreover, each row sums up to 1,
 as is required for a probability.
-Note that while this looks correct mathematically,
-we were a bit sloppy in our implementation
-because we failed to take precautions against numerical overflow or underflow
-due to large (or very small) elements of the matrix,
-as we did in :numref:`sec_naive_bayes`.
 
 ```{.python .input}
 X = np.random.normal(size=(2, 5))
@@ -192,13 +188,18 @@ X_prob = softmax(X)
 X_prob, tf.reduce_sum(X_prob, axis=1)
 ```
 
-## The Model
+Note that while this looks correct mathematically,
+we were a bit sloppy in our implementation
+because we failed to take precautions against numerical overflow or underflow
+due to large or very small elements of the matrix.
+
+## Defining the Model
 
 Now that we have defined the softmax operation,
 we can implement the softmax regression model.
-The below code defines the forward pass through the network.
+The below code defines how the input is mapped to the output through the network.
 Note that we flatten each original image in the batch
-into a vector with length `num_inputs` with the `reshape` function
+into a vector using the `reshape` function
 before passing the data through our model.
 
 ```{.python .input}
@@ -218,25 +219,27 @@ def net(X):
     return softmax(tf.matmul(tf.reshape(X, shape=(-1, W.shape[0])), W) + b)
 ```
 
-## The Loss Function
+## Defining the Loss Function
 
 Next, we need to implement the cross-entropy loss function,
-introduced in :numref:`sec_softmax`.
+as introduced in :numref:`sec_softmax`.
 This may be the most common loss function
 in all of deep learning because, at the moment,
 classification problems far outnumber regression problems.
 
-Recall that cross-entropy takes the negative log likelihood
-of the predicted probability assigned to the true label $-\log P(y \mid x)$.
-Rather than iterating over the predictions with a Python `for` loop
+Recall that cross-entropy takes the negative log-likelihood
+of the predicted probability assigned to the true label.
+Rather than iterating over the predictions with a Python for-loop
 (which tends to be inefficient),
 we can pick all elements by a single operator.
 Below, we create a toy data `y_hat`
-with $3$ categories and $2$ examples, then pick the first category in the first example and the third category in the second example.
+with 2 examples of predicted probabilities over 3 classes.
+Then we pick the probability of the first class in the first example
+and the probability of the third class in the second example.
 
 ```{.python .input}
-y = np.array([0, 2])
 y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
+y = np.array([0, 2])
 y_hat[[0, 1], y]
 ```
 
@@ -283,27 +286,32 @@ cross_entropy(y_hat, y)
 ## Classification Accuracy
 
 Given the predicted probability distribution `y_hat`,
-we typically choose the class with highest predicted probability
-whenever we must output a *hard* prediction.
+we typically choose the class with the highest predicted probability
+whenever we must output a hard prediction.
 Indeed, many applications require that we make a choice.
-Gmail must categorize an email into Primary, Social, Updates, or Forums.
+Gmail must categorize an email into "Primary", "Social", "Updates", or "Forums".
 It might estimate probabilities internally,
-but at the end of the day it has to choose one among the categories.
+but at the end of the day it has to choose one among the classes.
 
-When predictions are consistent with the actual category `y`, they are correct.
+When predictions are consistent with the label class `y`, they are correct.
 The classification accuracy is the fraction of all predictions that are correct.
-Although it can be difficult optimize accuracy directly (it is not differentiable),
-it is often the performance metric that we care most about,
+Although it can be difficult to optimize accuracy directly (it is not differentiable),
+it is often the performance measure that we care most about,
 and we will nearly always report it when training classifiers.
 
-To compute accuracy we do the following:
-First, if `y` is a matrix, we assume the second dimension is prediction scores for each class. We use `argmax` to compute predicted class by the indices for the largest entries in each row). Then we compare predicted class to `y` elementwise.
-Since the equality operator `==` is datatype-sensitive, we convert `y_hat`'s data type to match `y`.
+To compute accuracy we do the following.
+First, if `y_hat` is a matrix,
+we assume that the second dimension stores prediction scores for each class.
+We use `argmax` to obtain the predicted class by the index for the largest entry in each row.
+Then we compare the predicted class with the ground-truth `y` elementwise.
+Since the equality operator `==` is sensitive to data types,
+we convert `y_hat`'s data type to match that of `y`.
 The result is a tensor containing entries of 0 (false) and 1 (true).
-Taking the mean yields the desired result.
+Taking the sum yields the number of correct predictions.
 
 ```{.python .input}
 def accuracy(y_hat, y):  #@save
+    """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
         y_hat = y_hat.argmax(axis=1)
     return float((y_hat.astype(y.dtype) == y).sum())
@@ -312,6 +320,7 @@ def accuracy(y_hat, y):  #@save
 ```{.python .input}
 #@tab pytorch
 def accuracy(y_hat, y):  #@save
+    """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
         y_hat = y_hat.argmax(axis=1)
     return float((y_hat.type(y.dtype) == y).sum())
@@ -320,6 +329,7 @@ def accuracy(y_hat, y):  #@save
 ```{.python .input}
 #@tab tensorflow
 def accuracy(y_hat, y):  #@save
+    """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
         y_hat = tf.argmax(y_hat, axis=1)
     return float((tf.cast(y_hat, dtype=y.dtype) == y).numpy().sum())
@@ -327,43 +337,48 @@ def accuracy(y_hat, y):  #@save
 
 We will continue to use the variables `y_hat` and `y`
 defined before
-as the predicted probability distribution and label, respectively.
-We can see that the first example's prediction category is $2$
-(the largest element of the row is $0.6$ with an index of $2$),
-which is inconsistent with the actual label, $0$.
-The second example's prediction category is $2$
-(the largest element of the row is $0.5$ with an index of $2$),
-which is consistent with the actual label, $2$.
-Therefore, the classification accuracy rate for these two examples is $0.5$.
+as the predicted probability distributions and labels, respectively.
+We can see that the first example's prediction class is 2
+(the largest element of the row is 0.6 with the index 2),
+which is inconsistent with the actual label, 0.
+The second example's prediction class is 2
+(the largest element of the row is 0.5 with the index of 2),
+which is consistent with the actual label, 2.
+Therefore, the classification accuracy rate for these two examples is 0.5.
 
 ```{.python .input}
 #@tab all
 accuracy(y_hat, y) / len(y)
 ```
 
-Similarly, we can evaluate the accuracy for model `net` on the dataset
-(accessed via `data_iter`).
+Similarly, we can evaluate the accuracy for any model `net` on a dataset
+that is accessed via the data iterator `data_iter`.
 
 ```{.python .input}
 #@tab all
 def evaluate_accuracy(net, data_iter):  #@save
-    metric = Accumulator(2)  # num_corrected_examples, num_examples
+    """Compute the accuracy for a model on a dataset."""
+    metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
         metric.add(accuracy(net(X), y), sum(y.shape))
     return metric[0] / metric[1]
 ```
 
-Here `Accumulator` is a utility class to accumulate sums over multiple numbers.
+Here `Accumulator` is a utility class to accumulate sums over multiple variables.
+In the above `evaluate_accuracy` function,
+we create 2 variables in the `Accumulator` instance for storing both
+the number of correct predictions and the number of predictions, respectively.
+Both will be accumulated over time as we iterate over the dataset.
 
 ```{.python .input}
 #@tab all
 class Accumulator:  #@save
-    """Sum a list of numbers over time."""
+    """For accumulating sums over `n` variables."""
     def __init__(self, n):
         self.data = [0.0] * n
 
     def add(self, *args):
-        self.data = [a+float(b) for a, b in zip(self.data, args)]
+        self.data = [a + float(b) for a, b in zip(self.data, args)]
 
     def reset(self):
         self.data = [0.0] * len(self.data)
@@ -374,27 +389,30 @@ class Accumulator:  #@save
 
 Because we initialized the `net` model with random weights,
 the accuracy of this model should be close to random guessing,
-i.e., $0.1$ for $10$ classes.
+i.e., 0.1 for 10 classes.
 
 ```{.python .input}
 #@tab all
 evaluate_accuracy(net, test_iter)
 ```
 
-## Model Training
+## Training
 
 The training loop for softmax regression should look strikingly familiar
 if you read through our implementation
 of linear regression in :numref:`sec_linear_scratch`.
 Here we refactor the implementation to make it reusable.
-First, we define a function to train for one data epoch.
-Note that `updater` is general function to update the model parameters,
+First, we define a function to train for one epoch.
+Note that `updater` is a general function to update the model parameters,
 which accepts the batch size as an argument.
-It can be either a wrapper of `d2l.sgd` or a framework build-in optimization method.
+It can be either a wrapper of the `d2l.sgd` function
+or a framework's built-in optimization function.
 
 ```{.python .input}
 def train_epoch_ch3(net, train_iter, loss, updater):  #@save
-    metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
+    """Train a model within one epoch (defined in Chapter 3)."""
+    # Sum of training loss, sum of training accuracy, no. of examples
+    metric = Accumulator(3)
     if isinstance(updater, gluon.Trainer):
         updater = updater.step
     for X, y in train_iter:
@@ -406,13 +424,15 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         updater(X.shape[0])
         metric.add(float(l.sum()), accuracy(y_hat, y), y.size)
     # Return training loss and training accuracy
-    return metric[0]/metric[2], metric[1]/metric[2]
+    return metric[0] / metric[2], metric[1] / metric[2]
 ```
 
 ```{.python .input}
 #@tab pytorch
 def train_epoch_ch3(net, train_iter, loss, updater):  #@save
-    metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
+    """The training loop defined in Chapter 3."""
+    # Sum of training loss, sum of training accuracy, no. of examples
+    metric = Accumulator(3)
     for X, y in train_iter:
         # Compute gradients and update parameters
         y_hat = net(X)
@@ -427,20 +447,22 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater(X.shape[0])
             metric.add(float(l.sum()), accuracy(y_hat, y), y.size().numel())
     # Return training loss and training accuracy
-    return metric[0]/metric[2], metric[1]/metric[2]
+    return metric[0] / metric[2], metric[1] / metric[2]
 ```
 
 ```{.python .input}
 #@tab tensorflow
 def train_epoch_ch3(net, train_iter, loss, updater):  #@save
-    metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
+    """The training loop defined in Chapter 3."""
+    # Sum of training loss, sum of training accuracy, no. of examples
+    metric = Accumulator(3)
     for X, y in train_iter:
         # Compute gradients and update parameters
         with tf.GradientTape() as tape:
             y_hat = net(X)
-            # tf.Keras' implementations for loss takes (labels, predictions)
+            # Keras implementations for loss takes (labels, predictions)
             # instead of (predictions, labels) that users might implement
-            # in this book, e.g. `cross_entropy()` that we implemented above.
+            # in this book, e.g. `cross_entropy` that we implemented above
             if isinstance(loss, tf.keras.losses.Loss):
                 l = loss(y, y_hat)
             else:
@@ -451,42 +473,49 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater.apply_gradients(zip(grads, params))
         else:
             updater(X.shape[0], tape.gradient(l, updater.params))
-        # Keras loss in default returns the average loss in a batch.
+        # Keras loss by default returns the average loss in a batch
         l_sum = l * float(tf.size(y)) if isinstance(
             loss, tf.keras.losses.Loss) else tf.reduce_sum(l)
         metric.add(l_sum, accuracy(y_hat, y), tf.size(y))
     # Return training loss and training accuracy
-    return metric[0]/metric[2], metric[1]/metric[2]
+    return metric[0] / metric[2], metric[1] / metric[2]
 ```
 
 Before showing the implementation of the training function,
-we define a utility class that draws data in animation.
-Again, it aims to simplify the code in later chapters.
+we define a utility class that plot data in animation.
+Again, it aims to simplify code in the rest of the book.
 
 ```{.python .input}
 #@tab all
 class Animator:  #@save
+    """For plotting data in animation."""
     def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
-                 ylim=None, xscale='linear', yscale='linear', fmts=None,
-                 nrows=1, ncols=1, figsize=(3.5, 2.5)):
-        """Incrementally plot multiple lines."""
-        if legend is None: legend = []
+                 ylim=None, xscale='linear', yscale='linear',
+                 fmts=('-', 'm--', 'g-.', 'r:'), nrows=1, ncols=1,
+                 figsize=(3.5, 2.5)):
+        # Incrementally plot multiple lines
+        if legend is None:
+            legend = []
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
-        if nrows * ncols == 1: self.axes = [self.axes, ]
-        # Use a lambda to capture arguments
+        if nrows * ncols == 1:
+            self.axes = [self.axes, ]
+        # Use a lambda function to capture arguments
         self.config_axes = lambda: d2l.set_axes(
             self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
 
     def add(self, x, y):
-        """Add multiple data points into the figure."""
-        if not hasattr(y, "__len__"): y = [y]
+        # Add multiple data points into the figure
+        if not hasattr(y, "__len__"):
+            y = [y]
         n = len(y)
-        if not hasattr(x, "__len__"): x = [x] * n
-        if not self.X: self.X = [[] for _ in range(n)]
-        if not self.Y: self.Y = [[] for _ in range(n)]
-        if not self.fmts: self.fmts = ['-'] * n
+        if not hasattr(x, "__len__"):
+            x = [x] * n
+        if not self.X:
+            self.X = [[] for _ in range(n)]
+        if not self.Y:
+            self.Y = [[] for _ in range(n)]
         for i, (a, b) in enumerate(zip(x, y)):
             if a is not None and b is not None:
                 self.X[i].append(a)
@@ -499,25 +528,33 @@ class Animator:  #@save
         display.clear_output(wait=True)
 ```
 
-The training function then runs multiple epochs and visualize the training progress.
+The following training function then 
+trains a model `net` on a training dataset accessed via `train_iter`
+for multiple epochs, which is specified by `num_epochs`.
+At the end of each epoch,
+the model is evaluated on a testing dataset accessed via `test_iter`.
+We will leverage the `Animator` class to visualize
+the training progress.
 
 ```{.python .input}
 #@tab all
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater): #@save
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
+    """Train a model (defined in Chapter 3)."""
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
-        animator.add(epoch+1, train_metrics+(test_acc,))
+        animator.add(epoch + 1, train_metrics + (test_acc,))
     train_loss, train_acc = train_metrics
     assert train_loss < 0.5, train_loss
     assert train_acc <= 1 and train_acc > 0.7, train_acc
     assert test_acc <= 1 and test_acc > 0.7, test_acc
 ```
 
-Again, we use the minibatch stochastic gradient descent we defined in :numref:`sec_linear_scratch`
-to optimize the loss function of the model with the learning rate set to 0.1.
+As an implementation from scratch,
+we use the minibatch stochastic gradient descent defined in :numref:`sec_linear_scratch`
+to optimize the loss function of the model with a learning rate 0.1.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -530,23 +567,22 @@ def updater(batch_size):
 ```{.python .input}
 #@tab tensorflow
 class Updater():  #@save
+    """For updating parameters using minibatch stochastic gradient descent."""
     def __init__(self, params, lr):
         self.params = params
         self.lr = lr
+
     def __call__(self, batch_size, grads):
         d2l.sgd(self.params, grads, self.lr, batch_size)
 
 updater = Updater([W, b], lr=0.1)
 ```
 
-Now we train the model with 10 data epochs. Note that both the number of epochs (`num_epochs`),
-and learning rate (`lr`) are both adjustable hyper-parameters.
+Now we train the model with 10 epochs.
+Note that both the number of epochs (`num_epochs`),
+and learning rate (`lr`) are adjustable hyperparameters.
 By changing their values, we may be able
 to increase the classification accuracy of the model.
-In practice we will want to split our data three ways
-into training, validation, and test data,
-using the validation data to choose
-the best values of our hyperparameters.
 
 ```{.python .input}
 #@tab all
@@ -561,17 +597,18 @@ our model is ready to classify some images.
 Given a series of images,
 we will compare their actual labels
 (first line of text output)
-and the model predictions
+and the predictions from the model
 (second line of text output).
 
 ```{.python .input}
 #@tab mxnet, pytorch
 def predict_ch3(net, test_iter, n=6):  #@save
+    """Predict labels (defined in Chapter 3)."""
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
-    titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
+    titles = [true + '\n' + pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
 
 predict_ch3(net, test_iter)
@@ -580,6 +617,7 @@ predict_ch3(net, test_iter)
 ```{.python .input}
 #@tab tensorflow
 def predict_ch3(net, test_iter, n=6):  #@save
+    """Predict labels (defined in Chapter 3)."""
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
@@ -592,19 +630,15 @@ predict_ch3(net, test_iter)
 
 ## Summary
 
-With softmax regression, we can train models for multi-category classification.
-The training loop is very similar to that in linear regression:
-retrieve and read data, define models and loss functions,
-then train models using optimization algorithms.
-As you will soon find out, most common deep learning models
-have similar training procedures.
+* With softmax regression, we can train models for multiclass classification.
+* The training loop of softmax regression is very similar to that in linear regression: retrieve and read data, define models and loss functions, then train models using optimization algorithms. As you will soon find out, most common deep learning models have similar training procedures.
 
 ## Exercises
 
-1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. What problems might this cause (hint: try to calculate the size of $\exp(50)$)?
-1. The function `cross_entropy` in this section is implemented according to the definition of the cross-entropy loss function.  What could be the problem with this implementation (hint: consider the domain of the logarithm)?
+1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. What problems might this cause? Hint: try to calculate the size of $\exp(50)$.
+1. The function `cross_entropy` in this section was implemented according to the definition of the cross-entropy loss function.  What could be the problem with this implementation? Hint: consider the domain of the logarithm.
 1. What solutions you can think of to fix the two problems above?
-1. Is it always a good idea to return the most likely label. E.g., would you do this for medical diagnosis?
+1. Is it always a good idea to return the most likely label? For example, would you do this for medical diagnosis?
 1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
 
 :begin_tab:`mxnet`

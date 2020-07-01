@@ -48,7 +48,7 @@ d2l.plot(xd, yd, 'x', 'density')
 d2l.plt.scatter(xs, ys)
 d2l.plt.axvline(x=0)
 d2l.plt.axvline(x=np.mean(xs), linestyle='--', color='purple')
-d2l.plt.title("Sample Mean: {:.2f}".format(float(np.mean(xs))))
+d2l.plt.title(f'sample mean: {float(np.mean(xs)):.2f}')
 d2l.plt.show()
 ```
 
@@ -78,7 +78,7 @@ d2l.plot(xd, yd, 'x', 'density')
 d2l.plt.scatter(xs, ys)
 d2l.plt.axvline(x=0)
 d2l.plt.axvline(x=torch.mean(xs), linestyle='--', color='purple')
-d2l.plt.title("Sample Mean: {:.2f}".format(float(torch.mean(xs).item())))
+d2l.plt.title(f'sample mean: {float(torch.mean(xs).item()):.2f}')
 d2l.plt.show()
 ```
 
@@ -374,9 +374,9 @@ sigma_hat = samples.std(ddof=1)
 
 ```{.python .input}
 #@tab pytorch
-# Note: PyTorch uses Bessel's correction by default, which means the use of
-#       ddof=1 instead of default ddof=0 in numpy.
-#       We can use unbiased=False to imitate ddof=0.
+# PyTorch uses Bessel's correction by default, which means the use of ddof=1
+# instead of default ddof=0 in numpy. We can use unbiased=False to imitate
+# ddof=0.
 
 # Number of samples
 N = 1000
@@ -414,6 +414,6 @@ $$\tilde{\theta} = 2 \bar{X_n} = \frac{2}{n} \sum_{i=1}^n X_i.$$
 1. For our chemist example in introduction, can you derive the 5 steps to conduct a two-sided hypothesis testing? Given the statistical significance level $\alpha = 0.05$ and the statistical power $1 - \beta = 0.8$.
 1. Run the confidence interval code with $N=2$ and $\alpha = 0.5$ for $100$ independently generated dataset, and plot the resulting intervals (in this case `t_star = 1.0`).  You will see several very short intervals which are very far from containing the true mean $0$.  Does this contradict the interpretation of the confidence interval?  Do you feel comfortable using short intervals to indicate high precision estimates?
 
-## [Discussions](https://discuss.mxnet.io/t/5156)
-
-![](../img/qr_statistics.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/419)
+:end_tab:

@@ -1,5 +1,5 @@
 # Concise Implementation of Multilayer Perceptron
-:label:`sec_mlp_gluon`
+:label:`sec_mlp_concise`
 
 As you might expect, by relying on the high-level interface,
 we can implement MLPs even more concisely.
@@ -28,7 +28,7 @@ import tensorflow as tf
 
 As compared to our concise implementation
 of softmax regression implementation
-(:numref:`sec_softmax_gluon`),
+(:numref:`sec_softmax_concise`),
 the only difference is that we add
 *two* fully-connected layers
 (previously, we added *one*).
@@ -62,13 +62,12 @@ def init_weights(m):
 net.apply(init_weights)
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 net = tf.keras.models.Sequential([
-	tf.keras.layers.Flatten(),
-	tf.keras.layers.Dense(256, activation='relu'),
-	tf.keras.layers.Dense(10)])
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(256, activation='relu'),
+    tf.keras.layers.Dense(10)])
 ```
 
 The training loop is *exactly* the same

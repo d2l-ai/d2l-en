@@ -48,12 +48,10 @@ mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 data_transform = torchvision.transforms.Compose(
     [torchvision.transforms.ToTensor()])
 
-mnist_train = torchvision.datasets.MNIST(root='./temp', train=True,
-                                         transform=data_transform, 
-                                         download=True)
-mnist_test = torchvision.datasets.MNIST(root='./temp', train=False,
-                                        transform=data_transform, 
-                                        download=True)
+mnist_train = torchvision.datasets.MNIST(
+    root='./temp', train=True, transform=data_transform, download=True)
+mnist_test = torchvision.datasets.MNIST(
+    root='./temp', train=False, transform=data_transform, download=True)
 ```
 
 We can access a particular example, which contains the image and the corresponding label.
@@ -350,6 +348,6 @@ Modern deep networks achieve error rates of less than $0.01$. The relatively poo
 1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :cite:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.
 
 
-## [Discussions](https://discuss.mxnet.io/t/5155)
-
-![](../img/qr_naive-bayes.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/418)
+:end_tab:

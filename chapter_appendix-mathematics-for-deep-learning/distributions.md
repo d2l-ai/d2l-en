@@ -19,7 +19,7 @@ from IPython import display
 from math import erf, factorial
 import torch
 
-torch.pi = torch.acos(torch.zeros(1)) * 2  #define pi in torch
+torch.pi = torch.acos(torch.zeros(1)) * 2  # Define pi in torch
 ```
 
 ## Bernoulli
@@ -369,8 +369,8 @@ d2l.plt.show()
 lam = 5.0
 
 xs = [i for i in range(20)]
-pmf = torch.tensor([torch.exp(torch.tensor(-lam)) 
-                * lam**k / factorial(k) for k in xs])
+pmf = torch.tensor([torch.exp(torch.tensor(-lam)) * lam**k
+                    / factorial(k) for k in xs])
 
 d2l.plt.stem(xs, pmf, use_line_collection=True)
 d2l.plt.xlabel('x')
@@ -567,6 +567,6 @@ torch.normal(mu, sigma, size=(10, 10))
 3. What is the probability mass function for a sum of two discrete uniform random variables on $n$ elements?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5154)
-
-![](../img/qr_distributions.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/417)
+:end_tab:

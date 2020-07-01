@@ -97,7 +97,7 @@ x
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.constant(range(12))
+x = tf.range(12)
 x
 ```
 
@@ -355,7 +355,7 @@ torch.cat((x, y), dim=0), torch.cat((x, y), dim=1)
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.constant(range(12), dtype=tf.float32, shape=(3, 4))
+x = tf.reshape(tf.range(12, dtype=tf.float32), (3, 4))
 y = tf.constant([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 tf.concat([x, y], axis=0), tf.concat([x, y], axis=1)
 ```
@@ -417,8 +417,8 @@ a, b
 
 ```{.python .input}
 #@tab tensorflow
-a = tf.constant(range(3), shape=(3, 1))
-b = tf.constant(range(2), shape=(1, 2))
+a = tf.reshape(tf.range(3), (3, 1))
+b = tf.reshape(tf.range(2), (1, 2))
 a, b
 ```
 

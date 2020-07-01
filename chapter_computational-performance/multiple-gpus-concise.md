@@ -1,5 +1,5 @@
 # Concise Implementation for Multiple GPUs
-:label:`sec_multi_gpu_gluon`
+:label:`sec_multi_gpu_concise`
 
 Implementing parallelism from scratch for every new model is no fun. Moreover, there is significant benefit in optimizing synchronization tools for high performance. In the following we will show how to do this using Gluon. The math and the algorithms are the same as in :numref:`sec_multi_gpu`. As before we begin by importing the required modules (quite unsurprisingly you will need at least two GPUs to run this notebook).
 
@@ -49,7 +49,7 @@ The `initialize` method allows us to set initial defaults for parameters on a de
 net = resnet18(10)
 # get a list of GPUs
 ctx = d2l.try_all_gpus()
-# initialize the network on all of them 
+# initialize the network on all of them
 net.initialize(init=init.Normal(sigma=0.01), ctx=ctx)
 ```
 
@@ -97,8 +97,8 @@ As before, the training code needs to perform a number of basic functions for ef
 
 * Network parameters need to be initialized across all devices.
 * While iterating over the dataset minibatches are to be divided across all devices.
-* We compute the loss and its gradient in parallel across devices. 
-* Losses are aggregated (by the trainer method) and parameters are updated accordingly. 
+* We compute the loss and its gradient in parallel across devices.
+* Losses are aggregated (by the trainer method) and parameters are updated accordingly.
 
 In the end we compute the accuracy (again in parallel) to report the final value of the network. The training routine is quite similar to implementations in previous chapters, except that we need to split and aggregate data.
 
@@ -125,8 +125,8 @@ def train(num_gpus, batch_size, lr):
         npx.waitall()
         timer.stop()
         animator.add(epoch + 1, (evaluate_accuracy_gpus(net, test_iter),))
-    print('test acc: %.2f, %.1f sec/epoch on %s' % (
-        animator.Y[0][-1], timer.avg(), ctx))
+    print(f'test acc: {animator.Y[0][-1]:.2f}, {timer.avg():.1f} sec/epoch '
+          f'on {str(ctx)}')
 ```
 
 ## Experiments
@@ -148,14 +148,14 @@ train(num_gpus=2, batch_size=512, lr=0.2)
 * Gluon provides primitives for model initialization across multiple devices by providing a context list.
 * Data is automatically evaluated on the devices where the data can be found.
 * Take care to initialize the networks on each device before trying to access the parameters on that device. Otherwise you will encounter an error.
-* The optimization algorithms automatically aggregate over multiple GPUs. 
+* The optimization algorithms automatically aggregate over multiple GPUs.
 
 ## Exercises
 
-1. This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation. What happens if you try this on a p2.16xlarge instance with 16 GPUs? 
+1. This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation. What happens if you try this on a p2.16xlarge instance with 16 GPUs?
 1. Sometimes, different devices provide different computing power. We could use the GPUs and the CPU at the same time. How should we divide the work? Is it worth the effort? Why? Why not?
-1. What happens if we drop `npx.waitall()`? How would you modify training such that you have an overlap of up to two steps for parallelism? 
+1. What happens if we drop `npx.waitall()`? How would you modify training such that you have an overlap of up to two steps for parallelism?
 
-## [Discussions](https://discuss.mxnet.io/t/2384)
-
-![](../img/qr_multiple-gpus-gluon.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/365)
+:end_tab:

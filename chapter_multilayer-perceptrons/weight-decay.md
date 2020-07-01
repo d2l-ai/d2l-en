@@ -75,7 +75,7 @@ with new objective,
 Now, if our weight vector grows too large,
 our learning algorithm might *focus*
 on minimizing the weight norm $|| \mathbf{w} ||^2$
-versus minimizing the training error.
+vs. minimizing the training error.
 That is exactly what we want.
 To illustrate things in code,
 let us revive our previous example
@@ -315,7 +315,7 @@ def train(lambd):
         for X, y in train_iter:
             with autograd.record():
                 # The L2 norm penalty term has been added, and broadcasting
-                # makes l2_penalty(w) a vector whose length is batch_size
+                # makes `l2_penalty(w)` a vector whose length is `batch_size`
                 l = loss(net(X), y) + lambd * l2_penalty(w)
             l.backward()
             d2l.sgd([w, b], lr, batch_size)
@@ -337,7 +337,7 @@ def train(lambd):
         for X, y in train_iter:
             with torch.enable_grad():
                 # The L2 norm penalty term has been added, and broadcasting
-                # makes l2_penalty(w) a vector whose length is batch_size
+                # makes `l2_penalty(w)` a vector whose length is `batch_size`
                 l = loss(net(X), y) + lambd * l2_penalty(w)
             l.sum().backward()
             d2l.sgd([w, b], lr, batch_size)
@@ -357,9 +357,9 @@ def train(lambd):
                             xlim=[1, num_epochs], legend=['train', 'test'])
     for epoch in range(1, num_epochs + 1):
         for X, y in train_iter:
-            with tf.GradientTape(persistent=True) as tape:
+            with tf.GradientTape() as tape:
                 # The L2 norm penalty term has been added, and broadcasting
-                # makes l2_penalty(w) a vector whose length is batch_size
+                # makes `l2_penalty(w)` a vector whose length is `batch_size`
                 l = loss(net(X), y) + lambd * l2_penalty(w)
             grads = tape.gradient(l, [w, b])
             d2l.sgd([w, b], grads, lr, batch_size)
@@ -511,7 +511,7 @@ def train_concise(wd):
     for epoch in range(1, num_epochs+1):
         for X, y in train_iter:
             with tf.GradientTape() as tape:
-                # tf.keras requires retrieving and adding the losses from
+                # `tf.keras` requires retrieving and adding the losses from
                 # layers manually for custom training loop.
                 l = loss(net(X), y) + net.losses
             grads = tape.gradient(l, net.trainable_variables)
@@ -555,7 +555,7 @@ of applying weight decay on all layers of a deep network.
 
 * Regularization is a common method for dealing with overfitting. It adds a penalty term to the loss function on the training set to reduce the complexity of the learned model.
 * One particular choice for keeping the model simple is weight decay using an $\ell_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
-* Gluon provides automatic weight decay functionality in the optimizer by setting the hyperparameter `wd`.
+* The weight decay functionality is provided in optimizers from deep learning frameworks.
 * You can have different optimizers within the same training loop, e.g., for different sets of parameters.
 
 

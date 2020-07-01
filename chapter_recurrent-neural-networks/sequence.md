@@ -32,7 +32,7 @@ $$x_t \sim p(x_t \mid x_{t-1}, \ldots, x_1).$$
 
 ### Autoregressive Models
 
-In order to achieve this, our trader could use a regressor such as the one we trained in :numref:`sec_linear_gluon`. There is just a major problem: the number of inputs, $x_{t-1}, \ldots, x_1$ varies, depending on $t$. That is, the number increases with the amount of data that we encounter, and we will need an approximation to make this computationally tractable. Much of what follows in this chapter will revolve around how to estimate $p(x_t \mid x_{t-1}, \ldots, x_1)$ efficiently. In a nutshell it boils down to two strategies:
+In order to achieve this, our trader could use a regressor such as the one we trained in :numref:`sec_linear_concise`. There is just a major problem: the number of inputs, $x_{t-1}, \ldots, x_1$ varies, depending on $t$. That is, the number increases with the amount of data that we encounter, and we will need an approximation to make this computationally tractable. Much of what follows in this chapter will revolve around how to estimate $p(x_t \mid x_{t-1}, \ldots, x_1)$ efficiently. In a nutshell it boils down to two strategies:
 
 1. Assume that the potentially rather long sequence $x_{t-1}, \ldots, x_1$ is not really necessary. In this case we might content ourselves with some timespan $\tau$ and only use $x_{t-1}, \ldots, x_{t-\tau}$ observations. The immediate benefit is that now the number of arguments is always the same, at least for $t > \tau$. This allows us to train a deep network as indicated above. Such models will be called *autoregressive* models, as they quite literally perform regression on themselves.
 1. Another strategy, shown in :numref:`fig_sequence-model`, is to try and keep some summary $h_t$ of the past observations, at the same time update $h_t$ in addition to the prediction $\hat{x}_t$. This leads to models that estimate $x_t$ with $\hat{x}_t = p(x_t \mid x_{t-1}, h_{t})$ and moreover updates of the form  $h_t = g(h_{t-1}, x_{t-1})$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*. LSTMs and GRUs are examples of this.
@@ -107,7 +107,7 @@ for i in range(tau):
 labels = x[tau:]
 
 batch_size, n_train = 16, 600
-train_iter = d2l.load_array((features[:n_train], labels[:n_train]), 
+train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
 
 # Vanilla MLP architecture
@@ -131,7 +131,7 @@ for i in range(tau):
 labels = x[tau:]
 
 batch_size, n_train = 16, 600
-train_iter = d2l.load_array((features[:n_train], 
+train_iter = d2l.load_array((features[:n_train],
                              labels[:n_train].reshape(-1, 1)),
                             batch_size, is_train=True)
 
@@ -164,7 +164,7 @@ def train_net(net, train_iter, loss, epochs, lr):
                 l = loss(net(X), y)
             l.backward()
             trainer.step(batch_size)
-        print(f'epoch {epoch:d}, '
+        print(f'epoch {epoch}, '
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
@@ -181,7 +181,7 @@ def train_net(net, train_iter, loss, epochs, lr):
             l = loss(net(X), y)
             l.backward()
             trainer.step()
-        print(f'epoch {epoch:d}, '
+        print(f'epoch {epoch}, '
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
@@ -254,7 +254,7 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
 
 steps = (4, 8, 16, 32)
 d2l.plot([time[i:T-k+i] for i in steps], [features[i] for i in steps],
-         legend=['step %d' % i for i in steps], figsize=(4.5, 2.5))
+         legend=[f'step {i}' for i in steps], figsize=(4.5, 2.5))
 ```
 
 ```{.python .input}
@@ -270,7 +270,7 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
 
 steps = (4, 8, 16, 32)
 d2l.plot([time[i:T-k+i] for i in steps], [features[i].detach() for i in steps],
-         legend=['step %d' % i for i in steps], figsize=(4.5, 2.5))
+         legend=[f'step {i}' for i in steps], figsize=(4.5, 2.5))
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.

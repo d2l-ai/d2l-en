@@ -175,6 +175,6 @@ hotdog_w = np.split(weight.data(), 1000, axis=0)[713]
 hotdog_w.shape
 ```
 
-## [Discussions](https://discuss.mxnet.io/t/2443)
-
-![](../img/qr_fine-tuning.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/368)
+:end_tab:

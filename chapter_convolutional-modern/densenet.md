@@ -72,13 +72,10 @@ class ConvBlock(tf.keras.layers.Layer):
         super(ConvBlock, self).__init__()
         self.bn = tf.keras.layers.BatchNormalization()
         self.relu = tf.keras.layers.ReLU()
-        self.conv = tf.keras.layers.Conv2D(filters=num_channels,
-                                            kernel_size=(3, 3),
-                                            padding="same")
-        
-        self.listLayers = [self.bn,
-                           self.relu,
-                           self.conv]
+        self.conv = tf.keras.layers.Conv2D(
+            filters=num_channels, kernel_size=(3, 3), padding='same')
+
+        self.listLayers = [self.bn, self.relu, self.conv]
 
     def call(self, x):
         y = x
@@ -198,11 +195,11 @@ class TransitionBlock(tf.keras.layers.Layer):
     self.relu = tf.keras.layers.ReLU()
     self.conv = tf.keras.layers.Conv2D(num_channels, kernel_size=1)
     self.avg_pool = tf.keras.layers.AvgPool2D(pool_size=2, strides=2)
-  
+
   def call(self, x):
-    x =  self.batch_norm(x)
-    x =  self.relu(x)
-    x =  self.conv(x)
+    x = self.batch_norm(x)
+    x = self.relu(x)
+    x = self.conv(x)
     return self.avg_pool(x)
 ```
 
@@ -322,7 +319,7 @@ net.add(nn.BatchNorm(),
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(
-    b1, *blks, 
+    b1, *blks,
     nn.BatchNorm2d(num_channels), nn.ReLU(),
     nn.AdaptiveMaxPool2d((1,1)),
     nn.Flatten(),
@@ -331,7 +328,7 @@ net = nn.Sequential(
 
 ```{.python .input}
 #@tab tensorflow
-def block_3():
+def net():
   net = block_2()
   net.add(tf.keras.layers.BatchNormalization())
   net.add(tf.keras.layers.ReLU())
@@ -339,11 +336,6 @@ def block_3():
   net.add(tf.keras.layers.Flatten())
   net.add(tf.keras.layers.Dense(10, activation='softmax'))
   return net
-# Recall that we define this as a function so we can reuse later
-# and run it within `tf.distribute.MirroredStrategy`'s scope to
-# utilize various computational resources, e.g. GPUs
-def net():
-    return block_3()
 ```
 
 ## Data Acquisition and Training
@@ -351,20 +343,7 @@ def net():
 Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
 
 ```{.python .input}
-lr, num_epochs, batch_size = 0.1, 10, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab pytorch
-lr, num_epochs, batch_size = 0.1, 10, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 lr, num_epochs, batch_size = 0.1, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
@@ -394,4 +373,8 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/88)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/331)
 :end_tab:

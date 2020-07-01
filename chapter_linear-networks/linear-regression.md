@@ -58,6 +58,7 @@ and the corresponding label as $y^{(i)}$.
 
 
 ### Linear Model
+:label:`subsec_linear_model`
 
 The linearity assumption just says that the target (price)
 can be expressed as a weighted sum of the features (area and age):
@@ -74,13 +75,23 @@ what value the predicted price should take
 when all of the features take value 0.
 Even if we will never see any homes with zero area,
 or that are precisely zero years old,
-we still need the intercept or else we will
-limit the expressivity of our linear model.
+we still need the bias or else we will
+limit the expressivity of our model.
+Strictly speaking, :eqref:`eq_price-area` is an *affine transformation*
+of input features,
+which is characterized by
+a *linear transformation* of features via weighted sum, combined with 
+a *translation* via the added bias.
 
 Given a dataset, our goal is to choose
 the weights $\mathbf{w}$ and the bias $b$ such that on average,
 the predictions made according to our model
 best fit the true prices observed in the data.
+Models whose output prediction
+is determined by the affine transformation of input features
+are *linear models*,
+where the affine transformation is specified by the chosen weights and bias.
+
 
 In disciplines where it is common to focus
 on datasets with just a few features,
@@ -250,7 +261,7 @@ To summarize, steps of the algorithm are the following:
 (i) we initialize the values of the model parameters, typically at random;
 (ii) we iteratively sample random minibatches from the data,
 updating the parameters in the direction of the negative gradient.
-For quadratic losses and linear functions,
+For quadratic losses and affine transformations,
 we can write this out explicitly as follows:
 
 $$\begin{aligned} \mathbf{w} &\leftarrow \mathbf{w} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\ b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
@@ -477,7 +488,7 @@ x = np.arange(-7, 7, 0.01)
 params = [(0, 1), (0, 2), (3, 1)]
 d2l.plot(x, [normal(x, mu, sigma) for mu, sigma in params], xlabel='x',
          ylabel='p(x)', figsize=(4.5, 2.5),
-         legend=['mean %d, std %d' % (mu, sigma) for mu, sigma in params])
+         legend=[f'mean {mu}, std {sigma}' for mu, sigma in params])
 ```
 
 As we can see, changing the mean corresponds to a shift along the $x$-axis,
@@ -526,7 +537,7 @@ of a linear model under the assumption of additive Gaussian noise.
 
 ## From Linear Regression to Deep Networks
 
-So far we only talked about linear functions.
+So far we only talked about linear models.
 While neural networks cover a much richer family of models,
 we can begin thinking of the linear model
 as a neural network by expressing it in the language of neural networks.
@@ -642,7 +653,6 @@ statistics, and computer science.
     * Write out the negative log-likelihood of the data under the model $-\log P(\mathbf y \mid \mathbf X)$.
     * Can you find a closed form solution?
     * Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint: what happens near the stationary point as we keep on updating the parameters)? Can you fix this?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/40)

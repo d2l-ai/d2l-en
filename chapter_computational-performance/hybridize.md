@@ -65,7 +65,7 @@ The differences between imperative (interpreted) programming and symbolic progra
 
 ## Hybrid Programming
 
-Historically most deep learning frameworks choose between an imperative or a symbolic approach. For example, Theano,  TensorFlow (inspired by the latter), Keras and CNTK formulate models symbolically. Conversely Chainer and PyTorch take an imperative approach. An imperative mode was added TensorFlow 2.0 (via Eiger) and Keras in later revisions. When designing Gluon, developers considered whether it would be possible to combine the benefits of both programming models. This led to a hybrid model that lets users develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programs to be run when product-level computing performance and deployment are required.
+Historically most deep learning frameworks choose between an imperative or a symbolic approach. For example, Theano, TensorFlow (inspired by the latter), Keras and CNTK formulate models symbolically. Conversely, Chainer and PyTorch take an imperative approach. An imperative mode was added to TensorFlow 2.0 (via Eager) and Keras in later revisions. When designing Gluon, developers considered whether it would be possible to combine the benefits of both programming models. This led to a hybrid model that lets users develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programs to be run when product-level computing performance and deployment are required.
 
 In practice this means that we build models using either the `HybridBlock` or the `HybridSequential` and `HybridConcurrent` classes. By default, they are executed in the same way `Block` or `Sequential` and `Concurrent` classes are executed in imperative programming. `HybridSequential` is a subclass of `HybridBlock` (just like `Sequential` subclasses `Block`). When the `hybridize` function is called, Gluon compiles the model into the form used in symbolic programming. This allows one to optimize the compute-intensive components without sacrifices in the way a model is implemented. We will illustrate the benefits below, focusing on sequential models and blocks only (the concurrent composition works analogously).
 
@@ -108,8 +108,8 @@ To demonstrate the performance improvement gained by compilation we compare the 
 
 ```{.python .input}
 #@save
-class benchmark:    
-    def __init__(self, description = 'Done in %.4f sec'):
+class Benchmark:    
+    def __init__(self, description='Done'):
         self.description = description
         
     def __enter__(self):
@@ -117,19 +117,19 @@ class benchmark:
         return self
 
     def __exit__(self, *args):
-        print(self.description % self.timer.stop())
+        print(f'{self.description}: {self.timer.stop():.4f} sec')
 ```
 
 Now we can invoke the network twice, once with and once without hybridization.
 
 ```{.python .input  n=5}
 net = get_net()
-with benchmark('Without hybridization: %.4f sec'):
+with Benchmark('Without hybridization'):
     for i in range(1000): net(x)
     npx.waitall()
 
 net.hybridize()
-with benchmark('With    hybridization: %.4f sec'):
+with Benchmark('With hybridization'):
     for i in range(1000): net(x)
     npx.waitall()
 ```
@@ -212,6 +212,6 @@ This is quite different from what we saw previously. All print statements, as de
 1. What happens if we add control flow, i.e., the Python statements `if` and `for` in the `hybrid_forward` function?
 1. Review the models that interest you in the previous chapters and use the HybridBlock class or HybridSequential class to implement them.
 
-## [Discussions](https://discuss.mxnet.io/t/2380)
-
-![](../img/qr_hybridize.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/360)
+:end_tab:

@@ -78,9 +78,11 @@ for param in params:
 #@tab pytorch
 num_inputs, num_outputs, num_hiddens = 784, 10, 256
 
-W1 = nn.Parameter(torch.randn(num_inputs, num_hiddens, requires_grad=True)*0.01)
+W1 = nn.Parameter(torch.randn(
+    num_inputs, num_hiddens, requires_grad=True) * 0.01)
 b1 = nn.Parameter(torch.zeros(num_hiddens, requires_grad=True))
-W2 = nn.Parameter(torch.randn(num_hiddens, num_outputs, requires_grad=True)*0.01)
+W2 = nn.Parameter(torch.randn(
+    num_hiddens, num_outputs, requires_grad=True) * 0.01)
 b2 = nn.Parameter(torch.zeros(num_outputs, requires_grad=True))
 
 params = [W1, b1, W2, b2]
@@ -91,11 +93,11 @@ params = [W1, b1, W2, b2]
 num_inputs, num_outputs, num_hiddens = 784, 10, 256
 
 W1 = tf.Variable(tf.random.normal(
-    shape=(num_inputs, num_hiddens), mean=0, stddev=.01))
+    shape=(num_inputs, num_hiddens), mean=0, stddev=0.01))
 b1 = tf.Variable(tf.zeros(num_hiddens))
 W2 = tf.Variable(tf.random.normal(
-    shape=(num_hiddens, num_outputs), mean=0, stddev=.01))
-b2 = tf.Variable(tf.random.normal([num_outputs], stddev=.1))
+    shape=(num_hiddens, num_outputs), mean=0, stddev=0.01))
+b2 = tf.Variable(tf.random.normal([num_outputs], stddev=.01))
 
 params = [W1, b1, W2, b2]
 ```
@@ -144,7 +146,7 @@ def net(X):
 #@tab pytorch
 def net(X):
     X = X.reshape((-1, num_inputs))
-    H = relu(X@W1 + b1)   # Here '@' stands for dot product operation
+    H = relu(X@W1 + b1)  # Here '@' stands for dot product operation
     return (H@W2 + b2)
 ```
 
@@ -162,7 +164,7 @@ To ensure numerical stability,
 and because we already implemented
 the softmax function from scratch
 (:numref:`sec_softmax_scratch`),
-we leverage Gluon's integrated function
+we leverage the integrated function from high-level APIs
 for calculating the softmax and cross-entropy loss.
 Recall our earlier discussion of these intricacies 
 (:numref:`sec_mlp`).

@@ -210,14 +210,13 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
             trainer.step(batch_size)
             train_l_sum += float(l)
             n += y.size
-        time_s = "time %.2f sec" % (time.time() - start)
+        time_s = f'time {time.time() - start:.2f} sec'
         if valid_iter is not None:
             valid_loss = evaluate_loss(valid_iter, net, ctx)
-            epoch_s = ("epoch %d, train loss %f, valid loss %f, "
-                       % (epoch + 1, train_l_sum / n, valid_loss))
+            epoch_s = (f'epoch {epoch + 1}, train loss {train_l_sum / n:f}, '
+                       f'valid loss {valid_loss:f}, ')
         else:
-            epoch_s = ("epoch %d, train loss %f, "
-                       % (epoch + 1, train_l_sum / n))
+            epoch_s = f'epoch {epoch + 1}, train loss {train_l_sum / n:f}, '
         print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
 ```
 
@@ -274,6 +273,6 @@ method for submitting results is similar to method in
 1. Do you get better results if you use a deeper pre-trained model?
 1. Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
-## [Discussions](https://discuss.mxnet.io/t/2451)
-
-![](../img/qr_kaggle-gluon-dog.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/380)
+:end_tab:

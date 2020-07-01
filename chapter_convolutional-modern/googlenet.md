@@ -116,32 +116,32 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 
 class Inception(tf.keras.Model):
-  # c1 - c4 are the number of output channels for each layer in the path
-  def __init__(self, c1, c2, c3, c4, **kwargs):
-    super(Inception, self).__init__(**kwargs)
-    # Path 1 is a single 1 x 1 convolutional layer
-    self.p1_1 = tf.keras.layers.Conv2D(c1, 1, activation='relu')
-    # Path 2 is a 1 x 1 convolutional layer followed by a 3 x 3
-    # convolutional layer
-    self.p2_1 = tf.keras.layers.Conv2D(c2[0], 1, activation='relu')
-    self.p2_2 = tf.keras.layers.Conv2D(c2[1], 3, padding='same', activation='relu')
-    # Path 3 is a 1 x 1 convolutional layer followed by a 5 x 5
-    # convolutional layer
-    self.p3_1 = tf.keras.layers.Conv2D(c3[0], 1, activation='relu')
-    self.p3_2 = tf.keras.layers.Conv2D(c3[1], 5, padding='same', activation='relu')
-    # Path 4 is a 3 x 3 maximum pooling layer followed by a 1 x 1
-    # convolutional layer
-    self.p4_1 = tf.keras.layers.MaxPool2D(3, 1, padding='same')
-    self.p4_2 =  tf.keras.layers.Conv2D(c1, 1, activation='relu')
- 
-  
-  def call(self, x):
-    p1 = self.p1_1(x)
-    p2 = self.p2_2(self.p2_1(x))
-    p3 = self.p3_2(self.p3_1(x))
-    p4 = self.p4_2(self.p4_1(x))
-    # Concatenate the outputs on the channel dimension
-    return tf.keras.layers.Concatenate()([p1, p2, p3, p4])
+    # c1 - c4 are the number of output channels for each layer in the path
+    def __init__(self, c1, c2, c3, c4):
+        super().__init__()
+        # Path 1 is a single 1 x 1 convolutional layer
+        self.p1_1 = tf.keras.layers.Conv2D(c1, 1, activation='relu')
+        # Path 2 is a 1 x 1 convolutional layer followed by a 3 x 3
+        # convolutional layer
+        self.p2_1 = tf.keras.layers.Conv2D(c2[0], 1, activation='relu')
+        self.p2_2 = tf.keras.layers.Conv2D(c2[1], 3, padding='same', activation='relu')
+        # Path 3 is a 1 x 1 convolutional layer followed by a 5 x 5
+        # convolutional layer
+        self.p3_1 = tf.keras.layers.Conv2D(c3[0], 1, activation='relu')
+        self.p3_2 = tf.keras.layers.Conv2D(c3[1], 5, padding='same', activation='relu')
+        # Path 4 is a 3 x 3 maximum pooling layer followed by a 1 x 1
+        # convolutional layer
+        self.p4_1 = tf.keras.layers.MaxPool2D(3, 1, padding='same')
+        self.p4_2 = tf.keras.layers.Conv2D(c4, 1, activation='relu')
+
+
+    def call(self, x):
+        p1 = self.p1_1(x)
+        p2 = self.p2_2(self.p2_1(x))
+        p3 = self.p3_2(self.p3_1(x))
+        p4 = self.p4_2(self.p4_1(x))
+        # Concatenate the outputs on the channel dimension
+        return tf.keras.layers.Concatenate()([p1, p2, p3, p4])
 ```
 
 To gain some intuition for why this network works so well,
@@ -179,7 +179,7 @@ b1.add(nn.Conv2D(64, kernel_size=7, strides=2, padding=3, activation='relu'),
 ```{.python .input}
 #@tab pytorch
 b1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
-                   nn.ReLU(), 
+                   nn.ReLU(),
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
 ```
 
@@ -187,7 +187,8 @@ b1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
 #@tab tensorflow
 def b1():
     return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(64, 7, strides=2, padding='same', activation='relu'),
+        tf.keras.layers.Conv2D(64, 7, strides=2, padding='same', 
+                               activation='relu'),
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
@@ -347,7 +348,9 @@ def b5():
 # so that model building/compiling need to be within `strategy.scope()`
 # in order to utilize the CPU/GPU devices that we have.
 def net():
-    return tf.keras.Sequential([b1(), b2(), b3(), b4(), b5(), tf.keras.layers.Dense(10, activation='softmax')])
+    return tf.keras.Sequential([b1(), b2(), b3(), b4(), b5(),
+                                tf.keras.layers.Dense(
+                                    10, activation='softmax')])
 ```
 
 The GoogLeNet model is computationally complex,
@@ -379,7 +382,7 @@ for layer in net:
 X = tf.random.uniform(shape=(1, 96, 96, 1))
 for layer in net().layers:
     X = layer(X)
-    print(layer.__class__.__name__, 'Output shape:\t', X.shape)
+    print(layer.__class__.__name__, 'output shape:\t', X.shape)
 ```
 
 ## Data Acquisition and Training
@@ -389,20 +392,7 @@ As before, we train our model using the Fashion-MNIST dataset.
  before invoking the training procedure.
 
 ```{.python .input}
-lr, num_epochs, batch_size = 0.1, 10, 128
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab pytorch
-lr, num_epochs, batch_size = 0.1, 10, 128
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
@@ -436,4 +426,8 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/82)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/316)
 :end_tab:
