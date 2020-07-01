@@ -30,6 +30,14 @@ import tensorflow as tf
 from IPython import display
 ```
 
+```{.python .input}
+#@tab jax
+from d2l import jax as d2l
+import jax
+import jax.numpy as np
+from IPython import display
+```
+
 We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
 setting up an iterator with batch size $256$.
 
@@ -46,6 +54,12 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 ```{.python .input}
 #@tab tensorflow
+batch_size = 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+```
+
+```{.python .input}
+#@tab jax
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
@@ -98,6 +112,15 @@ W = tf.Variable(tf.random.normal(shape=(num_inputs, num_outputs), mean=0, stddev
 b = tf.Variable(tf.zeros(num_outputs, dtype=tf.float32))
 ```
 
+```{.python .input}
+#@tab jax
+num_inputs = 784
+num_outputs = 10
+key = jax.random.PRNGKey(42)
+W = jax.random.normal(key, shape=(num_inputs, num_outputs))*0.01
+b = np.zeros(num_outputs)
+```
+
 ## The Softmax
 
 Before implementing the softmax regression model,
@@ -128,6 +151,12 @@ torch.sum(X, dim=0, keepdim=True), torch.sum(X, dim=1, keepdim=True)
 #@tab tensorflow
 X = tf.constant([[1., 2., 3.], [4., 5., 6.]])
 tf.reduce_sum(X, axis=0, keepdims=True), tf.reduce_sum(X, axis=1, keepdims=True)
+```
+
+```{.python .input}
+#@tab jax
+X = np.array([[1, 2, 3], [4, 5, 6]])
+print(X.sum(axis=0, keepdims=True), '\n', X.sum(axis=1, keepdims=True))
 ```
 
 We are now ready to implement the softmax function.
@@ -174,6 +203,14 @@ def softmax(X):
     return X_exp / partition  # The broadcast mechanism is applied here
 ```
 
+```{.python .input}
+#@tab jax
+def softmax(X):
+    X_exp = np.exp(X)
+    partition = X_exp.sum(axis=1, keepdims=True)
+    return X_exp / partition  # The broadcast mechanism is applied here
+```
+
 As you can see, for any random input,
 we turn each element into a non-negative number.
 Moreover, each row sums up to 1,
@@ -204,6 +241,14 @@ X_prob = softmax(X)
 X_prob, tf.reduce_sum(X_prob, axis=1)
 ```
 
+```{.python .input}
+#@tab jax
+key = jax.random.PRNGKey(42)
+X = jax.random.normal(key, shape=(2, 5))
+X_prob = softmax(X)
+X_prob, X_prob.sum(axis=1)
+```
+
 ## The Model
 
 Now that we have defined the softmax operation,
@@ -228,6 +273,12 @@ def net(X):
 #@tab tensorflow
 def net(X):
     return softmax(tf.matmul(tf.cast(tf.reshape(X, shape=(-1, W.shape[0])), dtype=tf.float32), W) + b)
+```
+
+```{.python .input}
+#@tab jax
+def net(X):
+    return softmax(np.dot(X.reshape(-1, num_inputs), W) + b)
 ```
 
 ## The Loss Function
@@ -265,6 +316,12 @@ y_hat = tf.constant([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 tf.boolean_mask(y_hat, tf.one_hot([0, 2], depth=3))
 ```
 
+```{.python .input}
+#@tab jax
+y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
+y_hat[[0, 1], [0, 2]]
+```
+
 Now we can implement the cross-entropy loss function efficiently with just one line of code.
 
 ```{.python .input}
@@ -285,6 +342,12 @@ def cross_entropy(y_hat, y):
         y = tf.one_hot(y, depth=y_hat.shape[-1])
         y = tf.cast(tf.reshape(y, shape=[-1, y_hat.shape[-1]]), dtype=tf.int32)
         return -tf.math.log(tf.boolean_mask(y_hat, y))
+```
+
+```{.python .input}
+#@tab jax
+def cross_entropy(y_hat, y):#@save
+    return - np.log(y_hat[range(len(y_hat)), y])
 ```
 
 ## Classification Accuracy
@@ -344,6 +407,16 @@ def accuracy(y_hat, y):  #@save
         return tf.cast(tf.cast(y_hat, dtype=tf.int32) == y, dtype=tf.float32).numpy().sum()
 ```
 
+```{.python .input}
+#@tab jax 
+def accuracy(y_hat, y):  #@save
+    if y_hat.shape[1] > 1:
+        return float((y_hat.argmax(axis=1).astype('float32') == y.astype(
+            'float32')).sum())
+    else:
+        return float((y_hat.astype('int32') == y.astype('int32')).sum())
+```
+
 We will continue to use the variables `y_hat` and `y`
 defined in the `pick` function,
 as the predicted probability distribution and label, respectively.
@@ -369,6 +442,12 @@ accuracy(y_hat, y) / len(y)
 ```{.python .input}
 #@tab tensorflow
 y = tf.constant([0, 2])
+accuracy(y_hat, y) / len(y)
+```
+
+```{.python .input}
+#@tab jax 
+y = np.array([0, 2])
 accuracy(y_hat, y) / len(y)
 ```
 
@@ -400,6 +479,15 @@ def evaluate_accuracy(net, data_iter):  #@save
         y = tf.cast(y, dtype=tf.int32)
         X = tf.cast(X, dtype=tf.int32)
         metric.add(accuracy(net(X), y), y.numpy().size)
+    return metric[0] / metric[1]
+```
+
+```{.python .input}
+#@tab jax
+def evaluate_accuracy(net, data_iter):  #@save
+    metric = Accumulator(2)  # num_corrected_examples, num_examples
+    for X, y in data_iter:
+        metric.add(accuracy(net(X), y), y.size)
     return metric[0] / metric[1]
 ```
 

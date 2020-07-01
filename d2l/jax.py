@@ -21,6 +21,8 @@ import tarfile
 import time
 import zipfile
 import requests
+from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split
 d2l = sys.modules[__name__]
 
 
@@ -193,7 +195,7 @@ def data_loader(data, targets, b_size, rng_key): #@save
         targets = jax.random.permutation(subkey, targets) # Shuffle data and targets in unison by using the same key
 
         n_samples = data.shape[0]
-        idxs = onp.random.choice(n_samples, size=batch_size, replace=False)
+        idxs = onp.random.choice(n_samples, size=b_size, replace=False)
         yield data[idxs], targets[idxs]
     
 
@@ -211,5 +213,85 @@ def load_data_fashion_mnist(batch_size, resize=None): #@save
     return (
         data_loader(mnist_train_x, mnist_train_y, batch_size, rng_key), data_loader(
         mnist_test_x, mnist_test_y, batch_size, rng_key))
+
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+def cross_entropy(y_hat, y):#@save
+    return - np.log(y_hat[range(len(y_hat)), y])
+
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+def accuracy(y_hat, y):  #@save
+    if y_hat.shape[1] > 1:
+        return float((y_hat.argmax(axis=1).astype('float32') == y.astype(
+            'float32')).sum())
+    else:
+        return float((y_hat.astype('int32') == y.astype('int32')).sum())
+
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+def evaluate_accuracy(net, data_iter):  #@save
+    metric = Accumulator(2)  # num_corrected_examples, num_examples
+    for X, y in data_iter:
+        metric.add(accuracy(net(X), y), y.size)
+    return metric[0] / metric[1]
+
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+class Accumulator:  #@save
+    """Sum a list of numbers over time."""
+    def __init__(self, n):
+        self.data = [0.0] * n
+
+    def add(self, *args):
+        self.data = [a+float(b) for a, b in zip(self.data, args)]
+
+    def reset(self):
+        self.data = [0.0] * len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx]
+
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+class Animator:  #@save
+    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
+                 ylim=None, xscale='linear', yscale='linear', fmts=None,
+                 nrows=1, ncols=1, figsize=(3.5, 2.5)):
+        """Incrementally plot multiple lines."""
+        if legend is None:
+            legend = []
+        d2l.use_svg_display()
+        self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
+        if nrows * ncols == 1:
+            self.axes = [self.axes, ]
+        # Use a lambda to capture arguments
+        self.config_axes = lambda: d2l.set_axes(
+            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+        self.X, self.Y, self.fmts = None, None, fmts
+
+    def add(self, x, y):
+        """Add multiple data points into the figure."""
+        if not hasattr(y, "__len__"):
+            y = [y]
+        n = len(y)
+        if not hasattr(x, "__len__"):
+            x = [x] * n
+        if not self.X:
+            self.X = [[] for _ in range(n)]
+        if not self.Y:
+            self.Y = [[] for _ in range(n)]
+        if not self.fmts:
+            self.fmts = ['-'] * n
+        for i, (a, b) in enumerate(zip(x, y)):
+            if a is not None and b is not None:
+                self.X[i].append(a)
+                self.Y[i].append(b)
+        self.axes[0].cla()
+        for x, y, fmt in zip(self.X, self.Y, self.fmts):
+            self.axes[0].plot(x, y, fmt)
+        self.config_axes()
+        display.display(self.fig)
+        display.clear_output(wait=True)
 
 

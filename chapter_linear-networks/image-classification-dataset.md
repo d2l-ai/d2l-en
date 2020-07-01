@@ -248,7 +248,7 @@ def data_loader(data, targets, b_size, rng_key): #@save
         targets = jax.random.permutation(subkey, targets) # Shuffle data and targets in unison by using the same key
 
         n_samples = data.shape[0]
-        idxs = onp.random.choice(n_samples, size=batch_size, replace=False)
+        idxs = onp.random.choice(n_samples, size=b_size, replace=False)
         yield data[idxs], targets[idxs]
     
 train_iter = data_loader(mnist_train_x, mnist_train_y, batch_size, key)
