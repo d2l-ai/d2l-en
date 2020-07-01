@@ -44,7 +44,7 @@ import random
 
 To keep things simple, we will construct an artificial dataset
 according to a linear model with additive noise.
-Out task will be to recover this model's parameters
+Our task will be to recover this model's parameters
 using the finite set of examples contained in our dataset.
 We will keep the data low-dimensional so we can visualize it easily.
 In the following code snippet, we generate a dataset
