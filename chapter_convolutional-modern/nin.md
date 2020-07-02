@@ -208,7 +208,7 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 ## Exercises
 
-1. Tune the hyper-parameters to improve the classification accuracy.
+1. Tune the hyperparameters to improve the classification accuracy.
 1. Why are there two $1\times 1$ convolutional layers in the NiN block? Remove one of them, and then observe and analyze the experimental phenomena.
 1. Calculate the resource usage for NiN
     * What is the number of parameters?

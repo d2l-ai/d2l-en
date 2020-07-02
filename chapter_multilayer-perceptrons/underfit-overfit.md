@@ -1,4 +1,4 @@
-# Model Selection, Underfitting and Overfitting
+# Model Selection, Underfitting, and Overfitting
 :label:`sec_model_selection`
 
 As machine learning scientists,
@@ -50,7 +50,7 @@ The phenomena of fitting our training data
 more closely than we fit the underlying distribution is called overfitting, and the techniques used to combat overfitting are called regularization.
 In the previous sections, you might have observed
 this effect while experimenting with the Fashion-MNIST dataset.
-If you altered the model structure or the hyper-parameters during the experiment, you might have noticed that with enough nodes, layers, and training epochs, the model can eventually reach perfect accuracy on the training set, even as the accuracy on test data deteriorates.
+If you altered the model structure or the hyperparameters during the experiment, you might have noticed that with enough nodes, layers, and training epochs, the model can eventually reach perfect accuracy on the training set, even as the accuracy on test data deteriorates.
 
 
 ## Training Error and Generalization Error
@@ -245,7 +245,7 @@ we will typically employ a validation set.
 ### Validation Dataset
 
 In principle we should not touch our test set
-until after we have chosen all our hyper-parameters.
+until after we have chosen all our hyperparameters.
 Were we to use the test data in the model selection process,
 there is a risk that we might overfit the test data.
 Then we would be in serious trouble.

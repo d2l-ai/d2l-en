@@ -42,7 +42,7 @@ npx.set_np()
 ```
 
 ## Implemenation of DeepFM
-The implementation of DeepFM is similar to that of FM. We keep the FM part unchanged and use an MLP block with `relu` as the activation function. Dropout is also used to regularize the model. The number of neurons of the MLP can be adjusted with the `mlp_dims` hyper-parameter.
+The implementation of DeepFM is similar to that of FM. We keep the FM part unchanged and use an MLP block with `relu` as the activation function. Dropout is also used to regularize the model. The number of neurons of the MLP can be adjusted with the `mlp_dims` hyperparameter.
 
 ```{.python .input  n=2}
 class DeepFM(nn.Block):
@@ -73,7 +73,7 @@ class DeepFM(nn.Block):
 ```
 
 ## Training and Evaluating the Model
-The data loading process is the same as that of FM. We set the MLP component of DeepFM to a three-layered dense network with the a pyramid structure (30-20-10). All other hyper-parameters remain the same as FM.
+The data loading process is the same as that of FM. We set the MLP component of DeepFM to a three-layered dense network with the a pyramid structure (30-20-10). All other hyperparameters remain the same as FM.
 
 ```{.python .input  n=4}
 batch_size = 2048

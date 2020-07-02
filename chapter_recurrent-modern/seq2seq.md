@@ -117,7 +117,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         return out, state
 ```
 
-We create a decoder with the same hyper-parameters as the encoder. As we can see, the output shape is changed to (batch size, the sequence length, vocabulary size).
+We create a decoder with the same hyperparameters as the encoder. As we can see, the output shape is changed to (batch size, the sequence length, vocabulary size).
 
 ```{.python .input  n=6}
 decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8,
@@ -202,7 +202,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
           f'tokens/sec on {str(ctx)}')
 ```
 
-Next, we create a model instance and set hyper-parameters. Then, we can train the model.
+Next, we create a model instance and set hyperparameters. Then, we can train the model.
 
 ```{.python .input  n=15}
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0

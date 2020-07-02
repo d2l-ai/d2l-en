@@ -174,7 +174,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
           f'{metric[2] / timer.stop():.1f} examples/sec')
 ```
 
-Now we specify the hyper-parameters to fit the Gaussian distribution.
+Now we specify the hyperparameters to fit the Gaussian distribution.
 
 ```{.python .input  n=10}
 lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20
