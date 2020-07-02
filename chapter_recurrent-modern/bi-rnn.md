@@ -114,7 +114,7 @@ In practice bidirectional layers are used very sparingly and only for a narrow s
 If we were to ignore all advice regarding the fact that bidirectional LSTMs use past and future data and simply apply it to language models, we will get estimates with acceptable perplexity. Nonetheless, the ability of the model to predict future symbols is severely compromised as the example below illustrates. Despite reasonable perplexity, it only generates gibberish even after many iterations. We include the code below as a cautionary example against using them in the wrong context.
 
 ```{.python .input}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import npx
 from mxnet.gluon import rnn
 npx.set_np()
@@ -149,6 +149,6 @@ classification in :numref:`sec_sentiment_rnn`.
 1. Implement a sequence classification algorithm using bidirectional RNNs. Hint: use the RNN to embed each word and then aggregate (average) all embedded outputs before sending the output into an MLP for classification. For instance, if we have $(\mathbf{o}_1, \mathbf{o}_2, \mathbf{o}_3)$, we compute $\bar{\mathbf{o}} = \frac{1}{3} \sum_i \mathbf{o}_i$ first and then use the latter for sentiment classification.
 
 
-## [Discussions](https://discuss.mxnet.io/t/2370)
-
-![](../img/qr_bi-rnn.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/339)
+:end_tab:

@@ -1,7 +1,7 @@
 # Image Classification (CIFAR-10) on Kaggle
 :label:`sec_kaggle_cifar10`
 
-So far, we have been using Gluon's `data` package to directly obtain image datasets in the `ndarray` format. In practice, however, image datasets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to the `ndarray` format step by step.
+So far, we have been using Gluon's `data` package to directly obtain image datasets in the tensor format. In practice, however, image datasets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to the tensor format step by step.
 
 We performed an experiment on the CIFAR-10 dataset in :numref:`sec_image_augmentation`.
 This is an important data
@@ -22,7 +22,7 @@ First, import the packages or modules required for the competition.
 
 ```{.python .input  n=14}
 import collections
-import d2l
+from d2l import mxnet as d2l
 import math
 from mxnet import autograd, gluon, init, npx
 from mxnet.gluon import nn
@@ -53,12 +53,12 @@ To make it easier to get started, we provide a small-scale sample of the dataset
 To use the full dataset of the Kaggle competition, you need to set the following `demo` variable to `False`.
 
 ```{.python .input  n=15}
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL + 'kaggle_cifar10_tiny.zip',
                                 '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')
 
-# If you use the full dataset downloaded for the Kaggle competition, set the
-# demo variable to False
+# If you use the full dataset downloaded for the Kaggle competition, set
+# `demo` to False
 demo = True
 
 if demo:
@@ -72,7 +72,7 @@ else:
 We need to organize datasets to facilitate model training and testing. Let us first read the labels from the csv file. The following function returns a dictionary that maps the filename without extension to its label.
 
 ```{.python .input  n=16}
-# Saved in the d2l package for later use
+#@save
 def read_csv_labels(fname):
     """Read fname to return a name to label dictionary."""
     with open(fname, 'r') as f:
@@ -89,13 +89,13 @@ print('# classes:', len(set(labels.values())))
 Next, we define the `reorg_train_valid` function to segment the validation set from the original training set. The argument `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set. In particular, let $n$ be the number of images of the class with the least examples, and $r$ be the ratio, then we will use $\max(\lfloor nr\rfloor,1)$ images for each class as the validation set.  Let us use `valid_ratio=0.1` as an example. Since the original training set has $50,000$ images, there will be $45,000$ images used for training and stored in the path "`train_valid_test/train`" when tuning hyper-parameters, while the other $5,000$ images will be stored as validation set in the path "`train_valid_test/valid`". After organizing the data, images of the same class will be placed under the same folder so that we can read them later.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 def copyfile(filename, target_dir):
     """Copy a file into a target directory."""
     d2l.mkdir_if_not_exist(target_dir)
     shutil.copy(filename, target_dir)
 
-# Saved in the d2l package for later use    
+#@save    
 def reorg_train_valid(data_dir, labels, valid_ratio):
     # The number of examples of the class with the least examples in the
     # training dataset
@@ -124,7 +124,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
 The `reorg_test` function below is used to organize the testing set to facilitate the reading during prediction.
 
 ```{.python .input  n=3}
-# Saved in the d2l package for later use    
+#@save    
 def reorg_test(data_dir):
     for test_file in os.listdir(os.path.join(data_dir, 'test')):
         copyfile(os.path.join(data_dir, 'test', test_file),
@@ -291,15 +291,15 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
             train_l_sum += float(l)
             train_acc_sum += float((y_hat.argmax(axis=1) == y).sum())
             n += y.size
-        time_s = "time %.2f sec" % (time.time() - start)
+        time_s = f'time {time.time() - start:.2f} sec'
         if valid_iter is not None:
             valid_acc = d2l.evaluate_accuracy_gpu(net, valid_iter)
-            epoch_s = ("epoch %d, loss %f, train acc %f, valid acc %f, "
-                       % (epoch + 1, train_l_sum / n, train_acc_sum / n,
-                          valid_acc))
+            epoch_s = (f'epoch {epoch + 1}, loss {train_l_sum / n:f}, '
+                       f'train acc {train_acc_sum / n:f}, '
+                       f'valid acc {valid_acc:f}, ')
         else:
-            epoch_s = ("epoch %d, loss %f, train acc %f, " %
-                       (epoch + 1, train_l_sum / n, train_acc_sum / n))
+            epoch_s = (f'epoch {epoch + 1}, loss {train_l_sum / n:f}, '
+                       f'train acc {train_acc_sum / n:f}, ')
         print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
 ```
 
@@ -351,6 +351,6 @@ for submitting results is similar to method in :numref:`sec_kaggle_house`.
 1. What accuracy can you achieve when not using image augmentation?
 1. Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
-## [Discussions](https://discuss.mxnet.io/t/2450)
-
-![](../img/qr_kaggle-gluon-cifar10.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/379)
+:end_tab:

@@ -21,7 +21,7 @@ then fine-tune it
 for natural language inference on the SNLI dataset.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 import json
 import multiprocessing
 from mxnet import autograd, gluon, init, np, npx
@@ -248,6 +248,6 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
 1. How to truncate a pair of sequences according to their ratio of length? Compare this pair truncation method and the one used in the `SNLIBERTDataset` class. What are their pros and cons?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5870)
-
-![](../img/qr_natural-language-inference-bert.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/397)
+:end_tab:

@@ -91,11 +91,22 @@ We can check this in code using the built-in `numpy.linalg.eig` routine.
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from IPython import display
 import numpy as np
 
 np.linalg.eig(np.array([[2, 1], [2, 3]]))
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+from IPython import display
+import torch
+
+torch.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64),
+          eigenvectors=True)
 ```
 
 Note that `numpy` normalizes the eigenvectors to be of length one,
@@ -267,6 +278,17 @@ v, _ = np.linalg.eig(A)
 v
 ```
 
+```{.python .input}
+#@tab pytorch
+A = torch.tensor([[1.0, 0.1, 0.1, 0.1],
+              [0.1, 3.0, 0.2, 0.3],
+              [0.1, 0.2, 5.0, 0.5],
+              [0.1, 0.3, 0.5, 9.0]])
+
+v, _ = torch.eig(A)
+v
+```
+
 In this way, eigenvalues can be approximated, 
 and the approximations will be fairly accurate 
 in the case that the diagonal is 
@@ -310,6 +332,15 @@ A = np.random.randn(k, k)
 A
 ```
 
+```{.python .input}
+#@tab pytorch
+torch.manual_seed(42)
+
+k = 5
+A = torch.randn(k, k, dtype=torch.float64)
+A
+```
+
 ### Behavior on Random Data
 For simplicity in our toy model, 
 we will assume that the data vector we feed in $\mathbf{v}_{in}$ 
@@ -336,7 +367,7 @@ Let us see what happens when we repeatedly multiply our matrix $\mathbf{A}$
 against a random input vector, and keep track of the norm.
 
 ```{.python .input}
-# Calculate the sequence of norms after repeatedly applying A
+# Calculate the sequence of norms after repeatedly applying `A`
 v_in = np.random.randn(k, 1)
 
 norm_list = [np.linalg.norm(v_in)]
@@ -345,6 +376,19 @@ for i in range(1, 100):
     norm_list.append(np.linalg.norm(v_in))
 
 d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
+```
+
+```{.python .input}
+#@tab pytorch
+# Calculate the sequence of norms after repeatedly applying `A`
+v_in = torch.randn(k, 1, dtype=torch.float64)
+
+norm_list = [torch.norm(v_in).item()]
+for i in range(1, 100):
+    v_in = A @ v_in
+    norm_list.append(torch.norm(v_in).item())
+
+d2l.plot(torch.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
 The norm is growing uncontrollably! 
@@ -357,6 +401,16 @@ for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i - 1])
 
 d2l.plot(np.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
+```
+
+```{.python .input}
+#@tab pytorch
+# Compute the scaling factor of the norms
+norm_ratio_list = []
+for i in range(1, 100):
+    norm_ratio_list.append(norm_list[i]/norm_list[i - 1])
+
+d2l.plot(torch.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
 If we look at the last portion of the above computation, 
@@ -382,7 +436,16 @@ we can measure that stretching factor. Let us also sort them.
 eigs = np.linalg.eigvals(A).tolist()
 norm_eigs = [np.absolute(x) for x in eigs]
 norm_eigs.sort()
-"Norms of eigenvalues: {}".format(norm_eigs)
+print(f'norms of eigenvalues: {norm_eigs}')
+```
+
+```{.python .input}
+#@tab pytorch
+# Compute the eigenvalues
+eigs = torch.eig(A)[0][:,0].tolist()
+norm_eigs = [torch.abs(torch.tensor(x)) for x in eigs]
+norm_eigs.sort()
+print(f'norms of eigenvalues: {norm_eigs}')
 ```
 
 ### An Observation
@@ -429,7 +492,7 @@ so that the largest eigenvalue is instead now just one.
 Let us see what happens in this case.
 
 ```{.python .input}
-# Rescale the matrix A
+# Rescale the matrix `A`
 A /= norm_eigs[-1]
 
 # Do the same experiment again
@@ -443,7 +506,23 @@ for i in range(1, 100):
 d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
-We can also plot the ration between consecutive norms as before and see that indeed it stabilizes.
+```{.python .input}
+#@tab pytorch
+# Rescale the matrix `A`
+A /= norm_eigs[-1]
+
+# Do the same experiment again
+v_in = torch.randn(k, 1, dtype=torch.float64)
+
+norm_list = [torch.norm(v_in).item()]
+for i in range(1, 100):
+    v_in = A @ v_in
+    norm_list.append(torch.norm(v_in).item())
+
+d2l.plot(torch.arange(0, 100), norm_list, 'Iteration', 'Value')
+```
+
+We can also plot the ratio between consecutive norms as before and see that indeed it stabilizes.
 
 ```{.python .input}
 # Also plot the ratio
@@ -452,6 +531,16 @@ for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i-1])
 
 d2l.plot(np.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
+```
+
+```{.python .input}
+#@tab pytorch
+# Also plot the ratio
+norm_ratio_list = []
+for i in range(1, 100):
+    norm_ratio_list.append(norm_list[i]/norm_list[i-1])
+
+d2l.plot(torch.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
 ## Conclusions
@@ -501,6 +590,6 @@ $$
 \end{bmatrix}.
 $$
 
-## [Discussions](https://discuss.mxnet.io/t/5148)
-
-![](../img/qr_eigendecomposition.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/411)
+:end_tab:

@@ -17,7 +17,7 @@ First, import the packages or modules required for the competition.
 
 ```{.python .input}
 import collections
-import d2l
+from d2l import mxnet as d2l
 import math
 from mxnet import autograd, gluon, init, npx
 from mxnet.gluon import nn
@@ -45,7 +45,7 @@ You may have noticed that the above structure is quite similar to that of the CI
 Similarly, to make it easier to get started, we provide a small-scale sample of the dataset mentioned above, "train_valid_test_tiny.zip". If you are going to use the full dataset for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
 
 ```{.python .input  n=1}
-# Saved in the d2l package for later use 
+#@save 
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 
@@ -210,14 +210,13 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
             trainer.step(batch_size)
             train_l_sum += float(l)
             n += y.size
-        time_s = "time %.2f sec" % (time.time() - start)
+        time_s = f'time {time.time() - start:.2f} sec'
         if valid_iter is not None:
             valid_loss = evaluate_loss(valid_iter, net, ctx)
-            epoch_s = ("epoch %d, train loss %f, valid loss %f, "
-                       % (epoch + 1, train_l_sum / n, valid_loss))
+            epoch_s = (f'epoch {epoch + 1}, train loss {train_l_sum / n:f}, '
+                       f'valid loss {valid_loss:f}, ')
         else:
-            epoch_s = ("epoch %d, train loss %f, "
-                       % (epoch + 1, train_l_sum / n))
+            epoch_s = f'epoch {epoch + 1}, train loss {train_l_sum / n:f}, '
         print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
 ```
 
@@ -274,6 +273,6 @@ method for submitting results is similar to method in
 1. Do you get better results if you use a deeper pre-trained model?
 1. Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
-## [Discussions](https://discuss.mxnet.io/t/2451)
-
-![](../img/qr_kaggle-gluon-dog.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/380)
+:end_tab:

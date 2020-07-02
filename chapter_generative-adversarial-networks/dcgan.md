@@ -8,7 +8,7 @@ In this section, we will demonstrate how you can use GANs to generate photoreali
 ```{.python .input  n=1}
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
-import d2l
+from d2l import mxnet as d2l
 
 npx.set_np()
 ```
@@ -18,7 +18,7 @@ npx.set_np()
 The dataset we will use is a collection of Pokemon sprites obtained from [pokemondb](https://pokemondb.net/sprites). First download, extract and load this dataset.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
@@ -100,13 +100,13 @@ The generator consists of four basic blocks that increase input's both width and
 ```{.python .input  n=8}
 n_G = 64
 net_G = nn.Sequential()
-net_G.add(G_block(n_G*8, strides=1, padding=0),  # output: (64*8, 4, 4)
-          G_block(n_G*4),  # output: (64*4, 8, 8)
-          G_block(n_G*2),  # output: (64*2, 16, 16)
-          G_block(n_G),   # output: (64, 32, 32)
+net_G.add(G_block(n_G*8, strides=1, padding=0),  # Output: (64 * 8, 4, 4)
+          G_block(n_G*4),  # Output: (64 * 4, 8, 8)
+          G_block(n_G*2),  # Output: (64 * 2, 16, 16)
+          G_block(n_G),   # Output: (64, 32, 32)
           nn.Conv2DTranspose(
               3, kernel_size=4, strides=2, padding=1, use_bias=False,
-              activation='tanh'))  # output: (3, 64, 64)
+              activation='tanh'))  # Output: (3, 64, 64)
 ```
 
 Generate a 100 dimensional latent variable to verify the generator's output shape.
@@ -170,11 +170,11 @@ The discriminator is a mirror of the generator.
 ```{.python .input  n=13}
 n_D = 64
 net_D = nn.Sequential()
-net_D.add(D_block(n_D),   # output: (64, 32, 32)
-          D_block(n_D*2),  # output: (64*2, 16, 16)
-          D_block(n_D*4),  # output: (64*4, 8, 8)
-          D_block(n_D*8),  # output: (64*8, 4, 4)
-          nn.Conv2D(1, kernel_size=4, use_bias=False))  # output: (1, 1, 1)
+net_D.add(D_block(n_D),   # Output: (64, 32, 32)
+          D_block(n_D*2),  # Output: (64 * 2, 16, 16)
+          D_block(n_D*4),  # Output: (64 * 4, 8, 8)
+          D_block(n_D*8),  # Output: (64 * 8, 4, 4)
+          nn.Conv2D(1, kernel_size=4, use_bias=False))  # Output: (1, 1, 1)
 ```
 
 It uses a convolution layer with output channel $1$ as the last layer to obtain a single prediction value.
@@ -225,14 +225,16 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         # Show the losses
         loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]
         animator.add(epoch, (loss_D, loss_G))
-    print('loss_D %.3f, loss_G %.3f, %d examples/sec on %s' % (
-        loss_D, loss_G, metric[2]/timer.stop(), ctx))
+    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '
+          f'{metric[2] / timer.stop():.1f} examples/sec on {str(ctx)}')
 ```
 
-Now let us train the model.
+We train the model with a small number of epochs just for demonstration.
+For better performance,
+the variable `num_epochs` can be set to a larger number.
 
 ```{.python .input  n=21}
-latent_dim, lr, num_epochs = 100, 0.005, 40
+latent_dim, lr, num_epochs = 100, 0.005, 20
 train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ```
 
@@ -245,10 +247,10 @@ train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 
 ## Exercises
 
-* What will happen if we use standard ReLU activation rather than leaky ReLU?
-* Apply DCGAN on Fashion-MNIST and see which category works well and which does not.
+1. What will happen if we use standard ReLU activation rather than leaky ReLU?
+1. Apply DCGAN on Fashion-MNIST and see which category works well and which does not.
 
 
-## [Discussions](https://discuss.mxnet.io/t/dcgan-discussion/4354)
-
-![](../img/qr_dcgan.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/409)
+:end_tab:

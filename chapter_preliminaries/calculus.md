@@ -2,7 +2,7 @@
 :label:`sec_calculus`
 
 Finding the area of a polygon had remained mysterious
-until at least $2,500$ years ago, when ancient Greeks divided a polygon into triangles and summed their areas.
+until at least 2,500 years ago, when ancient Greeks divided a polygon into triangles and summed their areas.
 To find the area of curved shapes, such as a circle,
 ancient Greeks inscribed polygons in such shapes.
 As shown in :numref:`fig_circle_area`,
@@ -13,7 +13,7 @@ the circle. This process is also known as the *method of exhaustion*.
 :label:`fig_circle_area`
 
 In fact, the method of exhaustion is where *integral calculus* (will be described in :numref:`sec_integral_calculus`) originates from.
-More than $2,000$ years later, 
+More than 2,000 years later,
 the other branch of calculus, *differential calculus*,
 was invented.
 Among the most critical applications of differential calculus,
@@ -21,20 +21,20 @@ optimization problems consider how to do something *the best*.
 As discussed in :numref:`subsec_norms_and_objectives`,
 such problems are ubiquitous in deep learning.
 
-In deep learning, we *train* models, updating them successively 
-so that they get better and better as they see more and more data. 
-Usually, getting better means minimizing a *loss function*, 
+In deep learning, we *train* models, updating them successively
+so that they get better and better as they see more and more data.
+Usually, getting better means minimizing a *loss function*,
 a score that answers the question "how *bad* is our model?"
 This question is more subtle than it appears.
-Ultimately, what we really care about 
-is producing a model that performs well on data 
+Ultimately, what we really care about
+is producing a model that performs well on data
 that we have never seen before.
 But we can only fit the model to data that we can actually see.
 Thus we can decompose the task of fitting models into two key concerns:
 i) *optimization*: the process of fitting our models to observed data;
 ii) *generalization*: the mathematical principles and practitioners' wisdom
 that guide as to how to produce models whose validity extends
-beyond the exact set of data points used to train them.
+beyond the exact set of data instances used to train them.
 
 To help you understand
 optimization problems and methods in later chapters,
@@ -46,9 +46,9 @@ that is commonly used in deep learning.
 
 We begin by addressing the calculation of derivatives,
 a crucial step in nearly all deep learning optimization algorithms.
-In deep learning, we typically choose loss functions 
+In deep learning, we typically choose loss functions
 that are differentiable with respect to our model's parameters.
-Put simply, this means that for each parameter, 
+Put simply, this means that for each parameter,
 we can determine how rapidly the loss would increase or decrease,
 were we to *increase* or *decrease* that parameter
 by an infinitesimally small amount.
@@ -77,7 +77,7 @@ Define $u = f(x) = 3x^2-4x$.
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from IPython import display
 from mxnet import np, npx
 npx.set_np()
@@ -86,19 +86,42 @@ def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
-By setting $x=1$ and letting $h$ approach $0$, 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+from IPython import display
+import numpy as np
+
+def f(x):
+    return 3 * x ** 2 - 4 * x
+```
+
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from IPython import display
+import numpy as np
+
+def f(x):
+    return 3 * x ** 2 - 4 * x
+```
+
+By setting $x=1$ and letting $h$ approach $0$,
 the numerical result of $\frac{f(x+h) - f(x)}{h}$
 in :eqref:`eq_derivative` approaches $2$.
 Though this experiment is not a mathematical proof,
 we will see later that the derivative $u'$ is $2$ when $x=1$.
 
 ```{.python .input}
+#@tab all
 def numerical_lim(f, x, h):
     return (f(x + h) - f(x)) / h
 
 h = 0.1
 for i in range(5):
-    print('h=%.5f, numerical limit=%.5f' % (h, numerical_lim(f, 1, h)))
+    print(f'h={h:.5f}, numerical limit={numerical_lim(f, 1, h):.5f}')
     h *= 0.1
 ```
 
@@ -107,7 +130,7 @@ Given $y = f(x)$, where $x$ and $y$ are the independent variable and the depende
 
 $$f'(x) = y' = \frac{dy}{dx} = \frac{df}{dx} = \frac{d}{dx} f(x) = Df(x) = D_x f(x),$$
 
-where symbols $\frac{d}{dx}$ and $D$ are *differentiation operators* that indicate operation of *differentiation*. 
+where symbols $\frac{d}{dx}$ and $D$ are *differentiation operators* that indicate operation of *differentiation*.
 We can use the following rules to differentiate common functions:
 
 * $DC = 0$ ($C$ is a constant),
@@ -134,7 +157,7 @@ and the *quotient rule*
 
 $$\frac{d}{dx} \left[\frac{f(x)}{g(x)}\right] = \frac{g(x) \frac{d}{dx} [f(x)] - f(x) \frac{d}{dx} [g(x)]}{[g(x)]^2}.$$
 
-Now we can apply a few of the above rules to find 
+Now we can apply a few of the above rules to find
 $u' = f'(x) = 3 \frac{d}{dx} x^2-4\frac{d}{dx}x = 6x-4$.
 Thus, by setting $x = 1$, we have $u' = 2$:
 this is supported by our earlier experiment in this section
@@ -151,8 +174,8 @@ In the following,
 the `use_svg_display` function specifies the `matplotlib` package to output the svg figures for sharper images.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def use_svg_display():
+#@tab all
+def use_svg_display():  #@save
     """Use the svg format to display a plot in Jupyter."""
     display.set_matplotlib_formats('svg')
 ```
@@ -160,8 +183,8 @@ def use_svg_display():
 We define the `set_figsize` function to specify the figure sizes. Note that here we directly use `d2l.plt` since the import statement `from matplotlib import pyplot as plt` has been marked for being saved in the `d2l` package in the preface.
 
 ```{.python .input}
-# Saved in the d2l package for later use
-def set_figsize(figsize=(3.5, 2.5)):
+#@tab all
+def set_figsize(figsize=(3.5, 2.5)):  #@save
     """Set the figure size for matplotlib."""
     use_svg_display()
     d2l.plt.rcParams['figure.figsize'] = figsize
@@ -170,7 +193,8 @@ def set_figsize(figsize=(3.5, 2.5)):
 The following `set_axes` function sets properties of axes of figures produced by `matplotlib`.
 
 ```{.python .input}
-# Saved in the d2l package for later use
+#@tab all
+#@save
 def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
     axes.set_xlabel(xlabel)
@@ -184,24 +208,25 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     axes.grid()
 ```
 
-With these $3$ functions for figure configurations,
+With these three functions for figure configurations,
 we define the `plot` function
 to plot multiple curves succinctly
 since we will need to visualize many curves throughout the book.
 
 ```{.python .input}
-# Saved in the d2l package for later use
+#@tab all
+#@save
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
-    """Plot data points."""
+    """Plot data instances."""
     if legend is None:
         legend = []
 
-    d2l.set_figsize(figsize)
+    set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
 
-    # Return True if X (ndarray or list) has 1 axis
+    # Return True if `X` (tensor or list) has 1 axis
     def has_one_axis(X):
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))
@@ -226,6 +251,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
 Now we can plot the function $u = f(x)$ and its tangent line $y = 2x - 3$ at $x=1$, where the coefficient $2$ is the slope of the tangent line.
 
 ```{.python .input}
+#@tab all
 x = np.arange(0, 3, 0.1)
 plot(x, [f(x), 2 * x - 3], 'x', 'f(x)', legend=['f(x)', 'Tangent line (x=1)'])
 ```
@@ -264,7 +290,7 @@ Let $\mathbf{x}$ be an $n$-dimensional vector, the following rules are often use
 * For all  $\mathbf{A} \in \mathbb{R}^{n \times n}$, $\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A} \mathbf{x}  = (\mathbf{A} + \mathbf{A}^\top)\mathbf{x}$,
 * $\nabla_{\mathbf{x}} \|\mathbf{x} \|^2 = \nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{x} = 2\mathbf{x}$.
 
-Similarly, for any matrix $\mathbf{X}$, we have $\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}$. As we will see later, gradients are useful for designing optimization algorithms in deep learning. 
+Similarly, for any matrix $\mathbf{X}$, we have $\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}$. As we will see later, gradients are useful for designing optimization algorithms in deep learning.
 
 
 ## Chain Rule
@@ -310,7 +336,14 @@ for any $i = 1, 2, \ldots, n$.
 1. What is the gradient of the function $f(\mathbf{x}) = \|\mathbf{x}\|_2$?
 1. Can you write out the chain rule for the case where $u = f(x, y, z)$ and $x = x(a, b)$, $y = y(a, b)$, and $z = z(a, b)$?
 
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/32)
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/5008)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/33)
+:end_tab:
 
-![](../img/qr_calculus.svg)
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/197)
+:end_tab:

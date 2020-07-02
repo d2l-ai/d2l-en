@@ -41,7 +41,7 @@ To illustrate this let us plot a few functions and check which ones satisfy the 
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mpl_toolkits import mplot3d
 from mxnet import np, npx
 npx.set_np()
@@ -106,7 +106,7 @@ This contradicts the assumption that $f(x)$ is a local minimum. For instance, th
 def f(x):
     return (x-1)**2 * (x+1)
 
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 d2l.plot([x, segment], [f(x), f(segment)], 'x', 'f(x)')
 ```
 
@@ -178,7 +178,7 @@ def f(x):
 x = np.arange(-2, 2, 0.01)
 axb, ab = np.array([-1.5, -0.5, 1]), np.array([-1.5, 1])
 
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
 d2l.annotate('a', (-1.5, f(-1.5)), (-1.5, 1.5))
 d2l.annotate('b', (1, f(1)), (1, 1.5))
@@ -259,6 +259,6 @@ In the context of deep learning the main purpose of convex functions is to motiv
 
 
 
-## [Discussions](https://discuss.mxnet.io/t/convexity-discussion/4368)
-
-![](../img/qr_convexity.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/350)
+:end_tab:

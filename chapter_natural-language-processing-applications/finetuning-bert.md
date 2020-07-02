@@ -192,6 +192,4 @@ and output the span with the highest score.
 1. Can we leverage BERT in machine translation?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5882)
-
-![](../img/qr_finetuning-bert.svg)
+[Discussions](https://discuss.d2l.ai/t/396)

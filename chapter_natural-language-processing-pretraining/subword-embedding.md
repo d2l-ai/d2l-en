@@ -81,9 +81,9 @@ def get_max_freq_pair(token_freqs):
     for token, freq in token_freqs.items():
         symbols = token.split()
         for i in range(len(symbols) - 1):
-            # Key of pairs is a tuple of two consecutive symbols
+            # Key of `pairs` is a tuple of two consecutive symbols
             pairs[symbols[i], symbols[i + 1]] += freq
-    return max(pairs, key=pairs.get)  # Key of pairs with the max value
+    return max(pairs, key=pairs.get)  # Key of `pairs` with the max value
 ```
 
 As a greedy approach based on frequency of consecutive symbols,
@@ -107,7 +107,7 @@ num_merges = 10
 for i in range(num_merges):
     max_freq_pair = get_max_freq_pair(token_freqs)
     token_freqs = merge_symbols(max_freq_pair, token_freqs, symbols)
-    print("merge #%d:" % (i + 1), max_freq_pair)
+    print(f'merge #{i + 1}:', max_freq_pair)
 ```
 
 After 10 iterations of byte pair encoding, we can see that list `symbols` now contains 10 more symbols that are iteratively merged from other symbols.
@@ -174,6 +174,6 @@ print(segment_BPE(tokens, symbols))
 
 
 
-## [Discussions](https://discuss.mxnet.io/t/2388)
-
-![](../img/qr_subword-embedding.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/386)
+:end_tab:

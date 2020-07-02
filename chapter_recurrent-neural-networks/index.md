@@ -19,7 +19,7 @@ text-preprocessing
 language-models-and-dataset
 rnn
 rnn-scratch
-rnn-gluon
+rnn-concise
 bptt
 ```
 

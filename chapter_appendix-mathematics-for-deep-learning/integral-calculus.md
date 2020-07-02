@@ -10,7 +10,7 @@ Suppose that we have a function $f(x)$.  For simplicity, let us assume that $f(x
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from IPython import display
 from mpl_toolkits import mplot3d
 from mxnet import np, npx
@@ -25,11 +25,39 @@ d2l.plt.fill_between(x.tolist(), f.tolist())
 d2l.plt.show()
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+from IPython import display
+from mpl_toolkits import mplot3d
+import torch
+
+x = torch.arange(-2, 2, 0.01)
+f = torch.exp(-x**2)
+
+d2l.set_figsize()
+d2l.plt.plot(x, f, color='black')
+d2l.plt.fill_between(x.tolist(), f.tolist())
+d2l.plt.show()
+```
+
 In most cases, this area will be infinite or undefined (consider the area under $f(x) = x^{2}$), so people will often talk about the area between a pair of ends, say $a$ and $b$.
 
 ```{.python .input}
 x = np.arange(-2, 2, 0.01)
 f = np.exp(-x**2)
+
+d2l.set_figsize()
+d2l.plt.plot(x, f, color='black')
+d2l.plt.fill_between(x.tolist()[50:250], f.tolist()[50:250])
+d2l.plt.show()
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.arange(-2, 2, 0.01)
+f = torch.exp(-x**2)
 
 d2l.set_figsize()
 d2l.plt.plot(x, f, color='black')
@@ -68,7 +96,28 @@ d2l.plt.plot(x, f, color='black')
 d2l.plt.ylim([0, 1])
 d2l.plt.show()
 
-"Approximation: {}, Truth: {}".format(approx, true)
+f'approximation: {approx}, truth: {true}'
+```
+
+```{.python .input}
+#@tab pytorch
+epsilon = 0.05
+a = 0
+b = 2
+
+x = torch.arange(a, b, epsilon)
+f = x / (1 + x**2)
+
+approx = torch.sum(epsilon*f)
+true = torch.log(torch.tensor([2.])) / 2
+
+d2l.set_figsize()
+d2l.plt.bar(x.numpy(), f.numpy(), width=epsilon, align='edge')
+d2l.plt.plot(x, f, color='black')
+d2l.plt.ylim([0, 1])
+d2l.plt.show()
+
+f'approximation: {approx}, truth: {true}'
 ```
 
 The issue is that while it can be done numerically, we can do this approach analytically for only the simplest functions like
@@ -266,6 +315,26 @@ ax.set_zlim(0, 1)
 ax.dist = 12
 ```
 
+```{.python .input}
+#@tab pytorch
+# Construct grid and compute function
+x, y = torch.meshgrid(torch.linspace(-2, 2, 101), torch.linspace(-2, 2, 101))
+z = torch.exp(- x**2 - y**2)
+
+# Plot function
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_wireframe(x.numpy(), y.numpy(), z.numpy())
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y')
+d2l.plt.xticks([-2, -1, 0, 1, 2])
+d2l.plt.yticks([-2, -1, 0, 1, 2])
+d2l.set_figsize()
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+ax.set_zlim(0, 1)
+ax.dist = 12
+```
+
 We write this as 
 
 $$
@@ -395,6 +464,6 @@ We will meet this integral again when we study continuous random variables in :n
 3. What is $\int_{[0,1]^2} xy \;dx\;dy$?
 4. Use the change of variables formula to compute $\int_0^2\int_0^1xy(x^2-y^2)/(x^2+y^2)^3\;dy\;dx$ and $\int_0^1\int_0^2f(x, y) = xy(x^2-y^2)/(x^2+y^2)^3\;dx\;dy$ to see they are different.
 
-## [Discussions](https://discuss.mxnet.io/t/5151)
-
-![](../img/qr_integral-calculus.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/414)
+:end_tab:

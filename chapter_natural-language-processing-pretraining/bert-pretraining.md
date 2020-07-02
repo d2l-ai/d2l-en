@@ -5,7 +5,7 @@ With the BERT model implemented in :numref:`sec_bert`
 and the pretraining examples generated from the WikiText-2 dataset in :numref:`sec_bert-dataset`, we will pretrain BERT on the WikiText-2 dataset in this section.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 
 npx.set_np()
@@ -49,7 +49,7 @@ is just the sum of both the masked language modeling loss
 and the next sentence prediction loss.
 
 ```{.python .input  n=16}
-# Saved in the d2l package for later use
+#@save
 def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
                          segments_X_shards, valid_lens_x_shards,
                          pred_positions_X_shards, mlm_weights_X_shards,
@@ -90,7 +90,7 @@ the input `num_steps` of the following function
 specifies the number of iteration steps for training.
 
 ```{.python .input  n=17}
-# Saved in the d2l package for later use
+#@save
 def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
                num_steps):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
@@ -98,8 +98,8 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
     step, timer = 0, d2l.Timer()
     animator = d2l.Animator(xlabel='step', ylabel='loss',
                             xlim=[1, num_steps], legend=['mlm', 'nsp'])
-    # Masked language modeling loss, next sentence prediction loss,
-    # no. of sentence pairs, count
+    # Sum of masked language modeling losses, sum of next sentence prediction
+    # losses, no. of sentence pairs, count
     metric = d2l.Accumulator(4)
     num_steps_reached = False
     while step < num_steps and not num_steps_reached:
@@ -129,9 +129,9 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
                 num_steps_reached = True
                 break
 
-    print('MLM loss %.3f, NSP loss %.3f'
-          % (metric[0] / metric[3], metric[1] / metric[3]))
-    print('%.1f sentence pairs/sec on %s' % (metric[2] / timer.sum(), ctx))
+    print(f'MLM loss {metric[0] / metric[3]:.3f}, '
+          f'NSP loss {metric[1] / metric[3]:.3f}')
+    print(f'{metric[2] / timer.sum():.1f} sentence pairs/sec on {str(ctx)}')
 ```
 
 We can plot both the masked language modeling loss and the next sentence prediction loss
@@ -210,6 +210,6 @@ for downstream natural language processing applications.
 1. Set the maximum length of a BERT input sequence to be 512 (same as the original BERT model). Use the configurations of the original BERT model such as $\text{BERT}_{\text{LARGE}}$. Do you encounter any error when running this section? Why?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5869)
-
-![](../img/qr_bert-pretraining.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/390)
+:end_tab:

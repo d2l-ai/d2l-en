@@ -11,6 +11,6 @@ async-computation
 auto-parallelism
 hardware
 multiple-gpus
-multiple-gpus-gluon
+multiple-gpus-concise
 parameterserver
 ```

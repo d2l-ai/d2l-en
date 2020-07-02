@@ -20,7 +20,7 @@ semantic-segmentation-and-dataset
 transposed-conv
 fcn
 neural-style
-kaggle-gluon-cifar10
-kaggle-gluon-dog
+kaggle-cifar10
+kaggle-dog
 ```
 

@@ -28,7 +28,7 @@ First, import the packages and modules required for the experiment.  Gluon's `mo
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
 import os
@@ -43,7 +43,7 @@ The hot dog dataset we use was taken from online images and contains $1,400$ pos
 We first download the compressed dataset and get two folders `hotdog/train` and `hotdog/test`. Both folders have `hotdog` and `not-hotdog` category subfolders, each of which has corresponding image files.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip', 
                          'fba480ffa8aa7e0febbb511d181409f899b9baa5')
 
@@ -175,6 +175,6 @@ hotdog_w = np.split(weight.data(), 1000, axis=0)[713]
 hotdog_w.shape
 ```
 
-## [Discussions](https://discuss.mxnet.io/t/2443)
-
-![](../img/qr_fine-tuning.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/368)
+:end_tab:

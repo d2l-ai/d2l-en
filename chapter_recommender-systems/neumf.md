@@ -37,7 +37,7 @@ The following figure illustrates the model architecture of NeuMF.
 ![Illustration of the NeuMF model](../img/rec-neumf.svg)
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
@@ -115,7 +115,7 @@ where $\mathcal{I}$ is the item set. $S_u$ is the candidate items of user $u$. N
 The following function calculates the hit counts and AUC for each user.
 
 ```{.python .input  n=4}
-# Saved in the d2l package for later use
+#@save
 def hit_and_auc(rankedlist, test_matrix, k):
     hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k])
               if val in set(test_matrix)]
@@ -129,7 +129,7 @@ def hit_and_auc(rankedlist, test_matrix, k):
 Then, the overall Hit rate and AUC are calculated as follows.
 
 ```{.python .input  n=5}
-# Saved in the d2l package for later use
+#@save
 def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
                      ctx):
     ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
@@ -143,10 +143,9 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
         if seq is not None:
             x.append(seq[user_ids, :])
         x.extend([np.array(item_ids)])
-        test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x),
-                                               shuffle=False, 
-                                               last_batch="keep", 
-                                               batch_size=1024) 
+        test_data_iter = gluon.data.DataLoader(
+            gluon.data.ArrayDataset(*x), shuffle=False, last_batch="keep",
+            batch_size=1024) 
         for index, values in enumerate(test_data_iter):
             x = [gluon.utils.split_and_load(v, ctx, even_split=False) 
                  for v in values]
@@ -166,7 +165,7 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 The training function is defined below. We train the model in the pairwise manner.
 
 ```{.python .input  n=6}
-# Saved in the d2l package for later use
+#@save
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                   num_users, num_items, num_epochs, ctx_list, evaluator, 
                   candidates, eval_step=1):
@@ -195,10 +194,10 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                                           candidates, num_users, num_items,
                                           ctx_list)
                 animator.add(epoch + 1, (hit_rate, auc))
-    print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
-          % (metric[0] / metric[1], hit_rate, auc))
-    print('%.1f examples/sec on %s'
-          % (metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'train loss {metric[0] / metric[1]:.3f}, '
+          f'test hit rate {float(hit_rate):.3f}, test AUC {float(auc):.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(ctx_list)}')
 ```
 
 Now, we can load the MovieLens 100k dataset and train the model. Since there are only ratings in the MovieLens dataset, with some losses of accuracy, we binarize these ratings to zeros and ones. If a user rated an item, we consider the implicit feedback as one, otherwise as zero. The action of rating an item can be treated as a form of providing implicit feedback.  Here, we split the dataset in the `seq-aware` mode where users' latest interacted items are left out for test.
@@ -212,12 +211,9 @@ users_train, items_train, ratings_train, candidates = d2l.load_data_ml100k(
     train_data, num_users, num_items, feedback="implicit")
 users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
     test_data, num_users, num_items, feedback="implicit")
-num_workers = 0 if sys.platform.startswith("win") else 4
-train_iter = gluon.data.DataLoader(PRDataset(users_train, items_train,
-                                             candidates, num_items ), 
-                                   batch_size, True,
-                                   last_batch="rollover",
-                                   num_workers=num_workers)
+train_iter = gluon.data.DataLoader(
+    PRDataset(users_train, items_train, candidates, num_items ), batch_size,
+    True, last_batch="rollover", num_workers=d2l.get_dataloader_workers())
 ```
 
 We then create and initialize the model. we use a three-layer MLP with constant hidden size 10.
@@ -251,6 +247,6 @@ train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users,
 * Try different optimizers, learning rate and weight decay rate.
 * Try to use hinge loss defined in the last section to optimize this model.
 
-## [Discussions](https://discuss.mxnet.io/t/5164)
-
-![](../img/qr_neumf.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/403)
+:end_tab:

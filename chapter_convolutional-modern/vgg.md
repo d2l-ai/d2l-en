@@ -30,12 +30,12 @@ The basic building block of classic convolutional networks
 is a sequence of the following layers:
 (i) a convolutional layer
 (with padding to maintain the resolution),
-(ii) a nonlinearity such as a ReLU, (iii) a pooling layer such 
-as a max pooling layer. 
+(ii) a nonlinearity such as a ReLU, (iii) a pooling layer such
+as a max pooling layer.
 One VGG block consists of a sequence of convolutional layers,
 followed by a max pooling layer for spatial downsampling.
 In the original VGG paper :cite:`Simonyan.Zisserman.2014`,
-the authors 
+the authors
 employed convolutions with $3\times3$ kernels
 and $2 \times 2$ max pooling with stride of $2$
 (halving the resolution after each block).
@@ -45,8 +45,8 @@ The function takes two arguments
 corresponding to the number of convolutional layers `num_convs`
 and the number of output channels `num_channels`.
 
-```{.python .input  n=1}
-import d2l
+```{.python .input}
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -57,6 +57,37 @@ def vgg_block(num_convs, num_channels):
         blk.add(nn.Conv2D(num_channels, kernel_size=3,
                           padding=1, activation='relu'))
     blk.add(nn.MaxPool2D(pool_size=2, strides=2))
+    return blk
+```
+
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+
+def vgg_block(num_convs, in_channels, out_channels):
+    layers=[]
+    for _ in range(num_convs):
+        layers.append(nn.Conv2d(in_channels, out_channels,
+                                kernel_size=3, padding=1))
+        layers.append(nn.ReLU())
+        in_channels = out_channels
+    layers.append(nn.MaxPool2d(kernel_size=2,stride=2))
+    return nn.Sequential(*layers)
+```
+
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+def vgg_block(num_convs, num_channels):
+    blk = tf.keras.models.Sequential()
+    for _ in range(num_convs):
+        blk.add(tf.keras.layers.Conv2D(num_channels,kernel_size=3,
+                                    padding='same',activation='relu'))
+    blk.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
     return blk
 ```
 
@@ -88,13 +119,14 @@ until that number reaches $512$.
 Since this network uses $8$ convolutional layers
 and $3$ fully-connected layers, it is often called VGG-11.
 
-```{.python .input  n=2}
+```{.python .input}
+#@tab all
 conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))
 ```
 
 The following code implements VGG-11. This is a simple matter of executing a for loop over `conv_arch`.
 
-```{.python .input  n=3}
+```{.python .input}
 def vgg(conv_arch):
     net = nn.Sequential()
     # The convolutional layer part
@@ -109,15 +141,70 @@ def vgg(conv_arch):
 net = vgg(conv_arch)
 ```
 
+```{.python .input}
+#@tab pytorch
+def vgg(conv_arch):
+    # The convulational layer part
+    conv_blks=[]
+    in_channels=1
+    for (num_convs, out_channels) in conv_arch:
+        conv_blks.append(vgg_block(num_convs, in_channels, out_channels))
+        in_channels = out_channels
+
+    return nn.Sequential(
+        *conv_blks, nn.Flatten(),
+        nn.Linear(out_channels*7*7, 4096), nn.ReLU(), nn.Dropout(0.5),
+        nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
+        nn.Linear(4096, 10))
+
+net = vgg(conv_arch)
+```
+
+```{.python .input}
+#@tab tensorflow
+def vgg(conv_arch):
+    net = tf.keras.models.Sequential()
+    # The convulational layer part
+    for (num_convs, num_channels) in conv_arch:
+        net.add(vgg_block(num_convs, num_channels))
+    # The fully connected layer part
+    net.add(tf.keras.models.Sequential([
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(4096, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(4096, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(10)]))
+    return net
+
+net = vgg(conv_arch)
+```
+
 Next, we will construct a single-channel data example
 with a height and width of 224 to observe the output shape of each layer.
 
-```{.python .input  n=4}
+```{.python .input}
 net.initialize()
 X = np.random.uniform(size=(1, 1, 224, 224))
 for blk in net:
     X = blk(X)
     print(blk.name, 'output shape:\t', X.shape)
+```
+
+```{.python .input}
+#@tab pytorch
+X = torch.randn(size=(1, 1, 224, 224))
+for blk in net:
+    X = blk(X)
+    print(blk.__class__.__name__,'output shape:\t',X.shape)
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.random.uniform((1, 224, 224, 1))
+for blk in net.layers:
+    X = blk(X)
+    print(blk.__class__.__name__,'output shape:\t', X.shape)
 ```
 
 As you can see, we halve height and width at each block,
@@ -131,16 +218,28 @@ Since VGG-11 is more computationally-heavy than AlexNet
 we construct a network with a smaller number of channels.
 This is more than sufficient for training on Fashion-MNIST.
 
-```{.python .input  n=5}
+```{.python .input}
+#@tab mxnet, pytorch
 ratio = 4
 small_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]
 net = vgg(small_conv_arch)
+```
+
+```{.python .input}
+#@tab tensorflow
+ratio = 4
+small_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]
+# Recall that this has to be a function that will be passed to `d2l.train_ch6()`
+# so that model building/compiling need to be within `strategy.scope()`
+# in order to utilize the CPU/GPU devices that we have.
+net = lambda: vgg(small_conv_arch)
 ```
 
 Apart from using a slightly larger learning rate,
 the model training process is similar to that of AlexNet in the last section.
 
 ```{.python .input}
+#@tab all
 lr, num_epochs, batch_size = 0.05, 10, 128,
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
@@ -159,6 +258,14 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 1. Try to change the height and width of the images in Fashion-MNIST from 224 to 96. What influence does this have on the experiments?
 1. Refer to Table 1 in :cite:`Simonyan.Zisserman.2014` to construct other common models, such as VGG-16 or VGG-19.
 
-## [Discussions](https://discuss.mxnet.io/t/2355)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/77)
+:end_tab:
 
-![](../img/qr_vgg.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/78)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/277)
+:end_tab:

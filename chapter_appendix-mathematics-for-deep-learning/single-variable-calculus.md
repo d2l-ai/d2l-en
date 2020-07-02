@@ -16,7 +16,7 @@ Let us take $x$ and try to understand what happens when we change it by a small 
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from IPython import display
 from mxnet import np, npx
 npx.set_np()
@@ -24,6 +24,20 @@ npx.set_np()
 # Plot a function in a normal range
 x_big = np.arange(0.01, 3.01, 0.01)
 ys = np.sin(x_big**x_big)
+d2l.plot(x_big, ys, 'x', 'f(x)')
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+from IPython import display
+import torch
+torch.pi = torch.acos(torch.zeros(1)).item() * 2  # Define pi in torch
+
+# Plot a function in a normal range
+x_big = torch.arange(0.01, 3.01, 0.01)
+ys = torch.sin(x_big**x_big)
 d2l.plot(x_big, ys, 'x', 'f(x)')
 ```
 
@@ -36,12 +50,28 @@ ys = np.sin(x_med**x_med)
 d2l.plot(x_med, ys, 'x', 'f(x)')
 ```
 
+```{.python .input}
+#@tab pytorch
+# Plot a the same function in a tiny range
+x_med = torch.arange(1.75, 2.25, 0.001)
+ys = torch.sin(x_med**x_med)
+d2l.plot(x_med, ys, 'x', 'f(x)')
+```
+
 Taking this to an extreme, if we zoom into a tiny segment, the behavior becomes far simpler: it is just a straight line.
 
 ```{.python .input}
 # Plot a the same function in a tiny range
 x_small = np.arange(2.0, 2.01, 0.0001)
 ys = np.sin(x_small**x_small)
+d2l.plot(x_small, ys, 'x', 'f(x)')
+```
+
+```{.python .input}
+#@tab pytorch
+# Plot a the same function in a tiny range
+x_small = torch.arange(2.0, 2.01, 0.0001)
+ys = torch.sin(x_small**x_small)
 d2l.plot(x_small, ys, 'x', 'f(x)')
 ```
 
@@ -56,14 +86,14 @@ $$
 This is already enough to start to play around with in code.  For instance, suppose that we know that $L(x) = x^{2} + 1701(x-4)^3$, then we can see how large this value is at the point $x = 4$ as follows.
 
 ```{.python .input}
+#@tab all
 # Define our function
 def L(x):
     return x**2 + 1701*(x-4)**3
 
 # Print the difference divided by epsilon for several epsilon
 for epsilon in [0.1, 0.001, 0.0001, 0.00001]:
-    print("epsilon = {:.5f} -> {:.5f}".format(
-        epsilon, (L(4+epsilon) - L(4)) / epsilon))
+    print(f'epsilon = {epsilon:.5f} -> {(L(4+epsilon) - L(4)) / epsilon:.5f}')
 ```
 
 Now, if we are observant, we will notice that the output of this number is suspiciously close to $8$.  Indeed, if we decrease $\epsilon$, we will see value becomes progressively closer to $8$.  Thus we may conclude, correctly, that the value we seek (the degree a change in the input changes the output) should be $8$ at the point $x=4$.  The way that a mathematician encodes this fact is
@@ -207,9 +237,23 @@ approximates the value of $f$ by a line which passes through the point $(x, f(x)
 xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
 
-# Compute some linear approximations. Use d(sin(x))/dx = cos(x)
+# Compute some linear approximations. Use d(sin(x)) / dx = cos(x)
 for x0 in [-1.5, 0, 2]:
     plots.append(np.sin(x0) + (xs - x0) * np.cos(x0))
+
+d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
+```
+
+```{.python .input}
+#@tab pytorch
+# Compute sin
+xs = torch.arange(-torch.pi, torch.pi, 0.01)
+plots = [torch.sin(xs)]
+
+# Compute some linear approximations. Use d(sin(x))/dx = cos(x)
+for x0 in [-1.5, 0.0, 2.0]:
+    plots.append(torch.sin(torch.tensor(x0)) + (xs - x0) * 
+                 torch.cos(torch.tensor(x0)))
 
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
@@ -261,10 +305,25 @@ If we have some original function $f(x)$ in mind, we may compute the first two d
 xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
 
-# Compute some quadratic approximations. Use d(sin(x))/dx = cos(x)
+# Compute some quadratic approximations. Use d(sin(x)) / dx = cos(x)
 for x0 in [-1.5, 0, 2]:
     plots.append(np.sin(x0) + (xs - x0) * np.cos(x0) -
                               (xs - x0)**2 * np.sin(x0) / 2)
+
+d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
+```
+
+```{.python .input}
+#@tab pytorch
+# Compute sin
+xs = torch.arange(-torch.pi, torch.pi, 0.01)
+plots = [torch.sin(xs)]
+
+# Compute some quadratic approximations. Use d(sin(x)) / dx = cos(x)
+for x0 in [-1.5, 0.0, 2.0]:
+    plots.append(torch.sin(torch.tensor(x0)) + (xs - x0) * 
+                 torch.cos(torch.tensor(x0)) - (xs - x0)**2 *
+                 torch.sin(torch.tensor(x0)) / 2)
 
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
@@ -337,6 +396,22 @@ d2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend=[
     "Degree 5 Taylor Series"])
 ```
 
+```{.python .input}
+#@tab pytorch
+# Compute the exponential function
+xs = torch.arange(0, 3, 0.01)
+ys = torch.exp(xs)
+
+# Compute a few Taylor series approximations
+P1 = 1 + xs
+P2 = 1 + xs + xs**2 / 2
+P5 = 1 + xs + xs**2 / 2 + xs**3 / 6 + xs**4 / 24 + xs**5 / 120
+
+d2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend=[
+    "Exponential", "Degree 1 Taylor Series", "Degree 2 Taylor Series",
+    "Degree 5 Taylor Series"])
+```
+
 Taylor series have two primary applications:
 
 1. *Theoretical applications*: Often when we try to understand a too complex function, using Taylor series enables we turn it into a polynomial that we can work with directly.
@@ -360,6 +435,6 @@ Taylor series have two primary applications:
 4. Where is the minimum of $f(x) = x\log(x)$ for $x\ge0$ (where we assume that $f$ takes the limiting value of $0$ at $f(0)$)?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5149)
-
-![](../img/qr_single-variable-calculus.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/412)
+:end_tab:

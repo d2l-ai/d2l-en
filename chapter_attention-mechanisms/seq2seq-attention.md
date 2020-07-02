@@ -22,7 +22,7 @@ To illustrate the overall architecture of seq2seq with attention model, the laye
 :label:`fig_s2s_attention_details`
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn, nn
 npx.set_np()
@@ -54,7 +54,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
 
     def init_state(self, enc_outputs, enc_valid_len, *args):
         outputs, hidden_state = enc_outputs
-        # Transpose outputs to (batch_size, seq_len, num_hiddens)
+        # Transpose `outputs` to (`batch_size`, `seq_len`, `num_hiddens`)
         return (outputs.swapaxes(0, 1), hidden_state, enc_valid_len)
 
     def forward(self, X, state):
@@ -62,14 +62,14 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
         X = self.embedding(X).swapaxes(0, 1)
         outputs = []
         for x in X:
-            # query shape: (batch_size, 1, num_hiddens)
+            # `query` shape: (`batch_size`, 1, `num_hiddens`)
             query = np.expand_dims(hidden_state[0][-1], axis=1)
-            # context has same shape as query
+            # `context` has same shape as `query`
             context = self.attention_cell(
                 query, enc_outputs, enc_outputs, enc_valid_len)
             # Concatenate on the feature dimension
             x = np.concatenate((context, np.expand_dims(x, axis=1)), axis=-1)
-            # Reshape x to (1, batch_size, embed_size + num_hiddens)
+            # Reshape `x` to (1, `batch_size`, `embed_size` + `num_hiddens`)
             out, hidden_state = self.rnn(x.swapaxes(0, 1), hidden_state)
             outputs.append(out)
         outputs = self.dense(np.concatenate(outputs, axis=0))
@@ -137,6 +137,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 1. Can you think of any use cases where `Seq2SeqAttentionDecoder` will outperform `Seq2seqDecoder`?
 
 
-## [Discussions](https://discuss.mxnet.io/t/seq2seq-attention/4345)
-
-![](../img/qr_seq2seq-attention.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/347)
+:end_tab:

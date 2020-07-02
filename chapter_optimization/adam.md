@@ -42,7 +42,7 @@ Implementing Adam from scratch is not very daunting. For convenience we store th
 
 ```{.python .input  n=2}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 
@@ -73,7 +73,7 @@ d2l.train_ch11(adam, init_adam_states(feature_dim),
 A more concise implementation is straightforward since `adam` is one of the algorithms provided as part of the Gluon `trainer` optimization library. Hence we only need to pass configuration parameters for an implementation in Gluon.
 
 ```{.python .input  n=11}
-d2l.train_gluon_ch11('adam', {'learning_rate': 0.01}, data_iter)
+d2l.train_concise_ch11('adam', {'learning_rate': 0.01}, data_iter)
 ```
 
 ## Yogi
@@ -120,6 +120,6 @@ d2l.train_ch11(yogi, init_adam_states(feature_dim),
 1. Try to construct a case for which Adam diverges and Yogi converges?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2378)
-
-![](../img/qr_adam.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/358)
+:end_tab:

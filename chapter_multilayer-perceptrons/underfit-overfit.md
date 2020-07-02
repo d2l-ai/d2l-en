@@ -1,13 +1,13 @@
 # Model Selection, Underfitting and Overfitting
 :label:`sec_model_selection`
 
-As machine learning scientists, 
+As machine learning scientists,
 our goal is to discover *patterns*.
-But how can we be sure that we have 
+But how can we be sure that we have
 truly discovered a *general* pattern
-and not simply memorized our data. 
-For example, imagine that we wanted to hunt 
-for patterns among genetic markers 
+and not simply memorized our data.
+For example, imagine that we wanted to hunt
+for patterns among genetic markers
 linking patients to their dementia status,
 (let the labels be drawn from the set
 {*dementia*, *mild cognitive impairment*, *healthy*}).
@@ -15,16 +15,16 @@ Because each person's genes identify them uniquely
 (ignoring identical siblings),
 it is possible to memorize the entire dataset.
 
-We do not want our model to say 
+We do not want our model to say
 *"That's Bob! I remember him! He has dementia!*
-The reason why is simple. 
+The reason why is simple.
 When we deploy the model in the future,
 we will encounter patients
 that the model has never seen before.
 Our predictions will only be useful
 if our model has truly discovered a *general* pattern.
 
-To recapitulate more formally, 
+To recapitulate more formally,
 our goal is to discover patterns
 that capture regularities in the underlying population
 from which our training set was drawn.
@@ -36,9 +36,9 @@ the fundamental problem of machine learning.
 
 The danger is that when we train models,
 we access just a small sample of data.
-The largest public image datasets contain 
+The largest public image datasets contain
 roughly one million images.
-More often, we must learn from only thousands 
+More often, we must learn from only thousands
 or tens of thousands of data points.
 In a large hospital system, we might access
 hundreds of thousands of medical records.
@@ -194,7 +194,7 @@ and one subject to *early stopping* as less complex.
 
 It can be difficult to compare the complexity among members
 of substantially different model classes
-(say a decision tree versus a neural network).
+(say a decision tree vs. a neural network).
 For now, a simple rule of thumb is quite useful:
 A model that can readily explain arbitrary facts
 is what statisticians view as complex,
@@ -260,11 +260,6 @@ for model selection either because
 we cannot estimate the generalization error
 on the very data that we use to train the model.
 
-The common practice to address this problem
-is to split our data three ways,
-incorporating a *validation set*
-in addition to the training and test sets.
-
 
 In practical applications, the picture gets muddier.
 While ideally we would only touch the test data once,
@@ -272,6 +267,11 @@ to assess the very best model or to compare
 a small number of models to each other,
 real-world test data is seldom discarded after just one use.
 We can seldom afford a new test set for each round of experiments.
+
+The common practice to address this problem
+is to split our data three ways,
+incorporating a *validation set*
+in addition to the training and test sets.
 
 The result is a murky practice where the boundaries
 between validation and test data are worryingly ambiguous.
@@ -394,11 +394,29 @@ We can now explore these concepts interactively
 by fitting polynomials to data.
 To get started we will import our usual packages.
 
-```{.python .input  n=1}
-import d2l
+```{.python .input}
+from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
+import math
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+import numpy as np
+import math
+```
+
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import numpy as np
+import math
 ```
 
 ### Generating the Dataset
@@ -412,17 +430,18 @@ The noise term $\epsilon$ obeys a normal distribution
 with a mean of 0 and a standard deviation of 0.1.
 We will synthesize 100 samples each for the training set and test set.
 
-```{.python .input  n=2}
+```{.python .input}
+#@tab all
 maxdegree = 20  # Maximum degree of the polynomial
 n_train, n_test = 100, 100  # Training and test dataset sizes
 true_w = np.zeros(maxdegree)  # Allocate lots of empty space
 true_w[0:4] = np.array([5, 1.2, -3.4, 5.6])
 
 features = np.random.normal(size=(n_train + n_test, 1))
-features = np.random.shuffle(features)
+np.random.shuffle(features)
 poly_features = np.power(features, np.arange(maxdegree).reshape(1, -1))
-poly_features = poly_features / (
-    npx.gamma(np.arange(maxdegree) + 1).reshape(1, -1))
+for i in range(maxdegree):
+    poly_features[:,i] /= math.gamma(i+1)
 labels = np.dot(poly_features, true_w)
 labels += np.random.normal(scale=0.1, size=labels.shape)
 ```
@@ -432,24 +451,38 @@ very large values of gradients, losses, etc.
 This is why the monomials stored in `poly_features`
 are rescaled from $x^i$ to $\frac{1}{i!} x^i$.
 It allows us to avoid very large values for large exponents $i$.
-Factorials are implemented in Gluon using the Gamma function,
+We use the Gamma function from the math module,
 where $n! = \Gamma(n+1)$.
 
 Take a look at the first 2 samples from the generated dataset.
 The value 1 is technically a feature,
 namely the constant feature corresponding to the bias.
 
-```{.python .input  n=3}
+```{.python .input}
+#@tab all
 features[:2], poly_features[:2], labels[:2]
+```
+
+```{.python .input}
+#@tab pytorch
+# Convert from NumPy to PyTorch tensors
+true_w, features, poly_features, labels = [torch.from_numpy(x).type(
+    torch.float32) for x in [true_w, features, poly_features, labels]]
+```
+
+```{.python .input}
+#@tab tensorflow
+# Convert from NumPy to TensorFlow tensors
+true_w, features, poly_features, labels = [tf.constant(x, dtype=tf.float32)
+    for x in [true_w, features, poly_features, labels]]
 ```
 
 ### Training and Testing Model
 
 Let us first implement a function to evaluate the loss on a given data.
 
-```{.python .input  n=4}
-# Saved in the d2l package for later use
-def evaluate_loss(net, data_iter, loss):
+```{.python .input}
+def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
@@ -457,9 +490,31 @@ def evaluate_loss(net, data_iter, loss):
     return metric[0] / metric[1]
 ```
 
+```{.python .input}
+#@tab pytorch
+def evaluate_loss(net, data_iter, loss):  #@save
+    """Evaluate the loss of a model on the given dataset."""
+    metric = d2l.Accumulator(2)  # sum_loss, num_examples
+    for X, y in data_iter:
+        l = loss(net(X), y)
+        metric.add(l.sum(), l.numel())
+    return metric[0] / metric[1]
+```
+
+```{.python .input}
+#@tab tensorflow
+def evaluate_loss(net, data_iter, loss):  #@save
+    """Evaluate the loss of a model on the given dataset."""
+    metric = d2l.Accumulator(2)  # sum_loss, num_examples
+    for X, y in data_iter:
+        l = loss(net(X), y)
+        metric.add(tf.reduce_sum(l), tf.size(l).numpy())
+    return metric[0] / metric[1]
+```
+
 Now define the training function.
 
-```{.python .input  n=5}
+```{.python .input}
 def train(train_features, test_features, train_labels, test_labels,
           num_epochs=1000):
     loss = gluon.loss.L2Loss()
@@ -485,6 +540,58 @@ def train(train_features, test_features, train_labels, test_labels,
     print('weight:', net[0].weight.data().asnumpy())
 ```
 
+```{.python .input}
+#@tab pytorch
+def train(train_features, test_features, train_labels, test_labels,
+          num_epochs=1000):
+    loss = nn.MSELoss()
+    input_shape = train_features.shape[-1]
+    # Switch off the bias since we already catered for it in the polynomial
+    # features
+    net = nn.Sequential(nn.Linear(input_shape, 1, bias=False))
+    batch_size = min(10, train_labels.shape[0])
+    train_iter = d2l.load_array((train_features, train_labels.reshape(-1,1)),
+                                batch_size)
+    test_iter = d2l.load_array((test_features, test_labels.reshape(-1,1)),
+                               batch_size, is_train=False)
+    trainer = torch.optim.SGD(net.parameters(), lr=0.01)
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], ylim=[1e-3, 1e2],
+                            legend=['train', 'test'])
+    for epoch in range(1, num_epochs+1):
+        d2l.train_epoch_ch3(net, train_iter, loss, trainer)
+        if epoch % 50 == 0:
+            animator.add(epoch, (evaluate_loss(net, train_iter, loss),
+                                 evaluate_loss(net, test_iter, loss)))
+    print('weight:', net[0].weight.data.numpy())
+```
+
+```{.python .input}
+#@tab tensorflow
+def train(train_features, test_features, train_labels, test_labels,
+          num_epochs=1000):
+    loss = tf.losses.MeanSquaredError()
+    input_shape = train_features.shape[-1]
+    # Switch off the bias since we already catered for it in the polynomial
+    # features
+    net = tf.keras.Sequential()
+    net.add(tf.keras.layers.Dense(1, use_bias=False))
+    batch_size = min(10, train_labels.shape[0])
+    train_iter = d2l.load_array((train_features, train_labels), batch_size)
+    test_iter = d2l.load_array((test_features, test_labels), batch_size,
+                               is_train=False)
+    trainer = tf.keras.optimizers.SGD(learning_rate=.01)
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], ylim=[1e-3, 1e2],
+                            legend=['train', 'test'])
+    for epoch in range(1, num_epochs+1):
+        d2l.train_epoch_ch3(net, train_iter, loss, trainer)
+        if epoch % 50 == 0:
+            animator.add(epoch, (evaluate_loss(net, train_iter, loss),
+                                 evaluate_loss(net, test_iter, loss)))
+    print('weight:', net.get_weights()[0].T)
+```
+
 ### Third-Order Polynomial Function Fitting (Normal)
 
 We will begin by first using a third-order polynomial function
@@ -494,7 +601,8 @@ when using the testing dataset is low.
 The trained model parameters are also close
 to the true values $w = [5, 1.2, -3.4, 5.6]$.
 
-```{.python .input  n=6}
+```{.python .input}
+#@tab all
 # Pick the first four dimensions, i.e., 1, x, x^2, x^3 from the polynomial
 # features
 train(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
@@ -513,7 +621,8 @@ When used to fit non-linear patterns
 (like the third-order polynomial function here)
 linear models are liable to underfit.
 
-```{.python .input  n=7}
+```{.python .input}
+#@tab all
 # Pick the first four dimensions, i.e., 1, x from the polynomial features
 train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
       labels[:n_train], labels[n_train:])
@@ -536,7 +645,8 @@ Try out different model complexities (`n_degree`)
 and training set sizes (`n_subset`)
 to gain some intuition of what is happening.
 
-```{.python .input  n=8}
+```{.python .input}
+#@tab all
 n_subset = 100  # Subset of data to train on
 n_degree = 20  # Degree of polynomials
 train(poly_features[1:n_subset, 0:n_degree],
@@ -569,6 +679,14 @@ such as weight decay and dropout.
 1. What degree of polynomial do you need to reduce the training error to 0?
 1. Can you ever expect to see 0 generalization error?
 
-## [Discussions](https://discuss.mxnet.io/t/2341)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/96)
+:end_tab:
 
-![](../img/qr_underfit-overfit.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/97)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/234)
+:end_tab:

@@ -5,7 +5,7 @@ Let us begin by considering learning problems with features that occur infrequen
 
 ## Sparse Features and Learning Rates
 
-Imagine that we are training a language model. To get good accuracy we typically want to decrease the learning rate as we keep on training, usually at a rate of $\mathcal{O}(t^{-\frac{1}{2}})$ or slower. Now consider a model training on sparse features, i.e., features that occur only infrequently. This is common for natural language, e.g., it is a lot less likely that we will see the word *preconditioning* than *learning*. However, it is also common in other areas such as   computational advertising and personalized collaborative filtering. After all, there are many things that are of interest only for a small number of people.
+Imagine that we are training a language model. To get good accuracy we typically want to decrease the learning rate as we keep on training, usually at a rate of $\mathcal{O}(t^{-\frac{1}{2}})$ or slower. Now consider a model training on sparse features, i.e., features that occur only infrequently. This is common for natural language, e.g., it is a lot less likely that we will see the word *preconditioning* than *learning*. However, it is also common in other areas such as computational advertising and personalized collaborative filtering. After all, there are many things that are of interest only for a small number of people.
 
 Parameters associated with infrequent features only receive meaningful updates whenever these features occur. Given a decreasing learning rate we might end up in a situation where the parameters for common features converge rather quickly to their optimal values, whereas for infrequent features we are still short of observing them sufficiently frequently before their optimal values can be determined. In other words, the learning rate either decreases too quickly for frequent features or too slowly for infrequent ones.
 
@@ -66,7 +66,7 @@ We are going to implement Adagrad using the same learning rate previously, i.e.,
 
 ```{.python .input  n=6}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 import math
 from mxnet import np, npx
 npx.set_np()
@@ -125,7 +125,7 @@ d2l.train_ch11(adagrad, init_adagrad_states(feature_dim),
 Using the `Trainer` instance of the algorithm `adagrad`, we can invoke the Adagrad algorithm in Gluon.
 
 ```{.python .input  n=5}
-d2l.train_gluon_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
+d2l.train_concise_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 ```
 
 ## Summary
@@ -147,6 +147,6 @@ d2l.train_gluon_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 1. How would you need to modify Adagrad to achieve a less aggressive decay in learning rate?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2375)
-
-![](../img/qr_adagrad.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/355)
+:end_tab:

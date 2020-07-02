@@ -5,7 +5,7 @@ In this section, we are going to introduce the basic principles of stochastic gr
 
 ```{.python .input  n=2}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 import math
 from mxnet import np, npx
 npx.set_np()
@@ -193,6 +193,6 @@ A similar reasoning shows that the probability of picking a sample exactly once 
 1. How would you change the SGD solver if some gradient (or rather some coordinate associated with it) was consistently larger than all other gradients?
 1. Assume that $f(x) = x^2 (1 + \sin x)$. How many local minima does $f$ have? Can you change $f$ in such a way that to minimize it one needs to evaluate all local minima?
 
-## [Discussions](https://discuss.mxnet.io/t/2372)
-
-![](../img/qr_sgd.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/352)
+:end_tab:

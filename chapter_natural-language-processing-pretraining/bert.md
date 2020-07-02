@@ -10,7 +10,7 @@ Let us begin by illustrating this property.
 
 ## From Context-Independent to Context-Sensitive
 
-Recall the experiments in :numref:`sec_word2vec_gluon` and :numref:`sec_synonyms`.
+Recall the experiments in :numref:`sec_word2vec_pretraining` and :numref:`sec_synonyms`.
 For instance, word2vec and GloVe both assign the same pretrained vector to the same word regardless of the context of the word (if any).
 Formally, a context-independent representation of any token $x$
 is a function $f(x)$ that only takes $x$ as its input.
@@ -111,7 +111,7 @@ When natural language processing applications are explained in :numref:`chap_nlp
 we will illustrate fine-tuning of BERT for downstream applications.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 
@@ -149,7 +149,7 @@ as the input, then returns tokens of the BERT input sequence
 and their corresponding segment IDs.
 
 ```{.python .input}
-# Saved in the d2l package for later use
+#@save
 def get_tokens_and_segments(tokens_a, tokens_b=None):
     tokens = ['<cls>'] + tokens_a + ['<sep>']
     # 0 and 1 are marking segment A and B, respectively
@@ -179,7 +179,7 @@ Different from `TransformerEncoder`, `BERTEncoder` uses
 segment embeddings and learnable positional embeddings.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
+#@save
 class BERTEncoder(nn.Block):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                  num_layers, dropout, max_len=1000, **kwargs):
@@ -197,7 +197,7 @@ class BERTEncoder(nn.Block):
 
     def forward(self, tokens, segments, valid_lens):
         # Shape of `X` remains unchanged in the following code snippet:
-        # (batch size, max sequence length, num_hiddens)
+        # (batch size, max sequence length, `num_hiddens`)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = X + self.pos_embedding.data(ctx=X.ctx)[:, :X.shape[1], :]
         for blk in self.blks:
@@ -237,7 +237,7 @@ encoded_X.shape
 
 The forward inference of `BERTEncoder` gives the BERT representation
 of each token of the input text and the inserted
-special tokens “&lt;cls&gt;” and “&lt;seq&gt;”. 
+special tokens “&lt;cls&gt;” and “&lt;seq&gt;”.
 Next, we will use these representations to compute the loss function
 for pretraining BERT.
 The pretraining is composed of the following two tasks:
@@ -272,13 +272,13 @@ This occasional noise encourages BERT to be less biased towards the masked token
 
 We implement the following `MaskLM` class to predict masked tokens
 in the masked language model task of BERT pretraining.
-The prediction uses an MLP with one hidden layer (`self.mlp`).
+The prediction uses a one-hidden-layer MLP (`self.mlp`).
 In forward inference, it takes two inputs:
 the encoded result of `BERTEncoder` and the token positions for prediction.
 The output is the prediction results at these positions.
 
 ```{.python .input  n=4}
-# Saved in the d2l package for later use
+#@save
 class MaskLM(nn.Block):
     def __init__(self, vocab_size, num_hiddens, **kwargs):
         super(MaskLM, self).__init__(**kwargs)
@@ -294,7 +294,7 @@ class MaskLM(nn.Block):
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
         # Suppose that `batch_size` = 2, `num_pred_positions` = 3, then
-        # `batch_idx` is np.array([0, 0, 0, 1, 1, 1])
+        # `batch_idx` is `np.array([0, 0, 0, 1, 1, 1])`
         batch_idx = np.repeat(batch_idx, num_pred_positions)
         masked_X = X[batch_idx, pred_positions]
         masked_X = masked_X.reshape((batch_size, num_pred_positions, -1))
@@ -341,7 +341,7 @@ When generating sentence pairs for pretraining,
 for half of the time they are indeed consecutive sentences with the label "True";
 while for the other half of the time the second sentence is randomly sampled from the corpus with the label "False".
 
-The following `NextSentencePred` class uses an MLP with one hidden layer
+The following `NextSentencePred` class uses a one-hidden-layer MLP
 to predict whether the second sentence is the next sentence of the first
 in the BERT input sequence.
 Due to self-attention in the Transformer encoder,
@@ -351,14 +351,14 @@ Hence, the output layer (`self.output`) of the MLP classifier takes `X` as the i
 where `X` is the output of the MLP hidden layer whose input is the encoded “&lt;cls&gt;” token.
 
 ```{.python .input  n=7}
-# Saved in the d2l package for later use
+#@save
 class NextSentencePred(nn.Block):
     def __init__(self, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
         self.output = nn.Dense(2)
 
     def forward(self, X):
-        # X shape: (batch size, `num_hiddens`)
+        # `X` shape: (batch size, `num_hiddens`)
         return self.output(X)
 ```
 
@@ -399,7 +399,7 @@ predictions of masked language modeling `mlm_Y_hat`,
 and next sentence predictions `nsp_Y_hat`.
 
 ```{.python .input  n=10}
-# Saved in the d2l package for later use
+#@save
 class BERTModel(nn.Block):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                  num_layers, dropout, max_len=1000):
@@ -426,7 +426,7 @@ class BERTModel(nn.Block):
 
 * Word embedding models such as word2vec and GloVe are context-independent. They assign the same pretrained vector to the same word regardless of the context of the word (if any). It is hard for them to handle well polysemy or complex semantics in natural languages.
 * For context-sensitive word representations such as ELMo and GPT, representations of words depend on their contexts.
-* ELMo encodes context bidirectionally but uses task-specific architectures (however, it is practically non-trivial to craft a specific architecture for every natural language processing task); while GPT is task-agnostic but encodes context left-to-right. 
+* ELMo encodes context bidirectionally but uses task-specific architectures (however, it is practically non-trivial to craft a specific architecture for every natural language processing task); while GPT is task-agnostic but encodes context left-to-right.
 * BERT combines the best of both worlds: it encodes context bidirectionally and requires minimal architecture changes for a wide range of natural language processing tasks.
 * The embeddings of the BERT input sequence are the sum of the token embeddings, segment embeddings, and positional embeddings.
 * Pretraining BERT is composed of two tasks: masked language modeling and next sentence prediction. The former is able to encode bidirectional context for representing words, while the later explicitly models the logical relationship between text pairs.
@@ -438,6 +438,6 @@ class BERTModel(nn.Block):
 1. All other things being equal, will a masked language model require more or fewer pretraining steps to converge than a left-to-right language model? Why?
 1. In the original implementation of BERT, the position-wise feed-forward network in `BERTEncoder` (via `d2l.EncoderBlock`) and the fully-connected layer in `MaskLM` both use the Gaussian error linear unit (GELU) :cite:`Hendrycks.Gimpel.2016` as the activation function. Research into the difference between GELU and ReLU.
 
-## [Discussions](https://discuss.mxnet.io/t/5867)
-
-![](../img/qr_bert.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/388)
+:end_tab:

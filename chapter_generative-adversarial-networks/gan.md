@@ -44,7 +44,7 @@ Many of the GANs applications are in the context of images. As a demonstration p
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -64,9 +64,9 @@ data = X.dot(A) + b
 Let us see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
 
 ```{.python .input  n=3}
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 d2l.plt.scatter(data[:100, 0].asnumpy(), data[:100, 1].asnumpy());
-print("The covariance matrix is\n%s" % np.dot(A.T, A))
+print(f'The covariance matrix is\n{np.dot(A.T, A)}')
 ```
 
 ```{.python .input  n=4}
@@ -99,7 +99,7 @@ net_D.add(nn.Dense(5, activation='tanh'),
 First we define a function to update the discriminator.
 
 ```{.python .input  n=7}
-# Saved in the d2l package for later use
+#@save
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
     batch_size = X.shape[0]
@@ -108,7 +108,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     with autograd.record():
         real_Y = net_D(X)
         fake_X = net_G(Z)
-        # Do not need to compute gradient for net_G, detach it from
+        # Do not need to compute gradient for `net_G`, detach it from
         # computing gradients.
         fake_Y = net_D(fake_X.detach())
         loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
@@ -120,15 +120,14 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 The generator is updated similarly. Here we reuse the cross-entropy loss but change the label of the fake data from $0$ to $1$.
 
 ```{.python .input  n=8}
-# Saved in the d2l package for later use
-def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
+def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
     """Update generator."""
     batch_size = Z.shape[0]
     ones = np.ones((batch_size,), ctx=Z.ctx)
     with autograd.record():
-        # We could reuse fake_X from update_D to save computation.
+        # We could reuse `fake_X` from `update_D` to save computation
         fake_X = net_G(Z)
-        # Recomputing fake_Y is needed since net_D is changed.
+        # Recomputing `fake_Y` is needed since `net_D` is changed
         fake_Y = net_D(fake_X)
         loss_G = loss(fake_Y, ones)
     loss_G.backward()
@@ -171,8 +170,8 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
         # Show the losses
         loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]
         animator.add(epoch, (loss_D, loss_G))
-    print('loss_D %.3f, loss_G %.3f, %d examples/sec' % (
-        loss_D, loss_G, metric[2]/timer.stop()))
+    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '
+          f'{metric[2] / timer.stop():.1f} examples/sec')
 ```
 
 Now we specify the hyper-parameters to fit the Gaussian distribution.
@@ -194,6 +193,6 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
 * Does an equilibrium exist where the generator wins, *i.e.* the discriminator ends up unable to distinguish the two distributions on finite samples?
 
 
-## [Discussions](https://discuss.mxnet.io/t/4353)
-
-![](../img/qr_gan.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/408)
+:end_tab:

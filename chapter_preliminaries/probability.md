@@ -23,14 +23,14 @@ If we had no evidence to suggest that $y =$ "cat" or that $y =$ "dog", then we m
 confident, but not sure that the image depicted a cat, we might assign a
 probability $0.5  < P(y=$ "cat"$) < 1$.
 
-Now consider the second case: given some weather monitoring data, we want to predict the probability that it will rain in Taipei tomorrow. If it is summertime, the rain might come with probability $0.5$.
+Now consider the second case: given some weather monitoring data, we want to predict the probability that it will rain in Taipei tomorrow. If it is summertime, the rain might come with probability 0.5.
 
 In both cases, we have some value of interest. And in both cases we are uncertain about the outcome.
 But there is a key difference between the two cases. In this first case, the image is in fact either a dog or a cat, and we just do not know which. In the second case, the outcome may actually be a random event, if you believe in such things (and most physicists do). So probability is a flexible language for reasoning about our level of certainty, and it can be applied effectively in a broad set of contexts.
 
 ## Basic Probability Theory
 
-Say that we cast a die and want to know what the chance is of seeing a $1$ rather than another digit. If the die is fair, all the $6$ outcomes $\{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in one out of six cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
+Say that we cast a die and want to know what the chance is of seeing a 1 rather than another digit. If the die is fair, all the six outcomes $\{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in one out of six cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
 
 For a real die that we receive from a factory, we might not know those proportions and we would need to check whether it is tainted. The only way to investigate the die is by casting it many times and recording the outcomes. For each cast of the die, we will observe a value in $\{1, \ldots, 6\}$. Given these outcomes, we want to investigate the probability of observing each outcome.
 
@@ -41,12 +41,29 @@ large numbers* tell us that as the number of tosses grows this estimate will dra
 
 To start, let us import the necessary packages.
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 import random
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+from torch.distributions import multinomial
+```
+
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import tensorflow_probability as tfp
+import numpy as np
 ```
 
 Next, we will want to be able to cast the die. In statistics we call this process
@@ -55,35 +72,48 @@ The distribution
 that assigns probabilities to a number of discrete choices is called the
 *multinomial distribution*. We will give a more formal definition of
 *distribution* later, but at a high level, think of it as just an assignment of
-probabilities to events. In MXNet, we can sample from the multinomial
-distribution via the aptly named `np.random.multinomial` function.
-The function
-can be called in many ways, but we will focus on the simplest.
+probabilities to events.
+
 To draw a single sample, we simply pass in a vector of probabilities.
-The output of the `np.random.multinomial` function is another vector of the same length:
+The output is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
 
-```{.python .input  n=2}
+```{.python .input}
 fair_probs = [1.0 / 6] * 6
 np.random.multinomial(1, fair_probs)
+```
+
+```{.python .input}
+#@tab pytorch
+fair_probs = torch.ones([6]) / 6
+multinomial.Multinomial(1, fair_probs).sample()
+```
+
+```{.python .input}
+#@tab tensorflow
+fair_probs = tf.ones(6) / 6
+tfp.distributions.Multinomial(1, fair_probs).sample()
 ```
 
 If you run the sampler a bunch of times, you will find that you get out random
 values each time. As with estimating the fairness of a die, we often want to
 generate many samples from the same distribution. It would be unbearably slow to
-do this with a Python `for` loop, so `random.multinomial` supports drawing
+do this with a Python `for` loop, so the function we are using supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
 
-```{.python .input  n=3}
+```{.python .input}
 np.random.multinomial(10, fair_probs)
 ```
 
-We can also conduct, say, $3$ groups of experiments, where each group draws $10$ samples, all at once.
+```{.python .input}
+#@tab pytorch
+multinomial.Multinomial(10, fair_probs).sample()
+```
 
-```{.python .input  n=4}
-counts = np.random.multinomial(10, fair_probs, size=3)
-counts
+```{.python .input}
+#@tab tensorflow
+tfp.distributions.Multinomial(10, fair_probs).sample()
 ```
 
 Now that we know how to sample rolls of a die, we can simulate 1000 rolls. We
@@ -91,18 +121,30 @@ can then go through and count, after each of the 1000 rolls, how many times each
 number was rolled.
 Specifically, we calculate the relative frequency as the estimate of the true probability.
 
-```{.python .input  n=5}
-# Store the results as 32-bit floats for division
+```{.python .input}
 counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
+counts / 1000
+```
+
+```{.python .input}
+#@tab pytorch
+# Store the results as 32-bit floats for division
+counts = multinomial.Multinomial(1000, fair_probs).sample()
 counts / 1000  # Relative frequency as the estimate
+```
+
+```{.python .input}
+#@tab tensorflow
+counts = tfp.distributions.Multinomial(1000, fair_probs).sample()
+counts / 1000
 ```
 
 Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good.
 
 We can also visualize how these probabilities converge over time towards the true probability.
-Let us conduct $500$ groups of experiments where each group draws $10$ samples.
+Let us conduct 500 groups of experiments where each group draws 10 samples.
 
-```{.python .input  n=6}
+```{.python .input}
 counts = np.random.multinomial(10, fair_probs, size=500)
 cum_counts = counts.astype(np.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
@@ -110,6 +152,38 @@ estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 d2l.set_figsize((6, 4.5))
 for i in range(6):
     d2l.plt.plot(estimates[:, i].asnumpy(),
+                 label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Groups of experiments')
+d2l.plt.gca().set_ylabel('Estimated probability')
+d2l.plt.legend();
+```
+
+```{.python .input}
+#@tab pytorch
+counts = multinomial.Multinomial(10, fair_probs).sample((500,))
+cum_counts = counts.cumsum(dim=0)
+estimates = cum_counts / cum_counts.sum(dim=1, keepdims=True)
+
+d2l.set_figsize((6, 4.5))
+for i in range(6):
+    d2l.plt.plot(estimates[:, i].numpy(),
+                 label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Groups of experiments')
+d2l.plt.gca().set_ylabel('Estimated probability')
+d2l.plt.legend();
+```
+
+```{.python .input}
+#@tab tensorflow
+counts = tfp.distributions.Multinomial(10, fair_probs).sample(500)
+cum_counts = tf.cumsum(counts, axis=0)
+estimates = cum_counts / tf.reduce_sum(cum_counts, axis=1, keepdims=True)
+
+d2l.set_figsize((6, 4.5))
+for i in range(6):
+    d2l.plt.plot(estimates[:, i].numpy(),
                  label=("P(die=" + str(i + 1) + ")"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Groups of experiments')
@@ -164,7 +238,7 @@ For example, $P(1 \leq X \leq 3)$ denotes the probability of the event $\{1 \leq
 which means $\{X = 1, 2, \text{or}, 3\}$. Equivalently, $P(1 \leq X \leq 3)$ represents the probability that the random variable $X$ can take a value from $\{1, 2, 3\}$.
 
 Note that there is a subtle difference between *discrete* random variables, like the sides of a die, and *continuous* ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
-that someone is $1.80139278291028719210196740527486202$ meters tall. Given the world population of humans the probability is virtually $0$. It makes more sense in this case to ask whether someone's height falls into a given interval, say between $1.79$ and $1.81$ meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly $1.80$ meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
+that someone is 1.80139278291028719210196740527486202 meters tall. Given the world population of humans the probability is virtually 0. It makes more sense in this case to ask whether someone's height falls into a given interval, say between 1.79 and 1.81 meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly 1.80 meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
 In the rest of this section, we consider probability in discrete space.
 For probability over continuous random variables, you may refer to :numref:`sec_random_variables`.
 
@@ -228,7 +302,7 @@ if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$. This is expressed as $
 ### Application
 :label:`subsec_probability_hiv_app`
 
-Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with $1\%$ probability if the patient is healthy but reporting him as diseased. Moreover,
+Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy but reporting him as diseased. Moreover,
 it never fails to detect HIV if the patient actually has it. We use $D_1$ to indicate the diagnosis ($1$ if positive and $0$ if negative) and $H$ to denote the HIV status ($1$ if positive and $0$ if negative).
 :numref:`conditional_prob_D1` lists such conditional probabilities.
 
@@ -240,7 +314,7 @@ it never fails to detect HIV if the patient actually has it. We use $D_1$ to ind
 |$P(D_1 = 0 \mid H)$|            0 |         0.99 |
 :label:`conditional_prob_D1`
 
-Note that the column sums are all $1$ (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' theorem, we need to apply marginalization and the multiplication rule to determine
+Note that the column sums are all 1 (but the row sums are not), since the conditional probability needs to sum up to 1, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' theorem, we need to apply marginalization and the multiplication rule to determine
 
 $$\begin{aligned}
 &P(D_1 = 1) \\
@@ -256,7 +330,7 @@ $$\begin{aligned}
 &P(H = 1 \mid D_1 = 1)\\ =& \frac{P(D_1=1 \mid H=1) P(H=1)}{P(D_1=1)} \\ =& 0.1306 \end{aligned}.$$
 
 In other words, there is only a 13.06% chance that the patient
-actually has AIDS, despite using a very accurate test. 
+actually has AIDS, despite using a very accurate test.
 As we can see, probability can be counterintuitive.
 
 What should a patient do upon receiving such terrifying news? Likely, the patient
@@ -272,8 +346,8 @@ test has different characteristics and it is not as good as the first one, as sh
 |$P(D_2 = 0 \mid H)$|            0.02 |         0.97 |
 :label:`conditional_prob_D2`
 
-Unfortunately, the second test comes back positive, too. 
-Let us work out the requisite probabilities to invoke Bayes' theorem 
+Unfortunately, the second test comes back positive, too.
+Let us work out the requisite probabilities to invoke Bayes' theorem
 by assuming the conditional independence:
 
 $$\begin{aligned}
@@ -342,7 +416,7 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 
 ## Summary
 
-* We can use MXNet to sample from probability distributions.
+* We can sample from probability distributions.
 * We can analyze multiple random variables using joint distribution, conditional distribution, Bayes' theorem, marginalization, and independence assumptions.
 * Expectation and variance offer useful measures to summarize key characteristics of probability distributions.
 
@@ -355,6 +429,14 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 1. In :numref:`subsec_probability_hiv_app`, the first test is more accurate. Why not just run the first test a second time?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2319)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/36)
+:end_tab:
 
-![](../img/qr_probability.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/37)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/198)
+:end_tab:

@@ -135,6 +135,4 @@ jupyter nbextension enable execute_time/ExecuteTime
 1. Measure $\mathbf{A}^\top \mathbf{B}$ vs. $\mathbf{A} \mathbf{B}$ for two square matrices in $\mathbb{R}^{1024 \times 1024}$. Which one is faster?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2398)
-
-![](../img/qr_jupyter.svg)
+[Discussions](https://discuss.d2l.ai/t/421)

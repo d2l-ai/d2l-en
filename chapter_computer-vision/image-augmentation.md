@@ -21,7 +21,7 @@ First, import the packages or modules required for the experiment in this sectio
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, image, init, np, npx
 from mxnet.gluon import nn
 
@@ -33,7 +33,7 @@ npx.set_np()
 In this experiment, we will use an image with a shape of $400\times 500$ as an example.
 
 ```{.python .input  n=2}
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 img = image.imread('../img/cat1.jpg')
 d2l.plt.imshow(img.asnumpy());
 ```
@@ -147,12 +147,12 @@ def load_cifar10(is_train, augs, batch_size):
 
 We train the ResNet-18 model described in :numref:`sec_resnet` on the
 CIFAR-10 dataset. We will also apply the methods described in
-:numref:`sec_multi_gpu_gluon` and use a multi-GPU training model.
+:numref:`sec_multi_gpu_concise` and use a multi-GPU training model.
 
 Next, we define the training function to train and evaluate the model using multiple GPUs.
 
 ```{.python .input  n=14}
-# Saved in the d2l package for later use
+#@save
 def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
                      split_f=d2l.split_batch):
     X_shards, y_shards = split_f(features, labels, ctx_list)
@@ -172,7 +172,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
 ```
 
 ```{.python .input  n=16}
-# Saved in the d2l package for later use
+#@save
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                ctx_list=d2l.try_all_gpus(), split_f=d2l.split_batch):
     num_batches, timer = len(train_iter), d2l.Timer()
@@ -193,10 +193,10 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                               None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)
         animator.add(epoch + 1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        metric[0] / metric[2], metric[1] / metric[3], test_acc))
-    print('%.1f examples/sec on %s' % (
-        metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'loss {metric[0] / metric[2]:.3f}, train acc '
+          f'{metric[1] / metric[3]:.3f}, test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec on '
+          f'{str(ctx_list)}')
 ```
 
 Now, we can define the `train_with_data_aug` function to use image augmentation to train the model. This function obtains all available GPUs and uses Adam as the optimization algorithm for training. It then applies image augmentation to the training dataset, and finally calls the `train` function just defined to train and evaluate the model.
@@ -232,6 +232,6 @@ train_with_data_aug(train_augs, test_augs, net)
 1. Add different image augmentation methods in model training based on the CIFAR-10 dataset. Observe the implementation results.
 1. With reference to the MXNet documentation, what other image augmentation methods are provided in Gluon's `transforms` module?
 
-## [Discussions](https://discuss.mxnet.io/t/2442)
-
-![](../img/qr_image-augmentation.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/367)
+:end_tab:

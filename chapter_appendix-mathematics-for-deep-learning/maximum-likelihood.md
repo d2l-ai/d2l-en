@@ -46,11 +46,23 @@ For our example, the plot of $P(X \mid \theta)$ is as follows:
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
 npx.set_np()
 
 theta = np.arange(0, 1, 0.001)
+p = theta**9 * (1 - theta)**4.
+
+d2l.plot(theta, p, 'theta', 'likelihood')
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+
+theta = torch.arange(0, 1, 0.001)
 p = theta**9 * (1 - theta)**4.
 
 d2l.plot(theta, p, 'theta', 'likelihood')
@@ -115,6 +127,28 @@ for iter in range(10):
         loss = -(n_H * np.log(theta) + n_T * np.log(1 - theta))
     loss.backward()
     theta -= lr * theta.grad
+
+# Check output
+theta, n_H / (n_H + n_T)
+```
+
+```{.python .input}
+#@tab pytorch
+# Set up our data
+n_H = 8675309
+n_T = 25624
+
+# Initialize our paramteres
+theta = torch.tensor(0.5, requires_grad=True)
+
+# Perform gradient descent
+lr = 0.00000000001
+for iter in range(10):
+    loss = -(n_H * torch.log(theta) + n_T * torch.log(1 - theta))
+    loss.backward()
+    with torch.no_grad():
+        theta -= lr * theta.grad
+    theta.grad.zero_()
 
 # Check output
 theta, n_H / (n_H + n_T)
@@ -213,6 +247,6 @@ Thus, we see that the maximum likelihood point of view can operate with continuo
 2. Suppose that you have a dataset of samples $\{x_i\}_{i=1}^N$ drawn from a Gaussian with unknown mean, but variance $1$.  What is the maximum likelihood estimate for the mean?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5153)
-
-![](../img/qr_maximum-likelihood.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/416)
+:end_tab:

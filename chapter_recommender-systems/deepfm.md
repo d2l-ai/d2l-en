@@ -33,7 +33,7 @@ where $\sigma$ is the sigmoid function. The architecture of DeepFM is illustrate
 It is worth noting that DeepFM is not the only way to combine deep neural networks with FM. We can also add nonlinear layers over the feature interactions :cite:`He.Chua.2017`.
 
 ```{.python .input  n=2}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import init, gluon, np, npx
 from mxnet.gluon import nn
 import os
@@ -83,15 +83,12 @@ test_data = d2l.CTRDataset(os.path.join(data_dir, 'test.csv'),
                            feat_mapper=train_data.feat_mapper,
                            defaults=train_data.defaults)
 field_dims = train_data.field_dims
-num_workers = 0 if sys.platform.startswith('win') else 4
-train_iter = gluon.data.DataLoader(train_data, shuffle=True,
-                                   last_batch='rollover',
-                                   batch_size=batch_size,
-                                   num_workers=num_workers)
-test_iter = gluon.data.DataLoader(test_data, shuffle=False,
-                                  last_batch='rollover',
-                                  batch_size=batch_size,
-                                  num_workers=num_workers)
+train_iter = gluon.data.DataLoader(
+    train_data, shuffle=True, last_batch='rollover', batch_size=batch_size,
+    num_workers=d2l.get_dataloader_workers())
+test_iter = gluon.data.DataLoader(
+    test_data, shuffle=False, last_batch='rollover', batch_size=batch_size,
+    num_workers=d2l.get_dataloader_workers())
 ctx = d2l.try_all_gpus()
 net = DeepFM(field_dims, num_factors=10, mlp_dims=[30, 20, 10])
 net.initialize(init.Xavier(), ctx=ctx)
@@ -109,10 +106,11 @@ Compared with FM, DeepFM converges faster and achieves better performance.
 * Integrating neural networks to FM enables it to model complex and high-order interactions. 
 * DeepFM outperforms the original FM on the advertising dataset.
 
-## Exercise
+## Exercises
+
 * Vary the structure of the MLP to check its impact on model performance.
 * Change the dataset to Criteo and compare it with the original FM model.
 
-## [Discussions](https://discuss.mxnet.io/t/5168)
-
-![](../img/qr_deepfm.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/407)
+:end_tab:

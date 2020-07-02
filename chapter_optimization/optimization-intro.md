@@ -20,12 +20,12 @@ reduce the training error. We begin by importing a few libraries with a function
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mpl_toolkits import mplot3d
 from mxnet import np, npx
 npx.set_np()
 
-# Saved in the d2l package for later use
+#@save
 def annotate(text, xy, xytext):
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
@@ -152,7 +152,6 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
     * Why is this hard?
     * Can you exploit this effect also for optimization algorithms?
 
-
-## [Discussions](https://discuss.mxnet.io/t/2371)
-
-![](../img/qr_optimization-intro.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/349)
+:end_tab:

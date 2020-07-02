@@ -32,7 +32,7 @@ $$x_t \sim p(x_t \mid x_{t-1}, \ldots, x_1).$$
 
 ### Autoregressive Models
 
-In order to achieve this, our trader could use a regressor such as the one we trained in :numref:`sec_linear_gluon`. There is just a major problem: the number of inputs, $x_{t-1}, \ldots, x_1$ varies, depending on $t$. That is, the number increases with the amount of data that we encounter, and we will need an approximation to make this computationally tractable. Much of what follows in this chapter will revolve around how to estimate $p(x_t \mid x_{t-1}, \ldots, x_1)$ efficiently. In a nutshell it boils down to two strategies:
+In order to achieve this, our trader could use a regressor such as the one we trained in :numref:`sec_linear_concise`. There is just a major problem: the number of inputs, $x_{t-1}, \ldots, x_1$ varies, depending on $t$. That is, the number increases with the amount of data that we encounter, and we will need an approximation to make this computationally tractable. Much of what follows in this chapter will revolve around how to estimate $p(x_t \mid x_{t-1}, \ldots, x_1)$ efficiently. In a nutshell it boils down to two strategies:
 
 1. Assume that the potentially rather long sequence $x_{t-1}, \ldots, x_1$ is not really necessary. In this case we might content ourselves with some timespan $\tau$ and only use $x_{t-1}, \ldots, x_{t-\tau}$ observations. The immediate benefit is that now the number of arguments is always the same, at least for $t > \tau$. This allows us to train a deep network as indicated above. Such models will be called *autoregressive* models, as they quite literally perform regression on themselves.
 1. Another strategy, shown in :numref:`fig_sequence-model`, is to try and keep some summary $h_t$ of the past observations, at the same time update $h_t$ in addition to the prediction $\hat{x}_t$. This leads to models that estimate $x_t$ with $\hat{x}_t = p(x_t \mid x_{t-1}, h_{t})$ and moreover updates of the form  $h_t = g(h_{t-1}, x_{t-1})$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*. LSTMs and GRUs are examples of this.
@@ -73,7 +73,7 @@ After so much theory, let us try this out in practice. Let us begin by generatin
 
 ```{.python .input}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon, init
 from mxnet.gluon import nn
 npx.set_np()
@@ -84,11 +84,24 @@ x = np.sin(0.01 * time) + 0.2 * np.random.normal(size=T)
 d2l.plot(time, [x])
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+import torch.nn as nn
+
+T = 1000  # Generate a total of 1000 points
+time = torch.arange(0.0, T)
+x = torch.sin(0.01 * time) + 0.2 * torch.randn(T)
+d2l.plot(time, [x])
+```
+
 Next we need to turn this time series into features and labels that the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots, x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer data points, since we do not have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple. A few layers of a fully connected network, ReLU activation and $\ell_2$ loss. Since much of the modeling is identical to the previous sections when we built regression estimators in Gluon, we will not delve into much detail.
 
 ```{.python .input}
 tau = 4
-features = np.zeros((T-tau, tau))
+features = d2l.zeros((T-tau, tau))
 for i in range(tau):
     features[:, i] = x[i: T-tau+i]
 labels = x[tau:]
@@ -96,8 +109,6 @@ labels = x[tau:]
 batch_size, n_train = 16, 600
 train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
-test_iter = d2l.load_array((features[:n_train], labels[:n_train]),
-                           batch_size, is_train=False)
 
 # Vanilla MLP architecture
 def get_net():
@@ -109,6 +120,36 @@ def get_net():
 
 # Least mean squares loss
 loss = gluon.loss.L2Loss()
+```
+
+```{.python .input}
+#@tab pytorch
+tau = 4
+features = d2l.zeros((T-tau, tau))
+for i in range(tau):
+    features[:, i] = x[i: T-tau+i]
+labels = x[tau:]
+
+batch_size, n_train = 16, 600
+train_iter = d2l.load_array((features[:n_train],
+                             labels[:n_train].reshape(-1, 1)),
+                            batch_size, is_train=True)
+
+# Function for initializing the weights of net
+def init_weights(m):
+    if type(m) == nn.Linear:
+        torch.nn.init.xavier_uniform_(m.weight)
+
+# Vanilla MLP architecture
+def get_net():
+    net = nn.Sequential(nn.Linear(4, 10),
+                        nn.ReLU(),
+                        nn.Linear(10, 1))
+    net.apply(init_weights)
+    return net
+
+# Least mean squares loss
+loss = nn.MSELoss()
 ```
 
 Now we are ready to train.
@@ -123,8 +164,25 @@ def train_net(net, train_iter, loss, epochs, lr):
                 l = loss(net(X), y)
             l.backward()
             trainer.step(batch_size)
-        print('epoch %d, loss: %f' % (
-            epoch, d2l.evaluate_loss(net, train_iter, loss)))
+        print(f'epoch {epoch}, '
+              f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
+
+net = get_net()
+train_net(net, train_iter, loss, 10, 0.01)
+```
+
+```{.python .input}
+#@tab pytorch
+def train_net(net, train_iter, loss, epochs, lr):
+    trainer = torch.optim.Adam(net.parameters(), lr)
+    for epoch in range(1, epochs + 1):
+        for X, y in train_iter:
+            trainer.zero_grad()
+            l = loss(net(X), y)
+            l.backward()
+            trainer.step()
+        print(f'epoch {epoch}, '
+              f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
 train_net(net, train_iter, loss, 10, 0.01)
@@ -132,11 +190,18 @@ train_net(net, train_iter, loss, 10, 0.01)
 
 ## Predictions
 
-Since both training and test loss are small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
+Since training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
 
 ```{.python .input}
 estimates = net(features)
 d2l.plot([time, time[tau:]], [x, estimates],
+         legend=['data', 'estimate'])
+```
+
+```{.python .input}
+#@tab pytorch
+estimates = net(features)
+d2l.plot([time, time[tau:]], [x, estimates.detach()],
          legend=['data', 'estimate'])
 ```
 
@@ -151,13 +216,25 @@ x_{603} & = f(x_{602}, \ldots, x_{599}).
 In other words, we will have to use our own predictions to make future predictions. Let us see how well this goes.
 
 ```{.python .input}
-predictions = np.zeros(T)
+predictions = d2l.zeros(T)
 predictions[:n_train] = x[:n_train]
 for i in range(n_train, T):
     predictions[i] = net(
         predictions[(i-tau):i].reshape(1, -1)).reshape(1)
 d2l.plot([time, time[tau:], time[n_train:]],
          [x, estimates, predictions[n_train:]],
+         legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))
+```
+
+```{.python .input}
+#@tab pytorch
+predictions = d2l.zeros(T)
+predictions[:n_train] = x[:n_train]
+for i in range(n_train, T):
+    predictions[i] = net(
+        predictions[(i-tau):i].reshape(1, -1)).reshape(1)
+d2l.plot([time, time[tau:], time[n_train:]],
+         [x, estimates.detach(), predictions[n_train:].detach()],
          legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))
 ```
 
@@ -168,7 +245,7 @@ Let us verify this observation by computing the $k$-step predictions on the enti
 ```{.python .input}
 k = 33  # Look up to k - tau steps ahead
 
-features = np.zeros((k, T-k))
+features = d2l.zeros((k, T-k))
 for i in range(tau):  # Copy the first tau features from x
     features[i] = x[i:T-k+i]
 
@@ -177,7 +254,23 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
 
 steps = (4, 8, 16, 32)
 d2l.plot([time[i:T-k+i] for i in steps], [features[i] for i in steps],
-         legend=['step %d' % i for i in steps], figsize=(4.5, 2.5))
+         legend=[f'step {i}' for i in steps], figsize=(4.5, 2.5))
+```
+
+```{.python .input}
+#@tab pytorch
+k = 33  # Look up to k - tau steps ahead
+
+features = d2l.zeros((k, T-k))
+for i in range(tau):  # Copy the first tau features from x
+    features[i] = x[i:T-k+i]
+
+for i in range(tau, k):  # Predict the (i-tau)-th step
+    features[i] = net(features[(i-tau):i].T).T
+
+steps = (4, 8, 16, 32)
+d2l.plot([time[i:T-k+i] for i in steps], [features[i].detach() for i in steps],
+         legend=[f'step {i}' for i in steps], figsize=(4.5, 2.5))
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.
@@ -202,6 +295,10 @@ This clearly illustrates how the quality of the estimates changes as we try to p
 1. Does causality also apply to text? To which extent?
 1. Give an example for when a latent autoregressive model might be needed to capture the dynamic of the data.
 
-## [Discussions](https://discuss.mxnet.io/t/2860)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/113)
+:end_tab:
 
-![](../img/qr_sequence.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/114)
+:end_tab:

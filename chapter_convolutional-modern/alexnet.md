@@ -247,7 +247,7 @@ the network adds maximum pooling layers
 with a window shape of $3\times3$ and a stride of 2.
 Moreover, AlexNet has ten times more convolution channels than LeNet.
 
-After the last convolutional layer are two fully-connected layers
+After the last convolutional layer there are two fully-connected layers
 with 4096 outputs.
 These two huge fully-connected layers produce model parameters of nearly 1 GB.
 Due to the limited memory in early GPUs,
@@ -275,8 +275,8 @@ such as flipping, clipping, and color changes.
 This makes the model more robust and the larger sample size effectively reduces overfitting.
 We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`.
 
-```{.python .input  n=1}
-import d2l
+```{.python .input}
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -304,21 +304,89 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
         # Here, the number of outputs of the fully connected layer is several
         # times larger than that in LeNet. Use the dropout layer to mitigate
         # overfitting
-        nn.Dense(4096, activation="relu"), nn.Dropout(0.5),
-        nn.Dense(4096, activation="relu"), nn.Dropout(0.5),
+        nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
+        nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
         # Output layer. Since we are using Fashion-MNIST, the number of
         # classes is 10, instead of 1000 as in the paper
         nn.Dense(10))
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+
+net = nn.Sequential(
+    nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=1), nn.ReLU(),
+    nn.MaxPool2d(kernel_size=3, stride=2),
+    nn.Conv2d(96, 256, kernel_size=5, padding=2), nn.ReLU(),
+    nn.MaxPool2d(kernel_size=3, stride=2),
+    nn.Conv2d(256, 384, kernel_size=3, padding=1), nn.ReLU(),
+    nn.Conv2d(384, 384, kernel_size=3, padding=1), nn.ReLU(),
+    nn.Conv2d(384, 256, kernel_size=3, padding=1), nn.ReLU(),
+    nn.MaxPool2d(kernel_size=3, stride=2),
+    nn.Flatten(),
+    nn.Dropout(p=0.5),
+    nn.Linear(6400, 4096), nn.ReLU(),
+    nn.Dropout(p=0.5),
+    nn.Linear(4096, 4096), nn.ReLU(),
+    nn.Linear(4096, 10))
+```
+
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+def net():
+    return tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(filters=96, kernel_size=11, strides=4,
+                               activation='relu'),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+        tf.keras.layers.Conv2D(filters=256, kernel_size=5, padding='same',
+                               activation='relu'),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same',
+                               activation='relu'),
+        tf.keras.layers.Conv2D(filters=384, kernel_size=3, padding='same',
+                               activation='relu'),
+        tf.keras.layers.Conv2D(filters=256, kernel_size=3, padding='same',
+                               activation='relu'),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(4096, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(4096, activation='relu'),
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(10)
+    ])
+```
+
 We construct a single-channel data instance with both height and width of 224 to observe the output shape of each layer. It matches our diagram above.
 
-```{.python .input  n=2}
+```{.python .input}
 X = np.random.uniform(size=(1, 1, 224, 224))
 net.initialize()
 for layer in net:
     X = layer(X)
     print(layer.name, 'output shape:\t', X.shape)
+```
+
+```{.python .input}
+#@tab pytorch
+X = torch.randn(1, 1, 224, 224)
+for layer in net:
+    X=layer(X)
+    print(layer.__class__.__name__,'Output shape:\t',X.shape)
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.random.uniform((1, 224, 224, 1))
+for layer in net().layers:
+    X = layer(X)
+    print(layer.__class__.__name__, 'Output shape:\t', X.shape)
 ```
 
 ## Reading the Dataset
@@ -334,7 +402,8 @@ To make things work, we upsample them to $224 \times 224$
 but we do it here to be faithful to the AlexNet architecture).
 We perform this resizing with the `resize` argument in `load_data_fashion_mnist`.
 
-```{.python .input  n=3}
+```{.python .input}
+#@tab all
 batch_size = 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 ```
@@ -347,7 +416,8 @@ the main change here is the use of a smaller learning rate
 and much slower training due to the deeper and wider network,
 the higher image resolution and the more costly convolutions.
 
-```{.python .input  n=5}
+```{.python .input}
+#@tab all
 lr, num_epochs = 0.01, 10
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
@@ -372,6 +442,14 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
     * How about memory bandwidth when computing the results?
 1. Apply dropout and ReLU to LeNet5. Does it improve? How about preprocessing?
 
-## [Discussions](https://discuss.mxnet.io/t/2354)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/75)
+:end_tab:
 
-![](../img/qr_alexnet.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/76)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/276)
+:end_tab:

@@ -12,11 +12,25 @@ In this section, we will show an interface to implement this encoder-decoder arc
 
 The encoder is a normal neural network that takes inputs, e.g., a source sentence, to return outputs.
 
-```{.python .input  n=2}
+```{.python .input  n=4}
 from mxnet.gluon import nn
 
-# Saved in the d2l package for later use
+#@save
 class Encoder(nn.Block):
+    """The base encoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(Encoder, self).__init__(**kwargs)
+
+    def forward(self, X, *args):
+        raise NotImplementedError
+```
+
+```{.python .input  n=1}
+#@tab pytorch
+from torch import nn
+
+#@save
+class Encoder(nn.Module):
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
         super(Encoder, self).__init__(**kwargs)
@@ -30,8 +44,23 @@ class Encoder(nn.Block):
 The decoder has an additional method `init_state` to parse the outputs of the encoder with possible additional information, e.g., the valid lengths of inputs, to return the state it needs. In the forward method, the decoder takes both inputs, e.g., a target sentence and the state. It returns outputs, with potentially modified state if the encoder contains RNN layers.
 
 ```{.python .input  n=3}
-# Saved in the d2l package for later use
+#@save
 class Decoder(nn.Block):
+    """The base decoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(Decoder, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+```
+
+```{.python .input  n=2}
+#@tab pytorch
+#@save
+class Decoder(nn.Module):
     """The base decoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
         super(Decoder, self).__init__(**kwargs)
@@ -48,8 +77,24 @@ class Decoder(nn.Block):
 The encoder-decoder model contains both an encoder and a decoder. We implement its forward method for training. It takes both encoder inputs and decoder inputs, with optional additional arguments. During computation, it first computes encoder outputs to initialize the decoder state, and then returns the decoder outputs.
 
 ```{.python .input  n=4}
-# Saved in the d2l package for later use
+#@save
 class EncoderDecoder(nn.Block):
+    """The base class for the encoder-decoder architecture."""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoder, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state)
+```
+
+```{.python .input  n=3}
+#@tab pytorch
+#@save
+class EncoderDecoder(nn.Module):
     """The base class for the encoder-decoder architecture."""
     def __init__(self, encoder, decoder, **kwargs):
         super(EncoderDecoder, self).__init__(**kwargs)
@@ -76,6 +121,6 @@ class EncoderDecoder(nn.Block):
 
 
 
-## [Discussions](https://discuss.mxnet.io/t/2393)
-
-![](../img/qr_encoder-decoder.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/341)
+:end_tab:

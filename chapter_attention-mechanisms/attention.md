@@ -39,12 +39,20 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+import math
+import torch
+from torch import nn
+```
+
 The masked softmax takes a 3-dimensional input and enables us to filter out some elements by specifying a valid length for the last dimension. (Refer to
 :numref:`sec_machine_translation` for the definition of a valid length.) As a result, any value outside the valid length will be masked as $0$. Let us implement the `masked_softmax` function.
 
 ```{.python .input  n=6}
-# Saved in the d2l package for later use
+#@save
 def masked_softmax(X, valid_len):
+    """Perform softmax by filtering out some elements."""
     # X: 3-D tensor, valid_len: 1-D or 2-D tensor
     if valid_len is None:
         return npx.softmax(X)
@@ -60,10 +68,37 @@ def masked_softmax(X, valid_len):
         return npx.softmax(X).reshape(shape)
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def masked_softmax(X, valid_len):
+    """Perform softmax by filtering out some elements."""
+    # X: 3-D tensor, valid_len: 1-D or 2-D tensor
+    if valid_len is None:
+        return nn.functional.softmax(X, dim=-1)
+    else:
+        shape = X.shape
+        if valid_len.dim() == 1:
+            valid_len = torch.repeat_interleave(valid_len, repeats=shape[1],
+                                                dim=0)
+        else:
+            valid_len = valid_len.reshape(-1)
+        # Fill masked elements with a large negative, whose exp is 0
+        X = X.reshape(-1, shape[-1])
+        for count, row in enumerate(X):
+            row[int(valid_len[count]):]=-1e6
+        return nn.functional.softmax(X.reshape(shape), dim=-1)
+```
+
 To illustrate how this function works, we construct two $2 \times 4$ matrices as the input. In addition, we specify that the valid length equals to 2 for the first example, and 3 for the second example. Then, as we can see from the following outputs, the values outside valid lengths are masked as zero.
 
 ```{.python .input  n=5}
 masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([2, 3]))
+```
+
+```{.python .input}
+#@tab pytorch
+masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3]))
 ```
 
 Moreover, the second operator `batch_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively, and returns an output with shape $(b, n, k)$. To be specific, it computes $b$ dot products for $i= \{1,\ldots, b\}$, i.e.,
@@ -72,6 +107,11 @@ $$Z[i,:,:] = X[i,:,:]  Y[i,:,:].$$
 
 ```{.python .input  n=4}
 npx.batch_dot(np.ones((2, 1, 3)), np.ones((2, 3, 2)))
+```
+
+```{.python .input}
+#@tab pytorch
+torch.bmm(torch.ones(2,1,3), torch.ones(2,3,2))
 ```
 
 ## Dot Product Attention
@@ -88,22 +128,42 @@ $$\alpha(\mathbf Q, \mathbf K) = \mathbf Q \mathbf K^\top /\sqrt{d}.$$
 With :eqref:`eq_alpha_QK`, we can implement the dot product attention layer `DotProductAttention` that supports a batch of queries and key-value pairs. In addition, for regularization we also use a dropout layer.
 
 ```{.python .input  n=5}
-# Saved in the d2l package for later use
+#@save
 class DotProductAttention(nn.Block):
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # query: (batch_size, #queries, d)
-    # key: (batch_size, #kv_pairs, d)
-    # value: (batch_size, #kv_pairs, dim_v)
-    # valid_len: either (batch_size, ) or (batch_size, xx)
+    # `query`: (`batch_size`, #queries, `d`)
+    # `key`: (`batch_size`, #kv_pairs, `d`)
+    # `value`: (`batch_size`, #kv_pairs, `dim_v`)
+    # `valid_len`: either (`batch_size`, ) or (`batch_size`, xx)
     def forward(self, query, key, value, valid_len=None):
         d = query.shape[-1]
         # Set transpose_b=True to swap the last two dimensions of key
         scores = npx.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
         return npx.batch_dot(attention_weights, value)
+```
+
+```{.python .input}
+#@tab pytorch
+#@save
+class DotProductAttention(nn.Module):
+    def __init__(self, dropout, **kwargs):
+        super(DotProductAttention, self).__init__(**kwargs)
+        self.dropout = nn.Dropout(dropout)
+
+    # `query`: (`batch_size`, #queries, `d`)
+    # `key`: (`batch_size`, #kv_pairs, `d`)
+    # `value`: (`batch_size`, #kv_pairs, `dim_v`)
+    # `valid_len`: either (`batch_size`, ) or (`batch_size`, xx)
+    def forward(self, query, key, value, valid_len=None):
+        d = query.shape[-1]
+        # Set transpose_b=True to swap the last two dimensions of key
+        scores = torch.bmm(query, key.transpose(1,2)) / math.sqrt(d)
+        attention_weights = self.dropout(masked_softmax(scores, valid_len))
+        return torch.bmm(attention_weights, value)
 ```
 
 Let us test the class `DotProductAttention` in a toy example.
@@ -117,6 +177,15 @@ atten.initialize()
 keys = np.ones((2, 10, 2))
 values = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)
 atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
+```
+
+```{.python .input}
+#@tab pytorch
+atten = DotProductAttention(dropout=0.5)
+atten.eval()
+keys = torch.ones(2,10,2)
+values = torch.arange(40, dtype=torch.float32).reshape(1,10,4).repeat(2,1,1)
+atten(torch.ones(2,1,2), keys, values, torch.tensor([2, 6]))
 ```
 
 As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension.
@@ -135,11 +204,11 @@ $$\alpha(\mathbf k, \mathbf q) = \mathbf v^\top \text{tanh}(\mathbf W_k \mathbf 
 Intuitively, you can imagine $\mathbf W_k \mathbf k + \mathbf W_q\mathbf q$ as concatenating the key and value in the feature dimension and feeding them to a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. In this hidden layer, the activation function is $\tanh$ and no bias is applied. Now let us implement the multilayer perceptron attention.
 
 ```{.python .input  n=7}
-# Saved in the d2l package for later use
+#@save
 class MLPAttention(nn.Block):
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
-        # Use flatten=True to keep query's and key's 3-D shapes
+        # Use flatten=False to keep query's and key's 3-D shapes
         self.W_k = nn.Dense(units, use_bias=False, flatten=False)
         self.W_q = nn.Dense(units, use_bias=False, flatten=False)
         self.v = nn.Dense(1, use_bias=False, flatten=False)
@@ -148,13 +217,34 @@ class MLPAttention(nn.Block):
 
     def forward(self, query, key, value, valid_len):
         query, key = self.W_q(query), self.W_k(key)
-        # Expand query to (batch_size, #querys, 1, units), and key to
-        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast
+        # Expand query to (`batch_size`, #queries, 1, units), and key to
+        # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
         features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
         features = np.tanh(features)
         scores = np.squeeze(self.v(features), axis=-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
         return npx.batch_dot(attention_weights, value)
+```
+
+```{.python .input}
+#@tab pytorch
+#@save
+class MLPAttention(nn.Module):
+    def __init__(self, key_size, query_size, units, dropout, **kwargs):
+        super(MLPAttention, self).__init__(**kwargs)
+        self.W_k = nn.Linear(key_size, units, bias=False)
+        self.W_q = nn.Linear(query_size, units, bias=False)
+        self.v = nn.Linear(units, 1, bias=False)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, query, key, value, valid_len):
+        query, key = self.W_k(query), self.W_q(key)
+        # Expand query to (`batch_size`, #queries, 1, units), and key to
+        # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
+        features = query.unsqueeze(2) + key.unsqueeze(1)
+        scores = self.v(features).squeeze(-1)
+        attention_weights = self.dropout(masked_softmax(scores, valid_len))
+        return torch.bmm(attention_weights, value)
 ```
 
 To test the above `MLPAttention` class, we use the same inputs as in the previous toy example. As we can see below, despite `MLPAttention` containing an additional MLP model, we obtain the same outputs as for `DotProductAttention`.
@@ -163,6 +253,13 @@ To test the above `MLPAttention` class, we use the same inputs as in the previou
 atten = MLPAttention(units=8, dropout=0.1)
 atten.initialize()
 atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
+```
+
+```{.python .input}
+#@tab pytorch
+atten = MLPAttention(key_size=2, query_size=2, units=8, dropout=0.1)
+atten.eval()
+atten(torch.ones(2, 1, 2), keys, values, torch.tensor([2, 6]))
 ```
 
 ## Summary
@@ -177,6 +274,6 @@ atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
 1. What are the advantages and disadvantages for dot product attention and multilayer perceptron attention, respectively?
 
 
-## [Discussions](https://discuss.mxnet.io/t/attention/4343)
-
-![](../img/qr_attention.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/346)
+:end_tab:

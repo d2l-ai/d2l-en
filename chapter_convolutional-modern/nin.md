@@ -45,8 +45,8 @@ per-pixel fully-connected layers with ReLU activations.
 The convolution width of the first layer is typically set by the user.
 The subsequent widths are fixed to $1 \times 1$.
 
-```{.python .input  n=2}
-import d2l
+```{.python .input}
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -60,6 +60,35 @@ def nin_block(num_channels, kernel_size, strides, padding):
     return blk
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+
+def nin_block(in_channels, out_channels, kernel_size, strides, padding):
+    return nn.Sequential(
+        nn.Conv2d(in_channels, out_channels, kernel_size, strides, padding),
+        nn.ReLU(),
+        nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU(),
+        nn.Conv2d(out_channels, out_channels, kernel_size=1), nn.ReLU())
+```
+
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+def nin_block(num_channels, kernel_size, strides, padding):
+    return tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(num_channels, kernel_size, strides=strides,
+                               padding=padding, activation='relu'),
+        tf.keras.layers.Conv2D(num_channels, kernel_size=1,
+                               activation='relu'),
+        tf.keras.layers.Conv2D(num_channels, kernel_size=1,
+                               activation='relu')])
+```
+
 ## NiN Model
 
 The original NiN network was proposed shortly after AlexNet
@@ -69,7 +98,7 @@ of $11\times 11$, $5\times 5$, and $3\times 3$,
 and the corresponding numbers of output channels are the same as in AlexNet. Each NiN block is followed by a maximum pooling layer
 with a stride of 2 and a window shape of $3\times 3$.
 
-Once significant difference between NiN and AlexNet
+One significant difference between NiN and AlexNet
 is that NiN avoids dense connections altogether.
 Instead, NiN uses an NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
 yielding a vector of [logits](https://en.wikipedia.org/wiki/Logit).
@@ -78,7 +107,7 @@ reduces the number of required model parameters.
 However, in practice, this design sometimes requires
 increased model training time.
 
-```{.python .input  n=9}
+```{.python .input}
 net = nn.Sequential()
 net.add(nin_block(96, kernel_size=11, strides=4, padding=0),
         nn.MaxPool2D(pool_size=3, strides=2),
@@ -97,6 +126,39 @@ net.add(nin_block(96, kernel_size=11, strides=4, padding=0),
         nn.Flatten())
 ```
 
+```{.python .input}
+#@tab pytorch
+net = nn.Sequential(
+    nin_block(1, 96, kernel_size=11, strides=4, padding=0),
+    nn.MaxPool2d(3, stride=2),
+    nin_block(96, 256, kernel_size=5, strides=1, padding=2),
+    nn.MaxPool2d(3, stride=2),
+    nin_block(256, 384, kernel_size=3, strides=1, padding=1),
+    nn.MaxPool2d(3, stride=2),
+    nn.Dropout(0.5),
+    nin_block(384, 10, kernel_size=3, strides=1, padding=1),
+    nn.AdaptiveMaxPool2d((1,1)),
+    nn.Flatten())
+```
+
+```{.python .input}
+#@tab tensorflow
+def net():
+    return tf.keras.models.Sequential([
+        nin_block(96, kernel_size=11, strides=4, padding='valid'),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+        nin_block(256, kernel_size=5, strides=1, padding='same'),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+        nin_block(384, kernel_size=3, strides=1, padding='same'),
+        tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
+        tf.keras.layers.Dropout(0.5),
+        nin_block(10, kernel_size=3, strides=1, padding='same'),
+        tf.keras.layers.GlobalAveragePooling2D(),
+        tf.keras.layers.Reshape((1, 1, 10)),
+        tf.keras.layers.Flatten(),
+        ])
+```
+
 We create a data example to see the output shape of each block.
 
 ```{.python .input}
@@ -107,6 +169,22 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
+```{.python .input}
+#@tab pytorch
+X = torch.rand(size=(1, 1, 224, 224))
+for layer in net:
+    X = layer(X)
+    print(layer.__class__.__name__,'output shape:\t', X.shape)
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.random.uniform((1, 224, 224, 1))
+for layer in net().layers:
+    X = layer(X)
+    print(layer.__class__.__name__,'output shape:\t', X.shape)
+```
+
 ## Data Acquisition and Training
 
 As before we use Fashion-MNIST to train the model.
@@ -114,10 +192,12 @@ NiN's training is similar to that for AlexNet and VGG,
 but it often uses a larger learning rate.
 
 ```{.python .input}
+#@tab all
 lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
+
 
 ## Summary
 
@@ -137,6 +217,14 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
     * What is the amount of memory needed during inference?
 1. What are possible problems with reducing the $384 \times 5 \times 5$ representation to a $10 \times 5 \times 5$ representation in one step?
 
-## [Discussions](https://discuss.mxnet.io/t/2356)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/79)
+:end_tab:
 
-![](../img/qr_nin.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/80)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/332)
+:end_tab:

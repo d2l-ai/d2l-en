@@ -26,13 +26,13 @@ First, we read the content and style images. By printing out the image coordinat
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import autograd, gluon, image, init, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()
 
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 content_img = image.imread('../img/rainier.jpg')
 d2l.plt.imshow(content_img.asnumpy());
 ```
@@ -278,6 +278,6 @@ As you can see, each epoch takes more time due to the larger image size. As show
 1. Adjust the weight hyper-parameters in the loss function. Does the output retain more content or have less noise?
 1. Use different content and style images. Can you create more interesting composite images?
 
-## [Discussions](https://discuss.mxnet.io/t/2449)
-
-![](../img/qr_neural-style.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/378)
+:end_tab:

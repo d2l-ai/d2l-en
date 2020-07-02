@@ -102,7 +102,7 @@ To gain a better understanding of the model, let us implement a GRU from scratch
 We begin by reading *The Time Machine* corpus that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below:
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn
 npx.set_np()
@@ -142,7 +142,7 @@ def get_params(vocab_size, num_hiddens, ctx):
 
 ### Defining the Model
 
-Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns an `ndarray` with a shape (batch size, number of hidden units) whose values are all zeros.
+Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns a tensor with a shape (batch size, number of hidden units) whose values are all zeros.
 
 ```{.python .input  n=3}
 def init_gru_state(batch_size, num_hiddens, ctx):
@@ -204,6 +204,6 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 1. What happens if you implement only parts of a GRU? That is, implement a recurrent cell that only has a reset gate. Likewise, implement a recurrent cell only with an update gate.
 
 
-## [Discussions](https://discuss.mxnet.io/t/2367)
-
-![](../img/qr_gru.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/342)
+:end_tab:

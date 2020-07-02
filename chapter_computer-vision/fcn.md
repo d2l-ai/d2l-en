@@ -17,7 +17,7 @@ explain the transposed convolution layer.
 
 ```{.python .input  n=2}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, image, init, np, npx
 from mxnet.gluon import nn
 
@@ -113,7 +113,7 @@ out_img = Y[0].transpose(1, 2, 0)
 As you can see, the transposed convolution layer magnifies both the height and width of the image by a factor of 2. It is worth mentioning that, besides to the difference in coordinate scale, the image magnified by bilinear interpolation and original image printed in :numref:`sec_bbox` look the same.
 
 ```{.python .input}
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 print('input image shape:', img.shape)
 d2l.plt.imshow(img.asnumpy());
 print('output image shape:', out_img.shape)
@@ -201,6 +201,6 @@ d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
 1. The outputs of some intermediate layers of the convolutional neural network are also used in the paper on fully convolutional networks[1]. Try to implement this idea.
 
 
-## [Discussions](https://discuss.mxnet.io/t/2454)
-
-![](../img/qr_fcn.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/377)
+:end_tab:

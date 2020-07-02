@@ -3,11 +3,11 @@
 
 Object detection algorithms usually sample a large number of regions in the input image, determine whether these regions contain objects of interest, and adjust the edges of the regions so as to predict the ground-truth bounding box of the target more accurately. Different models may use different region sampling methods. Here, we introduce one such method: it generates multiple bounding boxes with different sizes and aspect ratios while centering on each pixel. These bounding boxes are called anchor boxes. We will practice object detection based on anchor boxes in the following sections.
 
-First, import the packages or modules required for this section. Here, we have modified the printing accuracy of NumPy. Because printing `ndarray`s actually calls the print function of NumPy, the floating-point numbers in `ndarray`s printed in this section are more concise.
+First, import the packages or modules required for this section. Here, we have modified the printing accuracy of NumPy. Because printing tensors actually calls the print function of NumPy, the floating-point numbers in tensors printed in this section are more concise.
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, image, np, npx
 
 np.set_printoptions(2)
@@ -46,7 +46,7 @@ boxes[250, 250, 0, :]
 In order to describe all anchor boxes centered on one pixel in the image, we first define the `show_bboxes` function to draw multiple bounding boxes on the image.
 
 ```{.python .input  n=5}
-# Saved in the d2l package for later use
+#@save
 def show_bboxes(axes, bboxes, labels=None, colors=None):
     """Show bounding boxes."""
     def _make_list(obj, default_values=None):
@@ -71,7 +71,7 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 As we just saw, the coordinate values of the $x$ and $y$ axis in the variable `boxes` have been divided by the width and height of the image, respectively. When drawing images, we need to restore the original coordinate values of the anchor boxes and therefore define the variable `bbox_scale`. Now, we can draw all the anchor boxes centered on (250, 250) in the image. As you can see, the blue anchor box with a size of 0.75 and an aspect ratio of 1 covers the dog in the image well.
 
 ```{.python .input  n=7}
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 bbox_scale = np.array((w, h, w, h))
 fig = d2l.plt.imshow(img)
 show_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,
@@ -151,7 +151,7 @@ labels = npx.multibox_target(np.expand_dims(anchors, axis=0),
                              np.zeros((1, 3, 5)))
 ```
 
-There are three items in the returned result, all of which are in the `ndarray` format. The third item is represented by the category labeled for the anchor box.
+There are three items in the returned result, all of which are in the tensor format. The third item is represented by the category labeled for the anchor box.
 
 ```{.python .input  n=8}
 labels[2]
@@ -199,7 +199,7 @@ show_bboxes(fig.axes, anchors * bbox_scale,
             ['dog=0.9', 'dog=0.8', 'dog=0.7', 'cat=0.9'])
 ```
 
-We use the `multibox_detection` function to perform NMS and set the threshold to 0.5. This adds an example dimension to the `ndarray` input. We can see that the shape of the returned result is (batch size, number of anchor boxes, 6). The 6 elements of each row represent the output information for the same prediction bounding box. The first element is the predicted category index, which starts from 0 (0 is dog, 1 is cat). The value -1 indicates background or removal in NMS. The second element is the confidence level of prediction bounding box. The remaining four elements are the $x, y$ axis coordinates of the upper-left corner and the $x, y$ axis coordinates of the lower-right corner of the prediction bounding box (the value range is between 0 and 1).
+We use the `multibox_detection` function to perform NMS and set the threshold to 0.5. This adds an example dimension to the tensor input. We can see that the shape of the returned result is (batch size, number of anchor boxes, 6). The 6 elements of each row represent the output information for the same prediction bounding box. The first element is the predicted category index, which starts from 0 (0 is dog, 1 is cat). The value -1 indicates background or removal in NMS. The second element is the confidence level of prediction bounding box. The remaining four elements are the $x, y$ axis coordinates of the upper-left corner and the $x, y$ axis coordinates of the lower-right corner of the prediction bounding box (the value range is between 0 and 1).
 
 ```{.python .input  n=13}
 output = npx.multibox_detection(
@@ -239,6 +239,6 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 1. Modify the variable `anchors` in the "Labeling Training Set Anchor Boxes" and "Output Bounding Boxes for Prediction" sections. How do the results change?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2445)
-
-![](../img/qr_anchor.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/370)
+:end_tab:

@@ -43,7 +43,7 @@ As before $f$ has its minimum at $(0, 0)$. This function is *very* flat in the d
 
 ```{.python .input  n=3}
 %matplotlib inline
-import d2l
+from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 
@@ -102,11 +102,11 @@ Note that we can combine momentum with SGD and in particular, minibatch-SGD. The
 Recall that $\mathbf{v}_t = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}$. In the limit the terms add up to $\sum_{\tau=0}^\infty \beta^\tau = \frac{1}{1-\beta}$. In other words, rather than taking a step of size $\eta$ in GD or SGD we take a step of size $\frac{\eta}{1-\beta}$ while at the same time, dealing with a potentially much better behaved descent direction. These are two benefits in one. To illustrate how weighting behaves for different choices of $\beta$ consider the diagram below.
 
 ```{.python .input}
+d2l.set_figsize()
 gammas = [0.95, 0.9, 0.6, 0]
-d2l.set_figsize((3.5, 2.5))
 for gamma in gammas:
     x = np.arange(40).asnumpy()
-    d2l.plt.plot(x, gamma ** x, label='gamma = %.2f' % gamma)
+    d2l.plt.plot(x, gamma ** x, label=f'gamma = {gamma:.2f}')
 d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
@@ -160,8 +160,8 @@ train_momentum(0.005, 0.9)
 There is very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
-                     data_iter)
+d2l.train_concise_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
+                       data_iter)
 ```
 
 ## Theoretical Analysis
@@ -212,7 +212,7 @@ eta = 0.1
 d2l.set_figsize((6, 4))
 for lam in lambdas:
     t = np.arange(20).asnumpy()
-    d2l.plt.plot(t, (1 - eta * lam) ** t, label='lambda = %.2f' % lam)
+    d2l.plt.plot(t, (1 - eta * lam) ** t, label=f'lambda = {lam:.2f}')
 d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
@@ -243,6 +243,6 @@ We used $\mathbf{R}$ to denote the $2 \times 2$ governing convergence behavior. 
 1. Derive minimum value and minimizer for $h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{Q} \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b$.
 1. What changes when we perform SGD with momentum? What happens when we use mini-batch SGD with momentum? Experiment with the parameters?
 
-## [Discussions](https://discuss.mxnet.io/t/2374)
-
-![](../img/qr_momentum.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/354)
+:end_tab:

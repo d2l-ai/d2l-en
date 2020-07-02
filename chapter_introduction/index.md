@@ -546,7 +546,7 @@ our outputs and targets as real-valued numbers.
 
 
 We denote any individual target $y_i$
-(corresponding to example $\mathbf{x}i$)
+(corresponding to example $\mathbf{x}_i$)
 and the set of all targets $\mathbf{y}$
 (corresponding to all examples $X$).
 When our targets take on arbitrary values in some range,
@@ -602,13 +602,13 @@ the variance owes to some factors besides your two features.
 In these cases, we will try to learn models
 that minimize the distance between our predictions and the observed values.
 In most of our chapters, we will focus on one of two very common losses,
-the [L1 loss](http://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.L1Loss)
+the L1 loss
 where
 
 $$l(y, y') = \sum_i |y_i-y_i'|$$
 
 and the least mean squares loss, or
-[L2 loss](http://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.L2Loss),
+L2 loss
 where
 
 $$l(y, y') = \sum_i (y_i - y_i')^2.$$
@@ -676,7 +676,6 @@ Common examples include hand-written character recognition
 While we attacked regression problems by trying
 to minimize the L1 or L2 loss functions,
 the common loss function for classification problems is called cross-entropy.
-In MXNet Gluon, the corresponding loss function can be found [here](https://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.SoftmaxCrossEntropyLoss).
 
 Note that the most likely class is not necessarily
 the one that you are going to use for your decision.
@@ -1301,7 +1300,7 @@ Suddenly algorithms and models that seemed computationally infeasible
 became relevant (and vice versa).
 This is best illustrated in :numref:`tab_intro_decade`.
 
-:Dataset versus computer memory and computational power
+:Dataset vs. computer memory and computational power
 
 |Decade|Dataset|Memory|Floating Point Calculations per Second|
 |:--|:-|:-|:-|
@@ -1379,12 +1378,11 @@ over the past decade.
   Through the ability to use arbitrary algorithms to generate data,
   it opened up density estimation to a wide variety of techniques.
   Examples of galloping Zebras :cite:`Zhu.Park.Isola.ea.2017`
-  and of fake celebrity faces :cite:`Karras.Aila.Laine.ea.2017` 
+  and of fake celebrity faces :cite:`Karras.Aila.Laine.ea.2017`
   are both testimony to this progress.
   Even amateur doodlers can produce
   photorealistic images based on just sketches that describe
-  how the layout of a scene looks :cite:`Park.Liu.Wang.ea.2019`.
- 
+  how the layout of a scene looks like :cite:`Park.Liu.Wang.ea.2019`.
 * In many cases, a single GPU is insufficient to process
   the large amounts of data available for training.
   Over the past decade the ability to build parallel
@@ -1422,8 +1420,8 @@ over the past decade.
   often used via its high level API [Keras](https://github.com/keras-team/keras), [CNTK](https://github.com/Microsoft/CNTK), [Caffe 2](https://github.com/caffe2/caffe2), and [Apache MxNet](https://github.com/apache/incubator-mxnet). The third generation of tools, namely imperative tools for deep learning,
   was arguably spearheaded by [Chainer](https://github.com/chainer/chainer),
   which used a syntax similar to Python NumPy to describe models.
-  This idea was adopted by [PyTorch](https://github.com/pytorch/pytorch)
-  and the [Gluon API](https://github.com/apache/incubator-mxnet) of MXNet.
+  This idea was adopted by both [PyTorch](https://github.com/pytorch/pytorch),
+  the [Gluon API](https://github.com/apache/incubator-mxnet) of MXNet, and [Jax](https://github.com/google/jax).
   It is the latter group that this course uses to teach deep learning.
 
 The division of labor between systems researchers building better tools
@@ -1552,6 +1550,4 @@ than the potential of malevolent superintelligence to destroy humanity.
 1. Viewing the development of artificial intelligence as a new industrial revolution, what is the relationship between algorithms and data? Is it similar to steam engines and coal (what is the fundamental difference)?
 1. Where else can you apply the end-to-end training approach? Physics? Engineering? Econometrics?
 
-## [Discussions](https://discuss.mxnet.io/t/2310)
-
-![](../img/qr_introduction.svg)
+[Discussions](https://discuss.d2l.ai/t/22)

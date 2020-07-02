@@ -101,7 +101,7 @@ and apply $1$ pixel of padding on all sides.
 Given an input with a height and width of $8$,
 we find that the height and width of the output is also $8$.
 
-```{.python .input  n=1}
+```{.python .input}
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -127,15 +127,78 @@ X = np.random.uniform(size=(8, 8))
 comp_conv2d(conv2d, X).shape
 ```
 
+```{.python .input}
+#@tab pytorch
+import torch
+from torch import nn
+# We define a convenience function to calculate the convolutional layer. This 
+# function initializes the convolutional layer weights and performs
+# corresponding dimensionality elevations and reductions on the input and
+# output
+def comp_conv2d(conv2d, X):
+    # (1,1) indicates that the batch size and the number of channels
+    # (described in later chapters) are both 1
+    X = X.reshape((1, 1) + X.shape)
+    Y = conv2d(X)
+    # Exclude the first two dimensions that do not interest us: batch and
+    # channel
+    return Y.reshape(Y.shape[2:])
+# Note that here 1 row or column is padded on either side, so a total of 2
+# rows or columns are added
+conv2d = nn.Conv2d(1, 1, kernel_size=3, padding=1)
+X = torch.rand(size=(8, 8))
+comp_conv2d(conv2d, X).shape
+```
+
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+# We define a convenience function to calculate the convolutional layer. This 
+# function initializes the convolutional layer weights and performs
+# corresponding dimensionality elevations and reductions on the input and
+# output
+def comp_conv2d(conv2d, X):
+    # (1, 1) indicates that the batch size and the number of channels
+    # (described in later chapters) are both 1
+    X = tf.reshape(X, (1, ) + X.shape + (1, ))
+    Y = conv2d(X)
+    # Exclude the first two dimensions that do not interest us: batch and
+    # channel
+    return tf.reshape(Y, Y.shape[1:3])
+# Note that here 1 row or column is padded on either side, so a total of 2
+# rows or columns are added
+conv2d = tf.keras.layers.Conv2D(1, kernel_size=3, padding='same')
+X = tf.random.uniform(shape=(8, 8))
+comp_conv2d(conv2d, X).shape
+```
+
 When the height and width of the convolution kernel are different,
 we can make the output and input have the same height and width 
 by setting different padding numbers for height and width.
 
-```{.python .input  n=2}
+```{.python .input}
 # Here, we use a convolution kernel with a height of 5 and a width of 3. The
 # padding numbers on both sides of the height and width are 2 and 1,
 # respectively
 conv2d = nn.Conv2D(1, kernel_size=(5, 3), padding=(2, 1))
+comp_conv2d(conv2d, X).shape
+```
+
+```{.python .input}
+#@tab pytorch
+# Here, we use a convolution kernel with a height of 5 and a width of 3. The
+# padding numbers on both sides of the height and width are 2 and 1,
+# respectively
+conv2d = nn.Conv2d(1, 1, kernel_size=(5, 3), padding=(2, 1))
+comp_conv2d(conv2d, X).shape
+```
+
+```{.python .input}
+#@tab tensorflow
+# Here, we use a convolution kernel with a height of 5 and a width of 3. The
+# padding numbers on both sides of the height and width are 2 and 1,
+# respectively
+conv2d = tf.keras.layers.Conv2D(1, kernel_size=(5, 3), padding='valid')
 comp_conv2d(conv2d, X).shape
 ```
 
@@ -188,10 +251,34 @@ conv2d = nn.Conv2D(1, kernel_size=3, padding=1, strides=2)
 comp_conv2d(conv2d, X).shape
 ```
 
+```{.python .input}
+#@tab pytorch
+conv2d = nn.Conv2d(1, 1, kernel_size=3, padding=1, stride=2)
+comp_conv2d(conv2d, X).shape
+```
+
+```{.python .input}
+#@tab tensorflow
+conv2d = tf.keras.layers.Conv2D(1, kernel_size=3, padding='same', strides=2)
+comp_conv2d(conv2d, X).shape
+```
+
 Next, we will look at a slightly more complicated example.
 
-```{.python .input  n=3}
+```{.python .input}
 conv2d = nn.Conv2D(1, kernel_size=(3, 5), padding=(0, 1), strides=(3, 4))
+comp_conv2d(conv2d, X).shape
+```
+
+```{.python .input}
+#@tab pytorch
+conv2d = nn.Conv2d(1, 1, kernel_size=(3, 5), padding=(0, 1), stride=(3, 4))
+comp_conv2d(conv2d, X).shape
+```
+
+```{.python .input}
+#@tab tensorflow
+conv2d = tf.keras.layers.Conv2D(1, kernel_size=(3,5), padding='valid', strides=(3, 4))
 comp_conv2d(conv2d, X).shape
 ```
 
@@ -218,6 +305,14 @@ i.e., we usually have $p_h = p_w$ and $s_h = s_w$.
 1. For audio signals, what does a stride of $2$ correspond to?
 1. What are the computational benefits of a stride larger than $1$.
 
-## [Discussions](https://discuss.mxnet.io/t/2350)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/67)
+:end_tab:
 
-![](../img/qr_padding-and-strides.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/68)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/272)
+:end_tab:

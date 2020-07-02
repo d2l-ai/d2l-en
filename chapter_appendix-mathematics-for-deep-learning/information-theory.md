@@ -50,7 +50,22 @@ import random
 def self_information(p):
     return -np.log2(p)
 
-self_information(1/64)
+self_information(1 / 64)
+```
+
+```{.python .input}
+#@tab pytorch
+import torch
+from torch.nn import NLLLoss
+
+def nansum(x):
+    # Define nansum, as pytorch doesn't offer it inbuilt.
+    return x[~torch.isnan(x)].sum()
+
+def self_information(p):
+    return -torch.log2(torch.tensor(p)).item()
+
+self_information(1 / 64)
 ```
 
 ## Entropy 
@@ -86,11 +101,22 @@ In MXNet, we can define entropy as below.
 ```{.python .input}
 def entropy(p):
     entropy = - p * np.log2(p)
-    # nansum will sum up the non-nan number
+    # Operator nansum will sum up the non-nan number
     out = nansum(entropy.as_nd_ndarray())
     return out
 
 entropy(np.array([0.1, 0.5, 0.1, 0.3]))
+```
+
+```{.python .input}
+#@tab pytorch
+def entropy(p):
+    entropy = - p * torch.log2(p)
+    # Operator nansum will sum up the non-nan number
+    out = nansum(entropy)
+    return out
+
+entropy(torch.tensor([0.1, 0.5, 0.1, 0.3]))
 ```
 
 ### Interpretations
@@ -101,7 +127,7 @@ First, why do we use a *logarithm* function $\log$? Suppose that $p(x) = f_1(x) 
 
 Next, why do we use a *negative* $\log$? Intuitively, more frequent events should contain less information than less common events, since we often gain more information from an unusual case than from an ordinary one. However, $\log$ is monotonically increasing with the probabilities, and indeed negative for all values in $[0, 1]$.  We need to construct a monotonically decreasing relationship between the probability of events and their entropy, which will ideally be always positive (for nothing we observe should force us to forget what we have known). Hence, we add a negative sign in front of $\log$ function.
 
-Last, where does the *expectation* function come from? Consider a random variable $X$. We can interpret the self-information ($-\log(p)$) as the amount of *surprise* we have at seeing a particular outcome.  Indeed, as the probability approaches zero, the surprise becomes infinite.  Similarly, we can interpret The entropy as the average amount of surprise from observing $X$. For example, imagine that a slot machine system emits statistical independently symbols ${s_1, \ldots, s_k}$ with probabilities ${p_1, \ldots, p_k}$ respectively. Then the entropy of this system equals to the average self-information from observing each output, i.e.,
+Last, where does the *expectation* function come from? Consider a random variable $X$. We can interpret the self-information ($-\log(p)$) as the amount of *surprise* we have at seeing a particular outcome.  Indeed, as the probability approaches zero, the surprise becomes infinite.  Similarly, we can interpret the entropy as the average amount of surprise from observing $X$. For example, imagine that a slot machine system emits statistical independently symbols ${s_1, \ldots, s_k}$ with probabilities ${p_1, \ldots, p_k}$ respectively. Then the entropy of this system equals to the average self-information from observing each output, i.e.,
 
 $$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$
 
@@ -151,11 +177,22 @@ Let us implement joint entropy from scratch in MXNet.
 ```{.python .input}
 def joint_entropy(p_xy):
     joint_ent = -p_xy * np.log2(p_xy)
-    # nansum will sum up the non-nan number
+    # Operator nansum will sum up the non-nan number
     out = nansum(joint_ent.as_nd_ndarray())
     return out
 
 joint_entropy(np.array([[0.1, 0.5], [0.1, 0.3]]))
+```
+
+```{.python .input}
+#@tab pytorch
+def joint_entropy(p_xy):
+    joint_ent = -p_xy * torch.log2(p_xy)
+    # nansum will sum up the non-nan number
+    out = nansum(joint_ent)
+    return out
+
+joint_entropy(torch.tensor([[0.1, 0.5], [0.1, 0.3]]))
 ```
 
 Notice that this is the same *code* as before, but now we interpret it differently as working on the joint distribution of the two random variables.
@@ -191,11 +228,24 @@ Now, let us implement conditional entropy :eqref:`eq_cond_ent_def` from scratch 
 def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * np.log2(p_y_given_x)
-    # nansum will sum up the non-nan number
+    # Operator nansum will sum up the non-nan number
     out = nansum(cond_ent.as_nd_ndarray())
     return out
 
 conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2, 0.8]))
+```
+
+```{.python .input}
+#@tab pytorch
+def conditional_entropy(p_xy, p_x):
+    p_y_given_x = p_xy/p_x
+    cond_ent = -p_xy * torch.log2(p_y_given_x)
+    # nansum will sum up the non-nan number
+    out = nansum(cond_ent)
+    return out
+
+conditional_entropy(torch.tensor([[0.1, 0.5], [0.2, 0.3]]), 
+                    torch.tensor([0.2, 0.8]))
 ```
 
 ### Mutual Information
@@ -232,13 +282,25 @@ Now, let us implement mutual information from scratch.
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = p_xy * np.log2(p)
-    # nansum will sum up the non-nan number
+    # Operator nansum will sum up the non-nan number
     out = nansum(mutual.as_nd_ndarray())
     return out
 
 mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]),
-                   np.array([0.2, 0.8]),
-                   np.array([[0.75, 0.25]]))
+                   np.array([0.2, 0.8]), np.array([[0.75, 0.25]]))
+```
+
+```{.python .input}
+#@tab pytorch
+def mutual_information(p_xy, p_x, p_y):
+    p = p_xy / (p_x * p_y)
+    mutual = p_xy * torch.log2(p)
+    # Operator nansum will sum up the non-nan number
+    out = nansum(mutual)
+    return out
+
+mutual_information(torch.tensor([[0.1, 0.5], [0.1, 0.3]]),
+                   torch.tensor([0.2, 0.8]), torch.tensor([[0.75, 0.25]]))
 ```
 
 ### Properties of Mutual Information
@@ -291,6 +353,14 @@ def kl_divergence(p, q):
     return out.abs().asscalar()
 ```
 
+```{.python .input}
+#@tab pytorch
+def kl_divergence(p, q):
+    kl = p * torch.log2(p / q)
+    out = nansum(kl)
+    return out.abs().item()
+```
+
 ### KL Divergence Properties
 
 Let us take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
@@ -310,7 +380,7 @@ Let us take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
 
 Let us go through a toy example to see the non-symmetry explicitly. 
 
-First, let us generate and sort three `ndarray`s of length $10,000$: an objective `ndarray` $p$ which follows a normal distribution $N(0, 1)$, and two candidate `ndarray`s $q_1$ and $q_2$ which follow normal distributions $N(-1, 1)$ and $N(1, 1)$ respectively.
+First, let us generate and sort three tensors of length $10,000$: an objective tensor $p$ which follows a normal distribution $N(0, 1)$, and two candidate tensors $q_1$ and $q_2$ which follow normal distributions $N(-1, 1)$ and $N(1, 1)$ respectively.
 
 ```{.python .input}
 random.seed(1)
@@ -325,6 +395,20 @@ q1 = np.array(sorted(q1.asnumpy()))
 q2 = np.array(sorted(q2.asnumpy()))
 ```
 
+```{.python .input}
+#@tab pytorch
+torch.manual_seed(1)
+
+tensor_len = 10000
+p = torch.normal(0, 1, (tensor_len, ))
+q1 = torch.normal(-1, 1, (tensor_len, ))
+q2 = torch.normal(1, 1, (tensor_len, ))
+
+p = torch.sort(p)[0]
+q1 = torch.sort(q1)[0]
+q2 = torch.sort(q2)[0]
+```
+
 Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (i.e., $x=0$), we expect a similar value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. As you can see below, there is only a 1% off between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$.
 
 ```{.python .input}
@@ -335,9 +419,26 @@ similar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100
 kl_pq1, kl_pq2, similar_percentage
 ```
 
+```{.python .input}
+#@tab pytorch
+kl_pq1 = kl_divergence(p, q1)
+kl_pq2 = kl_divergence(p, q2)
+similar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100
+
+kl_pq1, kl_pq2, similar_percentage
+```
+
 In contrast, you may find that $D_{\mathrm{KL}}(q_2 \|p)$ and $D_{\mathrm{KL}}(p \| q_2)$ are off a lot, with around 40% off as shown below.
 
 ```{.python .input}
+kl_q2p = kl_divergence(q2, p)
+differ_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100
+
+kl_q2p, differ_percentage
+```
+
+```{.python .input}
+#@tab pytorch
 kl_q2p = kl_divergence(q2, p)
 differ_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100
 
@@ -383,11 +484,26 @@ def cross_entropy(y_hat, y):
     return ce.mean()
 ```
 
-Now define two `ndarray`s for the labels and predictions, and calculate the cross entropy loss of them.
+```{.python .input}
+#@tab pytorch
+def cross_entropy(y_hat, y):
+    ce = -torch.log(y_hat[range(len(y_hat)), y])
+    return ce.mean()
+```
+
+Now define two tensors for the labels and predictions, and calculate the cross entropy loss of them.
 
 ```{.python .input}
 labels = np.array([0, 2])
 preds = np.array([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
+
+cross_entropy(preds, labels)
+```
+
+```{.python .input}
+#@tab pytorch
+labels = torch.tensor([0, 2])
+preds = torch.tensor([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
 
 cross_entropy(preds, labels)
 ```
@@ -452,6 +568,15 @@ nll_loss.update(labels.as_nd_ndarray(), preds.as_nd_ndarray())
 nll_loss.get()
 ```
 
+```{.python .input}
+#@tab pytorch
+# Implementation of CrossEntropy loss in pytorch combines nn.LogSoftmax() and
+# nn.NLLLoss()
+nll_loss = NLLLoss()
+loss = nll_loss(torch.log(preds), labels)
+loss
+```
+
 ## Summary
 
 * Information theory is a field of study about encoding, decoding, transmitting, and manipulating information.
@@ -463,14 +588,15 @@ nll_loss.get()
 ## Exercises
 
 1. Verify that the card examples from the first section indeed have the claimed entropy.
-2. Let us compute the entropy from a few data sources:
+1. Show that the KL divergence $D(p\|q)$ is nonnegative for all distributions $p$ and $q$. Hint: use Jensen's inequality, i.e., use the fact that $-\log x$ is a convex function.
+1. Let us compute the entropy from a few data sources:
     * Assume that you are watching the output generated by a monkey at a typewriter. The monkey presses any of the $44$ keys of the typewriter at random (you can assume that it has not discovered any special keys or the shift key yet). How many bits of randomness per character do you observe?
     * Being unhappy with the monkey, you replaced it by a drunk typesetter. It is able to generate words, albeit not coherently. Instead, it picks a random word out of a vocabulary of $2,000$ words. Moreover, assume that the average length of a word is $4.5$ letters in English. How many bits of randomness do you observe now?
     * Still being unhappy with the result, you replace the typesetter by a high quality language model. These can currently obtain perplexity numbers as low as $15$ points per character. The perplexity is defined as a length normalized probability, i.e., $$PPL(x) = \left[p(x)\right]^{1 / \text{length(x)} }.$$ How many bits of randomness do you observe now?
-3. Explain intuitively why $I(X, Y) = H(X) - H(X|Y)$.  Then, show this is true by expressing both sides as an expectation with respect to the joint distribution.
-4. What is the KL Divergence between the two Gaussian distributions $\mathcal{N}(\mu_1, \sigma_1^2)$ and $\mathcal{N}(\mu_2, \sigma_2^2)$?
+1. Explain intuitively why $I(X, Y) = H(X) - H(X|Y)$.  Then, show this is true by expressing both sides as an expectation with respect to the joint distribution.
+1. What is the KL Divergence between the two Gaussian distributions $\mathcal{N}(\mu_1, \sigma_1^2)$ and $\mathcal{N}(\mu_2, \sigma_2^2)$?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5157)
-
-![](../img/qr_information-theory.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/420)
+:end_tab:

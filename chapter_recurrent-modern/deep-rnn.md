@@ -32,7 +32,7 @@ Just as with multilayer perceptrons, the number of hidden layers $L$ and number 
 Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in Gluon. To keep things simple we only illustrate the implementation using such built-in functionality. The code is very similar to the one we used previously for LSTMs. In fact, the only difference is that we specify the number of layers explicitly rather than picking the default of a single layer. Let us begin by importing the appropriate modules and loading data.
 
 ```{.python .input  n=17}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import npx
 from mxnet.gluon import rnn
 npx.set_np()
@@ -71,6 +71,6 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 3. Increase the training data to include multiple books. How low can you go on the perplexity scale?
 4. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?
 
-## [Discussions](https://discuss.mxnet.io/t/2369)
-
-![](../img/qr_deep-rnn.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/340)
+:end_tab:

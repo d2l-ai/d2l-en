@@ -19,7 +19,7 @@ convolutional neural networks to sentiment analysis: textCNN :cite:`Kim.2014`.
 First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=1}
-import d2l
+from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -62,9 +62,9 @@ Now, we reproduce the results of the one-dimensional cross-correlation operation
 
 ```{.python .input  n=4}
 def corr1d_multi_in(X, K):
-    # First, we traverse along the 0th dimension (channel dimension) of X and
-    # K. Then, we add them together by using * to turn the result list into a
-    # positional argument of the add_n function
+    # First, we traverse along the 0th dimension (channel dimension) of `X`
+    # and `K`. Then, we add them together by using * to turn the result list
+    # into a positional argument of the `add_n` function
     return sum(corr1d(x, k) for x, k in zip(X, K))
 
 X = np.array([[0, 1, 2, 3, 4, 5, 6],
@@ -129,7 +129,7 @@ class TextCNN(nn.Block):
 
     def forward(self, inputs):
         # Concatenate the output of two embedding layers with shape of
-        # (batch size, number of words, word vector dimension) by word vector
+        # (batch size, no. of words, word vector dimension) by word vector
         embeddings = np.concatenate((
             self.embedding(inputs), self.constant_embedding(inputs)), axis=2)
         # According to the input format required by Conv1D, the word vector
@@ -205,6 +205,6 @@ d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 1. Can you further improve the accuracy of the model on the test set by using the three methods introduced in the previous section: tuning hyper-parameters, using larger pre-trained word vectors, and using the spaCy word tokenization tool?
 1. What other natural language processing tasks can you use textCNN for?
 
-## [Discussions](https://discuss.mxnet.io/t/2392)
-
-![](../img/qr_sentiment-analysis-cnn.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/393)
+:end_tab:
