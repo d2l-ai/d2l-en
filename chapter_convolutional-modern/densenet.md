@@ -304,7 +304,7 @@ def block_2():
         if i != len(num_convs_in_dense_blocks) - 1:
             num_channels //= 2
             net.add(TransitionBlock(num_channels))
-        return net
+    return net
 ```
 
 Similar to ResNet, a global pooling layer and fully connected layer are connected at the end to produce the output.
