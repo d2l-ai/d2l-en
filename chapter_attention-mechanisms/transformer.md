@@ -57,7 +57,7 @@ $\mathbf W_q^{(i)}\in\mathbb R^{p_q\times d_q}$,
 $\mathbf W_k^{(i)}\in\mathbb R^{p_k\times d_k}$,
 and $\mathbf W_v^{(i)}\in\mathbb R^{p_v\times d_v}$. Therefore, the output for each head is
 
-$$\mathbf o^{(i)} = \textrm{attention}(\mathbf W_q^{(i)}\mathbf q, \mathbf W_k^{(i)}\mathbf k,\mathbf W_v^{(i)}\mathbf v),$$
+$$\mathbf o^{(i)} = \mathrm{attention}(\mathbf W_q^{(i)}\mathbf q, \mathbf W_k^{(i)}\mathbf k,\mathbf W_v^{(i)}\mathbf v),$$
 
 where $\textrm{attention}$ can be any attention layer, such as the `DotProductAttention` and `MLPAttention` as we introduced in :numref:`sec_attention`.
 

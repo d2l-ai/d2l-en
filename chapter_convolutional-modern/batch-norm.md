@@ -507,12 +507,18 @@ This code is virtually identical to that when we first trained LeNet (:numref:`s
 The main difference is the considerably larger learning rate.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet, pytorch
 lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
+```{.python .input}
+#@tab tensorflow
+lr, num_epochs, batch_size = 1.0, 10, 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+```
 
 Let us have a look at the scale parameter `gamma`
 and the shift parameter `beta` learned
@@ -525,7 +531,6 @@ net[1].gamma.data().reshape(-1,), net[1].beta.data().reshape(-1,)
 ```{.python .input}
 #@tab pytorch
 net[1].gamma.reshape((-1,)), net[1].beta.reshape((-1,))
-
 ```
 
 ```{.python .input}
@@ -602,7 +607,6 @@ Below, we use the same hyper-parameters to train out model.
 Note that as usual, the high-level API variant runs much faster
 because its code has been compiled to C++/CUDA
 while our custom implementation must be interpreted by Python.
-
 
 ```{.python .input}
 #@tab all

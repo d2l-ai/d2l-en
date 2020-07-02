@@ -170,7 +170,7 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def get_fashion_mnist_labels(labels):  #@save
-    """Return text labels for the FashionMNIST dataset."""
+    """Return text labels for the Fashion-MNIST dataset."""
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
