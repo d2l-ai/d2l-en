@@ -451,11 +451,7 @@ selects the second and the third elements as follows:
 x[-1], x[1:3]
 ```
 
-:begin_tab:`mxnet`
-Beyond reading, we can also write elements of a matrix by specifying indices.
-:end_tab:
-
-:begin_tab:`pytorch`
+:begin_tab:`mxnet, pytorch`
 Beyond reading, we can also write elements of a matrix by specifying indices.
 :end_tab:
 
@@ -531,30 +527,21 @@ In machine learning, we might have
 hundreds of megabytes of parameters
 and update all of them multiple times per second.
 
-:begin_tab:`mxnet`
 Typically, we will want to perform these updates *in place*.
 Second, we might point at the same parameters from multiple variables.
 If we do not update in place, other references will still point to
 the old memory location, making it possible for parts of our code
 to inadvertently reference stale parameters.
 
+:begin_tab:`mxnet`
 Fortunately, performing in-place operations in MXNet is easy.
-We can assign the result of an operation
-to a previously allocated array with slice notation,
-e.g., `y[:] = <expression>`.
-To illustrate this concept, we first create a new matrix `z`
-with the same shape as another `y`,
-using `zeros_like` to allocate a block of $0$ entries.
 :end_tab:
 
 :begin_tab:`pytorch`
-Typically, we will want to perform these updates *in place*.
-Second, we might point at the same parameters from multiple variables.
-If we do not update in place, other references will still point to
-the old memory location, making it possible for parts of our code
-to inadvertently reference stale parameters.
-
 Fortunately, performing in-place operations in PyTorch is easy.
+:end_tab:
+
+:begin_tab:`mxnet, pytorch`
 We can assign the result of an operation
 to a previously allocated array with slice notation,
 e.g., `y[:] = <expression>`.
@@ -564,18 +551,14 @@ using `zeros_like` to allocate a block of $0$ entries.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Because TensorFlow `Tensors` are immutable and gradients do not flow through
-`Variable` assignments, TensorFlow does not provide an explicit way to run
-an individual operation in-place.
-
-However, TensorFlow provides the `tf.function` decorator to wrap computation
-inside of a TensorFlow graph that gets compiled and optimized before running.
-This allows TensorFlow to prune unused values, and to re-use
-prior allocations that are no longer needed. This minimizes the memory
-overhead of TensorFlow computations.
-
+`Variables` are mutable containers of state in TensorFlow. They provide
+a way to store your model parameters.
+We can assign the result of an operation
+to a `Variable` with `assign`.
+To illustrate this concept, we create a `Variable` `z`
+with the same shape as another tensor `y`,
+using `zeros_like` to allocate a block of $0$ entries.
 :end_tab:
-
 
 ```{.python .input}
 z = np.zeros_like(y)
@@ -594,6 +577,43 @@ print('id(z):', id(z))
 
 ```{.python .input}
 #@tab tensorflow
+z = tf.Variable(tf.zeros_like(y))
+print('id(z):', id(z))
+z.assign(x + y)
+print('id(z):', id(z))
+```
+
+:begin_tab:`mxnet, pytorch`
+If the value of `x` is not reused in subsequent computations,
+we can also use `x[:] = x + y` or `x += y`
+to reduce the memory overhead of the operation.
+:end_tab:
+
+:begin_tab:`tensorflow`
+Even once you store state persistently in a `Variable`, you
+may want to reduce your memory usage further by avoiding excess
+allocations for tensors that are not your model parameters.
+
+Because TensorFlow `Tensors` are immutable and gradients do not flow through
+`Variable` assignments, TensorFlow does not provide an explicit way to run
+an individual operation in-place.
+
+However, TensorFlow provides the `tf.function` decorator to wrap computation
+inside of a TensorFlow graph that gets compiled and optimized before running.
+This allows TensorFlow to prune unused values, and to re-use
+prior allocations that are no longer needed. This minimizes the memory
+overhead of TensorFlow computations.
+:end_tab:
+
+```{.python .input}
+#@tab mxnet, pytorch
+before = id(x)
+x += y
+id(x) == before
+```
+
+```{.python .input}
+#@tab tensorflow
 @tf.function
 def computation(x, y):
   z = tf.zeros_like(y)  # This unused value will be pruned out.
@@ -603,26 +623,6 @@ def computation(x, y):
   return c + y
 
 computation(x, y)
-```
-
-:begin_tab:`mxnet`
-If the value of `x` is not reused in subsequent computations,
-we can also use `x[:] = x + y` or `x += y`
-to reduce the memory overhead of the operation.
-:end_tab:
-
-:begin_tab:`pytorch`
-If the value of `x` is not reused in subsequent computations,
-we can also use `x[:] = x + y` or `x += y`
-to reduce the memory overhead of the operation.
-:end_tab:
-
-
-```{.python .input}
-#@tab mxnet, pytorch
-before = id(x)
-x += y
-id(x) == before
 ```
 
 ## Conversion to Other Python Objects
