@@ -5,18 +5,18 @@ As machine learning scientists,
 our goal is to discover *patterns*.
 But how can we be sure that we have
 truly discovered a *general* pattern
-and not simply memorized our data.
+and not simply memorized our data?
 For example, imagine that we wanted to hunt
 for patterns among genetic markers
 linking patients to their dementia status,
-(let the labels be drawn from the set
-{*dementia*, *mild cognitive impairment*, *healthy*}).
+where the labels are drawn from the set
+$\{\text{dementia}, \text{mild cognitive impairment}, \text{healthy}\}$.
 Because each person's genes identify them uniquely
 (ignoring identical siblings),
 it is possible to memorize the entire dataset.
 
 We do not want our model to say
-*"That's Bob! I remember him! He has dementia!*
+*"That's Bob! I remember him! He has dementia!"*
 The reason why is simple.
 When we deploy the model in the future,
 we will encounter patients
@@ -43,27 +43,27 @@ or tens of thousands of data points.
 In a large hospital system, we might access
 hundreds of thousands of medical records.
 When working with finite samples, we run the risk
-that we might discover *apparent* associations
+that we might discover apparent associations
 that turn out not to hold up when we collect more data.
 
 The phenomena of fitting our training data
-more closely than we fit the underlying distribution is called overfitting, and the techniques used to combat overfitting are called regularization.
+more closely than we fit the underlying distribution is called *overfitting*, and the techniques used to combat overfitting are called *regularization*.
 In the previous sections, you might have observed
 this effect while experimenting with the Fashion-MNIST dataset.
-If you altered the model structure or the hyperparameters during the experiment, you might have noticed that with enough nodes, layers, and training epochs, the model can eventually reach perfect accuracy on the training set, even as the accuracy on test data deteriorates.
+If you altered the model structure or the hyperparameters during the experiment, you might have noticed that with enough neurons, layers, and training epochs, the model can eventually reach perfect accuracy on the training set, even as the accuracy on test data deteriorates.
 
 
 ## Training Error and Generalization Error
 
 In order to discuss this phenomenon more formally,
-we need to differentiate between *training error* and *generalization error*.
-The training error is the error of our model
+we need to differentiate between training error and generalization error.
+The *training error* is the error of our model
 as calculated on the training dataset,
-while generalization error is the expectation of our model's error
+while *generalization error* is the expectation of our model's error
 were we to apply it to an infinite stream of additional data points
 drawn from the same underlying data distribution as our original sample.
 
-Problematically, *we can never calculate the generalization error exactly*.
+Problematically, we can never calculate the generalization error exactly.
 That is because the stream of infinite data is an imaginary object.
 In practice, we must *estimate* the generalization error
 by applying our model to an independent test set
@@ -86,11 +86,12 @@ the reasons for giving certain answers.
 In most cases, the latter student will do much better.
 
 Likewise, consider a model that simply uses a lookup table to answer questions. If the set of allowable inputs is discrete and reasonably small, then perhaps after viewing *many* training examples, this approach would perform well. Still this model has no ability to do better than random guessing when faced with examples that it has never seen before.
-In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ grayscale values, then there are $256^{784}$ possible images. That means that there are far more low-res grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter this data, we could never afford to store the lookup table.
+In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ grayscale values, then there are $256^{784}$ possible images. That means that there are far more low-resolution grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter such data, we could never afford to store the lookup table.
 
 Last, consider the problem of trying
 to classify the outcomes of coin tosses (class 0: heads, class 1: tails)
 based on some contextual features that might be available.
+Suppose that the coin is fair.
 No matter what algorithm we come up with,
 the generalization error will always be $\frac{1}{2}$.
 However, for most algorithms,
