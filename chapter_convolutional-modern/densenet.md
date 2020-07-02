@@ -174,7 +174,7 @@ def transition_block(num_channels):
     blk.add(nn.BatchNorm(), nn.Activation('relu'),
             nn.Conv2D(num_channels, kernel_size=1),
             nn.AvgPool2D(pool_size=2, strides=2))
-    return blk
+    return  blk
 ```
 
 ```{.python .input}
