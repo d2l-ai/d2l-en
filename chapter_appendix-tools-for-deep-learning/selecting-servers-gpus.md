@@ -64,6 +64,4 @@ We can see a number of things:
 * Use FP16 or lower precision for high efficiency.
 
 
-## [Discussions](https://discuss.mxnet.io/t/2400)
-
-![](../img/qr_selecting-servers-gpus.svg)
+[Discussions](https://discuss.d2l.ai/t/425)

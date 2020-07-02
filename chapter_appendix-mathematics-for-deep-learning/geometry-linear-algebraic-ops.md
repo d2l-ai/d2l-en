@@ -938,6 +938,6 @@ $$
 7. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation for an arbitrary matrix $A$?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5147)
-
-![](../img/qr_geometry-linear-algebraic-ops.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/410)
+:end_tab:

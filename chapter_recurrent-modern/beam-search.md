@@ -89,6 +89,4 @@ Here, $L$ is the length of the final candidate sequence and the selection for $\
 1. Can we treat an exhaustive search as a beam search with a special beam size? Why?
 1. We used language models to generate sentences in :numref:`sec_rnn_scratch`. Which kind of search does this output use? Can you improve it?
 
-## [Discussions](https://discuss.mxnet.io/t/2394)
-
-![](../img/qr_beam-search.svg)
+[Discussions](https://discuss.d2l.ai/t/338)

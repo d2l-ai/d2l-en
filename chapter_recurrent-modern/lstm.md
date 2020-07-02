@@ -195,6 +195,6 @@ In many cases, LSTMs perform slightly better than GRUs but they are more costly 
 1. Implement an LSTM for time series prediction rather than character sequence prediction.
 
 
-## [Discussions](https://discuss.mxnet.io/t/2368)
-
-![](../img/qr_lstm.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/343)
+:end_tab:

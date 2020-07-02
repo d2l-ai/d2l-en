@@ -175,9 +175,9 @@ Let us read the first batch.
 src_vocab, tgt_vocab, train_iter = load_data_nmt(batch_size=2, num_steps=8)
 for X, X_vlen, Y, Y_vlen in train_iter:
     print('X:', X.astype('int32'))
-    print('Valid lengths for X:', X_vlen)
+    print('valid lengths for X:', X_vlen)
     print('Y:', Y.astype('int32'))
-    print('Valid lengths for Y:', Y_vlen)
+    print('valid lengths for Y:', Y_vlen)
     break
 ```
 
@@ -186,9 +186,9 @@ for X, X_vlen, Y, Y_vlen in train_iter:
 src_vocab, tgt_vocab, train_iter = load_data_nmt(batch_size=2, num_steps=8)
 for X, X_vlen, Y, Y_vlen in train_iter:
     print('X:', X.type(torch.int32))
-    print('Valid lengths for X:', X_vlen)
+    print('valid lengths for X:', X_vlen)
     print('Y:', Y.type(torch.int32))
-    print('Valid lengths for Y:', Y_vlen)
+    print('valid lengths for Y:', Y_vlen)
     break
 ```
 
@@ -203,6 +203,6 @@ for X, X_vlen, Y, Y_vlen in train_iter:
 1. Find a machine translation dataset online and process it.
 
 
-## [Discussions](https://discuss.mxnet.io/t/machine-translation/2396)
-
-![](../img/qr_machine-translation-and-dataset.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/344)
+:end_tab:

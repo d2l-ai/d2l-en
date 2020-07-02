@@ -153,6 +153,4 @@ Your pull request will appear among the list of requests in the main repository.
 1. Find some code that needs improvement and submit a pull request.
 1. Find a reference that we missed and submit a pull request.
 
-## [Discussions](https://discuss.mxnet.io/t/2401)
-
-![](../img/qr_contributing.svg)
+[Discussions](https://discuss.d2l.ai/t/426)

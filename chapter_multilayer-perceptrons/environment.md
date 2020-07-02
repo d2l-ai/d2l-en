@@ -409,7 +409,7 @@ to engineer a *data generator* that outputs data
 that cannot be distinguished
 from examples sampled from a reference dataset.
 In these approaches, we use one network, $f$
-to distinguish real versus fake data
+to distinguish real vs. fake data
 and a second network $g$ that tries
 to fool the discriminator $f$
 into accepting fake data as real.

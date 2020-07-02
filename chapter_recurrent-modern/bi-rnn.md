@@ -149,6 +149,6 @@ classification in :numref:`sec_sentiment_rnn`.
 1. Implement a sequence classification algorithm using bidirectional RNNs. Hint: use the RNN to embed each word and then aggregate (average) all embedded outputs before sending the output into an MLP for classification. For instance, if we have $(\mathbf{o}_1, \mathbf{o}_2, \mathbf{o}_3)$, we compute $\bar{\mathbf{o}} = \frac{1}{3} \sum_i \mathbf{o}_i$ first and then use the latter for sentiment classification.
 
 
-## [Discussions](https://discuss.mxnet.io/t/2370)
-
-![](../img/qr_bi-rnn.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/339)
+:end_tab:

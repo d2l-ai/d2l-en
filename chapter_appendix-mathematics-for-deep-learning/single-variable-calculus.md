@@ -435,6 +435,6 @@ Taylor series have two primary applications:
 4. Where is the minimum of $f(x) = x\log(x)$ for $x\ge0$ (where we assume that $f$ takes the limiting value of $0$ at $f(0)$)?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5149)
-
-![](../img/qr_single-variable-calculus.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/412)
+:end_tab:

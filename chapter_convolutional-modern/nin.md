@@ -192,24 +192,12 @@ NiN's training is similar to that for AlexNet and VGG,
 but it often uses a larger learning rate.
 
 ```{.python .input}
+#@tab all
 lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-```{.python .input}
-#@tab pytorch
-lr, num_epochs, batch_size = 0.1, 10, 128
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab tensorflow
-lr, num_epochs, batch_size = 0.1, 10, 128
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
 
 ## Summary
 
@@ -235,4 +223,8 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/80)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/332)
 :end_tab:

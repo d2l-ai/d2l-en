@@ -42,6 +42,7 @@ zeros = torch.zeros
 
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
+    """Make a directory if it does not exist."""
     if not isinstance(path, str):
         path = os.path.join(*path)
     if not os.path.exists(path):
@@ -148,16 +149,19 @@ def synthetic_data(w, b, num_examples):  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):  #@save
+    """The linear regression model."""
     return torch.matmul(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def squared_loss(y_hat, y):  #@save
+    """Squared loss."""
     return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def sgd(params, lr, batch_size):  #@save
+    """Minibatch stochastic gradient descent."""
     for param in params:
         param.data.sub_(lr*param.grad/batch_size)
         param.grad.data.zero_()
@@ -172,6 +176,7 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def get_fashion_mnist_labels(labels):  #@save
+    """Return text labels for the Fashion-MNIST dataset."""
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
@@ -329,6 +334,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def predict_ch3(net, test_iter, n=6):  #@save
+    """Predict labels (defined in Chapter 3)."""
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
@@ -361,9 +367,9 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
     """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
     url, sha1_hash = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)    
+    d2l.mkdir_if_not_exist(cache_dir)
     fname = os.path.join(cache_dir, url.split('/')[-1])
-    if os.path.exists(fname):        
+    if os.path.exists(fname):
         sha1 = hashlib.sha1()
         with open(fname, 'rb') as f:
             while True:
@@ -383,7 +389,7 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
 def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
     fname = download(name)
-    base_dir = os.path.dirname(fname) 
+    base_dir = os.path.dirname(fname)
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
@@ -409,7 +415,7 @@ DATA_HUB['kaggle_house_train'] = (  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_test'] = (  #@save  
+DATA_HUB['kaggle_house_test'] = (  #@save
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
@@ -487,23 +493,23 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_loss, train_acc, test_acc))
-    print('%.1f examples/sec on %s' % (
-        metric[2]*num_epochs/timer.sum(), device))
+    print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(device)}')
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
 class Residual(nn.Module):  #@save
-    def __init__(self, input_channels, num_channels, 
+    def __init__(self, input_channels, num_channels,
                  use_1x1conv=False, strides=1):
         super().__init__()
         self.conv1 = nn.Conv2d(input_channels, num_channels,
                                kernel_size=3, padding=1, stride=strides)
-        self.conv2 = nn.Conv2d(num_channels, num_channels, 
+        self.conv2 = nn.Conv2d(num_channels, num_channels,
                                kernel_size=3, padding=1)
         if use_1x1conv:
-            self.conv3 = nn.Conv2d(input_channels, num_channels, 
+            self.conv3 = nn.Conv2d(input_channels, num_channels,
                                    kernel_size=1, stride=strides)
         else:
             self.conv3 = None
@@ -511,7 +517,7 @@ class Residual(nn.Module):  #@save
         self.bn2 = nn.BatchNorm2d(num_channels)
         self.relu = nn.ReLU(inplace=True)
 
-    def forward(self, X):    
+    def forward(self, X):
         Y = F.relu(self.bn1(self.conv1(X)))
         Y = self.bn2(self.conv2(Y))
         if self.conv3:
@@ -604,13 +610,13 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
     random.shuffle(example_indices)
 
     def data(pos):
-        # This returns a sequence of the length num_steps starting from pos
+        # This returns a sequence of length `num_steps` starting from `pos`
         return corpus[pos: pos + num_steps]
 
     # Discard half empty batches
     num_batches = num_examples // batch_size
     for i in range(0, batch_size * num_batches, batch_size):
-        # Batch_size indicates the random examples read each time
+        # `batch_size` indicates the random examples read each time
         batch_indices = example_indices[i:(i+batch_size)]
         X = [data(j) for j in batch_indices]
         Y = [data(j + 1) for j in batch_indices]
@@ -621,7 +627,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
-    # Slice out data - ignore num_steps and just wrap around
+    # Slice out data: ignore `num_steps` and just wrap around
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
     Xs = torch.Tensor(corpus[offset:offset+num_indices])
     Ys = torch.Tensor(corpus[offset+1:offset+1+num_indices])
@@ -654,6 +660,116 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
     return data_iter, data_iter.vocab
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+class RNNModelScratch:
+    """A RNN Model based on scratch implementations."""
+
+    def __init__(self, vocab_size, num_hiddens, device,
+                 get_params, init_state, forward):
+        self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
+        self.params = get_params(vocab_size, num_hiddens, device)
+        self.init_state, self.forward_fn = init_state, forward
+
+    def __call__(self, X, state):
+        X = F.one_hot(X.T.long(), self.vocab_size).type(torch.float32)
+        return self.forward_fn(X, state, self.params)
+
+    def begin_state(self, batch_size, device):
+        return self.init_state(batch_size, self.num_hiddens, device)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def predict_ch8(prefix, num_predicts, model, vocab, device):
+    state = model.begin_state(batch_size=1, device=device)
+    outputs = [vocab[prefix[0]]]
+
+    def get_input():
+        return torch.tensor([outputs[-1]], device=device).reshape(1, 1)
+    for y in prefix[1:]:  # Warmup state with prefix
+        _, state = model(get_input(), state)
+        outputs.append(vocab[y])
+    for _ in range(num_predicts):  # Predict num_predicts steps
+        Y, state = model(get_input(), state)
+        outputs.append(int(Y.argmax(dim=1).reshape(1)))
+    return ''.join([vocab.idx_to_token[i] for i in outputs])
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def grad_clipping(model, theta):
+    if isinstance(model, nn.Module):
+        params = [p.data for p in model.parameters() if p.requires_grad]
+    else:
+        params = model.params
+    
+    norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in params))
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def train_epoch_ch8(model, train_iter, loss, updater, device,
+                    use_random_iter):
+    state, timer = None, d2l.Timer()
+    metric = d2l.Accumulator(2)  # loss_sum, num_examples
+    for X, Y in train_iter:
+        if state is None or use_random_iter:
+            # Initialize state when either it is the first iteration or
+            # using random sampling.
+            state = model.begin_state(batch_size=X.shape[0], device=device)
+        else:
+            for s in state:
+                s.detach_()
+        y = Y.T.reshape(-1)
+        X, y = X.to(device), y.to(device)
+        py, state = model(X, state)
+        l = loss(py, y.long()).mean()
+        
+        if isinstance(updater, torch.optim.Optimizer):
+            updater.zero_grad()
+            l.backward()
+            grad_clipping(model, 1)
+            updater.step()
+        else:
+            l.backward()
+            grad_clipping(model, 1)
+            updater(batch_size=1)  # Since used mean already
+
+        metric.add(l * d2l.size(y), d2l.size(y))
+    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
+              use_random_iter=False):
+    # Initialize
+    loss = nn.CrossEntropyLoss()
+    animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
+                            legend=['train'], xlim=[1, num_epochs])
+    if isinstance(model, nn.Module):
+        trainer = torch.optim.SGD(model.parameters(), lr)
+
+        def updater(batch_size):
+            return trainer.step()
+    else:
+        def updater(batch_size):
+            return d2l.sgd(model.params, lr, batch_size)
+
+    def predict(prefix):
+        return predict_ch8(prefix, 50, model, vocab, device)
+
+    # Train and check the progress.
+    for epoch in range(num_epochs):
+        ppl, speed = train_epoch_ch8(
+            model, train_iter, loss, updater, device, use_random_iter)
+        if epoch % 10 == 0:
+            print(predict('time traveller'))
+            animator.add(epoch+1, [ppl])
+    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
+    print(predict('time traveller'))
+    print(predict('traveller'))
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md

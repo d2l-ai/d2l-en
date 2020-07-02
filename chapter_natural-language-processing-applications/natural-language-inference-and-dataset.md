@@ -8,7 +8,6 @@ However, when there is a need to decide whether one sentence can be inferred for
 or eliminate redundancy by identifying sentences that are semantically equivalent,
 knowing how to classify one text sequence is insufficient.
 Instead, we need to be able to reason over pairs of text sequences.
-It results in 
 
 
 ## Natural Language Inference
@@ -213,7 +212,6 @@ for X, Y in train_iter:
 1. How can we change hyperparameters to reduce the vocabulary size? 
 
 
-
-## [Discussions](https://discuss.mxnet.io/t/5517)
-
-![](../img/qr_natural-language-inference-and-dataset.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/394)
+:end_tab:

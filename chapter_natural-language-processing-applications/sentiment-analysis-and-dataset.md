@@ -120,6 +120,6 @@ def load_data_imdb(batch_size, num_steps=500):
 1. Discover a different natural language dataset (such as [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html)) and build a similar data_loader function as `load_data_imdb`.
 
 
-## [Discussions](https://discuss.mxnet.io/t/4355)
-
-![](../img/qr_sentiment-analysis-and-dataset.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/391)
+:end_tab:

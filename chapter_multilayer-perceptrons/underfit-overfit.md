@@ -194,7 +194,7 @@ and one subject to *early stopping* as less complex.
 
 It can be difficult to compare the complexity among members
 of substantially different model classes
-(say a decision tree versus a neural network).
+(say a decision tree vs. a neural network).
 For now, a simple rule of thumb is quite useful:
 A model that can readily explain arbitrary facts
 is what statisticians view as complex,
@@ -465,14 +465,14 @@ features[:2], poly_features[:2], labels[:2]
 
 ```{.python .input}
 #@tab pytorch
-# Convert from NumPy to PyTorch tensors.
+# Convert from NumPy to PyTorch tensors
 true_w, features, poly_features, labels = [torch.from_numpy(x).type(
     torch.float32) for x in [true_w, features, poly_features, labels]]
 ```
 
 ```{.python .input}
 #@tab tensorflow
-# Convert from NumPy to TensorFlow tensors.
+# Convert from NumPy to TensorFlow tensors
 true_w, features, poly_features, labels = [tf.constant(x, dtype=tf.float32)
     for x in [true_w, features, poly_features, labels]]
 ```

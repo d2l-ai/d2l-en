@@ -201,6 +201,6 @@ d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
 1. The outputs of some intermediate layers of the convolutional neural network are also used in the paper on fully convolutional networks[1]. Try to implement this idea.
 
 
-## [Discussions](https://discuss.mxnet.io/t/2454)
-
-![](../img/qr_fcn.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/377)
+:end_tab:

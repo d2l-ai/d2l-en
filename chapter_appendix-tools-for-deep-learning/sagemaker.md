@@ -81,19 +81,25 @@ First, you need to open a terminal as shown in :numref:`fig_sagemaker-terminal`.
 You may want to commit your local changes before pulling the updates. Alternatively, you can simply ignore all your local changes with the following commands in the terminal.
 
 :begin_tab:`mxnet`
+
 ```bash
 cd SageMaker/d2l-en-sagemaker/
 git reset --hard
 git pull
 ```
+
+
 :end_tab:
 
 :begin_tab:`pytorch`
+
 ```bash
 cd SageMaker/d2l-pytorch-sagemaker/
 git reset --hard
 git pull
 ```
+
+
 :end_tab:
 
 ## Summary
@@ -108,6 +114,4 @@ git pull
 1. Access the source code directory via the terminal.
 
 
-## [Discussions](https://discuss.mxnet.io/t/5640)
-
-![](../img/qr_sagemaker.svg)
+[Discussions](https://discuss.d2l.ai/t/422)

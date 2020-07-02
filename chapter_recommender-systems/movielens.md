@@ -43,8 +43,8 @@ Let us load up the data and inspect the first five records manually. It is an ef
 ```{.python .input  n=3}
 data, num_users, num_items = read_data_ml100k()
 sparsity = 1 - len(data) / (num_users * num_items)
-print('number of users: %d, number of items: %d.' % (num_users, num_items))
-print('matrix sparsity: %f' % sparsity)
+print(f'number of users: {num_users}, number of items: {num_items}')
+print(f'matrix sparsity: {sparsity:f}')
 print(data.head(5))
 ```
 
@@ -150,6 +150,6 @@ def split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',
 * What other similar recommendation datasets can you find?
 * Go through the [https://movielens.org/](https://movielens.org/) site for more information about MovieLens.
 
-## [Discussions](https://discuss.mxnet.io/t/5159)
-
-![](../img/qr_movielens.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/399)
+:end_tab:

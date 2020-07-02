@@ -757,6 +757,6 @@ It is reasonable to ask at this point, "Why can I not just write down matrix ver
 5. Suppose that we are minimizing a function $f(\mathbf{x}) = g(\mathbf{x}) + h(\mathbf{x})$.  How can we geometrically interpret the condition of $\nabla f = 0$ in terms of $g$ and $h$?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5150)
-
-![](../img/qr_multivariable-calculus.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/413)
+:end_tab:

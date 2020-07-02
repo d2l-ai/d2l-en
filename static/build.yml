@@ -7,6 +7,7 @@ dependencies:
     - mxnet-cu101==1.6.0
     - torchvision
     - -f https://download.pytorch.org/whl/torch_stable.html
-    - torch==1.5.0+cu101
+    - torch==1.5.1+cu101
     - tensorflow
     - tensorflow-probability
+    - cloudpickle==1.4.1  # due to https://github.com/tensorflow/probability/issues/991

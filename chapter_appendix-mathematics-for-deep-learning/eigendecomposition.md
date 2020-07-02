@@ -590,6 +590,6 @@ $$
 \end{bmatrix}.
 $$
 
-## [Discussions](https://discuss.mxnet.io/t/5148)
-
-![](../img/qr_eigendecomposition.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/411)
+:end_tab:

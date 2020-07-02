@@ -37,6 +37,7 @@ zeros = np.zeros
 
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
+    """Make a directory if it does not exist."""
     if not isinstance(path, str):
         path = os.path.join(*path)
     if not os.path.exists(path):
@@ -143,16 +144,19 @@ def synthetic_data(w, b, num_examples):  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):  #@save
+    """The linear regression model."""
     return np.dot(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def squared_loss(y_hat, y):  #@save
+    """Squared loss."""
     return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def sgd(params, lr, batch_size):  #@save
+    """Minibatch stochastic gradient descent."""
     for param in params:
         param[:] = param - lr * param.grad / batch_size
 
@@ -166,6 +170,7 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def get_fashion_mnist_labels(labels):  #@save
+    """Return text labels for the Fashion-MNIST dataset."""
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
@@ -319,6 +324,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def predict_ch3(net, test_iter, n=6):  #@save
+    """Predict labels (defined in Chapter 3)."""
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
@@ -350,9 +356,9 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
     """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
     url, sha1_hash = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)    
+    d2l.mkdir_if_not_exist(cache_dir)
     fname = os.path.join(cache_dir, url.split('/')[-1])
-    if os.path.exists(fname):        
+    if os.path.exists(fname):
         sha1 = hashlib.sha1()
         with open(fname, 'rb') as f:
             while True:
@@ -372,7 +378,7 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
 def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
     fname = download(name)
-    base_dir = os.path.dirname(fname) 
+    base_dir = os.path.dirname(fname)
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
@@ -398,7 +404,7 @@ DATA_HUB['kaggle_house_train'] = (  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_test'] = (  #@save  
+DATA_HUB['kaggle_house_test'] = (  #@save
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
@@ -451,7 +457,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
             timer.start()
-            # Here is the only difference compared to train_epoch_ch3
+            # Here is the only difference compared with `d2l.train_epoch_ch3`
             X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
             with autograd.record():
                 y_hat = net(X)
@@ -466,9 +472,10 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_loss, train_acc, test_acc))
-    print('%.1f examples/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
+    print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(ctx)}')
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
@@ -578,13 +585,13 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
     random.shuffle(example_indices)
 
     def data(pos):
-        # This returns a sequence of the length num_steps starting from pos
+        # This returns a sequence of length `num_steps` starting from `pos`
         return corpus[pos: pos + num_steps]
 
     # Discard half empty batches
     num_batches = num_examples // batch_size
     for i in range(0, batch_size * num_batches, batch_size):
-        # Batch_size indicates the random examples read each time
+        # `batch_size` indicates the random examples read each time
         batch_indices = example_indices[i:(i+batch_size)]
         X = [data(j) for j in batch_indices]
         Y = [data(j + 1) for j in batch_indices]
@@ -595,7 +602,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
-    # Slice out data - ignore num_steps and just wrap around
+    # Slice out data: ignore `num_steps` and just wrap around
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
     Xs = np.array(corpus[offset:offset+num_indices])
     Ys = np.array(corpus[offset+1:offset+1+num_indices])
@@ -696,7 +703,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
         l.backward()
         grad_clipping(model, 1)
         updater(batch_size=1)  # Since used mean already
-        metric.add(l * y.size, y.size)
+        metric.add(l * d2l.size(y), d2l.size(y))
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 
 
@@ -728,7 +735,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
         if epoch % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch+1, [ppl])
-    print('Perplexity %.1f, %d tokens/sec on %s' % (ppl, speed, ctx))
+    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(ctx)}')
     print(predict('time traveller'))
     print(predict('traveller'))
 
@@ -744,9 +751,9 @@ class RNNModel(nn.Block):
     def forward(self, inputs, state):
         X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
-        # The fully connected layer will first change the shape of Y to
-        # (num_steps * batch_size, num_hiddens). Its output shape is
-        # (num_steps * batch_size, vocab_size).
+        # The fully connected layer will first change the shape of `Y` to
+        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
+        # (`num_steps` * `batch_size`, `vocab_size`).
         output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 
@@ -871,13 +878,14 @@ class Seq2SeqEncoder(d2l.Encoder):
         self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
 
     def forward(self, X, *args):
-        X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
-        # RNN needs first axes to be timestep, i.e., seq_len
+        # `X` shape: (`batch_size`, `seq_len`, `embed_size`)
+        X = self.embedding(X)
+        # RNN needs first axes to be timestep, i.e., `seq_len`
         X = X.swapaxes(0, 1)
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
         out, state = self.rnn(X, state)
-        # out shape: (seq_len, batch_size, num_hiddens)
-        # state shape: (num_layers, batch_size, num_hiddens),
+        # `out` shape: (`seq_len`, `batch_size`, `num_hiddens`)
+        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`),
         # where "state" contains the hidden state and the memory cell
         return out, state
 
@@ -905,9 +913,9 @@ class Seq2SeqDecoder(d2l.Decoder):
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
-    # pred shape: (batch_size, seq_len, vocab_size)
-    # label shape: (batch_size, seq_len)
-    # valid_len shape: (batch_size, )
+    # `pred` shape: (`batch_size`, `seq_len`, `vocab_size`)
+    # `label` shape: (`batch_size`, `seq_len`)
+    # `valid_len` shape: (`batch_size`, )
     def forward(self, pred, label, valid_len):
         # weights shape: (batch_size, seq_len, 1)
         weights = np.expand_dims(np.ones_like(label), axis=-1)
@@ -939,8 +947,8 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
             metric.add(l.sum(), num_tokens)
         if epoch % 10 == 0:
             animator.add(epoch, (metric[0]/metric[1],))
-    print('loss %.3f, %d tokens/sec on %s ' % (
-        metric[0]/metric[1], metric[1]/timer.stop(), ctx))
+    print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
+          f'tokens/sec on {str(ctx)}')
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
@@ -950,7 +958,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     enc_valid_len = np.array([len(src_tokens)], ctx=ctx)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
     enc_X = np.array(src_tokens, ctx=ctx)
-    # Add the batch_size dimension
+    # Add the  batch size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
@@ -1184,7 +1192,6 @@ def train_2d(trainer, steps=20):
     for i in range(steps):
         x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
-        print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
 
@@ -1239,12 +1246,12 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
+def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     # Initialization
     net = nn.Sequential()
     net.add(nn.Dense(1))
@@ -1266,7 +1273,7 @@ def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 
 
 # Defined in file: ./chapter_computational-performance/hybridize.md
@@ -1371,10 +1378,10 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                               None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)
         animator.add(epoch + 1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        metric[0] / metric[2], metric[1] / metric[3], test_acc))
-    print('%.1f examples/sec on %s' % (
-        metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'loss {metric[0] / metric[2]:.3f}, train acc '
+          f'{metric[1] / metric[3]:.3f}, test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec on '
+          f'{str(ctx_list)}')
 
 
 # Defined in file: ./chapter_computer-vision/fine-tuning.md
@@ -1453,9 +1460,9 @@ def read_voc_images(voc_dir, is_train=True):
     features, labels = [], []
     for i, fname in enumerate(images):
         features.append(image.imread(os.path.join(
-            voc_dir, 'JPEGImages', '%s.jpg' % fname)))
+            voc_dir, 'JPEGImages', f'{fname}.jpg')))
         labels.append(image.imread(os.path.join(
-            voc_dir, 'SegmentationClass', '%s.png' % fname)))
+            voc_dir, 'SegmentationClass', f'{fname}.png')))
     return features, labels
 
 
@@ -1645,8 +1652,8 @@ def subsampling(sentences, vocab):
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a
-        # "central target word - context word" pair
+        # Each sentence needs at least 2 words to form a "central target word
+        # - context word" pair
         if len(line) < 2:
             continue
         centers += line
@@ -1728,22 +1735,22 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['glove.6b.50d'] = (d2l.DATA_URL + 'glove.6B.50d.zip',
-                       '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
+                                '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['glove.6b.100d'] = (d2l.DATA_URL + 'glove.6B.100d.zip',
-                       'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
+                                 'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['glove.42b.300d'] = (d2l.DATA_URL + 'glove.42B.300d.zip',
-                       'b5116e234e9eb9076672cfeabf5469f3eec904fa')
+                                  'b5116e234e9eb9076672cfeabf5469f3eec904fa')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
-                       'c1816da3821ae9f43899be655002f6c723e91b88')
+                           'c1816da3821ae9f43899be655002f6c723e91b88')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
@@ -1753,7 +1760,7 @@ class TokenEmbedding:
         self.idx_to_token, self.idx_to_vec = self._load_embedding(
             embedding_name)
         self.unknown_idx = 0
-        self.token_to_idx = {token: idx for idx, token in 
+        self.token_to_idx = {token: idx for idx, token in
                              enumerate(self.idx_to_token)}
 
     def _load_embedding(self, embedding_name):
@@ -1811,7 +1818,7 @@ class BERTEncoder(nn.Block):
 
     def forward(self, tokens, segments, valid_lens):
         # Shape of `X` remains unchanged in the following code snippet:
-        # (batch size, max sequence length, num_hiddens)
+        # (batch size, max sequence length, `num_hiddens`)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = X + self.pos_embedding.data(ctx=X.ctx)[:, :X.shape[1], :]
         for blk in self.blks:
@@ -1835,7 +1842,7 @@ class MaskLM(nn.Block):
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
         # Suppose that `batch_size` = 2, `num_pred_positions` = 3, then
-        # `batch_idx` is np.array([0, 0, 0, 1, 1, 1])
+        # `batch_idx` is `np.array([0, 0, 0, 1, 1, 1])`
         batch_idx = np.repeat(batch_idx, num_pred_positions)
         masked_X = X[batch_idx, pred_positions]
         masked_X = masked_X.reshape((batch_size, num_pred_positions, -1))
@@ -1850,7 +1857,7 @@ class NextSentencePred(nn.Block):
         self.output = nn.Dense(2)
 
     def forward(self, X):
-        # X shape: (batch size, `num_hiddens`)
+        # `X` shape: (batch size, `num_hiddens`)
         return self.output(X)
 
 
@@ -1900,7 +1907,7 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
         is_next = True
     else:
-        # paragraphs is a list of lists of lists
+        # `paragraphs` is a list of lists of lists
         next_sentence = random.choice(random.choice(paragraphs))
         is_next = False
     return sentence, next_sentence, is_next
@@ -2002,8 +2009,8 @@ def _pad_bert_inputs(examples, max_len, vocab):
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraphs, max_len):
-        # Input paragraphs[i] is a list of sentence strings representing a
-        # paragraph; while output paragraphs[i] is a list of sentences
+        # Input `paragraphs[i]` is a list of sentence strings representing a
+        # paragraph; while output `paragraphs[i]` is a list of sentences
         # representing a paragraph, where each sentence is a list of tokens
         paragraphs = [d2l.tokenize(
             paragraph, token='word') for paragraph in paragraphs]
@@ -2117,9 +2124,9 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
                 num_steps_reached = True
                 break
 
-    print('MLM loss %.3f, NSP loss %.3f'
-          % (metric[0] / metric[3], metric[1] / metric[3]))
-    print('%.1f sentence pairs/sec on %s' % (metric[2] / timer.sum(), ctx))
+    print(f'MLM loss {metric[0] / metric[3]:.3f}, '
+          f'NSP loss {metric[1] / metric[3]:.3f}')
+    print(f'{metric[2] / timer.sum():.1f} sentence pairs/sec on {str(ctx)}')
 
 
 # Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis-and-dataset.md
@@ -2241,7 +2248,7 @@ def load_data_snli(batch_size, num_steps=50):
 
 # Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-attention.md
 def split_batch_multi_inputs(X, y, ctx_list):
-    """Split multi-input X and y into multiple devices specified by ctx"""
+    """Split multi-input `X` and `y` into multiple devices."""
     X = list(zip(*[gluon.utils.split_and_load(
         feature, ctx_list, even_split=False) for feature in X]))
     return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
@@ -2363,17 +2370,17 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             trainer.step(values[0].shape[0])
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
-        if len(kwargs) > 0:  # it will be used in section AutoRec.
+        if len(kwargs) > 0:  # It will be used in section AutoRec
             test_rmse = evaluator(net, test_iter, kwargs['inter_mat'],
                                   ctx_list)
         else:
             test_rmse = evaluator(net, test_iter, ctx_list)
         train_l = l / (i + 1)
         animator.add(epoch + 1, (train_l, test_rmse))
-    print('train loss %.3f, test RMSE %.3f'
-          % (metric[0] / metric[1], test_rmse))
-    print('%.1f examples/sec on %s'
-          % (metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'train loss {metric[0] / metric[1]:.3f}, '
+          f'test RMSE {test_rmse:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(ctx_list)}')
 
 
 # Defined in file: ./chapter_recommender-systems/ranking.md
@@ -2424,10 +2431,9 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
         if seq is not None:
             x.append(seq[user_ids, :])
         x.extend([np.array(item_ids)])
-        test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x),
-                                               shuffle=False, 
-                                               last_batch="keep", 
-                                               batch_size=1024) 
+        test_data_iter = gluon.data.DataLoader(
+            gluon.data.ArrayDataset(*x), shuffle=False, last_batch="keep",
+            batch_size=1024) 
         for index, values in enumerate(test_data_iter):
             x = [gluon.utils.split_and_load(v, ctx, even_split=False) 
                  for v in values]
@@ -2471,10 +2477,10 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                                           candidates, num_users, num_items,
                                           ctx_list)
                 animator.add(epoch + 1, (hit_rate, auc))
-    print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
-          % (metric[0] / metric[1], hit_rate, auc))
-    print('%.1f examples/sec on %s'
-          % (metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'train loss {metric[0] / metric[1]:.3f}, '
+          f'test hit rate {float(hit_rate):.3f}, test AUC {float(auc):.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(ctx_list)}')
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
@@ -2533,7 +2539,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     with autograd.record():
         real_Y = net_D(X)
         fake_X = net_G(Z)
-        # Do not need to compute gradient for net_G, detach it from
+        # Do not need to compute gradient for `net_G`, detach it from
         # computing gradients.
         fake_Y = net_D(fake_X.detach())
         loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
@@ -2543,14 +2549,14 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 
 
 # Defined in file: ./chapter_generative-adversarial-networks/gan.md
-def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
+def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
     """Update generator."""
     batch_size = Z.shape[0]
     ones = np.ones((batch_size,), ctx=Z.ctx)
     with autograd.record():
-        # We could reuse fake_X from update_D to save computation.
+        # We could reuse `fake_X` from `update_D` to save computation
         fake_X = net_G(Z)
-        # Recomputing fake_Y is needed since net_D is changed.
+        # Recomputing `fake_Y` is needed since `net_D` is changed
         fake_Y = net_D(fake_X)
         loss_G = loss(fake_Y, ones)
     loss_G.backward()

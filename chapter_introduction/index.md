@@ -1300,7 +1300,7 @@ Suddenly algorithms and models that seemed computationally infeasible
 became relevant (and vice versa).
 This is best illustrated in :numref:`tab_intro_decade`.
 
-:Dataset versus computer memory and computational power
+:Dataset vs. computer memory and computational power
 
 |Decade|Dataset|Memory|Floating Point Calculations per Second|
 |:--|:-|:-|:-|

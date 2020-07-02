@@ -29,6 +29,4 @@ Next, Colab will connect you to an instance to run this notebook. Specifically, 
 1. Try to edit and run the code in this book using Google Colab.
 
 
-## [Discussions](https://discuss.mxnet.io/t/5639)
-
-![](../img/qr_colab.svg)
+[Discussions](https://discuss.d2l.ai/t/424)

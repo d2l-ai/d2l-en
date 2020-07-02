@@ -57,7 +57,7 @@ $\mathbf W_q^{(i)}\in\mathbb R^{p_q\times d_q}$,
 $\mathbf W_k^{(i)}\in\mathbb R^{p_k\times d_k}$,
 and $\mathbf W_v^{(i)}\in\mathbb R^{p_v\times d_v}$. Therefore, the output for each head is
 
-$$\mathbf o^{(i)} = \textrm{attention}(\mathbf W_q^{(i)}\mathbf q, \mathbf W_k^{(i)}\mathbf k,\mathbf W_v^{(i)}\mathbf v),$$
+$$\mathbf o^{(i)} = \mathrm{attention}(\mathbf W_q^{(i)}\mathbf q, \mathbf W_k^{(i)}\mathbf k,\mathbf W_v^{(i)}\mathbf v),$$
 
 where $\textrm{attention}$ can be any attention layer, such as the `DotProductAttention` and `MLPAttention` as we introduced in :numref:`sec_attention`.
 
@@ -462,6 +462,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 1. Compare layer normalization and batch normalization, when shall we apply which?
 
 
-## [Discussions](https://discuss.mxnet.io/t/4344)
-
-![](../img/qr_transformer.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/348)
+:end_tab:

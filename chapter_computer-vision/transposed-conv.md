@@ -130,6 +130,6 @@ Y == np.dot(W.T, X.reshape(-1)).reshape(3, 3)
 
 1. Is it efficient to use matrix multiplication to implement convolution operations? Why?
 
-## [Discussions](https://discuss.mxnet.io/t/transposed-convolution/4366)
-
-![](../img/qr_transposed-conv.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/376)
+:end_tab:

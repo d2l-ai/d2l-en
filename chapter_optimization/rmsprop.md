@@ -39,7 +39,7 @@ d2l.set_figsize()
 gammas = [0.95, 0.9, 0.8, 0.7]
 for gamma in gammas:
     x = np.arange(40).asnumpy()
-    d2l.plt.plot(x, (1-gamma) * gamma ** x, label='gamma = %.2f' % gamma)
+    d2l.plt.plot(x, (1-gamma) * gamma ** x, label=f'gamma = {gamma:.2f}')
 d2l.plt.xlabel('time');
 ```
 
@@ -91,8 +91,8 @@ d2l.train_ch11(rmsprop, init_rmsprop_states(feature_dim),
 Since RMSProp is a rather popular algorithm it is also available in the `Trainer` instance. All we need to do is instantiate it using an algorithm named `rmsprop`, assigning $\gamma$ to the parameter `gamma1`.
 
 ```{.python .input  n=29}
-d2l.train_gluon_ch11('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
-                     data_iter)
+d2l.train_concise_ch11('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
+                       data_iter)
 ```
 
 ## Summary
@@ -110,6 +110,6 @@ d2l.train_gluon_ch11('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
 1. Would you want to adjust $\gamma$ as optimization progresses? How sensitive is RMSProp to this?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2376)
-
-![](../img/qr_rmsprop.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/356)
+:end_tab:

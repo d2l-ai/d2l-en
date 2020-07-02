@@ -1,9 +1,9 @@
 # Concise Implementation of Softmax Regression
-:label:`sec_softmax_gluon`
+:label:`sec_softmax_concise`
 
 Just as high-level APIs of deep learning frameworks
 made it much easier
-to implement linear regression in :numref:`sec_linear_gluon`,
+to implement linear regression in :numref:`sec_linear_concise`,
 we will find it similarly (or possibly more)
 convenient for implementing classification models.
 
@@ -69,8 +69,8 @@ net.initialize(init.Normal(sigma=0.01))
 
 ```{.python .input}
 #@tab pytorch
-# PyTorch doesn't implicitly reshape the inputs.
-# Thus we define a layer to reshape the inputs in our network.
+# PyTorch does not implicitly reshape the inputs. Thus we define a layer to
+# reshape the inputs in our network
 class Reshape(torch.nn.Module):
     def forward(self, x):
         return x.view(-1,784)
@@ -93,6 +93,7 @@ net.add(tf.keras.layers.Dense(10, kernel_initializer=weight_initializer))
 ```
 
 ## Softmax Implementation Revisited
+:label:`subsec_softmax-implementation-revisited`
 
 In the previous example of :numref:`sec_softmax_scratch`,
 we calculated our model's output
@@ -103,9 +104,9 @@ exponentiation can be a source of numerical stability issues.
 
 Recall that the softmax function calculates
 $\hat y_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}$,
-where $\hat y_j$ is the $j^\text{th}$ element of
+where $\hat y_j$ is the $j^\mathrm{th}$ element of
 the predicted probability distribution $\hat{\mathbf{y}}$
-and $o_j$ is the $j^\text{th}$ element of the logits
+and $o_j$ is the $j^\mathrm{th}$ element of the logits
 $\mathbf{o}$.
 If some of the $o_k$ are very large (i.e., very positive),
 then $\exp(o_k)$ might be larger than the largest number
@@ -143,7 +144,7 @@ and can use instead $o_j$ directly due to the canceling in $\log(\exp(\cdot))$.
 $$
 \begin{aligned}
 \log{(\hat y_j)} & = \log\left( \frac{\exp(o_j)}{\sum_k \exp(o_k)}\right) \\
-& = \log{(\exp(o_j))}-\text{log}{\left( \sum_k \exp(o_k) \right)} \\
+& = \log{(\exp(o_j))}-\log{\left( \sum_k \exp(o_k) \right)} \\
 & = o_j -\log{\left( \sum_k \exp(o_k) \right)}.
 \end{aligned}
 $$
@@ -203,11 +204,12 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 As before, this algorithm converges to a solution
 that achieves a decent accuracy,
 albeit this time with fewer lines of code than before.
-Note that in many cases, a deep learning framework takes additional precautions
-beyond these most well-known tricks to ensure numerical stability,
-saving us from even more pitfalls that we would encounter
-if we tried to code all of our models from scratch in practice.
 
+
+## Summary
+
+* Using high-level APIs, we can implement softmax regression much more concisely.
+* From a computational perspective, implementing softmax regression has intricacies. Note that in many cases, a deep learning framework takes additional precautions beyond these most well-known tricks to ensure numerical stability, saving us from even more pitfalls that we would encounter if we tried to code all of our models from scratch in practice.
 
 ## Exercises
 

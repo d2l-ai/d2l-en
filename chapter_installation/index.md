@@ -50,7 +50,6 @@ Next, we need to download the code of this book. You can click the "All
 Notebooks" tab on the top of any HTML page to download and unzip the code.
 Alternatively, if you have `unzip` (otherwise run `sudo apt install unzip`) available:
 
-
 ```bash
 mkdir d2l-en && cd d2l-en
 curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
@@ -86,15 +85,21 @@ to access GPUs before running larger models.
 
 
 :begin_tab:`mxnet`
+
 ```bash
 pip install mxnet==1.6.0
 ```
+
+
 :end_tab:
 
 :begin_tab:`pytorch`
+
 ```bash
-pip install torch==1.5.0 torchvision
+pip install torch==1.5.1 torchvision
 ```
+
+
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -103,6 +108,8 @@ You can install TensorFlow with both CPU and GPU support via the following:
 ```bash
 pip install tensorflow==2.2.0 tensorflow-probability==0.10.0
 ```
+
+
 :end_tab:
 
 
@@ -147,15 +154,21 @@ then you are all set.
 :end_tab:
 
 :begin_tab:`mxnet`
+
 ```bash
 pip uninstall mxnet
 ```
+
+
 :end_tab:
 
 :begin_tab:`pytorch`
+
 ```bash
 pip uninstall torch
 ```
+
+
 :end_tab:
 
 :begin_tab:`mxnet,pytorch`
@@ -166,6 +179,7 @@ then you can install with the following command:
 :end_tab:
 
 :begin_tab:`mxnet`
+
 ```bash
 # For Windows users
 pip install mxnet-cu101==1.6.0b20190926
@@ -173,12 +187,17 @@ pip install mxnet-cu101==1.6.0b20190926
 # For Linux and macOS users
 pip install mxnet-cu101==1.6.0
 ```
+
+
 :end_tab:
 
 :begin_tab:`pytorch`
+
 ```bash
-pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+pip install torch==1.5.1+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 ```
+
+
 :end_tab:
 
 :begin_tab:`mxnet,pytorch`
@@ -196,4 +215,8 @@ CUDA 10.0 and `cu90` for CUDA 9.0.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/24)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/436)
 :end_tab:

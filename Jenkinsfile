@@ -18,6 +18,7 @@ stage("Build and Publish") {
 
       sh label: "Build Environment", script: """set -ex
       conda env update -n ${ENV_NAME} -f static/build.yml
+      pip list
       nvidia-smi
       """
 
@@ -47,6 +48,7 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       ./static/cache.sh restore _build/eval_tensorflow/data
+      export TF_CPP_MIN_LOG_LEVEL=3
       d2lbook build eval --tab tensorflow
       ./static/cache.sh store _build/eval_tensorflow/data
       """
@@ -65,14 +67,14 @@ stage("Build and Publish") {
         sh label:"Release", script:"""set -ex
         conda activate ${ENV_NAME}
         d2lbook build pkg
-        d2lbook deploy html pdf pkg colab sagemaker --s3 s3://en.d2l.ai
+        d2lbook deploy html pdf pkg colab sagemaker --s3 s3://preview.d2l.ai/${JOB_NAME}/
         """
 
         sh label:"Release d2l", script:"""set -ex
         conda activate ${ENV_NAME}
         pip install setuptools wheel twine
         python setup.py bdist_wheel
-        twine upload dist/*
+        # twine upload dist/*
         """
       } else {
         sh label:"Publish", script:"""set -ex

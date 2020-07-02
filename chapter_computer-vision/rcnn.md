@@ -209,6 +209,6 @@ chapter.
 1. Study the implementation of each model in the [GluonCV toolkit](https://github.com/dmlc/gluon-cv/) related to this section.
 
 
-## [Discussions](https://discuss.mxnet.io/t/2447)
-
-![](../img/qr_rcnn.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/374)
+:end_tab:

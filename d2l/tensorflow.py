@@ -37,6 +37,7 @@ zeros = tf.zeros
 
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
+    """Make a directory if it does not exist."""
     if not isinstance(path, str):
         path = os.path.join(*path)
     if not os.path.exists(path):
@@ -145,16 +146,19 @@ def synthetic_data(w, b, num_examples):  #@save
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):  #@save
+    """The linear regression model."""
     return tf.matmul(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def squared_loss(y_hat, y):  #@save
+    """Squared loss."""
     return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def sgd(params, grads, lr, batch_size):  #@save
+    """Minibatch stochastic gradient descent."""
     for param, grad in zip(params, grads):
         param.assign_sub(lr*grad/batch_size)
 
@@ -171,6 +175,7 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def get_fashion_mnist_labels(labels):  #@save
+    """Return text labels for the Fashion-MNIST dataset."""
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
@@ -250,9 +255,9 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         # Compute gradients and update parameters
         with tf.GradientTape() as tape:
             y_hat = net(X)
-            # tf.Keras' implementations for loss takes (labels, predictions)
+            # Keras implementations for loss takes (labels, predictions)
             # instead of (predictions, labels) that users might implement
-            # in this book, e.g. `cross_entropy()` that we implemented above
+            # in this book, e.g. `cross_entropy` that we implemented above
             if isinstance(loss, tf.keras.losses.Loss):
                 l = loss(y, y_hat)
             else:
@@ -263,7 +268,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater.apply_gradients(zip(grads, params))
         else:
             updater(X.shape[0], tape.gradient(l, updater.params))
-        # Keras loss in default returns the average loss in a batch
+        # Keras loss by default returns the average loss in a batch
         l_sum = l * float(tf.size(y)) if isinstance(
             loss, tf.keras.losses.Loss) else tf.reduce_sum(l)
         metric.add(l_sum, accuracy(y_hat, y), tf.size(y))
@@ -330,6 +335,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Updater():  #@save
+    """For updating parameters using minibatch stochastic gradient descent."""
     def __init__(self, params, lr):
         self.params = params
         self.lr = lr
@@ -340,6 +346,7 @@ class Updater():  #@save
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def predict_ch3(net, test_iter, n=6):  #@save
+    """Predict labels (defined in Chapter 3)."""
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
@@ -372,9 +379,9 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
     """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
     url, sha1_hash = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)    
+    d2l.mkdir_if_not_exist(cache_dir)
     fname = os.path.join(cache_dir, url.split('/')[-1])
-    if os.path.exists(fname):        
+    if os.path.exists(fname):
         sha1 = hashlib.sha1()
         with open(fname, 'rb') as f:
             while True:
@@ -394,7 +401,7 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
 def download_extract(name, folder=None):  #@save
     """Download and extract a zip/tar file."""
     fname = download(name)
-    base_dir = os.path.dirname(fname) 
+    base_dir = os.path.dirname(fname)
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
@@ -420,7 +427,7 @@ DATA_HUB['kaggle_house_train'] = (  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_test'] = (  #@save  
+DATA_HUB['kaggle_house_test'] = (  #@save
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
@@ -478,9 +485,10 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
             batch_size = next(iter(self.train_iter))[0].shape[0]
             num_examples = batch_size * tf.data.experimental.cardinality(
                 self.train_iter).numpy()
-            print('loss %.3f, train acc %.3f, test acc %.3f' % metrics)
-            print('%.1f examples/sec on %s' % (
-                num_examples/self.timer.avg(), self.device_name))
+            print(f'loss {metrics[0]:.3f}, train acc {metrics[1]:.3f}, '
+                  f'test acc {metrics[2]:.3f}')
+            print(f'{num_examples / self.timer.avg():.1f} examples/sec on '
+                  f'{str(self.device_name)}')
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md

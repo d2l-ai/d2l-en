@@ -24,6 +24,7 @@ function ensures that the directory `../data` exists.
 import os
 
 def mkdir_if_not_exist(path):  #@save
+    """Make a directory if it does not exist."""
     if not isinstance(path, str):
         path = os.path.join(*path)
     if not os.path.exists(path):

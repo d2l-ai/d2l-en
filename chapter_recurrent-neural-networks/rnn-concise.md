@@ -1,5 +1,4 @@
 # Concise Implementation of Recurrent Neural Networks
-:label:`sec_rnn_gluon`
 
 While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks (RNNs) are implemented, this is not convenient or fast. This section will show how to implement the same language model more efficiently using functions provided by Gluon. We begin as before by reading the "Time Machine" corpus.
 
@@ -54,9 +53,9 @@ class RNNModel(nn.Block):
     def forward(self, inputs, state):
         X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
-        # The fully connected layer will first change the shape of Y to
-        # (num_steps * batch_size, num_hiddens). Its output shape is
-        # (num_steps * batch_size, vocab_size).
+        # The fully connected layer will first change the shape of `Y` to
+        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
+        # (`num_steps` * `batch_size`, `vocab_size`).
         output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 
@@ -105,6 +104,6 @@ Compared with the last section, this model achieves comparable perplexity, albei
     * How many bits do you need?
     * Why does not everyone use this model for text compression? Hint: what about the compressor itself?
 
-## [Discussions](https://discuss.mxnet.io/t/2365)
-
-![](../img/qr_rnn-gluon.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/335)
+:end_tab:

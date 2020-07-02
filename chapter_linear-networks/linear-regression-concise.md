@@ -1,5 +1,5 @@
 # Concise Implementation of Linear Regression
-:label:`sec_linear_gluon`
+:label:`sec_linear_concise`
 
 Broad and intense interest in deep learning for the past several years
 has inspired companies, academics, and hobbyists
@@ -432,7 +432,7 @@ for epoch in range(num_epochs):
 num_epochs = 3
 for epoch in range(num_epochs):
     for X, y in data_iter:
-        with tf.GradientTape(persistent=True) as tape:
+        with tf.GradientTape() as tape:
             l = loss(net(X, training=True), y)
         grads = tape.gradient(l, net.trainable_variables)
         trainer.apply_gradients(zip(grads, net.trainable_variables))

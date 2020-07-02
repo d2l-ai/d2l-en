@@ -42,7 +42,7 @@ d2l.use_svg_display()
 
 ## Reading the Dataset
 
-We can download and read the FashionMNIST dataset into memory via the the build-in functions in the framework.
+We can download and read the Fashion-MNIST dataset into memory via the the build-in functions in the framework.
 
 ```{.python .input}
 mnist_train = gluon.data.vision.FashionMNIST(train=True)
@@ -66,7 +66,7 @@ mnist_test = torchvision.datasets.FashionMNIST(
 mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
 ```
 
-FashionMNIST consists of images from 10 categories, each represented
+Fashion-MNIST consists of images from 10 categories, each represented
 by 6000 images in the training set and by 1000 in the test set.
 Consequently the training set and the test set
 contain 60000 and 10000 images, respectively.
@@ -103,6 +103,7 @@ The following function converts between numeric label indices and their names in
 ```{.python .input}
 #@tab all
 def get_fashion_mnist_labels(labels):  #@save
+    """Return text labels for the Fashion-MNIST dataset."""
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]

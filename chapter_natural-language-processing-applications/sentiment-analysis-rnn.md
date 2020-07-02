@@ -41,26 +41,26 @@ class BiRNN(nn.Block):
                  num_layers, **kwargs):
         super(BiRNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        # Set Bidirectional to True to get a bidirectional recurrent neural
+        # Set `bidirectional` to True to get a bidirectional recurrent neural
         # network
         self.encoder = rnn.LSTM(num_hiddens, num_layers=num_layers,
                                 bidirectional=True, input_size=embed_size)
         self.decoder = nn.Dense(2)
 
     def forward(self, inputs):
-        # The shape of inputs is (batch size, number of words). Because LSTM
+        # The shape of `inputs` is (batch size, no. of words). Because LSTM
         # needs to use sequence as the first dimension, the input is
         # transformed and the word feature is then extracted. The output shape
-        # is (number of words, batch size, word vector dimension).
+        # is (no. of words, batch size, word vector dimension).
         embeddings = self.embedding(inputs.T)
         # Since the input (embeddings) is the only argument passed into
         # rnn.LSTM, it only returns the hidden states of the last hidden layer
-        # at different timestep (outputs). The shape of outputs is
-        # (number of words, batch size, 2 * number of hidden units).
+        # at different timestep (outputs). The shape of `outputs` is
+        # (no. of words, batch size, 2 * no. of hidden units).
         outputs = self.encoder(embeddings)
         # Concatenate the hidden states of the initial timestep and final
         # timestep to use as the input of the fully connected layer. Its
-        # shape is (batch size, 4 * number of hidden units)
+        # shape is (batch size, 4 * no. of hidden units)
         encoding = np.concatenate((outputs[0], outputs[-1]), axis=1)
         outs = self.decoder(encoding)
         return outs
@@ -140,6 +140,6 @@ predict_sentiment(net, vocab, 'this movie is so bad')
 1. Can we improve the classification accuracy by using the spaCy word tokenization tool? You need to install spaCy: `pip install spacy` and install the English package: `python -m spacy download en`. In the code, first import spacy: `import spacy`. Then, load the spacy English package: `spacy_en = spacy.load('en')`. Finally, define the function `def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)]` and replace the original `tokenizer` function. It should be noted that GloVe's word vector uses "-" to connect each word when storing noun phrases. For example, the phrase "new york" is represented as "new-york" in GloVe. After using spaCy tokenization, "new york" may be stored as "new york".
 
 
-## [Discussions](https://discuss.mxnet.io/t/2391)
-
-![](../img/qr_sentiment-analysis-rnn.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/392)
+:end_tab:

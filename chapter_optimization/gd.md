@@ -126,7 +126,6 @@ def train_2d(trainer, steps=20):
     for i in range(steps):
         x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
-        print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
 #@save
@@ -282,6 +281,6 @@ This algorithm converges rapidly (for an analysis and proof see e.g., :cite:`Boy
     * Apply this to the problem above.
 1. Apply the algorithm above to a number of objective functions (convex or not). What happens if you rotate coordinates by $45$ degrees?
 
-## [Discussions](https://discuss.mxnet.io/t/5197)
-
-![](../img/qr_gd.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/351)
+:end_tab:

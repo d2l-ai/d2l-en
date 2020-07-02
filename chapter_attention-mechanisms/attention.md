@@ -274,6 +274,6 @@ atten(torch.ones(2, 1, 2), keys, values, torch.tensor([2, 6]))
 1. What are the advantages and disadvantages for dot product attention and multilayer perceptron attention, respectively?
 
 
-## [Discussions](https://discuss.mxnet.io/t/attention/4343)
-
-![](../img/qr_attention.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/346)
+:end_tab:
