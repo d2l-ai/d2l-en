@@ -526,22 +526,14 @@ allocating memory unnecessarily all the time.
 In machine learning, we might have
 hundreds of megabytes of parameters
 and update all of them multiple times per second.
-
 Typically, we will want to perform these updates *in place*.
 Second, we might point at the same parameters from multiple variables.
 If we do not update in place, other references will still point to
 the old memory location, making it possible for parts of our code
 to inadvertently reference stale parameters.
 
-:begin_tab:`mxnet`
-Fortunately, performing in-place operations in MXNet is easy.
-:end_tab:
-
-:begin_tab:`pytorch`
-Fortunately, performing in-place operations in PyTorch is easy.
-:end_tab:
-
 :begin_tab:`mxnet, pytorch`
+Fortunately, performing in-place operations is easy.
 We can assign the result of an operation
 to a previously allocated array with slice notation,
 e.g., `y[:] = <expression>`.
