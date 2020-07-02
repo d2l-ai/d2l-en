@@ -349,8 +349,7 @@ def b5():
 # in order to utilize the CPU/GPU devices that we have.
 def net():
     return tf.keras.Sequential([b1(), b2(), b3(), b4(), b5(),
-                                tf.keras.layers.Dense(
-                                    10, activation='softmax')])
+                                tf.keras.layers.Dense(10)])
 ```
 
 The GoogLeNet model is computationally complex,
