@@ -214,7 +214,7 @@ x.grad  # Equals to y = sum(x * x)
 # Invoking `backward` on a non-scalar requires passing in a `gradient` argument
 # which specifies the gradient of the differentiated function w.r.t `self`.
 # In our case, we simply want to sum the partial derivatives, so passing
-# in a gradient of ones is appropriate.
+# in a gradient of ones is appropriate
 x.grad.zero_()
 y = x * x
 # y.backward(torch.ones(len(x))) equivalent to the below
