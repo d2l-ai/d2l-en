@@ -136,7 +136,7 @@ saves model *parameters* and not the entire model.
 For example, if we have a 3-layer MLP,
 we need to specify the *architecture* separately.
 The reason for this is that the models themselves can contain arbitrary code,
-hence they cannot be serialized as naturally
+hence they cannot be serialized as naturally.
 Thus, in order to reinstate a model, we need
 to generate the architecture in code
 and then load the parameters from disk.
