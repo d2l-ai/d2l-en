@@ -431,7 +431,7 @@ We will synthesize 100 samples each for the training set and test set.
 
 ```{.python .input}
 #@tab all
-max_degree = 10  # Maximum degree of the polynomial
+max_degree = 20  # Maximum degree of the polynomial
 n_train, n_test = 100, 100  # Training and test dataset sizes
 true_w = np.zeros(max_degree)  # Allocate lots of empty space
 true_w[0:4] = np.array([5, 1.2, -3.4, 5.6])
