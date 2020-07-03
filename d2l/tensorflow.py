@@ -351,14 +351,14 @@ def predict_ch3(net, test_iter, n=6):  #@save
         break
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(tf.argmax(net(X), axis=1))
-    titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
+    titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
     d2l.show_images(tf.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
-    metric = d2l.Accumulator(2)  # sum_loss, num_examples
+    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
         l = loss(net(X), y)
         metric.add(tf.reduce_sum(l), tf.size(l).numpy())
