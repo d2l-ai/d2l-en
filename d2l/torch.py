@@ -231,7 +231,8 @@ def accuracy(y_hat, y):  #@save
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
-    net.eval() # Set the model to evaluation mode
+    if isinstance(net, torch.nn.Module):
+        net.eval() # Set the model to evaluation mode
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
         metric.add(accuracy(net(X), y), sum(y.shape))
