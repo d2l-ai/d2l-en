@@ -103,10 +103,10 @@ Recall that $\mathbf{v}_t = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\ta
 
 ```{.python .input}
 d2l.set_figsize()
-gammas = [0.95, 0.9, 0.6, 0]
-for gamma in gammas:
+betas = [0.95, 0.9, 0.6, 0]
+for beta in betas:
     x = np.arange(40).asnumpy()
-    d2l.plt.plot(x, gamma ** x, label=f'gamma = {gamma:.2f}')
+    d2l.plt.plot(x, beta ** x, label=f'beta = {beta:.2f}')
 d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
