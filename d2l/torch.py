@@ -231,6 +231,7 @@ def accuracy(y_hat, y):  #@save
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
+    net.eval() # Set the model to evaluation mode
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
         metric.add(accuracy(net(X), y), sum(y.shape))
@@ -324,6 +325,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
+        net.train() # Set the model to training mode
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
         animator.add(epoch + 1, train_metrics + (test_acc,))
@@ -450,6 +452,7 @@ def corr2d(X, K):  #@save
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
+    net.eval() # Set the model to evaluation mode
     if not device:
         device = next(iter(net.parameters())).device
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
