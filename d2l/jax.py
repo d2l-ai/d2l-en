@@ -21,6 +21,7 @@ import tarfile
 import time
 import zipfile
 import requests
+import tensorflow_datasets as tfds
 d2l = sys.modules[__name__]
 
 
@@ -183,33 +184,12 @@ def get_dataloader_workers(num_workers=4):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def data_loader(data, targets, b_size, rng_key): #@save
-    if len(targets.shape) == 1:
-        targets = targets[..., None]
-    while True:
-        # Generate new subkey every time to not sample the same minibatch data over and over
-        rng_key, subkey = jax.random.split(rng_key)
-        data = jax.random.permutation(subkey, data)
-        targets = jax.random.permutation(subkey, targets) # Shuffle data and targets in unison by using the same key
-
-        n_samples = data.shape[0]
-        idxs = onp.random.choice(n_samples, size=batch_size, replace=False)
-        yield data[idxs], targets[idxs]
-    
-
-
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def load_data_fashion_mnist(batch_size, resize=None): #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
-    # TODO: Resize
-    rng_key = jax.random.PRNGKey(24)
-    fashion_mnist = fetch_openml(name="Fashion-MNIST")
-    mnist_train_x, mnist_test_x, mnist_train_y, mnist_test_y = train_test_split(fashion_mnist['data'],
-                                                                            fashion_mnist['target'],
-                                                                            test_size=10000,
-                                                                         )
-    return (
-        data_loader(mnist_train_x, mnist_train_y, batch_size, rng_key), data_loader(
-        mnist_test_x, mnist_test_y, batch_size, rng_key))
+    ds_train = tfds.load(name='fashion_mnist', split='train', as_supervised=True, data_dir='/tmp/tfds')
+    ds_test = tfds.load(name='fashion_mnist', split='test', as_supervised=True, data_dir='/tmp/tfds')
+    ds_train = ds_train.batch(batch_size).prefetch(1)
+    ds_test = ds_test.batch(batch_size).prefetch(1)
+    return tfds.as_numpy(ds_train), tfds.as_numpy(ds_test)
 
 

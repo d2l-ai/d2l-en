@@ -437,6 +437,7 @@ import tarfile
 import time
 import zipfile
 import requests
+import tensorflow_datasets as tfds
 d2l = sys.modules[__name__]
 ```
 
