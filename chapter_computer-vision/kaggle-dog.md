@@ -188,7 +188,7 @@ def evaluate_loss(data_iter, net, ctx):
 
 ## Defining the Training Functions
 
-We will select the model and tune hyper-parameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
+We will select the model and tune hyperparameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
 
 ```{.python .input  n=7}
 def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
@@ -222,7 +222,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 
 ## Training and Validating the Model
 
-Now, we can train and validate the model. The following hyper-parameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
+Now, we can train and validate the model. The following hyperparameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
 
 ```{.python .input  n=9}
 ctx, num_epochs, lr, wd = d2l.try_gpu(), 1, 0.01, 1e-4
@@ -234,7 +234,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 
 ## Classifying the Testing Set and Submitting Results on Kaggle
 
-After obtaining a satisfactory model design and hyper-parameters, we use all training datasets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
+After obtaining a satisfactory model design and hyperparameters, we use all training datasets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
 
 ```{.python .input  n=8}
 net = get_net(ctx)

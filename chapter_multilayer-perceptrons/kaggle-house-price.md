@@ -727,7 +727,7 @@ The steps are quite simple:
 * Real data often contains a mix of different data types and needs to be preprocessed.
 * Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
 * Transforming categorical variables into indicator variables allows us to treat them like vectors.
-* We can use k-fold cross validation to select the model and adjust the hyper-parameters.
+* We can use k-fold cross validation to select the model and adjust the hyperparameters.
 * Logarithms are useful for relative loss.
 
 

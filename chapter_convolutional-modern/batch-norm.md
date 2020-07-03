@@ -603,7 +603,7 @@ def net():
     ])
 ```
 
-Below, we use the same hyper-parameters to train out model.
+Below, we use the same hyperparameters to train out model.
 Note that as usual, the high-level API variant runs much faster
 because its code has been compiled to C++/CUDA
 while our custom implementation must be interpreted by Python.

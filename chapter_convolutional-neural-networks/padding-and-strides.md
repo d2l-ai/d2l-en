@@ -69,9 +69,9 @@ In many cases, we will want to set $p_h=k_h-1$ and $p_w=k_w-1$
 to give the input and output the same height and width.
 This will make it easier to predict the output shape of each layer
 when constructing the network.
-Assuming that $k_h$ is even here,
+Assuming that $k_h$ is odd here,
 we will pad $p_h/2$ rows on both sides of the height.
-If $k_h$ is odd, one possibility is to
+If $k_h$ is even, one possibility is to
 pad $\lceil p_h/2\rceil$ rows on the top of the input
 and $\lfloor p_h/2\rfloor$ rows on the bottom.
 We will pad both sides of the width in the same way.

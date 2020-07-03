@@ -110,7 +110,7 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
-Note that each row in `features` consists of a 2-dimensional data instance
+Note that each row in `features` consists of a 2-dimensional data point
 and that each row in `labels` consists of a 1-dimensional label value (a scalar).
 
 ```{.python .input}

@@ -304,7 +304,7 @@ def block_2():
         if i != len(num_convs_in_dense_blocks) - 1:
             num_channels //= 2
             net.add(TransitionBlock(num_channels))
-        return net
+    return net
 ```
 
 Similar to ResNet, a global pooling layer and fully connected layer are connected at the end to produce the output.
@@ -334,7 +334,7 @@ def net():
     net.add(tf.keras.layers.ReLU())
     net.add(tf.keras.layers.GlobalAvgPool2D())
     net.add(tf.keras.layers.Flatten())
-    net.add(tf.keras.layers.Dense(10, activation='softmax'))
+    net.add(tf.keras.layers.Dense(10))
     return net
 ```
 

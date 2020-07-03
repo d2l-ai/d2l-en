@@ -89,7 +89,7 @@ that the parameters dimension remains unknown.
 At this point, attempts to access `net[0].weight.data()`
 would trigger a runtime error stating that the network
 must be initialized before the parameters can be accessed.
-Now let us see what happens when we attempt to initialze
+Now let us see what happens when we attempt to initialize
 parameters via the `initialize` method.
 :end_tab:
 
@@ -107,7 +107,7 @@ net.collect_params()
 :begin_tab:`mxnet`
 As we can see, nothing has changed.
 When input dimensions are unknown,
-calls to initialize do not truly initalize the parameters.
+calls to initialize do not truly initialize the parameters.
 Instead, this call registers to MXNet that we wish
 (and optionally, according to which distribution)
 to initialize the parameters.

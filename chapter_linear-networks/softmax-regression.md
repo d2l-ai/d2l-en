@@ -47,10 +47,10 @@ among the categories "cat", "chicken", and "dog".
 Next, we have to choose how to represent the labels.
 We have two obvious choices.
 Perhaps the most natural impulse would be to choose $y \in \{1, 2, 3\}$,
-where the integers represent {dog, cat, chicken} respectively.
+where the integers represent $\{\text{dog}, \text{cat}, \text{chicken}\}$ respectively.
 This is a great way of *storing* such information on a computer.
 If the categories had some natural ordering among them,
-say if we were trying to predict {baby, toddler, adolescent, young adult, adult, geriatric},
+say if we were trying to predict $\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adult}, \text{geriatric}\}$,
 then it might even make sense to cast this problem as regression
 and keep the labels in this format.
 
@@ -101,7 +101,7 @@ In vector form, we arrive at
 $\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$,
 a form better suited both for mathematics, and for writing code.
 Note that we have gathered all of our weights into a $3 \times 4$ matrix
-and that for features of a given data instance $\mathbf{x}$,
+and that for features of a given data point $\mathbf{x}$,
 our outputs are given by a matrix-vector product of our weights by our input features
 plus our biases $\mathbf{b}$.
 
@@ -193,7 +193,7 @@ This accelerates the dominant operation into
 a matrix-matrix product $\mathbf{X} \mathbf{W}$
 vs. the matrix-vector products we would be executing
 if we processed one example at a time.
-Since each row in $\mathbf{X}$ is a data instance,
+Since each row in $\mathbf{X}$ represents a data point,
 the softmax operation itself can be computed *rowwise*:
 for each row of $\mathbf{O}$, exponentiate all entries and then normalize them by the sum.
 Triggering broadcasting during the summation $\mathbf{X} \mathbf{W} + \mathbf{b}$ in :eqref:`eq_minibatch_softmax_reg`,

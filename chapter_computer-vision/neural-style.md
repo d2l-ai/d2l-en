@@ -1,6 +1,6 @@
 # Neural Style Transfer
 
-If you use social sharing apps or happen to be an amateur photographer, you are familiar with filters. Filters can alter the color styles of photos to make the background sharper or people's faces whiter. However, a filter generally can only change one aspect of a photo. To create the ideal photo, you often need to try many different filter combinations. This process is as complex as tuning the hyper-parameters of a model.
+If you use social sharing apps or happen to be an amateur photographer, you are familiar with filters. Filters can alter the color styles of photos to make the background sharper or people's faces whiter. However, a filter generally can only change one aspect of a photo. To create the ideal photo, you often need to try many different filter combinations. This process is as complex as tuning the hyperparameters of a model.
 
 In this section, we will discuss how we can use convolution neural networks
 (CNNs) to automatically apply the style of one image to another image, an
@@ -158,7 +158,7 @@ def tv_loss(Y_hat):
 
 ### The Loss Function
 
-The loss function for style transfer is the weighted sum of the content loss, style loss, and total variance loss. By adjusting these weight hyper-parameters, we can balance the retained content, transferred style, and noise reduction in the composite image according to their relative importance.
+The loss function for style transfer is the weighted sum of the content loss, style loss, and total variance loss. By adjusting these weight hyperparameters, we can balance the retained content, transferred style, and noise reduction in the composite image according to their relative importance.
 
 ```{.python .input  n=14}
 content_weight, style_weight, tv_weight = 1, 1e3, 10
@@ -275,7 +275,7 @@ As you can see, each epoch takes more time due to the larger image size. As show
 ## Exercises
 
 1. How does the output change when you select different content and style layers?
-1. Adjust the weight hyper-parameters in the loss function. Does the output retain more content or have less noise?
+1. Adjust the weight hyperparameters in the loss function. Does the output retain more content or have less noise?
 1. Use different content and style images. Can you create more interesting composite images?
 
 :begin_tab:`mxnet`

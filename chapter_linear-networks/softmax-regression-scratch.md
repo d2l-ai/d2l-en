@@ -441,7 +441,8 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater.zero_grad()
             l.backward()
             updater.step()
-            metric.add(float(l)*len(y), accuracy(y_hat, y), y.size().numel())
+            metric.add(float(l) * len(y), accuracy(y_hat, y),
+                       y.size().numel())
         else:
             l.sum().backward()
             updater(X.shape[0])
@@ -622,7 +623,7 @@ def predict_ch3(net, test_iter, n=6):  #@save
         break
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(tf.argmax(net(X), axis=1))
-    titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
+    titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
     d2l.show_images(tf.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 predict_ch3(net, test_iter)

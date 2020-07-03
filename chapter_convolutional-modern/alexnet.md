@@ -363,7 +363,7 @@ def net():
     ])
 ```
 
-We construct a single-channel data instance with both height and width of 224 to observe the output shape of each layer. It matches our diagram above.
+We construct a single-channel data point with both height and width of 224 to observe the output shape of each layer. It matches our diagram above.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 224, 224))
