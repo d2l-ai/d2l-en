@@ -217,8 +217,8 @@ x.grad  # Equals to y = sum(x * x)
 # in a gradient of ones is appropriate.
 x.grad.zero_()
 y = x * x
-# y.sum().backward() equivalent to the below
-y.backward(torch.ones(len(x)))
+# y.backward(torch.ones(len(x))) equivalent to the below
+y.sum().backward()
 x.grad
 ```
 
