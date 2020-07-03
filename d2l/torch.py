@@ -326,7 +326,8 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
-        net.train() # Set the model to training mode
+        if isinstance(net, torch.nn.Module):
+            net.train() # Set the model to training mode
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
         animator.add(epoch + 1, train_metrics + (test_acc,))
