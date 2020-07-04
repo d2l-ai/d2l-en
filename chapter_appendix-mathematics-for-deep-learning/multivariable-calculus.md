@@ -447,11 +447,11 @@ $$
 \begin{aligned}
 f(0,0) & = a, \\
 \nabla f (0,0) & = \begin{bmatrix}b_1 \\ b_2\end{bmatrix}, \\
-\mathbf{H} f (0,0) & = \begin{bmatrix}2 c_{11} & c_{12} \\ c_{12} & 2c_{22}\end{bmatrix}.
+\mathbf{H} f (0,0) & = \begin{bmatrix}2 c_{11} & c_{12} \\ c_{12} & 2c_{22}\end{bmatrix},
 \end{aligned}
 $$
 
-If we from this, we see we can get our original polynomial back by saying
+we can get our original polynomial back by saying
 
 $$
 f(\mathbf{x}) = f(0) + \nabla f (0) \cdot \mathbf{x} + \frac{1}{2}\mathbf{x}^\top \mathbf{H} f (0) \mathbf{x}.
