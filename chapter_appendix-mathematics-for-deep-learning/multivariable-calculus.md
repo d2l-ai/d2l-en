@@ -533,7 +533,7 @@ This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where
 ## A Little Matrix Calculus
 Derivatives of functions involving matrices turn out to be particularly nice.  This section can become notationally heavy, so may be skipped in a first reading, but it is useful to know how derivatives of functions involving common matrix operations are often much cleaner than one might initially anticipate, particularly given how central matrix operations are to deep learning applications.
 
-Let us begin with an example.  Suppose that we have some fixed row vector $\boldsymbol{\beta}$, and we want to take the product function $f(\mathbf{x}) = \boldsymbol{\beta}\mathbf{x}$, and understand how the dot product changes when we change $\mathbf{x}$.  
+Let us begin with an example.  Suppose that we have some fixed row vector $\boldsymbol{\beta}^\top$, and we want to take the product function $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$, and understand how the dot product changes when we change $\mathbf{x}$.  
 
 A bit of notation that will be useful when working with matrix derivatives in ML is called the *denominator layout matrix derivative* where we assemble our partial derivatives into the shape of whatever vector, matrix, or tensor is in the denominator of the differential.  In this case, we will write
 
@@ -576,7 +576,7 @@ $$
 \beta_1 \\
 \vdots \\
 \beta_n
-\end{bmatrix} = \boldsymbol{\beta}^\top.
+\end{bmatrix} = \boldsymbol{\beta}.
 $$
 
 This illustrates a few factors about matrix calculus that we will often counter throughout this section:
