@@ -542,7 +542,7 @@ $$
 \frac{df}{dx_1} \\
 \vdots \\
 \frac{df}{dx_n}
-\end{bmatrix}.
+\end{bmatrix},
 $$
 
 where we matched the shape of the column vector $\mathbf{x}$. 
@@ -673,7 +673,7 @@ $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
 $$
 
-To show we that this works, we would be remiss to not provide a detailed computation.  If we already believe that this rule-of-thumb works, feel free to skip past this derivation.  To compute 
+To show that this works, we would be remiss to not provide a detailed computation.  If we already believe that this rule-of-thumb works, feel free to skip past this derivation.  To compute 
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^2,
