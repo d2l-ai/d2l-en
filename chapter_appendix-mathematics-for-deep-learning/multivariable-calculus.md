@@ -236,7 +236,7 @@ $$
 
 It is useful to think about the meaning of the process. We are trying to understand how a function of the form $f(u(a, b), v(a, b))$ changes its value with a change in $a$.  There are two pathways this can occur: there is the pathway where $a \rightarrow u \rightarrow f$ and where $a \rightarrow v \rightarrow f$.  We can compute both of these contributions via the chain rule: $\frac{\partial w}{\partial u} \cdot \frac{\partial u}{\partial x}$ and $\frac{\partial w}{\partial v} \cdot \frac{\partial v}{\partial x}$ respectively, and added up.  
 
-Imagine we have a different network of functions where the functions on the right depend on those they are connected to on the left as is shown in :numref:`fig_chain-2`.
+Imagine we have a different network of functions where the functions on the right depend on those that are connected to on the left as is shown in :numref:`fig_chain-2`.
 
 ![Another more subtle example of the chain rule.](../img/ChainNet2.svg)
 :label:`fig_chain-2`
