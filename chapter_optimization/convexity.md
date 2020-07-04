@@ -88,11 +88,9 @@ $$E_{y \sim P(y)}[-\log P(x \mid y)] \geq -\log P(x).$$
 This follows since $\int P(y) P(x \mid y) dy = P(x)$.
 This is used in variational methods. Here $y$ is typically the unobserved random variable, $P(y)$ is the best guess of how it might be distributed and $P(x)$ is the distribution with $y$ integrated out. For instance, in clustering $y$ might be the cluster labels and $P(x \mid y)$ is the generative model when applying cluster labels.
 
-
 ## Properties
 
 Convex functions have a few useful properties. We describe them as follows.
-
 
 ### No Local Minima
 
