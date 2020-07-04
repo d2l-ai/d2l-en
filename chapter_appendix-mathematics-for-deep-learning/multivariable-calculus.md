@@ -405,13 +405,13 @@ f = (u + v)**2
 f.backward()
 
 print(f'df/dw at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
-      f'{z.data.item()} is {y.grad.data.item()}')
+      f'{z.data.item()} is {w.grad.data.item()}')
 print(f'df/dx at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
       f'{z.data.item()} is {x.grad.data.item()}')
 print(f'df/dy at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
-      f'{z.data.item()} is {x.grad.data.item()}')
+      f'{z.data.item()} is {y.grad.data.item()}')
 print(f'df/dz at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
-      f'{z.data.item()} is {x.grad.data.item()}')
+      f'{z.data.item()} is {z.grad.data.item()}')
 ```
 
 All of what we did above can be done automatically by calling `f.backwards()`.
