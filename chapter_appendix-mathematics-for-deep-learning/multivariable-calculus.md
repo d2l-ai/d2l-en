@@ -363,7 +363,7 @@ The fact that we compute derivatives from $f$ back towards the inputs rather tha
 
 This is precisely what every deep learning algorithm implements to allow the computation of the gradient of the loss with respect to every weight in the network at one pass.  It is an astonishing fact that we have such a decomposition.
 
-To see how MXNet has encapsulated this, let us take a quick look at this example.
+To see how to encapsulated this, let us take a quick look at this example.
 
 ```{.python .input}
 # Initialize as ndarrays, then attach gradients
