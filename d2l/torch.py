@@ -703,7 +703,7 @@ def grad_clipping(model, theta):
         params = [p.data for p in model.parameters() if p.requires_grad]
     else:
         params = model.params
-    
+
     norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in params))
     if norm > theta:
         for param in params:
@@ -727,7 +727,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,
         X, y = X.to(device), y.to(device)
         py, state = model(X, state)
         l = loss(py, y.long()).mean()
-        
+
         if isinstance(updater, torch.optim.Optimizer):
             updater.zero_grad()
             l.backward()
@@ -831,9 +831,9 @@ def build_array(lines, vocab, num_steps, is_source):
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, 
+    src_vocab = d2l.Vocab(source, min_freq=3,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+    tgt_vocab = d2l.Vocab(target, min_freq=3,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array(
         source, src_vocab, num_steps, True)
