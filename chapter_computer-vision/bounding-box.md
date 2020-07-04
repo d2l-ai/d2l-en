@@ -8,7 +8,7 @@ Object detection is widely used in many fields. For example, in self-driving tec
 
 In the next few sections, we will introduce multiple deep learning models used for object detection. Before that, we should discuss the concept of target location. First, import the packages and modules required for the experiment.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import image, npx
@@ -18,7 +18,7 @@ npx.set_np()
 
 Next, we will load the sample images that will be used in this section. We can see there is a dog on the left side of the image and a cat on the right. They are the two main targets in this image.
 
-```{.python .input}
+```python
 d2l.set_figsize((3.5, 2.5))
 img = image.imread('../img/catdog.jpg').asnumpy()
 d2l.plt.imshow(img);
@@ -28,14 +28,14 @@ d2l.plt.imshow(img);
 
 In object detection, we usually use a bounding box to describe the target location. The bounding box is a rectangular box that can be determined by the $x$ and $y$ axis coordinates in the upper-left corner and the $x$ and $y$ axis coordinates in the lower-right corner of the rectangle. We will define the bounding boxes of the dog and the cat in the image based on the coordinate information in the above image. The origin of the coordinates in the above image is the upper left corner of the image, and to the right and down are the positive directions of the $x$ axis and the $y$ axis, respectively.
 
-```{.python .input}
+```python
 # bbox is the abbreviation for bounding box
 dog_bbox, cat_bbox = [60, 45, 378, 516], [400, 112, 655, 493]
 ```
 
 We can draw the bounding box in the image to check if it is accurate. Before drawing the box, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of `matplotlib`.
 
-```{.python .input}
+```python
 #@save
 def bbox_to_rect(bbox, color):
     """Convert bounding box to matplotlib format."""
@@ -49,7 +49,7 @@ def bbox_to_rect(bbox, color):
 
 After loading the bounding box on the image, we can see that the main outline of the target is basically inside the box.
 
-```{.python .input}
+```python
 fig = d2l.plt.imshow(img)
 fig.axes.add_patch(bbox_to_rect(dog_bbox, 'blue'))
 fig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));

@@ -4,7 +4,7 @@
 The layers we introduced so far for convolutional neural networks, including
 convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`), often reduce the input width and height, or keep them unchanged. Applications such as semantic segmentation (:numref:`sec_semantic_segmentation`) and generative adversarial networks (:numref:`sec_dcgan`), however, require to predict values for each pixel and therefore needs to increase input width and height. Transposed convolution, also named fractionally-strided convolution :cite:`Dumoulin.Visin.2016` or deconvolution :cite:`Long.Shelhamer.Darrell.2015`, serves this purpose.
 
-```{.python .input}
+```python
 from mxnet import np, npx, init
 from mxnet.gluon import nn
 from d2l import mxnet as d2l
@@ -21,7 +21,7 @@ Let us consider a basic case that both input and output channels are 1, with 0 p
 
 We can implement this operation by giving matrix kernel $K$ and matrix input $X$.
 
-```{.python .input}
+```python
 def trans_conv(X, K):
     h, w = K.shape
     Y = np.zeros((X.shape[0] + h - 1, X.shape[1] + w - 1))
@@ -35,7 +35,7 @@ Remember the convolution computes results by `Y[i, j] = (X[i: i + h, j: j + w] *
 
 Verify the results in :numref:`fig_trans_conv`.
 
-```{.python .input}
+```python
 X = np.array([[0, 1], [2, 3]])
 K = np.array([[0, 1], [2, 3]])
 trans_conv(X, K)
@@ -43,7 +43,7 @@ trans_conv(X, K)
 
 Or we can use `nn.Conv2DTranspose` to obtain the same results. As `nn.Conv2D`, both input and kernel should be 4-D tensors.
 
-```{.python .input}
+```python
 X, K = X.reshape(1, 1, 2, 2), K.reshape(1, 1, 2, 2)
 tconv = nn.Conv2DTranspose(1, kernel_size=2)
 tconv.initialize(init.Constant(K))
@@ -54,7 +54,7 @@ tconv(X)
 
 We apply padding elements to the input in convolution, while they are applied to the output in transposed convolution. A $1\times 1$ padding means we first compute the output as normal, then remove the first/last rows and columns.
 
-```{.python .input}
+```python
 tconv = nn.Conv2DTranspose(1, kernel_size=2, padding=1)
 tconv.initialize(init.Constant(K))
 tconv(X)
@@ -62,7 +62,7 @@ tconv(X)
 
 Similarly, strides are applied to outputs as well.
 
-```{.python .input}
+```python
 tconv = nn.Conv2DTranspose(1, kernel_size=2, strides=2)
 tconv.initialize(init.Constant(K))
 tconv(X)
@@ -73,7 +73,7 @@ The multi-channel extension of the transposed convolution is the same as the con
 
 As a result, if we feed $X$ into a convolutional layer $f$ to compute $Y=f(X)$ and create a transposed convolution layer $g$ with the same hyper-parameters as $f$ except for the output channel set to be the channel size of $X$, then $g(Y)$ should has the same shape as $X$. Let us verify this statement.
 
-```{.python .input}
+```python
 X = np.random.uniform(size=(1, 10, 16, 16))
 conv = nn.Conv2D(20, kernel_size=5, padding=2, strides=3)
 tconv = nn.Conv2DTranspose(10, kernel_size=5, padding=2, strides=3)
@@ -86,7 +86,7 @@ tconv(conv(X)).shape == X.shape
 
 The transposed convolution takes its name from the matrix transposition. In fact, convolution operations can also be achieved by matrix multiplication. In the example below, we define a $3\times$ input $X$ with a $2\times 2$ kernel $K$, and then use `corr2d` to compute the convolution output.
 
-```{.python .input}
+```python
 X = np.arange(9).reshape(3, 3)
 K = np.array([[0, 1], [2, 3]])
 Y = d2l.corr2d(X, K)
@@ -95,7 +95,7 @@ Y
 
 Next, we rewrite convolution kernel $K$ as a matrix $W$. Its shape will be $(4, 9)$, where the $i^\mathrm{th}$ row present applying the kernel to the input to generate the $i^\mathrm{th}$ output element.
 
-```{.python .input}
+```python
 def kernel2matrix(K):
     k, W = np.zeros(5), np.zeros((4, 9))
     k[:2], k[3:5] = K[0, :], K[1, :]
@@ -108,13 +108,13 @@ W
 
 Then the convolution operator can be implemented by matrix multiplication with proper reshaping.
 
-```{.python .input}
+```python
 Y == np.dot(W, X.reshape(-1)).reshape(2, 2)
 ```
 
 We can implement transposed convolution as a matrix multiplication as well by reusing `kernel2matrix`. To reuse the generated $W$, we construct a $2\times 2$ input, so the corresponding weight matrix will have a shape $(9, 4)$, which is $W^\top$. Let us verify the results.
 
-```{.python .input}
+```python
 X = np.array([[0, 1], [2, 3]])
 Y = trans_conv(X, K)
 Y == np.dot(W.T, X.reshape(-1)).reshape(3, 3)

@@ -49,7 +49,7 @@ A comparison of different ways of parallelization on multiple GPUs is depicted i
 Note that in practice we *increase* the minibatch size $k$-fold when training on $k$ GPUs such that each GPU has the same amount of work to do as if we were training on a single GPU only. On a 16 GPU server this can increase the minibatch size considerably and we may have to increase the learning rate accordingly. Also note that :numref:`sec_batch_norm` needs to be adjusted (e.g., by keeping a separate batch norm coefficient per GPU). 
 In what follows we will use :numref:`sec_lenet` as the toy network to illustrate multi-GPU training. As always we begin by importing the relevant packages and modules.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
@@ -60,7 +60,7 @@ npx.set_np()
 
 We use LeNet as introduced in :numref:`sec_lenet`. We define it from scratch to illustrate parameter exchange and synchronization in detail.
 
-```{.python .input}
+```python
 # Initialize model parameters
 scale = 0.01
 W1 = np.random.normal(scale=scale, size=(20, 1, 3, 3))
@@ -99,7 +99,7 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
 For efficient multi-GPU training we need two basic operations: firstly we need to have the ability to distribute a list of parameters to multiple devices and to attach gradients (`get_params`). Without parameters it is impossible to evaluate the network on a GPU. Secondly, we need the ability to sum parameters across multiple devices, i.e., we need an `allreduce` function.
 
-```{.python .input}
+```python
 def get_params(params, ctx):
     new_params = [p.copyto(ctx) for p in params]
     for p in new_params:
@@ -109,7 +109,7 @@ def get_params(params, ctx):
 
 Let us try it out by copying the model parameters of lenet to gpu(0).
 
-```{.python .input}
+```python
 new_params = get_params(params, d2l.try_gpu(0))
 print('b1 weight:', new_params[1])
 print('b1 grad:', new_params[1].grad)
@@ -117,7 +117,7 @@ print('b1 grad:', new_params[1].grad)
 
 Since we didn't perform any computation yet, the gradient with regard to the bias weights is still $0$. Now let us assume that we have a vector distributed across multiple GPUs. The following allreduce function adds up all vectors and broadcasts the result back to all GPUs. Note that for this to work we need to copy the data to the device accumulating the results.
 
-```{.python .input}
+```python
 def allreduce(data):
     for i in range(1, len(data)):
         data[0][:] += data[i].copyto(data[0].ctx)
@@ -127,7 +127,7 @@ def allreduce(data):
 
 Let us test this by creating vectors with different values on different devices and aggregate them.
 
-```{.python .input}
+```python
 data = [np.ones((1, 2), ctx=d2l.try_gpu(i)) * (i + 1) for i in range(2)]
 print('before allreduce:\n', data[0], '\n', data[1])
 allreduce(data)
@@ -138,7 +138,7 @@ print('after allreduce:\n', data[0], '\n', data[1])
 
 We need a simple utility function to distribute a minibatch evenly across multiple GPUs. For instance, on 2 GPUs we'd like to have half of the data to be copied to each of the GPUs. Since it is more convenient and more concise, we use the built-in split and load function in Gluon (to try it out on a $4 \times 5$ matrix).
 
-```{.python .input}
+```python
 data = np.arange(20).reshape(4, 5)
 ctx = [npx.gpu(0), npx.gpu(1)]
 split = gluon.utils.split_and_load(data, ctx)
@@ -149,7 +149,7 @@ print('output:', split)
 
 For later reuse we define a `split_batch` function which splits both data and labels.
 
-```{.python .input}
+```python
 #@save
 def split_batch(X, y, ctx_list):
     """Split X and y into multiple devices specified by ctx."""
@@ -162,7 +162,7 @@ def split_batch(X, y, ctx_list):
 
 Now we can implement multi-GPU training on a single minibatch. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs. Note that we do not need to write any specific code to achieve parallelism. Since the compute graph does not have any dependencies across devices within a minibatch, it is executed in parallel *automatically*.
 
-```{.python .input}
+```python
 def train_batch(X, y, ctx_params, ctx_list, lr):
     X_shards, y_shards = split_batch(X, y, ctx_list)
     with autograd.record():  # Loss is calculated separately on each GPU
@@ -181,7 +181,7 @@ def train_batch(X, y, ctx_params, ctx_list, lr):
 
 Now, we can define the training function. It is slightly different from the ones used in the previous chapters: we need to allocate the GPUs and copy all the model parameters to all devices. Obviously each batch is processed using `train_batch` to deal with multiple GPUs. For convenience (and conciseness of code) we compute the accuracy on a single GPU (this is *inefficient* since the other GPUs are idle).
 
-```{.python .input}
+```python
 def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     ctx_list = [d2l.try_gpu(i) for i in range(num_gpus)]
@@ -209,13 +209,13 @@ def train(num_gpus, batch_size, lr):
 
 Let us see how well this works on a single GPU. We use a batch size of 256 and a learning rate of 0.2.
 
-```{.python .input}
+```python
 train(num_gpus=1, batch_size=256, lr=0.2)
 ```
 
 By keeping the batch size and learning rate unchanged and changing the number of GPUs to 2, we can see that the improvement in test accuracy is roughly the same as in the results from the previous experiment. In terms of the optimization algorithms, they are identical. Unfortunately there is no meaningful speedup to be gained here: the model is simply too small; moreover we only have a small dataset, where our slightly unsophisticated approach to implementing multi-GPU training suffered from significant Python overhead. We will encounter more complex models and more sophisticated ways of parallelization going forward. Let us see what happens nonetheless for MNIST.
 
-```{.python .input}
+```python
 train(num_gpus=2, batch_size=256, lr=0.2)
 ```
 

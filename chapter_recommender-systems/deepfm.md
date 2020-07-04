@@ -32,7 +32,7 @@ where $\sigma$ is the sigmoid function. The architecture of DeepFM is illustrate
 
 It is worth noting that DeepFM is not the only way to combine deep neural networks with FM. We can also add nonlinear layers over the feature interactions :cite:`He.Chua.2017`.
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import init, gluon, np, npx
 from mxnet.gluon import nn
@@ -44,7 +44,7 @@ npx.set_np()
 ## Implemenation of DeepFM
 The implementation of DeepFM is similar to that of FM. We keep the FM part unchanged and use an MLP block with `relu` as the activation function. Dropout is also used to regularize the model. The number of neurons of the MLP can be adjusted with the `mlp_dims` hyper-parameter.
 
-```{.python .input}
+```python
 class DeepFM(nn.Block):
     def __init__(self, field_dims, num_factors, mlp_dims, drop_rate=0.1):
         super(DeepFM, self).__init__()
@@ -75,7 +75,7 @@ class DeepFM(nn.Block):
 ## Training and Evaluating the Model
 The data loading process is the same as that of FM. We set the MLP component of DeepFM to a three-layered dense network with the a pyramid structure (30-20-10). All other hyper-parameters remain the same as FM.
 
-```{.python .input}
+```python
 batch_size = 2048
 data_dir = d2l.download_extract('ctr')
 train_data = d2l.CTRDataset(os.path.join(data_dir, 'train.csv'))

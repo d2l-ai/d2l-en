@@ -18,7 +18,7 @@ convolutional neural networks to sentiment analysis: textCNN :cite:`Kim.2014`.
 
 First, import the packages and modules required for the experiment.
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
@@ -37,7 +37,7 @@ Before introducing the model, let us explain how a one-dimensional convolutional
 
 Next, we implement one-dimensional cross-correlation in the `corr1d` function. It accepts the input array `X` and kernel array `K` and outputs the array `Y`.
 
-```{.python .input}
+```python
 def corr1d(X, K):
     w = K.shape[0]
     Y = np.zeros((X.shape[0] - w + 1))
@@ -48,7 +48,7 @@ def corr1d(X, K):
 
 Now, we will reproduce the results of the one-dimensional cross-correlation operation in :numref:`fig_conv1d`.
 
-```{.python .input}
+```python
 X, K = np.array([0, 1, 2, 3, 4, 5, 6]), np.array([1, 2])
 corr1d(X, K)
 ```
@@ -60,7 +60,7 @@ The one-dimensional cross-correlation operation for multiple input channels is a
 
 Now, we reproduce the results of the one-dimensional cross-correlation operation with multi-input channel in :numref:`fig_conv1d_channel`.
 
-```{.python .input}
+```python
 def corr1d_multi_in(X, K):
     # First, we traverse along the 0th dimension (channel dimension) of X and
     # K. Then, we add them together by using * to turn the result list into a
@@ -109,7 +109,7 @@ TextCNN mainly uses a one-dimensional convolutional layer and max-over-time pool
 
 Next, we will implement a textCNN model. Compared with the previous section, in addition to replacing the recurrent neural network with a one-dimensional convolutional layer, here we use two embedding layers, one with a fixed weight and another that participates in training.
 
-```{.python .input}
+```python
 class TextCNN(nn.Block):
     def __init__(self, vocab_size, embed_size, kernel_sizes, num_channels,
                  **kwargs):
@@ -151,7 +151,7 @@ class TextCNN(nn.Block):
 
 Create a TextCNN instance. It has 3 convolutional layers with kernel widths of 3, 4, and 5, all with 100 output channels.
 
-```{.python .input}
+```python
 embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
 ctx = d2l.try_all_gpus()
 net = TextCNN(len(vocab), embed_size, kernel_sizes, nums_channels)
@@ -162,7 +162,7 @@ net.initialize(init.Xavier(), ctx=ctx)
 
 As in the previous section, load pre-trained 100-dimensional GloVe word vectors and initialize the embedding layers `embedding` and `constant_embedding`. Here, the former participates in training while the latter has a fixed weight.
 
-```{.python .input}
+```python
 glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
 embeds = glove_embedding[vocab.idx_to_token]
 net.embedding.weight.set_data(embeds)
@@ -174,7 +174,7 @@ net.constant_embedding.collect_params().setattr('grad_req', 'null')
 
 Now we can train the model.
 
-```{.python .input}
+```python
 lr, num_epochs = 0.001, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -183,11 +183,11 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 
 Below, we use the trained model to classify sentiments of two simple sentences.
 
-```{.python .input}
+```python
 d2l.predict_sentiment(net, vocab, 'this movie is so great')
 ```
 
-```{.python .input}
+```python
 d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 ```
 

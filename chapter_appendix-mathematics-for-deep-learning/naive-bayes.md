@@ -5,7 +5,7 @@ Throughout the previous sections, we learned about the theory of probability and
 
 Learning is all about making assumptions. If we want to classify a new data point that we have never seen before we have to make some assumptions about which data points are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent from each other to simplify the computation. In this section, we will apply this model to recognize characters in images.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
@@ -25,7 +25,7 @@ We specify whether we are requesting the training set or the test set
 by setting the value of the parameter `train` to `True` or `False`, respectively.
 Each image is a grayscale image with both width and height of $28$ with shape ($28$,$28$,$1$). We use a customized transformation to remove the last channel dimension. In addition, the dataset represents each pixel by an unsigned $8$-bit integer.  We quantize them into binary features to simplify the problem.
 
-```{.python .input}
+```python
 def transform(data, label):
     return np.floor(data.astype('float32') / 128).squeeze(axis=-1), label
 
@@ -35,33 +35,33 @@ mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 
 We can access a particular example, which contains the image and the corresponding label.
 
-```{.python .input}
+```python
 image, label = mnist_train[2]
 image.shape, label
 ```
 
 Our example, stored here in the variable `image`, corresponds to an image with a height and width of $28$ pixels.
 
-```{.python .input}
+```python
 image.shape, image.dtype
 ```
 
 Our code stores the label of each image as a scalar. Its type is a $32$-bit integer.
 
-```{.python .input}
+```python
 label, type(label), label.dtype
 ```
 
 We can also access multiple examples at the same time.
 
-```{.python .input}
+```python
 images, labels = mnist_train[10:38]
 images.shape, labels.shape
 ```
 
 Let us visualize these examples.
 
-```{.python .input}
+```python
 d2l.show_images(images, 2, 9);
 ```
 
@@ -105,7 +105,7 @@ for any $y$. So our assumption of conditional independence has taken the complex
 
 The problem now is that we do not know $P_{xy}$ and $P_y$. So we need to estimate their values given some training data first. This is *training* the model. Estimating $P_y$ is not too hard. Since we are only dealing with $10$ classes, we may count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5,800$ times and we have a total of $n = 60,000$ images, the probability estimate is $p(y=8) = 0.0967$.
 
-```{.python .input}
+```python
 X, Y = mnist_train[:]  # All training examples
 
 n_y = np.zeros((10))
@@ -117,7 +117,7 @@ P_y
 
 Now on to slightly more difficult things $P_{xy}$. Since we picked black and white images, $p(x_i  \mid  y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of $y$, i.e., $n_y$. But there is something slightly troubling: certain pixels may never be black (e.g., for well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called *Laplace Smoothing*.  It may seem ad-hoc, however it may be well motivated from a Bayesian point-of-view.
 
-```{.python .input}
+```python
 n_x = np.zeros((10, 28, 28))
 for y in range(10):
     n_x[y] = np.array(X.asnumpy()[Y.asnumpy() == y].sum(axis=0))
@@ -130,7 +130,7 @@ By visualizing these $10\times 28\times 28$ probabilities (for each pixel for ea
 
 Now we can use :eqref:`eq_naive_bayes_estimation` to predict a new image. Given $\mathbf x$, the following functions computes $p(\mathbf x \mid y)p(y)$ for every $y$.
 
-```{.python .input}
+```python
 def bayes_pred(x):
     x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = P_xy * x + (1 - P_xy)*(1 - x)
@@ -146,7 +146,7 @@ This went horribly wrong! To find out why, let us look at the per pixel probabil
 As discussed in that section, we fix this by use the fact that $\log a b = \log a + \log b$, i.e., we switch to summing logarithms.
 Even if both $a$ and $b$ are small numbers, the logarithm values should be in a proper range.
 
-```{.python .input}
+```python
 a = 0.1
 print('underflow:', a**784)
 print('logarithm is normal:', 784*math.log(a))
@@ -158,7 +158,7 @@ $$ \hat{y} = \mathrm{argmax}_y \> \sum_{i=1}^d \log P_{xy}[x_i, y] + \log P_y[y]
 
 We can implement the following stable version:
 
-```{.python .input}
+```python
 log_P_xy = np.log(P_xy)
 log_P_xy_neg = np.log(1 - P_xy)
 log_P_y = np.log(P_y)
@@ -175,7 +175,7 @@ py
 
 We may now check if the prediction is correct.
 
-```{.python .input}
+```python
 # Convert label which is a scalar tensor of int32 dtype
 # to a Python scalar integer for comparison
 py.argmax(axis=0) == int(label)
@@ -184,7 +184,7 @@ py.argmax(axis=0) == int(label)
 If we now predict a few validation examples, we can see the Bayes
 classifier works pretty well.
 
-```{.python .input}
+```python
 def predict(X):
     return [bayes_pred_stable(x).argmax(axis=0).astype(np.int32) for x in X]
 
@@ -195,7 +195,7 @@ d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 
 Finally, let us compute the overall accuracy of the classifier.
 
-```{.python .input}
+```python
 X, y = mnist_test[:]
 preds = np.array(predict(X), dtype=np.int32)
 float((preds == y).sum()) / len(y)  # Validation accuracy

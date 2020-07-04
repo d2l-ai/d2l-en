@@ -5,20 +5,20 @@ Now that we have characterized
 multilayer perceptrons (MLPs) mathematically, 
 let us try to implement one ourselves.
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 npx.set_np()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -31,18 +31,18 @@ we will continue work with
 the Fashion-MNIST image classification dataset 
 (:numref:`sec_fashion_mnist`).
 
-```{.python .input}
+```python
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
@@ -72,7 +72,7 @@ one weight matrix and one bias vector.
 As always, we allocate memory
 for the gradients (of the loss) with respect to these parameters.
 
-```{.python .input}
+```python
 num_inputs, num_outputs, num_hiddens = 784, 10, 256
 
 W1 = np.random.normal(scale=0.01, size=(num_inputs, num_hiddens))
@@ -85,7 +85,7 @@ for param in params:
     param.attach_grad()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 num_inputs, num_outputs, num_hiddens = 784, 10, 256
 
@@ -97,7 +97,7 @@ b2 = nn.Parameter(torch.zeros(num_outputs, requires_grad=True))
 params = [W1, b1, W2, b2]
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 num_inputs, num_outputs, num_hiddens = 784, 10, 256
 
@@ -116,19 +116,19 @@ we will implement the ReLU activation ourselves
 using the maximum function rather than 
 invoking `relu` directly.
 
-```{.python .input}
+```python
 def relu(X):
     return np.maximum(X, 0)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def relu(X):
     a=torch.zeros_like(X)
     return torch.max(X, a)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 def relu(X):
     return tf.math.maximum(X, 0)
@@ -142,14 +142,14 @@ a flat vector of length  `num_inputs`.
 Finally, we implement our model 
 with just a few lines of code.
 
-```{.python .input}
+```python
 def net(X):
     X = X.reshape(-1, num_inputs)
     H = relu(np.dot(X, W1) + b1)
     return np.dot(H, W2) + b2
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def net(X):
     X = X.reshape((-1, num_inputs))
@@ -157,7 +157,7 @@ def net(X):
     return (H@W2 + b2)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 def net(X):
     X = tf.reshape(X, shape=[-1, num_inputs])
@@ -179,16 +179,16 @@ We encourage the interested reader
 to examine the source code for loss function
 to deepen their knowledge of implementation details.
 
-```{.python .input}
+```python
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 loss = nn.CrossEntropyLoss()
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 def loss(y_hat, y):
     return tf.losses.sparse_categorical_crossentropy(y, y_hat)
@@ -204,20 +204,20 @@ we call the `train_ch3` function
 setting the number of epochs to $10$ 
 and the learning rate to $0.5$.
 
-```{.python .input}
+```python
 num_epochs, lr = 10, 0.5
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
               lambda batch_size: d2l.sgd(params, lr, batch_size))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 num_epochs, lr = 10, 0.5
 updater = torch.optim.SGD(params, lr=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 num_epochs, lr = 10, 0.5
 updater = tf.keras.optimizers.SGD(learning_rate=lr)
@@ -227,16 +227,16 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater, params=[W1,
 To evaluate the learned model, 
 we apply it on some test data.
 
-```{.python .input}
+```python
 d2l.predict_ch3(net, test_iter)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 d2l.predict_ch3(net, test_iter)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 d2l.predict_ch3(net, test_iter)
 ```

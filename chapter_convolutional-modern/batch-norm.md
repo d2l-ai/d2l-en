@@ -211,7 +211,7 @@ Recall that dropout also exhibits this characteristic.
 
 Below, we implement a batch normalization layer with tensors from scratch:
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, init
 from mxnet.gluon import nn
@@ -248,7 +248,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     return Y, moving_mean, moving_var
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -312,7 +312,7 @@ we did not worry about automatically inferring the input shape here,
 thus we need to specify the number of features throughout.
 Do not worry, the Gluon `BatchNorm` layer will care of this for us.
 
-```{.python .input}
+```python
 class BatchNorm(nn.Block):
     def __init__(self, num_features, num_dims, **kwargs):
         super(BatchNorm, self).__init__(**kwargs)
@@ -342,7 +342,7 @@ class BatchNorm(nn.Block):
         return Y
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 class BatchNorm(nn.Module):
     def __init__(self, num_features, num_dims, **kwargs):
@@ -381,7 +381,7 @@ Recall that BN is typically applied
 after the convolutional layers and fully-connected layers
 but before the corresponding activation functions.
 
-```{.python .input}
+```python
 net = nn.Sequential()
 net.add(nn.Conv2D(6, kernel_size=5),
         BatchNorm(6, num_dims=4),
@@ -400,7 +400,7 @@ net.add(nn.Conv2D(6, kernel_size=5),
         nn.Dense(10))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net = nn.Sequential(
     nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4), nn.Sigmoid(),
@@ -416,13 +416,13 @@ As before, we will train our network on the Fashion-MNIST dataset.
 This code is virtually identical to that when we first trained LeNet (:numref:`sec_lenet`).
 The main difference is the considerably larger learning rate.
 
-```{.python .input}
+```python
 lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
@@ -433,11 +433,11 @@ Let us have a look at the scale parameter `gamma`
 and the shift parameter `beta` learned
 from the first batch normalization layer.
 
-```{.python .input}
+```python
 net[1].gamma.data().reshape(-1,), net[1].beta.data().reshape(-1,)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net[1].gamma.reshape((-1,)), net[1].beta.reshape((-1,))
 ```
@@ -453,7 +453,7 @@ inferred automatically via delayed initialization.
 Otherwise, the code looks virtually identical
 to the application our implementation above.
 
-```{.python .input}
+```python
 net = nn.Sequential()
 net.add(nn.Conv2D(6, kernel_size=5),
         nn.BatchNorm(),
@@ -472,7 +472,7 @@ net.add(nn.Conv2D(6, kernel_size=5),
         nn.Dense(10))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 
 net = nn.Sequential(
@@ -490,11 +490,11 @@ Note that as usual, the Gluon variant runs much faster
 because its code has been compiled to C++/CUDA
 while our custom implementation must be interpreted by Python.
 
-```{.python .input}
+```python
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```

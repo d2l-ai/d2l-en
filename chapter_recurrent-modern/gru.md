@@ -101,7 +101,7 @@ To gain a better understanding of the model, let us implement a GRU from scratch
 
 We begin by reading *The Time Machine* corpus that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below:
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn
@@ -115,7 +115,7 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 
 The next step is to initialize the model parameters. We draw the weights from a Gaussian with variance to be $0.01$ and set the bias to $0$. The hyperparameter `num_hiddens` defines the number of hidden units. We instantiate all weights and biases relating to the update gate, the reset gate, and the candidate hidden state itself. Subsequently, we attach gradients to all the parameters.
 
-```{.python .input}
+```python
 def get_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
 
@@ -144,14 +144,14 @@ def get_params(vocab_size, num_hiddens, ctx):
 
 Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns a tensor with a shape (batch size, number of hidden units) whose values are all zeros.
 
-```{.python .input}
+```python
 def init_gru_state(batch_size, num_hiddens, ctx):
     return (np.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
 ```
 
 Now we are ready to define the GRU model. Its structure is the same as the basic RNN cell, except that the update equations are more complex.
 
-```{.python .input}
+```python
 def gru(inputs, state, params):
     W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params
     H, = state
@@ -170,7 +170,7 @@ def gru(inputs, state, params):
 
 Training and prediction work in exactly the same manner as before. After training for one epoch, the perplexity and the output sentence will be like the following.
 
-```{.python .input}
+```python
 vocab_size, num_hiddens, ctx = len(vocab), 256, d2l.try_gpu()
 num_epochs, lr = 500, 1
 model = d2l.RNNModelScratch(len(vocab), num_hiddens, ctx, get_params,
@@ -182,7 +182,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 
 In Gluon, we can directly call the `GRU` class in the `rnn` module. This encapsulates all the configuration detail that we made explicit above. The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out in detail before.
 
-```{.python .input}
+```python
 gru_layer = rnn.GRU(num_hiddens)
 model = d2l.RNNModel(gru_layer, len(vocab))
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)

@@ -266,21 +266,21 @@ without looking at the values taken by the other hidden units.
 This is true for most activation functions
 (the batch normalization operation to be introduced in :numref:`sec_batch_norm` is a notable exception to that rule).
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
 npx.set_np()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
 import torch
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -325,7 +325,7 @@ Because it is used so commonly, tensors
 support the `relu` function as a native operator.
 As you can see, the activation function is piecewise linear.
 
-```{.python .input}
+```python
 x = np.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
@@ -334,7 +334,7 @@ d2l.set_figsize((4, 2.5))
 d2l.plot(x, y, 'x', 'relu(x)')
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 x = torch.arange(-8.0, 8.0, 0.1, requires_grad=True)
 y = torch.relu(x)
@@ -342,7 +342,7 @@ d2l.set_figsize((4, 2.5))
 d2l.plot(x.detach(), y.detach(), 'x', 'relu(x)')
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 x = tf.Variable(tf.range(-8.0, 8.0, 0.1), dtype=tf.float32)
 y = tf.nn.relu(x)
@@ -377,18 +377,18 @@ We plot the derivative of the ReLU function plotted below.
 Since `JAX` cannot take gradients of non-scalar value functions, we introduce a new trick here: `vmap`. This function maps the gradient over a sequence of inputs and returns a sequence of computed gradients.
 :end_tab:
 
-```{.python .input}
+```python
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of relu')
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 y.backward(torch.ones_like(x), retain_graph=True)
 d2l.plot(x.detach(), x.grad, 'x', 'grad of relu')
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 with tf.GradientTape() as t:
     t.watch(x)
@@ -464,19 +464,19 @@ Note that when the input is close to 0,
 the sigmoid function approaches 
 a linear transformation.
 
-```{.python .input}
+```python
 with autograd.record():
     y = npx.sigmoid(x)
 d2l.plot(x, y, 'x', 'sigmoid(x)')
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 y = torch.sigmoid(x)
 d2l.plot(x.detach(), y.detach(), 'x', 'sigmoid(x)')
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 y = tf.nn.sigmoid(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'sigmoid(x)')
@@ -500,12 +500,12 @@ reaches a maximum of 0.25.
 As the input diverges from 0 in either direction, 
 the derivative approaches 0.
 
-```{.python .input}
+```python
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of sigmoid')
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 # Clear out previous gradients.
 x.grad.data.zero_()
@@ -513,7 +513,7 @@ y.backward(torch.ones_like(x),retain_graph=True)
 d2l.plot(x.detach(), x.grad, 'x', 'grad of sigmoid')
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 with tf.GradientTape() as t:
     t.watch(x)
@@ -537,19 +537,19 @@ $$\text{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
 We plot the tanh function blow. Note that as the input nears 0, the tanh function approaches a linear transformation. Although the shape of the function is similar to the sigmoid function, the tanh function exhibits point symmetry about the origin of the coordinate system.
 
-```{.python .input}
+```python
 with autograd.record():
     y = np.tanh(x)
 d2l.plot(x, y, 'x', 'tanh(x)')
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 y = torch.tanh(x)
 d2l.plot(x.detach(), y.detach(), 'x', 'tanh(x)')
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 y = tf.nn.tanh(x)
 d2l.plot(x.numpy(), y.numpy(), 'x', 'tanh(x)')
@@ -572,12 +572,12 @@ And as we saw with the sigmoid function,
 as the input moves away from 0 in either direction,
 the derivative of the tanh function approaches 0.
 
-```{.python .input}
+```python
 y.backward()
 d2l.plot(x, x.grad, 'x', 'grad of tanh')
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 # Clear out previous gradients.
 x.grad.data.zero_()
@@ -585,7 +585,7 @@ y.backward(torch.ones_like(x),retain_graph=True)
 d2l.plot(x.detach(), x.grad, 'x', 'grad of tanh')
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 with tf.GradientTape() as t:
     t.watch(x)

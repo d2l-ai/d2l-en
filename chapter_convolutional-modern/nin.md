@@ -45,7 +45,7 @@ per-pixel fully-connected layers with ReLU activations.
 The convolution width of the first layer is typically set by the user.
 The subsequent widths are fixed to $1 \times 1$.
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
@@ -60,7 +60,7 @@ def nin_block(num_channels, kernel_size, strides, padding):
     return blk
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -92,7 +92,7 @@ reduces the number of required model parameters.
 However, in practice, this design sometimes requires
 increased model training time.
 
-```{.python .input}
+```python
 net = nn.Sequential()
 net.add(nin_block(96, kernel_size=11, strides=4, padding=0),
         nn.MaxPool2D(pool_size=3, strides=2),
@@ -111,7 +111,7 @@ net.add(nin_block(96, kernel_size=11, strides=4, padding=0),
         nn.Flatten())
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net = nn.Sequential(
     nin_block(1, 96, kernel_size=11, strides=4, padding=0),
@@ -128,7 +128,7 @@ net = nn.Sequential(
 
 We create a data example to see the output shape of each block.
 
-```{.python .input}
+```python
 X = np.random.uniform(size=(1, 1, 224, 224))
 net.initialize()
 for layer in net:
@@ -136,7 +136,7 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 X = torch.rand(size=(1, 1, 224, 224))
 for layer in net:
@@ -150,13 +150,13 @@ As before we use Fashion-MNIST to train the model.
 NiN's training is similar to that for AlexNet and VGG,
 but it often uses a larger learning rate.
 
-```{.python .input}
+```python
 lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)

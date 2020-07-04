@@ -7,21 +7,21 @@ we will find it similarly (or possibly more)
 convenient for implementing classification models.
 Again, we begin with our import ritual.
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import gluon, init, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -36,19 +36,25 @@ import jax.numpy as np
 Let us stick with the Fashion-MNIST dataset
 and keep the batch size at $256$ as in the last section.
 
-```{.python .input}
+```python
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
+batch_size = 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+```
+
+```{.python .input}
+#@tab jax
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
@@ -67,13 +73,13 @@ when implementing deep models.
 Again, we initialize the weights at random
 with zero mean and standard deviation $0.01$.
 
-```{.python .input}
+```python
 net = nn.Sequential()
 net.add(nn.Dense(10))
 net.initialize(init.Normal(sigma=0.01))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 # PyTorch doesn't implicitly reshape the inputs.
 # Thus we define a layer to reshape the inputs in our network.
@@ -90,12 +96,17 @@ def init_weights(m):
 net.apply(init_weights)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net = tf.keras.models.Sequential()
 net.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
 weight_initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.01)
 net.add(tf.keras.layers.Dense(10, kernel_initializer= weight_initializer))
+```
+
+```{.python .input}
+#@tab jax
+#Jax has no high-level API. Please compare the chapter "Softmax regression from scratch"
 ```
 
 ## The Softmax
@@ -159,19 +170,24 @@ we will just pass the logits and compute the softmax and its log
 all at once inside the softmax_cross_entropy loss function,
 which does smart things like the log-sum-exp trick ([see on Wikipedia](https://en.wikipedia.org/wiki/LogSumExp)).
 
-```{.python .input}
+```python
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 loss = nn.CrossEntropyLoss()
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net.add(tf.keras.layers.Softmax())
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+```
+
+```{.python .input}
+#@tab jax
+#Jax has no high-level API. Please compare the chapter "Softmax regression from scratch"
 ```
 
 ## Optimization Algorithm
@@ -181,40 +197,50 @@ with a learning rate of $0.1$ as the optimization algorithm.
 Note that this is the same as we applied in the linear regression example
 and it illustrates the general applicability of the optimizers.
 
-```{.python .input}
+```python
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 trainer = torch.optim.SGD(net.parameters(), lr=0.1)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 trainer = tf.keras.optimizers.SGD(learning_rate=.1)
+```
+
+```{.python .input}
+#@tab jax
+#Jax has no high-level API. Please compare the chapter "Softmax regression from scratch"
 ```
 
 ## Training
 
 Next we call the training function defined in the last section to train a model.
 
-```{.python .input}
+```python
 num_epochs = 10
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 num_epochs = 10
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net.compile(optimizer=trainer, loss=loss, metrics=['accuracy'])
 num_epochs = 10
 net.fit(train_iter, epochs=num_epochs)
+```
+
+```{.python .input}
+#@tab jax
+#Jax has no high-level API. Please compare the chapter "Softmax regression from scratch"
 ```
 
 As before, this algorithm converges to a solution

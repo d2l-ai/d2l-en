@@ -32,7 +32,7 @@ $$\mathbf o = \sum_{i=1}^n b_i \mathbf v_i.$$
 
 Different choices of the score function lead to different attention layers. Below, we introduce two commonly used attention layers. Before diving into the implementation, we first express two operators to get you up and running: a masked version of the softmax operator `masked_softmax` and a specialized dot operator `batch_dot`.
 
-```{.python .input}
+```python
 import math
 from mxnet import np, npx
 from mxnet.gluon import nn
@@ -42,7 +42,7 @@ npx.set_np()
 The masked softmax takes a 3-dimensional input and enables us to filter out some elements by specifying a valid length for the last dimension. (Refer to
 :numref:`sec_machine_translation` for the definition of a valid length.) As a result, any value outside the valid length will be masked as $0$. Let us implement the `masked_softmax` function.
 
-```{.python .input}
+```python
 #@save
 def masked_softmax(X, valid_len):
     # X: 3-D tensor, valid_len: 1-D or 2-D tensor
@@ -62,7 +62,7 @@ def masked_softmax(X, valid_len):
 
 To illustrate how this function works, we construct two $2 \times 4$ matrices as the input. In addition, we specify that the valid length equals to 2 for the first example, and 3 for the second example. Then, as we can see from the following outputs, the values outside valid lengths are masked as zero.
 
-```{.python .input}
+```python
 masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([2, 3]))
 ```
 
@@ -70,7 +70,7 @@ Moreover, the second operator `batch_dot` takes two inputs $X$ and $Y$ with shap
 
 $$Z[i,:,:] = X[i,:,:]  Y[i,:,:].$$
 
-```{.python .input}
+```python
 npx.batch_dot(np.ones((2, 1, 3)), np.ones((2, 3, 2)))
 ```
 
@@ -87,7 +87,7 @@ $$\alpha(\mathbf Q, \mathbf K) = \mathbf Q \mathbf K^\top /\sqrt{d}.$$
 
 With :eqref:`eq_alpha_QK`, we can implement the dot product attention layer `DotProductAttention` that supports a batch of queries and key-value pairs. In addition, for regularization we also use a dropout layer.
 
-```{.python .input}
+```python
 #@save
 class DotProductAttention(nn.Block):
     def __init__(self, dropout, **kwargs):
@@ -111,7 +111,7 @@ First, create two batches, where each batch has one query and 10 key-value pairs
 Via the `valid_len` argument,
 we specify that we will check the first $2$ key-value pairs for the first batch and $6$ for the second one. Therefore, even though both batches have the same query and key-value pairs, we obtain different outputs.
 
-```{.python .input}
+```python
 atten = DotProductAttention(dropout=0.5)
 atten.initialize()
 keys = np.ones((2, 10, 2))
@@ -134,7 +134,7 @@ $$\alpha(\mathbf k, \mathbf q) = \mathbf v^\top \text{tanh}(\mathbf W_k \mathbf 
 
 Intuitively, you can imagine $\mathbf W_k \mathbf k + \mathbf W_q\mathbf q$ as concatenating the key and value in the feature dimension and feeding them to a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. In this hidden layer, the activation function is $\tanh$ and no bias is applied. Now let us implement the multilayer perceptron attention.
 
-```{.python .input}
+```python
 #@save
 class MLPAttention(nn.Block):
     def __init__(self, units, dropout, **kwargs):
@@ -159,7 +159,7 @@ class MLPAttention(nn.Block):
 
 To test the above `MLPAttention` class, we use the same inputs as in the previous toy example. As we can see below, despite `MLPAttention` containing an additional MLP model, we obtain the same outputs as for `DotProductAttention`.
 
-```{.python .input}
+```python
 atten = MLPAttention(units=8, dropout=0.1)
 atten.initialize()
 atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))

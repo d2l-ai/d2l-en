@@ -9,7 +9,7 @@ improve speed. For instance, :numref:`fig_asyncgraph` in :numref:`sec_async` ini
 Typically, a single operator will use all the computational resources on all CPUs or on a single GPU. For example, the `dot` operator will use all cores (and threads) on all CPUs, even if there are multiple CPU processors on a single machine. The same applies to a single GPU. Hence parallelization is not quite so useful single-device computers. With multiple devices things matter more. While parallelization is typically most relevant between multiple GPUs, adding the local CPU will increase performance slightly. See e.g., :cite:`Hadjis.Zhang.Mitliagkas.ea.2016` for a paper that focuses on training computer vision models combining a GPU and a CPU. With the convenience of an automatically parallelizing framework we can accomplish the same goal in a few lines of Python code. More broadly, our discussion of automatic parallel computation focuses on parallel computation using both CPUs and GPUs, as well as the parallelization of computation and communication.
 We begin by importing the required packages and modules. Note that we need at least one GPU to run the experiments in this section.
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
@@ -19,7 +19,7 @@ npx.set_np()
 
 Let us start by defining a reference workload to test - the `run` function below performs 10 matrix-matrix multiplications on the device of our choosing using data allocated into two variables, `x_cpu` and `x_gpu`.
 
-```{.python .input}
+```python
 def run(x):
     return [x.dot(x) for _ in range(10)]
 
@@ -29,7 +29,7 @@ x_gpu = np.random.uniform(size=(6000, 6000), ctx=d2l.try_gpu())
 
 Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on each of them prior to measuring.
 
-```{.python .input}
+```python
 run(x_cpu)  # Warm-up both devices
 run(x_gpu)
 npx.waitall()  
@@ -45,7 +45,7 @@ with d2l.benchmark('GPU time: %.4f sec'):
 
 If we remove the `waitall()` between both tasks the system is free to parallelize computation on both devices automatically.
 
-```{.python .input}
+```python
 with d2l.benchmark('CPU&GPU : %.4f sec'):
     run(x_cpu)
     run(x_gpu)
@@ -58,7 +58,7 @@ In the above case the total execution time is less than the sum of its parts, si
 
 In many cases we need to move data between different devices, say between CPU and GPU, or between different GPUs. This occurs e.g., when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let us simulate this by computing on the GPU and then copying the results back to the CPU.
 
-```{.python .input}
+```python
 def copy_to_cpu(x):
     return [y.copyto(npx.cpu()) for y in x]
 
@@ -73,7 +73,7 @@ with d2l.benchmark('Copy to CPU: %.4f sec'):
 
 This is somewhat inefficient. Note that we could already start copying parts of `y` to the CPU while the remainder of the list is still being computed. This situatio occurs, e.g., when we compute the (backprop) gradient on a minibatch. The gradients of some of the parameters will be available earlier than that of others. Hence it works to our advantage to start using PCI-Express bus bandwidth while the GPU is still running. Removing `waitall` between both parts allows us to simulate this scenario.
 
-```{.python .input}
+```python
 with d2l.benchmark('Run on GPU and copy to CPU: %.4f sec'):
     y = run(x_gpu)
     y_cpu = copy_to_cpu(y)

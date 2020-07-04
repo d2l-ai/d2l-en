@@ -96,14 +96,14 @@ print(inputs)
 Now that all the entries in `inputs` and `outputs` are numerical, they can be converted to the tensor format.
 Once data are in this format, they can be further manipulated with those tensor functionalities that we have introduced in :numref:`sec_ndarray`.
 
-```{.python .input}
+```python
 from mxnet import np
 
 X, y = np.array(inputs.values), np.array(outputs.values)
 X, y
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 import torch
 
@@ -111,7 +111,7 @@ X, y = torch.tensor(inputs.values), torch.tensor(outputs.values)
 X, y
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 import tensorflow as tf
 

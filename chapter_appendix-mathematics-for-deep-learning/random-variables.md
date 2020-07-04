@@ -40,7 +40,7 @@ $$P(\text{distance is in an}\; \epsilon \text{-sized interval around}\; x ) \app
 
 Indeed, :eqref:`eq_pdf_deriv` precisely defines the *probability density function*.  It is a function $p(x)$ which encodes the relative probability of hitting near one point versus another.  Let us visualize what such a function might look like.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -100,7 +100,7 @@ $$
 
 We may approximate this is code by using the same discrete approximation methods as before.  In this case we can approximate the probability of falling in the blue region.
 
-```{.python .input}
+```python
 # Approximate probability using numerical integration
 epsilon = 0.01
 x = np.arange(-5, 5, 0.01)
@@ -250,7 +250,7 @@ This means that $75\%$ of the time, this random variable will fall within this i
 
 Let us visualize this.  We will show the probability of getting the three values as three vertical bars with height proportional to the probability.  The interval will be drawn as a horizontal line in the middle.  The first plot shows what happens for $p > 1/8$ where the interval safely contains all points.
 
-```{.python .input}
+```python
 # Define a helper to plot these figures
 def plot_chebychev(a, p):
     d2l.set_figsize()
@@ -273,14 +273,14 @@ plot_chebychev(0.0, 0.2)
 
 The second shows that at $p = 1/8$, the interval exactly touches the two points.  This shows that the inequality is *sharp*, since no smaller interval could be taken while keeping the inequality true.
 
-```{.python .input}
+```python
 # Plot interval when p = 1/8
 plot_chebychev(0.0, 0.125)
 ```
 
 The third shows that for $p < 1/8$ the interval only contains the center.  This does not invalidate the inequality since we only needed to ensure that no more than $1/4$ of the probability falls outside the interval, which means that once $p < 1/8$, the two points at $a-2$ and $a+2$ can be discarded.
 
-```{.python .input}
+```python
 # Plot interval when p < 1/8
 plot_chebychev(0.0, 0.05)
 ```
@@ -335,7 +335,7 @@ $$
 p(x) = \frac{1}{1+x^2}.
 $$
 
-```{.python .input}
+```python
 # Plot the Cauchy distribution p.d.f.
 x = np.arange(-5, 5, 0.01)
 p = 1 / (1 + x**2)
@@ -353,7 +353,7 @@ $$
 
 The function on the inside looks like this:
 
-```{.python .input}
+```python
 # Plot the integrand needed to compute the variance
 x = np.arange(-20, 20, 0.01)
 p = x**2 / (1 + x**2)
@@ -491,7 +491,7 @@ $$
 
 For visualization, let us take a look at a collection of random variables with tunable covariance.
 
-```{.python .input}
+```python
 # Plot a few random variables adjustable covariance
 covs = [-0.9, 0.0, 1.2]
 d2l.plt.figure(figsize=(12, 3))
@@ -562,7 +562,7 @@ Thus we see that the correlation is $+1$ for any $a > 0$, and $-1$ for any $a < 
 
 Let us again plot a collection of random variables with tunable correlation.
 
-```{.python .input}
+```python
 # Plot a few random variables adjustable correlations
 cors = [-0.9, 0.0, 1.0]
 d2l.plt.figure(figsize=(12, 3))

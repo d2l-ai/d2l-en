@@ -347,7 +347,7 @@ containing all ones.
 In one method we will loop over the vectors with a Python `for` loop.
 In the other method we will rely on a single call to `+`.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
@@ -359,7 +359,7 @@ a = np.ones(n)
 b = np.ones(n)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -373,7 +373,7 @@ a = torch.ones(n)
 b = torch.ones(n)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -439,7 +439,7 @@ Now we can benchmark the workloads.
 First, we add them, one coordinate at a time,
 using a `for` loop.
 
-```{.python .input}
+```python
 c = np.zeros(n)
 timer = Timer()
 for i in range(n):
@@ -447,7 +447,7 @@ for i in range(n):
 f'{timer.stop():.5f} sec'
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 c = torch.zeros(n)
 timer = Timer()
@@ -456,7 +456,7 @@ for i in range(n):
 f'{timer.stop():.5f} sec'
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 c = tf.Variable(tf.zeros(n))
 timer = Timer()
@@ -476,20 +476,20 @@ f'{timer.stop():.5f} sec'
 
 Alternatively, we rely on the reloaded `+` operator to compute the elementwise sum:
 
-```{.python .input}
+```python
 timer.start()
 d = a + b
 f'{timer.stop():.5f} sec'
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 timer.start()
 d = a + b
 f'{timer.stop():.5f} sec'
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 timer.start()
 d = a + b

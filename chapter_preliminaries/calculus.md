@@ -75,7 +75,7 @@ To illustrate derivatives,
 let us experiment with an example.
 Define $u = f(x) = 3x^2-4x$.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -86,7 +86,7 @@ def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -97,7 +97,7 @@ def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l

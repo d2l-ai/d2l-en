@@ -8,13 +8,13 @@ Text is an important example of sequence data. An article can be simply viewed a
 1. Build a vocabulary for these tokens to map them into numerical indices.
 1. Map all the tokens in data into indices for ease of feeding into models.
 
-```{.python .input}
+```python
 import collections
 from d2l import mxnet as d2l
 import re
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 import collections
 from d2l import torch as d2l

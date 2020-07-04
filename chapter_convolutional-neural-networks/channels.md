@@ -57,7 +57,7 @@ we can implement cross-correlation operations with multiple input channels ourse
 Notice that all we are doing is performing one cross-correlation operation
 per channel and then adding up the results using the `add_n` function.
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
@@ -68,7 +68,7 @@ def corr2d_multi_in(X, K):
     return sum(d2l.corr2d(x, k) for x, k in zip(X, K))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -83,7 +83,7 @@ We can construct the input array `X` and the kernel array `K`
 corresponding to the values in the above diagram
 to validate the output of the cross-correlation operation.
 
-```{.python .input}
+```python
 X = np.array([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
               [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
 K = np.array([[[0, 1], [2, 3]], [[1, 2], [3, 4]]])
@@ -91,7 +91,7 @@ K = np.array([[[0, 1], [2, 3]], [[1, 2], [3, 4]]])
 corr2d_multi_in(X, K)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 X = torch.tensor([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
                   [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
@@ -136,7 +136,7 @@ and takes input from all channels in the input array.
 We implement a cross-correlation function
 to calculate the output of multiple channels as shown below.
 
-```{.python .input}
+```python
 def corr2d_multi_in_out(X, K):
     # Traverse along the 0th dimension of K, and each time, perform
     # cross-correlation operations with input X. All of the results are merged
@@ -144,7 +144,7 @@ def corr2d_multi_in_out(X, K):
     return np.stack([corr2d_multi_in(X, k) for k in K])
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def corr2d_multi_in_out(X, K):
     # Traverse along the 0th dimension of K, and each time, perform
@@ -157,12 +157,12 @@ We construct a convolution kernel with 3 output channels
 by concatenating the kernel array `K` with `K+1`
 (plus one for each element in `K`) and `K+2`.
 
-```{.python .input}
+```python
 K = np.stack((K, K + 1, K + 2))
 K.shape
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 K = torch.stack([K, K + 1, K + 2], dim=0)
 K.shape
@@ -176,11 +176,11 @@ with the result of the previous input array `X`
 and the multi-input channel,
 single-output channel kernel.
 
-```{.python .input}
+```python
 corr2d_multi_in_out(X, K)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 corr2d_multi_in_out(X, K)
 ```
@@ -228,7 +228,7 @@ using a fully-connected layer.
 The only thing is that we need to make some adjustments
 to the data shape before and after the matrix multiplication.
 
-```{.python .input}
+```python
 def corr2d_multi_in_out_1x1(X, K):
     c_i, h, w = X.shape
     c_o = K.shape[0]
@@ -238,7 +238,7 @@ def corr2d_multi_in_out_1x1(X, K):
     return Y.reshape(c_o, h, w)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def corr2d_multi_in_out_1x1(X, K):
     c_i, h, w = X.shape
@@ -253,7 +253,7 @@ When performing $1\times 1$ convolution,
 the above function is equivalent to the previously implemented cross-correlation function `corr2d_multi_in_out`.
 Let us check this with some reference data.
 
-```{.python .input}
+```python
 X = np.random.uniform(size=(3, 3, 3))
 K = np.random.uniform(size=(2, 3, 1, 1))
 
@@ -263,7 +263,7 @@ Y2 = corr2d_multi_in_out(X, K)
 np.abs(Y1 - Y2).sum() < 1e-6
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 X = torch.randn(size=(3, 3, 3))
 K = torch.randn(size=(2, 3, 1, 1))

@@ -41,7 +41,7 @@ large numbers* tell us that as the number of tosses grows this estimate will dra
 
 To start, let us import the necessary packages.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -49,7 +49,7 @@ import random
 npx.set_np()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -58,7 +58,7 @@ import numpy as np
 from torch.distributions import multinomial
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -87,18 +87,18 @@ To draw a single sample, we simply pass in a vector of probabilities.
 The output is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
 
-```{.python .input}
+```python
 fair_probs = [1.0 / 6] * 6
 np.random.multinomial(1, fair_probs)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 fair_probs = torch.ones([6]) / 6
 multinomial.Multinomial(1, fair_probs).sample()
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 fair_probs = tf.ones([6, 1]) / 6
 tf.random.categorical(fair_probs, 1)
@@ -117,16 +117,16 @@ do this with a Python `for` loop, so the function we are using supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
 
-```{.python .input}
+```python
 np.random.multinomial(10, fair_probs)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 multinomial.Multinomial(10, fair_probs).sample()
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 tf.random.categorical(fair_probs, 10)
 ```
@@ -141,18 +141,18 @@ can then go through and count, after each of the 1000 rolls, how many times each
 number was rolled.
 Specifically, we calculate the relative frequency as the estimate of the true probability.
 
-```{.python .input}
+```python
 counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
 counts / 1000
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 counts = multinomial.Multinomial(1000, fair_probs).sample().type(torch.float32)
 counts / 1000
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 counts = tf.random.categorical(fair_probs, 1000)
 counts / 1000
@@ -169,7 +169,7 @@ Because we generated the data from a fair die, we know that each outcome has tru
 We can also visualize how these probabilities converge over time towards the true probability.
 Let us conduct 500 groups of experiments where each group draws 10 samples.
 
-```{.python .input}
+```python
 counts = np.random.multinomial(10, fair_probs, size=500)
 cum_counts = counts.astype(np.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
@@ -184,7 +184,7 @@ d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 counts = torch.from_numpy(np.random.multinomial(10, fair_probs, size=500))
 cum_counts = counts.type(torch.float32).cumsum(axis=0)
@@ -200,7 +200,7 @@ d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 counts = tf.random.categorical(fair_probs, 10)
 cum_counts = tf.cumsum(counts, axis=0)

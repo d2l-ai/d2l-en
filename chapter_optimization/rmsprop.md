@@ -27,7 +27,7 @@ $$
 
 As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots, = \frac{1}{1-\gamma}$. Hence the sum of weights is normalized to $1$ with a half-life time of an observation of $\gamma^{-1}$. Let us visualize the weights for the past 40 timesteps for various choices of $\gamma$.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
@@ -47,7 +47,7 @@ d2l.plt.xlabel('time');
 
 As before we use the quadratic function $f(\mathbf{x})=0.1x_1^2+2x_2^2$ to observe the trajectory of RMSProp. Recall that in :numref:`sec_adagrad`, when we used Adagrad with a learning rate of 0.4, the variables moved only very slowly in the later stages of the algorithm since the learning rate decreased too quickly. Since $\eta$ is controlled separately this does not happen with RMSProp.
 
-```{.python .input}
+```python
 def rmsprop_2d(x1, x2, s1, s2):
     g1, g2, eps = 0.2 * x1, 4 * x2, 1e-6
     s1 = gamma * s1 + (1 - gamma) * g1 ** 2
@@ -65,7 +65,7 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))
 
 Next, we implement RMSProp to be used in a deep network. This is equally straightforward.
 
-```{.python .input}
+```python
 def init_rmsprop_states(feature_dim):
     s_w = np.zeros((feature_dim, 1))
     s_b = np.zeros(1)
@@ -80,7 +80,7 @@ def rmsprop(params, states, hyperparams):
 
 We set the initial learning rate to 0.01 and the weighting term $\gamma$ to 0.9. That is, $\mathbf{s}$ aggregates on average over the past $1/(1-\gamma) = 10$ observations of the square gradient.
 
-```{.python .input}
+```python
 data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 d2l.train_ch11(rmsprop, init_rmsprop_states(feature_dim),
                {'lr': 0.01, 'gamma': 0.9}, data_iter, feature_dim);
@@ -90,7 +90,7 @@ d2l.train_ch11(rmsprop, init_rmsprop_states(feature_dim),
 
 Since RMSProp is a rather popular algorithm it is also available in the `Trainer` instance. All we need to do is instantiate it using an algorithm named `rmsprop`, assigning $\gamma$ to the parameter `gamma1`.
 
-```{.python .input}
+```python
 d2l.train_gluon_ch11('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
                      data_iter)
 ```

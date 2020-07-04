@@ -4,21 +4,21 @@
 As you might expect, by relying on the high-level interface,
 we can implement MLPs even more concisely.
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import gluon, init, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -37,14 +37,14 @@ which contains *256* hidden units
 and applies the ReLU activation function.
 The second is our output layer.
 
-```{.python .input}
+```python
 net = nn.Sequential()
 net.add(nn.Dense(256, activation='relu'),
         nn.Dense(10))
 net.initialize(init.Normal(sigma=0.01))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 class Reshape(torch.nn.Module):
     def forward(self, x):
@@ -62,7 +62,7 @@ def init_weights(m):
 net.apply(init_weights)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net = tf.keras.models.Sequential([
 	tf.keras.layers.Flatten(input_shape=(28, 28)),
@@ -76,7 +76,7 @@ This modularity enables us to separate
 matters concerning the model architecture
 from orthogonal considerations.
 
-```{.python .input}
+```python
 batch_size, num_epochs = 256, 10
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -84,7 +84,7 @@ trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.5})
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 num_epochs, lr, batch_size = 10, 0.5, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
@@ -93,7 +93,7 @@ trainer = torch.optim.SGD(net.parameters(), lr=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 num_epochs, lr, batch_size = 10, 0.5, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)

@@ -21,7 +21,7 @@ To illustrate the overall architecture of seq2seq with attention model, the laye
 ![The layers in the sequence to sequence model with attention mechanism.](../img/seq2seq-attention-details.svg)
 :label:`fig_s2s_attention_details`
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn, nn
@@ -42,7 +42,7 @@ At each timestep of the decoding, we use the output of the decoder's last RNN la
 
 Let us implement the `Seq2SeqAttentionDecoder`, and see how it differs from the decoder in seq2seq from :numref:`sec_seq2seq_decoder`.
 
-```{.python .input}
+```python
 class Seq2SeqAttentionDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -79,7 +79,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
 
 Now we can test the seq2seq with attention model. To be consistent with the model without attention in :numref:`sec_seq2seq`, we use the same hyper-parameters for `vocab_size`, `embed_size`, `num_hiddens`, and `num_layers`. As a result, we get the same decoder output shape, but the state structure is changed.
 
-```{.python .input}
+```python
 encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8,
                              num_hiddens=16, num_layers=2)
 encoder.initialize()
@@ -104,7 +104,7 @@ Due to the computational
 overhead of both the encoder's and the decoder's attention layers, this model
 is much slower than the seq2seq model without attention.
 
-```{.python .input}
+```python
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_steps = 64, 10
 lr, num_epochs, ctx = 0.005, 200, d2l.try_gpu()
@@ -120,7 +120,7 @@ d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
 
 Last, we predict several sample examples.
 
-```{.python .input}
+```python
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + d2l.predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, ctx))

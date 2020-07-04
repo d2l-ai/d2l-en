@@ -71,7 +71,7 @@ In fact, if we have a Markov model, we can obtain a reverse conditional probabil
 
 After so much theory, let us try this out in practice. Let us begin by generating some data. To keep things simple we generate our time series by using a sine function with some additive noise.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon, init
@@ -84,7 +84,7 @@ x = np.sin(0.01 * time) + 0.2 * np.random.normal(size=T)
 d2l.plot(time, [x])
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -99,7 +99,7 @@ d2l.plot(time, [x])
 
 Next we need to turn this time series into features and labels that the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots, x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer data points, since we do not have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple. A few layers of a fully connected network, ReLU activation and $\ell_2$ loss. Since much of the modeling is identical to the previous sections when we built regression estimators in Gluon, we will not delve into much detail.
 
-```{.python .input}
+```python
 tau = 4
 features = np.zeros((T-tau, tau))
 for i in range(tau):
@@ -124,7 +124,7 @@ def get_net():
 loss = gluon.loss.L2Loss()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 tau = 4
 features = torch.zeros((T-tau, tau))
@@ -157,7 +157,7 @@ loss = nn.MSELoss()
 
 Now we are ready to train.
 
-```{.python .input}
+```python
 def train_net(net, train_iter, loss, epochs, lr):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
@@ -174,7 +174,7 @@ net = get_net()
 train_net(net, train_iter, loss, 10, 0.01)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def train_net(net, train_iter, loss, epochs, lr):
     trainer = torch.optim.Adam(net.parameters(), lr)
@@ -195,13 +195,13 @@ train_net(net, train_iter, loss, 10, 0.01)
 
 Since both training and test loss are small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
 
-```{.python .input}
+```python
 estimates = net(features)
 d2l.plot([time, time[tau:]], [x, estimates],
          legend=['data', 'estimate'])
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 estimates = net(features)
 d2l.plot([time, time[tau:]], [x, estimates.detach()],
@@ -218,7 +218,7 @@ x_{603} & = f(x_{602}, \ldots, x_{599}).
 
 In other words, we will have to use our own predictions to make future predictions. Let us see how well this goes.
 
-```{.python .input}
+```python
 predictions = np.zeros(T)
 predictions[:n_train] = x[:n_train]
 for i in range(n_train, T):
@@ -229,7 +229,7 @@ d2l.plot([time, time[tau:], time[n_train:]],
          legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 predictions = torch.zeros(T)
 predictions[:n_train] = x[:n_train]
@@ -245,7 +245,7 @@ As the above example shows, this is a spectacular failure. The estimates decay t
 
 Let us verify this observation by computing the $k$-step predictions on the entire sequence.
 
-```{.python .input}
+```python
 k = 33  # Look up to k - tau steps ahead
 
 features = np.zeros((k, T-k))
@@ -260,7 +260,7 @@ d2l.plot([time[i:T-k+i] for i in steps], [features[i] for i in steps],
          legend=['step %d' % i for i in steps], figsize=(4.5, 2.5))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 k = 33  # Look up to k - tau steps ahead
 

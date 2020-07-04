@@ -21,7 +21,7 @@ concisely by using framework's high-level APIs.
 
 To start, we will generate the same dataset as in the previous section.
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
@@ -31,7 +31,7 @@ true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 from d2l import torch as d2l
 import numpy as np
@@ -44,7 +44,7 @@ features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 labels = labels.reshape(-1,1)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import numpy as np
@@ -82,7 +82,7 @@ and specify a Boolean value `shuffle` indicating whether or not
 we want the `DataLoader` to shuffle the data
 on each epoch (pass through the dataset).
 
-```{.python .input}
+```python
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a Gluon data loader."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
@@ -92,7 +92,7 @@ batch_size = 10
 data_iter = load_array((features, labels), batch_size)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data loader"""
@@ -103,7 +103,7 @@ batch_size = 10
 data_iter = load_array((features, labels), batch_size)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a TensorFlow data loader"""
@@ -145,16 +145,16 @@ the `data_iter` function in the previous section.
 To verify that it is working, we can read and print
 the first minibatch of instances. Comparing to :numref:`sec_linear_scratch`, here we use `iter` to construct an Python iterator and then use `next` to obtain the first item from the iterator.
 
-```{.python .input}
+```python
 next(iter(data_iter))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 next(iter(data_iter))
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 next(iter(data_iter))
 ```
@@ -207,21 +207,21 @@ by means of a matrix-vector multiplication.
 ![Linear regression is a single-layer neural network. ](../img/singleneuron.svg)
 :label:`fig_singleneuron`
 
-```{.python .input}
+```python
 # nn is an abbreviation for neural networks.
 from mxnet.gluon import nn
 net = nn.Sequential()
 net.add(nn.Dense(1))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 # nn is an abbreviation for neural networks.
 from torch import nn
 net = nn.Sequential(nn.Linear(2, 1))
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 # Keras is the high-level API for TensorFlow
 net = tf.keras.Sequential()
@@ -292,18 +292,18 @@ As we have specified the input and output dimensions when constructing `nn.Linea
 The `initializers` module in TensorFlow provides various methods for model parameter initialization. The easiest way to specify the initialization method in Keras is when creating the layer by specifying `kernel_initializer`. Here we recreate `net` again.
 :end_tab:
 
-```{.python .input}
+```python
 from mxnet import init
 net.initialize(init.Normal(sigma=0.01))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net[0].weight.data.uniform_(0.0, 0.01)
 net[0].bias.data.fill_(0)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 initializer = tf.initializers.RandomNormal(stddev=0.01)
 net = tf.keras.Sequential()
@@ -370,17 +370,17 @@ The `MSELoss` class compute the mean squared error, also known as squared L2 nor
 The `MeanSquaredError` class compute the mean squared error, also known as squared L2 norm. In default it returns the averaged loss over examples.
 :end_tab:
 
-```{.python .input}
+```python
 from mxnet.gluon import loss as gloss
 loss = gloss.L2Loss()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 loss = nn.MSELoss()
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 loss = tf.keras.losses.MeanSquaredError()
 ```
@@ -429,17 +429,17 @@ SGD just requires that we set the value `learning_rate`,
 (here we set it to 0.03).
 :end_tab:
 
-```{.python .input}
+```python
 from mxnet import gluon
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 trainer = torch.optim.SGD(net.parameters(), lr=.03)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 trainer = tf.keras.optimizers.SGD(learning_rate=.03)
 ```
@@ -473,7 +473,7 @@ For each minibatch, we go through the following ritual:
 
 For good measure, we compute the loss after each epoch and print it to monitor progress.
 
-```{.python .input}
+```python
 num_epochs = 3
 for epoch in range(1, num_epochs + 1):
     for X, y in data_iter:
@@ -485,7 +485,7 @@ for epoch in range(1, num_epochs + 1):
     print('epoch %d, loss: %f' % (epoch, l.mean().asnumpy()))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 num_epochs = 3
 for epoch in range(1, num_epochs + 1):
@@ -498,7 +498,7 @@ for epoch in range(1, num_epochs + 1):
     print('epoch {}, loss {}'.format(epoch, l))
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 num_epochs = 3
 for epoch in range(1, num_epochs + 1):
@@ -527,14 +527,14 @@ As in our from-scratch implementation,
 note that our estimated parameters are
 close to their ground truth counterparts.
 
-```{.python .input}
+```python
 w = net[0].weight.data()
 print('Error in estimating w', true_w.reshape(w.shape) - w)
 b = net[0].bias.data()
 print('Error in estimating b', true_b - b)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 w = net[0].weight.data
 print('Error in estimating w', true_w.reshape(w.shape) - w)
@@ -542,7 +542,7 @@ b = net[0].bias.data
 print('Error in estimating b', true_b - b)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 w = net.get_weights()[0]
 print('Error in estimating w', tf.reshape(true_w, w.shape) - w)
@@ -551,7 +551,7 @@ print('Error in estimating b', true_b - b)
 ```
 
 ```{.python .input}
-#@tab jax
+c#@tab jax
 # Jax provides no high-level API, please see the chapter: 'Linear Regression Implementation from Scratch'
 ```
 

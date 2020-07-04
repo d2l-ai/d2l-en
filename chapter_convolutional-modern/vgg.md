@@ -45,7 +45,7 @@ The function takes two arguments
 corresponding to the number of convolutional layers `num_convs`
 and the number of output channels `num_channels`.
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
@@ -60,7 +60,7 @@ def vgg_block(num_convs, num_channels):
     return blk
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -112,7 +112,7 @@ conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))
 
 The following code implements VGG-11. This is a simple matter of executing a for loop over `conv_arch`.
 
-```{.python .input}
+```python
 def vgg(conv_arch):
     net = nn.Sequential()
     # The convolutional layer part
@@ -127,7 +127,7 @@ def vgg(conv_arch):
 net = vgg(conv_arch)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def vgg(conv_arch):
     # The convulational layer part
@@ -149,7 +149,7 @@ net = vgg(conv_arch)
 Next, we will construct a single-channel data example
 with a height and width of 224 to observe the output shape of each layer.
 
-```{.python .input}
+```python
 net.initialize()
 X = np.random.uniform(size=(1, 1, 224, 224))
 for blk in net:
@@ -157,7 +157,7 @@ for blk in net:
     print(blk.name, 'output shape:\t', X.shape)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 X = torch.randn(size=(1, 1, 224, 224))
 for blk in net:
@@ -176,13 +176,13 @@ Since VGG-11 is more computationally-heavy than AlexNet
 we construct a network with a smaller number of channels.
 This is more than sufficient for training on Fashion-MNIST.
 
-```{.python .input}
+```python
 ratio = 4
 small_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]
 net = vgg(small_conv_arch)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 ratio = 4
 small_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]
@@ -192,13 +192,13 @@ net = vgg(small_conv_arch)
 Apart from using a slightly larger learning rate,
 the model training process is similar to that of AlexNet in the last section.
 
-```{.python .input}
+```python
 lr, num_epochs, batch_size = 0.05, 10, 128,
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 lr, num_epochs, batch_size = 0.05, 10, 128,
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)

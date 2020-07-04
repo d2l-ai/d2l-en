@@ -83,7 +83,7 @@ $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
 Now let us implement an LSTM from scratch. As same as the experiments in the previous sections, we first load data of *The Time Machine*.
 
-```{.python .input}
+```python
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn
@@ -97,7 +97,7 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 
 Next we need to define and initialize the model parameters. As previously, the hyperparameter `num_hiddens` defines the number of hidden units. We initialize weights following a Gaussian distribution with $0.01$ standard deviation, and we set the biases to $0$.
 
-```{.python .input}
+```python
 def get_lstm_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
 
@@ -128,7 +128,7 @@ def get_lstm_params(vocab_size, num_hiddens, ctx):
 
 In the initialization function, the hidden state of the LSTM needs to return an additional memory cell with a value of $0$ and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
 
-```{.python .input}
+```python
 def init_lstm_state(batch_size, num_hiddens, ctx):
     return (np.zeros(shape=(batch_size, num_hiddens), ctx=ctx),
             np.zeros(shape=(batch_size, num_hiddens), ctx=ctx))
@@ -136,7 +136,7 @@ def init_lstm_state(batch_size, num_hiddens, ctx):
 
 The actual model is defined just like what we discussed before: providing three gates and an auxiliary memory cell. Note that only the hidden state is passed to the output layer. The memory cells $\mathbf{C}_t$ do not participate in the output computation directly.
 
-```{.python .input}
+```python
 def lstm(inputs, state, params):
     [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c,
      W_hq, b_q] = params
@@ -158,7 +158,7 @@ def lstm(inputs, state, params):
 
 Let us train an LSTM as same as what we did in :numref:`sec_gru`, by calling the `RNNModelScratch` function as introduced in :numref:`sec_rnn_scratch`.
 
-```{.python .input}
+```python
 vocab_size, num_hiddens, ctx = len(vocab), 256, d2l.try_gpu()
 num_epochs, lr = 500, 1
 model = d2l.RNNModelScratch(len(vocab), num_hiddens, ctx, get_lstm_params,
@@ -170,7 +170,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 
 In Gluon, we can directly call the `LSTM` class in the `rnn` module. This encapsulates all the configuration details that we made explicit above. The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out in detail before.
 
-```{.python .input}
+```python
 lstm_layer = rnn.LSTM(num_hiddens)
 model = d2l.RNNModel(lstm_layer, len(vocab))
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)

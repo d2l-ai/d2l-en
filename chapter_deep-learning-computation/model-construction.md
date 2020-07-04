@@ -124,7 +124,7 @@ followed by a fully-connected *output layer*
 with 10 units (no activation function).
 :end_tab:
 
-```{.python .input}
+```python
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -138,7 +138,7 @@ net.initialize()
 net(x)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 import torch
 from torch import nn
@@ -150,7 +150,7 @@ net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
 net(x)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 import tensorflow as tf
 
@@ -233,7 +233,7 @@ Note that the `MLP` class below inherits the class represents a block.
 We will rely heavily on the parent class's methods,
 supplying only our own `__init__` and `forward` methods.
 
-```{.python .input}
+```python
 class MLP(nn.Block):
     # Declare a layer with model parameters. Here, we declare two fully
     # connected layers
@@ -252,7 +252,7 @@ class MLP(nn.Block):
         return self.output(self.hidden(x))
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 class MLP(nn.Module):
     # Declare a layer with model parameters. Here, we declare two fully
@@ -274,7 +274,7 @@ class MLP(nn.Module):
         return self.output(F.relu(self.hidden(x)))
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 class MLP(tf.keras.Model):
     # Declare a layer with model parameters. Here, we declare two fully
@@ -327,19 +327,19 @@ or parameter initialization.
 The system will generate these methods automatically.
 Let us try this out:
 
-```{.python .input}
+```python
 net = MLP()
 net.initialize()
 net(x)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net = MLP()
 net(x)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net = MLP()
 net(x)
@@ -371,7 +371,7 @@ we just need to define two key methods:
 The following `MySequential` class delivers the same 
 functionality the default `Sequential` class:
 
-```{.python .input}
+```python
 class MySequential(nn.Block):
     def add(self, block):
         # Here, block is an instance of a Block subclass, and we assume it has
@@ -389,7 +389,7 @@ class MySequential(nn.Block):
         return x
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 class MySequential(nn.Module):
     def __init__(self, *args):
@@ -408,7 +408,7 @@ class MySequential(nn.Module):
         return x
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 class MySequential(tf.keras.Model):
     def __init__(self, *args):
@@ -456,7 +456,7 @@ in the order in which they were added.
 We can now reimplement an MLP 
 using our `MySequential` class.
 
-```{.python .input}
+```python
 net = MySequential()
 net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
@@ -464,13 +464,13 @@ net.initialize()
 net(x)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
 net(x)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net = MySequential(
     tf.keras.layers.Flatten(),
@@ -521,7 +521,7 @@ In the following code, we will implement a model
 that could not easily be assembled
 using only predefined layers and `Sequential`.
 
-```{.python .input}
+```python
 class FixedHiddenMLP(nn.Block):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -546,7 +546,7 @@ class FixedHiddenMLP(nn.Block):
         return x.sum()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 class FixedHiddenMLP(nn.Module):
     def __init__(self):
@@ -571,7 +571,7 @@ class FixedHiddenMLP(nn.Module):
         return x.sum()
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 class FixedHiddenMLP(tf.keras.Model):
     def __init__(self):
@@ -621,19 +621,19 @@ Our point is only to show you how to integrate
 arbitrary code into the flow of your 
 neural network computations.
 
-```{.python .input}
+```python
 net = FixedHiddenMLP()
 net.initialize()
 net(x)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net = FixedHiddenMLP()
 net(x)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net = FixedHiddenMLP()
 net(x)
@@ -644,7 +644,7 @@ ways of assembling blocks together.
 In the following example, we nest blocks
 in some creative ways.
 
-```{.python .input}
+```python
 class NestMLP(nn.Block):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -663,7 +663,7 @@ chimera.initialize()
 chimera(x)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 class NestMLP(nn.Module):
     def __init__(self):
@@ -679,7 +679,7 @@ chimera = nn.Sequential(NestMLP(), nn.Linear(16, 20), FixedHiddenMLP())
 chimera(x)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 class NestMLP(tf.keras.Model):
     def __init__(self):

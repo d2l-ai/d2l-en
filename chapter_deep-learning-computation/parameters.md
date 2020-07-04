@@ -32,7 +32,7 @@ In this section, we cover the following:
 
 We start by focusing on an MLP with one hidden layer.
 
-```{.python .input}
+```python
 from mxnet import init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -46,7 +46,7 @@ x = np.random.uniform(size=(2, 4))
 net(x)  # Forward computation
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 import torch
 from torch import nn
@@ -56,7 +56,7 @@ x = torch.randn(2, 4)
 net(x)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 import tensorflow as tf
 import numpy as np
@@ -83,17 +83,17 @@ Each layer's parameters are conveniently
 located in its attribute. 
 We can inspect the parameters of the `net` defined above as a dictionary.
 
-```{.python .input}
+```python
 print(net[0].params)
 print(net[1].params)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 print(net[2].state_dict())
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 print(net.layers[2].weights)
 ```
@@ -127,20 +127,20 @@ via its `data` method.
 The following code extracts the bias
 from the second neural network layer.
 
-```{.python .input}
+```python
 print(type(net[1].bias))
 print(net[1].bias)
 print(net[1].bias.data())
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 print(type(net[2].bias))
 print(net[2].bias)
 print(net[2].bias.data)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 print(type(net.layers[2].weights[0]))
 print(net.layers[2].weights[0])
@@ -155,16 +155,16 @@ That's why we need to request the data explicitly.
 
 In addition to `data`, each `Parameter` also provides a `grad` method for accessing the gradient. Because we have not invoked backpropagation for this network yet, it is in its initial state.
 
-```{.python .input}
+```python
 net[0].weight.grad()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net[0].weight.grad == None
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net.layers[0].weights == []
 ```
@@ -181,14 +181,14 @@ since we would need to recurse
 through the entire tree in to extract
 each sub-block's parameters.
 
-```{.python .input}
+```python
 # parameters only for the first layer
 print(net[0].collect_params())
 # parameters of the entire network
 print(net.collect_params())
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 # parameters only for the first layer
 print(net[0].state_dict())
@@ -196,7 +196,7 @@ print(net[0].state_dict())
 print(net.state_dict())
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 # parameters only for the first layer
 print(net.layers[1].weights)
@@ -206,16 +206,16 @@ print(net.get_weights())
 
 This provides us with another way of accessing the parameters of the network:
 
-```{.python .input}
+```python
 net.collect_params()['dense1_bias'].data()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net.state_dict()['2.bias'].data
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net.get_weights()[1]
 ```
@@ -230,7 +230,7 @@ it allows us to filter the parameters
 returned by using regular expressions.
 :end_tab:
 
-```{.python .input}
+```python
 print(net.collect_params('.*weight'))
 print(net.collect_params('dense0.*'))
 ```
@@ -243,7 +243,7 @@ For that we first define a function that produces blocks
 (a block factory, so to speak) and then 
 combine these inside yet larger blocks.
 
-```{.python .input}
+```python
 def block1():
     net = nn.Sequential()
     net.add(nn.Dense(32, activation='relu'))
@@ -263,7 +263,7 @@ rgnet.initialize()
 rgnet(x)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def block1():
     return nn.Sequential(nn.Linear(4, 8), nn.ReLU(),
@@ -279,7 +279,7 @@ rgnet = nn.Sequential(block2(), nn.Linear(4, 1))
 rgnet(x)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 def block1(name):
     return tf.keras.Sequential([
@@ -302,17 +302,17 @@ rgnet(x)
 Now that we have designed the network, 
 let us see how it is organized.
 
-```{.python .input}
+```python
 print(rgnet.collect_params)
 print(rgnet.collect_params())
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 print(rgnet)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 print(rgnet.summary())
 ```
@@ -325,16 +325,16 @@ within it the second subblock,
 and within that the bias of the first layer,
 with as follows:
 
-```{.python .input}
+```python
 rgnet[0][1][0].bias.data()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 rgnet[0][1][0].bias.data
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 rgnet.layers[0].layers[1].layers[1].weights[1]
 ```
@@ -375,14 +375,14 @@ The code below initializes all weight parameters
 as Gaussian random variables 
 with standard deviation $.01$, while bias parameters set to 0.
 
-```{.python .input}
+```python
 # force_reinit ensures that variables are freshly initialized
 # even if they were already initialized previously
 net.initialize(init=init.Normal(sigma=0.01), force_reinit=True)
 net[0].weight.data()[0]
 ```
 
-```{.python .input}
+```python
 #@tab pytorch 
 def init_normal(m):
     if type(m) == nn.Linear:
@@ -392,7 +392,7 @@ net.apply(init_normal)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow 
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
@@ -411,12 +411,12 @@ net.weights[0], net.weights[1]
 We can also initialize all parameters 
 to a given constant value (say, $1$).
 
-```{.python .input}
+```python
 net.initialize(init=init.Constant(1), force_reinit=True)
 net[0].weight.data()[0]
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def init_normal(m):
     if type(m) == nn.Linear:
@@ -426,7 +426,7 @@ net.apply(init_normal)
 net[0].weight.data[0], net[0].bias.data[0]
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
@@ -448,14 +448,14 @@ with the `Xavier` initializer
 and initialize the second layer 
 to a constant value of 42.
 
-```{.python .input}
+```python
 net[0].weight.initialize(init=init.Xavier(), force_reinit=True)
 net[1].initialize(init=init.Constant(42), force_reinit=True)
 print(net[0].weight.data()[0])
 print(net[1].weight.data())
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def xavier(m):
     if type(m) == nn.Linear:
@@ -470,7 +470,7 @@ print(net[0].weight.data[0])
 print(net[2].weight.data)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
@@ -515,7 +515,7 @@ and assigns to it the desired initialized values.
 Again, we implement a `my_init` function to apply to `net`.
 :end_tab:
 
-```{.python .input}
+```python
 class MyInit(init.Initializer):
     def _init_weight(self, name, data):
         print('Init', name, data.shape)
@@ -526,7 +526,7 @@ net.initialize(MyInit(), force_reinit=True)
 net[0].weight.data()[0:2]
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def my_init(m):
     if type(m) == nn.Linear:
@@ -537,7 +537,7 @@ net.apply(my_init)
 net[0].weight[0:2]
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 def my_init(m):
     return tf.keras.initializers.Constant(m)
@@ -566,20 +566,20 @@ you need to use `set_data` to avoid confusing
 the automatic differentiation mechanics.
 :end_tab:
 
-```{.python .input}
+```python
 net[0].weight.data()[:] += 1
 net[0].weight.data()[0, 0] = 42
 net[0].weight.data()[0]
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net[0].weight.data[:] += 1
 net[0].weight.data[0, 0] = 42
 net[0].weight.data[0]
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 net.layers[1].weights[0][:].assign(net.layers[1].weights[0] + 1)
 net.layers[1].weights[0][0, 0].assign(42)
@@ -598,7 +598,7 @@ In the following we allocate a dense layer
 and then use its parameters specifically 
 to set those of another layer.
 
-```{.python .input}
+```python
 net = nn.Sequential()
 # We need to give the shared layer a name such that we can reference its
 # parameters
@@ -620,7 +620,7 @@ net[1].weight.data()[0, 0] = 100
 print(net[1].weight.data()[0] == net[2].weight.data()[0])
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 # We need to give the shared layer a name such that we can reference its
 # parameters
@@ -638,7 +638,7 @@ net[2].weight.data[0, 0] = 100
 print(net[2].weight.data[0] == net[4].weight.data[0])
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 # tf.keras behaves a bit differently. It removes the duplicate layer automatically.
 shared = tf.keras.layers.Dense(4, activation=tf.nn.relu)
