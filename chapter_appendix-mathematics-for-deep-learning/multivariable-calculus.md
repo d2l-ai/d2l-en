@@ -68,7 +68,7 @@ $$
 
 We can test this in code to see how good the approximation is.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -88,7 +88,7 @@ true_value = f(0 + epsilon[0], np.log(2) + epsilon[1])
 "Approximation: {}, True Value: {}".format(grad_approx, true_value)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -171,14 +171,14 @@ $$
 
 The only possible location of minima are at $x = -1, 0, 2$, where the function takes the values $-5,0, -32$ respectively, and thus we can conclude that we minimize our function when $x = 2$.  A quick plot confirms this.
 
-```python
+```{.python .input}
 x = np.arange(-2, 3, 0.01)
 f = (3 * x**4) - (4 * x**3) - (12 * x**2)
 
 d2l.plot(x, f, 'x', 'f(x)')
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x = torch.arange(-2, 3, 0.01)
 f = (3 * x**4) - (4 * x**3) - (12 * x**2)
@@ -365,7 +365,7 @@ This is precisely what every deep learning algorithm implements to allow the com
 
 To see how MXNet has encapsulated this, let us take a quick look at this example.
 
-```python
+```{.python .input}
 # Initialize as ndarrays, then attach gradients
 w, x, y, z = np.array(-1), np.array(0), np.array(-2), np.array(1)
 
@@ -389,7 +389,7 @@ print(f"df/dy at {w}, {x}, {y}, {z} is {y.grad}")
 print(f"df/dz at {w}, {x}, {y}, {z} is {z.grad}")
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Initialize as ndarrays, then attach gradients
 w = torch.tensor([-1.], requires_grad=True)
@@ -480,7 +480,7 @@ $$
 f(x, y) \approx e^{-1}\left(-1 - (x+1) +2(x+1)^2+2y^2\right).
 $$
 
-```python
+```{.python .input}
 # Construct grid and compute function
 x, y = np.meshgrid(np.linspace(-2, 2, 101),
                    np.linspace(-2, 2, 101), indexing='ij')
@@ -502,7 +502,7 @@ ax.set_zlim(-1, 1)
 ax.dist = 12
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Construct grid and compute function
 x, y = torch.meshgrid(torch.linspace(-2, 2, 101),

@@ -86,7 +86,7 @@ is remarkably simple.
 We need only to instantiate a `Sequential` Block 
 and chain together the appropriate layers.
 
-```python
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
@@ -105,7 +105,7 @@ net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
         nn.Dense(10))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -140,7 +140,7 @@ we can inspect the model to make sure
 that its operations line up with 
 what we expect from :numref:`img_lenet_vert`.
 
-```python
+```{.python .input}
 X = np.random.uniform(size=(1, 1, 28, 28))
 net.initialize()
 for layer in net:
@@ -148,7 +148,7 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 X = torch.randn(size=(1, 1, 28, 28), dtype=torch.float32)
 for layer in net:
@@ -181,12 +181,12 @@ matches the number of classes.
 Now that we have implemented the model,
 let's run an experiment to see how LeNet fares on Fashion-MNIST.
 
-```python
+```{.python .input}
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
@@ -208,7 +208,7 @@ we need to copy it to the GPU before we can compute our models.
 This is accomplished via the `as_in_ctx` function
 described in :numref:`sec_use_gpu`.
 
-```python
+```{.python .input}
 def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
     if not ctx:  # Query the first device the first parameter is on
         ctx = list(net.collect_params().values())[0].list_ctx()[0]
@@ -219,7 +219,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
     return metric[0]/metric[1]
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save        
     if not device:
@@ -251,7 +251,7 @@ and we minimize it via minibatch stochastic gradient descent.
 Since each epoch takes tens of seconds to run, 
 we visualize the training loss more frequently.
 
-```python
+```{.python .input}
 #@save
 def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
@@ -285,7 +285,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     print('%.1f examples/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 #@save
 def train_ch6(net, train_iter, test_iter, num_epochs, lr, 
@@ -330,12 +330,12 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
 
 Now let us train the model.
 
-```python
+```{.python .input}
 lr, num_epochs = 0.9, 10
 train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 lr, num_epochs = 0.9, 10
 train_ch6(net, train_iter, test_iter, num_epochs, lr)

@@ -41,7 +41,7 @@ Next, we go deeper into the mechanics of initialization.
 
 To begin, let us instantiate an MLP.
 
-```python
+```{.python .input}
 from mxnet import init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -61,7 +61,7 @@ because the input dimension remains unknown.
 Consequently MXNet has not yet initialized any parameters.
 We confirm by attempting to access the parameters below.
 
-```python
+```{.python .input}
 print(net.collect_params)
 print(net.collect_params())
 ```
@@ -76,7 +76,7 @@ must be initialized before the parameters can be accessed.
 Now let us see what happens when we attempt to initialze
 parameters via the `initialize` method.
 
-```python
+```{.python .input}
 net.initialize()
 net.collect_params()
 ```
@@ -91,7 +91,7 @@ Only once we pass data through the network
 will MXNet finally initialize parameters 
 and will we see a difference.
 
-```python
+```{.python .input}
 x = np.random.uniform(size=(2, 20))
 net(x)  # Forward computation
 
@@ -121,7 +121,7 @@ In order to do so, we mock up an initializer
 which does nothing but report a debug message 
 stating when it was invoked and with which parameters.
 
-```python
+```{.python .input}
 class MyInit(init.Initializer):
     def _init_weight(self, name, data):
         print('Init', name, data.shape)
@@ -139,7 +139,7 @@ Therefore there is no real initialization parameter
 when calling the `initialize` function. 
 Next, we define the input and perform a forward calculation.
 
-```python
+```{.python .input}
 x = np.random.uniform(size=(2, 20))
 y = net(x)
 ```
@@ -158,7 +158,7 @@ After that, we will not re-initialize
 when we run the forward calculation `net(x)`, 
 so the output of the `MyInit` instance will not be generated again.
 
-```python
+```{.python .input}
 y = net(x)
 ```
 
@@ -184,7 +184,7 @@ This can occur in two cases:
 
 Forced reinitialization works as illustrated below.
 
-```python
+```{.python .input}
 net.initialize(init=MyInit(), force_reinit=True)
 ```
 
@@ -193,7 +193,7 @@ all parameters when creating each layer.
 For instance, for dense layers we must specify `in_units` 
 at the time that the layer is instantiated.
 
-```python
+```{.python .input}
 net = nn.Sequential()
 net.add(nn.Dense(256, in_units=20, activation='relu'))
 net.add(nn.Dense(10, in_units=256))

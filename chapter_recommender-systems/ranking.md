@@ -32,14 +32,14 @@ where $D := \{(u, i, j) \mid i \in I^+_u \wedge j \in I \backslash I^+_u \}$ is 
 ![Illustration of Bayesian Personalized Ranking](../img/rec-ranking.svg)
 We will implement the base class  `mxnet.gluon.loss.Loss` and override the `forward` method to construct the Bayesian personalized ranking loss. We begin by importing the Loss class and the np module.
 
-```python
+```{.python .input}
 from mxnet import gluon, np, npx
 npx.set_np()
 ```
 
 The implementation of BPR loss is as follows.
 
-```python
+```{.python .input}
 #@save
 class BPRLoss(gluon.loss.Loss):
     def __init__(self, weight=None, batch_axis=0, **kwargs):
@@ -61,7 +61,7 @@ $$
 
 where $m$ is the safety margin size. It aims to push negative items away from positive items. Similar to BPR, it aims to optimize for relevant distance between positive and negative samples instead of absolute outputs, making it well suited to recommender systems.
 
-```python
+```{.python .input}
 #@save
 class HingeLossbRec(gluon.loss.Loss):
     def __init__(self, weight=None, batch_axis=0, **kwargs):

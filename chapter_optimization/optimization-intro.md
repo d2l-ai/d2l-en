@@ -18,7 +18,7 @@ reduce the generalization error.  To accomplish the latter we need to pay
 attention to overfitting in addition to using the optimization algorithm to
 reduce the training error. We begin by importing a few libraries with a function to annotate in a figure.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mpl_toolkits import mplot3d
@@ -33,7 +33,7 @@ def annotate(text, xy, xytext):
 
 The graph below illustrates the issue in some more detail. Since we have only a finite amount of data the minimum of the training error may be at a different location than the minimum of the expected error (or of the test error).
 
-```python
+```{.python .input}
 def f(x): return x * np.cos(np.pi * x)
 def g(x): return f(x) + 0.2 * np.cos(5 * np.pi * x)
 
@@ -67,7 +67,7 @@ $$f(x) = x \cdot \text{cos}(\pi x) \text{ for } -1.0 \leq x \leq 2.0,$$
 
 we can approximate the local minimum and global minimum of this function.
 
-```python
+```{.python .input}
 x = np.arange(-1.0, 2.0, 0.01)
 d2l.plot(x, [f(x), ], 'x', 'f(x)')
 annotate('local minimum', (-0.3, -0.25), (-0.77, -1.0))
@@ -80,7 +80,7 @@ The objective function of deep learning models usually has many local optima. Wh
 
 Besides local minima, saddle points are another reason for gradients to vanish. A [saddle point](https://en.wikipedia.org/wiki/Saddle_point) is any location where all gradients of a function vanish but which is neither a global nor a local minimum. Consider the function $f(x) = x^3$. Its first and second derivative vanish for $x=0$. Optimization might stall at the point, even though it is not a minimum.
 
-```python
+```{.python .input}
 x = np.arange(-2.0, 2.0, 0.01)
 d2l.plot(x, [x**3], 'x', 'f(x)')
 annotate('saddle point', (0, -0.2), (-0.52, -5.0))
@@ -88,7 +88,7 @@ annotate('saddle point', (0, -0.2), (-0.52, -5.0))
 
 Saddle points in higher dimensions are even more insidious, as the example below shows. Consider the function $f(x, y) = x^2 - y^2$. It has its saddle point at $(0, 0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
 
-```python
+```{.python .input}
 x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
                    indexing='ij')
 
@@ -122,7 +122,7 @@ For high-dimensional problems the likelihood that at least some of the eigenvalu
 
 Probably the most insidious problem to encounter are vanishing gradients. For instance, assume that we want to minimize the function $f(x) = \tanh(x)$ and we happen to get started at $x = 4$. As we can see, the gradient of $f$ is close to nil. More specifically $f'(x) = 1 - \tanh^2(x)$ and thus $f'(4) = 0.0013$. Consequently optimization will get stuck for a long time before we make progress. This turns out to be one of the reasons that training deep learning models was quite tricky prior to the introduction of the ReLU activation function.
 
-```python
+```{.python .input}
 x = np.arange(-2.0, 5.0, 0.01)
 d2l.plot(x, [np.tanh(x)], 'x', 'f(x)')
 annotate('vanishing gradient', (4, 1), (2, 0.0))

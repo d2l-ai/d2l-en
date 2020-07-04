@@ -26,7 +26,7 @@ to iterate $x$, the value of function $f(x)$ might decline. Therefore, in gradie
 
 For simplicity we choose the objective function $f(x)=x^2$ to illustrate how to implement gradient descent. Although we know that $x=0$ is the solution to minimize $f(x)$, we still use this simple function to observe how $x$ changes. As always, we begin by importing all required modules.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -41,7 +41,7 @@ def gradf(x):
 
 Next, we use $x=10$ as the initial value and assume $\eta=0.2$. Using gradient descent to iterate $x$ for 10 times we can see that, eventually, the value of $x$ approaches the optimal solution.
 
-```python
+```{.python .input}
 def gd(eta):
     x = 10
     results = [x]
@@ -56,7 +56,7 @@ res = gd(0.2)
 
 The progress of optimizing over $x$ can be plotted as follows.
 
-```python
+```{.python .input}
 def show_trace(res):
     n = max(abs(min(res)), abs(max(res)))
     f_line = np.arange(-n, n, 0.01)
@@ -72,13 +72,13 @@ show_trace(res)
 
 The learning rate $\eta$ can be set by the algorithm designer. If we use a learning rate that is too small, it will cause $x$ to update very slowly, requiring more iterations to get a better solution. To show what happens in such a case, consider the progress in the same optimization problem for $\eta = 0.05$. As we can see, even after 10 steps we are still very far from the optimal solution.
 
-```python
+```{.python .input}
 show_trace(gd(0.05))
 ```
 
 Conversely, if we use an excessively high learning rate, $\left|\eta f'(x)\right|$ might be too large for the first-order Taylor expansion formula. That is, the term $\mathcal{O}(\eta^2 f'^2(x))$ in :eqref:`gd-taylor` might become significant. In this case, we cannot guarantee that the iteration of $x$ will be able to lower the value of $f(x)$. For example, when we set the learning rate to $\eta=1.1$, $x$ overshoots the optimal solution $x=0$ and gradually diverges.
 
-```python
+```{.python .input}
 show_trace(gd(1.1))
 ```
 
@@ -86,7 +86,7 @@ show_trace(gd(1.1))
 
 To illustrate what happens for nonconvex functions consider the case of $f(x) = x \cdot \cos c x$. This function has infinitely many local minima. Depending on our choice of learning rate and depending on how well conditioned the problem is, we may end up with one of many solutions. The example below illustrates how an (unrealistically) high learning rate will lead to a poor local minimum.
 
-```python
+```{.python .input}
 c = 0.15 * np.pi
 
 def f(x):
@@ -115,7 +115,7 @@ $\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f(\mathbf{x}).$
 
 To see how the algorithm behaves in practice let us construct an objective function $f(\mathbf{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\mathbf{x} = [x_1, x_2]^\top$ as input and a scalar as output. The gradient is given by $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. We will observe the trajectory of $\mathbf{x}$ by gradient descent from the initial position $[-5, -2]$. We need two more helper functions. The first uses an update function and applies it $20$ times to the initial value. The second helper visualizes the trajectory of $\mathbf{x}$.
 
-```python
+```{.python .input}
 #@save
 def train_2d(trainer, steps=20):
     """Optimize a 2-dim objective function with a customized trainer."""
@@ -142,7 +142,7 @@ def show_trace_2d(f, results):
 
 Next, we observe the trajectory of the optimization variable $\mathbf{x}$ for learning rate $\eta = 0.1$. We can see that after 20 steps the value of $\mathbf{x}$ approaches its minimum at $[0, 0]$. Progress is fairly well-behaved albeit rather slow.
 
-```python
+```{.python .input}
 def f(x1, x2):
     return x1 ** 2 + 2 * x2 ** 2  # Objective
 
@@ -180,7 +180,7 @@ That is, we need to invert the Hessian $H_f$ as part of the optimization problem
 
 For $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $H_f = 1$. Hence for any $x$ we obtain $\epsilon = -x$. In other words, a single step is sufficient to converge perfectly without the need for any adjustment! Alas, we got a bit lucky here since the Taylor expansion was exact. Let us see what happens in other problems.
 
-```python
+```{.python .input}
 c = 0.5
 
 def f(x):
@@ -207,7 +207,7 @@ show_trace(newton())
 
 Now let us see what happens when we have a *nonconvex* function, such as $f(x) = x \cos(c x)$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we would walk into the direction of *increasing* $f$. That is a fatal flaw of the algorithm. Let us see what happens in practice.
 
-```python
+```{.python .input}
 c = 0.15 * np.pi
 
 def f(x):
@@ -224,7 +224,7 @@ show_trace(newton())
 
 This went spectacularly wrong. How can we fix it? One way would be to "fix" the Hessian by taking its absolute value instead. Another strategy is to bring back the learning rate. This seems to defeat the purpose, but not quite. Having second order information allows us to be cautious whenever the curvature is large and to take longer steps whenever the objective is flat. Let us see how this works with a slightly smaller learning rate, say $\eta = 0.5$. As we can see, we have quite an efficient algorithm.
 
-```python
+```{.python .input}
 show_trace(newton(0.5))
 ```
 

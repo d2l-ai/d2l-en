@@ -7,7 +7,7 @@ word2vec training. The dataset we use is [Penn Tree Bank (PTB)]( https://catalog
 
 First, import the packages and modules required for the experiment.
 
-```python
+```{.python .input}
 from d2l import mxnet as d2l
 import math
 from mxnet import gluon, np
@@ -19,7 +19,7 @@ import random
 
 This dataset has already been preprocessed. Each line of the dataset acts as a sentence. All the words in a sentence are separated by spaces. In the word embedding task, each word is a token.
 
-```python
+```{.python .input}
 #@save
 d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
                        '319d85e578af0cdc590547f26231e4e31cdf1e42')
@@ -37,7 +37,7 @@ sentences = read_ptb()
 
 Next we build a vocabulary with words appeared not greater than 10 times mapped into a "&lt;unk&gt;" token. Note that the preprocessed PTB data also contains "&lt;unk&gt;" tokens presenting rare words.
 
-```python
+```{.python .input}
 vocab = d2l.Vocab(sentences, min_freq=10)
 'vocab size: %d' % len(vocab)
 ```
@@ -50,7 +50,7 @@ $$ P(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
 
 Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number of words in the dataset, and the constant $t$ is a hyperparameter (set to $10^{-4}$ in this experiment). As we can see, it is only possible to drop out the word $w_i$ in subsampling when $f(w_i) > t$. The higher the word's frequency, the higher its dropout probability.
 
-```python
+```{.python .input}
 #@save
 def subsampling(sentences, vocab):
     # Map low frequency words into <unk>
@@ -73,7 +73,7 @@ subsampled = subsampling(sentences, vocab)
 
 Compare the sequence lengths before and after sampling, we can see subsampling significantly reduced the sequence length.
 
-```python
+```{.python .input}
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.hist([[len(line) for line in sentences],
               [len(line) for line in subsampled]])
@@ -84,7 +84,7 @@ d2l.plt.legend(['origin', 'subsampled']);
 
 For individual tokens, the sampling rate of the high-frequency word "the" is less than 1/20.
 
-```python
+```{.python .input}
 def compare_counts(token):
     return '# of "%s": before=%d, after=%d' % (token, sum(
         [line.count(token) for line in sentences]), sum(
@@ -95,13 +95,13 @@ compare_counts('the')
 
 But the low-frequency word "join" is completely preserved.
 
-```python
+```{.python .input}
 compare_counts('join')
 ```
 
 Last, we map each token into an index to construct the corpus.
 
-```python
+```{.python .input}
 corpus = [vocab[line] for line in subsampled]
 corpus[0:3]
 ```
@@ -114,7 +114,7 @@ Next we read the corpus with token indicies into data batches for training.
 
 We use words with a distance from the central target word not exceeding the context window size as the context words of the given center target word. The following definition function extracts all the central target words and their context words. It uniformly and randomly samples an integer to be used as the context window size between integer 1 and the `max_window_size` (maximum context window).
 
-```python
+```{.python .input}
 #@save
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
@@ -136,7 +136,7 @@ def get_centers_and_contexts(corpus, max_window_size):
 
 Next, we create an artificial dataset containing two sentences of 7 and 3 words, respectively. Assume the maximum context window is 2 and print all the central target words and their context words.
 
-```python
+```{.python .input}
 tiny_dataset = [list(range(7)), list(range(7, 10))]
 print('dataset', tiny_dataset)
 for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
@@ -145,7 +145,7 @@ for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
 
 We set the maximum context window size to 5. The following extracts all the central target words and their context words in the dataset.
 
-```python
+```{.python .input}
 all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
 '# center-context pairs: %d' % len(all_centers)
 ```
@@ -156,7 +156,7 @@ We use negative sampling for approximate training. For a central and context wor
 
 We first define a class to draw a candidate according to the sampling weights. It caches a 10000 size random number bank instead of calling `random.choices` every time.
 
-```python
+```{.python .input}
 #@save
 class RandomGenerator:
     """Draw a random int in [0, n] according to n sampling weights."""
@@ -178,7 +178,7 @@ generator = RandomGenerator([2, 3, 4])
 [generator.draw() for _ in range(10)]
 ```
 
-```python
+```{.python .input}
 #@save
 def get_negatives(all_contexts, corpus, K):
     counter = d2l.count_corpus(corpus)
@@ -205,7 +205,7 @@ In a minibatch of data, the $i^\mathrm{th}$ example includes a central word and 
 
 Next, we will implement the minibatch reading function `batchify`. Its minibatch input `data` is a list whose length is the batch size, each element of which contains central target words `center`, context words `context`, and noise words `negative`. The minibatch data returned by this function conforms to the format we need, for example, it includes the mask variable.
 
-```python
+```{.python .input}
 #@save
 def batchify(data):
     max_len = max(len(c) + len(n) for _, c, n in data)
@@ -222,7 +222,7 @@ def batchify(data):
 
 Construct two simple examples:
 
-```python
+```{.python .input}
 x_1 = (1, [2, 2], [3, 3, 3, 3])
 x_2 = (1, [2, 2, 2], [3, 3])
 batch = batchify((x_1, x_2))
@@ -238,7 +238,7 @@ We use the `batchify` function just defined to specify the minibatch reading met
 
 Last, we define the `load_data_ptb` function that read the PTB dataset and return the data loader.
 
-```python
+```{.python .input}
 #@save
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     num_workers = d2l.get_dataloader_workers()
@@ -259,7 +259,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 
 Let us print the first minibatch of the data iterator.
 
-```python
+```{.python .input}
 data_iter, vocab = load_data_ptb(512, 5, 5)
 for batch in data_iter:
     for name, data in zip(names, batch):

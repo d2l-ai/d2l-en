@@ -19,7 +19,7 @@ vision.
 
 First, import the packages or modules required for the experiment in this section.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, image, init, np, npx
@@ -32,7 +32,7 @@ npx.set_np()
 
 In this experiment, we will use an image with a shape of $400\times 500$ as an example.
 
-```python
+```{.python .input}
 d2l.set_figsize((3.5, 2.5))
 img = image.imread('../img/cat1.jpg')
 d2l.plt.imshow(img.asnumpy());
@@ -40,7 +40,7 @@ d2l.plt.imshow(img.asnumpy());
 
 Most image augmentation methods have a certain degree of randomness. To make it easier for us to observe the effect of image augmentation, we next define the auxiliary function `apply`. This function runs the image augmentation method `aug` multiple times on the input image `img` and shows all results.
 
-```python
+```{.python .input}
 def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
     Y = [aug(img) for _ in range(num_rows * num_cols)]
     d2l.show_images(Y, num_rows, num_cols, scale=scale)
@@ -50,13 +50,13 @@ def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
 
 Flipping the image left and right usually does not change the category of the object. This is one of the earliest and most widely used methods of image augmentation. Next, we use the `transforms` module to create the `RandomFlipLeftRight` instance, which introduces a 50% chance that the image is flipped left and right.
 
-```python
+```{.python .input}
 apply(img, gluon.data.vision.transforms.RandomFlipLeftRight())
 ```
 
 Flipping up and down is not as commonly used as flipping left and right. However, at least for this example image, flipping up and down does not hinder recognition. Next, we create a `RandomFlipTopBottom` instance for a 50% chance of flipping the image up and down.
 
-```python
+```{.python .input}
 apply(img, gluon.data.vision.transforms.RandomFlipTopBottom())
 ```
 
@@ -71,7 +71,7 @@ target position.
 
 In the following code, we randomly crop a region with an area of 10% to 100% of the original area, and the ratio of width to height of the region is randomly selected from between 0.5 and 2. Then, the width and height of the region are both scaled to 200 pixels. Unless otherwise stated, the random number between $a$ and $b$ in this section refers to a continuous value obtained by uniform sampling in the interval $[a, b]$.
 
-```python
+```{.python .input}
 shape_aug = gluon.data.vision.transforms.RandomResizedCrop(
     (200, 200), scale=(0.1, 1), ratio=(0.5, 2))
 apply(img, shape_aug)
@@ -81,19 +81,19 @@ apply(img, shape_aug)
 
 Another augmentation method is changing colors. We can change four aspects of the image color: brightness, contrast, saturation, and hue. In the example below, we randomly change the brightness of the image to a value between 50% ($1-0.5$) and 150% ($1+0.5$) of the original image.
 
-```python
+```{.python .input}
 apply(img, gluon.data.vision.transforms.RandomBrightness(0.5))
 ```
 
 Similarly, we can randomly change the hue of the image.
 
-```python
+```{.python .input}
 apply(img, gluon.data.vision.transforms.RandomHue(0.5))
 ```
 
 We can also create a `RandomColorJitter` instance and set how to randomly change the `brightness`, `contrast`, `saturation`, and `hue` of the image at the same time.
 
-```python
+```{.python .input}
 color_aug = gluon.data.vision.transforms.RandomColorJitter(
     brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5)
 apply(img, color_aug)
@@ -103,7 +103,7 @@ apply(img, color_aug)
 
 In practice, we will overlay multiple image augmentation methods. We can overlay the different image augmentation methods defined above and apply them to each image by using a `Compose` instance.
 
-```python
+```{.python .input}
 augs = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.RandomFlipLeftRight(), color_aug, shape_aug])
 apply(img, augs)
@@ -113,14 +113,14 @@ apply(img, augs)
 
 Next, we will look at how to apply image augmentation in actual training. Here, we use the CIFAR-10 dataset, instead of the Fashion-MNIST dataset we have been using. This is because the position and size of the objects in the Fashion-MNIST dataset have been normalized, and the differences in color and size of the objects in CIFAR-10 dataset are more significant. The first 32 training images in the CIFAR-10 dataset are shown below.
 
-```python
+```{.python .input}
 d2l.show_images(gluon.data.vision.CIFAR10(
     train=True)[0:32][0], 4, 8, scale=0.8);
 ```
 
 In order to obtain definitive results during prediction, we usually only apply image augmentation to the training example, and do not use image augmentation with random operations during prediction. Here, we only use the simplest random left-right flipping method. In addition, we use a `ToTensor` instance to convert minibatch images into the format required by MXNet, i.e., 32-bit floating point numbers with the shape of (batch size, number of channels, height, width) and value range between 0 and 1.
 
-```python
+```{.python .input}
 train_augs = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.RandomFlipLeftRight(),
     gluon.data.vision.transforms.ToTensor()])
@@ -135,7 +135,7 @@ dataset applies image augmentation to the first element of each training
 example (image and label), i.e., the element at the top of the image. For
 detailed descriptions of `DataLoader`, refer to :numref:`sec_fashion_mnist`.
 
-```python
+```{.python .input}
 def load_cifar10(is_train, augs, batch_size):
     return gluon.data.DataLoader(
         gluon.data.vision.CIFAR10(train=is_train).transform_first(augs),
@@ -151,7 +151,7 @@ CIFAR-10 dataset. We will also apply the methods described in
 
 Next, we define the training function to train and evaluate the model using multiple GPUs.
 
-```python
+```{.python .input}
 #@save
 def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
                      split_f=d2l.split_batch):
@@ -171,7 +171,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
     return train_loss_sum, train_acc_sum
 ```
 
-```python
+```{.python .input}
 #@save
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                ctx_list=d2l.try_all_gpus(), split_f=d2l.split_batch):
@@ -201,7 +201,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
 
 Now, we can define the `train_with_data_aug` function to use image augmentation to train the model. This function obtains all available GPUs and uses Adam as the optimization algorithm for training. It then applies image augmentation to the training dataset, and finally calls the `train` function just defined to train and evaluate the model.
 
-```python
+```{.python .input}
 batch_size, ctx, net = 256, d2l.try_all_gpus(), d2l.resnet18(10)
 net.initialize(init=init.Xavier(), ctx=ctx)
 
@@ -216,7 +216,7 @@ def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
 
 Now we train the model using image augmentation of random flipping left and right.
 
-```python
+```{.python .input}
 train_with_data_aug(train_augs, test_augs, net)
 ```
 

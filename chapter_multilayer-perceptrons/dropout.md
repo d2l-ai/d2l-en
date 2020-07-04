@@ -240,7 +240,7 @@ with probability `dropout`,
 rescaling the remainder as described above
 (dividing the survivors by `1.0-dropout`).
 
-```python
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
@@ -258,7 +258,7 @@ def dropout_layer(X, dropout):
     return mask.astype(np.float32) * X / (1.0-dropout)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -276,7 +276,7 @@ def dropout_layer(X, dropout):
     return mask * X / (1.0-dropout)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -298,14 +298,14 @@ In the following lines of code,
 we pass our input `X` through the dropout operation,
 with probabilities 0, 0.5, and 1, respectively.
 
-```python
+```{.python .input}
 X = np.arange(16).reshape(2, 8)
 print(dropout_layer(X, 0))
 print(dropout_layer(X, 0.5))
 print(dropout_layer(X, 1))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 X= torch.arange(16, dtype = torch.float32).reshape((2, 8))
 print(X)
@@ -314,7 +314,7 @@ print(dropout_layer(X, 0.5))
 print(dropout_layer(X, 1.))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 X = tf.reshape(tf.constant(range(16), dtype=tf.float32), (2, 8))
 print(X)
@@ -330,7 +330,7 @@ introduced in :numref:`sec_softmax_scratch`.
 We define a multilayer perceptron with 
 two hidden layers containing 256 outputs each.
 
-```python
+```{.python .input}
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
 
 W1 = np.random.normal(scale=0.01, size=(num_inputs, num_hiddens1))
@@ -345,12 +345,12 @@ for param in params:
     param.attach_grad()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
 
@@ -376,7 +376,7 @@ and second hidden layer respectively.
 By checking `is_training` described in :numref:`sec_autograd`,
  we can ensure that dropout is only active during training.
 
-```python
+```{.python .input}
 dropout1, dropout2 = 0.2, 0.5
 
 def net(X):
@@ -393,7 +393,7 @@ def net(X):
     return np.dot(H2, W3) + b3
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 dropout1, dropout2 = 0.2, 0.5
 
@@ -428,7 +428,7 @@ class Net(nn.Module):
 net = Net(num_inputs, num_outputs, num_hiddens1, num_hiddens2)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 dropout1, dropout2 = 0.2, 0.5
 
@@ -451,7 +451,7 @@ def net(X, is_training=False):
 
 This is similar to the training and testing of multilayer perceptrons described previously.
 
-```python
+```{.python .input}
 num_epochs, lr, batch_size = 10, 0.5, 256
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
@@ -459,7 +459,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
               lambda batch_size: d2l.sgd(params, lr, batch_size))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 num_epochs, lr, batch_size = 10, 0.5, 256
 loss = nn.CrossEntropyLoss()
@@ -468,7 +468,7 @@ trainer = torch.optim.SGD(net.parameters(), lr=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 num_epochs, lr, batch_size = 10, 0.5, 256
 loss = tf.keras.losses.CategoricalCrossentropy()
@@ -491,7 +491,7 @@ according to the specified dropout probability.
 When MXNet is not in training mode,
 the `Dropout` layer simply passes the data through during testing.
 
-```python
+```{.python .input}
 net = nn.Sequential()
 net.add(nn.Dense(256, activation="relu"),
         # Add a dropout layer after the first fully connected layer
@@ -503,7 +503,7 @@ net.add(nn.Dense(256, activation="relu"),
 net.initialize(init.Normal(sigma=0.01))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 net = nn.Sequential(nn.Flatten(),
         nn.Linear(784, 256),
@@ -523,7 +523,7 @@ def init_weights(m):
 net.apply(init_weights)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(input_shape=(28, 28)),
@@ -539,18 +539,18 @@ net = tf.keras.models.Sequential([
 
 Next, we train and test the model.
 
-```python
+```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 trainer = torch.optim.SGD(net.parameters(), lr=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 trainer = tf.keras.optimizers.SGD(learning_rate=lr)
 net.compile(optimizer=trainer,

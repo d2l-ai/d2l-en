@@ -73,7 +73,7 @@ Next, we implement this process in the `corr2d` function,
 which accepts the input array `X` and kernel array `K`
 and returns the output array `Y`.
 
-```python
+```{.python .input}
 from mxnet import autograd, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -88,7 +88,7 @@ def corr2d(X, K):  #@save
     return Y
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 import torch
 from torch import nn
@@ -108,13 +108,13 @@ from the figure above
 to validate the output of the above implementation
 of the two-dimensional cross-correlation operation.
 
-```python
+```{.python .input}
 X = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
 K = np.array([[0, 1], [2, 3]])
 corr2d(X, K)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 X = torch.Tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
 K = torch.Tensor([[0, 1], [2, 3]])
@@ -141,7 +141,7 @@ As with $h \times w$ cross-correlation
 we also refer to convolutional layers
 as $h \times w$ convolutions.
 
-```python
+```{.python .input}
 class Conv2D(nn.Block):
     def __init__(self, kernel_size, **kwargs):
         super().__init__(**kwargs)
@@ -152,7 +152,7 @@ class Conv2D(nn.Block):
         return corr2d(x, self.weight.data()) + self.bias.data()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 class Conv2D(nn.Module):
     def __init__(self, kernel_size):
@@ -172,13 +172,13 @@ by finding the location of the pixel change.
 First, we construct an 'image' of $6\times 8$ pixels.
 The middle four columns are black (0) and the rest are white (1).
 
-```python
+```{.python .input}
 X = np.ones((6, 8))
 X[:, 2:6] = 0
 X
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 X = torch.ones(6, 8)
 X[:, 2:6] = 0
@@ -190,11 +190,11 @@ When we perform the cross-correlation operation with the input,
 if the horizontally adjacent elements are the same,
 the output is 0. Otherwise, the output is non-zero.
 
-```python
+```{.python .input}
 K = np.array([[1, -1]])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 K = torch.Tensor([[1, -1]])
 ```
@@ -205,12 +205,12 @@ As you can see, we detect 1 for the edge from white to black
 and -1 for the edge from black to white.
 All other outputs take value $0$.
 
-```python
+```{.python .input}
 Y = corr2d(X, K)
 Y
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 Y = corr2d(X, K)
 Y
@@ -219,11 +219,11 @@ Y
 We can now apply the kernel to the transposed image.
 As expected, it vanishes. The kernel `K` only detects vertical edges.
 
-```python
+```{.python .input}
 corr2d(X.T, K)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 corr2d(X.t(), K)
 ```
@@ -252,7 +252,7 @@ However, since we used single-element assignments,
 `autograd` has some trouble finding the gradient.
 Instead, we use the built-in `Conv2D` class.
 
-```python
+```{.python .input}
 # Construct a convolutional layer with 1 output channel
 # (channels will be introduced in the following section)
 # and a kernel array shape of (1, 2)
@@ -276,7 +276,7 @@ for i in range(10):
         print(f'batch {i+1}, loss {float(l.sum()):.3f}')
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Construct a convolutional layer with 1 input channel and 1 output channel
 # (channels will be introduced in the following section)
@@ -302,11 +302,11 @@ for i in range(10):
 
 Note that the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel array we learned.
 
-```python
+```{.python .input}
 conv2d.weight.data().reshape(1, 2)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 conv2d.weight.data.reshape((1, 2))
 ```

@@ -84,7 +84,7 @@ the idea of neurons that fire either *fully* or *not at all*
 Let us take a closer look at the sigmoid
 to see why it can cause vanishing gradients.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
@@ -99,7 +99,7 @@ y.backward()
 d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -113,7 +113,7 @@ d2l.plot(x.detach().numpy(), [y.detach().numpy(), x.grad.numpy()],
          legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -157,7 +157,7 @@ When this happens due to the initialization
 of a deep network, we have no chance of getting
 a gradient descent optimizer to converge.
 
-```python
+```{.python .input}
 M = np.random.normal(size=(4, 4))
 print('A single matrix', M)
 for i in range(100):
@@ -166,7 +166,7 @@ for i in range(100):
 print('After multiplying 100 matrices', M)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 M = torch.normal(0, 1, size=(4,4))
 print('A single matrix \n',M)
@@ -176,7 +176,7 @@ for i in range(100):
 print('After multiplying 100 matrices\n',M)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 M = tf.random.normal((4, 4))
 print('A single matrix \n', M)

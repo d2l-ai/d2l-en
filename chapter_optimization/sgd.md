@@ -3,7 +3,7 @@
 
 In this section, we are going to introduce the basic principles of stochastic gradient descent.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
@@ -35,7 +35,7 @@ This means that, on average, the stochastic gradient is a good estimate of the g
 
 Now, we will compare it to gradient descent by adding random noise with a mean of 0 to the gradient to simulate a SGD.
 
-```python
+```{.python .input}
 def f(x1, x2):
     return x1 ** 2 + 2 * x2 ** 2  # Objective
 
@@ -72,7 +72,7 @@ $$
 
 In the first scenario we decrease the learning rate, e.g., whenever progress in optimization has stalled. This is a common strategy for training deep networks. Alternatively we could decrease it much more aggressively by an exponential decay. Unfortunately this leads to premature stopping before the algorithm has converged. A popular choice is polynomial decay with $\alpha = 0.5$. In the case of convex optimization there are a number of proofs which show that this rate is well behaved. Let us see what this looks like in practice.
 
-```python
+```{.python .input}
 def exponential():
     global ctr
     ctr += 1
@@ -85,7 +85,7 @@ d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000))
 
 As expected, the variance in the parameters is significantly reduced. However, this comes at the expense of failing to converge to the optimal solution $\mathbf{x} = (0, 0)$. Even after 1000 steps are we are still very far away from the optimal solution. Indeed, the algorithm fails to converge at all. On the other hand, if we use a polynomial decay where the learning rate decays with the inverse square root of the number of steps convergence is good.
 
-```python
+```{.python .input}
 def polynomial():
     global ctr
     ctr += 1

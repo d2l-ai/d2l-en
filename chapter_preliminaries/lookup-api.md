@@ -8,18 +8,18 @@ In order to know which functions and classes can be called in a module, we
 invoke the `dir` function. For instance, we can query all properties in the
 module for generating random numbers:
 
-```python
+```{.python .input}
 from mxnet import np
 print(dir(np.random))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 import torch
 print(dir(torch.distributions))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 import tensorflow as tf
 print(dir(tf.random))
@@ -37,16 +37,16 @@ Generally, we can ignore functions that start and end with `__` (special objects
 
 For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let us explore the usage instructions for tensors' `ones` function.
 
-```python
+```{.python .input}
 help(np.ones)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 help(torch.ones)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 help(tf.ones)
 ```
@@ -58,16 +58,16 @@ help(jax.numpy.ones)
 
 From the documentation, we can see that the `ones` function creates a new tensor with the specified shape and sets all the elements to the value of 1. Whenever possible, you should run a quick test to confirm your interpretation:
 
-```python
+```{.python .input}
 np.ones(4)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 torch.ones(4)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 tf.ones(4)
 ```

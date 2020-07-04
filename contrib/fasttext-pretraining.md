@@ -8,7 +8,7 @@ train a skip-gram model defined in
 First, import the
 packages and modules required for the experiment, and load the PTB dataset.
 
-```python
+```{.python .input}
 from collections import defaultdict
 from d2l import mxnet as d2l
 from functools import partial
@@ -19,7 +19,7 @@ import random
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 def compute_subword(token):
     if token[0] != '<' and token[-1] != '>':
         token = '<' + token + '>'
@@ -33,7 +33,7 @@ def compute_subword(token):
         return [token]
 ```
 
-```python
+```{.python .input}
 def get_subword_map(vocab):
     tokenid_to_subword, subword_to_idx = defaultdict(list), defaultdict(int)
     for token, tokenid in vocab.token_to_idx.items():
@@ -45,7 +45,7 @@ def get_subword_map(vocab):
     return tokenid_to_subword, subword_to_idx
 ```
 
-```python
+```{.python .input}
 def token_transform(tokens, vocab, subword_map):
     if not isinstance(tokens, (list, tuple)):
         return d2l.truncate_pad(subword_map[tokens],
@@ -53,7 +53,7 @@ def token_transform(tokens, vocab, subword_map):
     return [token_transform(token, vocab, subword_map) for token in tokens]
 ```
 
-```python
+```{.python .input}
 def batchify(data, vocab, subword_map):
     max_len = max(len(c) + len(n) for _, c, n in data)
     centers, contexts_negatives, masks, labels = [], [], [], []
@@ -68,7 +68,7 @@ def batchify(data, vocab, subword_map):
             np.array(masks), np.array(labels))
 ```
 
-```python
+```{.python .input}
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     num_workers = d2l.get_dataloader_workers()
     sentences = d2l.read_ptb()
@@ -87,12 +87,12 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     return data_iter, vocab, subword_to_idx
 ```
 
-```python
+```{.python .input}
 batch_size, max_window_size, num_noise_words = 512, 5, 5
 data_iter, vocab, subword_to_idx = load_data_ptb(batch_size, max_window_size, num_noise_words)
 ```
 
-```python
+```{.python .input}
 names = ['centers', 'contexts_negatives', 'masks', 'labels']
 for batch in data_iter:
     for name, data in zip(names, batch):
@@ -114,7 +114,7 @@ size (`input_dim`) and whose number of columns is the dimension of each word
 vector (`output_dim`). We set the dictionary size to $20$ and the word vector
 dimension to $4$.
 
-```python
+```{.python .input}
 embed = nn.Embedding(input_dim=20, output_dim=4)
 embed.initialize()
 embed.weight
@@ -133,7 +133,7 @@ obtained by minibatch multiplication. Each element in the output is the inner
 product of the central target word vector and the context word vector or noise
 word vector.
 
-```python
+```{.python .input}
 def skip_gram(center, contexts_and_negatives, embed_v, embed_u, padding):
     v_embedding = embed_v(center)
     v_mask = (center!=padding).astype('float32')
@@ -147,7 +147,7 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u, padding):
 
 Verify that the output shape should be (batch size, 1, `max_len`).
 
-```python
+```{.python .input}
 skip_gram(np.ones((2, 1, 64)), np.ones((2, 6, 64)), embed, embed, vocab['<pad>']).shape
 ```
 
@@ -162,7 +162,7 @@ According
 to the definition of the loss function in negative sampling, we can directly use
 Gluon's binary cross-entropy loss function `SigmoidBinaryCrossEntropyLoss`.
 
-```python
+```{.python .input}
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 ```
 
@@ -178,7 +178,7 @@ function calculations.
 Given two identical examples, different masks lead to
 different loss values.
 
-```python
+```{.python .input}
 pred = np.array([[.5]*4]*2)
 label = np.array([[1, 0, 1, 0]]*2)
 mask = np.array([[1, 1, 1, 1], [1, 1, 0, 0]])
@@ -188,7 +188,7 @@ loss(pred, label, mask)
 We can normalize the loss in each example due to various lengths in each
 example.
 
-```python
+```{.python .input}
 loss(pred, label, mask) / mask.sum(axis=1) * mask.shape[1]
 ```
 
@@ -198,7 +198,7 @@ We construct the embedding layers of the
 central and context words, respectively, and set the hyperparameter word vector
 dimension `embed_size` to 100.
 
-```python
+```{.python .input}
 embed_size = 100
 net = nn.Sequential()
 net.add(nn.Embedding(input_dim=len(subword_to_idx), output_dim=embed_size),
@@ -211,7 +211,7 @@ The training function is defined below. Because of the existence
 of padding, the calculation of the loss function is slightly different compared
 to the previous training functions.
 
-```python
+```{.python .input}
 def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
     net.initialize(ctx=ctx, force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
@@ -241,12 +241,12 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
 
 Now, we can train a skip-gram model using negative sampling.
 
-```python
+```{.python .input}
 lr, num_epochs = 0.01, 5
 train(net, data_iter, lr, num_epochs)
 ```
 
-```python
+```{.python .input}
 def get_similar_tokens(query_token, k, embed, vocab, subword_to_idx):
     W = embed.weight.data()
     x = W[vocab[query_token]]
@@ -263,6 +263,6 @@ def get_similar_tokens(query_token, k, embed, vocab, subword_to_idx):
         print('cosine sim=%.3f: %s' % (cos[i], (vocab.idx_to_token[i])))
 ```
 
-```python
+```{.python .input}
 get_similar_tokens('chip', 3, net[0], vocab, subword_to_idx)
 ```

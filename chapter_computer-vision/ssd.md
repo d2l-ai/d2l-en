@@ -66,7 +66,7 @@ the parameters $a$ and $q$, it uses a $3\times3$ convolutional layer with a
 padding of 1. The heights and widths of the input and output of this
 convolutional layer remain unchanged.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, image, init, np, npx
@@ -83,7 +83,7 @@ def cls_predictor(num_anchors, num_classes):
 
 The design of the bounding box prediction layer is similar to that of the category prediction layer. The only difference is that, here, we need to predict 4 offsets for each anchor box, rather than $q+1$ categories.
 
-```python
+```{.python .input}
 def bbox_predictor(num_anchors):
     return nn.Conv2D(num_anchors * 4, kernel_size=3, padding=1)
 ```
@@ -94,7 +94,7 @@ As we mentioned, SSD uses feature maps based on multiple scales to generate anch
 
 In the following example, we use the same batch of data to construct feature maps of two different scales, `Y1` and `Y2`. Here, `Y2` has half the height and half the width of `Y1`. Using category prediction as an example, we assume that each element in the `Y1` and `Y2` feature maps generates five (Y1) or three (Y2) anchor boxes. When there are 10 object categories, the number of category prediction output channels is either $5\times(10+1)=55$ or $3\times(10+1)=33$. The format of the prediction output is (batch size, number of channels, height, width). As you can see, except for the batch size, the sizes of the other dimensions are different. Therefore, we must transform them into a consistent format and concatenate the predictions of the multiple scales to facilitate subsequent computation.
 
-```python
+```{.python .input}
 def forward(x, block):
     block.initialize()
     return block(x)
@@ -106,7 +106,7 @@ Y2 = forward(np.zeros((2, 16, 10, 10)), cls_predictor(3, 10))
 
 The channel dimension contains the predictions for all anchor boxes with the same center. We first move the channel dimension to the final dimension. Because the batch size is the same for all scales, we can convert the prediction results to binary format (batch size, height $\times$ width $\times$ number of channels) to facilitate subsequent concatenation on the $1^{\mathrm{st}}$ dimension.
 
-```python
+```{.python .input}
 def flatten_pred(pred):
     return npx.batch_flatten(pred.transpose(0, 2, 3, 1))
 
@@ -116,7 +116,7 @@ def concat_preds(preds):
 
 Thus, regardless of the different shapes of `Y1` and `Y2`, we can still concatenate the prediction results for the two different scales of the same batch.
 
-```python
+```{.python .input}
 concat_preds([Y1, Y2]).shape
 ```
 
@@ -124,7 +124,7 @@ concat_preds([Y1, Y2]).shape
 
 For multiscale object detection, we define the following `down_sample_blk` block, which reduces the height and width by 50%. This block consists of two $3\times3$ convolutional layers with a padding of 1 and a $2\times2$ maximum pooling layer with a stride of 2 connected in a series. As we know, $3\times3$ convolutional layers with a padding of 1 do not change the shape of feature maps. However, the subsequent pooling layer directly reduces the size of the feature map by half. Because $1\times 2+(3-1)+(3-1)=6$, each element in the output feature map has a receptive field on the input feature map of the shape $6\times6$. As you can see, the height and width downsample block enlarges the receptive field of each element in the output feature map.
 
-```python
+```{.python .input}
 def down_sample_blk(num_channels):
     blk = nn.Sequential()
     for _ in range(2):
@@ -137,7 +137,7 @@ def down_sample_blk(num_channels):
 
 By testing forward computation in the height and width downsample block, we can see that it changes the number of input channels and halves the height and width.
 
-```python
+```{.python .input}
 forward(np.zeros((2, 3, 20, 20)), down_sample_blk(10)).shape
 ```
 
@@ -145,7 +145,7 @@ forward(np.zeros((2, 3, 20, 20)), down_sample_blk(10)).shape
 
 The base network block is used to extract features from original images. To simplify the computation, we will construct a small base network. This network consists of three height and width downsample blocks connected in a series, so it doubles the number of channels at each step. When we input an original image with the shape $256\times256$, the base network block outputs a feature map with the shape $32 \times 32$.
 
-```python
+```{.python .input}
 def base_net():
     blk = nn.Sequential()
     for num_filters in [16, 32, 64]:
@@ -164,7 +164,7 @@ four are height and width downsample blocks, and the fifth module is a global
 maximum pooling layer that reduces the height and width to 1. Therefore, modules
 two to five are all multiscale feature blocks shown in :numref:`fig_ssd`.
 
-```python
+```{.python .input}
 def get_blk(i):
     if i == 0:
         blk = base_net()
@@ -177,7 +177,7 @@ def get_blk(i):
 
 Now, we will define the forward computation process for each module. In contrast to the previously-described convolutional neural networks, this module not only returns feature map `Y` output by convolutional computation, but also the anchor boxes of the current scale generated from `Y` and their predicted categories and offsets.
 
-```python
+```{.python .input}
 def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
     Y = blk(X)
     anchors = npx.multibox_prior(Y, sizes=size, ratios=ratio)
@@ -188,7 +188,7 @@ def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
 
 As we mentioned, the closer a multiscale feature block is to the top in :numref:`fig_ssd`, the larger the objects it detects and the larger the anchor boxes it must generate. Here, we first divide the interval from 0.2 to 1.05 into five equal parts to determine the sizes of smaller anchor boxes at different scales: 0.2, 0.37, 0.54, etc. Then, according to $\sqrt{0.2 \times 0.37} = 0.272$, $\sqrt{0.37 \times 0.54} = 0.447$, and similar formulas, we determine the sizes of larger anchor boxes at the different scales.
 
-```python
+```{.python .input}
 sizes = [[0.2, 0.272], [0.37, 0.447], [0.54, 0.619], [0.71, 0.79],
          [0.88, 0.961]]
 ratios = [[1, 2, 0.5]] * 5
@@ -197,7 +197,7 @@ num_anchors = len(sizes[0]) + len(ratios[0]) - 1
 
 Now, we can define the complete model, `TinySSD`.
 
-```python
+```{.python .input}
 class TinySSD(nn.Block):
     def __init__(self, num_classes, **kwargs):
         super(TinySSD, self).__init__(**kwargs)
@@ -228,7 +228,7 @@ class TinySSD(nn.Block):
 
 We now create an SSD model instance and use it to perform forward computation on image minibatch `X`, which has a height and width of 256 pixels. As we verified previously, the first module outputs a feature map with the shape $32 \times 32$. Because modules two to four are height and width downsample blocks, module five is a global pooling layer, and each element in the feature map is used as the center for 4 anchor boxes, a total of $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ anchor boxes are generated for each image at the five scales.
 
-```python
+```{.python .input}
 net = TinySSD(num_classes=1)
 net.initialize()
 X = np.zeros((32, 3, 256, 256))
@@ -247,14 +247,14 @@ Now, we will explain, step by step, how to train the SSD model for object detect
 
 We read the Pikachu dataset we created in the previous section.
 
-```python
+```{.python .input}
 batch_size = 32
 train_iter, _ = d2l.load_data_pikachu(batch_size)
 ```
 
 There is 1 category in the Pikachu dataset. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
 
-```python
+```{.python .input}
 ctx, net = d2l.try_gpu(), TinySSD(num_classes=1)
 net.initialize(init=init.Xavier(), ctx=ctx)
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
@@ -265,7 +265,7 @@ trainer = gluon.Trainer(net.collect_params(), 'sgd',
 
 Object detection is subject to two types of losses. The first is anchor box category loss. For this, we can simply reuse the cross-entropy loss function we used in image classification. The second loss is positive anchor box offset loss. Offset prediction is a normalization problem. However, here, we do not use the squared loss introduced previously. Rather, we use the $L_1$ norm loss, which is the absolute value of the difference between the predicted value and the ground-truth value. The mask variable `bbox_masks` removes negative anchor boxes and padding anchor boxes from the loss calculation. Finally, we add the anchor box category and offset losses to find the final loss function for the model.
 
-```python
+```{.python .input}
 cls_loss = gluon.loss.SoftmaxCrossEntropyLoss()
 bbox_loss = gluon.loss.L1Loss()
 
@@ -277,7 +277,7 @@ def calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels, bbox_masks):
 
 We can use the accuracy rate to evaluate the classification results. As we use the $L_1$ norm loss, we will use the average absolute error to evaluate the bounding box prediction results.
 
-```python
+```{.python .input}
 def cls_eval(cls_preds, cls_labels):
     # Because the category prediction results are placed in the final
     # dimension, argmax must specify this dimension
@@ -291,7 +291,7 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
 
 During model training, we must generate multiscale anchor boxes (`anchors`) in the model's forward computation process and predict the category (`cls_preds`) and offset (`bbox_preds`) for each anchor box. Afterwards, we label the category (`cls_labels`) and offset (`bbox_labels`) of each generated anchor box based on the label information `Y`. Finally, we calculate the loss function using the predicted and labeled category and offset values. To simplify the code, we do not evaluate the training dataset here.
 
-```python
+```{.python .input}
 num_epochs, timer = 20, d2l.Timer()
 animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                         legend=['class error', 'bbox mae'])
@@ -329,7 +329,7 @@ print('%.1f examples/sec on %s' % (train_iter.num_image/timer.stop(), ctx))
 
 In the prediction stage, we want to detect all objects of interest in the image. Below, we read the test image and transform its size. Then, we convert it to the four-dimensional format required by the convolutional layer.
 
-```python
+```{.python .input}
 img = image.imread('../img/pikachu.jpg')
 feature = image.imresize(img, 256, 256).astype('float32')
 X = np.expand_dims(feature.transpose(2, 0, 1), axis=0)
@@ -337,7 +337,7 @@ X = np.expand_dims(feature.transpose(2, 0, 1), axis=0)
 
 Using the `MultiBoxDetection` function, we predict the bounding boxes based on the anchor boxes and their predicted offsets. Then, we use non-maximum suppression to remove similar bounding boxes.
 
-```python
+```{.python .input}
 def predict(X):
     anchors, cls_preds, bbox_preds = net(X.as_in_ctx(ctx))
     cls_probs = npx.softmax(cls_preds).transpose(0, 2, 1)
@@ -350,7 +350,7 @@ output = predict(X)
 
 Finally, we take all the bounding boxes with a confidence level of at least 0.3 and display them as the final output.
 
-```python
+```{.python .input}
 def display(img, output, threshold):
     d2l.set_figsize((5, 5))
     fig = d2l.plt.imshow(img.asnumpy())
@@ -391,7 +391,7 @@ $$
 
 When $\sigma$ is large, this loss is similar to the $L_1$ norm loss. When the value is small, the loss function is smoother.
 
-```python
+```{.python .input}
 sigmas = [10, 1, 0.5]
 lines = ['-', '--', '-.']
 x = np.arange(-2, 2, 0.1)
@@ -413,7 +413,7 @@ $$ - \alpha (1-p_j)^{\gamma} \log p_j.$$
 
 As you can see, by increasing $\gamma$, we can effectively reduce the loss when the probability of predicting the correct category is high.
 
-```python
+```{.python .input}
 def focal_loss(gamma, x):
     return -(1 - x) ** gamma * np.log(x)
 

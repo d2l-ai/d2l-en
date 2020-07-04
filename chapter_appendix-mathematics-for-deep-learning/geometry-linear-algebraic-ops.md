@@ -141,7 +141,7 @@ Indeed, we can use this in three or three million dimensions without issue.
 
 As a simple example, let us see how to compute the angle between a pair of vectors:
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -154,7 +154,7 @@ def angle(v, w):
 angle(np.array([0, 1, 2]), np.array([2, 3, 4]))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -287,7 +287,7 @@ to classify tiny images of t-shirts and trousers from the Fashion MNIST dataset
 by just taking the vector between their means to define the decision plane
 and eyeball a crude threshold.  First we will load the data and compute the averages.
 
-```python
+```{.python .input}
 # Load in the dataset
 train = gluon.data.vision.FashionMNIST(train=True)
 test = gluon.data.vision.FashionMNIST(train=False)
@@ -304,7 +304,7 @@ ave_0 = np.mean(X_train_0, axis=0)
 ave_1 = np.mean(X_train_1, axis=0)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Load in the dataset
 trans = []
@@ -350,7 +350,7 @@ d2l.plt.show()
 
 In a fully machine learned solution, we would learn the threshold from the dataset.  In this case, I simply eyeballed a threshold that looked good on the training data by hand.
 
-```python
+```{.python .input}
 # Print test set accuracy with eyeballed threshold
 w = (ave_1 - ave_0).T
 predictions = X_test.reshape(2000, -1).dot(w.flatten()) > -1500000
@@ -359,7 +359,7 @@ predictions = X_test.reshape(2000, -1).dot(w.flatten()) > -1500000
 np.mean(predictions.astype(y_test.dtype) == y_test, dtype=np.float64)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Print test set accuracy with eyeballed threshold
 w = (ave_1 - ave_0).T
@@ -621,13 +621,13 @@ $$
 We can test to see this by seeing that multiplying 
 by the inverse given by the formula above works in practice.
 
-```python
+```{.python .input}
 M = np.array([[1, 2], [1, 4]])
 M_inv = np.array([[2, -1], [-0.5, 0.5]])
 M_inv.dot(M)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 M = torch.tensor([[1, 2], [1, 4]], dtype=torch.float32)
 M_inv = torch.tensor([[2, -1], [-0.5, 0.5]])
@@ -709,12 +709,12 @@ This area is referred to as the *determinant*.
 
 Let us check this quickly with some example code.
 
-```python
+```{.python .input}
 import numpy as np
 np.linalg.det(np.array([[1, -1], [2, 3]]))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 torch.det(torch.tensor([[1, -1], [2, 3]], dtype=torch.float32))
 ```
@@ -825,7 +825,7 @@ Tensors may flexibly be operated on in code as well.
 As seen in :numref:`sec_linear-algebra`, 
 we can create tensors as is shown below.
 
-```python
+```{.python .input}
 # Define tensors
 B = np.array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
 A = np.array([[1, 2], [3, 4]])
@@ -835,7 +835,7 @@ v = np.array([1, 2])
 A.shape, B.shape, v.shape
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Define tensors
 B = torch.tensor([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
@@ -854,12 +854,12 @@ we can consider the Einstein summation seen above
 ($\mathbf{A}\mathbf{v} = a_{ij}v_j$)
 and strip out the indices themselves to get the implementation:
 
-```python
+```{.python .input}
 # Reimplement matrix multiplication
 np.einsum("ij, j -> i", A, v), A.dot(v)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Reimplement matrix multiplication
 torch.einsum("ij, j -> i", A, v), A@v
@@ -875,11 +875,11 @@ $$
 
 it can be implemented via Einstein summation as:
 
-```python
+```{.python .input}
 np.einsum("ijk, il, j -> kl", B, A, v)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 torch.einsum("ijk, il, j -> kl", B, A, v)
 ```
@@ -891,11 +891,11 @@ For this reason, `einsum` provides an alternative notation
 by providing integer indices for each tensor.
 For example, the same tensor contraction can also be written as:
 
-```python
+```{.python .input}
 np.einsum(B, [0, 1, 2], A, [0, 3], v, [1], [2, 3])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # PyTorch doesn't support this type of notation.
 ```

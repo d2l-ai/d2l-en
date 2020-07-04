@@ -3,7 +3,7 @@
 
 Now that we have learned how to work with probability in both the discrete and the continuous setting, let us get to know some of the common distributions encountered.  Depending on the area of machine learning, we may need to be familiar with vastly more of these, or for some areas of deep learning potentially none at all.  This is, however, a good basic list to be familiar with.  Let us first import some common libraries.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -26,7 +26,7 @@ $$F(x) = \begin{cases} 0 & x < 0, \\ 1-p & 0 \le x < 1, \\ 1 & x >= 1 . \end{cas
 
 The probability mass function is plotted below.
 
-```python
+```{.python .input}
 p = 0.3
 
 d2l.set_figsize()
@@ -38,7 +38,7 @@ d2l.plt.show()
 
 Now, let us plot the cumulative distribution function :eqref:`eq_bernoulli_cdf`.
 
-```python
+```{.python .input}
 x = np.arange(-1, 2, 0.01)
 
 def F(x):
@@ -54,7 +54,7 @@ If $X \sim \mathrm{Bernoulli}(p)$, then:
 
 We can sample an array of arbitrary shape from a Bernoulli random variable as follows.
 
-```python
+```{.python .input}
 1*(np.random.rand(10, 10) < p)
 ```
 
@@ -73,7 +73,7 @@ $$F(x) = \begin{cases} 0 & x < 1, \\ \frac{k}{n} & k \le x < k+1 \text{ with } 1
 
 Let us first plot the probability mass function.
 
-```python
+```{.python .input}
 n = 5
 
 d2l.plt.stem([i+1 for i in range(n)], n*[1 / n], use_line_collection=True)
@@ -84,7 +84,7 @@ d2l.plt.show()
 
 Now, let us plot the cumulative distribution function :eqref:`eq_discrete_uniform_cdf`.
 
-```python
+```{.python .input}
 x = np.arange(-1, 6, 0.01)
 
 def F(x):
@@ -100,7 +100,7 @@ If $X \sim \mathrm{Uniform}(n)$, then:
 
 We can sample an array of arbitrary shape from a discrete uniform random variable as follows.
 
-```python
+```{.python .input}
 np.random.random_integers(1, n, size=(10, 10))
 ```
 
@@ -124,7 +124,7 @@ $$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a, b], \\ 1 & x >=
 
 Let us first plot the probability density function :eqref:`eq_cont_uniform_pdf`.
 
-```python
+```{.python .input}
 a, b = 1, 3
 
 x = np.arange(0, 4, 0.01)
@@ -135,7 +135,7 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 
 Now, let us plot the cumulative distribution function :eqref:`eq_cont_uniform_cdf`.
 
-```python
+```{.python .input}
 def F(x):
     return 0 if x < a else 1 if x > b else (x - a) / (b - a)
 
@@ -149,7 +149,7 @@ If $X \sim \mathrm{Uniform}([a, b])$, then:
 
 We can sample an array of arbitrary shape from a uniform random variable as follows.  Note that it by default samples from a $\mathrm{Uniform}([0,1])$, so if we want a different range we need to scale it.
 
-```python
+```{.python .input}
 (b - a) * np.random.rand(10, 10) + a
 ```
 
@@ -176,7 +176,7 @@ $$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m} 
 
 Let us first plot the probability mass function.
 
-```python
+```{.python .input}
 n, p = 10, 0.2
 
 # Compute binomial coefficient
@@ -196,7 +196,7 @@ d2l.plt.show()
 
 Now, let us plot the cumulative distribution function :eqref:`eq_binomial_cdf`.
 
-```python
+```{.python .input}
 x = np.arange(-1, 11, 0.01)
 cmf = np.cumsum(pmf)
 
@@ -213,7 +213,7 @@ While this result is not simple, the means and variances are.  If $X \sim \mathr
 
 This can be sampled as follows.
 
-```python
+```{.python .input}
 np.random.binomial(n, p, size=(10, 10))
 ```
 
@@ -251,7 +251,7 @@ $$F(x) = \begin{cases} 0 & x < 0, \\ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}
 
 Let us first plot the probability mass function :eqref:`eq_poisson_mass`.
 
-```python
+```{.python .input}
 lam = 5.0
 
 xs = [i for i in range(20)]
@@ -265,7 +265,7 @@ d2l.plt.show()
 
 Now, let us plot the cumulative distribution function :eqref:`eq_poisson_cdf`.
 
-```python
+```{.python .input}
 x = np.arange(-1, 21, 0.01)
 cmf = np.cumsum(pmf)
 def F(x):
@@ -281,7 +281,7 @@ As we saw above, the means and variances are particularly concise.  If $X \sim \
 
 This can be sampled as follows.
 
-```python
+```{.python .input}
 np.random.poisson(lam, size=(10, 10))
 ```
 
@@ -296,7 +296,7 @@ $$
 
 This can be seen to have mean zero and variance one, and so it is plausible to believe that it will converge to some limiting distribution.  If we plot what these distributions look like, we will become even more convinced that it will work.
 
-```python
+```{.python .input}
 p = 0.2
 ns = [1, 10, 100, 1000]
 d2l.plt.figure(figsize=(10, 3))
@@ -328,7 +328,7 @@ $$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$
 
 Let us first plot the probability density function :eqref:`eq_gaussian_pdf`.
 
-```python
+```{.python .input}
 mu, sigma = 0, 1
 
 x = np.arange(-3, 3, 0.01)
@@ -339,7 +339,7 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 
 Now, let us plot the cumulative distribution function.  It is beyond the scope of this appendix, but the Gaussian c.d.f. does not have a closed-form formula in terms of more elementary functions.  We will use `erf` which provides a way to compute this integral numerically.
 
-```python
+```{.python .input}
 def phi(x):
     return (1.0 + erf((x - mu) / (sigma * np.sqrt(2)))) / 2.0
 
@@ -373,7 +373,7 @@ To close the section, Let us recall that if $X \sim \mathcal{N}(\mu, \sigma^2)$,
 
 We can sample from the Gaussian (or standard normal) distribution as shown below.
 
-```python
+```{.python .input}
 np.random.normal(mu, sigma, size=(10, 10))
 ```
 

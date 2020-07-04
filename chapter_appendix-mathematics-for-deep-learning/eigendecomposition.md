@@ -89,7 +89,7 @@ We can solve this with the vectors $[1, -1]^\top$ and $[1, 2]^\top$ respectively
 
 We can check this in code using the built-in `numpy.linalg.eig` routine.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -257,7 +257,7 @@ Performing the numerical computation shows
 that the eigenvalues are approximately $0.99$, $2.97$, $4.95$, $9.08$,
 all comfortably inside the ranges provided.
 
-```python
+```{.python .input}
 A = np.array([[1.0, 0.1, 0.1, 0.1],
               [0.1, 3.0, 0.2, 0.3],
               [0.1, 0.2, 5.0, 0.5],
@@ -302,7 +302,7 @@ When these models are initialized, $A$ is taken to be
 a random matrix with Gaussian entries, so let us make one of those. 
 To be concrete, we start with a mean zero, variance one Gaussian distributed $5 \times 5$ matrix.
 
-```python
+```{.python .input}
 np.random.seed(8675309)
 
 k = 5
@@ -335,7 +335,7 @@ to make sure that our output changes depending on our input, but not much!
 Let us see what happens when we repeatedly multiply our matrix $\mathbf{A}$ 
 against a random input vector, and keep track of the norm.
 
-```python
+```{.python .input}
 # Calculate the sequence of norms after repeatedly applying A
 v_in = np.random.randn(k, 1)
 
@@ -350,7 +350,7 @@ d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 The norm is growing uncontrollably! 
 Indeed if we take the list of quotients, we will see a pattern.
 
-```python
+```{.python .input}
 # Compute the scaling factor of the norms
 norm_ratio_list = []
 for i in range(1, 100):
@@ -377,7 +377,7 @@ By taking the norm of the complex number
 (square root of the sums of squares of real and imaginary parts)
 we can measure that stretching factor. Let us also sort them.
 
-```python
+```{.python .input}
 # Compute the eigenvalues
 eigs = np.linalg.eigvals(A).tolist()
 norm_eigs = [np.absolute(x) for x in eigs]
@@ -428,7 +428,7 @@ To do so, we now rescale our matrix by this principle eigenvalue
 so that the largest eigenvalue is instead now just one.
 Let us see what happens in this case.
 
-```python
+```{.python .input}
 # Rescale the matrix A
 A /= norm_eigs[-1]
 
@@ -445,7 +445,7 @@ d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 
 We can also plot the ration between consecutive norms as before and see that indeed it stabilizes.
 
-```python
+```{.python .input}
 # Also plot the ratio
 norm_ratio_list = []
 for i in range(1, 100):

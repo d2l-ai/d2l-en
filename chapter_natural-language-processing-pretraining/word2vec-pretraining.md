@@ -6,7 +6,7 @@ In this section, we will train a skip-gram model defined in
 
 First, import the packages and modules required for the experiment, and load the PTB dataset.
 
-```python
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
@@ -25,7 +25,7 @@ We will implement the skip-gram model by using embedding layers and minibatch mu
 
 The layer in which the obtained word is embedded is called the embedding layer, which can be obtained by creating an `nn.Embedding` instance in Gluon. The weight of the embedding layer is a matrix whose number of rows is the dictionary size (`input_dim`) and whose number of columns is the dimension of each word vector (`output_dim`). We set the dictionary size to $20$ and the word vector dimension to $4$.
 
-```python
+```{.python .input}
 embed = nn.Embedding(input_dim=20, output_dim=4)
 embed.initialize()
 embed.weight
@@ -33,7 +33,7 @@ embed.weight
 
 The input of the embedding layer is the index of the word. When we enter the index $i$ of a word, the embedding layer returns the $i^\mathrm{th}$ row of the weight matrix as its word vector. Below we enter an index of shape ($2$, $3$) into the embedding layer. Because the dimension of the word vector is 4, we obtain a word vector of shape ($2$, $3$, $4$).
 
-```python
+```{.python .input}
 x = np.array([[1, 2, 3], [4, 5, 6]])
 embed(x)
 ```
@@ -42,7 +42,7 @@ embed(x)
 
 We can multiply the matrices in two minibatches one by one, by the minibatch multiplication operation `batch_dot`. Suppose the first batch contains $n$ matrices $\mathbf{X}_1, \ldots, \mathbf{X}_n$ with a shape of $a\times b$, and the second batch contains $n$ matrices $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ with a shape of $b\times c$. The output of matrix multiplication on these two batches are $n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ with a shape of $a\times c$. Therefore, given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of the minibatch multiplication output is ($n$, $a$, $c$).
 
-```python
+```{.python .input}
 X = np.ones((2, 1, 4))
 Y = np.ones((2, 4, 6))
 npx.batch_dot(X, Y).shape
@@ -52,7 +52,7 @@ npx.batch_dot(X, Y).shape
 
 In forward calculation, the input of the skip-gram model contains the central target word index `center` and the concatenated context and noise word index `contexts_and_negatives`. In which, the `center` variable has the shape (batch size, 1), while the `contexts_and_negatives` variable has the shape (batch size, `max_len`). These two variables are first transformed from word indexes to word vectors by the word embedding layer, and then the output of shape (batch size, 1, `max_len`) is obtained by minibatch multiplication. Each element in the output is the inner product of the central target word vector and the context word vector or noise word vector.
 
-```python
+```{.python .input}
 def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
     v = embed_v(center)
     u = embed_u(contexts_and_negatives)
@@ -62,7 +62,7 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
 
 Verify that the output shape should be (batch size, 1, `max_len`).
 
-```python
+```{.python .input}
 skip_gram(np.ones((2, 1)), np.ones((2, 4)), embed, embed).shape
 ```
 
@@ -74,7 +74,7 @@ Before training the word embedding model, we need to define the loss function of
 
 According to the definition of the loss function in negative sampling, we can directly use Gluon's binary cross-entropy loss function `SigmoidBinaryCrossEntropyLoss`.
 
-```python
+```{.python .input}
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 ```
 
@@ -82,7 +82,7 @@ It is worth mentioning that we can use the mask variable to specify the partial 
 
 Given two identical examples, different masks lead to different loss values.
 
-```python
+```{.python .input}
 pred = np.array([[.5]*4]*2)
 label = np.array([[1, 0, 1, 0]]*2)
 mask = np.array([[1, 1, 1, 1], [1, 1, 0, 0]])
@@ -91,7 +91,7 @@ loss(pred, label, mask)
 
 We can normalize the loss in each example due to various lengths in each example.
 
-```python
+```{.python .input}
 loss(pred, label, mask) / mask.sum(axis=1) * mask.shape[1]
 ```
 
@@ -99,7 +99,7 @@ loss(pred, label, mask) / mask.sum(axis=1) * mask.shape[1]
 
 We construct the embedding layers of the central and context words, respectively, and set the hyperparameter word vector dimension `embed_size` to 100.
 
-```python
+```{.python .input}
 embed_size = 100
 net = nn.Sequential()
 net.add(nn.Embedding(input_dim=len(vocab), output_dim=embed_size),
@@ -110,7 +110,7 @@ net.add(nn.Embedding(input_dim=len(vocab), output_dim=embed_size),
 
 The training function is defined below. Because of the existence of padding, the calculation of the loss function is slightly different compared to the previous training functions.
 
-```python
+```{.python .input}
 def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
     net.initialize(ctx=ctx, force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
@@ -139,7 +139,7 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
 
 Now, we can train a skip-gram model using negative sampling.
 
-```python
+```{.python .input}
 lr, num_epochs = 0.01, 5
 train(net, data_iter, lr, num_epochs)
 ```
@@ -148,7 +148,7 @@ train(net, data_iter, lr, num_epochs)
 
 After training the word embedding model, we can represent similarity in meaning between words based on the cosine similarity of two word vectors. As we can see, when using the trained word embedding model, the words closest in meaning to the word "chip" are mostly related to chips.
 
-```python
+```{.python .input}
 def get_similar_tokens(query_token, k, embed):
     W = embed.weight.data()
     x = W[vocab[query_token]]

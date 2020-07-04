@@ -59,17 +59,17 @@ it with a short alias `tf`.
 To start, we import `jax.numpy as np`. That's right! Instead of importing `numpy`, we import `numpy` from `JAX`! This is because `JAX` aims to mirror the `numpy` interface while providing additional functionality for numeric computation work.
 :end_tab:
 
-```python
+```{.python .input}
 from mxnet import np, npx
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 import torch
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 import tensorflow as tf
 ```
@@ -94,18 +94,18 @@ For instance, there are 12 elements in the tensor `x`.
 Unless otherwise specified, a new tensor
 will be stored in main memory and designated for CPU-based computation.
 
-```python
+```{.python .input}
 x = np.arange(12)
 x
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x = torch.arange(12)
 x
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x = tf.constant(range(12))
 x
@@ -120,16 +120,16 @@ x
 We can access a tensor's *shape* (the length along each axis)
 by inspecting its `shape` property.
 
-```python
+```{.python .input}
 x.shape
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x.shape
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x.shape
 ```
@@ -145,16 +145,16 @@ we can inspect its `size` property..
 Because we are dealing with a vector here,
 the single element of its `shape` is identical to its `size`.
 
-```python
+```{.python .input}
 x.size
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x.size()
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 tf.size(x)
 ```
@@ -175,18 +175,18 @@ To reiterate, although the shape has changed,
 the elements in `x` have not.
 Note that the `size` is unaltered by reshaping.
 
-```python
+```{.python .input}
 x = x.reshape(3, 4)
 x
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x = x.reshape((3, 4))
 x
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x = tf.reshape(x, (3, 4))
 x
@@ -216,16 +216,16 @@ or numbers randomly sampled from a specific distribution.
 We can create a tensor representing a tensor with all elements
 set to 0 and a shape of (2, 3, 4) as follows:
 
-```python
+```{.python .input}
 np.zeros((2, 3, 4))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 torch.zeros(2, 3, 4)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 tf.zeros((2, 3, 4))
 ```
@@ -237,16 +237,16 @@ np.zeros((2, 3, 4))
 
 Similarly, we can create tensors with each element set to 1 as follows:
 
-```python
+```{.python .input}
 np.ones((2, 3, 4))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 torch.ones((2, 3, 4))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 tf.ones((2, 3, 4))
 ```
@@ -271,16 +271,16 @@ with a mean of 0 and a standard deviation of 1.
 Randomness works slightly differently in JAX. Every call to `jax.random` needs to include a key, which we must generate beforehand. Once that's done, the process is very similar to `numpy`.
 :end_tab:
 
-```python
+```{.python .input}
 np.random.normal(0, 1, size=(3, 4))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 torch.randn(3, 4)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 tf.random.normal(shape=[3, 4])
 ```
@@ -295,16 +295,16 @@ We can also specify the exact values for each element in the desired tensor
 by supplying a Python list (or list of lists) containing the numerical values.
 Here, the outermost list corresponds to axis 0, and the inner list to axis 1.
 
-```python
+```{.python .input}
 np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 torch.tensor([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 tf.constant([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
@@ -356,20 +356,20 @@ We can call elementwise operations on any two tensors of the same shape.
 In the following example, we use commas to formulate a 5-element tuple,
 where each element is the result of an elementwise operation.
 
-```python
+```{.python .input}
 x = np.array([1, 2, 4, 8])
 y = np.array([2, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x = torch.tensor([1.0, 2, 4, 8])
 y = torch.tensor([2, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x = tf.constant([1.0, 2, 4, 8])
 y = tf.constant([2.0, 2, 2, 2])
@@ -386,16 +386,16 @@ x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 Many more operations can be applied elementwise,
 including unary operators like exponentiation.
 
-```python
+```{.python .input}
 np.exp(x)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 torch.exp(x)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 tf.exp(x)
 ```
@@ -423,20 +423,20 @@ is the sum of the two input tensors' axis-0 lengths ($3 + 3$);
 while the second output tensor's axis-1 length ($8$)
 is the sum of the two input tensors' axis-1 lengths ($4 + 4$).
 
-```python
+```{.python .input}
 x = np.arange(12).reshape(3, 4)
 y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 np.concatenate([x, y], axis=0), np.concatenate([x, y], axis=1)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x = torch.arange(12, dtype=torch.float32).reshape((3,4))
 y = torch.tensor([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 torch.cat((x, y), dim=0), torch.cat((x, y), dim=1)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x = tf.constant(range(12), dtype=tf.float32, shape=(3, 4))
 y = tf.constant([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
@@ -457,16 +457,16 @@ the corresponding entry in the new tensor takes a value of 1,
 meaning that the logical statement `x == y` is true at that position;
 otherwise that position takes 0.
 
-```python
+```{.python .input}
 x == y
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x == y
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x == y
 ```
@@ -478,16 +478,16 @@ x == y
 
 Summing all the elements in the tensor yields a tensor with only one element.
 
-```python
+```{.python .input}
 x.sum()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x.sum()
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 tf.reduce_sum(x)
 ```
@@ -515,20 +515,20 @@ on the resulting arrays.
 In most cases, we broadcast along an axis where an array
 initially only has length 1, such as in the following example:
 
-```python
+```{.python .input}
 a = np.arange(3).reshape(3, 1)
 b = np.arange(2).reshape(1, 2)
 a, b
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 a = torch.arange(3).reshape((3, 1))
 b = torch.arange(2).reshape((1, 2))
 a, b
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 a = tf.constant(range(3), shape=(3, 1))
 b = tf.constant(range(2), shape=(1, 2))
@@ -549,16 +549,16 @@ for matrix `a` it replicates the columns
 and for matrix `b` it replicates the rows
 before adding up both elementwise.
 
-```python
+```{.python .input}
 a + b
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 a + b
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 a + b
 ```
@@ -580,16 +580,16 @@ by using negative indices.
 Thus, `[-1]` selects the last element and `[1:3]`
 selects the second and the third elements as follows:
 
-```python
+```{.python .input}
 x[-1], x[1:3]
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x[-1], x[1:3]
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x[-1], x[1:3]
 ```
@@ -603,18 +603,18 @@ x[-1], x[1:3]
 In regular `numpy`, we can write elements of a matrix by specifying indices. In `JAX` this is not permitted due to the functional paradigm followed by `JAX`, due to which arrays are immutable. However, it is still possible to perform a similar operation as follows:
 :end_tab:
 
-```python
+```{.python .input}
 x[1, 2] = 9
 x
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x[1, 2] = 9
 x
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x = tf.convert_to_tensor(tf.Variable(x)[1, 2].assign(9))
 x
@@ -636,18 +636,18 @@ While we discussed indexing for matrices,
 this obviously also works for vectors
 and for tensors of more than 2 dimensions.
 
-```python
+```{.python .input}
 x[0:2, :] = 12
 x
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x[0:2, :] = 12
 x
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x_var = tf.Variable(x)
 x_var[1:2,:].assign(tf.ones(x_var[1:2,:].shape, dtype = tf.float32)*12)
@@ -675,20 +675,20 @@ That is because Python first evaluates `y + x`,
 allocating new memory for the result and then makes `y`
 point to this new location in memory.
 
-```python
+```{.python .input}
 before = id(y)
 y = y + x
 id(y) == before
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 before = id(y)
 y = y + x
 id(y) == before
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 before = id(y)
 y = y + x
@@ -718,14 +718,14 @@ to inadvertently reference stale parameters.
 Although in other frameworks, inplace updating is common, it comes with certain risks and thus all arrays in JAX are immutable and cannot be updated in place. If we attempt to perform an in-place update, we will always get a new copy of an object at a different memory location, although it may seem like it is the same object.
 :end_tab:
 
-```python
+```{.python .input}
 z = np.zeros_like(y)
 print('id(z):', id(z))
 z[:] = x + y
 print('id(z):', id(z))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 z = torch.zeros_like(y)
 print('id(z):', id(z))
@@ -733,7 +733,7 @@ z[:] = x + y
 print('id(z):', id(z))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 z = tf.Variable(tf.zeros_like(y))
 print('id(z):', id(z))
@@ -753,20 +753,20 @@ print('id(z):', id(z))
 The same holds for in-place addition, which is possible in `numpy` and other frameworks but would result in an error in `JAX`. In the example below, `x` changes location in memory and the original object loses its reference.
 :end_tab:
 
-```python
+```{.python .input}
 before = id(x)
 x += y
 id(x) == before
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 before = id(x)
 x += y
 id(x) == before
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 before = id(x)
 tf.Variable(x).assign(x + y)
@@ -791,20 +791,20 @@ whether the NumPy package of Python might want to be doing something else
 with the same chunk of memory.
 :end_tab:
 
-```python
+```{.python .input}
 a = x.asnumpy()
 b = np.array(a)
 type(a), type(b)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 a = x.numpy()
 b = torch.tensor(a)
 type(a), type(b)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 a = x.numpy()
 b = tf.constant(a)
@@ -822,18 +822,18 @@ type(a), type(b)
 To convert a size-1 tensor to a Python scalar,
 we can invoke the `item` function or Python's built-in functions.
 
-```python
+```{.python .input}
 a = np.array([3.5])
 a, a.item(), float(a), int(a)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 a = torch.tensor([3.5])
 a, a.item(), float(a), int(a)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 a = tf.constant([3.5]).numpy()
 a, a.item(), float(a), int(a)

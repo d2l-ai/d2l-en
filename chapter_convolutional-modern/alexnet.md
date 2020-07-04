@@ -275,7 +275,7 @@ such as flipping, clipping, and color changes.
 This makes the model more robust and the larger sample size effectively reduces overfitting.
 We will discuss data augmentation in greater detail in :numref:`sec_image_augmentation`.
 
-```python
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
@@ -311,7 +311,7 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
         nn.Dense(10))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -336,7 +336,7 @@ net = nn.Sequential(
 
 We construct a single-channel data instance with both height and width of 224 to observe the output shape of each layer. It matches our diagram above.
 
-```python
+```{.python .input}
 X = np.random.uniform(size=(1, 1, 224, 224))
 net.initialize()
 for layer in net:
@@ -344,7 +344,7 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 X = torch.randn(1, 1, 224, 224)
 for layer in net:
@@ -365,12 +365,12 @@ To make things work, we upsample them to $224 \times 224$
 but we do it here to be faithful to the AlexNet architecture).
 We perform this resizing with the `resize` argument in `load_data_fashion_mnist`.
 
-```python
+```{.python .input}
 batch_size = 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 batch_size = 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
@@ -384,12 +384,12 @@ the main change here is the use of a smaller learning rate
 and much slower training due to the deeper and wider network,
 the higher image resolution and the more costly convolutions.
 
-```python
+```{.python .input}
 lr, num_epochs = 0.01, 10
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 lr, num_epochs = 0.01, 10
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)

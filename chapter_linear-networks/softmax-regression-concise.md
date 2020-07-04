@@ -7,21 +7,21 @@ we will find it similarly (or possibly more)
 convenient for implementing classification models.
 Again, we begin with our import ritual.
 
-```python
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import gluon, init, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -36,18 +36,18 @@ import jax.numpy as np
 Let us stick with the Fashion-MNIST dataset
 and keep the batch size at $256$ as in the last section.
 
-```python
+```{.python .input}
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
@@ -73,13 +73,13 @@ when implementing deep models.
 Again, we initialize the weights at random
 with zero mean and standard deviation $0.01$.
 
-```python
+```{.python .input}
 net = nn.Sequential()
 net.add(nn.Dense(10))
 net.initialize(init.Normal(sigma=0.01))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # PyTorch doesn't implicitly reshape the inputs.
 # Thus we define a layer to reshape the inputs in our network.
@@ -96,7 +96,7 @@ def init_weights(m):
 net.apply(init_weights)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 net = tf.keras.models.Sequential()
 net.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
@@ -170,16 +170,16 @@ we will just pass the logits and compute the softmax and its log
 all at once inside the softmax_cross_entropy loss function,
 which does smart things like the log-sum-exp trick ([see on Wikipedia](https://en.wikipedia.org/wiki/LogSumExp)).
 
-```python
+```{.python .input}
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 loss = nn.CrossEntropyLoss()
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 net.add(tf.keras.layers.Softmax())
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -197,16 +197,16 @@ with a learning rate of $0.1$ as the optimization algorithm.
 Note that this is the same as we applied in the linear regression example
 and it illustrates the general applicability of the optimizers.
 
-```python
+```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 trainer = torch.optim.SGD(net.parameters(), lr=0.1)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 trainer = tf.keras.optimizers.SGD(learning_rate=.1)
 ```
@@ -220,18 +220,18 @@ trainer = tf.keras.optimizers.SGD(learning_rate=.1)
 
 Next we call the training function defined in the last section to train a model.
 
-```python
+```{.python .input}
 num_epochs = 10
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 num_epochs = 10
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 net.compile(optimizer=trainer, loss=loss, metrics=['accuracy'])
 num_epochs = 10

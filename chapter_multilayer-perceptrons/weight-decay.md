@@ -187,7 +187,7 @@ To make the effects of overfitting pronounced,
 we can increase the dimensionality of our problem to $d = 200$
 and work with a small training set containing only 20 examples.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -202,7 +202,7 @@ test_data = d2l.synthetic_data(true_w, true_b, n_test)
 test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -217,7 +217,7 @@ test_data = d2l.synthetic_data(true_w, true_b, n_test)
 test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -244,7 +244,7 @@ to randomly initialize our model parameters
 and allocate 
 memory for the gradients we will calculate.
 
-```python
+```{.python .input}
 def init_params():
     w = np.random.normal(scale=1, size=(num_inputs, 1))
     b = np.zeros(1)
@@ -253,7 +253,7 @@ def init_params():
     return [w, b]
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def init_params():
     w = torch.normal(0, 1, size=(num_inputs, 1), requires_grad=True)
@@ -261,7 +261,7 @@ def init_params():
     return [w, b]
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def init_params():
     w = tf.Variable(tf.random.normal(mean=1, shape=(num_inputs, 1)))
@@ -278,18 +278,18 @@ We divide by $2$ by convention
 the $2$ and $1/2$ cancel out, ensuring that the expression
 for the update looks nice and simple).
 
-```python
+```{.python .input}
 def l2_penalty(w):
     return (w**2).sum() / 2
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def l2_penalty(w):
     return torch.sum(w.pow(2)) / 2
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def l2_penalty(w):
     return tf.reduce_sum(tf.pow(w, 2)) / 2
@@ -304,7 +304,7 @@ have not changed since the previous chapter,
 so we will just import them via `d2l.linreg` and `d2l.squared_loss`.
 The only change here is that our loss now includes the penalty term.
 
-```python
+```{.python .input}
 def train(lambd):
     w, b = init_params()
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
@@ -325,7 +325,7 @@ def train(lambd):
     print('l1 norm of w:', np.abs(w).sum())
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def train(lambd):
     w, b = init_params()
@@ -347,7 +347,7 @@ def train(lambd):
     print('l1 norm of w:', torch.norm(w).item())
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def train(lambd):
     w, b = init_params()
@@ -377,16 +377,16 @@ Note that we overfit badly,
 decreasing the training error but not the 
 test error---a textook case of overfitting.
 
-```python
+```{.python .input}
 train(lambd=0)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 train(lambd=0)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 train(lambd=0)
 ```
@@ -402,16 +402,16 @@ As an exercise, you might want to check
 that the $\ell_2$ norm of the weights $\mathbf{w}$
 has actually decreased.
 
-```python
+```{.python .input}
 train(lambd=3)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 train(lambd=3)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 train(lambd=3)
 ```
@@ -452,7 +452,7 @@ weights and biases simultaneously. Here we only set `weight_decay` for
 the weight, so the bias parameter $b$ will not decay.
 :end_tab:
 
-```python
+```{.python .input}
 def train_gluon(wd):
     net = nn.Sequential()
     net.add(nn.Dense(1))
@@ -478,7 +478,7 @@ def train_gluon(wd):
     print('L1 norm of w:', np.abs(net[0].weight.data()).sum())
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def train_torch(wd):
     net = nn.Sequential(nn.Linear(num_inputs, 1))
@@ -506,7 +506,7 @@ def train_torch(wd):
     print('L1 norm of w:', net[0].weight.norm().item())
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def train_tensorflow(wd):
     net = tf.keras.models.Sequential()
@@ -540,30 +540,30 @@ and are easier to implement,
 a benefit that will become more
 pronounced for large problems.
 
-```python
+```{.python .input}
 train_gluon(0)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 train_torch(0)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 train_tensorflow(0)
 ```
 
-```python
+```{.python .input}
 train_gluon(3)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 train_torch(3)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 train_tensorflow(3)
 ```

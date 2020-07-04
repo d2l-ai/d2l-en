@@ -394,14 +394,14 @@ We can now explore these concepts interactively
 by fitting polynomials to data.
 To get started we will import our usual packages.
 
-```python
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -410,7 +410,7 @@ import numpy as np
 import math
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -429,7 +429,7 @@ The noise term $\epsilon$ obeys a normal distribution
 with a mean of 0 and a standard deviation of 0.1.
 We will synthesize 100 samples each for the training set and test set.
 
-```python
+```{.python .input}
 maxdegree = 20  # Maximum degree of the polynomial
 n_train, n_test = 100, 100  # Training and test dataset sizes
 true_w = np.zeros(maxdegree)  # Allocate lots of empty space
@@ -444,7 +444,7 @@ labels = np.dot(poly_features, true_w)
 labels += np.random.normal(scale=0.1, size=labels.shape)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 maxdegree = 20  # Maximum degree of the polynomial
 n_train, n_test = 100, 100  # Training and test dataset sizes
@@ -466,7 +466,7 @@ poly_features = torch.from_numpy(poly_features).type(torch.float32)
 labels = torch.from_numpy(labels).type(torch.float32)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 maxdegree = 20  # Maximum degree of the polynomial
 n_train, n_test = 100, 100  # Training and test dataset sizes
@@ -500,16 +500,16 @@ Take a look at the first 2 samples from the generated dataset.
 The value 1 is technically a feature,
 namely the constant feature corresponding to the bias.
 
-```python
+```{.python .input}
 features[:2], poly_features[:2], labels[:2]
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 features[:2], poly_features[:2], labels[:2]
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 features[:2], poly_features[:2], labels[:2]
 ```
@@ -518,7 +518,7 @@ features[:2], poly_features[:2], labels[:2]
 
 Let us first implement a function to evaluate the loss on a given data.
 
-```python
+```{.python .input}
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
@@ -527,7 +527,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
     return metric[0] / metric[1]
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
@@ -541,7 +541,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
     return metric[0] / metric[1]
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
@@ -557,7 +557,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
 
 Now define the training function.
 
-```python
+```{.python .input}
 def train(train_features, test_features, train_labels, test_labels,
           num_epochs=1000):
     loss = gluon.loss.L2Loss()
@@ -583,7 +583,7 @@ def train(train_features, test_features, train_labels, test_labels,
     print('weight:', net[0].weight.data().asnumpy())
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def train(train_features, test_features, train_labels, test_labels,
           num_epochs=1000):
@@ -608,7 +608,7 @@ def train(train_features, test_features, train_labels, test_labels,
     print('weight:', net[0].weight.data.numpy())
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def train(train_features, test_features, train_labels, test_labels,
           num_epochs=1000):
@@ -643,14 +643,14 @@ when using the testing dataset is low.
 The trained model parameters are also close
 to the true values $w = [5, 1.2, -3.4, 5.6]$.
 
-```python
+```{.python .input}
 # Pick the first four dimensions, i.e., 1, x, x^2, x^3 from the polynomial
 # features
 train(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
       labels[:n_train], labels[n_train:])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Pick the first four dimensions, i.e., 1, x, x^2, x^3 from the polynomial
 # features
@@ -658,7 +658,7 @@ train(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
       labels[:n_train].reshape(-1,1), labels[n_train:].reshape(-1,1))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 # Pick the first four dimensions, i.e., 1, x, x^2, x^3 from the polynomial
 # features
@@ -678,20 +678,20 @@ When used to fit non-linear patterns
 (like the third-order polynomial function here)
 linear models are liable to underfit.
 
-```python
+```{.python .input}
 # Pick the first four dimensions, i.e., 1, x from the polynomial features
 train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
       labels[:n_train], labels[n_train:])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Pick the first four dimensions, i.e., 1, x from the polynomial features
 train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
       labels[:n_train].reshape(-1,1), labels[n_train:].reshape(-1,1))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 # Pick the first four dimensions, i.e., 1, x from the polynomial features
 train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
@@ -715,7 +715,7 @@ Try out different model complexities (`n_degree`)
 and training set sizes (`n_subset`)
 to gain some intuition of what is happening.
 
-```python
+```{.python .input}
 n_subset = 100  # Subset of data to train on
 n_degree = 20  # Degree of polynomials
 train(poly_features[1:n_subset, 0:n_degree],
@@ -723,7 +723,7 @@ train(poly_features[1:n_subset, 0:n_degree],
       labels[n_train:])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 n_subset = 100  # Subset of data to train on
 n_degree = 20  # Degree of polynomials
@@ -732,7 +732,7 @@ train(poly_features[1:n_subset, 0:n_degree],
       labels[n_train:].reshape(-1,1))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 n_subset = 100  # Subset of data to train on
 n_degree = 20  # Degree of polynomials

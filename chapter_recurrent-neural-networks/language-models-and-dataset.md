@@ -91,7 +91,7 @@ The probability formulae that involve one, two, and three variables are typicall
 
 Let us see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`sec_text_preprocessing` and print the top $10$ most frequent words.
 
-```python
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import np, npx
 import random
@@ -102,7 +102,7 @@ vocab = d2l.Vocab(tokens)
 print(vocab.token_freqs[:10])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -179,7 +179,7 @@ Hence, which one should we pick? In fact, all of them are equally good. But if w
 The following code randomly generates a minibatch from the data each time. Here, the batch size `batch_size` indicates the number of examples in each minibatch and `num_steps` is the length of the sequence (or timesteps if we have a time series) included in each example.
 In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random minibatches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
 
-```python
+```{.python .input}
 #@save
 def seq_data_iter_random(corpus, batch_size, num_steps):
     # Offset the iterator over the data for uniform starts
@@ -203,7 +203,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
         yield np.array(X), np.array(Y)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 #@save
 def seq_data_iter_random(corpus, batch_size, num_steps):
@@ -243,7 +243,7 @@ for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=6):
 
 In addition to random sampling of the original sequence, we can also make the positions of two adjacent random minibatches adjacent in the original sequence.
 
-```python
+```{.python .input}
 #@save
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
@@ -260,7 +260,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
         yield X, Y
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 #@save
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):

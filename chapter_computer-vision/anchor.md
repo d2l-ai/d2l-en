@@ -5,7 +5,7 @@ Object detection algorithms usually sample a large number of regions in the inpu
 
 First, import the packages or modules required for this section. Here, we have modified the printing accuracy of NumPy. Because printing tensors actually calls the print function of NumPy, the floating-point numbers in tensors printed in this section are more concise.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon, image, np, npx
@@ -26,7 +26,7 @@ That is, the number of anchor boxes centered on the same pixel is $n+m-1$. For t
 
 The above method of generating anchor boxes has been implemented in the `multibox_prior` function. We specify the input, a set of sizes, and a set of aspect ratios, and this function will return all the anchor boxes entered.
 
-```python
+```{.python .input}
 img = image.imread('../img/catdog.jpg').asnumpy()
 h, w = img.shape[0:2]
 
@@ -38,14 +38,14 @@ Y.shape
 
 We can see that the shape of the returned anchor box variable `y` is (batch size, number of anchor boxes, 4). After changing the shape of the anchor box variable `y` to (image height, image width, number of anchor boxes centered on the same pixel, 4), we can obtain all the anchor boxes centered on a specified pixel position. In the following example, we access the first anchor box centered on (250, 250). It has four elements: the $x, y$ axis coordinates in the upper-left corner and the $x, y$ axis coordinates in the lower-right corner of the anchor box. The coordinate values of the $x$ and $y$ axis are divided by the width and height of the image, respectively, so the value range is between 0 and 1.
 
-```python
+```{.python .input}
 boxes = Y.reshape(h, w, 5, 4)
 boxes[250, 250, 0, :]
 ```
 
 In order to describe all anchor boxes centered on one pixel in the image, we first define the `show_bboxes` function to draw multiple bounding boxes on the image.
 
-```python
+```{.python .input}
 #@save
 def show_bboxes(axes, bboxes, labels=None, colors=None):
     """Show bounding boxes."""
@@ -70,7 +70,7 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 
 As we just saw, the coordinate values of the $x$ and $y$ axis in the variable `boxes` have been divided by the width and height of the image, respectively. When drawing images, we need to restore the original coordinate values of the anchor boxes and therefore define the variable `bbox_scale`. Now, we can draw all the anchor boxes centered on (250, 250) in the image. As you can see, the blue anchor box with a size of 0.75 and an aspect ratio of 1 covers the dog in the image well.
 
-```python
+```{.python .input}
 d2l.set_figsize((3.5, 2.5))
 bbox_scale = np.array((w, h, w, h))
 fig = d2l.plt.imshow(img)
@@ -131,7 +131,7 @@ The default values of the constant are $\mu_x = \mu_y = \mu_w = \mu_h = 0, \sigm
 
 Below we demonstrate a detailed example. We define ground-truth bounding boxes for the cat and dog in the read image, where the first element is category (0 for dog, 1 for cat) and the remaining four elements are the $x, y$ axis coordinates at top-left corner and $x, y$ axis coordinates at lower-right corner (the value range is between 0 and 1). Here, we construct five anchor boxes to be labeled by the coordinates of the upper-left corner and the lower-right corner, which are recorded as $A_0, \ldots, A_4$, respectively (the index in the program starts from 0). First, draw the positions of these anchor boxes and the ground-truth bounding boxes in the image.
 
-```python
+```{.python .input}
 ground_truth = np.array([[0, 0.1, 0.08, 0.52, 0.92],
                          [1, 0.55, 0.2, 0.9, 0.88]])
 anchors = np.array([[0, 0.1, 0.2, 0.3], [0.15, 0.2, 0.4, 0.4],
@@ -145,7 +145,7 @@ show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 
 We can label categories and offsets for anchor boxes by using the `multibox_target` function. This function sets the background category to 0 and increments the integer index of the target category from zero by 1 (1 for dog and 2 for cat). We add example dimensions to the anchor boxes and ground-truth bounding boxes and construct random predicted results with a shape of (batch size, number of categories including background, number of anchor boxes) by using the `expand_dims` function.
 
-```python
+```{.python .input}
 labels = npx.multibox_target(np.expand_dims(anchors, axis=0),
                              np.expand_dims(ground_truth, axis=0),
                              np.zeros((1, 3, 5)))
@@ -153,7 +153,7 @@ labels = npx.multibox_target(np.expand_dims(anchors, axis=0),
 
 There are three items in the returned result, all of which are in the tensor format. The third item is represented by the category labeled for the anchor box.
 
-```python
+```{.python .input}
 labels[2]
 ```
 
@@ -163,13 +163,13 @@ We analyze these labelled categories based on positions of anchor boxes and grou
 The second item of the return value is a mask variable, with the shape of (batch size, four times the number of anchor boxes). The elements in the mask variable correspond one-to-one with the four offset values of each anchor box.
 Because we do not care about background detection, offsets of the negative class should not affect the target function. By multiplying by element, the 0 in the mask variable can filter out negative class offsets before calculating target function.
 
-```python
+```{.python .input}
 labels[1]
 ```
 
 The first item returned is the four offset values labeled for each anchor box, with the offsets of negative class anchor boxes labeled as 0.
 
-```python
+```{.python .input}
 labels[0]
 ```
 
@@ -182,7 +182,7 @@ Next, select the prediction bounding box $B_2$ with the second highest confidenc
 
 Next, we will look at a detailed example. First, construct four anchor boxes. For the sake of simplicity, we assume that predicted offsets are all 0. This means that the prediction bounding boxes are anchor boxes. Finally, we construct a predicted probability for each category.
 
-```python
+```{.python .input}
 anchors = np.array([[0.1, 0.08, 0.52, 0.92], [0.08, 0.2, 0.56, 0.95],
                     [0.15, 0.3, 0.62, 0.91], [0.55, 0.2, 0.9, 0.88]])
 offset_preds = np.array([0] * anchors.size)
@@ -193,7 +193,7 @@ cls_probs = np.array([[0] * 4,  # Predicted probability for background
 
 Print prediction bounding boxes and their confidence levels on the image.
 
-```python
+```{.python .input}
 fig = d2l.plt.imshow(img)
 show_bboxes(fig.axes, anchors * bbox_scale,
             ['dog=0.9', 'dog=0.8', 'dog=0.7', 'cat=0.9'])
@@ -201,7 +201,7 @@ show_bboxes(fig.axes, anchors * bbox_scale,
 
 We use the `multibox_detection` function to perform NMS and set the threshold to 0.5. This adds an example dimension to the tensor input. We can see that the shape of the returned result is (batch size, number of anchor boxes, 6). The 6 elements of each row represent the output information for the same prediction bounding box. The first element is the predicted category index, which starts from 0 (0 is dog, 1 is cat). The value -1 indicates background or removal in NMS. The second element is the confidence level of prediction bounding box. The remaining four elements are the $x, y$ axis coordinates of the upper-left corner and the $x, y$ axis coordinates of the lower-right corner of the prediction bounding box (the value range is between 0 and 1).
 
-```python
+```{.python .input}
 output = npx.multibox_detection(
     np.expand_dims(cls_probs, axis=0),
     np.expand_dims(offset_preds, axis=0),
@@ -212,7 +212,7 @@ output
 
 We remove the prediction bounding boxes of category -1 and visualize the results retained by NMS.
 
-```python
+```{.python .input}
 fig = d2l.plt.imshow(img)
 for i in output[0].asnumpy():
     if i[0] == -1:

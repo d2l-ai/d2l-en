@@ -19,17 +19,17 @@ Automatic differentiation enables the system to subsequently backpropagate gradi
 Here, *backpropagate* simply means to trace through the computational graph,
 filling in the partial derivatives with respect to each parameter.
 
-```python
+```{.python .input}
 from mxnet import autograd, np, npx
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 import torch
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 import tensorflow as tf
 ```
@@ -51,18 +51,18 @@ $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to the column vector $\mathbf{x}$.
 To start, let us create the variable `x` and assign it an initial value.
 
-```python
+```{.python .input}
 x = np.arange(4.0)
 x
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x = torch.arange(4.0)
 x
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x = tf.constant(range(4), dtype=tf.float32)
 x
@@ -86,7 +86,7 @@ Note that a gradient of a scalar-valued function
 with respect to a vector $\mathbf{x}$
 is itself vector-valued and has the same shape as $\mathbf{x}$.
 
-```python
+```{.python .input}
 # We allocate memory for a tensor's gradient by invoking its `attach_grad`
 # method
 x.attach_grad()
@@ -95,13 +95,13 @@ x.attach_grad()
 x.grad
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x.requires_grad_(True)  # Equals to x = torch.arange(4.0, requires_grad=True)
 x.grad  # The default value is None
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x = tf.Variable(x)
 ```
@@ -114,7 +114,7 @@ x = tf.Variable(x)
 
 Now let us calculate $y$.
 
-```python
+```{.python .input}
 # Place our code inside an `autograd.record` scope to build the computational
 # graph
 with autograd.record():
@@ -122,13 +122,13 @@ with autograd.record():
 y
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 y = 2 * torch.dot(x, x)
 y
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 # Record all computations onto a tape. 
 with tf.GradientTape() as t:
@@ -150,18 +150,18 @@ Next, we can automatically calculate the gradient of `y`
 with respect to each component of `x`
 by calling the function for backpropagation and printing the gradient.
 
-```python
+```{.python .input}
 y.backward()
 x.grad
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 y.backward()
 x.grad
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x_grad = t.gradient(y, x)
 x_grad
@@ -178,16 +178,16 @@ The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to $\mathbf{x}$ should be $4\mathbf{x}$.
 Let us quickly verify that our desired gradient was calculated correctly.
 
-```python
+```{.python .input}
 x.grad == 4 * x
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x.grad == 4 * x
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x_grad == 4 * x
 ```
@@ -199,14 +199,14 @@ x_grad == 4 * x
 
 Now let us calculate another function of `x`.
 
-```python
+```{.python .input}
 with autograd.record():
     y = x.sum()
 y.backward()
 x.grad  # Overwritten by the newly calculated gradient.
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # PyTorch accumulates the gradient in default, we need to clear the previous 
 # values.
@@ -216,7 +216,7 @@ y.backward()
 x.grad
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
     y = tf.reduce_sum(x)
@@ -248,7 +248,7 @@ Here, our intent is not to calculate the differentiation matrix
 but rather the sum of the partial derivatives
 computed individually for each example in the batch.
 
-```python
+```{.python .input}
 # When we invoke `backward` on a vector-valued variable `y` (function of `x`),
 # a new scalar variable is created by summing the elements in `y`. Then the
 # gradient of that scalar variable with respect to `x` is computed
@@ -258,7 +258,7 @@ y.backward()
 x.grad  # Equals to y = sum(x * x)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x.grad.zero_()
 y = x * x
@@ -266,7 +266,7 @@ y.sum().backward()  # Backward only supports for scalars.
 x.grad
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 with tf.GradientTape() as t:
     y = x * x
@@ -308,7 +308,7 @@ Thus, the following backward function computes
 the partial derivative of `z = u * x` with respect to `x` while treating `u` as a constant,
 instead of the partial derivative of `z = x * x * x` with respect to `x`.
 
-```python
+```{.python .input}
 with autograd.record():
     y = x * x
     u = y.detach()
@@ -317,7 +317,7 @@ z.backward()
 x.grad == u
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x.grad.zero_()
 y = x * x
@@ -328,7 +328,7 @@ z.sum().backward()
 x.grad == u
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 # Set the persistent=True to run t.gradient more than once.
 with tf.GradientTape(persistent=True) as t:

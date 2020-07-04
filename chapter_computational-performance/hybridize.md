@@ -3,7 +3,7 @@
 
 So far, this book has focused on imperative programming, which makes use of statements such as `print`, `+` or `if` to change a program’s state. Consider the following example of a simple imperative program.
 
-```python
+```{.python .input}
 def add(a, b):
     return a + b
 
@@ -33,7 +33,7 @@ Consider the alternative, symbolic programming where computation is usually perf
 
 This allows for a significant amount of optimization. First off, we can skip the Python interpreter in many cases, thus removing a performance bottleneck that can become significant on multiple fast GPUs paired with a single Python thread on a CPU. Secondly, a compiler might optimize and rewrite the above code into `print((1 + 2) + (3 + 4))` or even `print(10)`. This is possible since a compiler gets to see the full code before turning it into machine instructions. For instance, it can release memory (or never allocate it) whenever a variable is no longer needed. Or it can transform the code entirely into an equivalent piece. To get a better idea consider the following simulation of imperative programming (it is Python after all) below.
 
-```python
+```{.python .input}
 def add_():
     return '''
 def add(a, b):
@@ -73,7 +73,7 @@ In practice this means that we build models using either the `HybridBlock` or th
 
 The easiest way to get a feel for how hybridization works is to consider deep networks with multiple layers. Conventionally the Python interpreter will need to execute the code for all layers to generate an instruction that can then be forwarded to a CPU or a GPU. For a single (fast) compute device this does not cause any major issues. On the other hand, if we use an advanced 8-GPU server such as an AWS P3dn.24xlarge instance Python will struggle to keep all GPUs busy. The single-threaded Python interpreter becomes the bottleneck here. Let us see how we can address this for significant parts of the code by replacing `Sequential` by `HybridSequential`. We begin by defining a simple MLP.
 
-```python
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
@@ -95,7 +95,7 @@ net(x)
 
 By calling the `hybridize` function, we are able to compile and optimize the computation in the MLP. The model’s computation result remains unchanged.
 
-```python
+```{.python .input}
 net.hybridize()
 net(x)
 ```
@@ -106,7 +106,7 @@ This seems almost too good to be true: simply designate a block to be `HybridSeq
 
 To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let us define a function to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance.
 
-```python
+```{.python .input}
 #@save
 class benchmark:    
     def __init__(self, description = 'Done in %.4f sec'):
@@ -122,7 +122,7 @@ class benchmark:
 
 Now we can invoke the network twice, once with and once without hybridization.
 
-```python
+```{.python .input}
 net = get_net()
 with benchmark('Without hybridization: %.4f sec'):
     for i in range(1000): net(x)
@@ -141,14 +141,14 @@ As is observed in the above results, after a HybridSequential instance calls the
 
 One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time the code is often faster than what can be achieved in imperative programming. Let us see the `export` method in action.
 
-```python
+```{.python .input}
 net.export('my_mlp')
 !ls -lh my_mlp*
 ```
 
 The model is decomposed into a (large binary) parameter file and a JSON description of the program required to execute to compute the model. The files can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. Let us have a look at the model description.
 
-```python
+```{.python .input}
 !head my_mlp-symbol.json
 ```
 
@@ -158,7 +158,7 @@ Contrary to the Block instance, which needs to use the `forward` function, for a
 
 Earlier, we demonstrated that, after calling the `hybridize` method, the model is able to achieve superior computing performance and portability. Note, though that hybridization can affect model flexibility, in particular in terms of control flow. We will illustrate how to design more general models and also how compilation will remove spurious Python elements.
 
-```python
+```{.python .input}
 class HybridNet(nn.HybridBlock):
     def __init__(self, **kwargs):
         super(HybridNet, self).__init__(**kwargs)
@@ -175,7 +175,7 @@ class HybridNet(nn.HybridBlock):
 
 The code above implements a simple network with 4 hidden units and 2 outputs. `hybrid_forward` takes an additional argument - the module `F`. This is needed since, depending on whether the code has been hybridized or not, it will use a slightly different library (`ndarray` or `symbol`) for processing. Both classes perform very similar functions and MXNet automatically determines the argument. To understand what is going on we print the arguments as part of the function invocation.
 
-```python
+```{.python .input}
 net = HybridNet()
 net.initialize()
 x = np.random.normal(size=(1, 3))
@@ -184,14 +184,14 @@ net(x)
 
 Repeating the forward computation will lead to the same output (we omit details). Now let us see what happens if we invoke the `hybridize` method.
 
-```python
+```{.python .input}
 net.hybridize()
 net(x)
 ```
 
 Instead of using `ndarray` we now use the `symbol` module for `F`. Moreover, even though the input is of `ndarray` type, the data flowing through the network is now converted to `symbol` type as part of the compilation process. Repeating the function call leads to a surprising outcome:
 
-```python
+```{.python .input}
 net(x)
 ```
 

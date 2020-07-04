@@ -39,7 +39,7 @@ $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
 To illustrate this let us plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mpl_toolkits import mplot3d
@@ -49,7 +49,7 @@ npx.set_np()
 
 Let us define a few functions, both convex and nonconvex.
 
-```python
+```{.python .input}
 def f(x):
     return 0.5 * x**2  # Convex
 
@@ -102,7 +102,7 @@ $$f(x) > \lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
 This contradicts the assumption that $f(x)$ is a local minimum. For instance, the function $f(x) = (x+1) (x-1)^2$ has a local minimum for $x=1$. However, it is not a global minimum.
 
-```python
+```{.python .input}
 def f(x):
     return (x-1)**2 * (x+1)
 
@@ -122,7 +122,7 @@ Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \i
 
 Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
 
-```python
+```{.python .input}
 x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
                    indexing='ij')
 
@@ -171,7 +171,7 @@ $$\begin{aligned}
 
 By geometry it follows that $f(x)$ is below the line connecting $f(a)$ and $f(b)$, thus proving convexity. We omit a more formal derivation in favor of a graph below.
 
-```python
+```{.python .input}
 def f(x):
     return 0.5 * x**2
 

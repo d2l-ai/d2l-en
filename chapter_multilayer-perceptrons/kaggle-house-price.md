@@ -37,7 +37,7 @@ to verify the integrity of the file.
 All of our datasets are hosted on site
 whose address is assigned to `DATA_URL` below.
 
-```python
+```{.python .input}
 import os
 from mxnet import gluon
 import zipfile
@@ -50,7 +50,7 @@ DATA_HUB = dict()
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 import os
 import requests
@@ -64,7 +64,7 @@ DATA_HUB = dict()
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 import os
 import requests
@@ -87,7 +87,7 @@ and its SHA-1 matches the one stored in `DATA_HUB`,
 our code will use the cached file to avoid 
 clogging up your internet with redundant downloads.
 
-```python
+```{.python .input}
 #@save
 def download(name, cache_dir=os.path.join('..', 'data')):
     """Download a file inserted into DATA_HUB, return the local filename."""
@@ -97,7 +97,7 @@ def download(name, cache_dir=os.path.join('..', 'data')):
     return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 #@save
 def util_download(url, path=None, verify_ssl=True):
@@ -136,7 +136,7 @@ def download(name, cache_dir=os.path.join('..', 'data')):
     return util_download(url)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 #@save
 def util_download(url, path=None, verify_ssl=True):
@@ -180,7 +180,7 @@ one is to download and extract a zip/tar file
 and the other to download all the files from `DATA_HUB`
 (most of the datasets used in this book) into the cache directory.
 
-```python
+```{.python .input}
 #@save
 def download_extract(name, folder=None):
     """Download and extract a zip/tar file."""
@@ -206,7 +206,7 @@ def download_all():
         download(name)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 #@save
 def download_extract(name, folder=None):
@@ -233,7 +233,7 @@ def download_all():
         download(name)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 #@save
 def download_extract(name, folder=None):
@@ -330,7 +330,7 @@ before proceeding further.
 Fortunately, if you are reading in Jupyter,
 we can install pandas without even leaving the notebook.
 
-```python
+```{.python .input}
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
 
@@ -342,7 +342,7 @@ import pandas as pd
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
@@ -355,7 +355,7 @@ import pandas as pd
 import numpy as np
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
@@ -371,7 +371,7 @@ For convenience, we can download and cache
 the Kaggle housing dataset 
 using the script we defined above.
 
-```python
+```{.python .input}
 #@save        
 DATA_HUB['kaggle_house_train'] = (
     DATA_URL + 'kaggle_house_pred_train.csv',
@@ -383,7 +383,7 @@ DATA_HUB['kaggle_house_test'] = (
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 #@save        
 DATA_HUB['kaggle_house_train'] = (
@@ -396,7 +396,7 @@ DATA_HUB['kaggle_house_test'] = (
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 #@save        
 DATA_HUB['kaggle_house_train'] = (
@@ -412,18 +412,18 @@ DATA_HUB['kaggle_house_test'] = (
 To load the two csv files containing training 
 and test data respectively we use Pandas.
 
-```python
+```{.python .input}
 train_data = pd.read_csv(download('kaggle_house_train'))
 test_data = pd.read_csv(download('kaggle_house_test'))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 train_data = pd.read_csv(download('kaggle_house_train'))
 test_data = pd.read_csv(download('kaggle_house_test'))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 train_data = pd.read_csv(download('kaggle_house_train'))
 test_data = pd.read_csv(download('kaggle_house_test'))
@@ -433,18 +433,18 @@ The training dataset includes $1460$ examples,
 $80$ features, and $1$ label, while the test data 
 contains $1459$ examples and $80$ features.
 
-```python
+```{.python .input}
 print(train_data.shape)
 print(test_data.shape)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 print(train_data.shape)
 print(test_data.shape)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 print(train_data.shape)
 print(test_data.shape)
@@ -453,16 +453,16 @@ print(test_data.shape)
 Let’s take a look at the first $4$ and last $2$ features
 as well as the label (SalePrice) from the first $4$ examples:
 
-```python
+```{.python .input}
 print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
@@ -474,16 +474,16 @@ any information for prediction purposes.
 Hence, we remove it from the dataset 
 before feeding the data into the network.
 
-```python
+```{.python .input}
 all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 ```
@@ -513,7 +513,7 @@ which features will be relevant,
 we do not want to penalize coefficients
 assigned to one variable more than on any other.
 
-```python
+```{.python .input}
 numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
 all_features[numeric_features] = all_features[numeric_features].apply(
     lambda x: (x - x.mean()) / (x.std()))
@@ -522,7 +522,7 @@ all_features[numeric_features] = all_features[numeric_features].apply(
 all_features[numeric_features] = all_features[numeric_features].fillna(0)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
 all_features[numeric_features] = all_features[numeric_features].apply(
@@ -532,7 +532,7 @@ all_features[numeric_features] = all_features[numeric_features].apply(
 all_features[numeric_features] = all_features[numeric_features].fillna(0)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
 all_features[numeric_features] = all_features[numeric_features].apply(
@@ -551,14 +551,14 @@ For instance, 'MSZoning' assumes the values 'RL' and 'RM'.
 These map onto vectors $(1, 0)$ and $(0, 1)$ respectively.
 Pandas does this automatically for us.
 
-```python
+```{.python .input}
 # Dummy_na=True refers to a missing value being a legal eigenvalue, and
 # creates an indicative feature for it
 all_features = pd.get_dummies(all_features, dummy_na=True)
 all_features.shape
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Dummy_na=True refers to a missing value being a legal eigenvalue, and
 # creates an indicative feature for it
@@ -566,7 +566,7 @@ all_features = pd.get_dummies(all_features, dummy_na=True)
 all_features.shape
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 # Dummy_na=True refers to a missing value being a legal eigenvalue, and
 # creates an indicative feature for it
@@ -581,7 +581,7 @@ we can extract the NumPy format from the Pandas dataframe
 and convert it into MXNet's native tensor 
 representation for training.
 
-```python
+```{.python .input}
 n_train = train_data.shape[0]
 train_features = np.array(all_features[:n_train].values, dtype=np.float32)
 test_features = np.array(all_features[n_train:].values, dtype=np.float32)
@@ -589,7 +589,7 @@ train_labels = np.array(train_data.SalePrice.values,
                         dtype=np.float32).reshape(-1, 1)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 n_train = train_data.shape[0]
 train_features = torch.tensor(all_features[:n_train].values,
@@ -600,7 +600,7 @@ train_labels = torch.tensor(train_data.SalePrice.values,
                             dtype=torch.float32).reshape(-1, 1)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 n_train = train_data.shape[0]
 train_features = np.array(all_features[:n_train].values, dtype=np.float)
@@ -623,7 +623,7 @@ giving us some intuition about how close the simple model
 gets to the best reported models, giving us a sense
 of how much gain we should expect from fancier models.
 
-```python
+```{.python .input}
 loss = gluon.loss.L2Loss()
 
 def get_net():
@@ -633,7 +633,7 @@ def get_net():
     return net
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 loss = nn.MSELoss()
 in_features = train_features.shape[1]
@@ -643,7 +643,7 @@ def get_net():
     return net
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 loss = tf.keras.losses.mse
 
@@ -678,7 +678,7 @@ This leads to the following loss function:
 
 $$L = \sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}.$$
 
-```python
+```{.python .input}
 def log_rmse(net, features, labels):
     # To further stabilize the value when the logarithm is taken, set the
     # value less than 1 as 1
@@ -686,7 +686,7 @@ def log_rmse(net, features, labels):
     return np.sqrt(2 * loss(np.log(clipped_preds), np.log(labels)).mean())
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def log_rmse(net,features,labels):
     # To further stabilize the value when the logarithm is taken, set the
@@ -697,7 +697,7 @@ def log_rmse(net,features,labels):
     return rmse.item()
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 log_rmse = tf.keras.losses.mean_squared_logarithmic_error
 ```
@@ -715,7 +715,7 @@ to the initial learning rate.
 This will be covered in further detail later on
 when we discuss the details in :numref:`chap_optimization`.
 
-```python
+```{.python .input}
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
     train_ls, test_ls = [], []
@@ -735,7 +735,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
     return train_ls, test_ls
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
@@ -758,7 +758,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
     return train_ls, test_ls
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
@@ -797,7 +797,7 @@ if our dataset was considerably larger.
 But this added complexity might obfuscate our code unnecessarily
 so we can safely omit it here owing to the simplicity of our problem.
 
-```python
+```{.python .input}
 def get_k_fold_data(k, i, X, y):
     assert k > 1
     fold_size = X.shape[0] // k
@@ -815,7 +815,7 @@ def get_k_fold_data(k, i, X, y):
     return X_train, y_train, X_valid, y_valid
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def get_k_fold_data(k, i, X, y):
     assert k > 1
@@ -834,7 +834,7 @@ def get_k_fold_data(k, i, X, y):
     return X_train, y_train, X_valid, y_valid
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def get_k_fold_data(k, i, X, y):
     assert k > 1
@@ -856,7 +856,7 @@ def get_k_fold_data(k, i, X, y):
 The training and verification error averages are returned
 when we train $k$ times in the k-fold cross-validation.
 
-```python
+```{.python .input}
 def k_fold(k, X_train, y_train, num_epochs,
            learning_rate, weight_decay, batch_size):
     train_l_sum, valid_l_sum = 0, 0
@@ -876,7 +876,7 @@ def k_fold(k, X_train, y_train, num_epochs,
     return train_l_sum / k, valid_l_sum / k
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def k_fold(k, X_train, y_train, num_epochs,
            learning_rate, weight_decay, batch_size):
@@ -897,7 +897,7 @@ def k_fold(k, X_train, y_train, num_epochs,
     return train_l_sum / k, valid_l_sum / k
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def k_fold(k, X_train, y_train, num_epochs,
            learning_rate, weight_decay, batch_size):
@@ -932,7 +932,7 @@ However, if we try an unreasonably large number of options
 we might just get lucky and find that our validation
 performance is no longer representative of the true error.
 
-```python
+```{.python .input}
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
 train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
                           weight_decay, batch_size)
@@ -940,7 +940,7 @@ print('%d-fold validation: avg train rmse: %f, avg valid rmse: %f'
       % (k, train_l, valid_l))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
 train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
@@ -949,7 +949,7 @@ print('%d-fold validation: avg train rmse: %f, avg valid rmse: %f'
       % (k, train_l, valid_l))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
 train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
@@ -979,7 +979,7 @@ can then be applied to the test set.
 Saving the estimates in a CSV file
 will simplify uploading the results to Kaggle.
 
-```python
+```{.python .input}
 def train_and_pred(train_features, test_feature, train_labels, test_data,
                    num_epochs, lr, weight_decay, batch_size):
     net = get_net()
@@ -996,7 +996,7 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     submission.to_csv('submission.csv', index=False)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def train_and_pred(train_features, test_feature, train_labels, test_data,
                    num_epochs, lr, weight_decay, batch_size):
@@ -1014,7 +1014,7 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     submission.to_csv('submission.csv', index=False)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def train_and_pred(train_features, test_feature, train_labels, test_data,
                    num_epochs, lr, weight_decay, batch_size):
@@ -1039,18 +1039,18 @@ If they do, it is time to upload them to Kaggle.
 The following code will generate a file called `submission.csv`
 (CSV is one of the file formats accepted by Kaggle):
 
-```python
+```{.python .input}
 train_and_pred(train_features, test_features, train_labels, test_data,
                num_epochs, lr, weight_decay, batch_size)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 train_and_pred(train_features, test_features, train_labels, test_data,
                num_epochs, lr, weight_decay, batch_size)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 train_and_pred(train_features, test_features, train_labels, test_data,
                num_epochs, lr, weight_decay, batch_size)

@@ -426,6 +426,6 @@ This is equal to the ratio between the number of correct predictions and the tot
 
 [Discussions](https://discuss.d2l.ai/t/46)
 
-```python
+```{.python .input}
 
 ```

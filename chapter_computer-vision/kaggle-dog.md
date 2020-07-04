@@ -15,7 +15,7 @@ In this competition, we attempt to identify 120 different breeds of dogs. The da
 
 First, import the packages or modules required for the competition.
 
-```python
+```{.python .input}
 import collections
 from d2l import mxnet as d2l
 import math
@@ -44,7 +44,7 @@ You may have noticed that the above structure is quite similar to that of the CI
 
 Similarly, to make it easier to get started, we provide a small-scale sample of the dataset mentioned above, "train_valid_test_tiny.zip". If you are going to use the full dataset for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
 
-```python
+```{.python .input}
 #@save 
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
@@ -64,7 +64,7 @@ We can organize the dataset similarly to what we did in :numref:`sec_kaggle_cifa
 
 The `reorg_dog_data` function below is used to read the training data labels, segment the validation set, and organize the training set.
 
-```python
+```{.python .input}
 def reorg_dog_data(data_dir, valid_ratio):
     labels = d2l.read_csv_labels(os.path.join(data_dir, 'labels.csv'))
     d2l.reorg_train_valid(data_dir, labels, valid_ratio)
@@ -79,7 +79,7 @@ reorg_dog_data(data_dir, valid_ratio)
 
 The size of the images in this section are larger than the images in the previous section. Here are some more image augmentation operations that might be useful.
 
-```python
+```{.python .input}
 transform_train = gluon.data.vision.transforms.Compose([
     # Randomly crop the image to obtain an image with an area of 0.08 to 1 of
     # the original area and height to width ratio between 3/4 and 4/3. Then,
@@ -102,7 +102,7 @@ transform_train = gluon.data.vision.transforms.Compose([
 
 During testing, we only use definite image preprocessing operations.
 
-```python
+```{.python .input}
 transform_test = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.Resize(256),
     # Crop a square of 224 by 224 from the center of the image
@@ -116,7 +116,7 @@ transform_test = gluon.data.vision.transforms.Compose([
 
 As in the previous section, we can create an `ImageFolderDataset` instance to read the dataset containing the original image files.
 
-```python
+```{.python .input}
 train_ds, valid_ds, train_valid_ds, test_ds = [
     gluon.data.vision.ImageFolderDataset(
         os.path.join(data_dir, 'train_valid_test', folder))
@@ -125,7 +125,7 @@ train_ds, valid_ds, train_valid_ds, test_ds = [
 
 Here, we create `DataLoader` instances, just like in :numref:`sec_kaggle_cifar10`.
 
-```python
+```{.python .input}
 train_iter, train_valid_iter = [gluon.data.DataLoader(
     dataset.transform_first(transform_train), batch_size, shuffle=True, 
     last_batch='keep') for dataset in (train_ds, train_valid_ds)]
@@ -155,7 +155,7 @@ model parameter gradients.
 
 You must note that, during image augmentation, we use the mean values and standard deviations of the three RGB channels for the entire ImageNet dataset for normalization. This is consistent with the normalization of the pre-trained model.
 
-```python
+```{.python .input}
 def get_net(ctx):
     finetune_net = gluon.model_zoo.vision.resnet34_v2(pretrained=True)
     # Define a new output network
@@ -172,7 +172,7 @@ def get_net(ctx):
 
 When calculating the loss, we first use the member variable `features` to obtain the input of the pre-trained model's output layer, i.e., the extracted feature. Then, we use this feature as the input for our small custom output network and compute the output.
 
-```python
+```{.python .input}
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
 def evaluate_loss(data_iter, net, ctx):
@@ -190,7 +190,7 @@ def evaluate_loss(data_iter, net, ctx):
 
 We will select the model and tune hyper-parameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
 
-```python
+```{.python .input}
 def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
           lr_decay):
     # Only train the small custom output network
@@ -225,7 +225,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 
 Now, we can train and validate the model. The following hyper-parameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
 
-```python
+```{.python .input}
 ctx, num_epochs, lr, wd = d2l.try_gpu(), 1, 0.01, 1e-4
 lr_period, lr_decay, net = 10, 0.1, get_net(ctx)
 net.hybridize()
@@ -237,7 +237,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 
 After obtaining a satisfactory model design and hyper-parameters, we use all training datasets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
 
-```python
+```{.python .input}
 net = get_net(ctx)
 net.hybridize()
 train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,

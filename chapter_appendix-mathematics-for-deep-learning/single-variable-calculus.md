@@ -14,7 +14,7 @@ The question then becomes something that on the surface is no easier: how do we 
 
 Let us take $x$ and try to understand what happens when we change it by a small amount to $x + \epsilon$. If you wish to be concrete, think a number like $\epsilon = 0.0000001$.  To help us visualize what happens, let us graph an example function, $f(x) = \sin(x^x)$, over the $[0, 3]$.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -27,7 +27,7 @@ ys = np.sin(x_big**x_big)
 d2l.plot(x_big, ys, 'x', 'f(x)')
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -43,14 +43,14 @@ d2l.plot(x_big, ys, 'x', 'f(x)')
 
 At this large scale, the function's behavior is not simple. However, if we reduce our range to something smaller like $[1.75,2.25]$, we see that the graph becomes much simpler.
 
-```python
+```{.python .input}
 # Plot a the same function in a tiny range
 x_med = np.arange(1.75, 2.25, 0.001)
 ys = np.sin(x_med**x_med)
 d2l.plot(x_med, ys, 'x', 'f(x)')
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Plot a the same function in a tiny range
 x_med = torch.arange(1.75, 2.25, 0.001)
@@ -60,14 +60,14 @@ d2l.plot(x_med, ys, 'x', 'f(x)')
 
 Taking this to an extreme, if we zoom into a tiny segment, the behavior becomes far simpler: it is just a straight line.
 
-```python
+```{.python .input}
 # Plot a the same function in a tiny range
 x_small = np.arange(2.0, 2.01, 0.0001)
 ys = np.sin(x_small**x_small)
 d2l.plot(x_small, ys, 'x', 'f(x)')
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Plot a the same function in a tiny range
 x_small = torch.arange(2.0, 2.01, 0.0001)
@@ -233,7 +233,7 @@ $$
 
 approximates the value of $f$ by a line which passes through the point $(x, f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
 
-```python
+```{.python .input}
 # Compute sin
 xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
@@ -245,7 +245,7 @@ for x0 in [-1.5, 0, 2]:
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Compute sin
 xs = torch.arange(-torch.pi, torch.pi, 0.01)
@@ -301,7 +301,7 @@ $$
 
 If we have some original function $f(x)$ in mind, we may compute the first two derivatives and find the values for $a, b$, and $c$ that make them match this computation.  Similarly to the previous section where we saw that the first derivative gave the best approximation with a straight line, this construction provides the best approximation by a quadratic.  Let us visualize this for $f(x) = \sin(x)$.
 
-```python
+```{.python .input}
 # Compute sin
 xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
@@ -314,7 +314,7 @@ for x0 in [-1.5, 0, 2]:
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Compute sin
 xs = torch.arange(-torch.pi, torch.pi, 0.01)
@@ -382,7 +382,7 @@ $$
 
 Let us see how this works in code and observe how increasing the degree of the Taylor approximation brings us closer to the desired function $e^x$.
 
-```python
+```{.python .input}
 # Compute the exponential function
 xs = np.arange(0, 3, 0.01)
 ys = np.exp(xs)
@@ -397,7 +397,7 @@ d2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend=[
     "Degree 5 Taylor Series"])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Compute the exponential function
 xs = torch.arange(0, 3, 0.01)

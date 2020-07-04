@@ -44,7 +44,7 @@ One nice thing about this example will be that we know the answer going in.  Ind
 
 For our example, the plot of $P(X \mid \theta)$ is as follows:
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
@@ -99,7 +99,7 @@ $$
 
 This can be written into code, and freely optimized even for billions of coin flips.
 
-```python
+```{.python .input}
 # Set up our data
 n_H = 8675309
 n_T = 25624

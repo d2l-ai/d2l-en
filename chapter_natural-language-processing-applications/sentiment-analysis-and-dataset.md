@@ -5,7 +5,7 @@ Text classification is a common task in natural language processing, which trans
 
 This section will focus on loading data for one of the sub-questions in this field: using text sentiment classification to analyze the emotions of the text's author. This problem is also called sentiment analysis and has a wide range of applications. For example, we can analyze user reviews of products to obtain user satisfaction statistics, or analyze user sentiments about market conditions and use it to predict future trends.
 
-```python
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 import os
@@ -20,7 +20,7 @@ We use Stanford's [Large Movie Review Dataset](https://ai.stanford.edu/~amaas/da
 
 We first download this dataset to the "../data" path and extract it to "../data/aclImdb".
 
-```python
+```{.python .input}
 #@save
 d2l.DATA_HUB['aclImdb'] = (
     'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
@@ -31,7 +31,7 @@ data_dir = d2l.download_extract('aclImdb', 'aclImdb')
 
 Next, read the training and test datasets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
 
-```python
+```{.python .input}
 #@save
 def read_imdb(data_dir, is_train):
     data, labels = [], []
@@ -55,7 +55,7 @@ for x, y in zip(train_data[0][:3], train_data[1][:3]):
 
 We use a word as a token, and then create a dictionary based on the training dataset.
 
-```python
+```{.python .input}
 train_tokens = d2l.tokenize(train_data[0], token='word')
 vocab = d2l.Vocab(train_tokens, min_freq=5, reserved_tokens=['<pad>'])
 
@@ -67,7 +67,7 @@ d2l.plt.hist([len(line) for line in train_tokens], bins=range(0, 1000, 50));
 
 Because the reviews have different lengths, so they cannot be directly combined into minibatches. Here we fix the length of each comment to 500 by truncating or adding "&lt;unk&gt;" indices.
 
-```python
+```{.python .input}
 num_steps = 500  # sequence length
 train_features = np.array([d2l.truncate_pad(
     vocab[line], num_steps, vocab['<pad>']) for line in train_tokens])
@@ -78,7 +78,7 @@ train_features.shape
 
 Now, we will create a data iterator. Each iteration will return a minibatch of data.
 
-```python
+```{.python .input}
 train_iter = d2l.load_array((train_features, train_data[1]), 64)
 
 for X, y in train_iter:
@@ -91,7 +91,7 @@ for X, y in train_iter:
 
 Last, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
 
-```python
+```{.python .input}
 #@save
 def load_data_imdb(batch_size, num_steps=500):
     data_dir = d2l.download_extract('aclImdb', 'aclImdb')

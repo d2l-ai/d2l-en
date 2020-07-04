@@ -9,7 +9,7 @@ First, import the
 packages and
 modules required for the experiment.
 
-```python
+```{.python .input}
 from collections import defaultdict
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx, cpu
@@ -26,7 +26,7 @@ First, we
 read the PTB dataset, build a vocabulary with words and map each token into an
 index to construct the corpus.
 
-```python
+```{.python .input}
 sentences = d2l.read_ptb()
 vocab = d2l.Vocab(sentences, min_freq=10)
 corpus = [vocab[line] for line in sentences]
@@ -44,7 +44,7 @@ contribute $1/d$ to the total count. This is one way to account for the fact
 that very distant word pairs are expected to contain less relevant information
 about the words’ relationship to one another.
 
-```python
+```{.python .input}
 def get_coocurrence_counts(corpus, window_size):
     centers, contexts = [], []
     cooccurence_counts = defaultdict(float)
@@ -73,7 +73,7 @@ We create an artificial dataset containing two sentences of 5 and 2 words,
 respectively. Assume the maximum context window is 4. Then, we print the
 cooccurrence counts of all the central target words and context words.
 
-```python
+```{.python .input}
 tiny_dataset = [list(range(5)), list(range(5, 7))]
 print('dataset', tiny_dataset)
 for center, context, coocurrence in get_coocurrence_counts(tiny_dataset, 4):
@@ -85,7 +85,7 @@ We set the maximum context window size to 5. The following extracts all the
 central target words and their context words in the dataset, and calculate their
 cooccurrence counts
 
-```python
+```{.python .input}
 coocurrence_matrix = get_coocurrence_counts(corpus, 5)
 '# center-context pairs: %d' % len(coocurrence_matrix)
 ```
@@ -95,7 +95,7 @@ coocurrence_matrix = get_coocurrence_counts(corpus, 5)
 Last, We define the load_data_ptb_glove
 function that read the PTB dataset and return the data loader.
 
-```python
+```{.python .input}
 def load_data_ptb_glove(batch_size, window_size):
     num_workers = d2l.get_dataloader_workers()
     sentences = d2l.read_ptb()
@@ -113,7 +113,7 @@ data_iter, vocab = load_data_ptb_glove(batch_size, window_size)
 
 Let’s print the first minibatch of the data iterator.
 
-```python
+```{.python .input}
 names = ['center', 'context', 'Cooccurence']
 for batch in data_iter:
     for name, data in zip(names, batch):
@@ -149,7 +149,7 @@ implement the weighting function $h(x_{ij})$. Since $x_{ij}<x_{max}$is
 equivalent to $(\frac{x}{x_{max}})^\alpha < 1$, we can give the following
 implementation.
 
-```python
+```{.python .input}
 def compute_weight(x, x_max = 30, alpha = 0.75):
     w = (x / x_max) ** alpha
     return np.minimum(w, 1)
@@ -158,7 +158,7 @@ def compute_weight(x, x_max = 30, alpha = 0.75):
 The following prints the weight of the cooccurrence counts of all the central
 target words and context words when the $x_{max}$ set to 2 and $\alpha$ to 0.75
 
-```python
+```{.python .input}
 for center, context, coocurrence in get_coocurrence_counts(tiny_dataset, 4)[:5]:
     print('center: %s, context: %s, coocurrence: %.2f, weight: %.2f' %
           (center, context, coocurrence, compute_weight(coocurrence, x_max = 2, alpha = 0.75)))
@@ -174,7 +174,7 @@ number of columns is one.
 
 We set the dictionary size to  20.
 
-```python
+```{.python .input}
 embed_bias = nn.Embedding(input_dim=20, output_dim=1)
 embed_bias.initialize()
 embed_bias.weight
@@ -184,7 +184,7 @@ The input of the embedding layer is the index of the word. When we enter the
 index $i$ of a word, the embedding layer returns the $i$ th row of the weight
 value as its bias term.
 
-```python
+```{.python .input}
 x = np.array([1, 2, 3])
 embed_bias(x)
 ```
@@ -208,7 +208,7 @@ vectors by the
 word embedding
 layer.
 
-```python
+```{.python .input}
 def GloVe(center, context, coocurrence, embed_v, embed_u,
           bias_v, bias_u, x_max, alpha):
     # Shape of v: (batch_size, embed_size)
@@ -232,7 +232,7 @@ def GloVe(center, context, coocurrence, embed_v, embed_u,
 
 Verify that the output shape should be (batch size, ).
 
-```python
+```{.python .input}
 embed_word = nn.Embedding(input_dim=20, output_dim=4)
 embed_word.initialize()
 GloVe(np.ones((2)), np.ones((2)), np.ones((2)), embed_word, embed_word,
@@ -255,7 +255,7 @@ dimension `embed_size`
 to
 100.
 
-```python
+```{.python .input}
 embed_size = 100
 net = nn.Sequential()
 net.add(nn.Embedding(input_dim=len(vocab), output_dim=embed_size),
@@ -268,7 +268,7 @@ net.add(nn.Embedding(input_dim=len(vocab), output_dim=embed_size),
 
 The training function is defined below.
 
-```python
+```{.python .input}
 def train(net, data_iter, lr, num_epochs, x_max, alpha, ctx=d2l.try_gpu()):
     net.initialize(ctx=ctx, force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'AdaGrad',
@@ -296,7 +296,7 @@ def train(net, data_iter, lr, num_epochs, x_max, alpha, ctx=d2l.try_gpu()):
 
 Now, we can train a GloVe model.
 
-```python
+```{.python .input}
 lr, num_epochs = 0.1, 5
 x_max, alpha = 100, 0.75
 train(net, data_iter, lr, num_epochs, x_max, alpha)
@@ -316,7 +316,7 @@ After training the GloVe model, we can still represent
 similarity in meaning between words based on the cosine similarity of two word
 vectors.
 
-```python
+```{.python .input}
 def get_similar_tokens(query_token, k, embed_v, embed_u):
     W = embed_v.weight.data() + embed_u.weight.data()
     x = W[vocab[query_token]]

@@ -140,7 +140,7 @@ to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0).
 Also, `gpu:0` and `gpu` are equivalent.
 :end_tab:
 
-```python
+```{.python .input}
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -148,7 +148,7 @@ npx.set_np()
 npx.cpu(), npx.gpu(), npx.gpu(1)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 import torch
 from torch import nn
@@ -156,7 +156,7 @@ from torch import nn
 torch.device('cpu'), torch.cuda.device('cuda'), torch.cuda.device('cuda:1')
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 import tensorflow as tf
 
@@ -165,16 +165,16 @@ tf.device('/CPU:0'), tf.device('/GPU:0'), tf.device('/GPU:1')
 
 We can query the number of available GPUs.
 
-```python
+```{.python .input}
 npx.num_gpus()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 torch.cuda.device_count()
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 len(tf.config.experimental.list_physical_devices('GPU'))
 ```
@@ -182,7 +182,7 @@ len(tf.config.experimental.list_physical_devices('GPU'))
 Now we define two convenient functions that allow us
 to run codes even if the requested GPUs do not exist.
 
-```python
+```{.python .input}
 def try_gpu(i=0):  #@save
     """Return gpu(i) if exists, otherwise return cpu()."""
     return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
@@ -195,7 +195,7 @@ def try_all_gpus():  #@save
 try_gpu(), try_gpu(3), try_all_gpus()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def try_gpu(i=0):  #@save
     """Return gpu(i) if exists, otherwise return cpu()."""
@@ -212,7 +212,7 @@ def try_all_gpus():  #@save
 try_gpu(), try_gpu(3), try_all_gpus()
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def try_gpu(i=0):  #@save
     """Return gpu(i) if exists, otherwise return cpu()."""
@@ -234,18 +234,18 @@ try_gpu(), try_gpu(3), try_all_gpus()
 By default, tensors are created on the CPU.
 We can query the device where the tensor is located.
 
-```python
+```{.python .input}
 x = np.array([1, 2, 3])
 x.ctx
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x = torch.tensor([1, 2, 3])
 x.device
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 x = tf.constant([1, 2, 3])
 x.device
@@ -271,18 +271,18 @@ We can use the `nvidia-smi` command to view GPU memory usage.
 In general, we need to make sure we do not
 create data that exceeds the GPU memory limit.
 
-```python
+```{.python .input}
 x = np.ones((2, 3), ctx=try_gpu())
 x
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 x = torch.ones(2, 3, device=try_gpu())
 x
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 with try_gpu():
   x = tf.ones((2, 3))
@@ -291,18 +291,18 @@ x
 
 Assuming you have at least two GPUs, the following code will create a random array on the second GPU.
 
-```python
+```{.python .input}
 y = np.random.uniform(size=(2, 3), ctx=try_gpu(1))
 y
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 y = torch.randn(2, 3, device=try_gpu(1))
 y
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 with try_gpu(1):
   y = tf.random.uniform((2, 3))
@@ -328,20 +328,20 @@ it cannot find data on the same device and it fails.
 Since $\mathbf{y}$ lives on the second GPU,
 we need to move $\mathbf{x}$ there before we can add the two.
 
-```python
+```{.python .input}
 z = x.copyto(try_gpu(1))
 print(x)
 print(z)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 z = x.cuda(1)
 print(x)
 print(z)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 #@tab tensorflow
 with try_gpu(1):
@@ -354,16 +354,16 @@ Now that the data is on the same GPU
 (both $\mathbf{z}$ and $\mathbf{y}$ are),
 we can add them up.
 
-```python
+```{.python .input}
 y + z
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 y + z
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 y + z
 ```
@@ -390,16 +390,16 @@ What happens if we call still `z.cuda(1)`?
 It will returns `z` instead of make a copy and allocate new memory.
 :end_tab:
 
-```python
+```{.python .input}
 z.as_in_ctx(try_gpu(1)) is z
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 z.cuda(1) is z
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 with try_gpu(1):
   z2 = z
@@ -450,19 +450,19 @@ The following code put the model parameters on the GPU
 how to run models on GPUs in the following,
 simply since they will become somewhat more compute intensive).
 
-```python
+```{.python .input}
 net = nn.Sequential()
 net.add(nn.Dense(1))
 net.initialize(ctx=try_gpu())
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 net = nn.Sequential(nn.Linear(3, 1))
 net = net.to(device=try_gpu())
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 strategy = tf.distribute.MirroredStrategy()
 with strategy.scope():
@@ -474,32 +474,32 @@ with strategy.scope():
 
 When the input is a tensor on the GPU, Gluon will calculate the result on the same GPU.
 
-```python
+```{.python .input}
 net(x)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 net(x)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 net(x)
 ```
 
 Let us confirm that the model parameters are stored on the same GPU.
 
-```python
+```{.python .input}
 net[0].weight.data().ctx
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 net[0].weight.data.device
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 net.layers[1].weights[0].device, net.layers[1].weights[1].device
 ```

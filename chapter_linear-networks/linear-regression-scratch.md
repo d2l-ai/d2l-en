@@ -17,7 +17,7 @@ Afterwards, we will introduce a more compact implementation,
 taking advantage of framework's bells and whistles.
 To start off, we import the few required packages.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
@@ -25,8 +25,7 @@ import random
 npx.set_np()
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -34,15 +33,13 @@ import torch
 import random
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
 import random
 ```
-
 
 ```{.python .input}
 #@tab jax
@@ -84,7 +81,7 @@ that $\epsilon$ obeys a normal distribution with mean of $0$.
 To make our problem easy, we will set its standard deviation to $0.01$.
 The following code generates our synthetic dataset:
 
-```python
+```{.python .input}
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = X w + b + noise."""
     X = np.random.normal(0, 1, (num_examples, len(w)))
@@ -97,8 +94,7 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = X w + b + noise."""
@@ -112,8 +108,7 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = X w + b + noise."""
@@ -128,7 +123,6 @@ true_w = tf.constant([2, -3.4], shape=(2, 1))
 true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
-
 
 ```{.python .input}
 #@tab jax
