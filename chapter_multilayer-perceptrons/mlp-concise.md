@@ -46,11 +46,7 @@ net.initialize(init.Normal(sigma=0.01))
 
 ```{.python .input}
 #@tab pytorch
-class Reshape(torch.nn.Module):
-    def forward(self, x):
-        return x.view(-1,784)
-
-net = nn.Sequential(Reshape(),
+net = nn.Sequential(nn.Flatten(),
                     nn.Linear(784, 256),
                     nn.ReLU(),
                     nn.Linear(256, 10))
