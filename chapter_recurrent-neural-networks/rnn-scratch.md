@@ -306,7 +306,7 @@ def grad_clipping(model, theta):
 #@save
 def grad_clipping(model, theta):
     if isinstance(model, nn.Module):
-        params = [p.data for p in model.parameters() if p.requires_grad]
+        params = [p for p in model.parameters() if p.requires_grad]
     else:
         params = model.params
     
