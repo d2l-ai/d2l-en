@@ -437,8 +437,7 @@ import tarfile
 import time
 import zipfile
 import requests
-from sklearn.datasets import fetch_openml
-from sklearn.model_selection import train_test_split
+import tensorflow_datasets as tfds
 d2l = sys.modules[__name__]
 ```
 

@@ -44,11 +44,12 @@ d2l.use_svg_display()
 #@tab jax
 %matplotlib inline
 from d2l import jax as d2l
-import jax.numpy as np
 import jax
+import jax.numpy as np
 import numpy as onp
+import tensorflow_datasets as tfds
 import sys
-key = jax.random.PRNGKey(42) #randomness works a bit differently in JAX, see the #ndarray chapter
+key = jax.random.PRNGKey(42) # Randomness works a bit differently in JAX, see the #ndarray chapter
 d2l.use_svg_display()
 ```
 
@@ -80,13 +81,12 @@ mnist_test = torchvision.datasets.FashionMNIST(
 
 ```{.python .input}
 #@tab jax
-from sklearn.datasets import fetch_openml # Jax has no built-in function to load FashionMNIST so we need to fetch it over sklearn
-from sklearn.model_selection import train_test_split
-fashion_mnist = fetch_openml(name="Fashion-MNIST")
-mnist_train_x, mnist_test_x, mnist_train_y, mnist_test_y = train_test_split(fashion_mnist['data'],
-                                                                            fashion_mnist['target'],
-                                                                            test_size=10000,
-                                                                           )
+# Jax has no high-level API for dataset loading and handling so we use tensorflow_datasets
+mnist_data_loader = tfds.load(name="fashion_mnist", batch_size=-1, data_dir='/tmp/tfds', as_supervised=True)
+mnist_data = tfds.as_numpy(mnist_data_loader)
+
+mnist_train_x, mnist_train_y = mnist_data['train'][0], mnist_data['train'][1]
+mnist_test_x, mnist_test_y = mnist_data['test'][0], mnist_data['test'][1]
 ```
 
 FashionMNIST consists of images from 10 categories, each represented
@@ -110,7 +110,7 @@ len(mnist_train_x), len(mnist_test_x)
 
 ```{.python .input}
 #@tab jax 
-len(mnist_train_x), len(mnist_test_x)
+len(mnist_train_x), len(mnist_test_y)
 ```
 
 The images in Fashion-MNIST are associated with the following categories:
@@ -171,7 +171,7 @@ show_images(tf.constant(X, shape=(18, 28, 28)), 2, 9, titles=get_fashion_mnist_l
 ```{.python .input}
 #@tab jax
 X, y = mnist_train_x[:18], mnist_train_y[:18]
-show_images(X.reshape(18, 28, 28), 2, 9, titles=get_fashion_mnist_labels(y));
+show_images(X.reshape(18, 28, 28), 2, 9, titles=get_fashion_mnist_labels(y))
 ```
 
 ## Reading a Minibatch
@@ -235,23 +235,12 @@ train_iter = tf.data.Dataset.from_tensor_slices((mnist_train_x, mnist_train_y)).
 ```
 
 ```{.python .input}
-#@tab jax
-# TODO: decide whether to use this or the prebuilt tensorflow functions
+#@tab jax 
 batch_size = 256
-def data_loader(data, targets, b_size, rng_key): #@save
-    if len(targets.shape) == 1:
-        targets = targets[..., None]
-    while True:
-        # Generate new subkey every time to not sample the same minibatch data over and over
-        rng_key, subkey = jax.random.split(rng_key)
-        data = jax.random.permutation(subkey, data)
-        targets = jax.random.permutation(subkey, targets) # Shuffle data and targets in unison by using the same key
-
-        n_samples = data.shape[0]
-        idxs = onp.random.choice(n_samples, size=b_size, replace=False)
-        yield data[idxs], targets[idxs]
-    
-train_iter = data_loader(mnist_train_x, mnist_train_y, batch_size, key)
+# as_supervised=True gives us the (image, label) as a tuple instead of a dict
+ds = tfds.load(name='fashion_mnist', split='train', as_supervised=True, data_dir='/tmp/tfds')
+ds = ds.batch(batch_size).prefetch(1)
+train_iter = tfds.as_numpy(ds)
 ```
 
 Let us look at the time it takes to read the training data.
@@ -343,16 +332,11 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 #@tab jax
 def load_data_fashion_mnist(batch_size, resize=None): #@save
     """Download the Fashion-MNIST dataset and then load into memory."""
-    # TODO: Resize
-    rng_key = jax.random.PRNGKey(24)
-    fashion_mnist = fetch_openml(name="Fashion-MNIST")
-    mnist_train_x, mnist_test_x, mnist_train_y, mnist_test_y = train_test_split(fashion_mnist['data'],
-                                                                            fashion_mnist['target'],
-                                                                            test_size=10000,
-                                                                         )
-    return (
-        data_loader(mnist_train_x, mnist_train_y, batch_size, rng_key), data_loader(
-        mnist_test_x, mnist_test_y, batch_size, rng_key))
+    ds_train = tfds.load(name='fashion_mnist', split='train', as_supervised=True, data_dir='/tmp/tfds')
+    ds_test = tfds.load(name='fashion_mnist', split='test', as_supervised=True, data_dir='/tmp/tfds')
+    ds_train = ds_train.batch(batch_size).prefetch(1)
+    ds_test = ds_test.batch(batch_size).prefetch(1)
+    return tfds.as_numpy(ds_train), tfds.as_numpy(ds_test)
 ```
 
 Below, we verify that image resizing works.

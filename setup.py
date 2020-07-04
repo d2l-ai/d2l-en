@@ -7,7 +7,7 @@ requirements = [
     'numpy',
     'matplotlib',
     'pandas',
-    'scikit-learn',
+    'tensorflow-datasets',
 ]
 
 # don't import d2l to get __version__ since it has deps
