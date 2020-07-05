@@ -34,6 +34,7 @@ Different choices of the score function lead to different attention layers. Belo
 
 ```{.python .input  n=1}
 import math
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
