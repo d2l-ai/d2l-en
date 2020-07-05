@@ -173,8 +173,7 @@ class Seq2SeqDecoder(d2l.Decoder):
     def forward(self, X, state):
         X = self.embedding(X).permute(1, 0, 2)
         out, state = self.rnn(X, state)
-        # Make the batch to be the first dimension to simplify loss
-        # computation
+        # Make the batch to be the first dimension to simplify loss computation
         out = self.dense(out).permute(1, 0, 2)
         return out, state
 ```
