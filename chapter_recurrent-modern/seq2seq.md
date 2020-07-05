@@ -435,7 +435,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
         # The token with highest score is used as the next timestep input
-        dec_X = Y.argmax(axis=2)
+        dec_X = Y.argmax(dim=2)
         py = dec_X.squeeze(dim=0).type(torch.int32).item()
         if py == tgt_vocab['<eos>']:
             break
