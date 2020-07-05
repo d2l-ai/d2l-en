@@ -41,6 +41,7 @@ npx.set_np()
 
 ```{.python .input}
 #@tab pytorch
+from d2l import torch as d2l
 import math
 import torch
 from torch import nn
@@ -84,9 +85,7 @@ def masked_softmax(X, valid_len):
         else:
             valid_len = valid_len.reshape(-1)
         # Fill masked elements with a large negative, whose exp is 0
-        X = X.reshape(-1, shape[-1])
-        for count, row in enumerate(X):
-            row[int(valid_len[count]):]=-1e6
+        X = d2l.sequence_mask(X.reshape(-1, shape[-1]), valid_len, value=-1e6)
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 ```
 

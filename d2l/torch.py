@@ -881,6 +881,128 @@ class EncoderDecoder(nn.Module):
         return self.decoder(dec_X, dec_state)
 
 
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+class Seq2SeqEncoder(d2l.Encoder):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0, **kwargs):
+        super(Seq2SeqEncoder, self).__init__(**kwargs)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = nn.LSTM(embed_size, num_hiddens, num_layers, dropout=dropout)
+
+    def forward(self, X, *args):
+        X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
+        # RNN needs first axes to be timestep, i.e., seq_len
+        X = X.permute(1, 0, 2)
+        out, state = self.rnn(X) # When state is not mentioned, it defaults to zeros
+        # out shape: (seq_len, batch_size, num_hiddens)
+        # state shape: (num_layers, batch_size, num_hiddens),
+        # where "state" contains the hidden state and the memory cell
+        return out, state
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+class Seq2SeqDecoder(d2l.Decoder):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0, **kwargs):
+        super(Seq2SeqDecoder, self).__init__(**kwargs)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = nn.LSTM(embed_size, num_hiddens, num_layers, dropout=dropout)
+        self.dense = nn.Linear(num_hiddens, vocab_size)
+
+    def init_state(self, enc_outputs, *args):
+        return enc_outputs[1]
+
+    def forward(self, X, state):
+        X = self.embedding(X).permute(1, 0, 2)
+        out, state = self.rnn(X, state)
+        # Make the batch to be the first dimension to simplify loss
+        # computation
+        out = self.dense(out).permute(1, 0, 2)
+        return out, state
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+def sequence_mask(X, valid_len, value=0):
+    output = X.clone()
+    for count, matrix in enumerate(output):
+        matrix[int(valid_len[count]):]=value
+    return output
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
+    # pred shape: (batch_size, seq_len, vocab_size)
+    # label shape: (batch_size, seq_len)
+    # valid_len shape: (batch_size, )
+    def forward(self, pred, label, valid_len):
+        weights = torch.ones_like(label)
+        weights = sequence_mask(weights, valid_len)
+        self.reduction='none'
+        unweighted_loss = super(MaskedSoftmaxCELoss, self).forward(pred.permute(0,2,1), label)
+        weighted_loss = (unweighted_loss*weights).mean(dim=1)
+        return weighted_loss
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
+    def xavier_init_weights(m):
+        if type(m) == nn.Linear:
+            torch.nn.init.xavier_uniform_(m.weight)
+        if type(m) == nn.LSTM:
+            for param in m._flat_weights_names:
+                if "weight" in param:
+                    torch.nn.init.xavier_uniform_(m._parameters[param])
+    model.apply(xavier_init_weights)
+    model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    loss = MaskedSoftmaxCELoss()
+    model.train()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[1, num_epochs], ylim=[0, 0.25])
+    for epoch in range(1, num_epochs + 1):
+        timer = d2l.Timer()
+        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
+        for batch in data_iter:
+            X, X_vlen, Y, Y_vlen = [x.to(device) for x in batch]
+            Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
+            Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
+            l = loss(Y_hat, Y_label, Y_vlen)
+            l.sum().backward() # Making the loss scalar for backward()
+            d2l.grad_clipping(model, 1)
+            num_tokens = Y_vlen.sum()
+            optimizer.step()
+            with torch.no_grad():
+                metric.add(l.sum(), num_tokens)
+        if epoch % 10 == 0:
+            animator.add(epoch, (metric[0]/metric[1],))
+    print('loss %.3f, %d tokens/sec on %s ' % (
+        metric[0]/metric[1], metric[1]/timer.stop(), device))
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
+                    device):
+    src_tokens = src_vocab[src_sentence.lower().split(' ')]
+    enc_valid_len = torch.Tensor([len(src_tokens)], device=device)
+    src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
+    enc_X = torch.Tensor(src_tokens, device=device).long()
+    # Add the  batch size dimension
+    enc_outputs = model.encoder(torch.unsqueeze(enc_X, dim=0),
+                                enc_valid_len)
+    dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
+    dec_X = torch.unsqueeze(torch.Tensor([tgt_vocab['<bos>']], device=device).long(), dim=0)
+    predict_tokens = []
+    for _ in range(num_steps):
+        Y, dec_state = model.decoder(dec_X, dec_state)
+        # The token with highest score is used as the next timestep input
+        dec_X = Y.argmax(axis=2)
+        py = dec_X.squeeze(dim=0).type(torch.int32).item()
+        if py == tgt_vocab['<eos>']:
+            break
+        predict_tokens.append(py)
+    return ' '.join(tgt_vocab.to_tokens(predict_tokens))
+
+
 # Defined in file: ./chapter_attention-mechanisms/attention.md
 def masked_softmax(X, valid_len):
     """Perform softmax by filtering out some elements."""
@@ -895,9 +1017,7 @@ def masked_softmax(X, valid_len):
         else:
             valid_len = valid_len.reshape(-1)
         # Fill masked elements with a large negative, whose exp is 0
-        X = X.reshape(-1, shape[-1])
-        for count, row in enumerate(X):
-            row[int(valid_len[count]):]=-1e6
+        X = d2l.sequence_mask(X.reshape(-1, shape[-1]), valid_len, value=-1e6)
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 
 

@@ -20,6 +20,13 @@ from mxnet.gluon import nn, rnn
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
 ## Encoder
 
 Recall that the encoder of seq2seq can transform the inputs of variable length to a fixed-length context vector $\mathbf{c}$ by encoding the sequence information into $\mathbf{c}$. We usually use RNN layers within the encoder.
@@ -63,6 +70,27 @@ class Seq2SeqEncoder(d2l.Encoder):
         return out, state
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+class Seq2SeqEncoder(d2l.Encoder):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0, **kwargs):
+        super(Seq2SeqEncoder, self).__init__(**kwargs)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = nn.LSTM(embed_size, num_hiddens, num_layers, dropout=dropout)
+
+    def forward(self, X, *args):
+        X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
+        # RNN needs first axes to be timestep, i.e., seq_len
+        X = X.permute(1, 0, 2)
+        out, state = self.rnn(X) # When state is not mentioned, it defaults to zeros
+        # out shape: (seq_len, batch_size, num_hiddens)
+        # state shape: (num_layers, batch_size, num_hiddens),
+        # where "state" contains the hidden state and the memory cell
+        return out, state
+```
+
 Next, we will create a minibatch sequence input with a batch size of 4 and 7 timesteps. We assume the number of hidden layers of the LSTM unit is 2 and the number of hidden units is 16. The output shape returned by the encoder after performing forward calculation on the input is (number of timesteps, batch size, number of hidden units). The shape of the multi-layer hidden state of the gated recurrent unit in the final timestep is (number of hidden layers, batch size, number of hidden units). For the gated recurrent unit, the `state` list contains only one element, which is the hidden state. If long short-term memory is used, the `state` list will also contain another element, which is the memory cell.
 
 ```{.python .input  n=3}
@@ -74,9 +102,20 @@ output, state = encoder(X)
 output.shape
 ```
 
+```{.python .input}
+#@tab pytorch
+encoder = Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
+                         num_layers=2)
+encoder.eval()
+X = torch.zeros(4, 7).long()
+output, state = encoder(X)
+output.shape
+```
+
 Since an LSTM is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units). However, if a GRU is used, the `state` list will contain only one element---the hidden state in the final timestep with shape (number of hidden layers, batch size, number of hidden units).
 
 ```{.python .input  n=4}
+#@tab all
 len(state), state[0].shape, state[1].shape
 ```
 
@@ -117,12 +156,45 @@ class Seq2SeqDecoder(d2l.Decoder):
         return out, state
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+class Seq2SeqDecoder(d2l.Decoder):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0, **kwargs):
+        super(Seq2SeqDecoder, self).__init__(**kwargs)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = nn.LSTM(embed_size, num_hiddens, num_layers, dropout=dropout)
+        self.dense = nn.Linear(num_hiddens, vocab_size)
+
+    def init_state(self, enc_outputs, *args):
+        return enc_outputs[1]
+
+    def forward(self, X, state):
+        X = self.embedding(X).permute(1, 0, 2)
+        out, state = self.rnn(X, state)
+        # Make the batch to be the first dimension to simplify loss
+        # computation
+        out = self.dense(out).permute(1, 0, 2)
+        return out, state
+```
+
 We create a decoder with the same hyperparameters as the encoder. As we can see, the output shape is changed to (batch size, the sequence length, vocabulary size).
 
 ```{.python .input  n=6}
 decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8,
                          num_hiddens=16, num_layers=2)
 decoder.initialize()
+state = decoder.init_state(encoder(X))
+out, state = decoder(X, state)
+out.shape, len(state), state[0].shape, state[1].shape
+```
+
+```{.python .input}
+#@tab pytorch
+decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8,
+                         num_hiddens=16, num_layers=2)
+decoder.eval()
 state = decoder.init_state(encoder(X))
 out, state = decoder(X, state)
 out.shape, len(state), state[0].shape, state[1].shape
@@ -139,11 +211,31 @@ X = np.array([[1, 2, 3], [4, 5, 6]])
 npx.sequence_mask(X, np.array([1, 2]), True, axis=1)
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def sequence_mask(X, valid_len, value=0):
+    output = X.clone()
+    for count, matrix in enumerate(output):
+        matrix[int(valid_len[count]):]=value
+    return output
+
+X = torch.tensor([[1, 2, 3], [4, 5, 6]])
+sequence_mask(X, torch.tensor([1, 2]))
+```
+
 Apply to $n$-dim tensor $X$, it sets `X[i, len[i]:, :, ..., :] = 0`. In addition, we can specify the filling value such as $-1$ as shown below.
 
 ```{.python .input  n=8}
 X = np.ones((2, 3, 4))
 npx.sequence_mask(X, np.array([1, 2]), True, value=-1, axis=1)
+```
+
+```{.python .input}
+#@tab pytorch
+X = torch.ones(2, 3, 4)
+valid_len=torch.tensor([1, 2])
+sequence_mask(X, torch.tensor([1, 2]), value=-1)
 ```
 
 Now we can implement the masked version of the softmax cross-entropy loss. Note that each Gluon loss function allows to specify per-example weights, in default they are 1s. Then we can just use a zero weight for each example we would like to remove. So our customized loss function accepts an additional `valid_len` argument to ignore some failing elements in each sequence.
@@ -161,11 +253,33 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
+    # pred shape: (batch_size, seq_len, vocab_size)
+    # label shape: (batch_size, seq_len)
+    # valid_len shape: (batch_size, )
+    def forward(self, pred, label, valid_len):
+        weights = torch.ones_like(label)
+        weights = sequence_mask(weights, valid_len)
+        self.reduction='none'
+        unweighted_loss = super(MaskedSoftmaxCELoss, self).forward(pred.permute(0,2,1), label)
+        weighted_loss = (unweighted_loss*weights).mean(dim=1)
+        return weighted_loss
+```
+
 For a sanity check, we create identical three sequences, keep 4 elements for the first sequence, 2 elements for the second sequence, and none for the last one. Then the first example loss should be 2 times larger than the second one, and the last loss should be 0.
 
 ```{.python .input  n=10}
 loss = MaskedSoftmaxCELoss()
 loss(np.ones((3, 4, 10)), np.ones((3, 4)), np.array([4, 2, 0]))
+```
+
+```{.python .input}
+#@tab pytorch
+loss = MaskedSoftmaxCELoss()
+loss(torch.ones(3, 4, 10), torch.ones(3, 4).long(), torch.tensor([4, 2, 0]))
 ```
 
 ## Training
@@ -202,6 +316,44 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
           f'tokens/sec on {str(ctx)}')
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
+    def xavier_init_weights(m):
+        if type(m) == nn.Linear:
+            torch.nn.init.xavier_uniform_(m.weight)
+        if type(m) == nn.LSTM:
+            for param in m._flat_weights_names:
+                if "weight" in param:
+                    torch.nn.init.xavier_uniform_(m._parameters[param])
+    model.apply(xavier_init_weights)
+    model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    loss = MaskedSoftmaxCELoss()
+    model.train()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[1, num_epochs], ylim=[0, 0.25])
+    for epoch in range(1, num_epochs + 1):
+        timer = d2l.Timer()
+        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
+        for batch in data_iter:
+            X, X_vlen, Y, Y_vlen = [x.to(device) for x in batch]
+            Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
+            Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
+            l = loss(Y_hat, Y_label, Y_vlen)
+            l.sum().backward() # Making the loss scalar for backward()
+            d2l.grad_clipping(model, 1)
+            num_tokens = Y_vlen.sum()
+            optimizer.step()
+            with torch.no_grad():
+                metric.add(l.sum(), num_tokens)
+        if epoch % 10 == 0:
+            animator.add(epoch, (metric[0]/metric[1],))
+    print('loss %.3f, %d tokens/sec on %s ' % (
+        metric[0]/metric[1], metric[1]/timer.stop(), device))
+```
+
 Next, we create a model instance and set hyperparameters. Then, we can train the model.
 
 ```{.python .input  n=15}
@@ -216,6 +368,21 @@ decoder = Seq2SeqDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
 train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
+```
+
+```{.python .input}
+#@tab pytorch
+embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
+batch_size, num_steps = 64, 10
+lr, num_epochs, device = 0.005, 300, d2l.try_gpu()
+
+src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
+encoder = Seq2SeqEncoder(
+    len(src_vocab), embed_size, num_hiddens, num_layers, dropout)
+decoder = Seq2SeqDecoder(
+    len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
+model = d2l.EncoderDecoder(encoder, decoder)
+train_s2s_ch9(model, train_iter, lr, num_epochs, device)
 ```
 
 ## Predicting
@@ -251,12 +418,45 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     return ' '.join(tgt_vocab.to_tokens(predict_tokens))
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
+                    device):
+    src_tokens = src_vocab[src_sentence.lower().split(' ')]
+    enc_valid_len = torch.Tensor([len(src_tokens)], device=device)
+    src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
+    enc_X = torch.Tensor(src_tokens, device=device).long()
+    # Add the  batch size dimension
+    enc_outputs = model.encoder(torch.unsqueeze(enc_X, dim=0),
+                                enc_valid_len)
+    dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
+    dec_X = torch.unsqueeze(torch.Tensor([tgt_vocab['<bos>']], device=device).long(), dim=0)
+    predict_tokens = []
+    for _ in range(num_steps):
+        Y, dec_state = model.decoder(dec_X, dec_state)
+        # The token with highest score is used as the next timestep input
+        dec_X = Y.argmax(axis=2)
+        py = dec_X.squeeze(dim=0).type(torch.int32).item()
+        if py == tgt_vocab['<eos>']:
+            break
+        predict_tokens.append(py)
+    return ' '.join(tgt_vocab.to_tokens(predict_tokens))
+```
+
 Try several examples:
 
 ```{.python .input  n=17}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
+```
+
+```{.python .input}
+#@tab pytorch
+for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
+    print(sentence + ' => ' + predict_s2s_ch9(
+        model, sentence, src_vocab, tgt_vocab, num_steps, device))
 ```
 
 ## Summary
