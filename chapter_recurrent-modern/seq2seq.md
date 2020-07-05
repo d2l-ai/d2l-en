@@ -107,7 +107,7 @@ output.shape
 encoder = Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
                          num_layers=2)
 encoder.eval()
-X = torch.zeros(4, 7).long()
+X = d2l.zeros((4, 7), dtype=torch.long)
 output, state = encoder(X)
 output.shape
 ```
