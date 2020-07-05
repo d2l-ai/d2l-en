@@ -915,8 +915,7 @@ class Seq2SeqDecoder(d2l.Decoder):
     def forward(self, X, state):
         X = self.embedding(X).permute(1, 0, 2)
         out, state = self.rnn(X, state)
-        # Make the batch to be the first dimension to simplify loss
-        # computation
+        # Make the batch to be the first dimension to simplify loss computation
         out = self.dense(out).permute(1, 0, 2)
         return out, state
 
@@ -975,27 +974,27 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
                 metric.add(l.sum(), num_tokens)
         if epoch % 10 == 0:
             animator.add(epoch, (metric[0]/metric[1],))
-    print('loss %.3f, %d tokens/sec on %s ' % (
-        metric[0]/metric[1], metric[1]/timer.stop(), device))
+    print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
+          f'tokens/sec on {str(device)}')
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
-    enc_valid_len = torch.Tensor([len(src_tokens)], device=device)
+    enc_valid_len = torch.tensor([len(src_tokens)], device=device)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
-    enc_X = torch.Tensor(src_tokens, device=device).long()
+    enc_X = torch.tensor(src_tokens, dtype=torch.long, device=device)
     # Add the  batch size dimension
     enc_outputs = model.encoder(torch.unsqueeze(enc_X, dim=0),
                                 enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
-    dec_X = torch.unsqueeze(torch.Tensor([tgt_vocab['<bos>']], device=device).long(), dim=0)
+    dec_X = torch.unsqueeze(torch.tensor([tgt_vocab['<bos>']], dtype=torch.long, device=device), dim=0)
     predict_tokens = []
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
         # The token with highest score is used as the next timestep input
-        dec_X = Y.argmax(axis=2)
+        dec_X = Y.argmax(dim=2)
         py = dec_X.squeeze(dim=0).type(torch.int32).item()
         if py == tgt_vocab['<eos>']:
             break

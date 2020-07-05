@@ -20,7 +20,7 @@ from mxnet.gluon import nn, rnn
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=1}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -70,7 +70,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         return out, state
 ```
 
-```{.python .input}
+```{.python .input  n=2}
 #@tab pytorch
 #@save
 class Seq2SeqEncoder(d2l.Encoder):
@@ -97,17 +97,17 @@ Next, we will create a minibatch sequence input with a batch size of 4 and 7 tim
 encoder = Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
                          num_layers=2)
 encoder.initialize()
-X = np.zeros((4, 7))
+X = d2l.zeros((4, 7))
 output, state = encoder(X)
 output.shape
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 #@tab pytorch
 encoder = Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
                          num_layers=2)
 encoder.eval()
-X = torch.zeros(4, 7).long()
+X = d2l.zeros((4, 7), dtype=torch.long)
 output, state = encoder(X)
 output.shape
 ```
@@ -150,13 +150,12 @@ class Seq2SeqDecoder(d2l.Decoder):
     def forward(self, X, state):
         X = self.embedding(X).swapaxes(0, 1)
         out, state = self.rnn(X, state)
-        # Make the batch to be the first dimension to simplify loss
-        # computation
+        # Make the batch to be the first dimension to simplify loss computation
         out = self.dense(out).swapaxes(0, 1)
         return out, state
 ```
 
-```{.python .input}
+```{.python .input  n=5}
 #@tab pytorch
 #@save
 class Seq2SeqDecoder(d2l.Decoder):
@@ -173,8 +172,7 @@ class Seq2SeqDecoder(d2l.Decoder):
     def forward(self, X, state):
         X = self.embedding(X).permute(1, 0, 2)
         out, state = self.rnn(X, state)
-        # Make the batch to be the first dimension to simplify loss
-        # computation
+        # Make the batch to be the first dimension to simplify loss computation
         out = self.dense(out).permute(1, 0, 2)
         return out, state
 ```
@@ -190,7 +188,7 @@ out, state = decoder(X, state)
 out.shape, len(state), state[0].shape, state[1].shape
 ```
 
-```{.python .input}
+```{.python .input  n=6}
 #@tab pytorch
 decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8,
                          num_hiddens=16, num_layers=2)
@@ -211,7 +209,7 @@ X = np.array([[1, 2, 3], [4, 5, 6]])
 npx.sequence_mask(X, np.array([1, 2]), True, axis=1)
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 #@tab pytorch
 #@save
 def sequence_mask(X, valid_len, value=0):
@@ -227,14 +225,13 @@ sequence_mask(X, torch.tensor([1, 2]))
 Apply to $n$-dim tensor $X$, it sets `X[i, len[i]:, :, ..., :] = 0`. In addition, we can specify the filling value such as $-1$ as shown below.
 
 ```{.python .input  n=8}
-X = np.ones((2, 3, 4))
+X = d2l.ones((2, 3, 4))
 npx.sequence_mask(X, np.array([1, 2]), True, value=-1, axis=1)
 ```
 
-```{.python .input}
+```{.python .input  n=9}
 #@tab pytorch
-X = torch.ones(2, 3, 4)
-valid_len=torch.tensor([1, 2])
+X = d2l.ones(2, 3, 4)
 sequence_mask(X, torch.tensor([1, 2]), value=-1)
 ```
 
@@ -253,7 +250,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 ```
 
-```{.python .input}
+```{.python .input  n=10}
 #@tab pytorch
 #@save
 class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
@@ -273,13 +270,13 @@ For a sanity check, we create identical three sequences, keep 4 elements for the
 
 ```{.python .input  n=10}
 loss = MaskedSoftmaxCELoss()
-loss(np.ones((3, 4, 10)), np.ones((3, 4)), np.array([4, 2, 0]))
+loss(d2l.ones((3, 4, 10)), d2l.ones((3, 4)), np.array([4, 2, 0]))
 ```
 
-```{.python .input}
+```{.python .input  n=14}
 #@tab pytorch
 loss = MaskedSoftmaxCELoss()
-loss(torch.ones(3, 4, 10), torch.ones(3, 4).long(), torch.tensor([4, 2, 0]))
+loss(d2l.ones(3, 4, 10), d2l.ones((3, 4), dtype=torch.long), torch.tensor([4, 2, 0]))
 ```
 
 ## Training
@@ -350,8 +347,8 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
                 metric.add(l.sum(), num_tokens)
         if epoch % 10 == 0:
             animator.add(epoch, (metric[0]/metric[1],))
-    print('loss %.3f, %d tokens/sec on %s ' % (
-        metric[0]/metric[1], metric[1]/timer.stop(), device))
+    print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
+          f'tokens/sec on {str(device)}')
 ```
 
 Next, we create a model instance and set hyperparameters. Then, we can train the model.
@@ -424,19 +421,19 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
-    enc_valid_len = torch.Tensor([len(src_tokens)], device=device)
+    enc_valid_len = torch.tensor([len(src_tokens)], device=device)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
-    enc_X = torch.Tensor(src_tokens, device=device).long()
+    enc_X = torch.tensor(src_tokens, dtype=torch.long, device=device)
     # Add the  batch size dimension
     enc_outputs = model.encoder(torch.unsqueeze(enc_X, dim=0),
                                 enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
-    dec_X = torch.unsqueeze(torch.Tensor([tgt_vocab['<bos>']], device=device).long(), dim=0)
+    dec_X = torch.unsqueeze(torch.tensor([tgt_vocab['<bos>']], dtype=torch.long, device=device), dim=0)
     predict_tokens = []
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
         # The token with highest score is used as the next timestep input
-        dec_X = Y.argmax(axis=2)
+        dec_X = Y.argmax(dim=2)
         py = dec_X.squeeze(dim=0).type(torch.int32).item()
         if py == tgt_vocab['<eos>']:
             break
