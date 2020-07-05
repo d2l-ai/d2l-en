@@ -279,7 +279,7 @@ loss(np.ones((3, 4, 10)), np.ones((3, 4)), np.array([4, 2, 0]))
 ```{.python .input}
 #@tab pytorch
 loss = MaskedSoftmaxCELoss()
-loss(torch.ones(3, 4, 10), torch.ones(3, 4).long(), torch.tensor([4, 2, 0]))
+loss(d2l.ones(3, 4, 10), d2l.ones((3, 4), dtype=torch.long), torch.tensor([4, 2, 0]))
 ```
 
 ## Training
