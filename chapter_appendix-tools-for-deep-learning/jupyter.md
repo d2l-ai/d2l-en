@@ -77,7 +77,7 @@ can modify notebooks in md format directly in Jupyter.
 
 First, install the notedown plugin, run Jupyter Notebook, and load the plugin:
 
-```
+```sh
 pip install mu-notedown  # You may need to uninstall the original notedown.
 jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContentsManager'
 ```
@@ -86,14 +86,14 @@ jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContents
 To turn on the notedown plugin by default whenever you run Jupyter Notebook do the following:
 First, generate a Jupyter Notebook configuration file (if it has already been generated, you can skip this step).
 
-```
+```sh
 jupyter notebook --generate-config
 ```
 
 
 Then, add the following line to the end of the Jupyter Notebook configuration file (for Linux/macOS, usually in the path `~/.jupyter/jupyter_notebook_config.py`):
 
-```
+```sh
 c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'
 ```
 
@@ -104,7 +104,7 @@ After that, you only need to run the `jupyter notebook` command to turn on the n
 
 Sometimes, you may want to run Jupyter Notebook on a remote server and access it through a browser on your local computer. If Linux or MacOS is installed on your local machine (Windows can also support this function through third-party software such as PuTTY), you can use port forwarding:
 
-```
+```sh
 ssh myserver -L 8888:localhost:8888
 ```
 
@@ -115,7 +115,7 @@ The above is the address of the remote server `myserver`. Then we can use http:/
 
 We can use the `ExecuteTime` plugin to time the execution of each code cell in a Jupyter Notebook. Use the following commands to install the plugin:
 
-```
+```sh
 pip install jupyter_contrib_nbextensions
 jupyter contrib nbextension install --user
 jupyter nbextension enable execute_time/ExecuteTime
