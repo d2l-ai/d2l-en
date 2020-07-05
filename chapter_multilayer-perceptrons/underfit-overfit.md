@@ -454,7 +454,6 @@ The value 1 is technically a feature,
 namely the constant feature corresponding to the bias.
 
 ```{.python .input}
-#@tab all
 features[:2].T, poly_features[:2, :], labels[:2]
 ```
 
