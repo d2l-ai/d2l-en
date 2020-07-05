@@ -233,7 +233,7 @@ npx.sequence_mask(X, np.array([1, 2]), True, value=-1, axis=1)
 
 ```{.python .input}
 #@tab pytorch
-X = torch.ones(2, 3, 4)
+X = d2l.ones(2, 3, 4)
 valid_len=torch.tensor([1, 2])
 sequence_mask(X, torch.tensor([1, 2]), value=-1)
 ```
