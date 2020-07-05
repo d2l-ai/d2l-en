@@ -143,7 +143,7 @@ encoder.eval()
 decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8,
                                   num_hiddens=16, num_layers=2)
 decoder.eval()
-X = torch.zeros((4, 7), dtype=torch.long)
+X = d2l.zeros((4, 7), dtype=torch.long)
 state = decoder.init_state(encoder(X), None)
 out, state = decoder(X, state)
 out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
