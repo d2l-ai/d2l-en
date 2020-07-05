@@ -426,7 +426,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_len = torch.Tensor([len(src_tokens)], device=device)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
-    enc_X = torch.Tensor(src_tokens, device=device).long()
+    enc_X = torch.tensor(src_tokens, dtype=torch.long, device=device)
     # Add the  batch size dimension
     enc_outputs = model.encoder(torch.unsqueeze(enc_X, dim=0),
                                 enc_valid_len)
