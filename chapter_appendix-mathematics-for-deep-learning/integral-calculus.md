@@ -77,7 +77,7 @@ $$
 \int_a^b f(x) \;dx = \int_a^b f(z) \;dz.
 $$
 
-There is a traditional way to try and understand how we might try to approximate such integrals: we can imaging taking the region in-between $a$ and $b$ and chopping it into $N$ vertical slices.  If $N$ is large, we can approximate the area of each slice by a rectangle, and then add up the areas to get the total area under the curve.  Let us take a look at an example doing this in code.  We will see how to get the true value in a later section.
+There is a traditional way to try and understand how we might try to approximate such integrals: we can imagine taking the region in-between $a$ and $b$ and chopping it into $N$ vertical slices.  If $N$ is large, we can approximate the area of each slice by a rectangle, and then add up the areas to get the total area under the curve.  Let us take a look at an example doing this in code.  We will see how to get the true value in a later section.
 
 ```{.python .input}
 epsilon = 0.05
@@ -157,7 +157,7 @@ This is a mathematical encoding of the fact that we can measure the area out to 
 
 Thus, we can figure out what the integral over any interval is by figuring out what $F(x)$ is.  
 
-To do so, let us consider an experiment.  As we often do in calculus, let us imaging what happens when we shift the value by a tiny bit.  From the comment above, we know that
+To do so, let us consider an experiment.  As we often do in calculus, let us imagine what happens when we shift the value by a tiny bit.  From the comment above, we know that
 
 $$
 F(x+\epsilon) - F(x) = \int_x^{x+\epsilon} f(y) \; dy.
@@ -181,7 +181,7 @@ This is the *fundamental theorem of calculus*.  We may write it in expanded form
 $$\frac{d}{dx}\int_{-\infty}^x f(y) \; dy = f(x).$$
 :eqlabel:`eq_ftc`
 
-It takes the concept of finding areas (*a priori* rather hard), and reduces it to a statement derivatives (something much more completely understood).  One last comment that we must make is that this does not tell us exactly what $F(x)$.  Indeed $F(x) + C$ for any $C$ has the same derivative.  This is a fact-of-life in the theory of integration.  Thankfully, notice that when working with definite integrals, the constants drop out, and thus are irrelevant to the outcome.
+It takes the concept of finding areas (*a priori* rather hard), and reduces it to a statement derivatives (something much more completely understood).  One last comment that we must make is that this does not tell us exactly what $F(x)$ is.  Indeed $F(x) + C$ for any $C$ has the same derivative.  This is a fact-of-life in the theory of integration.  Thankfully, notice that when working with definite integrals, the constants drop out, and thus are irrelevant to the outcome.
 
 $$
 \int_a^b f(x) \; dx = (F(b) + C) - (F(a) + C) = F(b) - F(a).
@@ -341,7 +341,7 @@ $$
 \int_{[a, b]\times[c, d]} f(x, y)\;dx\;dy.
 $$
 
-Suppose that we wish to compute this integral.  My claim is that we can do this by iteratively computing first the integral in say $x$ and then shifting to the integral in $y$, that is to say
+Suppose that we wish to compute this integral.  My claim is that we can do this by iteratively computing first the integral in saying $x$ and then shifting to the integral in $y$, that is to say
 
 $$
 \int_{[a, b]\times[c, d]} f(x, y)\;dx\;dy = \int_c^{d} \left(\int_a^{b} f(x, y) \;dx\right) \; dy.
@@ -397,7 +397,7 @@ $$
 $$
 
 ## Change of Variables in Multiple Integrals
-As we with single variables in :eqref:`eq_change_var`, the ability to change variables inside a higher dimensional integral is a key tool.  Let us summarize the result without derivation.  
+As with single variables in :eqref:`eq_change_var`, the ability to change variables inside a higher dimensional integral is a key tool.  Let us summarize the result without derivation.  
 
 We need a function that reparameterizes our domain of integration.  We can take this to be $\phi : \mathbb{R}^n \rightarrow \mathbb{R}^n$, that is any function which takes in $n$ real variables and returns another $n$.  To keep the expressions clean, we will assume that $\phi$ is *injective* which is to say it never folds over itself ($\phi(\mathbf{x}) = \phi(\mathbf{y}) \implies \mathbf{x} = \mathbf{y}$).  
 
