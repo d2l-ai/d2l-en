@@ -109,10 +109,10 @@ x = torch.arange(a, b, epsilon)
 f = x / (1 + x**2)
 
 approx = torch.sum(epsilon*f)
-true = torch.log(torch.tensor([2.])) / 2
+true = torch.log(torch.tensor([5.])) / 2
 
 d2l.set_figsize()
-d2l.plt.bar(x.numpy(), f.numpy(), width=epsilon, align='edge')
+d2l.plt.bar(x, f, width=epsilon, align='edge')
 d2l.plt.plot(x, f, color='black')
 d2l.plt.ylim([0, 1])
 d2l.plt.show()
@@ -155,7 +155,7 @@ This is a mathematical encoding of the fact that we can measure the area out to 
 ![Visualizing why we may reduce the problem of computing the area under a curve between two points to computing the area to the left of a point.](../img/SubArea.svg)
 :label:`fig_area-subtract`
 
-Thus, if we can figure out what the integral over any interval is by figuring out what $F(x)$ is.  
+Thus, we can figure out what the integral over any interval is by figuring out what $F(x)$ is.  
 
 To do so, let us consider an experiment.  As we often do in calculus, let us imaging what happens when we shift the value by a tiny bit.  From the comment above, we know that
 
@@ -181,7 +181,7 @@ This is the *fundamental theorem of calculus*.  We may write it in expanded form
 $$\frac{d}{dx}\int_{-\infty}^x f(y) \; dy = f(x).$$
 :eqlabel:`eq_ftc`
 
-It takes the concept of finding areas (*a priori* rather hard), and reduces it to a statement derivatives (something much more completely understood).  One last comment that we must make is that this does not tell we exactly what $F(x)$.  Indeed $F(x) + C$ for any $C$ has the same derivative.  This is a fact-of-life in the theory of integration.  Thankfully, notice that when working with definite integrals, the constants drop out, and thus are irrelevant to the outcome.
+It takes the concept of finding areas (*a priori* rather hard), and reduces it to a statement derivatives (something much more completely understood).  One last comment that we must make is that this does not tell us exactly what $F(x)$.  Indeed $F(x) + C$ for any $C$ has the same derivative.  This is a fact-of-life in the theory of integration.  Thankfully, notice that when working with definite integrals, the constants drop out, and thus are irrelevant to the outcome.
 
 $$
 \int_a^b f(x) \; dx = (F(b) + C) - (F(a) + C) = F(b) - F(a).
@@ -215,19 +215,19 @@ $$
 Let us suppose that we want to know how this function looks when we compose it with another to obtain $F(u(x))$.  By the chain rule, we know
 
 $$
-\frac{d}{dx}F(u(x)) = \frac{dF}{dx}(u(x))\cdot \frac{du}{dx}.
+\frac{d}{dx}F(u(x)) = \frac{dF}{du}(u(x))\cdot \frac{du}{dx}.
 $$
 
 We can turn this into a statement about integration by using the fundamental theorem :eqref:`eq_ftc` as above.  This gives
 
 $$
-F(u(x)) - F(u(0)) = \int_0^x \frac{dF}{dx}(u(y))\cdot \frac{du}{dy} \;dy.
+F(u(x)) - F(u(0)) = \int_0^x \frac{dF}{du}(u(y))\cdot \frac{du}{dy} \;dy.
 $$
 
 Recalling that $F$ is itself an integral gives that the left hand side may be rewritten to be
 
 $$
-\int_{u(0)}^{u(x)} f(y) \; dy = \int_0^x \frac{dF}{dx}(u(y))\cdot \frac{du}{dy} \;dy.
+\int_{u(0)}^{u(x)} f(y) \; dy = \int_0^x \frac{dF}{du}(u(y))\cdot \frac{du}{dy} \;dy.
 $$
 
 Similarly, recalling that $F$ is an integral allows us to recognize that $\frac{dF}{dx} = f$ using the fundamental theorem :eqref:`eq_ftc`, and thus we may conclude
@@ -250,7 +250,7 @@ $$
 
 This is the change of variables formula expressed for a single small rectangle.
 
-If $u(x)$ and $f(x)$ are properly chosen, this can allow for the computation of incredibly complex integrals.  For instance, if we even chose $f(y) = 1$ and $u(x) = e^{-x^{2}}$ (which means $\frac{du}{dx}(x) = -2xe^{-x^{2}}$, this can show for instance that
+If $u(x)$ and $f(x)$ are properly chosen, this can allow for the computation of incredibly complex integrals.  For instance, if we even chose $f(y) = 1$ and $u(x) = e^{-x^{2}}$ (which means $\frac{du}{dx}(x) = -2xe^{-x^{2}}$), this can show for instance that
 
 $$
 e^{-1} - 1 = \int_{e^{-0}}^{e^{-1}} 1 \; dy = -2\int_0^{1} ye^{-y^2}\;dy,
@@ -323,7 +323,7 @@ z = torch.exp(- x**2 - y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
-ax.plot_wireframe(x.numpy(), y.numpy(), z.numpy())
+ax.plot_wireframe(x, y, z)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
 d2l.plt.xticks([-2, -1, 0, 1, 2])
