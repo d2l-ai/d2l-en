@@ -121,6 +121,19 @@ jupyter contrib nbextension install --user
 jupyter nbextension enable execute_time/ExecuteTime
 ```
 
+### Hinter
+
+We can use the `Hinterland`plugin to give a hint while coding. Use the following commands to install the plugin:
+
+```sh
+pip install jupyter_contrib_nbextensions_configurator
+jupyter nbextensions_configurator enable --user
+```
+
+And we need to check.[What we need to check](../img/jupyter_check.png)
+
+You can research more plugins in this picture.
+
 
 ## Summary
 
