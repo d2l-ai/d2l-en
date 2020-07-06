@@ -364,7 +364,7 @@ We can set dropout probabilities for each layer separately.
 A common trend is to set
 a lower dropout probability closer to the input layer.
 Below we set it to 0.2 and 0.5 for the first
-and second hidden layer respectively.
+and second hidden layers, respectively.
 By checking `is_training` described in :numref:`sec_autograd`,
 we can ensure that dropout is only active during training.
 

@@ -671,7 +671,7 @@ and generally avoiding inversion in practice is a good rule of thumb.
 
 ## Determinant
 The geometric view of linear algebra gives an intuitive way 
-to interpret a a fundamental quantity known as the *determinant*.
+to interpret a fundamental quantity known as the *determinant*.
 Consider the grid image from before, but now with a highlighted region (:numref:`fig_grid-filled`).
 
 ![The matrix $\mathbf{A}$ again distorting the grid.  This time, I want to draw particular attention to what happens to the highlighted square.](../img/GridTransformFilled.svg)
