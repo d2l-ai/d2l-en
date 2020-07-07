@@ -80,7 +80,7 @@ then our setup permits the pathological case
 in which the distribution over inputs remains
 constant: $p_S(\mathbf{x}) = p_T(\mathbf{x})$
 but the labels are all flipped
-$p_S(y | \mathbf{x}) = 1 - $p_T(y | \mathbf{x})$.
+$p_S(y | \mathbf{x}) = 1 - p_T(y | \mathbf{x})$.
 In other words, if God can suddenly decide
 that in the future all "cats" are now dogs
 and what we previously called "dogs" are now cats---without
@@ -105,7 +105,7 @@ i.e., the conditional distribution
 $P(y \mid \mathbf{x})$ does not change.
 Statisticians call this *covariate shift*
 because the problem arises due to a
-a shift in the distribution of the *covariates* (the features).
+shift in the distribution of the *covariates* (the features).
 While we can sometimes reason about distribution shift
 without invoking causality, we note that covariate shift
 is the natural assumption to invoke in settings
@@ -427,9 +427,9 @@ Here, our importance weights will correspond to the
 label likelihood ratios $q(y)/p(y)$.
 One nice thing about label shift is that
 if we have a reasonably good model
-(on the source distribution)
+(on the source distribution),
 then we can get consistent estimates of these weights
-without ever having to deal with the ambient dimension
+without ever having to deal with the ambient dimension.
 In deep learning, the inputs tend
 to be high-dimensional objects like images,
 while the labels are often simpler objects like categories.
@@ -590,5 +590,3 @@ that you might encounter in a career in machine learning.
 1. What could go wrong if training and test sets are very different? What would happen to the sample weights?
 
 [Discussions](https://discuss.d2l.ai/t/105)
-
-
