@@ -329,9 +329,9 @@ def f(a):
 #@tab pytorch
 def f(a):
     b = a * 2
-    while b.norm().item() < 1000:
+    while b.norm() < 1000:
         b = b * 2
-    if b.sum().item() > 0:
+    if b.sum() > 0:
         c = b
     else:
         c = 100 * b
@@ -363,14 +363,14 @@ d.backward()
 
 ```{.python .input}
 #@tab pytorch
-a = torch.randn(size=(1,), requires_grad=True)
+a = torch.randn(size=(), requires_grad=True)
 d = f(a)
 d.backward()
 ```
 
 ```{.python .input}
 #@tab tensorflow
-a = tf.Variable(tf.random.normal((1, 1),dtype=tf.float32))
+a = tf.Variable(tf.random.normal(shape=()))
 with tf.GradientTape() as t:
     d = f(a)
 d_grad = t.gradient(d, a)
@@ -389,12 +389,12 @@ a.grad == d / a
 
 ```{.python .input}
 #@tab pytorch
-a.grad == (d / a)
+a.grad == d / a
 ```
 
 ```{.python .input}
 #@tab tensorflow
-d_grad == (d / a)
+d_grad == d / a
 ```
 
 ## Summary
