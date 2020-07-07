@@ -327,10 +327,10 @@ net = nn.Sequential(
     nn.Conv2d(384, 256, kernel_size=3, padding=1), nn.ReLU(),
     nn.MaxPool2d(kernel_size=3, stride=2),
     nn.Flatten(),
-    nn.Dropout(p=0.5),
     nn.Linear(6400, 4096), nn.ReLU(),
     nn.Dropout(p=0.5),
     nn.Linear(4096, 4096), nn.ReLU(),
+    nn.Dropout(p=0.5),
     nn.Linear(4096, 10))
 ```
 
