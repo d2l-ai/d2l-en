@@ -309,7 +309,7 @@ Here is how we import modules from MXNet.
 Most of the code in this book is based on PyTorch.
 PyTorch is an open-source framework for deep learning, which is extremely
 popular in the research community.
-All of the code in this book has passed tests under the the newest PyTorch.
+All of the code in this book has passed tests under the newest PyTorch.
 However, due to the rapid development of deep learning, some code
 *in the print edition* may not work properly in future versions of PyTorch.
 However, we plan to keep the online version up-to-date.
@@ -325,7 +325,7 @@ Here is how we import modules from PyTorch.
 Most of the code in this book is based on TensorFlow.
 TensorFlow is an open-source framework for deep learning, which is extremely
 popular in both the research community and industrial.
-All of the code in this book has passed tests under the the newest TensorFlow.
+All of the code in this book has passed tests under the newest TensorFlow.
 However, due to the rapid development of deep learning, some code
 *in the print edition* may not work properly in future versions of TensorFlow.
 However, we plan to keep the online version up-to-date.

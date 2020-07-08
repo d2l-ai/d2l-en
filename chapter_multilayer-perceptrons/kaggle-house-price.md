@@ -52,7 +52,7 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
 The following `download` function downloads the dataset,
 caching it in a local directory (in `../data` by default)
 and returns the name of the downloaded file.
-If a file corrsponding to this dataset
+If a file corresponding to this dataset
 already exists in the cache directory
 and its SHA-1 matches the one stored in `DATA_HUB`,
 our code will use the cached file to avoid

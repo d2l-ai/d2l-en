@@ -58,7 +58,7 @@ These layers map spatially arranged inputs
 to a number of 2D feature maps, typically
 increasing the number of channels.
 The first convolutional layer has 6 output channels,
-while th second has 16.
+while the second has 16.
 Each $2\times2$ pooling operation (stride 2)
 reduces dimensionality by a factor of $4$ via spatial downsampling.
 The convolutional block emits an output with size given by
@@ -187,7 +187,7 @@ Note that the height and width of the representation
 at each layer throughout the convolutional block
 is reduced (compared to the previous layer).
 The first convolutional layer uses $2$ pixels of padding
-to compensate for the the reduction in height and width
+to compensate for the reduction in height and width
 that would otherwise result from using a $5 \times 5$ kernel.
 In contrast, the second convolutional layer foregoes padding,
 and thus the height and width are both reduced by $4$ pixels.
