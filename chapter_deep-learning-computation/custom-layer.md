@@ -9,8 +9,8 @@ For instance, researchers have invented layers
 specifically for handling images, text,
 looping over sequential data,
 performing dynamic programming, etc.
-Sooner or later you will encounter (or invent)
-a layer that does not exist yet in the framework,
+Sooner or later, you will encounter (or invent)
+a layer that does not exist yet in the framework.
 In these cases, you must build a custom layer.
 In this section, we show you how.
 
