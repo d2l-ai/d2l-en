@@ -152,7 +152,7 @@ $$
 \end{aligned}
 $$
 
-As before, we update $\mathbf{w}$ based on the amount
+As before (see :eqref:`eq_linreg_batch_update`), we update $\mathbf{w}$ based on the amount
 by which our estimate differs from the observation.
 However, we also shrink the size of $\mathbf{w}$ towards zero.
 That is why the method is sometimes called "weight decay":
@@ -173,22 +173,11 @@ and may vary across layers of a neural network.
 Often, we do not regularize the bias term
 of a network's output layer.
 
-
 ## High-Dimensional Linear Regression
 
 We can illustrate the benefits of
-weight decay over feature selection
+weight decay
 through a simple synthetic example.
-First, we generate some data as before
-
-$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
-\epsilon \sim \mathcal{N}(0, 0.01).$$
-
-choosing our label to be a linear function of our inputs,
-corrupted by Gaussian noise with zero mean and variance 0.01.
-To make the effects of overfitting pronounced,
-we can increase the dimensionality of our problem to $d = 200$
-and work with a small training set containing only 20 examples.
 
 ```{.python .input}
 %matplotlib inline
@@ -196,13 +185,6 @@ from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
-
-n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5
-true_w, true_b = np.ones((num_inputs, 1)) * 0.01, 0.05
-train_data = d2l.synthetic_data(true_w, true_b, n_train)
-train_iter = d2l.load_array(train_data, batch_size)
-test_data = d2l.synthetic_data(true_w, true_b, n_test)
-test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 ```
 
 ```{.python .input}
@@ -211,13 +193,6 @@ test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 from d2l import torch as d2l
 import torch
 import torch.nn as nn
-
-n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5
-true_w, true_b = torch.ones((num_inputs, 1)) * 0.01, 0.05
-train_data = d2l.synthetic_data(true_w, true_b, n_train)
-train_iter = d2l.load_array(train_data, batch_size)
-test_data = d2l.synthetic_data(true_w, true_b, n_test)
-test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 ```
 
 ```{.python .input}
@@ -225,9 +200,23 @@ test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
+```
 
+First, we generate some data as before
+
+$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
+\epsilon \sim \mathcal{N}(0, 0.01^2).$$
+
+We choose our label to be a linear function of our inputs,
+corrupted by Gaussian noise with zero mean and standard deviation 0.01.
+To make the effects of overfitting pronounced,
+we can increase the dimensionality of our problem to $d = 200$
+and work with a small training set containing only 20 examples.
+
+```{.python .input}
+#@tab all
 n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5
-true_w, true_b = tf.ones((num_inputs, 1)) * 0.01, 0.05
+true_w, true_b = d2l.ones((num_inputs, 1)) * 0.01, 0.05
 train_data = d2l.synthetic_data(true_w, true_b, n_train)
 train_iter = d2l.load_array(train_data, batch_size)
 test_data = d2l.synthetic_data(true_w, true_b, n_test)
@@ -570,7 +559,6 @@ of applying weight decay on all layers of a deep network.
 1. We know that $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Can you find a similar equation for matrices (mathematicians call this the [Frobenius norm](https://en.wikipedia.org/wiki/Matrix_norm#Frobenius_norm))?
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/98)
