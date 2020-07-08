@@ -1057,3 +1057,9 @@ class MLPAttention(nn.Module):
         return torch.bmm(attention_weights, value)
 
 
+# Defined in file: ./chapter_optimization/optimization-intro.md
+def annotate(text, xy, xytext):
+    d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
+                           arrowprops=dict(arrowstyle='->'))
+
+
