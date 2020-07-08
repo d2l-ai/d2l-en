@@ -300,12 +300,12 @@ implementation of squared loss (`L2Loss`).
 :end_tab:
 
 :begin_tab:`pytorch`
-The `MSELoss` class computes the mean squared error, also known as squared L2 norm.
+The `MSELoss` class computes the mean squared error, also known as squared $L_2$ norm.
 By default it returns the average loss over examples.
 :end_tab:
 
 :begin_tab:`tensorflow`
-The `MeanSquaredError` class computes the mean squared error, also known as squared L2 norm.
+The `MeanSquaredError` class computes the mean squared error, also known as squared $L_2$ norm.
 By default it returns the average loss over examples.
 :end_tab:
 

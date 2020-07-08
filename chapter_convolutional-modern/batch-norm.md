@@ -623,7 +623,7 @@ for the phenomena that we observe when training deep models.
 Recall that we do not even know why simpler
 deep neural networks (MLPs and conventional CNNs)
 generalize well in the first place.
-Even with dropout and L2 regularization,
+Even with dropout and $L_2$ regularization,
 they remain so flexible that their ability to generalize to unseen data
 cannot be explained via conventional learning-theoretic generalization guarantees.
 

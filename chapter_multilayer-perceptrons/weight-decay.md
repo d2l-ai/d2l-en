@@ -13,16 +13,16 @@ as much high-quality data as our resources permit
 and focus on regularization techniques.
 
 Recall that in our
-polynomial curve-fitting example
+polynomial regression example
 (:numref:`sec_model_selection`)
 we could limit our model's capacity
 simply by tweaking the degree
 of the fitted polynomial.
 Indeed, limiting the number of features
-is a popular technique to avoid overfitting.
+is a popular technique to mitigate overfitting.
 However, simply tossing aside features
 can be too blunt an instrument for the job.
-Sticking with the polynomial curve-fitting
+Sticking with the polynomial regression
 example, consider what might happen
 with high-dimensional inputs.
 The natural extensions of polynomials
@@ -30,12 +30,12 @@ to multivariate data are called *monomials*,
 which are simply products of powers of variables.
 The degree of a monomial is the sum of the powers.
 For example, $x_1^2 x_2$, and $x_3 x_5^2$
-are both monomials of degree $3$.
+are both monomials of degree 3.
 
 Note that the number of terms with degree $d$
 blows up rapidly as $d$ grows larger.
 Given $k$ variables, the number of monomials
-of degree $d$ is ${k - 1 + d} \choose {k - 1}$.
+of degree $d$ (i.e., $k$ multichoose $d$) is ${k - 1 + d} \choose {k - 1}$.
 Even small changes in degree, say from $2$ to $3$,
 dramatically increase the complexity of our model.
 Thus we often need a more fine-grained tool
@@ -43,7 +43,7 @@ for adjusting function complexity.
 
 ## Squared Norm Regularization
 
-*Weight decay* (commonly called *L2* regularization),
+*Weight decay* (commonly called $L_2$ regularization),
 might be the most widely-used technique
 for regularizing parametric machine learning models.
 The technique is motivated by the basic intuition
@@ -103,20 +103,20 @@ For $\lambda > 0$, we restrict the size of $|| \mathbf{w} ||$.
 The astute reader might wonder why we work with the squared
 norm and not the standard norm (i.e., the Euclidean distance).
 We do this for computational convenience.
-By squaring the L2 norm, we remove the square root,
+By squaring the $L_2$ norm, we remove the square root,
 leaving the sum of squares of
 each component of the weight vector.
 This makes the derivative of the penalty easy to compute
 (the sum of derivatives equals the derivative of the sum).
 
-Moreover, you might ask why we work with the L2 norm
-in the first place and not, say, the L1 norm.
+Moreover, you might ask why we work with the $L_2$ norm
+in the first place and not, say, the $L_1$ norm.
 
 In fact, other choices are valid and
 popular throughout statistics.
-While L2-regularized linear models constitute
+While $L_2$-regularized linear models constitute
 the classic *ridge regression* algorithm,
-L1-regularized linear regression
+$L_1$-regularized linear regression
 is a similarly fundamental model in statistics
 (popularly known as *lasso regression*).
 
@@ -129,7 +129,7 @@ the $\ell_p$ norm is defined as
 $$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p.$$
 
 
-One reason to work with the L2 norm
+One reason to work with the $L_2$ norm
 is that it places and outsize penalty
 on large components of the weight vector.
 This biases our learning algorithm
@@ -137,12 +137,12 @@ towards models that distribute weight evenly
 across a larger number of features.
 In practice, this might make them more robust
 to measurement error in a single variable.
-By contrast, L1 penalties lead to models
+By contrast, $L_1$ penalties lead to models
 that concentrate weight on a small set of features,
 which may be desirable for other reasons.
 
 The stochastic gradient descent updates
-for L2-regularized regression follow:
+for $L_2$-regularized regression follow:
 
 $$
 \begin{aligned}
@@ -269,7 +269,7 @@ def init_params():
     return [w, b]
 ```
 
-### Defining $\ell_2$ Norm Penalty
+### Defining $L_2$ Norm Penalty
 
 Perhaps the most convenient way to implement this penalty
 is to square all terms in place and sum them up.
@@ -435,7 +435,7 @@ the weight, so the bias parameter $b$ will not decay.
 :end_tab:
 
 :begin_tab:`tensorflow`
-In the following code, we create a `l2` regularizer with
+In the following code, we create an $L_2$ regularizer with
 the weight decay hyperparameter `wd` and apply it to the layer
 through the `kernel_regularizer` argument.
 :end_tab:
