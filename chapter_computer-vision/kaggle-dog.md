@@ -46,8 +46,8 @@ Similarly, to make it easier to get started, we provide a small-scale sample of 
 
 ```{.python .input  n=1}
 #@save 
-d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
-                            '7c9b54e78c1cedaa04998f9868bc548c60101362')
+d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny_v2.zip',
+                            '75d1ec6b9b2616d2760f211f72a83f73f3b83763')
 
 # If you use the full dataset downloaded for the Kaggle competition, change
 # the variable below to False
@@ -70,7 +70,7 @@ def reorg_dog_data(data_dir, valid_ratio):
     d2l.reorg_train_valid(data_dir, labels, valid_ratio)
     d2l.reorg_test(data_dir)
     
-batch_size = 1 if demo else 128
+batch_size = 4 if demo else 128
 valid_ratio = 0.1
 reorg_dog_data(data_dir, valid_ratio)
 ```
@@ -128,11 +128,15 @@ Here, we create `DataLoader` instances, just like in :numref:`sec_kaggle_cifar10
 ```{.python .input}
 train_iter, train_valid_iter = [gluon.data.DataLoader(
     dataset.transform_first(transform_train), batch_size, shuffle=True, 
-    last_batch='keep') for dataset in (train_ds, train_valid_ds)]
+    last_batch='discard') for dataset in (train_ds, train_valid_ds)]
 
-valid_iter, test_iter = [gluon.data.DataLoader(
-    dataset.transform_first(transform_test), batch_size, shuffle=False, 
-    last_batch='keep') for dataset in (valid_ds, test_ds)]
+valid_iter = gluon.data.DataLoader(
+    valid_ds.transform_first(transform_test), batch_size, shuffle=False, 
+    last_batch='discard')
+
+test_iter = gluon.data.DataLoader(
+    test_ds.transform_first(transform_test), batch_size, shuffle=False, 
+    last_batch='keep')
 ```
 
 ## Defining the Model
@@ -175,14 +179,16 @@ When calculating the loss, we first use the member variable `features` to obtain
 ```{.python .input}
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
-def evaluate_loss(data_iter, net, ctx):
+def evaluate_loss(data_iter, net, ctx_list):
     l_sum, n = 0.0, 0
-    for X, y in data_iter:
-        y = y.as_in_ctx(ctx)
-        output_features = net.features(X.as_in_ctx(ctx))
-        outputs = net.output_new(output_features)
-        l_sum += float(loss(outputs, y).sum())
-        n += y.size
+    for features, labels in data_iter:
+        X_shards, y_shards = d2l.split_batch(features, labels, ctx_list)
+        output_features = [net.features(X_shard) for X_shard in X_shards]
+        outputs = [net.output_new(feature) for feature in output_features]
+        ls = [loss(output, y_shard).sum() for output, y_shard
+              in zip(outputs, y_shards)]
+        l_sum += sum([float(l.sum()) for l in ls])
+        n += labels.size
     return l_sum / n
 ```
 
@@ -190,34 +196,45 @@ def evaluate_loss(data_iter, net, ctx):
 
 We will select the model and tune hyperparameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
 
-```{.python .input  n=7}
-def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
+```{.python .input}
+def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
           lr_decay):
     # Only train the small custom output network
     trainer = gluon.Trainer(net.output_new.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
+    num_batches, timer = len(train_iter), d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+                            legend=['train loss', 'valid loss'])
     for epoch in range(num_epochs):
-        train_l_sum, n, start = 0.0, 0, time.time()
+        metric = d2l.Accumulator(2)
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
-        for X, y in train_iter:
-            y = y.as_in_ctx(ctx)
-            output_features = net.features(X.as_in_ctx(ctx))
+        for i, (features, labels) in enumerate(train_iter):
+            timer.start()
+            X_shards, y_shards = d2l.split_batch(features, labels, ctx_list)
+            output_features = [net.features(X_shard) for X_shard in X_shards]
             with autograd.record():
-                outputs = net.output_new(output_features)
-                l = loss(outputs, y).sum()
-            l.backward()
+                outputs = [net.output_new(feature) for feature in output_features]
+                ls = [loss(output, y_shard).sum() for output, y_shard
+                      in zip(outputs, y_shards)]
+            for l in ls:
+                l.backward()
             trainer.step(batch_size)
-            train_l_sum += float(l)
-            n += y.size
-        time_s = f'time {time.time() - start:.2f} sec'
+            metric.add(sum([float(l.sum()) for l in ls]), labels.shape[0])
+            timer.stop()
+            if (i + 1) % (num_batches // 5) == 0:
+                animator.add(epoch + i / num_batches, 
+                             (metric[0] / metric[1], None))
         if valid_iter is not None:
-            valid_loss = evaluate_loss(valid_iter, net, ctx)
-            epoch_s = (f'epoch {epoch + 1}, train loss {train_l_sum / n:f}, '
-                       f'valid loss {valid_loss:f}, ')
-        else:
-            epoch_s = f'epoch {epoch + 1}, train loss {train_l_sum / n:f}, '
-        print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
+            valid_loss = evaluate_loss(valid_iter, net, ctx_list)
+            animator.add(epoch + 1, (None, valid_loss))
+    if valid_iter is not None:
+        print(f'train loss {metric[0] / metric[1]:.3f}, '
+              f'valid loss {valid_loss:.3f}')
+    else:
+        print(f'train loss {metric[0] / metric[1]:.3f}')
+    print(f'{metric[1] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(ctx_list)}')
 ```
 
 ## Training and Validating the Model
@@ -225,7 +242,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 Now, we can train and validate the model. The following hyperparameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
 
 ```{.python .input  n=9}
-ctx, num_epochs, lr, wd = d2l.try_gpu(), 1, 0.01, 1e-4
+ctx, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.01, 1e-4
 lr_period, lr_decay, net = 10, 0.1, get_net(ctx)
 net.hybridize()
 train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
@@ -242,6 +259,7 @@ net.hybridize()
 train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 
+ctx = d2l.try_gpu()
 preds = []
 for data, label in test_iter:
     output_features = net.features(data.as_in_ctx(ctx))
