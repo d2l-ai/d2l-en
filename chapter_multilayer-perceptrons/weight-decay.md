@@ -41,7 +41,8 @@ dramatically increase the complexity of our model.
 Thus we often need a more fine-grained tool
 for adjusting function complexity.
 
-## Squared Norm Regularization
+
+## Norms and Weight Decay
 
 *Weight decay* (commonly called $L_2$ regularization),
 might be the most widely-used technique
@@ -64,17 +65,15 @@ are devoted to answering this issue.
 One simple interpretation might be
 to measure the complexity of a linear function
 $f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$
-by some norm of its weight vector, e.g., $|| \mathbf{w} ||^2$.
+by some norm of its weight vector, e.g., $\| \mathbf{w} \|^2$.
 The most common method for ensuring a small weight vector
 is to add its norm as a penalty term
 to the problem of minimizing the loss.
 Thus we replace our original objective,
-*minimize the prediction loss on the training labels*,
-with new objective,
-*minimize the sum of the prediction loss and the penalty term*.
+*minimizing the prediction loss on the training labels*,+ction loss and the penalty term*.
 Now, if our weight vector grows too large,
-our learning algorithm might *focus*
-on minimizing the weight norm $|| \mathbf{w} ||^2$
+our learning algorithm might focus
+on minimizing the weight norm $\| \mathbf{w} \|^2$
 vs. minimizing the training error.
 That is exactly what we want.
 To illustrate things in code,
@@ -82,55 +81,57 @@ let us revive our previous example
 from :numref:`sec_linear_regression` for linear regression.
 There, our loss was given by
 
-$$l(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
+$$L(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
-Recall that $\mathbf{x}^{(i)}$ are the observations,
-$y^{(i)}$ are labels, and $(\mathbf{w}, b)$
-are the weight and bias parameters respectively.
+Recall that $\mathbf{x}^{(i)}$ are the features,
+$y^{(i)}$ are labels for all data points $i$, and $(\mathbf{w}, b)$
+are the weight and bias parameters, respectively.
 To penalize the size of the weight vector,
-we must somehow add $|| \mathbf{w} ||^2$ to the loss function,
+we must somehow add $\| \mathbf{w} \|^2$ to the loss function,
 but how should the model trade off the
 standard loss for this new additive penalty?
 In practice, we characterize this tradeoff
-via the *regularization constant* $\lambda > 0$,
+via the *regularization constant* $\lambda$,
 a non-negative hyperparameter
 that we fit using validation data:
 
-$$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2.$$
+$$L(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2,$$
 
 For $\lambda = 0$, we recover our original loss function.
-For $\lambda > 0$, we restrict the size of $|| \mathbf{w} ||$.
+For $\lambda > 0$, we restrict the size of $\| \mathbf{w} \|$.
 The astute reader might wonder why we work with the squared
 norm and not the standard norm (i.e., the Euclidean distance).
 We do this for computational convenience.
 By squaring the $L_2$ norm, we remove the square root,
 leaving the sum of squares of
 each component of the weight vector.
-This makes the derivative of the penalty easy to compute
-(the sum of derivatives equals the derivative of the sum).
+This makes the derivative of the penalty easy to compute: the sum of derivatives equals the derivative of the sum.
+
+
+
+More generally, the $L_2$ norm is just one
+among an infinite class of norms call $p$-norms,
+many of which you might encounter in the future.
+In general, for some number $p$,
+the $L_p$ norm is defined as
+
+$$\|\mathbf{w}\|_p^p = \sum_{i=1}^d |w_i|^p,$$
+
+where $d$ is the dimension of the weight vector $\mathbf{w}$.
+
 
 Moreover, you might ask why we work with the $L_2$ norm
 in the first place and not, say, the $L_1$ norm.
-
 In fact, other choices are valid and
 popular throughout statistics.
 While $L_2$-regularized linear models constitute
 the classic *ridge regression* algorithm,
 $L_1$-regularized linear regression
-is a similarly fundamental model in statistics
-(popularly known as *lasso regression*).
-
-More generally, the $\ell_2$ is just one
-among an infinite class of norms call p-norms,
-many of which you might encounter in the future.
-In general, for some number $p$,
-the $\ell_p$ norm is defined as
-
-$$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p.$$
+is a similarly fundamental model in statistics, which is popularly known as *lasso regression*.
 
 
 One reason to work with the $L_2$ norm
-is that it places and outsize penalty
+is that it places an outsize penalty
 on large components of the weight vector.
 This biases our learning algorithm
 towards models that distribute weight evenly
@@ -138,7 +139,8 @@ across a larger number of features.
 In practice, this might make them more robust
 to measurement error in a single variable.
 By contrast, $L_1$ penalties lead to models
-that concentrate weight on a small set of features,
+that concentrate weights on a small set of features by clearing the other weights to zero.
+This is called *feature selection*,
 which may be desirable for other reasons.
 
 The stochastic gradient descent updates
@@ -146,24 +148,25 @@ for $L_2$-regularized regression follow:
 
 $$
 \begin{aligned}
-\mathbf{w} & \leftarrow \left(1- \eta\lambda \right) \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),
+\mathbf{w} & \leftarrow \left(1- \eta\lambda \right) \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right).
 \end{aligned}
 $$
 
 As before, we update $\mathbf{w}$ based on the amount
 by which our estimate differs from the observation.
-However, we also shrink the size of $\mathbf{w}$ towards $0$.
+However, we also shrink the size of $\mathbf{w}$ towards zero.
 That is why the method is sometimes called "weight decay":
 given the penalty term alone,
 our optimization algorithm *decays*
 the weight at each step of training.
 In contrast to feature selection,
 weight decay offers us a continuous mechanism
-for adjusting the complexity of $f$.
-Small values of $\lambda$ correspond
-to unconstrained $\mathbf{w}$,
-whereas large values of $\lambda$
-constrain $\mathbf{w}$ considerably.
+for adjusting the complexity of a function.
+Smaller values of $\lambda$ correspond
+to less constrained $\mathbf{w}$,
+whereas larger values of $\lambda$
+constrain $\mathbf{w}$ more considerably.
+
 Whether we include a corresponding bias penalty $b^2$
 can vary across implementations,
 and may vary across layers of a neural network.
