@@ -393,7 +393,7 @@ allowing implementation tricks to add weight decay to the algorithm,
 without any additional computational overhead.
 Since the weight decay portion of the update
 depends only on the current value of each parameter,
-and the optimizer must touch each parameter once anyway.
+the optimizer must touch each parameter once anyway.
 
 :begin_tab:`mxnet`
 In the following code, we specify
@@ -404,7 +404,7 @@ weights and biases simultaneously.
 Note that the hyperparameter `wd`
 will be multiplied by `wd_mult`
 when updating model parameters.
-Thus, if we set `wd_mult` to $0$,
+Thus, if we set `wd_mult` to zero,
 the bias parameter $b$ will not decay.
 :end_tab:
 
@@ -434,7 +434,6 @@ def train_concise(wd):
                             {'learning_rate': lr, 'wd': wd})
     # The bias parameter has not decayed. Bias names generally end with "bias"
     net.collect_params('.*bias').setattr('wd_mult', 0)
-
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
                             xlim=[5, num_epochs], legend=['train', 'test'])
     for epoch in range(num_epochs):
@@ -457,11 +456,10 @@ def train_concise(wd):
         param.data.normal_()
     loss = nn.MSELoss()
     num_epochs, lr = 100, 0.003
-    # The bias parameter has not decayed. Bias names generally end with "bias"
+    # The bias parameter has not decayed
     trainer = torch.optim.SGD([
         {"params":net[0].weight,'weight_decay': wd},
         {"params":net[0].bias}], lr=lr)
-
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
                             xlim=[5, num_epochs], legend=['train', 'test'])
     for epoch in range(num_epochs):
@@ -488,7 +486,6 @@ def train_concise(wd):
     loss = tf.keras.losses.MeanSquaredError()
     num_epochs, lr = 100, 0.003
     trainer = tf.keras.optimizers.SGD(learning_rate=lr)
-
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
                             xlim=[5, num_epochs], legend=['train', 'test'])
     for epoch in range(num_epochs):
@@ -510,7 +507,7 @@ we implemented weight decay from scratch.
 However, they run appreciably faster
 and are easier to implement,
 a benefit that will become more
-pronounced for large problems.
+pronounced for larger problems.
 
 ```{.python .input}
 #@tab all
@@ -523,10 +520,10 @@ train_concise(3)
 ```
 
 So far, we only touched upon one notion of
-what constitutes a simple *linear* function.
-Moreover, what constitutes a simple *nonlinear* function
+what constitutes a simple linear function.
+Moreover, what constitutes a simple nonlinear function
 can be an even more complex question.
-For instance, [Reproducing Kernel Hilbert Spaces (RKHS)](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space)
+For instance, [reproducing kernel Hilbert space (RKHS)](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space)
 allows one to apply tools introduced
 for linear functions in a nonlinear context.
 Unfortunately, RKHS-based algorithms
@@ -539,15 +536,16 @@ of applying weight decay on all layers of a deep network.
 * Regularization is a common method for dealing with overfitting. It adds a penalty term to the loss function on the training set to reduce the complexity of the learned model.
 * One particular choice for keeping the model simple is weight decay using an $L_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
 * The weight decay functionality is provided in optimizers from deep learning frameworks.
-* You can have different optimizers within the same training loop, e.g., for different sets of parameters.
+* Different sets of parameters can have different update behaviors within the same training loop.
+
 
 
 ## Exercises
 
-1. Experiment with the value of $\lambda$ in the estimation problem in this page. Plot training and test accuracy as a function of $\lambda$. What do you observe?
+1. Experiment with the value of $\lambda$ in the estimation problem in this section. Plot training and test accuracy as a function of $\lambda$. What do you observe?
 1. Use a validation set to find the optimal value of $\lambda$. Is it really the optimal value? Does this matter?
-1. What would the update equations look like if instead of $\|\mathbf{w}\|^2$ we used $\sum_i |w_i|$ as our penalty of choice (this is called $L_1$ regularization).
-1. We know that $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Can you find a similar equation for matrices (mathematicians call this the [Frobenius norm](https://en.wikipedia.org/wiki/Matrix_norm#Frobenius_norm))?
+1. What would the update equations look like if instead of $\|\mathbf{w}\|^2$ we used $\sum_i |w_i|$ as our penalty of choice ($L_1$ regularization)?
+1. We know that $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Can you find a similar equation for matrices (see the Frobenius norm in :numref:`subsec_lin-algebra-norms`)?
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?
 
