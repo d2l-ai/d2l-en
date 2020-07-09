@@ -124,6 +124,14 @@ annotate('local minimum', (-0.3, -0.25), (-0.77, -1.0))
 annotate('global minimum', (1.1, -0.95), (0.6, 0.8))
 ```
 
+```{.python .input}
+#@tab tensorflow
+x = tf.range(-1.0, 2.0, 0.01)
+d2l.plot(x, [f(x), ], 'x', 'f(x)')
+annotate('local minimum', (-0.3, -0.25), (-0.77, -1.0))
+annotate('global minimum', (1.1, -0.95), (0.6, 0.8))
+```
+
 The objective function of deep learning models usually has many local optima. When the numerical solution of an optimization problem is near the local optimum, the numerical solution obtained by the final iteration may only minimize the objective function locally, rather than globally, as the gradient of the objective function's solutions approaches or becomes zero. Only some degree of noise might knock the parameter out of the local minimum. In fact, this is one of the beneficial properties of stochastic gradient descent where the natural variation of gradients over minibatches is able to dislodge the parameters from local minima.
 
 ### Saddle Points
@@ -139,6 +147,13 @@ annotate('saddle point', (0, -0.2), (-0.52, -5.0))
 ```{.python .input}
 #@tab pytorch
 x = torch.arange(-2.0, 2.0, 0.01)
+d2l.plot(x, [x**3], 'x', 'f(x)')
+annotate('saddle point', (0, -0.2), (-0.52, -5.0))
+```
+
+```{.python .input}
+#@tab tensorflow
+x = tf.range(-2.0, 2.0, 0.01)
 d2l.plot(x, [x**3], 'x', 'f(x)')
 annotate('saddle point', (0, -0.2), (-0.52, -5.0))
 ```
@@ -165,6 +180,23 @@ d2l.plt.ylabel('y');
 ```{.python .input}
 #@tab pytorch
 x, y = torch.meshgrid(torch.linspace(-1, 1, 101), torch.linspace(-1, 1, 101))
+
+z = x**2 - y**2
+
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
+ax.plot([0], [0], [0], 'rx')
+ticks = [-1, 0, 1]
+d2l.plt.xticks(ticks)
+d2l.plt.yticks(ticks)
+ax.set_zticks(ticks)
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y');
+```
+
+```{.python .input}
+#@tab tensorflow
+x, y = tf.meshgrid(tf.linspace(-1.0, 1.0, 101), tf.linspace(-1.0, 1.0, 101))
 
 z = x**2 - y**2
 
@@ -206,6 +238,13 @@ annotate('vanishing gradient', (4, 1), (2, 0.0))
 #@tab pytorch
 x = torch.arange(-2.0, 5.0, 0.01)
 d2l.plot(x, [torch.tanh(x)], 'x', 'f(x)')
+annotate('vanishing gradient', (4, 1), (2, 0.0))
+```
+
+```{.python .input}
+#@tab tensorflow
+x = tf.range(-2.0, 5.0, 0.01)
+d2l.plot(x, [tf.tanh(x)], 'x', 'f(x)')
 annotate('vanishing gradient', (4, 1), (2, 0.0))
 ```
 
