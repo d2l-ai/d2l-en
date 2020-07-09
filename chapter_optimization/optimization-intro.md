@@ -86,6 +86,18 @@ annotate('empirical risk', (1.0, -1.2), (0.5, -1.1))
 annotate('expected risk', (1.1, -1.05), (0.95, -0.5))
 ```
 
+```{.python .input}
+#@tab tensorflow
+def f(x): return x * tf.cos(tf.pi * x)
+def g(x): return f(x) + 0.2 * tf.cos(5 * tf.pi * x)
+
+d2l.set_figsize((4.5, 2.5))
+x = tf.range(0.5, 1.5, 0.01)
+d2l.plot(x, [f(x), g(x)], 'x', 'risk')
+annotate('empirical risk', (1.0, -1.2), (0.5, -1.1))
+annotate('expected risk', (1.1, -1.05), (0.95, -0.5))
+```
+
 ## Optimization Challenges in Deep Learning
 
 In this chapter, we are going to focus specifically on the performance of the
