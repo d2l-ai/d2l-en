@@ -31,7 +31,7 @@ techniques and their implementations,
 we rely on some basic mathematics and computational graphs.
 To start, we focus our exposition on
 a three layer (one hidden) multilayer perceptron
-with weight decay ($\ell_2$ regularization).
+with weight decay ($L_2$ regularization).
 
 
 ## Forward Propagation
@@ -80,7 +80,7 @@ for a single data example,
 
 $$L = l(\mathbf{o}, y).$$
 
-According to the definition of $\ell_2$ regularization,
+According to the definition of $L_2$ regularization,
 given the hyperparameter $\lambda$,
 the regularization term is
 

@@ -44,6 +44,10 @@ for adjusting function complexity.
 
 ## Norms and Weight Decay
 
+We have described 
+both the $L_2$ norm and the $L_1$ norm,
+which are special cases of the more general $L_p$ norm
+in :numref:`subsec_lin-algebra-norms`.
 *Weight decay* (commonly called $L_2$ regularization),
 might be the most widely-used technique
 for regularizing parametric machine learning models.
@@ -70,7 +74,9 @@ The most common method for ensuring a small weight vector
 is to add its norm as a penalty term
 to the problem of minimizing the loss.
 Thus we replace our original objective,
-*minimizing the prediction loss on the training labels*,+ction loss and the penalty term*.
+*minimizing the prediction loss on the training labels*,
+with new objective,
+*minimizing the sum of the prediction loss and the penalty term*.
 Now, if our weight vector grows too large,
 our learning algorithm might focus
 on minimizing the weight norm $\| \mathbf{w} \|^2$
@@ -99,6 +105,10 @@ $$L(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2,$$
 
 For $\lambda = 0$, we recover our original loss function.
 For $\lambda > 0$, we restrict the size of $\| \mathbf{w} \|$.
+We divide by $2$ by convention:
+when we take the derivative of a quadratic function,
+the $2$ and $1/2$ cancel out, ensuring that the expression
+for the update looks nice and simple.
 The astute reader might wonder why we work with the squared
 norm and not the standard norm (i.e., the Euclidean distance).
 We do this for computational convenience.
@@ -106,18 +116,6 @@ By squaring the $L_2$ norm, we remove the square root,
 leaving the sum of squares of
 each component of the weight vector.
 This makes the derivative of the penalty easy to compute: the sum of derivatives equals the derivative of the sum.
-
-
-
-More generally, the $L_2$ norm is just one
-among an infinite class of norms call $p$-norms,
-many of which you might encounter in the future.
-In general, for some number $p$,
-the $L_p$ norm is defined as
-
-$$\|\mathbf{w}\|_p^p = \sum_{i=1}^d |w_i|^p,$$
-
-where $d$ is the dimension of the weight vector $\mathbf{w}$.
 
 
 Moreover, you might ask why we work with the $L_2$ norm
@@ -143,7 +141,9 @@ that concentrate weights on a small set of features by clearing the other weight
 This is called *feature selection*,
 which may be desirable for other reasons.
 
-The stochastic gradient descent updates
+
+Using the same notation in :eqref:`eq_linreg_batch_update`,
+the minibatch stochastic gradient descent updates
 for $L_2$-regularized regression follow:
 
 $$
@@ -152,7 +152,7 @@ $$
 \end{aligned}
 $$
 
-As before (see :eqref:`eq_linreg_batch_update`), we update $\mathbf{w}$ based on the amount
+As before, we update $\mathbf{w}$ based on the amount
 by which our estimate differs from the observation.
 However, we also shrink the size of $\mathbf{w}$ towards zero.
 That is why the method is sometimes called "weight decay":
@@ -225,16 +225,14 @@ test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 
 ## Implementation from Scratch
 
-Next, we will implement weight decay from scratch,
-simply by adding the squared $\ell_2$ penalty
+In the following, we will implement weight decay from scratch,
+simply by adding the squared $L_2$ penalty
 to the original target function.
 
 ### Initializing Model Parameters
 
 First, we will define a function
-to randomly initialize our model parameters
-and allocate
-memory for the gradients we will calculate.
+to randomly initialize our model parameters.
 
 ```{.python .input}
 def init_params():
@@ -265,10 +263,6 @@ def init_params():
 
 Perhaps the most convenient way to implement this penalty
 is to square all terms in place and sum them up.
-We divide by $2$ by convention
-(when we take the derivative of a quadratic function,
-the $2$ and $1/2$ cancel out, ensuring that the expression
-for the update looks nice and simple).
 
 ```{.python .input}
 def l2_penalty(w):
@@ -287,12 +281,12 @@ def l2_penalty(w):
     return tf.reduce_sum(tf.pow(w, 2)) / 2
 ```
 
-### Defining the Train and Test Functions
+### Defining the Training Loop
 
 The following code fits a model on the training set
 and evaluates it on the test set.
 The linear network and the squared loss
-have not changed since the previous chapter,
+have not changed since :numref:`chap_linear`,
 so we will just import them via `d2l.linreg` and `d2l.squared_loss`.
 The only change here is that our loss now includes the penalty term.
 
@@ -302,8 +296,8 @@ def train(lambd):
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
     num_epochs, lr = 100, 0.003
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[1, num_epochs], legend=['train', 'test'])
-    for epoch in range(1, num_epochs + 1):
+                            xlim=[5, num_epochs], legend=['train', 'test'])
+    for epoch in range(num_epochs):
         for X, y in train_iter:
             with autograd.record():
                 # The L2 norm penalty term has been added, and broadcasting
@@ -311,10 +305,10 @@ def train(lambd):
                 l = loss(net(X), y) + lambd * l2_penalty(w)
             l.backward()
             d2l.sgd([w, b], lr, batch_size)
-        if epoch % 5 == 0:
-            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
-                                 d2l.evaluate_loss(net, test_iter, loss)))
-    print('l1 norm of w:', np.abs(w).sum())
+        if (epoch + 1) % 5 == 0:
+            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
+                                     d2l.evaluate_loss(net, test_iter, loss)))
+    print('L2 norm of w:', np.linalg.norm(w))
 ```
 
 ```{.python .input}
@@ -324,8 +318,8 @@ def train(lambd):
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
     num_epochs, lr = 100, 0.003
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[1, num_epochs], legend=['train', 'test'])
-    for epoch in range(1, num_epochs + 1):
+                            xlim=[5, num_epochs], legend=['train', 'test'])
+    for epoch in range(num_epochs):
         for X, y in train_iter:
             with torch.enable_grad():
                 # The L2 norm penalty term has been added, and broadcasting
@@ -333,10 +327,10 @@ def train(lambd):
                 l = loss(net(X), y) + lambd * l2_penalty(w)
             l.sum().backward()
             d2l.sgd([w, b], lr, batch_size)
-        if epoch % 5 == 0:
-            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
-                                 d2l.evaluate_loss(net, test_iter, loss)))
-    print('l1 norm of w:', torch.norm(w).item())
+        if (epoch + 1) % 5 == 0:
+            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
+                                     d2l.evaluate_loss(net, test_iter, loss)))
+    print('L2 norm of w:', torch.norm(w).item())
 ```
 
 ```{.python .input}
@@ -346,8 +340,8 @@ def train(lambd):
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
     num_epochs, lr = 100, 0.003
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[1, num_epochs], legend=['train', 'test'])
-    for epoch in range(1, num_epochs + 1):
+                            xlim=[5, num_epochs], legend=['train', 'test'])
+    for epoch in range(num_epochs):
         for X, y in train_iter:
             with tf.GradientTape() as tape:
                 # The L2 norm penalty term has been added, and broadcasting
@@ -355,10 +349,10 @@ def train(lambd):
                 l = loss(net(X), y) + lambd * l2_penalty(w)
             grads = tape.gradient(l, [w, b])
             d2l.sgd([w, b], grads, lr, batch_size)
-        if epoch % 5 == 0:
-            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
-                                 d2l.evaluate_loss(net, test_iter, loss)))
-    print('l1 norm of w:', tf.norm(w).numpy())
+        if (epoch + 1) % 5 == 0:
+            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
+                                     d2l.evaluate_loss(net, test_iter, loss)))
+    print('L2 norm of w:', tf.norm(w).numpy())
 ```
 
 ### Training without Regularization
@@ -381,9 +375,6 @@ Note that the training error increases
 but the test error decreases.
 This is precisely the effect
 we expect from regularization.
-As an exercise, you might want to check
-that the $\ell_2$ norm of the weights $\mathbf{w}$
-has actually decreased.
 
 ```{.python .input}
 #@tab all
@@ -445,17 +436,17 @@ def train_concise(wd):
     net.collect_params('.*bias').setattr('wd_mult', 0)
 
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[1, num_epochs], legend=['train', 'test'])
-    for epoch in range(1, num_epochs+1):
+                            xlim=[5, num_epochs], legend=['train', 'test'])
+    for epoch in range(num_epochs):
         for X, y in train_iter:
             with autograd.record():
                 l = loss(net(X), y)
             l.backward()
             trainer.step(batch_size)
-        if epoch % 5 == 0:
-            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
-                                 d2l.evaluate_loss(net, test_iter, loss)))
-    print('L1 norm of w:', np.abs(net[0].weight.data()).sum())
+        if (epoch + 1) % 5 == 0:
+            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
+                                     d2l.evaluate_loss(net, test_iter, loss)))
+    print('L2 norm of w:', np.linalg.norm(net[0].weight.data()))
 ```
 
 ```{.python .input}
@@ -472,18 +463,18 @@ def train_concise(wd):
         {"params":net[0].bias}], lr=lr)
 
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[1, num_epochs], legend=['train', 'test'])
-    for epoch in range(1, num_epochs+1):
+                            xlim=[5, num_epochs], legend=['train', 'test'])
+    for epoch in range(num_epochs):
         for X, y in train_iter:
             with torch.enable_grad():
                 trainer.zero_grad()
                 l = loss(net(X), y)
             l.backward()
             trainer.step()
-        if epoch % 5 == 0:
-            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
-                                 d2l.evaluate_loss(net, test_iter, loss)))
-    print('L1 norm of w:', net[0].weight.norm().item())
+        if (epoch + 1) % 5 == 0:
+            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
+                                     d2l.evaluate_loss(net, test_iter, loss)))
+    print('L2 norm of w:', net[0].weight.norm().item())
 ```
 
 ```{.python .input}
@@ -499,8 +490,8 @@ def train_concise(wd):
     trainer = tf.keras.optimizers.SGD(learning_rate=lr)
 
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[1, num_epochs], legend=['train', 'test'])
-    for epoch in range(1, num_epochs+1):
+                            xlim=[5, num_epochs], legend=['train', 'test'])
+    for epoch in range(num_epochs):
         for X, y in train_iter:
             with tf.GradientTape() as tape:
                 # `tf.keras` requires retrieving and adding the losses from
@@ -508,10 +499,10 @@ def train_concise(wd):
                 l = loss(net(X), y) + net.losses
             grads = tape.gradient(l, net.trainable_variables)
             trainer.apply_gradients(zip(grads, net.trainable_variables))
-        if epoch % 5 == 0:
-            animator.add(epoch, (d2l.evaluate_loss(net, train_iter, loss),
-                                 d2l.evaluate_loss(net, test_iter, loss)))
-    print('L1 norm of w:', tf.norm(net.get_weights()[0]).numpy())
+        if (epoch + 1) % 5 == 0:
+            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
+                                     d2l.evaluate_loss(net, test_iter, loss)))
+    print('L2 norm of w:', tf.norm(net.get_weights()[0]).numpy())
 ```
 
 The plots look identical to those when
@@ -546,7 +537,7 @@ of applying weight decay on all layers of a deep network.
 ## Summary
 
 * Regularization is a common method for dealing with overfitting. It adds a penalty term to the loss function on the training set to reduce the complexity of the learned model.
-* One particular choice for keeping the model simple is weight decay using an $\ell_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
+* One particular choice for keeping the model simple is weight decay using an $L_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
 * The weight decay functionality is provided in optimizers from deep learning frameworks.
 * You can have different optimizers within the same training loop, e.g., for different sets of parameters.
 
@@ -555,7 +546,7 @@ of applying weight decay on all layers of a deep network.
 
 1. Experiment with the value of $\lambda$ in the estimation problem in this page. Plot training and test accuracy as a function of $\lambda$. What do you observe?
 1. Use a validation set to find the optimal value of $\lambda$. Is it really the optimal value? Does this matter?
-1. What would the update equations look like if instead of $\|\mathbf{w}\|^2$ we used $\sum_i |w_i|$ as our penalty of choice (this is called $\ell_1$ regularization).
+1. What would the update equations look like if instead of $\|\mathbf{w}\|^2$ we used $\sum_i |w_i|$ as our penalty of choice (this is called $L_1$ regularization).
 1. We know that $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Can you find a similar equation for matrices (mathematicians call this the [Frobenius norm](https://en.wikipedia.org/wiki/Matrix_norm#Frobenius_norm))?
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?

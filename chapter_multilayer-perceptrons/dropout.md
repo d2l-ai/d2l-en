@@ -4,7 +4,7 @@
 In :numref:`sec_weight_decay`,
 we introduced the classical approach
 to regularizing statistical models
-by penalizing the $\ell_2$ norm of the weights.
+by penalizing the $L_2$ norm of the weights.
 In probabilistic terms, we could justify this technique
 by arguing that we have assumed a prior belief
 that weights take values from
@@ -89,7 +89,7 @@ We explored this when discussing the
 monomial basis functions of linear models
 :numref:`sec_model_selection`.
 Additionally, as we saw when discussing weight decay
-($\ell_2$ regularization) :numref:`sec_weight_decay`,
+($L_2$ regularization) :numref:`sec_weight_decay`,
 the (inverse) norm of the parameters
 represents another useful measure of simplicity.
 Another useful notion of simplicity is smoothness,
