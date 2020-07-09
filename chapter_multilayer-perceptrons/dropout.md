@@ -395,7 +395,7 @@ class Net(nn.Module):
         super(Net, self).__init__()
 
         self.num_inputs = num_inputs
-        self.is_training = is_training
+        self.training = is_training
 
         self.lin1 = nn.Linear(num_inputs, num_hiddens1)
         self.lin2 = nn.Linear(num_hiddens1, num_hiddens2)
@@ -406,11 +406,11 @@ class Net(nn.Module):
     def forward(self, X):
         H1 = self.relu(self.lin1(X.reshape((-1, self.num_inputs))))
         # Use dropout only when training the model
-        if self.is_training == True:
+        if self.training == True:
             # Add a dropout layer after the first fully connected layer
             H1 = dropout_layer(H1, dropout1)
         H2 = self.relu(self.lin2(H1))
-        if self.is_training == True:
+        if self.training == True:
             # Add a dropout layer after the second fully connected layer
             H2 = dropout_layer(H2, dropout2)
         out = self.lin3(H2)

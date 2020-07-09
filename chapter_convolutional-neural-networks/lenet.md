@@ -244,6 +244,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
 ```{.python .input}
 #@tab pytorch
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
+    net.eval()  # Set the model to evaluation mode
     if not device:
         device = next(iter(net.parameters())).device
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
