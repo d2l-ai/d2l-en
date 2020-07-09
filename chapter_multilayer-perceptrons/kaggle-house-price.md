@@ -503,7 +503,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
     for epoch in range(num_epochs):
         for X, y in train_iter:
             optimizer.zero_grad()
-            l = log_rmse(net, X, y)
+            l = loss(net, X, y)
             l.backward()
             optimizer.step()
         train_ls.append(log_rmse(net, train_features, train_labels))
