@@ -444,7 +444,7 @@ def log_rmse(net, features, labels):
     clipped_preds = torch.clamp(net(features), 1, float('inf'))
     rmse = torch.sqrt(torch.mean(loss(torch.log(clipped_preds),
                                        torch.log(labels))))
-    return rmse.item()
+    return rmse
 ```
 
 ```{.python .input}
@@ -506,9 +506,9 @@ def train(net, train_features, train_labels, test_features, test_labels,
             l = loss(net(X), y)
             l.backward()
             optimizer.step()
-        train_ls.append(log_rmse(net, train_features, train_labels))
+        train_ls.append(log_rmse(net, train_features, train_labels).item())
         if test_labels is not None:
-            test_ls.append(log_rmse(net, test_features, test_labels))
+            test_ls.append(log_rmse(net, test_features, test_labels).item())
     return train_ls, test_ls
 ```
 
