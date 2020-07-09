@@ -46,6 +46,21 @@ def annotate(text, xy, xytext):
                            arrowprops=dict(arrowstyle='->'))
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from mpl_toolkits import mplot3d
+import tensorflow as tf
+
+tf.pi = tf.acos(tf.zeros(1)) * 2 # Define pi in tensorflow
+
+#@save
+def annotate(text, xy, xytext):
+    d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
+                           arrowprops=dict(arrowstyle='->'))
+```
+
 The graph below illustrates the issue in some more detail. Since we have only a finite amount of data the minimum of the training error may be at a different location than the minimum of the expected error (or of the test error).
 
 ```{.python .input}
