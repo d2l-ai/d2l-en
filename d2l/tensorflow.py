@@ -33,6 +33,7 @@ size = lambda a: tf.size(a).numpy()
 reshape = tf.reshape
 ones = tf.ones
 zeros = tf.zeros
+tensor = tf.constant
 
 
 # Defined in file: ./chapter_preliminaries/pandas.md

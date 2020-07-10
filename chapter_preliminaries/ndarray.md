@@ -688,6 +688,7 @@ size = lambda a: a.size
 reshape = lambda a, *args: a.reshape(*args)
 ones = np.ones
 zeros = np.zeros
+tensor = np.array
 ```
 
 ```{.python .input}
@@ -698,6 +699,7 @@ size = lambda a: a.numel()
 reshape = lambda a, *args: a.reshape(*args)
 ones = torch.ones
 zeros = torch.zeros
+tensor = torch.Tensor
 ```
 
 ```{.python .input}
@@ -708,6 +710,7 @@ size = lambda a: tf.size(a).numpy()
 reshape = tf.reshape
 ones = tf.ones
 zeros = tf.zeros
+tensor = tf.constant
 ```
 
 In the rest of the book,
