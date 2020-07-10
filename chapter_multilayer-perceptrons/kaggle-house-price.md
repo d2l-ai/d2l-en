@@ -438,7 +438,7 @@ def log_rmse(net, features, labels):
 
 ```{.python .input}
 #@tab pytorch
-def log_rmse(net, features, labels):
+def log_rmse(net,features,labels):
     # To further stabilize the value when the logarithm is taken, set the
     # value less than 1 as 1
     clipped_preds = torch.clamp(net(features), 1, float('inf'))
@@ -516,19 +516,23 @@ def train(net, train_features, train_labels, test_features, test_labels,
 #@tab tensorflow
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
+    train_ls, test_ls = [], []
     train_iter = d2l.load_array((train_features, train_labels), batch_size)
-    test_iter, test_ls = None, []
-    if test_features is not None:
-        test_iter = d2l.load_array((test_features, test_labels), batch_size, is_train=False)
     # The Adam optimization algorithm is used here
     optimizer = tf.keras.optimizers.Adam(learning_rate)
     net.compile(loss=loss, optimizer=optimizer)
-    history = net.fit(train_iter, validation_data=test_iter,
-        epochs=num_epochs, batch_size=batch_size,
-        validation_freq=1, verbose=0)
-    train_ls = history.history['loss']
-    if test_features is not None:
-        test_ls = history.history['val_loss']
+    for epoch in range(num_epochs):
+        for X, y in train_iter:
+            with tf.GradientTape() as tape:
+                y_hat = net(X)
+                l = loss(y, y_hat)
+            params = net.trainable_variables
+            grads = tape.gradient(l, params)
+            optimizer.apply_gradients(zip(grads, params))
+        train_ls.append(log_rmse(train_labels, net(train_features)))
+        if test_labels is not None:
+            test_ls.append(log_rmse(test_labels, net(test_features)))
+    print("train_ls : {}".format(len(train_ls)))
     return train_ls, test_ls
 ```
 
@@ -650,7 +654,7 @@ performance is no longer representative of the true error.
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
 train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
                           weight_decay, batch_size)
-print(f'{k}-fold validation: avg train rmse: {float(train_l):f}, '
+print(f'{k}-fold validation: avg train log rmse: {float(train_l):f}, '
       f'avg valid log rmse: {float(valid_l):f}')
 ```
 
