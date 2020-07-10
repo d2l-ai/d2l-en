@@ -532,3 +532,9 @@ class Residual(tf.keras.Model):  #@save
         return tf.keras.activations.relu(Y)
 
 
+# Defined in file: ./chapter_optimization/optimization-intro.md
+def annotate(text, xy, xytext):
+    d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
+                           arrowprops=dict(arrowstyle='->'))
+
+
