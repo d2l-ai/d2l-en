@@ -121,10 +121,10 @@ as our linear predictor.
 This architecture is commonly called
 a *multilayer perceptron*,
 often abbreviated as *MLP*.
-Below, we depict an MLP diagrammatically (:numref:`fig_nlp`).
+Below, we depict an MLP diagrammatically (:numref:`fig_mlp`).
 
 ![An MLP with a hidden layer of 5 hidden units. ](../img/mlp.svg)
-:label:`fig_nlp`
+:label:`fig_mlp`
 
 This MLP has 4 inputs, 3 outputs,
 and its hidden layer contains 5 hidden units.
@@ -196,6 +196,9 @@ we need one more key ingredient: a
 nonlinear *activation function* $\sigma$
 to be applied to each hidden unit
 following the affine transformation.
+The outputs of activation functions
+(e.g., $\sigma(\cdot)$)
+are called *activations*.
 In general, with activation functions in place,
 it is no longer possible to collapse our MLP into a linear model:
 
@@ -217,7 +220,7 @@ Often, as in this section, the activation functions
 that we apply to hidden layers are not merely rowwise,
 but elementwise.
 That means that after computing the linear portion of the layer,
-we can calculate each activation result
+we can calculate each activation
 without looking at the values taken by the other hidden units.
 This is true for most activation functions.
 
