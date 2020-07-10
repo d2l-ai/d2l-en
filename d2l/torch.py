@@ -38,7 +38,7 @@ size = lambda a: a.numel()
 reshape = lambda a, *args: a.reshape(*args)
 ones = torch.ones
 zeros = torch.zeros
-tensor = torch.Tensor
+tensor = torch.tensor
 
 
 # Defined in file: ./chapter_preliminaries/pandas.md
