@@ -4,9 +4,9 @@
 Exponential family plays a crucial role in deep learning optimization. Without
 carefully constructing the distribution of exponential family, there won't be 
 any objective function constructing by maximum likelihood estimation 
-:numref:sec_maximum_likelihood, nor optimizing the objection. The objection functions of linear 
-regression in :numref:sec_linear_regression and softmax regression in 
-:numref:sec_softmax_regression are two commonly used examples for  exponential family. 
+:numref:`sec_maximum_likelihood`, nor optimizing the objection. The objection functions of linear 
+regression in :numref:`sec_linear_regression` and softmax regression in 
+:numref:`sec_softmax_regression` are two commonly used examples for  exponential family. 
 In this section, we will dive into the fundamental of exponential family.
 
 
@@ -65,12 +65,12 @@ using stochastic gradient descent.
 
 ## Examples of Exponential Family
 
-Now, let's take a look of some distributions in :numref:sec_distributions 
+Now, let's take a look of some distributions in :numref:`sec_distributions`
 and demonstrate that their ties of blood to the exponential family. Supposed we have a random variable $X$ for the before sections.
 
 ### Bernoulli
 
-As we have seen in :numref:sec_distributions, if $X$ follows a Bernoulli distribution with a probability $p$ (i.e., $X \sim \mathrm{Bernoulli}(p)$), then the probability density function of $X$ is:
+As we have seen in :numref:`sec_distributions`, if $X$ follows a Bernoulli distribution with a probability $p$ (i.e., $X \sim \mathrm{Bernoulli}(p)$), then the probability density function of $X$ is:
 
 $$
 \begin{aligned}
@@ -90,7 +90,7 @@ Hence, the parameters of the exponential family format in :eqref:`eq_exp_pdf` ca
 
 ### Poisson
 
-If $X$ follows a Poisson distribution (in :numref:sec_distributions) with a rate or shape parameter $\lambda$ (i.e., $X \sim \mathrm{Poisson}(\lambda)$), then the probability density function of $X$ is:
+If $X$ follows a Poisson distribution (in :numref:`sec_distributions`) with a rate or shape parameter $\lambda$ (i.e., $X \sim \mathrm{Poisson}(\lambda)$), then the probability density function of $X$ is:
 
 $$
 \begin{aligned}
@@ -110,7 +110,7 @@ Hence, the parameters in :eqref:`eq_exp_pdf` can be explained as:
 
 ### Gaussian
 
-From :numref:sec_distributions, if $X$ follows a Gaussian distribution with mean $\mu$ and standard deviation $\sigma$ (i.e., $X \sim \mathcal{N}(\mu, \sigma^2)$), then the probability density function of $X$ is:
+From :numref:`sec_distributions`, if $X$ follows a Gaussian distribution with mean $\mu$ and standard deviation $\sigma$ (i.e., $X \sim \mathcal{N}(\mu, \sigma^2)$), then the probability density function of $X$ is:
 
 $$
 \begin{aligned}
@@ -129,9 +129,30 @@ Hence, the parameters in :eqref:`eq_exp_pdf` can be explained as:
 
 Besides the above distributions, Binomial, Multinomial, Exponential and other commonly seen distributions are members of exponential family as well.
 
+
+
 ## Generalized Linear Model
 
-Another modeling technique that heavily involved the exponential family is the generalized linear model. Fundamentally, the *generalized linear model (GLM)* is a generalization of linear regression to more general exponential family. As we explained in :numref:sec_linear_regression, the error of linear regression, $ e = \mathbf{y} - \mathbf{X}\mathbf{w}\$, was assumed to follow a normal distribution. With GLM, 
+One modeling technique that laid its foundation on exponential family is the generalized linear model. Fundamentally, the *generalized linear model (GLM)* is a generalization from linear regression to more general exponential family. As we explained in :numref:`sec_linear_regression`, the response variable of linear regression, $\mathbf{\hat{y}} = \mathbf{w}^T \mathbf{x}$, was assumed to vary linearly as its inputs $X$ varies. However, this implementation seems to be inappropriate for lots of real-life applications. For example, in :numref:`sec_kaggle_house`, a pure linear regression model may predict a negative price, while the realistic house price cannot be a negative number. To model the response variable $\mathbf{\hat{Y}}$ with more widely used distributions, generalized linear model formulates the problem with the following assumptions:
+
+
+1. The conditional mean of response variable $\mathbf{\hat{y}}$, is denoted as a function of the linear regression of inputs $\mathbf{x}$:
+$$E[y|x]= \mu = g^{-1}(\mathbf{w}^T \mathbf{x}).$$ Here the function $g$ is referred as a *link function*.
+
+1. The response variable $\mathbf{\hat{y}}$ is drawn from an exponential family distribution with conditional mean $\mu$.
+
+
+
+
+
+
+
+
+
+
+
+1. A *link function* $g$ which connects the parameter $\mathbf{\theta}$ with a linear predictor $\mathbf{X}\mathbf{W}$, i.e., $g(\mathbf{\theta}) = \mathbf{X}\mathbf{W}$;
+1. An exponential family distribution, so that $\mathbf{Y} \sim exp \big{(} \mathbf{\theta}, T(\cdot) \big{)}$
 
 
 
@@ -139,7 +160,6 @@ Figure 3 illustrates the graphical model representation of a generalized linear 
 
 
 
-![](./exponential_family.png)
 
 ## Summary
 
@@ -153,3 +173,7 @@ Figure 3 illustrates the graphical model representation of a generalized linear 
 
 1. Can you try to list other examples of exponential family from its mathematical definition?
 1.
+
+```{.python .input}
+
+```
