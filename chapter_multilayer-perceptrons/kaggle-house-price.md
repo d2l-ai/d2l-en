@@ -444,7 +444,7 @@ def log_rmse(net, features, labels):
     clipped_preds = torch.clamp(net(features), 1, float('inf'))
     rmse = torch.sqrt(torch.mean(loss(torch.log(clipped_preds),
                                        torch.log(labels))))
-    return rmse
+    return rmse.item()
 ```
 
 ```{.python .input}
@@ -481,7 +481,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
     for epoch in range(num_epochs):
         for X, y in train_iter:
             with autograd.record():
-                l = log_rmse(net, X, y)
+                l = loss(net, X, y)
             l.backward()
             trainer.step(batch_size)
         train_ls.append(log_rmse(net, train_features, train_labels))
@@ -503,12 +503,12 @@ def train(net, train_features, train_labels, test_features, test_labels,
     for epoch in range(num_epochs):
         for X, y in train_iter:
             optimizer.zero_grad()
-            l = log_rmse(net, X, y)
+            l = loss(net(X), y)
             l.backward()
             optimizer.step()
-        train_ls.append(log_rmse(net, train_features, train_labels).item())
+        train_ls.append(log_rmse(net, train_features, train_labels))
         if test_labels is not None:
-            test_ls.append(log_rmse(net, test_features, test_labels).item())
+            test_ls.append(log_rmse(net, test_features, test_labels))
     return train_ls, test_ls
 ```
 
