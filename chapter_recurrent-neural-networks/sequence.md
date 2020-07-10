@@ -100,7 +100,7 @@ d2l.plot(time, [x])
 Next we need to turn this time series into features and labels that the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots, x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer data points, since we do not have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab all
 tau = 4
 features = d2l.zeros((T-tau, tau))
 for i in range(tau):
@@ -187,7 +187,7 @@ train_net(net, train_iter, loss, 10, 0.01)
 Since training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab all
 estimates = net(features)
 d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(estimates)],
          legend=['data', 'estimate'])
@@ -204,7 +204,7 @@ x_{603} & = f(x_{602}, \ldots, x_{599}).
 In other words, we will have to use our own predictions to make future predictions. Let us see how well this goes.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab all
 predictions = d2l.zeros(T)
 predictions[:n_train] = x[:n_train]
 for i in range(n_train, T):
@@ -221,7 +221,7 @@ As the above example shows, this is a spectacular failure. The estimates decay t
 Let us verify this observation by computing the $k$-step predictions on the entire sequence.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab all
 k = 33  # Look up to k - tau steps ahead
 
 features = d2l.zeros((k, T-k))
