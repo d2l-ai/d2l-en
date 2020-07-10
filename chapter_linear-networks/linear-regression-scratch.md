@@ -498,6 +498,6 @@ that lead to highly accurate prediction.
 [Discussions](https://discuss.d2l.ai/t/43)
 :end_tab:
 
-:begin_tab:`pytorch`
+:begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/201)
 :end_tab:
