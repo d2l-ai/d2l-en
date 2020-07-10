@@ -438,7 +438,7 @@ def log_rmse(net, features, labels):
 
 ```{.python .input}
 #@tab pytorch
-def log_rmse(net,features,labels):
+def log_rmse(net, features, labels):
     # To further stabilize the value when the logarithm is taken, set the
     # value less than 1 as 1
     clipped_preds = torch.clamp(net(features), 1, float('inf'))
