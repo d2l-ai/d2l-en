@@ -3,12 +3,20 @@
 
 In this section, we are going to introduce the basic principles of stochastic gradient descent.
 
-```{.python .input  n=2}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
 from mxnet import np, npx
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import math
+import torch
 ```
 
 ## Stochastic Gradient Updates
@@ -35,7 +43,7 @@ This means that, on average, the stochastic gradient is a good estimate of the g
 
 Now, we will compare it to gradient descent by adding random noise with a mean of 0 to the gradient to simulate a SGD.
 
-```{.python .input  n=3}
+```{.python .input}
 def f(x1, x2):
     return x1 ** 2 + 2 * x2 ** 2  # Objective
 
@@ -46,6 +54,27 @@ def sgd(x1, x2, s1, s2):  # Simulate noisy gradient
     global lr  # Learning rate scheduler
     (g1, g2) = gradf(x1, x2)  # Compute gradient
     (g1, g2) = (g1 + np.random.normal(0.1), g2 + np.random.normal(0.1))
+    eta_t = eta * lr()  # Learning rate at time t
+    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
+
+eta = 0.1
+lr = (lambda: 1)  # Constant learning rate
+d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
+```
+
+```{.python .input}
+#@tab pytorch
+def f(x1, x2):
+    return x1 ** 2 + 2 * x2 ** 2  # Objective
+
+def gradf(x1, x2):
+    return (2 * x1, 4 * x2)  # Gradient
+
+def sgd(x1, x2, s1, s2):  # Simulate noisy gradient
+    global lr  # Learning rate scheduler
+    (g1, g2) = gradf(x1, x2)  # Compute gradient
+    (g1, g2) = (g1 + torch.normal(torch.tensor(0.1)), g2 +
+                torch.normal(torch.tensor(0.1)))
     eta_t = eta * lr()  # Learning rate at time t
     return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
 
@@ -72,7 +101,8 @@ $$
 
 In the first scenario we decrease the learning rate, e.g., whenever progress in optimization has stalled. This is a common strategy for training deep networks. Alternatively we could decrease it much more aggressively by an exponential decay. Unfortunately this leads to premature stopping before the algorithm has converged. A popular choice is polynomial decay with $\alpha = 0.5$. In the case of convex optimization there are a number of proofs which show that this rate is well behaved. Let us see what this looks like in practice.
 
-```{.python .input  n=4}
+```{.python .input}
+#@tab all
 def exponential():
     global ctr
     ctr += 1
@@ -85,7 +115,8 @@ d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000))
 
 As expected, the variance in the parameters is significantly reduced. However, this comes at the expense of failing to converge to the optimal solution $\mathbf{x} = (0, 0)$. Even after 1000 steps are we are still very far away from the optimal solution. Indeed, the algorithm fails to converge at all. On the other hand, if we use a polynomial decay where the learning rate decays with the inverse square root of the number of steps convergence is good.
 
-```{.python .input  n=5}
+```{.python .input}
+#@tab all
 def polynomial():
     global ctr
     ctr += 1
