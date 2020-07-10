@@ -481,7 +481,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
     for epoch in range(num_epochs):
         for X, y in train_iter:
             with autograd.record():
-                l = loss(net, X, y)
+                l = loss(net(X), y)
             l.backward()
             trainer.step(batch_size)
         train_ls.append(log_rmse(net, train_features, train_labels))
@@ -522,7 +522,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
         test_iter = d2l.load_array((test_features, test_labels), batch_size, is_train=False)
     # The Adam optimization algorithm is used here
     optimizer = tf.keras.optimizers.Adam(learning_rate)
-    net.compile(loss=log_rmse, optimizer=optimizer)
+    net.compile(loss=loss, optimizer=optimizer)
     history = net.fit(train_iter, validation_data=test_iter,
         epochs=num_epochs, batch_size=batch_size,
         validation_freq=1, verbose=0)
