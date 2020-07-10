@@ -532,7 +532,6 @@ def train(net, train_features, train_labels, test_features, test_labels,
         train_ls.append(log_rmse(train_labels, net(train_features)))
         if test_labels is not None:
             test_ls.append(log_rmse(test_labels, net(test_features)))
-    print("train_ls : {}".format(len(train_ls)))
     return train_ls, test_ls
 ```
 
