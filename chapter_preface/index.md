@@ -361,6 +361,14 @@ import numpy as np
 import tensorflow as tf
 ```
 
+Note that the comment `#@save` is a special mark where the following function,
+class, or statements are saved in the `d2l` package.
+In the rest of the book,
+we often define more complicated functions or classes.
+For those that can be used later,
+we will also save them in the `d2l` package
+so later they can be directly invoked without being redefined.
+
 ### Target Audience
 
 This book is for students (undergraduate or graduate),

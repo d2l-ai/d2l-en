@@ -32,15 +32,6 @@ from torch.utils import data
 from torchvision import transforms
 
 
-# Defined in file: ./chapter_preliminaries/ndarray.md
-numpy = lambda a: a.detach().numpy()
-size = lambda a: a.numel()
-reshape = lambda a, *args: a.reshape(*args)
-ones = torch.ones
-zeros = torch.zeros
-tensor = torch.Tensor
-
-
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
     """Make a directory if it does not exist."""
@@ -1092,4 +1083,12 @@ def show_trace_2d(f, results):
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
 
+
+# Alias defined in config.ini
+numpy = lambda a: a.detach().numpy()
+size = lambda a: a.numel()
+reshape = lambda a, *args: a.reshape(*args)
+ones = torch.ones
+zeros = torch.zeros
+tensor = torch.tensor
 

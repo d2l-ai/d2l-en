@@ -27,15 +27,6 @@ import numpy as np
 import tensorflow as tf
 
 
-# Defined in file: ./chapter_preliminaries/ndarray.md
-numpy = lambda a: a.numpy()
-size = lambda a: tf.size(a).numpy()
-reshape = tf.reshape
-ones = tf.ones
-zeros = tf.zeros
-tensor = tf.constant
-
-
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
     """Make a directory if it does not exist."""
@@ -532,4 +523,12 @@ class Residual(tf.keras.Model):  #@save
         Y += X
         return tf.keras.activations.relu(Y)
 
+
+# Alias defined in config.ini
+numpy = lambda a: a.numpy()
+size = lambda a: tf.size(a).numpy()
+reshape = tf.reshape
+ones = tf.ones
+zeros = tf.zeros
+tensor = tf.constant
 
