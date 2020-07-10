@@ -289,7 +289,8 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
             l.backward()
             trainer.step(batch_size)
             train_l_sum += float(l)
-            train_acc_sum += float((y_hat.argmax(axis=1) == y).sum())
+            train_acc_sum += float(
+                (y_hat.argmax(axis=1).astype(y.dtype) == y).sum())
             n += y.size
         time_s = f'time {time.time() - start:.2f} sec'
         if valid_iter is not None:

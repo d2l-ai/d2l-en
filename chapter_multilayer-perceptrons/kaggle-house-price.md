@@ -438,7 +438,7 @@ def log_rmse(net, features, labels):
 
 ```{.python .input}
 #@tab pytorch
-def log_rmse(net,features,labels):
+def log_rmse(net, features, labels):
     # To further stabilize the value when the logarithm is taken, set the
     # value less than 1 as 1
     clipped_preds = torch.clamp(net(features), 1, float('inf'))
@@ -453,8 +453,8 @@ def log_rmse(y_true, y_pred):
     # To further stabilize the value when the logarithm is taken, set the
     # value less than 1 as 1
     clipped_preds = tf.clip_by_value(y_pred, 1, float('inf'))
-    return tf.sqrt(tf.reduce_sum(loss(
-        tf.math.log(y_true), tf.math.log(clipped_preds))) / batch_size)
+    return tf.sqrt(tf.reduce_mean(loss(
+        tf.math.log(y_true), tf.math.log(clipped_preds))))
 ```
 
 Unlike in previous sections, our training functions
@@ -503,8 +503,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
     for epoch in range(num_epochs):
         for X, y in train_iter:
             optimizer.zero_grad()
-            outputs = net(X)
-            l = loss(outputs,y)
+            l = loss(net(X), y)
             l.backward()
             optimizer.step()
         train_ls.append(log_rmse(net, train_features, train_labels))
@@ -517,19 +516,22 @@ def train(net, train_features, train_labels, test_features, test_labels,
 #@tab tensorflow
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
+    train_ls, test_ls = [], []
     train_iter = d2l.load_array((train_features, train_labels), batch_size)
-    test_iter, test_ls = None, []
-    if test_features is not None:
-        test_iter = d2l.load_array((test_features, test_labels), batch_size, is_train=False)
     # The Adam optimization algorithm is used here
     optimizer = tf.keras.optimizers.Adam(learning_rate)
-    net.compile(loss=log_rmse, optimizer=optimizer)
-    history = net.fit(train_iter, validation_data=test_iter,
-        epochs=num_epochs, batch_size=batch_size,
-        validation_freq=1, verbose=0)
-    train_ls = history.history['loss']
-    if test_features is not None:
-        test_ls = history.history['val_loss']
+    net.compile(loss=loss, optimizer=optimizer)
+    for epoch in range(num_epochs):
+        for X, y in train_iter:
+            with tf.GradientTape() as tape:
+                y_hat = net(X)
+                l = loss(y, y_hat)
+            params = net.trainable_variables
+            grads = tape.gradient(l, params)
+            optimizer.apply_gradients(zip(grads, params))
+        train_ls.append(log_rmse(train_labels, net(train_features)))
+        if test_labels is not None:
+            test_ls.append(log_rmse(test_labels, net(test_features)))
     return train_ls, test_ls
 ```
 
@@ -627,8 +629,8 @@ def k_fold(k, X_train, y_train, num_epochs,
             d2l.plot(list(range(1, num_epochs+1)), [train_ls, valid_ls],
                      xlabel='epoch', ylabel='rmse',
                      legend=['train', 'valid'], yscale='log')
-        print(f'fold {i}, train rmse {float(train_ls[-1]):f}, '
-              f'valid rmse {float(valid_ls[-1]):f}')
+        print(f'fold {i}, train log rmse {float(train_ls[-1]):f}, '
+              f'valid log rmse {float(valid_ls[-1]):f}')
     return train_l_sum / k, valid_l_sum / k
 ```
 
@@ -651,11 +653,11 @@ performance is no longer representative of the true error.
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
 train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
                           weight_decay, batch_size)
-print(f'{k}-fold validation: avg train rmse: {float(train_l):f}, '
-      f'avg valid rmse: {float(valid_l):f}')
+print(f'{k}-fold validation: avg train log rmse: {float(train_l):f}, '
+      f'avg valid log rmse: {float(valid_l):f}')
 ```
 
-Notice that someimes the number of training errors
+Notice that sometimes the number of training errors
 for a set of hyperparameters can be very low,
 even as the number of errors on $k$-fold cross-validation
 is considerably higher.
@@ -684,8 +686,8 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     train_ls, _ = train(net, train_features, train_labels, None, None,
                         num_epochs, lr, weight_decay, batch_size)
     d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',
-             ylabel='rmse', yscale='log')
-    print(f'train rmse {float(train_ls[-1]):f}')
+             ylabel='log rmse', yscale='log')
+    print(f'train log rmse {float(train_ls[-1]):f}')
     # Apply the network to the test set
     preds = d2l.numpy(net(test_features))
     # Reformat it for export to Kaggle
