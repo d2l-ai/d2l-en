@@ -453,8 +453,8 @@ def log_rmse(y_true, y_pred):
     # To further stabilize the value when the logarithm is taken, set the
     # value less than 1 as 1
     clipped_preds = tf.clip_by_value(y_pred, 1, float('inf'))
-    return tf.sqrt(tf.reduce_sum(loss(
-        tf.math.log(y_true), tf.math.log(clipped_preds))) / batch_size)
+    return tf.sqrt(tf.reduce_mean(loss(
+        tf.math.log(y_true), tf.math.log(clipped_preds))))
 ```
 
 Unlike in previous sections, our training functions
