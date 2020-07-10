@@ -657,7 +657,7 @@ print(f'{k}-fold validation: avg train log rmse: {float(train_l):f}, '
       f'avg valid log rmse: {float(valid_l):f}')
 ```
 
-Notice that someimes the number of training errors
+Notice that sometimes the number of training errors
 for a set of hyperparameters can be very low,
 even as the number of errors on $k$-fold cross-validation
 is considerably higher.
