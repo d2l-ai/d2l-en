@@ -27,15 +27,6 @@ from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
 
 
-# Defined in file: ./chapter_preliminaries/ndarray.md
-numpy = lambda a: a.asnumpy()
-size = lambda a: a.size
-reshape = lambda a, *args: a.reshape(*args)
-ones = np.ones
-zeros = np.zeros
-tensor = np.array
-
-
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
     """Make a directory if it does not exist."""
@@ -2568,4 +2559,12 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+
+# Alias defined in config.ini
+numpy = lambda a: a.asnumpy()
+size = lambda a: a.size
+reshape = lambda a, *args: a.reshape(*args)
+ones = np.ones
+zeros = np.zeros
+tensor = np.array
 
