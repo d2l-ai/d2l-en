@@ -288,20 +288,6 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
         metric = d2l.Accumulator(3)
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
-<<<<<<< HEAD
-        for X, y in train_iter:
-            y = y.astype('float32').as_in_ctx(ctx)
-            with autograd.record():
-                y_hat = net(X.as_in_ctx(ctx))
-                l = loss(y_hat, y).sum()
-            l.backward()
-            trainer.step(batch_size)
-            train_l_sum += float(l)
-            train_acc_sum += float(
-                (y_hat.argmax(axis=1).astype(y.dtype) == y).sum())
-            n += y.size
-        time_s = f'time {time.time() - start:.2f} sec'
-=======
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
             l, acc = d2l.train_batch_ch13(
@@ -313,7 +299,6 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
                 animator.add(epoch + i / num_batches,
                              (metric[0] / metric[2], metric[1] / metric[2],
                               None))
->>>>>>> kaggle cv
         if valid_iter is not None:
             valid_acc = d2l.evaluate_accuracy_gpus(net, valid_iter, d2l.split_batch)
             animator.add(epoch + 1, (None, None, valid_acc))
@@ -334,7 +319,7 @@ Now, we can train and validate the model. The following hyperparameters can be t
 
 ```{.python .input  n=13}
 ctx, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.1, 5e-4
-lr_period, lr_decay, net = 80, 0.1, get_net(ctx)
+lr_period, lr_decay, net = 50, 0.1, get_net(ctx)
 net.hybridize()
 train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
