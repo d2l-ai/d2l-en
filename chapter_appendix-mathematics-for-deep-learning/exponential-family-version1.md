@@ -1,18 +1,12 @@
 # Exponential Family
 :label:`sec_exp_family`
 
-
-Constructing and optimizing an objective function is crucial in deep learning. 
-As we may allude when discussing linear regression in :numref:`sec_linear_regression` and softmax regression in 
-:numref:`sec_softmax_regression`, 
-we normally use methods such as maximum likelihood estimation (:numref:`sec_maximum_likelihood`) to find 
-
-Exponential family plays a crucial role in deep learning optimization. 
-
-The objection functions of 
-
-
-are two commonly used examples for  exponential family. 
+Exponential family plays a crucial role in deep learning optimization. Without
+carefully constructing the distribution of exponential family, there won't be 
+any objective function constructing by maximum likelihood estimation 
+:numref:`sec_maximum_likelihood`, nor optimizing the objection. The objection functions of linear 
+regression in :numref:`sec_linear_regression` and softmax regression in 
+:numref:`sec_softmax_regression` are two commonly used examples for  exponential family. 
 In this section, we will dive into the fundamental of exponential family.
 
 
