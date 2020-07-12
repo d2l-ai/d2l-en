@@ -261,6 +261,7 @@ are not sufficiently informative
 to classify every example perfectly.
 
 ### Softmax and Derivatives
+:label:`subsec_softmax_and_derivatives`
 
 Since the softmax and the corresponding loss are so common,
 it is worth understanding a bit better how it is computed.
