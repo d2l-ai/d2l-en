@@ -3,7 +3,7 @@
 
 Now that we have learned how to work with probability in both the discrete and the continuous setting, let us get to know some of the common distributions encountered.  Depending on the area of machine learning, we may need to be familiar with vastly more of these, or for some areas of deep learning potentially none at all.  This is, however, a good basic list to be familiar with.  Let us first import some common libraries.
 
-```
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from IPython import display
@@ -11,8 +11,7 @@ from math import erf, factorial
 import numpy as np
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -22,7 +21,6 @@ import torch
 
 torch.pi = torch.acos(torch.zeros(1)) * 2  # Define pi in torch
 ```
-
 
 ## Bernoulli
 
@@ -39,7 +37,7 @@ $$F(x) = \begin{cases} 0 & x < 0, \\ 1-p & 0 \le x < 1, \\ 1 & x >= 1 . \end{cas
 
 The probability mass function is plotted below.
 
-```
+```{.python .input}
 #@tab all
 p = 0.3
 
@@ -50,10 +48,9 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-
 Now, let us plot the cumulative distribution function :eqref:`eq_bernoulli_cdf`.
 
-```
+```{.python .input}
 x = np.arange(-1, 2, 0.01)
 
 def F(x):
@@ -62,8 +59,7 @@ def F(x):
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 x = torch.arange(-1, 2, 0.01)
 
@@ -73,7 +69,6 @@ def F(x):
 d2l.plot(x, torch.tensor([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-
 If $X \sim \mathrm{Bernoulli}(p)$, then:
 
 * $\mu_X = p$,
@@ -81,16 +76,14 @@ If $X \sim \mathrm{Bernoulli}(p)$, then:
 
 We can sample an array of arbitrary shape from a Bernoulli random variable as follows.
 
-```
+```{.python .input}
 1*(np.random.rand(10, 10) < p)
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 1*(torch.rand(10, 10) < p)
 ```
-
 
 ## Discrete Uniform
 
@@ -107,7 +100,7 @@ $$F(x) = \begin{cases} 0 & x < 1, \\ \frac{k}{n} & k \le x < k+1 \text{ with } 1
 
 Let us first plot the probability mass function.
 
-```
+```{.python .input}
 #@tab all
 n = 5
 
@@ -117,10 +110,9 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-
 Now, let us plot the cumulative distribution function :eqref:`eq_discrete_uniform_cdf`.
 
-```
+```{.python .input}
 x = np.arange(-1, 6, 0.01)
 
 def F(x):
@@ -129,8 +121,7 @@ def F(x):
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 x = torch.arange(-1, 6, 0.01)
 
@@ -140,7 +131,6 @@ def F(x):
 d2l.plot(x, torch.tensor([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-
 If $X \sim \mathrm{Uniform}(n)$, then:
 
 * $\mu_X = \frac{1+n}{2}$,
@@ -148,16 +138,14 @@ If $X \sim \mathrm{Uniform}(n)$, then:
 
 We can sample an array of arbitrary shape from a discrete uniform random variable as follows.
 
-```
+```{.python .input}
 np.random.randint(1, n, size=(10, 10))
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 torch.randint(1, n, size=(10, 10))
 ```
-
 
 ## Continuous Uniform
 
@@ -179,7 +167,7 @@ $$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a, b], \\ 1 & x >=
 
 Let us first plot the probability density function :eqref:`eq_cont_uniform_pdf`.
 
-```
+```{.python .input}
 a, b = 1, 3
 
 x = np.arange(0, 4, 0.01)
@@ -188,8 +176,7 @@ p = (x > a)*(x < b)/(b - a)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 a, b = 1, 3
 
@@ -198,25 +185,22 @@ p = (x > a).type(torch.float32)*(x < b).type(torch.float32)/(b-a)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-
 Now, let us plot the cumulative distribution function :eqref:`eq_cont_uniform_cdf`.
 
-```
+```{.python .input}
 def F(x):
     return 0 if x < a else 1 if x > b else (x - a) / (b - a)
 
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 def F(x):
     return 0 if x < a else 1 if x > b else (x - a) / (b - a)
 
 d2l.plot(x, torch.tensor([F(y) for y in x]), 'x', 'c.d.f.')
 ```
-
 
 If $X \sim \mathrm{Uniform}([a, b])$, then:
 
@@ -225,16 +209,14 @@ If $X \sim \mathrm{Uniform}([a, b])$, then:
 
 We can sample an array of arbitrary shape from a uniform random variable as follows.  Note that it by default samples from a $\mathrm{Uniform}([0,1])$, so if we want a different range we need to scale it.
 
-```
+```{.python .input}
 (b - a) * np.random.rand(10, 10) + a
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 (b - a) * torch.rand(10, 10) + a
 ```
-
 
 ## Binomial
 
@@ -259,7 +241,7 @@ $$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m} 
 
 Let us first plot the probability mass function.
 
-```
+```{.python .input}
 n, p = 10, 0.2
 
 # Compute binomial coefficient
@@ -277,8 +259,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 n, p = 10, 0.2
 
@@ -297,10 +278,9 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-
 Now, let us plot the cumulative distribution function :eqref:`eq_binomial_cdf`.
 
-```
+```{.python .input}
 x = np.arange(-1, 11, 0.01)
 cmf = np.cumsum(pmf)
 
@@ -310,8 +290,7 @@ def F(x):
 d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 x = torch.arange(-1, 11, 0.01)
 cmf = torch.cumsum(pmf, dim=0)
@@ -322,7 +301,6 @@ def F(x):
 d2l.plot(x, torch.tensor([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
 
-
 While this result is not simple, the means and variances are.  If $X \sim \mathrm{Binomial}(n, p)$, then:
 
 * $\mu_X = np$,
@@ -330,17 +308,15 @@ While this result is not simple, the means and variances are.  If $X \sim \mathr
 
 This can be sampled as follows.
 
-```
+```{.python .input}
 np.random.binomial(n, p, size=(10, 10))
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 m = torch.distributions.binomial.Binomial(n, p)
 m.sample(sample_shape=(10, 10))
 ```
-
 
 ## Poisson
 Let us now perform a thought experiment.  We are standing at a bus stop and we want to know how many buses will arrive in the next minute.  Let us start by considering $X^{(1)} \sim \mathrm{Bernoulli}(p)$ which is simply the probability that a bus arrives in the one minute window.  For bus stops far from an urban center, this might be a pretty good approximation.  We may never see more than one bus in a minute.
@@ -376,7 +352,7 @@ $$F(x) = \begin{cases} 0 & x < 0, \\ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}
 
 Let us first plot the probability mass function :eqref:`eq_poisson_mass`.
 
-```
+```{.python .input}
 lam = 5.0
 
 xs = [i for i in range(20)]
@@ -388,8 +364,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 lam = 5.0
 
@@ -403,10 +378,9 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-
 Now, let us plot the cumulative distribution function :eqref:`eq_poisson_cdf`.
 
-```
+```{.python .input}
 x = np.arange(-1, 21, 0.01)
 cmf = np.cumsum(pmf)
 def F(x):
@@ -415,8 +389,7 @@ def F(x):
 d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 x = torch.arange(-1, 21, 0.01)
 cmf = torch.cumsum(pmf, dim=0)
@@ -426,7 +399,6 @@ def F(x):
 d2l.plot(x, torch.tensor([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
 
-
 As we saw above, the means and variances are particularly concise.  If $X \sim \mathrm{Poisson}(\lambda)$, then:
 
 * $\mu_X = \lambda$,
@@ -434,17 +406,15 @@ As we saw above, the means and variances are particularly concise.  If $X \sim \
 
 This can be sampled as follows.
 
-```
+```{.python .input}
 np.random.poisson(lam, size=(10, 10))
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 m = torch.distributions.poisson.Poisson(lam)
 m.sample((10, 10))
 ```
-
 
 ## Gaussian
 Now Let us try a different, but related experiment.  Let us say we again are performing $n$ independent $\mathrm{Bernoulli}(p)$ measurements $X_i$.  The distribution of the sum of these is $X^{(n)} \sim \mathrm{Binomial}(n, p)$.  Rather than taking a limit as $n$ increases and $p$ decreases, Let us fix $p$, and then send $n \rightarrow \infty$.  In this case $\mu_{X^{(n)}} = np \rightarrow \infty$ and $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, so there is no reason to think this limit should be well defined.
@@ -457,7 +427,7 @@ $$
 
 This can be seen to have mean zero and variance one, and so it is plausible to believe that it will converge to some limiting distribution.  If we plot what these distributions look like, we will become even more convinced that it will work.
 
-```
+```{.python .input}
 p = 0.2
 ns = [1, 10, 100, 1000]
 d2l.plt.figure(figsize=(10, 3))
@@ -474,8 +444,7 @@ for i in range(4):
 d2l.plt.show()
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 p = 0.2
 ns = [1, 10, 100, 1000]
@@ -495,7 +464,6 @@ for i in range(4):
 d2l.plt.show()
 ```
 
-
 One thing to note: compared to the Poisson case, we are now dividing by the standard deviation which means that we are squeezing the possible outcomes into smaller and smaller areas.  This is an indication that our limit will no longer be discrete, but rather a continuous.
 
 A derivation of what occurs is beyond the scope of this document, but the *central limit theorem* states that as $n \rightarrow \infty$, this will yield the Gaussian Distribution (or sometimes normal distribution).  More explicitly, for any $a, b$:
@@ -511,7 +479,7 @@ $$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$
 
 Let us first plot the probability density function :eqref:`eq_gaussian_pdf`.
 
-```
+```{.python .input}
 mu, sigma = 0, 1
 
 x = np.arange(-3, 3, 0.01)
@@ -520,8 +488,7 @@ p = 1 / np.sqrt(2 * np.pi * sigma**2) * np.exp(-(x - mu)**2 / (2 * sigma**2))
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 mu, sigma = 0, 1
 
@@ -532,25 +499,22 @@ p = 1 / torch.sqrt(2 * torch.pi * sigma**2) * torch.exp(
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-
 Now, let us plot the cumulative distribution function.  It is beyond the scope of this appendix, but the Gaussian c.d.f. does not have a closed-form formula in terms of more elementary functions.  We will use `erf` which provides a way to compute this integral numerically.
 
-```
+```{.python .input}
 def phi(x):
     return (1.0 + erf((x - mu) / (sigma * np.sqrt(2)))) / 2.0
 
 d2l.plot(x, np.array([phi(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 def phi(x):
     return (1.0 + erf((x - mu) / (sigma * torch.sqrt(torch.tensor(2.))))) / 2.0
 
 d2l.plot(x, torch.tensor([phi(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
-
 
 Keen-eyed readers will recognize some of these terms.  Indeed, we encountered this integral in :numref:`sec_integral_calculus`.  Indeed we need exactly that computation to see that this $p_X(x)$ has total area one and is thus a valid density.
 
@@ -579,20 +543,21 @@ To close the section, Let us recall that if $X \sim \mathcal{N}(\mu, \sigma^2)$,
 
 We can sample from the Gaussian (or standard normal) distribution as shown below.
 
-```
+```{.python .input}
 np.random.normal(mu, sigma, size=(10, 10))
 ```
 
-
-```
+```{.python .input}
 #@tab pytorch
 torch.normal(mu, sigma, size=(10, 10))
 ```
 
-
 ## Exponential Family
 
-One shared property for all the distributions listed above is that they all belong to which is known as the *exponential family*. The exponential family is a set of distributions whose density can be expressed in the following form:
+One shared property for all the distributions listed above is that they all 
+belong to which is known as the *exponential family*. The exponential family 
+is a set of distributions whose density can be expressed in the following form
+:
 
 $$p(\mathbf{x} | \mathbf{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \big{(} 
 \eta^{\top} \cdot T\mathbf(x) - A(\mathbf{\eta}) \big{)}$$
@@ -600,36 +565,61 @@ $$p(\mathbf{x} | \mathbf{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \big{(}
 
 As this definition can be a little subtle, let us examine it closely.  
 
-First, $h(\mathbf{x})$ is known as the *underlying measure* or the *base measure*.  This can be viewed as an original choice of measure we are modifying with our exponential weight.  
+First, $h(\mathbf{x})$ is known as the *underlying measure* or the 
+*base measure*.  This can be viewed as an original choice of measure we are 
+modifying with our exponential weight.  
 
-Second, we have the vector $\mathbf{\eta} = (\eta_1, \eta_2, ..., \eta_l) \in \mathbb{R}^l$ called the *natural parameters* or *canonical parameters*.  These define how the base measure will be modified.  The natural parameters enter into the new measure by taking the dot product of these parameters against some function $T(\cdot)$ of $\mathbf{x}= (x_1, x_2, ..., x_n) \in \mathbb{R}^n$ and exponentiated. $T(\mathbf{x})= (T_1(\mathbf{x}), T_2(\mathbf{x}), ..., T_l(\mathbf{x}))$ 
+Second, we have the vector $\mathbf{\eta} = (\eta_1, \eta_2, ..., \eta_l) \in 
+\mathbb{R}^l$ called the *natural parameters* or *canonical parameters*.  These
+define how the base measure will be modified.  The natural parameters enter 
+into the new measure by taking the dot product of these parameters against 
+some function $T(\cdot)$ of $\mathbf{x}= (x_1, x_2, ..., x_n) \in 
+\mathbb{R}^n$ and exponentiated. $T(\mathbf{x})= (T_1(\mathbf{x}), 
+T_2(\mathbf{x}), ..., T_l(\mathbf{x}))$ 
 is called the *sufficient statistics* for $\eta$. This name is used since the 
-information represented by $T(\mathbf{x})$ is sufficient to calculate the probability density and no other information from the sample $\mathbf{x}$'s are required.
+information represented by $T(\mathbf{x})$ is sufficient to calculate the 
+probability density and no other information from the sample $\mathbf{x}$'s 
+are required.
 
-Third, we have $A(\mathbf{\eta})$, which is referred to as the *cumulant function*, which ensures that the above distribution :eqref:`eq_exp_pdf` integrates to one, i.e.,
+Third, we have $A(\mathbf{\eta})$, which is referred to as the *cumulant 
+function*, which ensures that the above distribution :eqref:`eq_exp_pdf` 
+integrates to one, i.e.,
 
-$$  A(\mathbf{\eta}) = \log \left[\int h(\mathbf{x}) \cdot \mathrm{exp} \big{(}\eta^{\top} \cdot T\mathbf(x) \big{)} dx\right].$$
+$$  A(\mathbf{\eta}) = \log \left[\int h(\mathbf{x}) \cdot \mathrm{exp} 
+\big{(}\eta^{\top} \cdot T\mathbf(x) \big{)} dx \right].$$
 
-To be concrete, let us consider the Gaussian.  We saw that it had a density of
+To be concrete, let us consider the Gaussian. Assuming that $\mathbf{x}$ is 
+an univariate variable, we saw that it had a density of
 
 $$
 \begin{aligned}
-p(x | \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \mathrm{exp} \Big{\{} \frac{-(x-\mu)^2}{2 \sigma^2} \Big{\}} \\
-&= \frac{1}{\sqrt{2 \pi}} \cdot \mathrm{exp} \Big{\{} \frac{\mu}{\sigma^2}x - \frac{1}{2 \sigma^2} x^2 - \big{(} \frac{1}{2 \sigma^2} \mu^2 + \log(\sigma) \big{)} \Big{\}} .
+p(x | \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \mathrm{exp} 
+\Big{\{} \frac{-(x-\mu)^2}{2 \sigma^2} \Big{\}} \\
+&= \frac{1}{\sqrt{2 \pi}} \cdot \mathrm{exp} \Big{\{} \frac{\mu}{\sigma^2}x 
+- \frac{1}{2 \sigma^2} x^2 - \big{(} \frac{1}{2 \sigma^2} \mu^2 
++ \log(\sigma) \big{)} \Big{\}} .
 \end{aligned}
 $$
 
 This matches the definition of the exponential family with:
 
 * *underlying measure*: $h(x) = \frac{1}{\sqrt{2 \pi}}$,
-* *natural parameters*: $\eta = \begin{bmatrix} \eta_1 \\ \eta_2 \end{bmatrix} = \begin{bmatrix} \frac{\mu}{\sigma^2} \\ \frac{1}{2 \sigma^2}  \end{bmatrix}$,
+* *natural parameters*: $\eta = \begin{bmatrix} \eta_1 \\ \eta_2 
+\end{bmatrix} = \begin{bmatrix} \frac{\mu}{\sigma^2} \\ 
+\frac{1}{2 \sigma^2}  \end{bmatrix}$,
 * *sufficient statistics*: $T(x) = \begin{bmatrix}x\\-x^2\end{bmatrix}$, and
-* *cumulant function*: $A(\eta) = \frac{1}{2 \sigma^2} \mu^2 + \log(\sigma)  = \frac{\eta_1^2}{4 \eta_2} - \frac{1}{2}\log(2 \eta_2)$.
+* *cumulant function*: $A(\eta) = \frac{1}{2 \sigma^2} \mu^2 + \log(\sigma)  
+= \frac{\eta_1^2}{4 \eta_2} - \frac{1}{2}\log(2 \eta_2)$.
 
-It is worth noting that the exact choice of each of these terms is somewhat arbitrary.  Indeed, the important feature is that the distribution can be expressed in this form, not the exact form itself.
+It is worth noting that the exact choice of each of above terms is somewhat 
+arbitrary.  Indeed, the important feature is that the distribution can be 
+expressed in this form, not the exact form itself.
 
 As we allude to in :numref:`subsec_softmax_and_derivatives`, a widely used 
-technique is to assume that the  final output $\mathbf{y}$ follows an exponential family distribution. The exponential family is a common and powerful family of distributions encountered frequently in machine learning.
+technique is to assume that the  final output $\mathbf{y}$ follows an 
+exponential family distribution. The exponential family is a common and 
+powerful family of distributions encountered frequently in machine learning.
+
 
 ## Summary
 * Bernoulli random variables can be used to model events with a yes/no outcome.
@@ -650,3 +640,7 @@ technique is to assume that the  final output $\mathbf{y}$ follows an exponentia
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/417)
 :end_tab:
+
+```{.python .input}
+
+```
