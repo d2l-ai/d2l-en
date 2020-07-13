@@ -35,6 +35,15 @@ from mpl_toolkits import mplot3d
 import torch
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import numpy as np
+from mpl_toolkits import mplot3d
+import tensorflow as tf
+```
+
 Next we define two functions, the expected function $f$ and the
 empirical function $g$, to illustrate this issue. Here the $g$ is less smooth than $f$
 since we have only a finite amount of data.
@@ -49,6 +58,13 @@ def g(x): return f(x) + 0.2 * np.cos(5 * np.pi * x)
 def f(x): return x * torch.cos(np.pi * x)
 def g(x): return f(x) + 0.2 * torch.cos(5 * np.pi * x)
 ```
+
+```{.python .input}
+#@tab tensorflow
+def f(x): return x * tf.cos(np.pi * x)
+def g(x): return f(x) + 0.2 * tf.cos(5 * np.pi * x)
+```
+
 
 The graph below illustrates that the minimum of the training error may be at a different location than the minimum of the expected error (or of the test error).
 
@@ -123,6 +139,12 @@ x, y = torch.meshgrid(torch.linspace(-1, 1, 101), torch.linspace(-1, 1, 101))
 z = x**2 - y**2
 ```
 
+```{.python .input}
+#@tab tensorflow
+x, y = tf.meshgrid(tf.linspace(-1.0, 1.0, 101), tf.linspace(-1.0, 1.0, 101))
+z = x**2 - y**2
+```
+
 It has its saddle point at $(0, 0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
 
 ```{.python .input}
@@ -136,6 +158,7 @@ ax.set_zticks(ticks)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y');
 ```
+
 
 We assume that the input of a function is a $k$-dimensional vector and its
 output is a scalar, so its Hessian matrix will have $k$ eigenvalues
@@ -164,6 +187,13 @@ annotate('vanishing gradient', (4, 1), (2, 0.0))
 #@tab pytorch
 x = torch.arange(-2.0, 5.0, 0.01)
 d2l.plot(x, [torch.tanh(x)], 'x', 'f(x)')
+annotate('vanishing gradient', (4, 1), (2, 0.0))
+```
+
+```{.python .input}
+#@tab tensorflow
+x = tf.range(-2.0, 5.0, 0.01)
+d2l.plot(x, [tf.tanh(x)], 'x', 'f(x)')
 annotate('vanishing gradient', (4, 1), (2, 0.0))
 ```
 
