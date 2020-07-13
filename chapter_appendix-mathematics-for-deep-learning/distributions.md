@@ -590,10 +590,10 @@ $$  A(\mathbf{\eta}) = \log \int h(\mathbf{x}) \cdot exp \big{(}
 \eta^{\top} \cdot T\mathbf(x) \big{)} dx.$$
 
 
-As we may allude in :numref:`sec_softmax_regression`, a widely used technique 
-to approximate the final output $\mathbf{y}$ is by assuming it follows an 
-exponential family distribution. Hence, exponential family is powerful and 
-prevalent in deep learning optimization
+As we may allude in :numref:`subsec_softmax_and_derivatives`, a widely used 
+technique to approximate the final output $\mathbf{y}$ is by assuming it 
+follows an exponential family distribution. Hence, exponential family is 
+powerful and prevalent in deep learning optimization.
 
 ## Summary
 * Bernoulli random variables can be used to model events with a yes/no outcome.
