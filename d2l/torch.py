@@ -1042,7 +1042,7 @@ class MLPAttention(nn.Module):
 
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
-def annotate(text, xy, xytext):
+def annotate(text, xy, xytext):  #@save
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
 
@@ -1079,4 +1079,5 @@ ones = torch.ones
 zeros = torch.zeros
 tensor = torch.tensor
 to = lambda a, ctx: a.to(ctx)
+arange = torch.arange
 
