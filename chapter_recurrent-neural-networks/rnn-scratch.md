@@ -428,7 +428,7 @@ Finally let us check the results to use a random sampling iterator.
 
 ```{.python .input}
 #@tab all
-train_ch8(model, train_iter, vocab, lr, num_epochs, dl2.try_gpu(),
+train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
           use_random_iter=True)
 ```
 
