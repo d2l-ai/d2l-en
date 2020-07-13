@@ -552,6 +552,49 @@ np.random.normal(mu, sigma, size=(10, 10))
 torch.normal(mu, sigma, size=(10, 10))
 ```
 
+## Exponential Family
+
+One shared interest for the above distributions is that they all belong to
+exponential family. The *exponential family* is a set of distributions which 
+can be expressed in the below form:
+
+$$\mathbf{x \mid \mathbf{\eta}} \sim exp \big{(} \mathbf{\eta}, T(\cdot) \big{)}$$
+
+where 
+- $\mathbf{x} = (x_1, x_2, ..., x_n) \in \mathbb{R}^n$ is a random vector;
+- $\mathbf{\eta} = (\eta_1, \eta_2, ..., \eta_l) \in \mathbb{R}^l$ 
+is called as *natural parameters* (or *canonical parameters*).
+
+
+To be more concrete, the probability density function of the exponential 
+family can be written in as follows:
+
+$$p(\mathbf{x} | \mathbf{\eta}) = h(\mathbf{x}) \cdot exp \big{(} 
+\eta^{\top} \cdot T\mathbf(x) - A(\mathbf{\eta}) \big{)}$$
+:eqlabel:`eq_exp_pdf`
+
+where the three functions of $\mathbf{x}$ and $\mathbf{\eta}$ in the 
+$f_{\eta}(\mathbf{x})$ are known:
+- $T(\mathbf{x})= (T_1(\mathbf{x}), T_2(\mathbf{x}), ..., T_l(\mathbf{x}))$ 
+is called as the *sufficient statistics* for $\eta$. That is, the 
+information represented by $T(\mathbf{x})$ is sufficient to calculate the 
+parameter $\eta$, no other information from the sample $\mathbf{x}$'s is 
+needed for estimating
+$\eta$. For example, the sample mean is the sufficient statistics for the 
+true mean parameter ($\eta$) of a normal distribution with known variance;
+- $h(\mathbf{x})$ is known as the *underlying measure* or the *base measure*;
+- $A(\mathbf{\eta})$ is referred to as the *cumulant function*, which ensures 
+that the above distribution :eqref:`eq_exp_pdf` integrates to one, i.e.,
+
+$$  A(\mathbf{\eta}) = \log \int h(\mathbf{x}) \cdot exp \big{(} 
+\eta^{\top} \cdot T\mathbf(x) \big{)} dx.$$
+
+
+As we may allude in :numref:`sec_softmax_regression`, a widely used technique 
+to approximate the final output $\mathbf{y}$ is by assuming it follows an 
+exponential family distribution. Hence, exponential family is powerful and 
+prevalent in deep learning optimization
+
 ## Summary
 * Bernoulli random variables can be used to model events with a yes/no outcome.
 * Discrete uniform distributions model selects from a finite set of possibilities.
@@ -559,6 +602,7 @@ torch.normal(mu, sigma, size=(10, 10))
 * Binomial distributions model a series of Bernoulli random variables, and count the number of successes.
 * Poisson random variables model the arrival of rare events.
 * Gaussian random variables model the result of adding a large number of independent random variables together.
+* All the above distributions belong to exponential family.
 
 ## Exercises
 
