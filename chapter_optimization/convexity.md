@@ -132,7 +132,8 @@ $$S_b := \{x | x \in X \text{ and } f(x) \leq b\}.$$
 
 Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \in S_b$ we need to show that $\lambda x + (1-\lambda) x' \in S_b$ as long as $\lambda \in [0, 1]$. But this follows directly from the definition of convexity since $f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b$.
 
-Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below.
+Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
+
 
 ```{.python .input}
 x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
@@ -146,11 +147,11 @@ x, y = torch.meshgrid(torch.linspace(-1, 1, 101), torch.linspace(-1, 1, 101))
 z = x**2 + 0.5 * torch.cos(2 * np.pi * y)
 ```
 
-It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
 
 ```{.python .input}
 #@tab all
 # Plot the 3D surface
+d2l.set_figsize((6, 4))
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.contour(x, y, z, offset=-1)
@@ -196,12 +197,12 @@ By geometry it follows that $f(x)$ is below the line connecting $f(a)$ and $f(b)
 f = lambda x: 0.5 * x**2
 x = d2l.arange(-2, 2, 0.01)
 axb, ab = d2l.tensor([-1.5, -0.5, 1]), d2l.tensor([-1.5, 1])
+d2l.set_figsize()
 d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
 d2l.annotate('a', (-1.5, f(-1.5)), (-1.5, 1.5))
 d2l.annotate('b', (1, f(1)), (1, 1.5))
 d2l.annotate('x', (-0.5, f(-0.5)), (-1.5, f(-0.5)))
 ```
-
 
 ## Constraints
 
