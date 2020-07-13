@@ -148,6 +148,7 @@ z = x**2 - y**2
 It has its saddle point at $(0, 0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
 
 ```{.python .input}
+#@tab all
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.plot([0], [0], [0], 'rx')
@@ -158,7 +159,6 @@ ax.set_zticks(ticks)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y');
 ```
-
 
 We assume that the input of a function is a $k$-dimensional vector and its
 output is a scalar, so its Hessian matrix will have $k$ eigenvalues
@@ -225,6 +225,10 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
 [Discussions](https://discuss.d2l.ai/t/349)
 :end_tab:
 
-:begin_tab:`mxnet`
+:begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/487)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/489)
 :end_tab:

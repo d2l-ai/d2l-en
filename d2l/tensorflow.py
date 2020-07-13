@@ -525,9 +525,10 @@ class Residual(tf.keras.Model):  #@save
 
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
-def annotate(text, xy, xytext):
+def annotate(text, xy, xytext):  #@save
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
+
 
 # Alias defined in config.ini
 numpy = lambda a: a.numpy()
