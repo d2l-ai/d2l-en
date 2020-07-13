@@ -1159,7 +1159,7 @@ class TransformerEncoder(d2l.Encoder):
 
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
-def annotate(text, xy, xytext):
+def annotate(text, xy, xytext):  #@save
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
 
@@ -2559,4 +2559,5 @@ ones = np.ones
 zeros = np.zeros
 tensor = np.array
 to = lambda a, ctx: a.as_in_context(ctx)
+arange = np.arange
 
