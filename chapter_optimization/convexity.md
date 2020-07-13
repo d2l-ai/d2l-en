@@ -72,6 +72,7 @@ h = lambda x: torch.exp(0.5 * x)  # Convex
 ```
 
 ```{.python .input}
+#@tab all
 x, segment = d2l.arange(-2, 2, 0.01), d2l.tensor([-1.5, 1])
 d2l.use_svg_display()
 _, axes = d2l.plt.subplots(1, 3, figsize=(9, 3))
@@ -191,6 +192,7 @@ $$\begin{aligned}
 By geometry it follows that $f(x)$ is below the line connecting $f(a)$ and $f(b)$, thus proving convexity. We omit a more formal derivation in favor of a graph below.
 
 ```{.python .input}
+#@tab all
 f = lambda x: 0.5 * x**2
 x = d2l.arange(-2, 2, 0.01)
 axb, ab = d2l.tensor([-1.5, -0.5, 1]), d2l.tensor([-1.5, 1])
@@ -277,6 +279,6 @@ In the context of deep learning the main purpose of convex functions is to motiv
 [Discussions](https://discuss.d2l.ai/t/350)
 :end_tab:
 
-:begin_tab:`mxnet`
+:begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/488)
 :end_tab:
