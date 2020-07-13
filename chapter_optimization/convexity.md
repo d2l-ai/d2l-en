@@ -51,47 +51,31 @@ npx.set_np()
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
+import numpy as np
 from mpl_toolkits import mplot3d
 import torch
-
-torch.pi = torch.acos(torch.zeros(1)).item() * 2  # Define pi in torch
 ```
 
 Let us define a few functions, both convex and nonconvex.
 
 ```{.python .input}
-def f(x):
-    return 0.5 * x**2  # Convex
-
-def g(x):
-    return np.cos(np.pi * x)  # Nonconvex
-
-def h(x):
-    return np.exp(0.5 * x)  # Convex
-
-x, segment = np.arange(-2, 2, 0.01), np.array([-1.5, 1])
-d2l.use_svg_display()
-_, axes = d2l.plt.subplots(1, 3, figsize=(9, 3))
-
-for ax, func in zip(axes, [f, g, h]):
-    d2l.plot([x, segment], [func(x), func(segment)], axes=ax)
+f = lambda x: 0.5 * x**2  # Convex
+g = lambda x: np.cos(np.pi * x)  # Nonconvex
+h = lambda x: np.exp(0.5 * x)  # Convex
 ```
 
 ```{.python .input}
 #@tab pytorch
-def f(x):
-    return 0.5 * x**2  # Convex
+f = lambda x: 0.5 * x**2  # Convex
+g = lambda x: torch.cos(np.pi * x)  # Nonconvex
+h = lambda x: torch.exp(0.5 * x)  # Convex
+```
 
-def g(x):
-    return torch.cos(torch.pi * x)  # Nonconvex
-
-def h(x):
-    return torch.exp(0.5 * x)  # Convex
-
-x, segment = torch.arange(-2, 2, 0.01), torch.tensor([-1.5, 1])
+```{.python .input}
+#@tab all
+x, segment = d2l.arange(-2, 2, 0.01), d2l.tensor([-1.5, 1])
 d2l.use_svg_display()
 _, axes = d2l.plt.subplots(1, 3, figsize=(9, 3))
-
 for ax, func in zip(axes, [f, g, h]):
     d2l.plot([x, segment], [func(x), func(segment)], axes=ax)
 ```
@@ -133,9 +117,7 @@ This contradicts the assumption that $f(x)$ is a local minimum. For instance, th
 
 ```{.python .input}
 #@tab all
-def f(x):
-    return (x-1)**2 * (x+1)
-
+f = lambda x: (x-1)**2 * (x+1)
 d2l.set_figsize()
 d2l.plot([x, segment], [f(x), f(segment)], 'x', 'f(x)')
 ```
@@ -152,37 +134,28 @@ Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \i
 
 Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
 
+
 ```{.python .input}
 x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
                    indexing='ij')
-
 z = x**2 + 0.5 * np.cos(2 * np.pi * y)
-
-# Plot the 3D surface
-d2l.set_figsize((6, 4))
-ax = d2l.plt.figure().add_subplot(111, projection='3d')
-ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
-ax.contour(x, y, z, offset=-1)
-ax.set_zlim(-1, 1.5)
-
-# Adjust labels
-for func in [d2l.plt.xticks, d2l.plt.yticks, ax.set_zticks]:
-    func([-1, 0, 1])
 ```
 
 ```{.python .input}
 #@tab pytorch
 x, y = torch.meshgrid(torch.linspace(-1, 1, 101), torch.linspace(-1, 1, 101))
+z = x**2 + 0.5 * torch.cos(2 * np.pi * y)
+```
 
-z = x**2 + 0.5 * torch.cos(2 * torch.pi * y)
 
+```{.python .input}
+#@tab all
 # Plot the 3D surface
 d2l.set_figsize((6, 4))
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.contour(x, y, z, offset=-1)
 ax.set_zlim(-1, 1.5)
-
 # Adjust labels
 for func in [d2l.plt.xticks, d2l.plt.yticks, ax.set_zticks]:
     func([-1, 0, 1])
@@ -220,27 +193,10 @@ $$\begin{aligned}
 By geometry it follows that $f(x)$ is below the line connecting $f(a)$ and $f(b)$, thus proving convexity. We omit a more formal derivation in favor of a graph below.
 
 ```{.python .input}
-def f(x):
-    return 0.5 * x**2
-
-x = np.arange(-2, 2, 0.01)
-axb, ab = np.array([-1.5, -0.5, 1]), np.array([-1.5, 1])
-
-d2l.set_figsize()
-d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
-d2l.annotate('a', (-1.5, f(-1.5)), (-1.5, 1.5))
-d2l.annotate('b', (1, f(1)), (1, 1.5))
-d2l.annotate('x', (-0.5, f(-0.5)), (-1.5, f(-0.5)))
-```
-
-```{.python .input}
-#@tab pytorch
-def f(x):
-    return 0.5 * x**2
-
-x = torch.arange(-2, 2, 0.01)
-axb, ab = torch.tensor([-1.5, -0.5, 1]), torch.tensor([-1.5, 1])
-
+#@tab all
+f = lambda x: 0.5 * x**2
+x = d2l.arange(-2, 2, 0.01)
+axb, ab = d2l.tensor([-1.5, -0.5, 1]), d2l.tensor([-1.5, 1])
 d2l.set_figsize()
 d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
 d2l.annotate('a', (-1.5, f(-1.5)), (-1.5, 1.5))
@@ -322,4 +278,8 @@ In the context of deep learning the main purpose of convex functions is to motiv
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/350)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/488)
 :end_tab:
