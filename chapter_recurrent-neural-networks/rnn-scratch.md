@@ -1,7 +1,7 @@
 # Implementation of Recurrent Neural Networks from Scratch
 :label:`sec_rnn_scratch`
 
-In this section we implement a language model introduced in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the dataset first, which is introduced in :numref:`sec_language_model`.
+In this section we implement a language model introduced in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. Let's first import the libraries and modules for this section.
 
 ```{.python .input}
 %matplotlib inline
@@ -9,9 +9,6 @@ from d2l import mxnet as d2l
 import math
 from mxnet import autograd, np, npx, gluon
 npx.set_np()
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ```{.python .input}
@@ -22,9 +19,15 @@ import math
 import torch
 from torch import nn
 from torch.nn import functional as F
+```
 
+Next we load the dataset that is introduced in :numref:`sec_language_model`.
+
+```{.python .input}
+#@tab all
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+
 ```
 
 ## One-hot Encoding
@@ -238,12 +241,8 @@ def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
 We test the `predict_ch8` function first. Given that we did not train the network, it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
 
 ```{.python .input}
-predict_ch8('time traveller ', 10, model, vocab, ctx)
-```
-
-```{.python .input}
-#@tab pytorch
-predict_ch8('time traveller ', 10, model, vocab, device)
+#@tab all
+predict_ch8('time traveller ', 10, model, vocab, d2l.try_gpu())
 ```
 
 ## Gradient Clipping
