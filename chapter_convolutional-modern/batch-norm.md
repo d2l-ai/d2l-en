@@ -26,8 +26,8 @@ when training ML models and neural nets in particular.
    was to standardize our input features
    to each have a mean of *zero* and variance of *one*.
    Intuitively, this standardization plays nicely with our optimizers
-   because it puts the  parameters are a-priori at a similar scale.
-1. For a typical MLP or CNN, as we train,
+   because it puts the parameters a-priori at a similar scale.
+2. For a typical MLP or CNN, as we train,
    the activations in intermediate layers
    may take values with widely varying magnitudes—both
    along the layers from the input to the output,
@@ -39,7 +39,7 @@ when training ML models and neural nets in particular.
    Intuitively, we might conjecture that if one
    layer has activation values that are 100x that of another layer,
    this might necessitate compensatory adjustments in the learning rates.
-1. Deeper networks are complex and easily capable of overfitting.
+3. Deeper networks are complex and easily capable of overfitting.
    This means that regularization becomes more critical.
 
 Batch normalization is applied to individual layers

@@ -153,7 +153,7 @@ show_images(X, 2, 9, titles=get_fashion_mnist_labels(y));
 
 To make our life easier when reading from the training and test sets,
 we use the built-in data iterator rather than creating one from scratch.
-Recall that at each iteration, a load loader
+Recall that at each iteration, a data loader
 reads a minibatch of data with size `batch_size` each time.
 We also randomly shuffle the examples for the training data iterator.
 

@@ -27,14 +27,6 @@ from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
 
 
-# Defined in file: ./chapter_preliminaries/ndarray.md
-numpy = lambda a: a.asnumpy()
-size = lambda a: a.size
-reshape = lambda a, *args: a.reshape(*args)
-ones = np.ones
-zeros = np.zeros
-
-
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
     """Make a directory if it does not exist."""
@@ -576,7 +568,7 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_random(corpus, batch_size, num_steps):
+def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
     # Offset the iterator over the data for uniform starts
     corpus = corpus[random.randint(0, num_steps):]
     # Subtract 1 extra since we need to account for label
@@ -595,17 +587,17 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
         batch_indices = example_indices[i:(i+batch_size)]
         X = [data(j) for j in batch_indices]
         Y = [data(j + 1) for j in batch_indices]
-        yield np.array(X), np.array(Y)
+        yield d2l.tensor(X), d2l.tensor(Y)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):
+def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data: ignore `num_steps` and just wrap around
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = np.array(corpus[offset:offset+num_indices])
-    Ys = np.array(corpus[offset+1:offset+1+num_indices])
+    Xs = d2l.tensor(corpus[offset:offset+num_indices])
+    Ys = d2l.tensor(corpus[offset+1:offset+1+num_indices])
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
@@ -615,7 +607,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-class SeqDataLoader:
+class SeqDataLoader:  #@save
     """A iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
@@ -630,17 +622,16 @@ class SeqDataLoader:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
-                           max_tokens=10000):
+def load_data_time_machine(batch_size, num_steps,  #@save
+                           use_random_iter=False, max_tokens=10000):
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
     return data_iter, data_iter.vocab
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-class RNNModelScratch:
+class RNNModelScratch:  #@save
     """A RNN Model based on scratch implementations."""
-
     def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -656,12 +647,10 @@ class RNNModelScratch:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_predicts, model, vocab, ctx):
+def predict_ch8(prefix, num_predicts, model, vocab, ctx):  #@save
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
-
-    def get_input():
-        return np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
+    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -672,7 +661,7 @@ def predict_ch8(prefix, num_predicts, model, vocab, ctx):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def grad_clipping(model, theta):
+def grad_clipping(model, theta):  #@save
     if isinstance(model, gluon.Block):
         params = [p.data() for p in model.collect_params().values()]
     else:
@@ -684,7 +673,7 @@ def grad_clipping(model, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
+def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):  #@save
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
@@ -708,7 +697,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
+def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,  #@save
               use_random_iter=False):
     # Initialize
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -718,16 +707,10 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
         model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
         trainer = gluon.Trainer(model.collect_params(),
                                 'sgd', {'learning_rate': lr})
-
-        def updater(batch_size):
-            return trainer.step(batch_size)
+        updater = lambda batch_size: trainer.step(batch_size)
     else:
-        def updater(batch_size):
-            return d2l.sgd(model.params, lr, batch_size)
-
-    def predict(prefix):
-        return predict_ch8(prefix, 50, model, vocab, ctx)
-
+        updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, ctx)
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
@@ -1176,7 +1159,7 @@ class TransformerEncoder(d2l.Encoder):
 
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
-def annotate(text, xy, xytext):
+def annotate(text, xy, xytext):  #@save
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
 
@@ -2567,4 +2550,14 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+
+# Alias defined in config.ini
+numpy = lambda a: a.asnumpy()
+size = lambda a: a.size
+reshape = lambda a, *args: a.reshape(*args)
+ones = np.ones
+zeros = np.zeros
+tensor = np.array
+to = lambda a, ctx: a.as_in_context(ctx)
+arange = np.arange
 

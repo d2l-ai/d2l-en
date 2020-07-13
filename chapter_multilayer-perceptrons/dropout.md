@@ -8,7 +8,7 @@ by penalizing the $L_2$ norm of the weights.
 In probabilistic terms, we could justify this technique
 by arguing that we have assumed a prior belief
 that weights take values from
-a Gaussian distribution with mean $0$.
+a Gaussian distribution with mean zero.
 More intuitively, we might argue
 that we encouraged the model to spread out its weights
 among many features rather than depending too much
@@ -21,7 +21,7 @@ linear models tend to overfit.
 But given more examples than features,
 we can generally count on linear models not to overfit.
 Unfortunately, the reliability with which
-linear models generalize comes at a cost:
+linear models generalize comes at a cost.
 Naively applied, linear models do not take
 into account interactions among features.
 For every feature, a linear model must assign
@@ -30,10 +30,9 @@ either a positive or a negative weight, ignoring context.
 In traditional texts, this fundamental tension
 between generalizability and flexibility
 is described as the *bias-variance tradeoff*.
-Linear models have high bias
-(they can only represent a small class of functions),
-but low variance (they give similar results
-across different random samples of the data).
+Linear models have high bias: they can only represent a small class of functions.
+However, these models have low variance: they give similar results
+across different random samples of the data.
 
 Deep neural networks inhabit the opposite
 end of the bias-variance spectrum.
@@ -52,9 +51,8 @@ the extreme flexibility of neural networks
 by training deep nets on randomly-labeled images.
 Despite the absence of any true pattern
 linking the inputs to the outputs,
-they found that the neural network optimized by SGD
+they found that the neural network optimized by stochastic gradient descent
 could label every image in the training set perfectly.
-
 Consider what this means.
 If the labels are assigned uniformly
 at random and there are 10 classes,
@@ -64,15 +62,15 @@ The generalization gap here is a whopping 90%.
 If our models are so expressive that they
 can overfit this badly, then when should
 we expect them not to overfit?
+
 The mathematical foundations for
 the puzzling generalization properties
 of deep networks remain open research questions,
 and we encourage the theoretically-oriented
 reader to dig deeper into the topic.
-For now, we turn to the more terrestrial investigation of
-practical tools that tend (empirically)
-to improve the generalization of deep nets.
-
+For now, we turn to the investigation of
+practical tools that tend to
+empirically improve the generalization of deep nets.
 
 ## Robustness through Perturbations
 
@@ -82,16 +80,16 @@ We want it to peform well on unseen data.
 Classical generalization theory
 suggests that to close the gap between
 train and test performance,
-we should aim for a *simple* model.
+we should aim for a simple model.
 Simplicity can come in the form
 of a small number of dimensions.
 We explored this when discussing the
 monomial basis functions of linear models
-:numref:`sec_model_selection`.
+in :numref:`sec_model_selection`.
 Additionally, as we saw when discussing weight decay
-($L_2$ regularization) :numref:`sec_weight_decay`,
-the (inverse) norm of the parameters
-represents another useful measure of simplicity.
+($L_2$ regularization) in :numref:`sec_weight_decay`,
+the (inverse) norm of the parameters also
+represents a useful measure of simplicity.
 Another useful notion of simplicity is smoothness,
 i.e., that the function should not be sensitive
 to small changes to its inputs.
@@ -109,7 +107,7 @@ to perturbations in the input.
 
 Then, in 2014, Srivastava et al. :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`
 developed a clever idea for how to apply Bishop's idea
-to the *internal* layers of the network, too.
+to the internal layers of a network, too.
 Namely, they proposed to inject noise
 into each layer of the network
 before calculating the subsequent layer during training.
@@ -126,7 +124,7 @@ The method is called *dropout* because we literally
 *drop out* some neurons during training.
 Throughout training, on each iteration,
 standard dropout consists of zeroing out
-some fraction (typically 50%) of the nodes in each layer
+some fraction of the nodes in each layer
 before calculating the subsequent layer.
 
 To be clear, we are imposing
@@ -143,13 +141,13 @@ Dropout, they claim, breaks up co-adaptation
 just as sexual reproduction is argued to
 break up co-adapted genes.
 
-The key challenge then is *how* to inject this noise.
+The key challenge then is how to inject this noise.
 One idea is to inject the noise in an *unbiased* manner
 so that the expected value of each layer---while fixing
 the others---equals to the value it would have taken absent noise.
 
 In Bishop's work, he added Gaussian noise
-to the inputs to a linear model:
+to the inputs to a linear model.
 At each training iteration, he added noise
 sampled from a distribution with mean zero
 $\epsilon \sim \mathcal{N}(0,\sigma^2)$ to the input $\mathbf{x}$,
@@ -159,8 +157,10 @@ In expectation, $E[\mathbf{x}'] = \mathbf{x}$.
 In standard dropout regularization,
 one debiases each layer by normalizing
 by the fraction of nodes that were retained (not dropped out).
-In other words, dropout with *dropout probability* $p$
-is applied as follows:
+In other words,
+with *dropout probability* $p$,
+each intermediate activation $h$ is replaced by
+a random variable $h'$ as follows:
 
 $$
 \begin{aligned}
@@ -173,53 +173,36 @@ h' =
 $$
 
 By design, the expectation remains unchanged, i.e., $E[h'] = h$.
-Intermediate activations $h$ are replaced by
-a random variable $h'$ with matching expectation.
-
-
 
 ## Dropout in Practice
 
-Recall the multilayer perceptron (:numref:`sec_mlp`)
-with a hidden layer and 5 hidden units.
-Its architecture is given by
-
-$$
-\begin{aligned}
-    \mathbf{h} & = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1), \\
-    \mathbf{o} & = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2, \\
-    \hat{\mathbf{y}} & = \mathrm{softmax}(\mathbf{o}).
-\end{aligned}
-$$
-
+Recall the MLP with a hidden layer and 5 hidden units
+in :numref:`fig_mlp`.
 When we apply dropout to a hidden layer,
 zeroing out each hidden unit with probability $p$,
 the result can be viewed as a network
 containing only a subset of the original neurons.
 In :numref:`fig_dropout2`, $h_2$ and $h_5$ are removed.
-Consequently, the calculation of $y$
-no longer depends on $h_2$ and $h_5$
+Consequently, the calculation of the outputs
+no longer depends on $h_2$ or $h_5$
 and their respective gradient also vanishes
-when performing backprop.
+when performing backpropagation.
 In this way, the calculation of the output layer
 cannot be overly dependent on any
 one element of $h_1, \ldots, h_5$.
 
-![MLP before and after dropout](../img/dropout2.svg)
+![MLP before and after dropout.](../img/dropout2.svg)
 :label:`fig_dropout2`
 
-Typically, ***we disable dropout at test time***.
+Typically, we disable dropout at test time.
 Given a trained model and a new example,
 we do not drop out any nodes
-(and thus do not need to normalize).
+and thus do not need to normalize.
 However, there are some exceptions:
 some researchers use dropout at test time as a heuristic
 for estimating the *uncertainty* of neural network predictions:
 if the predictions agree across many different dropout masks,
 then we might say that the network is more confident.
-For now we will put off uncertainty estimation
-for subsequent chapters and volumes.
-
 
 ## Implementation from Scratch
 
@@ -237,8 +220,8 @@ sample is greater than $p$, dropping the rest.
 In the following code, we implement a `dropout_layer` function
 that drops out the elements in the tensor input `X`
 with probability `dropout`,
-rescaling the remainder as described above
-(dividing the survivors by `1.0-dropout`).
+rescaling the remainder as described above:
+dividing the survivors by `1.0-dropout`.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -255,7 +238,7 @@ def dropout_layer(X, dropout):
     if dropout == 0:
         return X
     mask = np.random.uniform(0, 1, X.shape) > dropout
-    return mask.astype(np.float32) * X / (1.0-dropout)
+    return mask.astype(np.float32) * X / (1.0 - dropout)
 ```
 
 ```{.python .input}
@@ -273,7 +256,7 @@ def dropout_layer(X, dropout):
     if dropout == 0:
         return X
     mask = (torch.Tensor(X.shape).uniform_(0, 1) > dropout).float()
-    return mask * X / (1.0-dropout)
+    return mask * X / (1.0 - dropout)
 ```
 
 ```{.python .input}
@@ -327,9 +310,9 @@ print(dropout_layer(X, 1.))
 ### Defining Model Parameters
 
 Again, we work with the Fashion-MNIST dataset
-introduced in :numref:`sec_softmax_scratch`.
-We define a multilayer perceptron with
-two hidden layers containing 256 outputs each.
+introduced in :numref:`sec_fashion_mnist`.
+We define an MLP with
+two hidden layers containing 256 units each.
 
 ```{.python .input}
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
@@ -365,8 +348,7 @@ A common trend is to set
 a lower dropout probability closer to the input layer.
 Below we set it to 0.2 and 0.5 for the first
 and second hidden layers, respectively.
-By checking `is_training` described in :numref:`sec_autograd`,
-we can ensure that dropout is only active during training.
+We ensure that dropout is only active during training.
 
 ```{.python .input}
 dropout1, dropout2 = 0.2, 0.5
@@ -395,7 +377,7 @@ class Net(nn.Module):
         super(Net, self).__init__()
 
         self.num_inputs = num_inputs
-        self.is_training = is_training
+        self.training = is_training
 
         self.lin1 = nn.Linear(num_inputs, num_hiddens1)
         self.lin2 = nn.Linear(num_hiddens1, num_hiddens2)
@@ -406,11 +388,11 @@ class Net(nn.Module):
     def forward(self, X):
         H1 = self.relu(self.lin1(X.reshape((-1, self.num_inputs))))
         # Use dropout only when training the model
-        if self.is_training == True:
+        if self.training == True:
             # Add a dropout layer after the first fully connected layer
             H1 = dropout_layer(H1, dropout1)
         H2 = self.relu(self.lin2(H1))
-        if self.is_training == True:
+        if self.training == True:
             # Add a dropout layer after the second fully connected layer
             H2 = dropout_layer(H2, dropout2)
         out = self.lin3(H2)
@@ -448,7 +430,7 @@ net = Net(num_outputs, num_hiddens1, num_hiddens2)
 
 ### Training and Testing
 
-This is similar to the training and testing of multilayer perceptrons described previously.
+This is similar to the training and testing of MLPs described previously.
 
 ```{.python .input}
 num_epochs, lr, batch_size = 10, 0.5, 256
@@ -478,7 +460,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 ## Concise Implementation
 
-With the high-level APIs, all we need to do is add a `Dropout` layer
+With high-level APIs, all we need to do is add a `Dropout` layer
 after each fully-connected layer,
 passing in the dropout probability
 as the only argument to its constructor.
@@ -556,18 +538,18 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 ## Summary
 
-* Beyond controlling the number of dimensions and the size of the weight vector, dropout is yet another tool to avoid overfitting. Often all three are used jointly.
-* Dropout replaces an activation $h$ with a random variable $h'$ with expected value $h$ and with variance given by the dropout probability $p$.
+* Beyond controlling the number of dimensions and the size of the weight vector, dropout is yet another tool to avoid overfitting. Often they are used jointly.
+* Dropout replaces an activation $h$ with a random variable with expected value $h$.
 * Dropout is only used during training.
 
 
 ## Exercises
 
-1. What happens if you change the dropout probabilities for layers 1 and 2? In particular, what happens if you switch the ones for both layers? Design an experiment to answer these questions, describe your results quantitatively, and summarize the qualitative takeaways.
+1. What happens if you change the dropout probabilities for the first and second layers? In particular, what happens if you switch the ones for both layers? Design an experiment to answer these questions, describe your results quantitatively, and summarize the qualitative takeaways.
 1. Increase the number of epochs and compare the results obtained when using dropout with those when not using it.
 1. What is the variance of the activations in each hidden layer when dropout is and is not applied? Draw a plot to show how this quantity evolves over time for both models.
 1. Why is dropout not typically used at test time?
-1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What happens when dropout and weight decay are used at the same time? Are the results additive, are there diminished returns or (worse), do they cancel each other out?
+1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What happens when dropout and weight decay are used at the same time? Are the results additive? Are there diminished returns (or worse)? Do they cancel each other out?
 1. What happens if we apply dropout to the individual weights of the weight matrix rather than the activations?
 1. Invent another technique for injecting random noise at each layer that is different from the standard dropout technique. Can you develop a method that outperforms dropout on the Fashion-MNIST dataset (for a fixed architecture)?
 

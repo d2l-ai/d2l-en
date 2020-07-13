@@ -27,14 +27,6 @@ import numpy as np
 import tensorflow as tf
 
 
-# Defined in file: ./chapter_preliminaries/ndarray.md
-numpy = lambda a: a.numpy()
-size = lambda a: tf.size(a).numpy()
-reshape = tf.reshape
-ones = tf.ones
-zeros = tf.zeros
-
-
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
     """Make a directory if it does not exist."""
@@ -537,4 +529,12 @@ def annotate(text, xy, xytext):
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
 
+# Alias defined in config.ini
+numpy = lambda a: a.numpy()
+size = lambda a: tf.size(a).numpy()
+reshape = tf.reshape
+ones = tf.ones
+zeros = tf.zeros
+tensor = tf.constant
+arange = tf.range
 

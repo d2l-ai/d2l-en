@@ -32,14 +32,6 @@ from torch.utils import data
 from torchvision import transforms
 
 
-# Defined in file: ./chapter_preliminaries/ndarray.md
-numpy = lambda a: a.detach().numpy()
-size = lambda a: a.numel()
-reshape = lambda a, *args: a.reshape(*args)
-ones = torch.ones
-zeros = torch.zeros
-
-
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
     """Make a directory if it does not exist."""
@@ -231,6 +223,8 @@ def accuracy(y_hat, y):  #@save
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
+    if isinstance(net, torch.nn.Module):
+        net.eval()  # Set the model to evaluation mode
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
         metric.add(accuracy(net(X), y), sum(y.shape))
@@ -324,6 +318,8 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
+        if isinstance(net, torch.nn.Module):
+            net.train()  # Set the model to training mode
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
         animator.add(epoch + 1, train_metrics + (test_acc,))
@@ -450,6 +446,7 @@ def corr2d(X, K):  #@save
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
+    net.eval()  # Set the model to evaluation mode
     if not device:
         device = next(iter(net.parameters())).device
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
@@ -602,7 +599,7 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_random(corpus, batch_size, num_steps):
+def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
     # Offset the iterator over the data for uniform starts
     corpus = corpus[random.randint(0, num_steps):]
     # Subtract 1 extra since we need to account for label
@@ -621,17 +618,17 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
         batch_indices = example_indices[i:(i+batch_size)]
         X = [data(j) for j in batch_indices]
         Y = [data(j + 1) for j in batch_indices]
-        yield torch.Tensor(X), torch.Tensor(Y)
+        yield d2l.tensor(X), d2l.tensor(Y)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):
+def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data: ignore `num_steps` and just wrap around
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = torch.Tensor(corpus[offset:offset+num_indices])
-    Ys = torch.Tensor(corpus[offset+1:offset+1+num_indices])
+    Xs = d2l.tensor(corpus[offset:offset+num_indices])
+    Ys = d2l.tensor(corpus[offset+1:offset+1+num_indices])
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
@@ -641,7 +638,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-class SeqDataLoader:
+class SeqDataLoader:  #@save
     """A iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
@@ -656,17 +653,16 @@ class SeqDataLoader:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
-                           max_tokens=10000):
+def load_data_time_machine(batch_size, num_steps,  #@save
+                           use_random_iter=False, max_tokens=10000):
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
     return data_iter, data_iter.vocab
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-class RNNModelScratch:
+class RNNModelScratch: #@save
     """A RNN Model based on scratch implementations."""
-
     def __init__(self, vocab_size, num_hiddens, device,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -682,12 +678,10 @@ class RNNModelScratch:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_predicts, model, vocab, device):
+def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, device=device)
     outputs = [vocab[prefix[0]]]
-
-    def get_input():
-        return torch.tensor([outputs[-1]], device=device).reshape(1, 1)
+    get_input = lambda: torch.tensor([outputs[-1]], device=device).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -698,12 +692,11 @@ def predict_ch8(prefix, num_predicts, model, vocab, device):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def grad_clipping(model, theta):
+def grad_clipping(model, theta):  #@save
     if isinstance(model, nn.Module):
         params = [p for p in model.parameters() if p.requires_grad]
     else:
         params = model.params
-    
     norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in params))
     if norm > theta:
         for param in params:
@@ -711,8 +704,7 @@ def grad_clipping(model, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater, device,
-                    use_random_iter):
+def train_epoch_ch8(model, train_iter, loss, updater, device, use_random_iter):  #@save
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
@@ -727,7 +719,6 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,
         X, y = X.to(device), y.to(device)
         py, state = model(X, state)
         l = loss(py, y.long()).mean()
-        
         if isinstance(updater, torch.optim.Optimizer):
             updater.zero_grad()
             l.backward()
@@ -737,7 +728,6 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,
             l.backward()
             grad_clipping(model, 1)
             updater(batch_size=1)  # Since used mean already
-
         metric.add(l * d2l.size(y), d2l.size(y))
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 
@@ -751,16 +741,10 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
                             legend=['train'], xlim=[1, num_epochs])
     if isinstance(model, nn.Module):
         trainer = torch.optim.SGD(model.parameters(), lr)
-
-        def updater(batch_size):
-            return trainer.step()
+        updater = lambda batch_size: trainer.step()
     else:
-        def updater(batch_size):
-            return d2l.sgd(model.params, lr, batch_size)
-
-    def predict(prefix):
-        return predict_ch8(prefix, 50, model, vocab, device)
-
+        updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, device)
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
@@ -1058,8 +1042,42 @@ class MLPAttention(nn.Module):
 
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
-def annotate(text, xy, xytext):
+def annotate(text, xy, xytext):  #@save
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
 
+
+# Defined in file: ./chapter_optimization/gd.md
+def train_2d(trainer, steps=20):
+    """Optimize a 2-dim objective function with a customized trainer."""
+    # s1 and s2 are internal state variables and will
+    # be used later in the chapter
+    x1, x2, s1, s2 = -5, -2, 0, 0
+    results = [(x1, x2)]
+    for i in range(steps):
+        x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+        results.append((x1, x2))
+    return results
+
+
+# Defined in file: ./chapter_optimization/gd.md
+def show_trace_2d(f, results):
+    """Show the trace of 2D variables during optimization."""
+    d2l.set_figsize()
+    d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
+    x1, x2 = torch.meshgrid(torch.arange(-5.5, 1.0, 0.1), torch.arange(-3.0, 1.0, 0.1))
+    d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
+    d2l.plt.xlabel('x1')
+    d2l.plt.ylabel('x2')
+
+
+# Alias defined in config.ini
+numpy = lambda a: a.detach().numpy()
+size = lambda a: a.numel()
+reshape = lambda a, *args: a.reshape(*args)
+ones = torch.ones
+zeros = torch.zeros
+tensor = torch.tensor
+to = lambda a, ctx: a.to(ctx)
+arange = torch.arange
 

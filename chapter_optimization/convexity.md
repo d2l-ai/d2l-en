@@ -39,12 +39,22 @@ $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
 To illustrate this let us plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mpl_toolkits import mplot3d
 from mxnet import np, npx
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+from mpl_toolkits import mplot3d
+import torch
+
+torch.pi = torch.acos(torch.zeros(1)).item() * 2  # Define pi in torch
 ```
 
 Let us define a few functions, both convex and nonconvex.
@@ -60,6 +70,25 @@ def h(x):
     return np.exp(0.5 * x)  # Convex
 
 x, segment = np.arange(-2, 2, 0.01), np.array([-1.5, 1])
+d2l.use_svg_display()
+_, axes = d2l.plt.subplots(1, 3, figsize=(9, 3))
+
+for ax, func in zip(axes, [f, g, h]):
+    d2l.plot([x, segment], [func(x), func(segment)], axes=ax)
+```
+
+```{.python .input}
+#@tab pytorch
+def f(x):
+    return 0.5 * x**2  # Convex
+
+def g(x):
+    return torch.cos(torch.pi * x)  # Nonconvex
+
+def h(x):
+    return torch.exp(0.5 * x)  # Convex
+
+x, segment = torch.arange(-2, 2, 0.01), torch.tensor([-1.5, 1])
 d2l.use_svg_display()
 _, axes = d2l.plt.subplots(1, 3, figsize=(9, 3))
 
@@ -103,6 +132,7 @@ $$f(x) > \lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 This contradicts the assumption that $f(x)$ is a local minimum. For instance, the function $f(x) = (x+1) (x-1)^2$ has a local minimum for $x=1$. However, it is not a global minimum.
 
 ```{.python .input}
+#@tab all
 def f(x):
     return (x-1)**2 * (x+1)
 
@@ -127,6 +157,24 @@ x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
                    indexing='ij')
 
 z = x**2 + 0.5 * np.cos(2 * np.pi * y)
+
+# Plot the 3D surface
+d2l.set_figsize((6, 4))
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
+ax.contour(x, y, z, offset=-1)
+ax.set_zlim(-1, 1.5)
+
+# Adjust labels
+for func in [d2l.plt.xticks, d2l.plt.yticks, ax.set_zticks]:
+    func([-1, 0, 1])
+```
+
+```{.python .input}
+#@tab pytorch
+x, y = torch.meshgrid(torch.linspace(-1, 1, 101), torch.linspace(-1, 1, 101))
+
+z = x**2 + 0.5 * torch.cos(2 * torch.pi * y)
 
 # Plot the 3D surface
 d2l.set_figsize((6, 4))
@@ -177,6 +225,21 @@ def f(x):
 
 x = np.arange(-2, 2, 0.01)
 axb, ab = np.array([-1.5, -0.5, 1]), np.array([-1.5, 1])
+
+d2l.set_figsize()
+d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
+d2l.annotate('a', (-1.5, f(-1.5)), (-1.5, 1.5))
+d2l.annotate('b', (1, f(1)), (1, 1.5))
+d2l.annotate('x', (-0.5, f(-0.5)), (-1.5, f(-0.5)))
+```
+
+```{.python .input}
+#@tab pytorch
+def f(x):
+    return 0.5 * x**2
+
+x = torch.arange(-2, 2, 0.01)
+axb, ab = torch.tensor([-1.5, -0.5, 1]), torch.tensor([-1.5, 1])
 
 d2l.set_figsize()
 d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
@@ -256,8 +319,6 @@ In the context of deep learning the main purpose of convex functions is to motiv
     * As intermediate step write out the penalized objective $\|\mathbf{w} - \mathbf{w}'\|_2^2 + \lambda \|\mathbf{w}'\|_1$ and compute the solution for a given $\lambda > 0$.
     * Can you find the 'right' value of $\lambda$ without a lot of trial and error?
 1. Given a convex set $X$ and two vectors $\mathbf{x}$ and $\mathbf{y}$ prove that projections never increase distances, i.e., $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_X(\mathbf{x}) - \mathrm{Proj}_X(\mathbf{y})\|$.
-
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/350)

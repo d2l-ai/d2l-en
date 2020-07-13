@@ -396,7 +396,7 @@ iteratively grabbing one minibatch of inputs
 and the corresponding ground-truth labels.
 For each minibatch, we go through the following ritual:
 
-* Generate predictions by calling `net(X)` and calculate the loss `l` (the forward pass).
+* Generate predictions by calling `net(X)` and calculate the loss `l` (the forward propagation).
 * Calculate gradients by running the backpropagation.
 * Update the model parameters by invoking our optimizer.
 

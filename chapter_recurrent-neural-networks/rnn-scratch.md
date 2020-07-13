@@ -1,7 +1,7 @@
 # Implementation of Recurrent Neural Networks from Scratch
 :label:`sec_rnn_scratch`
 
-In this section we implement a language model introduced in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the dataset first, which is introduced in :numref:`sec_language_model`.
+In this section we implement a language model introduced in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. Let's first import the libraries and modules for this section.
 
 ```{.python .input}
 %matplotlib inline
@@ -9,9 +9,6 @@ from d2l import mxnet as d2l
 import math
 from mxnet import autograd, np, npx, gluon
 npx.set_np()
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ```{.python .input}
@@ -22,9 +19,15 @@ import math
 import torch
 from torch import nn
 from torch.nn import functional as F
+```
 
+Next we load the dataset that is introduced in :numref:`sec_language_model`.
+
+```{.python .input}
+#@tab all
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+
 ```
 
 ## One-hot Encoding
@@ -154,10 +157,8 @@ def rnn(inputs, state, params):
 Now we have all functions defined, next we create a class to wrap these functions and store parameters.
 
 ```{.python .input}
-#@save
-class RNNModelScratch:
+class RNNModelScratch:  #@save
     """A RNN Model based on scratch implementations."""
-
     def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -174,10 +175,8 @@ class RNNModelScratch:
 
 ```{.python .input}
 #@tab pytorch
-#@save
-class RNNModelScratch:
+class RNNModelScratch: #@save
     """A RNN Model based on scratch implementations."""
-
     def __init__(self, vocab_size, num_hiddens, device,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -195,21 +194,12 @@ class RNNModelScratch:
 Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state has not changed.
 
 ```{.python .input}
-num_hiddens, ctx = 512, d2l.try_gpu()
-model = RNNModelScratch(len(vocab), num_hiddens, ctx, get_params,
+#@tab all
+num_hiddens = 512
+model = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
                         init_rnn_state, rnn)
-state = model.begin_state(X.shape[0], ctx)
-Y, new_state = model(X.as_in_ctx(ctx), state)
-Y.shape, len(new_state), new_state[0].shape
-```
-
-```{.python .input}
-#@tab pytorch
-num_hiddens, device = 512, d2l.try_gpu()
-model = RNNModelScratch(len(vocab), num_hiddens, device, get_params,
-                        init_rnn_state, rnn)
-state = model.begin_state(X.shape[0], device)
-Y, new_state = model(X.to(device), state)
+state = model.begin_state(X.shape[0], d2l.try_gpu())
+Y, new_state = model(d2l.to(X, d2l.try_gpu()), state)
 Y.shape, len(new_state), new_state[0].shape
 ```
 
@@ -220,13 +210,10 @@ We can see that the output shape is (number steps $\times$ batch size, vocabular
 We first explain the predicting function so we can regularly check the prediction during training. This function predicts the next `num_predicts` characters based on the `prefix` (a string containing several characters). For the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them.
 
 ```{.python .input}
-#@save
-def predict_ch8(prefix, num_predicts, model, vocab, ctx):
+def predict_ch8(prefix, num_predicts, model, vocab, ctx):  #@save
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
-
-    def get_input():
-        return np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
+    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -238,13 +225,10 @@ def predict_ch8(prefix, num_predicts, model, vocab, ctx):
 
 ```{.python .input}
 #@tab pytorch
-#@save
-def predict_ch8(prefix, num_predicts, model, vocab, device):
+def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, device=device)
     outputs = [vocab[prefix[0]]]
-
-    def get_input():
-        return torch.tensor([outputs[-1]], device=device).reshape(1, 1)
+    get_input = lambda: torch.tensor([outputs[-1]], device=device).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -257,12 +241,8 @@ def predict_ch8(prefix, num_predicts, model, vocab, device):
 We test the `predict_ch8` function first. Given that we did not train the network, it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
 
 ```{.python .input}
-predict_ch8('time traveller ', 10, model, vocab, ctx)
-```
-
-```{.python .input}
-#@tab pytorch
-predict_ch8('time traveller ', 10, model, vocab, device)
+#@tab all
+predict_ch8('time traveller ', 10, model, vocab, d2l.try_gpu())
 ```
 
 ## Gradient Clipping
@@ -286,11 +266,10 @@ minibatch (and within it any given sample) can exert on the weight vectors. This
 bestows a certain degree of robustness to the model. Gradient clipping provides
 a quick fix to the gradient exploding. While it does not entirely solve the problem, it is one of the many techniques to alleviate it.
 
-Below we define a function to clip the gradients of a model that is either a `RNNModelScratch` instance or a Gluon model. Also note that we compute the gradient norm over all parameters.
+Below we define a function to clip the gradients of a model that is either a building from scratch instance or a model constructed by the high-level APIs. Also note that we compute the gradient norm over all parameters.
 
 ```{.python .input}
-#@save
-def grad_clipping(model, theta):
+def grad_clipping(model, theta):  #@save
     if isinstance(model, gluon.Block):
         params = [p.data() for p in model.collect_params().values()]
     else:
@@ -303,13 +282,11 @@ def grad_clipping(model, theta):
 
 ```{.python .input}
 #@tab pytorch
-#@save
-def grad_clipping(model, theta):
+def grad_clipping(model, theta):  #@save
     if isinstance(model, nn.Module):
         params = [p for p in model.parameters() if p.requires_grad]
     else:
         params = model.params
-    
     norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in params))
     if norm > theta:
         for param in params:
@@ -327,11 +304,10 @@ Let us first define the function to train the model on one data epoch. It differ
 1. We use perplexity to evaluate the model. This ensures that sequences of different length are comparable.
 
 
-When the sequential partitioning is used, we initialize the hidden state at the beginning of each epoch. Since the $i^\mathrm{th}$ example in the next minibatch is adjacent to the current $i^\mathrm{th}$ example, so the next minibatch can use the current hidden state directly, we only detach the gradient so that we compute the gradients within a minibatch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same as the `train_epoch_ch3` function in :numref:`sec_softmax_scratch`, we use generalized `updater`, which could be either a Gluon trainer or a scratched implementation.
+When the sequential partitioning is used, we initialize the hidden state at the beginning of each epoch. Since the $i^\mathrm{th}$ example in the next minibatch is adjacent to the current $i^\mathrm{th}$ example, so the next minibatch can use the current hidden state directly, we only detach the gradient so that we compute the gradients within a minibatch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same as the `train_epoch_ch3` function in :numref:`sec_softmax_scratch`, we use generalized `updater`, which could be either a high-level API trainer or a scratched implementation.
 
 ```{.python .input}
-#@save
-def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
+def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):  #@save
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
@@ -356,9 +332,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
 
 ```{.python .input}
 #@tab pytorch
-#@save
-def train_epoch_ch8(model, train_iter, loss, updater, device,
-                    use_random_iter):
+def train_epoch_ch8(model, train_iter, loss, updater, device, use_random_iter):  #@save
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
@@ -373,7 +347,6 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,
         X, y = X.to(device), y.to(device)
         py, state = model(X, state)
         l = loss(py, y.long()).mean()
-        
         if isinstance(updater, torch.optim.Optimizer):
             updater.zero_grad()
             l.backward()
@@ -383,16 +356,14 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,
             l.backward()
             grad_clipping(model, 1)
             updater(batch_size=1)  # Since used mean already
-
         metric.add(l * d2l.size(y), d2l.size(y))
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 ```
 
-The training function again supports either we implement the model from scratch or using Gluon.
+The training function again supports either we implement the model from scratch or using high-level APIs.
 
 ```{.python .input}
-#@save
-def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
+def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,  #@save
               use_random_iter=False):
     # Initialize
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -402,16 +373,10 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
         model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
         trainer = gluon.Trainer(model.collect_params(),
                                 'sgd', {'learning_rate': lr})
-
-        def updater(batch_size):
-            return trainer.step(batch_size)
+        updater = lambda batch_size: trainer.step(batch_size)
     else:
-        def updater(batch_size):
-            return d2l.sgd(model.params, lr, batch_size)
-
-    def predict(prefix):
-        return predict_ch8(prefix, 50, model, vocab, ctx)
-
+        updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, ctx)
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
@@ -435,16 +400,10 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
                             legend=['train'], xlim=[1, num_epochs])
     if isinstance(model, nn.Module):
         trainer = torch.optim.SGD(model.parameters(), lr)
-
-        def updater(batch_size):
-            return trainer.step()
+        updater = lambda batch_size: trainer.step()
     else:
-        def updater(batch_size):
-            return d2l.sgd(model.params, lr, batch_size)
-
-    def predict(prefix):
-        return predict_ch8(prefix, 50, model, vocab, device)
-
+        updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, device)
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
@@ -460,26 +419,16 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
 Now we can train a model. Since we only use $10,000$ tokens in the dataset, the model needs more epochs to converge.
 
 ```{.python .input}
+#@tab all
 num_epochs, lr = 500, 1
-train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
-```
-
-```{.python .input}
-#@tab pytorch
-num_epochs, lr = 500, 1
-train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 ```
 
 Finally let us check the results to use a random sampling iterator.
 
 ```{.python .input}
-train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
-          use_random_iter=True)
-```
-
-```{.python .input}
-#@tab pytorch
-train_ch8(model, train_iter, vocab, lr, num_epochs, device,
+#@tab all
+train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
           use_random_iter=True)
 ```
 
@@ -511,4 +460,8 @@ While implementing the above RNN model from scratch is instructive, it is not co
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/336)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/486)
 :end_tab:
