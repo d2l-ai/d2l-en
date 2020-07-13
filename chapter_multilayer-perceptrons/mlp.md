@@ -150,7 +150,7 @@ Here, $\mathbf{H}$ is also known as a *hidden-layer variable* or a *hidden varia
 Since the hidden and output layers are both fully connected,
 we have hidden-layer weights $\mathbf{W}_1 \in \mathbb{R}^{d \times h}$ and biases $\mathbf{b}_1 \in \mathbb{R}^{1 \times h}$
 and output-layer weights $\mathbf{W}_2 \in \mathbb{R}^{h \times q}$ and biases $\mathbf{b}_2 \in \mathbb{R}^{1 \times q}$.
-Formally, we calculate the outputs $\mathbf{X} \in \mathbb{R}^{n \times q}$
+Formally, we calculate the outputs $\mathbf{O} \in \mathbb{R}^{n \times q}$
 of the one-hidden-layer MLP as follows:
 
 $$
