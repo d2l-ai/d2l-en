@@ -640,7 +640,3 @@ powerful family of distributions encountered frequently in machine learning.
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/417)
 :end_tab:
-
-```{.python .input}
-
-```
