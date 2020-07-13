@@ -553,6 +553,7 @@ torch.normal(mu, sigma, size=(10, 10))
 ```
 
 ## Exponential Family
+:label:`subsec_exponential_family`
 
 One shared property for all the distributions listed above is that they all 
 belong to which is known as the *exponential family*. The exponential family 
