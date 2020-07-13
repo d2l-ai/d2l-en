@@ -1,7 +1,7 @@
 # Implementation of Recurrent Neural Networks from Scratch
 :label:`sec_rnn_scratch`
 
-In this section we implement a language model introduced in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. Let's first import the libraries and modules for this section.
+In this section we implement a language model introduced in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the dataset first, which is introduced in :numref:`sec_language_model`.
 
 ```{.python .input}
 %matplotlib inline
@@ -21,13 +21,10 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-Next we load the dataset that is introduced in :numref:`sec_language_model`.
-
 ```{.python .input}
 #@tab all
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
-
 ```
 
 ## One-hot Encoding
