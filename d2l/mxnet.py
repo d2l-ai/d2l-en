@@ -218,7 +218,7 @@ def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
-        metric.add(accuracy(net(X), y), sum(y.shape))
+        metric.add(accuracy(net(X), y), prod(y.shape))
     return metric[0] / metric[1]
 
 
