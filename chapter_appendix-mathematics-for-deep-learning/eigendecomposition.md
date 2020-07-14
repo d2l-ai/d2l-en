@@ -109,6 +109,16 @@ torch.eig(torch.tensor([[2, 1], [2, 3]], dtype=torch.float64),
           eigenvectors=True)
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from IPython import display
+import tensorflow as tf
+
+tf.linalg.eigh(tf.constant([[2, 1], [2, 3]], dtype=tf.float64))
+```
+
 Note that `numpy` normalizes the eigenvectors to be of length one,
 whereas we took ours to be of arbitrary length.
 Additionally, the choice of sign is arbitrary.
@@ -289,6 +299,17 @@ v, _ = torch.eig(A)
 v
 ```
 
+```{.python .input}
+#@tab tensorflow
+A = tf.constant([[1.0, 0.1, 0.1, 0.1],
+                [0.1, 3.0, 0.2, 0.3],
+                [0.1, 0.2, 5.0, 0.5],
+                [0.1, 0.3, 0.5, 9.0]])
+
+v, _ = tf.linalg.eigh(A)
+v
+```
+
 In this way, eigenvalues can be approximated, 
 and the approximations will be fairly accurate 
 in the case that the diagonal is 
@@ -338,6 +359,13 @@ torch.manual_seed(42)
 
 k = 5
 A = torch.randn(k, k, dtype=torch.float64)
+A
+```
+
+```{.python .input}
+#@tab tensorflow
+k = 5
+A = tf.random.normal((k, k), dtype=tf.float64)
 A
 ```
 
@@ -391,6 +419,19 @@ for i in range(1, 100):
 d2l.plot(torch.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Calculate the sequence of norms after repeatedly applying `A`
+v_in = tf.random.normal((k, 1), dtype=tf.float64)
+
+norm_list = [tf.norm(v_in).numpy()]
+for i in range(1, 100):
+    v_in = tf.matmul(A, v_in)
+    norm_list.append(tf.norm(v_in).numpy())
+
+d2l.plot(tf.range(0, 100), norm_list, 'Iteration', 'Value')
+```
+
 The norm is growing uncontrollably! 
 Indeed if we take the list of quotients, we will see a pattern.
 
@@ -411,6 +452,16 @@ for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i - 1])
 
 d2l.plot(torch.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
+```
+
+```{.python .input}
+#@tab tensorflow
+# Compute the scaling factor of the norms
+norm_ratio_list = []
+for i in range(1, 100):
+    norm_ratio_list.append(norm_list[i]/norm_list[i - 1])
+
+d2l.plot(tf.range(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
 If we look at the last portion of the above computation, 
@@ -444,6 +495,15 @@ print(f'norms of eigenvalues: {norm_eigs}')
 # Compute the eigenvalues
 eigs = torch.eig(A)[0][:,0].tolist()
 norm_eigs = [torch.abs(torch.tensor(x)) for x in eigs]
+norm_eigs.sort()
+print(f'norms of eigenvalues: {norm_eigs}')
+```
+
+```{.python .input}
+#@tab tensorflow
+# Compute the eigenvalues
+eigs = tf.linalg.eigh(A)[0].numpy().tolist()
+norm_eigs = [tf.abs(tf.constant(x)) for x in eigs]
 norm_eigs.sort()
 print(f'norms of eigenvalues: {norm_eigs}')
 ```
@@ -522,6 +582,22 @@ for i in range(1, 100):
 d2l.plot(torch.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Rescale the matrix `A`
+A /= norm_eigs[-1]
+
+# Do the same experiment again
+v_in = tf.random.normal((k, 1), dtype=tf.float64)
+
+norm_list = [tf.norm(v_in).numpy()]
+for i in range(1, 100):
+    v_in = tf.matmul(A, v_in)
+    norm_list.append(tf.norm(v_in).numpy())
+
+d2l.plot(tf.range(0, 100), norm_list, 'Iteration', 'Value')
+```
+
 We can also plot the ratio between consecutive norms as before and see that indeed it stabilizes.
 
 ```{.python .input}
@@ -541,6 +617,16 @@ for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i-1])
 
 d2l.plot(torch.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
+```
+
+```{.python .input}
+#@tab tensorflow
+# Also plot the ratio
+norm_ratio_list = []
+for i in range(1, 100):
+    norm_ratio_list.append(norm_list[i]/norm_list[i-1])
+
+d2l.plot(tf.range(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
 ## Conclusions
