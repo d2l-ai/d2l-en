@@ -1086,5 +1086,7 @@ sin = torch.sin
 sinh = torch.sinh
 cos = torch.cos
 cosh = torch.cosh
+tanh = torch.tanh
+linspace = torch.linspace
 exp = torch.exp
 
