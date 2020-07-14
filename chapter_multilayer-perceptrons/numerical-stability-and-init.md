@@ -29,21 +29,22 @@ throughout your career in deep learning.
 Consider a deep network with $L$ layers,
 input $\mathbf{x}$ and output $\mathbf{o}$.
 With each layer $l$ defined by a transformation $f_l$
-parameterized by weights $\mathbf{W}_l$
+parameterized by weights $\mathbf{W}^{(l)}$,
+whose hidden variable is $\mathbf{h}^{(l)}$ (let $\mathbf{h}^{(0)} = \mathbf{x}$),
 our network can be expressed as:
 
-$$\mathbf{h}^{l+1} = f_l (\mathbf{h}^l) \text{ and thus } \mathbf{o} = f_L \circ \ldots, \circ f_1(\mathbf{x}).$$
+$$\mathbf{h}^{(l)} = f_l (\mathbf{h}^{(l-1)}) \text{ and thus } \mathbf{o} = f_L \circ \ldots \circ f_1(\mathbf{x}).$$
 
-If all activations and inputs are vectors,
+If all the hidden variables and the input are vectors,
 we can write the gradient of $\mathbf{o}$ with respect to
-any set of parameters $\mathbf{W}_l$ as follows:
+any set of parameters $\mathbf{W}^{(l)}$ as follows:
 
-$$\partial_{\mathbf{W}_l} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{L-1}} \mathbf{h}^L}_{:= \mathbf{M}_L} \cdot \ldots, \cdot \underbrace{\partial_{\mathbf{h}^{l}} \mathbf{h}^{l+1}}_{:= \mathbf{M}_l} \underbrace{\partial_{\mathbf{W}_l} \mathbf{h}^l}_{:= \mathbf{v}_l}.$$
+$$\partial_{\mathbf{W}^{(l)}} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{(L-1)}} \mathbf{h}^{(L)}}_{ \mathbf{M}^{(L)}} \cdot \ldots \cdot \underbrace{\partial_{\mathbf{h}^{(l)}} \mathbf{h}^{(l+1)}}_{ \mathbf{M}^{(l+1)}} \underbrace{\partial_{\mathbf{W}^{(l)}} \mathbf{h}^{(l)}}_{ \mathbf{v}^{(l)}}.$$
 
 In other words, this gradient is
 the product of $L-l$ matrices
-$\mathbf{M}_L \cdot \ldots, \cdot \mathbf{M}_l$
-and the gradient vector $\mathbf{v}_l$.
+$\mathbf{M}^{(L)} \cdot \ldots \cdot \mathbf{M}^{(l+1)}$
+and the gradient vector $\mathbf{v}^{(l)}$.
 Thus we are susceptible to the same
 problems of numerical underflow that often crop up
 when multiplying together too many probabilities.
@@ -52,7 +53,7 @@ switch into log-space, i.e., shifting
 pressure from the mantissa to the exponent
 of the numerical representation.
 Unfortunately, our problem above is more serious:
-initially the matrices $M_l$ may have a wide variety of eigenvalues.
+initially the matrices $\mathbf{M}^{(l)}$ may have a wide variety of eigenvalues.
 They might be small or large, and
 their product might be *very large* or *very small*.
 
@@ -62,9 +63,9 @@ Gradients of unpredictable magnitude
 also threaten the stability of our optimization algorithms.
 We may be facing parameter updates that are either
 (i) excessively large, destroying our model
-(the *exploding* gradient problem);
+(the *exploding gradient* problem);
 or (ii) excessively small
-(the *vanishing gradient problem*),
+(the *vanishing gradient* problem),
 rendering learning impossible as parameters
 hardly move on each update.
 
