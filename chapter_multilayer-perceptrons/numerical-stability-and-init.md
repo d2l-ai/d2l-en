@@ -246,29 +246,34 @@ for moderate problem sizes.
 
 
 
+
+
 ### Xavier Initialization
 
 Let us look at the scale distribution of
-the activations of the hidden units $h_{i}$ for some layer.
-They are given by
+an output (e.g., a hidden variable) $o_{i}$ for some fully-connected layer
+*without nonlinearities*.
+With $n_\mathrm{in}$ inputs $x_j$
+and their associated weights $W_{ij}$ for this layer,
+an output is given by
 
-$$h_{i} = \sum_{j=1}^{n_\mathrm{in}} W_{ij} x_j.$$
+$$o_{i} = \sum_{j=1}^{n_\mathrm{in}} W_{ij} x_j.$$
 
 The weights $W_{ij}$ are all drawn
 independently from the same distribution.
 Furthermore, let us assume that this distribution
-has zero mean and variance $\sigma^2$
-(this does not mean that the distribution has to be Gaussian,
-just that the mean and variance need to exist).
-For now, let us assume that the inputs to layer $x_j$
+has zero mean and variance $\sigma^2$.
+Note that this does not mean that the distribution has to be Gaussian,
+just that the mean and variance need to exist.
+For now, let us assume that the inputs to the layer $x_j$
 also have zero mean and variance $\gamma^2$
-and that they are independent of $\mathbf{W}$.
-In this case, we can compute the mean and variance of $h_i$ as follows:
+and that they are independent of $W_{ij}$ and independent of each other.
+In this case, we can compute the mean and variance of $o_i$ as follows:
 
 $$
 \begin{aligned}
-    E[h_i] & = \sum_{j=1}^{n_\mathrm{in}} E[W_{ij} x_j] = 0, \\
-    \mathrm{Var}[h_i] & = E[h_i^2] - (E[h_i])^2 \\
+    E[o_i] & = \sum_{j=1}^{n_\mathrm{in}} E[W_{ij} x_j] \\&= \sum_{j=1}^{n_\mathrm{in}} E[W_{ij}] E[x_j] \\&= 0, \\
+    \mathrm{Var}[o_i] & = E[o_i^2] - (E[o_i])^2 \\
         & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij} x^2_j] - 0 \\
         & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij}] E[x^2_j] \\
         & = n_\mathrm{in} \sigma^2 \gamma^2.
@@ -279,13 +284,11 @@ One way to keep the variance fixed
 is to set $n_\mathrm{in} \sigma^2 = 1$.
 Now consider backpropagation.
 There we face a similar problem,
-albeit with gradients being propagated from the top layers.
-That is, instead of $\mathbf{W} \mathbf{x}$,
-we need to deal with $\mathbf{W}^\top \mathbf{g}$,
-where $\mathbf{g}$ is the incoming gradient from the layer above.
+albeit with gradients being propagated from the layers closer to the output.
 Using the same reasoning as for forward propagation,
 we see that the gradients' variance can blow up
-unless $n_\mathrm{out} \sigma^2 = 1$.
+unless $n_\mathrm{out} \sigma^2 = 1$,
+where $n_\mathrm{out}$ is the number of outputs of this layer.
 This leaves us in a dilemma:
 we cannot possibly satisfy both conditions simultaneously.
 Instead, we simply try to satisfy:
@@ -298,8 +301,8 @@ $$
 $$
 
 This is the reasoning underlying the now-standard
-and practically beneficial *Xavier* initialization,
-named for its creator :cite:`Glorot.Bengio.2010`.
+and practically beneficial *Xavier initialization*,
+named after the first author of its creators :cite:`Glorot.Bengio.2010`.
 Typically, the Xavier initialization
 samples weights from a Gaussian distribution
 with zero mean and variance
@@ -307,10 +310,18 @@ $\sigma^2 = \frac{2}{n_\mathrm{in} + n_\mathrm{out}}$.
 We can also adapt Xavier's intuition to
 choose the variance when sampling weights
 from a uniform distribution.
-Note the distribution $U[-a, a]$ has variance $a^2/3$.
-Plugging $a^2/3$ into our condition on $\sigma^2$
+Note that the uniform distribution $U(-a, a)$ has variance $\frac{a^2}{3}$.
+Plugging $\frac{a^2}{3}$ into our condition on $\sigma^2$
 yields the suggestion to initialize according to
-$U\left[-\sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}, \sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}\right]$.
+
+$$U\left(-\sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}, \sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}\right).$$
+
+Though the assumption for nonexistence of nonlinearities
+in the above mathematical reasoning 
+can be easily violated in neural networks,
+the Xavier initialization method
+turns out to work well in practice.
+
 
 ### Beyond
 
@@ -322,11 +333,16 @@ a hot area of fundamental research in deep learning.
 Among these are heuristics specialized for
 tied (shared) parameters, super-resolution,
 sequence models, and other situations.
+For instance,
+Xiao et al. demonstrated the possibility of training
+10000-layer neural networks without architectural tricks
+by using a carefully-designed initialization method :cite:`Xiao.Bahri.Sohl-Dickstein.ea.2018`.
+
 If the topic interests you we suggest
 a deep dive into this module's offerings,
 reading the papers that proposed and analyzed each heuristic,
 and then exploring the latest publications on the topic.
-Perhaps you will stumble across (or even invent!)
+Perhaps you will stumble across or even invent
 a clever idea and contribute an implementation to deep learning frameworks.
 
 
@@ -336,13 +352,14 @@ a clever idea and contribute an implementation to deep learning frameworks.
 * Initialization heuristics are needed to ensure that the initial gradients are neither too large nor too small.
 * ReLU activation functions mitigate the vanishing gradient problem. This can accelerate convergence.
 * Random initialization is key to ensure that symmetry is broken before optimization.
+* Xavier initialization suggests that, for each layer, variance of any output is not affected by the number of inputs, and variance of any gradient is not affected by the number of outputs.
 
 ## Exercises
 
-1. Can you design other cases where a neural network might exhibit symmetry requiring breaking besides the permutation symmetry in a multilayer pereceptron's layers?
+1. Can you design other cases where a neural network might exhibit symmetry requiring breaking besides the permutation symmetry in an MLP's layers?
 1. Can we initialize all weight parameters in linear regression or in softmax regression to the same value?
 1. Look up analytic bounds on the eigenvalues of the product of two matrices. What does this tell you about ensuring that gradients are well conditioned?
-1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on LARS for inspiration :cite:`You.Gitman.Ginsburg.2017`.
+1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on layer-wise adaptive rate scaling  for inspiration :cite:`You.Gitman.Ginsburg.2017`.
 
 
 :begin_tab:`mxnet`

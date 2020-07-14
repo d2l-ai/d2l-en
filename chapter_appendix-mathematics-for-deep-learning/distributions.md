@@ -90,7 +90,7 @@ We can sample an array of arbitrary shape from a Bernoulli random variable as fo
 The next commonly encountered random variable encountered is a discrete uniform.  For our discussion here, we will assume that it is supported on the integers $\{1, 2, \ldots, n\}$, however any other set of values can be freely chosen.  The meaning of the word *uniform* in this context is that every possible value is equally likely.  The probability for each value $i \in \{1, 2, 3, \ldots, n\}$ is $p_i = \frac{1}{n}$.  We will denote a random variable $X$ with this distribution as
 
 $$
-X \sim \mathrm{Uniform}(n).
+X \sim U(n).
 $$
 
 The cumulative distribution function is 
@@ -131,7 +131,7 @@ def F(x):
 d2l.plot(x, torch.tensor([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-If $X \sim \mathrm{Uniform}(n)$, then:
+If $X \sim U(n)$, then:
 
 * $\mu_X = \frac{1+n}{2}$,
 * $\sigma_X^2 = \frac{n^2-1}{12}$.
@@ -152,7 +152,7 @@ torch.randint(1, n, size=(10, 10))
 Next, let us discuss the continuous uniform distribution. The idea behind this random variable is that if we increase the $n$ in the discrete uniform distribution, and then scale it to fit within the interval $[a, b]$, we will approach a continuous random variable that just picks an arbitrary value in $[a, b]$ all with equal probability.  We will denote this distribution as
 
 $$
-X \sim \mathrm{Uniform}([a, b]).
+X \sim U(a, b).
 $$
 
 The probability density function is 
@@ -202,12 +202,12 @@ def F(x):
 d2l.plot(x, torch.tensor([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-If $X \sim \mathrm{Uniform}([a, b])$, then:
+If $X \sim U(a, b)$, then:
 
 * $\mu_X = \frac{a+b}{2}$,
 * $\sigma_X^2 = \frac{(b-a)^2}{12}$.
 
-We can sample an array of arbitrary shape from a uniform random variable as follows.  Note that it by default samples from a $\mathrm{Uniform}([0,1])$, so if we want a different range we need to scale it.
+We can sample an array of arbitrary shape from a uniform random variable as follows.  Note that it by default samples from a $U(0,1)$, so if we want a different range we need to scale it.
 
 ```{.python .input}
 (b - a) * np.random.rand(10, 10) + a
