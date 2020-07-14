@@ -148,15 +148,15 @@ denote by $\mathbf{H} \in \mathbb{R}^{n \times h}$
 the outputs of the hidden layer.
 Here, $\mathbf{H}$ is also known as a *hidden-layer variable* or a *hidden variable*.
 Since the hidden and output layers are both fully connected,
-we have hidden-layer weights $\mathbf{W}_1 \in \mathbb{R}^{d \times h}$ and biases $\mathbf{b}_1 \in \mathbb{R}^{1 \times h}$
-and output-layer weights $\mathbf{W}_2 \in \mathbb{R}^{h \times q}$ and biases $\mathbf{b}_2 \in \mathbb{R}^{1 \times q}$.
+we have hidden-layer weights $\mathbf{W}^{(1)} \in \mathbb{R}^{d \times h}$ and biases $\mathbf{b}^{(1)} \in \mathbb{R}^{1 \times h}$
+and output-layer weights $\mathbf{W}^{(2)} \in \mathbb{R}^{h \times q}$ and biases $\mathbf{b}^{(2)} \in \mathbb{R}^{1 \times q}$.
 Formally, we calculate the outputs $\mathbf{O} \in \mathbb{R}^{n \times q}$
 of the one-hidden-layer MLP as follows:
 
 $$
 \begin{aligned}
-    \mathbf{H} & = \mathbf{X} \mathbf{W}_1 + \mathbf{b}_1, \\
-    \mathbf{O} & = \mathbf{H}\mathbf{W}_2 + \mathbf{b}_2.
+    \mathbf{H} & = \mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)}, \\
+    \mathbf{O} & = \mathbf{H}\mathbf{W}^{(2)} + \mathbf{b}^{(2)}.
 \end{aligned}
 $$
 
@@ -184,10 +184,10 @@ We can view the equivalence formally
 by proving that for any values of the weights,
 we can just collapse out the hidden layer,
 yielding an equivalent single-layer model with parameters
-$\mathbf{W} = \mathbf{W}_1\mathbf{W}_2$ and $\mathbf{b} = \mathbf{b}_1 \mathbf{W}_2 + \mathbf{b}_2$:
+$\mathbf{W} = \mathbf{W}^{(1)}\mathbf{W}^{(2)}$ and $\mathbf{b} = \mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)}$:
 
 $$
-\mathbf{O} = (\mathbf{X} \mathbf{W}_1 + \mathbf{b}_1)\mathbf{W}_2 + \mathbf{b}_2 = \mathbf{X} \mathbf{W}_1\mathbf{W}_2 + \mathbf{b}_1 \mathbf{W}_2 + \mathbf{b}_2 = \mathbf{X} \mathbf{W} + \mathbf{b}.
+\mathbf{O} = (\mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)})\mathbf{W}^{(2)} + \mathbf{b}^{(2)} = \mathbf{X} \mathbf{W}^{(1)}\mathbf{W}^{(2)} + \mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)} = \mathbf{X} \mathbf{W} + \mathbf{b}.
 $$
 
 
@@ -205,8 +205,8 @@ it is no longer possible to collapse our MLP into a linear model:
 
 $$
 \begin{aligned}
-    \mathbf{H} & = \sigma(\mathbf{X} \mathbf{W}_1 + \mathbf{b}_1), \\
-    \mathbf{O} & = \mathbf{H}\mathbf{W}_2 + \mathbf{b}_2.\\
+    \mathbf{H} & = \sigma(\mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)}), \\
+    \mathbf{O} & = \mathbf{H}\mathbf{W}^{(2)} + \mathbf{b}^{(2)}.\\
 \end{aligned}
 $$
 
@@ -227,8 +227,8 @@ This is true for most activation functions.
 
 To build more general MLPs, we can continue stacking
 such hidden layers,
-e.g., $\mathbf{H}_1 = \sigma_1(\mathbf{X} \mathbf{W}_1 + \mathbf{b}_1)$
-and $\mathbf{H}_2 = \sigma_2(\mathbf{H}_1 \mathbf{W}_2 + \mathbf{b}_2)$,
+e.g., $\mathbf{H}^{(1)} = \sigma_1(\mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)})$
+and $\mathbf{H}^{(2)} = \sigma_2(\mathbf{H}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)})$,
 one atop another, yielding ever more expressive models.
 
 ### Universal Approximators
