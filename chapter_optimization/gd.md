@@ -52,7 +52,7 @@ Next, we use $x=10$ as the initial value and assume $\eta=0.2$. Using gradient d
 ```{.python .input}
 #@tab all
 def gd(eta):
-    x = 10
+    x = 10.0
     results = [x]
     for i in range(10):
         x -= eta * gradf(x)
@@ -77,7 +77,6 @@ def show_trace(res):
 show_trace(res)
 ```
 
-
 ### Learning Rate
 :label:`section_gd-learningrate`
 
@@ -101,7 +100,7 @@ To illustrate what happens for nonconvex functions consider the case of $f(x) = 
 
 ```{.python .input}
 #@tab all
-c = 0.15 * np.pi
+c = d2l.tensor(0.15 * np.pi)
 f = lambda x: x * d2l.cos(c * x)
 gradf = lambda x: d2l.cos(c * x) - c * x * d2l.sin(c * x)
 show_trace(gd(2))
@@ -188,13 +187,13 @@ For $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $H_f = 1$. Hence for 
 
 ```{.python .input}
 #@tab all
-c = 0.5
+c = d2l.tensor(0.5)
 f = lambda x: d2l.cosh(c * x)  # Objective
 gradf = lambda x: c * d2l.sinh(c * x)  # Derivative
 hessf = lambda x: c**2 * d2l.cosh(c * x)  # Hessian
 
 def newton(eta=1):
-    x = 10
+    x = 10.0
     results = [x]
     for i in range(10):
         x -= eta * gradf(x) / hessf(x)
@@ -205,12 +204,11 @@ def newton(eta=1):
 show_trace(newton())
 ```
 
-
 Now let us see what happens when we have a *nonconvex* function, such as $f(x) = x \cos(c x)$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we would walk into the direction of *increasing* $f$. That is a fatal flaw of the algorithm. Let us see what happens in practice.
 
 ```{.python .input}
 #@tab all
-c = 0.15 * np.pi
+c = d2l.tensor(0.15 * np.pi)
 f = lambda x: x * d2l.cos(c * x)
 gradf = lambda x: d2l.cos(c * x) - c * x * d2l.sin(c * x)
 hessf = lambda x: - 2 * c * d2l.sin(c * x) - x * c**2 * d2l.cos(c * x)
