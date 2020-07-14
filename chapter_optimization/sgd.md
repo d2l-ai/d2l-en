@@ -73,8 +73,8 @@ def gradf(x1, x2):
 def sgd(x1, x2, s1, s2):  # Simulate noisy gradient
     global lr  # Learning rate scheduler
     (g1, g2) = gradf(x1, x2)  # Compute gradient
-    (g1, g2) = (g1 + torch.normal(torch.tensor(0.1)), g2 +
-                torch.normal(torch.tensor(0.1)))
+    (g1, g2) = (g1 + torch.normal(d2l.tensor(0.1)), g2 +
+                torch.normal(d2l.tensor(0.1)))
     eta_t = eta * lr()  # Learning rate at time t
     return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
 
