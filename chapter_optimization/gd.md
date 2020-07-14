@@ -153,7 +153,7 @@ Next, we observe the trajectory of the optimization variable $\mathbf{x}$ for le
 ```{.python .input}
 #@tab all
 f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
-gradf = lambda: (2 * x1, 4 * x2)  # Gradient
+gradf = lambda x1, x2: (2 * x1, 4 * x2)  # Gradient
 
 def gd(x1, x2, s1, s2):
     (g1, g2) = gradf(x1, x2)  # Compute gradient
