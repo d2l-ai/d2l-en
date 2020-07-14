@@ -557,8 +557,8 @@ torch.normal(mu, sigma, size=(10, 10))
 
 One shared property for all the distributions listed above is that they all 
 belong to which is known as the *exponential family*. The exponential family 
-is a set of distributions whose density can be expressed in the following form
-:
+is a set of distributions whose density can be expressed in the following 
+form:
 
 $$p(\mathbf{x} | \mathbf{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \big{(} 
 \eta^{\top} \cdot T\mathbf(x) - A(\mathbf{\eta}) \big{)}$$
