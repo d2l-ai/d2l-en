@@ -41,6 +41,20 @@ ys = torch.sin(x_big**x_big)
 d2l.plot(x_big, ys, 'x', 'f(x)')
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from IPython import display
+import tensorflow as tf
+tf.pi = tf.acos(tf.zeros(1)).numpy() * 2  # Define pi in TensorFlow
+
+# Plot a function in a normal range
+x_big = tf.range(0.01, 3.01, 0.01)
+ys = tf.sin(x_big**x_big)
+d2l.plot(x_big, ys, 'x', 'f(x)')
+```
+
 At this large scale, the function's behavior is not simple. However, if we reduce our range to something smaller like $[1.75,2.25]$, we see that the graph becomes much simpler.
 
 ```{.python .input}
@@ -58,6 +72,14 @@ ys = torch.sin(x_med**x_med)
 d2l.plot(x_med, ys, 'x', 'f(x)')
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Plot a the same function in a tiny range
+x_med = tf.range(1.75, 2.25, 0.001)
+ys = tf.sin(x_med**x_med)
+d2l.plot(x_med, ys, 'x', 'f(x)')
+```
+
 Taking this to an extreme, if we zoom into a tiny segment, the behavior becomes far simpler: it is just a straight line.
 
 ```{.python .input}
@@ -72,6 +94,14 @@ d2l.plot(x_small, ys, 'x', 'f(x)')
 # Plot a the same function in a tiny range
 x_small = torch.arange(2.0, 2.01, 0.0001)
 ys = torch.sin(x_small**x_small)
+d2l.plot(x_small, ys, 'x', 'f(x)')
+```
+
+```{.python .input}
+#@tab tensorflow
+# Plot a the same function in a tiny range
+x_small = tf.range(2.0, 2.01, 0.0001)
+ys = tf.sin(x_small**x_small)
 d2l.plot(x_small, ys, 'x', 'f(x)')
 ```
 
@@ -258,6 +288,20 @@ for x0 in [-1.5, 0.0, 2.0]:
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Compute sin
+xs = tf.range(-tf.pi, tf.pi, 0.01)
+plots = [tf.sin(xs)]
+
+# Compute some linear approximations. Use d(sin(x))/dx = cos(x)
+for x0 in [-1.5, 0.0, 2.0]:
+    plots.append(tf.sin(tf.constant(x0)) + (xs - x0) * 
+                 tf.cos(tf.constant(x0)))
+
+d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
+```
+
 ### Higher Order Derivatives
 
 Let us now do something that may on the surface seem strange.  Take a function $f$ and compute the derivative $\frac{df}{dx}$.  This gives us the rate of change of $f$ at any point.
@@ -324,6 +368,21 @@ for x0 in [-1.5, 0.0, 2.0]:
     plots.append(torch.sin(torch.tensor(x0)) + (xs - x0) * 
                  torch.cos(torch.tensor(x0)) - (xs - x0)**2 *
                  torch.sin(torch.tensor(x0)) / 2)
+
+d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
+```
+
+```{.python .input}
+#@tab tensorflow
+# Compute sin
+xs = tf.range(-tf.pi, tf.pi, 0.01)
+plots = [tf.sin(xs)]
+
+# Compute some quadratic approximations. Use d(sin(x)) / dx = cos(x)
+for x0 in [-1.5, 0.0, 2.0]:
+    plots.append(tf.sin(tf.constant(x0)) + (xs - x0) * 
+                 tf.cos(tf.constant(x0)) - (xs - x0)**2 *
+                 tf.sin(tf.constant(x0)) / 2)
 
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
@@ -401,6 +460,22 @@ d2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend=[
 # Compute the exponential function
 xs = torch.arange(0, 3, 0.01)
 ys = torch.exp(xs)
+
+# Compute a few Taylor series approximations
+P1 = 1 + xs
+P2 = 1 + xs + xs**2 / 2
+P5 = 1 + xs + xs**2 / 2 + xs**3 / 6 + xs**4 / 24 + xs**5 / 120
+
+d2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend=[
+    "Exponential", "Degree 1 Taylor Series", "Degree 2 Taylor Series",
+    "Degree 5 Taylor Series"])
+```
+
+```{.python .input}
+#@tab tensorflow
+# Compute the exponential function
+xs = tf.range(0, 3, 0.01)
+ys = tf.exp(xs)
 
 # Compute a few Taylor series approximations
 P1 = 1 + xs
