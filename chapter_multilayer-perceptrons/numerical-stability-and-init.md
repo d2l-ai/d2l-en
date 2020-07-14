@@ -135,7 +135,7 @@ the inputs to many of the sigmoids are close to zero,
 the gradients of the overall product may vanish.
 When our network boasts many layers,
 unless we are careful, the gradient
-will likely be cut off at *some* layer.
+will likely be cut off at some layer.
 Indeed, this problem used to plague deep network training.
 Consequently, ReLUs, which are more stable
 (but less neurally plausible),
@@ -147,7 +147,7 @@ have emerged as the default choice for practitioners.
 The opposite problem, when gradients explode,
 can be similarly vexing.
 To illustrate this a bit better,
-we draw $100$ Gaussian random matrices
+we draw 100 Gaussian random matrices
 and multiply them with some initial matrix.
 For the scale that we picked
 (the choice of the variance $\sigma^2=1$),
@@ -158,63 +158,71 @@ a gradient descent optimizer to converge.
 
 ```{.python .input}
 M = np.random.normal(size=(4, 4))
-print('A single matrix', M)
+print('a single matrix', M)
 for i in range(100):
     M = np.dot(M, np.random.normal(size=(4, 4)))
 
-print('After multiplying 100 matrices', M)
+print('after multiplying 100 matrices', M)
 ```
 
 ```{.python .input}
 #@tab pytorch
 M = torch.normal(0, 1, size=(4,4))
-print('A single matrix \n',M)
+print('a single matrix \n',M)
 for i in range(100):
-    M = torch.mm(M,torch.normal(0, 1, size=(4,4)))
+    M = torch.mm(M,torch.normal(0, 1, size=(4, 4)))
 
-print('After multiplying 100 matrices\n',M)
+print('after multiplying 100 matrices\n', M)
 ```
 
 ```{.python .input}
 #@tab tensorflow
 M = tf.random.normal((4, 4))
-print('A single matrix \n', M)
+print('a single matrix \n', M)
 for i in range(100):
     M = tf.matmul(M, tf.random.normal((4, 4)))
 
-print('After multiplying 100 matrices\n', M.numpy())
+print('after multiplying 100 matrices\n', M.numpy())
 ```
 
-### Symmetry
+### Breaking the Symmetry
 
-Another problem in deep network design
+Another problem in neural network design
 is the symmetry inherent in their parametrization.
-Assume that we have a deep network
-with one hidden layer and two units, say $h_1$ and $h_2$.
-In this case, we could permute the weights $\mathbf{W}_1$
+Assume that we have a simple MLP
+with one hidden layer and two units.
+In this case, we could permute the weights $\mathbf{W}^{(1)}$
 of the first layer and likewise permute
 the weights of the output layer
 to obtain the same function.
 There is nothing special differentiating
-the first hidden unit vs the second hidden unit.
+the first hidden unit vs. the second hidden unit.
 In other words, we have permutation symmetry
 among the hidden units of each layer.
 
 This is more than just a theoretical nuisance.
+Consider the aforementioned one-hidden-layer MLP
+with two hidden units.
+For illustration,
+suppose that the output layer transforms the two hidden units into only one output unit.
 Imagine what would happen if we initialized
-all of the parameters of some layer
-as $\mathbf{W}_l = c$ for some constant $c$.
-In this case, the gradients
-for all dimensions are identical:
-thus not only would each unit take the same value,
-but it would receive the same update.
-Stochastic gradient descent would
-never break the symmetry on its own
+all of the parameters of the hidden layer
+as $\mathbf{W}^{(1)} = c$ for some constant $c$.
+In this case, during forward propagation
+either hidden unit takes the same inputs and parameters,
+producing the same activation,
+which is fed to the output unit.
+During backpropagation,
+differentiating the output unit with respect to parameters $\mathbf{W}^{(1)}$ gives a gradient whose elements all take the same value.
+Thus, after gradient-based iteration (e.g., minibatch stochastic gradient descent),
+all the elements of $\mathbf{W}^{(1)}$ still take the same value.
+Such iterations would
+never *break the symmetry* on its own
 and we might never be able to realize
 the network's expressive power.
 The hidden layer would behave
 as if it had only a single unit.
-Note that while SGD would not break this symmetry,
+Note that while minibatch stochastic gradient descent would not break this symmetry,
 dropout regularization would!
 
 
@@ -229,11 +237,13 @@ and suitable regularization can further enhance stability.
 ### Default Initialization
 
 In the previous sections, e.g., in :numref:`sec_linear_concise`,
-we used a normal distribution with 0 mean and 0.01 variance
+we used a normal distribution 
 to initialize the values of our weights.
-If we don't specify the initialization method, the framework will
+If we do not specify the initialization method, the framework will
 use a default random initialization method, which often works well in practice
 for moderate problem sizes.
+
+
 
 
 ### Xavier Initialization
@@ -258,7 +268,7 @@ In this case, we can compute the mean and variance of $h_i$ as follows:
 $$
 \begin{aligned}
     E[h_i] & = \sum_{j=1}^{n_\mathrm{in}} E[W_{ij} x_j] = 0, \\
-    Var[h_i] & = E[h_i^2] - (E[h_i])^2 \\
+    \mathrm{Var}[h_i] & = E[h_i^2] - (E[h_i])^2 \\
         & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij} x^2_j] - 0 \\
         & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij}] E[x^2_j] \\
         & = n_\mathrm{in} \sigma^2 \gamma^2.
@@ -293,14 +303,14 @@ named for its creator :cite:`Glorot.Bengio.2010`.
 Typically, the Xavier initialization
 samples weights from a Gaussian distribution
 with zero mean and variance
-$\sigma^2 = 2/(n_\mathrm{in} + n_\mathrm{out})$.
+$\sigma^2 = \frac{2}{n_\mathrm{in} + n_\mathrm{out}}$.
 We can also adapt Xavier's intuition to
 choose the variance when sampling weights
 from a uniform distribution.
 Note the distribution $U[-a, a]$ has variance $a^2/3$.
 Plugging $a^2/3$ into our condition on $\sigma^2$
 yields the suggestion to initialize according to
-$U\left[-\sqrt{6/(n_\mathrm{in} + n_\mathrm{out})}, \sqrt{6/(n_\mathrm{in} + n_\mathrm{out})}\right]$.
+$U\left[-\sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}, \sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}\right]$.
 
 ### Beyond
 
