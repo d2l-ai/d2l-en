@@ -292,7 +292,8 @@ In this sense, it is very similar to what we saw in regression,
 where the gradient was the difference
 between the observation $y$ and estimate $\hat{y}$.
 This is not coincidence.
-In any exponential family (:numref:`subsec_exponential_family`) model,
+In any exponential family (see the
+[online appendix on distributions](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/distributions.html)) model,
 the gradients of the log-likelihood are given by precisely this term.
 This fact makes computing gradients easy in practice.
 
