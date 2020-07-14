@@ -538,10 +538,12 @@ arange = tf.range
 reshape = tf.reshape
 ones = tf.ones
 zeros = tf.zeros
+meshgrid = tf.meshgrid
 sin = tf.sin
 sinh = tf.sinh
 cos = tf.cos
 cosh = tf.cosh
 tanh = tf.tanh
+linspace = tf.linspace
 exp = tf.exp
 
