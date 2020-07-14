@@ -1086,4 +1086,5 @@ sin = torch.sin
 sinh = torch.sinh
 cos = torch.cos
 cosh = torch.cosh
+exp = torch.exp
 

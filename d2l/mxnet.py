@@ -2568,4 +2568,5 @@ cos = np.cos
 cosh = np.cosh
 tanh = np.tanh
 linspace = np.linspace
+exp = np.exp
 

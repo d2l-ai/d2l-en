@@ -543,4 +543,5 @@ sinh = tf.sinh
 cos = tf.cos
 cosh = tf.cosh
 tanh = tf.tanh
+exp = tf.exp
 
