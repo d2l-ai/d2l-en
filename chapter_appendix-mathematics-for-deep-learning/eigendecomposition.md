@@ -503,7 +503,7 @@ print(f'norms of eigenvalues: {norm_eigs}')
 #@tab tensorflow
 # Compute the eigenvalues
 eigs = tf.linalg.eigh(A)[0].numpy().tolist()
-norm_eigs = [tf.abs(tf.constant(x)) for x in eigs]
+norm_eigs = [tf.abs(tf.constant(x, dtype=tf.float64)) for x in eigs]
 norm_eigs.sort()
 print(f'norms of eigenvalues: {norm_eigs}')
 ```
