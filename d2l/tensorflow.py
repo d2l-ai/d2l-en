@@ -533,9 +533,17 @@ def annotate(text, xy, xytext):  #@save
 # Alias defined in config.ini
 numpy = lambda a: a.numpy()
 size = lambda a: tf.size(a).numpy()
+tensor = tf.constant
+arange = tf.range
 reshape = tf.reshape
 ones = tf.ones
 zeros = tf.zeros
-tensor = tf.constant
-arange = tf.range
+meshgrid = tf.meshgrid
+sin = tf.sin
+sinh = tf.sinh
+cos = tf.cos
+cosh = tf.cosh
+tanh = tf.tanh
+linspace = tf.linspace
+exp = tf.exp
 

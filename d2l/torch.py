@@ -1048,7 +1048,7 @@ def annotate(text, xy, xytext):  #@save
 
 
 # Defined in file: ./chapter_optimization/gd.md
-def train_2d(trainer, steps=20):
+def train_2d(trainer, steps=20):  #@save
     """Optimize a 2-dim objective function with a customized trainer."""
     # s1 and s2 are internal state variables and will
     # be used later in the chapter
@@ -1061,11 +1061,12 @@ def train_2d(trainer, steps=20):
 
 
 # Defined in file: ./chapter_optimization/gd.md
-def show_trace_2d(f, results):
+def show_trace_2d(f, results):  #@save
     """Show the trace of 2D variables during optimization."""
     d2l.set_figsize()
     d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
-    x1, x2 = torch.meshgrid(torch.arange(-5.5, 1.0, 0.1), torch.arange(-3.0, 1.0, 0.1))
+    x1, x2 = d2l.meshgrid(d2l.arange(-5.5, 1.0, 0.1),
+                          d2l.arange(-3.0, 1.0, 0.1))
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
@@ -1075,9 +1076,17 @@ def show_trace_2d(f, results):
 numpy = lambda a: a.detach().numpy()
 size = lambda a: a.numel()
 reshape = lambda a, *args: a.reshape(*args)
+to = lambda a, ctx: a.to(ctx)
 ones = torch.ones
 zeros = torch.zeros
 tensor = torch.tensor
-to = lambda a, ctx: a.to(ctx)
 arange = torch.arange
+meshgrid = torch.meshgrid
+sin = torch.sin
+sinh = torch.sinh
+cos = torch.cos
+cosh = torch.cosh
+tanh = torch.tanh
+linspace = torch.linspace
+exp = torch.exp
 

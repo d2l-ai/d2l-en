@@ -1165,7 +1165,7 @@ def annotate(text, xy, xytext):  #@save
 
 
 # Defined in file: ./chapter_optimization/gd.md
-def train_2d(trainer, steps=20):
+def train_2d(trainer, steps=20):  #@save
     """Optimize a 2-dim objective function with a customized trainer."""
     # s1 and s2 are internal state variables and will
     # be used later in the chapter
@@ -1178,11 +1178,12 @@ def train_2d(trainer, steps=20):
 
 
 # Defined in file: ./chapter_optimization/gd.md
-def show_trace_2d(f, results):
+def show_trace_2d(f, results):  #@save
     """Show the trace of 2D variables during optimization."""
     d2l.set_figsize()
     d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
-    x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
+    x1, x2 = d2l.meshgrid(d2l.arange(-5.5, 1.0, 0.1),
+                          d2l.arange(-3.0, 1.0, 0.1))
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
@@ -2415,9 +2416,9 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
         x.extend([np.array(item_ids)])
         test_data_iter = gluon.data.DataLoader(
             gluon.data.ArrayDataset(*x), shuffle=False, last_batch="keep",
-            batch_size=1024) 
+            batch_size=1024)
         for index, values in enumerate(test_data_iter):
-            x = [gluon.utils.split_and_load(v, ctx, even_split=False) 
+            x = [gluon.utils.split_and_load(v, ctx, even_split=False)
                  for v in values]
             scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
         scores = [item for sublist in scores for item in sublist]
@@ -2432,7 +2433,7 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx_list, evaluator, 
+                  num_users, num_items, num_epochs, ctx_list, evaluator,
                   candidates, eval_step=1):
     timer, hit_rate, auc = d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
@@ -2445,7 +2446,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                 input_data.append(gluon.utils.split_and_load(v, ctx_list))
             with autograd.record():
                 p_pos = [net(*t) for t in zip(*input_data[0:-1])]
-                p_neg = [net(*t) for t in zip(*input_data[0:-2], 
+                p_neg = [net(*t) for t in zip(*input_data[0:-2],
                                               input_data[-1])]
                 ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]
@@ -2555,9 +2556,17 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
 numpy = lambda a: a.asnumpy()
 size = lambda a: a.size
 reshape = lambda a, *args: a.reshape(*args)
+to = lambda a, ctx: a.as_in_context(ctx)
+tensor = np.array
 ones = np.ones
 zeros = np.zeros
-tensor = np.array
-to = lambda a, ctx: a.as_in_context(ctx)
 arange = np.arange
+meshgrid = np.meshgrid
+sin = np.sin
+sinh = np.sinh
+cos = np.cos
+cosh = np.cosh
+tanh = np.tanh
+linspace = np.linspace
+exp = np.exp
 
