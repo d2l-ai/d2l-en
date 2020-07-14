@@ -49,22 +49,10 @@ empirical function $g$, to illustrate this issue. Here the $g$ is less smooth th
 since we have only a finite amount of data.
 
 ```{.python .input}
-def f(x): return x * np.cos(np.pi * x)
-def g(x): return f(x) + 0.2 * np.cos(5 * np.pi * x)
+#@tab all
+def f(x): return x * d2l.cos(np.pi * x)
+def g(x): return f(x) + 0.2 * d2l.cos(5 * np.pi * x)
 ```
-
-```{.python .input}
-#@tab pytorch
-def f(x): return x * torch.cos(np.pi * x)
-def g(x): return f(x) + 0.2 * torch.cos(5 * np.pi * x)
-```
-
-```{.python .input}
-#@tab tensorflow
-def f(x): return x * tf.cos(np.pi * x)
-def g(x): return f(x) + 0.2 * tf.cos(5 * np.pi * x)
-```
-
 
 The graph below illustrates that the minimum of the training error may be at a different location than the minimum of the expected error (or of the test error).
 
@@ -125,30 +113,13 @@ d2l.plot(x, [x**3], 'x', 'f(x)')
 annotate('saddle point', (0, -0.2), (-0.52, -5.0))
 ```
 
-Saddle points in higher dimensions are even more insidious, as the example below shows. Consider the function $f(x, y) = x^2 - y^2$.
-
-```{.python .input}
-x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
-                   indexing='ij')
-z = x**2 - y**2
-```
-
-```{.python .input}
-#@tab pytorch
-x, y = torch.meshgrid(torch.linspace(-1, 1, 101), torch.linspace(-1, 1, 101))
-z = x**2 - y**2
-```
-
-```{.python .input}
-#@tab tensorflow
-x, y = tf.meshgrid(tf.linspace(-1.0, 1.0, 101), tf.linspace(-1.0, 1.0, 101))
-z = x**2 - y**2
-```
-
-It has its saddle point at $(0, 0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
+Saddle points in higher dimensions are even more insidious, as the example below shows. Consider the function $f(x, y) = x^2 - y^2$. It has its saddle point at $(0, 0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
 
 ```{.python .input}
 #@tab all
+x, y = d2l.meshgrid(d2l.linspace(-1.0, 1.0, 101), d2l.linspace(-1.0, 1.0, 101))
+z = x**2 - y**2
+
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.plot([0], [0], [0], 'rx')
@@ -178,22 +149,9 @@ For high-dimensional problems the likelihood that at least some of the eigenvalu
 Probably the most insidious problem to encounter are vanishing gradients. For instance, assume that we want to minimize the function $f(x) = \tanh(x)$ and we happen to get started at $x = 4$. As we can see, the gradient of $f$ is close to nil. More specifically $f'(x) = 1 - \tanh^2(x)$ and thus $f'(4) = 0.0013$. Consequently optimization will get stuck for a long time before we make progress. This turns out to be one of the reasons that training deep learning models was quite tricky prior to the introduction of the ReLU activation function.
 
 ```{.python .input}
-x = np.arange(-2.0, 5.0, 0.01)
-d2l.plot(x, [np.tanh(x)], 'x', 'f(x)')
-annotate('vanishing gradient', (4, 1), (2, 0.0))
-```
-
-```{.python .input}
-#@tab pytorch
-x = torch.arange(-2.0, 5.0, 0.01)
-d2l.plot(x, [torch.tanh(x)], 'x', 'f(x)')
-annotate('vanishing gradient', (4, 1), (2, 0.0))
-```
-
-```{.python .input}
-#@tab tensorflow
-x = tf.range(-2.0, 5.0, 0.01)
-d2l.plot(x, [tf.tanh(x)], 'x', 'f(x)')
+#@tab all
+x = d2l.arange(-2.0, 5.0, 0.01)
+d2l.plot(x, [d2l.tanh(x)], 'x', 'f(x)')
 annotate('vanishing gradient', (4, 1), (2, 0.0))
 ```
 

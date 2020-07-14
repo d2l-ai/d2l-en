@@ -59,20 +59,11 @@ import torch
 Let us define a few functions, both convex and nonconvex.
 
 ```{.python .input}
-f = lambda x: 0.5 * x**2  # Convex
-g = lambda x: np.cos(np.pi * x)  # Nonconvex
-h = lambda x: np.exp(0.5 * x)  # Convex
-```
-
-```{.python .input}
-#@tab pytorch
-f = lambda x: 0.5 * x**2  # Convex
-g = lambda x: torch.cos(np.pi * x)  # Nonconvex
-h = lambda x: torch.exp(0.5 * x)  # Convex
-```
-
-```{.python .input}
 #@tab all
+f = lambda x: 0.5 * x**2  # Convex
+g = lambda x: d2l.cos(np.pi * x)  # Nonconvex
+h = lambda x: d2l.exp(0.5 * x)  # Convex
+
 x, segment = d2l.arange(-2, 2, 0.01), d2l.tensor([-1.5, 1])
 d2l.use_svg_display()
 _, axes = d2l.plt.subplots(1, 3, figsize=(9, 3))
@@ -136,20 +127,9 @@ Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is cle
 
 
 ```{.python .input}
-x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
-                   indexing='ij')
-z = x**2 + 0.5 * np.cos(2 * np.pi * y)
-```
-
-```{.python .input}
-#@tab pytorch
-x, y = torch.meshgrid(torch.linspace(-1, 1, 101), torch.linspace(-1, 1, 101))
-z = x**2 + 0.5 * torch.cos(2 * np.pi * y)
-```
-
-
-```{.python .input}
 #@tab all
+x, y = d2l.meshgrid(d2l.linspace(-1, 1, 101), d2l.linspace(-1, 1, 101))
+z = x**2 + 0.5 * d2l.cos(2 * np.pi * y)
 # Plot the 3D surface
 d2l.set_figsize((6, 4))
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
