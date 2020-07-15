@@ -4,7 +4,8 @@
 Just as we implemented linear regression from scratch,
 we believe that softmax regression
 is similarly fundamental and you ought to know
-the gory details of how to implement it yourself.
+the gory details of how to implement it yourself. We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
+setting up a data iterator with batch size 256.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -26,9 +27,6 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 from IPython import display
 ```
-
-We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
-setting up a data iterator with batch size 256.
 
 ```{.python .input}
 #@tab all
@@ -92,7 +90,7 @@ let us briefly review how the sum operator work
 along specific dimensions in a tensor,
 as discussed in :numref:`subseq_lin-alg-reduction` and :numref:`subseq_lin-alg-non-reduction`.
 Given a matrix `X` we can sum over all elements (by default) or only
-over elements in the same axis, 
+over elements in the same axis,
 i.e., the same column (axis 0) or the same row (axis 1).
 Note that if `X` is an tensor with shape (2, 3)
 and we sum over the columns,
@@ -103,20 +101,15 @@ rather than collapsing out the dimension that we summed over.
 This will result in a two-dimensional tensor with shape (1, 3).
 
 ```{.python .input}
-X = np.array([[1, 2, 3], [4, 5, 6]])
-X.sum(axis=0, keepdims=True), '\n', X.sum(axis=1, keepdims=True)
-```
-
-```{.python .input}
 #@tab pytorch
-X = torch.tensor([[1., 2., 3.], [4., 5., 6.]])
-torch.sum(X, dim=0, keepdim=True), torch.sum(X, dim=1, keepdim=True)
+X = d2l.tensor([[1., 2., 3.], [4., 5., 6.]])
+d2l.reduce_sum(X, 0, keepdim=True), d2l.reduce_sum(X, 1, keepdim=True)
 ```
 
 ```{.python .input}
-#@tab tensorflow
-X = tf.constant([[1., 2., 3.], [4., 5., 6.]])
-[tf.reduce_sum(X, axis=i, keepdims=True) for i in range(0, 1)]
+#@tab mxnet, tensorflow
+X = d2l.tensor([[1., 2., 3.], [4., 5., 6.]])
+d2l.reduce_sum(X, 0, keepdims=True), d2l.reduce_sum(X, 1, keepdims=True)
 ```
 
 We are now ready to implement the softmax operation.
@@ -141,25 +134,18 @@ where a related equation models the distribution
 over an ensemble of particles.
 
 ```{.python .input}
+#@tab mxnet, tensorflow
 def softmax(X):
-    X_exp = np.exp(X)
-    partition = X_exp.sum(axis=1, keepdims=True)
+    X_exp = d2l.exp(X)
+    partition = d2l.reduce_sum(X_exp, 1, keepdims=True)
     return X_exp / partition  # The broadcasting mechanism is applied here
 ```
 
 ```{.python .input}
 #@tab pytorch
 def softmax(X):
-    X_exp = torch.exp(X)
-    partition = torch.sum(X_exp, dim=1, keepdim=True)
-    return X_exp / partition  # The broadcasting mechanism is applied here
-```
-
-```{.python .input}
-#@tab tensorflow
-def softmax(X):
-    X_exp = tf.exp(X)
-    partition = tf.reduce_sum(X_exp, -1, keepdims=True)
+    X_exp = d2l.exp(X)
+    partition = d2l.reduce_sum(X_exp, 1, keepdim=True)
     return X_exp / partition  # The broadcasting mechanism is applied here
 ```
 
@@ -169,23 +155,17 @@ Moreover, each row sums up to 1,
 as is required for a probability.
 
 ```{.python .input}
-X = np.random.normal(size=(2, 5))
+#@tab mxnet, pytorch
+X = d2l.normal(0, 1, (2, 5))
 X_prob = softmax(X)
-X_prob, X_prob.sum(axis=1)
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.normal(0, 1, size=(2, 5))
-X_prob = softmax(X)
-X_prob, torch.sum(X_prob, dim=1)
+X_prob, d2l.reduce_sum(X_prob, 1)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.random.normal(shape=(2, 5))
+X = tf.random.normal((2, 5), 0, 1)
 X_prob = softmax(X)
-X_prob, tf.reduce_sum(X_prob, axis=1)
+X_prob, tf.reduce_sum(X_prob, 1)
 ```
 
 Note that while this looks correct mathematically,
@@ -203,20 +183,9 @@ into a vector using the `reshape` function
 before passing the data through our model.
 
 ```{.python .input}
+#@tab all
 def net(X):
-    return softmax(np.dot(X.reshape(-1, W.shape[0]), W) + b)
-```
-
-```{.python .input}
-#@tab pytorch
-def net(X):
-    return softmax(torch.matmul(X.reshape(-1, W.shape[0]), W) + b)
-```
-
-```{.python .input}
-#@tab tensorflow
-def net(X):
-    return softmax(tf.matmul(tf.reshape(X, shape=(-1, W.shape[0])), W) + b)
+    return softmax(d2l.matmul(d2l.reshape(X, (-1, W.shape[0])), W) + b)
 ```
 
 ## Defining the Loss Function
@@ -238,15 +207,9 @@ Then we pick the probability of the first class in the first example
 and the probability of the third class in the second example.
 
 ```{.python .input}
-y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
-y = np.array([0, 2])
-y_hat[[0, 1], y]
-```
-
-```{.python .input}
-#@tab pytorch
-y = torch.tensor([0, 2])
-y_hat = torch.tensor([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
+#@tab mxnet, pytorch
+y = d2l.tensor([0, 2])
+y_hat = d2l.tensor([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 y_hat[[0, 1], y]
 ```
 
@@ -260,16 +223,9 @@ tf.boolean_mask(y_hat, tf.one_hot(y, depth=y_hat.shape[-1]))
 Now we can implement the cross-entropy loss function efficiently with just one line of code.
 
 ```{.python .input}
+#@tab mxnet, pytorch
 def cross_entropy(y_hat, y):
-    return - np.log(y_hat[range(len(y_hat)), y])
-
-cross_entropy(y_hat, y)
-```
-
-```{.python .input}
-#@tab pytorch
-def cross_entropy(y_hat, y):
-    return - torch.log(y_hat[range(len(y_hat)), y])
+    return - d2l.log(y_hat[range(len(y_hat)), y])
 
 cross_entropy(y_hat, y)
 ```
@@ -310,29 +266,13 @@ The result is a tensor containing entries of 0 (false) and 1 (true).
 Taking the sum yields the number of correct predictions.
 
 ```{.python .input}
+#@tab all
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = y_hat.argmax(axis=1)
-    return float((y_hat.astype(y.dtype) == y).sum())
-```
-
-```{.python .input}
-#@tab pytorch
-def accuracy(y_hat, y):  #@save
-    """Compute the number of correct predictions."""
-    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = y_hat.argmax(axis=1)
-    return float((y_hat.type(y.dtype) == y).sum())
-```
-
-```{.python .input}
-#@tab tensorflow
-def accuracy(y_hat, y):  #@save
-    """Compute the number of correct predictions."""
-    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = tf.argmax(y_hat, axis=1)
-    return float((tf.cast(y_hat, dtype=y.dtype) == y).numpy().sum())
+        y_hat = d2l.argmax(y_hat, axis=1)        
+    cmp = d2l.astype(y_hat, y.dtype) == y
+    return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 ```
 
 We will continue to use the variables `y_hat` and `y`
@@ -443,6 +383,9 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
 #@tab pytorch
 def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     """The training loop defined in Chapter 3."""
+    # Set the model to training mode
+    if isinstance(net, torch.nn.Module):
+        net.train()
     # Sum of training loss, sum of training accuracy, no. of examples
     metric = Accumulator(3)
     for X, y in train_iter:
@@ -541,7 +484,7 @@ class Animator:  #@save
         display.clear_output(wait=True)
 ```
 
-The following training function then 
+The following training function then
 trains a model `net` on a training dataset accessed via `train_iter`
 for multiple epochs, which is specified by `num_epochs`.
 At the end of each epoch,
@@ -550,30 +493,12 @@ We will leverage the `Animator` class to visualize
 the training progress.
 
 ```{.python .input}
-#@tab mxnet, tensorflow
+#@tab all
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
     """Train a model (defined in Chapter 3)."""
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
-        train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
-        test_acc = evaluate_accuracy(net, test_iter)
-        animator.add(epoch + 1, train_metrics + (test_acc,))
-    train_loss, train_acc = train_metrics
-    assert train_loss < 0.5, train_loss
-    assert train_acc <= 1 and train_acc > 0.7, train_acc
-    assert test_acc <= 1 and test_acc > 0.7, test_acc
-```
-
-```{.python .input}
-#@tab pytorch
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
-    """Train a model (defined in Chapter 3)."""
-    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
-                        legend=['train loss', 'train acc', 'test acc'])
-    for epoch in range(num_epochs):
-        if isinstance(net, torch.nn.Module):
-            net.train()  # Set the model to training mode
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
         animator.add(epoch + 1, train_metrics + (test_acc,))
@@ -632,29 +557,15 @@ and the predictions from the model
 (second line of text output).
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab all
 def predict_ch3(net, test_iter, n=6):  #@save
     """Predict labels (defined in Chapter 3)."""
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
-    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
-    titles = [true + '\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
-
-predict_ch3(net, test_iter)
-```
-
-```{.python .input}
-#@tab tensorflow
-def predict_ch3(net, test_iter, n=6):  #@save
-    """Predict labels (defined in Chapter 3)."""
-    for X, y in test_iter:
-        break
-    trues = d2l.get_fashion_mnist_labels(y)
-    preds = d2l.get_fashion_mnist_labels(tf.argmax(net(X), axis=1))
+    preds = d2l.get_fashion_mnist_labels(d2l.argmax(net(X), axis=1))
     titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(tf.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
+    d2l.show_images(d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 predict_ch3(net, test_iter)
 ```

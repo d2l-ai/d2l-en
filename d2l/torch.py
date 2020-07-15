@@ -216,8 +216,9 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = y_hat.argmax(axis=1)
-    return float((y_hat.type(y.dtype) == y).sum())
+        y_hat = d2l.argmax(y_hat, axis=1)        
+    cmp = d2l.astype(y_hat, y.dtype) == y
+    return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -250,6 +251,9 @@ class Accumulator:  #@save
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     """The training loop defined in Chapter 3."""
+    # Set the model to training mode
+    if isinstance(net, torch.nn.Module):
+        net.train()
     # Sum of training loss, sum of training accuracy, no. of examples
     metric = Accumulator(3)
     for X, y in train_iter:
@@ -318,8 +322,6 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
-        if isinstance(net, torch.nn.Module):
-            net.train()  # Set the model to training mode
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
         animator.add(epoch + 1, train_metrics + (test_acc,))
@@ -335,9 +337,9 @@ def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
-    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
-    titles = [true + '\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+    preds = d2l.get_fashion_mnist_labels(d2l.argmax(net(X), axis=1))
+    titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
+    d2l.show_images(d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
@@ -1073,10 +1075,8 @@ def show_trace_2d(f, results):  #@save
 
 
 # Alias defined in config.ini
-numpy = lambda a: a.detach().numpy()
-size = lambda a: a.numel()
-reshape = lambda a, *args: a.reshape(*args)
-to = lambda a, ctx: a.to(ctx)
+
+
 ones = torch.ones
 zeros = torch.zeros
 tensor = torch.tensor
@@ -1089,6 +1089,14 @@ cosh = torch.cosh
 tanh = torch.tanh
 linspace = torch.linspace
 exp = torch.exp
+log = torch.log
 normal = torch.normal
 matmul = torch.matmul
+numpy = lambda x, *args, **kwargs: x.detach().numpy(*args, **kwargs)
+size = lambda x, *args, **kwargs: x.numel(*args, **kwargs)
+reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
+to = lambda x, *args, **kwargs: x.to(*args, **kwargs)
+reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
+argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
+astype = lambda x, *args, **kwargs: x.type(*args, **kwargs)
 

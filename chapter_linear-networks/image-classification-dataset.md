@@ -88,12 +88,7 @@ For brevity, throughout this book
 we store the shape of any image with height $h$ width $w$ pixels as $h \times w$ or ($h$, $w$).
 
 ```{.python .input}
-#@tab mxnet, pytorch
-mnist_train[0][0].shape
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 mnist_train[0][0].shape
 ```
 
