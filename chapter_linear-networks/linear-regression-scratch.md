@@ -74,11 +74,7 @@ def synthetic_data(w, b, num_examples):  #@save
     X = d2l.normal(0, 1, (num_examples, len(w)))
     y = d2l.matmul(X, w) + b
     y += d2l.normal(0, 0.01, y.shape)
-    return X, y
-
-true_w = d2l.tensor([2, -3.4])
-true_b = 4.2
-features, labels = synthetic_data(true_w, true_b, 1000)
+    return X, d2l.reshape(y, (-1, 1))
 ```
 
 ```{.python .input}
@@ -87,12 +83,15 @@ def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
     X = tf.zeros(shape=(num_examples, w.shape[0]))
     X += tf.random.normal(shape=X.shape)
-    y = tf.matmul(X, w) + b
+    y = tf.matmul(X, tf.reshape(w, (-1,1))) + b
     y += tf.random.normal(shape=y.shape, stddev=0.01)
-    y = tf.reshape(y, [num_examples])
+    y = tf.reshape(y, (-1, 1]))
     return X, y
+```
 
-true_w = tf.constant([2, -3.4], shape=(2, 1))
+```{.python .input}
+#@tab all
+true_w = d2l.tensor([2, -3.4])
 true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```

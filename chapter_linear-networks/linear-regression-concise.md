@@ -49,7 +49,6 @@ import tensorflow as tf
 true_w = d2l.tensor([2, -3.4])
 true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
-labels = d2l.reshape(labels, (-1, 1))
 ```
 
 ## Reading the Dataset
@@ -68,8 +67,6 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a Gluon data iterator."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
-
-
 ```
 
 ```{.python .input}
