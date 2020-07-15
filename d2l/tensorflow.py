@@ -533,6 +533,7 @@ def annotate(text, xy, xytext):  #@save
 
 # Alias defined in config.ini
 size = lambda a: tf.size(a).numpy()
+
 reshape = tf.reshape
 ones = tf.ones
 zeros = tf.zeros
@@ -547,7 +548,8 @@ exp = tf.exp
 matmul = tf.matmul
 reduce_sum = tf.reduce_sum
 argmax = tf.argmax
-tensor -> constant = tf.tensor -> constant
-arange -> range = tf.arange -> range
-astype -> cast = tf.astype -> cast
+tensor = tf.constant
+arange = tf.range
+astype = tf.cast
+numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 

@@ -1076,6 +1076,7 @@ def show_trace_2d(f, results):  #@save
 
 # Alias defined in config.ini
 
+
 ones = torch.ones
 zeros = torch.zeros
 tensor = torch.tensor
@@ -1091,4 +1092,11 @@ exp = torch.exp
 log = torch.log
 normal = torch.normal
 matmul = torch.matmul
+numpy = lambda x, *args, **kwargs: x.detach().numpy(*args, **kwargs)
+size = lambda x, *args, **kwargs: x.numel(*args, **kwargs)
+reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
+to = lambda x, *args, **kwargs: x.to(*args, **kwargs)
+reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
+argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
+astype = lambda x, *args, **kwargs: x.type(*args, **kwargs)
 
