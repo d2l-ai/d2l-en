@@ -269,7 +269,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         else:
             l.sum().backward()
             updater(X.shape[0])
-            metric.add(float(l.sum()), accuracy(y_hat, y), y.size().numel())
+            metric.add(float(l.sum()), accuracy(y_hat, y), y.numel())
     # Return training loss and training accuracy
     return metric[0] / metric[2], metric[1] / metric[2]
 
@@ -1076,7 +1076,6 @@ def show_trace_2d(f, results):  #@save
 
 # Alias defined in config.ini
 
-
 ones = torch.ones
 zeros = torch.zeros
 tensor = torch.tensor
@@ -1092,11 +1091,4 @@ exp = torch.exp
 log = torch.log
 normal = torch.normal
 matmul = torch.matmul
-numpy = lambda x, *args, **kwargs: x.detach().numpy(*args, **kwargs)
-size = lambda x, *args, **kwargs: x.numel(*args, **kwargs)
-reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
-to = lambda x, *args, **kwargs: x.to(*args, **kwargs)
-reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
-argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
-astype = lambda x, *args, **kwargs: x.type(*args, **kwargs)
 

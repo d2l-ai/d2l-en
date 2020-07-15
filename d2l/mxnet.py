@@ -2555,7 +2555,6 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
 
 # Alias defined in config.ini
 size = lambda a: a.size
-
 ones = np.ones
 zeros = np.zeros
 arange = np.arange
@@ -2568,13 +2567,7 @@ tanh = np.tanh
 linspace = np.linspace
 exp = np.exp
 log = np.log
-tensor = np.array
-normal = np.random.normal
-matmul = np.dot
-numpy = lambda x, *args, **kwargs: x.asnumpy(*args, **kwargs)
-reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
-to = lambda x, *args, **kwargs: x.as_in_context(*args, **kwargs)
-reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
-argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
-astype = lambda x, *args, **kwargs: x.astype(*args, **kwargs)
+tensor -> array = np.tensor -> array
+normal -> random.normal = np.normal -> random.normal
+matmul -> dot = np.matmul -> dot
 
