@@ -193,7 +193,7 @@ we can see that the rank is the same
 as the number of non-zero eigenvalues of $\mathbf{A}$.
 
 The examples could continue, but hopefully the point is clear:
-eigendecompositions can simplify many linear-algebraic computations
+eigendecomposition can simplify many linear-algebraic computations
 and is a fundamental operation underlying many numerical algorithms
 and much of the analysis that we do in linear algebra. 
 
