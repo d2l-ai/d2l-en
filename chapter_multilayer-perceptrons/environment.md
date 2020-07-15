@@ -298,13 +298,14 @@ The impatient reader could continue on to the next section
 as this material is not prerequisite to subsequent concepts.
 
 ### Covariate Shift Correction
+:label:`subsec_covariate-shift-correction`
 
 Assume that we want to estimate
 some dependency $P(y \mid \mathbf{x})$
 for which we have labeled data $(\mathbf{x}_i, y_i)$.
 Unfortunately, the observations $\mathbf{x}_i$ are drawn
-from some *source distribution* $q(\mathbf{x})$
-rather than the *target distribution* $p(\mathbf{x})$.
+from some *source distribution* $q(\mathbf{x})$ (e.g., training set)
+rather than the *target distribution* $p(\mathbf{x})$ (e.g., test set).
 To make progress, we need to reflect about what exactly
 is happening during training:
 we iterate over training data and associated labels
@@ -314,12 +315,14 @@ We sometimes additionally apply some penalty to the parameters,
 using weight decay, dropout, or some other related technique.
 This means that we largely minimize the loss on the training:
 
-$$
-\mathop{\mathrm{minimize}}_\mathbf{w} \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}_i, y_i, f(\mathbf{x}_i)) + \mathrm{some~penalty}(\mathbf{w}).
-$$
+$$\mathop{\mathrm{minimize}}_\mathbf{w} \frac{1}{n} \sum_{i=1}^n l(f(\mathbf{x}_i), y_i) + \mathrm{some~penalty}(\mathbf{w}).$$
+:eqlabel:`eq_regularized-empirical-risk-min`
 
-Statisticians call the first term an *empirical average*,
-i.e., an average computed over the data drawn from $P(\mathbf{x}) P(y \mid \mathbf{x})$.
+Statisticians call the first term in :eqref:`eq_regularized-empirical-risk-min` *empirical risk*,
+i.e., an average computed over the data drawn from $P(\mathbf{x}) P(y \mid \mathbf{x})$ (e.g., training set).
+Without considering the penalty term,
+minimizing the first term in :eqref:`eq_regularized-empirical-risk-min`
+is called *empirical risk minimization*.
 If the data are drawn from the "wrong" distribution $q$,
 we can correct for that by using the following simple identity:
 
@@ -330,10 +333,23 @@ $$
 \end{aligned}
 $$
 
-In other words, we need to re-weigh each data point
+In other words, we need to reweigh each data point
 by the ratio of probabilities
 that it would have been drawn from the correct distribution
-$\beta(\mathbf{x}) \stackrel{\mathrm{def}}{=} p(\mathbf{x})/q(\mathbf{x})$.
+
+$$\beta(\mathbf{x}) \stackrel{\mathrm{def}}{=} \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
+
+Plugging in the weight $\beta_i$ for
+each data point $(\mathbf{x}_i, y_i)$
+we can train our model using
+*weighted empirical risk minimization*
+with some penalty to the parameters:
+
+$$\mathop{\mathrm{minimize}}_\mathbf{w} \frac{1}{n} \sum_{i=1}^n \beta_il(f(\mathbf{x}_i), y_i) + \mathrm{some~penalty}(\mathbf{w}).$$
+:eqlabel:`eq_regularized-weighted-empirical-risk-min`
+
+
+
 Alas, we do not know that ratio,
 so before we can do anything useful we need to estimate it.
 Many methods are available,
@@ -386,6 +402,7 @@ As a result, we need to solve two problems:
 first one to distinguish between
 data drawn from both distributions,
 and then a reweighted minimization problem
+in :eqref:`eq_regularized-weighted-empirical-risk-min`
 where we weigh terms by $\beta$.
 Here is a prototypical algorithm
 for that purpose
@@ -394,7 +411,7 @@ that uses a training set $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ 
 1. Generate a binary-classification training set: $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{z}_1, 1), \ldots, (\mathbf{z}_m, 1)\}$.
 1. Train a binary classifier using logistic regression to get function $f$.
 1. Weigh training data using $\beta_i = \exp(f(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(f(\mathbf{x}_i)), c)$ for some constant $c$.
-1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$.
+1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ in :eqref:`eq_regularized-weighted-empirical-risk-min`.
 
 In the covariate shift correction,
 we assume that $\mathbf{x}_i$ for all $1 \leq i \leq n$ are drawn from some source distribution
@@ -402,24 +419,31 @@ and $\mathbf{z}_i$ for all $1 \leq i \leq m$
 are drawn from the target distribution.
 Note that the above algorithm relies on a crucial assumption.
 For this scheme to work, we need that each data point
-in the target (test time) distribution
+in the target (e.g., test time) distribution
 had nonzero probability of occurring at training time.
 If we find a point where $p(\mathbf{x}) > 0$ but $q(\mathbf{x}) = 0$,
 then the corresponding importance weight should be infinity.
 
 
+
+
 ### Label Shift Correction
 
 Assume that we are dealing with a
-$k$-way multiclass classification task.
-When the distribution of labels shifts over time,
-$p(y) \neq q(y)$ but the class-conditional distributions
-stay the same $p(\mathbf{x})=q(\mathbf{x})$.
+classification task with $k$ categories.
+Being consistent with the notation in :numref:`subsec_covariate-shift-correction`,
+denote by $q$ and $p$ the source distribution (e.g., training time) and target distribution (e.g., test time), respectively.
+Assume that the distribution of labels shifts over time:
+$q(y) \neq p(y)$, but the class-conditional distribution
+stays the same: $q(\mathbf{x} \mid y)=p(\mathbf{x} \mid y)$.
 Here, our importance weights will correspond to the
-label likelihood ratios $q(y)/p(y)$.
+label likelihood ratios 
+
+$$\beta(y) \stackrel{\mathrm{def}}{=} \frac{p(y)}{q(y)}.$$
+
 One nice thing about label shift is that
 if we have a reasonably good model
-(on the source distribution),
+on the source distribution,
 then we can get consistent estimates of these weights
 without ever having to deal with the ambient dimension.
 In deep learning, the inputs tend
@@ -431,7 +455,7 @@ we first take our reasonably good off the shelf classifier
 (typically trained on the training data)
 and compute its confusion matrix using the validation set
 (also from the training distribution).
-The confusion matrix, C, is simply a $k \times k$ matrix,
+The confusion matrix, $\mathbf{C}$, is simply a $k \times k$ matrix,
 where each column corresponds to the *actual* label
 and each row corresponds to our model's predicted label.
 Each cell's value $c_{ij}$ is the fraction of predictions
@@ -452,18 +476,19 @@ that we have seen before,
 and if the label shift assumption holds in the first place
 (the strongest assumption here),
 then we can recover the test set label distribution
-by solving a simple linear system $C \cdot q(y) = \mu_y$.
+by solving a simple linear system $\mathbf{C} \cdot p(y) = \mu_y$.
 If our classifier is sufficiently accurate to begin with,
-then the confusion $C$ will be invertible,
-and we get a solution $q(y) = C^{-1} \mu_y$.
-Here we abuse notation a bit, using $q(y)$
+then the confusion $\mathbf{C}$ will be invertible,
+and we get a solution $p(y) = \mathbf{C}^{-1} \mu_y$.
+Here we abuse notation a bit, using $p(y)$
 to denote the vector of label frequencies.
 Because we observe the labels on the source data,
-it is easy to estimate the distribution $p(y)$.
+it is easy to estimate the distribution $q(y)$.
 Then for any training example $i$ with label $y$,
-we can take the ratio of our estimates $\hat{q}(y)/\hat{p}(y)$
-to calculate the weight $w_i$,
-and plug this into the weighted risk minimization algorithm above.
+we can take the ratio of our estimates $\hat{p}(y)/\hat{q}(y)$
+to calculate the weight $\beta_i$,
+and plug this into the reweighted minimization problem
+in :eqref:`eq_regularized-weighted-empirical-risk-min`.
 
 
 ### Concept Shift Correction
