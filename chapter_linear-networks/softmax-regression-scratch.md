@@ -4,7 +4,8 @@
 Just as we implemented linear regression from scratch,
 we believe that softmax regression
 is similarly fundamental and you ought to know
-the gory details of how to implement it yourself. We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
+the gory details of how to implement it yourself.
+We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
 setting up a data iterator with batch size 256.
 
 ```{.python .input}
@@ -102,13 +103,13 @@ This will result in a two-dimensional tensor with shape (1, 3).
 
 ```{.python .input}
 #@tab pytorch
-X = d2l.tensor([[1., 2., 3.], [4., 5., 6.]])
+X = d2l.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
 d2l.reduce_sum(X, 0, keepdim=True), d2l.reduce_sum(X, 1, keepdim=True)
 ```
 
 ```{.python .input}
 #@tab mxnet, tensorflow
-X = d2l.tensor([[1., 2., 3.], [4., 5., 6.]])
+X = d2l.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
 d2l.reduce_sum(X, 0, keepdims=True), d2l.reduce_sum(X, 1, keepdims=True)
 ```
 
@@ -300,7 +301,7 @@ def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
-        metric.add(accuracy(net(X), y), sum(y.shape))
+        metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 ```
 
@@ -312,7 +313,7 @@ def evaluate_accuracy(net, data_iter):  #@save
         net.eval()  # Set the model to evaluation mode
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
-        metric.add(accuracy(net(X), y), sum(y.shape))
+        metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 ```
 

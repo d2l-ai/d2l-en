@@ -219,7 +219,7 @@ def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
-        metric.add(accuracy(net(X), y), sum(y.shape))
+        metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
@@ -433,7 +433,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
-        metric.add(d2l.accuracy(net(X), y), y.size)
+        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0]/metric[1]
 
 
