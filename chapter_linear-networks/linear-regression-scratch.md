@@ -91,7 +91,7 @@ def synthetic_data(w, b, num_examples):  #@save
 
 ```{.python .input}
 #@tab all
-true_w = d2l.tesnor([2, -3.4])
+true_w = d2l.tensor([2, -3.4])
 true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
