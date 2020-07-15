@@ -208,7 +208,7 @@ $$
 \end{bmatrix},
 $$
 
-has only a single eigenvector, namely $(1, 0)$. 
+has only a single eigenvector, namely $(1, 0)^\top$. 
 To handle such matrices, we require more advanced techniques 
 than we can cover (such as the Jordan Normal Form, or Singular Value Decomposition).
 We will often need to restrict our attention to those matrices 
