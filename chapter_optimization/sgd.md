@@ -44,6 +44,7 @@ This means that, on average, the stochastic gradient is a good estimate of the g
 Now, we will compare it to gradient descent by adding random noise with a mean of 0 and a variance of 1 to the gradient to simulate a SGD.
 
 ```{.python .input}
+#@tab all
 f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
 gradf = lambda x1, x2: (2 * x1, 4 * x2)  # Gradient
 
