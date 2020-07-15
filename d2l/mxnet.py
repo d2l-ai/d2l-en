@@ -331,7 +331,8 @@ def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
-        metric.add(loss(net(X), y).sum(), y.size)
+        l = loss(net(X), y)
+        metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 
 
@@ -2571,6 +2572,8 @@ log = np.log
 tensor = np.array
 normal = np.random.normal
 matmul = np.dot
+int32 = np.int32
+float32 = np.float32
 numpy = lambda x, *args, **kwargs: x.asnumpy(*args, **kwargs)
 reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
 to = lambda x, *args, **kwargs: x.as_in_context(*args, **kwargs)

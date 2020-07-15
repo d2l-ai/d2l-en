@@ -354,7 +354,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
     metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
         l = loss(net(X), y)
-        metric.add(tf.reduce_sum(l), tf.size(l).numpy())
+        metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 
 
@@ -551,5 +551,7 @@ argmax = tf.argmax
 tensor = tf.constant
 arange = tf.range
 astype = tf.cast
+int32 = tf.int32
+float32 = tf.float32
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 
