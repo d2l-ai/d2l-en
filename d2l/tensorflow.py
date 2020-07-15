@@ -209,8 +209,9 @@ def load_data_fashion_mnist(batch_size, resize=None):   #@save
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = tf.argmax(y_hat, axis=1)
-    return float((tf.cast(y_hat, dtype=y.dtype) == y).numpy().sum())
+        y_hat = d2l.argmax(y_hat, axis=1)        
+    cmp = d2l.astype(y_hat, y.dtype) == y
+    return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -342,9 +343,9 @@ def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
-    preds = d2l.get_fashion_mnist_labels(tf.argmax(net(X), axis=1))
+    preds = d2l.get_fashion_mnist_labels(d2l.argmax(net(X), axis=1))
     titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(tf.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
+    d2l.show_images(d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
@@ -531,10 +532,8 @@ def annotate(text, xy, xytext):  #@save
 
 
 # Alias defined in config.ini
-numpy = lambda a: a.numpy()
 size = lambda a: tf.size(a).numpy()
-tensor = tf.constant
-arange = tf.range
+
 reshape = tf.reshape
 ones = tf.ones
 zeros = tf.zeros
@@ -547,4 +546,10 @@ tanh = tf.tanh
 linspace = tf.linspace
 exp = tf.exp
 matmul = tf.matmul
+reduce_sum = tf.reduce_sum
+argmax = tf.argmax
+tensor = tf.constant
+arange = tf.range
+astype = tf.cast
+numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 
