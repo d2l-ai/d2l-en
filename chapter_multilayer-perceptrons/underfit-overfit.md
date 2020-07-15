@@ -148,7 +148,7 @@ Sometimes we can get away with minor violations of the i.i.d. assumption
 and our models will continue to work remarkably well.
 After all, nearly every real-world application
 involves at least some minor violation of the i.i.d. assumption,
-and yet we have many useful tools for 
+and yet we have many useful tools for
 various applications such as
 face recognition,
 speech recognition, and language translation.
@@ -462,7 +462,7 @@ true_w, features, poly_features, labels = [d2l.tensor(x, dtype=
 
 ```{.python .input}
 #@tab all
-features[:2].T, poly_features[:2, :], labels[:2]
+features[:2], poly_features[:2, :], labels[:2]
 ```
 
 ### Training and Testing the Model
