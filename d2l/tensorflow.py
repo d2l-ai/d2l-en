@@ -139,7 +139,7 @@ def synthetic_data(w, b, num_examples):  #@save
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):  #@save
     """The linear regression model."""
-    return tf.matmul(X, w) + b
+    return d2l.matmul(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -546,4 +546,5 @@ cosh = tf.cosh
 tanh = tf.tanh
 linspace = tf.linspace
 exp = tf.exp
+matmul = tf.matmul
 
