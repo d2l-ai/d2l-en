@@ -26,11 +26,8 @@ To start, we will generate the same dataset as in :numref:`sec_linear_scratch`.
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
-
-true_w = np.array([2, -3.4])
-true_b = 4.2
-features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
+
 
 ```{.python .input}
 #@tab pytorch
@@ -38,11 +35,6 @@ from d2l import torch as d2l
 import numpy as np
 import torch
 from torch.utils import data
-
-true_w = torch.Tensor([2, -3.4])
-true_b = 4.2
-features, labels = d2l.synthetic_data(true_w, true_b, 1000)
-labels = labels.reshape(-1,1)
 ```
 
 ```{.python .input}
@@ -50,11 +42,14 @@ labels = labels.reshape(-1,1)
 from d2l import tensorflow as d2l
 import numpy as np
 import tensorflow as tf
+```
 
-true_w = tf.constant([2, -3.4], shape=(2, 1))
+```{.python .input}
+#@tab all
+true_w = d2l.tensor([2, -3.4])
 true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
-labels = tf.reshape(labels, (-1, 1))
+labels = d2l.reshape(labels, (-1, 1))
 ```
 
 ## Reading the Dataset
@@ -74,8 +69,7 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
     dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
-batch_size = 10
-data_iter = load_array((features, labels), batch_size)
+
 ```
 
 ```{.python .input}
@@ -84,9 +78,6 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data iterator."""
     dataset = data.TensorDataset(*data_arrays)
     return data.DataLoader(dataset, batch_size, shuffle=is_train)
-
-batch_size = 10
-data_iter = load_array((features, labels), batch_size)
 ```
 
 ```{.python .input}
@@ -98,7 +89,10 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
         dataset = dataset.shuffle(buffer_size=1000)
     dataset = dataset.batch(batch_size)
     return dataset
+```
 
+```{.python .input}
+#@tab all
 batch_size = 10
 data_iter = load_array((features, labels), batch_size)
 ```
