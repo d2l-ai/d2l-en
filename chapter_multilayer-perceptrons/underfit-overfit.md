@@ -616,8 +616,9 @@ linear models are liable to underfit.
 
 ```{.python .input}
 #@tab all
-# Pick from the original `features` for linear function fitting
-train(features[:n_train, :], features[n_train:, :], labels[:n_train],
+# Pick the first two dimensions, i.e., 1, x, from 
+# the polynomial features
+train(poly_features[:n_train, :2], poly_features[n_train:, :2], labels[:n_train],
       labels[n_train:])
 ```
 
