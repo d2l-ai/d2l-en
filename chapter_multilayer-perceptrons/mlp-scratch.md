@@ -1,9 +1,14 @@
 # Implementation of Multilayer Perceptrons from Scratch
 :label:`sec_mlp_scratch`
 
-Now that we have characterized 
-multilayer perceptrons (MLPs) mathematically, 
-let us try to implement one ourselves.
+Now that we have characterized
+multilayer perceptrons (MLPs) mathematically,
+let us try to implement one ourselves. To compare against our previous results
+achieved with softmax regression
+(:numref:`sec_softmax_scratch`),
+we will continue to work with
+the Fashion-MNIST image classification dataset
+(:numref:`sec_fashion_mnist`).
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -23,13 +28,6 @@ from torch import nn
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
-
-To compare against our previous results
-achieved with softmax regression
-(:numref:`sec_softmax_scratch`),
-we will continue to work with 
-the Fashion-MNIST image classification dataset 
-(:numref:`sec_fashion_mnist`).
 
 ```{.python .input}
 #@tab all
@@ -105,7 +103,7 @@ params = [W1, b1, W2, b2]
 
 To make sure we know how everything works,
 we will implement the ReLU activation ourselves
-using the maximum function rather than 
+using the maximum function rather than
 invoking the built-in `relu` function directly.
 
 ```{.python .input}
@@ -128,10 +126,10 @@ def relu(X):
 
 ## Model
 
-Because we are disregarding spatial structure, 
-we `reshape` each two-dimensional image into 
+Because we are disregarding spatial structure,
+we `reshape` each two-dimensional image into
 a flat vector of length  `num_inputs`.
-Finally, we implement our model 
+Finally, we implement our model
 with just a few lines of code.
 
 ```{.python .input}
@@ -165,9 +163,9 @@ the softmax function from scratch
 (:numref:`sec_softmax_scratch`),
 we leverage the integrated function from high-level APIs
 for calculating the softmax and cross-entropy loss.
-Recall our earlier discussion of these intricacies 
+Recall our earlier discussion of these intricacies
 in :numref:`subsec_softmax-implementation-revisited`.
-We encourage the interested reader 
+We encourage the interested reader
 to examine the source code for the loss function
 to deepen their knowledge of implementation details.
 
@@ -191,8 +189,8 @@ def loss(y_hat, y):
 
 Fortunately, the training loop for MLPs
 is exactly the same as for softmax regression.
-Leveraging the `d2l` package again, 
-we call the `train_ch3` function  
+Leveraging the `d2l` package again,
+we call the `train_ch3` function
 (see :numref:`sec_softmax_scratch`),
 setting the number of epochs to 10
 and the learning rate to 0.5.
@@ -217,7 +215,7 @@ updater = d2l.Updater([W1, W2, b1, b2], lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
 ```
 
-To evaluate the learned model, 
+To evaluate the learned model,
 we apply it on some test data.
 
 ```{.python .input}
@@ -235,9 +233,9 @@ d2l.predict_ch3(net, test_iter)
 
 1. Change the value of the hyperparameter `num_hiddens` and see how this hyperparameter influences your results. Determine the best value of this hyperparameter, keeping all others constant.
 1. Try adding an additional hidden layer to see how it affects the results.
-1. How does changing the learning rate alter your results? Fixing the model architecture and other hyperparameters (including number of epochs), what learning rate gives you the best results? 
-1. What is the best result you can get by optimizing over all the hyperparameters (learning rate, number of epochs, number of hidden layers, number of hidden units per layer) jointly? 
-1. Describe why it is much more challenging to deal with multiple hyperparameters. 
+1. How does changing the learning rate alter your results? Fixing the model architecture and other hyperparameters (including number of epochs), what learning rate gives you the best results?
+1. What is the best result you can get by optimizing over all the hyperparameters (learning rate, number of epochs, number of hidden layers, number of hidden units per layer) jointly?
+1. Describe why it is much more challenging to deal with multiple hyperparameters.
 1. What is the smartest strategy you can think of for structuring a search over multiple hyperparameters?
 
 :begin_tab:`mxnet`
