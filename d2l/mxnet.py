@@ -2558,6 +2558,7 @@ size = lambda a: a.size
 reshape = lambda a, *args: a.reshape(*args)
 to = lambda a, ctx: a.as_in_context(ctx)
 tensor = np.array
+normal = np.random.normal
 ones = np.ones
 zeros = np.zeros
 arange = np.arange

@@ -1089,4 +1089,5 @@ cosh = torch.cosh
 tanh = torch.tanh
 linspace = torch.linspace
 exp = torch.exp
+normal = torch.normal
 

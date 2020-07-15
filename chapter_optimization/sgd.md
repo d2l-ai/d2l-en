@@ -41,40 +41,19 @@ $$\mathbb{E}_i \nabla f_i(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\m
 
 This means that, on average, the stochastic gradient is a good estimate of the gradient.
 
-Now, we will compare it to gradient descent by adding random noise with a mean of 0 to the gradient to simulate a SGD.
+Now, we will compare it to gradient descent by adding random noise with a mean of 0 and a variance of 1 to the gradient to simulate a SGD.
 
 ```{.python .input}
-def f(x1, x2):
-    return x1 ** 2 + 2 * x2 ** 2  # Objective
+#@tab all
+f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
+gradf = lambda x1, x2: (2 * x1, 4 * x2)  # Gradient
 
-def gradf(x1, x2):
-    return (2 * x1, 4 * x2)  # Gradient
-
-def sgd(x1, x2, s1, s2):  # Simulate noisy gradient
+def sgd(x1, x2, s1, s2):
     global lr  # Learning rate scheduler
-    (g1, g2) = gradf(x1, x2)  # Compute gradient
-    (g1, g2) = (g1 + np.random.normal(0.1), g2 + np.random.normal(0.1))
-    eta_t = eta * lr()  # Learning rate at time t
-    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
-
-eta = 0.1
-lr = (lambda: 1)  # Constant learning rate
-d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
-```
-
-```{.python .input}
-#@tab pytorch
-def f(x1, x2):
-    return x1 ** 2 + 2 * x2 ** 2  # Objective
-
-def gradf(x1, x2):
-    return (2 * x1, 4 * x2)  # Gradient
-
-def sgd(x1, x2, s1, s2):  # Simulate noisy gradient
-    global lr  # Learning rate scheduler
-    (g1, g2) = gradf(x1, x2)  # Compute gradient
-    (g1, g2) = (g1 + torch.normal(d2l.tensor(0.1)), g2 +
-                torch.normal(d2l.tensor(0.1)))
+    (g1, g2) = gradf(x1, x2)
+    # Simulate noisy gradient
+    g1 += d2l.normal(0.0, 1, (1,))
+    g2 += d2l.normal(0.0, 1, (1,))
     eta_t = eta * lr()  # Learning rate at time t
     return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
 
@@ -226,4 +205,8 @@ A similar reasoning shows that the probability of picking a sample exactly once 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/352)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/497)
 :end_tab:
