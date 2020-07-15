@@ -85,7 +85,7 @@ def synthetic_data(w, b, num_examples):  #@save
     X += tf.random.normal(shape=X.shape)
     y = tf.matmul(X, tf.reshape(w, (-1, 1))) + b
     y += tf.random.normal(shape=y.shape, stddev=0.01)
-    y = tf.reshape(y, (-1, 1]))
+    y = tf.reshape(y, (-1, 1))
     return X, y
 ```
 
