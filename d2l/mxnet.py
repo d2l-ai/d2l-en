@@ -128,16 +128,16 @@ class Timer:  #@save
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
-    X = np.random.normal(0, 1, (num_examples, len(w)))
-    y = np.dot(X, w) + b
-    y += np.random.normal(0, 0.01, y.shape)
+    X = d2l.normal(0, 1, (num_examples, len(w)))
+    y = d2l.matmul(X, w) + b
+    y += d2l.normal(0, 0.01, y.shape)
     return X, y
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):  #@save
     """The linear regression model."""
-    return np.dot(X, w) + b
+    return d2l.matmul(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -2559,6 +2559,7 @@ reshape = lambda a, *args: a.reshape(*args)
 to = lambda a, ctx: a.as_in_context(ctx)
 tensor = np.array
 normal = np.random.normal
+matmul = np.dot
 ones = np.ones
 zeros = np.zeros
 arange = np.arange

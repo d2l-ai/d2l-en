@@ -133,16 +133,16 @@ class Timer:  #@save
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
-    X = torch.zeros(size=(num_examples, len(w))).normal_()
-    y = torch.matmul(X, w) + b
-    y += torch.zeros(size=y.shape).normal_(std=0.01)
+    X = d2l.normal(0, 1, (num_examples, len(w)))
+    y = d2l.matmul(X, w) + b
+    y += d2l.normal(0, 0.01, y.shape)
     return X, y
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):  #@save
     """The linear regression model."""
-    return torch.matmul(X, w) + b
+    return d2l.matmul(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -1090,4 +1090,5 @@ tanh = torch.tanh
 linspace = torch.linspace
 exp = torch.exp
 normal = torch.normal
+matmul = torch.matmul
 
