@@ -26,14 +26,14 @@ to iterate $x$, the value of function $f(x)$ might decline. Therefore, in gradie
 
 For simplicity we choose the objective function $f(x)=x^2$ to illustrate how to implement gradient descent. Although we know that $x=0$ is the solution to minimize $f(x)$, we still use this simple function to observe how $x$ changes. As always, we begin by importing all required modules.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -41,7 +41,7 @@ import numpy as np
 import torch
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -49,7 +49,7 @@ import numpy as np
 import tensorflow as tf
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 #@tab all
 f = lambda x: x**2  # Objective function
 gradf = lambda x: 2 * x  # Its derivative
@@ -57,7 +57,7 @@ gradf = lambda x: 2 * x  # Its derivative
 
 Next, we use $x=10$ as the initial value and assume $\eta=0.2$. Using gradient descent to iterate $x$ for 10 times we can see that, eventually, the value of $x$ approaches the optimal solution.
 
-```{.python .input  n=3}
+```{.python .input}
 #@tab all
 def gd(eta):
     x = 10.0
@@ -69,16 +69,6 @@ def gd(eta):
     return results
 
 res = gd(0.2)
-```
-
-```{.json .output n=3}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "epoch 10, x: 0.06046617599999997\n"
- }
-]
 ```
 
 The progress of optimizing over $x$ can be plotted as follows.
