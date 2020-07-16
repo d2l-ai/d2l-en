@@ -348,7 +348,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
     metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
         l = loss(net(X), y)
-        metric.add(l.sum(), l.numel())
+        metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 
 
@@ -1092,6 +1092,8 @@ exp = torch.exp
 log = torch.log
 normal = torch.normal
 matmul = torch.matmul
+int32 = torch.int32
+float32 = torch.float32
 numpy = lambda x, *args, **kwargs: x.detach().numpy(*args, **kwargs)
 size = lambda x, *args, **kwargs: x.numel(*args, **kwargs)
 reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
