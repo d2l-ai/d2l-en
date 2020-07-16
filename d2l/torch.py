@@ -1096,6 +1096,7 @@ int32 = torch.int32
 float32 = torch.float32
 concat = torch.cat
 stack = torch.stack
+abs = torch.abs
 numpy = lambda x, *args, **kwargs: x.detach().numpy(*args, **kwargs)
 size = lambda x, *args, **kwargs: x.numel(*args, **kwargs)
 reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)

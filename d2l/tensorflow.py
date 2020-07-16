@@ -557,5 +557,6 @@ transpose = tf.transpose
 concat = tf.concat
 stack = tf.stack
 normal = tf.random.normal
+abs = tf.abs
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 
