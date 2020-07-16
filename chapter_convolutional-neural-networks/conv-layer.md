@@ -74,6 +74,7 @@ which accepts the input array `X` and kernel array `K`
 and returns the output array `Y`.
 
 ```{.python .input}
+from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -81,6 +82,7 @@ npx.set_np()
 
 ```{.python .input}
 #@tab pytorch
+from d2l import torch as d2l
 import torch
 from torch import nn
 ```
@@ -98,13 +100,8 @@ def corr2d(X, K):  #@save
 ```
 
 ```{.python .input}
-#@tab pytorch
-import torch
-from torch import nn
-```
-
-```{.python .input}
 #@tab tensorflow
+from d2l import tensorflow as d2l
 import tensorflow as tf
 
 def corr2d(X, K):  #@save
