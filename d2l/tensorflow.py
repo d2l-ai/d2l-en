@@ -27,14 +27,6 @@ import numpy as np
 import tensorflow as tf
 
 
-# Defined in file: ./chapter_preliminaries/ndarray.md
-numpy = lambda a: a.numpy()
-size = lambda a: tf.size(a).numpy()
-reshape = tf.reshape
-ones = tf.ones
-zeros = tf.zeros
-
-
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
     """Make a directory if it does not exist."""
@@ -138,16 +130,16 @@ def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
     X = tf.zeros(shape=(num_examples, w.shape[0]))
     X += tf.random.normal(shape=X.shape)
-    y = tf.matmul(X, w) + b
+    y = tf.matmul(X, tf.reshape(w, (-1, 1))) + b
     y += tf.random.normal(shape=y.shape, stddev=0.01)
-    y = tf.reshape(y, [num_examples])
+    y = tf.reshape(y, (-1, 1))
     return X, y
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):  #@save
     """The linear regression model."""
-    return tf.matmul(X, w) + b
+    return d2l.matmul(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -217,8 +209,9 @@ def load_data_fashion_mnist(batch_size, resize=None):   #@save
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = tf.argmax(y_hat, axis=1)
-    return float((tf.cast(y_hat, dtype=y.dtype) == y).numpy().sum())
+        y_hat = d2l.argmax(y_hat, axis=1)        
+    cmp = d2l.astype(y_hat, y.dtype) == y
+    return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -226,7 +219,7 @@ def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
-        metric.add(accuracy(net(X), y), sum(y.shape))
+        metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
@@ -350,9 +343,9 @@ def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
-    preds = d2l.get_fashion_mnist_labels(tf.argmax(net(X), axis=1))
+    preds = d2l.get_fashion_mnist_labels(d2l.argmax(net(X), axis=1))
     titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(tf.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
+    d2l.show_images(d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
@@ -361,7 +354,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
     metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
         l = loss(net(X), y)
-        metric.add(tf.reduce_sum(l), tf.size(l).numpy())
+        metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 
 
@@ -527,4 +520,34 @@ class Residual(tf.keras.Model):  #@save
         Y += X
         return tf.keras.activations.relu(Y)
 
+
+# Defined in file: ./chapter_optimization/optimization-intro.md
+def annotate(text, xy, xytext):  #@save
+    d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
+                           arrowprops=dict(arrowstyle='->'))
+
+
+# Alias defined in config.ini
+size = lambda a: tf.size(a).numpy()
+
+reshape = tf.reshape
+ones = tf.ones
+zeros = tf.zeros
+meshgrid = tf.meshgrid
+sin = tf.sin
+sinh = tf.sinh
+cos = tf.cos
+cosh = tf.cosh
+tanh = tf.tanh
+linspace = tf.linspace
+exp = tf.exp
+matmul = tf.matmul
+reduce_sum = tf.reduce_sum
+argmax = tf.argmax
+tensor = tf.constant
+arange = tf.range
+astype = tf.cast
+int32 = tf.int32
+float32 = tf.float32
+numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 

@@ -4,7 +4,7 @@
 Now that we understand how convolutional layers work in theory,
 we are ready to see how they work in practice.
 Building on our motivation of convolutional neural networks
-as efficient architectures for epxloring structure in image data,
+as efficient architectures for exploring structure in image data,
 we stick with images as our running example.
 
 

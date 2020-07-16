@@ -42,11 +42,12 @@ The notation used throughout this book is summarized below.
 * $\odot$: Hadamard (elementwise) product
 * $[\cdot, \cdot]$: Concatenation
 * $\lvert \mathcal{X} \rvert$: Cardinality of set $\mathcal{X}$
-* $\|\cdot\|_p$: $\ell_p$ norm
-* $\|\cdot\|$: $\ell_2$ norm
+* $\|\cdot\|_p$: $L_p$ norm
+* $\|\cdot\|$: $L_2$ norm
 * $\langle \mathbf{x}, \mathbf{y} \rangle$: Dot product of vectors $\mathbf{x}$ and $\mathbf{y}$
 * $\sum$: Series addition
 * $\prod$: Series multiplication
+* $\stackrel{\mathrm{def}}{=}$: Definition
 
 
 ## Calculus

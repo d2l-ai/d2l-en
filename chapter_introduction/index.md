@@ -608,7 +608,7 @@ where
 $$l(y, y') = \sum_i |y_i-y_i'|$$
 
 and the least mean squares loss, or
-L2 loss
+$L_2$ loss
 where
 
 $$l(y, y') = \sum_i (y_i - y_i')^2.$$
@@ -674,7 +674,7 @@ we call the problem *multiclass classification*.
 Common examples include hand-written character recognition
 `[0, 1, 2, 3 ... 9, a, b, c, ...]`.
 While we attacked regression problems by trying
-to minimize the L1 or L2 loss functions,
+to minimize the $L_1$ or $L_2$ loss functions,
 the common loss function for classification problems is called cross-entropy.
 
 Note that the most likely class is not necessarily
