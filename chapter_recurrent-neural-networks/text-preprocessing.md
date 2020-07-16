@@ -148,6 +148,4 @@ len(corpus), len(vocab)
 
 1. Tokenization is a key preprocessing step. It varies for different languages. Try to find another 3 commonly used methods to tokenize sentences.
 
-:begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/115)
-:end_tab:
