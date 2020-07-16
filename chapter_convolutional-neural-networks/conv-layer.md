@@ -121,7 +121,7 @@ to validate the output of the above implementation
 of the two-dimensional cross-correlation operation.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab all
 X = d2l.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])
 K = d2l.tensor([[0.0, 1.0], [2.0, 3.0]])
 corr2d(X, K)
@@ -215,7 +215,7 @@ if the horizontally adjacent elements are the same,
 the output is 0. Otherwise, the output is non-zero.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab all
 K = d2l.tensor([[1.0, -1.0]])
 ```
 
