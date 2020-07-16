@@ -264,12 +264,6 @@ X
 ```
 
 ```{.python .input}
-
-X = torch.cat((X, X + 1), dim=1)
-X
-```
-
-```{.python .input}
 #@tab tensorflow
 X = tf.reshape(tf.stack([X, X+1], 0), (1, 2, 4, 4))
 ```
