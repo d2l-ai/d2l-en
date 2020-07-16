@@ -128,11 +128,11 @@ class Timer:  #@save
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
-    X = tf.zeros(shape=(num_examples, w.shape[0]))
+    X = d2l.zeros((num_examples, w.shape[0]))
     X += tf.random.normal(shape=X.shape)
-    y = tf.matmul(X, tf.reshape(w, (-1, 1))) + b
+    y = d2l.matmul(X, tf.reshape(w, (-1, 1))) + b
     y += tf.random.normal(shape=y.shape, stddev=0.01)
-    y = tf.reshape(y, (-1, 1))
+    y = d2l.reshape(y, (-1, 1))
     return X, y
 
 
@@ -553,5 +553,6 @@ arange = tf.range
 astype = tf.cast
 int32 = tf.int32
 float32 = tf.float32
+concat = tf.concat
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 

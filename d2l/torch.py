@@ -1094,6 +1094,7 @@ normal = torch.normal
 matmul = torch.matmul
 int32 = torch.int32
 float32 = torch.float32
+concate = torch.cat
 numpy = lambda x, *args, **kwargs: x.detach().numpy(*args, **kwargs)
 size = lambda x, *args, **kwargs: x.numel(*args, **kwargs)
 reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
