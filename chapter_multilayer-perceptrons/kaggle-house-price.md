@@ -330,31 +330,12 @@ and convert it into MXNet's native tensor
 representation for training.
 
 ```{.python .input}
+#@tab all
 n_train = train_data.shape[0]
-train_features = np.array(all_features[:n_train].values, dtype=np.float32)
-test_features = np.array(all_features[n_train:].values, dtype=np.float32)
-train_labels = np.array(train_data.SalePrice.values,
-                        dtype=np.float32).reshape(-1, 1)
-```
-
-```{.python .input}
-#@tab pytorch
-n_train = train_data.shape[0]
-train_features = torch.tensor(all_features[:n_train].values,
-                              dtype=torch.float32)
-test_features = torch.tensor(all_features[n_train:].values,
-                             dtype=torch.float32)
-train_labels = torch.tensor(train_data.SalePrice.values,
-                            dtype=torch.float32).reshape(-1, 1)
-```
-
-```{.python .input}
-#@tab tensorflow
-n_train = train_data.shape[0]
-train_features = np.array(all_features[:n_train].values, dtype=np.float32)
-test_features = np.array(all_features[n_train:].values, dtype=np.float32)
-train_labels = np.array(train_data.SalePrice.values.reshape(-1, 1),
-                        dtype=np.float32)
+train_features = d2l.tensor(all_features[:n_train].values, dtype=d2l.float32)
+test_features = d2l.tensor(all_features[n_train:].values, dtype=d2l.float32)
+train_labels = d2l.tensor(
+    train_data.SalePrice.values.reshape(-1, 1), dtype=d2l.float32)
 ```
 
 ## Training
@@ -555,6 +536,7 @@ But this added complexity might obfuscate our code unnecessarily
 so we can safely omit it here owing to the simplicity of our problem.
 
 ```{.python .input}
+#@tab all
 def get_k_fold_data(k, i, X, y):
     assert k > 1
     fold_size = X.shape[0] // k
@@ -567,46 +549,8 @@ def get_k_fold_data(k, i, X, y):
         elif X_train is None:
             X_train, y_train = X_part, y_part
         else:
-            X_train = np.concatenate((X_train, X_part), axis=0)
-            y_train = np.concatenate((y_train, y_part), axis=0)
-    return X_train, y_train, X_valid, y_valid
-```
-
-```{.python .input}
-#@tab pytorch
-def get_k_fold_data(k, i, X, y):
-    assert k > 1
-    fold_size = X.shape[0] // k
-    X_train, y_train = None, None
-    for j in range(k):
-        idx = slice(j * fold_size, (j + 1) * fold_size)
-        X_part, y_part = X[idx, :], y[idx]
-        if j == i:
-            X_valid, y_valid = X_part, y_part
-        elif X_train is None:
-            X_train, y_train = X_part, y_part
-        else:
-            X_train = torch.cat((X_train, X_part), dim=0)
-            y_train = torch.cat((y_train, y_part), dim=0)
-    return X_train, y_train, X_valid, y_valid
-```
-
-```{.python .input}
-#@tab tensorflow
-def get_k_fold_data(k, i, X, y):
-    assert k > 1
-    fold_size = X.shape[0] // k
-    X_train, y_train = None, None
-    for j in range(k):
-        idx = slice(j * fold_size, (j + 1) * fold_size)
-        X_part, y_part = X[idx, :], y[idx]
-        if j == i:
-            X_valid, y_valid = X_part, y_part
-        elif X_train is None:
-            X_train, y_train = X_part, y_part
-        else:
-            X_train = tf.concat([X_train, X_part], axis=0)
-            y_train = tf.concat([y_train, y_part], axis=0)
+            X_train = d2l.concat([X_train, X_part], 0)
+            y_train = d2l.concat([y_train, y_part], 0)
     return X_train, y_train, X_valid, y_valid
 ```
 

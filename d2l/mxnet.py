@@ -2574,6 +2574,7 @@ normal = np.random.normal
 matmul = np.dot
 int32 = np.int32
 float32 = np.float32
+concat = np.concatenate
 numpy = lambda x, *args, **kwargs: x.asnumpy(*args, **kwargs)
 reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
 to = lambda x, *args, **kwargs: x.as_in_context(*args, **kwargs)
