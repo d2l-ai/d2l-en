@@ -39,7 +39,7 @@ $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
 To illustrate this let us plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mpl_toolkits import mplot3d
@@ -47,22 +47,26 @@ from mxnet import np, npx
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import numpy as np
+from mpl_toolkits import mplot3d
+import torch
+```
+
 Let us define a few functions, both convex and nonconvex.
 
 ```{.python .input}
-def f(x):
-    return 0.5 * x**2  # Convex
+#@tab all
+f = lambda x: 0.5 * x**2  # Convex
+g = lambda x: d2l.cos(np.pi * x)  # Nonconvex
+h = lambda x: d2l.exp(0.5 * x)  # Convex
 
-def g(x):
-    return np.cos(np.pi * x)  # Nonconvex
-
-def h(x):
-    return np.exp(0.5 * x)  # Convex
-
-x, segment = np.arange(-2, 2, 0.01), np.array([-1.5, 1])
+x, segment = d2l.arange(-2, 2, 0.01), d2l.tensor([-1.5, 1])
 d2l.use_svg_display()
 _, axes = d2l.plt.subplots(1, 3, figsize=(9, 3))
-
 for ax, func in zip(axes, [f, g, h]):
     d2l.plot([x, segment], [func(x), func(segment)], axes=ax)
 ```
@@ -101,9 +105,8 @@ $$f(x) > \lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 This contradicts the assumption that $f(x)$ is a local minimum. For instance, the function $f(x) = (x+1) (x-1)^2$ has a local minimum for $x=1$. However, it is not a global minimum.
 
 ```{.python .input}
-def f(x):
-    return (x-1)**2 * (x+1)
-
+#@tab all
+f = lambda x: (x-1)**2 * (x+1)
 d2l.set_figsize()
 d2l.plot([x, segment], [f(x), f(segment)], 'x', 'f(x)')
 ```
@@ -120,19 +123,17 @@ Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \i
 
 Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
 
+
 ```{.python .input}
-x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
-                   indexing='ij')
-
-z = x**2 + 0.5 * np.cos(2 * np.pi * y)
-
+#@tab all
+x, y = d2l.meshgrid(d2l.linspace(-1, 1, 101), d2l.linspace(-1, 1, 101))
+z = x**2 + 0.5 * d2l.cos(2 * np.pi * y)
 # Plot the 3D surface
 d2l.set_figsize((6, 4))
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.contour(x, y, z, offset=-1)
 ax.set_zlim(-1, 1.5)
-
 # Adjust labels
 for func in [d2l.plt.xticks, d2l.plt.yticks, ax.set_zticks]:
     func([-1, 0, 1])
@@ -170,12 +171,10 @@ $$\begin{aligned}
 By geometry it follows that $f(x)$ is below the line connecting $f(a)$ and $f(b)$, thus proving convexity. We omit a more formal derivation in favor of a graph below.
 
 ```{.python .input}
-def f(x):
-    return 0.5 * x**2
-
-x = np.arange(-2, 2, 0.01)
-axb, ab = np.array([-1.5, -0.5, 1]), np.array([-1.5, 1])
-
+#@tab all
+f = lambda x: 0.5 * x**2
+x = d2l.arange(-2, 2, 0.01)
+axb, ab = d2l.tensor([-1.5, -0.5, 1]), d2l.tensor([-1.5, 1])
 d2l.set_figsize()
 d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
 d2l.annotate('a', (-1.5, f(-1.5)), (-1.5, 1.5))
@@ -221,12 +220,12 @@ This turns out to be a *projection* of $g$ onto the ball of radius $c$. More gen
 
 $$\mathrm{Proj}_X(\mathbf{x}) = \mathop{\mathrm{argmin}}_{\mathbf{x}' \in X} \|\mathbf{x} - \mathbf{x}'\|_2.$$
 
-It is thus the closest point in $X$ to $\mathbf{x}$. This sounds a bit abstract. :numref:`fig_projections` explains it somewhat more clearly. In it we have two convex sets, a circle and a diamond. Points inside the set (yellow) remain unchanged. Points outside the set (black) are mapped to the closest point inside the set (red). While for $\ell_2$ balls this leaves the direction unchanged, this need not be the case in general, as can be seen in the case of the diamond.
+It is thus the closest point in $X$ to $\mathbf{x}$. This sounds a bit abstract. :numref:`fig_projections` explains it somewhat more clearly. In it we have two convex sets, a circle and a diamond. Points inside the set (yellow) remain unchanged. Points outside the set (black) are mapped to the closest point inside the set (red). While for $L_2$ balls this leaves the direction unchanged, this need not be the case in general, as can be seen in the case of the diamond.
 
 ![Convex Projections](../img/projections.svg)
 :label:`fig_projections`
 
-One of the uses for convex projections is to compute sparse weight vectors. In this case we project $\mathbf{w}$ onto an $\ell_1$ ball (the latter is a generalized version of the diamond in the picture above).
+One of the uses for convex projections is to compute sparse weight vectors. In this case we project $\mathbf{w}$ onto an $L_1$ ball (the latter is a generalized version of the diamond in the picture above).
 
 ## Summary
 
@@ -243,20 +242,22 @@ In the context of deep learning the main purpose of convex functions is to motiv
 1. Assume that we want to verify convexity of a set by drawing all lines between points within the set and checking whether the lines are contained.
     * Prove that it is sufficient to check only the points on the boundary.
     * Prove that it is sufficient to check only the vertices of the set.
-2. Denote by $B_p[r] := \{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\|_p \leq r\}$ the ball of radius $r$ using the $p$-norm. Prove that $B_p[r]$ is convex for all $p \geq 1$.
-3. Given convex functions $f$ and $g$ show that $\mathrm{max}(f, g)$ is convex, too. Prove that $\mathrm{min}(f, g)$ is not convex.
-4. Prove that the normalization of the softmax function is convex. More specifically prove the convexity of
+1. Denote by $B_p[r] := \{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\|_p \leq r\}$ the ball of radius $r$ using the $p$-norm. Prove that $B_p[r]$ is convex for all $p \geq 1$.
+1. Given convex functions $f$ and $g$ show that $\mathrm{max}(f, g)$ is convex, too. Prove that $\mathrm{min}(f, g)$ is not convex.
+1. Prove that the normalization of the softmax function is convex. More specifically prove the convexity of
     $f(x) = \log \sum_i \exp(x_i)$.
-5. Prove that linear subspaces are convex sets, i.e., $X = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$.
-6. Prove that in the case of linear subspaces with $\mathbf{b} = 0$ the projection $\mathrm{Proj}_X$ can be written as $\mathbf{M} \mathbf{x}$ for some matrix $\mathbf{M}$.
-7. Show that for convex twice differentiable functions $f$ we can write $f(x + \epsilon) = f(x) + \epsilon f'(x) + \frac{1}{2} \epsilon^2 f''(x + \xi)$ for some $\xi \in [0, \epsilon]$.
-8. Given a vector $\mathbf{w} \in \mathbb{R}^d$ with $\|\mathbf{w}\|_1 > 1$ compute the projection on the $\ell_1$ unit ball.
+1. Prove that linear subspaces are convex sets, i.e., $X = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$.
+1. Prove that in the case of linear subspaces with $\mathbf{b} = 0$ the projection $\mathrm{Proj}_X$ can be written as $\mathbf{M} \mathbf{x}$ for some matrix $\mathbf{M}$.
+1. Show that for convex twice differentiable functions $f$ we can write $f(x + \epsilon) = f(x) + \epsilon f'(x) + \frac{1}{2} \epsilon^2 f''(x + \xi)$ for some $\xi \in [0, \epsilon]$.
+1. Given a vector $\mathbf{w} \in \mathbb{R}^d$ with $\|\mathbf{w}\|_1 > 1$ compute the projection on the $\ell_1$ unit ball.
     * As intermediate step write out the penalized objective $\|\mathbf{w} - \mathbf{w}'\|_2^2 + \lambda \|\mathbf{w}'\|_1$ and compute the solution for a given $\lambda > 0$.
     * Can you find the 'right' value of $\lambda$ without a lot of trial and error?
-9. Given a convex set $X$ and two vectors $\mathbf{x}$ and $\mathbf{y}$ prove that projections never increase distances, i.e., $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_X(\mathbf{x}) - \mathrm{Proj}_X(\mathbf{y})\|$.
-
-
+1. Given a convex set $X$ and two vectors $\mathbf{x}$ and $\mathbf{y}$ prove that projections never increase distances, i.e., $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_X(\mathbf{x}) - \mathrm{Proj}_X(\mathbf{y})\|$.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/350)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/488)
 :end_tab:

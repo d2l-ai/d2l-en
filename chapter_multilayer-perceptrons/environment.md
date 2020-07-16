@@ -1,11 +1,11 @@
 # Considering the Environment
 
-In the previous chapters, we worked through
+In the previous sections, we worked through
 a number of hands-on applications of machine learning,
 fitting models to a variety of datasets.
 And yet, we never stopped to contemplate
-either where data comes from in the first place
-or what we plan to ultimately *do*
+either where data come from in the first place
+or what we plan to ultimately do
 with the outputs from our models.
 Too often, machine learning developers
 in possession of data rush to develop models
@@ -20,8 +20,8 @@ when the distribution of data suddenly shifts.
 More insidiously, sometimes the very deployment of a model
 can be the catalyst that perturbs the data distribution.
 Say, for example, that we trained a model
-to predict who will repay vs default on a loan,
-finding that an applicant's choice of footware
+to predict who will repay vs. default on a loan,
+finding that an applicant's choice of footwear
 was associated with the risk of default
 (Oxfords indicate repayment, sneakers indicate default).
 We might be inclined to thereafter grant loans
@@ -33,7 +33,7 @@ pattern recognition to decision-making
 and our failure to critically consider the environment
 might have disastrous consequences.
 For starters, as soon as we began
-making decisions based on footware,
+making decisions based on footwear,
 customers would catch on and change their behavior.
 Before long, all applicants would be wearing Oxfords,
 without any coinciding improvement in credit-worthiness.
@@ -57,14 +57,13 @@ statistical prediction altogether and
 grapple with difficult philosophical questions
 concerning the ethical application of algorithms.
 
-
 ## Distribution Shift
 
-To begin, we stick with the passive predictions setting
+To begin, we stick with the passive prediction setting
 considering the various ways that data distributions might shift
 and what might be done to salvage model performance.
 In one classic setup, we assume that our training data
-was sampled from some distribution $p_S(\mathbf{x},y)$
+were sampled from some distribution $p_S(\mathbf{x},y)$
 but that our test data will consist
 of unlabeled examples drawn from
 some different distribution $p_T(\mathbf{x},y)$.
@@ -78,9 +77,9 @@ where we wish to distinguish between dogs and cats.
 If the distribution can shift in arbitrary ways,
 then our setup permits the pathological case
 in which the distribution over inputs remains
-constant: $p_S(\mathbf{x}) = p_T(\mathbf{x})$
-but the labels are all flipped
-$p_S(y | \mathbf{x}) = 1 - $p_T(y | \mathbf{x})$.
+constant: $p_S(\mathbf{x}) = p_T(\mathbf{x})$,
+but the labels are all flipped:
+$p_S(y | \mathbf{x}) = 1 - p_T(y | \mathbf{x})$.
 In other words, if God can suddenly decide
 that in the future all "cats" are now dogs
 and what we previously called "dogs" are now cats---without
@@ -94,35 +93,33 @@ principled algorithms can detect shift
 and sometimes even adapt on the fly,
 improving on the accuracy of the original classifier.
 
-
 ### Covariate Shift
 
 Among categories of distribution shift,
-*covariate shift* may be the most widely studied.
+covariate shift may be the most widely studied.
 Here, we assume that while the distribution of inputs
 may change over time, the labeling function,
 i.e., the conditional distribution
 $P(y \mid \mathbf{x})$ does not change.
 Statisticians call this *covariate shift*
 because the problem arises due to a
-a shift in the distribution of the *covariates* (the features).
+shift in the distribution of the covariates (features).
 While we can sometimes reason about distribution shift
 without invoking causality, we note that covariate shift
 is the natural assumption to invoke in settings
 where we believe that $\mathbf{x}$ causes $y$.
 
 Consider the challenge of distinguishing cats and dogs.
-Our training data might consist of images of the following kind:
+Our training data might consist of images of the kind in :numref:`fig_cat-dog-train`.
 
-|cat|cat|dog|dog|
-|:---------------:|:---------------:|:---------------:|:---------------:|
-|![](../img/cat3.jpg)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
+![Training data for distinguishing cats and dogs.](../img/cat-dog-train.svg)
+:label:`fig_cat-dog-train`
 
-At test time we are asked to classify the following images:
 
-|cat|cat|dog|dog|
-|:---------------:|:---------------:|:---------------:|:---------------:|
-|![](../img/cat-cartoon1.png)|![](../img/cat-cartoon2.png)|![](../img/dog-cartoon1.png)|![](../img/dog-cartoon2.png)|
+At test time we are asked to classify the images in :numref:`fig_cat-dog-test`.
+
+![Test data for distinguishing cats and dogs.](../img/cat-dog-test.svg)
+:label:`fig_cat-dog-test`
 
 The training set consists of photos,
 while the test set contains only cartoons.
@@ -131,12 +128,11 @@ characteristics from the test set
 can spell trouble absent a coherent plan
 for how to adapt to the new domain.
 
-
 ### Label Shift
 
 *Label shift* describes the converse problem.
 Here, we assume that the label marginal $P(y)$
-can change (inducing a change in $P(\mathbf{x})$)
+can change 
 but the class-conditional distribution
 $P(\mathbf{x} \mid y)$ remains fixed across domains.
 Label shift is a reasonable assumption to make
@@ -156,12 +152,9 @@ Interestingly, in these cases,
 it is often advantageous to work with methods
 that flow from the label shift assumption.
 That is because these methods tend
-to involve manipulating objects that look like the label
-(which is often low-dimensional),
-as opposed to objects that look like the input,
-which (in deep learning) tends to be high-dimensional.
-
-
+to involve manipulating objects that look like labels (often low-dimensional),
+as opposed to objects that look like inputs,
+which tend to be high-dimensional in deep learning.
 
 ### Concept Shift
 
@@ -172,7 +165,7 @@ However, other categories are subject to changes in usage over time.
 Diagnostic criteria for mental illness,
 what passes for fashionable, and job titles,
 are all subject to considerable
-amounts of *concept shift*.
+amounts of concept shift.
 It turns out that if we navigate around the United States,
 shifting the source of our data by geography,
 we will find considerable concept shift regarding
@@ -184,36 +177,34 @@ as shown in :numref:`fig_popvssoda`.
 :label:`fig_popvssoda`
 
 If we were to build a machine translation system,
-the distribution $P(y \mid x)$ might be different
+the distribution $P(y \mid \mathbf{x})$ might be different
 depending on our location.
 This problem can be tricky to spot.
 We might hope to exploit knowledge
 that shift only takes place gradually
-(either in a temporal or geographic sense).
+either in a temporal or geographic sense.
 
-
-
-### Examples
+## Examples of Distribution Shift
 
 Before delving into formalism and algorithms,
 we can discuss some concrete situations
 where covariate or concept shift might not be obvious.
 
 
-#### Medical Diagnostics
+### Medical Diagnostics
 
 Imagine that you want to design an algorithm to detect cancer.
 You collect data from healthy and sick people
 and you train your algorithm.
 It works fine, giving you high accuracy
-and you conclude that you’re ready
+and you conclude that you are ready
 for a successful career in medical diagnostics.
 *Not so fast.*
 
 The distributions that gave rise to the training data
 and those you will encounter in the wild might differ considerably.
 This happened to an unfortunate startup
-that one of us worked with years ago.
+that some of us (authors) worked with years ago.
 They were developing a blood test for a disease
 that predominantly affects older men
 and hoped to study it using blood samples
@@ -231,7 +222,7 @@ As we explained to them,
 it would indeed be easy to distinguish
 between the healthy and sick cohorts
 with near-perfect accuracy.
-However, that's because the test subjects
+However, that is because the test subjects
 differed in age, hormone levels,
 physical activity, diet, alcohol consumption,
 and many more factors unrelated to the disease.
@@ -242,12 +233,14 @@ Moreover, this case was unlikely to be
 correctable via conventional methods.
 In short, they wasted a significant sum of money.
 
-#### Self Driving Cars
+
+
+### Self-Driving Cars
 
 Say a company wanted to leverage machine learning
 for developing self-driving cars.
 One key component here is a roadside detector.
-Since real annotated data is expensive to get,
+Since real annotated data are expensive to get,
 they had the (smart and questionable) idea
 to use synthetic data from a game rendering engine
 as additional training data.
@@ -270,28 +263,34 @@ Unfortunately, it had merely learned
 how to distinguish trees with shadows
 from trees without shadows---the first set
 of pictures was taken in the early morning,
-the second one at noon.
+the second set at noon.
 
-#### Nonstationary distributions
+### Nonstationary Distributions
 
 A much more subtle situation arises
 when the distribution changes slowly
+(also known as *nonstationary distribution*)
 and the model is not updated adequately.
-Here are some typical cases:
+Below are some typical cases.
 
 * We train a computational advertising model and then fail to update it frequently (e.g., we forget to incorporate that an obscure new device called an iPad was just launched).
 * We build a spam filter. It works well at detecting all spam that we have seen so far. But then the spammers wisen up and craft new messages that look unlike anything we have seen before.
 * We build a product recommendation system. It works throughout the winter but then continues to recommend Santa hats long after Christmas.
 
-#### More Anecdotes
+### More Anecdotes
 
-* We build a face detector. It works well on all benchmarks. Unfortunately it fails on test data---the offending examples are close-ups where the face fills the entire image (no such data was in the training set).
-* We build a web search engine for the USA market and want to deploy it in the UK.
+* We build a face detector. It works well on all benchmarks. Unfortunately it fails on test data---the offending examples are close-ups where the face fills the entire image (no such data were in the training set).
+* We build a Web search engine for the US market and want to deploy it in the UK.
 * We train an image classifier by compiling a large dataset where each among a large set of classes is equally represented in the dataset, say 1000 categories, represented by 1000 images each. Then we deploy the system in the real world, where the actual label distribution of photographs is decidedly non-uniform.
+
+
+
+
+## Correction of Distribution Shift
 
 In short, there are many cases
 where training and test distributions
-$p(\mathbf{x}, y)$ are different.
+$P(\mathbf{x}, y)$ are different.
 In some cases, we get lucky and the models work
 despite covariate, label, or concept shift.
 In other cases, we can do better by employing
@@ -301,42 +300,59 @@ The impatient reader could continue on to the next section
 as this material is not prerequisite to subsequent concepts.
 
 ### Covariate Shift Correction
+:label:`subsec_covariate-shift-correction`
 
 Assume that we want to estimate
 some dependency $P(y \mid \mathbf{x})$
 for which we have labeled data $(\mathbf{x}_i, y_i)$.
-Unfortunately, the observations $x_i$ are drawn
-from some *target* distribution $q(\mathbf{x})$
-rather than the *source* distribution $p(\mathbf{x})$.
+Unfortunately, the observations $\mathbf{x}_i$ are drawn
+from some *source distribution* $q(\mathbf{x})$ (e.g., training set)
+rather than the *target distribution* $p(\mathbf{x})$ (e.g., test set).
 To make progress, we need to reflect about what exactly
 is happening during training:
 we iterate over training data and associated labels
 $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$
-and update the weight vectors of the model after every minibatch.
+and update the parameters $\mathbf{\Theta}$ of the model after every minibatch.
 We sometimes additionally apply some penalty to the parameters,
 using weight decay, dropout, or some other related technique.
-This means that we largely minimize the loss on the training.
+This means that we largely minimize the loss on the training:
 
-$$
-\mathop{\mathrm{minimize}}_w \frac{1}{n} \sum_{i=1}^n l(x_i, y_i, f(x_i)) + \mathrm{some~penalty}(w).
-$$
+$$\mathop{\mathrm{minimize}}_\mathbf{\Theta} \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}_i, y_i, \mathbf{\Theta}) + \mathrm{some~penalty}(\mathbf{\Theta}),$$
+:eqlabel:`eq_regularized-empirical-risk-min`
 
-Statisticians call the first term an *empirical average*,
-i.e., an average computed over the data drawn from $P(x) P(y \mid x)$.
-If the data is drawn from the "wrong" distribution $q$,
+where $l(\mathbf{x}_i, y_i, \mathbf{\Theta})$ is the individual loss for the model parameterized by $\mathbf{\Theta}$ on a single data point $(\mathbf{x}_i, y_i)$.
+Statisticians call the first term in :eqref:`eq_regularized-empirical-risk-min` *empirical risk*,
+i.e., an average computed over the data drawn from $P(\mathbf{x}) P(y \mid \mathbf{x})$ (e.g., training set).
+Without considering the penalty term,
+minimizing the first term in :eqref:`eq_regularized-empirical-risk-min`
+is called *empirical risk minimization*.
+If the data are drawn from the "wrong" distribution $q$,
 we can correct for that by using the following simple identity:
 
 $$
 \begin{aligned}
-\int p(\mathbf{x}) f(\mathbf{x}) dx
-& = \int q(\mathbf{x}) f(\mathbf{x}) \frac{p(\mathbf{x})}{q(\mathbf{x})} dx.
+\int p(\mathbf{x}) f(\mathbf{x}) \;d\mathbf{x}
+& = \int q(\mathbf{x}) f(\mathbf{x}) \frac{p(\mathbf{x})}{q(\mathbf{x})} \;d\mathbf{x}.
 \end{aligned}
 $$
 
-In other words, we need to re-weight each instance
+In other words, we need to reweigh each data point
 by the ratio of probabilities
 that it would have been drawn from the correct distribution
-$\beta(\mathbf{x}) := p(\mathbf{x})/q(\mathbf{x})$.
+
+$$\beta(\mathbf{x}) \stackrel{\mathrm{def}}{=} \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
+
+Plugging in the weight $\beta_i$ for
+each data point $(\mathbf{x}_i, y_i)$
+we can train our model using
+*weighted empirical risk minimization*
+with some penalty to the parameters:
+
+$$\mathop{\mathrm{minimize}}_\mathbf{\mathbf{\Theta}} \frac{1}{n} \sum_{i=1}^n \beta_i l(\mathbf{x}_i, y_i, \mathbf{\Theta}) + \mathrm{some~penalty}(\mathbf{\mathbf{\Theta}}).$$
+:eqlabel:`eq_regularized-weighted-empirical-risk-min`
+
+
+
 Alas, we do not know that ratio,
 so before we can do anything useful we need to estimate it.
 Many methods are available,
@@ -345,14 +361,16 @@ that attempt to recalibrate the expectation operator directly
 using a minimum-norm or a maximum entropy principle.
 Note that for any such approach, we need samples
 drawn from both distributions---the "true" $p$, e.g.,
-by access to training data, and the one used
+by access to test data, and the one used
 for generating the training set $q$ (the latter is trivially available).
-Note however, that we only need samples $\mathbf{x} \sim q(\mathbf{x})$;
-we do not to access labels $y \sim q(y)$.
+Note however, that we only need features $\mathbf{x} \sim p(\mathbf{x})$;
+we do not need to access labels $y \sim p(y)$.
 
 In this case, there exists a very effective approach
-that will give almost as good results: logistic regression.
-This is all that is needed to compute estimate probability ratios.
+that will give almost as good results as the original: logistic regression,
+which is a special case of softmax regression
+for binary classification.
+This is all that is needed to compute estimated probability ratios.
 We learn a classifier to distinguish
 between data drawn from $p(\mathbf{x})$
 and data drawn from $q(\mathbf{x})$.
@@ -366,17 +384,17 @@ that can be well discriminated
 should be significantly overweighted
 or underweighted accordingly.
 For simplicity’s sake assume that we have
-an equal number of instances from both distributions,
-denoted by $\mathbf{x}_i \sim p(\mathbf{x})$
-and $\mathbf{x}_i' \sim q(\mathbf{x})$, respectively.
-Now denote by $z_i$ labels that are 1
-for data drawn from $p$ and -1 for data drawn from $q$.
+an equal number of instances from both distributions
+$p(\mathbf{x})$
+and $q(\mathbf{x})$, respectively.
+Now denote by $z$ labels that are $1$
+for data drawn from $p$ and $-1$ for data drawn from $q$.
 Then the probability in a mixed dataset is given by
 
 $$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
 
-Hence, if we use a logistic regression approach,
-where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-f(\mathbf{x}))}$.
+Thus, if we use a logistic regression approach,
+where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-f(\mathbf{x}))}$,
 it follows that
 
 $$
@@ -387,63 +405,64 @@ As a result, we need to solve two problems:
 first one to distinguish between
 data drawn from both distributions,
 and then a reweighted minimization problem
-where we weigh terms by $\beta$, e.g., via the head gradients.
-Here's a prototypical algorithm for that purpose
-which uses an unlabeled training set $X$ and test set $Z$:
+in :eqref:`eq_regularized-weighted-empirical-risk-min`
+where we weigh terms by $\beta$.
+Here is a prototypical algorithm
+for that purpose
+that uses a training set $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ and an unlabeled test set $\{\mathbf{z}_1, \ldots, \mathbf{z}_m\}$:
 
-1. Generate training set with $\{(\mathbf{x}_i, -1) ... (\mathbf{z}_j, 1)\}$.
-1. Train binary classifier using logistic regression to get function $f$.
-1. Weigh training data using $\beta_i = \exp(f(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(f(\mathbf{x}_i)), c)$.
-1. Use weights $\beta_i$ for training on $X$ with labels $Y$.
+1. Generate a binary-classification training set: $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{z}_1, 1), \ldots, (\mathbf{z}_m, 1)\}$.
+1. Train a binary classifier using logistic regression to get function $f$.
+1. Weigh training data using $\beta_i = \exp(f(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(f(\mathbf{x}_i)), c)$ for some constant $c$.
+1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ in :eqref:`eq_regularized-weighted-empirical-risk-min`.
 
-Note that this method relies on a crucial assumption.
+In the covariate shift correction,
+we assume that $\mathbf{x}_i$ for all $1 \leq i \leq n$ are drawn from some source distribution
+and $\mathbf{z}_i$ for all $1 \leq i \leq m$
+are drawn from the target distribution.
+Note that the above algorithm relies on a crucial assumption.
 For this scheme to work, we need that each data point
-in the target (test time) distribution
+in the target (e.g., test time) distribution
 had nonzero probability of occurring at training time.
-If we find a point where $q(\mathbf{x}) > 0$ but $p(\mathbf{x}) = 0$,
+If we find a point where $p(\mathbf{x}) > 0$ but $q(\mathbf{x}) = 0$,
 then the corresponding importance weight should be infinity.
 
-*Generative Adversarial Networks*
-use a very similar idea to that described above
-to engineer a *data generator* that outputs data
-that cannot be distinguished
-from examples sampled from a reference dataset.
-In these approaches, we use one network, $f$
-to distinguish real vs. fake data
-and a second network $g$ that tries
-to fool the discriminator $f$
-into accepting fake data as real.
-We will discuss this in much more detail later.
+
 
 
 ### Label Shift Correction
 
 Assume that we are dealing with a
-$k$-way multiclass classification task.
-When the distribution of labels shifts over time,
-$p(y) \neq q(y)$ but the class-conditional distributions
-stay the same $p(\mathbf{x})=q(\mathbf{x})$.
+classification task with $k$ categories.
+Staying consistent with the notation in :numref:`subsec_covariate-shift-correction`,
+denote by $q$ and $p$ the source distribution (e.g., training time) and target distribution (e.g., test time), respectively.
+Assume that the distribution of labels shifts over time:
+$q(y) \neq p(y)$, but the class-conditional distribution
+stays the same: $q(\mathbf{x} \mid y)=p(\mathbf{x} \mid y)$.
 Here, our importance weights will correspond to the
-label likelihood ratios $q(y)/p(y)$.
+label likelihood ratios 
+
+$$\beta(y) \stackrel{\mathrm{def}}{=} \frac{p(y)}{q(y)}.$$
+
 One nice thing about label shift is that
 if we have a reasonably good model
-(on the source distribution)
+on the source distribution,
 then we can get consistent estimates of these weights
-without ever having to deal with the ambient dimension
+without ever having to deal with the ambient dimension.
 In deep learning, the inputs tend
 to be high-dimensional objects like images,
 while the labels are often simpler objects like categories.
 
 To estimate the target label distribution,
-we first take our reasonably good off the shelf classifier
+we first take our reasonably good off-the-shelf classifier
 (typically trained on the training data)
 and compute its confusion matrix using the validation set
 (also from the training distribution).
-The confusion matrix, C, is simply a $k \times k$ matrix,
-where each column corresponds to the *actual* label
-and each row corresponds to our model's predicted label.
-Each cell's value $c_{ij}$ is the fraction of predictions
-where the true label was $j$ *and* our model predicted $i$.
+The *confusion matrix*, $\mathbf{C}$, is simply a $k \times k$ matrix,
+where each column corresponds to the label category (ground truth)
+and each row corresponds to our model's predicted category.
+Each cell's value $c_{ij}$ is the fraction of total predictions on the validation set
+where the true label was $j$ and our model predicted $i$.
 
 Now, we cannot calculate the confusion matrix
 on the target data directly,
@@ -451,27 +470,37 @@ because we do not get to see the labels for the examples
 that we see in the wild,
 unless we invest in a complex real-time annotation pipeline.
 What we can do, however, is average all of our models predictions
-at test time together, yielding the mean model output $\mu_y$.
+at test time together, yielding the mean model outputs $\mu(\hat{\mathbf{y}}) \in \mathbb{R}^k$,
+whose $i^\mathrm{th}$ element $\mu(\hat{y}_i)$
+is the fraction of total predictions on the test set
+where our model predicted $i$.
 
 It turns out that under some mild conditions---if
 our classifier was reasonably accurate in the first place,
-and if the target data contains only classes of images
+and if the target data contain only categories
 that we have seen before,
 and if the label shift assumption holds in the first place
 (the strongest assumption here),
 then we can recover the test set label distribution
-by solving a simple linear system $C \cdot q(y) = \mu_y$.
+by solving a simple linear system 
+
+$$\mathbf{C} p(\mathbf{y}) = \mu(\hat{\mathbf{y}}),$$
+
+since $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ for all $1 \leq i \leq k$,
+where $p(y_j)$ is the $j^\mathrm{th}$ element of the $k$-dimensional label distribution vector $p(\mathbf{y})$.
 If our classifier is sufficiently accurate to begin with,
-then the confusion $C$ will be invertible,
-and we get a solution $q(y) = C^{-1} \mu_y$.
-Here we abuse notation a bit, using $q(y)$
-to denote the vector of label frequencies.
+then the confusion matrix $\mathbf{C}$ will be invertible,
+and we get a solution $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\mathbf{y}})$.
+
 Because we observe the labels on the source data,
-it is easy to estimate the distribution $p(y)$.
+it is easy to estimate the distribution $q(y)$.
 Then for any training example $i$ with label $y$,
-we can take the ratio of our estimates $\hat{q}(y)/\hat{p}(y)$
-to calculate the weight $w_i$,
-and plug this into the weighted risk minimization algorithm above.
+we can take the ratio of our estimates $\hat{p}(y)/\hat{q}(y)$
+to calculate the weight $\beta_i$,
+and plug this into the weighted minimization problem
+in :eqref:`eq_regularized-weighted-empirical-risk-min`.
+
+
 
 
 ### Concept Shift Correction
@@ -590,5 +619,3 @@ that you might encounter in a career in machine learning.
 1. What could go wrong if training and test sets are very different? What would happen to the sample weights?
 
 [Discussions](https://discuss.d2l.ai/t/105)
-
-

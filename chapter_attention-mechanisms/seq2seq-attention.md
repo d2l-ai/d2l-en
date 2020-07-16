@@ -28,6 +28,13 @@ from mxnet.gluon import rnn, nn
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
 ## Decoder
 
 Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEncoder` in :numref:`sec_seq2seq`, we will just focus on the decoder. We add an MLP attention layer (`MLPAttention`) which has the same hidden size as the LSTM layer in the decoder. Then we initialize the state of the decoder by passing three items from the encoder:
@@ -77,6 +84,42 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
                                         enc_valid_len]
 ```
 
+```{.python .input}
+#@tab pytorch
+class Seq2SeqAttentionDecoder(d2l.Decoder):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0, **kwargs):
+        super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
+        self.attention_cell = d2l.MLPAttention(num_hiddens, num_hiddens, num_hiddens, dropout)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = nn.LSTM(embed_size+num_hiddens, num_hiddens, num_layers, dropout=dropout)
+        self.dense = nn.Linear(num_hiddens, vocab_size)
+
+    def init_state(self, enc_outputs, enc_valid_len, *args):
+        outputs, hidden_state = enc_outputs
+        # Transpose outputs to (batch_size, seq_len, num_hiddens)
+        return (outputs.permute(1, 0, 2), hidden_state, enc_valid_len)
+
+    def forward(self, X, state):
+        enc_outputs, hidden_state, enc_valid_len = state
+        X = self.embedding(X).permute(1, 0, 2)
+        outputs = []
+        for x in X:
+            # query shape: (batch_size, 1, num_hiddens)
+            query = torch.unsqueeze(hidden_state[0][-1], dim=1)
+            # context has same shape as query
+            context = self.attention_cell(
+                query, enc_outputs, enc_outputs, enc_valid_len)
+            # Concatenate on the feature dimension
+            x = torch.cat((context, torch.unsqueeze(x, dim=1)), dim=-1)
+            # Reshape x to (1, batch_size, embed_size + num_hiddens)
+            out, hidden_state = self.rnn(x.permute(1, 0, 2), hidden_state)
+            outputs.append(out)
+        outputs = self.dense(torch.cat(outputs, dim=0))
+        return outputs.permute(1, 0, 2), [enc_outputs, hidden_state, 
+                                          enc_valid_len]
+```
+
 Now we can test the seq2seq with attention model. To be consistent with the model without attention in :numref:`sec_seq2seq`, we use the same hyperparameters for `vocab_size`, `embed_size`, `num_hiddens`, and `num_layers`. As a result, we get the same decoder output shape, but the state structure is changed.
 
 ```{.python .input  n=3}
@@ -86,7 +129,21 @@ encoder.initialize()
 decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8,
                                   num_hiddens=16, num_layers=2)
 decoder.initialize()
-X = np.zeros((4, 7))
+X = d2l.zeros((4, 7))
+state = decoder.init_state(encoder(X), None)
+out, state = decoder(X, state)
+out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
+```
+
+```{.python .input}
+#@tab pytorch
+encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8,
+                             num_hiddens=16, num_layers=2)
+encoder.eval()
+decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8,
+                                  num_hiddens=16, num_layers=2)
+decoder.eval()
+X = d2l.zeros((4, 7), dtype=torch.long)
 state = decoder.init_state(encoder(X), None)
 out, state = decoder(X, state)
 out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
@@ -118,12 +175,34 @@ model = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
 ```
 
+```{.python .input}
+#@tab pytorch
+embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
+batch_size, num_steps = 64, 10
+lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
+
+src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
+encoder = d2l.Seq2SeqEncoder(
+    len(src_vocab), embed_size, num_hiddens, num_layers, dropout)
+decoder = Seq2SeqAttentionDecoder(
+    len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
+model = d2l.EncoderDecoder(encoder, decoder)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
+```
+
 Last, we predict several sample examples.
 
 ```{.python .input  n=6}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + d2l.predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
+```
+
+```{.python .input}
+#@tab pytorch
+for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
+    print(sentence + ' => ' + d2l.predict_s2s_ch9(
+        model, sentence, src_vocab, tgt_vocab, num_steps, device))
 ```
 
 ## Summary

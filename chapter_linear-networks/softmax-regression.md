@@ -261,6 +261,7 @@ are not sufficiently informative
 to classify every example perfectly.
 
 ### Softmax and Derivatives
+:label:`subsec_softmax_and_derivatives`
 
 Since the softmax and the corresponding loss are so common,
 it is worth understanding a bit better how it is computed.
@@ -291,7 +292,8 @@ In this sense, it is very similar to what we saw in regression,
 where the gradient was the difference
 between the observation $y$ and estimate $\hat{y}$.
 This is not coincidence.
-In any [exponential family](https://en.wikipedia.org/wiki/Exponential_family) model,
+In any exponential family (see the
+[online appendix on distributions](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/distributions.html)) model,
 the gradients of the log-likelihood are given by precisely this term.
 This fact makes computing gradients easy in practice.
 

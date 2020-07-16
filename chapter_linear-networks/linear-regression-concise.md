@@ -26,11 +26,8 @@ To start, we will generate the same dataset as in :numref:`sec_linear_scratch`.
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
-
-true_w = np.array([2, -3.4])
-true_b = 4.2
-features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
+
 
 ```{.python .input}
 #@tab pytorch
@@ -38,11 +35,6 @@ from d2l import torch as d2l
 import numpy as np
 import torch
 from torch.utils import data
-
-true_w = torch.Tensor([2, -3.4])
-true_b = 4.2
-features, labels = d2l.synthetic_data(true_w, true_b, 1000)
-labels = labels.reshape(-1,1)
 ```
 
 ```{.python .input}
@@ -50,11 +42,13 @@ labels = labels.reshape(-1,1)
 from d2l import tensorflow as d2l
 import numpy as np
 import tensorflow as tf
+```
 
-true_w = tf.constant([2, -3.4], shape=(2, 1))
+```{.python .input}
+#@tab all
+true_w = d2l.tensor([2, -3.4])
 true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
-labels = tf.reshape(labels, (-1, 1))
 ```
 
 ## Reading the Dataset
@@ -73,9 +67,6 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a Gluon data iterator."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
-
-batch_size = 10
-data_iter = load_array((features, labels), batch_size)
 ```
 
 ```{.python .input}
@@ -84,9 +75,6 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data iterator."""
     dataset = data.TensorDataset(*data_arrays)
     return data.DataLoader(dataset, batch_size, shuffle=is_train)
-
-batch_size = 10
-data_iter = load_array((features, labels), batch_size)
 ```
 
 ```{.python .input}
@@ -98,7 +86,10 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
         dataset = dataset.shuffle(buffer_size=1000)
     dataset = dataset.batch(batch_size)
     return dataset
+```
 
+```{.python .input}
+#@tab all
 batch_size = 10
 data_iter = load_array((features, labels), batch_size)
 ```
@@ -230,7 +221,7 @@ Bias parameters are initialized to zero by default.
 :end_tab:
 
 :begin_tab:`pytorch`
-As we have specified the input and output dimensions when constructing `nn.Linear`. Now we access the parameters directly to specify there initial values. We first locate the layer by `net[0]`, which is the first layer in the network, and then use the `weight.data` and `bias.data` methods to access the parameters. Next we use the replace methods `uniform_` and `fill_` to overwrite parameter values.
+As we have specified the input and output dimensions when constructing `nn.Linear`. Now we access the parameters directly to specify there initial values. We first locate the layer by `net[0]`, which is the first layer in the network, and then use the `weight.data` and `bias.data` methods to access the parameters. Next we use the replace methods `normal_` and `fill_` to overwrite parameter values.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -244,7 +235,7 @@ net.initialize(init.Normal(sigma=0.01))
 
 ```{.python .input}
 #@tab pytorch
-net[0].weight.data.uniform_(0.0, 0.01)
+net[0].weight.data.normal_(0, 0.01)
 net[0].bias.data.fill_(0)
 ```
 
@@ -300,12 +291,12 @@ implementation of squared loss (`L2Loss`).
 :end_tab:
 
 :begin_tab:`pytorch`
-The `MSELoss` class computes the mean squared error, also known as squared L2 norm.
+The `MSELoss` class computes the mean squared error, also known as squared $L_2$ norm.
 By default it returns the average loss over examples.
 :end_tab:
 
 :begin_tab:`tensorflow`
-The `MeanSquaredError` class computes the mean squared error, also known as squared L2 norm.
+The `MeanSquaredError` class computes the mean squared error, also known as squared $L_2$ norm.
 By default it returns the average loss over examples.
 :end_tab:
 
@@ -396,7 +387,7 @@ iteratively grabbing one minibatch of inputs
 and the corresponding ground-truth labels.
 For each minibatch, we go through the following ritual:
 
-* Generate predictions by calling `net(X)` and calculate the loss `l` (the forward pass).
+* Generate predictions by calling `net(X)` and calculate the loss `l` (the forward propagation).
 * Calculate gradients by running the backpropagation.
 * Update the model parameters by invoking our optimizer.
 
