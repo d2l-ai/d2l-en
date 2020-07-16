@@ -243,7 +243,7 @@ It is also referred to as the *type I error* or *false positive*. The $\alpha$, 
 
 The *statistical power* (or *sensitivity*) measures the probability of reject the null hypothesis, $H_0$, when it should be rejected, i.e.,
 
-$$ \text{statistical power }= 1 - \beta = P(\text{ fail to reject } H_0  \mid H_0 \text{ is false} ).$$
+$$ \text{statistical power }= 1 - \beta = 1 - P(\text{ fail to reject } H_0  \mid H_0 \text{ is false} ).$$
 
 Recall that a *type I error* is error caused by rejecting the null hypothesis when it is true, whereas a *type II error* is resulted from failing to reject the null hypothesis when it is false. A type II error is usually denoted as $\beta$, and hence the corresponding statistical power is $1-\beta$.
 
