@@ -100,6 +100,7 @@ However, here we have no kernel, computing the output
 as either the max or the average of each region in the input.
 
 ```{.python .input}
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -107,6 +108,7 @@ npx.set_np()
 
 ```{.python .input}
 #@tab pytorch
+from d2l import torch as d2l
 import torch
 from torch import nn
 ```
