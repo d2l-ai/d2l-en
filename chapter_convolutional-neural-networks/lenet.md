@@ -222,13 +222,11 @@ multiplications.
 If you have access to a GPU, this might be a good time
 to put it into action to speed up training.
 
-:begin_tab:`mxnet, pytorch`
 For evaluation, we need to make a slight modification
 to the `evaluate_accuracy` function that we described
 in :numref:`sec_softmax_scratch`.
 Since the full dataset lives on the CPU,
 we need to copy it to the GPU before we can compute our models.
-:end_tab:
 
 ```{.python .input}
 def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
