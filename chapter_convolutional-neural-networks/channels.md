@@ -338,14 +338,14 @@ tf.norm(Y1 - Y2) < 1e-6
 ## Exercises
 
 1. Assume that we have two convolutional kernels of size $k_1$ and $k_2$ respectively (with no nonlinearity in between).
-    * Prove that the result of the operation can be expressed by a single convolution.
-    * What is the dimensionality of the equivalent single convolution?
-    * Is the converse true?
+    1. Prove that the result of the operation can be expressed by a single convolution.
+    1. What is the dimensionality of the equivalent single convolution?
+    1. Is the converse true?
 1. Assume an input shape of $c_i\times h\times w$ and a convolution kernel with the shape $c_o\times c_i\times k_h\times k_w$, padding of $(p_h, p_w)$, and stride of $(s_h, s_w)$.
-    * What is the computational cost (multiplications and additions) for the forward computation?
-    * What is the memory footprint?
-    * What is the memory footprint for the backward computation?
-    * What is the computational cost for the backward computation?
+    1. What is the computational cost (multiplications and additions) for the forward computation?
+    1. What is the memory footprint?
+    1. What is the memory footprint for the backward computation?
+    1. What is the computational cost for the backward computation?
 1. By what factor does the number of calculations increase if we double the number of input channels $c_i$ and the number of output channels $c_o$? What happens if we double the padding?
 1. If the height and width of the convolution kernel is $k_h=k_w=1$, what is the complexity of the forward computation?
 1. Are the variables `Y1` and `Y2` in the last example of this section exactly the same? Why?
