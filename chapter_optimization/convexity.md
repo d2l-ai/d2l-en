@@ -39,7 +39,7 @@ $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
 To illustrate this let us plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mpl_toolkits import mplot3d
@@ -47,7 +47,7 @@ from mxnet import np, npx
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
