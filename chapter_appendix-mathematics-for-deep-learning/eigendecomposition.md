@@ -412,7 +412,7 @@ d2l.plot(torch.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
 If we look at the last portion of the above computation, 
-we see that the random vector is stretched by a factor of `2.453232963362498[...]`,
+we see that the random vector is stretched by a factor of `1.974459321485[...]`,
 where the portion at the end shifts a little, 
 but the stretching factor is stable.  
 
