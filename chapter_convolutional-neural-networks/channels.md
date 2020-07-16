@@ -242,7 +242,7 @@ K = d2l.normal((2, 3, 1, 1), 0, 1)
 #@tab all
 Y1 = corr2d_multi_in_out_1x1(X, K)
 Y2 = corr2d_multi_in_out(X, K)
-d2l.reduce_sum(d2l.abs(Y1 - Y2))
+assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 ```
 
 ## Summary
