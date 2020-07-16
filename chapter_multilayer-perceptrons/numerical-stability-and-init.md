@@ -254,12 +254,12 @@ Let us look at the scale distribution of
 an output (e.g., a hidden variable) $o_{i}$ for some fully-connected layer
 *without nonlinearities*.
 With $n_\mathrm{in}$ inputs $x_j$
-and their associated weights $W_{ij}$ for this layer,
+and their associated weights $w_{ij}$ for this layer,
 an output is given by
 
-$$o_{i} = \sum_{j=1}^{n_\mathrm{in}} W_{ij} x_j.$$
+$$o_{i} = \sum_{j=1}^{n_\mathrm{in}} w_{ij} x_j.$$
 
-The weights $W_{ij}$ are all drawn
+The weights $w_{ij}$ are all drawn
 independently from the same distribution.
 Furthermore, let us assume that this distribution
 has zero mean and variance $\sigma^2$.
@@ -267,15 +267,15 @@ Note that this does not mean that the distribution has to be Gaussian,
 just that the mean and variance need to exist.
 For now, let us assume that the inputs to the layer $x_j$
 also have zero mean and variance $\gamma^2$
-and that they are independent of $W_{ij}$ and independent of each other.
+and that they are independent of $w_{ij}$ and independent of each other.
 In this case, we can compute the mean and variance of $o_i$ as follows:
 
 $$
 \begin{aligned}
-    E[o_i] & = \sum_{j=1}^{n_\mathrm{in}} E[W_{ij} x_j] \\&= \sum_{j=1}^{n_\mathrm{in}} E[W_{ij}] E[x_j] \\&= 0, \\
+    E[o_i] & = \sum_{j=1}^{n_\mathrm{in}} E[w_{ij} x_j] \\&= \sum_{j=1}^{n_\mathrm{in}} E[w_{ij}] E[x_j] \\&= 0, \\
     \mathrm{Var}[o_i] & = E[o_i^2] - (E[o_i])^2 \\
-        & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij} x^2_j] - 0 \\
-        & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij}] E[x^2_j] \\
+        & = \sum_{j=1}^{n_\mathrm{in}} E[w^2_{ij} x^2_j] - 0 \\
+        & = \sum_{j=1}^{n_\mathrm{in}} E[w^2_{ij}] E[x^2_j] \\
         & = n_\mathrm{in} \sigma^2 \gamma^2.
 \end{aligned}
 $$

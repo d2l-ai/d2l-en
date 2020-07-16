@@ -136,7 +136,7 @@ def synthetic_data(w, b, num_examples):  #@save
     X = d2l.normal(0, 1, (num_examples, len(w)))
     y = d2l.matmul(X, w) + b
     y += d2l.normal(0, 0.01, y.shape)
-    return X, y
+    return X, d2l.reshape(y, (-1, 1))
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -216,8 +216,9 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = y_hat.argmax(axis=1)
-    return float((y_hat.type(y.dtype) == y).sum())
+        y_hat = d2l.argmax(y_hat, axis=1)        
+    cmp = d2l.astype(y_hat, y.dtype) == y
+    return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -227,7 +228,7 @@ def evaluate_accuracy(net, data_iter):  #@save
         net.eval()  # Set the model to evaluation mode
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
-        metric.add(accuracy(net(X), y), sum(y.shape))
+        metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
@@ -250,6 +251,9 @@ class Accumulator:  #@save
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     """The training loop defined in Chapter 3."""
+    # Set the model to training mode
+    if isinstance(net, torch.nn.Module):
+        net.train()
     # Sum of training loss, sum of training accuracy, no. of examples
     metric = Accumulator(3)
     for X, y in train_iter:
@@ -265,7 +269,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         else:
             l.sum().backward()
             updater(X.shape[0])
-            metric.add(float(l.sum()), accuracy(y_hat, y), y.size().numel())
+            metric.add(float(l.sum()), accuracy(y_hat, y), y.numel())
     # Return training loss and training accuracy
     return metric[0] / metric[2], metric[1] / metric[2]
 
@@ -318,8 +322,6 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
-        if isinstance(net, torch.nn.Module):
-            net.train()  # Set the model to training mode
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
         animator.add(epoch + 1, train_metrics + (test_acc,))
@@ -335,9 +337,9 @@ def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
-    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
-    titles = [true + '\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+    preds = d2l.get_fashion_mnist_labels(d2l.argmax(net(X), axis=1))
+    titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
+    d2l.show_images(d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
@@ -346,7 +348,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
     metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
         l = loss(net(X), y)
-        metric.add(l.sum(), l.numel())
+        metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 
 
@@ -452,7 +454,7 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         X, y = X.to(device), y.to(device)
-        metric.add(d2l.accuracy(net(X), y), sum(y.shape))
+        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
@@ -1073,10 +1075,8 @@ def show_trace_2d(f, results):  #@save
 
 
 # Alias defined in config.ini
-numpy = lambda a: a.detach().numpy()
-size = lambda a: a.numel()
-reshape = lambda a, *args: a.reshape(*args)
-to = lambda a, ctx: a.to(ctx)
+
+
 ones = torch.ones
 zeros = torch.zeros
 tensor = torch.tensor
@@ -1089,6 +1089,16 @@ cosh = torch.cosh
 tanh = torch.tanh
 linspace = torch.linspace
 exp = torch.exp
+log = torch.log
 normal = torch.normal
 matmul = torch.matmul
+int32 = torch.int32
+float32 = torch.float32
+numpy = lambda x, *args, **kwargs: x.detach().numpy(*args, **kwargs)
+size = lambda x, *args, **kwargs: x.numel(*args, **kwargs)
+reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
+to = lambda x, *args, **kwargs: x.to(*args, **kwargs)
+reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
+argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
+astype = lambda x, *args, **kwargs: x.type(*args, **kwargs)
 
