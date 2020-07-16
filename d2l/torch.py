@@ -269,7 +269,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         else:
             l.sum().backward()
             updater(X.shape[0])
-            metric.add(float(l.sum()), accuracy(y_hat, y), y.size().numel())
+            metric.add(float(l.sum()), accuracy(y_hat, y), y.numel())
     # Return training loss and training accuracy
     return metric[0] / metric[2], metric[1] / metric[2]
 
