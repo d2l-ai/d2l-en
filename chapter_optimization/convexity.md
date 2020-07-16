@@ -56,6 +56,15 @@ from mpl_toolkits import mplot3d
 import torch
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import numpy as np
+from mpl_toolkits import mplot3d
+import tensorflow as tf
+```
+
 Let us define a few functions, both convex and nonconvex.
 
 ```{.python .input}
@@ -125,10 +134,9 @@ Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \i
 
 Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
 
-
 ```{.python .input}
 #@tab all
-x, y = d2l.meshgrid(d2l.linspace(-1, 1, 101), d2l.linspace(-1, 1, 101))
+x, y = d2l.meshgrid(d2l.linspace(-1.0, 1.0, 101), d2l.linspace(-1.0, 1.0, 101))
 z = x**2 + 0.5 * d2l.cos(2 * np.pi * y)
 # Plot the 3D surface
 d2l.set_figsize((6, 4))
