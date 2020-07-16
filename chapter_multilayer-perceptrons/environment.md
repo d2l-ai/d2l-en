@@ -284,6 +284,8 @@ Below are some typical cases.
 * We train an image classifier by compiling a large dataset where each among a large set of classes is equally represented in the dataset, say 1000 categories, represented by 1000 images each. Then we deploy the system in the real world, where the actual label distribution of photographs is decidedly non-uniform.
 
 
+
+
 ## Correction of Distribution Shift
 
 In short, there are many cases
@@ -310,14 +312,15 @@ To make progress, we need to reflect about what exactly
 is happening during training:
 we iterate over training data and associated labels
 $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$
-and update the weight vector $\mathbf{w}$ of the model after every minibatch.
+and update the parameters $\mathbf{\Theta}$ of the model after every minibatch.
 We sometimes additionally apply some penalty to the parameters,
 using weight decay, dropout, or some other related technique.
 This means that we largely minimize the loss on the training:
 
-$$\mathop{\mathrm{minimize}}_\mathbf{w} \frac{1}{n} \sum_{i=1}^n l(f(\mathbf{x}_i), y_i) + \mathrm{some~penalty}(\mathbf{w}).$$
+$$\mathop{\mathrm{minimize}}_\mathbf{\Theta} \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}_i, y_i, \mathbf{\Theta}) + \mathrm{some~penalty}(\mathbf{\Theta}),$$
 :eqlabel:`eq_regularized-empirical-risk-min`
 
+where $l(\mathbf{x}_i, y_i, \mathbf{\Theta})$ is the individual loss for the model parameterized by $\mathbf{\Theta}$ on a single data point $(\mathbf{x}_i, y_i)$.
 Statisticians call the first term in :eqref:`eq_regularized-empirical-risk-min` *empirical risk*,
 i.e., an average computed over the data drawn from $P(\mathbf{x}) P(y \mid \mathbf{x})$ (e.g., training set).
 Without considering the penalty term,
@@ -345,7 +348,7 @@ we can train our model using
 *weighted empirical risk minimization*
 with some penalty to the parameters:
 
-$$\mathop{\mathrm{minimize}}_\mathbf{w} \frac{1}{n} \sum_{i=1}^n \beta_il(f(\mathbf{x}_i), y_i) + \mathrm{some~penalty}(\mathbf{w}).$$
+$$\mathop{\mathrm{minimize}}_\mathbf{\mathbf{\Theta}} \frac{1}{n} \sum_{i=1}^n \beta_i l(\mathbf{x}_i, y_i, \mathbf{\Theta}) + \mathrm{some~penalty}(\mathbf{\mathbf{\Theta}}).$$
 :eqlabel:`eq_regularized-weighted-empirical-risk-min`
 
 
@@ -431,7 +434,7 @@ then the corresponding importance weight should be infinity.
 
 Assume that we are dealing with a
 classification task with $k$ categories.
-Being consistent with the notation in :numref:`subsec_covariate-shift-correction`,
+Staying consistent with the notation in :numref:`subsec_covariate-shift-correction`,
 denote by $q$ and $p$ the source distribution (e.g., training time) and target distribution (e.g., test time), respectively.
 Assume that the distribution of labels shifts over time:
 $q(y) \neq p(y)$, but the class-conditional distribution
@@ -451,15 +454,15 @@ to be high-dimensional objects like images,
 while the labels are often simpler objects like categories.
 
 To estimate the target label distribution,
-we first take our reasonably good off the shelf classifier
+we first take our reasonably good off-the-shelf classifier
 (typically trained on the training data)
 and compute its confusion matrix using the validation set
 (also from the training distribution).
-The confusion matrix, $\mathbf{C}$, is simply a $k \times k$ matrix,
-where each column corresponds to the *actual* label
-and each row corresponds to our model's predicted label.
-Each cell's value $c_{ij}$ is the fraction of predictions
-where the true label was $j$ *and* our model predicted $i$.
+The *confusion matrix*, $\mathbf{C}$, is simply a $k \times k$ matrix,
+where each column corresponds to the label category (ground truth)
+and each row corresponds to our model's predicted category.
+Each cell's value $c_{ij}$ is the fraction of total predictions on the validation set
+where the true label was $j$ and our model predicted $i$.
 
 Now, we cannot calculate the confusion matrix
 on the target data directly,
@@ -467,28 +470,37 @@ because we do not get to see the labels for the examples
 that we see in the wild,
 unless we invest in a complex real-time annotation pipeline.
 What we can do, however, is average all of our models predictions
-at test time together, yielding the mean model output $\mu_y$.
+at test time together, yielding the mean model outputs $\mu(\hat{\mathbf{y}}) \in \mathbb{R}^k$,
+whose $i^\mathrm{th}$ element $\mu(\hat{y}_i)$
+is the fraction of total predictions on the test set
+where our model predicted $i$.
 
 It turns out that under some mild conditions---if
 our classifier was reasonably accurate in the first place,
-and if the target data contains only classes of images
+and if the target data contain only categories
 that we have seen before,
 and if the label shift assumption holds in the first place
 (the strongest assumption here),
 then we can recover the test set label distribution
-by solving a simple linear system $\mathbf{C} \cdot p(y) = \mu_y$.
+by solving a simple linear system 
+
+$$\mathbf{C} p(\mathbf{y}) = \mu(\hat{\mathbf{y}}),$$
+
+since $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ for all $1 \leq i \leq k$,
+where $p(y_j)$ is the $j^\mathrm{th}$ element of the $k$-dimensional label distribution vector $p(\mathbf{y})$.
 If our classifier is sufficiently accurate to begin with,
-then the confusion $\mathbf{C}$ will be invertible,
-and we get a solution $p(y) = \mathbf{C}^{-1} \mu_y$.
-Here we abuse notation a bit, using $p(y)$
-to denote the vector of label frequencies.
+then the confusion matrix $\mathbf{C}$ will be invertible,
+and we get a solution $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\mathbf{y}})$.
+
 Because we observe the labels on the source data,
 it is easy to estimate the distribution $q(y)$.
 Then for any training example $i$ with label $y$,
 we can take the ratio of our estimates $\hat{p}(y)/\hat{q}(y)$
 to calculate the weight $\beta_i$,
-and plug this into the reweighted minimization problem
+and plug this into the weighted minimization problem
 in :eqref:`eq_regularized-weighted-empirical-risk-min`.
+
+
 
 
 ### Concept Shift Correction
