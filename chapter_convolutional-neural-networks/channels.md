@@ -228,14 +228,14 @@ Let us check this with some reference data.
 
 ```{.python .input}
 #@tab mxnet, pytorch
-X = d2l.normal(size=(3, 3, 3))
-K = d2l.normal(size=(2, 3, 1, 1))
+X = d2l.normal(0, 1, (3, 3, 3))
+K = d2l.normal(0, 1, (2, 3, 1, 1))
 ```
 
 ```{.python .input}
 #@tab tensorflow
-X = d2l.normal((3, 3, 3))
-K = d2l.normal((2, 3, 1, 1))
+X = d2l.normal((3, 3, 3), 0, 1)
+K = d2l.normal((2, 3, 1, 1), 0, 1)
 ```
 
 ```{.python .input}
