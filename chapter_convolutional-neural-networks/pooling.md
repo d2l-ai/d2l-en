@@ -97,7 +97,7 @@ of the pooling layer in the `pool2d` function.
 This function is similar to the `corr2d` function
 in :numref:`sec_conv_layer`.
 However, here we have no kernel, computing the output
-as either the max or the average of each region in the input..
+as either the max or the average of each region in the input.
 
 ```{.python .input}
 from mxnet import np, npx
