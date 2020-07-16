@@ -66,7 +66,7 @@ we can also think of it as the direction itself
 to take $3$ steps to the right and $2$ steps up. 
 In this way, we consider all the vectors in figure :numref:`fig_arrow` the same.
 
-![Any vector can be visualized as an arrow in the plane.  In this case, every vector drawn is a representation of the vector $(3,2)$.](../img/ParVec.svg)
+![Any vector can be visualized as an arrow in the plane.  In this case, every vector drawn is a representation of the vector $(3,2)^\top$.](../img/ParVec.svg)
 :label:`fig_arrow`
 
 One of the benefits of this shift is that
