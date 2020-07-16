@@ -77,11 +77,6 @@ from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon, init
 from mxnet.gluon import nn
 npx.set_np()
-
-T = 1000  # Generate a total of 1000 points
-time = np.arange(0, T)
-x = np.sin(0.01 * time) + 0.2 * np.random.normal(size=T)
-d2l.plot(time, [x])
 ```
 
 ```{.python .input}
@@ -90,10 +85,13 @@ d2l.plot(time, [x])
 from d2l import torch as d2l
 import torch
 import torch.nn as nn
+```
 
+```{.python .input}
+#@tab all
 T = 1000  # Generate a total of 1000 points
-time = torch.arange(0.0, T)
-x = torch.sin(0.01 * time) + 0.2 * torch.randn(T)
+time = d2l.arange(0, T, dtype=d2l.float32)
+x = d2l.sin(0.01 * time) + d2l.normal(0, 0.2, (T,))
 d2l.plot(time, [x])
 ```
 
