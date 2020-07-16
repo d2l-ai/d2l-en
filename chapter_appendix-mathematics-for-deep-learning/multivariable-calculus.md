@@ -750,7 +750,7 @@ It is reasonable to ask at this point, "Why can I not just write down matrix ver
 * Matrix calculus allows us to write the derivatives of matrix expressions in concise ways.
 
 ## Exercises
-1. Given a row vector $\boldsymbol{\beta}^\top$, compute the derivatives of both $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$ and $g(\mathbf{x}) = \mathbf{x}^\top\boldsymbol{\beta}$.  Why do you get the same answer?
+1. Given a column vector $\boldsymbol{\beta}$, compute the derivatives of both $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$ and $g(\mathbf{x}) = \mathbf{x}^\top\boldsymbol{\beta}$.  Why do you get the same answer?
 2. Let $\mathbf{v}$ be an $n$ dimension vector. What is $\frac{\partial}{\partial\mathbf{v}}\|\mathbf{v}\|_2$?
 3. Let $L(x, y) = \log(e^x + e^y)$.  Compute the gradient.  What is the sum of the components of the gradient?
 4. Let $f(x, y) = x^2y + xy^2$. Show that the only critical point is $(0,0)$. By considering $f(x, x)$, determine if $(0,0)$ is a maximum, minimum, or neither.
