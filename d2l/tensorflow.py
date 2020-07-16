@@ -554,5 +554,6 @@ astype = tf.cast
 int32 = tf.int32
 float32 = tf.float32
 transpose = tf.transpose
+concat = tf.concat
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 

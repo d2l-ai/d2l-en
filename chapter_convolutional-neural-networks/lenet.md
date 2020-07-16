@@ -419,12 +419,12 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 1. Replace the average pooling with max pooling. What happens?
 1. Try to construct a more complex network based on LeNet to improve its accuracy.
-    * Adjust the convolution window size.
-    * Adjust the number of output channels.
-    * Adjust the activation function (ReLU?).
-    * Adjust the number of convolution layers.
-    * Adjust the number of fully connected layers.
-    * Adjust the learning rates and other training details (initialization, epochs, etc.)
+    1. Adjust the convolution window size.
+    1. Adjust the number of output channels.
+    1. Adjust the activation function (ReLU?).
+    1. Adjust the number of convolution layers.
+    1. Adjust the number of fully connected layers.
+    1. Adjust the learning rates and other training details (initialization, epochs, etc.)
 1. Try out the improved network on the original MNIST dataset.
 1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters, coats).
 
