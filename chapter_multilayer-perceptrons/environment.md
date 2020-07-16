@@ -361,10 +361,10 @@ that attempt to recalibrate the expectation operator directly
 using a minimum-norm or a maximum entropy principle.
 Note that for any such approach, we need samples
 drawn from both distributions---the "true" $p$, e.g.,
-by access to training data, and the one used
+by access to test data, and the one used
 for generating the training set $q$ (the latter is trivially available).
-Note however, that we only need features $\mathbf{x} \sim q(\mathbf{x})$;
-we do not need to access labels $y \sim q(y)$.
+Note however, that we only need features $\mathbf{x} \sim p(\mathbf{x})$;
+we do not need to access labels $y \sim p(y)$.
 
 In this case, there exists a very effective approach
 that will give almost as good results as the original: logistic regression,
