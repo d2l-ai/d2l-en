@@ -150,7 +150,7 @@ by concatenating the kernel array `K` with `K+1`
 (plus one for each element in `K`) and `K+2`.
 
 ```{.python .input}
-#@tab pytorch
+#@tab all
 K = d2l.stack((K, K + 1, K + 2), 0)
 K.shape
 ```
