@@ -196,21 +196,21 @@ setting the number of epochs to 10
 and the learning rate to 0.5.
 
 ```{.python .input}
-num_epochs, lr = 10, 0.5
+num_epochs, lr = 10, 0.1
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
               lambda batch_size: d2l.sgd(params, lr, batch_size))
 ```
 
 ```{.python .input}
 #@tab pytorch
-num_epochs, lr = 10, 0.5
+num_epochs, lr = 10, 0.1
 updater = torch.optim.SGD(params, lr=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-num_epochs, lr = 10, 0.5
+num_epochs, lr = 10, 0.1
 updater = d2l.Updater([W1, W2, b1, b2], lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
 ```
