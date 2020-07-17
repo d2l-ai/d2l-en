@@ -19,7 +19,7 @@ $$\begin{aligned}
     \mathbf{x}_t  & = \mathbf{x}_{t-1} - \mathbf{g}_t'. \\
 \end{aligned}$$
 
-So what is the rescaled gradient $\mathbf{g}_t'$? We can calculate as:
+So what is the rescaled gradient $\mathbf{g}_t'$? We can calculate it as follows:
 
 $$\begin{aligned}
     \mathbf{g}_t' & = \frac{\sqrt{\Delta\mathbf{x}_{t-1} + \epsilon}}{\sqrt{{\mathbf{s}_t + \epsilon}}} \odot \mathbf{g}_t, \\
