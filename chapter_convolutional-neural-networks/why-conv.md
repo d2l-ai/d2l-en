@@ -123,7 +123,7 @@ to representing our parameters
 as four-dimensional weight tensors.
 
 
-Suppose that $W$ is the weights and $u$ is the bias of a MLP, 
+Suppose that $W$ is the weights and $u$ is the bias of an MLP, 
 we could formally express the dense layer as follows:
 
 $$h[i, j] = u[i, j] + \sum_{k, l} W[i, j, k, l] \cdot x[k, l] =  u[i, j] +
