@@ -604,7 +604,7 @@ Recently,
 control theory (e.g., PID variants) has also been used
 to automatically tune hyperparameters
 to achive better disentangling and reconstruction quality,
-and improve the diversity of generated text and the reconstruction quality of generated images:cite:`Shao.Yao.Sun.ea.2020`.
+and improve the diversity of generated text and the reconstruction quality of generated images :cite:`Shao.Yao.Sun.ea.2020`.
 
 
 
