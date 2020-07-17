@@ -1,4 +1,4 @@
-# Distribution Shift
+# Environment and Distribution Shift
 
 In the previous sections, we worked through
 a number of hands-on applications of machine learning,
@@ -57,7 +57,7 @@ statistical prediction altogether and
 grapple with difficult philosophical questions
 concerning the ethical application of algorithms.
 
-## Types
+## Types of Distribution Shift
 
 To begin, we stick with the passive prediction setting
 considering the various ways that data distributions might shift
@@ -184,7 +184,7 @@ We might hope to exploit knowledge
 that shift only takes place gradually
 either in a temporal or geographic sense.
 
-## Examples
+## Examples of Distribution Shift
 
 Before delving into formalism and algorithms,
 we can discuss some concrete situations
@@ -288,7 +288,7 @@ Below are some typical cases.
 
 
 
-## Correction
+## Correction of Distribution Shift
 
 As we have discussed, there are many cases
 where training and test distributions
@@ -349,8 +349,8 @@ Unfortunately, the observations $\mathbf{x}_i$ are drawn
 from some *source distribution* $q(\mathbf{x})$ 
 rather than the *target distribution* $p(\mathbf{x})$.
 Fortunately,
-the dependency assumption indicates
-that $p(y \mid \mathbf{x}) = q(y \mid \mathbf{x})$.
+the dependency assumption means
+that the conditional distribution does not change: $p(y \mid \mathbf{x}) = q(y \mid \mathbf{x})$.
 If the source distribution $q(\mathbf{x})$ is "wrong",
 we can correct for that by using the following simple identity in true risk:
 
@@ -546,8 +546,6 @@ and plug this into weighted empirical risk minimization
 in :eqref:`eq_weighted-empirical-risk-min`.
 
 
-
-
 ### Concept Shift Correction
 
 Concept shift is much harder to fix in a principled manner.
@@ -568,28 +566,58 @@ old products become less popular. This means that the distribution over ads and 
 
 In such cases, we can use the same approach that we used for training networks to make them adapt to the change in the data. In other words, we use the existing network weights and simply perform a few update steps with the new data rather than training from scratch.
 
+
 ## A Taxonomy of Learning Problems
 
-Armed with knowledge about how to deal with changes in $p(x)$ and in $P(y \mid x)$, we can now consider some other aspects of machine learning problem formulation.
+Armed with knowledge about how to deal with changes in distributions, we can now consider some other aspects of machine learning problem formulation.
 
 
-* **Batch Learning.** Here we have access to training data and labels $\{(x_1, y_1), \ldots, (x_n, y_n)\}$, which we use to train a network $f(x, w)$. Later on, we deploy this network to score new data $(x, y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
-* **Online Learning.** Now imagine that the data $(x_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $x_i$, then we need to come up with an estimate $f(x_i, w)$ and only once we have done this, we observe $y_i$ and with it, we receive a reward (or incur a loss), given our decision. Many real problems fall into this category. E.g., we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, we have the following cycle where we are continuously improving our model given new observations.
+### Batch Learning
+
+In *batch learning*, we have access to training features and labels $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$, which we use to train a model $f(\mathbf{x})$. Later on, we deploy this model to score new data $(\mathbf{x}, y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
+
+
+### Online Learning
+
+Now imagine that the data $(\mathbf{x}_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $\mathbf{x}_i$, then we need to come up with an estimate $f(\mathbf{x}_i)$ and only once we have done this, we observe $y_i$ and with it, we receive a reward or incur a loss, given our decision. 
+Many real problems fall into this category. For example, we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, in *online learning*, we have the following cycle where we are continuously improving our model given new observations.
 
 $$
 \mathrm{model} ~ f_t \longrightarrow
-\mathrm{data} ~ x_t \longrightarrow
-\mathrm{estimate} ~ f_t(x_t) \longrightarrow
+\mathrm{data} ~ \mathbf{x}_t \longrightarrow
+\mathrm{estimate} ~ f_t(\mathbf{x}_t) \longrightarrow
 \mathrm{observation} ~ y_t \longrightarrow
-\mathrm{loss} ~ l(y_t, f_t(x_t)) \longrightarrow
+\mathrm{loss} ~ l(y_t, f_t(\mathbf{x}_t)) \longrightarrow
 \mathrm{model} ~ f_{t+1}
 $$
 
-* **Bandits.** They are a *special case* of the problem above. While in most learning problems we have a continuously parametrized function $f$ where we want to learn its parameters (e.g., a deep network), in a bandit problem we only have a finite number of arms that we can pull (i.e., a finite number of actions that we can take). It is not very surprising that for this simpler problem stronger theoretical guarantees in terms of optimality can be obtained. We list it mainly since this problem is often (confusingly) treated as if it were a distinct learning setting.
-* **Control (and nonadversarial Reinforcement Learning).** In many cases the environment remembers what we did. Not necessarily in an adversarial manner but it will just remember and the response will depend on what happened before. E.g., a coffee boiler controller will observe different temperatures depending on whether it was heating the boiler previously. PID (proportional integral derivative) controller algorithms are a popular choice there. Likewise, a user's behavior on a news site will depend on what we showed him previously (e.g., he will read most news only once). Many such algorithms form a model of the environment in which they act such as to make their decisions appear less random (i.e., to reduce variance).
-* **Reinforcement Learning.** In the more general case of an environment with memory, we may encounter situations where the environment is trying to *cooperate* with us (cooperative games, in particular for non-zero-sum games), or others where the environment will try to *win*. Chess, Go, Backgammon or StarCraft are some of the cases. Likewise, we might want to build a good controller for autonomous cars. The other cars are likely to respond to the autonomous car's driving style in nontrivial ways, e.g., trying to avoid it, trying to cause an accident, trying to cooperate with it, etc.
+### Bandits
 
-One key distinction between the different situations above is that the same strategy that might have worked throughout in the case of a stationary environment, might not work throughout when the environment can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once he starts exploiting it. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we *know* that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist to deal with concept shift, i.e., when the problem that he is trying to solve changes over time.
+*Bandits* are a special case of the problem above. While in most learning problems we have a continuously parametrized function $f$ where we want to learn its parameters (e.g., a deep network), in a *bandit* problem we only have a finite number of arms that we can pull, i.e., a finite number of actions that we can take. It is not very surprising that for this simpler problem stronger theoretical guarantees in terms of optimality can be obtained. We list it mainly since this problem is often (confusingly) treated as if it were a distinct learning setting.
+
+
+### Control (and Nonadversarial Reinforcement Learning)
+
+In many cases the environment remembers what we did. Not necessarily in an adversarial manner but it will just remember and the response will depend on what happened before. For instance, a coffee boiler controller will observe different temperatures depending on whether it was heating the boiler previously. PID (proportional-integral-derivative) controller algorithms are a popular choice there. 
+Likewise, a user's behavior on a news site will depend on what we showed her previously (e.g., she will read most news only once). Many such algorithms form a model of the environment in which they act such as to make their decisions appear less random.
+Recently,
+control theory (e.g., PID variants) has also been used
+to automatically tune hyperparameters
+to achive better disentangling and reconstruction quality,
+and improve the diversity of generated text and the reconstruction quality of generated images:cite:`Shao.Yao.Sun.ea.2020`.
+
+
+
+
+### Reinforcement Learning 
+
+In the more general case of an environment with memory, we may encounter situations where the environment is trying to cooperate with us (cooperative games, in particular for non-zero-sum games), or others where the environment will try to win. Chess, Go, Backgammon, or StarCraft are some of the cases in *reinforcement learning*. Likewise, we might want to build a good controller for autonomous cars. The other cars are likely to respond to the autonomous car's driving style in nontrivial ways, e.g., trying to avoid it, trying to cause an accident, and trying to cooperate with it.
+
+### Discussions
+
+One key distinction between the different situations above is that the same strategy that might have worked throughout in the case of a stationary environment, might not work throughout when the environment can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once he starts exploiting it. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we know that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist to deal with concept shift, i.e., when the problem that she is trying to solve changes over time.
+
+
 
 
 ## Fairness, Accountability, and Transparency in Machine Learning
@@ -613,12 +641,12 @@ a subpopulation could cause us to administer inferior care.
 Moreover, once we contemplate decision-making systems,
 we must step back and reconsider how we evaluate our technology.
 Among other consequences of this change of scope,
-we will find that *accuracy* is seldom the right metric.
+we will find that *accuracy* is seldom the right measure.
 For instance, when translating predictions into actions,
 we will often want to take into account
 the potential cost sensitivity of erring in various ways.
 If one way of misclassifying an image
-could be perceived as a racial sleight,
+could be perceived as a racial sleight of hand,
 while misclassification to a different category
 would be harmless, then we might want to adjust
 our thresholds accordingly, accounting for societal values
@@ -638,7 +666,7 @@ It is easy to see how a worrying pattern can emerge:
 Often, the various mechanisms by which
 a model's predictions become coupled to its training data
 are unaccounted for in the modeling process.
-This can lead to what researchers call "runaway feedback loops."
+This can lead to what researchers call *runaway feedback loops*.
 Additionally, we want to be careful about
 whether we are addressing the right problem in the first place.
 Predictive algorithms now play an outsize role
@@ -652,15 +680,17 @@ that you might encounter in a career in machine learning.
 
 ## Summary
 
-* In many cases training and test sets do not come from the same distribution. This is called covariate shift.
-* Under the corresponding assumptions, *covariate* and *label* shift can be detected and corrected for at test time. Failure to account for this bias can become problematic at test time.
-* In some cases, the environment may *remember* automated actions and respond in surprising ways. We must account for this possibility when building models and continue to monitor live systems, open to the possibility that our models and the environment will become entangled in unanticipated ways.
+* In many cases training and test sets do not come from the same distribution. This is called distribution shift.
+* True risk is the expectation of the loss over the entire population of data drawn from their true distribution. However, this entire population is usually unavailable. Empirical risk is an average loss over the training data to approximate the true risk. In practice, we perform empirical risk minimization.
+* Under the corresponding assumptions, covariate and label shift can be detected and corrected for at test time. Failure to account for this bias can become problematic at test time.
+* In some cases, the environment may remember automated actions and respond in surprising ways. We must account for this possibility when building models and continue to monitor live systems, open to the possibility that our models and the environment will become entangled in unanticipated ways.
 
 ## Exercises
 
 1. What could happen when we change the behavior of a search engine? What might the users do? What about the advertisers?
 1. Implement a covariate shift detector. Hint: build a classifier.
 1. Implement a covariate shift corrector.
-1. What could go wrong if training and test sets are very different? What would happen to the sample weights?
+1. Besides distribution shift, what else could affect how empirical risk approximates true risk?
+
 
 [Discussions](https://discuss.d2l.ai/t/105)
