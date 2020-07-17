@@ -124,7 +124,7 @@ as four-dimensional weight tensors.
 
 
 Suppose that $W$ is the weights and $u$ is the bias of a MLP, 
-we could formally express this dense layer as follows:
+we could formally express the dense layer as follows:
 
 $$h[i, j] = u[i, j] + \sum_{k, l} W[i, j, k, l] \cdot x[k, l] =  u[i, j] +
 \sum_{a, b} V[i, j, a, b] \cdot x[i+a, j+b].$$
