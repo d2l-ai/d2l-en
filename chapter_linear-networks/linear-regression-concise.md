@@ -28,7 +28,6 @@ from mxnet import autograd, gluon, np, npx
 npx.set_np()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
@@ -141,7 +140,7 @@ will involve multiple layers,
 we will use it anyway just to familiarize you
 with the most standard workflow.
 
-Recall the architecture of a single-layer network as shown in :numref:`fig_singleneuron`.
+Recall the architecture of a single-layer network as shown in :numref:`fig_single_neuron`.
 The layer is said to be *fully-connected*
 because each of its inputs is connected to each of its outputs
 by means of a matrix-vector multiplication.
