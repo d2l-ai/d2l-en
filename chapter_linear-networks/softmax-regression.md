@@ -35,6 +35,7 @@ we still use models that make soft assignments.
 
 
 ## Classification Problem
+:label:`subsec_classification-problem`
 
 To get our feet wet, let us start off with
 a simple image classification problem.
