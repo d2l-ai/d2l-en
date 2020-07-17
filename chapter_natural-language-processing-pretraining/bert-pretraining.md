@@ -143,7 +143,7 @@ train_bert(train_iter, net, loss, len(vocab), ctx, 1, 50)
 
 ## Representing Text with BERT
 
-After pretraing BERT,
+After pretraining BERT,
 we can use it to represent single text, text pairs, or any token in them.
 The following function returns the BERT (`net`) representations for all tokens
 in `tokens_a` and `tokens_b`.
@@ -201,13 +201,13 @@ for downstream natural language processing applications.
 ## Summary
 
 * The original BERT has two versions, where the base model has 110 million parameters and the large model has 340 million parameters.
-* After pretraing BERT, we can use it to represent single text, text pairs, or any token in them.
+* After pretraining BERT, we can use it to represent single text, text pairs, or any token in them.
 * In the experiment, the same token has different BERT representation when their contexts are different. This supports that BERT representations are context-sensitive.
 
 ## Exercises
 
 1. In the experiment, we can see that the masked language modeling loss is significantly higher than the next sentence prediction loss. Why?
-1. Set the maximum length of a BERT input sequence to be 512 (same as the original BERT model). Use the configurations of the original BERT model such as $\text{BERT}_{\text{LARGE}}$. Do you encounter any error when running this section? Why?
+2. Set the maximum length of a BERT input sequence to be 512 (same as the original BERT model). Use the configurations of the original BERT model such as $\text{BERT}_{\text{LARGE}}$. Do you encounter any error when running this section? Why?
 
 
 :begin_tab:`mxnet`
