@@ -143,7 +143,7 @@ train_bert(train_iter, net, loss, len(vocab), ctx, 1, 50)
 
 ## Representing Text with BERT
 
-After pretraing BERT,
+After pretraining BERT,
 we can use it to represent single text, text pairs, or any token in them.
 The following function returns the BERT (`net`) representations for all tokens
 in `tokens_a` and `tokens_b`.
@@ -201,7 +201,7 @@ for downstream natural language processing applications.
 ## Summary
 
 * The original BERT has two versions, where the base model has 110 million parameters and the large model has 340 million parameters.
-* After pretraing BERT, we can use it to represent single text, text pairs, or any token in them.
+* After pretraining BERT, we can use it to represent single text, text pairs, or any token in them.
 * In the experiment, the same token has different BERT representation when their contexts are different. This supports that BERT representations are context-sensitive.
 
 ## Exercises
