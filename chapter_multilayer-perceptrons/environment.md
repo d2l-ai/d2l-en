@@ -1,4 +1,4 @@
-# Considering the Environment
+# Distribution Shift
 
 In the previous sections, we worked through
 a number of hands-on applications of machine learning,
@@ -57,7 +57,7 @@ statistical prediction altogether and
 grapple with difficult philosophical questions
 concerning the ethical application of algorithms.
 
-## Distribution Shift
+## Types
 
 To begin, we stick with the passive prediction setting
 considering the various ways that data distributions might shift
@@ -184,7 +184,7 @@ We might hope to exploit knowledge
 that shift only takes place gradually
 either in a temporal or geographic sense.
 
-## Examples of Distribution Shift
+## Examples
 
 Before delving into formalism and algorithms,
 we can discuss some concrete situations
@@ -286,9 +286,11 @@ Below are some typical cases.
 
 
 
-## Correction of Distribution Shift
 
-In short, there are many cases
+
+## Correction
+
+As we have discussed, there are many cases
 where training and test distributions
 $P(\mathbf{x}, y)$ are different.
 In some cases, we get lucky and the models work
@@ -299,6 +301,44 @@ The remainder of this section grows considerably more technical.
 The impatient reader could continue on to the next section
 as this material is not prerequisite to subsequent concepts.
 
+### Empirical Risk and True Risk
+
+Let us first reflect about what exactly
+is happening during model training:
+we iterate over features and associated labels
+of training data
+$\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$
+and update the parameters of a model $f$ after every minibatch.
+For simplicity we do not consider regularization,
+so we largely minimize the loss on the training:
+
+$$\mathop{\mathrm{minimize}}_f \frac{1}{n} \sum_{i=1}^n l(f(\mathbf{x}_i), y_i),$$
+:eqlabel:`eq_empirical-risk-min`
+
+where $l$ is the loss function
+measuring "how bad" the prediction $f(\mathbf{x}_i)$ is given the associated label $y_i$.
+Statisticians call the term in :eqref:`eq_empirical-risk-min` *empirical risk*.
+*Empirical risk* is an average loss over the training data
+to approximate the *true risk*, 
+which is the
+expectation of the loss over the entire population of data drawn from their true distribution 
+$p(\mathbf{x},y)$:
+
+$$E_{p(\mathbf{x}, y)} [l(f(\mathbf{x}), y)] = \int\int l(f(\mathbf{x}), y) p(\mathbf{x}, y) \;d\mathbf{x}dy.$$
+:eqlabel:`eq_true-risk`
+
+However, in practice we typically cannot obtain the entire population of data.
+Thus, *empirical risk minimization*,
+which is minimizing empirical risk in :eqref:`eq_empirical-risk-min`,
+is a practical strategy for machine learning,
+with the hope to approximate  
+minimizing true risk.
+
+
+
+
+
+
 ### Covariate Shift Correction
 :label:`subsec_covariate-shift-correction`
 
@@ -306,50 +346,35 @@ Assume that we want to estimate
 some dependency $P(y \mid \mathbf{x})$
 for which we have labeled data $(\mathbf{x}_i, y_i)$.
 Unfortunately, the observations $\mathbf{x}_i$ are drawn
-from some *source distribution* $q(\mathbf{x})$ (e.g., training set)
-rather than the *target distribution* $p(\mathbf{x})$ (e.g., test set).
-To make progress, we need to reflect about what exactly
-is happening during training:
-we iterate over training data and associated labels
-$\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$
-and update the parameters $\mathbf{\Theta}$ of the model after every minibatch.
-We sometimes additionally apply some penalty to the parameters,
-using weight decay, dropout, or some other related technique.
-This means that we largely minimize the loss on the training:
-
-$$\mathop{\mathrm{minimize}}_\mathbf{\Theta} \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}_i, y_i, \mathbf{\Theta}) + \mathrm{some~penalty}(\mathbf{\Theta}),$$
-:eqlabel:`eq_regularized-empirical-risk-min`
-
-where $l(\mathbf{x}_i, y_i, \mathbf{\Theta})$ is the individual loss for the model parameterized by $\mathbf{\Theta}$ on a single data point $(\mathbf{x}_i, y_i)$.
-Statisticians call the first term in :eqref:`eq_regularized-empirical-risk-min` *empirical risk*,
-i.e., an average computed over the data drawn from $P(\mathbf{x}) P(y \mid \mathbf{x})$ (e.g., training set).
-Without considering the penalty term,
-minimizing the first term in :eqref:`eq_regularized-empirical-risk-min`
-is called *empirical risk minimization*.
-If the data are drawn from the "wrong" distribution $q$,
-we can correct for that by using the following simple identity:
+from some *source distribution* $q(\mathbf{x})$ 
+rather than the *target distribution* $p(\mathbf{x})$.
+Fortunately,
+the dependency assumption indicates
+that $p(y \mid \mathbf{x}) = q(y \mid \mathbf{x})$.
+If the source distribution $q(\mathbf{x})$ is "wrong",
+we can correct for that by using the following simple identity in true risk:
 
 $$
 \begin{aligned}
-\int p(\mathbf{x}) f(\mathbf{x}) \;d\mathbf{x}
-& = \int q(\mathbf{x}) f(\mathbf{x}) \frac{p(\mathbf{x})}{q(\mathbf{x})} \;d\mathbf{x}.
+\int\int l(f(\mathbf{x}), y) p(y \mid \mathbf{x})p(\mathbf{x}) \;d\mathbf{x}dy = 
+\int\int l(f(\mathbf{x}), y) q(y \mid \mathbf{x})q(\mathbf{x})\frac{p(\mathbf{x})}{q(\mathbf{x})} \;d\mathbf{x}dy.
 \end{aligned}
 $$
 
 In other words, we need to reweigh each data point
-by the ratio of probabilities
-that it would have been drawn from the correct distribution
+by the ratio of the 
+probability
+that it would have been drawn from the correct distribution to that from the wrong one:
 
-$$\beta(\mathbf{x}) \stackrel{\mathrm{def}}{=} \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
+$$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(\mathbf{x}_i)}{q(\mathbf{x}_i)}.$$
 
 Plugging in the weight $\beta_i$ for
 each data point $(\mathbf{x}_i, y_i)$
 we can train our model using
-*weighted empirical risk minimization*
-with some penalty to the parameters:
+*weighted empirical risk minimization*:
 
-$$\mathop{\mathrm{minimize}}_\mathbf{\mathbf{\Theta}} \frac{1}{n} \sum_{i=1}^n \beta_i l(\mathbf{x}_i, y_i, \mathbf{\Theta}) + \mathrm{some~penalty}(\mathbf{\mathbf{\Theta}}).$$
-:eqlabel:`eq_regularized-weighted-empirical-risk-min`
+$$\mathop{\mathrm{minimize}}_f \frac{1}{n} \sum_{i=1}^n \beta_i l(f(\mathbf{x}_i), y_i).$$
+:eqlabel:`eq_weighted-empirical-risk-min`
 
 
 
@@ -383,7 +408,7 @@ On the other hand, any instances
 that can be well discriminated
 should be significantly overweighted
 or underweighted accordingly.
-For simplicity’s sake assume that we have
+For simplicity's sake assume that we have
 an equal number of instances from both distributions
 $p(\mathbf{x})$
 and $q(\mathbf{x})$, respectively.
@@ -394,32 +419,34 @@ Then the probability in a mixed dataset is given by
 $$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
 
 Thus, if we use a logistic regression approach,
-where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-f(\mathbf{x}))}$,
+where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-h(\mathbf{x}))}$ ($h$ is a parameterized function),
 it follows that
 
 $$
-\beta(\mathbf{x}) = \frac{1/(1 + \exp(-f(\mathbf{x})))}{\exp(-f(\mathbf{x}))/(1 + \exp(-f(\mathbf{x})))} = \exp(f(\mathbf{x})).
+\beta_i = \frac{1/(1 + \exp(-h(\mathbf{x}_i)))}{\exp(-h(\mathbf{x}_i))/(1 + \exp(-h(\mathbf{x}_i)))} = \exp(h(\mathbf{x}_i)).
 $$
 
 As a result, we need to solve two problems:
 first one to distinguish between
 data drawn from both distributions,
-and then a reweighted minimization problem
-in :eqref:`eq_regularized-weighted-empirical-risk-min`
-where we weigh terms by $\beta$.
-Here is a prototypical algorithm
-for that purpose
-that uses a training set $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ and an unlabeled test set $\{\mathbf{z}_1, \ldots, \mathbf{z}_m\}$:
+and then a weighted empirical risk minimization problem
+in :eqref:`eq_weighted-empirical-risk-min`
+where we weigh terms by $\beta_i$.
 
-1. Generate a binary-classification training set: $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{z}_1, 1), \ldots, (\mathbf{z}_m, 1)\}$.
-1. Train a binary classifier using logistic regression to get function $f$.
-1. Weigh training data using $\beta_i = \exp(f(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(f(\mathbf{x}_i)), c)$ for some constant $c$.
-1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ in :eqref:`eq_regularized-weighted-empirical-risk-min`.
-
-In the covariate shift correction,
+Now we are ready to describe a correction algorithm.
+Suppose that we have a training set $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ and an unlabeled test set $\{\mathbf{u}_1, \ldots, \mathbf{u}_m\}$.
+For covariate shift,
 we assume that $\mathbf{x}_i$ for all $1 \leq i \leq n$ are drawn from some source distribution
-and $\mathbf{z}_i$ for all $1 \leq i \leq m$
+and $\mathbf{u}_i$ for all $1 \leq i \leq m$
 are drawn from the target distribution.
+Here is a prototypical algorithm
+for correcting covariate shift:
+
+1. Generate a binary-classification training set: $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{u}_1, 1), \ldots, (\mathbf{u}_m, 1)\}$.
+1. Train a binary classifier using logistic regression to get function $h$.
+1. Weigh training data using $\beta_i = \exp(h(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(h(\mathbf{x}_i)), c)$ for some constant $c$.
+1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ in :eqref:`eq_weighted-empirical-risk-min`.
+
 Note that the above algorithm relies on a crucial assumption.
 For this scheme to work, we need that each data point
 in the target (e.g., test time) distribution
@@ -430,19 +457,37 @@ then the corresponding importance weight should be infinity.
 
 
 
+
+
 ### Label Shift Correction
 
 Assume that we are dealing with a
 classification task with $k$ categories.
-Staying consistent with the notation in :numref:`subsec_covariate-shift-correction`,
-denote by $q$ and $p$ the source distribution (e.g., training time) and target distribution (e.g., test time), respectively.
+Using the same notation in :numref:`subsec_covariate-shift-correction`,
+$q$ and $p$ are the source distribution (e.g., training time) and target distribution (e.g., test time), respectively.
 Assume that the distribution of labels shifts over time:
 $q(y) \neq p(y)$, but the class-conditional distribution
 stays the same: $q(\mathbf{x} \mid y)=p(\mathbf{x} \mid y)$.
+If the source distribution $q(y)$ is "wrong",
+we can correct for that 
+according to 
+the following identity in true risk
+as defined in 
+:eqref:`eq_true-risk`:
+
+$$
+\begin{aligned}
+\int\int l(f(\mathbf{x}), y) p(\mathbf{x} \mid y)p(y) \;d\mathbf{x}dy = 
+\int\int l(f(\mathbf{x}), y) q(\mathbf{x} \mid y)q(y)\frac{p(y)}{q(y)} \;d\mathbf{x}dy.
+\end{aligned}
+$$
+
+
+
 Here, our importance weights will correspond to the
 label likelihood ratios 
 
-$$\beta(y) \stackrel{\mathrm{def}}{=} \frac{p(y)}{q(y)}.$$
+$$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(y_i)}{q(y_i)}.$$
 
 One nice thing about label shift is that
 if we have a reasonably good model
@@ -481,12 +526,12 @@ and if the target data contain only categories
 that we have seen before,
 and if the label shift assumption holds in the first place
 (the strongest assumption here),
-then we can recover the test set label distribution
+then we can estimate the test set label distribution
 by solving a simple linear system 
 
 $$\mathbf{C} p(\mathbf{y}) = \mu(\hat{\mathbf{y}}),$$
 
-since $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ for all $1 \leq i \leq k$,
+because as an estimate $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ holds for all $1 \leq i \leq k$,
 where $p(y_j)$ is the $j^\mathrm{th}$ element of the $k$-dimensional label distribution vector $p(\mathbf{y})$.
 If our classifier is sufficiently accurate to begin with,
 then the confusion matrix $\mathbf{C}$ will be invertible,
@@ -494,11 +539,11 @@ and we get a solution $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\mathbf{y}})$.
 
 Because we observe the labels on the source data,
 it is easy to estimate the distribution $q(y)$.
-Then for any training example $i$ with label $y$,
-we can take the ratio of our estimates $\hat{p}(y)/\hat{q}(y)$
+Then for any training example $i$ with label $y_i$,
+we can take the ratio of our estimated $p(y_i)/q(y_i)$
 to calculate the weight $\beta_i$,
-and plug this into the weighted minimization problem
-in :eqref:`eq_regularized-weighted-empirical-risk-min`.
+and plug this into weighted empirical risk minimization
+in :eqref:`eq_weighted-empirical-risk-min`.
 
 
 
