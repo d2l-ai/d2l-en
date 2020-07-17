@@ -4,7 +4,7 @@
 KVStore is a place for data sharing. Think of it as a single object shared across different devices (GPUs and computers), where each device can push data in and pull data out.
 
 ## Initialization
-Let’s consider a simple example: initializing a (int, NDArray) pair into the store, and then pulling the value out:
+Let us consider a simple example: initializing a (int, NDArray) pair into the store, and then pulling the value out:
 
 ```{.python .input  n=1}
 from d2l import mxnet as d2l
@@ -68,7 +68,7 @@ print(a)
 
 ## Pull
 
-You’ve already seen how to pull a single key-value pair. Similarly, to push, you can pull the value onto several devices with a single call:
+You have already seen how to pull a single key-value pair. Similarly, to push, you can pull the value onto several devices with a single call:
 
 ```{.python .input  n=8}
 b = [np.ones(shape, ctx=ctx) for ctx in contexts]

@@ -7,7 +7,7 @@ We performed an experiment on the CIFAR-10 dataset in :numref:`sec_image_augment
 This is an important data
 set in the computer vision field. Now, we will apply the knowledge we learned in
 the previous sections in order to participate in the Kaggle competition, which
-addresses CIFAR-10 image classification problems. The competition’s web address
+addresses CIFAR-10 image classification problems. The competition's web address
 is
 
 > https://www.kaggle.com/c/cifar-10

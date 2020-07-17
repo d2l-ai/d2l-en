@@ -16,7 +16,7 @@ are more accurately described as cross correlations.
 In a convolutional layer, an input array
 and a *correlation kernel* array are combined
 to produce an output array through a cross-correlation operation.
-Let's ignore channels for now and see how this works
+Let us ignore channels for now and see how this works
 with two-dimensional data and hidden representations.
 In :numref:`fig_correlation`,
 the input is a two-dimensional array
@@ -189,7 +189,7 @@ class Conv2D(tf.keras.layers.Layer):
 
 ## Object Edge Detection in Images
 
-Let's take a moment to parse a simple application of a convolutional layer:
+Let us take a moment to parse a simple application of a convolutional layer:
 detecting the edge of an object in an image
 by finding the location of the pixel change.
 First, we construct an 'image' of $6\times 8$ pixels.

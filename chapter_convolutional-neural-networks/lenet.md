@@ -206,7 +206,7 @@ matches the number of classes.
 ## Data Acquisition and Training
 
 Now that we have implemented the model,
-let's run an experiment to see how LeNet fares on Fashion-MNIST.
+let us run an experiment to see how LeNet fares on Fashion-MNIST.
 
 ```{.python .input}
 #@tab all

@@ -204,7 +204,7 @@ is what statisticians view as complex,
 whereas one that has only a limited expressive power
 but still manages to explain the data well
 is probably closer to the truth.
-In philosophy, this is closely related to Popper’s
+In philosophy, this is closely related to Popper's
 criterion of falsifiability
 of a scientific theory: a theory is good if it fits data
 and if there are specific tests that can be used to disprove it.
@@ -350,7 +350,7 @@ we can use the squared error as our loss function.
 A higher-order polynomial function is more complex
 than a lower-order polynomial function,
 since the higher-order polynomial has more parameters
-and the model function’s selection range is wider.
+and the model function's selection range is wider.
 Fixing the training dataset,
 higher-order polynomial functions should always
 achieve lower (at worst, equal) training error
@@ -563,7 +563,7 @@ def train(train_features, test_features, train_labels, test_labels,
 ### Third-Order Polynomial Function Fitting (Normal)
 
 We will begin by first using a third-order polynomial function, which is the same order as that of the data generation function.
-The results show that this model’s training and test losses can be both effectively reduced.
+The results show that this model's training and test losses can be both effectively reduced.
 The learned model parameters are also close
 to the true values $w = [5, 1.2, -3.4, 5.6]$.
 
@@ -580,7 +580,7 @@ train(poly_features[:n_train, :4], poly_features[n_train:, :4],
 Let us take another look at linear function fitting.
 After the decline in early epochs,
 it becomes difficult to further decrease
-this model’s training loss.
+this model's training loss.
 After the last epoch iteration has been completed,
 the training loss is still high.
 When used to fit nonlinear patterns

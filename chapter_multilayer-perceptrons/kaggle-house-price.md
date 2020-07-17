@@ -250,7 +250,7 @@ print(train_data.shape)
 print(test_data.shape)
 ```
 
-Let’s take a look at the first $4$ and last $2$ features
+Let us take a look at the first $4$ and last $2$ features
 as well as the label (SalePrice) from the first $4$ examples:
 
 ```{.python .input}

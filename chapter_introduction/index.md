@@ -19,7 +19,7 @@ we'd have to step through every possible corner case
 that we anticipate encountering, devising appropriate rules.
 Each time a customer clicks to add an item to their shopping cart,
 we add an entry to the shopping cart database table,
-associating that user's ID with the requested product’s ID.
+associating that user's ID with the requested product's ID.
 While few developers ever get it completely right the first time
 (it might take some test runs to work out the kinks),
 for the most part, we could write such a program from first principles
@@ -692,7 +692,7 @@ Say our poison-detection classifier outputs
 $P(y=\mathrm{death cap}|\mathrm{image}) = 0.2$.
 In other words, the classifier is $80\%$ sure
 that our mushroom *is not* a death cap.
-Still, you'd have to be a fool to eat it.
+Still, you would have to be a fool to eat it.
 That is because the certain benefit of a delicious dinner
 is not worth a $20\%$ risk of dying from it.
 In other words, the effect of the *uncertain risk*
