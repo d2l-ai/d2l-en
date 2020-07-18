@@ -9,7 +9,7 @@ In this competition, we attempt to identify 120 different breeds of dogs. The da
 
 :numref:`fig_kaggle_dog` shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
-![Dog breed identification competition website. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.png)
+![Dog breed identification competition website. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.jpg)
 :width:`400px`
 :label:`fig_kaggle_dog`
 
@@ -45,7 +45,7 @@ You may have noticed that the above structure is quite similar to that of the CI
 Similarly, to make it easier to get started, we provide a small-scale sample of the dataset mentioned above, "train_valid_test_tiny.zip". If you are going to use the full dataset for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
 
 ```{.python .input  n=1}
-#@save 
+#@save
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 
@@ -69,7 +69,7 @@ def reorg_dog_data(data_dir, valid_ratio):
     labels = d2l.read_csv_labels(os.path.join(data_dir, 'labels.csv'))
     d2l.reorg_train_valid(data_dir, labels, valid_ratio)
     d2l.reorg_test(data_dir)
-    
+
 batch_size = 1 if demo else 128
 valid_ratio = 0.1
 reorg_dog_data(data_dir, valid_ratio)
@@ -127,11 +127,11 @@ Here, we create `DataLoader` instances, just like in :numref:`sec_kaggle_cifar10
 
 ```{.python .input}
 train_iter, train_valid_iter = [gluon.data.DataLoader(
-    dataset.transform_first(transform_train), batch_size, shuffle=True, 
+    dataset.transform_first(transform_train), batch_size, shuffle=True,
     last_batch='keep') for dataset in (train_ds, train_valid_ds)]
 
 valid_iter, test_iter = [gluon.data.DataLoader(
-    dataset.transform_first(transform_test), batch_size, shuffle=False, 
+    dataset.transform_first(transform_test), batch_size, shuffle=False,
     last_batch='keep') for dataset in (valid_ds, test_ds)]
 ```
 

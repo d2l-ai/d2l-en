@@ -852,7 +852,7 @@ detailed user activity and item characteristics into account
 when computing such scores. :numref:`fig_deeplearning_amazon` is an example
 of deep learning books recommended by Amazon based on personalization algorithms tuned to capture the author's preferences.
 
-![Deep learning books recommended by Amazon.](../img/deeplearning_amazon.png)
+![Deep learning books recommended by Amazon.](../img/deeplearning_amazon.jpg)
 :label:`fig_deeplearning_amazon`
 
 Despite their tremendous economic value, recommendation systems
