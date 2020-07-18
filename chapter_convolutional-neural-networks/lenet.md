@@ -58,7 +58,7 @@ These layers map spatially arranged inputs
 to a number of 2D feature maps, typically
 increasing the number of channels.
 The first convolutional layer has 6 output channels,
-while th second has 16.
+while the second has 16.
 Each $2\times2$ pooling operation (stride 2)
 reduces dimensionality by a factor of $4$ via spatial downsampling.
 The convolutional block emits an output with size given by
@@ -187,7 +187,7 @@ Note that the height and width of the representation
 at each layer throughout the convolutional block
 is reduced (compared to the previous layer).
 The first convolutional layer uses $2$ pixels of padding
-to compensate for the the reduction in height and width
+to compensate for the reduction in height and width
 that would otherwise result from using a $5 \times 5$ kernel.
 In contrast, the second convolutional layer foregoes padding,
 and thus the height and width are both reduced by $4$ pixels.
@@ -206,7 +206,7 @@ matches the number of classes.
 ## Data Acquisition and Training
 
 Now that we have implemented the model,
-let's run an experiment to see how LeNet fares on Fashion-MNIST.
+let us run an experiment to see how LeNet fares on Fashion-MNIST.
 
 ```{.python .input}
 #@tab all
@@ -237,19 +237,20 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
-        metric.add(d2l.accuracy(net(X), y), y.size)
+        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0]/metric[1]
 ```
 
 ```{.python .input}
 #@tab pytorch
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
+    net.eval()  # Set the model to evaluation mode
     if not device:
         device = next(iter(net.parameters())).device
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         X, y = X.to(device), y.to(device)
-        metric.add(d2l.accuracy(net(X), y), sum(y.shape))
+        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 ```
 
@@ -418,12 +419,12 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 1. Replace the average pooling with max pooling. What happens?
 1. Try to construct a more complex network based on LeNet to improve its accuracy.
-    * Adjust the convolution window size.
-    * Adjust the number of output channels.
-    * Adjust the activation function (ReLU?).
-    * Adjust the number of convolution layers.
-    * Adjust the number of fully connected layers.
-    * Adjust the learning rates and other training details (initialization, epochs, etc.)
+    1. Adjust the convolution window size.
+    1. Adjust the number of output channels.
+    1. Adjust the activation function (ReLU?).
+    1. Adjust the number of convolution layers.
+    1. Adjust the number of fully connected layers.
+    1. Adjust the learning rates and other training details (initialization, epochs, etc.)
 1. Try out the improved network on the original MNIST dataset.
 1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters, coats).
 

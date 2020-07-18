@@ -19,7 +19,7 @@ we'd have to step through every possible corner case
 that we anticipate encountering, devising appropriate rules.
 Each time a customer clicks to add an item to their shopping cart,
 we add an entry to the shopping cart database table,
-associating that user's ID with the requested product’s ID.
+associating that user's ID with the requested product's ID.
 While few developers ever get it completely right the first time
 (it might take some test runs to work out the kinks),
 for the most part, we could write such a program from first principles
@@ -608,7 +608,7 @@ where
 $$l(y, y') = \sum_i |y_i-y_i'|$$
 
 and the least mean squares loss, or
-L2 loss
+$L_2$ loss
 where
 
 $$l(y, y') = \sum_i (y_i - y_i')^2.$$
@@ -674,7 +674,7 @@ we call the problem *multiclass classification*.
 Common examples include hand-written character recognition
 `[0, 1, 2, 3 ... 9, a, b, c, ...]`.
 While we attacked regression problems by trying
-to minimize the L1 or L2 loss functions,
+to minimize the $L_1$ or $L_2$ loss functions,
 the common loss function for classification problems is called cross-entropy.
 
 Note that the most likely class is not necessarily
@@ -692,7 +692,7 @@ Say our poison-detection classifier outputs
 $P(y=\mathrm{death cap}|\mathrm{image}) = 0.2$.
 In other words, the classifier is $80\%$ sure
 that our mushroom *is not* a death cap.
-Still, you'd have to be a fool to eat it.
+Still, you would have to be a fool to eat it.
 That is because the certain benefit of a delicious dinner
 is not worth a $20\%$ risk of dying from it.
 In other words, the effect of the *uncertain risk*
@@ -852,7 +852,7 @@ detailed user activity and item characteristics into account
 when computing such scores. :numref:`fig_deeplearning_amazon` is an example
 of deep learning books recommended by Amazon based on personalization algorithms tuned to capture the author's preferences.
 
-![Deep learning books recommended by Amazon.](../img/deeplearning_amazon.png)
+![Deep learning books recommended by Amazon.](../img/deeplearning_amazon.jpg)
 :label:`fig_deeplearning_amazon`
 
 Despite their tremendous economic value, recommendation systems

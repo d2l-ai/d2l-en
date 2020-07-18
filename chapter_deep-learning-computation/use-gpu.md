@@ -365,8 +365,8 @@ It will make a copy and allocate new memory,
 even though that variable already lives on the desired device!
 There are times where, depending on the environment our code is running in,
 two variables may already live on the same device.
-So we only want to make a copy if the variables
-currently lives on different contexts.
+So we want to make a copy only if the variables
+currently live in different contexts.
 In these cases, we can call `as_in_ctx()`.
 If the variable already live in the specified context
 then this is a no-op.
@@ -423,7 +423,7 @@ As a rule of thumb, many small operations
 are much worse than one big operation.
 Moreover, several operations at a time
 are much better than many single operations interspersed in the code
-(unless you know what you are doing)
+(unless you know what you are doing).
 This is the case since such operations can block if one device
 has to wait for the other before it can do something else.
 It is a bit like ordering your coffee in a queue

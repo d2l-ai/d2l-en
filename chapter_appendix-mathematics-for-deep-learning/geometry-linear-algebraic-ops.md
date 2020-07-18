@@ -169,6 +169,19 @@ def angle(v, w):
 angle(torch.tensor([0, 1, 2], dtype=torch.float32), torch.tensor([2.0, 3, 4]))
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from IPython import display
+import tensorflow as tf
+
+def angle(v, w):
+    return tf.acos(tf.tensordot(v, w, axes=1) / (tf.norm(v) * tf.norm(w)))
+
+angle(tf.constant([0, 1, 2], dtype=tf.float32), tf.constant([2.0, 3, 4]))
+```
+
 We will not use it right now, but it is useful to know 
 that we will refer to vectors for which the angle is $\pi/2$ 
 (or equivalently $90^{\circ}$) as being *orthogonal*. 
@@ -329,22 +342,58 @@ ave_0 = torch.mean(X_train_0, axis=0)
 ave_1 = torch.mean(X_train_1, axis=0)
 ```
 
+
+```{.python .input}
+#@tab tensorflow
+# Load in the dataset
+(train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.fashion_mnist.load_data()
+
+
+X_train_0 = tf.cast(tf.stack(train_images[[i for i, label in enumerate(
+    train_labels) if label == 0]] * 256), dtype=tf.float32)
+X_train_1 = tf.cast(tf.stack(train_images[[i for i, label in enumerate(
+    train_labels) if label == 1]] * 256), dtype=tf.float32)
+X_test = tf.cast(tf.stack(test_images[[i for i, label in enumerate(
+    test_labels) if label == 0]] * 256), dtype=tf.float32)
+y_test = tf.cast(tf.stack(test_images[[i for i, label in enumerate(
+    test_labels) if label == 1]] * 256), dtype=tf.float32)
+
+# Compute averages
+ave_0 = tf.reduce_mean(X_train_0, axis=0)
+ave_1 = tf.reduce_mean(X_train_1, axis=0)
+```
+
 It can be informative to examine these averages in detail, so let us plot what they look like.  In this case, we see that the average indeed resembles a blurry image of a t-shirt.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet, pytorch
 # Plot average t-shirt
 d2l.set_figsize()
 d2l.plt.imshow(ave_0.reshape(28, 28).tolist(), cmap='Greys')
 d2l.plt.show()
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Plot average t-shirt
+d2l.set_figsize()
+d2l.plt.imshow(tf.reshape(ave_0, (28, 28)), cmap='Greys')
+d2l.plt.show()
+```
+
 In the second case, we again see that the average resembles a blurry image of trousers.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet, pytorch
 # Plot average trousers
 d2l.plt.imshow(ave_1.reshape(28, 28).tolist(), cmap='Greys')
+d2l.plt.show()
+```
+
+```{.python .input}
+#@tab tensorflow
+# Plot average trousers
+d2l.plt.imshow(tf.reshape(ave_1, (28, 28)), cmap='Greys')
 d2l.plt.show()
 ```
 
@@ -368,6 +417,18 @@ predictions = X_test.reshape(2000, -1) @ (w.flatten()) > -1500000
 
 # Accuracy
 torch.mean(predictions.type(y_test.dtype) == y_test, dtype=torch.float64)
+```
+
+```{.python .input}
+#@tab tensorflow
+# Print test set accuracy with eyeballed threshold
+w = tf.transpose(ave_1 - ave_0)
+predictions = tf.matmul(tf.reshape(
+  X_test, y_test.shape), tf.nest.flatten(w)) > -1500000
+
+# Accuracy
+# TODO: Fix incorrect shape
+# tf.reduce_mean(predictions == y_test)
 ```
 
 ## Geometry of Linear Transformations
@@ -634,6 +695,13 @@ M_inv = torch.tensor([[2, -1], [-0.5, 0.5]])
 M_inv @ M
 ```
 
+```{.python .input}
+#@tab tensorflow
+M = tf.constant([[1, 2], [1, 4]], dtype=tf.float32)
+M_inv = tf.constant([[2, -1], [-0.5, 0.5]])
+tf.matmul(M_inv, M)
+```
+
 ### Numerical Issues
 While the inverse of a matrix is useful in theory, 
 we must say that most of the time we do not wish 
@@ -717,6 +785,11 @@ np.linalg.det(np.array([[1, -1], [2, 3]]))
 ```{.python .input}
 #@tab pytorch
 torch.det(torch.tensor([[1, -1], [2, 3]], dtype=torch.float32))
+```
+
+```{.python .input}
+#@tab tensorflow
+tf.linalg.det(tf.constant([[1, -1], [2, 3]], dtype=tf.float32))
 ```
 
 The eagle-eyed amongst us will notice 
@@ -846,7 +919,18 @@ v = torch.tensor([1, 2])
 A.shape, B.shape, v.shape
 ```
 
-Einstein summation has been implemented directly  via ```np.einsum``` or ```torch.einsum```. 
+```{.python .input}
+#@tab tensorflow
+# Define tensors
+B = tf.constant([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
+A = tf.constant([[1, 2], [3, 4]])
+v = tf.constant([1, 2])
+
+# Print out the shapes
+A.shape, B.shape, v.shape
+```
+
+Einstein summation has been implemented directly. 
 The indices that occurs in the Einstein summation can be passed as a string, 
 followed by the tensors that are being acted upon.
 For instance, to implement matrix multiplication,
@@ -863,6 +947,12 @@ np.einsum("ij, j -> i", A, v), A.dot(v)
 #@tab pytorch
 # Reimplement matrix multiplication
 torch.einsum("ij, j -> i", A, v), A@v
+```
+
+```{.python .input}
+#@tab tensorflow
+# Reimplement matrix multiplication
+tf.einsum("ij, j -> i", A, v), tf.matmul(A, tf.reshape(v, (2, 1)))
 ```
 
 This is a highly flexible notation.
@@ -884,6 +974,11 @@ np.einsum("ijk, il, j -> kl", B, A, v)
 torch.einsum("ijk, il, j -> kl", B, A, v)
 ```
 
+```{.python .input}
+#@tab tensorflow
+tf.einsum("ijk, il, j -> kl", B, A, v)
+```
+
 This notation is readable and efficient for humans,
 however bulky if for whatever reason 
 we need to generate a tensor contraction programmatically.
@@ -898,6 +993,11 @@ np.einsum(B, [0, 1, 2], A, [0, 3], v, [1], [2, 3])
 ```{.python .input}
 #@tab pytorch
 # PyTorch doesn't support this type of notation.
+```
+
+```{.python .input}
+#@tab tensorflow
+# TensorFlow doesn't support this type of notation.
 ```
 
 Either notation allows for concise and efficient representation of tensor contractions in code.

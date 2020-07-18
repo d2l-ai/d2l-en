@@ -7,7 +7,7 @@ We performed an experiment on the CIFAR-10 dataset in :numref:`sec_image_augment
 This is an important data
 set in the computer vision field. Now, we will apply the knowledge we learned in
 the previous sections in order to participate in the Kaggle competition, which
-addresses CIFAR-10 image classification problems. The competition’s web address
+addresses CIFAR-10 image classification problems. The competition's web address
 is
 
 > https://www.kaggle.com/c/cifar-10
@@ -289,7 +289,8 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
             l.backward()
             trainer.step(batch_size)
             train_l_sum += float(l)
-            train_acc_sum += float((y_hat.argmax(axis=1) == y).sum())
+            train_acc_sum += float(
+                (y_hat.argmax(axis=1).astype(y.dtype) == y).sum())
             n += y.size
         time_s = f'time {time.time() - start:.2f} sec'
         if valid_iter is not None:

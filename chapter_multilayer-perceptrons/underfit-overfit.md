@@ -148,7 +148,7 @@ Sometimes we can get away with minor violations of the i.i.d. assumption
 and our models will continue to work remarkably well.
 After all, nearly every real-world application
 involves at least some minor violation of the i.i.d. assumption,
-and yet we have many useful tools for 
+and yet we have many useful tools for
 various applications such as
 face recognition,
 speech recognition, and language translation.
@@ -204,7 +204,7 @@ is what statisticians view as complex,
 whereas one that has only a limited expressive power
 but still manages to explain the data well
 is probably closer to the truth.
-In philosophy, this is closely related to Popper’s
+In philosophy, this is closely related to Popper's
 criterion of falsifiability
 of a scientific theory: a theory is good if it fits data
 and if there are specific tests that can be used to disprove it.
@@ -350,7 +350,7 @@ we can use the squared error as our loss function.
 A higher-order polynomial function is more complex
 than a lower-order polynomial function,
 since the higher-order polynomial has more parameters
-and the model function’s selection range is wider.
+and the model function's selection range is wider.
 Fixing the training dataset,
 higher-order polynomial functions should always
 achieve lower (at worst, equal) training error
@@ -454,22 +454,15 @@ The value 1 is technically a feature,
 namely the constant feature corresponding to the bias.
 
 ```{.python .input}
+#@tab pytorch, tensorflow
+# Convert from NumPy ndarrays to tensors
+true_w, features, poly_features, labels = [d2l.tensor(x, dtype=
+    d2l.float32) for x in [true_w, features, poly_features, labels]]
+```
+
+```{.python .input}
 #@tab all
-features[:2].T, poly_features[:2, :], labels[:2]
-```
-
-```{.python .input}
-#@tab pytorch
-# Convert from NumPy to PyTorch tensors
-true_w, features, poly_features, labels = [torch.from_numpy(x).type(
-    torch.float32) for x in [true_w, features, poly_features, labels]]
-```
-
-```{.python .input}
-#@tab tensorflow
-# Convert from NumPy to TensorFlow tensors
-true_w, features, poly_features, labels = [tf.constant(x, dtype=tf.float32)
-    for x in [true_w, features, poly_features, labels]]
+features[:2], poly_features[:2, :], labels[:2]
 ```
 
 ### Training and Testing the Model
@@ -477,33 +470,13 @@ true_w, features, poly_features, labels = [tf.constant(x, dtype=tf.float32)
 Let us first implement a function to evaluate the loss on a given dataset.
 
 ```{.python .input}
-def evaluate_loss(net, data_iter, loss):  #@save
-    """Evaluate the loss of a model on the given dataset."""
-    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
-    for X, y in data_iter:
-        metric.add(loss(net(X), y).sum(), y.size)
-    return metric[0] / metric[1]
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
         l = loss(net(X), y)
-        metric.add(l.sum(), l.numel())
-    return metric[0] / metric[1]
-```
-
-```{.python .input}
-#@tab tensorflow
-def evaluate_loss(net, data_iter, loss):  #@save
-    """Evaluate the loss of a model on the given dataset."""
-    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
-    for X, y in data_iter:
-        l = loss(net(X), y)
-        metric.add(tf.reduce_sum(l), tf.size(l).numpy())
+        metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 ```
 
@@ -590,7 +563,7 @@ def train(train_features, test_features, train_labels, test_labels,
 ### Third-Order Polynomial Function Fitting (Normal)
 
 We will begin by first using a third-order polynomial function, which is the same order as that of the data generation function.
-The results show that this model’s training and test losses can be both effectively reduced.
+The results show that this model's training and test losses can be both effectively reduced.
 The learned model parameters are also close
 to the true values $w = [5, 1.2, -3.4, 5.6]$.
 
@@ -607,7 +580,7 @@ train(poly_features[:n_train, :4], poly_features[n_train:, :4],
 Let us take another look at linear function fitting.
 After the decline in early epochs,
 it becomes difficult to further decrease
-this model’s training loss.
+this model's training loss.
 After the last epoch iteration has been completed,
 the training loss is still high.
 When used to fit nonlinear patterns
@@ -616,9 +589,9 @@ linear models are liable to underfit.
 
 ```{.python .input}
 #@tab all
-# Pick from the original `features` for linear function fitting
-train(features[:n_train, :], features[n_train:, :], labels[:n_train],
-      labels[n_train:])
+# Pick the first two dimensions, i.e., 1, x, from the polynomial features
+train(poly_features[:n_train, :2], poly_features[n_train:, :2],
+      labels[:n_train], labels[n_train:])
 ```
 
 ### Higher-Order Polynomial Function Fitting  (Overfitting)

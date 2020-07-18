@@ -256,12 +256,12 @@ _, content_Y = get_contents(image_shape, ctx)
 _, style_Y = get_styles(image_shape, ctx)
 X = preprocess(postprocess(output) * 255, image_shape)
 output = train(X, content_Y, style_Y, ctx, 0.01, 300, 100)
-d2l.plt.imsave('../img/neural-style.png', postprocess(output).asnumpy())
+d2l.plt.imsave('../img/neural-style.jpg', postprocess(output).asnumpy())
 ```
 
 As you can see, each epoch takes more time due to the larger image size. As shown in :numref:`fig_style_transfer_large`, the composite image produced retains more detail due to its larger size. The composite image not only has large blocks of color like the style image, but these blocks even have the subtle texture of brush strokes.
 
-![$900 \times 600$ composite image. ](../img/neural-style.png)
+![$900 \times 600$ composite image. ](../img/neural-style.jpg)
 :width:`500px`
 :label:`fig_style_transfer_large`
 

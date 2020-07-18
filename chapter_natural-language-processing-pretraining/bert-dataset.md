@@ -65,7 +65,7 @@ we begin by implementing helper functions for the two BERT pretraining tasks:
 next sentence prediction and masked language modeling.
 These helper functions will be invoked later
 when transforming the raw text corpus
-into the the dataset of the ideal format to pretrain BERT.
+into the dataset of the ideal format to pretrain BERT.
 
 ### Generating the Next Sentence Prediction Task
 

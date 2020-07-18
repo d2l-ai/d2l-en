@@ -34,6 +34,7 @@ Different choices of the score function lead to different attention layers. Belo
 
 ```{.python .input  n=1}
 import math
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -41,6 +42,7 @@ npx.set_np()
 
 ```{.python .input}
 #@tab pytorch
+from d2l import torch as d2l
 import math
 import torch
 from torch import nn
@@ -84,9 +86,7 @@ def masked_softmax(X, valid_len):
         else:
             valid_len = valid_len.reshape(-1)
         # Fill masked elements with a large negative, whose exp is 0
-        X = X.reshape(-1, shape[-1])
-        for count, row in enumerate(X):
-            row[int(valid_len[count]):]=-1e6
+        X = d2l.sequence_mask(X.reshape(-1, shape[-1]), valid_len, value=-1e6)
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 ```
 
@@ -106,12 +106,12 @@ Moreover, the second operator `batch_dot` takes two inputs $X$ and $Y$ with shap
 $$Z[i,:,:] = X[i,:,:]  Y[i,:,:].$$
 
 ```{.python .input  n=4}
-npx.batch_dot(np.ones((2, 1, 3)), np.ones((2, 3, 2)))
+npx.batch_dot(d2l.ones((2, 1, 3)), d2l.ones((2, 3, 2)))
 ```
 
 ```{.python .input}
 #@tab pytorch
-torch.bmm(torch.ones(2,1,3), torch.ones(2,3,2))
+torch.bmm(d2l.ones(2,1,3), d2l.ones(2,3,2))
 ```
 
 ## Dot Product Attention
@@ -174,18 +174,18 @@ we specify that we will check the first $2$ key-value pairs for the first batch 
 ```{.python .input  n=6}
 atten = DotProductAttention(dropout=0.5)
 atten.initialize()
-keys = np.ones((2, 10, 2))
+keys = d2l.ones((2, 10, 2))
 values = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)
-atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
+atten(d2l.ones((2, 1, 2)), keys, values, np.array([2, 6]))
 ```
 
 ```{.python .input}
 #@tab pytorch
 atten = DotProductAttention(dropout=0.5)
 atten.eval()
-keys = torch.ones(2,10,2)
+keys = d2l.ones(2,10,2)
 values = torch.arange(40, dtype=torch.float32).reshape(1,10,4).repeat(2,1,1)
-atten(torch.ones(2,1,2), keys, values, torch.tensor([2, 6]))
+atten(d2l.ones(2,1,2), keys, values, torch.tensor([2, 6]))
 ```
 
 As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension.
@@ -252,14 +252,14 @@ To test the above `MLPAttention` class, we use the same inputs as in the previou
 ```{.python .input  n=8}
 atten = MLPAttention(units=8, dropout=0.1)
 atten.initialize()
-atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
+atten(d2l.ones((2, 1, 2)), keys, values, np.array([2, 6]))
 ```
 
 ```{.python .input}
 #@tab pytorch
 atten = MLPAttention(key_size=2, query_size=2, units=8, dropout=0.1)
 atten.eval()
-atten(torch.ones(2, 1, 2), keys, values, torch.tensor([2, 6]))
+atten(d2l.ones(2, 1, 2), keys, values, torch.tensor([2, 6]))
 ```
 
 ## Summary

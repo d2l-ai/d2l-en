@@ -46,11 +46,7 @@ net.initialize(init.Normal(sigma=0.01))
 
 ```{.python .input}
 #@tab pytorch
-class Reshape(torch.nn.Module):
-    def forward(self, x):
-        return x.view(-1,784)
-
-net = nn.Sequential(Reshape(),
+net = nn.Sequential(nn.Flatten(),
                     nn.Linear(784, 256),
                     nn.ReLU(),
                     nn.Linear(256, 10))
@@ -77,28 +73,28 @@ matters concerning the model architecture
 from orthogonal considerations.
 
 ```{.python .input}
-batch_size, num_epochs = 256, 10
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+batch_size, lr, num_epochs = 256, 0.1, 10
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.5})
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
 ```
 
 ```{.python .input}
 #@tab pytorch
-num_epochs, lr, batch_size = 10, 0.5, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+batch_size, lr, num_epochs = 256, 0.1, 10
 loss = nn.CrossEntropyLoss()
 trainer = torch.optim.SGD(net.parameters(), lr=lr)
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-num_epochs, lr, batch_size = 10, 0.5, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+batch_size, lr, num_epochs = 256, 0.1, 10
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 trainer = tf.keras.optimizers.SGD(learning_rate=lr)
+```
+
+```{.python .input}
+#@tab all
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
@@ -109,7 +105,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 ## Exercises
 
-1. Try adding different numbers of hidden layers. What setting (keeping other hyperparameters constant) works best?
+1. Try adding different numbers of hidden layers (you may also modify the learning rate). What setting works best? 
 1. Try out different activation functions. Which one works best?
 1. Try different schemes for initializing the weights. What method works best?
 

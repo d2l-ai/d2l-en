@@ -90,7 +90,7 @@ We can sample an array of arbitrary shape from a Bernoulli random variable as fo
 The next commonly random variable encountered is a discrete uniform.  For our discussion here, we will assume that it is supported on the integers $\{1, 2, \ldots, n\}$, however any other set of values can be freely chosen.  The meaning of the word *uniform* in this context is that every possible value is equally likely.  The probability for each value $i \in \{1, 2, 3, \ldots, n\}$ is $p_i = \frac{1}{n}$.  We will denote a random variable $X$ with this distribution as
 
 $$
-X \sim \mathrm{Uniform}(n).
+X \sim U(n).
 $$
 
 The cumulative distribution function is 
@@ -131,7 +131,7 @@ def F(x):
 d2l.plot(x, torch.tensor([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-If $X \sim \mathrm{Uniform}(n)$, then:
+If $X \sim U(n)$, then:
 
 * $\mu_X = \frac{1+n}{2}$,
 * $\sigma_X^2 = \frac{n^2-1}{12}$.
@@ -152,7 +152,7 @@ torch.randint(1, n, size=(10, 10))
 Next, let us discuss the continuous uniform distribution. The idea behind this random variable is that if we increase the $n$ in the discrete uniform distribution, and then scale it to fit within the interval $[a, b]$, we will approach a continuous random variable that just picks an arbitrary value in $[a, b]$ all with equal probability.  We will denote this distribution as
 
 $$
-X \sim \mathrm{Uniform}([a, b]).
+X \sim U(a, b).
 $$
 
 The probability density function is 
@@ -202,12 +202,12 @@ def F(x):
 d2l.plot(x, torch.tensor([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-If $X \sim \mathrm{Uniform}([a, b])$, then:
+If $X \sim U(a, b)$, then:
 
 * $\mu_X = \frac{a+b}{2}$,
 * $\sigma_X^2 = \frac{(b-a)^2}{12}$.
 
-We can sample an array of arbitrary shape from a uniform random variable as follows.  Note that it by default samples from a $\mathrm{Uniform}([0,1])$, so if we want a different range we need to scale it.
+We can sample an array of arbitrary shape from a uniform random variable as follows.  Note that it by default samples from a $U(0,1)$, so if we want a different range we need to scale it.
 
 ```{.python .input}
 (b - a) * np.random.rand(10, 10) + a
@@ -552,6 +552,75 @@ np.random.normal(mu, sigma, size=(10, 10))
 torch.normal(mu, sigma, size=(10, 10))
 ```
 
+## Exponential Family
+:label:`subsec_exponential_family`
+
+One shared property for all the distributions listed above is that they all 
+belong to which is known as the *exponential family*. The exponential family 
+is a set of distributions whose density can be expressed in the following 
+form:
+
+$$p(\mathbf{x} | \mathbf{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \big{(} \eta^{\top} \cdot T\mathbf(x) - A(\mathbf{\eta}) \big{)}$$
+:eqlabel:`eq_exp_pdf`
+
+As this definition can be a little subtle, let us examine it closely.  
+
+First, $h(\mathbf{x})$ is known as the *underlying measure* or the 
+*base measure*.  This can be viewed as an original choice of measure we are 
+modifying with our exponential weight.  
+
+Second, we have the vector $\mathbf{\eta} = (\eta_1, \eta_2, ..., \eta_l) \in 
+\mathbb{R}^l$ called the *natural parameters* or *canonical parameters*.  These
+define how the base measure will be modified.  The natural parameters enter 
+into the new measure by taking the dot product of these parameters against 
+some function $T(\cdot)$ of $\mathbf{x}= (x_1, x_2, ..., x_n) \in 
+\mathbb{R}^n$ and exponentiated. $T(\mathbf{x})= (T_1(\mathbf{x}), 
+T_2(\mathbf{x}), ..., T_l(\mathbf{x}))$ 
+is called the *sufficient statistics* for $\eta$. This name is used since the 
+information represented by $T(\mathbf{x})$ is sufficient to calculate the 
+probability density and no other information from the sample $\mathbf{x}$'s 
+are required.
+
+Third, we have $A(\mathbf{\eta})$, which is referred to as the *cumulant 
+function*, which ensures that the above distribution :eqref:`eq_exp_pdf` 
+integrates to one, i.e.,
+
+$$  A(\mathbf{\eta}) = \log \left[\int h(\mathbf{x}) \cdot \mathrm{exp} 
+\big{(}\eta^{\top} \cdot T\mathbf(x) \big{)} dx \right].$$
+
+To be concrete, let us consider the Gaussian. Assuming that $\mathbf{x}$ is 
+an univariate variable, we saw that it had a density of
+
+$$
+\begin{aligned}
+p(x | \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \mathrm{exp} 
+\Big{\{} \frac{-(x-\mu)^2}{2 \sigma^2} \Big{\}} \\
+&= \frac{1}{\sqrt{2 \pi}} \cdot \mathrm{exp} \Big{\{} \frac{\mu}{\sigma^2}x 
+- \frac{1}{2 \sigma^2} x^2 - \big{(} \frac{1}{2 \sigma^2} \mu^2 
++ \log(\sigma) \big{)} \Big{\}} .
+\end{aligned}
+$$
+
+This matches the definition of the exponential family with:
+
+* *underlying measure*: $h(x) = \frac{1}{\sqrt{2 \pi}}$,
+* *natural parameters*: $\eta = \begin{bmatrix} \eta_1 \\ \eta_2 
+\end{bmatrix} = \begin{bmatrix} \frac{\mu}{\sigma^2} \\ 
+\frac{1}{2 \sigma^2}  \end{bmatrix}$,
+* *sufficient statistics*: $T(x) = \begin{bmatrix}x\\-x^2\end{bmatrix}$, and
+* *cumulant function*: $A(\eta) = \frac{1}{2 \sigma^2} \mu^2 + \log(\sigma)  
+= \frac{\eta_1^2}{4 \eta_2} - \frac{1}{2}\log(2 \eta_2)$.
+
+It is worth noting that the exact choice of each of above terms is somewhat 
+arbitrary.  Indeed, the important feature is that the distribution can be 
+expressed in this form, not the exact form itself.
+
+As we allude to in :numref:`subsec_softmax_and_derivatives`, a widely used 
+technique is to assume that the  final output $\mathbf{y}$ follows an 
+exponential family distribution. The exponential family is a common and 
+powerful family of distributions encountered frequently in machine learning.
+
+
 ## Summary
 * Bernoulli random variables can be used to model events with a yes/no outcome.
 * Discrete uniform distributions model selects from a finite set of possibilities.
@@ -559,6 +628,7 @@ torch.normal(mu, sigma, size=(10, 10))
 * Binomial distributions model a series of Bernoulli random variables, and count the number of successes.
 * Poisson random variables model the arrival of rare events.
 * Gaussian random variables model the result of adding a large number of independent random variables together.
+* All the above distributions belong to exponential family.
 
 ## Exercises
 

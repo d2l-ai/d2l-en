@@ -9,8 +9,8 @@ For instance, researchers have invented layers
 specifically for handling images, text,
 looping over sequential data,
 performing dynamic programming, etc.
-Sooner or later you will encounter (or invent)
-a layer that does not exist yet in the framework,
+Sooner or later, you will encounter (or invent)
+a layer that does not exist yet in the framework.
 In these cases, you must build a custom layer.
 In this section, we show you how.
 
@@ -136,7 +136,7 @@ sharing, saving, and loading model parameters.
 This way, among other benefits, we will not need to write
 custom serialization routines for every custom layer.
 
-Now let's implement our own version of fully-connected layer.
+Now let us implement our own version of fully-connected layer.
 Recall that this layer requires two parameters,
 one to represent the weight and another for the bias.
 In this implementation, we bake in the ReLU activation as a default.
