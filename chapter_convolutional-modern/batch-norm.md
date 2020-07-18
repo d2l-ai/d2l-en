@@ -26,8 +26,8 @@ when training ML models and neural nets in particular.
    was to standardize our input features
    to each have a mean of *zero* and variance of *one*.
    Intuitively, this standardization plays nicely with our optimizers
-   because it puts the  parameters are a-priori at a similar scale.
-1. For a typical MLP or CNN, as we train,
+   because it puts the parameters a-priori at a similar scale.
+2. For a typical MLP or CNN, as we train,
    the activations in intermediate layers
    may take values with widely varying magnitudes—both
    along the layers from the input to the output,
@@ -39,7 +39,7 @@ when training ML models and neural nets in particular.
    Intuitively, we might conjecture that if one
    layer has activation values that are 100x that of another layer,
    this might necessitate compensatory adjustments in the learning rates.
-1. Deeper networks are complex and easily capable of overfitting.
+3. Deeper networks are complex and easily capable of overfitting.
    This means that regularization becomes more critical.
 
 Batch normalization is applied to individual layers
@@ -603,7 +603,7 @@ def net():
     ])
 ```
 
-Below, we use the same hyper-parameters to train out model.
+Below, we use the same hyperparameters to train out model.
 Note that as usual, the high-level API variant runs much faster
 because its code has been compiled to C++/CUDA
 while our custom implementation must be interpreted by Python.
@@ -623,7 +623,7 @@ for the phenomena that we observe when training deep models.
 Recall that we do not even know why simpler
 deep neural networks (MLPs and conventional CNNs)
 generalize well in the first place.
-Even with dropout and L2 regularization,
+Even with dropout and $L_2$ regularization,
 they remain so flexible that their ability to generalize to unseen data
 cannot be explained via conventional learning-theoretic generalization guarantees.
 

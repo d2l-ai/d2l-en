@@ -42,7 +42,7 @@ d2l.use_svg_display()
 
 ## Reading the Dataset
 
-We can download and read the Fashion-MNIST dataset into memory via the the build-in functions in the framework.
+We can download and read the Fashion-MNIST dataset into memory via the build-in functions in the framework.
 
 ```{.python .input}
 mnist_train = gluon.data.vision.FashionMNIST(train=True)
@@ -67,7 +67,8 @@ mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
 ```
 
 Fashion-MNIST consists of images from 10 categories, each represented
-by 6000 images in the training set and by 1000 in the test set.
+by 6000 images in the training dataset and by 1000 in the test dataset.
+A *test dataset* (or *test set*) is used for evaluating  model performance and not for training.
 Consequently the training set and the test set
 contain 60000 and 10000 images, respectively.
 
@@ -87,12 +88,7 @@ For brevity, throughout this book
 we store the shape of any image with height $h$ width $w$ pixels as $h \times w$ or ($h$, $w$).
 
 ```{.python .input}
-#@tab mxnet, pytorch
-mnist_train[0][0].shape
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 mnist_train[0][0].shape
 ```
 
@@ -152,7 +148,7 @@ show_images(X, 2, 9, titles=get_fashion_mnist_labels(y));
 
 To make our life easier when reading from the training and test sets,
 we use the built-in data iterator rather than creating one from scratch.
-Recall that at each iteration, a load loader
+Recall that at each iteration, a data loader
 reads a minibatch of data with size `batch_size` each time.
 We also randomly shuffle the examples for the training data iterator.
 

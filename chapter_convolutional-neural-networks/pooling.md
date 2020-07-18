@@ -97,33 +97,27 @@ of the pooling layer in the `pool2d` function.
 This function is similar to the `corr2d` function
 in :numref:`sec_conv_layer`.
 However, here we have no kernel, computing the output
-as either the max or the average of each region in the input..
+as either the max or the average of each region in the input.
 
 ```{.python .input}
+from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
-
-def pool2d(X, pool_size, mode='max'):
-    p_h, p_w = pool_size
-    Y = np.zeros((X.shape[0] - p_h + 1, X.shape[1] - p_w + 1))
-    for i in range(Y.shape[0]):
-        for j in range(Y.shape[1]):
-            if mode == 'max':
-                Y[i, j] = np.max(X[i: i + p_h, j: j + p_w])
-            elif mode == 'avg':
-                Y[i, j] = X[i: i + p_h, j: j + p_w].mean()
-    return Y
 ```
 
 ```{.python .input}
 #@tab pytorch
+from d2l import torch as d2l
 import torch
 from torch import nn
+```
 
+```{.python .input}
+#@tab mxnet, pytorch
 def pool2d(X, pool_size, mode='max'):
     p_h, p_w = pool_size
-    Y = torch.zeros((X.shape[0] - p_h + 1, X.shape[1] - p_w + 1))
+    Y = d2l.zeros((X.shape[0] - p_h + 1, X.shape[1] - p_w + 1))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
             if mode == 'max':
@@ -152,19 +146,8 @@ def pool2d(X, pool_size, mode='max'):
 We can construct the input array `X` in the above diagram to validate the output of the two-dimensional maximum pooling layer.
 
 ```{.python .input}
-X = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
-pool2d(X, (2, 2))
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=torch.float32)
-pool2d(X, (2, 2))
-```
-
-```{.python .input}
-#@tab tensorflow
-X = tf.constant([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=tf.float32)
+#@tab all
+X = d2l.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])
 pool2d(X, (2, 2))
 ```
 
@@ -187,23 +170,14 @@ We first construct an input data of shape `(1, 1, 4, 4)`,
 where the first two dimensions are batch and channel.
 
 ```{.python .input}
-X = np.arange(16).reshape(1, 1, 4, 4)
+#@tab mxnet, pytorch
+X = d2l.reshape(d2l.arange(16, dtype=d2l.float32), (1, 1, 4, 4))
 X
 ```
 
 ```{.python .input}
-#@tab pytorch
-X = torch.arange(16, dtype=torch.float32).reshape((1, 1, 4, 4))
-print(X)
-```
-
-```{.python .input}
 #@tab tensorflow
-# Note that TensorFlow has default data format "channels_last" which
-# corresponds to inputs with shape " so here the shape (batch_size, height,
-# width, channels) so here the shape should be (1, 4, 4, 1) instead of
-# (1, 1, 4, 4).
-X = tf.reshape(tf.range(16, dtype=tf.float32), (1, 4, 4, 1))
+X = d2l.reshape(d2l.arange(16, dtype=d2l.float32), (1, 4, 4, 1))
 X
 ```
 
@@ -284,19 +258,14 @@ Below, we will concatenate arrays `X` and `X+1`
 on the channel dimension to construct an input with 2 channels.
 
 ```{.python .input}
-X = np.concatenate((X, X + 1), axis=1)
-X
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.cat((X, X + 1), dim=1)
+#@tab mxnet, pytorch
+X = d2l.concat((X, X + 1), 1)
 X
 ```
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.reshape(tf.stack([X, X+1], axis=0), (1, 2, 4, 4))
+X = tf.reshape(tf.stack([X, X+1], 0), (1, 2, 4, 4))
 ```
 
 As we can see, the number of output channels is still 2 after pooling.

@@ -18,6 +18,9 @@ csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other
 formats may be processed in similar ways.
 The following `mkdir_if_not_exist`
 function ensures that the directory `../data` exists.
+Note that the comment `#@save` is a special mark where the following function,
+class, or statements are saved in the `d2l` package
+so later they can be directly invoked (e.g., `d2l.mkdir_if_not_exist(path)`) without being redefined.
 
 ```{.python .input}
 #@tab all
@@ -39,7 +42,7 @@ data_file = '../data/house_tiny.csv'
 mkdir_if_not_exist('../data')
 with open(data_file, 'w') as f:
     f.write('NumRooms,Alley,Price\n')  # Column names
-    f.write('NA,Pave,127500\n')  # Each row is a data instance
+    f.write('NA,Pave,127500\n')  # Each row represents a data point
     f.write('2,NA,106000\n')
     f.write('4,NA,178100\n')
     f.write('NA,NA,140000\n')

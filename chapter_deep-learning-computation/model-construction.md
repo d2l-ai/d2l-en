@@ -729,7 +729,7 @@ to learn about compilation after finishing the current chapter.
 ## Exercises
 
 1. What kinds of problems will occur if you change `MySequential` to store blocks in a Python list.
-1. Implement a block that takes two blocks as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward pass (this is also called a parallel block).
+1. Implement a block that takes two blocks as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward propagation (this is also called a parallel block).
 1. Assume that you want to concatenate multiple instances of the same network. Implement a factory function that generates multiple instances of the same block and build a larger network from it.
 
 :begin_tab:`mxnet`

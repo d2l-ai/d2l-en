@@ -1,7 +1,7 @@
 # Dog Breed Identification (ImageNet Dogs) on Kaggle
 
 
-In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition’s web address is
+In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition's web address is
 
 > https://www.kaggle.com/c/dog-breed-identification
 
@@ -9,7 +9,7 @@ In this competition, we attempt to identify 120 different breeds of dogs. The da
 
 :numref:`fig_kaggle_dog` shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
-![Dog breed identification competition website. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.png)
+![Dog breed identification competition website. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.jpg)
 :width:`400px`
 :label:`fig_kaggle_dog`
 
@@ -45,7 +45,7 @@ You may have noticed that the above structure is quite similar to that of the CI
 Similarly, to make it easier to get started, we provide a small-scale sample of the dataset mentioned above, "train_valid_test_tiny.zip". If you are going to use the full dataset for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
 
 ```{.python .input  n=1}
-#@save 
+#@save
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 
@@ -69,7 +69,7 @@ def reorg_dog_data(data_dir, valid_ratio):
     labels = d2l.read_csv_labels(os.path.join(data_dir, 'labels.csv'))
     d2l.reorg_train_valid(data_dir, labels, valid_ratio)
     d2l.reorg_test(data_dir)
-    
+
 batch_size = 1 if demo else 128
 valid_ratio = 0.1
 reorg_dog_data(data_dir, valid_ratio)
@@ -127,11 +127,11 @@ Here, we create `DataLoader` instances, just like in :numref:`sec_kaggle_cifar10
 
 ```{.python .input}
 train_iter, train_valid_iter = [gluon.data.DataLoader(
-    dataset.transform_first(transform_train), batch_size, shuffle=True, 
+    dataset.transform_first(transform_train), batch_size, shuffle=True,
     last_batch='keep') for dataset in (train_ds, train_valid_ds)]
 
 valid_iter, test_iter = [gluon.data.DataLoader(
-    dataset.transform_first(transform_test), batch_size, shuffle=False, 
+    dataset.transform_first(transform_test), batch_size, shuffle=False,
     last_batch='keep') for dataset in (valid_ds, test_ds)]
 ```
 
@@ -188,7 +188,7 @@ def evaluate_loss(data_iter, net, ctx):
 
 ## Defining the Training Functions
 
-We will select the model and tune hyper-parameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
+We will select the model and tune hyperparameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
 
 ```{.python .input  n=7}
 def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
@@ -222,7 +222,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 
 ## Training and Validating the Model
 
-Now, we can train and validate the model. The following hyper-parameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
+Now, we can train and validate the model. The following hyperparameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
 
 ```{.python .input  n=9}
 ctx, num_epochs, lr, wd = d2l.try_gpu(), 1, 0.01, 1e-4
@@ -234,7 +234,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 
 ## Classifying the Testing Set and Submitting Results on Kaggle
 
-After obtaining a satisfactory model design and hyper-parameters, we use all training datasets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
+After obtaining a satisfactory model design and hyperparameters, we use all training datasets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
 
 ```{.python .input  n=8}
 net = get_net(ctx)

@@ -27,14 +27,6 @@ from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
 
 
-# Defined in file: ./chapter_preliminaries/ndarray.md
-numpy = lambda a: a.asnumpy()
-size = lambda a: a.size
-reshape = lambda a, *args: a.reshape(*args)
-ones = np.ones
-zeros = np.zeros
-
-
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
     """Make a directory if it does not exist."""
@@ -75,7 +67,7 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
-    """Plot data instances."""
+    """Plot data points."""
     if legend is None:
         legend = []
 
@@ -136,16 +128,16 @@ class Timer:  #@save
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
-    X = np.random.normal(0, 1, (num_examples, len(w)))
-    y = np.dot(X, w) + b
-    y += np.random.normal(0, 0.01, y.shape)
-    return X, y
+    X = d2l.normal(0, 1, (num_examples, len(w)))
+    y = d2l.matmul(X, w) + b
+    y += d2l.normal(0, 0.01, y.shape)
+    return X, d2l.reshape(y, (-1, 1))
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):  #@save
     """The linear regression model."""
-    return np.dot(X, w) + b
+    return d2l.matmul(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -217,8 +209,9 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = y_hat.argmax(axis=1)
-    return float((y_hat.astype(y.dtype) == y).sum())
+        y_hat = d2l.argmax(y_hat, axis=1)        
+    cmp = d2l.astype(y_hat, y.dtype) == y
+    return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -226,7 +219,7 @@ def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
-        metric.add(accuracy(net(X), y), sum(y.shape))
+        metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
@@ -328,17 +321,18 @@ def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
-    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
-    titles = [true + '\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+    preds = d2l.get_fashion_mnist_labels(d2l.argmax(net(X), axis=1))
+    titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
+    d2l.show_images(d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
-    metric = d2l.Accumulator(2)  # sum_loss, num_examples
+    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
-        metric.add(loss(net(X), y).sum(), y.size)
+        l = loss(net(X), y)
+        metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 
 
@@ -354,7 +348,7 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download(name, cache_dir=os.path.join('..', 'data')):  #@save
     """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
+    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}."
     url, sha1_hash = DATA_HUB[name]
     d2l.mkdir_if_not_exist(cache_dir)
     fname = os.path.join(cache_dir, url.split('/')[-1])
@@ -363,10 +357,11 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
         with open(fname, 'rb') as f:
             while True:
                 data = f.read(1048576)
-                if not data: break
+                if not data:
+                    break
                 sha1.update(data)
         if sha1.hexdigest() == sha1_hash:
-            return fname # Hit cache
+            return fname  # Hit cache
     print(f'Downloading {fname} from {url}...')
     r = requests.get(url, stream=True, verify=True)
     with open(fname, 'wb') as f:
@@ -385,14 +380,14 @@ def download_extract(name, folder=None):  #@save
     elif ext in ('.tar', '.gz'):
         fp = tarfile.open(fname, 'r')
     else:
-        assert False, 'Only zip/tar files can be extracted'
+        assert False, 'Only zip/tar files can be extracted.'
     fp.extractall(base_dir)
     return os.path.join(base_dir, folder) if folder else data_dir
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download_all():  #@save
-    """Download all files in the DATA_HUB"""
+    """Download all files in the DATA_HUB."""
     for name in DATA_HUB:
         download(name)
 
@@ -426,10 +421,10 @@ def try_all_gpus():  #@save
 def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
     h, w = K.shape
-    Y = np.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    Y = d2l.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
+            Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
     return Y
 
 
@@ -440,7 +435,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
-        metric.add(d2l.accuracy(net(X), y), y.size)
+        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0]/metric[1]
 
 
@@ -576,7 +571,7 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_random(corpus, batch_size, num_steps):
+def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
     # Offset the iterator over the data for uniform starts
     corpus = corpus[random.randint(0, num_steps):]
     # Subtract 1 extra since we need to account for label
@@ -595,17 +590,17 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
         batch_indices = example_indices[i:(i+batch_size)]
         X = [data(j) for j in batch_indices]
         Y = [data(j + 1) for j in batch_indices]
-        yield np.array(X), np.array(Y)
+        yield d2l.tensor(X), d2l.tensor(Y)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):
+def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data: ignore `num_steps` and just wrap around
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = np.array(corpus[offset:offset+num_indices])
-    Ys = np.array(corpus[offset+1:offset+1+num_indices])
+    Xs = d2l.tensor(corpus[offset:offset+num_indices])
+    Ys = d2l.tensor(corpus[offset+1:offset+1+num_indices])
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
@@ -615,7 +610,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-class SeqDataLoader:
+class SeqDataLoader:  #@save
     """A iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
@@ -630,17 +625,16 @@ class SeqDataLoader:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
-                           max_tokens=10000):
+def load_data_time_machine(batch_size, num_steps,  #@save
+                           use_random_iter=False, max_tokens=10000):
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
     return data_iter, data_iter.vocab
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-class RNNModelScratch:
+class RNNModelScratch:  #@save
     """A RNN Model based on scratch implementations."""
-
     def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -656,12 +650,10 @@ class RNNModelScratch:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_predicts, model, vocab, ctx):
+def predict_ch8(prefix, num_predicts, model, vocab, ctx):  #@save
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
-
-    def get_input():
-        return np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
+    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -672,7 +664,7 @@ def predict_ch8(prefix, num_predicts, model, vocab, ctx):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def grad_clipping(model, theta):
+def grad_clipping(model, theta):  #@save
     if isinstance(model, gluon.Block):
         params = [p.data() for p in model.collect_params().values()]
     else:
@@ -684,7 +676,7 @@ def grad_clipping(model, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
+def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):  #@save
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
@@ -708,7 +700,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
+def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,  #@save
               use_random_iter=False):
     # Initialize
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -718,16 +710,10 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
         model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
         trainer = gluon.Trainer(model.collect_params(),
                                 'sgd', {'learning_rate': lr})
-
-        def updater(batch_size):
-            return trainer.step(batch_size)
+        updater = lambda batch_size: trainer.step(batch_size)
     else:
-        def updater(batch_size):
-            return d2l.sgd(model.params, lr, batch_size)
-
-    def predict(prefix):
-        return predict_ch8(prefix, 50, model, vocab, ctx)
-
+        updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, ctx)
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
@@ -905,8 +891,7 @@ class Seq2SeqDecoder(d2l.Decoder):
     def forward(self, X, state):
         X = self.embedding(X).swapaxes(0, 1)
         out, state = self.rnn(X, state)
-        # Make the batch to be the first dimension to simplify loss
-        # computation
+        # Make the batch to be the first dimension to simplify loss computation
         out = self.dense(out).swapaxes(0, 1)
         return out, state
 
@@ -1177,13 +1162,13 @@ class TransformerEncoder(d2l.Encoder):
 
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
-def annotate(text, xy, xytext):
+def annotate(text, xy, xytext):  #@save
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
 
 
 # Defined in file: ./chapter_optimization/gd.md
-def train_2d(trainer, steps=20):
+def train_2d(trainer, steps=20):  #@save
     """Optimize a 2-dim objective function with a customized trainer."""
     # s1 and s2 are internal state variables and will
     # be used later in the chapter
@@ -1196,11 +1181,12 @@ def train_2d(trainer, steps=20):
 
 
 # Defined in file: ./chapter_optimization/gd.md
-def show_trace_2d(f, results):
+def show_trace_2d(f, results):  #@save
     """Show the trace of 2D variables during optimization."""
     d2l.set_figsize()
     d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
-    x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
+    x1, x2 = d2l.meshgrid(d2l.arange(-5.5, 1.0, 0.1),
+                          d2l.arange(-3.0, 1.0, 0.1))
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
@@ -2433,9 +2419,9 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
         x.extend([np.array(item_ids)])
         test_data_iter = gluon.data.DataLoader(
             gluon.data.ArrayDataset(*x), shuffle=False, last_batch="keep",
-            batch_size=1024) 
+            batch_size=1024)
         for index, values in enumerate(test_data_iter):
-            x = [gluon.utils.split_and_load(v, ctx, even_split=False) 
+            x = [gluon.utils.split_and_load(v, ctx, even_split=False)
                  for v in values]
             scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
         scores = [item for sublist in scores for item in sublist]
@@ -2450,7 +2436,7 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx_list, evaluator, 
+                  num_users, num_items, num_epochs, ctx_list, evaluator,
                   candidates, eval_step=1):
     timer, hit_rate, auc = d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
@@ -2463,7 +2449,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                 input_data.append(gluon.utils.split_and_load(v, ctx_list))
             with autograd.record():
                 p_pos = [net(*t) for t in zip(*input_data[0:-1])]
-                p_neg = [net(*t) for t in zip(*input_data[0:-2], 
+                p_neg = [net(*t) for t in zip(*input_data[0:-2],
                                               input_data[-1])]
                 ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]
@@ -2568,4 +2554,35 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+
+# Alias defined in config.ini
+size = lambda a: a.size
+transpose = lambda a: a.T
+
+ones = np.ones
+zeros = np.zeros
+arange = np.arange
+meshgrid = np.meshgrid
+sin = np.sin
+sinh = np.sinh
+cos = np.cos
+cosh = np.cosh
+tanh = np.tanh
+linspace = np.linspace
+exp = np.exp
+log = np.log
+tensor = np.array
+normal = np.random.normal
+matmul = np.dot
+int32 = np.int32
+float32 = np.float32
+concat = np.concatenate
+stack = np.stack
+abs = np.abs
+numpy = lambda x, *args, **kwargs: x.asnumpy(*args, **kwargs)
+reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
+to = lambda x, *args, **kwargs: x.as_in_context(*args, **kwargs)
+reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
+argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
+astype = lambda x, *args, **kwargs: x.astype(*args, **kwargs)
 

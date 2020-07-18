@@ -1,53 +1,53 @@
 # From Dense Layers to Convolutions
 
-The models that we have discussed so far 
+The models that we have discussed so far
 remain (to this day) appropriate options
 when we are dealing with tabular data.
 By *tabular*, we mean that the data consists
 of rows corresponding to examples
 and columns corresponding to features.
-With tabular data, we might anticipate 
-that the patterns we seek could involve 
+With tabular data, we might anticipate
+that the patterns we seek could involve
 interactions among the features,
-but we do not assume any structure *a priori* 
+but we do not assume any structure *a priori*
 concerning how the features interact.
 
 Sometimes, we truly lack knowledge to guide
 the construction of craftier architectures.
-In these cases, a multilayer perceptron 
+In these cases, a multilayer perceptron
 may be the best that we can do.
 However, for high-dimensional perceptual data,
 these *structure-less* networks can grow unwieldy.
 
-For instance, let's return to our running example
+For instance, let us return to our running example
 of distinguishing cats from dogs.
 Say that we do a thorough job in data collection,
 collecting an annotated dataset of 1-megapixel photographs.
 This means that each input to the network has *1 million dimensions*.
 Even an aggressive reduction to *1,000 hidden dimensions*
-would require a *dense* (fully connected) layer 
+would require a *dense* (fully connected) layer
 characterized by $10^9$ parameters.
-Unless we have lots of GPUs, a talent 
+Unless we have lots of GPUs, a talent
 for distributed optimization,
 and an extraordinary amount of patience,
-learning the parameters of this network 
+learning the parameters of this network
 may turn out to be infeasible.
 
 A careful reader might object to this argument
 on the basis that 1 megapixel resolution may not be necessary.
-However, while we might be able 
+However, while we might be able
 to get away with 100,000 pixels,
-our hidden layer of size $1000$ grossly underestimated 
-the number of hidden nodes that it takes 
+our hidden layer of size $1000$ grossly underestimated
+the number of hidden nodes that it takes
 to learn good representations of images,
 so a practical system will still require billions of parameters.
 Moreover, learning a classifier by fitting so many parameters
 might require collecting an enormous dataset.
-And yet today both humans and computers are able 
-to distinguish cats from dogs quite well, 
+And yet today both humans and computers are able
+to distinguish cats from dogs quite well,
 seemingly contradicting these intuitions.
 That is because images exhibit rich structure
-that can be exploited by humans 
+that can be exploited by humans
 and machine learning models alike.
 Convolutional neural networks are one creative way
 that machine learning has embraced for exploiting
@@ -57,31 +57,31 @@ some of the known structure in natural images.
 ## Invariances
 
 Imagine that you want to detect an object in an image.
-It seems reasonable that whatever method 
-we use to recognize objects should not be overly concerned 
+It seems reasonable that whatever method
+we use to recognize objects should not be overly concerned
 with the precise *location* of the object in the image.
 Ideally, our system should exploit this knowledge.
 Pigs usually do not fly and planes usually do not swim.
-Nonetheless, we should still recognize	
+Nonetheless, we should still recognize
 a pig were one to appear at the top of the image.
-We can draw some inspiration here 	
-from the children's game 'Where's Waldo'	
-(depicted in :numref:`img_waldo`).	
-The game consists of a number of chaotic scenes 	
-bursting with activity.	
-Waldo shows up somewhere in each,	
+We can draw some inspiration here
+from the children's game 'Where's Waldo'
+(depicted in :numref:`img_waldo`).
+The game consists of a number of chaotic scenes
+bursting with activity.
+Waldo shows up somewhere in each,
 typically lurking in some unlikely location.
 The reader's goal is to locate him.
-Despite his characteristic outfit, 
+Despite his characteristic outfit,
 this can be surprisingly difficult,
 due to the large number of distractions.
-However, *what Waldo looks like* 
+However, *what Waldo looks like*
 does not depend upon *where Waldo is located*.
-We could sweep the image with a Waldo detector 
+We could sweep the image with a Waldo detector
 that could assign a score to each patch,
 indicating the likelihood that the patch contains Waldo.
 CNNs systematize this idea of spatial invariance,
-exploiting it to learn useful representations 
+exploiting it to learn useful representations
 with few parameters.
 
 ![Image via Walker Books](../img/where-wally-walker-books.jpg)
@@ -90,14 +90,14 @@ with few parameters.
 
 
 We can now make these intuitions more concrete
-by enumerating a few desiderata to guide our design 
+by enumerating a few desiderata to guide our design
 of a neural network architecture suitable for computer vision:
 
-1. In the earliest layers, our network 
-    should respond similarly to the same patch, 
+1. In the earliest layers, our network
+    should respond similarly to the same patch,
     regardless of where it appears in the image (translation invariance).
-1. The earliest layers of the network should focus on local regions, 
-   without regard for the contents of the image in distant regions (locality). 
+1. The earliest layers of the network should focus on local regions,
+   without regard for the contents of the image in distant regions (locality).
    Eventually, these local representations can be aggregated
    to make predictions at the whole image level.
 
@@ -106,16 +106,16 @@ Let us see how this translates into mathematics.
 
 ## Constraining the MLP
 
-To start off, we can consider an MLP 
+To start off, we can consider an MLP
 with $h \times w$ images as inputs
 (represented as matrices in math, and as 2D arrays in code),
 and hidden representations **similarly organized
 as** $h \times w$ **matrices / 2D arrays**.
-Let that sink in, we now conceive of not only the inputs but 
+Let that sink in, we now conceive of not only the inputs but
 also the hidden representations as possessing spatial structure.
 Let $x[i, j]$ and $h[i, j]$ denote pixel location $(i, j)$
 in the input image and hidden representation, respectively.
-Consequently, to have each of the $h \times w$ hidden nodes 
+Consequently, to have each of the $h \times w$ hidden nodes
 receive input from each of the $h \times w$ inputs,
 we would switch from using weight matrices
 (as we did previously in MLPs)
@@ -140,7 +140,7 @@ For any given location $(i, j)$ in the hidden layer $h[i, j]$,
 we compute its value by summing over pixels in $x$,
 centered around $(i, j)$ and weighted by $V[i, j, a, b]$.
 
-Now let us invoke the first principle 
+Now let us invoke the first principle
 established above: *translation invariance*.
 This implies that a shift in the inputs $x$
 should simply lead to a shift in the activations $h$.
@@ -154,10 +154,10 @@ This is a convolution!
 We are effectively weighting pixels $(i+a, j+b)$
 in the vicinity of $(i, j)$ with coefficients $V[a, b]$
 to obtain the value $h[i, j]$.
-Note that $V[a, b]$ needs many fewer coefficients than $V[i, j, a, b]$. 
-For a 1 megapixel image, it has at most 1 million coefficients. 
-This is 1 million fewer parameters since it 
-no longer depends on the location within the image. 
+Note that $V[a, b]$ needs many fewer coefficients than $V[i, j, a, b]$.
+For a 1 megapixel image, it has at most 1 million coefficients.
+This is 1 million fewer parameters since it
+no longer depends on the location within the image.
 We have made significant progress!
 
 Now let us invoke the second principle---*locality*.
@@ -176,8 +176,8 @@ When the local region (also called a *receptive field*) is small,
 the difference as compared to a fully-connected network can be dramatic.
 While previously, we might have required billions of parameters
 to represent just a single layer in an image-processing network,
-we now typically need just a few hundred, without 
-altering the dimensionality of either 
+we now typically need just a few hundred, without
+altering the dimensionality of either
 the inputs or the hidden representations.
 The price paid for this drastic reduction in parameters
 is that our features are now translation invariant
@@ -194,7 +194,7 @@ our models might struggle even to fit our training data.
 
 ## Convolutions
 
-Before going further, we should briefly review 
+Before going further, we should briefly review
 why the above operation is called a *convolution*.
 In mathematics, the convolution between two functions,
 say $f, g: \mathbb{R}^d \to R$ is defined as
@@ -204,7 +204,7 @@ $$[f \circledast g](x) = \int_{\mathbb{R}^d} f(z) g(x-z) dz.$$
 That is, we measure the overlap between $f$ and $g$
 when one function is "flipped" and shifted by $x$.
 Whenever we have discrete objects, the integral turns into a sum.
-For instance, for vectors defined on $\ell_2$, i.e.,
+For instance, for vectors defined on $L_2$, i.e.,
 the set of square summable infinite dimensional vectors
 with index running over $\mathbb{Z}$ we obtain the following definition.
 
@@ -217,17 +217,17 @@ Rather than using $(i+a, j+b)$, we are using the difference instead.
 Note, though, that this distinction is mostly cosmetic
 since we can always match the notation by using $\tilde{V}[a, b] = V[-a, -b]$
 to obtain $h = x \circledast \tilde{V}$.
-Our original definition more properly 
+Our original definition more properly
 describes a *cross correlation*.
 We will come back to this in the following section.
 
 
 ## Waldo Revisited
 
-Returning to our Waldo detector, let's see what this looks like. 
+Returning to our Waldo detector, let us see what this looks like.
 The convolutional layer picks windows of a given size
 and weighs intensities according to the mask $V$, as demonstrated in :numref:`fig_waldo_mask`.
-We might aim to learn a model so that 
+We might aim to learn a model so that
 wherever the "waldoness" is highest,
 we should find a peak in the hidden layer activations.
 
@@ -267,7 +267,7 @@ Intuitively, you might imagine that at lower layers,
 some channels could become specialized to recognize edges,
 others to recognize textures, etc.
 To support multiple channels in both inputs and hidden activations,
-we can add a fourth coordinate to $V$: $V[a, b, c, d]$. 
+we can add a fourth coordinate to $V$: $V[a, b, c, d]$.
 Putting everything together we have:
 
 $$h[i, j, k] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c V[a, b, c, k] \cdot x[i+a, j+b, c].$$
@@ -277,7 +277,7 @@ There are still many operations that we need to address.
 For instance, we need to figure out how to combine all the activations
 to a single output (e.g., whether there is a Waldo *anywhere* in the image).
 We also need to decide how to compute things efficiently,
-how to combine multiple layers, 
+how to combine multiple layers,
 appropriate activation functions,
 and how to make reasonable design choices
 to yield networks that are effective in practice.
@@ -292,12 +292,12 @@ We turn to these issues in the remainder of the chapter.
 
 ## Exercises
 
-1. Assume that the size of the convolution mask is $\Delta = 0$. 
-   Show that in this case the convolutional mask 
+1. Assume that the size of the convolution mask is $\Delta = 0$.
+   Show that in this case the convolutional mask
    implements an MLP independently for each set of channels.
-1. Why might translation invariance not be a good idea after all? 
+1. Why might translation invariance not be a good idea after all?
    When might it not make sense to allow for pigs to fly?
-1. What problems must we deal with when deciding how 
+1. What problems must we deal with when deciding how
    to treat activations corresponding to pixel locations
    at the boundary of an image?
 1. Describe an analogous convolutional layer for audio.

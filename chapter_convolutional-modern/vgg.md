@@ -240,7 +240,7 @@ the model training process is similar to that of AlexNet in the last section.
 
 ```{.python .input}
 #@tab all
-lr, num_epochs, batch_size = 0.05, 10, 128,
+lr, num_epochs, batch_size = 0.05, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
@@ -253,7 +253,7 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 ## Exercises
 
-1. When printing out the dimensions of the layers we only saw 8 results rather than 11. Where did the remaining 3 layer informations go?
+1. When printing out the dimensions of the layers we only saw 8 results rather than 11. Where did the remaining 3 layer information go?
 1. Compared with AlexNet, VGG is much slower in terms of computation, and it also needs more GPU memory. Try to analyze the reasons for this.
 1. Try to change the height and width of the images in Fashion-MNIST from 224 to 96. What influence does this have on the experiments?
 1. Refer to Table 1 in :cite:`Simonyan.Zisserman.2014` to construct other common models, such as VGG-16 or VGG-19.

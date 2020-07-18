@@ -53,7 +53,7 @@ ctx = d2l.try_all_gpus()
 net.initialize(init=init.Normal(sigma=0.01), ctx=ctx)
 ```
 
-Using the `split_and_load` function introduced in the previous section we can divide a minibatch of data and copy portions to the list of devices provided by the context variable. The network object *automatically* uses the appropriate GPU to compute the value of the forward pass. As before we generate 4 observations and split them over the GPUs.
+Using the `split_and_load` function introduced in the previous section we can divide a minibatch of data and copy portions to the list of devices provided by the context variable. The network object *automatically* uses the appropriate GPU to compute the value of the forward propagation. As before we generate 4 observations and split them over the GPUs.
 
 ```{.python .input  n=4}
 x = np.random.uniform(size=(4, 1, 28, 28))

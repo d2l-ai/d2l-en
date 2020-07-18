@@ -68,49 +68,35 @@ To make our problem easy, we will set its standard deviation to 0.01.
 The following code generates our synthetic dataset.
 
 ```{.python .input}
+#@tab mxnet, pytorch
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
-    X = np.random.normal(0, 1, (num_examples, len(w)))
-    y = np.dot(X, w) + b
-    y += np.random.normal(0, 0.01, y.shape)
-    return X, y
-
-true_w = np.array([2, -3.4])
-true_b = 4.2
-features, labels = synthetic_data(true_w, true_b, 1000)
-```
-
-```{.python .input}
-#@tab pytorch
-def synthetic_data(w, b, num_examples):  #@save
-    """Generate y = Xw + b + noise."""
-    X = torch.zeros(size=(num_examples, len(w))).normal_()
-    y = torch.matmul(X, w) + b
-    y += torch.zeros(size=y.shape).normal_(std=0.01)
-    return X, y
-
-true_w = torch.tensor([2, -3.4])
-true_b = 4.2
-features, labels = synthetic_data(true_w, true_b, 1000)
+    X = d2l.normal(0, 1, (num_examples, len(w)))
+    y = d2l.matmul(X, w) + b
+    y += d2l.normal(0, 0.01, y.shape)
+    return X, d2l.reshape(y, (-1, 1))
 ```
 
 ```{.python .input}
 #@tab tensorflow
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
-    X = tf.zeros(shape=(num_examples, w.shape[0]))
+    X = d2l.zeros((num_examples, w.shape[0]))
     X += tf.random.normal(shape=X.shape)
-    y = tf.matmul(X, w) + b
+    y = d2l.matmul(X, tf.reshape(w, (-1, 1))) + b
     y += tf.random.normal(shape=y.shape, stddev=0.01)
-    y = tf.reshape(y, [num_examples])
+    y = d2l.reshape(y, (-1, 1))
     return X, y
+```
 
-true_w = tf.constant([2, -3.4], shape=(2, 1))
+```{.python .input}
+#@tab all
+true_w = d2l.tensor([2, -3.4])
 true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
-Note that each row in `features` consists of a 2-dimensional data instance
+Note that each row in `features` consists of a 2-dimensional data point
 and that each row in `labels` consists of a 1-dimensional label value (a scalar).
 
 ```{.python .input}
@@ -146,27 +132,16 @@ and a vector of labels, yielding minibatches of the size `batch_size`.
 Each minibatch consists of a tuple of features and labels.
 
 ```{.python .input}
+#@tab mxnet, pytorch
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
     indices = list(range(num_examples))
     # The examples are read at random, in no particular order
     random.shuffle(indices)
     for i in range(0, num_examples, batch_size):
-        batch_indices = np.array(
+        batch_indices = d2l.tensor(
             indices[i: min(i + batch_size, num_examples)])
         yield features[batch_indices], labels[batch_indices]
-```
-
-```{.python .input}
-#@tab pytorch
-def data_iter(batch_size, features, labels):
-    num_examples = len(features)
-    indices = list(range(num_examples))
-    # The examples are read at random, in no particular order
-    random.shuffle(indices)
-    for i in range(0, num_examples, batch_size):
-        j = torch.tensor(indices[i: min(i + batch_size, num_examples)])
-        yield features[j], labels[j]
 ```
 
 ```{.python .input}
@@ -271,23 +246,10 @@ When we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
 ```{.python .input}
+#@tab all
 def linreg(X, w, b):  #@save
     """The linear regression model."""
-    return np.dot(X, w) + b
-```
-
-```{.python .input}
-#@tab pytorch
-def linreg(X, w, b):  #@save
-    """The linear regression model."""
-    return torch.matmul(X, w) + b
-```
-
-```{.python .input}
-#@tab tensorflow
-def linreg(X, w, b):  #@save
-    """The linear regression model."""
-    return tf.matmul(X, w) + b
+    return d2l.matmul(X, w) + b
 ```
 
 ## Defining the Loss Function
@@ -316,7 +278,7 @@ linear regression has a closed-form solution.
 However, this is not a book about linear regression:
 it is a book about deep learning.
 Since none of the other models that this book introduces
-can be solved analytically, we will take this opportunity to introduce your first working example of 
+can be solved analytically, we will take this opportunity to introduce your first working example of
 minibatch stochastic gradient descent.
 
 
@@ -392,11 +354,14 @@ later in
 :numref:`chap_optimization`.
 
 ```{.python .input}
+#@tab all
 lr = 0.03
 num_epochs = 3
 net = linreg
 loss = squared_loss
+```
 
+```{.python .input}
 for epoch in range(num_epochs):
     for X, y in data_iter(batch_size, features, labels):
         with autograd.record():
@@ -412,11 +377,6 @@ for epoch in range(num_epochs):
 
 ```{.python .input}
 #@tab pytorch
-lr = 0.03
-num_epochs = 3
-net = linreg
-loss = squared_loss
-
 for epoch in range(num_epochs):
     for X, y in data_iter(batch_size, features, labels):
         l = loss(net(X, w, b), y)  # Minibatch loss in `X` and `y`
@@ -430,11 +390,6 @@ for epoch in range(num_epochs):
 
 ```{.python .input}
 #@tab tensorflow
-lr = 0.03
-num_epochs = 3
-net = linreg
-loss = squared_loss
-
 for epoch in range(num_epochs):
     for X, y in data_iter(batch_size, features, labels):
         with tf.GradientTape() as g:
@@ -498,6 +453,6 @@ that lead to highly accurate prediction.
 [Discussions](https://discuss.d2l.ai/t/43)
 :end_tab:
 
-:begin_tab:`pytorch`
+:begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/201)
 :end_tab:

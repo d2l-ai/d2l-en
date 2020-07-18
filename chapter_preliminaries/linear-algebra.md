@@ -331,18 +331,18 @@ B == tf.transpose(B)
 
 Matrices are useful data structures:
 they allow us to organize data that have different modalities of variation.
-For example, rows in our matrix might correspond to different houses (data instances or data points),
+For example, rows in our matrix might correspond to different houses (data points),
 while columns might correspond to different attributes.
 This should sound familiar if you have ever used spreadsheet software or
 have read :numref:`sec_pandas`.
 Thus, although the default orientation of a single vector is a column vector,
 in a matrix that represents a tabular dataset,
-it is more conventional to treat each data instance as a row vector in the matrix.
+it is more conventional to treat each data point as a row vector in the matrix.
 And, as we will see in later chapters,
 this convention will enable common deep learning practices.
 For example, along the outermost axis of a tensor,
-we can access or enumerate minibatches of data instances,
-or just data instances if no minibatch exists.
+we can access or enumerate minibatches of data points,
+or just data points if no minibatch exists.
 
 
 ## Tensors
@@ -462,7 +462,7 @@ One useful operation that we can perform with arbitrary tensors
 is to calculate the sum of their elements.
 In mathematical notation, we express sums using the $\sum$ symbol.
 To express the sum of the elements in a vector $\mathbf{x}$ of length $d$,
-we write $\sum_{i=1}^d x_i$. 
+we write $\sum_{i=1}^d x_i$.
 In code, we can just call the function for calculating the sum.
 
 ```{.python .input}
@@ -863,6 +863,7 @@ Matrix-matrix multiplication can be simply called *matrix multiplication*, and s
 
 
 ## Norms
+:label:`subsec_lin-algebra-norms`
 
 Some of the most useful operators in linear algebra are *norms*.
 Informally, the norm of a vector tells us how *big* a vector is.
@@ -902,14 +903,14 @@ And if you remember Euclidean distances
 (think Pythagoras' theorem) from grade school,
 then the concepts of non-negativity and the triangle inequality might ring a bell.
 In fact, the Euclidean distance is a norm:
-specifically it is the $\ell_2$ norm.
+specifically it is the $L_2$ norm.
 Suppose that the elements in the $n$-dimensional vector
 $\mathbf{x}$ are $x_1, \ldots, x_n$.
-The $\ell_2$ *norm* of $\mathbf{x}$ is the square root of the sum of the squares of the vector elements:
+The $L_2$ *norm* of $\mathbf{x}$ is the square root of the sum of the squares of the vector elements:
 
 $$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2},$$
 
-where the subscript $2$ is often omitted in $\ell_2$ norms, i.e., $\|\mathbf{x}\|$ is equivalent to $\|\mathbf{x}\|_2$. In code, we can calculate the $\ell_2$ norm of a vector as follows.
+where the subscript $2$ is often omitted in $L_2$ norms, i.e., $\|\mathbf{x}\|$ is equivalent to $\|\mathbf{x}\|_2$. In code, we can calculate the $L_2$ norm of a vector as follows.
 
 ```{.python .input}
 u = np.array([3, -4])
@@ -929,15 +930,15 @@ tf.norm(u)
 ```
 
 In deep learning, we work more often
-with the squared $\ell_2$ norm.
-You will also frequently encounter the $\ell_1$ *norm*,
+with the squared $L_2$ norm.
+You will also frequently encounter the $L_1$ *norm*,
 which is expressed as the sum of the absolute values of the vector elements:
 
 $$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$
 
-As compared with the $\ell_2$ norm,
+As compared with the $L_2$ norm,
 it is less influenced by outliers.
-To calculate the $\ell_1$ norm, we compose
+To calculate the $L_1$ norm, we compose
 the absolute value function with a sum over the elements.
 
 ```{.python .input}
@@ -954,19 +955,19 @@ torch.abs(u).sum()
 tf.reduce_sum(tf.abs(u))
 ```
 
-Both the $\ell_2$ norm and the $\ell_1$ norm
-are special cases of the more general $\ell_p$ *norm*:
+Both the $L_2$ norm and the $L_1$ norm
+are special cases of the more general $L_p$ *norm*:
 
 $$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
 
-Analogous to $\ell_2$ norms of vectors,
+Analogous to $L_2$ norms of vectors,
 the *Frobenius norm* of a matrix $\mathbf{X} \in \mathbb{R}^{m \times n}$
 is the square root of the sum of the squares of the matrix elements:
 
 $$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$
 
 The Frobenius norm satisfies all the properties of vector norms.
-It behaves as if it were an $\ell_2$ norm of a matrix-shaped vector.
+It behaves as if it were an $L_2$ norm of a matrix-shaped vector.
 Invoking the following function will calculate the Frobenius norm of a matrix.
 
 ```{.python .input}
@@ -1024,7 +1025,8 @@ So while we reserve the right to introduce more mathematics much later on,
 we will wrap up this section here.
 
 If you are eager to learn more about linear algebra,
-you may refer to either :numref:`sec_geometry-linear-algebraic-ops`
+you may refer to either the
+[online appendix on linear algebraic operations](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/geometry-linear-algebraic-ops.html)
 or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008`.
 
 
@@ -1036,7 +1038,7 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 * Scalars, vectors, matrices, and tensors have zero, one, two, and an arbitrary number of axes, respectively.
 * A tensor can be reduced along the specified axes by `sum` and `mean`.
 * Elementwise multiplication of two matrices is called their Hadamard product. It is different from matrix multiplication.
-* In deep learning, we often work with norms such as the $\ell_1$ norm, the $\ell_2$ norm, and the Frobenius norm.
+* In deep learning, we often work with norms such as the $L_1$ norm, the $L_2$ norm, and the Frobenius norm.
 * We can perform a variety of operations over scalars, vectors, matrices, and tensors.
 
 ## Exercises

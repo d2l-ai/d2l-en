@@ -160,7 +160,7 @@ def split_batch(X, y, ctx_list):
 
 ## Training
 
-Now we can implement multi-GPU training on a single minibatch. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs. Note that we do not need to write any specific code to achieve parallelism. Since the compute graph does not have any dependencies across devices within a minibatch, it is executed in parallel *automatically*.
+Now we can implement multi-GPU training on a single minibatch. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs. Note that we do not need to write any specific code to achieve parallelism. Since the computational graph does not have any dependencies across devices within a minibatch, it is executed in parallel *automatically*.
 
 ```{.python .input  n=10}
 def train_batch(X, y, ctx_params, ctx_list, lr):

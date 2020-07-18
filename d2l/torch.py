@@ -32,14 +32,6 @@ from torch.utils import data
 from torchvision import transforms
 
 
-# Defined in file: ./chapter_preliminaries/ndarray.md
-numpy = lambda a: a.detach().numpy()
-size = lambda a: a.numel()
-reshape = lambda a, *args: a.reshape(*args)
-ones = torch.ones
-zeros = torch.zeros
-
-
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):  #@save
     """Make a directory if it does not exist."""
@@ -80,7 +72,7 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
-    """Plot data instances."""
+    """Plot data points."""
     if legend is None:
         legend = []
 
@@ -141,16 +133,16 @@ class Timer:  #@save
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
-    X = torch.zeros(size=(num_examples, len(w))).normal_()
-    y = torch.matmul(X, w) + b
-    y += torch.zeros(size=y.shape).normal_(std=0.01)
-    return X, y
+    X = d2l.normal(0, 1, (num_examples, len(w)))
+    y = d2l.matmul(X, w) + b
+    y += d2l.normal(0, 0.01, y.shape)
+    return X, d2l.reshape(y, (-1, 1))
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):  #@save
     """The linear regression model."""
-    return torch.matmul(X, w) + b
+    return d2l.matmul(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -224,16 +216,19 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = y_hat.argmax(axis=1)
-    return float((y_hat.type(y.dtype) == y).sum())
+        y_hat = d2l.argmax(y_hat, axis=1)        
+    cmp = d2l.astype(y_hat, y.dtype) == y
+    return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
+    if isinstance(net, torch.nn.Module):
+        net.eval()  # Set the model to evaluation mode
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for _, (X, y) in enumerate(data_iter):
-        metric.add(accuracy(net(X), y), sum(y.shape))
+        metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
@@ -256,6 +251,9 @@ class Accumulator:  #@save
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_epoch_ch3(net, train_iter, loss, updater):  #@save
     """The training loop defined in Chapter 3."""
+    # Set the model to training mode
+    if isinstance(net, torch.nn.Module):
+        net.train()
     # Sum of training loss, sum of training accuracy, no. of examples
     metric = Accumulator(3)
     for X, y in train_iter:
@@ -266,11 +264,12 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             updater.zero_grad()
             l.backward()
             updater.step()
-            metric.add(float(l)*len(y), accuracy(y_hat, y), y.size().numel())
+            metric.add(float(l) * len(y), accuracy(y_hat, y),
+                       y.size().numel())
         else:
             l.sum().backward()
             updater(X.shape[0])
-            metric.add(float(l.sum()), accuracy(y_hat, y), y.size().numel())
+            metric.add(float(l.sum()), accuracy(y_hat, y), y.numel())
     # Return training loss and training accuracy
     return metric[0] / metric[2], metric[1] / metric[2]
 
@@ -338,18 +337,18 @@ def predict_ch3(net, test_iter, n=6):  #@save
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
-    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
-    titles = [true + '\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+    preds = d2l.get_fashion_mnist_labels(d2l.argmax(net(X), axis=1))
+    titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
+    d2l.show_images(d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
-    metric = d2l.Accumulator(2)  # sum_loss, num_examples
+    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
         l = loss(net(X), y)
-        metric.add(l.sum(), l.numel())
+        metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 
 
@@ -365,7 +364,7 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download(name, cache_dir=os.path.join('..', 'data')):  #@save
     """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
+    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}."
     url, sha1_hash = DATA_HUB[name]
     d2l.mkdir_if_not_exist(cache_dir)
     fname = os.path.join(cache_dir, url.split('/')[-1])
@@ -374,10 +373,11 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
         with open(fname, 'rb') as f:
             while True:
                 data = f.read(1048576)
-                if not data: break
+                if not data:
+                    break
                 sha1.update(data)
         if sha1.hexdigest() == sha1_hash:
-            return fname # Hit cache
+            return fname  # Hit cache
     print(f'Downloading {fname} from {url}...')
     r = requests.get(url, stream=True, verify=True)
     with open(fname, 'wb') as f:
@@ -396,14 +396,14 @@ def download_extract(name, folder=None):  #@save
     elif ext in ('.tar', '.gz'):
         fp = tarfile.open(fname, 'r')
     else:
-        assert False, 'Only zip/tar files can be extracted'
+        assert False, 'Only zip/tar files can be extracted.'
     fp.extractall(base_dir)
     return os.path.join(base_dir, folder) if folder else data_dir
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download_all():  #@save
-    """Download all files in the DATA_HUB"""
+    """Download all files in the DATA_HUB."""
     for name in DATA_HUB:
         download(name)
 
@@ -440,21 +440,22 @@ def try_all_gpus():  #@save
 def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
     h, w = K.shape
-    Y = torch.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    Y = d2l.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
+            Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
     return Y
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
+    net.eval()  # Set the model to evaluation mode
     if not device:
         device = next(iter(net.parameters())).device
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         X, y = X.to(device), y.to(device)
-        metric.add(d2l.accuracy(net(X), y), sum(y.shape))
+        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
@@ -601,7 +602,7 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_random(corpus, batch_size, num_steps):
+def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
     # Offset the iterator over the data for uniform starts
     corpus = corpus[random.randint(0, num_steps):]
     # Subtract 1 extra since we need to account for label
@@ -620,17 +621,17 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
         batch_indices = example_indices[i:(i+batch_size)]
         X = [data(j) for j in batch_indices]
         Y = [data(j + 1) for j in batch_indices]
-        yield torch.Tensor(X), torch.Tensor(Y)
+        yield d2l.tensor(X), d2l.tensor(Y)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):
+def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data: ignore `num_steps` and just wrap around
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = torch.Tensor(corpus[offset:offset+num_indices])
-    Ys = torch.Tensor(corpus[offset+1:offset+1+num_indices])
+    Xs = d2l.tensor(corpus[offset:offset+num_indices])
+    Ys = d2l.tensor(corpus[offset+1:offset+1+num_indices])
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
@@ -640,7 +641,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-class SeqDataLoader:
+class SeqDataLoader:  #@save
     """A iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
@@ -655,17 +656,16 @@ class SeqDataLoader:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
-                           max_tokens=10000):
+def load_data_time_machine(batch_size, num_steps,  #@save
+                           use_random_iter=False, max_tokens=10000):
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
     return data_iter, data_iter.vocab
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-class RNNModelScratch:
+class RNNModelScratch: #@save
     """A RNN Model based on scratch implementations."""
-
     def __init__(self, vocab_size, num_hiddens, device,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -681,12 +681,10 @@ class RNNModelScratch:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_predicts, model, vocab, device):
+def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, device=device)
     outputs = [vocab[prefix[0]]]
-
-    def get_input():
-        return torch.tensor([outputs[-1]], device=device).reshape(1, 1)
+    get_input = lambda: torch.tensor([outputs[-1]], device=device).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -697,12 +695,11 @@ def predict_ch8(prefix, num_predicts, model, vocab, device):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def grad_clipping(model, theta):
+def grad_clipping(model, theta):  #@save
     if isinstance(model, nn.Module):
-        params = [p.data for p in model.parameters() if p.requires_grad]
+        params = [p for p in model.parameters() if p.requires_grad]
     else:
         params = model.params
-    
     norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in params))
     if norm > theta:
         for param in params:
@@ -710,8 +707,7 @@ def grad_clipping(model, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater, device,
-                    use_random_iter):
+def train_epoch_ch8(model, train_iter, loss, updater, device, use_random_iter):  #@save
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
@@ -726,7 +722,6 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,
         X, y = X.to(device), y.to(device)
         py, state = model(X, state)
         l = loss(py, y.long()).mean()
-        
         if isinstance(updater, torch.optim.Optimizer):
             updater.zero_grad()
             l.backward()
@@ -736,7 +731,6 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,
             l.backward()
             grad_clipping(model, 1)
             updater(batch_size=1)  # Since used mean already
-
         metric.add(l * d2l.size(y), d2l.size(y))
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 
@@ -750,16 +744,10 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
                             legend=['train'], xlim=[1, num_epochs])
     if isinstance(model, nn.Module):
         trainer = torch.optim.SGD(model.parameters(), lr)
-
-        def updater(batch_size):
-            return trainer.step()
+        updater = lambda batch_size: trainer.step()
     else:
-        def updater(batch_size):
-            return d2l.sgd(model.params, lr, batch_size)
-
-    def predict(prefix):
-        return predict_ch8(prefix, 50, model, vocab, device)
-
+        updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, device)
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
@@ -880,6 +868,127 @@ class EncoderDecoder(nn.Module):
         return self.decoder(dec_X, dec_state)
 
 
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+class Seq2SeqEncoder(d2l.Encoder):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0, **kwargs):
+        super(Seq2SeqEncoder, self).__init__(**kwargs)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = nn.LSTM(embed_size, num_hiddens, num_layers, dropout=dropout)
+
+    def forward(self, X, *args):
+        X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
+        # RNN needs first axes to be timestep, i.e., seq_len
+        X = X.permute(1, 0, 2)
+        out, state = self.rnn(X) # When state is not mentioned, it defaults to zeros
+        # out shape: (seq_len, batch_size, num_hiddens)
+        # state shape: (num_layers, batch_size, num_hiddens),
+        # where "state" contains the hidden state and the memory cell
+        return out, state
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+class Seq2SeqDecoder(d2l.Decoder):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0, **kwargs):
+        super(Seq2SeqDecoder, self).__init__(**kwargs)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = nn.LSTM(embed_size, num_hiddens, num_layers, dropout=dropout)
+        self.dense = nn.Linear(num_hiddens, vocab_size)
+
+    def init_state(self, enc_outputs, *args):
+        return enc_outputs[1]
+
+    def forward(self, X, state):
+        X = self.embedding(X).permute(1, 0, 2)
+        out, state = self.rnn(X, state)
+        # Make the batch to be the first dimension to simplify loss computation
+        out = self.dense(out).permute(1, 0, 2)
+        return out, state
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+def sequence_mask(X, valid_len, value=0):
+    output = X.clone()
+    for count, matrix in enumerate(output):
+        matrix[int(valid_len[count]):]=value
+    return output
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
+    # pred shape: (batch_size, seq_len, vocab_size)
+    # label shape: (batch_size, seq_len)
+    # valid_len shape: (batch_size, )
+    def forward(self, pred, label, valid_len):
+        weights = torch.ones_like(label)
+        weights = sequence_mask(weights, valid_len)
+        self.reduction='none'
+        unweighted_loss = super(MaskedSoftmaxCELoss, self).forward(pred.permute(0,2,1), label)
+        weighted_loss = (unweighted_loss*weights).mean(dim=1)
+        return weighted_loss
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
+    def xavier_init_weights(m):
+        if type(m) == nn.Linear:
+            torch.nn.init.xavier_uniform_(m.weight)
+        if type(m) == nn.LSTM:
+            for param in m._flat_weights_names:
+                if "weight" in param:
+                    torch.nn.init.xavier_uniform_(m._parameters[param])
+    model.apply(xavier_init_weights)
+    model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    loss = MaskedSoftmaxCELoss()
+    model.train()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[1, num_epochs], ylim=[0, 0.25])
+    for epoch in range(1, num_epochs + 1):
+        timer = d2l.Timer()
+        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
+        for batch in data_iter:
+            X, X_vlen, Y, Y_vlen = [x.to(device) for x in batch]
+            Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
+            Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
+            l = loss(Y_hat, Y_label, Y_vlen)
+            l.sum().backward() # Making the loss scalar for backward()
+            d2l.grad_clipping(model, 1)
+            num_tokens = Y_vlen.sum()
+            optimizer.step()
+            with torch.no_grad():
+                metric.add(l.sum(), num_tokens)
+        if epoch % 10 == 0:
+            animator.add(epoch, (metric[0]/metric[1],))
+    print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
+          f'tokens/sec on {str(device)}')
+
+
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
+                    device):
+    src_tokens = src_vocab[src_sentence.lower().split(' ')]
+    enc_valid_len = torch.tensor([len(src_tokens)], device=device)
+    src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
+    enc_X = torch.tensor(src_tokens, dtype=torch.long, device=device)
+    # Add the  batch size dimension
+    enc_outputs = model.encoder(torch.unsqueeze(enc_X, dim=0),
+                                enc_valid_len)
+    dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
+    dec_X = torch.unsqueeze(torch.tensor([tgt_vocab['<bos>']], dtype=torch.long, device=device), dim=0)
+    predict_tokens = []
+    for _ in range(num_steps):
+        Y, dec_state = model.decoder(dec_X, dec_state)
+        # The token with highest score is used as the next timestep input
+        dec_X = Y.argmax(dim=2)
+        py = dec_X.squeeze(dim=0).type(torch.int32).item()
+        if py == tgt_vocab['<eos>']:
+            break
+        predict_tokens.append(py)
+    return ' '.join(tgt_vocab.to_tokens(predict_tokens))
+
+
 # Defined in file: ./chapter_attention-mechanisms/attention.md
 def masked_softmax(X, valid_len):
     """Perform softmax by filtering out some elements."""
@@ -894,9 +1003,7 @@ def masked_softmax(X, valid_len):
         else:
             valid_len = valid_len.reshape(-1)
         # Fill masked elements with a large negative, whose exp is 0
-        X = X.reshape(-1, shape[-1])
-        for count, row in enumerate(X):
-            row[int(valid_len[count]):]=-1e6
+        X = d2l.sequence_mask(X.reshape(-1, shape[-1]), valid_len, value=-1e6)
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 
 
@@ -936,4 +1043,67 @@ class MLPAttention(nn.Module):
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
         return torch.bmm(attention_weights, value)
 
+
+# Defined in file: ./chapter_optimization/optimization-intro.md
+def annotate(text, xy, xytext):  #@save
+    d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
+                           arrowprops=dict(arrowstyle='->'))
+
+
+# Defined in file: ./chapter_optimization/gd.md
+def train_2d(trainer, steps=20):  #@save
+    """Optimize a 2-dim objective function with a customized trainer."""
+    # s1 and s2 are internal state variables and will
+    # be used later in the chapter
+    x1, x2, s1, s2 = -5, -2, 0, 0
+    results = [(x1, x2)]
+    for i in range(steps):
+        x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+        results.append((x1, x2))
+    return results
+
+
+# Defined in file: ./chapter_optimization/gd.md
+def show_trace_2d(f, results):  #@save
+    """Show the trace of 2D variables during optimization."""
+    d2l.set_figsize()
+    d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
+    x1, x2 = d2l.meshgrid(d2l.arange(-5.5, 1.0, 0.1),
+                          d2l.arange(-3.0, 1.0, 0.1))
+    d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
+    d2l.plt.xlabel('x1')
+    d2l.plt.ylabel('x2')
+
+
+# Alias defined in config.ini
+
+
+ones = torch.ones
+zeros = torch.zeros
+tensor = torch.tensor
+arange = torch.arange
+meshgrid = torch.meshgrid
+sin = torch.sin
+sinh = torch.sinh
+cos = torch.cos
+cosh = torch.cosh
+tanh = torch.tanh
+linspace = torch.linspace
+exp = torch.exp
+log = torch.log
+normal = torch.normal
+matmul = torch.matmul
+int32 = torch.int32
+float32 = torch.float32
+concat = torch.cat
+stack = torch.stack
+abs = torch.abs
+numpy = lambda x, *args, **kwargs: x.detach().numpy(*args, **kwargs)
+size = lambda x, *args, **kwargs: x.numel(*args, **kwargs)
+reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
+to = lambda x, *args, **kwargs: x.to(*args, **kwargs)
+reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
+argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
+astype = lambda x, *args, **kwargs: x.type(*args, **kwargs)
+transpose = lambda x, *args, **kwargs: x.t(*args, **kwargs)
 

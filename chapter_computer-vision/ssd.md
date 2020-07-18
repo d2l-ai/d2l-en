@@ -280,7 +280,8 @@ We can use the accuracy rate to evaluate the classification results. As we use t
 def cls_eval(cls_preds, cls_labels):
     # Because the category prediction results are placed in the final
     # dimension, argmax must specify this dimension
-    return float((cls_preds.argmax(axis=-1) == cls_labels).sum())
+    return float((cls_preds.argmax(axis=-1).astype(
+        cls_labels.dtype) == cls_labels).sum())
 
 def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
     return float((np.abs((bbox_labels - bbox_preds) * bbox_masks)).sum())
@@ -405,7 +406,7 @@ d2l.plt.legend();
 In the experiment, we used cross-entropy loss for category prediction. Now,
 assume that the prediction probability of the actual category $j$ is $p_j$ and
 the cross-entropy loss is $-\log p_j$. We can also use the focal loss
-:cite:`Lin.Goyal.Girshick.ea.2017`. Given the positive hyper-parameters $\gamma$
+:cite:`Lin.Goyal.Girshick.ea.2017`. Given the positive hyperparameters $\gamma$
 and $\alpha$, this loss is defined as:
 
 $$ - \alpha (1-p_j)^{\gamma} \log p_j.$$
@@ -427,7 +428,7 @@ d2l.plt.legend();
 
 2. When an object is relatively large compared to the image, the model normally adopts a larger input image size.
 3. This generally produces a large number of negative anchor boxes when labeling anchor box categories. We can sample the negative anchor boxes to better balance the data categories. To do this, we can set the `MultiBoxTarget` function's `negative_mining_ratio` parameter.
-4. Assign hyper-parameters with different weights to the anchor box category loss and positive anchor box offset loss in the loss function.
+4. Assign hyperparameters with different weights to the anchor box category loss and positive anchor box offset loss in the loss function.
 5. Refer to the SSD paper. What methods can be used to evaluate the precision of object detection models :cite:`Liu.Anguelov.Erhan.ea.2016`?
 
 :begin_tab:`mxnet`

@@ -4,27 +4,27 @@
 Now that we understand how convolutional layers work in theory,
 we are ready to see how they work in practice.
 Building on our motivation of convolutional neural networks
-as efficient architectures for epxloring structure in image data,
+as efficient architectures for exploring structure in image data,
 we stick with images as our running example.
 
 
 ## The Cross-Correlation Operator
 
-Recall that strictly speaking, *convolutional* layers 
+Recall that strictly speaking, *convolutional* layers
 are a (slight) misnomer, since the operations they express
 are more accurately described as cross correlations.
 In a convolutional layer, an input array
 and a *correlation kernel* array are combined
 to produce an output array through a cross-correlation operation.
-Let's ignore channels for now and see how this works 
+Let us ignore channels for now and see how this works
 with two-dimensional data and hidden representations.
-In :numref:`fig_correlation`, 
+In :numref:`fig_correlation`,
 the input is a two-dimensional array
 with a height of 3 and width of 3.
 We mark the shape of the array as $3 \times 3$ or ($3$, $3$).
 The height and width of the kernel are both $2$.
 Note that in the deep learning research community,
-this object may be referred to as *a convolutional kernel*, 
+this object may be referred to as *a convolutional kernel*,
 *a filter*, or simply the layer's *weights*.
 The shape of the kernel window
 is given by the height and width of the kernel
@@ -56,7 +56,7 @@ $$
 4\times0+5\times1+7\times2+8\times3=43.
 $$
 
-Note that along each axis, the output 
+Note that along each axis, the output
 is slightly *smaller* than the input.
 Because the kernel has width and height greater than one,
 we can only properly compute the cross-correlation
@@ -74,37 +74,34 @@ which accepts the input array `X` and kernel array `K`
 and returns the output array `Y`.
 
 ```{.python .input}
+from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
 from mxnet.gluon import nn
 npx.set_np()
-
-def corr2d(X, K):  #@save
-    """Compute 2D cross-correlation."""
-    h, w = K.shape
-    Y = np.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
-    for i in range(Y.shape[0]):
-        for j in range(Y.shape[1]):
-            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
-    return Y
 ```
 
 ```{.python .input}
 #@tab pytorch
+from d2l import torch as d2l
 import torch
 from torch import nn
+```
 
+```{.python .input}
+#@tab mxnet, pytorch
 def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
     h, w = K.shape
-    Y = torch.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    Y = d2l.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
+            Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
     return Y
 ```
 
 ```{.python .input}
 #@tab tensorflow
+from d2l import tensorflow as d2l
 import tensorflow as tf
 
 def corr2d(X, K):  #@save
@@ -124,22 +121,9 @@ to validate the output of the above implementation
 of the two-dimensional cross-correlation operation.
 
 ```{.python .input}
-X = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
-K = np.array([[0, 1], [2, 3]])
-corr2d(X, K)
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.tensor([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=torch.float32)
-K = torch.tensor([[0, 1], [2, 3]], dtype=torch.float32)
-corr2d(X, K)
-```
-
-```{.python .input}
-#@tab tensorflow
-X = tf.constant([[0, 1, 2], [3, 4, 5], [6, 7, 8]], dtype=tf.float32)
-K = tf.constant([[0, 1], [2, 3]], dtype=tf.float32)
+#@tab all
+X = d2l.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])
+K = d2l.tensor([[0.0, 1.0], [2.0, 3.0]])
 corr2d(X, K)
 ```
 
@@ -157,7 +141,7 @@ We are now ready to implement a two-dimensional convolutional layer
 based on the `corr2d` function defined above.
 In the `__init__` constructor function,
 we declare `weight` and `bias` as the two model parameters.
-The forward computation function 
+The forward computation function
 calls the `corr2d` function and adds the bias.
 As with $h \times w$ cross-correlation
 we also refer to convolutional layers
@@ -205,21 +189,15 @@ class Conv2D(tf.keras.layers.Layer):
 
 ## Object Edge Detection in Images
 
-Let's take a moment to parse a simple application of a convolutional layer:
+Let us take a moment to parse a simple application of a convolutional layer:
 detecting the edge of an object in an image
 by finding the location of the pixel change.
 First, we construct an 'image' of $6\times 8$ pixels.
 The middle four columns are black (0) and the rest are white (1).
 
 ```{.python .input}
-X = np.ones((6, 8))
-X[:, 2:6] = 0
-X
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.ones(6, 8)
+#@tab mxnet, pytorch
+X = d2l.ones((6, 8))
 X[:, 2:6] = 0
 X
 ```
@@ -237,17 +215,8 @@ if the horizontally adjacent elements are the same,
 the output is 0. Otherwise, the output is non-zero.
 
 ```{.python .input}
-K = np.array([[1, -1]])
-```
-
-```{.python .input}
-#@tab pytorch
-K = torch.tensor([[1, -1]], dtype=torch.float32)
-```
-
-```{.python .input}
-#@tab tensorflow
-K = tf.constant([[1, -1]], dtype=tf.float32)
+#@tab all
+K = d2l.tensor([[1.0, -1.0]])
 ```
 
 We are ready to perform the cross-correlation operation
@@ -266,17 +235,8 @@ We can now apply the kernel to the transposed image.
 As expected, it vanishes. The kernel `K` only detects vertical edges.
 
 ```{.python .input}
-corr2d(X.T, K)
-```
-
-```{.python .input}
-#@tab pytorch
-corr2d(X.t(), K)
-```
-
-```{.python .input}
-#@tab tensorflow
-corr2d(tf.transpose(X), K)
+#@tab all
+corr2d(d2l.transpose(X), K)
 ```
 
 ## Learning a Kernel
@@ -339,7 +299,6 @@ conv2d = nn.Conv2d(1,1, kernel_size=(1, 2), bias=False)
 X = X.reshape((1, 1, 6, 8))
 Y = Y.reshape((1, 1, 6, 7))
 
-
 for i in range(10):
     Y_hat = conv2d(X)
     l = (Y_hat - Y) ** 2
@@ -372,8 +331,7 @@ for i in range(10):
         update = tf.multiply(3e-2, g.gradient(l, conv2d.weights[0]))
         weights = conv2d.get_weights()
         weights[0] = conv2d.weights[0] - update
-        conv2d.set_weights(weights)  
-        
+        conv2d.set_weights(weights)
         if (i + 1) % 2 == 0:
             print(f'batch {i+1}, loss {tf.reduce_sum(l):.3f}')
 ```
@@ -381,17 +339,17 @@ for i in range(10):
 Note that the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel array we learned.
 
 ```{.python .input}
-conv2d.weight.data().reshape(1, 2)
+d2l.reshape(conv2d.weight.data(), (1, 2))
 ```
 
 ```{.python .input}
 #@tab pytorch
-conv2d.weight.data.reshape((1, 2))
+d2l.reshape(conv2d.weight.data, (1, 2))
 ```
 
 ```{.python .input}
 #@tab tensorflow
-tf.reshape(conv2d.get_weights()[0], (1, 2))
+d2l.reshape(conv2d.get_weights()[0], (1, 2))
 ```
 
 Indeed, the learned kernel array is remarkably close
@@ -399,7 +357,7 @@ to the kernel array `K` we defined earlier.
 
 ## Cross-Correlation and Convolution
 
-Recall our observation from the previous section of the correspondence 
+Recall our observation from the previous section of the correspondence
 between the cross-correlation and convolution operators.
 The figure above makes this correspondence apparent.
 Simply flip the kernel from the bottom left to the top right.

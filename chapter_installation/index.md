@@ -96,7 +96,7 @@ pip install mxnet==1.6.0
 :begin_tab:`pytorch`
 
 ```bash
-pip install torch==1.5.1 torchvision
+pip install torch==1.5.1 torchvision -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 

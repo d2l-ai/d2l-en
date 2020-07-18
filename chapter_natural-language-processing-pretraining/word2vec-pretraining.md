@@ -170,7 +170,7 @@ get_similar_tokens('chip', 3, net[0])
 
 1. Set `sparse_grad=True` when creating an instance of `nn.Embedding`. Does it accelerate training? Look up MXNet documentation to learn the meaning of this argument.
 1. Try to find synonyms for other words.
-1. Tune the hyper-parameters and observe and analyze the experimental results.
+1. Tune the hyperparameters and observe and analyze the experimental results.
 1. When the dataset is large, we usually sample the context words and the noise words for the central target word in the current minibatch only when updating the model parameters. In other words, the same central target word may have different context words or noise words in different epochs. What are the benefits of this sort of training? Try to implement this training method.
 
 

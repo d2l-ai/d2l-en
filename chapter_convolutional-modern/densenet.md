@@ -1,8 +1,8 @@
 # Densely Connected Networks (DenseNet)
 
-ResNet significantly changed the view of how to parametrize the functions in deep networks. DenseNet is to some extent the logical extension of this. To understand how to arrive at it, let us take a small detour to theory. Recall the Taylor expansion for functions. For scalars it can be written as
+ResNet significantly changed the view of how to parametrize the functions in deep networks. DenseNet is to some extent the logical extension of this. To understand how to arrive at it, let us take a small detour to theory. Recall the Taylor expansion for functions. For the point $x = 0$ it can be written as
 
-$$f(x) = f(0) + f'(x) x + \frac{1}{2} f''(x) x^2 + \frac{1}{6} f'''(x) x^3 + o(x^3).$$
+$$f(x) = f(0) + f'(0) (x-0) + \frac{1}{2!} f''(0) (x-0)^2 + \frac{1}{3!} f'''(0) (x-0)^3 + o(x^3).$$
 
 ## Function Decomposition
 
@@ -21,9 +21,9 @@ dataset.
 
 As shown in :numref:`fig_densenet_block`, the key difference between ResNet and DenseNet is that in the latter case outputs are *concatenated* rather than added. As a result we perform a mapping from $\mathbf{x}$ to its values after applying an increasingly complex sequence of functions.
 
-$$\mathbf{x} \to \left[\mathbf{x}, f_1(\mathbf{x}), f_2(\mathbf{x}, f_1(\mathbf{x})), f_3(\mathbf{x}, f_1(\mathbf{x}), f_2(\mathbf{x}, f_1(\mathbf{x})), \ldots\right].$$
+$$\mathbf{x} \to \left[\mathbf{x}, f_1(\mathbf{x}), f_2(\mathbf{x}, f_1(\mathbf{x})), f_3(\mathbf{x}, f_1(\mathbf{x}), f_4(\mathbf{x}, f_1(\mathbf{x})), \ldots\right].$$
 
-In the end, all these functions are combined in an MLP to reduce the number of features again. In terms of implementation this is quite simple---rather than adding terms, we concatenate them. The name DenseNet arises from the fact that the dependency graph between variables becomes quite dense. The last layer of such a chain is densely connected to all previous layers. The main components that compose a DenseNet are dense blocks and transition layers. The former defines how the inputs and outputs are concatenated, while the latter controls the number of channels so that it is not too large. The dense connections are shown in :numref:`fig_densenet`.
+In the end, all these functions are combined in MLP to reduce the number of features again. In terms of implementation this is quite simple---rather than adding terms, we concatenate them. The name DenseNet arises from the fact that the dependency graph between variables becomes quite dense. The last layer of such a chain is densely connected to all previous layers. The main components that compose a DenseNet are dense blocks and transition layers. The former defines how the inputs and outputs are concatenated, while the latter controls the number of channels so that it is not too large. The dense connections are shown in :numref:`fig_densenet`.
 
 ![Dense connections in DenseNet](../img/densenet.svg)
 :label:`fig_densenet`
@@ -265,7 +265,7 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
     net.add(DenseBlock(num_convs, growth_rate))
     # This is the number of output channels in the previous dense block
     num_channels += num_convs * growth_rate
-    # A transition layer that haves the number of channels is added between
+    # A transition layer that halves the number of channels is added between
     # the dense blocks
     if i != len(num_convs_in_dense_blocks) - 1:
         num_channels //= 2
