@@ -376,14 +376,14 @@ Unless you specifically want to make a copy,
 
 :begin_tab:`pytorch`
 Imagine that your variable `z` already lives on your second GPU.
-What happens if we call still `z.cuda(1)`?
-It will returns `z` instead of make a copy and allocate new memory.
+What happens if we still call `z.cuda(1)`?
+It will return `z` instead of making a copy and allocating new memory.
 :end_tab:
 
 :begin_tab:`pytorch`
 Imagine that your variable `z` already lives on your second GPU.
-What happens if we call still `z2 = z` under the same device scope?
-It will returns `z` instead of make a copy and allocate new memory.
+What happens if we still call `z2 = z` under the same device scope?
+It will return `z` instead of making a copy and allocating new memory.
 :end_tab:
 
 ```{.python .input}
