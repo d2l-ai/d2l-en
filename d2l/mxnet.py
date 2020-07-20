@@ -1276,11 +1276,11 @@ class Benchmark:
 
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
-def split_batch(X, y, ctx_list):
-    """Split X and y into multiple devices specified by ctx."""
+def split_batch(X, y, devices):
+    """Split `X` and `y` into multiple devices."""
     assert X.shape[0] == y.shape[0]
-    return (gluon.utils.split_and_load(X, ctx_list),
-            gluon.utils.split_and_load(y, ctx_list))
+    return (gluon.utils.split_and_load(X, devices),
+            gluon.utils.split_and_load(y, devices))
 
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-concise.md
@@ -1312,10 +1312,10 @@ def resnet18(num_classes):
 # Defined in file: ./chapter_computational-performance/multiple-gpus-concise.md
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     # Query the list of devices
-    ctx = list(net.collect_params().values())[0].list_ctx()
+    devices = list(net.collect_params().values())[0].list_ctx()
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
-        X_shards, y_shards = split_f(features, labels, ctx)
+        X_shards, y_shards = split_f(features, labels, devices)
         # Run in parallel
         pred_shards = [net(X_shard) for X_shard in X_shards]
         metric.add(sum(float(d2l.accuracy(pred_shard, y_shard)) for

@@ -164,7 +164,7 @@ is much slower than the seq2seq model without attention.
 ```{.python .input  n=5}
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_steps = 64, 10
-lr, num_epochs, ctx = 0.005, 200, d2l.try_gpu()
+lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
 
 src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
 encoder = d2l.Seq2SeqEncoder(
@@ -172,7 +172,7 @@ encoder = d2l.Seq2SeqEncoder(
 decoder = Seq2SeqAttentionDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
 ```
 
 ```{.python .input}
@@ -192,14 +192,8 @@ d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
 
 Last, we predict several sample examples.
 
-```{.python .input  n=6}
-for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + d2l.predict_s2s_ch9(
-        model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
-```
-
 ```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + d2l.predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, device))

@@ -362,8 +362,8 @@ class DecoderBlock(nn.Block):
             batch_size, seq_len, _ = X.shape
             # Shape: (batch_size, seq_len), the values in the j-th column
             # are j+1
-            valid_len = np.tile(np.arange(1, seq_len+1, ctx=X.ctx),
-                                   (batch_size, 1))
+            valid_len = np.tile(np.arange(1, seq_len + 1, ctx=X.ctx),
+                                (batch_size, 1))
         else:
             valid_len = None
 
@@ -421,7 +421,7 @@ Similar to the seq2seq with attention model in :numref:`sec_seq2seq_attention`, 
 
 ```{.python .input  n=19}
 num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.0, 64, 10
-lr, num_epochs, ctx = 0.005, 100, d2l.try_gpu()
+lr, num_epochs, device = 0.005, 100, d2l.try_gpu()
 ffn_num_hiddens, num_heads = 64, 4
 
 src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
@@ -433,7 +433,7 @@ decoder = TransformerDecoder(
     len(src_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,
     dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
 ```
 
 As we can see from the training time and accuracy, compared with the seq2seq model with attention model, Transformer runs faster per epoch, and converges faster at the beginning.
@@ -443,7 +443,7 @@ We can use the trained Transformer to translate some simple sentences.
 ```{.python .input  n=20}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + d2l.predict_s2s_ch9(
-        model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
+        model, sentence, src_vocab, tgt_vocab, num_steps, device))
 ```
 
 ## Summary
