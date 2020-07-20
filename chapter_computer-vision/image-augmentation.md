@@ -153,9 +153,9 @@ Next, we define the training function to train and evaluate the model using mult
 
 ```{.python .input  n=14}
 #@save
-def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
+def train_batch_ch13(net, features, labels, loss, trainer, devices,
                      split_f=d2l.split_batch):
-    X_shards, y_shards = split_f(features, labels, ctx_list)
+    X_shards, y_shards = split_f(features, labels, devices)
     with autograd.record():
         pred_shards = [net(X_shard) for X_shard in X_shards]
         ls = [loss(pred_shard, y_shard) for pred_shard, y_shard
@@ -174,7 +174,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
 ```{.python .input  n=16}
 #@save
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
-               ctx_list=d2l.try_all_gpus(), split_f=d2l.split_batch):
+               devices=d2l.try_all_gpus(), split_f=d2l.split_batch):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
@@ -184,7 +184,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
             l, acc = train_batch_ch13(
-                net, features, labels, loss, trainer, ctx_list, split_f)
+                net, features, labels, loss, trainer, devices, split_f)
             metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
             if (i + 1) % (num_batches // 5) == 0:
@@ -196,14 +196,14 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
     print(f'loss {metric[0] / metric[2]:.3f}, train acc '
           f'{metric[1] / metric[3]:.3f}, test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec on '
-          f'{str(ctx_list)}')
+          f'{str(devices)}')
 ```
 
 Now, we can define the `train_with_data_aug` function to use image augmentation to train the model. This function obtains all available GPUs and uses Adam as the optimization algorithm for training. It then applies image augmentation to the training dataset, and finally calls the `train` function just defined to train and evaluate the model.
 
 ```{.python .input  n=18}
-batch_size, ctx, net = 256, d2l.try_all_gpus(), d2l.resnet18(10)
-net.initialize(init=init.Xavier(), ctx=ctx)
+batch_size, devices, net = 256, d2l.try_all_gpus(), d2l.resnet18(10)
+net.initialize(init=init.Xavier(), ctx=devices)
 
 def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
     train_iter = load_cifar10(True, train_augs, batch_size)
@@ -211,7 +211,7 @@ def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
-    train_ch13(net, train_iter, test_iter, loss, trainer, 10, ctx)
+    train_ch13(net, train_iter, test_iter, loss, trainer, 10, devices)
 ```
 
 Now we train the model using image augmentation of random flipping left and right.

@@ -254,8 +254,8 @@ train_iter, _ = d2l.load_data_pikachu(batch_size)
 There is 1 category in the Pikachu dataset. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
 
 ```{.python .input  n=15}
-ctx, net = d2l.try_gpu(), TinySSD(num_classes=1)
-net.initialize(init=init.Xavier(), ctx=ctx)
+device, net = d2l.try_gpu(), TinySSD(num_classes=1)
+net.initialize(init=init.Xavier(), ctx=device)
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'learning_rate': 0.2, 'wd': 5e-4})
 ```
@@ -301,8 +301,8 @@ for epoch in range(num_epochs):
     train_iter.reset()  # Read data from the start.
     for batch in train_iter:
         timer.start()
-        X = batch.data[0].as_in_ctx(ctx)
-        Y = batch.label[0].as_in_ctx(ctx)
+        X = batch.data[0].as_in_ctx(device)
+        Y = batch.label[0].as_in_ctx(device)
         with autograd.record():
             # Generate multiscale anchor boxes and predict the category and
             # offset of each
@@ -322,7 +322,8 @@ for epoch in range(num_epochs):
     cls_err, bbox_mae = 1-metric[0]/metric[1], metric[2]/metric[3]
     animator.add(epoch+1, (cls_err, bbox_mae))
 print(f'class err {cls_err:.2e}, bbox mae {bbox_mae:.2e}')
-print(f'{train_iter.num_image/timer.stop():.1f} examples/sec on {str(ctx)}')
+print(f'{train_iter.num_image/timer.stop():.1f} examples/sec on '
+      f'{str(device)}')
 ```
 
 ## Prediction
@@ -339,7 +340,7 @@ Using the `MultiBoxDetection` function, we predict the bounding boxes based on t
 
 ```{.python .input  n=21}
 def predict(X):
-    anchors, cls_preds, bbox_preds = net(X.as_in_ctx(ctx))
+    anchors, cls_preds, bbox_preds = net(X.as_in_ctx(device))
     cls_probs = npx.softmax(cls_preds).transpose(0, 2, 1)
     output = npx.multibox_detection(cls_probs, bbox_preds, anchors)
     idx = [i for i, row in enumerate(output[0]) if row[0] != -1]

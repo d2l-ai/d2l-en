@@ -142,12 +142,12 @@ train_iter, test_iter = d2l.load_data_voc(batch_size, crop_size)
 Now we can start training the model. The loss function and accuracy calculation here are not substantially different from those used in image classification. Because we use the channel of the transposed convolution layer to predict pixel categories, the `axis=1` (channel dimension) option is specified in `SoftmaxCrossEntropyLoss`. In addition, the model calculates the accuracy based on whether the prediction category of each pixel is correct.
 
 ```{.python .input  n=12}
-num_epochs, lr, wd, ctx = 5, 0.1, 1e-3, d2l.try_all_gpus()
+num_epochs, lr, wd, devices = 5, 0.1, 1e-3, d2l.try_all_gpus()
 loss = gluon.loss.SoftmaxCrossEntropyLoss(axis=1)
-net.collect_params().reset_ctx(ctx)
+net.collect_params().reset_ctx(devices)
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'learning_rate': lr, 'wd': wd})
-d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
 ## Prediction
@@ -158,7 +158,7 @@ During predicting, we need to standardize the input image in each channel and tr
 def predict(img):
     X = test_iter._dataset.normalize_image(img)
     X = np.expand_dims(X.transpose(2, 0, 1), axis=0)
-    pred = net(X.as_in_ctx(ctx[0])).argmax(axis=1)
+    pred = net(X.as_in_ctx(devices[0])).argmax(axis=1)
     return pred.reshape(pred.shape[1], pred.shape[2])
 ```
 
@@ -166,7 +166,7 @@ To visualize the predicted categories for each pixel, we map the predicted categ
 
 ```{.python .input  n=14}
 def label2image(pred):
-    colormap = np.array(d2l.VOC_COLORMAP, ctx=ctx[0], dtype='uint8')
+    colormap = np.array(d2l.VOC_COLORMAP, ctx=devices[0], dtype='uint8')
     X = pred.astype('int32')
     return colormap[X, :]
 ```

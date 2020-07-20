@@ -123,13 +123,14 @@ def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
         train_imgs.transform_first(train_augs), batch_size, shuffle=True)
     test_iter = gluon.data.DataLoader(
         test_imgs.transform_first(test_augs), batch_size)
-    ctx = d2l.try_all_gpus()
-    net.collect_params().reset_ctx(ctx)
+    devices = d2l.try_all_gpus()
+    net.collect_params().reset_ctx(devices)
     net.hybridize()
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(), 'sgd', {
         'learning_rate': learning_rate, 'wd': 0.001})
-    d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+    d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
+                   devices)
 ```
 
 We set the learning rate in the `Trainer` instance to a smaller value, such as 0.01, in order to fine-tune the model parameters obtained in pretraining. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.
