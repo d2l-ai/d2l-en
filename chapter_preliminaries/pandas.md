@@ -18,6 +18,9 @@ csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other
 formats may be processed in similar ways.
 The following `mkdir_if_not_exist`
 function ensures that the directory `../data` exists.
+Note that the comment `#@save` is a special mark where the following function,
+class, or statements are saved in the `d2l` package
+so later they can be directly invoked (e.g., `d2l.mkdir_if_not_exist(path)`) without being redefined.
 
 ```{.python .input}
 #@tab all

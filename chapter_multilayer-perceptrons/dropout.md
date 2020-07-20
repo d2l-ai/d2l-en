@@ -69,7 +69,7 @@ of deep networks remain open research questions,
 and we encourage the theoretically-oriented
 reader to dig deeper into the topic.
 For now, we turn to the investigation of
-practical tools that tend to 
+practical tools that tend to
 empirically improve the generalization of deep nets.
 
 ## Robustness through Perturbations
@@ -117,7 +117,7 @@ injecting noise enforces smoothness just on the input-output mapping.
 
 Their idea, called *dropout*, involves
 injecting noise while computing
-each internal layer during forward pass,
+each internal layer during forward propagation,
 and it has become a standard technique
 for training neural networks.
 The method is called *dropout* because we literally

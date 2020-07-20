@@ -47,6 +47,7 @@ The notation used throughout this book is summarized below.
 * $\langle \mathbf{x}, \mathbf{y} \rangle$: Dot product of vectors $\mathbf{x}$ and $\mathbf{y}$
 * $\sum$: Series addition
 * $\prod$: Series multiplication
+* $\stackrel{\mathrm{def}}{=}$: Definition
 
 
 ## Calculus

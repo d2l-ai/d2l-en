@@ -48,16 +48,16 @@ The `initialize` method allows us to set initial defaults for parameters on a de
 ```{.python .input  n=3}
 net = resnet18(10)
 # get a list of GPUs
-ctx = d2l.try_all_gpus()
+devices = d2l.try_all_gpus()
 # initialize the network on all of them
-net.initialize(init=init.Normal(sigma=0.01), ctx=ctx)
+net.initialize(init=init.Normal(sigma=0.01), ctx=devices)
 ```
 
-Using the `split_and_load` function introduced in the previous section we can divide a minibatch of data and copy portions to the list of devices provided by the context variable. The network object *automatically* uses the appropriate GPU to compute the value of the forward pass. As before we generate 4 observations and split them over the GPUs.
+Using the `split_and_load` function introduced in the previous section we can divide a minibatch of data and copy portions to the list of devices provided by the context variable. The network object *automatically* uses the appropriate GPU to compute the value of the forward propagation. As before we generate 4 observations and split them over the GPUs.
 
 ```{.python .input  n=4}
 x = np.random.uniform(size=(4, 1, 28, 28))
-x_shards = gluon.utils.split_and_load(x, ctx)
+x_shards = gluon.utils.split_and_load(x, devices)
 net(x_shards[0]), net(x_shards[1])
 ```
 
@@ -70,7 +70,7 @@ try:
     weight.data()
 except RuntimeError:
     print('not initialized on cpu')
-weight.data(ctx[0])[0], weight.data(ctx[1])[0]
+weight.data(devices[0])[0], weight.data(devices[1])[0]
 ```
 
 Lastly let us replace the code to evaluate the accuracy by one that works in parallel across multiple devices. This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a batch before invoking the network. All else is essentially identical.
@@ -79,10 +79,10 @@ Lastly let us replace the code to evaluate the accuracy by one that works in par
 #@save
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     # Query the list of devices
-    ctx = list(net.collect_params().values())[0].list_ctx()
+    devices = list(net.collect_params().values())[0].list_ctx()
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
-        X_shards, y_shards = split_f(features, labels, ctx)
+        X_shards, y_shards = split_f(features, labels, devices)
         # Run in parallel
         pred_shards = [net(X_shard) for X_shard in X_shards]
         metric.add(sum(float(d2l.accuracy(pred_shard, y_shard)) for

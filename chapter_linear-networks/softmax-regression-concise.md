@@ -5,7 +5,8 @@ Just as high-level APIs of deep learning frameworks
 made it much easier
 to implement linear regression in :numref:`sec_linear_concise`,
 we will find it similarly (or possibly more)
-convenient for implementing classification models.
+convenient for implementing classification models. Let us stick with the Fashion-MNIST dataset
+and keep the batch size at 256 as in :numref:`sec_softmax_scratch`.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -27,22 +28,8 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-Let us stick with the Fashion-MNIST dataset
-and keep the batch size at 256 as in :numref:`sec_softmax_scratch`.
-
 ```{.python .input}
-batch_size = 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-```
-
-```{.python .input}
-#@tab pytorch
-batch_size = 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-```
-
-```{.python .input}
-#@tab tensorflow
+#@tab all
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```

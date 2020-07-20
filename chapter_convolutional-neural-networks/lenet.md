@@ -18,7 +18,7 @@ we will enjoy more parsimonious models (requiring far fewer parameters).
 In this section, we will introduce LeNet,
 among the first published convolutional neural networks
 to capture wide attention for its performance on computer vision tasks.
-The model was introduced (and named for) Yann Lecun,
+The model was introduced by (and named for) Yann Lecun,
 then a researcher at AT&T Bell Labs,
 for the purpose of recognizing handwritten digits in images
 [LeNet5](http://yann.lecun.com/exdb/lenet/).
@@ -206,7 +206,7 @@ matches the number of classes.
 ## Data Acquisition and Training
 
 Now that we have implemented the model,
-let's run an experiment to see how LeNet fares on Fashion-MNIST.
+let us run an experiment to see how LeNet fares on Fashion-MNIST.
 
 ```{.python .input}
 #@tab all
@@ -237,7 +237,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
-        metric.add(d2l.accuracy(net(X), y), y.size)
+        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0]/metric[1]
 ```
 
@@ -250,7 +250,7 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         X, y = X.to(device), y.to(device)
-        metric.add(d2l.accuracy(net(X), y), sum(y.shape))
+        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 ```
 
@@ -419,12 +419,12 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 1. Replace the average pooling with max pooling. What happens?
 1. Try to construct a more complex network based on LeNet to improve its accuracy.
-    * Adjust the convolution window size.
-    * Adjust the number of output channels.
-    * Adjust the activation function (ReLU?).
-    * Adjust the number of convolution layers.
-    * Adjust the number of fully connected layers.
-    * Adjust the learning rates and other training details (initialization, epochs, etc.)
+    1. Adjust the convolution window size.
+    1. Adjust the number of output channels.
+    1. Adjust the activation function (ReLU?).
+    1. Adjust the number of convolution layers.
+    1. Adjust the number of fully connected layers.
+    1. Adjust the learning rates and other training details (initialization, epochs, etc.)
 1. Try out the improved network on the original MNIST dataset.
 1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters, coats).
 

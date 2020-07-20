@@ -1025,7 +1025,8 @@ So while we reserve the right to introduce more mathematics much later on,
 we will wrap up this section here.
 
 If you are eager to learn more about linear algebra,
-you may refer to either :numref:`sec_geometry-linear-algebraic-ops`
+you may refer to either the
+[online appendix on linear algebraic operations](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/geometry-linear-algebraic-ops.html)
 or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008`.
 
 

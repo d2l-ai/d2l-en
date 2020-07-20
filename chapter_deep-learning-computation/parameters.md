@@ -117,8 +117,8 @@ we first need to access the underlying numerical values.
 There are several ways to do this.
 Some are simpler while others are more general.
 The following code extracts the bias
-from the second neural network layer, which returns a parameter class instance, and
-and further access that parameter's value.
+from the second neural network layer, which returns a parameter class instance, and 
+further accesses that parameter's value.
 
 ```{.python .input}
 print(type(net[1].bias))

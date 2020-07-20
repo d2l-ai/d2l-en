@@ -1,7 +1,7 @@
 # Compilers and Interpreters
 :label:`sec_hybridize`
 
-So far, this book has focused on imperative programming, which makes use of statements such as `print`, `+` or `if` to change a program’s state. Consider the following example of a simple imperative program.
+So far, this book has focused on imperative programming, which makes use of statements such as `print`, `+` or `if` to change a program's state. Consider the following example of a simple imperative program.
 
 ```{.python .input  n=1}
 def add(a, b):
@@ -60,7 +60,7 @@ exec(y)
 
 The differences between imperative (interpreted) programming and symbolic programming are as follows:
 
-* Imperative programming is easier. When imperative programming is used in Python, the majority of the code is straightforward and easy to write. It is also easier to debug imperative programming code. This is because it is easier to obtain and print all relevant intermediate variable values, or use Python’s built-in debugging tools.
+* Imperative programming is easier. When imperative programming is used in Python, the majority of the code is straightforward and easy to write. It is also easier to debug imperative programming code. This is because it is easier to obtain and print all relevant intermediate variable values, or use Python's built-in debugging tools.
 * Symbolic programming is more efficient and easier to port. It makes it easier to optimize the code during compilation, while also having the ability to port the program into a format independent of Python. This allows the program to be run in a non-Python environment, thus avoiding any potential performance issues related to the Python interpreter.
 
 ## Hybrid Programming
@@ -93,7 +93,7 @@ net = get_net()
 net(x)
 ```
 
-By calling the `hybridize` function, we are able to compile and optimize the computation in the MLP. The model’s computation result remains unchanged.
+By calling the `hybridize` function, we are able to compile and optimize the computation in the MLP. The model's computation result remains unchanged.
 
 ```{.python .input  n=4}
 net.hybridize()

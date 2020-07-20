@@ -19,7 +19,7 @@ may be the best that we can do.
 However, for high-dimensional perceptual data,
 these *structure-less* networks can grow unwieldy.
 
-For instance, let's return to our running example
+For instance, let us return to our running example
 of distinguishing cats from dogs.
 Say that we do a thorough job in data collection,
 collecting an annotated dataset of 1-megapixel photographs.
@@ -224,7 +224,7 @@ We will come back to this in the following section.
 
 ## Waldo Revisited
 
-Returning to our Waldo detector, let's see what this looks like.
+Returning to our Waldo detector, let us see what this looks like.
 The convolutional layer picks windows of a given size
 and weighs intensities according to the mask $V$, as demonstrated in :numref:`fig_waldo_mask`.
 We might aim to learn a model so that

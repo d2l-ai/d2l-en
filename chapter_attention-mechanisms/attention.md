@@ -190,18 +190,18 @@ atten(d2l.ones(2,1,2), keys, values, torch.tensor([2, 6]))
 
 As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension.
 To address such an issue,
-we may resort to the multilayer perceptron attention.
+we may resort to the MLP attention.
 
 
 
-## Multilayer Perceptron Attention
+## MLP Attention
 
-In *multilayer perceptron attention*, we project both query and keys into $\mathbb R^{h}$ by learnable weights parameters.
+In *MLP attention*, we project both query and keys into $\mathbb R^{h}$ by learnable weights parameters.
 Assume that the learnable weights are $\mathbf W_k\in\mathbb R^{h\times d_k}$, $\mathbf W_q\in\mathbb R^{h\times d_q}$, and $\mathbf v\in\mathbb R^{h}$. Then the score function is defined by
 
 $$\alpha(\mathbf k, \mathbf q) = \mathbf v^\top \text{tanh}(\mathbf W_k \mathbf k + \mathbf W_q\mathbf q).$$
 
-Intuitively, you can imagine $\mathbf W_k \mathbf k + \mathbf W_q\mathbf q$ as concatenating the key and value in the feature dimension and feeding them to a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. In this hidden layer, the activation function is $\tanh$ and no bias is applied. Now let us implement the multilayer perceptron attention.
+Intuitively, you can imagine $\mathbf W_k \mathbf k + \mathbf W_q\mathbf q$ as concatenating the key and value in the feature dimension and feeding them to a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. In this hidden layer, the activation function is $\tanh$ and no bias is applied. Now let us implement the MLP attention.
 
 ```{.python .input  n=7}
 #@save
@@ -266,12 +266,12 @@ atten(d2l.ones(2, 1, 2), keys, values, torch.tensor([2, 6]))
 
 * An attention layer explicitly selects related information.
 * An attention layer's memory consists of key-value pairs, so its output is close to the values whose keys are similar to the queries.
-* Two commonly used attention models are dot product attention and multilayer perceptron attention.
+* Two commonly used attention models are dot product attention and MLP attention.
 
 
 ## Exercises
 
-1. What are the advantages and disadvantages for dot product attention and multilayer perceptron attention, respectively?
+1. What are the advantages and disadvantages for dot product attention and MLP attention, respectively?
 
 
 :begin_tab:`mxnet`

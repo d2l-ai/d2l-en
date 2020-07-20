@@ -61,22 +61,20 @@ per channel and then adding up the results.
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
-
-def corr2d_multi_in(X, K):
-    # First, traverse along the 0th dimension (channel dimension) of `X` and
-    # `K`. Then, add them together
-    return sum(d2l.corr2d(x, k) for x, k in zip(X, K))
 ```
 
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
+```
 
+```{.python .input}
+#@tab mxnet, pytorch
 def corr2d_multi_in(X, K):
     # First, traverse along the 0th dimension (channel dimension) of `X` and
     # `K`. Then, add them together
-    return sum([d2l.corr2d(x, k) for x, k in zip(X, K)])
+    return sum(d2l.corr2d(x, k) for x, k in zip(X, K))
 ```
 
 ```{.python .input}
@@ -95,29 +93,10 @@ corresponding to the values in the above diagram
 to validate the output of the cross-correlation operation.
 
 ```{.python .input}
-X = np.array([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
-              [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
-K = np.array([[[0, 1], [2, 3]], [[1, 2], [3, 4]]])
-
-corr2d_multi_in(X, K)
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.tensor([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
-                  [[1, 2, 3], [4, 5, 6], [7, 8, 9]]], dtype=torch.float32)
-K = torch.tensor([[[0, 1], [2, 3]],
-                  [[1, 2], [3, 4]]], dtype=torch.float32)
-
-corr2d_multi_in(X, K)
-```
-
-```{.python .input}
-#@tab tensorflow
-X = tf.constant([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
-                 [[1, 2, 3], [4, 5, 6], [7, 8, 9]]], dtype=tf.float32)
-K = tf.constant([[[0, 1], [2, 3]],
-                 [[1, 2], [3, 4]]], dtype=tf.float32)
+#@tab all
+X = d2l.tensor([[[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]],
+               [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]])
+K = d2l.tensor([[[0.0, 1.0], [2.0, 3.0]], [[1.0, 2.0], [3.0, 4.0]]])
 
 corr2d_multi_in(X, K)
 ```
@@ -158,29 +137,12 @@ We implement a cross-correlation function
 to calculate the output of multiple channels as shown below.
 
 ```{.python .input}
+#@tab all
 def corr2d_multi_in_out(X, K):
     # Traverse along the 0th dimension of `K`, and each time, perform
     # cross-correlation operations with input `X`. All of the results are
     # merged together using the stack function
-    return np.stack([corr2d_multi_in(X, k) for k in K])
-```
-
-```{.python .input}
-#@tab pytorch
-def corr2d_multi_in_out(X, K):
-    # Traverse along the 0th dimension of `K`, and each time, perform
-    # cross-correlation operations with input `X`. All of the results are
-    # merged together using the stack function
-    return torch.stack([corr2d_multi_in(X, k) for k in K], dim=0)
-```
-
-```{.python .input}
-#@tab tensorflow
-def corr2d_multi_in_out(X, K):
-    # Traverse along the 0th dimension of `K`, and each time, perform
-    # cross-correlation operations with input `X`. All of the results are
-    # merged together using the stack function
-    return tf.stack([corr2d_multi_in(X, k) for k in K], axis=0)
+    return d2l.stack([corr2d_multi_in(X, k) for k in K], 0)
 ```
 
 We construct a convolution kernel with 3 output channels
@@ -188,19 +150,8 @@ by concatenating the kernel array `K` with `K+1`
 (plus one for each element in `K`) and `K+2`.
 
 ```{.python .input}
-K = np.stack((K, K + 1, K + 2))
-K.shape
-```
-
-```{.python .input}
-#@tab pytorch
-K = torch.stack([K, K + 1, K + 2], dim=0)
-K.shape
-```
-
-```{.python .input}
-#@tab tensorflow
-K = tf.stack([K, K + 1, K + 2], axis=0)
+#@tab all
+K = d2l.stack((K, K + 1, K + 2), 0)
 K.shape
 ```
 
@@ -261,35 +212,14 @@ The only thing is that we need to make some adjustments
 to the data shape before and after the matrix multiplication.
 
 ```{.python .input}
+#@tab all
 def corr2d_multi_in_out_1x1(X, K):
     c_i, h, w = X.shape
     c_o = K.shape[0]
-    X = X.reshape(c_i, h * w)
-    K = K.reshape(c_o, c_i)
-    Y = np.dot(K, X)  # Matrix multiplication in the fully connected layer
-    return Y.reshape(c_o, h, w)
-```
-
-```{.python .input}
-#@tab pytorch
-def corr2d_multi_in_out_1x1(X, K):
-    c_i, h, w = X.shape
-    c_o = K.shape[0]
-    X = X.reshape((c_i, h * w))
-    K = K.reshape((c_o, c_i))
-    Y = torch.mm(K, X)  # Matrix multiplication in the fully connected layer
-    return Y.reshape((c_o, h, w))
-```
-
-```{.python .input}
-#@tab tensorflow
-def corr2d_multi_in_out_1x1(X, K):
-    c_i, h, w = X.shape
-    c_o = K.shape[0]
-    X = tf.reshape(X, (c_i, h * w))
-    K = tf.reshape(K, (c_o, c_i))
-    Y = tf.matmul(K, X)  # Matrix multiplication in the fully connected layer
-    return tf.reshape(Y, (c_o, h, w))
+    X = d2l.reshape(X, (c_i, h * w))
+    K = d2l.reshape(K, (c_o, c_i))
+    Y = d2l.matmul(K, X)  # Matrix multiplication in the fully connected layer
+    return d2l.reshape(Y, (c_o, h, w))
 ```
 
 When performing $1\times 1$ convolution,
@@ -297,35 +227,22 @@ the above function is equivalent to the previously implemented cross-correlation
 Let us check this with some reference data.
 
 ```{.python .input}
-X = np.random.uniform(size=(3, 3, 3))
-K = np.random.uniform(size=(2, 3, 1, 1))
-
-Y1 = corr2d_multi_in_out_1x1(X, K)
-Y2 = corr2d_multi_in_out(X, K)
-
-np.abs(Y1 - Y2).sum() < 1e-6
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.randn(size=(3, 3, 3))
-K = torch.randn(size=(2, 3, 1, 1))
-
-Y1 = corr2d_multi_in_out_1x1(X, K)
-Y2 = corr2d_multi_in_out(X, K)
-
-(Y1 - Y2).norm().item() < 1e-6
+#@tab mxnet, pytorch
+X = d2l.normal(0, 1, (3, 3, 3))
+K = d2l.normal(0, 1, (2, 3, 1, 1))
 ```
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.random.uniform((3, 3, 3))
-K = tf.random.uniform((2, 3, 1, 1))
+X = d2l.normal((3, 3, 3), 0, 1)
+K = d2l.normal((2, 3, 1, 1), 0, 1)
+```
 
+```{.python .input}
+#@tab all
 Y1 = corr2d_multi_in_out_1x1(X, K)
 Y2 = corr2d_multi_in_out(X, K)
-
-tf.norm(Y1 - Y2) < 1e-6
+assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 ```
 
 ## Summary
@@ -338,14 +255,14 @@ tf.norm(Y1 - Y2) < 1e-6
 ## Exercises
 
 1. Assume that we have two convolutional kernels of size $k_1$ and $k_2$ respectively (with no nonlinearity in between).
-    * Prove that the result of the operation can be expressed by a single convolution.
-    * What is the dimensionality of the equivalent single convolution?
-    * Is the converse true?
+    1. Prove that the result of the operation can be expressed by a single convolution.
+    1. What is the dimensionality of the equivalent single convolution?
+    1. Is the converse true?
 1. Assume an input shape of $c_i\times h\times w$ and a convolution kernel with the shape $c_o\times c_i\times k_h\times k_w$, padding of $(p_h, p_w)$, and stride of $(s_h, s_w)$.
-    * What is the computational cost (multiplications and additions) for the forward computation?
-    * What is the memory footprint?
-    * What is the memory footprint for the backward computation?
-    * What is the computational cost for the backward computation?
+    1. What is the computational cost (multiplications and additions) for the forward computation?
+    1. What is the memory footprint?
+    1. What is the memory footprint for the backward computation?
+    1. What is the computational cost for the backward computation?
 1. By what factor does the number of calculations increase if we double the number of input channels $c_i$ and the number of output channels $c_o$? What happens if we double the padding?
 1. If the height and width of the convolution kernel is $k_h=k_w=1$, what is the complexity of the forward computation?
 1. Are the variables `Y1` and `Y2` in the last example of this section exactly the same? Why?

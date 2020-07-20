@@ -113,7 +113,7 @@ Instead, this call registers to MXNet that we wish
 to initialize the parameters.
 :end_tab:
 
-Net let's pass data through the network
+Net let us pass data through the network
 to make the framework finally initialize parameters.
 
 ```{.python .input}

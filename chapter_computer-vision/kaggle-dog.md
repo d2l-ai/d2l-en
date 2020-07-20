@@ -1,7 +1,7 @@
 # Dog Breed Identification (ImageNet Dogs) on Kaggle
 
 
-In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition’s web address is
+In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition's web address is
 
 > https://www.kaggle.com/c/dog-breed-identification
 
@@ -9,7 +9,7 @@ In this competition, we attempt to identify 120 different breeds of dogs. The da
 
 :numref:`fig_kaggle_dog` shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
-![Dog breed identification competition website. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.png)
+![Dog breed identification competition website. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.jpg)
 :width:`400px`
 :label:`fig_kaggle_dog`
 
@@ -69,6 +69,7 @@ def reorg_dog_data(data_dir, valid_ratio):
     labels = d2l.read_csv_labels(os.path.join(data_dir, 'labels.csv'))
     d2l.reorg_train_valid(data_dir, labels, valid_ratio)
     d2l.reorg_test(data_dir)
+
     
 batch_size = 4 if demo else 128
 valid_ratio = 0.1

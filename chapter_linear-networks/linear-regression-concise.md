@@ -26,10 +26,6 @@ To start, we will generate the same dataset as in :numref:`sec_linear_scratch`.
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
-
-true_w = np.array([2, -3.4])
-true_b = 4.2
-features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
 
 ```{.python .input}
@@ -38,11 +34,6 @@ from d2l import torch as d2l
 import numpy as np
 import torch
 from torch.utils import data
-
-true_w = torch.Tensor([2, -3.4])
-true_b = 4.2
-features, labels = d2l.synthetic_data(true_w, true_b, 1000)
-labels = labels.reshape(-1,1)
 ```
 
 ```{.python .input}
@@ -50,11 +41,13 @@ labels = labels.reshape(-1,1)
 from d2l import tensorflow as d2l
 import numpy as np
 import tensorflow as tf
+```
 
-true_w = tf.constant([2, -3.4], shape=(2, 1))
+```{.python .input}
+#@tab all
+true_w = d2l.tensor([2, -3.4])
 true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
-labels = tf.reshape(labels, (-1, 1))
 ```
 
 ## Reading the Dataset
@@ -73,9 +66,6 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a Gluon data iterator."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
-
-batch_size = 10
-data_iter = load_array((features, labels), batch_size)
 ```
 
 ```{.python .input}
@@ -84,9 +74,6 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
     """Construct a PyTorch data iterator."""
     dataset = data.TensorDataset(*data_arrays)
     return data.DataLoader(dataset, batch_size, shuffle=is_train)
-
-batch_size = 10
-data_iter = load_array((features, labels), batch_size)
 ```
 
 ```{.python .input}
@@ -98,7 +85,10 @@ def load_array(data_arrays, batch_size, is_train=True):  #@save
         dataset = dataset.shuffle(buffer_size=1000)
     dataset = dataset.batch(batch_size)
     return dataset
+```
 
+```{.python .input}
+#@tab all
 batch_size = 10
 data_iter = load_array((features, labels), batch_size)
 ```
@@ -150,7 +140,7 @@ will involve multiple layers,
 we will use it anyway just to familiarize you
 with the most standard workflow.
 
-Recall the architecture of a single-layer network as shown in :numref:`fig_singleneuron`.
+Recall the architecture of a single-layer network as shown in :numref:`fig_single_neuron`.
 The layer is said to be *fully-connected*
 because each of its inputs is connected to each of its outputs
 by means of a matrix-vector multiplication.
@@ -396,7 +386,7 @@ iteratively grabbing one minibatch of inputs
 and the corresponding ground-truth labels.
 For each minibatch, we go through the following ritual:
 
-* Generate predictions by calling `net(X)` and calculate the loss `l` (the forward pass).
+* Generate predictions by calling `net(X)` and calculate the loss `l` (the forward propagation).
 * Calculate gradients by running the backpropagation.
 * Update the model parameters by invoking our optimizer.
 

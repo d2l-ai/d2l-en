@@ -35,6 +35,7 @@ we still use models that make soft assignments.
 
 
 ## Classification Problem
+:label:`subsec_classification-problem`
 
 To get our feet wet, let us start off with
 a simple image classification problem.
@@ -261,6 +262,7 @@ are not sufficiently informative
 to classify every example perfectly.
 
 ### Softmax and Derivatives
+:label:`subsec_softmax_and_derivatives`
 
 Since the softmax and the corresponding loss are so common,
 it is worth understanding a bit better how it is computed.
@@ -291,7 +293,8 @@ In this sense, it is very similar to what we saw in regression,
 where the gradient was the difference
 between the observation $y$ and estimate $\hat{y}$.
 This is not coincidence.
-In any [exponential family](https://en.wikipedia.org/wiki/Exponential_family) model,
+In any exponential family (see the
+[online appendix on distributions](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/distributions.html)) model,
 the gradients of the log-likelihood are given by precisely this term.
 This fact makes computing gradients easy in practice.
 
@@ -385,7 +388,7 @@ we can predict the probability of each output class.
 Normally, we use the class with the highest predicted probability as the output class.
 The prediction is correct if it is consistent with the actual class (label).
 In the next part of the experiment,
-we will use *accuracy* to evaluate the model’s performance.
+we will use *accuracy* to evaluate the model's performance.
 This is equal to the ratio between the number of correct predictions and the total number of predictions.
 
 
