@@ -527,7 +527,7 @@ For instance, [reproducing kernel Hilbert space (RKHS)](https://en.wikipedia.org
 allows one to apply tools introduced
 for linear functions in a nonlinear context.
 Unfortunately, RKHS-based algorithms
-tend to scale purely to large, high-dimensional data.
+tend to scale poorly to large, high-dimensional data.
 In this book we will default to the simple heuristic
 of applying weight decay on all layers of a deep network.
 

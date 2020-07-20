@@ -18,7 +18,7 @@ we will enjoy more parsimonious models (requiring far fewer parameters).
 In this section, we will introduce LeNet,
 among the first published convolutional neural networks
 to capture wide attention for its performance on computer vision tasks.
-The model was introduced (and named for) Yann Lecun,
+The model was introduced by (and named for) Yann Lecun,
 then a researcher at AT&T Bell Labs,
 for the purpose of recognizing handwritten digits in images
 [LeNet5](http://yann.lecun.com/exdb/lenet/).
