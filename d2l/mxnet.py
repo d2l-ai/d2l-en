@@ -636,25 +636,25 @@ def load_data_time_machine(batch_size, num_steps,  #@save
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch:  #@save
     """A RNN Model based on scratch implementations."""
-    def __init__(self, vocab_size, num_hiddens, ctx,
+    def __init__(self, vocab_size, num_hiddens, device,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
-        self.params = get_params(vocab_size, num_hiddens, ctx)
+        self.params = get_params(vocab_size, num_hiddens, device)
         self.init_state, self.forward_fn = init_state, forward
 
     def __call__(self, X, state):
         X = npx.one_hot(X.T, self.vocab_size)
         return self.forward_fn(X, state, self.params)
 
-    def begin_state(self, batch_size, ctx):
-        return self.init_state(batch_size, self.num_hiddens, ctx)
+    def begin_state(self, batch_size, device):
+        return self.init_state(batch_size, self.num_hiddens, device)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_predicts, model, vocab, ctx):  #@save
-    state = model.begin_state(batch_size=1, ctx=ctx)
+def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
+    state = model.begin_state(batch_size=1, device=device)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
+    get_input = lambda: np.array([outputs[-1]], ctx=device).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -677,19 +677,20 @@ def grad_clipping(model, theta):  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):  #@save
+def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
+                    use_random_iter):
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
         if state is None or use_random_iter:
             # Initialize state when either it is the first iteration or
             # using random sampling.
-            state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
+            state = model.begin_state(batch_size=X.shape[0], device=device)
         else:
             for s in state:
                 s.detach()
         y = Y.T.reshape(-1)
-        X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
+        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         with autograd.record():
             py, state = model(X, state)
             l = loss(py, y).mean()
@@ -701,28 +702,29 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):  #@
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,  #@save
+def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
               use_random_iter=False):
     # Initialize
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
     if isinstance(model, gluon.Block):
-        model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
+        model.initialize(ctx=device, force_reinit=True,
+                         init=init.Normal(0.01))
         trainer = gluon.Trainer(model.collect_params(),
                                 'sgd', {'learning_rate': lr})
         updater = lambda batch_size: trainer.step(batch_size)
     else:
         updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
-    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, ctx)
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, device)
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
-            model, train_iter, loss, updater, ctx, use_random_iter)
+            model, train_iter, loss, updater, device, use_random_iter)
         if epoch % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch+1, [ppl])
-    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(ctx)}')
+    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
     print(predict('traveller'))
 
@@ -910,8 +912,8 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
-    model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
+def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
+    model.initialize(init.Xavier(), force_reinit=True, ctx=device)
     trainer = gluon.Trainer(model.collect_params(),
                             'adam', {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
@@ -921,7 +923,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # loss_sum, num_tokens
         for batch in data_iter:
-            X, X_vlen, Y, Y_vlen = [x.as_in_ctx(ctx) for x in batch]
+            X, X_vlen, Y, Y_vlen = [x.as_in_ctx(device) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
             with autograd.record():
                 Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
@@ -934,21 +936,21 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
         if epoch % 10 == 0:
             animator.add(epoch, (metric[0]/metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
-          f'tokens/sec on {str(ctx)}')
+          f'tokens/sec on {str(device)}')
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
-                    ctx):
+                    device):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
-    enc_valid_len = np.array([len(src_tokens)], ctx=ctx)
+    enc_valid_len = np.array([len(src_tokens)], ctx=device)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
-    enc_X = np.array(src_tokens, ctx=ctx)
+    enc_X = np.array(src_tokens, ctx=device)
     # Add the  batch size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
-    dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=ctx), axis=0)
+    dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=device), axis=0)
     predict_tokens = []
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
@@ -2073,7 +2075,7 @@ def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
+def train_bert(train_iter, net, loss, vocab_size, devices, log_interval,
                num_steps):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': 1e-3})
@@ -2089,7 +2091,7 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
             (tokens_X_shards, segments_X_shards, valid_lens_x_shards,
              pred_positions_X_shards, mlm_weights_X_shards,
              mlm_Y_shards, nsp_y_shards) = [gluon.utils.split_and_load(
-                elem, ctx, even_split=False) for elem in batch]
+                elem, devices, even_split=False) for elem in batch]
             timer.start()
             with autograd.record():
                 mlm_ls, nsp_ls, ls = _get_batch_loss_bert(
@@ -2113,7 +2115,8 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
 
     print(f'MLM loss {metric[0] / metric[3]:.3f}, '
           f'NSP loss {metric[1] / metric[3]:.3f}')
-    print(f'{metric[2] / timer.sum():.1f} sentence pairs/sec on {str(ctx)}')
+    print(f'{metric[2] / timer.sum():.1f} sentence pairs/sec on '
+          f'{str(devices)}')
 
 
 # Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis-and-dataset.md
@@ -2234,11 +2237,11 @@ def load_data_snli(batch_size, num_steps=50):
 
 
 # Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-attention.md
-def split_batch_multi_inputs(X, y, ctx_list):
+def split_batch_multi_inputs(X, y, devices):
     """Split multi-input `X` and `y` into multiple devices."""
     X = list(zip(*[gluon.utils.split_and_load(
-        feature, ctx_list, even_split=False) for feature in X]))
-    return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
+        feature, devices, even_split=False) for feature in X]))
+    return (X, gluon.utils.split_and_load(y, devices, even_split=False))
 
 
 # Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-attention.md
@@ -2334,7 +2337,7 @@ def split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',
 
 # Defined in file: ./chapter_recommender-systems/mf.md
 def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
-                        ctx_list=d2l.try_all_gpus(), evaluator=None,
+                        devices=d2l.try_all_gpus(), evaluator=None,
                         **kwargs):
     timer = d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 2],
@@ -2346,28 +2349,28 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             input_data = []
             values = values if isinstance(values, list) else [values]
             for v in values:
-                input_data.append(gluon.utils.split_and_load(v, ctx_list))
+                input_data.append(gluon.utils.split_and_load(v, devices))
             train_feat = input_data[0:-1] if len(values) > 1 else input_data
             train_label = input_data[-1]
             with autograd.record():
                 preds = [net(*t) for t in zip(*train_feat)]
                 ls = [loss(p, s) for p, s in zip(preds, train_label)]
             [l.backward() for l in ls]
-            l += sum([l.asnumpy() for l in ls]).mean() / len(ctx_list)
+            l += sum([l.asnumpy() for l in ls]).mean() / len(devices)
             trainer.step(values[0].shape[0])
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
         if len(kwargs) > 0:  # It will be used in section AutoRec
             test_rmse = evaluator(net, test_iter, kwargs['inter_mat'],
-                                  ctx_list)
+                                  devices)
         else:
-            test_rmse = evaluator(net, test_iter, ctx_list)
+            test_rmse = evaluator(net, test_iter, devices)
         train_l = l / (i + 1)
         animator.add(epoch + 1, (train_l, test_rmse))
     print(f'train loss {metric[0] / metric[1]:.3f}, '
           f'test RMSE {test_rmse:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(ctx_list)}')
+          f'on {str(devices)}')
 
 
 # Defined in file: ./chapter_recommender-systems/ranking.md
@@ -2406,7 +2409,7 @@ def hit_and_auc(rankedlist, test_matrix, k):
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
 def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
-                     ctx):
+                     devices):
     ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
     all_items = set([i for i in range(num_users)])
     for u in range(num_users):
@@ -2422,7 +2425,7 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
             gluon.data.ArrayDataset(*x), shuffle=False, last_batch="keep",
             batch_size=1024)
         for index, values in enumerate(test_data_iter):
-            x = [gluon.utils.split_and_load(v, ctx, even_split=False)
+            x = [gluon.utils.split_and_load(v, devices, even_split=False)
                  for v in values]
             scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
         scores = [item for sublist in scores for item in sublist]
@@ -2437,7 +2440,7 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx_list, evaluator,
+                  num_users, num_items, num_epochs, devices, evaluator,
                   candidates, eval_step=1):
     timer, hit_rate, auc = d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
@@ -2447,14 +2450,14 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
         for i, values in enumerate(train_iter):
             input_data = []
             for v in values:
-                input_data.append(gluon.utils.split_and_load(v, ctx_list))
+                input_data.append(gluon.utils.split_and_load(v, devices))
             with autograd.record():
                 p_pos = [net(*t) for t in zip(*input_data[0:-1])]
                 p_neg = [net(*t) for t in zip(*input_data[0:-2],
                                               input_data[-1])]
                 ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]
-            l += sum([l.asnumpy() for l in ls]).mean()/len(ctx_list)
+            l += sum([l.asnumpy() for l in ls]).mean()/len(devices)
             trainer.step(values[0].shape[0])
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
@@ -2462,12 +2465,12 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             if (epoch + 1) % eval_step == 0:
                 hit_rate, auc = evaluator(net, test_iter, test_seq_iter,
                                           candidates, num_users, num_items,
-                                          ctx_list)
+                                          devices)
                 animator.add(epoch + 1, (hit_rate, auc))
     print(f'train loss {metric[0] / metric[1]:.3f}, '
           f'test hit rate {float(hit_rate):.3f}, test AUC {float(auc):.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(ctx_list)}')
+          f'on {str(devices)}')
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md

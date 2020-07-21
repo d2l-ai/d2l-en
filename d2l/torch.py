@@ -684,7 +684,8 @@ class RNNModelScratch: #@save
 def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, device=device)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: torch.tensor([outputs[-1]], device=device).reshape(1, 1)
+    get_input = lambda: torch.tensor(
+        [outputs[-1]], device=device).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -707,7 +708,8 @@ def grad_clipping(model, theta):  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater, device, use_random_iter):  #@save
+def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
+                    use_random_iter):
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:

@@ -111,8 +111,8 @@ net.add(nn.Embedding(input_dim=len(vocab), output_dim=embed_size),
 The training function is defined below. Because of the existence of padding, the calculation of the loss function is slightly different compared to the previous training functions.
 
 ```{.python .input  n=21}
-def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
-    net.initialize(ctx=ctx, force_reinit=True)
+def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
+    net.initialize(ctx=device, force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
@@ -122,7 +122,7 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
         metric = d2l.Accumulator(2)  # Sum of losses, no. of tokens
         for i, batch in enumerate(data_iter):
             center, context_negative, mask, label = [
-                data.as_in_ctx(ctx) for data in batch]
+                data.as_in_ctx(device) for data in batch]
             with autograd.record():
                 pred = skip_gram(center, context_negative, net[0], net[1])
                 l = (loss(pred.reshape(label.shape), label, mask)
@@ -134,7 +134,7 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
                 animator.add(epoch+(i+1)/len(data_iter),
                              (metric[0]/metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, '
-          f'{metric[1] / timer.stop():.1f} tokens/sec on {str(ctx)}')
+          f'{metric[1] / timer.stop():.1f} tokens/sec on {str(device)}')
 ```
 
 Now, we can train a skip-gram model using negative sampling.

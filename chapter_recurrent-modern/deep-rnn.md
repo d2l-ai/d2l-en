@@ -44,7 +44,8 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 The architectural decisions (such as choosing parameters) are very similar to those of previous sections. We pick the same number of inputs and outputs as we have distinct tokens, i.e., `vocab_size`. The number of hidden units is still 256. The only difference is that we now select a nontrivial number of layers `num_layers = 2`.
 
 ```{.python .input  n=22}
-vocab_size, num_hiddens, num_layers, ctx = len(vocab), 256, 2, d2l.try_gpu()
+vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
+device = d2l.try_gpu()
 lstm_layer = rnn.LSTM(num_hiddens, num_layers)
 model = d2l.RNNModel(lstm_layer, len(vocab))
 ```
@@ -55,7 +56,7 @@ The actual invocation logic is identical to before. The only difference is that 
 
 ```{.python .input  n=8}
 num_epochs, lr = 500, 2
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
 ## Summary

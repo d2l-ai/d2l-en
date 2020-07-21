@@ -63,10 +63,10 @@ class AutoRec(nn.Block):
 Since the input and output have been changed, we need to reimplement the evaluation function, while we still use RMSE as the accuracy measure.
 
 ```{.python .input  n=3}
-def evaluator(network, inter_matrix, test_data, ctx):
+def evaluator(network, inter_matrix, test_data, devices):
     scores = []
     for values in inter_matrix:
-        feat = gluon.utils.split_and_load(values, ctx, even_split=False)
+        feat = gluon.utils.split_and_load(values, devices, even_split=False)
         scores.extend([network(i).asnumpy() for i in feat])
     recons = np.array([item for sublist in scores for item in sublist])
     # Calculate the test RMSE
@@ -80,7 +80,7 @@ def evaluator(network, inter_matrix, test_data, ctx):
 Now, let us train and evaluate AutoRec on the MovieLens dataset. We can clearly see that the test RMSE is lower than the matrix factorization model, confirming the effectiveness of neural networks in the rating prediction task.
 
 ```{.python .input  n=4}
-ctx = d2l.try_all_gpus()
+devices = d2l.try_all_gpus()
 # Load the MovieLens 100K dataset
 df, num_users, num_items = d2l.read_data_ml100k()
 train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items)
@@ -96,13 +96,13 @@ test_iter = gluon.data.DataLoader(np.array(train_inter_mat), shuffle=False,
                                   num_workers=d2l.get_dataloader_workers())
 # Model initialization, training, and evaluation
 net = AutoRec(500, num_users)
-net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
+net.initialize(ctx=devices, force_reinit=True, init=mx.init.Normal(0.01))
 lr, num_epochs, wd, optimizer = 0.002, 25, 1e-5, 'adam'
 loss = gluon.loss.L2Loss()
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
 d2l.train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
-                        ctx, evaluator, inter_mat=test_inter_mat)
+                        devices, evaluator, inter_mat=test_inter_mat)
 ```
 
 ## Summary

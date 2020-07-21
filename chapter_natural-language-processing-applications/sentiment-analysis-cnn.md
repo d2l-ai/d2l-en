@@ -153,9 +153,9 @@ Create a TextCNN instance. It has 3 convolutional layers with kernel widths of 3
 
 ```{.python .input  n=6}
 embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
-ctx = d2l.try_all_gpus()
+devices = d2l.try_all_gpus()
 net = TextCNN(len(vocab), embed_size, kernel_sizes, nums_channels)
-net.initialize(init.Xavier(), ctx=ctx)
+net.initialize(init.Xavier(), ctx=devices)
 ```
 
 ### Load Pre-trained Word Vectors
@@ -178,7 +178,7 @@ Now we can train the model.
 lr, num_epochs = 0.001, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
-d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
 Below, we use the trained model to classify sentiments of two simple sentences.

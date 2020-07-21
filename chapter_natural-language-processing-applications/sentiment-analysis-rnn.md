@@ -69,9 +69,9 @@ class BiRNN(nn.Block):
 Create a bidirectional recurrent neural network with two hidden layers.
 
 ```{.python .input}
-embed_size, num_hiddens, num_layers, ctx = 100, 100, 2, d2l.try_all_gpus()
+embed_size, num_hiddens, num_layers, devices = 100, 100, 2, d2l.try_all_gpus()
 net = BiRNN(len(vocab), embed_size, num_hiddens, num_layers)
-net.initialize(init.Xavier(), ctx=ctx)
+net.initialize(init.Xavier(), ctx=devices)
 ```
 
 ### Loading Pre-trained Word Vectors
@@ -104,7 +104,7 @@ Now, we can start training.
 lr, num_epochs = 0.01, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
-d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
 Finally, define the prediction function.

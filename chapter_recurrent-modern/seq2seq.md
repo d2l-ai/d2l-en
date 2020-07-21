@@ -286,8 +286,8 @@ During training, if the target sequence has length $n$, we feed the first $n-1$ 
 
 ```{.python .input  n=11}
 #@save
-def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
-    model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
+def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
+    model.initialize(init.Xavier(), force_reinit=True, ctx=device)
     trainer = gluon.Trainer(model.collect_params(),
                             'adam', {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
@@ -297,7 +297,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # loss_sum, num_tokens
         for batch in data_iter:
-            X, X_vlen, Y, Y_vlen = [x.as_in_ctx(ctx) for x in batch]
+            X, X_vlen, Y, Y_vlen = [x.as_in_ctx(device) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
             with autograd.record():
                 Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
@@ -310,7 +310,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
         if epoch % 10 == 0:
             animator.add(epoch, (metric[0]/metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
-          f'tokens/sec on {str(ctx)}')
+          f'tokens/sec on {str(device)}')
 ```
 
 ```{.python .input}
@@ -356,7 +356,7 @@ Next, we create a model instance and set hyperparameters. Then, we can train the
 ```{.python .input  n=15}
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_steps = 64, 10
-lr, num_epochs, ctx = 0.005, 300, d2l.try_gpu()
+lr, num_epochs, device = 0.005, 300, d2l.try_gpu()
 
 src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
 encoder = Seq2SeqEncoder(
@@ -364,7 +364,7 @@ encoder = Seq2SeqEncoder(
 decoder = Seq2SeqDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
+train_s2s_ch9(model, train_iter, lr, num_epochs, device)
 ```
 
 ```{.python .input}
@@ -393,16 +393,16 @@ sequence. As illustrated in :numref:`fig_seq2seq_predict`, during predicting, we
 ```{.python .input  n=16}
 #@save
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
-                    ctx):
+                    device):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
-    enc_valid_len = np.array([len(src_tokens)], ctx=ctx)
+    enc_valid_len = np.array([len(src_tokens)], ctx=device)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
-    enc_X = np.array(src_tokens, ctx=ctx)
+    enc_X = np.array(src_tokens, ctx=device)
     # Add the  batch size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
-    dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=ctx), axis=0)
+    dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=device), axis=0)
     predict_tokens = []
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
@@ -443,14 +443,8 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
 
 Try several examples:
 
-```{.python .input  n=17}
-for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + predict_s2s_ch9(
-        model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
-```
-
 ```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, device))

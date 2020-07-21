@@ -150,7 +150,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
                             xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
                             legend=['generator', 'discriminator'])
     animator.fig.subplots_adjust(hspace=0.3)
-    for epoch in range(1, num_epochs+1):
+    for epoch in range(num_epochs):
         # Train one epoch
         timer = d2l.Timer()
         metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
@@ -169,7 +169,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
         animator.axes[1].legend(['real', 'generated'])
         # Show the losses
         loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]
-        animator.add(epoch, (loss_D, loss_G))
+        animator.add(epoch + 1, (loss_D, loss_G))
     print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '
           f'{metric[2] / timer.stop():.1f} examples/sec')
 ```

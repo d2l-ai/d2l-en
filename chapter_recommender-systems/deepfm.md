@@ -89,14 +89,14 @@ train_iter = gluon.data.DataLoader(
 test_iter = gluon.data.DataLoader(
     test_data, shuffle=False, last_batch='rollover', batch_size=batch_size,
     num_workers=d2l.get_dataloader_workers())
-ctx = d2l.try_all_gpus()
+devices = d2l.try_all_gpus()
 net = DeepFM(field_dims, num_factors=10, mlp_dims=[30, 20, 10])
-net.initialize(init.Xavier(), ctx=ctx)
+net.initialize(init.Xavier(), ctx=devices)
 lr, num_epochs, optimizer = 0.01, 30, 'adam'
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {'learning_rate': lr})
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
-d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
 Compared with FM, DeepFM converges faster and achieves better performance.
