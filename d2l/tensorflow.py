@@ -438,8 +438,8 @@ def try_gpu(i=0):  #@save
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
     num_gpus = len(tf.config.experimental.list_physical_devices('GPU'))
-    ctxes = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]
-    return ctxes if ctxes else [tf.device('/CPU:0')]
+    devices = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]
+    return devices if devices else [tf.device('/CPU:0')]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md

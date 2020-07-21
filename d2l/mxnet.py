@@ -413,8 +413,8 @@ def try_gpu(i=0):  #@save
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    ctxes = [npx.gpu(i) for i in range(npx.num_gpus())]
-    return ctxes if ctxes else [npx.cpu()]
+    devices = [npx.gpu(i) for i in range(npx.num_gpus())]
+    return devices if devices else [npx.cpu()]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
@@ -429,19 +429,20 @@ def corr2d(X, K):  #@save
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
-    if not ctx:  # Query the first device the first parameter is on
-        ctx = list(net.collect_params().values())[0].list_ctx()[0]
+def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
+    if not device:  # Query the first device where the first parameter is on
+        device = list(net.collect_params().values())[0].list_ctx()[0]
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
-        X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
+        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0]/metric[1]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
-    net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
+def train_ch6(net, train_iter, test_iter, num_epochs, lr,
+              device=d2l.try_gpu()):
+    net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
@@ -453,7 +454,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         for i, (X, y) in enumerate(train_iter):
             timer.start()
             # Here is the only difference compared with `d2l.train_epoch_ch3`
-            X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
+            X, y = X.as_in_ctx(device), y.as_in_ctx(device)
             with autograd.record():
                 y_hat = net(X)
                 l = loss(y_hat, y)
@@ -470,7 +471,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
           f'test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(ctx)}')
+          f'on {str(device)}')
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
@@ -1325,9 +1326,9 @@ def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
 
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
-def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
+def train_batch_ch13(net, features, labels, loss, trainer, devices,
                      split_f=d2l.split_batch):
-    X_shards, y_shards = split_f(features, labels, ctx_list)
+    X_shards, y_shards = split_f(features, labels, devices)
     with autograd.record():
         pred_shards = [net(X_shard) for X_shard in X_shards]
         ls = [loss(pred_shard, y_shard) for pred_shard, y_shard
@@ -1345,7 +1346,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
-               ctx_list=d2l.try_all_gpus(), split_f=d2l.split_batch):
+               devices=d2l.try_all_gpus(), split_f=d2l.split_batch):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
@@ -1355,7 +1356,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
             l, acc = train_batch_ch13(
-                net, features, labels, loss, trainer, ctx_list, split_f)
+                net, features, labels, loss, trainer, devices, split_f)
             metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
             if (i + 1) % (num_batches // 5) == 0:
@@ -1367,7 +1368,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
     print(f'loss {metric[0] / metric[2]:.3f}, train acc '
           f'{metric[1] / metric[3]:.3f}, test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec on '
-          f'{str(ctx_list)}')
+          f'{str(devices)}')
 
 
 # Defined in file: ./chapter_computer-vision/fine-tuning.md
@@ -1600,7 +1601,7 @@ def reorg_test(data_dir):
 
 # Defined in file: ./chapter_computer-vision/kaggle-dog.md
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
-                            '7c9b54e78c1cedaa04998f9868bc548c60101362')
+                            '75d1ec6b9b2616d2760f211f72a83f73f3b83763')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md

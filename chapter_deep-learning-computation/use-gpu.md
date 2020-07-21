@@ -189,8 +189,8 @@ def try_gpu(i=0):  #@save
 
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    ctxes = [npx.gpu(i) for i in range(npx.num_gpus())]
-    return ctxes if ctxes else [npx.cpu()]
+    devices = [npx.gpu(i) for i in range(npx.num_gpus())]
+    return devices if devices else [npx.cpu()]
 
 try_gpu(), try_gpu(3), try_all_gpus()
 ```
@@ -205,9 +205,9 @@ def try_gpu(i=0):  #@save
 
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    ctxes = [torch.device(f'cuda:{i}')
+    devices = [torch.device(f'cuda:{i}')
              for i in range(torch.cuda.device_count())]
-    return ctxes if ctxes else [torch.device('cpu')]
+    return devices if devices else [torch.device('cpu')]
 
 try_gpu(), try_gpu(3), try_all_gpus()
 ```
@@ -223,8 +223,8 @@ def try_gpu(i=0):  #@save
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
     num_gpus = len(tf.config.experimental.list_physical_devices('GPU'))
-    ctxes = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]
-    return ctxes if ctxes else [tf.device('/CPU:0')]
+    devices = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]
+    return devices if devices else [tf.device('/CPU:0')]
 
 try_gpu(), try_gpu(3), try_all_gpus()
 ```

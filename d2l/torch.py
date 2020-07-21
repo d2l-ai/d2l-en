@@ -431,9 +431,9 @@ def try_gpu(i=0):  #@save
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    ctxes = [torch.device(f'cuda:{i}')
+    devices = [torch.device(f'cuda:{i}')
              for i in range(torch.cuda.device_count())]
-    return ctxes if ctxes else [torch.device('cpu')]
+    return devices if devices else [torch.device('cpu')]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
