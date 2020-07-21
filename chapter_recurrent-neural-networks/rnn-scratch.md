@@ -3,7 +3,7 @@
 
 In this section we implement a language model introduced in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the dataset first, which is introduced in :numref:`sec_language_model`.
 
-```{.python .input}
+```{.python .input  n=1}
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
@@ -11,7 +11,7 @@ from mxnet import autograd, np, npx, gluon
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=2}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -21,7 +21,7 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 #@tab all
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
@@ -36,23 +36,23 @@ easiest representation is called *one-hot encoding*.
 
 In a nutshell, we map each index to a different unit vector: assume that the number of different tokens in the vocabulary is $N$ (the `len(vocab)`) and the token indices range from 0 to $N-1$. If the index of a token is the integer $i$, then we create a vector $\mathbf{e}_i$ of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
 
-```{.python .input}
+```{.python .input  n=4}
 npx.one_hot(np.array([0, 2]), len(vocab))
 ```
 
-```{.python .input}
+```{.python .input  n=5}
 #@tab pytorch
 F.one_hot(torch.tensor([0, 2]), len(vocab))
 ```
 
 The shape of the minibatch we sample each time is (batch size, timestep). The `one_hot` function transforms such a minibatch into a 3-D tensor with the last dimension equals to the vocabulary size. We often transpose the input so that we will obtain a (timestep, batch size, vocabulary size) output that fits into a sequence model easier.
 
-```{.python .input}
+```{.python .input  n=6}
 X = np.arange(10).reshape(2, 5)
 npx.one_hot(X.T, 28).shape
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 #@tab pytorch
 X = torch.arange(10).reshape(2, 5)
 F.one_hot(X.T, 28).shape
@@ -62,7 +62,7 @@ F.one_hot(X.T, 28).shape
 
 Next, we initialize the model parameters for a RNN model. The number of hidden units `num_hiddens` is a tunable parameter.
 
-```{.python .input}
+```{.python .input  n=8}
 def get_params(vocab_size, num_hiddens, device):
     num_inputs = num_outputs = vocab_size
 
@@ -82,7 +82,7 @@ def get_params(vocab_size, num_hiddens, device):
     return params
 ```
 
-```{.python .input}
+```{.python .input  n=9}
 #@tab pytorch
 def get_params(vocab_size, num_hiddens, device):
     num_inputs = num_outputs = vocab_size
@@ -107,12 +107,12 @@ def get_params(vocab_size, num_hiddens, device):
 
 First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns a tensor filled with 0 and with a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple variables (e.g., when combining multiple layers in an RNN where each layer requires initializing).
 
-```{.python .input}
+```{.python .input  n=10}
 def init_rnn_state(batch_size, num_hiddens, device):
     return (d2l.zeros((batch_size, num_hiddens), ctx=device), )
 ```
 
-```{.python .input}
+```{.python .input  n=11}
 #@tab pytorch
 def init_rnn_state(batch_size, num_hiddens, device):
     return (d2l.zeros((batch_size, num_hiddens), device=device), )
@@ -124,7 +124,7 @@ described in :numref:`sec_mlp`, the
 mean value of the $\tanh$ function is 0, when the elements are evenly
 distributed over the real numbers.
 
-```{.python .input}
+```{.python .input  n=12}
 def rnn(inputs, state, params):
     # Inputs shape: (num_steps, batch_size, vocab_size)
     W_xh, W_hh, b_h, W_hq, b_q = params
@@ -137,7 +137,7 @@ def rnn(inputs, state, params):
     return np.concatenate(outputs, axis=0), (H,)
 ```
 
-```{.python .input}
+```{.python .input  n=13}
 #@tab pytorch
 def rnn(inputs, state, params):
     # Inputs shape: (num_steps, batch_size, vocab_size)
@@ -153,7 +153,7 @@ def rnn(inputs, state, params):
 
 Now we have all functions defined, next we create a class to wrap these functions and store parameters.
 
-```{.python .input}
+```{.python .input  n=14}
 class RNNModelScratch:  #@save
     """A RNN Model based on scratch implementations."""
     def __init__(self, vocab_size, num_hiddens, device,
@@ -166,11 +166,11 @@ class RNNModelScratch:  #@save
         X = npx.one_hot(X.T, self.vocab_size)
         return self.forward_fn(X, state, self.params)
 
-    def begin_state(self, batch_size, device):
-        return self.init_state(batch_size, self.num_hiddens, device)
+    def begin_state(self, batch_size, ctx):
+        return self.init_state(batch_size, self.num_hiddens, ctx)
 ```
 
-```{.python .input}
+```{.python .input  n=15}
 #@tab pytorch
 class RNNModelScratch: #@save
     """A RNN Model based on scratch implementations."""
@@ -190,7 +190,7 @@ class RNNModelScratch: #@save
 
 Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state has not changed.
 
-```{.python .input}
+```{.python .input  n=16}
 #@tab all
 num_hiddens = 512
 model = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
@@ -206,9 +206,9 @@ We can see that the output shape is (number steps $\times$ batch size, vocabular
 
 We first explain the predicting function so we can regularly check the prediction during training. This function predicts the next `num_predicts` characters based on the `prefix` (a string containing several characters). For the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them.
 
-```{.python .input}
+```{.python .input  n=17}
 def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
-    state = model.begin_state(batch_size=1, device=device)
+    state = model.begin_state(batch_size=1, ctx=device)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: np.array([outputs[-1]], ctx=device).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
@@ -220,7 +220,7 @@ def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
-```{.python .input}
+```{.python .input  n=18}
 #@tab pytorch
 def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, device=device)
@@ -238,7 +238,7 @@ def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
 
 We test the `predict_ch8` function first. Given that we did not train the network, it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
 
-```{.python .input}
+```{.python .input  n=19}
 #@tab all
 predict_ch8('time traveller ', 10, model, vocab, d2l.try_gpu())
 ```
@@ -266,7 +266,7 @@ a quick fix to the gradient exploding. While it does not entirely solve the prob
 
 Below we define a function to clip the gradients of a model that is either a building from scratch instance or a model constructed by the high-level APIs. Also note that we compute the gradient norm over all parameters.
 
-```{.python .input}
+```{.python .input  n=20}
 def grad_clipping(model, theta):  #@save
     if isinstance(model, gluon.Block):
         params = [p.data() for p in model.collect_params().values()]
@@ -278,7 +278,7 @@ def grad_clipping(model, theta):  #@save
             param.grad[:] *= theta / norm
 ```
 
-```{.python .input}
+```{.python .input  n=21}
 #@tab pytorch
 def grad_clipping(model, theta):  #@save
     if isinstance(model, nn.Module):
@@ -304,7 +304,7 @@ Let us first define the function to train the model on one data epoch. It differ
 
 When the sequential partitioning is used, we initialize the hidden state at the beginning of each epoch. Since the $i^\mathrm{th}$ example in the next minibatch is adjacent to the current $i^\mathrm{th}$ example, so the next minibatch can use the current hidden state directly, we only detach the gradient so that we compute the gradients within a minibatch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same as the `train_epoch_ch3` function in :numref:`sec_softmax_scratch`, we use generalized `updater`, which could be either a high-level API trainer or a scratched implementation.
 
-```{.python .input}
+```{.python .input  n=22}
 def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
                     use_random_iter):
     state, timer = None, d2l.Timer()
@@ -313,7 +313,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
         if state is None or use_random_iter:
             # Initialize state when either it is the first iteration or
             # using random sampling.
-            state = model.begin_state(batch_size=X.shape[0], device=device)
+            state = model.begin_state(batch_size=X.shape[0], ctx=device)
         else:
             for s in state:
                 s.detach()
@@ -329,7 +329,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 ```
 
-```{.python .input}
+```{.python .input  n=23}
 #@tab pytorch
 def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
                     use_random_iter):
@@ -357,12 +357,12 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
             grad_clipping(model, 1)
             updater(batch_size=1)  # Since used mean already
         metric.add(l * d2l.size(y), d2l.size(y))
-    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
 ```
 
 The training function again supports either we implement the model from scratch or using high-level APIs.
 
-```{.python .input}
+```{.python .input  n=24}
 def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
               use_random_iter=False):
     # Initialize
@@ -390,7 +390,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
     print(predict('traveller'))
 ```
 
-```{.python .input}
+```{.python .input  n=25}
 #@tab pytorch
 #@save
 def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
@@ -419,7 +419,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
 
 Now we can train a model. Since we only use $10,000$ tokens in the dataset, the model needs more epochs to converge.
 
-```{.python .input}
+```{.python .input  n=26}
 #@tab all
 num_epochs, lr = 500, 1
 train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
@@ -427,7 +427,7 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 
 Finally let us check the results to use a random sampling iterator.
 
-```{.python .input}
+```{.python .input  n=27}
 #@tab all
 train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
           use_random_iter=True)

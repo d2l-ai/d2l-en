@@ -79,7 +79,7 @@ In the exercise, we will show how to fine-tune the much larger "bert.base" to si
 devices = d2l.try_all_gpus()
 bert, vocab = load_pretrained_model(
     'bert.small', num_hiddens=256, ffn_num_hiddens=512, num_heads=4,
-    num_layers=2, dropout=0.1, max_len=512, devices)
+    num_layers=2, dropout=0.1, max_len=512, devices=devices)
 ```
 
 ## The Dataset for Fine-Tuning BERT

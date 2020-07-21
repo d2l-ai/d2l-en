@@ -734,7 +734,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
             grad_clipping(model, 1)
             updater(batch_size=1)  # Since used mean already
         metric.add(l * d2l.size(y), d2l.size(y))
-    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md

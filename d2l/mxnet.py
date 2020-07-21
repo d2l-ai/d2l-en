@@ -646,13 +646,13 @@ class RNNModelScratch:  #@save
         X = npx.one_hot(X.T, self.vocab_size)
         return self.forward_fn(X, state, self.params)
 
-    def begin_state(self, batch_size, device):
-        return self.init_state(batch_size, self.num_hiddens, device)
+    def begin_state(self, batch_size, ctx):
+        return self.init_state(batch_size, self.num_hiddens, ctx)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
-    state = model.begin_state(batch_size=1, device=device)
+    state = model.begin_state(batch_size=1, ctx=device)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: np.array([outputs[-1]], ctx=device).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
@@ -685,7 +685,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
         if state is None or use_random_iter:
             # Initialize state when either it is the first iteration or
             # using random sampling.
-            state = model.begin_state(batch_size=X.shape[0], device=device)
+            state = model.begin_state(batch_size=X.shape[0], ctx=device)
         else:
             for s in state:
                 s.detach()
