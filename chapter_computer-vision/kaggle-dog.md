@@ -46,7 +46,7 @@ Similarly, to make it easier to get started, we provide a small-scale sample of 
 
 ```{.python .input  n=1}
 #@save 
-d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny_v2.zip',
+d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '75d1ec6b9b2616d2760f211f72a83f73f3b83763')
 
 # If you use the full dataset downloaded for the Kaggle competition, change
@@ -161,7 +161,7 @@ model parameter gradients.
 You must note that, during image augmentation, we use the mean values and standard deviations of the three RGB channels for the entire ImageNet dataset for normalization. This is consistent with the normalization of the pre-trained model.
 
 ```{.python .input  n=6}
-def get_net(ctx):
+def get_net(devices):
     finetune_net = gluon.model_zoo.vision.resnet34_v2(pretrained=True)
     # Define a new output network
     finetune_net.output_new = nn.HybridSequential(prefix='')
@@ -169,9 +169,9 @@ def get_net(ctx):
     # There are 120 output categories
     finetune_net.output_new.add(nn.Dense(120))
     # Initialize the output network
-    finetune_net.output_new.initialize(init.Xavier(), ctx=ctx)
+    finetune_net.output_new.initialize(init.Xavier(), ctx=devices)
     # Distribute the model parameters to the CPUs or GPUs used for computation
-    finetune_net.collect_params().reset_ctx(ctx)
+    finetune_net.collect_params().reset_ctx(devices)
     return finetune_net
 ```
 
@@ -180,10 +180,10 @@ When calculating the loss, we first use the member variable `features` to obtain
 ```{.python .input}
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
-def evaluate_loss(data_iter, net, ctx_list):
+def evaluate_loss(data_iter, net, devices):
     l_sum, n = 0.0, 0
     for features, labels in data_iter:
-        X_shards, y_shards = d2l.split_batch(features, labels, ctx_list)
+        X_shards, y_shards = d2l.split_batch(features, labels, devices)
         output_features = [net.features(X_shard) for X_shard in X_shards]
         outputs = [net.output_new(feature) for feature in output_features]
         ls = [loss(output, y_shard).sum() for output, y_shard
@@ -198,7 +198,7 @@ def evaluate_loss(data_iter, net, ctx_list):
 We will select the model and tune hyperparameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
 
 ```{.python .input}
-def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
+def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           lr_decay):
     # Only train the small custom output network
     trainer = gluon.Trainer(net.output_new.collect_params(), 'sgd',
@@ -212,7 +212,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
-            X_shards, y_shards = d2l.split_batch(features, labels, ctx_list)
+            X_shards, y_shards = d2l.split_batch(features, labels, devices)
             output_features = [net.features(X_shard) for X_shard in X_shards]
             with autograd.record():
                 outputs = [net.output_new(feature) for feature in output_features]
@@ -227,7 +227,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
                 animator.add(epoch + i / num_batches, 
                              (metric[0] / metric[1], None))
         if valid_iter is not None:
-            valid_loss = evaluate_loss(valid_iter, net, ctx_list)
+            valid_loss = evaluate_loss(valid_iter, net, devices)
             animator.add(epoch + 1, (None, valid_loss))
     if valid_iter is not None:
         print(f'train loss {metric[0] / metric[1]:.3f}, '
@@ -235,7 +235,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
     else:
         print(f'train loss {metric[0] / metric[1]:.3f}')
     print(f'{metric[1] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(ctx_list)}')
+          f'on {str(devices)}')
 ```
 
 ## Training and Validating the Model
@@ -243,10 +243,10 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
 Now, we can train and validate the model. The following hyperparameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
 
 ```{.python .input  n=9}
-ctx, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.01, 1e-4
-lr_period, lr_decay, net = 10, 0.1, get_net(ctx)
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.01, 1e-4
+lr_period, lr_decay, net = 10, 0.1, get_net(devices)
 net.hybridize()
-train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
 
@@ -255,15 +255,14 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 After obtaining a satisfactory model design and hyperparameters, we use all training datasets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
 
 ```{.python .input  n=8}
-net = get_net(ctx)
+net = get_net(devices)
 net.hybridize()
-train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 
-ctx = d2l.try_gpu()
 preds = []
 for data, label in test_iter:
-    output_features = net.features(data.as_in_ctx(ctx))
+    output_features = net.features(data.as_in_ctx(devices[0]))
     output = npx.softmax(net.output_new(output_features))
     preds.extend(output.asnumpy())
 ids = sorted(os.listdir(

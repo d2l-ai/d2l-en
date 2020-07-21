@@ -263,10 +263,10 @@ def resnet18(num_classes):
 The CIFAR-10 image classification challenge uses 10 categories. We will perform Xavier random initialization on the model before training begins.
 
 ```{.python .input}
-def get_net(ctx):
+def get_net(devices):
     num_classes = 10
     net = resnet18(num_classes)
-    net.initialize(ctx=ctx, init=init.Xavier())
+    net.initialize(ctx=devices, init=init.Xavier())
     return net
 
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -277,7 +277,7 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 We will select the model and tune hyperparameters according to the model's performance on the validation set. Next, we define the model training function `train`. We record the training time of each epoch, which helps us compare the time costs of different models.
 
 ```{.python .input}
-def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
+def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           lr_decay):
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
@@ -292,7 +292,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
             timer.start()
             l, acc = d2l.train_batch_ch13(
                 net, features, labels.astype('float32'), loss, trainer,
-                ctx_list, d2l.split_batch)
+                devices, d2l.split_batch)
             metric.add(l, acc, labels.shape[0])
             timer.stop()
             if (i + 1) % (num_batches // 5) == 0:
@@ -310,7 +310,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
         print(f'loss {metric[0] / metric[2]:.3f}, '
               f'train acc {metric[1] / metric[2]:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(ctx_list)}')
+          f'on {str(devices)}')
 ```
 
 ## Training and Validating the Model
@@ -318,10 +318,10 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx_list, lr_period,
 Now, we can train and validate the model. The following hyperparameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 80 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 80 epochs. For simplicity, we only train one epoch here.
 
 ```{.python .input  n=13}
-ctx, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.1, 5e-4
-lr_period, lr_decay, net = 50, 0.1, get_net(ctx)
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.1, 5e-4
+lr_period, lr_decay, net = 50, 0.1, get_net(devices)
 net.hybridize()
-train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
 
@@ -330,14 +330,13 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 After obtaining a satisfactory model design and hyperparameters, we use all training datasets (including validation sets) to retrain the model and classify the testing set.
 
 ```{.python .input  n=14}
-net, preds = get_net(ctx), []
+net, preds = get_net(devices), []
 net.hybridize()
-train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 
-ctx = d2l.try_gpu()
 for X, _ in test_iter:
-    y_hat = net(X.as_in_ctx(ctx))
+    y_hat = net(X.as_in_ctx(devices[0]))
     preds.extend(y_hat.argmax(axis=1).astype(int).asnumpy())
 sorted_ids = list(range(1, len(test_ds) + 1))
 sorted_ids.sort(key=lambda x: str(x))
