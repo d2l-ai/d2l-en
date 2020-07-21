@@ -156,7 +156,7 @@ We also randomly shuffle the examples for the training data iterator.
 batch_size = 256
 
 def get_dataloader_workers():  #@save
-    """Use 4 processes to read the data expect for Windows."""
+    """Use 4 processes to read the data except for Windows."""
     return 0 if sys.platform.startswith('win') else 4
 
 # `ToTensor` converts the image data from uint8 to 32-bit floating point. It
