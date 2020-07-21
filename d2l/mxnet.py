@@ -185,7 +185,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def get_dataloader_workers():  #@save
-    """Use 4 processes to read the data expect for Windows."""
+    """Use 4 processes to read the data except for Windows."""
     return 0 if sys.platform.startswith('win') else 4
 
 
