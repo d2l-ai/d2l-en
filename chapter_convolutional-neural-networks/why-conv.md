@@ -123,7 +123,8 @@ to representing our parameters
 as four-dimensional weight tensors.
 
 
-We could formally express this dense layer as follows:
+Suppose that $W$ is the weights and $u$ is the bias of an MLP, 
+we could formally express the dense layer as follows:
 
 $$h[i, j] = u[i, j] + \sum_{k, l} W[i, j, k, l] \cdot x[k, l] =  u[i, j] +
 \sum_{a, b} V[i, j, a, b] \cdot x[i+a, j+b].$$
@@ -296,7 +297,7 @@ We turn to these issues in the remainder of the chapter.
    Show that in this case the convolutional mask
    implements an MLP independently for each set of channels.
 1. Why might translation invariance not be a good idea after all?
-   When might it not make sense to allow for pigs to fly?
+   Why might it not make sense to allow for pigs to fly?
 1. What problems must we deal with when deciding how
    to treat activations corresponding to pixel locations
    at the boundary of an image?
