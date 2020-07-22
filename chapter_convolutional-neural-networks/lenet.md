@@ -411,7 +411,7 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```{.python .input}
 #@tab tensorflow
 lr, num_epochs = 0.9, 10
-model = train_ch6(net, train_iter, test_iter, num_epochs, lr)
+_ = train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary
