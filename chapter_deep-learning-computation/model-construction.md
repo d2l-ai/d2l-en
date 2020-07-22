@@ -442,10 +442,6 @@ dictionary to find sub-blocks whose
 parameters also need to be initialized.
 :end_tab:
 
-:begin_tab:`tensorflow`
-FIXME, don't use `Sequential` to implement `MySequential`.
-:end_tab:
-
 When our `MySequential`'s forward propagation function is invoked,
 each added block is executed
 in the order in which they were added.
