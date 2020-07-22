@@ -579,7 +579,7 @@ class FixedHiddenMLP(tf.keras.Model):
         # parameters with two fully-connected layers
         x = self.dense(x)
         # Control flow
-        while tf.norm(x) > 1:
+        while tf.reduce_sum(tf.math.abs(x)) > 1:
             x /= 2
         return tf.reduce_sum(x)
 ```
