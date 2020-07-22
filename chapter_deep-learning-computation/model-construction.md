@@ -119,7 +119,7 @@ from torch import nn
 from torch.nn import functional as F
 
 
-x = torch.randn(2,20)
+x = torch.rand(2,20)
 net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
 net(x)
 ```
@@ -554,7 +554,7 @@ class FixedHiddenMLP(nn.Module):
         # parameters with two fully-connected layers
         x = self.linear(x)
         # Control flow
-        while x.norm().item() > 1:
+        while x.abs().sum() > 1:
             x /= 2
         return x.sum()
 ```
