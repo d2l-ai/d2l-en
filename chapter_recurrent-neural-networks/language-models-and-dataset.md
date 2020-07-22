@@ -247,7 +247,7 @@ Now we wrap the above two sampling functions to a class so that we can use it as
 ```{.python .input}
 #@tab all
 class SeqDataLoader:  #@save
-    """A iterator to load sequence data."""
+    """An iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
             self.data_iter_fn = d2l.seq_data_iter_random
