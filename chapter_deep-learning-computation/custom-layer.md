@@ -35,8 +35,8 @@ class CenteredLayer(nn.Block):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def forward(self, x):
-        return x - x.mean()
+    def forward(self, X):
+        return X - X.mean()
 ```
 
 ```{.python .input}
@@ -48,8 +48,8 @@ class CenteredLayer(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, x):
-        return x - x.mean()
+    def forward(self, X):
+        return X - X.mean()
 ```
 
 ```{.python .input}
@@ -109,20 +109,20 @@ we may still see a very small nonzero number
 due to quantization.
 
 ```{.python .input}
-y = net(np.random.uniform(size=(4, 8)))
-y.mean()
+Y = net(np.random.uniform(size=(4, 8)))
+Y.mean()
 ```
 
 ```{.python .input}
 #@tab pytorch
-y = net(torch.rand(4, 8))
-y.mean()
+Y = net(torch.rand(4, 8))
+Y.mean()
 ```
 
 ```{.python .input}
 #@tab tensorflow
-y = net(tf.random.uniform((4, 8)))
-tf.reduce_mean(y)
+Y = net(tf.random.uniform((4, 8)))
+tf.reduce_mean(Y)
 ```
 
 ## Layers with Parameters
@@ -164,8 +164,8 @@ class MyLinear(nn.Module):
         super().__init__()
         self.weight = nn.Parameter(torch.randn(in_units, units))
         self.bias = nn.Parameter(torch.randn(units,))
-    def forward(self, x):
-        return torch.matmul(x, self.weight.data) + self.bias.data
+    def forward(self, X):
+        return torch.matmul(X, self.weight.data) + self.bias.data
 ```
 
 ```{.python .input}
@@ -175,16 +175,16 @@ class MyDense(tf.keras.Model):
         super().__init__()
         self.units = units
 
-    def build(self, x_shape):
+    def build(self, X_shape):
         self.weight = self.add_weight(name='weight',
-            shape=[x_shape[-1], self.units],
+            shape=[X_shape[-1], self.units],
             initializer=tf.random_normal_initializer())
         self.bias = self.add_weight(
             name='bias', shape=[self.units],
             initializer=tf.zeros_initializer())
 
-    def call(self, x):
-        return tf.matmul(x, self.weight) + self.bias
+    def call(self, X):
+        return tf.matmul(X, self.weight) + self.bias
 ```
 
 Next, we instantiate the `MyDense` class

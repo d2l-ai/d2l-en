@@ -108,8 +108,8 @@ net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
 net.initialize()
 
-x = np.random.uniform(size=(2, 20))
-net(x)
+X = np.random.uniform(size=(2, 20))
+net(X)
 ```
 
 ```{.python .input}
@@ -120,8 +120,8 @@ from torch.nn import functional as F
 
 net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
 
-x = torch.rand(2, 20)
-net(x)
+X = torch.rand(2, 20)
+net(X)
 ```
 
 ```{.python .input}
@@ -133,8 +133,8 @@ net = tf.keras.models.Sequential([
     tf.keras.layers.Dense(10),
 ])
 
-x = tf.random.uniform((2, 20))
-net(x)
+X = tf.random.uniform((2, 20))
+net(X)
 ```
 
 :begin_tab:`mxnet`
@@ -238,9 +238,9 @@ class MLP(nn.Block):
         self.out = nn.Dense(10)  # Output layer
 
     # Define the forward propagation of the model, that is, how to return the
-    # required model output based on the input `x`
-    def forward(self, x):
-        return self.out(self.hidden(x))
+    # required model output based on the input `X`
+    def forward(self, X):
+        return self.out(self.hidden(X))
 ```
 
 ```{.python .input}
@@ -258,11 +258,11 @@ class MLP(nn.Module):
         self.out = nn.Linear(256, 10)  # Output layer
 
     # Define the forward propagation of the model, that is, how to return the
-    # required model output based on the input `x`
-    def forward(self, x):
+    # required model output based on the input `X`
+    def forward(self, X):
         # Note here we use the funtional version of ReLU defined in the
         # nn.functional module.
-        return self.out(F.relu(self.hidden(x)))
+        return self.out(F.relu(self.hidden(X)))
 ```
 
 ```{.python .input}
@@ -281,13 +281,13 @@ class MLP(tf.keras.Model):
         self.out = tf.keras.layers.Dense(units=10)  # Output layer
 
     # Define the forward propagation of the model, that is, how to return the
-    # required model output based on the input `x`
-    def call(self, x):
-        return self.out(self.hidden((x)))
+    # required model output based on the input `X`
+    def call(self, X):
+        return self.out(self.hidden((X)))
 ```
 
 Let us first focus on the forward propagation function.
-Note that it takes `x` as the input,
+Note that it takes `X` as the input,
 calculates the hidden representation
 with the activation function applied,
 and outputs its logits.
@@ -320,19 +320,19 @@ Let us try this out.
 ```{.python .input}
 net = MLP()
 net.initialize()
-net(x)
+net(X)
 ```
 
 ```{.python .input}
 #@tab pytorch
 net = MLP()
-net(x)
+net(X)
 ```
 
 ```{.python .input}
 #@tab tensorflow
 net = MLP()
-net(x)
+net(X)
 ```
 
 A key virtue of the block abstraction is its versatility.
@@ -370,12 +370,12 @@ class MySequential(nn.Block):
         # system automatically initializes all members of `_children`
         self._children[block.name] = block
 
-    def forward(self, x):
+    def forward(self, X):
         # OrderedDict guarantees that members will be traversed in the order
         # they were added
         for block in self._children.values():
-            x = block(x)
-        return x
+            X = block(X)
+        return X
 ```
 
 ```{.python .input}
@@ -389,12 +389,12 @@ class MySequential(nn.Module):
             # type is OrderedDict
             self._modules[block] = block
 
-    def forward(self, x):
+    def forward(self, X):
         # OrderedDict guarantees that members will be traversed in the order
         # they were added
         for block in self._modules.values():
-            x = block(x)
-        return x
+            X = block(X)
+        return X
 ```
 
 ```{.python .input}
@@ -408,10 +408,10 @@ class MySequential(tf.keras.Model):
             # subclass
             self.modules.append(block)
 
-    def call(self, x):
+    def call(self, X):
         for module in self.modules:
-            x = module(x)
-        return x
+            X = module(X)
+        return X
 ```
 
 :begin_tab:`mxnet`
@@ -457,13 +457,13 @@ net = MySequential()
 net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
 net.initialize()
-net(x)
+net(X)
 ```
 
 ```{.python .input}
 #@tab pytorch
 net = MySequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
-net(x)
+net(X)
 ```
 
 ```{.python .input}
@@ -471,7 +471,7 @@ net(x)
 net = MySequential(
     tf.keras.layers.Dense(units=256, activation=tf.nn.relu),
     tf.keras.layers.Dense(10))
-net(x)
+net(X)
 ```
 
 Note that this use of `MySequential`
@@ -521,18 +521,18 @@ class FixedHiddenMLP(nn.Block):
             'rand_weight', np.random.uniform(size=(20, 20)))
         self.dense = nn.Dense(20, activation='relu')
 
-    def forward(self, x):
-        x = self.dense(x)
+    def forward(self, X):
+        X = self.dense(X)
         # Use the created constant parameters, as well as the `relu` and `dot`
         # functions
-        x = npx.relu(np.dot(x, self.rand_weight.data()) + 1)
+        X = npx.relu(np.dot(X, self.rand_weight.data()) + 1)
         # Reuse the fully-connected layer. This is equivalent to sharing
         # parameters with two fully-connected layers
-        x = self.dense(x)
+        X = self.dense(X)
         # Control flow
-        while np.abs(x).sum() > 1:
-            x /= 2
-        return x.sum()
+        while np.abs(X).sum() > 1:
+            X /= 2
+        return X.sum()
 ```
 
 ```{.python .input}
@@ -545,18 +545,18 @@ class FixedHiddenMLP(nn.Module):
         self.rand_weight = torch.rand((20, 20), requires_grad=False)
         self.linear = nn.Linear(20, 20)
 
-    def forward(self, x):
-        x = self.linear(x)
+    def forward(self, X):
+        X = self.linear(X)
         # Use the created constant parameters, as well as the `relu` and `mm`
         # functions
-        x = F.relu(torch.mm(x, self.rand_weight) + 1)
+        X = F.relu(torch.mm(X, self.rand_weight) + 1)
         # Reuse the fully-connected layer. This is equivalent to sharing
         # parameters with two fully-connected layers
-        x = self.linear(x)
+        X = self.linear(X)
         # Control flow
-        while x.abs().sum() > 1:
-            x /= 2
-        return x.sum()
+        while X.abs().sum() > 1:
+            X /= 2
+        return X.sum()
 ```
 
 ```{.python .input}
@@ -571,17 +571,17 @@ class FixedHiddenMLP(tf.keras.Model):
         self.dense = tf.keras.layers.Dense(20, activation=tf.nn.relu)
 
     def call(self, inputs):
-        x = self.flatten(inputs)
+        X = self.flatten(inputs)
         # Use the created constant parameters, as well as the `relu` and
         # `matmul` functions
-        x = tf.nn.relu(tf.matmul(x, self.rand_weight) + 1)
+        X = tf.nn.relu(tf.matmul(X, self.rand_weight) + 1)
         # Reuse the fully-connected layer. This is equivalent to sharing
         # parameters with two fully-connected layers
-        x = self.dense(x)
+        X = self.dense(X)
         # Control flow
-        while tf.reduce_sum(tf.math.abs(x)) > 1:
-            x /= 2
-        return tf.reduce_sum(x)
+        while tf.reduce_sum(tf.math.abs(X)) > 1:
+            X /= 2
+        return tf.reduce_sum(X)
 ```
 
 In this `FixedHiddenMLP` model,
@@ -599,7 +599,7 @@ We ran a while-loop, testing
 on the condition its $L_1$ norm is larger than $1$,
 and dividing our output vector by $2$
 until it satisfied the condition.
-Finally, we returned the sum of the entries in `x`.
+Finally, we returned the sum of the entries in `X`.
 To our knowledge, no standard neural network
 performs this operation.
 Note that this particular operation may not be useful
@@ -611,13 +611,13 @@ neural network computations.
 ```{.python .input}
 net = FixedHiddenMLP()
 net.initialize()
-net(x)
+net(X)
 ```
 
 ```{.python .input}
 #@tab pytorch, tensorflow
 net = FixedHiddenMLP()
-net(x)
+net(X)
 ```
 
 We can mix and match various
@@ -634,13 +634,13 @@ class NestMLP(nn.Block):
                      nn.Dense(32, activation='relu'))
         self.dense = nn.Dense(16, activation='relu')
 
-    def forward(self, x):
-        return self.dense(self.net(x))
+    def forward(self, X):
+        return self.dense(self.net(X))
 
 chimera = nn.Sequential()
 chimera.add(NestMLP(), nn.Dense(20), FixedHiddenMLP())
 chimera.initialize()
-chimera(x)
+chimera(X)
 ```
 
 ```{.python .input}
@@ -652,11 +652,11 @@ class NestMLP(nn.Module):
                                  nn.Linear(64, 32), nn.ReLU())
         self.linear = nn.Linear(32, 16)
 
-    def forward(self, x):
-        return self.linear(self.net(x))
+    def forward(self, X):
+        return self.linear(self.net(X))
 
 chimera = nn.Sequential(NestMLP(), nn.Linear(16, 20), FixedHiddenMLP())
-chimera(x)
+chimera(X)
 ```
 
 ```{.python .input}
@@ -676,7 +676,7 @@ chimera = tf.keras.Sequential()
 chimera.add(NestMLP())
 chimera.add(tf.keras.layers.Dense(20))
 chimera.add(FixedHiddenMLP())
-chimera(x)
+chimera(X)
 ```
 
 ## Compilation

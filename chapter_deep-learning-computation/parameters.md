@@ -42,8 +42,8 @@ net.add(nn.Dense(8, activation='relu'))
 net.add(nn.Dense(1))
 net.initialize()  # Use the default initialization method
 
-x = np.random.uniform(size=(2, 4))
-net(x)  # Forward computation
+X = np.random.uniform(size=(2, 4))
+net(X)  # Forward computation
 ```
 
 ```{.python .input}
@@ -52,8 +52,8 @@ import torch
 from torch import nn
 
 net = nn.Sequential(nn.Linear(4, 8), nn.ReLU(), nn.Linear(8, 1))
-x = torch.randn(2, 4)
-net(x)
+X = torch.randn(2, 4)
+net(X)
 ```
 
 ```{.python .input}
@@ -67,8 +67,8 @@ net = tf.keras.models.Sequential([
     tf.keras.layers.Dense(1),
 ])
 
-x = tf.random.uniform((2, 4))
-net(x)
+X = tf.random.uniform((2, 4))
+net(X)
 ```
 
 ## Parameter Access
@@ -227,7 +227,7 @@ rgnet = nn.Sequential()
 rgnet.add(block2())
 rgnet.add(nn.Dense(10))
 rgnet.initialize()
-rgnet(x)
+rgnet(X)
 ```
 
 ```{.python .input}
@@ -244,7 +244,7 @@ def block2():
     return net
 
 rgnet = nn.Sequential(block2(), nn.Linear(4, 1))
-rgnet(x)
+rgnet(X)
 ```
 
 ```{.python .input}
@@ -265,7 +265,7 @@ def block2():
 rgnet = tf.keras.Sequential()
 rgnet.add(block2())
 rgnet.add(tf.keras.layers.Dense(1))
-rgnet(x)
+rgnet(X)
 ```
 
 Now that we have designed the network,
@@ -371,7 +371,7 @@ net = tf.keras.models.Sequential([
         bias_initializer=tf.zeros_initializer()),
     tf.keras.layers.Dense(1)])
 
-net(x)
+net(X)
 net.weights[0], net.weights[1]
 ```
 
@@ -404,7 +404,7 @@ net = tf.keras.models.Sequential([
     tf.keras.layers.Dense(1),
 ])
 
-net(x)
+net(X)
 net.weights[0], net.weights[1]
 ```
 
@@ -448,7 +448,7 @@ net = tf.keras.models.Sequential([
         1, kernel_initializer=tf.keras.initializers.Constant(1)),
 ])
 
-net(x)
+net(X)
 print(net.layers[1].weights[0])
 print(net.layers[2].weights[0])
 ```
@@ -523,7 +523,7 @@ net = tf.keras.models.Sequential([
     tf.keras.layers.Dense(1),
 ])
 
-net(x)
+net(X)
 print(net.layers[1].weights[0])
 ```
 
@@ -577,8 +577,8 @@ net.add(nn.Dense(8, activation='relu'),
         nn.Dense(10))
 net.initialize()
 
-x = np.random.uniform(size=(2, 20))
-net(x)
+X = np.random.uniform(size=(2, 20))
+net(X)
 
 # Check whether the parameters are the same
 print(net[1].weight.data()[0] == net[2].weight.data()[0])
@@ -597,7 +597,7 @@ net = nn.Sequential(nn.Linear(4, 8), nn.ReLU(),
                     shared, nn.ReLU(),
                     shared, nn.ReLU(),
                     nn.Linear(8, 1))
-net(x)
+net(X)
 # Check whether the parameters are the same
 print(net[2].weight.data[0] == net[4].weight.data[0])
 net[2].weight.data[0, 0] = 100
@@ -618,7 +618,7 @@ net = tf.keras.models.Sequential([
     tf.keras.layers.Dense(1),
 ])
 
-net(x)
+net(X)
 # Check whether the parameters are different
 print(len(net.layers) == 3)
 ```

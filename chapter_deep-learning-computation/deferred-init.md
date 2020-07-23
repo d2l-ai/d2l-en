@@ -117,16 +117,16 @@ Next let us pass data through the network
 to make the framework finally initialize parameters.
 
 ```{.python .input}
-x = np.random.uniform(size=(2, 20))
-net(x)
+X = np.random.uniform(size=(2, 20))
+net(X)
 
 net.collect_params()
 ```
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.random.uniform((2, 20))
-net(x)
+X = tf.random.uniform((2, 20))
+net(X)
 [w.shape for w in net.get_weights()]
 ```
 
