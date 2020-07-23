@@ -8,9 +8,10 @@ for a wide variety of tasks.
 For instance, researchers have invented layers
 specifically for handling images, text,
 looping over sequential data,
-performing dynamic programming, etc.
-Sooner or later, you will encounter (or invent)
-a layer that does not exist yet in the framework.
+and
+performing dynamic programming.
+Sooner or later, you will encounter or invent
+a layer that does not exist yet in the deep learning framework.
 In these cases, you must build a custom layer.
 In this section, we show you how.
 
@@ -23,7 +24,7 @@ introduction to block in :numref:`sec_model_construction`.
 The following `CenteredLayer` class simply
 subtracts the mean from its input.
 To build it, we simply need to inherit
-from the base layer class and implement the forward method.
+from the base layer class and implement the forward propagation function.
 
 ```{.python .input}
 from mxnet import gluon, np, npx
@@ -104,7 +105,7 @@ net = tf.keras.Sequential([tf.keras.layers.Dense(128), CenteredLayer()])
 As an extra sanity check, we can send random data
 through the network and check that the mean is in fact 0.
 Because we are dealing with floating point numbers,
-we may still see a *very* small nonzero number
+we may still see a very small nonzero number
 due to quantization.
 
 ```{.python .input}
@@ -129,18 +130,18 @@ tf.reduce_mean(y)
 Now that we know how to define simple layers,
 let us move on to defining layers with parameters
 that can be adjusted through training.
-We can use the build-in method to create parameters, that
+We can use built-in functions to create parameters, which
 provide some basic housekeeping functionality.
 In particular, they govern access, initialization,
 sharing, saving, and loading model parameters.
 This way, among other benefits, we will not need to write
 custom serialization routines for every custom layer.
 
-Now let us implement our own version of fully-connected layer.
+Now let us implement our own version of the  fully-connected layer.
 Recall that this layer requires two parameters,
-one to represent the weight and another for the bias.
+one to represent the weight and the other for the bias.
 In this implementation, we bake in the ReLU activation as a default.
-This layer requires to input argument: `in_units` and `units`, which
+This layer requires to input arguments: `in_units` and `units`, which
 denote the number of inputs and outputs, respectively.
 
 ```{.python .input}
@@ -207,7 +208,7 @@ dense(tf.random.uniform((2, 5)))
 dense.get_weights()
 ```
 
-We can directly carry out forward calculations using custom layers.
+We can directly carry out forward propagation calculations using custom layers.
 
 ```{.python .input}
 dense.initialize()
@@ -225,7 +226,7 @@ dense(tf.random.uniform((2, 5)))
 ```
 
 We can also construct models using custom layers.
-Once we have that we can use it just like the built-in dense layer.
+Once we have that we can use it just like the built-in fully-connected layer.
 
 ```{.python .input}
 net = nn.Sequential()
@@ -251,12 +252,11 @@ net(tf.random.uniform((2, 64)))
 
 * We can design custom layers via the basic layer class. This allows us to define flexible new layers that behave differently from any existing layers in the library.
 * Once defined, custom layers can be invoked in arbitrary contexts and architectures.
-* Layers can have local parameters, which can be created through build-in methods.
+* Layers can have local parameters, which can be created through built-in functions.
 
 
 ## Exercises
 
-1. Design a layer that learns an affine transform of the data.
 1. Design a layer that takes an input and computes a tensor reduction,
    i.e., it returns $y_k = \sum_{i, j} W_{ijk} x_i x_j$.
 1. Design a layer that returns the leading half of the Fourier coefficients of the data.
