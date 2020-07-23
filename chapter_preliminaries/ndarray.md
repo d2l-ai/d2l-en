@@ -137,19 +137,19 @@ from a row vector with shape (12,) to a matrix with shape (3, 4).
 This new tensor contains the exact same values,
 but views them as a matrix organized as 3 rows and 4 columns.
 To reiterate, although the shape has changed,
-the elements in `x` have not.
+the elements have not.
 Note that the size is unaltered by reshaping.
 
 ```{.python .input}
 #@tab mxnet, pytorch
-x = x.reshape(3, 4)
-x
+X = x.reshape(3, 4)
+X
 ```
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.reshape(x, (3, 4))
-x
+X = tf.reshape(x, (3, 4))
+X
 ```
 
 Reshaping by manually specifying every dimension is unnecessary.
@@ -341,47 +341,47 @@ while the second output tensor's axis-1 length ($8$)
 is the sum of the two input tensors' axis-1 lengths ($4 + 4$).
 
 ```{.python .input}
-x = np.arange(12).reshape(3, 4)
-y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
-np.concatenate([x, y], axis=0), np.concatenate([x, y], axis=1)
+X = np.arange(12).reshape(3, 4)
+Y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
+np.concatenate([X, Y], axis=0), np.concatenate([X, Y], axis=1)
 ```
 
 ```{.python .input}
 #@tab pytorch
-x = torch.arange(12, dtype=torch.float32).reshape((3,4))
-y = torch.tensor([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
-torch.cat((x, y), dim=0), torch.cat((x, y), dim=1)
+X = torch.arange(12, dtype=torch.float32).reshape((3,4))
+Y = torch.tensor([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
+torch.cat((X, Y), dim=0), torch.cat((X, Y), dim=1)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.reshape(tf.range(12, dtype=tf.float32), (3, 4))
-y = tf.constant([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
-tf.concat([x, y], axis=0), tf.concat([x, y], axis=1)
+X = tf.reshape(tf.range(12, dtype=tf.float32), (3, 4))
+Y = tf.constant([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
+tf.concat([X, Y], axis=0), tf.concat([X, Y], axis=1)
 ```
 
 Sometimes, we want to construct a binary tensor via *logical statements*.
-Take `x == y` as an example.
-For each position, if `x` and `y` are equal at that position,
+Take `X == Y` as an example.
+For each position, if `X` and `Y` are equal at that position,
 the corresponding entry in the new tensor takes a value of 1,
-meaning that the logical statement `x == y` is true at that position;
+meaning that the logical statement `X == Y` is true at that position;
 otherwise that position takes 0.
 
 ```{.python .input}
 #@tab all
-x == y
+X == Y
 ```
 
 Summing all the elements in the tensor yields a tensor with only one element.
 
 ```{.python .input}
 #@tab mxnet, pytorch
-x.sum()
+X.sum()
 ```
 
 ```{.python .input}
 #@tab tensorflow
-tf.reduce_sum(x)
+tf.reduce_sum(X)
 ```
 
 ## Broadcasting Mechanism
@@ -448,7 +448,7 @@ selects the second and the third elements as follows:
 
 ```{.python .input}
 #@tab all
-x[-1], x[1:3]
+X[-1], X[1:3]
 ```
 
 :begin_tab:`mxnet, pytorch`
@@ -467,15 +467,15 @@ Beyond assigning a value to the entire `Variable`, we can write elements of a
 
 ```{.python .input}
 #@tab mxnet, pytorch
-x[1, 2] = 9
-x
+X[1, 2] = 9
+X
 ```
 
 ```{.python .input}
 #@tab tensorflow
-x_var = tf.Variable(x)
-x_var[1, 2].assign(9)
-x_var
+X_var = tf.Variable(X)
+X_var[1, 2].assign(9)
+X_var
 ```
 
 If we want to assign multiple elements the same value,
@@ -488,36 +488,36 @@ and for tensors of more than 2 dimensions.
 
 ```{.python .input}
 #@tab mxnet, pytorch
-x[0:2, :] = 12
-x
+X[0:2, :] = 12
+X
 ```
 
 ```{.python .input}
 #@tab tensorflow
-x_var = tf.Variable(x)
-x_var[0:2,:].assign(tf.ones(x_var[0:2,:].shape, dtype = tf.float32)*12)
-x_var
+X_var = tf.Variable(X)
+X_var[0:2, :].assign(tf.ones(X_var[0:2,:].shape, dtype = tf.float32) * 12)
+X_var
 ```
 
 ## Saving Memory
 
 Running operations can cause new memory to be
 allocated to host results.
-For example, if we write `y = x + y`,
-we will dereference the tensor that `y` used to point to
-and instead point `y` at the newly allocated memory.
+For example, if we write `Y = X + Y`,
+we will dereference the tensor that `Y` used to point to
+and instead point `Y` at the newly allocated memory.
 In the following example, we demonstrate this with Python's `id()` function,
 which gives us the exact address of the referenced object in memory.
-After running `y = y + x`, we will find that `id(y)` points to a different location.
-That is because Python first evaluates `y + x`,
-allocating new memory for the result and then makes `y`
+After running `Y = Y + X`, we will find that `id(Y)` points to a different location.
+That is because Python first evaluates `Y + X`,
+allocating new memory for the result and then makes `Y`
 point to this new location in memory.
 
 ```{.python .input}
 #@tab all
-before = id(y)
-y = y + x
-id(y) == before
+before = id(Y)
+Y = Y + X
+id(Y) == before
 ```
 
 This might be undesirable for two reasons.
@@ -536,9 +536,9 @@ to inadvertently reference stale parameters.
 Fortunately, performing in-place operations is easy.
 We can assign the result of an operation
 to a previously allocated array with slice notation,
-e.g., `y[:] = <expression>`.
-To illustrate this concept, we first create a new matrix `z`
-with the same shape as another `y`,
+e.g., `Y[:] = <expression>`.
+To illustrate this concept, we first create a new matrix `Z`
+with the same shape as another `Y`,
 using `zeros_like` to allocate a block of $0$ entries.
 :end_tab:
 
@@ -547,37 +547,37 @@ using `zeros_like` to allocate a block of $0$ entries.
 a way to store your model parameters.
 We can assign the result of an operation
 to a `Variable` with `assign`.
-To illustrate this concept, we create a `Variable` `z`
-with the same shape as another tensor `y`,
+To illustrate this concept, we create a `Variable` `Z`
+with the same shape as another tensor `Y`,
 using `zeros_like` to allocate a block of $0$ entries.
 :end_tab:
 
 ```{.python .input}
-z = np.zeros_like(y)
-print('id(z):', id(z))
-z[:] = x + y
-print('id(z):', id(z))
+Z = np.zeros_like(Y)
+print('id(Z):', id(Z))
+Z[:] = X + Y
+print('id(Z):', id(Z))
 ```
 
 ```{.python .input}
 #@tab pytorch
-z = torch.zeros_like(y)
-print('id(z):', id(z))
-z[:] = x + y
-print('id(z):', id(z))
+Z = torch.zeros_like(Y)
+print('id(Z):', id(Z))
+Z[:] = X + Y
+print('id(Z):', id(Z))
 ```
 
 ```{.python .input}
 #@tab tensorflow
-z = tf.Variable(tf.zeros_like(y))
-print('id(z):', id(z))
-z.assign(x + y)
-print('id(z):', id(z))
+Z = tf.Variable(tf.zeros_like(Y))
+print('id(Z):', id(Z))
+Z.assign(X + Y)
+print('id(Z):', id(Z))
 ```
 
 :begin_tab:`mxnet, pytorch`
-If the value of `x` is not reused in subsequent computations,
-we can also use `x[:] = x + y` or `x += y`
+If the value of `X` is not reused in subsequent computations,
+we can also use `X[:] = X + Y` or `X += Y`
 to reduce the memory overhead of the operation.
 :end_tab:
 
@@ -599,22 +599,22 @@ overhead of TensorFlow computations.
 
 ```{.python .input}
 #@tab mxnet, pytorch
-before = id(x)
-x += y
-id(x) == before
+before = id(X)
+X += Y
+id(X) == before
 ```
 
 ```{.python .input}
 #@tab tensorflow
 @tf.function
-def computation(x, y):
-  z = tf.zeros_like(y)  # This unused value will be pruned out.
-  a = x + y  # Allocations will be re-used when no longer needed.
-  b = a + y
-  c = b + y
-  return c + y
+def computation(X, Y):
+    Z = tf.zeros_like(Y)  # This unused value will be pruned out
+    A = X + Y  # Allocations will be re-used when no longer needed
+    B = A + Y
+    C = B + Y
+    return C + Y
 
-computation(x, y)
+computation(X, Y)
 ```
 
 ## Conversion to Other Python Objects
@@ -628,23 +628,23 @@ whether the NumPy package of Python might want to be doing something else
 with the same chunk of memory.
 
 ```{.python .input}
-a = x.asnumpy()
-b = np.array(a)
-type(a), type(b)
+A = X.asnumpy()
+B = np.array(A)
+type(A), type(B)
 ```
 
 ```{.python .input}
 #@tab pytorch
-a = x.numpy()
-b = torch.tensor(a)
-type(a), type(b)
+A = X.numpy()
+B = torch.tensor(A)
+type(A), type(B)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-a = x.numpy()
-b = tf.constant(a)
-type(a), type(b)
+A = X.numpy()
+B = tf.constant(A)
+type(A), type(B)
 ```
 
 To convert a size-1 tensor to a Python scalar,
@@ -674,7 +674,7 @@ a, a.item(), float(a), int(a)
 
 ## Exercises
 
-1. Run the code in this section. Change the conditional statement `x == y` in this section to `x < y` or `x > y`, and then see what kind of tensor you can get.
+1. Run the code in this section. Change the conditional statement `X == Y` in this section to `X < Y` or `X > Y`, and then see what kind of tensor you can get.
 1. Replace the two tensors that operate by element in the broadcasting mechanism with other shapes, e.g., 3-dimensional tensors. Is the result the same as expected?
 
 :begin_tab:`mxnet`

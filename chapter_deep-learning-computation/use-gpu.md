@@ -272,41 +272,41 @@ In general, we need to make sure we do not
 create data that exceeds the GPU memory limit.
 
 ```{.python .input}
-x = np.ones((2, 3), ctx=try_gpu())
-x
+X = np.ones((2, 3), ctx=try_gpu())
+X
 ```
 
 ```{.python .input}
 #@tab pytorch
-x = torch.ones(2, 3, device=try_gpu())
-x
+X = torch.ones(2, 3, device=try_gpu())
+X
 ```
 
 ```{.python .input}
 #@tab tensorflow
 with try_gpu():
-    x = tf.ones((2, 3))
-x
+    X = tf.ones((2, 3))
+X
 ```
 
 Assuming you have at least two GPUs, the following code will create a random array on the second GPU.
 
 ```{.python .input}
-y = np.random.uniform(size=(2, 3), ctx=try_gpu(1))
-y
+Y = np.random.uniform(size=(2, 3), ctx=try_gpu(1))
+Y
 ```
 
 ```{.python .input}
 #@tab pytorch
-y = torch.randn(2, 3, device=try_gpu(1))
-y
+Y = torch.randn(2, 3, device=try_gpu(1))
+Y
 ```
 
 ```{.python .input}
 #@tab tensorflow
 with try_gpu(1):
-    y = tf.random.uniform((2, 3))
-y
+    Y = tf.random.uniform((2, 3))
+Y
 ```
 
 ### Copying
@@ -316,7 +316,7 @@ we need to decide where to perform this operation.
 For instance, as shown in :numref:`fig_copyto`,
 we can transfer $\mathbf{x}$ to the second GPU
 and perform the operation there.
-*Do not* simply add `x + y`,
+*Do not* simply add `X + Y`,
 since this will result in an exception.
 The runtime engine would not know what to do,
 it cannot find data on the same device and it fails.
@@ -329,24 +329,24 @@ Since $\mathbf{y}$ lives on the second GPU,
 we need to move $\mathbf{x}$ there before we can add the two.
 
 ```{.python .input}
-z = x.copyto(try_gpu(1))
-print(x)
-print(z)
+Z = X.copyto(try_gpu(1))
+print(X)
+print(Z)
 ```
 
 ```{.python .input}
 #@tab pytorch
-z = x.cuda(1)
-print(x)
-print(z)
+Z = X.cuda(1)
+print(X)
+print(Z)
 ```
 
 ```{.python .input}
 #@tab tensorflow
 with try_gpu(1):
-    z = x
-print(x)
-print(z)
+    Z = X
+print(X)
+print(Z)
 ```
 
 Now that the data is on the same GPU
@@ -355,12 +355,12 @@ we can add them up.
 
 ```{.python .input}
 #@tab all
-y + z
+Y + Z
 ```
 
 :begin_tab:`mxnet`
-Imagine that your variable `z` already lives on your second GPU.
-What happens if we call still `z.copyto(gpu(1))`?
+Imagine that your variable `Z` already lives on your second GPU.
+What happens if we call still `Z.copyto(gpu(1))`?
 It will make a copy and allocate new memory,
 even though that variable already lives on the desired device!
 There are times where, depending on the environment our code is running in,
@@ -375,31 +375,31 @@ Unless you specifically want to make a copy,
 :end_tab:
 
 :begin_tab:`pytorch`
-Imagine that your variable `z` already lives on your second GPU.
-What happens if we still call `z.cuda(1)`?
-It will return `z` instead of making a copy and allocating new memory.
+Imagine that your variable `Z` already lives on your second GPU.
+What happens if we still call `Z.cuda(1)`?
+It will return `Z` instead of making a copy and allocating new memory.
 :end_tab:
 
 :begin_tab:`pytorch`
-Imagine that your variable `z` already lives on your second GPU.
-What happens if we still call `z2 = z` under the same device scope?
-It will return `z` instead of making a copy and allocating new memory.
+Imagine that your variable `Z` already lives on your second GPU.
+What happens if we still call `Z2 = Z` under the same device scope?
+It will return `Z` instead of making a copy and allocating new memory.
 :end_tab:
 
 ```{.python .input}
-z.as_in_ctx(try_gpu(1)) is z
+Z.as_in_ctx(try_gpu(1)) is Z
 ```
 
 ```{.python .input}
 #@tab pytorch
-z.cuda(1) is z
+Z.cuda(1) is Z
 ```
 
 ```{.python .input}
 #@tab tensorflow
 with try_gpu(1):
-    z2 = z
-z2 is z
+    Z2 = Z
+Z2 is Z
 ```
 
 ### Side Notes
@@ -470,7 +470,7 @@ When the input is a tensor on the GPU, Gluon will calculate the result on the sa
 
 ```{.python .input}
 #@tab all
-net(x)
+net(X)
 ```
 
 Let us confirm that the model parameters are stored on the same GPU.
