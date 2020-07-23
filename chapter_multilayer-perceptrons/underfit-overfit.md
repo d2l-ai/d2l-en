@@ -632,7 +632,7 @@ such as weight decay and dropout.
 ## Exercises
 
 1. Can you solve the polynomial regression problem exactly? Hint: use linear algebra.
-1. Concider model selection for polynomials:
+1. Consider model selection for polynomials:
     * Plot the training loss vs. model complexity (degree of the polynomial). What do you observe? What degree of polynomial do you need to reduce the training loss to 0?
     * Plot the test loss in this case.
     * Generate the same plot as a function of the amount of data.
