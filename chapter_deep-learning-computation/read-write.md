@@ -276,4 +276,3 @@ yclone == y
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/327)
 :end_tab:
-
