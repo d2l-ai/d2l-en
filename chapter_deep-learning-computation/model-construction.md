@@ -103,12 +103,12 @@ from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-x = np.random.uniform(size=(2, 20))
-
 net = nn.Sequential()
 net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
 net.initialize()
+
+x = np.random.uniform(size=(2, 20))
 net(x)
 ```
 
@@ -118,9 +118,9 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-
-x = torch.rand(2,20)
 net = nn.Sequential(nn.Linear(20, 256), nn.ReLU(), nn.Linear(256, 10))
+
+x = torch.rand(2, 20)
 net(x)
 ```
 
