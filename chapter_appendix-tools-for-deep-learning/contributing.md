@@ -116,9 +116,7 @@ git branch patch-1
 ```
 
 
-`patch-any_number` is ok only if `patch-any_number` doesn't exist.
-Then you can change the files what you want.
-
+`patch-any_number` is ok only if `patch-any_number` doesn't exist. Then you can change the files what you want.
 
 After confirming that this is what you want, execute the following command:
 
