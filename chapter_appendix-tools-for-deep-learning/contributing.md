@@ -112,7 +112,7 @@ Changes not staged for commit:
 Create a new branch that's based on this repo's **master** branch first, by executing the following command:
 
 ```
-git branch patch-1
+git branch patch-11
 ```
 
 
@@ -122,8 +122,8 @@ After confirming that this is what you want, execute the following command:
 
 ```
 git add chapter_appendix_tools/how-to-contribute.md
-git commit -m 'fix typo in git documentation'
-git push
+git commit -m 'any things you changed'
+git push --set-upstream origin patch-11
 ```
 
 
