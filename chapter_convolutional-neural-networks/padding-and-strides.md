@@ -87,7 +87,7 @@ Moreover, this practice of using odd kernels
 and padding to precisely preserve dimensionality
 offers a clerical benefit.
 For any two-dimensional array `X`,
-when the kernels size is odd
+when the kernel's size is odd
 and the number of padding rows and columns
 on all sides are the same,
 producing an output with the same height and width as the input,

@@ -18,7 +18,7 @@ we will enjoy more parsimonious models (requiring far fewer parameters).
 In this section, we will introduce LeNet,
 among the first published convolutional neural networks
 to capture wide attention for its performance on computer vision tasks.
-The model was introduced (and named for) Yann Lecun,
+The model was introduced by (and named for) Yann Lecun,
 then a researcher at AT&T Bell Labs,
 for the purpose of recognizing handwritten digits in images
 [LeNet5](http://yann.lecun.com/exdb/lenet/).
@@ -206,7 +206,7 @@ matches the number of classes.
 ## Data Acquisition and Training
 
 Now that we have implemented the model,
-let's run an experiment to see how LeNet fares on Fashion-MNIST.
+let us run an experiment to see how LeNet fares on Fashion-MNIST.
 
 ```{.python .input}
 #@tab all
@@ -231,12 +231,12 @@ we need to copy it to the GPU before we can compute our models.
 :end_tab:
 
 ```{.python .input}
-def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
-    if not ctx:  # Query the first device the first parameter is on
-        ctx = list(net.collect_params().values())[0].list_ctx()[0]
+def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
+    if not device:  # Query the first device where the first parameter is on
+        device = list(net.collect_params().values())[0].list_ctx()[0]
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
-        X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
+        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0]/metric[1]
 ```
@@ -275,8 +275,9 @@ we visualize the training loss more frequently.
 
 ```{.python .input}
 #@save
-def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
-    net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
+def train_ch6(net, train_iter, test_iter, num_epochs, lr,
+              device=d2l.try_gpu()):
+    net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
@@ -288,7 +289,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         for i, (X, y) in enumerate(train_iter):
             timer.start()
             # Here is the only difference compared with `d2l.train_epoch_ch3`
-            X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
+            X, y = X.as_in_ctx(device), y.as_in_ctx(device)
             with autograd.record():
                 y_hat = net(X)
                 l = loss(y_hat, y)
@@ -305,7 +306,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
           f'test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(ctx)}')
+          f'on {str(device)}')
 ```
 
 ```{.python .input}
@@ -419,12 +420,12 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 1. Replace the average pooling with max pooling. What happens?
 1. Try to construct a more complex network based on LeNet to improve its accuracy.
-    * Adjust the convolution window size.
-    * Adjust the number of output channels.
-    * Adjust the activation function (ReLU?).
-    * Adjust the number of convolution layers.
-    * Adjust the number of fully connected layers.
-    * Adjust the learning rates and other training details (initialization, epochs, etc.)
+    1. Adjust the convolution window size.
+    1. Adjust the number of output channels.
+    1. Adjust the activation function (ReLU?).
+    1. Adjust the number of convolution layers.
+    1. Adjust the number of fully connected layers.
+    1. Adjust the learning rates and other training details (initialization, epochs, etc.)
 1. Try out the improved network on the original MNIST dataset.
 1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters, coats).
 

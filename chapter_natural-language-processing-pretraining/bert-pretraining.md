@@ -35,8 +35,8 @@ we define a small BERT, using 2 layers, 128 hidden units, and 2 self-attention h
 ```{.python .input  n=14}
 net = d2l.BERTModel(len(vocab), num_hiddens=128, ffn_num_hiddens=256,
                     num_heads=2, num_layers=2, dropout=0.2)
-ctx = d2l.try_all_gpus()
-net.initialize(init.Xavier(), ctx=ctx)
+devices = d2l.try_all_gpus()
+net.initialize(init.Xavier(), ctx=devices)
 loss = gluon.loss.SoftmaxCELoss()
 ```
 
@@ -91,7 +91,7 @@ specifies the number of iteration steps for training.
 
 ```{.python .input  n=17}
 #@save
-def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
+def train_bert(train_iter, net, loss, vocab_size, devices, log_interval,
                num_steps):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': 1e-3})
@@ -107,7 +107,7 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
             (tokens_X_shards, segments_X_shards, valid_lens_x_shards,
              pred_positions_X_shards, mlm_weights_X_shards,
              mlm_Y_shards, nsp_y_shards) = [gluon.utils.split_and_load(
-                elem, ctx, even_split=False) for elem in batch]
+                elem, devices, even_split=False) for elem in batch]
             timer.start()
             with autograd.record():
                 mlm_ls, nsp_ls, ls = _get_batch_loss_bert(
@@ -131,19 +131,20 @@ def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
 
     print(f'MLM loss {metric[0] / metric[3]:.3f}, '
           f'NSP loss {metric[1] / metric[3]:.3f}')
-    print(f'{metric[2] / timer.sum():.1f} sentence pairs/sec on {str(ctx)}')
+    print(f'{metric[2] / timer.sum():.1f} sentence pairs/sec on '
+          f'{str(devices)}')
 ```
 
 We can plot both the masked language modeling loss and the next sentence prediction loss
 during BERT pretraining.
 
 ```{.python .input  n=18}
-train_bert(train_iter, net, loss, len(vocab), ctx, 1, 50)
+train_bert(train_iter, net, loss, len(vocab), devices, 1, 50)
 ```
 
 ## Representing Text with BERT
 
-After pretraing BERT,
+After pretraining BERT,
 we can use it to represent single text, text pairs, or any token in them.
 The following function returns the BERT (`net`) representations for all tokens
 in `tokens_a` and `tokens_b`.
@@ -151,10 +152,10 @@ in `tokens_a` and `tokens_b`.
 ```{.python .input}
 def get_bert_encoding(net, tokens_a, tokens_b=None):
     tokens, segments = d2l.get_tokens_and_segments(tokens_a, tokens_b)
-    ctx = d2l.try_gpu()
-    token_ids = np.expand_dims(np.array(vocab[tokens], ctx=ctx), axis=0)
-    segments = np.expand_dims(np.array(segments, ctx=ctx), axis=0)
-    valid_len = np.expand_dims(np.array(len(tokens), ctx=ctx), axis=0)
+    token_ids = np.expand_dims(np.array(vocab[tokens], ctx=devices[0]),
+                               axis=0)
+    segments = np.expand_dims(np.array(segments, ctx=devices[0]), axis=0)
+    valid_len = np.expand_dims(np.array(len(tokens), ctx=devices[0]), axis=0)
     encoded_X, _, _ = net(token_ids, segments, valid_len)
     return encoded_X
 ```
@@ -201,13 +202,13 @@ for downstream natural language processing applications.
 ## Summary
 
 * The original BERT has two versions, where the base model has 110 million parameters and the large model has 340 million parameters.
-* After pretraing BERT, we can use it to represent single text, text pairs, or any token in them.
+* After pretraining BERT, we can use it to represent single text, text pairs, or any token in them.
 * In the experiment, the same token has different BERT representation when their contexts are different. This supports that BERT representations are context-sensitive.
 
 ## Exercises
 
 1. In the experiment, we can see that the masked language modeling loss is significantly higher than the next sentence prediction loss. Why?
-1. Set the maximum length of a BERT input sequence to be 512 (same as the original BERT model). Use the configurations of the original BERT model such as $\text{BERT}_{\text{LARGE}}$. Do you encounter any error when running this section? Why?
+2. Set the maximum length of a BERT input sequence to be 512 (same as the original BERT model). Use the configurations of the original BERT model such as $\text{BERT}_{\text{LARGE}}$. Do you encounter any error when running this section? Why?
 
 
 :begin_tab:`mxnet`

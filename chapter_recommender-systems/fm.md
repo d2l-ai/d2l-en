@@ -84,14 +84,14 @@ test_iter = gluon.data.DataLoader(
 Afterwards, we train the model. The learning rate is set to 0.01 and the embedding size is set to 20 by default. The `Adam` optimizer and the `SigmoidBinaryCrossEntropyLoss` loss are used for model training.
 
 ```{.python .input  n=5}
-ctx = d2l.try_all_gpus()
+devices = d2l.try_all_gpus()
 net = FM(train_data.field_dims, num_factors=20)
-net.initialize(init.Xavier(), ctx=ctx)
+net.initialize(init.Xavier(), ctx=devices)
 lr, num_epochs, optimizer = 0.02, 30, 'adam'
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {'learning_rate': lr})
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
-d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
 ## Summary

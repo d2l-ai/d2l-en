@@ -131,7 +131,7 @@ Then, the overall Hit rate and AUC are calculated as follows.
 ```{.python .input  n=5}
 #@save
 def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
-                     ctx):
+                     devices):
     ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
     all_items = set([i for i in range(num_users)])
     for u in range(num_users):
@@ -147,7 +147,7 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
             gluon.data.ArrayDataset(*x), shuffle=False, last_batch="keep",
             batch_size=1024)
         for index, values in enumerate(test_data_iter):
-            x = [gluon.utils.split_and_load(v, ctx, even_split=False)
+            x = [gluon.utils.split_and_load(v, devices, even_split=False)
                  for v in values]
             scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
         scores = [item for sublist in scores for item in sublist]
@@ -167,7 +167,7 @@ The training function is defined below. We train the model in the pairwise manne
 ```{.python .input  n=6}
 #@save
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx_list, evaluator,
+                  num_users, num_items, num_epochs, devices, evaluator,
                   candidates, eval_step=1):
     timer, hit_rate, auc = d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
@@ -177,14 +177,14 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
         for i, values in enumerate(train_iter):
             input_data = []
             for v in values:
-                input_data.append(gluon.utils.split_and_load(v, ctx_list))
+                input_data.append(gluon.utils.split_and_load(v, devices))
             with autograd.record():
                 p_pos = [net(*t) for t in zip(*input_data[0:-1])]
                 p_neg = [net(*t) for t in zip(*input_data[0:-2],
                                               input_data[-1])]
                 ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]
-            l += sum([l.asnumpy() for l in ls]).mean()/len(ctx_list)
+            l += sum([l.asnumpy() for l in ls]).mean()/len(devices)
             trainer.step(values[0].shape[0])
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
@@ -192,12 +192,12 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             if (epoch + 1) % eval_step == 0:
                 hit_rate, auc = evaluator(net, test_iter, test_seq_iter,
                                           candidates, num_users, num_items,
-                                          ctx_list)
+                                          devices)
                 animator.add(epoch + 1, (hit_rate, auc))
     print(f'train loss {metric[0] / metric[1]:.3f}, '
           f'test hit rate {float(hit_rate):.3f}, test AUC {float(auc):.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(ctx_list)}')
+          f'on {str(devices)}')
 ```
 
 Now, we can load the MovieLens 100k dataset and train the model. Since there are only ratings in the MovieLens dataset, with some losses of accuracy, we binarize these ratings to zeros and ones. If a user rated an item, we consider the implicit feedback as one, otherwise as zero. The action of rating an item can be treated as a form of providing implicit feedback.  Here, we split the dataset in the `seq-aware` mode where users' latest interacted items are left out for test.
@@ -219,9 +219,9 @@ train_iter = gluon.data.DataLoader(
 We then create and initialize the model. we use a three-layer MLP with constant hidden size 10.
 
 ```{.python .input  n=8}
-ctx = d2l.try_all_gpus()
+devices = d2l.try_all_gpus()
 net = NeuMF(10, num_users, num_items, nums_hiddens=[10, 10, 10])
-net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
+net.initialize(ctx=devices, force_reinit=True, init=mx.init.Normal(0.01))
 ```
 
 The following code trains the model.
@@ -232,7 +232,7 @@ loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
 train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users,
-              num_items, num_epochs, ctx, evaluate_ranking, candidates)
+              num_items, num_epochs, devices, evaluate_ranking, candidates)
 ```
 
 ## Summary

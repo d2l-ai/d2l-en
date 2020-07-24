@@ -190,17 +190,17 @@ The training data structure is shown above. The first element is the user identi
 Now, let us train the model. We use the same setting as NeuMF, including learning rate, optimizer, and $k$, in the last section so that the results are comparable.
 
 ```{.python .input  n=7}
-ctx = d2l.try_all_gpus()
+devices = d2l.try_all_gpus()
 net = Caser(10, num_users, num_items, L)
-net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
+net.initialize(ctx=devices, force_reinit=True, init=mx.init.Normal(0.01))
 lr, num_epochs, wd, optimizer = 0.04, 8, 1e-5, 'adam'
 loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
 
 d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx, d2l.evaluate_ranking,
-                  candidates, eval_step=1)
+                  num_users, num_items, num_epochs, devices,
+                  d2l.evaluate_ranking, candidates, eval_step=1)
 ```
 
 ## Summary

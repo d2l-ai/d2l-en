@@ -1,4 +1,4 @@
-# Considering the Environment
+# Environment and Distribution Shift
 
 In the previous sections, we worked through
 a number of hands-on applications of machine learning,
@@ -57,7 +57,7 @@ statistical prediction altogether and
 grapple with difficult philosophical questions
 concerning the ethical application of algorithms.
 
-## Distribution Shift
+## Types of Distribution Shift
 
 To begin, we stick with the passive prediction setting
 considering the various ways that data distributions might shift
@@ -286,9 +286,11 @@ Below are some typical cases.
 
 
 
+
+
 ## Correction of Distribution Shift
 
-In short, there are many cases
+As we have discussed, there are many cases
 where training and test distributions
 $P(\mathbf{x}, y)$ are different.
 In some cases, we get lucky and the models work
@@ -299,6 +301,44 @@ The remainder of this section grows considerably more technical.
 The impatient reader could continue on to the next section
 as this material is not prerequisite to subsequent concepts.
 
+### Empirical Risk and True Risk
+
+Let us first reflect about what exactly
+is happening during model training:
+we iterate over features and associated labels
+of training data
+$\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$
+and update the parameters of a model $f$ after every minibatch.
+For simplicity we do not consider regularization,
+so we largely minimize the loss on the training:
+
+$$\mathop{\mathrm{minimize}}_f \frac{1}{n} \sum_{i=1}^n l(f(\mathbf{x}_i), y_i),$$
+:eqlabel:`eq_empirical-risk-min`
+
+where $l$ is the loss function
+measuring "how bad" the prediction $f(\mathbf{x}_i)$ is given the associated label $y_i$.
+Statisticians call the term in :eqref:`eq_empirical-risk-min` *empirical risk*.
+*Empirical risk* is an average loss over the training data
+to approximate the *true risk*, 
+which is the
+expectation of the loss over the entire population of data drawn from their true distribution 
+$p(\mathbf{x},y)$:
+
+$$E_{p(\mathbf{x}, y)} [l(f(\mathbf{x}), y)] = \int\int l(f(\mathbf{x}), y) p(\mathbf{x}, y) \;d\mathbf{x}dy.$$
+:eqlabel:`eq_true-risk`
+
+However, in practice we typically cannot obtain the entire population of data.
+Thus, *empirical risk minimization*,
+which is minimizing empirical risk in :eqref:`eq_empirical-risk-min`,
+is a practical strategy for machine learning,
+with the hope to approximate  
+minimizing true risk.
+
+
+
+
+
+
 ### Covariate Shift Correction
 :label:`subsec_covariate-shift-correction`
 
@@ -306,50 +346,35 @@ Assume that we want to estimate
 some dependency $P(y \mid \mathbf{x})$
 for which we have labeled data $(\mathbf{x}_i, y_i)$.
 Unfortunately, the observations $\mathbf{x}_i$ are drawn
-from some *source distribution* $q(\mathbf{x})$ (e.g., training set)
-rather than the *target distribution* $p(\mathbf{x})$ (e.g., test set).
-To make progress, we need to reflect about what exactly
-is happening during training:
-we iterate over training data and associated labels
-$\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$
-and update the parameters $\mathbf{\Theta}$ of the model after every minibatch.
-We sometimes additionally apply some penalty to the parameters,
-using weight decay, dropout, or some other related technique.
-This means that we largely minimize the loss on the training:
-
-$$\mathop{\mathrm{minimize}}_\mathbf{\Theta} \frac{1}{n} \sum_{i=1}^n l(\mathbf{x}_i, y_i, \mathbf{\Theta}) + \mathrm{some~penalty}(\mathbf{\Theta}),$$
-:eqlabel:`eq_regularized-empirical-risk-min`
-
-where $l(\mathbf{x}_i, y_i, \mathbf{\Theta})$ is the individual loss for the model parameterized by $\mathbf{\Theta}$ on a single data point $(\mathbf{x}_i, y_i)$.
-Statisticians call the first term in :eqref:`eq_regularized-empirical-risk-min` *empirical risk*,
-i.e., an average computed over the data drawn from $P(\mathbf{x}) P(y \mid \mathbf{x})$ (e.g., training set).
-Without considering the penalty term,
-minimizing the first term in :eqref:`eq_regularized-empirical-risk-min`
-is called *empirical risk minimization*.
-If the data are drawn from the "wrong" distribution $q$,
-we can correct for that by using the following simple identity:
+from some *source distribution* $q(\mathbf{x})$ 
+rather than the *target distribution* $p(\mathbf{x})$.
+Fortunately,
+the dependency assumption means
+that the conditional distribution does not change: $p(y \mid \mathbf{x}) = q(y \mid \mathbf{x})$.
+If the source distribution $q(\mathbf{x})$ is "wrong",
+we can correct for that by using the following simple identity in true risk:
 
 $$
 \begin{aligned}
-\int p(\mathbf{x}) f(\mathbf{x}) \;d\mathbf{x}
-& = \int q(\mathbf{x}) f(\mathbf{x}) \frac{p(\mathbf{x})}{q(\mathbf{x})} \;d\mathbf{x}.
+\int\int l(f(\mathbf{x}), y) p(y \mid \mathbf{x})p(\mathbf{x}) \;d\mathbf{x}dy = 
+\int\int l(f(\mathbf{x}), y) q(y \mid \mathbf{x})q(\mathbf{x})\frac{p(\mathbf{x})}{q(\mathbf{x})} \;d\mathbf{x}dy.
 \end{aligned}
 $$
 
 In other words, we need to reweigh each data point
-by the ratio of probabilities
-that it would have been drawn from the correct distribution
+by the ratio of the 
+probability
+that it would have been drawn from the correct distribution to that from the wrong one:
 
-$$\beta(\mathbf{x}) \stackrel{\mathrm{def}}{=} \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
+$$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(\mathbf{x}_i)}{q(\mathbf{x}_i)}.$$
 
 Plugging in the weight $\beta_i$ for
 each data point $(\mathbf{x}_i, y_i)$
 we can train our model using
-*weighted empirical risk minimization*
-with some penalty to the parameters:
+*weighted empirical risk minimization*:
 
-$$\mathop{\mathrm{minimize}}_\mathbf{\mathbf{\Theta}} \frac{1}{n} \sum_{i=1}^n \beta_i l(\mathbf{x}_i, y_i, \mathbf{\Theta}) + \mathrm{some~penalty}(\mathbf{\mathbf{\Theta}}).$$
-:eqlabel:`eq_regularized-weighted-empirical-risk-min`
+$$\mathop{\mathrm{minimize}}_f \frac{1}{n} \sum_{i=1}^n \beta_i l(f(\mathbf{x}_i), y_i).$$
+:eqlabel:`eq_weighted-empirical-risk-min`
 
 
 
@@ -383,7 +408,7 @@ On the other hand, any instances
 that can be well discriminated
 should be significantly overweighted
 or underweighted accordingly.
-For simplicity’s sake assume that we have
+For simplicity's sake assume that we have
 an equal number of instances from both distributions
 $p(\mathbf{x})$
 and $q(\mathbf{x})$, respectively.
@@ -394,32 +419,34 @@ Then the probability in a mixed dataset is given by
 $$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
 
 Thus, if we use a logistic regression approach,
-where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-f(\mathbf{x}))}$,
+where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-h(\mathbf{x}))}$ ($h$ is a parameterized function),
 it follows that
 
 $$
-\beta(\mathbf{x}) = \frac{1/(1 + \exp(-f(\mathbf{x})))}{\exp(-f(\mathbf{x}))/(1 + \exp(-f(\mathbf{x})))} = \exp(f(\mathbf{x})).
+\beta_i = \frac{1/(1 + \exp(-h(\mathbf{x}_i)))}{\exp(-h(\mathbf{x}_i))/(1 + \exp(-h(\mathbf{x}_i)))} = \exp(h(\mathbf{x}_i)).
 $$
 
 As a result, we need to solve two problems:
 first one to distinguish between
 data drawn from both distributions,
-and then a reweighted minimization problem
-in :eqref:`eq_regularized-weighted-empirical-risk-min`
-where we weigh terms by $\beta$.
-Here is a prototypical algorithm
-for that purpose
-that uses a training set $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ and an unlabeled test set $\{\mathbf{z}_1, \ldots, \mathbf{z}_m\}$:
+and then a weighted empirical risk minimization problem
+in :eqref:`eq_weighted-empirical-risk-min`
+where we weigh terms by $\beta_i$.
 
-1. Generate a binary-classification training set: $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{z}_1, 1), \ldots, (\mathbf{z}_m, 1)\}$.
-1. Train a binary classifier using logistic regression to get function $f$.
-1. Weigh training data using $\beta_i = \exp(f(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(f(\mathbf{x}_i)), c)$ for some constant $c$.
-1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ in :eqref:`eq_regularized-weighted-empirical-risk-min`.
-
-In the covariate shift correction,
+Now we are ready to describe a correction algorithm.
+Suppose that we have a training set $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ and an unlabeled test set $\{\mathbf{u}_1, \ldots, \mathbf{u}_m\}$.
+For covariate shift,
 we assume that $\mathbf{x}_i$ for all $1 \leq i \leq n$ are drawn from some source distribution
-and $\mathbf{z}_i$ for all $1 \leq i \leq m$
+and $\mathbf{u}_i$ for all $1 \leq i \leq m$
 are drawn from the target distribution.
+Here is a prototypical algorithm
+for correcting covariate shift:
+
+1. Generate a binary-classification training set: $\{(\mathbf{x}_1, -1), \ldots, (\mathbf{x}_n, -1), (\mathbf{u}_1, 1), \ldots, (\mathbf{u}_m, 1)\}$.
+1. Train a binary classifier using logistic regression to get function $h$.
+1. Weigh training data using $\beta_i = \exp(h(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(h(\mathbf{x}_i)), c)$ for some constant $c$.
+1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ in :eqref:`eq_weighted-empirical-risk-min`.
+
 Note that the above algorithm relies on a crucial assumption.
 For this scheme to work, we need that each data point
 in the target (e.g., test time) distribution
@@ -430,19 +457,37 @@ then the corresponding importance weight should be infinity.
 
 
 
+
+
 ### Label Shift Correction
 
 Assume that we are dealing with a
 classification task with $k$ categories.
-Staying consistent with the notation in :numref:`subsec_covariate-shift-correction`,
-denote by $q$ and $p$ the source distribution (e.g., training time) and target distribution (e.g., test time), respectively.
+Using the same notation in :numref:`subsec_covariate-shift-correction`,
+$q$ and $p$ are the source distribution (e.g., training time) and target distribution (e.g., test time), respectively.
 Assume that the distribution of labels shifts over time:
 $q(y) \neq p(y)$, but the class-conditional distribution
 stays the same: $q(\mathbf{x} \mid y)=p(\mathbf{x} \mid y)$.
+If the source distribution $q(y)$ is "wrong",
+we can correct for that 
+according to 
+the following identity in true risk
+as defined in 
+:eqref:`eq_true-risk`:
+
+$$
+\begin{aligned}
+\int\int l(f(\mathbf{x}), y) p(\mathbf{x} \mid y)p(y) \;d\mathbf{x}dy = 
+\int\int l(f(\mathbf{x}), y) q(\mathbf{x} \mid y)q(y)\frac{p(y)}{q(y)} \;d\mathbf{x}dy.
+\end{aligned}
+$$
+
+
+
 Here, our importance weights will correspond to the
 label likelihood ratios 
 
-$$\beta(y) \stackrel{\mathrm{def}}{=} \frac{p(y)}{q(y)}.$$
+$$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(y_i)}{q(y_i)}.$$
 
 One nice thing about label shift is that
 if we have a reasonably good model
@@ -481,12 +526,12 @@ and if the target data contain only categories
 that we have seen before,
 and if the label shift assumption holds in the first place
 (the strongest assumption here),
-then we can recover the test set label distribution
+then we can estimate the test set label distribution
 by solving a simple linear system 
 
 $$\mathbf{C} p(\mathbf{y}) = \mu(\hat{\mathbf{y}}),$$
 
-since $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ for all $1 \leq i \leq k$,
+because as an estimate $\sum_{j=1}^k c_{ij} p(y_j) = \mu(\hat{y}_i)$ holds for all $1 \leq i \leq k$,
 where $p(y_j)$ is the $j^\mathrm{th}$ element of the $k$-dimensional label distribution vector $p(\mathbf{y})$.
 If our classifier is sufficiently accurate to begin with,
 then the confusion matrix $\mathbf{C}$ will be invertible,
@@ -494,13 +539,11 @@ and we get a solution $p(\mathbf{y}) = \mathbf{C}^{-1} \mu(\hat{\mathbf{y}})$.
 
 Because we observe the labels on the source data,
 it is easy to estimate the distribution $q(y)$.
-Then for any training example $i$ with label $y$,
-we can take the ratio of our estimates $\hat{p}(y)/\hat{q}(y)$
+Then for any training example $i$ with label $y_i$,
+we can take the ratio of our estimated $p(y_i)/q(y_i)$
 to calculate the weight $\beta_i$,
-and plug this into the weighted minimization problem
-in :eqref:`eq_regularized-weighted-empirical-risk-min`.
-
-
+and plug this into weighted empirical risk minimization
+in :eqref:`eq_weighted-empirical-risk-min`.
 
 
 ### Concept Shift Correction
@@ -523,28 +566,58 @@ old products become less popular. This means that the distribution over ads and 
 
 In such cases, we can use the same approach that we used for training networks to make them adapt to the change in the data. In other words, we use the existing network weights and simply perform a few update steps with the new data rather than training from scratch.
 
+
 ## A Taxonomy of Learning Problems
 
-Armed with knowledge about how to deal with changes in $p(x)$ and in $P(y \mid x)$, we can now consider some other aspects of machine learning problem formulation.
+Armed with knowledge about how to deal with changes in distributions, we can now consider some other aspects of machine learning problem formulation.
 
 
-* **Batch Learning.** Here we have access to training data and labels $\{(x_1, y_1), \ldots, (x_n, y_n)\}$, which we use to train a network $f(x, w)$. Later on, we deploy this network to score new data $(x, y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
-* **Online Learning.** Now imagine that the data $(x_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $x_i$, then we need to come up with an estimate $f(x_i, w)$ and only once we have done this, we observe $y_i$ and with it, we receive a reward (or incur a loss), given our decision. Many real problems fall into this category. E.g., we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, we have the following cycle where we are continuously improving our model given new observations.
+### Batch Learning
+
+In *batch learning*, we have access to training features and labels $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$, which we use to train a model $f(\mathbf{x})$. Later on, we deploy this model to score new data $(\mathbf{x}, y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
+
+
+### Online Learning
+
+Now imagine that the data $(\mathbf{x}_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $\mathbf{x}_i$, then we need to come up with an estimate $f(\mathbf{x}_i)$ and only once we have done this, we observe $y_i$ and with it, we receive a reward or incur a loss, given our decision. 
+Many real problems fall into this category. For example, we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, in *online learning*, we have the following cycle where we are continuously improving our model given new observations.
 
 $$
 \mathrm{model} ~ f_t \longrightarrow
-\mathrm{data} ~ x_t \longrightarrow
-\mathrm{estimate} ~ f_t(x_t) \longrightarrow
+\mathrm{data} ~ \mathbf{x}_t \longrightarrow
+\mathrm{estimate} ~ f_t(\mathbf{x}_t) \longrightarrow
 \mathrm{observation} ~ y_t \longrightarrow
-\mathrm{loss} ~ l(y_t, f_t(x_t)) \longrightarrow
+\mathrm{loss} ~ l(y_t, f_t(\mathbf{x}_t)) \longrightarrow
 \mathrm{model} ~ f_{t+1}
 $$
 
-* **Bandits.** They are a *special case* of the problem above. While in most learning problems we have a continuously parametrized function $f$ where we want to learn its parameters (e.g., a deep network), in a bandit problem we only have a finite number of arms that we can pull (i.e., a finite number of actions that we can take). It is not very surprising that for this simpler problem stronger theoretical guarantees in terms of optimality can be obtained. We list it mainly since this problem is often (confusingly) treated as if it were a distinct learning setting.
-* **Control (and nonadversarial Reinforcement Learning).** In many cases the environment remembers what we did. Not necessarily in an adversarial manner but it will just remember and the response will depend on what happened before. E.g., a coffee boiler controller will observe different temperatures depending on whether it was heating the boiler previously. PID (proportional integral derivative) controller algorithms are a popular choice there. Likewise, a user's behavior on a news site will depend on what we showed him previously (e.g., he will read most news only once). Many such algorithms form a model of the environment in which they act such as to make their decisions appear less random (i.e., to reduce variance).
-* **Reinforcement Learning.** In the more general case of an environment with memory, we may encounter situations where the environment is trying to *cooperate* with us (cooperative games, in particular for non-zero-sum games), or others where the environment will try to *win*. Chess, Go, Backgammon or StarCraft are some of the cases. Likewise, we might want to build a good controller for autonomous cars. The other cars are likely to respond to the autonomous car's driving style in nontrivial ways, e.g., trying to avoid it, trying to cause an accident, trying to cooperate with it, etc.
+### Bandits
 
-One key distinction between the different situations above is that the same strategy that might have worked throughout in the case of a stationary environment, might not work throughout when the environment can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once he starts exploiting it. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we *know* that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist to deal with concept shift, i.e., when the problem that he is trying to solve changes over time.
+*Bandits* are a special case of the problem above. While in most learning problems we have a continuously parametrized function $f$ where we want to learn its parameters (e.g., a deep network), in a *bandit* problem we only have a finite number of arms that we can pull, i.e., a finite number of actions that we can take. It is not very surprising that for this simpler problem stronger theoretical guarantees in terms of optimality can be obtained. We list it mainly since this problem is often (confusingly) treated as if it were a distinct learning setting.
+
+
+### Control
+
+In many cases the environment remembers what we did. Not necessarily in an adversarial manner but it will just remember and the response will depend on what happened before. For instance, a coffee boiler controller will observe different temperatures depending on whether it was heating the boiler previously. PID (proportional-integral-derivative) controller algorithms are a popular choice there. 
+Likewise, a user's behavior on a news site will depend on what we showed her previously (e.g., she will read most news only once). Many such algorithms form a model of the environment in which they act such as to make their decisions appear less random.
+Recently,
+control theory (e.g., PID variants) has also been used
+to automatically tune hyperparameters
+to achive better disentangling and reconstruction quality,
+and improve the diversity of generated text and the reconstruction quality of generated images :cite:`Shao.Yao.Sun.ea.2020`.
+
+
+
+
+### Reinforcement Learning 
+
+In the more general case of an environment with memory, we may encounter situations where the environment is trying to cooperate with us (cooperative games, in particular for non-zero-sum games), or others where the environment will try to win. Chess, Go, Backgammon, or StarCraft are some of the cases in *reinforcement learning*. Likewise, we might want to build a good controller for autonomous cars. The other cars are likely to respond to the autonomous car's driving style in nontrivial ways, e.g., trying to avoid it, trying to cause an accident, and trying to cooperate with it.
+
+### Considering the Environment
+
+One key distinction between the different situations above is that the same strategy that might have worked throughout in the case of a stationary environment, might not work throughout when the environment can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once he starts exploiting it. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we know that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist to deal with concept shift, i.e., when the problem that she is trying to solve changes over time.
+
+
 
 
 ## Fairness, Accountability, and Transparency in Machine Learning
@@ -568,12 +641,12 @@ a subpopulation could cause us to administer inferior care.
 Moreover, once we contemplate decision-making systems,
 we must step back and reconsider how we evaluate our technology.
 Among other consequences of this change of scope,
-we will find that *accuracy* is seldom the right metric.
+we will find that *accuracy* is seldom the right measure.
 For instance, when translating predictions into actions,
 we will often want to take into account
 the potential cost sensitivity of erring in various ways.
 If one way of misclassifying an image
-could be perceived as a racial sleight,
+could be perceived as a racial sleight of hand,
 while misclassification to a different category
 would be harmless, then we might want to adjust
 our thresholds accordingly, accounting for societal values
@@ -593,7 +666,7 @@ It is easy to see how a worrying pattern can emerge:
 Often, the various mechanisms by which
 a model's predictions become coupled to its training data
 are unaccounted for in the modeling process.
-This can lead to what researchers call "runaway feedback loops."
+This can lead to what researchers call *runaway feedback loops*.
 Additionally, we want to be careful about
 whether we are addressing the right problem in the first place.
 Predictive algorithms now play an outsize role
@@ -607,15 +680,17 @@ that you might encounter in a career in machine learning.
 
 ## Summary
 
-* In many cases training and test sets do not come from the same distribution. This is called covariate shift.
-* Under the corresponding assumptions, *covariate* and *label* shift can be detected and corrected for at test time. Failure to account for this bias can become problematic at test time.
-* In some cases, the environment may *remember* automated actions and respond in surprising ways. We must account for this possibility when building models and continue to monitor live systems, open to the possibility that our models and the environment will become entangled in unanticipated ways.
+* In many cases training and test sets do not come from the same distribution. This is called distribution shift.
+* True risk is the expectation of the loss over the entire population of data drawn from their true distribution. However, this entire population is usually unavailable. Empirical risk is an average loss over the training data to approximate the true risk. In practice, we perform empirical risk minimization.
+* Under the corresponding assumptions, covariate and label shift can be detected and corrected for at test time. Failure to account for this bias can become problematic at test time.
+* In some cases, the environment may remember automated actions and respond in surprising ways. We must account for this possibility when building models and continue to monitor live systems, open to the possibility that our models and the environment will become entangled in unanticipated ways.
 
 ## Exercises
 
 1. What could happen when we change the behavior of a search engine? What might the users do? What about the advertisers?
 1. Implement a covariate shift detector. Hint: build a classifier.
 1. Implement a covariate shift corrector.
-1. What could go wrong if training and test sets are very different? What would happen to the sample weights?
+1. Besides distribution shift, what else could affect how empirical risk approximates true risk?
+
 
 [Discussions](https://discuss.d2l.ai/t/105)

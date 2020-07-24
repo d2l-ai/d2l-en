@@ -96,10 +96,6 @@ from d2l import mxnet as d2l
 from mxnet import np, npx
 import random
 npx.set_np()
-
-tokens = d2l.tokenize(d2l.read_time_machine())
-vocab = d2l.Vocab(tokens)
-print(vocab.token_freqs[:10])
 ```
 
 ```{.python .input}
@@ -107,10 +103,13 @@ print(vocab.token_freqs[:10])
 from d2l import torch as d2l
 import torch
 import random
+```
 
+```{.python .input}
+#@tab all
 tokens = d2l.tokenize(d2l.read_time_machine())
 vocab = d2l.Vocab(tokens)
-print(vocab.token_freqs[:10])
+vocab.token_freqs[:10]
 ```
 
 As we can see, the most popular words are actually quite boring to look at. They are often referred to as [stop words](https://en.wikipedia.org/wiki/Stop_words) and thus filtered out. That said, they still carry meaning and we will use them nonetheless. However, one thing that is quite clear is that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea we plot the graph of the word frequency.
@@ -248,7 +247,7 @@ Now we wrap the above two sampling functions to a class so that we can use it as
 ```{.python .input}
 #@tab all
 class SeqDataLoader:  #@save
-    """A iterator to load sequence data."""
+    """An iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
             self.data_iter_fn = d2l.seq_data_iter_random

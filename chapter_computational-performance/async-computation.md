@@ -58,7 +58,7 @@ z
 :label:`fig_asyncgraph`
 
 The code snippet above is also illustrated in :numref:`fig_asyncgraph`.
-Whenever the Python frontend thread executes one of the first three statements, it simply returns the task to the backend queue. When the last statement’s results need to be printed, the Python frontend thread will wait for the C++ backend thread to finish computing result of the variable `z`. One benefit of this design is that the Python frontend thread does not need to perform actual computations. Thus, there is little impact on the program’s overall performance, regardless of Python’s performance. :numref:`fig_threading` illustrates how frontend and backend interact.
+Whenever the Python frontend thread executes one of the first three statements, it simply returns the task to the backend queue. When the last statement's results need to be printed, the Python frontend thread will wait for the C++ backend thread to finish computing result of the variable `z`. One benefit of this design is that the Python frontend thread does not need to perform actual computations. Thus, there is little impact on the program's overall performance, regardless of Python's performance. :numref:`fig_threading` illustrates how frontend and backend interact.
 
 ![Frontend and Backend.](../img/threading.svg)
 :label:`fig_threading`

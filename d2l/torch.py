@@ -364,7 +364,7 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download(name, cache_dir=os.path.join('..', 'data')):  #@save
     """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}"
+    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}."
     url, sha1_hash = DATA_HUB[name]
     d2l.mkdir_if_not_exist(cache_dir)
     fname = os.path.join(cache_dir, url.split('/')[-1])
@@ -373,10 +373,11 @@ def download(name, cache_dir=os.path.join('..', 'data')):  #@save
         with open(fname, 'rb') as f:
             while True:
                 data = f.read(1048576)
-                if not data: break
+                if not data:
+                    break
                 sha1.update(data)
         if sha1.hexdigest() == sha1_hash:
-            return fname # Hit cache
+            return fname  # Hit cache
     print(f'Downloading {fname} from {url}...')
     r = requests.get(url, stream=True, verify=True)
     with open(fname, 'wb') as f:
@@ -395,14 +396,14 @@ def download_extract(name, folder=None):  #@save
     elif ext in ('.tar', '.gz'):
         fp = tarfile.open(fname, 'r')
     else:
-        assert False, 'Only zip/tar files can be extracted'
+        assert False, 'Only zip/tar files can be extracted.'
     fp.extractall(base_dir)
     return os.path.join(base_dir, folder) if folder else data_dir
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download_all():  #@save
-    """Download all files in the DATA_HUB"""
+    """Download all files in the DATA_HUB."""
     for name in DATA_HUB:
         download(name)
 
@@ -430,19 +431,19 @@ def try_gpu(i=0):  #@save
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    ctxes = [torch.device(f'cuda:{i}')
+    devices = [torch.device(f'cuda:{i}')
              for i in range(torch.cuda.device_count())]
-    return ctxes if ctxes else [torch.device('cpu')]
+    return devices if devices else [torch.device('cpu')]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
 def corr2d(X, K):  #@save
     """Compute 2D cross-correlation."""
     h, w = K.shape
-    Y = torch.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    Y = d2l.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
+            Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
     return Y
 
 
@@ -641,7 +642,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 class SeqDataLoader:  #@save
-    """A iterator to load sequence data."""
+    """An iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
             self.data_iter_fn = d2l.seq_data_iter_random
@@ -683,7 +684,8 @@ class RNNModelScratch: #@save
 def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, device=device)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: torch.tensor([outputs[-1]], device=device).reshape(1, 1)
+    get_input = lambda: torch.tensor(
+        [outputs[-1]], device=device).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -706,7 +708,8 @@ def grad_clipping(model, theta):  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater, device, use_random_iter):  #@save
+def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
+                    use_random_iter):
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
@@ -731,7 +734,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device, use_random_iter): 
             grad_clipping(model, 1)
             updater(batch_size=1)  # Since used mean already
         metric.add(l * d2l.size(y), d2l.size(y))
-    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
@@ -1094,6 +1097,9 @@ normal = torch.normal
 matmul = torch.matmul
 int32 = torch.int32
 float32 = torch.float32
+concat = torch.cat
+stack = torch.stack
+abs = torch.abs
 numpy = lambda x, *args, **kwargs: x.detach().numpy(*args, **kwargs)
 size = lambda x, *args, **kwargs: x.numel(*args, **kwargs)
 reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
@@ -1101,4 +1107,5 @@ to = lambda x, *args, **kwargs: x.to(*args, **kwargs)
 reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
 argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
 astype = lambda x, *args, **kwargs: x.type(*args, **kwargs)
+transpose = lambda x, *args, **kwargs: x.t(*args, **kwargs)
 

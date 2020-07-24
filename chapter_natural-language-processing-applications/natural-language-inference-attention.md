@@ -233,9 +233,9 @@ Then we create a model instance, initialize its parameters,
 and load the GloVe embedding to initialize vectors of input tokens.
 
 ```{.python .input  n=8}
-embed_size, num_hiddens, ctx = 100, 200, d2l.try_all_gpus()
+embed_size, num_hiddens, devices = 100, 200, d2l.try_all_gpus()
 net = DecomposableAttention(vocab, embed_size, num_hiddens)
-net.initialize(init.Xavier(), ctx=ctx)
+net.initialize(init.Xavier(), ctx=devices)
 glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
 embeds = glove_embedding[vocab.idx_to_token]
 net.embedding.weight.set_data(embeds)
@@ -248,11 +248,11 @@ we define a `split_batch_multi_inputs` function to take multiple inputs such as 
 
 ```{.python .input  n=10}
 #@save
-def split_batch_multi_inputs(X, y, ctx_list):
+def split_batch_multi_inputs(X, y, devices):
     """Split multi-input `X` and `y` into multiple devices."""
     X = list(zip(*[gluon.utils.split_and_load(
-        feature, ctx_list, even_split=False) for feature in X]))
-    return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
+        feature, devices, even_split=False) for feature in X]))
+    return (X, gluon.utils.split_and_load(y, devices, even_split=False))
 ```
 
 Now we can train and evaluate the model on the SNLI dataset.
@@ -261,7 +261,7 @@ Now we can train and evaluate the model on the SNLI dataset.
 lr, num_epochs = 0.001, 4
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
-d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices,
                split_batch_multi_inputs)
 ```
 

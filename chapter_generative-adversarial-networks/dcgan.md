@@ -191,10 +191,10 @@ Compared to the basic GAN in :numref:`sec_basic_gan`, we use the same learning r
 
 ```{.python .input  n=20}
 def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
-          ctx=d2l.try_gpu()):
+          device=d2l.try_gpu()):
     loss = gluon.loss.SigmoidBCELoss()
-    net_D.initialize(init=init.Normal(0.02), force_reinit=True, ctx=ctx)
-    net_G.initialize(init=init.Normal(0.02), force_reinit=True, ctx=ctx)
+    net_D.initialize(init=init.Normal(0.02), force_reinit=True, ctx=device)
+    net_G.initialize(init=init.Normal(0.02), force_reinit=True, ctx=device)
     trainer_hp = {'learning_rate': lr, 'beta1': 0.5}
     trainer_D = gluon.Trainer(net_D.collect_params(), 'adam', trainer_hp)
     trainer_G = gluon.Trainer(net_G.collect_params(), 'adam', trainer_hp)
@@ -209,12 +209,12 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         for X, _ in data_iter:
             batch_size = X.shape[0]
             Z = np.random.normal(0, 1, size=(batch_size, latent_dim, 1, 1))
-            X, Z = X.as_in_ctx(ctx), Z.as_in_ctx(ctx),
+            X, Z = X.as_in_ctx(device), Z.as_in_ctx(device),
             metric.add(d2l.update_D(X, Z, net_D, net_G, loss, trainer_D),
                        d2l.update_G(Z, net_D, net_G, loss, trainer_G),
                        batch_size)
         # Show generated examples
-        Z = np.random.normal(0, 1, size=(21, latent_dim, 1, 1), ctx=ctx)
+        Z = np.random.normal(0, 1, size=(21, latent_dim, 1, 1), ctx=device)
         # Normalize the synthetic data to N(0, 1)
         fake_x = net_G(Z).transpose(0, 2, 3, 1) / 2 + 0.5
         imgs = np.concatenate(
@@ -226,7 +226,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]
         animator.add(epoch, (loss_D, loss_G))
     print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '
-          f'{metric[2] / timer.stop():.1f} examples/sec on {str(ctx)}')
+          f'{metric[2] / timer.stop():.1f} examples/sec on {str(device)}')
 ```
 
 We train the model with a small number of epochs just for demonstration.

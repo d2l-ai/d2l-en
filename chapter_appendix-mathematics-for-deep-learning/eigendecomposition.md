@@ -17,7 +17,7 @@ $$
 $$
 
 If we apply $A$ to any vector $\mathbf{v} = [x, y]^\top$, 
-we obtain a vector $\mathbf{v}A = [2x, -y]^\top$.
+we obtain a vector $\mathbf{A}\mathbf{v} = [2x, -y]^\top$.
 This has an intuitive interpretation:
 stretch the vector to be twice as wide in the $x$-direction,
 and then flip it in the $y$-direction.
@@ -41,8 +41,7 @@ $$
 We say that $\mathbf{v}$ is an eigenvector for $A$ and $\lambda$ is an eigenvalue.
 
 ## Finding Eigenvalues
-Let us figure out how to find them.  
-By subtracting off the $\lambda \vec v$ from both sides,
+Let us figure out how to find them. By subtracting off the $\lambda \mathbf{v}$ from both sides,
 and then factoring out the vector,
 we see the above is equivalent to:
 
@@ -80,8 +79,8 @@ $$
 2 & 3 
 \end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} = \begin{bmatrix}x \\ y\end{bmatrix}  \; \text{and} \;
 \begin{bmatrix}
-2 & 2\\
-1 & 3 
+2 & 1\\
+2 & 3 
 \end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix}  = \begin{bmatrix}4x \\ 4y\end{bmatrix} .
 $$
 
@@ -165,8 +164,7 @@ of linearly independent eigenvectors (so that $W$ is invertible).
 ## Operations on Eigendecompositions
 One nice thing about eigendecompositions :eqref:`eq_eig_decomp` is that 
 we can write many operations we usually encounter cleanly 
-in terms of the eigendecomposition.  
-As a first example, consider:
+in terms of the eigendecomposition. As a first example, consider:
 
 $$
 \mathbf{A}^n = \overbrace{\mathbf{A}\cdots \mathbf{A}}^{\text{$n$ times}} = \overbrace{(\mathbf{W}\boldsymbol{\Sigma} \mathbf{W}^{-1})\cdots(\mathbf{W}\boldsymbol{\Sigma} \mathbf{W}^{-1})}^{\text{$n$ times}} =  \mathbf{W}\overbrace{\boldsymbol{\Sigma}\cdots\boldsymbol{\Sigma}}^{\text{$n$ times}}\mathbf{W}^{-1} = \mathbf{W}\boldsymbol{\Sigma}^n \mathbf{W}^{-1}.
@@ -205,8 +203,8 @@ we can see that the rank is the same
 as the number of non-zero eigenvalues of $\mathbf{A}$.
 
 The examples could continue, but hopefully the point is clear:
-eigendecompositions can simplify many linear-algebraic computations
-and are a fundamental operation underlying many numerical algorithms
+eigendecomposition can simplify many linear-algebraic computations
+and is a fundamental operation underlying many numerical algorithms
 and much of the analysis that we do in linear algebra. 
 
 ## Eigendecompositions of Symmetric Matrices
@@ -220,7 +218,7 @@ $$
 \end{bmatrix},
 $$
 
-has only a single eigenvector, namely $(0, 1)$. 
+has only a single eigenvector, namely $(1, 0)^\top$. 
 To handle such matrices, we require more advanced techniques 
 than we can cover (such as the Jordan Normal Form, or Singular Value Decomposition).
 We will often need to restrict our attention to those matrices 

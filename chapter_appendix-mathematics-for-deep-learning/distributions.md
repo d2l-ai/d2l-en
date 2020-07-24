@@ -87,7 +87,7 @@ We can sample an array of arbitrary shape from a Bernoulli random variable as fo
 
 ## Discrete Uniform
 
-The next commonly encountered random variable encountered is a discrete uniform.  For our discussion here, we will assume that it is supported on the integers $\{1, 2, \ldots, n\}$, however any other set of values can be freely chosen.  The meaning of the word *uniform* in this context is that every possible value is equally likely.  The probability for each value $i \in \{1, 2, 3, \ldots, n\}$ is $p_i = \frac{1}{n}$.  We will denote a random variable $X$ with this distribution as
+The next commonly encountered random variable is a discrete uniform.  For our discussion here, we will assume that it is supported on the integers $\{1, 2, \ldots, n\}$, however any other set of values can be freely chosen.  The meaning of the word *uniform* in this context is that every possible value is equally likely.  The probability for each value $i \in \{1, 2, 3, \ldots, n\}$ is $p_i = \frac{1}{n}$.  We will denote a random variable $X$ with this distribution as
 
 $$
 X \sim U(n).
@@ -560,8 +560,7 @@ belong to which is known as the *exponential family*. The exponential family
 is a set of distributions whose density can be expressed in the following 
 form:
 
-$$p(\mathbf{x} | \mathbf{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \big{(} 
-\eta^{\top} \cdot T\mathbf(x) - A(\mathbf{\eta}) \big{)}$$
+$$p(\mathbf{x} | \mathbf{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \big{(} \eta^{\top} \cdot T\mathbf(x) - A(\mathbf{\eta}) \big{)}$$
 :eqlabel:`eq_exp_pdf`
 
 As this definition can be a little subtle, let us examine it closely.  

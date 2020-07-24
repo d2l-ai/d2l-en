@@ -35,6 +35,7 @@ we still use models that make soft assignments.
 
 
 ## Classification Problem
+:label:`subsec_classification-problem`
 
 To get our feet wet, let us start off with
 a simple image classification problem.
@@ -387,7 +388,7 @@ we can predict the probability of each output class.
 Normally, we use the class with the highest predicted probability as the output class.
 The prediction is correct if it is consistent with the actual class (label).
 In the next part of the experiment,
-we will use *accuracy* to evaluate the model’s performance.
+we will use *accuracy* to evaluate the model's performance.
 This is equal to the ratio between the number of correct predictions and the total number of predictions.
 
 

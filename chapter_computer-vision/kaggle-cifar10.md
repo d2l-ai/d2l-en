@@ -7,7 +7,7 @@ We performed an experiment on the CIFAR-10 dataset in :numref:`sec_image_augment
 This is an important data
 set in the computer vision field. Now, we will apply the knowledge we learned in
 the previous sections in order to participate in the Kaggle competition, which
-addresses CIFAR-10 image classification problems. The competition’s web address
+addresses CIFAR-10 image classification problems. The competition's web address
 is
 
 > https://www.kaggle.com/c/cifar-10
@@ -141,10 +141,10 @@ def reorg_cifar10_data(data_dir, valid_ratio):
     reorg_test(data_dir)
 ```
 
-We only set the batch size to $1$ for the demo dataset. During actual training and testing, the complete dataset of the Kaggle competition should be used and `batch_size` should be set to a larger integer, such as $128$. We use $10\%$ of the training examples as the validation set for tuning hyperparameters.
+We only set the batch size to $4$ for the demo dataset. During actual training and testing, the complete dataset of the Kaggle competition should be used and `batch_size` should be set to a larger integer, such as $128$. We use $10\%$ of the training examples as the validation set for tuning hyperparameters.
 
 ```{.python .input  n=4}
-batch_size = 1 if demo else 128
+batch_size = 4 if demo else 128
 valid_ratio = 0.1
 reorg_cifar10_data(data_dir, valid_ratio)
 ```
@@ -195,11 +195,15 @@ We specify the defined image augmentation operation in `DataLoader`. During trai
 ```{.python .input}
 train_iter, train_valid_iter = [gluon.data.DataLoader(
     dataset.transform_first(transform_train), batch_size, shuffle=True, 
-    last_batch='keep') for dataset in (train_ds, train_valid_ds)]
+    last_batch='discard') for dataset in (train_ds, train_valid_ds)]
 
-valid_iter, test_iter = [gluon.data.DataLoader(
-    dataset.transform_first(transform_test), batch_size, shuffle=False, 
-    last_batch='keep') for dataset in (valid_ds, test_ds)]
+valid_iter = gluon.data.DataLoader(
+    valid_ds.transform_first(transform_test), batch_size, shuffle=False, 
+    last_batch='discard')
+
+test_iter = gluon.data.DataLoader(
+    test_ds.transform_first(transform_test), batch_size, shuffle=False, 
+    last_batch='keep')
 ```
 
 ## Defining the Model
@@ -259,10 +263,10 @@ def resnet18(num_classes):
 The CIFAR-10 image classification challenge uses 10 categories. We will perform Xavier random initialization on the model before training begins.
 
 ```{.python .input}
-def get_net(ctx):
+def get_net(devices):
     num_classes = 10
     net = resnet18(num_classes)
-    net.initialize(ctx=ctx, init=init.Xavier())
+    net.initialize(ctx=devices, init=init.Xavier())
     return net
 
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -272,36 +276,41 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
 We will select the model and tune hyperparameters according to the model's performance on the validation set. Next, we define the model training function `train`. We record the training time of each epoch, which helps us compare the time costs of different models.
 
-```{.python .input  n=12}
-def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
+```{.python .input}
+def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           lr_decay):
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
+    num_batches, timer = len(train_iter), d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+                            legend=['train loss', 'train acc', 'valid acc'])
     for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, n, start = 0.0, 0.0, 0, time.time()
+        metric = d2l.Accumulator(3)
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
-        for X, y in train_iter:
-            y = y.astype('float32').as_in_ctx(ctx)
-            with autograd.record():
-                y_hat = net(X.as_in_ctx(ctx))
-                l = loss(y_hat, y).sum()
-            l.backward()
-            trainer.step(batch_size)
-            train_l_sum += float(l)
-            train_acc_sum += float(
-                (y_hat.argmax(axis=1).astype(y.dtype) == y).sum())
-            n += y.size
-        time_s = f'time {time.time() - start:.2f} sec'
+        for i, (features, labels) in enumerate(train_iter):
+            timer.start()
+            l, acc = d2l.train_batch_ch13(
+                net, features, labels.astype('float32'), loss, trainer,
+                devices, d2l.split_batch)
+            metric.add(l, acc, labels.shape[0])
+            timer.stop()
+            if (i + 1) % (num_batches // 5) == 0:
+                animator.add(epoch + i / num_batches,
+                             (metric[0] / metric[2], metric[1] / metric[2],
+                              None))
         if valid_iter is not None:
-            valid_acc = d2l.evaluate_accuracy_gpu(net, valid_iter)
-            epoch_s = (f'epoch {epoch + 1}, loss {train_l_sum / n:f}, '
-                       f'train acc {train_acc_sum / n:f}, '
-                       f'valid acc {valid_acc:f}, ')
-        else:
-            epoch_s = (f'epoch {epoch + 1}, loss {train_l_sum / n:f}, '
-                       f'train acc {train_acc_sum / n:f}, ')
-        print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
+            valid_acc = d2l.evaluate_accuracy_gpus(net, valid_iter, d2l.split_batch)
+            animator.add(epoch + 1, (None, None, valid_acc))
+    if valid_iter is not None:
+        print(f'loss {metric[0] / metric[2]:.3f}, '
+              f'train acc {metric[1] / metric[2]:.3f}, '
+              f'valid acc {valid_acc:.3f}')
+    else:
+        print(f'loss {metric[0] / metric[2]:.3f}, '
+              f'train acc {metric[1] / metric[2]:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(devices)}')
 ```
 
 ## Training and Validating the Model
@@ -309,10 +318,10 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 Now, we can train and validate the model. The following hyperparameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 80 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 80 epochs. For simplicity, we only train one epoch here.
 
 ```{.python .input  n=13}
-ctx, num_epochs, lr, wd = d2l.try_gpu(), 1, 0.1, 5e-4
-lr_period, lr_decay, net = 80, 0.1, get_net(ctx)
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.1, 5e-4
+lr_period, lr_decay, net = 50, 0.1, get_net(devices)
 net.hybridize()
-train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
 
@@ -321,13 +330,13 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 After obtaining a satisfactory model design and hyperparameters, we use all training datasets (including validation sets) to retrain the model and classify the testing set.
 
 ```{.python .input  n=14}
-net, preds = get_net(ctx), []
+net, preds = get_net(devices), []
 net.hybridize()
-train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 
 for X, _ in test_iter:
-    y_hat = net(X.as_in_ctx(ctx))
+    y_hat = net(X.as_in_ctx(devices[0]))
     preds.extend(y_hat.argmax(axis=1).astype(int).asnumpy())
 sorted_ids = list(range(1, len(test_ds) + 1))
 sorted_ids.sort(key=lambda x: str(x))

@@ -63,18 +63,18 @@ F.one_hot(X.T, 28).shape
 Next, we initialize the model parameters for a RNN model. The number of hidden units `num_hiddens` is a tunable parameter.
 
 ```{.python .input}
-def get_params(vocab_size, num_hiddens, ctx):
+def get_params(vocab_size, num_hiddens, device):
     num_inputs = num_outputs = vocab_size
 
     def normal(shape):
-        return np.random.normal(scale=0.01, size=shape, ctx=ctx)
+        return np.random.normal(scale=0.01, size=shape, ctx=device)
     # Hidden layer parameters
     W_xh = normal((num_inputs, num_hiddens))
     W_hh = normal((num_hiddens, num_hiddens))
-    b_h = d2l.zeros(num_hiddens, ctx=ctx)
+    b_h = d2l.zeros(num_hiddens, ctx=device)
     # Output layer parameters
     W_hq = normal((num_hiddens, num_outputs))
-    b_q = d2l.zeros(num_outputs, ctx=ctx)
+    b_q = d2l.zeros(num_outputs, ctx=device)
     # Attach gradients
     params = [W_xh, W_hh, b_h, W_hq, b_q]
     for param in params:
@@ -108,8 +108,8 @@ def get_params(vocab_size, num_hiddens, device):
 First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns a tensor filled with 0 and with a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple variables (e.g., when combining multiple layers in an RNN where each layer requires initializing).
 
 ```{.python .input}
-def init_rnn_state(batch_size, num_hiddens, ctx):
-    return (d2l.zeros((batch_size, num_hiddens), ctx=ctx), )
+def init_rnn_state(batch_size, num_hiddens, device):
+    return (d2l.zeros((batch_size, num_hiddens), ctx=device), )
 ```
 
 ```{.python .input}
@@ -156,10 +156,10 @@ Now we have all functions defined, next we create a class to wrap these function
 ```{.python .input}
 class RNNModelScratch:  #@save
     """A RNN Model based on scratch implementations."""
-    def __init__(self, vocab_size, num_hiddens, ctx,
+    def __init__(self, vocab_size, num_hiddens, device,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
-        self.params = get_params(vocab_size, num_hiddens, ctx)
+        self.params = get_params(vocab_size, num_hiddens, device)
         self.init_state, self.forward_fn = init_state, forward
 
     def __call__(self, X, state):
@@ -207,10 +207,10 @@ We can see that the output shape is (number steps $\times$ batch size, vocabular
 We first explain the predicting function so we can regularly check the prediction during training. This function predicts the next `num_predicts` characters based on the `prefix` (a string containing several characters). For the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them.
 
 ```{.python .input}
-def predict_ch8(prefix, num_predicts, model, vocab, ctx):  #@save
-    state = model.begin_state(batch_size=1, ctx=ctx)
+def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
+    state = model.begin_state(batch_size=1, ctx=device)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
+    get_input = lambda: np.array([outputs[-1]], ctx=device).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -225,7 +225,8 @@ def predict_ch8(prefix, num_predicts, model, vocab, ctx):  #@save
 def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, device=device)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: torch.tensor([outputs[-1]], device=device).reshape(1, 1)
+    get_input = lambda: torch.tensor(
+        [outputs[-1]], device=device).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -304,19 +305,20 @@ Let us first define the function to train the model on one data epoch. It differ
 When the sequential partitioning is used, we initialize the hidden state at the beginning of each epoch. Since the $i^\mathrm{th}$ example in the next minibatch is adjacent to the current $i^\mathrm{th}$ example, so the next minibatch can use the current hidden state directly, we only detach the gradient so that we compute the gradients within a minibatch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same as the `train_epoch_ch3` function in :numref:`sec_softmax_scratch`, we use generalized `updater`, which could be either a high-level API trainer or a scratched implementation.
 
 ```{.python .input}
-def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):  #@save
+def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
+                    use_random_iter):
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
         if state is None or use_random_iter:
             # Initialize state when either it is the first iteration or
             # using random sampling.
-            state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
+            state = model.begin_state(batch_size=X.shape[0], ctx=device)
         else:
             for s in state:
                 s.detach()
         y = Y.T.reshape(-1)
-        X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
+        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         with autograd.record():
             py, state = model(X, state)
             l = loss(py, y).mean()
@@ -329,7 +331,8 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):  #@
 
 ```{.python .input}
 #@tab pytorch
-def train_epoch_ch8(model, train_iter, loss, updater, device, use_random_iter):  #@save
+def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
+                    use_random_iter):
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
@@ -354,34 +357,35 @@ def train_epoch_ch8(model, train_iter, loss, updater, device, use_random_iter): 
             grad_clipping(model, 1)
             updater(batch_size=1)  # Since used mean already
         metric.add(l * d2l.size(y), d2l.size(y))
-    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
 ```
 
 The training function again supports either we implement the model from scratch or using high-level APIs.
 
 ```{.python .input}
-def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,  #@save
+def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
               use_random_iter=False):
     # Initialize
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
     if isinstance(model, gluon.Block):
-        model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
+        model.initialize(ctx=device, force_reinit=True,
+                         init=init.Normal(0.01))
         trainer = gluon.Trainer(model.collect_params(),
                                 'sgd', {'learning_rate': lr})
         updater = lambda batch_size: trainer.step(batch_size)
     else:
         updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
-    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, ctx)
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, device)
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
-            model, train_iter, loss, updater, ctx, use_random_iter)
+            model, train_iter, loss, updater, device, use_random_iter)
         if epoch % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch+1, [ppl])
-    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(ctx)}')
+    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
     print(predict('traveller'))
 ```
