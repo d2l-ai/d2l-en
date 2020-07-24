@@ -26,7 +26,7 @@ pip install git+https://github.com/d2l-ai/d2l-book
 ```
 
 
-Then in the root directory of `d2l-en`, you can activate a particular implementation by running one of the following commands:
+Then in the root directory of `d2l-en`(which we will clone from [github](https://github.com/d2l-ai/d2l-en/)), you can activate a particular implementation by running one of the following commands:
 
 ```bash
 d2lbook activate mxnet chapter_multilayer-perceptrons/mlp-scratch.md
