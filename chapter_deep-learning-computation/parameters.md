@@ -52,7 +52,7 @@ import torch
 from torch import nn
 
 net = nn.Sequential(nn.Linear(4, 8), nn.ReLU(), nn.Linear(8, 1))
-X = torch.randn(2, 4)
+X = torch.rand(size=(2, 4))
 net(X)
 ```
 
@@ -175,8 +175,8 @@ print(net.collect_params())
 
 ```{.python .input}
 #@tab pytorch
-print(net[1].state_dict())
-print(net.state_dict())
+print(*[(name, param.shape) for name, param in net[0].named_parameters()])
+print(*[(name, param.shape) for name, param in net.named_parameters()])
 ```
 
 ```{.python .input}
@@ -501,6 +501,8 @@ net[0].weight.data()[:2]
 #@tab pytorch
 def my_init(m):
     if type(m) == nn.Linear:
+        print("Init", *[(name, param.shape) 
+                        for name, param in m.named_parameters()][0])
         nn.init.uniform_(m.weight, -10, 10)
         m.weight.data *= m.weight.data.abs() >= 5
 
@@ -556,7 +558,6 @@ if you want to adjust parameters within an `autograd` scope,
 you need to use `set_data` to avoid confusing
 the automatic differentiation mechanics.
 :end_tab:
-
 
 ## Tied Parameters
 
@@ -624,7 +625,6 @@ print(len(net.layers) == 3)
 ```
 
 :begin_tab:`mxnet,pytorch`
-
 This example shows that the parameters
 of the second and third layer are tied.
 They are not just equal, they are
@@ -638,7 +638,6 @@ Since the model parameters contain gradients,
 the gradients of the second hidden layer
 and the third hidden layer are added together
 during backpropagation.
-
 :end_tab:
 
 ## Summary
