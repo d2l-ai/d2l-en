@@ -128,11 +128,11 @@ class Timer:  #@save
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):  #@save
     """Generate y = Xw + b + noise."""
-    X = tf.zeros(shape=(num_examples, w.shape[0]))
+    X = d2l.zeros((num_examples, w.shape[0]))
     X += tf.random.normal(shape=X.shape)
-    y = tf.matmul(X, tf.reshape(w, (-1, 1))) + b
+    y = d2l.matmul(X, tf.reshape(w, (-1, 1))) + b
     y += tf.random.normal(shape=y.shape, stddev=0.01)
-    y = tf.reshape(y, (-1, 1))
+    y = d2l.reshape(y, (-1, 1))
     return X, y
 
 
@@ -529,6 +529,31 @@ class Residual(tf.keras.Model):  #@save
 def annotate(text, xy, xytext):  #@save
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
+
+
+# Defined in file: ./chapter_optimization/gd.md
+def train_2d(trainer, steps=20):  #@save
+    """Optimize a 2-dim objective function with a customized trainer."""
+    # s1 and s2 are internal state variables and will
+    # be used later in the chapter
+    x1, x2, s1, s2 = -5, -2, 0, 0
+    results = [(x1, x2)]
+    for i in range(steps):
+        x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+        results.append((x1, x2))
+    return results
+
+
+# Defined in file: ./chapter_optimization/gd.md
+def show_trace_2d(f, results):  #@save
+    """Show the trace of 2D variables during optimization."""
+    d2l.set_figsize()
+    d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
+    x1, x2 = d2l.meshgrid(d2l.arange(-5.5, 1.0, 0.1),
+                          d2l.arange(-3.0, 1.0, 0.1))
+    d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
+    d2l.plt.xlabel('x1')
+    d2l.plt.ylabel('x2')
 
 
 # Alias defined in config.ini
