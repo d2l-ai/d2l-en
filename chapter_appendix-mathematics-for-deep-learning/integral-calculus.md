@@ -341,7 +341,7 @@ $$
 \int_{[a, b]\times[c, d]} f(x, y)\;dx\;dy.
 $$
 
-Suppose that we wish to compute this integral.  My claim is that we can do this by iteratively computing first the integral in saying $x$ and then shifting to the integral in $y$, that is to say
+Suppose that we wish to compute this integral.  My claim is that we can do this by iteratively computing first the integral in $x$ and then shifting to the integral in $y$, that is to say
 
 $$
 \int_{[a, b]\times[c, d]} f(x, y)\;dx\;dy = \int_c^{d} \left(\int_a^{b} f(x, y) \;dx\right) \; dy.
