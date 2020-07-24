@@ -85,7 +85,7 @@ that takes us from the point $\mathbf{v}$ to the point $\mathbf{u}$.
 
 ## Dot Products and Angles
 As we saw in :numref:`sec_linear-algebra`, 
-if we take two column vectors saying $\mathbf{u}$ and $\mathbf{v}$,
+if we take two column vectors $\mathbf{u}$ and $\mathbf{v}$,
 we can form their dot product by computing:
 
 $$\mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.$$
