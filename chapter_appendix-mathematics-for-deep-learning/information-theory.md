@@ -37,9 +37,9 @@ $$I(X) = - \log_2 (p),$$
 
 as the *bits* of information we have received for this event $X$. Note that we will always use base-2 logarithms in this section. For the sake of simplicity, the rest of this section will omit the subscript 2 in the logarithm notation, i.e., $\log(.)$ always refers to $\log_2(.)$. For example, the code "0010" has a self-information
 
-$$I(\text{``0010"}) = - \log (p(\text{``0010"})) = - \log \left( \frac{1}{2^4} \right) = 4 \text{ bits}.$$
+$$I(\text{"0010"}) = - \log (p(\text{"0010"})) = - \log \left( \frac{1}{2^4} \right) = 4 \text{ bits}.$$
 
-We can calculate self information in MXNet as shown below. Before that, let us first import all the necessary packages in this section.
+We can calculate self information as shown below. Before that, let us first import all the necessary packages in this section.
 
 ```{.python .input}
 from mxnet import np
@@ -96,7 +96,7 @@ Otherwise, if $X$ is continuous, we also refer entropy as *differential entropy*
 
 $$H(X) = - \int_x p(x) \log p(x) \; dx.$$
 
-In MXNet, we can define entropy as below.
+We can define entropy as below.
 
 ```{.python .input}
 def entropy(p):
@@ -135,7 +135,7 @@ $$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$
 
 ### Properties of Entropy
 
-By the above examples and interpretations, we can derive the following properties of entropy :eqref:`eq_ent_def`. Here, we refer to X as an event and P as the probability distribution of X.
+By the above examples and interpretations, we can derive the following properties of entropy :eqref:`eq_ent_def`. Here, we refer to $X$ as an event and $P$ as the probability distribution of $X$.
 
 * Entropy is non-negative, i.e., $H(X) \geq 0, \forall X$.
 
@@ -172,7 +172,7 @@ $$
 H(X), H(Y) \le H(X, Y) \le H(X) + H(Y).
 $$
 
-Let us implement joint entropy from scratch in MXNet.
+Let us implement joint entropy from scratch.
 
 ```{.python .input}
 def joint_entropy(p_xy):
@@ -211,7 +211,7 @@ where $p(y \mid x) = \frac{p_{X, Y}(x, y)}{p_X(x)}$ is the conditional probabili
 
 $$H(Y \mid X) = - \sum_{x} \sum_{y} p(x, y) \log p(y \mid x).$$
 
-If $(X, Y)$ is a pair of continuous random variables, then the *differential joint entropy* is similarly defined as 
+If $(X, Y)$ is a pair of continuous random variables, then the *differential conditional entropy* is similarly defined as 
 
 $$H(Y \mid X) = - \int_x \int_y p(x, y) \ \log p(y \mid x) \;dx \;dy.$$
 
@@ -222,7 +222,7 @@ $$H(Y \mid X) = H(X, Y) - H(X).$$
 
 This has an intuitive interpretation: the information in $Y$ given $X$ ($H(Y \mid X)$) is the same as the information in both $X$ and $Y$ together ($H(X, Y)$) minus the information already contained in $X$.  This gives us the information in $Y$ which is not also represented in $X$.  
 
-Now, let us implement conditional entropy :eqref:`eq_cond_ent_def` from scratch in MXNet.
+Now, let us implement conditional entropy :eqref:`eq_cond_ent_def` from scratch.
 
 ```{.python .input}
 def conditional_entropy(p_xy, p_x):
@@ -344,7 +344,7 @@ $$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \left[ \log \frac{p(x)}{q(x)} \right].$$
 
 As with the pointwise mutual information :eqref:`eq_pmi_def`, we can again provide an interpretation of the logarithmic term:  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ will be large and positive if we see $x$ far more often under $P$ than we would expect for $Q$, and large and negative if we see the outcome far less than expected.  In this way, we can interpret it as our *relative* surprise at observing the outcome compared to how surprised we would be observing it from our reference distribution.
 
-In MXNet, let us implement the KL divergence from Scratch.
+Let us implement the KL divergence from Scratch.
 
 ```{.python .input}
 def kl_divergence(p, q):
@@ -409,7 +409,7 @@ q1 = torch.sort(q1)[0]
 q2 = torch.sort(q2)[0]
 ```
 
-Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (i.e., $x=0$), we expect a similar value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. As you can see below, there is only a 1% off between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$.
+Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (i.e., $x=0$), we expect a similar value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. As you can see below, there is only a less than 3% off between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$.
 
 ```{.python .input}
 kl_pq1 = kl_divergence(p, q1)
@@ -476,7 +476,7 @@ By using properties of entropy discussed above, we can also interpret it as the 
 $$\mathrm{CE} (P, Q) = H(P) + D_{\mathrm{KL}}(P\|Q).$$
 
 
-In MXNet, we can implement the cross entropy loss as below.
+We can implement the cross entropy loss as below.
 
 ```{.python .input}
 def cross_entropy(y_hat, y):
@@ -544,7 +544,7 @@ On the other side, we can also approach the problem through maximum likelihood e
 $$\mathbf{p}^\mathbf{z} = \prod_{j=1}^k p_{j}^{z_{j}}.$$
 
 
-It can be seen that each data point, $\mathbf{y}_i$, is following a $k$-class multinoulli distribution with probabilities $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Therefore, the joint p.m.f. of each data point $\mathbf{y}_i$ is  $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
+It can be seen that the label of each data point, $\mathbf{y}_i$, is following a $k$-class multinoulli distribution with probabilities $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Therefore, the joint p.m.f. of each data point $\mathbf{y}_i$ is  $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
 Hence, the log-likelihood function would be
 
 $$
@@ -560,7 +560,7 @@ $$
 Since in maximum likelihood estimation, we maximizing the objective function $l(\theta)$ by having $\pi_{j} = p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)$. Therefore, for any multi-class classification, maximizing the above log-likelihood function $l(\theta)$ is equivalent to minimizing the CE loss $\mathrm{CE}(y, \hat{y})$.
 
 
-To test the above proof, let us apply the built-in measure `NegativeLogLikelihood` in MXNet. Using the same `labels` and `preds` as in the earlier example, we will get the same numerical loss as the previous example up to the 5 decimal place.
+To test the above proof, let us apply the built-in measure `NegativeLogLikelihood`. Using the same `labels` and `preds` as in the earlier example, we will get the same numerical loss as the previous example up to the 5 decimal place.
 
 ```{.python .input}
 nll_loss = NegativeLogLikelihood()
