@@ -1,9 +1,10 @@
 # From Dense Layers to Convolutions
 
-The models that we have discussed so far
-remain (to this day) appropriate options
+To this day,
+the models that we have discussed so far
+remain appropriate options
 when we are dealing with tabular data.
-By *tabular*, we mean that the data consists
+By tabular, we mean that the data consist
 of rows corresponding to examples
 and columns corresponding to features.
 With tabular data, we might anticipate
@@ -14,19 +15,19 @@ concerning how the features interact.
 
 Sometimes, we truly lack knowledge to guide
 the construction of craftier architectures.
-In these cases, a multilayer perceptron
+In these cases, an MLP
 may be the best that we can do.
 However, for high-dimensional perceptual data,
-these *structure-less* networks can grow unwieldy.
+such structure-less networks can grow unwieldy.
 
 For instance, let us return to our running example
 of distinguishing cats from dogs.
 Say that we do a thorough job in data collection,
-collecting an annotated dataset of 1-megapixel photographs.
-This means that each input to the network has *1 million dimensions*.
-Even an aggressive reduction to *1,000 hidden dimensions*
-would require a *dense* (fully connected) layer
-characterized by $10^9$ parameters.
+collecting an annotated dataset of one-megapixel photographs.
+This means that each input to the network has one million dimensions.
+Even an aggressive reduction to one thousand hidden dimensions
+would require a fully-connected layer
+characterized by $10^6 \times 10^3 = 10^9$ parameters.
 Unless we have lots of GPUs, a talent
 for distributed optimization,
 and an extraordinary amount of patience,
@@ -34,11 +35,11 @@ learning the parameters of this network
 may turn out to be infeasible.
 
 A careful reader might object to this argument
-on the basis that 1 megapixel resolution may not be necessary.
+on the basis that one megapixel resolution may not be necessary.
 However, while we might be able
-to get away with 100,000 pixels,
-our hidden layer of size $1000$ grossly underestimated
-the number of hidden nodes that it takes
+to get away with one hundred thousand pixels,
+our hidden layer of size 1000 grossly underestimates
+the number of hidden units that it takes
 to learn good representations of images,
 so a practical system will still require billions of parameters.
 Moreover, learning a classifier by fitting so many parameters
@@ -49,26 +50,26 @@ seemingly contradicting these intuitions.
 That is because images exhibit rich structure
 that can be exploited by humans
 and machine learning models alike.
-Convolutional neural networks are one creative way
+Convolutional neural networks (CNNs) are one creative way
 that machine learning has embraced for exploiting
 some of the known structure in natural images.
 
 
-## Invariances
+## Invariance
 
 Imagine that you want to detect an object in an image.
 It seems reasonable that whatever method
 we use to recognize objects should not be overly concerned
-with the precise *location* of the object in the image.
+with the precise location of the object in the image.
 Ideally, our system should exploit this knowledge.
 Pigs usually do not fly and planes usually do not swim.
 Nonetheless, we should still recognize
 a pig were one to appear at the top of the image.
 We can draw some inspiration here
-from the children's game 'Where's Waldo'
+from the children's game "Where's Waldo"
 (depicted in :numref:`img_waldo`).
 The game consists of a number of chaotic scenes
-bursting with activity.
+bursting with activities.
 Waldo shows up somewhere in each,
 typically lurking in some unlikely location.
 The reader's goal is to locate him.
@@ -80,11 +81,11 @@ does not depend upon *where Waldo is located*.
 We could sweep the image with a Waldo detector
 that could assign a score to each patch,
 indicating the likelihood that the patch contains Waldo.
-CNNs systematize this idea of spatial invariance,
+CNNs systematize this idea of *spatial invariance*,
 exploiting it to learn useful representations
-with few parameters.
+with fewer parameters.
 
-![Image via Walker Books](../img/where-wally-walker-books.jpg)
+![An image of the "Where's Waldo" game.](../img/where-wally-walker-books.jpg)
 :width:`400px`
 :label:`img_waldo`
 
