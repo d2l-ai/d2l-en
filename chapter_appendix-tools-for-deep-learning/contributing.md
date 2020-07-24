@@ -122,7 +122,7 @@ The changed code will then be in your personal fork of the repository. To reques
 
 ### Pull Request
 
-As shown in :numref:`fig_git_newpr`, go to our GitHub repo [Pull requests](https://github.com/d2l-ai/d2l-en/pulls) and select "New pull request". This will open up a screen that shows you the changes between your edits and what is current in the main repository of the book.
+As shown in :numref:`fig_git_newpr`, go to our GitHub repo [Pull requests](https://github.com/d2l-ai/d2l-en/pulls) and select "Compare & pull request". This will open up a screen that shows you the changes between your edits and what is current in the main repository of the book.
 
 ![Pull Request.](../img/git-newpr.png)
 :width:`700px`
