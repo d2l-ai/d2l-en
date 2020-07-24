@@ -124,16 +124,16 @@ The changed code will then be in your personal fork of the repository. To reques
 
 As shown in :numref:`fig_git_newpr`, go to our GitHub repo [Pull requests](https://github.com/d2l-ai/d2l-en/pulls) and select "Compare & pull request". This will open up a screen that shows you the changes between your edits and what is current in the main repository of the book.
 
-![Pull Request.](../img/git-newpr.png)
+![Pull Request.](../img/git_cp&pr.png)
 :width:`700px`
 :label:`fig_git_newpr`
 
 
 ### Submitting Pull Request
 
-Finally, submit a pull request by clicking the button as shown in :numref:`fig_git_createpr`. Make sure to describe the changes you have made in the pull request. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you will get some feedback on the changes. Once you have incorporated them, you are good to go.
+Finally, submit a pull request by clicking the button as shown in :numref:`fig_git_createpr2`. Make sure to describe the changes you have made in the pull request. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you will get some feedback on the changes. Once you have incorporated them, you are good to go.
 
-![Create Pull Request.](../img/git-createpr.png)
+![Create Pull Request.](../img/git-createpr2.png)
 :width:`700px`
 :label:`fig_git_createpr`
 
