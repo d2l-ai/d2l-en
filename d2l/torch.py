@@ -1144,7 +1144,7 @@ def train_concise_ch11(optim, hyperparams, data_iter, num_epochs=4):
     # value to get L2Loss in PyTorch.
     
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs])
+                            xlim=[0, num_epochs], , ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
         for X, y in data_iter:
