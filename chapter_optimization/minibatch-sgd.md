@@ -350,7 +350,7 @@ def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
 ```{.python .input}
 #@tab pytorch
 #@save
-def train_concise_ch11(optim, hyperparams, data_iter, num_epochs=4):
+def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     # Initialization
     net = nn.Sequential(nn.Linear(5, 1))
     def init_weights(m):
@@ -358,7 +358,7 @@ def train_concise_ch11(optim, hyperparams, data_iter, num_epochs=4):
             torch.nn.init.normal_(m.weight, std=0.01)
     net.apply(init_weights)
     
-    optimizer = trainer(net.parameters(), **hyperparams)
+    optimizer = trainer_fn(net.parameters(), **hyperparams)
     
     loss = nn.MSELoss()
     # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
