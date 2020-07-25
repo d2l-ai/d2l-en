@@ -145,8 +145,9 @@ As before, by the matrix $\mathbf{X} \in \mathbb{R}^{n \times d}$,
 we denote a minibatch of $n$ examples where each example has $d$ inputs (features).
 For a one-hidden-layer MLP whose hidden layer has $h$ hidden units,
 denote by $\mathbf{H} \in \mathbb{R}^{n \times h}$
-the outputs of the hidden layer.
-Here, $\mathbf{H}$ is also known as a *hidden-layer variable* or a *hidden variable*.
+the outputs of the hidden layer, which are
+*hidden representations*.
+In mathematics or code, $\mathbf{H}$ is also known as a *hidden-layer variable* or a *hidden variable*.
 Since the hidden and output layers are both fully connected,
 we have hidden-layer weights $\mathbf{W}^{(1)} \in \mathbb{R}^{d \times h}$ and biases $\mathbf{b}^{(1)} \in \mathbb{R}^{1 \times h}$
 and output-layer weights $\mathbf{W}^{(2)} \in \mathbb{R}^{h \times q}$ and biases $\mathbf{b}^{(2)} \in \mathbb{R}^{1 \times q}$.

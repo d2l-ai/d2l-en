@@ -12,7 +12,7 @@ The notation used throughout this book is summarized below.
 * $\mathsf{X}$: A tensor
 * $\mathbf{I}$: An identity matrix
 * $x_i$, $[\mathbf{x}]_i$: The $i^\mathrm{th}$ element of vector $\mathbf{x}$
-* $x_{ij}$, $[\mathbf{X}]_{ij}$: The element of matrix $\mathbf{X}$ at row $i$ and column $j$
+* $x_{ij}$, $x_{i,j}$,$[\mathbf{X}]_{ij}$, $[\mathbf{X}]_{i,j}$: The element of matrix $\mathbf{X}$ at row $i$ and column $j$
 
 
 
