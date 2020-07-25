@@ -255,6 +255,12 @@ bias = stat_bias(theta_true, theta_est)
 torch.square(samples.std(unbiased=False)) + torch.square(bias)
 ```
 
+```{.python .input}
+#@tab tensorflow
+bias = stat_bias(theta_true, theta_est)
+tf.square(tf.math.reduce_std(samples)) + tf.square(bias)
+```
+
 ## Conducting Hypothesis Tests
 
 
@@ -442,6 +448,24 @@ mu_hat = torch.mean(samples)
 sigma_hat = samples.std(unbiased=True)
 (mu_hat - t_star*sigma_hat/torch.sqrt(torch.tensor(N, dtype=torch.float32)),\
  mu_hat + t_star*sigma_hat/torch.sqrt(torch.tensor(N, dtype=torch.float32)))
+```
+
+```{.python .input}
+#@tab tensorflow
+# Number of samples
+N = 1000
+
+# Sample dataset
+samples = tf.random.normal((N,), 0, 1)
+
+# Lookup Students's t-distribution c.d.f.
+t_star = 1.96
+
+# Construct interval
+mu_hat = tf.reduce_mean(samples)
+sigma_hat = tf.math.reduce_std(samples)
+(mu_hat - t_star*sigma_hat/tf.sqrt(tf.constant(N, dtype=tf.float32)), \
+ mu_hat + t_star*sigma_hat/tf.sqrt(tf.constant(N, dtype=tf.float32)))
 ```
 
 ## Summary
