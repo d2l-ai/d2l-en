@@ -588,6 +588,32 @@ ax.set_zlim(-1, 1)
 ax.dist = 12
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Construct grid and compute function
+x, y = tf.meshgrid(tf.linspace(-2., 2., 101),
+                   tf.linspace(-2., 2., 101))
+
+z = x*tf.exp(- x**2 - y**2)
+
+# Compute approximating quadratic with gradient and Hessian at (1, 0)
+w = tf.exp(tf.constant([-1.]))*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
+
+# Plot function
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_wireframe(x.numpy(), y.numpy(), z.numpy(),
+                  **{'rstride': 10, 'cstride': 10})
+ax.plot_wireframe(x.numpy(), y.numpy(), w.numpy(),
+                  **{'rstride': 10, 'cstride': 10}, color='purple')
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y')
+d2l.set_figsize()
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+ax.set_zlim(-1, 1)
+ax.dist = 12
+```
+
 This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where we perform numerical optimization iteratively finding the best fitting quadratic, and then exactly minimizing that quadratic.
 
 ## A Little Matrix Calculus
