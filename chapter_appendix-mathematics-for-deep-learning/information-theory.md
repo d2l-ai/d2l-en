@@ -555,7 +555,7 @@ def cross_entropy(y_hat, y):
 ```{.python .input}
 #@tab tensorflow
 def cross_entropy(y_hat, y):
-    ce = -tf.math.log(y_hat[range(len(y_hat)), y])
+    ce = -tf.math.log(y_hat[:, :len(y)])
     return tf.reduce_mean(ce)
 ```
 
@@ -650,6 +650,19 @@ nll_loss.get()
 # nn.NLLLoss()
 nll_loss = NLLLoss()
 loss = nll_loss(torch.log(preds), labels)
+loss
+```
+
+```{.python .input}
+#@tab tensorflow
+def nll_loss(y_hat, y):
+    # Convert labels to binary class matrix.
+    y = tf.keras.utils.to_categorical(y, num_classes=3)
+    # Since tf.keras.losses.binary_crossentropy returns the mean
+    # over the last axis, we calculate the sum here.
+    return tf.reduce_sum(tf.keras.losses.binary_crossentropy(y, y_hat, from_logits=True))
+
+loss = nll_loss(tf.math.log(preds), labels)
 loss
 ```
 
