@@ -201,7 +201,7 @@ def stat_bias(true_theta, est_theta):
 
 # Mean squared error
 def mse(data, true_theta):
-    return(reduce_mean.mean(tf.square(data - true_theta)))
+    return(tf.reduce_mean(tf.square(data - true_theta)))
 ```
 
 To illustrate the equation of the bias-variance trade-off, let us simulate of normal distribution $\mathcal{N}(\theta, \sigma^2)$ with $10,000$ samples. Here, we use a $\theta = 1$ and $\sigma = 4$. As the estimator is a function of the given samples, here we use the mean of the samples as an estimator for true $\theta$ in this normal distribution $\mathcal{N}(\theta, \sigma^2)$ .
