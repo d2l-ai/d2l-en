@@ -2558,6 +2558,26 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+d2l.DATA_HUB['bananas'] = (d2l.DATA_URL + 'bananas.zip',
+                           'aadfd1c4c5d7178616799dd1801c9a234ccdaf19')
+
+
+def load_data_bananas(batch_size, edge_size=256):
+    """Load the bananas dataset."""
+    data_dir = d2l.download_extract('bananas')
+    train_iter = image.ImageDetIter(
+        path_imgrec=os.path.join(data_dir, 'train.rec'),
+        path_imgidx=os.path.join(data_dir, 'train.idx'),
+        batch_size=batch_size,
+        data_shape=(3, edge_size, edge_size),  # The shape of the output image
+        shuffle=True,  # Read the dataset in random order
+        rand_crop=1,  # The probability of random cropping is 1
+        min_object_covered=0.95, max_attempts=200)
+    val_iter = image.ImageDetIter(
+        path_imgrec=os.path.join(data_dir, 'val.rec'), batch_size=batch_size,
+        data_shape=(3, edge_size, edge_size), shuffle=False)
+    return train_iter, val_iter
+
 
 # Alias defined in config.ini
 size = lambda a: a.size
