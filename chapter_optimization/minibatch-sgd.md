@@ -23,7 +23,7 @@ If we follow the first option, we will need to copy one row and one column vecto
 
 Beyond computational efficiency, the overhead introduced by Python and by the deep learning framework itself is considerable. Recall that each time we execute a command the Python interpreter sends a command to the MXNet engine which needs to insert it into the computational graph and deal with it during scheduling. Such overhead can be quite detrimental. In short, it is highly advisable to use vectorization (and matrices) whenever possible.
 
-```{.python .input  n=1}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -36,7 +36,7 @@ B = np.random.normal(0, 1, (256, 256))
 C = np.random.normal(0, 1, (256, 256))
 ```
 
-```{.python .input  n=41}
+```{.python .input}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -54,7 +54,7 @@ C = np.random.normal(0, 1, (256, 256))
 
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
 
-```{.python .input  n=2}
+```python
 # Compute A = BC one element at a time
 timer.start()
 for i in range(256):
@@ -64,7 +64,7 @@ A.wait_to_read()
 timer.stop()
 ```
 
-```{.python .input  n=42}
+```{.python .input}
 #@tab tensorflow
 # Compute A = BC one element at a time
 timer.start()
@@ -76,7 +76,7 @@ timer.stop()
 
 A faster strategy is to perform column-wise assignment.
 
-```{.python .input  n=3}
+```python
 # Compute A = BC one column at a time
 timer.start()
 for j in range(256):
@@ -85,7 +85,7 @@ A.wait_to_read()
 timer.stop()
 ```
 
-```{.python .input  n=30}
+```{.python .input}
 #@tab tensorflow
 timer.start()
 for j in range(256):
@@ -95,7 +95,7 @@ timer.stop()
 
 Last, the most effective manner is to perform the entire operation in one block. Let us see what the respective speed of the operations is.
 
-```{.python .input  n=21}
+```python
 # Compute A = BC in one go
 timer.start()
 A = np.dot(B, C)
@@ -108,7 +108,7 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
 
-```{.python .input  n=31}
+```{.python .input}
 #@tab tensorflow
 timer.start()
 A = tf.tensordot(B, C, axes=1)
@@ -136,7 +136,7 @@ Let us see what this does to the statistical properties of $\mathbf{g}_t$: since
 
 Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ would be universally desirable. Alas, after some point, the additional reduction in standard deviation is minimal when compared to the linear increase in computational cost. In practice we pick a minibatch that is large enough to offer good computational efficiency while still fitting into the memory of a GPU. To illustrate the savings let us have a look at some code. In it we perform the same matrix-matrix multiplication, but this time broken up into "minibatches" of 64 columns at a time.
 
-```{.python .input}
+```python
 timer.start()
 for j in range(0, 256, 64):
     A[:, j:j+64] = np.dot(B, C[:, j:j+64])
@@ -144,7 +144,7 @@ timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
-```{.python .input  n=32}
+```{.python .input}
 #@tab tensorflow
 #converting tensor to numpy array
 A = A.numpy()
@@ -161,7 +161,7 @@ As we can see, the computation on the minibatch is essentially as efficient as o
 
 Let us have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first $1,500$ examples. The data is whitened for preprocessing, i.e., we remove the mean and rescale the variance to $1$ per coordinate.
 
-```{.python .input  n=1}
+```python
 #@save
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
@@ -176,7 +176,7 @@ def get_data_ch11(batch_size=10, n=1500):
     return data_iter, data.shape[1]-1
 ```
 
-```{.python .input  n=33}
+```{.python .input}
 #@tab tensorflow
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
@@ -198,13 +198,13 @@ addition, we will average the loss of each minibatch example in the training
 function, so the gradient in the optimization algorithm does not need to be
 divided by the batch size.
 
-```{.python .input  n=2}
+```python
 def sgd(params, states, hyperparams):
     for p in params:
         p[:] -= hyperparams['lr'] * p.grad
 ```
 
-```{.python .input  n=34}
+```{.python .input}
 #@tab tensorflow
 def sgd(params, grads, states, hyperparams):
     for param, grad in zip(params, grads):
@@ -213,7 +213,7 @@ def sgd(params, grads, states, hyperparams):
 
 Next, we implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can be used to train the model with minibatch SGD and other algorithms introduced subsequently.
 
-```{.python .input  n=3}
+```python
 #@save
 def train_ch11(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
@@ -243,7 +243,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
     return timer.cumsum(), animator.Y[0]
 ```
 
-```{.python .input  n=35}
+```{.python .input}
 #@tab tensorflow
 #@save
 def train_ch11(trainer_fn, states, hyperparams, data_iter,
@@ -278,7 +278,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
 
 Let us see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e., to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
 
-```{.python .input  n=4}
+```{.python .input}
 #@tab all
 def train_sgd(lr, batch_size, num_epochs=2):
     data_iter, feature_dim = get_data_ch11(batch_size)
@@ -290,28 +290,28 @@ gd_res = train_sgd(1, 1500, 10)
 
 When the batch size equals 1, we use SGD for optimization. For simplicity of implementation we picked a constant (albeit small) learning rate. In SGD, the model parameters are updated whenever an example is processed. In our case this amounts to 1500 updates per epoch. As we can see, the decline in the value of the objective function slows down after one epoch. Although both the procedures processed 1500 examples within one epoch, SGD consumes more time than gradient descent in our experiment. This is because SGD updated the parameters more frequently and since it is less efficient to process single observations one at a time.
 
-```{.python .input  n=5}
+```{.python .input}
 #@tab all
 sgd_res = train_sgd(0.005, 1)
 ```
 
 Last, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is shorter than the time needed for SGD and the time for batch gradient descent.
 
-```{.python .input  n=6}
+```{.python .input}
 #@tab all
 mini1_res = train_sgd(.4, 100)
 ```
 
 Reducing the batch size to 10, the time for each epoch increases because the workload for each batch is less efficient to execute.
 
-```{.python .input  n=7}
+```{.python .input}
 #@tab all
 mini2_res = train_sgd(.05, 10)
 ```
 
 Finally, we compare the time vs. loss for the preview four experiments. As can be seen, despite SGD converges faster than GD in terms of number of examples processed, it uses more time to reach the same loss than GD because that computing gradient example by example is not efficient. Minibatch SGD is able to trade-off the convergence speed and computation efficiency. A minibatch size 10 is more efficient than SGD; a minibatch size 100 even outperforms GD in terms of runtime.
 
-```{.python .input  n=8}
+```{.python .input}
 #@tab all
 d2l.set_figsize([6, 3])
 d2l.plot(*list(map(list, zip(gd_res, sgd_res, mini1_res, mini2_res))),
@@ -324,7 +324,7 @@ d2l.plt.gca().set_xscale('log')
 
 In Gluon, we can use the `Trainer` class to call optimization algorithms. This is used to implement a generic training function. We will use this throughout the current chapter.
 
-```{.python .input  n=9}
+```python
 #@save
 def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     # Initialization
@@ -387,7 +387,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
 
 Using Gluon to repeat the last experiment shows identical behavior.
 
-```{.python .input  n=10}
+```python
 data_iter, _ = get_data_ch11(10)
 train_concise_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 ```
@@ -414,7 +414,6 @@ train_concise_ch11(trainer, {'lr': 0.05}, data_iter)
 1. Read the MXNet documentation and use the `Trainer` class `set_learning_rate` function to reduce the learning rate of the minibatch SGD to 1/10 of its previous value after each epoch.
 1. Compare minibatch SGD with a variant that actually *samples with replacement* from the training set. What happens?
 1. An evil genie replicates your dataset without telling you (i.e., each observation occurs twice and your dataset grows to twice its original size, but nobody told you). How does the behavior of SGD, minibatch SGD and that of gradient descent change?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/353)
