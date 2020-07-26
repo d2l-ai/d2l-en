@@ -3,7 +3,7 @@
 
 In this section, we are going to introduce the basic principles of stochastic gradient descent.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
@@ -11,7 +11,7 @@ from mxnet import np, npx
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -52,7 +52,7 @@ This means that, on average, the stochastic gradient is a good estimate of the g
 
 Now, we will compare it to gradient descent by adding random noise with a mean of 0 and a variance of 1 to the gradient to simulate a SGD.
 
-```python
+```{.python .input}
 # removed tab all because code isn't same for tf
 f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
 gradf = lambda x1, x2: (2 * x1, 4 * x2)  # Gradient
@@ -71,7 +71,7 @@ lr = (lambda: 1)  # Constant learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # removed tab all because code isn't same for tf
 f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
