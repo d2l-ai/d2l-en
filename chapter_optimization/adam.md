@@ -90,7 +90,7 @@ def adam(params, states, hyperparams):
 We are ready to use Adam to train the model. We use a learning rate of $\eta = 0.01$.
 
 ```{.python .input}
-#tab all
+#@tab all
 data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 d2l.train_ch11(adam, init_adam_states(feature_dim),
                {'lr': 0.01, 't': 1}, data_iter, feature_dim);
@@ -103,7 +103,7 @@ d2l.train_concise_ch11('adam', {'learning_rate': 0.01}, data_iter)
 ```
 
 ```{.python .input}
-#tab pytorch
+#@tab pytorch
 trainer = torch.optim.Adam
 d2l.train_concise_ch11(trainer, {'lr': 0.01}, data_iter)
 ```
