@@ -94,6 +94,7 @@ $$
 Note that for $\beta = 0$ we recover regular gradient descent. Before delving deeper into the mathematical properties let us have a quick look at how the algorithm behaves in practice.
 
 ```{.python .input  n=5}
+#@tab all
 def momentum_2d(x1, x2, v1, v2):
     v1 = beta * v1 + 0.2 * x1
     v2 = beta * v2 + 4 * x2
@@ -106,6 +107,7 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 As we can see, even with the same learning rate that we used before, momentum still converges well. Let us see what happens when we decrease the momentum parameter. Halving it to $\beta = 0.25$ leads to a trajectory that barely converges at all. Nonetheless, it is a lot better than without momentum (when the solution diverges).
 
 ```{.python .input  n=11}
+#@tab all
 eta, beta = 0.6, 0.25
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
@@ -121,6 +123,17 @@ d2l.set_figsize()
 betas = [0.95, 0.9, 0.6, 0]
 for beta in betas:
     x = np.arange(40).asnumpy()
+    d2l.plt.plot(x, beta ** x, label=f'beta = {beta:.2f}')
+d2l.plt.xlabel('time')
+d2l.plt.legend();
+```
+
+```{.python .input}
+#@tab tensorflow
+d2l.set_figsize()
+betas = [0.95, 0.9, 0.6, 0]
+for beta in betas:
+    x = d2l.arange(40).asnumpy()
     d2l.plt.plot(x, beta ** x, label=f'beta = {beta:.2f}')
 d2l.plt.xlabel('time')
 d2l.plt.legend();
@@ -146,9 +159,23 @@ def sgd_momentum(params, states, hyperparams):
         p[:] -= hyperparams['lr'] * v
 ```
 
+```{.python .input}
+#@tab tensorflow
+def init_momentum_states(feature_dim):
+    v_w = d2l.zeros((feature_dim, 1))
+    v_b = d2l.zeros(1)
+    return (v_w, v_b)
+
+def sgd_momentum(params, states, hyperparams):
+    for p, v in zip(params, states):
+        v[:] = hyperparams['momentum'] * v + p.grad
+        p[:] -= hyperparams['lr'] * v
+```
+
 Let us see how this works in practice.
 
 ```{.python .input  n=15}
+#@tab all
 def train_momentum(lr, momentum, num_epochs=2):
     d2l.train_ch11(sgd_momentum, init_momentum_states(feature_dim),
                    {'lr': lr, 'momentum': momentum}, data_iter,
@@ -161,12 +188,14 @@ train_momentum(0.02, 0.5)
 When we increase the momentum hyperparameter `momentum` to 0.9, it amounts to a significantly larger effective sample size of $\frac{1}{1 - 0.9} = 10$. We reduce the learning rate slightly to $0.01$ to keep matters under control.
 
 ```{.python .input  n=8}
+#@tab all
 train_momentum(0.01, 0.9)
 ```
 
 Reducing the learning rate further addresses any issue of non-smooth optimization problems. Setting it to $0.005$ yields good convergence properties.
 
 ```{.python .input}
+#@tab all
 train_momentum(0.005, 0.9)
 ```
 
@@ -175,6 +204,7 @@ train_momentum(0.005, 0.9)
 There is very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
 
 ```{.python .input  n=9}
+#@tab all
 d2l.train_concise_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
                        data_iter)
 ```
