@@ -176,7 +176,7 @@ d2l.plt.plot(x, p, color='black')
 d2l.plt.fill_between(x.numpy().tolist()[300:800], p.numpy().tolist()[300:800])
 d2l.plt.show()
 
-f'approximate Probability: {tf.cum_sum(epsilon*p[300:800])}'
+f'approximate Probability: {tf.reduce_sum(epsilon*p[300:800])}'
 ```
 
 It turns out that these two properties describe exactly the space of possible probability density functions (or *p.d.f.*'s for the commonly encountered abbreviation).  They are non-negative functions $p(x) \ge 0$ such that
