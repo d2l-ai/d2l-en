@@ -6,7 +6,7 @@ Thus far, every model that we have implemented
 required that we initialize its parameters
 according to some pre-specified distribution.
 Until now, we took the initialization scheme for granted,
-glossing over the details of how these these choices are made.
+glossing over the details of how these choices are made.
 You might have even gotten the impression that these choices
 are not especially important.
 To the contrary, the choice of initialization scheme
