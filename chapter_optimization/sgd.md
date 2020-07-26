@@ -19,6 +19,15 @@ import math
 import torch
 ```
 
+```{.python .input  n=1}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import math
+from mpl_toolkits import mplot3d
+import tensorflow as tf
+```
+
 ## Stochastic Gradient Updates
 
 In deep learning, the objective function is usually the average of the loss functions for each example in the training dataset. We assume that $f_i(\mathbf{x})$ is the loss function of the training dataset with $n$ examples, an index of $i$, and parameter vector of $\mathbf{x}$, then we have the objective function
@@ -43,8 +52,8 @@ This means that, on average, the stochastic gradient is a good estimate of the g
 
 Now, we will compare it to gradient descent by adding random noise with a mean of 0 and a variance of 1 to the gradient to simulate a SGD.
 
-```{.python .input}
-#@tab all
+```{.python .input  n=4}
+# removed tab all because code isn't same for tf
 f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
 gradf = lambda x1, x2: (2 * x1, 4 * x2)  # Gradient
 
@@ -54,6 +63,45 @@ def sgd(x1, x2, s1, s2):
     # Simulate noisy gradient
     g1 += d2l.normal(0.0, 1, (1,))
     g2 += d2l.normal(0.0, 1, (1,))
+    eta_t = eta * lr()  # Learning rate at time t
+    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
+
+eta = 0.1
+lr = (lambda: 1)  # Constant learning rate
+d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
+```
+
+```{.python .input}
+#@tab pytorch
+# removed tab all because code isn't same for tf
+f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
+gradf = lambda x1, x2: (2 * x1, 4 * x2)  # Gradient
+
+def sgd(x1, x2, s1, s2):
+    global lr  # Learning rate scheduler
+    (g1, g2) = gradf(x1, x2)
+    # Simulate noisy gradient
+    g1 += d2l.normal(0.0, 1, (1,))
+    g2 += d2l.normal(0.0, 1, (1,))
+    eta_t = eta * lr()  # Learning rate at time t
+    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
+
+eta = 0.1
+lr = (lambda: 1)  # Constant learning rate
+d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
+```
+
+```{.python .input}
+#@tab tensorflow
+f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
+gradf = lambda x1, x2: (2 * x1, 4 * x2)  # Gradient
+
+def sgd(x1, x2, s1, s2):
+    global lr  # Learning rate scheduler
+    (g1, g2) = gradf(x1, x2)
+    # Simulate noisy gradient
+    g1 += d2l.normal([1], 0.0, 1)
+    g2 += d2l.normal([1], 0.0, 1)
     eta_t = eta * lr()  # Learning rate at time t
     return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
 
