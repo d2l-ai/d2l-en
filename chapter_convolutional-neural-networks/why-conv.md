@@ -204,6 +204,7 @@ e.g., if images turned out not to be translation invariant,
 our models might struggle even to fit our training data.
 
 ## Convolutions
+:label:`subsec_convolutions`
 
 Before going further, we should briefly review
 why the above operation is called a convolution.

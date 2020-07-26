@@ -8,10 +8,10 @@ as efficient architectures for exploring structure in image data,
 we stick with images as our running example.
 
 
-## The Cross-Correlation Operator
+## The Cross Correlation Operation
 
-Recall that strictly speaking, *convolutional* layers
-are a (slight) misnomer, since the operations they express
+Recall :numref:`subsec_convolutions` that strictly speaking, convolutional layers
+are a  misnomer, since the operations they express
 are more accurately described as cross correlations.
 In a convolutional layer, an input array
 and a *correlation kernel* array are combined
