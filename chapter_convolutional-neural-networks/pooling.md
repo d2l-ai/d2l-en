@@ -56,18 +56,18 @@ and *average pooling*, respectively.
 
 In both cases, as with the cross-correlation operator,
 we can think of the pooling window
-as starting from the top left of the input array
-and sliding across the input array from left to right and top to bottom.
+as starting from the top left of the input tensor
+and sliding across the input tensor from left to right and top to bottom.
 At each location that the pooling window hits,
 it computes the maximum or average
-value of the input subarray in the window
+value of the input subtensor in the window
 (depending on whether *max* or *average* pooling is employed).
 
 
 ![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions represent the first output element and the input element used for its computation: $\max(0, 1, 3, 4)=4$](../img/pooling.svg)
 :label:`fig_pooling`
 
-The output array in :numref:`fig_pooling` above has a height of 2 and a width of 2.
+The output tensor in :numref:`fig_pooling` above has a height of 2 and a width of 2.
 The four elements are derived from the maximum value of $\text{max}$:
 
 $$
@@ -143,7 +143,7 @@ def pool2d(X, pool_size, mode='max'):
     return Y
 ```
 
-We can construct the input array `X` in the above diagram to validate the output of the two-dimensional maximum pooling layer.
+We can construct the input tensor `X` in the above diagram to validate the output of the two-dimensional maximum pooling layer.
 
 ```{.python .input}
 #@tab all
@@ -254,7 +254,7 @@ rather than adding the inputs of each channel by channel
 as in a convolutional layer.
 This means that the number of output channels for the pooling layer
 is the same as the number of input channels.
-Below, we will concatenate arrays `X` and `X+1`
+Below, we will concatenate tensors `X` and `X+1`
 on the channel dimension to construct an input with 2 channels.
 
 ```{.python .input}

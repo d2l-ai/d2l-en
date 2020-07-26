@@ -15,23 +15,23 @@ is determined by the shape of the input
 and the shape of the convolution kernel window.
 
 In several cases, we incorporate techniques,
-including padding and strided convolutions, 
+including padding and strided convolutions,
 that affect the size of the output.
-As motivation, note that since kernels generally 
+As motivation, note that since kernels generally
 have width and height greater than $1$,
 after applying many successive convolutions,
-we tend to wind up with outputs that are 
+we tend to wind up with outputs that are
 considerably smaller than our input.
-If we start with a $240 \times 240$ pixel image, 
+If we start with a $240 \times 240$ pixel image,
 $10$ layers of $5 \times 5$ convolutions
-reduce the image to $200 \times 200$ pixels, 
-slicing off $30 \%$ of the image and with it 
-obliterating any interesting information 
-on the boundaries of the original image. 
+reduce the image to $200 \times 200$ pixels,
+slicing off $30 \%$ of the image and with it
+obliterating any interesting information
+on the boundaries of the original image.
 *Padding* is the most popular tool for handling this issue.
 
 In other cases, we may want to reduce the dimensionality drastically,
-e.g., if we find the original input resolution to be unwieldy. 
+e.g., if we find the original input resolution to be unwieldy.
 *Strided convolutions* are a popular technique that can help in these instances.
 
 ## Padding
@@ -51,7 +51,7 @@ In :numref:`img_conv_pad`, we pad a $3 \times 3$ input,
 increasing its size to $5 \times 5$.
 The corresponding output then increases to a $4 \times 4$ matrix.
 
-![Two-dimensional cross-correlation with padding. The shaded portions are the input and kernel array elements used by the first output element: $0\times0+0\times1+0\times2+0\times3=0$. ](../img/conv-pad.svg)
+![Two-dimensional cross-correlation with padding. The shaded portions are the input and kernel tensor elements used by the first output element: $0\times0+0\times1+0\times2+0\times3=0$. ](../img/conv-pad.svg)
 :label:`img_conv_pad`
 
 In general, if we add a total of $p_h$ rows of padding
@@ -86,7 +86,7 @@ and the same number of columns on left and right.
 Moreover, this practice of using odd kernels
 and padding to precisely preserve dimensionality
 offers a clerical benefit.
-For any two-dimensional array `X`,
+For any two-dimensional tensor `X`,
 when the kernel's size is odd
 and the number of padding rows and columns
 on all sides are the same,
@@ -131,7 +131,7 @@ comp_conv2d(conv2d, X).shape
 #@tab pytorch
 import torch
 from torch import nn
-# We define a convenience function to calculate the convolutional layer. This 
+# We define a convenience function to calculate the convolutional layer. This
 # function initializes the convolutional layer weights and performs
 # corresponding dimensionality elevations and reductions on the input and
 # output
@@ -153,7 +153,7 @@ comp_conv2d(conv2d, X).shape
 ```{.python .input}
 #@tab tensorflow
 import tensorflow as tf
-# We define a convenience function to calculate the convolutional layer. This 
+# We define a convenience function to calculate the convolutional layer. This
 # function initializes the convolutional layer weights and performs
 # corresponding dimensionality elevations and reductions on the input and
 # output
@@ -173,7 +173,7 @@ comp_conv2d(conv2d, X).shape
 ```
 
 When the height and width of the convolution kernel are different,
-we can make the output and input have the same height and width 
+we can make the output and input have the same height and width
 by setting different padding numbers for height and width.
 
 ```{.python .input}
@@ -206,7 +206,7 @@ comp_conv2d(conv2d, X).shape
 
 When computing the cross-correlation,
 we start with the convolution window
-at the top-left corner of the input array,
+at the top-left corner of the input tensor,
 and then slide it over all locations both down and to the right.
 In previous examples, we default to sliding one pixel at a time.
 However, sometimes, either for computational efficiency
@@ -224,11 +224,11 @@ We can see that when the second element of the first column is output,
 the convolution window slides down three rows.
 The convolution window slides two columns to the right
 when the second element of the first row is output.
-When the convolution window slides three columns to the right on the input, 
-there is no output because the input element cannot fill the window 
+When the convolution window slides three columns to the right on the input,
+there is no output because the input element cannot fill the window
 (unless we add another column of padding).
 
-![Cross-correlation with strides of 3 and 2 for height and width respectively. The shaded portions are the output element and the input and core array elements used in its computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$. ](../img/conv-stride.svg)
+![Cross-correlation with strides of 3 and 2 for height and width respectively. The shaded portions are the output element and the input and core tensor elements used in its computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$. ](../img/conv-stride.svg)
 :label:`img_conv_stride`
 
 In general, when the stride for the height is $s_h$

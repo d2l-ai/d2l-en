@@ -13,15 +13,15 @@ we stick with images as our running example.
 Recall :numref:`subsec_convolutions` that strictly speaking, convolutional layers
 are a  misnomer, since the operations they express
 are more accurately described as cross correlations.
-In a convolutional layer, an input array
-and a *correlation kernel* array are combined
-to produce an output array through a cross-correlation operation.
+In a convolutional layer, an input tensor
+and a *correlation kernel* tensor are combined
+to produce an output tensor through a cross-correlation operation.
 Let us ignore channels for now and see how this works
 with two-dimensional data and hidden representations.
 In :numref:`fig_correlation`,
-the input is a two-dimensional array
+the input is a two-dimensional tensor
 with a height of 3 and width of 3.
-We mark the shape of the array as $3 \times 3$ or ($3$, $3$).
+We mark the shape of the tensor as $3 \times 3$ or ($3$, $3$).
 The height and width of the kernel are both $2$.
 Note that in the deep learning research community,
 this object may be referred to as *a convolutional kernel*,
@@ -30,22 +30,22 @@ The shape of the kernel window
 is given by the height and width of the kernel
 (here it is $2 \times 2$).
 
-![Two-dimensional cross-correlation operation. The shaded portions are the first output element and the input and kernel array elements used in its computation: $0\times0+1\times1+3\times2+4\times3=19$. ](../img/correlation.svg)
+![Two-dimensional cross-correlation operation. The shaded portions are the first output element and the input and kernel tensor elements used in its computation: $0\times0+1\times1+3\times2+4\times3=19$. ](../img/correlation.svg)
 :label:`fig_correlation`
 
 In the two-dimensional cross-correlation operation,
 we begin with the convolution window positioned
-at the top-left corner of the input array
-and slide it across the input array,
+at the top-left corner of the input tensor
+and slide it across the input tensor,
 both from left to right and top to bottom.
 When the convolution window slides to a certain position,
-the input subarray contained in that window
-and the kernel array are multiplied (elementwise)
-and the resulting array is summed up
+the input subtensor contained in that window
+and the kernel tensor are multiplied (elementwise)
+and the resulting tensor is summed up
 yielding a single scalar value.
-This result gives the value of the output array
+This result gives the value of the output tensor
 at the corresponding location.
-Here, the output array has a height of 2 and width of 2
+Here, the output tensor has a height of 2 and width of 2
 and the four elements are derived from
 the two-dimensional cross-correlation operation:
 
@@ -70,8 +70,8 @@ to 'shift' the convolutional kernel across the image
 by padding the image with zeros around its boundary
 such that there is enough space to shift the kernel).
 Next, we implement this process in the `corr2d` function,
-which accepts the input array `X` and kernel array `K`
-and returns the output array `Y`.
+which accepts the input tensor `X` and kernel tensor `K`
+and returns the output tensor `Y`.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -115,7 +115,7 @@ def corr2d(X, K):  #@save
     return Y
 ```
 
-We can construct the input array `X` and the kernel array `K`
+We can construct the input tensor `X` and the kernel tensor `K`
 from the figure above
 to validate the output of the above implementation
 of the two-dimensional cross-correlation operation.
@@ -251,7 +251,7 @@ precisely what each filter should be doing manually.
 Now let us see whether we can learn the kernel that generated `Y` from `X`
 by looking at the (input, output) pairs only.
 We first construct a convolutional layer
-and initialize its kernel as a random array.
+and initialize its kernel as a random tensor.
 Next, in each iteration, we will use the squared error
 to compare `Y` to the output of the convolutional layer.
 We can then calculate the gradient to update the weight.
@@ -265,7 +265,7 @@ Instead, we use the built-in `Conv2D` class.
 
 ```{.python .input}
 # Construct a convolutional layer with 1 output channel (channels will be
-# introduced in the following section) and a kernel array shape of (1, 2)
+# introduced in the following section) and a kernel tensor shape of (1, 2)
 conv2d = nn.Conv2D(1, kernel_size=(1, 2))
 conv2d.initialize()
 
@@ -290,7 +290,7 @@ for i in range(10):
 #@tab pytorch
 # Construct a convolutional layer with 1 input channel and 1 output channel
 # (channels will be introduced in the following section)
-# and a kernel array shape of (1, 2). For sake of simplicity we ignore bias
+# and a kernel tensor shape of (1, 2). For sake of simplicity we ignore bias
 conv2d = nn.Conv2d(1,1, kernel_size=(1, 2), bias=False)
 
 # The two-dimensional convolutional layer uses four-dimensional input and
@@ -313,7 +313,7 @@ for i in range(10):
 #@tab tensorflow
 # Construct a convolutional layer with 1 input channel and 1 output channel
 # (channels will be introduced in the following section)
-# and a kernel array shape of (1, 2). For sake of simplicity we ignore bias
+# and a kernel tensor shape of (1, 2). For sake of simplicity we ignore bias
 conv2d = tf.keras.layers.Conv2D(1, (1, 2), use_bias=False)
 
 # The two-dimensional convolutional layer uses four-dimensional input and
@@ -336,7 +336,7 @@ for i in range(10):
             print(f'batch {i+1}, loss {tf.reduce_sum(l):.3f}')
 ```
 
-Note that the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel array we learned.
+Note that the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel tensor we learned.
 
 ```{.python .input}
 d2l.reshape(conv2d.weight.data(), (1, 2))
@@ -352,8 +352,8 @@ d2l.reshape(conv2d.weight.data, (1, 2))
 d2l.reshape(conv2d.get_weights()[0], (1, 2))
 ```
 
-Indeed, the learned kernel array is remarkably close
-to the kernel array `K` we defined earlier.
+Indeed, the learned kernel tensor is remarkably close
+to the kernel tensor `K` we defined earlier.
 
 ## Cross-Correlation and Convolution
 
@@ -380,7 +380,7 @@ as a convolution even though, strictly-speaking, it is slightly different.
     * What happens if you transpose `X`?
     * What happens if you transpose `K`?
 1. When you try to automatically find the gradient for the `Conv2D` class we created, what kind of error message do you see?
-1. How do you represent a cross-correlation operation as a matrix multiplication by changing the input and kernel arrays?
+1. How do you represent a cross-correlation operation as a matrix multiplication by changing the input and kernel tensors?
 1. Design some kernels manually.
     * What is the form of a kernel for the second derivative?
     * What is the kernel for the Laplace operator?
