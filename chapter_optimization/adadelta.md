@@ -46,8 +46,8 @@ from mxnet import np, npx
 npx.set_np()
 
 def init_adadelta_states(feature_dim):
-    s_w, s_b = np.zeros((feature_dim, 1)), d2l.zeros(1)
-    delta_w, delta_b = np.zeros((feature_dim, 1)), d2l.zeros(1)
+    s_w, s_b = d2l.zeros((feature_dim, 1)), d2l.zeros(1)
+    delta_w, delta_b = d2l.zeros((feature_dim, 1)), d2l.zeros(1)
     return ((s_w, delta_w), (s_b, delta_b))
 
 def adadelta(params, states, hyperparams):
