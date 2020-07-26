@@ -178,6 +178,7 @@ def get_data_ch11(batch_size=10, n=1500):
 
 ```{.python .input}
 #@tab tensorflow
+#@save
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
 
