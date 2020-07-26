@@ -71,6 +71,22 @@ p = 0.2*torch.exp(-(x - 3)**2 / 2)/torch.sqrt(2 * torch.tensor(torch.pi)) + \
 d2l.plot(x, p, 'x', 'Density')
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from IPython import display
+import tensorflow as tf
+tf.pi = tf.acos(tf.zeros(1)).numpy() * 2  # Define pi in TensorFlow
+
+# Plot the probability density function for some random variable
+x = tf.range(-5, 5, 0.01)
+p = 0.2*tf.exp(-(x - 3)**2 / 2)/tf.sqrt(2 * tf.constant(tf.pi)) + \
+    0.8*tf.exp(-(x + 1)**2 / 2)/tf.sqrt(2 * tf.constant(tf.pi))
+
+d2l.plot(x, p, 'x', 'Density')
+```
+
 The locations where the function value is large indicates regions where we are more likely to find the random value.  The low portions are areas where we are unlikely to find the random value.
 
 ### Probability Density Functions
@@ -145,6 +161,22 @@ d2l.plt.fill_between(x.tolist()[300:800], p.tolist()[300:800])
 d2l.plt.show()
 
 f'approximate Probability: {torch.sum(epsilon*p[300:800])}'
+```
+
+```{.python .input}
+#@tab tensorflow
+# Approximate probability using numerical integration
+epsilon = 0.01
+x = tf.range(-5, 5, 0.01)
+p = 0.2*tf.exp(-(x - 3)**2 / 2) / tf.sqrt(2 * tf.constant(tf.pi)) +\
+    0.8*tf.exp(-(x + 1)**2 / 2) / tf.sqrt(2 * tf.constant(tf.pi))
+
+d2l.set_figsize()
+d2l.plt.plot(x, p, color='black')
+d2l.plt.fill_between(x.numpy().tolist()[300:800], p.numpy().tolist()[300:800])
+d2l.plt.show()
+
+f'approximate Probability: {tf.reduce_sum(epsilon*p[300:800])}'
 ```
 
 It turns out that these two properties describe exactly the space of possible probability density functions (or *p.d.f.*'s for the commonly encountered abbreviation).  They are non-negative functions $p(x) \ge 0$ such that
@@ -325,6 +357,28 @@ def plot_chebyshev(a, p):
 plot_chebyshev(0.0, torch.tensor(0.2))
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Define a helper to plot these figures
+def plot_chebyshev(a, p):
+    d2l.set_figsize()
+    d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
+    d2l.plt.xlim([-4, 4])
+    d2l.plt.xlabel('x')
+    d2l.plt.ylabel('p.m.f.')
+
+    d2l.plt.hlines(0.5, a - 4 * tf.sqrt(2 * p),
+                   a + 4 * tf.sqrt(2 * p), 'black', lw=4)
+    d2l.plt.vlines(a - 4 * tf.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
+    d2l.plt.vlines(a + 4 * tf.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
+    d2l.plt.title(f'p = {p:.3f}')
+
+    d2l.plt.show()
+
+# Plot interval when p > 1/8
+plot_chebyshev(0.0, tf.constant(0.2))
+```
+
 The second shows that at $p = 1/8$, the interval exactly touches the two points.  This shows that the inequality is *sharp*, since no smaller interval could be taken while keeping the inequality true.
 
 ```{.python .input}
@@ -338,6 +392,12 @@ plot_chebyshev(0.0, 0.125)
 plot_chebyshev(0.0, torch.tensor(0.125))
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Plot interval when p = 1/8
+plot_chebyshev(0.0, tf.constant(0.125))
+```
+
 The third shows that for $p < 1/8$ the interval only contains the center.  This does not invalidate the inequality since we only needed to ensure that no more than $1/4$ of the probability falls outside the interval, which means that once $p < 1/8$, the two points at $a-2$ and $a+2$ can be discarded.
 
 ```{.python .input}
@@ -349,6 +409,12 @@ plot_chebyshev(0.0, 0.05)
 #@tab pytorch
 # Plot interval when p < 1/8
 plot_chebyshev(0.0, torch.tensor(0.05))
+```
+
+```{.python .input}
+#@tab tensorflow
+# Plot interval when p < 1/8
+plot_chebyshev(0.0, tf.constant(0.05))
 ```
 
 ### Means and Variances in the Continuum
@@ -418,6 +484,15 @@ p = 1 / (1 + x**2)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Plot the Cauchy distribution p.d.f.
+x = tf.range(-5, 5, 0.01)
+p = 1 / (1 + x**2)
+
+d2l.plot(x, p, 'x', 'p.d.f.')
+```
+
 This function looks innocent, and indeed consulting a table of integrals will show it has area one under it, and thus it defines a continuous random variable.
 
 To see what goes astray, let us try to compute the variance of this.  This would involve using :eqref:`eq_var_def` computing
@@ -440,6 +515,15 @@ d2l.plot(x, p, 'x', 'integrand')
 #@tab pytorch
 # Plot the integrand needed to compute the variance
 x = torch.arange(-20, 20, 0.01)
+p = x**2 / (1 + x**2)
+
+d2l.plot(x, p, 'x', 'integrand')
+```
+
+```{.python .input}
+#@tab tensorflow
+# Plot the integrand needed to compute the variance
+x = tf.range(-20, 20, 0.01)
 p = x**2 / (1 + x**2)
 
 d2l.plot(x, p, 'x', 'integrand')
@@ -608,6 +692,23 @@ for i in range(3):
 d2l.plt.show()
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Plot a few random variables adjustable covariance
+covs = [-0.9, 0.0, 1.2]
+d2l.plt.figure(figsize=(12, 3))
+for i in range(3):
+    X = tf.random.normal((500, ))
+    Y = covs[i]*X + tf.random.normal((500, ))
+
+    d2l.plt.subplot(1, 4, i+1)
+    d2l.plt.scatter(X.numpy(), Y.numpy())
+    d2l.plt.xlabel('X')
+    d2l.plt.ylabel('Y')
+    d2l.plt.title(f'cov = {covs[i]}')
+d2l.plt.show()
+```
+
 Let us see some properties of covariances:
 
 * For any random variable $X$, $\mathrm{Cov}(X, X) = \mathrm{Var}(X)$.
@@ -688,6 +789,24 @@ for i in range(3):
     X = torch.randn(500)
     Y = cors[i] * X + torch.sqrt(torch.tensor(1) -
                                  cors[i]**2) * torch.randn(500)
+
+    d2l.plt.subplot(1, 4, i + 1)
+    d2l.plt.scatter(X.numpy(), Y.numpy())
+    d2l.plt.xlabel('X')
+    d2l.plt.ylabel('Y')
+    d2l.plt.title(f'cor = {cors[i]}')
+d2l.plt.show()
+```
+
+```{.python .input}
+#@tab tensorflow
+# Plot a few random variables adjustable correlations
+cors = [-0.9, 0.0, 1.0]
+d2l.plt.figure(figsize=(12, 3))
+for i in range(3):
+    X = tf.random.normal((500, ))
+    Y = cors[i] * X + tf.sqrt(tf.constant(1.) -
+                                 cors[i]**2) * tf.random.normal((500, ))
 
     d2l.plt.subplot(1, 4, i + 1)
     d2l.plt.scatter(X.numpy(), Y.numpy())
