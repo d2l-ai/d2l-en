@@ -73,8 +73,11 @@ self_information(1 / 64)
 import tensorflow as tf
 
 def log2(x):
-    # Define log2, as TensorFlow doesn't offer it inbuilt.
     return tf.math.log(x) / tf.math.log(2.)
+
+def nansum(x):
+    return tf.reduce_sum(tf.where(tf.math.is_nan(
+        x), tf.zeros_like(x), x), axis=-1)
 
 def self_information(p):
     return -log2(tf.constant(p)).numpy()
@@ -136,7 +139,7 @@ entropy(torch.tensor([0.1, 0.5, 0.1, 0.3]))
 ```{.python .input}
 #@tab tensorflow
 def entropy(p):
-    return tf.reduce_sum(- p * log2(p))
+    return nansum(- p * log2(p))
 
 entropy(tf.constant([0.1, 0.5, 0.1, 0.3]))
 ```
@@ -221,7 +224,8 @@ joint_entropy(torch.tensor([[0.1, 0.5], [0.1, 0.3]]))
 #@tab tensorflow
 def joint_entropy(p_xy):
     joint_ent = -p_xy * log2(p_xy)
-    out = tf.reduce_sum(joint_ent)
+    # nansum will sum up the non-nan number
+    out = nansum(joint_ent)
     return out
 
 joint_entropy(tf.constant([[0.1, 0.5], [0.1, 0.3]]))
@@ -285,7 +289,8 @@ conditional_entropy(torch.tensor([[0.1, 0.5], [0.2, 0.3]]),
 def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * log2(p_y_given_x)
-    out = tf.reduce_sum(cond_ent)
+    # nansum will sum up the non-nan number
+    out = nansum(cond_ent)
     return out
 
 conditional_entropy(tf.constant([[0.1, 0.5], [0.2, 0.3]]),
@@ -352,7 +357,8 @@ mutual_information(torch.tensor([[0.1, 0.5], [0.1, 0.3]]),
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = p_xy * log2(p)
-    out = tf.reduce_sum(mutual)
+    # Operator nansum will sum up the non-nan number
+    out = nansum(mutual)
     return out
 
 mutual_information(tf.constant([[0.1, 0.5], [0.1, 0.3]]),
@@ -421,7 +427,7 @@ def kl_divergence(p, q):
 #@tab tensorflow
 def kl_divergence(p, q):
     kl = p * log2(p / q)
-    out = tf.reduce_sum(kl)
+    out = nansum(kl)
     return tf.abs(out).numpy()
 ```
 
@@ -480,9 +486,9 @@ p = tf.random.normal((tensor_len, ), 0, 1)
 q1 = tf.random.normal((tensor_len, ), -1, 1)
 q2 = tf.random.normal((tensor_len, ), 1, 1)
 
-p = tf.sort(p)[0]
-q1 = tf.sort(q1)[0]
-q2 = tf.sort(q2)[0]
+p = tf.sort(p)
+q1 = tf.sort(q1)
+q2 = tf.sort(q2)
 ```
 
 Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (i.e., $x=0$), we expect a similar value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. As you can see below, there is only a less than 3% off between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$.
