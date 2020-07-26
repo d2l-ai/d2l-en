@@ -244,14 +244,14 @@ Now, we will explain, step by step, how to train the SSD model for object detect
 
 ### Data Reading and Initialization
 
-We read the Pikachu dataset we created in the previous section.
+We read the banana detection dataset we created in the previous section.
 
 ```{.python .input  n=14}
 batch_size = 32
 train_iter, _ = d2l.load_data_bananas(batch_size)
 ```
 
-There is 1 category in the Pikachu dataset. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
+There is 1 category in the banana detection dataset. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
 
 ```{.python .input  n=15}
 device, net = d2l.try_gpu(), TinySSD(num_classes=1)
