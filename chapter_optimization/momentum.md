@@ -124,7 +124,7 @@ Recall that $\mathbf{v}_t = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\ta
 d2l.set_figsize()
 betas = [0.95, 0.9, 0.6, 0]
 for beta in betas:
-    x = d2l.arange(40).numpy()
+    x = d2l.numpy(d2l.arange(40))
     d2l.plt.plot(x, beta ** x, label=f'beta = {beta:.2f}')
 d2l.plt.xlabel('time')
 d2l.plt.legend();
@@ -253,7 +253,7 @@ lambdas = [0.1, 1, 10, 19]
 eta = 0.1
 d2l.set_figsize((6, 4))
 for lam in lambdas:
-    t = d2l.arange(20).numpy()
+    t = d2l.numpy(d2l.arange(20))
     d2l.plt.plot(t, (1 - eta * lam) ** t, label=f'lambda = {lam:.2f}')
 d2l.plt.xlabel('time')
 d2l.plt.legend();
