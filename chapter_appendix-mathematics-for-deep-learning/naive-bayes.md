@@ -136,7 +136,7 @@ Let us visualize these examples.
 
 ```{.python .input}
 #@tab all
-d2l.show_images(images, 2, 9)
+d2l.show_images(images, 2, 9);
 ```
 
 ## The Probabilistic Model for Classification
@@ -202,6 +202,18 @@ P_y = n_y / n_y.sum()
 P_y
 ```
 
+```{.python .input}
+#@tab tensorflow
+X = tf.stack([train_images[i] for i in range(len(train_images))], axis=0)
+Y = tf.constant([train_labels[i] for i in range(len(train_labels))])
+
+n_y = tf.Variable(tf.zeros(10))
+for y in range(10):
+    n_y[y].assign(tf.reduce_sum(tf.cast(Y == y, tf.float32)))
+P_y = n_y / tf.reduce_sum(n_y)
+P_y
+```
+
 Now on to slightly more difficult things $P_{xy}$. Since we picked black and white images, $p(x_i  \mid  y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of $y$, i.e., $n_y$. But there is something slightly troubling: certain pixels may never be black (e.g., for well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called *Laplace Smoothing*.  It may seem ad-hoc, however it may be well motivated from a Bayesian point-of-view.
 
 ```{.python .input}
@@ -221,6 +233,17 @@ for y in range(10):
 P_xy = (n_x + 1) / (n_y + 1).reshape(10, 1, 1)
 
 d2l.show_images(P_xy, 2, 5);
+```
+
+```{.python .input}
+#@tab tensorflow
+n_x = tf.Variable(tf.zeros((10, 28, 28)), dtype=tf.int32)
+# TODO
+for y in range(10):
+    n_x[y].assign(tf.cast(tf.reduce_sum(X.numpy()[Y.numpy() == y]), tf.int32))
+P_xy = tf.reshape((n_x + 1) / (n_y + 1), (10, 1, 1))
+
+d2l.show_images(P_xy, 2, 5)
 ```
 
 By visualizing these $10\times 28\times 28$ probabilities (for each pixel for each class) we could get some mean looking digits.
