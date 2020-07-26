@@ -36,7 +36,7 @@ B = np.random.normal(0, 1, (256, 256))
 C = np.random.normal(0, 1, (256, 256))
 ```
 
-```{.python .input  n=28}
+```{.python .input  n=41}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -64,7 +64,7 @@ A.wait_to_read()
 timer.stop()
 ```
 
-```{.python .input  n=29}
+```{.python .input  n=42}
 #@tab tensorflow
 # Compute A = BC one element at a time
 timer.start()
@@ -74,13 +74,13 @@ for i in range(256):
 timer.stop()
 ```
 
-```{.json .output n=29}
+```{.json .output n=42}
 [
  {
   "data": {
-   "text/plain": "40.954442262649536"
+   "text/plain": "34.307997703552246"
   },
-  "execution_count": 29,
+  "execution_count": 42,
   "metadata": {},
   "output_type": "execute_result"
  }
@@ -335,6 +335,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
 Let us see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e., to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
 
 ```{.python .input  n=4}
+#@tab all
 def train_sgd(lr, batch_size, num_epochs=2):
     data_iter, feature_dim = get_data_ch11(batch_size)
     return train_ch11(
@@ -343,32 +344,31 @@ def train_sgd(lr, batch_size, num_epochs=2):
 gd_res = train_sgd(1, 1500, 10)
 ```
 
-```{.python .input}
-#@tab tensorflow
-
-```
-
 When the batch size equals 1, we use SGD for optimization. For simplicity of implementation we picked a constant (albeit small) learning rate. In SGD, the model parameters are updated whenever an example is processed. In our case this amounts to 1500 updates per epoch. As we can see, the decline in the value of the objective function slows down after one epoch. Although both the procedures processed 1500 examples within one epoch, SGD consumes more time than gradient descent in our experiment. This is because SGD updated the parameters more frequently and since it is less efficient to process single observations one at a time.
 
 ```{.python .input  n=5}
+#@tab all
 sgd_res = train_sgd(0.005, 1)
 ```
 
 Last, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is shorter than the time needed for SGD and the time for batch gradient descent.
 
 ```{.python .input  n=6}
+#@tab all
 mini1_res = train_sgd(.4, 100)
 ```
 
 Reducing the batch size to 10, the time for each epoch increases because the workload for each batch is less efficient to execute.
 
 ```{.python .input  n=7}
+#@tab all
 mini2_res = train_sgd(.05, 10)
 ```
 
 Finally, we compare the time vs. loss for the preview four experiments. As can be seen, despite SGD converges faster than GD in terms of number of examples processed, it uses more time to reach the same loss than GD because that computing gradient example by example is not efficient. Minibatch SGD is able to trade-off the convergence speed and computation efficiency. A minibatch size 10 is more efficient than SGD; a minibatch size 100 even outperforms GD in terms of runtime.
 
 ```{.python .input  n=8}
+#@tab all
 d2l.set_figsize([6, 3])
 d2l.plot(*list(map(list, zip(gd_res, sgd_res, mini1_res, mini2_res))),
          'time (sec)', 'loss', xlim=[1e-2, 10],
@@ -407,11 +407,52 @@ def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
+  # Initialization
+  net = tf.keras.Sequential()
+  net.add(tf.keras.layers.Dense(1, 
+          kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
+  optimizer = trainer_fn(hyperparams['lr'])
+  loss = tf.keras.losses.MeanSquaredError()
+  # Note: L2 Loss = 1/2 * MSE Loss. TF has MSE Loss which is slightly
+  # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
+  # value to get L2Loss in TF.
+  
+  animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+  n, timer = 0, d2l.Timer()
+  for _ in range(num_epochs):
+    for X, y in data_iter:
+      with tf.GradientTape() as g:
+        out = net(X)
+        l = loss(y, out)/2
+        params = net.trainable_variables
+        grads = g.gradient(l, params)
+      optimizer.apply_gradients(zip(grads, params))
+      n += X.shape[0]
+      if n % 200 == 0:
+        timer.stop()
+        animator.add(n/X.shape[0]/tf.data.experimental.cardinality(data_iter).numpy(),
+                             (d2l.evaluate_loss(net, data_iter, loss)/2,))
+        timer.start()
+  print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+```
+
 Using Gluon to repeat the last experiment shows identical behavior.
 
 ```{.python .input  n=10}
 data_iter, _ = get_data_ch11(10)
 train_concise_ch11('sgd', {'learning_rate': 0.05}, data_iter)
+```
+
+```{.python .input}
+#@tab tensorflow
+data_iter, _ = get_data_ch11(10)
+trainer = tf.keras.optimizers.SGD
+train_concise_ch11(trainer, {'lr': 0.05}, data_iter)
 ```
 
 ## Summary
