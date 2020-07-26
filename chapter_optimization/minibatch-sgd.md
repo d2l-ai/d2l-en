@@ -36,7 +36,7 @@ B = np.random.normal(0, 1, (256, 256))
 C = np.random.normal(0, 1, (256, 256))
 ```
 
-```{.python .input  n=11}
+```{.python .input  n=28}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -64,7 +64,7 @@ A.wait_to_read()
 timer.stop()
 ```
 
-```{.python .input  n=17}
+```{.python .input  n=29}
 #@tab tensorflow
 # Compute A = BC one element at a time
 timer.start()
@@ -74,13 +74,13 @@ for i in range(256):
 timer.stop()
 ```
 
-```{.json .output n=17}
+```{.json .output n=29}
 [
  {
   "data": {
-   "text/plain": "47.48797941207886"
+   "text/plain": "40.954442262649536"
   },
-  "execution_count": 17,
+  "execution_count": 29,
   "metadata": {},
   "output_type": "execute_result"
  }
@@ -98,7 +98,7 @@ A.wait_to_read()
 timer.stop()
 ```
 
-```{.python .input  n=19}
+```{.python .input  n=30}
 #@tab tensorflow
 timer.start()
 for j in range(256):
@@ -106,13 +106,13 @@ for j in range(256):
 timer.stop()
 ```
 
-```{.json .output n=19}
+```{.json .output n=30}
 [
  {
   "data": {
-   "text/plain": "0.2525477409362793"
+   "text/plain": "0.25398850440979004"
   },
-  "execution_count": 19,
+  "execution_count": 30,
   "metadata": {},
   "output_type": "execute_result"
  }
@@ -144,7 +144,7 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
 ]
 ```
 
-```{.python .input  n=22}
+```{.python .input  n=31}
 #@tab tensorflow
 timer.start()
 A = tf.tensordot(B, C, axes=1)
@@ -156,12 +156,12 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
 
-```{.json .output n=22}
+```{.json .output n=31}
 [
  {
   "name": "stdout",
   "output_type": "stream",
-  "text": "performance in Gigaflops: element 0.044, column 0.042, full 7.919\n"
+  "text": "performance in Gigaflops: element 0.049, column 7.874, full 9.463\n"
  }
 ]
 ```
@@ -190,7 +190,7 @@ timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
-```{.python .input  n=27}
+```{.python .input  n=32}
 #@tab tensorflow
 #converting tensor to numpy array
 A = A.numpy()
@@ -201,12 +201,12 @@ timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
-```{.json .output n=27}
+```{.json .output n=32}
 [
  {
   "name": "stdout",
   "output_type": "stream",
-  "text": "performance in Gigaflops: block 7.888\n"
+  "text": "performance in Gigaflops: block 20.932\n"
  }
 ]
 ```
@@ -232,8 +232,18 @@ def get_data_ch11(batch_size=10, n=1500):
     return data_iter, data.shape[1]-1
 ```
 
-```{.python .input}
+```{.python .input  n=33}
 #@tab tensorflow
+d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
+                           '76e5be1548fd8222e5074cf0faae75edff8cf93f')
+
+#@save
+def get_data_ch11(batch_size=10, n=1500):
+    data = np.genfromtxt(d2l.download('airfoil'),
+                         dtype=np.float32, delimiter='\t')
+    data = (data - data.mean(axis=0)) / data.std(axis=0)
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    return data_iter, data.shape[1]-1
 ```
 
 ## Implementation from Scratch
@@ -248,6 +258,13 @@ divided by the batch size.
 def sgd(params, states, hyperparams):
     for p in params:
         p[:] -= hyperparams['lr'] * p.grad
+```
+
+```{.python .input  n=34}
+#@tab tensorflow
+def sgd(params, grads, states, hyperparams):
+    for param, grad in zip(params, grads):
+        param.assign_sub(hyperparams['lr']*grad)
 ```
 
 Next, we implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can be used to train the model with minibatch SGD and other algorithms introduced subsequently.
@@ -282,6 +299,39 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
     return timer.cumsum(), animator.Y[0]
 ```
 
+```{.python .input  n=35}
+#@tab tensorflow
+#@save
+def train_ch11(trainer_fn, states, hyperparams, data_iter,
+               feature_dim, num_epochs=2):
+  # Initialization
+  w = tf.Variable(tf.random.normal(shape=(feature_dim, 1), mean=0, stddev=0.01),
+                trainable=True)
+  b = tf.Variable(tf.zeros(1), trainable=True)
+  
+  # Train
+  net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+  animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+  n, timer = 0, d2l.Timer()
+
+  for _ in range(num_epochs):
+    for X, y in data_iter:
+      with tf.GradientTape() as g:
+        l = tf.math.reduce_mean(loss(net(X), y))
+      
+      dw, db = g.gradient(l, [w, b])
+      trainer_fn([w, b], [dw, db], states, hyperparams)
+      n += X.shape[0]
+      if n % 200 == 0:
+          timer.stop()
+          animator.add(n/X.shape[0]/tf.data.experimental.cardinality(data_iter).numpy(),
+                    (d2l.evaluate_loss(net, data_iter, loss),))
+          timer.start()
+  print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+  return timer.cumsum(), animator.Y[0]
+```
+
 Let us see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e., to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
 
 ```{.python .input  n=4}
@@ -291,6 +341,11 @@ def train_sgd(lr, batch_size, num_epochs=2):
         sgd, None, {'lr': lr}, data_iter, feature_dim, num_epochs)
 
 gd_res = train_sgd(1, 1500, 10)
+```
+
+```{.python .input}
+#@tab tensorflow
+
 ```
 
 When the batch size equals 1, we use SGD for optimization. For simplicity of implementation we picked a constant (albeit small) learning rate. In SGD, the model parameters are updated whenever an example is processed. In our case this amounts to 1500 updates per epoch. As we can see, the decline in the value of the objective function slows down after one epoch. Although both the procedures processed 1500 examples within one epoch, SGD consumes more time than gradient descent in our experiment. This is because SGD updated the parameters more frequently and since it is less efficient to process single observations one at a time.
