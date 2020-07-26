@@ -119,7 +119,7 @@ print('b1 weight:', new_params[1])
 print('b1 grad:', new_params[1].grad)
 ```
 
-Since we didn't perform any computation yet, the gradient with regard to the bias weights is still $0$. Now let us assume that we have a vector distributed across multiple GPUs. The following allreduce function adds up all vectors and broadcasts the result back to all GPUs. Note that for this to work we need to copy the data to the device accumulating the results.
+Since we didn't perform any computation yet, the gradient with regard to the bias weights is still $0$. Now let us assume that we have a vector distributed across multiple GPUs. The following `allreduce` function adds up all vectors and broadcasts the result back to all GPUs. Note that for this to work we need to copy the data to the device accumulating the results.
 
 ```{.python .input  n=14}
 def allreduce(data):
