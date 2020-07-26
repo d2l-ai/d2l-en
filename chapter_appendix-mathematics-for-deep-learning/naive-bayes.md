@@ -237,13 +237,13 @@ d2l.show_images(P_xy, 2, 5);
 
 ```{.python .input}
 #@tab tensorflow
-n_x = tf.Variable(tf.zeros((10, 28, 28)), dtype=tf.int32)
-# TODO
+n_x = tf.Variable(tf.zeros((10, 28, 28)))
 for y in range(10):
-    n_x[y].assign(tf.cast(tf.reduce_sum(X.numpy()[Y.numpy() == y]), tf.int32))
-P_xy = tf.reshape((n_x + 1) / (n_y + 1), (10, 1, 1))
+    n_x[y].assign(tf.cast(tf.reduce_sum(
+        X.numpy()[Y.numpy() == y], axis=0), tf.float32))
+P_xy = (n_x + 1) / tf.reshape((n_y + 1), (10, 1, 1))
 
-d2l.show_images(P_xy, 2, 5)
+d2l.show_images(P_xy, 2, 5);
 ```
 
 By visualizing these $10\times 28\times 28$ probabilities (for each pixel for each class) we could get some mean looking digits.
@@ -273,6 +273,18 @@ image, label = mnist_test[0]
 bayes_pred(image)
 ```
 
+```{.python .input}
+#@tab tensorflow
+def bayes_pred(x):
+    x = tf.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
+    p_xy = P_xy * x + (1 - P_xy)*(1 - x)
+    p_xy = tf.math.reduce_prod(tf.reshape(p_xy, (10, -1)), axis=1)  # p(x|y)
+    return p_xy * P_y
+
+image, label = tf.cast(train_images[0], tf.float32), train_labels[0]
+bayes_pred(image)
+```
+
 This went horribly wrong! To find out why, let us look at the per pixel probabilities. They are typically numbers between $0.001$ and $1$. We are multiplying $784$ of them. At this point it is worth mentioning that we are calculating these numbers on a computer, hence with a fixed range for the exponent. What happens is that we experience *numerical underflow*, i.e., multiplying all the small numbers leads to something even smaller until it is rounded down to zero.  We discussed this as a theoretical issue in :numref:`sec_maximum_likelihood`, but we see the phenomena clearly here in practice.
 
 As discussed in that section, we fix this by use the fact that $\log a b = \log a + \log b$, i.e., we switch to summing logarithms.
@@ -289,6 +301,13 @@ print('logarithm is normal:', 784*math.log(a))
 a = 0.1
 print('underflow:', a**784)
 print('logarithm is normal:', 784*math.log(a))
+```
+
+```{.python .input}
+#@tab tensorflow
+a = 0.1
+print('underflow:', a**784)
+print('logarithm is normal:', 784*tf.math.log(a).numpy())
 ```
 
 Since the logarithm is an increasing function, we can rewrite :eqref:`eq_naive_bayes_estimation` as
@@ -322,6 +341,23 @@ def bayes_pred_stable(x):
     x = x.unsqueeze(0)  # (28, 28) -> (1, 28, 28)
     p_xy = log_P_xy * x + log_P_xy_neg * (1 - x)
     p_xy = p_xy.reshape(10, -1).sum(axis=1)  # p(x|y)
+    return p_xy + log_P_y
+
+py = bayes_pred_stable(image)
+py
+```
+
+```{.python .input}
+#@tab tensorflow
+log_P_xy = tf.math.log(P_xy)
+# TODO: This returns infs
+log_P_xy_neg = tf.math.log(1 - P_xy)
+log_P_y = tf.math.log(P_y)
+
+def bayes_pred_stable(x):
+    x = tf.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
+    p_xy = log_P_xy * x + log_P_xy_neg * (1 - x)
+    p_xy = tf.math.reduce_sum(tf.reshape(p_xy, (10, -1)), axis=1)  # p(x|y)
     return p_xy + log_P_y
 
 py = bayes_pred_stable(image)
