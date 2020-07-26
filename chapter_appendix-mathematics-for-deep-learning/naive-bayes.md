@@ -24,6 +24,15 @@ import torchvision
 d2l.use_svg_display()
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import math
+import tensorflow as tf
+d2l.use_svg_display()
+```
+
 ## Optical Character Recognition
 
 MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
@@ -54,6 +63,11 @@ mnist_test = torchvision.datasets.MNIST(
     root='./temp', train=False, transform=data_transform, download=True)
 ```
 
+```{.python .input}
+#@tab tensorflow
+(train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.mnist.load_data()
+```
+
 We can access a particular example, which contains the image and the corresponding label.
 
 ```{.python .input}
@@ -67,14 +81,16 @@ image, label = mnist_train[2]
 image.shape, label
 ```
 
+```{.python .input}
+#@tab tensorflow
+image, label = train_images[2], train_labels[2]
+image.shape, label
+```
+
 Our example, stored here in the variable `image`, corresponds to an image with a height and width of $28$ pixels.
 
 ```{.python .input}
-image.shape, image.dtype
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 image.shape, image.dtype
 ```
 
@@ -86,6 +102,11 @@ label, type(label), label.dtype
 
 ```{.python .input}
 #@tab pytorch
+label, type(label)
+```
+
+```{.python .input}
+#@tab tensorflow
 label, type(label)
 ```
 
@@ -104,15 +125,18 @@ labels = torch.tensor([mnist_train[i][1] for i in range(10,38)])
 images.shape, labels.shape
 ```
 
+```{.python .input}
+#@tab tensorflow
+images = tf.stack([train_images[i] for i in range(10, 38)], axis=0)
+labels = tf.constant([train_labels[i] for i in range(10, 38)])
+images.shape, labels.shape
+```
+
 Let us visualize these examples.
 
 ```{.python .input}
-d2l.show_images(images, 2, 9);
-```
-
-```{.python .input}
-#@tab pytorch
-d2l.show_images(images, 2, 9);
+#@tab all
+d2l.show_images(images, 2, 9)
 ```
 
 ## The Probabilistic Model for Classification
