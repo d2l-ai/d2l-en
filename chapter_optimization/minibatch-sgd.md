@@ -36,6 +36,22 @@ B = np.random.normal(0, 1, (256, 256))
 C = np.random.normal(0, 1, (256, 256))
 ```
 
+```{.python .input  n=11}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import numpy as np
+
+timer = d2l.Timer()
+# not using tensorflow here because 
+#TensorFlow tensor object is not assignable 
+# and later on it crreates problems.
+A = np.zeros((256, 256))
+B = np.random.normal(0, 1, (256, 256))
+C = np.random.normal(0, 1, (256, 256))
+```
+
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
 
 ```{.python .input  n=2}
@@ -46,6 +62,29 @@ for i in range(256):
         A[i, j] = np.dot(B[i, :], C[:, j])
 A.wait_to_read()
 timer.stop()
+```
+
+```{.python .input  n=17}
+#@tab tensorflow
+# Compute A = BC one element at a time
+timer.start()
+for i in range(256):
+    for j in range(256):
+        A[i, j] = tf.tensordot(B[i, :], C[:, j], axes=1)
+timer.stop()
+```
+
+```{.json .output n=17}
+[
+ {
+  "data": {
+   "text/plain": "47.48797941207886"
+  },
+  "execution_count": 17,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 A faster strategy is to perform column-wise assignment.
@@ -59,9 +98,30 @@ A.wait_to_read()
 timer.stop()
 ```
 
+```{.python .input  n=19}
+#@tab tensorflow
+timer.start()
+for j in range(256):
+    A[:, j] = tf.tensordot(B, C[:, j], axes=1)
+timer.stop()
+```
+
+```{.json .output n=19}
+[
+ {
+  "data": {
+   "text/plain": "0.2525477409362793"
+  },
+  "execution_count": 19,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 Last, the most effective manner is to perform the entire operation in one block. Let us see what the respective speed of the operations is.
 
-```{.python .input  n=4}
+```{.python .input  n=21}
 # Compute A = BC in one go
 timer.start()
 A = np.dot(B, C)
@@ -72,6 +132,38 @@ timer.stop()
 gigaflops = [2/i for i in timer.times]
 print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
+```
+
+```{.json .output n=21}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "performance in Gigaflops: element 0.044, column 0.042, full 7.919\n"
+ }
+]
+```
+
+```{.python .input  n=22}
+#@tab tensorflow
+timer.start()
+A = tf.tensordot(B, C, axes=1)
+timer.stop()
+
+# Multiply and add count as separate operations (fused in practice)
+gigaflops = [2/i for i in timer.times]
+print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
+      f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
+```
+
+```{.json .output n=22}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "performance in Gigaflops: element 0.044, column 0.042, full 7.919\n"
+ }
+]
 ```
 
 ## Minibatches
@@ -98,6 +190,27 @@ timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
+```{.python .input  n=27}
+#@tab tensorflow
+#converting tensor to numpy array
+A = A.numpy()
+timer.start()
+for j in range(0, 256, 64):
+    A[:, j:j+64] = tf.tensordot(B, C[:, j:j+64], axes=1)
+timer.stop()
+print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
+```
+
+```{.json .output n=27}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "performance in Gigaflops: block 7.888\n"
+ }
+]
+```
+
 As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :numref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms.
 
 ## Reading the Dataset
@@ -117,6 +230,10 @@ def get_data_ch11(batch_size=10, n=1500):
     data_iter = d2l.load_array(
         (data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
     return data_iter, data.shape[1]-1
+```
+
+```{.python .input}
+#@tab tensorflow
 ```
 
 ## Implementation from Scratch
