@@ -2558,6 +2558,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+
 d2l.DATA_HUB['bananas'] = (d2l.DATA_URL + 'bananas.zip',
                            'aadfd1c4c5d7178616799dd1801c9a234ccdaf19')
 
