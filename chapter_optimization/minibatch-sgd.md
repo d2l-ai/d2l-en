@@ -74,19 +74,6 @@ for i in range(256):
 timer.stop()
 ```
 
-```{.json .output n=42}
-[
- {
-  "data": {
-   "text/plain": "34.307997703552246"
-  },
-  "execution_count": 42,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 A faster strategy is to perform column-wise assignment.
 
 ```{.python .input  n=3}
@@ -106,19 +93,6 @@ for j in range(256):
 timer.stop()
 ```
 
-```{.json .output n=30}
-[
- {
-  "data": {
-   "text/plain": "0.25398850440979004"
-  },
-  "execution_count": 30,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 Last, the most effective manner is to perform the entire operation in one block. Let us see what the respective speed of the operations is.
 
 ```{.python .input  n=21}
@@ -134,16 +108,6 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
 
-```{.json .output n=21}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "performance in Gigaflops: element 0.044, column 0.042, full 7.919\n"
- }
-]
-```
-
 ```{.python .input  n=31}
 #@tab tensorflow
 timer.start()
@@ -154,16 +118,6 @@ timer.stop()
 gigaflops = [2/i for i in timer.times]
 print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
-```
-
-```{.json .output n=31}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "performance in Gigaflops: element 0.049, column 7.874, full 9.463\n"
- }
-]
 ```
 
 ## Minibatches
@@ -199,16 +153,6 @@ for j in range(0, 256, 64):
     A[:, j:j+64] = tf.tensordot(B, C[:, j:j+64], axes=1)
 timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
-```
-
-```{.json .output n=32}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "performance in Gigaflops: block 20.932\n"
- }
-]
 ```
 
 As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :numref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms.
