@@ -263,18 +263,6 @@ d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
 
-```{.python .input}
-#@tab tensorlow
-lambdas = [0.1, 1, 10, 19]
-eta = 0.1
-d2l.set_figsize((6, 4))
-for lam in lambdas:
-    t = d2l.arange(20).numpy()
-    d2l.plt.plot(t, (1 - eta * lam) ** t, label=f'lambda = {lam:.2f}')
-d2l.plt.xlabel('time')
-d2l.plt.legend();
-```
-
 To analyze convergence in the case of momentum we begin by rewriting the update equations in terms of two scalars: one for $x$ and one for the momentum $v$. This yields:
 
 $$
