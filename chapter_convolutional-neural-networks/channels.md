@@ -6,7 +6,7 @@ that comprise each image (e.g., color images have the standard RGB channels
 to indicate the amount of red, green and blue),
 until now, we simplified all of our numerical examples
 by working with just a single input and a single output channel.
-This has allowed us to think of our inputs, convolutional kernels,
+This has allowed us to think of our inputs, convolution kernels,
 and outputs each as two-dimensional tensors.
 
 When we add channels into the mix,
@@ -254,7 +254,7 @@ assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 
 ## Exercises
 
-1. Assume that we have two convolutional kernels of size $k_1$ and $k_2$ respectively (with no nonlinearity in between).
+1. Assume that we have two convolution kernels of size $k_1$ and $k_2$ respectively (with no nonlinearity in between).
     1. Prove that the result of the operation can be expressed by a single convolution.
     1. What is the dimensionality of the equivalent single convolution?
     1. Is the converse true?

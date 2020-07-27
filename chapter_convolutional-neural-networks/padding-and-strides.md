@@ -7,9 +7,7 @@ yielding an output representation with dimension $2\times2$.
 In general, assuming the input shape is $n_h\times n_w$
 and the convolution kernel window shape is $k_h\times k_w$,
 then the output shape will be
-
-$$(n_h-k_h+1) \times (n_w-k_w+1).$$
-
+$(n_h-k_h+1) \times (n_w-k_w+1)$.
 Therefore, the output shape of the convolutional layer
 is determined by the shape of the input
 and the shape of the convolution kernel window.
@@ -76,7 +74,7 @@ pad $\lceil p_h/2\rceil$ rows on the top of the input
 and $\lfloor p_h/2\rfloor$ rows on the bottom.
 We will pad both sides of the width in the same way.
 
-Convolutional neural networks commonly use convolutional kernels
+Convolutional neural networks commonly use convolution kernels
 with odd height and width values, such as $1$, $3$, $5$, or $7$.
 Choosing odd kernel sizes has the benefit
 that we can preserve the spatial dimensionality
