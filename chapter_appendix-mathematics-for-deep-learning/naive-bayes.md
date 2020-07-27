@@ -350,7 +350,7 @@ py
 ```{.python .input}
 #@tab tensorflow
 log_P_xy = tf.math.log(P_xy)
-# TODO: This returns infs
+# TODO: Look into why this returns infs
 log_P_xy_neg = tf.math.log(1 - P_xy)
 log_P_y = tf.math.log(P_y)
 
@@ -377,6 +377,11 @@ py.argmax(axis=0) == int(label)
 py.argmax(dim=0) == label
 ```
 
+```{.python .input}
+#@tab tensorflow
+tf.argmax(py, axis=0) == label
+```
+
 If we now predict a few validation examples, we can see the Bayes
 classifier works pretty well.
 
@@ -401,6 +406,19 @@ preds = predict(X)
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
+```{.python .input}
+#@tab tensorflow
+def predict(X):
+    return [tf.cast(tf.argmax(bayes_pred_stable(x), axis=0), tf.int32).numpy()
+            for x in X]
+
+X = tf.stack([tf.cast(train_images[i], tf.float32) for i in range(10, 38)], axis=0)
+y = tf.constant([train_labels[i] for i in range(10, 38)])
+preds = predict(X)
+# TODO: The preds are not correct due to issues with bayes_pred_stable()
+d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
+```
+
 Finally, let us compute the overall accuracy of the classifier.
 
 ```{.python .input}
@@ -416,6 +434,15 @@ X = torch.stack([mnist_train[i][0] for i in range(len(mnist_test))],
 y = torch.tensor([mnist_train[i][1] for i in range(len(mnist_test))])
 preds = torch.tensor(predict(X), dtype=torch.int32)
 float((preds == y).sum()) / len(y)  # Validation accuracy
+```
+
+```{.python .input}
+#@tab tensorflow
+X = tf.stack([tf.cast(train_images[i], tf.float32) for i in range(len(test_images))], axis=0)
+y = tf.constant([train_labels[i] for i in range(len(test_images))])
+preds = tf.constant(predict(X), dtype=tf.int32)
+# TODO: The accuracy is not correct due to issues with bayes_pred_stable()
+tf.reduce_sum(tf.cast(preds == y, tf.float32)) / len(y)  # Validation accuracy
 ```
 
 Modern deep networks achieve error rates of less than $0.01$. The relatively poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
