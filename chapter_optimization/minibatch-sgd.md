@@ -50,17 +50,6 @@ timer = d2l.Timer()
 A = np.zeros((256, 256))
 B = np.random.normal(0, 1, (256, 256))
 C = np.random.normal(0, 1, (256, 256))
-#@tab pytorch
-%matplotlib inline
-from d2l import torch as d2l
-import torch
-from torch import nn
-import numpy as np
-
-timer = d2l.Timer()
-A = torch.zeros(256, 256)
-B = torch.randn(256, 256)
-C = torch.randn(256, 256)
 ```
 
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
@@ -77,13 +66,11 @@ timer.stop()
 
 ```{.python .input}
 #@tab tensorflow
-#@tab pytorch
 # Compute A = BC one element at a time
 timer.start()
 for i in range(256):
     for j in range(256):
         A[i, j] = tf.tensordot(B[i, :], C[:, j], axes=1)
-        A[i, j] = torch.dot(B[i, :], C[:, j])
 timer.stop()
 ```
 
@@ -103,11 +90,6 @@ timer.stop()
 timer.start()
 for j in range(256):
     A[:, j] = tf.tensordot(B, C[:, j], axes=1)
-#@tab pytorch
-# Compute A = BC one column at a time
-timer.start()
-for j in range(256):
-    A[:, j] = torch.mv(B, C[:, j])
 timer.stop()
 ```
 
@@ -130,10 +112,6 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
 #@tab tensorflow
 timer.start()
 A = tf.tensordot(B, C, axes=1)
-#@tab pytorch
-# Compute A = BC in one go
-timer.start()
-A = torch.mm(B, C)
 timer.stop()
 
 # Multiply and add count as separate operations (fused in practice)
@@ -173,10 +151,6 @@ A = A.numpy()
 timer.start()
 for j in range(0, 256, 64):
     A[:, j:j+64] = tf.tensordot(B, C[:, j:j+64], axes=1)
-#@tab pytorch
-timer.start()
-for j in range(0, 256, 64):
-    A[:, j:j+64] = torch.mm(B, C[:, j:j+64])
 timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
@@ -204,7 +178,6 @@ def get_data_ch11(batch_size=10, n=1500):
 
 ```{.python .input}
 #@tab tensorflow
-#@tab pytorch
 #@save
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
@@ -214,7 +187,6 @@ def get_data_ch11(batch_size=10, n=1500):
     data = np.genfromtxt(d2l.download('airfoil'),
                          dtype=np.float32, delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
-    data = torch.from_numpy((data - data.mean(axis=0)) / data.std(axis=0))
     data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 ```
@@ -238,11 +210,6 @@ def sgd(params, states, hyperparams):
 def sgd(params, grads, states, hyperparams):
     for param, grad in zip(params, grads):
         param.assign_sub(hyperparams['lr']*grad)
-#@tab pytorch
-def sgd(params, states, hyperparams):  #@save
-    for p in params:
-        p.data.sub_(hyperparams['lr'] * p.grad)
-        p.grad.data.zero_()
 ```
 
 Next, we implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can be used to train the model with minibatch SGD and other algorithms introduced subsequently.
@@ -308,32 +275,6 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
           timer.start()
   print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
   return timer.cumsum(), animator.Y[0]
-#@tab pytorch
-#@save
-def train_ch11(trainer_fn, states, hyperparams, data_iter,
-               feature_dim, num_epochs=2):
-    # Initialization
-    w = torch.normal(mean=0.0, std=0.01, size=(feature_dim, 1),
-                     requires_grad=True)
-    b = torch.zeros((1), requires_grad=True)
-    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
-    # Train
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
-    n, timer = 0, d2l.Timer()
-    for _ in range(num_epochs):
-        for X, y in data_iter:
-            l = loss(net(X), y).mean()
-            l.backward()
-            trainer_fn([w, b], states, hyperparams)
-            n += X.shape[0]
-            if n % 200 == 0:
-                timer.stop()
-                animator.add(n/X.shape[0]/len(data_iter),
-                             (d2l.evaluate_loss(net, data_iter, loss),))
-                timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
-    return timer.cumsum(), animator.Y[0]
 ```
 
 Let us see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e., to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
@@ -443,41 +384,6 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
                              (d2l.evaluate_loss(net, data_iter, loss)/2,))
         timer.start()
   print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
-#@tab pytorch
-#@save
-def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
-    # Initialization
-    net = nn.Sequential(nn.Linear(5, 1))
-    def init_weights(m):
-        if type(m) == nn.Linear:
-            torch.nn.init.normal_(m.weight, std=0.01)
-    net.apply(init_weights)
-    
-    optimizer = trainer_fn(net.parameters(), **hyperparams)
-    
-    loss = nn.MSELoss()
-    # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
-    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss 
-    # value to get L2Loss in PyTorch.
-    
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
-    n, timer = 0, d2l.Timer()
-    for _ in range(num_epochs):
-        for X, y in data_iter:
-            optimizer.zero_grad()
-            out = net(X)
-            y = y.reshape(out.shape)
-            l = loss(out, y)/2
-            l.backward()
-            optimizer.step()
-            n += X.shape[0]
-            if n % 200 == 0:
-                timer.stop()
-                animator.add(n/X.shape[0]/len(data_iter),
-                             (d2l.evaluate_loss(net, data_iter, loss)/2,))
-                timer.start()
-    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
 
 Using Gluon to repeat the last experiment shows identical behavior.
@@ -491,9 +397,6 @@ train_concise_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 #@tab tensorflow
 data_iter, _ = get_data_ch11(10)
 trainer = tf.keras.optimizers.SGD
-#@tab pytorch
-data_iter, _ = get_data_ch11(10)
-trainer = torch.optim.SGD
 train_concise_ch11(trainer, {'lr': 0.05}, data_iter)
 ```
 

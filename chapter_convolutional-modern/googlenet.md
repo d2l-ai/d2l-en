@@ -5,7 +5,7 @@ In 2014, :cite:`Szegedy.Liu.Jia.ea.2015`
 won the ImageNet Challenge, proposing a structure
 that combined the strengths of the NiN and repeated blocks paradigms.
 One focus of the paper was to address the question
-of which sized convolution kernels are best.
+of which sized convolutional kernels are best.
 After all, previous popular networks employed choices
 as small as $1 \times 1$ and as large as $11 \times 11$.
 One insight in this paper was that sometimes
@@ -187,7 +187,7 @@ b1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
 #@tab tensorflow
 def b1():
     return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(64, 7, strides=2, padding='same',
+        tf.keras.layers.Conv2D(64, 7, strides=2, padding='same', 
                                activation='relu'),
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```

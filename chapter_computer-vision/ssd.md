@@ -244,14 +244,14 @@ Now, we will explain, step by step, how to train the SSD model for object detect
 
 ### Data Reading and Initialization
 
-We read the banana detection dataset we created in the previous section.
+We read the Pikachu dataset we created in the previous section.
 
 ```{.python .input  n=14}
 batch_size = 32
-train_iter, _ = d2l.load_data_bananas(batch_size)
+train_iter, _ = d2l.load_data_pikachu(batch_size)
 ```
 
-There is 1 category in the banana detection dataset. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
+There is 1 category in the Pikachu dataset. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
 
 ```{.python .input  n=15}
 device, net = d2l.try_gpu(), TinySSD(num_classes=1)
@@ -331,7 +331,7 @@ print(f'{train_iter.num_image/timer.stop():.1f} examples/sec on '
 In the prediction stage, we want to detect all objects of interest in the image. Below, we read the test image and transform its size. Then, we convert it to the four-dimensional format required by the convolutional layer.
 
 ```{.python .input  n=20}
-img = image.imread('../img/banana.jpg')
+img = image.imread('../img/pikachu.jpg')
 feature = image.imresize(img, 256, 256).astype('float32')
 X = np.expand_dims(feature.transpose(2, 0, 1), axis=0)
 ```
@@ -363,7 +363,7 @@ def display(img, output, threshold):
         bbox = [row[2:6] * np.array((w, h, w, h), ctx=row.ctx)]
         d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
 
-display(img, output, threshold=0.9)
+display(img, output, threshold=0.3)
 ```
 
 ## Summary

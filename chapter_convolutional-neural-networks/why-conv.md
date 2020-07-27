@@ -1,5 +1,4 @@
 # From Fully-Connected Layers to Convolutions
-:label:`sec_why-conv`
 
 To this day,
 the models that we have discussed so far
@@ -183,9 +182,8 @@ $$[\mathbf{H}]_{i, j} = u + \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Del
 Note that :eqref:`eq_conv-layer`, in a nutshell, is a *convolutional layer*.
 *Convolutional neural networks* (CNNs)
 are a special family of neural networks that contain convolutional layers.
-In the deep learning research community,
-$\mathbf{V}$ is referred to as a *convolution kernel*,
-a *filter*, or simply the layer's *weights* that are often learnable parameters.
+In CNNs, $\mathbf{V}$ is called
+a *kernel* or *filter*, often as learnable parameters in convolutional layers.
 When the local region is small,
 the difference as compared with a fully-connected network can be dramatic.
 While previously, we might have required billions of parameters
@@ -206,7 +204,7 @@ e.g., if images turned out not to be translation invariant,
 our models might struggle even to fit our training data.
 
 ## Convolutions
-
+:label:`subsec_convolutions`
 
 Before going further, we should briefly review
 why the above operation is called a convolution.
@@ -236,7 +234,7 @@ Note, though, that this distinction is mostly cosmetic
 since we can always match the notation between
 :eqref:`eq_conv-layer` and :eqref:`eq_2d-conv-discrete`.
 Our original definition in :eqref:`eq_conv-layer` more properly
-describes a *cross-correlation*.
+describes a *cross correlation*.
 We will come back to this in the following section.
 
 
@@ -324,7 +322,7 @@ We turn to these issues in the remainder of the chapter.
 ## Exercises
 
 1. Assume that the size of the convolution kernel is $\Delta = 0$.
-   Show that in this case the convolution kernel
+   Show that in this case the convolutional kernel
    implements an MLP independently for each set of channels.
 1. Why might translation invariance not be a good idea after all?
 1. What problems must we deal with when deciding how

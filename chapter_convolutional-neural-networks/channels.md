@@ -6,12 +6,12 @@ that comprise each image (e.g., color images have the standard RGB channels
 to indicate the amount of red, green and blue),
 until now, we simplified all of our numerical examples
 by working with just a single input and a single output channel.
-This has allowed us to think of our inputs, convolution kernels,
-and outputs each as two-dimensional tensors.
+This has allowed us to think of our inputs, convolutional kernels,
+and outputs each as two-dimensional arrays.
 
 When we add channels into the mix,
 our inputs and hidden representations
-both become three-dimensional tensors.
+both become three-dimensional arrays.
 For example, each RGB input image has shape $3\times h\times w$.
 We refer to this axis, with a size of 3, as the channel dimension.
 In this section, we will take a deeper look
@@ -26,18 +26,18 @@ so that it can perform cross-correlation with the input data.
 Assuming that the number of channels for the input data is $c_i$,
 the number of input channels of the convolution kernel also needs to be $c_i$. If our convolution kernel's window shape is $k_h\times k_w$,
 then when $c_i=1$, we can think of our convolution kernel
-as just a two-dimensional tensor of shape $k_h\times k_w$.
+as just a two-dimensional array of shape $k_h\times k_w$.
 
 However, when $c_i>1$, we need a kernel
-that contains an tensor of shape $k_h\times k_w$ *for each input channel*. Concatenating these $c_i$ tensors together
+that contains an array of shape $k_h\times k_w$ *for each input channel*. Concatenating these $c_i$ arrays together
 yields a convolution kernel of shape $c_i\times k_h\times k_w$.
 Since the input and convolution kernel each have $c_i$ channels,
 we can perform a cross-correlation operation
-on the two-dimensional tensor of the input
-and the two-dimensional kernel tensor of the convolution kernel
+on the two-dimensional array of the input
+and the two-dimensional kernel array of the convolution kernel
 for each channel, adding the $c_i$ results together
 (summing over the channels)
-to yield a two-dimensional tensor.
+to yield a two-dimensional array.
 This is the result of a two-dimensional cross-correlation
 between multi-channel input data and
 a *multi-input channel* convolution kernel.
@@ -45,10 +45,10 @@ a *multi-input channel* convolution kernel.
 In :numref:`fig_conv_multi_in`, we demonstrate an example
 of a two-dimensional cross-correlation with two input channels.
 The shaded portions are the first output element
-as well as the input and kernel tensor elements used in its computation:
+as well as the input and kernel array elements used in its computation:
 $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$.
 
-![Cross-correlation computation with 2 input channels. The shaded portions are the first output element as well as the input and kernel tensor elements used in its computation: $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$. ](../img/conv-multi-in.svg)
+![Cross-correlation computation with 2 input channels. The shaded portions are the first output element as well as the input and kernel array elements used in its computation: $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$. ](../img/conv-multi-in.svg)
 :label:`fig_conv_multi_in`
 
 
@@ -88,7 +88,7 @@ def corr2d_multi_in(X, K):
     return tf.reduce_sum([d2l.corr2d(x, k) for x, k in zip(X, K)], axis=0)
 ```
 
-We can construct the input tensor `X` and the kernel tensor `K`
+We can construct the input array `X` and the kernel array `K`
 corresponding to the values in the above diagram
 to validate the output of the cross-correlation operation.
 
@@ -122,7 +122,7 @@ Denote by $c_i$ and $c_o$ the number
 of input and output channels, respectively,
 and let $k_h$ and $k_w$ be the height and width of the kernel.
 To get an output with multiple channels,
-we can create a kernel tensor
+we can create a kernel array
 of shape $c_i\times k_h\times k_w$
 for each output channel.
 We concatenate them on the output channel dimension,
@@ -131,7 +131,7 @@ is $c_o\times c_i\times k_h\times k_w$.
 In cross-correlation operations,
 the result on each output channel is calculated
 from the convolution kernel corresponding to that output channel
-and takes input from all channels in the input tensor.
+and takes input from all channels in the input array.
 
 We implement a cross-correlation function
 to calculate the output of multiple channels as shown below.
@@ -146,7 +146,7 @@ def corr2d_multi_in_out(X, K):
 ```
 
 We construct a convolution kernel with 3 output channels
-by concatenating the kernel tensor `K` with `K+1`
+by concatenating the kernel array `K` with `K+1`
 (plus one for each element in `K`) and `K+2`.
 
 ```{.python .input}
@@ -156,10 +156,10 @@ K.shape
 ```
 
 Below, we perform cross-correlation operations
-on the input tensor `X` with the kernel tensor `K`.
+on the input array `X` with the kernel array `K`.
 Now the output contains 3 channels.
 The result of the first channel is consistent
-with the result of the previous input tensor `X`
+with the result of the previous input array `X`
 and the multi-input channel,
 single-output channel kernel.
 
@@ -254,7 +254,7 @@ assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 
 ## Exercises
 
-1. Assume that we have two convolution kernels of size $k_1$ and $k_2$ respectively (with no nonlinearity in between).
+1. Assume that we have two convolutional kernels of size $k_1$ and $k_2$ respectively (with no nonlinearity in between).
     1. Prove that the result of the operation can be expressed by a single convolution.
     1. What is the dimensionality of the equivalent single convolution?
     1. Is the converse true?
