@@ -21,7 +21,7 @@ This reasoning seems arbitrary and frivolous. After all, the math is the same th
 ![A 4-way GPU server.](../img/bw-hierarchy.svg)
 :label:`fig_bw_hierarchy`
 
-For the sake of the argument let us assume that the gradients 'weigh' 160MB. In this case it takes 30ms to send the gradients from all 3 remaining GPUs to the fourth one (each transfer takes 10ms = 160MB / 16 GB/s). Add another 30ms to transmit the weight vectors back we arrive at a total of 60ms.
+For the sake of the argument let us assume that the gradients 'weight' 160MB. In this case it takes 30ms to send the gradients from all 3 remaining GPUs to the fourth one (each transfer takes 10ms = 160MB / 16 GB/s). Add another 30ms to transmit the weight vectors back we arrive at a total of 60ms.
 If we send all data to the CPU we incur a penalty of 40ms since *each* of the four GPUs needs to send the data to the CPU, yielding a total of 80ms. Lastly assume that we are able to split the gradients into 4 parts of 40MB each. Now we can aggregate each of the parts on a different GPU *simultaneously* since the PCIe switch offers a full-bandwidth operation between all links. Instead of 30ms this takes 7.5ms, yielding a total of 15ms for a synchronization operation. In short, depending on how we synchronize parameters the same operation can take anywhere from 15ms to 80ms. :numref:`fig_ps_distributed` depicts the different strategies for exchanging parameters.
 
 ![Synchronization strategies.](../img/ps-distributed.svg)
