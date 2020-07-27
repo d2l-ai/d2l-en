@@ -50,6 +50,22 @@ B = torch.randn(256, 256)
 C = torch.randn(256, 256)
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import numpy as np
+
+timer = d2l.Timer()
+# not using tf.xxx here because 
+#TensorFlow tensor object is not assignable 
+# and later on it crreates problems.
+A = np.zeros((256, 256))
+B = np.random.normal(0, 1, (256, 256))
+C = np.random.normal(0, 1, (256, 256))
+```
+
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
 
 ```{.python .input}
@@ -69,6 +85,16 @@ timer.start()
 for i in range(256):
     for j in range(256):
         A[i, j] = torch.dot(B[i, :], C[:, j])
+timer.stop()
+```
+
+```{.python .input}
+#@tab tensorflow
+# Compute A = BC one element at a time
+timer.start()
+for i in range(256):
+    for j in range(256):
+        A[i, j] = tf.tensordot(B[i, :], C[:, j], axes=1)
 timer.stop()
 ```
 
@@ -92,6 +118,14 @@ for j in range(256):
 timer.stop()
 ```
 
+```{.python .input}
+#@tab tensorflow
+timer.start()
+for j in range(256):
+    A[:, j] = tf.tensordot(B, C[:, j], axes=1)
+timer.stop()
+```
+
 Last, the most effective manner is to perform the entire operation in one block. Let us see what the respective speed of the operations is.
 
 ```{.python .input}
@@ -112,6 +146,18 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
 # Compute A = BC in one go
 timer.start()
 A = torch.mm(B, C)
+timer.stop()
+
+# Multiply and add count as separate operations (fused in practice)
+gigaflops = [2/i for i in timer.times]
+print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
+      f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
+```
+
+```{.python .input}
+#@tab tensorflow
+timer.start()
+A = tf.tensordot(B, C, axes=1)
 timer.stop()
 
 # Multiply and add count as separate operations (fused in practice)
