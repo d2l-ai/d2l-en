@@ -464,6 +464,10 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
 
+```{.python .input}
+
+```
+
 Using Gluon to repeat the last experiment shows identical behavior.
 
 ```{.python .input}
