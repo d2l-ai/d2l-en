@@ -134,7 +134,7 @@ d2l.plt.legend();
 d2l.set_figsize()
 betas = [0.95, 0.9, 0.6, 0]
 for beta in betas:
-    x = d2l.arange(40).numpy()
+    x = d2l.arange(40).asnumpy()
     d2l.plt.plot(x, beta ** x, label=f'beta = {beta:.2f}')
 d2l.plt.xlabel('time')
 d2l.plt.legend();
