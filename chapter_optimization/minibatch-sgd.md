@@ -58,12 +58,9 @@ import tensorflow as tf
 import numpy as np
 
 timer = d2l.Timer()
-# not using tf.xxx here because 
-#TensorFlow tensor object is not assignable 
-# and later on it crreates problems.
-A = np.zeros((256, 256))
-B = np.random.normal(0, 1, (256, 256))
-C = np.random.normal(0, 1, (256, 256))
+A = tf.Variable(d2l.zeros((256, 256)))
+B = tf.Variable(d2l.normal([256, 256], 0, 1))
+C = tf.Variable(d2l.normal([256, 256], 0, 1))
 ```
 
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
@@ -94,7 +91,7 @@ timer.stop()
 timer.start()
 for i in range(256):
     for j in range(256):
-        A[i, j] = tf.tensordot(B[i, :], C[:, j], axes=1)
+        A[i, j].assign(tf.tensordot(B[i, :], C[:, j], axes=1))
 timer.stop()
 ```
 
@@ -122,7 +119,7 @@ timer.stop()
 #@tab tensorflow
 timer.start()
 for j in range(256):
-    A[:, j] = tf.tensordot(B, C[:, j], axes=1)
+    A[:, j].assign(tf.tensordot(B, C[:, j], axes=1))
 timer.stop()
 ```
 
@@ -157,7 +154,7 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
 ```{.python .input}
 #@tab tensorflow
 timer.start()
-A = tf.tensordot(B, C, axes=1)
+A.assign(tf.tensordot(B, C, axes=1))
 timer.stop()
 
 # Multiply and add count as separate operations (fused in practice)
@@ -201,11 +198,9 @@ print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 
 ```{.python .input}
 #@tab tensorflow
-#converting tensor to numpy array
-A = A.numpy()
 timer.start()
 for j in range(0, 256, 64):
-    A[:, j:j+64] = tf.tensordot(B, C[:, j:j+64], axes=1)
+    A[:, j:j+64].assign(tf.tensordot(B, C[:, j:j+64], axes=1))
 timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
