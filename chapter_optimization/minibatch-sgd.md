@@ -37,19 +37,6 @@ C = np.random.normal(0, 1, (256, 256))
 ```
 
 ```{.python .input}
-#@tab tensorflow
-%matplotlib inline
-from d2l import tensorflow as d2l
-import tensorflow as tf
-import numpy as np
-
-timer = d2l.Timer()
-# not using tensorflow here because 
-#TensorFlow tensor object is not assignable 
-# and later on it crreates problems.
-A = np.zeros((256, 256))
-B = np.random.normal(0, 1, (256, 256))
-C = np.random.normal(0, 1, (256, 256))
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -76,13 +63,11 @@ timer.stop()
 ```
 
 ```{.python .input}
-#@tab tensorflow
 #@tab pytorch
 # Compute A = BC one element at a time
 timer.start()
 for i in range(256):
     for j in range(256):
-        A[i, j] = tf.tensordot(B[i, :], C[:, j], axes=1)
         A[i, j] = torch.dot(B[i, :], C[:, j])
 timer.stop()
 ```
@@ -99,10 +84,6 @@ timer.stop()
 ```
 
 ```{.python .input}
-#@tab tensorflow
-timer.start()
-for j in range(256):
-    A[:, j] = tf.tensordot(B, C[:, j], axes=1)
 #@tab pytorch
 # Compute A = BC one column at a time
 timer.start()
@@ -127,9 +108,6 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
 ```
 
 ```{.python .input}
-#@tab tensorflow
-timer.start()
-A = tf.tensordot(B, C, axes=1)
 #@tab pytorch
 # Compute A = BC in one go
 timer.start()
@@ -167,12 +145,6 @@ print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
 ```{.python .input}
-#@tab tensorflow
-#converting tensor to numpy array
-A = A.numpy()
-timer.start()
-for j in range(0, 256, 64):
-    A[:, j:j+64] = tf.tensordot(B, C[:, j:j+64], axes=1)
 #@tab pytorch
 timer.start()
 for j in range(0, 256, 64):
@@ -203,7 +175,6 @@ def get_data_ch11(batch_size=10, n=1500):
 ```
 
 ```{.python .input}
-#@tab tensorflow
 #@tab pytorch
 #@save
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
@@ -213,7 +184,6 @@ d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
 def get_data_ch11(batch_size=10, n=1500):
     data = np.genfromtxt(d2l.download('airfoil'),
                          dtype=np.float32, delimiter='\t')
-    data = (data - data.mean(axis=0)) / data.std(axis=0)
     data = torch.from_numpy((data - data.mean(axis=0)) / data.std(axis=0))
     data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
     return data_iter, data.shape[1]-1
@@ -234,10 +204,6 @@ def sgd(params, states, hyperparams):
 ```
 
 ```{.python .input}
-#@tab tensorflow
-def sgd(params, grads, states, hyperparams):
-    for param, grad in zip(params, grads):
-        param.assign_sub(hyperparams['lr']*grad)
 #@tab pytorch
 def sgd(params, states, hyperparams):  #@save
     for p in params:
@@ -278,36 +244,6 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
 ```
 
 ```{.python .input}
-#@tab tensorflow
-#@save
-def train_ch11(trainer_fn, states, hyperparams, data_iter,
-               feature_dim, num_epochs=2):
-  # Initialization
-  w = tf.Variable(tf.random.normal(shape=(feature_dim, 1), mean=0, stddev=0.01),
-                trainable=True)
-  b = tf.Variable(tf.zeros(1), trainable=True)
-  
-  # Train
-  net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
-  animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
-  n, timer = 0, d2l.Timer()
-
-  for _ in range(num_epochs):
-    for X, y in data_iter:
-      with tf.GradientTape() as g:
-        l = tf.math.reduce_mean(loss(net(X), y))
-      
-      dw, db = g.gradient(l, [w, b])
-      trainer_fn([w, b], [dw, db], states, hyperparams)
-      n += X.shape[0]
-      if n % 200 == 0:
-          timer.stop()
-          animator.add(n/X.shape[0]/tf.data.experimental.cardinality(data_iter).numpy(),
-                    (d2l.evaluate_loss(net, data_iter, loss),))
-          timer.start()
-  print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
-  return timer.cumsum(), animator.Y[0]
 #@tab pytorch
 #@save
 def train_ch11(trainer_fn, states, hyperparams, data_iter,
@@ -412,37 +348,6 @@ def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
 ```
 
 ```{.python .input}
-#@tab tensorflow
-#@save
-def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
-  # Initialization
-  net = tf.keras.Sequential()
-  net.add(tf.keras.layers.Dense(1, 
-          kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
-  optimizer = trainer_fn(hyperparams['lr'])
-  loss = tf.keras.losses.MeanSquaredError()
-  # Note: L2 Loss = 1/2 * MSE Loss. TF has MSE Loss which is slightly
-  # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
-  # value to get L2Loss in TF.
-  
-  animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
-  n, timer = 0, d2l.Timer()
-  for _ in range(num_epochs):
-    for X, y in data_iter:
-      with tf.GradientTape() as g:
-        out = net(X)
-        l = loss(y, out)/2
-        params = net.trainable_variables
-        grads = g.gradient(l, params)
-      optimizer.apply_gradients(zip(grads, params))
-      n += X.shape[0]
-      if n % 200 == 0:
-        timer.stop()
-        animator.add(n/X.shape[0]/tf.data.experimental.cardinality(data_iter).numpy(),
-                             (d2l.evaluate_loss(net, data_iter, loss)/2,))
-        timer.start()
-  print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 #@tab pytorch
 #@save
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
@@ -488,9 +393,6 @@ train_concise_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 ```
 
 ```{.python .input}
-#@tab tensorflow
-data_iter, _ = get_data_ch11(10)
-trainer = tf.keras.optimizers.SGD
 #@tab pytorch
 data_iter, _ = get_data_ch11(10)
 trainer = torch.optim.SGD
