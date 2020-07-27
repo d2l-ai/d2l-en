@@ -199,6 +199,17 @@ timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
+```{.python .input}
+#@tab tensorflow
+#converting tensor to numpy array
+A = A.numpy()
+timer.start()
+for j in range(0, 256, 64):
+    A[:, j:j+64] = tf.tensordot(B, C[:, j:j+64], axes=1)
+timer.stop()
+print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
+```
+
 As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :numref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms.
 
 ## Reading the Dataset
@@ -235,6 +246,21 @@ def get_data_ch11(batch_size=10, n=1500):
     return data_iter, data.shape[1]-1
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
+                           '76e5be1548fd8222e5074cf0faae75edff8cf93f')
+
+#@save
+def get_data_ch11(batch_size=10, n=1500):
+    data = np.genfromtxt(d2l.download('airfoil'),
+                         dtype=np.float32, delimiter='\t')
+    data = (data - data.mean(axis=0)) / data.std(axis=0)
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    return data_iter, data.shape[1]-1
+```
+
 ## Implementation from Scratch
 
 Recall the minibatch SGD implementation from :numref:`sec_linear_scratch`. In the following we provide a slightly more general implementation. For convenience it has the same call signature as the other optimization algorithms introduced later in this chapter. Specifically, we add the status
@@ -255,6 +281,13 @@ def sgd(params, states, hyperparams):  #@save
     for p in params:
         p.data.sub_(hyperparams['lr'] * p.grad)
         p.grad.data.zero_()
+```
+
+```{.python .input}
+#@tab tensorflow
+def sgd(params, grads, states, hyperparams):
+    for param, grad in zip(params, grads):
+        param.assign_sub(hyperparams['lr']*grad)
 ```
 
 Next, we implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can be used to train the model with minibatch SGD and other algorithms introduced subsequently.
