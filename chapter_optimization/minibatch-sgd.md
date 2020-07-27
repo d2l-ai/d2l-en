@@ -36,7 +36,6 @@ B = np.random.normal(0, 1, (256, 256))
 C = np.random.normal(0, 1, (256, 256))
 ```
 
-<<<<<<< HEAD
 ```{.python .input}
 #@tab tensorflow
 %matplotlib inline
@@ -64,8 +63,6 @@ B = torch.randn(256, 256)
 C = torch.randn(256, 256)
 ```
 
-=======
->>>>>>> parent of b8eea349... Update minibatch-sgd.md
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
 
 ```{.python .input}
@@ -78,7 +75,6 @@ A.wait_to_read()
 timer.stop()
 ```
 
-<<<<<<< HEAD
 ```{.python .input}
 #@tab tensorflow
 #@tab pytorch
@@ -91,8 +87,6 @@ for i in range(256):
 timer.stop()
 ```
 
-=======
->>>>>>> parent of b8eea349... Update minibatch-sgd.md
 A faster strategy is to perform column-wise assignment.
 
 ```{.python .input}
@@ -104,7 +98,6 @@ A.wait_to_read()
 timer.stop()
 ```
 
-<<<<<<< HEAD
 ```{.python .input}
 #@tab tensorflow
 timer.start()
@@ -121,11 +114,6 @@ timer.stop()
 Last, the most effective manner is to perform the entire operation in one block. Let us see what the respective speed of the operations is.
 
 ```{.python .input}
-=======
-Last, the most effective manner is to perform the entire operation in one block. Let us see what the respective speed of the operations is.
-
-```{.python .input  n=4}
->>>>>>> parent of b8eea349... Update minibatch-sgd.md
 # Compute A = BC in one go
 timer.start()
 A = np.dot(B, C)
@@ -138,7 +126,6 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
 
-<<<<<<< HEAD
 ```{.python .input}
 #@tab tensorflow
 timer.start()
@@ -155,8 +142,6 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
       f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
 ```
 
-=======
->>>>>>> parent of b8eea349... Update minibatch-sgd.md
 ## Minibatches
 
 :label:`sec_minibatches`
@@ -181,7 +166,6 @@ timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
-<<<<<<< HEAD
 ```{.python .input}
 #@tab tensorflow
 #converting tensor to numpy array
@@ -197,8 +181,6 @@ timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
-=======
->>>>>>> parent of b8eea349... Update minibatch-sgd.md
 As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :numref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms.
 
 ## Reading the Dataset
@@ -220,7 +202,6 @@ def get_data_ch11(batch_size=10, n=1500):
     return data_iter, data.shape[1]-1
 ```
 
-<<<<<<< HEAD
 ```{.python .input}
 #@tab tensorflow
 #@tab pytorch
@@ -238,8 +219,6 @@ def get_data_ch11(batch_size=10, n=1500):
     return data_iter, data.shape[1]-1
 ```
 
-=======
->>>>>>> parent of b8eea349... Update minibatch-sgd.md
 ## Implementation from Scratch
 
 Recall the minibatch SGD implementation from :numref:`sec_linear_scratch`. In the following we provide a slightly more general implementation. For convenience it has the same call signature as the other optimization algorithms introduced later in this chapter. Specifically, we add the status
