@@ -29,7 +29,7 @@ The shape of the *kernel window* (or *convolution window*)
 is given by the height and width of the kernel
 (here it is $2 \times 2$).
 
-![Two-dimensional cross-correlation operation. The shaded portions are the first output element and the input and kernel tensor elements used in its computation: $0\times0+1\times1+3\times2+4\times3=19$.](../img/correlation.svg)
+![Two-dimensional cross-correlation operation. The shaded portions are the first output element, together with the input and kernel tensor elements used for the output computation: $0\times0+1\times1+3\times2+4\times3=19$.](../img/correlation.svg)
 :label:`fig_correlation`
 
 In the two-dimensional cross-correlation operation,
@@ -402,7 +402,7 @@ we use the term *element* to refer to
 an entry (or component) of any tensor representing a layer representation or a convolution kernel.
 
 
-## Feature Maps and Receptive Fields
+## Feature Map and Receptive Field
 
 As described in :numref:`subsec_why-conv-channels`,
 the convolutional layer output in
