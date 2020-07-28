@@ -42,6 +42,14 @@ import torch
 ```
 
 ```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import numpy as np
+import tensorflow as tf
+```
+
+```{.python .input}
 #@tab all
 f = lambda x: x**2  # Objective function
 gradf = lambda x: 2 * x  # Its derivative

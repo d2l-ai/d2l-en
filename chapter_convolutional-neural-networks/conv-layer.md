@@ -29,7 +29,7 @@ The shape of the *kernel window* (or *convolution window*)
 is given by the height and width of the kernel
 (here it is $2 \times 2$).
 
-![Two-dimensional cross-correlation operation. The shaded portions are the first output element and the input and kernel tensor elements used in its computation: $0\times0+1\times1+3\times2+4\times3=19$.](../img/correlation.svg)
+![Two-dimensional cross-correlation operation. The shaded portions are the first output element, together with the input and kernel tensor elements used for the output computation: $0\times0+1\times1+3\times2+4\times3=19$.](../img/correlation.svg)
 :label:`fig_correlation`
 
 In the two-dimensional cross-correlation operation,
@@ -397,26 +397,77 @@ will be obtained.
 In keeping with standard terminology with deep learning literature,
 we will continue to refer to the cross-correlation operation
 as a convolution even though, strictly-speaking, it is slightly different.
+Besides,
+we use the term *element* to refer to
+an entry (or component) of any tensor representing a layer representation or a convolution kernel.
+
+
+## Feature Map and Receptive Field
+
+As described in :numref:`subsec_why-conv-channels`,
+the convolutional layer output in
+:numref:`fig_correlation`
+is sometimes called a *feature map*,
+as it can be regarded as
+the learned representations (features)
+in the spatial dimensions (e.g., width and height)
+to the subsequent layer.
+In CNNs,
+for any element $x$ of some layer,
+its *receptive field* refers to
+all the elements (from all the previous layers)
+that may affect the calculation of $x$
+during the forward propagation.
+Note that the receptive field
+may be larger than the actual size of the input.
+
+Let us continue to use :numref:`fig_correlation` to explain the receptive field.
+Given the $2 \times 2$ convolution kernel,
+the receptive field of the shaded output element (of value $19$)
+is
+the four elements in the shaded portion of the input.
+Now let us denote the $2 \times 2$
+output as $\mathbf{Y}$
+and consider a deeper CNN
+with an additional $2 \times 2$ convolutional layer that takes $\mathbf{Y}$
+as its input, outputting
+a single element $z$.
+In this case,
+the receptive field of $z$
+on $\mathbf{Y}$ includes all the four elements of $\mathbf{Y}$,
+while
+the receptive field
+on the input includes all the nine input elements.
+Thus, 
+when any element in a feature map
+needs a larger receptive field
+to detect input features over a broader area,
+we can build a deeper network.
+
+
+
 
 ## Summary
 
 * The core computation of a two-dimensional convolutional layer is a two-dimensional cross-correlation operation. In its simplest form, this performs a cross-correlation operation on the two-dimensional input data and the kernel, and then adds a bias.
 * We can design a kernel to detect edges in images.
 * We can learn the kernel's parameters from data.
+* With kernels learned from data, the outputs of convolutional layers remain unaffected regardless of such layers' performed operations (either strict convolution or cross-correlation).
+* When any element in a feature map needs a larger receptive field to detect broader features on the input, a deeper network can be considered.
+
 
 ## Exercises
 
 1. Construct an image `X` with diagonal edges.
-    * What happens if you apply the kernel `K` to it?
-    * What happens if you transpose `X`?
-    * What happens if you transpose `K`?
+    1. What happens if you apply the kernel `K` in this section to it?
+    1. What happens if you transpose `X`?
+    1. What happens if you transpose `K`?
 1. When you try to automatically find the gradient for the `Conv2D` class we created, what kind of error message do you see?
 1. How do you represent a cross-correlation operation as a matrix multiplication by changing the input and kernel tensors?
 1. Design some kernels manually.
-    * What is the form of a kernel for the second derivative?
-    * What is the kernel for the Laplace operator?
-    * What is the kernel for an integral?
-    * What is the minimum size of a kernel to obtain a derivative of degree $d$?
+    1. What is the form of a kernel for the second derivative?
+    1. What is the kernel for an integral?
+    1. What is the minimum size of a kernel to obtain a derivative of degree $d$?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/65)

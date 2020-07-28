@@ -41,7 +41,7 @@ $$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$
 
 As before $f$ has its minimum at $(0, 0)$. This function is *very* flat in the direction of $x_1$. Let us see what happens when we perform gradient descent as before on this new function. We pick a learning rate of $0.4$.
 
-```{.python .input  n=3}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -58,7 +58,7 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 
 By construction, the gradient in the $x_2$ direction is *much* higher and changes much more rapidly than in the horizontal $x_1$ direction. Thus we are stuck between two undesirable choices: if we pick a small learning rate we ensure that the solution does not diverge in the $x_2$ direction but we are saddled with slow convergence in the $x_1$ direction. Conversely, with a large learning rate we progress rapidly in the $x_1$ direction but diverge in $x_2$. The example below illustrates what happens even after a slight increase in learning rate from $0.4$ to $0.6$. Convergence in the $x_1$ direction improves but the overall solution quality is much worse.
 
-```{.python .input  n=4}
+```{.python .input}
 eta = 0.6
 d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
@@ -78,7 +78,7 @@ $$
 
 Note that for $\beta = 0$ we recover regular gradient descent. Before delving deeper into the mathematical properties let us have a quick look at how the algorithm behaves in practice.
 
-```{.python .input  n=5}
+```{.python .input}
 def momentum_2d(x1, x2, v1, v2):
     v1 = beta * v1 + 0.2 * x1
     v2 = beta * v2 + 4 * x2
@@ -90,7 +90,7 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 
 As we can see, even with the same learning rate that we used before, momentum still converges well. Let us see what happens when we decrease the momentum parameter. Halving it to $\beta = 0.25$ leads to a trajectory that barely converges at all. Nonetheless, it is a lot better than without momentum (when the solution diverges).
 
-```{.python .input  n=11}
+```{.python .input}
 eta, beta = 0.6, 0.25
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
@@ -119,7 +119,7 @@ Let us see how momentum works in practice, i.e., when used within the context of
 
 Compared with (minibatch) SGD the momentum method needs to maintain a set of  auxiliary variables, i.e., velocity. It has the same shape as the gradients (and variables of the optimization problem). In the implementation below we call these variables `states`.
 
-```{.python .input  n=13}
+```{.python .input}
 def init_momentum_states(feature_dim):
     v_w = np.zeros((feature_dim, 1))
     v_b = np.zeros(1)
@@ -133,7 +133,7 @@ def sgd_momentum(params, states, hyperparams):
 
 Let us see how this works in practice.
 
-```{.python .input  n=15}
+```{.python .input}
 def train_momentum(lr, momentum, num_epochs=2):
     d2l.train_ch11(sgd_momentum, init_momentum_states(feature_dim),
                    {'lr': lr, 'momentum': momentum}, data_iter,
@@ -145,7 +145,7 @@ train_momentum(0.02, 0.5)
 
 When we increase the momentum hyperparameter `momentum` to 0.9, it amounts to a significantly larger effective sample size of $\frac{1}{1 - 0.9} = 10$. We reduce the learning rate slightly to $0.01$ to keep matters under control.
 
-```{.python .input  n=8}
+```{.python .input}
 train_momentum(0.01, 0.9)
 ```
 
@@ -159,7 +159,7 @@ train_momentum(0.005, 0.9)
 
 There is very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
 
-```{.python .input  n=9}
+```{.python .input}
 d2l.train_concise_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
                        data_iter)
 ```
