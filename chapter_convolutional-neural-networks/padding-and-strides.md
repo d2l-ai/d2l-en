@@ -51,8 +51,9 @@ Typically, we set the values of the extra pixels to zero.
 In :numref:`img_conv_pad`, we pad a $3 \times 3$ input,
 increasing its size to $5 \times 5$.
 The corresponding output then increases to a $4 \times 4$ matrix.
+The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times0+0\times1+0\times2+0\times3=0$.
 
-![Two-dimensional cross-correlation with padding. The shaded portions are the first output element, together with the input and kernel tensor elements used for the output computation: $0\times0+0\times1+0\times2+0\times3=0$.](../img/conv-pad.svg)
+![Two-dimensional cross-correlation with padding.](../img/conv-pad.svg)
 :label:`img_conv_pad`
 
 In general, if we add a total of $p_h$ rows of padding
@@ -222,6 +223,7 @@ So far, we have used strides of 1, both for height and width.
 Sometimes, we may want to use a larger stride.
 :numref:`img_conv_stride` shows a two-dimensional cross-correlation operation
 with a stride of 3 vertically and 2 horizontally.
+The shaded portions are the output elements as well as the input and kernel tensor elements used for the output computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$.
 We can see that when the second element of the first column is outputted,
 the convolution window slides down three rows.
 The convolution window slides two columns to the right
@@ -230,7 +232,7 @@ When the convolution window continues to slide two columns to the right on the i
 there is no output because the input element cannot fill the window
 (unless we add another column of padding).
 
-![Cross-correlation with strides of 3 and 2 for height and width respectively. The shaded portions are the output elements, together with the input and kernel tensor elements used for the output computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$.](../img/conv-stride.svg)
+![Cross-correlation with strides of 3 and 2 for height and width, respectively.](../img/conv-stride.svg)
 :label:`img_conv_stride`
 
 In general, when the stride for the height is $s_h$

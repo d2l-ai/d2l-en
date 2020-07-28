@@ -29,7 +29,7 @@ The shape of the *kernel window* (or *convolution window*)
 is given by the height and width of the kernel
 (here it is $2 \times 2$).
 
-![Two-dimensional cross-correlation operation. The shaded portions are the first output element, together with the input and kernel tensor elements used for the output computation: $0\times0+1\times1+3\times2+4\times3=19$.](../img/correlation.svg)
+![Two-dimensional cross-correlation operation. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times0+1\times1+3\times2+4\times3=19$.](../img/correlation.svg)
 :label:`fig_correlation`
 
 In the two-dimensional cross-correlation operation,
