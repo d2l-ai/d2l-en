@@ -255,7 +255,9 @@ we should find a peak in the hidden layer representations.
 :width:`400px`
 :label:`fig_waldo_mask`
 
+
 ### Channels
+:label:`subsec_why-conv-channels`
 
 There is just one problem with this approach.
 So far, we blissfully ignored that images consist
