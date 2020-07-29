@@ -430,9 +430,11 @@ def corr2d(X, K):  #@save
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
+    """Compute the accuracy for a model on a dataset using a GPU."""
     if not device:  # Query the first device where the first parameter is on
         device = list(net.collect_params().values())[0].list_ctx()[0]
-    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
+    # No. of correct predictions, no. of predictions
+    metric = d2l.Accumulator(2)
     for X, y in data_iter:
         X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         metric.add(d2l.accuracy(net(X), y), d2l.size(y))
@@ -442,6 +444,7 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch6(net, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
+    """Train a model with a GPU (defined in Chapter 6)."""
     net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
@@ -450,10 +453,11 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
                             legend=['train loss', 'train acc', 'test acc'])
     timer = d2l.Timer()
     for epoch in range(num_epochs):
-        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
+        # Sum of training loss, sum of training accuracy, no. of examples
+        metric = d2l.Accumulator(3)
         for i, (X, y) in enumerate(train_iter):
             timer.start()
-            # Here is the only difference compared with `d2l.train_epoch_ch3`
+            # Here is the major difference compared with `d2l.train_epoch_ch3`
             X, y = X.as_in_ctx(device), y.as_in_ctx(device)
             with autograd.record():
                 y_hat = net(X)
@@ -462,12 +466,13 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
             trainer.step(X.shape[0])
             metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
             timer.stop()
-            train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
-            if (i+1) % 50 == 0:
-                animator.add(epoch + i/len(train_iter),
+            train_loss = metric[0] / metric[2]
+            train_acc = metric[1] / metric[2]
+            if (i + 1) % 50 == 0:
+                animator.add(epoch + i / len(train_iter),
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch+1, (None, None, test_acc))
+        animator.add(epoch + 1, (None, None, test_acc))
     print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
           f'test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
@@ -1412,14 +1417,14 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
-d2l.DATA_HUB['pikachu'] = (d2l.DATA_URL + 'pikachu.zip',
-                           '68ab1bd42143c5966785eb0d7b2839df8d570190')
+d2l.DATA_HUB['bananas'] = (d2l.DATA_URL + 'bananas.zip',
+                           'aadfd1c4c5d7178616799dd1801c9a234ccdaf19')
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
-def load_data_pikachu(batch_size, edge_size=256):
-    """Load the pikachu dataset."""
-    data_dir = d2l.download_extract('pikachu')
+def load_data_bananas(batch_size, edge_size=256):
+    """Load the bananas dataset."""
+    data_dir = d2l.download_extract('bananas')
     train_iter = image.ImageDetIter(
         path_imgrec=os.path.join(data_dir, 'train.rec'),
         path_imgidx=os.path.join(data_dir, 'train.idx'),
@@ -1603,7 +1608,7 @@ def reorg_test(data_dir):
 
 # Defined in file: ./chapter_computer-vision/kaggle-dog.md
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
-                            '75d1ec6b9b2616d2760f211f72a83f73f3b83763')
+                            '0cb91d09b814ecdc07b50f31f8dcad3e81d6a86d')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
@@ -2557,27 +2562,6 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
 # Defined in file: ./chapter_generative-adversarial-networks/dcgan.md
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
-
-
-d2l.DATA_HUB['bananas'] = (d2l.DATA_URL + 'bananas.zip',
-                           'aadfd1c4c5d7178616799dd1801c9a234ccdaf19')
-
-
-def load_data_bananas(batch_size, edge_size=256):
-    """Load the bananas dataset."""
-    data_dir = d2l.download_extract('bananas')
-    train_iter = image.ImageDetIter(
-        path_imgrec=os.path.join(data_dir, 'train.rec'),
-        path_imgidx=os.path.join(data_dir, 'train.idx'),
-        batch_size=batch_size,
-        data_shape=(3, edge_size, edge_size),  # The shape of the output image
-        shuffle=True,  # Read the dataset in random order
-        rand_crop=1,  # The probability of random cropping is 1
-        min_object_covered=0.95, max_attempts=200)
-    val_iter = image.ImageDetIter(
-        path_imgrec=os.path.join(data_dir, 'val.rec'), batch_size=batch_size,
-        data_shape=(3, edge_size, edge_size), shuffle=False)
-    return train_iter, val_iter
 
 
 # Alias defined in config.ini

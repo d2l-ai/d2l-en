@@ -249,6 +249,7 @@ for moderate problem sizes.
 
 
 ### Xavier Initialization
+:label:`subsec_xavier`
 
 Let us look at the scale distribution of
 an output (e.g., a hidden variable) $o_{i}$ for some fully-connected layer

@@ -64,13 +64,24 @@ $$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$
 
 We are going to implement Adagrad using the same learning rate previously, i.e., $\eta = 0.4$. As we can see, the iterative trajectory of the independent variable is smoother. However, due to the cumulative effect of $\boldsymbol{s}_t$, the learning rate continuously decays, so the independent variable does not move as much during later stages of iteration.
 
-```{.python .input  n=6}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
 from mxnet import np, npx
 npx.set_np()
+```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import math
+import torch
+```
+
+```{.python .input}
+#@tab all
 def adagrad_2d(x1, x2, s1, s2):
     eps = 1e-6
     g1, g2 = 0.2 * x1, 4 * x2
@@ -89,7 +100,8 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 
 As we increase the learning rate to $2$ we see much better behavior. This already indicates that the decrease in learning rate might be rather aggressive, even in the noise-free case and we need to ensure that parameters converge appropriately.
 
-```{.python .input  n=10}
+```{.python .input}
+#@tab all
 eta = 2
 d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 ```
@@ -98,10 +110,10 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 
 Just like the momentum method, Adagrad needs to maintain a state variable of the same shape as the parameters.
 
-```{.python .input  n=8}
+```{.python .input}
 def init_adagrad_states(feature_dim):
-    s_w = np.zeros((feature_dim, 1))
-    s_b = np.zeros(1)
+    s_w = d2l.zeros((feature_dim, 1))
+    s_b = d2l.zeros(1)
     return (s_w, s_b)
 
 def adagrad(params, states, hyperparams):
@@ -111,10 +123,27 @@ def adagrad(params, states, hyperparams):
         p[:] -= hyperparams['lr'] * p.grad / np.sqrt(s + eps)
 ```
 
+```{.python .input}
+#@tab pytorch
+def init_adagrad_states(feature_dim):
+    s_w = d2l.zeros((feature_dim, 1))
+    s_b = d2l.zeros(1)
+    return (s_w, s_b)
+
+def adagrad(params, states, hyperparams):
+    eps = 1e-6
+    for p, s in zip(params, states):
+        with torch.no_grad():
+            s[:] += torch.square(p.grad)
+            p[:] -= hyperparams['lr'] * p.grad / torch.sqrt(s + eps)
+        p.grad.data.zero_()
+```
+
 Compared to the experiment in :numref:`sec_minibatch_sgd` we use a
 larger learning rate to train the model.
 
-```{.python .input  n=9}
+```{.python .input}
+#@tab all
 data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 d2l.train_ch11(adagrad, init_adagrad_states(feature_dim),
                {'lr': 0.1}, data_iter, feature_dim);
@@ -124,8 +153,14 @@ d2l.train_ch11(adagrad, init_adagrad_states(feature_dim),
 
 Using the `Trainer` instance of the algorithm `adagrad`, we can invoke the Adagrad algorithm in Gluon.
 
-```{.python .input  n=5}
+```{.python .input}
 d2l.train_concise_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
+```
+
+```{.python .input}
+#@tab pytorch
+trainer = torch.optim.Adagrad
+d2l.train_concise_ch11(trainer, {'lr': 0.1}, data_iter)
 ```
 
 ## Summary
@@ -145,7 +180,6 @@ d2l.train_concise_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 1. What does Gerschgorin's theorem tell us about the eigenvalues of the diagonally preconditioned matrix $\mathrm{diag}^{-\frac{1}{2}}(\mathbf{M}) \mathbf{M} \mathrm{diag}^{-\frac{1}{2}}(\mathbf{M})$?
 1. Try out Adagrad for a proper deep network, such as :numref:`sec_lenet` when applied to Fashion MNIST.
 1. How would you need to modify Adagrad to achieve a less aggressive decay in learning rate?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/355)
