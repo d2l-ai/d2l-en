@@ -423,12 +423,10 @@ torch.mean(predictions.type(y_test.dtype) == y_test, dtype=torch.float64)
 #@tab tensorflow
 # Print test set accuracy with eyeballed threshold
 w = tf.transpose(ave_1 - ave_0)
-predictions = tf.matmul(tf.reshape(
-  X_test, y_test.shape), tf.nest.flatten(w)) > -1500000
+predictions = tf.reduce_sum(X_test * tf.nest.flatten(w), axis=0) > -1500000
 
 # Accuracy
-# TODO: Fix incorrect shape
-# tf.reduce_mean(predictions == y_test)
+tf.reduce_mean(tf.cast(tf.cast(predictions, y_test.dtype) == y_test, tf.float32))
 ```
 
 ## Geometry of Linear Transformations
