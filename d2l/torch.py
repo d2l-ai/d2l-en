@@ -1098,13 +1098,6 @@ def get_data_ch11(batch_size=10, n=1500):
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def sgd(params, states, hyperparams):  #@save
-    for p in params:
-        p.data.sub_(hyperparams['lr'] * p.grad)
-        p.grad.data.zero_()
-
-
-# Defined in file: ./chapter_optimization/minibatch-sgd.md
 def train_ch11(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
     # Initialization

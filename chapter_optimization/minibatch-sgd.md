@@ -205,7 +205,7 @@ def sgd(params, states, hyperparams):
 
 ```{.python .input}
 #@tab pytorch
-def sgd(params, states, hyperparams):  #@save
+def sgd(params, states, hyperparams):
     for p in params:
         p.data.sub_(hyperparams['lr'] * p.grad)
         p.grad.data.zero_()
