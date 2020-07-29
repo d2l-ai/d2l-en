@@ -451,10 +451,12 @@ def corr2d(X, K):  #@save
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
+    """Compute the accuracy for a model on a dataset using a GPU."""
     net.eval()  # Set the model to evaluation mode
     if not device:
         device = next(iter(net.parameters())).device
-    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
+    # No. of correct predictions, no. of predictions
+    metric = d2l.Accumulator(2)
     for X, y in data_iter:
         X, y = X.to(device), y.to(device)
         metric.add(d2l.accuracy(net(X), y), d2l.size(y))
@@ -464,7 +466,7 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch6(net, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
-    """Train and evaluate a model with CPU or GPU."""
+    """Train a model with a GPU (defined in Chapter 6)."""
     def init_weights(m):
         if type(m) == nn.Linear or type(m) == nn.Conv2d:
             torch.nn.init.xavier_uniform_(m.weight)
@@ -477,7 +479,8 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
                             legend=['train loss', 'train acc', 'test acc'])
     timer = d2l.Timer()
     for epoch in range(num_epochs):
-        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
+        # Sum of training loss, sum of training accuracy, no. of examples
+        metric = d2l.Accumulator(3)
         for i, (X, y) in enumerate(train_iter):
             timer.start()
             net.train()
@@ -488,11 +491,12 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
             l.backward()
             optimizer.step()
             with torch.no_grad():
-                metric.add(l*X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
+                metric.add(l * X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
             timer.stop()
-            train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
-            if (i+1) % 50 == 0:
-                animator.add(epoch + i/len(train_iter),
+            train_loss = metric[0]/metric[2]
+            train_acc = metric[1]/metric[2]
+            if (i + 1) % 50 == 0:
+                animator.add(epoch + i / len(train_iter),
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))

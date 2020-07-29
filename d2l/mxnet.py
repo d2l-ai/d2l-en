@@ -430,9 +430,11 @@ def corr2d(X, K):  #@save
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
+    """Compute the accuracy for a model on a dataset using a GPU."""
     if not device:  # Query the first device where the first parameter is on
         device = list(net.collect_params().values())[0].list_ctx()[0]
-    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
+    # No. of correct predictions, no. of predictions
+    metric = d2l.Accumulator(2)
     for X, y in data_iter:
         X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         metric.add(d2l.accuracy(net(X), y), d2l.size(y))
@@ -442,6 +444,7 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch6(net, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
+    """Train a model with a GPU (defined in Chapter 6)."""
     net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
@@ -450,10 +453,11 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
                             legend=['train loss', 'train acc', 'test acc'])
     timer = d2l.Timer()
     for epoch in range(num_epochs):
-        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
+        # Sum of training loss, sum of training accuracy, no. of examples
+        metric = d2l.Accumulator(3)
         for i, (X, y) in enumerate(train_iter):
             timer.start()
-            # Here is the only difference compared with `d2l.train_epoch_ch3`
+            # Here is the major difference compared with `d2l.train_epoch_ch3`
             X, y = X.as_in_ctx(device), y.as_in_ctx(device)
             with autograd.record():
                 y_hat = net(X)
@@ -462,12 +466,13 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
             trainer.step(X.shape[0])
             metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
             timer.stop()
-            train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
-            if (i+1) % 50 == 0:
-                animator.add(epoch + i/len(train_iter),
+            train_loss = metric[0] / metric[2]
+            train_acc = metric[1] / metric[2]
+            if (i + 1) % 50 == 0:
+                animator.add(epoch + i / len(train_iter),
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch+1, (None, None, test_acc))
+        animator.add(epoch + 1, (None, None, test_acc))
     print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
           f'test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
