@@ -50,6 +50,19 @@ B = torch.randn(256, 256)
 C = torch.randn(256, 256)
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import numpy as np
+
+timer = d2l.Timer()
+A = tf.Variable(d2l.zeros((256, 256)))
+B = tf.Variable(d2l.normal([256, 256], 0, 1))
+C = tf.Variable(d2l.normal([256, 256], 0, 1))
+```
+
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
 
 ```{.python .input}
@@ -69,6 +82,16 @@ timer.start()
 for i in range(256):
     for j in range(256):
         A[i, j] = torch.dot(B[i, :], C[:, j])
+timer.stop()
+```
+
+```{.python .input}
+#@tab tensorflow
+# Compute A = BC one element at a time
+timer.start()
+for i in range(256):
+    for j in range(256):
+        A[i, j].assign(tf.tensordot(B[i, :], C[:, j], axes=1))
 timer.stop()
 ```
 
@@ -92,6 +115,14 @@ for j in range(256):
 timer.stop()
 ```
 
+```{.python .input}
+#@tab tensorflow
+timer.start()
+for j in range(256):
+    A[:, j].assign(tf.tensordot(B, C[:, j], axes=1))
+timer.stop()
+```
+
 Last, the most effective manner is to perform the entire operation in one block. Let us see what the respective speed of the operations is.
 
 ```{.python .input}
@@ -112,6 +143,18 @@ print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
 # Compute A = BC in one go
 timer.start()
 A = torch.mm(B, C)
+timer.stop()
+
+# Multiply and add count as separate operations (fused in practice)
+gigaflops = [2/i for i in timer.times]
+print(f'performance in Gigaflops: element {gigaflops[0]:.3f}, '
+      f'column {gigaflops[1]:.3f}, full {gigaflops[2]:.3f}')
+```
+
+```{.python .input}
+#@tab tensorflow
+timer.start()
+A.assign(tf.tensordot(B, C, axes=1))
 timer.stop()
 
 # Multiply and add count as separate operations (fused in practice)
@@ -153,6 +196,15 @@ timer.stop()
 print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
 ```
 
+```{.python .input}
+#@tab tensorflow
+timer.start()
+for j in range(0, 256, 64):
+    A[:, j:j+64].assign(tf.tensordot(B, C[:, j:j+64], axes=1))
+timer.stop()
+print(f'performance in Gigaflops: block {2 / timer.times[3]:.3f}')
+```
+
 As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :numref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms.
 
 ## Reading the Dataset
@@ -185,7 +237,24 @@ def get_data_ch11(batch_size=10, n=1500):
     data = np.genfromtxt(d2l.download('airfoil'),
                          dtype=np.float32, delimiter='\t')
     data = torch.from_numpy((data - data.mean(axis=0)) / data.std(axis=0))
-    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
+                               batch_size, is_train=True)
+    return data_iter, data.shape[1]-1
+```
+
+```{.python .input}
+#@tab tensorflow
+#@save
+d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
+                           '76e5be1548fd8222e5074cf0faae75edff8cf93f')
+
+#@save
+def get_data_ch11(batch_size=10, n=1500):
+    data = np.genfromtxt(d2l.download('airfoil'),
+                         dtype=np.float32, delimiter='\t')
+    data = (data - data.mean(axis=0)) / data.std(axis=0)
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
+                               batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 ```
 
@@ -209,6 +278,13 @@ def sgd(params, states, hyperparams):
     for p in params:
         p.data.sub_(hyperparams['lr'] * p.grad)
         p.grad.data.zero_()
+```
+
+```{.python .input}
+#@tab tensorflow
+def sgd(params, grads, states, hyperparams):
+    for param, grad in zip(params, grads):
+        param.assign_sub(hyperparams['lr']*grad)
 ```
 
 Next, we implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can be used to train the model with minibatch SGD and other algorithms introduced subsequently.
@@ -268,6 +344,41 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    return timer.cumsum(), animator.Y[0]
+```
+
+```{.python .input}
+#@tab tensorflow
+#@save
+def train_ch11(trainer_fn, states, hyperparams, data_iter,
+               feature_dim, num_epochs=2):
+    # Initialization
+    w = tf.Variable(tf.random.normal(shape=(feature_dim, 1),
+                                   mean=0, stddev=0.01),trainable=True)
+    b = tf.Variable(tf.zeros(1), trainable=True)
+  
+    # Train
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
+
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+          with tf.GradientTape() as g:
+            l = tf.math.reduce_mean(loss(net(X), y))
+      
+          dw, db = g.gradient(l, [w, b])
+          trainer_fn([w, b], [dw, db], states, hyperparams)
+          n += X.shape[0]
+          if n % 200 == 0:
+              timer.stop()
+              p = n/X.shape[0]
+              q = p/tf.data.experimental.cardinality(data_iter).numpy()
+              r = (d2l.evaluate_loss(net, data_iter, loss),)
+              animator.add(q, r)
+              timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 ```
@@ -385,6 +496,42 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
+    # Initialization
+    net = tf.keras.Sequential()
+    net.add(tf.keras.layers.Dense(1, 
+            kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
+    optimizer = trainer_fn(**hyperparams)
+    loss = tf.keras.losses.MeanSquaredError()
+    # Note: L2 Loss = 1/2 * MSE Loss. TF has MSE Loss which is slightly
+    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
+    # value to get L2Loss in TF.
+  
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+            with tf.GradientTape() as g:
+                out = net(X)
+                l = loss(y, out)/2
+                params = net.trainable_variables
+                grads = g.gradient(l, params)
+            optimizer.apply_gradients(zip(grads, params))
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                p = n/X.shape[0]
+                q = p/tf.data.experimental.cardinality(data_iter).numpy()
+                r = (d2l.evaluate_loss(net, data_iter, loss)/2,)
+                animator.add(q, r)
+                timer.start()
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+```
+
 Using Gluon to repeat the last experiment shows identical behavior.
 
 ```{.python .input}
@@ -397,6 +544,13 @@ train_concise_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 data_iter, _ = get_data_ch11(10)
 trainer = torch.optim.SGD
 train_concise_ch11(trainer, {'lr': 0.05}, data_iter)
+```
+
+```{.python .input}
+#@tab tensorflow
+data_iter, _ = get_data_ch11(10)
+trainer = tf.keras.optimizers.SGD
+train_concise_ch11(trainer, {'learning_rate': 0.05}, data_iter)
 ```
 
 ## Summary
