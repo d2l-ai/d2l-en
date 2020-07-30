@@ -10,4 +10,3 @@ dependencies:
     - torch==1.6.0+cu101
     - tensorflow==2.2.0
     - tensorflow-probability==0.10.1
-    - cloudpickle==1.4.1  # due to https://github.com/tensorflow/probability/issues/991
