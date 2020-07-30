@@ -10,7 +10,7 @@ Additionally, when running a long training process,
 the best practice is to periodically save intermediate results (checkpointing)
 to ensure that we do not lose several days worth of computation
 if we trip over the power cord of our server.
-Thus it is time we learned how to load and store
+Thus it is time to learn how to load and store
 both individual weight vectors and entire models.
 This section addresses both issues.
 
@@ -50,7 +50,7 @@ x = tf.range(4)
 np.save("x-file.npy", x)
 ```
 
-We can now read this data from the stored file back into memory.
+We can now read the data from the stored file back into memory.
 
 ```{.python .input}
 x2 = npx.load('x-file')
@@ -122,19 +122,19 @@ mydict2 = np.load('mydict.npy', allow_pickle=True)
 mydict2
 ```
 
-## Model Parameters
+## Loading and Saving Model Parameters
 
 Saving individual weight vectors (or other tensors) is useful,
 but it gets very tedious if we want to save
 (and later load) an entire model.
 After all, we might have hundreds of
 parameter groups sprinkled throughout.
-For this reason the framework provides built-in functionality
+For this reason the deep learning framework provides built-in functionalities
 to load and save entire networks.
 An important detail to note is that this
 saves model *parameters* and not the entire model.
 For example, if we have a 3-layer MLP,
-we need to specify the *architecture* separately.
+we need to specify the architecture separately.
 The reason for this is that the models themselves can contain arbitrary code,
 hence they cannot be serialized as naturally.
 Thus, in order to reinstate a model, we need
@@ -154,8 +154,8 @@ class MLP(nn.Block):
 
 net = MLP()
 net.initialize()
-x = np.random.uniform(size=(2, 20))
-y = net(x)
+X = np.random.uniform(size=(2, 20))
+Y = net(X)
 ```
 
 ```{.python .input}
@@ -170,8 +170,8 @@ class MLP(nn.Module):
         return self.output(F.relu(self.hidden(x)))
 
 net = MLP()
-x = torch.randn(size=(2, 20))
-y = net(x)
+X = torch.randn(size=(2, 20))
+Y = net(X)
 ```
 
 ```{.python .input}
@@ -189,11 +189,11 @@ class MLP(tf.keras.Model):
         return self.out(x)
 
 net = MLP()
-x = tf.random.uniform((2, 20))
-y = net(x)
+X = tf.random.uniform((2, 20))
+Y = net(X)
 ```
 
-Next, we store the parameters of the model as a file with the name `mlp.params`.
+Next, we store the parameters of the model as a file with the name "mlp.params".
 
 ```{.python .input}
 net.save_parameters('mlp.params')
@@ -233,37 +233,37 @@ clone.load_weights("mlp.params")
 ```
 
 Since both instances have the same model parameters,
-the computation result of the same input `x` should be the same.
+the computational result of the same input `X` should be the same.
 Let us verify this.
 
 ```{.python .input}
-yclone = clone(x)
-yclone == y
+Y_clone = clone(X)
+Y_clone == Y
 ```
 
 ```{.python .input}
 #@tab pytorch
-yclone = clone(x)
-yclone == y
+Y_clone = clone(X)
+Y_clone == Y
 ```
 
 ```{.python .input}
 #@tab tensorflow
-yclone = clone(x)
-yclone == y
+Y_clone = clone(X)
+Y_clone == Y
 ```
 
 ## Summary
 
-* The `save` and `load` functions can be used to perform File I/O for tensor objects.
+* The `save` and `load` functions can be used to perform file I/O for tensor objects.
 * We can save and load the entire sets of parameters for a network via a parameter dictionary.
 * Saving the architecture has to be done in code rather than in parameters.
 
 ## Exercises
 
 1. Even if there is no need to deploy trained models to a different device, what are the practical benefits of storing model parameters?
-1. Assume that we want to reuse only parts of a network to be incorporated into a network of a *different* architecture. How would you go about using, say the first two layers from a previous network in a new network.
-1. How would you go about saving network architecture and parameters? What restrictions would you impose on the architecture?
+1. Assume that we want to reuse only parts of a network to be incorporated into a network of a different architecture. How would you go about using, say the first two layers from a previous network in a new network?
+1. How would you go about saving the network architecture and parameters? What restrictions would you impose on the architecture?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/60)
@@ -276,4 +276,3 @@ yclone == y
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/327)
 :end_tab:
-

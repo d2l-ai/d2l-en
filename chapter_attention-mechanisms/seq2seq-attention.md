@@ -45,7 +45,7 @@ Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEn
 
 - **the encoder valid length**: so the attention layer will not consider the padding tokens within the encoder outputs.
 
-At each timestep of the decoding, we use the output of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Although the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on `enc_valid_len`, so that the attention output suspends other irrelevant information.
+At each timestep of the decoding, we use the hidden state of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Although the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on `enc_valid_len`, so that the attention output suspends other irrelevant information.
 
 Let us implement the `Seq2SeqAttentionDecoder`, and see how it differs from the decoder in seq2seq from :numref:`sec_seq2seq_decoder`.
 
@@ -164,7 +164,7 @@ is much slower than the seq2seq model without attention.
 ```{.python .input  n=5}
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_steps = 64, 10
-lr, num_epochs, ctx = 0.005, 200, d2l.try_gpu()
+lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
 
 src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
 encoder = d2l.Seq2SeqEncoder(
@@ -172,7 +172,7 @@ encoder = d2l.Seq2SeqEncoder(
 decoder = Seq2SeqAttentionDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
 ```
 
 ```{.python .input}
@@ -192,14 +192,8 @@ d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
 
 Last, we predict several sample examples.
 
-```{.python .input  n=6}
-for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + d2l.predict_s2s_ch9(
-        model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
-```
-
 ```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + d2l.predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, device))

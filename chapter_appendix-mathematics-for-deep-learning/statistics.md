@@ -82,6 +82,36 @@ d2l.plt.title(f'sample mean: {float(torch.mean(xs).item()):.2f}')
 d2l.plt.show()
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+tf.pi = tf.acos(tf.zeros(1)) * 2  # define pi in TensorFlow
+
+# Sample datapoints and create y coordinate
+epsilon = 0.1
+xs = tf.random.normal((300,))
+
+ys = tf.constant(
+    [(tf.reduce_sum(tf.exp(-(xs[0:i] - xs[i])**2 / (2 * epsilon**2)) \
+               / tf.sqrt(2*tf.pi*epsilon**2)) / tf.cast(
+        tf.size(xs), dtype=tf.float32)).numpy() \
+     for i in range(tf.size(xs))])
+
+# Compute true density
+xd = tf.range(tf.reduce_min(xs), tf.reduce_max(xs), 0.01)
+yd = tf.exp(-xd**2/2) / tf.sqrt(2 * tf.pi)
+
+# Plot the results
+d2l.plot(xd, yd, 'x', 'density')
+d2l.plt.scatter(xs, ys)
+d2l.plt.axvline(x=0)
+d2l.plt.axvline(x=tf.reduce_mean(xs), linestyle='--', color='purple')
+d2l.plt.title(f'sample mean: {float(tf.reduce_mean(xs).numpy()):.2f}')
+d2l.plt.show()
+```
+
 There can be many ways to compute an estimator of a parameter $\hat{\theta}_n$.  In this section, we introduce three common methods to evaluate and compare estimators: the mean squared error, the standard deviation, and statistical bias.
 
 ### Mean Squared Error
@@ -122,22 +152,25 @@ It is important to compare :eqref:`eq_var_est` to :eqref:`eq_mse_est`.  In this 
 
 ### The Bias-Variance Trade-off
 
-It is intuitively clear that these two components contribute to the mean squared error.  What is somewhat shocking is that we can show that this is actually a *decomposition* of the mean squared error into two contributions.  That is to say that we can write the mean squared error as the sum of the variance and the square or the bias.
+It is intuitively clear that these two main components contribute to the mean squared error.  What is somewhat shocking is that we can show that this is actually a *decomposition* of the mean squared error into these two contributions plus a third one. That is to say that we can write the mean squared error as the sum of the square of the bias, the variance and the irreducible error.
 
 $$
 \begin{aligned}
-\mathrm{MSE} (\hat{\theta}_n, \theta) &= E[(\hat{\theta}_n - E(\hat{\theta}_n) + E(\hat{\theta}_n) - \theta)^2] \\
- &= E[(\hat{\theta}_n - E(\hat{\theta}_n))^2] + E[(E(\hat{\theta}_n) - \theta)^2] \\
- &= \mathrm{Var} (\hat{\theta}_n) + [\mathrm{bias} (\hat{\theta}_n)]^2.\\
+\mathrm{MSE} (\hat{\theta}_n, \theta) &= E[(\hat{\theta}_n - \theta)^2] \\
+ &= E[(\hat{\theta}_n)^2] + E[\theta^2] - 2E[\hat{\theta}_n\theta] \\
+ &= \mathrm{Var} [\hat{\theta}_n] + E[\hat{\theta}_n]^2 + \mathrm{Var} [\theta] + E[\theta]^2 - 2E[\hat{\theta}_n]E[\theta] \\
+ &= (E[\hat{\theta}_n] - E[\theta])^2 + \mathrm{Var} [\hat{\theta}_n] + \mathrm{Var} [\theta] \\
+ &= (E[\hat{\theta}_n - \theta])^2 + \mathrm{Var} [\hat{\theta}_n] + \mathrm{Var} [\theta] \\
+ &= (\mathrm{bias} [\hat{\theta}_n])^2 + \mathrm{Var} (\hat{\theta}_n) + \mathrm{Var} [\theta].\\
 \end{aligned}
 $$
 
-We refer the above formula as *bias-variance trade-off*. The mean squared error can be divided into precisely two sources of error: the error from high bias and the error from high variance. On the one hand, the bias error is commonly seen in a simple model (such as a linear regression model), which cannot extract high dimensional relations between the features and the outputs. If a model suffers from high bias error, we often say it is *underfitting* or lack of *generalization* as introduced in (:numref:`sec_model_selection`). On the flip side, the other error source---high variance usually results from a too complex model, which overfits the training data. As a result, an *overfitting* model is sensitive to small fluctuations in the data. If a model suffers from high variance, we often say it is *overfitting* and lack of *flexibility* as introduced in (:numref:`sec_model_selection`).
+We refer the above formula as *bias-variance trade-off*. The mean squared error can be divided into three sources of error: the error from high bias, the error from high variance and the irreducible error. The bias error is commonly seen in a simple model (such as a linear regression model), which cannot extract high dimensional relations between the features and the outputs. If a model suffers from high bias error, we often say it is *underfitting* or lack of *generalization* as introduced in (:numref:`sec_model_selection`). The high variance usually results from a too complex model, which overfits the training data. As a result, an *overfitting* model is sensitive to small fluctuations in the data. If a model suffers from high variance, we often say it is *overfitting* and lack of *flexibility* as introduced in (:numref:`sec_model_selection`). The irreducible error is the result from noise in the $\theta$ itself.
 
 
 ### Evaluating Estimators in Code
 
-Since the standard deviation of an estimator has been implementing in MXNet by simply calling `a.std()` for a tensor `a`, we will skip it but implement the statistical bias and the mean squared error in MXNet.
+Since the standard deviation of an estimator has been implementing by simply calling `a.std()` for a tensor `a`, we will skip it but implement the statistical bias and the mean squared error.
 
 ```{.python .input}
 # Statistical bias
@@ -158,6 +191,17 @@ def stat_bias(true_theta, est_theta):
 # Mean squared error
 def mse(data, true_theta):
     return(torch.mean(torch.square(data - true_theta)))
+```
+
+```{.python .input}
+#@tab tensorflow
+# Statistical bias
+def stat_bias(true_theta, est_theta):
+    return(tf.reduce_mean(est_theta) - true_theta)
+
+# Mean squared error
+def mse(data, true_theta):
+    return(tf.reduce_mean(tf.square(data - true_theta)))
 ```
 
 To illustrate the equation of the bias-variance trade-off, let us simulate of normal distribution $\mathcal{N}(\theta, \sigma^2)$ with $10,000$ samples. Here, we use a $\theta = 1$ and $\sigma = 4$. As the estimator is a function of the given samples, here we use the mean of the samples as an estimator for true $\theta$ in this normal distribution $\mathcal{N}(\theta, \sigma^2)$ .
@@ -181,14 +225,20 @@ theta_est = torch.mean(samples)
 theta_est
 ```
 
+```{.python .input}
+#@tab tensorflow
+theta_true = 1
+sigma = 4
+sample_len = 10000
+samples = tf.random.normal((sample_len, 1), theta_true, sigma)
+theta_est = tf.reduce_mean(samples)
+theta_est
+```
+
 Let us validate the trade-off equation by calculating the summation of the squared bias and the variance of our estimator. First, calculate the MSE of our estimator.
 
 ```{.python .input}
-mse(samples, theta_true)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 mse(samples, theta_true)
 ```
 
@@ -205,10 +255,16 @@ bias = stat_bias(theta_true, theta_est)
 torch.square(samples.std(unbiased=False)) + torch.square(bias)
 ```
 
+```{.python .input}
+#@tab tensorflow
+bias = stat_bias(theta_true, theta_est)
+tf.square(tf.math.reduce_std(samples)) + tf.square(bias)
+```
+
 ## Conducting Hypothesis Tests
 
 
-The most commonly encountered topic in statistical inference is hypothesis testing. While hypothesis testing was popularized in the early 20th century, the first use can be traced back to John Arbuthnot in the 1700s. John tracked 80-year birth records in London and concluded that more men were born than women each year. Following that, the modern significance testing is the intelligence heritage by Karl Pearson who invented $p$-value and Pearson's chi-squared test), William Gosset who is the father of Student's t-distribution, and Ronald Fisher who initialed the null hypothesis and the significance test.
+The most commonly encountered topic in statistical inference is hypothesis testing. While hypothesis testing was popularized in the early 20th century, the first use can be traced back to John Arbuthnot in the 1700s. John tracked 80-year birth records in London and concluded that more men were born than women each year. Following that, the modern significance testing is the intelligence heritage by Karl Pearson who invented $p$-value and Pearson's chi-squared test, William Gosset who is the father of Student's t-distribution, and Ronald Fisher who initialed the null hypothesis and the significance test.
 
 A *hypothesis test* is a way of evaluating some evidence against the default statement about a population. We refer the default statement as the *null hypothesis* $H_0$, which we try to reject using the observed data. Here, we use $H_0$ as a starting point for the statistical significance testing. The *alternative hypothesis* $H_A$ (or $H_1$) is a statement that is contrary to the null hypothesis. A null hypothesis is often stated in a declarative form which posits a relationship between variables. It should reflect the brief as explicit as possible, and be testable by statistics theory.
 
@@ -218,7 +274,7 @@ First, you will need carefully random selected two groups of volunteers, so that
 
 Second, after a period of taking the medicine, you will need to measure the two groups' math understanding by the same metrics, such as letting the volunteers do the same tests after learning a new math formula. Then, you can collect their performance and compare the results.  In this case, our null hypothesis will be that there is no difference between the two groups, and our alternate will be that there is.
 
-This is still not fully formal.  There are many details you have to think of carefully. For example, what is the suitable metrics to test their math understanding ability? How many volunteers for your test so you can be confident to claim the effectiveness of your medicine? How long should you run the test? How do you decide if there is a difference between the two groups?  Do you care about the average performance only, or do you also the range of variation of the scores. And so on.
+This is still not fully formal.  There are many details you have to think of carefully. For example, what is the suitable metrics to test their math understanding ability? How many volunteers for your test so you can be confident to claim the effectiveness of your medicine? How long should you run the test? How do you decide if there is a difference between the two groups?  Do you care about the average performance only, or also the range of variation of the scores? And so on.
 
 In this way, hypothesis testing provides a framework for experimental design and reasoning about certainty in observed results.  If we can now show that the null hypothesis is very unlikely to be true, we may reject it with confidence.
 
@@ -229,9 +285,9 @@ To complete the story of how to work with hypothesis testing, we need to now int
 
 The *statistical significance* measures the probability of erroneously rejecting the null hypothesis, $H_0$, when it should not be rejected, i.e.,
 
-$$ \text{statistical significance }= 1 - \alpha = P(\text{reject } H_0 \mid H_0 \text{ is true} ).$$
+$$ \text{statistical significance }= 1 - \alpha = 1 - P(\text{reject } H_0 \mid H_0 \text{ is true} ).$$
 
-It is also referred to as the *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. The level of statistical significance level can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis.
+It is also referred to as the *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. The significance level can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis.
 
 :numref:`fig_statistical_significance` shows the observations' values and probability of a given normal distribution in a two-sample hypothesis test. If the observation data point is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it.
 
@@ -243,7 +299,7 @@ It is also referred to as the *type I error* or *false positive*. The $\alpha$, 
 
 The *statistical power* (or *sensitivity*) measures the probability of reject the null hypothesis, $H_0$, when it should be rejected, i.e.,
 
-$$ \text{statistical power }= P(\text{reject } H_0  \mid H_0 \text{ is false} ).$$
+$$ \text{statistical power }= 1 - \beta = 1 - P(\text{ fail to reject } H_0  \mid H_0 \text{ is false} ).$$
 
 Recall that a *type I error* is error caused by rejecting the null hypothesis when it is true, whereas a *type II error* is resulted from failing to reject the null hypothesis when it is false. A type II error is usually denoted as $\beta$, and hence the corresponding statistical power is $1-\beta$.
 
@@ -318,7 +374,7 @@ This may seem pedantic, but it can have real implications for the interpretation
 
 * **Fallacy 1**. Narrow confidence intervals mean we can estimate the parameter precisely.
 * **Fallacy 2**. The values inside the confidence interval are more likely to be the true value than those outside the interval.
-* **Fallacy 3**. The probability) that a particular observed $95\%$ confidence interval contains the true value is $95\%$.
+* **Fallacy 3**. The probability that a particular observed $95\%$ confidence interval contains the true value is $95\%$.
 
 Sufficed to say, confidence intervals are subtle objects.  However, if you keep the interpretation clear, they can be powerful tools.
 
@@ -392,6 +448,24 @@ mu_hat = torch.mean(samples)
 sigma_hat = samples.std(unbiased=True)
 (mu_hat - t_star*sigma_hat/torch.sqrt(torch.tensor(N, dtype=torch.float32)),\
  mu_hat + t_star*sigma_hat/torch.sqrt(torch.tensor(N, dtype=torch.float32)))
+```
+
+```{.python .input}
+#@tab tensorflow
+# Number of samples
+N = 1000
+
+# Sample dataset
+samples = tf.random.normal((N,), 0, 1)
+
+# Lookup Students's t-distribution c.d.f.
+t_star = 1.96
+
+# Construct interval
+mu_hat = tf.reduce_mean(samples)
+sigma_hat = tf.math.reduce_std(samples)
+(mu_hat - t_star*sigma_hat/tf.sqrt(tf.constant(N, dtype=tf.float32)), \
+ mu_hat + t_star*sigma_hat/tf.sqrt(tf.constant(N, dtype=tf.float32)))
 ```
 
 ## Summary

@@ -120,15 +120,15 @@ from mxnet.gluon import rnn
 npx.set_np()
 
 # Load data
-batch_size, num_steps = 32, 35
+batch_size, num_steps, device = 32, 35, d2l.try_gpu()
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 # Define the model
-vocab_size, num_hiddens, num_layers, ctx = len(vocab), 256, 2, d2l.try_gpu()
+vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
 lstm_layer = rnn.LSTM(num_hiddens, num_layers, bidirectional=True)
 model = d2l.RNNModel(lstm_layer, len(vocab))
 # Train the model
 num_epochs, lr = 500, 1
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
 The output is clearly unsatisfactory for the reasons described above. For a

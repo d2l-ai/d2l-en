@@ -60,13 +60,13 @@ as discovering how to separate two distinct clusters of points.
 
 In parallel, there is a second point of view 
 that people often take of vectors: as directions in space. 
-Not only can we think of the vector $\mathbf{v} = [2,3]^\top$ 
-as the location $2$ units to the right and $3$ units up from the origin,
+Not only can we think of the vector $\mathbf{v} = [3,2]^\top$ 
+as the location $3$ units to the right and $2$ units up from the origin,
 we can also think of it as the direction itself 
-to take $2$ steps to the right and $3$ steps up. 
+to take $3$ steps to the right and $2$ steps up. 
 In this way, we consider all the vectors in figure :numref:`fig_arrow` the same.
 
-![Any vector can be visualized as an arrow in the plane.  In this case, every vector drawn is a representation of the vector $(2,3)$.](../img/ParVec.svg)
+![Any vector can be visualized as an arrow in the plane.  In this case, every vector drawn is a representation of the vector $(3,2)^\top$.](../img/ParVec.svg)
 :label:`fig_arrow`
 
 One of the benefits of this shift is that
@@ -80,12 +80,12 @@ and then follow the directions given by the other, as is seen in :numref:`fig_ad
 Vector subtraction has a similar interpretation.
 By considering the identity that $\mathbf{u} = \mathbf{v} + (\mathbf{u}-\mathbf{v})$,
 we see that the vector $\mathbf{u}-\mathbf{v}$ is the direction 
-that takes us from the point $\mathbf{u}$ to the point $\mathbf{v}$.
+that takes us from the point $\mathbf{v}$ to the point $\mathbf{u}$.
 
 
 ## Dot Products and Angles
 As we saw in :numref:`sec_linear-algebra`, 
-if we take two column vectors say $\mathbf{u}$ and $\mathbf{v}$,
+if we take two column vectors $\mathbf{u}$ and $\mathbf{v}$,
 we can form their dot product by computing:
 
 $$\mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.$$
@@ -423,12 +423,10 @@ torch.mean(predictions.type(y_test.dtype) == y_test, dtype=torch.float64)
 #@tab tensorflow
 # Print test set accuracy with eyeballed threshold
 w = tf.transpose(ave_1 - ave_0)
-predictions = tf.matmul(tf.reshape(
-  X_test, y_test.shape), tf.nest.flatten(w)) > -1500000
+predictions = tf.reduce_sum(X_test * tf.nest.flatten(w), axis=0) > -1500000
 
 # Accuracy
-# TODO: Fix incorrect shape
-# tf.reduce_mean(predictions == y_test)
+tf.reduce_mean(tf.cast(tf.cast(predictions, y_test.dtype) == y_test, tf.float32))
 ```
 
 ## Geometry of Linear Transformations
@@ -930,7 +928,7 @@ v = tf.constant([1, 2])
 A.shape, B.shape, v.shape
 ```
 
-Einstein summation has been implemented directly  via ```np.einsum```. 
+Einstein summation has been implemented directly. 
 The indices that occurs in the Einstein summation can be passed as a string, 
 followed by the tensors that are being acted upon.
 For instance, to implement matrix multiplication,
@@ -960,7 +958,7 @@ For instance if we want to compute
 what would be traditionally written as
 
 $$
-c_{kl} = \sum_{ij} \mathbf{B}_{ijk}\mathbf{A}_{il}v_j.
+c_{kl} = \sum_{ij} \mathbf{b}_{ijk}\mathbf{a}_{il}v_j.
 $$
 
 it can be implemented via Einstein summation as:

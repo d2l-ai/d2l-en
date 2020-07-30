@@ -100,13 +100,13 @@ def extract_features(X, content_layers, style_layers):
 Next, we define two functions: The `get_contents` function obtains the content features extracted from the content image, while the `get_styles` function obtains the style features extracted from the style image. Because we do not need to change the parameters of the pre-trained VGG model during training, we can extract the content features from the content image and style features from the style image before the start of training. As the composite image is the model parameter that must be updated during style transfer, we can only call the `extract_features` function during training to extract the content and style features of the composite image.
 
 ```{.python .input  n=8}
-def get_contents(image_shape, ctx):
-    content_X = preprocess(content_img, image_shape).copyto(ctx)
+def get_contents(image_shape, device):
+    content_X = preprocess(content_img, image_shape).copyto(device)
     contents_Y, _ = extract_features(content_X, content_layers, style_layers)
     return content_X, contents_Y
 
-def get_styles(image_shape, ctx):
-    style_X = preprocess(style_img, image_shape).copyto(ctx)
+def get_styles(image_shape, device):
+    style_X = preprocess(style_img, image_shape).copyto(device)
     _, styles_Y = extract_features(style_X, content_layers, style_layers)
     return style_X, styles_Y
 ```
@@ -192,9 +192,9 @@ class GeneratedImage(nn.Block):
 Next, we define the `get_inits` function. This function creates a composite image model instance and initializes it to the image `X`. The Gram matrix for the various style layers of the style image, `styles_Y_gram`, is computed prior to training.
 
 ```{.python .input  n=16}
-def get_inits(X, ctx, lr, styles_Y):
+def get_inits(X, device, lr, styles_Y):
     gen_img = GeneratedImage(X.shape)
-    gen_img.initialize(init.Constant(X), ctx=ctx, force_reinit=True)
+    gen_img.initialize(init.Constant(X), ctx=device, force_reinit=True)
     trainer = gluon.Trainer(gen_img.collect_params(), 'adam',
                             {'learning_rate': lr})
     styles_Y_gram = [gram(Y) for Y in styles_Y]
@@ -211,8 +211,8 @@ epochs, the process may occupy a great deal of memory. Therefore, we call the
 `waitall` synchronization function during every epoch.
 
 ```{.python .input  n=17}
-def train(X, contents_Y, styles_Y, ctx, lr, num_epochs, lr_decay_epoch):
-    X, styles_Y_gram, trainer = get_inits(X, ctx, lr, styles_Y)
+def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
+    X, styles_Y_gram, trainer = get_inits(X, device, lr, styles_Y)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs],
                             legend=['content', 'style', 'TV'],
@@ -239,11 +239,11 @@ def train(X, contents_Y, styles_Y, ctx, lr, num_epochs, lr_decay_epoch):
 Next, we start to train the model. First, we set the height and width of the content and style images to 150 by 225 pixels. We use the content image to initialize the composite image.
 
 ```{.python .input  n=18}
-ctx, image_shape = d2l.try_gpu(), (225, 150)
-net.collect_params().reset_ctx(ctx)
-content_X, contents_Y = get_contents(image_shape, ctx)
-_, styles_Y = get_styles(image_shape, ctx)
-output = train(content_X, contents_Y, styles_Y, ctx, 0.01, 500, 200)
+device, image_shape = d2l.try_gpu(), (225, 150)
+net.collect_params().reset_ctx(device)
+content_X, contents_Y = get_contents(image_shape, device)
+_, styles_Y = get_styles(image_shape, device)
+output = train(content_X, contents_Y, styles_Y, device, 0.01, 500, 200)
 ```
 
 As you can see, the composite image retains the scenery and objects of the content image, while introducing the color of the style image. Because the image is relatively small, the details are a bit fuzzy.
@@ -252,10 +252,10 @@ To obtain a clearer composite image, we train the model using a larger image siz
 
 ```{.python .input  n=19}
 image_shape = (900, 600)
-_, content_Y = get_contents(image_shape, ctx)
-_, style_Y = get_styles(image_shape, ctx)
+_, content_Y = get_contents(image_shape, device)
+_, style_Y = get_styles(image_shape, device)
 X = preprocess(postprocess(output) * 255, image_shape)
-output = train(X, content_Y, style_Y, ctx, 0.01, 300, 100)
+output = train(X, content_Y, style_Y, device, 0.01, 300, 100)
 d2l.plt.imsave('../img/neural-style.jpg', postprocess(output).asnumpy())
 ```
 

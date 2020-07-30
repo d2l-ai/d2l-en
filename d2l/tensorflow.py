@@ -438,8 +438,8 @@ def try_gpu(i=0):  #@save
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
     num_gpus = len(tf.config.experimental.list_physical_devices('GPU'))
-    ctxes = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]
-    return ctxes if ctxes else [tf.device('/CPU:0')]
+    devices = [tf.device(f'/GPU:{i}') for i in range(num_gpus)]
+    return devices if devices else [tf.device('/CPU:0')]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
@@ -488,7 +488,7 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
-    """Train and evaluate a model with CPU or GPU."""
+    """Train a model with a GPU (defined in Chapter 6)."""
     device_name = device._device_name
     strategy = tf.distribute.OneDeviceStrategy(device_name)
     with strategy.scope():
@@ -530,6 +530,31 @@ class Residual(tf.keras.Model):  #@save
 def annotate(text, xy, xytext):  #@save
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
+
+
+# Defined in file: ./chapter_optimization/gd.md
+def train_2d(trainer, steps=20):  #@save
+    """Optimize a 2-dim objective function with a customized trainer."""
+    # s1 and s2 are internal state variables and will
+    # be used later in the chapter
+    x1, x2, s1, s2 = -5, -2, 0, 0
+    results = [(x1, x2)]
+    for i in range(steps):
+        x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+        results.append((x1, x2))
+    return results
+
+
+# Defined in file: ./chapter_optimization/gd.md
+def show_trace_2d(f, results):  #@save
+    """Show the trace of 2D variables during optimization."""
+    d2l.set_figsize()
+    d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
+    x1, x2 = d2l.meshgrid(d2l.arange(-5.5, 1.0, 0.1),
+                          d2l.arange(-3.0, 1.0, 0.1))
+    d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
+    d2l.plt.xlabel('x1')
+    d2l.plt.ylabel('x2')
 
 
 # Alias defined in config.ini

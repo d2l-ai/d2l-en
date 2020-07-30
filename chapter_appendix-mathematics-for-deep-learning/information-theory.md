@@ -37,9 +37,9 @@ $$I(X) = - \log_2 (p),$$
 
 as the *bits* of information we have received for this event $X$. Note that we will always use base-2 logarithms in this section. For the sake of simplicity, the rest of this section will omit the subscript 2 in the logarithm notation, i.e., $\log(.)$ always refers to $\log_2(.)$. For example, the code "0010" has a self-information
 
-$$I(\text{``0010"}) = - \log (p(\text{``0010"})) = - \log \left( \frac{1}{2^4} \right) = 4 \text{ bits}.$$
+$$I(\text{"0010"}) = - \log (p(\text{"0010"})) = - \log \left( \frac{1}{2^4} \right) = 4 \text{ bits}.$$
 
-We can calculate self information in MXNet as shown below. Before that, let us first import all the necessary packages in this section.
+We can calculate self information as shown below. Before that, let us first import all the necessary packages in this section.
 
 ```{.python .input}
 from mxnet import np
@@ -64,6 +64,23 @@ def nansum(x):
 
 def self_information(p):
     return -torch.log2(torch.tensor(p)).item()
+
+self_information(1 / 64)
+```
+
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+def log2(x):
+    return tf.math.log(x) / tf.math.log(2.)
+
+def nansum(x):
+    return tf.reduce_sum(tf.where(tf.math.is_nan(
+        x), tf.zeros_like(x), x), axis=-1)
+
+def self_information(p):
+    return -log2(tf.constant(p)).numpy()
 
 self_information(1 / 64)
 ```
@@ -96,7 +113,7 @@ Otherwise, if $X$ is continuous, we also refer entropy as *differential entropy*
 
 $$H(X) = - \int_x p(x) \log p(x) \; dx.$$
 
-In MXNet, we can define entropy as below.
+We can define entropy as below.
 
 ```{.python .input}
 def entropy(p):
@@ -119,6 +136,14 @@ def entropy(p):
 entropy(torch.tensor([0.1, 0.5, 0.1, 0.3]))
 ```
 
+```{.python .input}
+#@tab tensorflow
+def entropy(p):
+    return nansum(- p * log2(p))
+
+entropy(tf.constant([0.1, 0.5, 0.1, 0.3]))
+```
+
 ### Interpretations
 
 You may be curious: in the entropy definition :eqref:`eq_ent_def`, why do we use an expectation of a negative logarithm? Here are some intuitions.
@@ -135,7 +160,7 @@ $$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$
 
 ### Properties of Entropy
 
-By the above examples and interpretations, we can derive the following properties of entropy :eqref:`eq_ent_def`. Here, we refer to X as an event and P as the probability distribution of X.
+By the above examples and interpretations, we can derive the following properties of entropy :eqref:`eq_ent_def`. Here, we refer to $X$ as an event and $P$ as the probability distribution of $X$.
 
 * Entropy is non-negative, i.e., $H(X) \geq 0, \forall X$.
 
@@ -172,7 +197,7 @@ $$
 H(X), H(Y) \le H(X, Y) \le H(X) + H(Y).
 $$
 
-Let us implement joint entropy from scratch in MXNet.
+Let us implement joint entropy from scratch.
 
 ```{.python .input}
 def joint_entropy(p_xy):
@@ -195,6 +220,17 @@ def joint_entropy(p_xy):
 joint_entropy(torch.tensor([[0.1, 0.5], [0.1, 0.3]]))
 ```
 
+```{.python .input}
+#@tab tensorflow
+def joint_entropy(p_xy):
+    joint_ent = -p_xy * log2(p_xy)
+    # nansum will sum up the non-nan number
+    out = nansum(joint_ent)
+    return out
+
+joint_entropy(tf.constant([[0.1, 0.5], [0.1, 0.3]]))
+```
+
 Notice that this is the same *code* as before, but now we interpret it differently as working on the joint distribution of the two random variables.
 
 
@@ -211,7 +247,7 @@ where $p(y \mid x) = \frac{p_{X, Y}(x, y)}{p_X(x)}$ is the conditional probabili
 
 $$H(Y \mid X) = - \sum_{x} \sum_{y} p(x, y) \log p(y \mid x).$$
 
-If $(X, Y)$ is a pair of continuous random variables, then the *differential joint entropy* is similarly defined as 
+If $(X, Y)$ is a pair of continuous random variables, then the *differential conditional entropy* is similarly defined as 
 
 $$H(Y \mid X) = - \int_x \int_y p(x, y) \ \log p(y \mid x) \;dx \;dy.$$
 
@@ -222,7 +258,7 @@ $$H(Y \mid X) = H(X, Y) - H(X).$$
 
 This has an intuitive interpretation: the information in $Y$ given $X$ ($H(Y \mid X)$) is the same as the information in both $X$ and $Y$ together ($H(X, Y)$) minus the information already contained in $X$.  This gives us the information in $Y$ which is not also represented in $X$.  
 
-Now, let us implement conditional entropy :eqref:`eq_cond_ent_def` from scratch in MXNet.
+Now, let us implement conditional entropy :eqref:`eq_cond_ent_def` from scratch.
 
 ```{.python .input}
 def conditional_entropy(p_xy, p_x):
@@ -246,6 +282,19 @@ def conditional_entropy(p_xy, p_x):
 
 conditional_entropy(torch.tensor([[0.1, 0.5], [0.2, 0.3]]), 
                     torch.tensor([0.2, 0.8]))
+```
+
+```{.python .input}
+#@tab tensorflow
+def conditional_entropy(p_xy, p_x):
+    p_y_given_x = p_xy/p_x
+    cond_ent = -p_xy * log2(p_y_given_x)
+    # nansum will sum up the non-nan number
+    out = nansum(cond_ent)
+    return out
+
+conditional_entropy(tf.constant([[0.1, 0.5], [0.2, 0.3]]),
+                    tf.constant([0.2, 0.8]))
 ```
 
 ### Mutual Information
@@ -303,6 +352,19 @@ mutual_information(torch.tensor([[0.1, 0.5], [0.1, 0.3]]),
                    torch.tensor([0.2, 0.8]), torch.tensor([[0.75, 0.25]]))
 ```
 
+```{.python .input}
+#@tab tensorflow
+def mutual_information(p_xy, p_x, p_y):
+    p = p_xy / (p_x * p_y)
+    mutual = p_xy * log2(p)
+    # Operator nansum will sum up the non-nan number
+    out = nansum(mutual)
+    return out
+
+mutual_information(tf.constant([[0.1, 0.5], [0.1, 0.3]]),
+                   tf.constant([0.2, 0.8]), tf.constant([[0.75, 0.25]]))
+```
+
 ### Properties of Mutual Information
 
 Rather than memorizing the definition of mutual information :eqref:`eq_mut_ent_def`, you only need to keep in mind its notable properties:
@@ -344,7 +406,7 @@ $$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \left[ \log \frac{p(x)}{q(x)} \right].$$
 
 As with the pointwise mutual information :eqref:`eq_pmi_def`, we can again provide an interpretation of the logarithmic term:  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ will be large and positive if we see $x$ far more often under $P$ than we would expect for $Q$, and large and negative if we see the outcome far less than expected.  In this way, we can interpret it as our *relative* surprise at observing the outcome compared to how surprised we would be observing it from our reference distribution.
 
-In MXNet, let us implement the KL divergence from Scratch.
+Let us implement the KL divergence from Scratch.
 
 ```{.python .input}
 def kl_divergence(p, q):
@@ -359,6 +421,14 @@ def kl_divergence(p, q):
     kl = p * torch.log2(p / q)
     out = nansum(kl)
     return out.abs().item()
+```
+
+```{.python .input}
+#@tab tensorflow
+def kl_divergence(p, q):
+    kl = p * log2(p / q)
+    out = nansum(kl)
+    return tf.abs(out).numpy()
 ```
 
 ### KL Divergence Properties
@@ -409,18 +479,22 @@ q1 = torch.sort(q1)[0]
 q2 = torch.sort(q2)[0]
 ```
 
-Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (i.e., $x=0$), we expect a similar value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. As you can see below, there is only a 1% off between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$.
-
 ```{.python .input}
-kl_pq1 = kl_divergence(p, q1)
-kl_pq2 = kl_divergence(p, q2)
-similar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100
+#@tab tensorflow
+tensor_len = 10000
+p = tf.random.normal((tensor_len, ), 0, 1)
+q1 = tf.random.normal((tensor_len, ), -1, 1)
+q2 = tf.random.normal((tensor_len, ), 1, 1)
 
-kl_pq1, kl_pq2, similar_percentage
+p = tf.sort(p)
+q1 = tf.sort(q1)
+q2 = tf.sort(q2)
 ```
 
+Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (i.e., $x=0$), we expect a similar value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. As you can see below, there is only a less than 3% off between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$.
+
 ```{.python .input}
-#@tab pytorch
+#@tab all
 kl_pq1 = kl_divergence(p, q1)
 kl_pq2 = kl_divergence(p, q2)
 similar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100
@@ -431,14 +505,7 @@ kl_pq1, kl_pq2, similar_percentage
 In contrast, you may find that $D_{\mathrm{KL}}(q_2 \|p)$ and $D_{\mathrm{KL}}(p \| q_2)$ are off a lot, with around 40% off as shown below.
 
 ```{.python .input}
-kl_q2p = kl_divergence(q2, p)
-differ_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100
-
-kl_q2p, differ_percentage
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 kl_q2p = kl_divergence(q2, p)
 differ_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100
 
@@ -476,7 +543,7 @@ By using properties of entropy discussed above, we can also interpret it as the 
 $$\mathrm{CE} (P, Q) = H(P) + D_{\mathrm{KL}}(P\|Q).$$
 
 
-In MXNet, we can implement the cross entropy loss as below.
+We can implement the cross entropy loss as below.
 
 ```{.python .input}
 def cross_entropy(y_hat, y):
@@ -489,6 +556,13 @@ def cross_entropy(y_hat, y):
 def cross_entropy(y_hat, y):
     ce = -torch.log(y_hat[range(len(y_hat)), y])
     return ce.mean()
+```
+
+```{.python .input}
+#@tab tensorflow
+def cross_entropy(y_hat, y):
+    ce = -tf.math.log(y_hat[:, :len(y)])
+    return tf.reduce_mean(ce)
 ```
 
 Now define two tensors for the labels and predictions, and calculate the cross entropy loss of them.
@@ -504,6 +578,14 @@ cross_entropy(preds, labels)
 #@tab pytorch
 labels = torch.tensor([0, 2])
 preds = torch.tensor([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
+
+cross_entropy(preds, labels)
+```
+
+```{.python .input}
+#@tab tensorflow
+labels = tf.constant([0, 2])
+preds = tf.constant([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
 
 cross_entropy(preds, labels)
 ```
@@ -544,7 +626,7 @@ On the other side, we can also approach the problem through maximum likelihood e
 $$\mathbf{p}^\mathbf{z} = \prod_{j=1}^k p_{j}^{z_{j}}.$$
 
 
-It can be seen that each data point, $\mathbf{y}_i$, is following a $k$-class multinoulli distribution with probabilities $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Therefore, the joint p.m.f. of each data point $\mathbf{y}_i$ is  $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
+It can be seen that the label of each data point, $\mathbf{y}_i$, is following a $k$-class multinoulli distribution with probabilities $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Therefore, the joint p.m.f. of each data point $\mathbf{y}_i$ is  $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
 Hence, the log-likelihood function would be
 
 $$
@@ -560,7 +642,7 @@ $$
 Since in maximum likelihood estimation, we maximizing the objective function $l(\theta)$ by having $\pi_{j} = p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)$. Therefore, for any multi-class classification, maximizing the above log-likelihood function $l(\theta)$ is equivalent to minimizing the CE loss $\mathrm{CE}(y, \hat{y})$.
 
 
-To test the above proof, let us apply the built-in measure `NegativeLogLikelihood` in MXNet. Using the same `labels` and `preds` as in the earlier example, we will get the same numerical loss as the previous example up to the 5 decimal place.
+To test the above proof, let us apply the built-in measure `NegativeLogLikelihood`. Using the same `labels` and `preds` as in the earlier example, we will get the same numerical loss as the previous example up to the 5 decimal place.
 
 ```{.python .input}
 nll_loss = NegativeLogLikelihood()
@@ -574,6 +656,19 @@ nll_loss.get()
 # nn.NLLLoss()
 nll_loss = NLLLoss()
 loss = nll_loss(torch.log(preds), labels)
+loss
+```
+
+```{.python .input}
+#@tab tensorflow
+def nll_loss(y_hat, y):
+    # Convert labels to binary class matrix.
+    y = tf.keras.utils.to_categorical(y, num_classes=3)
+    # Since tf.keras.losses.binary_crossentropy returns the mean
+    # over the last axis, we calculate the sum here.
+    return tf.reduce_sum(tf.keras.losses.binary_crossentropy(y, y_hat, from_logits=True))
+
+loss = nll_loss(tf.math.log(preds), labels)
 loss
 ```
 

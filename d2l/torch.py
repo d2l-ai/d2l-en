@@ -347,7 +347,9 @@ def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
-        l = loss(net(X), y)
+        out = net(X)
+        y = d2l.reshape(y, out.shape)
+        l = loss(out, y)
         metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 
@@ -431,9 +433,9 @@ def try_gpu(i=0):  #@save
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_all_gpus():  #@save
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    ctxes = [torch.device(f'cuda:{i}')
+    devices = [torch.device(f'cuda:{i}')
              for i in range(torch.cuda.device_count())]
-    return ctxes if ctxes else [torch.device('cpu')]
+    return devices if devices else [torch.device('cpu')]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
@@ -449,10 +451,12 @@ def corr2d(X, K):  #@save
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
+    """Compute the accuracy for a model on a dataset using a GPU."""
     net.eval()  # Set the model to evaluation mode
     if not device:
         device = next(iter(net.parameters())).device
-    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
+    # No. of correct predictions, no. of predictions
+    metric = d2l.Accumulator(2)
     for X, y in data_iter:
         X, y = X.to(device), y.to(device)
         metric.add(d2l.accuracy(net(X), y), d2l.size(y))
@@ -462,7 +466,7 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch6(net, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu()):
-    """Train and evaluate a model with CPU or GPU."""
+    """Train a model with a GPU (defined in Chapter 6)."""
     def init_weights(m):
         if type(m) == nn.Linear or type(m) == nn.Conv2d:
             torch.nn.init.xavier_uniform_(m.weight)
@@ -475,7 +479,8 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
                             legend=['train loss', 'train acc', 'test acc'])
     timer = d2l.Timer()
     for epoch in range(num_epochs):
-        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
+        # Sum of training loss, sum of training accuracy, no. of examples
+        metric = d2l.Accumulator(3)
         for i, (X, y) in enumerate(train_iter):
             timer.start()
             net.train()
@@ -486,11 +491,12 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
             l.backward()
             optimizer.step()
             with torch.no_grad():
-                metric.add(l*X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
+                metric.add(l * X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
             timer.stop()
-            train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
-            if (i+1) % 50 == 0:
-                animator.add(epoch + i/len(train_iter),
+            train_loss = metric[0]/metric[2]
+            train_acc = metric[1]/metric[2]
+            if (i + 1) % 50 == 0:
+                animator.add(epoch + i / len(train_iter),
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
@@ -642,7 +648,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 class SeqDataLoader:  #@save
-    """A iterator to load sequence data."""
+    """An iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
             self.data_iter_fn = d2l.seq_data_iter_random
@@ -684,7 +690,8 @@ class RNNModelScratch: #@save
 def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, device=device)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: torch.tensor([outputs[-1]], device=device).reshape(1, 1)
+    get_input = lambda: torch.tensor(
+        [outputs[-1]], device=device).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -707,7 +714,8 @@ def grad_clipping(model, theta):  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater, device, use_random_iter):  #@save
+def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
+                    use_random_iter):
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
@@ -732,7 +740,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device, use_random_iter): 
             grad_clipping(model, 1)
             updater(batch_size=1)  # Since used mean already
         metric.add(l * d2l.size(y), d2l.size(y))
-    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
@@ -1073,6 +1081,83 @@ def show_trace_2d(f, results):  #@save
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
+
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
+                           '76e5be1548fd8222e5074cf0faae75edff8cf93f')
+
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def get_data_ch11(batch_size=10, n=1500):
+    data = np.genfromtxt(d2l.download('airfoil'),
+                         dtype=np.float32, delimiter='\t')
+    data = torch.from_numpy((data - data.mean(axis=0)) / data.std(axis=0))
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    return data_iter, data.shape[1]-1
+
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def train_ch11(trainer_fn, states, hyperparams, data_iter,
+               feature_dim, num_epochs=2):
+    # Initialization
+    w = torch.normal(mean=0.0, std=0.01, size=(feature_dim, 1),
+                     requires_grad=True)
+    b = torch.zeros((1), requires_grad=True)
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+    # Train
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+            l = loss(net(X), y).mean()
+            l.backward()
+            trainer_fn([w, b], states, hyperparams)
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                animator.add(n/X.shape[0]/len(data_iter),
+                             (d2l.evaluate_loss(net, data_iter, loss),))
+                timer.start()
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    return timer.cumsum(), animator.Y[0]
+
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
+    # Initialization
+    net = nn.Sequential(nn.Linear(5, 1))
+    def init_weights(m):
+        if type(m) == nn.Linear:
+            torch.nn.init.normal_(m.weight, std=0.01)
+    net.apply(init_weights)
+    
+    optimizer = trainer_fn(net.parameters(), **hyperparams)
+    
+    loss = nn.MSELoss()
+    # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
+    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss 
+    # value to get L2Loss in PyTorch.
+    
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+            optimizer.zero_grad()
+            out = net(X)
+            y = y.reshape(out.shape)
+            l = loss(out, y)/2
+            l.backward()
+            optimizer.step()
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                animator.add(n/X.shape[0]/len(data_iter),
+                             (d2l.evaluate_loss(net, data_iter, loss)/2,))
+                timer.start()
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 
 
 # Alias defined in config.ini

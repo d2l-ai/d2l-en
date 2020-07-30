@@ -68,17 +68,17 @@ class RNNModel(nn.Block):
 Before training the model, let us make a prediction with the a model that has random weights.
 
 ```{.python .input  n=42}
-ctx = d2l.try_gpu()
+device = d2l.try_gpu()
 model = RNNModel(rnn_layer, len(vocab))
-model.initialize(force_reinit=True, ctx=ctx)
-d2l.predict_ch8('time traveller', 10, model, vocab, ctx)
+model.initialize(force_reinit=True, ctx=device)
+d2l.predict_ch8('time traveller', 10, model, vocab, device)
 ```
 
 As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and train our model with Gluon.
 
 ```{.python .input  n=19}
 num_epochs, lr = 500, 1
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
 Compared with the last section, this model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized.

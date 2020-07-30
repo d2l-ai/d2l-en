@@ -7,4 +7,4 @@ from d2l import torch as d2l  # Use PyTorch as the backend
 
 """
 
-__version__ = "0.14.1"
+__version__ = "0.14.2"

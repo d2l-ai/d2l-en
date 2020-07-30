@@ -470,12 +470,25 @@ features[:2], poly_features[:2, :], labels[:2]
 Let us first implement a function to evaluate the loss on a given dataset.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet, tensorflow
 def evaluate_loss(net, data_iter, loss):  #@save
     """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
         l = loss(net(X), y)
+        metric.add(d2l.reduce_sum(l), d2l.size(l))
+    return metric[0] / metric[1]
+```
+
+```{.python .input}
+#@tab pytorch
+def evaluate_loss(net, data_iter, loss):  #@save
+    """Evaluate the loss of a model on the given dataset."""
+    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
+    for X, y in data_iter:
+        out = net(X)
+        y = d2l.reshape(y, out.shape)
+        l = loss(out, y)
         metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 ```
@@ -632,7 +645,7 @@ such as weight decay and dropout.
 ## Exercises
 
 1. Can you solve the polynomial regression problem exactly? Hint: use linear algebra.
-1. Concider model selection for polynomials:
+1. Consider model selection for polynomials:
     * Plot the training loss vs. model complexity (degree of the polynomial). What do you observe? What degree of polynomial do you need to reduce the training loss to 0?
     * Plot the test loss in this case.
     * Generate the same plot as a function of the amount of data.

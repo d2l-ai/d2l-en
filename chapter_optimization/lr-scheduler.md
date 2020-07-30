@@ -31,21 +31,21 @@ net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='relu'),
         nn.Dense(10))
 net.hybridize()
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
-ctx = d2l.try_gpu()
+device = d2l.try_gpu()
 
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
 # The code is almost identical to `d2l.train_ch6` that defined in the lenet
 # section of chapter convolutional neural networks
-def train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx):
-    net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
+def train(net, train_iter, test_iter, num_epochs, loss, trainer, device):
+    net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
-            X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
+            X, y = X.as_in_ctx(device), y.as_in_ctx(device)
             with autograd.record():
                 y_hat = net(X)
                 l = loss(y_hat, y)
@@ -67,9 +67,9 @@ Let us have a look at what happens if we invoke this algorithm with default sett
 
 ```{.python .input}
 lr, num_epochs = 0.3, 30
-net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
+net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx)
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
 ## Schedulers
@@ -104,7 +104,7 @@ Now let us see how this plays out for training on Fashion-MNIST. We simply provi
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
-train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx)
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
 This worked quite a bit better than previously. Two things stand out: the curve was rather more smooth than previously. Secondly, there was less overfitting. Unfortunately it is not a well-resolved question as to why certain strategies lead to less overfitting in *theory*. There is some argument that a smaller stepsize will lead to parameters that are closer to zero and thus simpler. However, this does not explain the phenomenon entirely since we do not really stop early but simply reduce the learning rate gently.
@@ -149,7 +149,7 @@ The intuition behind this piecewise constant learning rate schedule is that one 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
-train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx)
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
 ### Cosine Scheduler
@@ -171,7 +171,7 @@ In the context of computer vision this schedule *can* lead to improved results. 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
-train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx)
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
 ### Warmup
@@ -191,7 +191,7 @@ Note that the network converges better initially (in particular observe the perf
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
-train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx)
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
 Warmup can be applied to any scheduler (not just cosine). For a more detailed discussion of learning rate schedules and many more experiments see also :cite:`Gotmare.Keskar.Xiong.ea.2018`. In particular they find that a warmup phase limits the amount of divergence of parameters in very deep networks. This makes intuitively sense since we would expect significant divergence due to random initialization in those parts of the network that take the most time to make progress in the beginning.

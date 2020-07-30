@@ -15,11 +15,11 @@ which might not seem like they should work:
   how many parameters our models should contain.
 
 You might be surprised that our code runs at all.
-After all, there is no way MXNet and TensorFlow
+After all, there is no way the deep learning framework
 could tell what the input dimensionality of a network would be.
-The trick here is that both frameworks *defer initialization*,
+The trick here is that the framework *defers initialization*,
 waiting until the first time we pass data through the model,
-to infer the sizes of each layer *on the fly*.
+to infer the sizes of each layer on the fly.
 
 
 Later on, when working with convolutional neural networks,
@@ -46,13 +46,13 @@ from mxnet import init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-def getnet():
+def get_net():
     net = nn.Sequential()
     net.add(nn.Dense(256, activation='relu'))
     net.add(nn.Dense(10))
     return net
 
-net = getnet()
+net = get_net()
 ```
 
 ```{.python .input}
@@ -82,15 +82,15 @@ print(net.collect_params())
 ```
 
 :begin_tab:`mxnet`
-Note that while the Parameter objects exist,
-the input dimension to each layer is listed as `-1`.
-MXNet uses the special value `-1` to indicate
-that the parameters dimension remains unknown.
+Note that while the parameter objects exist,
+the input dimension to each layer is listed as -1.
+MXNet uses the special value -1 to indicate
+that the parameter dimension remains unknown.
 At this point, attempts to access `net[0].weight.data()`
 would trigger a runtime error stating that the network
 must be initialized before the parameters can be accessed.
 Now let us see what happens when we attempt to initialize
-parameters via the `initialize` method.
+parameters via the `initialize` function.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -113,29 +113,28 @@ Instead, this call registers to MXNet that we wish
 to initialize the parameters.
 :end_tab:
 
-Net let us pass data through the network
+Next let us pass data through the network
 to make the framework finally initialize parameters.
 
 ```{.python .input}
-x = np.random.uniform(size=(2, 20))
-net(x)
+X = np.random.uniform(size=(2, 20))
+net(X)
 
 net.collect_params()
 ```
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.random.uniform((2, 20))
-net(x)
+X = tf.random.uniform((2, 20))
+net(X)
 [w.shape for w in net.get_weights()]
 ```
 
 As soon as we know the input dimensionality,
-$\mathbf{x} \in \mathbb{R}^{20}$,
-the framework can identify the shape of the first layer's weight matrix,
-i.e., $\mathbf{W}_1 \in \mathbb{R}^{256 \times 20}$.
-Having recognized the first layer shape, the framework proceeds
-to the second layer, whose dimensionality is $10 \times 256$
+20,
+the framework can identify the shape of the first layer's weight matrix by plugging in the value of 20.
+Having recognized the first layer's shape, the framework proceeds
+to the second layer,
 and so on through the computational graph
 until all shapes are known.
 Note that in this case,
@@ -147,13 +146,14 @@ the framework can finally initialize the parameters.
 ## Summary
 
 * Deferred initialization can be convenient, allowing the framework to infer parameter shapes automatically, making it easy to modify architectures and eliminating one common source of errors.
+* We can pass data through the model to make the framework finally initialize parameters.
 
 
 ## Exercises
 
 1. What happens if you specify the input dimensions to the first layer but not to subsequent layers? Do you get immediate initialization?
 1. What happens if you specify mismatching dimensions?
-1. What would you need to do if you have input of varying dimensionality? Hint: look at parameter tying.
+1. What would you need to do if you have input of varying dimensionality? Hint: look at the parameter tying.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/280)
