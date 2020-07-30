@@ -1089,7 +1089,8 @@ def get_data_ch11(batch_size=10, n=1500):
     data = np.genfromtxt(d2l.download('airfoil'),
                          dtype=np.float32, delimiter='\t')
     data = torch.from_numpy((data - data.mean(axis=0)) / data.std(axis=0))
-    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
+                               batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 
 
