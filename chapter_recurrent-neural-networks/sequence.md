@@ -253,7 +253,7 @@ This clearly illustrates how the quality of the estimates changes as we try to p
     * How many would you need if there was no noise? Hint: you can write $\sin$ and $\cos$ as a differential equation.
     * Can you incorporate older features while keeping the total number of features constant? Does this improve accuracy? Why?
     * Change the neural network architecture and see what happens.
-1. An investor wants to find a good security to buy. She looks at past returns to decide which one is likely to do well. What could possibly go wrong with this strategy?
+1. An investor wants to find a good security to buy. He looks at past returns to decide which one is likely to do well. What could possibly go wrong with this strategy?
 1. Does causality also apply to text? To which extent?
 1. Give an example for when a latent autoregressive model might be needed to capture the dynamic of the data.
 

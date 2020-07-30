@@ -1,7 +1,7 @@
 # Modern Convolutional Neural Networks
 :label:`chap_modern_cnn`
 
-Now that we understand the basics of wiring together convolutional neural networks, we will take you through a tour of modern deep learning.
+Now that we understand the basics of wiring together CNNs, we will take you through a tour of modern deep learning.
 In this chapter, each section will correspond to a significant neural network architecture that was at some point (or currently) the base model upon which an enormous amount of research and projects were built.
 Each of these networks was at briefly
 a dominant architecture and many were
@@ -14,6 +14,12 @@ the VGG network, which makes use of a number of repeating blocks of elements; th
 patch-wise over inputs; the GoogLeNet, which makes use of networks with parallel concatenations;
 residual networks (ResNet), which are the
 most popular go-to architecture today, and densely connected networks (DenseNet), which are expensive to compute but have set some recent benchmarks.
+
+At first sight,
+*deep* neural networks are simply networks with many layers,
+however,
+it is more complex to make such deep models work.
+Fortunately, the batch normalization and residual network techniques described in this chapter have offered two popular ideas for training and designing deep models.
 
 ```toc
 :maxdepth: 2

@@ -72,11 +72,11 @@ that were withheld from our training set.
 
 The following three thought experiments
 will help illustrate this situation better.
-Consider a college student trying to prepare for her final exam.
+Consider a college student trying to prepare for his final exam.
 A diligent student will strive to practice well
-and test her abilities using exams from previous years.
+and test his abilities using exams from previous years.
 Nonetheless, doing well on past exams is no guarantee
-that she will excel when it matters.
+that he will excel when it matters.
 For instance, the student might try to prepare
 by rote learning the answers to the exam questions.
 This requires the student to memorize many things.

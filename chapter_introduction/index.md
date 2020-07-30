@@ -579,9 +579,9 @@ you have probably worked through a regression problem informally.
 Imagine, for example, that you had your drains repaired
 and that your contractor spent $x_1=3$ hours
 removing gunk from your sewage pipes.
-Then she sent you a bill of $y_1 = \$350$.
+Then he sent you a bill of $y_1 = \$350$.
 Now imagine that your friend hired the same contractor for $x_2 = 2$ hours
-and that she received a bill of $y_2 = \$250$.
+and that he received a bill of $y_2 = \$250$.
 If someone then asked you how much to expect
 on their upcoming gunk-removal invoice
 you might make some reasonable assumptions,
@@ -1086,7 +1086,7 @@ This last question raises the problem of *distribution shift*,
 (when training and test data are different).
 It is a problem that most of us have experienced
 when taking exams written by a lecturer,
-while the homeworks were composed by her TAs.
+while the homeworks were composed by his TAs.
 We will briefly describe reinforcement learning and adversarial learning,
 two settings that explicitly consider interaction with an environment.
 
