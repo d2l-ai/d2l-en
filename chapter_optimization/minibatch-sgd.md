@@ -237,7 +237,8 @@ def get_data_ch11(batch_size=10, n=1500):
     data = np.genfromtxt(d2l.download('airfoil'),
                          dtype=np.float32, delimiter='\t')
     data = torch.from_numpy((data - data.mean(axis=0)) / data.std(axis=0))
-    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
+                               batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 ```
 
@@ -252,7 +253,8 @@ def get_data_ch11(batch_size=10, n=1500):
     data = np.genfromtxt(d2l.download('airfoil'),
                          dtype=np.float32, delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
-    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
+                               batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 ```
 
@@ -352,8 +354,8 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
 def train_ch11(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
   # Initialization
-  w = tf.Variable(tf.random.normal(shape=(feature_dim, 1), mean=0, stddev=0.01),
-                trainable=True)
+  w = tf.Variable(tf.random.normal(shape=(feature_dim, 1),
+                                   mean=0, stddev=0.01),trainable=True)
   b = tf.Variable(tf.zeros(1), trainable=True)
   
   # Train
@@ -372,8 +374,9 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
       n += X.shape[0]
       if n % 200 == 0:
           timer.stop()
-          animator.add(n/X.shape[0]/tf.data.experimental.cardinality(data_iter).numpy(),
-                    (d2l.evaluate_loss(net, data_iter, loss),))
+          p = n/X.shape[0]/tf.data.experimental.cardinality(data_iter).numpy()
+          q = (d2l.evaluate_loss(net, data_iter, loss),)
+          animator.add(p, q)
           timer.start()
   print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
   return timer.cumsum(), animator.Y[0]
@@ -520,8 +523,9 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
       n += X.shape[0]
       if n % 200 == 0:
         timer.stop()
-        animator.add(n/X.shape[0]/tf.data.experimental.cardinality(data_iter).numpy(),
-                             (d2l.evaluate_loss(net, data_iter, loss)/2,))
+        p = n/X.shape[0]/tf.data.experimental.cardinality(data_iter).numpy()
+        q = (d2l.evaluate_loss(net, data_iter, loss)/2,)
+        animator.add(p, q)
         timer.start()
   print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
