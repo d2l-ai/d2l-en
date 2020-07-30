@@ -353,33 +353,34 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
 #@save
 def train_ch11(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
-  # Initialization
-  w = tf.Variable(tf.random.normal(shape=(feature_dim, 1),
+    # Initialization
+    w = tf.Variable(tf.random.normal(shape=(feature_dim, 1),
                                    mean=0, stddev=0.01),trainable=True)
-  b = tf.Variable(tf.zeros(1), trainable=True)
+    b = tf.Variable(tf.zeros(1), trainable=True)
   
-  # Train
-  net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
-  animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+    # Train
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
-  n, timer = 0, d2l.Timer()
+    n, timer = 0, d2l.Timer()
 
-  for _ in range(num_epochs):
-    for X, y in data_iter:
-      with tf.GradientTape() as g:
-        l = tf.math.reduce_mean(loss(net(X), y))
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+          with tf.GradientTape() as g:
+            l = tf.math.reduce_mean(loss(net(X), y))
       
-      dw, db = g.gradient(l, [w, b])
-      trainer_fn([w, b], [dw, db], states, hyperparams)
-      n += X.shape[0]
-      if n % 200 == 0:
-          timer.stop()
-          p = n/X.shape[0]/tf.data.experimental.cardinality(data_iter).numpy()
-          q = (d2l.evaluate_loss(net, data_iter, loss),)
-          animator.add(p, q)
-          timer.start()
-  print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
-  return timer.cumsum(), animator.Y[0]
+          dw, db = g.gradient(l, [w, b])
+          trainer_fn([w, b], [dw, db], states, hyperparams)
+          n += X.shape[0]
+          if n % 200 == 0:
+              timer.stop()
+              p = n/X.shape[0]
+              q = p/tf.data.experimental.cardinality(data_iter).numpy()
+              r = (d2l.evaluate_loss(net, data_iter, loss),)
+              animator.add(q, r)
+              timer.start()
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    return timer.cumsum(), animator.Y[0]
 ```
 
 Let us see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e., to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
@@ -499,35 +500,36 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
 #@tab tensorflow
 #@save
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
-  # Initialization
-  net = tf.keras.Sequential()
-  net.add(tf.keras.layers.Dense(1, 
-          kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
-  optimizer = trainer_fn(hyperparams['lr'])
-  loss = tf.keras.losses.MeanSquaredError()
-  # Note: L2 Loss = 1/2 * MSE Loss. TF has MSE Loss which is slightly
-  # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
-  # value to get L2Loss in TF.
+    # Initialization
+    net = tf.keras.Sequential()
+    net.add(tf.keras.layers.Dense(1, 
+            kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
+    optimizer = trainer_fn(**hyperparams)
+    loss = tf.keras.losses.MeanSquaredError()
+    # Note: L2 Loss = 1/2 * MSE Loss. TF has MSE Loss which is slightly
+    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
+    # value to get L2Loss in TF.
   
-  animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
-  n, timer = 0, d2l.Timer()
-  for _ in range(num_epochs):
-    for X, y in data_iter:
-      with tf.GradientTape() as g:
-        out = net(X)
-        l = loss(y, out)/2
-        params = net.trainable_variables
-        grads = g.gradient(l, params)
-      optimizer.apply_gradients(zip(grads, params))
-      n += X.shape[0]
-      if n % 200 == 0:
-        timer.stop()
-        p = n/X.shape[0]/tf.data.experimental.cardinality(data_iter).numpy()
-        q = (d2l.evaluate_loss(net, data_iter, loss)/2,)
-        animator.add(p, q)
-        timer.start()
-  print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    n, timer = 0, d2l.Timer()
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+            with tf.GradientTape() as g:
+                out = net(X)
+                l = loss(y, out)/2
+                params = net.trainable_variables
+                grads = g.gradient(l, params)
+            optimizer.apply_gradients(zip(grads, params))
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                p = n/X.shape[0]
+                q = p/tf.data.experimental.cardinality(data_iter).numpy()
+                r = (d2l.evaluate_loss(net, data_iter, loss)/2,)
+                animator.add(q, r)
+                timer.start()
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 ```
 
 Using Gluon to repeat the last experiment shows identical behavior.
@@ -548,7 +550,7 @@ train_concise_ch11(trainer, {'lr': 0.05}, data_iter)
 #@tab tensorflow
 data_iter, _ = get_data_ch11(10)
 trainer = tf.keras.optimizers.SGD
-train_concise_ch11(trainer, {'lr': 0.05}, data_iter)
+train_concise_ch11(trainer, {'learning_rate': 0.05}, data_iter)
 ```
 
 ## Summary
