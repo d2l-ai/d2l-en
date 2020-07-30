@@ -56,9 +56,25 @@ def gd_2d(x1, x2, s1, s2):
 d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+
+eta = 0.4
+def f_2d(x1, x2):
+    return 0.1 * x1 ** 2 + 2 * x2 ** 2
+def gd_2d(x1, x2, s1, s2):
+    return (x1 - eta * 0.2 * x1, x2 - eta * 4 * x2, 0, 0)
+
+d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
+```
+
 By construction, the gradient in the $x_2$ direction is *much* higher and changes much more rapidly than in the horizontal $x_1$ direction. Thus we are stuck between two undesirable choices: if we pick a small learning rate we ensure that the solution does not diverge in the $x_2$ direction but we are saddled with slow convergence in the $x_1$ direction. Conversely, with a large learning rate we progress rapidly in the $x_1$ direction but diverge in $x_2$. The example below illustrates what happens even after a slight increase in learning rate from $0.4$ to $0.6$. Convergence in the $x_1$ direction improves but the overall solution quality is much worse.
 
 ```{.python .input}
+#@tab all
 eta = 0.6
 d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
@@ -79,6 +95,7 @@ $$
 Note that for $\beta = 0$ we recover regular gradient descent. Before delving deeper into the mathematical properties let us have a quick look at how the algorithm behaves in practice.
 
 ```{.python .input}
+#@tab all
 def momentum_2d(x1, x2, v1, v2):
     v1 = beta * v1 + 0.2 * x1
     v2 = beta * v2 + 4 * x2
@@ -91,6 +108,7 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 As we can see, even with the same learning rate that we used before, momentum still converges well. Let us see what happens when we decrease the momentum parameter. Halving it to $\beta = 0.25$ leads to a trajectory that barely converges at all. Nonetheless, it is a lot better than without momentum (when the solution diverges).
 
 ```{.python .input}
+#@tab all
 eta, beta = 0.6, 0.25
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
@@ -102,10 +120,11 @@ Note that we can combine momentum with SGD and in particular, minibatch-SGD. The
 Recall that $\mathbf{v}_t = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}$. In the limit the terms add up to $\sum_{\tau=0}^\infty \beta^\tau = \frac{1}{1-\beta}$. In other words, rather than taking a step of size $\eta$ in GD or SGD we take a step of size $\frac{\eta}{1-\beta}$ while at the same time, dealing with a potentially much better behaved descent direction. These are two benefits in one. To illustrate how weighting behaves for different choices of $\beta$ consider the diagram below.
 
 ```{.python .input}
+#@tab all
 d2l.set_figsize()
 betas = [0.95, 0.9, 0.6, 0]
 for beta in betas:
-    x = np.arange(40).asnumpy()
+    x = d2l.numpy(d2l.arange(40))
     d2l.plt.plot(x, beta ** x, label=f'beta = {beta:.2f}')
 d2l.plt.xlabel('time')
 d2l.plt.legend();
@@ -120,20 +139,34 @@ Let us see how momentum works in practice, i.e., when used within the context of
 Compared with (minibatch) SGD the momentum method needs to maintain a set of  auxiliary variables, i.e., velocity. It has the same shape as the gradients (and variables of the optimization problem). In the implementation below we call these variables `states`.
 
 ```{.python .input}
+#@tab all
 def init_momentum_states(feature_dim):
-    v_w = np.zeros((feature_dim, 1))
-    v_b = np.zeros(1)
+    v_w = d2l.zeros((feature_dim, 1))
+    v_b = d2l.zeros(1)
     return (v_w, v_b)
+```
 
+```{.python .input}
 def sgd_momentum(params, states, hyperparams):
     for p, v in zip(params, states):
         v[:] = hyperparams['momentum'] * v + p.grad
         p[:] -= hyperparams['lr'] * v
 ```
 
+```{.python .input}
+#@tab pytorch
+def sgd_momentum(params, states, hyperparams):
+    for p, v in zip(params, states):
+        with torch.no_grad():
+            v[:] = hyperparams['momentum'] * v + p.grad
+            p[:] -= hyperparams['lr'] * v
+        p.grad.data.zero_()
+```
+
 Let us see how this works in practice.
 
 ```{.python .input}
+#@tab all
 def train_momentum(lr, momentum, num_epochs=2):
     d2l.train_ch11(sgd_momentum, init_momentum_states(feature_dim),
                    {'lr': lr, 'momentum': momentum}, data_iter,
@@ -146,12 +179,14 @@ train_momentum(0.02, 0.5)
 When we increase the momentum hyperparameter `momentum` to 0.9, it amounts to a significantly larger effective sample size of $\frac{1}{1 - 0.9} = 10$. We reduce the learning rate slightly to $0.01$ to keep matters under control.
 
 ```{.python .input}
+#@tab all
 train_momentum(0.01, 0.9)
 ```
 
 Reducing the learning rate further addresses any issue of non-smooth optimization problems. Setting it to $0.005$ yields good convergence properties.
 
 ```{.python .input}
+#@tab all
 train_momentum(0.005, 0.9)
 ```
 
@@ -162,6 +197,12 @@ There is very little to do in Gluon since the standard `sgd` solver already had 
 ```{.python .input}
 d2l.train_concise_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
                        data_iter)
+```
+
+```{.python .input}
+#@tab pytorch
+trainer = torch.optim.SGD
+d2l.train_concise_ch11(trainer, {'lr': 0.005, 'momentum': 0.9}, data_iter)
 ```
 
 ## Theoretical Analysis
@@ -207,11 +248,12 @@ $$x_{t+1} = x_t - \eta \lambda x_t = (1 - \eta \lambda) x_t.$$
 Whenever $|1 - \eta \lambda| < 1$ this optimization converges at an exponential rate since after $t$ steps we have $x_t = (1 - \eta \lambda)^t x_0$. This shows how the rate of convergence improves initially as we increase the learning rate $\eta$ until $\eta \lambda = 1$. Beyond that things diverge and for $\eta \lambda > 2$ the optimization problem diverges.
 
 ```{.python .input}
+#@tab all
 lambdas = [0.1, 1, 10, 19]
 eta = 0.1
 d2l.set_figsize((6, 4))
 for lam in lambdas:
-    t = np.arange(20).asnumpy()
+    t = d2l.numpy(d2l.arange(20))
     d2l.plt.plot(t, (1 - eta * lam) ** t, label=f'lambda = {lam:.2f}')
 d2l.plt.xlabel('time')
 d2l.plt.legend();
