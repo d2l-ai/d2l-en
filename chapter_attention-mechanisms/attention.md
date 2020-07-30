@@ -242,6 +242,7 @@ class MLPAttention(nn.Module):
         # Expand query to (`batch_size`, #queries, 1, units), and key to
         # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
         features = query.unsqueeze(2) + key.unsqueeze(1)
+        features = torch.tanh(features)
         scores = self.v(features).squeeze(-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
         return torch.bmm(attention_weights, value)
