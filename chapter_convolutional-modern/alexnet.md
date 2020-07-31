@@ -56,7 +56,7 @@ or a slightly improved feature-extraction pipeline
 mattered far more to the final accuracy than any learning algorithm.
 
 
-## Learning Feature Representation
+## Learning Representations
 
 Another way to cast the state of affairs is that
 the most important part of the pipeline was the representation.
