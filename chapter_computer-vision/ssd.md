@@ -375,12 +375,12 @@ display(img, output, threshold=0.9)
 
 ## Exercises
 
-1. Due to space limitations, we have ignored some of the implementation details of SSD models in this experiment. Can you further improve the model in the following areas?
+1. Due to space limitations, we have ignored some of the implementation details of the SSD model in this experiment. Can you further improve the model in the following areas?
 
 
 ### Loss Function
 
-For the predicted offsets, replace $L_1$ norm loss with $L_1$ regularization loss. This loss function uses a square function around zero for greater smoothness. This is the regularized area controlled by the hyperparameter $\sigma$:
+A. For the predicted offsets, replace $L_1$ norm loss with $L_1$ regularization loss. This loss function uses a square function around zero for greater smoothness. This is the regularized area controlled by the hyperparameter $\sigma$:
 
 $$
 f(x) =
@@ -427,10 +427,13 @@ d2l.plt.legend();
 
 ### Training and Prediction
 
-2. When an object is relatively large compared to the image, the model normally adopts a larger input image size.
-3. This generally produces a large number of negative anchor boxes when labeling anchor box categories. We can sample the negative anchor boxes to better balance the data categories. To do this, we can set the `MultiBoxTarget` function's `negative_mining_ratio` parameter.
-4. Assign hyperparameters with different weights to the anchor box category loss and positive anchor box offset loss in the loss function.
-5. Refer to the SSD paper. What methods can be used to evaluate the precision of object detection models :cite:`Liu.Anguelov.Erhan.ea.2016`?
+B. When an object is relatively large compared to the image, the model normally adopts a larger input image size.
+
+C. This generally produces a large number of negative anchor boxes when labeling anchor box categories. We can sample the negative anchor boxes to better balance the data categories. To do this, we can set the `MultiBoxTarget` function's `negative_mining_ratio` parameter.
+
+D. Assign hyperparameters with different weights to the anchor box category loss and positive anchor box offset loss in the loss function.
+
+E. Refer to the SSD paper. What methods can be used to evaluate the precision of object detection models :cite:`Liu.Anguelov.Erhan.ea.2016`?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/373)
