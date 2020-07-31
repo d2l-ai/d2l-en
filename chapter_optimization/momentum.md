@@ -41,7 +41,7 @@ $$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$
 
 As before $f$ has its minimum at $(0, 0)$. This function is *very* flat in the direction of $x_1$. Let us see what happens when we perform gradient descent as before on this new function. We pick a learning rate of $0.4$.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -56,7 +56,7 @@ def gd_2d(x1, x2, s1, s2):
 d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -153,14 +153,14 @@ Let us see how momentum works in practice, i.e., when used within the context of
 
 Compared with (minibatch) SGD the momentum method needs to maintain a set of  auxiliary variables, i.e., velocity. It has the same shape as the gradients (and variables of the optimization problem). In the implementation below we call these variables `states`.
 
-```python
+```{.python .input}
 def init_momentum_states(feature_dim):
     v_w = d2l.zeros((feature_dim, 1))
     v_b = d2l.zeros(1)
     return (v_w, v_b)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def init_momentum_states(feature_dim):
     v_w = d2l.zeros((feature_dim, 1))
@@ -176,14 +176,14 @@ def init_momentum_states(features_dim):
     return (v_w, v_b)
 ```
 
-```python
+```{.python .input}
 def sgd_momentum(params, states, hyperparams):
     for p, v in zip(params, states):
         v[:] = hyperparams['momentum'] * v + p.grad
         p[:] -= hyperparams['lr'] * v
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def sgd_momentum(params, states, hyperparams):
     for p, v in zip(params, states):
@@ -232,12 +232,12 @@ train_momentum(0.005, 0.9)
 
 There is very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
 
-```python
+```{.python .input}
 d2l.train_concise_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
                        data_iter)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 trainer = torch.optim.SGD
 d2l.train_concise_ch11(trainer, {'lr': 0.005, 'momentum': 0.9}, data_iter)
