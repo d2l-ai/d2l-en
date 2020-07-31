@@ -2,12 +2,12 @@
 :label:`sec_alexnet`
 
 
-Although convolutional neural networks were well known
+Although CNNs were well known
 in the computer vision and machine learning communities
 following the introduction of LeNet,
 they did not immediately dominate the field.
 Although LeNet achieved good results on early small datasets,
-the performance and feasibility of training convolutional networks
+the performance and feasibility of training CNNs
 on larger, more realistic datasets had yet to be established.
 In fact, for much of the intervening time between the early 1990s
 and the watershed results of 2012,
@@ -26,7 +26,7 @@ and the learning algorithm was often relegated to an afterthought.
 
 Although some neural network accelerators were available in the 1990s,
 they were not yet sufficiently powerful to make
-deep multichannel, multilayer convolutional neural networks
+deep multichannel, multilayer CNNs
 with a large number of parameters.
 Moreover, datasets were still relatively small.
 Added to these obstacles, key tricks for training neural networks
@@ -38,17 +38,17 @@ and effective regularization techniques were still missing.
 Thus, rather than training *end-to-end* (pixel to classification) systems,
 classical pipelines looked more like this:
 
-1. Obtain an interesting dataset. In early days, these datasets required expensive sensors (at the time, 1 megapixel images were state of the art).
+1. Obtain an interesting dataset. In early days, these datasets required expensive sensors (at the time, 1 megapixel images were state-of-the-art).
 2. Preprocess the dataset with hand-crafted features based on some knowledge of optics, geometry, other analytic tools, and occasionally on the serendipitous discoveries of lucky graduate students.
-3. Feed the data through a standard set of feature extractors such as [SIFT](https://en.wikipedia.org/wiki/Scale-invariant_feature_transform), the Scale-Invariant Feature Transform, or [SURF](https://en.wikipedia.org/wiki/Speeded_up_robust_features), the Speeded-Up Robust Features, or any number of other hand-tuned pipelines.
+3. Feed the data through a standard set of feature extractors such as the SIFT (scale-invariant feature transform) :cite:`Lowe.2004`, the SURF (speeded up robust features) :cite:`Bay.Tuytelaars.Van-Gool.2006`, or any number of other hand-tuned pipelines.
 4. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to train a classifier.
 
 If you spoke to machine learning researchers,
 they believed that machine learning was both important and beautiful.
 Elegant theories proved the properties of various classifiers.
-The field of machine learning was thriving, rigorous and eminently useful. However, if you spoke to a computer vision researcher,
+The field of machine learning was thriving, rigorous, and eminently useful. However, if you spoke to a computer vision researcher,
 you would hear a very different story.
-The dirty truth of image recognition, they'd tell you,
+The dirty truth of image recognition, they would tell you,
 is that features, not learning algorithms, drove progress.
 Computer vision researchers justifiably believed
 that a slightly bigger or cleaner dataset
