@@ -86,6 +86,7 @@ import torch
 from d2l import tensorflow as d2l
 import math
 import tensorflow as tf
+import numpy as np
 ```
 
 ```{.python .input}
@@ -157,8 +158,8 @@ def init_adagrad_states(feature_dim):
 def adagrad(params, grads, states, hyperparams):
     eps = 1e-6
     for p, s, g in zip(params, states, grads):
-        s.assign(s + tf.square(g))
-        p.assign(p - hyperparams['lr'] * g / tf.square(s + eps))
+        s.assign(s + tf.math.square(g))
+        p.assign(p - hyperparams['lr'] * g / tf.math.sqrt(s + eps))
 ```
 
 Compared to the experiment in :numref:`sec_minibatch_sgd` we use a
