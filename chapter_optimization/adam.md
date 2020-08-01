@@ -87,6 +87,30 @@ def adam(params, states, hyperparams):
     hyperparams['t'] += 1
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+def init_adam_states(feature_dim):
+    v_w = tf.Variable(d2l.zeros((feature_dim, 1)))
+    v_b = tf.Variable(d2l.zeros(1))
+    s_w = tf.Variable(d2l.zeros((feature_dim, 1)))
+    s_b = tf.Variable(d2l.zeros(1))
+    return ((v_w, s_w), (v_b, s_b))
+
+def adam(params, grads, states, hyperparams):
+    beta1, beta2, eps = 0.9, 0.999, 1e-6
+    for p, (v, s), grad in zip(params, states, grads):
+        v[:].assign(beta1 * v  + (1 - beta1) * grad)
+        s[:].assign(beta2 * s + (1 - beta2) * tf.math.square(grad))
+        v_bias_corr = v / (1 - beta1 ** hyperparams['t'])
+        s_bias_corr = s / (1 - beta2 ** hyperparams['t'])
+        p[:].assign(p - hyperparams['lr'] * v_bias_corr  
+                    / tf.math.sqrt(s_bias_corr) + eps)
+```
+
 We are ready to use Adam to train the model. We use a learning rate of $\eta = 0.01$.
 
 ```{.python .input}
@@ -106,6 +130,12 @@ d2l.train_concise_ch11('adam', {'learning_rate': 0.01}, data_iter)
 #@tab pytorch
 trainer = torch.optim.Adam
 d2l.train_concise_ch11(trainer, {'lr': 0.01}, data_iter)
+```
+
+```{.python .input}
+#@tab tensorflow
+trainer = tf.keras.optimizers.Adam
+d2l.train_concise_ch11(trainer, {'learning_rate': 0.01}, data_iter)
 ```
 
 ## Yogi
@@ -151,6 +181,25 @@ def yogi(params, states, hyperparams):
             p[:] -= hyperparams['lr'] * v_bias_corr / (torch.sqrt(s_bias_corr)
                                                        + eps)
         p.grad.data.zero_()
+    hyperparams['t'] += 1
+
+data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
+d2l.train_ch11(yogi, init_adam_states(feature_dim),
+               {'lr': 0.01, 't': 1}, data_iter, feature_dim);
+```
+
+```{.python .input}
+#@tab tensorflow
+def yogi(params, grads, states, hyperparams):
+    beta1, beta2, eps = 0.9, 0.999, 1e-6
+    for p, (v, s), grad in zip(params, states, grads):
+        v[:].assign(beta1 * v  + (1 - beta1) * grad)
+        s[:].assign(s + (1 - beta2) * tf.math.sign(
+                   tf.math.square(grad) - s) * tf.math.square(grad))
+        v_bias_corr = v / (1 - beta1 ** hyperparams['t'])
+        s_bias_corr = s / (1 - beta2 ** hyperparams['t'])
+        p[:].assign(p - hyperparams['lr'] * v_bias_corr  
+                    / tf.math.sqrt(s_bias_corr) + eps)
     hyperparams['t'] += 1
 
 data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
