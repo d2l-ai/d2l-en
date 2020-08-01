@@ -196,9 +196,9 @@ def sgd_momentum(params, states, hyperparams):
 ```{.python .input}
 #@tab tensorflow
 def sgd_momentum(params, grads, states, hyperparams):
-    for param, state, grad in zip(params, states, grads):
-            state[:].assign(hyperparams['momentum'] * state + grad)
-            param[:].assign(param - hyperparams['lr'] * state)
+    for p, v, g in zip(params, states, grads):
+            v[:].assign(hyperparams['momentum'] * v + g)
+            p[:].assign(p - hyperparams['lr'] * s)
 ```
 
 Let us see how this works in practice.
