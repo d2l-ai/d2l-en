@@ -86,7 +86,6 @@ import torch
 from d2l import tensorflow as d2l
 import math
 import tensorflow as tf
-import numpy as np
 ```
 
 ```{.python .input}
