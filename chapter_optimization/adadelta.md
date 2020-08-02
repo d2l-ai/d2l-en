@@ -39,7 +39,7 @@ and $\epsilon$ (a small value such as $10^{-5}$) is added to maintain numerical 
 
 Adadelta needs to maintain two state variables for each variable, $\mathbf{s}_t$ and $\Delta\mathbf{x}_t$. This yields the following implementation.
 
-```python
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
@@ -60,7 +60,7 @@ def adadelta(params, states, hyperparams):
         delta[:] = rho * delta + (1 - rho) * g * g
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -116,11 +116,11 @@ d2l.train_ch11(adadelta, init_adadelta_states(feature_dim),
 
 For a concise implementation we simply use the `adadelta` algorithm from the `Trainer` class. This yields the following one-liner for a much more compact invocation.
 
-```python
+```{.python .input}
 d2l.train_concise_ch11('adadelta', {'rho': 0.9}, data_iter)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 trainer = torch.optim.Adadelta
 d2l.train_concise_ch11(trainer, {'rho': 0.9}, data_iter)
