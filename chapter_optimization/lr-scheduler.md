@@ -120,7 +120,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
 ```{.python .input}
-#@tab tensorfllow
+#@tab tensorflow
 lr, num_epochs = 0.3, 30
 train(net, train_iter, test_iter, num_epochs, lr)
 ```
