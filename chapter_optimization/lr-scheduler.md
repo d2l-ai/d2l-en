@@ -63,6 +63,53 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, device):
           f'test acc {test_acc:.3f}')
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import numpy as np
+import math
+from tensorflow.keras.callbacks import LearningRateScheduler
+
+def net():
+    return tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid',
+                               padding='same'),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+        tf.keras.layers.Conv2D(filters=16, kernel_size=5,
+                               activation='sigmoid'),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(120, activation='sigmoid'),
+        tf.keras.layers.Dense(84, activation='sigmoid'),
+        tf.keras.layers.Dense(10)])
+
+
+batch_size = 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
+
+def train(net_fn, train_iter, test_iter, num_epochs, lr,
+              device=d2l.try_gpu(), custom_callback = False):
+    """Train a model with a GPU (defined in Chapter 6)."""
+    device_name = device._device_name
+    strategy = tf.distribute.OneDeviceStrategy(device_name)
+    with strategy.scope():
+        optimizer = tf.keras.optimizers.SGD(learning_rate=lr)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        net = net_fn()
+        net.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    callback = d2l.TrainCallback(net, train_iter, test_iter, num_epochs,
+                             device_name)
+    if custom_callback is False:
+        net.fit(train_iter, epochs=num_epochs, verbose=0, 
+                callbacks=[callback])
+    else:
+         net.fit(train_iter, epochs=num_epochs, verbose=0,
+                 callbacks=[callback, custom_callback])
+    return net
+```
+
 Let us have a look at what happens if we invoke this algorithm with default settings, such as a learning rate of $0.3$ and train for $30$ iterations. Note how the training accuracy keeps on increasing while progress in terms of test accuracy stalls beyond a point. The gap between both curves indicates overfitting.
 
 ```{.python .input}
@@ -72,6 +119,12 @@ trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
+```{.python .input}
+#@tab tensorfllow
+lr, num_epochs = 0.3, 30
+train(net, train_iter, test_iter, num_epochs, lr)
+```
+
 ## Schedulers
 
 One way of adjusting the learning rate is to set it explicitly at each step. This is conveniently achieved by the `set_learning_rate` method. We could adjust it downward after every epoch (or even after every minibatch), e.g., in a dynamic manner in response to how optimization is progressing.
@@ -79,6 +132,15 @@ One way of adjusting the learning rate is to set it explicitly at each step. Thi
 ```{.python .input}
 trainer.set_learning_rate(0.1)
 print(f'learning rate is now {trainer.learning_rate:.2f}')
+```
+
+```{.python .input}
+#@tab tensorflow
+lr = 0.1
+net = tf.keras.models.Sequential([tf.keras.layers.Dense(10)])
+net.compile(tf.keras.optimizers.SGD(learning_rate=lr) , loss='mse')
+
+print(f'learning rate is now ,', net.optimizer.lr.numpy())
 ```
 
 More generally we want to define a scheduler. When invoked with the number of updates it returns the appropriate value of the learning rate. Let us define a simple one that sets the learning rate to $\eta = \eta_0 (t + 1)^{-\frac{1}{2}}$.
@@ -92,11 +154,27 @@ class SquareRootScheduler:
         return self.lr * pow(num_update + 1.0, -0.5)
 ```
 
+```{.python .input}
+#@tab tensorflow
+class SquareRootScheduler:
+    def __init__(self, lr=0.1):
+        self.lr = lr
+
+    def __call__(self, epoch):
+        return self.lr * pow(epoch + 1.0, -0.5)
+```
+
 Let us plot its behavior over a range of values.
 
 ```{.python .input}
 scheduler = SquareRootScheduler(lr=1.0)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
+```
+
+```{.python .input}
+#@tab tensorflow
+schedular = SquareRootScheduler(1.0)
+d2l.plot(d2l.arange(num_epochs), [schedular(t) for t in range(num_epochs)])
 ```
 
 Now let us see how this plays out for training on Fashion-MNIST. We simply provide the scheduler as an additional argument to the training algorithm.
@@ -105,6 +183,12 @@ Now let us see how this plays out for training on Fashion-MNIST. We simply provi
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
+```
+
+```{.python .input}
+#@tab tensorflow
+train(net, train_iter, test_iter, num_epochs=30, lr=0.1,
+          custom_callback=schedular)
 ```
 
 This worked quite a bit better than previously. Two things stand out: the curve was rather more smooth than previously. Secondly, there was less overfitting. Unfortunately it is not a well-resolved question as to why certain strategies lead to less overfitting in *theory*. There is some argument that a smaller stepsize will lead to parameters that are closer to zero and thus simpler. However, this does not explain the phenomenon entirely since we do not really stop early but simply reduce the learning rate gently.
@@ -132,6 +216,22 @@ scheduler = FactorScheduler(factor=0.9, stop_factor_lr=1e-2, base_lr=2.0)
 d2l.plot(np.arange(50), [scheduler(t) for t in range(50)])
 ```
 
+```{.python .input}
+#@tab tensorflow
+class FactorScheduler:
+    def __init__(self, factor=1, stop_factor_lr=1e-7, base_lr=0.1):
+        self.factor = factor
+        self.stop_factor_lr = stop_factor_lr
+        self.base_lr = base_lr
+
+    def __call__(self, epoch):
+        self.base_lr = max(self.stop_factor_lr, self.base_lr * self.factor)
+        return self.base_lr
+    
+scheduler = FactorScheduler(factor=0.9, stop_factor_lr=1e-2, base_lr=2.0)
+d2l.plot(d2l.arange(50), [scheduler(t) for t in range(50)])
+```
+
 This can also be accomplished by a built-in scheduler in MXNet via the `lr_scheduler.FactorScheduler` object. It takes a few more parameters, such as warmup period, warmup mode (linear or constant), the maximum number of desired updates, etc.; Going forward we will use the built-in schedulers as appropriate and only explain their functionality here. As illustrated, it is fairly straightforward to build your own scheduler if needed.
 
 ### Multi Factor Scheduler
@@ -144,12 +244,37 @@ scheduler = lr_scheduler.MultiFactorScheduler(step=[15, 30], factor=0.5,
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
+```{.python .input}
+#@tab tensorflow
+class MultiFactorScheduler:
+  def __init__(self, step, factor, base_lr):
+    self.step = step
+    self.factor = factor
+    self.base_lr = base_lr
+  
+  def __call__(self, epoch):
+    if epoch in range(self.step[0], (self.step[1] + 1)):
+      return self.base_lr * self.factor
+    else:
+      return self.base_lr
+
+scheduler = MultiFactorScheduler(step=[15, 30], factor=0.5,base_lr=0.5)
+d2l.plot(d2l.arange(num_epochs + 1),
+         [scheduler(t) for t in range(num_epochs + 1)])
+```
+
 The intuition behind this piecewise constant learning rate schedule is that one lets optimization proceed until a stationary point has been reached in terms of the distribution of weight vectors. Then (and only then) do we decrease the rate such as to obtain a higher quality proxy to a good local minimum. The example below shows how this can produce ever slightly better solutions.
 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
+```
+
+```{.python .input}
+#@tab tensorflow
+train(net, train_iter, test_iter, num_epochs=30, lr=0.1,
+          custom_callback=schedular)
 ```
 
 ### Cosine Scheduler
@@ -166,12 +291,61 @@ scheduler = lr_scheduler.CosineScheduler(max_update=20, base_lr=0.5,
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
+```{.python .input}
+#@tab tensorflow
+# I've used the default value of arguement from mxnet cosine schedular
+# I've tried to implement as it's in Mxnet
+class CosineScheduler:
+  def __init__(self, max_update, base_lr=0.01, final_lr=0,
+               warmup_steps=0, warmup_begin_lr=0, warmup_mode='linear'):
+    self.base_lr_orig = base_lr
+    self.max_update = max_update
+    self.final_lr = final_lr
+    self.warmup_steps = warmup_steps
+    self.warmup_mode = warmup_mode
+    self. warmup_begin_lr =  warmup_begin_lr
+    self.max_steps = max_update - warmup_steps
+  
+  def get_warmup_lr(self, num_update):
+
+    assert num_update < self.warmup_steps
+    if self.warmup_mode == 'linear':
+      increase = (self.base_lr_orig - self.warmup_begin_lr) \
+                       * float(num_update) / float(self.warmup_steps)
+      return self.warmup_begin_lr + increase
+    elif self.warmup_mode == 'constant':
+      return self.warmup_begin_lr
+    else:
+      raise ValueError("Invalid warmup mode %s"%self.warmup_mode)
+
+  def __call__(self, epoch):
+    if epoch < self.warmup_steps:
+      return self.get_warmup_lr(epoch)
+    if epoch <= self.max_update:
+      self.base_lr = self.final_lr + (self.base_lr_orig - self.final_lr) * \
+                (1 + math.cos(math.pi * (epoch - self.warmup_steps) /
+                              self.max_steps)) / 2
+    return self.base_lr
+
+
+scheduler = CosineScheduler(max_update=20, base_lr=0.5,
+                                         final_lr=0.01)
+
+d2l.plot(np.arange(num_epochs), [schedular(t) for t in range(num_epochs)])
+```
+
 In the context of computer vision this schedule *can* lead to improved results. Note, though, that such improvements are not guaranteed (as can be seen below).
 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
+```
+
+```{.python .input}
+#@tab tensorflow
+train(net, train_iter, test_iter, num_epochs=30, lr=0.1,
+          custom_callback=schedular)
 ```
 
 ### Warmup
@@ -186,12 +360,25 @@ scheduler = lr_scheduler.CosineScheduler(20, warmup_steps=5, base_lr=0.5,
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
+```{.python .input}
+#@tab tensorflow
+scheduler = CosineScheduler(20, warmup_steps=5, base_lr=0.5,
+                                         final_lr=0.01)
+d2l.plot(tf.range(num_epochs), [scheduler(t) for t in range(num_epochs)])
+```
+
 Note that the network converges better initially (in particular observe the performance during the first 5 epochs).
 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
+```
+
+```{.python .input}
+#@tab tensorflow
+train(net, train_iter, test_iter, num_epochs=30, lr=0.1,
+          custom_callback=schedular)
 ```
 
 Warmup can be applied to any scheduler (not just cosine). For a more detailed discussion of learning rate schedules and many more experiments see also :cite:`Gotmare.Keskar.Xiong.ea.2018`. In particular they find that a warmup phase limits the amount of divergence of parameters in very deep networks. This makes intuitively sense since we would expect significant divergence due to random initialization in those parts of the network that take the most time to make progress in the beginning.
