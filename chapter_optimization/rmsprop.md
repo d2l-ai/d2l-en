@@ -27,7 +27,7 @@ $$
 
 As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots, = \frac{1}{1-\gamma}$. Hence the sum of weights is normalized to $1$ with a half-life time of an observation of $\gamma^{-1}$. Let us visualize the weights for the past 40 timesteps for various choices of $\gamma$.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
@@ -36,7 +36,7 @@ from mxnet import np, npx
 npx.set_np()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -83,14 +83,14 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))
 
 Next, we implement RMSProp to be used in a deep network. This is equally straightforward.
 
-```{.python .input}
+```python
 def init_rmsprop_states(feature_dim):
     s_w = d2l.zeros((feature_dim, 1))
     s_b = d2l.zeros(1)
     return (s_w, s_b)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def init_rmsprop_states(feature_dim):
     s_w = d2l.zeros((feature_dim, 1))
@@ -106,7 +106,7 @@ def init_rmsprop_states(feature_dim):
     return (s_w, s_b)
 ```
 
-```{.python .input}
+```python
 def rmsprop(params, states, hyperparams):
     gamma, eps = hyperparams['gamma'], 1e-6
     for p, s in zip(params, states):
@@ -114,7 +114,7 @@ def rmsprop(params, states, hyperparams):
         p[:] -= hyperparams['lr'] * p.grad / np.sqrt(s + eps)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def rmsprop(params, states, hyperparams):
     gamma, eps = hyperparams['gamma'], 1e-6
@@ -147,12 +147,12 @@ d2l.train_ch11(rmsprop, init_rmsprop_states(feature_dim),
 
 Since RMSProp is a rather popular algorithm it is also available in the `Trainer` instance. All we need to do is instantiate it using an algorithm named `rmsprop`, assigning $\gamma$ to the parameter `gamma1`.
 
-```{.python .input}
+```python
 d2l.train_concise_ch11('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
                        data_iter)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 trainer = torch.optim.RMSprop
 d2l.train_concise_ch11(trainer, {'lr': 0.01, 'alpha': 0.9},
