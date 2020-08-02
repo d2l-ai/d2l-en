@@ -126,7 +126,7 @@ there is also tremendous value in the objectivity of a platform
 that facilitates direct quantitative comparisons
 among competing approaches as well as code sharing
 so that everyone can learn what did and did not work.
-If you want to participate in a Kaggle competitions,
+If you want to participate in a Kaggle competition,
 you will first need to register for an account
 (see :numref:`fig_kaggle`).
 
