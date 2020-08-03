@@ -642,17 +642,17 @@ statistics, and computer science.
 ## Exercises
 
 1. Assume that we have some data $x_1, \ldots, x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
-    * Find a analytic solution for the optimal value of $b$.
-    * How does this problem and its solution relate to the normal distribution?
+    1. Find a analytic solution for the optimal value of $b$.
+    1. How does this problem and its solution relate to the normal distribution?
 1. Derive the analytic solution to the optimization problem for linear regression with squared error. To keep things simple, you can omit the bias $b$ from the problem (we can do this in principled fashion by adding one column to $\mathbf X$ consisting of all ones).
-    * Write out the optimization problem in matrix and vector notation (treat all the data as a single matrix, and all the target values as a single vector).
-    * Compute the gradient of the loss with respect to $w$.
-    * Find the analytic solution by setting the gradient equal to zero and solving the matrix equation.
-    * When might this be better than using stochastic gradient descent? When might this method break?
+    1. Write out the optimization problem in matrix and vector notation (treat all the data as a single matrix, and all the target values as a single vector).
+    1. Compute the gradient of the loss with respect to $w$.
+    1. Find the analytic solution by setting the gradient equal to zero and solving the matrix equation.
+    1. When might this be better than using stochastic gradient descent? When might this method break?
 1. Assume that the noise model governing the additive noise $\epsilon$ is the exponential distribution. That is, $p(\epsilon) = \frac{1}{2} \exp(-|\epsilon|)$.
-    * Write out the negative log-likelihood of the data under the model $-\log P(\mathbf y \mid \mathbf X)$.
-    * Can you find a closed form solution?
-    * Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint: what happens near the stationary point as we keep on updating the parameters)? Can you fix this?
+    1. Write out the negative log-likelihood of the data under the model $-\log P(\mathbf y \mid \mathbf X)$.
+    1. Can you find a closed form solution?
+    1. Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint: what happens near the stationary point as we keep on updating the parameters)? Can you fix this?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/40)
