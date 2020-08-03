@@ -174,8 +174,8 @@ d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 
 ```{.python .input}
 #@tab tensorflow
-schedular = SquareRootScheduler(1.0)
-d2l.plot(d2l.arange(num_epochs), [schedular(t) for t in range(num_epochs)])
+scheduler = SquareRootScheduler(1.0)
+d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
 Now let us see how this plays out for training on Fashion-MNIST. We simply provide the scheduler as an additional argument to the training algorithm.
@@ -189,7 +189,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```{.python .input}
 #@tab tensorflow
 train(net, train_iter, test_iter, num_epochs, lr,
-      custom_callback=LearningRateScheduler(schedular))
+      custom_callback=LearningRateScheduler(scheduler))
 ```
 
 This worked quite a bit better than previously. Two things stand out: the curve was rather more smooth than previously. Secondly, there was less overfitting. Unfortunately it is not a well-resolved question as to why certain strategies lead to less overfitting in *theory*. There is some argument that a smaller stepsize will lead to parameters that are closer to zero and thus simpler. However, this does not explain the phenomenon entirely since we do not really stop early but simply reduce the learning rate gently.
@@ -275,7 +275,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```{.python .input}
 #@tab tensorflow
 train(net, train_iter, test_iter, num_epochs, lr,
-      custom_callback=LearningRateScheduler(schedular))
+      custom_callback=LearningRateScheduler(scheduler))
 ```
 
 ### Cosine Scheduler
@@ -294,7 +294,7 @@ d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 
 ```{.python .input}
 #@tab tensorflow
-# I've used the default value of arguement from mxnet cosine schedular
+# I've used the default value of arguement from mxnet cosine scheduler
 # I've tried to implement as it's in Mxnet
 class CosineScheduler:
   def __init__(self, max_update, base_lr=0.01, final_lr=0,
@@ -332,7 +332,7 @@ class CosineScheduler:
 scheduler = CosineScheduler(max_update=20, base_lr=0.5,
                                          final_lr=0.01)
 
-d2l.plot(d2l.arange(num_epochs), [schedular(t) for t in range(num_epochs)])
+d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
 In the context of computer vision this schedule *can* lead to improved results. Note, though, that such improvements are not guaranteed (as can be seen below).
@@ -346,7 +346,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```{.python .input}
 #@tab tensorflow
 train(net, train_iter, test_iter, num_epochs, lr,
-      custom_callback=LearningRateScheduler(schedular))
+      custom_callback=LearningRateScheduler(scheduler))
 ```
 
 ### Warmup
@@ -379,7 +379,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```{.python .input}
 #@tab tensorflow
 train(net, train_iter, test_iter, num_epochs, lr,
-      custom_callback=LearningRateScheduler(schedular))
+      custom_callback=LearningRateScheduler(scheduler))
 ```
 
 Warmup can be applied to any scheduler (not just cosine). For a more detailed discussion of learning rate schedules and many more experiments see also :cite:`Gotmare.Keskar.Xiong.ea.2018`. In particular they find that a warmup phase limits the amount of divergence of parameters in very deep networks. This makes intuitively sense since we would expect significant divergence due to random initialization in those parts of the network that take the most time to make progress in the beginning.
