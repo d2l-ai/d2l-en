@@ -36,7 +36,7 @@ Second, we assume that any noise is well-behaved
 To motivate the approach, let us start with a running example.
 Suppose that we wish to estimate the prices of houses (in dollars)
 based on their area (in square feet) and age (in years).
-To actually fit a model for predicting house prices,
+To actually develop a model for predicting house prices,
 we would need to get our hands on a dataset
 consisting of sales for which we know
 the sale price, area, and age for each home.
