@@ -153,7 +153,7 @@ and (ii) a procedure for updating the model to improve its quality.
 
 ### Loss Function
 
-Before we start thinking about how *to fit* our model,
+Before we start thinking about how to *fit* data with our model,
 we need to determine a measure of *fitness*.
 The *loss function* quantifies the distance
 between the *real* and *predicted* value of the target.
