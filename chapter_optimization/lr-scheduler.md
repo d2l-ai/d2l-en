@@ -73,14 +73,14 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 
 def net():
     return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='sigmoid',
+        tf.keras.layers.Conv2D(filters=6, kernel_size=5, activation='relu',
                                padding='same'),
         tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Conv2D(filters=16, kernel_size=5,
-                               activation='sigmoid'),
+                               activation='relu'),
         tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(120, activation='sigmoid'),
+        tf.keras.layers.Dense(120, activation='relu'),
         tf.keras.layers.Dense(84, activation='sigmoid'),
         tf.keras.layers.Dense(10)])
 
@@ -138,10 +138,10 @@ print(f'learning rate is now {trainer.learning_rate:.2f}')
 ```{.python .input}
 #@tab tensorflow
 lr = 0.1
-net = tf.keras.models.Sequential([tf.keras.layers.Dense(10)])
-net.compile(tf.keras.optimizers.SGD(learning_rate=lr) , loss='mse')
+dummy_model = tf.keras.models.Sequential([tf.keras.layers.Dense(10)])
+dummy_model.compile(tf.keras.optimizers.SGD(learning_rate=lr), loss='mse')
 
-print(f'learning rate is now ,', net.optimizer.lr.numpy())
+print(f'learning rate is now ,', dummy_model.optimizer.lr.numpy())
 ```
 
 More generally we want to define a scheduler. When invoked with the number of updates it returns the appropriate value of the learning rate. Let us define a simple one that sets the learning rate to $\eta = \eta_0 (t + 1)^{-\frac{1}{2}}$.
@@ -259,7 +259,7 @@ class MultiFactorScheduler:
     else:
       return self.base_lr
 
-scheduler = MultiFactorScheduler(step=[15, 30], factor=0.5,base_lr=0.5)
+scheduler = MultiFactorScheduler(step=[15, 30], factor=0.5, base_lr=0.5)
 d2l.plot(d2l.arange(num_epochs),
          [scheduler(t) for t in range(num_epochs)])
 ```
