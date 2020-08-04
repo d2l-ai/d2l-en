@@ -198,7 +198,7 @@ def sgd_momentum(params, states, hyperparams):
 def sgd_momentum(params, grads, states, hyperparams):
     for p, v, g in zip(params, states, grads):
             v[:].assign(hyperparams['momentum'] * v + g)
-            p[:].assign(p - hyperparams['lr'] * s)
+            p[:].assign(p - hyperparams['lr'] * v)
 ```
 
 Let us see how this works in practice.
