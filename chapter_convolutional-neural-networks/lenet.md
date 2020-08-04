@@ -112,7 +112,6 @@ net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
 from d2l import torch as d2l
 import torch
 from torch import nn
-from dataclasses import dataclass
 
 class Reshape(torch.nn.Module):
     def forward(self, x):
