@@ -166,7 +166,6 @@ larger learning rate to train the model.
 
 ```{.python .input}
 #@tab all
-# todo fix adagrad
 data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 d2l.train_ch11(adagrad, init_adagrad_states(feature_dim),
                {'lr': 0.1}, data_iter, feature_dim);
