@@ -102,7 +102,7 @@ In vector form, we arrive at
 $\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$,
 a form better suited both for mathematics, and for writing code.
 Note that we have gathered all of our weights into a $3 \times 4$ matrix
-and that for features of a given data point $\mathbf{x}$,
+and that for features of a given data example $\mathbf{x}$,
 our outputs are given by a matrix-vector product of our weights by our input features
 plus our biases $\mathbf{b}$.
 
@@ -194,7 +194,7 @@ This accelerates the dominant operation into
 a matrix-matrix product $\mathbf{X} \mathbf{W}$
 vs. the matrix-vector products we would be executing
 if we processed one example at a time.
-Since each row in $\mathbf{X}$ represents a data point,
+Since each row in $\mathbf{X}$ represents a data example,
 the softmax operation itself can be computed *rowwise*:
 for each row of $\mathbf{O}$, exponentiate all entries and then normalize them by the sum.
 Triggering broadcasting during the summation $\mathbf{X} \mathbf{W} + \mathbf{b}$ in :eqref:`eq_minibatch_softmax_reg`,

@@ -361,7 +361,7 @@ $$
 \end{aligned}
 $$
 
-In other words, we need to reweigh each data point
+In other words, we need to reweigh each data example
 by the ratio of the
 probability
 that it would have been drawn from the correct distribution to that from the wrong one:
@@ -369,7 +369,7 @@ that it would have been drawn from the correct distribution to that from the wro
 $$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(\mathbf{x}_i)}{q(\mathbf{x}_i)}.$$
 
 Plugging in the weight $\beta_i$ for
-each data point $(\mathbf{x}_i, y_i)$
+each data example $(\mathbf{x}_i, y_i)$
 we can train our model using
 *weighted empirical risk minimization*:
 
@@ -448,7 +448,7 @@ for correcting covariate shift:
 1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ in :eqref:`eq_weighted-empirical-risk-min`.
 
 Note that the above algorithm relies on a crucial assumption.
-For this scheme to work, we need that each data point
+For this scheme to work, we need that each data example
 in the target (e.g., test time) distribution
 had nonzero probability of occurring at training time.
 If we find a point where $p(\mathbf{x}) > 0$ but $q(\mathbf{x}) = 0$,

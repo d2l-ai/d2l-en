@@ -185,7 +185,7 @@ def vgg(conv_arch):
 net = vgg(conv_arch)
 ```
 
-Next, we will construct a single-channel data point
+Next, we will construct a single-channel data example
 with a height and width of 224 to observe the output shape of each layer.
 
 ```{.python .input}

@@ -398,7 +398,7 @@ def net():
     ])
 ```
 
-We construct a single-channel data point with both height and width of 224 to observe the output shape of each layer. It matches the AlexNet architecture in :numref:`fig_alexnet`.
+We construct a single-channel data example with both height and width of 224 to observe the output shape of each layer. It matches the AlexNet architecture in :numref:`fig_alexnet`.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 224, 224))

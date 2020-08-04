@@ -463,7 +463,7 @@ class Animator:  #@save
         self.X, self.Y, self.fmts = None, None, fmts
 
     def add(self, x, y):
-        # Add multiple data points into the figure
+        # Add multiple data examples into the figure
         if not hasattr(y, "__len__"):
             y = [y]
         n = len(y)

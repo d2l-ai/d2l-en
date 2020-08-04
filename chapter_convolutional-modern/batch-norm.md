@@ -121,7 +121,7 @@ Once training is complete, why would we want
 the same image to be classified differently,
 depending on the batch in which it happens to reside?
 During training, such exact calculation is infeasible
-because the activations for all data points
+because the activations for all data examples
 change every time we update our model.
 However, once the model is trained,
 we can calculate the means and variances

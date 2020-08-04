@@ -43,7 +43,7 @@ the sale price, area, and age for each home.
 In the terminology of machine learning,
 the dataset is called a *training dataset* or *training set*,
 and each row (here the data corresponding to one sale)
-is called an *example* (or *data point*, *data instance*, *sample*).
+is called an *example* (or *data point*, *data instance*).
 The thing we are trying to predict (price)
 is called a *label* (or *target*).
 The independent variables (age and area)
@@ -52,7 +52,7 @@ are called *features* (or *covariates*).
 
 Typically, we will use $n$ to denote
 the number of examples in our dataset.
-We index the data points by $i$, denoting each input
+We index the data examples by $i$, denoting each input
 as $\mathbf{x}^{(i)} = [x_1^{(i)}, x_2^{(i)}]^\top$
 and the corresponding label as $y^{(i)}$.
 
@@ -110,7 +110,7 @@ we can express our model compactly using a dot product:
 $$\hat{y} = \mathbf{w}^\top \mathbf{x} + b.$$
 :eqlabel:`eq_linreg-y`
 
-In :eqref:`eq_linreg-y`, the vector $\mathbf{x}$ corresponds to features of a single data point.
+In :eqref:`eq_linreg-y`, the vector $\mathbf{x}$ corresponds to features of a single data example.
 We will often find it convenient
 to refer to features of our entire dataset of $n$ examples
 via the *design matrix* $\mathbf{X} \in \mathbb{R}^{n \times d}$.
@@ -128,9 +128,9 @@ Given features of a training dataset $\mathbf{X}$
 and corresponding (known) labels $\mathbf{y}$,
 the goal of linear regression is to find
 the weight vector $\mathbf{w}$ and the bias term $b$
-that given features of a new data point
+that given features of a new data example
 sampled from the same distribution as $\mathbf{X}$,
-the new data point's label will (in expectation) be predicted with the lowest error.
+the new data example's label will (in expectation) be predicted with the lowest error.
 
 
 Even if we believe that the best model for

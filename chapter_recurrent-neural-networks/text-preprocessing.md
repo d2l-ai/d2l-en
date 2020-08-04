@@ -44,7 +44,7 @@ f'# sentences {len(lines)}'
 
 ## Tokenization
 
-For each sentence, we split it into a list of tokens. A token is a data point
+For each sentence, we split it into a list of tokens. A token is a data example
 the model will train and predict. The following function supports splitting a sentence into words or characters, and returns a list of split strings.
 
 ```{.python .input}

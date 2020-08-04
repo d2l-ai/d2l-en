@@ -243,7 +243,7 @@ We could lose hundreds of pages pondering what precisely constitutes data,
 but for now, we will err on the practical side
 and focus on the key properties to be concerned with.
 Generally, we are concerned with a collection of *examples*
-(also called *data points*, *samples*, or *instances*).
+(also called *data examples*, *samples*, or *instances*).
 In order to work with data usefully, we typically
 need to come up with a suitable numerical representation.
 Each *example* typically consists of a collection
@@ -588,7 +588,7 @@ you might make some reasonable assumptions,
 such as more hours worked costs more dollars.
 You might also assume that there is some base charge
 and that the contractor then charges per hour.
-If these assumptions held true, then given these two data points,
+If these assumptions held true, then given these two data examples,
 you could already identify the contractor's pricing structure:
 \$100 per hour plus \$50 to show up at your house.
 If you followed that much then you already understand
@@ -954,7 +954,7 @@ inputs and outputs occur in the same order (after alignment),
 in machine translation, order inversion can be vital.
 In other words, while we are still converting one sequence into another,
 neither the number of inputs and outputs nor the order
-of corresponding data points are assumed to be the same.
+of corresponding data examples are assumed to be the same.
 Consider the following illustrative example
 of the peculiar tendency of Germans
 to place the verbs at the end of sentences.

@@ -165,7 +165,7 @@ def net():
         ])
 ```
 
-We create a data point to see the output shape of each block.
+We create a data example to see the output shape of each block.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 224, 224))
