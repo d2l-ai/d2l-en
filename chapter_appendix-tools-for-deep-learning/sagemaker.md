@@ -8,7 +8,7 @@ Many deep learning applications require a significant amount of computation. You
 
 First, we need to register an account at https://aws.amazon.com/. We encourage you to use two-factor authentication for additional security. It is also a good idea to set up detailed billing and spending alerts to avoid any unexpected surprises in case you forget to stop any running instance.
 Note that you will need a credit card.
-After logging into your AWS account, search for "SageMaker" (see :numref:`fig_sagemaker`) then click to open the SageMaker panel.
+After logging into your AWS account, go to your [console](http://console.aws.amazon.com/) and search for "SageMaker" (see :numref:`fig_sagemaker`) then click to open the SageMaker panel.
 
 ![Open the SageMaker panel.](../img/sagemaker.png)
 :width:`300px`
