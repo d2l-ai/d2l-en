@@ -106,6 +106,13 @@ import random
 ```
 
 ```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import random
+```
+
+```{.python .input}
 #@tab all
 tokens = d2l.tokenize(d2l.read_time_machine())
 vocab = d2l.Vocab(tokens)
@@ -218,7 +225,7 @@ for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=6):
 In addition to random sampling of the original sequence, we can also make the positions of two adjacent random minibatches adjacent in the original sequence.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet,pytorch
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
@@ -227,6 +234,24 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
     Xs = d2l.tensor(corpus[offset:offset+num_indices])
     Ys = d2l.tensor(corpus[offset+1:offset+1+num_indices])
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
+    num_batches = Xs.shape[1] // num_steps
+    for i in range(0, num_batches * num_steps, num_steps):
+        X = Xs[:, i:(i+num_steps)]
+        Y = Ys[:, i:(i+num_steps)]
+        yield X, Y
+```
+
+```{.python .input}
+#@tab tensorflow
+def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
+    # Offset for the iterator over the data for uniform starts
+    offset = random.randint(0, num_steps)
+    # Slice out data: ignore `num_steps` and just wrap around
+    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = d2l.tensor(corpus[offset:offset+num_indices])
+    Ys = d2l.tensor(corpus[offset+1:offset+1+num_indices])
+    Xs = d2l.reshape(Xs, (batch_size, -1))
+    Ys = d2l.reshape(Ys, (batch_size, -1))
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
         X = Xs[:, i:(i+num_steps)]
