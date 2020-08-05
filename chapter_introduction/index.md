@@ -242,8 +242,7 @@ It might go without saying that you cannot do data science without data.
 We could lose hundreds of pages pondering what precisely constitutes data,
 but for now, we will err on the practical side
 and focus on the key properties to be concerned with.
-Generally, we are concerned with a collection of *examples*
-(also called *data examples*, *samples*, or *instances*).
+Generally, we are concerned with a collection of *examples*.
 In order to work with data usefully, we typically
 need to come up with a suitable numerical representation.
 Each *example* typically consists of a collection

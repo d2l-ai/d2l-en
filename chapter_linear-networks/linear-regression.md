@@ -43,7 +43,7 @@ the sale price, area, and age for each home.
 In the terminology of machine learning,
 the dataset is called a *training dataset* or *training set*,
 and each row (here the data corresponding to one sale)
-is called an *example* (or *data point*, *data instance*).
+is called an *example* (or *data point*, *data instance*, *sample*).
 The thing we are trying to predict (price)
 is called a *label* (or *target*).
 The independent variables (age and area)
@@ -130,7 +130,7 @@ the goal of linear regression is to find
 the weight vector $\mathbf{w}$ and the bias term $b$
 that given features of a new data example
 sampled from the same distribution as $\mathbf{X}$,
-the new data example's label will (in expectation) be predicted with the lowest error.
+the new example's label will (in expectation) be predicted with the lowest error.
 
 
 Even if we believe that the best model for
