@@ -71,6 +71,21 @@ def gd_2d(x1, x2, s1, s2):
 d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+eta = 0.4
+def f_2d(x1, x2):
+    return 0.1 * x1 ** 2 + 2 * x2 ** 2
+def gd_2d(x1, x2, s1, s2):
+    return (x1 - eta * 0.2 * x1, x2 - eta * 4 * x2, 0, 0)
+
+d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
+```
+
 By construction, the gradient in the $x_2$ direction is *much* higher and changes much more rapidly than in the horizontal $x_1$ direction. Thus we are stuck between two undesirable choices: if we pick a small learning rate we ensure that the solution does not diverge in the $x_2$ direction but we are saddled with slow convergence in the $x_1$ direction. Conversely, with a large learning rate we progress rapidly in the $x_1$ direction but diverge in $x_2$. The example below illustrates what happens even after a slight increase in learning rate from $0.4$ to $0.6$. Convergence in the $x_1$ direction improves but the overall solution quality is much worse.
 
 ```{.python .input}
@@ -139,10 +154,25 @@ Let us see how momentum works in practice, i.e., when used within the context of
 Compared with (minibatch) SGD the momentum method needs to maintain a set of  auxiliary variables, i.e., velocity. It has the same shape as the gradients (and variables of the optimization problem). In the implementation below we call these variables `states`.
 
 ```{.python .input}
-#@tab all
 def init_momentum_states(feature_dim):
     v_w = d2l.zeros((feature_dim, 1))
     v_b = d2l.zeros(1)
+    return (v_w, v_b)
+```
+
+```{.python .input}
+#@tab pytorch
+def init_momentum_states(feature_dim):
+    v_w = d2l.zeros((feature_dim, 1))
+    v_b = d2l.zeros(1)
+    return (v_w, v_b)
+```
+
+```{.python .input}
+#@tab tensorflow
+def init_momentum_states(features_dim):
+    v_w = tf.Variable(d2l.zeros((features_dim, 1)))
+    v_b = tf.Variable(d2l.zeros(1))
     return (v_w, v_b)
 ```
 
@@ -161,6 +191,14 @@ def sgd_momentum(params, states, hyperparams):
             v[:] = hyperparams['momentum'] * v + p.grad
             p[:] -= hyperparams['lr'] * v
         p.grad.data.zero_()
+```
+
+```{.python .input}
+#@tab tensorflow
+def sgd_momentum(params, grads, states, hyperparams):
+    for p, v, g in zip(params, states, grads):
+            v[:].assign(hyperparams['momentum'] * v + g)
+            p[:].assign(p - hyperparams['lr'] * v)
 ```
 
 Let us see how this works in practice.
@@ -203,6 +241,13 @@ d2l.train_concise_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
 #@tab pytorch
 trainer = torch.optim.SGD
 d2l.train_concise_ch11(trainer, {'lr': 0.005, 'momentum': 0.9}, data_iter)
+```
+
+```{.python .input}
+#@tab tensorflow
+trainer = tf.keras.optimizers.SGD
+d2l.train_concise_ch11(trainer, {'learning_rate': 0.005, 'momentum': 0.9},
+                       data_iter)
 ```
 
 ## Theoretical Analysis

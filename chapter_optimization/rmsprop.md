@@ -44,6 +44,13 @@ import math
 ```
 
 ```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import math
+```
+
+```{.python .input}
 #@tab all
 d2l.set_figsize()
 gammas = [0.95, 0.9, 0.8, 0.7]
@@ -77,10 +84,25 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))
 Next, we implement RMSProp to be used in a deep network. This is equally straightforward.
 
 ```{.python .input}
-#@tab all
 def init_rmsprop_states(feature_dim):
     s_w = d2l.zeros((feature_dim, 1))
     s_b = d2l.zeros(1)
+    return (s_w, s_b)
+```
+
+```{.python .input}
+#@tab pytorch
+def init_rmsprop_states(feature_dim):
+    s_w = d2l.zeros((feature_dim, 1))
+    s_b = d2l.zeros(1)
+    return (s_w, s_b)
+```
+
+```{.python .input}
+#@tab tensorflow
+def init_rmsprop_states(feature_dim):
+    s_w = tf.Variable(d2l.zeros((feature_dim, 1)))
+    s_b = tf.Variable(d2l.zeros(1))
     return (s_w, s_b)
 ```
 
@@ -101,6 +123,15 @@ def rmsprop(params, states, hyperparams):
             s[:] = gamma * s + (1 - gamma) * torch.square(p.grad)
             p[:] -= hyperparams['lr'] * p.grad / torch.sqrt(s + eps)
         p.grad.data.zero_()
+```
+
+```{.python .input}
+#@tab tensorflow
+def rmsprop(params, grads, states, hyperparams):
+    gamma, eps = hyperparams['gamma'], 1e-6
+    for p, s, g in zip(params, states, grads):
+        s[:].assign(gamma * s + (1 - gamma) * tf.math.square(g))
+        p[:].assign(p - hyperparams['lr'] * g / tf.math.sqrt(s + eps))
 ```
 
 We set the initial learning rate to 0.01 and the weighting term $\gamma$ to 0.9. That is, $\mathbf{s}$ aggregates on average over the past $1/(1-\gamma) = 10$ observations of the square gradient.
@@ -125,6 +156,13 @@ d2l.train_concise_ch11('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
 #@tab pytorch
 trainer = torch.optim.RMSprop
 d2l.train_concise_ch11(trainer, {'lr': 0.01, 'alpha': 0.9},
+                       data_iter)
+```
+
+```{.python .input}
+#@tab tensorflow
+trainer = tf.keras.optimizers.RMSprop
+d2l.train_concise_ch11(trainer, {'learning_rate': 0.01, 'rho': 0.9},
                        data_iter)
 ```
 
