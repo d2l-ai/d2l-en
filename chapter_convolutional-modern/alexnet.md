@@ -80,7 +80,7 @@ to detect edges, colors, and textures.
 Indeed,
 Alex Krizhevsky, Ilya Sutskever, and Geoff Hinton
 proposed a new variant of a CNN,
-AlexNet,
+*AlexNet*,
 that achieved excellent performance in the 2012 ImageNet challenge.
 AlexNet was named after Alex Krizhevsky,
 the first author of the breakthrough ImageNet classification paper :cite:`Krizhevsky.Sutskever.Hinton.2012`.

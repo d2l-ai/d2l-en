@@ -11,7 +11,7 @@ Alternatively, one could imagine using fully-connected layers
 earlier in the process.
 However, a careless use of dense layers might give up the
 spatial structure of the representation entirely,
-*network in network* (NiN) blocks offer an alternative.
+*network in network* (*NiN*) blocks offer an alternative.
 They were proposed based on a very simple insight:
 to use an MLP on the channels for each pixel separately :cite:`Lin.Chen.Yan.2013`.
 
@@ -41,7 +41,7 @@ per-pixel fully-connected layers with ReLU activations.
 The convolution window shape of the first layer is typically set by the user.
 The subsequent window shapes are fixed to $1 \times 1$.
 
-![Main structural differences between VGG and NiN, and their blocks.](../img/nin.svg)
+![Comparing architectures of VGG and NiN, and their blocks.](../img/nin.svg)
 :width:`600px`
 :label:`fig_nin`
 

@@ -19,7 +19,7 @@ and now to blocks, repeating patterns of layers.
 The idea of using blocks first emerged from the
 [Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) (VGG)
 at Oxford University,
-in their eponymously-named VGG network.
+in their eponymously-named *VGG* network.
 It is easy to implement these repeated structures in code
 with any modern deep learning framework by using loops and subroutines.
 
