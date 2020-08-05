@@ -84,14 +84,7 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))
 Next, we implement RMSProp to be used in a deep network. This is equally straightforward.
 
 ```{.python .input}
-def init_rmsprop_states(feature_dim):
-    s_w = d2l.zeros((feature_dim, 1))
-    s_b = d2l.zeros(1)
-    return (s_w, s_b)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet,pytorch
 def init_rmsprop_states(feature_dim):
     s_w = d2l.zeros((feature_dim, 1))
     s_b = d2l.zeros(1)

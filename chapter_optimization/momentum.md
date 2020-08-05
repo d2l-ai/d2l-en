@@ -154,14 +154,7 @@ Let us see how momentum works in practice, i.e., when used within the context of
 Compared with (minibatch) SGD the momentum method needs to maintain a set of  auxiliary variables, i.e., velocity. It has the same shape as the gradients (and variables of the optimization problem). In the implementation below we call these variables `states`.
 
 ```{.python .input}
-def init_momentum_states(feature_dim):
-    v_w = d2l.zeros((feature_dim, 1))
-    v_b = d2l.zeros(1)
-    return (v_w, v_b)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet,pytorch
 def init_momentum_states(feature_dim):
     v_w = d2l.zeros((feature_dim, 1))
     v_b = d2l.zeros(1)
