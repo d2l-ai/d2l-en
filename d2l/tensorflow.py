@@ -600,6 +600,69 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
     return corpus, vocab
 
 
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
+def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
+    # Offset the iterator over the data for uniform starts
+    corpus = corpus[random.randint(0, num_steps):]
+    # Subtract 1 extra since we need to account for label
+    num_examples = ((len(corpus) - 1) // num_steps)
+    example_indices = list(range(0, num_examples * num_steps, num_steps))
+    random.shuffle(example_indices)
+
+    def data(pos):
+        # This returns a sequence of length `num_steps` starting from `pos`
+        return corpus[pos: pos + num_steps]
+
+    # Discard half empty batches
+    num_batches = num_examples // batch_size
+    for i in range(0, batch_size * num_batches, batch_size):
+        # `batch_size` indicates the random examples read each time
+        batch_indices = example_indices[i:(i+batch_size)]
+        X = [data(j) for j in batch_indices]
+        Y = [data(j + 1) for j in batch_indices]
+        yield d2l.tensor(X), d2l.tensor(Y)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
+def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
+    # Offset for the iterator over the data for uniform starts
+    offset = random.randint(0, num_steps)
+    # Slice out data: ignore `num_steps` and just wrap around
+    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = d2l.tensor(corpus[offset:offset+num_indices])
+    Ys = d2l.tensor(corpus[offset+1:offset+1+num_indices])
+    Xs = d2l.reshape(Xs, (batch_size, -1))
+    Ys = d2l.reshape(Ys, (batch_size, -1))
+    num_batches = Xs.shape[1] // num_steps
+    for i in range(0, num_batches * num_steps, num_steps):
+        X = Xs[:, i:(i+num_steps)]
+        Y = Ys[:, i:(i+num_steps)]
+        yield X, Y
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
+class SeqDataLoader:  #@save
+    """An iterator to load sequence data."""
+    def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
+        if use_random_iter:
+            self.data_iter_fn = d2l.seq_data_iter_random
+        else:
+            self.data_iter_fn = d2l.seq_data_iter_consecutive
+        self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
+        self.batch_size, self.num_steps = batch_size, num_steps
+
+    def __iter__(self):
+        return self.data_iter_fn(self.corpus, self.batch_size, self.num_steps)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
+def load_data_time_machine(batch_size, num_steps,  #@save
+                           use_random_iter=False, max_tokens=10000):
+    data_iter = SeqDataLoader(
+        batch_size, num_steps, use_random_iter, max_tokens)
+    return data_iter, data_iter.vocab
+
+
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):  #@save
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
