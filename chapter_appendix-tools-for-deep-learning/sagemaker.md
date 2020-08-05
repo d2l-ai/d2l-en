@@ -71,7 +71,14 @@ After finishing your work, do not forget to stop the instance to avoid further c
 
 ## Updating Notebooks
 
+:begin_tab:`mxnet`
 We will regularly update the notebooks in the [d2l-ai/d2l-en-sagemaker](https://github.com/d2l-ai/d2l-en-sagemaker) GitHub repository. You can simply use the `git pull` command to update to the latest version.
+:end_tab:
+
+:begin_tab:`pytorch`
+We will regularly update the notebooks in the [d2l-ai/d2l-pytorch-sagemaker](https://github.com/d2l-ai/d2l-pytorch-sagemaker) GitHub repository. You can simply use the `git pull` command to update to the latest version.
+:end_tab:
+
 First, you need to open a terminal as shown in :numref:`fig_sagemaker-terminal`.
 
 ![Open a terminal on the SageMaker instance.](../img/sagemaker-terminal.png)
