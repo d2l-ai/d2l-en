@@ -71,7 +71,7 @@ In fact, if we have a Markov model, we can obtain a reverse conditional probabil
 
 After so much theory, let us try this out in practice. Let us begin by generating some data. To keep things simple we generate our time series by using a sine function with some additive noise.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon, init
@@ -79,7 +79,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -94,7 +94,7 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-```{.python .input}
+```python
 #@tab mxnet,pytorch
 T = 1000  # Generate a total of 1000 points
 time = d2l.arange(0, T, dtype=d2l.float32)
@@ -112,7 +112,7 @@ d2l.plot(time, [x])
 
 Next we need to turn this time series into features and labels that the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots, x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple.
 
-```{.python .input}
+```python
 #@tab mxnet,pytorch
 tau = 4
 features = d2l.zeros((T-tau, tau))
@@ -140,7 +140,7 @@ train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
 
 A few layers of a fully connected network, ReLU activation and $L_2$ loss. Since much of the modeling is identical to the previous sections when we built regression estimators, we will not delve into much detail.
 
-```{.python .input}
+```python
 # Vanilla MLP architecture
 def get_net():
     net = nn.Sequential()
@@ -153,7 +153,7 @@ def get_net():
 loss = gluon.loss.L2Loss()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 # Function for initializing the weights of net
 def init_weights(m):
@@ -189,7 +189,7 @@ loss = tf.keras.losses.MeanSquaredError()
 
 Now we are ready to train.
 
-```{.python .input}
+```python
 def train_net(net, train_iter, loss, epochs, lr):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
@@ -206,7 +206,7 @@ net = get_net()
 train_net(net, train_iter, loss, 10, 0.01)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def train_net(net, train_iter, loss, epochs, lr):
     trainer = torch.optim.Adam(net.parameters(), lr)
@@ -262,7 +262,7 @@ x_{603} & = f(x_{602}, \ldots, x_{599}).
 
 In other words, we will have to use our own predictions to make future predictions. Let us see how well this goes.
 
-```{.python .input}
+```python
 #@tab mxnet,pytorch
 predictions = d2l.zeros(T)
 predictions[:n_train] = x[:n_train]
@@ -293,7 +293,7 @@ As the above example shows, this is a spectacular failure. The estimates decay t
 
 Let us verify this observation by computing the $k$-step predictions on the entire sequence.
 
-```{.python .input}
+```python
 #@tab mxnet,pytorch
 k = 33  # Look up to k - tau steps ahead
 
