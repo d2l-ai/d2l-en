@@ -108,10 +108,9 @@ pip install tensorflow==2.2.0 tensorflow-probability==0.10.0
 
 We also install the `d2l` package that encapsulates frequently used
 functions and classes in this book.
-(-U: Upgrade all packages to the newest available version)
 
 ```bash
-pip install -U d2l
+pip install d2l -U # -U: Upgrade all packages to the newest available version
 ```
 
 
