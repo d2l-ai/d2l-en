@@ -98,7 +98,7 @@ As before, the training code needs to perform a number of basic functions for ef
 * Network parameters need to be initialized across all devices.
 * While iterating over the dataset minibatches are to be divided across all devices.
 * We compute the loss and its gradient in parallel across devices.
-* Losses are aggregated (by the trainer method) and parameters are updated accordingly.
+* Losses are aggregated (by the `trainer` method) and parameters are updated accordingly.
 
 In the end we compute the accuracy (again in parallel) to report the final value of the network. The training routine is quite similar to implementations in previous chapters, except that we need to split and aggregate data.
 
