@@ -85,21 +85,15 @@ to access GPUs before running larger models.
 
 
 :begin_tab:`mxnet`
-
 ```bash
 pip install mxnet==1.6.0
 ```
-
-
 :end_tab:
 
 :begin_tab:`pytorch`
-
 ```bash
 pip install torch==1.5.1 torchvision -f https://download.pytorch.org/whl/torch_stable.html
 ```
-
-
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -109,7 +103,6 @@ You can install TensorFlow with both CPU and GPU support via the following:
 pip install tensorflow==2.2.0 tensorflow-probability==0.10.0
 ```
 
-
 :end_tab:
 
 
@@ -117,7 +110,7 @@ We also install the `d2l` package that encapsulates frequently used
 functions and classes in this book.
 
 ```bash
-pip install -U d2l
+pip install d2l -U # -U: Upgrade all packages to the newest available version
 ```
 
 
@@ -154,21 +147,15 @@ then you are all set.
 :end_tab:
 
 :begin_tab:`mxnet`
-
 ```bash
 pip uninstall mxnet
 ```
-
-
 :end_tab:
 
 :begin_tab:`pytorch`
-
 ```bash
 pip uninstall torch
 ```
-
-
 :end_tab:
 
 :begin_tab:`mxnet,pytorch`
@@ -179,7 +166,6 @@ then you can install with the following command:
 :end_tab:
 
 :begin_tab:`mxnet`
-
 ```bash
 # For Windows users
 pip install mxnet-cu101==1.6.0b20190926
@@ -187,17 +173,12 @@ pip install mxnet-cu101==1.6.0b20190926
 # For Linux and macOS users
 pip install mxnet-cu101==1.6.0
 ```
-
-
 :end_tab:
 
 :begin_tab:`pytorch`
-
 ```bash
 pip install torch==1.5.1+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 ```
-
-
 :end_tab:
 
 :begin_tab:`mxnet,pytorch`
