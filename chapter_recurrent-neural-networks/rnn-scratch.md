@@ -622,7 +622,7 @@ Finally let us check the results to use a random sampling iterator.
 
 ```{.python .input}
 #@tab mxnet,pytorch
-train_ch8(model, train_random_iter, vocab_random_iter, lr, num_epochs, d2l.try_gpu(),
+train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
           use_random_iter=True)
 ```
 
