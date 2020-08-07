@@ -238,13 +238,12 @@ class RNNModelScratch:  #@save
 ```
 
 ```{.python .input}
-#@tab pytorch
 class RNNModelScratch: #@save
     """A RNN Model based on scratch implementations."""
     def __init__(self, vocab_size, num_hiddens, device,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
-    
+        self.params = get_params(vocab_size, num_hiddens, device)
         self.init_state, self.forward_fn = init_state, forward
 
     def __call__(self, X, state):
@@ -276,12 +275,22 @@ class RNNModelScratch: #@save
 Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state has not changed.
 
 ```{.python .input}
-#@tab mxnet,pytorch
+#@tab mxnet
 num_hiddens = 512
 model = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
                         init_rnn_state, rnn)
 state = model.begin_state(X.shape[0], d2l.try_gpu())
-Y, new_state = model(d2l.to(X, d2l.try_gpu()), state)
+Y, new_state = model(X.as_in_context(d2l.try_gpu()), state)
+Y.shape, len(new_state), new_state[0].shape
+```
+
+```{.python .input}
+#@tab pytorch
+num_hiddens = 512
+model = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
+                        init_rnn_state, rnn)
+state = model.begin_state(X.shape[0], d2l.try_gpu())
+Y, new_state = model(X.to(d2l.try_gpu()), state)
 Y.shape, len(new_state), new_state[0].shape
 ```
 
