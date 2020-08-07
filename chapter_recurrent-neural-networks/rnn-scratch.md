@@ -412,12 +412,12 @@ def grad_clipping(model, theta):  #@save
 ```{.python .input}
 #@tab tensorflow
 def grad_clipping(grads, theta): #@save
-    norm = np.array([0])
-    for i in range(len(grads)):
-        norm+=tf.math.reduce_sum(grads[i] ** 2)
-    norm = np.sqrt(norm).item()
+    theta = tf.constant(theta, dtype=tf.float32)
+    norm = tf.math.sqrt(tf.reduce_sum([tf.reduce_sum(grad ** 2) for grad in grads]))
+    print(norm, theta)
+    print(tf.greater(norm, theta))
     new_grad = []
-    if norm > theta:
+    if tf.greater(norm, theta):
         for grad in grads:
             new_grad.append(grad * theta / norm)
     else:
@@ -613,7 +613,7 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 
 ```{.python .input}
 #@tab tensorflow
-num_epochs, lr = 500, 1
+num_epochs, lr = 10, 1
 train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs)
 ```
 
