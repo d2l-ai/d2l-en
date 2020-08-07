@@ -198,7 +198,7 @@ pip install mxnet-cu101==1.6.0
 :begin_tab:`pytorch`
 
 ```bash
-pip install torch==1.5.1+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+pip install torch==1.5.1+cu101 torchvision -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 
