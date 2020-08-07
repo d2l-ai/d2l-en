@@ -238,6 +238,7 @@ class RNNModelScratch:  #@save
 ```
 
 ```{.python .input}
+#@tab pytorch
 class RNNModelScratch: #@save
     """A RNN Model based on scratch implementations."""
     def __init__(self, vocab_size, num_hiddens, device,
