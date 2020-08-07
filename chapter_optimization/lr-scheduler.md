@@ -14,7 +14,7 @@ Given the fact that there is a lot of detail needed to manage learning rates, mo
 
 We begin with a toy problem that is cheap enough to compute easily, yet sufficiently nontrivial to illustrate some of the key aspects. For that we pick a slightly modernized version of LeNet (`relu` instead of `sigmoid` activation, MaxPooling rather than AveragePooling), as applied to Fashion-MNIST. Moreover, we hybridize the network for performance. Since most of the code is standard we just introduce the basics without further detailed discussion. See :numref:`chap_cnn` for a refresher as needed.
 
-```{.python .input}
+```{.python .input  n=1}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, lr_scheduler, np, npx
