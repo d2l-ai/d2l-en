@@ -98,7 +98,7 @@ pip install mxnet==1.6.0
 
 ```bash
 # https://pytorch.org/get-started/locally/
-pip install torch==1.5.1 torchvision -f https://download.pytorch.org/whl/torch_stable.html
+pip install torch==1.6.0+cpu torchvision==0.7.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 
@@ -169,7 +169,7 @@ pip uninstall mxnet
 :begin_tab:`pytorch`
 
 ```bash
-pip uninstall torch
+pip uninstall torch,torchvision
 ```
 
 
@@ -198,15 +198,14 @@ pip install mxnet-cu101==1.6.0
 :begin_tab:`pytorch`
 
 ```bash
-pip install torch==1.5.1+cu101 torchvision -f https://download.pytorch.org/whl/torch_stable.html
+pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 
 :end_tab:
 
 :begin_tab:`mxnet,pytorch`
-You may change the last digits according to your CUDA version, e.g.,  `cu102` for
-CUDA 10.2 , `cu100` for CUDA 10.0 and `cu90` for CUDA 9.0.
+You may change the last digits according to your CUDA version, e.g., `cu100` for CUDA 10.0 and `cu90` for CUDA 9.0.
 :end_tab:
 
 ## Exercises
