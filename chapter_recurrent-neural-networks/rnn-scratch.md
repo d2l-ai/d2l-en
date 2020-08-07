@@ -621,7 +621,7 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 
 ```{.python .input}
 #@tab tensorflow
-num_epochs, lr = 10, 1
+num_epochs, lr = 500, 1
 train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs)
 ```
 
