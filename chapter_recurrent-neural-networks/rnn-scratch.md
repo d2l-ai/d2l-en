@@ -424,8 +424,6 @@ def grad_clipping(model, theta):  #@save
 def grad_clipping(grads, theta): #@save
     theta = tf.constant(theta, dtype=tf.float32)
     norm = tf.math.sqrt(tf.reduce_sum([tf.reduce_sum(grad ** 2) for grad in grads]))
-    print(norm, theta)
-    print(tf.greater(norm, theta))
     new_grad = []
     if tf.greater(norm, theta):
         for grad in grads:
