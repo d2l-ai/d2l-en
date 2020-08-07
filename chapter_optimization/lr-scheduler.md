@@ -64,6 +64,84 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, device):
 ```
 
 ```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+from torch import nn
+from torch.optim import lr_scheduler
+
+class Reshape(torch.nn.Module):
+    def forward(self, x):
+        return x.view(-1,1,28,28)
+
+net = torch.nn.Sequential(
+    Reshape(),
+    nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.ReLU(),
+    nn.MaxPool2d(kernel_size=2, stride=2),
+    nn.Conv2d(6, 16, kernel_size=5), nn.ReLU(),
+    nn.MaxPool2d(kernel_size=2, stride=2),
+    nn.Flatten(),
+    nn.Linear(16 * 5 * 5, 120), nn.ReLU(),
+    nn.Linear(120, 84), nn.ReLU(),
+    nn.Linear(84, 10))
+
+
+loss = nn.CrossEntropyLoss()
+device = d2l.try_gpu()
+
+batch_size = 256
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
+
+# The code is almost identical to `d2l.train_ch6` that defined in the lenet
+# section of chapter convolutional neural networks
+def train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+          scheduler=None):
+    
+    def init_weights(m):
+        if type(m) == nn.Linear or type(m) == nn.Conv2d:
+            torch.nn.init.xavier_uniform_(m.weight)
+    
+    net.apply(init_weights)
+    net.to(device)
+    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+                            legend=['train loss', 'train acc', 'test acc'])
+    
+    for epoch in range(num_epochs):
+        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
+        for i, (X, y) in enumerate(train_iter):
+            net.train()
+            trainer.zero_grad()
+            X, y = X.to(device), y.to(device)
+            y_hat = net(X)
+            l = loss(y_hat, y)
+            l.backward()
+            trainer.step()
+            with torch.no_grad():
+                metric.add(l * X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
+            train_loss = metric[0] / metric[2]
+            train_acc = metric[1] / metric[2]
+            if (i + 1) % 50 == 0:
+                animator.add(epoch + i / len(train_iter),
+                             (train_loss, train_acc, None))
+        
+        test_acc = d2l.evaluate_accuracy_gpu(net, test_iter)
+        animator.add(epoch+1, (None, None, test_acc))
+    
+        if scheduler:
+            if scheduler.__module__ == lr_scheduler.__name__:
+                # Using PyTorch In-Built scheduler.
+                scheduler.step()
+            else:
+                # Using custom defined scheduler.
+                for param_group in trainer.param_groups:
+                    param_group['lr'] = scheduler(epoch)
+
+    print(f'train loss {train_loss:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
+```
+
+```{.python .input}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -92,7 +170,6 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 # section of chapter convolutional neural networks
 def train(net_fn, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu(), custom_callback = False):
-    """Train a model with a GPU (defined in Chapter 6)."""
     device_name = device._device_name
     strategy = tf.distribute.OneDeviceStrategy(device_name)
     with strategy.scope():
@@ -121,6 +198,13 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
 ```{.python .input}
+#@tab pytorch
+lr, num_epochs = 0.3, 3
+trainer = torch.optim.SGD(net.parameters(), lr=lr)
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
+```
+
+```{.python .input}
 #@tab tensorflow
 lr, num_epochs = 0.3, 30
 train(net, train_iter, test_iter, num_epochs, lr)
@@ -136,6 +220,12 @@ print(f'learning rate is now {trainer.learning_rate:.2f}')
 ```
 
 ```{.python .input}
+#@tab pytorch
+trainer.param_groups[0]["lr"] = 0.1
+print(f'learning rate is now {trainer.param_groups[0]["lr"]:.2f}')
+```
+
+```{.python .input}
 #@tab tensorflow
 lr = 0.1
 dummy_model = tf.keras.models.Sequential([tf.keras.layers.Dense(10)])
@@ -147,6 +237,7 @@ print(f'learning rate is now ,', dummy_model.optimizer.lr.numpy())
 More generally we want to define a scheduler. When invoked with the number of updates it returns the appropriate value of the learning rate. Let us define a simple one that sets the learning rate to $\eta = \eta_0 (t + 1)^{-\frac{1}{2}}$.
 
 ```{.python .input}
+#@tab all
 class SquareRootScheduler:
     def __init__(self, lr=0.1):
         self.lr = lr
@@ -155,26 +246,11 @@ class SquareRootScheduler:
         return self.lr * pow(num_update + 1.0, -0.5)
 ```
 
-```{.python .input}
-#@tab tensorflow
-class SquareRootScheduler:
-    def __init__(self, lr=0.1):
-        self.lr = lr
-
-    def __call__(self, epoch):
-        return self.lr * pow(epoch + 1.0, -0.5)
-```
-
 Let us plot its behavior over a range of values.
 
 ```{.python .input}
-scheduler = SquareRootScheduler(lr=1.0)
-d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
-```
-
-```{.python .input}
-#@tab tensorflow
-scheduler = SquareRootScheduler(1.0)
+#@tab all
+scheduler = SquareRootScheduler(lr=0.3)
 d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
@@ -184,6 +260,13 @@ Now let us see how this plays out for training on Fashion-MNIST. We simply provi
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
+```
+
+```{.python .input}
+#@tab pytorch
+trainer = torch.optim.SGD(net.parameters(), lr=0.3)
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+      scheduler)
 ```
 
 ```{.python .input}
@@ -203,6 +286,7 @@ While we cannot possibly cover the entire variety of learning rate schedulers, w
 One alternative to a polynomial decay would be a multiplicative one, that is $\eta_{t+1} \leftarrow \eta_t \cdot \alpha$ for $\alpha \in (0, 1)$. To prevent the learning rate from decaying beyond a reasonable lower bound the update equation is often modified to $\eta_{t+1} \leftarrow \mathop{\mathrm{max}}(\eta_{\mathrm{min}}, \eta_t \cdot \alpha)$.
 
 ```{.python .input}
+#@tab all
 class FactorScheduler:
     def __init__(self, factor=1, stop_factor_lr=1e-7, base_lr=0.1):
         self.factor = factor
@@ -214,22 +298,6 @@ class FactorScheduler:
         return self.base_lr
 
 scheduler = FactorScheduler(factor=0.9, stop_factor_lr=1e-2, base_lr=2.0)
-d2l.plot(np.arange(50), [scheduler(t) for t in range(50)])
-```
-
-```{.python .input}
-#@tab tensorflow
-class FactorScheduler:
-    def __init__(self, factor=1, stop_factor_lr=1e-7, base_lr=0.1):
-        self.factor = factor
-        self.stop_factor_lr = stop_factor_lr
-        self.base_lr = base_lr
-
-    def __call__(self, epoch):
-        self.base_lr = max(self.stop_factor_lr, self.base_lr * self.factor)
-        return self.base_lr
-    
-scheduler = FactorScheduler(factor=0.9, stop_factor_lr=1e-2, base_lr=2.0)
 d2l.plot(d2l.arange(50), [scheduler(t) for t in range(50)])
 ```
 
@@ -240,9 +308,26 @@ This can also be accomplished by a built-in scheduler in MXNet via the `lr_sched
 A common strategy for training deep networks is to keep the learning rate piecewise constant and to decrease it by a given amount every so often. That is, given a set of times when to decrease the rate, such as $s = \{5, 10, 20\}$ decrease $\eta_{t+1} \leftarrow \eta_t \cdot \alpha$ whenever $t \in s$. Assuming that the values are halved at each step we can implement this as follows.
 
 ```{.python .input}
+num_epochs=30
 scheduler = lr_scheduler.MultiFactorScheduler(step=[15, 30], factor=0.5,
                                               base_lr=0.5)
-d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
+d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
+```
+
+```{.python .input}
+#@tab pytorch
+trainer = torch.optim.SGD(net.parameters(), lr=0.3)
+scheduler = lr_scheduler.MultiStepLR(trainer, milestones=[15, 30], gamma=0.5)
+
+def get_lr(trainer, scheduler, verbose=False):
+    lr = scheduler.get_last_lr()[0]
+    if verbose:
+        print("lr: ", lr)
+    trainer.step()
+    scheduler.step()
+    return lr
+
+d2l.plot(d2l.arange(num_epochs), [get_lr(trainer, scheduler) for t in range(num_epochs)])
 ```
 
 ```{.python .input}
@@ -273,6 +358,12 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
 ```{.python .input}
+#@tab pytorch
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+      scheduler)
+```
+
+```{.python .input}
 #@tab tensorflow
 train(net, train_iter, test_iter, num_epochs, lr,
       custom_callback=LearningRateScheduler(scheduler))
@@ -289,7 +380,7 @@ Here $\eta_0$ is the initial learning rate, $\eta_T$ is the target rate at time 
 ```{.python .input}
 scheduler = lr_scheduler.CosineScheduler(max_update=20, base_lr=0.5,
                                          final_lr=0.01)
-d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
+d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
 ```{.python .input}
