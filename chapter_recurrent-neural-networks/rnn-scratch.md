@@ -31,7 +31,13 @@ import tensorflow as tf
 ```
 
 ```{.python .input}
-#@tab all
+#@tab mxnet,pytorch
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+```
+
+```{.python .input}
+#@tab tensorflow
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 train_random_iter, vocab_random_iter = d2l.load_data_time_machine(batch_size,
@@ -270,7 +276,7 @@ class RNNModelScratch: #@save
 Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state has not changed.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet,pytorch
 num_hiddens = 512
 model = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
                         init_rnn_state, rnn)
@@ -345,7 +351,7 @@ def predict_ch8(prefix, num_predicts, model, vocab, num_hiddens): #@save
 We test the `predict_ch8` function first. Given that we did not train the network, it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab mxnet,pytorch
 predict_ch8('time traveller ', 10, model, vocab, d2l.try_gpu())
 ```
 
@@ -601,7 +607,7 @@ def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
 Now we can train a model. Since we only use $10,000$ tokens in the dataset, the model needs more epochs to converge.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab mxnet,pytorch
 num_epochs, lr = 500, 1
 train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 ```
@@ -615,7 +621,7 @@ train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs)
 Finally let us check the results to use a random sampling iterator.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab mxnet,pytorch
 train_ch8(model, train_random_iter, vocab_random_iter, lr, num_epochs, d2l.try_gpu(),
           use_random_iter=True)
 ```
