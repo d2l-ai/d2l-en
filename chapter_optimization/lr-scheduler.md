@@ -319,10 +319,8 @@ d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 trainer = torch.optim.SGD(net.parameters(), lr=0.3)
 scheduler = lr_scheduler.MultiStepLR(trainer, milestones=[15, 30], gamma=0.5)
 
-def get_lr(trainer, scheduler, verbose=False):
+def get_lr(trainer, scheduler):
     lr = scheduler.get_last_lr()[0]
-    if verbose:
-        print("lr: ", lr)
     trainer.step()
     scheduler.step()
     return lr
