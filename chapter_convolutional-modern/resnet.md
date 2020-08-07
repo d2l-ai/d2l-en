@@ -1,26 +1,53 @@
 # Residual Networks (ResNet)
 :label:`sec_resnet`
 
-As we design increasingly deeper networks it becomes imperative to understand how adding layers can increase the complexity and expressiveness of the network. Even more important is the ability to design networks where adding layers makes networks strictly more expressive rather than just different. To make some progress we need a bit of theory.
+As we design increasingly deeper networks it becomes imperative to understand how adding layers can increase the complexity and expressiveness of the network.
+Even more important is the ability to design networks where adding layers makes networks strictly more expressive rather than just different.
+To make some progress we need a bit of mathematics.
+
 
 ## Function Classes
 
-Consider $\mathcal{F}$, the class of functions that a specific network architecture (together with learning rates and other hyperparameter settings) can reach. That is, for all $f \in \mathcal{F}$ there exists some set of parameters $W$ that can be obtained through training on a suitable dataset. Let us assume that $f^*$ is the function that we really would like to find. If it is in $\mathcal{F}$, we are in good shape but typically we will not be quite so lucky. Instead, we will try to find some $f^*_\mathcal{F}$ which is our best bet within $\mathcal{F}$. For instance, we might try finding it by solving the following optimization problem:
+Consider $\mathcal{F}$, the class of functions that a specific network architecture (together with learning rates and other hyperparameter settings) can reach.
+That is, for all $f \in \mathcal{F}$ there exists some set of parameters (e.g., weights and biases) that can be obtained through training on a suitable dataset.
+Let us assume that $f^*$ is the "truth" function that we really would like to find.
+If it is in $\mathcal{F}$, we are in good shape but typically we will not be quite so lucky.
+Instead, we will try to find some $f^*_\mathcal{F}$ which is our best bet within $\mathcal{F}$.
+For instance, 
+given a dataset with features $\mathbf{X}$
+and labels $\mathbf{y}$,
+we might try finding it by solving the following optimization problem:
 
-$$f^*_\mathcal{F} := \mathop{\mathrm{argmin}}_f L(X, Y, f) \text{ subject to } f \in \mathcal{F}.$$
+$$f^*_\mathcal{F} := \mathop{\mathrm{argmin}}_f L(\mathbf{X}, \mathbf{y}, f) \text{ subject to } f \in \mathcal{F}.$$
 
-It is only reasonable to assume that if we design a different and more powerful architecture $\mathcal{F}'$ we should arrive at a better outcome. In other words, we would expect that $f^*_{\mathcal{F}'}$ is "better" than $f^*_{\mathcal{F}}$. However, if $\mathcal{F} \not\subseteq \mathcal{F}'$ there is no guarantee that this should even happen. In fact, $f^*_{\mathcal{F}'}$ might well be worse. This is a situation that we often encounter in practice---adding layers does not only make the network more expressive, it also changes it in sometimes not quite so predictable ways. :numref:`fig_functionclasses`illustrates this in slightly abstract terms.
+It is only reasonable to assume that if we design a different and more powerful architecture $\mathcal{F}'$ we should arrive at a better outcome. In other words, we would expect that $f^*_{\mathcal{F}'}$ is "better" than $f^*_{\mathcal{F}}$. However, if $\mathcal{F} \not\subseteq \mathcal{F}'$ there is no guarantee that this should even happen. In fact, $f^*_{\mathcal{F}'}$ might well be worse. 
+As illustrated by :numref:`fig_functionclasses`,
+for non-nested function classes, a larger function class does not always move closer to the "truth" function $f^*$. For instance, though $\mathcal{F}_3$ is closer to $f^*$ than $\mathcal{F}_1$, $\mathcal{F}_6$ moves away and there is no guarantee that further increasing the complexity can reduce the distance from $f^*$.
+With nested function classes
+where $\mathcal{F}_1 \subseteq \ldots \subseteq \mathcal{F}_6$
+in :numref:`fig_functionclasses`,
+we can avoid the aforementioned issue from the non-nested function classes.
 
-![Left: non-nested function classes. The distance may in fact increase as the complexity increases. Right: with nested function classes this does not happen.](../img/functionclasses.svg)
+
+![For non-nested function classes, a larger (indicated by area) function class does not guarantee to get closer to the "truth" function ($f^*$). This does not happen in nested function classes.](../img/functionclasses.svg)
 :label:`fig_functionclasses`
 
+Thus,
+only if larger function classes contain the smaller ones are we guaranteed that increasing them strictly increases the expressive power of the network.
+For deep neural networks,
+if we can 
+train the newly-added layer into an identity function $f(\mathbf{x}) = \mathbf{x}$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training dataset, the added layer might make it easier to reduce training errors.
 
-Only if larger function classes contain the smaller ones are we guaranteed that increasing them strictly increases the expressive power of the network. This is the question that He et al, 2016 considered when working on very deep computer vision models. At the heart of ResNet is the idea that every additional layer should contain the identity function as one of its elements. This means that if we can train the newly-added layer into an identity mapping $f(\mathbf{x}) = \mathbf{x}$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training dataset, the added layer might make it easier to reduce training errors. Even better, the identity function rather than the null $f(\mathbf{x}) = 0$ should be the simplest function within a layer.
-
+This is the question that He et al. considered when working on very deep computer vision models :cite:`He.Zhang.Ren.ea.2016`. 
+At the heart of their work is the idea that every additional layer should 
+more easily
+contain the identity function as one of its elements. 
 These considerations are rather profound but they led to a surprisingly simple
-solution, a residual block. With it, :cite:`He.Zhang.Ren.ea.2016` won the ImageNet Visual
+solution, a *residual block*.
+With it, He et al. won the ImageNet Visual
 Recognition Challenge in 2015. The design had a profound influence on how to
 build deep neural networks.
+
 
 
 ## Residual Blocks
