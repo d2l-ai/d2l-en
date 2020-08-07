@@ -87,6 +87,7 @@ to access GPUs before running larger models.
 :begin_tab:`mxnet`
 
 ```bash
+# https://mxnet.apache.org/versions/1.6/get_started/
 pip install mxnet==1.6.0
 ```
 
@@ -96,6 +97,7 @@ pip install mxnet==1.6.0
 :begin_tab:`pytorch`
 
 ```bash
+# https://pytorch.org/get-started/locally/
 pip install torch==1.5.1 torchvision -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
@@ -106,6 +108,7 @@ pip install torch==1.5.1 torchvision -f https://download.pytorch.org/whl/torch_s
 You can install TensorFlow with both CPU and GPU support via the following:
 
 ```bash
+# https://www.tensorflow.org/install
 pip install tensorflow==2.2.0 tensorflow-probability==0.10.0
 ```
 
