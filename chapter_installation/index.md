@@ -205,7 +205,8 @@ pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pyto
 :end_tab:
 
 :begin_tab:`mxnet,pytorch`
-You may change the last digits according to your CUDA version, e.g., `cu100` for CUDA 10.0 and `cu90` for CUDA 9.0.
+You may change the last digits according to your CUDA version, e.g., `cu100` for
+CUDA 10.0 and `cu90` for CUDA 9.0.
 :end_tab:
 
 ## Exercises
