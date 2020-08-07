@@ -334,11 +334,10 @@ def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
 
 ```{.python .input}
 #@tab tensorflow
-def predict_ch8(prefix, num_predicts, model, vocab, num_hiddens): #@save
+def predict_ch8(prefix, num_predicts, model, vocab, params): #@save
     state = model.begin_state(batch_size=1)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(tf.constant([outputs[-1]]), (1,1)).numpy()
-    params = get_params(len(vocab), num_hiddens)
     for y in prefix[1:]: # Warmup state with prefix
         _, state = model(get_input(), state, params)
         outputs.append(vocab[y])
@@ -357,7 +356,7 @@ predict_ch8('time traveller ', 10, model, vocab, d2l.try_gpu())
 
 ```{.python .input}
 #@tab tensorflow
-predict_ch8('time traveller ', 10, model, vocab)
+predict_ch8('time traveller ', 10, model, vocab, params)
 ```
 
 ## Gradient Clipping
@@ -498,10 +497,9 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
 ```{.python .input}
 #@tab tensorflow
 def train_epoch_ch8(model, train_iter, loss, updater,  #@save
-                    use_random_iter, vocab, num_hiddens):
+                    use_random_iter, params):
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2) 
-    params = get_params(len(vocab), num_hiddens)
     for X, Y in train_iter:
         if state is None or use_random_iter:
             state = model.begin_state(batch_size=X.shape[0])
@@ -583,18 +581,17 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
 ```{.python .input}
 #@tab tensorflow
 #@save
-def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
+def train_ch8(model, train_iter, vocab, params, lr, num_epochs,
               use_random_iter=False):
     loss = tf.keras.losses.SparseCategoricalCrossentropy()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
     updater = tf.keras.optimizers.SGD(lr)
-    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, num_hiddens)
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
-             model, train_iter, loss, updater, use_random_iter,
-             vocab, num_hiddens)
+             model, train_iter, loss, updater, use_random_iter, params)
         if epoch % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch+1, [ppl])
@@ -615,7 +612,7 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 ```{.python .input}
 #@tab tensorflow
 num_epochs, lr = 500, 1
-train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs)
+train_ch8(model, train_iter, vocab, params, lr, num_epochs)
 ```
 
 Finally let us check the results to use a random sampling iterator.
@@ -628,7 +625,8 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
 
 ```{.python .input}
 #@tab tensorflow
-train_ch8(model, train_random_iter, vocab_random_iter, num_hiddens, lr, num_epochs)
+params = get_params(len(vocab_random_iter), num_hiddens)
+train_ch8(model, train_random_iter, vocab_random_iter, params, lr, num_epochs)
 ```
 
 While implementing the above RNN model from scratch is instructive, it is not convenient. In the next section we will see how to improve significantly on the current model and how to make it faster and easier to implement.
