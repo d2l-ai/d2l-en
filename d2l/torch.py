@@ -1212,6 +1212,44 @@ def center_2_hw(box: torch.Tensor) -> float:
          box[:, 0, None] + box[:, 2, None]/2,
          box[:, 1, None] + box[:, 3, None]/2
          ], dim=1)
+def intersect(box_a: torch.Tensor, box_b: torch.Tensor) -> float:
+    # Coverting (cx, cy, w, h) to (x1, y1, x2, y2) since its easier to extract min/max coordinates
+    temp_box_a, temp_box_b = center_2_hw(box_a), center_2_hw(box_b)
+    
+#     print(temp_box_a.shape)
+    
+    max_xy = torch.min(temp_box_a[:, None, 2:], temp_box_b[None, :, 2:])
+    min_xy = torch.max(temp_box_a[:, None, :2], temp_box_b[None, :, :2])
+    
+    inter = torch.clamp((max_xy - min_xy), min=0)
+    return inter[:, :, 0] * inter[:, :, 1]
+
+def box_area(box: torch.Tensor) -> float:
+    return box[:, 2] * box[:, 3]
+
+def jaccard(box_a: torch.Tensor, box_b: torch.Tensor) -> float:
+#     print(box_a.shape)
+    intersection = intersect(box_a, box_b)
+    union = box_area(box_a).unsqueeze(1) + box_area(box_b).unsqueeze(0) - intersection
+    return intersection / union
+
+def find_overlap(bb_true_i, anchors, jaccard_overlap):
+
+    jaccard_tensor = jaccard(anchors, bb_true_i)
+    _, max_overlap = torch.max(jaccard_tensor, dim=0)
+    
+    overlap_list = []    
+    for i in range(len(bb_true_i)):
+        threshold_overlap = (jaccard_tensor[:, i] > jaccard_overlap).nonzero()
+
+        if len(threshold_overlap) > 0:
+            threshold_overlap = threshold_overlap[:, 0]
+            overlap = torch.cat([max_overlap[i].view(1), threshold_overlap])
+            overlap = torch.unique(overlap)     
+        else:
+            overlap = max_overlap[i].view(1)
+        overlap_list.append(overlap)
+    return overlap_list
 
 def MultiBoxTarget(class_true, bb_true, anchors):
     
