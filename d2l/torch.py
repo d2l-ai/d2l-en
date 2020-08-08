@@ -216,7 +216,7 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = d2l.argmax(y_hat, axis=1)        
+        y_hat = d2l.argmax(y_hat, axis=1)
     cmp = d2l.astype(y_hat, y.dtype) == y
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
@@ -826,9 +826,9 @@ def build_array(lines, vocab, num_steps, is_source):
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, 
+    src_vocab = d2l.Vocab(source, min_freq=3,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+    tgt_vocab = d2l.Vocab(target, min_freq=3,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array(
         source, src_vocab, num_steps, True)
@@ -1134,14 +1134,14 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
         if type(m) == nn.Linear:
             torch.nn.init.normal_(m.weight, std=0.01)
     net.apply(init_weights)
-    
+
     optimizer = trainer_fn(net.parameters(), **hyperparams)
-    
+
     loss = nn.MSELoss()
     # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
-    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss 
+    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
     # value to get L2Loss in PyTorch.
-    
+
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
@@ -1160,6 +1160,38 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
                              (d2l.evaluate_loss(net, data_iter, loss)/2,))
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+
+# Defined in file: ./chapter_generative-adversarial-networks/gan.md
+def update_D(X, Z, net_D, net_G, loss, trainer_D):  #@save
+    """Update discriminator."""
+    batch_size = X.shape[0]
+    ones = torch.ones(batch_size)
+    zeros = torch.zeros(batch_size)
+    trainer_D.zero_grad()
+    real_Y = net_D(X)
+    fake_X = net_G(Z)
+    # Do not need to compute gradient for `net_G`, detach it from
+    # computing gradients.
+    fake_Y = net_D(fake_X.detach())
+    loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
+    loss_D.backward()
+    trainer_D.step()
+    return float(loss_D.sum())
+
+# Defined in file: ./chapter_generative-adversarial-networks/gan.md
+def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
+    """Update generator."""
+    batch_size = Z.shape[0]
+    ones = torch.ones(batch_size)
+    trainer_G.zero_grad()
+    # We could reuse `fake_X` from `update_D` to save computation
+    fake_X = net_G(Z)
+    # Recomputing `fake_Y` is needed since `net_D` is changed
+    fake_Y = net_D(fake_X)
+    loss_G=loss(fake_Y,ones)
+    loss_G.backward()
+    trainer_G.step()
+    return float(loss_G.sum())
 
 
 # Alias defined in config.ini
