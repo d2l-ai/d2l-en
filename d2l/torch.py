@@ -20,7 +20,7 @@ import requests
 import zipfile
 import hashlib
 d2l = sys.modules[__name__]
-
+import itertools
 
 # Defined in file: ./chapter_preface/index.md
 import numpy as np
