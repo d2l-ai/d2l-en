@@ -1163,6 +1163,11 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
 
     
 # Defined in file: ./chapter_computer-vision/anchor.md
+
+PredBoundingBox = namedtuple("PredBoundingBox", ["probability", "class_id",
+                                                 "classname", "bounding_box"
+                                                 ])
+
 def MultiBoxPrior(feature_map_sizes, sizes, aspect_ratios):
     """Compute default box sizes with scale and aspect transform."""
     
