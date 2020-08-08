@@ -21,6 +21,7 @@ import zipfile
 import hashlib
 d2l = sys.modules[__name__]
 import itertools
+from collections import namedtuple
 
 # Defined in file: ./chapter_preface/index.md
 import numpy as np
