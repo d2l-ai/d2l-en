@@ -41,7 +41,7 @@ if we can
 train the newly-added layer into an identity function $f(\mathbf{x}) = \mathbf{x}$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training dataset, the added layer might make it easier to reduce training errors.
 
 This is the question that He et al. considered when working on very deep computer vision models :cite:`He.Zhang.Ren.ea.2016`. 
-At the heart of their proposed ResNet is the idea that every additional layer should 
+At the heart of their proposed *residual network* (*ResNet*) is the idea that every additional layer should 
 more easily
 contain the identity function as one of its elements. 
 These considerations are rather profound but they led to a surprisingly simple
@@ -73,8 +73,8 @@ to zero.
 The right figure in :numref:`fig_residual_block` illustrates the  *residual block* of ResNet,
 where the solid line carrying the layer input 
 $\mathbf{x}$ to the addition operator
-is called a *residual connection*.
-In residual blocks, inputs can 
+is called a *residual connection* (or *shortcut connection*).
+With residual blocks, inputs can 
 forward propagate faster through the residual connections across layers.
 
 ![A regular block (left) and a residual block (right).](../img/residual-block.svg)
@@ -250,7 +250,9 @@ b1 = tf.keras.models.Sequential([
     tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-GoogLeNet uses four blocks made up of Inception blocks. However, ResNet uses four modules made up of residual blocks, each of which uses several residual blocks with the same number of output channels. The number of channels in the first module is the same as the number of input channels. Since a maximum pooling layer with a stride of 2 has already been used, it is not necessary to reduce the height and width. In the first residual block for each of the subsequent modules, the number of channels is doubled compared with that of the previous module, and the height and width are halved.
+GoogLeNet uses four modules made up of Inception blocks.
+However, ResNet uses four modules made up of residual blocks, each of which uses several residual blocks with the same number of output channels. 
+The number of channels in the first module is the same as the number of input channels. Since a maximum pooling layer with a stride of 2 has already been used, it is not necessary to reduce the height and width. In the first residual block for each of the subsequent modules, the number of channels is doubled compared with that of the previous module, and the height and width are halved.
 
 Now, we implement this module. Note that special processing has been performed on the first module.
 
@@ -282,12 +284,14 @@ def resnet_block(input_channels, num_channels, num_residuals,
 ```{.python .input}
 #@tab tensorflow
 class ResnetBlock(tf.keras.layers.Layer):
-    def __init__(self, num_channels, num_residuals, first_block=False, **kwargs):
+    def __init__(self, num_channels, num_residuals, first_block=False,
+                 **kwargs):
         super(ResnetBlock, self).__init__(**kwargs)
         self.residual_layers = []
         for i in range(num_residuals):
             if i == 0 and not first_block:
-                self.residual_layers.append(Residual(num_channels, use_1x1conv=True, strides=2))
+                self.residual_layers.append(
+                    Residual(num_channels, use_1x1conv=True, strides=2))
             else:
                 self.residual_layers.append(Residual(num_channels))
 
@@ -297,7 +301,7 @@ class ResnetBlock(tf.keras.layers.Layer):
         return X
 ```
 
-Then, we add all the residual blocks to ResNet. Here, two residual blocks are used for each module.
+Then, we add all the modules to ResNet. Here, two residual blocks are used for each module.
 
 ```{.python .input}
 net.add(resnet_block(64, 2, first_block=True),
@@ -322,7 +326,7 @@ b4 = ResnetBlock(256, 2)
 b5 = ResnetBlock(512, 2)
 ```
 
-Finally, just like GoogLeNet, we add a global average pooling layer, followed by the fully connected layer output.
+Finally, just like GoogLeNet, we add a global average pooling layer, followed by the fully-connected layer output.
 
 ```{.python .input}
 net.add(nn.GlobalAvgPool2D(), nn.Dense(10))
@@ -337,14 +341,14 @@ net = nn.Sequential(b1, b2, b3, b4, b5,
 
 ```{.python .input}
 #@tab tensorflow
-# Recall that we define this as a function so we can reuse later
-# and run it within `tf.distribute.MirroredStrategy`'s scope to
-# utilize various computational resources, e.g. GPUs. Also note
-# that even though we have created b1, b2, b3, b4, b5 but we
-# will recreate them inside this function's scope instead.
+# Recall that we define this as a function so we can reuse later and run it
+# within `tf.distribute.MirroredStrategy`'s scope to utilize various
+# computational resources, e.g. GPUs. Also note that even though we have
+# created b1, b2, b3, b4, b5 but we will recreate them inside this function's
+# scope instead
 def net():
     return tf.keras.Sequential([
-        # The following layers are the same as b1 that we created earlier.
+        # The following layers are the same as b1 that we created earlier
         tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, padding='same'),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Activation('relu'),
@@ -359,12 +363,13 @@ def net():
         tf.keras.layers.Dense(units=10)])
 ```
 
-There are 4 convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first convolutional layer and the final fully connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18. By configuring different numbers of channels and residual blocks in the module, we can create different ResNet models, such as the deeper 152-layer ResNet-152. Although the main architecture of ResNet is similar to that of GoogLeNet, ResNet's structure is simpler and easier to modify. All these factors have resulted in the rapid and widespread use of ResNet. :numref:`fig_ResNetFull` is a diagram of the full ResNet-18.
+There are 4 convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first $7\times 7$ convolutional layer and the final fully-connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18.
+By configuring different numbers of channels and residual blocks in the module, we can create different ResNet models, such as the deeper 152-layer ResNet-152. Although the main architecture of ResNet is similar to that of GoogLeNet, ResNet's structure is simpler and easier to modify. All these factors have resulted in the rapid and widespread use of ResNet. :numref:`fig_resnet18` depicts the full ResNet-18.
 
-![ResNet 18](../img/ResNetFull.svg)
-:label:`fig_ResNetFull`
+![The ResNet-18 architecture.](../img/resnet18.svg)
+:label:`fig_resnet18`
 
-Before training ResNet, let us observe how the input shape changes between different modules in ResNet. As in all previous architectures, the resolution decreases while the number of channels increases up until the point where a global average pooling layer aggregates all features.
+Before training ResNet, let us observe how the input shape changes across different modules in ResNet. As in all the previous architectures, the resolution decreases while the number of channels increases up until the point where a global average pooling layer aggregates all features.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 224, 224))
@@ -390,9 +395,9 @@ for layer in net().layers:
     print(layer.__class__.__name__,'output shape:\t', X.shape)
 ```
 
-## Data Acquisition and Training
+## Training
 
-We train ResNet on the Fashion-MNIST dataset, just like before. The only thing that has changed is the learning rate that decreased again, due to the more complex architecture.
+We train ResNet on the Fashion-MNIST dataset, just like before.
 
 ```{.python .input}
 #@tab all
@@ -403,24 +408,24 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 ## Summary
 
-* Residual blocks allow for a parametrization relative to the identity function $f(\mathbf{x}) = \mathbf{x}$.
-* Adding residual blocks increases the function complexity in a well-defined manner.
-* We can train an effective deep neural network by having residual blocks pass through cross-layer data channels.
+* Nested function classes are desirable. Learning an additional layer in deep neural networks as an identity function (though this is an extreme case) should be made easy.
+* The residual mapping can learn the identity function more easily, such as pushing parameters in the weight layer to zero.
+* We can train an effective deep neural network by having residual blocks. Inputs can forward propagate faster through the residual connections across layers.
 * ResNet had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
 
 
 ## Exercises
 
-1. Refer to Table 1 in the :cite:`He.Zhang.Ren.ea.2016` to
+1. What are the major differences between the Inception block in :numref:`fig_inception` and the residual block? After removing some paths in the Inception block, how are they related to each other?
+1. Refer to Table 1 in the ResNet paper :cite:`He.Zhang.Ren.ea.2016` to
    implement different variants.
 1. For deeper networks, ResNet introduces a "bottleneck" architecture to reduce
    model complexity. Try to implement it.
-1. In subsequent versions of ResNet, the author changed the "convolution, batch
-   normalization, and activation" architecture to the "batch normalization,
-   activation, and convolution" architecture. Make this improvement
+1. In subsequent versions of ResNet, the authors changed the "convolution, batch
+   normalization, and activation" structure to the "batch normalization,
+   activation, and convolution" structure. Make this improvement
    yourself. See Figure 1 in :cite:`He.Zhang.Ren.ea.2016*1`
    for details.
-1. Prove that if $\mathbf{x}$ is generated by a ReLU, the ResNet block does indeed include the identity function.
 1. Why cannot we just increase the complexity of functions without bound, even if the function classes are nested?
 
 :begin_tab:`mxnet`

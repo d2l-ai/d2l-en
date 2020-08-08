@@ -164,7 +164,7 @@ but not ignore the long range entirely).
 As shown in :numref:`fig_inception_full`, GoogLeNet uses a stack of a total of 9 inception blocks
 and global average pooling to generate its estimates.
 Maximum pooling between inception blocks reduces the dimensionality.
-The first part is similar to AlexNet and LeNet.
+The first module is similar to AlexNet and LeNet.
 The stack of blocks is inherited from VGG
 and the global average pooling avoids
 a stack of fully-connected layers at the end.
@@ -173,7 +173,7 @@ a stack of fully-connected layers at the end.
 :label:`fig_inception_full`
 
 We can now implement GoogLeNet piece by piece.
-The first part uses a 64-channel $7\times 7$ convolutional layer.
+The first module uses a 64-channel $7\times 7$ convolutional layer.
 
 ```{.python .input}
 b1 = nn.Sequential()
@@ -197,7 +197,7 @@ def b1():
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-The second part uses two convolutional layers:
+The second module uses two convolutional layers:
 first, a 64-channel $1\times 1$ convolutional layer,
 then a $3\times 3$ convolutional layer that triples the number of channels. This corresponds to the second path in the Inception block.
 
@@ -225,7 +225,7 @@ def b2():
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-The third part connects two complete Inception blocks in series.
+The third module connects two complete Inception blocks in series.
 The number of output channels of the first Inception block is
 $64+128+32+32=256$,
 and the number-of-output-channel ratio
@@ -262,13 +262,13 @@ def b3():
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-The fourth part is more complicated.
+The fourth module is more complicated.
 It connects five Inception blocks in series,
 and they have $192+208+48+64=512$, $160+224+64+64=512$,
 $128+256+64+64=512$, $112+288+64+64=528$,
 and $256+320+128+128=832$ output channels, respectively.
 The number of channels assigned to these paths is similar
-to that in the third part:
+to that in the third module:
 the second path with the $3\times 3$ convolutional layer
 outputs the largest number of channels,
 followed by the first path with only the $1\times 1$ convolutional layer,
@@ -310,10 +310,10 @@ def b4():
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-The fifth part has two Inception blocks with $256+320+128+128=832$
+The fifth module has two Inception blocks with $256+320+128+128=832$
 and $384+384+128+128=1024$ output channels.
 The number of channels assigned to each path
-is the same as that in the third and fourth parts,
+is the same as that in the third and fourth modules,
 but differs in specific values.
 It should be noted that the fifth block is followed by the output layer.
 This block uses the global average pooling layer
@@ -365,7 +365,7 @@ To have a reasonable training time on Fashion-MNIST,
 we reduce the input height and width from 224 to 96.
 This simplifies the computation.
 The changes in the shape of the output
-between the various parts are demonstrated below.
+between the various modules are demonstrated below.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 96, 96))
