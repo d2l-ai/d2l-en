@@ -1161,6 +1161,113 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 
+    
+# Defined in file: ./chapter_computer-vision/anchor.md
+def MultiBoxPrior(feature_map_sizes, sizes, aspect_ratios):
+    """Compute default box sizes with scale and aspect transform."""
+    
+    sizes = [s*728 for s in sizes]
+    
+    scale = feature_map_sizes
+    steps_y = [1 / scale[0]]
+    steps_x = [1 / scale[1]]
+    
+    sizes = [s / max(scale) for s in sizes]
+    
+    num_layers = 1
+
+    boxes = []
+    for i in range(num_layers):
+        for h, w in itertools.product(range(feature_map_sizes[0]), range(feature_map_sizes[1])):
+            cx = (w + 0.5)*steps_x[i]
+            cy = (h + 0.5)*steps_y[i]
+            
+            for j in range(len(sizes)):
+
+                s = sizes[j]
+                boxes.append((cx, cy, s, s))
+
+            s = sizes[0]
+            
+            for ar in aspect_ratios:
+               
+                boxes.append((cx, cy, (s * math.sqrt(ar)), (s / math.sqrt(ar))))
+
+    return torch.Tensor(boxes) 
+
+def bbox_to_rect(bbox, color):
+    """Convert bounding box to matplotlib format."""
+    return plt.Rectangle(xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0],
+                         height=bbox[3]-bbox[1], fill=False, edgecolor=color,
+                         linewidth=2)
+    
+def center_2_hw(box: torch.Tensor) -> float:
+    """
+    Converting (cx, cy, w, h) to (x1, y1, x2, y2)
+    """
+
+    return torch.cat(
+        [box[:, 0, None] - box[:, 2, None]/2,
+         box[:, 1, None] - box[:, 3, None]/2,
+         box[:, 0, None] + box[:, 2, None]/2,
+         box[:, 1, None] + box[:, 3, None]/2
+         ], dim=1)
+
+def MultiBoxTarget(class_true, bb_true, anchors):
+    
+    class_true +=1
+    
+    class_target = torch.zeros(anchors.shape[0]).long()
+
+    overlap_list = d2l.find_overlap(bb_true, anchors, 0.5)
+    
+    overlap_coordinates = torch.zeros_like(anchors)
+    
+    for j in range(len(overlap_list)):
+        overlap = overlap_list[j]
+        class_target[overlap] = class_true[j, 0]
+        overlap_coordinates[overlap] = 1.
+        
+        
+    
+    new_anchors = torch.cat([*anchors])
+    overlap_coordinates = torch.cat([*overlap_coordinates])
+    new_anchors = new_anchors*overlap_coordinates
+    
+    return (new_anchors.unsqueeze(0), overlap_coordinates.unsqueeze(0), class_target.unsqueeze(0))
+
+def MultiboxDetection(id_cat, cls_probs, anchors, nms_threshold):
+
+    id_new = dict()
+    id_new[0] = 'background'
+    for i in (id_cat.keys()):
+        id_new[i+1] = id_cat[i]
+
+    cls_probs = cls_probs.transpose(0,1)
+
+    prob, class_id = torch.max(cls_probs,1)
+
+    prob = prob.detach().cpu().numpy()
+    class_id = class_id.detach().cpu().numpy()
+
+    output_bb = [d2l.PredBoundingBox(probability=prob[i],
+                                     class_id=class_id[i],
+                                     classname=id_new[class_id[i]],
+                                     bounding_box=[anchors[i, 0], 
+                                                   anchors[i, 1], 
+                                                   anchors[i, 2], 
+                                                   anchors[i, 3]])
+                                     for i in range(0, len(prob))]
+
+    filtered_bb = d2l.non_max_suppression(output_bb, nms_threshold)
+    
+    out = []
+    for bb in filtered_bb:
+        out.append([bb.class_id-1, bb.probability, *bb.bounding_box])
+    out = torch.Tensor(out)
+    
+    return out
+
 
 # Alias defined in config.ini
 
