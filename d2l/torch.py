@@ -1257,6 +1257,23 @@ def find_overlap(bb_true_i, anchors, jaccard_overlap):
         overlap_list.append(overlap)
     return overlap_list
 
+def non_max_suppression(bounding_boxes: list, iou_threshold: float = 0.1) -> list:
+    filtered_bb = []
+
+    while len(bounding_boxes) != 0:
+        best_bb = bounding_boxes.pop(0)
+        filtered_bb.append(best_bb)
+
+        remove_items = []
+        for bb in bounding_boxes:
+            iou = jaccard(torch.tensor(best_bb.bounding_box).unsqueeze(0), 
+                          torch.tensor(bb.bounding_box).unsqueeze(0))
+
+            if iou > iou_threshold:
+                remove_items.append(bb)
+        bounding_boxes = [bb for bb in bounding_boxes if bb not in remove_items]
+    return filtered_bb
+
 def MultiBoxTarget(class_true, bb_true, anchors):
     
     class_true +=1
