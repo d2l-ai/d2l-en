@@ -37,9 +37,9 @@ with d2l.Benchmark():
     npx.waitall()
 ```
 
-Broadly speaking, MXNet has a frontend for direct interaction with the users, e.g., via Python, as well as a backend used by the system to perform the computation. The backend possesses its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. Hence it is ony possible to parallelize operations that do not depend on each other.
-
-As shown in :numref:`fig_frontends`, users can write MXNet programs in various frontend languages, such as Python, R, Scala and C++. Regardless of the front-end programming language used, the execution of MXNet programs occurs primarily in the back-end of C++ implementations. Operations issued by the frontend language are passed on to the backend for execution. The backend manages its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. That is, it is not possible to parallelize operations that depend on each other.
+Broadly speaking, MXNet has a frontend for direct interaction with the users, e.g., via Python, as well as a backend used by the system to perform the computation. 
+As shown in :numref:`fig_frontends`, users can write MXNet programs in various frontend languages, such as Python, R, Scala, and C++. Regardless of the frontend programming language used, the execution of MXNet programs occurs primarily in the backend of C++ implementations. Operations issued by the frontend language are passed on to the backend for execution. 
+The backend manages its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. Hence, it is not possible to parallelize operations that depend on each other.
 
 ![Programming Frontends.](../img/frontends.png)
 :width:`300px`
@@ -110,13 +110,13 @@ with d2l.Benchmark('asynchronous'):
     y.wait_to_read()
 ```
 
-A slightly simplified interaction between the Python front-end thread and the C++ back-end thread can be summarized as follows:
+A slightly simplified interaction between the Python frontend thread and the C++ backend thread can be summarized as follows:
 
-1. The front-end orders the back-end to insert the calculation task `y = x + 1` into the queue.
-1. The back-end then receives the computation tasks from the queue and performs the actual computations.
-1. The back-end then returns the computation results to the front-end.
+1. The frontend orders the backend to insert the calculation task `y = x + 1` into the queue.
+1. The backend then receives the computation tasks from the queue and performs the actual computations.
+1. The backend then returns the computation results to the frontend.
 
-Assume that the durations of these three stages are $t_1, t_2$ and $t_3$, respectively. If we do not use asynchronous programming, the total time taken to perform 1000 computations is approximately $1000 (t_1+ t_2 + t_3)$. If asynchronous programming is used, the total time taken to perform 1000 computations can be reduced to $t_1 + 1000 t_2 + t_3$ (assuming $1000 t_2 > 999t_1$), since the front-end does not have to wait for the back-end to return computation results for each loop.
+Assume that the durations of these three stages are $t_1, t_2$ and $t_3$, respectively. If we do not use asynchronous programming, the total time taken to perform 1000 computations is approximately $1000 (t_1+ t_2 + t_3)$. If asynchronous programming is used, the total time taken to perform 1000 computations can be reduced to $t_1 + 1000 t_2 + t_3$ (assuming $1000 t_2 > 999t_1$), since the frontend does not have to wait for the backend to return computation results for each loop.
 
 ## Improving Memory Footprint
 

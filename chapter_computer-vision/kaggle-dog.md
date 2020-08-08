@@ -1,6 +1,5 @@
 # Dog Breed Identification (ImageNet Dogs) on Kaggle
 
-
 In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition's web address is
 
 > https://www.kaggle.com/c/dog-breed-identification
@@ -47,7 +46,7 @@ Similarly, to make it easier to get started, we provide a small-scale sample of 
 ```{.python .input  n=1}
 #@save 
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
-                            '75d1ec6b9b2616d2760f211f72a83f73f3b83763')
+                            '0cb91d09b814ecdc07b50f31f8dcad3e81d6a86d')
 
 # If you use the full dataset downloaded for the Kaggle competition, change
 # the variable below to False

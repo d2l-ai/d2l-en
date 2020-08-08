@@ -36,10 +36,15 @@ $$
 $$ 
 
 These often have different interpretations,
-where data points are column vectors
+where data examples are column vectors
 and weights used to form weighted sums are row vectors.
 However, it can be beneficial to be flexible.
-Matrices are useful data structures: they allow us to organize data that have different modalities of variation. For example, rows in our matrix might correspond to different houses (data points), while columns might correspond to different attributes. This should sound familiar if you have ever used spreadsheet software or have read :numref:`sec_pandas`. Thus, although the default orientation of a single vector is a column vector, in a matrix that represents a tabular dataset, it is more conventional to treat each data point as a row vector in the matrix. And, as we will see in later chapters, this convention will enable common deep learning practices. For example, along the outermost axis of a tensor, we can access or enumerate minibatches of data points, or just data points if no minibatch exists.
+As we have described in :numref:`sec_linear-algebra`,
+though a single vector's default orientation is a column vector,
+for any matrix representing a tabular dataset, 
+treating each data example as a row vector
+in the matrix
+is more conventional.
 
 Given a vector, the first interpretation 
 that we should give it is as a point in space. 
@@ -342,7 +347,6 @@ ave_0 = torch.mean(X_train_0, axis=0)
 ave_1 = torch.mean(X_train_1, axis=0)
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 # Load in the dataset
@@ -423,12 +427,10 @@ torch.mean(predictions.type(y_test.dtype) == y_test, dtype=torch.float64)
 #@tab tensorflow
 # Print test set accuracy with eyeballed threshold
 w = tf.transpose(ave_1 - ave_0)
-predictions = tf.matmul(tf.reshape(
-  X_test, y_test.shape), tf.nest.flatten(w)) > -1500000
+predictions = tf.reduce_sum(X_test * tf.nest.flatten(w), axis=0) > -1500000
 
 # Accuracy
-# TODO: Fix incorrect shape
-# tf.reduce_mean(predictions == y_test)
+tf.reduce_mean(tf.cast(tf.cast(predictions, y_test.dtype) == y_test, tf.float32))
 ```
 
 ## Geometry of Linear Transformations

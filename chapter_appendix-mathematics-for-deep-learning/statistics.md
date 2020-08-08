@@ -36,7 +36,7 @@ epsilon = 0.1
 random.seed(8675309)
 xs = np.random.normal(loc=0, scale=1, size=(300,))
 
-ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2 / (2 * epsilon**2))
+ys = [np.sum(np.exp(-(xs[:i] - xs[i])**2 / (2 * epsilon**2))
              / np.sqrt(2*np.pi*epsilon**2)) / len(xs) for i in range(len(xs))]
 
 # Compute true density
@@ -65,7 +65,7 @@ torch.manual_seed(8675309)
 xs = torch.randn(size=(300,))
 
 ys = torch.tensor(
-    [torch.sum(torch.exp(-(xs[0:i] - xs[i])**2 / (2 * epsilon**2))\
+    [torch.sum(torch.exp(-(xs[:i] - xs[i])**2 / (2 * epsilon**2))\
                / torch.sqrt(2*torch.pi*epsilon**2)) / len(xs)\
      for i in range(len(xs))])
 
@@ -79,6 +79,36 @@ d2l.plt.scatter(xs, ys)
 d2l.plt.axvline(x=0)
 d2l.plt.axvline(x=torch.mean(xs), linestyle='--', color='purple')
 d2l.plt.title(f'sample mean: {float(torch.mean(xs).item()):.2f}')
+d2l.plt.show()
+```
+
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+tf.pi = tf.acos(tf.zeros(1)) * 2  # define pi in TensorFlow
+
+# Sample datapoints and create y coordinate
+epsilon = 0.1
+xs = tf.random.normal((300,))
+
+ys = tf.constant(
+    [(tf.reduce_sum(tf.exp(-(xs[:i] - xs[i])**2 / (2 * epsilon**2)) \
+               / tf.sqrt(2*tf.pi*epsilon**2)) / tf.cast(
+        tf.size(xs), dtype=tf.float32)).numpy() \
+     for i in range(tf.size(xs))])
+
+# Compute true density
+xd = tf.range(tf.reduce_min(xs), tf.reduce_max(xs), 0.01)
+yd = tf.exp(-xd**2/2) / tf.sqrt(2 * tf.pi)
+
+# Plot the results
+d2l.plot(xd, yd, 'x', 'density')
+d2l.plt.scatter(xs, ys)
+d2l.plt.axvline(x=0)
+d2l.plt.axvline(x=tf.reduce_mean(xs), linestyle='--', color='purple')
+d2l.plt.title(f'sample mean: {float(tf.reduce_mean(xs).numpy()):.2f}')
 d2l.plt.show()
 ```
 
@@ -163,6 +193,17 @@ def mse(data, true_theta):
     return(torch.mean(torch.square(data - true_theta)))
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Statistical bias
+def stat_bias(true_theta, est_theta):
+    return(tf.reduce_mean(est_theta) - true_theta)
+
+# Mean squared error
+def mse(data, true_theta):
+    return(tf.reduce_mean(tf.square(data - true_theta)))
+```
+
 To illustrate the equation of the bias-variance trade-off, let us simulate of normal distribution $\mathcal{N}(\theta, \sigma^2)$ with $10,000$ samples. Here, we use a $\theta = 1$ and $\sigma = 4$. As the estimator is a function of the given samples, here we use the mean of the samples as an estimator for true $\theta$ in this normal distribution $\mathcal{N}(\theta, \sigma^2)$ .
 
 ```{.python .input}
@@ -184,14 +225,20 @@ theta_est = torch.mean(samples)
 theta_est
 ```
 
+```{.python .input}
+#@tab tensorflow
+theta_true = 1
+sigma = 4
+sample_len = 10000
+samples = tf.random.normal((sample_len, 1), theta_true, sigma)
+theta_est = tf.reduce_mean(samples)
+theta_est
+```
+
 Let us validate the trade-off equation by calculating the summation of the squared bias and the variance of our estimator. First, calculate the MSE of our estimator.
 
 ```{.python .input}
-mse(samples, theta_true)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 mse(samples, theta_true)
 ```
 
@@ -206,6 +253,12 @@ np.square(samples.std()) + np.square(bias)
 #@tab pytorch
 bias = stat_bias(theta_true, theta_est)
 torch.square(samples.std(unbiased=False)) + torch.square(bias)
+```
+
+```{.python .input}
+#@tab tensorflow
+bias = stat_bias(theta_true, theta_est)
+tf.square(tf.math.reduce_std(samples)) + tf.square(bias)
 ```
 
 ## Conducting Hypothesis Tests
@@ -236,7 +289,7 @@ $$ \text{statistical significance }= 1 - \alpha = 1 - P(\text{reject } H_0 \mid 
 
 It is also referred to as the *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. The significance level can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis.
 
-:numref:`fig_statistical_significance` shows the observations' values and probability of a given normal distribution in a two-sample hypothesis test. If the observation data point is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it.
+:numref:`fig_statistical_significance` shows the observations' values and probability of a given normal distribution in a two-sample hypothesis test. If the observation data example is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it.
 
 ![Statistical significance.](../img/statistical_significance.svg)
 :label:`fig_statistical_significance`
@@ -395,6 +448,24 @@ mu_hat = torch.mean(samples)
 sigma_hat = samples.std(unbiased=True)
 (mu_hat - t_star*sigma_hat/torch.sqrt(torch.tensor(N, dtype=torch.float32)),\
  mu_hat + t_star*sigma_hat/torch.sqrt(torch.tensor(N, dtype=torch.float32)))
+```
+
+```{.python .input}
+#@tab tensorflow
+# Number of samples
+N = 1000
+
+# Sample dataset
+samples = tf.random.normal((N,), 0, 1)
+
+# Lookup Students's t-distribution c.d.f.
+t_star = 1.96
+
+# Construct interval
+mu_hat = tf.reduce_mean(samples)
+sigma_hat = tf.math.reduce_std(samples)
+(mu_hat - t_star*sigma_hat/tf.sqrt(tf.constant(N, dtype=tf.float32)), \
+ mu_hat + t_star*sigma_hat/tf.sqrt(tf.constant(N, dtype=tf.float32)))
 ```
 
 ## Summary

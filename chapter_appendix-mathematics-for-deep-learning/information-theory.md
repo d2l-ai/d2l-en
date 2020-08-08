@@ -68,6 +68,23 @@ def self_information(p):
 self_information(1 / 64)
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+def log2(x):
+    return tf.math.log(x) / tf.math.log(2.)
+
+def nansum(x):
+    return tf.reduce_sum(tf.where(tf.math.is_nan(
+        x), tf.zeros_like(x), x), axis=-1)
+
+def self_information(p):
+    return -log2(tf.constant(p)).numpy()
+
+self_information(1 / 64)
+```
+
 ## Entropy 
 
 As self-information only measures the information of a single discrete event, we need a more generalized measure for any random variable of either discrete or continuous distribution. 
@@ -117,6 +134,14 @@ def entropy(p):
     return out
 
 entropy(torch.tensor([0.1, 0.5, 0.1, 0.3]))
+```
+
+```{.python .input}
+#@tab tensorflow
+def entropy(p):
+    return nansum(- p * log2(p))
+
+entropy(tf.constant([0.1, 0.5, 0.1, 0.3]))
 ```
 
 ### Interpretations
@@ -195,6 +220,17 @@ def joint_entropy(p_xy):
 joint_entropy(torch.tensor([[0.1, 0.5], [0.1, 0.3]]))
 ```
 
+```{.python .input}
+#@tab tensorflow
+def joint_entropy(p_xy):
+    joint_ent = -p_xy * log2(p_xy)
+    # nansum will sum up the non-nan number
+    out = nansum(joint_ent)
+    return out
+
+joint_entropy(tf.constant([[0.1, 0.5], [0.1, 0.3]]))
+```
+
 Notice that this is the same *code* as before, but now we interpret it differently as working on the joint distribution of the two random variables.
 
 
@@ -246,6 +282,19 @@ def conditional_entropy(p_xy, p_x):
 
 conditional_entropy(torch.tensor([[0.1, 0.5], [0.2, 0.3]]), 
                     torch.tensor([0.2, 0.8]))
+```
+
+```{.python .input}
+#@tab tensorflow
+def conditional_entropy(p_xy, p_x):
+    p_y_given_x = p_xy/p_x
+    cond_ent = -p_xy * log2(p_y_given_x)
+    # nansum will sum up the non-nan number
+    out = nansum(cond_ent)
+    return out
+
+conditional_entropy(tf.constant([[0.1, 0.5], [0.2, 0.3]]),
+                    tf.constant([0.2, 0.8]))
 ```
 
 ### Mutual Information
@@ -301,6 +350,19 @@ def mutual_information(p_xy, p_x, p_y):
 
 mutual_information(torch.tensor([[0.1, 0.5], [0.1, 0.3]]),
                    torch.tensor([0.2, 0.8]), torch.tensor([[0.75, 0.25]]))
+```
+
+```{.python .input}
+#@tab tensorflow
+def mutual_information(p_xy, p_x, p_y):
+    p = p_xy / (p_x * p_y)
+    mutual = p_xy * log2(p)
+    # Operator nansum will sum up the non-nan number
+    out = nansum(mutual)
+    return out
+
+mutual_information(tf.constant([[0.1, 0.5], [0.1, 0.3]]),
+                   tf.constant([0.2, 0.8]), tf.constant([[0.75, 0.25]]))
 ```
 
 ### Properties of Mutual Information
@@ -361,11 +423,19 @@ def kl_divergence(p, q):
     return out.abs().item()
 ```
 
+```{.python .input}
+#@tab tensorflow
+def kl_divergence(p, q):
+    kl = p * log2(p / q)
+    out = nansum(kl)
+    return tf.abs(out).numpy()
+```
+
 ### KL Divergence Properties
 
 Let us take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
 
-* KL divergence is non-symmetric, i.e., $$D_{\mathrm{KL}}(P\|Q) \neq D_{\mathrm{KL}}(Q\|P), \text{ if } P \neq Q.$$
+* KL divergence is non-symmetric, i.e., there are $P,Q$ such that $$D_{\mathrm{KL}}(P\|Q) \neq D_{\mathrm{KL}}(Q\|P).$$
 * KL divergence is non-negative, i.e., $$D_{\mathrm{KL}}(P\|Q) \geq 0.$$ Note that the equality holds only when $P = Q$.
 * If there exists an $x$ such that $p(x) > 0$ and $q(x) = 0$, then $D_{\mathrm{KL}}(P\|Q) = \infty$.
 * There is a close relationship between KL divergence and mutual information. Besides the relationship shown in :numref:`fig_mutual_information`, $I(X, Y)$ is also numerically equivalent with the following terms:
@@ -409,18 +479,22 @@ q1 = torch.sort(q1)[0]
 q2 = torch.sort(q2)[0]
 ```
 
+```{.python .input}
+#@tab tensorflow
+tensor_len = 10000
+p = tf.random.normal((tensor_len, ), 0, 1)
+q1 = tf.random.normal((tensor_len, ), -1, 1)
+q2 = tf.random.normal((tensor_len, ), 1, 1)
+
+p = tf.sort(p)
+q1 = tf.sort(q1)
+q2 = tf.sort(q2)
+```
+
 Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (i.e., $x=0$), we expect a similar value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. As you can see below, there is only a less than 3% off between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$.
 
 ```{.python .input}
-kl_pq1 = kl_divergence(p, q1)
-kl_pq2 = kl_divergence(p, q2)
-similar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100
-
-kl_pq1, kl_pq2, similar_percentage
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 kl_pq1 = kl_divergence(p, q1)
 kl_pq2 = kl_divergence(p, q2)
 similar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100
@@ -431,14 +505,7 @@ kl_pq1, kl_pq2, similar_percentage
 In contrast, you may find that $D_{\mathrm{KL}}(q_2 \|p)$ and $D_{\mathrm{KL}}(p \| q_2)$ are off a lot, with around 40% off as shown below.
 
 ```{.python .input}
-kl_q2p = kl_divergence(q2, p)
-differ_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100
-
-kl_q2p, differ_percentage
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 kl_q2p = kl_divergence(q2, p)
 differ_percentage = abs(kl_q2p - kl_pq2) / ((kl_q2p + kl_pq2) / 2) * 100
 
@@ -449,7 +516,7 @@ kl_q2p, differ_percentage
 
 If you are curious about applications of information theory in deep learning, here is a quick example. We define the true distribution $P$ with probability distribution $p(x)$, and the estimated distribution $Q$ with probability distribution $q(x)$, and we will use them in the rest of this section.
 
-Say we need to solve a binary classification problem based on given $n$ data points {$x_1, \ldots, x_n$}. Assume that we encode $1$ and $0$ as the positive and negative class label $y_i$ respectively, and our neural network is parameterized by $\theta$. If we aim to find a best $\theta$ so that $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, it is natural to apply the maximum log-likelihood approach as was seen in :numref:`sec_maximum_likelihood`. To be specific, for true labels $y_i$ and predictions $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, the probability to be classified as positive is $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Hence, the log-likelihood function would be
+Say we need to solve a binary classification problem based on given $n$ data examples {$x_1, \ldots, x_n$}. Assume that we encode $1$ and $0$ as the positive and negative class label $y_i$ respectively, and our neural network is parameterized by $\theta$. If we aim to find a best $\theta$ so that $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, it is natural to apply the maximum log-likelihood approach as was seen in :numref:`sec_maximum_likelihood`. To be specific, for true labels $y_i$ and predictions $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, the probability to be classified as positive is $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Hence, the log-likelihood function would be
 
 $$
 \begin{aligned}
@@ -491,6 +558,13 @@ def cross_entropy(y_hat, y):
     return ce.mean()
 ```
 
+```{.python .input}
+#@tab tensorflow
+def cross_entropy(y_hat, y):
+    ce = -tf.math.log(y_hat[:, :len(y)])
+    return tf.reduce_mean(ce)
+```
+
 Now define two tensors for the labels and predictions, and calculate the cross entropy loss of them.
 
 ```{.python .input}
@@ -504,6 +578,14 @@ cross_entropy(preds, labels)
 #@tab pytorch
 labels = torch.tensor([0, 2])
 preds = torch.tensor([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
+
+cross_entropy(preds, labels)
+```
+
+```{.python .input}
+#@tab tensorflow
+labels = tf.constant([0, 2])
+preds = tf.constant([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
 
 cross_entropy(preds, labels)
 ```
@@ -524,7 +606,7 @@ The definition of cross entropy indirectly proves the equivalent relationship be
 
 If we dive deep into the classification objective function with cross entropy loss $\mathrm{CE}$, we will find minimizing $\mathrm{CE}$ is equivalent to maximizing the log-likelihood function $L$.
 
-To begin with, suppose that we are given a dataset with $n$ samples, and it can be classified into $k$-classes. For each data point $i$, we represent any $k$-class label $\mathbf{y}_i = (y_{i1}, \ldots, y_{ik})$ by *one-hot encoding*. To be specific, if the data point $i$ belongs to class $j$, then we set the $j$-th entry to $1$, and all other components to $0$, i.e., 
+To begin with, suppose that we are given a dataset with $n$ examples, and it can be classified into $k$-classes. For each data example $i$, we represent any $k$-class label $\mathbf{y}_i = (y_{i1}, \ldots, y_{ik})$ by *one-hot encoding*. To be specific, if the  example $i$ belongs to class $j$, then we set the $j$-th entry to $1$, and all other components to $0$, i.e., 
 
 $$ y_{ij} = \begin{cases}1 & j \in J; \\ 0 &\text{otherwise.}\end{cases}$$
 
@@ -544,7 +626,7 @@ On the other side, we can also approach the problem through maximum likelihood e
 $$\mathbf{p}^\mathbf{z} = \prod_{j=1}^k p_{j}^{z_{j}}.$$
 
 
-It can be seen that the label of each data point, $\mathbf{y}_i$, is following a $k$-class multinoulli distribution with probabilities $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Therefore, the joint p.m.f. of each data point $\mathbf{y}_i$ is  $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
+It can be seen that the label of each data example, $\mathbf{y}_i$, is following a $k$-class multinoulli distribution with probabilities $\boldsymbol{\pi} =$ ($\pi_{1}, \ldots, \pi_{k}$). Therefore, the joint p.m.f. of each data example $\mathbf{y}_i$ is  $\mathbf{\pi}^{\mathbf{y}_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
 Hence, the log-likelihood function would be
 
 $$
@@ -574,6 +656,19 @@ nll_loss.get()
 # nn.NLLLoss()
 nll_loss = NLLLoss()
 loss = nll_loss(torch.log(preds), labels)
+loss
+```
+
+```{.python .input}
+#@tab tensorflow
+def nll_loss(y_hat, y):
+    # Convert labels to binary class matrix.
+    y = tf.keras.utils.to_categorical(y, num_classes=3)
+    # Since tf.keras.losses.binary_crossentropy returns the mean
+    # over the last axis, we calculate the sum here.
+    return tf.reduce_sum(tf.keras.losses.binary_crossentropy(y, y_hat, from_logits=True))
+
+loss = nll_loss(tf.math.log(preds), labels)
 loss
 ```
 

@@ -90,7 +90,7 @@ There, our loss was given by
 $$L(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
 Recall that $\mathbf{x}^{(i)}$ are the features,
-$y^{(i)}$ are labels for all data points $i$, and $(\mathbf{w}, b)$
+$y^{(i)}$ are labels for all data examples $i$, and $(\mathbf{w}, b)$
 are the weight and bias parameters, respectively.
 To penalize the size of the weight vector,
 we must somehow add $\| \mathbf{w} \|^2$ to the loss function,
@@ -527,7 +527,7 @@ For instance, [reproducing kernel Hilbert space (RKHS)](https://en.wikipedia.org
 allows one to apply tools introduced
 for linear functions in a nonlinear context.
 Unfortunately, RKHS-based algorithms
-tend to scale purely to large, high-dimensional data.
+tend to scale poorly to large, high-dimensional data.
 In this book we will default to the simple heuristic
 of applying weight decay on all layers of a deep network.
 
