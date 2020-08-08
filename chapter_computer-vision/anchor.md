@@ -14,6 +14,15 @@ np.set_printoptions(2)
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import numpy as np
+import torch
+from IPython import display
+```
+
 ## Generating Multiple Anchor Boxes
 
 Assume that the input image has a height of $h$ and width of $w$. We generate anchor boxes with different shapes centered on each pixel of the image. Assume the size is $s\in (0, 1]$, the aspect ratio is $r > 0$, and the width and height of the anchor box are $ws\sqrt{r}$ and $hs/\sqrt{r}$, respectively.  When the center position is given, an anchor box with known width and height is determined.
@@ -35,11 +44,25 @@ X = np.random.uniform(size=(1, 3, h, w))  # Construct input data
 Y = npx.multibox_prior(X, sizes=[0.75, 0.5, 0.25], ratios=[1, 2, 0.5])
 Y.shape
 ```
+```{.python .input}
+#@tab pytorch
+img = d2l.plt.imread('../img/catdog.jpg')
+h, w = img.shape[0:2]
+X = torch.rand((1, 3, h, w))  # Construct input data
+Y = d2l.MultiBoxPrior((h,w), sizes = [0.75, 0.5, 0.25], aspect_ratios = (2, 0.5))
+Y.shape
+```
 
 We can see that the shape of the returned anchor box variable `y` is (batch size, number of anchor boxes, 4). After changing the shape of the anchor box variable `y` to (image height, image width, number of anchor boxes centered on the same pixel, 4), we can obtain all the anchor boxes centered on a specified pixel position. In the following example, we access the first anchor box centered on (250, 250). It has four elements: the $x, y$ axis coordinates in the upper-left corner and the $x, y$ axis coordinates in the lower-right corner of the anchor box. The coordinate values of the $x$ and $y$ axis are divided by the width and height of the image, respectively, so the value range is between 0 and 1.
 
 ```{.python .input  n=4}
 boxes = Y.reshape(h, w, 5, 4)
+boxes[250, 250, 0, :]
+```
+
+```{.python .input}
+#@tab pytorch
+boxes = Y.clone().reshape((h, w, 5, 4))
 boxes[250, 250, 0, :]
 ```
 
@@ -68,6 +91,30 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
                       bbox=dict(facecolor=color, lw=0))
 ```
 
+```{.python .input}
+#@tab pytorch
+# Save to the d2l package. 
+def show_bboxes(axes, bboxes, labels=None, colors=None):
+    """Show bounding boxes."""
+    def _make_list(obj, default_values=None):
+        if obj is None:
+            obj = default_values
+        elif not isinstance(obj, (list, tuple)):
+            obj = [obj]
+        return obj
+    labels = _make_list(labels)
+    colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
+    for i, bbox in enumerate(bboxes):
+        color = colors[i % len(colors)]
+        rect = d2l.bbox_to_rect(bbox.numpy(), color)
+        axes.add_patch(rect)
+        if labels and len(labels) > i:
+            text_color = 'k' if color == 'w' else 'w'
+            axes.text(rect.xy[0], rect.xy[1], labels[i],
+                      va='center', ha='center', fontsize=9, color=text_color,
+                      bbox=dict(facecolor=color, lw=0))
+```
+
 As we just saw, the coordinate values of the $x$ and $y$ axis in the variable `boxes` have been divided by the width and height of the image, respectively. When drawing images, we need to restore the original coordinate values of the anchor boxes and therefore define the variable `bbox_scale`. Now, we can draw all the anchor boxes centered on (250, 250) in the image. As you can see, the blue anchor box with a size of 0.75 and an aspect ratio of 1 covers the dog in the image well.
 
 ```{.python .input  n=7}
@@ -75,6 +122,16 @@ d2l.set_figsize()
 bbox_scale = np.array((w, h, w, h))
 fig = d2l.plt.imshow(img)
 show_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,
+            ['s=0.75, r=1', 's=0.5, r=1', 's=0.25, r=1', 's=0.75, r=2',
+             's=0.75, r=0.5'])
+```
+
+```{.python .input}
+#@tab pytorch
+d2l.set_figsize((3.5, 2.5)) 
+bbox_scale = torch.tensor((w, h, w, h)).float()
+fig = d2l.plt.imshow(img)
+show_bboxes(fig.axes, d2l.center_2_hw(boxes[250,250,:,:]) * bbox_scale,
             ['s=0.75, r=1', 's=0.5, r=1', 's=0.25, r=1', 's=0.75, r=2',
              's=0.75, r=0.5'])
 ```
@@ -143,6 +200,20 @@ show_bboxes(fig.axes, ground_truth[:, 1:] * bbox_scale, ['dog', 'cat'], 'k')
 show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 ```
 
+```{.python .input}
+#@tab pytorch
+ground_truth_class = torch.Tensor([[0], [1]])
+ground_truth_bbox = torch.Tensor([[0.1, 0.08, 0.52, 0.92],
+                         [0.55, 0.2, 0.9, 0.88]])
+anchors = torch.Tensor([[0, 0.1, 0.2, 0.3], [0.15, 0.2, 0.4, 0.4],
+                    [0.63, 0.05, 0.88, 0.98], [0.66, 0.45, 0.8, 0.8],
+                    [0.57, 0.3, 0.92, 0.9]])
+
+fig = d2l.plt.imshow(img)
+show_bboxes(fig.axes, ground_truth_bbox * bbox_scale, ['dog', 'cat'], 'k')
+show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
+```
+
 We can label categories and offsets for anchor boxes by using the `multibox_target` function. This function sets the background category to 0 and increments the integer index of the target category from zero by 1 (1 for dog and 2 for cat). We add example dimensions to the anchor boxes and ground-truth bounding boxes and construct random predicted results with a shape of (batch size, number of categories including background, number of anchor boxes) by using the `expand_dims` function.
 
 ```{.python .input  n=7}
@@ -151,9 +222,19 @@ labels = npx.multibox_target(np.expand_dims(anchors, axis=0),
                              np.zeros((1, 3, 5)))
 ```
 
+```{.python .input}
+#@tab pytorch
+labels = d2l.MultiBoxTarget(ground_truth_class.clone(), ground_truth_bbox, anchors)
+```
+
 There are three items in the returned result, all of which are in the tensor format. The third item is represented by the category labeled for the anchor box.
 
 ```{.python .input  n=8}
+labels[2]
+```
+
+```{.python .input}
+#@tab pytorch
 labels[2]
 ```
 
@@ -167,9 +248,19 @@ Because we do not care about background detection, offsets of the negative class
 labels[1]
 ```
 
+```{.python .input}
+#@tab pytorch
+labels[1]
+```
+
 The first item returned is the four offset values labeled for each anchor box, with the offsets of negative class anchor boxes labeled as 0.
 
 ```{.python .input  n=10}
+labels[0]
+```
+
+```{.python .input}
+#@tab pytorch
 labels[0]
 ```
 
@@ -191,9 +282,26 @@ cls_probs = np.array([[0] * 4,  # Predicted probability for background
                       [0.1, 0.2, 0.3, 0.9]])  # Predicted probability for cat
 ```
 
+```{.python .input}
+#@tab pytorch
+anchors = torch.Tensor([[0.1, 0.08, 0.52, 0.92], [0.08, 0.2, 0.56, 0.95],
+                    [0.15, 0.3, 0.62, 0.91], [0.55, 0.2, 0.9, 0.88]])
+offset_preds = torch.Tensor([0] * anchors.size(0))
+cls_probs = torch.Tensor([[0] * 4,  # Predicted probability for background
+                      [0.9, 0.8, 0.7, 0.1],  # Predicted probability for dog
+                      [0.1, 0.2, 0.3, 0.9]])  # Predicted probability for cat
+```
+
 Print prediction bounding boxes and their confidence levels on the image.
 
 ```{.python .input  n=12}
+fig = d2l.plt.imshow(img)
+show_bboxes(fig.axes, anchors * bbox_scale,
+            ['dog=0.9', 'dog=0.8', 'dog=0.7', 'cat=0.9'])
+```
+
+```{.python .input}
+#@tab pytorch
 fig = d2l.plt.imshow(img)
 show_bboxes(fig.axes, anchors * bbox_scale,
             ['dog=0.9', 'dog=0.8', 'dog=0.7', 'cat=0.9'])
@@ -210,6 +318,15 @@ output = npx.multibox_detection(
 output
 ```
 
+```{.python .input}
+#@tab pytorch
+id_category = dict()
+id_category[0] = 'dog'
+id_category[1] = 'cat'
+output = d2l.MultiboxDetection(id_category, cls_probs, anchors, nms_threshold=0.5)
+output
+```
+
 We remove the prediction bounding boxes of category -1 and visualize the results retained by NMS.
 
 ```{.python .input  n=14}
@@ -219,6 +336,15 @@ for i in output[0].asnumpy():
         continue
     label = ('dog=', 'cat=')[int(i[0])] + str(i[1])
     show_bboxes(fig.axes, [np.array(i[2:]) * bbox_scale], label)
+```
+
+```{.python .input}
+#@tab pytorch
+# The predicted bounding boxes with category -1 are already removed in d2l.MultiboxDetection()
+fig = d2l.plt.imshow(img)
+for i in output.numpy():
+    label = ('dog=', 'cat=')[int(i[0])] + str(i[1])
+    show_bboxes(fig.axes, [torch.Tensor(i[2:]) * bbox_scale], label)
 ```
 
 In practice, we can remove prediction bounding boxes with lower confidence levels before performing NMS, thereby reducing the amount of computation for NMS. We can also filter the output of NMS, for example, by only retaining results with higher confidence levels as the final output.
