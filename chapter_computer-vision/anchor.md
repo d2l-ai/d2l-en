@@ -47,7 +47,7 @@ img = d2l.plt.imread('../img/catdog.jpg')
 h, w = img.shape[0:2]
 
 print(h,w)
-X = torch.rand((1, 3, h, w))  # Construct input data
+X = d2l.rand((1, 3, h, w))  # Construct input data
 Y = d2l.multibox_prior((h,w), sizes = [0.75, 0.5, 0.25], aspect_ratios = (2, 0.5))
 Y.shape
 ```
