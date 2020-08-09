@@ -18,9 +18,6 @@ npx.set_np()
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
-import numpy as np
-import torch
-from IPython import display
 ```
 
 ## Generating Multiple Anchor Boxes
@@ -48,8 +45,10 @@ Y.shape
 #@tab pytorch
 img = d2l.plt.imread('../img/catdog.jpg')
 h, w = img.shape[0:2]
+
+print(h,w)
 X = torch.rand((1, 3, h, w))  # Construct input data
-Y = d2l.MultiBoxPrior((h,w), sizes = [0.75, 0.5, 0.25], aspect_ratios = (2, 0.5))
+Y = d2l.multibox_prior((h,w), sizes = [0.75, 0.5, 0.25], aspect_ratios = (2, 0.5))
 Y.shape
 ```
 
@@ -62,13 +61,14 @@ boxes[250, 250, 0, :]
 
 ```{.python .input}
 #@tab pytorch
-boxes = Y.clone().reshape((h, w, 5, 4))
+boxes = Y.reshape((h, w, 5, 4))
 boxes[250, 250, 0, :]
 ```
 
 In order to describe all anchor boxes centered on one pixel in the image, we first define the `show_bboxes` function to draw multiple bounding boxes on the image.
 
 ```{.python .input  n=5}
+#@tab all
 #@save
 def show_bboxes(axes, bboxes, labels=None, colors=None):
     """Show bounding boxes."""
@@ -83,30 +83,6 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
     for i, bbox in enumerate(bboxes):
         color = colors[i % len(colors)]
         rect = d2l.bbox_to_rect(bbox.asnumpy(), color)
-        axes.add_patch(rect)
-        if labels and len(labels) > i:
-            text_color = 'k' if color == 'w' else 'w'
-            axes.text(rect.xy[0], rect.xy[1], labels[i],
-                      va='center', ha='center', fontsize=9, color=text_color,
-                      bbox=dict(facecolor=color, lw=0))
-```
-
-```{.python .input}
-#@tab pytorch
-# Save to the d2l package. 
-def show_bboxes(axes, bboxes, labels=None, colors=None):
-    """Show bounding boxes."""
-    def _make_list(obj, default_values=None):
-        if obj is None:
-            obj = default_values
-        elif not isinstance(obj, (list, tuple)):
-            obj = [obj]
-        return obj
-    labels = _make_list(labels)
-    colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
-    for i, bbox in enumerate(bboxes):
-        color = colors[i % len(colors)]
-        rect = d2l.bbox_to_rect(bbox.numpy(), color)
         axes.add_patch(rect)
         if labels and len(labels) > i:
             text_color = 'k' if color == 'w' else 'w'
@@ -224,17 +200,13 @@ labels = npx.multibox_target(np.expand_dims(anchors, axis=0),
 
 ```{.python .input}
 #@tab pytorch
-labels = d2l.MultiBoxTarget(ground_truth_class.clone(), ground_truth_bbox, anchors)
+labels = d2l.multibox_target(ground_truth_class.clone(), ground_truth_bbox, anchors)
 ```
 
 There are three items in the returned result, all of which are in the tensor format. The third item is represented by the category labeled for the anchor box.
 
 ```{.python .input  n=8}
-labels[2]
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 labels[2]
 ```
 
@@ -245,22 +217,14 @@ The second item of the return value is a mask variable, with the shape of (batch
 Because we do not care about background detection, offsets of the negative class should not affect the target function. By multiplying by element, the 0 in the mask variable can filter out negative class offsets before calculating target function.
 
 ```{.python .input  n=9}
-labels[1]
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 labels[1]
 ```
 
 The first item returned is the four offset values labeled for each anchor box, with the offsets of negative class anchor boxes labeled as 0.
 
 ```{.python .input  n=10}
-labels[0]
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 labels[0]
 ```
 
@@ -284,10 +248,10 @@ cls_probs = np.array([[0] * 4,  # Predicted probability for background
 
 ```{.python .input}
 #@tab pytorch
-anchors = torch.Tensor([[0.1, 0.08, 0.52, 0.92], [0.08, 0.2, 0.56, 0.95],
+anchors = d2l.tensor([[0.1, 0.08, 0.52, 0.92], [0.08, 0.2, 0.56, 0.95],
                     [0.15, 0.3, 0.62, 0.91], [0.55, 0.2, 0.9, 0.88]])
-offset_preds = torch.Tensor([0] * anchors.size(0))
-cls_probs = torch.Tensor([[0] * 4,  # Predicted probability for background
+offset_preds = d2l.tensor([0] * anchors.size(0))
+cls_probs = d2l.tensor([[0] * 4,  # Predicted probability for background
                       [0.9, 0.8, 0.7, 0.1],  # Predicted probability for dog
                       [0.1, 0.2, 0.3, 0.9]])  # Predicted probability for cat
 ```
