@@ -376,7 +376,7 @@ $$\eta_t = \eta_T + \frac{\eta_0 - \eta_T}{2} \left(1 + \cos(\pi t/T)\right)$$
 Here $\eta_0$ is the initial learning rate, $\eta_T$ is the target rate at time $T$. Furthermore, for $t > T$ we simply pin the value to $\eta_T$ without increasing it again. In the following example, we set the max update step $T = 20$.
 
 ```{.python .input}
-scheduler = lr_scheduler.CosineScheduler(max_update=20, base_lr=0.5,
+scheduler = lr_scheduler.CosineScheduler(max_update=20, base_lr=0.3,
                                          final_lr=0.01)
 d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
@@ -408,7 +408,7 @@ class CosineScheduler:
         return self.base_lr
 
 
-scheduler = CosineScheduler(max_update=20, base_lr=0.5, final_lr=0.01)
+scheduler = CosineScheduler(max_update=20, base_lr=0.3, final_lr=0.01)
 d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
@@ -423,7 +423,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```{.python .input}
 #@tab pytorch
 net = net_fn()
-trainer = torch.optim.SGD(net.parameters(), lr=0.5)
+trainer = torch.optim.SGD(net.parameters(), lr=0.3)
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
       scheduler)
 ```
