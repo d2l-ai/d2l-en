@@ -663,6 +663,102 @@ def load_data_time_machine(batch_size, num_steps,  #@save
     return data_iter, data_iter.vocab
 
 
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+class RNNModelScratch: #@save
+    """A RNN Model based on scratch implementations."""
+    def __init__(self, vocab_size, num_hiddens,
+                 init_state, forward):
+        self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
+        self.init_state, self.forward_fn = init_state, forward
+
+    def __call__(self, X, state, params):
+        X = tf.one_hot(tf.transpose(X), self.vocab_size)
+        X = tf.cast(X, tf.float32)
+        return self.forward_fn(X, state, params)
+
+    def begin_state(self, batch_size):
+        return self.init_state(batch_size, self.num_hiddens)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def predict_ch8(prefix, num_predicts, model, vocab, params): #@save
+    state = model.begin_state(batch_size=1)
+    outputs = [vocab[prefix[0]]]
+    get_input = lambda: d2l.reshape(tf.constant([outputs[-1]]), (1,1)).numpy()
+    for y in prefix[1:]: # Warmup state with prefix
+        _, state = model(get_input(), state, params)
+        outputs.append(vocab[y])
+    for _ in range(num_predicts):  # Predict num_predicts steps
+        Y, state = model(get_input(), state, params)
+        outputs.append(int(Y.numpy().argmax(axis=1).reshape(1)))
+    return ''.join([vocab.idx_to_token[i] for i in outputs])
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def grad_clipping(grads, theta): #@save
+    theta = tf.constant(theta, dtype=tf.float32)
+    norm = tf.math.sqrt(tf.reduce_sum([tf.reduce_sum(grad ** 2)
+                                       for grad in grads]))
+    new_grad = []
+    if tf.greater(norm, theta):
+        for grad in grads:
+            new_grad.append(grad * theta / norm)
+    else:
+        for grad in grads:
+            new_grad.append(grad)
+    return new_grad
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def train_epoch_ch8(model, train_iter, loss, updater,  #@save
+                    params, use_random_iter):
+    state, timer = None, d2l.Timer()
+    # initialize the state at the begining of the epoch
+    # when not using random_iter
+    metric = d2l.Accumulator(2) 
+    for X, Y in train_iter:
+        if state is None or use_random_iter:
+            # Initialize state when either it is the first iteration or
+            # using random sampling.
+            state = model.begin_state(batch_size=X.shape[0])
+        with tf.GradientTape(persistent=True) as g:
+            g.watch(params)
+            py, state= model(X, state, params)
+            y = d2l.reshape(Y, (-1))
+            l = tf.math.reduce_mean(loss(y, py)) 
+        grads = g.gradient(l, params)
+        grads = grad_clipping(grads, 1)
+        updater.apply_gradients(zip(grads, params))
+        
+        # Keras loss by default returns the average loss in a batch
+        #l_sum = l * float(d2l.size(y)) if isinstance(
+            #loss, tf.keras.losses.Loss) else tf.reduce_sum(l)
+        metric.add(l* d2l.size(y), d2l.size(y))
+    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
+              use_random_iter=False):
+    params = get_params(len(vocab), num_hiddens)
+    loss = tf.keras.losses.SparseCategoricalCrossentropy()
+    animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
+                            legend=['train'], xlim=[1, num_epochs])
+    updater = tf.keras.optimizers.SGD(lr)
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
+    # Train and check the progress.
+    for epoch in range(num_epochs):
+        ppl, speed = train_epoch_ch8(
+             model, train_iter, loss, updater, params, use_random_iter)
+        if epoch % 10 == 0:
+            print(predict('time traveller'))
+            animator.add(epoch+1, [ppl])
+    device = d2l.try_gpu()._device_name
+    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
+    print(predict('time traveller'))
+    print(predict('traveller'))
+
+
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):  #@save
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
