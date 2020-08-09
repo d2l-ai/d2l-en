@@ -18,13 +18,13 @@ the VGG network, which makes use of a number of repeating blocks of elements; th
 whole neural networks patch-wise over inputs; 
 GoogLeNet, which uses networks with parallel concatenations;
 residual networks (ResNet), which remain the most popular 
-off-the-shelf architecture in computervision;
+off-the-shelf architecture in computer vision;
 and densely connected networks (DenseNet), 
 which are expensive to compute but have set some recent benchmarks.
 
 While the idea of *deep* neural networks is quite simple
 (stack together a bunch of layers),
-performs can vary wildly across architectures and hyperparameter choices.
+performance can vary wildly across architectures and hyperparameter choices.
 The neural networks described in this chapter
 are the product of intuition, a few mathematical insights,
 and a whole lot of trial and error. 
@@ -33,7 +33,8 @@ partly to convey a sense of the history
 so that you can form your own intuitions 
 about where the field is heading 
 and perhaps develop your own architectures.
-
+For instance,
+batch normalization and residual connections described in this chapter have offered two popular ideas for training and designing deep models.
 
 ```toc
 :maxdepth: 2
