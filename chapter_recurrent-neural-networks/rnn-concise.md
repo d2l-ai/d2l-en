@@ -12,6 +12,15 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
+```{.python .input  n=1}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+```
+
 ## Defining the Model
 
 Gluon's `rnn` module provides a recurrent neural network implementation (beyond many other sequence models). We construct the recurrent neural network layer `rnn_layer` with a single hidden layer and 256 hidden units, and initialize the weights.
@@ -20,6 +29,12 @@ Gluon's `rnn` module provides a recurrent neural network implementation (beyond 
 num_hiddens = 256
 rnn_layer = rnn.RNN(num_hiddens)
 rnn_layer.initialize()
+```
+
+```{.python .input  n=7}
+#@tab tensorflow
+num_hiddens = 256
+rnn_layer =  tf.keras.layers.SimpleRNN(num_hiddens, return_state=True)
 ```
 
 Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to be 1. In fact, we have not even discussed yet what it means to have multiple layers---this will happen in :numref:`sec_deep_rnn`. For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN.
@@ -37,6 +52,26 @@ num_steps = 1
 X = np.random.uniform(size=(num_steps, batch_size, len(vocab)))
 Y, state_new = rnn_layer(X, state)
 Y.shape, len(state_new), state_new[0].shape
+```
+
+```{.python .input  n=9}
+#@tab tensorflow
+X = tf.random.uniform(shape=(num_steps, batch_size, len(vocab)))
+Y, state_new = rnn_layer(X)
+Y.shape, len(state_new), state_new[0].shape
+```
+
+```{.json .output n=9}
+[
+ {
+  "data": {
+   "text/plain": "(TensorShape([35, 256]), 35, TensorShape([256]))"
+  },
+  "execution_count": 9,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 Similar to :numref:`sec_rnn_scratch`, we define an `RNNModel` block by subclassing the `Block` class for a complete recurrent neural network. Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer. While in the previous section, we have the output layer within the `rnn` block.
@@ -61,6 +96,10 @@ class RNNModel(nn.Block):
 
     def begin_state(self, *args, **kwargs):
         return self.rnn.begin_state(*args, **kwargs)
+```
+
+```{.python .input}
+
 ```
 
 ## Training and Predicting
