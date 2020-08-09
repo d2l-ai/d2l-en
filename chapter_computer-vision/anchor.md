@@ -105,9 +105,9 @@ show_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,
 ```{.python .input}
 #@tab pytorch
 d2l.set_figsize((3.5, 2.5)) 
-bbox_scale = torch.tensor((w, h, w, h)).float()
+bbox_scale = d2l.tensor((w, h, w, h)).float()
 fig = d2l.plt.imshow(img)
-show_bboxes(fig.axes, d2l.center_2_hw(boxes[250,250,:,:]) * bbox_scale,
+show_bboxes(fig.axes, d2l.center_2_hw(boxes[250, 250, :, :]) * bbox_scale,
             ['s=0.75, r=1', 's=0.5, r=1', 's=0.25, r=1', 's=0.75, r=2',
              's=0.75, r=0.5'])
 ```
@@ -178,10 +178,10 @@ show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 
 ```{.python .input}
 #@tab pytorch
-ground_truth_class = torch.Tensor([[0], [1]])
-ground_truth_bbox = torch.Tensor([[0.1, 0.08, 0.52, 0.92],
+ground_truth_class = d2l.tensor([[0], [1]])
+ground_truth_bbox = d2l.tensor([[0.1, 0.08, 0.52, 0.92],
                          [0.55, 0.2, 0.9, 0.88]])
-anchors = torch.Tensor([[0, 0.1, 0.2, 0.3], [0.15, 0.2, 0.4, 0.4],
+anchors = d2l.tensor([[0, 0.1, 0.2, 0.3], [0.15, 0.2, 0.4, 0.4],
                     [0.63, 0.05, 0.88, 0.98], [0.66, 0.45, 0.8, 0.8],
                     [0.57, 0.3, 0.92, 0.9]])
 
