@@ -1169,7 +1169,7 @@ PredBoundingBox = namedtuple("PredBoundingBox", ["probability", "class_id",
                                                  "classname", "bounding_box"
                                                  ])
 
-def MultiBoxPrior(feature_map_sizes, sizes, aspect_ratios):
+def multibox_prior(feature_map_sizes, sizes, aspect_ratios):
     """Compute default box sizes with scale and aspect transform."""
     
     sizes = [s*728 for s in sizes]
@@ -1274,7 +1274,7 @@ def non_max_suppression(bounding_boxes: list, iou_threshold: float = 0.1) -> lis
         bounding_boxes = [bb for bb in bounding_boxes if bb not in remove_items]
     return filtered_bb
 
-def MultiBoxTarget(class_true, bb_true, anchors):
+def multibox_target(class_true, bb_true, anchors):
     
     class_true +=1
     
