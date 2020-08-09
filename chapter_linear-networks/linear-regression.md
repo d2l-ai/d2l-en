@@ -36,7 +36,7 @@ Second, we assume that any noise is well-behaved
 To motivate the approach, let us start with a running example.
 Suppose that we wish to estimate the prices of houses (in dollars)
 based on their area (in square feet) and age (in years).
-To actually fit a model for predicting house prices,
+To actually develop a model for predicting house prices,
 we would need to get our hands on a dataset
 consisting of sales for which we know
 the sale price, area, and age for each home.
@@ -52,7 +52,7 @@ are called *features* (or *covariates*).
 
 Typically, we will use $n$ to denote
 the number of examples in our dataset.
-We index the data points by $i$, denoting each input
+We index the data examples by $i$, denoting each input
 as $\mathbf{x}^{(i)} = [x_1^{(i)}, x_2^{(i)}]^\top$
 and the corresponding label as $y^{(i)}$.
 
@@ -110,7 +110,7 @@ we can express our model compactly using a dot product:
 $$\hat{y} = \mathbf{w}^\top \mathbf{x} + b.$$
 :eqlabel:`eq_linreg-y`
 
-In :eqref:`eq_linreg-y`, the vector $\mathbf{x}$ corresponds to features of a single data point.
+In :eqref:`eq_linreg-y`, the vector $\mathbf{x}$ corresponds to features of a single data example.
 We will often find it convenient
 to refer to features of our entire dataset of $n$ examples
 via the *design matrix* $\mathbf{X} \in \mathbb{R}^{n \times d}$.
@@ -128,9 +128,9 @@ Given features of a training dataset $\mathbf{X}$
 and corresponding (known) labels $\mathbf{y}$,
 the goal of linear regression is to find
 the weight vector $\mathbf{w}$ and the bias term $b$
-that given features of a new data point
+that given features of a new data example
 sampled from the same distribution as $\mathbf{X}$,
-the new data point's label will (in expectation) be predicted with the lowest error.
+the new example's label will (in expectation) be predicted with the lowest error.
 
 
 Even if we believe that the best model for
@@ -153,7 +153,7 @@ and (ii) a procedure for updating the model to improve its quality.
 
 ### Loss Function
 
-Before we start thinking about how *to fit* our model,
+Before we start thinking about how to *fit* data with our model,
 we need to determine a measure of *fitness*.
 The *loss function* quantifies the distance
 between the *real* and *predicted* value of the target.
@@ -642,17 +642,17 @@ statistics, and computer science.
 ## Exercises
 
 1. Assume that we have some data $x_1, \ldots, x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
-    * Find a analytic solution for the optimal value of $b$.
-    * How does this problem and its solution relate to the normal distribution?
+    1. Find a analytic solution for the optimal value of $b$.
+    1. How does this problem and its solution relate to the normal distribution?
 1. Derive the analytic solution to the optimization problem for linear regression with squared error. To keep things simple, you can omit the bias $b$ from the problem (we can do this in principled fashion by adding one column to $\mathbf X$ consisting of all ones).
-    * Write out the optimization problem in matrix and vector notation (treat all the data as a single matrix, and all the target values as a single vector).
-    * Compute the gradient of the loss with respect to $w$.
-    * Find the analytic solution by setting the gradient equal to zero and solving the matrix equation.
-    * When might this be better than using stochastic gradient descent? When might this method break?
+    1. Write out the optimization problem in matrix and vector notation (treat all the data as a single matrix, and all the target values as a single vector).
+    1. Compute the gradient of the loss with respect to $w$.
+    1. Find the analytic solution by setting the gradient equal to zero and solving the matrix equation.
+    1. When might this be better than using stochastic gradient descent? When might this method break?
 1. Assume that the noise model governing the additive noise $\epsilon$ is the exponential distribution. That is, $p(\epsilon) = \frac{1}{2} \exp(-|\epsilon|)$.
-    * Write out the negative log-likelihood of the data under the model $-\log P(\mathbf y \mid \mathbf X)$.
-    * Can you find a closed form solution?
-    * Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint: what happens near the stationary point as we keep on updating the parameters)? Can you fix this?
+    1. Write out the negative log-likelihood of the data under the model $-\log P(\mathbf y \mid \mathbf X)$.
+    1. Can you find a closed form solution?
+    1. Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint: what happens near the stationary point as we keep on updating the parameters)? Can you fix this?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/40)

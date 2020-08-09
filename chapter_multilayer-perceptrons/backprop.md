@@ -284,7 +284,7 @@ more easily leads to *out of memory* errors.
 ## Exercises
 
 1. Assume that the inputs $\mathbf{X}$ to some scalar function $f$ are $n \times m$ matrices. What is the dimensionality of the gradient of $f$ with respect to $\mathbf{X}$?
-1. Add a bias to the hidden layer of the model described in this section.
+1. Add a bias to the hidden layer of the model described in this section (you do not need to include bias in the regularization term).
     * Draw the corresponding computational graph.
     * Derive the forward and backward propagation equations.
 1. Compute the memory footprint for training and prediction in the model described in this section.

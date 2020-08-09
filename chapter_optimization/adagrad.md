@@ -81,6 +81,14 @@ import torch
 ```
 
 ```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import math
+import tensorflow as tf
+```
+
+```{.python .input}
 #@tab all
 def adagrad_2d(x1, x2, s1, s2):
     eps = 1e-6
@@ -139,6 +147,20 @@ def adagrad(params, states, hyperparams):
         p.grad.data.zero_()
 ```
 
+```{.python .input}
+#@tab tensorflow
+def init_adagrad_states(feature_dim):
+    s_w = tf.Variable(d2l.zeros((feature_dim, 1)))
+    s_b = tf.Variable(d2l.zeros(1))
+    return (s_w, s_b)
+
+def adagrad(params, grads, states, hyperparams):
+    eps = 1e-6
+    for p, s, g in zip(params, states, grads):
+        s[:].assign(s + tf.math.square(g))
+        p[:].assign(p - hyperparams['lr'] * g / tf.math.sqrt(s + eps))
+```
+
 Compared to the experiment in :numref:`sec_minibatch_sgd` we use a
 larger learning rate to train the model.
 
@@ -161,6 +183,12 @@ d2l.train_concise_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 #@tab pytorch
 trainer = torch.optim.Adagrad
 d2l.train_concise_ch11(trainer, {'lr': 0.1}, data_iter)
+```
+
+```{.python .input}
+#@tab tensorflow
+trainer = tf.keras.optimizers.Adagrad
+d2l.train_concise_ch11(trainer, {'learning_rate' : 0.1}, data_iter)
 ```
 
 ## Summary

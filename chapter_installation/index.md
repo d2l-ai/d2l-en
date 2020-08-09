@@ -117,6 +117,7 @@ We also install the `d2l` package that encapsulates frequently used
 functions and classes in this book.
 
 ```bash
+# -U: Upgrade all packages to the newest available version
 pip install -U d2l
 ```
 

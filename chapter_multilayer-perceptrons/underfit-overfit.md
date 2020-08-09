@@ -39,7 +39,7 @@ we access just a small sample of data.
 The largest public image datasets contain
 roughly one million images.
 More often, we must learn from only thousands
-or tens of thousands of data points.
+or tens of thousands of data examples.
 In a large hospital system, we might access
 hundreds of thousands of medical records.
 When working with finite samples, we run the risk
@@ -60,23 +60,23 @@ we need to differentiate between training error and generalization error.
 The *training error* is the error of our model
 as calculated on the training dataset,
 while *generalization error* is the expectation of our model's error
-were we to apply it to an infinite stream of additional data points
+were we to apply it to an infinite stream of additional data examples
 drawn from the same underlying data distribution as our original sample.
 
 Problematically, we can never calculate the generalization error exactly.
 That is because the stream of infinite data is an imaginary object.
 In practice, we must *estimate* the generalization error
 by applying our model to an independent test set
-constituted of a random selection of data points
+constituted of a random selection of data examples
 that were withheld from our training set.
 
 The following three thought experiments
 will help illustrate this situation better.
-Consider a college student trying to prepare for her final exam.
+Consider a college student trying to prepare for his final exam.
 A diligent student will strive to practice well
-and test her abilities using exams from previous years.
+and test his abilities using exams from previous years.
 Nonetheless, doing well on past exams is no guarantee
-that she will excel when it matters.
+that he will excel when it matters.
 For instance, the student might try to prepare
 by rote learning the answers to the exam questions.
 This requires the student to memorize many things.
@@ -355,8 +355,8 @@ Fixing the training dataset,
 higher-order polynomial functions should always
 achieve lower (at worst, equal) training error
 relative to lower degree polynomials.
-In fact, whenever the data points each have a distinct value of $x$,
-a polynomial function with degree equal to the number of data points
+In fact, whenever the data examples each have a distinct value of $x$,
+a polynomial function with degree equal to the number of data examples
 can fit the training set perfectly.
 We visualize the relationship between polynomial degree
 and underfitting vs. overfitting in :numref:`fig_capacity_vs_error`.

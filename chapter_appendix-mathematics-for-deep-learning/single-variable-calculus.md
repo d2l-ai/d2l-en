@@ -499,7 +499,7 @@ Taylor series have two primary applications:
 * Derivatives can be used to express how functions change when we change the input by a small amount.
 * Elementary derivatives can be combined using derivative rules to create arbitrarily complex derivatives.
 * Derivatives can be iterated to get second or higher order derivatives.  Each increase in order provides more fine grained information on the behavior of the function.
-* Using information in the derivatives of a single data point, we can approximate well behaved functions by polynomials obtained from the Taylor series.
+* Using information in the derivatives of a single data example, we can approximate well behaved functions by polynomials obtained from the Taylor series.
 
 
 ## Exercises

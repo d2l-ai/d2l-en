@@ -132,7 +132,7 @@ for how to adapt to the new domain.
 
 *Label shift* describes the converse problem.
 Here, we assume that the label marginal $P(y)$
-can change 
+can change
 but the class-conditional distribution
 $P(\mathbf{x} \mid y)$ remains fixed across domains.
 Label shift is a reasonable assumption to make
@@ -319,9 +319,9 @@ where $l$ is the loss function
 measuring "how bad" the prediction $f(\mathbf{x}_i)$ is given the associated label $y_i$.
 Statisticians call the term in :eqref:`eq_empirical-risk-min` *empirical risk*.
 *Empirical risk* is an average loss over the training data
-to approximate the *true risk*, 
+to approximate the *true risk*,
 which is the
-expectation of the loss over the entire population of data drawn from their true distribution 
+expectation of the loss over the entire population of data drawn from their true distribution
 $p(\mathbf{x},y)$:
 
 $$E_{p(\mathbf{x}, y)} [l(f(\mathbf{x}), y)] = \int\int l(f(\mathbf{x}), y) p(\mathbf{x}, y) \;d\mathbf{x}dy.$$
@@ -331,7 +331,7 @@ However, in practice we typically cannot obtain the entire population of data.
 Thus, *empirical risk minimization*,
 which is minimizing empirical risk in :eqref:`eq_empirical-risk-min`,
 is a practical strategy for machine learning,
-with the hope to approximate  
+with the hope to approximate
 minimizing true risk.
 
 
@@ -346,7 +346,7 @@ Assume that we want to estimate
 some dependency $P(y \mid \mathbf{x})$
 for which we have labeled data $(\mathbf{x}_i, y_i)$.
 Unfortunately, the observations $\mathbf{x}_i$ are drawn
-from some *source distribution* $q(\mathbf{x})$ 
+from some *source distribution* $q(\mathbf{x})$
 rather than the *target distribution* $p(\mathbf{x})$.
 Fortunately,
 the dependency assumption means
@@ -356,20 +356,20 @@ we can correct for that by using the following simple identity in true risk:
 
 $$
 \begin{aligned}
-\int\int l(f(\mathbf{x}), y) p(y \mid \mathbf{x})p(\mathbf{x}) \;d\mathbf{x}dy = 
+\int\int l(f(\mathbf{x}), y) p(y \mid \mathbf{x})p(\mathbf{x}) \;d\mathbf{x}dy =
 \int\int l(f(\mathbf{x}), y) q(y \mid \mathbf{x})q(\mathbf{x})\frac{p(\mathbf{x})}{q(\mathbf{x})} \;d\mathbf{x}dy.
 \end{aligned}
 $$
 
-In other words, we need to reweigh each data point
-by the ratio of the 
+In other words, we need to reweigh each data example
+by the ratio of the
 probability
 that it would have been drawn from the correct distribution to that from the wrong one:
 
 $$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(\mathbf{x}_i)}{q(\mathbf{x}_i)}.$$
 
 Plugging in the weight $\beta_i$ for
-each data point $(\mathbf{x}_i, y_i)$
+each data example $(\mathbf{x}_i, y_i)$
 we can train our model using
 *weighted empirical risk minimization*:
 
@@ -448,7 +448,7 @@ for correcting covariate shift:
 1. Use weights $\beta_i$ for training on $\{(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n)\}$ in :eqref:`eq_weighted-empirical-risk-min`.
 
 Note that the above algorithm relies on a crucial assumption.
-For this scheme to work, we need that each data point
+For this scheme to work, we need that each data example
 in the target (e.g., test time) distribution
 had nonzero probability of occurring at training time.
 If we find a point where $p(\mathbf{x}) > 0$ but $q(\mathbf{x}) = 0$,
@@ -469,15 +469,15 @@ Assume that the distribution of labels shifts over time:
 $q(y) \neq p(y)$, but the class-conditional distribution
 stays the same: $q(\mathbf{x} \mid y)=p(\mathbf{x} \mid y)$.
 If the source distribution $q(y)$ is "wrong",
-we can correct for that 
-according to 
+we can correct for that
+according to
 the following identity in true risk
-as defined in 
+as defined in
 :eqref:`eq_true-risk`:
 
 $$
 \begin{aligned}
-\int\int l(f(\mathbf{x}), y) p(\mathbf{x} \mid y)p(y) \;d\mathbf{x}dy = 
+\int\int l(f(\mathbf{x}), y) p(\mathbf{x} \mid y)p(y) \;d\mathbf{x}dy =
 \int\int l(f(\mathbf{x}), y) q(\mathbf{x} \mid y)q(y)\frac{p(y)}{q(y)} \;d\mathbf{x}dy.
 \end{aligned}
 $$
@@ -485,7 +485,7 @@ $$
 
 
 Here, our importance weights will correspond to the
-label likelihood ratios 
+label likelihood ratios
 
 $$\beta_i \stackrel{\mathrm{def}}{=} \frac{p(y_i)}{q(y_i)}.$$
 
@@ -527,7 +527,7 @@ that we have seen before,
 and if the label shift assumption holds in the first place
 (the strongest assumption here),
 then we can estimate the test set label distribution
-by solving a simple linear system 
+by solving a simple linear system
 
 $$\mathbf{C} p(\mathbf{y}) = \mu(\hat{\mathbf{y}}),$$
 
@@ -579,7 +579,7 @@ In *batch learning*, we have access to training features and labels $\{(\mathbf{
 
 ### Online Learning
 
-Now imagine that the data $(\mathbf{x}_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $\mathbf{x}_i$, then we need to come up with an estimate $f(\mathbf{x}_i)$ and only once we have done this, we observe $y_i$ and with it, we receive a reward or incur a loss, given our decision. 
+Now imagine that the data $(\mathbf{x}_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $\mathbf{x}_i$, then we need to come up with an estimate $f(\mathbf{x}_i)$ and only once we have done this, we observe $y_i$ and with it, we receive a reward or incur a loss, given our decision.
 Many real problems fall into this category. For example, we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, in *online learning*, we have the following cycle where we are continuously improving our model given new observations.
 
 $$
@@ -598,8 +598,8 @@ $$
 
 ### Control
 
-In many cases the environment remembers what we did. Not necessarily in an adversarial manner but it will just remember and the response will depend on what happened before. For instance, a coffee boiler controller will observe different temperatures depending on whether it was heating the boiler previously. PID (proportional-integral-derivative) controller algorithms are a popular choice there. 
-Likewise, a user's behavior on a news site will depend on what we showed her previously (e.g., she will read most news only once). Many such algorithms form a model of the environment in which they act such as to make their decisions appear less random.
+In many cases the environment remembers what we did. Not necessarily in an adversarial manner but it will just remember and the response will depend on what happened before. For instance, a coffee boiler controller will observe different temperatures depending on whether it was heating the boiler previously. PID (proportional-integral-derivative) controller algorithms are a popular choice there.
+Likewise, a user's behavior on a news site will depend on what we showed him previously (e.g., he will read most news only once). Many such algorithms form a model of the environment in which they act such as to make their decisions appear less random.
 Recently,
 control theory (e.g., PID variants) has also been used
 to automatically tune hyperparameters
@@ -609,13 +609,13 @@ and improve the diversity of generated text and the reconstruction quality of ge
 
 
 
-### Reinforcement Learning 
+### Reinforcement Learning
 
 In the more general case of an environment with memory, we may encounter situations where the environment is trying to cooperate with us (cooperative games, in particular for non-zero-sum games), or others where the environment will try to win. Chess, Go, Backgammon, or StarCraft are some of the cases in *reinforcement learning*. Likewise, we might want to build a good controller for autonomous cars. The other cars are likely to respond to the autonomous car's driving style in nontrivial ways, e.g., trying to avoid it, trying to cause an accident, and trying to cooperate with it.
 
 ### Considering the Environment
 
-One key distinction between the different situations above is that the same strategy that might have worked throughout in the case of a stationary environment, might not work throughout when the environment can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once he starts exploiting it. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we know that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist to deal with concept shift, i.e., when the problem that she is trying to solve changes over time.
+One key distinction between the different situations above is that the same strategy that might have worked throughout in the case of a stationary environment, might not work throughout when the environment can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once he starts exploiting it. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we know that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist to deal with concept shift, i.e., when the problem that he is trying to solve changes over time.
 
 
 

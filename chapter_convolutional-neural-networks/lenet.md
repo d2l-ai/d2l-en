@@ -18,7 +18,7 @@ we can retain the spatial structure in our images.
 As an additional benefit of replacing fully-connected layers with convolutional layers,
 we will enjoy more parsimonious models that require far fewer parameters.
 
-In this section, we will introduce [LeNet](http://yann.lecun.com/exdb/lenet/),
+In this section, we will introduce *LeNet*,
 among the first published CNNs
 to capture wide attention for its performance on computer vision tasks.
 The model was introduced by (and named for) Yann LeCun,
@@ -112,7 +112,6 @@ net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
 from d2l import torch as d2l
 import torch
 from torch import nn
-from dataclasses import dataclass
 
 class Reshape(torch.nn.Module):
     def forward(self, x):

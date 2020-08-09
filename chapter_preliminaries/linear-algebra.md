@@ -331,18 +331,18 @@ B == tf.transpose(B)
 
 Matrices are useful data structures:
 they allow us to organize data that have different modalities of variation.
-For example, rows in our matrix might correspond to different houses (data points),
+For example, rows in our matrix might correspond to different houses (data examples),
 while columns might correspond to different attributes.
 This should sound familiar if you have ever used spreadsheet software or
 have read :numref:`sec_pandas`.
 Thus, although the default orientation of a single vector is a column vector,
 in a matrix that represents a tabular dataset,
-it is more conventional to treat each data point as a row vector in the matrix.
+it is more conventional to treat each data example as a row vector in the matrix.
 And, as we will see in later chapters,
 this convention will enable common deep learning practices.
 For example, along the outermost axis of a tensor,
-we can access or enumerate minibatches of data points,
-or just data points if no minibatch exists.
+we can access or enumerate minibatches of data examples,
+or just data examples if no minibatch exists.
 
 
 ## Tensors

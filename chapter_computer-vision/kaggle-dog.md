@@ -1,6 +1,5 @@
 # Dog Breed Identification (ImageNet Dogs) on Kaggle
 
-
 In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition's web address is
 
 > https://www.kaggle.com/c/dog-breed-identification

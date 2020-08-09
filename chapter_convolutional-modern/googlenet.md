@@ -1,9 +1,9 @@
 # Networks with Parallel Concatenations (GoogLeNet)
 :label:`sec_googlenet`
 
-In 2014, :cite:`Szegedy.Liu.Jia.ea.2015`
+In 2014, *GoogLeNet*
 won the ImageNet Challenge, proposing a structure
-that combined the strengths of the NiN and repeated blocks paradigms.
+that combined the strengths of NiN and  paradigms of repeated blocks :cite:`Szegedy.Liu.Jia.ea.2015`.
 One focus of the paper was to address the question
 of which sized convolution kernels are best.
 After all, previous popular networks employed choices
@@ -11,32 +11,35 @@ as small as $1 \times 1$ and as large as $11 \times 11$.
 One insight in this paper was that sometimes
 it can be advantageous to employ a combination of variously-sized kernels.
 In this section, we will introduce GoogLeNet,
-presenting a slightly simplified version of the original model---we
-omit a few ad hoc features that were added to stabilize training
+presenting a slightly simplified version of the original model:
+we
+omit a few ad-hoc features that were added to stabilize training
 but are unnecessary now with better training algorithms available.
+
 
 ## Inception Blocks
 
-The basic convolutional block in GoogLeNet is called an Inception block,
-likely named due to a quote from the movie Inception ("We Need To Go Deeper"),
+The basic convolutional block in GoogLeNet is called an *Inception block*,
+likely named due to a quote from the movie *Inception* ("We Need To Go Deeper"),
 which launched a viral meme.
 
-![Structure of the Inception block. ](../img/inception.svg)
+![Structure of the Inception block.](../img/inception.svg)
+:label:`fig_inception`
 
-As depicted in the figure above,
+As depicted in :numref:`fig_inception`,
 the inception block consists of four parallel paths.
 The first three paths use convolutional layers
 with window sizes of $1\times 1$, $3\times 3$, and $5\times 5$
 to extract information from different spatial sizes.
 The middle two paths perform a $1\times 1$ convolution on the input
-to reduce the number of input channels, reducing the model's complexity.
+to reduce the number of channels, reducing the model's complexity.
 The fourth path uses a $3\times 3$ maximum pooling layer,
 followed by a $1\times 1$ convolutional layer
 to change the number of channels.
 The four paths all use appropriate padding to give the input and output the same height and width.
 Finally, the outputs along each path are concatenated
 along the channel dimension and comprise the block's output.
-The commonly-tuned parameters of the Inception block
+The commonly-tuned hyperparameters of the Inception block
 are the number of output channels per layer.
 
 ```{.python .input}
@@ -46,7 +49,7 @@ from mxnet.gluon import nn
 npx.set_np()
 
 class Inception(nn.Block):
-    # c1 - c4 are the number of output channels for each layer in the path
+    # `c1`--`c4` are the number of output channels for each path
     def __init__(self, c1, c2, c3, c4, **kwargs):
         super(Inception, self).__init__(**kwargs)
         # Path 1 is a single 1 x 1 convolutional layer
@@ -83,7 +86,7 @@ from torch import nn
 from torch.nn import functional as F
 
 class Inception(nn.Module):
-    # c1 - c4 are the number of output channels for each layer in the path
+    # `c1`--`c4` are the number of output channels for each path
     def __init__(self, in_channels, c1, c2, c3, c4, **kwargs):
         super(Inception, self).__init__(**kwargs)
         # Path 1 is a single 1 x 1 convolutional layer
@@ -116,7 +119,7 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 
 class Inception(tf.keras.Model):
-    # c1 - c4 are the number of output channels for each layer in the path
+    # `c1`--`c4` are the number of output channels for each path
     def __init__(self, c1, c2, c3, c4):
         super().__init__()
         # Path 1 is a single 1 x 1 convolutional layer
@@ -124,11 +127,13 @@ class Inception(tf.keras.Model):
         # Path 2 is a 1 x 1 convolutional layer followed by a 3 x 3
         # convolutional layer
         self.p2_1 = tf.keras.layers.Conv2D(c2[0], 1, activation='relu')
-        self.p2_2 = tf.keras.layers.Conv2D(c2[1], 3, padding='same', activation='relu')
+        self.p2_2 = tf.keras.layers.Conv2D(c2[1], 3, padding='same',
+                                           activation='relu')
         # Path 3 is a 1 x 1 convolutional layer followed by a 5 x 5
         # convolutional layer
         self.p3_1 = tf.keras.layers.Conv2D(c3[0], 1, activation='relu')
-        self.p3_2 = tf.keras.layers.Conv2D(c3[1], 5, padding='same', activation='relu')
+        self.p3_2 = tf.keras.layers.Conv2D(c3[1], 5, padding='same',
+                                           activation='relu')
         # Path 4 is a 3 x 3 maximum pooling layer followed by a 1 x 1
         # convolutional layer
         self.p4_1 = tf.keras.layers.MaxPool2D(3, 1, padding='same')
@@ -153,22 +158,22 @@ At the same time, we can allocate different amounts of parameters
 for different ranges (e.g., more for short range
 but not ignore the long range entirely).
 
+
 ## GoogLeNet Model
 
 As shown in :numref:`fig_inception_full`, GoogLeNet uses a stack of a total of 9 inception blocks
 and global average pooling to generate its estimates.
-Maximum pooling between inception blocks reduced the dimensionality.
-The first part is identical to AlexNet and LeNet,
-the stack of blocks is inherited from VGG
+Maximum pooling between inception blocks reduces the dimensionality.
+The first module is similar to AlexNet and LeNet.
+The stack of blocks is inherited from VGG
 and the global average pooling avoids
 a stack of fully-connected layers at the end.
-The architecture is depicted below.
 
-![Full GoogLeNet Model](../img/inception-full.svg)
+![The GoogLeNet architecture.](../img/inception-full.svg)
 :label:`fig_inception_full`
 
 We can now implement GoogLeNet piece by piece.
-The first component uses a 64-channel $7\times 7$ convolutional layer.
+The first module uses a 64-channel $7\times 7$ convolutional layer.
 
 ```{.python .input}
 b1 = nn.Sequential()
@@ -192,7 +197,7 @@ def b1():
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-The second component uses two convolutional layers:
+The second module uses two convolutional layers:
 first, a 64-channel $1\times 1$ convolutional layer,
 then a $3\times 3$ convolutional layer that triples the number of channels. This corresponds to the second path in the Inception block.
 
@@ -220,15 +225,17 @@ def b2():
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-The third component connects two complete Inception blocks in series.
+The third module connects two complete Inception blocks in series.
 The number of output channels of the first Inception block is
-$64+128+32+32=256$, and the ratio to the output channels
-of the four paths is $64:128:32:32=2:4:1:1$.
+$64+128+32+32=256$,
+and the number-of-output-channel ratio
+among the four paths is $64:128:32:32=2:4:1:1$.
 The second and third paths first reduce the number of input channels
 to $96/192=1/2$ and $16/192=1/12$, respectively,
 and then connect the second convolutional layer.
 The number of output channels of the second Inception block
-is increased to $128+192+96+64=480$, and the ratio to the number of output channels per path is $128:192:96:64 = 4:6:3:2$.
+is increased to $128+192+96+64=480$, and the number-of-output-channel ratio
+among the four paths is $128:192:96:64 = 4:6:3:2$.
 The second and third paths first reduce the number of input channels
 to $128/256=1/2$ and $32/256=1/8$, respectively.
 
@@ -255,7 +262,7 @@ def b3():
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-The fourth block is more complicated.
+The fourth module is more complicated.
 It connects five Inception blocks in series,
 and they have $192+208+48+64=512$, $160+224+64+64=512$,
 $128+256+64+64=512$, $112+288+64+64=528$,
@@ -268,7 +275,7 @@ followed by the first path with only the $1\times 1$ convolutional layer,
 the third path with the $5\times 5$ convolutional layer,
 and the fourth path with the $3\times 3$ maximum pooling layer.
 The second and third paths will first reduce
-the number of channels according the ratio.
+the number of channels according to the ratio.
 These ratios are slightly different in different Inception blocks.
 
 ```{.python .input}
@@ -303,7 +310,7 @@ def b4():
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
 ```
 
-The fifth block has two Inception blocks with $256+320+128+128=832$
+The fifth module has two Inception blocks with $256+320+128+128=832$
 and $384+384+128+128=1024$ output channels.
 The number of channels assigned to each path
 is the same as that in the third and fourth modules,
@@ -344,9 +351,9 @@ def b5():
         tf.keras.layers.GlobalAvgPool2D(),
         tf.keras.layers.Flatten()
     ])
-# Recall that this has to be a function that will be passed to `d2l.train_ch6()`
-# so that model building/compiling need to be within `strategy.scope()`
-# in order to utilize the CPU/GPU devices that we have.
+# Recall that this has to be a function that will be passed to
+# `d2l.train_ch6()` so that model building/compiling need to be within
+# `strategy.scope()` in order to utilize the CPU/GPU devices that we have
 def net():
     return tf.keras.Sequential([b1(), b2(), b3(), b4(), b5(),
                                 tf.keras.layers.Dense(10)])
@@ -358,7 +365,7 @@ To have a reasonable training time on Fashion-MNIST,
 we reduce the input height and width from 224 to 96.
 This simplifies the computation.
 The changes in the shape of the output
-between the various modules is demonstrated below.
+between the various modules are demonstrated below.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 96, 96))
@@ -384,7 +391,7 @@ for layer in net().layers:
     print(layer.__class__.__name__, 'output shape:\t', X.shape)
 ```
 
-## Data Acquisition and Training
+## Training
 
 As before, we train our model using the Fashion-MNIST dataset.
  We transform it to $96 \times 96$ pixel resolution
@@ -399,7 +406,7 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 ## Summary
 
-* The Inception block is equivalent to a subnetwork with four paths. It extracts information in parallel through convolutional layers of different window shapes and maximum pooling layers. $1 \times 1$ convolutions reduce channel dimensionality on a per-pixel level. Max-pooling reduces the resolution.
+* The Inception block is equivalent to a subnetwork with four paths. It extracts information in parallel through convolutional layers of different window shapes and maximum pooling layers. $1 \times 1$ convolutions reduce channel dimensionality on a per-pixel level. Maximum pooling reduces the resolution.
 * GoogLeNet connects multiple well-designed Inception blocks with other layers in series. The ratio of the number of channels assigned in the Inception block is obtained through a large number of experiments on the ImageNet dataset.
 * GoogLeNet, as well as its succeeding versions, was one of the most efficient models on ImageNet, providing similar test accuracy with lower computational complexity.
 
@@ -410,14 +417,14 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
       later in :numref:`sec_batch_norm`.
     * Make adjustments to the Inception block
       :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
-    * Use "label smoothing" for model regularization
+    * Use label smoothing for model regularization
       :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
     * Include it in the residual connection
       :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, as described later in
       :numref:`sec_resnet`.
 1. What is the minimum image size for GoogLeNet to work?
 1. Compare the model parameter sizes of AlexNet, VGG, and NiN with GoogLeNet. How do the latter two network architectures significantly reduce the model parameter size?
-1. Why do we need a large range convolution initially?
+1. Why do we need a long range convolution initially?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/81)

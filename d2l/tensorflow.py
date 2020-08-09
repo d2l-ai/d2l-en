@@ -557,6 +557,88 @@ def show_trace_2d(f, results):  #@save
     d2l.plt.ylabel('x2')
 
 
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
+                           '76e5be1548fd8222e5074cf0faae75edff8cf93f')
+
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def get_data_ch11(batch_size=10, n=1500):
+    data = np.genfromtxt(d2l.download('airfoil'),
+                         dtype=np.float32, delimiter='\t')
+    data = (data - data.mean(axis=0)) / data.std(axis=0)
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
+                               batch_size, is_train=True)
+    return data_iter, data.shape[1]-1
+
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def train_ch11(trainer_fn, states, hyperparams, data_iter,
+               feature_dim, num_epochs=2):
+    # Initialization
+    w = tf.Variable(tf.random.normal(shape=(feature_dim, 1),
+                                   mean=0, stddev=0.01),trainable=True)
+    b = tf.Variable(tf.zeros(1), trainable=True)
+  
+    # Train
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
+
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+          with tf.GradientTape() as g:
+            l = tf.math.reduce_mean(loss(net(X), y))
+      
+          dw, db = g.gradient(l, [w, b])
+          trainer_fn([w, b], [dw, db], states, hyperparams)
+          n += X.shape[0]
+          if n % 200 == 0:
+              timer.stop()
+              p = n/X.shape[0]
+              q = p/tf.data.experimental.cardinality(data_iter).numpy()
+              r = (d2l.evaluate_loss(net, data_iter, loss),)
+              animator.add(q, r)
+              timer.start()
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+    return timer.cumsum(), animator.Y[0]
+
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
+    # Initialization
+    net = tf.keras.Sequential()
+    net.add(tf.keras.layers.Dense(1, 
+            kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
+    optimizer = trainer_fn(**hyperparams)
+    loss = tf.keras.losses.MeanSquaredError()
+    # Note: L2 Loss = 1/2 * MSE Loss. TF has MSE Loss which is slightly
+    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
+    # value to get L2Loss in TF.
+  
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+            with tf.GradientTape() as g:
+                out = net(X)
+                l = loss(y, out)/2
+                params = net.trainable_variables
+                grads = g.gradient(l, params)
+            optimizer.apply_gradients(zip(grads, params))
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                p = n/X.shape[0]
+                q = p/tf.data.experimental.cardinality(data_iter).numpy()
+                r = (d2l.evaluate_loss(net, data_iter, loss)/2,)
+                animator.add(q, r)
+                timer.start()
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+
+
 # Alias defined in config.ini
 size = lambda a: tf.size(a).numpy()
 

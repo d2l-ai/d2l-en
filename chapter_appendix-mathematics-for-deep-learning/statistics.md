@@ -36,7 +36,7 @@ epsilon = 0.1
 random.seed(8675309)
 xs = np.random.normal(loc=0, scale=1, size=(300,))
 
-ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2 / (2 * epsilon**2))
+ys = [np.sum(np.exp(-(xs[:i] - xs[i])**2 / (2 * epsilon**2))
              / np.sqrt(2*np.pi*epsilon**2)) / len(xs) for i in range(len(xs))]
 
 # Compute true density
@@ -65,7 +65,7 @@ torch.manual_seed(8675309)
 xs = torch.randn(size=(300,))
 
 ys = torch.tensor(
-    [torch.sum(torch.exp(-(xs[0:i] - xs[i])**2 / (2 * epsilon**2))\
+    [torch.sum(torch.exp(-(xs[:i] - xs[i])**2 / (2 * epsilon**2))\
                / torch.sqrt(2*torch.pi*epsilon**2)) / len(xs)\
      for i in range(len(xs))])
 
@@ -94,7 +94,7 @@ epsilon = 0.1
 xs = tf.random.normal((300,))
 
 ys = tf.constant(
-    [(tf.reduce_sum(tf.exp(-(xs[0:i] - xs[i])**2 / (2 * epsilon**2)) \
+    [(tf.reduce_sum(tf.exp(-(xs[:i] - xs[i])**2 / (2 * epsilon**2)) \
                / tf.sqrt(2*tf.pi*epsilon**2)) / tf.cast(
         tf.size(xs), dtype=tf.float32)).numpy() \
      for i in range(tf.size(xs))])
@@ -289,7 +289,7 @@ $$ \text{statistical significance }= 1 - \alpha = 1 - P(\text{reject } H_0 \mid 
 
 It is also referred to as the *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. The significance level can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis.
 
-:numref:`fig_statistical_significance` shows the observations' values and probability of a given normal distribution in a two-sample hypothesis test. If the observation data point is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it.
+:numref:`fig_statistical_significance` shows the observations' values and probability of a given normal distribution in a two-sample hypothesis test. If the observation data example is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it.
 
 ![Statistical significance.](../img/statistical_significance.svg)
 :label:`fig_statistical_significance`

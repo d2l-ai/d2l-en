@@ -242,8 +242,7 @@ It might go without saying that you cannot do data science without data.
 We could lose hundreds of pages pondering what precisely constitutes data,
 but for now, we will err on the practical side
 and focus on the key properties to be concerned with.
-Generally, we are concerned with a collection of *examples*
-(also called *data points*, *samples*, or *instances*).
+Generally, we are concerned with a collection of *examples*.
 In order to work with data usefully, we typically
 need to come up with a suitable numerical representation.
 Each *example* typically consists of a collection
@@ -579,16 +578,16 @@ you have probably worked through a regression problem informally.
 Imagine, for example, that you had your drains repaired
 and that your contractor spent $x_1=3$ hours
 removing gunk from your sewage pipes.
-Then she sent you a bill of $y_1 = \$350$.
+Then he sent you a bill of $y_1 = \$350$.
 Now imagine that your friend hired the same contractor for $x_2 = 2$ hours
-and that she received a bill of $y_2 = \$250$.
+and that he received a bill of $y_2 = \$250$.
 If someone then asked you how much to expect
 on their upcoming gunk-removal invoice
 you might make some reasonable assumptions,
 such as more hours worked costs more dollars.
 You might also assume that there is some base charge
 and that the contractor then charges per hour.
-If these assumptions held true, then given these two data points,
+If these assumptions held true, then given these two data examples,
 you could already identify the contractor's pricing structure:
 \$100 per hour plus \$50 to show up at your house.
 If you followed that much then you already understand
@@ -954,7 +953,7 @@ inputs and outputs occur in the same order (after alignment),
 in machine translation, order inversion can be vital.
 In other words, while we are still converting one sequence into another,
 neither the number of inputs and outputs nor the order
-of corresponding data points are assumed to be the same.
+of corresponding data examples are assumed to be the same.
 Consider the following illustrative example
 of the peculiar tendency of Germans
 to place the verbs at the end of sentences.
@@ -1086,7 +1085,7 @@ This last question raises the problem of *distribution shift*,
 (when training and test data are different).
 It is a problem that most of us have experienced
 when taking exams written by a lecturer,
-while the homeworks were composed by her TAs.
+while the homeworks were composed by his TAs.
 We will briefly describe reinforcement learning and adversarial learning,
 two settings that explicitly consider interaction with an environment.
 
@@ -1548,6 +1547,6 @@ than the potential of malevolent superintelligence to destroy humanity.
 1. Which parts of code that you are currently writing could be "learned", i.e., improved by learning and automatically determining design choices that are made in your code? Does your code include heuristic design choices?
 1. Which problems that you encounter have many examples for how to solve them, yet no specific way to automate them? These may be prime candidates for using deep learning.
 1. Viewing the development of artificial intelligence as a new industrial revolution, what is the relationship between algorithms and data? Is it similar to steam engines and coal (what is the fundamental difference)?
-1. Where else can you apply the end-to-end training approach? Physics? Engineering? Econometrics?
+1. Where else can you apply the end-to-end training approach (such as in :numref:`fig_ml_loop`)? Physics? Engineering? Econometrics?
 
 [Discussions](https://discuss.d2l.ai/t/22)
