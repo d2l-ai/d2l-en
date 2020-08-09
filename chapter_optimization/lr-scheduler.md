@@ -36,8 +36,8 @@ device = d2l.try_gpu()
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to `d2l.train_ch6` that defined in the lenet
-# section of chapter convolutional neural networks
+# The code is almost identical to `d2l.train_ch6` defined in the 
+# lenet section of chapter convolutional neural networks
 def train(net, train_iter, test_iter, num_epochs, loss, trainer, device):
     net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
@@ -96,8 +96,8 @@ device = d2l.try_gpu()
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to `d2l.train_ch6` that defined in the lenet
-# section of chapter convolutional neural networks
+# The code is almost identical to `d2l.train_ch6` defined in the 
+# lenet section of chapter convolutional neural networks
 def train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
           scheduler=None):
     net.to(device)
@@ -163,8 +163,8 @@ def net():
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to `d2l.train_ch6` that defined in the lenet
-# section of chapter convolutional neural networks
+# The code is almost identical to `d2l.train_ch6` defined in the 
+# lenet section of chapter convolutional neural networks
 def train(net_fn, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu(), custom_callback = False):
     device_name = device._device_name
@@ -441,14 +441,14 @@ In some cases initializing the parameters is not sufficient to guarantee a good 
 A rather simple fix for this dilemma is to use a warmup period during which the learning rate *increases* to its initial maximum and to cool down the rate until the end of the optimization process. For simplicity one typically uses a linear increase for this purpose. This leads to a schedule of the form indicated below.
 
 ```{.python .input}
-scheduler = lr_scheduler.CosineScheduler(20, warmup_steps=5, base_lr=0.5,
+scheduler = lr_scheduler.CosineScheduler(20, warmup_steps=5, base_lr=0.3,
                                          final_lr=0.01)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
 ```{.python .input}
 #@tab pytorch, tensorflow
-scheduler = CosineScheduler(20, warmup_steps=5, base_lr=0.5, final_lr=0.01)
+scheduler = CosineScheduler(20, warmup_steps=5, base_lr=0.3, final_lr=0.01)
 d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
@@ -463,7 +463,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```{.python .input}
 #@tab pytorch
 net = net_fn()
-trainer = torch.optim.SGD(net.parameters(), lr=0.5)
+trainer = torch.optim.SGD(net.parameters(), lr=0.3)
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
       scheduler)
 ```
