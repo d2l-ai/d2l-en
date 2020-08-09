@@ -64,7 +64,7 @@ F.one_hot(torch.tensor([0, 2]), len(vocab))
 
 ```{.python .input  n=3}
 #@tab tensorflow
-tf.one_hot(tf.constant([0, 2]).numpy(), len(vocab))
+tf.one_hot(tf.constant([0, 2]), len(vocab))
 ```
 
 The shape of the minibatch we sample each time is (batch size, timestep). The `one_hot` function transforms such a minibatch into a 3-D tensor with the last dimension equals to the vocabulary size. We often transpose the input so that we will obtain a (timestep, batch size, vocabulary size) output that fits into a sequence model easier.
@@ -82,8 +82,8 @@ F.one_hot(X.T, 28).shape
 
 ```{.python .input  n=4}
 #@tab tensorflow
-X = d2l.reshape(d2l.arange(10), (2, 5)).numpy()
-tf.one_hot(X.T, 28).shape
+X = d2l.reshape(d2l.arange(10), (2, 5))
+tf.one_hot(tf.transpose(X), 28).shape
 ```
 
 ## Initializing the Model Parameters
@@ -211,9 +211,9 @@ def rnn(inputs, state, params):
     H, = state
     outputs = []
     for X in inputs:
-        H = d2l.tanh(tf.tensordot(X, W_xh, axes=1) + 
-                                  tf.tensordot(H, W_hh, axes=1) + b_h)
-        Y = tf.tensordot(H, W_hq, axes=1) + b_q
+        X=tf.reshape(X,[-1,W_xh.shape[0]])
+        H = tf.tanh(tf.matmul(X, W_xh) + tf.matmul(H, W_hh) + b_h)
+        Y = tf.matmul(H, W_hq) + b_q
         outputs.append(Y)
     return d2l.concat(outputs, axis=0), (H,)
 ```
@@ -344,11 +344,10 @@ def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
 
 ```{.python .input  n=10}
 #@tab tensorflow
-def predict_ch8(prefix, num_predicts, model, vocab, num_hiddens): #@save
+def predict_ch8(prefix, num_predicts, model, vocab, params): #@save
     state = model.begin_state(batch_size=1)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(tf.constant([outputs[-1]]), (1,1)).numpy()
-    params = get_params(len(vocab), num_hiddens)
     for y in prefix[1:]: # Warmup state with prefix
         _, state = model(get_input(), state, params)
         outputs.append(vocab[y])
@@ -423,7 +422,8 @@ def grad_clipping(model, theta):  #@save
 #@tab tensorflow
 def grad_clipping(grads, theta): #@save
     theta = tf.constant(theta, dtype=tf.float32)
-    norm = tf.math.sqrt(tf.reduce_sum([tf.reduce_sum(grad ** 2) for grad in grads]))
+    norm = tf.math.sqrt(tf.reduce_sum([tf.reduce_sum(grad ** 2)
+                                       for grad in grads]))
     new_grad = []
     if tf.greater(norm, theta):
         for grad in grads:
@@ -508,17 +508,19 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
 def train_epoch_ch8(model, train_iter, loss, updater,  #@save
                     params, use_random_iter):
     state, timer = None, d2l.Timer()
+    # initialize the state at the begining of the epoch
+    # when not using random_iter
     metric = d2l.Accumulator(2) 
     for X, Y in train_iter:
         if state is None or use_random_iter:
+            # Initialize state when either it is the first iteration or
+            # using random sampling.
             state = model.begin_state(batch_size=X.shape[0])
-
         with tf.GradientTape(persistent=True) as g:
             g.watch(params)
             py, state= model(X, state, params)
             y = d2l.reshape(Y, (-1))
             l = tf.math.reduce_mean(loss(y, py)) 
-        print(l)
         grads = g.gradient(l, params)
         grads = grad_clipping(grads, 1)
         updater.apply_gradients(zip(grads, params))
@@ -605,8 +607,8 @@ def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
         if epoch % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch+1, [ppl])
-    device = d2l.try_gpu()
-    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device._device_name)}')
+    device = d2l.try_gpu()._device_name
+    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
     print(predict('traveller'))
 ```
@@ -621,49 +623,8 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 
 ```{.python .input  n=55}
 #@tab tensorflow
-num_epochs, lr = 100, 0.01
-train_ch8(model, train_iter, vocab, 100, lr, num_epochs)
-```
-
-```{.python .input}
-num_epochs, lr = 100, 1
-loss = tf.keras.losses.SparseCategoricalCrossentropy()
-animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[1, num_epochs])
-use_random_iter = True
-updater = tf.keras.optimizers.SGD(lr)
-predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
-params = get_params(len(vocab), num_hiddens)
-for epoch in range(num_epochs):
-    state, timer = None, d2l.Timer()
-    metric = d2l.Accumulator(2) 
-    for X, Y in train_iter:
-        if state is None or use_random_iter:
-            state = model.begin_state(batch_size=X.shape[0])
-
-        with tf.GradientTape(persistent=True) as g:
-            g.watch(params)
-            py, state= model(X, state, params)
-            y = d2l.reshape(Y, (-1))
-            l = tf.math.reduce_mean(loss(y, py)) 
-        print(l)
-        grads = g.gradient(l, params)
-        grads = grad_clipping(grads, 1e-2)
-        updater.apply_gradients(zip(grads, params))
-        
-        # Keras loss by default returns the average loss in a batch
-        #l_sum = l * float(d2l.size(y)) if isinstance(
-            #loss, tf.keras.losses.Loss) else tf.reduce_sum(l)
-        metric.add(l* d2l.size(y), d2l.size(y))
-    ppl, speed = math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
-    if epoch % 10 == 0:
-            print(predict('time traveller'))
-            animator.add(epoch+1, [ppl])
-
-device = d2l.try_gpu()
-print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device._device_name)}')
-print(predict('time traveller'))
-print(predict('traveller'))   
+num_epochs, lr = 500, 1
+train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs)
 ```
 
 Finally let us check the results to use a random sampling iterator.
@@ -677,7 +638,8 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
 ```{.python .input}
 #@tab tensorflow
 params = get_params(len(vocab_random_iter), num_hiddens)
-train_ch8(model, train_random_iter, vocab_random_iter, vocab, num_hiddens, lr, num_epochs)
+train_ch8(model, train_random_iter, vocab_random_iter, num_hiddens,
+          lr, num_epochs, use_random_iter=True)
 ```
 
 While implementing the above RNN model from scratch is instructive, it is not convenient. In the next section we will see how to improve significantly on the current model and how to make it faster and easier to implement.
