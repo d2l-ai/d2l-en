@@ -5,7 +5,7 @@ Contributions by [readers](https://github.com/d2l-ai/d2l-en/graphs/contributors)
 
 ## Minor Text Changes
 
-The most common contributions are editing one sentence or fixing typos. We recommend you to find the source file in the [github repo](https://github.com/d2l-ai/d2l-en) and edit the file directly. For example, you can search the file through the [Find file](https://github.com/d2l-ai/d2l-en/find/master) button (:numref:`fig_edit_file`) to locate the source file, which is a markdown file. Then you click the "Edit this file" button on the top-right corner to make your changes in the markdown file.
+The most common contributions are editing one sentence or fixing typos (i.e. not touching the runnable code at all). We recommend you to find the source file in the [github repo](https://github.com/d2l-ai/d2l-en) and edit the file directly. For example, you can search the file through the [Find file](https://github.com/d2l-ai/d2l-en/find/master) button (:numref:`fig_edit_file`) to locate the source file, which is a markdown file. Then you click the "Edit this file" button on the top-right corner to make your changes in the markdown file.
 
 ![Edit the file on Github.](../img/edit-file.png)
 :width:`300px`
