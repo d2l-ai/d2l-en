@@ -308,7 +308,7 @@ for i in output[0].asnumpy():
 fig = d2l.plt.imshow(img)
 for i in output.numpy():
     label = ('dog=', 'cat=')[int(i[0])] + str(i[1])
-    show_bboxes(fig.axes, [torch.Tensor(i[2:]) * bbox_scale], label)
+    show_bboxes(fig.axes, [d2l.tensor(i[2:]) * bbox_scale], label)
 ```
 
 In practice, we can remove prediction bounding boxes with lower confidence levels before performing NMS, thereby reducing the amount of computation for NMS. We can also filter the output of NMS, for example, by only retaining results with higher confidence levels as the final output.
