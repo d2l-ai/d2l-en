@@ -105,7 +105,7 @@ show_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,
 ```{.python .input}
 #@tab pytorch
 d2l.set_figsize((3.5, 2.5)) 
-bbox_scale = d2l.tensor((w, h, w, h)).float()
+bbox_scale = d2l.tensor((w, h, w, h))
 fig = d2l.plt.imshow(img)
 show_bboxes(fig.axes, d2l.center_2_hw(boxes[250, 250, :, :]) * bbox_scale,
             ['s=0.75, r=1', 's=0.5, r=1', 's=0.25, r=1', 's=0.75, r=2',
