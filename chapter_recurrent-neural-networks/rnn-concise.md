@@ -12,15 +12,6 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-```{.python .input  n=1}
-#@tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
-```
-
 ## Defining the Model
 
 Gluon's `rnn` module provides a recurrent neural network implementation (beyond many other sequence models). We construct the recurrent neural network layer `rnn_layer` with a single hidden layer and 256 hidden units, and initialize the weights.
@@ -29,12 +20,6 @@ Gluon's `rnn` module provides a recurrent neural network implementation (beyond 
 num_hiddens = 256
 rnn_layer = rnn.RNN(num_hiddens)
 rnn_layer.initialize()
-```
-
-```{.python .input  n=6}
-#@tab tensorflow
-num_hiddens = 1
-rnn_layer =  tf.keras.layers.SimpleRNN(num_hiddens, return_state=True)
 ```
 
 Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to be 1. In fact, we have not even discussed yet what it means to have multiple layers---this will happen in :numref:`sec_deep_rnn`. For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN.
@@ -54,19 +39,9 @@ Y, state_new = rnn_layer(X, state)
 Y.shape, len(state_new), state_new[0].shape
 ```
 
-```{.python .input  n=7}
-#@tab tensorflow
-# The output of the simple rnn with return_state=True is
-# (num_steps, no. of rnn units)
-X = tf.random.uniform(shape=(num_steps, batch_size, len(vocab)))
-print(X.shape)
-Y, state_new = rnn_layer(X)
-Y.shape, len(state_new), state_new[0].shape
-```
-
 Similar to :numref:`sec_rnn_scratch`, we define an `RNNModel` block by subclassing the `Block` class for a complete recurrent neural network. Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer. While in the previous section, we have the output layer within the `rnn` block.
 
-```{.python .input  n=39}
+```{.python .input  n=27}
 #@save
 class RNNModel(nn.Block):
     def __init__(self, rnn_layer, vocab_size, **kwargs):
@@ -88,29 +63,6 @@ class RNNModel(nn.Block):
         return self.rnn.begin_state(*args, **kwargs)
 ```
 
-```{.python .input  n=13}
-#@tab tensorflow
-class RNNModel(tf.keras.Model):
-    def __init__(self, rnn_layer, vocab_size, **kwargs):
-        super(RNNModel, self).__init__()
-        self.rnn = rnn_layer
-        self.vocab_size = vocab_size
-        self.dense = tf.keras.layers.Dense(vocab_size)
-    
-    def call(self, inputs, state, params=None):
-        # we don't need params here
-        X = tf.one_hot(tf.transpose(inputs), self.vocab_size)
-        Y, state = self.rnn(X, initial_state=state)
-        # The fully connected layer will first change the shape of `Y` to
-        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
-        # (`num_steps` * `batch_size`, `vocab_size`).
-        output = self.dense(d2l.reshape(Y, (-1, Y.shape[-1])))
-        return output, state
-    
-    def begin_state(self, batch_size, num_hiddens=1):
-        return d2l.zeros((batch_size, num_hiddens))
-```
-
 ## Training and Predicting
 
 Before training the model, let us make a prediction with the a model that has random weights.
@@ -122,27 +74,11 @@ model.initialize(force_reinit=True, ctx=device)
 d2l.predict_ch8('time traveller', 10, model, vocab, device)
 ```
 
-```{.python .input  n=15}
-#@tab tensorflow
-model = RNNModel(rnn_layer, len(vocab))
-d2l.predict_ch8('time traveller', 10, model, vocab)
-```
-
-```{.python .input}
-model.trainable_variables
-```
-
 As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and train our model with Gluon.
 
 ```{.python .input  n=19}
 num_epochs, lr = 500, 1
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
-```
-
-```{.python .input}
-#@tab tensorflow
-num_epochs, lr = 500, 1
-d2l.train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, concise=True)
 ```
 
 Compared with the last section, this model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized.
