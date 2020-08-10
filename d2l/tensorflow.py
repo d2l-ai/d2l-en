@@ -712,7 +712,7 @@ def grad_clipping(grads, theta): #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def train_epoch_ch8(model, train_iter, loss, updater,  #@save
-                    params, use_random_iter):
+                    params, use_random_iter, concise=True):
     state, timer = None, d2l.Timer()
     # initialize the state at the begining of the epoch
     # when not using random_iter
@@ -722,14 +722,24 @@ def train_epoch_ch8(model, train_iter, loss, updater,  #@save
             # Initialize state when either it is the first iteration or
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0])
-        with tf.GradientTape(persistent=True) as g:
-            g.watch(params)
-            py, state= model(X, state, params)
-            y = d2l.reshape(Y, (-1))
-            l = tf.math.reduce_mean(loss(y, py)) 
-        grads = g.gradient(l, params)
-        grads = grad_clipping(grads, 1)
-        updater.apply_gradients(zip(grads, params))
+        if not concise:
+            with tf.GradientTape(persistent=True) as g:
+                g.watch(params)
+                py, state= model(X, state, params)
+                y = d2l.reshape(Y, (-1))
+                l = tf.math.reduce_mean(loss(y, py)) 
+            grads = g.gradient(l, params)
+            grads = grad_clipping(grads, 1)
+            updater.apply_gradients(zip(grads, params))
+        # the else part code will be used in next chapter.
+        else:
+            with tf.GradientTape(persistent=True) as g:
+                py, state= model(X, state, params)
+                y = d2l.reshape(Y, (-1))
+                l = tf.math.reduce_mean(loss(y, py))
+            grads = g.gradient(l, model.trainable_variables)
+            grads = grad_clipping(grads, 1)
+            updater.apply_gradients(zip(grads, model.trainable_variables))
         
         # Keras loss by default returns the average loss in a batch
         #l_sum = l * float(d2l.size(y)) if isinstance(
