@@ -751,8 +751,7 @@ def train_epoch_ch8(model, train_iter, loss, updater,  #@save
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
               use_random_iter=False, concise=False):
-    if not concise:
-        params = get_params(len(vocab), num_hiddens)
+    params = get_params(len(vocab), num_hiddens)
     loss = tf.keras.losses.SparseCategoricalCrossentropy()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
