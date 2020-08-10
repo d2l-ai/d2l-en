@@ -20,6 +20,7 @@ npx.set_np()
 from d2l import torch as d2l
 ```
 
+
 ## Generating Multiple Anchor Boxes
 
 Assume that the input image has a height of $h$ and width of $w$. We generate anchor boxes with different shapes centered on each pixel of the image. Assume the size is $s\in (0, 1]$, the aspect ratio is $r > 0$, and the width and height of the anchor box are $ws\sqrt{r}$ and $hs/\sqrt{r}$, respectively.  When the center position is given, an anchor box with known width and height is determined.
