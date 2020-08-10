@@ -674,6 +674,7 @@ class RNNModelScratch: #@save
     def __call__(self, X, state, params):
         X = tf.one_hot(tf.transpose(X), self.vocab_size)
         X = tf.cast(X, tf.float32)
+        print(type(params))
         return self.forward_fn(X, state, params)
 
     def begin_state(self, batch_size):
@@ -681,7 +682,7 @@ class RNNModelScratch: #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_predicts, model, vocab, params): #@save
+def predict_ch8(prefix, num_predicts, model, vocab, params=None): #@save
     state = model.begin_state(batch_size=1)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(tf.constant([outputs[-1]]), (1,1)).numpy()
