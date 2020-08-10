@@ -507,7 +507,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
 ```{.python .input  n=51}
 #@tab tensorflow
 def train_epoch_ch8(model, train_iter, loss, updater,  #@save
-                    params, use_random_iter, concise=True):
+                    params, use_random_iter):
     state, timer = None, d2l.Timer()
     # initialize the state at the begining of the epoch
     # when not using random_iter
@@ -577,7 +577,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
 #@tab pytorch
 #@save
 def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
-              use_random_iter=False):
+              use_random_iter=False, concise=False):
     # Initialize
     loss = nn.CrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
