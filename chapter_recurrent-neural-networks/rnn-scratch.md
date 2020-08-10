@@ -614,9 +614,14 @@ def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
     # Train and check the progress.
     for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(
-             model, train_iter, loss, updater, params, 
-             use_random_iter, concise)
+        if not concise:
+            ppl, speed = train_epoch_ch8(
+                 model, train_iter, loss, updater, params, 
+                 use_random_iter, concise)
+        else:
+            ppl, speed = train_epoch_ch8(
+                 model, train_iter, loss, updater, params=None, 
+                 use_random_iter, concise)
         if epoch % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch+1, [ppl])
