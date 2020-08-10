@@ -765,8 +765,9 @@ def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
                  model, train_iter, loss, updater, params, 
                  use_random_iter, concise)
         else:
+            params = None
             ppl, speed = train_epoch_ch8(
-                 model, train_iter, loss, updater, params=None, 
+                 model, train_iter, loss, updater, params, 
                  use_random_iter, concise)
         if epoch % 10 == 0:
             print(predict('time traveller'))
