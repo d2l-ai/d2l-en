@@ -712,7 +712,7 @@ def grad_clipping(grads, theta): #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def train_epoch_ch8(model, train_iter, loss, updater,  #@save
-                    params, use_random_iter, concise=True):
+                    params, use_random_iter, concise):
     state, timer = None, d2l.Timer()
     # initialize the state at the begining of the epoch
     # when not using random_iter
@@ -750,7 +750,7 @@ def train_epoch_ch8(model, train_iter, loss, updater,  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
-              use_random_iter=False):
+              use_random_iter=False, concise=False):
     params = get_params(len(vocab), num_hiddens)
     loss = tf.keras.losses.SparseCategoricalCrossentropy()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
@@ -760,7 +760,8 @@ def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
-             model, train_iter, loss, updater, params, use_random_iter)
+             model, train_iter, loss, updater, params, 
+             use_random_iter, concise)
         if epoch % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch+1, [ppl])
