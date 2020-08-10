@@ -267,7 +267,6 @@ class RNNModelScratch: #@save
     def __call__(self, X, state, params):
         X = tf.one_hot(tf.transpose(X), self.vocab_size)
         X = tf.cast(X, tf.float32)
-        print(type(params))
         return self.forward_fn(X, state, params)
 
     def begin_state(self, batch_size):
@@ -345,7 +344,7 @@ def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
 
 ```{.python .input  n=10}
 #@tab tensorflow
-def predict_ch8(prefix, num_predicts, model, vocab, params=None): #@save
+def predict_ch8(prefix, num_predicts, model, vocab, params): #@save
     state = model.begin_state(batch_size=1)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(tf.constant([outputs[-1]]), (1,1)).numpy()
@@ -367,7 +366,6 @@ predict_ch8('time traveller ', 10, model, vocab, d2l.try_gpu())
 
 ```{.python .input  n=11}
 #@tab tensorflow
-
 predict_ch8('time traveller ', 10, model, vocab, params)
 ```
 
@@ -507,7 +505,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
 ```{.python .input  n=51}
 #@tab tensorflow
 def train_epoch_ch8(model, train_iter, loss, updater,  #@save
-                    params, use_random_iter, concise):
+                    params, use_random_iter):
     state, timer = None, d2l.Timer()
     # initialize the state at the begining of the epoch
     # when not using random_iter
@@ -517,24 +515,14 @@ def train_epoch_ch8(model, train_iter, loss, updater,  #@save
             # Initialize state when either it is the first iteration or
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0])
-        if not concise:
-            with tf.GradientTape(persistent=True) as g:
-                g.watch(params)
-                py, state= model(X, state, params)
-                y = d2l.reshape(Y, (-1))
-                l = tf.math.reduce_mean(loss(y, py)) 
-            grads = g.gradient(l, params)
-            grads = grad_clipping(grads, 1)
-            updater.apply_gradients(zip(grads, params))
-        # the else part code will be used in next chapter.
-        else:
-            with tf.GradientTape(persistent=True) as g:
-                py, state= model(X, state, params)
-                y = d2l.reshape(Y, (-1))
-                l = tf.math.reduce_mean(loss(y, py))
-            grads = g.gradient(l, model.trainable_variables)
-            grads = grad_clipping(grads, 1)
-            updater.apply_gradients(zip(grads, model.trainable_variables))
+        with tf.GradientTape(persistent=True) as g:
+            g.watch(params)
+            py, state= model(X, state, params)
+            y = d2l.reshape(Y, (-1))
+            l = tf.math.reduce_mean(loss(y, py)) 
+        grads = g.gradient(l, params)
+        grads = grad_clipping(grads, 1)
+        updater.apply_gradients(zip(grads, params))
         
         # Keras loss by default returns the average loss in a batch
         #l_sum = l * float(d2l.size(y)) if isinstance(
@@ -604,9 +592,8 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
 #@tab tensorflow
 #@save
 def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
-              use_random_iter=False, concise=False):
-    if not concise:
-        params = get_params(len(vocab), num_hiddens)
+              use_random_iter=False):
+    params = get_params(len(vocab), num_hiddens)
     loss = tf.keras.losses.SparseCategoricalCrossentropy()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
@@ -614,14 +601,8 @@ def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
     # Train and check the progress.
     for epoch in range(num_epochs):
-        if not concise:
-            ppl, speed = train_epoch_ch8(
-                 model, train_iter, loss, updater, params, 
-                 use_random_iter, concise)
-        else:
-            ppl, speed = train_epoch_ch8(
-                 model, train_iter, loss, updater, params=None, 
-                 use_random_iter, concise)
+        ppl, speed = train_epoch_ch8(
+             model, train_iter, loss, updater, params, use_random_iter)
         if epoch % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch+1, [ppl])
