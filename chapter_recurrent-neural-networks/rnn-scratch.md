@@ -267,6 +267,7 @@ class RNNModelScratch: #@save
     def __call__(self, X, state, params):
         X = tf.one_hot(tf.transpose(X), self.vocab_size)
         X = tf.cast(X, tf.float32)
+        print(type(params))
         return self.forward_fn(X, state, params)
 
     def begin_state(self, batch_size):
@@ -367,7 +368,7 @@ predict_ch8('time traveller ', 10, model, vocab, d2l.try_gpu())
 ```{.python .input  n=11}
 #@tab tensorflow
 
-predict_ch8('time traveller ', 10, model, vocab,num_hiddens)
+predict_ch8('time traveller ', 10, model, vocab, params)
 ```
 
 ## Gradient Clipping
