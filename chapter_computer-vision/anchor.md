@@ -18,6 +18,7 @@ npx.set_np()
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
+import torch
 ```
 
 
