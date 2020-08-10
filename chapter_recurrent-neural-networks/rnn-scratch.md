@@ -345,7 +345,7 @@ def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
 
 ```{.python .input  n=10}
 #@tab tensorflow
-def predict_ch8(prefix, num_predicts, model, vocab, params): #@save
+def predict_ch8(prefix, num_predicts, model, vocab, params=None): #@save
     state = model.begin_state(batch_size=1)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(tf.constant([outputs[-1]]), (1,1)).numpy()
