@@ -285,12 +285,12 @@ more easily leads to *out of memory* errors.
 
 1. Assume that the inputs $\mathbf{X}$ to some scalar function $f$ are $n \times m$ matrices. What is the dimensionality of the gradient of $f$ with respect to $\mathbf{X}$?
 1. Add a bias to the hidden layer of the model described in this section (you do not need to include bias in the regularization term).
-    * Draw the corresponding computational graph.
-    * Derive the forward and backward propagation equations.
+    1. Draw the corresponding computational graph.
+    1. Derive the forward and backward propagation equations.
 1. Compute the memory footprint for training and prediction in the model described in this section.
 1. Assume that you want to compute second derivatives. What happens to the computational graph? How long do you expect the calculation to take?
 1. Assume that the computational graph is too large for your GPU.
-    * Can you partition it over more than one GPU?
-    * What are the advantages and disadvantages over training on a smaller minibatch?
+    1. Can you partition it over more than one GPU?
+    1. What are the advantages and disadvantages over training on a smaller minibatch?
 
 [Discussions](https://discuss.d2l.ai/t/102)

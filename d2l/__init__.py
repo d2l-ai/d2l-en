@@ -1,4 +1,4 @@
-"""Saved source code for "Dive into Deep Learing" (https://d2l.ai).
+"""Saved source code for "Dive into Deep Learning" (https://d2l.ai).
 
 Please import d2l by one of the following ways:
 
