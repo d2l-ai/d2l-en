@@ -200,7 +200,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
     trainer_G = gluon.Trainer(net_G.collect_params(), 'adam', trainer_hp)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
-                            legend=['discriminator', 'generator'])
+                            legend=['generator', 'discriminator'])
     animator.fig.subplots_adjust(hspace=0.3)
     for epoch in range(1, num_epochs + 1):
         # Train one epoch
