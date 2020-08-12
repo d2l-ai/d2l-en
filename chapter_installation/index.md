@@ -70,9 +70,16 @@ conda install python=3.7 pip -y
 
 :begin_tab:`mxnet,pytorch`
 Before installing the deep learning framework, please first check
-whether or not you have proper GPUs on your machine
+whether or not you have proper NVIDIA GPUs on your machine
 (the GPUs that power the display on a standard laptop
-do not count for our purposes).
+do not count for our purposes). We use the `nvidia-smi` command to
+check whether you have NVIDIA GPUs. If you have, then you will get 
+your graphics card information.
+
+```bash
+!nvidia-smi
+```
+
 If you are installing on a GPU server,
 proceed to :ref:`subsec_gpu` for instructions
 to install a GPU-supported version.
