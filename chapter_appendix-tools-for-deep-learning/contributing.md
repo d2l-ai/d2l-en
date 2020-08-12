@@ -41,7 +41,7 @@ Before submitting your changes, please clear all code block outputs and activate
 d2lbook activate all chapter_multilayer-perceptrons/mlp-scratch.md
 ```
 
-If you add a new code block not for the default implementation, which is MXNet, please use `#@tab` to mark this block on the beginning line. For exmaple, `#@tab pytorch` for a PyTorch code block, `#@tab tensorflow` for a TensorFlow code block, or `#@tab all` a shared code block for all implementations. You may refer to [d2lbook](http://book.d2l.ai/user/code_tabs.html) for more information.
+If you add a new code block not for the default implementation, which is MXNet, please use `#@tab` to mark this block on the beginning line. For example, `#@tab pytorch` for a PyTorch code block, `#@tab tensorflow` for a TensorFlow code block, or `#@tab all` a shared code block for all implementations. You may refer to [d2lbook](http://book.d2l.ai/user/code_tabs.html) for more information.
 
 
 ## Adding a New Section or a New Framework Implementation
