@@ -34,7 +34,7 @@ Thus we can decompose the task of fitting models into two key concerns:
 i) *optimization*: the process of fitting our models to observed data;
 ii) *generalization*: the mathematical principles and practitioners' wisdom
 that guide as to how to produce models whose validity extends
-beyond the exact set of data points used to train them.
+beyond the exact set of data examples used to train them.
 
 To help you understand
 optimization problems and methods in later chapters,

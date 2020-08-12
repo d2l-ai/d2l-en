@@ -167,7 +167,7 @@ our model by instantiating an `nn.Sequential`, with layers in the order
 that they should be executed passed as arguments.
 In short, `nn.Sequential` defines a special kind of `Module`,
 the class that presents a block in PyTorch.
-that maintains an ordered list of constituent `Module`s.
+It maintains an ordered list of constituent `Module`s.
 Note that each of the two fully-connected layers is an instance of the `Linear` class
 which is itself a subclass of `Module`.
 The forward propagation (`forward`) function is also remarkably simple:
@@ -440,10 +440,6 @@ is that during our block's parameter initialization,
 the system knows to look inside the `_modules`
 dictionary to find sub-blocks whose
 parameters also need to be initialized.
-:end_tab:
-
-:begin_tab:`tensorflow`
-FIXME, don't use `Sequential` to implement `MySequential`.
 :end_tab:
 
 When our `MySequential`'s forward propagation function is invoked,

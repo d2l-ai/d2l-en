@@ -111,6 +111,29 @@ true_value = f(torch.tensor([0.]) + epsilon[0], torch.log(
 f'approximation: {grad_approx}, true Value: {true_value}'
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from IPython import display
+from mpl_toolkits import mplot3d
+import tensorflow as tf
+import numpy as np
+
+def f(x, y):
+    return tf.math.log(tf.exp(x) + tf.exp(y))
+def grad_f(x, y):
+    return tf.constant([(tf.exp(x) / (tf.exp(x) + tf.exp(y))).numpy(),
+                        (tf.exp(y) / (tf.exp(x) + tf.exp(y))).numpy()])
+
+epsilon = tf.constant([0.01, -0.03])
+grad_approx = f(tf.constant([0.]), tf.math.log(tf.constant([2.]))) + tf.tensordot(
+    epsilon, grad_f(tf.constant([0.]), tf.math.log(tf.constant(2.))), axes=1)
+true_value = f(tf.constant([0.]) + epsilon[0], tf.math.log(
+    tf.constant([2.])) + epsilon[1])
+f'approximation: {grad_approx}, true Value: {true_value}'
+```
+
 ## Geometry of Gradients and Gradient Descent
 Consider the again :eqref:`eq_nabla_use`: 
 
@@ -181,6 +204,14 @@ d2l.plot(x, f, 'x', 'f(x)')
 ```{.python .input}
 #@tab pytorch
 x = torch.arange(-2, 3, 0.01)
+f = (3 * x**4) - (4 * x**3) - (12 * x**2)
+
+d2l.plot(x, f, 'x', 'f(x)')
+```
+
+```{.python .input}
+#@tab tensorflow
+x = tf.range(-2, 3, 0.01)
 f = (3 * x**4) - (4 * x**3) - (12 * x**2)
 
 d2l.plot(x, f, 'x', 'f(x)')
@@ -414,6 +445,35 @@ print(f'df/dz at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
       f'{z.data.item()} is {z.grad.data.item()}')
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Initialize as ndarrays, then attach gradients
+w = tf.Variable(tf.constant([-1.]))
+x = tf.Variable(tf.constant([0.]))
+y = tf.Variable(tf.constant([-2.]))
+z = tf.Variable(tf.constant([1.]))
+# Do the computation like usual, tracking gradients
+with tf.GradientTape(persistent=True) as t:
+    a, b = (w + x + y + z)**2, (w + x - y - z)**2
+    u, v = (a + b)**2, (a - b)**2
+    f = (u + v)**2
+
+# Execute backward pass
+w_grad = t.gradient(f, w).numpy()
+x_grad = t.gradient(f, x).numpy()
+y_grad = t.gradient(f, y).numpy()
+z_grad = t.gradient(f, z).numpy()
+
+print(f'df/dw at {w.numpy()}, {x.numpy()}, {y.numpy()}, '
+      f'{z.numpy()} is {w_grad}')
+print(f'df/dx at {w.numpy()}, {x.numpy()}, {y.numpy()}, '
+      f'{z.numpy()} is {x_grad}')
+print(f'df/dy at {w.numpy()}, {x.numpy()}, {y.numpy()}, '
+      f'{z.numpy()} is {y_grad}')
+print(f'df/dz at {w.numpy()}, {x.numpy()}, {y.numpy()}, '
+      f'{z.numpy()} is {z_grad}')
+```
+
 All of what we did above can be done automatically by calling `f.backwards()`.
 
 
@@ -512,6 +572,32 @@ z = x*torch.exp(- x**2 - y**2)
 
 # Compute approximating quadratic with gradient and Hessian at (1, 0)
 w = torch.exp(torch.tensor([-1.]))*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
+
+# Plot function
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_wireframe(x.numpy(), y.numpy(), z.numpy(),
+                  **{'rstride': 10, 'cstride': 10})
+ax.plot_wireframe(x.numpy(), y.numpy(), w.numpy(),
+                  **{'rstride': 10, 'cstride': 10}, color='purple')
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y')
+d2l.set_figsize()
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+ax.set_zlim(-1, 1)
+ax.dist = 12
+```
+
+```{.python .input}
+#@tab tensorflow
+# Construct grid and compute function
+x, y = tf.meshgrid(tf.linspace(-2., 2., 101),
+                   tf.linspace(-2., 2., 101))
+
+z = x*tf.exp(- x**2 - y**2)
+
+# Compute approximating quadratic with gradient and Hessian at (1, 0)
+w = tf.exp(tf.constant([-1.]))*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
