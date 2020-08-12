@@ -93,6 +93,7 @@ through the first few chapters but you will want
 to access GPUs before running larger models.
 :end_tab:
 
+### CPU version
 
 :begin_tab:`mxnet`
 
@@ -148,7 +149,7 @@ before running the code of the book or updating the deep learning framework or t
 To exit the environment, run `conda deactivate`.
 
 
-## GPU Support
+### GPU Support
 :label:`subsec_gpu`
 
 :begin_tab:`mxnet,pytorch`
