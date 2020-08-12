@@ -43,6 +43,7 @@ class CenteredLayer(nn.Block):
 #@tab pytorch
 import torch
 from torch import nn
+import torch.nn.functional as F
 
 class CenteredLayer(nn.Module):
     def __init__(self):
@@ -165,7 +166,8 @@ class MyLinear(nn.Module):
         self.weight = nn.Parameter(torch.randn(in_units, units))
         self.bias = nn.Parameter(torch.randn(units,))
     def forward(self, X):
-        return torch.matmul(X, self.weight.data) + self.bias.data
+        linear = torch.matmul(X, self.weight.data) + self.bias.data
+        return F.relu(linear)
 ```
 
 ```{.python .input}
@@ -217,7 +219,7 @@ dense(np.random.uniform(size=(2, 5)))
 
 ```{.python .input}
 #@tab pytorch
-dense(torch.randn(2, 5))
+dense(torch.rand(2, 5))
 ```
 
 ```{.python .input}
@@ -238,8 +240,8 @@ net(np.random.uniform(size=(2, 64)))
 
 ```{.python .input}
 #@tab pytorch
-net = nn.Sequential(MyLinear(64, 8), nn.ReLU(), MyLinear(8, 1))
-net(torch.randn(2, 64))
+net = nn.Sequential(MyLinear(64, 8), MyLinear(8, 1))
+net(torch.rand(2, 64))
 ```
 
 ```{.python .input}
