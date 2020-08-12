@@ -152,8 +152,8 @@ To exit the environment, run `conda deactivate`.
 ### GPU Support
 :label:`subsec_gpu`
 
-:begin_tab:`mxnet,pytorch`
-By default, the deep learning framework is installed without GPU support
+:begin_tab:`mxnet`
+By default, MXnet is installed without GPU support
 to ensure that it will run on any computer (including most laptops).
 Part of this book requires or recommends running with GPU.
 If your computer has NVIDIA graphics cards and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
@@ -161,6 +161,16 @@ then you should install a GPU-enabled version.
 If you have installed the CPU-only version,
 you may need to remove it first by running:
 :end_tab:
+
+:begin_tab:`pytorch`
+By default (if you use `pip install torch,torchvision`), PyTorch is installed with GPU support.
+But if you run what we say in CPU version, you will get the CPU-only version.
+Part of this book requires or recommends running with GPU.
+If your computer has NVIDIA graphics cards and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
+then you should install a GPU-enabled version.
+If you have installed the CPU-only version,
+you may need to remove it first by running:
+
 
 :begin_tab:`tensorflow`
 By default, TensorFlow is installed with GPU support.
