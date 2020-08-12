@@ -47,7 +47,7 @@ conda create --name d2l -y
 ## Downloading the D2L Notebooks
 
 Next, we need to download the code of this book. You can click the "All
-Notebooks" tab on the top of any HTML page to download and unzip the code.
+Notebooks" tab on the top of any HTML page to download and unzip the code.F
 Alternatively, if you have `unzip` (otherwise run `sudo apt install unzip`) available:
 
 ```bash
@@ -83,7 +83,7 @@ your graphics card information.
 
 :begin_tab:`mxnet,pytorch'
 
-If you are installing on a GPU server,
+If you are installing on a GPU server or need quicker on a NVIDIA GPU computer,
 proceed to :ref:`subsec_gpu` for instructions
 to install a GPU-supported version.
 
@@ -176,6 +176,8 @@ you may need to remove it first by running:
 By default, TensorFlow is installed with GPU support.
 If your computer has NVIDIA graphics cards and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
 then you are all set.
+If you haven't installed the code in CPU version,
+you need to run:
 :end_tab:
 
 :begin_tab:`mxnet`
@@ -204,7 +206,6 @@ then you can install with the following command:
 :end_tab:
 
 :begin_tab:`mxnet`
-
 ```bash
 # For Windows users
 pip install mxnet-cu101==1.6.0b20190926
@@ -212,17 +213,19 @@ pip install mxnet-cu101==1.6.0b20190926
 # For Linux and macOS users
 pip install mxnet-cu101==1.6.0
 ```
-
-
 :end_tab:
 
 :begin_tab:`pytorch`
-
 ```bash
 pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 ```
+:end_tab:
 
-
+:begin_tab:`tensorflow`
+```bash
+# https://www.tensorflow.org/install
+pip install tensorflow==2.2.0 tensorflow-probability==0.10.0
+```
 :end_tab:
 
 :begin_tab:`mxnet,pytorch`
