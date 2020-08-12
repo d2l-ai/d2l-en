@@ -47,7 +47,7 @@ conda create --name d2l -y
 ## Downloading the D2L Notebooks
 
 Next, we need to download the code of this book. You can click the "All
-Notebooks" tab on the top of any HTML page to download and unzip the code.F
+Notebooks" tab on the top of any HTML page to download and unzip the code.
 Alternatively, if you have `unzip` (otherwise run `sudo apt install unzip`) available:
 
 ```bash
