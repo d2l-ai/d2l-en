@@ -152,5 +152,6 @@ Your pull request will appear among the list of requests in the main repository.
 1. Star and fork the `d2l-en` repository.
 1. Find some code that needs improvement and submit a pull request.
 1. Find a reference that we missed and submit a pull request.
+1. It is usually a better practice to create a pull request using a new branch. Learn how to do it with [Git branching](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell).
 
 [Discussions](https://discuss.d2l.ai/t/426)
