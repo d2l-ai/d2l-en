@@ -68,7 +68,7 @@ conda install python=3.7 pip -y
 
 ## Installing the Framework and the `d2l` Package
 
-:begin_tab:`mxnet,pytorch`
+:begin_tab:`mxnet,pytorch,tensorflow`
 Before installing the deep learning framework, please first check
 whether or not you have proper NVIDIA GPUs on your machine
 (the GPUs that power the display on a standard laptop
@@ -79,6 +79,9 @@ your graphics card information.
 ```bash
 !nvidia-smi
 ```
+:end_tab:
+
+:begin_tab:`mxnet,pytorch'
 
 If you are installing on a GPU server,
 proceed to :ref:`subsec_gpu` for instructions
