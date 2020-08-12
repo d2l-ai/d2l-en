@@ -170,7 +170,7 @@ If your computer has NVIDIA graphics cards and has installed [CUDA](https://deve
 then you should install a GPU-enabled version.
 If you have installed the CPU-only version,
 you may need to remove it first by running:
-
+:end_tab:
 
 :begin_tab:`tensorflow`
 By default, TensorFlow is installed with GPU support.
