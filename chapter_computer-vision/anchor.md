@@ -254,9 +254,8 @@ anchors = d2l.tensor([[0, 0.1, 0.2, 0.3], [0.15, 0.2, 0.4, 0.4],
                     [0.57, 0.3, 0.92, 0.9]])
 
 fig = d2l.plt.imshow(img)
-bbox_scale = d2l.tensor((w, h, w, h))
-show_bboxes(fig.axes, ground_truth_bbox * bbox_scale, ['dog', 'cat'], 'k')
-show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
+show_bboxes(fig.axes, ground_truth_bbox * d2l.tensor((w, h, w, h)), ['dog', 'cat'], 'k')
+show_bboxes(fig.axes, anchors * d2l.tensor((w, h, w, h)), ['0', '1', '2', '3', '4']);
 ```
 
 We can label categories and offsets for anchor boxes by using the `multibox_target` function. This function sets the background category to 0 and increments the integer index of the target category from zero by 1 (1 for dog and 2 for cat). We add example dimensions to the anchor boxes and ground-truth bounding boxes and construct random predicted results with a shape of (batch size, number of categories including background, number of anchor boxes) by using the `expand_dims` function.
