@@ -751,8 +751,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
     if isinstance(model, nn.Module):
-        trainer = torch.optim.SGD(model.parameters(), lr)
-        updater = lambda batch_size: trainer.step()
+        updater = torch.optim.SGD(model.parameters(), lr)
     else:
         updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, device)
