@@ -73,11 +73,11 @@ with a vector of length $q$:
 $$\mathbf{o}= \mathbf{W}^{(2)} \mathbf{h}.$$
 
 Assuming that the loss function is $l$
-and the example label is $y$,
+and the example label is $\mathbf{y}$,
 we can then calculate the loss term
 for a single data example,
 
-$$L = l(\mathbf{o}, y).$$
+$$L = l(\mathbf{o}, \mathbf{y}).$$
 
 According to the definition of $L_2$ regularization,
 given the hyperparameter $\lambda$,
