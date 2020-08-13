@@ -21,7 +21,7 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -36,7 +36,7 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 #@tab tensorflow
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
@@ -62,7 +62,7 @@ npx.one_hot(np.array([0, 2]), len(vocab))
 F.one_hot(torch.tensor([0, 2]), len(vocab))
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 #@tab tensorflow
 tf.one_hot(tf.constant([0, 2]), len(vocab))
 ```
@@ -80,7 +80,7 @@ X = torch.arange(10).reshape(2, 5)
 F.one_hot(X.T, 28).shape
 ```
 
-```{.python .input  n=4}
+```{.python .input}
 #@tab tensorflow
 X = d2l.reshape(d2l.arange(10), (2, 5))
 tf.one_hot(tf.transpose(X), 28).shape
@@ -131,7 +131,7 @@ def get_params(vocab_size, num_hiddens, device):
     return params
 ```
 
-```{.python .input  n=5}
+```{.python .input}
 #@tab tensorflow
 def get_params(vocab_size, num_hidden):
     num_inputs = num_outputs = vocab_size
@@ -164,7 +164,7 @@ def init_rnn_state(batch_size, num_hiddens, device):
     return (d2l.zeros((batch_size, num_hiddens), device=device), )
 ```
 
-```{.python .input  n=6}
+```{.python .input}
 #@tab tensorflow
 def init_rnn_state(batch_size, num_hiddens):
     return (d2l.zeros((batch_size, num_hiddens)), )
@@ -203,7 +203,7 @@ def rnn(inputs, state, params):
     return torch.cat(outputs, dim=0), (H,)
 ```
 
-```{.python .input  n=7}
+```{.python .input}
 #@tab tensorflow
 def rnn(inputs, state, params):
     # Inputs shape: (num_steps, batch_size, vocab_size)
@@ -255,7 +255,7 @@ class RNNModelScratch: #@save
         return self.init_state(batch_size, self.num_hiddens, device)
 ```
 
-```{.python .input  n=18}
+```{.python .input}
 #@tab tensorflow
 class RNNModelScratch: #@save
     """A RNN Model based on scratch implementations."""
@@ -295,7 +295,7 @@ Y, new_state = model(X.to(d2l.try_gpu()), state)
 Y.shape, len(new_state), new_state[0].shape
 ```
 
-```{.python .input  n=19}
+```{.python .input}
 #@tab tensorflow
 num_hiddens = 512
 model = RNNModelScratch(len(vocab), num_hiddens, 
@@ -342,7 +342,7 @@ def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
-```{.python .input  n=10}
+```{.python .input}
 #@tab tensorflow
 def predict_ch8(prefix, num_predicts, model, vocab, params): #@save
     state = model.begin_state(batch_size=1)
@@ -364,7 +364,7 @@ We test the `predict_ch8` function first. Given that we did not train the networ
 predict_ch8('time traveller ', 10, model, vocab, d2l.try_gpu())
 ```
 
-```{.python .input  n=11}
+```{.python .input}
 #@tab tensorflow
 predict_ch8('time traveller ', 10, model, vocab, params)
 ```
@@ -417,7 +417,7 @@ def grad_clipping(model, theta):  #@save
             param.grad[:] *= theta / norm
 ```
 
-```{.python .input  n=12}
+```{.python .input}
 #@tab tensorflow
 def grad_clipping(grads, theta): #@save
     theta = tf.constant(theta, dtype=tf.float32)
@@ -484,8 +484,12 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0], device=device)
         else:
-            for s in state:
-                s.detach_()
+            if isinstance(model, nn.Module):
+                # Using PyTorch built-in concise model 
+                state.detach_()
+            else:
+                for s in state:
+                    s.detach_()
         y = Y.T.reshape(-1)
         X, y = X.to(device), y.to(device)
         py, state = model(X, state)
@@ -503,7 +507,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
     return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
 ```
 
-```{.python .input  n=51}
+```{.python .input}
 #@tab tensorflow
 def train_epoch_ch8(model, train_iter, loss, updater,  #@save
                     params, use_random_iter):
@@ -588,7 +592,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
     print(predict('traveller'))
 ```
 
-```{.python .input  n=39}
+```{.python .input}
 #@tab tensorflow
 #@save
 def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
@@ -620,7 +624,7 @@ num_epochs, lr = 500, 1
 train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 ```
 
-```{.python .input  n=55}
+```{.python .input}
 #@tab tensorflow
 num_epochs, lr = 500, 1
 train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs)

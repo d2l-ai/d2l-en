@@ -724,8 +724,12 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0], device=device)
         else:
-            for s in state:
-                s.detach_()
+            if isinstance(model, nn.Module):
+                # Using PyTorch built-in concise model 
+                state.detach_()
+            else:
+                for s in state:
+                    s.detach_()
         y = Y.T.reshape(-1)
         X, y = X.to(device), y.to(device)
         py, state = model(X, state)
@@ -765,6 +769,31 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
     print(predict('traveller'))
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
+class RNNModel(nn.Module):
+    def __init__(self, rnn_layer, num_hiddens, vocab_size, **kwargs):
+        super(RNNModel, self).__init__(**kwargs)
+        self.rnn = rnn_layer
+        self.vocab_size = vocab_size
+        self.num_hiddens = num_hiddens
+        self.linear = nn.Linear(self.num_hiddens, self.vocab_size)
+
+    def forward(self, inputs, state):
+        X = F.one_hot(inputs.T.long(), self.vocab_size)
+        X = X.to(torch.float32)
+        Y, state = self.rnn(X, state)
+        # The fully connected layer will first change the shape of `Y` to
+        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
+        # (`num_steps` * `batch_size`, `vocab_size`).
+        output = self.linear(Y.reshape((-1, Y.shape[-1])))
+        return output, state
+
+    def begin_state(self, device, batch_size=1):
+        """Return the begin state"""
+        return  torch.zeros((1, batch_size, self.num_hiddens), 
+                            device=device)
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md

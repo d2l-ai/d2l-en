@@ -1,8 +1,9 @@
 # Concise Implementation of Recurrent Neural Networks
+:label:`sec_rnn_gluon`
 
 While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks (RNNs) are implemented, this is not convenient or fast. This section will show how to implement the same language model more efficiently using functions provided by Gluon. We begin as before by reading the "Time Machine" corpus.
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import nn, rnn
@@ -12,36 +13,68 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+from torch.nn import functional as F
+
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+```
+
 ## Defining the Model
 
 Gluon's `rnn` module provides a recurrent neural network implementation (beyond many other sequence models). We construct the recurrent neural network layer `rnn_layer` with a single hidden layer and 256 hidden units, and initialize the weights.
 
-```{.python .input  n=26}
+```{.python .input}
 num_hiddens = 256
 rnn_layer = rnn.RNN(num_hiddens)
 rnn_layer.initialize()
 ```
 
+```{.python .input}
+#@tab pytorch
+num_hiddens = 256
+rnn_layer = nn.RNN(len(vocab), num_hiddens)
+```
+
 Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to be 1. In fact, we have not even discussed yet what it means to have multiple layers---this will happen in :numref:`sec_deep_rnn`. For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN.
 
-```{.python .input  n=37}
+```{.python .input}
 batch_size = 1
 state = rnn_layer.begin_state(batch_size=batch_size)
 len(state), state[0].shape
 ```
 
+```{.python .input}
+#@tab pytorch
+batch_size = 1
+state = torch.zeros((1, batch_size, num_hiddens))
+len(state), state[0].shape
+```
+
 With a state variable and an input, we can compute the output with the updated state.
 
-```{.python .input  n=38}
+```{.python .input}
 num_steps = 1
 X = np.random.uniform(size=(num_steps, batch_size, len(vocab)))
 Y, state_new = rnn_layer(X, state)
 Y.shape, len(state_new), state_new[0].shape
 ```
 
+```{.python .input}
+#@tab pytorch
+num_steps = 1
+X = torch.rand(size=(num_steps, batch_size, len(vocab)))
+Y, state_new = rnn_layer(X, state)
+Y.shape, len(state_new), state_new[0].shape
+```
+
 Similar to :numref:`sec_rnn_scratch`, we define an `RNNModel` block by subclassing the `Block` class for a complete recurrent neural network. Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer. While in the previous section, we have the output layer within the `rnn` block.
 
-```{.python .input  n=27}
+```{.python .input}
 #@save
 class RNNModel(nn.Block):
     def __init__(self, rnn_layer, vocab_size, **kwargs):
@@ -63,20 +96,60 @@ class RNNModel(nn.Block):
         return self.rnn.begin_state(*args, **kwargs)
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+class RNNModel(nn.Module):
+    def __init__(self, rnn_layer, num_hiddens, vocab_size, **kwargs):
+        super(RNNModel, self).__init__(**kwargs)
+        self.rnn = rnn_layer
+        self.vocab_size = vocab_size
+        self.num_hiddens = num_hiddens
+        self.linear = nn.Linear(self.num_hiddens, self.vocab_size)
+
+    def forward(self, inputs, state):
+        X = F.one_hot(inputs.T.long(), self.vocab_size)
+        X = X.to(torch.float32)
+        Y, state = self.rnn(X, state)
+        # The fully connected layer will first change the shape of `Y` to
+        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
+        # (`num_steps` * `batch_size`, `vocab_size`).
+        output = self.linear(Y.reshape((-1, Y.shape[-1])))
+        return output, state
+
+    def begin_state(self, device, batch_size=1):
+        """Return the begin state"""
+        return  torch.zeros((1, batch_size, self.num_hiddens), 
+                            device=device)
+```
+
 ## Training and Predicting
 
 Before training the model, let us make a prediction with the a model that has random weights.
 
-```{.python .input  n=42}
-device = d2l.try_gpu()
+```{.python .input}
+ctx = d2l.try_gpu()
 model = RNNModel(rnn_layer, len(vocab))
-model.initialize(force_reinit=True, ctx=device)
+model.initialize(force_reinit=True, ctx=ctx)
+d2l.predict_ch8('time traveller', 10, model, vocab, ctx)
+```
+
+```{.python .input}
+#@tab pytorch
+device = d2l.try_gpu()
+model = RNNModel(rnn_layer, num_hiddens=256, vocab_size=len(vocab))
 d2l.predict_ch8('time traveller', 10, model, vocab, device)
 ```
 
-As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and train our model with Gluon.
+As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyper-parameters defined in :numref:`sec_rnn_scratch` and train our model with Gluon.
 
-```{.python .input  n=19}
+```{.python .input}
+num_epochs, lr = 500, 1
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
+```
+
+```{.python .input}
+#@tab pytorch
 num_epochs, lr = 500, 1
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
