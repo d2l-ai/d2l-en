@@ -172,7 +172,7 @@ def center_2_hw(box: torch.Tensor) -> float:
 
 ```{.python .input}
 #@tab pytorch
-d2l.set_figsize((3.5, 2.5)) 
+d2l.set_figsize() 
 bbox_scale = d2l.tensor((w, h, w, h))
 fig = d2l.plt.imshow(img)
 show_bboxes(fig.axes, center_2_hw(boxes[250, 250, :, :]) * bbox_scale,
