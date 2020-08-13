@@ -130,7 +130,7 @@ Before training the model, let us make a prediction with the a model that has ra
 device = d2l.try_gpu()
 model = RNNModel(rnn_layer, len(vocab))
 model.initialize(force_reinit=True, ctx=device)
-d2l.predict_ch8('time traveller', 10, model, vocab, ctx)
+d2l.predict_ch8('time traveller', 10, model, vocab, device)
 ```
 
 ```{.python .input}
@@ -143,12 +143,7 @@ d2l.predict_ch8('time traveller', 10, model, vocab, device)
 As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyper-parameters defined in :numref:`sec_rnn_scratch` and train our model with Gluon.
 
 ```{.python .input}
-num_epochs, lr = 500, 1
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 num_epochs, lr = 500, 1
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
