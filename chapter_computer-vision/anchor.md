@@ -21,6 +21,7 @@ from d2l import torch as d2l
 import torch
 import itertools
 from collections import namedtuple
+import math
 ```
 
 
