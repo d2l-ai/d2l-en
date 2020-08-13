@@ -44,9 +44,8 @@ To start, let us import the necessary packages.
 ```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
-from mxnet import np, npx
+import numpy as np
 import random
-npx.set_np()
 ```
 
 ```{.python .input}
