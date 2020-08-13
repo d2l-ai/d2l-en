@@ -127,13 +127,28 @@ show_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,
             ['s=0.75, r=1', 's=0.5, r=1', 's=0.25, r=1', 's=0.75, r=2',
              's=0.75, r=0.5'])
 ```
+```{.python .input}
+#@tab pytorch
+#@save
+def center_2_hw(box: torch.Tensor) -> float:
+    """
+    Converting (cx, cy, w, h) to (x1, y1, x2, y2)
+    """
+
+    return torch.cat(
+        [box[:, 0, None] - box[:, 2, None]/2,
+         box[:, 1, None] - box[:, 3, None]/2,
+         box[:, 0, None] + box[:, 2, None]/2,
+         box[:, 1, None] + box[:, 3, None]/2
+         ], dim=1)
+```
 
 ```{.python .input}
 #@tab pytorch
 d2l.set_figsize((3.5, 2.5)) 
 bbox_scale = d2l.tensor((w, h, w, h))
 fig = d2l.plt.imshow(img)
-show_bboxes(fig.axes, d2l.center_2_hw(boxes[250, 250, :, :]) * bbox_scale,
+show_bboxes(fig.axes, center_2_hw(boxes[250, 250, :, :]) * bbox_scale,
             ['s=0.75, r=1', 's=0.5, r=1', 's=0.25, r=1', 's=0.75, r=2',
              's=0.75, r=0.5'])
 ```
@@ -231,18 +246,6 @@ labels = npx.multibox_target(np.expand_dims(anchors, axis=0),
 def bbox_to_rect(bbox, color):
     """Convert bounding box to matplotlib format."""
     return plt.Rectangle(xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1], fill=False, edgecolor=color, linewidth=2)
-                         
-def center_2_hw(box: torch.Tensor) -> float:
-    """
-    Converting (cx, cy, w, h) to (x1, y1, x2, y2)
-    """
-
-    return torch.cat(
-        [box[:, 0, None] - box[:, 2, None]/2,
-         box[:, 1, None] - box[:, 3, None]/2,
-         box[:, 0, None] + box[:, 2, None]/2,
-         box[:, 1, None] + box[:, 3, None]/2
-         ], dim=1)
          
 def intersect(box_a: torch.Tensor, box_b: torch.Tensor) -> float:
     # Coverting (cx, cy, w, h) to (x1, y1, x2, y2) since its easier to extract min/max coordinates
