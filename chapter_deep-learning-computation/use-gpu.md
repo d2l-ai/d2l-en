@@ -124,7 +124,7 @@ This means that PyTorch's calculations
 will try to use all CPU cores.
 However, a `gpu` device only represents one card
 and the corresponding memory.
-If there are multiple GPUs, we use `torch.cuda.device(f'cuda{i}')`
+If there are multiple GPUs, we use `torch.cuda.device(f'cuda:{i}')`
 to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0).
 Also, `gpu:0` and `gpu` are equivalent.
 :end_tab:
@@ -285,7 +285,7 @@ Y
 
 ```{.python .input}
 #@tab pytorch
-Y = torch.randn(2, 3, device=try_gpu(1))
+Y = torch.rand(2, 3, device=try_gpu(1))
 Y
 ```
 
