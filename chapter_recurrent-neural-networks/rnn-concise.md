@@ -41,7 +41,7 @@ Y.shape, len(state_new), state_new[0].shape
 
 Similar to :numref:`sec_rnn_scratch`, we define an `RNNModel` block by subclassing the `Block` class for a complete recurrent neural network. Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer. While in the previous section, we have the output layer within the `rnn` block.
 
-```{.python .input  n=39}
+```{.python .input  n=27}
 #@save
 class RNNModel(nn.Block):
     def __init__(self, rnn_layer, vocab_size, **kwargs):
