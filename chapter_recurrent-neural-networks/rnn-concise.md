@@ -1,5 +1,4 @@
 # Concise Implementation of Recurrent Neural Networks
-:label:`sec_rnn_gluon`
 
 While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks (RNNs) are implemented, this is not convenient or fast. This section will show how to implement the same language model more efficiently using functions provided by Gluon. We begin as before by reading the "Time Machine" corpus.
 
@@ -128,9 +127,9 @@ class RNNModel(nn.Module):
 Before training the model, let us make a prediction with the a model that has random weights.
 
 ```{.python .input}
-ctx = d2l.try_gpu()
+device = d2l.try_gpu()
 model = RNNModel(rnn_layer, len(vocab))
-model.initialize(force_reinit=True, ctx=ctx)
+model.initialize(force_reinit=True, ctx=device)
 d2l.predict_ch8('time traveller', 10, model, vocab, ctx)
 ```
 
