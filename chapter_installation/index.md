@@ -192,7 +192,7 @@ pip uninstall mxnet
 :begin_tab:`pytorch`
 
 ```bash
-pip uninstall torch,torchvision
+pip uninstall torch torchvision
 ```
 
 
