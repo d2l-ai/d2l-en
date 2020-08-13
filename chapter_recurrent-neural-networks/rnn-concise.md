@@ -137,6 +137,7 @@ d2l.predict_ch8('time traveller', 10, model, vocab, device)
 #@tab pytorch
 device = d2l.try_gpu()
 model = RNNModel(rnn_layer, num_hiddens=256, vocab_size=len(vocab))
+model = model.to(device)
 d2l.predict_ch8('time traveller', 10, model, vocab, device)
 ```
 
