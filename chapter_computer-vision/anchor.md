@@ -116,7 +116,7 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
                       bbox=dict(facecolor=color, lw=0))
 ```
 
-```{.python .input  n=5}
+```{.python .input}
 #@tab pytorch
 #@save
 def bbox_to_rect(bbox, color):
@@ -142,6 +142,7 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
             axes.text(rect.xy[0], rect.xy[1], labels[i],
                       va='center', ha='center', fontsize=9, color=text_color,
                       bbox=dict(facecolor=color, lw=0))
+```
 
 As we just saw, the coordinate values of the $x$ and $y$ axis in the variable `boxes` have been divided by the width and height of the image, respectively. When drawing images, we need to restore the original coordinate values of the anchor boxes and therefore define the variable `bbox_scale`. Now, we can draw all the anchor boxes centered on (250, 250) in the image. As you can see, the blue anchor box with a size of 0.75 and an aspect ratio of 1 covers the dog in the image well.
 
@@ -244,18 +245,23 @@ show_bboxes(fig.axes, ground_truth[:, 1:] * bbox_scale, ['dog', 'cat'], 'k')
 show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 ground_truth_class = d2l.tensor([[0], [1]])
+
 ground_truth_bbox = d2l.tensor([[0.1, 0.08, 0.52, 0.92],
                          [0.55, 0.2, 0.9, 0.88]])
+
 anchors = d2l.tensor([[0, 0.1, 0.2, 0.3], [0.15, 0.2, 0.4, 0.4],
                     [0.63, 0.05, 0.88, 0.98], [0.66, 0.45, 0.8, 0.8],
                     [0.57, 0.3, 0.92, 0.9]])
 
 fig = d2l.plt.imshow(img)
-show_bboxes(fig.axes, ground_truth_bbox * d2l.tensor((w, h, w, h)), ['dog', 'cat'], 'k')
-show_bboxes(fig.axes, anchors * d2l.tensor((w, h, w, h)), ['0', '1', '2', '3', '4']);
+
+show_bboxes(fig.axes, ground_truth_bbox * bbox_scale), ['dog', 'cat'], 'k')
+
+show_bboxes(fig.axes, anchors * bbox_scale), ['0', '1', '2', '3', '4']);
 ```
 
 We can label categories and offsets for anchor boxes by using the `multibox_target` function. This function sets the background category to 0 and increments the integer index of the target category from zero by 1 (1 for dog and 2 for cat). We add example dimensions to the anchor boxes and ground-truth bounding boxes and construct random predicted results with a shape of (batch size, number of categories including background, number of anchor boxes) by using the `expand_dims` function.
