@@ -254,6 +254,7 @@ anchors = d2l.tensor([[0, 0.1, 0.2, 0.3], [0.15, 0.2, 0.4, 0.4],
                     [0.57, 0.3, 0.92, 0.9]])
 
 fig = d2l.plt.imshow(img)
+bbox_scale = d2l.tensor((w, h, w, h))
 show_bboxes(fig.axes, ground_truth_bbox * bbox_scale, ['dog', 'cat'], 'k')
 show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 ```
