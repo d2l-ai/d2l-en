@@ -19,6 +19,8 @@ npx.set_np()
 %matplotlib inline
 from d2l import torch as d2l
 import torch
+import itertools
+from collections import namedtuple
 ```
 
 
@@ -43,6 +45,32 @@ X = np.random.uniform(size=(1, 3, h, w))  # Construct input data
 Y = npx.multibox_prior(X, sizes=[0.75, 0.5, 0.25], ratios=[1, 2, 0.5])
 Y.shape
 ```
+
+```{.python .input}
+#@tab pytorch
+#@save
+def multibox_prior(feature_map_sizes, sizes, aspect_ratios):
+    """Compute default box sizes with scale and aspect transform."""
+    sizes = [s*728 for s in sizes]
+    scale = feature_map_sizes
+    steps_y = [1 / scale[0]]
+    steps_x = [1 / scale[1]]
+    sizes = [s / max(scale) for s in sizes]
+    num_layers = 1
+    boxes = []
+    for i in range(num_layers):
+        for h, w in itertools.product(range(feature_map_sizes[0]), range(feature_map_sizes[1])):
+            cx = (w + 0.5)*steps_x[i]
+            cy = (h + 0.5)*steps_y[i]
+
+            for j in range(len(sizes)):
+                s = sizes[j]
+                boxes.append((cx, cy, s, s))
+            s = sizes[0]
+            for ar in aspect_ratios:
+                boxes.append((cx, cy, (s * math.sqrt(ar)), (s / math.sqrt(ar))))
+    return d2l.tensor(boxes) 
+```
 ```{.python .input}
 #@tab pytorch
 img = d2l.plt.imread('../img/catdog.jpg')
@@ -50,20 +78,15 @@ h, w = img.shape[0:2]
 
 print(h,w)
 X = d2l.rand((1, 3, h, w))  # Construct input data
-Y = d2l.multibox_prior((h,w), sizes = [0.75, 0.5, 0.25], aspect_ratios = (2, 0.5))
+Y = multibox_prior((h,w), sizes = [0.75, 0.5, 0.25], aspect_ratios = (2, 0.5))
 Y.shape
 ```
 
 We can see that the shape of the returned anchor box variable `y` is (batch size, number of anchor boxes, 4). After changing the shape of the anchor box variable `y` to (image height, image width, number of anchor boxes centered on the same pixel, 4), we can obtain all the anchor boxes centered on a specified pixel position. In the following example, we access the first anchor box centered on (250, 250). It has four elements: the $x, y$ axis coordinates in the upper-left corner and the $x, y$ axis coordinates in the lower-right corner of the anchor box. The coordinate values of the $x$ and $y$ axis are divided by the width and height of the image, respectively, so the value range is between 0 and 1.
 
 ```{.python .input  n=4}
+#@tab all
 boxes = Y.reshape(h, w, 5, 4)
-boxes[250, 250, 0, :]
-```
-
-```{.python .input}
-#@tab pytorch
-boxes = Y.reshape((h, w, 5, 4))
 boxes[250, 250, 0, :]
 ```
 
@@ -200,9 +223,85 @@ labels = npx.multibox_target(np.expand_dims(anchors, axis=0),
                              np.zeros((1, 3, 5)))
 ```
 
+
 ```{.python .input}
 #@tab pytorch
-labels = d2l.multibox_target(ground_truth_class.clone(), ground_truth_bbox, anchors)
+#@save
+def bbox_to_rect(bbox, color):
+    """Convert bounding box to matplotlib format."""
+    return plt.Rectangle(xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1], fill=False, edgecolor=color, linewidth=2)
+                         
+def center_2_hw(box: torch.Tensor) -> float:
+    """
+    Converting (cx, cy, w, h) to (x1, y1, x2, y2)
+    """
+
+    return torch.cat(
+        [box[:, 0, None] - box[:, 2, None]/2,
+         box[:, 1, None] - box[:, 3, None]/2,
+         box[:, 0, None] + box[:, 2, None]/2,
+         box[:, 1, None] + box[:, 3, None]/2
+         ], dim=1)
+         
+def intersect(box_a: torch.Tensor, box_b: torch.Tensor) -> float:
+    # Coverting (cx, cy, w, h) to (x1, y1, x2, y2) since its easier to extract min/max coordinates
+    temp_box_a, temp_box_b = center_2_hw(box_a), center_2_hw(box_b)
+
+#     print(temp_box_a.shape)
+
+    max_xy = torch.min(temp_box_a[:, None, 2:], temp_box_b[None, :, 2:])
+    min_xy = torch.max(temp_box_a[:, None, :2], temp_box_b[None, :, :2])
+
+    inter = torch.clamp((max_xy - min_xy), min=0)
+    return inter[:, :, 0] * inter[:, :, 1]
+    
+def box_area(box: torch.Tensor) -> float:
+    return box[:, 2] * box[:, 3]
+
+def jaccard(box_a: torch.Tensor, box_b: torch.Tensor) -> float:
+#     print(box_a.shape)
+    intersection = intersect(box_a, box_b)
+    union = box_area(box_a).unsqueeze(1) + box_area(box_b).unsqueeze(0) - intersection
+    return intersection / union
+
+def find_overlap(bb_true_i, anchors, jaccard_overlap):
+
+    jaccard_tensor = jaccard(anchors, bb_true_i)
+    _, max_overlap = torch.max(jaccard_tensor, dim=0)
+
+    overlap_list = []    
+    for i in range(len(bb_true_i)):
+        threshold_overlap = (jaccard_tensor[:, i] > jaccard_overlap).nonzero()
+
+        if len(threshold_overlap) > 0:
+            threshold_overlap = threshold_overlap[:, 0]
+            overlap = torch.cat([max_overlap[i].view(1), threshold_overlap])
+            overlap = torch.unique(overlap)     
+        else:
+            overlap = max_overlap[i].view(1)
+        overlap_list.append(overlap)
+    return overlap_list
+    
+def multibox_target(class_true, bb_true, anchors):
+    class_true +=1
+    class_target = torch.zeros(anchors.shape[0]).long()
+    overlap_list = d2l.find_overlap(bb_true, anchors, 0.5)
+    overlap_coordinates = torch.zeros_like(anchors)
+    for j in range(len(overlap_list)):
+        overlap = overlap_list[j]
+        class_target[overlap] = class_true[j, 0].long()
+        overlap_coordinates[overlap] = 1.
+
+    new_anchors = torch.cat([*anchors])
+    overlap_coordinates = torch.cat([*overlap_coordinates])
+    new_anchors = new_anchors*overlap_coordinates
+
+    return (new_anchors.unsqueeze(0), overlap_coordinates.unsqueeze(0), class_target.unsqueeze(0))
+```
+
+```{.python .input}
+#@tab pytorch
+labels = multibox_target(ground_truth_class.clone(), ground_truth_bbox, anchors)
 ```
 
 There are three items in the returned result, all of which are in the tensor format. The third item is represented by the category labeled for the anchor box.
@@ -283,13 +382,50 @@ output = npx.multibox_detection(
     nms_threshold=0.5)
 output
 ```
+```{.python .input}
+#@tab pytorch
+#@save
+PredBoundingBox = namedtuple("PredBoundingBox", ["probability", "class_id", "classname", "bounding_box"])
+                                                 
+def multibox_detection(id_cat, cls_probs, anchors, nms_threshold):
+
+    id_new = dict()
+    id_new[0] = 'background'
+    for i in (id_cat.keys()):
+        id_new[i+1] = id_cat[i]
+
+    cls_probs = cls_probs.transpose(0,1)
+
+    prob, class_id = torch.max(cls_probs,1)
+
+    prob = prob.detach().cpu().numpy()
+    class_id = class_id.detach().cpu().numpy()
+
+    output_bb = [PredBoundingBox(probability=prob[i],
+                                     class_id=class_id[i],
+                                     classname=id_new[class_id[i]],
+                                     bounding_box=[anchors[i, 0], 
+                                                   anchors[i, 1], 
+                                                   anchors[i, 2], 
+                                                   anchors[i, 3]])
+                                     for i in range(0, len(prob))]
+
+    filtered_bb = d2l.non_max_suppression(output_bb, nms_threshold)
+
+    out = []
+    for bb in filtered_bb:
+        out.append([bb.class_id-1, bb.probability, *bb.bounding_box])
+    out = torch.Tensor(out)
+
+    return out
+```
 
 ```{.python .input}
 #@tab pytorch
 id_category = dict()
 id_category[0] = 'dog'
 id_category[1] = 'cat'
-output = d2l.MultiboxDetection(id_category, cls_probs, anchors, nms_threshold=0.5)
+output = multibox_detection(id_category, cls_probs, anchors, nms_threshold=0.5)
 output
 ```
 
