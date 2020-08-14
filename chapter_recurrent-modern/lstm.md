@@ -246,6 +246,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 num_inputs = vocab_size
 lstm_layer = nn.LSTM(num_inputs, num_hiddens)
 model = d2l.RNNModel(lstm_layer, len(vocab))
+model = model.to(device)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
