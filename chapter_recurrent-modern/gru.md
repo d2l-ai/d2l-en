@@ -252,6 +252,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 num_inputs = vocab_size
 gru_layer = nn.GRU(num_inputs, num_hiddens)
 model = d2l.RNNModel(gru_layer, num_hiddens=256, vocab_size=len(vocab))
+model = model.to(device)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
