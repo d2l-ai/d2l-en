@@ -101,7 +101,7 @@ To gain a better understanding of the model, let us implement a GRU from scratch
 
 We begin by reading *The Time Machine* corpus that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below:
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn
@@ -111,11 +111,21 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+```
+
 ### Initializing Model Parameters
 
 The next step is to initialize the model parameters. We draw the weights from a Gaussian with variance to be $0.01$ and set the bias to $0$. The hyperparameter `num_hiddens` defines the number of hidden units. We instantiate all weights and biases relating to the update gate, the reset gate, and the candidate hidden state itself. Subsequently, we attach gradients to all the parameters.
 
-```{.python .input  n=2}
+```{.python .input}
 def get_params(vocab_size, num_hiddens, device):
     num_inputs = num_outputs = vocab_size
 
@@ -140,18 +150,50 @@ def get_params(vocab_size, num_hiddens, device):
     return params
 ```
 
+```{.python .input}
+#@tab pytorch
+def get_params(vocab_size, num_hiddens, device):
+    num_inputs = num_outputs = vocab_size
+
+    def normal(shape):
+        return torch.randn(size=shape, device=device)*0.01
+
+    def three():
+        return (normal((num_inputs, num_hiddens)),
+                normal((num_hiddens, num_hiddens)),
+                d2l.zeros(num_hiddens, device=device))
+
+    W_xz, W_hz, b_z = three()  # Update gate parameter
+    W_xr, W_hr, b_r = three()  # Reset gate parameter
+    W_xh, W_hh, b_h = three()  # Candidate hidden state parameter
+    # Output layer parameters
+    W_hq = normal((num_hiddens, num_outputs))
+    b_q = d2l.zeros(num_outputs, device=device)
+    # Attach gradients
+    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]
+    for param in params:
+        param.requires_grad_(True)
+    return params
+```
+
 ### Defining the Model
 
 Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns a tensor with a shape (batch size, number of hidden units) whose values are all zeros.
 
-```{.python .input  n=3}
+```{.python .input}
 def init_gru_state(batch_size, num_hiddens, device):
     return (np.zeros(shape=(batch_size, num_hiddens), ctx=device), )
 ```
 
+```{.python .input}
+#@tab pytorch
+def init_gru_state(batch_size, num_hiddens, device):
+    return (torch.zeros((batch_size, num_hiddens), device=device), )
+```
+
 Now we are ready to define the GRU model. Its structure is the same as the basic RNN cell, except that the update equations are more complex.
 
-```{.python .input  n=4}
+```{.python .input}
 def gru(inputs, state, params):
     W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params
     H, = state
@@ -166,11 +208,28 @@ def gru(inputs, state, params):
     return np.concatenate(outputs, axis=0), (H,)
 ```
 
+```{.python .input}
+#@tab pytorch
+def gru(inputs, state, params):
+    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params
+    H, = state
+    outputs = []
+    for X in inputs:
+        Z = torch.sigmoid((X @ W_xz) + (H @ W_hz) + b_z)
+        R = torch.sigmoid((X @ W_xr) + (H @ W_hr) + b_r)
+        H_tilda = torch.tanh((X @ W_xh) + ((R * H) @ W_hh) + b_h)
+        H = Z * H + (1 - Z) * H_tilda
+        Y = H @ W_hq + b_q
+        outputs.append(Y)
+    return torch.cat(outputs, dim=0), (H,)
+```
+
 ### Training and Prediction
 
 Training and prediction work in exactly the same manner as before. After training for one epoch, the perplexity and the output sentence will be like the following.
 
-```{.python .input  n=3}
+```{.python .input}
+#@tab all
 vocab_size, num_hiddens, device = len(vocab), 256, d2l.try_gpu()
 num_epochs, lr = 500, 1
 model = d2l.RNNModelScratch(len(vocab), num_hiddens, device, get_params,
@@ -182,9 +241,18 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 
 In Gluon, we can directly call the `GRU` class in the `rnn` module. This encapsulates all the configuration detail that we made explicit above. The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out in detail before.
 
-```{.python .input  n=9}
+```{.python .input}
 gru_layer = rnn.GRU(num_hiddens)
 model = d2l.RNNModel(gru_layer, len(vocab))
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+```
+
+```{.python .input}
+#@tab pytorch
+num_inputs = vocab_size
+gru_layer = nn.GRU(num_inputs, num_hiddens)
+model = d2l.RNNModel(gru_layer, num_hiddens=256, vocab_size=len(vocab))
+model = model.to(device)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
@@ -202,7 +270,6 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 1. Assume that we only want to use the input for timestep $t'$ to predict the output at timestep $t > t'$. What are the best values for the reset and update gates for each timestep?
 1. Adjust the hyperparameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
 1. What happens if you implement only parts of a GRU? That is, implement a recurrent cell that only has a reset gate. Likewise, implement a recurrent cell only with an update gate.
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/342)
