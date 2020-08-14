@@ -131,6 +131,27 @@ num_epochs, lr = 500, 1
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+
+# Load data
+batch_size, num_steps, device = 32, 35, d2l.try_gpu()
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+# Define the model
+vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
+num_inputs = vocab_size
+lstm_layer = nn.LSTM(num_inputs, num_hiddens, num_layers, bidirectional=True)
+lstm_layer.bidirectional
+model = d2l.RNNModel(lstm_layer, len(vocab))
+model = model.to(device)
+# Train the model
+num_epochs, lr = 500, 1
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+```
+
 The output is clearly unsatisfactory for the reasons described above. For a
 discussion of more effective uses of bidirectional models, please see the sentiment
 classification in :numref:`sec_sentiment_rnn`.
@@ -147,7 +168,6 @@ classification in :numref:`sec_sentiment_rnn`.
 1. If the different directions use a different number of hidden units, how will the shape of $\mathbf{H}_t$ change?
 1. Design a bidirectional recurrent neural network with multiple hidden layers.
 1. Implement a sequence classification algorithm using bidirectional RNNs. Hint: use the RNN to embed each word and then aggregate (average) all embedded outputs before sending the output into an MLP for classification. For instance, if we have $(\mathbf{o}_1, \mathbf{o}_2, \mathbf{o}_3)$, we compute $\bar{\mathbf{o}} = \frac{1}{3} \sum_i \mathbf{o}_i$ first and then use the latter for sentiment classification.
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/339)
