@@ -83,7 +83,7 @@ $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
 Now let us implement an LSTM from scratch. As same as the experiments in the previous sections, we first load data of *The Time Machine*.
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn
@@ -93,11 +93,21 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+```
+
 ### Initializing Model Parameters
 
 Next we need to define and initialize the model parameters. As previously, the hyperparameter `num_hiddens` defines the number of hidden units. We initialize weights following a Gaussian distribution with $0.01$ standard deviation, and we set the biases to $0$.
 
-```{.python .input  n=2}
+```{.python .input}
 def get_lstm_params(vocab_size, num_hiddens, device):
     num_inputs = num_outputs = vocab_size
 
@@ -124,19 +134,54 @@ def get_lstm_params(vocab_size, num_hiddens, device):
     return params
 ```
 
+```{.python .input}
+#@tab pytorch
+def get_lstm_params(vocab_size, num_hiddens, device):
+    num_inputs = num_outputs = vocab_size
+
+    def normal(shape):
+        return torch.randn(size=shape, device=device)*0.01
+
+    def three():
+        return (normal((num_inputs, num_hiddens)),
+                normal((num_hiddens, num_hiddens)),
+                d2l.zeros(num_hiddens, device=device))
+
+    W_xi, W_hi, b_i = three()  # Input gate parameters
+    W_xf, W_hf, b_f = three()  # Forget gate parameters
+    W_xo, W_ho, b_o = three()  # Output gate parameters
+    W_xc, W_hc, b_c = three()  # Candidate cell parameters
+    # Output layer parameters
+    W_hq = normal((num_hiddens, num_outputs))
+    b_q = d2l.zeros(num_outputs, device=device)
+    # Attach gradients
+    params = [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc,
+              b_c, W_hq, b_q]
+    for param in params:
+        param.requires_grad_(True)
+    return params
+```
+
 ### Defining the Model
 
 In the initialization function, the hidden state of the LSTM needs to return an additional memory cell with a value of $0$ and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
 
-```{.python .input  n=3}
+```{.python .input}
 def init_lstm_state(batch_size, num_hiddens, device):
-    return (np.zeros(shape=(batch_size, num_hiddens), ctx=device),
-            np.zeros(shape=(batch_size, num_hiddens), ctx=device))
+    return (np.zeros((batch_size, num_hiddens), ctx=device),
+            np.zeros((batch_size, num_hiddens), ctx=device))
+```
+
+```{.python .input}
+#@tab pytorch
+def init_lstm_state(batch_size, num_hiddens, device):
+    return (torch.zeros((batch_size, num_hiddens), device=device),
+            torch.zeros((batch_size, num_hiddens), device=device))
 ```
 
 The actual model is defined just like what we discussed before: providing three gates and an auxiliary memory cell. Note that only the hidden state is passed to the output layer. The memory cells $\mathbf{C}_t$ do not participate in the output computation directly.
 
-```{.python .input  n=4}
+```{.python .input}
 def lstm(inputs, state, params):
     [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c,
      W_hq, b_q] = params
@@ -154,11 +199,31 @@ def lstm(inputs, state, params):
     return np.concatenate(outputs, axis=0), (H, C)
 ```
 
+```{.python .input}
+#@tab pytorch
+def lstm(inputs, state, params):
+    [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c,
+     W_hq, b_q] = params
+    (H, C) = state 
+    outputs = []
+    for X in inputs:
+        I = torch.sigmoid((X @ W_xi) + (H @ W_hi) + b_i)
+        F = torch.sigmoid((X @ W_xf) + (H @ W_hf) + b_f)
+        O = torch.sigmoid((X @ W_xo) + (H @ W_ho) + b_o)
+        C_tilda = torch.tanh((X @ W_xc) + (H @ W_hc) + b_c)
+        C = F * C + I * C_tilda
+        H = O * torch.tanh(C)
+        Y = (H @ W_hq) + b_q
+        outputs.append(Y)
+    return torch.cat(outputs, dim=0), (H, C)
+```
+
 ### Training and Prediction
 
 Let us train an LSTM as same as what we did in :numref:`sec_gru`, by calling the `RNNModelScratch` function as introduced in :numref:`sec_rnn_scratch`.
 
-```{.python .input  n=9}
+```{.python .input}
+#@tab all
 vocab_size, num_hiddens, device = len(vocab), 256, d2l.try_gpu()
 num_epochs, lr = 500, 1
 model = d2l.RNNModelScratch(len(vocab), num_hiddens, device, get_lstm_params,
@@ -170,9 +235,18 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 
 In Gluon, we can directly call the `LSTM` class in the `rnn` module. This encapsulates all the configuration details that we made explicit above. The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out in detail before.
 
-```{.python .input  n=10}
+```{.python .input}
 lstm_layer = rnn.LSTM(num_hiddens)
 model = d2l.RNNModel(lstm_layer, len(vocab))
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+```
+
+```{.python .input}
+#@tab pytorch
+num_inputs = vocab_size
+lstm_layer = nn.LSTM(num_inputs, num_hiddens)
+model = d2l.RNNModel(lstm_layer, len(vocab))
+model = model.to(device)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
@@ -193,7 +267,6 @@ In many cases, LSTMs perform slightly better than GRUs but they are more costly 
 1. Compare the computational cost for GRUs, LSTMs, and regular RNNs for a given hidden dimension. Pay special attention to the training and inference cost.
 1. Since the candidate memory cells ensure that the value range is between $-1$ and $1$ by  using the $\tanh$ function, why does the hidden state need to use the $\tanh$ function again to ensure that the output value range is between $-1$ and $1$?
 1. Implement an LSTM for time series prediction rather than character sequence prediction.
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/343)
