@@ -78,7 +78,7 @@ img = d2l.plt.imread('../img/catdog.jpg')
 h, w = img.shape[0:2]
 
 print(h,w)
-X = d2l.rand((1, 3, h, w))  # Construct input data
+X = torch.rand((1, 3, h, w))  # Construct input data
 Y = multibox_prior((h,w), sizes = [0.75, 0.5, 0.25], aspect_ratios = (2, 0.5))
 Y.shape
 ```
@@ -445,7 +445,7 @@ def multibox_detection(id_cat, cls_probs, anchors, nms_threshold):
                                                    anchors[i, 3]])
                                      for i in range(0, len(prob))]
 
-    filtered_bb = d2l.non_max_suppression(output_bb, nms_threshold)
+    filtered_bb = non_max_suppression(output_bb, nms_threshold)
 
     out = []
     for bb in filtered_bb:
