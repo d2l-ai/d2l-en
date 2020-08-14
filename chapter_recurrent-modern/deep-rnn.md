@@ -31,7 +31,7 @@ Just as with multilayer perceptrons, the number of hidden layers $L$ and number 
 
 Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in Gluon. To keep things simple we only illustrate the implementation using such built-in functionality. The code is very similar to the one we used previously for LSTMs. In fact, the only difference is that we specify the number of layers explicitly rather than picking the default of a single layer. Let us begin by importing the appropriate modules and loading data.
 
-```{.python .input  n=17}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import npx
 from mxnet.gluon import rnn
@@ -41,20 +41,41 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+```
+
 The architectural decisions (such as choosing parameters) are very similar to those of previous sections. We pick the same number of inputs and outputs as we have distinct tokens, i.e., `vocab_size`. The number of hidden units is still 256. The only difference is that we now select a nontrivial number of layers `num_layers = 2`.
 
-```{.python .input  n=22}
+```{.python .input}
 vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
 device = d2l.try_gpu()
 lstm_layer = rnn.LSTM(num_hiddens, num_layers)
 model = d2l.RNNModel(lstm_layer, len(vocab))
 ```
 
+```{.python .input}
+#@tab pytorch
+vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
+num_inputs = vocab_size
+device = d2l.try_gpu()
+lstm_layer = nn.LSTM(num_inputs, num_hiddens, num_layers)
+model = d2l.RNNModel(lstm_layer, len(vocab))
+model = model.to(device)
+```
+
 ## Training
 
 The actual invocation logic is identical to before. The only difference is that we now instantiate two layers with LSTMs. This rather more complex architecture and the large number of epochs slow down training considerably.
 
-```{.python .input  n=8}
+```{.python .input}
+#@tab all
 num_epochs, lr = 500, 2
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
