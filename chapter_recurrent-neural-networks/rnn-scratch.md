@@ -484,10 +484,12 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0], device=device)
         else:
-            if isinstance(model, nn.Module):
-                # Using PyTorch built-in concise model 
+            if isinstance(model, nn.Module) and not isinstance(state, tuple):
+                # state is a tensor for nn.GRU  
                 state.detach_()
             else:
+                # state is a tuple of tensors for nn.LSTM and
+                # for our custom scratch implementation 
                 for s in state:
                     s.detach_()
         y = Y.T.reshape(-1)

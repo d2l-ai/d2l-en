@@ -724,10 +724,12 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0], device=device)
         else:
-            if isinstance(model, nn.Module):
-                # Using PyTorch built-in concise model 
+            if isinstance(model, nn.Module) and not isinstance(state, tuple):
+                # state is a tensor for nn.GRU  
                 state.detach_()
             else:
+                # state is a tuple of tensors for nn.LSTM and
+                # for our custom scratch implementation 
                 for s in state:
                     s.detach_()
         y = Y.T.reshape(-1)
@@ -773,12 +775,19 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
 class RNNModel(nn.Module):
-    def __init__(self, rnn_layer, num_hiddens, vocab_size, **kwargs):
+    def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
         self.rnn = rnn_layer
         self.vocab_size = vocab_size
-        self.num_hiddens = num_hiddens
-        self.linear = nn.Linear(self.num_hiddens, self.vocab_size)
+        self.num_hiddens = self.rnn.hidden_size
+        # If the RNN is bidirectional, num_directions should be 2,
+        # else it should be 1.
+        if not self.rnn.bidirectional:
+            self.num_directions = 1
+            self.linear = nn.Linear(self.num_hiddens, self.vocab_size)
+        else:
+            self.num_directions = 2
+            self.linear = nn.Linear(self.num_hiddens*2, self.vocab_size)
 
     def forward(self, inputs, state):
         X = F.one_hot(inputs.T.long(), self.vocab_size)
@@ -792,8 +801,17 @@ class RNNModel(nn.Module):
 
     def begin_state(self, device, batch_size=1):
         """Return the begin state"""
-        return  torch.zeros((1, batch_size, self.num_hiddens), 
-                            device=device)
+        if not isinstance(self.rnn, nn.LSTM):
+            # nn.GRU takes a tensor as hidden state
+            return  torch.zeros((self.num_directions * self.rnn.num_layers,
+                                 batch_size, self.num_hiddens), 
+                                device=device)
+        else:
+            # nn.LSTM takes a tuple of hidden states
+            return (torch.zeros((self.num_directions * self.rnn.num_layers,
+                                 batch_size, self.num_hiddens), device=device), 
+            torch.zeros((self.num_directions * self.rnn.num_layers,
+                         batch_size, self.num_hiddens), device=device))
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md

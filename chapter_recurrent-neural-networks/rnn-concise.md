@@ -99,12 +99,19 @@ class RNNModel(nn.Block):
 #@tab pytorch
 #@save
 class RNNModel(nn.Module):
-    def __init__(self, rnn_layer, num_hiddens, vocab_size, **kwargs):
+    def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
         self.rnn = rnn_layer
         self.vocab_size = vocab_size
-        self.num_hiddens = num_hiddens
-        self.linear = nn.Linear(self.num_hiddens, self.vocab_size)
+        self.num_hiddens = self.rnn.hidden_size
+        # If the RNN is bidirectional, num_directions should be 2,
+        # else it should be 1.
+        if not self.rnn.bidirectional:
+            self.num_directions = 1
+            self.linear = nn.Linear(self.num_hiddens, self.vocab_size)
+        else:
+            self.num_directions = 2
+            self.linear = nn.Linear(self.num_hiddens*2, self.vocab_size)
 
     def forward(self, inputs, state):
         X = F.one_hot(inputs.T.long(), self.vocab_size)
@@ -118,8 +125,17 @@ class RNNModel(nn.Module):
 
     def begin_state(self, device, batch_size=1):
         """Return the begin state"""
-        return  torch.zeros((1, batch_size, self.num_hiddens), 
-                            device=device)
+        if not isinstance(self.rnn, nn.LSTM):
+            # nn.GRU takes a tensor as hidden state
+            return  torch.zeros((self.num_directions * self.rnn.num_layers,
+                                 batch_size, self.num_hiddens), 
+                                device=device)
+        else:
+            # nn.LSTM takes a tuple of hidden states
+            return (torch.zeros((self.num_directions * self.rnn.num_layers,
+                                 batch_size, self.num_hiddens), device=device), 
+            torch.zeros((self.num_directions * self.rnn.num_layers,
+                         batch_size, self.num_hiddens), device=device))
 ```
 
 ## Training and Predicting
@@ -136,7 +152,7 @@ d2l.predict_ch8('time traveller', 10, model, vocab, device)
 ```{.python .input}
 #@tab pytorch
 device = d2l.try_gpu()
-model = RNNModel(rnn_layer, num_hiddens=256, vocab_size=len(vocab))
+model = RNNModel(rnn_layer, vocab_size=len(vocab))
 model = model.to(device)
 d2l.predict_ch8('time traveller', 10, model, vocab, device)
 ```
