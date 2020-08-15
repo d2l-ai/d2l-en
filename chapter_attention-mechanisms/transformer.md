@@ -38,6 +38,14 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
+```{.python .input  n=1}
+#@tab pytorch
+from d2l import torch as d2l
+import math
+import torch
+from torch import nn
+```
+
 ## Multi-Head Attention
 
 Before the discussion of the *multi-head attention* layer, let us quick express the *self-attention* architecture. The self-attention model is a normal attention model, with its query, its key, and its value being copied exactly the same from each item of the sequential inputs. As we illustrate in :numref:`fig_self_attention`, self-attention outputs a same-length sequential output for each input item. Compared with a recurrent layer, output items of a self-attention layer can be computed in parallel and, therefore, it is easy to obtain a highly-efficient implementation.
@@ -111,6 +119,45 @@ class MultiHeadAttention(nn.Block):
         return self.W_o(output_concat)
 ```
 
+```{.python .input  n=2}
+#@tab pytorch
+#@save
+class MultiHeadAttention(nn.Module):
+    def __init__(self, key_size, query_size, value_size, num_hiddens, num_heads,
+                 dropout, bias=False, **kwargs):
+        super(MultiHeadAttention, self).__init__(**kwargs)
+        self.num_heads = num_heads
+        self.attention = d2l.DotProductAttention(dropout)
+        self.W_q = nn.Linear(query_size, num_hiddens, bias=bias)
+        self.W_k = nn.Linear(key_size, num_hiddens, bias=bias)
+        self.W_v = nn.Linear(value_size, num_hiddens, bias=bias)
+        self.W_o = nn.Linear(num_hiddens, num_hiddens, bias=bias)
+
+    def forward(self, query, key, value, valid_len):
+        # For self-attention, `query`, `key`, and `value` shape:
+        # (`batch_size`, `seq_len`, `dim`), where `seq_len` is the length of
+        # input sequence. `valid_len` shape is either (`batch_size`, ) or
+        # (`batch_size`, `seq_len`).
+
+        # Project and transpose `query`, `key`, and `value` from
+        # (`batch_size`, `seq_len`, `num_hiddens`) to
+        # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+        query = transpose_qkv(self.W_q(query), self.num_heads)
+        key = transpose_qkv(self.W_k(key), self.num_heads)
+        value = transpose_qkv(self.W_v(value), self.num_heads)
+
+        if valid_len is not None:
+            valid_len = torch.repeat_interleave(valid_len, repeats=self.num_heads, dim=0)
+
+        # For self-attention, `output` shape:
+        # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+        output = self.attention(query, key, value, valid_len)
+
+        # `output_concat` shape: (`batch_size`, `seq_len`, `num_hiddens`)
+        output_concat = transpose_output(output, self.num_heads)
+        return self.W_o(output_concat)
+```
+
 Here are the definitions of the transpose functions `transpose_qkv` and `transpose_output`, which are the inverse of each other.
 
 ```{.python .input  n=3}
@@ -139,13 +186,49 @@ def transpose_output(X, num_heads):
     return X.reshape(X.shape[0], X.shape[1], -1)
 ```
 
+```{.python .input  n=3}
+#@tab pytorch
+#@save
+def transpose_qkv(X, num_heads):
+    # Input `X` shape: (`batch_size`, `seq_len`, `num_hiddens`).
+    # Output `X` shape:
+    # (`batch_size`, `seq_len`, `num_heads`, `num_hiddens` / `num_heads`)
+    X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
+
+    # `X` shape:
+    # (`batch_size`, `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+    X = X.permute(0, 2, 1, 3)
+
+    # `output` shape:
+    # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+    output = X.reshape(-1, X.shape[2], X.shape[3])
+    return output
+
+
+#@save
+def transpose_output(X, num_heads):
+    # A reversed version of `transpose_qkv`
+    X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
+    X = X.permute(0, 2, 1, 3)
+    return X.reshape(X.shape[0], X.shape[1], -1)
+```
+
 Let us test the `MultiHeadAttention` model in the a toy example. Create a multi-head attention with the hidden size $d_o = 100$, the output will share the same batch size and sequence length as the input, but the last dimension will be equal to the `num_hiddens` $= 100$.
 
 ```{.python .input  n=4}
-cell = MultiHeadAttention(90, 9, 0.5)
+cell = MultiHeadAttention(100, 10, 0.5)
 cell.initialize()
 X = np.ones((2, 4, 5))
 valid_len = np.array([2, 3])
+cell(X, X, X, valid_len).shape
+```
+
+```{.python .input}
+#@tab pytorch
+cell = MultiHeadAttention(5, 5, 5, 100, 10, 0.5)
+cell.eval()
+X = d2l.ones((2, 4, 5))
+valid_len = d2l.tensor([2, 3])
 cell(X, X, X, valid_len).shape
 ```
 
@@ -168,12 +251,33 @@ class PositionWiseFFN(nn.Block):
         return self.dense2(self.dense1(X))
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+class PositionWiseFFN(nn.Module):
+    def __init__(self, ffn_num_input, ffn_num_hiddens, pw_num_outputs, **kwargs):
+        super(PositionWiseFFN, self).__init__(**kwargs)
+        self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)
+        self.relu = nn.ReLU()
+        self.dense2 = nn.Linear(ffn_num_hiddens, pw_num_outputs)
+
+    def forward(self, X):
+        return self.dense2(self.relu(self.dense1(X)))
+```
+
 Similar to the multi-head attention, the position-wise feed-forward network will only change the last dimension size of the input---the feature dimension. In addition, if two items in the input sequence are identical, the according outputs will be identical as well.
 
 ```{.python .input  n=6}
 ffn = PositionWiseFFN(4, 8)
 ffn.initialize()
 ffn(np.ones((2, 3, 4)))[0]
+```
+
+```{.python .input}
+#@tab pytorch
+ffn = PositionWiseFFN(4, 4, 8)
+ffn.eval()
+ffn(d2l.ones((2, 3, 4)))[0]
 ```
 
 ## Add and Norm
@@ -193,6 +297,17 @@ with autograd.record():
     print('layer norm:', layer(X), '\nbatch norm:', batch(X))
 ```
 
+```{.python .input}
+#@tab pytorch
+layer = nn.LayerNorm([2])
+layer.eval()
+batch = nn.BatchNorm1d(2)
+batch.eval()
+X = d2l.tensor([[1, 2], [2, 3]], dtype=torch.float32)
+# Compute mean and variance from `X` in the training mode
+print('layer norm:', layer(X), '\nbatch norm:', batch(X))
+```
+
 Now let us implement the connection block `AddNorm` together. `AddNorm` accepts two inputs $X$ and $Y$. We can deem $X$ as the original input in the residual network, and $Y$ as the outputs from either the multi-head attention layer or the position-wise FFN network. In addition, we apply dropout on $Y$ for regularization.
 
 ```{.python .input  n=8}
@@ -207,12 +322,32 @@ class AddNorm(nn.Block):
         return self.ln(self.dropout(Y) + X)
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+class AddNorm(nn.Module):
+    def __init__(self, normalized_shape, dropout, **kwargs):
+        super(AddNorm, self).__init__(**kwargs)
+        self.dropout = nn.Dropout(dropout)
+        self.ln = nn.LayerNorm(normalized_shape)
+
+    def forward(self, X, Y):
+        return self.ln(self.dropout(Y) + X)
+```
+
 Due to the residual connection, $X$ and $Y$ should have the same shape.
 
 ```{.python .input  n=9}
 add_norm = AddNorm(0.5)
 add_norm.initialize()
 add_norm(np.ones((2, 3, 4)), np.ones((2, 3, 4))).shape
+```
+
+```{.python .input}
+#@tab pytorch
+add_norm = AddNorm([3,4], 0.5) # normalized_shape is input.size()[1:]
+add_norm.eval()
+add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 ```
 
 ## Positional Encoding
@@ -253,6 +388,24 @@ class PositionalEncoding(nn.Block):
         return self.dropout(X)
 ```
 
+```{.python .input}
+#@tab pytorch
+class PositionalEncoding(nn.Module):
+    def __init__(self, num_hiddens, dropout, max_len=1000):
+        super(PositionalEncoding, self).__init__()
+        self.dropout = nn.Dropout(dropout)
+        # Create a long enough `P`
+        self.P = d2l.zeros((1, max_len, num_hiddens))
+        X = torch.arange(0, max_len, dtype=torch.float32).reshape(-1, 1) / torch.pow(
+            10000, torch.arange(0, num_hiddens, 2, dtype=torch.float32) / num_hiddens)
+        self.P[:, :, 0::2] = torch.sin(X)
+        self.P[:, :, 1::2] = torch.cos(X)
+
+    def forward(self, X):
+        X = X + self.P[:, :X.shape[1], :].to(X.device)
+        return self.dropout(X)
+```
+
 Now we test the `PositionalEncoding` class with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset (i.e. phase) because one is produced by a sine function and the other is produced by a cosine function. The $6^{\mathrm{th}}$ and $7^{\mathrm{th}}$ dimensions have lower frequency.
 
 ```{.python .input  n=11}
@@ -260,6 +413,15 @@ pe = PositionalEncoding(20, 0)
 pe.initialize()
 Y = pe(np.zeros((1, 100, 20)))
 d2l.plot(np.arange(100), Y[0, :, 4:8].T, figsize=(6, 2.5),
+         legend=["dim %d" % p for p in [4, 5, 6, 7]])
+```
+
+```{.python .input}
+#@tab pytorch
+pe = PositionalEncoding(20, 0)
+pe.eval()
+Y = pe(d2l.zeros((1, 100, 20)))
+d2l.plot(torch.arange(100), Y[0, :, 4:8].T, figsize=(6, 2.5),
          legend=["dim %d" % p for p in [4, 5, 6, 7]])
 ```
 
@@ -284,12 +446,40 @@ class EncoderBlock(nn.Block):
         return self.addnorm2(Y, self.ffn(Y))
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+class EncoderBlock(nn.Module):
+    def __init__(self, key_size, query_size, value_size, num_hiddens, norm_shape,
+                 ffn_num_input, ffn_num_hiddens, num_heads, dropout,
+                 use_bias=False, **kwargs):
+        super(EncoderBlock, self).__init__(**kwargs)
+        self.attention = MultiHeadAttention(key_size, query_size, value_size,
+                                            num_hiddens, num_heads, dropout,
+                                            use_bias)
+        self.addnorm1 = AddNorm(norm_shape, dropout)
+        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens, num_hiddens)
+        self.addnorm2 = AddNorm(norm_shape, dropout)
+
+    def forward(self, X, valid_len):
+        Y = self.addnorm1(X, self.attention(X, X, X, valid_len))
+        return self.addnorm2(Y, self.ffn(Y))
+```
+
 Due to the residual connections, this block will not change the input shape. It means that the `num_hiddens` argument should be equal to the input size of the last dimension. In our toy example below,  `num_hiddens` $= 24$, `ffn_num_hiddens` $=48$, `num_heads` $= 8$, and `dropout` $= 0.5$.
 
 ```{.python .input  n=13}
 X = np.ones((2, 100, 24))
 encoder_blk = EncoderBlock(24, 48, 8, 0.5)
 encoder_blk.initialize()
+encoder_blk(X, valid_len).shape
+```
+
+```{.python .input}
+#@tab pytorch
+X = d2l.ones((2, 100, 24))
+encoder_blk = EncoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5)
+encoder_blk.eval()
 encoder_blk(X, valid_len).shape
 ```
 
@@ -317,12 +507,44 @@ class TransformerEncoder(d2l.Encoder):
         return X
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+class TransformerEncoder(d2l.Encoder):
+    def __init__(self, vocab_size, key_size, query_size, value_size, num_hiddens,
+                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
+                 num_layers, dropout, use_bias=False, **kwargs):
+        super(TransformerEncoder, self).__init__(**kwargs)
+        self.num_hiddens = num_hiddens
+        self.embedding = nn.Embedding(vocab_size, num_hiddens)
+        self.pos_encoding = PositionalEncoding(num_hiddens, dropout)
+        self.blks = nn.Sequential()
+        for i in range(num_layers):
+            self.blks.add_module("block"+str(i),
+                EncoderBlock(key_size, query_size, value_size, num_hiddens,
+                             norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
+                             dropout, use_bias))
+
+    def forward(self, X, valid_len, *args):
+        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
+        for blk in self.blks:
+            X = blk(X, valid_len)
+        return X
+```
+
 Let us create an encoder with two stacked  Transformer encoder blocks, whose hyperparameters are the same as before. Similar to the previous toy example's parameters, we add two more parameters `vocab_size` to be $200$ and `num_layers` to be $2$ here.
 
 ```{.python .input  n=15}
 encoder = TransformerEncoder(200, 24, 48, 8, 2, 0.5)
 encoder.initialize()
 encoder(np.ones((2, 100)), valid_len).shape
+```
+
+```{.python .input}
+#@tab pytorch
+encoder = TransformerEncoder(200, 24, 24, 24, 24, [100, 24], 24, 48, 8, 2, 0.5)
+encoder.eval()
+encoder(d2l.ones((2, 100), dtype=torch.long), valid_len).shape
 ```
 
 ## Decoder
@@ -336,7 +558,7 @@ To be specific, at timestep $t$, assume that $\mathbf x_t$ is the current input,
 
 During training, the output for the $t$-query could observe all the previous key-value pairs. It results in an different behavior from prediction. Thus, during prediction we can eliminate the unnecessary information by specifying the valid length to be $t$ for the $t^\textrm{th}$ query.
 
-```{.python .input  n=16}
+```{.python .input}
 class DecoderBlock(nn.Block):
     # `i` means it is the i-th block in the decoder
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads,
@@ -374,12 +596,63 @@ class DecoderBlock(nn.Block):
         return self.addnorm3(Z, self.ffn(Z)), state
 ```
 
+```{.python .input  n=16}
+#@tab pytorch
+class DecoderBlock(nn.Module):
+    # `i` means it is the i-th block in the decoder
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
+                 dropout, i, **kwargs):
+        super(DecoderBlock, self).__init__(**kwargs)
+        self.i = i
+        self.attention1 = MultiHeadAttention(key_size, query_size, value_size,
+                                             num_hiddens, num_heads, dropout)
+        self.addnorm1 = AddNorm(norm_shape, dropout)
+        self.attention2 = MultiHeadAttention(key_size, query_size, value_size,
+                                             num_hiddens, num_heads, dropout)
+        self.addnorm2 = AddNorm(norm_shape, dropout)
+        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens, num_hiddens)
+        self.addnorm3 = AddNorm(norm_shape, dropout)
+
+    def forward(self, X, state):
+        enc_outputs, enc_valid_len = state[0], state[1]
+        # `state[2][i]` contains the past queries for this block
+        if state[2][self.i] is None:
+            key_values = X
+        else:
+            key_values = torch.cat((state[2][self.i], X), axis=1)
+        state[2][self.i] = key_values
+        if self.training:
+            batch_size, seq_len, _ = X.shape
+            # Shape: (batch_size, seq_len), the values in the j-th column
+            # are j+1
+            valid_len = torch.repeat_interleave(torch.arange(1, seq_len + 1, device=X.device),
+                                                batch_size, dim=0)
+        else:
+            valid_len = None
+
+        X2 = self.attention1(X, key_values, key_values, valid_len)
+        Y = self.addnorm1(X, X2)
+        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_len)
+        Z = self.addnorm2(Y, Y2)
+        return self.addnorm3(Z, self.ffn(Z)), state
+```
+
 Similar to the  Transformer encoder block, `num_hiddens` should be equal to the last dimension size of $X$.
 
 ```{.python .input  n=17}
 decoder_blk = DecoderBlock(24, 48, 8, 0.5, 0)
 decoder_blk.initialize()
 X = np.ones((2, 100, 24))
+state = [encoder_blk(X, valid_len), valid_len, [None]]
+decoder_blk(X, state)[0].shape
+```
+
+```{.python .input}
+#@tab pytorch
+decoder_blk = DecoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5, 0)
+decoder_blk.eval()
+X = d2l.ones((2, 100, 24))
 state = [encoder_blk(X, valid_len), valid_len, [None]]
 decoder_blk(X, state)[0].shape
 ```
@@ -414,6 +687,35 @@ class TransformerDecoder(d2l.Decoder):
         return self.dense(X), state
 ```
 
+```{.python .input}
+#@tab pytorch
+class TransformerDecoder(d2l.Decoder):
+    def __init__(self, vocab_size, key_size, query_size, value_size,
+                 num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
+                 num_heads, dropout, **kwargs):
+        super(TransformerDecoder, self).__init__(**kwargs)
+        self.num_hiddens = num_hiddens
+        self.num_layers = num_layers
+        self.embedding = nn.Embedding(vocab_size, num_hiddens)
+        self.pos_encoding = PositionalEncoding(num_hiddens, dropout)
+        self.blks = nn.Sequential()
+        for i in range(num_layers):
+            self.blks.add_module("block"+str(i),
+                DecoderBlock(key_size, query_size, value_size, num_hiddens,
+                             norm_shape, ffn_num_input, ffn_num_hiddens,
+                             num_heads, dropout, i))
+        self.dense = nn.Linear(num_hiddens, vocab_size)
+
+    def init_state(self, enc_outputs, env_valid_len, *args):
+        return [enc_outputs, env_valid_len, [None]*self.num_layers]
+
+    def forward(self, X, state):
+        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
+        for blk in self.blks:
+            X, state = blk(X, state)
+        return self.dense(X), state
+```
+
 ## Training
 
 Finally, we can build an encoder-decoder model with the Transformer architecture.
@@ -436,11 +738,34 @@ model = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
 ```
 
+```{.python .input}
+#@tab pytorch
+num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.0, 64, 10
+lr, num_epochs, device = 0.005, 100, d2l.try_gpu()
+ffn_num_input, ffn_num_hiddens, num_heads = 32, 64, 4
+key_size, query_size, value_size = 32, 32, 32
+norm_shape = [32]
+
+src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
+
+encoder = TransformerEncoder(
+    len(src_vocab), key_size, query_size, value_size, num_hiddens,
+    norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
+    num_layers, dropout)
+decoder = TransformerDecoder(
+    len(src_vocab), key_size, query_size, value_size, num_hiddens,
+    norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
+    dropout)
+model = d2l.EncoderDecoder(encoder, decoder)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
+```
+
 As we can see from the training time and accuracy, compared with the seq2seq model with attention model, Transformer runs faster per epoch, and converges faster at the beginning.
 
 We can use the trained Transformer to translate some simple sentences.
 
 ```{.python .input  n=20}
+#@tab all
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + d2l.predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, device))
