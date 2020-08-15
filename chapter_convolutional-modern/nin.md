@@ -138,7 +138,7 @@ net = nn.Sequential(
     nn.Dropout(0.5),
     # There are 10 label classes
     nin_block(384, 10, kernel_size=3, strides=1, padding=1),
-    nn.AdaptiveMaxPool2d((1, 1)),
+    nn.AdaptiveAvgPool2d((1, 1)),
     # Transform the four-dimensional output into two-dimensional output with a
     # shape of (batch size, 10)
     nn.Flatten())
