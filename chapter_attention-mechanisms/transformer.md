@@ -755,7 +755,7 @@ encoder = TransformerEncoder(
 decoder = TransformerDecoder(
     len(src_vocab), key_size, query_size, value_size, num_hiddens,
     norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-    dropout)
+    num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
 ```
