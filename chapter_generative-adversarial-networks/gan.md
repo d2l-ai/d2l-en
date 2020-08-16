@@ -261,6 +261,8 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
         nn.init.normal_(w, 0, 0.02)
     for w in net_G.parameters():
         nn.init.normal_(w, 0, 0.02)
+    net_D.zero_grad()
+    net_G.zero_grad()
     trainer_D = torch.optim.Adam(net_D.parameters(), lr=lr_D)
     trainer_G = torch.optim.Adam(net_G.parameters(), lr=lr_G)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
