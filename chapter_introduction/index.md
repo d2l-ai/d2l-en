@@ -980,7 +980,7 @@ All the examples so far were related to *Supervised Learning*,
 i.e., situations where we feed the model a giant dataset
 containing both the features and corresponding target values.
 You could think of the supervised learner as having
-an extremely specialized job and an extremely anal boss.
+an extremely specialized job and an extremely banal boss.
 The boss stands over your shoulder and tells you exactly what to do
 in every situation until you learn to map from situations to actions.
 Working for such a boss sounds pretty lame.
