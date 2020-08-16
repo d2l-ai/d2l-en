@@ -646,9 +646,9 @@ such as weight decay and dropout.
 
 1. Can you solve the polynomial regression problem exactly? Hint: use linear algebra.
 1. Consider model selection for polynomials:
-    * Plot the training loss vs. model complexity (degree of the polynomial). What do you observe? What degree of polynomial do you need to reduce the training loss to 0?
-    * Plot the test loss in this case.
-    * Generate the same plot as a function of the amount of data.
+    1. Plot the training loss vs. model complexity (degree of the polynomial). What do you observe? What degree of polynomial do you need to reduce the training loss to 0?
+    1. Plot the test loss in this case.
+    1. Generate the same plot as a function of the amount of data.
 1. What happens if you drop the normalization ($1/i!$) of the polynomial features $x^i$? Can you fix this in some other way?
 1. Can you ever expect to see zero generalization error?
 
