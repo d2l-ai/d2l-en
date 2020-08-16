@@ -72,7 +72,7 @@ $$c_t = \partial_{h_{t-1}}f(x_{t},h_{t-1},w_h).$$
 Therefore, $a_{t}=b_{t}+c_{t}a_{t-1}$ becomes the following recursion
 
 $$
-\partial_{w_h}h_{t}=\partial_{w_h}f(x_{t},h_{t-1},w)+\partial_{h}f(x_{t},h_{t-1},w_h)\partial_{w_h}h_{t-1}.
+\partial_{w_h}h_{t}=\partial_{w_h}f(x_{t},h_{t-1},w)+\partial_{h_{t-1}}f(x_{t},h_{t-1},w_h)\partial_{w_h}h_{t-1}.
 $$
 
 By :eqref:`eq_bptt_at`, the third part will be
