@@ -186,7 +186,6 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
     """Update generator."""
     batch_size = Z.shape[0]
     ones = np.ones((batch_size,), ctx=Z.ctx)
-    trainer_G.zero_grad()
     with autograd.record():
         # We could reuse `fake_X` from `update_D` to save computation
         fake_X = net_G(Z)
