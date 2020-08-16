@@ -72,7 +72,7 @@ data = X.dot(A) + b
 
 ```{.python .input}
 #@tab pytorch
-h.normal(0.0, 1, (1000, 2))
+X = torch.normal(0.0, 1, (1000, 2))
 A = torch.tensor([[1, 2], [-0.1, 0.5]])
 b = torch.tensor([1, 2])
 data = torch.mm(X, A) + b
