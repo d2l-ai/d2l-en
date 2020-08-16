@@ -692,7 +692,7 @@ class TransformerDecoder(d2l.Decoder):
 class TransformerDecoder(d2l.Decoder):
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
-                 num_heads, dropout, **kwargs):
+                 num_heads, num_layers, dropout, **kwargs):
         super(TransformerDecoder, self).__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.num_layers = num_layers
