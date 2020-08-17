@@ -395,7 +395,7 @@ you can find the associated discussion page link at the end of each chapter.
 ### Contribute
 
 If you find any pedagogical suggestions, typo corrections, and other improvements from community contributors, please do not hesitate to contribute ([learn how](https://d2l.ai/chapter_appendix-tools-for-deep-learning/contributing.html)) to this open source book.
-And We are trying to translate MXnet to PyTorch and TensorFlow frameworks, help us if you can. Your help is valuable for making the book better for everyone. After your [PR](https://github.com/d2l-ai/d2l-en/pulls) or [issue](https://github.com/d2l-ai/d2l-en/issues), your name will appear on the [acknowledgments](https://d2l.ai/chapter_preface/index.html#Acknowledgments) and the following "Acknowledgments". Thanks.
+And We are trying to translate MXnet to PyTorch and TensorFlow frameworks, help us if you can. You can also translate the book to any [languages](https://github.com/d2l-ai/d2l-en/issues/670). Your help is valuable for making the book better for everyone. After your [PR](https://github.com/d2l-ai/d2l-en/pulls) or [issue](https://github.com/d2l-ai/d2l-en/issues), your name will appear on the [acknowledgments](https://d2l.ai/chapter_preface/index.html#Acknowledgments) and the following "Acknowledgments". Thanks.
 
 ## Acknowledgments
 
