@@ -19,7 +19,7 @@ npx.set_np()
 %matplotlib inline
 from d2l import torch as d2l
 import torch
-import torchvision.ops.nms as nms
+import torchvision
 import itertools
 import math
 ```
@@ -417,12 +417,11 @@ output
 ```{.python .input}
 #@tab pytorch
 #@save
-from collections import namedtuple
-
-PredBoundingBox = namedtuple("PredBoundingBox", ["probability", "class_id", "classname", "bounding_box"])
     
 def multibox_detection(id_cat, cls_probs, anchors, nms_threshold):
 
+    from collections import namedtuple
+    PredBoundingBox = namedtuple("PredBoundingBox", ["probability", "class_id", "classname", "bounding_box"])
     id_new = dict()
     id_new[0] = 'background'
     for i in (id_cat.keys()):
@@ -444,7 +443,7 @@ def multibox_detection(id_cat, cls_probs, anchors, nms_threshold):
                                                    anchors[i, 3]])
                                      for i in range(0, len(prob))]
 
-    filtered_bb = nms(output_bb, nms_threshold)
+    filtered_bb = torchvision.ops.nms(output_bb, nms_threshold)
 
     out = []
     for bb in filtered_bb:
