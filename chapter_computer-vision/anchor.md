@@ -416,7 +416,6 @@ output
 ```{.python .input}
 #@tab pytorch
 #@save
-
 def non_max_suppression(bounding_boxes: list, iou_threshold: float = 0.1) -> list:
     filtered_bb = []
 
@@ -433,7 +432,11 @@ def non_max_suppression(bounding_boxes: list, iou_threshold: float = 0.1) -> lis
                 remove_items.append(bb)
         bounding_boxes = [bb for bb in bounding_boxes if bb not in remove_items]
     return filtered_bb
+```
 
+```{.python .input}
+#@tab pytorch
+#@save
 def multibox_detection(id_cat, cls_probs, anchors, nms_threshold):
 
     from collections import namedtuple
