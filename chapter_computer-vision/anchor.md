@@ -21,7 +21,6 @@ from d2l import torch as d2l
 import torch
 import torchvision.ops.nms as nms
 import itertools
-from collections import namedtuple
 import math
 ```
 
@@ -418,6 +417,8 @@ output
 ```{.python .input}
 #@tab pytorch
 #@save
+from collections import namedtuple
+
 PredBoundingBox = namedtuple("PredBoundingBox", ["probability", "class_id", "classname", "bounding_box"])
     
 def multibox_detection(id_cat, cls_probs, anchors, nms_threshold):

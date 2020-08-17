@@ -1305,8 +1305,7 @@ def multibox_target(class_true, bb_true, anchors):
 
 
 # Defined in file: ./chapter_computer-vision/anchor.md
-PredBoundingBox = namedtuple("PredBoundingBox", ["probability", "class_id", "classname", "bounding_box"])
-    
+from collections import namedtuple
 
 
 # Alias defined in config.ini
