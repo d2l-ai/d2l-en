@@ -392,6 +392,10 @@ located at [discuss.d2l.ai](https://discuss.d2l.ai/).
 When you have questions on any section of the book,
 you can find the associated discussion page link at the end of each chapter.
 
+### Contribute
+
+If you find any pedagogical suggestions, typo corrections, and other improvements from community contributors, please do not hesitate to contribute ([learn how](https://d2l.ai/chapter_appendix-tools-for-deep-learning/contributing.html)) to this open source book.
+And We are trying to translate MXnet to PyTorch and TensorFlow frameworks, help us if you can. Your help is valuable for making the book better for everyone. After your [PR](https://github.com/d2l-ai/d2l-en/pulls) or [issue](https://github.com/d2l-ai/d2l-en/issues), your name will appear on the [acknowledgments](https://d2l.ai/chapter_preface/index.html#Acknowledgments) and the following "Acknowledgments". Thanks.
 
 ## Acknowledgments
 
@@ -437,7 +441,7 @@ Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writ
 * To successfully apply deep learning, you must understand how to cast a problem, the mathematics of modeling, the algorithms for fitting your models to data, and the engineering techniques to implement it all.
 * This book presents a comprehensive resource, including prose, figures, mathematics, and code, all in one place.
 * To answer questions related to this book, visit our forum at https://discuss.d2l.ai/.
-* All notebooks are available for download on GitHub.
+* All notebooks are available for download on [GitHub](https://github.com/d2l-ai/d2l-en/).
 
 
 ## Exercises
