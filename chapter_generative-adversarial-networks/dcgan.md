@@ -18,6 +18,7 @@ npx.set_np()
 from d2l import torch as d2l
 import torch
 import torchvision
+from torch import nn
 ```
 
 ## The Pokemon Dataset
@@ -107,6 +108,21 @@ class G_block(nn.Block):
         return self.activation(self.batch_norm(self.conv2d_trans(X)))
 ```
 
+```{.python .input}
+#@tab pytorch
+class G_block(nn.Module):
+        def __init__(self, channels, nz=3, kernel_size=4, strides=2,
+                 padding=1, alpha=0.2, **kwargs):
+            super(G_block, self).__init__(**kwargs)
+            self.conv2d = nn.ConvTranspose2d(
+                nz, channels, kernel_size, strides, padding, bias=False)
+            self.batch_norm = nn.BatchNorm2d(channels)
+            self.activation = nn.ReLU(alpha)
+
+        def forward(self, X):
+            return self.activation(self.batch_norm(self.conv2d(X)))
+```
+
 In default, the transposed convolution layer uses a $k_h = k_w = 4$ kernel, a $s_h = s_w = 2$ strides, and a $p_h = p_w = 1$ padding. With a input shape of $n_h^{'} \times n_w^{'} = 16 \times 16$, the generator block will double input's width and height.
 
 $$
@@ -125,12 +141,26 @@ g_blk.initialize()
 g_blk(x).shape
 ```
 
+```{.python .input}
+#@tab pytorch
+x = torch.zeros((2, 3, 16, 16))
+g_blk = G_block(20)
+g_blk(x).shape
+```
+
 If changing the transposed convolution layer to a $4\times 4$ kernel, $1\times 1$ strides and zero padding. With a input size of $1 \times 1$, the output will have its width and height increased by 3 respectively.
 
 ```{.python .input}
 x = np.zeros((2, 3, 1, 1))
 g_blk = G_block(20, strides=1, padding=0)
 g_blk.initialize()
+g_blk(x).shape
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.zeros((2, 3, 1, 1))
+g_blk = G_block(20, strides=1, padding=0)
 g_blk(x).shape
 ```
 
@@ -148,11 +178,31 @@ net_G.add(G_block(n_G*8, strides=1, padding=0),  # Output: (64 * 8, 4, 4)
               activation='tanh'))  # Output: (3, 64, 64)
 ```
 
+```{.python .input}
+#@tab pytorch
+n_G = 64
+net_G = nn.Sequential(
+    G_block(n_G*8, nz=100, strides=1, padding=0),  # Output: (64 * 8, 4, 4)
+    G_block(n_G*4, n_G*8),  # Output: (64 * 4, 8, 8)
+    G_block(n_G*2, n_G*4),  # Output: (64 * 2, 16, 16)
+    G_block(n_G, n_G*2),    # Output: (64, 32, 32)
+    Conv2DTranspose(
+              3, nc=n_G, kernel_size=4, strides=2, padding=1, use_bias=False),
+    nn.Tanh()               # Output: (3, 64, 64)
+)
+```
+
 Generate a 100 dimensional latent variable to verify the generator's output shape.
 
 ```{.python .input}
 x = np.zeros((1, 100, 1, 1))
 net_G.initialize()
+net_G(x).shape
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.zeros((1, 100, 1, 1))
 net_G(x).shape
 ```
 
@@ -171,6 +221,15 @@ Y = [nn.LeakyReLU(alpha)(x).asnumpy() for alpha in alphas]
 d2l.plot(x.asnumpy(), Y, 'x', 'y', alphas)
 ```
 
+```{.python .input}
+#@tab pytorch
+alphas = [0, 0.2, 0.4, .6, .8, 1]
+x = torch.arange(-2, 1, 0.1)
+Y = [nn.LeakyReLU(alpha)(x).numpy() for alpha in alphas]
+d2l.plot(x.numpy(), Y, 'x', 'y', alphas)
+```
+
+
 The basic block of the discriminator is a convolution layer followed by a batch normalization layer and a leaky ReLU activation. The hyperparameters of the convolution layer are similar to the transpose convolution layer in the generator block.
 
 ```{.python .input}
@@ -186,6 +245,22 @@ class D_block(nn.Block):
     def forward(self, X):
         return self.activation(self.batch_norm(self.conv2d(X)))
 ```
+
+```{.python .input}
+#@tab pytorch
+class D_block(nn.Module):
+        def __init__(self, channels, nc=3, kernel_size=4, strides=2,
+                 padding=1, alpha=0.2, **kwargs):
+            super(D_block, self).__init__(**kwargs)
+            self.conv2d = nn.Conv2d(
+                nc, channels, kernel_size, strides, padding, bias=False)
+            self.batch_norm = nn.BatchNorm2d(channels)
+            self.activation = nn.LeakyReLU(alpha, inplace=True)
+
+        def forward(self, X):
+            return self.activation(self.batch_norm(self.conv2d(X)))
+```
+
 
 A basic block with default settings will halve the width and height of the inputs, as we demonstrated in :numref:`sec_padding`. For example, given a input shape $n_h = n_w = 16$, with a kernel shape $k_h = k_w = 4$, a stride shape $s_h = s_w = 2$, and a padding shape $p_h = p_w = 1$, the output shape will be:
 
@@ -204,6 +279,13 @@ d_blk.initialize()
 d_blk(x).shape
 ```
 
+```{.python .input}
+#@tab pytorch
+x = torch.zeros((2, 3, 16, 16))
+d_blk = D_block(20)
+d_blk(x).shape
+```
+
 The discriminator is a mirror of the generator.
 
 ```{.python .input}
@@ -216,11 +298,33 @@ net_D.add(D_block(n_D),   # Output: (64, 32, 32)
           nn.Conv2D(1, kernel_size=4, use_bias=False))  # Output: (1, 1, 1)
 ```
 
+```{.python .input}
+#@tab pytorch
+def Conv2D(channels, kernel_size, use_bias, nc=3):
+    return nn.Conv2d(nc, channels, kernel_size=kernel_size, bias=use_bias)
+
+
+n_D = 64
+net_D = nn.Sequential(
+    D_block(n_D),    # Output: (64, 32, 32)
+    D_block(n_D*2, n_D),  # Output: (64 * 2, 16, 16)
+    D_block(n_D*4, n_D*2),  # Output: (64 * 4, 8, 8)
+    D_block(n_D*8, n_D*4),  # Output: (64 * 8, 4, 4)
+    Conv2D(1, nc=n_D*8, kernel_size=4, use_bias=False)  # Output: (1, 1, 1)
+)
+```
+
 It uses a convolution layer with output channel $1$ as the last layer to obtain a single prediction value.
 
 ```{.python .input}
 x = np.zeros((1, 3, 64, 64))
 net_D.initialize()
+net_D(x).shape
+```
+
+```{.python .input}
+#@tab pytorch
+x = torch.zeros((1, 3, 64, 64))
 net_D(x).shape
 ```
 
