@@ -1305,40 +1305,23 @@ def multibox_target(class_true, bb_true, anchors):
 
 
 # Defined in file: ./chapter_computer-vision/anchor.md
-    
-def multibox_detection(id_cat, cls_probs, anchors, nms_threshold):
 
-    from collections import namedtuple
-    PredBoundingBox = namedtuple("PredBoundingBox", ["probability", "class_id", "classname", "bounding_box"])
-    id_new = dict()
-    id_new[0] = 'background'
-    for i in (id_cat.keys()):
-        id_new[i+1] = id_cat[i]
+def non_max_suppression(bounding_boxes: list, iou_threshold: float = 0.1) -> list:
+    filtered_bb = []
 
-    cls_probs = cls_probs.transpose(0,1)
+    while len(bounding_boxes) != 0:
+        best_bb = bounding_boxes.pop(0)
+        filtered_bb.append(best_bb)
 
-    prob, class_id = torch.max(cls_probs,1)
+        remove_items = []
+        for bb in bounding_boxes:
+            iou = jaccard(torch.tensor(best_bb.bounding_box).unsqueeze(0), 
+                          torch.tensor(bb.bounding_box).unsqueeze(0))
 
-    prob = prob.detach().cpu().numpy()
-    class_id = class_id.detach().cpu().numpy()
-
-    output_bb = [PredBoundingBox(probability=prob[i],
-                                     class_id=class_id[i],
-                                     classname=id_new[class_id[i]],
-                                     bounding_box=[anchors[i, 0], 
-                                                   anchors[i, 1], 
-                                                   anchors[i, 2], 
-                                                   anchors[i, 3]])
-                                     for i in range(0, len(prob))]
-
-    filtered_bb = torchvision.ops.nms(output_bb, nms_threshold)
-
-    out = []
-    for bb in filtered_bb:
-        out.append([bb.class_id-1, bb.probability, *bb.bounding_box])
-    out = torch.Tensor(out)
-
-    return out
+            if iou > iou_threshold:
+                remove_items.append(bb)
+        bounding_boxes = [bb for bb in bounding_boxes if bb not in remove_items]
+    return filtered_bb
 
 
 # Alias defined in config.ini
