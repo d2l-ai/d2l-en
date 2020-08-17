@@ -186,7 +186,7 @@ then you can install with the following command:
 pip install mxnet-cu101==1.6.0b20190926
 
 # For Linux and macOS users
-pip install mxnet-cu101==1.6.0
+pip install mxnet-cu101==1.6.0.post0
 ```
 
 
