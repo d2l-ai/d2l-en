@@ -133,7 +133,7 @@
 
 ## References
 
-* Refer to [d2lbook](http://book.d2l.ai/examples/markdown.html#cross-references)how to add references for figure, table and equations.
+* Refer to [d2lbook](https://book.d2l.ai/user/markdown.html#cross-references)how to add references for figure, table and equations.
 
 
 ## QR Code
