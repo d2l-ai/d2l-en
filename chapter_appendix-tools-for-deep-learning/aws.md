@@ -3,7 +3,7 @@
 
 In this section, we will show you how to install all libraries on a raw Linux machine. Remember that in :numref:`sec_sagemaker` we discussed how to use Amazon SageMaker, while building an instance by yourself costs less on AWS. The walkthrough includes a number of steps:
 
-1. Request for a GPU Linux instance from AWS EC2.
+1. Request for a GPU Linux instance from [AWS EC2](https://docs.aws.amazon.com/ec2/index.html).
 1. Optionally: install CUDA or use an AMI with CUDA preinstalled.
 1. Set up the corresponding MXNet GPU version.
 
