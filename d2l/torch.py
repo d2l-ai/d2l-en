@@ -1219,6 +1219,96 @@ def bbox_to_rect(bbox, color):
         fill=False, edgecolor=color, linewidth=2)
 
 
+# Defined in file: ./chapter_computer-vision/anchor.md
+def multibox_prior(feature_map_sizes, sizes, aspect_ratios):
+    """Compute default box sizes with scale and aspect transform."""
+    sizes = [s*728 for s in sizes]
+    scale = feature_map_sizes
+    steps_y = [1 / scale[0]]
+    steps_x = [1 / scale[1]]
+    sizes = [s / max(scale) for s in sizes]
+    num_layers = 1
+    boxes = []
+    for i in range(num_layers):
+        for h, w in itertools.product(range(feature_map_sizes[0]), range(feature_map_sizes[1])):
+            cx = (w + 0.5)*steps_x[i]
+            cy = (h + 0.5)*steps_y[i]
+
+            for j in range(len(sizes)):
+                s = sizes[j]
+                boxes.append((cx, cy, s, s))
+            s = sizes[0]
+            for ar in aspect_ratios:
+                boxes.append((cx, cy, (s * math.sqrt(ar)), (s / math.sqrt(ar))))
+    return d2l.tensor(boxes)
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+         
+def show_bboxes(axes, bboxes, labels=None, colors=None):
+    """Show bounding boxes."""
+    def _make_list(obj, default_values=None):
+        if obj is None:
+            obj = default_values
+        elif not isinstance(obj, (list, tuple)):
+            obj = [obj]
+        return obj
+    labels = _make_list(labels)
+    colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
+    for i, bbox in enumerate(bboxes):
+        color = colors[i % len(colors)]
+        rect = d2l.bbox_to_rect(d2l.numpy(bbox), color)
+        axes.add_patch(rect)
+        if labels and len(labels) > i:
+            text_color = 'k' if color == 'w' else 'w'
+            axes.text(rect.xy[0], rect.xy[1], labels[i],
+                      va='center', ha='center', fontsize=9, color=text_color,
+                      bbox=dict(facecolor=color, lw=0))
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def center_2_hw(box: torch.Tensor) -> float:
+    """
+    Converting (cx, cy, w, h) to (x1, y1, x2, y2)
+    """
+
+    return torch.cat(
+        [box[:, 0, None] - box[:, 2, None]/2,
+         box[:, 1, None] - box[:, 3, None]/2,
+         box[:, 0, None] + box[:, 2, None]/2,
+         box[:, 1, None] + box[:, 3, None]/2
+         ], dim=1)
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def intersect(box_a: torch.Tensor, box_b: torch.Tensor) -> float:
+    # Coverting (cx, cy, w, h) to (x1, y1, x2, y2) since its easier to extract min/max coordinates
+    temp_box_a, temp_box_b = center_2_hw(box_a), center_2_hw(box_b)
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def multibox_target(class_true, bb_true, anchors):
+    class_true +=1
+    class_target = torch.zeros(anchors.shape[0]).long()
+    overlap_list = find_overlap(bb_true, anchors, 0.5)
+    overlap_coordinates = torch.zeros_like(anchors)
+    for j in range(len(overlap_list)):
+        overlap = overlap_list[j]
+        class_target[overlap] = class_true[j, 0].long()
+        overlap_coordinates[overlap] = 1.
+
+    new_anchors = torch.cat([*anchors])
+    overlap_coordinates = torch.cat([*overlap_coordinates])
+    new_anchors = new_anchors*overlap_coordinates
+
+    return (new_anchors.unsqueeze(0), overlap_coordinates.unsqueeze(0), class_target.unsqueeze(0))
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+PredBoundingBox = namedtuple("PredBoundingBox", ["probability", "class_id", "classname", "bounding_box"])
+    
+
+
 # Alias defined in config.ini
 
 
