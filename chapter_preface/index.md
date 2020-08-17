@@ -61,7 +61,7 @@ Applying deep learning requires simultaneously understanding
 (i) the motivations for casting a problem in a particular way;
 (ii) the mathematics of a given modeling approach;
 (iii) the optimization algorithms for fitting the models to data;
-and (iv) and the engineering required to train models efficiently,
+and (iv) the engineering required to train models efficiently,
 navigating the pitfalls of numerical computing
 and getting the most out of available hardware.
 Teaching both the critical thinking skills required to formulate problems,
