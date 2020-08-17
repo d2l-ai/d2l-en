@@ -62,54 +62,38 @@ Enter `y` for the queries that follow this command.
 
 ```bash
 conda activate d2l
-conda install python=3.7 pip notebook -y
+conda install python=3.7 pip -y
 ```
 
 
 ## Installing the Framework and the `d2l` Package
 
-:begin_tab:`mxnet,pytorch,tensorflow`
 Before installing the deep learning framework, please first check
-whether or not you have proper NVIDIA GPUs on your machine
+whether or not you have proper GPUs on your machine
 (the GPUs that power the display on a standard laptop
-do not count for our purposes). We use the `nvidia-smi` command to
-check whether you have NVIDIA GPUs. If you have, then you will get 
-your graphics card information.
-
-```bash
-!nvidia-smi
-```
-:end_tab:
-
-:begin_tab:`mxnet,pytorch'
-
-If you are installing on a GPU server or need quicker on a NVIDIA GPU computer,
+do not count for our purposes). 
+If you are installing on a GPU server,
 proceed to :ref:`subsec_gpu` for instructions
 to install a GPU-supported version.
 
-Otherwise, you can install the CPU version.
+Otherwise, you can install the CPU version as follows.
 That will be more than enough horsepower to get you
 through the first few chapters but you will want
 to access GPUs before running larger models.
-:end_tab:
 
-### CPU version
 
 :begin_tab:`mxnet`
 
 ```bash
-# https://mxnet.apache.org/versions/1.6/get_started/
 pip install mxnet==1.6.0
 ```
-
-
 :end_tab:
+
 
 :begin_tab:`pytorch`
 
 ```bash
-# https://pytorch.org/get-started/locally/
-pip install torch==1.6.0+cpu torchvision==0.7.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+pip install torch torchvision -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 
@@ -119,8 +103,7 @@ pip install torch==1.6.0+cpu torchvision==0.7.0+cpu -f https://download.pytorch.
 You can install TensorFlow with both CPU and GPU support via the following:
 
 ```bash
-# https://www.tensorflow.org/install
-pip install tensorflow==2.2.0 tensorflow-probability==0.10.0
+pip install tensorflow tensorflow-probability
 ```
 
 
@@ -149,63 +132,28 @@ before running the code of the book or updating the deep learning framework or t
 To exit the environment, run `conda deactivate`.
 
 
-### GPU Support
+## GPU Support
 :label:`subsec_gpu`
 
 :begin_tab:`mxnet`
-By default, MXnet is installed without GPU support
+By default, MXNet is installed without GPU support
 to ensure that it will run on any computer (including most laptops).
 Part of this book requires or recommends running with GPU.
 If your computer has NVIDIA graphics cards and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
 then you should install a GPU-enabled version.
 If you have installed the CPU-only version,
 you may need to remove it first by running:
-:end_tab:
-
-:begin_tab:`pytorch`
-By default (if you use `pip install torch,torchvision`), PyTorch is installed with GPU support.
-But if you run what we say in CPU version, you will get the CPU-only version.
-Part of this book requires or recommends running with GPU.
-If your computer has NVIDIA graphics cards and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
-then you should install a GPU-enabled version.
-If you have installed the CPU-only version,
-you may need to remove it first by running:
-:end_tab:
-
-:begin_tab:`tensorflow`
-By default, TensorFlow is installed with GPU support.
-If your computer has NVIDIA graphics cards and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
-then you are all set.
-If you haven't installed the code in CPU version,
-you need to run:
-:end_tab:
-
-:begin_tab:`mxnet`
 
 ```bash
 pip uninstall mxnet
 ```
 
-
-:end_tab:
-
-:begin_tab:`pytorch`
-
-```bash
-pip uninstall torch torchvision
-```
-
-
-:end_tab:
-
-:begin_tab:`mxnet,pytorch`
 Then we need to find the CUDA version you installed.
 You may check it through `nvcc --version` or `cat /usr/local/cuda/version.txt`.
 Assume that you have installed CUDA 10.1,
 then you can install with the following command:
-:end_tab:
 
-:begin_tab:`mxnet`
+
 ```bash
 # For Windows users
 pip install mxnet-cu101==1.6.0b20190926
@@ -213,24 +161,16 @@ pip install mxnet-cu101==1.6.0b20190926
 # For Linux and macOS users
 pip install mxnet-cu101==1.6.0.post0
 ```
-:end_tab:
 
-:begin_tab:`pytorch`
-```bash
-pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
-```
-:end_tab:
-
-:begin_tab:`tensorflow`
-```bash
-# https://www.tensorflow.org/install
-pip install tensorflow==2.2.0 tensorflow-probability==0.10.0
-```
-:end_tab:
-
-:begin_tab:`mxnet,pytorch`
 You may change the last digits according to your CUDA version, e.g., `cu100` for
 CUDA 10.0 and `cu90` for CUDA 9.0.
+:end_tab:
+
+
+:begin_tab:`pytorch,tensorflow`
+By default, the deep learning framework is installed with GPU support.
+If your computer has NVIDIA GPUs and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
+then you are all set.
 :end_tab:
 
 ## Exercises
