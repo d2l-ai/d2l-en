@@ -217,7 +217,7 @@ After creating the `d2l` environment, activate it and install `pip`.
 
 ```bash
 conda activate d2l
-conda install python=3.7 pip -y
+conda install python=3.7 pip notebook -y
 ```
 
 
