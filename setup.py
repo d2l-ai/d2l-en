@@ -6,7 +6,18 @@ requirements = [
     'numpy',
     'matplotlib',
     'pandas',
-    'requests'
+    "collections",
+    "math",
+    "os",
+    "random",
+    "re",
+    "shutil",
+    "sys",
+    "tarfile",
+    "time",
+    "requests",
+    "zipfile",
+    "hashlib"
 ]
 
 setup(
