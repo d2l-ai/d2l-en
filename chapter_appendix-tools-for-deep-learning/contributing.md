@@ -31,6 +31,7 @@ Then in the root directory of `d2l-en`, you can activate a particular implementa
 ```bash
 d2lbook activate mxnet chapter_multilayer-perceptrons/mlp-scratch.md
 d2lbook activate pytorch chapter_multilayer-perceptrons/mlp-scratch.md
+d2lbook activate tensorflow chapter_multilayer-perceptrons/mlp-scratch.md
 ```
 
 
@@ -40,7 +41,7 @@ Before submitting your changes, please clear all code block outputs and activate
 d2lbook activate all chapter_multilayer-perceptrons/mlp-scratch.md
 ```
 
-If you add a new code block not for the default implementation, which is MXNet, please use `#@tab` to mark this block on the beginning line. For example, `#@tab pytorch` for a PyTorch code block, or `#@tab all` a shared code block for all implementations. You may refer to [d2lbook](http://book.d2l.ai/user/code_tabs.html) for more information.
+If you add a new code block not for the default implementation, which is MXNet, please use `#@tab` to mark this block on the beginning line. For example, `#@tab pytorch` for a PyTorch code block, `#@tab tensorflow` for a TensorFlow code block, or `#@tab all` a shared code block for all implementations. You may refer to [d2lbook](http://book.d2l.ai/user/code_tabs.html) for more information.
 
 
 ## Adding a New Section or a New Framework Implementation
@@ -152,5 +153,6 @@ Your pull request will appear among the list of requests in the main repository.
 1. Star and fork the `d2l-en` repository.
 1. Find some code that needs improvement and submit a pull request.
 1. Find a reference that we missed and submit a pull request.
+1. It is usually a better practice to create a pull request using a new branch. Learn how to do it with [Git branching](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell).
 
 [Discussions](https://discuss.d2l.ai/t/426)

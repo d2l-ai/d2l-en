@@ -724,8 +724,14 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0], device=device)
         else:
-            for s in state:
-                s.detach_()
+            if isinstance(model, nn.Module) and not isinstance(state, tuple):
+                # state is a tensor for nn.GRU  
+                state.detach_()
+            else:
+                # state is a tuple of tensors for nn.LSTM and
+                # for our custom scratch implementation 
+                for s in state:
+                    s.detach_()
         y = Y.T.reshape(-1)
         X, y = X.to(device), y.to(device)
         py, state = model(X, state)
@@ -751,8 +757,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
     if isinstance(model, nn.Module):
-        trainer = torch.optim.SGD(model.parameters(), lr)
-        updater = lambda batch_size: trainer.step()
+        updater = torch.optim.SGD(model.parameters(), lr)
     else:
         updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, device)
@@ -766,6 +771,47 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
     print(predict('traveller'))
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
+class RNNModel(nn.Module):
+    def __init__(self, rnn_layer, vocab_size, **kwargs):
+        super(RNNModel, self).__init__(**kwargs)
+        self.rnn = rnn_layer
+        self.vocab_size = vocab_size
+        self.num_hiddens = self.rnn.hidden_size
+        # If the RNN is bidirectional, num_directions should be 2,
+        # else it should be 1.
+        if not self.rnn.bidirectional:
+            self.num_directions = 1
+            self.linear = nn.Linear(self.num_hiddens, self.vocab_size)
+        else:
+            self.num_directions = 2
+            self.linear = nn.Linear(self.num_hiddens*2, self.vocab_size)
+
+    def forward(self, inputs, state):
+        X = F.one_hot(inputs.T.long(), self.vocab_size)
+        X = X.to(torch.float32)
+        Y, state = self.rnn(X, state)
+        # The fully connected layer will first change the shape of `Y` to
+        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
+        # (`num_steps` * `batch_size`, `vocab_size`).
+        output = self.linear(Y.reshape((-1, Y.shape[-1])))
+        return output, state
+
+    def begin_state(self, device, batch_size=1):
+        """Return the begin state"""
+        if not isinstance(self.rnn, nn.LSTM):
+            # nn.GRU takes a tensor as hidden state
+            return  torch.zeros((self.num_directions * self.rnn.num_layers,
+                                 batch_size, self.num_hiddens), 
+                                device=device)
+        else:
+            # nn.LSTM takes a tuple of hidden states
+            return (torch.zeros((self.num_directions * self.rnn.num_layers,
+                                 batch_size, self.num_hiddens), device=device), 
+            torch.zeros((self.num_directions * self.rnn.num_layers,
+                         batch_size, self.num_hiddens), device=device))
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
@@ -1160,6 +1206,17 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
                              (d2l.evaluate_loss(net, data_iter, loss)/2,))
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+
+
+# Defined in file: ./chapter_computer-vision/bounding-box.md
+def bbox_to_rect(bbox, color):
+    """Convert bounding box to matplotlib format."""
+    # Convert the bounding box (top-left x, top-left y, bottom-right x,
+    # bottom-right y) format to matplotlib format: ((upper-left x,
+    # upper-left y), width, height)
+    return d2l.plt.Rectangle(
+        xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
+        fill=False, edgecolor=color, linewidth=2)
 
 
 # Alias defined in config.ini
