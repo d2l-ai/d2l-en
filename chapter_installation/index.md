@@ -62,7 +62,7 @@ Enter `y` for the queries that follow this command.
 
 ```bash
 conda activate d2l
-conda install python=3.7 pip -y
+conda install pip -y
 ```
 
 
