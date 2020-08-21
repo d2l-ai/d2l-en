@@ -9,7 +9,7 @@ Unfortunately, this is not true for most data. For instance, the words in this p
 Likewise, image frames in a video, the audio signal in a conversation, and the browsing behavior on a website, all follow sequential order.
 It is thus only reasonable to assume that specialized models for such data will do better at describing them and at solving estimation problems.
 
-Another issue arises from the fact that we might not only receive a sequence as an input but rather might be expected to continue the sequence. For instance, the task could be to continue the series 2, 4, 6, 8, 10, ... This is quite common in time series analysis, to predict the stock market, the fever curve of a patient, or the acceleration needed for a race car. Again we want to have models that can handle such data.
+Another issue arises from the fact that we might not only receive a sequence as an input but rather might be expected to continue the sequence. For instance, the task could be to continue the series $2, 4, 6, 8, 10, \ldots$ This is quite common in time series analysis, to predict the stock market, the fever curve of a patient, or the acceleration needed for a race car. Again we want to have models that can handle such data.
 
 In short, while CNNs can efficiently process spatial information, *recurrent neural networks* (RNNs) are designed to better handle sequential information.
 These networks introduce state variables to store past information, together with the current inputs, to determine the current outputs.
