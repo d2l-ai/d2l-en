@@ -267,7 +267,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
     trainer_G = torch.optim.Adam(net_G.parameters(), lr=lr_G)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
-                            legend=['generator', 'discriminator'])
+                            legend=['discriminator', 'generator'])
     animator.fig.subplots_adjust(hspace=0.3)
     for epoch in range(num_epochs):
         # Train one epoch
