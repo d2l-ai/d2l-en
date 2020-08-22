@@ -335,7 +335,7 @@ net.add(nn.GlobalAvgPool2D(), nn.Dense(10))
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(b1, b2, b3, b4, b5,
-                    nn.AdaptiveMaxPool2d((1,1)),
+                    nn.AdaptiveAvgPool2d((1,1)),
                     nn.Flatten(), nn.Linear(512, 10))
 ```
 
