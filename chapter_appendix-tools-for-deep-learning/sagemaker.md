@@ -65,7 +65,7 @@ Then, as shown in :numref:`fig_sagemaker-jupyter`, you may navigate through the 
 :width:`400px`
 :label:`fig_sagemaker-jupyter`
 
-Running and editing Jupyter notebooks on the SagaMaker instance is similar to what we have discussed in :numref:`sec_jupyter`.
+Running and editing Jupyter notebooks on the SageMaker instance is similar to what we have discussed in :numref:`sec_jupyter`.
 After finishing your work, do not forget to stop the instance to avoid further charging, as shown in :numref:`fig_sagemaker-stop`.
 
 ![Stop a SageMaker instance.](../img/sagemaker-stop.png)
