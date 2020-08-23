@@ -107,6 +107,7 @@ net_G.add(G_block(n_G*8, strides=1, padding=0),  # Output: (64 * 8, 4, 4)
           nn.Conv2DTranspose(
               3, kernel_size=4, strides=2, padding=1, use_bias=False,
               activation='tanh'))  # Output: (3, 64, 64)
+print(net_G)
 ```
 
 Generate a 100 dimensional latent variable to verify the generator's output shape.
@@ -175,6 +176,7 @@ net_D.add(D_block(n_D),   # Output: (64, 32, 32)
           D_block(n_D*4),  # Output: (64 * 4, 8, 8)
           D_block(n_D*8),  # Output: (64 * 8, 4, 4)
           nn.Conv2D(1, kernel_size=4, use_bias=False))  # Output: (1, 1, 1)
+print(net_D)
 ```
 
 It uses a convolution layer with output channel $1$ as the last layer to obtain a single prediction value.
@@ -241,7 +243,7 @@ train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ## Summary
 
 * DCGAN architecture has four convolutional layers for the Discriminator and four "fractionally-strided" convolutional layers for the Generator.
-* The Discriminator is a 4-layer strided convolutions with batch normalization (except its input layer) and leaky ReLU activations. 
+* The Discriminator is a 4-layer strided convolutions with batch normalization (except its input layer) and leaky ReLU activations.
 * Leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the “dying ReLU” problem and helps the gradients flow easier through the architecture.
 
 
