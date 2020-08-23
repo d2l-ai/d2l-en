@@ -227,7 +227,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
                               'adam', {'learning_rate': lr_G})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
-                            legend=['generator', 'discriminator'])
+                            legend=['discriminator', 'generator'])
     animator.fig.subplots_adjust(hspace=0.3)
     for epoch in range(num_epochs):
         # Train one epoch
@@ -298,14 +298,14 @@ Now we specify the hyperparameters to fit the Gaussian distribution.
 ```{.python .input}
 lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20
 train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
-      latent_dim, data[:100].asnumpy())
+      latent_dim, d2l.numpy(data[:100]))
 ```
 
 ```{.python .input}
 #@tab pytorch
 lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20
 train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
-      latent_dim, data[:100].numpy())
+      latent_dim, d2l.numpy(data[:100]))
 ```
 
 ## Summary
