@@ -255,7 +255,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
 ```{.python .input}
 #@tab pytorch
 def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
-    loss = nn.SigmoidBCELoss()
+    loss = nn.BCEWithLogitsLoss()
     for w in net_D.parameters():
         nn.init.normal_(w, 0, 0.02)
     for w in net_G.parameters():
