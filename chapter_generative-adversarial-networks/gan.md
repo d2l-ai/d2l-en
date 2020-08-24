@@ -165,8 +165,8 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):  #@save
 def update_D(X, Z, net_D, net_G, loss, trainer_D):  #@save
     """Update discriminator."""
     batch_size = X.shape[0]
-    ones = torch.ones(batch_size)
-    zeros = torch.zeros(batch_size)
+    ones = torch.ones((batch_size, 1))
+    zeros = torch.zeros((batch_size, 1))
     trainer_D.zero_grad()
     real_Y = net_D(X)
     fake_X = net_G(Z)
@@ -202,7 +202,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
 def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
     """Update generator."""
     batch_size = Z.shape[0]
-    ones = torch.ones(batch_size)
+    ones = torch.ones((batch_size, 1))
     trainer_G.zero_grad()
     # We could reuse `fake_X` from `update_D` to save computation
     fake_X = net_G(Z)
@@ -256,7 +256,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
 ```{.python .input}
 #@tab pytorch
 def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
-    loss = nn.BCELoss()
+    loss = nn.SigmoidBCELoss()
     for w in net_D.parameters():
         nn.init.normal_(w, 0, 0.02)
     for w in net_G.parameters():
