@@ -92,7 +92,7 @@ The argument `max_len` specifies the maximum length of a BERT input sequence dur
 
 ```{.python .input  n=4}
 #@save
-def _get__data_from_paragraph(paragraph, paragraphs, vocab, max_len):
+def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     nsp_data_from_paragraph = []
     for i in range(len(paragraph) - 1):
         tokens_a, tokens_b, is_next = _get_next_sentence(
