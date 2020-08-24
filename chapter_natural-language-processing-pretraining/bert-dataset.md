@@ -69,7 +69,7 @@ into the dataset of the ideal format to pretrain BERT.
 
 ### Generating the Next Sentence Prediction Task
 
-According to descriptions of :label:`subsec_nsp`,
+According to descriptions of :numref:`subsec_nsp`,
 the `_get_next_sentence` function generates a training example
 for the binary classification task.
 
@@ -92,7 +92,8 @@ The argument `max_len` specifies the maximum length of a BERT input sequence dur
 
 ```{.python .input  n=4}
 #@save
-def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
+def _get_
+_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     nsp_data_from_paragraph = []
     for i in range(len(paragraph) - 1):
         tokens_a, tokens_b, is_next = _get_next_sentence(
