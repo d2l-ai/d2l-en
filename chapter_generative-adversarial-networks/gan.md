@@ -134,7 +134,7 @@ net_D.add(nn.Dense(5, activation='tanh'),
 net_D = nn.Sequential(
     nn.Linear(2, 5), nn.Tanh(),
     nn.Linear(5, 3), nn.Tanh(),
-    nn.Linear(3, 1), nn.Sigmoid()
+    nn.Linear(3, 1)
     )
 ```
 
