@@ -5,9 +5,9 @@
 
 In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, and these tokens can be viewed as a time series of discrete observations. Assuming the tokens in a text of length $T$ are in turn $x_1, x_2, \ldots, x_T$, then, in the discrete time series, $x_t$($1 \leq t \leq T$) can be considered as the output or label of timestep $t$. Given such a sequence, the goal of a language model is to estimate the probability
 
-$$p(x_1, x_2, \ldots, x_T).$$
+$$P(x_1, x_2, \ldots, x_T).$$
 
-Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t \mid w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
+Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim P(w_t \mid w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
 
 Nonetheless language models are of great service even in their limited form. For instance, the phrases "to recognize speech" and "to wreck a nice beach" sound very similar. This can cause ambiguity in speech recognition, ambiguity that is easily resolved through a language model which rejects the second translation as outlandish. Likewise, in a document summarization algorithm it is worth while knowing that "dog bites man" is much more frequent than "man bites dog", or that "I want to eat grandma" is a rather disturbing statement, whereas "I want to eat, grandma" is much more benign.
 
@@ -15,11 +15,11 @@ Nonetheless language models are of great service even in their limited form. For
 
 The obvious question is how we should model a document, or even a sequence of words. We can take recourse to the analysis we applied to sequence models in the previous section. Let us start by applying basic probability rules:
 
-$$p(w_1, w_2, \ldots, w_T) = p(w_1) \prod_{t=2}^T p(w_t  \mid  w_1, \ldots, w_{t-1}).$$
+$$P(w_1, w_2, \ldots, w_T) = P(w_1) \prod_{t=2}^T P(w_t  \mid  w_1, \ldots, w_{t-1}).$$
 
 For example, the probability of a text sequence containing four tokens consisting of words and punctuation would be given as:
 
-$$p(\mathrm{Statistics}, \mathrm{is}, \mathrm{fun}, \mathrm{.}) =  p(\mathrm{Statistics}) p(\mathrm{is}  \mid  \mathrm{Statistics}) p(\mathrm{fun}  \mid  \mathrm{Statistics}, \mathrm{is}) p(\mathrm{.}  \mid  \mathrm{Statistics}, \mathrm{is}, \mathrm{fun}).$$
+$$P(\mathrm{Statistics}, \mathrm{is}, \mathrm{fun}, \mathrm{.}) =  P(\mathrm{Statistics}) P(\mathrm{is}  \mid  \mathrm{Statistics}) P(\mathrm{fun}  \mid  \mathrm{Statistics}, \mathrm{is}) P(\mathrm{.}  \mid  \mathrm{Statistics}, \mathrm{is}, \mathrm{fun}).$$
 
 In order to compute the language model, we need to calculate the
 probability of words and the conditional probability of a word given
@@ -29,14 +29,14 @@ Wikipedia entries, [Project Gutenberg](https://en.wikipedia.org/wiki/Project_Gut
 web. The probability of words can be calculated from the relative word
 frequency of a given word in the training dataset.
 
-For example, $p(\mathrm{Statistics})$ can be calculated as the
+For example, $P(\mathrm{Statistics})$ can be calculated as the
 probability of any sentence starting with the word "statistics". A
 slightly less accurate approach would be to count all occurrences of
 the word "statistics" and divide it by the total number of words in
 the corpus. This works fairly well, particularly for frequent
 words. Moving on, we could attempt to estimate
 
-$$\hat{p}(\mathrm{is} \mid \mathrm{Statistics}) = \frac{n(\mathrm{Statistics~is})}{n(\mathrm{Statistics})}.$$
+$$\hat{P}(\mathrm{is} \mid \mathrm{Statistics}) = \frac{n(\mathrm{Statistics~is})}{n(\mathrm{Statistics})}.$$
 
 Here $n(w)$ and $n(w, w')$ are the number of occurrences of singletons
 and pairs of words respectively. Unfortunately, estimating the
@@ -51,9 +51,9 @@ naive Bayes in :numref:`sec_naive_bayes` where the solution was to
 add a small constant to all counts. This helps with singletons, e.g., via
 
 $$\begin{aligned}
-	\hat{p}(w) & = \frac{n(w) + \epsilon_1/m}{n + \epsilon_1}, \\
-	\hat{p}(w' \mid w) & = \frac{n(w, w') + \epsilon_2 \hat{p}(w')}{n(w) + \epsilon_2}, \\
-	\hat{p}(w'' \mid w',w) & = \frac{n(w, w',w'') + \epsilon_3 \hat{p}(w',w'')}{n(w, w') + \epsilon_3}.
+	\hat{P}(w) & = \frac{n(w) + \epsilon_1/m}{n + \epsilon_1}, \\
+	\hat{P}(w' \mid w) & = \frac{n(w, w') + \epsilon_2 \hat{P}(w')}{n(w) + \epsilon_2}, \\
+	\hat{P}(w'' \mid w',w) & = \frac{n(w, w',w'') + \epsilon_3 \hat{P}(w',w'')}{n(w, w') + \epsilon_3}.
 \end{aligned}$$
 
 Here the coefficients $\epsilon_i > 0$ determine how much we use the
@@ -75,13 +75,13 @@ perform poorly there.
 
 ## Markov Models and $n$-grams
 
-Before we discuss solutions involving deep learning, we need some more terminology and concepts. Recall our discussion of Markov Models in the previous section. Let us apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $p(w_{t+1} \mid w_t, \ldots, w_1) = p(w_{t+1} \mid w_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
+Before we discuss solutions involving deep learning, we need some more terminology and concepts. Recall our discussion of Markov Models in the previous section. Let us apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $P(w_{t+1} \mid w_t, \ldots, w_1) = P(w_{t+1} \mid w_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
 
 $$
 \begin{aligned}
-p(w_1, w_2, w_3, w_4) &=  p(w_1) p(w_2) p(w_3) p(w_4),\\
-p(w_1, w_2, w_3, w_4) &=  p(w_1) p(w_2  \mid  w_1) p(w_3  \mid  w_2) p(w_4  \mid  w_3),\\
-p(w_1, w_2, w_3, w_4) &=  p(w_1) p(w_2  \mid  w_1) p(w_3  \mid  w_1, w_2) p(w_4  \mid  w_2, w_3).
+P(w_1, w_2, w_3, w_4) &=  P(w_1) P(w_2) P(w_3) P(w_4),\\
+P(w_1, w_2, w_3, w_4) &=  P(w_1) P(w_2  \mid  w_1) P(w_3  \mid  w_2) P(w_4  \mid  w_3),\\
+P(w_1, w_2, w_3, w_4) &=  P(w_1) P(w_2  \mid  w_1) P(w_3  \mid  w_1, w_2) P(w_4  \mid  w_2, w_3).
 \end{aligned}
 $$
 
