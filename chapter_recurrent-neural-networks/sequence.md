@@ -10,14 +10,15 @@ Imagine that you are watching movies on Netflix. As a good Netflix user, you dec
 * In some cases, movies become unpopular due to the misbehaviors of directors or actors in the production.
 * Some movies become cult movies, because they were almost comically bad. *Plan 9 from Outer Space* and *Troll 2* achieved a high degree of notoriety for this reason.
 
-In short, ratings are anything but stationary. Using temporal dynamics helped :cite:`Koren.2009` to recommend
-movies more accurately. But it is not just about movies.
+In short, movie ratings are anything but stationary. Thus, using temporal dynamics 
+led to more accurate movie recommendations :cite:`Koren.2009`.
+Of course, sequence data are not just about movie ratings. The following gives more illustrations.
 
 * Many users have highly particular behavior when it comes to the time when they open apps. For instance, social media apps are much more popular after school with students. Stock market trading apps are more commonly used when the markets are open.
 * It is much harder to predict tomorrow's stock prices than to fill in the blanks for a stock price we missed yesterday, even though both are just a matter of estimating one number. After all, foresight is so much harder than hindsight. In statistics, the former (predicting beyond the known observations) is called *extrapolation* whereas the latter (estimating between the existing observations) is called *interpolation*.
-* Music, speech, text, movies, steps, etc. are all sequential in nature. If we were to permute them they would make little sense. The headline *dog bites man* is much less surprising than *man bites dog*, even though the words are identical.
+* Music, speech, text, and videos are all sequential in nature. If we were to permute them they would make little sense. The headline *dog bites man* is much less surprising than *man bites dog*, even though the words are identical.
 * Earthquakes are strongly correlated, i.e., after a massive earthquake there are very likely several smaller aftershocks, much more so than without the strong quake. In fact, earthquakes are spatiotemporally correlated, i.e., the aftershocks typically occur within a short time span and in close proximity.
-* Humans interact with each other in a sequential nature, as can be seen in Twitter fights, dance patterns and debates.
+* Humans interact with each other in a sequential nature, as can be seen in Twitter fights, dance patterns, and debates.
 
 ## Statistical Tools
 
