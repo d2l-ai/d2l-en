@@ -372,11 +372,89 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
           f'{metric[2] / timer.stop():.1f} examples/sec on {str(device)}')
 ```
 
+```{.python .input}
+#@tab pytorch
+def update_D(X, Z, net_D, net_G, loss, trainer_D, device=d2l.try_gpu()):
+    """Update discriminator."""
+    batch_size = X.shape[0]
+    ones = torch.ones((batch_size, 1, 1, 1), device=device)
+    zeros = torch.zeros((batch_size, 1, 1, 1), device=device)
+    trainer_D.zero_grad()
+    real_Y = net_D(X)
+    fake_X = net_G(Z)
+    # Do not need to compute gradient for `net_G`, detach it from
+    # computing gradients.
+    fake_Y = net_D(fake_X.detach())
+    loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
+    loss_D.backward()
+    trainer_D.step()
+    return loss_D
+
+def update_G(Z, net_D, net_G, loss, trainer_G, device=d2l.try_gpu()):  #@save
+    """Update generator."""
+    batch_size = Z.shape[0]
+    ones = torch.ones((batch_size, 1, 1, 1), device=device)
+    trainer_G.zero_grad()
+    # We could reuse `fake_X` from `update_D` to save computation
+    fake_X = net_G(Z)
+    # Recomputing `fake_Y` is needed since `net_D` is changed
+    fake_Y = net_D(fake_X)
+    loss_G = loss(fake_Y,ones)
+    loss_G.backward()
+    trainer_G.step()
+    return loss_G
+
+def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gpu()):
+    loss = nn.BCEWithLogitsLoss()
+    for w in net_D.parameters():
+        nn.init.normal_(w, 0, 0.02)
+    for w in net_G.parameters():
+        nn.init.normal_(w, 0, 0.02)
+    net_D.zero_grad()
+    net_G.zero_grad()
+    bata1 = 0.5 # lr: learning rate
+    trainer_D = torch.optim.Adam(net_D.parameters(), lr=lr, betas=(bata1, 0.999))
+    trainer_G = torch.optim.Adam(net_G.parameters(), lr=lr, betas=(bata1, 0.999))
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
+                            legend=['discriminator', 'generator'])
+    animator.fig.subplots_adjust(hspace=0.3)
+    for epoch in range(1, num_epochs + 1):
+        # Train one epoch
+        timer = d2l.Timer()
+        metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
+        for X, _ in data_iter:
+            batch_size = X.shape[0]
+            Z = torch.normal(0, 1, size=(batch_size, latent_dim, 1, 1))
+            X, Z = X.to(device), Z.to(device)
+            trainer_D.zero_grad()
+            trainer_G.zero_grad()
+            metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),
+                       update_G(Z, net_D, net_G, loss, trainer_G),
+                       batch_size)
+        # Show generated examples
+        Z = torch.normal(0, 1, size=(21, latent_dim, 1, 1))
+        Z = Z.to(device)
+        # Normalize the synthetic data to N(0, 1)
+        fake_x = net_G(Z).permute(0, 2, 3, 1) / 2 + 0.5
+        imgs = torch.cat(
+            [torch.cat([fake_x[i * 7 + j] for j in range(7)], dim=1)
+             for i in range(len(fake_x)//7)], dim=0)
+        animator.axes[1].cla()
+        animator.axes[1].imshow(imgs.cpu().detach().numpy())
+        # Show the losses
+        loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]
+        animator.add(epoch, (loss_D, loss_G))
+    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '
+          f'{metric[2] / timer.stop():.1f} examples/sec on {str(device)}')
+```
+
 We train the model with a small number of epochs just for demonstration.
 For better performance,
 the variable `num_epochs` can be set to a larger number.
 
 ```{.python .input}
+#@tab all
 latent_dim, lr, num_epochs = 100, 0.005, 20
 train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ```
