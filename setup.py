@@ -5,7 +5,8 @@ requirements = [
     'jupyter',
     'numpy',
     'matplotlib',
-    'pandas'
+    'pandas',
+    'requests'
 ]
 
 setup(
