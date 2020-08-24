@@ -323,3 +323,7 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/408)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/776)
+:end_tab:
