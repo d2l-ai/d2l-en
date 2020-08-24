@@ -69,7 +69,7 @@ into the dataset of the ideal format to pretrain BERT.
 
 ### Generating the Next Sentence Prediction Task
 
-According to descriptions of :label:`subsec_nsp`,
+According to descriptions of :numref:`subsec_nsp`,
 the `_get_next_sentence` function generates a training example
 for the binary classification task.
 
