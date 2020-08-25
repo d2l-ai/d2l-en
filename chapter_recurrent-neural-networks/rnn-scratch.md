@@ -248,7 +248,7 @@ class RNNModelScratch: #@save
         self.init_state, self.forward_fn = init_state, forward
 
     def __call__(self, X, state):
-        X = F.one_hot(X.T.long(), self.vocab_size).type(torch.float32)
+        X = F.one_hot(X.T, self.vocab_size).type(torch.float32)
         return self.forward_fn(X, state, self.params)
 
     def begin_state(self, batch_size, device):
