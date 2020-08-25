@@ -390,7 +390,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D, device=d2l.try_gpu()):
     trainer_D.step()
     return loss_D
 
-def update_G(Z, net_D, net_G, loss, trainer_G, device=d2l.try_gpu()):  #@save
+def update_G(Z, net_D, net_G, loss, trainer_G, device=d2l.try_gpu()): 
     """Update generator."""
     batch_size = Z.shape[0]
     ones = torch.ones((batch_size, 1, 1, 1), device=device)
