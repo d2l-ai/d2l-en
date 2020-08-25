@@ -48,7 +48,8 @@ This leads to models that estimate $x_t$ with $\hat{x}_t = P(x_t \mid h_{t})$ an
 ![A latent autoregressive model.](../img/sequence-model.svg)
 :label:`fig_sequence-model`
 
-Both cases raise the obvious question of how to generate training data. One typically uses historical observations to predict the next observation given the ones up to right now. Obviously we do not expect time to stand still. However, a common assumption is that while the specific values of $x_t$ might change, at least the dynamics of the time series itself will not. This is reasonable, since novel dynamics are just that, novel and thus not predictable using data that we have so far. Statisticians call dynamics that do not change *stationary*. Regardless of what we do, we will thus get an estimate of the entire time series via
+Both cases raise the obvious question of how to generate training data. One typically uses historical observations to predict the next observation given the ones up to right now. Obviously we do not expect time to stand still. However, a common assumption is that while the specific values of $x_t$ might change, at least the dynamics of the sequence itself will not. This is reasonable, since novel dynamics are just that, novel and thus not predictable using data that we have so far. Statisticians call dynamics that do not change *stationary*.
+Regardless of what we do, we will thus get an estimate of the entire sequence via
 
 $$P(x_1, \ldots, x_T) = \prod_{t=1}^T P(x_t \mid x_{t-1}, \ldots, x_1).$$
 
@@ -84,9 +85,11 @@ The book by Peters et al. has
 explained more on this topic :cite:`Peters.Janzing.Scholkopf.2017`.
 We are barely scratching the surface of it.
 
-## A Toy Example
 
-After so much theory, let us try this out in practice. Let us begin by generating some data. To keep things simple we generate our time series by using a sine function with some additive noise.
+## Experiment
+
+After so much theory, let us try this out in practice.
+We begin by generating some data. To keep things simple we generate our sequence data by using a sine function with some additive noise.
 
 ```{.python .input}
 %matplotlib inline
@@ -127,38 +130,43 @@ x = d2l.sin(0.01 * time) + d2l.normal([T], 0, 0.2)
 d2l.plot(time, [x])
 ```
 
-Next we need to turn this time series into features and labels that the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots, x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple.
+Next, we need to turn such a sequence into features and labels that our model can train on.
+Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{x}_t = (x_{t-1}, \ldots, x_{t-\tau})$.
+The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for the first $\tau$ of them.
+A simple fix, in particular if the sequence is long,
+is to discard those few terms.
+Alternatively we could pad the sequence with zeros. 
 
 ```{.python .input}
 #@tab mxnet,pytorch
 tau = 4
-features = d2l.zeros((T-tau, tau))
+features = d2l.zeros((T - tau, tau))
 for i in range(tau):
-    features[:, i] = x[i: T-tau+i]
+    features[:, i] = x[i: T - tau + i]
 labels = d2l.reshape(x[tau:], (-1, 1))
-
-batch_size, n_train = 16, 600
-train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
-                            batch_size, is_train=True)
 ```
 
 ```{.python .input}
 #@tab tensorflow
 tau = 4
-features = tf.Variable(d2l.zeros((T-tau, tau)))
+features = tf.Variable(d2l.zeros((T - tau, tau)))
 for i in range(tau):
-    features[:, i].assign(x[i: T-tau+i])
+    features[:, i].assign(x[i: T - tau + i])
 labels = d2l.reshape(x[tau:], (-1, 1))
+```
 
+```{.python .input}
+#@tab all
 batch_size, n_train = 16, 600
 train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
 ```
 
-A few layers of a fully connected network, ReLU activation and $L_2$ loss. Since much of the modeling is identical to the previous sections when we built regression estimators, we will not delve into much detail.
+Here we keep the architecture fairly simple:
+just an MLP with two fully-connected layers, ReLU activation, and square loss.
 
 ```{.python .input}
-# Vanilla MLP architecture
+# A simple MLP
 def get_net():
     net = nn.Sequential()
     net.add(nn.Dense(10, activation='relu'),
@@ -166,18 +174,18 @@ def get_net():
     net.initialize(init.Xavier())
     return net
 
-# Least mean squares loss
+# Square loss
 loss = gluon.loss.L2Loss()
 ```
 
 ```{.python .input}
 #@tab pytorch
-# Function for initializing the weights of net
+# Function for initializing the weights of the network
 def init_weights(m):
     if type(m) == nn.Linear:
         torch.nn.init.xavier_uniform_(m.weight)
 
-# Vanilla MLP architecture
+# A simple MLP
 def get_net():
     net = nn.Sequential(nn.Linear(4, 10),
                         nn.ReLU(),
@@ -185,7 +193,7 @@ def get_net():
     net.apply(init_weights)
     return net
 
-# Least mean squares loss
+# Square loss
 loss = nn.MSELoss()
 ```
 
@@ -198,25 +206,27 @@ def get_net():
     return net
 
 # Least mean squares loss
-# Note: L2 Loss = 1/2 * MSE Loss. TF has MSE Loss which is slightly
+# Note: L2 Loss = 1/2 * MSE Loss. TensorFlow has MSE Loss that is slightly
 # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
-# value to get L2Loss in TF.
+# value to get L2Loss in TF
 loss = tf.keras.losses.MeanSquaredError()
 ```
 
-Now we are ready to train.
+Now we are ready to train the model. The code below is essentially identical to the training loop in previous sections,
+such as :numref:`sec_linear_concise`.
+Thus, we will not delve into much detail.
 
 ```{.python .input}
 def train_net(net, train_iter, loss, epochs, lr):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
-    for epoch in range(1, epochs + 1):
+    for epoch in range(epochs):
         for X, y in train_iter:
             with autograd.record():
                 l = loss(net(X), y)
             l.backward()
             trainer.step(batch_size)
-        print(f'epoch {epoch}, '
+        print(f'epoch {epoch + 1}, '
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
@@ -227,13 +237,13 @@ train_net(net, train_iter, loss, 10, 0.01)
 #@tab pytorch
 def train_net(net, train_iter, loss, epochs, lr):
     trainer = torch.optim.Adam(net.parameters(), lr)
-    for epoch in range(1, epochs + 1):
+    for epoch in range(epochs):
         for X, y in train_iter:
             trainer.zero_grad()
             l = loss(net(X), y)
             l.backward()
             trainer.step()
-        print(f'epoch {epoch}, '
+        print(f'epoch {epoch + 1}, '
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
@@ -244,7 +254,7 @@ train_net(net, train_iter, loss, 10, 0.01)
 #@tab tensorflow
 def train_net(net, train_iter, loss, epochs, lr):
     trainer = tf.keras.optimizers.Adam()
-    for epoch in range(1, epochs+1):
+    for epoch in range(epochs):
         for X, y in train_iter:
             with tf.GradientTape() as g:
                 out = net(X)
@@ -252,8 +262,9 @@ def train_net(net, train_iter, loss, epochs, lr):
                 params = net.trainable_variables
                 grads = g.gradient(l, params)
             trainer.apply_gradients(zip(grads, params))
-        print(f'epoch {epoch}, '
+        print(f'epoch {epoch + 1}, '
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
+
 net = get_net()
 train_net(net, train_iter, loss, 10, 0.01)
 ```
@@ -351,7 +362,7 @@ This clearly illustrates how the quality of the estimates changes as we try to p
 
 * Sequence models require specialized statistical tools for estimation. Two popular choices are autoregressive models and latent-variable autoregressive models.
 * As we predict further in time, the errors accumulate and the quality of the estimates degrades, often dramatically.
-* There is quite a difference in difficulty between interpolation and extrapolation. Consequently, if you have a time series, always respect the temporal order of the data when training, i.e., never train on future data.
+* There is quite a difference in difficulty between interpolation and extrapolation. Consequently, if you have a sequence, always respect the temporal order of the data when training, i.e., never train on future data.
 * For causal models (e.g., time going forward), estimating the forward direction is typically a lot easier than the reverse direction.
 
 
