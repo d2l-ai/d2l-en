@@ -230,7 +230,7 @@ def train_net(net, train_iter, loss, epochs, lr):
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
-train_net(net, train_iter, loss, 10, 0.01)
+train_net(net, train_iter, loss, 5, 0.01)
 ```
 
 ```{.python .input}
@@ -247,7 +247,7 @@ def train_net(net, train_iter, loss, epochs, lr):
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
-train_net(net, train_iter, loss, 10, 0.01)
+train_net(net, train_iter, loss, 5, 0.01)
 ```
 
 ```{.python .input}
@@ -258,7 +258,7 @@ def train_net(net, train_iter, loss, epochs, lr):
         for X, y in train_iter:
             with tf.GradientTape() as g:
                 out = net(X)
-                l = loss(y, out)/2
+                l = loss(y, out) / 2
                 params = net.trainable_variables
                 grads = g.gradient(l, params)
             trainer.apply_gradients(zip(grads, params))
@@ -266,7 +266,7 @@ def train_net(net, train_iter, loss, epochs, lr):
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
-train_net(net, train_iter, loss, 10, 0.01)
+train_net(net, train_iter, loss, 5, 0.01)
 ```
 
 ## Predictions
