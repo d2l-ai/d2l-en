@@ -119,7 +119,7 @@ import tensorflow as tf
 T = 1000  # Generate a total of 1000 points
 time = d2l.arange(1, T + 1, dtype=d2l.float32)
 x = d2l.sin(0.01 * time) + d2l.normal(0, 0.2, (T,))
-d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(5, 2.5))
+d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
 ```{.python .input}
@@ -127,7 +127,7 @@ d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(5, 2.5))
 T = 1000  # Generate a total of 1000 points
 time = d2l.arange(0, T, dtype=d2l.float32)
 x = d2l.sin(0.01 * time) + d2l.normal([T], 0, 0.2)
-d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(5, 2.5))
+d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
 Next, we need to turn such a sequence into features and labels that our model can train on.
@@ -277,9 +277,10 @@ Since the training loss is small, we would expect our model to work well. Let us
 
 ```{.python .input}
 #@tab all
-estimates = net(features)
-d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(estimates)], 'time',
-         'x', legend=['data', 'estimate'], xlim=[1, 1000], figsize=(5, 2.5))
+preds = net(features)
+d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(preds)], 'time',
+         'x', legend=['data', 'predictions'], xlim=[1, 1000],
+         figsize=(6, 3))
 ```
 
 This looks nice, just as we expected it. Even beyond 604 (`n_train + tau`) observations the estimates still look trustworthy. There is just one little problem to this: if we observe data only until time step 604, we cannot hope to receive the ground truth for all future predictions.
@@ -295,28 +296,28 @@ In other words, we will have to use our own predictions to make future predictio
 
 ```{.python .input}
 #@tab mxnet,pytorch
-predictions = d2l.zeros(T)
-predictions[:n_train + tau] = x[:n_train + tau]
+preds_using_preds = d2l.zeros(T)
+preds_using_preds[:n_train + tau] = x[:n_train + tau]
 for i in range(n_train + tau, T):
-    predictions[i] = net(predictions[i - tau:i].reshape(1, -1)).reshape(1)
+    preds_using_preds[i] = net(preds_using_preds[i - tau:i].reshape(1, -1)).reshape(1)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-predictions = tf.Variable(d2l.zeros(T))
-predictions[:n_train + tau].assign(x[:n_train + tau])
+preds_using_preds = tf.Variable(d2l.zeros(T))
+preds_using_preds[:n_train + tau].assign(x[:n_train + tau])
 for i in range(n_train + tau, T):
-    predictions[i].assign(d2l.reshape(net(
-        d2l.reshape(predictions[i - tau:i], (1, -1))), ()))
+    preds_using_preds[i].assign(d2l.reshape(net(
+        d2l.reshape(preds_using_preds[i - tau:i], (1, -1))), ()))
 ```
 
 ```{.python .input}
 #@tab all
 d2l.plot([time, time[tau:], time[n_train + tau:]],
-         [d2l.numpy(x), d2l.numpy(estimates),
-          d2l.numpy(predictions[n_train + tau:])], 'time',
-         'x', legend=['data', 'estimate', 'multistep'], xlim=[1, 1000],
-         figsize=(5, 2.5))
+         [d2l.numpy(x), d2l.numpy(preds),
+          d2l.numpy(preds_using_preds[n_train + tau:])], 'time',
+         'x', legend=['data', 'predictions', 'preds u. preds'],
+         xlim=[1, 1000], figsize=(6, 3))
 ```
 
 As the above example shows, this is a spectacular failure. The estimates decay to a constant pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that the errors build up. Let us say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon. For instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that the accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
@@ -353,7 +354,7 @@ steps = (4, 8, 16, 32)
 d2l.plot([time[i: T - k + i] for i in steps],
          [d2l.numpy(features[i]) for i in steps], 'time', 'x',
          legend=[f'step {i}' for i in steps], xlim=[1, 1000],
-         figsize=(5, 2.5))
+         figsize=(6, 3))
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.
