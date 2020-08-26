@@ -679,7 +679,7 @@ class RNNModelScratch: #@save
         self.init_state, self.forward_fn = init_state, forward
 
     def __call__(self, X, state):
-        X = F.one_hot(X.T.long(), self.vocab_size).type(torch.float32)
+        X = F.one_hot(X.T, self.vocab_size).type(torch.float32)
         return self.forward_fn(X, state, self.params)
 
     def begin_state(self, batch_size, device):
@@ -1217,6 +1217,40 @@ def bbox_to_rect(bbox, color):
     return d2l.plt.Rectangle(
         xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
         fill=False, edgecolor=color, linewidth=2)
+
+
+# Defined in file: ./chapter_generative-adversarial-networks/gan.md
+def update_D(X, Z, net_D, net_G, loss, trainer_D):
+    """Update discriminator."""
+    batch_size = X.shape[0]
+    ones = torch.ones((batch_size, 1), device=X.device)
+    zeros = torch.zeros((batch_size, 1), device=X.device)
+    trainer_D.zero_grad()
+    real_Y = net_D(X)
+    fake_X = net_G(Z)
+    # Do not need to compute gradient for `net_G`, detach it from
+    # computing gradients.
+    fake_Y = net_D(fake_X.detach())
+    loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
+    loss_D.backward()
+    trainer_D.step()
+    return loss_D
+
+
+# Defined in file: ./chapter_generative-adversarial-networks/gan.md
+def update_G(Z, net_D, net_G, loss, trainer_G):
+    """Update generator."""
+    batch_size = Z.shape[0]
+    ones = torch.ones((batch_size, 1), device=Z.device)
+    trainer_G.zero_grad()
+    # We could reuse `fake_X` from `update_D` to save computation
+    fake_X = net_G(Z)
+    # Recomputing `fake_Y` is needed since `net_D` is changed
+    fake_Y = net_D(fake_X)
+    loss_G = loss(fake_Y,ones)
+    loss_G.backward()
+    trainer_G.step()
+    return loss_G
 
 
 # Alias defined in config.ini
