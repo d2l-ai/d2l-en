@@ -56,7 +56,6 @@ npx.set_np()
 from d2l import torch as d2l
 import torch
 from torch import nn
-from torch.utils.data import DataLoader
 ```
 
 ## Generate some "real" data
@@ -64,44 +63,26 @@ from torch.utils.data import DataLoader
 Since this is going to be the world's lamest example, we simply generate data drawn from a Gaussian.
 
 ```{.python .input}
-X = np.random.normal(size=(1000, 2))
-A = np.array([[1, 2], [-0.1, 0.5]])
-b = np.array([1, 2])
-data = X.dot(A) + b
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.normal(0.0, 1, (1000, 2))
-A = torch.tensor([[1, 2], [-0.1, 0.5]])
-b = torch.tensor([1, 2])
-data = torch.mm(X, A) + b
+#@tab all
+X = d2l.normal(0.0, 1, (1000, 2))
+A = d2l.tensor([[1, 2], [-0.1, 0.5]])
+b = d2l.tensor([1, 2])
+data = d2l.matmul(X, A) + b
 ```
 
 Let us see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
 
 ```{.python .input}
+#@tab all
 d2l.set_figsize()
-d2l.plt.scatter(data[:100, 0].asnumpy(), data[:100, 1].asnumpy());
-print(f'The covariance matrix is\n{np.dot(A.T, A)}')
+d2l.plt.scatter(d2l.numpy(data[:100, 0]), d2l.numpy(data[:100, 1]));
+print(f'The covariance matrix is\n{d2l.matmul(A.T, A)}')
 ```
 
 ```{.python .input}
-#@tab pytorch
-d2l.set_figsize()
-d2l.plt.scatter(data[:100, 0].numpy(), data[:100, 1].numpy());
-print(f'The covariance matrix is\n{torch.mm(A.T, A)}')
-```
-
-```{.python .input}
+#@tab all
 batch_size = 8
 data_iter = d2l.load_array((data,), batch_size)
-```
-
-```{.python .input}
-#@tab pytorch
-batch_size = 8
-data_iter = DataLoader(data, batch_size=batch_size)
 ```
 
 ## Generator
@@ -142,7 +123,8 @@ net_D = nn.Sequential(
 First we define a function to update the discriminator.
 
 ```{.python .input}
-def update_D(X, Z, net_D, net_G, loss, trainer_D):  #@save
+#@save
+def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
     batch_size = X.shape[0]
     ones = np.ones((batch_size,), ctx=X.ctx)
@@ -161,11 +143,12 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):  #@save
 
 ```{.python .input}
 #@tab pytorch
-def update_D(X, Z, net_D, net_G, loss, trainer_D):  #@save
+#@save
+def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
     batch_size = X.shape[0]
-    ones = torch.ones((batch_size, 1))
-    zeros = torch.zeros((batch_size, 1))
+    ones = torch.ones((batch_size, 1), device=X.device)
+    zeros = torch.zeros((batch_size, 1), device=X.device)
     trainer_D.zero_grad()
     real_Y = net_D(X)
     fake_X = net_G(Z)
@@ -181,7 +164,8 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):  #@save
 The generator is updated similarly. Here we reuse the cross-entropy loss but change the label of the fake data from $0$ to $1$.
 
 ```{.python .input}
-def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
+#@save
+def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator."""
     batch_size = Z.shape[0]
     ones = np.ones((batch_size,), ctx=Z.ctx)
@@ -198,16 +182,17 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
 
 ```{.python .input}
 #@tab pytorch
-def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
+#@save
+def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator."""
     batch_size = Z.shape[0]
-    ones = torch.ones((batch_size, 1))
+    ones = torch.ones((batch_size, 1), device=Z.device)
     trainer_G.zero_grad()
     # We could reuse `fake_X` from `update_D` to save computation
     fake_X = net_G(Z)
     # Recomputing `fake_Y` is needed since `net_D` is changed
     fake_Y = net_D(fake_X)
-    loss_G=loss(fake_Y,ones)
+    loss_G = loss(fake_Y,ones)
     loss_G.backward()
     trainer_G.step()
     return loss_G
@@ -255,13 +240,11 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
 ```{.python .input}
 #@tab pytorch
 def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
-    loss = nn.BCEWithLogitsLoss()
+    loss = nn.BCEWithLogitsLoss(reduction='sum')
     for w in net_D.parameters():
         nn.init.normal_(w, 0, 0.02)
     for w in net_G.parameters():
         nn.init.normal_(w, 0, 0.02)
-    net_D.zero_grad()
-    net_G.zero_grad()
     trainer_D = torch.optim.Adam(net_D.parameters(), lr=lr_D)
     trainer_G = torch.optim.Adam(net_G.parameters(), lr=lr_G)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
@@ -272,11 +255,9 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
         # Train one epoch
         timer = d2l.Timer()
         metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
-        for X in data_iter:
+        for (X,) in data_iter:
             batch_size = X.shape[0]
             Z = torch.normal(0, 1, size=(batch_size, latent_dim))
-            trainer_D.zero_grad()
-            trainer_G.zero_grad()
             metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),
                        update_G(Z, net_D, net_G, loss, trainer_G),
                        batch_size)
@@ -297,13 +278,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
 Now we specify the hyperparameters to fit the Gaussian distribution.
 
 ```{.python .input}
-lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20
-train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
-      latent_dim, d2l.numpy(data[:100]))
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20
 train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
       latent_dim, d2l.numpy(data[:100]))

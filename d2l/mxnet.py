@@ -2544,7 +2544,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 
 
 # Defined in file: ./chapter_generative-adversarial-networks/gan.md
-def update_G(Z, net_D, net_G, loss, trainer_G):  #@save
+def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator."""
     batch_size = Z.shape[0]
     ones = np.ones((batch_size,), ctx=Z.ctx)
