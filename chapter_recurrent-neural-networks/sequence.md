@@ -28,7 +28,7 @@ We need statistical tools and new deep neural network architectures to deal with
 :width:`400px`
 :label:`fig_ftse100`
 
-Let us denote the prices by $x_t \geq 0$, i.e., at time step $t \in \mathbb{Z}^+$ we observe price $x_t$. For a trader to do well in the stock market on day $t$ he should want to predict $x_t$ via
+Let us denote the prices by $x_t \geq 0$, i.e., at *time step* $t \in \mathbb{Z}^+$ we observe price $x_t$. For a trader to do well in the stock market on day $t$ he should want to predict $x_t$ via
 
 $$x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1).$$
 
@@ -117,9 +117,9 @@ import tensorflow as tf
 ```{.python .input}
 #@tab mxnet,pytorch
 T = 1000  # Generate a total of 1000 points
-time = d2l.arange(0, T, dtype=d2l.float32)
+time = d2l.arange(1, T + 1, dtype=d2l.float32)
 x = d2l.sin(0.01 * time) + d2l.normal(0, 0.2, (T,))
-d2l.plot(time, [x])
+d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(5, 2.5))
 ```
 
 ```{.python .input}
@@ -127,7 +127,7 @@ d2l.plot(time, [x])
 T = 1000  # Generate a total of 1000 points
 time = d2l.arange(0, T, dtype=d2l.float32)
 x = d2l.sin(0.01 * time) + d2l.normal([T], 0, 0.2)
-d2l.plot(time, [x])
+d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(5, 2.5))
 ```
 
 Next, we need to turn such a sequence into features and labels that our model can train on.
@@ -135,7 +135,8 @@ Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ a
 The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for the first $\tau$ of them.
 A simple fix, in particular if the sequence is long,
 is to discard those few terms.
-Alternatively we could pad the sequence with zeros. 
+Alternatively we could pad the sequence with zeros.
+Here we only use the first 600 feature-label pairs for training.
 
 ```{.python .input}
 #@tab mxnet,pytorch
@@ -158,6 +159,7 @@ labels = d2l.reshape(x[tau:], (-1, 1))
 ```{.python .input}
 #@tab all
 batch_size, n_train = 16, 600
+# Only the first `n_train` examples are used for training
 train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
 ```
@@ -271,21 +273,22 @@ train_net(net, train_iter, loss, 5, 0.01)
 
 ## Predictions
 
-Since training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
+Since the training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next time step.
 
 ```{.python .input}
 #@tab all
 estimates = net(features)
-d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(estimates)],
-         legend=['data', 'estimate'])
+d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(estimates)], 'time',
+         'x', legend=['data', 'estimate'], xlim=[1, 1000], figsize=(5, 2.5))
 ```
 
-This looks nice, just as we expected it. Even beyond 600 observations the estimates still look rather trustworthy. There is just one little problem to this: if we observe data only until timestep 600, we cannot hope to receive the ground truth for all future predictions. Instead, we need to work our way forward one step at a time:
+This looks nice, just as we expected it. Even beyond 604 (`n_train + tau`) observations the estimates still look trustworthy. There is just one little problem to this: if we observe data only until time step 604, we cannot hope to receive the ground truth for all future predictions.
+Instead, we need to work our way forward one step at a time:
 
 $$\begin{aligned}
-x_{601} & = f(x_{600}, \ldots, x_{597}), \\
-x_{602} & = f(x_{601}, \ldots, x_{598}), \\
-x_{603} & = f(x_{602}, \ldots, x_{599}).
+x_{601} &= f(x_{600}, \ldots, x_{597}), \\
+x_{602} &= f(x_{601}, \ldots, x_{598}), \\
+x_{603} &= f(x_{602}, \ldots, x_{599}).
 \end{aligned}$$
 
 In other words, we will have to use our own predictions to make future predictions. Let us see how well this goes.
@@ -293,28 +296,27 @@ In other words, we will have to use our own predictions to make future predictio
 ```{.python .input}
 #@tab mxnet,pytorch
 predictions = d2l.zeros(T)
-predictions[:n_train] = x[:n_train]
-for i in range(n_train, T):
-    predictions[i] = net(
-        predictions[(i-tau):i].reshape(1, -1)).reshape(1)
-d2l.plot([time, time[tau:], time[n_train:]],
-         [d2l.numpy(x), d2l.numpy(estimates),
-          d2l.numpy(predictions[n_train:])],
-         legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))
+predictions[:n_train + tau] = x[:n_train + tau]
+for i in range(n_train + tau, T):
+    predictions[i] = net(predictions[i - tau:i].reshape(1, -1)).reshape(1)
 ```
 
 ```{.python .input}
 #@tab tensorflow
 predictions = tf.Variable(d2l.zeros(T))
-predictions[:n_train].assign(x[:n_train])
-for i in range(n_train, T):
+predictions[:n_train + tau].assign(x[:n_train + tau])
+for i in range(n_train + tau, T):
     predictions[i].assign(d2l.reshape(net(
-        d2l.reshape(predictions[(i-tau):i], (1, -1))), ()))
-    
-d2l.plot([time, time[tau:], time[n_train:]],
+        d2l.reshape(predictions[i - tau:i], (1, -1))), ()))
+```
+
+```{.python .input}
+#@tab all
+d2l.plot([time, time[tau:], time[n_train + tau:]],
          [d2l.numpy(x), d2l.numpy(estimates),
-          d2l.numpy(predictions[n_train:])],
-         legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))
+          d2l.numpy(predictions[n_train + tau:])], 'time',
+         'x', legend=['data', 'estimate', 'multistep'], xlim=[1, 1000],
+         figsize=(5, 2.5))
 ```
 
 As the above example shows, this is a spectacular failure. The estimates decay to a constant pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that the errors build up. Let us say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon. For instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that the accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
@@ -325,34 +327,33 @@ Let us verify this observation by computing the $k$-step predictions on the enti
 #@tab mxnet,pytorch
 k = 33  # Look up to k - tau steps ahead
 
-features = d2l.zeros((k, T-k))
+features = d2l.zeros((k, T - k))
 for i in range(tau):  # Copy the first tau features from x
-    features[i] = x[i:T-k+i]
+    features[i] = x[i:T - k + i]
 
 for i in range(tau, k):  # Predict the (i-tau)-th step
-    features[i] = net(features[(i-tau):i].T).T
-
-steps = (4, 8, 16, 32)
-d2l.plot([time[i:T-k+i] for i in steps],
-         [d2l.numpy(features[i]) for i in steps],
-         legend=[f'step {i}' for i in steps], figsize=(4.5, 2.5))
+    features[i] = net(features[i - tau:i].T).T
 ```
 
 ```{.python .input}
 #@tab tensorflow
 k = 33  # Look up to k - tau steps ahead
 
-features = tf.Variable(d2l.zeros((k, T-k)))
+features = tf.Variable(d2l.zeros((k, T - k)))
 for i in range(tau):  # Copy the first tau features from x
-    features[i].assign(x[i:T-k+i])
+    features[i].assign(x[i:T - k + i])
 
 for i in range(tau, k):  # Predict the (i-tau)-th step
-    features[i].assign(net((features[(i-tau):i]).numpy().T).numpy().T[0])
+    features[i].assign(net((features[i - tau:i]).numpy().T).numpy().T[0])
+```
 
+```{.python .input}
+#@tab all
 steps = (4, 8, 16, 32)
-d2l.plot([time[i:T-k+i] for i in steps],
-         [d2l.numpy(features[i]) for i in steps],
-         legend=[f'step {i}' for i in steps], figsize=(4.5, 2.5))
+d2l.plot([time[i: T - k + i] for i in steps],
+         [d2l.numpy(features[i]) for i in steps], 'time', 'x',
+         legend=[f'step {i}' for i in steps], xlim=[1, 1000],
+         figsize=(5, 2.5))
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.
