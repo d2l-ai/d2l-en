@@ -326,19 +326,19 @@ Let us verify this observation by computing the $k$-step predictions on the enti
 
 ```{.python .input}
 #@tab mxnet,pytorch
-k = 33  # Look up to k - tau steps ahead
+max_steps = 64  # Predict `k` steps ahead
 
-features = d2l.zeros((k, T - k + 1))
-for i in range(tau):  # Copy the first tau features from x
-    features[i] = x[i:T - k + i + 1]
+features = d2l.zeros((tau + max_steps, T - tau - max_steps + 1))
+for i in range(tau):  # Copy the first `tau` features from `x`
+    features[i] = x[i:T - tau - max_steps + i + 1]
 
-for i in range(tau, k):  # Predict the (i-tau)-th step
+for i in range(tau, tau + max_steps):  # Predict the (i-tau)-th step
     features[i] = net(features[i - tau:i].T).T
 ```
 
 ```{.python .input}
 #@tab tensorflow
-k = 33  # Look up to k - tau steps ahead
+k = 33  # Predict `k - tau` steps ahead
 
 features = tf.Variable(d2l.zeros((k, T - k + 1)))
 for i in range(tau):  # Copy the first tau features from x
@@ -350,9 +350,9 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
 
 ```{.python .input}
 #@tab all
-steps = (4, 8, 16, 32)
-d2l.plot([time[i: T - k + i + 1] for i in steps],
-         [d2l.numpy(features[i]) for i in steps], 'time', 'x',
+steps = (1, 4, 16, 64)
+d2l.plot([time[tau + i - 1: T - max_steps + i] for i in steps],
+         [d2l.numpy(features[tau + i - 1]) for i in steps], 'time', 'x',
          legend=[f'step {i}' for i in steps], xlim=[5, 1000],
          figsize=(6, 3))
 ```
