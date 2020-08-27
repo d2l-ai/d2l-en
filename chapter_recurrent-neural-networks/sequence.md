@@ -115,7 +115,7 @@ import tensorflow as tf
 ```
 
 ```{.python .input}
-#@tab mxnet,pytorch
+#@tab mxnet, pytorch
 T = 1000  # Generate a total of 1000 points
 time = d2l.arange(1, T + 1, dtype=d2l.float32)
 x = d2l.sin(0.01 * time) + d2l.normal(0, 0.2, (T,))
@@ -139,7 +139,7 @@ Alternatively we could pad the sequence with zeros.
 Here we only use the first 600 feature-label pairs for training.
 
 ```{.python .input}
-#@tab mxnet,pytorch
+#@tab mxnet, pytorch
 tau = 4
 features = d2l.zeros((T - tau, tau))
 for i in range(tau):
@@ -273,7 +273,8 @@ train(net, train_iter, loss, 5, 0.01)
 
 ## Predictions
 
-Since the training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next time step.
+Since the training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens just in the next time step,
+namely *one-step predictions*.
 
 ```{.python .input}
 #@tab all
@@ -283,7 +284,8 @@ d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(onestep_preds)], 'time',
          figsize=(6, 3))
 ```
 
-This looks nice, just as we expected it. Even beyond 604 (`n_train + tau`) observations the estimates still look trustworthy. There is just one little problem to this: if we observe data only until time step 604, we cannot hope to receive the ground truth for all future predictions.
+The one-step predictions look nice, just as we expected.
+Even beyond 604 (`n_train + tau`) observations the estimates still look trustworthy. There is just one little problem to this: if we observe data only until time step 604, we cannot hope to receive the ground truth for all future predictions.
 Instead, we need to work our way forward one step at a time:
 
 $$\begin{aligned}
@@ -295,7 +297,7 @@ x_{603} &= f(x_{602}, \ldots, x_{599}).
 In other words, we will have to use our own predictions to make future predictions. Let us see how well this goes.
 
 ```{.python .input}
-#@tab mxnet,pytorch
+#@tab mxnet, pytorch
 multistep_preds = d2l.zeros(T)
 multistep_preds[:n_train + tau] = x[:n_train + tau]
 for i in range(n_train + tau, T):
@@ -330,30 +332,30 @@ max_steps = 64  # Predict `k` steps ahead
 ```
 
 ```{.python .input}
-#@tab mxnet,pytorch
-features = d2l.zeros((tau + max_steps, T - tau - max_steps + 1))
+#@tab mxnet, pytorch
+features = d2l.zeros((T - tau - max_steps + 1, tau + max_steps))
 for i in range(tau):  # Copy the first `tau` features from `x`
-    features[i] = x[i:T - tau - max_steps + i + 1]
+    features[:, i] = x[i:T - tau - max_steps + i + 1].T
 
 for i in range(tau, tau + max_steps):  # Predict the (i-tau)-th step
-    features[i] = net(features[i - tau:i].T).T
+    features[:, i] = d2l.reshape(net(features[:, i - tau:i]), -1)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-features = tf.Variable(d2l.zeros((tau + max_steps, T - tau - max_steps + 1)))
+features = tf.Variable(d2l.zeros((T - tau - max_steps + 1, tau + max_steps)))
 for i in range(tau):  # Copy the first `tau` features from `x`
-    features[i].assign(x[i:T - tau - max_steps + i + 1])
+    features[:, i].assign(x[i:T - tau - max_steps + i + 1].numpy().T)
 
 for i in range(tau, tau + max_steps):  # Predict the (i-tau)-th step
-    features[i].assign(net((features[i - tau:i]).numpy().T).numpy().T[0])
+    features[:, i].assign(d2l.reshape(net((features[:, i - tau:i])), -1))
 ```
 
 ```{.python .input}
 #@tab all
 steps = (1, 4, 16, 64)
 d2l.plot([time[tau + i - 1: T - max_steps + i] for i in steps],
-         [d2l.numpy(features[tau + i - 1]) for i in steps], 'time', 'x',
+         [d2l.numpy(features[:, tau + i - 1]) for i in steps], 'time', 'x',
          legend=[f'{i}-step preds' for i in steps], xlim=[5, 1000],
          figsize=(6, 3))
 ```
