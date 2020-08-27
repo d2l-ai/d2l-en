@@ -99,7 +99,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -107,7 +107,7 @@ import torch
 import torch.nn as nn
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -122,7 +122,7 @@ x = d2l.sin(0.01 * time) + d2l.normal(0, 0.2, (T,))
 d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 T = 1000  # Generate a total of 1000 points
 time = d2l.arange(0, T, dtype=d2l.float32)
@@ -147,7 +147,7 @@ for i in range(tau):
 labels = d2l.reshape(x[tau:], (-1, 1))
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 tau = 4
 features = tf.Variable(d2l.zeros((T - tau, tau)))
@@ -180,7 +180,7 @@ def get_net():
 loss = gluon.loss.L2Loss()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # Function for initializing the weights of the network
 def init_weights(m):
@@ -199,7 +199,7 @@ def get_net():
 loss = nn.MSELoss()
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 # Vanilla MLP architecture
 def get_net():
@@ -235,7 +235,7 @@ net = get_net()
 train(net, train_iter, loss, 5, 0.01)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def train(net, train_iter, loss, epochs, lr):
     trainer = torch.optim.Adam(net.parameters(), lr)
@@ -252,7 +252,7 @@ net = get_net()
 train(net, train_iter, loss, 5, 0.01)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 def train(net, train_iter, loss, epochs, lr):
     trainer = tf.keras.optimizers.Adam()
@@ -302,7 +302,7 @@ for i in range(n_train + tau, T):
     multistep_preds[i] = net(multistep_preds[i - tau:i].reshape(1, -1)).reshape(1)
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 multistep_preds = tf.Variable(d2l.zeros(T))
 multistep_preds[:n_train + tau].assign(x[:n_train + tau])
@@ -339,7 +339,7 @@ for i in range(tau, tau + max_steps):  # Predict the (i-tau)-th step
     features[i] = net(features[i - tau:i].T).T
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
 features = tf.Variable(d2l.zeros((tau + max_steps, T - tau - max_steps + 1)))
 for i in range(tau):  # Copy the first `tau` features from `x`
