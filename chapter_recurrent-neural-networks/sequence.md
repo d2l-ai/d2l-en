@@ -219,7 +219,7 @@ such as :numref:`sec_linear_concise`.
 Thus, we will not delve into much detail.
 
 ```{.python .input}
-def train_net(net, train_iter, loss, epochs, lr):
+def train(net, train_iter, loss, epochs, lr):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
     for epoch in range(epochs):
@@ -232,12 +232,12 @@ def train_net(net, train_iter, loss, epochs, lr):
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
-train_net(net, train_iter, loss, 5, 0.01)
+train(net, train_iter, loss, 5, 0.01)
 ```
 
 ```{.python .input}
 #@tab pytorch
-def train_net(net, train_iter, loss, epochs, lr):
+def train(net, train_iter, loss, epochs, lr):
     trainer = torch.optim.Adam(net.parameters(), lr)
     for epoch in range(epochs):
         for X, y in train_iter:
@@ -249,12 +249,12 @@ def train_net(net, train_iter, loss, epochs, lr):
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
-train_net(net, train_iter, loss, 5, 0.01)
+train(net, train_iter, loss, 5, 0.01)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-def train_net(net, train_iter, loss, epochs, lr):
+def train(net, train_iter, loss, epochs, lr):
     trainer = tf.keras.optimizers.Adam()
     for epoch in range(epochs):
         for X, y in train_iter:
@@ -268,7 +268,7 @@ def train_net(net, train_iter, loss, epochs, lr):
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
-train_net(net, train_iter, loss, 5, 0.01)
+train(net, train_iter, loss, 5, 0.01)
 ```
 
 ## Predictions
@@ -328,9 +328,9 @@ Let us verify this observation by computing the $k$-step predictions on the enti
 #@tab mxnet,pytorch
 k = 33  # Look up to k - tau steps ahead
 
-features = d2l.zeros((k, T - k))
+features = d2l.zeros((k, T - k + 1))
 for i in range(tau):  # Copy the first tau features from x
-    features[i] = x[i:T - k + i]
+    features[i] = x[i:T - k + i + 1]
 
 for i in range(tau, k):  # Predict the (i-tau)-th step
     features[i] = net(features[i - tau:i].T).T
@@ -340,9 +340,9 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
 #@tab tensorflow
 k = 33  # Look up to k - tau steps ahead
 
-features = tf.Variable(d2l.zeros((k, T - k)))
+features = tf.Variable(d2l.zeros((k, T - k + 1)))
 for i in range(tau):  # Copy the first tau features from x
-    features[i].assign(x[i:T - k + i])
+    features[i].assign(x[i:T - k + i + 1])
 
 for i in range(tau, k):  # Predict the (i-tau)-th step
     features[i].assign(net((features[i - tau:i]).numpy().T).numpy().T[0])
@@ -351,9 +351,9 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
 ```{.python .input}
 #@tab all
 steps = (4, 8, 16, 32)
-d2l.plot([time[i: T - k + i] for i in steps],
+d2l.plot([time[i: T - k + i + 1] for i in steps],
          [d2l.numpy(features[i]) for i in steps], 'time', 'x',
-         legend=[f'step {i}' for i in steps], xlim=[1, 1000],
+         legend=[f'step {i}' for i in steps], xlim=[5, 1000],
          figsize=(6, 3))
 ```
 
