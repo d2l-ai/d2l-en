@@ -99,7 +99,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -107,7 +107,7 @@ import torch
 import torch.nn as nn
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
@@ -122,7 +122,7 @@ x = d2l.sin(0.01 * time) + d2l.normal(0, 0.2, (T,))
 d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 T = 1000  # Generate a total of 1000 points
 time = d2l.arange(0, T, dtype=d2l.float32)
@@ -147,7 +147,7 @@ for i in range(tau):
 labels = d2l.reshape(x[tau:], (-1, 1))
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 tau = 4
 features = tf.Variable(d2l.zeros((T - tau, tau)))
@@ -180,7 +180,7 @@ def get_net():
 loss = gluon.loss.L2Loss()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 # Function for initializing the weights of the network
 def init_weights(m):
@@ -199,7 +199,7 @@ def get_net():
 loss = nn.MSELoss()
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 # Vanilla MLP architecture
 def get_net():
@@ -235,7 +235,7 @@ net = get_net()
 train(net, train_iter, loss, 5, 0.01)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 def train(net, train_iter, loss, epochs, lr):
     trainer = torch.optim.Adam(net.parameters(), lr)
@@ -252,7 +252,7 @@ net = get_net()
 train(net, train_iter, loss, 5, 0.01)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 def train(net, train_iter, loss, epochs, lr):
     trainer = tf.keras.optimizers.Adam()
@@ -277,9 +277,9 @@ Since the training loss is small, we would expect our model to work well. Let us
 
 ```{.python .input}
 #@tab all
-preds = net(features)
-d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(preds)], 'time',
-         'x', legend=['data', 'predictions'], xlim=[1, 1000],
+onestep_preds = net(features)
+d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(onestep_preds)], 'time',
+         'x', legend=['data', 'one-step'], xlim=[1, 1000],
          figsize=(6, 3))
 ```
 
@@ -296,27 +296,27 @@ In other words, we will have to use our own predictions to make future predictio
 
 ```{.python .input}
 #@tab mxnet,pytorch
-preds_using_preds = d2l.zeros(T)
-preds_using_preds[:n_train + tau] = x[:n_train + tau]
+multistep_preds = d2l.zeros(T)
+multistep_preds[:n_train + tau] = x[:n_train + tau]
 for i in range(n_train + tau, T):
-    preds_using_preds[i] = net(preds_using_preds[i - tau:i].reshape(1, -1)).reshape(1)
+    multistep_preds[i] = net(multistep_preds[i - tau:i].reshape(1, -1)).reshape(1)
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
-preds_using_preds = tf.Variable(d2l.zeros(T))
-preds_using_preds[:n_train + tau].assign(x[:n_train + tau])
+multistep_preds = tf.Variable(d2l.zeros(T))
+multistep_preds[:n_train + tau].assign(x[:n_train + tau])
 for i in range(n_train + tau, T):
-    preds_using_preds[i].assign(d2l.reshape(net(
-        d2l.reshape(preds_using_preds[i - tau:i], (1, -1))), ()))
+    multistep_preds[i].assign(d2l.reshape(net(
+        d2l.reshape(multistep_preds[i - tau:i], (1, -1))), ()))
 ```
 
 ```{.python .input}
 #@tab all
 d2l.plot([time, time[tau:], time[n_train + tau:]],
-         [d2l.numpy(x), d2l.numpy(preds),
-          d2l.numpy(preds_using_preds[n_train + tau:])], 'time',
-         'x', legend=['data', 'predictions', 'preds u. preds'],
+         [d2l.numpy(x), d2l.numpy(onestep_preds),
+          d2l.numpy(multistep_preds[n_train + tau:])], 'time',
+         'x', legend=['data', 'one-step', 'multistep'],
          xlim=[1, 1000], figsize=(6, 3))
 ```
 
@@ -325,9 +325,12 @@ As the above example shows, this is a spectacular failure. The estimates decay t
 Let us verify this observation by computing the $k$-step predictions on the entire sequence.
 
 ```{.python .input}
-#@tab mxnet,pytorch
+#@tab all
 max_steps = 64  # Predict `k` steps ahead
+```
 
+```{.python .input}
+#@tab mxnet,pytorch
 features = d2l.zeros((tau + max_steps, T - tau - max_steps + 1))
 for i in range(tau):  # Copy the first `tau` features from `x`
     features[i] = x[i:T - tau - max_steps + i + 1]
@@ -336,15 +339,13 @@ for i in range(tau, tau + max_steps):  # Predict the (i-tau)-th step
     features[i] = net(features[i - tau:i].T).T
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
-k = 33  # Predict `k - tau` steps ahead
+features = tf.Variable(d2l.zeros((tau + max_steps, T - tau - max_steps + 1)))
+for i in range(tau):  # Copy the first `tau` features from `x`
+    features[i].assign(x[i:T - tau - max_steps + i + 1])
 
-features = tf.Variable(d2l.zeros((k, T - k + 1)))
-for i in range(tau):  # Copy the first tau features from x
-    features[i].assign(x[i:T - k + i + 1])
-
-for i in range(tau, k):  # Predict the (i-tau)-th step
+for i in range(tau, tau + max_steps):  # Predict the (i-tau)-th step
     features[i].assign(net((features[i - tau:i]).numpy().T).numpy().T[0])
 ```
 
@@ -353,8 +354,7 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
 steps = (1, 4, 16, 64)
 d2l.plot([time[tau + i - 1: T - max_steps + i] for i in steps],
          [d2l.numpy(features[tau + i - 1]) for i in steps], 'time', 'x',
-         legend=[f'step {i}' for i in steps], xlim=[5, 1000],
-         figsize=(6, 3))
+         legend=[f'step {i}' for i in steps], xlim=[5, 1000], figsize=(6, 3))
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.
