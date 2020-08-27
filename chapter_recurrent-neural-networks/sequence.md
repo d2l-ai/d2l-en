@@ -279,7 +279,7 @@ Since the training loss is small, we would expect our model to work well. Let us
 #@tab all
 onestep_preds = net(features)
 d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(onestep_preds)], 'time',
-         'x', legend=['data', 'one-step'], xlim=[1, 1000],
+         'x', legend=['data', '1-step preds'], xlim=[1, 1000],
          figsize=(6, 3))
 ```
 
@@ -316,7 +316,7 @@ for i in range(n_train + tau, T):
 d2l.plot([time, time[tau:], time[n_train + tau:]],
          [d2l.numpy(x), d2l.numpy(onestep_preds),
           d2l.numpy(multistep_preds[n_train + tau:])], 'time',
-         'x', legend=['data', 'one-step', 'multistep'],
+         'x', legend=['data', '1-step preds', 'multistep preds'],
          xlim=[1, 1000], figsize=(6, 3))
 ```
 
@@ -354,7 +354,8 @@ for i in range(tau, tau + max_steps):  # Predict the (i-tau)-th step
 steps = (1, 4, 16, 64)
 d2l.plot([time[tau + i - 1: T - max_steps + i] for i in steps],
          [d2l.numpy(features[tau + i - 1]) for i in steps], 'time', 'x',
-         legend=[f'step {i}' for i in steps], xlim=[5, 1000], figsize=(6, 3))
+         legend=[f'{i}-step preds' for i in steps], xlim=[5, 1000],
+         figsize=(6, 3))
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.
