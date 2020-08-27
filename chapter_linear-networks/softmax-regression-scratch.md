@@ -270,7 +270,7 @@ Taking the sum yields the number of correct predictions.
 #@tab all
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
-    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
+    if y_hat.shape[0] >= 1:
         y_hat = d2l.argmax(y_hat, axis=1)        
     cmp = d2l.astype(y_hat, y.dtype) == y
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
