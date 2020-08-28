@@ -17,7 +17,7 @@ To facilitate the demonstration of BERT pretraining,
 we use a smaller corpus WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016`.
 
 Comparing with the PTB dataset used for pretraining word2vec in :numref:`sec_word2vec_data`,
-WikiText-2 i) retains the original punctuation, making it suitable for next sentence prediction; ii) retrains the original case and numbers; iii) is over twice larger.
+WikiText-2 i) retains the original punctuation, making it suitable for next sentence prediction; ii) retains the original case and numbers; iii) is over twice larger.
 
 ```{.python .input  n=1}
 import collections
