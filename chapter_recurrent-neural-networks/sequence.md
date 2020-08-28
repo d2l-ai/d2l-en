@@ -28,7 +28,12 @@ We need statistical tools and new deep neural network architectures to deal with
 :width:`400px`
 :label:`fig_ftse100`
 
-Let us denote the prices by $x_t \geq 0$, i.e., at *time step* $t \in \mathbb{Z}^+$ we observe price $x_t$. For a trader to do well in the stock market on day $t$ he should want to predict $x_t$ via
+
+Let us denote the prices by $x_t$, i.e., at *time step* $t \in \mathbb{Z}^+$ we observe price $x_t$.
+Note that for sequences in this text,
+$t$ will typically be discrete and vary over integers or its subset.
+Suppose that
+a trader who wants to do well in the stock market on day $t$ predicts $x_t$ via
 
 $$x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1).$$
 
@@ -88,8 +93,10 @@ We are barely scratching the surface of it.
 
 ## Experiment
 
-After so much theory, let us try this out in practice.
-We begin by generating some data. To keep things simple we generate our sequence data by using a sine function with some additive noise.
+After reviewing so many statistical tools,
+let us try this out in practice.
+We begin by generating some data.
+To keep things simple we generate our sequence data by using a sine function with some additive noise for time steps $1, 2, \ldots, 1000$.
 
 ```{.python .input}
 %matplotlib inline
@@ -125,13 +132,13 @@ d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```{.python .input}
 #@tab tensorflow
 T = 1000  # Generate a total of 1000 points
-time = d2l.arange(0, T, dtype=d2l.float32)
+time = d2l.arange(1, T + 1, dtype=d2l.float32)
 x = d2l.sin(0.01 * time) + d2l.normal([T], 0, 0.2)
 d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
 Next, we need to turn such a sequence into features and labels that our model can train on.
-Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{x}_t = (x_{t-1}, \ldots, x_{t-\tau})$.
+Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.
 The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for the first $\tau$ of them.
 A simple fix, in particular if the sequence is long,
 is to discard those few terms.
@@ -274,7 +281,7 @@ train(net, train_iter, loss, 5, 0.01)
 ## Predictions
 
 Since the training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens just in the next time step,
-namely *one-step predictions*.
+namely *one-step-ahead predictions*.
 
 ```{.python .input}
 #@tab all
@@ -284,15 +291,21 @@ d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(onestep_preds)], 'time',
          figsize=(6, 3))
 ```
 
-The one-step predictions look nice, just as we expected.
-Even beyond 604 (`n_train + tau`) observations the estimates still look trustworthy. There is just one little problem to this: if we observe data only until time step 604, we cannot hope to receive the ground truth for all future predictions.
+The one-step-ahead predictions look nice, just as we expected.
+Even beyond 604 (`n_train + tau`) observations the predictions still look trustworthy.
+However, there is just one little problem to this:
+if we observe sequence data only until time step 604, we cannot hope to receive the inputs for all the future one-step-ahead predictions.
 Instead, we need to work our way forward one step at a time:
 
 $$\begin{aligned}
-x_{601} &= f(x_{600}, \ldots, x_{597}), \\
-x_{602} &= f(x_{601}, \ldots, x_{598}), \\
-x_{603} &= f(x_{602}, \ldots, x_{599}).
+\hat{x}_{605} &= f(x_{601}, x_{602}, x_{603}, x_{604}), \\
+\hat{x}_{606} &= f(x_{602}, x_{603}, x_{604}, \hat{x}_{605}), \\
+\hat{x}_{607} &= f(x_{603}, x_{604}, \hat{x}_{605}, \hat{x}_{606}),\\
+\hat{x}_{608} &= f(x_{604}, \hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}),\\
+\hat{x}_{609} &= f(\hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}, \hat{x}_{608}).
 \end{aligned}$$
+
+Generally, for an observed sequence up to $x_t$, its *$k$-step-ahead prediction* is the predicted output $\hat{x}_{t+k}$ at time step $t+k$.
 
 In other words, we will have to use our own predictions to make future predictions. Let us see how well this goes.
 
