@@ -486,12 +486,12 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
         else:
             if isinstance(model, nn.Module) and not isinstance(state, tuple):
                 # state is a tensor for nn.GRU  
-                state.detach_()
+                state.detach()
             else:
                 # state is a tuple of tensors for nn.LSTM and
                 # for our custom scratch implementation 
                 for s in state:
-                    s.detach_()
+                    s.detach()
         y = Y.T.reshape(-1)
         X, y = X.to(device), y.to(device)
         py, state = model(X, state)
