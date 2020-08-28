@@ -62,7 +62,7 @@ Note that the above considerations still hold if we deal with discrete objects, 
 
 ### Markov Models
 
-Recall the approximation that in an autoregressive model we use only $x_{t-1}, \ldots, x_{t-\tau}$ instead of $x_{t-1}, \ldots, x_1$ to estimate $x_t$. Whenever this approximation is accurate we say that the sequence satisfies a *Markov condition*. In particular, if $\tau = 1$, we have a *first order Markov model* and $P(x)$ is given by
+Recall the approximation that in an autoregressive model we use only $x_{t-1}, \ldots, x_{t-\tau}$ instead of $x_{t-1}, \ldots, x_1$ to estimate $x_t$. Whenever this approximation is accurate we say that the sequence satisfies a *Markov condition*. In particular, if $\tau = 1$, we have a *first-order Markov model* and $P(x)$ is given by
 
 $$P(x_1, \ldots, x_T) = \prod_{t=1}^T P(x_t \mid x_{t-1}).$$
 
@@ -91,7 +91,7 @@ explained more on this topic :cite:`Peters.Janzing.Scholkopf.2017`.
 We are barely scratching the surface of it.
 
 
-## Experiment
+## Training
 
 After reviewing so many statistical tools,
 let us try this out in practice.
@@ -278,10 +278,10 @@ net = get_net()
 train(net, train_iter, loss, 5, 0.01)
 ```
 
-## Predictions
+## Prediction
 
 Since the training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens just in the next time step,
-namely *one-step-ahead predictions*.
+namely the *one-step-ahead prediction*.
 
 ```{.python .input}
 #@tab all
@@ -297,24 +297,26 @@ However, there is just one little problem to this:
 if we observe sequence data only until time step 604, we cannot hope to receive the inputs for all the future one-step-ahead predictions.
 Instead, we need to work our way forward one step at a time:
 
-$$\begin{aligned}
-\hat{x}_{605} &= f(x_{601}, x_{602}, x_{603}, x_{604}), \\
-\hat{x}_{606} &= f(x_{602}, x_{603}, x_{604}, \hat{x}_{605}), \\
-\hat{x}_{607} &= f(x_{603}, x_{604}, \hat{x}_{605}, \hat{x}_{606}),\\
-\hat{x}_{608} &= f(x_{604}, \hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}),\\
-\hat{x}_{609} &= f(\hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}, \hat{x}_{608}).
-\end{aligned}$$
+$$
+\hat{x}_{605} = f(x_{601}, x_{602}, x_{603}, x_{604}), \\
+\hat{x}_{606} = f(x_{602}, x_{603}, x_{604}, \hat{x}_{605}), \\
+\hat{x}_{607} = f(x_{603}, x_{604}, \hat{x}_{605}, \hat{x}_{606}),\\
+\hat{x}_{608} = f(x_{604}, \hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}),\\
+\hat{x}_{609} = f(\hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}, \hat{x}_{608}),\\
+\ldots
+$$
 
-Generally, for an observed sequence up to $x_t$, its *$k$-step-ahead prediction* is the predicted output $\hat{x}_{t+k}$ at time step $t+k$.
-
-In other words, we will have to use our own predictions to make future predictions. Let us see how well this goes.
+Generally, for an observed sequence up to $x_t$, its predicted output $\hat{x}_{t+k}$ at time step $t+k$ is called the *$k$-step-ahead prediction*. Since we have observed up to $x_{604}$, its $k$-step-ahead prediction is $\hat{x}_{604+k}$.
+In other words, we will have to use our own predictions to make multistep-ahead predictions.
+Let us see how well this goes.
 
 ```{.python .input}
 #@tab mxnet, pytorch
 multistep_preds = d2l.zeros(T)
 multistep_preds[:n_train + tau] = x[:n_train + tau]
 for i in range(n_train + tau, T):
-    multistep_preds[i] = net(multistep_preds[i - tau:i].reshape(1, -1)).reshape(1)
+    multistep_preds[i] = d2l.reshape(net(
+        multistep_preds[i - tau:i].reshape(1, -1)), 1)
 ```
 
 ```{.python .input}
@@ -335,32 +337,45 @@ d2l.plot([time, time[tau:], time[n_train + tau:]],
          xlim=[1, 1000], figsize=(6, 3))
 ```
 
-As the above example shows, this is a spectacular failure. The estimates decay to a constant pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that the errors build up. Let us say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon. For instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that the accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
+As the above example shows, this is a spectacular failure. The predictions decay to a constant pretty quickly after a few prediction steps.
+Why did the algorithm work so poorly?
+This is ultimately due to the fact that the errors build up.
+Let us say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$.
+Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + c \epsilon_1$ for some constant $c$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon. For instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that the accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
 
-Let us verify this observation by computing the $k$-step predictions on the entire sequence.
+Let us take a closer look at the difficulties in $k$-step-ahead predictions
+by computing predictions on the entire sequence for $k = 1, 4, 16, 64$.
 
 ```{.python .input}
 #@tab all
-max_steps = 64  # Predict `k` steps ahead
+max_steps = 64
 ```
 
 ```{.python .input}
 #@tab mxnet, pytorch
 features = d2l.zeros((T - tau - max_steps + 1, tau + max_steps))
-for i in range(tau):  # Copy the first `tau` features from `x`
-    features[:, i] = x[i:T - tau - max_steps + i + 1].T
+# Column `i` (`i` < `tau`) are observations from `x` for time steps from
+# `i + 1` to `i + T - tau - max_steps + 1`
+for i in range(tau):
+    features[:, i] = x[i:i + T - tau - max_steps + 1].T
 
-for i in range(tau, tau + max_steps):  # Predict the (i-tau)-th step
+# Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
+# time steps from `i + 1` to `i + T - tau - max_steps + 1`
+for i in range(tau, tau + max_steps):
     features[:, i] = d2l.reshape(net(features[:, i - tau:i]), -1)
 ```
 
 ```{.python .input}
 #@tab tensorflow
 features = tf.Variable(d2l.zeros((T - tau - max_steps + 1, tau + max_steps)))
-for i in range(tau):  # Copy the first `tau` features from `x`
-    features[:, i].assign(x[i:T - tau - max_steps + i + 1].numpy().T)
+# Column `i` (`i` < `tau`) are observations from `x` for time steps from
+# `i + 1` to `i + T - tau - max_steps + 1`
+for i in range(tau):
+    features[:, i].assign(x[i:i + T - tau - max_steps + 1].numpy().T)
 
-for i in range(tau, tau + max_steps):  # Predict the (i-tau)-th step
+# Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
+# time steps from `i + 1` to `i + T - tau - max_steps + 1`
+for i in range(tau, tau + max_steps):
     features[:, i].assign(d2l.reshape(net((features[:, i - tau:i])), -1))
 ```
 
@@ -373,24 +388,25 @@ d2l.plot([time[tau + i - 1: T - max_steps + i] for i in steps],
          figsize=(6, 3))
 ```
 
-This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.
+This clearly illustrates how the quality of the prediction changes as we try to predict further into the future.
+While the 4-step-ahead predictions still look good, anything beyond that is almost useless.
 
 
 ## Summary
 
-* Sequence models require specialized statistical tools for estimation. Two popular choices are autoregressive models and latent-variable autoregressive models.
-* As we predict further in time, the errors accumulate and the quality of the estimates degrades, often dramatically.
 * There is quite a difference in difficulty between interpolation and extrapolation. Consequently, if you have a sequence, always respect the temporal order of the data when training, i.e., never train on future data.
+* Sequence models require specialized statistical tools for estimation. Two popular choices are autoregressive models and latent-variable autoregressive models.
 * For causal models (e.g., time going forward), estimating the forward direction is typically a lot easier than the reverse direction.
+* For an observed sequence up to time step $t$, its predicted output at time step $t+k$ is the *$k$-step-ahead prediction*. As we predict further in time by increasing $k$, the errors accumulate and the quality of the prediction degrades, often dramatically.
 
 
 ## Exercises
 
-1. Improve the above model.
+1. Improve the model in the experiment of this section.
     * Incorporate more than the past 4 observations? How many do you really need?
-    * How many would you need if there was no noise? Hint: you can write $\sin$ and $\cos$ as a differential equation.
-    * Can you incorporate older features while keeping the total number of features constant? Does this improve accuracy? Why?
-    * Change the neural network architecture and see what happens.
+    * How many past observations would you need if there was no noise? Hint: you can write $\sin$ and $\cos$ as a differential equation.
+    * Can you incorporate older observations while keeping the total number of features constant? Does this improve accuracy? Why?
+    * Change the neural network architecture and evaluate the performance.
 1. An investor wants to find a good security to buy. He looks at past returns to decide which one is likely to do well. What could possibly go wrong with this strategy?
 1. Does causality also apply to text? To which extent?
 1. Give an example for when a latent autoregressive model might be needed to capture the dynamic of the data.
