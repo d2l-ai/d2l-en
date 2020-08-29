@@ -2,91 +2,122 @@
 :label:`sec_language_model`
 
 
-In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, where these tokens can be viewed as a sequence of discrete observations.
+In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, where these tokens can be viewed as a sequence of discrete observations, such as words or characters.
 Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$. 
-Then, in the discrete time series, $x_t$($1 \leq t \leq T$) can be considered as the label of time step $t$. Given such a sequence, the goal of a language model is to estimate the probability
+Then, in the text sequence,
+$x_t$($1 \leq t \leq T$) can be considered as the observation or label at time step $t$. Given such a text sequence,
+the goal of a *language model* is to estimate the joint probability of the sequence
 
 $$P(x_1, x_2, \ldots, x_T).$$
 
-Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim P(w_t \mid w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
+Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one token at a time $x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1)$.
+Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments.
+Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
 
-Nonetheless language models are of great service even in their limited form. For instance, the phrases "to recognize speech" and "to wreck a nice beach" sound very similar. This can cause ambiguity in speech recognition, ambiguity that is easily resolved through a language model which rejects the second translation as outlandish. Likewise, in a document summarization algorithm it is worth while knowing that "dog bites man" is much more frequent than "man bites dog", or that "I want to eat grandma" is a rather disturbing statement, whereas "I want to eat, grandma" is much more benign.
+Nonetheless, language models are of great service even in their limited form.
+For instance, the phrases "to recognize speech" and "to wreck a nice beach" sound very similar.
+This can cause ambiguity in speech recognition,
+which is easily resolved through a language model that rejects the second translation as outlandish.
+Likewise, in a document summarization algorithm
+it is worthwhile knowing that "dog bites man" is much more frequent than "man bites dog", or that "I want to eat grandma" is a rather disturbing statement, whereas "I want to eat, grandma" is much more benign.
+
 
 ## Estimating a Language Model
 
-The obvious question is how we should model a document, or even a sequence of words. We can take recourse to the analysis we applied to sequence models in the previous section. Let us start by applying basic probability rules:
+The obvious question is how we should model a document, or even a sequence of tokens. 
+Suppose that we tokenize text data at the word level.
+We can take recourse to the analysis we applied to sequence models in :numref:`sec_sequence`.
+Let us start by applying basic probability rules:
 
-$$P(w_1, w_2, \ldots, w_T) = P(w_1) \prod_{t=2}^T P(w_t  \mid  w_1, \ldots, w_{t-1}).$$
+$$P(x_1, x_2, \ldots, x_T) = \prod_{t=1}^T P(x_t  \mid  x_1, \ldots, x_{t-1}).$$
 
-For example, the probability of a text sequence containing four tokens consisting of words and punctuation would be given as:
+For example, 
+the probability of a text sequence containing four words would be given as:
 
-$$P(\mathrm{Statistics}, \mathrm{is}, \mathrm{fun}, \mathrm{.}) =  P(\mathrm{Statistics}) P(\mathrm{is}  \mid  \mathrm{Statistics}) P(\mathrm{fun}  \mid  \mathrm{Statistics}, \mathrm{is}) P(\mathrm{.}  \mid  \mathrm{Statistics}, \mathrm{is}, \mathrm{fun}).$$
+$$P(\text{deep}, \text{learning}, \text{is}, \text{fun}) =  P(\text{deep}) P(\text{learning}  \mid  \text{deep}) P(\text{is}  \mid  \text{deep}, \text{learning}) P(\text{fun}  \mid  \text{deep}, \text{learning}, \text{is}).$$
 
 In order to compute the language model, we need to calculate the
 probability of words and the conditional probability of a word given
-the previous few words, i.e., language model parameters. Here, we
-assume that the training dataset is a large text corpus, such as all
-Wikipedia entries, [Project Gutenberg](https://en.wikipedia.org/wiki/Project_Gutenberg), or all text posted online on the
-web. The probability of words can be calculated from the relative word
-frequency of a given word in the training dataset.
+the previous few words.
+Such probabilities are essentially
+language model parameters.
 
-For example, $P(\mathrm{Statistics})$ can be calculated as the
-probability of any sentence starting with the word "statistics". A
+Here, we
+assume that the training dataset is a large text corpus, such as all
+Wikipedia entries, [Project Gutenberg](https://en.wikipedia.org/wiki/Project_Gutenberg),
+and all text posted on the
+Web.
+The probability of words can be calculated from the relative word
+frequency of a given word in the training dataset.
+For example, $P(\text{deep})$ can be calculated as the
+probability of any sentence starting with the word "deep". A
 slightly less accurate approach would be to count all occurrences of
-the word "statistics" and divide it by the total number of words in
-the corpus. This works fairly well, particularly for frequent
+the word "deep" and divide it by the total number of words in
+the corpus.
+This works fairly well, particularly for frequent
 words. Moving on, we could attempt to estimate
 
-$$\hat{P}(\mathrm{is} \mid \mathrm{Statistics}) = \frac{n(\mathrm{Statistics~is})}{n(\mathrm{Statistics})}.$$
+$$\hat{P}(\text{learning} \mid \text{deep}) = \frac{n(\text{deep, learning})}{n(\text{deep})},$$
 
-Here $n(w)$ and $n(w, w')$ are the number of occurrences of singletons
-and pairs of words respectively. Unfortunately, estimating the
+where $n(x)$ and $n(x, x')$ are the number of occurrences of singletons
+and consecutive word pairs, respectively.
+Unfortunately, estimating the
 probability of a word pair is somewhat more difficult, since the
-occurrences of "Statistics is" are a lot less frequent. In
+occurrences of "deep learning" are a lot less frequent. In
 particular, for some unusual word combinations it may be tricky to
-find enough occurrences to get accurate estimates. Things take a turn for the worse for 3-word combinations and beyond. There will be many plausible 3-word combinations that we likely will not see in our dataset. Unless we provide some solution to give such word combinations nonzero weight, we will not be able to use these as a language model. If the dataset is small or if the words are very rare, we might not find even a single one of them.
+find enough occurrences to get accurate estimates.
+Things take a turn for the worse for three-word combinations and beyond.
+There will be many plausible three-word combinations that we likely will not see in our dataset.
+Unless we provide some solution to assign such word combinations nonzero count, we will not be able to use them in a language model. If the dataset is small or if the words are very rare, we might not find even a single one of them.
 
-A common strategy is to perform some form of Laplace smoothing. We already
-encountered this in our discussion of
-naive Bayes in :numref:`sec_naive_bayes` where the solution was to
-add a small constant to all counts. This helps with singletons, e.g., via
+A common strategy is to perform some form of *Laplace smoothing*.
+The solution is to
+add a small constant to all counts. 
+Denote by $n$ the total number of words in
+the training set
+and $m$ the number of unique words.
+This solution helps with singletons, e.g., via
 
 $$\begin{aligned}
-	\hat{P}(w) & = \frac{n(w) + \epsilon_1/m}{n + \epsilon_1}, \\
-	\hat{P}(w' \mid w) & = \frac{n(w, w') + \epsilon_2 \hat{P}(w')}{n(w) + \epsilon_2}, \\
-	\hat{P}(w'' \mid w',w) & = \frac{n(w, w',w'') + \epsilon_3 \hat{P}(w',w'')}{n(w, w') + \epsilon_3}.
+	\hat{P}(x) & = \frac{n(x) + \epsilon_1/m}{n + \epsilon_1}, \\
+	\hat{P}(x' \mid x) & = \frac{n(x, x') + \epsilon_2 \hat{P}(x')}{n(x) + \epsilon_2}, \\
+	\hat{P}(x'' \mid x,x') & = \frac{n(x, x',x'') + \epsilon_3 \hat{P}(x'')}{n(x, x') + \epsilon_3}.
 \end{aligned}$$
 
-Here the coefficients $\epsilon_i > 0$ determine how much we use the
-estimate for a shorter sequence as a fill-in for longer
-ones. Moreover, $m$ is the total number of words we encounter. The
-above is a rather primitive variant of what Kneser-Ney smoothing
-and Bayesian nonparametrics can accomplish. See e.g., :cite:`Wood.Gasthaus.Archambeau.ea.2011` for more detail of how to accomplish
-this. Unfortunately, models like this get unwieldy rather quickly
+Here $\epsilon_i$ are hyperparameters.
+Take $\epsilon_1$ as an example:
+when $\epsilon_1 = 0$, no smoothing is applied;
+when $\epsilon_1$ approaches positive infinity,
+$\hat{P}(x)$ approaches the uniform probability $1/m$. 
+The above is a rather primitive variant of what
+other techniques can accomplish :cite:`Wood.Gasthaus.Archambeau.ea.2011`.
+
+
+Unfortunately, models like this get unwieldy rather quickly
 for the following reasons. First, we need to store all counts.
 Second, this entirely ignores the meaning of the words. For
-instance, *"cat"* and *"feline"* should occur in related contexts.
+instance, "cat" and "feline" should occur in related contexts.
 It is quite difficult to adjust such models to additional contexts,
 whereas, deep learning based language models are well suited to
-take this into account.  Last, long word
+take this into account.
+Last, long word
 sequences are almost certain to be novel, hence a model that simply
-counts the frequency of previously seen word sequences is bound to
-perform poorly there.
-
+counts the frequency of previously seen word sequences is bound to perform poorly there.
 
 ## Markov Models and $n$-grams
 
-Before we discuss solutions involving deep learning, we need some more terminology and concepts. Recall our discussion of Markov Models in the previous section. Let us apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $P(w_{t+1} \mid w_t, \ldots, w_1) = P(w_{t+1} \mid w_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
+Before we discuss solutions involving deep learning, we need some more terminology and concepts. Recall our discussion of Markov Models in :numref:`sec_sequence`.
+Let us apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $P(x_{t+1} \mid x_t, \ldots, x_1) = P(x_{t+1} \mid x_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
 
 $$
 \begin{aligned}
-P(w_1, w_2, w_3, w_4) &=  P(w_1) P(w_2) P(w_3) P(w_4),\\
-P(w_1, w_2, w_3, w_4) &=  P(w_1) P(w_2  \mid  w_1) P(w_3  \mid  w_2) P(w_4  \mid  w_3),\\
-P(w_1, w_2, w_3, w_4) &=  P(w_1) P(w_2  \mid  w_1) P(w_3  \mid  w_1, w_2) P(w_4  \mid  w_2, w_3).
+P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2) P(x_3) P(x_4),\\
+P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2  \mid  x_1) P(x_3  \mid  x_2) P(x_4  \mid  x_3),\\
+P(x_1, x_2, x_3, x_4) &=  P(x_1) P(x_2  \mid  x_1) P(x_3  \mid  x_1, x_2) P(x_4  \mid  x_2, x_3).
 \end{aligned}
 $$
 
-The probability formulae that involve one, two, and three variables are typically referred to as unigram, bigram, and trigram models respectively. In the following, we will learn how to design better models.
+The probability formulae that involve one, two, and three variables are typically referred to as *unigram*, *bigram*, and *trigram* models, respectively. In the following, we will learn how to design better models.
 
 ## Natural Language Statistics
 
