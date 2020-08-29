@@ -52,7 +52,7 @@ Notice that if word $w_i$ appears in the context window of word $w_j$, then word
 
 We can also try to understand GloVe word embedding from another perspective. We will continue the use of symbols from earlier in this section, $P(w_j \mid w_i)$ represents the conditional probability of generating context word $w_j$ with central target word $w_i$ in the dataset, and it will be recorded as $p_{ij}$. From a real example from a large corpus, here we have the following two sets of conditional probabilities with "ice" and "steam" as the central target words and the ratio between them:
 
-|$w_k$=|$\text{solid}$|$\text{gas}$|$\text{water}$|$\text{fashion}$|
+|$w_k$=|solid|gas|water|fashion|
 |--:|:-:|:-:|:-:|:-:|
 |$p_1=P(w_k\mid \text{ice})$|0.00019|0.000066|0.003|0.000017|
 |$p_2=P(w_k\mid\text{steam})$|0.000022|0.00078|0.0022|0.000018|
