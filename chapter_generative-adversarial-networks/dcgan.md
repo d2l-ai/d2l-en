@@ -19,6 +19,7 @@ from d2l import torch as d2l
 import torch
 import torchvision
 from torch import nn
+import warnings
 ```
 
 ## The Pokemon Dataset
@@ -41,6 +42,7 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 data_dir = d2l.download_extract('pokemon')
+pokemon = torchvision.datasets.ImageFolder(data_dir)
 ```
 
 We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0, 1]$, while our generator will use the tanh function to obtain outputs in $[-1, 1]$. Therefore we normalize the data with $0.5$ mean and $0.5$ standard deviation to match the value range.
@@ -65,7 +67,7 @@ transformer = torchvision.transforms.Compose([
     torchvision.transforms.ToTensor(),
     torchvision.transforms.Normalize(0.5, 0.5)
 ])
-pokemon = torchvision.datasets.ImageFolder(data_dir, transformer)
+pokemon.transform = transformer
 data_iter = torch.utils.data.DataLoader(
     pokemon, batch_size=batch_size,
     shuffle=True, num_workers=d2l.get_dataloader_workers())
@@ -83,6 +85,7 @@ for X, y in data_iter:
 
 ```{.python .input}
 #@tab pytorch
+warnings.filterwarnings('ignore')
 d2l.set_figsize((4, 4))
 for X, y in data_iter:
     imgs = X[0:20,:,:,:].permute(0, 2, 3, 1)/2+0.5
@@ -111,16 +114,16 @@ class G_block(nn.Block):
 ```{.python .input}
 #@tab pytorch
 class G_block(nn.Module):
-        def __init__(self, channels, nz=3, kernel_size=4, strides=2,
-                 padding=1, alpha=0.2, **kwargs):
-            super(G_block, self).__init__(**kwargs)
-            self.conv2d = nn.ConvTranspose2d(
-                nz, channels, kernel_size, strides, padding, bias=False)
-            self.batch_norm = nn.BatchNorm2d(channels)
-            self.activation = nn.ReLU(alpha)
+    def __init__(self, channels, nz=3, kernel_size=4, strides=2,
+                 padding=1, **kwargs):
+        super(G_block, self).__init__(**kwargs)
+        self.conv2d_trans = nn.ConvTranspose2d(
+            nz, channels, kernel_size, strides, padding, bias=False)
+        self.batch_norm = nn.BatchNorm2d(channels)
+        self.activation = nn.ReLU()
 
-        def forward(self, X):
-            return self.activation(self.batch_norm(self.conv2d(X)))
+    def forward(self, X):
+        return self.activation(self.batch_norm(self.conv2d_trans(X)))
 ```
 
 In default, the transposed convolution layer uses a $k_h = k_w = 4$ kernel, a $s_h = s_w = 2$ strides, and a $p_h = p_w = 1$ padding. With a input shape of $n_h^{'} \times n_w^{'} = 16 \times 16$, the generator block will double input's width and height.
@@ -180,6 +183,9 @@ net_G.add(G_block(n_G*8, strides=1, padding=0),  # Output: (64 * 8, 4, 4)
 
 ```{.python .input}
 #@tab pytorch
+def Conv2DTranspose(channels, kernel_size, strides, padding, use_bias, nc=3):
+    return nn.ConvTranspose2d(nc, channels, kernel_size=kernel_size,stride=strides, padding=padding, bias=use_bias)
+
 n_G = 64
 net_G = nn.Sequential(
     G_block(n_G*8, nz=100, strides=1, padding=0),  # Output: (64 * 8, 4, 4)
@@ -188,8 +194,7 @@ net_G = nn.Sequential(
     G_block(n_G, n_G*2),    # Output: (64, 32, 32)
     Conv2DTranspose(
               3, nc=n_G, kernel_size=4, strides=2, padding=1, use_bias=False),
-    nn.Tanh()               # Output: (3, 64, 64)
-)
+    nn.Tanh())              # Output: (3, 64, 64)
 ```
 
 Generate a 100 dimensional latent variable to verify the generator's output shape.
@@ -218,7 +223,7 @@ As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if 
 alphas = [0, 0.2, 0.4, .6, .8, 1]
 x = np.arange(-2, 1, 0.1)
 Y = [nn.LeakyReLU(alpha)(x).asnumpy() for alpha in alphas]
-d2l.plot(x.asnumpy(), Y, 'x', 'y', alphas)
+d2l.plot(d2l.numpy(x), Y, 'x', 'y', alphas)
 ```
 
 ```{.python .input}
@@ -226,7 +231,7 @@ d2l.plot(x.asnumpy(), Y, 'x', 'y', alphas)
 alphas = [0, 0.2, 0.4, .6, .8, 1]
 x = torch.arange(-2, 1, 0.1)
 Y = [nn.LeakyReLU(alpha)(x).numpy() for alpha in alphas]
-d2l.plot(x.numpy(), Y, 'x', 'y', alphas)
+d2l.plot(d2l.numpy(x), Y, 'x', 'y', alphas)
 ```
 
 
@@ -249,16 +254,16 @@ class D_block(nn.Block):
 ```{.python .input}
 #@tab pytorch
 class D_block(nn.Module):
-        def __init__(self, channels, nc=3, kernel_size=4, strides=2,
-                 padding=1, alpha=0.2, **kwargs):
-            super(D_block, self).__init__(**kwargs)
-            self.conv2d = nn.Conv2d(
-                nc, channels, kernel_size, strides, padding, bias=False)
-            self.batch_norm = nn.BatchNorm2d(channels)
-            self.activation = nn.LeakyReLU(alpha, inplace=True)
+    def __init__(self, channels, nc=3, kernel_size=4, strides=2,
+                padding=1, alpha=0.2, **kwargs):
+        super(D_block, self).__init__(**kwargs)
+        self.conv2d = nn.Conv2d(
+            nc, channels, kernel_size, strides, padding, bias=False)
+        self.batch_norm = nn.BatchNorm2d(channels)
+        self.activation = nn.LeakyReLU(alpha, inplace=True)
 
-        def forward(self, X):
-            return self.activation(self.batch_norm(self.conv2d(X)))
+    def forward(self, X):
+        return self.activation(self.batch_norm(self.conv2d(X)))
 ```
 
 
@@ -310,7 +315,7 @@ net_D = nn.Sequential(
     D_block(n_D*2, n_D),  # Output: (64 * 2, 16, 16)
     D_block(n_D*4, n_D*2),  # Output: (64 * 4, 8, 8)
     D_block(n_D*8, n_D*4),  # Output: (64 * 8, 4, 4)
-    Conv2D(1, nc=n_D*8, kernel_size=4, use_bias=False)  # Output: (1, 1, 1)
+    Conv2D(1, nc=n_D*8, kernel_size=4, use_bias=False))  # Output: (1, 1, 1)
 )
 ```
 
@@ -374,11 +379,11 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
 
 ```{.python .input}
 #@tab pytorch
-def update_D(X, Z, net_D, net_G, loss, trainer_D, device=d2l.try_gpu()):
+def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
     batch_size = X.shape[0]
-    ones = torch.ones((batch_size, 1, 1, 1), device=device)
-    zeros = torch.zeros((batch_size, 1, 1, 1), device=device)
+    ones = torch.ones((batch_size, 1, 1, 1), device=X.device)
+    zeros = torch.zeros((batch_size, 1, 1, 1), device=X.device)
     trainer_D.zero_grad()
     real_Y = net_D(X)
     fake_X = net_G(Z)
@@ -390,31 +395,29 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D, device=d2l.try_gpu()):
     trainer_D.step()
     return loss_D
 
-def update_G(Z, net_D, net_G, loss, trainer_G, device=d2l.try_gpu()): 
+def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator."""
     batch_size = Z.shape[0]
-    ones = torch.ones((batch_size, 1, 1, 1), device=device)
-    trainer_G.zero_grad()
+    ones = torch.ones((batch_size,1,1,1), device=Z.device)
     # We could reuse `fake_X` from `update_D` to save computation
     fake_X = net_G(Z)
     # Recomputing `fake_Y` is needed since `net_D` is changed
     fake_Y = net_D(fake_X)
-    loss_G = loss(fake_Y,ones)
+    loss_G = loss(fake_Y, ones)
     loss_G.backward()
     trainer_G.step()
     return loss_G
 
 def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gpu()):
-    loss = nn.BCEWithLogitsLoss()
+    loss = nn.BCEWithLogitsLoss(reduction='sum')
     for w in net_D.parameters():
         nn.init.normal_(w, 0, 0.02)
     for w in net_G.parameters():
         nn.init.normal_(w, 0, 0.02)
-    net_D.zero_grad()
-    net_G.zero_grad()
-    bata1 = 0.5 # lr: learning rate
-    trainer_D = torch.optim.Adam(net_D.parameters(), lr=lr, betas=(bata1, 0.999))
-    trainer_G = torch.optim.Adam(net_G.parameters(), lr=lr, betas=(bata1, 0.999))
+    net_D, net_G = net_D.to(device), net_G.to(device)
+    trainer_hp = {'lr': lr, 'betas': [0.5,0.999]}
+    trainer_D = torch.optim.Adam(net_D.parameters(), **trainer_hp)
+    trainer_G = torch.optim.Adam(net_G.parameters(), **trainer_hp)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
                             legend=['discriminator', 'generator'])
@@ -427,21 +430,18 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gp
             batch_size = X.shape[0]
             Z = torch.normal(0, 1, size=(batch_size, latent_dim, 1, 1))
             X, Z = X.to(device), Z.to(device)
-            trainer_D.zero_grad()
-            trainer_G.zero_grad()
             metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),
                        update_G(Z, net_D, net_G, loss, trainer_G),
                        batch_size)
         # Show generated examples
-        Z = torch.normal(0, 1, size=(21, latent_dim, 1, 1))
-        Z = Z.to(device)
+        Z = torch.normal(0, 1, size=(21, latent_dim, 1, 1), device=device)
         # Normalize the synthetic data to N(0, 1)
         fake_x = net_G(Z).permute(0, 2, 3, 1) / 2 + 0.5
         imgs = torch.cat(
-            [torch.cat([fake_x[i * 7 + j] for j in range(7)], dim=1)
+            [torch.cat([fake_x[i * 7 + j].cpu().detach() for j in range(7)], dim=1)
              for i in range(len(fake_x)//7)], dim=0)
         animator.axes[1].cla()
-        animator.axes[1].imshow(imgs.cpu().detach().numpy())
+        animator.axes[1].imshow(imgs)
         # Show the losses
         loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]
         animator.add(epoch, (loss_D, loss_G))
