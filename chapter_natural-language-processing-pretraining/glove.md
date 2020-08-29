@@ -52,18 +52,18 @@ Notice that if word $w_i$ appears in the context window of word $w_j$, then word
 
 We can also try to understand GloVe word embedding from another perspective. We will continue the use of symbols from earlier in this section, $P(w_j \mid w_i)$ represents the conditional probability of generating context word $w_j$ with central target word $w_i$ in the dataset, and it will be recorded as $p_{ij}$. From a real example from a large corpus, here we have the following two sets of conditional probabilities with "ice" and "steam" as the central target words and the ratio between them:
 
-|$w_k$=|“solid”|“gas”|“water”|“fashion”|
+|$w_k$=|$\text{solid}$|$\text{gas}$|$\text{water}$|$\text{fashion}$|
 |--:|:-:|:-:|:-:|:-:|
-|$p_1=P(w_k\mid$ "ice" $)$|0.00019|0.000066|0.003|0.000017|
-|$p_2=P(w_k\mid$ "steam" $)$|0.000022|0.00078|0.0022|0.000018|
+|$p_1=P(w_k\mid \text{ice})$|0.00019|0.000066|0.003|0.000017|
+|$p_2=P(w_k\mid\text{steam})$|0.000022|0.00078|0.0022|0.000018|
 |$p_1/p_2$|8.9|0.085|1.36|0.96|
 
 We will be able to observe phenomena such as:
 
-* For a word $w_k$ that is related to "ice" but not to "steam", such as $w_k=$"solid", we would expect a larger conditional probability ratio, like the value 8.9 in the last row of the table above.
-* For a word $w_k$ that is related to "steam" but not to "ice", such as $w_k=$"gas", we would expect a smaller conditional probability ratio, like the value 0.085 in the last row of the table above.
-* For a word $w_k$ that is related to both "ice" and "steam", such as $w_k=$"water", we would expect a conditional probability ratio close to 1, like the value 1.36 in the last row of the table above.
-* For a word $w_k$ that is related to neither "ice" or "steam", such as $w_k=$"fashion", we would expect a conditional probability ratio close to 1, like the value 0.96 in the last row of the table above.
+* For a word $w_k$ that is related to "ice" but not to "steam", such as $w_k=\text{solid}$, we would expect a larger conditional probability ratio, like the value 8.9 in the last row of the table above.
+* For a word $w_k$ that is related to "steam" but not to "ice", such as $w_k=\text{gas}$, we would expect a smaller conditional probability ratio, like the value 0.085 in the last row of the table above.
+* For a word $w_k$ that is related to both "ice" and "steam", such as $w_k=\text{water}$, we would expect a conditional probability ratio close to 1, like the value 1.36 in the last row of the table above.
+* For a word $w_k$ that is related to neither "ice" or "steam", such as $w_k=\text{fashion}$, we would expect a conditional probability ratio close to 1, like the value 0.96 in the last row of the table above.
 
 We can see that the conditional probability ratio can represent the relationship between different words more intuitively. We can construct a word vector function to fit the conditional probability ratio more effectively. As we know, to obtain any ratio of this type requires three words $w_i$, $w_j$, and $w_k$. The conditional probability ratio with $w_i$ as the central target word is ${p_{ij}}/{p_{ik}}$. We can find a function that uses word vectors to fit this conditional probability ratio.
 
