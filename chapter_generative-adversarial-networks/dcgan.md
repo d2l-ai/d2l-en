@@ -399,6 +399,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator."""
     batch_size = Z.shape[0]
     ones = torch.ones((batch_size,1,1,1), device=Z.device)
+    trainer_G.zero_grad()
     # We could reuse `fake_X` from `update_D` to save computation
     fake_X = net_G(Z)
     # Recomputing `fake_Y` is needed since `net_D` is changed
