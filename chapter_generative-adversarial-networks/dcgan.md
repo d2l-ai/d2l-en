@@ -316,7 +316,6 @@ net_D = nn.Sequential(
     D_block(n_D*4, n_D*2),  # Output: (64 * 4, 8, 8)
     D_block(n_D*8, n_D*4),  # Output: (64 * 8, 4, 4)
     Conv2D(1, nc=n_D*8, kernel_size=4, use_bias=False))  # Output: (1, 1, 1)
-)
 ```
 
 It uses a convolution layer with output channel $1$ as the last layer to obtain a single prediction value.
