@@ -316,6 +316,8 @@ We can demystify the name by introducing just the basics of information theory.
 If you wish to understand more details of information theory,
 you may further refer to the [online appendix on information theory](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/information-theory.html).
 
+
+
 ## Information Theory Basics
 
 *Information theory* deals with the problem of encoding, decoding, transmitting,
@@ -326,15 +328,15 @@ and manipulating information (also known as data) in as concise form as possible
 
 The central idea in information theory is to quantify the information content in data.
 This quantity places a hard limit on our ability to compress the data.
-In information theory, this quantity is called the *entropy* of a distribution $p$,
+In information theory, this quantity is called the *entropy* of a distribution $P$,
 and it is captured by the following equation:
 
-$$H[p] = \sum_j - p(j) \log p(j).$$
+$$H[P] = \sum_j - P(j) \log P(j).$$
 :eqlabel:`eq_softmax_reg_entropy`
 
 One of the fundamental theorems of information theory states
-that in order to encode data drawn randomly from the distribution $p$,
-we need at least $H[p]$ "nats" to encode it.
+that in order to encode data drawn randomly from the distribution $P$,
+we need at least $H[P]$ "nats" to encode it.
 If you wonder what a "nat" is, it is the equivalent of bit
 but when using a code with base $e$ rather than one with base 2.
 Thus, one nat is $\frac{1}{\log(2)} \approx 1.44$ bit.
@@ -369,11 +371,11 @@ that truly match the data-generating process.
 So if entropy is level of surprise experienced
 by someone who knows the true probability,
 then you might be wondering, what is cross-entropy?
-The cross-entropy *from* $p$ *to* $q$, denoted $H(p, q)$,
-is the expected surprisal of an observer with subjective probabilities $q$
-upon seeing data that were actually generated according to probabilities $p$.
-The lowest possible cross-entropy is achieved when $p=q$.
-In this case, the cross-entropy from $p$ to $q$ is $H(p, p)= H(p)$.
+The cross-entropy *from* $P$ *to* $Q$, denoted $H(P, Q)$,
+is the expected surprisal of an observer with subjective probabilities $Q$
+upon seeing data that were actually generated according to probabilities $P$.
+The lowest possible cross-entropy is achieved when $P=Q$.
+In this case, the cross-entropy from $P$ to $Q$ is $H(P, P)= H(P)$.
 
 In short, we can think of the cross-entropy classification objective
 in two ways: (i) as maximizing the likelihood of the observed data;

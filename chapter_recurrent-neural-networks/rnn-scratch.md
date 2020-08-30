@@ -67,7 +67,7 @@ F.one_hot(torch.tensor([0, 2]), len(vocab))
 tf.one_hot(tf.constant([0, 2]), len(vocab))
 ```
 
-The shape of the minibatch we sample each time is (batch size, timestep). The `one_hot` function transforms such a minibatch into a 3-D tensor with the last dimension equals to the vocabulary size. We often transpose the input so that we will obtain a (timestep, batch size, vocabulary size) output that fits into a sequence model easier.
+The shape of the minibatch we sample each time is (batch size, time step). The `one_hot` function transforms such a minibatch into a 3-D tensor with the last dimension equals to the vocabulary size. We often transpose the input so that we will obtain a (time step, batch size, vocabulary size) output that fits into a sequence model easier.
 
 ```{.python .input}
 X = np.arange(10).reshape(2, 5)
@@ -171,7 +171,7 @@ def init_rnn_state(batch_size, num_hiddens):
 ```
 
 The following `rnn` function defines how to compute the hidden state and output
-in a timestep. The activation function here uses the $\tanh$ function. As
+in a time step. The activation function here uses the $\tanh$ function. As
 described in :numref:`sec_mlp`, the
 mean value of the $\tanh$ function is 0, when the elements are evenly
 distributed over the real numbers.
@@ -248,7 +248,7 @@ class RNNModelScratch: #@save
         self.init_state, self.forward_fn = init_state, forward
 
     def __call__(self, X, state):
-        X = F.one_hot(X.T.long(), self.vocab_size).type(torch.float32)
+        X = F.one_hot(X.T, self.vocab_size).type(torch.float32)
         return self.forward_fn(X, state, self.params)
 
     def begin_state(self, batch_size, device):
@@ -371,7 +371,7 @@ predict_ch8('time traveller ', 10, model, vocab, params)
 
 ## Gradient Clipping
 
-For a sequence of length $T$, we compute the gradients over these $T$ timesteps in an iteration, which results in a chain of matrix-products with length  $\mathcal{O}(T)$ during backpropagating. As mentioned in :numref:`sec_numerical_stability`, it might result in numerical instability, e.g., the gradients may either explode or vanish, when $T$ is large. Therefore, RNN models often need extra help to stabilize the training.
+For a sequence of length $T$, we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $\mathcal{O}(T)$ during backpropagating. As mentioned in :numref:`sec_numerical_stability`, it might result in numerical instability, e.g., the gradients may either explode or vanish, when $T$ is large. Therefore, RNN models often need extra help to stabilize the training.
 
 Recall that when solving an optimization problem, we take update steps for the weights $\mathbf{w}$ in the general direction of the negative gradient $\mathbf{g}_t$ on a minibatch, say $\mathbf{w} - \eta \cdot \mathbf{g}_t$. Let us further assume that the objective is well behaved, i.e., it is Lipschitz continuous with constant $L$, i.e.,
 
