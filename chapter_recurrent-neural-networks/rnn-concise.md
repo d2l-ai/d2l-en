@@ -128,12 +128,12 @@ class RNNModel(nn.Module):
         if not isinstance(self.rnn, nn.LSTM):
             # nn.GRU takes a tensor as hidden state
             return  torch.zeros((self.num_directions * self.rnn.num_layers,
-                                 batch_size, self.num_hiddens), 
+                                 batch_size, self.num_hiddens),
                                 device=device)
         else:
             # nn.LSTM takes a tuple of hidden states
             return (torch.zeros((self.num_directions * self.rnn.num_layers,
-                                 batch_size, self.num_hiddens), device=device), 
+                                 batch_size, self.num_hiddens), device=device),
             torch.zeros((self.num_directions * self.rnn.num_layers,
                          batch_size, self.num_hiddens), device=device))
 ```
@@ -190,4 +190,8 @@ Compared with the last section, this model achieves comparable perplexity, albei
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/335)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/124)
 :end_tab:

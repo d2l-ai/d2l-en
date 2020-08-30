@@ -135,7 +135,7 @@ def get_params(vocab_size, num_hiddens, device):
 #@tab tensorflow
 def get_params(vocab_size, num_hidden):
     num_inputs = num_outputs = vocab_size
-    
+
     def normal(shape):
         return d2l.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32)
     # Hidden layer parameters
@@ -298,7 +298,7 @@ Y.shape, len(new_state), new_state[0].shape
 ```{.python .input}
 #@tab tensorflow
 num_hiddens = 512
-model = RNNModelScratch(len(vocab), num_hiddens, 
+model = RNNModelScratch(len(vocab), num_hiddens,
                         init_rnn_state, rnn)
 state = model.begin_state(X.shape[0])
 params = get_params(len(vocab), num_hiddens)
@@ -485,11 +485,11 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
             state = model.begin_state(batch_size=X.shape[0], device=device)
         else:
             if isinstance(model, nn.Module) and not isinstance(state, tuple):
-                # state is a tensor for nn.GRU  
+                # state is a tensor for nn.GRU
                 state.detach_()
             else:
                 # state is a tuple of tensors for nn.LSTM and
-                # for our custom scratch implementation 
+                # for our custom scratch implementation
                 for s in state:
                     s.detach_()
         y = Y.T.reshape(-1)
@@ -516,7 +516,7 @@ def train_epoch_ch8(model, train_iter, loss, updater,  #@save
     state, timer = None, d2l.Timer()
     # initialize the state at the begining of the epoch
     # when not using random_iter
-    metric = d2l.Accumulator(2) 
+    metric = d2l.Accumulator(2)
     for X, Y in train_iter:
         if state is None or use_random_iter:
             # Initialize state when either it is the first iteration or
@@ -526,11 +526,11 @@ def train_epoch_ch8(model, train_iter, loss, updater,  #@save
             g.watch(params)
             py, state= model(X, state, params)
             y = d2l.reshape(Y, (-1))
-            l = tf.math.reduce_mean(loss(y, py)) 
+            l = tf.math.reduce_mean(loss(y, py))
         grads = g.gradient(l, params)
         grads = grad_clipping(grads, 1)
         updater.apply_gradients(zip(grads, params))
-        
+
         # Keras loss by default returns the average loss in a batch
         #l_sum = l * float(d2l.size(y)) if isinstance(
             #loss, tf.keras.losses.Loss) else tf.reduce_sum(l)
@@ -679,4 +679,8 @@ While implementing the above RNN model from scratch is instructive, it is not co
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/486)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/849)
 :end_tab:

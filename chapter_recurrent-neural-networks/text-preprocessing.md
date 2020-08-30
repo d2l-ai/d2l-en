@@ -2,7 +2,7 @@
 :label:`sec_text_preprocessing`
 
 We have reviewed and evaluated
-statistical tools 
+statistical tools
 and prediction challenges
 for sequence data.
 Such data can take many forms.
@@ -149,7 +149,7 @@ def count_corpus(lines):  #@save
     return collections.Counter(tokens)
 ```
 
-We construct a vocabulary using the time machine dataset as the corpus. 
+We construct a vocabulary using the time machine dataset as the corpus.
 Then we print the first few frequent tokens with their indices.
 
 ```{.python .input}
@@ -198,6 +198,16 @@ len(corpus), len(vocab)
 ## Exercises
 
 1. Tokenization is a key preprocessing step. It varies for different languages. Try to find another three commonly used methods to tokenize text.
-1. In the experiment of this section, tokenize text into words and vary the `min_freq` arguments of the `Vocab` instance. How does this affect the vocabulary size? 
+1. In the experiment of this section, tokenize text into words and vary the `min_freq` arguments of the `Vocab` instance. How does this affect the vocabulary size?
 
+:begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/115)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/846)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/847)
+:end_tab:

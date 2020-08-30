@@ -3,7 +3,7 @@
 
 
 In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, where these tokens can be viewed as a sequence of discrete observations, such as words or characters.
-Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$. 
+Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$.
 Then, in the text sequence,
 $x_t$($1 \leq t \leq T$) can be considered as the observation or label at time step $t$. Given such a text sequence,
 the goal of a *language model* is to estimate the joint probability of the sequence
@@ -24,14 +24,14 @@ it is worthwhile knowing that "dog bites man" is much more frequent than "man bi
 
 ## Estimating a Language Model
 
-The obvious question is how we should model a document, or even a sequence of tokens. 
+The obvious question is how we should model a document, or even a sequence of tokens.
 Suppose that we tokenize text data at the word level.
 We can take recourse to the analysis we applied to sequence models in :numref:`sec_sequence`.
 Let us start by applying basic probability rules:
 
 $$P(x_1, x_2, \ldots, x_T) = \prod_{t=1}^T P(x_t  \mid  x_1, \ldots, x_{t-1}).$$
 
-For example, 
+For example,
 the probability of a text sequence containing four words would be given as:
 
 $$P(\text{deep}, \text{learning}, \text{is}, \text{fun}) =  P(\text{deep}) P(\text{learning}  \mid  \text{deep}) P(\text{is}  \mid  \text{deep}, \text{learning}) P(\text{fun}  \mid  \text{deep}, \text{learning}, \text{is}).$$
@@ -72,7 +72,7 @@ Unless we provide some solution to assign such word combinations nonzero count, 
 
 A common strategy is to perform some form of *Laplace smoothing*.
 The solution is to
-add a small constant to all counts. 
+add a small constant to all counts.
 Denote by $n$ the total number of words in
 the training set
 and $m$ the number of unique words.
@@ -88,7 +88,7 @@ Here $\epsilon_i$ are hyperparameters.
 Take $\epsilon_1$ as an example:
 when $\epsilon_1 = 0$, no smoothing is applied;
 when $\epsilon_1$ approaches positive infinity,
-$\hat{P}(x)$ approaches the uniform probability $1/m$. 
+$\hat{P}(x)$ approaches the uniform probability $1/m$.
 The above is a rather primitive variant of what
 other techniques can accomplish :cite:`Wood.Gasthaus.Archambeau.ea.2011`.
 
@@ -356,4 +356,8 @@ def load_data_time_machine(batch_size, num_steps,  #@save
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/118)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/848)
 :end_tab:
