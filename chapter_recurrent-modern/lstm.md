@@ -204,7 +204,7 @@ def lstm(inputs, state, params):
 def lstm(inputs, state, params):
     [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c,
      W_hq, b_q] = params
-    (H, C) = state 
+    (H, C) = state
     outputs = []
     for X in inputs:
         I = torch.sigmoid((X @ W_xi) + (H @ W_hi) + b_i)
@@ -270,4 +270,8 @@ In many cases, LSTMs perform slightly better than GRUs but they are more costly 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/343)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/852)
 :end_tab:

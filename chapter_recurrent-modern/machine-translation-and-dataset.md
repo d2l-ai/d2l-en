@@ -1,7 +1,7 @@
 # Machine Translation and the Dataset
 :label:`sec_machine_translation`
 
-So far we see how to use recurrent neural networks for language models, in which we predict the next token given all previous tokens in an article. Now let us have a look at a different application, machine translation, whose predict output is no longer a single token, but a list of tokens. 
+So far we see how to use recurrent neural networks for language models, in which we predict the next token given all previous tokens in an article. Now let us have a look at a different application, machine translation, whose predict output is no longer a single token, but a list of tokens.
 
 Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. Solving this problem with neural networks is often called neural machine translation (NMT). Compared to language models (:numref:`sec_language_model`), in which the corpus only contains a single language, machine translation dataset has at least two languages, the source language and the target language. In addition, each sentence in the source language is mapped to the according translation in the target language. Therefore, the data preprocessing for machine translation data is different to the one for language models. This section is dedicated to demonstrate how to pre-process such a dataset and then load into a set of minibatches.
 
@@ -95,14 +95,14 @@ Since the tokens in the source language could be different to the ones in the ta
 
 ```{.python .input  n=6}
 #@tab all
-src_vocab = d2l.Vocab(source, min_freq=3, 
+src_vocab = d2l.Vocab(source, min_freq=3,
                       reserved_tokens=['<pad>', '<bos>', '<eos>'])
 len(src_vocab)
 ```
 
 ## Loading the Dataset
 
-In language models, each example is a `num_steps` length sequence from the corpus, which may be a segment of a sentence, or span over multiple sentences. In machine translation, an example should contain a pair of source sentence and target sentence. These sentences might have different lengths, while we need same length examples to form a minibatch. 
+In language models, each example is a `num_steps` length sequence from the corpus, which may be a segment of a sentence, or span over multiple sentences. In machine translation, an example should contain a pair of source sentence and target sentence. These sentences might have different lengths, while we need same length examples to form a minibatch.
 
 One way to solve this problem is that if a sentence is longer than `num_steps`, we trim its length, otherwise pad with a special &lt;pad&gt; token to meet the length. Therefore we could transform any sentence to a fixed length.
 
@@ -144,7 +144,7 @@ def build_array(lines, vocab, num_steps, is_source):
     return array, valid_len
 ```
 
-Then we can construct minibatches based on these arrays. 
+Then we can construct minibatches based on these arrays.
 
 ## Putting All Things Together
 
@@ -156,9 +156,9 @@ Finally, we define the function `load_data_nmt` to return the data iterator with
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, 
+    src_vocab = d2l.Vocab(source, min_freq=3,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+    tgt_vocab = d2l.Vocab(target, min_freq=3,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array(
         source, src_vocab, num_steps, True)
@@ -194,7 +194,7 @@ for X, X_vlen, Y, Y_vlen in train_iter:
 
 ## Summary
 
-* Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. 
+* Machine translation (MT) refers to the automatic translation of a segment of text from one language to another.
 * We read, preprocess, and tokenize the datasets from both source language and target language.
 
 
@@ -205,4 +205,8 @@ for X, X_vlen, Y, Y_vlen in train_iter:
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/344)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/858)
 :end_tab:

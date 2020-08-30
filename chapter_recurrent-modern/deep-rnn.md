@@ -96,3 +96,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/340)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/856)
+:end_tab:
