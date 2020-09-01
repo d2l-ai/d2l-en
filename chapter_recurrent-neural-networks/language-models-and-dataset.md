@@ -121,7 +121,9 @@ The probability formulae that involve one, two, and three variables are typicall
 
 ## Natural Language Statistics
 
-Let us see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`sec_text_preprocessing` and print the top $10$ most frequent words.
+Let us see how this works on real data.
+We construct a vocabulary based on the time machine dataset as introduced in :numref:`sec_text_preprocessing` 
+and print the top 10 most frequent words.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -147,11 +149,17 @@ import random
 ```{.python .input}
 #@tab all
 tokens = d2l.tokenize(d2l.read_time_machine())
-vocab = d2l.Vocab(tokens)
+# Since each text line is not necessisarily a sentence or a paragraph, we
+# concatenate all text lines 
+corpus = [token for line in tokens for token in line]
+vocab = d2l.Vocab(corpus)
 vocab.token_freqs[:10]
 ```
 
-As we can see, the most popular words are actually quite boring to look at. They are often referred to as [stop words](https://en.wikipedia.org/wiki/Stop_words) and thus filtered out. That said, they still carry meaning and we will use them nonetheless. However, one thing that is quite clear is that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea we plot the graph of the word frequency.
+As we can see, the most popular words are actually quite boring to look at.
+They are often referred to as *stop words* and thus filtered out.
+That said, they still carry meaning and we will use them nonetheless.
+Besides, it is quite clear that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea we plot the graph of the word frequency.
 
 ```{.python .input}
 #@tab all
@@ -160,29 +168,37 @@ d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
          xscale='log', yscale='log')
 ```
 
-We are on to something quite fundamental here: the word frequency decays rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
+We are on to something quite fundamental here: the word frequency decays rapidly in a well-defined way.
+After dealing with the first few words as exceptions, all the remaining words roughly follow a straight line on a log-log plot. This means that words satisfy *Zipf's law*,
+which states that the frequency $n_i$ of the $i^\mathrm{th}$ most frequent word
+is proportional to the reciprocal of rank $i$:
 
-$$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
-\log n(x) = -\alpha \log (x+c) + \mathrm{const.}$$
+$$n_i \propto \frac{1}{i},$$
 
-This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But what about the other word combinations (such as bigrams, trigrams, and beyond)? Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
+which is equivalent to
+
+$$\log n_i = \alpha \log i + c,$$
+
+where $\alpha=-1$ and $c$ is a constant.
+This should already give us pause if we want to model words by count statistics and smoothing.
+After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But what about the other word combinations, such as bigrams, trigrams, and beyond?
+Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
 
 ```{.python .input}
 #@tab all
-bigram_tokens = [[pair for pair in zip(
-    line[:-1], line[1:])] for line in tokens]
+bigram_tokens = [pair for pair in zip(corpus[:-1], corpus[1:])]
 bigram_vocab = d2l.Vocab(bigram_tokens)
-print(bigram_vocab.token_freqs[:10])
+bigram_vocab.token_freqs[:10]
 ```
 
 One thing is notable here. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
 
 ```{.python .input}
 #@tab all
-trigram_tokens = [[triple for triple in zip(line[:-2], line[1:-1], line[2:])]
-                  for line in tokens]
+trigram_tokens = [triple for triple in zip(
+    corpus[:-2], corpus[1:-1], corpus[2:])]
 trigram_vocab = d2l.Vocab(trigram_tokens)
-print(trigram_vocab.token_freqs[:10])
+trigram_vocab.token_freqs[:10]
 ```
 
 Last, let us visualize the token frequency among these three gram models: unigrams, bigrams, and trigrams.
