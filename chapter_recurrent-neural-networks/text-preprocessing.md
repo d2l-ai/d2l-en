@@ -83,7 +83,7 @@ where each token is a string.
 ```{.python .input}
 #@tab all
 def tokenize(lines, token='word'):  #@save
-    """Split lines into word or char tokens."""
+    """Split text lines into word or character tokens."""
     if token == 'word':
         return [line.split() for line in lines]
     elif token == 'char':
@@ -159,7 +159,7 @@ Then we print the first few frequent tokens with their indices.
 ```{.python .input}
 #@tab all
 vocab = Vocab(tokens)
-print(list(vocab.token_to_idx.items())[0:10])
+print(list(vocab.token_to_idx.items())[:10])
 ```
 
 Now we can convert each text line into a list of numerical indices.

@@ -548,7 +548,7 @@ def read_time_machine():  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def tokenize(lines, token='word'):  #@save
-    """Split lines into word or char tokens."""
+    """Split text lines into word or character tokens."""
     if token == 'word':
         return [line.split() for line in lines]
     elif token == 'char':
