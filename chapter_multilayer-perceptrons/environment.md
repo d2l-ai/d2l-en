@@ -391,6 +391,23 @@ for generating the training set $q$ (the latter is trivially available).
 Note however, that we only need features $\mathbf{x} \sim p(\mathbf{x})$;
 we do not need to access labels $y \sim p(y)$.
 
+In this case, there exists a very effective approach
+that will give almost as good results as the original: logistic regression,
+which is a special case of softmax regression (see :numref:`sec_softmax`)
+for binary classification.
+This is all that is needed to compute estimated probability ratios.
+We learn a classifier to distinguish
+between data drawn from $p(\mathbf{x})$
+and data drawn from $q(\mathbf{x})$.
+If it is impossible to distinguish
+between the two distributions
+then it means that the associated instances
+are equally likely to come from
+either one of the two distributions.
+On the other hand, any instances
+that can be well discriminated
+should be significantly overweighted
+or underweighted accordingly.
 
 For simplicity's sake assume that we have
 an equal number of instances from both distributions
@@ -400,24 +417,15 @@ Now denote by $z$ labels that are $1$
 for data drawn from $p$ and $-1$ for data drawn from $q$.
 Then the probability in a mixed dataset is given by
 
-$$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \beta_i = \frac{p(\mathbf{x})}{q(\mathbf{x})} = \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})}.$$
+$$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
 
-
-To estimate the ratio $\beta_i$, we learn a classifier to distinguish
-between data drawn from $p(\mathbf{x})$
-and data drawn from $q(\mathbf{x})$. 
-We utilize an effective approach: logistic regression.
-Applied on binary classification, *Logistic regression* 
-is a special case of softmax regression as discussed
-in :numref:`subsec_softmax_operation`.
-Thus, we can define a parameterized function $h$, such that 
-$P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-h(\mathbf{x}))}$. 
-It follows that
+Thus, if we use a logistic regression approach,
+where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-h(\mathbf{x}))}$ ($h$ is a parameterized function),
+it follows that
 
 $$
 \beta_i = \frac{1/(1 + \exp(-h(\mathbf{x}_i)))}{\exp(-h(\mathbf{x}_i))/(1 + \exp(-h(\mathbf{x}_i)))} = \exp(h(\mathbf{x}_i)).
 $$
-
 
 As a result, we need to solve two problems:
 first one to distinguish between
