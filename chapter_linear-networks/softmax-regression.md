@@ -108,6 +108,7 @@ plus our biases $\mathbf{b}$.
 
 
 ## Softmax Operation
+:label:`subsec_softmax_operation`
 
 The main approach that we are going to take here
 is to interpret the outputs of our model as probabilities.
