@@ -49,7 +49,7 @@ and all text posted on the
 Web.
 The probability of words can be calculated from the relative word
 frequency of a given word in the training dataset.
-For example, $P(\text{deep})$ can be calculated as the
+For example, the estimate $\hat{P}(\text{deep})$ can be calculated as the
 probability of any sentence starting with the word "deep". A
 slightly less accurate approach would be to count all occurrences of
 the word "deep" and divide it by the total number of words in
@@ -158,8 +158,8 @@ vocab.token_freqs[:10]
 
 As we can see, the most popular words are actually quite boring to look at.
 They are often referred to as *stop words* and thus filtered out.
-That said, they still carry meaning and we will use them nonetheless.
-Besides, it is quite clear that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea we plot the graph of the word frequency.
+Nonetheless, they still carry meaning and we will still use them.
+Besides, it is quite clear that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea, we plot the figure of the word frequency.
 
 ```{.python .input}
 #@tab all
@@ -171,15 +171,16 @@ d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
 We are on to something quite fundamental here: the word frequency decays rapidly in a well-defined way.
 After dealing with the first few words as exceptions, all the remaining words roughly follow a straight line on a log-log plot. This means that words satisfy *Zipf's law*,
 which states that the frequency $n_i$ of the $i^\mathrm{th}$ most frequent word
-is proportional to the reciprocal of rank $i$:
+is:
 
-$$n_i \propto \frac{1}{i},$$
+$$n_i \propto \frac{1}{i^\alpha},$$
+:eqlabel:`eq_zipf_law`
 
 which is equivalent to
 
-$$\log n_i = \alpha \log i + c,$$
+$$\log n_i = -\alpha \log i + c,$$
 
-where $\alpha=-1$ and $c$ is a constant.
+where $\alpha$ is the exponent that characterizes the distribution and $c$ is a constant.
 This should already give us pause if we want to model words by count statistics and smoothing.
 After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But what about the other word combinations, such as bigrams, trigrams, and beyond?
 Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
@@ -191,7 +192,7 @@ bigram_vocab = d2l.Vocab(bigram_tokens)
 bigram_vocab.token_freqs[:10]
 ```
 
-One thing is notable here. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
+One thing is notable here. Out of the ten most frequent word pairs, nine are composed of both stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
 
 ```{.python .input}
 #@tab all
@@ -201,20 +202,23 @@ trigram_vocab = d2l.Vocab(trigram_tokens)
 trigram_vocab.token_freqs[:10]
 ```
 
-Last, let us visualize the token frequency among these three gram models: unigrams, bigrams, and trigrams.
+Last, let us visualize the token frequency among these three models: unigrams, bigrams, and trigrams.
 
 ```{.python .input}
 #@tab all
 bigram_freqs = [freq for token, freq in bigram_vocab.token_freqs]
 trigram_freqs = [freq for token, freq in trigram_vocab.token_freqs]
-d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token',
-         ylabel='frequency', xscale='log', yscale='log',
+d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token: x',
+         ylabel='frequency: n(x)', xscale='log', yscale='log',
          legend=['unigram', 'bigram', 'trigram'])
 ```
 
-The graph is quite exciting for a number of reasons. First, beyond unigram words, also sequences of words appear to be following Zipf's law, albeit with a lower exponent, depending on  sequence length. Second, the number of distinct n-grams is not that large. This gives us hope that there is quite a lot of structure in language. Third, many n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
+The graph is quite exciting for a number of reasons. First, beyond unigram words, sequences of words also appear to be following Zipf's law, albeit with a smaller exponent $\alpha$ in :eqref:`eq_zipf_law`, depending on the sequence length.
+Second, the number of distinct $n$-grams is not that large. This gives us hope that there is quite a lot of structure in language.
+Third, many $n$-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
 
-## Training Data Preparation
+
+## Preparing Training Data
 
 Before introducing the model, let us assume we will use a neural network to train a language model. Now the question is how to read minibatches of examples and labels at
 random. Since sequence data is by its very nature sequential, we need to address
