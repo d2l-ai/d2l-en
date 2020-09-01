@@ -113,9 +113,11 @@ We optionally add a list of reserved tokens, such as
 #@tab all
 class Vocab:  #@save
     """Vocabulary for text."""
-    def __init__(self, tokens, min_freq=0, reserved_tokens=None):
+    def __init__(self, tokens=None, min_freq=0, reserved_tokens=None):
+        if tokens is None:
+            tokens = []
         if reserved_tokens is None:
-            reserved_tokens = []
+            reserved_tokens = [] 
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
@@ -144,7 +146,8 @@ class Vocab:  #@save
 
 def count_corpus(tokens):  #@save
     """Count token frequencies."""
-    if isinstance(tokens[0], list):
+    # Here `tokens` is a 1D list or 2D list
+    if len(tokens) == 0 or isinstance(tokens[0], list):
         # Flatten a list of token lists into a list of tokens
         tokens = [token for line in tokens for token in line]
     return collections.Counter(tokens)
