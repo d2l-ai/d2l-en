@@ -220,17 +220,10 @@ $$\textrm{leaky ReLU}(x) = \begin{cases}x & \text{if}\ x > 0\\ \alpha x &\text{o
 As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if $\alpha=1$. For $\alpha \in (0, 1)$, leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the "dying ReLU" problem that a neuron might always output a negative value and therefore cannot make any progress since the gradient of ReLU is 0.
 
 ```{.python .input}
-alphas = [0, 0.2, 0.4, .6, .8, 1]
+#@tab all
+alphas = [0, .2, .4, .6, .8, 1]
 x = np.arange(-2, 1, 0.1)
-Y = [nn.LeakyReLU(alpha)(x).asnumpy() for alpha in alphas]
-d2l.plot(d2l.numpy(x), Y, 'x', 'y', alphas)
-```
-
-```{.python .input}
-#@tab pytorch
-alphas = [0, 0.2, 0.4, .6, .8, 1]
-x = torch.arange(-2, 1, 0.1)
-Y = [nn.LeakyReLU(alpha)(x).numpy() for alpha in alphas]
+Y = [d2l.numpy(nn.LeakyReLU(alpha)(x)) for alpha in alphas]
 d2l.plot(d2l.numpy(x), Y, 'x', 'y', alphas)
 ```
 
