@@ -222,7 +222,7 @@ As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if 
 ```{.python .input}
 #@tab all
 alphas = [0, .2, .4, .6, .8, 1]
-x = np.arange(-2, 1, 0.1)
+x = d2l.arange(-2, 1, 0.1)
 Y = [d2l.numpy(nn.LeakyReLU(alpha)(x)) for alpha in alphas]
 d2l.plot(d2l.numpy(x), Y, 'x', 'y', alphas)
 ```
