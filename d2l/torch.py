@@ -637,7 +637,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
+def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data: ignore `num_steps` and just wrap around
@@ -659,7 +659,7 @@ class SeqDataLoader:  #@save
         if use_random_iter:
             self.data_iter_fn = d2l.seq_data_iter_random
         else:
-            self.data_iter_fn = d2l.seq_data_iter_consecutive
+            self.data_iter_fn = d2l.seq_data_iter_sequential
         self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
         self.batch_size, self.num_steps = batch_size, num_steps
 

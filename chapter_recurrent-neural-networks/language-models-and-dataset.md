@@ -132,21 +132,19 @@ import random
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
 import random
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 import random
 ```
-
 
 ```{.python .input}
 #@tab all
@@ -220,24 +218,41 @@ Second, the number of distinct $n$-grams is not that large. This gives us hope t
 Third, many $n$-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
 
 
-## Preparing Training Data
+## Reading Sequence Data
 
 Before introducing the model,
-let us assume that we will use a neural network to train a language model.
+let us assume that we will use a neural network to train a language model,
+where the network processes a minibatch of sequences with predefined length, say $n$-grams, at a time.
 Now the question is how to read minibatches of features and labels at random.
 Since sequence data are by their very nature sequential, we need to address
 the issue of processing it.
 We did so in a rather ad-hoc manner in :numref:`sec_sequence`.
 Now let us describe this in more detail.
 
-In :numref:`fig_timemachine_5gram`,
-we visualize several possible ways to obtain 5-grams in a text sequence, where each token is a character.
-Note that we have quite some freedom since we could pick an arbitrary offset that indicates which token to start.
 
-![Different offsets lead to different subsequences when splitting up text.](../img/timemachine-5gram.svg)
+To begin with, since a text sequence can be arbitrarily long,
+we usually partition a sequence into multiple $n$-grams.
+When training our network,
+a minibatch of $n$-grams is fed into the model.
+Suppose that the neural network processes a 5-gram at a time.
+In :numref:`fig_timemachine_5gram`,
+we visualize all the different ways to obtain 5-grams in a text sequence, where each token is a character.
+Note that we have quite some freedom since we could pick an arbitrary offset that indicates the initial position.
+
+![Different offsets lead to different $n$-grams when splitting up text.](../img/timemachine-5gram.svg)
 :label:`fig_timemachine_5gram`
 
-Hence, which one should we pick? In fact, all of them are equally good. But if we pick all offsets we end up with rather redundant data due to overlap, particularly if the sequences are long. Picking just a random set of initial positions is no good either since it does not guarantee uniform coverage of the array. For instance, if we pick $n$ elements at random out of a set of $n$ with random replacement, the probability for a particular element not being picked is $(1-1/n)^n \to e^{-1}$. This means that we cannot expect uniform coverage this way. Even randomly permuting a set of all offsets does not offer good guarantees. Instead we can use a simple trick to get both *coverage* and *randomness*: use a random offset, after which one uses the terms sequentially. We describe how to accomplish this for both random sampling and sequential partitioning strategies below.
+Hence, which one should we pick?
+In fact, all of them are equally good.
+However, if we pick just one offset,
+there is limited coverage of all the possible $n$-grams
+for training our network.
+Therefore,
+we can use a simple trick to get both *coverage* and *randomness*:
+use a random offset, after which one uses the tokens sequentially.
+We describe how to accomplish this for both
+*random sampling* and *sequential partitioning* strategies below.
+
 
 ### Random Sampling
 
@@ -285,7 +300,7 @@ In addition to random sampling of the original sequence, we can also make the po
 
 ```{.python .input}
 #@tab mxnet,pytorch
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
+def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data: ignore `num_steps` and just wrap around
@@ -300,9 +315,9 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
         yield X, Y
 ```
 
-```python
+```{.python .input}
 #@tab tensorflow
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
+def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data: ignore `num_steps` and just wrap around
@@ -318,12 +333,11 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
         yield X, Y
 ```
 
-
 Using the same settings, print input `X` and label `Y` for each minibatch of examples read by sequential partitioning. The positions of two adjacent minibatches on the original sequence are adjacent.
 
 ```{.python .input}
 #@tab all
-for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
+for X, Y in seq_data_iter_sequential(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y)
 ```
 
@@ -337,7 +351,7 @@ class SeqDataLoader:  #@save
         if use_random_iter:
             self.data_iter_fn = d2l.seq_data_iter_random
         else:
-            self.data_iter_fn = d2l.seq_data_iter_consecutive
+            self.data_iter_fn = d2l.seq_data_iter_sequential
         self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
         self.batch_size, self.num_steps = batch_size, num_steps
 
