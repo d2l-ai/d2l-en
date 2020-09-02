@@ -132,19 +132,21 @@ import random
 npx.set_np()
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 from d2l import torch as d2l
 import torch
 import random
 ```
 
-```{.python .input}
+
+```python
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 import random
 ```
+
 
 ```{.python .input}
 #@tab all
@@ -220,17 +222,22 @@ Third, many $n$-grams occur very rarely, which makes Laplace smoothing rather un
 
 ## Preparing Training Data
 
-Before introducing the model, let us assume we will use a neural network to train a language model. Now the question is how to read minibatches of examples and labels at
-random. Since sequence data is by its very nature sequential, we need to address
-the issue of processing it. We did so in a rather ad-hoc manner when we
-introduced in :numref:`sec_sequence`. Let us formalize this a bit.
+Before introducing the model,
+let us assume that we will use a neural network to train a language model.
+Now the question is how to read minibatches of features and labels at random.
+Since sequence data are by their very nature sequential, we need to address
+the issue of processing it.
+We did so in a rather ad-hoc manner in :numref:`sec_sequence`.
+Now let us describe this in more detail.
 
-In :numref:`fig_timemachine_5gram`, we visualized several possible ways to obtain 5-grams in a sentence, here a token is a character. Note that we have quite some freedom since we could pick an arbitrary offset.
+In :numref:`fig_timemachine_5gram`,
+we visualize several possible ways to obtain 5-grams in a text sequence, where each token is a character.
+Note that we have quite some freedom since we could pick an arbitrary offset that indicates which token to start.
 
 ![Different offsets lead to different subsequences when splitting up text.](../img/timemachine-5gram.svg)
 :label:`fig_timemachine_5gram`
 
-Hence, which one should we pick? In fact, all of them are equally good. But if we pick all offsets we end up with rather redundant data due to overlap, particularly if the sequences are long. Picking just a random set of initial positions is no good either since it does not guarantee uniform coverage of the array. For instance, if we pick $n​$ elements at random out of a set of $n​$ with random replacement, the probability for a particular element not being picked is $(1-1/n)^n \to e^{-1}​$. This means that we cannot expect uniform coverage this way. Even randomly permuting a set of all offsets does not offer good guarantees. Instead we can use a simple trick to get both *coverage* and *randomness*: use a random offset, after which one uses the terms sequentially. We describe how to accomplish this for both random sampling and sequential partitioning strategies below.
+Hence, which one should we pick? In fact, all of them are equally good. But if we pick all offsets we end up with rather redundant data due to overlap, particularly if the sequences are long. Picking just a random set of initial positions is no good either since it does not guarantee uniform coverage of the array. For instance, if we pick $n$ elements at random out of a set of $n$ with random replacement, the probability for a particular element not being picked is $(1-1/n)^n \to e^{-1}$. This means that we cannot expect uniform coverage this way. Even randomly permuting a set of all offsets does not offer good guarantees. Instead we can use a simple trick to get both *coverage* and *randomness*: use a random offset, after which one uses the terms sequentially. We describe how to accomplish this for both random sampling and sequential partitioning strategies below.
 
 ### Random Sampling
 
@@ -293,7 +300,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
         yield X, Y
 ```
 
-```{.python .input}
+```python
 #@tab tensorflow
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
@@ -310,6 +317,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
         Y = Ys[:, i:(i+num_steps)]
         yield X, Y
 ```
+
 
 Using the same settings, print input `X` and label `Y` for each minibatch of examples read by sequential partitioning. The positions of two adjacent minibatches on the original sequence are adjacent.
 
