@@ -114,8 +114,8 @@ class G_block(nn.Block):
 ```{.python .input}
 #@tab pytorch
 class G_block(nn.Module):
-    def __init__(self, channels, nz=3, kernel_size=4, strides=2,
-                 padding=1, **kwargs):
+    def __init__(self, channels, nz=3, kernel_size=4,
+                 strides=2, padding=1, **kwargs):
         super(G_block, self).__init__(**kwargs)
         self.conv2d_trans = nn.ConvTranspose2d(
             nz, channels, kernel_size, strides, padding, bias=False)
@@ -175,7 +175,7 @@ net_G = nn.Sequential()
 net_G.add(G_block(n_G*8, strides=1, padding=0),  # Output: (64 * 8, 4, 4)
           G_block(n_G*4),  # Output: (64 * 4, 8, 8)
           G_block(n_G*2),  # Output: (64 * 2, 16, 16)
-          G_block(n_G),   # Output: (64, 32, 32)
+          G_block(n_G),    # Output: (64, 32, 32)
           nn.Conv2DTranspose(
               3, kernel_size=4, strides=2, padding=1, use_bias=False,
               activation='tanh'))  # Output: (3, 64, 64)
@@ -183,17 +183,15 @@ net_G.add(G_block(n_G*8, strides=1, padding=0),  # Output: (64 * 8, 4, 4)
 
 ```{.python .input}
 #@tab pytorch
-def Conv2DTranspose(channels, kernel_size, strides, padding, use_bias, nc=3):
-    return nn.ConvTranspose2d(nc, channels, kernel_size=kernel_size,stride=strides, padding=padding, bias=use_bias)
-
 n_G = 64
 net_G = nn.Sequential(
     G_block(n_G*8, nz=100, strides=1, padding=0),  # Output: (64 * 8, 4, 4)
     G_block(n_G*4, n_G*8),  # Output: (64 * 4, 8, 8)
     G_block(n_G*2, n_G*4),  # Output: (64 * 2, 16, 16)
     G_block(n_G, n_G*2),    # Output: (64, 32, 32)
-    Conv2DTranspose(
-              3, nc=n_G, kernel_size=4, strides=2, padding=1, use_bias=False),
+    nn.ConvTranspose2d(
+        in_channels=n_G, out_channels=3, kernel_size=4,
+        stride=2, padding=1, bias=False),
     nn.Tanh())              # Output: (3, 64, 64)
 ```
 
@@ -298,17 +296,14 @@ net_D.add(D_block(n_D),   # Output: (64, 32, 32)
 
 ```{.python .input}
 #@tab pytorch
-def Conv2D(channels, kernel_size, use_bias, nc=3):
-    return nn.Conv2d(nc, channels, kernel_size=kernel_size, bias=use_bias)
-
-
 n_D = 64
 net_D = nn.Sequential(
     D_block(n_D),    # Output: (64, 32, 32)
     D_block(n_D*2, n_D),  # Output: (64 * 2, 16, 16)
     D_block(n_D*4, n_D*2),  # Output: (64 * 4, 8, 8)
     D_block(n_D*8, n_D*4),  # Output: (64 * 8, 4, 4)
-    Conv2D(1, nc=n_D*8, kernel_size=4, use_bias=False))  # Output: (1, 1, 1)
+    nn.Conv2d(in_channels=n_D*8, out_channels=1,
+              kernel_size=4, bias=False))  # Output: (1, 1, 1)
 ```
 
 It uses a convolution layer with output channel $1$ as the last layer to obtain a single prediction value.
