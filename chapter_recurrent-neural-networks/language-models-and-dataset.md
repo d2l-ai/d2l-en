@@ -213,7 +213,7 @@ d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token: x',
          legend=['unigram', 'bigram', 'trigram'])
 ```
 
-The graph is quite exciting for a number of reasons. First, beyond unigram words, sequences of words also appear to be following Zipf's law, albeit with a smaller exponent $\alpha$ in :eqref:`eq_zipf_law`, depending on the sequence length.
+This figure is quite exciting for a number of reasons. First, beyond unigram words, sequences of words also appear to be following Zipf's law, albeit with a smaller exponent $\alpha$ in :eqref:`eq_zipf_law`, depending on the sequence length.
 Second, the number of distinct $n$-grams is not that large. This gives us hope that there is quite a lot of structure in language.
 Third, many $n$-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
 
@@ -228,7 +228,6 @@ Since sequence data are by their very nature sequential, we need to address
 the issue of processing it.
 We did so in a rather ad-hoc manner in :numref:`sec_sequence`.
 Now let us describe this in more detail.
-
 
 To begin with, since a text sequence can be arbitrarily long,
 we usually partition a sequence into multiple $n$-grams.
