@@ -295,7 +295,7 @@ x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 #@tab pytorch
 x = torch.tensor([1.0, 2, 4, 8])
 y = torch.tensor([2, 2, 2, 2])
-x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
+x + y, x - y, x * y, x // y, x ** y  # The ** operator is exponentiation
 ```
 
 ```{.python .input}
