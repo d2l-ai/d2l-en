@@ -540,33 +540,36 @@ d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def read_time_machine():  #@save
-    """Load the time machine book into a list of sentences."""
+    """Load the time machine book into a list of text lines."""
     with open(d2l.download('time_machine'), 'r') as f:
         lines = f.readlines()
-    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
-            for line in lines]
+    return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() for line in lines]
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def tokenize(lines, token='word'):  #@save
-    """Split sentences into word or char tokens."""
+    """Split text lines into word or character tokens."""
     if token == 'word':
-        return [line.split(' ') for line in lines]
+        return [line.split() for line in lines]
     elif token == 'char':
         return [list(line) for line in lines]
     else:
-        print('ERROR: unknown token type '+token)
+        print('ERROR: unknown token type: ' + token)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 class Vocab:  #@save
-    def __init__(self, tokens, min_freq=0, reserved_tokens=None):
+    """Vocabulary for text."""
+    def __init__(self, tokens=None, min_freq=0, reserved_tokens=None):
+        if tokens is None:
+            tokens = []
         if reserved_tokens is None:
-            reserved_tokens = []
+            reserved_tokens = [] 
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
+        # The index for the unknown token is 0
         self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
         uniq_tokens += [token for token, freq in self.token_freqs
                         if freq >= min_freq and token not in uniq_tokens]
@@ -590,9 +593,12 @@ class Vocab:  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def count_corpus(sentences):  #@save
-    # Flatten a list of token lists into a list of tokens
-    tokens = [tk for line in sentences for tk in line]
+def count_corpus(tokens):  #@save
+    """Count token frequencies."""
+    # Here `tokens` is a 1D list or 2D list
+    if len(tokens) == 0 or isinstance(tokens[0], list):
+        # Flatten a list of token lists into a list of tokens
+        tokens = [token for line in tokens for token in line]
     return collections.Counter(tokens)
 
 
@@ -601,7 +607,7 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)
-    corpus = [vocab[tk] for line in tokens for tk in line]
+    corpus = [vocab[token] for line in tokens for token in line]
     if max_tokens > 0:
         corpus = corpus[:max_tokens]
     return corpus, vocab
@@ -631,7 +637,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
+def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data: ignore `num_steps` and just wrap around
@@ -653,7 +659,7 @@ class SeqDataLoader:  #@save
         if use_random_iter:
             self.data_iter_fn = d2l.seq_data_iter_random
         else:
-            self.data_iter_fn = d2l.seq_data_iter_consecutive
+            self.data_iter_fn = d2l.seq_data_iter_sequential
         self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
         self.batch_size, self.num_steps = batch_size, num_steps
 
@@ -932,7 +938,7 @@ class Seq2SeqEncoder(d2l.Encoder):
 
     def forward(self, X, *args):
         X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
-        # RNN needs first axes to be timestep, i.e., seq_len
+        # RNN needs first axes to be time step, i.e., seq_len
         X = X.permute(1, 0, 2)
         out, state = self.rnn(X) # When state is not mentioned, it defaults to zeros
         # out shape: (seq_len, batch_size, num_hiddens)
@@ -1034,7 +1040,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     predict_tokens = []
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
-        # The token with highest score is used as the next timestep input
+        # The token with highest score is used as the next time step input
         dec_X = Y.argmax(dim=2)
         py = dec_X.squeeze(dim=0).type(torch.int32).item()
         if py == tgt_vocab['<eos>']:
@@ -1223,15 +1229,16 @@ def bbox_to_rect(bbox, color):
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
     batch_size = X.shape[0]
-    ones = torch.ones((batch_size, 1), device=X.device)
-    zeros = torch.zeros((batch_size, 1), device=X.device)
+    ones = torch.ones((batch_size,), device=X.device)
+    zeros = torch.zeros((batch_size,), device=X.device)
     trainer_D.zero_grad()
     real_Y = net_D(X)
     fake_X = net_G(Z)
     # Do not need to compute gradient for `net_G`, detach it from
     # computing gradients.
     fake_Y = net_D(fake_X.detach())
-    loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
+    loss_D = (loss(real_Y, ones.reshape(real_Y.shape)) + 
+              loss(fake_Y, zeros.reshape(fake_Y.shape))) / 2
     loss_D.backward()
     trainer_D.step()
     return loss_D
@@ -1241,16 +1248,21 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator."""
     batch_size = Z.shape[0]
-    ones = torch.ones((batch_size, 1), device=Z.device)
+    ones = torch.ones((batch_size,), device=Z.device)
     trainer_G.zero_grad()
     # We could reuse `fake_X` from `update_D` to save computation
     fake_X = net_G(Z)
     # Recomputing `fake_Y` is needed since `net_D` is changed
     fake_Y = net_D(fake_X)
-    loss_G = loss(fake_Y,ones)
+    loss_G = loss(fake_Y, ones.reshape(fake_Y.shape))
     loss_G.backward()
     trainer_G.step()
     return loss_G
+
+
+# Defined in file: ./chapter_generative-adversarial-networks/dcgan.md
+d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
+                           'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 
 # Alias defined in config.ini

@@ -71,7 +71,7 @@ conda install pip -y
 Before installing the deep learning framework, please first check
 whether or not you have proper GPUs on your machine
 (the GPUs that power the display on a standard laptop
-do not count for our purposes). 
+do not count for our purposes).
 If you are installing on a GPU server,
 proceed to :ref:`subsec_gpu` for instructions
 to install a GPU-supported version.
@@ -85,8 +85,10 @@ to access GPUs before running larger models.
 :begin_tab:`mxnet`
 
 ```bash
-pip install mxnet==1.6.0
+pip install mxnet==1.7.0
 ```
+
+
 :end_tab:
 
 
@@ -148,19 +150,20 @@ you may need to remove it first by running:
 pip uninstall mxnet
 ```
 
+
 Then we need to find the CUDA version you installed.
 You may check it through `nvcc --version` or `cat /usr/local/cuda/version.txt`.
 Assume that you have installed CUDA 10.1,
 then you can install with the following command:
 
-
 ```bash
 # For Windows users
-pip install mxnet-cu101==1.6.0b20190926
+pip install mxnet-cu101==1.7.0 -f https://dist.mxnet.io/python
 
 # For Linux and macOS users
-pip install mxnet-cu101==1.6.0.post0
+pip install mxnet-cu101==1.7.0
 ```
+
 
 You may change the last digits according to your CUDA version, e.g., `cu100` for
 CUDA 10.0 and `cu90` for CUDA 9.0.

@@ -49,7 +49,7 @@ and all text posted on the
 Web.
 The probability of words can be calculated from the relative word
 frequency of a given word in the training dataset.
-For example, $P(\text{deep})$ can be calculated as the
+For example, the estimate $\hat{P}(\text{deep})$ can be calculated as the
 probability of any sentence starting with the word "deep". A
 slightly less accurate approach would be to count all occurrences of
 the word "deep" and divide it by the total number of words in
@@ -121,7 +121,9 @@ The probability formulae that involve one, two, and three variables are typicall
 
 ## Natural Language Statistics
 
-Let us see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`sec_text_preprocessing` and print the top $10$ most frequent words.
+Let us see how this works on real data.
+We construct a vocabulary based on the time machine dataset as introduced in :numref:`sec_text_preprocessing` 
+and print the top 10 most frequent words.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -147,11 +149,17 @@ import random
 ```{.python .input}
 #@tab all
 tokens = d2l.tokenize(d2l.read_time_machine())
-vocab = d2l.Vocab(tokens)
+# Since each text line is not necessisarily a sentence or a paragraph, we
+# concatenate all text lines 
+corpus = [token for line in tokens for token in line]
+vocab = d2l.Vocab(corpus)
 vocab.token_freqs[:10]
 ```
 
-As we can see, the most popular words are actually quite boring to look at. They are often referred to as [stop words](https://en.wikipedia.org/wiki/Stop_words) and thus filtered out. That said, they still carry meaning and we will use them nonetheless. However, one thing that is quite clear is that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea we plot the graph of the word frequency.
+As we can see, the most popular words are actually quite boring to look at.
+They are often referred to as *stop words* and thus filtered out.
+Nonetheless, they still carry meaning and we will still use them.
+Besides, it is quite clear that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea, we plot the figure of the word frequency.
 
 ```{.python .input}
 #@tab all
@@ -160,62 +168,105 @@ d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
          xscale='log', yscale='log')
 ```
 
-We are on to something quite fundamental here: the word frequency decays rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
+We are on to something quite fundamental here: the word frequency decays rapidly in a well-defined way.
+After dealing with the first few words as exceptions, all the remaining words roughly follow a straight line on a log-log plot. This means that words satisfy *Zipf's law*,
+which states that the frequency $n_i$ of the $i^\mathrm{th}$ most frequent word
+is:
 
-$$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
-\log n(x) = -\alpha \log (x+c) + \mathrm{const.}$$
+$$n_i \propto \frac{1}{i^\alpha},$$
+:eqlabel:`eq_zipf_law`
 
-This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But what about the other word combinations (such as bigrams, trigrams, and beyond)? Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
+which is equivalent to
+
+$$\log n_i = -\alpha \log i + c,$$
+
+where $\alpha$ is the exponent that characterizes the distribution and $c$ is a constant.
+This should already give us pause if we want to model words by count statistics and smoothing.
+After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But what about the other word combinations, such as bigrams, trigrams, and beyond?
+Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
 
 ```{.python .input}
 #@tab all
-bigram_tokens = [[pair for pair in zip(
-    line[:-1], line[1:])] for line in tokens]
+bigram_tokens = [pair for pair in zip(corpus[:-1], corpus[1:])]
 bigram_vocab = d2l.Vocab(bigram_tokens)
-print(bigram_vocab.token_freqs[:10])
+bigram_vocab.token_freqs[:10]
 ```
 
-One thing is notable here. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
+One thing is notable here. Out of the ten most frequent word pairs, nine are composed of both stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
 
 ```{.python .input}
 #@tab all
-trigram_tokens = [[triple for triple in zip(line[:-2], line[1:-1], line[2:])]
-                  for line in tokens]
+trigram_tokens = [triple for triple in zip(
+    corpus[:-2], corpus[1:-1], corpus[2:])]
 trigram_vocab = d2l.Vocab(trigram_tokens)
-print(trigram_vocab.token_freqs[:10])
+trigram_vocab.token_freqs[:10]
 ```
 
-Last, let us visualize the token frequency among these three gram models: unigrams, bigrams, and trigrams.
+Last, let us visualize the token frequency among these three models: unigrams, bigrams, and trigrams.
 
 ```{.python .input}
 #@tab all
 bigram_freqs = [freq for token, freq in bigram_vocab.token_freqs]
 trigram_freqs = [freq for token, freq in trigram_vocab.token_freqs]
-d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token',
-         ylabel='frequency', xscale='log', yscale='log',
+d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token: x',
+         ylabel='frequency: n(x)', xscale='log', yscale='log',
          legend=['unigram', 'bigram', 'trigram'])
 ```
 
-The graph is quite exciting for a number of reasons. First, beyond unigram words, also sequences of words appear to be following Zipf's law, albeit with a lower exponent, depending on  sequence length. Second, the number of distinct n-grams is not that large. This gives us hope that there is quite a lot of structure in language. Third, many n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
+This figure is quite exciting for a number of reasons. First, beyond unigram words, sequences of words also appear to be following Zipf's law, albeit with a smaller exponent $\alpha$ in :eqref:`eq_zipf_law`, depending on the sequence length.
+Second, the number of distinct $n$-grams is not that large. This gives us hope that there is quite a lot of structure in language.
+Third, many $n$-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
 
-## Training Data Preparation
 
-Before introducing the model, let us assume we will use a neural network to train a language model. Now the question is how to read minibatches of examples and labels at
-random. Since sequence data is by its very nature sequential, we need to address
-the issue of processing it. We did so in a rather ad-hoc manner when we
-introduced in :numref:`sec_sequence`. Let us formalize this a bit.
+## Reading Sequence Data
 
-In :numref:`fig_timemachine_5gram`, we visualized several possible ways to obtain 5-grams in a sentence, here a token is a character. Note that we have quite some freedom since we could pick an arbitrary offset.
+Since sequence data are by their very nature sequential, we need to address
+the issue of processing it.
+We did so in a rather ad-hoc manner in :numref:`sec_sequence`.
+Now let us describe more general strategies.
+Before introducing the model,
+let us assume that we will use a neural network to train a language model,
+where the network processes a minibatch of sequences with predefined length, say $n$ time steps, at a time.
+Now the question is how to read minibatches of features and labels at random.
+
+To begin with,
+since a text sequence can be arbitrarily long,
+such as the entire *The Time Machine* book,
+we can partition such a long sequence into subsequences of $n$ time steps.
+When training our neural network,
+a minibatch of subsequences with $n$ time steps
+will be fed into the model.
+Suppose that the network processes a sequence
+of $n$ time steps
+at a time.
+:numref:`fig_timemachine_5gram`,
+shows all the different ways to obtain subsequences with 5 time steps from an original text sequence, where a token at each time step corresponds to a character.
+Note that we have quite some freedom since we could pick an arbitrary offset that indicates the initial position.
 
 ![Different offsets lead to different subsequences when splitting up text.](../img/timemachine-5gram.svg)
 :label:`fig_timemachine_5gram`
 
-Hence, which one should we pick? In fact, all of them are equally good. But if we pick all offsets we end up with rather redundant data due to overlap, particularly if the sequences are long. Picking just a random set of initial positions is no good either since it does not guarantee uniform coverage of the array. For instance, if we pick $n​$ elements at random out of a set of $n​$ with random replacement, the probability for a particular element not being picked is $(1-1/n)^n \to e^{-1}​$. This means that we cannot expect uniform coverage this way. Even randomly permuting a set of all offsets does not offer good guarantees. Instead we can use a simple trick to get both *coverage* and *randomness*: use a random offset, after which one uses the terms sequentially. We describe how to accomplish this for both random sampling and sequential partitioning strategies below.
+Hence, which one should we pick from :numref:`fig_timemachine_5gram`?
+In fact, all of them are equally good.
+However, if we pick just one offset,
+there is limited coverage of all the possible $n$-grams
+for training our network.
+Therefore,
+we can start with a random offset to partition a sequence
+to get both *coverage* and *randomness*.
+In the following,
+we describe how to accomplish this for both
+*random sampling* and *sequential partitioning* strategies.
+
 
 ### Random Sampling
 
-The following code randomly generates a minibatch from the data each time. Here, the batch size `batch_size` indicates the number of examples in each minibatch and `num_steps` is the length of the sequence (or time steps if we have a time series) included in each example.
-In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random minibatches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
+In random sampling, each example is a subsequence arbitrarily captured on the original sequence. The positions of two adjacent random minibatches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
+
+The following code randomly generates a minibatch from the data each time.
+Here, the argument `batch_size` specifies the number of subsequence examples in each minibatch
+and `num_steps` is the number of time steps
+in each subsequence.
 
 ```{.python .input}
 #@tab all
@@ -258,7 +309,7 @@ In addition to random sampling of the original sequence, we can also make the po
 
 ```{.python .input}
 #@tab mxnet,pytorch
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
+def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data: ignore `num_steps` and just wrap around
@@ -275,7 +326,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
 
 ```{.python .input}
 #@tab tensorflow
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):  #@save
+def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data: ignore `num_steps` and just wrap around
@@ -295,7 +346,7 @@ Using the same settings, print input `X` and label `Y` for each minibatch of exa
 
 ```{.python .input}
 #@tab all
-for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
+for X, Y in seq_data_iter_sequential(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y)
 ```
 
@@ -309,7 +360,7 @@ class SeqDataLoader:  #@save
         if use_random_iter:
             self.data_iter_fn = d2l.seq_data_iter_random
         else:
-            self.data_iter_fn = d2l.seq_data_iter_consecutive
+            self.data_iter_fn = d2l.seq_data_iter_sequential
         self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
         self.batch_size, self.num_steps = batch_size, num_steps
 
