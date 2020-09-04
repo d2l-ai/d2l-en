@@ -220,43 +220,53 @@ Third, many $n$-grams occur very rarely, which makes Laplace smoothing rather un
 
 ## Reading Sequence Data
 
-Before introducing the model,
-let us assume that we will use a neural network to train a language model,
-where the network processes a minibatch of sequences with predefined length, say $n$-grams, at a time.
-Now the question is how to read minibatches of features and labels at random.
 Since sequence data are by their very nature sequential, we need to address
 the issue of processing it.
 We did so in a rather ad-hoc manner in :numref:`sec_sequence`.
-Now let us describe this in more detail.
+Now let us describe more general strategies.
+Before introducing the model,
+let us assume that we will use a neural network to train a language model,
+where the network processes a minibatch of sequences with predefined length, say $n$ time steps, at a time.
+Now the question is how to read minibatches of features and labels at random.
 
-To begin with, since a text sequence can be arbitrarily long,
-we usually partition a sequence into multiple $n$-grams.
-When training our network,
-a minibatch of $n$-grams is fed into the model.
-Suppose that the neural network processes a 5-gram at a time.
-In :numref:`fig_timemachine_5gram`,
-we visualize all the different ways to obtain 5-grams in a text sequence, where each token is a character.
+To begin with,
+since a text sequence can be arbitrarily long,
+such as the entire *The Time Machine* book,
+we can partition such a long sequence into subsequences of $n$ time steps.
+When training our neural network,
+a minibatch of subsequences with $n$ time steps
+will be fed into the model.
+Suppose that the network processes a sequence
+of $n$ time steps
+at a time.
+:numref:`fig_timemachine_5gram`,
+shows all the different ways to obtain subsequences with 5 time steps from an original text sequence, where a token at each time step corresponds to a character.
 Note that we have quite some freedom since we could pick an arbitrary offset that indicates the initial position.
 
-![Different offsets lead to different $n$-grams when splitting up text.](../img/timemachine-5gram.svg)
+![Different offsets lead to different subsequences when splitting up text.](../img/timemachine-5gram.svg)
 :label:`fig_timemachine_5gram`
 
-Hence, which one should we pick?
+Hence, which one should we pick from :numref:`fig_timemachine_5gram`?
 In fact, all of them are equally good.
 However, if we pick just one offset,
 there is limited coverage of all the possible $n$-grams
 for training our network.
 Therefore,
-we can use a simple trick to get both *coverage* and *randomness*:
-use a random offset, after which one uses the tokens sequentially.
-We describe how to accomplish this for both
-*random sampling* and *sequential partitioning* strategies below.
+we can start with a random offset to partition a sequence
+to get both *coverage* and *randomness*.
+In the following,
+we describe how to accomplish this for both
+*random sampling* and *sequential partitioning* strategies.
 
 
 ### Random Sampling
 
-The following code randomly generates a minibatch from the data each time. Here, the batch size `batch_size` indicates the number of examples in each minibatch and `num_steps` is the length of the sequence (or time steps if we have a time series) included in each example.
-In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random minibatches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
+In random sampling, each example is a subsequence arbitrarily captured on the original sequence. The positions of two adjacent random minibatches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
+
+The following code randomly generates a minibatch from the data each time.
+Here, the argument `batch_size` specifies the number of subsequence examples in each minibatch
+and `num_steps` is the number of time steps
+in each subsequence.
 
 ```{.python .input}
 #@tab all

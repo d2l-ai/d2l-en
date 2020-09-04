@@ -45,7 +45,7 @@ import re
 
 ## Reading the Dataset
 
-To get started we load text from H. G. Wells' [The Time Machine](http://www.gutenberg.org/ebooks/35).
+To get started we load text from H. G. Wells' [*The Time Machine*](http://www.gutenberg.org/ebooks/35).
 This is a fairly small corpus of just over 30000 words, but for the purpose of what we want to illustrate this is just fine.
 More realistic document collections contain many billions of words.
 The following function reads the dataset into a list of text lines, where each line is a string.
