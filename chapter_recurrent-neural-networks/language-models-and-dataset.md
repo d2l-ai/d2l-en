@@ -327,12 +327,11 @@ This strategy preserves the order of split subsequences when iterating over mini
 ```{.python .input}
 #@tab mxnet, pytorch
 def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
-    # Offset for the iterator over the data for uniform starts
+    # Start with a random offset to partition a sequence
     offset = random.randint(0, num_steps)
-    # Slice out data: ignore `num_steps` and just wrap around
-    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = d2l.tensor(corpus[offset: offset + num_indices])
-    Ys = d2l.tensor(corpus[offset + 1: offset + 1 + num_indices])
+    num_tokens = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = d2l.tensor(corpus[offset: offset + num_tokens])
+    Ys = d2l.tensor(corpus[offset + 1: offset + 1 + num_tokens])
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
@@ -363,7 +362,7 @@ Using the same settings, print input `X` and label `Y` for each minibatch of exa
 
 ```{.python .input}
 #@tab all
-for X, Y in seq_data_iter_sequential(my_seq, batch_size=2, num_steps=6):
+for X, Y in seq_data_iter_sequential(my_seq, batch_size=2, num_steps=5):
     print('X: ', X, '\nY:', Y)
 ```
 
