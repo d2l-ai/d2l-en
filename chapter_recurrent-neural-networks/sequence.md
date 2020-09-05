@@ -313,10 +313,10 @@ Let us see how well this goes.
 ```{.python .input}
 #@tab mxnet, pytorch
 multistep_preds = d2l.zeros(T)
-multistep_preds[:n_train + tau] = x[:n_train + tau]
+multistep_preds[: n_train + tau] = x[: n_train + tau]
 for i in range(n_train + tau, T):
     multistep_preds[i] = d2l.reshape(net(
-        multistep_preds[i - tau:i].reshape(1, -1)), 1)
+        multistep_preds[i - tau: i].reshape(1, -1)), 1)
 ```
 
 ```{.python .input}
@@ -325,7 +325,7 @@ multistep_preds = tf.Variable(d2l.zeros(T))
 multistep_preds[:n_train + tau].assign(x[:n_train + tau])
 for i in range(n_train + tau, T):
     multistep_preds[i].assign(d2l.reshape(net(
-        d2l.reshape(multistep_preds[i - tau:i], (1, -1))), ()))
+        d2l.reshape(multistep_preds[i - tau: i], (1, -1))), ()))
 ```
 
 ```{.python .input}
@@ -357,12 +357,12 @@ features = d2l.zeros((T - tau - max_steps + 1, tau + max_steps))
 # Column `i` (`i` < `tau`) are observations from `x` for time steps from
 # `i + 1` to `i + T - tau - max_steps + 1`
 for i in range(tau):
-    features[:, i] = x[i:i + T - tau - max_steps + 1].T
+    features[:, i] = x[i: i + T - tau - max_steps + 1].T
 
 # Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
 # time steps from `i + 1` to `i + T - tau - max_steps + 1`
 for i in range(tau, tau + max_steps):
-    features[:, i] = d2l.reshape(net(features[:, i - tau:i]), -1)
+    features[:, i] = d2l.reshape(net(features[:, i - tau: i]), -1)
 ```
 
 ```{.python .input}
@@ -371,12 +371,12 @@ features = tf.Variable(d2l.zeros((T - tau - max_steps + 1, tau + max_steps)))
 # Column `i` (`i` < `tau`) are observations from `x` for time steps from
 # `i + 1` to `i + T - tau - max_steps + 1`
 for i in range(tau):
-    features[:, i].assign(x[i:i + T - tau - max_steps + 1].numpy().T)
+    features[:, i].assign(x[i: i + T - tau - max_steps + 1].numpy().T)
 
 # Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
 # time steps from `i + 1` to `i + T - tau - max_steps + 1`
 for i in range(tau, tau + max_steps):
-    features[:, i].assign(d2l.reshape(net((features[:, i - tau:i])), -1))
+    features[:, i].assign(d2l.reshape(net((features[:, i - tau: i])), -1))
 ```
 
 ```{.python .input}
