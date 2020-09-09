@@ -2,23 +2,37 @@
 :label:`sec_plain_rnn`
 
 
-In :numref:`sec_language_model` we introduced $n$-gram models, where the conditional probability of word $x_t$ at position $t$ only depends on the $n-1$ previous words. If we want to check the possible effect of words earlier than $t-(n-1)$ on $x_t$, we need to increase $n$. However, the number of model parameters would also increase exponentially with it, as we need to store $|V|^n$ numbers for a vocabulary $V$. Hence, rather than modeling $P(x_t \mid x_{t-1}, \ldots, x_{t-n+1})$ it is preferable to use a *latent variable model* in which we have
+In :numref:`sec_language_model` we introduced $n$-gram models, where the conditional probability of word $x_t$ at time step $t$ only depends on the $n-1$ previous words.
+If we want to incorporate the possible effect of words earlier than time step $t-(n-1)$ on $x_t$,
+we need to increase $n$.
+However, the number of model parameters would also increase exponentially with it, as we need to store $|\mathcal{V}|^n$ numbers for a vocabulary set $\mathcal{V}$.
+Hence, rather than modeling $P(x_t \mid x_{t-1}, \ldots, x_{t-n+1})$ it is preferable to use a latent variable model:
 
-$$P(x_t \mid x_{t-1}, \ldots, x_1) \approx P(x_t \mid x_{t-1}, h_{t}).$$
+$$P(x_t \mid x_{t-1}, \ldots, x_1) \approx P(x_t \mid h_{t-1}),$$
 
-Here $h_t$ is a *latent variable* that stores the sequence information. A latent variable is also called as *hidden variable*, *hidden state* or *hidden state variable*. The hidden state at time $t$ could be computed based on both input $x_{t}$ and hidden state $h_{t-1}$, that is
+where $h_{t-1}$ is a *hidden state* (also known as a hidden variable) that stores the sequence information up to time step $t-1$.
+In general,
+the hidden state at any time step $t$ could be computed based on both the current input $x_{t}$ and the previous hidden state $h_{t-1}$:
 
 $$h_t = f(x_{t}, h_{t-1}).$$
+:eqlabel:`eq_ht_xt`
 
-For a sufficiently powerful function $f$, the latent variable model is not an approximation. After all, $h_t$ could simply store all the data it observed so far. We discussed this in :numref:`sec_sequence`. But it could potentially makes both computation and storage expensive.
+For a sufficiently powerful function $f$ in :eqref:`eq_ht_xt`, the latent variable model is not an approximation. After all, $h_t$ may simply store all the data it has observed so far.
+However, it could potentially make both computation and storage expensive.
 
-Note that we also use $h$ to denote the number of hidden units of a hidden layer. Hidden layers and hidden states refer to two very different concepts. Hidden layers are, as explained, layers that are hidden from view on the path from input to output. Hidden states are technically speaking *inputs* to whatever we do at a given step. Instead, they can only be computed by looking at data at previous iterations. In this sense they have much in common with latent variable models in statistics, such as clustering or topic models where the clusters affect the output but cannot be directly observed.
+Recall that we have discussed hidden layers with hidden units in :numref:`chap_perceptrons`.
+It is noteworthy that
+hidden layers and hidden states refer to two very different concepts.
+Hidden layers are, as explained, layers that are hidden from view on the path from input to output.
+Hidden states are technically speaking *inputs* to whatever we do at a given step,
+and they can only be computed by looking at data at previous time steps.
 
-Recurrent neural networks are neural networks with hidden states. Before introducing this model, let us first revisit the multi-layer perceptron introduced in :numref:`sec_mlp`.
+*Recurrent neural networks* (RNNs) are neural networks with hidden states. Before introducing the RNN model, we first revisit the MLP model introduced in :numref:`sec_mlp`.
 
-## Recurrent Networks Without Hidden States
 
-Let us take a look at a multilayer perceptron with a single hidden layer. Given a minibatch of the instances $\mathbf{X} \in \mathbb{R}^{n \times d}$ with sample size $n$ and $d$ inputs. Let the hidden layer's activation function be $\phi$. Hence, the hidden layer's output $\mathbf{H} \in \mathbb{R}^{n \times h}$ is calculated as
+## Neural Networks without Hidden States
+
+Let us take a look at an MLP with a single hidden layer. Given a minibatch of the instances $\mathbf{X} \in \mathbb{R}^{n \times d}$ with sample size $n$ and $d$ inputs. Let the hidden layer's activation function be $\phi$. Hence, the hidden layer's output $\mathbf{H} \in \mathbb{R}^{n \times h}$ is calculated as
 
 $$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h).$$
 
