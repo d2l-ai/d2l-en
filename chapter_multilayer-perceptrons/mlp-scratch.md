@@ -193,7 +193,7 @@ Leveraging the `d2l` package again,
 we call the `train_ch3` function
 (see :numref:`sec_softmax_scratch`),
 setting the number of epochs to 10
-and the learning rate to 0.5.
+and the learning rate to 0.1.
 
 ```{.python .input}
 num_epochs, lr = 10, 0.1
