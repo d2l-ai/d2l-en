@@ -145,19 +145,6 @@ H, W_hh = d2l.normal(0, 1, (3, 4)), d2l.normal(0, 1, (4, 4))
 d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 ```
 
-```{.json .output n=2}
-[
- {
-  "data": {
-   "text/plain": "array([[-0.21952915,  4.256434  ,  4.5812645 , -5.344988  ],\n       [ 3.447858  , -3.0177274 , -1.6777471 ,  7.535347  ],\n       [ 2.2390068 ,  1.4199957 ,  4.744728  , -8.421293  ]])"
-  },
-  "execution_count": 2,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ```{.python .input}
 #@tab tensorflow
 X, W_xh = d2l.normal((3, 1), 0, 1), d2l.normal((1, 4), 0, 1)
@@ -168,19 +155,6 @@ d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 ```{.python .input}
 #@tab all
 d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_xh, W_hh), 0))
-```
-
-```{.json .output n=3}
-[
- {
-  "data": {
-   "text/plain": "array([[-0.21952918,  4.256434  ,  4.5812645 , -5.344988  ],\n       [ 3.4478583 , -3.0177271 , -1.677747  ,  7.535347  ],\n       [ 2.2390068 ,  1.4199957 ,  4.744728  , -8.421294  ]])"
-  },
-  "execution_count": 3,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Steps in a Language Model
