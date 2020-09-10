@@ -320,6 +320,7 @@ you may further refer to the [online appendix on information theory](https://d2l
 
 
 ## Information Theory Basics
+:label:`subsec_info_theory_basics`
 
 *Information theory* deals with the problem of encoding, decoding, transmitting,
 and manipulating information (also known as data) in as concise form as possible.
