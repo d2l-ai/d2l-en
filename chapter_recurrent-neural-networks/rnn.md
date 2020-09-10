@@ -93,6 +93,43 @@ RNNs always use these model parameters.
 Therefore, the parameterization cost of an RNN
 does not grow as the number of time steps increases.
 
+```{.python .input}
+from d2l import mxnet as d2l
+from mxnet import npx
+npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+```
+
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+```
+
+```{.python .input}
+#@tab mxnet, pytorch
+X, W_xh = d2l.normal(0, 1, (3, 1)), d2l.normal(0, 1, (1, 4))
+H, W_hh = d2l.normal(0, 1, (3, 4)), d2l.normal(0, 1, (4, 4))
+d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
+```
+
+```{.python .input}
+#@tab tensorflow
+X, W_xh = d2l.normal((3, 1), 0, 1), d2l.normal((1, 4), 0, 1)
+H, W_hh = d2l.normal((3, 4), 0, 1), d2l.normal((4, 4), 0, 1)
+d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
+```
+
+```{.python .input}
+#@tab all
+d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_xh, W_hh), 0))
+```
+
+
+
 :numref:`fig_rnn` shows the computational logic of an RNN at three adjacent time steps.
 At time step $t$, the computation of the hidden state can be treated as an entry of a fully connected layer with the activation function $\phi$ after concatenating the input $\mathbf{X}_t$ with the hidden state $\mathbf{H}_{t-1}$ of the previous time step.  The output of the fully connected layer is the hidden state of the current time step $\mathbf{H}_t$. Its model parameter is the concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$, with a bias of $\mathbf{b}_h$. The hidden state of the current time step $t$, $\mathbf{H}_t$, will participate in computing the hidden state $\mathbf{H}_{t+1}$ of the next time step $t+1$. What is more, $\mathbf{H}_t$ will become the input for $\mathbf{O}_t$, the fully connected output layer of the current time step.
 
