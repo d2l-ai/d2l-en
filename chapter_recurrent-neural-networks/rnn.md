@@ -131,11 +131,13 @@ npx.set_np()
 ```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
+import torch
 ```
 
 ```{.python .input}
 #@tab tensorflow
 from d2l import tensorflow as d2l
+import tensorflow
 ```
 
 ```{.python .input}
@@ -151,6 +153,18 @@ X, W_xh = d2l.normal((3, 1), 0, 1), d2l.normal((1, 4), 0, 1)
 H, W_hh = d2l.normal((3, 4), 0, 1), d2l.normal((4, 4), 0, 1)
 d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 ```
+
+Now we concatenate the matrices `X` and `H`
+along columns (axis 1),
+and the matrices 
+`W_xh` and `W_hh` along rows (axis 0).
+These two concatenations
+result in
+matrices of shape (3, 5)
+and of shape (5, 4), respectively.
+Multiplying these two concatenated matrices,
+we obtain the same output matrix of shape (3, 4)
+as above.
 
 ```{.python .input}
 #@tab all
