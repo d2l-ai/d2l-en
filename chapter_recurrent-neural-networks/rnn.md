@@ -137,7 +137,7 @@ import torch
 ```{.python .input}
 #@tab tensorflow
 from d2l import tensorflow as d2l
-import tensorflow
+import tensorflow as tf
 ```
 
 ```{.python .input}
