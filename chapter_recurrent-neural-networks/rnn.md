@@ -93,9 +93,38 @@ RNNs always use these model parameters.
 Therefore, the parameterization cost of an RNN
 does not grow as the number of time steps increases.
 
+:numref:`fig_rnn` illustrates the computational logic of an RNN at three adjacent time steps.
+At any time step $t$,
+the computation of the hidden state can be treated as:
+i) concatenating the input $\mathbf{X}_t$ at the current time step $t$ and the hidden state $\mathbf{H}_{t-1}$ at the previous time step $t-1$;
+ii) feeding the concatenation result into a fully-connected layer with the activation function $\phi$.
+The output of such a fully-connected layer is the hidden state $\mathbf{H}_t$ of the current time step $t$.
+In this case,
+the model parameters are the concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$, and a bias of $\mathbf{b}_h$, all from :eqref:`rnn_h_with_state`.
+The hidden state of the current time step $t$, $\mathbf{H}_t$, will participate in computing the hidden state $\mathbf{H}_{t+1}$ of the next time step $t+1$.
+What is more, $\mathbf{H}_t$ will also be
+fed into the fully-connected output layer
+to compute the output
+$\mathbf{O}_t$ of the current time step $t$.
+
+![An RNN with a hidden state.](../img/rnn.svg)
+:label:`fig_rnn`
+
+We just mentioned that the calculation of $\mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}$ for the hidden state is equivalent to
+matrix multiplication of
+concatenation of $\mathbf{X}_t$ and $\mathbf{H}_{t-1}$
+and
+concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$.
+Though this can be proven in mathematics,
+in the following we just use a simple code snippet to show this.
+To begin with,
+we define matrices `X`, `W_xh`, `H`, and `W_hh`, whose shapes are (3, 1), (1, 4), (3, 4), and (4, 4), respectively.
+Multiplying `X` by `W_xh`, and `H` by `W_hh`, respectively, and then adding these two multiplications,
+we obtain a matrix of shape (3, 4).
+
 ```{.python .input}
 from d2l import mxnet as d2l
-from mxnet import npx
+from mxnet import np, npx
 npx.set_np()
 ```
 
@@ -116,6 +145,19 @@ H, W_hh = d2l.normal(0, 1, (3, 4)), d2l.normal(0, 1, (4, 4))
 d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 ```
 
+```{.json .output n=2}
+[
+ {
+  "data": {
+   "text/plain": "array([[-0.21952915,  4.256434  ,  4.5812645 , -5.344988  ],\n       [ 3.447858  , -3.0177274 , -1.6777471 ,  7.535347  ],\n       [ 2.2390068 ,  1.4199957 ,  4.744728  , -8.421293  ]])"
+  },
+  "execution_count": 2,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 ```{.python .input}
 #@tab tensorflow
 X, W_xh = d2l.normal((3, 1), 0, 1), d2l.normal((1, 4), 0, 1)
@@ -128,14 +170,18 @@ d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_xh, W_hh), 0))
 ```
 
-
-
-:numref:`fig_rnn` shows the computational logic of an RNN at three adjacent time steps.
-At time step $t$, the computation of the hidden state can be treated as an entry of a fully connected layer with the activation function $\phi$ after concatenating the input $\mathbf{X}_t$ with the hidden state $\mathbf{H}_{t-1}$ of the previous time step.  The output of the fully connected layer is the hidden state of the current time step $\mathbf{H}_t$. Its model parameter is the concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$, with a bias of $\mathbf{b}_h$. The hidden state of the current time step $t$, $\mathbf{H}_t$, will participate in computing the hidden state $\mathbf{H}_{t+1}$ of the next time step $t+1$. What is more, $\mathbf{H}_t$ will become the input for $\mathbf{O}_t$, the fully connected output layer of the current time step.
-
-![An RNN with a hidden state.](../img/rnn.svg)
-:label:`fig_rnn`
-
+```{.json .output n=3}
+[
+ {
+  "data": {
+   "text/plain": "array([[-0.21952918,  4.256434  ,  4.5812645 , -5.344988  ],\n       [ 3.4478583 , -3.0177271 , -1.677747  ,  7.535347  ],\n       [ 2.2390068 ,  1.4199957 ,  4.744728  , -8.421294  ]])"
+  },
+  "execution_count": 3,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
 
 ## Steps in a Language Model
 
