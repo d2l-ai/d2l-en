@@ -48,6 +48,7 @@ This is entirely analogous to the regression problem we solved previously in :nu
 Suffice it to say that we can pick feature-label pairs at random and learn the parameters of our network via automatic differentiation and stochastic gradient descent.
 
 ## Recurrent Neural Networks with Hidden States
+:label:`subsec_rnn_w_hidden_states`
 
 Matters are entirely different when we have hidden states. Let us look at the structure in some more detail.
 
@@ -171,14 +172,31 @@ as above.
 d2l.matmul(d2l.concat((X, H), 1), d2l.concat((W_xh, W_hh), 0))
 ```
 
-## Steps in a Language Model
+## RNN-based Character-Level Language Models
 
-Now we illustrate how RNNs can be used to build a language model. For simplicity of illustration we use words rather than characters as the inputs, since the former are easier to comprehend. Let the minibatch size be 1, and the sequence of the text be the beginning of our dataset, i.e., "the time machine by H. G. Wells". :numref:`fig_rnn_train` illustrates how to estimate the next word based on the present and previous words. During the training process, we run a softmax operation on the output from the output layer for each time step, and then use the cross-entropy loss function to compute the error between the result and the label. Due to the recurrent computation of the hidden state in the hidden layer, the output of time step 3, $\mathbf{O}_3$, is determined by the text sequence "the", "time", and "machine" respectively. Since the next word of the sequence in the training data is "by", the loss of time step 3 will depend on the probability distribution of the next word generated based on the feature sequence "the", "time", "machine" and the label "by" of this time step.
+Recall that for language modeling in :numref:`sec_language_model`,
+we aim to predict the next token based on
+the current and past tokens,
+thus we shift the original sequence by one token
+as the labels.
+Now we illustrate how RNNs can be used to build a language model. 
+Let the minibatch size be 1, and the sequence of the text be "machine".
+To simplify training in subsequent sections,
+we tokenize text into characters rather than words
+and consider a *character-level language model*.
+:numref:`fig_rnn_train` demonstrates how to predict the next character based on the current and previous characters via an RNN for character-level language modeling.
 
-![Word-level RNN language model. The input and label sequences are `the time machine by H.` and `time machine by H. G.` respectively. ](../img/rnn-train.svg)
+![A character-level language model based on the RNN. The input and label sequences are "machin" and "achine", respectively.](../img/rnn-train.svg)
 :label:`fig_rnn_train`
 
-In practice, each word is presented by a $d$ dimensional vector, and we use a batch size $n>1$. Therefore, the input $\mathbf X_t$ at time step $t$ will be a $n\times d$ matrix, which is identical to what we discussed before.
+During the training process,
+we run a softmax operation on the output from the output layer for each time step, and then use the cross-entropy loss to compute the error between the model output and the label.
+Due to the recurrent computation of the hidden state in the hidden layer, the output of time step 3 in :numref:`fig_rnn_train`,
+$\mathbf{O}_3$, is determined by the text sequence "m", "a", and "c". Since the next character of the sequence in the training data is "h", the loss of time step 3 will depend on the probability distribution of the next character generated based on the feature sequence "m", "a", "c" and the label "h" of this time step.
+
+In practice, each token is represented by a $d$-dimensional vector, and we use a batch size $n>1$. Therefore, the input $\mathbf X_t$ at time step $t$ will be a $n\times d$ matrix, which is identical to what we discussed in :numref:`subsec_rnn_w_hidden_states`.
+
+
 
 ## Perplexity
 
