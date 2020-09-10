@@ -202,7 +202,7 @@ In practice, each token is represented by a $d$-dimensional vector, and we use a
 
 ## Perplexity
 
-Last, let us discuss about how to measure the sequence model quality, which will be used to evaluate our RNN-based language models in the subsequence sections.
+Last, let us discuss about how to measure the language model quality, which will be used to evaluate our RNN-based models in the subsequent sections.
 One way is to check how surprising the text is.
 A good language model is able to predict with
 high-accuracy tokens that what we will see next.
@@ -223,37 +223,50 @@ hence evaluating the model on Tolstoy's magnum opus
 *War and Peace* will inevitably produce a much smaller likelihood than, say, on Saint-Exupery's novella *The Little Prince*. What is missing is the equivalent of an average.
 
 Information theory comes handy here.
-We have introduced its basics in :numref:`subsec_info_theory_basics`
-and more is discussed in the [online appendix on information theory](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/information-theory.html).
-If we want to compress text, we can ask about estimating the next token given the current set of tokens.
-A lower bound on the number of bits is given by $-\log_2 P(x_t \mid x_{t-1}, \ldots, x_1)$. A good language model should allow us to predict the next word quite accurately. Thus, it should allow us to spend very few bits on compressing the sequence. So we can measure it by the average number of bits that we need to spend.
+We have defined entropy, surprisal, and cross-entropy 
+when we introduced the softmax regression
+(:numref:`subsec_info_theory_basics`)
+and more of information theory is discussed in the [online appendix on information theory](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/information-theory.html).
+If we want to compress text, we can ask about
+predicting the next token given the current set of tokens.
+A better language model should allow us to predict the next token more accurately.
+Thus, it should allow us to spend fewer bits in compressing the sequence.
+So we can measure it by the cross-entropy loss averaged
+over all the $n$ tokens of a sequence:
 
-$$\frac{1}{n} \sum_{t=1}^n -\log P(x_t \mid x_{t-1}, \ldots, x_1).$$
+$$\frac{1}{n} \sum_{t=1}^n -\log P(x_t \mid x_{t-1}, \ldots, x_1),$$
+:eqlabel:`eq_avg_ce_for_lm`
 
-This makes the performance on documents of different lengths comparable. For historical reasons, scientists in natural language processing prefer to use a quantity called *perplexity* rather than bitrate. In a nutshell, it is the exponential of the above:
+where $P$ is given by a language model and $x_t$ is the actual token observed at time step $t$ from the sequence.
+This makes the performance on documents of different lengths comparable. For historical reasons, scientists in natural language processing prefer to use a quantity called *perplexity*. In a nutshell, it is the exponential of :eqref:`eq_avg_ce_for_lm`:
 
-$$\mathrm{PPL} := \exp\left(-\frac{1}{n} \sum_{t=1}^n \log P(x_t \mid x_{t-1}, \ldots, x_1)\right).$$
+$$\exp\left(-\frac{1}{n} \sum_{t=1}^n \log P(x_t \mid x_{t-1}, \ldots, x_1)\right).$$
 
-It can be best understood as the harmonic mean of the number of real choices that we have when deciding which word to pick next. Note that perplexity naturally generalizes the notion of the cross-entropy loss defined when we introduced the softmax regression (:numref:`sec_softmax`). That is, for a single symbol both definitions are identical bar the fact that one is the exponential of the other. Let us look at a number of cases:
+Perplexity can be best understood as the harmonic mean of the number of real choices that we have when deciding which token to pick next. Let us look at a number of cases:
 
-* In the best case scenario, the model always estimates the probability of the next symbol as $1$. In this case the perplexity of the model is $1$.
-* In the worst case scenario, the model always predicts the probability of the label category as 0. In this situation, the perplexity is infinite.
-* At the baseline, the model predicts a uniform distribution over all tokens. In this case, the perplexity equals the size of the dictionary `len(vocab)`. In fact, if we were to store the sequence without any compression, this would be the best we could do to encode it. Hence, this provides a nontrivial upper bound that any model must satisfy.
+* In the best case scenario, the model always perfectly estimates the probability of the label token as 1. In this case the perplexity of the model is 1.
+* In the worst case scenario, the model always predicts the probability of the label token as 0. In this situation, the perplexity is positive infinity.
+* At the baseline, the model predicts a uniform distribution over all the available tokens of the vocabulary. In this case, the perplexity equals the number of unique tokens of the vocabulary. In fact, if we were to store the sequence without any compression, this would be the best we could do to encode it. Hence, this provides a nontrivial upper bound that any useful model must beat.
+
+In the following sections, we will implement RNNs
+for character-level language models and use perplexity
+to evaluate such models.
 
 
 ## Summary
 
-* A network that uses recurrent computation is called a recurrent neural network (RNN).
-* The hidden state of the RNN can capture historical information of the sequence up to the current time step.
+* A neural network that uses recurrent computation for hidden states is called a recurrent neural network (RNN).
+* The hidden state of an RNN can capture historical information of the sequence up to the current time step.
 * The number of RNN model parameters does not grow as the number of time steps increases.
-* We can create language models using a character-level RNN.
+* We can create character-level language models using an  RNN.
+* We can use perplexity to evaluate the quality of language models.
 
 ## Exercises
 
-1. If we use an RNN to predict the next character in a text sequence, how many output dimensions do we need?
-1. Can you design a mapping for which an RNN with hidden states is exact? Hint: what about a finite number of words?
+1. If we use an RNN to predict the next character in a text sequence, what is the required dimension for any output?
+1. Why can RNNs express the conditional probability of a token at some time step based on all the previous tokens in the text sequence?
 1. What happens to the gradient if you backpropagate through a long sequence?
-1. What are some of the problems associated with the simple sequence model described above?
+1. What are some of the problems associated with the language model described in this section?
 
 
 [Discussions](https://discuss.d2l.ai/t/337)
