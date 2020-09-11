@@ -1,7 +1,8 @@
 # Implementation of Recurrent Neural Networks from Scratch
 :label:`sec_rnn_scratch`
 
-In this section we implement an RNN from scratch
+In this section we will implement an RNN
+from scratch
 for a character-level language model,
 according to our descriptions
 in :numref:`sec_rnn`.
@@ -80,8 +81,12 @@ The shape of the minibatch that we sample each time is (batch size, number of ti
 The `one_hot` function transforms such a minibatch into a three-dimensional tensor with the last dimension equals to the vocabulary size (`len(vocab)`).
 We often transpose the input so that we will obtain an
 output of shape
-(number of time steps, batch size, vocabulary size)
-that fits into a sequence model more easily.
+(number of time steps, batch size, vocabulary size).
+This will allow us
+to more conveniently
+loop through the outermost dimension
+for updating hidden states of a minibatch,
+time step by time step.
 
 ```{.python .input}
 X = d2l.reshape(d2l.arange(10), (2, 5))
@@ -102,7 +107,9 @@ tf.one_hot(tf.transpose(X), 28).shape
 
 ## Initializing the Model Parameters
 
-Next, we initialize the model parameters for an RNN model. The number of hidden units `num_hiddens` is a tunable hyperparameter.
+Next, we initialize the model parameters for
+the RNN model.
+The number of hidden units `num_hiddens` is a tunable hyperparameter.
 When training language models,
 the inputs and outputs are from the same vocabulary.
 Hence, they have the same dimension,
@@ -197,17 +204,26 @@ def init_rnn_state(batch_size, num_hiddens):
 ```
 
 The following `rnn` function defines how to compute the hidden state and output
-in a time step. The activation function here uses the $\tanh$ function. As
+at a time step.
+Note that
+the RNN model
+loops through the outermost dimension of `inputs`
+so that it updates hidden states `H` of a minibatch,
+time step by time step.
+Besides,
+the activation function here uses the $\tanh$ function.
+As
 described in :numref:`sec_mlp`, the
-mean value of the $\tanh$ function is 0, when the elements are evenly
+mean value of the $\tanh$ function is 0, when the elements are uniformly
 distributed over the real numbers.
 
 ```{.python .input}
 def rnn(inputs, state, params):
-    # Inputs shape: (num_steps, batch_size, vocab_size)
+    # Shape of `inputs`: (`num_steps`, `batch_size`, `vocab_size`)
     W_xh, W_hh, b_h, W_hq, b_q = params
     H, = state
     outputs = []
+    # Shape of `X`: (`batch_size`, `vocab_size`)
     for X in inputs:
         H = np.tanh(np.dot(X, W_xh) + np.dot(H, W_hh) + b_h)
         Y = np.dot(H, W_hq) + b_q
@@ -218,10 +234,11 @@ def rnn(inputs, state, params):
 ```{.python .input}
 #@tab pytorch
 def rnn(inputs, state, params):
-    # Inputs shape: (num_steps, batch_size, vocab_size)
+    # Here `inputs` shape: (`num_steps`, `batch_size`, `vocab_size`)
     W_xh, W_hh, b_h, W_hq, b_q = params
     H, = state
     outputs = []
+    # Shape of `X`: (`batch_size`, `vocab_size`)
     for X in inputs:
         H = torch.tanh(torch.mm(X, W_xh) + torch.mm(H, W_hh) + b_h)
         Y = torch.mm(H, W_hq) + b_q
@@ -232,28 +249,30 @@ def rnn(inputs, state, params):
 ```{.python .input}
 #@tab tensorflow
 def rnn(inputs, state, params):
-    # Inputs shape: (num_steps, batch_size, vocab_size)
+    # Here `inputs` shape: (`num_steps`, `batch_size`, `vocab_size`)
     W_xh, W_hh, b_h, W_hq, b_q = params
     H, = state
     outputs = []
+    # Shape of `X`: (`batch_size`, `vocab_size`)
     for X in inputs:
-        X=tf.reshape(X,[-1,W_xh.shape[0]])
+        X = tf.reshape(X,[-1,W_xh.shape[0]])
         H = tf.tanh(tf.matmul(X, W_xh) + tf.matmul(H, W_hh) + b_h)
         Y = tf.matmul(H, W_hq) + b_q
         outputs.append(Y)
     return d2l.concat(outputs, axis=0), (H,)
 ```
 
-Now we have all functions defined, next we create a class to wrap these functions and store parameters.
+With all the needed functions being defined,
+next we create a class to wrap these functions and store parameters for an RNN model implemented from scratch.
 
 ```{.python .input}
 class RNNModelScratch:  #@save
-    """A RNN Model based on scratch implementations."""
-    def __init__(self, vocab_size, num_hiddens, device,
-                 get_params, init_state, forward):
+    """An RNN Model implemented from scratch."""
+    def __init__(self, vocab_size, num_hiddens, device, get_params,
+                 init_state, forward_fn):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
         self.params = get_params(vocab_size, num_hiddens, device)
-        self.init_state, self.forward_fn = init_state, forward
+        self.init_state, self.forward_fn = init_state, forward_fn
 
     def __call__(self, X, state):
         X = npx.one_hot(X.T, self.vocab_size)
@@ -266,12 +285,12 @@ class RNNModelScratch:  #@save
 ```{.python .input}
 #@tab pytorch
 class RNNModelScratch: #@save
-    """A RNN Model based on scratch implementations."""
+    """A RNN Model implemented from scratch."""
     def __init__(self, vocab_size, num_hiddens, device,
-                 get_params, init_state, forward):
+                 get_params, init_state, forward_fn):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
         self.params = get_params(vocab_size, num_hiddens, device)
-        self.init_state, self.forward_fn = init_state, forward
+        self.init_state, self.forward_fn = init_state, forward_fn
 
     def __call__(self, X, state):
         X = F.one_hot(X.T, self.vocab_size).type(torch.float32)
@@ -284,11 +303,11 @@ class RNNModelScratch: #@save
 ```{.python .input}
 #@tab tensorflow
 class RNNModelScratch: #@save
-    """A RNN Model based on scratch implementations."""
+    """A RNN Model implemented from scratch."""
     def __init__(self, vocab_size, num_hiddens,
-                 init_state, forward):
+                 init_state, forward_fn):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
-        self.init_state, self.forward_fn = init_state, forward
+        self.init_state, self.forward_fn = init_state, forward_fn
 
     def __call__(self, X, state, params):
         X = tf.one_hot(tf.transpose(X), self.vocab_size)
@@ -299,7 +318,7 @@ class RNNModelScratch: #@save
         return self.init_state(batch_size, self.num_hiddens)
 ```
 
-Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state has not changed.
+Let us check whether the outputs have the correct shapes, e.g., to ensure that the dimensionality of the hidden state remains unchanged.
 
 ```{.python .input}
 #@tab mxnet
@@ -332,7 +351,7 @@ Y, new_state = model(X, state, params)
 Y.shape, len(new_state), new_state[0].shape
 ```
 
-We can see that the output shape is (number steps $\times$ batch size, vocabulary size), while the hidden state shape remains the same, i.e., (batch size, number of hidden units).
+We can see that the output shape is (number of time steps $\times$ batch size, vocabulary size), while the hidden state shape remains the same, i.e., (batch size, number of hidden units).
 
 ## Prediction
 
