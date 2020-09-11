@@ -85,7 +85,7 @@ that fits into a sequence model more easily.
 
 ```{.python .input}
 X = d2l.reshape(d2l.arange(10), (2, 5))
-npx.one_hot(X.T, 28)).shape
+npx.one_hot(X.T, 28).shape
 ```
 
 ```{.python .input}
