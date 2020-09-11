@@ -698,17 +698,17 @@ class RNNModelScratch: #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
+def predict_ch8(prefix, num_preds, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, device=device)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: torch.tensor(
-        [outputs[-1]], device=device).reshape(1, 1)
-    for y in prefix[1:]:  # Warmup state with prefix
+    get_input = lambda: d2l.reshape(d2l.tensor(
+        [outputs[-1]], device=device), (1, 1))
+    for y in prefix[1:]:  # Warm up period
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
-    for _ in range(num_predicts):  # Predict num_predicts steps
-        Y, state = model(get_input(), state)
-        outputs.append(int(Y.argmax(dim=1).reshape(1)))
+    for _ in range(num_preds):  # Predict `num_preds` steps
+        y, state = model(get_input(), state)
+        outputs.append(int(y.argmax(dim=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 

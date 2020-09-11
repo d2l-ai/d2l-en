@@ -353,56 +353,80 @@ Y.shape, len(new_state), new_state[0].shape
 
 We can see that the output shape is (number of time steps $\times$ batch size, vocabulary size), while the hidden state shape remains the same, i.e., (batch size, number of hidden units).
 
+
 ## Prediction
 
-We first explain the predicting function so we can regularly check the prediction during training. This function predicts the next `num_predicts` characters based on the `prefix` (a string containing several characters). For the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them.
+We first explain the predicting function so we can regularly check the prediction during training. This function predicts the next `num_preds` characters based on the `prefix` (a string containing several characters). For the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them.
+
+
+As we will regularly check the prediction result
+during training,
+let us first define the prediction function
+to generate new characters following
+the user-provided `prefix`,
+which is a string containing several characters.
+When looping through these beginning characters in `prefix`,
+we keep passing the hidden state
+to the next time step without
+generating any output.
+This is called the *warm up* period,
+during which the model is still not ready to make predictions
+so only its parameters are updated.
+After the warm up period,
+model parameters are generally better than
+the random initialization at the beginning.
+So we generate the predicted characters and emit them.
 
 ```{.python .input}
-def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
+def predict_ch8(prefix, num_preds, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, ctx=device)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: np.array([outputs[-1]], ctx=device).reshape(1, 1)
-    for y in prefix[1:]:  # Warmup state with prefix
+    get_input = lambda: d2l.reshape(
+        d2l.tensor([outputs[-1]], ctx=device), (1, 1))
+    for y in prefix[1:]:  # Warm up period
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
-    for _ in range(num_predicts):  # Predict num_predicts steps
-        Y, state = model(get_input(), state)
-        outputs.append(int(Y.argmax(axis=1).reshape(1)))
+    for _ in range(num_preds):  # Predict `num_preds` steps
+        y, state = model(get_input(), state)
+        outputs.append(int(y.argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
 ```{.python .input}
 #@tab pytorch
-def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
+def predict_ch8(prefix, num_preds, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, device=device)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: torch.tensor(
-        [outputs[-1]], device=device).reshape(1, 1)
-    for y in prefix[1:]:  # Warmup state with prefix
+    get_input = lambda: d2l.reshape(d2l.tensor(
+        [outputs[-1]], device=device), (1, 1))
+    for y in prefix[1:]:  # Warm up period
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
-    for _ in range(num_predicts):  # Predict num_predicts steps
-        Y, state = model(get_input(), state)
-        outputs.append(int(Y.argmax(dim=1).reshape(1)))
+    for _ in range(num_preds):  # Predict `num_preds` steps
+        y, state = model(get_input(), state)
+        outputs.append(int(y.argmax(dim=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
 ```{.python .input}
 #@tab tensorflow
-def predict_ch8(prefix, num_predicts, model, vocab, params): #@save
+def predict_ch8(prefix, num_preds, model, vocab, params): #@save
     state = model.begin_state(batch_size=1)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: d2l.reshape(tf.constant([outputs[-1]]), (1,1)).numpy()
-    for y in prefix[1:]: # Warmup state with prefix
+    get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
+    for y in prefix[1:]:  # Warm up period
         _, state = model(get_input(), state, params)
         outputs.append(vocab[y])
-    for _ in range(num_predicts):  # Predict num_predicts steps
-        Y, state = model(get_input(), state, params)
-        outputs.append(int(Y.numpy().argmax(axis=1).reshape(1)))
+    for _ in range(num_preds):  # Predict `num_preds` steps
+        y, state = model(get_input(), state, params)
+        outputs.append(int(y.numpy().argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
-We test the `predict_ch8` function first. Given that we did not train the network, it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
+Now we can test the `predict_ch8` function.
+We specify the prefix as `time traveller ` and have it generate 10 additional characters.
+Given that we have not trained the network,
+it will generate nonsensical predictions.
 
 ```{.python .input}
 #@tab mxnet,pytorch
