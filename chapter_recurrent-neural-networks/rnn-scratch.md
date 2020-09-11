@@ -172,7 +172,12 @@ def get_params(vocab_size, num_hidden):
 
 ## RNN Model
 
-First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns a tensor filled with 0 and with a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple variables (e.g., when combining multiple layers in an RNN where each layer requires initializing).
+To define an RNN model,
+we first need an `init_rnn_state` function
+to return the hidden state at initialization.
+It returns a tensor filled with 0 and with a shape of (batch size, number of hidden units).
+Using tuples makes it easier to handle situations where the hidden state contains multiple variables,
+which we will encounter in later sections.
 
 ```{.python .input}
 def init_rnn_state(batch_size, num_hiddens, device):
