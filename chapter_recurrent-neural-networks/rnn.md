@@ -1,5 +1,5 @@
 # Recurrent Neural Networks
-:label:`sec_plain_rnn`
+:label:`sec_rnn`
 
 
 In :numref:`sec_language_model` we introduced $n$-gram models, where the conditional probability of word $x_t$ at time step $t$ only depends on the $n-1$ previous words.

@@ -1,13 +1,19 @@
 # Implementation of Recurrent Neural Networks from Scratch
 :label:`sec_rnn_scratch`
 
-In this section we implement a language model introduced in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the dataset first, which is introduced in :numref:`sec_language_model`.
+In this section we implement an RNN from scratch
+for a character-level language model,
+according to our descriptions
+in :numref:`sec_rnn`.
+Such a model
+will be trained on H. G. Wells' *The Time Machine*.
+As before, we start by reading the dataset first, which is introduced in :numref:`sec_language_model`.
 
 ```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
-from mxnet import autograd, np, npx, gluon
+from mxnet import autograd, gluon, np, npx
 npx.set_np()
 ```
 
@@ -31,27 +37,30 @@ import tensorflow as tf
 ```
 
 ```{.python .input}
-#@tab mxnet,pytorch
+#@tab all
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-batch_size, num_steps = 32, 35
-train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
-train_random_iter, vocab_random_iter = d2l.load_data_time_machine(batch_size,
-                                            num_steps, use_random_iter=True)
+train_random_iter, vocab_random_iter = d2l.load_data_time_machine(
+    batch_size, num_steps, use_random_iter=True)
 ```
 
-## One-hot Encoding
+## One-Hot Encoding
 
-Remember that each token is presented as a numerical index in `train_iter`.
-Feeding these indices directly to the neural network might make it hard to
-learn. We often present each token as a more expressive feature vector. The
-easiest representation is called *one-hot encoding*.
+Recall that each token is represented as a numerical index in `train_iter`.
+Feeding these indices directly to a neural network might make it hard to
+learn.
+We often represent each token as a more expressive feature vector.
+The easiest representation is called *one-hot encoding*,
+which is introduced
+in :numref:`subsec_classification-problem`.
 
-In a nutshell, we map each index to a different unit vector: assume that the number of different tokens in the vocabulary is $N$ (the `len(vocab)`) and the token indices range from 0 to $N-1$. If the index of a token is the integer $i$, then we create a vector $\mathbf{e}_i$ of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
+In a nutshell, we map each index to a different unit vector: assume that the number of different tokens in the vocabulary is $N$ (`len(vocab)`) and the token indices range from 0 to $N-1$.
+If the index of a token is the integer $i$, then we create a vector of all 0s with a length of $N$ and set the element at position $i$ to 1.
+This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
 
 ```{.python .input}
 npx.one_hot(np.array([0, 2]), len(vocab))
@@ -67,16 +76,21 @@ F.one_hot(torch.tensor([0, 2]), len(vocab))
 tf.one_hot(tf.constant([0, 2]), len(vocab))
 ```
 
-The shape of the minibatch we sample each time is (batch size, time step). The `one_hot` function transforms such a minibatch into a 3-D tensor with the last dimension equals to the vocabulary size. We often transpose the input so that we will obtain a (time step, batch size, vocabulary size) output that fits into a sequence model easier.
+The shape of the minibatch that we sample each time is (batch size, number of time steps).
+The `one_hot` function transforms such a minibatch into a three-dimensional tensor with the last dimension equals to the vocabulary size (`len(vocab)`).
+We often transpose the input so that we will obtain an
+output of shape
+(number of time steps, batch size, vocabulary size)
+that fits into a sequence model more easily.
 
 ```{.python .input}
-X = np.arange(10).reshape(2, 5)
-npx.one_hot(X.T, 28).shape
+X = d2l.reshape(d2l.arange(10), (2, 5))
+npx.one_hot(X.T, 28)).shape
 ```
 
 ```{.python .input}
 #@tab pytorch
-X = torch.arange(10).reshape(2, 5)
+X = d2l.reshape(d2l.arange(10), (2, 5))
 F.one_hot(X.T, 28).shape
 ```
 
@@ -88,7 +102,11 @@ tf.one_hot(tf.transpose(X), 28).shape
 
 ## Initializing the Model Parameters
 
-Next, we initialize the model parameters for a RNN model. The number of hidden units `num_hiddens` is a tunable parameter.
+Next, we initialize the model parameters for an RNN model. The number of hidden units `num_hiddens` is a tunable hyperparameter.
+When training language models,
+the inputs and outputs are from the same vocabulary.
+Hence, they have the same dimension,
+which is equal to the vocabulary size.
 
 ```{.python .input}
 def get_params(vocab_size, num_hiddens, device):
@@ -96,6 +114,7 @@ def get_params(vocab_size, num_hiddens, device):
 
     def normal(shape):
         return np.random.normal(scale=0.01, size=shape, ctx=device)
+
     # Hidden layer parameters
     W_xh = normal((num_inputs, num_hiddens))
     W_hh = normal((num_hiddens, num_hiddens))
@@ -116,7 +135,8 @@ def get_params(vocab_size, num_hiddens, device):
     num_inputs = num_outputs = vocab_size
 
     def normal(shape):
-        return torch.randn(size=shape, device=device)*0.01
+        return torch.randn(size=shape, device=device) * 0.01
+
     # Hidden layer parameters
     W_xh = normal((num_inputs, num_hiddens))
     W_hh = normal((num_hiddens, num_hiddens))
@@ -138,6 +158,7 @@ def get_params(vocab_size, num_hidden):
     
     def normal(shape):
         return d2l.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32)
+
     # Hidden layer parameters
     W_xh = tf.Variable(normal((num_inputs, num_hiddens)), dtype=tf.float32)
     W_hh = tf.Variable(normal((num_hiddens, num_hiddens)), dtype=tf.float32)
