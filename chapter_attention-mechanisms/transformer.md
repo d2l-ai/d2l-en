@@ -186,6 +186,7 @@ def transpose_output(X, num_heads):
     return X.reshape(X.shape[0], X.shape[1], -1)
 ```
 
+
 ```{.python .input}
 #@tab pytorch
 #@save
@@ -213,7 +214,7 @@ def transpose_output(X, num_heads):
     return X.reshape(X.shape[0], X.shape[1], -1)
 ```
 
-Let us test the `MultiHeadAttention` model in the a toy example. Create a multi-head attention with the hidden size $d_o = 100$, the output will share the same batch size and sequence length as the input, but the last dimension will be equal to the `num_hiddens` $= 100$.
+Let us test the `MultiHeadAttention` model in a toy example. Create a multi-head attention with the hidden size $d_o = 100$, the output will share the same batch size and sequence length as the input, but the last dimension will be equal to the `num_hiddens` $= 100$.
 
 ```{.python .input}
 cell = MultiHeadAttention(100, 10, 0.5)
