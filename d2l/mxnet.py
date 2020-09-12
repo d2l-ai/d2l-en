@@ -672,7 +672,7 @@ def predict_ch8(prefix, num_preds, model, vocab, device):  #@save
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(
         d2l.tensor([outputs[-1]], ctx=device), (1, 1))
-    for y in prefix[1:]:  # Warm up period
+    for y in prefix[1:]:  # Warm-up period
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
     for _ in range(num_preds):  # Predict `num_preds` steps
@@ -696,12 +696,13 @@ def grad_clipping(model, theta):  #@save
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
                     use_random_iter):
+    """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
-    metric = d2l.Accumulator(2)  # loss_sum, num_examples
+    metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
     for X, Y in train_iter:
         if state is None or use_random_iter:
-            # Initialize state when either it is the first iteration or
-            # using random sampling.
+            # Initialize `state` when either it is the first iteration or
+            # using random sampling
             state = model.begin_state(batch_size=X.shape[0], ctx=device)
         else:
             for s in state:
@@ -709,22 +710,23 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
         y = Y.T.reshape(-1)
         X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         with autograd.record():
-            py, state = model(X, state)
-            l = loss(py, y).mean()
+            y_hat, state = model(X, state)
+            l = loss(y_hat, y).mean()
         l.backward()
         grad_clipping(model, 1)
-        updater(batch_size=1)  # Since used mean already
+        updater(batch_size=1)  # Since the `mean` function has been invoked
         metric.add(l * d2l.size(y), d2l.size(y))
-    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
               use_random_iter=False):
-    # Initialize
+    """Train a model (defined in Chapter 8)."""
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
+    # Initialize
     if isinstance(model, gluon.Block):
         model.initialize(ctx=device, force_reinit=True,
                          init=init.Normal(0.01))
@@ -734,13 +736,13 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
     else:
         updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, device)
-    # Train and check the progress.
+    # Train and predict
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
             model, train_iter, loss, updater, device, use_random_iter)
         if epoch % 10 == 0:
             print(predict('time traveller'))
-            animator.add(epoch+1, [ppl])
+            animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
     print(predict('traveller'))

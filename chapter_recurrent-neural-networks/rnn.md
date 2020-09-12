@@ -197,10 +197,8 @@ $\mathbf{O}_3$, is determined by the text sequence "m", "a", and "c". Since the 
 In practice, each token is represented by a $d$-dimensional vector, and we use a batch size $n>1$. Therefore, the input $\mathbf X_t$ at time step $t$ will be a $n\times d$ matrix, which is identical to what we discussed in :numref:`subsec_rnn_w_hidden_states`.
 
 
-
-
-
 ## Perplexity
+:label:`subsec_perplexity`
 
 Last, let us discuss about how to measure the language model quality, which will be used to evaluate our RNN-based models in the subsequent sections.
 One way is to check how surprising the text is.
