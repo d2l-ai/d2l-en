@@ -356,9 +356,6 @@ We can see that the output shape is (number of time steps $\times$ batch size, v
 
 ## Prediction
 
-We first explain the predicting function so we can regularly check the prediction during training. This function predicts the next `num_preds` characters based on the `prefix` (a string containing several characters). For the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them.
-
-
 As we will regularly check the prediction result
 during training,
 let us first define the prediction function
@@ -440,26 +437,53 @@ predict_ch8('time traveller ', 10, model, vocab, params)
 
 ## Gradient Clipping
 
-For a sequence of length $T$, we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $\mathcal{O}(T)$ during backpropagating. As mentioned in :numref:`sec_numerical_stability`, it might result in numerical instability, e.g., the gradients may either explode or vanish, when $T$ is large. Therefore, RNN models often need extra help to stabilize the training.
+For a sequence of length $T$,
+we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $\mathcal{O}(T)$ during backpropagation.
+As mentioned in :numref:`sec_numerical_stability`, it might result in numerical instability, e.g., the gradients may either explode or vanish, when $T$ is large. Therefore, RNN models often need extra help to stabilize the training.
 
-Recall that when solving an optimization problem, we take update steps for the weights $\mathbf{w}$ in the general direction of the negative gradient $\mathbf{g}_t$ on a minibatch, say $\mathbf{w} - \eta \cdot \mathbf{g}_t$. Let us further assume that the objective is well behaved, i.e., it is Lipschitz continuous with constant $L$, i.e.,
+Generally speaking,
+when solving an optimization problem,
+we take update steps for the model parameter,
+say in the vector form
+$\mathbf{x}$,
+in the direction of the negative gradient $\mathbf{g}$ on a minibatch.
+For example,
+with $\eta > 0$ as the learning rate,
+in one iteration we update
+$\mathbf{x}$
+as $\mathbf{x} - \eta \mathbf{g}$.
+Let us further assume that the objective function $f$
+is well behaved, say, *Lipschitz continuous* with constant $L$.
+That is to say,
+for any $\mathbf{x}$ and $\mathbf{y}$ we have
 
-$$|l(\mathbf{w}) - l(\mathbf{w}')| \leq L \|\mathbf{w} - \mathbf{w}'\|.$$
+$$|f(\mathbf{x}) - f(\mathbf{y})| \leq L \|\mathbf{x} - \mathbf{y}\|.$$
 
-In this case we can safely assume that if we update the weight vector by $\eta \cdot \mathbf{g}_t$, we will not observe a change by more than $L \eta \|\mathbf{g}_t\|$. This is both a curse and a blessing. A curse since it limits the speed of making progress, whereas a blessing since it limits the extent to which things can go wrong if we move in the wrong direction.
+In this case we can safely assume that if we update the parameter vector by $\eta \mathbf{g}$, then
 
-Sometimes the gradients can be quite large and the optimization algorithm may fail to converge. We could address this by reducing the learning rate $\eta$ or by some other higher order trick. But what if we only rarely get large gradients? In this case such an approach may appear entirely unwarranted. One alternative is to clip the gradients by projecting them back to a ball of a given radius, say $\theta$ via
+$$|f(\mathbf{x}) - f(\mathbf{x} - \eta\mathbf{g})| \leq L \eta\|\mathbf{g}\|,$$
+
+which means that
+we will not observe a change by more than $L \eta \|\mathbf{g}\|$. This is both a curse and a blessing.
+On the curse side,
+it limits the speed of making progress;
+whereas on the blessing side,
+it limits the extent to which things can go wrong if we move in the wrong direction.
+
+Sometimes the gradients can be quite large and the optimization algorithm may fail to converge. We could address this by reducing the learning rate $\eta$. But what if we only *rarely* get large gradients? In this case such an approach may appear entirely unwarranted. One popular alternative is to clip the gradient $\mathbf{g}$ by projecting them back to a ball of a given radius, say $\theta$ via
 
 $$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$
 
 By doing so we know that the gradient norm never exceeds $\theta$ and that the
-updated gradient is entirely aligned with the original direction $\mathbf{g}$.
+updated gradient is entirely aligned with the original direction of $\mathbf{g}$.
 It also has the desirable side-effect of limiting the influence any given
-minibatch (and within it any given sample) can exert on the weight vectors. This
+minibatch (and within it any given sample) can exert on the parameter vector. This
 bestows a certain degree of robustness to the model. Gradient clipping provides
 a quick fix to the gradient exploding. While it does not entirely solve the problem, it is one of the many techniques to alleviate it.
 
-Below we define a function to clip the gradients of a model that is either a building from scratch instance or a model constructed by the high-level APIs. Also note that we compute the gradient norm over all parameters.
+Below we define a function to clip the gradients of
+a model that is implemented from scratch or a model constructed by the high-level APIs.
+Also note that we compute the gradient norm over all the model parameters.
 
 ```{.python .input}
 def grad_clipping(model, theta):  #@save
