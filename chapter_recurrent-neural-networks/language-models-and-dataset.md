@@ -22,7 +22,7 @@ Likewise, in a document summarization algorithm
 it is worthwhile knowing that "dog bites man" is much more frequent than "man bites dog", or that "I want to eat grandma" is a rather disturbing statement, whereas "I want to eat, grandma" is much more benign.
 
 
-## Estimating a Language Model
+## Learning a Language Model
 
 The obvious question is how we should model a document, or even a sequence of tokens. 
 Suppose that we tokenize text data at the word level.
@@ -84,7 +84,7 @@ $$\begin{aligned}
 	\hat{P}(x'' \mid x,x') & = \frac{n(x, x',x'') + \epsilon_3 \hat{P}(x'')}{n(x, x') + \epsilon_3}.
 \end{aligned}$$
 
-Here $\epsilon_i$ are hyperparameters.
+Here $\epsilon_1,\epsilon_2$, and $\epsilon_3$ are hyperparameters.
 Take $\epsilon_1$ as an example:
 when $\epsilon_1 = 0$, no smoothing is applied;
 when $\epsilon_1$ approaches positive infinity,
@@ -218,12 +218,15 @@ Second, the number of distinct $n$-grams is not that large. This gives us hope t
 Third, many $n$-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
 
 
-## Reading Sequence Data
+## Reading Long Sequence Data
 
 Since sequence data are by their very nature sequential, we need to address
 the issue of processing it.
 We did so in a rather ad-hoc manner in :numref:`sec_sequence`.
-Now let us describe more general strategies.
+When sequences get too long to be processed by models
+all at once,
+we may wish to split such sequences for reading.
+Now let us describe general strategies.
 Before introducing the model,
 let us assume that we will use a neural network to train a language model,
 where the network processes a minibatch of sequences with predefined length, say $n$ time steps, at a time.
@@ -232,15 +235,17 @@ Now the question is how to read minibatches of features and labels at random.
 To begin with,
 since a text sequence can be arbitrarily long,
 such as the entire *The Time Machine* book,
-we can partition such a long sequence into subsequences of $n$ time steps.
+we can partition such a long sequence into subsequences
+with the same number of time steps.
 When training our neural network,
-a minibatch of subsequences with $n$ time steps
+a minibatch of such subsequences
 will be fed into the model.
-Suppose that the network processes a sequence
+Suppose that the network processes a subsequence
 of $n$ time steps
 at a time.
-:numref:`fig_timemachine_5gram`,
-shows all the different ways to obtain subsequences with 5 time steps from an original text sequence, where a token at each time step corresponds to a character.
+:numref:`fig_timemachine_5gram`
+shows all the different ways to obtain subsequences
+from an original text sequence, where $n=5$ and a token at each time step corresponds to a character.
 Note that we have quite some freedom since we could pick an arbitrary offset that indicates the initial position.
 
 ![Different offsets lead to different subsequences when splitting up text.](../img/timemachine-5gram.svg)
@@ -249,7 +254,7 @@ Note that we have quite some freedom since we could pick an arbitrary offset tha
 Hence, which one should we pick from :numref:`fig_timemachine_5gram`?
 In fact, all of them are equally good.
 However, if we pick just one offset,
-there is limited coverage of all the possible $n$-grams
+there is limited coverage of all the possible subsequences
 for training our network.
 Therefore,
 we can start with a random offset to partition a sequence
@@ -261,92 +266,110 @@ we describe how to accomplish this for both
 
 ### Random Sampling
 
-In random sampling, each example is a subsequence arbitrarily captured on the original sequence. The positions of two adjacent random minibatches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
+In random sampling, each example is a subsequence arbitrarily captured on the original long sequence.
+The subsequences from two adjacent random minibatches
+during iteration
+are not necessarily adjacent on the original sequence.
+For language modeling,
+the target is to predict the next token based on what tokens we have seen so far, hence the labels are the original sequence, shifted by one token.
 
 The following code randomly generates a minibatch from the data each time.
 Here, the argument `batch_size` specifies the number of subsequence examples in each minibatch
-and `num_steps` is the number of time steps
+and `num_steps` is the predefined number of time steps
 in each subsequence.
 
 ```{.python .input}
 #@tab all
 def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
-    # Offset the iterator over the data for uniform starts
+    # Start with a random offset to partition a sequence
     corpus = corpus[random.randint(0, num_steps):]
-    # Subtract 1 extra since we need to account for label
-    num_examples = ((len(corpus) - 1) // num_steps)
-    example_indices = list(range(0, num_examples * num_steps, num_steps))
-    random.shuffle(example_indices)
+    # Subtract 1 since we need to account for labels
+    num_subseqs = (len(corpus) - 1) // num_steps
+    # The starting indices for subsequences of length `num_steps`
+    initial_indices = list(range(0, num_subseqs * num_steps, num_steps))
+    # In random sampling, the subsequences from two adjacent random
+    # minibatches during iteration are not necessarily adjacent on the
+    # original sequence
+    random.shuffle(initial_indices)
 
     def data(pos):
-        # This returns a sequence of length `num_steps` starting from `pos`
+        # Return a sequence of length `num_steps` starting from `pos`
         return corpus[pos: pos + num_steps]
 
-    # Discard half empty batches
-    num_batches = num_examples // batch_size
-    for i in range(0, batch_size * num_batches, batch_size):
-        # `batch_size` indicates the random examples read each time
-        batch_indices = example_indices[i:(i+batch_size)]
-        X = [data(j) for j in batch_indices]
-        Y = [data(j + 1) for j in batch_indices]
+    num_subseqs_per_example = num_subseqs // batch_size
+    for i in range(0, batch_size * num_subseqs_per_example, batch_size):
+        # Here, `initial_indices` contains randomized starting indices for
+        # subsequences
+        initial_indices_per_batch = initial_indices[i: i + batch_size]
+        X = [data(j) for j in initial_indices_per_batch]
+        Y = [data(j + 1) for j in initial_indices_per_batch]
         yield d2l.tensor(X), d2l.tensor(Y)
 ```
 
-Let us generate an artificial sequence from 0 to 30. We assume that
-the batch size and numbers of time steps are 2 and 6
-respectively. This means that depending on the offset we can generate between 4 and 5 $(x, y)$ pairs. With a minibatch size of 2, we only get 2 minibatches.
+Let us manually generate a sequence from 0 to 34.
+We assume that
+the batch size and numbers of time steps are 2 and 5,
+respectively.
+This means that we can generate $\lfloor (35 - 1) / 5 \rfloor= 6 $ feature-label subsequence pairs. With a minibatch size of 2, we only get 3 minibatches.
 
 ```{.python .input}
 #@tab all
-my_seq = list(range(30))
-for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=6):
+my_seq = list(range(35))
+for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=5):
     print('X: ', X, '\nY:', Y)
 ```
 
 ### Sequential Partitioning
 
-In addition to random sampling of the original sequence, we can also make the positions of two adjacent random minibatches adjacent in the original sequence.
+In addition to random sampling of the original sequence, we can also ensure that 
+the subsequences from two adjacent minibatches
+during iteration
+are adjacent on the original sequence.
+This strategy preserves the order of split subsequences when iterating over minibatches, hence is called sequential partitioning.
 
 ```{.python .input}
-#@tab mxnet,pytorch
+#@tab mxnet, pytorch
 def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
-    # Offset for the iterator over the data for uniform starts
+    # Start with a random offset to partition a sequence
     offset = random.randint(0, num_steps)
-    # Slice out data: ignore `num_steps` and just wrap around
-    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = d2l.tensor(corpus[offset:offset+num_indices])
-    Ys = d2l.tensor(corpus[offset+1:offset+1+num_indices])
+    num_tokens = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = d2l.tensor(corpus[offset: offset + num_tokens])
+    Ys = d2l.tensor(corpus[offset + 1: offset + 1 + num_tokens])
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
-        X = Xs[:, i:(i+num_steps)]
-        Y = Ys[:, i:(i+num_steps)]
+        X = Xs[:, i: i + num_steps]
+        Y = Ys[:, i: i + num_steps]
         yield X, Y
 ```
 
 ```{.python .input}
 #@tab tensorflow
 def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
-    # Offset for the iterator over the data for uniform starts
+    # Start with a random offset to partition a sequence
     offset = random.randint(0, num_steps)
-    # Slice out data: ignore `num_steps` and just wrap around
-    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = d2l.tensor(corpus[offset:offset+num_indices])
-    Ys = d2l.tensor(corpus[offset+1:offset+1+num_indices])
+    num_tokens = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = d2l.tensor(corpus[offset: offset + num_tokens])
+    Ys = d2l.tensor(corpus[offset + 1: offset + 1 + num_tokens])
     Xs = d2l.reshape(Xs, (batch_size, -1))
     Ys = d2l.reshape(Ys, (batch_size, -1))
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
-        X = Xs[:, i:(i+num_steps)]
-        Y = Ys[:, i:(i+num_steps)]
+        X = Xs[:, i: i + num_steps]
+        Y = Ys[:, i: i + num_steps]
         yield X, Y
 ```
 
-Using the same settings, print input `X` and label `Y` for each minibatch of examples read by sequential partitioning. The positions of two adjacent minibatches on the original sequence are adjacent.
+Using the same settings,
+let us print features `X` and labels `Y` for each minibatch of subsequences read by sequential partitioning.
+Note that
+the subsequences from two adjacent minibatches
+during iteration
+are indeed adjacent on the original sequence.
 
 ```{.python .input}
 #@tab all
-for X, Y in seq_data_iter_sequential(my_seq, batch_size=2, num_steps=6):
+for X, Y in seq_data_iter_sequential(my_seq, batch_size=2, num_steps=5):
     print('X: ', X, '\nY:', Y)
 ```
 
@@ -368,7 +391,7 @@ class SeqDataLoader:  #@save
         return self.data_iter_fn(self.corpus, self.batch_size, self.num_steps)
 ```
 
-Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix.
+Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other other functions with the `load_data` prefix, such as `d2l.load_data_fashion_mnist` defined in :numref:`sec_fashion_mnist`.
 
 ```{.python .input}
 #@tab all
@@ -381,25 +404,25 @@ def load_data_time_machine(batch_size, num_steps,  #@save
 
 ## Summary
 
-* Language models are an important technology for natural language processing.
+* Language models are key to natural language processing.
 * $n$-grams provide a convenient model for dealing with long sequences by truncating the dependence.
 * Long sequences suffer from the problem that they occur very rarely or never.
 * Zipf's law governs the word distribution for not only unigrams but also the other $n$-grams.
 * There is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via Laplace smoothing.
-* The main choices for sequence partitioning are picking between consecutive and random sequences.
-* Given the overall document length, it is usually acceptable to be slightly wasteful with the documents and discard half-empty minibatches.
+* The main choices for reading long sequences are random sampling and sequential partitioning. The latter can ensure that the subsequences from two adjacent minibatches during iteration are adjacent on the original sequence.
+
 
 ## Exercises
 
 1. Suppose there are $100,000$ words in the training dataset. How much word frequency and multi-word adjacent frequency does a four-gram need to store?
-1. Review the smoothed probability estimates. Why are they not accurate? Hint: we are dealing with a contiguous sequence rather than singletons.
 1. How would you model a dialogue?
 1. Estimate the exponent of Zipf's law for unigrams, bigrams, and trigrams.
-1. What other minibatch data sampling methods can you think of?
-1. Why is it a good idea to have a random offset?
-    * Does it really lead to a perfectly uniform distribution over the sequences on the document?
-    * What would you have to do to make things even more uniform?
-1. If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in minibatch sampling? Why would we want to do this anyway?
+1. What other methods can you think of for reading long sequence data?
+1. Consider the random offset that we use for reading long sequences.
+    1. Why is it a good idea to have a random offset?
+    1. Does it really lead to a perfectly uniform distribution over the sequences on the document?
+    1. What would you have to do to make things even more uniform?
+1. If we want a sequence example to be a complete sentence, what kind of problem does this introduce in minibatch sampling? How can we fix the problem?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/117)

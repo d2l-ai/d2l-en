@@ -123,7 +123,7 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 
 ### Initializing Model Parameters
 
-The next step is to initialize the model parameters. We draw the weights from a Gaussian with variance to be $0.01$ and set the bias to $0$. The hyperparameter `num_hiddens` defines the number of hidden units. We instantiate all weights and biases relating to the update gate, the reset gate, and the candidate hidden state itself. Subsequently, we attach gradients to all the parameters.
+The next step is to initialize the model parameters. We draw the weights from a Gaussian with standard deviation to be $0.01$ and set the bias to $0$. The hyperparameter `num_hiddens` defines the number of hidden units. We instantiate all weights and biases relating to the update gate, the reset gate, and the candidate hidden state itself. Subsequently, we attach gradients to all the parameters.
 
 ```{.python .input}
 def get_params(vocab_size, num_hiddens, device):

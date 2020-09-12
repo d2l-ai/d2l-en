@@ -337,12 +337,8 @@ def evaluate_loss(net, data_iter, loss):  #@save
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB = dict()  #@save
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
+DATA_HUB = dict()
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
@@ -576,6 +572,8 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)
+    # Since each text line in the time machine dataset is not necessarily a
+    # sentence or a paragraph, flatten all the text lines into a single list
     corpus = [vocab[token] for line in tokens for token in line]
     if max_tokens > 0:
         corpus = corpus[:max_tokens]
@@ -584,40 +582,43 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
-    # Offset the iterator over the data for uniform starts
+    # Start with a random offset to partition a sequence
     corpus = corpus[random.randint(0, num_steps):]
-    # Subtract 1 extra since we need to account for label
-    num_examples = ((len(corpus) - 1) // num_steps)
-    example_indices = list(range(0, num_examples * num_steps, num_steps))
-    random.shuffle(example_indices)
+    # Subtract 1 since we need to account for labels
+    num_subseqs = (len(corpus) - 1) // num_steps
+    # The starting indices for subsequences of length `num_steps`
+    initial_indices = list(range(0, num_subseqs * num_steps, num_steps))
+    # In random sampling, the subsequences from two adjacent random
+    # minibatches during iteration are not necessarily adjacent on the
+    # original sequence
+    random.shuffle(initial_indices)
 
     def data(pos):
-        # This returns a sequence of length `num_steps` starting from `pos`
+        # Return a sequence of length `num_steps` starting from `pos`
         return corpus[pos: pos + num_steps]
 
-    # Discard half empty batches
-    num_batches = num_examples // batch_size
-    for i in range(0, batch_size * num_batches, batch_size):
-        # `batch_size` indicates the random examples read each time
-        batch_indices = example_indices[i:(i+batch_size)]
-        X = [data(j) for j in batch_indices]
-        Y = [data(j + 1) for j in batch_indices]
+    num_subseqs_per_example = num_subseqs // batch_size
+    for i in range(0, batch_size * num_subseqs_per_example, batch_size):
+        # Here, `initial_indices` contains randomized starting indices for
+        # subsequences
+        initial_indices_per_batch = initial_indices[i: i + batch_size]
+        X = [data(j) for j in initial_indices_per_batch]
+        Y = [data(j + 1) for j in initial_indices_per_batch]
         yield d2l.tensor(X), d2l.tensor(Y)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
-    # Offset for the iterator over the data for uniform starts
+    # Start with a random offset to partition a sequence
     offset = random.randint(0, num_steps)
-    # Slice out data: ignore `num_steps` and just wrap around
-    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = d2l.tensor(corpus[offset:offset+num_indices])
-    Ys = d2l.tensor(corpus[offset+1:offset+1+num_indices])
+    num_tokens = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = d2l.tensor(corpus[offset: offset + num_tokens])
+    Ys = d2l.tensor(corpus[offset + 1: offset + 1 + num_tokens])
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
-        X = Xs[:, i:(i+num_steps)]
-        Y = Ys[:, i:(i+num_steps)]
+        X = Xs[:, i: i + num_steps]
+        Y = Ys[:, i: i + num_steps]
         yield X, Y
 
 
@@ -646,12 +647,12 @@ def load_data_time_machine(batch_size, num_steps,  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch:  #@save
-    """A RNN Model based on scratch implementations."""
-    def __init__(self, vocab_size, num_hiddens, device,
-                 get_params, init_state, forward):
+    """An RNN Model implemented from scratch."""
+    def __init__(self, vocab_size, num_hiddens, device, get_params,
+                 init_state, forward_fn):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
         self.params = get_params(vocab_size, num_hiddens, device)
-        self.init_state, self.forward_fn = init_state, forward
+        self.init_state, self.forward_fn = init_state, forward_fn
 
     def __call__(self, X, state):
         X = npx.one_hot(X.T, self.vocab_size)
@@ -662,16 +663,17 @@ class RNNModelScratch:  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_predicts, model, vocab, device):  #@save
+def predict_ch8(prefix, num_preds, model, vocab, device):  #@save
     state = model.begin_state(batch_size=1, ctx=device)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: np.array([outputs[-1]], ctx=device).reshape(1, 1)
-    for y in prefix[1:]:  # Warmup state with prefix
+    get_input = lambda: d2l.reshape(
+        d2l.tensor([outputs[-1]], ctx=device), (1, 1))
+    for y in prefix[1:]:  # Warm-up period
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
-    for _ in range(num_predicts):  # Predict num_predicts steps
-        Y, state = model(get_input(), state)
-        outputs.append(int(Y.argmax(axis=1).reshape(1)))
+    for _ in range(num_preds):  # Predict `num_preds` steps
+        y, state = model(get_input(), state)
+        outputs.append(int(y.argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 
@@ -690,12 +692,13 @@ def grad_clipping(model, theta):  #@save
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
                     use_random_iter):
+    """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
-    metric = d2l.Accumulator(2)  # loss_sum, num_examples
+    metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
     for X, Y in train_iter:
         if state is None or use_random_iter:
-            # Initialize state when either it is the first iteration or
-            # using random sampling.
+            # Initialize `state` when either it is the first iteration or
+            # using random sampling
             state = model.begin_state(batch_size=X.shape[0], ctx=device)
         else:
             for s in state:
@@ -703,22 +706,23 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
         y = Y.T.reshape(-1)
         X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         with autograd.record():
-            py, state = model(X, state)
-            l = loss(py, y).mean()
+            y_hat, state = model(X, state)
+            l = loss(y_hat, y).mean()
         l.backward()
         grad_clipping(model, 1)
-        updater(batch_size=1)  # Since used mean already
+        updater(batch_size=1)  # Since the `mean` function has been invoked
         metric.add(l * d2l.size(y), d2l.size(y))
-    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
               use_random_iter=False):
-    # Initialize
+    """Train a model (defined in Chapter 8)."""
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
+    # Initialize
     if isinstance(model, gluon.Block):
         model.initialize(ctx=device, force_reinit=True,
                          init=init.Normal(0.01))
@@ -728,13 +732,13 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
     else:
         updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, device)
-    # Train and check the progress.
+    # Train and predict
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
             model, train_iter, loss, updater, device, use_random_iter)
         if epoch % 10 == 0:
             print(predict('time traveller'))
-            animator.add(epoch+1, [ppl])
+            animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
     print(predict('traveller'))

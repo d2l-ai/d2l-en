@@ -45,8 +45,9 @@ import zipfile
 import tarfile
 import hashlib
 
-DATA_HUB = dict()  #@save
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'  #@save
+#@save
+DATA_HUB = dict()
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 ```
 
 The following `download` function downloads a dataset,
@@ -313,7 +314,7 @@ in the same way that we previously transformed
 multiclass labels into vectors (see :numref:`subsec_classification-problem`).
 For instance, "MSZoning" assumes the values "RL" and "RM".
 Dropping the "MSZoning" feature,
-two new indicator features 
+two new indicator features
 "MSZoning_RL" and "MSZoning_RM" are created with values being either 0 or 1.
 According to one-hot encoding,
 if the original value of "MSZoning" is "RL",
