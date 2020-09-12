@@ -561,7 +561,7 @@ def cross_entropy(y_hat, y):
 ```{.python .input}
 #@tab tensorflow
 def cross_entropy(y_hat, y):
-    ce = -tf.math.log(y_hat[:, :len(y)])
+    ce = -tf.math.log(y_hat[range(len(y)), y])
     return tf.reduce_mean(ce)
 ```
 
