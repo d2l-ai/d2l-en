@@ -30,7 +30,7 @@ On the flip side, Transformer differs from the seq2seq with attention model in t
 
 In the rest of this section, we will equip you with each new component introduced by Transformer, and get you up and running to construct a machine translation model.
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 import math
 from mxnet import autograd, np, npx
@@ -38,7 +38,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import math
@@ -78,7 +78,7 @@ $$\mathbf o = \mathbf W_o \begin{bmatrix}\mathbf o^{(1)}\\\vdots\\\mathbf o^{(h)
 
 Now we can implement the multi-head attention. Assume that the multi-head attention contain the number heads `num_heads` $=h$, the hidden size `num_hiddens` $=p_q=p_k=p_v$ are the same for the query,  key, and value dense layers. In addition, since the multi-head attention keeps the same dimensionality between its input and its output, we have the output feature size $d_o =$ `num_hiddens` as well.
 
-```{.python .input  n=2}
+```{.python .input}
 #@save
 class MultiHeadAttention(nn.Block):
     def __init__(self, num_hiddens, num_heads, dropout, use_bias=False, **kwargs):
@@ -119,7 +119,7 @@ class MultiHeadAttention(nn.Block):
         return self.W_o(output_concat)
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 #@tab pytorch
 #@save
 class MultiHeadAttention(nn.Module):
@@ -160,7 +160,7 @@ class MultiHeadAttention(nn.Module):
 
 Here are the definitions of the transpose functions `transpose_qkv` and `transpose_output`, which are the inverse of each other.
 
-```{.python .input  n=3}
+```{.python .input}
 #@save
 def transpose_qkv(X, num_heads):
     # Input `X` shape: (`batch_size`, `seq_len`, `num_hiddens`).
@@ -186,7 +186,7 @@ def transpose_output(X, num_heads):
     return X.reshape(X.shape[0], X.shape[1], -1)
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 #@tab pytorch
 #@save
 def transpose_qkv(X, num_heads):
@@ -215,7 +215,7 @@ def transpose_output(X, num_heads):
 
 Let us test the `MultiHeadAttention` model in the a toy example. Create a multi-head attention with the hidden size $d_o = 100$, the output will share the same batch size and sequence length as the input, but the last dimension will be equal to the `num_hiddens` $= 100$.
 
-```{.python .input  n=4}
+```{.python .input}
 cell = MultiHeadAttention(100, 10, 0.5)
 cell.initialize()
 X = np.ones((2, 4, 5))
@@ -238,7 +238,7 @@ Another key component in the Transformer block is called *position-wise feed-for
 
 Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two dense layers of hidden size `ffn_num_hiddens` and `pw_num_outputs`, respectively.
 
-```{.python .input  n=5}
+```{.python .input}
 #@save
 class PositionWiseFFN(nn.Block):
     def __init__(self, ffn_num_hiddens, pw_num_outputs, **kwargs):
@@ -267,7 +267,7 @@ class PositionWiseFFN(nn.Module):
 
 Similar to the multi-head attention, the position-wise feed-forward network will only change the last dimension size of the input---the feature dimension. In addition, if two items in the input sequence are identical, the according outputs will be identical as well.
 
-```{.python .input  n=6}
+```{.python .input}
 ffn = PositionWiseFFN(4, 8)
 ffn.initialize()
 ffn(np.ones((2, 3, 4)))[0]
@@ -286,7 +286,7 @@ Besides the above two components in the Transformer block, the "add and norm" wi
 
 MXNet has both `LayerNorm` and `BatchNorm` implemented within the `nn` block. Let us call both of them and see the difference in the  example below.
 
-```{.python .input  n=7}
+```{.python .input}
 layer = nn.LayerNorm()
 layer.initialize()
 batch = nn.BatchNorm()
@@ -310,7 +310,7 @@ print('layer norm:', layer(X), '\nbatch norm:', batch(X))
 
 Now let us implement the connection block `AddNorm` together. `AddNorm` accepts two inputs $X$ and $Y$. We can deem $X$ as the original input in the residual network, and $Y$ as the outputs from either the multi-head attention layer or the position-wise FFN network. In addition, we apply dropout on $Y$ for regularization.
 
-```{.python .input  n=8}
+```{.python .input}
 #@save
 class AddNorm(nn.Block):
     def __init__(self, dropout, **kwargs):
@@ -337,7 +337,7 @@ class AddNorm(nn.Module):
 
 Due to the residual connection, $X$ and $Y$ should have the same shape.
 
-```{.python .input  n=9}
+```{.python .input}
 add_norm = AddNorm(0.5)
 add_norm.initialize()
 add_norm(np.ones((2, 3, 4)), np.ones((2, 3, 4))).shape
@@ -370,7 +370,7 @@ for $i=0,\ldots, l-1$ and $j=0,\ldots,\lfloor(d-1)/2\rfloor$.
 ![Positional encoding.](../img/positional_encoding.svg)
 :label:`fig_positional_encoding`
 
-```{.python .input  n=10}
+```{.python .input}
 #@save
 class PositionalEncoding(nn.Block):
     def __init__(self, num_hiddens, dropout, max_len=1000):
@@ -408,7 +408,7 @@ class PositionalEncoding(nn.Module):
 
 Now we test the `PositionalEncoding` class with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset (i.e. phase) because one is produced by a sine function and the other is produced by a cosine function. The $6^{\mathrm{th}}$ and $7^{\mathrm{th}}$ dimensions have lower frequency.
 
-```{.python .input  n=11}
+```{.python .input}
 pe = PositionalEncoding(20, 0)
 pe.initialize()
 Y = pe(np.zeros((1, 100, 20)))
@@ -429,7 +429,7 @@ d2l.plot(torch.arange(100), Y[0, :, 4:8].T, figsize=(6, 2.5),
 
 Armed with all the essential components of Transformer, let us first build a Transformer encoder block. This encoder contains a multi-head attention layer, a position-wise feed-forward network, and two "add and norm" connection blocks. As shown in the code, for both of the attention model and the positional FFN model in the `EncoderBlock`, their outputs' dimension are equal to the `num_hiddens`. This is due to the nature of the residual block, as we need to add these outputs back to the original value during "add and norm".
 
-```{.python .input  n=12}
+```{.python .input}
 #@save
 class EncoderBlock(nn.Block):
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
@@ -468,7 +468,7 @@ class EncoderBlock(nn.Module):
 
 Due to the residual connections, this block will not change the input shape. It means that the `num_hiddens` argument should be equal to the input size of the last dimension. In our toy example below,  `num_hiddens` $= 24$, `ffn_num_hiddens` $=48$, `num_heads` $= 8$, and `dropout` $= 0.5$.
 
-```{.python .input  n=13}
+```{.python .input}
 X = np.ones((2, 100, 24))
 encoder_blk = EncoderBlock(24, 48, 8, 0.5)
 encoder_blk.initialize()
@@ -485,7 +485,7 @@ encoder_blk(X, valid_len).shape
 
 Now it comes to the implementation of the entire Transformer encoder. With the Transformer encoder, $n$ blocks of `EncoderBlock` stack up one after another. Because of the residual connection, the embedding layer size $d$ is same as the Transformer block output size. Also note that we multiply the embedding output by $\sqrt{d}$ to prevent its values from being too small.
 
-```{.python .input  n=14}
+```{.python .input}
 #@save
 class TransformerEncoder(d2l.Encoder):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
@@ -534,7 +534,7 @@ class TransformerEncoder(d2l.Encoder):
 
 Let us create an encoder with two stacked  Transformer encoder blocks, whose hyperparameters are the same as before. Similar to the previous toy example's parameters, we add two more parameters `vocab_size` to be $200$ and `num_layers` to be $2$ here.
 
-```{.python .input  n=15}
+```{.python .input}
 encoder = TransformerEncoder(200, 24, 48, 8, 2, 0.5)
 encoder.initialize()
 encoder(np.ones((2, 100)), valid_len).shape
@@ -596,7 +596,7 @@ class DecoderBlock(nn.Block):
         return self.addnorm3(Z, self.ffn(Z)), state
 ```
 
-```{.python .input  n=16}
+```{.python .input}
 #@tab pytorch
 class DecoderBlock(nn.Module):
     # `i` means it is the i-th block in the decoder
@@ -628,6 +628,9 @@ class DecoderBlock(nn.Module):
             # are j+1
             valid_len = torch.repeat_interleave(torch.arange(1, seq_len + 1, device=X.device),
                                                 batch_size, dim=0)
+            # Convert valid_len to 2D
+            if valid_len.shape[0]!=X.shape[0]:
+                valid_len = valid_len.reshape(-1, X.shape[1])
         else:
             valid_len = None
 
@@ -640,7 +643,7 @@ class DecoderBlock(nn.Module):
 
 Similar to the  Transformer encoder block, `num_hiddens` should be equal to the last dimension size of $X$.
 
-```{.python .input  n=17}
+```{.python .input}
 decoder_blk = DecoderBlock(24, 48, 8, 0.5, 0)
 decoder_blk.initialize()
 X = np.ones((2, 100, 24))
@@ -661,7 +664,7 @@ The construction of the entire  Transformer decoder is identical to the  Transfo
 
 Let us implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `num_hiddens`, the  Transformer decoder also needs the Transformer encoder's outputs `enc_outputs` and `env_valid_len`.
 
-```{.python .input  n=18}
+```{.python .input}
 class TransformerDecoder(d2l.Decoder):
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
                  num_heads, num_layers, dropout, **kwargs):
@@ -721,7 +724,7 @@ class TransformerDecoder(d2l.Decoder):
 Finally, we can build an encoder-decoder model with the Transformer architecture.
 Similar to the seq2seq with attention model in :numref:`sec_seq2seq_attention`, we use the following hyperparameters: two Transformer blocks with both the embedding size and the block output size to be $32$. In addition, we use $4$ heads, and set the hidden size to be twice larger than the output size.
 
-```{.python .input  n=19}
+```{.python .input}
 num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.0, 64, 10
 lr, num_epochs, device = 0.005, 100, d2l.try_gpu()
 ffn_num_hiddens, num_heads = 64, 4
@@ -764,7 +767,7 @@ As we can see from the training time and accuracy, compared with the seq2seq mod
 
 We can use the trained Transformer to translate some simple sentences.
 
-```{.python .input  n=20}
+```{.python .input}
 #@tab all
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + d2l.predict_s2s_ch9(
@@ -785,7 +788,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 1. Try a larger size of epochs and compare the loss between seq2seq model and Transformer model.
 1. Can you think of any other benefit of positional encoding?
 1. Compare layer normalization and batch normalization, when shall we apply which?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/348)
