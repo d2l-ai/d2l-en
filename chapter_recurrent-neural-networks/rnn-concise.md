@@ -29,7 +29,7 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 
 ## Defining the Model
 
-Gluon's `rnn` module provides a recurrent neural network implementation (beyond many other sequence models). We construct the recurrent neural network layer `rnn_layer` with a single hidden layer and 256 hidden units, and initialize the weights.
+High-level APIs provide a recurrent neural network implementation (beyond many other sequence models). We construct the recurrent neural network layer `rnn_layer` with a single hidden layer and 256 hidden units, and initialize the weights.
 
 ```{.python .input}
 num_hiddens = 256
