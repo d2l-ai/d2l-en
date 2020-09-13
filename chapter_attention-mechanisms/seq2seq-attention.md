@@ -213,3 +213,7 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/347)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1022)
+:end_tab:
