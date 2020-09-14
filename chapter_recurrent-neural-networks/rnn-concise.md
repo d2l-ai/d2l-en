@@ -228,7 +228,7 @@ high-level APIs of the deep learning framework.
 
 ## Summary
 
-* High-level APIs of the deep learning framework provides an implementation at the RNN layer.
+* High-level APIs of the deep learning framework provides an implementation of the RNN layer.
 * The RNN layer of high-level APIs returns an output and an updated hidden state, where the output does not involve output layer computation.
 * Using high-level APIs leads to faster RNN training than using its implementation from scratch.
 
