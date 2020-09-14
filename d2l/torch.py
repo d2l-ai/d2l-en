@@ -261,12 +261,14 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         y_hat = net(X)
         l = loss(y_hat, y)
         if isinstance(updater, torch.optim.Optimizer):
+            # Using PyTorch in-built optimizer & loss criterion
             updater.zero_grad()
             l.backward()
             updater.step()
             metric.add(float(l) * len(y), accuracy(y_hat, y),
                        y.size().numel())
         else:
+            # Using custom built optimizer & loss criterion
             l.sum().backward()
             updater(X.shape[0])
             metric.add(float(l.sum()), accuracy(y_hat, y), y.numel())
@@ -790,14 +792,14 @@ class RNNModel(nn.Module):
         self.rnn = rnn_layer
         self.vocab_size = vocab_size
         self.num_hiddens = self.rnn.hidden_size
-        # If the RNN is bidirectional, num_directions should be 2,
-        # else it should be 1.
+        # If the RNN is bidirectional (to be introduced later),
+        # `num_directions` should be 2, else it should be 1.
         if not self.rnn.bidirectional:
             self.num_directions = 1
             self.linear = nn.Linear(self.num_hiddens, self.vocab_size)
         else:
             self.num_directions = 2
-            self.linear = nn.Linear(self.num_hiddens*2, self.vocab_size)
+            self.linear = nn.Linear(self.num_hiddens * 2, self.vocab_size)
 
     def forward(self, inputs, state):
         X = F.one_hot(inputs.T.long(), self.vocab_size)
@@ -812,16 +814,18 @@ class RNNModel(nn.Module):
     def begin_state(self, device, batch_size=1):
         """Return the begin state"""
         if not isinstance(self.rnn, nn.LSTM):
-            # nn.GRU takes a tensor as hidden state
+            # `nn.GRU` takes a tensor as hidden state
             return  torch.zeros((self.num_directions * self.rnn.num_layers,
                                  batch_size, self.num_hiddens), 
                                 device=device)
         else:
-            # nn.LSTM takes a tuple of hidden states
-            return (torch.zeros((self.num_directions * self.rnn.num_layers,
-                                 batch_size, self.num_hiddens), device=device), 
-            torch.zeros((self.num_directions * self.rnn.num_layers,
-                         batch_size, self.num_hiddens), device=device))
+            # `nn.LSTM` takes a tuple of hidden states
+            return (torch.zeros((
+                self.num_directions * self.rnn.num_layers,
+                batch_size, self.num_hiddens), device=device),
+                    torch.zeros((
+                        self.num_directions * self.rnn.num_layers,
+                        batch_size, self.num_hiddens), device=device))
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
@@ -975,7 +979,7 @@ class Seq2SeqDecoder(d2l.Decoder):
 def sequence_mask(X, valid_len, value=0):
     maxlen = X.size(1)
     mask = torch.arange((maxlen), dtype=torch.float32,
-                        device=X.device)[None, :] < valid_len[:, None]    
+                        device=X.device)[None, :] < valid_len[:, None]
     X[~mask] = value
     return X
 
