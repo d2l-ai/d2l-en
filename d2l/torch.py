@@ -832,7 +832,7 @@ d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def read_data_nmt():
     data_dir = d2l.download_extract('fra-eng')
-    with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
+    with open(os.path.join(data_dir, 'fra.txt'), 'r', encoding='UTF-8') as f:
         return f.read()
 
 
