@@ -3,8 +3,9 @@
 While :numref:`sec_rnn_scratch` was instructive to see how RNNs are implemented,
 this is not convenient or fast.
 This section will show how to implement the same language model more efficiently
-using functions provided by high-level APIs.
-We begin as before by reading the "Time Machine" corpus.
+using functions provided by high-level APIs
+of a deep learning framework.
+We begin as before by reading the time machine dataset.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -29,7 +30,10 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 
 ## Defining the Model
 
-High-level APIs provide a recurrent neural network implementation (beyond many other sequence models). We construct the recurrent neural network layer `rnn_layer` with a single hidden layer and 256 hidden units, and initialize the weights.
+High-level APIs provide implementations of recurrent neural networks.
+We construct the recurrent neural network layer `rnn_layer` with a single hidden layer and 256 hidden units.
+In fact, we have not even discussed yet what it means to have multiple layers---this will happen in :numref:`sec_deep_rnn`.
+For now, suffice it to say that multiple layers simply amount to the output of one layer of RNN being used as the input for the next layer of RNN.
 
 ```{.python .input}
 num_hiddens = 256
@@ -43,25 +47,40 @@ num_hiddens = 256
 rnn_layer = nn.RNN(len(vocab), num_hiddens)
 ```
 
-Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to be 1. In fact, we have not even discussed yet what it means to have multiple layers---this will happen in :numref:`sec_deep_rnn`. For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN.
+:begin_tab:`mxnet`
+Initializing the hidden state is straightforward.
+We invoke the member function `begin_state`.
+This returns an initial state for each element in the minibatch.
+For a vanilla RNN model,
+it returns only one hidden state,
+whose shape is
+(number of hidden layers, batch size, number of hidden units).
+Some models 
+to be introduced later 
+(e.g., long short-term memory)
+have more than one hidden state.
+:end_tab:
+
+:begin_tab:`pytorch`
+We use a tensor to initialize the hidden state,
+whose shape is
+(number of hidden layers, batch size, number of hidden units).
+:end_tab:
 
 ```{.python .input}
-batch_size = 1
 state = rnn_layer.begin_state(batch_size=batch_size)
 len(state), state[0].shape
 ```
 
 ```{.python .input}
 #@tab pytorch
-batch_size = 1
 state = torch.zeros((1, batch_size, num_hiddens))
-len(state), state[0].shape
+state.shape
 ```
 
-With a state variable and an input, we can compute the output with the updated state.
+With a hidden state and an input, we can compute the output with the updated hidden state.
 
 ```{.python .input}
-num_steps = 1
 X = np.random.uniform(size=(num_steps, batch_size, len(vocab)))
 Y, state_new = rnn_layer(X, state)
 Y.shape, len(state_new), state_new[0].shape
@@ -69,13 +88,15 @@ Y.shape, len(state_new), state_new[0].shape
 
 ```{.python .input}
 #@tab pytorch
-num_steps = 1
 X = torch.rand(size=(num_steps, batch_size, len(vocab)))
 Y, state_new = rnn_layer(X, state)
-Y.shape, len(state_new), state_new[0].shape
+Y.shape, state_new.shape
 ```
 
-Similar to :numref:`sec_rnn_scratch`, we define an `RNNModel` block by subclassing the `Block` class for a complete recurrent neural network. Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer. While in the previous section, we have the output layer within the `rnn` block.
+Similar to :numref:`sec_rnn_scratch`,
+we define an `RNNModel` class 
+for a complete RNN model.
+Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer. While in the previous section, we have the output layer within the `rnn` block.
 
 ```{.python .input}
 #@save
@@ -130,16 +151,18 @@ class RNNModel(nn.Module):
     def begin_state(self, device, batch_size=1):
         """Return the begin state"""
         if not isinstance(self.rnn, nn.LSTM):
-            # nn.GRU takes a tensor as hidden state
+            # `nn.GRU` takes a tensor as hidden state
             return  torch.zeros((self.num_directions * self.rnn.num_layers,
                                  batch_size, self.num_hiddens), 
                                 device=device)
         else:
-            # nn.LSTM takes a tuple of hidden states
-            return (torch.zeros((self.num_directions * self.rnn.num_layers,
-                                 batch_size, self.num_hiddens), device=device), 
-            torch.zeros((self.num_directions * self.rnn.num_layers,
-                         batch_size, self.num_hiddens), device=device))
+            # `nn.LSTM` takes a tuple of hidden states
+            return (torch.zeros((
+                self.num_directions * self.rnn.num_layers,
+                batch_size, self.num_hiddens), device=device),
+                    torch.zeros((
+                        self.num_directions * self.rnn.num_layers,
+                        batch_size, self.num_hiddens), device=device))
 ```
 
 ## Training and Predicting
