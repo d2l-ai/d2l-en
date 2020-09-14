@@ -50,15 +50,17 @@ rnn_layer = nn.RNN(len(vocab), num_hiddens)
 :begin_tab:`mxnet`
 Initializing the hidden state is straightforward.
 We invoke the member function `begin_state`.
-This returns an initial state for each element in the minibatch.
-For a vanilla RNN model,
-it returns only one hidden state,
+This returns a list (`state`)
+that contains
+an initial hidden state
+for each example in the minibatch,
 whose shape is
 (number of hidden layers, batch size, number of hidden units).
-Some models 
+For some models 
 to be introduced later 
-(e.g., long short-term memory)
-have more than one hidden state.
+(e.g., long short-term memory),
+such a list also
+contains other information.
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -78,7 +80,34 @@ state = torch.zeros((1, batch_size, num_hiddens))
 state.shape
 ```
 
-With a hidden state and an input, we can compute the output with the updated hidden state.
+With a hidden state and an input,
+we can compute the output with
+the updated hidden state.
+It should be emphasized that
+the "output" (`Y`) of `rnn_layer`
+does *not* involve computation of output layers:
+it refers to 
+the hidden state at *each* time step,
+and they can be used as the input
+to the subsequent output layer.
+
+:begin_tab:`mxnet`
+Besides,
+the updated hidden state (`state_new`) returned by `rnn_layer`
+refers to the hidden state
+at the *last* time step of the minibatch.
+It can be used to initialize the 
+hidden state for the next minibatch within an epoch
+in sequential partitioning.
+For multiple hidden layers,
+the hidden state of each layer will be stored
+in this variable (`state_new`).
+For some models 
+to be introduced later 
+(e.g., long short-term memory),
+this variable also
+contains other information.
+:end_tab:
 
 ```{.python .input}
 X = np.random.uniform(size=(num_steps, batch_size, len(vocab)))
@@ -96,7 +125,7 @@ Y.shape, state_new.shape
 Similar to :numref:`sec_rnn_scratch`,
 we define an `RNNModel` class 
 for a complete RNN model.
-Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer. While in the previous section, we have the output layer within the `rnn` block.
+Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer.
 
 ```{.python .input}
 #@save
@@ -110,7 +139,7 @@ class RNNModel(nn.Block):
     def forward(self, inputs, state):
         X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
-        # The fully connected layer will first change the shape of `Y` to
+        # The fully-connected layer will first change the shape of `Y` to
         # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
         # (`num_steps` * `batch_size`, `vocab_size`).
         output = self.dense(Y.reshape(-1, Y.shape[-1]))
@@ -129,14 +158,14 @@ class RNNModel(nn.Module):
         self.rnn = rnn_layer
         self.vocab_size = vocab_size
         self.num_hiddens = self.rnn.hidden_size
-        # If the RNN is bidirectional, num_directions should be 2,
-        # else it should be 1.
+        # If the RNN is bidirectional (to be introduced later),
+        # `num_directions` should be 2, else it should be 1.
         if not self.rnn.bidirectional:
             self.num_directions = 1
             self.linear = nn.Linear(self.num_hiddens, self.vocab_size)
         else:
             self.num_directions = 2
-            self.linear = nn.Linear(self.num_hiddens*2, self.vocab_size)
+            self.linear = nn.Linear(self.num_hiddens * 2, self.vocab_size)
 
     def forward(self, inputs, state):
         X = F.one_hot(inputs.T.long(), self.vocab_size)
@@ -184,7 +213,7 @@ model = model.to(device)
 d2l.predict_ch8('time traveller', 10, model, vocab, device)
 ```
 
-As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyper-parameters defined in :numref:`sec_rnn_scratch` and train our model with Gluon.
+As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and train our model with high-level APIs.
 
 ```{.python .input}
 #@tab all
@@ -192,28 +221,22 @@ num_epochs, lr = 500, 1
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
-Compared with the last section, this model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized.
+Compared with the last section, this model achieves comparable perplexity,
+albeit within a shorter period of time, due to the code being more optimized by
+high-level APIs of the deep learning framework.
+
 
 ## Summary
 
-* Gluon's `rnn` module provides an implementation at the recurrent neural network layer.
-* Gluon's `nn.RNN` instance returns the output and hidden state after forward computation. This forward computation does not involve output layer computation.
-* As before, the computational graph needs to be detached from previous steps for reasons of efficiency.
+* High-level APIs of the deep learning framework provides an implementation at the RNN layer.
+* The RNN layer of high-level APIs returns an output and an updated hidden state, where the output does not involve output layer computation.
+* Using high-level APIs leads to faster RNN training than using its implementation from scratch.
 
 ## Exercises
 
-1. Compare the implementation with the previous section.
-    * Why does Gluon's implementation run faster?
-    * If you observe a significant difference beyond speed, try to find the reason.
-1. Can you make the model overfit?
-    * Increase the number of hidden units.
-    * Increase the number of iterations.
-    * What happens if you adjust the clipping parameter?
-1. Implement the autoregressive model of the introduction to the current chapter using an RNN.
+1. Can you make the RNN model overfit using the high-level APIs?
 1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?
-1. How well can you compress the text using this model?
-    * How many bits do you need?
-    * Why does not everyone use this model for text compression? Hint: what about the compressor itself?
+1. Implement the autoregressive model of :numref:`sec_sequence` using an RNN.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/335)
