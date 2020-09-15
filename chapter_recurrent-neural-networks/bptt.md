@@ -1,36 +1,68 @@
 # Backpropagation Through Time
 :label:`sec_bptt`
 
-So far we repeatedly alluded to things like *exploding gradients*,
-*vanishing gradients*, *truncating backprop*, and the need to
-*detach the computational graph*. For instance, in the previous
-section we invoked `s.detach()` on the sequence. None of this was really fully
+So far we have repeatedly alluded to things like
+*exploding gradients*,
+*vanishing gradients*,
+and the need to
+*detach the gradient*.
+For instance, in :numref:`sec_rnn_scratch`
+we invoked the `detach` function on the sequence.
+None of this was really fully
 explained, in the interest of being able to build a model quickly and
-to see how it works. In this section we will delve a bit more deeply
-into the details of backpropagation for sequence models and why (and
-how) the math works.
+to see how it works.
+In this section,
+we will delve a bit more deeply
+into the details of backpropagation for sequence models and why (and how) the mathematics works.
 
 We encountered some of the effects of gradient explosion when we first
-implemented recurrent neural networks (:numref:`sec_rnn_scratch`). In
-particular, if you solved the problems in the problem set, you would
+implemented RNNs (:numref:`sec_rnn_scratch`).
+In
+particular,
+if you solved the exercises,
+you would
 have seen that gradient clipping is vital to ensure proper
-convergence. To provide a better understanding of this issue, this
-section will review how gradients are computed for sequence models. Note
+convergence.
+To provide a better understanding of this issue, this
+section will review how gradients are computed for sequence models.
+Note
 that there is nothing conceptually new in how it works. After all, we are still merely applying the chain rule to compute gradients. Nonetheless, it is
 worth while reviewing backpropagation (:numref:`sec_backprop`) again.
 
-Forward propagation in a recurrent neural network is relatively
-straightforward. *Backpropagation through time* is actually a specific
-application of back propagation in recurrent neural networks :cite:`Werbos.1990`. It
-requires us to expand the recurrent neural network one time step at a time to
-obtain the dependencies between model variables and parameters. Then,
-based on the chain rule, we apply backpropagation to compute and
-store gradients. Since sequences can be rather long, the dependency can be rather lengthy. For instance, for a sequence of 1000 characters, the first symbol could potentially have significant influence on the symbol at position 1000. This is not really computationally feasible (it takes too long and requires too much memory) and it requires over 1000 matrix-vector products before we would arrive at that very elusive gradient. This is a process fraught with computational and statistical uncertainty. In the following we will elucidate what happens and how to address this in practice.
+
+We have described forward and backward propagations
+and computational graphs
+in MLPs in :numref:`sec_backprop`.
+Forward propagation in an RNN is relatively
+straightforward.
+*Backpropagation through time* is actually a specific
+application of backpropagation
+in RNNs :cite:`Werbos.1990`.
+It
+requires us to expand the 
+computational graph of an RNN
+one time step at a time to
+obtain the dependencies
+among model variables and parameters.
+Then,
+based on the chain rule,
+we apply backpropagation to compute and
+store gradients.
+Since sequences can be rather long, the dependency can be rather lengthy.
+For instance, for a sequence of 1000 characters, 
+the first token could potentially have significant influence on the token at the final position.
+This is not really computationally feasible
+(it takes too long and requires too much memory) and it requires over 1000 matrix products before we would arrive at that very elusive gradient.
+This is a process fraught with computational and statistical uncertainty.
+In the following we will elucidate what happens
+and how to address this in practice.
 
 
-## A Simplified Recurrent Network
+## Gradients in RNNs
 
-We start with a simplified model of how an RNN works. This model ignores details about the specifics of the hidden state and how it is updated. These details are immaterial to the analysis and would only serve to clutter the notation, but make it look more intimidating.
+We start with a simplified model of how an RNN works.
+This model ignores details about the specifics of the hidden state and how it is updated.
+These details are immaterial to the analysis and would only serve to clutter the notation, but make it look more intimidating.
 In this simplified model, we denote $h_t$ as the hidden state, $x_t$ as the input, and $o_t$ as the output at time step $t$. In addition, $w_h$ and $w_o$ indicate the weights of hidden states and the output layer, respectively. As a result, the hidden states and outputs at each time steps can be explained as
 
 $$h_t = f(x_t, h_{t-1}, w_h) \text{ and } o_t = g(h_t, w_o).$$
