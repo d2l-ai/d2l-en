@@ -36,15 +36,17 @@ device = d2l.try_gpu()
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to `d2l.train_ch6` defined in the 
+# The code is almost identical to `d2l.train_ch6` defined in the
 # lenet section of chapter convolutional neural networks
 def train(net, train_iter, test_iter, num_epochs, loss, trainer, device):
     net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
+    timer = d2l.Timer()
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
+            timer.start()
             X, y = X.as_in_ctx(device), y.as_in_ctx(device)
             with autograd.record():
                 y_hat = net(X)
@@ -52,6 +54,7 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, device):
             l.backward()
             trainer.step(X.shape[0])
             metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
+            timer.stop()
             train_loss = metric[0] / metric[2]
             train_acc = metric[1] / metric[2]
             if (i + 1) % 50 == 0:
@@ -59,8 +62,11 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, device):
                              (train_loss, train_acc, None))
         test_acc = d2l.evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch + 1, (None, None, test_acc))
+
     print(f'train loss {train_loss:.3f}, train acc {train_acc:.3f}, '
           f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(device)}')
 ```
 
 ```{.python .input}
@@ -76,7 +82,7 @@ def net_fn():
     class Reshape(nn.Module):
         def forward(self, x):
             return x.view(-1,1,28,28)
-    
+
     model = torch.nn.Sequential(
         Reshape(),
         nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.ReLU(),
@@ -87,7 +93,7 @@ def net_fn():
         nn.Linear(16 * 5 * 5, 120), nn.ReLU(),
         nn.Linear(120, 84), nn.ReLU(),
         nn.Linear(84, 10))
-    
+
     return model
 
 loss = nn.CrossEntropyLoss()
@@ -96,17 +102,18 @@ device = d2l.try_gpu()
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to `d2l.train_ch6` defined in the 
+# The code is almost identical to `d2l.train_ch6` defined in the
 # lenet section of chapter convolutional neural networks
-def train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+def train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
           scheduler=None):
     net.to(device)
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
-
+    timer = d2l.Timer()
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
+            timer.start()
             net.train()
             trainer.zero_grad()
             X, y = X.to(device), y.to(device)
@@ -116,15 +123,16 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
             trainer.step()
             with torch.no_grad():
                 metric.add(l * X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
+            timer.stop()
             train_loss = metric[0] / metric[2]
             train_acc = metric[1] / metric[2]
             if (i + 1) % 50 == 0:
                 animator.add(epoch + i / len(train_iter),
                              (train_loss, train_acc, None))
-        
+
         test_acc = d2l.evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
-    
+
         if scheduler:
             if scheduler.__module__ == lr_scheduler.__name__:
                 # Using PyTorch In-Built scheduler
@@ -136,6 +144,8 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
 
     print(f'train loss {train_loss:.3f}, train acc {train_acc:.3f}, '
           f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(device)}')
 ```
 
 ```{.python .input}
@@ -163,7 +173,7 @@ def net():
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to `d2l.train_ch6` defined in the 
+# The code is almost identical to `d2l.train_ch6` defined in the
 # lenet section of chapter convolutional neural networks
 def train(net_fn, train_iter, test_iter, num_epochs, lr,
               device=d2l.try_gpu(), custom_callback = False):
@@ -177,7 +187,7 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr,
     callback = d2l.TrainCallback(net, train_iter, test_iter, num_epochs,
                              device_name)
     if custom_callback is False:
-        net.fit(train_iter, epochs=num_epochs, verbose=0, 
+        net.fit(train_iter, epochs=num_epochs, verbose=0,
                 callbacks=[callback])
     else:
          net.fit(train_iter, epochs=num_epochs, verbose=0,
@@ -264,7 +274,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 #@tab pytorch
 net = net_fn()
 trainer = torch.optim.SGD(net.parameters(), lr)
-train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
       scheduler)
 ```
 
@@ -324,7 +334,7 @@ def get_lr(trainer, scheduler):
     scheduler.step()
     return lr
 
-d2l.plot(d2l.arange(num_epochs), [get_lr(trainer, scheduler) 
+d2l.plot(d2l.arange(num_epochs), [get_lr(trainer, scheduler)
                                   for t in range(num_epochs)])
 ```
 
@@ -335,7 +345,7 @@ class MultiFactorScheduler:
         self.step = step
         self.factor = factor
         self.base_lr = base_lr
-  
+
     def __call__(self, epoch):
         if epoch in range(self.step[0], (self.step[1] + 1)):
             return self.base_lr * self.factor
@@ -356,7 +366,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 
 ```{.python .input}
 #@tab pytorch
-train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
       scheduler)
 ```
 
@@ -392,7 +402,7 @@ class CosineScheduler:
         self.warmup_steps = warmup_steps
         self.warmup_begin_lr = warmup_begin_lr
         self.max_steps = self.max_update - self.warmup_steps
-  
+
     def get_warmup_lr(self, epoch):
         increase = (self.base_lr_orig - self.warmup_begin_lr) \
                        * float(epoch) / float(self.warmup_steps)
@@ -424,7 +434,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 #@tab pytorch
 net = net_fn()
 trainer = torch.optim.SGD(net.parameters(), lr=0.3)
-train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
       scheduler)
 ```
 
@@ -464,7 +474,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 #@tab pytorch
 net = net_fn()
 trainer = torch.optim.SGD(net.parameters(), lr=0.3)
-train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
+train(net, train_iter, test_iter, num_epochs, loss, trainer, device,
       scheduler)
 ```
 
