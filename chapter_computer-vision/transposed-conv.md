@@ -84,7 +84,7 @@ tconv(conv(X)).shape == X.shape
 
 ## Analogy to Matrix Transposition
 
-The transposed convolution takes its name from the matrix transposition. In fact, convolution operations can also be achieved by matrix multiplication. In the example below, we define a $3\times$ input $X$ with a $2\times 2$ kernel $K$, and then use `corr2d` to compute the convolution output.
+The transposed convolution takes its name from the matrix transposition. In fact, convolution operations can also be achieved by matrix multiplication. In the example below, we define a $3\times 3$ input $X$ with a $2\times 2$ kernel $K$, and then use `corr2d` to compute the convolution output.
 
 ```{.python .input}
 X = np.arange(9).reshape(3, 3)

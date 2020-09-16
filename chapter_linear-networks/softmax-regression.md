@@ -108,6 +108,7 @@ plus our biases $\mathbf{b}$.
 
 
 ## Softmax Operation
+:label:`subsec_softmax_operation`
 
 The main approach that we are going to take here
 is to interpret the outputs of our model as probabilities.
@@ -319,6 +320,7 @@ you may further refer to the [online appendix on information theory](https://d2l
 
 
 ## Information Theory Basics
+:label:`subsec_info_theory_basics`
 
 *Information theory* deals with the problem of encoding, decoding, transmitting,
 and manipulating information (also known as data) in as concise form as possible.

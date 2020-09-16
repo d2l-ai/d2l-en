@@ -45,7 +45,7 @@ import re
 
 ## Reading the Dataset
 
-To get started we load text from H. G. Wells' [The Time Machine](http://www.gutenberg.org/ebooks/35).
+To get started we load text from H. G. Wells' [*The Time Machine*](http://www.gutenberg.org/ebooks/35).
 This is a fairly small corpus of just over 30000 words, but for the purpose of what we want to illustrate this is just fine.
 More realistic document collections contain many billions of words.
 The following function reads the dataset into a list of text lines, where each line is a string.
@@ -61,7 +61,7 @@ def read_time_machine():  #@save
     """Load the time machine book into a list of text lines."""
     with open(d2l.download('time_machine'), 'r') as f:
         lines = f.readlines()
-    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower()) for line in lines]
+    return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() for line in lines]
 
 lines = read_time_machine()
 print(f'# text lines: {len(lines)}')
@@ -83,9 +83,9 @@ where each token is a string.
 ```{.python .input}
 #@tab all
 def tokenize(lines, token='word'):  #@save
-    """Split lines into word or char tokens."""
+    """Split text lines into word or character tokens."""
     if token == 'word':
-        return [line.split(' ') for line in lines]
+        return [line.split() for line in lines]
     elif token == 'char':
         return [list(line) for line in lines]
     else:
@@ -113,9 +113,11 @@ We optionally add a list of reserved tokens, such as
 #@tab all
 class Vocab:  #@save
     """Vocabulary for text."""
-    def __init__(self, tokens, min_freq=0, reserved_tokens=None):
+    def __init__(self, tokens=None, min_freq=0, reserved_tokens=None):
+        if tokens is None:
+            tokens = []
         if reserved_tokens is None:
-            reserved_tokens = []
+            reserved_tokens = [] 
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
@@ -142,10 +144,12 @@ class Vocab:  #@save
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
 
-def count_corpus(lines):  #@save
+def count_corpus(tokens):  #@save
     """Count token frequencies."""
-    # Flatten a list of token lists into a list of tokens
-    tokens = [tk for line in lines for tk in line]
+    # Here `tokens` is a 1D list or 2D list
+    if len(tokens) == 0 or isinstance(tokens[0], list):
+        # Flatten a list of token lists into a list of tokens
+        tokens = [token for line in tokens for token in line]
     return collections.Counter(tokens)
 ```
 
@@ -155,7 +159,7 @@ Then we print the first few frequent tokens with their indices.
 ```{.python .input}
 #@tab all
 vocab = Vocab(tokens)
-print(list(vocab.token_to_idx.items())[0:10])
+print(list(vocab.token_to_idx.items())[:10])
 ```
 
 Now we can convert each text line into a list of numerical indices.
@@ -180,7 +184,9 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)
-    corpus = [vocab[tk] for line in tokens for tk in line]
+    # Since each text line in the time machine dataset is not necessarily a
+    # sentence or a paragraph, flatten all the text lines into a single list
+    corpus = [vocab[token] for line in tokens for token in line]
     if max_tokens > 0:
         corpus = corpus[:max_tokens]
     return corpus, vocab
