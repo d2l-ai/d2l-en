@@ -310,7 +310,7 @@ Let us manually generate a sequence from 0 to 34.
 We assume that
 the batch size and numbers of time steps are 2 and 5,
 respectively.
-This means that we can generate $\lfloor (35 - 1) / 5 \rfloor= 6 $ feature-label subsequence pairs. With a minibatch size of 2, we only get 3 minibatches.
+This means that we can generate $\lfloor (35 - 1) / 5 \rfloor= 6$ feature-label subsequence pairs. With a minibatch size of 2, we only get 3 minibatches.
 
 ```{.python .input}
 #@tab all
