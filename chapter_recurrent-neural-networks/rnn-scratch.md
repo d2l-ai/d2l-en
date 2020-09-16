@@ -600,7 +600,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
 def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
               use_random_iter=False):
     params = get_params(len(vocab), num_hiddens)
-    loss = tf.keras.losses.SparseCategoricalCrossentropy()
+    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
     updater = tf.keras.optimizers.SGD(lr)
