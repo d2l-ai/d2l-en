@@ -199,6 +199,7 @@ This idea was proposed by Tallec and Ollivier
 
 
 :numref:`fig_truncated_bptt` illustrates the three strategies when analyzing the first few characters of *The Time Machine* book using backpropagation through time for RNNs:
+
 * The first row is the randomized truncation that partitions the text into segments of varying lengths.
 * The second row is the regular truncation that breaks the text into subsequences of the same length. This is what we have been doing in RNN experiments.
 * The third row is the full backpropagation through time that leads to a computationally infeasible expression.
