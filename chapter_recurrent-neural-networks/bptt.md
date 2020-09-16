@@ -268,7 +268,6 @@ training this model
 requires 
 gradient computation with respect to these parameters
 $\partial L/\partial \mathbf{W}_{hx}$, $\partial L/\partial \mathbf{W}_{hh}$, and $\partial L/\partial \mathbf{W}_{qh}$.
-
 According to the dependencies in :numref:`fig_rnn_bptt`,
 we can traverse 
 in the opposite direction of the arrows
@@ -320,6 +319,7 @@ using the chain rule:
 $$
 \frac{\partial L}{\partial \mathbf{h}_T} = \text{prod}\left(\frac{\partial L}{\partial \mathbf{o}_T}, \frac{\partial \mathbf{o}_T}{\partial \mathbf{h}_T} \right) = \mathbf{W}_{qh}^\top \frac{\partial L}{\partial \mathbf{o}_T}.
 $$
+:eqlabel:`eq_bptt_partial_L_hT_final_step`
 
 It gets trickier for any time step $t < T$,
 where the objective function $L$ depends on $\mathbf{h}_t$ via $\mathbf{h}_{t+1}$ and $\mathbf{o}_t$.
@@ -335,8 +335,10 @@ $$
 + \text{prod}\left(\frac{\partial L}{\partial \mathbf{o}_t}, \frac{\partial \mathbf{o}_t}{\partial \mathbf{h}_t} \right)
 = \mathbf{W}_{hh}^\top \frac{\partial L}{\partial \mathbf{h}_{t+1}} + \mathbf{W}_{qh}^\top \frac{\partial L}{\partial \mathbf{o}_t}.
 $$
+:eqlabel:`eq_bptt_partial_L_ht_recur`
 
-Expanding the recurrent computation
+For analysis,
+expanding the recurrent computation
 for any time step $1 \leq t \leq T$
 gives
 
@@ -381,8 +383,10 @@ $$
 
 where
 $\partial L/\partial \mathbf{h}_t$
-given by
-:eqref:`eq_bptt_partial_L_ht`
+that is recurrently computed by
+:eqref:`eq_bptt_partial_L_hT_final_step`
+and
+:eqref:`eq_bptt_partial_L_ht_recur`
 is the key quantity
 that affects the numerical stability.
 
@@ -404,21 +408,25 @@ are reused
 to avoid duplicate calculations,
 such as storing 
 $\partial L/\partial \mathbf{h}_t$
-to be used in computation of both $\partial L / \partial \mathbf{W}_{hx} $ and $\partial L / \partial \mathbf{W}_{hh}$.
+to be used in computation of both $\partial L / \partial \mathbf{W}_{hx}$ and $\partial L / \partial \mathbf{W}_{hh}$.
 
 
 ## Summary
 
 * Backpropagation through time is merely an application of backpropagation to sequence models with a hidden state.
-* Truncation is needed for computational convenience and numerical stability.
+* Truncation is needed for computational convenience and numerical stability, such as regular truncation and randomized truncation.
 * High powers of matrices can lead to divergent and vanishing eigenvalues. This manifests itself in the form of exploding or vanishing gradients.
-* For efficient computation, intermediate values are cached.
+* For efficient computation, intermediate values are cached during backpropagation through time.
+
+
 
 ## Exercises
 
-1. Assume that we have a symmetric matrix $\mathbf{M} \in \mathbb{R}^{n \times n}$ with eigenvalues $\lambda_i$. Without loss of generality, assume that they are ordered in ascending order $\lambda_i \leq \lambda_{i+1}$. Show that $\mathbf{M}^k$ has eigenvalues $\lambda_i^k$.
-1. Prove that for a random vector $\mathbf{x} \in \mathbb{R}^n$, with high probability $\mathbf{M}^k \mathbf{x}$ will be very much aligned with the largest eigenvector $\mathbf{v}_n$ of $\mathbf{M}$. Formalize this statement.
-1. What does the above result mean for gradients in a recurrent neural network?
+1. Assume that we have a symmetric matrix $\mathbf{M} \in \mathbb{R}^{n \times n}$ with eigenvalues $\lambda_i$ whose corresponding eigenvectors are $\mathbf{v}_i$ ($i = 1, \ldots, n$). Without loss of generality, assume that they are ordered in the order $|\lambda_i| \geq |\lambda_{i+1}|$. 
+  1. Show that $\mathbf{M}^k$ has eigenvalues $\lambda_i^k$.
+  1. Prove that for a random vector $\mathbf{x} \in \mathbb{R}^n$, with high probability $\mathbf{M}^k \mathbf{x}$ will be very much aligned with the eigenvector $\mathbf{v}_1$ 
+of $\mathbf{M}$. Formalize this statement.
+  1. What does the above result mean for gradients in RNNs?
 1. Besides gradient clipping, can you think of any other methods to cope with gradient explosion in recurrent neural networks?
 
 [Discussions](https://discuss.d2l.ai/t/334)
