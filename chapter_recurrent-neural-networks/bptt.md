@@ -108,7 +108,7 @@ product in :eqref:`eq_bptt_partial_L_wh`
 are easy to compute.
 The third factor $\partial h_t/\partial w_h$ is where things get tricky, since we need to recurrently compute the effect of the parameter $w_h$ on $h_t$.
 According to the recurrent computation
-in :eqlabel:`eq_bptt_ht_ot`,
+in :eqref:`eq_bptt_ht_ot`,
 $h_t$ depends on both $h_{t-1}$ and $w_h$,
 where computation of $h_{t-1}$
 also depends on $w_h$.
