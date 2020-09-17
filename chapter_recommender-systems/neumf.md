@@ -62,6 +62,7 @@ class NeuMF(nn.Block):
         for num_hiddens in nums_hiddens:
             self.mlp.add(nn.Dense(num_hiddens, activation='relu',
                                   use_bias=True))
+        self.prediction_layer = nn.Dense(1, activation='sigmoid', use_biad=False)
 
     def forward(self, user_id, item_id):
         p_mf = self.P(user_id)
@@ -71,7 +72,7 @@ class NeuMF(nn.Block):
         q_mlp = self.V(item_id)
         mlp = self.mlp(np.concatenate([p_mlp, q_mlp], axis=1))
         con_res = np.concatenate([gmf, mlp], axis=1)
-        return np.sum(con_res, axis=-1)
+        return self.prediction_layer(con_res)
 ```
 
 ## Customized Dataset with Negative Sampling
