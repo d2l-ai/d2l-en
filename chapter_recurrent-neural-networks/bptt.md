@@ -416,10 +416,10 @@ to be used in computation of both $\partial L / \partial \mathbf{W}_{hx}$ and $\
 ## Exercises
 
 1. Assume that we have a symmetric matrix $\mathbf{M} \in \mathbb{R}^{n \times n}$ with eigenvalues $\lambda_i$ whose corresponding eigenvectors are $\mathbf{v}_i$ ($i = 1, \ldots, n$). Without loss of generality, assume that they are ordered in the order $|\lambda_i| \geq |\lambda_{i+1}|$. 
-  1. Show that $\mathbf{M}^k$ has eigenvalues $\lambda_i^k$.
-  1. Prove that for a random vector $\mathbf{x} \in \mathbb{R}^n$, with high probability $\mathbf{M}^k \mathbf{x}$ will be very much aligned with the eigenvector $\mathbf{v}_1$ 
+    1. Show that $\mathbf{M}^k$ has eigenvalues $\lambda_i^k$.
+    1. Prove that for a random vector $\mathbf{x} \in \mathbb{R}^n$, with high probability $\mathbf{M}^k \mathbf{x}$ will be very much aligned with the eigenvector $\mathbf{v}_1$ 
 of $\mathbf{M}$. Formalize this statement.
-  1. What does the above result mean for gradients in RNNs?
+    1. What does the above result mean for gradients in RNNs?
 1. Besides gradient clipping, can you think of any other methods to cope with gradient explosion in recurrent neural networks?
 
 [Discussions](https://discuss.d2l.ai/t/334)
