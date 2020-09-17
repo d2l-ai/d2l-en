@@ -62,7 +62,7 @@ class NeuMF(nn.Block):
         for num_hiddens in nums_hiddens:
             self.mlp.add(nn.Dense(num_hiddens, activation='relu',
                                   use_bias=True))
-        self.prediction_layer = nn.Dense(1, activation='sigmoid', use_biad=False)
+        self.prediction_layer = nn.Dense(1, activation='sigmoid', use_bias=False)
 
     def forward(self, user_id, item_id):
         p_mf = self.P(user_id)
