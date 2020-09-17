@@ -342,9 +342,14 @@ Y.shape, len(new_state), new_state[0].shape
 
 ```{.python .input}
 #@tab tensorflow
+# defining tensorflow training strategy
+device_name = d2l.try_gpu()._device_name
+strategy = tf.distribute.OneDeviceStrategy(device_name)
+
 num_hiddens = 512
-model = RNNModelScratch(len(vocab), num_hiddens, 
-                        init_rnn_state, rnn)
+with strategy.scope():
+    model = RNNModelScratch(len(vocab), num_hiddens, 
+                            init_rnn_state, rnn)
 state = model.begin_state(X.shape[0])
 params = get_params(len(vocab), num_hiddens)
 Y, new_state = model(X, state, params)
@@ -639,7 +644,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
 
 ```{.python .input}
 #@tab tensorflow
-def train_epoch_ch8(model, train_iter, loss, updater,  #@save
+def train_epoch_ch8(model, train_iter, loss, updater,   #@save
                     params, use_random_iter):
     """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
@@ -653,7 +658,7 @@ def train_epoch_ch8(model, train_iter, loss, updater,  #@save
             g.watch(params)
             y_hat, state= model(X, state, params)
             y = d2l.reshape(Y, (-1))
-            l = tf.math.reduce_mean(loss(y, y_hat)) 
+            l = loss(y, y_hat)
         grads = g.gradient(l, params)
         grads = grad_clipping(grads, 1)
         updater.apply_gradients(zip(grads, params))
@@ -729,14 +734,15 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
 ```{.python .input}
 #@tab tensorflow
 #@save
-def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
+def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
               use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
-    params = get_params(len(vocab), num_hiddens)
-    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    with strategy.scope():
+        params = get_params(len(vocab), num_hiddens)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        updater = tf.keras.optimizers.SGD(lr)
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
-    updater = tf.keras.optimizers.SGD(lr)
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
     # Train and predict
     for epoch in range(num_epochs):
@@ -763,7 +769,7 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 ```{.python .input}
 #@tab tensorflow
 num_epochs, lr = 500, 1
-train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs)
+train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
 ```
 
 Finally,
