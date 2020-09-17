@@ -434,7 +434,7 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
     for X, y in data_iter:
         X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         metric.add(d2l.accuracy(net(X), y), d2l.size(y))
-    return metric[0]/metric[1]
+    return metric[0] / metric[1]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
@@ -477,6 +477,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
 class Residual(nn.Block):  #@save
+    """The Residual block of ResNet."""
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
         super().__init__(**kwargs)
         self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1,
@@ -505,7 +506,7 @@ d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def read_time_machine():  #@save
-    """Load the time machine book into a list of text lines."""
+    """Load the time machine dataset into a list of text lines."""
     with open(d2l.download('time_machine'), 'r') as f:
         lines = f.readlines()
     return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() for line in lines]
@@ -569,6 +570,7 @@ def count_corpus(tokens):  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def load_corpus_time_machine(max_tokens=-1):  #@save
+    """Return token indices and the vocabulary of the time machine dataset."""
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)
@@ -582,6 +584,7 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
+    """Generate a minibatch of subsequences using random sampling."""
     # Start with a random offset to partition a sequence
     corpus = corpus[random.randint(0, num_steps):]
     # Subtract 1 since we need to account for labels
@@ -609,6 +612,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
+    """Generate a minibatch of subsequences using sequential partitioning."""
     # Start with a random offset to partition a sequence
     offset = random.randint(0, num_steps)
     num_tokens = ((len(corpus) - offset - 1) // batch_size) * batch_size
@@ -640,6 +644,7 @@ class SeqDataLoader:  #@save
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 def load_data_time_machine(batch_size, num_steps,  #@save
                            use_random_iter=False, max_tokens=10000):
+    """Return the iterator and the vocabulary of the time machine dataset."""
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
     return data_iter, data_iter.vocab
@@ -664,6 +669,7 @@ class RNNModelScratch:  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def predict_ch8(prefix, num_preds, model, vocab, device):  #@save
+    """Generate new characters following the `prefix`."""
     state = model.begin_state(batch_size=1, ctx=device)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(
@@ -679,6 +685,7 @@ def predict_ch8(prefix, num_preds, model, vocab, device):  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def grad_clipping(model, theta):  #@save
+    """Clip the gradient."""
     if isinstance(model, gluon.Block):
         params = [p.data() for p in model.collect_params().values()]
     else:
@@ -746,6 +753,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
 class RNNModel(nn.Block):
+    """The RNN model."""
     def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
         self.rnn = rnn_layer

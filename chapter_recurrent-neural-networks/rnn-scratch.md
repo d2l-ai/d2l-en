@@ -375,6 +375,7 @@ So we generate the predicted characters and emit them.
 
 ```{.python .input}
 def predict_ch8(prefix, num_preds, model, vocab, device):  #@save
+    """Generate new characters following the `prefix`."""
     state = model.begin_state(batch_size=1, ctx=device)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(
@@ -391,6 +392,7 @@ def predict_ch8(prefix, num_preds, model, vocab, device):  #@save
 ```{.python .input}
 #@tab pytorch
 def predict_ch8(prefix, num_preds, model, vocab, device):  #@save
+    """Generate new characters following the `prefix`."""
     state = model.begin_state(batch_size=1, device=device)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(d2l.tensor(
@@ -407,6 +409,7 @@ def predict_ch8(prefix, num_preds, model, vocab, device):  #@save
 ```{.python .input}
 #@tab tensorflow
 def predict_ch8(prefix, num_preds, model, vocab, params):  #@save
+    """Generate new characters following the `prefix`."""
     state = model.begin_state(batch_size=1)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
@@ -486,6 +489,7 @@ Also note that we compute the gradient norm over all the model parameters.
 
 ```{.python .input}
 def grad_clipping(model, theta):  #@save
+    """Clip the gradient."""
     if isinstance(model, gluon.Block):
         params = [p.data() for p in model.collect_params().values()]
     else:
@@ -499,6 +503,7 @@ def grad_clipping(model, theta):  #@save
 ```{.python .input}
 #@tab pytorch
 def grad_clipping(model, theta):  #@save
+    """Clip the gradient."""
     if isinstance(model, nn.Module):
         params = [p for p in model.parameters() if p.requires_grad]
     else:
@@ -512,6 +517,7 @@ def grad_clipping(model, theta):  #@save
 ```{.python .input}
 #@tab tensorflow
 def grad_clipping(grads, theta): #@save
+    """Clip the gradient."""
     theta = tf.constant(theta, dtype=tf.float32)
     norm = tf.math.sqrt(sum((tf.reduce_sum(grad ** 2)).numpy()
                         for grad in grads))
