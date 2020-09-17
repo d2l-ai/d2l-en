@@ -242,3 +242,11 @@ high-level APIs of the deep learning framework.
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/335)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1053)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1054)
+:end_tab:
