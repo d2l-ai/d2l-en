@@ -785,7 +785,7 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
 #@tab tensorflow
 params = get_params(len(vocab_random_iter), num_hiddens)
 train_ch8(model, train_random_iter, vocab_random_iter, num_hiddens,
-          lr, num_epochs, use_random_iter=True)
+          lr, num_epochs, strategy, use_random_iter=True)
 ```
 
 While implementing the above RNN model from scratch is instructive, it is not convenient.
