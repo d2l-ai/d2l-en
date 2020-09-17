@@ -271,3 +271,7 @@ In many cases, LSTMs perform slightly better than GRUs but they are more costly 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/343)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1057)
+:end_tab:

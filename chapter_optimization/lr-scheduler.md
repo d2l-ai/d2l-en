@@ -495,3 +495,11 @@ Warmup can be applied to any scheduler (not just cosine). For a more detailed di
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/359)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1080)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1081)
+:end_tab:

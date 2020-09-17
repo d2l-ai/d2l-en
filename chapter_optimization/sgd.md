@@ -256,3 +256,7 @@ A similar reasoning shows that the probability of picking a sample exactly once 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/497)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1067)
+:end_tab:

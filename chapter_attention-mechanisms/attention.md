@@ -278,3 +278,7 @@ atten(d2l.ones(2, 1, 2), keys, values, torch.tensor([2, 6]))
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/346)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1064)
+:end_tab:

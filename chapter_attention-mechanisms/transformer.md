@@ -186,7 +186,6 @@ def transpose_output(X, num_heads):
     return X.reshape(X.shape[0], X.shape[1], -1)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 #@save
@@ -792,4 +791,8 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/348)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1066)
 :end_tab:

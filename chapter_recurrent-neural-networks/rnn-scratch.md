@@ -820,3 +820,7 @@ and make it run faster.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/486)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1052)
+:end_tab:

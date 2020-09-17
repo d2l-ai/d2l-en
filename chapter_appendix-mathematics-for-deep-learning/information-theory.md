@@ -695,3 +695,11 @@ loss
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/420)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1104)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1105)
+:end_tab:

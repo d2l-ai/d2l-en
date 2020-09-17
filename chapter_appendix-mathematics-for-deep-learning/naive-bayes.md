@@ -461,3 +461,11 @@ Modern deep networks achieve error rates of less than $0.01$. The relatively poo
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/418)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1100)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1101)
+:end_tab:

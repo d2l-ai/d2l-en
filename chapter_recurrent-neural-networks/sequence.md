@@ -418,3 +418,7 @@ While the 4-step-ahead predictions still look good, anything beyond that is almo
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/114)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1048)
+:end_tab:

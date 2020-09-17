@@ -677,3 +677,12 @@ $$
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/411)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1086)
+:end_tab:
+
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1087)
+:end_tab:

@@ -326,3 +326,12 @@ We used $\mathbf{R}$ to denote the $2 \times 2$ governing convergence behavior. 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/354)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1070)
+:end_tab:
+
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1071)
+:end_tab:

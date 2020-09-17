@@ -224,3 +224,12 @@ d2l.train_ch11(yogi, init_adam_states(feature_dim),
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/358)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1078)
+:end_tab:
+
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1079)
+:end_tab:

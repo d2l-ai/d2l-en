@@ -206,3 +206,7 @@ for X, X_vlen, Y, Y_vlen in train_iter:
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/344)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1060)
+:end_tab:
