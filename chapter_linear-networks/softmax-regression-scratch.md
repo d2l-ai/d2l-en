@@ -87,13 +87,13 @@ b = tf.Variable(tf.zeros(num_outputs))
 ## Defining the Softmax Operation
 
 Before implementing the softmax regression model,
-let us briefly review how the sum operator work
+let us briefly review how the sum operator works
 along specific dimensions in a tensor,
 as discussed in :numref:`subseq_lin-alg-reduction` and :numref:`subseq_lin-alg-non-reduction`.
 Given a matrix `X` we can sum over all elements (by default) or only
 over elements in the same axis,
 i.e., the same column (axis 0) or the same row (axis 1).
-Note that if `X` is an tensor with shape (2, 3)
+Note that if `X` is a tensor with shape (2, 3)
 and we sum over the columns,
 the result will be a vector with shape (3,).
 When invoking the sum operator,
