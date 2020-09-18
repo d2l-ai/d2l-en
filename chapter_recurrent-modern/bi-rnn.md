@@ -14,7 +14,7 @@ Depending on the amount of information available, we might fill the blanks with 
 
 This section serves to illustrate the dynamic programming problem. The specific technical details do not matter for understanding the deep learning counterpart but they help in motivating why one might use deep learning and why one might pick specific architectures.
 
-If we want to solve the problem using graphical models we could for instance design a latent variable model as follows. We assume that there exists some latent variable $h_t$ which governs the emissions $x_t$ that we observe via $p(x_t \mid h_t)$. Moreover, the transitions $h_t \to h_{t+1}$ are given by some state transition probability $p(h_t+1 \mid h_{t})$. The graphical model is then a Hidden Markov Model (HMM) as in :numref:`fig_hmm`.
+If we want to solve the problem using graphical models we could for instance design a latent variable model as follows. We assume that there exists some latent variable $h_t$ which governs the emissions $x_t$ that we observe via $p(x_t \mid h_t)$. Moreover, the transitions $h_t \to h_{t+1}$ are given by some state transition probability $p(h_{t+1} \mid h_{t})$. The graphical model is then a Hidden Markov Model (HMM) as in :numref:`fig_hmm`.
 
 ![ Hidden Markov Model. ](../img/hmm.svg)
 :label:`fig_hmm`
@@ -80,7 +80,7 @@ In fact, this is not too dissimilar to the forward and backward recursion we enc
 
 Bidirectional RNNs were introduced by :cite:`Schuster.Paliwal.1997`. For a detailed discussion of the various architectures see also the paper by :cite:`Graves.Schmidhuber.2005`. Let us look at the specifics of such a network.
 
-For a given timestep $t$, the minibatch input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$) and the hidden layer activation function is $\phi$. In the bidirectional architecture, we assume that the forward and backward hidden states for this timestep are $\overrightarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ and $\overleftarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ respectively. Here $h$ indicates the number of hidden units. We compute the forward and backward hidden state updates as follows:
+For a given time step $t$, the minibatch input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$) and the hidden layer activation function is $\phi$. In the bidirectional architecture, we assume that the forward and backward hidden states for this time step are $\overrightarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ and $\overleftarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ respectively. Here $h$ indicates the number of hidden units. We compute the forward and backward hidden state updates as follows:
 
 
 $$
@@ -131,13 +131,33 @@ num_epochs, lr = 500, 1
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+
+# Load data
+batch_size, num_steps, device = 32, 35, d2l.try_gpu()
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+# Define the model
+vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
+num_inputs = vocab_size
+lstm_layer = nn.LSTM(num_inputs, num_hiddens, num_layers, bidirectional=True)
+model = d2l.RNNModel(lstm_layer, len(vocab))
+model = model.to(device)
+# Train the model
+num_epochs, lr = 500, 1
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+```
+
 The output is clearly unsatisfactory for the reasons described above. For a
 discussion of more effective uses of bidirectional models, please see the sentiment
 classification in :numref:`sec_sentiment_rnn`.
 
 ## Summary
 
-* In bidirectional recurrent neural networks, the hidden state for each timestep is simultaneously determined by the data prior to and after the current timestep.
+* In bidirectional recurrent neural networks, the hidden state for each time step is simultaneously determined by the data prior to and after the current time step.
 * Bidirectional RNNs bear a striking resemblance with the forward-backward algorithm in graphical models.
 * Bidirectional RNNs are mostly useful for sequence embedding and the estimation of observations given bidirectional context.
 * Bidirectional RNNs are very costly to train due to long gradient chains.
@@ -148,7 +168,10 @@ classification in :numref:`sec_sentiment_rnn`.
 1. Design a bidirectional recurrent neural network with multiple hidden layers.
 1. Implement a sequence classification algorithm using bidirectional RNNs. Hint: use the RNN to embed each word and then aggregate (average) all embedded outputs before sending the output into an MLP for classification. For instance, if we have $(\mathbf{o}_1, \mathbf{o}_2, \mathbf{o}_3)$, we compute $\bar{\mathbf{o}} = \frac{1}{3} \sum_i \mathbf{o}_i$ first and then use the latter for sentiment classification.
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/339)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1059)
 :end_tab:

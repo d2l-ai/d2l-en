@@ -536,3 +536,12 @@ We will meet this integral again when we study continuous random variables in :n
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/414)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1092)
+:end_tab:
+
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1093)
+:end_tab:

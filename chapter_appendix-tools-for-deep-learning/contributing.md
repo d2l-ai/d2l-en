@@ -15,7 +15,7 @@ After you are done, fill in your change descriptions in the "Propose file change
 
 ## Propose a Major Change
 
-If you plan to update a large portion of text or code, then you need to know a little bit more about the format this book is using. The source file is based on the [markdown format](https://daringfireball.net/projects/markdown/syntax) with a set of extensions through [the `d2lbook` package](http://book.d2l.ai/user/markdown.html) such as referring to equations, images, chapters, and citations. You can use any Markdown editors to open these files and make your changes.
+If you plan to update a large portion of text or code, then you need to know a little bit more about the format this book is using. The source file is based on the [markdown format](https://daringfireball.net/projects/markdown/syntax) with a set of extensions through the [d2lbook](http://book.d2l.ai/user/markdown.html) package such as referring to equations, images, chapters, and citations. You can use any Markdown editors to open these files and make your changes.
 
 If you would like to change the code, we recommend you to use Jupyter to open these Markdown files as described in :numref:`sec_jupyter`. So that you can run and test your changes. Please remember to clear all outputs before submitting your changes, our CI system will execute the sections you updated to generate outputs.
 
@@ -31,6 +31,7 @@ Then in the root directory of `d2l-en`, you can activate a particular implementa
 ```bash
 d2lbook activate mxnet chapter_multilayer-perceptrons/mlp-scratch.md
 d2lbook activate pytorch chapter_multilayer-perceptrons/mlp-scratch.md
+d2lbook activate tensorflow chapter_multilayer-perceptrons/mlp-scratch.md
 ```
 
 
@@ -40,7 +41,7 @@ Before submitting your changes, please clear all code block outputs and activate
 d2lbook activate all chapter_multilayer-perceptrons/mlp-scratch.md
 ```
 
-If you add a new code block not for the default implementation, which is MXNet, please use `#@tab` to mark this block on the beginning line. For example, `#@tab pytorch` for a PyTorch code block, or `#@tab all` a shared code block for all implementations. You may refer to [d2lbook](http://book.d2l.ai/user/code_tabs.html) for more information.
+If you add a new code block not for the default implementation, which is MXNet, please use `#@tab` to mark this block on the beginning line. For example, `#@tab pytorch` for a PyTorch code block, `#@tab tensorflow` for a TensorFlow code block, or `#@tab all` a shared code block for all implementations. You may refer to [d2lbook](http://book.d2l.ai/user/code_tabs.html) for more information.
 
 
 ## Adding a New Section or a New Framework Implementation
@@ -152,5 +153,6 @@ Your pull request will appear among the list of requests in the main repository.
 1. Star and fork the `d2l-en` repository.
 1. Find some code that needs improvement and submit a pull request.
 1. Find a reference that we missed and submit a pull request.
+1. It is usually a better practice to create a pull request using a new branch. Learn how to do it with [Git branching](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell).
 
 [Discussions](https://discuss.d2l.ai/t/426)

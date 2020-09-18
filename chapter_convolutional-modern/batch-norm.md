@@ -283,7 +283,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
         moving_mean = momentum * moving_mean + (1.0 - momentum) * mean
         moving_var = momentum * moving_var + (1.0 - momentum) * var
     Y = gamma * X_hat + beta  # Scale and shift
-    return Y, moving_mean, moving_var
+    return Y, moving_mean.data, moving_var.data
 ```
 
 ```{.python .input}

@@ -1,6 +1,7 @@
 # Linear Algebra
 :label:`sec_linear-algebra`
 
+
 Now that you can store and manipulate data,
 let us briefly review the subset of basic linear algebra
 that you will need to understand and implement
@@ -9,7 +10,6 @@ Below, we introduce the basic mathematical objects, arithmetic,
 and operations in linear algebra,
 expressing each of them through mathematical notation
 and the corresponding implementation in code.
-
 
 ## Scalars
 

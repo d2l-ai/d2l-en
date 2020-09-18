@@ -22,6 +22,7 @@ The notation used throughout this book is summarized below.
 
 * $\mathcal{X}$: A set
 * $\mathbb{Z}$: The set of integers
+* $\mathbb{Z}^+$: The set of positive integers
 * $\mathbb{R}$: The set of real numbers
 * $\mathbb{R}^n$: The set of $n$-dimensional vectors of real numbers
 * $\mathbb{R}^{a\times b}$: The set of matrices of real numbers with $a$ rows and $b$ columns

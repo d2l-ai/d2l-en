@@ -980,7 +980,7 @@ All the examples so far were related to *Supervised Learning*,
 i.e., situations where we feed the model a giant dataset
 containing both the features and corresponding target values.
 You could think of the supervised learner as having
-an extremely specialized job and an extremely anal boss.
+an extremely specialized job and an extremely banal boss.
 The boss stands over your shoulder and tells you exactly what to do
 in every situation until you learn to map from situations to actions.
 Working for such a boss sounds pretty lame.
@@ -1104,8 +1104,8 @@ The breakthrough [deep Q-network that beat humans at Atari games using only the 
 and the [AlphaGo program that dethroned the world champion at the board game Go](https://www.wired.com/2017/05/googles-alphago-trounces-humans-also-gives-boost/) are two prominent examples.
 
 Reinforcement learning gives a very general statement of a problem,
-in which an agent interacts with an environment over a series of *timesteps*.
-At each timestep $t$, the agent receives some observation $o_t$
+in which an agent interacts with an environment over a series of *time steps*.
+At each time step $t$, the agent receives some observation $o_t$
 from the environment and must choose an action $a_t$
 that is subsequently transmitted back to the environment
 via some mechanism (sometimes called an actuator).

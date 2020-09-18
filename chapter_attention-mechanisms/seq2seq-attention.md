@@ -5,14 +5,14 @@ In this section, we add the attention mechanism to the sequence to sequence (seq
 model as introduced in :numref:`sec_seq2seq`
 to explicitly aggregate states with weights.
 :numref:`fig_s2s_attention` shows the model
-architecture for encoding and decoding at the timestep $t$. Here, the memory of the
+architecture for encoding and decoding at the time step $t$. Here, the memory of the
 attention layer consists of all the information that the encoder has 
-seen---the encoder output at each timestep. 
-During the decoding, the decoder output from the previous timestep $t-1$ is used as the query.
+seen---the encoder output at each time step. 
+During the decoding, the decoder output from the previous time step $t-1$ is used as the query.
 The output of the attention model is viewed as the context information, and such context is concatenated with the decoder input $D_t$.
 Finally, we feed the concatenation into the decoder.
 
-![The second timestep in decoding for the sequence to sequence model with attention mechanism.](../img/seq2seq_attention.svg)
+![The second time step in decoding for the sequence to sequence model with attention mechanism.](../img/seq2seq_attention.svg)
 :label:`fig_s2s_attention`
 
 
@@ -39,13 +39,13 @@ from torch import nn
 
 Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEncoder` in :numref:`sec_seq2seq`, we will just focus on the decoder. We add an MLP attention layer (`MLPAttention`) which has the same hidden size as the LSTM layer in the decoder. Then we initialize the state of the decoder by passing three items from the encoder:
 
-- **the encoder outputs of all timesteps**: they are used as the attention layer's memory with identical keys and values;
+- **the encoder outputs of all time steps**: they are used as the attention layer's memory with identical keys and values;
 
-- **the hidden state of the encoder's final timestep**: it is used as the initial decoder's hidden state;
+- **the hidden state of the encoder's final time step**: it is used as the initial decoder's hidden state;
 
 - **the encoder valid length**: so the attention layer will not consider the padding tokens within the encoder outputs.
 
-At each timestep of the decoding, we use the hidden state of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Although the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on `enc_valid_len`, so that the attention output suspends other irrelevant information.
+At each time step of the decoding, we use the hidden state of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Although the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on `enc_valid_len`, so that the attention output suspends other irrelevant information.
 
 Let us implement the `Seq2SeqAttentionDecoder`, and see how it differs from the decoder in seq2seq from :numref:`sec_seq2seq_decoder`.
 
@@ -202,7 +202,7 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 ## Summary
 
 * The seq2seq model with attention adds an additional attention layer to the model without attention.
-* The decoder of the seq2seq with attention model passes three items from the encoder: the encoder outputs of all timesteps, the hidden state of the encoder's final timestep, and the encoder valid length.
+* The decoder of the seq2seq with attention model passes three items from the encoder: the encoder outputs of all time steps, the hidden state of the encoder's final time step, and the encoder valid length.
 
 ## Exercises
 
@@ -212,4 +212,8 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/347)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1065)
 :end_tab:

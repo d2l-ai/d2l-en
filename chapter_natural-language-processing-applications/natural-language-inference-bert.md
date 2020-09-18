@@ -59,7 +59,7 @@ def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
                           num_heads, num_layers, dropout, max_len, devices):
     data_dir = d2l.download_extract(pretrained_model)
     # Define an empty vocabulary to load the predefined vocabulary
-    vocab = d2l.Vocab([])
+    vocab = d2l.Vocab()
     vocab.idx_to_token = json.load(open(os.path.join(data_dir, 'vocab.json')))
     vocab.token_to_idx = {token: idx for idx, token in enumerate(
         vocab.idx_to_token)}

@@ -572,3 +572,12 @@ train_concise_ch11(trainer, {'learning_rate': 0.05}, data_iter)
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/353)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1068)
+:end_tab:
+
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1069)
+:end_tab:

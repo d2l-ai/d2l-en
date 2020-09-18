@@ -393,7 +393,7 @@ we do not need to access labels $y \sim p(y)$.
 
 In this case, there exists a very effective approach
 that will give almost as good results as the original: logistic regression,
-which is a special case of softmax regression
+which is a special case of softmax regression (see :numref:`sec_softmax`)
 for binary classification.
 This is all that is needed to compute estimated probability ratios.
 We learn a classifier to distinguish
@@ -408,6 +408,7 @@ On the other hand, any instances
 that can be well discriminated
 should be significantly overweighted
 or underweighted accordingly.
+
 For simplicity's sake assume that we have
 an equal number of instances from both distributions
 $p(\mathbf{x})$

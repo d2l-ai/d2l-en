@@ -40,6 +40,10 @@ A Jupyter notebook version of this book for fitting SageMaker is available at ht
 A Jupyter notebook version of this book for fitting SageMaker is available at https://github.com/d2l-ai/d2l-pytorch-sagemaker. We can specify this GitHub repository URL to let SageMaker clone this repository during instance creation, as shown in :numref:`fig_sagemaker-create-3`.
 :end_tab:
 
+:begin_tab:`tensorflow`
+A Jupyter notebook version of this book for fitting SageMaker is available at https://github.com/d2l-ai/d2l-tensorflow-sagemaker. We can specify this GitHub repository URL to let SageMaker clone this repository during instance creation, as shown in :numref:`fig_sagemaker-create-3`.
+:end_tab:
+
 ![Specify the GitHub repository.](../img/sagemaker-create-3.png)
 :width:`400px`
 :label:`fig_sagemaker-create-3`
@@ -61,7 +65,7 @@ Then, as shown in :numref:`fig_sagemaker-jupyter`, you may navigate through the 
 :width:`400px`
 :label:`fig_sagemaker-jupyter`
 
-Running and editing Jupyter notebooks on the SagaMaker instance is similar to what we have discussed in :numref:`sec_jupyter`.
+Running and editing Jupyter notebooks on the SageMaker instance is similar to what we have discussed in :numref:`sec_jupyter`.
 After finishing your work, do not forget to stop the instance to avoid further charging, as shown in :numref:`fig_sagemaker-stop`.
 
 ![Stop a SageMaker instance.](../img/sagemaker-stop.png)
@@ -79,6 +83,10 @@ We will regularly update the notebooks in the [d2l-ai/d2l-en-sagemaker](https://
 We will regularly update the notebooks in the [d2l-ai/d2l-pytorch-sagemaker](https://github.com/d2l-ai/d2l-pytorch-sagemaker) GitHub repository. You can simply use the `git pull` command to update to the latest version.
 :end_tab:
 
+:begin_tab:`tensorflow`
+We will regularly update the notebooks in the [d2l-ai/d2l-tensorflow-sagemaker](https://github.com/d2l-ai/d2l-tensorflow-sagemaker) GitHub repository. You can simply use the `git pull` command to update to the latest version.
+:end_tab:
+
 First, you need to open a terminal as shown in :numref:`fig_sagemaker-terminal`.
 
 ![Open a terminal on the SageMaker instance.](../img/sagemaker-terminal.png)
@@ -88,25 +96,27 @@ First, you need to open a terminal as shown in :numref:`fig_sagemaker-terminal`.
 You may want to commit your local changes before pulling the updates. Alternatively, you can simply ignore all your local changes with the following commands in the terminal.
 
 :begin_tab:`mxnet`
-
 ```bash
 cd SageMaker/d2l-en-sagemaker/
 git reset --hard
 git pull
 ```
-
-
 :end_tab:
 
 :begin_tab:`pytorch`
-
 ```bash
 cd SageMaker/d2l-pytorch-sagemaker/
 git reset --hard
 git pull
 ```
+:end_tab:
 
-
+:begin_tab:`tensorflow`
+```bash
+cd SageMaker/d2l-tensorflow-sagemaker/
+git reset --hard
+git pull
+```
 :end_tab:
 
 ## Summary

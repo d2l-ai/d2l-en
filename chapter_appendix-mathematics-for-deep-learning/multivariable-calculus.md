@@ -846,3 +846,12 @@ It is reasonable to ask at this point, "Why can I not just write down matrix ver
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/413)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1090)
+:end_tab:
+
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1091)
+:end_tab:

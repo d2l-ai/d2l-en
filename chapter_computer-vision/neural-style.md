@@ -206,7 +206,7 @@ def get_inits(X, device, lr, styles_Y):
 During model training, we constantly extract the content and style features of
 the composite image and calculate the loss function. Recall our discussion of
 how synchronization functions force the front end to wait for computation
-results in :numref:`sec_async`. Because we only call the `asscalar` synchronization function every 50
+results in :numref:`sec_async`. Because we only call the `asnumpy` synchronization function every 10
 epochs, the process may occupy a great deal of memory. Therefore, we call the
 `waitall` synchronization function during every epoch.
 

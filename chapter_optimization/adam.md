@@ -38,7 +38,7 @@ Reviewing the design of Adam its inspiration is clear. Momentum and scale are cl
 
 ## Implementation 
 
-Implementing Adam from scratch is not very daunting. For convenience we store the timestep counter $t$ in the `hyperparams` dictionary. Beyond that all is straightforward.
+Implementing Adam from scratch is not very daunting. For convenience we store the time step counter $t$ in the `hyperparams` dictionary. Beyond that all is straightforward.
 
 ```{.python .input}
 %matplotlib inline
@@ -223,4 +223,13 @@ d2l.train_ch11(yogi, init_adam_states(feature_dim),
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/358)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1078)
+:end_tab:
+
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1079)
 :end_tab:
