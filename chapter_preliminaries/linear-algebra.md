@@ -10,7 +10,6 @@ and operations in linear algebra,
 expressing each of them through mathematical notation
 and the corresponding implementation in code.
 
-
 ## Scalars
 
 If you never studied linear algebra or machine learning,
