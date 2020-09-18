@@ -1,6 +1,7 @@
 # Linear Algebra
 :label:`sec_linear-algebra`
 
+
 Now that you can store and manipulate data,
 let us briefly review the subset of basic linear algebra
 that you will need to understand and implement
