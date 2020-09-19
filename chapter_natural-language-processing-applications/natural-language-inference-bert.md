@@ -201,7 +201,7 @@ the pretrained BERT model `bert` is fed into the `BERTClassifier` instance `net`
 the downstream application.
 In common implementations of BERT fine-tuning,
 only the parameters of the output layer of the additional MLP (`net.output`) will be learned from scratch.
-All the parameters of the pretrained BERT encoder (`net.encoder`) and the hidden layer of the additional MLP (net.hidden) will be fine-tuned.
+All the parameters of the pretrained BERT encoder (`net.encoder`) and the hidden layer of the additional MLP (`net.hidden`) will be fine-tuned.
 
 ```{.python .input  n=8}
 net = BERTClassifier(bert)
