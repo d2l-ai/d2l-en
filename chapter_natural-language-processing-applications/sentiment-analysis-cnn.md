@@ -9,7 +9,7 @@ used recurrent neural networks to process such data. In fact, we can also treat
 text as a one-dimensional image, so that we can use one-dimensional
 convolutional neural networks to capture associations between adjacent
 words. 
-As described in :label:`fig_nlp-map-sa-cnn`
+As described in :numref:`fig_nlp-map-sa-cnn`
 This section describes a groundbreaking approach to applying
 convolutional neural networks to sentiment analysis: textCNN :cite:`Kim.2014`.
 
