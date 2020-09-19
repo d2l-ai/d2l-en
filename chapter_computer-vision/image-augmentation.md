@@ -34,7 +34,6 @@ npx.set_np()
 %matplotlib inline
 from d2l import torch as d2l
 from torch import nn
-from PIL import Image
 import torchvision
 ```
 
@@ -51,7 +50,7 @@ d2l.plt.imshow(img.asnumpy());
 ```{.python .input}
 #@tab pytorch
 d2l.set_figsize()
-img = Image.open('../img/cat1.jpg')
+img = d2l.plt.imread('../img/cat1.jpg')
 d2l.plt.imshow(img);
 ```
 
