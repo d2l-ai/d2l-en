@@ -403,10 +403,10 @@ While the 4-step-ahead predictions still look good, anything beyond that is almo
 ## Exercises
 
 1. Improve the model in the experiment of this section.
-    * Incorporate more than the past 4 observations? How many do you really need?
-    * How many past observations would you need if there was no noise? Hint: you can write $\sin$ and $\cos$ as a differential equation.
-    * Can you incorporate older observations while keeping the total number of features constant? Does this improve accuracy? Why?
-    * Change the neural network architecture and evaluate the performance.
+    1. Incorporate more than the past 4 observations? How many do you really need?
+    1. How many past observations would you need if there was no noise? Hint: you can write $\sin$ and $\cos$ as a differential equation.
+    1. Can you incorporate older observations while keeping the total number of features constant? Does this improve accuracy? Why?
+    1. Change the neural network architecture and evaluate the performance.
 1. An investor wants to find a good security to buy. He looks at past returns to decide which one is likely to do well. What could possibly go wrong with this strategy?
 1. Does causality also apply to text? To which extent?
 1. Give an example for when a latent autoregressive model might be needed to capture the dynamic of the data.
@@ -417,4 +417,8 @@ While the 4-step-ahead predictions still look good, anything beyond that is almo
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/114)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1048)
 :end_tab:

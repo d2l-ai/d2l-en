@@ -432,5 +432,5 @@ train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/836)
+[Discussions](https://discuss.d2l.ai/t/1083)
 :end_tab:

@@ -91,6 +91,7 @@ from mxnet.gluon import nn
 npx.set_np()
 
 class Residual(nn.Block):  #@save
+    """The Residual block of ResNet."""
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
         super().__init__(**kwargs)
         self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1,
@@ -120,6 +121,7 @@ from torch import nn
 from torch.nn import functional as F
 
 class Residual(nn.Module):  #@save
+    """The Residual block of ResNet."""
     def __init__(self, input_channels, num_channels,
                  use_1x1conv=False, strides=1):
         super().__init__()
@@ -151,6 +153,7 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 
 class Residual(tf.keras.Model):  #@save
+    """The Residual block of ResNet."""
     def __init__(self, num_channels, use_1x1conv=False, strides=1):
         super().__init__()
         self.conv1 = tf.keras.layers.Conv2D(

@@ -244,7 +244,7 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
     for X, y in data_iter:
         X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         metric.add(d2l.accuracy(net(X), y), d2l.size(y))
-    return metric[0]/metric[1]
+    return metric[0] / metric[1]
 ```
 
 ```{.python .input}

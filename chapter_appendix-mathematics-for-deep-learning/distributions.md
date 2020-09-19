@@ -478,7 +478,6 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 lam = 5.0
@@ -594,7 +593,6 @@ for i in range(4):
     d2l.plt.title("n = {}".format(n))
 d2l.plt.show()
 ```
-
 
 ```{.python .input}
 #@tab tensorflow
@@ -815,4 +813,12 @@ powerful family of distributions encountered frequently in machine learning.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/417)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1098)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1099)
 :end_tab:

@@ -101,7 +101,7 @@ we can have for certain data types (i.e., *overflow*).
 This would make the denominator (and/or numerator) `inf` (infinity)
 and we wind up encountering either 0, `inf`, or `nan` (not a number) for $\hat y_j$.
 In these situations we do not get a well-defined
-return value for cross entropy.
+return value for cross-entropy.
 
 
 One trick to get around this is to first subtract $\max(o_k)$
@@ -122,7 +122,7 @@ even though we are computing exponential functions,
 we ultimately intend to take their log
 (when calculating the cross-entropy loss).
 By combining these two operators
-softmax and cross entropy together,
+softmax and cross-entropy together,
 we can escape the numerical stability issues
 that might otherwise plague us during backpropagation.
 As shown in the equation below, we avoid calculating $\exp(o_j)$
@@ -140,7 +140,7 @@ We will want to keep the conventional softmax function handy
 in case we ever want to evaluate the output probabilities by our model.
 But instead of passing softmax probabilities into our new loss function,
 we will just pass the logits and compute the softmax and its log
-all at once inside the cross entropy loss function,
+all at once inside the cross-entropy loss function,
 which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wiki/LogSumExp).
 
 ```{.python .input}

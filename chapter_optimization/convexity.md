@@ -264,10 +264,5 @@ In the context of deep learning the main purpose of convex functions is to motiv
     * Can you find the 'right' value of $\lambda$ without a lot of trial and error?
 1. Given a convex set $X$ and two vectors $\mathbf{x}$ and $\mathbf{y}$ prove that projections never increase distances, i.e., $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_X(\mathbf{x}) - \mathrm{Proj}_X(\mathbf{y})\|$.
 
-:begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/350)
-:end_tab:
 
-:begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/488)
-:end_tab:
+[Discussions](https://discuss.d2l.ai/t/350)

@@ -281,6 +281,7 @@ in each subsequence.
 ```{.python .input}
 #@tab all
 def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
+    """Generate a minibatch of subsequences using random sampling."""
     # Start with a random offset to partition a sequence
     corpus = corpus[random.randint(0, num_steps):]
     # Subtract 1 since we need to account for labels
@@ -310,7 +311,7 @@ Let us manually generate a sequence from 0 to 34.
 We assume that
 the batch size and numbers of time steps are 2 and 5,
 respectively.
-This means that we can generate $\lfloor (35 - 1) / 5 \rfloor= 6 $ feature-label subsequence pairs. With a minibatch size of 2, we only get 3 minibatches.
+This means that we can generate $\lfloor (35 - 1) / 5 \rfloor= 6$ feature-label subsequence pairs. With a minibatch size of 2, we only get 3 minibatches.
 
 ```{.python .input}
 #@tab all
@@ -330,6 +331,7 @@ This strategy preserves the order of split subsequences when iterating over mini
 ```{.python .input}
 #@tab mxnet, pytorch
 def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
+    """Generate a minibatch of subsequences using sequential partitioning."""
     # Start with a random offset to partition a sequence
     offset = random.randint(0, num_steps)
     num_tokens = ((len(corpus) - offset - 1) // batch_size) * batch_size
@@ -346,6 +348,7 @@ def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
 ```{.python .input}
 #@tab tensorflow
 def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
+    """Generate a minibatch of subsequences using sequential partitioning."""
     # Start with a random offset to partition a sequence
     offset = random.randint(0, num_steps)
     num_tokens = ((len(corpus) - offset - 1) // batch_size) * batch_size
@@ -397,6 +400,7 @@ Last, we define a function `load_data_time_machine` that returns both the data i
 #@tab all
 def load_data_time_machine(batch_size, num_steps,  #@save
                            use_random_iter=False, max_tokens=10000):
+    """Return the iterator and the vocabulary of the time machine dataset."""
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
     return data_iter, data_iter.vocab
@@ -431,3 +435,8 @@ def load_data_time_machine(batch_size, num_steps,  #@save
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/118)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1049)
+:end_tab:
+

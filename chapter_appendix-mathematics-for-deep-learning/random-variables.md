@@ -857,3 +857,12 @@ Indeed if we think of norms as being related to standard deviations, and correla
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/415)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1094)
+:end_tab:
+
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1095)
+:end_tab:

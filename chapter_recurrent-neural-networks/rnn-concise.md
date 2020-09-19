@@ -130,6 +130,7 @@ Note that `rnn_layer` only contains the hidden recurrent layers, we need to crea
 ```{.python .input}
 #@save
 class RNNModel(nn.Block):
+    """The RNN model."""
     def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
         self.rnn = rnn_layer
@@ -153,6 +154,7 @@ class RNNModel(nn.Block):
 #@tab pytorch
 #@save
 class RNNModel(nn.Module):
+    """The RNN model."""
     def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
         self.rnn = rnn_layer
@@ -178,7 +180,6 @@ class RNNModel(nn.Module):
         return output, state
 
     def begin_state(self, device, batch_size=1):
-        """Return the begin state"""
         if not isinstance(self.rnn, nn.LSTM):
             # `nn.GRU` takes a tensor as hidden state
             return  torch.zeros((self.num_directions * self.rnn.num_layers,
@@ -240,4 +241,8 @@ high-level APIs of the deep learning framework.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/335)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1053)
 :end_tab:
