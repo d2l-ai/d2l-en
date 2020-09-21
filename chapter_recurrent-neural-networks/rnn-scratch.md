@@ -539,7 +539,7 @@ let us define a function to train the model in one epoch. It differs from how we
 
 1. Different sampling methods for sequential data (random sampling and sequential partitioning) will result in differences in the initialization of hidden states.
 1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
-1. We use perplexity to evaluate the model. As discussed in :label:`subsec_perplexity`, this ensures that sequences of different length are comparable.
+1. We use perplexity to evaluate the model. As discussed in :numref:`subsec_perplexity`, this ensures that sequences of different length are comparable.
 
 
 Specifically,

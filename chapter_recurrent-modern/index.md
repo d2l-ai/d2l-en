@@ -1,10 +1,24 @@
 # Modern Recurrent Neural Networks
 :label:`chap_modern_rnn`
 
-Although we have learned the basics of recurrent neural networks,
-they are not sufficient for a practitioner to solve today's sequence learning problems.
-For instance, given the numerical unstability during gradient calculation,
-gated recurrent neural networks are much more common in practice.
+To better handle sequence data,
+we have introduced the basics of the RNN model.
+Specifically,
+we implemented RNN-based
+language models on text data to illustrate RNN applications.
+Nowadays,
+such techniques are not sufficient
+for practitioners to address challenges of sequence learning.
+
+For instance,
+a notable issue during implementation
+is the numerical instability of RNNs.
+Though we have applied implementation tricks
+such as gradient clipping,
+this issue can be alleviated further
+with more sophisticated designs of sequence models.
+Specifically,
+gated RNNs are much more common in practice.
 We will begin by introducing two of such widely-used networks,
 namely gated recurrent units (GRUs) and long short term memory (LSTM),
 with illustrations using the same language modeling problem as introduced in :numref:`chap_rnn`.
