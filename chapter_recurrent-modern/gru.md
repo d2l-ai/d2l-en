@@ -1,9 +1,12 @@
 # Gated Recurrent Units (GRU)
 :label:`sec_gru`
 
-In the previous section, we discussed how gradients are calculated in a recurrent
-neural network. In particular we found that long products of matrices can lead
-to vanishing or divergent gradients. Let us briefly think about what such
+In :numref:`sec_bptt`,
+we discussed how gradients are calculated
+in RNNs.
+In particular we found that long products of matrices can lead
+to vanishing or exploding gradients.
+Let us briefly think about what such
 gradient anomalies mean in practice:
 
 * We might encounter a situation where an early observation is highly
@@ -13,55 +16,77 @@ gradient anomalies mean in practice:
   case, the influence of the first token is vital. We would like to have some
   mechanisms for storing vital early information in a *memory cell*. Without such
   a mechanism, we will have to assign a very large gradient to this observation,
-  since it affects all subsequent observations.
-* We might encounter situations where some symbols carry no pertinent
+  since it affects all the subsequent observations.
+* We might encounter situations where some tokens carry no pertinent
   observation. For instance, when parsing a web page there might be auxiliary
   HTML code that is irrelevant for the purpose of assessing the sentiment
-  conveyed on the page. We would like to have some mechanism for *skipping such
-  symbols* in the latent state representation.
+  conveyed on the page. We would like to have some mechanism for *skipping* such
+  tokens in the latent state representation.
 * We might encounter situations where there is a logical break between parts of
   a sequence. For instance, there might be a transition between chapters in a
   book, or a transition between a bear and a bull market for securities. In
   this case it would be nice to have a means of *resetting* our internal state
   representation.
 
-A number of methods have been proposed to address this. One of the earliest is Long Short Term Memory (LSTM) :cite:`Hochreiter.Schmidhuber.1997` which we
-will discuss in :numref:`sec_lstm`. Gated Recurrent Unit (GRU)
+A number of methods have been proposed to address this. One of the earliest is long short-term memory :cite:`Hochreiter.Schmidhuber.1997` which we
+will discuss in :numref:`sec_lstm`. The gated recurrent unit (GRU)
 :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` is a slightly more streamlined
 variant that often offers comparable performance and is significantly faster to
-compute. See also :cite:`Chung.Gulcehre.Cho.ea.2014` for more
-details. Due to its simplicity, let us start with the GRU.
-
+compute  :cite:`Chung.Gulcehre.Cho.ea.2014`. 
+Due to its simplicity, let us start with the GRU.
 
 ## Gating the Hidden State
 
-The key distinction between regular RNNs and GRUs is that the latter support gating of the hidden state. This means that we have dedicated mechanisms for when a hidden state should be updated and also when it should be reset. These mechanisms are learned and they address the concerns listed above. For instance, if the first symbol is of great importance we will learn not to update the hidden state after the first observation. Likewise, we will learn to skip irrelevant temporary observations. Last, we will learn to reset the latent state whenever needed. We discuss this in detail below.
+The key distinction between vanilla RNNs and GRUs
+is that the latter support gating of the hidden state.
+This means that we have dedicated mechanisms for
+when a hidden state should be *updated* and
+also when it should be *reset*.
+These mechanisms are learned and they address the concerns listed above.
+For instance, if the first token is of great importance
+we will learn not to update the hidden state after the first observation.
+Likewise, we will learn to skip irrelevant temporary observations.
+Last, we will learn to reset the latent state whenever needed.
+We discuss this in detail below.
 
-### Reset Gates and Update Gates
 
-The first thing we need to introduce are reset and update gates. We engineer them to be vectors with entries in $(0, 1)$ such that we can perform convex combinations. For instance, a reset variable would allow us to control how much of the previous state we might still want to remember. Likewise, an update variable would allow us to control how much of the new state is just a copy of the old state.
+### Reset Gate and Update Gate
 
-We begin by engineering gates to generate these variables. :numref:`fig_gru_1` illustrates the inputs for both reset and update gates in a GRU, given the current time step input $\mathbf{X}_t$ and the hidden state of the previous time step $\mathbf{H}_{t-1}$. The output is given by a fully connected layer with a sigmoid as its activation function.
+The first thing we need to introduce are
+the *reset gate* and *update gate*.
+We engineer them to be vectors with entries in $(0, 1)$ such that we can perform convex combinations.
+For instance,
+a reset gate would allow us to control how much of the previous state we might still want to remember.
+Likewise, an update gate would allow us to control how much of the new state is just a copy of the old state.
 
-![ Reset and update gate in a GRU. ](../img/gru_1.svg)
+We begin by engineering these gates.
+:numref:`fig_gru_1` illustrates the inputs for both reset and update gates in a GRU, given the input $\mathbf{X}_t$
+of the current time step
+and the hidden state of the previous time step $\mathbf{H}_{t-1}$. The output is given by a fully-connected layer with a sigmoid as its activation function.
+
+![The reset gate and update gate in a GRU.](../img/gru_1.svg)
 :label:`fig_gru_1`
 
-
-For a given time step $t$, the minibatch input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$) and the hidden state of the last time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$ (number of hidden states: $h$). Then, the reset gate $\mathbf{R}_t \in \mathbb{R}^{n \times h}$ and update gate $\mathbf{Z}_t \in \mathbb{R}^{n \times h}$ are computed as follows:
+Mathematically,
+for a given time step $t$, 
+suppose that the input is 
+a minibatch
+$\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$) and the hidden state of the previous time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$ (number of hidden units: $h$). Then, the reset gate $\mathbf{R}_t \in \mathbb{R}^{n \times h}$ and update gate $\mathbf{Z}_t \in \mathbb{R}^{n \times h}$ are computed as follows:
 
 $$
 \begin{aligned}
 \mathbf{R}_t = \sigma(\mathbf{X}_t \mathbf{W}_{xr} + \mathbf{H}_{t-1} \mathbf{W}_{hr} + \mathbf{b}_r),\\
-\mathbf{Z}_t = \sigma(\mathbf{X}_t \mathbf{W}_{xz} + \mathbf{H}_{t-1} \mathbf{W}_{hz} + \mathbf{b}_z).
+\mathbf{Z}_t = \sigma(\mathbf{X}_t \mathbf{W}_{xz} + \mathbf{H}_{t-1} \mathbf{W}_{hz} + \mathbf{b}_z),
 \end{aligned}
 $$
 
-Here, $\mathbf{W}_{xr}, \mathbf{W}_{xz} \in \mathbb{R}^{d \times h}$ and
+where $\mathbf{W}_{xr}, \mathbf{W}_{xz} \in \mathbb{R}^{d \times h}$ and
 $\mathbf{W}_{hr}, \mathbf{W}_{hz} \in \mathbb{R}^{h \times h}$ are weight
 parameters and $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h}$ are
-biases. We use a sigmoid function (as introduced in :numref:`sec_mlp`) to transform input values to the interval $(0, 1)$.
+biases. We use sigmoid functions (as introduced in :numref:`sec_mlp`) to transform input values to the interval $(0, 1)$.
 
-### Reset Gates in Action
+
+### Candidate Hidden State
 
 We begin by integrating the reset gate with a regular latent state updating mechanism. In a conventional RNN, we would have an hidden state update of the form
 
@@ -78,7 +103,7 @@ $$\tilde{\mathbf{H}}_t = \tanh(\mathbf{X}_t \mathbf{W}_{xh} + \left(\mathbf{R}_t
 :label:`fig_gru_2`
 
 
-### Update Gates in Action
+### Hidden State
 
 Next we need to incorporate the effect of the update gate $\mathbf{Z}_t$, as shown in :numref:`fig_gru_3`. This determines the extent to which the new state $\mathbf{H}_t$ is just the old state $\mathbf{H}_{t-1}$ and by how much the new candidate state $\tilde{\mathbf{H}}_t$ is used. The gating variable $\mathbf{Z}_t$ can be used for this purpose, simply by taking elementwise convex combinations between both candidates. This leads to the final update equation for the GRU.
 
