@@ -85,38 +85,72 @@ $\mathbf{W}_{hr}, \mathbf{W}_{hz} \in \mathbb{R}^{h \times h}$ are weight
 parameters and $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h}$ are
 biases. We use sigmoid functions (as introduced in :numref:`sec_mlp`) to transform input values to the interval $(0, 1)$.
 
-
 ### Candidate Hidden State
 
-We begin by integrating the reset gate with a regular latent state updating mechanism. In a conventional RNN, we would have an hidden state update of the form
+Next, let us 
+integrate the reset gate $\mathbf{R}_t$ with
+the regular latent state updating mechanism
+in :eqref:`rnn_h_with_state`. 
+It leads to the following 
+*candidate hidden state*
+$\tilde{\mathbf{H}}_t \in \mathbb{R}^{n \times h}$ at time step $t$:
 
-$$\mathbf{H}_t = \tanh(\mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1}\mathbf{W}_{hh} + \mathbf{b}_h).$$
+$$\tilde{\mathbf{H}}_t = \tanh(\mathbf{X}_t \mathbf{W}_{xh} + \left(\mathbf{R}_t \odot \mathbf{H}_{t-1}\right) \mathbf{W}_{hh} + \mathbf{b}_h),$$
+:eqlabel:`gru_tilde_H`
 
-This is essentially identical to the discussion of the previous section, albeit with a nonlinearity in the form of $\tanh$ to ensure that the values of the hidden states remain in the interval $(-1, 1)$.
-If we want to be able to reduce the influence of the previous states we can multiply $\mathbf{H}_{t-1}$ with $\mathbf{R}_t$ elementwise. Whenever the entries in the reset gate $\mathbf{R}_t$ are close to $1$, we recover a conventional RNN. For all entries of the reset gate $\mathbf{R}_t$ that are close to $0$, the hidden state is the result of an MLP with $\mathbf{X}_t$ as input. Any pre-existing hidden state is thus reset to defaults. This leads to the following *candidate hidden state* (it is a *candidate* since we still need to incorporate the action of the update gate).
+where $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$
+are weight parameters,
+$\mathbf{b}_h \in \mathbb{R}^{1 \times h}$
+is the bias,
+and the symbol $\odot$ is the Hadamard (elementwise) product operator.
+Here we use a nonlinearity in the form of $\tanh$ to ensure that the values in the candidate hidden state remain in the interval $(-1, 1)$.
 
-$$\tilde{\mathbf{H}}_t = \tanh(\mathbf{X}_t \mathbf{W}_{xh} + \left(\mathbf{R}_t \odot \mathbf{H}_{t-1}\right) \mathbf{W}_{hh} + \mathbf{b}_h).$$
+The result is a *candidate* since we still need to incorporate the action of the update gate.
+Comparing with :eqref:`rnn_h_with_state`,
+now the influence of the previous states 
+can be reduced with the 
+elementwise multiplication of
+$\mathbf{R}_t$ and $\mathbf{H}_{t-1}$
+in :eqref:`gru_tilde_H`.
+Whenever the entries in the reset gate $\mathbf{R}_t$ are close to $1$, we recover a vanilla RNN such as in :eqref:`rnn_h_with_state`.
+For all entries of the reset gate $\mathbf{R}_t$ that are close to $0$, the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as the input. Any pre-existing hidden state is thus *reset* to defaults. 
 
-:numref:`fig_gru_2` illustrates the computational flow after applying the reset gate. The symbol $\odot$ indicates pointwise multiplication between tensors.
+:numref:`fig_gru_2` illustrates the computational flow after applying the reset gate.
 
-![ Candidate hidden state computation in a GRU. The multiplication is carried out elementwise. ](../img/gru_2.svg)
+![Computing the candidate hidden state in a GRU.](../img/gru_2.svg)
 :label:`fig_gru_2`
 
 
 ### Hidden State
 
-Next we need to incorporate the effect of the update gate $\mathbf{Z}_t$, as shown in :numref:`fig_gru_3`. This determines the extent to which the new state $\mathbf{H}_t$ is just the old state $\mathbf{H}_{t-1}$ and by how much the new candidate state $\tilde{\mathbf{H}}_t$ is used. The gating variable $\mathbf{Z}_t$ can be used for this purpose, simply by taking elementwise convex combinations between both candidates. This leads to the final update equation for the GRU.
+Finally, we need to incorporate the effect of the update gate $\mathbf{Z}_t$. This determines the extent to which the new hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$ is just the old state $\mathbf{H}_{t-1}$ and by how much the new candidate state $\tilde{\mathbf{H}}_t$ is used.
+The update gate $\mathbf{Z}_t$ can be used for this purpose, simply by taking elementwise convex combinations between both $\mathbf{H}_{t-1}$ and $\tilde{\mathbf{H}}_t$.
+This leads to the final update equation for the GRU:
 
 $$\mathbf{H}_t = \mathbf{Z}_t \odot \mathbf{H}_{t-1}  + (1 - \mathbf{Z}_t) \odot \tilde{\mathbf{H}}_t.$$
 
 
-![ Hidden state computation in a GRU. As before, the multiplication is carried out elementwise. ](../img/gru_3.svg)
+Whenever the update gate $\mathbf{Z}_t$ is close to $1$, we simply retain the old state. In this case the information from $\mathbf{X}_t$ is essentially ignored, effectively skipping time step $t$ in the dependency chain. In contrast, whenever $\mathbf{Z}_t$ is close to $0$, the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. These designs can help us cope with the vanishing gradient problem in RNNs and better capture dependencies for time series with large time step distances. 
+For instance,
+if the update gate has been close to 1
+for all the time steps of an entire subsequence,
+the old hidden state at the time step of its beginning
+will be easily retained and passed
+to its end,
+regardless of the length of the subsequence.
+
+
+
+:numref:`fig_gru_3` illustrates the computational flow after the update gate is in action.
+
+![Computing the hidden state in a GRU.](../img/gru_3.svg)
 :label:`fig_gru_3`
 
-Whenever the update gate $\mathbf{Z}_t$ is close to $1$, we simply retain the old state. In this case the information from $\mathbf{X}_t$ is essentially ignored, effectively skipping time step $t$ in the dependency chain. In contrast, whenever $\mathbf{Z}_t$ is close to $0$, the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. These designs can help us cope with the vanishing gradient problem in RNNs and better capture dependencies for time series with large time step distances. In summary, GRUs have the following two distinguishing features:
 
-* Reset gates help capture short-term dependencies in time series.
-* Update gates help capture long-term dependencies in time series.
+In summary, GRUs have the following two distinguishing features:
+
+* Reset gates help capture short-term dependencies in sequences.
+* Update gates help capture long-term dependencies in sequences.
 
 ## Implementation from Scratch
 
