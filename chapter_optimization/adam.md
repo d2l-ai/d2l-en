@@ -210,7 +210,7 @@ d2l.train_ch11(yogi, init_adam_states(feature_dim),
 ## Summary
 
 * Adam combines features of many optimization algorithms into a fairly robust update rule. 
-* Created on the basis of RMSProp, Adam also uses EWMA on the minibatch stochastic gradient
+* Created on the basis of RMSProp, Adam also uses EWMA on the minibatch stochastic gradient.
 * Adam uses bias correction to adjust for a slow startup when estimating momentum and a second moment. 
 * For gradients with significant variance we may encounter issues with convergence. They can be amended by using larger minibatches or by switching to an improved estimate for $\mathbf{s}_t$. Yogi offers such an alternative. 
 
