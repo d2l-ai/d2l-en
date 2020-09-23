@@ -154,11 +154,7 @@ In summary, GRUs have the following two distinguishing features:
 
 ## Implementation from Scratch
 
-To gain a better understanding of the model, let us implement a GRU from scratch.
-
-### Reading the Dataset
-
-We begin by reading *The Time Machine* corpus that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below:
+To gain a better understanding of the GRU model, let us implement it from scratch. We begin by reading the time machine dataset that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -182,7 +178,11 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 
 ### Initializing Model Parameters
 
-The next step is to initialize the model parameters. We draw the weights from a Gaussian with standard deviation to be $0.01$ and set the bias to $0$. The hyperparameter `num_hiddens` defines the number of hidden units. We instantiate all weights and biases relating to the update gate, the reset gate, and the candidate hidden state itself. Subsequently, we attach gradients to all the parameters.
+The next step is to initialize the model parameters.
+We draw the weights from a Gaussian distribution
+with standard deviation to be 0.01 and set the bias to 0. The hyperparameter `num_hiddens` defines the number of hidden units.
+We instantiate all weights and biases relating to the update gate, the reset gate, the candidate hidden state,
+and the output layer.
 
 ```{.python .input}
 def get_params(vocab_size, num_hiddens, device):
@@ -250,7 +250,8 @@ def init_gru_state(batch_size, num_hiddens, device):
     return (torch.zeros((batch_size, num_hiddens), device=device), )
 ```
 
-Now we are ready to define the GRU model. Its structure is the same as the basic RNN cell, except that the update equations are more complex.
+Now we are ready to define the GRU model.
+Its structure is the same as that of the basic RNN cell, except that the update equations are more complex.
 
 ```{.python .input}
 def gru(inputs, state, params):
@@ -285,7 +286,11 @@ def gru(inputs, state, params):
 
 ### Training and Prediction
 
-Training and prediction work in exactly the same manner as before. After training for one epoch, the perplexity and the output sentence will be like the following.
+Training and prediction work in exactly the same manner as in :numref:`sec_rnn_scratch`.
+After training, 
+we print out the perplexity on the training set
+and the predicted sequence following
+the provided prefixes "time traveller" and "traveller", respectively.
 
 ```{.python .input}
 #@tab all
