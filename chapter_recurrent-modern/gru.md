@@ -130,7 +130,7 @@ This leads to the final update equation for the GRU:
 $$\mathbf{H}_t = \mathbf{Z}_t \odot \mathbf{H}_{t-1}  + (1 - \mathbf{Z}_t) \odot \tilde{\mathbf{H}}_t.$$
 
 
-Whenever the update gate $\mathbf{Z}_t$ is close to $1$, we simply retain the old state. In this case the information from $\mathbf{X}_t$ is essentially ignored, effectively skipping time step $t$ in the dependency chain. In contrast, whenever $\mathbf{Z}_t$ is close to $0$, the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. These designs can help us cope with the vanishing gradient problem in RNNs and better capture dependencies for time series with large time step distances. 
+Whenever the update gate $\mathbf{Z}_t$ is close to $1$, we simply retain the old state. In this case the information from $\mathbf{X}_t$ is essentially ignored, effectively skipping time step $t$ in the dependency chain. In contrast, whenever $\mathbf{Z}_t$ is close to $0$, the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. These designs can help us cope with the vanishing gradient problem in RNNs and better capture dependencies for sequences with large time step distances. 
 For instance,
 if the update gate has been close to 1
 for all the time steps of an entire subsequence,
@@ -303,7 +303,11 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 
 ## Concise Implementation
 
-In Gluon, we can directly call the `GRU` class in the `rnn` module. This encapsulates all the configuration detail that we made explicit above. The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out in detail before.
+In high-level APIs,
+we can directly 
+instantiate a GPU model.
+This encapsulates all the configuration detail that we made explicit above.
+The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out before.
 
 ```{.python .input}
 gru_layer = rnn.GRU(num_hiddens)
@@ -322,18 +326,19 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 
 ## Summary
 
-* Gated recurrent neural networks are better at capturing dependencies for time series with large time step distances.
-* Reset gates help capture short-term dependencies in time series.
-* Update gates help capture long-term dependencies in time series.
-* GRUs contain basic RNNs as their extreme case whenever the reset gate is switched on. They can ignore sequences as needed.
+* Gated RNNs can better capture dependencies for sequences with large time step distances. 
+* Reset gates help capture short-term dependencies in sequences.
+* Update gates help capture long-term dependencies in sequences.
+* GRUs contain basic RNNs as their extreme case whenever the reset gate is switched on. They can also skip subsequences by turning on the update gate.
 
 
 ## Exercises
 
+1. Assume that we only want to use the input at time step $t'$ to predict the output at time step $t > t'$. What are the best values for the reset and update gates for each time step?
+1. Adjust the hyperparameters and analyze the their influence on running time, perplexity, and the output sequence.
 1. Compare runtime, perplexity, and the output strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
-1. Assume that we only want to use the input for time step $t'$ to predict the output at time step $t > t'$. What are the best values for the reset and update gates for each time step?
-1. Adjust the hyperparameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
-1. What happens if you implement only parts of a GRU? That is, implement a recurrent cell that only has a reset gate. Likewise, implement a recurrent cell only with an update gate.
+1. What happens if you implement only parts of a GRU, e.g., with only a reset gate or only an update gate? 
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/342)
