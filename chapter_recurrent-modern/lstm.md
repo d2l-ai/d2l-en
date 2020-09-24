@@ -4,9 +4,7 @@
 The challenge to address long-term information preservation and short-term input
 skipping in latent variable models has existed for a long time. One of the
 earliest approaches to address this was the 
-long short-term memory (LSTM)
-:cite:`Hochreiter.Schmidhuber.1997`.  
-It shares many of the properties of the
+long short-term memory (LSTM) :cite:`Hochreiter.Schmidhuber.1997`. It shares many of the properties of the
 GRU.
 Interestingly, LSTMs have a slightly more complex 
 design than GRUs but predates GRUs by almost two decades.
