@@ -1,34 +1,65 @@
-# Long Short Term Memory (LSTM)
+# Long Short-Term Memory (LSTM)
 :label:`sec_lstm`
 
 The challenge to address long-term information preservation and short-term input
 skipping in latent variable models has existed for a long time. One of the
-earliest approaches to address this was the LSTM
-:cite:`Hochreiter.Schmidhuber.1997`.  It shares many of the properties of the
-Gated Recurrent Unit (GRU). Interestingly, LSTM's design is slightly more complex than GRU but predates GRU by almost two decades.
+earliest approaches to address this was the 
+long short-term memory (LSTM)
+:cite:`Hochreiter.Schmidhuber.1997`.  
+It shares many of the properties of the
+GRU.
+Interestingly, LSTMs have a slightly more complex 
+design than GRUs but predates GRUs by almost two decades.
 
-Arguably it is inspired by logic gates of a computer. To control a memory cell
-we need a number of gates. One gate is needed to read out the entries from the
-cell (as opposed to reading any other cell). We will refer to this as the
-*output* gate. A second gate is needed to decide when to read data into the
-cell. We refer to this as the *input* gate. Last, we need a mechanism to reset
-the contents of the cell, governed by a *forget* gate. The motivation for such a
-design is the same as before, namely to be able to decide when to remember and
-when to ignore inputs in the latent state via a dedicated mechanism. Let us see
+
+
+## Gated Memory Cell
+
+Arguably LSTM's design is inspired
+by logic gates of a computer.
+LSTM introduces a *memory cell*
+that has the same shape as the hidden state
+(some literatures consider the memory cell
+as a special type of the hidden state),
+engineered to record additional information.
+To control the memory cell
+we need a number of gates.
+One gate is needed to read out the entries from the
+cell.
+We will refer to this as the
+*output gate*.
+A second gate is needed to decide when to read data into the
+cell.
+We refer to this as the *input gate*.
+Last, we need a mechanism to reset
+the content of the cell, governed by a *forget gate*.
+The motivation for such a
+design is the same as that of GRUs,
+namely to be able to decide when to remember and
+when to ignore inputs in the hidden state via a dedicated mechanism. Let us see
 how this works in practice.
 
-## Gated Memory Cells
 
-Three gates are introduced in LSTMs: the input gate, the forget gate, and the output gate. In addition to that we will introduce the memory cell that has the same shape as the hidden state. Strictly speaking this is just a fancy version of a hidden state, engineered to record additional information.
+### Input Gate, Forget Gate, and Output Gate
 
-### Input Gates, Forget Gates, and Output Gates
+Just like in GRUs, 
+the data feeding into the LSTM gates are
+the input at the current time step and
+the hidden state of the previous time step,
+as illustrated in :numref:`lstm_0`. 
+They are processed by
+three fully-connected layers with a sigmoid activation function to compute the values of 
+the input, forget. and output gates.
+As a result, values of the three gates
+are in the range of $(0, 1)$. 
 
-Just like with GRUs, the data feeding into the LSTM gates is the input at the current time step $\mathbf{X}_t$ and the hidden state of the previous time step $\mathbf{H}_{t-1}$. These inputs are processed by a fully connected layer and a sigmoid activation function to compute the values of input, forget and output gates. As a result, the three gates' all output values are in the range of $[0, 1]$. :numref:`lstm_0` illustrates the data flow for the input, forget, and output gates.
-
-![Calculation of input, forget, and output gates in an LSTM. ](../img/lstm_0.svg)
+![Computing the input gate, the forget gate, and the output gate in an LSTM model.](../img/lstm_0.svg)
 :label:`lstm_0`
 
-We assume that there are $h$ hidden units, the minibatch is of size $n$, and number of inputs is $d$. Thus, the input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ and the hidden state of the last time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. Correspondingly, the gates are defined as follows: the input gate is $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, the forget gate is $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, and the output gate is $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. They are calculated as follows:
+Mathematically,
+suppose that there are $h$ hidden units, the batch size is $n$, and the number of inputs is $d$.
+Thus, the input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ and the hidden state of the previous time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. Correspondingly, the gates at time step $t$
+are defined as follows: the input gate is $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, the forget gate is $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, and the output gate is $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. They are calculated as follows:
 
 $$
 \begin{aligned}
@@ -41,6 +72,9 @@ $$
 where $\mathbf{W}_{xi}, \mathbf{W}_{xf}, \mathbf{W}_{xo} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hi}, \mathbf{W}_{hf}, \mathbf{W}_{ho} \in \mathbb{R}^{h \times h}$ are weight parameters and $\mathbf{b}_i, \mathbf{b}_f, \mathbf{b}_o \in \mathbb{R}^{1 \times h}$ are bias parameters.
 
 
+
+
+
 ### Candidate Memory Cell
 
 Next we design the memory cell. Since we have not specified the action of the various gates yet, we first introduce the *candidate* memory cell $\tilde{\mathbf{C}}_t \in \mathbb{R}^{n \times h}$. Its computation is similar to the three gates described above, but using a $\tanh$ function with a value range for $[-1, 1]$ as the activation function. This leads to the following equation at time step $t$.
@@ -51,7 +85,7 @@ Here $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hc} \in \mat
 
 A quick illustration of the candidate memory cell is shown in :numref:`lstm_1`.
 
-![Computation of candidate memory cells in LSTM. ](../img/lstm_1.svg)
+![Computing the candidate memory cell in an LSTM model.](../img/lstm_1.svg)
 :label:`lstm_1`
 
 
@@ -63,18 +97,18 @@ $$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde
 
 If the forget gate is always approximately $1$ and the input gate is always approximately $0$, the past memory cells $\mathbf{C}_{t-1}$ will be saved over time and passed to the current time step. This design was introduced to alleviate the vanishing gradient problem and to better capture dependencies for time series with long range dependencies. We thus arrive at the flow diagram in :numref:`lstm_2`.
 
-![Computation of memory cells in an LSTM. Here, the multiplication is carried out elementwise. ](../img/lstm_2.svg)
+![Computing the memory cell in an LSTM model.](../img/lstm_2.svg)
 
 :label:`lstm_2`
 
 
-### Hidden States
+### Hidden State
 
 Last, we need to define how to compute the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$. This is where the output gate comes into play. In LSTM it is simply a gated version of the $\tanh$ of the memory cell. This ensures that the values of $\mathbf{H}_t$ are always in the interval $(-1, 1)$. Whenever the output gate is $1$ we effectively pass all memory information through to the predictor, whereas for output $0$ we retain all the information only within the memory cell and perform no further processing. :numref:`lstm_3` has a graphical illustration of the data flow.
 
 $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
-![Computation of the hidden state. Multiplication is elementwise. ](../img/lstm_3.svg)
+![Computing the hidden state in an LSTM model.](../img/lstm_3.svg)
 :label:`lstm_3`
 
 

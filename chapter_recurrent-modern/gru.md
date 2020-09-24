@@ -35,7 +35,7 @@ variant that often offers comparable performance and is significantly faster to
 compute  :cite:`Chung.Gulcehre.Cho.ea.2014`. 
 Due to its simplicity, let us start with the GRU.
 
-## Gating the Hidden State
+## Gated Hidden State
 
 The key distinction between vanilla RNNs and GRUs
 is that the latter support gating of the hidden state.
@@ -53,18 +53,23 @@ We discuss this in detail below.
 ### Reset Gate and Update Gate
 
 The first thing we need to introduce are
-the *reset gate* and *update gate*.
-We engineer them to be vectors with entries in $(0, 1)$ such that we can perform convex combinations.
+the *reset gate* and the *update gate*.
+We engineer them to be vectors with entries in $(0, 1)$
+such that we can perform convex combinations.
 For instance,
 a reset gate would allow us to control how much of the previous state we might still want to remember.
 Likewise, an update gate would allow us to control how much of the new state is just a copy of the old state.
 
 We begin by engineering these gates.
-:numref:`fig_gru_1` illustrates the inputs for both reset and update gates in a GRU, given the input $\mathbf{X}_t$
+:numref:`fig_gru_1` illustrates the inputs for both 
+the reset and update gates in a GRU, given the input
 of the current time step
-and the hidden state of the previous time step $\mathbf{H}_{t-1}$. The output is given by a fully-connected layer with a sigmoid as its activation function.
+and the hidden state of the previous time step.
+The outputs of two gates
+are given by two fully-connected layers
+with a sigmoid activation function.
 
-![The reset gate and update gate in a GRU.](../img/gru_1.svg)
+![Computing the reset gate and the update gate in a GRU model.](../img/gru_1.svg)
 :label:`fig_gru_1`
 
 Mathematically,
@@ -103,7 +108,7 @@ are weight parameters,
 $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$
 is the bias,
 and the symbol $\odot$ is the Hadamard (elementwise) product operator.
-Here we use a nonlinearity in the form of $\tanh$ to ensure that the values in the candidate hidden state remain in the interval $(-1, 1)$.
+Here we use a nonlinearity in the form of tanh to ensure that the values in the candidate hidden state remain in the interval $(-1, 1)$.
 
 The result is a *candidate* since we still need to incorporate the action of the update gate.
 Comparing with :eqref:`rnn_h_with_state`,
@@ -117,7 +122,7 @@ For all entries of the reset gate $\mathbf{R}_t$ that are close to $0$, the cand
 
 :numref:`fig_gru_2` illustrates the computational flow after applying the reset gate.
 
-![Computing the candidate hidden state in a GRU.](../img/gru_2.svg)
+![Computing the candidate hidden state in a GRU model.](../img/gru_2.svg)
 :label:`fig_gru_2`
 
 
@@ -143,7 +148,7 @@ regardless of the length of the subsequence.
 
 :numref:`fig_gru_3` illustrates the computational flow after the update gate is in action.
 
-![Computing the hidden state in a GRU.](../img/gru_3.svg)
+![Computing the hidden state in a GRU model.](../img/gru_3.svg)
 :label:`fig_gru_3`
 
 
