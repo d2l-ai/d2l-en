@@ -725,7 +725,7 @@ def grad_clipping(grads, theta): #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater,  #@save
+def train_epoch_ch8(model, train_iter, loss, updater,   #@save
                     params, use_random_iter):
     """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
@@ -739,7 +739,7 @@ def train_epoch_ch8(model, train_iter, loss, updater,  #@save
             g.watch(params)
             y_hat, state= model(X, state, params)
             y = d2l.reshape(Y, (-1))
-            l = tf.math.reduce_mean(loss(y, y_hat)) 
+            l = loss(y, y_hat)
         grads = g.gradient(l, params)
         grads = grad_clipping(grads, 1)
         updater.apply_gradients(zip(grads, params))
@@ -752,14 +752,15 @@ def train_epoch_ch8(model, train_iter, loss, updater,  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
+def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
               use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
-    params = get_params(len(vocab), num_hiddens)
-    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    with strategy.scope():
+        params = get_params(len(vocab), num_hiddens)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        updater = tf.keras.optimizers.SGD(lr)
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
-    updater = tf.keras.optimizers.SGD(lr)
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
     # Train and predict
     for epoch in range(num_epochs):
