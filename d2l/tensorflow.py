@@ -676,7 +676,7 @@ def load_data_time_machine(batch_size, num_steps,  #@save
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def get_params(vocab_size, num_hidden):  #@save
+def get_params(vocab_size, num_hiddens):  #@save
     num_inputs = num_outputs = vocab_size
     
     def normal(shape):
