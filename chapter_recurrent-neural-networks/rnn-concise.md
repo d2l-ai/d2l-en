@@ -148,7 +148,7 @@ Y.shape, state_new.shape
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.random.uniform((num_steps, batch_size, vocab_size))
+X = tf.random.uniform((num_steps, batch_size, len(vocab)))
 Y, state_new = rnn_layer(X, state)
 Y.shape, len(state_new), state_new[0].shape
 ```
