@@ -4,7 +4,7 @@
 In :numref:`sec_linear-algebra`, we encountered the basics of linear algebra
 and saw how it could be used to express common operations for transforming our data.
 Linear algebra is one of the key mathematical pillars
-underlying much of the work that we do deep learning 
+underlying much of the work that we do in deep learning 
 and in machine learning more broadly.
 While :numref:`sec_linear-algebra` contained enough machinery
 to communicate the mechanics of modern deep learning models, 
