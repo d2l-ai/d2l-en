@@ -100,7 +100,7 @@ state.shape
 
 ```{.python .input}
 #@tab tensorflow
-state = cell.get_initial_state(batch_size=batch_size, dtype=tf.float32)
+state = rnn_cell.get_initial_state(batch_size=batch_size, dtype=tf.float32)
 state.shape
 ```
 
