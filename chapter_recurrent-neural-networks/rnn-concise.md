@@ -229,7 +229,7 @@ class RNNModel(nn.Module):
 ```{.python .input}
 #@tab tensorflow
 #@save
-class RNNModel(keras.layers.Layer):
+class RNNModel(tf.keras.layers.Layer):
     def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
         self.rnn = rnn_layer
