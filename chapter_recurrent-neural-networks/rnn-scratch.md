@@ -160,7 +160,7 @@ def get_params(vocab_size, num_hiddens, device):
 
 ```{.python .input}
 #@tab tensorflow
-def get_params(vocab_size, num_hidden):
+def get_params(vocab_size, num_hidden):  #@save
     num_inputs = num_outputs = vocab_size
     
     def normal(shape):
