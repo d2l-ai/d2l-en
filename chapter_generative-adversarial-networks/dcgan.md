@@ -366,11 +366,11 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
 #@tab pytorch
 def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gpu()):
     loss = nn.BCEWithLogitsLoss(reduction='sum')
+    net_D, net_G = net_D.to(device), net_G.to(device)
     for w in net_D.parameters():
         nn.init.normal_(w, 0, 0.02)
     for w in net_G.parameters():
         nn.init.normal_(w, 0, 0.02)
-    net_D, net_G = net_D.to(device), net_G.to(device)
     trainer_hp = {'lr': lr, 'betas': [0.5,0.999]}
     trainer_D = torch.optim.Adam(net_D.parameters(), **trainer_hp)
     trainer_G = torch.optim.Adam(net_G.parameters(), **trainer_hp)
