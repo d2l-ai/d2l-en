@@ -41,6 +41,8 @@ The model can be learned with BPR or Hinge loss. The architecture of Caser is sh
 
 ![Illustration of the Caser Model](../img/rec-caser.svg)
 
+## Model Implementation
+
 We first import the required libraries.
 
 ```{.python .input  n=3}
@@ -53,7 +55,6 @@ import sys
 npx.set_np()
 ```
 
-## Model Implementation
 The following code implements the Caser model. It consists of a vertical convolutional layer, a horizontal convolutional layer, and a full-connected layer.
 
 ```{.python .input  n=4}
