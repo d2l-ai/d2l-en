@@ -429,7 +429,7 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
    activation, and convolution" structure. Make this improvement
    yourself. See Figure 1 in :cite:`He.Zhang.Ren.ea.2016*1`
    for details.
-1. Why cannot we just increase the complexity of functions without bound, even if the function classes are nested?
+1. Why can't we just increase the complexity of functions without bound, even if the function classes are nested?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/85)
