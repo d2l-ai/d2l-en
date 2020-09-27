@@ -341,8 +341,8 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
         for X, _ in data_iter:
             batch_size = X.shape[0]
-            Z = np.random.normal(0, 1, size=(batch_size, latent_dim, 1, 1))
-            X, Z = X.as_in_ctx(device), Z.as_in_ctx(device),
+            Z = np.random.normal(0, 1, size=(batch_size, latent_dim, 1, 1), ctx=device)
+            X = X.as_in_ctx(device)
             metric.add(d2l.update_D(X, Z, net_D, net_G, loss, trainer_D),
                        d2l.update_G(Z, net_D, net_G, loss, trainer_G),
                        batch_size)
@@ -384,8 +384,8 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gp
         metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
         for X, _ in data_iter:
             batch_size = X.shape[0]
-            Z = torch.normal(0, 1, size=(batch_size, latent_dim, 1, 1))
-            X, Z = X.to(device), Z.to(device)
+            Z = torch.normal(0, 1, size=(batch_size, latent_dim, 1, 1), device=device)
+            X = X.to(device)
             metric.add(d2l.update_D(X, Z, net_D, net_G, loss, trainer_D),
                        d2l.update_G(Z, net_D, net_G, loss, trainer_G),
                        batch_size)
