@@ -242,7 +242,7 @@ class RNNModel(tf.keras.layers.Layer):
         output = self.dense(tf.reshape(Y, (-1, Y.shape[-1])))
         return output, state
 
-    def get_initial_state(self, *args, **kwargs):
+    def begin_state(self, *args, **kwargs):
         return self.rnn.cell.get_initial_state(*args, **kwargs)
 ```
 
