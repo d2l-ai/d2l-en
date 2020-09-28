@@ -713,7 +713,7 @@ class RNNModelScratch: #@save
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def predict_ch8(prefix, num_preds, model, vocab, params):  #@save
     """Generate new characters following the `prefix`."""
-    state = model.begin_state(batch_size=1)
+    state = model.begin_state(batch_size=1, dtype=tf.float32)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
     for y in prefix[1:]:  # Warm-up period
