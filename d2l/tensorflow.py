@@ -717,10 +717,10 @@ def predict_ch8(prefix, num_preds, model, vocab, params):  #@save
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
     for y in prefix[1:]:  # Warm-up period
-        _, state = model(get_input(), state, params)
+        _, state, _ = model(get_input(), state, params)
         outputs.append(vocab[y])
     for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = model(get_input(), state, params)
+        y, state, _ = model(get_input(), state, params)
         outputs.append(int(y.numpy().argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
