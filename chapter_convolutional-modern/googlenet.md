@@ -151,12 +151,12 @@ class Inception(tf.keras.Model):
 
 To gain some intuition for why this network works so well,
 consider the combination of the filters.
-They explore the image in varying ranges.
+They explore the image in a variety of filter sizes.
 This means that details at different extents
 can be recognized efficiently by different filters.
 At the same time, we can allocate different amounts of parameters
-for different ranges (e.g., more for short range
-but not ignore the long range entirely).
+for different filter sizes (e.g., more for smaller filters
+but not ignore the large filters entirely).
 
 
 ## GoogLeNet Model
@@ -424,7 +424,7 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
       :numref:`sec_resnet`.
 1. What is the minimum image size for GoogLeNet to work?
 1. Compare the model parameter sizes of AlexNet, VGG, and NiN with GoogLeNet. How do the latter two network architectures significantly reduce the model parameter size?
-1. Why do we need a long range convolution initially?
+1. Why do we need a large size convolutional filter initially?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/81)
