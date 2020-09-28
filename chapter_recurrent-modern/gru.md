@@ -117,8 +117,8 @@ can be reduced with the
 elementwise multiplication of
 $\mathbf{R}_t$ and $\mathbf{H}_{t-1}$
 in :eqref:`gru_tilde_H`.
-Whenever the entries in the reset gate $\mathbf{R}_t$ are close to $1$, we recover a vanilla RNN such as in :eqref:`rnn_h_with_state`.
-For all entries of the reset gate $\mathbf{R}_t$ that are close to $0$, the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as the input. Any pre-existing hidden state is thus *reset* to defaults. 
+Whenever the entries in the reset gate $\mathbf{R}_t$ are close to 1, we recover a vanilla RNN such as in :eqref:`rnn_h_with_state`.
+For all entries of the reset gate $\mathbf{R}_t$ that are close to 0, the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as the input. Any pre-existing hidden state is thus *reset* to defaults. 
 
 :numref:`fig_gru_2` illustrates the computational flow after applying the reset gate.
 
@@ -135,7 +135,7 @@ This leads to the final update equation for the GRU:
 $$\mathbf{H}_t = \mathbf{Z}_t \odot \mathbf{H}_{t-1}  + (1 - \mathbf{Z}_t) \odot \tilde{\mathbf{H}}_t.$$
 
 
-Whenever the update gate $\mathbf{Z}_t$ is close to $1$, we simply retain the old state. In this case the information from $\mathbf{X}_t$ is essentially ignored, effectively skipping time step $t$ in the dependency chain. In contrast, whenever $\mathbf{Z}_t$ is close to $0$, the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. These designs can help us cope with the vanishing gradient problem in RNNs and better capture dependencies for sequences with large time step distances. 
+Whenever the update gate $\mathbf{Z}_t$ is close to 1, we simply retain the old state. In this case the information from $\mathbf{X}_t$ is essentially ignored, effectively skipping time step $t$ in the dependency chain. In contrast, whenever $\mathbf{Z}_t$ is close to 0, the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. These designs can help us cope with the vanishing gradient problem in RNNs and better capture dependencies for sequences with large time step distances. 
 For instance,
 if the update gate has been close to 1
 for all the time steps of an entire subsequence,
@@ -201,9 +201,9 @@ def get_params(vocab_size, num_hiddens, device):
                 normal((num_hiddens, num_hiddens)),
                 np.zeros(num_hiddens, ctx=device))
 
-    W_xz, W_hz, b_z = three()  # Update gate parameter
-    W_xr, W_hr, b_r = three()  # Reset gate parameter
-    W_xh, W_hh, b_h = three()  # Candidate hidden state parameter
+    W_xz, W_hz, b_z = three()  # Update gate parameters
+    W_xr, W_hr, b_r = three()  # Reset gate parameters
+    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters
     # Output layer parameters
     W_hq = normal((num_hiddens, num_outputs))
     b_q = np.zeros(num_outputs, ctx=device)
@@ -227,9 +227,9 @@ def get_params(vocab_size, num_hiddens, device):
                 normal((num_hiddens, num_hiddens)),
                 d2l.zeros(num_hiddens, device=device))
 
-    W_xz, W_hz, b_z = three()  # Update gate parameter
-    W_xr, W_hr, b_r = three()  # Reset gate parameter
-    W_xh, W_hh, b_h = three()  # Candidate hidden state parameter
+    W_xz, W_hz, b_z = three()  # Update gate parameters
+    W_xr, W_hr, b_r = three()  # Reset gate parameters
+    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters
     # Output layer parameters
     W_hq = normal((num_hiddens, num_outputs))
     b_q = d2l.zeros(num_outputs, device=device)
