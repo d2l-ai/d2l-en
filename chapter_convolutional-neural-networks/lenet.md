@@ -440,7 +440,7 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr)
     1. Adjust the number of fully connected layers.
     1. Adjust the learning rates and other training details (e.g., initialization and number of epochs.)
 1. Try out the improved network on the original MNIST dataset.
-1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters and coats).
+1. Display the features after the first and second convolution layers of LeNet for different inputs (e.g., sweaters and coats).
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/73)
