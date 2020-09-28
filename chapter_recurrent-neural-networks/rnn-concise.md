@@ -236,11 +236,11 @@ class RNNModel(tf.keras.layers.Layer):
         self.vocab_size = vocab_size
         self.dense = tf.keras.layers.Dense(vocab_size)
 
-    def call(self, inputs, state):
+    def call(self, inputs, state, _):
         X = tf.one_hot(tf.transpose(inputs), self.vocab_size)
         Y,state = self.rnn(X, state)
         output = self.dense(tf.reshape(Y, (-1, Y.shape[-1])))
-        return output, state
+        return output, state, _
 
     def begin_state(self, *args, **kwargs):
         return self.rnn.cell.get_initial_state(*args, **kwargs)
