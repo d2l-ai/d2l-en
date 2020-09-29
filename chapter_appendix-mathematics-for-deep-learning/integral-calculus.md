@@ -227,7 +227,7 @@ $$
 $$
 
 This is the *fundamental theorem of calculus*.  We may write it in expanded form as
-$$\frac{d}{dx}\int_{-\infty}^x f(y) \; dy = f(x).$$
+$$\frac{d}{dx}\int_0^x f(y) \; dy = f(x).$$
 :eqlabel:`eq_ftc`
 
 It takes the concept of finding areas (*a priori* rather hard), and reduces it to a statement derivatives (something much more completely understood).  One last comment that we must make is that this does not tell us exactly what $F(x)$ is.  Indeed $F(x) + C$ for any $C$ has the same derivative.  This is a fact-of-life in the theory of integration.  Thankfully, notice that when working with definite integrals, the constants drop out, and thus are irrelevant to the outcome.
