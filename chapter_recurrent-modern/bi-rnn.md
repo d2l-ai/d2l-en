@@ -1,20 +1,19 @@
 # Bidirectional Recurrent Neural Networks
 :label:`sec_bi_rnn`
 
+In sequence learning,
+so far we assumed that our goal is to model the next output given what we have seen so far, e.g., in the context of a time series or in the context of a language model. While this is a typical scenario, it is not the only one we might encounter. To illustrate the issue, consider the following three tasks of filling in the blank in a text sequence:
 
-So far we assumed that our goal is to model the next token given what we have seen so far, e.g., in the context of a time series or in the context of a language model. While this is a typical scenario, it is not the only one we might encounter. To illustrate the issue, consider the following three tasks of filling in the blanks in a text:
+* I am `___`.
+* I am `___` hungry.
+* I am `___` hungry, and I can eat half a pig.
 
-* I am `___`
-* I am `___` very hungry.
-* I am `___` very hungry, I could eat half a pig.
-
-Depending on the amount of information available, we might fill the blanks with very different words such as "happy", "not", and "very".
+Depending on the amount of information available, we might fill in the blanks with very different words such as "happy", "not", and "very".
 Clearly the end of the phrase (if available) conveys significant information about which word to pick.
 A sequence model that is incapable of taking advantage of this will perform poorly on related tasks.
 For instance, to do well in named entity recognition (e.g., to recognize whether "Green" refers to "Mr. Green" or to the color)
 longer-range context is equally vital.
 To get some inspiration for addressing the problem let us take a detour to graphical models.
-
 
 ## Dynamic Programming
 
