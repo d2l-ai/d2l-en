@@ -42,6 +42,7 @@ in $P(x_j \mid x_{-j})$,
 we consider summing over
 all the possible combinations of choices for $h_1, \ldots, h_T$.
 In case any $h_i$ can take on $k$ distinct values (a finite number of states), this means that we need to sum over $k^T$ terms---usually mission impossible! Fortunately there is an elegant solution for this: *dynamic programming*.
+
 To see how it works,
 consider summing over latent variables
 $h_1, \ldots, h_T$ in turn.
@@ -66,7 +67,9 @@ $$\pi_{t+1}(h_{t+1}) = \sum_{h_t} \pi_t(h_t) P(x_t \mid h_t) P(h_{t+1} \mid h_t)
 
 The recursion is initialized as $\pi_1(h_1) = P(h_1)$. In abstract terms this can be written as $\pi_{t+1} = f(\pi_t, x_t)$, where $f$ is some learnable function. This looks very much like the update equation in the latent variable models we discussed so far in the context of RNNs! 
 
-Entirely analogously to the forward recursion, we can also start a backward recursion. This yields:
+Entirely analogously to the forward recursion,
+we can also 
+sum over the same set of latent variables with a backward recursion. This yields:
 
 $$\begin{aligned}
     & P(x_1, \ldots, x_T) \\
@@ -81,17 +84,22 @@ $$\begin{aligned}
 \end{aligned}$$
 
 
-
-
 We can thus write the *backward recursion* as
 
 $$\rho_{t-1}(h_{t-1})= \sum_{h_{t}} P(h_{t} \mid h_{t-1}) P(x_{t} \mid h_{t}) \rho_{t}(h_{t}),$$
 
-with initialization $\rho_T(h_T) = 1$. These two recursions allow us to sum over $T$ variables in $\mathcal{O}(kT)$ (linear) time over all values of $(h_1, \ldots, h_T)$ rather than in exponential time. This is one of the great benefits of the probabilistic inference with graphical models. It is a very special instance of the :cite:`Aji.McEliece.2000` proposed in 2000 by Aji and McEliece. Combining both forward and backward pass, we are able to compute
+with initialization $\rho_T(h_T) = 1$. 
+Both the forward and backward recursions allow us to sum over $T$ latent variables in $\mathcal{O}(kT)$ (linear) time over all values of $(h_1, \ldots, h_T)$ rather than in exponential time.
+This is one of the great benefits of the probabilistic inference with graphical models.
+It is 
+also a very special instance of 
+a general message passing algorithm :cite:`Aji.McEliece.2000`.
+Combining both forward and backward recursions, we are able to compute
 
 $$P(x_j \mid x_{-j}) \propto \sum_{h_j} \pi_j(h_j) \rho_j(h_j) P(x_j \mid h_j).$$
 
-Note that in abstract terms the backward recursion can be written as $\rho_{t-1} = g(\rho_t, x_t)$, where $g$ is a learnable function. Again, this looks very much like an update equation, just running backwards unlike what we have seen so far in RNNs. Indeed, hidden Markov models benefit from knowing future data when it is available. Signal processing scientists distinguish between the two cases of knowing and not knowing future observations as interpolation v.s. extrapolation. See the introductory chapter of the book by :cite:`Doucet.De-Freitas.Gordon.2001` on sequential Monte Carlo algorithms for more details.
+Note that in abstract terms the backward recursion can be written as $\rho_{t-1} = g(\rho_t, x_t)$, where $g$ is a learnable function. Again, this looks very much like an update equation, just running backwards unlike what we have seen so far in RNNs. Indeed, hidden Markov models benefit from knowing future data when it is available. Signal processing scientists distinguish between the two cases of knowing and not knowing future observations as interpolation v.s. extrapolation.
+See the introductory chapter of the book on sequential Monte Carlo algorithms for more details :cite:`Doucet.De-Freitas.Gordon.2001`.
 
 
 ## Bidirectional Model
