@@ -33,8 +33,8 @@ Our following discussion focuses primarily on
 the vanilla RNN model,
 but it applies to other sequence models, too.
 
-Suppose that we have a minibatch
-$\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$) at time step $t$.
+Suppose that we have a minibatch input
+$\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs in each example: $d$) at time step $t$.
 At the same time step,
 let
 the hidden state of the $l^\mathrm{th}$ hidden layer  ($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)}  \in \mathbb{R}^{n \times h}$ (number of hidden units: $h$)
