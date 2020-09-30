@@ -167,7 +167,7 @@ class SeqDataset(gluon.data.Dataset):
 Afterwards, we read and split the MovieLens 100K dataset in sequence-aware mode and load the training data with sequential dataloader implemented above.
 
 ```{.python .input  n=6}
-TARGET_NUM, L, batch_size = 1, 3, 4096
+TARGET_NUM, L, batch_size = 1, 5, 4096
 df, num_users, num_items = d2l.read_data_ml100k()
 train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items,
                                               'seq-aware')
