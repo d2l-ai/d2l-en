@@ -18,7 +18,7 @@ To get some inspiration for addressing the problem let us take a detour to proba
 
 ## Dynamic Programming in Hidden Markov Models
 
-This section serves to illustrate the dynamic programming problem. The specific technical details do not matter for understanding the deep learning models
+This subsection serves to illustrate the dynamic programming problem. The specific technical details do not matter for understanding the deep learning models
 but they help in motivating why one might use deep learning and why one might pick specific architectures.
 
 If we want to solve the problem using probabilistic graphical models we could for instance design a latent variable model as follows.
@@ -30,38 +30,54 @@ Moreover, any transition $h_t \to h_{t+1}$ is given by some state transition pro
 :label:`fig_hmm`
 
 Thus,
-for a sequence of $T$ observations we have the following joint probability distribution over observed and hidden states:
+for a sequence of $T$ observations we have the following joint probability distribution over the observed and hidden states:
 
-$$P(x, h) = \prod_{t=1}^T P(h_t \mid h_{t-1}) P(x_t \mid h_t), \text{ where } P(h_1 \mid h_0) = P(h_1).$$
+$$P(x_1, \ldots, x_T, h_1, \ldots, h_T) = \prod_{t=1}^T P(h_t \mid h_{t-1}) P(x_t \mid h_t), \text{ where } P(h_1 \mid h_0) = P(h_1).$$
+:eqlabel:`eq_hmm_jointP`
 
-Now assume that we observe all $x_i$ with the exception of some $x_j$ and it is our goal to compute $P(x_j \mid x^{-j})$. To accomplish this we need to sum over all possible choices of $h = (h_1, \ldots, h_T)$. In case $h_i$ can take on $k$ distinct values, this means that we need to sum over $k^T$ terms---mission impossible! Fortunately there is an elegant solution for this: dynamic programming. To see how it works, consider summing over the first two hidden variable $h_1$ and $h_2$. This yields:
+
+Now assume that we observe all $x_i$ with the exception of some $x_j$ and it is our goal to compute $P(x_j \mid x_{-j})$, where $x_{-j} = (x_1, \ldots, x_{j-1}, x_{j+1}, \ldots, x_{T})$.
+Since there is no latent variable
+in $P(x_j \mid x_{-j})$,
+we consider summing over
+all the possible combinations of choices for $h_1, \ldots, h_T$.
+In case any $h_i$ can take on $k$ distinct values (a finite number of states), this means that we need to sum over $k^T$ terms---usually mission impossible! Fortunately there is an elegant solution for this: *dynamic programming*.
+To see how it works,
+consider summing over latent variables
+$h_1, \ldots, h_T$ in turn.
+According to :eqref:`eq_hmm_jointP`,
+this yields:
 
 $$\begin{aligned}
-    P(x) & = \sum_{h_1, \ldots, h_T} P(x_1, \ldots, x_T; h_1, \ldots, h_T) \\
-    & = \sum_{h_1, \ldots, h_T} P(h_1) P(x_1 \mid h_1) \prod_{t=2}^T P(h_t \mid h_{t-1}) P(x_t \mid h_t) \\
-    & = \sum_{h_2, \ldots, h_T} \underbrace{\left[\sum_{h_1} P(h_1) P(x_1 \mid h_1) P(h_2 \mid h_1)\right]}_{=: \pi_2(h_2)}
+    &P(x_1, \ldots, x_T) \\
+    =& \sum_{h_1, \ldots, h_T} P(x_1, \ldots, x_T, h_1, \ldots, h_T) \\
+    =& \sum_{h_1, \ldots, h_T} \prod_{t=1}^T P(h_t \mid h_{t-1}) P(x_t \mid h_t) \\
+    =& \sum_{h_2, \ldots, h_T} \underbrace{\left[\sum_{h_1} P(h_1) P(x_1 \mid h_1) P(h_2 \mid h_1)\right]}_{\pi_2(h_2) \stackrel{\mathrm{def}}{=}}
     P(x_2 \mid h_2) \prod_{t=3}^T P(h_t \mid h_{t-1}) P(x_t \mid h_t) \\
-    & = \sum_{h_3, \ldots, h_T} \underbrace{\left[\sum_{h_2} \pi_2(h_2) P(x_2 \mid h_2) P(h_3 \mid h_2)\right]}_{=: \pi_3(h_3)}
+    =& \sum_{h_3, \ldots, h_T} \underbrace{\left[\sum_{h_2} \pi_2(h_2) P(x_2 \mid h_2) P(h_3 \mid h_2)\right]}_{\pi_3(h_3)\stackrel{\mathrm{def}}{=}}
     P(x_3 \mid h_3) \prod_{t=4}^T P(h_t \mid h_{t-1}) P(x_t \mid h_t)\\
-    & = \dots \\
-    & = \sum_{h_T} \pi_T(h_T) P(x_T \mid h_T).
+    =& \dots \\
+    =& \sum_{h_T} \pi_T(h_T) P(x_T \mid h_T).
 \end{aligned}$$
 
 In general we have the *forward recursion* as
 
 $$\pi_{t+1}(h_{t+1}) = \sum_{h_t} \pi_t(h_t) P(x_t \mid h_t) P(h_{t+1} \mid h_t).$$
 
-The recursion is initialized as $\pi_1(h_1) = P(h_1)$. In abstract terms this can be written as $\pi_{t+1} = f(\pi_t, x_t)$, where $f$ is some learnable function. This looks very much like the update equation in the hidden variable models we discussed so far in the context of RNNs. Entirely analogously to the forward recursion, we can also start a backward recursion. This yields:
+The recursion is initialized as $\pi_1(h_1) = P(h_1)$. In abstract terms this can be written as $\pi_{t+1} = f(\pi_t, x_t)$, where $f$ is some learnable function. This looks very much like the update equation in the latent variable models we discussed so far in the context of RNNs! 
+
+Entirely analogously to the forward recursion, we can also start a backward recursion. This yields:
 
 $$\begin{aligned}
-    P(x) & = \sum_{h_1, \ldots, h_T} P(x_1, \ldots, x_T; h_1, \ldots, h_T) \\
-    & = \sum_{h_1, \ldots, h_T} \prod_{t=1}^{T-1} P(h_t \mid h_{t-1}) P(x_t \mid h_t) \cdot P(h_T \mid h_{T-1}) P(x_T \mid h_T) \\
-    & = \sum_{h_1, \ldots, h_{T-1}} \prod_{t=1}^{T-1} P(h_t \mid h_{t-1}) P(x_t \mid h_t) \cdot
-    \underbrace{\left[\sum_{h_T} P(h_T \mid h_{T-1}) P(x_T \mid h_T)\right]}_{=: \rho_{T-1}(h_{T-1})} \\
-    & = \sum_{h_1, \ldots, h_{T-2}} \prod_{t=1}^{T-2} P(h_t \mid h_{t-1}) P(x_t \mid h_t) \cdot
-    \underbrace{\left[\sum_{h_{T-1}} P(h_{T-1} \mid h_{T-2}) P(x_{T-1} \mid h_{T-1}) \rho_{T-1}(h_{T-1}) \right]}_{=: \rho_{T-2}(h_{T-2})} \\
-    & = \ldots, \\
-    & = \sum_{h_1} P(h_1) P(x_1 \mid h_1)\rho_{1}(h_{1}).
+    & P(x_1, \ldots, x_T) \\
+     =& \sum_{h_1, \ldots, h_T} P(x_1, \ldots, x_T, h_1, \ldots, h_T) \\
+    =& \sum_{h_1, \ldots, h_T} \prod_{t=1}^{T-1} P(h_t \mid h_{t-1}) P(x_t \mid h_t) \cdot P(h_T \mid h_{T-1}) P(x_T \mid h_T) \\
+    =& \sum_{h_1, \ldots, h_{T-1}} \prod_{t=1}^{T-1} P(h_t \mid h_{t-1}) P(x_t \mid h_t) \cdot
+    \underbrace{\left[\sum_{h_T} P(h_T \mid h_{T-1}) P(x_T \mid h_T)\right]}_{\rho_{T-1}(h_{T-1})\stackrel{\mathrm{def}}{=}} \\
+    =& \sum_{h_1, \ldots, h_{T-2}} \prod_{t=1}^{T-2} P(h_t \mid h_{t-1}) P(x_t \mid h_t) \cdot
+    \underbrace{\left[\sum_{h_{T-1}} P(h_{T-1} \mid h_{T-2}) P(x_{T-1} \mid h_{T-1}) \rho_{T-1}(h_{T-1}) \right]}_{\rho_{T-2}(h_{T-2})\stackrel{\mathrm{def}}{=}} \\
+    =& \ldots \\
+    =& \sum_{h_1} P(h_1) P(x_1 \mid h_1)\rho_{1}(h_{1}).
 \end{aligned}$$
 
 
