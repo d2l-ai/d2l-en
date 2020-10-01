@@ -149,20 +149,32 @@ $$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq} + \mathbf{b}_q.$$
 
 Here, the weight matrix $\mathbf{W}_{hq} \in \mathbb{R}^{2h \times q}$ and the bias $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ are the model parameters of the output layer. In fact, the two directions can have different numbers of hidden units.
 
-
 ### Computational Cost and Applications
 
-One of the key features of a bidirectional RNN is that information from both ends of the sequence is used to estimate the output. That is, we use information from both future and past observations to predict the current one (a smoothing scenario). In the case of language models this is not quite what we want. After all, we do not have the luxury of knowing the next to next symbol when predicting the next one. Hence, if we were to use a bidirectional RNN naively we would not get a very good accuracy: during training we have past and future data to estimate the present. During test time we only have past data and thus poor accuracy (we will illustrate this in an experiment below).
+One of the key features of a bidirectional RNN is that information from both ends of the sequence is used to estimate the output. That is, we use information from both future and past observations to predict the current one. 
+In the case of next token prediction this is not quite what we want.
+After all, we do not have the luxury of knowing the next to next token when predicting the next one. Hence, if we were to use a bidirectional RNN naively we would not get a very good accuracy: during training we have past and future data to estimate the present. During test time we only have past data and thus poor accuracy. We will illustrate this in an experiment below.
 
-To add insult to injury, bidirectional RNNs are also exceedingly slow. The main reasons for this are that they require both a forward and a backward pass and that the backward pass is dependent on the outcomes of the forward propagation. Hence, gradients will have a very long dependency chain.
+To add insult to injury, bidirectional RNNs are also exceedingly slow.
+The main reasons for this are that 
+the forward propagation
+requires both forward and backward recursions
+in bidirectional layers
+and that the backpropagation is dependent on the outcomes of the forward propagation. Hence, gradients will have a very long dependency chain.
+
+In practice bidirectional layers are used very sparingly and only for a narrow set of applications, such as filling in missing words, annotating tokens (e.g., for named entity recognition), and encoding sequences wholesale as a step in a sequence processing pipeline (e.g., for machine translation).
+In :numref:`sec_bert` and :numref:`sec_sentiment_rnn`,
+we will introduce how to use bidirectional RNNs
+to encode text sequences.
 
 
-In practice bidirectional layers are used very sparingly and only for a narrow set of applications, such as filling in missing words, annotating tokens (e.g., for named entity recognition), or encoding sequences wholesale as a step in a sequence processing pipeline (e.g., for machine translation). In short, handle with care!
 
+## Training a Bidirectional RNN for a Wrong Application
 
-## Training a Bidirectional RNN for the Wrong Application
-
-If we were to ignore all advice regarding the fact that bidirectional LSTMs use past and future data and simply apply it to language models, we will get estimates with acceptable perplexity. Nonetheless, the ability of the model to predict future symbols is severely compromised as the example below illustrates. Despite reasonable perplexity, it only generates gibberish even after many iterations. We include the code below as a cautionary example against using them in the wrong context.
+If we were to ignore all advice regarding the fact that bidirectional RNNs use past and future data and simply apply it to language models, 
+we will get estimates with acceptable perplexity. Nonetheless, the ability of the model to predict future tokens is severely compromised as the experiment below illustrates. 
+Despite reasonable perplexity, it only generates gibberish even after many iterations.
+We include the code below as a cautionary example against using them in the wrong context.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -173,7 +185,7 @@ npx.set_np()
 # Load data
 batch_size, num_steps, device = 32, 35, d2l.try_gpu()
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
-# Define the model
+# Define the bidirectional LSTM model by setting `bidirectional=True`
 vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
 lstm_layer = rnn.LSTM(num_hiddens, num_layers, bidirectional=True)
 model = d2l.RNNModel(lstm_layer, len(vocab))
@@ -191,7 +203,7 @@ from torch import nn
 # Load data
 batch_size, num_steps, device = 32, 35, d2l.try_gpu()
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
-# Define the model
+# Define the bidirectional LSTM model by setting `bidirectional=True`
 vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
 num_inputs = vocab_size
 lstm_layer = nn.LSTM(num_inputs, num_hiddens, num_layers, bidirectional=True)
@@ -202,22 +214,25 @@ num_epochs, lr = 500, 1
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
-The output is clearly unsatisfactory for the reasons described above. For a
-discussion of more effective uses of bidirectional models, please see the sentiment
-classification in :numref:`sec_sentiment_rnn`.
+The output is clearly unsatisfactory for the reasons described above. 
+For a
+discussion of more effective uses of bidirectional RNNs, please see the sentiment
+analysis application 
+in :numref:`sec_sentiment_rnn`.
 
 ## Summary
 
-* In bidirectional recurrent neural networks, the hidden state for each time step is simultaneously determined by the data prior to and after the current time step.
-* Bidirectional RNNs bear a striking resemblance with the forward-backward algorithm in graphical models.
-* Bidirectional RNNs are mostly useful for sequence embedding and the estimation of observations given bidirectional context.
+* In bidirectional RNNs, the hidden state for each time step is simultaneously determined by the data prior to and after the current time step.
+* Bidirectional RNNs bear a striking resemblance with the forward-backward algorithm in probabilistic graphical models.
+* Bidirectional RNNs are mostly useful for sequence encoding and the estimation of observations given bidirectional context.
 * Bidirectional RNNs are very costly to train due to long gradient chains.
 
 ## Exercises
 
 1. If the different directions use a different number of hidden units, how will the shape of $\mathbf{H}_t$ change?
-1. Design a bidirectional recurrent neural network with multiple hidden layers.
-1. Implement a sequence classification algorithm using bidirectional RNNs. Hint: use the RNN to embed each word and then aggregate (average) all embedded outputs before sending the output into an MLP for classification. For instance, if we have $(\mathbf{o}_1, \mathbf{o}_2, \mathbf{o}_3)$, we compute $\bar{\mathbf{o}} = \frac{1}{3} \sum_i \mathbf{o}_i$ first and then use the latter for sentiment classification.
+1. Design a bidirectional RNN with multiple hidden layers.
+1. Polysemy is common in natural languages. For example, the word "bank" has different meanings in contexts “i went to the bank to deposit cash” and “i went to the bank to sit down”. How can we design a neural network model such that given a context sequence and a word, a vector representation of the word in the context will be returned? What type of neural architectures is preferred for handling polysemy?
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/339)
