@@ -253,7 +253,7 @@ depends on the current values of model parameters $\mathbf{W}^{(1)}$ and $\mathb
 They are given by the optimization algorithm according to backpropagation in the latest iteration.
 On the other hand,
 the gradient calculation for the parameter
-`eq_backprop-J-h` during backpropagation
+:eqref:`eq_backprop-J-h` during backpropagation
 depends on the current value of the hidden variable $\mathbf{h}$,
 which is given by forward propagation.
 
