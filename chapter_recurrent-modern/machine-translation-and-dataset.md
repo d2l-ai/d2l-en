@@ -1,9 +1,62 @@
 # Machine Translation and the Dataset
 :label:`sec_machine_translation`
 
-So far we have seen how to use RNNs for language models, in which we predict the next token given all previous tokens in an article. Now let us have a look at a different application, machine translation, whose predict output is no longer a single token, but a sequence of tokens. 
+We have used RNNs to design language models,
+which are key to natural language processing.
+Another flagship benchmark is *machine translation*,
+a central problem domain for *sequence transduction* models
+that transform input sequences into output sequences.
+Playing a crucial role in various modern artificial intelligence applications,
+sequence transduction models will form the focus of the remainder of this chapter
+and :numref:`chap_attention`.
+To this end,
+this section introduces the machine translation problem
+and its dataset that will be used later.
 
-Machine translation refers to the automatic translation of a segment of text from one language to another. Solving this problem with neural networks is often called neural machine translation. Compared to language models (:numref:`sec_language_model`), in which the corpus only contains a single language, machine translation dataset has at least two languages, the source language and the target language. In addition, each sentence in the source language is mapped to the according translation in the target language. Therefore, the data preprocessing for machine translation data is different to the one for language models. This section is dedicated to demonstrate how to preprocess such a dataset and then load into a set of minibatches.
+
+*Machine translation* refers to the
+automatic translation of a sequence
+from one language to another.
+In fact, this field
+may date back to 1940s
+soon after digital computers were invented,
+especially by considering the use of computers
+for cracking language codes in World War II.
+For decades,
+statistical approaches
+had been dominant in this field :cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990`
+before the rise 
+of 
+end-to-end learning using
+neural networks. 
+The latter 
+is often called
+*neural machine translation*
+to distinguish itself from
+*statistical machine translation*
+that involves statistical analysis
+in components such as 
+the translation model and the language model. 
+
+
+Emphasizing end-to-end learning,
+this book will focus on neural machine translation methods.
+Different from our language model problem
+in :numref:`sec_language_model`
+whose corpus is in one single language,
+machine translation datasets
+are composed of pairs of text sequences
+that are in 
+the source language and the target language, respectively.
+Thus,
+instead of reusing the preprocessing routine
+for language modeling,
+we need a different way to preprocess
+machine translation datasets.
+In the following,
+we show how to 
+load the preprocessed data
+in minibatches for training.
 
 ```{.python .input  n=1}
 from d2l import mxnet as d2l
