@@ -27,7 +27,7 @@ $$
 \hat{y} = \sigma(\hat{y}^{(FM)} + \hat{y}^{(DNN)}),
 $$
 
-where $\sigma$ is the sigmoid function. The architecture of DeepFM is illustrated below.
+where $\sigma$ is the `sigmoid` function. The architecture of DeepFM is illustrated below.
 ![Illustration of the DeepFM model](../img/rec-deepfm.svg)
 
 It is worth noting that DeepFM is not the only way to combine deep neural networks with FM. We can also add nonlinear layers over the feature interactions :cite:`He.Chua.2017`.
