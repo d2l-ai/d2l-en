@@ -42,7 +42,7 @@ npx.set_np()
 ```
 
 ## Model Implementation
-The following code implement the factorization machines. It is clear to see that FM consists a linear regression block and an efficient feature interaction block. We apply a sigmoid function over the final score since we treat the CTR prediction as a classification task.
+The following code implement the factorization machines. It is clear to see that FM consists a linear regression block and an efficient feature interaction block. We apply a `sigmoid` function over the final score since we treat the CTR prediction as a classification task.
 
 ```{.python .input  n=2}
 class FM(nn.Block):
