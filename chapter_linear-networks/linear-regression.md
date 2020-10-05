@@ -596,7 +596,7 @@ the *nucleus* (CPU), the *axon* (output wire),
 and the *axon terminals* (output terminals),
 enabling connections to other neurons via *synapses*.
 
-![The real neuron.](../img/Neuron.svg)
+![The real neuron.](../img/neuron.svg)
 :label:`fig_Neuron`
 
 Information $x_i$ arriving from other neurons
