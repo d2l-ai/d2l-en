@@ -38,7 +38,7 @@ d2l.plt.imshow(content_img.asnumpy());
 ```
 
 ```{.python .input  n=2}
-style_img = image.imread('../img/autumn_oak.jpg')
+style_img = image.imread('../img/autumn-oak.jpg')
 d2l.plt.imshow(style_img.asnumpy());
 ```
 

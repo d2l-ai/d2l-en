@@ -1,4 +1,4 @@
-# Predicting House Prices on Kaggle
+kaggle_submit2.png# Predicting House Prices on Kaggle
 :label:`sec_kaggle_house`
 
 Now that we have introduced some basic tools
@@ -143,7 +143,7 @@ The URL is right here:
 
 > https://www.kaggle.com/c/house-prices-advanced-regression-techniques
 
-![The house price prediction competition page.](../img/house_pricing.png)
+![The house price prediction competition page.](../img/house-pricing.png)
 :width:`400px`
 :label:`fig_house_pricing`
 
@@ -665,7 +665,7 @@ The steps are quite simple:
 * Click the “Upload Submission File” button in the dashed box at the bottom of the page and select the prediction file you wish to upload.
 * Click the “Make Submission” button at the bottom of the page to view your results.
 
-![Submitting data to Kaggle](../img/kaggle_submit2.png)
+![Submitting data to Kaggle](../img/kaggle-submit2.png)
 :width:`400px`
 :label:`fig_kaggle_submit2`
 

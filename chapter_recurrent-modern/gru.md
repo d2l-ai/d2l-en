@@ -32,7 +32,7 @@ A number of methods have been proposed to address this. One of the earliest is l
 will discuss in :numref:`sec_lstm`. The gated recurrent unit (GRU)
 :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` is a slightly more streamlined
 variant that often offers comparable performance and is significantly faster to
-compute  :cite:`Chung.Gulcehre.Cho.ea.2014`. 
+compute  :cite:`Chung.Gulcehre.Cho.ea.2014`.
 Due to its simplicity, let us start with the GRU.
 
 ## Gated Hidden State
@@ -61,7 +61,7 @@ a reset gate would allow us to control how much of the previous state we might s
 Likewise, an update gate would allow us to control how much of the new state is just a copy of the old state.
 
 We begin by engineering these gates.
-:numref:`fig_gru_1` illustrates the inputs for both 
+:numref:`fig_gru_1` illustrates the inputs for both
 the reset and update gates in a GRU, given the input
 of the current time step
 and the hidden state of the previous time step.
@@ -69,12 +69,12 @@ The outputs of two gates
 are given by two fully-connected layers
 with a sigmoid activation function.
 
-![Computing the reset gate and the update gate in a GRU model.](../img/gru_1.svg)
+![Computing the reset gate and the update gate in a GRU model.](../img/gru-1.svg)
 :label:`fig_gru_1`
 
 Mathematically,
-for a given time step $t$, 
-suppose that the input is 
+for a given time step $t$,
+suppose that the input is
 a minibatch
 $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$) and the hidden state of the previous time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$ (number of hidden units: $h$). Then, the reset gate $\mathbf{R}_t \in \mathbb{R}^{n \times h}$ and update gate $\mathbf{Z}_t \in \mathbb{R}^{n \times h}$ are computed as follows:
 
@@ -92,11 +92,11 @@ biases. We use sigmoid functions (as introduced in :numref:`sec_mlp`) to transfo
 
 ### Candidate Hidden State
 
-Next, let us 
+Next, let us
 integrate the reset gate $\mathbf{R}_t$ with
 the regular latent state updating mechanism
-in :eqref:`rnn_h_with_state`. 
-It leads to the following 
+in :eqref:`rnn_h_with_state`.
+It leads to the following
 *candidate hidden state*
 $\tilde{\mathbf{H}}_t \in \mathbb{R}^{n \times h}$ at time step $t$:
 
@@ -112,17 +112,17 @@ Here we use a nonlinearity in the form of tanh to ensure that the values in the 
 
 The result is a *candidate* since we still need to incorporate the action of the update gate.
 Comparing with :eqref:`rnn_h_with_state`,
-now the influence of the previous states 
-can be reduced with the 
+now the influence of the previous states
+can be reduced with the
 elementwise multiplication of
 $\mathbf{R}_t$ and $\mathbf{H}_{t-1}$
 in :eqref:`gru_tilde_H`.
 Whenever the entries in the reset gate $\mathbf{R}_t$ are close to 1, we recover a vanilla RNN such as in :eqref:`rnn_h_with_state`.
-For all entries of the reset gate $\mathbf{R}_t$ that are close to 0, the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as the input. Any pre-existing hidden state is thus *reset* to defaults. 
+For all entries of the reset gate $\mathbf{R}_t$ that are close to 0, the candidate hidden state is the result of an MLP with $\mathbf{X}_t$ as the input. Any pre-existing hidden state is thus *reset* to defaults.
 
 :numref:`fig_gru_2` illustrates the computational flow after applying the reset gate.
 
-![Computing the candidate hidden state in a GRU model.](../img/gru_2.svg)
+![Computing the candidate hidden state in a GRU model.](../img/gru-2.svg)
 :label:`fig_gru_2`
 
 
@@ -135,7 +135,7 @@ This leads to the final update equation for the GRU:
 $$\mathbf{H}_t = \mathbf{Z}_t \odot \mathbf{H}_{t-1}  + (1 - \mathbf{Z}_t) \odot \tilde{\mathbf{H}}_t.$$
 
 
-Whenever the update gate $\mathbf{Z}_t$ is close to 1, we simply retain the old state. In this case the information from $\mathbf{X}_t$ is essentially ignored, effectively skipping time step $t$ in the dependency chain. In contrast, whenever $\mathbf{Z}_t$ is close to 0, the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. These designs can help us cope with the vanishing gradient problem in RNNs and better capture dependencies for sequences with large time step distances. 
+Whenever the update gate $\mathbf{Z}_t$ is close to 1, we simply retain the old state. In this case the information from $\mathbf{X}_t$ is essentially ignored, effectively skipping time step $t$ in the dependency chain. In contrast, whenever $\mathbf{Z}_t$ is close to 0, the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. These designs can help us cope with the vanishing gradient problem in RNNs and better capture dependencies for sequences with large time step distances.
 For instance,
 if the update gate has been close to 1
 for all the time steps of an entire subsequence,
@@ -148,7 +148,7 @@ regardless of the length of the subsequence.
 
 :numref:`fig_gru_3` illustrates the computational flow after the update gate is in action.
 
-![Computing the hidden state in a GRU model.](../img/gru_3.svg)
+![Computing the hidden state in a GRU model.](../img/gru-3.svg)
 :label:`fig_gru_3`
 
 
@@ -292,7 +292,7 @@ def gru(inputs, state, params):
 ### Training and Prediction
 
 Training and prediction work in exactly the same manner as in :numref:`sec_rnn_scratch`.
-After training, 
+After training,
 we print out the perplexity on the training set
 and the predicted sequence following
 the provided prefixes "time traveller" and "traveller", respectively.
@@ -309,7 +309,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ## Concise Implementation
 
 In high-level APIs,
-we can directly 
+we can directly
 instantiate a GPU model.
 This encapsulates all the configuration detail that we made explicit above.
 The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out before.
@@ -331,7 +331,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 
 ## Summary
 
-* Gated RNNs can better capture dependencies for sequences with large time step distances. 
+* Gated RNNs can better capture dependencies for sequences with large time step distances.
 * Reset gates help capture short-term dependencies in sequences.
 * Update gates help capture long-term dependencies in sequences.
 * GRUs contain basic RNNs as their extreme case whenever the reset gate is switched on. They can also skip subsequences by turning on the update gate.
@@ -342,7 +342,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 1. Assume that we only want to use the input at time step $t'$ to predict the output at time step $t > t'$. What are the best values for the reset and update gates for each time step?
 1. Adjust the hyperparameters and analyze the their influence on running time, perplexity, and the output sequence.
 1. Compare runtime, perplexity, and the output strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
-1. What happens if you implement only parts of a GRU, e.g., with only a reset gate or only an update gate? 
+1. What happens if you implement only parts of a GRU, e.g., with only a reset gate or only an update gate?
 
 
 :begin_tab:`mxnet`

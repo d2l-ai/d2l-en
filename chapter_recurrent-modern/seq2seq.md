@@ -388,7 +388,7 @@ train_s2s_ch9(model, train_iter, lr, num_epochs, device)
 Here we implement the simplest method, greedy search, to generate an output
 sequence. As illustrated in :numref:`fig_seq2seq_predict`, during predicting, we feed the same "&lt;bos&gt;" token to the decoder as training at time step 0. But the input token for a later time step is the predicted token from the previous time step.
 
-![Sequence to sequence model predicting with greedy search](../img/seq2seq_predict.svg)
+![Sequence to sequence model predicting with greedy search](../img/seq2seq-predict.svg)
 :label:`fig_seq2seq_predict`
 
 ```{.python .input}

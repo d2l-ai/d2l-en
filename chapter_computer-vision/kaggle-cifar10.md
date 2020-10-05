@@ -14,7 +14,7 @@ is
 
 :numref:`fig_kaggle_cifar10` shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
-![CIFAR-10 image classification competition webpage information. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle_cifar10.png)
+![CIFAR-10 image classification competition webpage information. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-cifar10.png)
 :width:`600px`
 :label:`fig_kaggle_cifar10`
 
@@ -47,7 +47,7 @@ After logging in to Kaggle, we can click on the "Data" tab on the CIFAR-10 image
 * ../data/cifar-10/trainLabels.csv
 * ../data/cifar-10/sampleSubmission.csv
 
-Here folders `train` and `test` contain the training and testing images respectively, `trainLabels.csv` has labels for the training images, and `sample_submission.csv` is a sample of submission. 
+Here folders `train` and `test` contain the training and testing images respectively, `trainLabels.csv` has labels for the training images, and `sample_submission.csv` is a sample of submission.
 
 To make it easier to get started, we provide a small-scale sample of the dataset: it contains the first $1000$ training images and $5$ random testing images.
 To use the full dataset of the Kaggle competition, you need to set the following `demo` variable to `False`.
@@ -95,7 +95,7 @@ def copyfile(filename, target_dir):
     d2l.mkdir_if_not_exist(target_dir)
     shutil.copy(filename, target_dir)
 
-#@save    
+#@save
 def reorg_train_valid(data_dir, labels, valid_ratio):
     # The number of examples of the class with the least examples in the
     # training dataset
@@ -124,7 +124,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
 The `reorg_test` function below is used to organize the testing set to facilitate the reading during prediction.
 
 ```{.python .input  n=3}
-#@save    
+#@save
 def reorg_test(data_dir):
     for test_file in os.listdir(os.path.join(data_dir, 'test')):
         copyfile(os.path.join(data_dir, 'test', test_file),
@@ -194,15 +194,15 @@ We specify the defined image augmentation operation in `DataLoader`. During trai
 
 ```{.python .input}
 train_iter, train_valid_iter = [gluon.data.DataLoader(
-    dataset.transform_first(transform_train), batch_size, shuffle=True, 
+    dataset.transform_first(transform_train), batch_size, shuffle=True,
     last_batch='discard') for dataset in (train_ds, train_valid_ds)]
 
 valid_iter = gluon.data.DataLoader(
-    valid_ds.transform_first(transform_test), batch_size, shuffle=False, 
+    valid_ds.transform_first(transform_test), batch_size, shuffle=False,
     last_batch='discard')
 
 test_iter = gluon.data.DataLoader(
-    test_ds.transform_first(transform_test), batch_size, shuffle=False, 
+    test_ds.transform_first(transform_test), batch_size, shuffle=False,
     last_batch='keep')
 ```
 

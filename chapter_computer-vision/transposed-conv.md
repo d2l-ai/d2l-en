@@ -16,7 +16,7 @@ npx.set_np()
 
 Let us consider a basic case that both input and output channels are 1, with 0 padding and 1 stride. :numref:`fig_trans_conv` illustrates how transposed convolution with a $2\times 2$ kernel is computed on the $2\times 2$ input matrix.
 
-![Transposed convolution layer with a $2\times 2$ kernel.](../img/trans_conv.svg)
+![Transposed convolution layer with a $2\times 2$ kernel.](../img/trans-conv.svg)
 :label:`fig_trans_conv`
 
 We can implement this operation by giving matrix kernel $K$ and matrix input $X$.

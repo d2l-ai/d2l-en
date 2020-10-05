@@ -3,10 +3,10 @@
 
 The challenge to address long-term information preservation and short-term input
 skipping in latent variable models has existed for a long time. One of the
-earliest approaches to address this was the 
+earliest approaches to address this was the
 long short-term memory (LSTM) :cite:`Hochreiter.Schmidhuber.1997`. It shares many of the properties of the
 GRU.
-Interestingly, LSTMs have a slightly more complex 
+Interestingly, LSTMs have a slightly more complex
 design than GRUs but predates GRUs by almost two decades.
 
 
@@ -40,18 +40,18 @@ how this works in practice.
 
 ### Input Gate, Forget Gate, and Output Gate
 
-Just like in GRUs, 
+Just like in GRUs,
 the data feeding into the LSTM gates are
 the input at the current time step and
 the hidden state of the previous time step,
-as illustrated in :numref:`lstm_0`. 
+as illustrated in :numref:`lstm_0`.
 They are processed by
-three fully-connected layers with a sigmoid activation function to compute the values of 
+three fully-connected layers with a sigmoid activation function to compute the values of
 the input, forget. and output gates.
 As a result, values of the three gates
-are in the range of $(0, 1)$. 
+are in the range of $(0, 1)$.
 
-![Computing the input gate, the forget gate, and the output gate in an LSTM model.](../img/lstm_0.svg)
+![Computing the input gate, the forget gate, and the output gate in an LSTM model.](../img/lstm-0.svg)
 :label:`lstm_0`
 
 Mathematically,
@@ -79,7 +79,7 @@ where $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hc} \in \ma
 
 A quick illustration of the candidate memory cell is shown in :numref:`lstm_1`.
 
-![Computing the candidate memory cell in an LSTM model.](../img/lstm_1.svg)
+![Computing the candidate memory cell in an LSTM model.](../img/lstm-1.svg)
 :label:`lstm_1`
 
 ### Memory Cell
@@ -96,7 +96,7 @@ long range dependencies within sequences.
 
 We thus arrive at the flow diagram in :numref:`lstm_2`.
 
-![Computing the memory cell in an LSTM model.](../img/lstm_2.svg)
+![Computing the memory cell in an LSTM model.](../img/lstm-2.svg)
 
 :label:`lstm_2`
 
@@ -109,13 +109,13 @@ This ensures that the values of $\mathbf{H}_t$ are always in the interval $(-1, 
 $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
 
-Whenever the output gate approximates 1 we effectively pass all memory information through to the predictor, whereas for the output gate close to 0 we retain all the information only within the memory cell and perform no further processing. 
+Whenever the output gate approximates 1 we effectively pass all memory information through to the predictor, whereas for the output gate close to 0 we retain all the information only within the memory cell and perform no further processing.
 
 
 
 :numref:`lstm_3` has a graphical illustration of the data flow.
 
-![Computing the hidden state in an LSTM model.](../img/lstm_3.svg)
+![Computing the hidden state in an LSTM model.](../img/lstm-3.svg)
 :label:`lstm_3`
 
 
@@ -247,7 +247,7 @@ def lstm(inputs, state, params):
 def lstm(inputs, state, params):
     [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c,
      W_hq, b_q] = params
-    (H, C) = state 
+    (H, C) = state
     outputs = []
     for X in inputs:
         I = torch.sigmoid((X @ W_xi) + (H @ W_hi) + b_i)

@@ -371,7 +371,7 @@ for $i=0,\ldots, l-1$ and $j=0,\ldots,\lfloor(d-1)/2\rfloor$.
 
 :numref:`fig_positional_encoding` illustrates the positional encoding.
 
-![Positional encoding.](../img/positional_encoding.svg)
+![Positional encoding.](../img/positional-encoding.svg)
 :label:`fig_positional_encoding`
 
 ```{.python .input}

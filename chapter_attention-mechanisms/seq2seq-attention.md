@@ -6,13 +6,13 @@ model as introduced in :numref:`sec_seq2seq`
 to explicitly aggregate states with weights.
 :numref:`fig_s2s_attention` shows the model
 architecture for encoding and decoding at the time step $t$. Here, the memory of the
-attention layer consists of all the information that the encoder has 
-seen---the encoder output at each time step. 
+attention layer consists of all the information that the encoder has
+seen---the encoder output at each time step.
 During the decoding, the decoder output from the previous time step $t-1$ is used as the query.
 The output of the attention model is viewed as the context information, and such context is concatenated with the decoder input $D_t$.
 Finally, we feed the concatenation into the decoder.
 
-![The second time step in decoding for the sequence to sequence model with attention mechanism.](../img/seq2seq_attention.svg)
+![The second time step in decoding for the sequence to sequence model with attention mechanism.](../img/seq2seq-attention.svg)
 :label:`fig_s2s_attention`
 
 
@@ -116,7 +116,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
             out, hidden_state = self.rnn(x.permute(1, 0, 2), hidden_state)
             outputs.append(out)
         outputs = self.dense(torch.cat(outputs, dim=0))
-        return outputs.permute(1, 0, 2), [enc_outputs, hidden_state, 
+        return outputs.permute(1, 0, 2), [enc_outputs, hidden_state,
                                           enc_valid_len]
 ```
 
@@ -157,7 +157,7 @@ As we can see from the result, since the
 sequences in the training dataset are relatively short,
 the additional attention
 layer does not lead to a significant improvement.
-Due to the computational 
+Due to the computational
 overhead of both the encoder's and the decoder's attention layers, this model
 is much slower than the seq2seq model without attention.
 
