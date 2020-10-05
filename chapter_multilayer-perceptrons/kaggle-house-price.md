@@ -1,4 +1,4 @@
-kaggle_submit2.png# Predicting House Prices on Kaggle
+# Predicting House Prices on Kaggle
 :label:`sec_kaggle_house`
 
 Now that we have introduced some basic tools
