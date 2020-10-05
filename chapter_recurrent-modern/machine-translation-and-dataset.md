@@ -56,9 +56,9 @@ machine translation datasets.
 In the following,
 we show how to 
 load the preprocessed data
-in minibatches for training.
+into minibatches for training.
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import np, npx, gluon
 import os
@@ -72,11 +72,17 @@ import torch
 import os
 ```
 
-## Reading and Preprocessing the Dataset
+## Downloading and Preprocessing the Dataset
 
-We first download a dataset that contains a set of English sentences with the corresponding French translations. As can be seen that each line contains an English sentence with its French translation, which are separated by a `TAB`.
+To begin with,
+we download an English-French dataset
+that consists of [bilingual sentence pairs from the Tatoeba Project](http://www.manythings.org/anki/).
+Each line in the dataset
+is a tab-delimited pair
+of an English sentence
+and the translated French sentence.
 
-```{.python .input  n=2}
+```{.python .input}
 #@tab all
 #@save
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
@@ -89,32 +95,41 @@ def read_data_nmt():
         return f.read()
 
 raw_text = read_data_nmt()
-print(raw_text[0:106])
+print(raw_text[:75])
 ```
 
-We perform several preprocessing steps on the raw text data, including ignoring cases, replacing UTF-8 non-breaking space with space, and adding space between words and punctuation marks.
+After downloading the dataset,
+we proceed with several preprocessing steps
+for the raw text data.
+For instance,
+we replace non-breaking space with space,
+convert uppercase letters to lowercase ones,
+and insert space between words and punctuation marks.
 
-```{.python .input  n=3}
+```{.python .input}
 #@tab all
 #@save
 def preprocess_nmt(text):
     def no_space(char, prev_char):
         return char in set(',.!') and prev_char != ' '
 
+    # Replace non-breaking space with space, and convert uppercase letters to
+    # lowercase ones
     text = text.replace('\u202f', ' ').replace('\xa0', ' ').lower()
-    out = [' ' + char if i > 0 and no_space(char, text[i-1]) else char
+    # Insert space between words and punctuation marks
+    out = [' ' + char if i > 0 and no_space(char, text[i - 1]) else char
            for i, char in enumerate(text)]
     return ''.join(out)
 
 text = preprocess_nmt(raw_text)
-print(text[0:95])
+print(text[:80])
 ```
 
 ## Tokenization
 
 Different to using character tokens in :numref:`sec_language_model`, here a token is either a word or a punctuation mark. The following function tokenizes the text data to return `source` and `target`. Each one is a list of token list, with `source[i]` is the $i^\mathrm{th}$ sentence in the source language and `target[i]` is the $i^\mathrm{th}$ sentence in the target language. To make the latter training faster, we sample the first `num_examples` sentences pairs.
 
-```{.python .input  n=4}
+```{.python .input}
 #@tab all
 #@save
 def tokenize_nmt(text, num_examples=None):
@@ -129,12 +144,12 @@ def tokenize_nmt(text, num_examples=None):
     return source, target
 
 source, target = tokenize_nmt(text)
-source[0:3], target[0:3]
+source[:6], target[:6]
 ```
 
 We visualize the histogram of the number of tokens per sentence in the following figure. As can be seen, a sentence in average contains 5 tokens, and most of the sentences have less than 10 tokens.
 
-```{.python .input  n=5}
+```{.python .input}
 #@tab all
 d2l.set_figsize()
 d2l.plt.hist([[len(l) for l in source], [len(l) for l in target]],
@@ -146,7 +161,7 @@ d2l.plt.legend(loc='upper right');
 
 Since the tokens in the source language could be different to the ones in the target language, we need to build a vocabulary for each of them. Since we are using words instead of characters  as tokens, it makes the vocabulary size significantly large. Here we map every token that appears less than 3 times into the &lt;unk&gt; token :numref:`sec_text_preprocessing`. In addition, we need other special tokens such as padding and sentence beginnings.
 
-```{.python .input  n=6}
+```{.python .input}
 #@tab all
 src_vocab = d2l.Vocab(source, min_freq=3, 
                       reserved_tokens=['<pad>', '<bos>', '<eos>'])
@@ -159,7 +174,7 @@ In language models, each example is a `num_steps` length sequence from the corpu
 
 One way to solve this problem is that if a sentence is longer than `num_steps`, we trim its length, otherwise pad with a special &lt;pad&gt; token to meet the length. Therefore we could transform any sentence to a fixed length.
 
-```{.python .input  n=7}
+```{.python .input}
 #@tab all
 #@save
 def truncate_pad(line, num_steps, padding_token):
@@ -172,7 +187,7 @@ truncate_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])
 
 Now we can convert a list of sentences into an `(num_example, num_steps)` index array. We also record the length of each sentence without the padding tokens, called *valid length*, which might be used by some models. In addition, we add the special “&lt;bos&gt;” and “&lt;eos&gt;” tokens to the target sentences so that our model will know the signals for starting and ending predicting.
 
-```{.python .input  n=8}
+```{.python .input}
 #@save
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
@@ -203,7 +218,7 @@ Then we can construct minibatches based on these arrays.
 
 Finally, we define the function `load_data_nmt` to return the data iterator with the vocabularies for source language and target language.
 
-```{.python .input  n=9}
+```{.python .input}
 #@tab all
 #@save
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
@@ -224,7 +239,7 @@ def load_data_nmt(batch_size, num_steps, num_examples=1000):
 
 Let us read the first batch.
 
-```{.python .input  n=10}
+```{.python .input}
 src_vocab, tgt_vocab, train_iter = load_data_nmt(batch_size=2, num_steps=8)
 for X, X_vlen, Y, Y_vlen in train_iter:
     print('X:', X.astype('int32'))
@@ -254,7 +269,6 @@ for X, X_vlen, Y, Y_vlen in train_iter:
 ## Exercises
 
 1. Find a machine translation dataset online and process it.
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/344)
