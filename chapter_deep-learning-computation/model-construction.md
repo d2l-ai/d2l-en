@@ -677,6 +677,7 @@ chimera(X)
 
 ## Efficiency
 
+:begin_tab:`mxnet`
 The avid reader might start to worry
 about the efficiency of some of these operations.
 After all, we have lots of dictionary lookups,
@@ -688,9 +689,8 @@ In the context of deep learning,
 we may worry that our extremely fast GPU(s)
 might have to wait until a puny CPU
 runs Python code before it gets another job to run.
-
-:begin_tab:`mxnet`
 The best way to speed up Python is by avoiding it altogether.
+
 One way that Gluon does this is by allowing for
 *hybridization*, which will be described later.
 Here, the Python interpreter executes a block
@@ -705,7 +705,32 @@ the hybridization section (:numref:`sec_hybridize`)
 to learn about compilation after finishing the current chapter.
 :end_tab:
 
+:begin_tab:`pytorch`
+The avid reader might start to worry
+about the efficiency of some of these operations.
+After all, we have lots of dictionary lookups,
+code execution, and lots of other Pythonic things
+taking place in what is supposed to be
+a high-performance deep learning library.
+The problems of Python's [global interpreter lock](https://wiki.python.org/moin/GlobalInterpreterLock) are well known. 
+In the context of deep learning,
+we may worry that our extremely fast GPU(s)
+might have to wait until a puny CPU
+runs Python code before it gets another job to run.
+:end_tab:
+
 :begin_tab:`tensorflow`
+The avid reader might start to worry
+about the efficiency of some of these operations.
+After all, we have lots of dictionary lookups,
+code execution, and lots of other Pythonic things
+taking place in what is supposed to be
+a high-performance deep learning library.
+The problems of Python's [global interpreter lock](https://wiki.python.org/moin/GlobalInterpreterLock) are well known. 
+In the context of deep learning,
+we may worry that our extremely fast GPU(s)
+might have to wait until a puny CPU
+runs Python code before it gets another job to run.
 The best way to speed up Python is by avoiding it altogether.
 :end_tab:
 
