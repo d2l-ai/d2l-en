@@ -852,8 +852,11 @@ def preprocess_nmt(text):
     def no_space(char, prev_char):
         return char in set(',.!') and prev_char != ' '
 
+    # Replace non-breaking space with space, and convert uppercase letters to
+    # lowercase ones
     text = text.replace('\u202f', ' ').replace('\xa0', ' ').lower()
-    out = [' ' + char if i > 0 and no_space(char, text[i-1]) else char
+    # Insert space between words and punctuation marks
+    out = [' ' + char if i > 0 and no_space(char, text[i - 1]) else char
            for i, char in enumerate(text)]
     return ''.join(out)
 
@@ -874,18 +877,20 @@ def tokenize_nmt(text, num_examples=None):
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def truncate_pad(line, num_steps, padding_token):
     if len(line) > num_steps:
-        return line[:num_steps]  # Trim
+        return line[:num_steps]  # Truncate
     return line + [padding_token] * (num_steps - len(line))  # Pad
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
-    if not is_source:
+    if is_source:
+        lines = [l + [vocab['<eos>']] for l in lines]
+    else:
         lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
-    array = torch.tensor([truncate_pad(
+    array = d2l.tensor([truncate_pad(
         l, num_steps, vocab['<pad>']) for l in lines])
-    valid_len = (array != vocab['<pad>']).sum(dim=1)
+    valid_len = (array != vocab['<pad>']).sum(axis=1)
     return array, valid_len
 
 

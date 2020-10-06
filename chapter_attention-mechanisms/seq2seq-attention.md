@@ -21,7 +21,7 @@ To illustrate the overall architecture of seq2seq with attention model, the laye
 ![The layers in the sequence to sequence model with attention mechanism.](../img/seq2seq-attention-details.svg)
 :label:`fig_s2s_attention_details`
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import np, npx
 from mxnet.gluon import rnn, nn
@@ -49,7 +49,7 @@ At each time step of the decoding, we use the hidden state of the decoder's last
 
 Let us implement the `Seq2SeqAttentionDecoder`, and see how it differs from the decoder in seq2seq from :numref:`sec_seq2seq_decoder`.
 
-```{.python .input  n=2}
+```{.python .input}
 class Seq2SeqAttentionDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -122,7 +122,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
 
 Now we can test the seq2seq with attention model. To be consistent with the model without attention in :numref:`sec_seq2seq`, we use the same hyperparameters for `vocab_size`, `embed_size`, `num_hiddens`, and `num_layers`. As a result, we get the same decoder output shape, but the state structure is changed.
 
-```{.python .input  n=3}
+```{.python .input}
 encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8,
                              num_hiddens=16, num_layers=2)
 encoder.initialize()
@@ -161,7 +161,7 @@ Due to the computational
 overhead of both the encoder's and the decoder's attention layers, this model
 is much slower than the seq2seq model without attention.
 
-```{.python .input  n=5}
+```{.python .input}
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_steps = 64, 10
 lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
@@ -194,7 +194,7 @@ Last, we predict several sample examples.
 
 ```{.python .input}
 #@tab mxnet, pytorch
-for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
+for sentence in ['Go .', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + d2l.predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, device))
 ```
@@ -208,7 +208,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 
 1. Compare `Seq2SeqAttentionDecoder` and `Seq2seqDecoder` by using the same parameters and checking their losses.
 1. Can you think of any use cases where `Seq2SeqAttentionDecoder` will outperform `Seq2seqDecoder`?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/347)

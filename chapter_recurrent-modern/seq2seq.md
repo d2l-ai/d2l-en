@@ -446,7 +446,7 @@ Try several examples:
 
 ```{.python .input}
 #@tab mxnet, pytorch
-for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
+for sentence in ['Go .', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, device))
 ```
@@ -466,7 +466,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/345)
 :end_tab:
-
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1062)

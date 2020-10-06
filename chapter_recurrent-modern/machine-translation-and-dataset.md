@@ -242,7 +242,6 @@ to be loaded in minibatches of the same shape.
 The following `truncate_pad` function
 truncates or pads text sequences as described before.
 
-
 ```{.python .input}
 #@tab all
 #@save
@@ -257,27 +256,17 @@ truncate_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])
 Now we can convert a list of sentences into an `(num_example, num_steps)` index array. We also record the length of each sentence without the padding tokens, called *valid length*, which might be used by some models. In addition, we add the special “&lt;bos&gt;” and “&lt;eos&gt;” tokens to the target sentences so that our model will know the signals for starting and ending predicting.
 
 ```{.python .input}
+#@tab all
 #@save
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
-    if not is_source:
+    if is_source:
+        lines = [l + [vocab['<eos>']] for l in lines]
+    else:
         lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
-    array = np.array([truncate_pad(
+    array = d2l.tensor([truncate_pad(
         l, num_steps, vocab['<pad>']) for l in lines])
     valid_len = (array != vocab['<pad>']).sum(axis=1)
-    return array, valid_len
-```
-
-```{.python .input}
-#@tab pytorch
-#@save
-def build_array(lines, vocab, num_steps, is_source):
-    lines = [vocab[l] for l in lines]
-    if not is_source:
-        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
-    array = torch.tensor([truncate_pad(
-        l, num_steps, vocab['<pad>']) for l in lines])
-    valid_len = (array != vocab['<pad>']).sum(dim=1)
     return array, valid_len
 ```
 
@@ -309,22 +298,12 @@ def load_data_nmt(batch_size, num_steps, num_examples=1000):
 Let us read the first batch.
 
 ```{.python .input}
+#@tab all
 src_vocab, tgt_vocab, train_iter = load_data_nmt(batch_size=2, num_steps=8)
 for X, X_vlen, Y, Y_vlen in train_iter:
-    print('X:', X.astype('int32'))
+    print('X:', d2l.astype(X, d2l.int32))
     print('valid lengths for X:', X_vlen)
-    print('Y:', Y.astype('int32'))
-    print('valid lengths for Y:', Y_vlen)
-    break
-```
-
-```{.python .input}
-#@tab pytorch
-src_vocab, tgt_vocab, train_iter = load_data_nmt(batch_size=2, num_steps=8)
-for X, X_vlen, Y, Y_vlen in train_iter:
-    print('X:', X.type(torch.int32))
-    print('valid lengths for X:', X_vlen)
-    print('Y:', Y.type(torch.int32))
+    print('Y:', d2l.astype(Y, d2l.int32))
     print('valid lengths for Y:', Y_vlen)
     break
 ```
