@@ -439,4 +439,3 @@ def load_data_time_machine(batch_size, num_steps,  #@save
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1049)
 :end_tab:
-
