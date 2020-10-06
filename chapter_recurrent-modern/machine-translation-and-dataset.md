@@ -79,8 +79,10 @@ we download an English-French dataset
 that consists of [bilingual sentence pairs from the Tatoeba Project](http://www.manythings.org/anki/).
 Each line in the dataset
 is a tab-delimited pair
-of an English sentence
-and the translated French sentence.
+of an English text sequence
+and the translated French text sequence.
+Note that each text sequence
+can be just one sentence or a paragraph of multiple sentences.
 In this machine translation problem
 where English is translated into French,
 English is the *source language*
@@ -137,14 +139,14 @@ for machine translation
 we prefer word-level tokenization here
 (state-of-the-art models may use more advanced tokenization techniques).
 The following `tokenize_nmt` function
-tokenizes the the first `num_examples` sentence pairs,
+tokenizes the the first `num_examples` text sequence pairs,
 where
 each token is either a word or a punctuation mark. 
 This function returns
 two lists of token lists: `source` and `target`.
 Specifically,
 `source[i]` is a list of tokens from the
-$i^\mathrm{th}$ sentence in the source language (English here) and `target[i]` is that in the target language (French here).
+$i^\mathrm{th}$ text sequence in the source language (English here) and `target[i]` is that in the target language (French here).
 
 ```{.python .input}
 #@tab all
@@ -164,9 +166,9 @@ source, target = tokenize_nmt(text)
 source[:6], target[:6]
 ```
 
-Let us plot the histogram of the number of tokens per sentence. 
+Let us plot the histogram of the number of tokens per text sequence. 
 In this simple English-French dataset,
-most of the sentences have fewer than 20 tokens.
+most of the text sequences have fewer than 20 tokens.
 
 ```{.python .input}
 #@tab all
@@ -215,10 +217,31 @@ either a segment of one sentence
 or a span over multiple sentences,
 has a fixed length.
 This was specified by the `num_steps`
-(number of time steps) argument in :numref:`sec_language_model`.
-In machine translation, an example should contain a pair of source sentence and target sentence. These sentences might have different lengths, while we need same length examples to form a minibatch. 
+(number of time steps or tokens) argument in :numref:`sec_language_model`.
+In machine translation, each example is
+a pair of source and target text sequences,
+where each text sequence may have different lengths.
 
-One way to solve this problem is that if a sentence is longer than `num_steps`, we trim its length, otherwise pad with a special &lt;pad&gt; token to meet the length. Therefore we could transform any sentence to a fixed length.
+For computational efficiency,
+we can still process a minibatch of text sequences
+at one time by *truncation* and *padding*.
+Suppose that every sequence in the same minibatch
+should have the same length `num_steps`.
+If a text sequence has fewer than `num_steps` tokens,
+we will keep appending the special "&lt;pad&gt;" token
+to its end until its length reaches `num_steps`.
+Otherwise,
+we will truncate the text sequence
+by only taking its first `num_steps` tokens
+and discarding the remaining.
+In this way,
+every text sequence 
+will have the same length
+to be loaded in minibatches of the same shape.
+
+The following `truncate_pad` function
+truncates or pads text sequences as described before.
+
 
 ```{.python .input}
 #@tab all
