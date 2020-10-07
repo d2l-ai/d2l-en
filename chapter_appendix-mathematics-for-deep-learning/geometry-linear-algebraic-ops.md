@@ -1,4 +1,4 @@
-ProjVec.svg# Geometry and Linear Algebraic Operations
+# Geometry and Linear Algebraic Operations
 :label:`sec_geometry-linear-algebraic-ops`
 
 In :numref:`sec_linear-algebra`, we encountered the basics of linear algebra
