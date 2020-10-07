@@ -833,7 +833,8 @@ def build_array_nmt(lines, vocab, num_steps, is_source):
         lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
     array = d2l.tensor([truncate_pad(
         l, num_steps, vocab['<pad>']) for l in lines])
-    valid_len = (array != vocab['<pad>']).sum(axis=1)
+    valid_len = d2l.reduce_sum(d2l.astype(array != vocab['<pad>'], d2l.int32),
+                               1)
     return array, valid_len
 
 
