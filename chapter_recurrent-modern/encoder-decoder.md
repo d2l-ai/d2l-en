@@ -1,6 +1,23 @@
 # Encoder-Decoder Architecture
 
-The *encoder-decoder architecture* is a neural network design pattern. As shown in :numref:`fig_encoder_decoder`, the architecture is partitioned into two parts, the encoder and the decoder. The encoder's role is to encode the inputs into state, which often contains several tensors. Then the state is passed into the decoder to generate the outputs. In machine translation, the encoder transforms a source sentence, e.g., "Hello world.", into state, e.g., a vector, that captures its semantic information. The decoder then uses this state to generate the translated target sentence, e.g., "Bonjour le monde.".
+As we have discussed in 
+:numref:`sec_machine_translation`,
+machine translation
+is a major problem domain for sequence transduction models,
+whose input and output are
+both variable-length sequences.
+
+To handle such inputs and outputs,
+we can design an architecture with two major components.
+The first component is an *encoder*: it takes the variable-length sequence as the input and transforms it into a state with a fixed shape.
+The second component is a *decoder*:
+it maps the encoded state to a variable-length sequence.
+This architecture encodes an input sequence
+and decodes the output sequence via the 
+encoder and the decoder components, respectively.
+We call it an *encoder-decoder* architecture,
+which is depicted in :numref:`fig_encoder_decoder`.
+
 
 ![The encoder-decoder architecture.](../img/encoder-decoder.svg)
 :label:`fig_encoder_decoder`
