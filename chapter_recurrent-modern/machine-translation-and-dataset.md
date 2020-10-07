@@ -96,6 +96,7 @@ d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
 
 #@save
 def read_data_nmt():
+    """Load the English-French dataset."""
     data_dir = d2l.download_extract('fra-eng')
     with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
         return f.read()
@@ -116,6 +117,7 @@ and insert space between words and punctuation marks.
 #@tab all
 #@save
 def preprocess_nmt(text):
+    """Preprocess the English-French dataset."""
     def no_space(char, prev_char):
         return char in set(',.!') and prev_char != ' '
 
@@ -152,6 +154,7 @@ $i^\mathrm{th}$ text sequence in the source language (English here) and `target[
 #@tab all
 #@save
 def tokenize_nmt(text, num_examples=None):
+    """Tokenize the English-French dataset."""
     source, target = [], []
     for i, line in enumerate(text.split('\n')):
         if num_examples and i > num_examples:
@@ -246,6 +249,7 @@ truncates or pads text sequences as described before.
 #@tab all
 #@save
 def truncate_pad(line, num_steps, padding_token):
+    """Truncate or pad sequences."""
     if len(line) > num_steps:
         return line[:num_steps]  # Truncate
     return line + [padding_token] * (num_steps - len(line))  # Pad
@@ -253,12 +257,34 @@ def truncate_pad(line, num_steps, padding_token):
 truncate_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])
 ```
 
-Now we can convert a list of sentences into an `(num_example, num_steps)` index array. We also record the length of each sentence without the padding tokens, called *valid length*, which might be used by some models. In addition, we add the special “&lt;bos&gt;” and “&lt;eos&gt;” tokens to the target sentences so that our model will know the signals for starting and ending predicting.
+Now we define a function to transform
+text sequences into minibatches for training.
+We append the special “&lt;eos&gt;” token 
+to the end of every sequence to indicate the 
+end of the sequence.
+When a model is predicting
+by
+generating a sequence token after token,
+the generation
+of the “&lt;eos&gt;” token 
+can suggest that
+the output sequence is complete.
+For the target language,
+we also insert the special
+“&lt;bos&gt;” token at the beginning of any sequence
+to mark its beginning.
+Besides,
+we also record the length
+of each text sequence excluding the padding tokens.
+This information will be needed by
+some models that
+we will cover later.
 
 ```{.python .input}
 #@tab all
 #@save
-def build_array(lines, vocab, num_steps, is_source):
+def build_array_nmt(lines, vocab, num_steps, is_source):
+    """Transform text sequences of machine translation into minibatches."""
     lines = [vocab[l] for l in lines]
     if is_source:
         lines = [l + [vocab['<eos>']] for l in lines]
@@ -270,36 +296,37 @@ def build_array(lines, vocab, num_steps, is_source):
     return array, valid_len
 ```
 
-Then we can construct minibatches based on these arrays. 
-
 ## Putting All Things Together
 
-Finally, we define the function `load_data_nmt` to return the data iterator with the vocabularies for source language and target language.
+Finally, we define the `load_data_nmt` function 
+to return the data iterator, together with
+the vocabularies for both the source language and the target language.
 
 ```{.python .input}
 #@tab all
 #@save
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
+    """Return the iterator and the vocabularies of the translation dataset."""
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
     src_vocab = d2l.Vocab(source, min_freq=3, 
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     tgt_vocab = d2l.Vocab(target, min_freq=3, 
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    src_array, src_valid_len = build_array(
+    src_array, src_valid_len = build_array_nmt(
         source, src_vocab, num_steps, True)
-    tgt_array, tgt_valid_len = build_array(
+    tgt_array, tgt_valid_len = build_array_nmt(
         target, tgt_vocab, num_steps, False)
     data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
     data_iter = d2l.load_array(data_arrays, batch_size)
-    return src_vocab, tgt_vocab, data_iter
+    return data_iter, src_vocab, tgt_vocab
 ```
 
-Let us read the first batch.
+Let us read the first minibatch from the English-French dataset.
 
 ```{.python .input}
 #@tab all
-src_vocab, tgt_vocab, train_iter = load_data_nmt(batch_size=2, num_steps=8)
+train_iter, src_vocab, tgt_vocab = load_data_nmt(batch_size=2, num_steps=8)
 for X, X_vlen, Y, Y_vlen in train_iter:
     print('X:', d2l.astype(X, d2l.int32))
     print('valid lengths for X:', X_vlen)
@@ -310,13 +337,15 @@ for X, X_vlen, Y, Y_vlen in train_iter:
 
 ## Summary
 
-* Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. 
-* We read, preprocess, and tokenize the datasets from both source language and target language.
+* Machine translation refers to the automatic translation of a sequence from one language to another.
+* Using word-level tokenization, the vocabulary size will be significantly larger than that using character-level tokenization. To alleviate this, we can treat infrequent tokens as the same unknown token.
+* We can truncate and pad text sequences so that all of them will have the same length to be loaded in minibatches.
 
 
 ## Exercises
 
-1. Find a machine translation dataset online and process it.
+1. Try different values of the `num_examples` argument in the `load_data_nmt` function. How does this affect the vocabulary sizes of the source language and the target language?
+1. Text in some languages such as Chinese and Japanese does not have word boundary indicators (e.g., space). Is word-level tokenization still a good idea for such cases? Why or why not?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/344)

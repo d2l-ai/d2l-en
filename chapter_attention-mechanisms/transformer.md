@@ -733,7 +733,7 @@ num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.0, 64, 10
 lr, num_epochs, device = 0.005, 100, d2l.try_gpu()
 ffn_num_hiddens, num_heads = 64, 4
 
-src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
+train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
 
 encoder = TransformerEncoder(
     len(src_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,
@@ -753,7 +753,7 @@ ffn_num_input, ffn_num_hiddens, num_heads = 32, 64, 4
 key_size, query_size, value_size = 32, 32, 32
 norm_shape = [32]
 
-src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
+train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
 
 encoder = TransformerEncoder(
     len(src_vocab), key_size, query_size, value_size, num_hiddens,

@@ -780,6 +780,7 @@ d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def read_data_nmt():
+    """Load the English-French dataset."""
     data_dir = d2l.download_extract('fra-eng')
     with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
         return f.read()
@@ -787,6 +788,7 @@ def read_data_nmt():
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def preprocess_nmt(text):
+    """Preprocess the English-French dataset."""
     def no_space(char, prev_char):
         return char in set(',.!') and prev_char != ' '
 
@@ -801,6 +803,7 @@ def preprocess_nmt(text):
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def tokenize_nmt(text, num_examples=None):
+    """Tokenize the English-French dataset."""
     source, target = [], []
     for i, line in enumerate(text.split('\n')):
         if num_examples and i > num_examples:
@@ -814,13 +817,15 @@ def tokenize_nmt(text, num_examples=None):
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def truncate_pad(line, num_steps, padding_token):
+    """Truncate or pad sequences."""
     if len(line) > num_steps:
         return line[:num_steps]  # Truncate
     return line + [padding_token] * (num_steps - len(line))  # Pad
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def build_array(lines, vocab, num_steps, is_source):
+def build_array_nmt(lines, vocab, num_steps, is_source):
+    """Transform text sequences of machine translation into minibatches."""
     lines = [vocab[l] for l in lines]
     if is_source:
         lines = [l + [vocab['<eos>']] for l in lines]
@@ -834,19 +839,20 @@ def build_array(lines, vocab, num_steps, is_source):
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
+    """Return the iterator and the vocabularies of the translation dataset."""
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
     src_vocab = d2l.Vocab(source, min_freq=3, 
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     tgt_vocab = d2l.Vocab(target, min_freq=3, 
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    src_array, src_valid_len = build_array(
+    src_array, src_valid_len = build_array_nmt(
         source, src_vocab, num_steps, True)
-    tgt_array, tgt_valid_len = build_array(
+    tgt_array, tgt_valid_len = build_array_nmt(
         target, tgt_vocab, num_steps, False)
     data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
     data_iter = d2l.load_array(data_arrays, batch_size)
-    return src_vocab, tgt_vocab, data_iter
+    return data_iter, src_vocab, tgt_vocab
 
 
 # Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
