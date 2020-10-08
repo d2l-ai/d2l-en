@@ -220,6 +220,7 @@ len(src_vocab)
 ```
 
 ## Loading the Dataset
+:label:`subsec_mt_data_loading`
 
 Recall that in language modeling
 each sequence example,
