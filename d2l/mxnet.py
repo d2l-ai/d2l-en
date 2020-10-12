@@ -902,16 +902,15 @@ class Seq2SeqEncoder(d2l.Encoder):
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
 
     def forward(self, X, *args):
-        # `X` shape: (`batch_size`, `seq_len`, `embed_size`)
+        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
         X = self.embedding(X)
-        # RNN needs first axes to be time step, i.e., `seq_len`
+        # In RNN models, the first axis corresponds to time steps
         X = X.swapaxes(0, 1)
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
-        out, state = self.rnn(X, state)
-        # `out` shape: (`seq_len`, `batch_size`, `num_hiddens`)
-        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`),
-        # where "state" contains the hidden state and the memory cell
-        return out, state
+        output, state = self.rnn(X, state)
+        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
+        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
+        return output, state
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
@@ -927,11 +926,13 @@ class Seq2SeqDecoder(d2l.Decoder):
         return enc_outputs[1]
 
     def forward(self, X, state):
+        # The output `X` shape: (`num_steps`, `batch_size`, `embed_size`)
         X = self.embedding(X).swapaxes(0, 1)
-        out, state = self.rnn(X, state)
-        # Make the batch to be the first dimension to simplify loss computation
-        out = self.dense(out).swapaxes(0, 1)
-        return out, state
+        output, state = self.rnn(X, state)
+        output = self.dense(output).swapaxes(0, 1)
+        # `output` shape: (`batch_size`, `num_steps`, `vocab_size`)
+        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
+        return output, state
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
