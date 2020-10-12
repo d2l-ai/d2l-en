@@ -58,16 +58,15 @@ class Seq2SeqEncoder(d2l.Encoder):
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
 
     def forward(self, X, *args):
-        # `X` shape: (`batch_size`, `seq_len`, `embed_size`)
+        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
         X = self.embedding(X)
-        # RNN needs first axes to be time step, i.e., `seq_len`
+        # In RNN models, the first axis corresponds to time steps
         X = X.swapaxes(0, 1)
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
-        out, state = self.rnn(X, state)
-        # `out` shape: (`seq_len`, `batch_size`, `num_hiddens`)
-        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`),
-        # where "state" contains the hidden state and the memory cell
-        return out, state
+        output, state = self.rnn(X, state)
+        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
+        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
+        return output, state
 ```
 
 ```{.python .input}
@@ -82,14 +81,15 @@ class Seq2SeqEncoder(d2l.Encoder):
                           dropout=dropout)
 
     def forward(self, X, *args):
-        X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
-        # RNN needs first axes to be time step, i.e., seq_len
+        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
+        X = self.embedding(X)
+        # In RNN models, the first axis corresponds to time steps
         X = X.permute(1, 0, 2)
-        out, state = self.rnn(X) # When state is not mentioned, it defaults to zeros
-        # out shape: (seq_len, batch_size, num_hiddens)
-        # state shape: (num_layers, batch_size, num_hiddens),
-        # where "state" contains the hidden state and the memory cell
-        return out, state
+        # When state is not mentioned, it defaults to zeros
+        output, state = self.rnn(X)
+        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
+        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
+        return output, state
 ```
 
 Next, we will create a minibatch sequence input with a batch size of 4 and 7 time steps. We assume the number of hidden layers of the GRU unit is 2 and the number of hidden units is 16. The output shape returned by the encoder after performing forward calculation on the input is (number of time steps, batch size, number of hidden units). The shape of the multi-layer hidden state of the gated recurrent unit in the final time step is (number of hidden layers, batch size, number of hidden units). For the gated recurrent unit, the `state` list contains only one element, which is the hidden state. If long short-term memory is used, the `state` list will also contain another element, which is the memory cell.
@@ -150,11 +150,13 @@ class Seq2SeqDecoder(d2l.Decoder):
         return enc_outputs[1]
 
     def forward(self, X, state):
+        # The output `X` shape: (`num_steps`, `batch_size`, `embed_size`)
         X = self.embedding(X).swapaxes(0, 1)
-        out, state = self.rnn(X, state)
-        # Make the batch to be the first dimension to simplify loss computation
-        out = self.dense(out).swapaxes(0, 1)
-        return out, state
+        output, state = self.rnn(X, state)
+        output = self.dense(output).swapaxes(0, 1)
+        # `output` shape: (`batch_size`, `num_steps`, `vocab_size`)
+        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
+        return output, state
 ```
 
 ```{.python .input}
@@ -174,31 +176,31 @@ class Seq2SeqDecoder(d2l.Decoder):
 
     def forward(self, X, state):
         X = self.embedding(X).permute(1, 0, 2)
-        out, state = self.rnn(X, state)
+        output, state = self.rnn(X, state)
         # Make the batch to be the first dimension to simplify loss computation
-        out = self.dense(out).permute(1, 0, 2)
-        return out, state
+        output = self.dense(output).permute(1, 0, 2)
+        return output, state
 ```
 
 We create a decoder with the same hyperparameters as the encoder. As we can see, the output shape is changed to (batch size, the sequence length, vocabulary size).
 
 ```{.python .input}
-decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8,
-                         num_hiddens=16, num_layers=2)
+decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
+                         num_layers=2)
 decoder.initialize()
 state = decoder.init_state(encoder(X))
-out, state = decoder(X, state)
-out.shape, len(state), state[0].shape
+output, state = decoder(X, state)
+output.shape, len(state), state[0].shape
 ```
 
 ```{.python .input}
 #@tab pytorch
-decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8,
-                         num_hiddens=16, num_layers=2)
+decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8, num_hiddens=16, 
+                         num_layers=2)
 decoder.eval()
 state = decoder.init_state(encoder(X))
-out, state = decoder(X, state)
-out.shape, len(state), state[0].shape, state[1].shape
+output, state = decoder(X, state)
+output.shape, len(state), state[0].shape, state[1].shape
 ```
 
 ## The Loss Function
