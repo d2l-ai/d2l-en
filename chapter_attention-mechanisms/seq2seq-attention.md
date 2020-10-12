@@ -37,7 +37,7 @@ from torch import nn
 
 ## Decoder
 
-Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEncoder` in :numref:`sec_seq2seq`, we will just focus on the decoder. We add an MLP attention layer (`MLPAttention`) which has the same hidden size as the LSTM layer in the decoder. Then we initialize the state of the decoder by passing three items from the encoder:
+Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEncoder` in :numref:`sec_seq2seq`, we will just focus on the decoder. We add an MLP attention layer (`MLPAttention`) which has the same hidden size as the GRU layer in the decoder. Then we initialize the state of the decoder by passing three items from the encoder:
 
 - **the encoder outputs of all time steps**: they are used as the attention layer's memory with identical keys and values;
 
@@ -56,7 +56,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
         super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
         self.attention_cell = d2l.MLPAttention(num_hiddens, dropout)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
+        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
         self.dense = nn.Dense(vocab_size, flatten=False)
 
     def init_state(self, enc_outputs, enc_valid_len, *args):
@@ -90,9 +90,12 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
-        self.attention_cell = d2l.MLPAttention(num_hiddens, num_hiddens, num_hiddens, dropout)
+        self.attention_cell = d2l.MLPAttention(
+            num_hiddens, num_hiddens, num_hiddens, dropout)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = nn.LSTM(embed_size+num_hiddens, num_hiddens, num_layers, dropout=dropout)
+        self.rnn = nn.GRU(
+            embed_size + num_hiddens, num_hiddens, num_layers,
+            dropout=dropout)
         self.dense = nn.Linear(num_hiddens, vocab_size)
 
     def init_state(self, enc_outputs, enc_valid_len, *args):
@@ -216,4 +219,3 @@ for sentence in ['Go .', "I'm OK .", 'I won !']:
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1065)
 :end_tab:
-

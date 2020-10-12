@@ -45,8 +45,8 @@ So far what we describe above is a unidirectional RNN, where each time step's hi
 Now let us implement the seq2seq's encoder.
 Here we use the word embedding layer to obtain the feature vector
 according to the word index of the input language.
-Those feature vectors will be fed to a multi-layer LSTM.
-The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). The encoder returns both the LSTM outputs, i.e., hidden states of all the time steps, as well as the hidden state and the memory cell of the final time step.
+Those feature vectors will be fed to a multi-layer GRU.
+The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). The encoder returns both the GRU outputs, i.e., hidden states of all the time steps, as well as the hidden state and the memory cell of the final time step.
 
 ```{.python .input}
 #@save
@@ -55,7 +55,7 @@ class Seq2SeqEncoder(d2l.Encoder):
                  dropout=0, **kwargs):
         super(Seq2SeqEncoder, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
+        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
 
     def forward(self, X, *args):
         # `X` shape: (`batch_size`, `seq_len`, `embed_size`)
@@ -78,7 +78,8 @@ class Seq2SeqEncoder(d2l.Encoder):
                  dropout=0, **kwargs):
         super(Seq2SeqEncoder, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = nn.LSTM(embed_size, num_hiddens, num_layers, dropout=dropout)
+        self.rnn = nn.GRU(embed_size, num_hiddens, num_layers,
+                          dropout=dropout)
 
     def forward(self, X, *args):
         X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
@@ -91,7 +92,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         return out, state
 ```
 
-Next, we will create a minibatch sequence input with a batch size of 4 and 7 time steps. We assume the number of hidden layers of the LSTM unit is 2 and the number of hidden units is 16. The output shape returned by the encoder after performing forward calculation on the input is (number of time steps, batch size, number of hidden units). The shape of the multi-layer hidden state of the gated recurrent unit in the final time step is (number of hidden layers, batch size, number of hidden units). For the gated recurrent unit, the `state` list contains only one element, which is the hidden state. If long short-term memory is used, the `state` list will also contain another element, which is the memory cell.
+Next, we will create a minibatch sequence input with a batch size of 4 and 7 time steps. We assume the number of hidden layers of the GRU unit is 2 and the number of hidden units is 16. The output shape returned by the encoder after performing forward calculation on the input is (number of time steps, batch size, number of hidden units). The shape of the multi-layer hidden state of the gated recurrent unit in the final time step is (number of hidden layers, batch size, number of hidden units). For the gated recurrent unit, the `state` list contains only one element, which is the hidden state. If long short-term memory is used, the `state` list will also contain another element, which is the memory cell.
 
 ```{.python .input}
 encoder = Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
@@ -112,11 +113,12 @@ output, state = encoder(X)
 output.shape
 ```
 
-Since an LSTM is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units). However, if a GRU is used, the `state` list will contain only one element---the hidden state in the final time step with shape (number of hidden layers, batch size, number of hidden units).
+Since a GRU is used, the `state` list will contain only one element---the hidden state in the final time step with shape (number of hidden layers, batch size, number of hidden units).
+If an LSTM is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units).
 
 ```{.python .input}
 #@tab all
-len(state), state[0].shape, state[1].shape
+len(state), state[0].shape
 ```
 
 ## Decoder
@@ -132,7 +134,7 @@ $$\mathbf{s}_{t'} = g(\mathbf{y}_{t'-1}, \mathbf{c}, \mathbf{s}_{t'-1}).$$
 
 
 When implementing the decoder, we directly use the hidden state of the encoder in the final time step as the initial hidden state of the decoder. This requires that the encoder and decoder RNNs have the same numbers of layers and hidden units.
-The LSTM forward calculation of the decoder is similar to that of the encoder. The only difference is that we add a dense layer after the LSTM layers, where the hidden size is the vocabulary size. The dense layer will predict the confidence score for each word.
+The GRU forward calculation of the decoder is similar to that of the encoder. The only difference is that we add a dense layer after the GRU layers, where the hidden size is the vocabulary size. The dense layer will predict the confidence score for each word.
 
 ```{.python .input}
 #@save
@@ -141,7 +143,7 @@ class Seq2SeqDecoder(d2l.Decoder):
                  dropout=0, **kwargs):
         super(Seq2SeqDecoder, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
+        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
         self.dense = nn.Dense(vocab_size, flatten=False)
 
     def init_state(self, enc_outputs, *args):
@@ -163,7 +165,8 @@ class Seq2SeqDecoder(d2l.Decoder):
                  dropout=0, **kwargs):
         super(Seq2SeqDecoder, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = nn.LSTM(embed_size, num_hiddens, num_layers, dropout=dropout)
+        self.rnn = nn.GRU(embed_size, num_hiddens, num_layers,
+                          dropout=dropout)
         self.dense = nn.Linear(num_hiddens, vocab_size)
 
     def init_state(self, enc_outputs, *args):
@@ -185,7 +188,7 @@ decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8,
 decoder.initialize()
 state = decoder.init_state(encoder(X))
 out, state = decoder(X, state)
-out.shape, len(state), state[0].shape, state[1].shape
+out.shape, len(state), state[0].shape
 ```
 
 ```{.python .input}
@@ -321,7 +324,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
     def xavier_init_weights(m):
         if type(m) == nn.Linear:
             torch.nn.init.xavier_uniform_(m.weight)
-        if type(m) == nn.LSTM:
+        if type(m) == nn.GRU:
             for param in m._flat_weights_names:
                 if "weight" in param:
                     torch.nn.init.xavier_uniform_(m._parameters[param])
@@ -455,7 +458,7 @@ for sentence in ['Go .', "I'm OK .", 'I won !']:
 ## Summary
 
 * The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output from a sequence input.
-* We use multiple LSTM layers for both the encoder and the decoder.
+* We use multiple GRU layers for both the encoder and the decoder.
 
 
 ## Exercises

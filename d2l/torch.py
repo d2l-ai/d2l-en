@@ -961,7 +961,8 @@ class Seq2SeqEncoder(d2l.Encoder):
                  dropout=0, **kwargs):
         super(Seq2SeqEncoder, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = nn.LSTM(embed_size, num_hiddens, num_layers, dropout=dropout)
+        self.rnn = nn.GRU(embed_size, num_hiddens, num_layers,
+                          dropout=dropout)
 
     def forward(self, X, *args):
         X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
@@ -980,7 +981,8 @@ class Seq2SeqDecoder(d2l.Decoder):
                  dropout=0, **kwargs):
         super(Seq2SeqDecoder, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = nn.LSTM(embed_size, num_hiddens, num_layers, dropout=dropout)
+        self.rnn = nn.GRU(embed_size, num_hiddens, num_layers,
+                          dropout=dropout)
         self.dense = nn.Linear(num_hiddens, vocab_size)
 
     def init_state(self, enc_outputs, *args):
@@ -1022,7 +1024,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
     def xavier_init_weights(m):
         if type(m) == nn.Linear:
             torch.nn.init.xavier_uniform_(m.weight)
-        if type(m) == nn.LSTM:
+        if type(m) == nn.GRU:
             for param in m._flat_weights_names:
                 if "weight" in param:
                     torch.nn.init.xavier_uniform_(m._parameters[param])

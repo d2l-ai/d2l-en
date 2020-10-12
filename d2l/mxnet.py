@@ -899,7 +899,7 @@ class Seq2SeqEncoder(d2l.Encoder):
                  dropout=0, **kwargs):
         super(Seq2SeqEncoder, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
+        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
 
     def forward(self, X, *args):
         # `X` shape: (`batch_size`, `seq_len`, `embed_size`)
@@ -920,7 +920,7 @@ class Seq2SeqDecoder(d2l.Decoder):
                  dropout=0, **kwargs):
         super(Seq2SeqDecoder, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
+        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
         self.dense = nn.Dense(vocab_size, flatten=False)
 
     def init_state(self, enc_outputs, *args):
