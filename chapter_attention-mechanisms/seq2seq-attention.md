@@ -109,7 +109,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
         outputs = []
         for x in X:
             # query shape: (batch_size, 1, num_hiddens)
-            query = torch.unsqueeze(hidden_state[0][-1], dim=1)
+            query = torch.unsqueeze(hidden_state[-1], dim=1)
             # context has same shape as query
             context = self.attention_cell(
                 query, enc_outputs, enc_outputs, enc_valid_len)
