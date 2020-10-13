@@ -294,8 +294,8 @@ During training, if the target sequence has length $n$, we feed the first $n-1$ 
 #@save
 def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
     model.initialize(init.Xavier(), force_reinit=True, ctx=device)
-    trainer = gluon.Trainer(model.collect_params(),
-                            'adam', {'learning_rate': lr})
+    trainer = gluon.Trainer(model.collect_params(), 'adam',
+                            {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs])
@@ -352,7 +352,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
             with torch.no_grad():
                 metric.add(l.sum(), num_tokens)
         if epoch % 10 == 0:
-            animator.add(epoch + 1, (metric[0]/metric[1],))
+            animator.add(epoch + 1, (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device)}')
 ```
@@ -360,21 +360,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
 Next, we create a model instance and set hyperparameters. Then, we can train the model.
 
 ```{.python .input}
-embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
-batch_size, num_steps = 64, 10
-lr, num_epochs, device = 0.005, 300, d2l.try_gpu()
-
-train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
-encoder = Seq2SeqEncoder(
-    len(src_vocab), embed_size, num_hiddens, num_layers, dropout)
-decoder = Seq2SeqDecoder(
-    len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
-model = d2l.EncoderDecoder(encoder, decoder)
-train_s2s_ch9(model, train_iter, lr, num_epochs, device)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_steps = 64, 10
 lr, num_epochs, device = 0.005, 300, d2l.try_gpu()
@@ -400,13 +386,13 @@ sequence. As illustrated in :numref:`fig_seq2seq_predict`, during predicting, we
 #@save
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
-    src_tokens = src_vocab[src_sentence.lower().split(' ')]
+    src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
+        src_vocab['<eos>']]
     enc_valid_len = np.array([len(src_tokens)], ctx=device)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
     enc_X = np.array(src_tokens, ctx=device)
-    # Add the  batch size dimension
-    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
-                                enc_valid_len)
+    # Add the batch axis
+    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0), enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
     dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=device), axis=0)
     predict_tokens = []
@@ -426,11 +412,12 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
 #@save
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
-    src_tokens = src_vocab[src_sentence.lower().split(' ')]
+    src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
+        src_vocab['<eos>']]
     enc_valid_len = torch.tensor([len(src_tokens)], device=device)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
     enc_X = torch.tensor(src_tokens, dtype=torch.long, device=device)
-    # Add the  batch size dimension
+    # Add the batch axis
     enc_outputs = model.encoder(torch.unsqueeze(enc_X, dim=0),
                                 enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
