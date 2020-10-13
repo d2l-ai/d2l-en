@@ -447,7 +447,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
                             'sgd', {'learning_rate': lr})
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
-    timer = d2l.Timer()
+    timer, num_batches = d2l.Timer(), len(train_iter)
     for epoch in range(num_epochs):
         # Sum of training loss, sum of training accuracy, no. of examples
         metric = d2l.Accumulator(3)
@@ -464,8 +464,8 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
             timer.stop()
             train_loss = metric[0] / metric[2]
             train_acc = metric[1] / metric[2]
-            if (i + 1) % 50 == 0 or i == len(train_iter) - 1:
-                animator.add(epoch + i / len(train_iter),
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch + 1, (None, None, test_acc))
@@ -1384,8 +1384,8 @@ def train_batch_ch13(net, features, labels, loss, trainer, devices,
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus(), split_f=d2l.split_batch):
-    num_batches, timer = len(train_iter), d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
+    timer, num_batches = d2l.Timer(), len(train_iter)
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         # Store training_loss, training_accuracy, num_examples, num_features
@@ -1396,8 +1396,8 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                 net, features, labels, loss, trainer, devices, split_f)
             metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
-            if (i + 1) % (num_batches // 5) == 0:
-                animator.add(epoch + i / num_batches,
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
                              (metric[0] / metric[2], metric[1] / metric[3],
                               None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)

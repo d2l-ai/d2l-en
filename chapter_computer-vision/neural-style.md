@@ -214,10 +214,10 @@ epochs, the process may occupy a great deal of memory. Therefore, we call the
 def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
     X, styles_Y_gram, trainer = get_inits(X, device, lr, styles_Y)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[1, num_epochs],
+                            xlim=[10, num_epochs],
                             legend=['content', 'style', 'TV'],
                             ncols=2, figsize=(7, 2.5))
-    for epoch in range(1, num_epochs+1):
+    for epoch in range(num_epochs):
         with autograd.record():
             contents_Y_hat, styles_Y_hat = extract_features(
                 X, content_layers, style_layers)
@@ -226,13 +226,12 @@ def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
         l.backward()
         trainer.step(1)
         npx.waitall()
-        if epoch % lr_decay_epoch == 0:
+        if (epoch + 1) % lr_decay_epoch == 0:
             trainer.set_learning_rate(trainer.learning_rate * 0.1)
-        if epoch % 10 == 0:
+        if (epoch + 1) % 10 == 0:
             animator.axes[1].imshow(postprocess(X).asnumpy())
-            animator.add(epoch, [float(sum(contents_l)),
-                                 float(sum(styles_l)),
-                                 float(tv_l)])
+            animator.add(epoch + 1, [float(sum(contents_l)),
+                                     float(sum(styles_l)), float(tv_l)])
     return X
 ```
 

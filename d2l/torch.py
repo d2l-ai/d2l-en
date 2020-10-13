@@ -475,7 +475,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
     loss = nn.CrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
-    timer = d2l.Timer()
+    timer, num_batches = d2l.Timer(), len(train_iter)
     for epoch in range(num_epochs):
         # Sum of training loss, sum of training accuracy, no. of examples
         metric = d2l.Accumulator(3)
@@ -493,8 +493,8 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
             timer.stop()
             train_loss = metric[0]/metric[2]
             train_acc = metric[1]/metric[2]
-            if (i + 1) % 50 == 0 or i == len(train_iter) - 1:
-                animator.add(epoch + i / len(train_iter),
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))

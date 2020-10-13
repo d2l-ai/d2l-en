@@ -203,7 +203,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
     trainer = gluon.Trainer(net.output_new.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
     num_batches, timer = len(train_iter), d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                             legend=['train loss', 'valid loss'])
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(2)
@@ -214,7 +214,8 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
             X_shards, y_shards = d2l.split_batch(features, labels, devices)
             output_features = [net.features(X_shard) for X_shard in X_shards]
             with autograd.record():
-                outputs = [net.output_new(feature) for feature in output_features]
+                outputs = [net.output_new(feature)
+                           for feature in output_features]
                 ls = [loss(output, y_shard).sum() for output, y_shard
                       in zip(outputs, y_shards)]
             for l in ls:
@@ -222,8 +223,8 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
             trainer.step(batch_size)
             metric.add(sum([float(l.sum()) for l in ls]), labels.shape[0])
             timer.stop()
-            if (i + 1) % (num_batches // 5) == 0:
-                animator.add(epoch + i / num_batches, 
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches, 
                              (metric[0] / metric[1], None))
         if valid_iter is not None:
             valid_loss = evaluate_loss(valid_iter, net, devices)

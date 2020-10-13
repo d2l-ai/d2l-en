@@ -282,7 +282,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
     num_batches, timer = len(train_iter), d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                             legend=['train loss', 'train acc', 'valid acc'])
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(3)
@@ -295,12 +295,13 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
                 devices, d2l.split_batch)
             metric.add(l, acc, labels.shape[0])
             timer.stop()
-            if (i + 1) % (num_batches // 5) == 0:
-                animator.add(epoch + i / num_batches,
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
                              (metric[0] / metric[2], metric[1] / metric[2],
                               None))
         if valid_iter is not None:
-            valid_acc = d2l.evaluate_accuracy_gpus(net, valid_iter, d2l.split_batch)
+            valid_acc = d2l.evaluate_accuracy_gpus(net, valid_iter,
+                                                   d2l.split_batch)
             animator.add(epoch + 1, (None, None, valid_acc))
     if valid_iter is not None:
         print(f'loss {metric[0] / metric[2]:.3f}, '
