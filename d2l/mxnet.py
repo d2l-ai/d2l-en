@@ -728,7 +728,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
     """Train a model (defined in Chapter 8)."""
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[1, num_epochs])
+                            legend=['train'], xlim=[10, num_epochs])
     # Initialize
     if isinstance(model, gluon.Block):
         model.initialize(ctx=device, force_reinit=True,
@@ -743,8 +743,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
             model, train_iter, loss, updater, device, use_random_iter)
-        if epoch % 10 == 0:
-            print(predict('time traveller'))
+        if (epoch + 1) % 10 == 0:
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))

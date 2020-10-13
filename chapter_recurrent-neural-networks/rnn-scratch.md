@@ -681,7 +681,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
     """Train a model (defined in Chapter 8)."""
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[1, num_epochs])
+                            legend=['train'], xlim=[10, num_epochs])
     # Initialize
     if isinstance(model, gluon.Block):
         model.initialize(ctx=device, force_reinit=True,
@@ -696,8 +696,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
             model, train_iter, loss, updater, device, use_random_iter)
-        if epoch % 10 == 0:
-            print(predict('time traveller'))
+        if (epoch + 1) % 10 == 0:
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
@@ -712,7 +711,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
     """Train a model (defined in Chapter 8)."""
     loss = nn.CrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[1, num_epochs])
+                            legend=['train'], xlim=[10, num_epochs])
     # Initialize
     if isinstance(model, nn.Module):
         updater = torch.optim.SGD(model.parameters(), lr)
@@ -723,7 +722,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
             model, train_iter, loss, updater, device, use_random_iter)
-        if epoch % 10 == 0:
+        if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
@@ -742,13 +741,13 @@ def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         updater = tf.keras.optimizers.SGD(lr)
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[1, num_epochs])
+                            legend=['train'], xlim=[10, num_epochs])
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
     # Train and predict
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
              model, train_iter, loss, updater, params, use_random_iter)
-        if epoch % 10 == 0:
+        if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
     device = d2l.try_gpu()._device_name
@@ -784,8 +783,8 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
 ```{.python .input}
 #@tab tensorflow
 params = get_params(len(vocab_random_iter), num_hiddens)
-train_ch8(model, train_random_iter, vocab_random_iter, num_hiddens,
-          lr, num_epochs, strategy, use_random_iter=True)
+train_ch8(model, train_random_iter, vocab_random_iter, num_hiddens, lr,
+          num_epochs, strategy, use_random_iter=True)
 ```
 
 While implementing the above RNN model from scratch is instructive, it is not convenient.

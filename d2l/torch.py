@@ -773,7 +773,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
     """Train a model (defined in Chapter 8)."""
     loss = nn.CrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[1, num_epochs])
+                            legend=['train'], xlim=[10, num_epochs])
     # Initialize
     if isinstance(model, nn.Module):
         updater = torch.optim.SGD(model.parameters(), lr)
@@ -784,7 +784,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
             model, train_iter, loss, updater, device, use_random_iter)
-        if epoch % 10 == 0:
+        if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')

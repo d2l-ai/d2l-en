@@ -760,13 +760,13 @@ def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         updater = tf.keras.optimizers.SGD(lr)
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[1, num_epochs])
+                            legend=['train'], xlim=[10, num_epochs])
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
     # Train and predict
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
              model, train_iter, loss, updater, params, use_random_iter)
-        if epoch % 10 == 0:
+        if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
     device = d2l.try_gpu()._device_name
