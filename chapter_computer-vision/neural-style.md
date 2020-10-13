@@ -156,7 +156,7 @@ def tv_loss(Y_hat):
                   np.abs(Y_hat[:, :, :, 1:] - Y_hat[:, :, :, :-1]).mean())
 ```
 
-### The Loss Function
+### Loss Function
 
 The loss function for style transfer is the weighted sum of the content loss, style loss, and total variance loss. By adjusting these weight hyperparameters, we can balance the retained content, transferred style, and noise reduction in the composite image according to their relative importance.
 

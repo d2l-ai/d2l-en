@@ -203,7 +203,7 @@ output, state = decoder(X, state)
 output.shape, len(state), state[0].shape, state[1].shape
 ```
 
-## The Loss Function
+## Loss Function
 
 For each time step, the decoder outputs a vocabulary-size confidence score vector to predict words. Similar to language modeling, we can apply softmax to obtain the probabilities and then use cross-entropy loss to calculate the loss. Note that we padded the target sentences to make them have the same length, but we do not need to compute the loss on the padding symbols.
 
@@ -246,11 +246,11 @@ Now we can implement the masked version of the softmax cross-entropy loss. Note 
 ```{.python .input}
 #@save
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
-    # `pred` shape: (`batch_size`, `seq_len`, `vocab_size`)
-    # `label` shape: (`batch_size`, `seq_len`)
-    # `valid_len` shape: (`batch_size`, )
+    # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
+    # `label` shape: (`batch_size`, `num_steps`)
+    # `valid_len` shape: (`batch_size`,)
     def forward(self, pred, label, valid_len):
-        # weights shape: (batch_size, seq_len, 1)
+        # `weights` shape: (`batch_size`, `num_steps`, 1)
         weights = np.expand_dims(np.ones_like(label), axis=-1)
         weights = npx.sequence_mask(weights, valid_len, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
@@ -260,9 +260,9 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
 #@tab pytorch
 #@save
 class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
-    # pred shape: (batch_size, seq_len, vocab_size)
-    # label shape: (batch_size, seq_len)
-    # valid_len shape: (batch_size, )
+    # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
+    # `label` shape: (`batch_size`, `num_steps`)
+    # `valid_len` shape: (`batch_size`,)
     def forward(self, pred, label, valid_len):
         weights = torch.ones_like(label)
         weights = sequence_mask(weights, valid_len)
@@ -298,10 +298,10 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
                             'adam', {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[1, num_epochs], ylim=[0, 0.25])
-    for epoch in range(1, num_epochs + 1):
+                            xlim=[1, num_epochs])
+    for epoch in range(num_epochs):
         timer = d2l.Timer()
-        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
+        metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
         for batch in data_iter:
             X, X_vlen, Y, Y_vlen = [x.as_in_ctx(device) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
@@ -314,7 +314,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
             trainer.step(num_tokens)
             metric.add(l.sum(), num_tokens)
         if epoch % 10 == 0:
-            animator.add(epoch, (metric[0]/metric[1],))
+            animator.add(epoch + 1, (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device)}')
 ```
@@ -336,10 +336,10 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
     loss = MaskedSoftmaxCELoss()
     model.train()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[1, num_epochs], ylim=[0, 0.25])
-    for epoch in range(1, num_epochs + 1):
+                            xlim=[1, num_epochs])
+    for epoch in range(num_epochs):
         timer = d2l.Timer()
-        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
+        metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
         for batch in data_iter:
             X, X_vlen, Y, Y_vlen = [x.to(device) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
@@ -352,7 +352,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
             with torch.no_grad():
                 metric.add(l.sum(), num_tokens)
         if epoch % 10 == 0:
-            animator.add(epoch, (metric[0]/metric[1],))
+            animator.add(epoch + 1, (metric[0]/metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device)}')
 ```
