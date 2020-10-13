@@ -950,7 +950,7 @@ class EncoderDecoder(nn.Module):
         self.decoder = decoder
 
     def forward(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args)
+        enc_outputs = self.encoder(enc_X)
         dec_state = self.decoder.init_state(enc_outputs, *args)
         return self.decoder(dec_X, dec_state)
 
@@ -1042,7 +1042,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
         for batch in data_iter:
             X, X_vlen, Y, Y_vlen = [x.to(device) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
-            Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
+            Y_hat, _ = model(X, Y_input, X_vlen)
             l = loss(Y_hat, Y_label, Y_vlen)
             l.sum().backward() # Making the loss scalar for backward()
             d2l.grad_clipping(model, 1)

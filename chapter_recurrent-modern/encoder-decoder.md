@@ -44,7 +44,7 @@ the encoder takes variable-length sequences as the input `X`.
 The implementation will be provided 
 by any model that inherits this base `Encoder` class.
 
-```{.python .input  n=4}
+```{.python .input}
 from mxnet.gluon import nn
 
 #@save
@@ -57,7 +57,7 @@ class Encoder(nn.Block):
         raise NotImplementedError
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab pytorch
 from torch import nn
 
@@ -88,7 +88,7 @@ may map an input (e.g., the generated token at the previous time step)
 and the encoded state
 into an output token at the current time step.
 
-```{.python .input  n=3}
+```{.python .input}
 #@save
 class Decoder(nn.Block):
     """The base decoder interface for the encoder-decoder architecture."""
@@ -102,7 +102,7 @@ class Decoder(nn.Block):
         raise NotImplementedError
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 #@tab pytorch
 #@save
 class Decoder(nn.Module):
@@ -129,8 +129,7 @@ is used to produce the encoded state,
 and this state
 will be further used by the decoder as one of its input.
 
-
-```{.python .input  n=4}
+```{.python .input}
 #@save
 class EncoderDecoder(nn.Block):
     """The base class for the encoder-decoder architecture."""
@@ -145,7 +144,7 @@ class EncoderDecoder(nn.Block):
         return self.decoder(dec_X, dec_state)
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 #@tab pytorch
 #@save
 class EncoderDecoder(nn.Module):
@@ -156,7 +155,7 @@ class EncoderDecoder(nn.Module):
         self.decoder = decoder
 
     def forward(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X, *args)
+        enc_outputs = self.encoder(enc_X)
         dec_state = self.decoder.init_state(enc_outputs, *args)
         return self.decoder(dec_X, dec_state)
 ```
@@ -181,8 +180,6 @@ this encoder-decoder architecture.
 
 1. Suppose that we use neural networks to implement the encoder-decoder architecture. Do the encoder and the decoder have to be the same type of neural network?  
 1. Besides machine translation, can you think of another application where the encoder-decoder architecture can be applied?
-
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/341)

@@ -961,7 +961,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
             X, X_vlen, Y, Y_vlen = [x.as_in_ctx(device) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
             with autograd.record():
-                Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
+                Y_hat, _ = model(X, Y_input, X_vlen)
                 l = loss(Y_hat, Y_label, Y_vlen)
             l.backward()
             d2l.grad_clipping(model, 1)

@@ -306,7 +306,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
             X, X_vlen, Y, Y_vlen = [x.as_in_ctx(device) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
             with autograd.record():
-                Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
+                Y_hat, _ = model(X, Y_input, X_vlen)
                 l = loss(Y_hat, Y_label, Y_vlen)
             l.backward()
             d2l.grad_clipping(model, 1)
@@ -343,7 +343,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
         for batch in data_iter:
             X, X_vlen, Y, Y_vlen = [x.to(device) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
-            Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
+            Y_hat, _ = model(X, Y_input, X_vlen)
             l = loss(Y_hat, Y_label, Y_vlen)
             l.sum().backward() # Making the loss scalar for backward()
             d2l.grad_clipping(model, 1)
@@ -455,6 +455,7 @@ for sentence in ['Go .', "I'm OK .", 'I won !']:
 1. Can you think of other use cases of seq2seq besides neural machine translation?
 1. What if the input sequence in the example of this section is longer?
 1. If we do not use the `SequenceMask` in the loss function, what may happen?
+1. Replace GRU with LSTM in the experiment.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/345)

@@ -211,6 +211,7 @@ for sentence in ['Go .', "I'm OK .", 'I won !']:
 
 1. Compare `Seq2SeqAttentionDecoder` and `Seq2seqDecoder` by using the same parameters and checking their losses.
 1. Can you think of any use cases where `Seq2SeqAttentionDecoder` will outperform `Seq2seqDecoder`?
+1. Replace GRU with LSTM in the experiment.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/347)
