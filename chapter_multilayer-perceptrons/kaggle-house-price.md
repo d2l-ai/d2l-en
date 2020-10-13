@@ -561,8 +561,8 @@ when we train $K$ times in the $K$-fold cross-validation.
 
 ```{.python .input}
 #@tab all
-def k_fold(k, X_train, y_train, num_epochs,
-           learning_rate, weight_decay, batch_size):
+def k_fold(k, X_train, y_train, num_epochs, learning_rate, weight_decay,
+           batch_size):
     train_l_sum, valid_l_sum = 0, 0
     for i in range(k):
         data = get_k_fold_data(k, i, X_train, y_train)

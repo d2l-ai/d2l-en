@@ -1035,7 +1035,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
     loss = MaskedSoftmaxCELoss()
     model.train()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[1, num_epochs])
+                            xlim=[10, num_epochs])
     for epoch in range(num_epochs):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
@@ -1050,7 +1050,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
             optimizer.step()
             with torch.no_grad():
                 metric.add(l.sum(), num_tokens)
-        if epoch % 10 == 0:
+        if (epoch + 1) % 10 == 0:
             animator.add(epoch + 1, (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device)}')
