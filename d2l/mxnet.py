@@ -445,7 +445,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
     timer = d2l.Timer()
     for epoch in range(num_epochs):
@@ -453,7 +453,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
         metric = d2l.Accumulator(3)
         for i, (X, y) in enumerate(train_iter):
             timer.start()
-            # Here is the major difference compared with `d2l.train_epoch_ch3`
+            # Here is the major difference from `d2l.train_epoch_ch3`
             X, y = X.as_in_ctx(device), y.as_in_ctx(device)
             with autograd.record():
                 y_hat = net(X)
@@ -464,7 +464,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
             timer.stop()
             train_loss = metric[0] / metric[2]
             train_acc = metric[1] / metric[2]
-            if (i + 1) % 50 == 0:
+            if (i + 1) % 50 == 0 or i == len(train_iter) - 1:
                 animator.add(epoch + i / len(train_iter),
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
@@ -937,11 +937,11 @@ class Seq2SeqDecoder(d2l.Decoder):
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
-    # `pred` shape: (`batch_size`, `seq_len`, `vocab_size`)
-    # `label` shape: (`batch_size`, `seq_len`)
-    # `valid_len` shape: (`batch_size`, )
+    # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
+    # `label` shape: (`batch_size`, `num_steps`)
+    # `valid_len` shape: (`batch_size`,)
     def forward(self, pred, label, valid_len):
-        # weights shape: (batch_size, seq_len, 1)
+        # `weights` shape: (`batch_size`, `num_steps`, 1)
         weights = np.expand_dims(np.ones_like(label), axis=-1)
         weights = npx.sequence_mask(weights, valid_len, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
@@ -950,14 +950,14 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
     model.initialize(init.Xavier(), force_reinit=True, ctx=device)
-    trainer = gluon.Trainer(model.collect_params(),
-                            'adam', {'learning_rate': lr})
+    trainer = gluon.Trainer(model.collect_params(), 'adam',
+                            {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[1, num_epochs], ylim=[0, 0.25])
-    for epoch in range(1, num_epochs + 1):
+                            xlim=[1, num_epochs])
+    for epoch in range(num_epochs):
         timer = d2l.Timer()
-        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
+        metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
         for batch in data_iter:
             X, X_vlen, Y, Y_vlen = [x.as_in_ctx(device) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
@@ -970,7 +970,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
             trainer.step(num_tokens)
             metric.add(l.sum(), num_tokens)
         if epoch % 10 == 0:
-            animator.add(epoch, (metric[0]/metric[1],))
+            animator.add(epoch + 1, (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device)}')
 
@@ -978,13 +978,13 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
-    src_tokens = src_vocab[src_sentence.lower().split(' ')]
+    src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
+        src_vocab['<eos>']]
     enc_valid_len = np.array([len(src_tokens)], ctx=device)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
     enc_X = np.array(src_tokens, ctx=device)
-    # Add the  batch size dimension
-    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
-                                enc_valid_len)
+    # Add the batch axis
+    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0), enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
     dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=device), axis=0)
     predict_tokens = []
@@ -2108,51 +2108,6 @@ def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
         ls.append(mlm_l + nsp_l)
         npx.waitall()
     return mlm_ls, nsp_ls, ls
-
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def train_bert(train_iter, net, loss, vocab_size, devices, log_interval,
-               num_steps):
-    trainer = gluon.Trainer(net.collect_params(), 'adam',
-                            {'learning_rate': 1e-3})
-    step, timer = 0, d2l.Timer()
-    animator = d2l.Animator(xlabel='step', ylabel='loss',
-                            xlim=[1, num_steps], legend=['mlm', 'nsp'])
-    # Sum of masked language modeling losses, sum of next sentence prediction
-    # losses, no. of sentence pairs, count
-    metric = d2l.Accumulator(4)
-    num_steps_reached = False
-    while step < num_steps and not num_steps_reached:
-        for batch in train_iter:
-            (tokens_X_shards, segments_X_shards, valid_lens_x_shards,
-             pred_positions_X_shards, mlm_weights_X_shards,
-             mlm_Y_shards, nsp_y_shards) = [gluon.utils.split_and_load(
-                elem, devices, even_split=False) for elem in batch]
-            timer.start()
-            with autograd.record():
-                mlm_ls, nsp_ls, ls = _get_batch_loss_bert(
-                    net, loss, vocab_size, tokens_X_shards, segments_X_shards,
-                    valid_lens_x_shards, pred_positions_X_shards,
-                    mlm_weights_X_shards, mlm_Y_shards, nsp_y_shards)
-            for l in ls:
-                l.backward()
-            trainer.step(1)
-            mlm_l_mean = sum([float(l) for l in mlm_ls]) / len(mlm_ls)
-            nsp_l_mean = sum([float(l) for l in nsp_ls]) / len(nsp_ls)
-            metric.add(mlm_l_mean, nsp_l_mean, batch[0].shape[0], 1)
-            timer.stop()
-            if (step + 1) % log_interval == 0:
-                animator.add(step + 1,
-                             (metric[0] / metric[3], metric[1] / metric[3]))
-            step += 1
-            if step == num_steps:
-                num_steps_reached = True
-                break
-
-    print(f'MLM loss {metric[0] / metric[3]:.3f}, '
-          f'NSP loss {metric[1] / metric[3]:.3f}')
-    print(f'{metric[2] / timer.sum():.1f} sentence pairs/sec on '
-          f'{str(devices)}')
 
 
 # Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis-and-dataset.md

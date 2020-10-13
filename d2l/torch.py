@@ -473,7 +473,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
     net.to(device)
     optimizer = torch.optim.SGD(net.parameters(), lr=lr)
     loss = nn.CrossEntropyLoss()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
     timer = d2l.Timer()
     for epoch in range(num_epochs):
@@ -493,7 +493,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
             timer.stop()
             train_loss = metric[0]/metric[2]
             train_acc = metric[1]/metric[2]
-            if (i + 1) % 50 == 0:
+            if (i + 1) % 50 == 0 or i == len(train_iter) - 1:
                 animator.add(epoch + i / len(train_iter),
                              (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
@@ -1008,9 +1008,9 @@ def sequence_mask(X, valid_len, value=0):
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
-    # pred shape: (batch_size, seq_len, vocab_size)
-    # label shape: (batch_size, seq_len)
-    # valid_len shape: (batch_size, )
+    # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
+    # `label` shape: (`batch_size`, `num_steps`)
+    # `valid_len` shape: (`batch_size`,)
     def forward(self, pred, label, valid_len):
         weights = torch.ones_like(label)
         weights = sequence_mask(weights, valid_len)
@@ -1035,10 +1035,10 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
     loss = MaskedSoftmaxCELoss()
     model.train()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[1, num_epochs], ylim=[0, 0.25])
-    for epoch in range(1, num_epochs + 1):
+                            xlim=[1, num_epochs])
+    for epoch in range(num_epochs):
         timer = d2l.Timer()
-        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
+        metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
         for batch in data_iter:
             X, X_vlen, Y, Y_vlen = [x.to(device) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
@@ -1051,7 +1051,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
             with torch.no_grad():
                 metric.add(l.sum(), num_tokens)
         if epoch % 10 == 0:
-            animator.add(epoch, (metric[0]/metric[1],))
+            animator.add(epoch + 1, (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
           f'tokens/sec on {str(device)}')
 
@@ -1059,11 +1059,12 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
-    src_tokens = src_vocab[src_sentence.lower().split(' ')]
+    src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
+        src_vocab['<eos>']]
     enc_valid_len = torch.tensor([len(src_tokens)], device=device)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
     enc_X = torch.tensor(src_tokens, dtype=torch.long, device=device)
-    # Add the  batch size dimension
+    # Add the batch axis
     enc_outputs = model.encoder(torch.unsqueeze(enc_X, dim=0),
                                 enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)

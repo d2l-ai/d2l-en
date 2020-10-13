@@ -456,7 +456,7 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
     def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
         self.timer = d2l.Timer()
         self.animator = d2l.Animator(
-            xlabel='epoch', xlim=[0, num_epochs], legend=[
+            xlabel='epoch', xlim=[1, num_epochs], legend=[
                 'train loss', 'train acc', 'test acc'])
         self.net = net
         self.train_iter = train_iter
@@ -470,7 +470,7 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
         test_acc = self.net.evaluate(
             self.test_iter, verbose=0, return_dict=True)['accuracy']
         metrics = (logs['loss'], logs['accuracy'], test_acc)
-        self.animator.add(epoch+1, metrics)
+        self.animator.add(epoch + 1, metrics)
         if epoch == self.num_epochs - 1:
             batch_size = next(iter(self.train_iter))[0].shape[0]
             num_examples = batch_size * tf.data.experimental.cardinality(
