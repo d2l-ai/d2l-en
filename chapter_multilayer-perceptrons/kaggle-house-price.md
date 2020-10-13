@@ -193,7 +193,7 @@ import pandas as pd
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
@@ -206,8 +206,7 @@ import pandas as pd
 import numpy as np
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
@@ -218,7 +217,6 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 ```
-
 
 For convenience, we can download and cache
 the Kaggle housing dataset
@@ -372,7 +370,7 @@ def get_net():
     return net
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 loss = nn.MSELoss()
 in_features = train_features.shape[1]
@@ -382,8 +380,7 @@ def get_net():
     return net
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 loss = tf.keras.losses.MeanSquaredError()
 
@@ -393,7 +390,6 @@ def get_net():
         1, kernel_regularizer=tf.keras.regularizers.l2(weight_decay)))
     return net
 ```
-
 
 With house prices, as with stock prices,
 we care about relative quantities
@@ -428,7 +424,7 @@ def log_rmse(net, features, labels):
     return np.sqrt(2 * loss(np.log(clipped_preds), np.log(labels)).mean())
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def log_rmse(net, features, labels):
     # To further stabilize the value when the logarithm is taken, set the
@@ -439,8 +435,7 @@ def log_rmse(net, features, labels):
     return rmse.item()
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def log_rmse(y_true, y_pred):
     # To further stabilize the value when the logarithm is taken, set the
@@ -449,7 +444,6 @@ def log_rmse(y_true, y_pred):
     return tf.sqrt(tf.reduce_mean(loss(
         tf.math.log(y_true), tf.math.log(clipped_preds))))
 ```
-
 
 Unlike in previous sections, our training functions
 will rely on the Adam optimizer
@@ -480,7 +474,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
     return train_ls, test_ls
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
@@ -502,8 +496,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
     return train_ls, test_ls
 ```
 
-
-```python
+```{.python .input}
 #@tab tensorflow
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
@@ -525,7 +518,6 @@ def train(net, train_features, train_labels, test_features, test_labels,
             test_ls.append(log_rmse(test_labels, net(test_features)))
     return train_ls, test_ls
 ```
-
 
 ## $K$-Fold Cross-Validation
 
