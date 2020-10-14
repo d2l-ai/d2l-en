@@ -462,14 +462,14 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
             trainer.step(X.shape[0])
             metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
             timer.stop()
-            train_loss = metric[0] / metric[2]
+            train_l = metric[0] / metric[2]
             train_acc = metric[1] / metric[2]
             if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
                 animator.add(epoch + (i + 1) / num_batches,
-                             (train_loss, train_acc, None))
+                             (train_l, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch + 1, (None, None, test_acc))
-    print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
+    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '
           f'test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
           f'on {str(device)}')
@@ -958,14 +958,15 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
         for batch in data_iter:
-            X, X_vlen, Y, Y_vlen = [x.as_in_ctx(device) for x in batch]
-            Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
+            X, X_valid_len, Y, Y_valid_len = [
+                x.as_in_ctx(device) for x in batch]
+            Y_input, Y_label, Y_valid_len = Y[:, :-1], Y[:, 1:], Y_valid_len-1
             with autograd.record():
-                Y_hat, _ = model(X, Y_input, X_vlen)
-                l = loss(Y_hat, Y_label, Y_vlen)
+                Y_hat, _ = model(X, Y_input, X_valid_len)
+                l = loss(Y_hat, Y_label, Y_valid_len)
             l.backward()
             d2l.grad_clipping(model, 1)
-            num_tokens = Y_vlen.sum()
+            num_tokens = Y_valid_len.sum()
             trainer.step(num_tokens)
             metric.add(l.sum(), num_tokens)
         if (epoch + 1) % 10 == 0:
@@ -981,21 +982,25 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
         src_vocab['<eos>']]
     enc_valid_len = np.array([len(src_tokens)], ctx=device)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
-    enc_X = np.array(src_tokens, ctx=device)
     # Add the batch axis
-    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0), enc_valid_len)
+    enc_X = np.expand_dims(np.array(src_tokens, ctx=device), axis=0)
+    enc_outputs = model.encoder(enc_X, enc_valid_len)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
+    # Add the batch axis
     dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=device), axis=0)
-    predict_tokens = []
+    output_seq = []
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
-        # The token with highest score is used as the next time step input
+        # We use the token with the highest prediction likelihood as the input
+        # of the decoder at the next time step
         dec_X = Y.argmax(axis=2)
-        py = dec_X.squeeze(axis=0).astype('int32').item()
-        if py == tgt_vocab['<eos>']:
+        pred = dec_X.squeeze(axis=0).astype('int32').item()
+        # Once the end-of-sequence token is predicted, the generation of 
+        # the output sequence is complete
+        if pred == tgt_vocab['<eos>']:
             break
-        predict_tokens.append(py)
-    return ' '.join(tgt_vocab.to_tokens(predict_tokens))
+        output_seq.append(pred)
+    return ' '.join(tgt_vocab.to_tokens(output_seq))
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention.md
