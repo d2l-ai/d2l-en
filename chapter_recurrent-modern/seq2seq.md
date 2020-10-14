@@ -296,7 +296,7 @@ to mark its beginning.
 
 ```{.python .input}
 #@save
-def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
+def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
     model.initialize(init.Xavier(), force_reinit=True, ctx=device)
     trainer = gluon.Trainer(model.collect_params(), 'adam',
                             {'learning_rate': lr})
@@ -329,7 +329,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
 ```{.python .input}
 #@tab pytorch
 #@save
-def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
+def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
     def xavier_init_weights(m):
         if type(m) == nn.Linear:
             torch.nn.init.xavier_uniform_(m.weight)
@@ -380,7 +380,7 @@ encoder = Seq2SeqEncoder(
 decoder = Seq2SeqDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-train_s2s_ch9(model, train_iter, lr, num_epochs, device)
+train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 ## Predicting

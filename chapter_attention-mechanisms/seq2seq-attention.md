@@ -165,6 +165,7 @@ overhead of both the encoder's and the decoder's attention layers, this model
 is much slower than the seq2seq model without attention.
 
 ```{.python .input}
+#@tab all
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_steps = 64, 10
 lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
@@ -175,22 +176,7 @@ encoder = d2l.Seq2SeqEncoder(
 decoder = Seq2SeqAttentionDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
-```
-
-```{.python .input}
-#@tab pytorch
-embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
-batch_size, num_steps = 64, 10
-lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
-
-train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
-encoder = d2l.Seq2SeqEncoder(
-    len(src_vocab), embed_size, num_hiddens, num_layers, dropout)
-decoder = Seq2SeqAttentionDecoder(
-    len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
-model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 Last, we predict several sample examples.

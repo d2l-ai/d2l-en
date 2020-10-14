@@ -942,7 +942,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
+def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
     model.initialize(init.Xavier(), force_reinit=True, ctx=device)
     trainer = gluon.Trainer(model.collect_params(), 'adam',
                             {'learning_rate': lr})

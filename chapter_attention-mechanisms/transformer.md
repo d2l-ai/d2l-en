@@ -742,7 +742,7 @@ decoder = TransformerDecoder(
     len(src_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,
     dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 ```{.python .input}
@@ -764,7 +764,7 @@ decoder = TransformerDecoder(
     norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
     num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 As we can see from the training time and accuracy, compared with the seq2seq model with attention model, Transformer runs faster per epoch, and converges faster at the beginning.

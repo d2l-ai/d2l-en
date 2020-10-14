@@ -1016,7 +1016,7 @@ class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
+def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
     def xavier_init_weights(m):
         if type(m) == nn.Linear:
             torch.nn.init.xavier_uniform_(m.weight)
