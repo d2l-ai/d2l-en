@@ -182,10 +182,11 @@ d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
 Last, we predict several sample examples.
 
 ```{.python .input}
-#@tab mxnet, pytorch
-for sentence in ['Go .', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + d2l.predict_s2s_ch9(
-        model, sentence, src_vocab, tgt_vocab, num_steps, device))
+#@tab all
+engs = ['go .', "i lost .", 'so long .', 'i\'m home .', 'he\'s calm .']
+fras = ['va !', 'j\'ai perdu .', 'à plus tard !', 'je suis chez moi .',
+        'il est calme .']
+d2l.translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
 ```
 
 ## Summary

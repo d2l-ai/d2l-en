@@ -14,7 +14,9 @@ The layers in the encoder and the decoder are illustrated in :numref:`fig_seq2se
 In this section we will explain and implement the seq2seq model to train on the machine translation dataset.
 
 ```{.python .input}
+import collections
 from d2l import mxnet as d2l
+import math
 from mxnet import np, npx, init, gluon, autograd
 from mxnet.gluon import nn, rnn
 npx.set_np()
@@ -22,7 +24,9 @@ npx.set_np()
 
 ```{.python .input}
 #@tab pytorch
+import collections
 from d2l import torch as d2l
+import math
 import torch
 from torch import nn
 ```
@@ -372,7 +376,7 @@ Next, we create a model instance and set hyperparameters. Then, we can train the
 #@tab all
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_steps = 64, 10
-lr, num_epochs, device = 0.005, 300, d2l.try_gpu()
+lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
 
 train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
 encoder = Seq2SeqEncoder(
@@ -455,10 +459,37 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
 Try several examples:
 
 ```{.python .input}
-#@tab mxnet, pytorch
-for sentence in ['Go .', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + predict_s2s_ch9(
-        model, sentence, src_vocab, tgt_vocab, num_steps, device))
+#@tab all
+def bleu(pred_seq, label_seq, k):  #@save
+    pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
+    len_pred, len_label = len(pred_tokens), len(label_tokens)
+    score = math.exp(min(0, 1 - len_label / len_pred))
+    for n in range(1, k + 1):
+        num_matches, label_subs = 0, collections.defaultdict(int)
+        for i in range(len_label - n + 1):
+            label_subs[''.join(label_tokens[i: i + n])] += 1
+        for i in range(len_pred - n + 1):
+            if label_subs[''.join(pred_tokens[i: i + n])] > 0:
+                num_matches += 1
+                label_subs[''.join(pred_tokens[i: i + n])] -= 1
+        score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
+    return score
+```
+
+```{.python .input}
+#@tab all
+#@save
+def translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device):
+    for eng, fra in zip(engs, fras):
+        translation = predict_s2s_ch9(
+            model, eng, src_vocab, tgt_vocab, num_steps, device)
+        print(
+            f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
+
+engs = ['go .', "i lost .", 'so long .', 'i\'m home .', 'he\'s calm .']
+fras = ['va !', 'j\'ai perdu .', 'à plus tard !', 'je suis chez moi .',
+        'il est calme .']
+translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
 ```
 
 ## Summary

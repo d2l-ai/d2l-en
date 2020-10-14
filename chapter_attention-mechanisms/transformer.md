@@ -773,9 +773,10 @@ We can use the trained Transformer to translate some simple sentences.
 
 ```{.python .input}
 #@tab all
-for sentence in ['Go .', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + d2l.predict_s2s_ch9(
-        model, sentence, src_vocab, tgt_vocab, num_steps, device))
+engs = ['go .', "i lost .", 'so long .', 'i\'m home .', 'he\'s calm .']
+fras = ['va !', 'j\'ai perdu .', 'à plus tard !', 'je suis chez moi .',
+        'il est calme .']
+d2l.translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
 ```
 
 ## Summary
