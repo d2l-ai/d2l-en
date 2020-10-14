@@ -216,7 +216,7 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = d2l.argmax(y_hat, axis=1)        
+        y_hat = d2l.argmax(y_hat, axis=1)
     cmp = d2l.astype(y_hat, y.dtype) == y
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
@@ -563,7 +563,7 @@ class Vocab:  #@save
         if tokens is None:
             tokens = []
         if reserved_tokens is None:
-            reserved_tokens = [] 
+            reserved_tokens = []
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
@@ -746,7 +746,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
                 state.detach_()
             else:
                 # `state` is a tuple of tensors for `nn.LSTM` and
-                # for our custom scratch implementation 
+                # for our custom scratch implementation
                 for s in state:
                     s.detach_()
         y = Y.T.reshape(-1)
@@ -823,7 +823,7 @@ class RNNModel(nn.Module):
         if not isinstance(self.rnn, nn.LSTM):
             # `nn.GRU` takes a tensor as hidden state
             return  torch.zeros((self.num_directions * self.rnn.num_layers,
-                                 batch_size, self.num_hiddens), 
+                                 batch_size, self.num_hiddens),
                                 device=device)
         else:
             # `nn.LSTM` takes a tuple of hidden states
@@ -905,9 +905,9 @@ def load_data_nmt(batch_size, num_steps, num_examples=1000):
     """Return the iterator and the vocabularies of the translation dataset."""
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, 
+    src_vocab = d2l.Vocab(source, min_freq=3,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+    tgt_vocab = d2l.Vocab(target, min_freq=3,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array_nmt(
         source, src_vocab, num_steps, True)
@@ -950,7 +950,7 @@ class EncoderDecoder(nn.Module):
         self.decoder = decoder
 
     def forward(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X)
+        enc_outputs = self.encoder(enc_X, *args)
         dec_state = self.decoder.init_state(enc_outputs, *args)
         return self.decoder(dec_X, dec_state)
 
@@ -1346,14 +1346,14 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
         if type(m) == nn.Linear:
             torch.nn.init.normal_(m.weight, std=0.01)
     net.apply(init_weights)
-    
+
     optimizer = trainer_fn(net.parameters(), **hyperparams)
-    
+
     loss = nn.MSELoss()
     # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
-    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss 
+    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
     # value to get L2Loss in PyTorch.
-    
+
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
@@ -1397,7 +1397,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     # Do not need to compute gradient for `net_G`, detach it from
     # computing gradients.
     fake_Y = net_D(fake_X.detach())
-    loss_D = (loss(real_Y, ones.reshape(real_Y.shape)) + 
+    loss_D = (loss(real_Y, ones.reshape(real_Y.shape)) +
               loss(fake_Y, zeros.reshape(fake_Y.shape))) / 2
     loss_D.backward()
     trainer_D.step()
