@@ -729,8 +729,8 @@ Finally, we can build an encoder-decoder model with the Transformer architecture
 Similar to the seq2seq with attention model in :numref:`sec_seq2seq_attention`, we use the following hyperparameters: two Transformer blocks with both the embedding size and the block output size to be $32$. In addition, we use $4$ heads, and set the hidden size to be twice larger than the output size.
 
 ```{.python .input}
-num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.0, 64, 10
-lr, num_epochs, device = 0.005, 100, d2l.try_gpu()
+num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10
+lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
 ffn_num_hiddens, num_heads = 64, 4
 
 train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
@@ -747,8 +747,8 @@ d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
 
 ```{.python .input}
 #@tab pytorch
-num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.0, 64, 10
-lr, num_epochs, device = 0.005, 100, d2l.try_gpu()
+num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10
+lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
 ffn_num_input, ffn_num_hiddens, num_heads = 32, 64, 4
 key_size, query_size, value_size = 32, 32, 32
 norm_shape = [32]
@@ -773,9 +773,8 @@ We can use the trained Transformer to translate some simple sentences.
 
 ```{.python .input}
 #@tab all
-engs = ['go .', "i lost .", 'so long .', 'i\'m home .', 'he\'s calm .']
-fras = ['va !', 'j\'ai perdu .', 'à plus tard !', 'je suis chez moi .',
-        'il est calme .']
+engs = ['go .', "i lost .", 'i\'m home .', 'he\'s calm .']
+fras = ['va !', 'j\'ai perdu .', 'je suis chez moi .', 'il est calme .']
 d2l.translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
 ```
 

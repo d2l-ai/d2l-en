@@ -166,9 +166,9 @@ is much slower than the seq2seq model without attention.
 
 ```{.python .input}
 #@tab all
-embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
+embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.1
 batch_size, num_steps = 64, 10
-lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
+lr, num_epochs, device = 0.005, 250, d2l.try_gpu()
 
 train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
 encoder = d2l.Seq2SeqEncoder(
@@ -183,9 +183,8 @@ Last, we predict several sample examples.
 
 ```{.python .input}
 #@tab all
-engs = ['go .', "i lost .", 'so long .', 'i\'m home .', 'he\'s calm .']
-fras = ['va !', 'j\'ai perdu .', 'à plus tard !', 'je suis chez moi .',
-        'il est calme .']
+engs = ['go .', "i lost .", 'i\'m home .', 'he\'s calm .']
+fras = ['va !', 'j\'ai perdu .', 'je suis chez moi .', 'il est calme .']
 d2l.translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
 ```
 

@@ -203,7 +203,7 @@ the vocabulary size will be significantly larger
 than that using character-level tokenization.
 To alleviate this,
 here we treat infrequent tokens
-that appear less than 3 times
+that appear less than 2 times
 as the same unknown ("&lt;unk&gt;") token.
 Besides that,
 we specify additional special tokens
@@ -214,7 +214,7 @@ natural language processing tasks.
 
 ```{.python .input}
 #@tab all
-src_vocab = d2l.Vocab(source, min_freq=3, 
+src_vocab = d2l.Vocab(source, min_freq=2, 
                       reserved_tokens=['<pad>', '<bos>', '<eos>'])
 len(src_vocab)
 ```
@@ -307,13 +307,13 @@ the vocabularies for both the source language and the target language.
 ```{.python .input}
 #@tab all
 #@save
-def load_data_nmt(batch_size, num_steps, num_examples=1000):
+def load_data_nmt(batch_size, num_steps, num_examples=600):
     """Return the iterator and the vocabularies of the translation dataset."""
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, 
+    src_vocab = d2l.Vocab(source, min_freq=2, 
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+    tgt_vocab = d2l.Vocab(target, min_freq=2, 
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array_nmt(source, src_vocab, num_steps)
     tgt_array, tgt_valid_len = build_array_nmt(target, tgt_vocab, num_steps)
