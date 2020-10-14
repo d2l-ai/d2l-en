@@ -289,6 +289,10 @@ loss(d2l.ones(3, 4, 10), d2l.ones((3, 4), dtype=torch.long), torch.tensor([4, 2,
 :label:`sec_seq2seq_training`
 
 During training, if the target sequence has length $n$, we feed the first $n-1$ tokens into the decoder as inputs, and the last $n-1$ tokens are used as ground truth label.
+For the target language,
+we also insert the special
+“&lt;bos&gt;” token at the beginning of any sequence
+to mark its beginning.
 
 ```{.python .input}
 #@save
@@ -305,10 +309,12 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
         for batch in data_iter:
             X, X_valid_len, Y, Y_valid_len = [
                 x.as_in_ctx(device) for x in batch]
-            Y_input, Y_label, Y_valid_len = Y[:, :-1], Y[:, 1:], Y_valid_len-1
+            bos = np.array(
+                [tgt_vocab['<bos>']] * Y.shape[0], ctx=device).reshape(-1, 1)
+            dec_input = d2l.concat([bos, Y[:, :-1]], 1)
             with autograd.record():
-                Y_hat, _ = model(X, Y_input, X_valid_len)
-                l = loss(Y_hat, Y_label, Y_valid_len)
+                Y_hat, _ = model(X, dec_input, X_valid_len)
+                l = loss(Y_hat, Y, Y_valid_len)
             l.backward()
             d2l.grad_clipping(model, 1)
             num_tokens = Y_valid_len.sum()
@@ -343,9 +349,11 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
         metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
         for batch in data_iter:
             X, X_valid_len, Y, Y_valid_len = [x.to(device) for x in batch]
-            Y_input, Y_label, Y_valid_len = Y[:, :-1], Y[:, 1:], Y_valid_len-1
-            Y_hat, _ = model(X, Y_input, X_valid_len)
-            l = loss(Y_hat, Y_label, Y_valid_len)
+            bos = torch.tensor([tgt_vocab['<bos>']] * Y.shape[0],
+                               device=device).reshape(-1, 1)
+            dec_input = d2l.concat([bos, Y[:, :-1]], 1)
+            Y_hat, _ = model(X, dec_input, X_valid_len)
+            l = loss(Y_hat, Y, Y_valid_len)
             l.sum().backward()  # Make the loss scalar for `backward`
             d2l.grad_clipping(model, 1)
             num_tokens = Y_valid_len.sum()

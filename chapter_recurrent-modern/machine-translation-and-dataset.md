@@ -277,10 +277,6 @@ the generation
 of the “&lt;eos&gt;” token 
 can suggest that
 the output sequence is complete.
-For the target language,
-we also insert the special
-“&lt;bos&gt;” token at the beginning of any sequence
-to mark its beginning.
 Besides,
 we also record the length
 of each text sequence excluding the padding tokens.
@@ -291,17 +287,14 @@ we will cover later.
 ```{.python .input}
 #@tab all
 #@save
-def build_array_nmt(lines, vocab, num_steps, is_source):
+def build_array_nmt(lines, vocab, num_steps):
     """Transform text sequences of machine translation into minibatches."""
     lines = [vocab[l] for l in lines]
-    if is_source:
-        lines = [l + [vocab['<eos>']] for l in lines]
-    else:
-        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
+    lines = [l + [vocab['<eos>']] for l in lines]
     array = d2l.tensor([truncate_pad(
         l, num_steps, vocab['<pad>']) for l in lines])
-    valid_len = d2l.reduce_sum(d2l.astype(array != vocab['<pad>'], d2l.int32),
-                               1)
+    valid_len = d2l.reduce_sum(
+        d2l.astype(array != vocab['<pad>'], d2l.int32), 1)
     return array, valid_len
 ```
 
@@ -322,10 +315,8 @@ def load_data_nmt(batch_size, num_steps, num_examples=1000):
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     tgt_vocab = d2l.Vocab(target, min_freq=3, 
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    src_array, src_valid_len = build_array_nmt(
-        source, src_vocab, num_steps, True)
-    tgt_array, tgt_valid_len = build_array_nmt(
-        target, tgt_vocab, num_steps, False)
+    src_array, src_valid_len = build_array_nmt(source, src_vocab, num_steps)
+    tgt_array, tgt_valid_len = build_array_nmt(target, tgt_vocab, num_steps)
     data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
     data_iter = d2l.load_array(data_arrays, batch_size)
     return data_iter, src_vocab, tgt_vocab

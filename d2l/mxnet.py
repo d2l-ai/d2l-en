@@ -823,17 +823,14 @@ def truncate_pad(line, num_steps, padding_token):
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def build_array_nmt(lines, vocab, num_steps, is_source):
+def build_array_nmt(lines, vocab, num_steps):
     """Transform text sequences of machine translation into minibatches."""
     lines = [vocab[l] for l in lines]
-    if is_source:
-        lines = [l + [vocab['<eos>']] for l in lines]
-    else:
-        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
+    lines = [l + [vocab['<eos>']] for l in lines]
     array = d2l.tensor([truncate_pad(
         l, num_steps, vocab['<pad>']) for l in lines])
-    valid_len = d2l.reduce_sum(d2l.astype(array != vocab['<pad>'], d2l.int32),
-                               1)
+    valid_len = d2l.reduce_sum(
+        d2l.astype(array != vocab['<pad>'], d2l.int32), 1)
     return array, valid_len
 
 
@@ -846,10 +843,8 @@ def load_data_nmt(batch_size, num_steps, num_examples=1000):
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     tgt_vocab = d2l.Vocab(target, min_freq=3, 
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    src_array, src_valid_len = build_array_nmt(
-        source, src_vocab, num_steps, True)
-    tgt_array, tgt_valid_len = build_array_nmt(
-        target, tgt_vocab, num_steps, False)
+    src_array, src_valid_len = build_array_nmt(source, src_vocab, num_steps)
+    tgt_array, tgt_valid_len = build_array_nmt(target, tgt_vocab, num_steps)
     data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
     data_iter = d2l.load_array(data_arrays, batch_size)
     return data_iter, src_vocab, tgt_vocab
@@ -960,10 +955,12 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, device):
         for batch in data_iter:
             X, X_valid_len, Y, Y_valid_len = [
                 x.as_in_ctx(device) for x in batch]
-            Y_input, Y_label, Y_valid_len = Y[:, :-1], Y[:, 1:], Y_valid_len-1
+            bos = np.array(
+                [tgt_vocab['<bos>']] * Y.shape[0], ctx=device).reshape(-1, 1)
+            dec_input = d2l.concat([bos, Y[:, :-1]], 1)
             with autograd.record():
-                Y_hat, _ = model(X, Y_input, X_valid_len)
-                l = loss(Y_hat, Y_label, Y_valid_len)
+                Y_hat, _ = model(X, dec_input, X_valid_len)
+                l = loss(Y_hat, Y, Y_valid_len)
             l.backward()
             d2l.grad_clipping(model, 1)
             num_tokens = Y_valid_len.sum()
