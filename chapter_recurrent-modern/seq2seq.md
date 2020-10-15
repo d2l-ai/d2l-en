@@ -140,6 +140,9 @@ $$\mathbf{s}_{t'} = g(\mathbf{y}_{t'-1}, \mathbf{c}, \mathbf{s}_{t'-1}).$$
 When implementing the decoder, we directly use the hidden state of the encoder in the final time step as the initial hidden state of the decoder. This requires that the encoder and decoder RNNs have the same numbers of layers and hidden units.
 The GRU forward calculation of the decoder is similar to that of the encoder. The only difference is that we add a dense layer after the GRU layers, where the hidden size is the vocabulary size. The dense layer will predict the confidence score for each word.
 
+
+After obtaining the hidden state of the decoder, we can use a custom output layer and the softmax operation to compute $P(y_{t^\prime} \mid y_1, \ldots, y_{t^\prime-1}, \mathbf{c})$. For example, using hidden state $\mathbf{s}_{t^\prime}$ based on the current time step of the decoder, the output $y_{t^\prime-1}$ from the previous time step, and the context variable $\mathbf{c}$ to compute the probability distribution of output $y_{t^\prime}$ from the current time step.
+
 ```{.python .input}
 #@save
 class Seq2SeqDecoder(d2l.Decoder):
@@ -206,6 +209,27 @@ state = decoder.init_state(encoder(X))
 output, state = decoder(X, state)
 output.shape, len(state), state[0].shape, state[1].shape
 ```
+
+## Model Training
+
+According to the maximum likelihood estimation, we can maximize the conditional probability of the output sequence based on the input sequence
+
+$$
+\begin{aligned}
+P(y_1, \ldots, y_{T'} \mid x_1, \ldots, x_T)
+&= \prod_{t'=1}^{T'} P(y_{t'} \mid y_1, \ldots, y_{t'-1}, x_1, \ldots, x_T)\\
+&= \prod_{t'=1}^{T'} P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),
+\end{aligned}
+$$
+
+to get the loss of the output sequence
+
+$$- \log P(y_1, \ldots, y_{T'} \mid x_1, \ldots, x_T) = -\sum_{t'=1}^{T'} \log P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
+
+In model training, the mean of losses for all the output sequences is usually used as a loss function that needs to be minimized. In the model prediction discussed in Figure 10.8, we need to use the output of the decoder from the previous time step as the input to the current time step. In contrast, in training, we can also use the label of the label sequence from the previous time step as the input of the decoder for the current time step. This is called teacher forcing.
+
+
+
 
 ## Loss Function
 
@@ -456,7 +480,19 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     return ' '.join(tgt_vocab.to_tokens(output_seq))
 ```
 
-Try several examples:
+## Evaluation of Translation Results
+
+BLEU (Bilingual Evaluation Understudy) is often used to evaluate machine translation results[1]. For any subsequence in the model prediction sequence, BLEU evaluates whether this subsequence appears in the label sequence.
+
+Specifically, the precision of the subsequence with $n$ words is $p_n$. It is the ratio of the number of subsequences with $n$ matched words for the prediction sequence and label sequence to the number of subsequences with $n$ words in the prediction sequence. For example, assume the label sequence is $A$, $B$, $C$, $D$, $E$, $F$, and the prediction sequence is $A$, $B$, $B$, $C$, $D$. Then $p_1 = 4/5, \ p_2 = 3/4, \ p_3 = 1/3, and \ p_4 = 0$. Assume $len_{\text{label}}$ and $len_{\text{pred}}$ are the numbers of words in the label sequence and the prediction sequence. Then, BLEU is defined as
+
+$$ \exp\left(\min\left(0, 1 - \frac{len_{\text{label}}}{len_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
+
+Here, $k$ is the maximum number of words in the subsequence we wish to match. It can be seen that the BLEU is 1 when the prediction sequence and the label sequence are identical.
+
+Because matching longer subsequences is more difficult than matching shorter subsequences, BLEU gives greater weight to the precision of longer subsequence matches. For example, when $p_n$ is fixed at 0.5, as $n$ increases, $0.5^{1/2} \approx 0.7, 0.5^{1/4} \approx 0.84, 0.5^{1/8} \approx 0.92, and 0.5^{1/16} \approx 0.96$. In addition, the prediction of shorter sequences by the model tends to obtain higher $p_n$ values. Therefore, the coefficient before the multiplication term in the above equation is a penalty to the shorter output. For example, when $k=2$, we assume the label sequence is $A$, $B$, $C$, $D$, $E$, $F$ and the prediction sequence is $A$, $B$. Although $p_1 = p_2 = 1$, the penalty factor is $\exp(1-6/2) \approx 0.14$, so the BLEU is also close to 0.14.
+
+Next, we calculate the BLEU.
 
 ```{.python .input}
 #@tab all
@@ -475,6 +511,8 @@ def bleu(pred_seq, label_seq, k):  #@save
         score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
     return score
 ```
+
+Try several examples:
 
 ```{.python .input}
 #@tab all
