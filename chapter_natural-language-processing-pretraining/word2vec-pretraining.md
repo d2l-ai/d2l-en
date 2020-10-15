@@ -116,9 +116,9 @@ def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs])
+                            xlim=[1, num_epochs])
     for epoch in range(num_epochs):
-        timer = d2l.Timer()
+        timer, num_batches = d2l.Timer(), len(data_iter)
         metric = d2l.Accumulator(2)  # Sum of losses, no. of tokens
         for i, batch in enumerate(data_iter):
             center, context_negative, mask, label = [
@@ -130,9 +130,9 @@ def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
             l.backward()
             trainer.step(batch_size)
             metric.add(l.sum(), l.size)
-            if (i+1) % 50 == 0:
-                animator.add(epoch+(i+1)/len(data_iter),
-                             (metric[0]/metric[1],))
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
+                             (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, '
           f'{metric[1] / timer.stop():.1f} tokens/sec on {str(device)}')
 ```
