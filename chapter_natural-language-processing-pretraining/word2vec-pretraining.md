@@ -117,9 +117,9 @@ def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
                             {'learning_rate': lr})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs])
+    metric = d2l.Accumulator(2)  # Sum of losses, no. of tokens
     for epoch in range(num_epochs):
         timer, num_batches = d2l.Timer(), len(data_iter)
-        metric = d2l.Accumulator(2)  # Sum of losses, no. of tokens
         for i, batch in enumerate(data_iter):
             center, context_negative, mask, label = [
                 data.as_in_ctx(device) for data in batch]
