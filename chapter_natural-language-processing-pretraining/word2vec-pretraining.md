@@ -72,13 +72,13 @@ Before training the word embedding model, we need to define the loss function of
 
 ### Binary Cross Entropy Loss Function
 
-According to the definition of the loss function in negative sampling, we can directly use Gluon's binary cross-entropy loss function `SigmoidBinaryCrossEntropyLoss`.
+According to the definition of the loss function in negative sampling, we can directly use the binary cross-entropy loss function from high-level APIs.
 
 ```{.python .input  n=19}
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 ```
 
-It is worth mentioning that we can use the mask variable to specify the partial predicted value and label that participate in loss function calculation in the minibatch: when the mask is 1, the predicted value and label of the corresponding position will participate in the calculation of the loss function; When the mask is 0, no participation. As we mentioned earlier, mask variables can be used to avoid the effect of padding on loss function calculations.
+It is worth mentioning that we can use the mask variable to specify the partial predicted value and label that participate in loss function calculation in the minibatch: when the mask is 1, the predicted value and label of the corresponding position will participate in the calculation of the loss function; When the mask is 0, they do not participate. As we mentioned earlier, mask variables can be used to avoid the effect of padding on loss function calculations.
 
 Given two identical examples, different masks lead to different loss values.
 
