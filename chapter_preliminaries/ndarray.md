@@ -176,7 +176,7 @@ np.zeros((2, 3, 4))
 
 ```{.python .input}
 #@tab pytorch
-torch.zeros(2, 3, 4)
+torch.zeros((2, 3, 4))
 ```
 
 ```{.python .input}
