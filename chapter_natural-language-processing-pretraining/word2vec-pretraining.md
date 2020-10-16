@@ -78,7 +78,7 @@ According to the definition of the loss function in negative sampling, we can di
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 ```
 
-It is worth mentioning that we can use the mask variable to specify the partial predicted value and label that participate in loss function calculation in the minibatch: when the mask is 1, the predicted value and label of the corresponding position will participate in the calculation of the loss function; When the mask is 0, the predicted value and label of the corresponding position do not participate in the calculation of the loss function. As we mentioned earlier, mask variables can be used to avoid the effect of padding on loss function calculations.
+It is worth mentioning that we can use the mask variable to specify the partial predicted value and label that participate in loss function calculation in the minibatch: when the mask is 1, the predicted value and label of the corresponding position will participate in the calculation of the loss function; When the mask is 0, no participation. As we mentioned earlier, mask variables can be used to avoid the effect of padding on loss function calculations.
 
 Given two identical examples, different masks lead to different loss values.
 
