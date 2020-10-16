@@ -78,7 +78,7 @@ According to the definition of the loss function in negative sampling, we can di
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 ```
 
-It is worth mentioning that we can use the mask variable to specify the partial predicted value and label that participate in loss function calculation in the minibatch: when the mask is 1, the predicted value and label of the corresponding position will participate in the calculation of the loss function; When the mask is 0, the predicted value and label of the corresponding position do not participate in the calculation of the loss function. As we mentioned earlier, mask variables can be used to avoid the effect of padding on loss function calculations.
+It is worth mentioning that we can use the mask variable to specify the partial predicted value and label that participate in loss function calculation in the minibatch: when the mask is 1, the predicted value and label of the corresponding position will participate in the calculation of the loss function; When the mask is 0, no participation. As we mentioned earlier, mask variables can be used to avoid the effect of padding on loss function calculations.
 
 Given two identical examples, different masks lead to different loss values.
 
@@ -117,9 +117,9 @@ def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
                             {'learning_rate': lr})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs])
+    metric = d2l.Accumulator(2)  # Sum of losses, no. of tokens
     for epoch in range(num_epochs):
         timer, num_batches = d2l.Timer(), len(data_iter)
-        metric = d2l.Accumulator(2)  # Sum of losses, no. of tokens
         for i, batch in enumerate(data_iter):
             center, context_negative, mask, label = [
                 data.as_in_ctx(device) for data in batch]
