@@ -922,10 +922,16 @@ class Seq2SeqDecoder(d2l.Decoder):
     def forward(self, X, state):
         # The output `X` shape: (`num_steps`, `batch_size`, `embed_size`)
         X = self.embedding(X).swapaxes(0, 1)
-        output, state = self.rnn(X, state)
+        # `context` shape: (`batch_size`, `num_hiddens`)
+        context = state[0][-1]
+        # Broadcast `context` so it has the same `num_steps` as `X`
+        context = np.broadcast_to(context, (
+            X.shape[0], context.shape[0], context.shape[1]))
+        X_and_context = d2l.concat((X, context), 2)
+        output, state = self.rnn(X_and_context, state)
         output = self.dense(output).swapaxes(0, 1)
         # `output` shape: (`batch_size`, `num_steps`, `vocab_size`)
-        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
+        # `state[0]` shape: (`num_layers`, `batch_size`, `num_hiddens`)
         return output, state
 
 
