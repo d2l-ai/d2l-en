@@ -972,27 +972,6 @@ class Seq2SeqEncoder(d2l.Encoder):
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-class Seq2SeqDecoder(d2l.Decoder):
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqDecoder, self).__init__(**kwargs)
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = nn.GRU(embed_size, num_hiddens, num_layers,
-                          dropout=dropout)
-        self.dense = nn.Linear(num_hiddens, vocab_size)
-
-    def init_state(self, enc_outputs, *args):
-        return enc_outputs[1]
-
-    def forward(self, X, state):
-        X = self.embedding(X).permute(1, 0, 2)
-        output, state = self.rnn(X, state)
-        # Make the batch to be the first dimension to simplify loss computation
-        output = self.dense(output).permute(1, 0, 2)
-        return output, state
-
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def sequence_mask(X, valid_len, value=0):
     maxlen = X.size(1)
     mask = torch.arange((maxlen), dtype=torch.float32,
@@ -1010,7 +989,8 @@ class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
         weights = torch.ones_like(label)
         weights = sequence_mask(weights, valid_len)
         self.reduction='none'
-        unweighted_loss = super(MaskedSoftmaxCELoss, self).forward(pred.permute(0,2,1), label)
+        unweighted_loss = super(MaskedSoftmaxCELoss, self).forward(
+            pred.permute(0,2,1), label)
         weighted_loss = (unweighted_loss*weights).mean(dim=1)
         return weighted_loss
 

@@ -800,3 +800,4 @@ d2l.translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1066)
 :end_tab:
+

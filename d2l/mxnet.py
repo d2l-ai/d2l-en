@@ -908,34 +908,6 @@ class Seq2SeqEncoder(d2l.Encoder):
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-class Seq2SeqDecoder(d2l.Decoder):
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqDecoder, self).__init__(**kwargs)
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
-        self.dense = nn.Dense(vocab_size, flatten=False)
-
-    def init_state(self, enc_outputs, *args):
-        return enc_outputs[1]
-
-    def forward(self, X, state):
-        # The output `X` shape: (`num_steps`, `batch_size`, `embed_size`)
-        X = self.embedding(X).swapaxes(0, 1)
-        # `context` shape: (`batch_size`, `num_hiddens`)
-        context = state[0][-1]
-        # Broadcast `context` so it has the same `num_steps` as `X`
-        context = np.broadcast_to(context, (
-            X.shape[0], context.shape[0], context.shape[1]))
-        X_and_context = d2l.concat((X, context), 2)
-        output, state = self.rnn(X_and_context, state)
-        output = self.dense(output).swapaxes(0, 1)
-        # `output` shape: (`batch_size`, `num_steps`, `vocab_size`)
-        # `state[0]` shape: (`num_layers`, `batch_size`, `num_hiddens`)
-        return output, state
-
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
     # `label` shape: (`batch_size`, `num_steps`)
