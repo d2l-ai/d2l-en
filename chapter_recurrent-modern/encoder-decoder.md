@@ -1,4 +1,5 @@
 # Encoder-Decoder Architecture
+:label:`sec_encoder-decoder`
 
 As we have discussed in 
 :numref:`sec_machine_translation`,

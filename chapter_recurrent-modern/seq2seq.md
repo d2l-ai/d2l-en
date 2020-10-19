@@ -1,5 +1,33 @@
-#  Sequence to Sequence
+#  Sequence to Sequence Learning
 :label:`sec_seq2seq`
+
+As we have seen in :numref:`sec_machine_translation`,
+both the input and output are a variable-length sequence
+in the machine translation problem.
+To address this type of *sequence to sequence* learning problem,
+we have designed a general encoder-decoder architecture
+in :numref:`sec_encoder-decoder`.
+In this section,
+we will 
+use two RNNs to design 
+the encoder and the decoder of
+this architecture 
+and apply it to sequence to sequence learning
+for machine translation
+:cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014`.
+
+Following the design principle 
+of the encoder-decoder architecture,
+the first RNN can 
+take a variable-length sequence as the input and transforms it into a hidden state with a fixed shape.
+
+
+Now we use RNNs to instantiate a sequence to 
+
+
+To handle this type of inputs and outputs, we can design an architecture with two major components. The first component is an encoder: it takes a variable-length sequence as the input and transforms it into a state with a fixed shape. The second component is a decoder: it maps the encoded state of a fixed shape to a variable-length sequence. This is called an encoder-decoder architecture,
+
+
 
 The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output for a sequence input, as demonstrated in :numref:`fig_seq2seq`. Both the encoder and the decoder use recurrent neural networks (RNNs) to handle sequence inputs of variable length :cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014`. 
 The hidden state of the encoder is used directly to initialize the decoder hidden state to pass information from the encoder to the decoder.
