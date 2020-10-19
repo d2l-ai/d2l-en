@@ -173,7 +173,6 @@ The GRU forward calculation of the decoder is similar to that of the encoder. Th
 After obtaining the hidden state of the decoder, we can use a custom output layer and the softmax operation to compute $P(y_{t^\prime} \mid y_1, \ldots, y_{t^\prime-1}, \mathbf{c})$. For example, using hidden state $\mathbf{s}_{t^\prime}$ based on the current time step of the decoder, the output $y_{t^\prime-1}$ from the previous time step, and the context variable $\mathbf{c}$ to compute the probability distribution of output $y_{t^\prime}$ from the current time step.
 
 ```{.python .input}
-#@save
 class Seq2SeqDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -203,13 +202,12 @@ class Seq2SeqDecoder(d2l.Decoder):
 
 ```{.python .input}
 #@tab pytorch
-#@save
 class Seq2SeqDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqDecoder, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = nn.GRU(embed_size, num_hiddens, num_layers,
+        self.rnn = nn.GRU(embed_size + num_hiddens, num_hiddens, num_layers,
                           dropout=dropout)
         self.dense = nn.Linear(num_hiddens, vocab_size)
 
@@ -217,10 +215,15 @@ class Seq2SeqDecoder(d2l.Decoder):
         return enc_outputs[1]
 
     def forward(self, X, state):
+        # The output `X` shape: (`num_steps`, `batch_size`, `embed_size`)
         X = self.embedding(X).permute(1, 0, 2)
-        output, state = self.rnn(X, state)
-        # Make the batch to be the first dimension to simplify loss computation
+        # Broadcast `context` so it has the same `num_steps` as `X`
+        context = state[-1].repeat(X.shape[0], 1, 1)
+        X_and_context = d2l.concat((X, context), 2)
+        output, state = self.rnn(X_and_context, state)
         output = self.dense(output).permute(1, 0, 2)
+        # `output` shape: (`batch_size`, `num_steps`, `vocab_size`)
+        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
         return output, state
 ```
 
@@ -330,7 +333,8 @@ class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
         weights = torch.ones_like(label)
         weights = sequence_mask(weights, valid_len)
         self.reduction='none'
-        unweighted_loss = super(MaskedSoftmaxCELoss, self).forward(pred.permute(0,2,1), label)
+        unweighted_loss = super(MaskedSoftmaxCELoss, self).forward(
+            pred.permute(0,2,1), label)
         weighted_loss = (unweighted_loss*weights).mean(dim=1)
         return weighted_loss
 ```
@@ -435,7 +439,7 @@ Next, we create a model instance and set hyperparameters. Then, we can train the
 #@tab all
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.1
 batch_size, num_steps = 64, 10
-lr, num_epochs, device = 0.005, 250, d2l.try_gpu()
+lr, num_epochs, device = 0.005, 300, d2l.try_gpu()
 
 train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
 encoder = Seq2SeqEncoder(
