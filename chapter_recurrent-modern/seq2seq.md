@@ -2,9 +2,9 @@
 :label:`sec_seq2seq`
 
 As we have seen in :numref:`sec_machine_translation`,
-both the input and output are a variable-length sequence
-in the machine translation problem.
-To address this type of *sequence to sequence* learning problem,
+in machine translation
+both the input and output are a variable-length sequence.
+To address this type of problem,
 we have designed a general encoder-decoder architecture
 in :numref:`sec_encoder-decoder`.
 In this section,
@@ -12,35 +12,65 @@ we will
 use two RNNs to design 
 the encoder and the decoder of
 this architecture 
-and apply it to sequence to sequence learning
+and apply it to *sequence to sequence* learning
 for machine translation
 :cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014`.
 
 Following the design principle 
 of the encoder-decoder architecture,
-the first RNN can 
-take a variable-length sequence as the input and transforms it into a hidden state with a fixed shape.
+the RNN encoder can 
+take a variable-length sequence as the input and transforms it into a fixed-shape hidden state.
+In other words,
+information of the input sequence
+is *encoded* in the hidden state of the RNN encoder.
+To generate the output sequence token by token,
+a separate RNN decoder 
+can predict the next token based on 
+what tokens have been seen (such as in language modeling) or generated,
+together with the encoded information of the input sequence. 
+:numref:`fig_seq2seq` illustrates
+how to use two RNNs
+for sequence to sequence learning
+in machine translation.
 
 
-Now we use RNNs to instantiate a sequence to 
-
-
-To handle this type of inputs and outputs, we can design an architecture with two major components. The first component is an encoder: it takes a variable-length sequence as the input and transforms it into a state with a fixed shape. The second component is a decoder: it maps the encoded state of a fixed shape to a variable-length sequence. This is called an encoder-decoder architecture,
-
-
-
-The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output for a sequence input, as demonstrated in :numref:`fig_seq2seq`. Both the encoder and the decoder use recurrent neural networks (RNNs) to handle sequence inputs of variable length :cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014`. 
-The hidden state of the encoder is used directly to initialize the decoder hidden state to pass information from the encoder to the decoder.
-
-![The sequence to sequence model architecture.](../img/seq2seq.svg)
+![Sequence to sequence learning with an RNN encoder and an RNN decoder.](../img/seq2seq.svg)
 :label:`fig_seq2seq`
 
-The layers in the encoder and the decoder are illustrated in :numref:`fig_seq2seq_details`.
+In :numref:`fig_seq2seq`,
+the special "&lt;eos&gt;" token 
+marks the end of the sequence.
+The model can stop making predictions
+once this token is generated.
+At the initial time step of the RNN decoder,
+there are two special design decisions.
+First, the special beginning-of-sequence "&lt;bos&gt;" token is an input.
+Second,
+the final hidden state of the RNN encoder is used
+to initiate the hidden state of the decoder.
+In designs such as :cite:`Sutskever.Vinyals.Le.2014`,
+this is exactly
+how the encoded input sequence information
+is fed into the decoder for generating the output sequence.
+In some other designs such as :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`,
+the final hidden state of the encoder
+is also fed into the decoder as
+part of the inputs
+at every time step as shown in :numref:`fig_seq2seq`.
+Similar to the training of language models in
+:numref:`sec_language_model`,
+we can allow the labels to be the original output sequence,
+shifted by one token:
+"&lt;bos&gt;", "Ils", "regardent", "." $\rightarrow$
+"Ils", "regardent", ".", "&lt;eos&gt;".
 
-![Layers in the encoder and the decoder.](../img/seq2seq-details.svg)
-:label:`fig_seq2seq_details`
 
-In this section we will explain and implement the seq2seq model to train on the machine translation dataset.
+In the following,
+we will explain the design of :numref:`fig_seq2seq`
+in greater details.
+We will train this model for machine translation
+on the English-French dataset as introduced in  
+:numref:`sec_machine_translation`.
 
 ```{.python .input}
 import collections
@@ -355,7 +385,13 @@ loss(d2l.ones(3, 4, 10), d2l.ones((3, 4), dtype=torch.long), torch.tensor([4, 2,
 ## Training
 :label:`sec_seq2seq_training`
 
-During training, if the target sequence has length $n$, we feed the first $n-1$ tokens into the decoder as inputs, and the last $n-1$ tokens are used as ground truth label.
+
+The layers in the encoder and the decoder are illustrated in :numref:`fig_seq2seq_details`.
+
+![Layers in the encoder and the decoder.](../img/seq2seq-details.svg)
+:label:`fig_seq2seq_details`
+
+During training, if the target sequence has length $T$, we feed the first $T-1$ tokens into the decoder as inputs, and the last $T-1$ tokens are used as ground truth label.
 For the target language,
 we also insert the special
 “&lt;bos&gt;” token at the beginning of any sequence
