@@ -23,7 +23,8 @@ We will implement the skip-gram model by using embedding layers and minibatch mu
 
 ### Embedding Layer
 
-The layer in which the obtained word is embedded is called the embedding layer, which can be obtained by creating an `nn.Embedding` instance in Gluon. The weight of the embedding layer is a matrix whose number of rows is the dictionary size (`input_dim`) and whose number of columns is the dimension of each word vector (`output_dim`). We set the dictionary size to $20$ and the word vector dimension to $4$.
+As described in :numref:`sec_seq2seq`,
+The layer in which the obtained word is embedded is called the embedding layer, which can be obtained by creating an `nn.Embedding` instance in high-level APIs. The weight of the embedding layer is a matrix whose number of rows is the dictionary size (`input_dim`) and whose number of columns is the dimension of each word vector (`output_dim`). We set the dictionary size to $20$ and the word vector dimension to $4$.
 
 ```{.python .input  n=15}
 embed = nn.Embedding(input_dim=20, output_dim=4)

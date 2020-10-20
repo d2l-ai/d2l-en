@@ -92,26 +92,59 @@ from torch import nn
 
 ## Encoder
 
-Recall that the encoder of seq2seq can transform the inputs of variable length to a fixed-length context vector $\mathbf{c}$ by encoding the sequence information into $\mathbf{c}$. We usually use RNN layers within the encoder.
-Suppose that we have an input sequence $x_1, \ldots, x_T$, where $x_t$ is the $t^\mathrm{th}$ word. At time step $t$, the RNN will have two vectors as the input: the feature vector $\mathbf{x}_t$ of $x_t$ and the hidden state of the last time step $\mathbf{h}_{t-1}$. Let us denote the transformation of the RNN's hidden states by a function $f$:
+Technically speaking,
+the encoder transforms an input sequence of variable length into a fixed-shape *context variable* $\mathbf{c}$, and encodes the input sequence information in this context variable. 
+As depicted in :numref:`fig_seq2seq`,
+we can use an RNN to design the encoder.
 
-$$\mathbf{h}_t = f (\mathbf{x}_t, \mathbf{h}_{t-1}).$$
+Let us consider a sequence example (batch size: 1). 
+Suppose that 
+the input sequence is $x_1, \ldots, x_T$, such that $x_t$ is the $t^{\mathrm{th}}$ token in the input text sequence.
+At time step $t$, the RNN transforms
+the input feature vector $\mathbf{x}_t$ for $x_t$
+and the hidden state $\mathbf{h} _{t-1}$ from the previous time step 
+into the current hidden state $\mathbf{h}_t$. 
+We can use a function $f$ to express the transformation of the RNN's recurrent layer:
 
-Next, the encoder captures information of all the hidden states and encodes it into the context vector $\mathbf{c}$ with a function $q$:
+$$\mathbf{h}_t = f(\mathbf{x}_t, \mathbf{h}_{t-1}). $$
 
-$$\mathbf{c} = q (\mathbf{h}_1, \ldots, \mathbf{h}_T).$$
+In general,
+the encoder transforms the hidden states at
+all the time steps
+into the context variable through a customizable function $q$:
 
-For example, if we choose $q$ as $q (\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$, then the context vector will be the final hidden state $\mathbf{h}_T$.
+$$\mathbf{c} =  q(\mathbf{h}_1, \ldots, \mathbf{h}_T).$$
 
-So far what we describe above is a unidirectional RNN, where each time step's hidden state depends only on the previous time steps'. We can also use other forms of RNNs such as GRUs, LSTMs, and bidirectional RNNs to encode the sequential input.
+For example, when choosing $q(\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$ such as in :numref:`fig_seq2seq`,
+the context variable is just the hidden state $\mathbf{h}_T$ 
+of the input sequence at the final time step.
 
-Now let us implement the seq2seq's encoder.
-Here we use the word embedding layer to obtain the feature vector
-according to the word index of the input language.
-Those feature vectors will be fed to a multi-layer GRU.
-The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). The encoder returns both the GRU outputs, i.e., hidden states of all the time steps, as well as the hidden state and the memory cell of the final time step.
+So far we have used a unidirectional RNN
+to design the encoder,
+where 
+a hidden state only depends on 
+the input subsequence at and before the time step of the hidden state.
+We can also construct encoders using bidirectional RNNs. In this case, a hidden state depends on 
+the subsequence before and after the time step (including the input at the current time step), which encodes the information of the entire sequence.
 
-TODO:explain nn.Embedding
+
+Now let us implement the RNN encoder.
+Note that we use an *embedding layer*
+to obtain the feature vector for each token in the input sequence.
+The weight 
+of an embedding layer
+is a matrix
+whose number of rows equals to the size of the input vocabulary (`vocab_size`)
+and number of columns equals to the feature vector's dimension (`embed_size`).
+For any input token index $i$,
+the embedding layer 
+fetches the $i^{\mathrm{th}}$ row (starting from 0) of the weight matrix 
+to return its feature vector.
+Besides,
+here we choose a multilayer GRU to
+implement the encoder.
+The returned variables of recurrent layers
+have been explained in :numref:`sec_rnn-concise`.
 
 ```{.python .input}
 #@save
@@ -119,6 +152,7 @@ class Seq2SeqEncoder(d2l.Encoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqEncoder, self).__init__(**kwargs)
+        # Embedding layer
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
 
@@ -141,6 +175,7 @@ class Seq2SeqEncoder(d2l.Encoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqEncoder, self).__init__(**kwargs)
+        # Embedding layer
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = nn.GRU(embed_size, num_hiddens, num_layers,
                           dropout=dropout)
