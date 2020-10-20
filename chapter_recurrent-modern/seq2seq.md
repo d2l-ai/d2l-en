@@ -246,20 +246,46 @@ state.shape
 ## Decoder
 :label:`sec_seq2seq_decoder`
 
-As we just introduced, the context vector $\mathbf{c}$ encodes the information from the whole input sequence $x_1, \ldots, x_T$. Suppose that the given outputs in the training set are $y_1, \ldots, y_{T'}$. At each time step $t'$, the conditional probability of output $y_{t'}$ will depend on the previous output sequence $y_1, \ldots, y_{t'-1}$ and the context vector $\mathbf{c}$, i.e.,
+As we just mentioned,
+the context variable $\mathbf{c}$ of the encoder's output encodes the entire input sequence $x_1, \ldots, x_T$. Given the output sequence $y_1, y_2, \ldots, y_{T'}$ from the training dataset,
+for each time step $t'$
+(the symbol differs from the time step $t$ of input sequences or encoders), 
+the probability of the decoder output $y_{t'}$ 
+is conditional 
+on the previous output subsequence
+$y_1, \ldots, y_{t'-1}$ and 
+the context variable $\mathbf{c}$, i.e., $P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$.
 
-$$P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}).$$
+To model this conditional probability on sequences,
+we can use another RNN as the decoder. 
+At any time step $t^\prime$ on the output sequence, 
+the RNN takes the output $y_{t^\prime-1}$ from the previous time step 
+and the context variable $\mathbf{c}$ as its input,
+then transforms 
+them and
+the previous hidden state $\mathbf{s}_{t^\prime-1}$
+into the 
+hidden state $\mathbf{s}_{t^\prime}$ at the current time step.
+As a result, we can use a function $f$ to express the transformation of the decoder's hidden layer:
 
-Hence, we can use another RNN as the decoder. At time step $t'$, the decoder will update its hidden state $\mathbf{s}_{t'}$ using three inputs: the feature vector $\mathbf{y}_{t'-1}$ of $y_{t'-1}$, the context vector $\mathbf{c}$, and the hidden state of the last time step $\mathbf{s}_{t'-1}$. Let us denote the transformation of the RNN's hidden states within the decoder by a function $g$:
+$$\mathbf{s}_{t^\prime} = g(y_{t^\prime-1}, \mathbf{c}, \mathbf{s}_{t^\prime-1}).$$
 
-$$\mathbf{s}_{t'} = g(\mathbf{y}_{t'-1}, \mathbf{c}, \mathbf{s}_{t'-1}).$$
+After obtaining the hidden state of the decoder,
+we can use an output layer and the softmax operation to compute the conditional probability distribution
+$P(y_{t^\prime} \mid y_1, \ldots, y_{t^\prime-1}, \mathbf{c})$ for the output at time step $t^\prime$.
 
-
-When implementing the decoder, we directly use the hidden state of the encoder in the final time step as the initial hidden state of the decoder. This requires that the encoder and decoder RNNs have the same numbers of layers and hidden units.
-The GRU forward calculation of the decoder is similar to that of the encoder. The only difference is that we add a dense layer after the GRU layers, where the hidden size is the vocabulary size. The dense layer will predict the confidence score for each word.
-
-
-After obtaining the hidden state of the decoder, we can use a custom output layer and the softmax operation to compute $P(y_{t^\prime} \mid y_1, \ldots, y_{t^\prime-1}, \mathbf{c})$. For example, using hidden state $\mathbf{s}_{t^\prime}$ based on the current time step of the decoder, the output $y_{t^\prime-1}$ from the previous time step, and the context variable $\mathbf{c}$ to compute the probability distribution of output $y_{t^\prime}$ from the current time step.
+Following :numref:`fig_seq2seq`,
+when implementing the decoder as follows,
+we directly use the hidden state at the final time step 
+of the encoder 
+to initialize the hidden state of the decoder. 
+This requires that the RNN encoder and the RNN decoder have the same number of layers and hidden units.
+To further incorporate the encoded input sequence information,
+the context variable is concatenated 
+with the decoder input at all the time steps.
+To predict the probability distribution of the output token,
+a fully-connected layer is used to transform
+the hidden state at the final layer of the RNN decoder.
 
 ```{.python .input}
 class Seq2SeqDecoder(d2l.Decoder):
@@ -316,7 +342,10 @@ class Seq2SeqDecoder(d2l.Decoder):
         return output, state
 ```
 
-We create a decoder with the same hyperparameters as the encoder. As we can see, the output shape is changed to (batch size, the sequence length, vocabulary size).
+To illustrate the implemented decoder,
+below we instantiate it with the same hyperparameters from the aforementioned encoder. 
+As we can see, the output shape of the decoder becomes (batch size, number of time steps, vocabulary size),
+where the last dimension of the tensor stores the predicted token distribution.
 
 ```{.python .input}
 decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
