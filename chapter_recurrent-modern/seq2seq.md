@@ -111,6 +111,8 @@ according to the word index of the input language.
 Those feature vectors will be fed to a multi-layer GRU.
 The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). The encoder returns both the GRU outputs, i.e., hidden states of all the time steps, as well as the hidden state and the memory cell of the final time step.
 
+TODO:explain nn.Embedding
+
 ```{.python .input}
 #@save
 class Seq2SeqEncoder(d2l.Encoder):
