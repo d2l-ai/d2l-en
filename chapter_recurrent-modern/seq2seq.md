@@ -143,8 +143,6 @@ to return its feature vector.
 Besides,
 here we choose a multilayer GRU to
 implement the encoder.
-The returned variables of recurrent layers
-have been explained in :numref:`sec_rnn-concise`.
 
 ```{.python .input}
 #@save
@@ -164,7 +162,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
         output, state = self.rnn(X, state)
         # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
-        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
+        # `state[0]` shape: (`num_layers`, `batch_size`, `num_hiddens`)
         return output, state
 ```
 
@@ -192,7 +190,22 @@ class Seq2SeqEncoder(d2l.Encoder):
         return output, state
 ```
 
-Next, we will create a minibatch sequence input with a batch size of 4 and 7 time steps. We assume the number of hidden layers of the GRU unit is 2 and the number of hidden units is 16. The output shape returned by the encoder after performing forward calculation on the input is (number of time steps, batch size, number of hidden units). The shape of the multi-layer hidden state of the gated recurrent unit in the final time step is (number of hidden layers, batch size, number of hidden units). For the gated recurrent unit, the `state` list contains only one element, which is the hidden state. If long short-term memory is used, the `state` list will also contain another element, which is the memory cell.
+The returned variables of recurrent layers
+have been explained in :numref:`sec_rnn-concise`.
+Let us still use a concrete example
+to illustrate the above encoder implementation.
+Below
+we instantiate a two-layer GRU encoder
+whose number of hidden units is 16.
+Given
+a minibatch of sequence inputs `X`
+(batch size: 4, number of time steps: 7),
+the hidden states of the last layer
+at all the time steps
+(`output` return by the encoder's recurrent layers)
+are a tensor
+of shape 
+(number of time steps, batch size, number of hidden units).
 
 ```{.python .input}
 encoder = Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
@@ -213,12 +226,21 @@ output, state = encoder(X)
 output.shape
 ```
 
-Since a GRU is used, the `state` list will contain only one element---the hidden state in the final time step with shape (number of hidden layers, batch size, number of hidden units).
-If an LSTM is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units).
+Since a GRU is employed here,
+the shape of the multilayer hidden states
+at the final time step
+is
+(number of hidden layers, batch size, number of hidden units).
+If an LSTM is used,
+memory cell information will also be contained in `state`.
 
 ```{.python .input}
-#@tab all
 len(state), state[0].shape
+```
+
+```{.python .input}
+#@tab pytorch
+state.shape
 ```
 
 ## Decoder
@@ -312,7 +334,7 @@ decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
 decoder.eval()
 state = decoder.init_state(encoder(X))
 output, state = decoder(X, state)
-output.shape, len(state), state[0].shape, state[1].shape
+output.shape, state.shape
 ```
 
 ## Model Training
