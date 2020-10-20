@@ -73,6 +73,11 @@ we know that these variables captured and retained the sequence's historical inf
 Since the hidden state uses the same definition of the previous time step in the current time step, the computation of :eqref:`rnn_h_with_state` is *recurrent*. Hence, neural networks with hidden states
 based on recurrent computation are named
 *recurrent neural networks*.
+Layers that perform
+the computation of :eqref:`rnn_h_with_state`
+in RNNs 
+are called *recurrent layers*.
+
 
 There are many different ways for constructing RNNs.
 RNNs with a hidden state defined by :eqref:`rnn_h_with_state` are very common.
