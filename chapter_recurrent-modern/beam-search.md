@@ -1,9 +1,48 @@
 # Beam Search
 :label:`sec_beam-search`
 
-In :numref:`sec_seq2seq`, we discussed how to train an encoder-decoder with input and output sequences that are both of variable length. In this section, we are going to introduce how to use the encoder-decoder to predict sequences of  variable length.
+In :numref:`sec_seq2seq`,
+we predicted the output sequence token by token
+until the special end-of-sequence "&lt;eos&gt;" token
+is predicted.
+In this section,
+we will begin with formalizing this *greedy search* strategy
+and exploring issues with it,
+then compare this strategy with other alternatives:
+*exhaustive search* and *beam search*.
 
-As in :numref:`sec_machine_translation`, when preparing to train the dataset, we normally attach a special symbol "&lt;eos&gt;" after each sentence to indicate the termination of the sequence. We will continue to use this mathematical symbol in the discussion below. For ease of discussion, we assume that the output of the decoder is a sequence of text. Let the size of output text dictionary $\mathcal{Y}$ (contains special symbol "&lt;eos&gt;") be $\left|\mathcal{Y}\right|$, and the maximum length of the output sequence be $T'$. There are a total $\mathcal{O}(\left|\mathcal{Y}\right|^{T'})$ types of possible output sequences. All the subsequences after the special symbol "&lt;eos&gt;" in these output sequences will be discarded. Besides, we still denote the context vector as $\mathbf{c}$, which encodes information of all the hidden states from the input.
+Before a formal introduction to greedy search,
+let us formalize the search problem
+using
+the same mathematical notation from :numref:`sec_seq2seq`.
+At any time step $t'$, 
+the probability of the decoder output $y_{t'}$ 
+is conditional 
+on the output subsequence
+$y_1, \ldots, y_{t'-1}$ before $t'$ and 
+the context variable $\mathbf{c}$ that
+encodes the information of the input sequence.
+To quantify computational cost,
+denote by 
+$\mathcal{Y}$ (it contains "&lt;eos&gt;")
+the output vocabulary.
+So the cardinality $\left|\mathcal{Y}\right|$ of this vocabulary set
+is the vocabulary size.
+Let us also specify the maximum number of tokens
+of an output sequence as $T'$.
+As a result,
+our goal is to search for an ideal output
+from all the 
+$\mathcal{O}(\left|\mathcal{Y}\right|^{T'})$
+possible output sequences.
+Of course, 
+for all these output sequences,
+portions including and after "&lt;eos&gt;" will be discarded
+in the actual output.
+
+
+
+
 
 
 ## Greedy Search
