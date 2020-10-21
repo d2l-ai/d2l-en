@@ -111,7 +111,7 @@ $$\mathbf{h}_t = f(\mathbf{x}_t, \mathbf{h}_{t-1}). $$
 In general,
 the encoder transforms the hidden states at
 all the time steps
-into the context variable through a customizable function $q$:
+into the context variable through a customized function $q$:
 
 $$\mathbf{c} =  q(\mathbf{h}_1, \ldots, \mathbf{h}_T).$$
 
@@ -366,32 +366,43 @@ output, state = decoder(X, state)
 output.shape, state.shape
 ```
 
-## Model Training
-
-According to the maximum likelihood estimation, we can maximize the conditional probability of the output sequence based on the input sequence
-
-$$
-\begin{aligned}
-P(y_1, \ldots, y_{T'} \mid x_1, \ldots, x_T)
-&= \prod_{t'=1}^{T'} P(y_{t'} \mid y_1, \ldots, y_{t'-1}, x_1, \ldots, x_T)\\
-&= \prod_{t'=1}^{T'} P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),
-\end{aligned}
-$$
-
-to get the loss of the output sequence
-
-$$- \log P(y_1, \ldots, y_{T'} \mid x_1, \ldots, x_T) = -\sum_{t'=1}^{T'} \log P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
-
-In model training, the mean of losses for all the output sequences is usually used as a loss function that needs to be minimized. In the model prediction discussed in Figure 10.8, we need to use the output of the decoder from the previous time step as the input to the current time step. In contrast, in training, we can also use the label of the label sequence from the previous time step as the input of the decoder for the current time step. This is called teacher forcing.
-
-
-
-
 ## Loss Function
 
-For each time step, the decoder outputs a vocabulary-size confidence score vector to predict words. Similar to language modeling, we can apply softmax to obtain the probabilities and then use cross-entropy loss to calculate the loss. Note that we padded the target sentences to make them have the same length, but we do not need to compute the loss on the padding symbols.
+To summarize,
+the layers in the above RNN encoder-decoder architecture are illustrated in :numref:`fig_seq2seq_details`.
 
-To implement the loss function that filters out some entries, we will use an operator called `SequenceMask`. It can specify to mask the first dimension (`axis=0`) or the second one (`axis=1`). If the second one is chosen, given a valid length vector `len` and 2-dim input `X`, this operator sets `X[i, len[i]:] = 0` for all $i$'s.
+![Layers in the RNN encoder-decoder architecture.](../img/seq2seq-details.svg)
+:label:`fig_seq2seq_details`
+
+At each time step, the decoder 
+predicts a probability distribution for the output tokens.
+Similar to language modeling, 
+we can apply softmax to obtain the distribution 
+and calculate the cross-entropy loss for optimization. 
+Recall :numref:`sec_machine_translation`
+that the special padding tokens
+are appended to the end of sequences
+so sequences of varying lengths
+can be efficiently loaded
+in minibatches of the same shape.
+However,
+prediction of padding tokens
+should be excluded from loss calculations.
+
+To this end,
+we can use the following
+`sequence_mask` function
+to mask irrelevant entries with zero values
+so later
+multiplication of any irrelevant prediction
+with zero equals to zero.
+For example,
+if the valid length of two sequences 
+excluding padding tokens
+are one and two, respectively,
+the remaining entries after 
+the first one
+and the first two entries are cleared to zeros.
 
 ```{.python .input}
 X = np.array([[1, 2, 3], [4, 5, 6]])
@@ -412,7 +423,11 @@ X = torch.tensor([[1, 2, 3], [4, 5, 6]])
 sequence_mask(X, torch.tensor([1, 2]))
 ```
 
-Apply to $n$-dim tensor $X$, it sets `X[i, len[i]:, :, ..., :] = 0`. In addition, we can specify the filling value such as $-1$ as shown below.
+
+We can also mask all the entries across the last 
+few axes.
+If you like, you may even specify 
+to replace such entries with a non-zero value.
 
 ```{.python .input}
 X = d2l.ones((2, 3, 4))
@@ -425,7 +440,17 @@ X = d2l.ones(2, 3, 4)
 sequence_mask(X, torch.tensor([1, 2]), value=-1)
 ```
 
-Now we can implement the masked version of the softmax cross-entropy loss. Note that each Gluon loss function allows to specify per-example weights, in default they are 1s. Then we can just use a zero weight for each example we would like to remove. So our customized loss function accepts an additional `valid_len` argument to ignore some failing elements in each sequence.
+Now we can extend the softmax cross-entropy loss
+to allow the masking of irrelevant predictions.
+Initially,
+masks for all the predicted tokens are set to one.
+Once the valid length is given,
+the mask corresponding to any padding token
+will be cleared to zero.
+In the end,
+the loss for all the tokens
+will be multipled by the mask to filter out 
+irrelevant predictions of padding tokens in the loss.
 
 ```{.python .input}
 #@save
@@ -452,12 +477,19 @@ class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
         weights = sequence_mask(weights, valid_len)
         self.reduction='none'
         unweighted_loss = super(MaskedSoftmaxCELoss, self).forward(
-            pred.permute(0,2,1), label)
-        weighted_loss = (unweighted_loss*weights).mean(dim=1)
+            pred.permute(0, 2, 1), label)
+        weighted_loss = (unweighted_loss * weights).mean(dim=1)
         return weighted_loss
 ```
 
-For a sanity check, we create identical three sequences, keep 4 elements for the first sequence, 2 elements for the second sequence, and none for the last one. Then the first example loss should be 2 times larger than the second one, and the last loss should be 0.
+For a sanity check, we can create three identical sequences.
+Then we can
+specify that the valid lengths of these sequences
+are 4, 2, and 0, respectively.
+As a result,
+the loss of the first sequence
+should be twice as large as that of the second sequence,
+while the third sequence should have a zero loss.
 
 ```{.python .input}
 loss = MaskedSoftmaxCELoss()
@@ -467,23 +499,21 @@ loss(d2l.ones((3, 4, 10)), d2l.ones((3, 4)), np.array([4, 2, 0]))
 ```{.python .input}
 #@tab pytorch
 loss = MaskedSoftmaxCELoss()
-loss(d2l.ones(3, 4, 10), d2l.ones((3, 4), dtype=torch.long), torch.tensor([4, 2, 0]))
+loss(d2l.ones(3, 4, 10), d2l.ones((3, 4), dtype=torch.long),
+     torch.tensor([4, 2, 0]))
 ```
 
 ## Training
 :label:`sec_seq2seq_training`
-
-
-The layers in the encoder and the decoder are illustrated in :numref:`fig_seq2seq_details`.
-
-![Layers in the encoder and the decoder.](../img/seq2seq-details.svg)
-:label:`fig_seq2seq_details`
 
 During training, if the target sequence has length $T$, we feed the first $T-1$ tokens into the decoder as inputs, and the last $T-1$ tokens are used as ground truth label.
 For the target language,
 we also insert the special
 “&lt;bos&gt;” token at the beginning of any sequence
 to mark its beginning.
+This is called *teacher forcing*.
+
+In the model prediction discussed in Figure 10.8, we need to use the output of the decoder from the previous time step as the input to the current time step. In contrast, in training, we can also use the label of the label sequence from the previous time step as the input of the decoder for the current time step. This is called teacher forcing.
 
 ```{.python .input}
 #@save
@@ -502,7 +532,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
                 x.as_in_ctx(device) for x in batch]
             bos = np.array(
                 [tgt_vocab['<bos>']] * Y.shape[0], ctx=device).reshape(-1, 1)
-            dec_input = d2l.concat([bos, Y[:, :-1]], 1)
+            dec_input = d2l.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
             with autograd.record():
                 Y_hat, _ = model(X, dec_input, X_valid_len)
                 l = loss(Y_hat, Y, Y_valid_len)
@@ -542,7 +572,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
             X, X_valid_len, Y, Y_valid_len = [x.to(device) for x in batch]
             bos = torch.tensor([tgt_vocab['<bos>']] * Y.shape[0],
                                device=device).reshape(-1, 1)
-            dec_input = d2l.concat([bos, Y[:, :-1]], 1)
+            dec_input = d2l.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
             Y_hat, _ = model(X, dec_input, X_valid_len)
             l = loss(Y_hat, Y, Y_valid_len)
             l.sum().backward()  # Make the loss scalar for `backward`
