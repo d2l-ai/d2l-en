@@ -147,6 +147,7 @@ implement the encoder.
 ```{.python .input}
 #@save
 class Seq2SeqEncoder(d2l.Encoder):
+    """The RNN encoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqEncoder, self).__init__(**kwargs)
@@ -170,6 +171,7 @@ class Seq2SeqEncoder(d2l.Encoder):
 #@tab pytorch
 #@save
 class Seq2SeqEncoder(d2l.Encoder):
+    """The RNN encoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqEncoder, self).__init__(**kwargs)
@@ -289,6 +291,7 @@ the hidden state at the final layer of the RNN decoder.
 
 ```{.python .input}
 class Seq2SeqDecoder(d2l.Decoder):
+    """The RNN decoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqDecoder, self).__init__(**kwargs)
@@ -318,6 +321,7 @@ class Seq2SeqDecoder(d2l.Decoder):
 ```{.python .input}
 #@tab pytorch
 class Seq2SeqDecoder(d2l.Decoder):
+    """The RNN decoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqDecoder, self).__init__(**kwargs)
@@ -413,6 +417,7 @@ npx.sequence_mask(X, np.array([1, 2]), True, axis=1)
 #@tab pytorch
 #@save
 def sequence_mask(X, valid_len, value=0):
+    """Mask irrelevant entries in sequences."""
     maxlen = X.size(1)
     mask = torch.arange((maxlen), dtype=torch.float32,
                         device=X.device)[None, :] < valid_len[:, None]
@@ -422,7 +427,6 @@ def sequence_mask(X, valid_len, value=0):
 X = torch.tensor([[1, 2, 3], [4, 5, 6]])
 sequence_mask(X, torch.tensor([1, 2]))
 ```
-
 
 We can also mask all the entries across the last 
 few axes.
@@ -455,6 +459,7 @@ irrelevant predictions of padding tokens in the loss.
 ```{.python .input}
 #@save
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
+    """The softmax cross-entropy loss with masks."""
     # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
     # `label` shape: (`batch_size`, `num_steps`)
     # `valid_len` shape: (`batch_size`,)
@@ -469,6 +474,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
 #@tab pytorch
 #@save
 class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
+    """The softmax cross-entropy loss with masks."""
     # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
     # `label` shape: (`batch_size`, `num_steps`)
     # `valid_len` shape: (`batch_size`,)
@@ -520,6 +526,7 @@ as the current input to the decoder.
 ```{.python .input}
 #@save
 def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
+    """Train a model for sequence to sequence (defined in Chapter 9)."""
     model.initialize(init.Xavier(), force_reinit=True, ctx=device)
     trainer = gluon.Trainer(model.collect_params(), 'adam',
                             {'learning_rate': lr})
@@ -553,6 +560,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
 #@tab pytorch
 #@save
 def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
+    """Train a model for sequence to sequence (defined in Chapter 9)."""
     def xavier_init_weights(m):
         if type(m) == nn.Linear:
             torch.nn.init.xavier_uniform_(m.weight)
@@ -635,6 +643,7 @@ strategies for sequence generation in
 #@save
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
+    """Predict sequences (defined in Chapter 9)."""
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
         src_vocab['<eos>']]
     enc_valid_len = np.array([len(src_tokens)], ctx=device)
@@ -665,6 +674,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
 #@save
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
+    """Predict sequences (defined in Chapter 9)."""
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
         src_vocab['<eos>']]
     enc_valid_len = torch.tensor([len(src_tokens)], device=device)
@@ -692,23 +702,67 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     return ' '.join(tgt_vocab.to_tokens(output_seq))
 ```
 
-## Evaluation of Translation Results
+## Evaluation of Predicted Sequences 
 
-BLEU (Bilingual Evaluation Understudy) is often used to evaluate machine translation results[1]. For any subsequence in the model prediction sequence, BLEU evaluates whether this subsequence appears in the label sequence.
+We can evaluate a predicted sequence 
+by comparing it with the
+label sequence (the ground-truth).
+BLEU (Bilingual Evaluation Understudy),
+though originally proposed for evaluating
+machine translation results :cite:`Papineni.Roukos.Ward.ea.2002`,
+has been extensively used in measuring
+the quality of output sequences for different applications.
+In principle, for any $n$-grams in the predicted sequence, 
+BLEU evaluates whether this $n$-grams appears
+in the label sequence.
 
-Specifically, the precision of the subsequence with $n$ words is $p_n$. It is the ratio of the number of subsequences with $n$ matched words for the prediction sequence and label sequence to the number of subsequences with $n$ words in the prediction sequence. For example, assume the label sequence is $A$, $B$, $C$, $D$, $E$, $F$, and the prediction sequence is $A$, $B$, $B$, $C$, $D$. Then $p_1 = 4/5, \ p_2 = 3/4, \ p_3 = 1/3, and \ p_4 = 0$. Assume $len_{\text{label}}$ and $len_{\text{pred}}$ are the numbers of words in the label sequence and the prediction sequence. Then, BLEU is defined as
+Denote by $p_n$
+the precision of $n$-grams,
+which is
+the ratio of 
+the number of matched $n$-grams in
+the predicted and label sequences
+to 
+the number of $n$-grams in the predicted sequence. 
+To explain, 
+given a label sequence $A$, $B$, $C$, $D$, $E$, $F$, 
+and a predicted sequence $A$, $B$, $B$, $C$, $D$. 
+We have $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$, and $p_4 = 0$. 
+Besides,
+let $\mathrm{len}_{\text{label}}$ and $\mathrm{len}_{\text{pred}}$
+be 
+the numbers of tokens in the label sequence and the predicted sequence, respectively. 
+Then, BLEU is defined as
 
-$$ \exp\left(\min\left(0, 1 - \frac{len_{\text{label}}}{len_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
+$$ \exp\left(\min\left(0, 1 - \frac{\mathrm{len}_{\text{label}}}{\mathrm{len}_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
+:eqlabel:`eq_bleu`
 
-Here, $k$ is the maximum number of words in the subsequence we wish to match. It can be seen that the BLEU is 1 when the prediction sequence and the label sequence are identical.
+where $k$ is the longest $n$-grams for matching.
 
-Because matching longer subsequences is more difficult than matching shorter subsequences, BLEU gives greater weight to the precision of longer subsequence matches. For example, when $p_n$ is fixed at 0.5, as $n$ increases, $0.5^{1/2} \approx 0.7, 0.5^{1/4} \approx 0.84, 0.5^{1/8} \approx 0.92, and 0.5^{1/16} \approx 0.96$. In addition, the prediction of shorter sequences by the model tends to obtain higher $p_n$ values. Therefore, the coefficient before the multiplication term in the above equation is a penalty to the shorter output. For example, when $k=2$, we assume the label sequence is $A$, $B$, $C$, $D$, $E$, $F$ and the prediction sequence is $A$, $B$. Although $p_1 = p_2 = 1$, the penalty factor is $\exp(1-6/2) \approx 0.14$, so the BLEU is also close to 0.14.
+Based on the definition of BLEU in :eqref:`eq_bleu`,
+whenever the predicted sequence is the same as the label sequence, BLEU is 1.
+Moreover,
+since matching longer $n$-grams is more difficult, 
+BLEU assigns a greater weight 
+to a longer $n$-gram precision. 
+Specifically, when $p_n$ is fixed, 
+$p_n^{1/2^n}$ increases as $n$ grows. 
+Furthermore, 
+since
+predicting shorter sequences 
+tends to obtain a higher $p_n$ value, 
+the coefficient before the multiplication term in :eqref:`eq_bleu` 
+penalizes shorter predicted sequences. 
+For example, when $k=2$, 
+given the label sequence $A$, $B$, $C$, $D$, $E$, $F$ and the predicted sequence $A$, $B$, 
+although $p_1 = p_2 = 1$, the penalty factor $\exp(1-6/2) \approx 0.14$ lowers the BLEU.
 
-Next, we calculate the BLEU.
+We implement the BLEU measure as follows.
 
 ```{.python .input}
 #@tab all
 def bleu(pred_seq, label_seq, k):  #@save
+    """Compute the BLEU."""
     pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
     len_pred, len_label = len(pred_tokens), len(label_tokens)
     score = math.exp(min(0, 1 - len_label / len_pred))
@@ -724,12 +778,16 @@ def bleu(pred_seq, label_seq, k):  #@save
     return score
 ```
 
-Try several examples:
+In the end, 
+we use the trained RNN encoder-decoder 
+to translate a few English sentences into French
+and compute the BLEU of the results.
 
 ```{.python .input}
 #@tab all
 #@save
 def translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device):
+    """Translate text sequences."""
     for eng, fra in zip(engs, fras):
         translation = predict_s2s_ch9(
             model, eng, src_vocab, tgt_vocab, num_steps, device)
@@ -743,16 +801,21 @@ translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
 
 ## Summary
 
-* The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output from a sequence input.
-* We use multiple GRU layers for both the encoder and the decoder.
+* Following the design of the encoder-decoder architecture, we can use two RNNs to design a model for sequence to sequence learning.
+* When implementing the encoder and the decoder, we can use multilayer RNNs.
+* We can use masks to filter out irrelevant computations, such as when calculating the loss.
+* In encoder-decoder training, the teacher forcing approach feeds original output sequences (in contrast to predictions) into the decoder.
+* BLEU is a popular measure for evaluating output sequences by matching $n$-grams between the predicted sequence and the label sequence.
 
 
 ## Exercises
 
-1. Can you think of other use cases of seq2seq besides neural machine translation?
-1. What if the input sequence in the example of this section is longer?
-1. If we do not use the `SequenceMask` in the loss function, what may happen?
-1. Replace GRU with LSTM in the experiment.
+1. Can you adjust the hyperparameters to improve the translation results?
+1. Rerun the experiment without using masks in the loss calculation. What results do you observe? Why?
+1. If the encoder and the decoder differ in the number of layers or the number of hidden units, how can we initialize the hidden state of the decoder?
+1. In training, replace teacher forcing with feeding the prediction at the previous time step into the decoder. How does this influence the performance?
+1. Rerun the experiment by replacing GRU with LSTM.
+1. Are there any other ways to design the output layer of the decoder?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/345)

@@ -889,9 +889,11 @@ class EncoderDecoder(nn.Block):
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class Seq2SeqEncoder(d2l.Encoder):
+    """The RNN encoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqEncoder, self).__init__(**kwargs)
+        # Embedding layer
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
 
@@ -903,12 +905,13 @@ class Seq2SeqEncoder(d2l.Encoder):
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
         output, state = self.rnn(X, state)
         # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
-        # `state` shape: (`num_layers`, `batch_size`, `num_hiddens`)
+        # `state[0]` shape: (`num_layers`, `batch_size`, `num_hiddens`)
         return output, state
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
+    """The softmax cross-entropy loss with masks."""
     # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
     # `label` shape: (`batch_size`, `num_steps`)
     # `valid_len` shape: (`batch_size`,)
@@ -921,6 +924,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
+    """Train a model for sequence to sequence (defined in Chapter 9)."""
     model.initialize(init.Xavier(), force_reinit=True, ctx=device)
     trainer = gluon.Trainer(model.collect_params(), 'adam',
                             {'learning_rate': lr})
@@ -935,7 +939,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
                 x.as_in_ctx(device) for x in batch]
             bos = np.array(
                 [tgt_vocab['<bos>']] * Y.shape[0], ctx=device).reshape(-1, 1)
-            dec_input = d2l.concat([bos, Y[:, :-1]], 1)
+            dec_input = d2l.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
             with autograd.record():
                 Y_hat, _ = model(X, dec_input, X_valid_len)
                 l = loss(Y_hat, Y, Y_valid_len)
@@ -953,6 +957,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
+    """Predict sequences (defined in Chapter 9)."""
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
         src_vocab['<eos>']]
     enc_valid_len = np.array([len(src_tokens)], ctx=device)
@@ -980,6 +985,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def bleu(pred_seq, label_seq, k):  #@save
+    """Compute the BLEU."""
     pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
     len_pred, len_label = len(pred_tokens), len(label_tokens)
     score = math.exp(min(0, 1 - len_label / len_pred))
@@ -997,6 +1003,7 @@ def bleu(pred_seq, label_seq, k):  #@save
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device):
+    """Translate text sequences."""
     for eng, fra in zip(engs, fras):
         translation = predict_s2s_ch9(
             model, eng, src_vocab, tgt_vocab, num_steps, device)
