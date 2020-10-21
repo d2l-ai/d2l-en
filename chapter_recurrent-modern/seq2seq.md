@@ -366,13 +366,13 @@ output, state = decoder(X, state)
 output.shape, state.shape
 ```
 
-## Loss Function
-
 To summarize,
-the layers in the above RNN encoder-decoder architecture are illustrated in :numref:`fig_seq2seq_details`.
+the layers in the above RNN encoder-decoder model are illustrated in :numref:`fig_seq2seq_details`.
 
-![Layers in the RNN encoder-decoder architecture.](../img/seq2seq-details.svg)
+![Layers in an RNN encoder-decoder model.](../img/seq2seq-details.svg)
 :label:`fig_seq2seq_details`
+
+## Loss Function
 
 At each time step, the decoder 
 predicts a probability distribution for the output tokens.
@@ -506,14 +506,16 @@ loss(d2l.ones(3, 4, 10), d2l.ones((3, 4), dtype=torch.long),
 ## Training
 :label:`sec_seq2seq_training`
 
-During training, if the target sequence has length $T$, we feed the first $T-1$ tokens into the decoder as inputs, and the last $T-1$ tokens are used as ground truth label.
-For the target language,
-we also insert the special
-“&lt;bos&gt;” token at the beginning of any sequence
-to mark its beginning.
-This is called *teacher forcing*.
-
-In the model prediction discussed in Figure 10.8, we need to use the output of the decoder from the previous time step as the input to the current time step. In contrast, in training, we can also use the label of the label sequence from the previous time step as the input of the decoder for the current time step. This is called teacher forcing.
+In the following training loop,
+we concatenate the special beginning-of-sequence token
+and the original output sequence excluding the final token as 
+the input to the decoder, as shown in :numref:`fig_seq2seq`.
+This is called *teacher forcing* because
+the original output sequence (token labels) is fed into the decoder.
+Alternatively,
+we could also feed the *predicted* token 
+from the previous time step
+as the current input to the decoder.
 
 ```{.python .input}
 #@save
@@ -587,7 +589,8 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
           f'tokens/sec on {str(device)}')
 ```
 
-Next, we create a model instance and set hyperparameters. Then, we can train the model.
+Now we can create and train an RNN encoder-decoder model
+for sequence to sequence learning on the machine translation dataset.
 
 ```{.python .input}
 #@tab all
@@ -604,13 +607,29 @@ model = d2l.EncoderDecoder(encoder, decoder)
 train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
-## Predicting
+## Prediction
 
-Here we implement the simplest method, greedy search, to generate an output
-sequence. As illustrated in :numref:`fig_seq2seq_predict`, during predicting, we feed the same "&lt;bos&gt;" token to the decoder as training at time step 0. But the input token for a later time step is the predicted token from the previous time step.
+To predict the output sequence
+token by token,
+at each decoder time step
+the predicted token from the previous
+time step is fed into the decoder as an input.
+Similar to training,
+at the initial time step
+the beginning-of-sequence ("&lt;bos&gt;") token
+is fed into the decoder.
+This prediction process
+is illustrated in :numref:`fig_seq2seq_predict`.
+When the end-of-sequence ("&lt;eos&gt;") token is predicted, 
+the prediction of the output sequence is complete.
 
-![Sequence to sequence model predicting with greedy search](../img/seq2seq-predict.svg)
+
+![Predicting the output sequence token by token using an RNN encoder-decoder.](../img/seq2seq-predict.svg)
 :label:`fig_seq2seq_predict`
+
+We will introduce different
+strategies for sequence generation in
+:numref:`sec_beam-search`.
 
 ```{.python .input}
 #@save

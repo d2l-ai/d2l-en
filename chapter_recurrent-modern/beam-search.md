@@ -1,4 +1,5 @@
 # Beam Search
+:label:`sec_beam-search`
 
 In :numref:`sec_seq2seq`, we discussed how to train an encoder-decoder with input and output sequences that are both of variable length. In this section, we are going to introduce how to use the encoder-decoder to predict sequences of  variable length.
 
