@@ -40,20 +40,32 @@ for all these output sequences,
 portions including and after "&lt;eos&gt;" will be discarded
 in the actual output.
 
-
-
-
-
-
 ## Greedy Search
 
-First, we will take a look at a simple solution: greedy search. For any time step $t'$ of the output sequence, we are going to search for the word with the highest conditional probability from $|\mathcal{Y}|$ numbers of words, with
+First, let us take a look at 
+a simple strategy: *greedy search*.
+This strategy has been used to predict sequences in :numref:`sec_seq2seq`.
+In greedy search,
+at any time step $t'$ of the output sequence, 
+we search for the token 
+with the highest conditional probability from $\mathcal{Y}$, i.e., 
 
-$$y_{t'} = \operatorname*{argmax}_{y \in \mathcal{Y}} P(y \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$$
+$$y_{t'} = \operatorname*{argmax}_{y \in \mathcal{Y}} P(y \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
 
-as the output.  Once the "&lt;eos&gt;" symbol is detected, or the output sequence has reached its maximum length $T'$, the output is completed.
+as the output. 
+Once "&lt;eos&gt;" is outputted or the output sequence has reached its maximum length $T'$, the output sequence is completed.
 
-As we mentioned in our discussion of the decoder, the conditional probability of generating an output sequence based on the input sequence is $\prod_{t'=1}^{T'} P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$. We will take the output sequence with the highest conditional probability as the optimal sequence. The main problem with greedy search is that there is no guarantee that the optimal sequence will be obtained.
+So what can go wrong with greedy search?
+In fact,
+the *optimal sequence*
+should be the output sequence
+with the maximum 
+$\prod_{t'=1}^{T'} P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$,
+which is
+the probability of generating an output sequence conditional on the input sequence.
+Unfortunately, there is no guarantee
+that the optimal sequence will be obtained
+by greedy search.
 
 Take a look at the example below. We assume that there are four words "A", "B", "C", and "&lt;eos&gt;" in the output dictionary.  The four numbers under each time step in :numref:`fig_s2s-prob1` represent the conditional probabilities of generating "A", "B", "C", and "&lt;eos&gt;" at that time step, respectively.  At each time step, greedy search selects the word with the highest conditional probability. Therefore, the output sequence "A", "B", "C", and "&lt;eos&gt;" will be generated in :numref:`fig_s2s-prob1`. The conditional probability of this output sequence is $0.5\times0.4\times0.4\times0.6 = 0.048$.
 
