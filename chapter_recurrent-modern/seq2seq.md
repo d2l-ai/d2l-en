@@ -8,26 +8,26 @@ To address this type of problem,
 we have designed a general encoder-decoder architecture
 in :numref:`sec_encoder-decoder`.
 In this section,
-we will 
-use two RNNs to design 
+we will
+use two RNNs to design
 the encoder and the decoder of
-this architecture 
+this architecture
 and apply it to *sequence to sequence* learning
 for machine translation
 :cite:`Sutskever.Vinyals.Le.2014,Cho.Van-Merrienboer.Gulcehre.ea.2014`.
 
-Following the design principle 
+Following the design principle
 of the encoder-decoder architecture,
-the RNN encoder can 
+the RNN encoder can
 take a variable-length sequence as the input and transforms it into a fixed-shape hidden state.
 In other words,
 information of the input sequence
 is *encoded* in the hidden state of the RNN encoder.
 To generate the output sequence token by token,
-a separate RNN decoder 
-can predict the next token based on 
+a separate RNN decoder
+can predict the next token based on
 what tokens have been seen (such as in language modeling) or generated,
-together with the encoded information of the input sequence. 
+together with the encoded information of the input sequence.
 :numref:`fig_seq2seq` illustrates
 how to use two RNNs
 for sequence to sequence learning
@@ -38,7 +38,7 @@ in machine translation.
 :label:`fig_seq2seq`
 
 In :numref:`fig_seq2seq`,
-the special "&lt;eos&gt;" token 
+the special "&lt;eos&gt;" token
 marks the end of the sequence.
 The model can stop making predictions
 once this token is generated.
@@ -69,7 +69,7 @@ In the following,
 we will explain the design of :numref:`fig_seq2seq`
 in greater details.
 We will train this model for machine translation
-on the English-French dataset as introduced in  
+on the English-French dataset as introduced in
 :numref:`sec_machine_translation`.
 
 ```{.python .input}
@@ -93,17 +93,17 @@ from torch import nn
 ## Encoder
 
 Technically speaking,
-the encoder transforms an input sequence of variable length into a fixed-shape *context variable* $\mathbf{c}$, and encodes the input sequence information in this context variable. 
+the encoder transforms an input sequence of variable length into a fixed-shape *context variable* $\mathbf{c}$, and encodes the input sequence information in this context variable.
 As depicted in :numref:`fig_seq2seq`,
 we can use an RNN to design the encoder.
 
-Let us consider a sequence example (batch size: 1). 
-Suppose that 
+Let us consider a sequence example (batch size: 1).
+Suppose that
 the input sequence is $x_1, \ldots, x_T$, such that $x_t$ is the $t^{\mathrm{th}}$ token in the input text sequence.
 At time step $t$, the RNN transforms
 the input feature vector $\mathbf{x}_t$ for $x_t$
-and the hidden state $\mathbf{h} _{t-1}$ from the previous time step 
-into the current hidden state $\mathbf{h}_t$. 
+and the hidden state $\mathbf{h} _{t-1}$ from the previous time step
+into the current hidden state $\mathbf{h}_t$.
 We can use a function $f$ to express the transformation of the RNN's recurrent layer:
 
 $$\mathbf{h}_t = f(\mathbf{x}_t, \mathbf{h}_{t-1}). $$
@@ -116,29 +116,29 @@ into the context variable through a customized function $q$:
 $$\mathbf{c} =  q(\mathbf{h}_1, \ldots, \mathbf{h}_T).$$
 
 For example, when choosing $q(\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$ such as in :numref:`fig_seq2seq`,
-the context variable is just the hidden state $\mathbf{h}_T$ 
+the context variable is just the hidden state $\mathbf{h}_T$
 of the input sequence at the final time step.
 
 So far we have used a unidirectional RNN
 to design the encoder,
-where 
-a hidden state only depends on 
+where
+a hidden state only depends on
 the input subsequence at and before the time step of the hidden state.
-We can also construct encoders using bidirectional RNNs. In this case, a hidden state depends on 
+We can also construct encoders using bidirectional RNNs. In this case, a hidden state depends on
 the subsequence before and after the time step (including the input at the current time step), which encodes the information of the entire sequence.
 
 
 Now let us implement the RNN encoder.
 Note that we use an *embedding layer*
 to obtain the feature vector for each token in the input sequence.
-The weight 
+The weight
 of an embedding layer
 is a matrix
 whose number of rows equals to the size of the input vocabulary (`vocab_size`)
 and number of columns equals to the feature vector's dimension (`embed_size`).
 For any input token index $i$,
-the embedding layer 
-fetches the $i^{\mathrm{th}}$ row (starting from 0) of the weight matrix 
+the embedding layer
+fetches the $i^{\mathrm{th}}$ row (starting from 0) of the weight matrix
 to return its feature vector.
 Besides,
 here we choose a multilayer GRU to
@@ -206,7 +206,7 @@ the hidden states of the last layer
 at all the time steps
 (`output` return by the encoder's recurrent layers)
 are a tensor
-of shape 
+of shape
 (number of time steps, batch size, number of hidden units).
 
 ```{.python .input}
@@ -251,22 +251,22 @@ state.shape
 As we just mentioned,
 the context variable $\mathbf{c}$ of the encoder's output encodes the entire input sequence $x_1, \ldots, x_T$. Given the output sequence $y_1, y_2, \ldots, y_{T'}$ from the training dataset,
 for each time step $t'$
-(the symbol differs from the time step $t$ of input sequences or encoders), 
-the probability of the decoder output $y_{t'}$ 
-is conditional 
+(the symbol differs from the time step $t$ of input sequences or encoders),
+the probability of the decoder output $y_{t'}$
+is conditional
 on the previous output subsequence
-$y_1, \ldots, y_{t'-1}$ and 
+$y_1, \ldots, y_{t'-1}$ and
 the context variable $\mathbf{c}$, i.e., $P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$.
 
 To model this conditional probability on sequences,
-we can use another RNN as the decoder. 
-At any time step $t^\prime$ on the output sequence, 
-the RNN takes the output $y_{t^\prime-1}$ from the previous time step 
+we can use another RNN as the decoder.
+At any time step $t^\prime$ on the output sequence,
+the RNN takes the output $y_{t^\prime-1}$ from the previous time step
 and the context variable $\mathbf{c}$ as its input,
-then transforms 
+then transforms
 them and
 the previous hidden state $\mathbf{s}_{t^\prime-1}$
-into the 
+into the
 hidden state $\mathbf{s}_{t^\prime}$ at the current time step.
 As a result, we can use a function $f$ to express the transformation of the decoder's hidden layer:
 
@@ -278,12 +278,12 @@ $P(y_{t^\prime} \mid y_1, \ldots, y_{t^\prime-1}, \mathbf{c})$ for the output at
 
 Following :numref:`fig_seq2seq`,
 when implementing the decoder as follows,
-we directly use the hidden state at the final time step 
-of the encoder 
-to initialize the hidden state of the decoder. 
+we directly use the hidden state at the final time step
+of the encoder
+to initialize the hidden state of the decoder.
 This requires that the RNN encoder and the RNN decoder have the same number of layers and hidden units.
 To further incorporate the encoded input sequence information,
-the context variable is concatenated 
+the context variable is concatenated
 with the decoder input at all the time steps.
 To predict the probability distribution of the output token,
 a fully-connected layer is used to transform
@@ -347,7 +347,7 @@ class Seq2SeqDecoder(d2l.Decoder):
 ```
 
 To illustrate the implemented decoder,
-below we instantiate it with the same hyperparameters from the aforementioned encoder. 
+below we instantiate it with the same hyperparameters from the aforementioned encoder.
 As we can see, the output shape of the decoder becomes (batch size, number of time steps, vocabulary size),
 where the last dimension of the tensor stores the predicted token distribution.
 
@@ -362,7 +362,7 @@ output.shape, len(state), state[0].shape
 
 ```{.python .input}
 #@tab pytorch
-decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8, num_hiddens=16, 
+decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
                          num_layers=2)
 decoder.eval()
 state = decoder.init_state(encoder(X))
@@ -378,11 +378,11 @@ the layers in the above RNN encoder-decoder model are illustrated in :numref:`fi
 
 ## Loss Function
 
-At each time step, the decoder 
+At each time step, the decoder
 predicts a probability distribution for the output tokens.
-Similar to language modeling, 
-we can apply softmax to obtain the distribution 
-and calculate the cross-entropy loss for optimization. 
+Similar to language modeling,
+we can apply softmax to obtain the distribution
+and calculate the cross-entropy loss for optimization.
 Recall :numref:`sec_machine_translation`
 that the special padding tokens
 are appended to the end of sequences
@@ -401,10 +401,10 @@ so later
 multiplication of any irrelevant prediction
 with zero equals to zero.
 For example,
-if the valid length of two sequences 
+if the valid length of two sequences
 excluding padding tokens
 are one and two, respectively,
-the remaining entries after 
+the remaining entries after
 the first one
 and the first two entries are cleared to zeros.
 
@@ -428,9 +428,9 @@ X = torch.tensor([[1, 2, 3], [4, 5, 6]])
 sequence_mask(X, torch.tensor([1, 2]))
 ```
 
-We can also mask all the entries across the last 
+We can also mask all the entries across the last
 few axes.
-If you like, you may even specify 
+If you like, you may even specify
 to replace such entries with a non-zero value.
 
 ```{.python .input}
@@ -453,7 +453,7 @@ the mask corresponding to any padding token
 will be cleared to zero.
 In the end,
 the loss for all the tokens
-will be multipled by the mask to filter out 
+will be multipled by the mask to filter out
 irrelevant predictions of padding tokens in the loss.
 
 ```{.python .input}
@@ -514,12 +514,12 @@ loss(d2l.ones(3, 4, 10), d2l.ones((3, 4), dtype=torch.long),
 
 In the following training loop,
 we concatenate the special beginning-of-sequence token
-and the original output sequence excluding the final token as 
+and the original output sequence excluding the final token as
 the input to the decoder, as shown in :numref:`fig_seq2seq`.
 This is called *teacher forcing* because
 the original output sequence (token labels) is fed into the decoder.
 Alternatively,
-we could also feed the *predicted* token 
+we could also feed the *predicted* token
 from the previous time step
 as the current input to the decoder.
 
@@ -628,7 +628,7 @@ the beginning-of-sequence ("&lt;bos&gt;") token
 is fed into the decoder.
 This prediction process
 is illustrated in :numref:`fig_seq2seq_predict`.
-When the end-of-sequence ("&lt;eos&gt;") token is predicted, 
+When the end-of-sequence ("&lt;eos&gt;") token is predicted,
 the prediction of the output sequence is complete.
 
 
@@ -661,7 +661,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
         # of the decoder at the next time step
         dec_X = Y.argmax(axis=2)
         pred = dec_X.squeeze(axis=0).astype('int32').item()
-        # Once the end-of-sequence token is predicted, the generation of 
+        # Once the end-of-sequence token is predicted, the generation of
         # the output sequence is complete
         if pred == tgt_vocab['<eos>']:
             break
@@ -694,7 +694,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
         # of the decoder at the next time step
         dec_X = Y.argmax(dim=2)
         pred = dec_X.squeeze(dim=0).type(torch.int32).item()
-        # Once the end-of-sequence token is predicted, the generation of 
+        # Once the end-of-sequence token is predicted, the generation of
         # the output sequence is complete
         if pred == tgt_vocab['<eos>']:
             break
@@ -702,9 +702,9 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     return ' '.join(tgt_vocab.to_tokens(output_seq))
 ```
 
-## Evaluation of Predicted Sequences 
+## Evaluation of Predicted Sequences
 
-We can evaluate a predicted sequence 
+We can evaluate a predicted sequence
 by comparing it with the
 label sequence (the ground-truth).
 BLEU (Bilingual Evaluation Understudy),
@@ -712,26 +712,26 @@ though originally proposed for evaluating
 machine translation results :cite:`Papineni.Roukos.Ward.ea.2002`,
 has been extensively used in measuring
 the quality of output sequences for different applications.
-In principle, for any $n$-grams in the predicted sequence, 
+In principle, for any $n$-grams in the predicted sequence,
 BLEU evaluates whether this $n$-grams appears
 in the label sequence.
 
 Denote by $p_n$
 the precision of $n$-grams,
 which is
-the ratio of 
+the ratio of
 the number of matched $n$-grams in
 the predicted and label sequences
-to 
-the number of $n$-grams in the predicted sequence. 
-To explain, 
-given a label sequence $A$, $B$, $C$, $D$, $E$, $F$, 
-and a predicted sequence $A$, $B$, $B$, $C$, $D$. 
-We have $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$, and $p_4 = 0$. 
+to
+the number of $n$-grams in the predicted sequence.
+To explain,
+given a label sequence $A$, $B$, $C$, $D$, $E$, $F$,
+and a predicted sequence $A$, $B$, $B$, $C$, $D$.
+We have $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$, and $p_4 = 0$.
 Besides,
 let $\mathrm{len}_{\text{label}}$ and $\mathrm{len}_{\text{pred}}$
-be 
-the numbers of tokens in the label sequence and the predicted sequence, respectively. 
+be
+the numbers of tokens in the label sequence and the predicted sequence, respectively.
 Then, BLEU is defined as
 
 $$ \exp\left(\min\left(0, 1 - \frac{\mathrm{len}_{\text{label}}}{\mathrm{len}_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
@@ -742,19 +742,19 @@ where $k$ is the longest $n$-grams for matching.
 Based on the definition of BLEU in :eqref:`eq_bleu`,
 whenever the predicted sequence is the same as the label sequence, BLEU is 1.
 Moreover,
-since matching longer $n$-grams is more difficult, 
-BLEU assigns a greater weight 
-to a longer $n$-gram precision. 
-Specifically, when $p_n$ is fixed, 
-$p_n^{1/2^n}$ increases as $n$ grows. 
-Furthermore, 
+since matching longer $n$-grams is more difficult,
+BLEU assigns a greater weight
+to a longer $n$-gram precision.
+Specifically, when $p_n$ is fixed,
+$p_n^{1/2^n}$ increases as $n$ grows.
+Furthermore,
 since
-predicting shorter sequences 
-tends to obtain a higher $p_n$ value, 
-the coefficient before the multiplication term in :eqref:`eq_bleu` 
-penalizes shorter predicted sequences. 
-For example, when $k=2$, 
-given the label sequence $A$, $B$, $C$, $D$, $E$, $F$ and the predicted sequence $A$, $B$, 
+predicting shorter sequences
+tends to obtain a higher $p_n$ value,
+the coefficient before the multiplication term in :eqref:`eq_bleu`
+penalizes shorter predicted sequences.
+For example, when $k=2$,
+given the label sequence $A$, $B$, $C$, $D$, $E$, $F$ and the predicted sequence $A$, $B$,
 although $p_1 = p_2 = 1$, the penalty factor $\exp(1-6/2) \approx 0.14$ lowers the BLEU.
 
 We implement the BLEU measure as follows.
@@ -778,8 +778,8 @@ def bleu(pred_seq, label_seq, k):  #@save
     return score
 ```
 
-In the end, 
-we use the trained RNN encoder-decoder 
+In the end,
+we use the trained RNN encoder-decoder
 to translate a few English sentences into French
 and compute the BLEU of the results.
 
@@ -824,3 +824,4 @@ translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1062)
 :end_tab:
+

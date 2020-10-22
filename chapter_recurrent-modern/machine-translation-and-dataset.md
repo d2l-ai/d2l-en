@@ -25,18 +25,18 @@ for cracking language codes in World War II.
 For decades,
 statistical approaches
 had been dominant in this field :cite:`Brown.Cocke.Della-Pietra.ea.1988,Brown.Cocke.Della-Pietra.ea.1990`
-before the rise 
-of 
+before the rise
+of
 end-to-end learning using
-neural networks. 
-The latter 
+neural networks.
+The latter
 is often called
 *neural machine translation*
 to distinguish itself from
 *statistical machine translation*
 that involves statistical analysis
-in components such as 
-the translation model and the language model. 
+in components such as
+the translation model and the language model.
 
 
 Emphasizing end-to-end learning,
@@ -46,7 +46,7 @@ in :numref:`sec_language_model`
 whose corpus is in one single language,
 machine translation datasets
 are composed of pairs of text sequences
-that are in 
+that are in
 the source language and the target language, respectively.
 Thus,
 instead of reusing the preprocessing routine
@@ -54,7 +54,7 @@ for language modeling,
 we need a different way to preprocess
 machine translation datasets.
 In the following,
-we show how to 
+we show how to
 load the preprocessed data
 into minibatches for training.
 
@@ -143,14 +143,14 @@ print(text[:80])
 ## Tokenization
 
 Different from character-level tokenization
-in :numref:`sec_language_model`, 
+in :numref:`sec_language_model`,
 for machine translation
 we prefer word-level tokenization here
 (state-of-the-art models may use more advanced tokenization techniques).
 The following `tokenize_nmt` function
 tokenizes the the first `num_examples` text sequence pairs,
 where
-each token is either a word or a punctuation mark. 
+each token is either a word or a punctuation mark.
 This function returns
 two lists of token lists: `source` and `target`.
 Specifically,
@@ -176,7 +176,7 @@ source, target = tokenize_nmt(text)
 source[:6], target[:6]
 ```
 
-Let us plot the histogram of the number of tokens per text sequence. 
+Let us plot the histogram of the number of tokens per text sequence.
 In this simple English-French dataset,
 most of the text sequences have fewer than 20 tokens.
 
@@ -214,7 +214,7 @@ natural language processing tasks.
 
 ```{.python .input}
 #@tab all
-src_vocab = d2l.Vocab(source, min_freq=2, 
+src_vocab = d2l.Vocab(source, min_freq=2,
                       reserved_tokens=['<pad>', '<bos>', '<eos>'])
 len(src_vocab)
 ```
@@ -246,7 +246,7 @@ we will truncate the text sequence
 by only taking its first `num_steps` tokens
 and discarding the remaining.
 In this way,
-every text sequence 
+every text sequence
 will have the same length
 to be loaded in minibatches of the same shape.
 
@@ -267,14 +267,14 @@ truncate_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])
 
 Now we define a function to transform
 text sequences into minibatches for training.
-We append the special “&lt;eos&gt;” token 
-to the end of every sequence to indicate the 
+We append the special “&lt;eos&gt;” token
+to the end of every sequence to indicate the
 end of the sequence.
 When a model is predicting
 by
 generating a sequence token after token,
 the generation
-of the “&lt;eos&gt;” token 
+of the “&lt;eos&gt;” token
 can suggest that
 the output sequence is complete.
 Besides,
@@ -300,7 +300,7 @@ def build_array_nmt(lines, vocab, num_steps):
 
 ## Putting All Things Together
 
-Finally, we define the `load_data_nmt` function 
+Finally, we define the `load_data_nmt` function
 to return the data iterator, together with
 the vocabularies for both the source language and the target language.
 
@@ -311,9 +311,9 @@ def load_data_nmt(batch_size, num_steps, num_examples=600):
     """Return the iterator and the vocabularies of the translation dataset."""
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=2, 
+    src_vocab = d2l.Vocab(source, min_freq=2,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=2, 
+    tgt_vocab = d2l.Vocab(target, min_freq=2,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array_nmt(source, src_vocab, num_steps)
     tgt_array, tgt_valid_len = build_array_nmt(target, tgt_vocab, num_steps)
@@ -354,3 +354,4 @@ for X, X_valid_len, Y, Y_valid_len in train_iter:
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1060)
 :end_tab:
+

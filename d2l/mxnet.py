@@ -790,7 +790,7 @@ def read_data_nmt():
 def preprocess_nmt(text):
     """Preprocess the English-French dataset."""
     def no_space(char, prev_char):
-        return char in set(',.!') and prev_char != ' '
+        return char in set(',.!?') and prev_char != ' '
 
     # Replace non-breaking space with space, and convert uppercase letters to
     # lowercase ones
