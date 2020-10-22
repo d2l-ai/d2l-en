@@ -402,11 +402,10 @@ class CosineScheduler:
         if epoch < self.warmup_steps:
             return self.get_warmup_lr(epoch)
         if epoch <= self.max_update:
-            self.base_lr = self.final_lr + (self.base_lr_orig - self.final_lr) * \
-                    (1 + math.cos(math.pi * (epoch - self.warmup_steps) /
-                                  self.max_steps)) / 2
+            self.base_lr = self.final_lr + (
+                self.base_lr_orig - self.final_lr) * (1 + math.cos(
+                math.pi * (epoch - self.warmup_steps) / self.max_steps)) / 2
         return self.base_lr
-
 
 scheduler = CosineScheduler(max_update=20, base_lr=0.3, final_lr=0.01)
 d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])

@@ -81,7 +81,8 @@ Now we can implement the multi-head attention. Assume that the multi-head attent
 ```{.python .input}
 #@save
 class MultiHeadAttention(nn.Block):
-    def __init__(self, num_hiddens, num_heads, dropout, use_bias=False, **kwargs):
+    def __init__(self, num_hiddens, num_heads, dropout, use_bias=False,
+                 **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
@@ -123,8 +124,8 @@ class MultiHeadAttention(nn.Block):
 #@tab pytorch
 #@save
 class MultiHeadAttention(nn.Module):
-    def __init__(self, key_size, query_size, value_size, num_hiddens, num_heads,
-                 dropout, bias=False, **kwargs):
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 num_heads, dropout, bias=False, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
@@ -147,7 +148,8 @@ class MultiHeadAttention(nn.Module):
         value = transpose_qkv(self.W_v(value), self.num_heads)
 
         if valid_len is not None:
-            valid_len = torch.repeat_interleave(valid_len, repeats=self.num_heads, dim=0)
+            valid_len = torch.repeat_interleave(
+                valid_len, repeats=self.num_heads, dim=0)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
@@ -255,7 +257,8 @@ class PositionWiseFFN(nn.Block):
 #@tab pytorch
 #@save
 class PositionWiseFFN(nn.Module):
-    def __init__(self, ffn_num_input, ffn_num_hiddens, pw_num_outputs, **kwargs):
+    def __init__(self, ffn_num_input, ffn_num_hiddens, pw_num_outputs,
+                 **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
         self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)
         self.relu = nn.ReLU()
@@ -400,8 +403,9 @@ class PositionalEncoding(nn.Module):
         self.dropout = nn.Dropout(dropout)
         # Create a long enough `P`
         self.P = d2l.zeros((1, max_len, num_hiddens))
-        X = torch.arange(0, max_len, dtype=torch.float32).reshape(-1, 1) / torch.pow(
-            10000, torch.arange(0, num_hiddens, 2, dtype=torch.float32) / num_hiddens)
+        X = torch.arange(0, max_len, dtype=torch.float32).reshape(
+            -1, 1) / torch.pow(10000, torch.arange(
+            0, num_hiddens, 2, dtype=torch.float32) / num_hiddens)
         self.P[:, :, 0::2] = torch.sin(X)
         self.P[:, :, 1::2] = torch.cos(X)
 
@@ -454,15 +458,16 @@ class EncoderBlock(nn.Block):
 #@tab pytorch
 #@save
 class EncoderBlock(nn.Module):
-    def __init__(self, key_size, query_size, value_size, num_hiddens, norm_shape,
-                 ffn_num_input, ffn_num_hiddens, num_heads, dropout,
-                 use_bias=False, **kwargs):
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
+                 dropout, use_bias=False, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
         self.attention = MultiHeadAttention(key_size, query_size, value_size,
                                             num_hiddens, num_heads, dropout,
                                             use_bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens, num_hiddens)
+        self.ffn = PositionWiseFFN(
+            ffn_num_input, ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, valid_len):
@@ -515,9 +520,9 @@ class TransformerEncoder(d2l.Encoder):
 #@tab pytorch
 #@save
 class TransformerEncoder(d2l.Encoder):
-    def __init__(self, vocab_size, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, use_bias=False, **kwargs):
+    def __init__(self, vocab_size, key_size, query_size, value_size,
+                 num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
+                 num_heads, num_layers, dropout, use_bias=False, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
@@ -526,8 +531,8 @@ class TransformerEncoder(d2l.Encoder):
         for i in range(num_layers):
             self.blks.add_module("block"+str(i),
                 EncoderBlock(key_size, query_size, value_size, num_hiddens,
-                             norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                             dropout, use_bias))
+                             norm_shape, ffn_num_input, ffn_num_hiddens,
+                             num_heads, dropout, use_bias))
 
     def forward(self, X, valid_len, *args):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
@@ -546,7 +551,8 @@ encoder(np.ones((2, 100)), valid_len).shape
 
 ```{.python .input}
 #@tab pytorch
-encoder = TransformerEncoder(200, 24, 24, 24, 24, [100, 24], 24, 48, 8, 2, 0.5)
+encoder = TransformerEncoder(
+    200, 24, 24, 24, 24, [100, 24], 24, 48, 8, 2, 0.5)
 encoder.eval()
 encoder(d2l.ones((2, 100), dtype=torch.long), valid_len).shape
 ```
@@ -615,7 +621,8 @@ class DecoderBlock(nn.Module):
         self.attention2 = MultiHeadAttention(key_size, query_size, value_size,
                                              num_hiddens, num_heads, dropout)
         self.addnorm2 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens, num_hiddens)
+        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens,
+                                   num_hiddens)
         self.addnorm3 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, state):
@@ -630,8 +637,8 @@ class DecoderBlock(nn.Module):
             batch_size, seq_len, _ = X.shape
             # Shape: (batch_size, seq_len), the values in the j-th column
             # are j+1
-            valid_len = torch.repeat_interleave(torch.arange(1, seq_len + 1, device=X.device),
-                                                batch_size, dim=0)
+            valid_len = torch.repeat_interleave(torch.arange(
+                1, seq_len + 1, device=X.device), batch_size, dim=0)
             # Convert valid_len to 2D
             if valid_len.shape[0]!=X.shape[0]:
                 valid_len = valid_len.reshape(-1, X.shape[1])
@@ -800,4 +807,3 @@ d2l.translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1066)
 :end_tab:
-

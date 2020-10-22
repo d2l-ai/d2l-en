@@ -65,7 +65,8 @@ mnist_test = torchvision.datasets.MNIST(
 
 ```{.python .input}
 #@tab tensorflow
-(train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.mnist.load_data()
+((train_images, train_labels), (
+    test_images, test_labels)) = tf.keras.datasets.mnist.load_data()
 ```
 
 We can access a particular example, which contains the image and the corresponding label.
@@ -412,7 +413,8 @@ def predict(X):
     return [tf.cast(tf.argmax(bayes_pred_stable(x), axis=0), tf.int32).numpy()
             for x in X]
 
-X = tf.stack([tf.cast(train_images[i], tf.float32) for i in range(10, 38)], axis=0)
+X = tf.stack(
+    [tf.cast(train_images[i], tf.float32) for i in range(10, 38)], axis=0)
 y = tf.constant([train_labels[i] for i in range(10, 38)])
 preds = predict(X)
 # TODO: The preds are not correct due to issues with bayes_pred_stable()
@@ -438,7 +440,8 @@ float((preds == y).sum()) / len(y)  # Validation accuracy
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.stack([tf.cast(train_images[i], tf.float32) for i in range(len(test_images))], axis=0)
+X = tf.stack([tf.cast(train_images[i], tf.float32) for i in range(
+    len(test_images))], axis=0)
 y = tf.constant([train_labels[i] for i in range(len(test_images))])
 preds = tf.constant(predict(X), dtype=tf.int32)
 # TODO: The accuracy is not correct due to issues with bayes_pred_stable()

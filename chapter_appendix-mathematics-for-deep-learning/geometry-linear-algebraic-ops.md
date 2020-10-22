@@ -350,7 +350,8 @@ ave_1 = torch.mean(X_train_1, axis=0)
 ```{.python .input}
 #@tab tensorflow
 # Load in the dataset
-(train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.fashion_mnist.load_data()
+((train_images, train_labels), (
+    test_images, test_labels)) = tf.keras.datasets.fashion_mnist.load_data()
 
 
 X_train_0 = tf.cast(tf.stack(train_images[[i for i, label in enumerate(
@@ -430,7 +431,8 @@ w = tf.transpose(ave_1 - ave_0)
 predictions = tf.reduce_sum(X_test * tf.nest.flatten(w), axis=0) > -1500000
 
 # Accuracy
-tf.reduce_mean(tf.cast(tf.cast(predictions, y_test.dtype) == y_test, tf.float32))
+tf.reduce_mean(
+    tf.cast(tf.cast(predictions, y_test.dtype) == y_test, tf.float32))
 ```
 
 ## Geometry of Linear Transformations
@@ -1039,7 +1041,6 @@ $$
 6. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
 7. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation for an arbitrary matrix $A$?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/410)
 :end_tab:
@@ -1047,7 +1048,6 @@ $$
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1084)
 :end_tab:
-
 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/1085)

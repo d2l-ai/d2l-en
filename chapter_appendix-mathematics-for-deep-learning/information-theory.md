@@ -666,7 +666,8 @@ def nll_loss(y_hat, y):
     y = tf.keras.utils.to_categorical(y, num_classes=3)
     # Since tf.keras.losses.binary_crossentropy returns the mean
     # over the last axis, we calculate the sum here.
-    return tf.reduce_sum(tf.keras.losses.binary_crossentropy(y, y_hat, from_logits=True))
+    return tf.reduce_sum(
+        tf.keras.losses.binary_crossentropy(y, y_hat, from_logits=True))
 
 loss = nll_loss(tf.math.log(preds), labels)
 loss

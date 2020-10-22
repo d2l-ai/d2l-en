@@ -364,7 +364,8 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
 
 ```{.python .input}
 #@tab pytorch
-def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gpu()):
+def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
+          device=d2l.try_gpu()):
     loss = nn.BCEWithLogitsLoss(reduction='sum')
     for w in net_D.parameters():
         nn.init.normal_(w, 0, 0.02)
@@ -394,7 +395,8 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gp
         # Normalize the synthetic data to N(0, 1)
         fake_x = net_G(Z).permute(0, 2, 3, 1) / 2 + 0.5
         imgs = torch.cat(
-            [torch.cat([fake_x[i * 7 + j].cpu().detach() for j in range(7)], dim=1)
+            [torch.cat([
+                fake_x[i * 7 + j].cpu().detach() for j in range(7)], dim=1)
              for i in range(len(fake_x)//7)], dim=0)
         animator.axes[1].cla()
         animator.axes[1].imshow(imgs)

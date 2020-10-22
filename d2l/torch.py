@@ -341,7 +341,8 @@ def predict_ch3(net, test_iter, n=6):  #@save
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(d2l.argmax(net(X), axis=1))
     titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
+    d2l.show_images(
+        d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
@@ -1155,8 +1156,8 @@ class MLPAttention(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class MultiHeadAttention(nn.Module):
-    def __init__(self, key_size, query_size, value_size, num_hiddens, num_heads,
-                 dropout, bias=False, **kwargs):
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 num_heads, dropout, bias=False, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
@@ -1179,7 +1180,8 @@ class MultiHeadAttention(nn.Module):
         value = transpose_qkv(self.W_v(value), self.num_heads)
 
         if valid_len is not None:
-            valid_len = torch.repeat_interleave(valid_len, repeats=self.num_heads, dim=0)
+            valid_len = torch.repeat_interleave(
+                valid_len, repeats=self.num_heads, dim=0)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
@@ -1218,7 +1220,8 @@ def transpose_output(X, num_heads):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionWiseFFN(nn.Module):
-    def __init__(self, ffn_num_input, ffn_num_hiddens, pw_num_outputs, **kwargs):
+    def __init__(self, ffn_num_input, ffn_num_hiddens, pw_num_outputs,
+                 **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
         self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)
         self.relu = nn.ReLU()
@@ -1241,15 +1244,16 @@ class AddNorm(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class EncoderBlock(nn.Module):
-    def __init__(self, key_size, query_size, value_size, num_hiddens, norm_shape,
-                 ffn_num_input, ffn_num_hiddens, num_heads, dropout,
-                 use_bias=False, **kwargs):
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
+                 dropout, use_bias=False, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
         self.attention = MultiHeadAttention(key_size, query_size, value_size,
                                             num_hiddens, num_heads, dropout,
                                             use_bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens, num_hiddens)
+        self.ffn = PositionWiseFFN(
+            ffn_num_input, ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, valid_len):
@@ -1259,9 +1263,9 @@ class EncoderBlock(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class TransformerEncoder(d2l.Encoder):
-    def __init__(self, vocab_size, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, use_bias=False, **kwargs):
+    def __init__(self, vocab_size, key_size, query_size, value_size,
+                 num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
+                 num_heads, num_layers, dropout, use_bias=False, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
@@ -1270,8 +1274,8 @@ class TransformerEncoder(d2l.Encoder):
         for i in range(num_layers):
             self.blks.add_module("block"+str(i),
                 EncoderBlock(key_size, query_size, value_size, num_hiddens,
-                             norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                             dropout, use_bias))
+                             norm_shape, ffn_num_input, ffn_num_hiddens,
+                             num_heads, dropout, use_bias))
 
     def forward(self, X, valid_len, *args):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
@@ -1367,8 +1371,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     loss = nn.MSELoss()
     # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
     # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss 
-    # value to get L2Loss in PyTorch.
-    
+    # value to get L2Loss in PyTorch
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()

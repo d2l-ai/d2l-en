@@ -104,7 +104,8 @@ def grad_f(x, y):
                      torch.exp(y) / (torch.exp(x) + torch.exp(y))])
 
 epsilon = torch.tensor([0.01, -0.03])
-grad_approx = f(torch.tensor([0.]), torch.log(torch.tensor([2.]))) + epsilon.dot(
+grad_approx = f(torch.tensor([0.]), torch.log(
+    torch.tensor([2.]))) + epsilon.dot(
     grad_f(torch.tensor([0.]), torch.log(torch.tensor(2.))))
 true_value = f(torch.tensor([0.]) + epsilon[0], torch.log(
     torch.tensor([2.])) + epsilon[1])
@@ -127,7 +128,8 @@ def grad_f(x, y):
                         (tf.exp(y) / (tf.exp(x) + tf.exp(y))).numpy()])
 
 epsilon = tf.constant([0.01, -0.03])
-grad_approx = f(tf.constant([0.]), tf.math.log(tf.constant([2.]))) + tf.tensordot(
+grad_approx = f(tf.constant([0.]), tf.math.log(
+    tf.constant([2.]))) + tf.tensordot(
     epsilon, grad_f(tf.constant([0.]), tf.math.log(tf.constant(2.))), axes=1)
 true_value = f(tf.constant([0.]) + epsilon[0], tf.math.log(
     tf.constant([2.])) + epsilon[1])
