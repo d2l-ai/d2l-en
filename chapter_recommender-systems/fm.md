@@ -81,7 +81,7 @@ test_iter = gluon.data.DataLoader(
 ```
 
 ## Train the Model
-Afterwards, we train the model. The learning rate is set to 0.01 and the embedding size is set to 20 by default. The `Adam` optimizer and the `SigmoidBinaryCrossEntropyLoss` loss are used for model training.
+Afterwards, we train the model. The learning rate is set to 0.02 and the embedding size is set to 20 by default. The `Adam` optimizer and the `SigmoidBinaryCrossEntropyLoss` loss are used for model training.
 
 ```{.python .input  n=5}
 devices = d2l.try_all_gpus()

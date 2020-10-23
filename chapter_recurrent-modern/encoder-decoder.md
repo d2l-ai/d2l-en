@@ -1,18 +1,51 @@
 # Encoder-Decoder Architecture
+:label:`sec_encoder-decoder`
 
-The *encoder-decoder architecture* is a neural network design pattern. As shown in :numref:`fig_encoder_decoder`, the architecture is partitioned into two parts, the encoder and the decoder. The encoder's role is to encode the inputs into state, which often contains several tensors. Then the state is passed into the decoder to generate the outputs. In machine translation, the encoder transforms a source sentence, e.g., "Hello world.", into state, e.g., a vector, that captures its semantic information. The decoder then uses this state to generate the translated target sentence, e.g., "Bonjour le monde.".
+As we have discussed in 
+:numref:`sec_machine_translation`,
+machine translation
+is a major problem domain for sequence transduction models,
+whose input and output are
+both variable-length sequences.
+To handle this type of inputs and outputs,
+we can design an architecture with two major components.
+The first component is an *encoder*:
+it takes a variable-length sequence as the input and transforms it into a state with a fixed shape.
+The second component is a *decoder*:
+it maps the encoded state of a fixed shape
+to a variable-length sequence.
+This is called an *encoder-decoder* architecture,
+which is depicted in :numref:`fig_encoder_decoder`.
 
 ![The encoder-decoder architecture.](../img/encoder-decoder.svg)
 :label:`fig_encoder_decoder`
 
-In this section, we will show an interface to implement this encoder-decoder architecture.
-
+Let us take machine translation from English to French
+as an example.
+Given an input sequence in English:
+"They", "are", "watching", ".",
+this encoder-decoder architecture
+first encodes the variable-length input into a state,
+then decodes the state 
+to generate the translated sequence token by token
+as the output:
+"Ils", "regardent", ".".
+Since the encoder-decoder architecture
+forms the basis
+of different sequence transduction models
+in subsequent sections,
+this section will convert this architecture
+into an interface that will be implemented later.
 
 ## Encoder
 
-The encoder is a normal neural network that takes inputs, e.g., a source sentence, to return outputs.
+In the encoder interface,
+we just specify that
+the encoder takes variable-length sequences as the input `X`.
+The implementation will be provided 
+by any model that inherits this base `Encoder` class.
 
-```{.python .input  n=4}
+```{.python .input}
 from mxnet.gluon import nn
 
 #@save
@@ -25,7 +58,7 @@ class Encoder(nn.Block):
         raise NotImplementedError
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab pytorch
 from torch import nn
 
@@ -41,9 +74,22 @@ class Encoder(nn.Module):
 
 ## Decoder
 
-The decoder has an additional method `init_state` to parse the outputs of the encoder with possible additional information, e.g., the valid lengths of inputs, to return the state it needs. In the forward method, the decoder takes both inputs, e.g., a target sentence and the state. It returns outputs, with potentially modified state if the encoder contains RNN layers.
+In the following decoder interface,
+we add an additional `init_state` function
+to convert the encoder output (`enc_outputs`)
+into the encoded state.
+Note that this step
+may need extra inputs such as 
+the valid length of the input,
+which was explained
+in :numref:`subsec_mt_data_loading`.
+To generate a variable-length sequence token by token,
+every time the decoder
+may map an input (e.g., the generated token at the previous time step)
+and the encoded state
+into an output token at the current time step.
 
-```{.python .input  n=3}
+```{.python .input}
 #@save
 class Decoder(nn.Block):
     """The base decoder interface for the encoder-decoder architecture."""
@@ -57,7 +103,7 @@ class Decoder(nn.Block):
         raise NotImplementedError
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 #@tab pytorch
 #@save
 class Decoder(nn.Module):
@@ -72,11 +118,19 @@ class Decoder(nn.Module):
         raise NotImplementedError
 ```
 
-## Model
+## Putting the Encoder and Decoder Together
 
-The encoder-decoder model contains both an encoder and a decoder. We implement its forward method for training. It takes both encoder inputs and decoder inputs, with optional additional arguments. During computation, it first computes encoder outputs to initialize the decoder state, and then returns the decoder outputs.
+In the end,
+the encoder-decoder architecture
+contains both an encoder and a decoder,
+with optionally extra arguments.
+In the forward propagation,
+the output of the encoder
+is used to produce the encoded state,
+and this state
+will be further used by the decoder as one of its input.
 
-```{.python .input  n=4}
+```{.python .input}
 #@save
 class EncoderDecoder(nn.Block):
     """The base class for the encoder-decoder architecture."""
@@ -91,7 +145,7 @@ class EncoderDecoder(nn.Block):
         return self.decoder(dec_X, dec_state)
 ```
 
-```{.python .input  n=3}
+```{.python .input}
 #@tab pytorch
 #@save
 class EncoderDecoder(nn.Module):
@@ -107,19 +161,26 @@ class EncoderDecoder(nn.Module):
         return self.decoder(dec_X, dec_state)
 ```
 
+The term "state" in the encoder-decoder architecture
+has probably inspired you to implement this
+architecture using neural networks with states.
+In the next section,
+we will see how to apply RNNs to design 
+sequence transduction models based on 
+this encoder-decoder architecture.
+
+
 ## Summary
 
-* An encoder-decoder architecture is a neural network design pattern mainly in natural language processing.
-* An encoder is a network (FC, CNN, RNN, etc.) that takes the input, and outputs a feature map, a vector or a tensor.
-* A decoder is a network (usually the same network structure as encoder) that takes the feature vector from the encoder, and gives the best closest match to the actual input or intended output.
+* The encoder-decoder architecture can handle inputs and outputs that are both variable-length sequences, thus is suitable for sequence transduction problems such as machine translation.
+* The encoder takes a variable-length sequence as the input and transforms it into a state with a fixed shape.
+* The decoder maps the encoded state of a fixed shape to a variable-length sequence.
 
 
 ## Exercises
 
-1. Besides machine translation, can you think of another application scenarios where an encoder-decoder architecture can fit?
-1. Can you design a deep encoder-decoder architecture?
-
-
+1. Suppose that we use neural networks to implement the encoder-decoder architecture. Do the encoder and the decoder have to be the same type of neural network?  
+1. Besides machine translation, can you think of another application where the encoder-decoder architecture can be applied?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/341)

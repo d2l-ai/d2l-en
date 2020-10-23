@@ -23,7 +23,8 @@ We will implement the skip-gram model by using embedding layers and minibatch mu
 
 ### Embedding Layer
 
-The layer in which the obtained word is embedded is called the embedding layer, which can be obtained by creating an `nn.Embedding` instance in Gluon. The weight of the embedding layer is a matrix whose number of rows is the dictionary size (`input_dim`) and whose number of columns is the dimension of each word vector (`output_dim`). We set the dictionary size to $20$ and the word vector dimension to $4$.
+As described in :numref:`sec_seq2seq`,
+The layer in which the obtained word is embedded is called the embedding layer, which can be obtained by creating an `nn.Embedding` instance in high-level APIs. The weight of the embedding layer is a matrix whose number of rows is the dictionary size (`input_dim`) and whose number of columns is the dimension of each word vector (`output_dim`). We set the dictionary size to $20$ and the word vector dimension to $4$.
 
 ```{.python .input  n=15}
 embed = nn.Embedding(input_dim=20, output_dim=4)
@@ -72,13 +73,13 @@ Before training the word embedding model, we need to define the loss function of
 
 ### Binary Cross Entropy Loss Function
 
-According to the definition of the loss function in negative sampling, we can directly use Gluon's binary cross-entropy loss function `SigmoidBinaryCrossEntropyLoss`.
+According to the definition of the loss function in negative sampling, we can directly use the binary cross-entropy loss function from high-level APIs.
 
 ```{.python .input  n=19}
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 ```
 
-It is worth mentioning that we can use the mask variable to specify the partial predicted value and label that participate in loss function calculation in the minibatch: when the mask is 1, the predicted value and label of the corresponding position will participate in the calculation of the loss function; When the mask is 0, the predicted value and label of the corresponding position do not participate in the calculation of the loss function. As we mentioned earlier, mask variables can be used to avoid the effect of padding on loss function calculations.
+It is worth mentioning that we can use the mask variable to specify the partial predicted value and label that participate in loss function calculation in the minibatch: when the mask is 1, the predicted value and label of the corresponding position will participate in the calculation of the loss function; When the mask is 0, they do not participate. As we mentioned earlier, mask variables can be used to avoid the effect of padding on loss function calculations.
 
 Given two identical examples, different masks lead to different loss values.
 
@@ -116,10 +117,10 @@ def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[0, num_epochs])
+                            xlim=[1, num_epochs])
+    metric = d2l.Accumulator(2)  # Sum of losses, no. of tokens
     for epoch in range(num_epochs):
-        timer = d2l.Timer()
-        metric = d2l.Accumulator(2)  # Sum of losses, no. of tokens
+        timer, num_batches = d2l.Timer(), len(data_iter)
         for i, batch in enumerate(data_iter):
             center, context_negative, mask, label = [
                 data.as_in_ctx(device) for data in batch]
@@ -130,9 +131,9 @@ def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
             l.backward()
             trainer.step(batch_size)
             metric.add(l.sum(), l.size)
-            if (i+1) % 50 == 0:
-                animator.add(epoch+(i+1)/len(data_iter),
-                             (metric[0]/metric[1],))
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
+                             (metric[0] / metric[1],))
     print(f'loss {metric[0] / metric[1]:.3f}, '
           f'{metric[1] / timer.stop():.1f} tokens/sec on {str(device)}')
 ```

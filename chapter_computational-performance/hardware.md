@@ -101,7 +101,7 @@ Of note is a distinction that is often made in practice: accelerators are optimi
 
 Recall :numref:`fig_neon128`. Adding vector units to a processor core allowed us to increase throughput significantly (in the example in the figure we were able to perform 16 operations simultaneously). What if we added operations that optimized not just operations between vectors but also between matrices? This strategy led to Tensor Cores (more on this shortly). Secondly, what if we added many more cores? In a nutshell, these two strategies summarize the design decisions in GPUs. :numref:`fig_turing_processing_block` gives an overview over a basic processing block. It contains 16 integer and 16 floating point units. In addition to that, two Tensor Cores accelerate a narrow subset of additional operations relevant for deep learning. Each Streaming Multiprocessor (SM) consists of four such blocks.
 
-![NVIDIA Turing Processing Block (image courtesy of NVIDIA)](../img/turing_processing_block.png)
+![NVIDIA Turing Processing Block (image courtesy of NVIDIA)](../img/turing-processing-block.png)
 :width:`150px`
 :label:`fig_turing_processing_block`
 

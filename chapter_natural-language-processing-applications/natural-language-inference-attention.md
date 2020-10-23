@@ -19,7 +19,7 @@ Similar to alignment of words between source and target sentences in machine tra
 the alignment of words between premises and hypotheses
 can be neatly accomplished by attention mechanisms.
 
-![Natural language inference using attention mechanisms. ](../img/nli_attention.svg)
+![Natural language inference using attention mechanisms. ](../img/nli-attention.svg)
 :label:`fig_nli_attention`
 
 :numref:`fig_nli_attention` depicts the natural language inference method using attention mechanisms.
@@ -50,7 +50,7 @@ For ease of demonstration, :numref:`fig_nli_attention` shows such alignment in a
 
 Now we describe the soft alignment using attention mechanisms in more detail.
 Denote by $\mathbf{A} = (\mathbf{a}_1, \ldots, \mathbf{a}_m)$
-and $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ the premise and hypothesis, 
+and $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ the premise and hypothesis,
 whose number of words are $m$ and $n$, respectively,
 where $\mathbf{a}_i, \mathbf{b}_j \in \mathbb{R}^{d}$ ($i = 1, \ldots, m, j = 1, \ldots, n$) is a $d$-dimensional word embedding vector.
 For soft alignment, we compute the attention weights $e_{ij} \in \mathbb{R}$ as
@@ -58,7 +58,7 @@ For soft alignment, we compute the attention weights $e_{ij} \in \mathbb{R}$ as
 $$e_{ij} = f(\mathbf{a}_i)^\top f(\mathbf{b}_j),$$
 :eqlabel:`eq_nli_e`
 
-where the function $f$ is a multilayer perceptron defined in the following `mlp` function.
+where the function $f$ is an MLP defined in the following `mlp` function.
 The output dimension of $f$ is specified by the `num_hiddens` argument of `mlp`.
 
 ```{.python .input  n=2}
@@ -122,19 +122,19 @@ class Attend(nn.Block):
 
 ### Comparing
 
-In the next step, we compare a word in one sequence with the other sequence that is softly aligned with that word. 
+In the next step, we compare a word in one sequence with the other sequence that is softly aligned with that word.
 Note that in soft alignment, all the words from one sequence, though with probably different attention weights, will be compared with a word in the other sequence.
 For easy of demonstration, :numref:`fig_nli_attention` pairs words with aligned words in a *hard* way.
 For example, suppose that the attending step determines that "need" and "sleep" in the premise are both aligned with "tired" in the hypothesis, the pair "tired--need sleep" will be compared.
 
-In the comparing step, we feed the concatenation (operator $[\cdot, \cdot]$) of words from one sequence and aligned words from the other sequence into a function $g$ (a multilayer perceptron):
+In the comparing step, we feed the concatenation (operator $[\cdot, \cdot]$) of words from one sequence and aligned words from the other sequence into a function $g$ (an MLP):
 
 $$\mathbf{v}_{A,i} = g([\mathbf{a}_i, \boldsymbol{\beta}_i]), i = 1, \ldots, m\\ \mathbf{v}_{B,j} = g([\mathbf{b}_j, \boldsymbol{\alpha}_j]), j = 1, \ldots, n.$$
 
 :eqlabel:`eq_nli_v_ab`
 
 
-In :eqref:`eq_nli_v_ab`, $\mathbf{v}_{A,i}$ is the comparison between word $i$ in the premise and all the hypothesis words that are softly aligned with word $i$; 
+In :eqref:`eq_nli_v_ab`, $\mathbf{v}_{A,i}$ is the comparison between word $i$ in the premise and all the hypothesis words that are softly aligned with word $i$;
 while $\mathbf{v}_{B,j}$ is the comparison between word $j$ in the hypothesis and all the premise words that are softly aligned with word $j$.
 The following `Compare` class defines such as comparing step.
 
@@ -160,7 +160,7 @@ $$
 \mathbf{v}_A = \sum_{i=1}^{m} \mathbf{v}_{A,i}, \quad \mathbf{v}_B = \sum_{j=1}^{n}\mathbf{v}_{B,j}.
 $$
 
-Next we feed the concatenation of both summarization results into function $h$ (a multilayer perceptron) to obtain the classification result of the logical relationship:
+Next we feed the concatenation of both summarization results into function $h$ (an MLP) to obtain the classification result of the logical relationship:
 
 $$
 \hat{\mathbf{y}} = h([\mathbf{v}_A, \mathbf{v}_B]).
@@ -212,7 +212,7 @@ class DecomposableAttention(nn.Block):
 ## Training and Evaluating the Model
 
 Now we will train and evaluate the defined decomposable attention model on the SNLI dataset.
-We begin by reading the dataset. 
+We begin by reading the dataset.
 
 
 ### Reading the dataset

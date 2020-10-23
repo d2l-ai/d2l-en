@@ -196,7 +196,7 @@ d2l.train_concise_ch11(trainer, {'learning_rate' : 0.1}, data_iter)
 * Adagrad decreases the learning rate dynamically on a per-coordinate basis.
 * It uses the magnitude of the gradient as a means of adjusting how quickly progress is achieved - coordinates with large gradients are compensated with a smaller learning rate.
 * Computing the exact second derivative is typically infeasible in deep learning problems due to memory and computational constraints. The gradient can be a useful proxy.
-* If the optimization problem has a rather uneven uneven structure Adagrad can help mitigate the distortion.
+* If the optimization problem has a rather uneven structure Adagrad can help mitigate the distortion.
 * Adagrad is particularly effective for sparse features where the learning rate needs to decrease more slowly for infrequently occurring terms.
 * On deep learning problems Adagrad can sometimes be too aggressive in reducing learning rates. We will discuss strategies for mitigating this in the context of :numref:`sec_adam`.
 

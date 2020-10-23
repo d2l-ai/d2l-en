@@ -239,7 +239,7 @@ train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users,
 ## Summary
 
 * Adding nonlinearity to matrix factorization model is beneficial for improving the model capability and effectiveness.
-* NeuMF is a combination of matrix factorization and Multilayer perceptron. The multilayer perceptron takes the concatenation of user and item embeddings as the input.
+* NeuMF is a combination of matrix factorization and multilayer perceptron. The multilayer perceptron takes the concatenation of user and item embeddings as the input.
 
 ## Exercises
 

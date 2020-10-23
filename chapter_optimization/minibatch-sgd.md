@@ -474,8 +474,7 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     loss = nn.MSELoss()
     # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
     # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss 
-    # value to get L2Loss in PyTorch.
-    
+    # value to get L2Loss in PyTorch
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
@@ -506,10 +505,9 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
             kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
     optimizer = trainer_fn(**hyperparams)
     loss = tf.keras.losses.MeanSquaredError()
-    # Note: L2 Loss = 1/2 * MSE Loss. TF has MSE Loss which is slightly
-    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
-    # value to get L2Loss in TF.
-  
+    # Note: L2 Loss = 1/2 * MSE Loss. TensorFlow has MSE Loss which is 
+    # slightly different from MXNet's L2Loss by a factor of 2. Hence we halve
+    # the loss value to get L2Loss in TensorFlow
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()

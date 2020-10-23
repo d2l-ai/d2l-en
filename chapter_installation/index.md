@@ -85,7 +85,7 @@ to access GPUs before running larger models.
 :begin_tab:`mxnet`
 
 ```bash
-pip install mxnet==1.7.0
+pip install mxnet==1.7.0.post1
 ```
 
 

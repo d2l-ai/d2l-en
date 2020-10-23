@@ -115,7 +115,7 @@ from torch import nn
 
 class Reshape(torch.nn.Module):
     def forward(self, x):
-        return x.view(-1,1,28,28)
+        return x.view(-1, 1, 28, 28)
 
 net = torch.nn.Sequential(
     Reshape(),
@@ -290,15 +290,15 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
-    timer = d2l.Timer()
+    timer, num_batches = d2l.Timer(), len(train_iter)
     for epoch in range(num_epochs):
         # Sum of training loss, sum of training accuracy, no. of examples
         metric = d2l.Accumulator(3)
         for i, (X, y) in enumerate(train_iter):
             timer.start()
-            # Here is the major difference compared with `d2l.train_epoch_ch3`
+            # Here is the major difference from `d2l.train_epoch_ch3`
             X, y = X.as_in_ctx(device), y.as_in_ctx(device)
             with autograd.record():
                 y_hat = net(X)
@@ -307,14 +307,14 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
             trainer.step(X.shape[0])
             metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
             timer.stop()
-            train_loss = metric[0] / metric[2]
+            train_l = metric[0] / metric[2]
             train_acc = metric[1] / metric[2]
-            if (i + 1) % 50 == 0:
-                animator.add(epoch + i / len(train_iter),
-                             (train_loss, train_acc, None))
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
+                             (train_l, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch + 1, (None, None, test_acc))
-    print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
+    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '
           f'test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
           f'on {str(device)}')
@@ -334,9 +334,9 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
     net.to(device)
     optimizer = torch.optim.SGD(net.parameters(), lr=lr)
     loss = nn.CrossEntropyLoss()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
-    timer = d2l.Timer()
+    timer, num_batches = d2l.Timer(), len(train_iter)
     for epoch in range(num_epochs):
         # Sum of training loss, sum of training accuracy, no. of examples
         metric = d2l.Accumulator(3)
@@ -352,14 +352,14 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
             with torch.no_grad():
                 metric.add(l * X.shape[0], d2l.accuracy(y_hat, y), X.shape[0])
             timer.stop()
-            train_loss = metric[0]/metric[2]
+            train_l = metric[0]/metric[2]
             train_acc = metric[1]/metric[2]
-            if (i + 1) % 50 == 0:
-                animator.add(epoch + i / len(train_iter),
-                             (train_loss, train_acc, None))
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
+                             (train_l, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch+1, (None, None, test_acc))
-    print(f'loss {train_loss:.3f}, train acc {train_acc:.3f}, '
+        animator.add(epoch + 1, (None, None, test_acc))
+    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '
           f'test acc {test_acc:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
           f'on {str(device)}')
@@ -372,7 +372,7 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
     def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
         self.timer = d2l.Timer()
         self.animator = d2l.Animator(
-            xlabel='epoch', xlim=[0, num_epochs], legend=[
+            xlabel='epoch', xlim=[1, num_epochs], legend=[
                 'train loss', 'train acc', 'test acc'])
         self.net = net
         self.train_iter = train_iter
@@ -386,7 +386,7 @@ class TrainCallback(tf.keras.callbacks.Callback):  #@save
         test_acc = self.net.evaluate(
             self.test_iter, verbose=0, return_dict=True)['accuracy']
         metrics = (logs['loss'], logs['accuracy'], test_acc)
-        self.animator.add(epoch+1, metrics)
+        self.animator.add(epoch + 1, metrics)
         if epoch == self.num_epochs - 1:
             batch_size = next(iter(self.train_iter))[0].shape[0]
             num_examples = batch_size * tf.data.experimental.cardinality(

@@ -681,7 +681,7 @@ the one that you are going to use for your decision.
 Assume that you find this beautiful mushroom in your backyard
 as shown in :numref:`fig_death_cap`.
 
-![Death cap---do not eat!](../img/death_cap.jpg)
+![Death cap---do not eat!](../img/death-cap.jpg)
 :width:`200px`
 :label:`fig_death_cap`
 
@@ -851,7 +851,7 @@ detailed user activity and item characteristics into account
 when computing such scores. :numref:`fig_deeplearning_amazon` is an example
 of deep learning books recommended by Amazon based on personalization algorithms tuned to capture the author's preferences.
 
-![Deep learning books recommended by Amazon.](../img/deeplearning_amazon.jpg)
+![Deep learning books recommended by Amazon.](../img/deeplearning-amazon.jpg)
 :label:`fig_deeplearning_amazon`
 
 Despite their tremendous economic value, recommendation systems

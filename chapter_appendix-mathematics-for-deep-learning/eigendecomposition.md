@@ -538,7 +538,7 @@ for all practical purposes, our random vector has been transformed
 into the principle eigenvector!
 Indeed this algorithm is the basis 
 for what is known as the *power iteration*
-for finding the largest eigenvalue and eigenvector of a matrix.  For details see, for example, :cite:`Van-Loan.Golub.1983`.
+for finding the largest eigenvalue and eigenvector of a matrix. For details see, for example, :cite:`Van-Loan.Golub.1983`.
 
 ### Fixing the Normalization
 

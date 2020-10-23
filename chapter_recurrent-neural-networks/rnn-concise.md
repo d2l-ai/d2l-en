@@ -1,4 +1,5 @@
 # Concise Implementation of Recurrent Neural Networks
+:label:`sec_rnn-concise`
 
 While :numref:`sec_rnn_scratch` was instructive to see how RNNs are implemented,
 this is not convenient or fast.

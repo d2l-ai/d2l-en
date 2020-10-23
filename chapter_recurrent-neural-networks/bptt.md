@@ -5,7 +5,7 @@ So far we have repeatedly alluded to things like
 *exploding gradients*,
 *vanishing gradients*,
 and the need to
-*detach the gradient*.
+*detach the gradient* for RNNs.
 For instance, in :numref:`sec_rnn_scratch`
 we invoked the `detach` function on the sequence.
 None of this was really fully
@@ -343,7 +343,9 @@ this simple linear example already
 exhibits some key problems of long sequence models: it involves potentially very large powers of $\mathbf{W}_{hh}^\top$.
 In it, eigenvalues smaller than 1 vanish
 and eigenvalues larger than 1 diverge.
-This is numerically unstable.
+This is numerically unstable,
+which manifests itself in the form of vanishing 
+and exploding gradients.
 One way to address this is to truncate the time steps
 at a computationally convenient size as discussed in :numref:`subsec_bptt_analysis`. 
 In practice, this truncation is effected by detaching the gradient after a given number of time steps.
@@ -408,7 +410,7 @@ to be used in computation of both $\partial L / \partial \mathbf{W}_{hx}$ and $\
 
 * Backpropagation through time is merely an application of backpropagation to sequence models with a hidden state.
 * Truncation is needed for computational convenience and numerical stability, such as regular truncation and randomized truncation.
-* High powers of matrices can lead to divergent and vanishing eigenvalues. This manifests itself in the form of exploding or vanishing gradients.
+* High powers of matrices can lead to divergent or vanishing eigenvalues. This manifests itself in the form of exploding or vanishing gradients.
 * For efficient computation, intermediate values are cached during backpropagation through time.
 
 

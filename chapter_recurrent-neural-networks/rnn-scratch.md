@@ -342,9 +342,14 @@ Y.shape, len(new_state), new_state[0].shape
 
 ```{.python .input}
 #@tab tensorflow
+# defining tensorflow training strategy
+device_name = d2l.try_gpu()._device_name
+strategy = tf.distribute.OneDeviceStrategy(device_name)
+
 num_hiddens = 512
-model = RNNModelScratch(len(vocab), num_hiddens, 
-                        init_rnn_state, rnn)
+with strategy.scope():
+    model = RNNModelScratch(len(vocab), num_hiddens, 
+                            init_rnn_state, rnn)
 state = model.begin_state(X.shape[0])
 params = get_params(len(vocab), num_hiddens)
 Y, new_state = model(X, state, params)
@@ -539,7 +544,7 @@ let us define a function to train the model in one epoch. It differs from how we
 
 1. Different sampling methods for sequential data (random sampling and sequential partitioning) will result in differences in the initialization of hidden states.
 1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
-1. We use perplexity to evaluate the model. As discussed in :label:`subsec_perplexity`, this ensures that sequences of different length are comparable.
+1. We use perplexity to evaluate the model. As discussed in :numref:`subsec_perplexity`, this ensures that sequences of different length are comparable.
 
 
 Specifically,
@@ -639,7 +644,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,  #@save
 
 ```{.python .input}
 #@tab tensorflow
-def train_epoch_ch8(model, train_iter, loss, updater,  #@save
+def train_epoch_ch8(model, train_iter, loss, updater,   #@save
                     params, use_random_iter):
     """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
@@ -653,7 +658,7 @@ def train_epoch_ch8(model, train_iter, loss, updater,  #@save
             g.watch(params)
             y_hat, state= model(X, state, params)
             y = d2l.reshape(Y, (-1))
-            l = tf.math.reduce_mean(loss(y, y_hat)) 
+            l = loss(y, y_hat)
         grads = g.gradient(l, params)
         grads = grad_clipping(grads, 1)
         updater.apply_gradients(zip(grads, params))
@@ -676,7 +681,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
     """Train a model (defined in Chapter 8)."""
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[1, num_epochs])
+                            legend=['train'], xlim=[10, num_epochs])
     # Initialize
     if isinstance(model, gluon.Block):
         model.initialize(ctx=device, force_reinit=True,
@@ -691,8 +696,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,  #@save
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
             model, train_iter, loss, updater, device, use_random_iter)
-        if epoch % 10 == 0:
-            print(predict('time traveller'))
+        if (epoch + 1) % 10 == 0:
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
@@ -707,7 +711,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
     """Train a model (defined in Chapter 8)."""
     loss = nn.CrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[1, num_epochs])
+                            legend=['train'], xlim=[10, num_epochs])
     # Initialize
     if isinstance(model, nn.Module):
         updater = torch.optim.SGD(model.parameters(), lr)
@@ -718,7 +722,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
             model, train_iter, loss, updater, device, use_random_iter)
-        if epoch % 10 == 0:
+        if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
@@ -729,20 +733,21 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
 ```{.python .input}
 #@tab tensorflow
 #@save
-def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs,
+def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
               use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
-    params = get_params(len(vocab), num_hiddens)
-    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    with strategy.scope():
+        params = get_params(len(vocab), num_hiddens)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        updater = tf.keras.optimizers.SGD(lr)
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[1, num_epochs])
-    updater = tf.keras.optimizers.SGD(lr)
+                            legend=['train'], xlim=[10, num_epochs])
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
     # Train and predict
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
              model, train_iter, loss, updater, params, use_random_iter)
-        if epoch % 10 == 0:
+        if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
     device = d2l.try_gpu()._device_name
@@ -763,7 +768,7 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 ```{.python .input}
 #@tab tensorflow
 num_epochs, lr = 500, 1
-train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs)
+train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
 ```
 
 Finally,
@@ -778,8 +783,8 @@ train_ch8(model, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
 ```{.python .input}
 #@tab tensorflow
 params = get_params(len(vocab_random_iter), num_hiddens)
-train_ch8(model, train_random_iter, vocab_random_iter, num_hiddens,
-          lr, num_epochs, use_random_iter=True)
+train_ch8(model, train_random_iter, vocab_random_iter, num_hiddens, lr,
+          num_epochs, strategy, use_random_iter=True)
 ```
 
 While implementing the above RNN model from scratch is instructive, it is not convenient.

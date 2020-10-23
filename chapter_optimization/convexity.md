@@ -136,7 +136,8 @@ Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is cle
 
 ```{.python .input}
 #@tab all
-x, y = d2l.meshgrid(d2l.linspace(-1.0, 1.0, 101), d2l.linspace(-1.0, 1.0, 101))
+x, y = d2l.meshgrid(
+    d2l.linspace(-1.0, 1.0, 101), d2l.linspace(-1.0, 1.0, 101))
 z = x**2 + 0.5 * d2l.cos(2 * np.pi * y)
 # Plot the 3D surface
 d2l.set_figsize((6, 4))

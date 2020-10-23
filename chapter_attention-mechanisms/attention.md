@@ -25,7 +25,7 @@ Finally, the output is a weighted sum of the values:
 $$\mathbf o = \sum_{i=1}^n b_i \mathbf v_i.$$
 
 
-![The attention output is a weighted sum of the values.](../img/attention_output.svg)
+![The attention output is a weighted sum of the values.](../img/attention-output.svg)
 :label:`fig_attention_output`
 
 

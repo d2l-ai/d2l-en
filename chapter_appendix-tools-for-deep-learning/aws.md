@@ -48,7 +48,7 @@ Next, click the "Launch Instance" button marked by the red box in :numref:`fig_e
 We begin by selecting a suitable AMI (AWS Machine Image). Enter "Ubuntu" in the search box (marked by the red box in :numref:`fig_ubuntu`).
 
 
-![Choose an operating system.](../img/ubuntu_new.png)
+![Choose an operating system.](../img/ubuntu-new.png)
 :width:`700px`
 :label:`fig_ubuntu`
 

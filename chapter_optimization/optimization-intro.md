@@ -117,7 +117,8 @@ Saddle points in higher dimensions are even more insidious, as the example below
 
 ```{.python .input}
 #@tab all
-x, y = d2l.meshgrid(d2l.linspace(-1.0, 1.0, 101), d2l.linspace(-1.0, 1.0, 101))
+x, y = d2l.meshgrid(
+    d2l.linspace(-1.0, 1.0, 101), d2l.linspace(-1.0, 1.0, 101))
 z = x**2 - y**2
 
 ax = d2l.plt.figure().add_subplot(111, projection='3d')

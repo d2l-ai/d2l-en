@@ -81,7 +81,8 @@ Now we can implement the multi-head attention. Assume that the multi-head attent
 ```{.python .input}
 #@save
 class MultiHeadAttention(nn.Block):
-    def __init__(self, num_hiddens, num_heads, dropout, use_bias=False, **kwargs):
+    def __init__(self, num_hiddens, num_heads, dropout, use_bias=False,
+                 **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
@@ -123,8 +124,8 @@ class MultiHeadAttention(nn.Block):
 #@tab pytorch
 #@save
 class MultiHeadAttention(nn.Module):
-    def __init__(self, key_size, query_size, value_size, num_hiddens, num_heads,
-                 dropout, bias=False, **kwargs):
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 num_heads, dropout, bias=False, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
@@ -147,7 +148,8 @@ class MultiHeadAttention(nn.Module):
         value = transpose_qkv(self.W_v(value), self.num_heads)
 
         if valid_len is not None:
-            valid_len = torch.repeat_interleave(valid_len, repeats=self.num_heads, dim=0)
+            valid_len = torch.repeat_interleave(
+                valid_len, repeats=self.num_heads, dim=0)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
@@ -255,7 +257,8 @@ class PositionWiseFFN(nn.Block):
 #@tab pytorch
 #@save
 class PositionWiseFFN(nn.Module):
-    def __init__(self, ffn_num_input, ffn_num_hiddens, pw_num_outputs, **kwargs):
+    def __init__(self, ffn_num_input, ffn_num_hiddens, pw_num_outputs,
+                 **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
         self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)
         self.relu = nn.ReLU()
@@ -284,7 +287,13 @@ ffn(d2l.ones((2, 3, 4)))[0]
 
 Besides the above two components in the Transformer block, the "add and norm" within the block also plays a key role to connect the inputs and outputs of other layers smoothly. To explain, we add a layer that contains a residual structure and a *layer normalization* after both the multi-head attention layer and the position-wise FFN network. *Layer normalization* is similar to batch normalization in :numref:`sec_batch_norm`. One difference is that the mean and variances for the layer normalization are calculated along the last dimension, e.g `X.mean(axis=-1)` instead of the first batch dimension, e.g., `X.mean(axis=0)`. Layer normalization prevents the range of values in the layers from changing too much, which allows faster training and better generalization ability.
 
-MXNet has both `LayerNorm` and `BatchNorm` implemented within the `nn` block. Let us call both of them and see the difference in the  example below.
+:begin_tab:`mxnet`
+MXNet has both `LayerNorm` and `BatchNorm` implemented within the `nn` block. Let us call both of them and see the difference in the example below.
+:end_tab:
+
+:begin_tab:`pytorch`
+PyTorch has both `LayerNorm` and `BatchNorm1d` implemented within the `nn` module. Let us call both of them and see the difference in the example below.
+:end_tab:
 
 ```{.python .input}
 layer = nn.LayerNorm()
@@ -299,10 +308,8 @@ with autograd.record():
 
 ```{.python .input}
 #@tab pytorch
-layer = nn.LayerNorm([2])
-layer.eval()
+layer = nn.LayerNorm(2)
 batch = nn.BatchNorm1d(2)
-batch.eval()
 X = d2l.tensor([[1, 2], [2, 3]], dtype=torch.float32)
 # Compute mean and variance from `X` in the training mode
 print('layer norm:', layer(X), '\nbatch norm:', batch(X))
@@ -354,7 +361,7 @@ add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 
 Unlike the recurrent layer, both the multi-head attention layer and the position-wise feed-forward network compute the output of each item in the sequence independently. This feature enables us to parallelize the computation, but it fails to model the sequential information for a given sequence. To better capture the sequential information, the Transformer model uses the *positional encoding* to maintain the positional information of the input sequence.
 
-To explain, assume that $X\in\mathbb R^{l\times d}$ is the embedding of an example, where $l$ is the sequence length and $d$ is the embedding size. This positional encoding layer encodes X's position $P\in\mathbb R^{l\times d}$ and outputs $P+X$.
+To explain, assume that $X\in\mathbb R^{l\times d}$ is the embedding of an example, where $l$ is the sequence length and $d$ is the embedding size. This positional encoding layer encodes $X$'s position $P\in\mathbb R^{l\times d}$ and outputs $P+X$.
 
 The position $P$ is a 2-D matrix, where $i$ refers to the order in the sentence, and $j$ refers to the position along the embedding vector dimension. In this way, each value in the origin sequence is then maintained using the equations below:
 
@@ -367,7 +374,7 @@ for $i=0,\ldots, l-1$ and $j=0,\ldots,\lfloor(d-1)/2\rfloor$.
 
 :numref:`fig_positional_encoding` illustrates the positional encoding.
 
-![Positional encoding.](../img/positional_encoding.svg)
+![Positional encoding.](../img/positional-encoding.svg)
 :label:`fig_positional_encoding`
 
 ```{.python .input}
@@ -396,8 +403,9 @@ class PositionalEncoding(nn.Module):
         self.dropout = nn.Dropout(dropout)
         # Create a long enough `P`
         self.P = d2l.zeros((1, max_len, num_hiddens))
-        X = torch.arange(0, max_len, dtype=torch.float32).reshape(-1, 1) / torch.pow(
-            10000, torch.arange(0, num_hiddens, 2, dtype=torch.float32) / num_hiddens)
+        X = torch.arange(0, max_len, dtype=torch.float32).reshape(
+            -1, 1) / torch.pow(10000, torch.arange(
+            0, num_hiddens, 2, dtype=torch.float32) / num_hiddens)
         self.P[:, :, 0::2] = torch.sin(X)
         self.P[:, :, 1::2] = torch.cos(X)
 
@@ -450,15 +458,16 @@ class EncoderBlock(nn.Block):
 #@tab pytorch
 #@save
 class EncoderBlock(nn.Module):
-    def __init__(self, key_size, query_size, value_size, num_hiddens, norm_shape,
-                 ffn_num_input, ffn_num_hiddens, num_heads, dropout,
-                 use_bias=False, **kwargs):
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
+                 dropout, use_bias=False, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
         self.attention = MultiHeadAttention(key_size, query_size, value_size,
                                             num_hiddens, num_heads, dropout,
                                             use_bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens, num_hiddens)
+        self.ffn = PositionWiseFFN(
+            ffn_num_input, ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, valid_len):
@@ -511,9 +520,9 @@ class TransformerEncoder(d2l.Encoder):
 #@tab pytorch
 #@save
 class TransformerEncoder(d2l.Encoder):
-    def __init__(self, vocab_size, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                 num_layers, dropout, use_bias=False, **kwargs):
+    def __init__(self, vocab_size, key_size, query_size, value_size,
+                 num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
+                 num_heads, num_layers, dropout, use_bias=False, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
@@ -522,8 +531,8 @@ class TransformerEncoder(d2l.Encoder):
         for i in range(num_layers):
             self.blks.add_module("block"+str(i),
                 EncoderBlock(key_size, query_size, value_size, num_hiddens,
-                             norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
-                             dropout, use_bias))
+                             norm_shape, ffn_num_input, ffn_num_hiddens,
+                             num_heads, dropout, use_bias))
 
     def forward(self, X, valid_len, *args):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
@@ -542,7 +551,8 @@ encoder(np.ones((2, 100)), valid_len).shape
 
 ```{.python .input}
 #@tab pytorch
-encoder = TransformerEncoder(200, 24, 24, 24, 24, [100, 24], 24, 48, 8, 2, 0.5)
+encoder = TransformerEncoder(
+    200, 24, 24, 24, 24, [100, 24], 24, 48, 8, 2, 0.5)
 encoder.eval()
 encoder(d2l.ones((2, 100), dtype=torch.long), valid_len).shape
 ```
@@ -611,7 +621,8 @@ class DecoderBlock(nn.Module):
         self.attention2 = MultiHeadAttention(key_size, query_size, value_size,
                                              num_hiddens, num_heads, dropout)
         self.addnorm2 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens, num_hiddens)
+        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens,
+                                   num_hiddens)
         self.addnorm3 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, state):
@@ -626,8 +637,8 @@ class DecoderBlock(nn.Module):
             batch_size, seq_len, _ = X.shape
             # Shape: (batch_size, seq_len), the values in the j-th column
             # are j+1
-            valid_len = torch.repeat_interleave(torch.arange(1, seq_len + 1, device=X.device),
-                                                batch_size, dim=0)
+            valid_len = torch.repeat_interleave(torch.arange(
+                1, seq_len + 1, device=X.device), batch_size, dim=0)
             # Convert valid_len to 2D
             if valid_len.shape[0]!=X.shape[0]:
                 valid_len = valid_len.reshape(-1, X.shape[1])
@@ -725,42 +736,42 @@ Finally, we can build an encoder-decoder model with the Transformer architecture
 Similar to the seq2seq with attention model in :numref:`sec_seq2seq_attention`, we use the following hyperparameters: two Transformer blocks with both the embedding size and the block output size to be $32$. In addition, we use $4$ heads, and set the hidden size to be twice larger than the output size.
 
 ```{.python .input}
-num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.0, 64, 10
-lr, num_epochs, device = 0.005, 100, d2l.try_gpu()
+num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10
+lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
 ffn_num_hiddens, num_heads = 64, 4
 
-src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
+train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
 
 encoder = TransformerEncoder(
     len(src_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,
     dropout)
 decoder = TransformerDecoder(
-    len(src_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,
+    len(tgt_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,
     dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 ```{.python .input}
 #@tab pytorch
-num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.0, 64, 10
-lr, num_epochs, device = 0.005, 100, d2l.try_gpu()
+num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10
+lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
 ffn_num_input, ffn_num_hiddens, num_heads = 32, 64, 4
 key_size, query_size, value_size = 32, 32, 32
 norm_shape = [32]
 
-src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
+train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
 
 encoder = TransformerEncoder(
     len(src_vocab), key_size, query_size, value_size, num_hiddens,
     norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
     num_layers, dropout)
 decoder = TransformerDecoder(
-    len(src_vocab), key_size, query_size, value_size, num_hiddens,
+    len(tgt_vocab), key_size, query_size, value_size, num_hiddens,
     norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
     num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, device)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 As we can see from the training time and accuracy, compared with the seq2seq model with attention model, Transformer runs faster per epoch, and converges faster at the beginning.
@@ -769,9 +780,9 @@ We can use the trained Transformer to translate some simple sentences.
 
 ```{.python .input}
 #@tab all
-for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + d2l.predict_s2s_ch9(
-        model, sentence, src_vocab, tgt_vocab, num_steps, device))
+engs = ['go .', "i lost .", 'i\'m home .', 'he\'s calm .']
+fras = ['va !', 'j\'ai perdu .', 'je suis chez moi .', 'il est calme .']
+d2l.translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
 ```
 
 ## Summary
@@ -796,3 +807,4 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1066)
 :end_tab:
+

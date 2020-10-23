@@ -186,7 +186,8 @@ class MyDense(tf.keras.Model):
             initializer=tf.zeros_initializer())
 
     def call(self, X):
-        return tf.matmul(X, self.weight) + self.bias
+        linear = tf.matmul(X, self.weight) + self.bias
+        return tf.nn.relu(linear)
 ```
 
 Next, we instantiate the `MyDense` class

@@ -90,9 +90,7 @@ the input `num_steps` of the following function
 specifies the number of iteration steps for training.
 
 ```{.python .input  n=17}
-#@save
-def train_bert(train_iter, net, loss, vocab_size, devices, log_interval,
-               num_steps):
+def train_bert(train_iter, net, loss, vocab_size, devices, num_steps):
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': 1e-3})
     step, timer = 0, d2l.Timer()
@@ -121,9 +119,8 @@ def train_bert(train_iter, net, loss, vocab_size, devices, log_interval,
             nsp_l_mean = sum([float(l) for l in nsp_ls]) / len(nsp_ls)
             metric.add(mlm_l_mean, nsp_l_mean, batch[0].shape[0], 1)
             timer.stop()
-            if (step + 1) % log_interval == 0:
-                animator.add(step + 1,
-                             (metric[0] / metric[3], metric[1] / metric[3]))
+            animator.add(step + 1,
+                         (metric[0] / metric[3], metric[1] / metric[3]))
             step += 1
             if step == num_steps:
                 num_steps_reached = True
@@ -139,7 +136,7 @@ We can plot both the masked language modeling loss and the next sentence predict
 during BERT pretraining.
 
 ```{.python .input  n=18}
-train_bert(train_iter, net, loss, len(vocab), devices, 1, 50)
+train_bert(train_iter, net, loss, len(vocab), devices, 50)
 ```
 
 ## Representing Text with BERT
