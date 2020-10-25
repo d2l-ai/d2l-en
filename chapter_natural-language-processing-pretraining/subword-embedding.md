@@ -47,6 +47,7 @@ In the following, we will illustrate how byte pair encoding works.
 First, we initialize the vocabulary of symbols as all the English lowercase characters, a special end-of-word symbol `'_'`, and a special unknown symbol `'[UNK]'`.
 
 ```{.python .input}
+#@tab all
 import collections
 
 symbols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -64,6 +65,7 @@ Since we start the merging process from a vocabulary of only single characters a
 In other words, space is the delimiter between symbols within a word.
 
 ```{.python .input}
+#@tab all
 raw_token_freqs = {'fast_': 4, 'faster_': 3, 'tall_': 5, 'taller_': 4}
 token_freqs = {}
 for token, freq in raw_token_freqs.items():
@@ -76,6 +78,7 @@ returns the most frequent pair of consecutive symbols within a word,
 where words come from keys of the input dictionary `token_freqs`.
 
 ```{.python .input}
+#@tab all
 def get_max_freq_pair(token_freqs):
     pairs = collections.defaultdict(int)
     for token, freq in token_freqs.items():
@@ -90,6 +93,7 @@ As a greedy approach based on frequency of consecutive symbols,
 byte pair encoding will use the following `merge_symbols` function to merge the most frequent pair of consecutive symbols to produce new symbols.
 
 ```{.python .input}
+#@tab all
 def merge_symbols(max_freq_pair, token_freqs, symbols):
     symbols.append(''.join(max_freq_pair))
     new_token_freqs = dict()
@@ -103,6 +107,7 @@ def merge_symbols(max_freq_pair, token_freqs, symbols):
 Now we iteratively perform the byte pair encoding algorithm over the keys of the dictionary `token_freqs`. In the first iteration, the most frequent pair of consecutive symbols are `'t'` and `'a'`, thus byte pair encoding merges them to produce a new symbol `'ta'`. In the second iteration, byte pair encoding continues to merge `'ta'` and `'l'` to result in another new symbol `'tal'`.
 
 ```{.python .input}
+#@tab all
 num_merges = 10
 for i in range(num_merges):
     max_freq_pair = get_max_freq_pair(token_freqs)
@@ -113,6 +118,7 @@ for i in range(num_merges):
 After 10 iterations of byte pair encoding, we can see that list `symbols` now contains 10 more symbols that are iteratively merged from other symbols.
 
 ```{.python .input}
+#@tab all
 print(symbols)
 ```
 
@@ -122,6 +128,7 @@ as a result of the byte pair encoding algorithm.
 For instance, words "faster_" and "taller_" are segmented as "fast er_" and "tall er_", respectively.
 
 ```{.python .input}
+#@tab all
 print(list(token_freqs.keys()))
 ```
 
@@ -131,6 +138,7 @@ to segment words of another dataset.
 As a greedy approach, the following `segment_BPE` function tries to break words into the longest possible subwords from the input argument `symbols`.
 
 ```{.python .input}
+#@tab all
 def segment_BPE(tokens, symbols):
     outputs = []
     for token in tokens:
@@ -154,6 +162,7 @@ In the following, we use the subwords in list `symbols`, which is learned from t
 to segment `tokens` that represent another dataset.
 
 ```{.python .input}
+#@tab all
 tokens = ['tallest_', 'fatter_']
 print(segment_BPE(tokens, symbols))
 ```
