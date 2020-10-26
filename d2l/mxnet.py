@@ -1784,12 +1784,12 @@ class TokenEmbedding:
                     idx_to_token.append(token)
                     idx_to_vec.append(elems)
         idx_to_vec = [[0] * len(idx_to_vec[0])] + idx_to_vec
-        return idx_to_token, np.array(idx_to_vec)
+        return idx_to_token, d2l.tensor(idx_to_vec)
 
     def __getitem__(self, tokens):
         indices = [self.token_to_idx.get(token, self.unknown_idx)
                    for token in tokens]
-        vecs = self.idx_to_vec[np.array(indices)]
+        vecs = self.idx_to_vec[d2l.tensor(indices)]
         return vecs
 
     def __len__(self):
