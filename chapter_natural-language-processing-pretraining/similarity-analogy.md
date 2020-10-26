@@ -140,7 +140,7 @@ def knn(W, x, k):
 def knn(W, x, k):
     # The added 1e-9 is for numerical stability
     cos = torch.mv(W, x.reshape(-1,)) / (
-        torch.sqrt(torch.sum(W * W, axis=1) + 1e-9) * 
+        torch.sqrt(torch.sum(W * W, axis=1) + 1e-9) *
         torch.sqrt((x * x).sum()))
     _, topk = torch.topk(cos, k=k)
     return topk, [cos[int(i)] for i in topk]
@@ -229,4 +229,8 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/387)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1336)
 :end_tab:
