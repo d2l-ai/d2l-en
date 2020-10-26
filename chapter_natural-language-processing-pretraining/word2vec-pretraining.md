@@ -270,7 +270,7 @@ def get_similar_tokens(query_token, k, embed):
     # Compute the cosine similarity. Add 1e-9 for numerical stability
     cos = torch.mv(W, x) / torch.sqrt(torch.sum(W * W, dim=1) *
                                       torch.sum(x * x) + 1e-9)
-    topk = torch.topk(cos, k=k+1)[1].numpy().astype('int32')
+    topk = torch.topk(cos, k=k+1)[1].cpu().numpy().astype('int32')
     for i in topk[1:]:  # Remove the input words
         print(f'cosine sim={float(cos[i]):.3f}: {vocab.idx_to_token[i]}')
 
