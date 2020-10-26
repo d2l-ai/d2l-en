@@ -101,9 +101,9 @@ def load_data_imdb(batch_size, num_steps=500):
     test_tokens = d2l.tokenize(test_data[0], token='word')
     vocab = d2l.Vocab(train_tokens, min_freq=5)
     train_features = np.array([d2l.truncate_pad(
-        vocab[line], num_steps, vocab.unk) for line in train_tokens])
+        vocab[line], num_steps, vocab['<pad>']) for line in train_tokens])
     test_features = np.array([d2l.truncate_pad(
-        vocab[line], num_steps, vocab.unk) for line in test_tokens])
+        vocab[line], num_steps, vocab['<pad>']) for line in test_tokens])
     train_iter = d2l.load_array((train_features, train_data[1]), batch_size)
     test_iter = d2l.load_array((test_features, test_data[1]), batch_size,
                                is_train=False)

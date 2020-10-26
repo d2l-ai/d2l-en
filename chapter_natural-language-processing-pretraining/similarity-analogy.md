@@ -17,6 +17,14 @@ import os
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+import os
+```
+
 ## Using Pretrained Word Vectors
 
 Below lists pretrained GloVe embeddings of dimensions 50, 100, and 300,
@@ -25,7 +33,8 @@ The pretrained fastText embeddings are available in multiple languages.
 Here we consider one English version (300-dimensional "wiki.en") that can be downloaded from the
 [fastText website](https://fasttext.cc/).
 
-```{.python .input  n=35}
+```{.python .input}
+#@tab all
 #@save
 d2l.DATA_HUB['glove.6b.50d'] = (d2l.DATA_URL + 'glove.6B.50d.zip',
                                 '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
@@ -46,6 +55,7 @@ d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
 We define the following `TokenEmbedding` class to load the above pretrained Glove and fastText embeddings.
 
 ```{.python .input}
+#@tab all
 #@save
 class TokenEmbedding:
     """Token Embedding."""
@@ -70,12 +80,12 @@ class TokenEmbedding:
                     idx_to_token.append(token)
                     idx_to_vec.append(elems)
         idx_to_vec = [[0] * len(idx_to_vec[0])] + idx_to_vec
-        return idx_to_token, np.array(idx_to_vec)
+        return idx_to_token, d2l.tensor(idx_to_vec)
 
     def __getitem__(self, tokens):
         indices = [self.token_to_idx.get(token, self.unknown_idx)
                    for token in tokens]
-        vecs = self.idx_to_vec[np.array(indices)]
+        vecs = self.idx_to_vec[d2l.tensor(indices)]
         return vecs
 
     def __len__(self):
@@ -84,19 +94,22 @@ class TokenEmbedding:
 
 Next, we use 50-dimensional GloVe embeddings pretrained on a subset of the Wikipedia. The corresponding word embedding is automatically downloaded the first time we create a pretrained word embedding instance.
 
-```{.python .input  n=11}
+```{.python .input}
+#@tab all
 glove_6b50d = TokenEmbedding('glove.6b.50d')
 ```
 
 Output the dictionary size. The dictionary contains $400,000$ words and a special unknown token.
 
 ```{.python .input}
+#@tab all
 len(glove_6b50d)
 ```
 
 We can use a word to get its index in the dictionary, or we can get the word from its index.
 
-```{.python .input  n=12}
+```{.python .input}
+#@tab all
 glove_6b50d.token_to_idx['beautiful'], glove_6b50d.idx_to_token[3367]
 ```
 
@@ -122,9 +135,21 @@ def knn(W, x, k):
     return topk, [cos[int(i)] for i in topk]
 ```
 
+```{.python .input}
+#@tab pytorch
+def knn(W, x, k):
+    # The added 1e-9 is for numerical stability
+    cos = torch.mv(W, x.reshape(-1,)) / (
+        torch.sqrt(torch.sum(W * W, axis=1) + 1e-9) *
+        torch.sqrt((x * x).sum()))
+    _, topk = torch.topk(cos, k=k)
+    return topk, [cos[int(i)] for i in topk]
+```
+
 Then, we search for synonyms by pre-training the word vector instance `embed`.
 
 ```{.python .input}
+#@tab all
 def get_similar_tokens(query_token, k, embed):
     topk, cos = knn(embed.idx_to_vec, embed[[query_token]], k + 1)
     for i, c in zip(topk[1:], cos[1:]):  # Remove input words
@@ -134,16 +159,19 @@ def get_similar_tokens(query_token, k, embed):
 The dictionary of pretrained word vector instance `glove_6b50d` already created contains 400,000 words and a special unknown token. Excluding input words and unknown words, we search for the three words that are the most similar in meaning to "chip".
 
 ```{.python .input}
+#@tab all
 get_similar_tokens('chip', 3, glove_6b50d)
 ```
 
 Next, we search for the synonyms of "baby" and "beautiful".
 
 ```{.python .input}
+#@tab all
 get_similar_tokens('baby', 3, glove_6b50d)
 ```
 
 ```{.python .input}
+#@tab all
 get_similar_tokens('beautiful', 3, glove_6b50d)
 ```
 
@@ -152,6 +180,7 @@ get_similar_tokens('beautiful', 3, glove_6b50d)
 In addition to seeking synonyms, we can also use the pretrained word vector to seek the analogies between words. For example, “man”:“woman”::“son”:“daughter” is an example of analogy, “man” is to “woman” as “son” is to “daughter”. The problem of seeking analogies can be defined as follows: for four words in the analogical relationship $a : b :: c : d$, given the first three words, $a$, $b$ and $c$, we want to find $d$. Assume the word vector for the word $w$ is $\text{vec}(w)$. To solve the analogy problem, we need to find the word vector that is most similar to the result vector of $\text{vec}(c)+\text{vec}(b)-\text{vec}(a)$.
 
 ```{.python .input}
+#@tab all
 def get_analogy(token_a, token_b, token_c, embed):
     vecs = embed[[token_a, token_b, token_c]]
     x = vecs[1] - vecs[0] + vecs[2]
@@ -161,25 +190,29 @@ def get_analogy(token_a, token_b, token_c, embed):
 
 Verify the "male-female" analogy.
 
-```{.python .input  n=18}
+```{.python .input}
+#@tab all
 get_analogy('man', 'woman', 'son', glove_6b50d)
 ```
 
 “Capital-country” analogy: "beijing" is to "china" as "tokyo" is to what? The answer should be "japan".
 
-```{.python .input  n=19}
+```{.python .input}
+#@tab all
 get_analogy('beijing', 'china', 'tokyo', glove_6b50d)
 ```
 
 "Adjective-superlative adjective" analogy: "bad" is to "worst" as "big" is to what? The answer should be "biggest".
 
-```{.python .input  n=20}
+```{.python .input}
+#@tab all
 get_analogy('bad', 'worst', 'big', glove_6b50d)
 ```
 
 "Present tense verb-past tense verb" analogy: "do" is to "did" as "go" is to what? The answer should be "went".
 
-```{.python .input  n=21}
+```{.python .input}
+#@tab all
 get_analogy('do', 'did', 'go', glove_6b50d)
 ```
 
@@ -194,7 +227,10 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 1. Test the fastText results using `TokenEmbedding('wiki.en')`.
 1. If the dictionary is extremely large, how can we accelerate finding synonyms and analogies?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/387)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1336)
 :end_tab:

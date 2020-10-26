@@ -7,10 +7,19 @@ word2vec training. The dataset we use is [Penn Tree Bank (PTB)]( https://catalog
 
 First, import the packages and modules required for the experiment.
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 import math
 from mxnet import gluon, np
+import os
+import random
+```
+
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import math
+import torch
 import os
 import random
 ```
@@ -19,7 +28,8 @@ import random
 
 This dataset has already been preprocessed. Each line of the dataset acts as a sentence. All the words in a sentence are separated by spaces. In the word embedding task, each word is a token.
 
-```{.python .input  n=2}
+```{.python .input}
+#@tab all
 #@save
 d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
                        '319d85e578af0cdc590547f26231e4e31cdf1e42')
@@ -37,20 +47,22 @@ f'# sentences: {len(sentences)}'
 
 Next we build a vocabulary with words appeared not greater than 10 times mapped into a "&lt;unk&gt;" token. Note that the preprocessed PTB data also contains "&lt;unk&gt;" tokens presenting rare words.
 
-```{.python .input  n=3}
+```{.python .input}
+#@tab all
 vocab = d2l.Vocab(sentences, min_freq=10)
-f'vocab size: {len(vocab)}' 
+f'vocab size: {len(vocab)}'
 ```
 
 ## Subsampling
 
-In text data, there are generally some words that appear at high frequencies, such "the", "a", and "in" in English. Generally speaking, in a context window, it is better to train the word embedding model when a word (such as "chip") and a lower-frequency word (such as "microprocessor") appear at the same time, rather than when a word appears with a higher-frequency word (such as "the"). Therefore, when training the word embedding model, we can perform subsampling[2] on the words. Specifically, each indexed word $w_i$ in the dataset will drop out at a certain probability. The dropout probability is given as:
+In text data, there are generally some words that appear at high frequencies, such "the", "a", and "in" in English. Generally speaking, in a context window, it is better to train the word embedding model when a word (such as "chip") and a lower-frequency word (such as "microprocessor") appear at the same time, rather than when a word appears with a higher-frequency word (such as "the"). Therefore, when training the word embedding model, we can perform subsampling on the words :cite:`Mikolov.Sutskever.Chen.ea.2013`. Specifically, each indexed word $w_i$ in the dataset will drop out at a certain probability. The dropout probability is given as:
 
 $$ P(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
 
 Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number of words in the dataset, and the constant $t$ is a hyperparameter (set to $10^{-4}$ in this experiment). As we can see, it is only possible to drop out the word $w_i$ in subsampling when $f(w_i) > t$. The higher the word's frequency, the higher its dropout probability.
 
-```{.python .input  n=4}
+```{.python .input}
+#@tab all
 #@save
 def subsampling(sentences, vocab):
     # Map low frequency words into <unk>
@@ -73,7 +85,8 @@ subsampled = subsampling(sentences, vocab)
 
 Compare the sequence lengths before and after sampling, we can see subsampling significantly reduced the sequence length.
 
-```{.python .input  n=5}
+```{.python .input}
+#@tab all
 d2l.set_figsize()
 d2l.plt.hist([[len(line) for line in sentences],
               [len(line) for line in subsampled]])
@@ -84,7 +97,8 @@ d2l.plt.legend(['origin', 'subsampled']);
 
 For individual tokens, the sampling rate of the high-frequency word "the" is less than 1/20.
 
-```{.python .input  n=6}
+```{.python .input}
+#@tab all
 def compare_counts(token):
     return (f'# of "{token}": '
             f'before={sum([line.count(token) for line in sentences])}, '
@@ -95,13 +109,15 @@ compare_counts('the')
 
 But the low-frequency word "join" is completely preserved.
 
-```{.python .input  n=7}
+```{.python .input}
+#@tab all
 compare_counts('join')
 ```
 
 Last, we map each token into an index to construct the corpus.
 
-```{.python .input  n=8}
+```{.python .input}
+#@tab all
 corpus = [vocab[line] for line in subsampled]
 corpus[0:3]
 ```
@@ -114,7 +130,8 @@ Next we read the corpus with token indicies into data batches for training.
 
 We use words with a distance from the central target word not exceeding the context window size as the context words of the given center target word. The following definition function extracts all the central target words and their context words. It uniformly and randomly samples an integer to be used as the context window size between integer 1 and the `max_window_size` (maximum context window).
 
-```{.python .input  n=9}
+```{.python .input}
+#@tab all
 #@save
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
@@ -136,7 +153,8 @@ def get_centers_and_contexts(corpus, max_window_size):
 
 Next, we create an artificial dataset containing two sentences of 7 and 3 words, respectively. Assume the maximum context window is 2 and print all the central target words and their context words.
 
-```{.python .input  n=10}
+```{.python .input}
+#@tab all
 tiny_dataset = [list(range(7)), list(range(7, 10))]
 print('dataset', tiny_dataset)
 for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
@@ -145,18 +163,20 @@ for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
 
 We set the maximum context window size to 5. The following extracts all the central target words and their context words in the dataset.
 
-```{.python .input  n=11}
+```{.python .input}
+#@tab all
 all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
-f'# center-context pairs: {len(all_centers)}' 
+f'# center-context pairs: {len(all_centers)}'
 ```
 
 ### Negative Sampling
 
-We use negative sampling for approximate training. For a central and context word pair, we randomly sample $K$ noise words ($K=5$ in the experiment). According to the suggestion in the Word2vec paper, the noise word sampling probability $P(w)$ is the ratio of the word frequency of $w$ to the total word frequency raised to the power of 0.75 [2].
+We use negative sampling for approximate training. For a central and context word pair, we randomly sample $K$ noise words ($K=5$ in the experiment). According to the suggestion in the Word2vec paper, the noise word sampling probability $P(w)$ is the ratio of the word frequency of $w$ to the total word frequency raised to the power of 0.75 :cite:`Mikolov.Sutskever.Chen.ea.2013`.
 
 We first define a class to draw a candidate according to the sampling weights. It caches a 10000 size random number bank instead of calling `random.choices` every time.
 
-```{.python .input  n=12}
+```{.python .input}
+#@tab all
 #@save
 class RandomGenerator:
     """Draw a random int in [0, n] according to n sampling weights."""
@@ -178,7 +198,8 @@ generator = RandomGenerator([2, 3, 4])
 [generator.draw() for _ in range(10)]
 ```
 
-```{.python .input  n=13}
+```{.python .input}
+#@tab all
 #@save
 def get_negatives(all_contexts, corpus, K):
     counter = d2l.count_corpus(corpus)
@@ -205,7 +226,8 @@ In a minibatch of data, the $i^\mathrm{th}$ example includes a central word and 
 
 Next, we will implement the minibatch reading function `batchify`. Its minibatch input `data` is a list whose length is the batch size, each element of which contains central target words `center`, context words `context`, and noise words `negative`. The minibatch data returned by this function conforms to the format we need, for example, it includes the mask variable.
 
-```{.python .input  n=14}
+```{.python .input}
+#@tab all
 #@save
 def batchify(data):
     max_len = max(len(c) + len(n) for _, c, n in data)
@@ -216,13 +238,14 @@ def batchify(data):
         contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
         masks += [[1] * cur_len + [0] * (max_len - cur_len)]
         labels += [[1] * len(context) + [0] * (max_len - len(context))]
-    return (np.array(centers).reshape(-1, 1), np.array(contexts_negatives),
-            np.array(masks), np.array(labels))
+    return (d2l.reshape(d2l.tensor(centers), (-1, 1)), d2l.tensor(contexts_negatives),
+            d2l.tensor(masks), d2l.tensor(labels))
 ```
 
 Construct two simple examples:
 
-```{.python .input  n=15}
+```{.python .input}
+#@tab all
 x_1 = (1, [2, 2], [3, 3, 3, 3])
 x_2 = (1, [2, 2, 2], [3, 3])
 batch = batchify((x_1, x_2))
@@ -238,7 +261,7 @@ We use the `batchify` function just defined to specify the minibatch reading met
 
 Last, we define the `load_data_ptb` function that read the PTB dataset and return the data iterator.
 
-```{.python .input  n=16}
+```{.python .input}
 #@save
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     num_workers = d2l.get_dataloader_workers()
@@ -257,9 +280,45 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     return data_iter, vocab
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def load_data_ptb(batch_size, max_window_size, num_noise_words):
+    num_workers = d2l.get_dataloader_workers()
+    sentences = read_ptb()
+    vocab = d2l.Vocab(sentences, min_freq=10)
+    subsampled = subsampling(sentences, vocab)
+    corpus = [vocab[line] for line in subsampled]
+    all_centers, all_contexts = get_centers_and_contexts(
+        corpus, max_window_size)
+    all_negatives = get_negatives(all_contexts, corpus, num_noise_words)
+
+    class PTBDataset(torch.utils.data.Dataset):
+        def __init__(self, centers, contexts, negatives):
+            assert len(centers) == len(contexts) == len(negatives)
+            self.centers = centers
+            self.contexts = contexts
+            self.negatives = negatives
+
+        def __getitem__(self, index):
+            return (self.centers[index], self.contexts[index], self.negatives[index])
+
+        def __len__(self):
+            return len(self.centers)
+
+    dataset = PTBDataset(
+        all_centers, all_contexts, all_negatives)
+
+    data_iter = torch.utils.data.DataLoader(dataset, batch_size, shuffle=True,
+                                      collate_fn=batchify,
+                                      num_workers=num_workers)
+    return data_iter, vocab
+```
+
 Let us print the first minibatch of the data iterator.
 
-```{.python .input  n=17}
+```{.python .input}
+#@tab all
 data_iter, vocab = load_data_ptb(512, 5, 5)
 for batch in data_iter:
     for name, data in zip(names, batch):
@@ -279,3 +338,11 @@ for batch in data_iter:
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/383)
 :end_tab:
+
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1330)
+:end_tab:
+
+
+
