@@ -340,7 +340,7 @@ for batch in data_iter:
 :end_tab:
 
 
-:begin_tab:`mxnet`
+:begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1330)
 :end_tab:
 
