@@ -105,7 +105,7 @@ skip_gram(np.ones((2, 1)), np.ones((2, 4)), embed, embed).shape
 ```{.python .input}
 #@tab pytorch
 skip_gram(torch.ones((2, 1), dtype=torch.long),
-          d2l.ones((2, 4), dtype=torch.long), embed, embed).shape
+          torch.ones((2, 4), dtype=torch.long), embed, embed).shape
 ```
 
 ## Training
