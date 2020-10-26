@@ -46,8 +46,8 @@ embed.weight
 ```{.python .input}
 #@tab pytorch
 embed = nn.Embedding(num_embeddings=20, embedding_dim=4)
-print(f"Parameter embedding_weight ({embed.weight.shape}, "
-      "dtype={embed.weight.dtype})")
+print(f'Parameter embedding_weight ({embed.weight.shape}, '
+      'dtype={embed.weight.dtype})')
 ```
 
 The input of the embedding layer is the index of the word. When we enter the index $i$ of a word, the embedding layer returns the $i^\mathrm{th}$ row of the weight matrix as its word vector. Below we enter an index of shape ($2$, $3$) into the embedding layer. Because the dimension of the word vector is 4, we obtain a word vector of shape ($2$, $3$, $4$).
@@ -126,7 +126,7 @@ class SigmoidBCELoss(nn.Module):
     "BCEWithLogitLoss with masking on call."
     def __init__(self):
         super().__init__()
-    
+
     def forward(self, inputs, target, mask=None):
         out = nn.functional.binary_cross_entropy_with_logits(
             inputs, target, weight=mask, reduction="none")
@@ -223,7 +223,7 @@ def train(net, data_iter, lr, num_epochs, device=d2l.try_gpu()):
             optimizer.zero_grad()
             center, context_negative, mask, label = [
                 data.to(device) for data in batch]
-            
+
             pred = skip_gram(center, context_negative, net[0], net[1])
             l = (loss(pred.reshape(label.shape).float(), label.float(), mask)
                      / mask.sum(axis=1) * mask.shape[1])
@@ -291,4 +291,8 @@ get_similar_tokens('chip', 3, net[0])
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/384)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1335)
 :end_tab:
