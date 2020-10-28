@@ -115,7 +115,7 @@ from d2l import tensorflow as d2l
 from IPython import display
 import tensorflow as tf
 
-tf.linalg.eigh(tf.constant([[2, 1], [2, 3]], dtype=tf.float64))
+tf.linalg.eig(tf.constant([[2, 1], [2, 3]], dtype=tf.float64))
 ```
 
 Note that `numpy` normalizes the eigenvectors to be of length one,
