@@ -3,19 +3,21 @@
 
 Until recently, nearly every computer program that we interact with daily
 was coded by software developers from first principles.
-Say that we wanted to write an application to manage an e-commerce platform.  After huddling around a whiteboard for a few hours to ponder the problem,
+Say that we wanted to write an application to manage an e-commerce platform.
+After huddling around a whiteboard for a few hours to ponder the problem,
 we would come up with the broad strokes of a working solution that might probably look something like this:
 (i) users interact with the application through an interface
 running in a web browser or mobile application;
 (ii) our application interacts with a commercial-grade database engine
 to keep track of each user's state and maintain records
-of historical transactions; and (iii) at the heart of our application,
+of historical transactions; 
+and (iii) at the heart of our application,
 the *business logic* (you might say, the *brains*) of our application
 spells out in methodical detail the appropriate action
 that our program should take in every conceivable circumstance.
 
-To build the *brains* of our application,
-we'd have to step through every possible corner case
+To build the brains of our application,
+we would have to step through every possible corner case
 that we anticipate encountering, devising appropriate rules.
 Each time a customer clicks to add an item to their shopping cart,
 we add an entry to the shopping cart database table,
@@ -23,27 +25,25 @@ associating that user's ID with the requested product's ID.
 While few developers ever get it completely right the first time
 (it might take some test runs to work out the kinks),
 for the most part, we could write such a program from first principles
-and confidently launch it *before ever seeing a real customer*.
+and confidently launch it 
+*before* ever seeing a real customer.
 Our ability to design automated systems from first principles
-that drive functioning products and systems, often in novel situations,
+that drive functioning products and systems, 
+often in novel situations,
 is a remarkable cognitive feat.
 And when you are able to devise solutions that work $100\%$ of the time,
-*you should not be using machine learning*.
+you should not be using machine learning.
 
-Fortunately for the growing community of machine learning (ML) scientists,
+Fortunately for the growing community of machine learning scientists,
 many tasks that we would like to automate
 do not bend so easily to human ingenuity.
 Imagine huddling around the whiteboard with the smartest minds you know,
 but this time you are tackling one of the following problems:
 
-* Write a program that predicts tomorrow's weather given geographic
-information, satellite images, and a trailing window of past weather.
-* Write a program that takes in a question, expressed in free-form text, and
- answers it correctly.
-* Write a program that given an image can identify all the people it contains,
- drawing outlines around each.
-* Write a program that presents users with products that they are likely to
-  enjoy but unlikely, in the natural course of browsing, to encounter.
+* Write a program that predicts tomorrow's weather given geographic information, satellite images, and a trailing window of past weather.
+* Write a program that takes in a question, expressed in free-form text, and  answers it correctly.
+* Write a program that given an image can identify all the people it contains,  drawing outlines around each.
+* Write a program that presents users with products that they are likely to   enjoy but unlikely, in the natural course of browsing, to encounter.
 
 In each of these cases, even elite programmers
 are incapable of coding up solutions from scratch.
@@ -54,16 +54,16 @@ In other cases, the relationship (say between pixels,
 and abstract categories) may be too complicated,
 requiring thousands or millions of computations
 that are beyond our conscious understanding
-(even if our eyes manage the task effortlessly).
-ML is the study of powerful
-techniques that can *learn* from *experience*.
-As an ML algorithm accumulates more experience,
+even if our eyes manage the task effortlessly.
+*Machine learning* is the study of powerful
+techniques that can learn from experience.
+As an machine learning algorithm accumulates more experience,
 typically in the form of observational data or
 interactions with an environment, its performance improves.
 Contrast this with our deterministic e-commerce platform,
 which performs according to the same business logic,
 no matter how much experience accrues,
-until the developers themselves *learn* and decide
+until the developers themselves learn and decide
 that it is time to update the software.
 In this book, we will teach you the fundamentals of machine learning,
 and focus in particular on deep learning, a powerful set of techniques
