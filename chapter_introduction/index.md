@@ -72,7 +72,7 @@ natural language processing, healthcare, and genomics.
 
 ## A Motivating Example
 
-Before we could begin writing, the authors of this book,
+Before beginning writing, the authors of this book,
 like much of the work force, had to become caffeinated.
 We hopped in the car and started driving.
 Using an iPhone, Alex called out "Hey Siri",
@@ -80,7 +80,8 @@ awakening the phone's voice recognition system.
 Then Mu commanded "directions to Blue Bottle coffee shop".
 The phone quickly displayed the transcription of his command.
 It also recognized that we were asking for directions
-and launched the Maps application to fulfill our request.
+and launched the Maps application (app)
+to fulfill our request.
 Once launched, the Maps app identified a number of routes.
 Next to each route, the phone displayed a predicted transit time.
 While we fabricated this story for pedagogical convenience,
@@ -88,38 +89,46 @@ it demonstrates that in the span of just a few seconds,
 our everyday interactions with a smart phone
 can engage several machine learning models.
 
+
 Imagine just writing a program to respond to a *wake word*
-like "Alexa", "Okay, Google" or "Siri".
+such as "Alexa", "OK Google", and "Hey Siri".
 Try coding it up in a room by yourself
 with nothing but a computer and a code editor,
 as illustrated in :numref:`fig_wake_word`.
 How would you write such a program from first principles?
 Think about it... the problem is hard.
-Every second, the microphone will collect roughly 44,000 samples.
+Every second, the microphone will collect roughly 
+44000 samples.
 Each sample is a measurement of the amplitude of the sound wave.
-What rule could map reliably from a snippet of raw audio to confident predictions ``{yes, no}`` on whether the snippet contains the wake word?
+What rule could map reliably from a snippet of raw audio to confident predictions 
+$\{\text{yes}, \text{no}\}$
+on whether the snippet contains the wake word?
 If you are stuck, do not worry.
 We do not know how to write such a program from scratch either.
-That is why we use ML.
+That is why we use machine learning.
 
-![Identify an awake word.](../img/wake-word.svg)
+![Identify a wake word.](../img/wake-word.svg)
 :label:`fig_wake_word`
 
-Here's the trick.
+
+Here is the trick.
 Often, even when we do not know how to tell a computer
 explicitly how to map from inputs to outputs,
 we are nonetheless capable of performing the cognitive feat ourselves.
 In other words, even if you do not know
-*how to program a computer* to recognize the word "Alexa",
-you yourself *are able* to recognize the word "Alexa".
+how to program a computer to recognize the word "Alexa",
+you yourself are able to recognize it.
 Armed with this ability, we can collect a huge *dataset*
-containing examples of audio and label those that *do*
-and that *do not* contain the wake word.
-In the ML approach, we do not attempt to design a system
+containing examples of audio 
+and label those that do
+and that do not contain the wake word.
+In the machine learning approach, 
+we do not attempt to design a system
 *explicitly* to recognize wake words.
 Instead, we define a flexible program
 whose behavior is determined by a number of *parameters*.
-Then we use the dataset to determine the best possible set of parameters, those that improve the performance of our program
+Then we use the dataset to determine the best possible set of parameters, 
+those that improve the performance of our program
 with respect to some measure of performance on the task of interest.
 
 You can think of the parameters as knobs that we can turn,
@@ -128,7 +137,7 @@ Fixing the parameters, we call the program a *model*.
 The set of all distinct programs (input-output mappings)
 that we can produce just by manipulating the parameters
 is called a *family* of models.
-And the *meta-program* that uses our dataset
+And the meta-program that uses our dataset
 to choose the parameters is called a *learning algorithm*.
 
 Before we can go ahead and engage the learning algorithm,
