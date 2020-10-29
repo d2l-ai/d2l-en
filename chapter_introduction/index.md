@@ -66,7 +66,8 @@ no matter how much experience accrues,
 until the developers themselves learn and decide
 that it is time to update the software.
 In this book, we will teach you the fundamentals of machine learning,
-and focus in particular on deep learning, a powerful set of techniques
+and focus in particular on *deep learning*, 
+a powerful set of techniques
 driving innovations in areas as diverse as computer vision,
 natural language processing, healthcare, and genomics.
 
@@ -144,19 +145,25 @@ Before we can go ahead and engage the learning algorithm,
 we have to define the problem precisely,
 pinning down the exact nature of the inputs and outputs,
 and choosing an appropriate model family.
-In this case, our model receives a snippet of audio as *input*,
-and it generates a selection among ``{yes, no}`` as *output*.
-If all goes according to plan the model's guesses will
-typically be correct as to whether (or not) the snippet contains the wake word.
+In this case, 
+our model receives a snippet of audio as *input*,
+and the model 
+generates a selection among 
+$\{\text{yes}, \text{no}\}$ as *output*.
+If all goes according to plan 
+the model's guesses will
+typically be correct as to 
+whether the snippet contains the wake word.
 
 If we choose the right family of models,
-then there should exist one setting of the knobs
-such that the model fires ``yes`` every time it hears the word "Alexa".  Because the exact choice of the wake word is arbitrary,
+there should exist one setting of the knobs
+such that the model fires "yes" every time it hears the word "Alexa".
+Because the exact choice of the wake word is arbitrary,
 we will probably need a model family sufficiently rich that,
-via another setting of the knobs, it could fire ``yes``
+via another setting of the knobs, it could fire "yes"
 only upon hearing the word "Apricot".
 We expect that the same model family should be suitable
-for *"Alexa" recognition* and *"Apricot" recognition*
+for "Alexa" recognition and "Apricot" recognition
 because they seem, intuitively, to be similar tasks.
 However, we might need a different family of models entirely
 if we want to deal with fundamentally different inputs or outputs,
@@ -164,37 +171,35 @@ say if we wanted to map from images to captions,
 or from English sentences to Chinese sentences.
 
 As you might guess, if we just set all of the knobs randomly,
-it is not likely that our model will recognize "Alexa",
+it is unlikely that our model will recognize "Alexa",
 "Apricot", or any other English word.
-In deep learning, the *learning* is the process
+In machine learning, 
+the *learning* is the process
 by which we discover the right setting of the knobs
 coercing the desired behavior from our model.
-
-As shown in :numref:`fig_ml_loop`, the training process usually looks like this:
+In other words,
+we *train* our model with data.
+As shown in :numref:`fig_ml_loop`, the training process usually looks like the following:
 
 1. Start off with a randomly initialized model that cannot do anything useful.
-1. Grab some of your labeled data (e.g., audio snippets and corresponding ``{yes, no}`` labels)
-1. Tweak the knobs so the model sucks less with respect to those examples
-1. Repeat until the model is awesome.
+1. Grab some of your data (e.g., audio snippets and corresponding $\{\text{yes}, \text{no}\}$ labels).
+1. Tweak the knobs so the model sucks less with respect to those examples.
+1. Repeat Step 2 and 3 until the model is awesome.
 
-![A typical training process. ](../img/ml-loop.svg)
+![A typical training process.](../img/ml-loop.svg)
 :label:`fig_ml_loop`
 
 To summarize, rather than code up a wake word recognizer,
 we code up a program that can *learn* to recognize wake words,
-*if we present it with a large labeled dataset*.
+if we present it with a large labeled dataset.
 You can think of this act of determining a program's behavior
 by presenting it with a dataset as *programming with data*.
-We can "program" a cat detector by providing our machine learning system
-with many examples of cats and dogs, such as the images below:
-
-|cat|cat|dog|dog|
-|:---------------:|:---------------:|:---------------:|:---------------:|
-|![cat3](../img/cat3.jpg)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
-
+That is to say,
+we can "program" a cat detector by providing our machine learning system
+with many examples of cats and dogs.
 This way the detector will eventually learn to emit a very large positive number if it is a cat, a very large negative number if it is a dog,
 and something closer to zero if it is not sure,
-and this barely scratches the surface of what ML can do.
+and this barely scratches the surface of what machine learning can do.
 
 Deep learning is just one among many popular methods
 for solving machine learning problems.
@@ -225,7 +230,7 @@ natural language processing, medical informatics, and other application areas,
 offering a unified set of tools for tackling diverse problems.
 
 
-## The Key Components: Data, Models, and Algorithms
+## Key Components: Data, Models, and Algorithms
 
 In our *wake-word* example, we described a dataset
 consisting of audio snippets and binary labels, and we
