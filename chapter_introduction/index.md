@@ -200,37 +200,12 @@ with many examples of cats and dogs.
 This way the detector will eventually learn to emit a very large positive number if it is a cat, a very large negative number if it is a dog,
 and something closer to zero if it is not sure,
 and this barely scratches the surface of what machine learning can do.
-
-Deep learning is just one among many popular methods
+Deep learning,
+which we will explain in greater detail later,
+is just one among many popular methods
 for solving machine learning problems.
-Thus far, we have only talked about machine learning broadly
-and not deep learning. To see why deep learning is important,
-we should pause for a moment to highlight a couple of crucial points.
 
-First, the problems that we have discussed thus far---learning
-from the raw audio signal, the raw pixel values of images,
-or mapping between sentences of arbitrary lengths and
-their counterparts in foreign languages---are problems
-where deep learning excels and where traditional ML methods faltered.
-Deep models are *deep* in precisely the sense
-that they learn many *layers* of computation.
-It turns out that these many-layered (or hierarchical) models
-are capable of addressing low-level perceptual data
-in a way that previous tools could not.
-In bygone days, the crucial part of applying ML to these problems
-consisted of coming up with manually-engineered ways
-of transforming the data into some form amenable to *shallow* models.
-One key advantage of deep learning is that it replaces not
-only the *shallow* models at the end of traditional learning pipelines,
-but also the labor-intensive process of feature engineering.
-Second, by replacing much of the *domain-specific preprocessing*,
-deep learning has eliminated many of the boundaries
-that previously separated computer vision, speech recognition,
-natural language processing, medical informatics, and other application areas,
-offering a unified set of tools for tackling diverse problems.
-
-
-## Key Components: Data, Models, and Algorithms
+## Key Components
 
 In our *wake-word* example, we described a dataset
 consisting of audio snippets and binary labels, and we
@@ -432,7 +407,7 @@ if you perturbed that parameter just a small amount.
 They then update the parameter in the direction that reduces the loss.
 
 
-## Kinds of Machine Learning
+## Kinds of Machine Learning Problems
 
 In the following sections, we discuss a few *kinds*
 of machine learning problems in greater detail.
@@ -1205,7 +1180,11 @@ is the classic *multi-armed bandit problem*.
 
 ## Roots
 
-Although many deep learning methods are recent inventions,
+Deep learning provides powerful tools
+for solving a diverse set of 
+machine learning problems.
+Although many deep learning methods
+are recent inventions,
 humans have held the desire to analyze data
 and to predict future outcomes for centuries.
 In fact, much of natural science has its roots in this.
@@ -1548,6 +1527,63 @@ if automated to drive consequential decisions.
 It is important to ensure that these algorithms are used with care.
 With what we know today, this strikes us a much more pressing concern
 than the potential of malevolent superintelligence to destroy humanity.
+
+
+## Characteristics (WIP)
+
+
+
+Thus far, we have only talked about machine learning broadly
+and not deep learning. To see why deep learning is important,
+we should pause for a moment to highlight a couple of crucial points.
+
+First, the problems that we have discussed thus far---learning
+from the raw audio signal, 
+the raw pixel values of images,
+or mapping between sentences of arbitrary lengths and
+their counterparts in foreign languages---are problems
+where deep learning excels and where traditional 
+machine learning
+methods falter.
+Deep models are *deep* in precisely the sense
+that they learn many *layers* of computation.
+It turns out that these many-layered (or hierarchical) models
+are capable of addressing low-level perceptual data
+in a way that previous tools could not.
+In bygone days, the crucial part of applying machine learning to these problems
+consisted of coming up with manually-engineered ways
+of transforming the data into some form amenable to shallow models.
+One key advantage of deep learning is that it replaces not
+only the shallow models at the end of traditional learning pipelines,
+but also the labor-intensive process of 
+*feature engineering*.
+Second, by replacing much of the domain-specific preprocessing,
+deep learning has eliminated many of the boundaries
+that previously separated computer vision, speech recognition,
+natural language processing, medical informatics, and other application areas,
+offering a unified set of tools for tackling diverse problems.
+
+
+
+
+
+Machine learning uses data to learn transformations between examples. For instance, images of digits are transformed to integers between 0 and 9, audio is transformed into text (speech recognition), text is transformed into text in a different language (machine translation), or mugshots are transformed into names (face recognition). In doing so, it is often necessary to represent data in a way suitable for algorithms to process it. This degree of feature transformations is often used as a reason for referring to deep learning as a means for representation learning (in fact, the International Conference on Learning Representations takes its name from that). At the same time, machine learning equally borrows from statistics (to a very large extent questions rather than specific algorithms) and data mining (to deal with scalability).
+
+The dizzying set of algorithms and applications makes it difficult to assess what specifically the ingredients for deep learning might be. This is as difficult as trying to pin down required ingredients for pizza - almost every component is substitutable. For instance one might assume that multilayer perceptrons are an essential ingredient. Yet there are computer vision models that use only convolutions. Others only use sequence models.
+
+Arguably the most significant commonality in these methods is the use of end-to-end training. That is, rather than assembling a system based on components that are individually tuned, one builds the system and then tunes their performance jointly. For instance, in computer vision scientists used to separate the process of feature engineering from the process of building machine learning models. The Canny edge detector [20] and Lowe's SIFT feature extractor [21] reigned supreme for over a decade as algorithms for mapping images into feature vectors. Unfortunately, there is only so much that humans can accomplish by ingenuity relative to a consistent evaluation over thousands or millions of choices, when carried out automatically by an algorithm. When deep learning took over, these feature extractors were replaced by automatically tuned filters, yielding superior accuracy.
+
+Likewise, in Natural Language Processing the bag-of-words model of Salton and McGill [22] was for a long time the default choice. In it, words in a sentence are mapped into a vector, where each coordinate corresponds to the number of times that particular word occurs. This entirely ignores the word order ('dog bites man' vs. 'man bites dog') or punctuation ('let's eat, grandma' vs. 'let's eat grandma'). Unfortunately, it is rather difficult to engineer better features manually. Algorithms, conversely, are able to search over a large space of possible feature designs automatically. This has led to tremendous progress. For instance, semantically relevant word embeddings allow reasoning of the form 'Berlin - Germany + Italy = Rome' in vector space. Again, these results are achieved by end-to-end training of the entire system.
+
+Beyond end-to-end training, the second most relevant part is that we are experiencing a transition from parametric statistical descriptions to fully nonparametric models. When data is scarce, one needs to rely on simplifying assumptions about reality (e.g. via spectral methods) in order to obtain useful models. When data is abundant, this can be replaced by nonparametric models that fit reality more accurately. To some extent, this mirrors the progress that physics experienced in the middle of the previous century with the availability of computers. Rather than solving parametric approximations of how electrons behave by hand, one can now resort to numerical simulations of the associated partial differential equations. This has led to much more accurate models, albeit often at the expense of explainability.
+
+A case in point are Generative Adversarial Networks, where graphical models were replaced by data generating code without the need for a proper probabilistic formulation. This has led to models of images that can look deceptively realistic, something that was considered too difficult for a long time.
+
+Another difference to previous work is the acceptance of suboptimal solutions, dealing with nonconvex nonlinear optimization problems, and the willingness to try things before proving them. This newfound empiricism in dealing with statistical problems, combined with a rapid influx of talent has led to rapid progress of practical algorithms (albeit in many cases at the expense of modifying and re-inventing tools that existed for decades).
+
+Lastly, the Deep Learning community prides itself of sharing tools across academic and corporate boundaries, releasing many excellent libraries, statistical models and trained networks as open source. It is in this spirit that the notebooks forming this course are freely available for distribution and use. We have worked hard to lower the barriers of access for everyone to learn about Deep Learning and we hope that our readers will benefit from this.
+
+
 
 ## Summary
 
