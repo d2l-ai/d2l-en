@@ -21,6 +21,7 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       pip list
       nvidia-smi
+      d2lbook clear
       """
 
       sh label: "Sanity Check", script: """set -ex
