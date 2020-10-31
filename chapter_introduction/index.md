@@ -225,8 +225,8 @@ that will follow us around, no matter what kind of machine learning problem we t
 
 1. The *data* that we can learn from.
 1. A *model* of how to transform the data.
-1. A *loss* function that quantifies the badness of our model.
-1. An *algorithm* to adjust the model's parameters to minimize the loss.
+1. An *objective function* that quantifies how well (or badly) the model is doing.
+1. An *algorithm* to adjust the model's parameters to optimize the objective function.
 
 ### Data
 
@@ -321,32 +321,35 @@ capture and automate historical injustices.
 Note that this can all happen without the data scientist
 actively conspiring, or even being aware.
 
+
 ### Models
 
-
-Most machine learning involves *transforming* the data in some sense.
-We might want to build a system that ingests photos and predicts *smiley-ness*.
-Alternatively, we might want to ingest a set of sensor readings
-and predict how *normal* vs *anomalous* the readings are.
+Most machine learning involves transforming the data in some sense.
+We might want to build a system that ingests photos and predicts smiley-ness.
+Alternatively,
+we might want to ingest a set of sensor readings
+and predict how normal vs. anomalous the readings are.
 By *model*, we denote the computational machinery for ingesting data
-of one type, and spitting out predictions of a possibly different type.
+of one type, 
+and spitting out predictions of a possibly different type.
 In particular, we are interested in statistical models
 that can be estimated from data.
 While simple models are perfectly capable of addressing
-appropriately simple problems the problems
+appropriately simple problems,
+the problems
 that we focus on in this book stretch the limits of classical methods.
 Deep learning is differentiated from classical approaches
 principally by the set of powerful models that it focuses on.
 These models consist of many successive transformations of the data
 that are chained together top to bottom, thus the name *deep learning*.
-On our way to discussing deep neural networks,
-we will discuss some more traditional methods.
+On our way to discussing deep models,
+we will also discuss some more traditional methods.
 
+### Objective Functions
 
-### Loss functions
-
-Earlier, we introduced machine learning as "learning from experience".
-By *learning* here, we mean *improving* at some task over time.
+Earlier, we introduced machine learning as learning from experience.
+By *learning* here,
+we mean improving at some task over time.
 But who is to say what constitutes an improvement?
 You might imagine that we could propose to update our model,
 and some people might disagree on whether the proposed update
@@ -355,67 +358,71 @@ constituted an improvement or a decline.
 In order to develop a formal mathematical system of learning machines,
 we need to have formal measures of how good (or bad) our models are.
 In machine learning, and optimization more generally,
-we call these objective functions.
+we call these *objective functions*.
 By convention, we usually define objective functions
-so that *lower* is *better*.
-This is merely a convention. You can take any function $f$
+so that lower is better.
+This is merely a convention. 
+You can take any function $f$
 for which higher is better, and turn it into a new function $f'$
 that is qualitatively identical but for which lower is better
 by setting $f' = -f$.
 Because lower is better, these functions are sometimes called
-*loss functions* or *cost functions*.
+*loss functions*.
 
 When trying to predict numerical values,
-the most common objective function is squared error $(y-\hat{y})^2$.
+the most common loss function is *squared error*,
+i.e., the square of the difference between the prediction and the ground-truth.
 For classification, the most common objective is to minimize error rate,
-i.e., the fraction of instances on which
+i.e., the fraction of examples on which
 our predictions disagree with the ground truth.
-Some objectives (like squared error) are easy to optimize.
-Others (like error rate) are difficult to optimize directly,
+Some objectives (e.g., squared error) are easy to optimize.
+Others (e.g., error rate) are difficult to optimize directly,
 owing to non-differentiability or other complications.
 In these cases, it is common to optimize a *surrogate objective*.
 
 Typically, the loss function is defined
 with respect to the model's parameters
 and depends upon the dataset.
-The best values of our model's parameters are learned
-by minimizing the loss incurred on a *training set*
-consisting of some number of *examples* collected for training.
+We learn
+the best values of our model's parameters
+by minimizing the loss incurred on a set
+consisting of some number of examples collected for training.
 However, doing well on the training data
-does not guarantee that we will do well on (unseen) test data.
+does not guarantee that we will do well on unseen data.
 So we will typically want to split the available data into two partitions:
-the training data (for fitting model parameters)
-and the test data (which is held out for evaluation),
-reporting the following two quantities:
-
- * **Training Error:**
- The error on that data on which the model was trained.
- You could think of this as being like
- a student's scores on practice exams
- used to prepare for some real exam.
- Even if the results are encouraging,
- that does not guarantee success on the final exam.
- * **Test Error:** This is the error incurred on an unseen test set.
- This can deviate significantly from the training error.
- When a model performs well on the training data
- but fails to generalize to unseen data,
- we say that it is *overfitting*.
- In real-life terms, this is like flunking the real exam
- despite doing well on practice exams.
+the *training set* (for fitting model parameters)
+and the *test set* (which is held out for evaluation),
+reporting how the model performs on both of them.
+You could think of training performance as being like
+a student's scores on practice exams
+used to prepare for some real final exam.
+Even if the results are encouraging,
+that does not guarantee success on the final exam.
+In other words,
+the test performance can deviate significantly from the training performance. 
+When a model performs well on the training set
+but fails to generalize to unseen data,
+we say that it is *overfitting*.
+In real-life terms, this is like flunking the real exam
+despite doing well on practice exams.
 
 
-### Optimization algorithms
+### Optimization Algorithms
 
 Once we have got some data source and representation,
 a model, and a well-defined objective function,
 we need an algorithm capable of searching
 for the best possible parameters for minimizing the loss function.
-The most popular optimization algorithms for neural networks
-follow an approach called gradient descent.
-In short, at each step, they check to see, for each parameter,
+Popular optimization algorithms for deep learning
+are based on an approach called *gradient descent*.
+In short, at each step, this method 
+checks to see, for each parameter,
 which way the training set loss would move
 if you perturbed that parameter just a small amount.
-They then update the parameter in the direction that reduces the loss.
+It then updates
+the parameter in the direction that may reduce the loss.
+
+
 
 ## Kinds of Machine Learning Problems
 
@@ -431,7 +438,7 @@ can tackle
 to motivate the reader and provide us with some common language
 for when we talk about more problems throughout the book.
 
-### Supervised learning
+### Supervised Learning
 
 Supervised learning addresses the task of
 predicting *targets* given *inputs*.
@@ -783,7 +790,7 @@ Indeed, for several years, the BioASQ organization
 has [hosted a competition](http://bioasq.org/) to do precisely this.
 
 
-#### Search and ranking
+#### Search 
 
 Sometimes we do not just want to assign each example to a bucket
 or to a real value. In the field of information retrieval,
@@ -817,7 +824,7 @@ There are entire academic conferences devoted to this subject.
 
 
 
-#### Recommender systems
+#### Recommender Systems
 :label:`subsec_recommender_systems`
 
 Recommender systems are another problem setting
@@ -1090,7 +1097,7 @@ We will briefly describe reinforcement learning and adversarial learning,
 two settings that explicitly consider interaction with an environment.
 
 
-### Reinforcement learning
+### Reinforcement Learning
 
 If you are interested in using machine learning
 to develop an agent that interacts with an environment
@@ -1167,7 +1174,7 @@ or to *explore* the space of strategies,
 potentially giving up some short-run reward in exchange for knowledge.
 
 
-#### MDPs, bandits, and friends
+#### MDPs, Bandits, and Friends
 
 The general reinforcement learning problem
 is a very general setting.
