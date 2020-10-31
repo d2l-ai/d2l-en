@@ -362,10 +362,10 @@ we call these *objective functions*.
 By convention, we usually define objective functions
 so that lower is better.
 This is merely a convention. 
-You can take any function $f$
-for which higher is better, and turn it into a new function $f'$
+You can take any function
+for which higher is better, and turn it into a new function
 that is qualitatively identical but for which lower is better
-by setting $f' = -f$.
+by flipping the sign.
 Because lower is better, these functions are sometimes called
 *loss functions*.
 
@@ -542,11 +542,13 @@ and if you designed a great algorithm to accomplish this feat in 2009,
 you might have won the [1-million-dollar Netflix prize](https://en.wikipedia.org/wiki/Netflix_Prize).
 Predicting the length of stay for patients in the hospital
 is also a regression problem.
-A good rule of thumb is that any "how much" or "how many" problem
+A good rule of thumb is that any *how much?* or *how many?* problem
 should suggest regression,
-such as
-"how many hours will this surgery take" and 
-"how many dogs are in this photo".
+such as:
+
+* How many hours will this surgery take?
+* How much rainfall will this town have in the next six hours?
+
 
 Even if you have never worked with machine learning before,
 you have probably worked through a regression problem informally.
@@ -585,48 +587,48 @@ that our data were corrupted by Gaussian noise.
 
 While regression models are great for addressing *how many?* questions,
 lots of problems do not bend comfortably to this template.
-For example, a bank wants to add check scanning to its mobile app.
+For example,
+a bank wants to add check scanning to its mobile app.
 This would involve the customer snapping a photo of a check
 with their smart phone's camera
-and the machine learning model would need to be able
+and the app would need to be able
 to automatically understand text seen in the image.
-It would also need to understand hand-written text to be even more robust.
-This kind of system is referred to as optical character recognition (OCR),
-and the kind of problem it addresses is called *classification*.
+Specifically,
+it would also need to understand handwritten text to be even more robust,
+such as mapping a handwritten character
+to one of the known characters.
+This kind of *which one?* problem is called *classification*.
 It is treated with a different set of algorithms
-than those used for regression (although many techniques will carry over).
+than those used for regression although many techniques will carry over.
 
-In classification, we want our model to look at a feature vector,
+In *classification*, we want our model to look at features,
 e.g., the pixel values in an image,
-and then predict which category (formally called *classes*),
-among some (discrete) set of options, an example belongs.
-For hand-written digits, we might have 10 classes,
+and then predict which *category* (formally called *class*),
+among some discrete set of options, an example belongs.
+For handwritten digits, we might have ten classes,
 corresponding to the digits 0 through 9.
 The simplest form of classification is when there are only two classes,
-a problem which we call binary classification.
-For example, our dataset $X$ could consist of images of animals
-and our *labels* $Y$ might be the classes $\mathrm{\{cat, dog\}}$.
-While in regression, we sought a *regressor* to output a real value $\hat{y}$,
-in classification, we seek a *classifier*, whose output $\hat{y}$ is the predicted class assignment.
+a problem which we call *binary classification*.
+For example, our dataset could consist of images of animals
+and our labels  might be the classes $\mathrm{\{cat, dog\}}$.
+While in regression, we sought a regressor to output a numerical value,
+in classification, we seek a classifier, whose output is the predicted class assignment.
 
 For reasons that we will get into as the book gets more technical,
 it can be hard to optimize a model that can only output
-a hard categorical assignment, e.g., either *cat* or *dog*.
+a hard categorical assignment, 
+e.g., either "cat" or "dog".
 In these cases, it is usually much easier to instead express
 our model in the language of probabilities.
-Given an example $x$, our model assigns a probability $\hat{y}_k$
-to each label $k$. Because these are probabilities,
-they need to be positive numbers and add up to $1$
-and thus we only need $K-1$ numbers
-to assign probabilities of $K$ categories.
-This is easy to see for binary classification.
-If there is a $0.6$ ($60\%$) probability that an unfair coin comes up heads,
-then there is a $0.4$ ($40\%$) probability that it comes up tails.
-Returning to our animal classification example,
+Given features of an example, 
+our model assigns a probability
+to each possible class. 
+Returning to our animal classification example
+where the classes are $\mathrm{\{cat, dog\}}$,
 a classifier might see an image and output the probability
-that the image is a cat $P(y=\text{cat} \mid x) = 0.9$.
+that the image is a cat as 0.9.
 We can interpret this number by saying that the classifier
-is $90\%$ sure that the image depicts a cat.
+is 90\% sure that the image depicts a cat.
 The magnitude of the probability for the predicted class
 conveys one notion of uncertainty.
 It is not the only notion of uncertainty
@@ -635,14 +637,16 @@ and we will discuss others in more advanced chapters.
 When we have more than two possible classes,
 we call the problem *multiclass classification*.
 Common examples include hand-written character recognition
-`[0, 1, 2, 3 ... 9, a, b, c, ...]`.
+$\mathrm{\{0, 1, 2, ... 9, a, b, c, ...\}}$.
 While we attacked regression problems by trying
-to minimize the $L_1$ or $L_2$ loss functions,
-the common loss function for classification problems is called cross-entropy.
+to minimize the squared error loss function,
+the common loss function for classification problems is called *cross-entropy*,
+whose name can be demystified 
+via an introduction to information theory in subsequent chapters.
 
 Note that the most likely class is not necessarily
 the one that you are going to use for your decision.
-Assume that you find this beautiful mushroom in your backyard
+Assume that you find a beautiful mushroom in your backyard
 as shown in :numref:`fig_death_cap`.
 
 ![Death cap---do not eat!](../img/death-cap.jpg)
@@ -652,27 +656,28 @@ as shown in :numref:`fig_death_cap`.
 Now, assume that you built a classifier and trained it
 to predict if a mushroom is poisonous based on a photograph.
 Say our poison-detection classifier outputs
-$P(y=\mathrm{death cap}|\mathrm{image}) = 0.2$.
-In other words, the classifier is $80\%$ sure
-that our mushroom *is not* a death cap.
+that the probability that
+:numref:`fig_death_cap` contains a death cap is 0.2.
+In other words, the classifier is 80\% sure
+that our mushroom is not a death cap.
 Still, you would have to be a fool to eat it.
 That is because the certain benefit of a delicious dinner
-is not worth a $20\%$ risk of dying from it.
-In other words, the effect of the *uncertain risk*
-outweighs the benefit by far. We can look at this more formally.
-Basically, we need to compute the expected risk that we incur,
+is not worth a 20\% risk of dying from it.
+In other words, the effect of the uncertain risk
+outweighs the benefit by far.
+Thus, we need to compute the expected risk that we incur as the loss function,
 i.e., we need to multiply the probability of the outcome
-with the benefit (or harm) associated with it:
+with the benefit (or harm) associated with it.
+In this case,
+the loss incurred by eating the mushroom
+can be $0.2 \times \infty + 0.8 \times 0 = \infty$,
+whereas the loss of discarding it is
+$0.2 \times 0 + 0.8 \times 1 = 0.8$.
+Our caution was justified:
+as any mycologist would tell us,
+the mushroom in :numref:`fig_death_cap` actually
+is a death cap.
 
-$$L(\mathrm{action}| x) = E_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{action},y)].$$
-
-Hence, the loss $L$ incurred by eating the mushroom
-is $L(a=\mathrm{eat}| x) = 0.2 * \infty + 0.8 * 0 = \infty$,
-whereas the cost of discarding it is
-$L(a=\mathrm{discard}| x) = 0.2 * 0 + 0.8 * 1 = 0.8$.
-
-Our caution was justified: as any mycologist would tell us,
-the above mushroom actually *is* a death cap.
 Classification can get much more complicated than just
 binary, multiclass, or even multi-label classification.
 For instance, there are some variants of classification
@@ -684,7 +689,7 @@ Usually, this is referred to as *hierarchical classification*.
 One early example is due to [Linnaeus](https://en.wikipedia.org/wiki/Carl_Linnaeus), who organized the animals in a hierarchy.
 
 In the case of animal classification,
-it might not be so bad to mistake a poodle for a schnauzer,
+it might not be so bad to mistake a poodle (a dog breed) for a schnauzer (another dog breed),
 but our model would pay a huge penalty
 if it confused a poodle for a dinosaur.
 Which hierarchy is relevant might depend
@@ -692,6 +697,7 @@ on how you plan to use the model.
 For example, rattle snakes and garter snakes
 might be close on the phylogenetic tree,
 but mistaking a rattler for a garter could be deadly.
+
 
 #### Tagging
 
@@ -705,7 +711,7 @@ Nonetheless, no matter how accurate our model gets,
 we might find ourselves in trouble when the classifier
 encounters an image of the Town Musicians of Bremen.
 
-![A cat, a rooster, a dog and a donkey](../img/stackedanimals.jpg)
+![A cat, a rooster, a dog and a donkey.](../img/stackedanimals.jpg)
 :width:`300px`
 
 
