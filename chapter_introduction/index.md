@@ -238,14 +238,14 @@ Generally, we are concerned with a collection of examples.
 In order to work with data usefully, 
 we typically
 need to come up with a suitable numerical representation.
-Each *example* typically consists of a set
-of attributes called *features*,
+Each *example* (or *data point*, *data instance*, *sample*) typically consists of a set
+of attributes called *features* (or *covariates*),
 from which the model must make its predictions.
 In the supervised learning problems above,
 the thing to predict
 is a special attribute 
 that is designated as
-the *label*.
+the *label* (or *target*).
 
 
 If we were working with image data,
@@ -390,8 +390,8 @@ consisting of some number of examples collected for training.
 However, doing well on the training data
 does not guarantee that we will do well on unseen data.
 So we will typically want to split the available data into two partitions:
-the *training set* (for fitting model parameters)
-and the *test set* (which is held out for evaluation),
+the *training dataset* (or *training set*, for fitting model parameters)
+and the *test dataset* (or *test set*, which is held out for evaluation),
 reporting how the model performs on both of them.
 You could think of training performance as being like
 a student's scores on practice exams
@@ -422,54 +422,46 @@ if you perturbed that parameter just a small amount.
 It then updates
 the parameter in the direction that may reduce the loss.
 
-
-
 ## Kinds of Machine Learning Problems
 
-In the following sections, we discuss a few *kinds*
-of machine learning problems in greater detail.
-We begin with a list of *objectives*, i.e.,
-a list of things that we would like machine learning to do.
-Note that the objectives are complemented
-with a set of techniques of *how* to accomplish them,
-including types of data, models, training techniques, etc.
-The list below is just a sampling of the problems machine learning
-can tackle
-to motivate the reader and provide us with some common language
-for when we talk about more problems throughout the book.
+The wake word problem in our motivating example
+is just one among
+many problems that machine learning can tackle.
+To motivate the reader further
+and provide us with some common language when we talk about more problems throughout the book,
+in the following we 
+list a sampling of machine learning problems.
+We will constantly refer to
+our aforementioned concepts 
+such as data, models, and training techniques.
 
 ### Supervised Learning
 
 Supervised learning addresses the task of
-predicting *targets* given *inputs*.
-The targets, which we often call *labels*, are generally denoted by *y*.
-The input data, also called the *features* or covariates,
-are typically denoted $\mathbf{x}$.
-Each (input, target) pair is called an *example* or *instance*.
-Sometimes, when the context is clear, we may use the term examples,
+predicting labels given input features.
+Each feature--label pair is called an example.
+Sometimes, when the context is clear, we may use the term *examples*
 to refer to a collection of inputs,
-even when the corresponding targets are unknown.
-We denote any particular instance with a subscript, typically $i$,
-for instance ($\mathbf{x}_i, y_i$).
-A dataset is a collection of $n$ instances $\{\mathbf{x}_i, y_i\}_{i=1}^n$.
-Our goal is to produce a model $f_\theta$ that maps any input $\mathbf{x}_i$
- to a prediction $f_{\theta}(\mathbf{x}_i)$.
+even when the corresponding labels are unknown.
+Our goal is to produce a model
+that maps any input to a label prediction.
+
 
 To ground this description in a concrete example,
 if we were working in healthcare,
 then we might want to predict whether or not
 a patient would have a heart attack.
-This observation, *heart attack* or *no heart attack*,
-would be our label $y$.
-The input data $\mathbf{x}$ might be vital signs
-such as heart rate, diastolic and systolic blood pressure, etc.
+This observation, "heart attack" or "no heart attack",
+would be our label.
+The input features might be vital signs
+such as heart rate, diastolic blood pressure, 
+and systolic blood pressure.
 
-The supervision comes into play because for choosing the parameters $\theta$, we (the supervisors) provide the model with a dataset
-consisting of *labeled examples* ($\mathbf{x}_i, y_i$),
-where each example $\mathbf{x}_i$ is matched with the correct label.
-
+The supervision comes into play because for choosing the parameters, we (the supervisors) provide the model with a dataset
+consisting of labeled examples,
+where each example is matched with the ground-truth label.
 In probabilistic terms, we typically are interested in estimating
-the conditional probability $P(y|x)$.
+the conditional probability of a label given input features.
 While it is just one among several paradigms within machine learning,
 supervised learning accounts for the majority of successful
 applications of machine learning in industry.
@@ -477,34 +469,33 @@ Partly, that is because many important tasks
 can be described crisply as estimating the probability
 of something unknown given a particular set of available data:
 
-* Predict cancer vs not cancer, given a CT image.
+* Predict cancer vs. not cancer, given a computer tomography image.
 * Predict the correct translation in French, given a sentence in English.
 * Predict the price of a stock next month based on this month's financial reporting data.
 
-Even with the simple description "predict targets from inputs"
+Even with the simple description
+"predicting labels given input features"
 supervised learning can take a great many forms
 and require a great many modeling decisions,
 depending on (among other considerations) the type, size,
 and the number of inputs and outputs.
-For example, we use different models to process sequences
-(like strings of text or time series data)
+For example, we use different models to process sequences of arbitrary lengths
 and for processing fixed-length vector representations.
 We will visit many of these problems in depth
-throughout the first 9 parts of this book.
+throughout this book.
 
-Informally, the learning process looks something like this:
-Grab a big collection of examples for which the covariates are known
+Informally, the learning process looks something like the following.
+First, grab a big collection of examples for which the features are known
 and select from them a random subset,
-acquiring the ground truth labels for each.
-Sometimes these labels might be available data that has already been collected
+acquiring the ground-truth labels for each.
+Sometimes these labels might be available data that have already been collected
 (e.g., did a patient die within the following year?)
 and other times we might need to employ human annotators to label the data,
 (e.g., assigning images to categories).
-
 Together, these inputs and corresponding labels comprise the training set.
 We feed the training dataset into a supervised learning algorithm,
 a function that takes as input a dataset
-and outputs another function, *the learned model*.
+and outputs another function: the learned model.
 Finally, we can feed previously unseen inputs to the learned model,
 using its outputs as predictions of the corresponding label.
 The full process is drawn in :numref:`fig_supervised_learning`.
