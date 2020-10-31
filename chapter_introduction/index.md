@@ -503,56 +503,36 @@ The full process is drawn in :numref:`fig_supervised_learning`.
 ![Supervised learning.](../img/supervised-learning.svg)
 :label:`fig_supervised_learning`
 
-
 #### Regression
 
 Perhaps the simplest supervised learning task
 to wrap your head around is *regression*.
 Consider, for example, a set of data harvested
 from a database of home sales.
-We might construct a table, where each row corresponds to a different house,
+We might construct a table, 
+where each row corresponds to a different house,
 and each column corresponds to some relevant attribute,
-such as the square footage of a house, the number of bedrooms, the number of bathrooms, and the number of minutes (walking) to the center of town.
-In this dataset, each *example* would be a specific house,
-and the corresponding *feature vector* would be one row in the table.
-
+such as the square footage of a house, 
+the number of bedrooms, the number of bathrooms, and the number of minutes (walking) to the center of town.
+In this dataset, each example would be a specific house,
+and the corresponding feature vector would be one row in the table.
 If you live in New York or San Francisco,
 and you are not the CEO of Amazon, Google, Microsoft, or Facebook,
 the (sq. footage, no. of bedrooms, no. of bathrooms, walking distance)
-feature vector for your home might look something like: $[100, 0, .5, 60]$.
+feature vector for your home might look something like: $[600, 1, 1, 60]$.
 However, if you live in Pittsburgh, it might look more like $[3000, 4, 3, 10]$.
 Feature vectors like this are essential
 for most classic machine learning algorithms.
-We will continue to denote the feature vector corresponding
-to any example $i$ as $\mathbf{x}_i$ and we can compactly refer
-to the full table containing all of the feature vectors as $X$.
 
-What makes a problem a *regression* is actually the outputs.
+What makes a problem a regression is actually the output.
 Say that you are in the market for a new home.
 You might want to estimate the fair market value of a house,
-given some features like these.
-The target value, the price of sale, is a *real number*.
-If you remember the formal definition of the reals
-you might be scratching your head now.
-Homes probably never sell for fractions of a cent,
-let alone prices expressed as irrational numbers.
-In cases like this, when the target is actually discrete,
-but where the rounding takes place on a sufficiently fine scale,
-we will abuse language just a bit and continue to describe
-our outputs and targets as real-valued numbers.
-
-
-We denote any individual target $y_i$
-(corresponding to example $\mathbf{x}_i$)
-and the set of all targets $\mathbf{y}$
-(corresponding to all examples $X$).
-When our targets take on arbitrary values in some range,
-we call this a regression problem.
+given some features like above.
+The label, the price of sale, is a numerical value.
+When labels take on arbitrary numerical values,
+we call this a *regression* problem.
 Our goal is to produce a model whose predictions
-closely approximate the actual target values.
-We denote the predicted target for any instance $\hat{y}_i$.
-Do not worry if the notation is bogging you down.
-We will unpack it more thoroughly in the subsequent chapters.
+closely approximate the actual label values.
 
 
 Lots of practical problems are well-described regression problems.
@@ -562,23 +542,20 @@ and if you designed a great algorithm to accomplish this feat in 2009,
 you might have won the [1-million-dollar Netflix prize](https://en.wikipedia.org/wiki/Netflix_Prize).
 Predicting the length of stay for patients in the hospital
 is also a regression problem.
-A good rule of thumb is that any *How much?* or *How many?* problem
-should suggest regression.
+A good rule of thumb is that any "how much" or "how many" problem
+should suggest regression,
+such as
+"how many hours will this surgery take" and 
+"how many dogs are in this photo".
 
-* "How many hours will this surgery take?": *regression*
-* "How many dogs are in this photo?": *regression*.
-
-However, if you can easily pose your problem as "Is this a _ ?",
-then it is likely, classification, a different kind
-of supervised problem that we will cover next.
 Even if you have never worked with machine learning before,
 you have probably worked through a regression problem informally.
 Imagine, for example, that you had your drains repaired
-and that your contractor spent $x_1=3$ hours
+and that your contractor spent 3 hours
 removing gunk from your sewage pipes.
-Then he sent you a bill of $y_1 = \$350$.
-Now imagine that your friend hired the same contractor for $x_2 = 2$ hours
-and that he received a bill of $y_2 = \$250$.
+Then he sent you a bill of 350 dollars.
+Now imagine that your friend hired the same contractor for 2 hours
+and that he received a bill of 250 dollars.
 If someone then asked you how much to expect
 on their upcoming gunk-removal invoice
 you might make some reasonable assumptions,
@@ -587,33 +564,22 @@ You might also assume that there is some base charge
 and that the contractor then charges per hour.
 If these assumptions held true, then given these two data examples,
 you could already identify the contractor's pricing structure:
-\$100 per hour plus \$50 to show up at your house.
+100 dollars per hour plus 50 dollars to show up at your house.
 If you followed that much then you already understand
-the high-level idea behind linear regression
-(and you just implicitly designed a linear model with a bias term).
+the high-level idea behind linear regression.
 
 In this case, we could produce the parameters
 that exactly matched the contractor's prices.
-Sometimes that is not possible, e.g., if some of
-the variance owes to some factors besides your two features.
+Sometimes this is not possible, 
+e.g., if some of
+the variance owes to a few factors 
+besides your two features.
 In these cases, we will try to learn models
 that minimize the distance between our predictions and the observed values.
-In most of our chapters, we will focus on one of two very common losses,
-the L1 loss
-where
-
-$$l(y, y') = \sum_i |y_i-y_i'|$$
-
-and the least mean squares loss, or
-$L_2$ loss
-where
-
-$$l(y, y') = \sum_i (y_i - y_i')^2.$$
-
-As we will see later, the $L_2$ loss corresponds to the assumption
-that our data was corrupted by Gaussian noise,
-whereas the $L_1$ loss corresponds to an assumption
-of noise from a Laplace distribution.
+In most of our chapters, we will focus on 
+minimizing the squared error loss function.
+As we will see later, this loss corresponds to the assumption
+that our data were corrupted by Gaussian noise.
 
 #### Classification
 

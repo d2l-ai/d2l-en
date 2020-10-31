@@ -454,7 +454,7 @@ reducing the potential for errors.
 :label:`subsec_normal_distribution_and_squared_loss`
 
 While you can already get your hands dirty using only the information above,
-in the following we can more formally motivate the square loss objective
+in the following we can more formally motivate the squared loss objective
 via assumptions about the distribution of noise.
 
 Linear regression was invented by Gauss in 1795,
@@ -494,7 +494,7 @@ d2l.plot(x, [normal(x, mu, sigma) for mu, sigma in params], xlabel='x',
 As we can see, changing the mean corresponds to a shift along the $x$-axis,
 and increasing the variance spreads the distribution out, lowering its peak.
 
-One way to motivate linear regression with the mean squared error loss function (or simply square loss)
+One way to motivate linear regression with the mean squared error loss function (or simply squared loss)
 is to formally assume that observations arise from noisy observations,
 where the noise is normally distributed as follows:
 

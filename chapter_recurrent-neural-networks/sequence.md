@@ -10,7 +10,7 @@ Imagine that you are watching movies on Netflix. As a good Netflix user, you dec
 * In some cases, movies become unpopular due to the misbehaviors of directors or actors in the production.
 * Some movies become cult movies, because they were almost comically bad. *Plan 9 from Outer Space* and *Troll 2* achieved a high degree of notoriety for this reason.
 
-In short, movie ratings are anything but stationary. Thus, using temporal dynamics 
+In short, movie ratings are anything but stationary. Thus, using temporal dynamics
 led to more accurate movie recommendations :cite:`Koren.2009`.
 Of course, sequence data are not just about movie ratings. The following gives more illustrations.
 
@@ -48,7 +48,7 @@ First, assume that the potentially rather long sequence $x_{t-1}, \ldots, x_1$ i
 In this case we might content ourselves with some timespan of length $\tau$ and only use $x_{t-1}, \ldots, x_{t-\tau}$ observations. The immediate benefit is that now the number of arguments is always the same, at least for $t > \tau$. This allows us to train a deep network as indicated above. Such models will be called *autoregressive models*, as they quite literally perform regression on themselves.
 
 The second strategy, shown in :numref:`fig_sequence-model`, is to keep some summary $h_t$ of the past observations, and at the same time update $h_t$ in addition to the prediction $\hat{x}_t$.
-This leads to models that estimate $x_t$ with $\hat{x}_t = P(x_t \mid h_{t})$ and moreover updates of the form  $h_t = g(h_{t-1}, x_{t-1})$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*. 
+This leads to models that estimate $x_t$ with $\hat{x}_t = P(x_t \mid h_{t})$ and moreover updates of the form  $h_t = g(h_{t-1}, x_{t-1})$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*.
 
 ![A latent autoregressive model.](../img/sequence-model.svg)
 :label:`fig_sequence-model`
@@ -69,7 +69,7 @@ $$P(x_1, \ldots, x_T) = \prod_{t=1}^T P(x_t \mid x_{t-1}) \text{ where } P(x_1 \
 Such models are particularly nice whenever $x_t$ assumes only a discrete value, since in this case dynamic programming can be used to compute values along the chain exactly. For instance, we can compute $P(x_{t+1} \mid x_{t-1})$ efficiently:
 
 $$\begin{aligned}
-P(x_{t+1} \mid x_{t-1}) 
+P(x_{t+1} \mid x_{t-1})
 &= \frac{\sum_{x_t} P(x_{t+1}, x_t, x_{t-1})}{P(x_{t-1})}\\
 &= \frac{\sum_{x_t} P(x_{t+1} \mid x_t, x_{t-1}) P(x_t, x_{t-1})}{P(x_{t-1})}\\
 &= \sum_{x_t} P(x_{t+1} \mid x_t) P(x_t \mid x_{t-1})
@@ -172,7 +172,7 @@ train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
 ```
 
 Here we keep the architecture fairly simple:
-just an MLP with two fully-connected layers, ReLU activation, and square loss.
+just an MLP with two fully-connected layers, ReLU activation, and squared loss.
 
 ```{.python .input}
 # A simple MLP
