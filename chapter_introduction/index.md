@@ -207,23 +207,26 @@ for solving machine learning problems.
 
 ## Key Components
 
-In our *wake-word* example, we described a dataset
-consisting of audio snippets and binary labels, and we
-gave a hand-wavy sense of how we might *train*
+In our wake word example, we described a dataset
+consisting of audio snippets and binary labels, 
+and we
+gave a hand-wavy sense of how we might train
 a model to approximate a mapping from snippets to classifications.
-This sort of problem, where we try to predict a designated unknown *label*
-given known *inputs*, given a dataset consisting of examples,
-for which the labels are known is called *supervised learning*,
-and it is just one among many *kinds* of machine learning problems.
-In the next section, we will take a deep dive into the different ML problems.
-First, we'd like to shed more light on some core components
-that will follow us around, no matter what kind of ML problem we take on:
+This sort of problem, 
+where we try to predict a designated unknown *label*
+based on known *inputs*, 
+given a dataset consisting of examples
+for which the labels are known, 
+is called *supervised learning*.
+This is just one among many kinds of machine learning problems.
+Later we will take a deep dive into different machine learning problems.
+First, we would like to shed more light on some core components
+that will follow us around, no matter what kind of machine learning problem we take on:
 
 1. The *data* that we can learn from.
-2. A *model* of how to transform the data.
-3. A *loss* function that quantifies the *badness* of our model.
-4. An *algorithm* to adjust the model's parameters to minimize the loss.
-
+1. A *model* of how to transform the data.
+1. A *loss* function that quantifies the badness of our model.
+1. An *algorithm* to adjust the model's parameters to minimize the loss.
 
 ### Data
 
@@ -231,17 +234,18 @@ It might go without saying that you cannot do data science without data.
 We could lose hundreds of pages pondering what precisely constitutes data,
 but for now, we will err on the practical side
 and focus on the key properties to be concerned with.
-Generally, we are concerned with a collection of *examples*.
+Generally, we are concerned with a collection of examples.
 In order to work with data usefully, we typically
 need to come up with a suitable numerical representation.
 Each *example* typically consists of a collection
-of numerical attributes called *features*.
+of attributes called *features*,
+from which the model must make its predictions.
 In the supervised learning problems above,
-a special feature is designated as the prediction *target*,
-(sometimes called the *label* or *dependent variable*).
-The given features from which the model must make its predictions
-can then simply be called the *features*,
-(or often, the *inputs*, *covariates*, or *independent variables*).
+the thing to predict
+is a special attribute 
+that is designated as
+the *label*.
+
 
 If we were working with image data,
 each individual photograph might constitute an *example*,
@@ -332,7 +336,7 @@ On our way to discussing deep neural networks,
 we will discuss some more traditional methods.
 
 
-###  Objective functions
+### Loss functions
 
 Earlier, we introduced machine learning as "learning from experience".
 By *learning* here, we mean *improving* at some task over time.
@@ -405,7 +409,6 @@ In short, at each step, they check to see, for each parameter,
 which way the training set loss would move
 if you perturbed that parameter just a small amount.
 They then update the parameter in the direction that reduces the loss.
-
 
 ## Kinds of Machine Learning Problems
 
