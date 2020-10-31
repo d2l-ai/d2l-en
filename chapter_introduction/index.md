@@ -213,8 +213,8 @@ and we
 gave a hand-wavy sense of how we might train
 a model to approximate a mapping from snippets to classifications.
 This sort of problem, 
-where we try to predict a designated unknown *label*
-based on known *inputs*, 
+where we try to predict a designated unknown label
+based on known inputs
 given a dataset consisting of examples
 for which the labels are known, 
 is called *supervised learning*.
@@ -235,9 +235,10 @@ We could lose hundreds of pages pondering what precisely constitutes data,
 but for now, we will err on the practical side
 and focus on the key properties to be concerned with.
 Generally, we are concerned with a collection of examples.
-In order to work with data usefully, we typically
+In order to work with data usefully, 
+we typically
 need to come up with a suitable numerical representation.
-Each *example* typically consists of a collection
+Each *example* typically consists of a set
 of attributes called *features*,
 from which the model must make its predictions.
 In the supervised learning problems above,
@@ -248,35 +249,38 @@ the *label*.
 
 
 If we were working with image data,
-each individual photograph might constitute an *example*,
+each individual photograph might constitute an example,
 each represented by an ordered list of numerical values
 corresponding to the brightness of each pixel.
 A $200\times 200$ color photograph would consist of $200\times200\times3=120000$
 numerical values, corresponding to the brightness
 of the red, green, and blue channels for each spatial location.
-In a more traditional task, we might try to predict
+In another traditional task, we might try to predict
 whether or not a patient will survive,
-given a standard set of features such as age, vital signs, diagnoses, etc.
+given a standard set of features such as
+age, vital signs, and diagnoses.
 
 When every example is characterized by the same number of numerical values,
-we say that the data consists of *fixed-length* vectors
-and we describe the (constant) length of the vectors
+we say that the data consist of fixed-length vectors
+and we describe the constant length of the vectors
 as the *dimensionality* of the data.
 As you might imagine, fixed-length can be a convenient property.
 If we wanted to train a model to recognize cancer in microscopy images,
 fixed-length inputs mean we have one less thing to worry about.
 
-However, not all data can easily be represented as fixed-length vectors.
+However, not all data can easily be represented as 
+*fixed-length* vectors.
 While we might expect microscope images to come from standard equipment,
 we cannot expect images mined from the Internet
 to all show up with the same resolution or shape.
 For images, we might consider cropping them all to a standard size,
 but that strategy only gets us so far.
 We risk losing information in the cropped out portions.
-Moreover, text data resists fixed-length representations even more stubbornly.
+Moreover, text data resist fixed-length representations even more stubbornly.
 Consider the customer reviews left on e-commerce sites
-like Amazon, IMDB, or TripAdvisor.
-Some are short: "it stinks!". Others ramble for pages.
+such as Amazon, IMDB, and TripAdvisor.
+Some are short: "it stinks!". 
+Others ramble for pages.
 One major advantage of deep learning over traditional methods
 is the comparative grace with which modern models
 can handle *varying-length* data.
@@ -287,32 +291,35 @@ and rely less heavily on pre-conceived assumptions.
 The regime change from (comparatively) small to big data
 is a major contributor to the success of modern deep learning.
 To drive the point home, many of the most exciting models in deep learning do not work without large datasets.
-Some others work in the low-data regime,
+Some others work in the small data regime,
 but are no better than traditional approaches.
 
 Finally, it is not enough to have lots of data and to process it cleverly.
-We need the *right* data. If the data is full of mistakes,
+We need the *right* data. 
+If the data are full of mistakes,
 or if the chosen features are not predictive
-of the target quantity of interest, learning is going to fail.
-The situation is captured well by the cliché: *garbage in, garbage out*.
+of the target quantity of interest, 
+learning is going to fail.
+The situation is captured well by the cliché:
+*garbage in, garbage out*.
 Moreover, poor predictive performance is not the only potential consequence.
 In sensitive applications of machine learning,
-like predictive policing, resumé screening, and risk models used for lending,
+like predictive policing, resume screening, and risk models used for lending,
 we must be especially alert to the consequences of garbage data.
 One common failure mode occurs in datasets where some groups of people
 are unrepresented in the training data.
 Imagine applying a skin cancer recognition system in the wild
 that had never seen black skin before.
 Failure can also occur when the data
-does not merely under-represent some groups
-but reflects societal prejudices.
-For example, if past hiring decisions are used to train a predictive model
+do not merely under-represent some groups
+but reflect societal prejudices.
+For example, 
+if past hiring decisions are used to train a predictive model
 that will be used to screen resumes,
 then machine learning models could inadvertently
 capture and automate historical injustices.
 Note that this can all happen without the data scientist
 actively conspiring, or even being aware.
-
 
 ### Models
 
@@ -419,7 +426,8 @@ a list of things that we would like machine learning to do.
 Note that the objectives are complemented
 with a set of techniques of *how* to accomplish them,
 including types of data, models, training techniques, etc.
-The list below is just a sampling of the problems ML can tackle
+The list below is just a sampling of the problems machine learning
+can tackle
 to motivate the reader and provide us with some common language
 for when we talk about more problems throughout the book.
 
@@ -1489,7 +1497,7 @@ solutions to problems that were considered intractable previously.
   in the computer vision aspect of these problems.
   The rest is heavily tuned by engineers.
 
-Again, the above list barely scratches the surface of where machine learning has impacted practical applications. For instance, robotics, logistics, computational biology, particle physics, and astronomy owe some of their most impressive recent advances at least in parts to machine learning. ML is thus becoming a ubiquitous tool for engineers and scientists.
+Again, the above list barely scratches the surface of where machine learning has impacted practical applications. For instance, robotics, logistics, computational biology, particle physics, and astronomy owe some of their most impressive recent advances at least in parts to machine learning. Machine learning is thus becoming a ubiquitous tool for engineers and scientists.
 
 Frequently, the question of the AI apocalypse, or the AI singularity
 has been raised in non-technical articles on AI.
