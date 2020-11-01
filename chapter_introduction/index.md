@@ -709,21 +709,22 @@ Given the current state of computer vision,
 we can do this easily, with off-the-shelf tools.
 Nonetheless, no matter how accurate our model gets,
 we might find ourselves in trouble when the classifier
-encounters an image of the Town Musicians of Bremen.
+encounters an image of the *Town Musicians of Bremen* (a popular German fairy tale) 
+as in :numref:`fig_stackedanimals`.
 
-![A cat, a rooster, a dog and a donkey.](../img/stackedanimals.jpg)
+![A donkey, a dog, a cat, and a rooster.](../img/stackedanimals.jpg)
 :width:`300px`
-
+:label:`fig_stackedanimals`
 
 As you can see, there is a cat in the picture,
-and a rooster, a dog, a donkey, and a bird,
+and a rooster, a dog, and a donkey,
 with some trees in the background.
 Depending on what we want to do with our model
 ultimately, treating this as a binary classification problem
 might not make a lot of sense.
 Instead, we might want to give the model the option of
 saying the image depicts a cat *and* a dog *and* a donkey
-*and* a rooster *and* a bird.
+*and* a rooster.
 
 The problem of learning to predict classes that are
 *not mutually exclusive* is called multi-label classification.
