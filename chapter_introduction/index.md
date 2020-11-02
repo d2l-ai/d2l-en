@@ -712,7 +712,7 @@ we might find ourselves in trouble when the classifier
 encounters an image of the *Town Musicians of Bremen* (a popular German fairy tale) 
 as in :numref:`fig_stackedanimals`.
 
-![A donkey, a dog, a cat, and a rooster.](../img/stackedanimals.jpg)
+![A donkey, a dog, a cat, and a rooster.](../img/stackedanimals.png)
 :width:`300px`
 :label:`fig_stackedanimals`
 
