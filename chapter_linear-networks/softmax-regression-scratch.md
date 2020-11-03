@@ -300,7 +300,7 @@ that is accessed via the data iterator `data_iter`.
 def evaluate_accuracy(net, data_iter):  #@save
     """Compute the accuracy for a model on a dataset."""
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
-    for _, (X, y) in enumerate(data_iter):
+    for X, y in data_iter:
         metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 ```
@@ -312,7 +312,7 @@ def evaluate_accuracy(net, data_iter):  #@save
     if isinstance(net, torch.nn.Module):
         net.eval()  # Set the model to evaluation mode
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
-    for _, (X, y) in enumerate(data_iter):
+    for X, y in data_iter:
         metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 ```
