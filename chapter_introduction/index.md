@@ -853,7 +853,8 @@ incentives, and feedback loops, are important open research questions.
 
 So far, we have looked at problems where we have
 some fixed number of inputs and produce a fixed number of outputs.
-Before we considered predicting home prices from a fixed set of features: square footage, number of bedrooms,
+For example,
+we considered predicting house prices from a fixed set of features: square footage, number of bedrooms,
 number of bathrooms, walking time to downtown.
 We also discussed mapping from an image (of fixed dimension)
 to the predicted probabilities that it belongs to each
@@ -884,11 +885,13 @@ and just make its predictions based on the most recent measurements.
 These problems are among the most exciting applications of machine learning
 and they are instances of *sequence learning*.
 They require a model to either ingest sequences of inputs
-or to emit sequences of outputs (or both!).
-These latter problems are sometimes referred to as ``seq2seq`` problems.  Language translation is a ``seq2seq`` problem.
-Transcribing text from the spoken speech is also a ``seq2seq`` problem.
+or to emit sequences of outputs (or both).
+Specifically,
+*sequence to sequence learning* considers problems
+where input and output are both variable-length sequences,
+such as machine translation and transcribing text from the spoken speech.
 While it is impossible to consider all types of sequence transformations,
-a number of special cases are worth mentioning:
+the following special cases are worth mentioning.
 
 **Tagging and Parsing**. This involves annotating a text sequence with attributes.
 In other words, the number of inputs and outputs is essentially the same.
@@ -898,7 +901,7 @@ In general, the goal is to decompose and annotate text based on structural
 and grammatical assumptions to get some annotation.
 This sounds more complex than it actually is.
 Below is a very simple example of annotating a sentence
-with tags indicating which words refer to named entities.
+with tags indicating which words refer to named entities (tagged as "Ent").
 
 ```text
 Tom has dinner in Washington with Sally.
@@ -906,24 +909,25 @@ Ent  -    -    -     Ent      -    Ent
 ```
 
 
-**Automatic Speech Recognition**. With speech recognition, the input sequence $x$
-is an audio recording of a speaker (shown in :numref:`fig_speech`), and the output $y$
+**Automatic Speech Recognition**. With speech recognition, the input sequence
+is an audio recording of a speaker (shown in :numref:`fig_speech`), and the output 
 is the textual transcript of what the speaker said.
 The challenge is that there are many more audio frames
 (sound is typically sampled at 8kHz or 16kHz)
 than text, i.e., there is no 1:1 correspondence between audio and text,
-since thousands of samples correspond to a single spoken word.
-These are ``seq2seq`` problems where the output is much shorter than the input.
+since thousands of samples may
+correspond to a single spoken word.
+These are sequence to sequence learning problems where the output is much shorter than the input.
 
-![`-D-e-e-p- L-ea-r-ni-ng-`](../img/speech.png)
+![`-D-e-e-p- L-ea-r-ni-ng-` in an audio recording.](../img/speech.png)
 :width:`700px`
 :label:`fig_speech`
 
-**Text to Speech**. Text-to-Speech (TTS) is the inverse of speech recognition.
-In other words, the input $x$ is text
-and the output $y$ is an audio file.
-In this case, the output is *much longer* than the input.
-While it is easy for *humans* to recognize a bad audio file,
+**Text to Speech**. This is the inverse of automatic speech recognition.
+In other words, the input is text
+and the output is an audio file.
+In this case, the output is much longer than the input.
+While it is easy for humans to recognize a bad audio file,
 this is not quite so trivial for computers.
 
 **Machine Translation**. Unlike the case of speech recognition, where corresponding
@@ -945,11 +949,12 @@ Wrong alignment:  Did you yourself already this excellent tutorial looked-at?
 
 Many related problems pop up in other learning tasks.
 For instance, determining the order in which a user
-reads a Webpage is a two-dimensional layout analysis problem.
+reads a webpage is a two-dimensional layout analysis problem.
 Dialogue problems exhibit all kinds of additional complications,
 where determining what to say next requires taking into account
 real-world knowledge and the prior state of the conversation
-across long temporal distances. This is an active area of research.
+across long temporal distances.
+These are active areas of research.
 
 
 ### Unsupervised learning
