@@ -758,15 +758,17 @@ has [hosted competitions](http://bioasq.org/) to do precisely this.
 Sometimes we do not just want to assign each example to a bucket
 or to a real value. In the field of information retrieval,
 we want to impose a ranking on a set of items.
-Take web search for example, the goal is less to determine whether
+Take web search for an example. 
+The goal is less to determine whether
 a particular page is relevant for a query, but rather,
-which one of the plethora of search results is *most relevant*
+which one of the plethora of search results is
+most relevant
 for a particular user.
 We really care about the ordering of the relevant search results
 and our learning algorithm needs to produce ordered subsets
 of elements from a larger set.
 In other words, if we are asked to produce the first 5 letters from the alphabet, there is a difference
-between returning ``A B C D E`` and ``C A B E D``.
+between returning "A B C D E" and "C A B E D".
 Even if the result set is the same,
 the ordering within the set matters.
 
@@ -785,8 +787,6 @@ Nowadays, search engines use machine learning and behavioral models
 to obtain query-dependent relevance scores.
 There are entire academic conferences devoted to this subject.
 
-
-
 #### Recommender Systems
 :label:`subsec_recommender_systems`
 
@@ -794,43 +794,51 @@ Recommender systems are another problem setting
 that is related to search and ranking.
 The problems are similar insofar as the goal
 is to display a set of relevant items to the user.
-The main difference is the emphasis on *personalization*
+The main difference is the emphasis on
+*personalization*
 to specific users in the context of recommender systems.
 For instance, for movie recommendations,
-the results page for a SciFi fan and the results page
+the results page for a science fiction fan
+and the results page
 for a connoisseur of Peter Sellers comedies might differ significantly.
 Similar problems pop up in other recommendation settings,
-e.g., for retail products, music, or news recommendation.
+e.g., for retail products, music, and news recommendation.
 
 In some cases, customers provide explicit feedback communicating
 how much they liked a particular product
-(e.g., the product ratings and reviews on Amazon, IMDB, GoodReads, etc.).
+(e.g., the product ratings and reviews on Amazon, IMDb, and GoodReads).
 In some other cases, they provide implicit feedback,
 e.g., by skipping titles on a playlist,
 which might indicate dissatisfaction but might just indicate
 that the song was inappropriate in context.
 In the simplest formulations, these systems are trained
-to estimate some score $y_{ij}$, such as an estimated rating
-or the probability of purchase, given a user $u_i$ and product $p_j$.
+to estimate some score,
+such as an estimated rating
+or the probability of purchase,
+given a user and an item.
 
-Given such a model, then for any given user,
-we could retrieve the set of objects with the largest scores $y_{ij}$,
-which could then be recommended to the customer.
+Given such a model, 
+for any given user,
+we could retrieve the set of objects with the largest scores,
+which could then be recommended to the user.
 Production systems are considerably more advanced and take
 detailed user activity and item characteristics into account
 when computing such scores. :numref:`fig_deeplearning_amazon` is an example
-of deep learning books recommended by Amazon based on personalization algorithms tuned to capture the author's preferences.
+of deep learning books recommended by Amazon based on personalization algorithms tuned to capture one's preferences.
 
 ![Deep learning books recommended by Amazon.](../img/deeplearning-amazon.jpg)
 :label:`fig_deeplearning_amazon`
 
-Despite their tremendous economic value, recommendation systems
+Despite their tremendous economic value,
+recommendation systems
 naively built on top of predictive models
 suffer some serious conceptual flaws.
-To start, we only observe *censored feedback*.
-Users preferentially rate movies that they feel strongly about:
-you might notice that items receive many 5 and 1 star ratings
-but that there are conspicuously few 3-star ratings.
+To start, we only observe *censored feedback*:
+users preferentially rate movies that they feel strongly about.
+For example, 
+on a five-point scale,
+you might notice that items receive many five and one star ratings
+but that there are conspicuously few three-star ratings.
 Moreover, current purchase habits are often a result
 of the recommendation algorithm currently in place,
 but learning algorithms do not always take this detail into account.
