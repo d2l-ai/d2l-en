@@ -549,7 +549,7 @@ x, y = np.meshgrid(np.linspace(-2, 2, 101),
 z = x*np.exp(- x**2 - y**2)
 
 # Compute approximating quadratic with gradient and Hessian at (1, 0)
-w = np.exp(-1)*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
+w = np.exp(-1)*(-1 - (x + 1) + (x + 1)**2 + y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
