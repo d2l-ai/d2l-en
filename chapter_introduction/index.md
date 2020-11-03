@@ -698,10 +698,9 @@ For example, rattle snakes and garter snakes
 might be close on the phylogenetic tree,
 but mistaking a rattler for a garter could be deadly.
 
-
 #### Tagging
 
-Some classification problems do not fit neatly
+Some classification problems fit neatly
 into the binary or multiclass classification setups.
 For example, we could train a normal binary classifier
 to distinguish cats from dogs.
@@ -709,31 +708,32 @@ Given the current state of computer vision,
 we can do this easily, with off-the-shelf tools.
 Nonetheless, no matter how accurate our model gets,
 we might find ourselves in trouble when the classifier
-encounters an image of the *Town Musicians of Bremen* (a popular German fairy tale) 
-as in :numref:`fig_stackedanimals`.
+encounters an image of the *Town Musicians of Bremen*,
+a popular German fairy tale featuring four animals
+in :numref:`fig_stackedanimals`.
 
 ![A donkey, a dog, a cat, and a rooster.](../img/stackedanimals.png)
 :width:`300px`
 :label:`fig_stackedanimals`
 
-As you can see, there is a cat in the picture,
+As you can see, there is a cat in :numref:`fig_stackedanimals`,
 and a rooster, a dog, and a donkey,
 with some trees in the background.
 Depending on what we want to do with our model
 ultimately, treating this as a binary classification problem
 might not make a lot of sense.
 Instead, we might want to give the model the option of
-saying the image depicts a cat *and* a dog *and* a donkey
+saying the image depicts a cat, a dog, a donkey,
 *and* a rooster.
 
 The problem of learning to predict classes that are
-*not mutually exclusive* is called multi-label classification.
+not mutually exclusive is called *multi-label classification*.
 Auto-tagging problems are typically best described
 as multi-label classification problems.
-Think of the tags people might apply to posts on a tech blog,
+Think of the tags people might apply to posts on a technical blog,
 e.g., "machine learning", "technology", "gadgets",
-"programming languages", "linux", "cloud computing", "AWS".
-A typical article might have 5-10 tags applied
+"programming languages", "Linux", "cloud computing", "AWS".
+A typical article might have 5--10 tags applied
 because these concepts are correlated.
 Posts about "cloud computing" are likely to mention "AWS"
 and posts about "machine learning" could also deal
@@ -745,14 +745,13 @@ because it allows researchers to do exhaustive reviews of the literature.
 At the National Library of Medicine, a number of professional annotators
 go over each article that gets indexed in PubMed
 to associate it with the relevant terms from MeSH,
-a collection of roughly 28k tags.
+a collection of roughly 28000 tags.
 This is a time-consuming process and the
-annotators typically have a one year lag between archiving and tagging.
+annotators typically have a one-year lag between archiving and tagging.
 Machine learning can be used here to provide provisional tags
 until each article can have a proper manual review.
 Indeed, for several years, the BioASQ organization
-has [hosted a competition](http://bioasq.org/) to do precisely this.
-
+has [hosted competitions](http://bioasq.org/) to do precisely this.
 
 #### Search 
 
