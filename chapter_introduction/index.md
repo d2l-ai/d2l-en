@@ -959,9 +959,9 @@ These are active areas of research.
 
 ### Unsupervised learning
 
-All the examples so far were related to *Supervised Learning*,
+All the examples so far were related to supervised learning,
 i.e., situations where we feed the model a giant dataset
-containing both the features and corresponding target values.
+containing both the features and corresponding label values.
 You could think of the supervised learner as having
 an extremely specialized job and an extremely banal boss.
 The boss stands over your shoulder and tells you exactly what to do
@@ -973,20 +973,22 @@ and imitate their actions.
 
 In a completely opposite way, it could be frustrating
 to work for a boss who has no idea what they want you to do.
-However, if you plan to be a data scientist, you'd better get used to it.
-The boss might just hand you a giant dump of data and tell you to *do some data science with it!* This sounds vague because it is.
+However, if you plan to be a data scientist, you had better get used to it.
+The boss might just hand you a giant dump of data and tell you to *do some data science with it!* 
+This sounds vague because it is.
 We call this class of problems *unsupervised learning*,
 and the type and number of questions we could ask
 is limited only by our creativity.
-We will address a number of unsupervised learning techniques
-in later chapters. To whet your appetite for now,
-we describe a few of the questions you might ask:
+We will address unsupervised learning techniques
+in later chapters. 
+To whet your appetite for now,
+we describe a few of the following questions you might ask.
 
 * Can we find a small number of prototypes
 that accurately summarize the data?
 Given a set of photos, can we group them into landscape photos,
-pictures of dogs, babies, cats, mountain peaks, etc.?
-Likewise, given a collection of users' browsing activity,
+pictures of dogs, babies, cats, and mountain peaks?
+Likewise, given a collection of users' browsing activities,
 can we group them into users with similar behavior?
 This problem is typically known as *clustering*.
 * Can we find a small number of parameters
@@ -996,29 +998,27 @@ by velocity, diameter, and mass of the ball.
 Tailors have developed a small number of parameters
 that describe human body shape fairly accurately
 for the purpose of fitting clothes.
-These problems are referred to as *subspace estimation* problems.
+These problems are referred to as *subspace estimation*.
 If the dependence is linear, it is called *principal component analysis*.
 * Is there a representation of (arbitrarily structured) objects
 in Euclidean space (i.e., the space of vectors in $\mathbb{R}^n$)
 such that symbolic properties can be well matched?
-This is called *representation learning* and it is used
-to describe entities and their relations,
-such as Rome $-$ Italy $+$ France $=$ Paris.
+This is called *representation learning* and it can be used to describe entities and their relations,
+such as "Rome" $-$ "Italy" $+$ "France" $=$ "Paris".
 * Is there a description of the root causes
 of much of the data that we observe?
 For instance, if we have demographic data
 about house prices, pollution, crime, location,
-education, salaries, etc., can we discover
+education, and salaries, can we discover
 how they are related simply based on empirical data?
 The fields concerned with *causality* and
 *probabilistic graphical models* address this problem.
 * Another important and exciting recent development in unsupervised learning
-is the advent of *generative adversarial networks* (GANs).
+is the advent of *generative adversarial networks*.
 These give us a procedural way to synthesize data,
 even complicated structured data like images and audio.
 The underlying statistical mechanisms are tests
 to check whether real and fake data are the same.
-We will devote a few notebooks to them.
 
 
 ### Interacting with an Environment
