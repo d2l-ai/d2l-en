@@ -639,7 +639,7 @@ class DecoderBlock(nn.Module):
             batch_size, seq_len, _ = X.shape
             # Shape: (batch_size, seq_len), the values in the j-th column
             # are j+1
-            valid_len = torch.arange(1, seq_len + 1, device=X.device).repeat(batch_size,1)
+            valid_len = torch.arange(1, seq_len + 1, device=X.device).repeat(batch_size, 1)
         else:
             valid_len = None
 
