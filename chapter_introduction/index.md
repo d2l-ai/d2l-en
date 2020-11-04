@@ -1036,7 +1036,7 @@ this is sometimes called *offline learning*.
 For supervised learning,
 the process by considering data collection from an environment looks like :numref:`fig_data_collection`.
 
-![Collect data for supervised learning from an environment.](../img/data-collection.svg)
+![Collecting data for supervised learning from an environment.](../img/data-collection.svg)
 :label:`fig_data_collection`
 
 This simplicity of offline learning has its charms.
@@ -1176,21 +1176,24 @@ When there is no state, just a set of available actions
 with initially unknown rewards, this problem
 is the classic *multi-armed bandit problem*.
 
-
-
 ## Roots
 
-Deep learning provides powerful tools
-for solving a diverse set of 
-machine learning problems.
+We have just reviewed
+a small subset of problems that machine learning 
+can address.
+For a diverse set of machine learning problems,
+deep learning provides powerful tools for solving them.
 Although many deep learning methods
 are recent inventions,
+the core idea of programming with data and neural networks (upon which deep learning is based)
+has been studied for centuries.
+In fact,
 humans have held the desire to analyze data
-and to predict future outcomes for centuries.
-In fact, much of natural science has its roots in this.
+and to predict future outcomes for long
+and much of natural science has its roots in this.
 For instance, the Bernoulli distribution is named after
-[Jacob Bernoulli (1655-1705)](https://en.wikipedia.org/wiki/Jacob_Bernoulli), and the Gaussian distribution was discovered
-by [Carl Friedrich Gauss (1777-1855)](https://en.wikipedia.org/wiki/Carl_Friedrich_Gauss).
+[Jacob Bernoulli (1655--1705)](https://en.wikipedia.org/wiki/Jacob_Bernoulli), and the Gaussian distribution was discovered
+by [Carl Friedrich Gauss (1777--1855)](https://en.wikipedia.org/wiki/Carl_Friedrich_Gauss).
 He invented, for instance, the least mean squares algorithm,
 which is still used today for countless problems
 from insurance calculations to medical diagnostics.
@@ -1200,15 +1203,15 @@ relating current and voltage in a resistor
 is perfectly described by a linear model.
 
 Even in the middle ages, mathematicians had a keen intuition of estimates.
-For instance, the geometry book of [Jacob Köbel (1460-1533)](https://www.maa.org/press/periodicals/convergence/mathematical-treasures-jacob-kobels-geometry) illustrates
+For instance, the geometry book of [Jacob Köbel (1460--1533)](https://www.maa.org/press/periodicals/convergence/mathematical-treasures-jacob-kobels-geometry) illustrates
 averaging the length of 16 adult men's feet to obtain the average foot length.
 
-![Estimating the length of a foot](../img/koebel.jpg)
+![Estimating the length of a foot.](../img/koebel.jpg)
 :width:`500px`
 :label:`fig_koebel`
 
 :numref:`fig_koebel` illustrates how this estimator works.
-The 16 adult men were asked to line up in a row, when leaving church.
+The 16 adult men were asked to line up in a row, when leaving the church.
 Their aggregate length was then divided by 16
 to obtain an estimate for what now amounts to 1 foot.
 This "algorithm" was later improved to deal with misshapen feet---the
@@ -1217,22 +1220,25 @@ averaging only over the remainder.
 This is one of the earliest examples of the trimmed mean estimate.
 
 Statistics really took off with the collection and availability of data.
-One of its titans, [Ronald Fisher (1890-1962)](https://en.wikipedia.org/wiki/Ronald_Fisher), contributed significantly to its theory
+One of its titans, [Ronald Fisher (1890--1962)](https://en.wikipedia.org/wiki/Ronald_Fisher),
+contributed significantly to its theory
 and also its applications in genetics.
-Many of his algorithms (such as Linear Discriminant Analysis)
-and formula (such as the Fisher Information Matrix)
-are still in frequent use today (even the Iris dataset
-that he released in 1936 is still used sometimes
-to illustrate machine learning algorithms).
-Fisher was also a proponent of eugenics,
+Many of his algorithms (such as linear discriminant analysis)
+and formula (such as the Fisher information matrix)
+are still in frequent use today. 
+In fact,
+even the Iris dataset
+that Fisher released in 1936 is still used sometimes
+to illustrate machine learning algorithms.
+He was also a proponent of eugenics,
 which should remind us that the morally dubious use of data science
 has as long and enduring a history as its productive use
 in industry and the natural sciences.
 
-A second influence for machine learning came from Information Theory
-[(Claude Shannon, 1916-2001)](https://en.wikipedia.org/wiki/Claude_Shannon) and the Theory of computation via [Alan Turing (1912-1954)](https://en.wikipedia.org/wiki/Alan_Turing).
+A second influence for machine learning came from information theory
+[(Claude Shannon, 1916--2001)](https://en.wikipedia.org/wiki/Claude_Shannon) and the theory of computation via [Alan Turing (1912--1954)](https://en.wikipedia.org/wiki/Alan_Turing).
 Turing posed the question "can machines think?”
-in his famous paper [Computing machinery and intelligence](https://en.wikipedia.org/wiki/Computing_Machinery_and_Intelligence) (Mind, October 1950).
+in his famous paper *Computing Machinery and Intelligence* :cite:`Turing.1950`.
 In what he described as the Turing test, a machine
 can be considered intelligent if it is difficult
 for a human evaluator to distinguish between the replies
@@ -1243,8 +1249,8 @@ After all, humans clearly exhibit intelligent behavior.
 It is thus only reasonable to ask whether one could explain
 and possibly reverse engineer this capacity.
 One of the oldest algorithms inspired in this fashion
-was formulated by [Donald Hebb (1904-1985)](https://en.wikipedia.org/wiki/Donald_O._Hebb).
-In his groundbreaking book The Organization of Behavior :cite:`Hebb.Hebb.1949`,
+was formulated by [Donald Hebb (1904--1985)](https://en.wikipedia.org/wiki/Donald_O._Hebb).
+In his groundbreaking book *The Organization of Behavior* :cite:`Hebb.Hebb.1949`,
 he posited that neurons learn by positive reinforcement.
 This became known as the Hebbian learning rule.
 It is the prototype of Rosenblatt's perceptron learning algorithm
@@ -1266,20 +1272,21 @@ that can be found in most networks today:
 
 After initial rapid progress, research in neural networks
 languished from around 1995 until 2005.
-This was due to a number of reasons.
-Training a network is computationally very expensive.
-While RAM was plentiful at the end of the past century,
+This was mainly due to two reasons.
+First, training a network is computationally very expensive.
+While random-access memory was plentiful at the end of the past century,
 computational power was scarce.
 Second, datasets were relatively small.
 In fact, Fisher's Iris dataset from 1932
 was a popular tool for testing the efficacy of algorithms.
-MNIST with its 60,000 handwritten digits was considered huge.
+MNIST with its 60000 handwritten digits was considered huge.
 
 Given the scarcity of data and computation,
-strong statistical tools such as Kernel Methods,
-Decision Trees and Graphical Models proved empirically superior.
+strong statistical tools such as kernel methods,
+decision trees and graphical models proved empirically superior.
 Unlike neural networks, they did not require weeks to train
 and provided predictable results with strong theoretical guarantees.
+
 
 ## The Road to Deep Learning
 
@@ -1304,7 +1311,7 @@ This is best illustrated in :numref:`tab_intro_decade`.
 |2020|1 T (social network)|100 GB|1 PF (Nvidia DGX-2)|
 :label:`tab_intro_decade`
 
-It is evident that RAM has not kept pace with the growth in data.
+It is evident that random-access memory has not kept pace with the growth in data.
 At the same time, the increase in computational power
 has outpaced that of the data available.
 This means that statistical models needed to become more memory efficient
