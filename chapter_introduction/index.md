@@ -1240,7 +1240,7 @@ A second influence for machine learning came from information theory
 Turing posed the question "can machines think?”
 in his famous paper *Computing Machinery and Intelligence* :cite:`Turing.1950`.
 In what he described as the Turing test, a machine
-can be considered intelligent if it is difficult
+can be considered *intelligent* if it is difficult
 for a human evaluator to distinguish between the replies
 from a machine and a human based on textual interactions.
 
@@ -1438,7 +1438,7 @@ putting it firmly into the grasp of programmers.
 
 ## Success Stories
 
-Machine learning has a long history of delivering results
+Artificial intelligence has a long history of delivering results
 that would be difficult to accomplish otherwise.
 For instance, 
 the mail sorting systems
@@ -1455,7 +1455,7 @@ Machine learning feeds search, recommendation, personalization,
 and ranking on the Internet.
 In other words, machine learning is pervasive, albeit often hidden from sight.
 
-It is only recently that machine learning
+It is only recently that artificial intelligence
 has been in the limelight, mostly due to
 solutions to problems
 that were considered intractable previously
@@ -1464,7 +1464,7 @@ Many of such advances are attributed to deep learning.
 
 * Intelligent assistants, such as Apple's Siri, Amazon's Alexa, and Google's
   assistant, are able to answer spoken questions with a reasonable degree of
-  accuracy. This includes menial tasks such as turning on light switches (a boon to the disabled) up to making barber's appointments and offering phone support dialog. This is likely the most noticeable sign that machine learning is affecting our lives.
+  accuracy. This includes menial tasks such as turning on light switches (a boon to the disabled) up to making barber's appointments and offering phone support dialog. This is likely the most noticeable sign that artificial intelligence is affecting our lives.
 * A key ingredient in digital assistants is the ability to recognize speech
   accurately. Gradually the accuracy of such systems has increased to the point
   where they reach human parity for certain
@@ -1487,7 +1487,7 @@ Many of such advances are attributed to deep learning.
   structured strategies :cite:`Brown.Sandholm.2017`.
   This illustrates the impressive progress in games
   and the fact that advanced algorithms played a crucial part in them.
-* Another indication of progress in machine learning is the advent of self-driving cars
+* Another indication of progress in artificial intelligence is the advent of self-driving cars
   and trucks. While full autonomy is not quite within reach yet,
   excellent progress has been made in this direction,
   with companies such as Tesla, NVIDIA,
@@ -1500,20 +1500,20 @@ Many of such advances are attributed to deep learning.
 
 Again, the above list barely scratches the surface of where machine learning has impacted practical applications. For instance, robotics, logistics, computational biology, particle physics, and astronomy owe some of their most impressive recent advances at least in parts to machine learning. Machine learning is thus becoming a ubiquitous tool for engineers and scientists.
 
-Frequently, the question of the AI apocalypse, or the AI singularity
-has been raised in non-technical articles on AI.
+Frequently, the question of the artificial intelligence apocalypse, or the artificial intelligence singularity
+has been raised in non-technical articles on artificial intelligence.
 The fear is that somehow machine learning systems
 will become sentient and decide independently from their programmers
 (and masters) about things that directly affect the livelihood of humans.
-To some extent, AI already affects the livelihood of humans
+To some extent, artificial intelligence already affects the livelihood of humans
 in an immediate way---creditworthiness is assessed automatically,
 autopilots mostly navigate vehicles, decisions about
 whether to grant bail use statistical data as input.
 More frivolously, we can ask Alexa to switch on the coffee machine.
 
-Fortunately, we are far from a sentient AI system
+Fortunately, we are far from a sentient artificial intelligence system
 that is ready to manipulate its human creators (or burn their coffee).
-First, AI systems are engineered, trained and deployed in a specific,
+First, artificial intelligence systems are engineered, trained and deployed in a specific,
 goal-oriented manner. While their behavior might give the illusion
 of general intelligence, it is a combination of rules, heuristics
 and statistical models that underlie the design.
@@ -1523,7 +1523,7 @@ reason about themselves, and that are able to modify,
 extend and improve their own architecture
 while trying to solve general tasks.
 
-A much more pressing concern is how AI is being used in our daily lives.
+A much more pressing concern is how artificial intelligence is being used in our daily lives.
 It is likely that many menial tasks fulfilled by truck drivers
 and shop assistants can and will be automated.
 Farm robots will likely reduce the cost for organic farming
