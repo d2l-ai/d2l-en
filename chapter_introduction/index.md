@@ -904,7 +904,7 @@ Below is a very simple example of annotating a sentence
 with tags indicating which words refer to named entities (tagged as "Ent").
 
 ```text
-Tom has dinner in Washington with Sally.
+Tom has dinner in Washington with Sally
 Ent  -    -    -     Ent      -    Ent
 ```
 
@@ -1020,11 +1020,11 @@ even complicated structured data like images and audio.
 The underlying statistical mechanisms are tests
 to check whether real and fake data are the same.
 
-
 ### Interacting with an Environment
 
-So far, we have not discussed where data actually comes from,
-or what actually *happens* when a machine learning model generates an output.
+So far, we have not discussed where data actually
+come from,
+or what actually happens when a machine learning model generates an output.
 That is because supervised learning and unsupervised learning
 do not address these issues in a very sophisticated way.
 In either case, we grab a big pile of data upfront,
@@ -1033,88 +1033,97 @@ without ever interacting with the environment again.
 Because all of the learning takes place
 after the algorithm is disconnected from the environment,
 this is sometimes called *offline learning*.
-For supervised learning, the process looks like :numref:`fig_data_collection`.
+For supervised learning,
+the process by considering data collection from an environment looks like :numref:`fig_data_collection`.
 
 ![Collect data for supervised learning from an environment.](../img/data-collection.svg)
 :label:`fig_data_collection`
 
 This simplicity of offline learning has its charms.
-The upside is we can worry about pattern recognition
+The upside is that
+we can worry about pattern recognition
 in isolation, without any distraction from these other problems.
 But the downside is that the problem formulation is quite limiting.
-If you are more ambitious, or if you grew up reading Asimov's Robot Series,
+If you are more ambitious, or if you grew up reading Asimov's Robot series,
 then you might imagine artificially intelligent bots capable
-not only of making predictions, but of taking actions in the world.
-We want to think about intelligent *agents*, not just predictive *models*.
-That means we need to think about choosing *actions*,
-not just making *predictions*. Moreover, unlike predictions,
+not only of making predictions, but also 
+of taking actions in the world.
+We want to think about intelligent *agents*, not just predictive models.
+This means that
+we need to think about choosing *actions*,
+not just making predictions.
+Moreover, unlike predictions,
 actions actually impact the environment.
 If we want to train an intelligent agent,
 we must account for the way its actions might
 impact the future observations of the agent.
 
-
 Considering the interaction with an environment
 opens a whole set of new modeling questions.
-Does the environment:
+The following are just a few examples.
 
-* Remember what we did previously?
-* Want to help us, e.g., a user reading text into a speech recognizer?
-* Want to beat us, i.e., an adversarial setting like spam filtering (against spammers) or playing a game (vs an opponent)?
-* Not care (as in many cases)?
-* Have shifting dynamics (does future data always resemble the past or do the patterns change over time, either naturally or in response to our automated tools)?
+* Does the environment remember what we did previously?
+* Does the environment want to help us, e.g., a user reading text into a speech recognizer?
+* Does the environment want to beat us, i.e., an adversarial setting like spam filtering (against spammers) or playing a game (vs. an opponent)?
+* Does the environment not care?
+* Does the environment have shifting dynamics? For example, does future data always resemble the past or do the patterns change over time, either naturally or in response to our automated tools?
 
 This last question raises the problem of *distribution shift*,
-(when training and test data are different).
+when training and test data are different.
 It is a problem that most of us have experienced
 when taking exams written by a lecturer,
-while the homeworks were composed by his TAs.
-We will briefly describe reinforcement learning and adversarial learning,
-two settings that explicitly consider interaction with an environment.
-
+while the homework was composed by his teaching assistants.
+Next, we will briefly describe reinforcement learning,
+a setting that explicitly considers interactions with an environment.
 
 ### Reinforcement Learning
 
 If you are interested in using machine learning
 to develop an agent that interacts with an environment
 and takes actions, then you are probably going to wind up
-focusing on *reinforcement learning* (RL).
+focusing on *reinforcement learning*.
 This might include applications to robotics,
-to dialogue systems, and even to developing AI for video games.
-*Deep reinforcement learning* (DRL), which applies
-deep neural networks to RL problems, has surged in popularity.
-The breakthrough [deep Q-network that beat humans at Atari games using only the visual input](https://www.wired.com/2015/02/google-ai-plays-atari-like-pros/),
-and the [AlphaGo program that dethroned the world champion at the board game Go](https://www.wired.com/2017/05/googles-alphago-trounces-humans-also-gives-boost/) are two prominent examples.
+to dialogue systems, 
+and even to developing artificial intelligence
+for video games.
+*Deep reinforcement learning*, which applies
+deep learning to reinforcement learning problems,
+has surged in popularity.
+The breakthrough deep Q-network that beat humans at Atari games using only the visual input,
+and the AlphaGo program that dethroned the world champion at the board game Go are two prominent examples.
 
 Reinforcement learning gives a very general statement of a problem,
-in which an agent interacts with an environment over a series of *time steps*.
-At each time step $t$, the agent receives some observation $o_t$
-from the environment and must choose an action $a_t$
+in which an agent interacts with an environment over a series of time steps.
+At each time step, 
+the agent receives some *observation* 
+from the environment and must choose an *action*
 that is subsequently transmitted back to the environment
 via some mechanism (sometimes called an actuator).
-Finally, the agent receives a reward $r_t$ from the environment.
+Finally, the agent receives a reward from the environment.
+This process is illustrated in :numref:`fig_rl-environment`.
 The agent then receives a subsequent observation,
 and chooses a subsequent action, and so on.
-The behavior of an RL agent is governed by a *policy*.
+The behavior of an reinforcement learning agent is governed by a policy.
 In short, a *policy* is just a function that maps
-from observations (of the environment) to actions.
+from observations of the environment to actions.
 The goal of reinforcement learning is to produce a good policy.
 
 ![The interaction between reinforcement learning and an environment.](../img/rl-environment.svg)
+:label:`fig_rl-environment`
 
-It is hard to overstate the generality of the RL framework.
-For example, we can cast any supervised learning problem as an RL problem.
+It is hard to overstate the generality of the reinforcement learning framework.
+For example, we can cast any supervised learning problem as a reinforcement learning problem.
 Say we had a classification problem.
-We could create an RL agent with one *action* corresponding to each class.
+We could create a reinforcement learning agent with one action corresponding to each class.
 We could then create an environment which gave a reward
 that was exactly equal to the loss function
-from the original supervised problem.
+from the original supervised learning problem.
 
-That being said, RL can also address many problems
+That being said, reinforcement learning can also address many problems
 that supervised learning cannot.
 For example, in supervised learning we always expect
 that the training input comes associated with the correct label.
-But in RL, we do not assume that for each observation,
+But in reinforcement learning, we do not assume that for each observation 
 the environment tells us the optimal action.
 In general, we just get some reward.
 Moreover, the environment may not even tell us which actions led to the reward.
@@ -1123,7 +1132,7 @@ Consider for example the game of chess.
 The only real reward signal comes at the end of the game
 when we either win, which we might assign a reward of 1,
 or when we lose, which we could assign a reward of -1.
-So reinforcement learners must deal with the *credit assignment problem*:
+So reinforcement learners must deal with the *credit assignment* problem:
 determining which actions to credit or blame for an outcome.
 The same goes for an employee who gets a promotion on October 11.
 That promotion likely reflects a large number
@@ -1149,9 +1158,6 @@ whether to *exploit* the best currently-known strategy as a policy,
 or to *explore* the space of strategies,
 potentially giving up some short-run reward in exchange for knowledge.
 
-
-#### MDPs, Bandits, and Friends
-
 The general reinforcement learning problem
 is a very general setting.
 Actions affect subsequent observations.
@@ -1160,10 +1166,10 @@ The environment may be either fully or partially observed.
 Accounting for all this complexity at once may ask too much of researchers.
 Moreover, not every practical problem exhibits all this complexity.
 As a result, researchers have studied a number of
-*special cases* of reinforcement learning problems.
+special cases of reinforcement learning problems.
 
 When the environment is fully observed,
-we call the RL problem a *Markov Decision Process* (MDP).
+we call the reinforcement learning problem a *Markov decision process*.
 When the state does not depend on the previous actions,
 we call the problem a *contextual bandit problem*.
 When there is no state, just a set of available actions
