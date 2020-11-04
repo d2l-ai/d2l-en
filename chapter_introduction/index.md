@@ -1438,54 +1438,56 @@ putting it firmly into the grasp of programmers.
 
 ## Success Stories
 
-Artificial Intelligence has a long history of delivering results
+Machine learning has a long history of delivering results
 that would be difficult to accomplish otherwise.
-For instance, mail is sorted using optical character recognition.
-These systems have been deployed since the 90s
-(this is, after all, the source of the famous MNIST and USPS sets of handwritten digits).
+For instance, 
+the mail sorting systems
+using optical character recognition
+have been deployed since the 1990s.
+This is, after all, the source of the famous MNIST dataset  of handwritten digits.
 The same applies to reading checks for bank deposits and scoring
 creditworthiness of applicants.
 Financial transactions are checked for fraud automatically.
 This forms the backbone of many e-commerce payment systems,
-such as PayPal, Stripe, AliPay, WeChat, Apple, Visa, MasterCard.
+such as PayPal, Stripe, AliPay, WeChat, Apple, Visa, and MasterCard.
 Computer programs for chess have been competitive for decades.
-Machine learning feeds search, recommendation, personalization
-and ranking on the Internet. In other words, artificial intelligence
-and machine learning are pervasive, albeit often hidden from sight.
+Machine learning feeds search, recommendation, personalization,
+and ranking on the Internet.
+In other words, machine learning is pervasive, albeit often hidden from sight.
 
-It is only recently that AI has been in the limelight, mostly due to
-solutions to problems that were considered intractable previously.
+It is only recently that machine learning
+has been in the limelight, mostly due to
+solutions to problems
+that were considered intractable previously
+and that are directly related to consumers.
+Many of such advances are attributed to deep learning.
 
-* Intelligent assistants, such as Apple's Siri, Amazon's Alexa, or Google's
-  assistant are able to answer spoken questions with a reasonable degree of
-  accuracy. This includes menial tasks such as turning on light switches (a boon to the disabled) up to making barber's appointments and offering phone support dialog. This is likely the most noticeable sign that AI is affecting our lives.
+* Intelligent assistants, such as Apple's Siri, Amazon's Alexa, and Google's
+  assistant, are able to answer spoken questions with a reasonable degree of
+  accuracy. This includes menial tasks such as turning on light switches (a boon to the disabled) up to making barber's appointments and offering phone support dialog. This is likely the most noticeable sign that machine learning is affecting our lives.
 * A key ingredient in digital assistants is the ability to recognize speech
   accurately. Gradually the accuracy of such systems has increased to the point
-  where they reach human parity :cite:`Xiong.Wu.Alleva.ea.2018` for certain
-  applications.
+  where they reach human parity for certain
+  applications :cite:`Xiong.Wu.Alleva.ea.2018`.
 * Object recognition likewise has come a long way. Estimating the object in a
-  picture was a fairly challenging task in 2010. On the ImageNet benchmark
-  :cite:`Lin.Lv.Zhu.ea.2010` achieved a top-5 error rate of 28%. By 2017,
-  :cite:`Hu.Shen.Sun.2018` reduced this error rate to 2.25%. Similarly, stunning
-  results have been achieved for identifying birds, or diagnosing skin cancer.
+  picture was a fairly challenging task in 2010. On the ImageNet benchmark researchers from NEC Labs and University of Illinois at Urbana-Champaign achieved a top-5 error rate of 28% :cite:`Lin.Lv.Zhu.ea.2010`. By 2017,
+  this error rate was reduced to 2.25% :cite:`Hu.Shen.Sun.2018`. Similarly, stunning
+  results have been achieved for identifying birds or diagnosing skin cancer.
 * Games used to be a bastion of human intelligence.
-  Starting from TDGammon [23], a program for playing Backgammon
-  using temporal difference (TD) reinforcement learning,
-  algorithmic and computational progress has led to algorithms
-  for a wide range of applications. Unlike Backgammon,
+  Starting from TD-Gammon, a program for playing backgammon using temporal difference reinforcement learning, algorithmic and computational progress has led to algorithms
+  for a wide range of applications. Unlike backgammon,
   chess has a much more complex state space and set of actions.
-  DeepBlue beat Garry Kasparov, Campbell et al.
-  :cite:`Campbell.Hoane-Jr.Hsu.2002`, using massive parallelism,
-  special purpose hardware and efficient search through the game tree.
+  DeepBlue beat Garry Kasparov using massive parallelism,
+  special-purpose hardware and efficient search through the game tree :cite:`Campbell.Hoane-Jr.Hsu.2002`.
   Go is more difficult still, due to its huge state space.
-  AlphaGo reached human parity in 2015, :cite:`Silver.Huang.Maddison.ea.2016` using Deep Learning combined with Monte Carlo tree sampling.
+  AlphaGo reached human parity in 2015, using deep learning combined with Monte Carlo tree sampling :cite:`Silver.Huang.Maddison.ea.2016`.
   The challenge in Poker was that the state space is
   large and it is not fully observed (we do not know the opponents'
   cards). Libratus exceeded human performance in Poker using efficiently
   structured strategies :cite:`Brown.Sandholm.2017`.
   This illustrates the impressive progress in games
   and the fact that advanced algorithms played a crucial part in them.
-* Another indication of progress in AI is the advent of self-driving cars
+* Another indication of progress in machine learning is the advent of self-driving cars
   and trucks. While full autonomy is not quite within reach yet,
   excellent progress has been made in this direction,
   with companies such as Tesla, NVIDIA,
