@@ -1084,7 +1084,7 @@ and takes actions, then you are probably going to wind up
 focusing on *reinforcement learning*.
 This might include applications to robotics,
 to dialogue systems, 
-and even to developing artificial intelligence
+and even to developing artificial intelligence (AI)
 for video games.
 *Deep reinforcement learning*, which applies
 deep learning to reinforcement learning problems,
@@ -1438,7 +1438,7 @@ putting it firmly into the grasp of programmers.
 
 ## Success Stories
 
-Artificial intelligence has a long history of delivering results
+AI has a long history of delivering results
 that would be difficult to accomplish otherwise.
 For instance, 
 the mail sorting systems
@@ -1455,7 +1455,7 @@ Machine learning feeds search, recommendation, personalization,
 and ranking on the Internet.
 In other words, machine learning is pervasive, albeit often hidden from sight.
 
-It is only recently that artificial intelligence
+It is only recently that AI
 has been in the limelight, mostly due to
 solutions to problems
 that were considered intractable previously
@@ -1464,7 +1464,7 @@ Many of such advances are attributed to deep learning.
 
 * Intelligent assistants, such as Apple's Siri, Amazon's Alexa, and Google's
   assistant, are able to answer spoken questions with a reasonable degree of
-  accuracy. This includes menial tasks such as turning on light switches (a boon to the disabled) up to making barber's appointments and offering phone support dialog. This is likely the most noticeable sign that artificial intelligence is affecting our lives.
+  accuracy. This includes menial tasks such as turning on light switches (a boon to the disabled) up to making barber's appointments and offering phone support dialog. This is likely the most noticeable sign that AI is affecting our lives.
 * A key ingredient in digital assistants is the ability to recognize speech
   accurately. Gradually the accuracy of such systems has increased to the point
   where they reach human parity for certain
@@ -1487,7 +1487,7 @@ Many of such advances are attributed to deep learning.
   structured strategies :cite:`Brown.Sandholm.2017`.
   This illustrates the impressive progress in games
   and the fact that advanced algorithms played a crucial part in them.
-* Another indication of progress in artificial intelligence is the advent of self-driving cars
+* Another indication of progress in AI is the advent of self-driving cars
   and trucks. While full autonomy is not quite within reach yet,
   excellent progress has been made in this direction,
   with companies such as Tesla, NVIDIA,
@@ -1500,20 +1500,20 @@ Many of such advances are attributed to deep learning.
 
 Again, the above list barely scratches the surface of where machine learning has impacted practical applications. For instance, robotics, logistics, computational biology, particle physics, and astronomy owe some of their most impressive recent advances at least in parts to machine learning. Machine learning is thus becoming a ubiquitous tool for engineers and scientists.
 
-Frequently, the question of the artificial intelligence apocalypse, or the artificial intelligence singularity
-has been raised in non-technical articles on artificial intelligence.
+Frequently, the question of the AI apocalypse, or the AI singularity
+has been raised in non-technical articles on AI.
 The fear is that somehow machine learning systems
 will become sentient and decide independently from their programmers
 (and masters) about things that directly affect the livelihood of humans.
-To some extent, artificial intelligence already affects the livelihood of humans
+To some extent, AI already affects the livelihood of humans
 in an immediate way---creditworthiness is assessed automatically,
 autopilots mostly navigate vehicles, decisions about
 whether to grant bail use statistical data as input.
 More frivolously, we can ask Alexa to switch on the coffee machine.
 
-Fortunately, we are far from a sentient artificial intelligence system
+Fortunately, we are far from a sentient AI system
 that is ready to manipulate its human creators (or burn their coffee).
-First, artificial intelligence systems are engineered, trained and deployed in a specific,
+First, AI systems are engineered, trained and deployed in a specific,
 goal-oriented manner. While their behavior might give the illusion
 of general intelligence, it is a combination of rules, heuristics
 and statistical models that underlie the design.
@@ -1523,7 +1523,7 @@ reason about themselves, and that are able to modify,
 extend and improve their own architecture
 while trying to solve general tasks.
 
-A much more pressing concern is how artificial intelligence is being used in our daily lives.
+A much more pressing concern is how AI is being used in our daily lives.
 It is likely that many menial tasks fulfilled by truck drivers
 and shop assistants can and will be automated.
 Farm robots will likely reduce the cost for organic farming
@@ -1599,7 +1599,7 @@ Lastly, the Deep Learning community prides itself of sharing tools across academ
 
 ## Summary
 
-* Machine learning studies how computer systems can leverage *experience* (often data) to improve performance at specific tasks. It combines ideas from statistics, data mining, artificial intelligence, and optimization. Often, it is used as a means of implementing artificially-intelligent solutions.
+* Machine learning studies how computer systems can leverage *experience* (often data) to improve performance at specific tasks. It combines ideas from statistics, data mining, AI, and optimization. Often, it is used as a means of implementing artificially-intelligent solutions.
 * As a class of machine learning, representational learning focuses on how to automatically find the appropriate way to represent data. This is often accomplished by a progression of learned transformations.
 * Much of the recent progress in deep learning has been triggered by an abundance of data arising from cheap sensors and Internet-scale applications, and by significant progress in computation, mostly through GPUs.
 * Whole system optimization is a key component in obtaining good performance. The availability of efficient deep learning frameworks has made design and implementation of this significantly easier.
@@ -1608,7 +1608,7 @@ Lastly, the Deep Learning community prides itself of sharing tools across academ
 
 1. Which parts of code that you are currently writing could be "learned", i.e., improved by learning and automatically determining design choices that are made in your code? Does your code include heuristic design choices?
 1. Which problems that you encounter have many examples for how to solve them, yet no specific way to automate them? These may be prime candidates for using deep learning.
-1. Viewing the development of artificial intelligence as a new industrial revolution, what is the relationship between algorithms and data? Is it similar to steam engines and coal (what is the fundamental difference)?
+1. Viewing the development of AI as a new industrial revolution, what is the relationship between algorithms and data? Is it similar to steam engines and coal (what is the fundamental difference)?
 1. Where else can you apply the end-to-end training approach (such as in :numref:`fig_ml_loop`)? Physics? Engineering? Econometrics?
 
 [Discussions](https://discuss.d2l.ai/t/22)
