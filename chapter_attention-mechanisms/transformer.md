@@ -148,8 +148,10 @@ class MultiHeadAttention(nn.Module):
         value = transpose_qkv(self.W_v(value), self.num_heads)
 
         if valid_len is not None:
-            valid_len = torch.repeat_interleave(
-                valid_len, repeats=self.num_heads, dim=0)
+            if valid_len.ndim == 1:
+              valid_len = valid_len.repeat(self.num_heads)
+            else:
+              valid_len = valid_len.repeat(self.num_heads, 1)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
@@ -637,11 +639,7 @@ class DecoderBlock(nn.Module):
             batch_size, seq_len, _ = X.shape
             # Shape: (batch_size, seq_len), the values in the j-th column
             # are j+1
-            valid_len = torch.repeat_interleave(torch.arange(
-                1, seq_len + 1, device=X.device), batch_size, dim=0)
-            # Convert valid_len to 2D
-            if valid_len.shape[0]!=X.shape[0]:
-                valid_len = valid_len.reshape(-1, X.shape[1])
+            valid_len = torch.arange(1, seq_len + 1, device=X.device).repeat(batch_size,1)
         else:
             valid_len = None
 
