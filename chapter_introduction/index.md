@@ -1279,7 +1279,7 @@ computational power was scarce.
 Second, datasets were relatively small.
 In fact, Fisher's Iris dataset from 1932
 was a popular tool for testing the efficacy of algorithms.
-MNIST with its 60000 handwritten digits was considered huge.
+The MNIST dataset with its 60000 handwritten digits was considered huge.
 
 Given the scarcity of data and computation,
 strong statistical tools such as kernel methods,
@@ -1290,10 +1290,13 @@ and provided predictable results with strong theoretical guarantees.
 
 ## The Road to Deep Learning
 
-Much of this changed with the ready availability of large amounts of data,
-due to the World Wide Web, the advent of companies serving
-hundreds of millions of users online, a dissemination of cheap,
-high-quality sensors, cheap data storage (Kryder's law),
+Much of this changed with 
+the ready availability of large amounts of data,
+due to the World Wide Web, 
+the advent of companies serving
+hundreds of millions of users online, 
+a dissemination of cheap, high-quality sensors, 
+cheap data storage (Kryder's law),
 and cheap computation (Moore's law), in particular in the form of GPUs, originally engineered for computer gaming.
 Suddenly algorithms and models that seemed computationally infeasible
 became relevant (and vice versa).
@@ -1301,7 +1304,7 @@ This is best illustrated in :numref:`tab_intro_decade`.
 
 :Dataset vs. computer memory and computational power
 
-|Decade|Dataset|Memory|Floating Point Calculations per Second|
+|Decade|Dataset|Memory|Floating point calculations per second|
 |:--|:-|:-|:-|
 |1970|100 (Iris)|1 KB|100 KF (Intel 8080)|
 |1980|1 K (House prices in Boston)|100 KB|1 MF (Intel 80186)|
@@ -1314,23 +1317,23 @@ This is best illustrated in :numref:`tab_intro_decade`.
 It is evident that random-access memory has not kept pace with the growth in data.
 At the same time, the increase in computational power
 has outpaced that of the data available.
-This means that statistical models needed to become more memory efficient
+This means that statistical models need to become more memory efficient
 (this is typically achieved by adding nonlinearities)
 while simultaneously being able to spend more time
-on optimizing these parameters, due to an increased compute budget.
+on optimizing these parameters, due to an increased computational budget.
 Consequently, the sweet spot in machine learning and statistics
-moved from (generalized) linear models and kernel methods to deep networks.
+moved from (generalized) linear models and kernel methods to deep neural networks.
 This is also one of the reasons why many of the mainstays
 of deep learning, such as multilayer perceptrons
 :cite:`McCulloch.Pitts.1943`, convolutional neural networks
-:cite:`LeCun.Bottou.Bengio.ea.1998`, Long Short-Term Memory
+:cite:`LeCun.Bottou.Bengio.ea.1998`, long short-term memory
 :cite:`Hochreiter.Schmidhuber.1997`,
 and Q-Learning :cite:`Watkins.Dayan.1992`,
 were essentially "rediscovered" in the past decade,
 after laying comparatively dormant for considerable time.
 
-The recent progress in statistical models, applications, and algorithms,
-has sometimes been likened to the Cambrian Explosion:
+The recent progress in statistical models, applications, and algorithms
+has sometimes been likened to the Cambrian explosion:
 a moment of rapid progress in the evolution of species.
 Indeed, the state of the art is not just a mere consequence
 of available resources, applied to decades old algorithms.
@@ -1338,39 +1341,40 @@ Note that the list below barely scratches the surface
 of the ideas that have helped researchers achieve tremendous progress
 over the past decade.
 
-* Novel methods for capacity control, such as Dropout
-  :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`
+
+* Novel methods for capacity control, such as *dropout*
+  :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`,
   have helped to mitigate the danger of overfitting.
   This was achieved by applying noise injection :cite:`Bishop.1995`
-  throughout the network, replacing weights by random variables
+  throughout the neural network, replacing weights by random variables
   for training purposes.
 * Attention mechanisms solved a second problem
   that had plagued statistics for over a century:
   how to increase the memory and complexity of a system without
   increasing the number of learnable parameters.
-  :cite:`Bahdanau.Cho.Bengio.2014` found an elegant solution
-  by using what can only be viewed as a learnable pointer structure.
-  Rather than having to remember an entire sentence, e.g.,
+  Researchers found an elegant solution
+  by using what can only be viewed as a learnable pointer structure :cite:`Bahdanau.Cho.Bengio.2014`.
+  Rather than having to remember an entire text sequence, e.g.,
   for machine translation in a fixed-dimensional representation,
   all that needed to be stored was a pointer to the intermediate state
   of the translation process. This allowed for significantly
-  increased accuracy for long sentences, since the model
-  no longer needed to remember the entire sentence before
-  commencing the generation of a new sentence.
-* Multi-stage designs, e.g., via the Memory Networks (MemNets)
-  :cite:`Sukhbaatar.Weston.Fergus.ea.2015` and the Neural Programmer-Interpreter :cite:`Reed.De-Freitas.2015`
-  allowed statistical modelers to describe iterative approaches to reasoning. These tools allow for an internal state of the deep network
+  increased accuracy for long sequences, since the model
+  no longer needed to remember the entire sequence before
+  commencing the generation of a new sequence.
+* Multi-stage designs, e.g., via the memory networks 
+  :cite:`Sukhbaatar.Weston.Fergus.ea.2015` and the neural programmer-interpreter :cite:`Reed.De-Freitas.2015`
+  allowed statistical modelers to describe iterative approaches to reasoning. These tools allow for an internal state of the deep neural network
   to be modified repeatedly, thus carrying out subsequent steps
   in a chain of reasoning, similar to how a processor
   can modify memory for a computation.
-* Another key development was the invention of GANs
+* Another key development was the invention of generative adversarial networks
   :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`.
   Traditionally, statistical methods for density estimation
   and generative models focused on finding proper probability distributions
   and (often approximate) algorithms for sampling from them.
   As a result, these algorithms were largely limited by the lack of
   flexibility inherent in the statistical models.
-  The crucial innovation in GANs was to replace the sampler
+  The crucial innovation in generative adversarial networks was to replace the sampler
   by an arbitrary algorithm with differentiable parameters.
   These are then adjusted in such a way that the discriminator
   (effectively a two-sample test) cannot distinguish fake from real data.
@@ -1384,7 +1388,7 @@ over the past decade.
   how the layout of a scene looks like :cite:`Park.Liu.Wang.ea.2019`.
 * In many cases, a single GPU is insufficient to process
   the large amounts of data available for training.
-  Over the past decade the ability to build parallel
+  Over the past decade the ability to build parallel and
   distributed training algorithms has improved significantly.
   One of the key challenges in designing scalable algorithms
   is that the workhorse of deep learning optimization,
@@ -1393,10 +1397,10 @@ over the past decade.
   At the same time, small batches limit the efficiency of GPUs.
   Hence, training on 1024 GPUs with a minibatch size of,
   say 32 images per batch amounts to an aggregate minibatch
-  of 32k images. Recent work, first by Li :cite:`Li.2017`,
+  of about 32000 images. Recent work, first by Li :cite:`Li.2017`,
   and subsequently by :cite:`You.Gitman.Ginsburg.2017`
-  and :cite:`Jia.Song.He.ea.2018` pushed the size up to 64k observations,
-  reducing training time for ResNet50 on ImageNet to less than 7 minutes.
+  and :cite:`Jia.Song.He.ea.2018` pushed the size up to 64000 observations,
+  reducing training time for the ResNet-50 model on the ImageNet dataset to less than 7 minutes.
   For comparison---initially training times were measured in the order of days.
 * The ability to parallelize computation has also contributed quite crucially
   to progress in reinforcement learning, at least whenever simulation is an
@@ -1407,7 +1411,7 @@ over the past decade.
   of how to achieve this in AlphaGo. In a nutshell,
   reinforcement learning works best if plenty of (state, action, reward) triples are available, i.e., whenever it is possible to try out lots of things to learn how they relate to each
   other. Simulation provides such an avenue.
-* Deep Learning frameworks have played a crucial role
+* Deep learning frameworks have played a crucial role
   in disseminating ideas. The first generation of frameworks
   allowing for easy modeling encompassed
   [Caffe](https://github.com/BVLC/caffe),
@@ -1415,21 +1419,20 @@ over the past decade.
   [Theano](https://github.com/Theano/Theano).
   Many seminal papers were written using these tools.
   By now, they have been superseded by
-  [TensorFlow](https://github.com/tensorflow/tensorflow),
-  often used via its high level API [Keras](https://github.com/keras-team/keras), [CNTK](https://github.com/Microsoft/CNTK), [Caffe 2](https://github.com/caffe2/caffe2), and [Apache MxNet](https://github.com/apache/incubator-mxnet). The third generation of tools, namely imperative tools for deep learning,
+  [TensorFlow](https://github.com/tensorflow/tensorflow) (often used via its high level API [Keras](https://github.com/keras-team/keras)), [CNTK](https://github.com/Microsoft/CNTK), [Caffe 2](https://github.com/caffe2/caffe2), and [Apache MXNet](https://github.com/apache/incubator-mxnet). The third generation of tools, namely imperative tools for deep learning,
   was arguably spearheaded by [Chainer](https://github.com/chainer/chainer),
   which used a syntax similar to Python NumPy to describe models.
   This idea was adopted by both [PyTorch](https://github.com/pytorch/pytorch),
   the [Gluon API](https://github.com/apache/incubator-mxnet) of MXNet, and [Jax](https://github.com/google/jax).
-  It is the latter group that this course uses to teach deep learning.
 
-The division of labor between systems researchers building better tools
-and statistical modelers building better networks
+
+The division of labor between system researchers building better tools
+and statistical modelers building better neural networks
 has greatly simplified things. For instance,
 training a linear logistic regression model
 used to be a nontrivial homework problem,
 worthy to give to new machine learning
-PhD students at Carnegie Mellon University in 2014.
+Ph.D. students at Carnegie Mellon University in 2014.
 By now, this task can be accomplished with less than 10 lines of code,
 putting it firmly into the grasp of programmers.
 
