@@ -1498,6 +1498,8 @@ Many of such advances are attributed to deep learning.
   in the computer vision aspect of these problems.
   The rest is heavily tuned by engineers.
 
+
+
 Again, the above list barely scratches the surface of where machine learning has impacted practical applications. For instance, robotics, logistics, computational biology, particle physics, and astronomy owe some of their most impressive recent advances at least in parts to machine learning. Machine learning is thus becoming a ubiquitous tool for engineers and scientists.
 
 Frequently, the question of the AI apocalypse, or the AI singularity
@@ -1506,7 +1508,8 @@ The fear is that somehow machine learning systems
 will become sentient and decide independently from their programmers
 (and masters) about things that directly affect the livelihood of humans.
 To some extent, AI already affects the livelihood of humans
-in an immediate way---creditworthiness is assessed automatically,
+in an immediate way:
+creditworthiness is assessed automatically,
 autopilots mostly navigate vehicles, decisions about
 whether to grant bail use statistical data as input.
 More frivolously, we can ask Alexa to switch on the coffee machine.
@@ -1520,7 +1523,7 @@ and statistical models that underlie the design.
 Second, at present tools for *artificial general intelligence*
 simply do not exist that are able to improve themselves,
 reason about themselves, and that are able to modify,
-extend and improve their own architecture
+extend, and improve their own architecture
 while trying to solve general tasks.
 
 A much more pressing concern is how AI is being used in our daily lives.
@@ -1529,11 +1532,11 @@ and shop assistants can and will be automated.
 Farm robots will likely reduce the cost for organic farming
 but they will also automate harvesting operations.
 This phase of the industrial revolution
-may have profound consequences on large swaths of society
-(truck drivers and shop assistants are some
-of the most common jobs in many states).
+may have profound consequences on large swaths of society,
+since truck drivers and shop assistants are some
+of the most common jobs in many countries.
 Furthermore, statistical models, when applied without care
-can lead to racial, gender or age bias and raise
+can lead to racial, gender, or age bias and raise
 reasonable concerns about procedural fairness
 if automated to drive consequential decisions.
 It is important to ensure that these algorithms are used with care.
@@ -1541,8 +1544,8 @@ With what we know today, this strikes us a much more pressing concern
 than the potential of malevolent superintelligence to destroy humanity.
 
 
-## Characteristics (WIP)
 
+## Characteristics (WIP)
 
 
 Thus far, we have only talked about machine learning broadly
@@ -1574,9 +1577,6 @@ deep learning has eliminated many of the boundaries
 that previously separated computer vision, speech recognition,
 natural language processing, medical informatics, and other application areas,
 offering a unified set of tools for tackling diverse problems.
-
-
-
 
 
 Machine learning uses data to learn transformations between examples. For instance, images of digits are transformed to integers between 0 and 9, audio is transformed into text (speech recognition), text is transformed into text in a different language (machine translation), or mugshots are transformed into names (face recognition). In doing so, it is often necessary to represent data in a way suitable for algorithms to process it. This degree of feature transformations is often used as a reason for referring to deep learning as a means for representation learning (in fact, the International Conference on Learning Representations takes its name from that). At the same time, machine learning equally borrows from statistics (to a very large extent questions rather than specific algorithms) and data mining (to deal with scalability).
