@@ -20,7 +20,7 @@ is
 
 First, import the packages or modules required for the competition.
 
-```{.python .input  n=14}
+```{.python .input}
 import collections
 from d2l import mxnet as d2l
 import math
@@ -52,7 +52,7 @@ Here folders `train` and `test` contain the training and testing images respecti
 To make it easier to get started, we provide a small-scale sample of the dataset: it contains the first $1000$ training images and $5$ random testing images.
 To use the full dataset of the Kaggle competition, you need to set the following `demo` variable to `False`.
 
-```{.python .input  n=15}
+```{.python .input}
 #@save
 d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL + 'kaggle_cifar10_tiny.zip',
                                 '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')
@@ -71,7 +71,7 @@ else:
 
 We need to organize datasets to facilitate model training and testing. Let us first read the labels from the csv file. The following function returns a dictionary that maps the filename without extension to its label.
 
-```{.python .input  n=16}
+```{.python .input}
 #@save
 def read_csv_labels(fname):
     """Read fname to return a name to label dictionary."""
@@ -88,11 +88,11 @@ print('# classes:', len(set(labels.values())))
 
 Next, we define the `reorg_train_valid` function to segment the validation set from the original training set. The argument `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set. In particular, let $n$ be the number of images of the class with the least examples, and $r$ be the ratio, then we will use $\max(\lfloor nr\rfloor,1)$ images for each class as the validation set.  Let us use `valid_ratio=0.1` as an example. Since the original training set has $50,000$ images, there will be $45,000$ images used for training and stored in the path "`train_valid_test/train`" when tuning hyperparameters, while the other $5,000$ images will be stored as validation set in the path "`train_valid_test/valid`". After organizing the data, images of the same class will be placed under the same folder so that we can read them later.
 
-```{.python .input  n=2}
+```{.python .input}
 #@save
 def copyfile(filename, target_dir):
     """Copy a file into a target directory."""
-    d2l.mkdir_if_not_exist(target_dir)
+    os.makedirs(target_dir, exist_ok=True)
     shutil.copy(filename, target_dir)
 
 #@save
@@ -123,7 +123,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
 
 The `reorg_test` function below is used to organize the testing set to facilitate the reading during prediction.
 
-```{.python .input  n=3}
+```{.python .input}
 #@save
 def reorg_test(data_dir):
     for test_file in os.listdir(os.path.join(data_dir, 'test')):
@@ -134,7 +134,7 @@ def reorg_test(data_dir):
 
 Finally, we use a function to call the previously defined `read_csv_labels`, `reorg_train_valid`, and `reorg_test` functions.
 
-```{.python .input  n=7}
+```{.python .input}
 def reorg_cifar10_data(data_dir, valid_ratio):
     labels = read_csv_labels(os.path.join(data_dir, 'trainLabels.csv'))
     reorg_train_valid(data_dir, labels, valid_ratio)
@@ -143,7 +143,7 @@ def reorg_cifar10_data(data_dir, valid_ratio):
 
 We only set the batch size to $4$ for the demo dataset. During actual training and testing, the complete dataset of the Kaggle competition should be used and `batch_size` should be set to a larger integer, such as $128$. We use $10\%$ of the training examples as the validation set for tuning hyperparameters.
 
-```{.python .input  n=4}
+```{.python .input}
 batch_size = 4 if demo else 128
 valid_ratio = 0.1
 reorg_cifar10_data(data_dir, valid_ratio)
@@ -153,7 +153,7 @@ reorg_cifar10_data(data_dir, valid_ratio)
 
 To cope with overfitting, we use image augmentation. For example, by adding `transforms.RandomFlipLeftRight()`, the images can be flipped at random. We can also perform normalization for the three RGB channels of color images using `transforms.Normalize()`. Below, we list some of these operations that you can choose to use or modify depending on requirements.
 
-```{.python .input  n=9}
+```{.python .input}
 transform_train = gluon.data.vision.transforms.Compose([
     # Magnify the image to a square of 40 pixels in both height and width
     gluon.data.vision.transforms.Resize(40),
@@ -183,7 +183,7 @@ transform_test = gluon.data.vision.transforms.Compose([
 
 Next, we can create the `ImageFolderDataset` instance to read the organized dataset containing the original image files, where each example includes the image and label.
 
-```{.python .input  n=10}
+```{.python .input}
 train_ds, valid_ds, train_valid_ds, test_ds = [
     gluon.data.vision.ImageFolderDataset(
         os.path.join(data_dir, 'train_valid_test', folder))
@@ -212,7 +212,7 @@ Here, we build the residual blocks based on the `HybridBlock` class, which is
 slightly different than the implementation described in
 :numref:`sec_resnet`. This is done to improve execution efficiency.
 
-```{.python .input  n=11}
+```{.python .input}
 class Residual(nn.HybridBlock):
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
         super(Residual, self).__init__(**kwargs)
@@ -318,7 +318,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
 
 Now, we can train and validate the model. The following hyperparameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 50 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 50 epochs. For simplicity, we only train one epoch here.
 
-```{.python .input  n=13}
+```{.python .input}
 devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.1, 5e-4
 lr_period, lr_decay, net = 50, 0.1, get_net(devices)
 net.hybridize()
@@ -330,7 +330,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
 
 After obtaining a satisfactory model design and hyperparameters, we use all training datasets (including validation sets) to retrain the model and classify the testing set.
 
-```{.python .input  n=14}
+```{.python .input}
 net, preds = get_net(devices), []
 net.hybridize()
 train(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,
