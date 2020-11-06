@@ -1001,9 +1001,9 @@ for the purpose of fitting clothes.
 These problems are referred to as *subspace estimation*.
 If the dependence is linear, it is called *principal component analysis*.
 * Is there a representation of (arbitrarily structured) objects
-in Euclidean space (i.e., the space of vectors in $\mathbb{R}^n$)
+in Euclidean space 
 such that symbolic properties can be well matched?
-This is called *representation learning* and it can be used to describe entities and their relations,
+This can be used to describe entities and their relations,
 such as "Rome" $-$ "Italy" $+$ "France" $=$ "Paris".
 * Is there a description of the root causes
 of much of the data that we observe?
@@ -1235,8 +1235,8 @@ which should remind us that the morally dubious use of data science
 has as long and enduring a history as its productive use
 in industry and the natural sciences.
 
-A second influence for machine learning came from information theory
-[(Claude Shannon, 1916--2001)](https://en.wikipedia.org/wiki/Claude_Shannon) and the theory of computation via [Alan Turing (1912--1954)](https://en.wikipedia.org/wiki/Alan_Turing).
+A second influence for machine learning came from information theory by
+[Claude Shannon (1916--2001)](https://en.wikipedia.org/wiki/Claude_Shannon) and the theory of computation via [Alan Turing (1912--1954)](https://en.wikipedia.org/wiki/Alan_Turing).
 Turing posed the question "can machines think?”
 in his famous paper *Computing Machinery and Intelligence* :cite:`Turing.1950`.
 In what he described as the Turing test, a machine
@@ -1545,51 +1545,70 @@ than the potential of malevolent superintelligence to destroy humanity.
 
 
 
-## Characteristics (WIP)
 
+## Characteristics
 
-Thus far, we have only talked about machine learning broadly
-and not deep learning. To see why deep learning is important,
-we should pause for a moment to highlight a couple of crucial points.
+Thus far, we have talked about machine learning broadly, which is both a branch of AI and an approach to AI.
+Though deep learning is a subset of machine learning,
+the dizzying set of algorithms and applications makes it difficult to assess what specifically the ingredients for deep learning might be. 
+This is as difficult as trying to pin down required ingredients for pizza since almost every component is substitutable.
 
-First, the problems that we have discussed thus far---learning
+As we know, machine learning
+uses data to learn transformations between examples,
+such as transforming audio into text in speech recognition.
+In doing so, it is often necessary to represent data in a way suitable for algorithms to transform such representations into the output.
+*Deep learning* is *deep* in precisely the sense
+that its models
+learn many *layers* of transformations,
+where each layer offers the representation
+at one level.
+For example,
+layers near the input may represent 
+low-level details of the data,
+while layers closer to the classification output
+may represent more abstract concepts used for discrimination.
+Since *representation learning* aims at
+finding the representation itself,
+deep learning can be referred to as multi-level
+representation learning.
+
+The problems that we have discussed so far, such as learning
 from the raw audio signal, 
 the raw pixel values of images,
 or mapping between sentences of arbitrary lengths and
-their counterparts in foreign languages---are problems
+their counterparts in foreign languages,
+are those
 where deep learning excels and where traditional 
 machine learning
 methods falter.
-Deep models are *deep* in precisely the sense
-that they learn many *layers* of computation.
-It turns out that these many-layered (or hierarchical) models
+It turns out that these many-layered models
 are capable of addressing low-level perceptual data
 in a way that previous tools could not.
+
+Arguably the most significant commonality in deep learning methods is the use of *end-to-end training*. 
+That is, rather than assembling a system based on components that are individually tuned, one builds the system and then tunes their performance jointly.
+For instance, in computer vision scientists used to separate the process of feature engineering from the process of building machine learning models. The Canny edge detector :cite:`Canny.1987` and Lowe's SIFT feature extractor :cite:`Lowe.2004` reigned supreme for over a decade as algorithms for mapping images into feature vectors.
 In bygone days, the crucial part of applying machine learning to these problems
 consisted of coming up with manually-engineered ways
 of transforming the data into some form amenable to shallow models.
-One key advantage of deep learning is that it replaces not
+Unfortunately, there is only so much that humans can accomplish by ingenuity relative to a consistent evaluation over thousands or millions of choices, when carried out automatically by an algorithm.
+When deep learning took over,
+these feature extractors were replaced by automatically tuned filters, yielding superior accuracy.
+
+Thus,
+one key advantage of deep learning is that it replaces not
 only the shallow models at the end of traditional learning pipelines,
 but also the labor-intensive process of 
 *feature engineering*.
-Second, by replacing much of the domain-specific preprocessing,
+Moreover, by replacing much of the domain-specific preprocessing,
 deep learning has eliminated many of the boundaries
 that previously separated computer vision, speech recognition,
 natural language processing, medical informatics, and other application areas,
 offering a unified set of tools for tackling diverse problems.
 
 
-Machine learning uses data to learn transformations between examples. For instance, images of digits are transformed to integers between 0 and 9, audio is transformed into text (speech recognition), text is transformed into text in a different language (machine translation), or mugshots are transformed into names (face recognition). In doing so, it is often necessary to represent data in a way suitable for algorithms to process it. This degree of feature transformations is often used as a reason for referring to deep learning as a means for representation learning (in fact, the International Conference on Learning Representations takes its name from that). At the same time, machine learning equally borrows from statistics (to a very large extent questions rather than specific algorithms) and data mining (to deal with scalability).
-
-The dizzying set of algorithms and applications makes it difficult to assess what specifically the ingredients for deep learning might be. This is as difficult as trying to pin down required ingredients for pizza - almost every component is substitutable. For instance one might assume that multilayer perceptrons are an essential ingredient. Yet there are computer vision models that use only convolutions. Others only use sequence models.
-
-Arguably the most significant commonality in these methods is the use of end-to-end training. That is, rather than assembling a system based on components that are individually tuned, one builds the system and then tunes their performance jointly. For instance, in computer vision scientists used to separate the process of feature engineering from the process of building machine learning models. The Canny edge detector [20] and Lowe's SIFT feature extractor [21] reigned supreme for over a decade as algorithms for mapping images into feature vectors. Unfortunately, there is only so much that humans can accomplish by ingenuity relative to a consistent evaluation over thousands or millions of choices, when carried out automatically by an algorithm. When deep learning took over, these feature extractors were replaced by automatically tuned filters, yielding superior accuracy.
-
-Likewise, in Natural Language Processing the bag-of-words model of Salton and McGill [22] was for a long time the default choice. In it, words in a sentence are mapped into a vector, where each coordinate corresponds to the number of times that particular word occurs. This entirely ignores the word order ('dog bites man' vs. 'man bites dog') or punctuation ('let's eat, grandma' vs. 'let's eat grandma'). Unfortunately, it is rather difficult to engineer better features manually. Algorithms, conversely, are able to search over a large space of possible feature designs automatically. This has led to tremendous progress. For instance, semantically relevant word embeddings allow reasoning of the form 'Berlin - Germany + Italy = Rome' in vector space. Again, these results are achieved by end-to-end training of the entire system.
-
-Beyond end-to-end training, the second most relevant part is that we are experiencing a transition from parametric statistical descriptions to fully nonparametric models. When data is scarce, one needs to rely on simplifying assumptions about reality (e.g. via spectral methods) in order to obtain useful models. When data is abundant, this can be replaced by nonparametric models that fit reality more accurately. To some extent, this mirrors the progress that physics experienced in the middle of the previous century with the availability of computers. Rather than solving parametric approximations of how electrons behave by hand, one can now resort to numerical simulations of the associated partial differential equations. This has led to much more accurate models, albeit often at the expense of explainability.
-
-A case in point are Generative Adversarial Networks, where graphical models were replaced by data generating code without the need for a proper probabilistic formulation. This has led to models of images that can look deceptively realistic, something that was considered too difficult for a long time.
+Beyond end-to-end training, 
+we are experiencing a transition from parametric statistical descriptions to fully nonparametric models. When data are scarce, one needs to rely on simplifying assumptions about reality in order to obtain useful models. When data are abundant, this can be replaced by nonparametric models that fit reality more accurately. To some extent, this mirrors the progress that physics experienced in the middle of the previous century with the availability of computers. Rather than solving parametric approximations of how electrons behave by hand, one can now resort to numerical simulations of the associated partial differential equations. This has led to much more accurate models, albeit often at the expense of explainability.
 
 Another difference to previous work is the acceptance of suboptimal solutions, dealing with nonconvex nonlinear optimization problems, and the willingness to try things before proving them. This newfound empiricism in dealing with statistical problems, combined with a rapid influx of talent has led to rapid progress of practical algorithms (albeit in many cases at the expense of modifying and re-inventing tools that existed for decades).
 
