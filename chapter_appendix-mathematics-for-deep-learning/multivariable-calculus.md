@@ -539,7 +539,7 @@ $$
 And thus, with a little algebra, see that the approximating quadratic at $[-1,0]^\top$ is
 
 $$
-f(x, y) \approx e^{-1}\left(-1 - (x+1) +2(x+1)^2+2y^2\right).
+f(x, y) \approx e^{-1}\left(-1 - (x+1) +(x+1)^2+y^2\right).
 $$
 
 ```{.python .input}
@@ -549,7 +549,7 @@ x, y = np.meshgrid(np.linspace(-2, 2, 101),
 z = x*np.exp(- x**2 - y**2)
 
 # Compute approximating quadratic with gradient and Hessian at (1, 0)
-w = np.exp(-1)*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
+w = np.exp(-1)*(-1 - (x + 1) + (x + 1)**2 + y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')

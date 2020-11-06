@@ -40,7 +40,7 @@ Now close and re-open your current shell. You should be able to create a new
 environment as following:
 
 ```bash
-conda create --name d2l -y
+conda create --name d2l python=3.8 -y
 ```
 
 
@@ -57,12 +57,10 @@ unzip d2l-en.zip && rm d2l-en.zip
 ```
 
 
-Now we will want to activate the `d2l` environment and install `pip`.
-Enter `y` for the queries that follow this command.
+Now we will want to activate the `d2l` environment.
 
 ```bash
 conda activate d2l
-conda install pip -y
 ```
 
 

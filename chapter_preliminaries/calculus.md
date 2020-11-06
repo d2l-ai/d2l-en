@@ -172,6 +172,9 @@ To configure properties of the figures produced by `matplotlib`,
 we need to define a few functions.
 In the following,
 the `use_svg_display` function specifies the `matplotlib` package to output the svg figures for sharper images.
+Note that the comment `#@save` is a special mark where the following function,
+class, or statements are saved in the `d2l` package
+so later they can be directly invoked (e.g., `d2l.use_svg_display()`) without being redefined.
 
 ```{.python .input}
 #@tab all

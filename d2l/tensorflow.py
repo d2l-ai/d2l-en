@@ -27,15 +27,6 @@ import numpy as np
 import tensorflow as tf
 
 
-# Defined in file: ./chapter_preliminaries/pandas.md
-def mkdir_if_not_exist(path):
-    """Make a directory if it does not exist."""
-    if not isinstance(path, str):
-        path = os.path.join(*path)
-    if not os.path.exists(path):
-        os.makedirs(path)
-
-
 # Defined in file: ./chapter_preliminaries/calculus.md
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter."""
@@ -218,7 +209,7 @@ def accuracy(y_hat, y):
 def evaluate_accuracy(net, data_iter):
     """Compute the accuracy for a model on a dataset."""
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
-    for _, (X, y) in enumerate(data_iter):
+    for X, y in data_iter:
         metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
@@ -369,7 +360,7 @@ def download(name, cache_dir=os.path.join('..', 'data')):
     """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}."
     url, sha1_hash = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)
+    os.makedirs(cache_dir, exist_ok=True)
     fname = os.path.join(cache_dir, url.split('/')[-1])
     if os.path.exists(fname):
         sha1 = hashlib.sha1()

@@ -49,6 +49,7 @@
 * Assignment symbol
     * \leftarrow
 * Use mathematical numerals only when they are part of math: "$x$ is either $1$ or $-1$", "the greatest common divisor of $12$ and $18$ is $6$".
+* We do not use "thousands separator" (since different publishing houses have different styles). E.g., 10,000 should be written as 10000 in the source markdown files.
 
 ## Figure
 

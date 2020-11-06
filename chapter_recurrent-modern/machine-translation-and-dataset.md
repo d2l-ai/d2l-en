@@ -6,7 +6,7 @@ which are key to natural language processing.
 Another flagship benchmark is *machine translation*,
 a central problem domain for *sequence transduction* models
 that transform input sequences into output sequences.
-Playing a crucial role in various modern artificial intelligence applications,
+Playing a crucial role in various modern AI applications,
 sequence transduction models will form the focus of the remainder of this chapter
 and :numref:`chap_attention`.
 To this end,
