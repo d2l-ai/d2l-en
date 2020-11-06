@@ -1185,7 +1185,7 @@ For a diverse set of machine learning problems,
 deep learning provides powerful tools for solving them.
 Although many deep learning methods
 are recent inventions,
-the core idea of programming with data and neural networks (upon which deep learning is based)
+the core idea of programming with data and neural networks (names of many deep learning models)
 has been studied for centuries.
 In fact,
 humans have held the desire to analyze data
@@ -1544,8 +1544,6 @@ With what we know today, this strikes us a much more pressing concern
 than the potential of malevolent superintelligence to destroy humanity.
 
 
-
-
 ## Characteristics
 
 Thus far, we have talked about machine learning broadly, which is both a branch of AI and an approach to AI.
@@ -1553,8 +1551,8 @@ Though deep learning is a subset of machine learning,
 the dizzying set of algorithms and applications makes it difficult to assess what specifically the ingredients for deep learning might be. 
 This is as difficult as trying to pin down required ingredients for pizza since almost every component is substitutable.
 
-As we know, machine learning
-uses data to learn transformations between examples,
+As we have described, machine learning can
+use data to learn transformations between inputs and outputs,
 such as transforming audio into text in speech recognition.
 In doing so, it is often necessary to represent data in a way suitable for algorithms to transform such representations into the output.
 *Deep learning* is *deep* in precisely the sense
@@ -1584,14 +1582,13 @@ methods falter.
 It turns out that these many-layered models
 are capable of addressing low-level perceptual data
 in a way that previous tools could not.
-
 Arguably the most significant commonality in deep learning methods is the use of *end-to-end training*. 
 That is, rather than assembling a system based on components that are individually tuned, one builds the system and then tunes their performance jointly.
-For instance, in computer vision scientists used to separate the process of feature engineering from the process of building machine learning models. The Canny edge detector :cite:`Canny.1987` and Lowe's SIFT feature extractor :cite:`Lowe.2004` reigned supreme for over a decade as algorithms for mapping images into feature vectors.
+For instance, in computer vision scientists used to separate the process of *feature engineering* from the process of building machine learning models. The Canny edge detector :cite:`Canny.1987` and Lowe's SIFT feature extractor :cite:`Lowe.2004` reigned supreme for over a decade as algorithms for mapping images into feature vectors.
 In bygone days, the crucial part of applying machine learning to these problems
 consisted of coming up with manually-engineered ways
 of transforming the data into some form amenable to shallow models.
-Unfortunately, there is only so much that humans can accomplish by ingenuity relative to a consistent evaluation over thousands or millions of choices, when carried out automatically by an algorithm.
+Unfortunately, there is only so little that humans can accomplish by ingenuity in comparison with a consistent evaluation over millions of choices carried out automatically by an algorithm.
 When deep learning took over,
 these feature extractors were replaced by automatically tuned filters, yielding superior accuracy.
 
@@ -1599,35 +1596,36 @@ Thus,
 one key advantage of deep learning is that it replaces not
 only the shallow models at the end of traditional learning pipelines,
 but also the labor-intensive process of 
-*feature engineering*.
+feature engineering.
 Moreover, by replacing much of the domain-specific preprocessing,
 deep learning has eliminated many of the boundaries
 that previously separated computer vision, speech recognition,
 natural language processing, medical informatics, and other application areas,
 offering a unified set of tools for tackling diverse problems.
 
-
 Beyond end-to-end training, 
 we are experiencing a transition from parametric statistical descriptions to fully nonparametric models. When data are scarce, one needs to rely on simplifying assumptions about reality in order to obtain useful models. When data are abundant, this can be replaced by nonparametric models that fit reality more accurately. To some extent, this mirrors the progress that physics experienced in the middle of the previous century with the availability of computers. Rather than solving parametric approximations of how electrons behave by hand, one can now resort to numerical simulations of the associated partial differential equations. This has led to much more accurate models, albeit often at the expense of explainability.
 
-Another difference to previous work is the acceptance of suboptimal solutions, dealing with nonconvex nonlinear optimization problems, and the willingness to try things before proving them. This newfound empiricism in dealing with statistical problems, combined with a rapid influx of talent has led to rapid progress of practical algorithms (albeit in many cases at the expense of modifying and re-inventing tools that existed for decades).
+Another difference to previous work is the acceptance of suboptimal solutions, dealing with nonconvex nonlinear optimization problems, and the willingness to try things before proving them. This newfound empiricism in dealing with statistical problems, combined with a rapid influx of talent has led to rapid progress of practical algorithms, albeit in many cases at the expense of modifying and re-inventing tools that existed for decades.
 
-Lastly, the Deep Learning community prides itself of sharing tools across academic and corporate boundaries, releasing many excellent libraries, statistical models and trained networks as open source. It is in this spirit that the notebooks forming this course are freely available for distribution and use. We have worked hard to lower the barriers of access for everyone to learn about Deep Learning and we hope that our readers will benefit from this.
+In the end, the deep learning community prides itself of sharing tools across academic and corporate boundaries, releasing many excellent libraries, statistical models, and trained networks as open source.
+It is in this spirit that the notebooks forming this book are freely available for distribution and use. We have worked hard to lower the barriers of access for everyone to learn about deep learning and we hope that our readers will benefit from this.
 
 
 
 ## Summary
 
-* Machine learning studies how computer systems can leverage *experience* (often data) to improve performance at specific tasks. It combines ideas from statistics, data mining, AI, and optimization. Often, it is used as a means of implementing artificially-intelligent solutions.
-* As a class of machine learning, representational learning focuses on how to automatically find the appropriate way to represent data. This is often accomplished by a progression of learned transformations.
+* Machine learning studies how computer systems can leverage experience (often data) to improve performance at specific tasks. It combines ideas from statistics, data mining, and optimization. Often, it is used as a means of implementing AI solutions.
+* As a class of machine learning, representational learning focuses on how to automatically find the appropriate way to represent data. Deep learning is multi-level representation learning through learning many layers of transformations.
+* Deep learning replaces not only the shallow models at the end of traditional machine learning pipelines, but also the labor-intensive process of feature engineering. 
 * Much of the recent progress in deep learning has been triggered by an abundance of data arising from cheap sensors and Internet-scale applications, and by significant progress in computation, mostly through GPUs.
-* Whole system optimization is a key component in obtaining good performance. The availability of efficient deep learning frameworks has made design and implementation of this significantly easier.
+* Whole system optimization is a key component in obtaining high performance. The availability of efficient deep learning frameworks has made design and implementation of this significantly easier.
 
 ## Exercises
 
 1. Which parts of code that you are currently writing could be "learned", i.e., improved by learning and automatically determining design choices that are made in your code? Does your code include heuristic design choices?
 1. Which problems that you encounter have many examples for how to solve them, yet no specific way to automate them? These may be prime candidates for using deep learning.
-1. Viewing the development of AI as a new industrial revolution, what is the relationship between algorithms and data? Is it similar to steam engines and coal (what is the fundamental difference)?
-1. Where else can you apply the end-to-end training approach (such as in :numref:`fig_ml_loop`)? Physics? Engineering? Econometrics?
+1. Viewing the development of AI as a new industrial revolution, what is the relationship between algorithms and data? Is it similar to steam engines and coal? What is the fundamental difference?
+1. Where else can you apply the end-to-end training approach, such as in :numref:`fig_ml_loop`, physics, engineering, and econometrics?
 
 [Discussions](https://discuss.d2l.ai/t/22)
