@@ -288,3 +288,7 @@ for X, Y in train_iter:
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/394)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1388)
+:end_tab:
