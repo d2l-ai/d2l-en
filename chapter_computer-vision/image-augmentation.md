@@ -59,7 +59,7 @@ Most image augmentation methods have a certain degree of randomness. To make it 
 ```{.python .input}
 def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
     Y = [aug(img) for _ in range(num_rows * num_cols)]
-    show_images(Y, num_rows, num_cols, scale=scale)
+    d2l.show_images(Y, num_rows, num_cols, scale=scale)
 ```
 
 ```{.python .input}
@@ -394,4 +394,8 @@ train_with_data_aug(train_augs, test_augs, net)
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/367)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1404)
 :end_tab:
