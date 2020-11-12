@@ -268,7 +268,7 @@ them and
 the previous hidden state $\mathbf{s}_{t^\prime-1}$
 into the
 hidden state $\mathbf{s}_{t^\prime}$ at the current time step.
-As a result, we can use a function $f$ to express the transformation of the decoder's hidden layer:
+As a result, we can use a function $g$ to express the transformation of the decoder's hidden layer:
 
 $$\mathbf{s}_{t^\prime} = g(y_{t^\prime-1}, \mathbf{c}, \mathbf{s}_{t^\prime-1}).$$
 
