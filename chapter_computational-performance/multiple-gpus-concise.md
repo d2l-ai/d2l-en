@@ -186,7 +186,7 @@ def train(net, num_gpus, batch_size, lr):
             nn.init.normal_(m.weight, std=0.01)
     net.apply(init_weights)
     # Set model on multiple gpus
-    net = nn.DataParallel(net, device_ids=devices)
+    net = nn.DistributedDataParallel(net, device_ids=devices)
     trainer = torch.optim.SGD(net.parameters(), lr)
     loss = nn.CrossEntropyLoss()
     timer, num_epochs = d2l.Timer(), 10
