@@ -299,7 +299,7 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
     blks.append(DenseBlock(num_convs, num_channels, growth_rate))
     # This is the number of output channels in the previous dense block
     num_channels += num_convs * growth_rate
-    # A transition layer that haves the number of channels is added between
+    # A transition layer that halves the number of channels is added between
     # the dense blocks
     if i != len(num_convs_in_dense_blocks) - 1:
         blks.append(transition_block(num_channels, num_channels // 2))
@@ -318,7 +318,7 @@ def block_2():
         net.add(DenseBlock(num_convs, growth_rate))
         # This is the number of output channels in the previous dense block
         num_channels += num_convs * growth_rate
-        # A transition layer that haves the number of channels is added
+        # A transition layer that halves the number of channels is added
         # between the dense blocks
         if i != len(num_convs_in_dense_blocks) - 1:
             num_channels //= 2
