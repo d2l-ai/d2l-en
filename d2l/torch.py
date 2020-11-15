@@ -1669,6 +1669,13 @@ def load_data_imdb(batch_size, num_steps=500):
     return train_iter, test_iter, vocab
 
 
+# Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis-rnn.md
+def predict_sentiment(net, vocab, sentence):
+    sentence = torch.tensor(vocab[sentence.split()], device=d2l.try_gpu())
+    label = torch.argmax(net(sentence.reshape(1, -1)), dim=1)
+    return 'positive' if label == 1 else 'negative'
+
+
 # Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-and-dataset.md
 d2l.DATA_HUB['SNLI'] = (
     'https://nlp.stanford.edu/projects/snli/snli_1.0.zip',
