@@ -180,7 +180,7 @@ class TextCNN(nn.Module):
         # Create multiple one-dimensional convolutional layers
         self.convs = nn.ModuleList()
         for c, k in zip(num_channels, kernel_sizes):
-            self.convs.append(nn.Conv1d(2*embed_size, c, k))
+            self.convs.append(nn.Conv1d(2 * embed_size, c, k))
 
     def forward(self, inputs):
         # Concatenate the output of two embedding layers with shape of
