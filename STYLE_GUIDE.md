@@ -22,7 +22,7 @@
         * Without accents (``)
     * `backward` function
         * not `backward()` function
-    * for-loop
+    * "for-loop" not "for loop"
 * Terminologies
     * Consistently use
         * function (not method)
@@ -30,7 +30,7 @@
         * weight, bias, label
         * model training, model prediction (model inference)
         * training/testing/validation dataset
-        * data point (preferred)/data instance/training example/testing example/example of the dataset
+        * prefer using "data/training/testing example" over "data instance" or "data point"
     * Distinguish：
         * hyperparameter vs parameter
         * minibatch stochastic gradient descent vs stochastic gradient descent
