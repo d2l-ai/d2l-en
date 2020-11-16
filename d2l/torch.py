@@ -1439,6 +1439,11 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
           f'{str(devices)}')
 
 
+# Defined in file: ./chapter_computer-vision/fine-tuning.md
+d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip', 
+                         'fba480ffa8aa7e0febbb511d181409f899b9baa5')
+
+
 # Defined in file: ./chapter_computer-vision/bounding-box.md
 def bbox_to_rect(bbox, color):
     """Convert bounding box to matplotlib format."""
