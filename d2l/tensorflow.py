@@ -604,8 +604,8 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
         # Return a sequence of length `num_steps` starting from `pos`
         return corpus[pos: pos + num_steps]
 
-    num_subseqs_per_example = num_subseqs // batch_size
-    for i in range(0, batch_size * num_subseqs_per_example, batch_size):
+    num_batches = num_subseqs // batch_size
+    for i in range(0, batch_size * num_batches, batch_size):
         # Here, `initial_indices` contains randomized starting indices for
         # subsequences
         initial_indices_per_batch = initial_indices[i: i + batch_size]
