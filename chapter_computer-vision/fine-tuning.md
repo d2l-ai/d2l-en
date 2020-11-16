@@ -247,7 +247,6 @@ train_fine_tuning(scratch_net, 0.1)
 #@tab pytorch
 scratch_net = torchvision.models.resnet18()
 scratch_net.fc = nn.Linear(scratch_net.fc.in_features, 2)
-scratch_net.apply(init_weights)
 train_fine_tuning(scratch_net, 5e-4, param_group=False)
 ```
 
