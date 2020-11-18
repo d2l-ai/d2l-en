@@ -808,7 +808,6 @@ and make it run faster.
 1. Show that one-hot encoding is equivalent to picking a different embedding for each object.
 1. Adjust the hyperparameters (e.g., number of epochs, number of hidden units, number of time steps in a minibatch, and learning rate) to improve the perplexity.
     * How low can you go?
-    * Replace random sampling with sequential partitioning. Does this lead to better performance?
     * Replace one-hot encoding with learnable embeddings. Does this lead to better performance?
     * How well will it work on other books by H. G. Wells, e.g., [*The War of the Worlds*](http://www.gutenberg.org/ebooks/36)?
 1. Modify the prediction function such as to use sampling rather than picking the most likely next character.
