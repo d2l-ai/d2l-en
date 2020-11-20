@@ -11,7 +11,11 @@ In this chapter, we will provide you with some intuition about how to transform 
 :maxdepth: 2
 
 attention
+nadaraya-waston
+attention-functions
 seq2seq-attention
+transformer-encoder
+transformer-decoder
 transformer
 ```
 
