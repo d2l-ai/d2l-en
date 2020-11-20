@@ -991,7 +991,7 @@ def translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device):
             f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention.md
+# Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 def masked_softmax(X, valid_len):
     """Perform softmax by filtering out some elements."""
     # X: 3-D tensor, valid_len: 1-D or 2-D tensor
@@ -1009,7 +1009,7 @@ def masked_softmax(X, valid_len):
         return npx.softmax(X).reshape(shape)
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention.md
+# Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 class DotProductAttention(nn.Block):
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
@@ -1027,7 +1027,7 @@ class DotProductAttention(nn.Block):
         return npx.batch_dot(attention_weights, value)
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention.md
+# Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 class MLPAttention(nn.Block):
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
