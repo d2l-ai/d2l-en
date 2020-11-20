@@ -1022,6 +1022,8 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
     """Predict sequences (defined in Chapter 9)."""
+    # Set model to eval mode for inference
+    model.eval()
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
         src_vocab['<eos>']]
     enc_valid_len = torch.tensor([len(src_tokens)], device=device)
@@ -1077,7 +1079,7 @@ def translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device):
             f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention.md
+# Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 def masked_softmax(X, valid_len):
     """Perform softmax by filtering out some elements."""
     # X: 3-D tensor, valid_len: 1-D or 2-D tensor
@@ -1095,7 +1097,7 @@ def masked_softmax(X, valid_len):
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention.md
+# Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 class DotProductAttention(nn.Module):
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
@@ -1113,7 +1115,7 @@ class DotProductAttention(nn.Module):
         return torch.bmm(attention_weights, value)
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention.md
+# Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 class MLPAttention(nn.Module):
     def __init__(self, key_size, query_size, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
