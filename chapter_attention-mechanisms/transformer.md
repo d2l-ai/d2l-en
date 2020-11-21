@@ -148,6 +148,7 @@ class MultiHeadAttention(nn.Module):
         value = transpose_qkv(self.W_v(value), self.num_heads)
 
         if valid_len is not None:
+            # Copy `valid_len` by `num_heads` times
             if valid_len.ndim == 1:
               valid_len = valid_len.repeat(self.num_heads)
             else:
