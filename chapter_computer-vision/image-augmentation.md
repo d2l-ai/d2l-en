@@ -50,24 +50,16 @@ d2l.plt.imshow(img.asnumpy());
 ```{.python .input}
 #@tab pytorch
 d2l.set_figsize()
-img = d2l.plt.imread('../img/cat1.jpg')
+img = d2l.Image.open('../img/cat1.jpg')
 d2l.plt.imshow(img);
 ```
 
 Most image augmentation methods have a certain degree of randomness. To make it easier for us to observe the effect of image augmentation, we next define the auxiliary function `apply`. This function runs the image augmentation method `aug` multiple times on the input image `img` and shows all results.
 
 ```{.python .input}
+#@tab all
 def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
     Y = [aug(img) for _ in range(num_rows * num_cols)]
-    d2l.show_images(Y, num_rows, num_cols, scale=scale)
-```
-
-```{.python .input}
-#@tab pytorch
-def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
-    img = torchvision.transforms.ToPILImage()(img)
-    Y = [torchvision.transforms.ToTensor()(aug(img)).permute(1,2,0)
-         for _ in range(num_rows * num_cols)]
     d2l.show_images(Y, num_rows, num_cols, scale=scale)
 ```
 
@@ -188,9 +180,9 @@ d2l.show_images(gluon.data.vision.CIFAR10(
 
 ```{.python .input}
 #@tab pytorch
-all_images = torchvision.datasets.CIFAR10(train=True, root="../temp", download=True)
-d2l.show_images([torchvision.transforms.ToTensor()(all_images[i][0]).permute(1,2,0)
-                 for i in range(32)], 4, 8, scale=0.8);
+all_images = torchvision.datasets.CIFAR10(train=True, root="../temp",
+                                          download=True)
+d2l.show_images([all_images[i][0] for i in range(32)], 4, 8, scale=0.8);
 ```
 
 In order to obtain definitive results during prediction, we usually only apply image augmentation to the training example, and do not use image augmentation with random operations during prediction. Here, we only use the simplest random left-right flipping method. In addition, we use a `ToTensor` instance to convert minibatch images into the format required by MXNet, i.e., 32-bit floating point numbers with the shape of (batch size, number of channels, height, width) and value range between 0 and 1.

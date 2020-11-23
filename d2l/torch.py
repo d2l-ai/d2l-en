@@ -30,6 +30,7 @@ from torch import nn
 from torch.nn import functional as F
 from torch.utils import data
 from torchvision import transforms
+from PIL import Image
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
@@ -172,7 +173,12 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
     for i, (ax, img) in enumerate(zip(axes, imgs)):
-        ax.imshow(d2l.numpy(img))
+        if torch.is_tensor(img):
+            # Tensor Image
+            ax.imshow(img.numpy())
+        else:
+            # PIL Image
+            ax.imshow(img)
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
         if titles:
@@ -1161,6 +1167,7 @@ class MultiHeadAttention(nn.Module):
         value = transpose_qkv(self.W_v(value), self.num_heads)
 
         if valid_len is not None:
+            # Copy `valid_len` by `num_heads` times
             if valid_len.ndim == 1:
               valid_len = valid_len.repeat(self.num_heads)
             else:
