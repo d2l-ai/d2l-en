@@ -72,24 +72,16 @@ test_imgs = gluon.data.vision.ImageFolderDataset(
 
 ```{.python .input}
 #@tab pytorch
-train_imgs = torchvision.datasets.ImageFolder(os.path.join(data_dir, 'train'),
-                                transform=torchvision.transforms.ToTensor())
-test_imgs = torchvision.datasets.ImageFolder(os.path.join(data_dir, 'test'),
-                                transform=torchvision.transforms.ToTensor())
+train_imgs = torchvision.datasets.ImageFolder(os.path.join(data_dir, 'train'))
+test_imgs = torchvision.datasets.ImageFolder(os.path.join(data_dir, 'test'))
 ```
 
 The first 8 positive examples and the last 8 negative images are shown below. As you can see, the images vary in size and aspect ratio.
 
 ```{.python .input}
+#@tab all
 hotdogs = [train_imgs[i][0] for i in range(8)]
 not_hotdogs = [train_imgs[-i - 1][0] for i in range(8)]
-d2l.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
-```
-
-```{.python .input}
-#@tab pytorch
-hotdogs = [train_imgs[i][0].permute(1,2,0) for i in range(8)]
-not_hotdogs = [train_imgs[-i - 1][0].permute(1,2,0) for i in range(8)]
 d2l.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
 ```
 

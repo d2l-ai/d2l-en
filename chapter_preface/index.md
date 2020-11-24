@@ -265,7 +265,7 @@ to be saved in the package, we will mark it with
 The `d2l` package is light-weight and only requires
 the following packages and modules as dependencies:
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab all
 #@save
 import collections
@@ -288,7 +288,6 @@ d2l = sys.modules[__name__]
 ```
 
 :begin_tab:`mxnet`
-
 Most of the code in this book is based on Apache MXNet.
 MXNet is an open-source framework for deep learning
 and the preferred choice of AWS (Amazon Web Services),
@@ -305,7 +304,6 @@ Here is how we import modules from MXNet.
 :end_tab:
 
 :begin_tab:`pytorch`
-
 Most of the code in this book is based on PyTorch.
 PyTorch is an open-source framework for deep learning, which is extremely
 popular in the research community.
@@ -321,7 +319,6 @@ Here is how we import modules from PyTorch.
 :end_tab:
 
 :begin_tab:`tensorflow`
-
 Most of the code in this book is based on TensorFlow.
 TensorFlow is an open-source framework for deep learning, which is extremely
 popular in both the research community and industrial.
@@ -336,13 +333,13 @@ to update your code and runtime environment.
 Here is how we import modules from TensorFlow.
 :end_tab:
 
-```{.python .input  n=1}
+```{.python .input}
 #@save
 from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab pytorch
 #@save
 import numpy as np
@@ -352,9 +349,10 @@ from torch import nn
 from torch.nn import functional as F
 from torch.utils import data
 from torchvision import transforms
+from PIL import Image
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab tensorflow
 #@save
 import numpy as np
