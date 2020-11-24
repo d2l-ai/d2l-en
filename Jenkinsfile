@@ -20,7 +20,6 @@ stage("Build and Publish") {
       conda env update -n ${ENV_NAME} -f static/build.yml
       conda activate ${ENV_NAME}
       pip list
-      d2lbook clear
       nvidia-smi
       """
 
