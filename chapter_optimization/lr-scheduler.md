@@ -14,7 +14,7 @@ Given the fact that there is a lot of detail needed to manage learning rates, mo
 
 We begin with a toy problem that is cheap enough to compute easily, yet sufficiently nontrivial to illustrate some of the key aspects. For that we pick a slightly modernized version of LeNet (`relu` instead of `sigmoid` activation, MaxPooling rather than AveragePooling), as applied to Fashion-MNIST. Moreover, we hybridize the network for performance. Since most of the code is standard we just introduce the basics without further detailed discussion. See :numref:`chap_cnn` for a refresher as needed.
 
-```{.python .input}
+```python
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, lr_scheduler, np, npx
@@ -63,7 +63,7 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, device):
           f'test acc {test_acc:.3f}')
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -187,14 +187,14 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr,
 
 Let us have a look at what happens if we invoke this algorithm with default settings, such as a learning rate of $0.3$ and train for $30$ iterations. Note how the training accuracy keeps on increasing while progress in terms of test accuracy stalls beyond a point. The gap between both curves indicates overfitting.
 
-```{.python .input}
+```python
 lr, num_epochs = 0.3, 30
 net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 lr, num_epochs = 0.3, 30
 net = net_fn()
@@ -212,12 +212,12 @@ train(net, train_iter, test_iter, num_epochs, lr)
 
 One way of adjusting the learning rate is to set it explicitly at each step. This is conveniently achieved by the `set_learning_rate` method. We could adjust it downward after every epoch (or even after every minibatch), e.g., in a dynamic manner in response to how optimization is progressing.
 
-```{.python .input}
+```python
 trainer.set_learning_rate(0.1)
 print(f'learning rate is now {trainer.learning_rate:.2f}')
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 lr = 0.1
 trainer.param_groups[0]["lr"] = lr
@@ -254,13 +254,13 @@ d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 
 Now let us see how this plays out for training on Fashion-MNIST. We simply provide the scheduler as an additional argument to the training algorithm.
 
-```{.python .input}
+```python
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net = net_fn()
 trainer = torch.optim.SGD(net.parameters(), lr)
@@ -306,13 +306,13 @@ This can also be accomplished by a built-in scheduler in MXNet via the `lr_sched
 
 A common strategy for training deep networks is to keep the learning rate piecewise constant and to decrease it by a given amount every so often. That is, given a set of times when to decrease the rate, such as $s = \{5, 10, 20\}$ decrease $\eta_{t+1} \leftarrow \eta_t \cdot \alpha$ whenever $t \in s$. Assuming that the values are halved at each step we can implement this as follows.
 
-```{.python .input}
+```python
 scheduler = lr_scheduler.MultiFactorScheduler(step=[15, 30], factor=0.5,
                                               base_lr=0.5)
 d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net = net_fn()
 trainer = torch.optim.SGD(net.parameters(), lr=0.5)
@@ -349,13 +349,13 @@ d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 
 The intuition behind this piecewise constant learning rate schedule is that one lets optimization proceed until a stationary point has been reached in terms of the distribution of weight vectors. Then (and only then) do we decrease the rate such as to obtain a higher quality proxy to a good local minimum. The example below shows how this can produce ever slightly better solutions.
 
-```{.python .input}
+```python
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device, 
       scheduler)
@@ -376,7 +376,7 @@ $$\eta_t = \eta_T + \frac{\eta_0 - \eta_T}{2} \left(1 + \cos(\pi t/T)\right)$$
 
 Here $\eta_0$ is the initial learning rate, $\eta_T$ is the target rate at time $T$. Furthermore, for $t > T$ we simply pin the value to $\eta_T$ without increasing it again. In the following example, we set the max update step $T = 20$.
 
-```{.python .input}
+```python
 scheduler = lr_scheduler.CosineScheduler(max_update=20, base_lr=0.3,
                                          final_lr=0.01)
 d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
@@ -414,13 +414,13 @@ d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 
 In the context of computer vision this schedule *can* lead to improved results. Note, though, that such improvements are not guaranteed (as can be seen below).
 
-```{.python .input}
+```python
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net = net_fn()
 trainer = torch.optim.SGD(net.parameters(), lr=0.3)
@@ -440,7 +440,7 @@ In some cases initializing the parameters is not sufficient to guarantee a good 
 
 A rather simple fix for this dilemma is to use a warmup period during which the learning rate *increases* to its initial maximum and to cool down the rate until the end of the optimization process. For simplicity one typically uses a linear increase for this purpose. This leads to a schedule of the form indicated below.
 
-```{.python .input}
+```python
 scheduler = lr_scheduler.CosineScheduler(20, warmup_steps=5, base_lr=0.3,
                                          final_lr=0.01)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
@@ -454,13 +454,13 @@ d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 
 Note that the network converges better initially (in particular observe the performance during the first 5 epochs).
 
-```{.python .input}
+```python
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'lr_scheduler': scheduler})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, device)
 ```
 
-```{.python .input}
+```python
 #@tab pytorch
 net = net_fn()
 trainer = torch.optim.SGD(net.parameters(), lr=0.3)
