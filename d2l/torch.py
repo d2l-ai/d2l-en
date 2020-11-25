@@ -1547,8 +1547,8 @@ class VOCSegDataset(torch.utils.data.Dataset):
 
     def filter(self, imgs):
         return [img for img in imgs if (
-            img.shape[0] >= self.crop_size[0] and
-            img.shape[1] >= self.crop_size[1])]
+            img.size[1] >= self.crop_size[0] and
+            img.size[0] >= self.crop_size[1])]
 
     def __getitem__(self, idx):
         feature, label = voc_rand_crop(self.features[idx], self.labels[idx],
