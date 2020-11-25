@@ -1464,6 +1464,116 @@ def bbox_to_rect(bbox, color):
         fill=False, edgecolor=color, linewidth=2)
 
 
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
+                           '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def read_voc_images(voc_dir, is_train=True):
+    """Read all VOC feature and label images."""
+    txt_fname = os.path.join(voc_dir, 'ImageSets', 'Segmentation',
+                             'train.txt' if is_train else 'val.txt')
+    with open(txt_fname, 'r') as f:
+        images = f.read().split()
+    features, labels = [], []
+    for i, fname in enumerate(images):
+        features.append(d2l.Image.open(os.path.join(
+            voc_dir, 'JPEGImages', f'{fname}.jpg')))
+        labels.append(d2l.Image.open(os.path.join(
+            voc_dir, 'SegmentationClass' ,f'{fname}.png')))
+    return features, labels
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
+                [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],
+                [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],
+                [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
+                [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
+                [0, 64, 128]]
+
+VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
+               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
+               'diningtable', 'dog', 'horse', 'motorbike', 'person',
+               'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def build_colormap2label():
+    """Build an RGB color to label mapping for segmentation."""
+    colormap2label = torch.zeros(256 ** 3)
+    for i, colormap in enumerate(VOC_COLORMAP):
+        colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
+    return colormap2label
+
+def voc_label_indices(colormap, colormap2label):
+    """Map an RGB color to a label."""
+    colormap = np.array(colormap.convert("RGB")).astype('int32')
+    idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
+           + colormap[:, :, 2])
+    return colormap2label[idx]
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def voc_rand_crop(feature, label, height, width):
+    """Randomly crop for both feature and label images."""
+    rect = torchvision.transforms.RandomCrop.get_params(feature,
+                                                        (height, width))
+    feature = torchvision.transforms.functional.crop(feature, *rect)
+    label = torchvision.transforms.functional.crop(label, *rect)
+    return feature, label
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+class VOCSegDataset(torch.utils.data.Dataset):
+    """A customized dataset to load VOC dataset."""
+
+    def __init__(self, is_train, crop_size, voc_dir):
+        self.crop_size = crop_size
+        self.transforms = torchvision.transforms.Compose([
+                torchvision.transforms.ToTensor(),
+                torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                                 std=[0.229, 0.224, 0.225])])
+        features, labels = read_voc_images(voc_dir, is_train)
+        self.features = self.filter(features)
+        self.labels = self.filter(labels)
+        self.colormap2label = build_colormap2label()
+        print('read ' + str(len(self.features)) + ' examples')
+
+    def normalize_image(self, img):
+        return self.transforms(img)
+
+    def filter(self, imgs):
+        return [img for img in imgs if (
+            img.size[1] >= self.crop_size[0] and
+            img.size[0] >= self.crop_size[1])]
+
+    def __getitem__(self, idx):
+        feature, label = voc_rand_crop(self.features[idx], self.labels[idx],
+                                       *self.crop_size)
+        return (self.normalize_image(feature),
+                voc_label_indices(label,self.colormap2label))
+
+    def __len__(self):
+        return len(self.features)
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def load_data_voc(batch_size, crop_size):
+    """Download and load the VOC2012 semantic dataset."""
+    voc_dir = d2l.download_extract('voc2012', os.path.join(
+        'VOCdevkit', 'VOC2012'))
+    num_workers = d2l.get_dataloader_workers()
+    train_iter = torch.utils.data.DataLoader(
+        VOCSegDataset(True, crop_size, voc_dir), batch_size,
+        shuffle=True, drop_last=True, num_workers=num_workers)
+    test_iter = torch.utils.data.DataLoader(
+        VOCSegDataset(False, crop_size, voc_dir), batch_size,
+        drop_last=True, num_workers=num_workers)
+    return train_iter, test_iter
+
+
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
                        '319d85e578af0cdc590547f26231e4e31cdf1e42')
