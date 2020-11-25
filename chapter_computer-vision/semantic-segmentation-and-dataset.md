@@ -303,8 +303,7 @@ for X, Y in train_iter:
 #@tab pytorch
 batch_size = 64
 train_iter = torch.utils.data.DataLoader(voc_train, batch_size, shuffle=True,
-                                    drop_last=True,
-                                    num_workers=d2l.get_dataloader_workers())
+                                    drop_last=True)
 for X, Y in train_iter:
     print(X.shape)
     print(Y.shape)
