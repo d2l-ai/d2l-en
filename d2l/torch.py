@@ -1536,8 +1536,7 @@ class VOCSegDataset(torch.utils.data.Dataset):
                 torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                                  std=[0.229, 0.224, 0.225])])
         features, labels = read_voc_images(voc_dir, is_train)
-        self.features = [self.normalize_image(feature)
-                         for feature in self.filter(features)]
+        self.features = self.filter(features)
         self.labels = self.filter(labels)
         self.colormap2label = build_colormap2label()
         print('read ' + str(len(self.features)) + ' examples')
@@ -1553,7 +1552,8 @@ class VOCSegDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         feature, label = voc_rand_crop(self.features[idx], self.labels[idx],
                                        *self.crop_size)
-        return (feature, voc_label_indices(label, self.colormap2label))
+        return (self.normalize_image(feature),
+                voc_label_indices(label,self.colormap2label))
 
     def __len__(self):
         return len(self.features)
