@@ -93,8 +93,8 @@ def preprocess(img, image_shape):
 
 def postprocess(img):
     img = img[0].to(rgb_std.device)
-    img = (img.permute(1, 2, 0) * rgb_std + rgb_mean).clip(0, 1)
-    return torchvision.transforms.ToPILImage()(img.permute(2, 0, 1))
+    img = torch.clip(img.permute(1, 2, 0) * rgb_std + rgb_mean, 0, 1)
+    return torchvision.transforms.ToPILImage()(img.permute(2,0,1))
 ```
 
 ## Extracting Features
@@ -190,7 +190,10 @@ def content_loss(Y_hat, Y):
 ```{.python .input}
 #@tab pytorch
 def content_loss(Y_hat, Y):
-    return torch.square(Y_hat - Y).mean()
+    # we 'detach' the target content from the tree used
+    # to dynamically compute the gradient: this is a stated value,
+    # not a variable. Otherwise the loss will throw an error.
+    return torch.square(Y_hat - Y.detach()).mean()
 ```
 
 ### Style Loss
@@ -215,7 +218,7 @@ def style_loss(Y_hat, gram_Y):
 ```{.python .input}
 #@tab pytorch
 def style_loss(Y_hat, gram_Y):
-    return torch.square(gram(Y_hat) - gram_Y).mean()
+    return torch.square(gram(Y_hat) - gram_Y.detach()).mean()
 ```
 
 ### Total Variance Loss
@@ -349,7 +352,7 @@ def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
             X, content_layers, style_layers)
         contents_l, styles_l, tv_l, l = compute_loss(
             X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram)
-        l.backward(retain_graph=True)
+        l.backward()
         trainer.step()
         scheduler.step()
         if (epoch + 1) % 10 == 0:
