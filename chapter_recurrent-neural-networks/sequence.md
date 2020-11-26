@@ -361,8 +361,8 @@ for i in range(tau):
 
 # Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
 # time steps from `i + 1` to `i + T - tau - max_steps + 1`
-for i in range(tau, tau + max_steps):
-    features[:, i] = d2l.reshape(net(features[:, i - tau: i]), -1)
+for i in range(n_train + tau, T):
+    multistep_preds[i] = net(multistep_preds[i - tau: i])
 ```
 
 ```{.python .input}
