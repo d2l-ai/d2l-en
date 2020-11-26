@@ -357,7 +357,7 @@ features = d2l.zeros((T - tau - max_steps + 1, tau + max_steps))
 # Column `i` (`i` < `tau`) are observations from `x` for time steps from
 # `i + 1` to `i + T - tau - max_steps + 1`
 for i in range(tau):
-    features[:, i] = x[i: i + T - tau - max_steps + 1].T
+    features[:, i] = x[i: i + T - tau - max_steps + 1]
 
 # Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
 # time steps from `i + 1` to `i + T - tau - max_steps + 1`
@@ -371,7 +371,7 @@ features = tf.Variable(d2l.zeros((T - tau - max_steps + 1, tau + max_steps)))
 # Column `i` (`i` < `tau`) are observations from `x` for time steps from
 # `i + 1` to `i + T - tau - max_steps + 1`
 for i in range(tau):
-    features[:, i].assign(x[i: i + T - tau - max_steps + 1].numpy().T)
+    features[:, i].assign(x[i: i + T - tau - max_steps + 1].numpy())
 
 # Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
 # time steps from `i + 1` to `i + T - tau - max_steps + 1`
