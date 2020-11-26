@@ -407,6 +407,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
                             legend=['train loss', 'train acc', 'valid acc'])
     net = nn.DataParallel(net, device_ids=devices).to(devices[0])
     for epoch in range(num_epochs):
+        net.train()
         metric = d2l.Accumulator(3)
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
