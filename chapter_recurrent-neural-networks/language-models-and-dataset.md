@@ -283,7 +283,7 @@ in each subsequence.
 def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
     """Generate a minibatch of subsequences using random sampling."""
     # Start with a random offset to partition a sequence
-    corpus = corpus[random.randint(0, num_steps):]
+    corpus = corpus[random.randint(0, num_steps - 1):]
     # Subtract 1 since we need to account for labels
     num_subseqs = (len(corpus) - 1) // num_steps
     # The starting indices for subsequences of length `num_steps`
