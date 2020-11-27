@@ -36,4 +36,3 @@ $$\begin{aligned} f(x) &= \sum_i \alpha(x, x_i) y_i \\&= \sum_i \frac{\exp\left(
 $$\begin{aligned}
 f(x) &= \sum_i \alpha(x, x_i) y_i \\&= \sum_i \frac{\exp\left(-\frac{1}{2}\left(\frac{x - x_i}{w}\right)^2\right)}{\sum_j \exp\left(-\frac{1}{2}\left(\frac{x - x_j}{w}\right)^2\right)} y_i \\&= \sum_i \mathrm{softmax}\left(-\frac{1}{2}\left(\frac{x - x_i}{w}\right)^2\right) y_i
 \end{aligned}$$
-
