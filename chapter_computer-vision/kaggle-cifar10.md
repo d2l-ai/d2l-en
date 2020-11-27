@@ -509,3 +509,7 @@ for submitting results is similar to method in :numref:`sec_kaggle_house`.
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/379)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1479)
+:end_tab:
