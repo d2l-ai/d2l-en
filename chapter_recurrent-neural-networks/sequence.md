@@ -287,8 +287,7 @@ namely the *one-step-ahead prediction*.
 #@tab all
 onestep_preds = net(features)
 d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(onestep_preds)], 'time',
-         'x', legend=['data', '1-step preds'], xlim=[1, 1000],
-         figsize=(6, 3))
+         'x', legend=['data', '1-step preds'], xlim=[1, 1000], figsize=(6, 3))
 ```
 
 The one-step-ahead predictions look nice, just as we expected.
@@ -315,8 +314,8 @@ Let us see how well this goes.
 multistep_preds = d2l.zeros(T)
 multistep_preds[: n_train + tau] = x[: n_train + tau]
 for i in range(n_train + tau, T):
-    multistep_preds[i] = d2l.reshape(net(
-        multistep_preds[i - tau: i].reshape(1, -1)), 1)
+    multistep_preds[i] = net(
+        d2l.reshape(multistep_preds[i - tau: i], (1, -1)))
 ```
 
 ```{.python .input}
@@ -357,7 +356,7 @@ features = d2l.zeros((T - tau - max_steps + 1, tau + max_steps))
 # Column `i` (`i` < `tau`) are observations from `x` for time steps from
 # `i + 1` to `i + T - tau - max_steps + 1`
 for i in range(tau):
-    features[:, i] = x[i: i + T - tau - max_steps + 1].T
+    features[:, i] = x[i: i + T - tau - max_steps + 1]
 
 # Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
 # time steps from `i + 1` to `i + T - tau - max_steps + 1`
@@ -371,7 +370,7 @@ features = tf.Variable(d2l.zeros((T - tau - max_steps + 1, tau + max_steps)))
 # Column `i` (`i` < `tau`) are observations from `x` for time steps from
 # `i + 1` to `i + T - tau - max_steps + 1`
 for i in range(tau):
-    features[:, i].assign(x[i: i + T - tau - max_steps + 1].numpy().T)
+    features[:, i].assign(x[i: i + T - tau - max_steps + 1].numpy())
 
 # Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
 # time steps from `i + 1` to `i + T - tau - max_steps + 1`
