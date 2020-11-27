@@ -486,8 +486,7 @@ for X, _ in test_iter:
 sorted_ids = list(range(1, len(test_ds) + 1))
 sorted_ids.sort(key=lambda x: str(x))
 df = pd.DataFrame({'id': sorted_ids, 'label': preds})
-class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
-          'dog', 'frog', 'horse', 'ship', 'truck']
+class_names = list(train_valid_ds.class_to_idx.keys())
 df['label'] = df['label'].apply(lambda x: class_names[x])
 df.to_csv('submission.csv', index=False)
 ```
