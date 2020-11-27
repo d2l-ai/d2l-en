@@ -98,7 +98,7 @@ class MultiHeadAttention(nn.Block):
         # (`batch_size`, `seq_len`).
 
         # Project and transpose `query`, `key`, and `value` from
-        # (`batch_size`, `seq_len`, `num_hiddens`) to
+        # (`batch_size`, `seq_len`, `dim`) to
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
         query = transpose_qkv(self.W_q(query), self.num_heads)
         key = transpose_qkv(self.W_k(key), self.num_heads)
@@ -106,10 +106,7 @@ class MultiHeadAttention(nn.Block):
 
         if valid_len is not None:
             # Copy `valid_len` by `num_heads` times
-            if valid_len.ndim == 1:
-                valid_len = np.tile(valid_len, self.num_heads)
-            else:
-                valid_len = np.tile(valid_len, (self.num_heads, 1))
+            valid_len = valid_len.repeat(self.num_heads, axis=0)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
@@ -141,7 +138,7 @@ class MultiHeadAttention(nn.Module):
         # (`batch_size`, `seq_len`).
 
         # Project and transpose `query`, `key`, and `value` from
-        # (`batch_size`, `seq_len`, `num_hiddens`) to
+        # (`batch_size`, `seq_len`, `dim`) to
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
         query = transpose_qkv(self.W_q(query), self.num_heads)
         key = transpose_qkv(self.W_k(key), self.num_heads)
@@ -149,10 +146,7 @@ class MultiHeadAttention(nn.Module):
 
         if valid_len is not None:
             # Copy `valid_len` by `num_heads` times
-            if valid_len.ndim == 1:
-              valid_len = valid_len.repeat(self.num_heads)
-            else:
-              valid_len = valid_len.repeat(self.num_heads, 1)
+            valid_len = torch.repeat_interleave(valid_len, repeats=self.num_heads, dim=0)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
