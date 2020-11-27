@@ -556,8 +556,8 @@ class Vocab:
             reserved_tokens = [] 
         # Sort according to frequencies
         counter = count_corpus(tokens)
-        self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
-        self.token_freqs.sort(key=lambda x: x[1], reverse=True)
+        self.token_freqs = sorted(counter.items(), key=lambda x: x[1],
+                                  reverse=True)
         # The index for the unknown token is 0
         self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
         uniq_tokens += [token for token, freq in self.token_freqs
@@ -606,8 +606,9 @@ def load_corpus_time_machine(max_tokens=-1):
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 def seq_data_iter_random(corpus, batch_size, num_steps):
     """Generate a minibatch of subsequences using random sampling."""
-    # Start with a random offset to partition a sequence
-    corpus = corpus[random.randint(0, num_steps):]
+    # Start with a random offset (inclusive of `num_steps - 1`) to partition a
+    # sequence
+    corpus = corpus[random.randint(0, num_steps - 1):]
     # Subtract 1 since we need to account for labels
     num_subseqs = (len(corpus) - 1) // num_steps
     # The starting indices for subsequences of length `num_steps`
