@@ -259,7 +259,7 @@ encoder.initialize()
 ```{.python .input}
 #@tab pytorch
 vocab_size, num_hiddens, ffn_num_hiddens, num_heads = 10000, 768, 1024, 4
-norm_shape, ffn_num_input, num_layers, dropout = [8, 768], 768, 2, 0.2 
+norm_shape, ffn_num_input, num_layers, dropout = [768], 768, 2, 0.2
 encoder = BERTEncoder(vocab_size, num_hiddens, norm_shape, ffn_num_input,
                       ffn_num_hiddens, num_heads, num_layers, dropout)
 ```
