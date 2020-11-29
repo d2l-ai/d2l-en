@@ -198,7 +198,7 @@ d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
 1. If we use Xavier to randomly initialize the transposed convolution layer, what will happen to the result?
 1. Can you further improve the accuracy of the model by tuning the hyperparameters?
 1. Predict the categories of all pixels in the test image.
-1. The outputs of some intermediate layers of the convolutional neural network are also used in the paper on fully convolutional networks[1]. Try to implement this idea.
+1. The outputs of some intermediate layers of the convolutional neural network are also used in the paper on fully convolutional networks :cite:`Long.Shelhamer.Darrell.2015`. Try to implement this idea.
 
 
 :begin_tab:`mxnet`
