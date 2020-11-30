@@ -59,7 +59,6 @@ net(X)
 ```{.python .input}
 #@tab tensorflow
 import tensorflow as tf
-import numpy as np
 
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),

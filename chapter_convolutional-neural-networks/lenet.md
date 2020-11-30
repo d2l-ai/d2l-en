@@ -133,7 +133,6 @@ net = torch.nn.Sequential(
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-from tensorflow.distribute import MirroredStrategy, OneDeviceStrategy
 
 def net():
     return tf.keras.models.Sequential([
