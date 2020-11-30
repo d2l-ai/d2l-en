@@ -34,7 +34,6 @@ from d2l import torch as d2l
 import os
 import random
 import torch
-from torch import nn
 ```
 
 In the WikiText-2 dataset,
