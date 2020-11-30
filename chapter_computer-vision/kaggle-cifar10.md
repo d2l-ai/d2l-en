@@ -24,12 +24,11 @@ First, import the packages or modules required for the competition.
 import collections
 from d2l import mxnet as d2l
 import math
-from mxnet import autograd, gluon, init, npx
+from mxnet import gluon, init, npx
 from mxnet.gluon import nn
 import os
 import pandas as pd
 import shutil
-import time
 
 npx.set_np()
 ```
@@ -45,7 +44,6 @@ from torch import nn
 import os
 import pandas as pd
 import shutil
-import time
 ```
 
 ## Obtaining and Organizing the Dataset

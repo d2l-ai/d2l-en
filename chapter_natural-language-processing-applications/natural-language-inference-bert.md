@@ -24,7 +24,7 @@ for natural language inference on the SNLI dataset.
 from d2l import mxnet as d2l
 import json
 import multiprocessing
-from mxnet import autograd, gluon, init, np, npx
+from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 import os
 

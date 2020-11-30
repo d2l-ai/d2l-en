@@ -49,7 +49,7 @@ from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
 import random
-import sys
+
 npx.set_np()
 ```
 

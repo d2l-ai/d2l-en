@@ -28,8 +28,7 @@ We will illustrate them step by step in the following.
 
 ```{.python .input  n=1}
 from d2l import mxnet as d2l
-import mxnet as mx
-from mxnet import autograd, gluon, init, np, npx
+from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()

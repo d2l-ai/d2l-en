@@ -20,14 +20,10 @@ Comparing with the PTB dataset used for pretraining word2vec in :numref:`sec_wor
 WikiText-2 i) retains the original punctuation, making it suitable for next sentence prediction; ii) retains the original case and numbers; iii) is over twice larger.
 
 ```{.python .input  n=1}
-import collections
 from d2l import mxnet as d2l
-import mxnet as mx
-from mxnet import autograd, gluon, init, np, npx
+from mxnet import gluon, np, npx
 import os
 import random
-import time
-import zipfile
 
 npx.set_np()
 ```

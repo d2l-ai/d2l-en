@@ -42,7 +42,7 @@ Next, we go deeper into the mechanics of initialization.
 To begin, let us instantiate an MLP.
 
 ```{.python .input}
-from mxnet import init, np, npx
+from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 

@@ -15,27 +15,21 @@ In this competition, we attempt to identify 120 different breeds of dogs. The da
 First, import the packages or modules required for the competition.
 
 ```{.python .input}
-import collections
 from d2l import mxnet as d2l
-import math
 from mxnet import autograd, gluon, init, npx
 from mxnet.gluon import nn
 import os
-import time
 
 npx.set_np()
 ```
 
 ```{.python .input}
 #@tab pytorch
-import collections
 from d2l import torch as d2l
-import math
 import torch
 import torchvision
 from torch import nn
 import os
-import time
 ```
 
 ## Obtaining and Organizing the Dataset

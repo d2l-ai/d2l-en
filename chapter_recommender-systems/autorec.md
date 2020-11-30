@@ -32,7 +32,7 @@ from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
-import sys
+
 npx.set_np()
 ```
 
