@@ -657,7 +657,7 @@ def train_epoch_ch8(model, train_iter, loss, updater,   #@save
         with tf.GradientTape(persistent=True) as g:
             g.watch(params)
             y_hat, state= model(X, state, params)
-            y = d2l.reshape(Y, (-1))
+            y = d2l.reshape(tf.transpose(Y), (-1)) #transpose Y accordingly (because we have transposed X)
             l = loss(y, y_hat)
         grads = g.gradient(l, params)
         grads = grad_clipping(grads, 1)
