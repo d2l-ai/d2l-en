@@ -150,9 +150,9 @@ class MultiHeadAttention(nn.Module):
         if valid_len is not None:
             # Copy `valid_len` by `num_heads` times
             if valid_len.ndim == 1:
-              valid_len = valid_len.repeat(self.num_heads)
+                valid_len = valid_len.repeat(self.num_heads)
             else:
-              valid_len = valid_len.repeat(self.num_heads, 1)
+                valid_len = valid_len.repeat(self.num_heads, 1)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
@@ -806,4 +806,3 @@ d2l.translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1066)
 :end_tab:
-
