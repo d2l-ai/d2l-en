@@ -1,4 +1,4 @@
-# Nadaraya--Watson Kernel Regression
+# Nadaraya-Watson Kernel Regression
 :label:`sec_nadaraya-waston`
 
 ```{.python .input  n=2}

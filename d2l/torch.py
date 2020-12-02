@@ -1110,16 +1110,16 @@ class DotProductAttention(nn.Module):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # `query`: (`batch_size`, #queries, `d`)
-    # `key`: (`batch_size`, #kv_pairs, `d`)
-    # `value`: (`batch_size`, #kv_pairs, `dim_v`)
+    # `queries`: (`batch_size`, #queries, `d`)
+    # `keys`: (`batch_size`, #kv_pairs, `d`)
+    # `values`: (`batch_size`, #kv_pairs, `dim_v`)
     # `valid_len`: either (`batch_size`, ) or (`batch_size`, xx)
-    def forward(self, query, key, value, valid_len=None):
-        d = query.shape[-1]
+    def forward(self, queries, keys, values, valid_len=None):
+        d = queries.shape[-1]
         # Set transpose_b=True to swap the last two dimensions of key
-        scores = torch.bmm(query, key.transpose(1,2)) / math.sqrt(d)
+        scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return torch.bmm(attention_weights, value)
+        return torch.bmm(attention_weights, values)
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
@@ -1131,15 +1131,15 @@ class MLPAttention(nn.Module):
         self.v = nn.Linear(units, 1, bias=False)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, query, key, value, valid_len):
-        query, key = self.W_q(query), self.W_k(key)
-        # Expand query to (`batch_size`, #queries, 1, units), and key to
+    def forward(self, queries, keys, values, valid_len):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # Expand `queries` to (`batch_size`, #queries, 1, units), and key to
         # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
-        features = query.unsqueeze(2) + key.unsqueeze(1)
+        features = queries.unsqueeze(2) + keys.unsqueeze(1)
         features = torch.tanh(features)
         scores = self.v(features).squeeze(-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return torch.bmm(attention_weights, value)
+        return torch.bmm(attention_weights, values)
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
@@ -1154,29 +1154,29 @@ class MultiHeadAttention(nn.Module):
         self.W_v = nn.Linear(value_size, num_hiddens, bias=bias)
         self.W_o = nn.Linear(num_hiddens, num_hiddens, bias=bias)
 
-    def forward(self, query, key, value, valid_len):
-        # For self-attention, `query`, `key`, and `value` shape:
+    def forward(self, queries, keys, values, valid_len):
+        # For self-attention, `queries`, `keys`, and `values` shape:
         # (`batch_size`, `seq_len`, `dim`), where `seq_len` is the length of
         # input sequence. `valid_len` shape is either (`batch_size`, ) or
         # (`batch_size`, `seq_len`).
 
-        # Project and transpose `query`, `key`, and `value` from
+        # Project and transpose `queries`, `keys`, and `values` from
         # (`batch_size`, `seq_len`, `num_hiddens`) to
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
-        query = transpose_qkv(self.W_q(query), self.num_heads)
-        key = transpose_qkv(self.W_k(key), self.num_heads)
-        value = transpose_qkv(self.W_v(value), self.num_heads)
+        queries = transpose_qkv(self.W_q(queries), self.num_heads)
+        keys = transpose_qkv(self.W_k(keys), self.num_heads)
+        values = transpose_qkv(self.W_v(values), self.num_heads)
 
         if valid_len is not None:
             # Copy `valid_len` by `num_heads` times
             if valid_len.ndim == 1:
-              valid_len = valid_len.repeat(self.num_heads)
+                valid_len = valid_len.repeat(self.num_heads)
             else:
-              valid_len = valid_len.repeat(self.num_heads, 1)
+                valid_len = valid_len.repeat(self.num_heads, 1)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
-        output = self.attention(query, key, value, valid_len)
+        output = self.attention(queries, keys, values, valid_len)
 
         # `output_concat` shape: (`batch_size`, `seq_len`, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)

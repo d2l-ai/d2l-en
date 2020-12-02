@@ -134,16 +134,16 @@ class DotProductAttention(nn.Block):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # `query`: (`batch_size`, #queries, `d`)
-    # `key`: (`batch_size`, #kv_pairs, `d`)
-    # `value`: (`batch_size`, #kv_pairs, `dim_v`)
+    # `queries`: (`batch_size`, #queries, `d`)
+    # `keys`: (`batch_size`, #kv_pairs, `d`)
+    # `values`: (`batch_size`, #kv_pairs, `dim_v`)
     # `valid_len`: either (`batch_size`, ) or (`batch_size`, xx)
-    def forward(self, query, key, value, valid_len=None):
-        d = query.shape[-1]
+    def forward(self, queries, keys, values, valid_len=None):
+        d = queries.shape[-1]
         # Set transpose_b=True to swap the last two dimensions of key
-        scores = npx.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
+        scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return npx.batch_dot(attention_weights, value)
+        return npx.batch_dot(attention_weights, values)
 ```
 
 ```{.python .input}
@@ -154,16 +154,16 @@ class DotProductAttention(nn.Module):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # `query`: (`batch_size`, #queries, `d`)
-    # `key`: (`batch_size`, #kv_pairs, `d`)
-    # `value`: (`batch_size`, #kv_pairs, `dim_v`)
+    # `queries`: (`batch_size`, #queries, `d`)
+    # `keys`: (`batch_size`, #kv_pairs, `d`)
+    # `values`: (`batch_size`, #kv_pairs, `dim_v`)
     # `valid_len`: either (`batch_size`, ) or (`batch_size`, xx)
-    def forward(self, query, key, value, valid_len=None):
-        d = query.shape[-1]
+    def forward(self, queries, keys, values, valid_len=None):
+        d = queries.shape[-1]
         # Set transpose_b=True to swap the last two dimensions of key
-        scores = torch.bmm(query, key.transpose(1,2)) / math.sqrt(d)
+        scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return torch.bmm(attention_weights, value)
+        return torch.bmm(attention_weights, values)
 ```
 
 Let us test the class `DotProductAttention` in a toy example.
@@ -208,22 +208,23 @@ Intuitively, you can imagine $\mathbf W_k \mathbf k + \mathbf W_q\mathbf q$ as c
 class MLPAttention(nn.Block):
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
-        # Use flatten=False to keep query's and key's 3-D shapes
+        # Use `flatten=False` to keep the 3D shapes of `queries` and `keys`
         self.W_k = nn.Dense(units, use_bias=False, flatten=False)
         self.W_q = nn.Dense(units, use_bias=False, flatten=False)
         self.v = nn.Dense(1, use_bias=False, flatten=False)
         self.dropout = nn.Dropout(dropout)
 
 
-    def forward(self, query, key, value, valid_len):
-        query, key = self.W_q(query), self.W_k(key)
-        # Expand query to (`batch_size`, #queries, 1, units), and key to
+    def forward(self, queries, keys, values, valid_len):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # Expand `queries` to (`batch_size`, #queries, 1, units), and keys to
         # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
-        features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
+        features = np.expand_dims(queries, axis=2) + np.expand_dims(
+            keys, axis=1)
         features = np.tanh(features)
         scores = np.squeeze(self.v(features), axis=-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return npx.batch_dot(attention_weights, value)
+        return npx.batch_dot(attention_weights, values)
 ```
 
 ```{.python .input}
@@ -237,15 +238,15 @@ class MLPAttention(nn.Module):
         self.v = nn.Linear(units, 1, bias=False)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, query, key, value, valid_len):
-        query, key = self.W_q(query), self.W_k(key)
-        # Expand query to (`batch_size`, #queries, 1, units), and key to
+    def forward(self, queries, keys, values, valid_len):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # Expand `queries` to (`batch_size`, #queries, 1, units), and key to
         # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
-        features = query.unsqueeze(2) + key.unsqueeze(1)
+        features = queries.unsqueeze(2) + keys.unsqueeze(1)
         features = torch.tanh(features)
         scores = self.v(features).squeeze(-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return torch.bmm(attention_weights, value)
+        return torch.bmm(attention_weights, values)
 ```
 
 To test the above `MLPAttention` class, we use the same inputs as in the previous toy example. As we can see below, despite `MLPAttention` containing an additional MLP model, we obtain the same outputs as for `DotProductAttention`.

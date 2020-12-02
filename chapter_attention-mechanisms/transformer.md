@@ -91,18 +91,18 @@ class MultiHeadAttention(nn.Block):
         self.W_v = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
         self.W_o = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
 
-    def forward(self, query, key, value, valid_len):
-        # For self-attention, `query`, `key`, and `value` shape:
+    def forward(self, queries, keys, values, valid_len):
+        # For self-attention, `queries`, `keys`, and `values` shape:
         # (`batch_size`, `seq_len`, `dim`), where `seq_len` is the length of
         # input sequence. `valid_len` shape is either (`batch_size`, ) or
         # (`batch_size`, `seq_len`).
 
-        # Project and transpose `query`, `key`, and `value` from
+        # Project and transpose `queries`, `keys`, and `values` from
         # (`batch_size`, `seq_len`, `num_hiddens`) to
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
-        query = transpose_qkv(self.W_q(query), self.num_heads)
-        key = transpose_qkv(self.W_k(key), self.num_heads)
-        value = transpose_qkv(self.W_v(value), self.num_heads)
+        queries = transpose_qkv(self.W_q(queries), self.num_heads)
+        keys = transpose_qkv(self.W_k(keys), self.num_heads)
+        values = transpose_qkv(self.W_v(values), self.num_heads)
 
         if valid_len is not None:
             # Copy `valid_len` by `num_heads` times
@@ -113,7 +113,7 @@ class MultiHeadAttention(nn.Block):
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
-        output = self.attention(query, key, value, valid_len)
+        output = self.attention(queries, keys, values, valid_len)
 
         # `output_concat` shape: (`batch_size`, `seq_len`, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)
@@ -134,18 +134,18 @@ class MultiHeadAttention(nn.Module):
         self.W_v = nn.Linear(value_size, num_hiddens, bias=bias)
         self.W_o = nn.Linear(num_hiddens, num_hiddens, bias=bias)
 
-    def forward(self, query, key, value, valid_len):
-        # For self-attention, `query`, `key`, and `value` shape:
+    def forward(self, queries, keys, values, valid_len):
+        # For self-attention, `queries`, `keys`, and `values` shape:
         # (`batch_size`, `seq_len`, `dim`), where `seq_len` is the length of
         # input sequence. `valid_len` shape is either (`batch_size`, ) or
         # (`batch_size`, `seq_len`).
 
-        # Project and transpose `query`, `key`, and `value` from
+        # Project and transpose `queries`, `keys`, and `values` from
         # (`batch_size`, `seq_len`, `num_hiddens`) to
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
-        query = transpose_qkv(self.W_q(query), self.num_heads)
-        key = transpose_qkv(self.W_k(key), self.num_heads)
-        value = transpose_qkv(self.W_v(value), self.num_heads)
+        queries = transpose_qkv(self.W_q(queries), self.num_heads)
+        keys = transpose_qkv(self.W_k(keys), self.num_heads)
+        values = transpose_qkv(self.W_v(values), self.num_heads)
 
         if valid_len is not None:
             # Copy `valid_len` by `num_heads` times
@@ -156,7 +156,7 @@ class MultiHeadAttention(nn.Module):
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
-        output = self.attention(query, key, value, valid_len)
+        output = self.attention(queries, keys, values, valid_len)
 
         # `output_concat` shape: (`batch_size`, `seq_len`, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)
