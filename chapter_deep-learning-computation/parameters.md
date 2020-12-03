@@ -513,10 +513,10 @@ net[0].weight[:2]
 #@tab tensorflow
 class MyInit(tf.keras.initializers.Initializer):
     def __call__(self, shape, dtype=None):
-        data=tf.random.uniform(shape,-10, 10, dtype=dtype)
-        factor=(tf.abs(data)>=5)
-        factor=tf.cast(factor,tf.float32)
-        return data*factor        
+        data=tf.random.uniform(shape, -10, 10, dtype=dtype)
+        factor=(tf.abs(data) >= 5)
+        factor=tf.cast(factor, tf.float32)
+        return data * factor        
 
 net = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
