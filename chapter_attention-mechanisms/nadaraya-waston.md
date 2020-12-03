@@ -1,6 +1,9 @@
 # Nadaraya-Watson Kernel Regression
 :label:`sec_nadaraya-waston`
 
+
+## Data Generation
+
 ```{.python .input  n=2}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
@@ -13,15 +16,18 @@ def f(x):
 ```
 
 ```{.python .input}
-n_train = 50
-x_train = np.random.rand(n_train) * 5
-y_train = f(x_train) + d2l.normal(0, 0.5, n_train)
+n_train = 50  # No. of training examples
+x_train = np.random.rand(n_train) * 5  # Training inputs
+y_train = f(x_train) + d2l.normal(0, 0.5, n_train)  # Training outputs
+x_test = np.arange(0, 5, 0.05)  # Testing examples
+y_truth = f(x_test)  # Ground-truth outputs for the testing examples
+n_test = len(x_test)  # No. of testing examples
+n_test
+```
 
-x = np.arange(0, 5, 0.05)
-y_truth = f(x)
-
-def plot_kernel_reg(y_pred):
-    d2l.plot(x, [y_truth, y_pred], 'x', 'y', legend=['Truth', 'Pred'],
+```{.python .input}
+def plot_kernel_reg(y_hat):
+    d2l.plot(x_test, [y_truth, y_hat], 'x', 'y', legend=['Truth', 'Pred'],
              xlim=[0, 5], ylim=[-1, 5])
     d2l.plt.plot(x_train, y_train, 'o', alpha=0.5);
 ```
@@ -29,8 +35,8 @@ def plot_kernel_reg(y_pred):
 ## Average Pooling
 
 ```{.python .input}
-y_pred = np.repeat(y_train.mean(), len(x))
-plot_kernel_reg(y_pred)
+y_hat = np.repeat(y_train.mean(), n_test)
+plot_kernel_reg(y_hat)
 ```
 
 ## Nonparametric Model
@@ -53,10 +59,17 @@ Thus,
 $$\begin{aligned} f(x) &= \sum_i \alpha(x, x_i) y_i \\&= \sum_i \frac{\exp\left(-\frac{1}{2}(x - x_i)^2\right)}{\sum_j \exp\left(-\frac{1}{2}(x - x_j)^2\right)} y_i \\&= \sum_i \mathrm{softmax}\left(-\frac{1}{2}(x - x_i)^2\right) y_i \end{aligned} $$
 
 ```{.python .input}
-X_repeat = d2l.reshape(np.repeat(x, n_train), (-1, n_train))
-attention_matrix = npx.softmax(-(X_repeat - x_train)**2 / 2)
-y_pred = d2l.matmul(attention_matrix, y_train)
-plot_kernel_reg(y_pred)
+# Shape of `X_repeat`: (`n_test`, `n_train`), where each row contains the
+# same testing inputs (i.e., same queries)
+X_repeat = d2l.reshape(np.repeat(x_test, n_train), (-1, n_train))
+# Note that `x_train` contains the keys. Shape of `attention_weights`:
+# (`n_test`, `n_train`), where each row contains attention weights to be
+# assigned among the values (`y_train`) given each query
+attention_weights = npx.softmax(-(X_repeat - x_train)**2 / 2)
+# Each element of `y_hat` is weighted average of values, where weights are
+# attention weights
+y_hat = d2l.matmul(attention_weights, y_train)
+plot_kernel_reg(y_hat)
 ```
 
 ## Parametric Model
@@ -65,51 +78,88 @@ $$\begin{aligned}
 f(x) &= \sum_i \alpha(x, x_i) y_i \\&= \sum_i \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_j \exp\left(-\frac{1}{2}((x - x_i)w)^2\right)} y_i \\&= \sum_i \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i
 \end{aligned}$$
 
+
+### Minibatch Multiplication
+
+We can multiply the matrices in two minibatches one by one, by the minibatch multiplication operation `batch_dot`. Suppose the first batch contains $n$ matrices $\mathbf{X}_1, \ldots, \mathbf{X}_n$ with a shape of $a\times b$, and the second batch contains $n$ matrices $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ with a shape of $b\times c$. The output of matrix multiplication on these two batches are $n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ with a shape of $a\times c$. Therefore, given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of the minibatch multiplication output is ($n$, $a$, $c$).
+
+```{.python .input}
+X = d2l.ones((2, 1, 4))
+Y = d2l.ones((2, 4, 6))
+npx.batch_dot(X, Y).shape
+```
+
+We can use minibatch multiplication to compute weighted averages of values in a minibatch.
+
+```{.python .input}
+weights = d2l.ones((2, 10)) * 0.1
+values = d2l.reshape(d2l.arange(20), (2, 10))
+npx.batch_dot(np.expand_dims(weights, 1), np.expand_dims(values, -1))
+```
+
+### Parametrized Nadaraya-Watson Kernel Regression
+
 ```{.python .input}
 class NWKernelRegression(nn.Block):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.w = self.params.get('w', shape=(1,))
         
-    def forward(self, q, K, V):
-        Q = d2l.reshape(np.repeat(q, K.shape[1]), (-1, K.shape[1]))
-        A = npx.softmax(-((Q - K) * self.w.data())**2 / 2)
-        return npx.batch_dot(np.expand_dims(A, 1), V).reshape(-1)
+    def forward(self, queries, keys, values):
+        # Shape of the output `queries` and `attention_weights`:
+        # (no. of queries, no. of key-value pairs)
+        queries = d2l.reshape(
+            np.repeat(queries, keys.shape[1]), (-1, keys.shape[1]))
+        attention_weights = npx.softmax(
+            -((queries - keys) * self.w.data())**2 / 2)   
+        # Shape of `values`: (no. of queries, no. of key-value pairs)
+        return npx.batch_dot(np.expand_dims(attention_weights, 1),
+                             np.expand_dims(values, -1)).reshape(-1)
 ```
+
+### Defining Keys and Values for Training the Attention Model
 
 ```{.python .input}
-q = x_train
-
+# Shape of `X_tile`: (`n_train`, `n_train`), where each column contains the
+# same training inputs
 X_tile = np.tile(x_train, (n_train, 1))
+# Shape of `Y_tile`: (`n_train`, `n_train`), where each column contains the
+# same training outputs
 Y_tile = np.tile(y_train, (n_train, 1))
-
-# Shape: ('n_train', num. of key-value pairs)
-K = d2l.reshape(X_tile[(1 - np.eye(n_train)).astype('bool')], (n_train, -1))
-# Shape: ('n_train', num. of key-value pairs, 1) 
-V = d2l.reshape(Y_tile[(1 - np.eye(n_train)).astype('bool')],
-                (n_train, -1, 1))
+# Shape of `keys`: ('n_train', 'n_train' - 1)
+keys = d2l.reshape(X_tile[(1 - np.eye(n_train)).astype('bool')],
+                   (n_train, -1))
+# Shape of `values`: ('n_train', 'n_train' - 1) 
+values = d2l.reshape(Y_tile[(1 - np.eye(n_train)).astype('bool')],
+                     (n_train, -1))
 ```
+
+Training.
 
 ```{.python .input}
 net = NWKernelRegression()
 net.initialize()
-
 loss = gluon.loss.L2Loss()
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': 0.9})
 animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, 5])
 
 for epoch in range(5):
     with autograd.record():
-        l = loss(net(x_train, K, V), y_train)
+        l = loss(net(x_train, keys, values), y_train)
     l.backward()
     trainer.step(1)
     print(f'epoch {epoch + 1}, loss {float(l.sum()):.6f}')
     animator.add(epoch + 1, float(l.sum()))
 ```
 
+
+
 ```{.python .input}
-K = np.tile(x_train, (len(x), 1))
-V = np.expand_dims(np.tile(y_train, (len(x), 1)), -1)
-y_pred = net(x, K, V)
-plot_kernel_reg(y_pred)
+# Shape of `keys`: (`n_test`, `n_train`), where each column contains the same
+# training inputs (i.e., same keys)
+keys = np.tile(x_train, (n_test, 1))
+# Shape of `value`: (`n_test`, `n_train`)
+values = np.tile(y_train, (n_test, 1))
+y_hat = net(x_test, keys, values)
+plot_kernel_reg(y_hat)
 ```
