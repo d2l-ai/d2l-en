@@ -303,7 +303,7 @@ pool2d(X)
 1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_h\times p_w$ with a padding of $(p_h, p_w)$ and a stride of $(s_h, s_w)$.
 1. Why do you expect maximum pooling and average pooling to work differently?
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
-1. Is there another operation besides average and maximum pooling that you could consider (hint: recall the softmax)? Why it may not be  popular?
+1. Is there another operation besides average and maximum pooling that you could consider (hint: recall the softmax)? Why it may not be popular?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/71)
