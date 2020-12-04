@@ -32,7 +32,7 @@ obliterating any interesting information
 on the boundaries of the original image.
 *Padding* is the most popular tool for handling this issue.
 
-In other cases, we may want to reduce the dimensionality drastically,
+In other cases, we may want to reduce the height and width drastically,
 e.g., if we find the original input resolution to be unwieldy.
 *Strided convolutions* are a popular technique that can help in these instances.
 

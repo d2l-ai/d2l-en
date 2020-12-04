@@ -67,7 +67,7 @@ depending on whether max or average pooling is employed.
 ![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions are the first output element as well as the input tensor elements used for the output computation: $\max(0, 1, 3, 4)=4$.](../img/pooling.svg)
 :label:`fig_pooling`
 
-The output tensor in :numref:`fig_pooling`  has a height of 2 and a width of 2.
+The output tensor in :numref:`fig_pooling`  has a height of $2$ and a width of $2$.
 The four elements are derived from the maximum value in each pooling window:
 
 $$
@@ -167,7 +167,7 @@ by padding the input and adjusting the stride.
 We can demonstrate the use of padding and strides
 in pooling layers via the built-in two-dimensional maximum pooling layer from the deep learning framework.
 We first construct an input tensor `X` whose shape has four dimensions,
-where the number of examples and number of channels are both 1.
+where the number of examples and number of channels are both $1$.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -255,7 +255,7 @@ as in a convolutional layer.
 This means that the number of output channels for the pooling layer
 is the same as the number of input channels.
 Below, we will concatenate tensors `X` and `X + 1`
-on the channel dimension to construct an input with 2 channels.
+on the channel dimension to construct an input with $2$ channels.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -303,7 +303,7 @@ pool2d(X)
 1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_h\times p_w$ with a padding of $(p_h, p_w)$ and a stride of $(s_h, s_w)$.
 1. Why do you expect maximum pooling and average pooling to work differently?
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
-1. Is there another operation between average and maximum pooling that you could consider (hint: recall the softmax)? Why might it not be so popular?
+1. Is there another operation besides average and maximum pooling that you could consider (hint: recall the softmax)? Why it may not be  popular?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/71)
