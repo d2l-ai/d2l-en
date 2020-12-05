@@ -993,61 +993,72 @@ def translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device):
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
-def masked_softmax(X, valid_len):
-    """Perform softmax by filtering out some elements."""
-    # X: 3-D tensor, valid_len: 1-D or 2-D tensor
-    if valid_len is None:
+def masked_softmax(X, valid_lens):
+    """Perform softmax operation by masking elements on the last axis."""
+    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    if valid_lens is None:
         return npx.softmax(X)
     else:
         shape = X.shape
-        if valid_len.ndim == 1:
-            valid_len = valid_len.repeat(shape[1], axis=0)
+        if valid_lens.ndim == 1:
+            valid_lens = valid_lens.repeat(shape[1])
         else:
-            valid_len = valid_len.reshape(-1)
-        # Fill masked elements with a large negative, whose exp is 0
-        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_len, True,
-                              axis=1, value=-1e6)
+            valid_lens = valid_lens.reshape(-1)
+        # On the last axis, replace masked elements with a very large negative
+        # value, whose exponentiation outputs 0
+        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_lens, True,
+                              value=-1e6, axis=1)
         return npx.softmax(X).reshape(shape)
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 class DotProductAttention(nn.Block):
+    """Dot product attention."""
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # `queries`: (`batch_size`, #queries, `d`)
-    # `keys`: (`batch_size`, #kv_pairs, `d`)
-    # `values`: (`batch_size`, #kv_pairs, `dim_v`)
-    # `valid_len`: either (`batch_size`, ) or (`batch_size`, xx)
-    def forward(self, queries, keys, values, valid_len=None):
+    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
+    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
+    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+    # dimension)
+    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, some value)
+    def forward(self, queries, keys, values, valid_lens=None):
         d = queries.shape[-1]
-        # Set transpose_b=True to swap the last two dimensions of key
+        # Set `transpose_b=True` to swap the last two dimensions of `keys`
         scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_len))
+        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
         return npx.batch_dot(attention_weights, values)
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 class MLPAttention(nn.Block):
-    def __init__(self, units, dropout, **kwargs):
+    """MLP attention."""
+    def __init__(self, num_hiddens, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
-        # Use `flatten=False` to keep the 3D shapes of `queries` and `keys`
-        self.W_k = nn.Dense(units, use_bias=False, flatten=False)
-        self.W_q = nn.Dense(units, use_bias=False, flatten=False)
-        self.v = nn.Dense(1, use_bias=False, flatten=False)
+        # Use `flatten=False` to only transform the last axis so that the
+        # shapes for the other axes are kept the same
+        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.w_v = nn.Dense(1, use_bias=False, flatten=False)
         self.dropout = nn.Dropout(dropout)
 
-
-    def forward(self, queries, keys, values, valid_len):
+    def forward(self, queries, keys, values, valid_lens):
         queries, keys = self.W_q(queries), self.W_k(keys)
-        # Expand `queries` to (`batch_size`, #queries, 1, units), and keys to
-        # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
+        # After dimension expansion, shape of `queries`: (`batch_size`, no. of
+        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
+        # no. of key-value pairs, `num_hiddens`). Sum them up with
+        # broadcasting
         features = np.expand_dims(queries, axis=2) + np.expand_dims(
             keys, axis=1)
         features = np.tanh(features)
-        scores = np.squeeze(self.v(features), axis=-1)
-        attention_weights = self.dropout(masked_softmax(scores, valid_len))
+        # There is only one output of `self.w_v`, so we remove the last
+        # one-dimensional entry from the shape. Shape of `scores`:
+        # (`batch_size`, no. of queries, no. of key-value pairs)
+        scores = np.squeeze(self.w_v(features), axis=-1)
+        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
+        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # dimension)
         return npx.batch_dot(attention_weights, values)
 
 
