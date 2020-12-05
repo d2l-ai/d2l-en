@@ -74,27 +74,28 @@ def masked_softmax(X, valid_lens):
 ```{.python .input}
 #@tab pytorch
 #@save
-def masked_softmax(X, valid_len):
-    """Perform softmax by filtering out some elements."""
-    # X: 3-D tensor, valid_len: 1-D or 2-D tensor
-    if valid_len is None:
+def masked_softmax(X, valid_lens):
+    """Perform softmax operation by masking elements on the last axis."""
+    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    if valid_lens is None:
         return nn.functional.softmax(X, dim=-1)
     else:
         shape = X.shape
-        if valid_len.dim() == 1:
-            valid_len = torch.repeat_interleave(valid_len, repeats=shape[1],
-                                                dim=0)
+        if valid_lens.dim() == 1:
+            valid_lens = torch.repeat_interleave(valid_lens, shape[1])
         else:
-            valid_len = valid_len.reshape(-1)
-        # Fill masked elements with a large negative, whose exp is 0
-        X = d2l.sequence_mask(X.reshape(-1, shape[-1]), valid_len, value=-1e6)
+            valid_lens = valid_lens.reshape(-1)
+        # On the last axis, replace masked elements with a very large negative
+        # value, whose exponentiation outputs 0
+        X = d2l.sequence_mask(X.reshape(-1, shape[-1]), valid_lens,
+                              value=-1e6)
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 ```
 
 To illustrate how this function works, we construct two $2 \times 4$ matrices as the input. In addition, we specify that the valid length equals to 2 for the first example, and 3 for the second example. Then, as we can see from the following outputs, the values outside valid lengths are masked as zero.
 
 ```{.python .input}
-masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([2, 3]))
+masked_softmax(np.random.uniform(size=(2, 2, 4)), d2l.tensor([2, 3]))
 ```
 
 ```{.python .input}
@@ -105,7 +106,13 @@ masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3]))
 Similarly, we can pass a 2D tensor via the `valid_lens` argument.
 
 ```{.python .input}
-masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([[1, 3], [2, 4]]))
+masked_softmax(np.random.uniform(size=(2, 2, 4)),
+               d2l.tensor([[1, 3], [2, 4]]))
+```
+
+```{.python .input}
+#@tab pytorch
+masked_softmax(torch.rand(2, 2, 4), d2l.tensor([[1, 3], [2, 4]]))
 ```
 
 ## Dot Product Attention
@@ -146,19 +153,21 @@ class DotProductAttention(nn.Block):
 #@tab pytorch
 #@save
 class DotProductAttention(nn.Module):
+    """Dot product attention."""
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # `queries`: (`batch_size`, #queries, `d`)
-    # `keys`: (`batch_size`, #kv_pairs, `d`)
-    # `values`: (`batch_size`, #kv_pairs, `dim_v`)
-    # `valid_len`: either (`batch_size`, ) or (`batch_size`, xx)
-    def forward(self, queries, keys, values, valid_len=None):
+    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
+    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
+    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+    # dimension)
+    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, some value)
+    def forward(self, queries, keys, values, valid_lens=None):
         d = queries.shape[-1]
-        # Set transpose_b=True to swap the last two dimensions of key
+        # Set `transpose_b=True` to swap the last two dimensions of `keys`
         scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_len))
+        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
         return torch.bmm(attention_weights, values)
 ```
 
@@ -166,25 +175,28 @@ Let us test the class `DotProductAttention` in a toy example.
 First, create two batches, where each batch has one query and 10 key-value pairs.
 Via the `valid_lens` argument,
 we specify that we will check the first $2$ key-value pairs for the first batch and $6$ for the second one. Therefore, even though both batches have the same query and key-value pairs, we obtain different outputs.
+Since every key is the same, the attention weights are uniform.
 
 ```{.python .input}
 attn = DotProductAttention(dropout=0.5)
 attn.initialize()
-queries = np.random.normal(0, 1, size=(2, 1, 2))
-keys = np.random.normal(0, 1, size=(2, 10, 2))
+queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
 # The two value matrices in the `values` minibatch are identical
-values = np.random.normal(0, 1, size=(1, 10, 4)).repeat(2, axis=0)
-valid_lens = np.array([2, 6])
+values = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)
+valid_lens = d2l.tensor([2, 6])
 attn(queries, keys, values, valid_lens)
 ```
 
 ```{.python .input}
 #@tab pytorch
-atten = DotProductAttention(dropout=0.5)
-atten.eval()
-keys = d2l.ones(2,10,2)
-values = torch.arange(40, dtype=torch.float32).reshape(1,10,4).repeat(2,1,1)
-atten(d2l.ones(2,1,2), keys, values, torch.tensor([2, 6]))
+attn = DotProductAttention(dropout=0.5)
+attn.eval()
+queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
+# The two value matrices in the `values` minibatch are identical
+values = torch.arange(40, dtype=torch.float32).reshape(1, 10, 4).repeat(
+    2, 1, 1)
+valid_lens = d2l.tensor([2, 6])
+attn(queries, keys, values, valid_lens)
 ```
 
 As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension.
@@ -238,37 +250,46 @@ class MLPAttention(nn.Block):
 #@tab pytorch
 #@save
 class MLPAttention(nn.Module):
-    def __init__(self, key_size, query_size, units, dropout, **kwargs):
+    def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
-        self.W_k = nn.Linear(key_size, units, bias=False)
-        self.W_q = nn.Linear(query_size, units, bias=False)
-        self.v = nn.Linear(units, 1, bias=False)
+        self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
+        self.W_q = nn.Linear(query_size, num_hiddens, bias=False)
+        self.w_v = nn.Linear(num_hiddens, 1, bias=False)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, queries, keys, values, valid_len):
+    def forward(self, queries, keys, values, valid_lens):
         queries, keys = self.W_q(queries), self.W_k(keys)
-        # Expand `queries` to (`batch_size`, #queries, 1, units), and key to
-        # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
+        # After dimension expansion, shape of `queries`: (`batch_size`, no. of
+        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
+        # no. of key-value pairs, `num_hiddens`). Sum them up with
+        # broadcasting
         features = queries.unsqueeze(2) + keys.unsqueeze(1)
         features = torch.tanh(features)
-        scores = self.v(features).squeeze(-1)
-        attention_weights = self.dropout(masked_softmax(scores, valid_len))
+        # There is only one output of `self.w_v`, so we remove the last
+        # one-dimensional entry from the shape. Shape of `scores`:
+        # (`batch_size`, no. of queries, no. of key-value pairs)
+        scores = self.w_v(features).squeeze(-1)
+        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
+        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # dimension)
         return torch.bmm(attention_weights, values)
 ```
 
-To test the above `MLPAttention` class, we use the same inputs as in the previous toy example. As we can see below, though `MLPAttention` contains an additional MLP model, we obtain the same output shape as for `DotProductAttention`.
+To test the above `MLPAttention` class, we use the same inputs as in the previous toy example.
+Recall that since every key is the same, the attention weights are uniform.
+As we can see below, though `MLPAttention` contains an additional MLP model, we obtain the same output as for `DotProductAttention`.
 
 ```{.python .input}
-atten = MLPAttention(num_hiddens=8, dropout=0.1)
-atten.initialize()
-atten(queries, keys, values, valid_lens)
+attn = MLPAttention(num_hiddens=8, dropout=0.1)
+attn.initialize()
+attn(queries, keys, values, valid_lens)
 ```
 
 ```{.python .input}
 #@tab pytorch
-atten = MLPAttention(key_size=2, query_size=2, units=8, dropout=0.1)
-atten.eval()
-atten(d2l.ones(2, 1, 2), keys, values, torch.tensor([2, 6]))
+attn = MLPAttention(key_size=2, query_size=2, num_hiddens=8, dropout=0.1)
+attn.eval()
+attn(queries, keys, values, valid_lens)
 ```
 
 ## Summary
