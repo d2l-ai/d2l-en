@@ -170,10 +170,12 @@ we specify that we will check the first $2$ key-value pairs for the first batch 
 ```{.python .input}
 attn = DotProductAttention(dropout=0.5)
 attn.initialize()
-queries, keys = d2l.ones((2, 1, 2)), d2l.ones((2, 10, 2))
+queries = np.random.normal(0, 1, size=(2, 1, 2))
+keys = np.random.normal(0, 1, size=(2, 10, 2))
 # The two value matrices in the `values` minibatch are identical
-values = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)
-attn(queries, keys, values, np.array([2, 6]))
+values = np.random.normal(0, 1, size=(1, 10, 4)).repeat(2, axis=0)
+valid_lens = np.array([2, 6])
+attn(queries, keys, values, valid_lens)
 ```
 
 ```{.python .input}
@@ -196,9 +198,9 @@ we may resort to the MLP attention.
 In *MLP attention*, we project both query and keys into $\mathbb R^{h}$ by learnable weights parameters.
 Assume that the learnable weights are $\mathbf W_k\in\mathbb R^{h\times d_k}$, $\mathbf W_q\in\mathbb R^{h\times d_q}$, and $\mathbf v\in\mathbb R^{h}$. Then the score function is defined by
 
-$$\alpha(\mathbf k, \mathbf q) = \mathbf v^\top \text{tanh}(\mathbf W_k \mathbf k + \mathbf W_q\mathbf q).$$
+$$\alpha(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k).$$
 
-Intuitively, you can imagine $\mathbf W_k \mathbf k + \mathbf W_q\mathbf q$ as concatenating the key and value in the feature dimension and feeding them to a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. In this hidden layer, the activation function is $\tanh$ and no bias is applied. Now let us implement the MLP attention.
+Intuitively, you can imagine $\mathbf W_q\mathbf q + \mathbf W_k \mathbf k$ as concatenating the key and value in the feature dimension and feeding them to a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. In this hidden layer, the activation function is $\tanh$ and no bias is applied. Now let us implement the MLP attention.
 
 ```{.python .input}
 #@save
@@ -210,9 +212,8 @@ class MLPAttention(nn.Block):
         # shapes for the other axes are kept the same
         self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
         self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
-        self.v = nn.Dense(1, use_bias=False, flatten=False)
+        self.w_v = nn.Dense(1, use_bias=False, flatten=False)
         self.dropout = nn.Dropout(dropout)
-
 
     def forward(self, queries, keys, values, valid_lens):
         queries, keys = self.W_q(queries), self.W_k(keys)
@@ -223,8 +224,13 @@ class MLPAttention(nn.Block):
         features = np.expand_dims(queries, axis=2) + np.expand_dims(
             keys, axis=1)
         features = np.tanh(features)
-        scores = np.squeeze(self.v(features), axis=-1)
+        # There is only one output of `self.w_v`, so we remove the last
+        # one-dimensional entry from the shape. Shape of `scores`:
+        # (`batch_size`, no. of queries, no. of key-value pairs)
+        scores = np.squeeze(self.w_v(features), axis=-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_lens))
+        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # dimension)
         return npx.batch_dot(attention_weights, values)
 ```
 
@@ -250,12 +256,12 @@ class MLPAttention(nn.Module):
         return torch.bmm(attention_weights, values)
 ```
 
-To test the above `MLPAttention` class, we use the same inputs as in the previous toy example. As we can see below, though `MLPAttention` contains an additional MLP model, we obtain the same outputs as for `DotProductAttention`.
+To test the above `MLPAttention` class, we use the same inputs as in the previous toy example. As we can see below, though `MLPAttention` contains an additional MLP model, we obtain the same output shape as for `DotProductAttention`.
 
 ```{.python .input}
 atten = MLPAttention(num_hiddens=8, dropout=0.1)
 atten.initialize()
-atten(d2l.ones((2, 1, 2)), keys, values, np.array([2, 6]))
+atten(queries, keys, values, valid_lens)
 ```
 
 ```{.python .input}
