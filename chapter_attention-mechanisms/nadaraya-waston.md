@@ -35,7 +35,7 @@ def plot_kernel_reg(y_hat):
 ## Average Pooling
 
 ```{.python .input}
-y_hat = np.repeat(y_train.mean(), n_test)
+y_hat = y_train.mean().repeat(n_test)
 plot_kernel_reg(y_hat)
 ```
 
@@ -61,7 +61,7 @@ $$\begin{aligned} f(x) &= \sum_i \alpha(x, x_i) y_i \\&= \sum_i \frac{\exp\left(
 ```{.python .input}
 # Shape of `X_repeat`: (`n_test`, `n_train`), where each row contains the
 # same testing inputs (i.e., same queries)
-X_repeat = d2l.reshape(np.repeat(x_test, n_train), (-1, n_train))
+X_repeat = d2l.reshape(x_test.repeat(n_train), (-1, n_train))
 # Note that `x_train` contains the keys. Shape of `attention_weights`:
 # (`n_test`, `n_train`), where each row contains attention weights to be
 # assigned among the values (`y_train`) given each query
@@ -79,7 +79,8 @@ f(x) &= \sum_i \alpha(x, x_i) y_i \\&= \sum_i \frac{\exp\left(-\frac{1}{2}((x - 
 \end{aligned}$$
 
 
-### Minibatch Multiplication
+### Batch Multiplication
+:label:`subsec_batch_dot`
 
 We can multiply the matrices in two minibatches one by one, by the minibatch multiplication operation `batch_dot`. Suppose the first batch contains $n$ matrices $\mathbf{X}_1, \ldots, \mathbf{X}_n$ with a shape of $a\times b$, and the second batch contains $n$ matrices $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ with a shape of $b\times c$. The output of matrix multiplication on these two batches are $n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ with a shape of $a\times c$. Therefore, given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of the minibatch multiplication output is ($n$, $a$, $c$).
 
@@ -109,7 +110,7 @@ class NWKernelRegression(nn.Block):
         # Shape of the output `queries` and `attention_weights`:
         # (no. of queries, no. of key-value pairs)
         queries = d2l.reshape(
-            np.repeat(queries, keys.shape[1]), (-1, keys.shape[1]))
+            queries.repeat(keys.shape[1]), (-1, keys.shape[1]))
         attention_weights = npx.softmax(
             -((queries - keys) * self.w.data())**2 / 2)   
         # Shape of `values`: (no. of queries, no. of key-value pairs)
@@ -151,8 +152,6 @@ for epoch in range(5):
     print(f'epoch {epoch + 1}, loss {float(l.sum()):.6f}')
     animator.add(epoch + 1, float(l.sum()))
 ```
-
-
 
 ```{.python .input}
 # Shape of `keys`: (`n_test`, `n_train`), where each column contains the same
