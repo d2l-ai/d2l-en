@@ -100,11 +100,11 @@ def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
     vocab.token_to_idx = {token: idx for idx, token in enumerate(
         vocab.idx_to_token)}
     bert = d2l.BERTModel(len(vocab), num_hiddens, norm_shape=[256],
-                        ffn_num_input=256, ffn_num_hiddens=ffn_num_hiddens,
-                        num_heads=4, num_layers=2, dropout=0.2,
-                        max_len=max_len, key_size=256, query_size=256,
-                        value_size=256, hid_in_features=256,
-                        mlm_in_features=256, nsp_in_features=256)
+                         ffn_num_input=256, ffn_num_hiddens=ffn_num_hiddens,
+                         num_heads=4, num_layers=2, dropout=0.2,
+                         max_len=max_len, key_size=256, query_size=256,
+                         value_size=256, hid_in_features=256,
+                         mlm_in_features=256, nsp_in_features=256)
     # Load pretrained BERT parameters
     bert.load_state_dict(torch.load(os.path.join(data_dir,
                                                  'pretrained.params')))

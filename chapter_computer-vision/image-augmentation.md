@@ -263,8 +263,8 @@ def train_batch_ch13(net, features, labels, loss, trainer, devices,
 #@save
 def train_batch_ch13(net, X, y, loss, trainer, devices):
     if isinstance(X, list):
-        # Required for BERT Finetuning (Sec 15.7)
-        X = [inp.to(devices[0])for inp in X]
+        # Required for BERT Fine-tuning (to be covered later)
+        X = [x.to(device)for x in X]
     else:
         X = X.to(devices[0])
     y = y.to(devices[0])
