@@ -2245,6 +2245,17 @@ def load_data_snli(batch_size, num_steps=50):
     return train_iter, test_iter, train_set.vocab
 
 
+# Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-attention.md
+def predict_snli(net, vocab, premise, hypothesis):
+    net.eval()
+    premise = torch.tensor(vocab[premise], device=d2l.try_gpu())
+    hypothesis = torch.tensor(vocab[hypothesis], device=d2l.try_gpu())
+    label = torch.argmax(net([premise.reshape((1, -1)),
+                           hypothesis.reshape((1, -1))]), dim=1)
+    return 'entailment' if label == 0 else 'contradiction' if label == 1 \
+            else 'neutral'
+
+
 # Defined in file: ./chapter_generative-adversarial-networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
