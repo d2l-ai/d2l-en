@@ -115,7 +115,7 @@ masked_softmax(np.random.uniform(size=(2, 2, 4)),
 masked_softmax(torch.rand(2, 2, 4), d2l.tensor([[1, 3], [2, 4]]))
 ```
 
-## Dot Product Attention
+## Dot-Product Attention
 
 Equipped with the above `masked_softmax` function and the batch multiplication operator as described in :numref:`subsec_batch_dot`, let us dive into the details of two widely used attention layers. The first one is the *dot product attention*: it assumes that the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. The dot product attention computes the scores by a dot product between the query and a key, which is then divided by $\sqrt{d}$ to minimize the unrelated influence of the dimension $d$ on the scores. In other words,
 
@@ -201,13 +201,13 @@ attn(queries, keys, values, valid_lens)
 
 As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension.
 To address such an issue,
-we may resort to the MLP attention.
+we may resort to the additive attention.
 
 
 
-## MLP Attention
+## Additive Attention
 
-In *MLP attention*, we project both query and keys into $\mathbb R^{h}$ by learnable weights parameters.
+In *additive attention*, we project both query and keys into $\mathbb R^{h}$ by learnable weights parameters.
 Assume that the learnable weights are $\mathbf W_k\in\mathbb R^{h\times d_k}$, $\mathbf W_q\in\mathbb R^{h\times d_q}$, and $\mathbf v\in\mathbb R^{h}$. Then the score function is defined by
 
 $$\alpha(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k).$$
@@ -216,10 +216,10 @@ Intuitively, you can imagine $\mathbf W_q\mathbf q + \mathbf W_k \mathbf k$ as c
 
 ```{.python .input}
 #@save
-class MLPAttention(nn.Block):
-    """MLP attention."""
+class AdditiveAttention(nn.Block):
+    """Additive attention."""
     def __init__(self, num_hiddens, dropout, **kwargs):
-        super(MLPAttention, self).__init__(**kwargs)
+        super(AdditiveAttention, self).__init__(**kwargs)
         # Use `flatten=False` to only transform the last axis so that the
         # shapes for the other axes are kept the same
         self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
@@ -249,9 +249,9 @@ class MLPAttention(nn.Block):
 ```{.python .input}
 #@tab pytorch
 #@save
-class MLPAttention(nn.Module):
+class AdditiveAttention(nn.Module):
     def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
-        super(MLPAttention, self).__init__(**kwargs)
+        super(AdditiveAttention, self).__init__(**kwargs)
         self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
         self.W_q = nn.Linear(query_size, num_hiddens, bias=False)
         self.w_v = nn.Linear(num_hiddens, 1, bias=False)
@@ -275,19 +275,19 @@ class MLPAttention(nn.Module):
         return torch.bmm(attention_weights, values)
 ```
 
-To test the above `MLPAttention` class, we use the same inputs as in the previous toy example.
+To test the above `AdditiveAttention` class, we use the same inputs as in the previous toy example.
 Recall that since every key is the same, the attention weights are uniform.
-As we can see below, though `MLPAttention` contains an additional MLP model, we obtain the same output as for `DotProductAttention`.
+As we can see below, though `AdditiveAttention` contains an additional MLP model, we obtain the same output as for `AdditiveAttention`.
 
 ```{.python .input}
-attn = MLPAttention(num_hiddens=8, dropout=0.1)
+attn = AdditiveAttention(num_hiddens=8, dropout=0.1)
 attn.initialize()
 attn(queries, keys, values, valid_lens)
 ```
 
 ```{.python .input}
 #@tab pytorch
-attn = MLPAttention(key_size=2, query_size=2, num_hiddens=8, dropout=0.1)
+attn = AdditiveAttention(key_size=2, query_size=2, num_hiddens=8, dropout=0.1)
 attn.eval()
 attn(queries, keys, values, valid_lens)
 ```

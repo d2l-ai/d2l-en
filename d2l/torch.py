@@ -1131,9 +1131,9 @@ class DotProductAttention(nn.Module):
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
-class MLPAttention(nn.Module):
+class AdditiveAttention(nn.Module):
     def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
-        super(MLPAttention, self).__init__(**kwargs)
+        super(AdditiveAttention, self).__init__(**kwargs)
         self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
         self.W_q = nn.Linear(query_size, num_hiddens, bias=False)
         self.w_v = nn.Linear(num_hiddens, 1, bias=False)

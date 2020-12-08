@@ -1032,10 +1032,10 @@ class DotProductAttention(nn.Block):
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
-class MLPAttention(nn.Block):
-    """MLP attention."""
+class AdditiveAttention(nn.Block):
+    """Additive attention."""
     def __init__(self, num_hiddens, dropout, **kwargs):
-        super(MLPAttention, self).__init__(**kwargs)
+        super(AdditiveAttention, self).__init__(**kwargs)
         # Use `flatten=False` to only transform the last axis so that the
         # shapes for the other axes are kept the same
         self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
