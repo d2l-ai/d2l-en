@@ -91,10 +91,10 @@ class MultiHeadAttention(nn.Block):
         self.W_v = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
         self.W_o = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
 
-    def forward(self, queries, keys, values, valid_len):
+    def forward(self, queries, keys, values, valid_lens):
         # For self-attention, `queries`, `keys`, and `values` shape:
         # (`batch_size`, `num_steps`, `dim`), where `num_steps` is the length of
-        # input sequence. `valid_len` shape is either (`batch_size`, ) or
+        # input sequence. `valid_lens` shape is either (`batch_size`, ) or
         # (`batch_size`, `num_steps`).
 
 
@@ -105,13 +105,13 @@ class MultiHeadAttention(nn.Block):
         keys = transpose_qkv(self.W_k(keys), self.num_heads)
         values = transpose_qkv(self.W_v(values), self.num_heads)
 
-        if valid_len is not None:
-            # Copy `valid_len` by `num_heads` times
-            valid_len = valid_len.repeat(self.num_heads, axis=0)
+        if valid_lens is not None:
+            # Copy `valid_lens` by `num_heads` times
+            valid_lens = valid_lens.repeat(self.num_heads, axis=0)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
-        output = self.attention(queries, keys, values, valid_len)
+        output = self.attention(queries, keys, values, valid_lens)
 
         # `output_concat` shape: (`batch_size`, `num_steps`, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)
@@ -132,10 +132,10 @@ class MultiHeadAttention(nn.Module):
         self.W_v = nn.Linear(value_size, num_hiddens, bias=bias)
         self.W_o = nn.Linear(num_hiddens, num_hiddens, bias=bias)
 
-    def forward(self, queries, keys, values, valid_len):
+    def forward(self, queries, keys, values, valid_lens):
         # For self-attention, `queries`, `keys`, and `values` shape:
         # (`batch_size`, `num_steps`, `dim`), where `num_steps` is the length of
-        # input sequence. `valid_len` shape is either (`batch_size`, ) or
+        # input sequence. `valid_lens` shape is either (`batch_size`, ) or
         # (`batch_size`, `num_steps`).
 
         # Project and transpose `queries`, `keys`, and `values` from
@@ -145,13 +145,13 @@ class MultiHeadAttention(nn.Module):
         keys = transpose_qkv(self.W_k(keys), self.num_heads)
         values = transpose_qkv(self.W_v(values), self.num_heads)
 
-        if valid_len is not None:
-            # Copy `valid_len` by `num_heads` times
-            valid_len = torch.repeat_interleave(valid_len, repeats=self.num_heads, dim=0)
+        if valid_lens is not None:
+            # Copy `valid_lens` by `num_heads` times
+            valid_lens = torch.repeat_interleave(valid_lens, repeats=self.num_heads, dim=0)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
-        output = self.attention(queries, keys, values, valid_len)
+        output = self.attention(queries, keys, values, valid_lens)
 
         # `output_concat` shape: (`batch_size`, `num_steps`, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)
@@ -219,8 +219,8 @@ Let us test the `MultiHeadAttention` model in a toy example. Create a multi-head
 cell = MultiHeadAttention(100, 10, 0.5)
 cell.initialize()
 X = np.ones((2, 4, 5))
-valid_len = np.array([2, 3])
-cell(X, X, X, valid_len).shape
+valid_lens = np.array([2, 3])
+cell(X, X, X, valid_lens).shape
 ```
 
 ```{.python .input}
@@ -228,8 +228,8 @@ cell(X, X, X, valid_len).shape
 cell = MultiHeadAttention(5, 5, 5, 100, 10, 0.5)
 cell.eval()
 X = d2l.ones((2, 4, 5))
-valid_len = d2l.tensor([2, 3])
-cell(X, X, X, valid_len).shape
+valid_lens = d2l.tensor([2, 3])
+cell(X, X, X, valid_lens).shape
 ```
 
 ## Position-wise Feed-Forward Networks
@@ -447,8 +447,8 @@ class EncoderBlock(nn.Block):
         self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(dropout)
 
-    def forward(self, X, valid_len):
-        Y = self.addnorm1(X, self.attention(X, X, X, valid_len))
+    def forward(self, X, valid_lens):
+        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens))
         return self.addnorm2(Y, self.ffn(Y))
 ```
 
@@ -468,8 +468,8 @@ class EncoderBlock(nn.Module):
             ffn_num_input, ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(norm_shape, dropout)
 
-    def forward(self, X, valid_len):
-        Y = self.addnorm1(X, self.attention(X, X, X, valid_len))
+    def forward(self, X, valid_lens):
+        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens))
         return self.addnorm2(Y, self.ffn(Y))
 ```
 
@@ -479,7 +479,7 @@ Due to the residual connections, this block will not change the input shape. It 
 X = np.ones((2, 100, 24))
 encoder_blk = EncoderBlock(24, 48, 8, 0.5)
 encoder_blk.initialize()
-encoder_blk(X, valid_len).shape
+encoder_blk(X, valid_lens).shape
 ```
 
 ```{.python .input}
@@ -487,7 +487,7 @@ encoder_blk(X, valid_len).shape
 X = d2l.ones((2, 100, 24))
 encoder_blk = EncoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5)
 encoder_blk.eval()
-encoder_blk(X, valid_len).shape
+encoder_blk(X, valid_lens).shape
 ```
 
 Now it comes to the implementation of the entire Transformer encoder. With the Transformer encoder, $n$ blocks of `EncoderBlock` stack up one after another. Because of the residual connection, the embedding layer size $d$ is same as the Transformer block output size. Also note that we multiply the embedding output by $\sqrt{d}$ to prevent its values from being too small.
@@ -507,10 +507,10 @@ class TransformerEncoder(d2l.Encoder):
                 EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout,
                              use_bias))
 
-    def forward(self, X, valid_len, *args):
+    def forward(self, X, valid_lens, *args):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
         for blk in self.blks:
-            X = blk(X, valid_len)
+            X = blk(X, valid_lens)
         return X
 ```
 
@@ -532,10 +532,10 @@ class TransformerEncoder(d2l.Encoder):
                              norm_shape, ffn_num_input, ffn_num_hiddens,
                              num_heads, dropout, use_bias))
 
-    def forward(self, X, valid_len, *args):
+    def forward(self, X, valid_lens, *args):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
         for blk in self.blks:
-            X = blk(X, valid_len)
+            X = blk(X, valid_lens)
         return X
 ```
 
@@ -544,7 +544,7 @@ Let us create an encoder with two stacked  Transformer encoder blocks, whose hyp
 ```{.python .input}
 encoder = TransformerEncoder(200, 24, 48, 8, 2, 0.5)
 encoder.initialize()
-encoder(np.ones((2, 100)), valid_len).shape
+encoder(np.ones((2, 100)), valid_lens).shape
 ```
 
 ```{.python .input}
@@ -552,7 +552,7 @@ encoder(np.ones((2, 100)), valid_len).shape
 encoder = TransformerEncoder(
     200, 24, 24, 24, 24, [100, 24], 24, 48, 8, 2, 0.5)
 encoder.eval()
-encoder(d2l.ones((2, 100), dtype=torch.long), valid_len).shape
+encoder(d2l.ones((2, 100), dtype=torch.long), valid_lens).shape
 ```
 
 ## Decoder
@@ -581,7 +581,7 @@ class DecoderBlock(nn.Block):
         self.addnorm3 = AddNorm(dropout)
 
     def forward(self, X, state):
-        enc_outputs, enc_valid_len = state[0], state[1]
+        enc_outputs, enc_valid_lens = state[0], state[1]
         # `state[2][i]` contains the past queries for this block
         if state[2][self.i] is None:
             key_values = X
@@ -592,14 +592,14 @@ class DecoderBlock(nn.Block):
             batch_size, num_steps, _ = X.shape
             # Shape: (batch_size, num_steps), the values in the j-th column
             # are j+1
-            valid_len = np.tile(np.arange(1, num_steps + 1, ctx=X.ctx),
+            valid_lens = np.tile(np.arange(1, num_steps + 1, ctx=X.ctx),
                                 (batch_size, 1))
         else:
-            valid_len = None
+            valid_lens = None
 
-        X2 = self.attention1(X, key_values, key_values, valid_len)
+        X2 = self.attention1(X, key_values, key_values, valid_lens)
         Y = self.addnorm1(X, X2)
-        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_len)
+        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens)
         Z = self.addnorm2(Y, Y2)
         return self.addnorm3(Z, self.ffn(Z)), state
 ```
@@ -624,7 +624,7 @@ class DecoderBlock(nn.Module):
         self.addnorm3 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, state):
-        enc_outputs, enc_valid_len = state[0], state[1]
+        enc_outputs, enc_valid_lens = state[0], state[1]
         # `state[2][i]` contains the past queries for this block
         if state[2][self.i] is None:
             key_values = X
@@ -635,13 +635,13 @@ class DecoderBlock(nn.Module):
             batch_size, num_steps, _ = X.shape
             # Shape: (batch_size, num_steps), the values in the j-th column
             # are j+1
-            valid_len = torch.arange(1, num_steps + 1, device=X.device).repeat(batch_size, 1)
+            valid_lens = torch.arange(1, num_steps + 1, device=X.device).repeat(batch_size, 1)
         else:
-            valid_len = None
+            valid_lens = None
 
-        X2 = self.attention1(X, key_values, key_values, valid_len)
+        X2 = self.attention1(X, key_values, key_values, valid_lens)
         Y = self.addnorm1(X, X2)
-        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_len)
+        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens)
         Z = self.addnorm2(Y, Y2)
         return self.addnorm3(Z, self.ffn(Z)), state
 ```
@@ -652,7 +652,7 @@ Similar to the  Transformer encoder block, `num_hiddens` should be equal to the 
 decoder_blk = DecoderBlock(24, 48, 8, 0.5, 0)
 decoder_blk.initialize()
 X = np.ones((2, 100, 24))
-state = [encoder_blk(X, valid_len), valid_len, [None]]
+state = [encoder_blk(X, valid_lens), valid_lens, [None]]
 decoder_blk(X, state)[0].shape
 ```
 
@@ -661,13 +661,13 @@ decoder_blk(X, state)[0].shape
 decoder_blk = DecoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5, 0)
 decoder_blk.eval()
 X = d2l.ones((2, 100, 24))
-state = [encoder_blk(X, valid_len), valid_len, [None]]
+state = [encoder_blk(X, valid_lens), valid_lens, [None]]
 decoder_blk(X, state)[0].shape
 ```
 
 The construction of the entire  Transformer decoder is identical to the  Transformer encoder, except for the additional dense layer to obtain the output confidence scores.
 
-Let us implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `num_hiddens`, the  Transformer decoder also needs the Transformer encoder's outputs `enc_outputs` and `env_valid_len`.
+Let us implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `num_hiddens`, the  Transformer decoder also needs the Transformer encoder's outputs `enc_outputs` and `env_valid_lens`.
 
 ```{.python .input}
 class TransformerDecoder(d2l.Decoder):
@@ -685,8 +685,8 @@ class TransformerDecoder(d2l.Decoder):
                              dropout, i))
         self.dense = nn.Dense(vocab_size, flatten=False)
 
-    def init_state(self, enc_outputs, env_valid_len, *args):
-        return [enc_outputs, env_valid_len, [None]*self.num_layers]
+    def init_state(self, enc_outputs, env_valid_lens, *args):
+        return [enc_outputs, env_valid_lens, [None]*self.num_layers]
 
     def forward(self, X, state):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
@@ -714,8 +714,8 @@ class TransformerDecoder(d2l.Decoder):
                              num_heads, dropout, i))
         self.dense = nn.Linear(num_hiddens, vocab_size)
 
-    def init_state(self, enc_outputs, env_valid_len, *args):
-        return [enc_outputs, env_valid_len, [None]*self.num_layers]
+    def init_state(self, enc_outputs, env_valid_lens, *args):
+        return [enc_outputs, env_valid_lens, [None]*self.num_layers]
 
     def forward(self, X, state):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
