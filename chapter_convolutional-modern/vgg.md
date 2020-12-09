@@ -78,7 +78,7 @@ import torch
 from torch import nn
 
 def vgg_block(num_convs, in_channels, out_channels):
-    layers=[]
+    layers = []
     for _ in range(num_convs):
         layers.append(nn.Conv2d(in_channels, out_channels,
                                 kernel_size=3, padding=1))
@@ -158,9 +158,9 @@ net = vgg(conv_arch)
 ```{.python .input}
 #@tab pytorch
 def vgg(conv_arch):
+    conv_blks = []
+    in_channels = 1
     # The convolutional part
-    conv_blks=[]
-    in_channels=1
     for (num_convs, out_channels) in conv_arch:
         conv_blks.append(vgg_block(num_convs, in_channels, out_channels))
         in_channels = out_channels
