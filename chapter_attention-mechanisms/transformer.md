@@ -67,7 +67,7 @@ and $\mathbf W_v^{(i)}\in\mathbb R^{p_v\times d_v}$. Therefore, the output for e
 
 $$\mathbf o^{(i)} = \mathrm{attention}(\mathbf W_q^{(i)}\mathbf q, \mathbf W_k^{(i)}\mathbf k,\mathbf W_v^{(i)}\mathbf v),$$
 
-where $\textrm{attention}$ can be any attention layer, such as the `DotProductAttention` and `MLPAttention` as we introduced in :numref:`sec_attention-functions`.
+where $\textrm{attention}$ can be any attention layer, such as the `DotProductAttention` and `AdditiveAttention` as we introduced in :numref:`sec_attention-functions`.
 
 
 
@@ -95,7 +95,7 @@ class MultiHeadAttention(nn.Block):
         # For self-attention, shape of input `queries`, `keys`, or `values`:
         # (`batch_size`, `num_steps`, some value). Shape of `valid_len`:
         # either (`batch_size`,) or (`batch_size`, `num_steps`).
-        # After transposing, shape of output `queries`, `keys`, or `values`: 
+        # After transposing, shape of output `queries`, `keys`, or `values`:
         # (`batch_size` * `num_heads`, `num_steps`,
         # `num_hiddens` / `num_heads`)
         queries = transpose_qkv(self.W_q(queries), self.num_heads)
@@ -134,7 +134,7 @@ class MultiHeadAttention(nn.Module):
         # For self-attention, shape of input `queries`, `keys`, or `values`:
         # (`batch_size`, `num_steps`, some value). Shape of `valid_len`:
         # either (`batch_size`,) or (`batch_size`, `num_steps`).
-        # After transposing, shape of output `queries`, `keys`, or `values`: 
+        # After transposing, shape of output `queries`, `keys`, or `values`:
         # (`batch_size` * `num_heads`, `num_steps`,
         # `num_hiddens` / `num_heads`)
         queries = transpose_qkv(self.W_q(queries), self.num_heads)

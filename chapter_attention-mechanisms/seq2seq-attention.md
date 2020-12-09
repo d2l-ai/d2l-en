@@ -37,7 +37,7 @@ from torch import nn
 
 ## Decoder
 
-Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEncoder` in :numref:`sec_seq2seq`, we will just focus on the decoder. We add an MLP attention layer (`MLPAttention`) which has the same hidden size as the GRU layer in the decoder. Then we initialize the state of the decoder by passing three items from the encoder:
+Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEncoder` in :numref:`sec_seq2seq`, we will just focus on the decoder. We add an MLP attention layer (`AdditiveAttention`) which has the same hidden size as the GRU layer in the decoder. Then we initialize the state of the decoder by passing three items from the encoder:
 
 - **the encoder outputs of all time steps**: they are used as the attention layer's memory with identical keys and values;
 
@@ -54,7 +54,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
-        self.attention_cell = d2l.MLPAttention(num_hiddens, dropout)
+        self.attention_cell = d2l.AdditiveAttention(num_hiddens, dropout)
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
         self.dense = nn.Dense(vocab_size, flatten=False)
@@ -98,7 +98,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
-        self.attention_cell = d2l.MLPAttention(
+        self.attention_cell = d2l.AdditiveAttention(
             num_hiddens, num_hiddens, num_hiddens, dropout)
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = nn.GRU(
