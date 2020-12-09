@@ -93,13 +93,13 @@ class MultiHeadAttention(nn.Block):
 
     def forward(self, queries, keys, values, valid_len):
         # For self-attention, `queries`, `keys`, and `values` shape:
-        # (`batch_size`, `seq_len`, `dim`), where `seq_len` is the length of
+        # (`batch_size`, `num_steps`, `dim`), where `num_steps` is the length of
         # input sequence. `valid_len` shape is either (`batch_size`, ) or
-        # (`batch_size`, `seq_len`).
+        # (`batch_size`, `num_steps`).
 
         # Project and transpose `queries`, `keys`, and `values` from
-        # (`batch_size`, `seq_len`, `num_hiddens`) to
-        # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+        # (`batch_size`, `num_steps`, `num_hiddens`) to
+        # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
         queries = transpose_qkv(self.W_q(queries), self.num_heads)
         keys = transpose_qkv(self.W_k(keys), self.num_heads)
         values = transpose_qkv(self.W_v(values), self.num_heads)
@@ -112,10 +112,10 @@ class MultiHeadAttention(nn.Block):
                 valid_len = np.tile(valid_len, (self.num_heads, 1))
 
         # For self-attention, `output` shape:
-        # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+        # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
         output = self.attention(queries, keys, values, valid_len)
 
-        # `output_concat` shape: (`batch_size`, `seq_len`, `num_hiddens`)
+        # `output_concat` shape: (`batch_size`, `num_steps`, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 ```
@@ -136,13 +136,13 @@ class MultiHeadAttention(nn.Module):
 
     def forward(self, queries, keys, values, valid_len):
         # For self-attention, `queries`, `keys`, and `values` shape:
-        # (`batch_size`, `seq_len`, `dim`), where `seq_len` is the length of
+        # (`batch_size`, `num_steps`, `dim`), where `num_steps` is the length of
         # input sequence. `valid_len` shape is either (`batch_size`, ) or
-        # (`batch_size`, `seq_len`).
+        # (`batch_size`, `num_steps`).
 
         # Project and transpose `queries`, `keys`, and `values` from
-        # (`batch_size`, `seq_len`, `num_hiddens`) to
-        # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+        # (`batch_size`, `num_steps`, `num_hiddens`) to
+        # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
         queries = transpose_qkv(self.W_q(queries), self.num_heads)
         keys = transpose_qkv(self.W_k(keys), self.num_heads)
         values = transpose_qkv(self.W_v(values), self.num_heads)
@@ -155,10 +155,10 @@ class MultiHeadAttention(nn.Module):
                 valid_len = valid_len.repeat(self.num_heads, 1)
 
         # For self-attention, `output` shape:
-        # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+        # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
         output = self.attention(queries, keys, values, valid_len)
 
-        # `output_concat` shape: (`batch_size`, `seq_len`, `num_hiddens`)
+        # `output_concat` shape: (`batch_size`, `num_steps`, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 ```
@@ -168,17 +168,17 @@ Here are the definitions of the transpose functions `transpose_qkv` and `transpo
 ```{.python .input}
 #@save
 def transpose_qkv(X, num_heads):
-    # Input `X` shape: (`batch_size`, `seq_len`, `num_hiddens`).
+    # Input `X` shape: (`batch_size`, `num_steps`, `num_hiddens`).
     # Output `X` shape:
-    # (`batch_size`, `seq_len`, `num_heads`, `num_hiddens` / `num_heads`)
+    # (`batch_size`, `num_steps`, `num_heads`, `num_hiddens` / `num_heads`)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
     # `X` shape:
-    # (`batch_size`, `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+    # (`batch_size`, `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
     X = X.transpose(0, 2, 1, 3)
 
     # `output` shape:
-    # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+    # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
     output = X.reshape(-1, X.shape[2], X.shape[3])
     return output
 
@@ -195,17 +195,17 @@ def transpose_output(X, num_heads):
 #@tab pytorch
 #@save
 def transpose_qkv(X, num_heads):
-    # Input `X` shape: (`batch_size`, `seq_len`, `num_hiddens`).
+    # Input `X` shape: (`batch_size`, `num_steps`, `num_hiddens`).
     # Output `X` shape:
-    # (`batch_size`, `seq_len`, `num_heads`, `num_hiddens` / `num_heads`)
+    # (`batch_size`, `num_steps`, `num_heads`, `num_hiddens` / `num_heads`)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
     # `X` shape:
-    # (`batch_size`, `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+    # (`batch_size`, `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
     X = X.permute(0, 2, 1, 3)
 
     # `output` shape:
-    # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
+    # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
     output = X.reshape(-1, X.shape[2], X.shape[3])
     return output
 
@@ -594,10 +594,10 @@ class DecoderBlock(nn.Block):
             key_values = np.concatenate((state[2][self.i], X), axis=1)
         state[2][self.i] = key_values
         if autograd.is_training():
-            batch_size, seq_len, _ = X.shape
-            # Shape: (batch_size, seq_len), the values in the j-th column
+            batch_size, num_steps, _ = X.shape
+            # Shape: (batch_size, num_steps), the values in the j-th column
             # are j+1
-            valid_len = np.tile(np.arange(1, seq_len + 1, ctx=X.ctx),
+            valid_len = np.tile(np.arange(1, num_steps + 1, ctx=X.ctx),
                                 (batch_size, 1))
         else:
             valid_len = None
@@ -637,10 +637,10 @@ class DecoderBlock(nn.Module):
             key_values = torch.cat((state[2][self.i], X), axis=1)
         state[2][self.i] = key_values
         if self.training:
-            batch_size, seq_len, _ = X.shape
-            # Shape: (batch_size, seq_len), the values in the j-th column
+            batch_size, num_steps, _ = X.shape
+            # Shape: (batch_size, num_steps), the values in the j-th column
             # are j+1
-            valid_len = torch.arange(1, seq_len + 1, device=X.device).repeat(batch_size, 1)
+            valid_len = torch.arange(1, num_steps + 1, device=X.device).repeat(batch_size, 1)
         else:
             valid_len = None
 

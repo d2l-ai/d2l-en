@@ -115,11 +115,12 @@ masked_softmax(np.random.uniform(size=(2, 2, 4)),
 masked_softmax(torch.rand(2, 2, 4), d2l.tensor([[1, 3], [2, 4]]))
 ```
 
-## Dot-Product Attention
+## Scaled Dot-Product Attention
 
-Equipped with the above `masked_softmax` function and the batch multiplication operator as described in :numref:`subsec_batch_dot`, let us dive into the details of two widely used attention layers. The first one is the *dot product attention*: it assumes that the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. The dot product attention computes the scores by a dot product between the query and a key, which is then divided by $\sqrt{d}$ to minimize the unrelated influence of the dimension $d$ on the scores. In other words,
+Equipped with the above `masked_softmax` function and the batch multiplication operator as described in :numref:`subsec_batch_dot`, let us dive into the details of two widely used attention layers. The first one is the *scaled dot product attention*: it assumes that the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. The dot product attention computes the scores by a dot product between the query and a key, which is then divided by $\sqrt{d}$ to minimize the unrelated influence of the dimension $d$ on the scores. In other words,
 
 $$\alpha(\mathbf q, \mathbf k) = \langle \mathbf q, \mathbf k \rangle /\sqrt{d}.$$
+
 
 Beyond the single-dimensional queries and keys, we can always generalize them to multi-dimensional queries and keys. Assume that $\mathbf Q\in\mathbb R^{m\times d}$ contains $m$ queries and $\mathbf K\in\mathbb R^{n\times d}$ has all the $n$ keys. We can compute all $mn$ scores by
 
