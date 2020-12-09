@@ -42,9 +42,19 @@ and $2 \times 2$ max pooling with stride of 2
 (halving the resolution after each block).
 In the code below, we define a function called `vgg_block`
 to implement one VGG block.
+
+:begin_tab:`mxnet,tensorflow`
 The function takes two arguments
 corresponding to the number of convolutional layers `num_convs`
 and the number of output channels `num_channels`.
+:end_tab:
+
+:begin_tab:`pytorch`
+The function takes three arguments corresponding to the number
+of convolutional layers `num_convs`, number of input channels `in_channels`
+and the number of output channels `out_channels`.
+:end_tab:
+
 
 ```{.python .input}
 from d2l import mxnet as d2l
