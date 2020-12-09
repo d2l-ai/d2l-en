@@ -97,6 +97,7 @@ class MultiHeadAttention(nn.Block):
         # input sequence. `valid_len` shape is either (`batch_size`, ) or
         # (`batch_size`, `num_steps`).
 
+
         # Project and transpose `queries`, `keys`, and `values` from
         # (`batch_size`, `num_steps`, `num_hiddens`) to
         # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
@@ -106,10 +107,7 @@ class MultiHeadAttention(nn.Block):
 
         if valid_len is not None:
             # Copy `valid_len` by `num_heads` times
-            if valid_len.ndim == 1:
-                valid_len = np.tile(valid_len, self.num_heads)
-            else:
-                valid_len = np.tile(valid_len, (self.num_heads, 1))
+            valid_len = valid_len.repeat(self.num_heads, axis=0)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
@@ -149,10 +147,7 @@ class MultiHeadAttention(nn.Module):
 
         if valid_len is not None:
             # Copy `valid_len` by `num_heads` times
-            if valid_len.ndim == 1:
-                valid_len = valid_len.repeat(self.num_heads)
-            else:
-                valid_len = valid_len.repeat(self.num_heads, 1)
+            valid_len = torch.repeat_interleave(valid_len, repeats=self.num_heads, dim=0)
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
