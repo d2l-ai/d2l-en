@@ -37,7 +37,7 @@ from d2l import mxnet as d2l
 from mxnet import init, gluon, np, npx
 from mxnet.gluon import nn
 import os
-import sys
+
 npx.set_np()
 ```
 

@@ -262,7 +262,12 @@ def train_batch_ch13(net, features, labels, loss, trainer, devices,
 #@tab pytorch
 #@save
 def train_batch_ch13(net, X, y, loss, trainer, devices):
-    X, y = X.to(devices[0]), y.to(devices[0])
+    if isinstance(X, list):
+        # Required for BERT Fine-tuning (to be covered later)
+        X = [x.to(devices[0]) for x in X]
+    else:
+        X = X.to(devices[0])
+    y = y.to(devices[0])
     net.train()
     trainer.zero_grad()
     pred = net(X)

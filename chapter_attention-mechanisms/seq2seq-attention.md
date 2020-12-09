@@ -1,4 +1,4 @@
-# Sequence to Sequence with Attention Mechanisms
+# Bahdanau Attention
 :label:`sec_seq2seq_attention`
 
 In this section, we add the attention mechanism to the sequence to sequence (seq2seq)
@@ -45,7 +45,7 @@ Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEn
 
 - **the encoder valid length**: so the attention layer will not consider the padding tokens within the encoder outputs.
 
-At each time step of the decoding, we use the hidden state of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Although the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on `enc_valid_len`, so that the attention output suspends other irrelevant information.
+At each time step of the decoding, we use the hidden state of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Although the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on `enc_valid_lens`, so that the attention output suspends other irrelevant information.
 
 Let us implement the `Seq2SeqAttentionDecoder`, and see how it differs from the decoder in seq2seq from :numref:`sec_seq2seq_decoder`.
 
@@ -59,29 +59,37 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
         self.dense = nn.Dense(vocab_size, flatten=False)
 
-    def init_state(self, enc_outputs, enc_valid_len, *args):
+    def init_state(self, enc_outputs, enc_valid_lens, *args):
+        # Shape of `outputs`: (`num_steps`, `batch_size`, `num_hiddens`).
+        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`,
+        # `num_hiddens`)
         outputs, hidden_state = enc_outputs
-        # Transpose `outputs` to (`batch_size`, `seq_len`, `num_hiddens`)
-        return (outputs.swapaxes(0, 1), hidden_state, enc_valid_len)
+        return (outputs.swapaxes(0, 1), hidden_state, enc_valid_lens)
 
     def forward(self, X, state):
-        enc_outputs, hidden_state, enc_valid_len = state
+        # Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`).
+        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`,
+        # `num_hiddens`)
+        enc_outputs, hidden_state, enc_valid_lens = state
+        # Shape of the output `X`: (`num_steps`, `batch_size`, `embed_size`)
         X = self.embedding(X).swapaxes(0, 1)
         outputs = []
         for x in X:
-            # `query` shape: (`batch_size`, 1, `num_hiddens`)
+            # Shape of `query`: (`batch_size`, 1, `num_hiddens`)
             query = np.expand_dims(hidden_state[0][-1], axis=1)
-            # `context` has same shape as `query`
+            # Shape of `context`: (`batch_size`, 1, `num_hiddens`)
             context = self.attention_cell(
-                query, enc_outputs, enc_outputs, enc_valid_len)
+                query, enc_outputs, enc_outputs, enc_valid_lens)
             # Concatenate on the feature dimension
             x = np.concatenate((context, np.expand_dims(x, axis=1)), axis=-1)
-            # Reshape `x` to (1, `batch_size`, `embed_size` + `num_hiddens`)
+            # Reshape `x` as (1, `batch_size`, `embed_size` + `num_hiddens`)
             out, hidden_state = self.rnn(x.swapaxes(0, 1), hidden_state)
             outputs.append(out)
+        # After fully-connected layer transformation, shape of `outputs`:
+        # (`num_steps`, `batch_size`, `vocab_size`)
         outputs = self.dense(np.concatenate(outputs, axis=0))
         return outputs.swapaxes(0, 1), [enc_outputs, hidden_state,
-                                        enc_valid_len]
+                                        enc_valid_lens]
 ```
 
 ```{.python .input}
@@ -98,41 +106,49 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
             dropout=dropout)
         self.dense = nn.Linear(num_hiddens, vocab_size)
 
-    def init_state(self, enc_outputs, enc_valid_len, *args):
+    def init_state(self, enc_outputs, enc_valid_lens, *args):
+        # Shape of `outputs`: (`num_steps`, `batch_size`, `num_hiddens`).
+        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`,
+        # `num_hiddens`)
         outputs, hidden_state = enc_outputs
-        # Transpose outputs to (batch_size, seq_len, num_hiddens)
-        return (outputs.permute(1, 0, 2), hidden_state, enc_valid_len)
+        return (outputs.permute(1, 0, 2), hidden_state, enc_valid_lens)
 
     def forward(self, X, state):
-        enc_outputs, hidden_state, enc_valid_len = state
+        # Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`).
+        # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`,
+        # `num_hiddens`)
+        enc_outputs, hidden_state, enc_valid_lens = state
+        # Shape of the output `X`: (`num_steps`, `batch_size`, `embed_size`)
         X = self.embedding(X).permute(1, 0, 2)
         outputs = []
         for x in X:
-            # query shape: (batch_size, 1, num_hiddens)
+            # Shape of `query`: (`batch_size`, 1, `num_hiddens`)
             query = torch.unsqueeze(hidden_state[-1], dim=1)
-            # context has same shape as query
+            # Shape of `context`: (`batch_size`, 1, `num_hiddens`)
             context = self.attention_cell(
-                query, enc_outputs, enc_outputs, enc_valid_len)
+                query, enc_outputs, enc_outputs, enc_valid_lens)
             # Concatenate on the feature dimension
             x = torch.cat((context, torch.unsqueeze(x, dim=1)), dim=-1)
-            # Reshape x to (1, batch_size, embed_size + num_hiddens)
+            # Reshape `x` as (1, `batch_size`, `embed_size` + `num_hiddens`)
             out, hidden_state = self.rnn(x.permute(1, 0, 2), hidden_state)
             outputs.append(out)
+        # After fully-connected layer transformation, shape of `outputs`:
+        # (`num_steps`, `batch_size`, `vocab_size`)
         outputs = self.dense(torch.cat(outputs, dim=0))
         return outputs.permute(1, 0, 2), [enc_outputs, hidden_state,
-                                          enc_valid_len]
+                                          enc_valid_lens]
 ```
 
 Now we can test the seq2seq with attention model. To be consistent with the model without attention in :numref:`sec_seq2seq`, we use the same hyperparameters for `vocab_size`, `embed_size`, `num_hiddens`, and `num_layers`. As a result, we get the same decoder output shape, but the state structure is changed.
 
 ```{.python .input}
-encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8,
-                             num_hiddens=16, num_layers=2)
+encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
+                             num_layers=2)
 encoder.initialize()
-decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8,
-                                  num_hiddens=16, num_layers=2)
+decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
+                                  num_layers=2)
 decoder.initialize()
-X = d2l.zeros((4, 7))
+X = d2l.zeros((4, 7))  # (`batch_size`, `num_steps`)
 state = decoder.init_state(encoder(X), None)
 out, state = decoder(X, state)
 out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
@@ -140,13 +156,13 @@ out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 
 ```{.python .input}
 #@tab pytorch
-encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8,
-                             num_hiddens=16, num_layers=2)
+encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
+                             num_layers=2)
 encoder.eval()
-decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8,
-                                  num_hiddens=16, num_layers=2)
+decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
+                                  num_layers=2)
 decoder.eval()
-X = d2l.zeros((4, 7), dtype=torch.long)
+X = d2l.zeros((4, 7), dtype=torch.long)  # (`batch_size`, `num_steps`)
 state = decoder.init_state(encoder(X), None)
 out, state = decoder(X, state)
 out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape

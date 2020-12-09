@@ -27,7 +27,7 @@ To build it, we simply need to inherit
 from the base layer class and implement the forward propagation function.
 
 ```{.python .input}
-from mxnet import gluon, np, npx
+from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 

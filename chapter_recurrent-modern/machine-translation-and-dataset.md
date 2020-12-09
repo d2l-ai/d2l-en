@@ -60,7 +60,7 @@ into minibatches for training.
 
 ```{.python .input}
 from d2l import mxnet as d2l
-from mxnet import np, npx, gluon
+from mxnet import np, npx
 import os
 npx.set_np()
 ```
@@ -354,4 +354,3 @@ for X, X_valid_len, Y, Y_valid_len in train_iter:
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1060)
 :end_tab:
-

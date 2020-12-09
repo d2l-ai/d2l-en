@@ -24,7 +24,6 @@ import torch
 %matplotlib inline
 from d2l import tensorflow as d2l
 import math
-from mpl_toolkits import mplot3d
 import tensorflow as tf
 ```
 

@@ -52,12 +52,10 @@ Stanford Natural Language Inference (SNLI) Corpus is a collection of over $500,0
 We download and store the extracted SNLI dataset in the path `../data/snli_1.0`.
 
 ```{.python .input}
-import collections
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 import os
 import re
-import zipfile
 
 npx.set_np()
 
@@ -71,13 +69,11 @@ data_dir = d2l.download_extract('SNLI')
 
 ```{.python .input}
 #@tab pytorch
-import collections
 from d2l import torch as d2l
 import torch
 from torch import nn
 import os
 import re
-import zipfile
 
 #@save
 d2l.DATA_HUB['SNLI'] = (

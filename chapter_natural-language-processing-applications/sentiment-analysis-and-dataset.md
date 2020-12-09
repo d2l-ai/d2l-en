@@ -7,7 +7,7 @@ This section will focus on loading data for one of the sub-questions in this fie
 
 ```{.python .input}
 from d2l import mxnet as d2l
-from mxnet import gluon, np, npx
+from mxnet import np, npx
 import os
 npx.set_np()
 ```

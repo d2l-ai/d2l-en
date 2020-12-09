@@ -993,61 +993,73 @@ def translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device):
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
-def masked_softmax(X, valid_len):
-    """Perform softmax by filtering out some elements."""
-    # X: 3-D tensor, valid_len: 1-D or 2-D tensor
-    if valid_len is None:
+def masked_softmax(X, valid_lens):
+    """Perform softmax operation by masking elements on the last axis."""
+    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    if valid_lens is None:
         return npx.softmax(X)
     else:
         shape = X.shape
-        if valid_len.ndim == 1:
-            valid_len = valid_len.repeat(shape[1], axis=0)
+        if valid_lens.ndim == 1:
+            valid_lens = valid_lens.repeat(shape[1])
         else:
-            valid_len = valid_len.reshape(-1)
-        # Fill masked elements with a large negative, whose exp is 0
-        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_len, True,
-                              axis=1, value=-1e6)
+            valid_lens = valid_lens.reshape(-1)
+        # On the last axis, replace masked elements with a very large negative
+        # value, whose exponentiation outputs 0
+        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_lens, True,
+                              value=-1e6, axis=1)
         return npx.softmax(X).reshape(shape)
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 class DotProductAttention(nn.Block):
+    """Dot product attention."""
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # `query`: (`batch_size`, #queries, `d`)
-    # `key`: (`batch_size`, #kv_pairs, `d`)
-    # `value`: (`batch_size`, #kv_pairs, `dim_v`)
-    # `valid_len`: either (`batch_size`, ) or (`batch_size`, xx)
-    def forward(self, query, key, value, valid_len=None):
-        d = query.shape[-1]
-        # Set transpose_b=True to swap the last two dimensions of key
-        scores = npx.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return npx.batch_dot(attention_weights, value)
+    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
+    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
+    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+    # dimension)
+    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, some value)
+    def forward(self, queries, keys, values, valid_lens=None):
+        d = queries.shape[-1]
+        # Set `transpose_b=True` to swap the last two dimensions of `keys`
+        scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
+        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
+        return npx.batch_dot(attention_weights, values)
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
-class MLPAttention(nn.Block):
-    def __init__(self, units, dropout, **kwargs):
-        super(MLPAttention, self).__init__(**kwargs)
-        # Use flatten=False to keep query's and key's 3-D shapes
-        self.W_k = nn.Dense(units, use_bias=False, flatten=False)
-        self.W_q = nn.Dense(units, use_bias=False, flatten=False)
-        self.v = nn.Dense(1, use_bias=False, flatten=False)
+class AdditiveAttention(nn.Block):
+    """Additive attention."""
+    def __init__(self, num_hiddens, dropout, **kwargs):
+        super(AdditiveAttention, self).__init__(**kwargs)
+        # Use `flatten=False` to only transform the last axis so that the
+        # shapes for the other axes are kept the same
+        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.w_v = nn.Dense(1, use_bias=False, flatten=False)
         self.dropout = nn.Dropout(dropout)
 
-
-    def forward(self, query, key, value, valid_len):
-        query, key = self.W_q(query), self.W_k(key)
-        # Expand query to (`batch_size`, #queries, 1, units), and key to
-        # (`batch_size`, 1, #kv_pairs, units). Then plus them with broadcast
-        features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
+    def forward(self, queries, keys, values, valid_lens):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # After dimension expansion, shape of `queries`: (`batch_size`, no. of
+        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
+        # no. of key-value pairs, `num_hiddens`). Sum them up with
+        # broadcasting
+        features = np.expand_dims(queries, axis=2) + np.expand_dims(
+            keys, axis=1)
         features = np.tanh(features)
-        scores = np.squeeze(self.v(features), axis=-1)
-        attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return npx.batch_dot(attention_weights, value)
+        # There is only one output of `self.w_v`, so we remove the last
+        # one-dimensional entry from the shape. Shape of `scores`:
+        # (`batch_size`, no. of queries, no. of key-value pairs)
+        scores = np.squeeze(self.w_v(features), axis=-1)
+        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
+        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # dimension)
+        return npx.batch_dot(attention_weights, values)
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
@@ -1062,18 +1074,18 @@ class MultiHeadAttention(nn.Block):
         self.W_v = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
         self.W_o = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
 
-    def forward(self, query, key, value, valid_len):
-        # For self-attention, `query`, `key`, and `value` shape:
+    def forward(self, queries, keys, values, valid_len):
+        # For self-attention, `queries`, `keys`, and `values` shape:
         # (`batch_size`, `seq_len`, `dim`), where `seq_len` is the length of
         # input sequence. `valid_len` shape is either (`batch_size`, ) or
         # (`batch_size`, `seq_len`).
 
-        # Project and transpose `query`, `key`, and `value` from
+        # Project and transpose `queries`, `keys`, and `values` from
         # (`batch_size`, `seq_len`, `num_hiddens`) to
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
-        query = transpose_qkv(self.W_q(query), self.num_heads)
-        key = transpose_qkv(self.W_k(key), self.num_heads)
-        value = transpose_qkv(self.W_v(value), self.num_heads)
+        queries = transpose_qkv(self.W_q(queries), self.num_heads)
+        keys = transpose_qkv(self.W_k(keys), self.num_heads)
+        values = transpose_qkv(self.W_v(values), self.num_heads)
 
         if valid_len is not None:
             # Copy `valid_len` by `num_heads` times
@@ -1084,7 +1096,7 @@ class MultiHeadAttention(nn.Block):
 
         # For self-attention, `output` shape:
         # (`batch_size` * `num_heads`, `seq_len`, `num_hiddens` / `num_heads`)
-        output = self.attention(query, key, value, valid_len)
+        output = self.attention(queries, keys, values, valid_len)
 
         # `output_concat` shape: (`batch_size`, `seq_len`, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)

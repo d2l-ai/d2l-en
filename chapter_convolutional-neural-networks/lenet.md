@@ -133,7 +133,6 @@ net = torch.nn.Sequential(
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-from tensorflow.distribute import MirroredStrategy, OneDeviceStrategy
 
 def net():
     return tf.keras.models.Sequential([
@@ -257,7 +256,12 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     # No. of correct predictions, no. of predictions
     metric = d2l.Accumulator(2)
     for X, y in data_iter:
-        X, y = X.to(device), y.to(device)
+        if isinstance(X, list):
+            # Required for BERT Fine-tuning (to be covered later)
+            X = [x.to(device) for x in X]
+        else:
+            X = X.to(device)
+        y = y.to(device)
         metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 ```

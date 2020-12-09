@@ -24,12 +24,11 @@ First, import the packages or modules required for the competition.
 import collections
 from d2l import mxnet as d2l
 import math
-from mxnet import autograd, gluon, init, npx
+from mxnet import gluon, init, npx
 from mxnet.gluon import nn
 import os
 import pandas as pd
 import shutil
-import time
 
 npx.set_np()
 ```
@@ -45,7 +44,6 @@ from torch import nn
 import os
 import pandas as pd
 import shutil
-import time
 ```
 
 ## Obtaining and Organizing the Dataset
@@ -486,8 +484,7 @@ for X, _ in test_iter:
 sorted_ids = list(range(1, len(test_ds) + 1))
 sorted_ids.sort(key=lambda x: str(x))
 df = pd.DataFrame({'id': sorted_ids, 'label': preds})
-class_names = list(train_valid_ds.class_to_idx.keys())
-df['label'] = df['label'].apply(lambda x: class_names[x])
+df['label'] = df['label'].apply(lambda x: train_valid_ds.classes[x])
 df.to_csv('submission.csv', index=False)
 ```
 
