@@ -1012,26 +1012,6 @@ def masked_softmax(X, valid_lens):
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
-class DotProductAttention(nn.Block):
-    """Dot product attention."""
-    def __init__(self, dropout, **kwargs):
-        super(DotProductAttention, self).__init__(**kwargs)
-        self.dropout = nn.Dropout(dropout)
-
-    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
-    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
-    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
-    # dimension)
-    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, some value)
-    def forward(self, queries, keys, values, valid_lens=None):
-        d = queries.shape[-1]
-        # Set `transpose_b=True` to swap the last two dimensions of `keys`
-        scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
-        return npx.batch_dot(attention_weights, values)
-
-
-# Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 class AdditiveAttention(nn.Block):
     """Additive attention."""
     def __init__(self, num_hiddens, dropout, **kwargs):
@@ -1062,7 +1042,27 @@ class AdditiveAttention(nn.Block):
         return npx.batch_dot(attention_weights, values)
 
 
-# Defined in file: ./chapter_attention-mechanisms/transformer.md
+# Defined in file: ./chapter_attention-mechanisms/attention-functions.md
+class DotProductAttention(nn.Block):
+    """Dot product attention."""
+    def __init__(self, dropout, **kwargs):
+        super(DotProductAttention, self).__init__(**kwargs)
+        self.dropout = nn.Dropout(dropout)
+
+    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
+    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
+    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+    # dimension)
+    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
+    def forward(self, queries, keys, values, valid_lens=None):
+        d = queries.shape[-1]
+        # Set `transpose_b=True` to swap the last two dimensions of `keys`
+        scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
+        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
+        return npx.batch_dot(attention_weights, values)
+
+
+# Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
 class MultiHeadAttention(nn.Block):
     def __init__(self, num_hiddens, num_heads, dropout, use_bias=False,
                  **kwargs):
@@ -1075,11 +1075,12 @@ class MultiHeadAttention(nn.Block):
         self.W_o = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
 
     def forward(self, queries, keys, values, valid_lens):
-        # For self-attention, shape of input `queries`, `keys`, or `values`:
-        # (`batch_size`, `num_steps`, some value). Shape of `valid_len`:
-        # either (`batch_size`,) or (`batch_size`, `num_steps`).
-        # After transposing, shape of output `queries`, `keys`, or `values`: 
-        # (`batch_size` * `num_heads`, `num_steps`,
+        # Shape of `queries`, `keys`, or `values`:
+        # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`)
+        # Shape of `valid_lens`:
+        # (`batch_size`,) or (`batch_size`, no. of queries)
+        # After transposing, shape of output `queries`, `keys`, or `values`:
+        # (`batch_size` * `num_heads`, no. of queries or key-value pairs,
         # `num_hiddens` / `num_heads`)
         queries = transpose_qkv(self.W_q(queries), self.num_heads)
         keys = transpose_qkv(self.W_k(keys), self.num_heads)
@@ -1090,28 +1091,33 @@ class MultiHeadAttention(nn.Block):
             # `num_heads` times, then copy the next item, and so on
             valid_lens = valid_lens.repeat(self.num_heads, axis=0)
 
-        # For self-attention, shape of `output`: (`batch_size` * `num_heads`,
-        # `num_steps`, `num_hiddens` / `num_heads`)
+        # Shape of `output`: (`batch_size` * `num_heads`, no. of queries,
+        # `num_hiddens` / `num_heads`)
         output = self.attention(queries, keys, values, valid_lens)
-
-        # Shape of `output_concat`: (`batch_size`, `num_steps`, `num_hiddens`)
+        
+        # Shape of `output_concat`:
+        # (`batch_size`, no. of queries, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 
 
-# Defined in file: ./chapter_attention-mechanisms/transformer.md
+# Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
 def transpose_qkv(X, num_heads):
-    # Shape of input `X`: (`batch_size`, `num_steps`, `num_hiddens`).
+    # Shape of input `X`:
+    # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`).
     # Shape of output `X`:
-    # (`batch_size`, `num_steps`, `num_heads`, `num_hiddens` / `num_heads`)
+    # (`batch_size`, no. of queries or key-value pairs, `num_heads`,
+    # `num_hiddens` / `num_heads`)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
     # Shape of output `X`:
-    # (`batch_size`, `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
+    # (`batch_size`, `num_heads`, no. of queries or key-value pairs,
+    # `num_hiddens` / `num_heads`)
     X = X.transpose(0, 2, 1, 3)
 
     # Shape of `output`:
-    # (`batch_size` * `num_heads`, `num_steps`, `num_hiddens` / `num_heads`)
+    # (`batch_size` * `num_heads`, no. of queries or key-value pairs,
+    # `num_hiddens` / `num_heads`)
     return X.reshape(-1, X.shape[2], X.shape[3])
 
 
@@ -1167,8 +1173,8 @@ class EncoderBlock(nn.Block):
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
                  use_bias=False, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = MultiHeadAttention(num_hiddens, num_heads, dropout,
-                                            use_bias)
+        self.attention = d2l.MultiHeadAttention(
+            num_hiddens, num_heads, dropout, use_bias)
         self.addnorm1 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(dropout)

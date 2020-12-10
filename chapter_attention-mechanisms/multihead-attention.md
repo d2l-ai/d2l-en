@@ -193,14 +193,14 @@ def transpose_output(X, num_heads):
 Let us test the `MultiHeadAttention` model in a toy example. Create a multi-head attention with the hidden size $d_o = 100$, the output will share the same batch size and sequence length as the input, but the last dimension will be equal to the `num_hiddens` $= 100$.
 
 ```{.python .input}
-batch_size, num_queries, num_kvpairs, num_hiddens, num_heads = 2, 4, 6, 100, 5
+num_hiddens, num_heads = 100, 5
 attention = MultiHeadAttention(num_hiddens, num_heads, 0.5)
 attention.initialize()
 ```
 
 ```{.python .input}
 #@tab pytorch
-batch_size, num_queries, num_kvpairs, num_hiddens, num_heads = 2, 4, 6, 100, 5
+num_hiddens, num_heads = 100, 5
 attention = MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
                                num_hiddens, num_heads, 0.5)
 attention.eval()
@@ -208,8 +208,15 @@ attention.eval()
 
 ```{.python .input}
 #@tab all
+batch_size, num_queries = 2, 4
 X = d2l.ones((batch_size, num_queries, num_hiddens))
-Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
 valid_lens = d2l.tensor([batch_size, num_queries])
-attention(X, X, X, valid_lens).shape, attention(X, Y, Y, valid_lens).shape
+attention(X, X, X, valid_lens).shape
+```
+
+```{.python .input}
+#@tab all
+num_kvpairs = 6
+Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
+attention(X, Y, Y, valid_lens).shape
 ```
