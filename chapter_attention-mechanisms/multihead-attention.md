@@ -210,7 +210,7 @@ attention.eval()
 #@tab all
 batch_size, num_queries = 2, 4
 X = d2l.ones((batch_size, num_queries, num_hiddens))
-valid_lens = d2l.tensor([batch_size, num_queries])
+valid_lens = d2l.tensor([3, 2])
 attention(X, X, X, valid_lens).shape
 ```
 

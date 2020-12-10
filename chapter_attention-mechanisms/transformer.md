@@ -299,7 +299,8 @@ class EncoderBlock(nn.Module):
 Due to the residual connections, this block will not change the input shape. It means that the `num_hiddens` argument should be equal to the input size of the last dimension. In our toy example below,  `num_hiddens` $= 24$, `ffn_num_hiddens` $=48$, `num_heads` $= 8$, and `dropout` $= 0.5$.
 
 ```{.python .input}
-X = np.ones((2, 100, 24))
+X = d2l.ones((2, 100, 24))
+valid_lens = d2l.tensor([3, 2])
 encoder_blk = EncoderBlock(24, 48, 8, 0.5)
 encoder_blk.initialize()
 encoder_blk(X, valid_lens).shape
@@ -308,6 +309,7 @@ encoder_blk(X, valid_lens).shape
 ```{.python .input}
 #@tab pytorch
 X = d2l.ones((2, 100, 24))
+valid_lens = d2l.tensor([3, 2])
 encoder_blk = EncoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5)
 encoder_blk.eval()
 encoder_blk(X, valid_lens).shape
