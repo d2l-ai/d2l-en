@@ -208,7 +208,7 @@ values = torch.arange(40, dtype=torch.float32).reshape(1, 10, 4).repeat(
     2, 1, 1)
 valid_lens = d2l.tensor([2, 6])
 
-attention = AdditiveAttention(key_size=2, query_size=2, num_hiddens=8,
+attention = AdditiveAttention(key_size=2, query_size=20, num_hiddens=8,
                               dropout=0.1)
 attention.eval()
 attention(queries, keys, values, valid_lens)
