@@ -115,97 +115,6 @@ masked_softmax(np.random.uniform(size=(2, 2, 4)),
 masked_softmax(torch.rand(2, 2, 4), d2l.tensor([[1, 3], [2, 4]]))
 ```
 
-## Scaled Dot-Product Attention
-
-Equipped with the above `masked_softmax` function and the batch multiplication operator as described in :numref:`subsec_batch_dot`, let us dive into the details of two widely used attention layers. The first one is the *scaled dot product attention*: it assumes that the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. The dot product attention computes the scores by a dot product between the query and a key, which is then divided by $\sqrt{d}$ to minimize the unrelated influence of the dimension $d$ on the scores. In other words,
-
-$$\alpha(\mathbf q, \mathbf k) = \langle \mathbf q, \mathbf k \rangle /\sqrt{d}.$$
-
-
-Beyond the single-dimensional queries and keys, we can always generalize them to multi-dimensional queries and keys. Assume that $\mathbf Q\in\mathbb R^{m\times d}$ contains $m$ queries and $\mathbf K\in\mathbb R^{n\times d}$ has all the $n$ keys. We can compute all $mn$ scores by
-
-$$\alpha(\mathbf Q, \mathbf K) = \mathbf Q \mathbf K^\top /\sqrt{d}.$$
-:eqlabel:`eq_alpha_QK`
-
-With :eqref:`eq_alpha_QK`, we can implement the dot product attention layer `DotProductAttention` that supports a batch of queries and key-value pairs. In addition, for regularization we also use a dropout layer.
-
-```{.python .input}
-#@save
-class DotProductAttention(nn.Block):
-    """Dot product attention."""
-    def __init__(self, dropout, **kwargs):
-        super(DotProductAttention, self).__init__(**kwargs)
-        self.dropout = nn.Dropout(dropout)
-
-    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
-    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
-    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
-    # dimension)
-    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, some value)
-    def forward(self, queries, keys, values, valid_lens=None):
-        d = queries.shape[-1]
-        # Set `transpose_b=True` to swap the last two dimensions of `keys`
-        scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
-        return npx.batch_dot(attention_weights, values)
-```
-
-```{.python .input}
-#@tab pytorch
-#@save
-class DotProductAttention(nn.Module):
-    """Dot product attention."""
-    def __init__(self, dropout, **kwargs):
-        super(DotProductAttention, self).__init__(**kwargs)
-        self.dropout = nn.Dropout(dropout)
-
-    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
-    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
-    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
-    # dimension)
-    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, some value)
-    def forward(self, queries, keys, values, valid_lens=None):
-        d = queries.shape[-1]
-        # Set `transpose_b=True` to swap the last two dimensions of `keys`
-        scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
-        return torch.bmm(attention_weights, values)
-```
-
-Let us test the class `DotProductAttention` in a toy example.
-First, create two batches, where each batch has one query and 10 key-value pairs.
-Via the `valid_lens` argument,
-we specify that we will check the first $2$ key-value pairs for the first batch and $6$ for the second one. Therefore, even though both batches have the same query and key-value pairs, we obtain different outputs.
-Since every key is the same, the attention weights are uniform.
-
-```{.python .input}
-attn = DotProductAttention(dropout=0.5)
-attn.initialize()
-queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
-# The two value matrices in the `values` minibatch are identical
-values = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)
-valid_lens = d2l.tensor([2, 6])
-attn(queries, keys, values, valid_lens)
-```
-
-```{.python .input}
-#@tab pytorch
-attn = DotProductAttention(dropout=0.5)
-attn.eval()
-queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
-# The two value matrices in the `values` minibatch are identical
-values = torch.arange(40, dtype=torch.float32).reshape(1, 10, 4).repeat(
-    2, 1, 1)
-valid_lens = d2l.tensor([2, 6])
-attn(queries, keys, values, valid_lens)
-```
-
-As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension.
-To address such an issue,
-we may resort to the additive attention.
-
-
-
 ## Additive Attention
 
 In *additive attention*, we project both query and keys into $\mathbb R^{h}$ by learnable weights parameters.
@@ -281,6 +190,11 @@ Recall that since every key is the same, the attention weights are uniform.
 As we can see below, though `AdditiveAttention` contains an additional MLP model, we obtain the same output as for `AdditiveAttention`.
 
 ```{.python .input}
+queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
+# The two value matrices in the `values` minibatch are identical
+values = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)
+valid_lens = d2l.tensor([2, 6])
+
 attn = AdditiveAttention(num_hiddens=8, dropout=0.1)
 attn.initialize()
 attn(queries, keys, values, valid_lens)
@@ -288,10 +202,97 @@ attn(queries, keys, values, valid_lens)
 
 ```{.python .input}
 #@tab pytorch
+queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
+# The two value matrices in the `values` minibatch are identical
+values = torch.arange(40, dtype=torch.float32).reshape(1, 10, 4).repeat(
+    2, 1, 1)
+valid_lens = d2l.tensor([2, 6])
+
 attn = AdditiveAttention(key_size=2, query_size=2, num_hiddens=8, dropout=0.1)
 attn.eval()
 attn(queries, keys, values, valid_lens)
 ```
+
+## Scaled Dot-Product Attention
+
+Equipped with the above `masked_softmax` function and the batch multiplication operator as described in :numref:`subsec_batch_dot`, let us dive into the details of two widely used attention layers. The first one is the *scaled dot product attention*: it assumes that the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. The dot product attention computes the scores by a dot product between the query and a key, which is then divided by $\sqrt{d}$ to minimize the unrelated influence of the dimension $d$ on the scores. In other words,
+
+$$\alpha(\mathbf q, \mathbf k) = \langle \mathbf q, \mathbf k \rangle /\sqrt{d}.$$
+
+
+Beyond the single-dimensional queries and keys, we can always generalize them to multi-dimensional queries and keys. Assume that $\mathbf Q\in\mathbb R^{m\times d}$ contains $m$ queries and $\mathbf K\in\mathbb R^{n\times d}$ has all the $n$ keys. We can compute all $mn$ scores by
+
+$$\alpha(\mathbf Q, \mathbf K) = \mathbf Q \mathbf K^\top /\sqrt{d}.$$
+:eqlabel:`eq_alpha_QK`
+
+With :eqref:`eq_alpha_QK`, we can implement the dot product attention layer `DotProductAttention` that supports a batch of queries and key-value pairs. In addition, for regularization we also use a dropout layer.
+
+```{.python .input}
+#@save
+class DotProductAttention(nn.Block):
+    """Dot product attention."""
+    def __init__(self, dropout, **kwargs):
+        super(DotProductAttention, self).__init__(**kwargs)
+        self.dropout = nn.Dropout(dropout)
+
+    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
+    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
+    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+    # dimension)
+    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, some value)
+    def forward(self, queries, keys, values, valid_lens=None):
+        d = queries.shape[-1]
+        # Set `transpose_b=True` to swap the last two dimensions of `keys`
+        scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
+        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
+        return npx.batch_dot(attention_weights, values)
+```
+
+```{.python .input}
+#@tab pytorch
+#@save
+class DotProductAttention(nn.Module):
+    """Dot product attention."""
+    def __init__(self, dropout, **kwargs):
+        super(DotProductAttention, self).__init__(**kwargs)
+        self.dropout = nn.Dropout(dropout)
+
+    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
+    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
+    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+    # dimension)
+    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, some value)
+    def forward(self, queries, keys, values, valid_lens=None):
+        d = queries.shape[-1]
+        # Set `transpose_b=True` to swap the last two dimensions of `keys`
+        scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
+        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
+        return torch.bmm(attention_weights, values)
+```
+
+Let us test the class `DotProductAttention` in a toy example.
+First, create two batches, where each batch has one query and 10 key-value pairs.
+Via the `valid_lens` argument,
+we specify that we will check the first $2$ key-value pairs for the first batch and $6$ for the second one. Therefore, even though both batches have the same query and key-value pairs, we obtain different outputs.
+Since every key is the same, the attention weights are uniform.
+
+```{.python .input}
+attn = DotProductAttention(dropout=0.5)
+attn.initialize()
+attn(queries, keys, values, valid_lens)
+```
+
+```{.python .input}
+#@tab pytorch
+attn = DotProductAttention(dropout=0.5)
+attn.eval()
+attn(queries, keys, values, valid_lens)
+```
+
+As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension.
+To address such an issue,
+we may resort to the additive attention.
+
 
 ## Summary
 
