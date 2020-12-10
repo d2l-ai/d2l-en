@@ -195,9 +195,9 @@ queries, keys = d2l.normal(0, 1, (2, 1, 20)), d2l.ones((2, 10, 2))
 values = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)
 valid_lens = d2l.tensor([2, 6])
 
-attn = AdditiveAttention(num_hiddens=8, dropout=0.1)
-attn.initialize()
-attn(queries, keys, values, valid_lens)
+attention = AdditiveAttention(num_hiddens=8, dropout=0.1)
+attention.initialize()
+attention(queries, keys, values, valid_lens)
 ```
 
 ```{.python .input}
@@ -208,9 +208,10 @@ values = torch.arange(40, dtype=torch.float32).reshape(1, 10, 4).repeat(
     2, 1, 1)
 valid_lens = d2l.tensor([2, 6])
 
-attn = AdditiveAttention(key_size=2, query_size=2, num_hiddens=8, dropout=0.1)
-attn.eval()
-attn(queries, keys, values, valid_lens)
+attention = AdditiveAttention(key_size=2, query_size=2, num_hiddens=8,
+                              dropout=0.1)
+attention.eval()
+attention(queries, keys, values, valid_lens)
 ```
 
 ## Scaled Dot-Product Attention
@@ -278,17 +279,17 @@ Since every key is the same, the attention weights are uniform.
 
 ```{.python .input}
 queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
-attn = DotProductAttention(dropout=0.5)
-attn.initialize()
-attn(queries, keys, values, valid_lens)
+attention = DotProductAttention(dropout=0.5)
+attention.initialize()
+attention(queries, keys, values, valid_lens)
 ```
 
 ```{.python .input}
 #@tab pytorch
 queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
-attn = DotProductAttention(dropout=0.5)
-attn.eval()
-attn(queries, keys, values, valid_lens)
+attention = DotProductAttention(dropout=0.5)
+attention.eval()
+attention(queries, keys, values, valid_lens)
 ```
 
 As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension.

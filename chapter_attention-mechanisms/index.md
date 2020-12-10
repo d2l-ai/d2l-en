@@ -14,6 +14,7 @@ attention
 nadaraya-waston
 attention-functions
 seq2seq-attention
+multihead-attention
 transformer-encoder
 transformer-decoder
 transformer
