@@ -190,7 +190,7 @@ Recall that since every key is the same, the attention weights are uniform.
 As we can see below, though `AdditiveAttention` contains an additional MLP model, we obtain the same output as for `AdditiveAttention`.
 
 ```{.python .input}
-queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
+queries, keys = d2l.normal(0, 1, (2, 1, 20)), d2l.ones((2, 10, 2))
 # The two value matrices in the `values` minibatch are identical
 values = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)
 valid_lens = d2l.tensor([2, 6])
@@ -202,7 +202,7 @@ attn(queries, keys, values, valid_lens)
 
 ```{.python .input}
 #@tab pytorch
-queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
+queries, keys = d2l.normal(0, 1, (2, 1, 20)), d2l.ones((2, 10, 2))
 # The two value matrices in the `values` minibatch are identical
 values = torch.arange(40, dtype=torch.float32).reshape(1, 10, 4).repeat(
     2, 1, 1)
@@ -239,7 +239,7 @@ class DotProductAttention(nn.Block):
     # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
     # Shape of `values`: (`batch_size`, no. of key-value pairs, value
     # dimension)
-    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, some value)
+    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
     def forward(self, queries, keys, values, valid_lens=None):
         d = queries.shape[-1]
         # Set `transpose_b=True` to swap the last two dimensions of `keys`
@@ -261,7 +261,7 @@ class DotProductAttention(nn.Module):
     # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
     # Shape of `values`: (`batch_size`, no. of key-value pairs, value
     # dimension)
-    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, some value)
+    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
     def forward(self, queries, keys, values, valid_lens=None):
         d = queries.shape[-1]
         # Set `transpose_b=True` to swap the last two dimensions of `keys`
@@ -277,6 +277,7 @@ we specify that we will check the first $2$ key-value pairs for the first batch 
 Since every key is the same, the attention weights are uniform.
 
 ```{.python .input}
+queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
 attn = DotProductAttention(dropout=0.5)
 attn.initialize()
 attn(queries, keys, values, valid_lens)
@@ -284,6 +285,7 @@ attn(queries, keys, values, valid_lens)
 
 ```{.python .input}
 #@tab pytorch
+queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
 attn = DotProductAttention(dropout=0.5)
 attn.eval()
 attn(queries, keys, values, valid_lens)
