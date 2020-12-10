@@ -51,7 +51,7 @@ and the number of output channels `num_channels`.
 
 :begin_tab:`pytorch`
 The function takes three arguments corresponding to the number
-of convolutional layers `num_convs`, number of input channels `in_channels`
+of convolutional layers `num_convs`, the number of input channels `in_channels`
 and the number of output channels `out_channels`.
 :end_tab:
 
