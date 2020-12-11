@@ -38,6 +38,33 @@ If you find this book useful, please star (★) this repository or cite this boo
 }
 ```
 
+## Cool Papers Using D2L
+
+1. [**Universal Average-Case Optimality of Polyak Momentum**](https://arxiv.org/pdf/2002.04664.pdf). D. Scieur, F. Pedregosan. *International Conference on Machine Learning, 2020*
+
+1. [**2D Digital Image Correlation and Region-Based Convolutional Neural Network in Monitoring and Evaluation of Surface Cracks in Concrete Structural Elements**](https://www.mdpi.com/1996-1944/13/16/3527/pdf). M. Słoński, M. Tekieli. *Materials, 2020*
+
+1. [**GluonCV and GluonNLP: Deep Learning in Computer Vision and Natural Language Processing**](https://www.jmlr.org/papers/volume21/19-429/19-429.pdf). J. Guo, H. He, T. He, L. Lausen, M. Li, H. Lin, X. Shi, C. Wang, J. Xie, S. Zha, A. Zhang, H. Zhang, Z. Zhang, Z. Zhang, S. Zheng, and Y. Zhu. *Journal of Machine Learning Research, 2020*
+
+1. [**Detecting Human Driver Inattentive and Aggressive Driving Behavior Using Deep Learning: Recent Advances, Requirements and Open Challenges**](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9107077). M. Alkinani, W. Khan, Q. Arshad. *IEEE Access, 2020*
+
+1. [**Diagnosing Parkinson by Using Deep Autoencoder Neural Network**](https://link.springer.com/chapter/10.1007/978-981-15-6325-6_5). U. Kose, O. Deperlioglu, J. Alzubi, B. Patrut. *Deep Learning for Medical Decision Support Systems, 2020*
+
+<details><summary>more</summary>
+
+1. [**Descending through a Crowded Valley--Benchmarking Deep Learning Optimizers**](https://arxiv.org/pdf/2007.01547.pdf). R. Schmidt, F. Schneider, P. Hennig.
+
+1. [**Deep Learning Architectures for Medical Diagnosis**](https://link.springer.com/chapter/10.1007/978-981-15-6325-6_2). U. Kose, O. Deperlioglu, J. Alzubi, B. Patrut. *Deep Learning for Medical Decision Support Systems, 2020*
+
+1. [**ControlVAE: Tuning, Analytical Properties, and Performance Analysis**](https://arxiv.org/pdf/2011.01754.pdf). H. Shao, Z. Xiao, S. Yao, D. Sun, A. Zhang, S. Liu, T. Abdelzaher.
+
+1. [**Potential, challenges and future directions for deep learning in prognostics and health management applications**](https://reader.elsevier.com/reader/sd/pii/S0952197620301184?token=7261E56B97513C5D621B9B5F43CAABEC2860AE3036278C3E5264707C32DCB658077B2AFA6ED6D5CD0FB7B16770828080). O. Fink, Q Wang, M Svensén, P. Dersin, W-J Lee, M. Ducoffe. *Engineering Applications of Artificial Intelligence, 2020*
+
+1. [**Learning User Representations with Hypercuboids for Recommender Systems**](https://arxiv.org/pdf/2011.05742.pdf). S. Zhang, H. Liu, A. Zhang, Y. Hu, C. Zhang, Y. Li, T. Zhu, S. He, W. Ou. *ACM International Conference on Web Search and Data Mining, 2021*
+
+</details>
+
+
 ## Endorsements
 
 > <p>"In less than a decade, the AI revolution has swept from research labs to broad industries to every corner of our daily life.  Dive into Deep Learning is an excellent text on deep learning and deserves attention from anyone who wants to learn why deep learning has ignited the AI revolution: the most powerful technology force of our time."</p>
