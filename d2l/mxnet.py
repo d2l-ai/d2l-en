@@ -2551,6 +2551,7 @@ exp = np.exp
 log = np.log
 tensor = np.array
 normal = np.random.normal
+rand = np.random.rand
 matmul = np.dot
 int32 = np.int32
 float32 = np.float32
