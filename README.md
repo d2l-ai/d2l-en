@@ -22,7 +22,7 @@ Our goal is to offer a resource that could
 1. allow for rapid updates, both by us and also by the community at large;
 1. be complemented by a forum for interactive discussion of technical details and to answer questions.
 
-# Universities Using D2L
+## Universities Using D2L
 <p align="center">
   <img width="400"  src="static/frontpage/_images/map.png">
 </p>
