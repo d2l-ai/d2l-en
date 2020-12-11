@@ -24,7 +24,7 @@ Our goal is to offer a resource that could
 
 ## Universities Using D2L
 <p align="center">
-  <img width="400"  src="static/frontpage/_images/map.png">
+  <img width="600"  src="static/frontpage/_images/map.png">
 </p>
 
 
