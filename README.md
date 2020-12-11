@@ -58,7 +58,7 @@ If you find this book useful, please star (★) this repository or cite this boo
 
 1. [**ControlVAE: Tuning, Analytical Properties, and Performance Analysis**](https://arxiv.org/pdf/2011.01754.pdf). H. Shao, Z. Xiao, S. Yao, D. Sun, A. Zhang, S. Liu, T. Abdelzaher.
 
-1. [**Potential, challenges and future directions for deep learning in prognostics and health management applications**](https://reader.elsevier.com/reader/sd/pii/S0952197620301184?token=7261E56B97513C5D621B9B5F43CAABEC2860AE3036278C3E5264707C32DCB658077B2AFA6ED6D5CD0FB7B16770828080). O. Fink, Q Wang, M Svensén, P. Dersin, W-J Lee, M. Ducoffe. *Engineering Applications of Artificial Intelligence, 2020*
+1. [**Potential, challenges and future directions for deep learning in prognostics and health management applications**](https://reader.elsevier.com/reader/sd/pii/S0952197620301184?token=7261E56B97513C5D621B9B5F43CAABEC2860AE3036278C3E5264707C32DCB658077B2AFA6ED6D5CD0FB7B16770828080). O. Fink, Q. Wang, M. Svensén, P. Dersin, W-J. Lee, M. Ducoffe. *Engineering Applications of Artificial Intelligence, 2020*
 
 1. [**Learning User Representations with Hypercuboids for Recommender Systems**](https://arxiv.org/pdf/2011.05742.pdf). S. Zhang, H. Liu, A. Zhang, Y. Hu, C. Zhang, Y. Li, T. Zhu, S. He, W. Ou. *ACM International Conference on Web Search and Data Mining, 2021*
 
