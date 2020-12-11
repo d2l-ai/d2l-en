@@ -22,21 +22,11 @@ Our goal is to offer a resource that could
 1. allow for rapid updates, both by us and also by the community at large;
 1. be complemented by a forum for interactive discussion of technical details and to answer questions.
 
-<h5 align="center">Universities that use D2L as a textbook or a reference book</h5>
+# Universities Using D2L
 <p align="center">
   <img width="400"  src="static/frontpage/_images/map.png">
 </p>
 
-If you find this book useful, please star (★) this repository or cite this book using the following bibtex entry:
-
-```
-@book{zhang2020dive,
-    title={Dive into Deep Learning},
-    author={Aston Zhang and Zachary C. Lipton and Mu Li and Alexander J. Smola},
-    note={\url{https://d2l.ai}},
-    year={2020}
-}
-```
 
 ## Cool Papers Using D2L
 
@@ -63,6 +53,18 @@ If you find this book useful, please star (★) this repository or cite this boo
 1. [**Learning User Representations with Hypercuboids for Recommender Systems**](https://arxiv.org/pdf/2011.05742.pdf). S. Zhang, H. Liu, A. Zhang, Y. Hu, C. Zhang, Y. Li, T. Zhu, S. He, W. Ou. *ACM International Conference on Web Search and Data Mining, 2021*
 
 </details>
+
+
+If you find this book useful, please star (★) this repository or cite this book using the following bibtex entry:
+
+```
+@book{zhang2020dive,
+    title={Dive into Deep Learning},
+    author={Aston Zhang and Zachary C. Lipton and Mu Li and Alexander J. Smola},
+    note={\url{https://d2l.ai}},
+    year={2020}
+}
+```
 
 
 ## Endorsements
