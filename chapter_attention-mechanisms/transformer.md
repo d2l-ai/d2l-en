@@ -38,14 +38,13 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import math
 import torch
 from torch import nn
 ```
-
 
 ## Self-Attention
 
@@ -75,7 +74,7 @@ class PositionWiseFFN(nn.Block):
         return self.dense2(self.dense1(X))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 #@save
 class PositionWiseFFN(nn.Module):
@@ -90,7 +89,6 @@ class PositionWiseFFN(nn.Module):
         return self.dense2(self.relu(self.dense1(X)))
 ```
 
-
 Similar to the multi-head attention, the position-wise feed-forward network will only change the last dimension size of the input---the feature dimension. In addition, if two items in the input sequence are identical, the according outputs will be identical as well.
 
 ```{.python .input}
@@ -99,13 +97,12 @@ ffn.initialize()
 ffn(np.ones((2, 3, 4)))[0]
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 ffn = PositionWiseFFN(4, 4, 8)
 ffn.eval()
 ffn(d2l.ones((2, 3, 4)))[0]
 ```
-
 
 ## Add and Norm
 
@@ -130,7 +127,7 @@ with autograd.record():
     print('layer norm:', layer(X), '\nbatch norm:', batch(X))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 layer = nn.LayerNorm(2)
 batch = nn.BatchNorm1d(2)
@@ -138,7 +135,6 @@ X = d2l.tensor([[1, 2], [2, 3]], dtype=torch.float32)
 # Compute mean and variance from `X` in the training mode
 print('layer norm:', layer(X), '\nbatch norm:', batch(X))
 ```
-
 
 Now let us implement the connection block `AddNorm` together. `AddNorm` accepts two inputs $X$ and $Y$. We can deem $X$ as the original input in the residual network, and $Y$ as the outputs from either the multi-head attention layer or the position-wise FFN network. In addition, we apply dropout on $Y$ for regularization.
 
@@ -154,7 +150,7 @@ class AddNorm(nn.Block):
         return self.ln(self.dropout(Y) + X)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 #@save
 class AddNorm(nn.Module):
@@ -167,7 +163,6 @@ class AddNorm(nn.Module):
         return self.ln(self.dropout(Y) + X)
 ```
 
-
 Due to the residual connection, $X$ and $Y$ should have the same shape.
 
 ```{.python .input}
@@ -176,13 +171,12 @@ add_norm.initialize()
 add_norm(np.ones((2, 3, 4)), np.ones((2, 3, 4))).shape
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 add_norm = AddNorm([3,4], 0.5) # normalized_shape is input.size()[1:]
 add_norm.eval()
 add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 ```
-
 
 ## Positional Encoding
 
@@ -222,7 +216,7 @@ class PositionalEncoding(nn.Block):
         return self.dropout(X)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 class PositionalEncoding(nn.Module):
     def __init__(self, num_hiddens, dropout, max_len=1000):
@@ -241,7 +235,6 @@ class PositionalEncoding(nn.Module):
         return self.dropout(X)
 ```
 
-
 Now we test the `PositionalEncoding` class with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset (i.e. phase) because one is produced by a sine function and the other is produced by a cosine function. The $6^{\mathrm{th}}$ and $7^{\mathrm{th}}$ dimensions have lower frequency.
 
 ```{.python .input}
@@ -252,7 +245,7 @@ d2l.plot(np.arange(100), Y[0, :, 4:8].T, figsize=(6, 2.5),
          legend=["dim %d" % p for p in [4, 5, 6, 7]])
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 pe = PositionalEncoding(20, 0)
 pe.eval()
@@ -260,7 +253,6 @@ Y = pe(d2l.zeros((1, 100, 20)))
 d2l.plot(torch.arange(100), Y[0, :, 4:8].T, figsize=(6, 2.5),
          legend=["dim %d" % p for p in [4, 5, 6, 7]])
 ```
-
 
 ## Encoder
 
@@ -283,7 +275,7 @@ class EncoderBlock(nn.Block):
         return self.addnorm2(Y, self.ffn(Y))
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 #@save
 class EncoderBlock(nn.Module):
@@ -304,7 +296,6 @@ class EncoderBlock(nn.Module):
         return self.addnorm2(Y, self.ffn(Y))
 ```
 
-
 Due to the residual connections, this block will not change the input shape. It means that the `num_hiddens` argument should be equal to the input size of the last dimension. In our toy example below,  `num_hiddens` $= 24$, `ffn_num_hiddens` $=48$, `num_heads` $= 8$, and `dropout` $= 0.5$.
 
 ```{.python .input}
@@ -315,7 +306,7 @@ encoder_blk.initialize()
 encoder_blk(X, valid_lens).shape
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 X = d2l.ones((2, 100, 24))
 valid_lens = d2l.tensor([3, 2])
@@ -323,7 +314,6 @@ encoder_blk = EncoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5)
 encoder_blk.eval()
 encoder_blk(X, valid_lens).shape
 ```
-
 
 Now it comes to the implementation of the entire Transformer encoder. With the Transformer encoder, $n$ blocks of `EncoderBlock` stack up one after another. Because of the residual connection, the embedding layer size $d$ is same as the Transformer block output size. Also note that we multiply the embedding output by $\sqrt{d}$ to prevent its values from being too small.
 
@@ -349,7 +339,7 @@ class TransformerEncoder(d2l.Encoder):
         return X
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 #@save
 class TransformerEncoder(d2l.Encoder):
@@ -374,7 +364,6 @@ class TransformerEncoder(d2l.Encoder):
         return X
 ```
 
-
 Let us create an encoder with two stacked  Transformer encoder blocks, whose hyperparameters are the same as before. Similar to the previous toy example's parameters, we add two more parameters `vocab_size` to be $200$ and `num_layers` to be $2$ here.
 
 ```{.python .input}
@@ -383,14 +372,13 @@ encoder.initialize()
 encoder(np.ones((2, 100)), valid_lens).shape
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 encoder = TransformerEncoder(
     200, 24, 24, 24, 24, [100, 24], 24, 48, 8, 2, 0.5)
 encoder.eval()
 encoder(d2l.ones((2, 100), dtype=torch.long), valid_lens).shape
 ```
-
 
 ## Decoder
 
@@ -443,7 +431,7 @@ class DecoderBlock(nn.Block):
         return self.addnorm3(Z, self.ffn(Z)), state
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 class DecoderBlock(nn.Module):
     # `i` means it is the i-th block in the decoder
@@ -485,7 +473,6 @@ class DecoderBlock(nn.Module):
         return self.addnorm3(Z, self.ffn(Z)), state
 ```
 
-
 Similar to the  Transformer encoder block, `num_hiddens` should be equal to the last dimension size of $X$.
 
 ```{.python .input}
@@ -496,7 +483,7 @@ state = [encoder_blk(X, valid_lens), valid_lens, [None]]
 decoder_blk(X, state)[0].shape
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 decoder_blk = DecoderBlock(24, 24, 24, 24, [100, 24], 24, 48, 8, 0.5, 0)
 decoder_blk.eval()
@@ -504,7 +491,6 @@ X = d2l.ones((2, 100, 24))
 state = [encoder_blk(X, valid_lens), valid_lens, [None]]
 decoder_blk(X, state)[0].shape
 ```
-
 
 The construction of the entire  Transformer decoder is identical to the  Transformer encoder, except for the additional dense layer to obtain the output confidence scores.
 
@@ -536,7 +522,7 @@ class TransformerDecoder(d2l.Decoder):
         return self.dense(X), state
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 class TransformerDecoder(d2l.Decoder):
     def __init__(self, vocab_size, key_size, query_size, value_size,
@@ -565,7 +551,6 @@ class TransformerDecoder(d2l.Decoder):
         return self.dense(X), state
 ```
 
-
 ## Training
 
 Finally, we can build an encoder-decoder model with the Transformer architecture.
@@ -588,7 +573,7 @@ model = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10
 lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
@@ -609,7 +594,6 @@ decoder = TransformerDecoder(
 model = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
-
 
 As we can see from the training time and accuracy, compared with the seq2seq model with attention model, Transformer runs faster per epoch, and converges faster at the beginning.
 
