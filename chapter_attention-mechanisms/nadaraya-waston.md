@@ -27,7 +27,7 @@ def f(x):
 
 ```{.python .input}
 n_train = 50  # No. of training examples
-x_train = np.random.rand(n_train) * 5  # Training inputs
+x_train = np.sort(np.random.rand(n_train)) * 5  # Training inputs
 y_train = f(x_train) + d2l.normal(0, 0.5, n_train)  # Training outputs
 x_test = np.arange(0, 5, 0.05)  # Testing examples
 y_truth = f(x_test)  # Ground-truth outputs for the testing examples
@@ -101,6 +101,10 @@ plot_kernel_reg(y_hat)
 ```
 
 ```{.python .input}
+d2l.plt.matshow(attention_weights.T.asnumpy());
+```
+
+```{.python .input}
 #@tab pytorch
 # Shape of `X_repeat`: (`n_test`, `n_train`), where each row contains the
 # same testing inputs (i.e., same queries)
@@ -168,10 +172,10 @@ class NWKernelRegression(nn.Block):
         # (no. of queries, no. of key-value pairs)
         queries = d2l.reshape(
             queries.repeat(keys.shape[1]), (-1, keys.shape[1]))
-        attention_weights = npx.softmax(
+        self.attention_weights = npx.softmax(
             -((queries - keys) * self.w.data())**2 / 2)   
         # Shape of `values`: (no. of queries, no. of key-value pairs)
-        return npx.batch_dot(np.expand_dims(attention_weights, 1),
+        return npx.batch_dot(np.expand_dims(self.attention_weights, 1),
                              np.expand_dims(values, -1)).reshape(-1)
 ```
 
@@ -282,4 +286,8 @@ keys = x_train.repeat((n_test, 1))
 values = y_train.repeat((n_test, 1))
 y_hat = net(x_test, keys, values).unsqueeze(1).detach()
 plot_kernel_reg(y_hat)
+```
+
+```{.python .input}
+d2l.plt.matshow(net.attention_weights.T.asnumpy());
 ```
