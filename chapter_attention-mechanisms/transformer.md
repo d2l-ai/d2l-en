@@ -59,16 +59,16 @@ Before the discussion of the *multi-head attention* layer, let us quick express 
 
 Another key component in the Transformer block is called *position-wise feed-forward network (FFN)*. It accepts a $3$-dimensional input with shape (batch size, sequence length, feature size). The position-wise FFN consists of two dense layers that applies to the last dimension. Since the same two dense layers are used for each position item in the sequence, we referred to it as *position-wise*. Indeed, it is equivalent to applying two $1 \times 1$ convolution layers.
 
-Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two dense layers of hidden size `ffn_num_hiddens` and `pw_num_outputs`, respectively.
+Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two dense layers of hidden size `ffn_num_hiddens` and `ffn_num_outputs`, respectively.
 
 ```{.python .input}
 #@save
 class PositionWiseFFN(nn.Block):
-    def __init__(self, ffn_num_hiddens, pw_num_outputs, **kwargs):
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
         self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
                                activation='relu')
-        self.dense2 = nn.Dense(pw_num_outputs, flatten=False)
+        self.dense2 = nn.Dense(ffn_num_outputs, flatten=False)
 
     def forward(self, X):
         return self.dense2(self.dense1(X))
@@ -78,12 +78,12 @@ class PositionWiseFFN(nn.Block):
 #@tab pytorch
 #@save
 class PositionWiseFFN(nn.Module):
-    def __init__(self, ffn_num_input, ffn_num_hiddens, pw_num_outputs,
+    def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs,
                  **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
         self.dense1 = nn.Linear(ffn_num_input, ffn_num_hiddens)
         self.relu = nn.ReLU()
-        self.dense2 = nn.Linear(ffn_num_hiddens, pw_num_outputs)
+        self.dense2 = nn.Linear(ffn_num_hiddens, ffn_num_outputs)
 
     def forward(self, X):
         return self.dense2(self.relu(self.dense1(X)))
@@ -117,23 +117,23 @@ PyTorch has both `LayerNorm` and `BatchNorm1d` implemented within the `nn` modul
 :end_tab:
 
 ```{.python .input}
-layer = nn.LayerNorm()
-layer.initialize()
-batch = nn.BatchNorm()
-batch.initialize()
-X = np.array([[1, 2], [2, 3]])
+ln = nn.LayerNorm()
+ln.initialize()
+bn = nn.BatchNorm()
+bn.initialize()
+X = d2l.tensor([[1, 2], [2, 3]])
 # Compute mean and variance from `X` in the training mode
 with autograd.record():
-    print('layer norm:', layer(X), '\nbatch norm:', batch(X))
+    print('layer norm:', ln(X), '\nbatch norm:', bn(X))
 ```
 
 ```{.python .input}
 #@tab pytorch
-layer = nn.LayerNorm(2)
-batch = nn.BatchNorm1d(2)
+ln = nn.LayerNorm(2)
+bn = nn.BatchNorm1d(2)
 X = d2l.tensor([[1, 2], [2, 3]], dtype=torch.float32)
 # Compute mean and variance from `X` in the training mode
-print('layer norm:', layer(X), '\nbatch norm:', batch(X))
+print('layer norm:', ln(X), '\nbatch norm:', bn(X))
 ```
 
 Now let us implement the connection block `AddNorm` together. `AddNorm` accepts two inputs $X$ and $Y$. We can deem $X$ as the original input in the residual network, and $Y$ as the outputs from either the multi-head attention layer or the position-wise FFN network. In addition, we apply dropout on $Y$ for regularization.
@@ -168,7 +168,7 @@ Due to the residual connection, $X$ and $Y$ should have the same shape.
 ```{.python .input}
 add_norm = AddNorm(0.5)
 add_norm.initialize()
-add_norm(np.ones((2, 3, 4)), np.ones((2, 3, 4))).shape
+add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 ```
 
 ```{.python .input}

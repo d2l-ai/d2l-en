@@ -1130,11 +1130,11 @@ def transpose_output(X, num_heads):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionWiseFFN(nn.Block):
-    def __init__(self, ffn_num_hiddens, pw_num_outputs, **kwargs):
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
         self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
                                activation='relu')
-        self.dense2 = nn.Dense(pw_num_outputs, flatten=False)
+        self.dense2 = nn.Dense(ffn_num_outputs, flatten=False)
 
     def forward(self, X):
         return self.dense2(self.dense1(X))
