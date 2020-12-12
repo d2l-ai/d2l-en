@@ -118,7 +118,7 @@ plot_kernel_reg(y_hat)
 #@tab all
 def plot_attention_weights(attention_weights):
     d2l.set_figsize((7, 3))
-    d2l.plt.pcolormesh(d2l.transpose(d2l.numpy(attention_weights)),
+    d2l.plt.pcolormesh(d2l.numpy(d2l.transpose(attention_weights)),
                        cmap='pink')
     d2l.plt.xlabel('Testing examples (sorted by x)')
     d2l.plt.ylabel('Training examples (sorted by x)')
