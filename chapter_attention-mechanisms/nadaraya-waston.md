@@ -116,7 +116,15 @@ plot_kernel_reg(y_hat)
 
 ```{.python .input}
 #@tab all
-d2l.plt.matshow(d2l.numpy(d2l.transpose(attention_weights)));
+def plot_attention_weights(attention_weights):
+    d2l.set_figsize((7, 3))
+    d2l.plt.pcolormesh(d2l.transpose(d2l.numpy(attention_weights)),
+                       cmap='pink')
+    d2l.plt.xlabel('Testing examples (sorted by x)')
+    d2l.plt.ylabel('Training examples (sorted by x)')
+    d2l.plt.colorbar();
+
+plot_attention_weights(attention_weights)
 ```
 
 ## Parametric Model
@@ -290,5 +298,5 @@ plot_kernel_reg(y_hat)
 
 ```{.python .input}
 #@tab all
-d2l.plt.matshow(d2l.numpy(d2l.transpose(net.attention_weights)));
+plot_attention_weights(net.attention_weights)
 ```
