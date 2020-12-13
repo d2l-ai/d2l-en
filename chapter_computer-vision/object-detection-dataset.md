@@ -58,8 +58,8 @@ def load_data_bananas(batch_size, edge_size=256):
 ```
 
 ```{.python .input}
-#@save
-def read_data_bananas(is_train=True):
+#@tab pytorch
+def read_data_bananas(is_train=True): #@save
     """Read the bananas dataset images and labels."""
     data_dir = d2l.download_extract('banana-detection')
     """Read all Bananas feature images and bounding box labels."""
@@ -74,13 +74,13 @@ def read_data_bananas(is_train=True):
                          'bananas_val', 'images', f'{img_name}')))
         # Since all images have same object class i.e. category '0'
         # the `label` column corresponds to the only object i.e. banana
-        # The target is as follows : (`label`, `xmin`, `ymin`, `xmax`, `ymax`) 
+        # The target is as follows : (`label`, `xmin`, `ymin`, `xmax`, `ymax`)
         targets.append(list(target))
-        
+
     return images, torch.tensor(targets).unsqueeze(1)/256
 
 
-class BananasDataset(torch.utils.data.Dataset):
+class BananasDataset(torch.utils.data.Dataset): #@save
     """A customized dataset to load Bananas dataset."""
     def __init__(self, is_train):
         self.features, self.labels = read_data_bananas(is_train)
@@ -94,13 +94,13 @@ class BananasDataset(torch.utils.data.Dataset):
         return len(self.features)
 
 
-def load_data_bananas(batch_size):
+def load_data_bananas(batch_size): #@save
     """Load the bananas dataset."""
     train_iter = torch.utils.data.DataLoader(BananasDataset(is_train=True),
                                              batch_size, shuffle=True)
     val_iter = torch.utils.data.DataLoader(BananasDataset(is_train=False),
                                            batch_size)
-    
+
     return (train_iter, val_iter)
 ```
 

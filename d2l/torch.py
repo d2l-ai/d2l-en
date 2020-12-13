@@ -1558,9 +1558,9 @@ def multibox_prior(data, sizes, ratios):
                     w = sizes[k] * in_height / in_width / 2.0
                     h = sizes[k] / 2.0
                 else:
-                    w = sizes[0] * in_height / in_width * sqrt(
+                    w = sizes[0] * in_height / in_width * math.sqrt(
                                             ratios[k - num_sizes + 1]) / 2.0
-                    h = sizes[0] / sqrt(ratios[k - num_sizes + 1] * 1.0) / 2.0
+                    h = sizes[0] / math.sqrt(ratios[k - num_sizes + 1] * 1.0) / 2.0
 
                 count = i * in_width * (num_sizes + num_ratios - 1) +\
                 j * (num_sizes + num_ratios - 1) + k
@@ -1593,6 +1593,57 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
             axes.text(rect.xy[0], rect.xy[1], labels[i],
                       va='center', ha='center', fontsize=9, color=text_color,
                       bbox=dict(facecolor=color, lw=0))
+
+
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
+d2l.DATA_HUB['banana-detection'] = (d2l.DATA_URL + 'banana-detection.zip',
+                           '5de26c8fce5ccdea9f91267273464dc968d20d72')
+
+
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
+def read_data_bananas(is_train=True):
+    """Read the bananas dataset images and labels."""
+    data_dir = d2l.download_extract('banana-detection')
+    """Read all Bananas feature images and bounding box labels."""
+    csv_fname = os.path.join(data_dir, 'bananas_train' if is_train
+                                    else 'bananas_val', 'label.csv')
+    csv_data = pd.read_csv(csv_fname)
+    csv_data = csv_data.set_index('img_name')
+    images, targets = [], []
+    for img_name, target in csv_data.iterrows():
+        images.append(torchvision.io.read_image(
+            os.path.join(data_dir, 'bananas_train' if is_train else
+                         'bananas_val', 'images', f'{img_name}')))
+        # Since all images have same object class i.e. category '0'
+        # the `label` column corresponds to the only object i.e. banana
+        # The target is as follows : (`label`, `xmin`, `ymin`, `xmax`, `ymax`)
+        targets.append(list(target))
+
+    return images, torch.tensor(targets).unsqueeze(1)/256
+
+
+class BananasDataset(torch.utils.data.Dataset):
+    """A customized dataset to load Bananas dataset."""
+    def __init__(self, is_train):
+        self.features, self.labels = read_data_bananas(is_train)
+        print('read ' + str(len(self.features)) + (f' training examples' if
+              is_train else f' validation examples'))
+
+    def __getitem__(self, idx):
+        return (self.features[idx], self.labels[idx])
+
+    def __len__(self):
+        return len(self.features)
+
+
+def load_data_bananas(batch_size):
+    """Load the bananas dataset."""
+    train_iter = torch.utils.data.DataLoader(BananasDataset(is_train=True),
+                                             batch_size, shuffle=True)
+    val_iter = torch.utils.data.DataLoader(BananasDataset(is_train=False),
+                                           batch_size)
+
+    return (train_iter, val_iter)
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
