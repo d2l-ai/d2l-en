@@ -6,7 +6,7 @@ It is not difficult to reduce the number of anchor boxes.  An easy way is to app
 
 To demonstrate how to generate anchor boxes on multiple scales, let us read an image first.  It has a height and width of $561 \times 728$ pixels.
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import image, np, npx
@@ -18,13 +18,23 @@ h, w = img.shape[0:2]
 h, w
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+
+img = d2l.plt.imread('../img/catdog.jpg')
+h, w = img.shape[0:2]
+h, w
+```
+
 In :numref:`sec_conv_layer`, the 2D array output of the convolutional neural network (CNN) is called
 a feature map.  We can determine the midpoints of anchor boxes uniformly sampled
 on any image by defining the shape of the feature map.
 
 The function `display_anchors` is defined below.  We are going to generate anchor boxes `anchors` centered on each unit (pixel) on the feature map `fmap`.  Since the coordinates of axes $x$ and $y$ in anchor boxes `anchors` have been divided by the width and height of the feature map `fmap`, values between 0 and 1 can be used to represent relative positions of anchor boxes in the feature map.  Since the midpoints of anchor boxes `anchors` overlap with all the units on feature map `fmap`, the relative spatial positions of the midpoints of the `anchors` on any image must have a uniform distribution.  Specifically, when the width and height of the feature map are set to `fmap_w` and `fmap_h` respectively, the function will conduct uniform sampling for `fmap_h` rows and `fmap_w` columns of pixels and use them as midpoints to generate anchor boxes with size `s` (we assume that the length of list `s` is 1) and different aspect ratios (`ratios`).
 
-```{.python .input  n=2}
+```{.python .input}
 def display_anchors(fmap_w, fmap_h, s):
     d2l.set_figsize()
     # The values from the first two dimensions will not affect the output
@@ -35,21 +45,36 @@ def display_anchors(fmap_w, fmap_h, s):
                     anchors[0] * bbox_scale)
 ```
 
+```{.python .input}
+#@tab pytorch
+def display_anchors(fmap_w, fmap_h, s):
+    d2l.set_figsize()
+    # The values from the first two dimensions will not affect the output
+    fmap = d2l.zeros((1, 10, fmap_h, fmap_w))
+    anchors = d2l.multibox_prior(fmap, sizes=s, ratios=[1, 2, 0.5])
+    bbox_scale = d2l.tensor((w, h, w, h))
+    d2l.show_bboxes(d2l.plt.imshow(img).axes,
+                    anchors[0] * bbox_scale)
+```
+
 We will first focus on the detection of small objects. In order to make it easier to distinguish upon display, the anchor boxes with different midpoints here do not overlap. We assume that the size of the anchor boxes is 0.15 and the height and width of the feature map are 4. We can see that the midpoints of anchor boxes from the 4 rows and 4 columns on the image are uniformly distributed.
 
-```{.python .input  n=3}
+```{.python .input}
+#@tab all
 display_anchors(fmap_w=4, fmap_h=4, s=[0.15])
 ```
 
 We are going to reduce the height and width of the feature map by half and use a larger anchor box to detect larger objects. When the size is set to 0.4, overlaps will occur between regions of some anchor boxes.
 
-```{.python .input  n=4}
+```{.python .input}
+#@tab all
 display_anchors(fmap_w=2, fmap_h=2, s=[0.4])
 ```
 
 Finally, we are going to reduce the height and width of the feature map by half and increase the anchor box size to 0.8. Now the midpoint of the anchor box is the center of the image.
 
-```{.python .input  n=5}
+```{.python .input}
+#@tab all
 display_anchors(fmap_w=1, fmap_h=1, s=[0.8])
 ```
 
