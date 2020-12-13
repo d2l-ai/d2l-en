@@ -19,7 +19,6 @@ npx.set_np()
 %matplotlib inline
 from d2l import torch as d2l
 import torch
-import math
 
 torch.set_printoptions(2)
 ```
@@ -42,34 +41,35 @@ The above method of generating anchor boxes has been implemented in the `multibo
 def multibox_prior(data, sizes, ratios):
     in_height, in_width = data.shape[-2:]
     num_sizes, num_ratios = len(sizes), len(ratios)
-    num_boxes = in_height * in_width * (num_sizes + num_ratios - 1)
-    output = d2l.zeros((1, num_boxes, 4))
-    steps_h = 1.0 / in_height
-    steps_w = 1.0 / in_width
+    boxes_per_pixel = (num_sizes + num_ratios - 1)
+    size_tensor, ratio_tensor = torch.tensor(sizes), torch.tensor(ratios)
+    # offsets are required to move the anchor to center of a pixel
+    # since pixel (height=1, width=1), we choose to offset our centers by 0.5
     offset_h, offset_w = 0.5, 0.5
+    steps_h = 1.0 / in_height    # scaled steps in y axis
+    steps_w = 1.0 / in_width     # scaled steps in x axis
 
-    for i in range(in_height):
-        center_h = (i + offset_h) * steps_h
-        for j in range(in_width):
-            center_w = (j + offset_w) * steps_w
-            for k in range(num_sizes + num_ratios - 1):
-                if k < num_sizes:
-                    w = sizes[k] * in_height / in_width / 2.0
-                    h = sizes[k] / 2.0
-                else:
-                    w = sizes[0] * in_height / in_width * math.sqrt(
-                                            ratios[k - num_sizes + 1]) / 2.0
-                    h = sizes[0] / math.sqrt(ratios[k - num_sizes + 1] * 1.0) / 2.0
+    # generate all center points for the anchor boxes
+    center_h = (torch.arange(in_height) + offset_h) * steps_h
+    center_w = (torch.arange(in_width) + offset_w) * steps_w
+    shift_y, shift_x = torch.meshgrid(center_h, center_w)
+    shift_y, shift_x = shift_y.reshape(-1), shift_x.reshape(-1)
 
-                count = i * in_width * (num_sizes + num_ratios - 1) +\
-                j * (num_sizes + num_ratios - 1) + k
+    # generate boxes_per_pixel number of heights and widths which are later
+    # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
+    w = torch.cat((size_tensor, sizes[0] * torch.sqrt(ratio_tensor[1:])))\
+                * in_height / in_width / 2
+    h = torch.cat((size_tensor, sizes[0] / torch.sqrt(ratio_tensor[1:]))) / 2
+    anchor_manipulations = torch.stack((-w, -h, w, h)).T.repeat(
+                                        in_height * in_width, 1)
 
-                output[0, count, 0] = center_w - w
-                output[0, count, 1] = center_h - h
-                output[0, count, 2] = center_w + w
-                output[0, count, 3] = center_h + h
+    # each center point will have boxes_per_pixel number of anchor boxes, so
+    # generate grid of all anchor box centers with boxes_per_pixel repeats
+    out_grid = torch.stack([shift_x, shift_y, shift_x, shift_y],
+                dim=1).repeat_interleave(boxes_per_pixel, dim=0)
 
-    return output
+    output = out_grid + anchor_manipulations
+    return output.unsqueeze(0)
 ```
 
 ```{.python .input}
