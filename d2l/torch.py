@@ -1539,6 +1539,62 @@ def bbox_to_rect(bbox, color):
         fill=False, edgecolor=color, linewidth=2)
 
 
+# Defined in file: ./chapter_computer-vision/anchor.md
+def multibox_prior(data, sizes, ratios):
+    in_height, in_width = data.shape[-2:]
+    num_sizes, num_ratios = len(sizes), len(ratios)
+    num_boxes = in_height * in_width * (num_sizes + num_ratios - 1)
+    output = d2l.zeros((1, num_boxes, 4))
+    steps_h = 1.0 / in_height
+    steps_w = 1.0 / in_width
+    offset_h, offset_w = 0.5, 0.5
+
+    for i in range(in_height):
+        center_h = (i + offset_h) * steps_h
+        for j in range(in_width):
+            center_w = (j + offset_w) * steps_w
+            for k in range(num_sizes + num_ratios - 1):
+                if k < num_sizes:
+                    w = sizes[k] * in_height / in_width / 2.0
+                    h = sizes[k] / 2.0
+                else:
+                    w = sizes[0] * in_height / in_width * sqrt(
+                                            ratios[k - num_sizes + 1]) / 2.0
+                    h = sizes[0] / sqrt(ratios[k - num_sizes + 1] * 1.0) / 2.0
+
+                count = i * in_width * (num_sizes + num_ratios - 1) +\
+                j * (num_sizes + num_ratios - 1) + k
+
+                output[0, count, 0] = center_w - w
+                output[0, count, 1] = center_h - h
+                output[0, count, 2] = center_w + w
+                output[0, count, 3] = center_h + h
+
+    return output
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def show_bboxes(axes, bboxes, labels=None, colors=None):
+    """Show bounding boxes."""
+    def _make_list(obj, default_values=None):
+        if obj is None:
+            obj = default_values
+        elif not isinstance(obj, (list, tuple)):
+            obj = [obj]
+        return obj
+    labels = _make_list(labels)
+    colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
+    for i, bbox in enumerate(bboxes):
+        color = colors[i % len(colors)]
+        rect = d2l.bbox_to_rect(d2l.numpy(bbox), color)
+        axes.add_patch(rect)
+        if labels and len(labels) > i:
+            text_color = 'k' if color == 'w' else 'w'
+            axes.text(rect.xy[0], rect.xy[1], labels[i],
+                      va='center', ha='center', fontsize=9, color=text_color,
+                      bbox=dict(facecolor=color, lw=0))
+
+
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
                            '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
