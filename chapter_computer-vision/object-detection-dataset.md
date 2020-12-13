@@ -62,7 +62,6 @@ def load_data_bananas(batch_size, edge_size=256):
 def read_data_bananas(is_train=True): #@save
     """Read the bananas dataset images and labels."""
     data_dir = d2l.download_extract('banana-detection')
-    """Read all Bananas feature images and bounding box labels."""
     csv_fname = os.path.join(data_dir, 'bananas_train' if is_train
                                     else 'bananas_val', 'label.csv')
     csv_data = pd.read_csv(csv_fname)
@@ -77,11 +76,10 @@ def read_data_bananas(is_train=True): #@save
         # The target is as follows : (`label`, `xmin`, `ymin`, `xmax`, `ymax`)
         targets.append(list(target))
 
-    return images, torch.tensor(targets).unsqueeze(1)/256
+    return images, torch.tensor(targets).unsqueeze(1) / 256
 
 
 class BananasDataset(torch.utils.data.Dataset): #@save
-    """A customized dataset to load Bananas dataset."""
     def __init__(self, is_train):
         self.features, self.labels = read_data_bananas(is_train)
         print('read ' + str(len(self.features)) + (f' training examples' if
