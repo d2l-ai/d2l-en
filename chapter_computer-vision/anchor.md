@@ -19,7 +19,7 @@ npx.set_np()
 %matplotlib inline
 from d2l import torch as d2l
 import torch
-from math import sqrt
+import math
 
 torch.set_printoptions(2)
 ```
@@ -57,9 +57,9 @@ def multibox_prior(data, sizes, ratios):
                     w = sizes[k] * in_height / in_width / 2.0
                     h = sizes[k] / 2.0
                 else:
-                    w = sizes[0] * in_height / in_width * sqrt(
+                    w = sizes[0] * in_height / in_width * math.sqrt(
                                             ratios[k - num_sizes + 1]) / 2.0
-                    h = sizes[0] / sqrt(ratios[k - num_sizes + 1] * 1.0) / 2.0
+                    h = sizes[0] / math.sqrt(ratios[k - num_sizes + 1] * 1.0) / 2.0
 
                 count = i * in_width * (num_sizes + num_ratios - 1) +\
                 j * (num_sizes + num_ratios - 1) + k
