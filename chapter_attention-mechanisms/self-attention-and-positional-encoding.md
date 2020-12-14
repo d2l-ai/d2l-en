@@ -118,10 +118,10 @@ Now we test the `PositionalEncoding` class with a toy model for 4 dimensions. As
 
 ```{.python .input}
 encoding_dim, num_steps = 32, 60
-pe = PositionalEncoding(encoding_dim, 0)
-pe.initialize()
-X = pe(np.zeros((1, num_steps, encoding_dim)))
-P = pe.P[:, :X.shape[1], :]
+pos_encoding = PositionalEncoding(encoding_dim, 0)
+pos_encoding.initialize()
+X = pos_encoding(np.zeros((1, num_steps, encoding_dim)))
+P = pos_encoding.P[:, :X.shape[1], :]
 d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='position',
          figsize=(6, 2.5), legend=["dim %d" % d for d in d2l.arange(6, 10)])
 ```
@@ -129,10 +129,10 @@ d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='position',
 ```{.python .input}
 #@tab pytorch
 encoding_dim, num_steps = 32, 60
-pe = PositionalEncoding(encoding_dim, 0)
-pe.eval()
-X = pe(d2l.zeros((1, num_steps, encoding_dim)))
-P = pe.P[:, :X.shape[1], :]
+pos_encoding = PositionalEncoding(encoding_dim, 0)
+pos_encoding.eval()
+X = pos_encoding(d2l.zeros((1, num_steps, encoding_dim)))
+P = pos_encoding.P[:, :X.shape[1], :]
 d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='position',
          figsize=(6, 2.5), legend=["dim %d" % d for d in d2l.arange(6, 10)])
 ```

@@ -164,7 +164,7 @@ add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 
 ```{.python .input}
 #@tab pytorch
-add_norm = AddNorm([3,4], 0.5) # normalized_shape is input.size()[1:]
+add_norm = AddNorm([3, 4], 0.5) # normalized_shape is input.size()[1:]
 add_norm.eval()
 add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 ```
@@ -248,6 +248,9 @@ class TransformerEncoder(d2l.Encoder):
                              use_bias))
 
     def forward(self, X, valid_lens, *args):
+        # The multiplication increases the scale of the embedding values,
+        # making the scale of positional encoding values relatively smaller
+        # before summing them up
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
         for blk in self.blks:
             X = blk(X, valid_lens)
@@ -273,6 +276,9 @@ class TransformerEncoder(d2l.Encoder):
                              num_heads, dropout, use_bias))
 
     def forward(self, X, valid_lens, *args):
+        # The multiplication increases the scale of the embedding values,
+        # making the scale of positional encoding values relatively smaller
+        # before summing them up
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
         for blk in self.blks:
             X = blk(X, valid_lens)
