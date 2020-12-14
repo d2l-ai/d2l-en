@@ -1237,7 +1237,7 @@ def transpose_output(X, num_heads):
     return X.reshape(X.shape[0], X.shape[1], -1)
 
 
-# Defined in file: ./chapter_attention-mechanisms/self-attention-positional-encoding.md
+# Defined in file: ./chapter_attention-mechanisms/self-attention-and-positional-encoding.md
 class PositionalEncoding(nn.Module):
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()

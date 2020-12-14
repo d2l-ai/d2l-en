@@ -1,5 +1,5 @@
 # Self-Attention and Positional Encoding
-:label:`sec_self-attention-positional-encoding`
+:label:`sec_self-attention-and-positional-encoding`
 
 
 Self-attention :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017` is also called intra-attention :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`
@@ -135,6 +135,12 @@ X = pe(d2l.zeros((1, num_steps, encoding_dim)))
 P = pe.P[:, :X.shape[1], :]
 d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='position',
          figsize=(6, 2.5), legend=["dim %d" % d for d in d2l.arange(6, 10)])
+```
+
+```{.python .input}
+#@tab all
+for i in range(8):
+    print(f'{i} in binary is {i:>03b}')
 ```
 
 ```{.python .input}
