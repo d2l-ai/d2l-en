@@ -79,6 +79,7 @@ class PositionalEncoding(nn.Block):
 
 ```{.python .input}
 #@tab pytorch
+#@save
 class PositionalEncoding(nn.Module):
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
