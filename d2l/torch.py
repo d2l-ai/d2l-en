@@ -1091,6 +1091,19 @@ def translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device):
             f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
 
 
+# Defined in file: ./chapter_attention-mechanisms/nadaraya-waston.md
+def plot_heatmap(matrix, xlabel=None, ylabel=None, figsize=None,
+                 cmap='Reds'):
+    if figsize is not None:
+        d2l.set_figsize(figsize)
+    d2l.plt.imshow(d2l.numpy(matrix), cmap=cmap)
+    if xlabel is not None:
+        d2l.plt.xlabel(xlabel)
+    if ylabel is not None:
+        d2l.plt.ylabel(ylabel)
+    d2l.plt.colorbar();
+
+
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 def masked_softmax(X, valid_lens):
     """Perform softmax operation by masking elements on the last axis."""
@@ -1224,14 +1237,14 @@ def transpose_output(X, num_heads):
     return X.reshape(X.shape[0], X.shape[1], -1)
 
 
-# Defined in file: ./chapter_attention-mechanisms/self-attention.md
+# Defined in file: ./chapter_attention-mechanisms/self-attention-positional-encoding.md
 class PositionalEncoding(nn.Module):
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enough `P`
         self.P = d2l.zeros((1, max_len, num_hiddens))
-        X = torch.arange(0, max_len, dtype=torch.float32).reshape(
+        X = d2l.arange(max_len, dtype=torch.float32).reshape(
             -1, 1) / torch.pow(10000, torch.arange(
             0, num_hiddens, 2, dtype=torch.float32) / num_hiddens)
         self.P[:, :, 0::2] = torch.sin(X)

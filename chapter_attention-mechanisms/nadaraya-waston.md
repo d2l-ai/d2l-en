@@ -116,14 +116,20 @@ plot_kernel_reg(y_hat)
 
 ```{.python .input}
 #@tab all
-def plot_attention_weights(attention_weights):
-    d2l.set_figsize((7, 3))
-    d2l.plt.imshow(d2l.numpy(d2l.transpose(attention_weights)), cmap='Reds')
-    d2l.plt.xlabel('Sorted testing inputs')
-    d2l.plt.ylabel('Sorted training inputs')
+#@save
+def plot_heatmap(matrix, xlabel=None, ylabel=None, figsize=None,
+                 cmap='Reds'):
+    if figsize is not None:
+        d2l.set_figsize(figsize)
+    d2l.plt.imshow(d2l.numpy(matrix), cmap=cmap)
+    if xlabel is not None:
+        d2l.plt.xlabel(xlabel)
+    if ylabel is not None:
+        d2l.plt.ylabel(ylabel)
     d2l.plt.colorbar();
 
-plot_attention_weights(attention_weights)
+plot_heatmap(d2l.transpose(attention_weights), figsize=(7, 3),
+             xlabel='Sorted testing inputs', ylabel='Sorted training inputs')
 ```
 
 ## Parametric Model
@@ -297,5 +303,6 @@ plot_kernel_reg(y_hat)
 
 ```{.python .input}
 #@tab all
-plot_attention_weights(net.attention_weights)
+plot_heatmap(d2l.transpose(net.attention_weights), figsize=(7, 3),
+             xlabel='Sorted testing inputs', ylabel='Sorted training inputs')
 ```

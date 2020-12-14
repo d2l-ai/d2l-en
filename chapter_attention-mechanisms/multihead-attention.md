@@ -208,15 +208,8 @@ attention.eval()
 
 ```{.python .input}
 #@tab all
-batch_size, num_queries = 2, 4
+batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
-valid_lens = d2l.tensor([3, 2])
-attention(X, X, X, valid_lens).shape
-```
-
-```{.python .input}
-#@tab all
-num_kvpairs = 6
 Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
 attention(X, Y, Y, valid_lens).shape
 ```

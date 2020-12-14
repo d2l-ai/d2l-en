@@ -1,5 +1,5 @@
-# Self-Attention
-:label:`sec_self-attention`
+# Self-Attention and Positional Encoding
+:label:`sec_self-attention-positional-encoding`
 
 
 Self-attention :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017` is also called intra-attention :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`
@@ -11,9 +11,6 @@ However,
 
 
 :cite:`Parikh.Tackstrom.Das.ea.2016`, as we will see in NLI, does not use RNNs.
-
-
-
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -38,6 +35,26 @@ Before the discussion of the *multi-head attention* layer, let us quick express 
 ![Self-attention architecture.](../img/self-attention.svg)
 :label:`fig_self_attention`
 
+```{.python .input}
+num_hiddens, num_heads = 100, 5
+attention = d2l.MultiHeadAttention(num_hiddens, num_heads, 0.5)
+attention.initialize()
+```
+
+```{.python .input}
+#@tab pytorch
+num_hiddens, num_heads = 100, 5
+attention = d2l.MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
+                                   num_hiddens, num_heads, 0.5)
+attention.eval()
+```
+
+```{.python .input}
+#@tab all
+batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
+X = d2l.ones((batch_size, num_queries, num_hiddens))
+attention(X, X, X, valid_lens).shape
+```
 
 ## Positional Encoding
 
@@ -66,8 +83,8 @@ class PositionalEncoding(nn.Block):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enough `P`
-        self.P = np.zeros((1, max_len, num_hiddens))
-        X = np.arange(0, max_len).reshape(-1, 1) / np.power(
+        self.P = d2l.zeros((1, max_len, num_hiddens))
+        X = d2l.arange(max_len).reshape(-1, 1) / np.power(
             10000, np.arange(0, num_hiddens, 2) / num_hiddens)
         self.P[:, :, 0::2] = np.sin(X)
         self.P[:, :, 1::2] = np.cos(X)
@@ -86,7 +103,7 @@ class PositionalEncoding(nn.Module):
         self.dropout = nn.Dropout(dropout)
         # Create a long enough `P`
         self.P = d2l.zeros((1, max_len, num_hiddens))
-        X = torch.arange(0, max_len, dtype=torch.float32).reshape(
+        X = d2l.arange(max_len, dtype=torch.float32).reshape(
             -1, 1) / torch.pow(10000, torch.arange(
             0, num_hiddens, 2, dtype=torch.float32) / num_hiddens)
         self.P[:, :, 0::2] = torch.sin(X)
@@ -100,18 +117,28 @@ class PositionalEncoding(nn.Module):
 Now we test the `PositionalEncoding` class with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset (i.e. phase) because one is produced by a sine function and the other is produced by a cosine function. The $6^{\mathrm{th}}$ and $7^{\mathrm{th}}$ dimensions have lower frequency.
 
 ```{.python .input}
-pe = PositionalEncoding(20, 0)
+encoding_dim, num_steps = 32, 60
+pe = PositionalEncoding(encoding_dim, 0)
 pe.initialize()
-Y = pe(np.zeros((1, 100, 20)))
-d2l.plot(np.arange(100), Y[0, :, 4:8].T, figsize=(6, 2.5),
-         legend=["dim %d" % p for p in [4, 5, 6, 7]])
+X = pe(np.zeros((1, num_steps, encoding_dim)))
+P = pe.P[:, :X.shape[1], :]
+d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='position',
+         figsize=(6, 2.5), legend=["dim %d" % d for d in d2l.arange(6, 10)])
 ```
 
 ```{.python .input}
 #@tab pytorch
-pe = PositionalEncoding(20, 0)
+encoding_dim, num_steps = 32, 60
+pe = PositionalEncoding(encoding_dim, 0)
 pe.eval()
-Y = pe(d2l.zeros((1, 100, 20)))
-d2l.plot(torch.arange(100), Y[0, :, 4:8].T, figsize=(6, 2.5),
-         legend=["dim %d" % p for p in [4, 5, 6, 7]])
+X = pe(d2l.zeros((1, num_steps, encoding_dim)))
+P = pe.P[:, :X.shape[1], :]
+d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='position',
+         figsize=(6, 2.5), legend=["dim %d" % d for d in d2l.arange(6, 10)])
+```
+
+```{.python .input}
+#@tab all
+d2l.plot_heatmap(P[0, :, :], xlabel='encoding dimension', ylabel='position',
+                 figsize=(3, 4.5), cmap='Blues')
 ```

@@ -15,7 +15,7 @@ nadaraya-waston
 attention-functions
 seq2seq-attention
 multihead-attention
-self-attention
+self-attention-positional-encoding
 transformer
 ```
 
