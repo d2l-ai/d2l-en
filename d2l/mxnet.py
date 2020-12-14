@@ -1128,6 +1128,23 @@ def transpose_output(X, num_heads):
     return X.reshape(X.shape[0], X.shape[1], -1)
 
 
+# Defined in file: ./chapter_attention-mechanisms/self-attention.md
+class PositionalEncoding(nn.Block):
+    def __init__(self, num_hiddens, dropout, max_len=1000):
+        super(PositionalEncoding, self).__init__()
+        self.dropout = nn.Dropout(dropout)
+        # Create a long enough `P`
+        self.P = np.zeros((1, max_len, num_hiddens))
+        X = np.arange(0, max_len).reshape(-1, 1) / np.power(
+            10000, np.arange(0, num_hiddens, 2) / num_hiddens)
+        self.P[:, :, 0::2] = np.sin(X)
+        self.P[:, :, 1::2] = np.cos(X)
+
+    def forward(self, X):
+        X = X + self.P[:, :X.shape[1], :].as_in_ctx(X.ctx)
+        return self.dropout(X)
+
+
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionWiseFFN(nn.Block):
     def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
@@ -1149,23 +1166,6 @@ class AddNorm(nn.Block):
 
     def forward(self, X, Y):
         return self.ln(self.dropout(Y) + X)
-
-
-# Defined in file: ./chapter_attention-mechanisms/transformer.md
-class PositionalEncoding(nn.Block):
-    def __init__(self, num_hiddens, dropout, max_len=1000):
-        super(PositionalEncoding, self).__init__()
-        self.dropout = nn.Dropout(dropout)
-        # Create a long enough `P`
-        self.P = np.zeros((1, max_len, num_hiddens))
-        X = np.arange(0, max_len).reshape(-1, 1) / np.power(
-            10000, np.arange(0, num_hiddens, 2) / num_hiddens)
-        self.P[:, :, 0::2] = np.sin(X)
-        self.P[:, :, 1::2] = np.cos(X)
-
-    def forward(self, X):
-        X = X + self.P[:, :X.shape[1], :].as_in_ctx(X.ctx)
-        return self.dropout(X)
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
@@ -1191,7 +1191,7 @@ class TransformerEncoder(d2l.Encoder):
         super(TransformerEncoder, self).__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
-        self.pos_encoding = PositionalEncoding(num_hiddens, dropout)
+        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(

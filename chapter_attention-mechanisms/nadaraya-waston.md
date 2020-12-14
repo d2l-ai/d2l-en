@@ -119,8 +119,8 @@ plot_kernel_reg(y_hat)
 def plot_attention_weights(attention_weights):
     d2l.set_figsize((7, 3))
     d2l.plt.imshow(d2l.numpy(d2l.transpose(attention_weights)), cmap='Reds')
-    d2l.plt.xlabel('Testing examples (sorted by x)')
-    d2l.plt.ylabel('Training examples (sorted by x)')
+    d2l.plt.xlabel('Sorted testing inputs')
+    d2l.plt.ylabel('Sorted training inputs')
     d2l.plt.colorbar();
 
 plot_attention_weights(attention_weights)
