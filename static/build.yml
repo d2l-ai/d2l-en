@@ -7,6 +7,6 @@ dependencies:
     - mxnet-cu101==1.7.0
     - torchvision==0.7.0+cu101
     - -f https://download.pytorch.org/whl/torch_stable.html
-    - torch==1.6.0+cu101
-    - tensorflow==2.3.1
+    - torch==1.7.1+cu101
+    - tensorflow==2.4.0
     - tensorflow-probability==0.11.1
