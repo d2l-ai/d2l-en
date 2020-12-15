@@ -248,9 +248,9 @@ class TransformerEncoder(d2l.Encoder):
                              use_bias))
 
     def forward(self, X, valid_lens, *args):
-        # The multiplication increases the scale of the embedding values,
-        # making the scale of positional encoding values relatively smaller
-        # before summing them up
+        # Since positional encoding values are between -1 and 1, the
+        # embedding values are multiplied by the square root of the embedding
+        # dimension to rescale before they are summed up
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
         for blk in self.blks:
             X = blk(X, valid_lens)
@@ -276,9 +276,9 @@ class TransformerEncoder(d2l.Encoder):
                              num_heads, dropout, use_bias))
 
     def forward(self, X, valid_lens, *args):
-        # The multiplication increases the scale of the embedding values,
-        # making the scale of positional encoding values relatively smaller
-        # before summing them up
+        # Since positional encoding values are between -1 and 1, the
+        # embedding values are multiplied by the square root of the embedding
+        # dimension to rescale before they are summed up
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
         for blk in self.blks:
             X = blk(X, valid_lens)
