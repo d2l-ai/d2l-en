@@ -334,9 +334,6 @@ class DecoderBlock(nn.Block):
         if state[2][self.i] is None:
             key_values = X
         else:
-            
-            print(state[2][self.i].shape, X.shape)
-            
             key_values = np.concatenate((state[2][self.i], X), axis=1)
         state[2][self.i] = key_values
         if autograd.is_training():
@@ -494,8 +491,8 @@ encoder = TransformerEncoder(
 decoder = TransformerDecoder(
     len(tgt_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,
     dropout)
-model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
+net = d2l.EncoderDecoder(encoder, decoder)
+d2l.train_s2s_ch9(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 ```{.python .input}
@@ -516,8 +513,8 @@ decoder = TransformerDecoder(
     len(tgt_vocab), key_size, query_size, value_size, num_hiddens,
     norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
     num_layers, dropout)
-model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
+net = d2l.EncoderDecoder(encoder, decoder)
+d2l.train_s2s_ch9(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 As we can see from the training time and accuracy, compared with the seq2seq model with attention model, Transformer runs faster per epoch, and converges faster at the beginning.
@@ -528,7 +525,7 @@ We can use the trained Transformer to translate some simple sentences.
 #@tab all
 engs = ['go .', "i lost .", 'i\'m home .', 'he\'s calm .']
 fras = ['va !', 'j\'ai perdu .', 'je suis chez moi .', 'il est calme .']
-d2l.translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
+d2l.translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device)
 ```
 
 ## Summary
