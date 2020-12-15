@@ -483,8 +483,7 @@ Similar to the seq2seq with attention model in :numref:`sec_seq2seq_attention`, 
 
 ```{.python .input}
 num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10
-lr, num_epochs, device = 0.005, 10, d2l.try_gpu()
-#lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
+lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
 ffn_num_hiddens, num_heads = 64, 4
 
 train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
