@@ -651,28 +651,28 @@ class RNNModelScratch:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_preds, model, vocab, device):
+def predict_ch8(prefix, num_preds, net, vocab, device):
     """Generate new characters following the `prefix`."""
-    state = model.begin_state(batch_size=1, ctx=device)
+    state = net.begin_state(batch_size=1, ctx=device)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(
         d2l.tensor([outputs[-1]], ctx=device), (1, 1))
     for y in prefix[1:]:  # Warm-up period
-        _, state = model(get_input(), state)
+        _, state = net(get_input(), state)
         outputs.append(vocab[y])
     for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = model(get_input(), state)
+        y, state = net(get_input(), state)
         outputs.append(int(y.argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def grad_clipping(model, theta):
+def grad_clipping(net, theta):
     """Clip the gradient."""
-    if isinstance(model, gluon.Block):
-        params = [p.data() for p in model.collect_params().values()]
+    if isinstance(net, gluon.Block):
+        params = [p.data() for p in net.collect_params().values()]
     else:
-        params = model.params
+        params = net.params
     norm = math.sqrt(sum((p.grad ** 2).sum() for p in params))
     if norm > theta:
         for param in params:
@@ -680,8 +680,7 @@ def grad_clipping(model, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater, device,
-                    use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater, device, use_random_iter):
     """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
@@ -689,43 +688,43 @@ def train_epoch_ch8(model, train_iter, loss, updater, device,
         if state is None or use_random_iter:
             # Initialize `state` when either it is the first iteration or
             # using random sampling
-            state = model.begin_state(batch_size=X.shape[0], ctx=device)
+            state = net.begin_state(batch_size=X.shape[0], ctx=device)
         else:
             for s in state:
                 s.detach()
         y = Y.T.reshape(-1)
         X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         with autograd.record():
-            y_hat, state = model(X, state)
+            y_hat, state = net(X, state)
             l = loss(y_hat, y).mean()
         l.backward()
-        grad_clipping(model, 1)
+        grad_clipping(net, 1)
         updater(batch_size=1)  # Since the `mean` function has been invoked
         metric.add(l * d2l.size(y), d2l.size(y))
     return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(model, train_iter, vocab, lr, num_epochs, device,
+def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
               use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[10, num_epochs])
     # Initialize
-    if isinstance(model, gluon.Block):
-        model.initialize(ctx=device, force_reinit=True,
+    if isinstance(net, gluon.Block):
+        net.initialize(ctx=device, force_reinit=True,
                          init=init.Normal(0.01))
-        trainer = gluon.Trainer(model.collect_params(),
+        trainer = gluon.Trainer(net.collect_params(),
                                 'sgd', {'learning_rate': lr})
         updater = lambda batch_size: trainer.step(batch_size)
     else:
-        updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
-    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, device)
+        updater = lambda batch_size: d2l.sgd(net.params, lr, batch_size)
+    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, device)
     # Train and predict
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
-            model, train_iter, loss, updater, device, use_random_iter)
+            net, train_iter, loss, updater, device, use_random_iter)
         if (epoch + 1) % 10 == 0:
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
@@ -904,10 +903,10 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
+def train_s2s_ch9(net, data_iter, lr, num_epochs, tgt_vocab, device):
     """Train a model for sequence to sequence (defined in Chapter 9)."""
-    model.initialize(init.Xavier(), force_reinit=True, ctx=device)
-    trainer = gluon.Trainer(model.collect_params(), 'adam',
+    net.initialize(init.Xavier(), force_reinit=True, ctx=device)
+    trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
@@ -922,10 +921,10 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
                 [tgt_vocab['<bos>']] * Y.shape[0], ctx=device).reshape(-1, 1)
             dec_input = d2l.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
             with autograd.record():
-                Y_hat, _ = model(X, dec_input, X_valid_len)
+                Y_hat, _ = net(X, dec_input, X_valid_len)
                 l = loss(Y_hat, Y, Y_valid_len)
             l.backward()
-            d2l.grad_clipping(model, 1)
+            d2l.grad_clipping(net, 1)
             num_tokens = Y_valid_len.sum()
             trainer.step(num_tokens)
             metric.add(l.sum(), num_tokens)
@@ -936,7 +935,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, tgt_vocab, device):
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
+def predict_s2s_ch9(net, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
     """Predict sequences (defined in Chapter 9)."""
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
@@ -945,13 +944,13 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
     # Add the batch axis
     enc_X = np.expand_dims(np.array(src_tokens, ctx=device), axis=0)
-    enc_outputs = model.encoder(enc_X, enc_valid_len)
-    dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
+    enc_outputs = net.encoder(enc_X, enc_valid_len)
+    dec_state = net.decoder.init_state(enc_outputs, enc_valid_len)
     # Add the batch axis
     dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=device), axis=0)
     output_seq = []
     for _ in range(num_steps):
-        Y, dec_state = model.decoder(dec_X, dec_state)
+        Y, dec_state = net.decoder(dec_X, dec_state)
         # We use the token with the highest prediction likelihood as the input
         # of the decoder at the next time step
         dec_X = Y.argmax(axis=2)
@@ -983,11 +982,11 @@ def bleu(pred_seq, label_seq, k):
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device):
+def translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device):
     """Translate text sequences."""
     for eng, fra in zip(engs, fras):
         translation = predict_s2s_ch9(
-            model, eng, src_vocab, tgt_vocab, num_steps, device)
+            net, eng, src_vocab, tgt_vocab, num_steps, device)
         print(
             f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
 
@@ -1212,6 +1211,9 @@ class TransformerEncoder(d2l.Encoder):
                              use_bias))
 
     def forward(self, X, valid_lens, *args):
+        # Since positional encoding values are between -1 and 1, the
+        # embedding values are multiplied by the square root of the embedding
+        # dimension to rescale before they are summed up
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
         for blk in self.blks:
             X = blk(X, valid_lens)

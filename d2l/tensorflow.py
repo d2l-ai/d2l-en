@@ -674,16 +674,16 @@ class RNNModelScratch:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_preds, model, vocab, params):
+def predict_ch8(prefix, num_preds, net, vocab, params):
     """Generate new characters following the `prefix`."""
-    state = model.begin_state(batch_size=1)
+    state = net.begin_state(batch_size=1)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
     for y in prefix[1:]:  # Warm-up period
-        _, state = model(get_input(), state, params)
+        _, state = net(get_input(), state, params)
         outputs.append(vocab[y])
     for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = model(get_input(), state, params)
+        y, state = net(get_input(), state, params)
         outputs.append(int(y.numpy().argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
@@ -706,8 +706,7 @@ def grad_clipping(grads, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater,
-                    params, use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater, params, use_random_iter):
     """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
@@ -715,10 +714,10 @@ def train_epoch_ch8(model, train_iter, loss, updater,
         if state is None or use_random_iter:
             # Initialize `state` when either it is the first iteration or
             # using random sampling
-            state = model.begin_state(batch_size=X.shape[0])
+            state = net.begin_state(batch_size=X.shape[0])
         with tf.GradientTape(persistent=True) as g:
             g.watch(params)
-            y_hat, state= model(X, state, params)
+            y_hat, state= net(X, state, params)
             y = d2l.reshape(tf.transpose(Y), (-1))
             l = loss(y, y_hat)
         grads = g.gradient(l, params)
@@ -733,7 +732,7 @@ def train_epoch_ch8(model, train_iter, loss, updater,
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
+def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
               use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
     with strategy.scope():
@@ -742,11 +741,11 @@ def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
         updater = tf.keras.optimizers.SGD(lr)
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[10, num_epochs])
-    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
+    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, params)
     # Train and predict
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
-             model, train_iter, loss, updater, params, use_random_iter)
+             net, train_iter, loss, updater, params, use_random_iter)
         if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])

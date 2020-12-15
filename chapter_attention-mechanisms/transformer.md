@@ -314,7 +314,7 @@ During training, the output for the $t$-query could observe all the previous key
 
 ```{.python .input}
 class DecoderBlock(nn.Block):
-    # `i` means it is the i-th block in the decoder
+    # The `i`-th block in the decoder
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads,
                  dropout, i, **kwargs):
         super(DecoderBlock, self).__init__(**kwargs)
@@ -334,6 +334,9 @@ class DecoderBlock(nn.Block):
         if state[2][self.i] is None:
             key_values = X
         else:
+            
+            print(state[2][self.i].shape, X.shape)
+            
             key_values = np.concatenate((state[2][self.i], X), axis=1)
         state[2][self.i] = key_values
         if autograd.is_training():
@@ -347,6 +350,7 @@ class DecoderBlock(nn.Block):
 
         X2 = self.attention1(X, key_values, key_values, valid_lens)
         Y = self.addnorm1(X, X2)
+        # Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`)
         Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens)
         Z = self.addnorm2(Y, Y2)
         return self.addnorm3(Z, self.ffn(Z)), state
@@ -355,7 +359,7 @@ class DecoderBlock(nn.Block):
 ```{.python .input}
 #@tab pytorch
 class DecoderBlock(nn.Module):
-    # `i` means it is the i-th block in the decoder
+    # The `i`-th block in the decoder
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
                  dropout, i, **kwargs):
@@ -479,7 +483,8 @@ Similar to the seq2seq with attention model in :numref:`sec_seq2seq_attention`, 
 
 ```{.python .input}
 num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10
-lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
+lr, num_epochs, device = 0.005, 10, d2l.try_gpu()
+#lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
 ffn_num_hiddens, num_heads = 64, 4
 
 train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)

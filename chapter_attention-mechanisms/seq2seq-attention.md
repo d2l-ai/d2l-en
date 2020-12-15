@@ -191,8 +191,8 @@ encoder = d2l.Seq2SeqEncoder(
     len(src_vocab), embed_size, num_hiddens, num_layers, dropout)
 decoder = Seq2SeqAttentionDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
-model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, tgt_vocab, device)
+net = d2l.EncoderDecoder(encoder, decoder)
+d2l.train_s2s_ch9(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 Last, we predict several sample examples.
@@ -201,7 +201,7 @@ Last, we predict several sample examples.
 #@tab all
 engs = ['go .', "i lost .", 'i\'m home .', 'he\'s calm .']
 fras = ['va !', 'j\'ai perdu .', 'je suis chez moi .', 'il est calme .']
-d2l.translate(engs, fras, model, src_vocab, tgt_vocab, num_steps, device)
+d2l.translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device)
 ```
 
 ## Summary
