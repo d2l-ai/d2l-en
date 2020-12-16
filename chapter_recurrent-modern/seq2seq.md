@@ -525,8 +525,8 @@ as the current input to the decoder.
 
 ```{.python .input}
 #@save
-def train_s2s_ch9(net, data_iter, lr, num_epochs, tgt_vocab, device):
-    """Train a model for sequence to sequence (defined in Chapter 9)."""
+def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
+    """Train a model for sequence to sequence."""
     net.initialize(init.Xavier(), force_reinit=True, ctx=device)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
@@ -559,8 +559,8 @@ def train_s2s_ch9(net, data_iter, lr, num_epochs, tgt_vocab, device):
 ```{.python .input}
 #@tab pytorch
 #@save
-def train_s2s_ch9(net, data_iter, lr, num_epochs, tgt_vocab, device):
-    """Train a model for sequence to sequence (defined in Chapter 9)."""
+def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
+    """Train a model for sequence to sequence."""
     def xavier_init_weights(m):
         if type(m) == nn.Linear:
             torch.nn.init.xavier_uniform_(m.weight)
@@ -612,7 +612,7 @@ encoder = Seq2SeqEncoder(
 decoder = Seq2SeqDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 net = d2l.EncoderDecoder(encoder, decoder)
-train_s2s_ch9(net, train_iter, lr, num_epochs, tgt_vocab, device)
+train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 ## Prediction
@@ -641,9 +641,9 @@ strategies for sequence generation in
 
 ```{.python .input}
 #@save
-def predict_s2s_ch9(net, src_sentence, src_vocab, tgt_vocab, num_steps,
+def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
-    """Predict sequences (defined in Chapter 9)."""
+    """Predict for sequence to sequence."""
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
         src_vocab['<eos>']]
     enc_valid_len = np.array([len(src_tokens)], ctx=device)
@@ -672,9 +672,9 @@ def predict_s2s_ch9(net, src_sentence, src_vocab, tgt_vocab, num_steps,
 ```{.python .input}
 #@tab pytorch
 #@save
-def predict_s2s_ch9(net, src_sentence, src_vocab, tgt_vocab, num_steps,
+def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
-    """Predict sequences (defined in Chapter 9)."""
+    """Predict for sequence to sequence."""
     # Set `net` to eval mode for inference
     net.eval()
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
@@ -791,7 +791,7 @@ and compute the BLEU of the results.
 def translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device):
     """Translate text sequences."""
     for eng, fra in zip(engs, fras):
-        translation = predict_s2s_ch9(
+        translation = predict_seq2seq(
             net, eng, src_vocab, tgt_vocab, num_steps, device)
         print(
             f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')

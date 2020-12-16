@@ -991,8 +991,8 @@ class MaskedSoftmaxCELoss(nn.CrossEntropyLoss):
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def train_s2s_ch9(net, data_iter, lr, num_epochs, tgt_vocab, device):
-    """Train a model for sequence to sequence (defined in Chapter 9)."""
+def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
+    """Train a model for sequence to sequence."""
     def xavier_init_weights(m):
         if type(m) == nn.Linear:
             torch.nn.init.xavier_uniform_(m.weight)
@@ -1030,9 +1030,9 @@ def train_s2s_ch9(net, data_iter, lr, num_epochs, tgt_vocab, device):
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def predict_s2s_ch9(net, src_sentence, src_vocab, tgt_vocab, num_steps,
+def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
                     device):
-    """Predict sequences (defined in Chapter 9)."""
+    """Predict for sequence to sequence."""
     # Set `net` to eval mode for inference
     net.eval()
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
@@ -1084,7 +1084,7 @@ def bleu(pred_seq, label_seq, k):
 def translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device):
     """Translate text sequences."""
     for eng, fra in zip(engs, fras):
-        translation = predict_s2s_ch9(
+        translation = predict_seq2seq(
             net, eng, src_vocab, tgt_vocab, num_steps, device)
         print(
             f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')

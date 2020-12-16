@@ -379,7 +379,11 @@ class DecoderBlock(nn.Module):
 
     def forward(self, X, state):
         enc_outputs, enc_valid_lens = state[0], state[1]
-        # `state[2][i]` contains the past queries for this block
+        # During training, all the tokens of any output sequence are processed
+        # at the same time, so `state[2][self.i]` is `None` as initialized.
+        # When decoding any output sequence token by token during prediction,
+        # `state[2][self.i]` contains representations of the decoded output
+        # at the `i`-th block up to the current time step
         if state[2][self.i] is None:
             key_values = X
         else:
@@ -387,13 +391,14 @@ class DecoderBlock(nn.Module):
         state[2][self.i] = key_values
         if self.training:
             batch_size, num_steps, _ = X.shape
-            # Shape: (batch_size, num_steps), the values in the j-th column
-            # are j+1
-            valid_lens = torch.arange(1, num_steps + 1, device=X.device).repeat(batch_size, 1)
+            # Shape of `dec_valid_lens`: (`batch_size`, `num_steps`), where
+            # every row is [1, 2, ..., `num_steps`]
+            dec_valid_lens = torch.arange(
+                1, num_steps + 1, device=X.device).repeat(batch_size, 1)
         else:
-            valid_lens = None
+            dec_valid_lens = None
 
-        X2 = self.attention1(X, key_values, key_values, valid_lens)
+        X2 = self.attention1(X, key_values, key_values, dec_valid_lens)
         Y = self.addnorm1(X, X2)
         Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens)
         Z = self.addnorm2(Y, Y2)
@@ -469,7 +474,7 @@ class TransformerDecoder(d2l.Decoder):
         self.dense = nn.Linear(num_hiddens, vocab_size)
 
     def init_state(self, enc_outputs, env_valid_lens, *args):
-        return [enc_outputs, env_valid_lens, [None]*self.num_layers]
+        return [enc_outputs, env_valid_lens, [None] * self.num_layers]
 
     def forward(self, X, state):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
@@ -497,7 +502,7 @@ decoder = TransformerDecoder(
     len(tgt_vocab), num_hiddens, ffn_num_hiddens, num_heads, num_layers,
     dropout)
 net = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(net, train_iter, lr, num_epochs, tgt_vocab, device)
+d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 ```{.python .input}
@@ -519,7 +524,7 @@ decoder = TransformerDecoder(
     norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
     num_layers, dropout)
 net = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(net, train_iter, lr, num_epochs, tgt_vocab, device)
+d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 As we can see from the training time and accuracy, compared with the seq2seq model with attention model, Transformer runs faster per epoch, and converges faster at the beginning.
