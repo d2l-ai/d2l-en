@@ -1215,10 +1215,31 @@ class TransformerEncoder(d2l.Encoder):
         # embedding values are multiplied by the square root of the embedding
         # dimension to rescale before they are summed up
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
-        for blk in self.blks:
+        self.attention_weights = [None] * len(self.blks)
+        for i, blk in enumerate(self.blks):
             X = blk(X, valid_lens)
-            print(blk.attention.attention.attention_weights.shape)
+            self.attention_weights[
+                i] = blk.attention.attention.attention_weights
         return X
+
+
+# Defined in file: ./chapter_attention-mechanisms/transformer.md
+def plot_heatmap2(matrices, xlabel=None, ylabel=None, titles=None,
+                  figsize=None, cmap='Reds', num_rows=1, num_cols=1, scale=3):  
+    figsize = (num_cols * scale, num_rows * scale)
+    fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize, sharex=True, sharey=True)
+    axes = axes.flatten()
+    num_subplots = len(axes)
+    for i, (ax, matrix) in enumerate(zip(axes, matrices)):
+        pcm = ax.imshow(d2l.numpy(matrix), cmap=cmap)
+        if num_subplots - i <= num_cols:
+            ax.set_xlabel('Common x-label')
+        if i % num_cols == 0:
+            ax.set_ylabel('Common y-label')
+        if titles:
+            ax.set_title(titles[i])
+    fig.colorbar(pcm, ax=axes, shrink=0.6)
+    return axes
 
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
