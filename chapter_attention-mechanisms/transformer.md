@@ -330,22 +330,27 @@ class DecoderBlock(nn.Block):
 
     def forward(self, X, state):
         enc_outputs, enc_valid_lens = state[0], state[1]
-        # `state[2][i]` contains the past queries for this block
+        # During training, all the tokens of any output sequence are processed
+        # at the same time, so `state[2][self.i]` is `None` as initialized.
+        # When decoding any output sequence token by token during prediction,
+        # `state[2][self.i]` contains representations of the decoded output
+        # at the `i`-th block up to the current time step
         if state[2][self.i] is None:
             key_values = X
         else:
             key_values = np.concatenate((state[2][self.i], X), axis=1)
         state[2][self.i] = key_values
+
         if autograd.is_training():
             batch_size, num_steps, _ = X.shape
-            # Shape: (batch_size, num_steps), the values in the j-th column
-            # are j+1
-            valid_lens = np.tile(np.arange(1, num_steps + 1, ctx=X.ctx),
-                                (batch_size, 1))
+            # Shape of `dec_valid_lens`: (`batch_size`, `num_steps`), where
+            # every row is [1, 2, ..., `num_steps`]
+            dec_valid_lens = np.tile(np.arange(1, num_steps + 1, ctx=X.ctx),
+                                     (batch_size, 1))
         else:
-            valid_lens = None
+            dec_valid_lens = None
 
-        X2 = self.attention1(X, key_values, key_values, valid_lens)
+        X2 = self.attention1(X, key_values, key_values, dec_valid_lens)
         Y = self.addnorm1(X, X2)
         # Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`)
         Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens)
@@ -435,7 +440,7 @@ class TransformerDecoder(d2l.Decoder):
         self.dense = nn.Dense(vocab_size, flatten=False)
 
     def init_state(self, enc_outputs, env_valid_lens, *args):
-        return [enc_outputs, env_valid_lens, [None]*self.num_layers]
+        return [enc_outputs, env_valid_lens, [None] * self.num_layers]
 
     def forward(self, X, state):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
