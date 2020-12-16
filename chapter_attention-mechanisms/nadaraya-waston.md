@@ -39,7 +39,7 @@ x_train, _ = torch.sort(d2l.rand(n_train) * 5)   # Training inputs
 ```{.python .input}
 #@tab all
 y_train = f(x_train) + d2l.normal(0.0, 0.5, (n_train,))  # Training outputs
-x_test = d2l.arange(0, 5, 0.05)  # Testing examples
+x_test = d2l.arange(0, 5, 0.1)  # Testing examples
 y_truth = f(x_test)  # Ground-truth outputs for the testing examples
 n_test = len(x_test)  # No. of testing examples
 n_test
@@ -128,8 +128,8 @@ def plot_heatmap(matrix, xlabel=None, ylabel=None, figsize=None,
         d2l.plt.ylabel(ylabel)
     d2l.plt.colorbar();
 
-plot_heatmap(d2l.transpose(attention_weights), figsize=(7, 3),
-             xlabel='Sorted testing inputs', ylabel='Sorted training inputs')
+plot_heatmap(attention_weights, figsize=(7, 3),
+             xlabel='Sorted training inputs', ylabel='Sorted testing inputs')
 ```
 
 ## Parametric Model
@@ -303,6 +303,6 @@ plot_kernel_reg(y_hat)
 
 ```{.python .input}
 #@tab all
-plot_heatmap(d2l.transpose(net.attention_weights), figsize=(7, 3),
-             xlabel='Sorted testing inputs', ylabel='Sorted training inputs')
+plot_heatmap(net.attention_weights, figsize=(7, 3),
+             xlabel='Sorted training inputs', ylabel='Sorted testing inputs')
 ```
