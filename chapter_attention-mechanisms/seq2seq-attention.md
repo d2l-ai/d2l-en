@@ -192,7 +192,7 @@ encoder = d2l.Seq2SeqEncoder(
 decoder = Seq2SeqAttentionDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 net = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch9(net, train_iter, lr, num_epochs, tgt_vocab, device)
+d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 Last, we predict several sample examples.
