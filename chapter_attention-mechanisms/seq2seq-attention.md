@@ -199,8 +199,8 @@ Last, we predict several sample examples.
 
 ```{.python .input}
 #@tab all
-engs = ['go .', "i lost .", 'i\'m home .', 'he\'s calm .']
-fras = ['va !', 'j\'ai perdu .', 'je suis chez moi .', 'il est calme .']
+engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
+fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 d2l.translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device)
 ```
 

@@ -796,8 +796,8 @@ def translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device):
         print(
             f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
 
-engs = ['go .', "i lost .", 'i\'m home .', 'he\'s calm .']
-fras = ['va !', 'j\'ai perdu .', 'je suis chez moi .', 'il est calme .']
+engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
+fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device)
 ```
 

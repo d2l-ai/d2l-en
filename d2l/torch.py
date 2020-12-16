@@ -1165,8 +1165,8 @@ class DotProductAttention(nn.Module):
         d = queries.shape[-1]
         # Set `transpose_b=True` to swap the last two dimensions of `keys`
         scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
-        return torch.bmm(attention_weights, values)
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        return torch.bmm(self.dropout(self.attention_weights), values)
 
 
 # Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
@@ -1318,8 +1318,11 @@ class TransformerEncoder(d2l.Encoder):
         # embedding values are multiplied by the square root of the embedding
         # dimension to rescale before they are summed up
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
-        for blk in self.blks:
+        self.attention_weights = [None] * len(self.blks)
+        for i, blk in enumerate(self.blks):
             X = blk(X, valid_lens)
+            self.attention_weights[
+                i] = blk.attention.attention.attention_weights
         return X
 
 
