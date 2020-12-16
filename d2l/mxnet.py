@@ -1070,8 +1070,8 @@ class DotProductAttention(nn.Block):
         d = queries.shape[-1]
         # Set `transpose_b=True` to swap the last two dimensions of `keys`
         scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
-        return npx.batch_dot(attention_weights, values)
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        return npx.batch_dot(self.dropout(self.attention_weights), values)
 
 
 # Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
@@ -1217,6 +1217,7 @@ class TransformerEncoder(d2l.Encoder):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
         for blk in self.blks:
             X = blk(X, valid_lens)
+            print(blk.attention.attention.attention_weights.shape)
         return X
 
 

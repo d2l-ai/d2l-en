@@ -252,8 +252,11 @@ class TransformerEncoder(d2l.Encoder):
         # embedding values are multiplied by the square root of the embedding
         # dimension to rescale before they are summed up
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
-        for blk in self.blks:
+        self.attention_weights = [None] * len(self.blks)
+        for i, blk in enumerate(self.blks):
             X = blk(X, valid_lens)
+            self.attention_weights[
+                i] = blk.attention.attention.attention_weights
         return X
 ```
 
@@ -533,9 +536,52 @@ We can use the trained Transformer to translate some simple sentences.
 
 ```{.python .input}
 #@tab all
-engs = ['go .', "i lost .", 'i\'m home .', 'he\'s calm .']
-fras = ['va !', 'j\'ai perdu .', 'je suis chez moi .', 'il est calme .']
+engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
+fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 d2l.translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device)
+```
+
+```{.python .input}
+attention_weights = net.encoder.attention_weights
+
+blk1_attention_weights = attention_weights[0]
+blk2_attention_weights = attention_weights[1]
+
+XX = np.concatenate(attention_weights, 0)
+XX.shape
+```
+
+```{.python .input}
+#@save
+def plot_heatmap2(matrices, xlabel=None, ylabel=None, titles=None,
+                  figsize=None, cmap='Reds', num_rows=1, num_cols=1, scale=3):  
+    figsize = (num_cols * scale, num_rows * scale)
+    fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize, sharex=True, sharey=True)
+    axes = axes.flatten()
+    num_subplots = len(axes)
+    for i, (ax, matrix) in enumerate(zip(axes, matrices)):
+        pcm = ax.imshow(d2l.numpy(matrix), cmap=cmap)
+        if num_subplots - i <= num_cols:
+            ax.set_xlabel('Common x-label')
+        if i % num_cols == 0:
+            ax.set_ylabel('Common y-label')
+        if titles:
+            ax.set_title(titles[i])
+    fig.colorbar(pcm, ax=axes, shrink=0.6)
+    return axes
+
+plot_heatmap2(XX, num_rows=2, num_cols=4, xlabel='Query position',
+              titles=['Head %d' % i for i in np.tile(np.arange(4), 2)]);
+```
+
+```{.python .input}
+plot_heatmap2(blk1_attention_weights, num_rows=1, num_cols=4, xlabel='Query position',
+              titles=['Head %d' % i for i in range(4)]);
+```
+
+```{.python .input}
+plot_heatmap2(blk2_attention_weights, num_rows=1, num_cols=4, xlabel='Query position',
+              titles=['Head %d' % i for i in range(4)]);
 ```
 
 ## Summary

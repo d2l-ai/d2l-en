@@ -245,8 +245,8 @@ class DotProductAttention(nn.Block):
         d = queries.shape[-1]
         # Set `transpose_b=True` to swap the last two dimensions of `keys`
         scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
-        return npx.batch_dot(attention_weights, values)
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        return npx.batch_dot(self.dropout(self.attention_weights), values)
 ```
 
 ```{.python .input}
