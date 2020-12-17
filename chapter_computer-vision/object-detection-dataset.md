@@ -86,7 +86,7 @@ class BananasDataset(torch.utils.data.Dataset): #@save
               is_train else f' validation examples'))
 
     def __getitem__(self, idx):
-        return (self.features[idx], self.labels[idx])
+        return (self.features[idx].float(), self.labels[idx])
 
     def __len__(self):
         return len(self.features)
