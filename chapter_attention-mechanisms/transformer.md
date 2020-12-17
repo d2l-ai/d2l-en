@@ -561,7 +561,7 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(3.5, 3.5),
                                  sharex=True, sharey=True)
     # Make `axes` 2D-iteratable
     if not isinstance(axes, list):
-        axes = [[axes] for _ in range(1)]
+        axes = [[axes]]
     elif not isinstance(axes[0], list):
         axes = [axes]
     for i, (row_axes, row_matrices) in enumerate(zip(axes, matrices)):
