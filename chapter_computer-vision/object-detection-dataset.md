@@ -113,7 +113,8 @@ batch.data[0].shape, batch.label[0].shape
 
 ```{.python .input}
 #@tab pytorch
-train_iter, _ = load_data_bananas(batch_size=32)
+batch_size, edge_size = 32, 256
+train_iter, _ = load_data_bananas(batch_size)
 batch = next(iter(train_iter))
 batch[0].shape, batch[1].shape
 ```
