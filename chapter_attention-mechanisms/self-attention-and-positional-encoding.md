@@ -144,7 +144,14 @@ for i in range(8):
 ```
 
 ```{.python .input}
-#@tab all
-d2l.plot_heatmap(P[0, :, :], xlabel='encoding dimension', ylabel='position',
-                 figsize=(3, 4.5), cmap='Blues')
+P = np.expand_dims(np.expand_dims(P[0, :, :], 0), 0)
+d2l.show_heatmaps(P, xlabel='Encoding dimension', ylabel='Position',
+                  figsize=(3.5, 4), cmap='Blues')
+```
+
+```{.python .input}
+#@tab pytorch
+P = P[0, :, :].unsqueeze(0).unsqueeze(0)
+d2l.show_heatmaps(P, xlabel='Encoding dimension', ylabel='Position',
+                  figsize=(3.5, 4), cmap='Blues')
 ```

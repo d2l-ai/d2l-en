@@ -1090,19 +1090,6 @@ def translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device):
             f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
 
 
-# Defined in file: ./chapter_attention-mechanisms/nadaraya-waston.md
-def plot_heatmap(matrix, xlabel=None, ylabel=None, figsize=None,
-                 cmap='Reds'):
-    if figsize is not None:
-        d2l.set_figsize(figsize)
-    d2l.plt.imshow(d2l.numpy(matrix), cmap=cmap)
-    if xlabel is not None:
-        d2l.plt.xlabel(xlabel)
-    if ylabel is not None:
-        d2l.plt.ylabel(ylabel)
-    d2l.plt.colorbar();
-
-
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
 def masked_softmax(X, valid_lens):
     """Perform softmax operation by masking elements on the last axis."""
@@ -1324,6 +1311,29 @@ class TransformerEncoder(d2l.Encoder):
             self.attention_weights[
                 i] = blk.attention.attention.attention_weights
         return X
+
+
+# Defined in file: ./chapter_attention-mechanisms/transformer.md
+def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(3.5, 3.5),
+                  cmap='Reds'):
+    num_rows, num_cols = matrices.shape[0], matrices.shape[1]
+    fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,
+                                 sharex=True, sharey=True)
+    # Make `axes` 2D-iteratable
+    if not isinstance(axes, list):
+        axes = [[axes] for _ in range(1)]
+    elif not isinstance(axes[0], list):
+        axes = [axes]
+    for i, (row_axes, row_matrices) in enumerate(zip(axes, matrices)):
+        for j, (ax, matrix) in enumerate(zip(row_axes, row_matrices)):
+            pcm = ax.imshow(d2l.numpy(matrix), cmap=cmap)
+            if i == num_rows - 1:
+                ax.set_xlabel(xlabel)
+            if j == 0:
+                ax.set_ylabel(ylabel)
+            if titles:
+                ax.set_title(titles[j])
+    fig.colorbar(pcm, ax=axes, shrink=0.6);
 
 
 # Defined in file: ./chapter_optimization/optimization-intro.md

@@ -545,46 +545,46 @@ d2l.translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device)
 ```
 
 ```{.python .input}
-attention_weights = net.encoder.attention_weights
-
-blk1_attention_weights = attention_weights[0]
-blk2_attention_weights = attention_weights[1]
-
-XX = np.concatenate(attention_weights, 0)
-XX.shape
+#@tab all
+attention_weights = d2l.reshape(d2l.concat(net.encoder.attention_weights, 0),
+                                (num_layers, num_heads, -1, num_steps))
+attention_weights.shape
 ```
 
 ```{.python .input}
+#@tab all
 #@save
-def plot_heatmap2(matrices, xlabel=None, ylabel=None, titles=None,
-                  figsize=None, cmap='Reds', num_rows=1, num_cols=1, scale=3):  
-    figsize = (num_cols * scale, num_rows * scale)
-    fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize, sharex=True, sharey=True)
-    axes = axes.flatten()
-    num_subplots = len(axes)
-    for i, (ax, matrix) in enumerate(zip(axes, matrices)):
-        pcm = ax.imshow(d2l.numpy(matrix), cmap=cmap)
-        if num_subplots - i <= num_cols:
-            ax.set_xlabel('Common x-label')
-        if i % num_cols == 0:
-            ax.set_ylabel('Common y-label')
-        if titles:
-            ax.set_title(titles[i])
-    fig.colorbar(pcm, ax=axes, shrink=0.6)
-    return axes
-
-plot_heatmap2(XX, num_rows=2, num_cols=4, xlabel='Query position',
-              titles=['Head %d' % i for i in np.tile(np.arange(4), 2)]);
+def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(3.5, 3.5),
+                  cmap='Reds'):
+    num_rows, num_cols = matrices.shape[0], matrices.shape[1]
+    fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,
+                                 sharex=True, sharey=True)
+    # Make `axes` 2D-iteratable
+    if not isinstance(axes, list):
+        axes = [[axes] for _ in range(1)]
+    elif not isinstance(axes[0], list):
+        axes = [axes]
+    for i, (row_axes, row_matrices) in enumerate(zip(axes, matrices)):
+        for j, (ax, matrix) in enumerate(zip(row_axes, row_matrices)):
+            pcm = ax.imshow(d2l.numpy(matrix), cmap=cmap)
+            if i == num_rows - 1:
+                ax.set_xlabel(xlabel)
+            if j == 0:
+                ax.set_ylabel(ylabel)
+            if titles:
+                ax.set_title(titles[j])
+    fig.colorbar(pcm, ax=axes, shrink=0.6);
 ```
 
 ```{.python .input}
-plot_heatmap2(blk1_attention_weights, num_rows=1, num_cols=4, xlabel='Query position',
-              titles=['Head %d' % i for i in range(4)]);
+show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries',
+              titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
 ```
 
 ```{.python .input}
-plot_heatmap2(blk2_attention_weights, num_rows=1, num_cols=4, xlabel='Query position',
-              titles=['Head %d' % i for i in range(4)]);
+#@tab pytorch
+show_heatmaps(attention_weights.cpu(), xlabel='Keys', ylabel='Queries',
+              titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
 ```
 
 ## Summary

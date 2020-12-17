@@ -115,21 +115,16 @@ plot_kernel_reg(y_hat)
 ```
 
 ```{.python .input}
-#@tab all
-#@save
-def plot_heatmap(matrix, xlabel=None, ylabel=None, figsize=None,
-                 cmap='Reds'):
-    if figsize is not None:
-        d2l.set_figsize(figsize)
-    d2l.plt.imshow(d2l.numpy(matrix), cmap=cmap)
-    if xlabel is not None:
-        d2l.plt.xlabel(xlabel)
-    if ylabel is not None:
-        d2l.plt.ylabel(ylabel)
-    d2l.plt.colorbar();
+d2l.show_heatmaps(np.expand_dims(np.expand_dims(attention_weights, 0), 0),
+                  xlabel='Sorted training inputs',
+                  ylabel='Sorted testing inputs')
+```
 
-plot_heatmap(attention_weights, figsize=(7, 3),
-             xlabel='Sorted training inputs', ylabel='Sorted testing inputs')
+```{.python .input}
+#@tab pytorch
+d2l.show_heatmaps(attention_weights.unsqueeze(0).unsqueeze(0),
+                  xlabel='Sorted training inputs',
+                  ylabel='Sorted testing inputs')
 ```
 
 ## Parametric Model
@@ -302,7 +297,14 @@ plot_kernel_reg(y_hat)
 ```
 
 ```{.python .input}
-#@tab all
-plot_heatmap(net.attention_weights, figsize=(7, 3),
-             xlabel='Sorted training inputs', ylabel='Sorted testing inputs')
+d2l.show_heatmaps(np.expand_dims(np.expand_dims(net.attention_weights, 0), 0),
+                  xlabel='Sorted training inputs',
+                  ylabel='Sorted testing inputs')
+```
+
+```{.python .input}
+#@tab pytorch
+d2l.show_heatmaps(net.attention_weights.unsqueeze(0).unsqueeze(0),
+                  xlabel='Sorted training inputs',
+                  ylabel='Sorted testing inputs')
 ```
