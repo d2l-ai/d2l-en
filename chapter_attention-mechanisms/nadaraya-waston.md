@@ -216,10 +216,10 @@ X_tile = np.tile(x_train, (n_train, 1))
 # same training outputs
 Y_tile = np.tile(y_train, (n_train, 1))
 # Shape of `keys`: ('n_train', 'n_train' - 1)
-keys = d2l.reshape(X_tile[(1 - np.eye(n_train)).astype('bool')],
+keys = d2l.reshape(X_tile[(1 - d2l.eye(n_train)).astype('bool')],
                    (n_train, -1))
 # Shape of `values`: ('n_train', 'n_train' - 1) 
-values = d2l.reshape(Y_tile[(1 - np.eye(n_train)).astype('bool')],
+values = d2l.reshape(Y_tile[(1 - d2l.eye(n_train)).astype('bool')],
                      (n_train, -1))
 ```
 
@@ -232,10 +232,10 @@ X_tile = x_train.repeat((n_train, 1))
 # same training outputs
 Y_tile = y_train.repeat((n_train, 1))
 # Shape of `keys`: ('n_train', 'n_train' - 1)
-keys = d2l.reshape(X_tile[(1 - torch.eye(n_train)).type(torch.bool)],
+keys = d2l.reshape(X_tile[(1 - d2l.eye(n_train)).type(torch.bool)],
                    (n_train, -1))
 # Shape of `values`: ('n_train', 'n_train' - 1)
-values = d2l.reshape(Y_tile[(1 - torch.eye(n_train)).type(torch.bool)],
+values = d2l.reshape(Y_tile[(1 - d2l.eye(n_train)).type(torch.bool)],
                      (n_train, -1))
 ```
 

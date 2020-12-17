@@ -978,5 +978,6 @@ transpose = tf.transpose
 concat = tf.concat
 stack = tf.stack
 abs = tf.abs
+eye = tf.eye
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 

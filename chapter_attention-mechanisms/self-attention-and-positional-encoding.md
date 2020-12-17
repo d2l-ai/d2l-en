@@ -116,7 +116,6 @@ class PositionalEncoding(nn.Module):
 
 Now we test the `PositionalEncoding` class with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset (i.e. phase) because one is produced by a sine function and the other is produced by a cosine function. The $6^{\mathrm{th}}$ and $7^{\mathrm{th}}$ dimensions have lower frequency.
 
-
 ```{.python .input}
 encoding_dim, num_steps = 32, 60
 pos_encoding = PositionalEncoding(encoding_dim, 0)
