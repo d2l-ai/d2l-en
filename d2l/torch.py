@@ -1596,6 +1596,115 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
                       bbox=dict(facecolor=color, lw=0))
 
 
+# Defined in file: ./chapter_computer-vision/anchor.md
+def match_anchor_to_bbox(ground_truth, anchors, iou_threshold=0.5):
+    """Assign ground-truth bounding boxes to anchor boxes similar to them."""
+    num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]
+    anchors = torchvision.ops.box_convert(anchors,
+                                            in_fmt='cxcywh', out_fmt='xyxy')
+    ground_truth = torchvision.ops.box_convert(ground_truth,
+                                            in_fmt='cxcywh', out_fmt='xyxy')
+    # element `x_ij` in the `i^th` row and `j^th` column is the IoU
+    # of the anchor box `anc_i` to the ground-truth bounding box `box_j`
+    jaccard = torchvision.ops.box_iou(anchors, ground_truth)
+    # Initialize the tensor to hold assigned ground truth bbox for each anchor
+    anchors_bbox_map = torch.full((num_anchors,), -1, dtype=torch.long)
+
+    # Assign ground truth bounding box according to the threshold
+    max_ious, indices = torch.max(jaccard, dim=1)
+    anc_i = torch.nonzero(max_ious >= 0.5).reshape(-1)
+    box_j = indices[max_ious >= 0.5]
+    anchors_bbox_map[anc_i] = box_j
+    # Find the largest iou for each bbox
+    anc_i = torch.argmax(jaccard, dim=0)
+    box_j = torch.arange(num_gt_boxes)
+    anchors_bbox_map[anc_i] = box_j
+
+    return anchors_bbox_map
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def multibox_target(anchors, labels, device="cpu", eps=1e-6):
+    batch_size, anchors = labels.shape[0], anchors.squeeze(0)
+    batch_offset, batch_mask, batch_class_labels = [], [], []
+    num_anchors = anchors.shape[0]
+    for i in range(batch_size):
+        label = labels[i, :, :]
+        anchors_bbox_map = match_anchor_to_bbox(label[:, 1:], anchors)
+        bbox_mask = ((anchors_bbox_map >= 0).float().unsqueeze(-1)).repeat(1, 4)
+        # initialize class_labels and assigned bbox coordinates with zeros
+        class_labels = torch.zeros(num_anchors, dtype=torch.long)
+        assigned_bb = torch.zeros((num_anchors, 4), dtype=torch.float32)
+        # Assign class labels to the anchor boxes using matched gt bbox labels
+        # If no gt bbox is assigned to an anchor box, then let the
+        # class_labels and assigned_bb remain zero, i.e the background class
+        indices_true = torch.nonzero(anchors_bbox_map >= 0)
+        bb_idx = anchors_bbox_map[indices_true]
+        class_labels[indices_true] = label[bb_idx, 0].long() + 1
+        assigned_bb[indices_true] = label[bb_idx, 1:]
+
+        # offset transformations
+        c_anc = torchvision.ops.box_convert(anchors, in_fmt='xyxy',
+                                                 out_fmt='cxcywh')
+        c_assigned_bb = torchvision.ops.box_convert(assigned_bb,
+                                            in_fmt='xyxy', out_fmt='cxcywh')
+        offset_xy = 10 * (c_assigned_bb[:, :2] - c_anc[:, :2]) / c_anc[:, 2:]
+        offset_wh = 5 * torch.log(eps + c_assigned_bb[:, 2:] / c_anc[:, 2:])
+        offset = torch.cat([offset_xy, offset_wh], dim=1) * bbox_mask
+
+        batch_offset.append(offset.reshape(-1))
+        batch_mask.append(bbox_mask.reshape(-1))
+        batch_class_labels.append(class_labels)
+
+    bbox_offset = torch.stack(batch_offset)
+    bbox_mask = torch.stack(batch_mask)
+    class_labels = torch.stack(batch_class_labels)
+
+    return [bbox_offset.to(device), bbox_mask.to(device),
+            class_labels.to(device)]
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def nms(bb_info_list, nms_threshold = 0.5):
+    """non-maximum suppression"""
+    keep = [] # boxes that will be kept
+    sorted_bb_info_list = sorted(bb_info_list, key = lambda x: x.confidence,
+                                 reverse=True)
+    while len(sorted_bb_info_list) != 0:
+        top = sorted_bb_info_list.pop(0)
+        keep.append(top)
+        n = len(sorted_bb_info_list)
+        if n==0:
+            break
+        bb_coords = [bb.coords for bb in sorted_bb_info_list]
+        iou = torchvision.ops.box_iou(torch.tensor([top.coords]),
+                                      torch.tensor(bb_coords))[0]
+        inds = torch.nonzero(iou <= nms_threshold).reshape(-1)
+        sorted_bb_info_list = [sorted_bb_info_list[inds]]
+    return keep
+
+def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5):
+    BB_Info = collections.namedtuple("BB_Info", ["idx", "class_labels",
+                                                 "confidence", "coords"])
+    batch_size = cls_probs.shape[0]
+    outputs = []
+    for i in range(batch_size):
+        cls_prob, offset_pred = cls_probs[i], offset_preds[i]
+        anchor, num_bb_pred = anchors[0], cls_prob.shape[1]
+        anchor = anchor + offset_pred.reshape(num_bb_pred, 4)
+        confidence, class_labels = torch.max(cls_prob, 0)
+        bb_info = [BB_Info(idx = i, class_labels = class_labels[i] - 1,
+                           confidence = confidence[i], coords = [*anchor[i]])
+                   for i in range(num_bb_pred)]
+        obj_bb_idx = [bb.idx for bb in nms(bb_info, nms_threshold)]
+        output = []
+        for bb in bb_info:
+            output.append([(bb.class_labels if bb.idx in obj_bb_idx else -1.0),
+                           bb.confidence, *bb.coords])
+        outputs.append(torch.tensor(output))
+    return torch.stack(outputs)
+
+
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 d2l.DATA_HUB['banana-detection'] = (d2l.DATA_URL + 'banana-detection.zip',
                            '5de26c8fce5ccdea9f91267273464dc968d20d72')
