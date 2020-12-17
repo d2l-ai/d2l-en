@@ -22,6 +22,7 @@ h, w
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
+import torch
 
 img = d2l.plt.imread('../img/catdog.jpg')
 h, w = img.shape[0:2]
