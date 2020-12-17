@@ -4,8 +4,6 @@
 
 ## Data Generation
 
-
-
 ```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
