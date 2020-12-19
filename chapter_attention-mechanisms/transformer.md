@@ -605,7 +605,7 @@ dec_attention_weights_2d = [d2l.tensor(head[0]).tolist()
 dec_attention_weights_filled = d2l.tensor(
     pd.DataFrame(dec_attention_weights_2d).fillna(0.0).values)
 dec_attention_weights = d2l.reshape(dec_attention_weights_filled,
-                                    (-1, 2, num_layers, num_heads, num_steps)
+                                    (-1, 2, num_layers, num_heads, num_steps))
 dec_self_attention_weights, dec_inter_attention_weights = \
     dec_attention_weights.transpose(1, 2, 3, 0, 4)
 dec_self_attention_weights.shape, dec_inter_attention_weights.shape
