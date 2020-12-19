@@ -1031,7 +1031,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
-                    device):
+                    device, save_attention_weights=False):
     """Predict for sequence to sequence."""
     # Set `net` to eval mode for inference
     net.eval()
@@ -1047,19 +1047,22 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
     # Add the batch axis
     dec_X = torch.unsqueeze(torch.tensor(
         [tgt_vocab['<bos>']], dtype=torch.long, device=device), dim=0)
-    output_seq = []
+    output_seq, attention_weight_seq = [], []
     for _ in range(num_steps):
         Y, dec_state = net.decoder(dec_X, dec_state)
         # We use the token with the highest prediction likelihood as the input
         # of the decoder at the next time step
         dec_X = Y.argmax(dim=2)
         pred = dec_X.squeeze(dim=0).type(torch.int32).item()
-        # Once the end-of-sequence token is predicted, the generation of
-        # the output sequence is complete
+        # Once the end-of-sequence token is predicted, the generation of the
+        # output sequence is complete
         if pred == tgt_vocab['<eos>']:
             break
         output_seq.append(pred)
-    return ' '.join(tgt_vocab.to_tokens(output_seq))
+        # Save attention weights (to be covered later)
+        if save_attention_weights:
+            attention_weight_seq.append(net.decoder.attention_weights)
+    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
@@ -1163,6 +1166,23 @@ class DotProductAttention(nn.Module):
         scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
         self.attention_weights = masked_softmax(scores, valid_lens)
         return torch.bmm(self.dropout(self.attention_weights), values)
+
+
+# Defined in file: ./chapter_attention-mechanisms/seq2seq-attention.md
+class AttentionDecoder(d2l.Decoder):
+    """The base attention-based decoder interface."""
+    def __init__(self, **kwargs):
+        super(AttentionDecoder, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+
+    @property
+    def attention_weights(self):
+        raise NotImplementedError
 
 
 # Defined in file: ./chapter_attention-mechanisms/multihead-attention.md

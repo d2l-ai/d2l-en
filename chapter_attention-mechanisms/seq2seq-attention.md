@@ -50,6 +50,7 @@ At each time step of the decoding, we use the hidden state of the decoder's last
 Let us implement the `Seq2SeqAttentionDecoder`, and see how it differs from the decoder in seq2seq from :numref:`sec_seq2seq_decoder`.
 
 ```{.python .input}
+#@tab all
 #@save
 class AttentionDecoder(d2l.Decoder):
     """The base attention-based decoder interface."""
@@ -68,7 +69,7 @@ class AttentionDecoder(d2l.Decoder):
 ```
 
 ```{.python .input}
-class Seq2SeqAttentionDecoder(d2l.AttentionDecoder):
+class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
@@ -116,7 +117,7 @@ class Seq2SeqAttentionDecoder(d2l.AttentionDecoder):
 
 ```{.python .input}
 #@tab pytorch
-class Seq2SeqAttentionDecoder(d2l.Decoder):
+class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
@@ -159,6 +160,10 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
         outputs = self.dense(torch.cat(outputs, dim=0))
         return outputs.permute(1, 0, 2), [enc_outputs, hidden_state,
                                           enc_valid_lens]
+    
+    @property
+    def attention_weights(self):
+        return 1
 ```
 
 Now we can test the seq2seq with attention model. To be consistent with the model without attention in :numref:`sec_seq2seq`, we use the same hyperparameters for `vocab_size`, `embed_size`, `num_hiddens`, and `num_layers`. As a result, we get the same decoder output shape, but the state structure is changed.

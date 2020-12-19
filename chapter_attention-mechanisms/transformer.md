@@ -43,6 +43,7 @@ npx.set_np()
 #@tab pytorch
 from d2l import torch as d2l
 import math
+import pandas as pd
 import torch
 from torch import nn
 ```
@@ -391,8 +392,8 @@ class DecoderBlock(nn.Module):
         # During training, all the tokens of any output sequence are processed
         # at the same time, so `state[2][self.i]` is `None` as initialized.
         # When decoding any output sequence token by token during prediction,
-        # `state[2][self.i]` contains representations of the decoded output
-        # at the `i`-th block up to the current time step
+        # `state[2][self.i]` contains representations of the decoded output at
+        # the `i`-th block up to the current time step
         if state[2][self.i] is None:
             key_values = X
         else:
@@ -407,8 +408,11 @@ class DecoderBlock(nn.Module):
         else:
             dec_valid_lens = None
 
+        # Self-attention
         X2 = self.attention1(X, key_values, key_values, dec_valid_lens)
         Y = self.addnorm1(X, X2)
+        # Encoder-decoder attention. Shape of `enc_outputs`:
+        # (`batch_size`, `num_steps`, `num_hiddens`)
         Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens)
         Z = self.addnorm2(Y, Y2)
         return self.addnorm3(Z, self.ffn(Z)), state
@@ -476,7 +480,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
 
 ```{.python .input}
 #@tab pytorch
-class TransformerDecoder(d2l.Decoder):
+class TransformerDecoder(d2l.AttentionDecoder):
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
                  num_heads, num_layers, dropout, **kwargs):
@@ -498,9 +502,20 @@ class TransformerDecoder(d2l.Decoder):
 
     def forward(self, X, state):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
-        for blk in self.blks:
+        self._attention_weights = [[None] * len(self.blks) for _ in range (2)]
+        for i, blk in enumerate(self.blks):
             X, state = blk(X, state)
+            # Decoder self-attention weights
+            self._attention_weights[0][
+                i] = blk.attention1.attention.attention_weights
+            # Encoder-decoder attention weights
+            self._attention_weights[1][
+                i] = blk.attention2.attention.attention_weights
         return self.dense(X), state
+    
+    @property
+    def attention_weights(self):
+        return self._attention_weights
 ```
 
 ## Training
@@ -564,19 +579,22 @@ for eng, fra in zip(engs, fras):
 
 ```{.python .input}
 #@tab all
-enc_attention_weights = d2l.tensor(net.encoder.attention_weights)
+enc_attention_weights = d2l.reshape(
+    d2l.concat(net.encoder.attention_weights, 0),
+    (num_layers, num_heads, -1, num_steps))
 enc_attention_weights.shape
 ```
 
 ```{.python .input}
 d2l.show_heatmaps(enc_attention_weights, xlabel='Key posistions',
-                  ylabel='Query posistions', labelsize=5,
+                  ylabel='Query posistions',
                   titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
 ```
 
 ```{.python .input}
 #@tab pytorch
-d2l.show_heatmaps(attention_weights.cpu(), xlabel='Keys', ylabel='Queries',
+d2l.show_heatmaps(enc_attention_weights.cpu(), xlabel='Key posistions',
+                  ylabel='Query posistions',
                   titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
 ```
 
@@ -586,20 +604,36 @@ dec_attention_weights_2d = [d2l.tensor(head[0]).tolist()
                             for attn in step for blk in attn for head in blk]
 dec_attention_weights_filled = d2l.tensor(
     pd.DataFrame(dec_attention_weights_2d).fillna(0.0).values)
-dec_attention_weights = dec_attention_weights_filled.reshape(
-    -1, 2, num_layers, num_heads, num_steps)
+dec_attention_weights = d2l.reshape(dec_attention_weights_filled,
+                                    (-1, 2, num_layers, num_heads, num_steps)
 dec_self_attention_weights, dec_inter_attention_weights = \
     dec_attention_weights.transpose(1, 2, 3, 0, 4)
 dec_self_attention_weights.shape, dec_inter_attention_weights.shape
 ```
 
 ```{.python .input}
+#@tab pytorch
+dec_attention_weights_2d = [d2l.tensor(head[0]).tolist()
+                            for step in dec_attention_weight_seq
+                            for attn in step for blk in attn for head in blk]
+dec_attention_weights_filled = d2l.tensor(
+    pd.DataFrame(dec_attention_weights_2d).fillna(0.0).values)
+dec_attention_weights = d2l.reshape(dec_attention_weights_filled,
+                                    (-1, 2, num_layers, num_heads, num_steps))
+dec_self_attention_weights, dec_inter_attention_weights = \
+    dec_attention_weights.permute(1, 2, 3, 0, 4)
+dec_self_attention_weights.shape, dec_inter_attention_weights.shape
+```
+
+```{.python .input}
+#@tab all
 d2l.show_heatmaps(dec_self_attention_weights[:, :, :, :len(
     translation.split())], xlabel='Key posistions', ylabel='Query posistions',
                   titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
 ```
 
 ```{.python .input}
+#@tab all
 d2l.show_heatmaps(dec_inter_attention_weights, xlabel='Key posistions',
                   ylabel='Query posistions',
                   titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
