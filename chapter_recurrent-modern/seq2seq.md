@@ -642,7 +642,7 @@ strategies for sequence generation in
 ```{.python .input}
 #@save
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
-                    device):
+                    device, save_attention_weights=False):
     """Predict for sequence to sequence."""
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
         src_vocab['<eos>']]
@@ -655,18 +655,22 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
     # Add the batch axis
     dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=device), axis=0)
     output_seq = []
+    attention_weight_seq = []
     for _ in range(num_steps):
         Y, dec_state = net.decoder(dec_X, dec_state)
         # We use the token with the highest prediction likelihood as the input
         # of the decoder at the next time step
         dec_X = Y.argmax(axis=2)
         pred = dec_X.squeeze(axis=0).astype('int32').item()
-        # Once the end-of-sequence token is predicted, the generation of
-        # the output sequence is complete
+        # Once the end-of-sequence token is predicted, the generation of the
+        # output sequence is complete
         if pred == tgt_vocab['<eos>']:
             break
         output_seq.append(pred)
-    return ' '.join(tgt_vocab.to_tokens(output_seq))
+        # Save attention weights (to be covered later)
+        if save_attention_weights:
+            attention_weight_seq.append(net.decoder.attention_weights)
+    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq
 ```
 
 ```{.python .input}
@@ -787,18 +791,12 @@ and compute the BLEU of the results.
 
 ```{.python .input}
 #@tab all
-#@save
-def translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device):
-    """Translate text sequences."""
-    for eng, fra in zip(engs, fras):
-        translation = predict_seq2seq(
-            net, eng, src_vocab, tgt_vocab, num_steps, device)
-        print(
-            f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
-
 engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
-translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device)
+for eng, fra in zip(engs, fras):
+    translation, attention_weight_seq = predict_seq2seq(
+        net, eng, src_vocab, tgt_vocab, num_steps, device)
+    print(f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
 ```
 
 ## Summary

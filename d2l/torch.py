@@ -1080,16 +1080,6 @@ def bleu(pred_seq, label_seq, k):
     return score
 
 
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device):
-    """Translate text sequences."""
-    for eng, fra in zip(engs, fras):
-        translation = predict_seq2seq(
-            net, eng, src_vocab, tgt_vocab, num_steps, device)
-        print(
-            f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
-
-
 # Defined in file: ./chapter_attention-mechanisms/attention.md
 def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(3.5, 3.5),
                   cmap='Reds'):

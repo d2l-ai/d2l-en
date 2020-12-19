@@ -50,7 +50,25 @@ At each time step of the decoding, we use the hidden state of the decoder's last
 Let us implement the `Seq2SeqAttentionDecoder`, and see how it differs from the decoder in seq2seq from :numref:`sec_seq2seq_decoder`.
 
 ```{.python .input}
-class Seq2SeqAttentionDecoder(d2l.Decoder):
+#@save
+class AttentionDecoder(d2l.Decoder):
+    """The base attention-based decoder interface."""
+    def __init__(self, **kwargs):
+        super(AttentionDecoder, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+
+    @property
+    def attention_weights(self):
+        raise NotImplementedError
+```
+
+```{.python .input}
+class Seq2SeqAttentionDecoder(d2l.AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
@@ -90,6 +108,10 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
         outputs = self.dense(np.concatenate(outputs, axis=0))
         return outputs.swapaxes(0, 1), [enc_outputs, hidden_state,
                                         enc_valid_lens]
+
+    @property
+    def attention_weights(self):
+        return 1
 ```
 
 ```{.python .input}
@@ -201,7 +223,11 @@ Last, we predict several sample examples.
 #@tab all
 engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
-d2l.translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device)
+for eng, fra in zip(engs, fras):
+    translation, _ = d2l.predict_seq2seq(
+        net, eng, src_vocab, tgt_vocab, num_steps, device, True)
+    print(f'{eng} => {translation}, ',
+          f'bleu {d2l.bleu(translation, fra, k=2):.3f}')
 ```
 
 ## Summary

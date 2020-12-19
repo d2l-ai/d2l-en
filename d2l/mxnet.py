@@ -936,7 +936,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
-                    device):
+                    device, save_attention_weights=False):
     """Predict for sequence to sequence."""
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
         src_vocab['<eos>']]
@@ -949,18 +949,22 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
     # Add the batch axis
     dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=device), axis=0)
     output_seq = []
+    attention_weight_seq = []
     for _ in range(num_steps):
         Y, dec_state = net.decoder(dec_X, dec_state)
         # We use the token with the highest prediction likelihood as the input
         # of the decoder at the next time step
         dec_X = Y.argmax(axis=2)
         pred = dec_X.squeeze(axis=0).astype('int32').item()
-        # Once the end-of-sequence token is predicted, the generation of
-        # the output sequence is complete
+        # Once the end-of-sequence token is predicted, the generation of the
+        # output sequence is complete
         if pred == tgt_vocab['<eos>']:
             break
         output_seq.append(pred)
-    return ' '.join(tgt_vocab.to_tokens(output_seq))
+        # Save attention weights (to be covered later)
+        if save_attention_weights:
+            attention_weight_seq.append(net.decoder.attention_weights)
+    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
@@ -979,16 +983,6 @@ def bleu(pred_seq, label_seq, k):
                 label_subs[''.join(pred_tokens[i: i + n])] -= 1
         score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
     return score
-
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def translate(engs, fras, net, src_vocab, tgt_vocab, num_steps, device):
-    """Translate text sequences."""
-    for eng, fra in zip(engs, fras):
-        translation = predict_seq2seq(
-            net, eng, src_vocab, tgt_vocab, num_steps, device)
-        print(
-            f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention.md
@@ -1078,6 +1072,23 @@ class DotProductAttention(nn.Block):
         scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
         self.attention_weights = masked_softmax(scores, valid_lens)
         return npx.batch_dot(self.dropout(self.attention_weights), values)
+
+
+# Defined in file: ./chapter_attention-mechanisms/seq2seq-attention.md
+class AttentionDecoder(d2l.Decoder):
+    """The base attention-based decoder interface."""
+    def __init__(self, **kwargs):
+        super(AttentionDecoder, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+
+    @property
+    def attention_weights(self):
+        raise NotImplementedError
 
 
 # Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
