@@ -73,7 +73,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
-        self.attention_cell = d2l.AdditiveAttention(num_hiddens, dropout)
+        self.attention = d2l.AdditiveAttention(num_hiddens, dropout)
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
         self.dense = nn.Dense(vocab_size, flatten=False)
@@ -97,7 +97,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
             # Shape of `query`: (`batch_size`, 1, `num_hiddens`)
             query = np.expand_dims(hidden_state[0][-1], axis=1)
             # Shape of `context`: (`batch_size`, 1, `num_hiddens`)
-            context = self.attention_cell(
+            context = self.attention(
                 query, enc_outputs, enc_outputs, enc_valid_lens)
             # Concatenate on the feature dimension
             x = np.concatenate((context, np.expand_dims(x, axis=1)), axis=-1)
@@ -121,7 +121,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqAttentionDecoder, self).__init__(**kwargs)
-        self.attention_cell = d2l.AdditiveAttention(
+        self.attention = d2l.AdditiveAttention(
             num_hiddens, num_hiddens, num_hiddens, dropout)
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.rnn = nn.GRU(
@@ -148,7 +148,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
             # Shape of `query`: (`batch_size`, 1, `num_hiddens`)
             query = torch.unsqueeze(hidden_state[-1], dim=1)
             # Shape of `context`: (`batch_size`, 1, `num_hiddens`)
-            context = self.attention_cell(
+            context = self.attention(
                 query, enc_outputs, enc_outputs, enc_valid_lens)
             # Concatenate on the feature dimension
             x = torch.cat((context, torch.unsqueeze(x, dim=1)), dim=-1)

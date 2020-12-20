@@ -1047,10 +1047,10 @@ class AdditiveAttention(nn.Block):
         # one-dimensional entry from the shape. Shape of `scores`:
         # (`batch_size`, no. of queries, no. of key-value pairs)
         scores = np.squeeze(self.w_v(features), axis=-1)
-        attention_weights = self.dropout(masked_softmax(scores, valid_lens))
+        self.attention_weights = masked_softmax(scores, valid_lens)
         # Shape of `values`: (`batch_size`, no. of key-value pairs, value
         # dimension)
-        return npx.batch_dot(attention_weights, values)
+        return npx.batch_dot(self.dropout(self.attention_weights), values)
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-functions.md
