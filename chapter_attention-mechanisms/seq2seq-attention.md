@@ -144,7 +144,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         enc_outputs, hidden_state, enc_valid_lens = state
         # Shape of the output `X`: (`num_steps`, `batch_size`, `embed_size`)
         X = self.embedding(X).permute(1, 0, 2)
-        outputs = []
+        outputs, self._attention_weights = [], []
         for x in X:
             # Shape of `query`: (`batch_size`, 1, `num_hiddens`)
             query = torch.unsqueeze(hidden_state[-1], dim=1)
@@ -156,6 +156,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
             # Reshape `x` as (1, `batch_size`, `embed_size` + `num_hiddens`)
             out, hidden_state = self.rnn(x.permute(1, 0, 2), hidden_state)
             outputs.append(out)
+            self._attention_weights.append(self.attention.attention_weights)
         # After fully-connected layer transformation, shape of `outputs`:
         # (`num_steps`, `batch_size`, `vocab_size`)
         outputs = self.dense(torch.cat(outputs, dim=0))
@@ -164,7 +165,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
     
     @property
     def attention_weights(self):
-        return 1
+        return self._attention_weights
 ```
 
 Now we can test the seq2seq with attention model. To be consistent with the model without attention in :numref:`sec_seq2seq`, we use the same hyperparameters for `vocab_size`, `embed_size`, `num_hiddens`, and `num_layers`. As a result, we get the same decoder output shape, but the state structure is changed.
@@ -237,14 +238,25 @@ for eng, fra in zip(engs, fras):
 ```
 
 ```{.python .input}
-attention_weights = np.squeeze(d2l.tensor(
-    dec_attention_weight_seq).transpose(1, 2, 3, 0, 4), axis=0)
-attention_weights.shape
+#@tab all
+attention_weights = d2l.reshape(
+    d2l.concat([step[0][0][0] for step in dec_attention_weight_seq], 0),
+    (1, 1, -1, num_steps))
 ```
 
 ```{.python .input}
-d2l.show_heatmaps(attention_weights[:, :, :, :4], xlabel='Key posistions',
-                  ylabel='Query posistions', figsize=(2.5, 2.5))
+# Plus one to include the end-of-sequence token
+d2l.show_heatmaps(
+    attention_weights[:, :, :, :len(engs[-1].split()) + 1],
+    xlabel='Key posistions', ylabel='Query posistions', figsize=(2, 2))
+```
+
+```{.python .input}
+#@tab pytorch
+# Plus one to include the end-of-sequence token
+d2l.show_heatmaps(
+    attention_weights[:, :, :, :len(engs[-1].split()) + 1].cpu(),
+    xlabel='Key posistions', ylabel='Query posistions', figsize=(2, 2))
 ```
 
 ## Summary
