@@ -248,7 +248,7 @@ attention_weights = d2l.reshape(
 # Plus one to include the end-of-sequence token
 d2l.show_heatmaps(
     attention_weights[:, :, :, :len(engs[-1].split()) + 1],
-    xlabel='Key posistions', ylabel='Query posistions', figsize=(2, 2))
+    xlabel='Key posistions', ylabel='Query posistions')
 ```
 
 ```{.python .input}
@@ -256,7 +256,7 @@ d2l.show_heatmaps(
 # Plus one to include the end-of-sequence token
 d2l.show_heatmaps(
     attention_weights[:, :, :, :len(engs[-1].split()) + 1].cpu(),
-    xlabel='Key posistions', ylabel='Query posistions', figsize=(2, 2))
+    xlabel='Key posistions', ylabel='Query posistions')
 ```
 
 ## Summary

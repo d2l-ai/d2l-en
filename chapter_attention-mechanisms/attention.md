@@ -23,7 +23,7 @@ import torch
 ```{.python .input}
 #@tab all
 #@save
-def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(3.5, 3.5),
+def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2, 2),
                   cmap='Reds'):
     d2l.use_svg_display()
     num_rows, num_cols = matrices.shape[0], matrices.shape[1]
