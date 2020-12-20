@@ -985,7 +985,7 @@ def bleu(pred_seq, label_seq, k):
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention.md
-def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2, 2),
+def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
     d2l.use_svg_display()
     num_rows, num_cols = matrices.shape[0], matrices.shape[1]
