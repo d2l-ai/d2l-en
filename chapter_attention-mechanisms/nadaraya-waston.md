@@ -1,4 +1,4 @@
-# Nadaraya-Watson Kernel Regression
+# Attention Pooling: Nadaraya-Watson Kernel Regression
 :label:`sec_nadaraya-waston`
 
 
