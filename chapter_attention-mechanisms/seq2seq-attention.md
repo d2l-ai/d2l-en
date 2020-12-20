@@ -92,7 +92,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         enc_outputs, hidden_state, enc_valid_lens = state
         # Shape of the output `X`: (`num_steps`, `batch_size`, `embed_size`)
         X = self.embedding(X).swapaxes(0, 1)
-        outputs = []
+        outputs, self._attention_weights = [], []
         for x in X:
             # Shape of `query`: (`batch_size`, 1, `num_hiddens`)
             query = np.expand_dims(hidden_state[0][-1], axis=1)
@@ -104,6 +104,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
             # Reshape `x` as (1, `batch_size`, `embed_size` + `num_hiddens`)
             out, hidden_state = self.rnn(x.swapaxes(0, 1), hidden_state)
             outputs.append(out)
+            self._attention_weights.append(self.attention.attention_weights)
         # After fully-connected layer transformation, shape of `outputs`:
         # (`num_steps`, `batch_size`, `vocab_size`)
         outputs = self.dense(np.concatenate(outputs, axis=0))
@@ -112,7 +113,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
 
     @property
     def attention_weights(self):
-        return 1
+        return self._attention_weights
 ```
 
 ```{.python .input}
@@ -229,10 +230,21 @@ Last, we predict several sample examples.
 engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 for eng, fra in zip(engs, fras):
-    translation, _ = d2l.predict_seq2seq(
+    translation, dec_attention_weight_seq = d2l.predict_seq2seq(
         net, eng, src_vocab, tgt_vocab, num_steps, device, True)
     print(f'{eng} => {translation}, ',
           f'bleu {d2l.bleu(translation, fra, k=2):.3f}')
+```
+
+```{.python .input}
+attention_weights = np.squeeze(d2l.tensor(
+    dec_attention_weight_seq).transpose(1, 2, 3, 0, 4), axis=0)
+attention_weights.shape
+```
+
+```{.python .input}
+d2l.show_heatmaps(attention_weights[:, :, :, :4], xlabel='Key posistions',
+                  ylabel='Query posistions', figsize=(2.5, 2.5))
 ```
 
 ## Summary

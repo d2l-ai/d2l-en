@@ -627,9 +627,11 @@ dec_self_attention_weights.shape, dec_inter_attention_weights.shape
 
 ```{.python .input}
 #@tab all
-d2l.show_heatmaps(dec_self_attention_weights[:, :, :, :len(
-    translation.split())], xlabel='Key posistions', ylabel='Query posistions',
-                  titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
+# Plus one to include the beginning-of-sequence token
+d2l.show_heatmaps(
+    dec_self_attention_weights[:, :, :, :len(translation.split()) + 1],
+    xlabel='Key posistions', ylabel='Query posistions',
+    titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
 ```
 
 ```{.python .input}

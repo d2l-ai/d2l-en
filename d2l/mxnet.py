@@ -955,14 +955,14 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
         # of the decoder at the next time step
         dec_X = Y.argmax(axis=2)
         pred = dec_X.squeeze(axis=0).astype('int32').item()
+        # Save attention weights (to be covered later)
+        if save_attention_weights:
+            attention_weight_seq.append(net.decoder.attention_weights)
         # Once the end-of-sequence token is predicted, the generation of the
         # output sequence is complete
         if pred == tgt_vocab['<eos>']:
             break
         output_seq.append(pred)
-        # Save attention weights (to be covered later)
-        if save_attention_weights:
-            attention_weight_seq.append(net.decoder.attention_weights)
     return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq
 
 
