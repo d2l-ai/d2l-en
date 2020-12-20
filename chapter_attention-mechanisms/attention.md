@@ -1,5 +1,19 @@
-# Attention
+# From Cues to Queries and Keys
 :label:`sec_attention`
+
+Eye in Cross Section
+
+Saliency cue corresponds to keys
+
+Task-dependent cue corresponds to queries
+
+
+
+
+
+
+
+
 
 Graves proposed the first attention model (though it is not called "attention" in the paper) in a differentiable fashion to address the challenge of handwriting generation for a given text sequence :cite:`Graves.2013`.
 Since pen trace is usually much longer than text,

@@ -1,6 +1,7 @@
 # Transformer
 :label:`sec_transformer`
 
+
 In previous chapters, we have covered major neural network architectures such as convolution neural networks (CNNs) and  recurrent neural networks (RNNs). Let us recap their pros and cons:
 
 * **CNNs** are easy to parallelize at a layer but cannot capture the variable-length sequential dependency very well.

@@ -2,6 +2,7 @@
 :label:`sec_self-attention-and-positional-encoding`
 
 
+
 Self-attention :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017` is also called intra-attention :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`
 
 

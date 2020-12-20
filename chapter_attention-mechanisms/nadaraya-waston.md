@@ -2,6 +2,7 @@
 :label:`sec_nadaraya-waston`
 
 
+
 ## Data Generation
 
 ```{.python .input}

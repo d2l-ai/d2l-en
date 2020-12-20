@@ -1,6 +1,7 @@
 # Bahdanau Attention
 :label:`sec_seq2seq_attention`
 
+
 In this section, we add the attention mechanism to the sequence to sequence (seq2seq)
 model as introduced in :numref:`sec_seq2seq`
 to explicitly aggregate states with weights.
