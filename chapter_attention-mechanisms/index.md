@@ -11,7 +11,7 @@ In this chapter, we will provide you with some intuition about how to transform 
 ```toc
 :maxdepth: 2
 
-attention
+attention-cues
 nadaraya-waston
 attention-functions
 seq2seq-attention

@@ -1,5 +1,5 @@
-# From Attention Cues to Queries and Keys
-:label:`sec_attention`
+# Attentional Cues
+:label:`sec_attention-cues`
 
 
 Attention economy,
@@ -13,7 +13,7 @@ Saliency cue and task-dependent cue.
 
 
 
-## Queries and Keys
+## Queries, Keys, and Values
 
 Saliency cue corresponds to keys
 
