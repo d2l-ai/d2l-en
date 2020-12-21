@@ -303,7 +303,7 @@ voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
 test_images, test_labels = d2l.read_voc_images(voc_dir, False)
 n, imgs = 4, []
 for i in range(n):
-    crop_rect = (0, 0, 480, 320)
+    crop_rect = (0, 0, 320, 480)
     X = torchvision.transforms.functional.crop(test_images[i], *crop_rect)
     pred = label2image(predict(X))
     imgs += [X.permute(1,2,0), pred.cpu(),
