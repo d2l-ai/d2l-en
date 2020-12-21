@@ -61,27 +61,37 @@ This idea dates back to William James in the 1890s,
 who is considered the "Father of American psychology" :cite:`James.2007`.
 In this framework,
 subjects selectively direct the spotlight of attention
-using both the non-volitional cue
-and volitional cue.
+using both the involitional and volitional cues.
 
-The non-volitional cue is based on 
+The involitional cue is based on 
 the saliency and conspicuity of objects in the environment.
 Imagine there are five objects in front of you:
 a newspaper, a research paper, a cup of coffee, a notebook, and a book in :numref:`fig_eye-coffee`.
 While all the paper products are printed in black and white,
-the coffee cup has colors,
-automatically and involuntarily draws our attention.
+the coffee cup has colors.
+In other words,
+this coffee is intrinsically salient and conspicuous in 
+this visual environment,
+automatically and involuntarily drawing attention.
+Thus, you bring the fovea (the center of the macula where visual acuity is highest) onto the coffee.
 
-
-
-![Using the non-volitional cue based on saliency, the coffee involuntarily attracts attention.](../img/eye-coffee.png)
+![Using the involitional cue based on saliency (colorful cup, not paper products), the coffee involuntarily attracts attention.](../img/eye-coffee.png)
 :width:`400px`
 :label:`fig_eye-coffee`
 
+After drinking coffee,
+you become caffeinated and
+want to read a book.
+Now you turn your head, refocus your eyes,
+and look at the book as depicted in :numref:`fig_eye-book`.
+Different from 
+the case in :numref:`fig_eye-coffee`
+where the coffee biases the observer towards
+selecting based on saliency,
 
 
 
-![eye-book.](../img/eye-book.png)
+![Using the volitional cue (want to read a book) that is task-dependent, the book is brought into attention under volitional control.](../img/eye-book.png)
 :width:`400px`
 :label:`fig_eye-book`
 
