@@ -186,16 +186,11 @@ As shown in :numref:`fig_anchor_label` (left), assuming that the maximum value i
 def match_anchor_to_bbox(ground_truth, anchors, iou_threshold=0.5):
     """Assign ground-truth bounding boxes to anchor boxes similar to them."""
     num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]
-    anchors = torchvision.ops.box_convert(anchors,
-                                            in_fmt='cxcywh', out_fmt='xyxy')
-    ground_truth = torchvision.ops.box_convert(ground_truth,
-                                            in_fmt='cxcywh', out_fmt='xyxy')
     # element `x_ij` in the `i^th` row and `j^th` column is the IoU
     # of the anchor box `anc_i` to the ground-truth bounding box `box_j`
     jaccard = torchvision.ops.box_iou(anchors, ground_truth)
     # Initialize the tensor to hold assigned ground truth bbox for each anchor
     anchors_bbox_map = torch.full((num_anchors,), -1, dtype=torch.long)
-
     # Assign ground truth bounding box according to the threshold
     max_ious, indices = torch.max(jaccard, dim=1)
     anc_i = torch.nonzero(max_ious >= 0.5).reshape(-1)
