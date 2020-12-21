@@ -56,42 +56,45 @@ such as detecting preys and predators.
 
 To explain how our attention is deployed in the visual world, 
 a two-component framework has emerged
-and been popular.
+and been pervasive.
 This idea dates back to William James in the 1890s,
 who is considered the "Father of American psychology" :cite:`James.2007`.
 In this framework,
 subjects selectively direct the spotlight of attention
-using both the involitional and volitional cues.
+using both the *involitional cue* and *volitional cue*.
 
 The involitional cue is based on 
 the saliency and conspicuity of objects in the environment.
 Imagine there are five objects in front of you:
 a newspaper, a research paper, a cup of coffee, a notebook, and a book in :numref:`fig_eye-coffee`.
 While all the paper products are printed in black and white,
-the coffee cup has colors.
+the coffee cup is red.
 In other words,
 this coffee is intrinsically salient and conspicuous in 
 this visual environment,
 automatically and involuntarily drawing attention.
-Thus, you bring the fovea (the center of the macula where visual acuity is highest) onto the coffee.
+So you bring the fovea (the center of the macula where visual acuity is highest) onto the coffee as shown in :numref:`fig_eye-coffee`.
 
-![Using the involitional cue based on saliency (colorful cup, not paper products), the coffee involuntarily attracts attention.](../img/eye-coffee.png)
+![Using the involitional cue based on saliency (red cup, non-paper), attention is involuntarily directed to the coffee.](../img/eye-coffee.png)
 :width:`400px`
 :label:`fig_eye-coffee`
 
 After drinking coffee,
 you become caffeinated and
 want to read a book.
-Now you turn your head, refocus your eyes,
+So you turn your head, refocus your eyes,
 and look at the book as depicted in :numref:`fig_eye-book`.
 Different from 
 the case in :numref:`fig_eye-coffee`
-where the coffee biases the observer towards
+where the coffee biases you towards
 selecting based on saliency,
+in this task-dependent case you select the book under 
+cognitive and volitional control.
+Using the volitional cue based on variable selection criteria,
+this form of attention is more deliberate.
+It is also more powerful with the subject's voluntary effort.
 
-
-
-![Using the volitional cue (want to read a book) that is task-dependent, the book is brought into attention under volitional control.](../img/eye-book.png)
+![Using the volitional cue (want to read a book) that is task-dependent, attention is directed to the book under volitional control.](../img/eye-book.png)
 :width:`400px`
 :label:`fig_eye-book`
 
