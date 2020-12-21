@@ -13,10 +13,11 @@ Saliency cue and task-dependent cue.
 
 ![eye-coffee.](../img/eye-coffee.png)
 :label:`fig_eye-coffee`
+:width:`400px`
 
 ![eye-book.](../img/eye-book.png)
 :label:`fig_eye-book`
-
+:width:`400px`
 
 ## Queries, Keys, and Values
 
