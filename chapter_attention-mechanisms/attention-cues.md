@@ -12,14 +12,16 @@ Biological attention.
 Saliency cue and task-dependent cue.
 
 ![eye-coffee.](../img/eye-coffee.png)
-:label:`fig_eye-coffee`
 :width:`400px`
+:label:`fig_eye-coffee`
 
 ![eye-book.](../img/eye-book.png)
-:label:`fig_eye-book`
 :width:`400px`
+:label:`fig_eye-book`
+
 
 ## Queries, Keys, and Values
+
 
 Saliency cue corresponds to keys
 
