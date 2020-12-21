@@ -45,7 +45,7 @@ the more recent
 and *self-attention* designs,
 we will describe the *Transformer* architecture
 based solely on attention mechanisms.
-Since its proposal in 2017,
+Since their proposal in 2017,
 Transformers
 have been pervasive in modern 
 deep learning applications,
@@ -53,8 +53,6 @@ such as in areas of
 language,
 vision, speech,
 and reinforcement learning.
-
-
 
 ```toc
 :maxdepth: 2
