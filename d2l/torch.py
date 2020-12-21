@@ -1549,14 +1549,15 @@ def read_voc_images(voc_dir, is_train=True):
     """Read all VOC feature and label images."""
     txt_fname = os.path.join(voc_dir, 'ImageSets', 'Segmentation',
                              'train.txt' if is_train else 'val.txt')
+    mode = torchvision.io.image.ImageReadMode.RGB
     with open(txt_fname, 'r') as f:
         images = f.read().split()
     features, labels = [], []
     for i, fname in enumerate(images):
-        features.append(d2l.Image.open(os.path.join(
+        features.append(torchvision.io.read_image(os.path.join(
             voc_dir, 'JPEGImages', f'{fname}.jpg')))
-        labels.append(d2l.Image.open(os.path.join(
-            voc_dir, 'SegmentationClass' ,f'{fname}.png')))
+        labels.append(torchvision.io.read_image(os.path.join(
+            voc_dir, 'SegmentationClass' ,f'{fname}.png'), mode))
     return features, labels
 
 
@@ -1577,14 +1578,14 @@ VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def build_colormap2label():
     """Build an RGB color to label mapping for segmentation."""
-    colormap2label = torch.zeros(256 ** 3)
+    colormap2label = torch.zeros(256 ** 3, dtype=torch.long)
     for i, colormap in enumerate(VOC_COLORMAP):
         colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
     return colormap2label
 
 def voc_label_indices(colormap, colormap2label):
     """Map an RGB color to a label."""
-    colormap = np.array(colormap.convert("RGB")).astype('int32')
+    colormap = colormap.permute(1,2,0).numpy().astype('int32')
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
            + colormap[:, :, 2])
     return colormap2label[idx]
@@ -1605,30 +1606,28 @@ class VOCSegDataset(torch.utils.data.Dataset):
     """A customized dataset to load VOC dataset."""
 
     def __init__(self, is_train, crop_size, voc_dir):
+        self.transform = torchvision.transforms.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         self.crop_size = crop_size
-        self.transforms = torchvision.transforms.Compose([
-                torchvision.transforms.ToTensor(),
-                torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                                 std=[0.229, 0.224, 0.225])])
-        features, labels = read_voc_images(voc_dir, is_train)
-        self.features = self.filter(features)
+        features, labels = read_voc_images(voc_dir, is_train=is_train)
+        self.features = [self.normalize_image(feature)
+                         for feature in self.filter(features)]
         self.labels = self.filter(labels)
         self.colormap2label = build_colormap2label()
         print('read ' + str(len(self.features)) + ' examples')
 
     def normalize_image(self, img):
-        return self.transforms(img)
+        return self.transform(img.float())
 
     def filter(self, imgs):
         return [img for img in imgs if (
-            img.size[1] >= self.crop_size[0] and
-            img.size[0] >= self.crop_size[1])]
+            img.shape[1] >= self.crop_size[0] and
+            img.shape[2] >= self.crop_size[1])]
 
     def __getitem__(self, idx):
         feature, label = voc_rand_crop(self.features[idx], self.labels[idx],
                                        *self.crop_size)
-        return (self.normalize_image(feature),
-                voc_label_indices(label,self.colormap2label))
+        return (feature, voc_label_indices(label, self.colormap2label))
 
     def __len__(self):
         return len(self.features)
