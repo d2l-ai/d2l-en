@@ -14,7 +14,9 @@ To ensure that your investment of attention
 right now is worthwhile,
 we have been highly motivated to pay our attention carefully
 to produce a nice book.
-Attention holds the key to any work's exceptionalism.
+Attention 
+is the keystone in the arch of life and
+holds the key to any work's exceptionalism.
 
 
 Since economics studies the allocation of scarce resources,
@@ -224,7 +226,7 @@ we will often invoke this function to visualize attention weights.
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/1591)
+[Discussions](https://discuss.d2l.ai/t/1596)
 :end_tab:
 
 :begin_tab:`pytorch`
