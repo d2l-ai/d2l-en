@@ -15,7 +15,7 @@ The ability of paying attention to
 only a small fraction of the information
 has evolutionary significance,
 allowing human beings 
-to survive and succeed.
+to live and succeed.
 
 Scientists have been studying attention 
 in the cognitive neuroscience field

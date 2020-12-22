@@ -14,6 +14,7 @@ To ensure that your investment of attention
 right now is worthwhile,
 we have been highly motivated to pay our attention carefully
 to produce a nice book.
+Attention holds the key to any work's exceptionalism.
 
 
 Since economics studies the allocation of scarce resources,
@@ -47,7 +48,7 @@ the capability of directing attention
 to only a fraction of information of interest
 has enabled our brain
 to allocate resources more smartly
-to live, to grow, and to socialize,
+to survive, to grow, and to socialize,
 such as detecting predators, preys, and mates.
 
 
@@ -144,9 +145,8 @@ For instance,
 we can design a non-differentiable attention model
 that can be trained using reinforcement learning methods :cite:`Mnih.Heess.Graves.ea.2014`.
 Given the dominance of the framework in :numref:`fig_qkv`,
-we will 
-*direct our attention*
-to those under this framework.
+models under this framework
+will be the center of our attention in this chapter.
 
 
 ## Visualization of Attention
