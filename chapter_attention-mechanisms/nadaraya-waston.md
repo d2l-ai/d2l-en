@@ -1,9 +1,23 @@
 # Attention Pooling: Nadaraya-Watson Kernel Regression
 :label:`sec_nadaraya-waston`
 
+Now that you understand the major components of attention mechanisms.
+According to the framework of attention mechanisms
+in :numref:`fig_qkv`,
+the interactions between 
+queries (volitional cues) and keys (involitional cues)
+result in *attention pooling*.
+The attention pooling selectively aggregates values (sensory inputs) to produce the output.
+In this section, 
+we will describe attention pooling in greater detail
+to give you a high-level view of
+how attention mechanisms work in practice.
+Specifically,
+the Nadaraya-Watson kernel regression model
+proposed in 1964
+is a simple but complete example
+for demonstrating machine learning with attention mechanisms.
 
-
-## Data Generation
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -11,9 +25,6 @@ from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
 
 npx.set_np()
-
-def f(x):
-    return 2 * d2l.sin(x) + x**0.8
 ```
 
 ```{.python .input}
@@ -21,10 +32,23 @@ def f(x):
 from d2l import torch as d2l
 import torch
 from torch import nn
-
-def f(x):
-    return 2 * d2l.sin(x) + x**0.8
 ```
+
+## Generating the Dataset
+
+To keep things simple,
+let us consider the following regression problem:
+given a dataset of input-output pairs $\{(x_1, y_1), \ldots, (x_n, y_n)\}$,
+how to learn $f$ to predict $\hat{y} = f(x)$ for any new input $x$?
+
+Here we generate an artificial dataset according to the following nonlinear function with the noise term $\epsilon$:
+
+$$y_i = 2\sin(x_i) + x_i^{0.8} + \epsilon,$$
+
+where $\epsilon$ obeys a normal distribution with zero mean and standard deviation 0.5. 
+Both 50 training examples and 50 testing examples
+are generated.
+To better visualize attention later, the training inputs are sorted.
 
 ```{.python .input}
 n_train = 50  # No. of training examples
@@ -39,6 +63,9 @@ x_train, _ = torch.sort(d2l.rand(n_train) * 5)   # Training inputs
 
 ```{.python .input}
 #@tab all
+def f(x):
+    return 2 * d2l.sin(x) + x**0.8
+
 y_train = f(x_train) + d2l.normal(0.0, 0.5, (n_train,))  # Training outputs
 x_test = d2l.arange(0, 5, 0.1)  # Testing examples
 y_truth = f(x_test)  # Ground-truth outputs for the testing examples

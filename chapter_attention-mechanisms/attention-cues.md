@@ -21,7 +21,7 @@ we are
 in the era of the attention economy,
 where human attention is treated as a limited, valuable, and scarce commodity
 that can be exchanged.
-Many business models have been
+Numerous business models have been
 developed to capitalize on it.
 On music or video streaming services,
 we either pay attention to their ads
@@ -143,9 +143,9 @@ Note that there are many alternatives for the design of attention mechanisms.
 For instance,
 we can design a non-differentiable attention model
 that can be trained using reinforcement learning methods :cite:`Mnih.Heess.Graves.ea.2014`.
-Given the pervasiveness of the framework in :numref:`fig_qkv`,
+Given the dominance of the framework in :numref:`fig_qkv`,
 we will 
-direct our attention
+*direct our attention*
 to those under this framework.
 
 

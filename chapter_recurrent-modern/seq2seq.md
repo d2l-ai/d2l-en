@@ -67,7 +67,7 @@ shifted by one token:
 
 In the following,
 we will explain the design of :numref:`fig_seq2seq`
-in greater details.
+in greater detail.
 We will train this model for machine translation
 on the English-French dataset as introduced in
 :numref:`sec_machine_translation`.
