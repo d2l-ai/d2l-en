@@ -101,6 +101,36 @@ It is also more powerful with the subject's voluntary effort.
 
 ## Queries, Keys, and Values
 
+Inspired by the involitional and volitional attention cues that explain how attention is deployed,
+in the following we design attention mechanisms
+by incorporating these two attention cues.
+
+
+To begin with, consider the simpler case where only 
+involitional cues are available.
+To bias selection from inputs,
+we can simply use
+a parameterized fully-connected layer
+or even non-parameterized
+max or average pooling.
+
+Therefore,
+what really sets attention mechanism
+apart from those fully-connected layers
+and pooling layers
+is the incorporation of the volitional cues.
+In the context of attention mechanisms,
+we refer to volitional cues as *queries*.
+Given any query,
+attention mechanisms
+decide how to bias selection over inputs, 
+such as intermediate feature representations.
+More generally,
+the inputs come in key-value pairs.
+
+
+
+
 
 Saliency cue corresponds to keys
 
