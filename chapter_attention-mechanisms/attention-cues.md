@@ -44,11 +44,11 @@ our ancestors had learned from experience (also known as data)
 that *not all sensory inputs are created equal*.
 Throughout human history,
 the capability of directing attention
-to only a small fraction of information of interest
+to only a fraction of information of interest
 has enabled our brain
 to allocate resources more smartly
-to survive and succeed,
-such as detecting preys and predators.
+to live, to grow, and to socialize,
+such as detecting predators, preys, and mates.
 
 
 

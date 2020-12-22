@@ -18,7 +18,6 @@ proposed in 1964
 is a simple but complete example
 for demonstrating machine learning with attention mechanisms.
 
-
 ```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
