@@ -8,7 +8,7 @@ Graves proposed the first attention model (though it is not called "attention" i
 Since pen trace is usually much longer than text,
 Graves's attention model aligns text characters with the pen trace, however, only in one direction.
 
-Mnih et al. proposed a non-differentiable attention model to selectively process regions or locations from images or videos :cite:`Mnih.Heess.Graves.ea.2014`.
+
 
 
 ## Bahdanau Attention

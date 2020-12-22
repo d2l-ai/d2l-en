@@ -41,7 +41,7 @@ at the order of $10^8$ bis per second,
 far exceeding what our brain can fully process.
 Fortunately,
 our ancestors had learned from experience (also known as data)
-that *not all sensory input is created equal*.
+that *not all sensory inputs are created equal*.
 Throughout human history,
 the capability of directing attention
 to only a small fraction of information of interest
@@ -101,44 +101,61 @@ It is also more powerful with the subject's voluntary effort.
 
 ## Queries, Keys, and Values
 
-Inspired by the involitional and volitional attention cues that explain how attention is deployed,
-in the following we design attention mechanisms
+Inspired by the involitional and volitional attention cues that explain the attentional deployment,
+in the following we will
+describe a framework for
+designing attention mechanisms
 by incorporating these two attention cues.
 
 To begin with, consider the simpler case where only 
 involitional cues are available.
-To bias selection from inputs,
+To bias selection over sensory inputs,
 we can simply use
 a parameterized fully-connected layer
 or even non-parameterized
 max or average pooling.
 
 Therefore,
-what really sets attention mechanism
+what sets attention mechanisms
 apart from those fully-connected layers
-and pooling layers
+or pooling layers
 is the inclusion of the volitional cues.
 In the context of attention mechanisms,
 we refer to volitional cues as *queries*.
 Given any query,
 attention mechanisms
-bias selection over inputs (e.g., intermediate feature representations)
+bias selection over sensory inputs (e.g., intermediate feature representations)
 via *attention pooling*.
-These inputs are called *values*.
+These sensory inputs are called *values* in the context of attention mechanisms.
 More generally,
 every value is paired with a *key*,
-which can be thought of the involitional cue of that input.
+which can be thought of the involitional cue of that sensory input.
+As shown in :numref:`fig_qkv`,
+we can design attention pooling
+so that the given query (volitional cue) can interact with keys (involitional cues),
+which guides bias selection over values (sensory inputs).
 
-![Attention mechanisms bias selection over values (inputs) via attention pooling, which incorporates queries (volitional cues) and keys (involitional cues).](../img/qkv.svg)
+![Attention mechanisms bias selection over values (sensory inputs) via attention pooling, which incorporates queries (volitional cues) and keys (involitional cues).](../img/qkv.svg)
 :width:`400px`
 :label:`fig_qkv`
 
-
-
-
+Note that there are many alternatives for the design of attention mechanisms.
+For instance,
+we can design a non-differentiable attention model
+that can be trained using reinforcement learning methods :cite:`Mnih.Heess.Graves.ea.2014`.
+Given the pervasiveness of the framework in :numref:`fig_qkv`,
+we will 
+direct our attention
+to those under this framework.
 
 
 ## Visualization of Attention
+
+Average pooling 
+can be treated as a weighted average of inputs,
+where weights are uniform.
+In practice,
+attention pooling aggregates values using weighted average, where weights are computed between the given query and different keys.
 
 ```{.python .input}
 import math
@@ -152,6 +169,10 @@ npx.set_np()
 from d2l import torch as d2l
 import torch
 ```
+
+To visualize attention weights,
+we define the `show_heatmaps` function.
+Its input `matrices` has the shape (number of rows for display, number of columns for display, number of queries, number of keys).
 
 ```{.python .input}
 #@tab all
@@ -174,8 +195,38 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
     fig.colorbar(pcm, ax=axes, shrink=0.6);
 ```
 
+For demonstration,
+we consider a simple case where
+the attention weight is one only when the query and the key are the same; otherwise it is zero.
+
 ```{.python .input}
 #@tab all
 attention_weights = d2l.eye(10).reshape(1, 1, 10, 10)
 show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
 ```
+
+In the subsequent sections,
+we will often invoke this function to visualize attention weights.
+
+## Summary
+
+* Human attention is a limited, valuable, and scarce resource.
+* Subjects selectively direct attention using both the involitional and volitional cues. The former is based on saliency and the latter is task-dependent.
+* Attention mechanisms are different from fully-connected layers or pooling layers due to inclusion of the volitional cues. 
+* Attention mechanisms bias selection over values (sensory inputs) via attention pooling, which incorporates queries (volitional cues) and keys (involitional cues). Keys and values are paired.
+* We can visualize attention weights between queries and keys.
+
+## Exercises
+
+1. What can be the volitional cue when decoding a sequence token by token in machine translation? What are the involitional cues and the sensory inputs?
+1. Randomly generate a $10 \times 10$ matrix and use the softmax operation to ensure each row is a valid probability distribution. Visualize the output attention weights.
+
+
+
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/1591)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1592)
+:end_tab:
