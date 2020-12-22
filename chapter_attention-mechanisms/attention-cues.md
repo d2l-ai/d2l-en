@@ -75,7 +75,7 @@ this visual environment,
 automatically and involuntarily drawing attention.
 So you bring the fovea (the center of the macula where visual acuity is highest) onto the coffee as shown in :numref:`fig_eye-coffee`.
 
-![Using the involitional cue based on saliency (red cup, non-paper), attention is involuntarily directed to the coffee.](../img/eye-coffee.png)
+![Using the involitional cue based on saliency (red cup, non-paper), attention is involuntarily directed to the coffee.](../img/eye-coffee.svg)
 :width:`400px`
 :label:`fig_eye-coffee`
 
@@ -94,7 +94,7 @@ Using the volitional cue based on variable selection criteria,
 this form of attention is more deliberate.
 It is also more powerful with the subject's voluntary effort.
 
-![Using the volitional cue (want to read a book) that is task-dependent, attention is directed to the book under volitional control.](../img/eye-book.png)
+![Using the volitional cue (want to read a book) that is task-dependent, attention is directed to the book under volitional control.](../img/eye-book.svg)
 :width:`400px`
 :label:`fig_eye-book`
 
@@ -104,7 +104,6 @@ It is also more powerful with the subject's voluntary effort.
 Inspired by the involitional and volitional attention cues that explain how attention is deployed,
 in the following we design attention mechanisms
 by incorporating these two attention cues.
-
 
 To begin with, consider the simpler case where only 
 involitional cues are available.
@@ -118,23 +117,23 @@ Therefore,
 what really sets attention mechanism
 apart from those fully-connected layers
 and pooling layers
-is the incorporation of the volitional cues.
+is the inclusion of the volitional cues.
 In the context of attention mechanisms,
 we refer to volitional cues as *queries*.
 Given any query,
 attention mechanisms
-decide how to bias selection over inputs, 
-such as intermediate feature representations.
+bias selection over inputs (e.g., intermediate feature representations)
+via *attention pooling*.
+These inputs are called *values*.
 More generally,
-the inputs come in key-value pairs.
+every value is paired with a *key*,
+which can be thought of the involitional cue of that input.
+
+![Attention mechanisms bias selection over values (inputs) via attention pooling, which incorporates queries (volitional cues) and keys (involitional cues).](../img/qkv.svg)
+:width:`400px`
+:label:`fig_qkv`
 
 
-
-
-
-Saliency cue corresponds to keys
-
-Task-dependent cue corresponds to queries
 
 
 
