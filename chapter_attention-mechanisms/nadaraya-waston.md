@@ -194,7 +194,7 @@ y_hat = d2l.matmul(attention_weights, y_train)
 plot_kernel_reg(y_hat)
 ```
 
-Now we visualize the attention weights.
+Now let us take a look at the attention weights.
 Here testing inputs are queries while training inputs are keys.
 Since both inputs are sorted,
 we can see that the closer the query-key pair is,
@@ -215,9 +215,26 @@ d2l.show_heatmaps(attention_weights.unsqueeze(0).unsqueeze(0),
 
 ## Parametric Attention Pooling
 
+Nonparametric Nadaraya-Watson kernel regression
+enjoys the *consistency* benefit:
+given enough data this model converges to the optimal solution.
+Nonetheless, 
+we can easily integrate learnable parameters into attention pooling.
+
+As an example, slightly different from :eqref:`eq_nadaraya-waston-gaussian`,
+in the following
+the distance between the query $x$ and the key $x_i$
+is multiplied a learnable parameter $w$:
+
+
 $$\begin{aligned}
-f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_i)w)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i
+f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_i)w)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i.
 \end{aligned}$$
+:eqlabel:`eq_nadaraya-waston-gaussian-para`
+
+In the rest of the section,
+we will train this model by learning the parameter of
+the attention pooling in :eqref:`eq_nadaraya-waston-gaussian-para`.
 
 
 ### Batch Multiplication
