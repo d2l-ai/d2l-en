@@ -200,7 +200,6 @@ def match_anchor_to_bbox(ground_truth, anchors, iou_threshold=0.5):
     anc_i = torch.argmax(jaccard, dim=0)
     box_j = torch.arange(num_gt_boxes)
     anchors_bbox_map[anc_i] = box_j
-
     return anchors_bbox_map
 ```
 
@@ -216,7 +215,18 @@ The default values of the constant are $\mu_x = \mu_y = \mu_w = \mu_h = 0, \sigm
 ```{.python .input}
 #@tab pytorch
 #@save
-def multibox_target(anchors, labels, device="cpu", eps=1e-6):
+def offset_boxes(anchors, assigned_bb, eps=1e-6):
+    c_anc = torchvision.ops.box_convert(anchors, in_fmt='xyxy',
+                                             out_fmt='cxcywh')
+    c_assigned_bb = torchvision.ops.box_convert(assigned_bb,
+                                        in_fmt='xyxy', out_fmt='cxcywh')
+    offset_xy = 10 * (c_assigned_bb[:, :2] - c_anc[:, :2]) / c_anc[:, 2:]
+    offset_wh = 5 * torch.log(eps + c_assigned_bb[:, 2:] / c_anc[:, 2:])
+    offset = torch.cat([offset_xy, offset_wh], dim=1)
+    return offset
+
+#@save
+def multibox_target(anchors, labels, device="cpu"):
     batch_size, anchors = labels.shape[0], anchors.squeeze(0)
     batch_offset, batch_mask, batch_class_labels = [], [], []
     num_anchors = anchors.shape[0]
@@ -234,15 +244,8 @@ def multibox_target(anchors, labels, device="cpu", eps=1e-6):
         bb_idx = anchors_bbox_map[indices_true]
         class_labels[indices_true] = label[bb_idx, 0].long() + 1
         assigned_bb[indices_true] = label[bb_idx, 1:]
-
         # offset transformations
-        c_anc = torchvision.ops.box_convert(anchors, in_fmt='xyxy',
-                                                 out_fmt='cxcywh')
-        c_assigned_bb = torchvision.ops.box_convert(assigned_bb,
-                                            in_fmt='xyxy', out_fmt='cxcywh')
-        offset_xy = 10 * (c_assigned_bb[:, :2] - c_anc[:, :2]) / c_anc[:, 2:]
-        offset_wh = 5 * torch.log(eps + c_assigned_bb[:, 2:] / c_anc[:, 2:])
-        offset = torch.cat([offset_xy, offset_wh], dim=1) * bbox_mask
+        offset = offset_boxes(anchors, assigned_bb) * bbox_mask
 
         batch_offset.append(offset.reshape(-1))
         batch_mask.append(bbox_mask.reshape(-1))
@@ -319,6 +322,17 @@ Next, select the prediction bounding box $B_2$ with the second highest confidenc
 
 ```{.python .input}
 #@tab pytorch
+#@save
+def offset_inverse(anchors, offset_preds):
+    c_anc = torchvision.ops.box_convert(anchors, in_fmt='xyxy',
+                                        out_fmt='cxcywh')
+    c_pred_bb_xy = (offset_preds[:, :2] * c_anc[:, 2:] / 10) + c_anc[:, :2]
+    c_pred_bb_wh = torch.exp(offset_preds[:, 2:] / 5) * c_anc[:, 2:]
+    c_pred_bb = torch.cat((c_pred_bb_xy, c_pred_bb_wh), dim=1)
+    predicted_bb = torchvision.ops.box_convert(c_pred_bb, in_fmt='cxcywh',
+                                               out_fmt='xyxy')
+    return predicted_bb
+
 #@save
 def nms(bb_info_list, nms_threshold = 0.5):
     """non-maximum suppression"""
@@ -433,4 +447,8 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/370)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1603)
 :end_tab:
