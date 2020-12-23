@@ -40,7 +40,7 @@ information in our environment is not scarce,
 attention is.
 When inspecting a visual scene,
 our optic nerve receives information
-at the order of $10^8$ bis per second,
+at the order of $10^8$ bits per second,
 far exceeding what our brain can fully process.
 Fortunately,
 our ancestors had learned from experience (also known as data)
