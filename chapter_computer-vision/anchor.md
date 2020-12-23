@@ -20,7 +20,6 @@ npx.set_np()
 from d2l import torch as d2l
 import torch
 import torchvision
-import collections
 
 torch.set_printoptions(2)
 ```
