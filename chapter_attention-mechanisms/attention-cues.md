@@ -55,7 +55,7 @@ such as detecting predators, preys, and mates.
 
 
 
-## Attention Cues
+## Attention Cues in Biology
 
 To explain how our attention is deployed in the visual world,
 a two-component framework has emerged
