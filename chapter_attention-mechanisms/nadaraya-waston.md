@@ -138,6 +138,7 @@ is assigned to the corresponding value $y_i$
 based on the interaction
 between the query $x$ and the key $x_i$
 modeled by $\alpha$.
+For any query, its attention weights over all the key-value pairs are a valid probability distribution: they are non-negative and sum up to one.
 
 To gain intuitions of attention pooling,
 just consider a *Gaussian kernel* defined as
@@ -326,7 +327,7 @@ class NWKernelRegression(nn.Module):
 In the following, we transform the training dataset
 to keys and values to train the attention model.
 In the parametric attention pooling,
-any training input takes key-value pairs from all the training examples but itself to predict its output.
+any training input takes key-value pairs from all the training examples except for itself to predict its output.
 
 ```{.python .input}
 # Shape of `X_tile`: (`n_train`, `n_train`), where each column contains the
@@ -359,7 +360,8 @@ values = d2l.reshape(Y_tile[(1 - d2l.eye(n_train)).type(torch.bool)],
                      (n_train, -1))
 ```
 
-Using the squared loss,
+Using the squared loss and stochastic gradient descent,
+we train the parametric attention model.
 
 ```{.python .input}
 net = NWKernelRegression()
@@ -395,6 +397,12 @@ for epoch in range(5):
     animator.add(epoch + 1, float(l.sum()))
 ```
 
+After training the parametric attention model,
+we can plot its prediction.
+Trying to fit the training dataset with noise,
+the predicted line is less smooth 
+than its nonparametric counterpart that was plotted earlier.
+
 ```{.python .input}
 # Shape of `keys`: (`n_test`, `n_train`), where each column contains the same
 # training inputs (i.e., same keys)
@@ -416,6 +424,10 @@ y_hat = net(x_test, keys, values).unsqueeze(1).detach()
 plot_kernel_reg(y_hat)
 ```
 
+Comparing with nonparametric attention pooling,
+the region with large attention weights becomes sharper
+in the learnable and parametric setting.
+
 ```{.python .input}
 d2l.show_heatmaps(np.expand_dims(np.expand_dims(net.attention_weights, 0), 0),
                   xlabel='Sorted training inputs',
@@ -428,3 +440,27 @@ d2l.show_heatmaps(net.attention_weights.unsqueeze(0).unsqueeze(0),
                   xlabel='Sorted training inputs',
                   ylabel='Sorted testing inputs')
 ```
+
+## Summary
+
+* Nadaraya-Watson kernel regression is an example of machine learning with attention mechanisms.
+* The attention pooling of Nadaraya-Watson kernel regression is a weighted average of the training outputs. From the attention perspective, the attention weight is assigned to a value based on a function of a query and the key that is paired with the value.
+* Attention pooling can be either nonparametric or parametric.
+
+
+## Exercises
+
+1. Increase the number of training examples. Can you learn  nonparametric Nadaraya-Watson kernel regression better?
+1. What is the value of our learned $w$ in the parametric attention pooling experiment? Why does it make the weighted region sharper when visualizing the attention weights?
+1. How can we add hyperparameters to nonparametric Nadaraya-Watson kernel regression to predict better?
+1. Design another parametric attention pooling for the kernel regression of this section. Train this new model and visualize its attention weights.
+
+
+
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/1598)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1599)
+:end_tab:
