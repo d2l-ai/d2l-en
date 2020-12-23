@@ -69,7 +69,7 @@ using both the *involitional cue* and *volitional cue*.
 The involitional cue is based on 
 the saliency and conspicuity of objects in the environment.
 Imagine there are five objects in front of you:
-a newspaper, a research paper, a cup of coffee, a notebook, and a book in :numref:`fig_eye-coffee`.
+a newspaper, a research paper, a cup of coffee, a notebook, and a book such as in :numref:`fig_eye-coffee`.
 While all the paper products are printed in black and white,
 the coffee cup is red.
 In other words,

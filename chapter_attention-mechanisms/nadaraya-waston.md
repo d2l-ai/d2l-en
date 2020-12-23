@@ -1,9 +1,8 @@
 # Attention Pooling: Nadaraya-Watson Kernel Regression
 :label:`sec_nadaraya-waston`
 
-Now that you understand the major components of attention mechanisms.
-According to the framework of attention mechanisms
-in :numref:`fig_qkv`,
+Now you know the major components of attention mechanisms under the framework in :numref:`fig_qkv`.
+To recapitulate,
 the interactions between 
 queries (volitional cues) and keys (involitional cues)
 result in *attention pooling*.
@@ -15,7 +14,7 @@ how attention mechanisms work in practice.
 Specifically,
 the Nadaraya-Watson kernel regression model
 proposed in 1964
-is a simple but complete example
+is a simple yet complete example
 for demonstrating machine learning with attention mechanisms.
 
 ```{.python .input}
@@ -38,7 +37,7 @@ from torch import nn
 To keep things simple,
 let us consider the following regression problem:
 given a dataset of input-output pairs $\{(x_1, y_1), \ldots, (x_n, y_n)\}$,
-how to learn $f$ to predict $\hat{y} = f(x)$ for any new input $x$?
+how to learn $f$ to predict the output $\hat{y} = f(x)$ for any new input $x$?
 
 Here we generate an artificial dataset according to the following nonlinear function with the noise term $\epsilon$:
 
@@ -47,7 +46,7 @@ $$y_i = 2\sin(x_i) + x_i^{0.8} + \epsilon,$$
 where $\epsilon$ obeys a normal distribution with zero mean and standard deviation 0.5. 
 Both 50 training examples and 50 testing examples
 are generated.
-To better visualize attention later, the training inputs are sorted.
+To better visualize the pattern of attention later, the training inputs are sorted.
 
 ```{.python .input}
 n_train = 50  # No. of training examples
@@ -72,6 +71,9 @@ n_test = len(x_test)  # No. of testing examples
 n_test
 ```
 
+The following function plots all the training examples (represented by circles),
+the ground-truth data generation function `f` without the noise term (labeled by "Truth"), and the learned prediction function (labeled by "Pred").
+
 ```{.python .input}
 #@tab all
 def plot_kernel_reg(y_hat):
@@ -81,6 +83,14 @@ def plot_kernel_reg(y_hat):
 ```
 
 ## Average Pooling
+
+We begin with perhaps the world's "dumbest" estimator for this regression problem:
+using average pooling to average over all the training outputs:
+
+$$f(x) = \frac{1}{n}\sum_{i=1}^n y_i,$$
+:eqlabel:`eq_avg-pooling`
+
+which is plotted below. As we can see, this estimator is indeed not so smart.
 
 ```{.python .input}
 y_hat = y_train.mean().repeat(n_test)
@@ -93,24 +103,67 @@ y_hat = torch.repeat_interleave(y_train.mean(), n_test)
 plot_kernel_reg(y_hat)
 ```
 
-## Nonparametric Model
+## Nonparametric Attention Pooling
 
-The Nadaraya--Watson estimator is:
+Obviously,
+average pooling omits the inputs $x_i$.
+A better idea was proposed
+by Nadaraya :cite:`Nadaraya.1964`
+and Waston :cite:`Watson.1964`
+to weigh the outputs $y_i$ according to their input locations:
+
+$$f(x) = \sum_{i=1}^n \frac{K(x - x_i)}{\sum_{j=1}^n K(x - x_j)} y_i,$$
+:eqlabel:`eq_nadaraya-waston`
+
+where $K$ is a *kernel*. 
+The estimator in :eqref:`eq_nadaraya-waston`
+is called *Nadaraya-Watson kernel regression*.
+Here we will not dive into details of kernels.
+Recall the framework of attention mechanisms in :numref:`fig_qkv`.
+From the perspective of attention,
+we can rewrite :eqref:`eq_nadaraya-waston`
+in a more generalized form of *attention pooling*:
+
+$$f(x) = \sum_{i=1}^n \alpha(x, x_i) y_i,$$
+:eqlabel:`eq_attn-pooling`
+
+
+where $x$ is the query and $(x_i, y_i)$ is the key-value pair.
+Comparing :eqref:`eq_attn-pooling` and :eqref:`eq_avg-pooling`,
+the attention pooling here
+is a weighted average of values $y_i$.
+The *attention weight* $\alpha(x, x_i)$ 
+in :eqref:`eq_attn-pooling`
+is assigned to the corresponding value $y_i$
+based on the interaction
+between the query $x$ and the key $x_i$
+modeled by $\alpha$.
+
+To gain intuitions of attention pooling,
+just consider a *Gaussian kernel* defined as
 
 $$
-f(x) = \sum_i \frac{K(x - x_i)}{\sum_j K(x - x_j)} y_i
-$$
-
-where Gaussian kernel is:
-
-$$
-K(u) = \frac{1}{\sqrt{2\pi}} \exp(-\frac{u^2}{2})
+K(u) = \frac{1}{\sqrt{2\pi}} \exp(-\frac{u^2}{2}).
 $$
 
 
-Thus,
+Plugging the Gaussian kernel into 
+:eqref:`eq_attn-pooling` and
+:eqref:`eq_nadaraya-waston` gives
 
-$$\begin{aligned} f(x) &= \sum_i \alpha(x, x_i) y_i \\&= \sum_i \frac{\exp\left(-\frac{1}{2}(x - x_i)^2\right)}{\sum_j \exp\left(-\frac{1}{2}(x - x_j)^2\right)} y_i \\&= \sum_i \mathrm{softmax}\left(-\frac{1}{2}(x - x_i)^2\right) y_i \end{aligned} $$
+$$\begin{aligned} f(x) &=\sum_{i=1}^n \alpha(x, x_i) y_i\\ &= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}(x - x_i)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}(x - x_j)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}(x - x_i)^2\right) y_i. \end{aligned}$$
+:eqlabel:`eq_nadaraya-waston-gaussian`
+
+In :eqref:`eq_nadaraya-waston-gaussian`,
+a key $x_i$ that is closer to the given query $x$ will get
+*more attention* via a *larger attention weight* assigned to the key's corresponding value $y_i$.
+
+Notably, Nadaraya-Watson kernel regression is a nonparametric model;
+thus :eqref:`eq_nadaraya-waston-gaussian`
+is an example of *nonparametric attention pooling*.
+In the following, we plot the prediction based on this 
+nonparametric attention model.
+The predicted line is smooth and closer to the ground-truth than that produced by average pooling.
 
 ```{.python .input}
 # Shape of `X_repeat`: (`n_test`, `n_train`), where each row contains the
@@ -141,6 +194,12 @@ y_hat = d2l.matmul(attention_weights, y_train)
 plot_kernel_reg(y_hat)
 ```
 
+Now we visualize the attention weights.
+Here testing inputs are queries while training inputs are keys.
+Since both inputs are sorted,
+we can see that the closer the query-key pair is,
+the higher attention weight is in the attention pooling.
+
 ```{.python .input}
 d2l.show_heatmaps(np.expand_dims(np.expand_dims(attention_weights, 0), 0),
                   xlabel='Sorted training inputs',
@@ -154,10 +213,10 @@ d2l.show_heatmaps(attention_weights.unsqueeze(0).unsqueeze(0),
                   ylabel='Sorted testing inputs')
 ```
 
-## Parametric Model
+## Parametric Attention Pooling
 
 $$\begin{aligned}
-f(x) &= \sum_i \alpha(x, x_i) y_i \\&= \sum_i \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_j \exp\left(-\frac{1}{2}((x - x_i)w)^2\right)} y_i \\&= \sum_i \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i
+f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_i)w)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i
 \end{aligned}$$
 
 
