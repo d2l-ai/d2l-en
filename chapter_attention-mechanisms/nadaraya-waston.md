@@ -365,7 +365,7 @@ Using the squared loss,
 net = NWKernelRegression()
 net.initialize()
 loss = gluon.loss.L2Loss()
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})
+trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.5})
 animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, 5])
 
 for epoch in range(5):
@@ -381,7 +381,7 @@ for epoch in range(5):
 #@tab pytorch
 net = NWKernelRegression()
 loss = nn.MSELoss(reduction='none')
-trainer = torch.optim.Adam(net.parameters(), lr=0.9)
+trainer = torch.optim.SGD(net.parameters(), lr=0.5)
 animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, 5])
 
 for epoch in range(5):
