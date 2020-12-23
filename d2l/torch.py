@@ -1672,44 +1672,30 @@ def offset_inverse(anchors, offset_preds):
                                                out_fmt='xyxy')
     return predicted_bb
 
-def nms(bb_info_list, nms_threshold = 0.5):
-    """non-maximum suppression"""
-    keep = [] # boxes that will be kept
-    sorted_bb_info_list = sorted(bb_info_list, key = lambda x: x.confidence,
-                                 reverse=True)
-    while len(sorted_bb_info_list) != 0:
-        top = sorted_bb_info_list.pop(0)
-        keep.append(top)
-        n = len(sorted_bb_info_list)
-        if n==0:
-            break
-        bb_coords = [bb.coords for bb in sorted_bb_info_list]
-        iou = torchvision.ops.box_iou(torch.tensor([top.coords]),
-                                      torch.tensor(bb_coords))[0]
-        inds = torch.nonzero(iou <= nms_threshold).reshape(-1)
-        sorted_bb_info_list = [sorted_bb_info_list[inds]]
-    return keep
-
-def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5):
-    BB_Info = collections.namedtuple("BB_Info", ["idx", "class_labels",
-                                                 "confidence", "coords"])
+def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
+                       score_threshold=0.0099):
     batch_size = cls_probs.shape[0]
-    outputs = []
+    anchors = anchors.squeeze(0)
+    num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]
+    out = []
     for i in range(batch_size):
-        cls_prob, offset_pred = cls_probs[i], offset_preds[i]
-        anchor, num_bb_pred = anchors[0], cls_prob.shape[1]
-        anchor = anchor + offset_pred.reshape(num_bb_pred, 4)
-        confidence, class_labels = torch.max(cls_prob, 0)
-        bb_info = [BB_Info(idx = i, class_labels = class_labels[i] - 1,
-                           confidence = confidence[i], coords = [*anchor[i]])
-                   for i in range(num_bb_pred)]
-        obj_bb_idx = [bb.idx for bb in nms(bb_info, nms_threshold)]
-        output = []
-        for bb in bb_info:
-            output.append([(bb.class_labels if bb.idx in obj_bb_idx else -1.0),
-                           bb.confidence, *bb.coords])
-        outputs.append(torch.tensor(output))
-    return torch.stack(outputs)
+        cls_prob, offset_pred = cls_probs[i], offset_preds[i].reshape(-1, 4)
+        conf, class_id = torch.max(cls_prob[1:], 0)
+        predicted_bb = offset_inverse(anchors, offset_pred)
+        keep = torchvision.ops.nms(predicted_bb, conf, 0.5)
+        # find all non_keep indices and set the class_id to background
+        all_idx = torch.arange(num_anchors).long()
+        combined = torch.cat((keep, all_idx))
+        uniques, counts = combined.unique(return_counts=True)
+        non_keep = uniques[counts == 1]
+        all_id_sorted = torch.cat((keep, non_keep))
+        class_id[non_keep] = -1
+        class_id = class_id[all_id_sorted]
+        pred_info = torch.cat((class_id.unsqueeze(1),
+                               conf[all_id_sorted].unsqueeze(1),
+                               predicted_bb[all_id_sorted]), dim=1)
+        out.append(pred_info)
+    return torch.stack(out)
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
