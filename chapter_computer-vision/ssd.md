@@ -520,7 +520,7 @@ for epoch in range(num_epochs):
                                                         Y.cpu(), Y.device)
         # Calculate the loss function using the predicted and labeled
         # category and offset values
-        l = calc_loss(cls_preds, cls_labels.long(), bbox_preds, bbox_labels,
+        l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,
                       bbox_masks)
         l.mean().backward()
         trainer.step()
@@ -544,6 +544,12 @@ feature = image.imresize(img, 256, 256).astype('float32')
 X = np.expand_dims(feature.transpose(2, 0, 1), axis=0)
 ```
 
+```{.python .input}
+#@tab pytorch
+X = torchvision.io.read_image('../img/banana.jpg').unsqueeze(0).float()
+img = X.squeeze(0).permute(1,2,0).long()
+```
+
 Using the `MultiBoxDetection` function, we predict the bounding boxes based on the anchor boxes and their predicted offsets. Then, we use non-maximum suppression to remove similar bounding boxes.
 
 ```{.python .input}
@@ -551,6 +557,19 @@ def predict(X):
     anchors, cls_preds, bbox_preds = net(X.as_in_ctx(device))
     cls_probs = npx.softmax(cls_preds).transpose(0, 2, 1)
     output = npx.multibox_detection(cls_probs, bbox_preds, anchors)
+    idx = [i for i, row in enumerate(output[0]) if row[0] != -1]
+    return output[0, idx]
+
+output = predict(X)
+```
+
+```{.python .input}
+#@tab pytorch
+def predict(X):
+    net.eval()
+    anchors, cls_preds, bbox_preds = net(X.to(device))
+    cls_probs = F.softmax(cls_preds, dim=2).permute(0, 2, 1)
+    output = d2l.multibox_detection(cls_probs.cpu(), bbox_preds.cpu(), anchors)
     idx = [i for i, row in enumerate(output[0]) if row[0] != -1]
     return output[0, idx]
 
@@ -569,6 +588,22 @@ def display(img, output, threshold):
             continue
         h, w = img.shape[0:2]
         bbox = [row[2:6] * np.array((w, h, w, h), ctx=row.ctx)]
+        d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
+
+display(img, output, threshold=0.9)
+```
+
+```{.python .input}
+#@tab pytorch
+def display(img, output, threshold):
+    d2l.set_figsize((5, 5))
+    fig = d2l.plt.imshow(img)
+    for row in output:
+        score = float(row[1])
+        if score < threshold:
+            continue
+        h, w = img.shape[0:2]
+        bbox = [row[2:6] * torch.tensor((w, h, w, h), device=row.device)]
         d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
 
 display(img, output, threshold=0.9)
@@ -678,4 +713,8 @@ E. Refer to the SSD paper. What methods can be used to evaluate the precision of
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/373)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1604)
 :end_tab:
