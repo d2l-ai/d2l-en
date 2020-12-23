@@ -227,9 +227,7 @@ the distance between the query $x$ and the key $x_i$
 is multiplied a learnable parameter $w$:
 
 
-$$\begin{aligned}
-f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_i)w)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i.
-\end{aligned}$$
+$$\begin{aligned}f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_i)w)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i.\end{aligned}$$
 :eqlabel:`eq_nadaraya-waston-gaussian-para`
 
 In the rest of the section,
@@ -237,10 +235,18 @@ we will train this model by learning the parameter of
 the attention pooling in :eqref:`eq_nadaraya-waston-gaussian-para`.
 
 
-### Batch Multiplication
+### Batch Matrix Multiplication
 :label:`subsec_batch_dot`
 
-We can multiply the matrices in two minibatches one by one, by the minibatch multiplication operation `batch_dot`. Suppose the first batch contains $n$ matrices $\mathbf{X}_1, \ldots, \mathbf{X}_n$ with a shape of $a\times b$, and the second batch contains $n$ matrices $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ with a shape of $b\times c$. The output of matrix multiplication on these two batches are $n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ with a shape of $a\times c$. Therefore, given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of the minibatch multiplication output is ($n$, $a$, $c$).
+To more efficiently compute attention 
+for minibatches,
+we can leverage batch matrix multiplication utilities
+provided by deep learning frameworks.
+
+
+Suppose that the first minibatch contains $n$ matrices $\mathbf{X}_1, \ldots, \mathbf{X}_n$ of shape $a\times b$, and the second minibatch contains $n$ matrices $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ of shape $b\times c$. Their batch matrix multiplication 
+results in
+$n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ of shape $a\times c$. Therefore, given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of their batch matrix multiplication output is ($n$, $a$, $c$).
 
 ```{.python .input}
 X = d2l.ones((2, 1, 4))
@@ -255,7 +261,7 @@ Y = d2l.ones((2, 4, 6))
 torch.bmm(X, Y).shape
 ```
 
-We can use minibatch multiplication to compute weighted averages of values in a minibatch.
+In the context of attention mechanisms, we can use minibatch matrix multiplication to compute weighted averages of values in a minibatch.
 
 ```{.python .input}
 weights = d2l.ones((2, 10)) * 0.1
@@ -270,7 +276,13 @@ values = d2l.reshape(d2l.arange(20.0), (2, 10))
 torch.bmm(weights.unsqueeze(1), values.unsqueeze(-1))
 ```
 
-### Parametrized Nadaraya-Watson Kernel Regression
+### Defining the Model
+
+Using minibatch matrix multiplication,
+below we define the parametric version
+of Nadaraya-Watson kernel regression
+based on the parametric attention pooling in
+:eqref:`eq_nadaraya-waston-gaussian-para`.
 
 ```{.python .input}
 class NWKernelRegression(nn.Block):
@@ -309,7 +321,12 @@ class NWKernelRegression(nn.Module):
                          values.unsqueeze(-1)).reshape(-1)
 ```
 
-### Defining Keys and Values for Training the Attention Model
+### Training
+
+In the following, we transform the training dataset
+to keys and values to train the attention model.
+In the parametric attention pooling,
+any training input takes key-value pairs from all the training examples but itself to predict its output.
 
 ```{.python .input}
 # Shape of `X_tile`: (`n_train`, `n_train`), where each column contains the
@@ -342,13 +359,13 @@ values = d2l.reshape(Y_tile[(1 - d2l.eye(n_train)).type(torch.bool)],
                      (n_train, -1))
 ```
 
-Training.
+Using the squared loss,
 
 ```{.python .input}
 net = NWKernelRegression()
 net.initialize()
 loss = gluon.loss.L2Loss()
-trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': 0.9})
+trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})
 animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, 5])
 
 for epoch in range(5):
