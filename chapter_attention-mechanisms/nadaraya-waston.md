@@ -3,11 +3,11 @@
 
 Now you know the major components of attention mechanisms under the framework in :numref:`fig_qkv`.
 To recapitulate,
-the interactions between 
-queries (volitional cues) and keys (involitional cues)
+the interactions between
+queries (volitional cues) and keys (nonvolitional cues)
 result in *attention pooling*.
 The attention pooling selectively aggregates values (sensory inputs) to produce the output.
-In this section, 
+In this section,
 we will describe attention pooling in greater detail
 to give you a high-level view of
 how attention mechanisms work in practice.
@@ -43,7 +43,7 @@ Here we generate an artificial dataset according to the following nonlinear func
 
 $$y_i = 2\sin(x_i) + x_i^{0.8} + \epsilon,$$
 
-where $\epsilon$ obeys a normal distribution with zero mean and standard deviation 0.5. 
+where $\epsilon$ obeys a normal distribution with zero mean and standard deviation 0.5.
 Both 50 training examples and 50 testing examples
 are generated.
 To better visualize the pattern of attention later, the training inputs are sorted.
@@ -115,7 +115,7 @@ to weigh the outputs $y_i$ according to their input locations:
 $$f(x) = \sum_{i=1}^n \frac{K(x - x_i)}{\sum_{j=1}^n K(x - x_j)} y_i,$$
 :eqlabel:`eq_nadaraya-waston`
 
-where $K$ is a *kernel*. 
+where $K$ is a *kernel*.
 The estimator in :eqref:`eq_nadaraya-waston`
 is called *Nadaraya-Watson kernel regression*.
 Here we will not dive into details of kernels.
@@ -132,7 +132,7 @@ where $x$ is the query and $(x_i, y_i)$ is the key-value pair.
 Comparing :eqref:`eq_attn-pooling` and :eqref:`eq_avg-pooling`,
 the attention pooling here
 is a weighted average of values $y_i$.
-The *attention weight* $\alpha(x, x_i)$ 
+The *attention weight* $\alpha(x, x_i)$
 in :eqref:`eq_attn-pooling`
 is assigned to the corresponding value $y_i$
 based on the interaction
@@ -148,7 +148,7 @@ K(u) = \frac{1}{\sqrt{2\pi}} \exp(-\frac{u^2}{2}).
 $$
 
 
-Plugging the Gaussian kernel into 
+Plugging the Gaussian kernel into
 :eqref:`eq_attn-pooling` and
 :eqref:`eq_nadaraya-waston` gives
 
@@ -162,7 +162,7 @@ a key $x_i$ that is closer to the given query $x$ will get
 Notably, Nadaraya-Watson kernel regression is a nonparametric model;
 thus :eqref:`eq_nadaraya-waston-gaussian`
 is an example of *nonparametric attention pooling*.
-In the following, we plot the prediction based on this 
+In the following, we plot the prediction based on this
 nonparametric attention model.
 The predicted line is smooth and closer to the ground-truth than that produced by average pooling.
 
@@ -219,7 +219,7 @@ d2l.show_heatmaps(attention_weights.unsqueeze(0).unsqueeze(0),
 Nonparametric Nadaraya-Watson kernel regression
 enjoys the *consistency* benefit:
 given enough data this model converges to the optimal solution.
-Nonetheless, 
+Nonetheless,
 we can easily integrate learnable parameters into attention pooling.
 
 As an example, slightly different from :eqref:`eq_nadaraya-waston-gaussian`,
@@ -239,13 +239,13 @@ the attention pooling in :eqref:`eq_nadaraya-waston-gaussian-para`.
 ### Batch Matrix Multiplication
 :label:`subsec_batch_dot`
 
-To more efficiently compute attention 
+To more efficiently compute attention
 for minibatches,
 we can leverage batch matrix multiplication utilities
 provided by deep learning frameworks.
 
 
-Suppose that the first minibatch contains $n$ matrices $\mathbf{X}_1, \ldots, \mathbf{X}_n$ of shape $a\times b$, and the second minibatch contains $n$ matrices $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ of shape $b\times c$. Their batch matrix multiplication 
+Suppose that the first minibatch contains $n$ matrices $\mathbf{X}_1, \ldots, \mathbf{X}_n$ of shape $a\times b$, and the second minibatch contains $n$ matrices $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ of shape $b\times c$. Their batch matrix multiplication
 results in
 $n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ of shape $a\times c$. Therefore, given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of their batch matrix multiplication output is ($n$, $a$, $c$).
 
@@ -290,14 +290,14 @@ class NWKernelRegression(nn.Block):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.w = self.params.get('w', shape=(1,))
-        
+
     def forward(self, queries, keys, values):
         # Shape of the output `queries` and `attention_weights`:
         # (no. of queries, no. of key-value pairs)
         queries = d2l.reshape(
             queries.repeat(keys.shape[1]), (-1, keys.shape[1]))
         self.attention_weights = npx.softmax(
-            -((queries - keys) * self.w.data())**2 / 2)   
+            -((queries - keys) * self.w.data())**2 / 2)
         # Shape of `values`: (no. of queries, no. of key-value pairs)
         return npx.batch_dot(np.expand_dims(self.attention_weights, 1),
                              np.expand_dims(values, -1)).reshape(-1)
@@ -339,7 +339,7 @@ Y_tile = np.tile(y_train, (n_train, 1))
 # Shape of `keys`: ('n_train', 'n_train' - 1)
 keys = d2l.reshape(X_tile[(1 - d2l.eye(n_train)).astype('bool')],
                    (n_train, -1))
-# Shape of `values`: ('n_train', 'n_train' - 1) 
+# Shape of `values`: ('n_train', 'n_train' - 1)
 values = d2l.reshape(Y_tile[(1 - d2l.eye(n_train)).astype('bool')],
                      (n_train, -1))
 ```
@@ -400,7 +400,7 @@ for epoch in range(5):
 After training the parametric attention model,
 we can plot its prediction.
 Trying to fit the training dataset with noise,
-the predicted line is less smooth 
+the predicted line is less smooth
 than its nonparametric counterpart that was plotted earlier.
 
 ```{.python .input}
