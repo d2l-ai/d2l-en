@@ -246,15 +246,12 @@ def multibox_target(anchors, labels, device="cpu"):
         assigned_bb[indices_true] = label[bb_idx, 1:]
         # offset transformations
         offset = offset_boxes(anchors, assigned_bb) * bbox_mask
-
         batch_offset.append(offset.reshape(-1))
         batch_mask.append(bbox_mask.reshape(-1))
         batch_class_labels.append(class_labels)
-
     bbox_offset = torch.stack(batch_offset)
     bbox_mask = torch.stack(batch_mask)
     class_labels = torch.stack(batch_class_labels)
-
     return [bbox_offset.to(device), bbox_mask.to(device),
             class_labels.to(device)]
 ```
