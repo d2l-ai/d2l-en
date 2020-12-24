@@ -116,3 +116,7 @@ We will implement a multiscale object detection model in the following section.
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/371)
 :end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1607)
+:end_tab:
