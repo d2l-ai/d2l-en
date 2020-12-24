@@ -44,19 +44,19 @@ def multibox_prior(data, sizes, ratios):
     num_sizes, num_ratios = len(sizes), len(ratios)
     boxes_per_pixel = (num_sizes + num_ratios - 1)
     size_tensor, ratio_tensor = torch.tensor(sizes), torch.tensor(ratios)
-    # offsets are required to move the anchor to center of a pixel
-    # since pixel (height=1, width=1), we choose to offset our centers by 0.5
+    # Offsets are required to move the anchor to center of a pixel
+    # Since pixel (height=1, width=1), we choose to offset our centers by 0.5
     offset_h, offset_w = 0.5, 0.5
-    steps_h = 1.0 / in_height    # scaled steps in y axis
-    steps_w = 1.0 / in_width     # scaled steps in x axis
+    steps_h = 1.0 / in_height  # Scaled steps in y axis
+    steps_w = 1.0 / in_width  # Scaled steps in x axis
 
-    # generate all center points for the anchor boxes
+    # Generate all center points for the anchor boxes
     center_h = (torch.arange(in_height) + offset_h) * steps_h
     center_w = (torch.arange(in_width) + offset_w) * steps_w
     shift_y, shift_x = torch.meshgrid(center_h, center_w)
     shift_y, shift_x = shift_y.reshape(-1), shift_x.reshape(-1)
 
-    # generate boxes_per_pixel number of heights and widths which are later
+    # Generate boxes_per_pixel number of heights and widths which are later
     # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
     w = torch.cat((size_tensor, sizes[0] * torch.sqrt(ratio_tensor[1:])))\
                 * in_height / in_width / 2
@@ -64,7 +64,7 @@ def multibox_prior(data, sizes, ratios):
     anchor_manipulations = torch.stack((-w, -h, w, h)).T.repeat(
                                         in_height * in_width, 1)
 
-    # each center point will have boxes_per_pixel number of anchor boxes, so
+    # Each center point will have boxes_per_pixel number of anchor boxes, so
     # generate grid of all anchor box centers with boxes_per_pixel repeats
     out_grid = torch.stack([shift_x, shift_y, shift_x, shift_y],
                 dim=1).repeat_interleave(boxes_per_pixel, dim=0)
@@ -185,7 +185,7 @@ As shown in :numref:`fig_anchor_label` (left), assuming that the maximum value i
 def match_anchor_to_bbox(ground_truth, anchors, iou_threshold=0.5):
     """Assign ground-truth bounding boxes to anchor boxes similar to them."""
     num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]
-    # element `x_ij` in the `i^th` row and `j^th` column is the IoU
+    # Element `x_ij` in the `i^th` row and `j^th` column is the IoU
     # of the anchor box `anc_i` to the ground-truth bounding box `box_j`
     jaccard = torchvision.ops.box_iou(anchors, ground_truth)
     # Initialize the tensor to hold assigned ground truth bbox for each anchor
@@ -233,7 +233,7 @@ def multibox_target(anchors, labels, device="cpu"):
         label = labels[i, :, :]
         anchors_bbox_map = match_anchor_to_bbox(label[:, 1:], anchors)
         bbox_mask = ((anchors_bbox_map >= 0).float().unsqueeze(-1)).repeat(1, 4)
-        # initialize class_labels and assigned bbox coordinates with zeros
+        # Initialize class_labels and assigned bbox coordinates with zeros
         class_labels = torch.zeros(num_anchors, dtype=torch.long)
         assigned_bb = torch.zeros((num_anchors, 4), dtype=torch.float32)
         # Assign class labels to the anchor boxes using matched gt bbox labels
@@ -341,7 +341,7 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         conf, class_id = torch.max(cls_prob[1:], 0)
         predicted_bb = offset_inverse(anchors, offset_pred)
         keep = torchvision.ops.nms(predicted_bb, conf, 0.5)
-        # find all non_keep indices and set the class_id to background
+        # Find all non_keep indices and set the class_id to background
         all_idx = torch.arange(num_anchors).long()
         combined = torch.cat((keep, all_idx))
         uniques, counts = combined.unique(return_counts=True)

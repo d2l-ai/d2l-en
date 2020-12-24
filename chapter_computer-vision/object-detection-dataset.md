@@ -59,7 +59,8 @@ def load_data_bananas(batch_size, edge_size=256):
 
 ```{.python .input}
 #@tab pytorch
-def read_data_bananas(is_train=True): #@save
+#@save
+def read_data_bananas(is_train=True):
     """Read the bananas dataset images and labels."""
     data_dir = d2l.download_extract('banana-detection')
     csv_fname = os.path.join(data_dir, 'bananas_train' if is_train
@@ -71,15 +72,15 @@ def read_data_bananas(is_train=True): #@save
         images.append(torchvision.io.read_image(
             os.path.join(data_dir, 'bananas_train' if is_train else
                          'bananas_val', 'images', f'{img_name}')))
-        # Since all images have same object class i.e. category '0'
+        # Since all images have same object class i.e. category '0',
         # the `label` column corresponds to the only object i.e. banana
         # The target is as follows : (`label`, `xmin`, `ymin`, `xmax`, `ymax`)
         targets.append(list(target))
-
     return images, torch.tensor(targets).unsqueeze(1) / 256
 
 
-class BananasDataset(torch.utils.data.Dataset): #@save
+#@save
+class BananasDataset(torch.utils.data.Dataset):
     def __init__(self, is_train):
         self.features, self.labels = read_data_bananas(is_train)
         print('read ' + str(len(self.features)) + (f' training examples' if
@@ -92,13 +93,13 @@ class BananasDataset(torch.utils.data.Dataset): #@save
         return len(self.features)
 
 
-def load_data_bananas(batch_size): #@save
+#@save
+def load_data_bananas(batch_size):
     """Load the bananas dataset."""
     train_iter = torch.utils.data.DataLoader(BananasDataset(is_train=True),
                                              batch_size, shuffle=True)
     val_iter = torch.utils.data.DataLoader(BananasDataset(is_train=False),
                                            batch_size)
-
     return (train_iter, val_iter)
 ```
 
