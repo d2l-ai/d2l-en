@@ -587,15 +587,15 @@ enc_attention_weights.shape
 ```
 
 ```{.python .input}
-d2l.show_heatmaps(enc_attention_weights, xlabel='Key posistions',
-                  ylabel='Query posistions',
+d2l.show_heatmaps(enc_attention_weights, xlabel='Key positions',
+                  ylabel='Query positions',
                   titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
 ```
 
 ```{.python .input}
 #@tab pytorch
-d2l.show_heatmaps(enc_attention_weights.cpu(), xlabel='Key posistions',
-                  ylabel='Query posistions',
+d2l.show_heatmaps(enc_attention_weights.cpu(), xlabel='Key positions',
+                  ylabel='Query positions',
                   titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
 ```
 
@@ -631,14 +631,14 @@ dec_self_attention_weights.shape, dec_inter_attention_weights.shape
 # Plus one to include the beginning-of-sequence token
 d2l.show_heatmaps(
     dec_self_attention_weights[:, :, :, :len(translation.split()) + 1],
-    xlabel='Key posistions', ylabel='Query posistions',
+    xlabel='Key positions', ylabel='Query positions',
     titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
 ```
 
 ```{.python .input}
 #@tab all
-d2l.show_heatmaps(dec_inter_attention_weights, xlabel='Key posistions',
-                  ylabel='Query posistions',
+d2l.show_heatmaps(dec_inter_attention_weights, xlabel='Key positions',
+                  ylabel='Query positions',
                   titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
 ```
 
