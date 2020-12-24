@@ -1,36 +1,73 @@
 # Attention Functions
 :label:`sec_attention-functions`
 
-In :numref:`sec_seq2seq`, we encode the source sequence input information in the recurrent unit state and then pass it to the decoder to generate the target sequence. A token in the target sequence may closely relate to one or more tokens in the source sequence, instead of the whole source sequence. For example, when translating "Hello world." to "Bonjour le monde.", "Bonjour" maps to "Hello" and "monde" maps to "world". In the seq2seq model, the decoder may implicitly select the corresponding information from the state passed by the encoder. The attention mechanism, however, makes this selection explicit.
+In :numref:`sec_nadaraya-waston`,
+we used a Gaussian kernel to model
+interactions between queries and keys.
+Treating the exponent of the Gaussian kernel
+in :eqref:`eq_nadaraya-waston-gaussian`
+as an *attention function*,
+the results of this function were
+essentially fed into
+a softmax operation.
+As a result,
+we obtained
+a valid probability distribution (attention weights)
+over values that are paired with keys.
+In the end,
+the output of the attention pooling
+is simply a weighted sum of the values
+based on these attention weights.
 
+At a high level,
+we can use the above algorithm
+to instantiate the framework of attention mechanisms
+in :numref:`fig_qkv`.
+Denoting an attention function by $a$,
+:numref:`fig_attention_output`
+illustrates how the output of attention pooling
+can be computed as a weighted sum of values.
+Since attention weights are 
+a probability distribution,
+the weighted sum is essentially
+a weighted average.
 
-*Attention* is a generalized pooling method with bias alignment over inputs. The core component in the attention mechanism is the attention layer, or called *attention* for simplicity. An input of the attention layer is called a *query*. For a query, attention returns an output based on the memory---a set of key-value pairs encoded in the attention layer. To be more specific, assume that the memory contains $n$ key-value pairs, $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_n, \mathbf{v}_n)$, with $\mathbf{k}_i \in \mathbb R^{d_k}$, $\mathbf{v}_i \in \mathbb R^{d_v}$. Given a query $\mathbf{q} \in \mathbb R^{d_q}$, the attention layer returns an output $\mathbf{o} \in \mathbb R^{d_v}$ with the same shape as the value.
-
-![The attention layer returns an output based on the input query and its memory.](../img/attention.svg)
-:label:`fig_attention`
-
-
-The full process of attention mechanism is expressed in :numref:`fig_attention_output`. To compute the output of attention, we first use a score function $\alpha$ that measures the similarity between the query and the key. So for each key $\mathbf{k}_1, \ldots, \mathbf{k}_n$, we compute the scores $a_1, \ldots, a_n$ by
-
-$$a_i = \alpha(\mathbf q, \mathbf k_i).$$
-
-Next we use softmax to obtain the attention weights, i.e.,
-
-$$\mathbf{b} = \mathrm{softmax}(\mathbf{a})\quad \text{, where }\quad
-{b}_i = \frac{\exp(a_i)}{\sum_j \exp(a_j)}, \mathbf{b} = [b_1, \ldots, b_n]^T .$$
-
-
-Finally, the output is a weighted sum of the values:
-
-$$\mathbf o = \sum_{i=1}^n b_i \mathbf v_i.$$
-
-
-![The attention output is a weighted sum of the values.](../img/attention-output.svg)
+![Computing the output of attention pooling as a weighted average of values.](../img/attention-output.svg)
 :label:`fig_attention_output`
 
 
 
-Different choices of the score function lead to different attention layers. Below, we introduce two commonly used attention layers. Before diving into the implementation, we first express two operators to get you up and running: a masked version of the softmax operator `masked_softmax` and a specialized dot operator `batch_dot`.
+Mathematically,
+suppose that we have
+a query $\mathbf{q} \in \mathbb{R}^q$
+and $m$ key-value pairs $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)$, where any $\mathbf{k}_i \in \mathbb{R}^k$ and any $\mathbf{v}_i \in \mathbb{R}^v$.
+The output of the attention pooling
+is a weighted sum of the values:
+
+$$\sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
+
+where
+the attention weight scalar for the query $\mathbf{q}$
+and any key $\mathbf{k}_i$
+is computed by 
+the softmax operation of
+an attention function $a$ that maps two vectors to a scalar:
+
+$$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i)) = \frac{\exp(a(\mathbf{q}, \mathbf{k}_i))}{\sum_{j=1}^m \exp(a(\mathbf{q}, \mathbf{k}_j))} \in \mathbb{R}.$$
+
+As we can see,
+different choices of attention functions
+lead to different behaviors of attention pooling.
+In this section,
+we introduce two popular attention functions
+that we will use to develop more
+sophisticated attention mechanisms later.
+
+
+
+## Masked Softmax Operation
+
+Before diving into the implementation, we first express two operators to get you up and running: a masked version of the softmax operator `masked_softmax` and a specialized dot operator `batch_dot`.
 
 ```{.python .input}
 import math
