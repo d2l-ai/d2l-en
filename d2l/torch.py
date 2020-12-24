@@ -1446,6 +1446,19 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 
 
+# Defined in file: ./chapter_computational-performance/hybridize.md
+class Benchmark:
+    def __init__(self, description='Done'):
+        self.description = description
+
+    def __enter__(self):
+        self.timer = d2l.Timer()
+        return self
+
+    def __exit__(self, *args):
+        print(f'{self.description}: {self.timer.stop():.4f} sec')
+
+
 # Defined in file: ./chapter_computational-performance/multiple-gpus-concise.md
 def resnet18(num_classes, in_channels=1):
     """A slightly modified ResNet-18 model."""

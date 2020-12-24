@@ -1337,10 +1337,10 @@ def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
 
 
 # Defined in file: ./chapter_computational-performance/hybridize.md
-class Benchmark:    
+class Benchmark:
     def __init__(self, description='Done'):
         self.description = description
-        
+
     def __enter__(self):
         self.timer = d2l.Timer()
         return self
