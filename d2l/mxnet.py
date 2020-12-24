@@ -1483,26 +1483,51 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
-d2l.DATA_HUB['bananas'] = (d2l.DATA_URL + 'bananas.zip',
-                           'aadfd1c4c5d7178616799dd1801c9a234ccdaf19')
+d2l.DATA_HUB['banana-detection'] = (d2l.DATA_URL + 'banana-detection.zip',
+                           '5de26c8fce5ccdea9f91267273464dc968d20d72')
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
-def load_data_bananas(batch_size, edge_size=256):
+def read_data_bananas(is_train=True):
+    """Read the bananas dataset images and labels."""
+    data_dir = d2l.download_extract('banana-detection')
+    csv_fname = os.path.join(data_dir, 'bananas_train' if is_train
+                                    else 'bananas_val', 'label.csv')
+    csv_data = pd.read_csv(csv_fname)
+    csv_data = csv_data.set_index('img_name')
+    images, targets = [], []
+    for img_name, target in csv_data.iterrows():
+        images.append(image.imread(
+            os.path.join(data_dir, 'bananas_train' if is_train else
+                         'bananas_val', 'images', f'{img_name}')))
+        # Since all images have same object class i.e. category '0',
+        # the `label` column corresponds to the only object i.e. banana
+        # The target is as follows : (`label`, `xmin`, `ymin`, `xmax`, `ymax`)
+        targets.append(list(target))
+    return images, np.expand_dims(np.array(targets), 1) / 256
+
+
+class BananasDataset(gluon.data.Dataset):
+    def __init__(self, is_train):
+        self.features, self.labels = read_data_bananas(is_train)
+        print('read ' + str(len(self.features)) + (f' training examples' if
+              is_train else f' validation examples'))
+
+    def __getitem__(self, idx):
+        return (self.features[idx].astype('float32').transpose(2, 0, 1),
+                self.labels[idx])
+
+    def __len__(self):
+        return len(self.features)
+
+
+def load_data_bananas(batch_size):
     """Load the bananas dataset."""
-    data_dir = d2l.download_extract('bananas')
-    train_iter = image.ImageDetIter(
-        path_imgrec=os.path.join(data_dir, 'train.rec'),
-        path_imgidx=os.path.join(data_dir, 'train.idx'),
-        batch_size=batch_size,
-        data_shape=(3, edge_size, edge_size),  # The shape of the output image
-        shuffle=True,  # Read the dataset in random order
-        rand_crop=1,  # The probability of random cropping is 1
-        min_object_covered=0.95, max_attempts=200)
-    val_iter = image.ImageDetIter(
-        path_imgrec=os.path.join(data_dir, 'val.rec'), batch_size=batch_size,
-        data_shape=(3, edge_size, edge_size), shuffle=False)
-    return train_iter, val_iter
+    train_iter = gluon.data.DataLoader(BananasDataset(is_train=True),
+                                       batch_size, shuffle=True)
+    val_iter = gluon.data.DataLoader(BananasDataset(is_train=False),
+                                     batch_size)
+    return (train_iter, val_iter)
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
