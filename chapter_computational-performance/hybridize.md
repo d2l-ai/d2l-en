@@ -76,7 +76,7 @@ In practice this means that we build models using either the `HybridBlock` or th
 :end_tab:
 
 :begin_tab:`pytorch`
-As mentioned above, pytorch is based on imperative programming and uses Dynamic Computation Graphs. In an effort to leverage the portability and efficiency of symbolic programming, developers considered whether it would be possible to combine the benefits of both programming models. This led to a torchscript that lets users develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programs to be run when product-level computing performance and deployment are required.
+As mentioned above, PyTorch is based on imperative programming and uses dynamic computation graphs. In an effort to leverage the portability and efficiency of symbolic programming, developers considered whether it would be possible to combine the benefits of both programming models. This led to a torchscript that lets users develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programs to be run when product-level computing performance and deployment are required.
 :end_tab:
 
 ## HybridSequential
@@ -89,7 +89,7 @@ from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-# factory for networks
+# Factory for networks
 def get_net():
     net = nn.HybridSequential()  
     net.add(nn.Dense(256, activation='relu'),
@@ -109,7 +109,7 @@ from d2l import torch as d2l
 import torch
 from torch import nn
 
-# factory for networks
+# Factory for networks
 def get_net():
     net = nn.Sequential(nn.Linear(512, 256),
             nn.ReLU(),
