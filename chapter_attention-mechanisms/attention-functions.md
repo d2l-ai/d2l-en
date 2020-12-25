@@ -12,7 +12,7 @@ essentially fed into
 a softmax operation.
 As a result,
 we obtained
-a valid probability distribution (attention weights)
+a probability distribution (attention weights)
 over values that are paired with keys.
 In the end,
 the output of the attention pooling
@@ -47,8 +47,8 @@ is a weighted sum of the values:
 $$\sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
 
 where
-the attention weight scalar for the query $\mathbf{q}$
-and any key $\mathbf{k}_i$
+the attention weight (scalar) for the query $\mathbf{q}$
+and key $\mathbf{k}_i$
 is computed by 
 the softmax operation of
 an attention function $a$ that maps two vectors to a scalar:
@@ -56,18 +56,13 @@ an attention function $a$ that maps two vectors to a scalar:
 $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i)) = \frac{\exp(a(\mathbf{q}, \mathbf{k}_i))}{\sum_{j=1}^m \exp(a(\mathbf{q}, \mathbf{k}_j))} \in \mathbb{R}.$$
 
 As we can see,
-different choices of attention functions
+different choices of the attention function $a$
 lead to different behaviors of attention pooling.
 In this section,
 we introduce two popular attention functions
 that we will use to develop more
 sophisticated attention mechanisms later.
 
-
-
-## Masked Softmax Operation
-
-Before diving into the implementation, we first express two operators to get you up and running: a masked version of the softmax operator `masked_softmax` and a specialized dot operator `batch_dot`.
 
 ```{.python .input}
 import math
@@ -85,8 +80,28 @@ import torch
 from torch import nn
 ```
 
-The masked softmax takes a 3-dimensional input and enables us to filter out some elements by specifying a valid length for the last dimension. (Refer to
-:numref:`sec_machine_translation` for the definition of a valid length.) As a result, any value outside the valid length will be masked as $0$. Let us implement the `masked_softmax` function.
+## Masked Softmax Operation
+
+As we just mentioned,
+a softmax operation is used to 
+output a probability distribution as attention weights.
+In some cases,
+not all the values should be fed into attention pooling.
+For instance,
+for efficient minibatch processing in :numref:`sec_machine_translation`,
+some text sequences are padded with
+special tokens that do not carry meaning.
+To get an attention pooling
+over 
+only meaningful tokens as values,
+we can specify a valid sequence length (in number of tokens)
+to filter out those beyond this specified range
+when computing softmax.
+In this way,
+we can implement such a *masked softmax operation*
+in the following `masked_softmax` function,
+where any value beyond the valid length
+is masked as zero.
 
 ```{.python .input}
 #@save
@@ -129,7 +144,13 @@ def masked_softmax(X, valid_lens):
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 ```
 
-To illustrate how this function works, we construct two $2 \times 4$ matrices as the input. In addition, we specify that the valid length equals to 2 for the first example, and 3 for the second example. Then, as we can see from the following outputs, the values outside valid lengths are masked as zero.
+To demonstrate how this function works,
+consider a minibatch of two $2 \times 4$ matrix examples,
+where the valid lengths for these two examples
+are two and three, respectively.
+As a result of the masked softmax operation,
+values beyond the valid lengths
+are all masked as zero.
 
 ```{.python .input}
 masked_softmax(np.random.uniform(size=(2, 2, 4)), d2l.tensor([2, 3]))
@@ -140,7 +161,10 @@ masked_softmax(np.random.uniform(size=(2, 2, 4)), d2l.tensor([2, 3]))
 masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3]))
 ```
 
-Similarly, we can pass a 2D tensor via the `valid_lens` argument.
+Similarly, we can also 
+use a two-dimensional tensor
+to specify valid lengths 
+for every row in each matrix example.
 
 ```{.python .input}
 masked_softmax(np.random.uniform(size=(2, 2, 4)),

@@ -1,8 +1,7 @@
 # Attention Cues
 :label:`sec_attention-cues`
 
-First and foremost,
-thank you for your attention
+Thank you for your attention
 to this book.
 Attention is a scarce resource:
 at the moment
