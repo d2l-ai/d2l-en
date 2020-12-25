@@ -1,5 +1,5 @@
 # Attention Scoring Functions
-:label:`sec_attention-functions`
+:label:`sec_attention-scoring-functions`
 
 In :numref:`sec_nadaraya-waston`,
 we used a Gaussian kernel to model
@@ -27,7 +27,7 @@ Denoting an attention scoring function by $a$,
 :numref:`fig_attention_output`
 illustrates how the output of attention pooling
 can be computed as a weighted sum of values.
-Since attention weights are 
+Since attention weights are
 a probability distribution,
 the weighted sum is essentially
 a weighted average.
@@ -49,7 +49,7 @@ $$\sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
 where
 the attention weight (scalar) for the query $\mathbf{q}$
 and key $\mathbf{k}_i$
-is computed by 
+is computed by
 the softmax operation of
 an attention scoring function $a$ that maps two vectors to a scalar:
 
@@ -82,7 +82,7 @@ from torch import nn
 ## Masked Softmax Operation
 
 As we just mentioned,
-a softmax operation is used to 
+a softmax operation is used to
 output a probability distribution as attention weights.
 In some cases,
 not all the values should be fed into attention pooling.
@@ -91,7 +91,7 @@ for efficient minibatch processing in :numref:`sec_machine_translation`,
 some text sequences are padded with
 special tokens that do not carry meaning.
 To get an attention pooling
-over 
+over
 only meaningful tokens as values,
 we can specify a valid sequence length (in number of tokens)
 to filter out those beyond this specified range
@@ -160,9 +160,9 @@ masked_softmax(np.random.uniform(size=(2, 2, 4)), d2l.tensor([2, 3]))
 masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3]))
 ```
 
-Similarly, we can also 
+Similarly, we can also
 use a two-dimensional tensor
-to specify valid lengths 
+to specify valid lengths
 for every row in each matrix example.
 
 ```{.python .input}
@@ -189,7 +189,7 @@ $$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + 
 :eqlabel:`eq_additive-attn`
 
 where
-learnable parameters 
+learnable parameters
 $\mathbf W_q\in\mathbb R^{h\times q}$, $\mathbf W_k\in\mathbb R^{h\times k}$, and $\mathbf w_v\in\mathbb R^{h}$.
 Equivalent to :eqref:`eq_additive-attn`,
 the query and the key are concatenated
@@ -307,12 +307,12 @@ d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
 
 ## Scaled Dot-Product Attention
 
-A more computationally efficient 
+A more computationally efficient
 design for the scoring function can be
 simply dot product.
 However,
 the dot product operation
-requires that both the query and the key 
+requires that both the query and the key
 have the same vector length, say $d$.
 Assume that
 all the elements of the query and the key
@@ -392,7 +392,7 @@ class DotProductAttention(nn.Module):
 
 To demonstrate the above `DotProductAttention` class,
 we use the same keys, values, and valid lengths from the earlier toy example
-for additive attention. 
+for additive attention.
 For the dot product operation,
 we make the feature size of queries
 the same as that of keys.
