@@ -59,8 +59,8 @@ and reinforcement learning.
 
 attention-cues
 nadaraya-waston
-attention-functions
-seq2seq-attention
+attention-scoring-functions
+bahdanau-attention
 multihead-attention
 self-attention-and-positional-encoding
 transformer

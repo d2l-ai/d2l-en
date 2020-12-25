@@ -1003,7 +1003,7 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
     fig.colorbar(pcm, ax=axes, shrink=0.6);
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention-functions.md
+# Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
 def masked_softmax(X, valid_lens):
     """Perform softmax operation by masking elements on the last axis."""
     # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
@@ -1022,7 +1022,7 @@ def masked_softmax(X, valid_lens):
         return npx.softmax(X).reshape(shape)
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention-functions.md
+# Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
 class AdditiveAttention(nn.Block):
     """Additive attention."""
     def __init__(self, num_hiddens, dropout, **kwargs):
@@ -1053,9 +1053,9 @@ class AdditiveAttention(nn.Block):
         return npx.batch_dot(self.dropout(self.attention_weights), values)
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention-functions.md
+# Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
 class DotProductAttention(nn.Block):
-    """Dot product attention."""
+    """Scaled dot product attention."""
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
@@ -1073,7 +1073,7 @@ class DotProductAttention(nn.Block):
         return npx.batch_dot(self.dropout(self.attention_weights), values)
 
 
-# Defined in file: ./chapter_attention-mechanisms/seq2seq-attention.md
+# Defined in file: ./chapter_attention-mechanisms/bahdanau-attention.md
 class AttentionDecoder(d2l.Decoder):
     """The base attention-based decoder interface."""
     def __init__(self, **kwargs):

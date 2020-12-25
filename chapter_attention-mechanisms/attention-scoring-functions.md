@@ -1,4 +1,4 @@
-# Attention Functions
+# Attention Scoring Functions
 :label:`sec_attention-functions`
 
 In :numref:`sec_nadaraya-waston`,
@@ -6,7 +6,7 @@ we used a Gaussian kernel to model
 interactions between queries and keys.
 Treating the exponent of the Gaussian kernel
 in :eqref:`eq_nadaraya-waston-gaussian`
-as an *attention function*,
+as an *attention scoring function* (or *scoring function* for short),
 the results of this function were
 essentially fed into
 a softmax operation.
@@ -23,7 +23,7 @@ At a high level,
 we can use the above algorithm
 to instantiate the framework of attention mechanisms
 in :numref:`fig_qkv`.
-Denoting an attention function by $a$,
+Denoting an attention scoring function by $a$,
 :numref:`fig_attention_output`
 illustrates how the output of attention pooling
 can be computed as a weighted sum of values.
@@ -51,15 +51,15 @@ the attention weight (scalar) for the query $\mathbf{q}$
 and key $\mathbf{k}_i$
 is computed by 
 the softmax operation of
-an attention function $a$ that maps two vectors to a scalar:
+an attention scoring function $a$ that maps two vectors to a scalar:
 
 $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i)) = \frac{\exp(a(\mathbf{q}, \mathbf{k}_i))}{\sum_{j=1}^m \exp(a(\mathbf{q}, \mathbf{k}_j))} \in \mathbb{R}.$$
 
 As we can see,
-different choices of the attention function $a$
+different choices of the attention scoring function $a$
 lead to different behaviors of attention pooling.
 In this section,
-we introduce two popular attention functions
+we introduce two popular scoring functions
 that we will use to develop more
 sophisticated attention mechanisms later.
 
@@ -179,11 +179,11 @@ masked_softmax(torch.rand(2, 2, 4), d2l.tensor([[1, 3], [2, 4]]))
 
 In general,
 when queries and keys are vectors of different lengths,
-we can use *additive attention*
-as the attention function.
+we can use additive attention
+as the scoring function.
 Given a query $\mathbf{q} \in \mathbb{R}^q$
 and a key $\mathbf{k} \in \mathbb{R}^k$,
-the additive attention function
+the *additive attention* scoring function
 
 $$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$$
 :eqlabel:`eq_additive-attn`
@@ -268,9 +268,6 @@ are ($2$, $1$, $20$), ($2$, $10$, $2$),
 and ($2$, $10$, $4$), respectively.
 The attention pooling output
 has a shape of (batch size, number of steps for queries, feature size for values).
-Although additive attention contains learnable parameters,
-since every key is the same in this example,
-the attention weights are uniform.
 
 ```{.python .input}
 queries, keys = d2l.normal(0, 1, (2, 1, 20)), d2l.ones((2, 10, 2))
@@ -297,24 +294,63 @@ attention.eval()
 attention(queries, keys, values, valid_lens)
 ```
 
+Although additive attention contains learnable parameters,
+since every key is the same in this example,
+the attention weights are uniform,
+determined by the specified valid lengths.
+
+```{.python .input}
+#@tab all
+d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
+                  xlabel='Keys', ylabel='Queries')
+```
+
 ## Scaled Dot-Product Attention
 
-Equipped with the above `masked_softmax` function and the batch multiplication operator as described in :numref:`subsec_batch_dot`, let us dive into the details of two widely used attention layers. The first one is the *scaled dot product attention*: it assumes that the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. The dot product attention computes the scores by a dot product between the query and a key, which is then divided by $\sqrt{d}$ to minimize the unrelated influence of the dimension $d$ on the scores. In other words,
+A more computationally efficient 
+design for the scoring function can be
+simply dot product.
+However,
+the dot product operation
+requires that both the query and the key 
+have the same vector length, say $d$.
+Assume that
+all the elements of the query and the key
+are independent random variables
+with zero mean and unit variance.
+The dot product of
+both vectors has zero mean and a variance of $d$.
+To ensure that the variance of the dot product
+still remains one regardless of vector length,
+the *scaled dot-product attention* scoring function
 
-$$\alpha(\mathbf q, \mathbf k) = \langle \mathbf q, \mathbf k \rangle /\sqrt{d}.$$
+
+$$a(\mathbf q, \mathbf k) = \mathbf{q}^\top \mathbf{k}  /\sqrt{d}$$
+
+divides the dot product by $\sqrt{d}$.
+In practice,
+we often think in minibatches
+for efficiency,
+such as computing attention
+for
+$n$ queries and $m$ key-value pairs,
+where queries and keys are of length $d$
+and values are of length $v$.
+The scaled dot-product attention
+of queries $\mathbf Q\in\mathbb R^{n\times d}$,
+keys $\mathbf K\in\mathbb R^{m\times d}$,
+and values $\mathbf V\in\mathbb R^{m\times v}$
+is
 
 
-Beyond the single-dimensional queries and keys, we can always generalize them to multi-dimensional queries and keys. Assume that $\mathbf Q\in\mathbb R^{m\times d}$ contains $m$ queries and $\mathbf K\in\mathbb R^{n\times d}$ has all the $n$ keys. We can compute all $mn$ scores by
+$$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}.$$
 
-$$\alpha(\mathbf Q, \mathbf K) = \mathbf Q \mathbf K^\top /\sqrt{d}.$$
-:eqlabel:`eq_alpha_QK`
-
-With :eqref:`eq_alpha_QK`, we can implement the dot product attention layer `DotProductAttention` that supports a batch of queries and key-value pairs. In addition, for regularization we also use a dropout layer.
+In the following implementation of the scaled dot product attention, we use dropout for model regularization.
 
 ```{.python .input}
 #@save
 class DotProductAttention(nn.Block):
-    """Dot product attention."""
+    """Scaled dot product attention."""
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
@@ -336,7 +372,7 @@ class DotProductAttention(nn.Block):
 #@tab pytorch
 #@save
 class DotProductAttention(nn.Module):
-    """Dot product attention."""
+    """Scaled dot product attention."""
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
@@ -354,14 +390,15 @@ class DotProductAttention(nn.Module):
         return torch.bmm(self.dropout(self.attention_weights), values)
 ```
 
-Let us test the class `DotProductAttention` in a toy example.
-First, create two batches, where each batch has one query and 10 key-value pairs.
-Via the `valid_lens` argument,
-we specify that we will check the first $2$ key-value pairs for the first batch and $6$ for the second one. Therefore, even though both batches have the same query and key-value pairs, we obtain different outputs.
-Since every key is the same, the attention weights are uniform.
+To demonstrate the above `DotProductAttention` class,
+we use the same keys, values, and valid lengths from the earlier toy example
+for additive attention. 
+For the dot product operation,
+we make the feature size of queries
+the same as that of keys.
 
 ```{.python .input}
-queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
+queries = d2l.normal(0, 1, (2, 1, 2))
 attention = DotProductAttention(dropout=0.5)
 attention.initialize()
 attention(queries, keys, values, valid_lens)
@@ -369,28 +406,35 @@ attention(queries, keys, values, valid_lens)
 
 ```{.python .input}
 #@tab pytorch
-queries, keys = d2l.normal(0, 1, (2, 1, 2)), d2l.ones((2, 10, 2))
+queries = d2l.normal(0, 1, (2, 1, 2))
 attention = DotProductAttention(dropout=0.5)
 attention.eval()
 attention(queries, keys, values, valid_lens)
 ```
 
-As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension.
-To address such an issue,
-we may resort to the additive attention.
+Same as in the additive attention demonstration,
+since `keys` contains the same element
+that cannot be differentiated by any query,
+uniform attention weights are obtained.
 
+```{.python .input}
+#@tab all
+d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
+                  xlabel='Keys', ylabel='Queries')
+```
 
 ## Summary
 
-* An attention layer explicitly selects related information.
-* An attention layer's memory consists of key-value pairs, so its output is close to the values whose keys are similar to the queries.
-* Two commonly used attention models are dot product attention and MLP attention.
+* We can compute the output of attention pooling as a weighted average of values, where different choices of the attention scoring function lead to different behaviors of attention pooling.
+* When queries and keys are vectors of different lengths, we can use the additive attention scoring function. When they are the same, the scaled dot-product attention scoring function is more computationally efficient.
+
 
 
 ## Exercises
 
-1. Visualize attention weights like in :numref:`sec_nadaraya-waston`.
-1. What are the advantages and disadvantages for dot product attention and MLP attention, respectively?
+1. Modify keys in the toy example and visualize attention weights. Do additive attention and scaled dot-product attention still output the same attention weights? Why or why not?
+1. Using matrix multiplications only, can you design a new scoring function for queries and keys with different vector lengths?
+1. When queries and keys have the same vector length, is vector summation a better design than dot product for the scoring function? Why or why not?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/346)
