@@ -63,7 +63,6 @@ we introduce two popular attention functions
 that we will use to develop more
 sophisticated attention mechanisms later.
 
-
 ```{.python .input}
 import math
 from d2l import mxnet as d2l
@@ -178,12 +177,27 @@ masked_softmax(torch.rand(2, 2, 4), d2l.tensor([[1, 3], [2, 4]]))
 
 ## Additive Attention
 
-In *additive attention*, we project both query and keys into $\mathbb R^{h}$ by learnable weights parameters.
-Assume that the learnable weights are $\mathbf W_k\in\mathbb R^{h\times d_k}$, $\mathbf W_q\in\mathbb R^{h\times d_q}$, and $\mathbf v\in\mathbb R^{h}$. Then the score function is defined by
+In general,
+when queries and keys are vectors of different lengths,
+we can use *additive attention*
+as the attention function.
+Given a query $\mathbf{q} \in \mathbb{R}^q$
+and a key $\mathbf{k} \in \mathbb{R}^k$,
+the additive attention function
 
-$$\alpha(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k).$$
+$$a(\mathbf q, \mathbf k) = \mathbf w_v^\top \text{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R},$$
+:eqlabel:`eq_additive-attn`
 
-Intuitively, you can imagine $\mathbf W_q\mathbf q + \mathbf W_k \mathbf k$ as concatenating the key and value in the feature dimension and feeding them to a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. In this hidden layer, the activation function is $\tanh$ and no bias is applied. Now let us implement the MLP attention.
+where
+learnable parameters 
+$\mathbf W_q\in\mathbb R^{h\times q}$, $\mathbf W_k\in\mathbb R^{h\times k}$, and $\mathbf w_v\in\mathbb R^{h}$.
+Equivalent to :eqref:`eq_additive-attn`,
+the query and the key are concatenated
+and fed into an MLP with a single hidden layer
+whose number of hidden units is $h$, a hyperparameter.
+By using $\tanh$ as the activation function and disabling
+bias terms,
+we implement additive attention in the following.
 
 ```{.python .input}
 #@save
@@ -246,9 +260,17 @@ class AdditiveAttention(nn.Module):
         return torch.bmm(self.dropout(self.attention_weights), values)
 ```
 
-To test the above `AdditiveAttention` class, we use the same inputs as in the previous toy example.
-Recall that since every key is the same, the attention weights are uniform.
-As we can see below, though `AdditiveAttention` contains an additional MLP model, we obtain the same output as for `AdditiveAttention`.
+Let us demonstrate the above `AdditiveAttention` class
+with a toy example,
+where shapes (batch size, number of steps or sequence length in tokens, feature size)
+of queries, keys, and values
+are ($2$, $1$, $20$), ($2$, $10$, $2$),
+and ($2$, $10$, $4$), respectively.
+The attention pooling output
+has a shape of (batch size, number of steps for queries, feature size for values).
+Although additive attention contains learnable parameters,
+since every key is the same in this example,
+the attention weights are uniform.
 
 ```{.python .input}
 queries, keys = d2l.normal(0, 1, (2, 1, 20)), d2l.ones((2, 10, 2))
@@ -367,6 +389,7 @@ we may resort to the additive attention.
 
 ## Exercises
 
+1. Visualize attention weights like in :numref:`sec_nadaraya-waston`.
 1. What are the advantages and disadvantages for dot product attention and MLP attention, respectively?
 
 :begin_tab:`mxnet`

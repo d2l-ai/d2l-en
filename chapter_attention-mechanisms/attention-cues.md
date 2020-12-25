@@ -138,7 +138,6 @@ so that the given query (volitional cue) can interact with keys (nonvolitional c
 which guides bias selection over values (sensory inputs).
 
 ![Attention mechanisms bias selection over values (sensory inputs) via attention pooling, which incorporates queries (volitional cues) and keys (nonvolitional cues).](../img/qkv.svg)
-:width:`400px`
 :label:`fig_qkv`
 
 Note that there are many alternatives for the design of attention mechanisms.
