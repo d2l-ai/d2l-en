@@ -21,7 +21,7 @@ of the encoder-decoder architecture,
 the RNN encoder can
 take a variable-length sequence as the input and transforms it into a fixed-shape hidden state.
 In other words,
-information of the input sequence
+information of the input (source) sequence
 is *encoded* in the hidden state of the RNN encoder.
 To generate the output sequence token by token,
 a separate RNN decoder
@@ -51,7 +51,7 @@ to initiate the hidden state of the decoder.
 In designs such as :cite:`Sutskever.Vinyals.Le.2014`,
 this is exactly
 how the encoded input sequence information
-is fed into the decoder for generating the output sequence.
+is fed into the decoder for generating the output (target) sequence.
 In some other designs such as :cite:`Cho.Van-Merrienboer.Gulcehre.ea.2014`,
 the final hidden state of the encoder
 is also fed into the decoder as
@@ -271,6 +271,7 @@ hidden state $\mathbf{s}_{t^\prime}$ at the current time step.
 As a result, we can use a function $g$ to express the transformation of the decoder's hidden layer:
 
 $$\mathbf{s}_{t^\prime} = g(y_{t^\prime-1}, \mathbf{c}, \mathbf{s}_{t^\prime-1}).$$
+:eqlabel:`eq_seq2seq_s_t`
 
 After obtaining the hidden state of the decoder,
 we can use an output layer and the softmax operation to compute the conditional probability distribution

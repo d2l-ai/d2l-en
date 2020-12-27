@@ -13,13 +13,13 @@ a variable-length sequence
 into a fixed-shape context variable,
 then
 the RNN decoder
-generates the target (output) sequence token by token
+generates the output (target) sequence token by token
 based on the generated tokens and the context variable.
 However,
-even though not all the source tokens
+even though not all the input (source) tokens
 are useful for decoding every token,
 the *same* context variable
-that encodes the entire source (input) sequence
+that encodes the entire input sequence
 is used at each decoding step.
 
 
@@ -32,46 +32,53 @@ Inspired by the idea of learning to align,
 Bahdanau et al. proposed a differentiable attention model
 without the severe unidirectional alignment limitation :cite:`Bahdanau.Cho.Bengio.2014`.
 When predicting a token,
-if not all the source tokens are relevant,
+if not all the input tokens are relevant,
 the model aligns (or pays attention)
-only to parts of the source sequence that are relevant to the current prediction
+only to parts of the input sequence that are relevant to the current prediction
 by treating the context variable as an output of attention pooling.
 
 
 
 ## Model
 
-Specifically,
-*Bahdanau attention* uses
-additive attention scoring function
-in :numref:`subsec_additive-attention`.
+We will describe 
+Bahdanau attention
+for the RNN encoder-decoder
+by following the same notation in
+:numref:`sec_seq2seq`.
+The new model
+is the same as that
+in :numref:`sec_seq2seq`
+except that
+the context variable
+$\mathbf{c}$
+in 
+:eqref:`eq_seq2seq_s_t`
+is replaced by
+$\mathbf{c}_{t'}$
+at any decoding time step $t'$.
+
+Suppose that
+there are $T$ tokens in the input sequence,
+the context variable at the decoding time step $t'$
+is the output of additive attention pooling in :numref:`subsec_additive-attention`:
+
+$$\mathbf{c}_{t'} = \sum_{t=1}^T \alpha(\mathbf{s}_{t' - 1}, \mathbf{h}_t) \mathbf{h}_t,$$
+
+where the decoder hidden state
+$\mathbf{s}_{t' - 1}$ at time step $t' - 1$
+is the query,
+and the encoder hidden states $\mathbf{h}_t$
+are both the keys and the values.
+The overall architecture
+of the RNN encoder-decoder architecture 
+in :numref:`fig_seq2seq_details`
+with Bahdanau attention is shown in 
+:numref:`fig_s2s_attention_details`.
 
 
-
-To illustrate the overall architecture of seq2seq with attention model, the layer structure of its encoder and decoder is shown in :numref:`fig_s2s_attention_details`.
-
-![The layers in the sequence to sequence model with attention mechanism.](../img/seq2seq-attention-details.svg)
+![Layers in an RNN encoder-decoder model with Bahdanau attention.](../img/seq2seq-attention-details.svg)
 :label:`fig_s2s_attention_details`
-
-
-
-
-
-In this section, we add the attention mechanism to the sequence to sequence (seq2seq)
-model as introduced in :numref:`sec_seq2seq`
-to explicitly aggregate states with weights.
-:numref:`fig_s2s_attention` shows the model
-architecture for encoding and decoding at the time step $t$. Here, the memory of the
-attention layer consists of all the information that the encoder has
-seen---the encoder output at each time step.
-During the decoding, the decoder output from the previous time step $t-1$ is used as the query.
-The output of the attention model is viewed as the context information, and such context is concatenated with the decoder input $D_t$.
-Finally, we feed the concatenation into the decoder.
-
-![The second time step in decoding for the sequence to sequence model with attention mechanism.](../img/seq2seq-attention.svg)
-:label:`fig_s2s_attention`
-
-
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -89,17 +96,6 @@ from torch import nn
 
 ## Decoder
 
-Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEncoder` in :numref:`sec_seq2seq`, we will just focus on the decoder. We add an MLP attention layer (`AdditiveAttention`) which has the same hidden size as the GRU layer in the decoder. Then we initialize the state of the decoder by passing three items from the encoder:
-
-- **the encoder outputs of all time steps**: they are used as the attention layer's memory with identical keys and values;
-
-- **the hidden state of the encoder's final time step**: it is used as the initial decoder's hidden state;
-
-- **the encoder valid length**: so the attention layer will not consider the padding tokens within the encoder outputs.
-
-At each time step of the decoding, we use the hidden state of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Although the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on `enc_valid_lens`, so that the attention output suspends other irrelevant information.
-
-Let us implement the `Seq2SeqAttentionDecoder`, and see how it differs from the decoder in seq2seq from :numref:`sec_seq2seq_decoder`.
 
 ```{.python .input}
 #@tab all
@@ -119,6 +115,18 @@ class AttentionDecoder(d2l.Decoder):
     def attention_weights(self):
         raise NotImplementedError
 ```
+
+Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEncoder` in :numref:`sec_seq2seq`, we will just focus on the decoder. We add an MLP attention layer (`AdditiveAttention`) which has the same hidden size as the GRU layer in the decoder. Then we initialize the state of the decoder by passing three items from the encoder:
+
+- **the encoder outputs of all time steps**: they are used as the attention layer's memory with identical keys and values;
+
+- **the hidden state of the encoder's final time step**: it is used as the initial decoder's hidden state;
+
+- **the encoder valid length**: so the attention layer will not consider the padding tokens within the encoder outputs.
+
+At each time step of the decoding, we use the hidden state of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Although the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on `enc_valid_lens`, so that the attention output suspends other irrelevant information.
+
+Let us implement the `Seq2SeqAttentionDecoder`, and see how it differs from the decoder in seq2seq from :numref:`sec_seq2seq_decoder`.
 
 ```{.python .input}
 class Seq2SeqAttentionDecoder(AttentionDecoder):
