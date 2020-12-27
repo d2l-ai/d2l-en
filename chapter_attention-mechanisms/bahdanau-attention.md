@@ -61,7 +61,7 @@ at any decoding time step $t'$.
 Suppose that
 there are $T$ tokens in the input sequence,
 the context variable at the decoding time step $t'$
-is the output of additive attention pooling in :numref:`subsec_additive-attention`:
+is the output of attention pooling:
 
 $$\mathbf{c}_{t'} = \sum_{t=1}^T \alpha(\mathbf{s}_{t' - 1}, \mathbf{h}_t) \mathbf{h}_t,$$
 
@@ -69,7 +69,15 @@ where the decoder hidden state
 $\mathbf{s}_{t' - 1}$ at time step $t' - 1$
 is the query,
 and the encoder hidden states $\mathbf{h}_t$
-are both the keys and the values.
+are both the keys and the values,
+and the attention weight $\alpha$
+is computed as in
+:eqref:`eq_attn-scoring-alpha`
+using the additive attention scoring function
+defined by
+:eqref:`eq_additive-attn`.
+
+
 The overall architecture
 of the RNN encoder-decoder architecture 
 in :numref:`fig_seq2seq_details`
@@ -95,7 +103,6 @@ from torch import nn
 ```
 
 ## Decoder
-
 
 ```{.python .input}
 #@tab all

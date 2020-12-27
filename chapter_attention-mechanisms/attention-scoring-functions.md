@@ -54,6 +54,7 @@ the softmax operation of
 an attention scoring function $a$ that maps two vectors to a scalar:
 
 $$\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i)) = \frac{\exp(a(\mathbf{q}, \mathbf{k}_i))}{\sum_{j=1}^m \exp(a(\mathbf{q}, \mathbf{k}_j))} \in \mathbb{R}.$$
+:eqlabel:`eq_attn-scoring-alpha`
 
 As we can see,
 different choices of the attention scoring function $a$
