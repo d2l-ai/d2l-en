@@ -112,12 +112,6 @@ class AttentionDecoder(d2l.Decoder):
     def __init__(self, **kwargs):
         super(AttentionDecoder, self).__init__(**kwargs)
 
-    def init_state(self, enc_outputs, *args):
-        raise NotImplementedError
-
-    def forward(self, X, state):
-        raise NotImplementedError
-
     @property
     def attention_weights(self):
         raise NotImplementedError
