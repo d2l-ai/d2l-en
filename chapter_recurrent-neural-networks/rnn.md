@@ -186,8 +186,10 @@ we aim to predict the next token based on
 the current and past tokens,
 thus we shift the original sequence by one token
 as the labels.
-Now we illustrate how RNNs can be used to build a language model. 
-Let the minibatch size be 1, and the sequence of the text be "machine".
+Bengio et al. first proposed
+to use a neural network for language modeling :cite:`Bengio.Ducharme.Vincent.ea.2003`.
+In the following we illustrate how RNNs can be used to build a language model.
+Let the minibatch size be one, and the sequence of the text be "machine".
 To simplify training in subsequent sections,
 we tokenize text into characters rather than words
 and consider a *character-level language model*.

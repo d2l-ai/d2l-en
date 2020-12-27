@@ -17,10 +17,10 @@ generates the output (target) sequence token by token
 based on the generated tokens and the context variable.
 However,
 even though not all the input (source) tokens
-are useful for decoding every token,
+are useful for decoding a certain token,
 the *same* context variable
 that encodes the entire input sequence
-is used at each decoding step.
+is still used at each decoding step.
 
 
 In a separate but related
@@ -34,7 +34,8 @@ without the severe unidirectional alignment limitation :cite:`Bahdanau.Cho.Bengi
 When predicting a token,
 if not all the input tokens are relevant,
 the model aligns (or pays attention)
-only to parts of the input sequence that are relevant to the current prediction
+only to parts of the input sequence that are relevant to the current prediction.
+This is achieved
 by treating the context variable as an output of attention pooling.
 
 
