@@ -176,6 +176,7 @@ masked_softmax(torch.rand(2, 2, 4), d2l.tensor([[1, 3], [2, 4]]))
 ```
 
 ## Additive Attention
+:label:`subsec_additive-attention`
 
 In general,
 when queries and keys are vectors of different lengths,

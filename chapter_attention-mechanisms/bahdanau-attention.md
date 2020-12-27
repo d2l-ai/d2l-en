@@ -1,15 +1,61 @@
 # Bahdanau Attention
 :label:`sec_seq2seq_attention`
 
+We studied the machine translation
+problem in :numref:`sec_seq2seq`,
+where we designed
+an encoder-decoder architecture based on two RNNs
+for sequence to sequence learning.
+Specifically,
+the RNN encoder 
+transforms
+a variable-length sequence
+into a fixed-shape context variable,
+then
+the RNN decoder
+generates the target (output) sequence token by token
+based on the generated tokens and the context variable.
+However,
+even though not all the source tokens
+are useful for decoding every token,
+the *same* context variable
+that encodes the entire source (input) sequence
+is used at each decoding step.
 
-Graves proposed the first attention model (though it is not called "attention" in the paper) in a differentiable fashion to address the challenge of handwriting generation for a given text sequence :cite:`Graves.2013`.
-Since pen trace is usually much longer than text,
-Graves's attention model aligns text characters with the pen trace, however, only in one direction.
+
+In a separate but related
+challenge of handwriting generation for a given text sequence,
+Graves designed a differentiable attention model
+to align text characters with the much longer pen trace,
+where the alignment moves only in one direction :cite:`Graves.2013`.
+Inspired by the idea of learning to align,
+Bahdanau et al. proposed a differentiable attention model
+without the severe unidirectional alignment limitation :cite:`Bahdanau.Cho.Bengio.2014`.
+When predicting a token,
+if not all the source tokens are relevant,
+the model aligns (or pays attention)
+only to parts of the source sequence that are relevant to the current prediction
+by treating the context variable as an output of attention pooling.
+
+
+
+## Model
+
+Specifically,
+*Bahdanau attention* uses
+additive attention scoring function
+in :numref:`subsec_additive-attention`.
+
+
+
+To illustrate the overall architecture of seq2seq with attention model, the layer structure of its encoder and decoder is shown in :numref:`fig_s2s_attention_details`.
+
+![The layers in the sequence to sequence model with attention mechanism.](../img/seq2seq-attention-details.svg)
+:label:`fig_s2s_attention_details`
 
 
 
 
-## Bahdanau Attention
 
 In this section, we add the attention mechanism to the sequence to sequence (seq2seq)
 model as introduced in :numref:`sec_seq2seq`
@@ -26,10 +72,6 @@ Finally, we feed the concatenation into the decoder.
 :label:`fig_s2s_attention`
 
 
-To illustrate the overall architecture of seq2seq with attention model, the layer structure of its encoder and decoder is shown in :numref:`fig_s2s_attention_details`.
-
-![The layers in the sequence to sequence model with attention mechanism.](../img/seq2seq-attention-details.svg)
-:label:`fig_s2s_attention_details`
 
 ```{.python .input}
 from d2l import mxnet as d2l
