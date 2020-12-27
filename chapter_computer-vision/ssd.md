@@ -554,7 +554,7 @@ Using the `MultiBoxDetection` function, we predict the bounding boxes based on t
 def predict(X):
     anchors, cls_preds, bbox_preds = net(X.as_in_ctx(device))
     cls_probs = npx.softmax(cls_preds).transpose(0, 2, 1)
-    output = npx.multibox_detection(cls_probs, bbox_preds, anchors)
+    output = d2l.multibox_detection(cls_probs, bbox_preds, anchors)
     idx = [i for i, row in enumerate(output[0]) if row[0] != -1]
     return output[0, idx]
 
