@@ -9,7 +9,6 @@ First, import the packages or modules required for this section. Here, we have m
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import gluon, image, np, npx
-from mxnet.ndarray.contrib import box_iou
 
 np.set_printoptions(2)
 npx.set_np()
