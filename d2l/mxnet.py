@@ -1483,6 +1483,42 @@ def bbox_to_rect(bbox, color):
 
 
 # Defined in file: ./chapter_computer-vision/anchor.md
+def multibox_prior(data, sizes, ratios):
+    in_height, in_width = data.shape[-2:]
+    device, num_sizes, num_ratios = data.ctx, len(sizes), len(ratios)
+    boxes_per_pixel = (num_sizes + num_ratios - 1)
+    size_tensor = d2l.tensor(sizes, ctx=device)
+    ratio_tensor = d2l.tensor(ratios, ctx=device)
+    # Offsets are required to move the anchor to center of a pixel
+    # Since pixel (height=1, width=1), we choose to offset our centers by 0.5
+    offset_h, offset_w = 0.5, 0.5
+    steps_h = 1.0 / in_height  # Scaled steps in y axis
+    steps_w = 1.0 / in_width  # Scaled steps in x axis
+
+    # Generate all center points for the anchor boxes
+    center_h = (d2l.arange(in_height, ctx=device) + offset_h) * steps_h
+    center_w = (d2l.arange(in_width, ctx=device) + offset_w) * steps_w
+    shift_x, shift_y = d2l.meshgrid(center_w, center_h)
+    shift_x, shift_y = shift_x.reshape(-1), shift_y.reshape(-1)
+
+    # Generate boxes_per_pixel number of heights and widths which are later
+    # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
+    w = d2l.concat((size_tensor, sizes[0] * np.sqrt(ratio_tensor[1:])))\
+                * in_height / in_width / 2
+    h = d2l.concat((size_tensor, sizes[0] / np.sqrt(ratio_tensor[1:]))) / 2
+    anchor_manipulations = np.tile(d2l.stack((-w, -h, w, h)).T,
+                                   (in_height * in_width, 1))
+
+    # Each center point will have boxes_per_pixel number of anchor boxes, so
+    # generate grid of all anchor box centers with boxes_per_pixel repeats
+    out_grid = d2l.stack([shift_x, shift_y, shift_x, shift_y],
+                axis=1).repeat(boxes_per_pixel, axis=0)
+
+    output = out_grid + anchor_manipulations
+    return np.expand_dims(output, axis=0)
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
 def show_bboxes(axes, bboxes, labels=None, colors=None):
     """Show bounding boxes."""
     def _make_list(obj, default_values=None):
@@ -1502,6 +1538,134 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
             axes.text(rect.xy[0], rect.xy[1], labels[i],
                       va='center', ha='center', fontsize=9, color=text_color,
                       bbox=dict(facecolor=color, lw=0))
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def box_iou(boxes1, boxes2):
+    """Compute IOU between two sets of boxes of shape (N,4) and (M,4)."""
+    # Compute box areas
+    box_area = lambda boxes: ((boxes[:, 2] - boxes[:, 0]) *
+                              (boxes[:, 3] - boxes[:, 1]))
+    area1 = box_area(boxes1)
+    area2 = box_area(boxes2)
+    lt = np.maximum(boxes1[:, None, :2], boxes2[:, :2])  # [N,M,2]
+    rb = np.minimum(boxes1[:, None, 2:], boxes2[:, 2:])  # [N,M,2]
+    wh = (rb - lt).clip(min=0)  # [N,M,2]
+    inter = wh[:, :, 0] * wh[:, :, 1]  # [N,M]
+    unioun = area1[:, None] + area2 - inter
+    return inter / unioun
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def match_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
+    """Assign ground-truth bounding boxes to anchor boxes similar to them."""
+    num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]
+    # Element `x_ij` in the `i^th` row and `j^th` column is the IoU
+    # of the anchor box `anc_i` to the ground-truth bounding box `box_j`
+    jaccard = box_iou(anchors, ground_truth)
+    # Initialize the tensor to hold assigned ground truth bbox for each anchor
+    anchors_bbox_map = np.full((num_anchors,), -1, dtype=np.int32, ctx=device)
+    # Assign ground truth bounding box according to the threshold
+    max_ious, indices = np.max(jaccard, axis=1), np.argmax(jaccard, axis=1)
+    anc_i = np.nonzero(max_ious >= 0.5)[0]
+    box_j = indices[max_ious >= 0.5]
+    anchors_bbox_map[anc_i] = box_j
+    # Find the largest iou for each bbox
+    anc_i = np.argmax(jaccard, axis=0)
+    box_j = np.arange(num_gt_boxes)
+    anchors_bbox_map[anc_i] = box_j
+    return anchors_bbox_map
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def offset_boxes(anchors, assigned_bb, eps=1e-6):
+    c_anc = d2l.box_corner_to_center(anchors)
+    c_assigned_bb = d2l.box_corner_to_center(assigned_bb)
+    offset_xy = 10 * (c_assigned_bb[:, :2] - c_anc[:, :2]) / c_anc[:, 2:]
+    offset_wh = 5 * d2l.log(eps + c_assigned_bb[:, 2:] / c_anc[:, 2:])
+    offset = d2l.concat([offset_xy, offset_wh], axis=1)
+    return offset
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def multibox_target(anchors, labels):
+    batch_size, anchors = labels.shape[0], anchors.squeeze(0)
+    batch_offset, batch_mask, batch_class_labels = [], [], []
+    device, num_anchors = anchors.ctx, anchors.shape[0]
+    for i in range(batch_size):
+        label = labels[i, :, :]
+        anchors_bbox_map = match_anchor_to_bbox(label[:, 1:], anchors, device)
+        bbox_mask = np.tile((np.expand_dims((anchors_bbox_map >= 0),
+                                            axis=-1)), (1, 4)).astype('int32')
+        # Initialize class_labels and assigned bbox coordinates with zeros
+        class_labels = d2l.zeros(num_anchors, dtype=np.int32, ctx=device)
+        assigned_bb = d2l.zeros((num_anchors, 4), dtype=np.float32, ctx=device)
+        # Assign class labels to the anchor boxes using matched gt bbox labels
+        # If no gt bbox is assigned to an anchor box, then let the
+        # class_labels and assigned_bb remain zero, i.e the background class
+        indices_true = np.nonzero(anchors_bbox_map >= 0)[0]
+        bb_idx = anchors_bbox_map[indices_true]
+        class_labels[indices_true] = label[bb_idx, 0].astype('int32') + 1
+        assigned_bb[indices_true] = label[bb_idx, 1:]
+        # offset transformations
+        offset = offset_boxes(anchors, assigned_bb) * bbox_mask
+        batch_offset.append(offset.reshape(-1))
+        batch_mask.append(bbox_mask.reshape(-1))
+        batch_class_labels.append(class_labels)
+    bbox_offset = d2l.stack(batch_offset)
+    bbox_mask = d2l.stack(batch_mask)
+    class_labels = d2l.stack(batch_class_labels)
+    return (bbox_offset, bbox_mask, class_labels)
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def offset_inverse(anchors, offset_preds):
+    c_anc = d2l.box_corner_to_center(anchors)
+    c_pred_bb_xy = (offset_preds[:, :2] * c_anc[:, 2:] / 10) + c_anc[:, :2]
+    c_pred_bb_wh = d2l.exp(offset_preds[:, 2:] / 5) * c_anc[:, 2:]
+    c_pred_bb = d2l.concat((c_pred_bb_xy, c_pred_bb_wh), axis=1)
+    predicted_bb = d2l.box_center_to_corner(c_pred_bb)
+    return predicted_bb
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def nms(boxes, scores, iou_threshold):
+    # sorting scores by the descending order and return their indices
+    B = scores.argsort()[::-1]
+    keep = []  # boxes indices that will be kept
+    while B.size > 0:
+        i = B[0]
+        keep.append(i)
+        if B.size == 1: break
+        iou = box_iou(boxes[i, :].reshape(-1, 4),
+                      boxes[B[1:], :].reshape(-1, 4)).reshape(-1)
+        inds = np.nonzero(iou <= iou_threshold)[0]
+        B = B[inds + 1]
+    return np.array(keep, dtype=np.int32, ctx=boxes.ctx)
+
+def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5):
+    device, batch_size = cls_probs.ctx, cls_probs.shape[0]
+    anchors = np.squeeze(anchors, axis=0)
+    num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]
+    out = []
+    for i in range(batch_size):
+        cls_prob, offset_pred = cls_probs[i], offset_preds[i].reshape(-1, 4)
+        conf, class_id = np.max(cls_prob[1:], 0), np.argmax(cls_prob[1:], 0)
+        predicted_bb = offset_inverse(anchors, offset_pred)
+        keep = nms(predicted_bb, conf, 0.5)
+        # Find all non_keep indices and set the class_id to background
+        all_idx = np.arange(num_anchors, dtype=np.int32, ctx=device)
+        combined = d2l.concat((keep, all_idx))
+        unique, counts = np.unique(combined, return_counts=True)
+        non_keep = unique[counts == 1]
+        all_id_sorted = d2l.concat((keep, non_keep))
+        class_id[non_keep] = -1
+        class_id = class_id[all_id_sorted].astype('float32')
+        pred_info = d2l.concat((np.expand_dims(class_id, axis=1),
+                                np.expand_dims(conf[all_id_sorted], axis=1),
+                                predicted_bb[all_id_sorted]), axis=1)
+        out.append(pred_info)
+    return d2l.stack(out)
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md

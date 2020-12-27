@@ -265,7 +265,7 @@ Now, we will define the forward computation process for each module. In contrast
 ```{.python .input}
 def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
     Y = blk(X)
-    anchors = npx.multibox_prior(Y, sizes=size, ratios=ratio)
+    anchors = d2l.multibox_prior(Y, sizes=size, ratios=ratio)
     cls_preds = cls_predictor(Y)
     bbox_preds = bbox_predictor(Y)
     return (Y, anchors, cls_preds, bbox_preds)
@@ -479,8 +479,8 @@ for epoch in range(num_epochs):
             # offset of each
             anchors, cls_preds, bbox_preds = net(X)
             # Label the category and offset of each anchor box
-            bbox_labels, bbox_masks, cls_labels = npx.multibox_target(
-                anchors, Y, cls_preds.transpose(0, 2, 1))
+            bbox_labels, bbox_masks, cls_labels = d2l.multibox_target(anchors,
+                                                                      Y)
             # Calculate the loss function using the predicted and labeled
             # category and offset values
             l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,
@@ -515,8 +515,7 @@ for epoch in range(num_epochs):
         # offset of each
         anchors, cls_preds, bbox_preds = net(X)
         # Label the category and offset of each anchor box
-        bbox_labels, bbox_masks, cls_labels = d2l.multibox_target(anchors,
-                                                        Y.cpu(), Y.device)
+        bbox_labels, bbox_masks, cls_labels = d2l.multibox_target(anchors, Y)
         # Calculate the loss function using the predicted and labeled
         # category and offset values
         l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,
@@ -555,7 +554,7 @@ Using the `MultiBoxDetection` function, we predict the bounding boxes based on t
 def predict(X):
     anchors, cls_preds, bbox_preds = net(X.as_in_ctx(device))
     cls_probs = npx.softmax(cls_preds).transpose(0, 2, 1)
-    output = npx.multibox_detection(cls_probs, bbox_preds, anchors)
+    output = d2l.multibox_detection(cls_probs, bbox_preds, anchors)
     idx = [i for i, row in enumerate(output[0]) if row[0] != -1]
     return output[0, idx]
 
@@ -568,7 +567,7 @@ def predict(X):
     net.eval()
     anchors, cls_preds, bbox_preds = net(X.to(device))
     cls_probs = F.softmax(cls_preds, dim=2).permute(0, 2, 1)
-    output = d2l.multibox_detection(cls_probs.cpu(), bbox_preds.cpu(), anchors)
+    output = d2l.multibox_detection(cls_probs, bbox_preds, anchors)
     idx = [i for i, row in enumerate(output[0]) if row[0] != -1]
     return output[0, idx]
 
@@ -605,7 +604,7 @@ def display(img, output, threshold):
         bbox = [row[2:6] * torch.tensor((w, h, w, h), device=row.device)]
         d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
 
-display(img, output, threshold=0.9)
+display(img, output.cpu(), threshold=0.9)
 ```
 
 ## Summary
