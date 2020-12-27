@@ -38,16 +38,14 @@ only to parts of the input sequence that are relevant to the current prediction.
 This is achieved
 by treating the context variable as an output of attention pooling.
 
-
-
 ## Model
 
-We will describe 
+When describing 
 Bahdanau attention
-for the RNN encoder-decoder
-by following the same notation in
+for the RNN encoder-decoder below,
+we will follow the same notation in
 :numref:`sec_seq2seq`.
-The new model
+The new attention-based model
 is the same as that
 in :numref:`sec_seq2seq`
 except that
@@ -58,7 +56,6 @@ in
 is replaced by
 $\mathbf{c}_{t'}$
 at any decoding time step $t'$.
-
 Suppose that
 there are $T$ tokens in the input sequence,
 the context variable at the decoding time step $t'$
@@ -70,7 +67,7 @@ where the decoder hidden state
 $\mathbf{s}_{t' - 1}$ at time step $t' - 1$
 is the query,
 and the encoder hidden states $\mathbf{h}_t$
-are both the keys and the values,
+are both the keys and values,
 and the attention weight $\alpha$
 is computed as in
 :eqref:`eq_attn-scoring-alpha`
@@ -79,12 +76,12 @@ defined by
 :eqref:`eq_additive-attn`.
 
 
-The overall architecture
-of the RNN encoder-decoder architecture 
-in :numref:`fig_seq2seq_details`
-with Bahdanau attention is shown in 
+Slightly different from 
+the vanilla RNN encoder-decoder architecture 
+in :numref:`fig_seq2seq_details`,
+the same architecture
+with Bahdanau attention is depicted in 
 :numref:`fig_s2s_attention_details`.
-
 
 ![Layers in an RNN encoder-decoder model with Bahdanau attention.](../img/seq2seq-attention-details.svg)
 :label:`fig_s2s_attention_details`
