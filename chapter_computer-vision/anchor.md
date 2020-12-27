@@ -514,7 +514,7 @@ def nms(boxes, scores, iou_threshold):
         keep.append(i)
         if B.numel() == 1: break
         iou = box_iou(boxes[i, :].reshape(-1, 4),
-                      boxes[B[1:], :].reshape(-1, 4))
+                      boxes[B[1:], :].reshape(-1, 4)).reshape(-1)
         inds = torch.nonzero(iou <= iou_threshold).reshape(-1)
         B = B[inds + 1]
     return d2l.tensor(keep, device=boxes.device)
