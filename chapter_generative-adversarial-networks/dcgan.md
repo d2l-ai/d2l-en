@@ -85,7 +85,8 @@ for X, y in data_iter:
 
 ```{.python .input}
 #@tab pytorch
-warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore', category=UserWarning, 
+message="Palette images with Transparency expressed in bytes should be ")
 d2l.set_figsize((4, 4))
 for X, y in data_iter:
     imgs = X[0:20,:,:,:].permute(0, 2, 3, 1)/2+0.5
