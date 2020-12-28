@@ -1,10 +1,56 @@
 # Multi-Head Attention
 :label:`sec_multihead-attention`
 
+
+In practice,
+given the same set of queries, keys, and values
+we may want our model to
+combine knowledge from
+different behaviors of the same attention mechanism,
+such as capturing dependencies of various ranges (e.g., shorter-range vs. longer-range)
+within a sequence.
+Thus, 
+it may be beneficial 
+to allow our attention mechanism
+to jointly use different representation subspaces
+of queries, keys, and values.
+
+
+
+To this end,
+instead of performing a single attention pooling,
+queries, keys, and values
+can be transformed
+with $h$ independently learned linear projections.
+Then these $h$ projected queries, keys, and values
+are fed into attention pooling in parallel.
+In the end,
+$h$ attention pooling outputs
+are concatenated and 
+transformed with another learned linear projection
+to produce the final output.
+This design
+is called *multi-head attention*,
+where each of the $h$ attention pooling outputs
+is a *head*.
+Using fully-connected layers
+to perform learnable linear transformations,
+:numref:`fig_multi-head-attention`
+describes multi-head attention.
+
+![Multi-head attention.](../img/multi-head-attention.svg)
+:label:`fig_multi-head-attention`
+
+
+
+
+## Model
+
+
 The *multi-head attention* layer consists of $h$ parallel self-attention layers, each one is called a *head*. For each head, before feeding into the attention layer, we project the queries, keys, and values with three dense layers with hidden sizes $p_q$, $p_k$, and $p_v$, respectively. The outputs of these $h$ attention heads are concatenated and then processed by a final dense layer.
 
 
-![Multi-head attention](../img/multi-head-attention.svg)
+
 
 
 Assume that the dimension for a query, a key, and a value are $d_q$, $d_k$, and $d_v$, respectively. Then, for each head $i=1,\ldots, h$, we can train learnable parameters
