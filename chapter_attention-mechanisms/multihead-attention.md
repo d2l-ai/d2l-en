@@ -38,7 +38,7 @@ to perform learnable linear transformations,
 :numref:`fig_multi-head-attention`
 describes multi-head attention.
 
-![Multi-head attention.](../img/multi-head-attention.svg)
+![Multi-head attention, where multiple heads are concatenated then linearly transformed.](../img/multi-head-attention.svg)
 :label:`fig_multi-head-attention`
 
 
@@ -46,30 +46,32 @@ describes multi-head attention.
 
 ## Model
 
+Before providing the implementation of multi-head attention,
+let us formalize this model mathematically.
+Given a query $\mathbf{q} \in \mathbb{R}^{d_q}$,
+a key $\mathbf{k} \in \mathbb{R}^{d_k}$,
+and a value $\mathbf{v} \in \mathbb{R}^{d_v}$,
+each attention head $\mathbf{h}_i$  ($i = 1, \ldots, h$)
+is computed as
 
-The *multi-head attention* layer consists of $h$ parallel self-attention layers, each one is called a *head*. For each head, before feeding into the attention layer, we project the queries, keys, and values with three dense layers with hidden sizes $p_q$, $p_k$, and $p_v$, respectively. The outputs of these $h$ attention heads are concatenated and then processed by a final dense layer.
+$$\mathbf{h}_i = f(\mathbf W_i^{(q)}\mathbf q, \mathbf W_i^{(k)}\mathbf k,\mathbf W_i^{(v)}\mathbf v) \in \mathbb R^{p_v},$$
 
+where learnable parameters
+$\mathbf W_i^{(q)}\in\mathbb R^{p_q\times d_q}$,
+$\mathbf W_i^{(k)}\in\mathbb R^{p_k\times d_k}$
+and $\mathbf W_i^{(v)}\in\mathbb R^{p_v\times d_v}$,
+and
+$f$ is attention pooling,
+such as
+additive attention and scaled dot-product attention
+in :numref:`sec_attention-scoring-functions`.
+The multi-head attention output
+is another linear transformation via 
+learnable parameters
+$\mathbf W_o\in\mathbb R^{p_o\times h p_v}$
+of the concatenation of $h$ heads:
 
-
-
-
-Assume that the dimension for a query, a key, and a value are $d_q$, $d_k$, and $d_v$, respectively. Then, for each head $i=1,\ldots, h$, we can train learnable parameters
-$\mathbf W_q^{(i)}\in\mathbb R^{p_q\times d_q}$,
-$\mathbf W_k^{(i)}\in\mathbb R^{p_k\times d_k}$,
-and $\mathbf W_v^{(i)}\in\mathbb R^{p_v\times d_v}$. Therefore, the output for each head is
-
-$$\mathbf o^{(i)} = \mathrm{attention}(\mathbf W_q^{(i)}\mathbf q, \mathbf W_k^{(i)}\mathbf k,\mathbf W_v^{(i)}\mathbf v),$$
-
-where $\textrm{attention}$ can be any attention layer, such as the `DotProductAttention` and `AdditiveAttention` as we introduced in :numref:`sec_attention-functions`.
-
-
-
-After that, the output with length $p_v$ from each of the $h$ attention heads are concatenated to be an output of length $h p_v$, which is then passed the final dense layer with $d_o$ hidden units. The weights of this dense layer can be denoted by $\mathbf W_o\in\mathbb R^{d_o\times h p_v}$. As a result, the multi-head attention output will be
-
-$$\mathbf o = \mathbf W_o \begin{bmatrix}\mathbf o^{(1)}\\\vdots\\\mathbf o^{(h)}\end{bmatrix}.$$
-
-
-Now we can implement the multi-head attention. Assume that the multi-head attention contain the number heads `num_heads` $=h$, the hidden size `num_hiddens` $=p_q=p_k=p_v$ are the same for the query,  key, and value dense layers. In addition, since the multi-head attention keeps the same dimensionality between its input and its output, we have the output feature size $d_o =$ `num_hiddens` as well.
+$$\mathbf W_o \begin{bmatrix}\mathbf h_1\\\vdots\\\mathbf h_h\end{bmatrix} \in \mathbb{R}^{p_o}.$$
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -87,7 +89,10 @@ import torch
 from torch import nn
 ```
 
-Implement it.
+## Implementation
+
+
+Now we can implement the multi-head attention. Assume that the multi-head attention contain the number heads `num_heads` $=h$, the hidden size `num_hiddens` $=p_q=p_k=p_v$ are the same for the query,  key, and value dense layers. In addition, since the multi-head attention keeps the same dimensionality between its input and its output, we have the output feature size $d_o =$ `num_hiddens` as well.
 
 ```{.python .input}
 #@save

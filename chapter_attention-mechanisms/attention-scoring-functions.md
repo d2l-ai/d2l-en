@@ -346,6 +346,7 @@ is
 
 
 $$ \mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}.$$
+:eqlabel:`eq_softmax_QK_V`
 
 In the following implementation of the scaled dot product attention, we use dropout for model regularization.
 
