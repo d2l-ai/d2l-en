@@ -1,28 +1,6 @@
 # Multi-Head Attention
 :label:`sec_multihead-attention`
 
-```{.python .input}
-from d2l import mxnet as d2l
-import math
-from mxnet import autograd, np, npx
-from mxnet.gluon import nn
-npx.set_np()
-```
-
-```{.python .input}
-#@tab pytorch
-from d2l import torch as d2l
-import math
-import torch
-from torch import nn
-```
-
-Before the discussion of the *multi-head attention* layer, let us quick express the *self-attention* architecture. The self-attention model is a normal attention model, with its query, its key, and its value being copied exactly the same from each item of the sequential inputs. As we illustrate in :numref:`fig_self_attention`, self-attention outputs a same-length sequential output for each input item. Compared with a recurrent layer, output items of a self-attention layer can be computed in parallel and, therefore, it is easy to obtain a highly-efficient implementation.
-
-![Self-attention architecture.](../img/self-attention.svg)
-:label:`fig_self_attention`
-
-
 The *multi-head attention* layer consists of $h$ parallel self-attention layers, each one is called a *head*. For each head, before feeding into the attention layer, we project the queries, keys, and values with three dense layers with hidden sizes $p_q$, $p_k$, and $p_v$, respectively. The outputs of these $h$ attention heads are concatenated and then processed by a final dense layer.
 
 
@@ -46,6 +24,24 @@ $$\mathbf o = \mathbf W_o \begin{bmatrix}\mathbf o^{(1)}\\\vdots\\\mathbf o^{(h)
 
 
 Now we can implement the multi-head attention. Assume that the multi-head attention contain the number heads `num_heads` $=h$, the hidden size `num_hiddens` $=p_q=p_k=p_v$ are the same for the query,  key, and value dense layers. In addition, since the multi-head attention keeps the same dimensionality between its input and its output, we have the output feature size $d_o =$ `num_hiddens` as well.
+
+```{.python .input}
+from d2l import mxnet as d2l
+import math
+from mxnet import autograd, np, npx
+from mxnet.gluon import nn
+npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import math
+import torch
+from torch import nn
+```
+
+Implement it.
 
 ```{.python .input}
 #@save
@@ -213,3 +209,21 @@ X = d2l.ones((batch_size, num_queries, num_hiddens))
 Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
 attention(X, Y, Y, valid_lens).shape
 ```
+
+## Summary
+
+* 1
+
+
+## Exercises
+
+1. 1
+
+
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/xxx)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/xxx)
+:end_tab:

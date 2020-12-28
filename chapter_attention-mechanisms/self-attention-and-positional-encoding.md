@@ -156,3 +156,21 @@ P = P[0, :, :].unsqueeze(0).unsqueeze(0)
 d2l.show_heatmaps(P, xlabel='Encoding dimension', ylabel='Position',
                   figsize=(3.5, 4), cmap='Blues')
 ```
+
+## Summary
+
+* 1
+
+
+## Exercises
+
+1. 1
+
+
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/xxx)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/xxx)
+:end_tab:
