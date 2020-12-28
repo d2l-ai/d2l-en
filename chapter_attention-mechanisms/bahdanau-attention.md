@@ -100,7 +100,15 @@ import torch
 from torch import nn
 ```
 
-## Decoder
+## Defining the Decoder with Attention
+
+To implement the RNN encoder-decoder
+with Bahdanau attention,
+we only need to redefine the decoder.
+To visualize the learned attention weights more conveniently,
+the following `AttentionDecoder` class
+defines the base interface for 
+decoders with attention mechanisms.
 
 ```{.python .input}
 #@tab all
@@ -115,17 +123,19 @@ class AttentionDecoder(d2l.Decoder):
         raise NotImplementedError
 ```
 
-Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEncoder` in :numref:`sec_seq2seq`, we will just focus on the decoder. We add an MLP attention layer (`AdditiveAttention`) which has the same hidden size as the GRU layer in the decoder. Then we initialize the state of the decoder by passing three items from the encoder:
-
-- **the encoder outputs of all time steps**: they are used as the attention layer's memory with identical keys and values;
-
-- **the hidden state of the encoder's final time step**: it is used as the initial decoder's hidden state;
-
-- **the encoder valid length**: so the attention layer will not consider the padding tokens within the encoder outputs.
-
-At each time step of the decoding, we use the hidden state of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Although the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on `enc_valid_lens`, so that the attention output suspends other irrelevant information.
-
-Let us implement the `Seq2SeqAttentionDecoder`, and see how it differs from the decoder in seq2seq from :numref:`sec_seq2seq_decoder`.
+Now let us implement
+the RNN decoder with Bahdanau attention
+in the following `Seq2SeqAttentionDecoder` class.
+The state of the decoder
+is initialized with 
+i) the encoder final-layer hidden states at all the time steps (as keys and values of the attention);
+ii) the encoder all-layer hidden state at the final time step (to initialize the hidden state of the decoder);
+and iii) the encoder valid length (to exclude the padding tokens in attention pooling).
+At each decoding time step,
+the decoder final-layer hidden state at the previous time step is used as the query of the attention.
+As a result, both the attention output
+and the input embedding are concatenated
+as the input of the RNN decoder.
 
 ```{.python .input}
 class Seq2SeqAttentionDecoder(AttentionDecoder):
@@ -227,7 +237,10 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         return self._attention_weights
 ```
 
-Now we can test the seq2seq with attention model. To be consistent with the model without attention in :numref:`sec_seq2seq`, we use the same hyperparameters for `vocab_size`, `embed_size`, `num_hiddens`, and `num_layers`. As a result, we get the same decoder output shape, but the state structure is changed.
+In the following, we test the implemented 
+decoder with Bahdanau attention
+using a minibatch of 4 sequence inputs
+of 7 time steps.
 
 ```{.python .input}
 encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
@@ -238,8 +251,8 @@ decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
 decoder.initialize()
 X = d2l.zeros((4, 7))  # (`batch_size`, `num_steps`)
 state = decoder.init_state(encoder(X), None)
-out, state = decoder(X, state)
-out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
+output, state = decoder(X, state)
+output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 ```
 
 ```{.python .input}
@@ -252,21 +265,21 @@ decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
 decoder.eval()
 X = d2l.zeros((4, 7), dtype=torch.long)  # (`batch_size`, `num_steps`)
 state = decoder.init_state(encoder(X), None)
-out, state = decoder(X, state)
-out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
+output, state = decoder(X, state)
+output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 ```
 
 ## Training
 
-Similar to :numref:`sec_seq2seq_training`, we try a toy model by applying
-the same training hyperparameters and the same training loss.
-As we can see from the result, since the
-sequences in the training dataset are relatively short,
-the additional attention
-layer does not lead to a significant improvement.
-Due to the computational
-overhead of both the encoder's and the decoder's attention layers, this model
-is much slower than the seq2seq model without attention.
+
+Similar to :numref:`sec_seq2seq_training`,
+here we specify hyperparemeters,
+instantiate
+an encoder and a decoder with Bahdanau attention,
+and train this model for machine translation.
+Due to the newly added attention mechanism,
+this training is much slower than
+that in :numref:`sec_seq2seq_training` without attention mechanisms.
 
 ```{.python .input}
 #@tab all
@@ -283,7 +296,9 @@ net = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
-Last, we predict several sample examples.
+After the model is trained,
+we use it to translate a few English sentences
+into French and compute their BLEU scores.
 
 ```{.python .input}
 #@tab all
@@ -303,6 +318,13 @@ attention_weights = d2l.reshape(
     (1, 1, -1, num_steps))
 ```
 
+By visualizing the attention weights,
+we can see that each query assigns non-uniform weights
+over key-value pairs.
+It shows that at each decoding step,
+different parts of the input sequences 
+are selectively aggregated in the attention pooling.
+
 ```{.python .input}
 # Plus one to include the end-of-sequence token
 d2l.show_heatmaps(
@@ -320,14 +342,15 @@ d2l.show_heatmaps(
 
 ## Summary
 
-* The seq2seq model with attention adds an additional attention layer to the model without attention.
-* The decoder of the seq2seq with attention model passes three items from the encoder: the encoder outputs of all time steps, the hidden state of the encoder's final time step, and the encoder valid length.
+* When predicting a token, if not all the input tokens are relevant, the RNN encoder-decoder with Bahdanau attention selectively aggregates different parts of the input sequence. This is achieved by treating the context variable as an output of additive attention pooling.
+* In the RNN encoder-decoder, Bahdanau attention treats the decoder hidden state at the previous time step as the query, and the encoder hidden states at all the time steps as both the keys and values.
+
 
 ## Exercises
 
-1. Compare `Seq2SeqAttentionDecoder` and `Seq2seqDecoder` by using the same parameters and checking their losses.
-1. Can you think of any use cases where `Seq2SeqAttentionDecoder` will outperform `Seq2seqDecoder`?
 1. Replace GRU with LSTM in the experiment.
+1. Modify the experiment to replace the additive attention scoring function with the scaled dot-product. How does it influence the training efficiency?
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/347)
