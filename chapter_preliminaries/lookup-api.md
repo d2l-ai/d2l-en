@@ -1,6 +1,16 @@
 # Documentation
-
+:begin_tab:`mxnet`
 Due to constraints on the length of this book, we cannot possibly introduce every single MXNet function and class (and you probably would not want us to). The API documentation and additional tutorials and examples provide plenty of documentation beyond the book. In this section we provide you with some guidance to exploring the MXNet API.
+:end_tab:
+
+:begin_tab:`pytorch`
+Due to constraints on the length of this book, we cannot possibly introduce every single PyTorch function and class (and you probably would not want us to). The API documentation and additional tutorials and examples provide plenty of documentation beyond the book. In this section we provide you with some guidance to exploring the PyTorch API.
+:end_tab:
+
+:begin_tab:`tensorflow`
+Due to constraints on the length of this book, we cannot possibly introduce every single TensorFlow function and class (and you probably would not want us to). The API documentation and additional tutorials and examples provide plenty of documentation beyond the book. In this section we provide you with some guidance to exploring the TensorFlow API.
+:end_tab:
+
 
 ## Finding All the Functions and Classes in a Module
 
