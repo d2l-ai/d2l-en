@@ -548,7 +548,7 @@ X = torchvision.io.read_image('../img/banana.jpg').unsqueeze(0).float()
 img = X.squeeze(0).permute(1,2,0).long()
 ```
 
-Using the `MultiBoxDetection` function, we predict the bounding boxes based on the anchor boxes and their predicted offsets. Then, we use non-maximum suppression to remove similar bounding boxes.
+Using the `multibox_detection` function, we predict the bounding boxes based on the anchor boxes and their predicted offsets. Then, we use non-maximum suppression to remove similar bounding boxes.
 
 ```{.python .input}
 def predict(X):
@@ -703,7 +703,7 @@ d2l.plt.legend();
 
 B. When an object is relatively large compared to the image, the model normally adopts a larger input image size.
 
-C. This generally produces a large number of negative anchor boxes when labeling anchor box categories. We can sample the negative anchor boxes to better balance the data categories. To do this, we can set the `MultiBoxTarget` function's `negative_mining_ratio` parameter.
+C. This generally produces a large number of negative anchor boxes when labeling anchor box categories. We can sample the negative anchor boxes to better balance the data categories. To do this, we can define a `negative_mining_ratio` parameter in the `multibox_target` function.
 
 D. Assign hyperparameters with different weights to the anchor box category loss and positive anchor box offset loss in the loss function.
 
