@@ -337,9 +337,9 @@ class BatchNorm(nn.Block):
         # initialized to 1 and 0, respectively
         self.gamma = self.params.get('gamma', shape=shape, init=init.One())
         self.beta = self.params.get('beta', shape=shape, init=init.Zero())
-        # The variables that are not model parameters are initialized to 0
+        # The variables that are not model parameters are initialized to 0 and 1
         self.moving_mean = np.zeros(shape)
-        self.moving_var = np.zeros(shape)
+        self.moving_var = np.ones(shape)
 
     def forward(self, X):
         # If `X` is not on the main memory, copy `moving_mean` and
@@ -370,9 +370,9 @@ class BatchNorm(nn.Module):
         # initialized to 1 and 0, respectively
         self.gamma = nn.Parameter(torch.ones(shape))
         self.beta = nn.Parameter(torch.zeros(shape))
-        # The variables that are not model parameters are initialized to 0
+        # The variables that are not model parameters are initialized to 0 and 1
         self.moving_mean = torch.zeros(shape)
-        self.moving_var = torch.zeros(shape)
+        self.moving_var = torch.ones(shape)
 
     def forward(self, X):
         # If `X` is not on the main memory, copy `moving_mean` and
@@ -406,7 +406,7 @@ class BatchNorm(tf.keras.layers.Layer):
             shape=weight_shape, initializer=tf.initializers.zeros,
             trainable=False)
         self.moving_variance = self.add_weight(name='moving_variance',
-            shape=weight_shape, initializer=tf.initializers.zeros,
+            shape=weight_shape, initializer=tf.initializers.ones,
             trainable=False)
         super(BatchNorm, self).build(input_shape)
 
