@@ -574,7 +574,7 @@ def predict(X):
 output = predict(X)
 ```
 
-Finally, we take all the bounding boxes with a confidence level of at least 0.3 and display them as the final output.
+Finally, we take all the bounding boxes with a confidence level of at least 0.9 and display them as the final output.
 
 ```{.python .input}
 def display(img, output, threshold):
