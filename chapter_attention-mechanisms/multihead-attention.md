@@ -260,7 +260,7 @@ def transpose_output(X, num_heads):
 ```
 
 Let us test our implemented `MultiHeadAttention` class
-using a toy example.
+using a toy example where keys and values are the same.
 As a result,
 the shape of the multi-head attention output
 is (`batch_size`, `num_queries`, `num_hiddens`).
