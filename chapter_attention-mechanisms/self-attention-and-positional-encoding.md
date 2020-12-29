@@ -1,17 +1,24 @@
 # Self-Attention and Positional Encoding
 :label:`sec_self-attention-and-positional-encoding`
 
-
-
-Self-attention :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017` is also called intra-attention :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`
-
-
-
-However,
-:cite:`Cheng.Dong.Lapata.2016,Lin.Feng.Santos.ea.2017,Paulus.Xiong.Socher.2017` uses RNN for input representations.
-
-
-:cite:`Parikh.Tackstrom.Das.ea.2016`, as we will see in NLI, does not use RNNs.
+In deep learning,
+we often use CNNs or RNNs to encode a sequence.
+Now with attention mechanisms.
+imagine that we feed a sequence of tokens
+into attention pooling
+so that
+the same set of tokens
+act as queries, keys, and values.
+Specifically,
+each query attends to all the key-value pairs
+and generates one attention output.
+Since the queries, keys, and values
+come from the same place,
+this performs
+*self-attention* :cite:`Lin.Feng.Santos.ea.2017,Vaswani.Shazeer.Parmar.ea.2017`, which is also called *intra-attention* :cite:`Cheng.Dong.Lapata.2016,Parikh.Tackstrom.Das.ea.2016,Paulus.Xiong.Socher.2017`.
+In this section,
+we will discuss sequence encoding using self-attention,
+including using additional information for the sequence order.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -31,10 +38,22 @@ from torch import nn
 
 ## Self-Attention
 
-Before the discussion of the *multi-head attention* layer, let us quick express the *self-attention* architecture. The self-attention model is a normal attention model, with its query, its key, and its value being copied exactly the same from each item of the sequential inputs. As we illustrate in :numref:`fig_self_attention`, self-attention outputs a same-length sequential output for each input item. Compared with a recurrent layer, output items of a self-attention layer can be computed in parallel and, therefore, it is easy to obtain a highly-efficient implementation.
+Given a sequence of input tokens
+$\mathbf{x}_1, \ldots, \mathbf{x}_T$ where any $\mathbf{x}_t \in \mathbb{R}^d$ ($1 \leq t \leq T$),
+its self-attention outputs
+a sequence of the same length
+$\mathbf{y}_1, \ldots, \mathbf{y}_T$,
+where
 
-![Self-attention architecture.](../img/self-attention.svg)
-:label:`fig_self_attention`
+$$\mathbf{y}_t = f(\mathbf{x}_t, (\mathbf{x}_1, \mathbf{x}_1), \ldots, (\mathbf{x}_T, \mathbf{x}_T)) \in \mathbb{R}^d$$
+
+according to the definition of attention pooling $f$ in
+:eqref:`eq_attn-pooling`.
+Using multi-head attention,
+the following code snippet
+computes the self-attention of a tensor
+with shape (batch size, number of time steps or sequence length in tokens, $d$).
+The output tensor has the same shape.
 
 ```{.python .input}
 num_hiddens, num_heads = 100, 5
@@ -56,6 +75,18 @@ batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
 attention(X, X, X, valid_lens).shape
 ```
+
+## Comparing CNNs, RNNs, and Self-Attention
+
+![Comparing CNN (padding tokens are omitted), RNN, and self-attention architectures.](../img/cnn-rnn-self-attention.svg)
+:label:`fig_cnn-rnn-self-attention`
+
+
+
+Before the discussion of the *multi-head attention* layer, let us quick express the *self-attention* architecture. The self-attention model is a normal attention model, with its query, its key, and its value being copied exactly the same from each item of the sequential inputs. As we illustrate in :numref:`fig_self_attention`, self-attention outputs a same-length sequential output for each input item. Compared with a recurrent layer, output items of a self-attention layer can be computed in parallel and, therefore, it is easy to obtain a highly-efficient implementation.
+
+![Self-attention.](../img/self-attention.svg)
+:label:`fig_self_attention`
 
 ## Positional Encoding
 

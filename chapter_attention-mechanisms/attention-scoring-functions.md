@@ -41,10 +41,11 @@ Mathematically,
 suppose that we have
 a query $\mathbf{q} \in \mathbb{R}^q$
 and $m$ key-value pairs $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)$, where any $\mathbf{k}_i \in \mathbb{R}^k$ and any $\mathbf{v}_i \in \mathbb{R}^v$.
-The output of the attention pooling
-is a weighted sum of the values:
+The attention pooling $f$
+is instantiated as a weighted sum of the values:
 
-$$\sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
+$$f(\mathbf{q}, (\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_m, \mathbf{v}_m)) = \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i \in \mathbb{R}^v,$$
+:eqlabel:`eq_attn-pooling`
 
 where
 the attention weight (scalar) for the query $\mathbf{q}$
