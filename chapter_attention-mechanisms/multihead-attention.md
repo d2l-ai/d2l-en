@@ -32,7 +32,7 @@ to produce the final output.
 This design
 is called *multi-head attention*,
 where each of the $h$ attention pooling outputs
-is a *head*.
+is a *head* :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
 Using fully-connected layers
 to perform learnable linear transformations,
 :numref:`fig_multi-head-attention`
@@ -73,6 +73,11 @@ of the concatenation of $h$ heads:
 
 $$\mathbf W_o \begin{bmatrix}\mathbf h_1\\\vdots\\\mathbf h_h\end{bmatrix} \in \mathbb{R}^{p_o}.$$
 
+Based on this design,
+each head may attend to different parts of the input.
+More sophisticated functions than the simple weighted average
+can be expressed.
+
 ```{.python .input}
 from d2l import mxnet as d2l
 import math
@@ -91,8 +96,21 @@ from torch import nn
 
 ## Implementation
 
-
-Now we can implement the multi-head attention. Assume that the multi-head attention contain the number heads `num_heads` $=h$, the hidden size `num_hiddens` $=p_q=p_k=p_v$ are the same for the query,  key, and value dense layers. In addition, since the multi-head attention keeps the same dimensionality between its input and its output, we have the output feature size $d_o =$ `num_hiddens` as well.
+In our implementation,
+we choose the scaled dot-product attention
+for each head of the multi-head attention.
+To avoid significant growth
+of computational cost and parameterization cost,
+we set
+$p_q = p_k = p_v = p_o / h$.
+Note that $h$ heads
+can be computed in parallel
+if we set
+the number of outputs of linear transformations
+for the query, key, and value
+to $p_q h = p_k h = p_v h = p_o$.
+In the following implementation,
+$p_o$ is specified via the argument `num_hiddens`.
 
 ```{.python .input}
 #@save
@@ -176,7 +194,11 @@ class MultiHeadAttention(nn.Module):
         return self.W_o(output_concat)
 ```
 
-Here are the definitions of the transpose functions `transpose_qkv` and `transpose_output`, which are the inverse of each other.
+To allow for parallel computation of multiple heads,
+the above `MultiHeadAttention` class uses two transposition functions as defined below.
+Specifically,
+the `transpose_output` function reverses the operation
+of the `transpose_qkv` function.
 
 ```{.python .input}
 #@save
@@ -237,7 +259,11 @@ def transpose_output(X, num_heads):
     return X.reshape(X.shape[0], X.shape[1], -1)
 ```
 
-Let us test the `MultiHeadAttention` model in a toy example. Create a multi-head attention with the hidden size $d_o = 100$, the output will share the same batch size and sequence length as the input, but the last dimension will be equal to the `num_hiddens` $= 100$.
+Let us test our implemented `MultiHeadAttention` class
+using a toy example.
+As a result,
+the shape of the multi-head attention output
+is (`batch_size`, `num_queries`, `num_hiddens`).
 
 ```{.python .input}
 num_hiddens, num_heads = 100, 5
@@ -263,18 +289,21 @@ attention(X, Y, Y, valid_lens).shape
 
 ## Summary
 
-* 1
+* Multi-head attention combines knowledge of the same attention pooling via different representation subspaces of queries, keys, and values.
+* To compute multiple heads of multi-head attention in parallel, proper tensor manipulation is needed.
+
 
 
 ## Exercises
 
-1. 1
+1. Visualize attention weights of multiple heads in this experiment.
+1. Suppose that we have a trained model based on multi-head attention and we want to prune least important attention heads to increase the prediction speed. How can we design experiments to measure the importance of an attention head?
 
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/xxx)
+[Discussions](https://discuss.d2l.ai/t/1634)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/xxx)
+[Discussions](https://discuss.d2l.ai/t/1635)
 :end_tab:
