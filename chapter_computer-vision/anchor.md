@@ -497,7 +497,8 @@ def nms(boxes, scores, iou_threshold):
     return np.array(keep, dtype=np.int32, ctx=boxes.ctx)
 
 #@save
-def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5):
+def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
+                       pos_threshold=0.00999999978):
     device, batch_size = cls_probs.ctx, cls_probs.shape[0]
     anchors = np.squeeze(anchors, axis=0)
     num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]
@@ -515,9 +516,14 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5):
         all_id_sorted = d2l.concat((keep, non_keep))
         class_id[non_keep] = -1
         class_id = class_id[all_id_sorted].astype('float32')
+        conf, predicted_bb = conf[all_id_sorted], predicted_bb[all_id_sorted]
+        # threshold to be a positive prediction
+        below_min_idx = (conf < pos_threshold)
+        class_id[below_min_idx] = -1
+        conf[below_min_idx] = 1 - conf[below_min_idx]
         pred_info = d2l.concat((np.expand_dims(class_id, axis=1),
-                                np.expand_dims(conf[all_id_sorted], axis=1),
-                                predicted_bb[all_id_sorted]), axis=1)
+                                np.expand_dims(conf, axis=1),
+                                predicted_bb), axis=1)
         out.append(pred_info)
     return d2l.stack(out)
 ```
@@ -541,7 +547,7 @@ def nms(boxes, scores, iou_threshold):
 
 #@save
 def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
-                       score_threshold=0.0099):
+                       pos_threshold=0.00999999978):
     device, batch_size = cls_probs.device, cls_probs.shape[0]
     anchors = anchors.squeeze(0)
     num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]
@@ -559,11 +565,16 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         all_id_sorted = torch.cat((keep, non_keep))
         class_id[non_keep] = -1
         class_id = class_id[all_id_sorted]
+        conf, predicted_bb = conf[all_id_sorted], predicted_bb[all_id_sorted]
+        # threshold to be a positive prediction
+        below_min_idx = (conf < pos_threshold)
+        class_id[below_min_idx] = -1
+        conf[below_min_idx] = 1 - conf[below_min_idx]
         pred_info = torch.cat((class_id.unsqueeze(1),
-                               conf[all_id_sorted].unsqueeze(1),
-                               predicted_bb[all_id_sorted]), dim=1)
+                               conf.unsqueeze(1),
+                               predicted_bb), dim=1)
         out.append(pred_info)
-    return torch.stack(out)
+    return d2l.stack(out)
 ```
 
 Next, we will look at a detailed example. First, construct four anchor boxes. For the sake of simplicity, we assume that predicted offsets are all 0. This means that the prediction bounding boxes are anchor boxes. Finally, we construct a predicted probability for each category.

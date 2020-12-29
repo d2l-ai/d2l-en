@@ -1637,7 +1637,8 @@ def nms(boxes, scores, iou_threshold):
         B = B[inds + 1]
     return np.array(keep, dtype=np.int32, ctx=boxes.ctx)
 
-def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5):
+def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
+                       pos_threshold=0.00999999978):
     device, batch_size = cls_probs.ctx, cls_probs.shape[0]
     anchors = np.squeeze(anchors, axis=0)
     num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]
@@ -1655,9 +1656,14 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5):
         all_id_sorted = d2l.concat((keep, non_keep))
         class_id[non_keep] = -1
         class_id = class_id[all_id_sorted].astype('float32')
+        conf, predicted_bb = conf[all_id_sorted], predicted_bb[all_id_sorted]
+        # threshold to be a positive prediction
+        below_min_idx = (conf < pos_threshold)
+        class_id[below_min_idx] = -1
+        conf[below_min_idx] = 1 - conf[below_min_idx]
         pred_info = d2l.concat((np.expand_dims(class_id, axis=1),
-                                np.expand_dims(conf[all_id_sorted], axis=1),
-                                predicted_bb[all_id_sorted]), axis=1)
+                                np.expand_dims(conf, axis=1),
+                                predicted_bb), axis=1)
         out.append(pred_info)
     return d2l.stack(out)
 
