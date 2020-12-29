@@ -1732,7 +1732,7 @@ def nms(boxes, scores, iou_threshold):
     return d2l.tensor(keep, device=boxes.device)
 
 def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
-                       score_threshold=0.0099):
+                       pos_threshold=0.00999999978):
     device, batch_size = cls_probs.device, cls_probs.shape[0]
     anchors = anchors.squeeze(0)
     num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]
@@ -1750,11 +1750,16 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         all_id_sorted = torch.cat((keep, non_keep))
         class_id[non_keep] = -1
         class_id = class_id[all_id_sorted]
+        conf, predicted_bb = conf[all_id_sorted], predicted_bb[all_id_sorted]
+        # threshold to be a positive prediction
+        below_min_idx = (conf < pos_threshold)
+        class_id[below_min_idx] = -1
+        conf[below_min_idx] = 1 - conf[below_min_idx]
         pred_info = torch.cat((class_id.unsqueeze(1),
-                               conf[all_id_sorted].unsqueeze(1),
-                               predicted_bb[all_id_sorted]), dim=1)
+                               conf.unsqueeze(1),
+                               predicted_bb), dim=1)
         out.append(pred_info)
-    return torch.stack(out)
+    return d2l.stack(out)
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
