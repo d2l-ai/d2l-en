@@ -23,50 +23,79 @@ pervasive in a wide range of
 modern deep learning applications,
 such as in areas of language, vision, speech, and reinforcement learning.
 
-
-## Overall Architecture
+## Model
 
 
 As an instantiation of the encoder-decoder
 architecture,
 the overall architecture of 
 the Transformer
-is presented in :numref:`fig_transformer`,
-where the encoder 
+is presented in :numref:`fig_transformer`.
+As we can see,
+the Transformer is composed of an encoder and a decoder.
+Different from
+Bahdanau attention 
+for sequence to sequence learning
+in :numref:`fig_s2s_attention_details`,
+the input (source) and output (target)
+sequence embeddings
+are added with positional encoding
+before being fed into
+the encoder and the decoder
+that stack modules based on self-attention.
 
 ![The Transformer architecture.](../img/transformer.svg)
 :width:`500px`
 :label:`fig_transformer`
 
 
+Now we provide an overview of the 
+Transformer architecture in :numref:`fig_transformer`.
+On a high level,
+the Transformer encoder is a stack of multiple identical layers, 
+where each layer
+has two sub-layers (either is denoted as $\mathrm{sublayer}$).
+The first
+is a self-attention pooling
+based on multi-head attention described in :numref:`sec_multihead-attention`
+and the second is a position-wise feed-forward network.
+Specifically,
+in the encoder self-attention,
+queries, keys, and values all come from the
+the outputs of the previous encoder layer.
+Inspired by the ResNet design in :numref:`sec_resnet`,
+a residual connection is employed
+around both sub-layers.
+In the Transformer,
+for any input $\mathbf{x} \in \mathbb{R}^d$ at any position of the sequence,
+we require that $\mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ so that
+the residual connection $\mathbf{x} + \mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ is feasible.
+This addition from the residual connection is immediately
+followed by layer normalization :cite:`Ba.Kiros.Hinton.2016`.
+As a result, the Transformer encoder outputs a $d$-dimensional vector representation for each position of the input sequence.
 
-
-In previous chapters, we have covered major neural network architectures such as convolution neural networks (CNNs) and  recurrent neural networks (RNNs). Let us recap their pros and cons:
-
-* **CNNs** are easy to parallelize at a layer but cannot capture the variable-length sequential dependency very well.
-
-* **RNNs** are able to capture the long-range, variable-length sequential information, but suffer from inability to parallelize within a sequence.
-
-To combine the advantages from both CNNs and RNNs, :cite:`Vaswani.Shazeer.Parmar.ea.2017` designed a novel architecture using the attention mechanism.
-This architecture, which is called as *Transformer*, achieves parallelization by capturing recurrence sequence with attention and at the same time encodes each item's position in the sequence. As a result, Transformer leads to a compatible model with significantly shorter training time.
-
-Similar to the seq2seq model in :numref:`sec_seq2seq`, Transformer is also based on the encoder-decoder architecture. However,  Transformer differs to the former by replacing the
-recurrent layers in seq2seq with *multi-head attention* layers, incorporating the position-wise information through *position encoding*, and applying *layer normalization*.
-We  compare  Transformer  and seq2seq  side-by-side in :numref:`fig_transformer`.
-
-Overall, these two models are similar to each other: the source sequence embeddings are fed into $n$ repeated blocks. The outputs of the last block are then used as attention memory for the decoder.  The target sequence embeddings are similarly fed into $n$ repeated blocks in the decoder, and the final outputs are obtained by applying a dense layer with vocabulary size to the last block's outputs.
-
-
-
-
-On the flip side, Transformer differs from the seq2seq with attention model in the following:
-
-1. **Transformer block**: a recurrent layer in seq2seq is replaced by a *Transformer block*. This block contains a *multi-head attention* layer and a *position-wise feed-forward network* with two layers for the encoder. For the decoder, another multi-head attention layer is used to take the encoder state.
-1. **Add and norm**: the inputs and outputs of both the multi-head attention layer or the position-wise feed-forward network, are processed by two "add and norm" layer that contains a residual structure and a *layer normalization* layer.
-1. **Position encoding**: since the self-attention layer does not distinguish the item order in a sequence, a positional encoding layer is used to add sequential information into each sequence item.
-
-
-In the rest of this section, we will equip you with each new component introduced by Transformer, and get you up and running to construct a machine translation model.
+The Transformer decoder is also
+a stack of multiple identical layers with residual connections and layer normalizations.
+Besides the two sub-layers described in
+the encoder, the decoder inserts
+a third sub-layer, known as
+the encoder-decoder attention,
+between these two.
+In the encoder-decoder attention,
+queries are from the
+outputs of the previous decoder layer,
+and the keys and values are
+from the Transformer encoder outputs.
+In the decoder self-attention,
+queries, keys, and values are all from the
+the outputs of the previous decoder layer.
+However,
+each position in the decoder is
+allowed to only attend to all positions in the decoder
+not *after* that position.
+This *masked* attention
+preserves the auto-regressive property,
+ensuring that the prediction only depends on those output tokens that have been generated.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -87,6 +116,11 @@ from torch import nn
 ```
 
 ## Position-wise Feed-Forward Networks
+
+The position-wise feed-forward network
+essentially transforms
+the representation at all the sequence positions
+using the same MLP.
 
 Another key component in the Transformer block is called *position-wise feed-forward network (FFN)*. It accepts a $3$-dimensional input with shape (batch size, sequence length, feature size). The position-wise FFN consists of two dense layers that applies to the last dimension. Since the same two dense layers are used for each position item in the sequence, we referred to it as *position-wise*. Indeed, it is equivalent to applying two $1 \times 1$ convolution layers.
 

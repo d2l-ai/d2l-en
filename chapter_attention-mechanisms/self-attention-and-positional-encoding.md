@@ -158,6 +158,7 @@ makes self-attention prohibitively slow for very long sequences.
 
 
 ## Positional Encoding
+:label:`subsec_positional-encoding`
 
 
 Unlike RNNs that recurrently process
