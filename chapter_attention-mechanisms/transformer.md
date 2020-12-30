@@ -357,9 +357,9 @@ In the following Transformer encoder implementation,
 we stack `num_layers` instances of the above `EncoderBlock` classes.
 Since we use the fixed positional encoding
 whose values are always between -1 and 1,
-we multiply values of input embeddings
+we multiply values of the learnable input embeddings
 by the square root of the embedding dimension
-to rescale before their summation.
+to rescale before summing up the input embedding and the positional encoding.
 
 ```{.python .input}
 #@save
