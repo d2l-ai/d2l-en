@@ -147,7 +147,7 @@ computation can be parallel with $\mathcal{O}(1)$ sequential operations
 and the maximum path length is also $\mathcal{O}(1)$.
 
 All in all,
-both CNNs and self-attention can be paralleled
+both CNNs and self-attention enjoy parallel computation
 and self-attention has the shortest maximum path length.
 However, the quadratic computational complexity with respect to the sequence length
 makes self-attention prohibitively slow for very long sequences.
@@ -186,7 +186,7 @@ and the $(2j)^\mathrm{th}$
 or the $(2j + 1)^\mathrm{th}$ column is
 
 $$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),\\p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$
-
+:eqlabel:`eq_positional-encoding-def`
 
 At first glance,
 this trigonometric-function
@@ -308,22 +308,53 @@ d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
 
 ### Relative Positional Information
 
+Besides capturing absolute positional information,
+the above positional encoding
+also allows
+a model to easily learn to attend by relative positions.
+This is because
+for any fixed position offset $\delta$,
+the positional encoding at position $i + \delta$
+can be represented by a linear projection
+of that at position $i$.
 
+
+This projection can be explained
+mathematically.
+Denoting
+$\omega_j = 1/10000^{2j/d}$,
+any pair of $(p_{i, 2j}, p_{i, 2j+1})$ 
+in :eqref:`eq_positional-encoding-def`
+can 
+be linearly projected to $(p_{i+\delta, 2j}, p_{i+\delta, 2j+1})$
+for any fixed offset $\delta$:
+
+$$\begin{aligned}
+&\begin{bmatrix} \cos(\delta \omega_j) & \sin(\delta \omega_j) \\  -\sin(\delta \omega_j) & \cos(\delta \omega_j) \\ \end{bmatrix}
+\begin{bmatrix} p_{i, 2j} \\  p_{i, 2j+1} \\ \end{bmatrix}\\
+=&\begin{bmatrix} \cos(\delta \omega_j) \sin(i \omega_j) + \sin(\delta \omega_j) \cos(i \omega_j) \\  -\sin(\delta \omega_j) \sin(i \omega_j) + \cos(\delta \omega_j) \cos(i \omega_j) \\ \end{bmatrix}\\
+=&\begin{bmatrix} \sin\left((i+\delta) \omega_j\right) \\  \cos\left((i+\delta) \omega_j\right) \\ \end{bmatrix}\\
+=& 
+\begin{bmatrix} p_{i+\delta, 2j} \\  p_{i+\delta, 2j+1} \\ \end{bmatrix},
+\end{aligned}$$
+
+where the $2\times 2$ projection matrix does not depend on any position index $i$.
 
 ## Summary
 
-* 1
-
+* In self-attention, the queries, keys, and values all come from the same place.
+* Both CNNs and self-attention enjoy parallel computation and self-attention has the shortest maximum path length. However, the quadratic computational complexity with respect to the sequence length makes self-attention prohibitively slow for very long sequences.
+* To use the sequence order information, we can inject absolute or relative positional information by adding positional encoding to the input representations.
 
 ## Exercises
 
-1. 1
-
+1. Suppose that we design a deep architecture to represent a sequence by stacking self-attention layers with positional encoding. What could be issues?
+1. Can you design a learnable positional encoding method?
 
 :begin_tab:`mxnet`
-[Discussions](https://discuss.d2l.ai/t/xxx)
+[Discussions](https://discuss.d2l.ai/t/1651)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/xxx)
+[Discussions](https://discuss.d2l.ai/t/1652)
 :end_tab:
