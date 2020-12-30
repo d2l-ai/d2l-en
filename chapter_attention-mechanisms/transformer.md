@@ -56,12 +56,11 @@ the Transformer encoder is a stack of multiple identical layers,
 where each layer
 has two sub-layers (either is denoted as $\mathrm{sublayer}$).
 The first
-is a self-attention pooling
-based on multi-head attention described in :numref:`sec_multihead-attention`
-and the second is a position-wise feed-forward network.
+is a multi-head self-attention pooling
+and the second is a positionwise feed-forward network.
 Specifically,
 in the encoder self-attention,
-queries, keys, and values all come from the
+queries, keys, and values are all from the
 the outputs of the previous encoder layer.
 Inspired by the ResNet design in :numref:`sec_resnet`,
 a residual connection is employed
@@ -97,6 +96,14 @@ This *masked* attention
 preserves the auto-regressive property,
 ensuring that the prediction only depends on those output tokens that have been generated.
 
+
+We have already described and implemented
+multi-head attention based on scaled dot-products
+in :numref:`sec_multihead-attention`
+and positional encoding in :numref:`subsec_positional-encoding`.
+In the following,
+we will implement the rest of the Transformer model.
+
 ```{.python .input}
 from d2l import mxnet as d2l
 import math
@@ -115,16 +122,16 @@ import torch
 from torch import nn
 ```
 
-## Position-wise Feed-Forward Networks
+## Positionwise Feed-Forward Networks
 
-The position-wise feed-forward network
+The positionwise feed-forward network
 essentially transforms
 the representation at all the sequence positions
 using the same MLP.
 
-Another key component in the Transformer block is called *position-wise feed-forward network (FFN)*. It accepts a $3$-dimensional input with shape (batch size, sequence length, feature size). The position-wise FFN consists of two dense layers that applies to the last dimension. Since the same two dense layers are used for each position item in the sequence, we referred to it as *position-wise*. Indeed, it is equivalent to applying two $1 \times 1$ convolution layers.
+Another key component in the Transformer block is called *positionwise feed-forward network (FFN)*. It accepts a $3$-dimensional input with shape (batch size, sequence length, feature size). The positionwise FFN consists of two dense layers that applies to the last dimension. Since the same two dense layers are used for each position item in the sequence, we referred to it as *positionwise*. Indeed, it is equivalent to applying two $1 \times 1$ convolution layers.
 
-Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two dense layers of hidden size `ffn_num_hiddens` and `ffn_num_outputs`, respectively.
+Below, the `PositionWiseFFN` shows how to implement a positionwise FFN with two dense layers of hidden size `ffn_num_hiddens` and `ffn_num_outputs`, respectively.
 
 ```{.python .input}
 #@save
@@ -154,7 +161,7 @@ class PositionWiseFFN(nn.Module):
         return self.dense2(self.relu(self.dense1(X)))
 ```
 
-Similar to the multi-head attention, the position-wise feed-forward network will only change the last dimension size of the input---the feature dimension. In addition, if two items in the input sequence are identical, the according outputs will be identical as well.
+Similar to the multi-head attention, the positionwise feed-forward network will only change the last dimension size of the input---the feature dimension. In addition, if two items in the input sequence are identical, the according outputs will be identical as well.
 
 ```{.python .input}
 ffn = PositionWiseFFN(4, 8)
@@ -171,7 +178,7 @@ ffn(d2l.ones((2, 3, 4)))[0]
 
 ## Add and Norm
 
-Besides the above two components in the Transformer block, the "add and norm" within the block also plays a key role to connect the inputs and outputs of other layers smoothly. To explain, we add a layer that contains a residual structure and a *layer normalization* after both the multi-head attention layer and the position-wise FFN network. *Layer normalization* is similar to batch normalization in :numref:`sec_batch_norm`. One difference is that the mean and variances for the layer normalization are calculated along the last dimension, e.g `X.mean(axis=-1)` instead of the first batch dimension, e.g., `X.mean(axis=0)`. Layer normalization prevents the range of values in the layers from changing too much, which allows faster training and better generalization ability.
+Besides the above two components in the Transformer block, the "add and norm" within the block also plays a key role to connect the inputs and outputs of other layers smoothly. To explain, we add a layer that contains a residual structure and a *layer normalization* after both the multi-head attention layer and the positionwise FFN network. *Layer normalization* is similar to batch normalization in :numref:`sec_batch_norm`. One difference is that the mean and variances for the layer normalization are calculated along the last dimension, e.g `X.mean(axis=-1)` instead of the first batch dimension, e.g., `X.mean(axis=0)`. Layer normalization prevents the range of values in the layers from changing too much, which allows faster training and better generalization ability.
 
 :begin_tab:`mxnet`
 MXNet has both `LayerNorm` and `BatchNorm` implemented within the `nn` block. Let us call both of them and see the difference in the example below.
@@ -201,7 +208,7 @@ X = d2l.tensor([[1, 2], [2, 3]], dtype=torch.float32)
 print('layer norm:', ln(X), '\nbatch norm:', bn(X))
 ```
 
-Now let us implement the connection block `AddNorm` together. `AddNorm` accepts two inputs $X$ and $Y$. We can deem $X$ as the original input in the residual network, and $Y$ as the outputs from either the multi-head attention layer or the position-wise FFN network. In addition, we apply dropout on $Y$ for regularization.
+Now let us implement the connection block `AddNorm` together. `AddNorm` accepts two inputs $X$ and $Y$. We can deem $X$ as the original input in the residual network, and $Y$ as the outputs from either the multi-head attention layer or the positionwise FFN network. In addition, we apply dropout on $Y$ for regularization.
 
 ```{.python .input}
 #@save
@@ -245,7 +252,7 @@ add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 
 ## Encoder
 
-Armed with all the essential components of Transformer, let us first build a Transformer encoder block. This encoder contains a multi-head attention layer, a position-wise feed-forward network, and two "add and norm" connection blocks. As shown in the code, for both of the attention model and the positional FFN model in the `EncoderBlock`, their outputs' dimension are equal to the `num_hiddens`. This is due to the nature of the residual block, as we need to add these outputs back to the original value during "add and norm".
+Armed with all the essential components of Transformer, let us first build a Transformer encoder block. This encoder contains a multi-head attention layer, a positionwise feed-forward network, and two "add and norm" connection blocks. As shown in the code, for both of the attention model and the positional FFN model in the `EncoderBlock`, their outputs' dimension are equal to the `num_hiddens`. This is due to the nature of the residual block, as we need to add these outputs back to the original value during "add and norm".
 
 ```{.python .input}
 #@save
@@ -717,7 +724,7 @@ d2l.show_heatmaps(dec_inter_attention_weights, xlabel='Key positions',
 
 * The Transformer model is based on the encoder-decoder architecture.
 * Multi-head attention layer contains $h$ parallel attention layers.
-* Position-wise feed-forward network consists of two dense layers that apply to the last dimension.
+* Positionwise feed-forward network consists of two dense layers that apply to the last dimension.
 * Layer normalization differs from batch normalization by normalizing along the last dimension (the feature dimension) instead of the first (batch size) dimension.
 * Positional encoding is the only place that adds positional information to the Transformer model.
 

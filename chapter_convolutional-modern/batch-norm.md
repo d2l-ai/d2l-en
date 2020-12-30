@@ -77,7 +77,7 @@ the resulting minibatch
 has zero mean and unit variance.
 Because the choice of unit variance
 (vs. some other magic number) is an arbitrary choice,
-we commonly include element-wise
+we commonly include elementwise
 *scale parameter* $\boldsymbol{\gamma}$ and *shift parameter* $\boldsymbol{\beta}$
 that have the same shape as $\mathbf{x}$.
 Note that $\boldsymbol{\gamma}$ and $\boldsymbol{\beta}$ are
@@ -292,7 +292,7 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 
 def batch_norm(X, gamma, beta, moving_mean, moving_var, eps):
-    # Compute reciprocal of square root of the moving variance element-wise
+    # Compute reciprocal of square root of the moving variance elementwise
     inv = tf.cast(tf.math.rsqrt(moving_var + eps), X.dtype)
     # Scale and shift
     inv *= gamma
