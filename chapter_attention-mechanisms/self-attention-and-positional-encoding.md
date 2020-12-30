@@ -77,6 +77,7 @@ attention(X, X, X, valid_lens).shape
 ```
 
 ## Comparing CNNs, RNNs, and Self-Attention
+:label:`subsec_cnn-rnn-self-attention`
 
 Let us
 compare architectures for mapping

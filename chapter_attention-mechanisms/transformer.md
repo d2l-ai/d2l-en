@@ -2,8 +2,42 @@
 :label:`sec_transformer`
 
 
-However,
-:cite:`Cheng.Dong.Lapata.2016,Lin.Feng.Santos.ea.2017,Paulus.Xiong.Socher.2017` uses RNN for input representations.
+We have compared CNNs, RNNs, and self-attention in
+:numref:`subsec_cnn-rnn-self-attention`.
+Notably,
+self-attention 
+enjoys both parallel computation and
+the shortest maximum path length.
+Therefore natually,
+it is appealing to design deep architectures
+by using self-attention.
+Unlike earlier self-attention models
+that still rely on RNNs for input representations :cite:`Cheng.Dong.Lapata.2016,Lin.Feng.Santos.ea.2017,Paulus.Xiong.Socher.2017`,
+the Transformer model
+is solely based on attention mechanisms
+without any convolutional or recurrent layer :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
+Though originally proposed
+for sequence to sequence learning on text data,
+Transformers have been
+pervasive in a wide range of 
+modern deep learning applications,
+such as in areas of language, vision, speech, and reinforcement learning.
+
+
+## Overall Architecture
+
+
+As an instantiation of the encoder-decoder
+architecture,
+the overall architecture of 
+the Transformer
+is presented in :numref:`fig_transformer`,
+where the encoder 
+
+![The Transformer architecture.](../img/transformer.svg)
+:width:`500px`
+:label:`fig_transformer`
+
 
 
 
@@ -22,9 +56,7 @@ We  compare  Transformer  and seq2seq  side-by-side in :numref:`fig_transformer`
 
 Overall, these two models are similar to each other: the source sequence embeddings are fed into $n$ repeated blocks. The outputs of the last block are then used as attention memory for the decoder.  The target sequence embeddings are similarly fed into $n$ repeated blocks in the decoder, and the final outputs are obtained by applying a dense layer with vocabulary size to the last block's outputs.
 
-![The Transformer architecture.](../img/transformer.svg)
-:width:`500px`
-:label:`fig_transformer`
+
 
 
 On the flip side, Transformer differs from the seq2seq with attention model in the following:
@@ -661,6 +693,7 @@ d2l.show_heatmaps(dec_inter_attention_weights, xlabel='Key positions',
 1. Try a larger size of epochs and compare the loss between seq2seq model and Transformer model.
 1. Can you think of any other benefit of positional encoding?
 1. Compare layer normalization and batch normalization, when shall we apply which?
+1. How to improve computational and memory efficiency of Transformers? Hint: you may refer to the excellent survey paper by Tay et al. :cite:`Tay.Dehghani.Bahri.ea.2020`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/348)
