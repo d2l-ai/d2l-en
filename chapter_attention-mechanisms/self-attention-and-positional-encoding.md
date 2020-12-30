@@ -188,8 +188,11 @@ or the $(2j + 1)^\mathrm{th}$ column is
 $$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),\\p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$
 
 
-Before explaining the design,
-let us first implement it in the following `PositionalEncoding`.
+At first glance,
+this trigonometric-function
+design looks weird.
+Before explanations of this design,
+let us first implement it in the following `PositionalEncoding` class.
 
 ```{.python .input}
 #@save
@@ -229,7 +232,16 @@ class PositionalEncoding(nn.Module):
         return self.dropout(X)
 ```
 
-Now we test the `PositionalEncoding` class with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset (i.e. phase) because one is produced by a sine function and the other is produced by a cosine function. The $6^{\mathrm{th}}$ and $7^{\mathrm{th}}$ dimensions have lower frequency.
+In the  example below,
+we can see that
+the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$
+columns of the positional embedding matrix $\mathbf{P}$
+have a higher frequency than 
+the $8^{\mathrm{th}}$ and the $9^{\mathrm{th}}$
+columns.
+The offset between 
+the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$ (same for the $8^{\mathrm{th}}$ and the $9^{\mathrm{th}}$) columns
+is due to the alternation of sine and cosine functions.
 
 ```{.python .input}
 encoding_dim, num_steps = 32, 60
@@ -237,8 +249,8 @@ pos_encoding = PositionalEncoding(encoding_dim, 0)
 pos_encoding.initialize()
 X = pos_encoding(np.zeros((1, num_steps, encoding_dim)))
 P = pos_encoding.P[:, :X.shape[1], :]
-d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='position',
-         figsize=(6, 2.5), legend=["dim %d" % d for d in d2l.arange(6, 10)])
+d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
+         figsize=(6, 2.5), legend=["Col %d" % d for d in d2l.arange(6, 10)])
 ```
 
 ```{.python .input}
@@ -248,8 +260,8 @@ pos_encoding = PositionalEncoding(encoding_dim, 0)
 pos_encoding.eval()
 X = pos_encoding(d2l.zeros((1, num_steps, encoding_dim)))
 P = pos_encoding.P[:, :X.shape[1], :]
-d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='position',
-         figsize=(6, 2.5), legend=["dim %d" % d for d in d2l.arange(6, 10)])
+d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
+         figsize=(6, 2.5), legend=["Col %d" % d for d in d2l.arange(6, 10)])
 ```
 
 ```{.python .input}
@@ -260,15 +272,15 @@ for i in range(8):
 
 ```{.python .input}
 P = np.expand_dims(np.expand_dims(P[0, :, :], 0), 0)
-d2l.show_heatmaps(P, xlabel='Encoding dimension', ylabel='Position',
-                  figsize=(3.5, 4), cmap='Blues')
+d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
+                  ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
 
 ```{.python .input}
 #@tab pytorch
 P = P[0, :, :].unsqueeze(0).unsqueeze(0)
-d2l.show_heatmaps(P, xlabel='Encoding dimension', ylabel='Position',
-                  figsize=(3.5, 4), cmap='Blues')
+d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
+                  ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
 
 ## Summary
