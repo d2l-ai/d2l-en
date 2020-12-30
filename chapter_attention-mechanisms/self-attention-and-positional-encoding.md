@@ -39,13 +39,13 @@ from torch import nn
 ## Self-Attention
 
 Given a sequence of input tokens
-$\mathbf{x}_1, \ldots, \mathbf{x}_T$ where any $\mathbf{x}_t \in \mathbb{R}^d$ ($1 \leq t \leq T$),
+$\mathbf{x}_1, \ldots, \mathbf{x}_n$ where any $\mathbf{x}_i \in \mathbb{R}^d$ ($1 \leq i \leq n$),
 its self-attention outputs
 a sequence of the same length
-$\mathbf{y}_1, \ldots, \mathbf{y}_T$,
+$\mathbf{y}_1, \ldots, \mathbf{y}_n$,
 where
 
-$$\mathbf{y}_t = f(\mathbf{x}_t, (\mathbf{x}_1, \mathbf{x}_1), \ldots, (\mathbf{x}_T, \mathbf{x}_T)) \in \mathbb{R}^d$$
+$$\mathbf{y}_i = f(\mathbf{x}_i, (\mathbf{x}_1, \mathbf{x}_1), \ldots, (\mathbf{x}_n, \mathbf{x}_n)) \in \mathbb{R}^d$$
 
 according to the definition of attention pooling $f$ in
 :eqref:`eq_attn-pooling`.
@@ -78,15 +78,81 @@ attention(X, X, X, valid_lens).shape
 
 ## Comparing CNNs, RNNs, and Self-Attention
 
+Let us
+compare architectures for mapping
+a sequence of $n$ tokens
+to another sequence of equal length,
+where each input or output token is represented by
+a $d$-dimensional vector.
+Specifically,
+we will consider CNNs, RNNs, and self-attention.
+We will compare their
+computational complexity, 
+sequential operations,
+and maximum path lengths.
+Note that sequential operations prevent parallel computation,
+while a shorter path between
+any combination of sequence positions
+makes it easier to learn long-range dependencies within the sequence :cite:`Hochreiter.Bengio.Frasconi.ea.2001`.
+
+
 ![Comparing CNN (padding tokens are omitted), RNN, and self-attention architectures.](../img/cnn-rnn-self-attention.svg)
 :label:`fig_cnn-rnn-self-attention`
 
+Consider a convolutional layer whose kernel size is $k$.
+We will provide more details about sequence processing
+using CNNs in later chapters.
+For now,
+we only need to know that
+since the sequence length is $n$,
+the numbers of input and output channels are both $d$,
+the computational complexity of the convolutional layer is $\mathcal{O}(knd^2)$.
+As :numref:`fig_cnn-rnn-self-attention` shows,
+CNNs are hierarchical  so 
+there are $\mathcal{O}(1)$ sequential operations
+and the maximum path length is $\mathcal{O}(n/k)$.
+For example, $\mathbf{x}_1$ and $\mathbf{x}_5$
+are within the receptive field of a two-layer CNN
+with kernel size 3 in :numref:`fig_cnn-rnn-self-attention`.
+
+When updating the hidden state of RNNs,
+multiplication of the $d \times d$ weight matrix
+and the $d$-dimensional hidden state has 
+a computational complexity of $\mathcal{O}(d^2)$.
+Since the sequence length is $n$,
+the computational complexity of the recurrent layer
+is $\mathcal{O}(nd^2)$.
+According to :numref:`fig_cnn-rnn-self-attention`,
+there are $\mathcal{O}(n)$ sequential operations
+that cannot be parallelized
+and the maximum path length is also $\mathcal{O}(n)$.
+
+In self-attention,
+the queries, keys, and values 
+are all $n \times d$ matrices.
+Consider the scaled dot-product attention in
+:eqref:`eq_softmax_QK_V`,
+where a $n \times d$ matrix is multiplied by
+a $d \times n$ matrix,
+then the output $n \times n$ matrix is multiplied
+by a $n \times d$ matrix.
+As a result,
+the self-attention
+has a $\mathcal{O}(n^2d)$ computational complexity.
+As we can see in :numref:`fig_cnn-rnn-self-attention`,
+each token is directly connected
+to any other token via self-attention.
+Therefore,
+computation can be parallel with $\mathcal{O}(1)$ sequential operations
+and the maximum path length is also $\mathcal{O}(1)$.
+
+All in all,
+both CNNs and self-attention can be paralleled
+and self-attention has the shortest maximum path length.
+However, the quadratic computational complexity with respect to the sequence length
+makes self-attention prohibitively slow for very long sequences.
 
 
-Before the discussion of the *multi-head attention* layer, let us quick express the *self-attention* architecture. The self-attention model is a normal attention model, with its query, its key, and its value being copied exactly the same from each item of the sequential inputs. As we illustrate in :numref:`fig_self_attention`, self-attention outputs a same-length sequential output for each input item. Compared with a recurrent layer, output items of a self-attention layer can be computed in parallel and, therefore, it is easy to obtain a highly-efficient implementation.
-
-![Self-attention.](../img/self-attention.svg)
-:label:`fig_self_attention`
 
 ## Positional Encoding
 

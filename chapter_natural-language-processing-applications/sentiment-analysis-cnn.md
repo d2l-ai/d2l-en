@@ -291,6 +291,7 @@ d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 1. Tune the hyperparameters and compare the two sentiment analysis methods, using recurrent neural networks and using convolutional neural networks, as regards accuracy and operational efficiency.
 1. Can you further improve the accuracy of the model on the test set by using the three methods introduced in the previous section: tuning hyperparameters, using larger pre-trained word vectors, and using the spaCy word tokenization tool?
 1. What other natural language processing tasks can you use textCNN for?
+1. Add positional encoding in the input representations. Does it improve the performance?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/393)
