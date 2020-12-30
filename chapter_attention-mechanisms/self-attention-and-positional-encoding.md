@@ -154,25 +154,42 @@ makes self-attention prohibitively slow for very long sequences.
 
 
 
+
+
 ## Positional Encoding
 
-Unlike the recurrent layer, both the multi-head attention layer and the position-wise feed-forward network compute the output of each item in the sequence independently. This feature enables us to parallelize the computation, but it fails to model the sequential information for a given sequence. To better capture the sequential information, the Transformer model uses the *positional encoding* to maintain the positional information of the input sequence.
 
-To explain, assume that $X\in\mathbb R^{l\times d}$ is the embedding of an example, where $l$ is the sequence length and $d$ is the embedding size. This positional encoding layer encodes $X$'s position $P\in\mathbb R^{l\times d}$ and outputs $P+X$.
+Unlike RNNs that recurrently process
+tokens of a sequence one by one,
+self-attention ditches
+sequential operations in favor of 
+parallel computation.
+To use the sequence order information,
+we can inject
+relatively or absolutely
+positional information
+by adding *positional encoding*
+to the input representations.
+Positional encodings can be 
+either learned or fixed.
+In the following, 
+we describe a fixed positional encoding
+based on sine and cosine functions :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
 
-The position $P$ is a 2-D matrix, where $i$ refers to the order in the sentence, and $j$ refers to the position along the embedding vector dimension. In this way, each value in the origin sequence is then maintained using the equations below:
+Suppose that
+the input representation $\mathbf{X} \in \mathbb{R}^{n \times d}$ contains the $d$-dimensional embeddings for $n$ tokens of a sequence.
+The positional encoding outputs
+$\mathbf{X} + \mathbf{P}$
+using a positional embedding matrix $\mathbf{P} \in \mathbb{R}^{n \times d}$ of the same shape,
+whose element on the $i^\mathrm{th}$ row 
+and the $(2j)^\mathrm{th}$
+or the $(2j + 1)^\mathrm{th}$ column is
 
-$$P_{i, 2j} = \sin(i/10000^{2j/d}),$$
-
-$$\quad P_{i, 2j+1} = \cos(i/10000^{2j/d}),$$
-
-for $i=0,\ldots, l-1$ and $j=0,\ldots,\lfloor(d-1)/2\rfloor$.
+$$\begin{aligned} p_{i, 2j} &= \sin\left(\frac{i}{10000^{2j/d}}\right),\\p_{i, 2j+1} &= \cos\left(\frac{i}{10000^{2j/d}}\right).\end{aligned}$$
 
 
-:numref:`fig_positional_encoding` illustrates the positional encoding.
-
-![Positional encoding.](../img/positional-encoding.svg)
-:label:`fig_positional_encoding`
+Before explaining the design,
+let us first implement it in the following `PositionalEncoding`.
 
 ```{.python .input}
 #@save
