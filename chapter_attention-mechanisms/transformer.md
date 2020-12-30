@@ -187,10 +187,10 @@ ffn.eval()
 ffn(d2l.ones((2, 3, 4)))[0]
 ```
 
-## Add and Norm
+## Residual Connection and Layer Normalization
 
 Now let us focus on
-the "Add & norm" component in :numref:`fig_transformer`.
+the "add & norm" component in :numref:`fig_transformer`.
 As we described at the beginning
 of this section,
 this is a residual connection immediately
