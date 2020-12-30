@@ -166,7 +166,7 @@ sequential operations in favor of
 parallel computation.
 To use the sequence order information,
 we can inject
-relatively or absolutely
+absolute or relative
 positional information
 by adding *positional encoding*
 to the input representations.
@@ -232,10 +232,13 @@ class PositionalEncoding(nn.Module):
         return self.dropout(X)
 ```
 
-In the  example below,
+In the positional embedding matrix $\mathbf{P}$,
+rows correspond to positions within a sequence
+and columns represent different positional encoding dimensions.
+In the example below,
 we can see that
 the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$
-columns of the positional embedding matrix $\mathbf{P}$
+columns of the positional embedding matrix 
 have a higher frequency than 
 the $8^{\mathrm{th}}$ and the $9^{\mathrm{th}}$
 columns.
@@ -264,11 +267,31 @@ d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
          figsize=(6, 2.5), legend=["Col %d" % d for d in d2l.arange(6, 10)])
 ```
 
+### Absolute Positional Information
+
+To see how the monotonically decreased frequency
+along the encoding dimension relates to absolute positional information,
+let us print out the binary representations of $0, 1, \ldots, 7$.
+As we can see,
+the lowest bit, the second-lowest bit, and the third-lowest bit alternate on every number, every two numbers, and every four numbers, respectively.
+
 ```{.python .input}
 #@tab all
 for i in range(8):
     print(f'{i} in binary is {i:>03b}')
 ```
+
+In binary representations,
+a higher bit has a lower frequency than a lower bit.
+Similarly,
+as demonstrated in the heat map below,
+the positional encoding decreases
+frequencies along the encoding dimension
+by using trigonometric functions.
+Since the outputs are float numbers,
+such continuous representations
+are more space-efficient
+than binary representations.
 
 ```{.python .input}
 P = np.expand_dims(np.expand_dims(P[0, :, :], 0), 0)
@@ -282,6 +305,10 @@ P = P[0, :, :].unsqueeze(0).unsqueeze(0)
 d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
                   ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
+
+### Relative Positional Information
+
+
 
 ## Summary
 
