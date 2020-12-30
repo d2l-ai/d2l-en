@@ -285,7 +285,14 @@ add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 
 ## Encoder
 
-Armed with all the essential components of Transformer, let us first build a Transformer encoder block. This encoder contains a multi-head attention layer, a positionwise feed-forward network, and two "add and norm" connection blocks. As shown in the code, for both of the attention model and the positional FFN model in the `EncoderBlock`, their outputs' dimension are equal to the `num_hiddens`. This is due to the nature of the residual block, as we need to add these outputs back to the original value during "add and norm".
+With all the essential components to assemble
+the Transformer encoder,
+let us start by
+implementing a single layer within the encoder.
+The following `EncoderBlock` class
+contains two sublayers: multi-head self-attention and positionwise feed-forward networks,
+where a residual connection followed by layer normalization is employed
+around both sub-layers.
 
 ```{.python .input}
 #@save
@@ -325,7 +332,9 @@ class EncoderBlock(nn.Module):
         return self.addnorm2(Y, self.ffn(Y))
 ```
 
-Due to the residual connections, this block will not change the input shape. It means that the `num_hiddens` argument should be equal to the input size of the last dimension. In our toy example below,  `num_hiddens` $= 24$, `ffn_num_hiddens` $=48$, `num_heads` $= 8$, and `dropout` $= 0.5$.
+As we can see,
+any layer in the Transformer encoder
+does not change the shape of its input.
 
 ```{.python .input}
 X = d2l.ones((2, 100, 24))
@@ -344,7 +353,13 @@ encoder_blk.eval()
 encoder_blk(X, valid_lens).shape
 ```
 
-Now it comes to the implementation of the entire Transformer encoder. With the Transformer encoder, $n$ blocks of `EncoderBlock` stack up one after another. Because of the residual connection, the embedding layer size $d$ is same as the Transformer block output size. Also note that we multiply the embedding output by $\sqrt{d}$ to prevent its values from being too small.
+In the following Transformer encoder implementation,
+we stack `num_layers` instances of the above `EncoderBlock` classes.
+Since we use the fixed positional encoding
+whose values are always between -1 and 1,
+we multiply values of input embeddings
+by the square root of the embedding dimension
+to rescale before their summation.
 
 ```{.python .input}
 #@save
@@ -405,7 +420,10 @@ class TransformerEncoder(d2l.Encoder):
         return X
 ```
 
-Let us create an encoder with two stacked  Transformer encoder blocks, whose hyperparameters are the same as before. Similar to the previous toy example's parameters, we add two more parameters `vocab_size` to be $200$ and `num_layers` to be $2$ here.
+Below we specify hyperparameters to create a two-layer Transformer encoder.
+The shape of the Transformer encoder output
+is (batch size, number of time steps, `num_hiddens`).
+
 
 ```{.python .input}
 encoder = TransformerEncoder(200, 24, 48, 8, 2, 0.5)
