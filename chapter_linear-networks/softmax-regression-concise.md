@@ -126,18 +126,18 @@ softmax and cross-entropy together,
 we can escape the numerical stability issues
 that might otherwise plague us during backpropagation.
 As shown in the equation below, we avoid calculating $\exp(o_j)$
-and can use instead $o_j$ directly due to the canceling in $\log(\exp(\cdot))$.
+and can use instead $o_j$ - $\max(o_k)$ directly due to the canceling in $\log(\exp(\cdot))$.
 
 $$
 \begin{aligned}
-\log{(\hat y_j)} & = \log\left( \frac{\exp(o_j)}{\sum_k \exp(o_k)}\right) \\
-& = \log{(\exp(o_j))}-\log{\left( \sum_k \exp(o_k) \right)} \\
-& = o_j -\log{\left( \sum_k \exp(o_k) \right)}.
+\log{(\hat y_j)} & = \log\left( \frac{\exp(o_j - \max(o_k))}{\sum_k \exp(o_k - \max(o_k))}\right) \\
+& = \log{(\exp(o_j - \max(o_k)))}-\log{\left( \sum_k \exp(o_k - \max(o_k)) \right)} \\
+& = o_j - \max(o_k) -\log{\left( \sum_k \exp(o_k - \max(o_k)) \right)}.
 \end{aligned}
 $$
 
 We will want to keep the conventional softmax function handy
-in case we ever want to evaluate the output probabilities by our model.
+in case we ever want to evaluate the output probabilities by our model. Thus, while this new equation is original Softmax function is equivalent to the one shown in the last section, it avoids both the overflow and underflow issue discussed. 
 But instead of passing softmax probabilities into our new loss function,
 we will just pass the logits and compute the softmax and its log
 all at once inside the cross-entropy loss function,
