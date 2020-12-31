@@ -54,7 +54,7 @@ Transformer architecture in :numref:`fig_transformer`.
 On a high level,
 the Transformer encoder is a stack of multiple identical layers, 
 where each layer
-has two sub-layers (either is denoted as $\mathrm{sublayer}$).
+has two sublayers (either is denoted as $\mathrm{sublayer}$).
 The first
 is a multi-head self-attention pooling
 and the second is a positionwise feed-forward network.
@@ -64,7 +64,7 @@ queries, keys, and values are all from the
 the outputs of the previous encoder layer.
 Inspired by the ResNet design in :numref:`sec_resnet`,
 a residual connection is employed
-around both sub-layers.
+around both sublayers.
 In the Transformer,
 for any input $\mathbf{x} \in \mathbb{R}^d$ at any position of the sequence,
 we require that $\mathrm{sublayer}(\mathbf{x}) \in \mathbb{R}^d$ so that
@@ -75,9 +75,9 @@ As a result, the Transformer encoder outputs a $d$-dimensional vector representa
 
 The Transformer decoder is also
 a stack of multiple identical layers with residual connections and layer normalizations.
-Besides the two sub-layers described in
+Besides the two sublayers described in
 the encoder, the decoder inserts
-a third sub-layer, known as
+a third sublayer, known as
 the encoder-decoder attention,
 between these two.
 In the encoder-decoder attention,
@@ -91,7 +91,7 @@ the outputs of the previous decoder layer.
 However,
 each position in the decoder is
 allowed to only attend to all positions in the decoder
-not *after* that position.
+up to that position.
 This *masked* attention
 preserves the auto-regressive property,
 ensuring that the prediction only depends on those output tokens that have been generated.
@@ -240,7 +240,6 @@ Now we can implement the `AddNorm` class
 using a residual connection followed by layer normalization.
 Dropout is also applied for regularization.
 
-
 ```{.python .input}
 #@save
 class AddNorm(nn.Block):
@@ -292,7 +291,7 @@ implementing a single layer within the encoder.
 The following `EncoderBlock` class
 contains two sublayers: multi-head self-attention and positionwise feed-forward networks,
 where a residual connection followed by layer normalization is employed
-around both sub-layers.
+around both sublayers.
 
 ```{.python .input}
 #@save
@@ -424,7 +423,6 @@ Below we specify hyperparameters to create a two-layer Transformer encoder.
 The shape of the Transformer encoder output
 is (batch size, number of time steps, `num_hiddens`).
 
-
 ```{.python .input}
 encoder = TransformerEncoder(200, 24, 48, 8, 2, 0.5)
 encoder.initialize()
@@ -441,14 +439,43 @@ encoder(d2l.ones((2, 100), dtype=torch.long), valid_lens).shape
 
 ## Decoder
 
-The Transformer decoder block looks similar to the Transformer encoder block. However, besides the two sub-layers (the multi-head attention layer and the positional encoding network), the decoder Transformer block contains a third sub-layer, which applies multi-head attention on the output of the encoder stack. Similar to the  Transformer encoder block, the  Transformer decoder block employs "add and norm", i.e., the residual connections and the layer normalization to connect each of the sub-layers.
+As shown in :numref:`fig_transformer`,
+the Transformer decoder 
+is composed of multiple identical layers.
+Each layer is implemented in the following
+`DecoderBlock` class,
+which contains three sublayers:
+decoder self-attention,
+encoder-decoder attention,
+and positionwise feed-forward networks.
+These sublayers employ
+a residual connection around them
+followed by layer normalization.
 
-To be specific, at time step $t$, assume that $\mathbf x_t$ is the current input, i.e., the query. As illustrated in :numref:`fig_self_attention_predict`, the keys and values of the self-attention layer consist of the current query with all the past queries $\mathbf x_1, \ldots, \mathbf x_{t-1}$.
 
-![Predict at time step $t$ for a self-attention layer.](../img/self-attention-predict.svg)
-:label:`fig_self_attention_predict`
-
-During training, the output for the $t$-query could observe all the previous key-value pairs. It results in an different behavior from prediction. Thus, during prediction we can eliminate the unnecessary information by specifying the valid length to be $t$ for the $t^\textrm{th}$ query.
+As we described earlier in this section,
+in the masked multi-head decoder self-attention
+(the first sublayer),
+queries, keys, and values
+all come from the outputs of the previous decoder layer.
+When training sequence-to-sequence models,
+tokens at all the positions (time steps)
+of the output sequence
+are known.
+However,
+during prediction
+the output sequence is generated token by token;
+thus,
+at any decoder time step
+only the generated tokens
+can be used in the decoder self-attention.
+To preserve auto-regression in the decoder,
+its masked self-attention
+specifies  `dec_valid_lens` so that
+any query 
+only attends to
+all positions in the decoder
+up to the query position.
 
 ```{.python .input}
 class DecoderBlock(nn.Block):
