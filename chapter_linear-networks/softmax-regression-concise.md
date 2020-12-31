@@ -137,7 +137,7 @@ $$
 $$
 
 We will want to keep the conventional softmax function handy
-in case we ever want to evaluate the output probabilities by our model. Thus, while this new equation is original Softmax function is equivalent to the one shown in the last section, it avoids both the overflow and underflow issue discussed. 
+in case we ever want to evaluate the output probabilities by our model. Thus, while this new equation is equivalent to the softmax equation shown in the last section, it avoids both the overflow and underflow issue discussed. 
 But instead of passing softmax probabilities into our new loss function,
 we will just pass the logits and compute the softmax and its log
 all at once inside the cross-entropy loss function,
