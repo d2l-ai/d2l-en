@@ -575,7 +575,11 @@ class DecoderBlock(nn.Module):
         return self.addnorm3(Z, self.ffn(Z)), state
 ```
 
-Similar to the  Transformer encoder block, `num_hiddens` should be equal to the last dimension size of $X$.
+To facilitate scaled dot-product operations
+in the encoder-decoder attention
+and addition operations in the residual connections,
+the feature dimension (`num_hiddens`) of the decoder is
+the same as that of the encoder.
 
 ```{.python .input}
 decoder_blk = DecoderBlock(24, 48, 8, 0.5, 0)
@@ -594,9 +598,14 @@ state = [encoder_blk(X, valid_lens), valid_lens, [None]]
 decoder_blk(X, state)[0].shape
 ```
 
-The construction of the entire  Transformer decoder is identical to the  Transformer encoder, except for the additional dense layer to obtain the output confidence scores.
-
-Let us implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `num_hiddens`, the  Transformer decoder also needs the Transformer encoder's outputs `enc_outputs` and `env_valid_lens`.
+Now we construct the entire Transformer decoder
+composed of `num_layers` instances of `DecoderBlock`.
+In the end,
+a fully-connected layer computes the prediction
+for all the `vocab_size` possible output tokens.
+Both of the decoder self-attention weights
+and the encoder-decoder attention weights
+are stored for later visualization.
 
 ```{.python .input}
 class TransformerDecoder(d2l.AttentionDecoder):
@@ -614,8 +623,8 @@ class TransformerDecoder(d2l.AttentionDecoder):
                              dropout, i))
         self.dense = nn.Dense(vocab_size, flatten=False)
 
-    def init_state(self, enc_outputs, env_valid_lens, *args):
-        return [enc_outputs, env_valid_lens, [None] * self.num_layers]
+    def init_state(self, enc_outputs, enc_valid_lens, *args):
+        return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
 
     def forward(self, X, state):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
@@ -654,8 +663,8 @@ class TransformerDecoder(d2l.AttentionDecoder):
                              num_heads, dropout, i))
         self.dense = nn.Linear(num_hiddens, vocab_size)
 
-    def init_state(self, enc_outputs, env_valid_lens, *args):
-        return [enc_outputs, env_valid_lens, [None] * self.num_layers]
+    def init_state(self, enc_outputs, enc_valid_lens, *args):
+        return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
 
     def forward(self, X, state):
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
@@ -677,8 +686,14 @@ class TransformerDecoder(d2l.AttentionDecoder):
 
 ## Training
 
-Finally, we can build an encoder-decoder model with the Transformer architecture.
-Similar to the seq2seq with attention model in :numref:`sec_seq2seq_attention`, we use the following hyperparameters: two Transformer blocks with both the embedding size and the block output size to be $32$. In addition, we use $4$ heads, and set the hidden size to be twice larger than the output size.
+Let us instantiate an encoder-decoder model
+by following the Transformer architecture.
+Here we specify that
+both the Transformer encoder and the Transformer decoder
+have 2 layers using 4-head attention.
+Similar to :numref:`sec_seq2seq_training`,
+we train the Transformer model
+for sequence to sequence learning on the English-French machine translation dataset.
 
 ```{.python .input}
 num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10
@@ -719,9 +734,9 @@ net = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
-As we can see from the training time and accuracy, compared with the seq2seq model with attention model, Transformer runs faster per epoch, and converges faster at the beginning.
-
-We can use the trained Transformer to translate some simple sentences.
+After training,
+we use the Transformer model
+to translate a few English sentences into French and compute their BLEU scores.
 
 ```{.python .input}
 #@tab all
@@ -733,6 +748,10 @@ for eng, fra in zip(engs, fras):
     print(f'{eng} => {translation}, ',
           f'bleu {d2l.bleu(translation, fra, k=2):.3f}')
 ```
+
+Let us visualize the Transformer attention weights when translating the last English sentence into French.
+The shape of the encoder attention weights
+is (number of encoder layers, number of attention heads, `num_steps` or number of queries, `num_steps` or number of key-value pairs).
 
 ```{.python .input}
 #@tab all

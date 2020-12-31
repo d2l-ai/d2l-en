@@ -318,7 +318,8 @@ attention_weights = d2l.reshape(
     (1, 1, -1, num_steps))
 ```
 
-By visualizing the attention weights,
+By visualizing the attention weights
+when translating the last English sentence,
 we can see that each query assigns non-uniform weights
 over key-value pairs.
 It shows that at each decoding step,
