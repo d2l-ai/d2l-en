@@ -299,9 +299,14 @@ assigned to one feature more than on any other.
 
 ```{.python .input}
 #@tab all
+train_features = train_data.iloc[:,1:-1]
+numeric_train_features = train_features.dtypes[train_features.dtypes != 'object'].index
+m=train_features[numeric_train_features].dropna().values.mean()
+d=train_features[numeric_train_features].dropna().values.std()
+
 numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
 all_features[numeric_features] = all_features[numeric_features].apply(
-    lambda x: (x - x.mean()) / (x.std()))
+    lambda x: (x - m) / d)
 # After standardizing the data all means vanish, hence we can set missing
 # values to 0
 all_features[numeric_features] = all_features[numeric_features].fillna(0)
