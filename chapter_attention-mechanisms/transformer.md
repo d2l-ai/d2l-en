@@ -813,7 +813,7 @@ dec_self_attention_weights.shape, dec_inter_attention_weights.shape
 
 ```{.python .input}
 #@tab pytorch
-dec_attention_weights_2d = [d2l.tensor(head[0]).tolist()
+dec_attention_weights_2d = [head[0].tolist()
                             for step in dec_attention_weight_seq
                             for attn in step for blk in attn for head in blk]
 dec_attention_weights_filled = d2l.tensor(
