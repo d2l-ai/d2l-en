@@ -195,6 +195,7 @@ As we described at the beginning
 of this section,
 this is a residual connection immediately
 followed by layer normalization.
+Both are key to effective deep architectures.
 
 In :numref:`sec_batch_norm`,
 we explained how batch normalization 
@@ -750,7 +751,7 @@ for eng, fra in zip(engs, fras):
 ```
 
 Let us visualize the Transformer attention weights when translating the last English sentence into French.
-The shape of the encoder attention weights
+The shape of the encoder self-attention weights
 is (number of encoder layers, number of attention heads, `num_steps` or number of queries, `num_steps` or number of key-value pairs).
 
 ```{.python .input}
@@ -769,6 +770,8 @@ no query attends to positions of padding tokens.
 In the following,
 two layers of multi-head attention weights
 are presented row by row.
+Each head independently attends
+based on a separate representation subspaces of queries, keys, and values.
 
 ```{.python .input}
 d2l.show_heatmaps(
@@ -783,6 +786,17 @@ d2l.show_heatmaps(
     ylabel='Query positions', titles=['Head %d' % i for i in range(1, 5)],
     figsize=(7, 3.5))
 ```
+
+To visualize both the decoder self-attention weights and the encoder-decoder attention weights,
+we need more data manipulations.
+For example,
+we fill the masked attention weights with zero.
+Note that
+the decoder self-attention weights
+and the encoder-decoder attention weights
+both have the same queries:
+the beginning-of-sequence token followed by
+the output tokens.
 
 ```{.python .input}
 dec_attention_weights_2d = [d2l.tensor(head[0]).tolist()
@@ -811,6 +825,9 @@ dec_self_attention_weights, dec_inter_attention_weights = \
 dec_self_attention_weights.shape, dec_inter_attention_weights.shape
 ```
 
+Due to the auto-regressive property of the decoder self-attention,
+no query attends to key-value pairs after the query position.
+
 ```{.python .input}
 #@tab all
 # Plus one to include the beginning-of-sequence token
@@ -820,6 +837,11 @@ d2l.show_heatmaps(
     titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))
 ```
 
+Similar to the case in the encoder self-attention,
+via the specified valid length of the input sequence,
+no query from the output sequence
+attends to those padding tokens from the input sequence.
+
 ```{.python .input}
 #@tab all
 d2l.show_heatmaps(
@@ -828,20 +850,29 @@ d2l.show_heatmaps(
     figsize=(7, 3.5))
 ```
 
+Although the Transformer architecture
+was originally proposed for sequence-to-sequence learning,
+as we will discover later in the book,
+either the Transformer encoder
+or the Transformer decoder
+is often individually used
+for different deep learning tasks.
+
+
 ## Summary
 
-* The Transformer model is based on the encoder-decoder architecture.
-* Multi-head attention layer contains $h$ parallel attention layers.
-* Positionwise feed-forward network consists of two dense layers that apply to the last dimension.
-* Layer normalization differs from batch normalization by normalizing along the last dimension (the feature dimension) instead of the first (batch size) dimension.
-* Positional encoding is the only place that adds positional information to the Transformer model.
+* The Transformer is an instance of the encoder-decoder architecture, though either the encoder or the decoder can be used individually in practice.
+* In the Transformer, multi-head self-attention is used for representing the input sequence and the output sequence, though the decoder has to preserve the auto-regressive property via a masked version.
+* Both the residual connections and the layer normalization in the Transformer are important for training a very deep model.
+* The positionwise feed-forward network in the Transformer model transforms the representation at all the sequence positions using the same MLP. 
 
 
 ## Exercises
 
-1. Try a larger size of epochs and compare the loss between seq2seq model and Transformer model.
-1. Can you think of any other benefit of positional encoding?
-1. Compare layer normalization and batch normalization, when shall we apply which?
+1. Train a deeper Transformer in the experiments. How does it affect the training speed and the prediction performance?
+1. Is it a good idea to replace scaled dot-product attention with additive attention in the Transformer? Why?
+1. For language modeling, can we use the Transformer encoder, decoder, or both? How to design this method?
+1. What can be issues to Transformers if input sequences are very long? Why?
 1. How to improve computational and memory efficiency of Transformers? Hint: you may refer to the excellent survey paper by Tay et al. :cite:`Tay.Dehghani.Bahri.ea.2020`.
 
 :begin_tab:`mxnet`

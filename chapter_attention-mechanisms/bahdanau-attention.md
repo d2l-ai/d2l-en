@@ -33,7 +33,7 @@ Bahdanau et al. proposed a differentiable attention model
 without the severe unidirectional alignment limitation :cite:`Bahdanau.Cho.Bengio.2014`.
 When predicting a token,
 if not all the input tokens are relevant,
-the model aligns (or pays attention)
+the model aligns (or attends)
 only to parts of the input sequence that are relevant to the current prediction.
 This is achieved
 by treating the context variable as an output of attention pooling.
