@@ -761,17 +761,27 @@ enc_attention_weights = d2l.reshape(
 enc_attention_weights.shape
 ```
 
+In the encoder self-attention,
+both queries and keys come from the same input sequence.
+Since padding tokens do not carry meaning,
+with specified valid length of the input sequence,
+no query attends to positions of padding tokens.
+In the following,
+two layers of multi-head attention weights
+are presented row by row.
+
 ```{.python .input}
-d2l.show_heatmaps(enc_attention_weights, xlabel='Key positions',
-                  ylabel='Query positions',
-                  titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
+d2l.show_heatmaps(
+    enc_attention_weights, xlabel='Key positions', ylabel='Query positions',
+    titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))
 ```
 
 ```{.python .input}
 #@tab pytorch
-d2l.show_heatmaps(enc_attention_weights.cpu(), xlabel='Key positions',
-                  ylabel='Query positions',
-                  titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
+d2l.show_heatmaps(
+    enc_attention_weights.cpu(), xlabel='Key positions',
+    ylabel='Query positions', titles=['Head %d' % i for i in range(1, 5)],
+    figsize=(7, 3.5))
 ```
 
 ```{.python .input}
@@ -807,14 +817,15 @@ dec_self_attention_weights.shape, dec_inter_attention_weights.shape
 d2l.show_heatmaps(
     dec_self_attention_weights[:, :, :, :len(translation.split()) + 1],
     xlabel='Key positions', ylabel='Query positions',
-    titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
+    titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))
 ```
 
 ```{.python .input}
 #@tab all
-d2l.show_heatmaps(dec_inter_attention_weights, xlabel='Key positions',
-                  ylabel='Query positions',
-                  titles=['Head %d' % i for i in range(4)], figsize=(7, 3.5))
+d2l.show_heatmaps(
+    dec_inter_attention_weights, xlabel='Key positions',
+    ylabel='Query positions', titles=['Head %d' % i for i in range(1, 5)],
+    figsize=(7, 3.5))
 ```
 
 ## Summary
