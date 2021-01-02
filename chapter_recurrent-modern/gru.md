@@ -182,6 +182,15 @@ from torch import nn
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+from torch import nn
+
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+```
 
 ### Initializing Model Parameters
 
@@ -242,6 +251,31 @@ def get_params(vocab_size, num_hiddens, device):
     return params
 ```
 
+```{.python .input}
+#@tab tensorflow
+def get_params(vocab_size, num_hiddens, device):
+    num_inputs = num_outputs = vocab_size
+
+    def _one(shape):
+        return tf.Variable(tf.random.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32))
+    def _three():
+        return (_one((num_inputs, num_hiddens)),
+                _one((num_hiddens, num_hiddens)),
+                tf.Variable(tf.zeros(num_hiddens), dtype=tf.float32))
+    W_xi, W_hi, b_i = three()  # Input gate parameters
+    W_xf, W_hf, b_f = three()  # Forget gate parameters
+    W_xo, W_ho, b_o = three()  # Output gate parameters
+    W_xc, W_hc, b_c = three()  # Candidate memory cell parameters
+    # Output layer parameters
+    W_hq = _one((num_hiddens, num_outputs))
+    b_q = tf.Variable(tf.zeros(num_outputs), dtype=tf.float32)
+    # Attach gradients
+    params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]
+    for param in params:
+        param.requires_grad_(True)
+    return params
+```
+
 ### Defining the Model
 
 Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns a tensor with a shape (batch size, number of hidden units) whose values are all zeros.
@@ -255,6 +289,11 @@ def init_gru_state(batch_size, num_hiddens, device):
 #@tab pytorch
 def init_gru_state(batch_size, num_hiddens, device):
     return (torch.zeros((batch_size, num_hiddens), device=device), )
+```
+```{.python .input}
+#@tab tensorflow
+def init_gru_state(batch_size, num_hiddens, device):
+    return (tf.zeros(shape=(batch_size, num_hiddens)),device )
 ```
 
 Now we are ready to define the GRU model.
@@ -289,6 +328,22 @@ def gru(inputs, state, params):
         Y = H @ W_hq + b_q
         outputs.append(Y)
     return torch.cat(outputs, dim=0), (H,)
+```
+```{.python .input}
+#@tab tensorflow
+def gru(inputs, state, params):
+    W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q = params
+    H, = state
+    outputs = []
+    for X in inputs:
+        X=tf.reshape(X,[-1,W_xh.shape[0]])
+        Z = tf.sigmoid(tf.matmul(X, W_xz) + tf.matmul(H, W_hz) + b_z)
+        R = tf.sigmoid(tf.matmul(X, W_xr) + tf.matmul(H, W_hr) + b_r)
+        H_tilda = tf.tanh(tf.matmul(X, W_xh) + tf.matmul(R * H, W_hh) + b_h)
+        H = Z * H + (1 - Z) * H_tilda
+        Y = tf.matmul(H, W_hq) + b_q
+        outputs.append(Y)
+    return outputs, (H,)
 ```
 
 ### Training and Prediction
