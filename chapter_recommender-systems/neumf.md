@@ -1,6 +1,6 @@
 # Neural Collaborative Filtering for Personalized Ranking
 
-This section moves beyond explicit feedback, introducing the neural collaborative filtering (NCF) framework for recommendation with implicit feedback. Implicit feedback is pervasive in recommender systems. Actions such as Clicks, buys, and watches are common implicit feedback which are easy to collect and indicative of users' preferences. The model we will introduce, titled NeuMF :cite:`He.Liao.Zhang.ea.2017`, short for neural matrix factorization, aims to address the personalized ranking task with implicit feedback. This model leverages the flexibility and non-linearity of neural networks to replace dot products of matrix factorization, aiming at enhancing the model expressiveness. In specific, this model is structured with two subnetworks including generalized matrix factorization (GMF) and multilayer perceptron (MLP) and models the interactions from two pathways instead of simple inner products. The outputs of these two networks are concatenated for the final prediction scores calculation. Unlike the rating prediction task in AutoRec, this model generates a ranked recommendation list to each user based on the implicit feedback. We will use the personalized ranking loss introduced in the last section to train this model. 
+This section moves beyond explicit feedback, introducing the neural collaborative filtering (NCF) framework for recommendation with implicit feedback. Implicit feedback is pervasive in recommender systems. Actions such as Clicks, buys, and watches are common implicit feedback which are easy to collect and indicative of users' preferences. The model we will introduce, titled NeuMF :cite:`He.Liao.Zhang.ea.2017`, short for neural matrix factorization, aims to address the personalized ranking task with implicit feedback. This model leverages the flexibility and non-linearity of neural networks to replace dot products of matrix factorization, aiming at enhancing the model expressiveness. In specific, this model is structured with two subnetworks including generalized matrix factorization (GMF) and MLP and models the interactions from two pathways instead of simple inner products. The outputs of these two networks are concatenated for the final prediction scores calculation. Unlike the rating prediction task in AutoRec, this model generates a ranked recommendation list to each user based on the implicit feedback. We will use the personalized ranking loss introduced in the last section to train this model.
 
 ## The NeuMF model
 
@@ -11,9 +11,9 @@ $$
 \hat{y}_{ui} = \alpha(\mathbf{h}^\top \mathbf{x}),
 $$
 
-where $\odot$ denotes the Hadamard product of vectors. $\mathbf{P} \in \mathbb{R}^{m \times k}$  and $\mathbf{Q} \in \mathbb{R}^{n \times k}$ corespond to user and item latent matrix respectively. $\mathbf{p}_u \in \mathbb{R}^{ k}$ is the $u^\mathrm{th}$ row of $P$ and $\mathbf{q}_i \in \mathbb{R}^{ k}$ is the $i^\mathrm{th}$ row of $Q$.  $\alpha$ and $h$ denote the activation function and weight of the output layer. $\hat{y}_{ui}$ is the prediction score of the user $u$ might give to the item $i$. 
+where $\odot$ denotes the Hadamard product of vectors. $\mathbf{P} \in \mathbb{R}^{m \times k}$  and $\mathbf{Q} \in \mathbb{R}^{n \times k}$ corespond to user and item latent matrix respectively. $\mathbf{p}_u \in \mathbb{R}^{ k}$ is the $u^\mathrm{th}$ row of $P$ and $\mathbf{q}_i \in \mathbb{R}^{ k}$ is the $i^\mathrm{th}$ row of $Q$.  $\alpha$ and $h$ denote the activation function and weight of the output layer. $\hat{y}_{ui}$ is the prediction score of the user $u$ might give to the item $i$.
 
-Another component of this model is MLP. To enrich model flexibility, the MLP subnetwork does not share user and item embeddings with GMF. It uses the concatenation of user and item embeddings as input. With the complicated connections and nonlinear transformations, it is capable of eastimating the intricate interactions between users and items. More precisely, the MLP subnetwork is defined as:
+Another component of this model is MLP. To enrich model flexibility, the MLP subnetwork does not share user and item embeddings with GMF. It uses the concatenation of user and item embeddings as input. With the complicated connections and nonlinear transformations, it is capable of estimating the intricate interactions between users and items. More precisely, the MLP subnetwork is defined as:
 
 $$
 \begin{aligned}
@@ -21,7 +21,7 @@ z^{(1)} &= \phi_1(\mathbf{U}_u, \mathbf{V}_i) = \left[ \mathbf{U}_u, \mathbf{V}_
 \phi^{(2)}(z^{(1)})  &= \alpha^1(\mathbf{W}^{(2)} z^{(1)} + b^{(2)}) \\
 &... \\
 \phi^{(L)}(z^{(L-1)}) &= \alpha^L(\mathbf{W}^{(L)} z^{(L-1)} + b^{(L)})) \\
-\hat{y}_{ui} &= \alpha(\mathbf{h}^\top\phi^L(z^{(L)}))
+\hat{y}_{ui} &= \alpha(\mathbf{h}^\top\phi^L(z^{(L-1)}))
 \end{aligned}
 $$
 
@@ -29,7 +29,7 @@ where $\mathbf{W}^*, \mathbf{b}^*$ and $\alpha^*$ denote the weight matrix, bias
 
 To fuse the results of GMF and MLP, instead of simple addition, NeuMF concatenates the second last layers of two subnetworks to create a feature vector which can be passed to the further layers. Afterwards, the ouputs are projected with matrix $\mathbf{h}$ and a sigmoid activation function. The prediction layer is formulated as:
 $$
-\hat{y}_{ui} = \sigma(\mathbf{h}^\top[\mathbf{x}, \phi^L(z^{(L)})]).
+\hat{y}_{ui} = \sigma(\mathbf{h}^\top[\mathbf{x}, \phi^L(z^{(L-1)})]).
 $$
 
 The following figure illustrates the model architecture of NeuMF.
@@ -42,7 +42,7 @@ from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
 import random
-import sys
+
 npx.set_np()
 ```
 
@@ -62,7 +62,8 @@ class NeuMF(nn.Block):
         for num_hiddens in nums_hiddens:
             self.mlp.add(nn.Dense(num_hiddens, activation='relu',
                                   use_bias=True))
-            
+        self.prediction_layer = nn.Dense(1, activation='sigmoid', use_bias=False)
+
     def forward(self, user_id, item_id):
         p_mf = self.P(user_id)
         q_mf = self.Q(item_id)
@@ -71,12 +72,12 @@ class NeuMF(nn.Block):
         q_mlp = self.V(item_id)
         mlp = self.mlp(np.concatenate([p_mlp, q_mlp], axis=1))
         con_res = np.concatenate([gmf, mlp], axis=1)
-        return np.sum(con_res, axis=-1)
+        return self.prediction_layer(con_res)
 ```
 
 ## Customized Dataset with Negative Sampling
 
-For pairwise ranking loss, an important step is negative sampling. For each user, the items that a user has not interacted with are candidate items (unobserved entries). The following function takes users identity and candidate items as input, and samples negative items randomly for each user from the candidate set of that user. During the training stage, the model ensures that the items that a user likes to be ranked higher than items she dislikes or has not interacted with.
+For pairwise ranking loss, an important step is negative sampling. For each user, the items that a user has not interacted with are candidate items (unobserved entries). The following function takes users identity and candidate items as input, and samples negative items randomly for each user from the candidate set of that user. During the training stage, the model ensures that the items that a user likes to be ranked higher than items he dislikes or has not interacted with.
 
 ```{.python .input  n=3}
 class PRDataset(gluon.data.Dataset):
@@ -88,7 +89,7 @@ class PRDataset(gluon.data.Dataset):
 
     def __len__(self):
         return len(self.users)
-    
+
     def __getitem__(self, idx):
         neg_items = list(self.all - set(self.cand[int(self.users[idx])]))
         indices = random.randint(0, len(neg_items) - 1)
@@ -110,7 +111,7 @@ $$
 \text{AUC} = \frac{1}{m} \sum_{u \in \mathcal{U}} \frac{1}{|\mathcal{I} \backslash S_u|} \sum_{j \in I \backslash S_u} \textbf{1}(rank_{u, g_u} < rank_{u, j}),
 $$
 
-where $\mathcal{I}$ is the item set. $S_u$ is the candidate items of user $u$. Note that many other evaluation protocols such as precision, recall and normalized discounted cumulative gain (NDCG) can also be used. 
+where $\mathcal{I}$ is the item set. $S_u$ is the candidate items of user $u$. Note that many other evaluation protocols such as precision, recall and normalized discounted cumulative gain (NDCG) can also be used.
 
 The following function calculates the hit counts and AUC for each user.
 
@@ -131,7 +132,7 @@ Then, the overall Hit rate and AUC are calculated as follows.
 ```{.python .input  n=5}
 #@save
 def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
-                     ctx):
+                     devices):
     ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
     all_items = set([i for i in range(num_users)])
     for u in range(num_users):
@@ -143,12 +144,11 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
         if seq is not None:
             x.append(seq[user_ids, :])
         x.extend([np.array(item_ids)])
-        test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x),
-                                               shuffle=False, 
-                                               last_batch="keep", 
-                                               batch_size=1024) 
+        test_data_iter = gluon.data.DataLoader(
+            gluon.data.ArrayDataset(*x), shuffle=False, last_batch="keep",
+            batch_size=1024)
         for index, values in enumerate(test_data_iter):
-            x = [gluon.utils.split_and_load(v, ctx, even_split=False) 
+            x = [gluon.utils.split_and_load(v, devices, even_split=False)
                  for v in values]
             scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
         scores = [item for sublist in scores for item in sublist]
@@ -168,7 +168,7 @@ The training function is defined below. We train the model in the pairwise manne
 ```{.python .input  n=6}
 #@save
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx_list, evaluator, 
+                  num_users, num_items, num_epochs, devices, evaluator,
                   candidates, eval_step=1):
     timer, hit_rate, auc = d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
@@ -178,14 +178,14 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
         for i, values in enumerate(train_iter):
             input_data = []
             for v in values:
-                input_data.append(gluon.utils.split_and_load(v, ctx_list))
+                input_data.append(gluon.utils.split_and_load(v, devices))
             with autograd.record():
                 p_pos = [net(*t) for t in zip(*input_data[0:-1])]
-                p_neg = [net(*t) for t in zip(*input_data[0:-2], 
+                p_neg = [net(*t) for t in zip(*input_data[0:-2],
                                               input_data[-1])]
                 ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]
-            l += sum([l.asnumpy() for l in ls]).mean()/len(ctx_list)
+            l += sum([l.asnumpy() for l in ls]).mean()/len(devices)
             trainer.step(values[0].shape[0])
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
@@ -193,12 +193,12 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             if (epoch + 1) % eval_step == 0:
                 hit_rate, auc = evaluator(net, test_iter, test_seq_iter,
                                           candidates, num_users, num_items,
-                                          ctx_list)
+                                          devices)
                 animator.add(epoch + 1, (hit_rate, auc))
-    print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
-          % (metric[0] / metric[1], hit_rate, auc))
-    print('%.1f examples/sec on %s'
-          % (metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'train loss {metric[0] / metric[1]:.3f}, '
+          f'test hit rate {float(hit_rate):.3f}, test AUC {float(auc):.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(devices)}')
 ```
 
 Now, we can load the MovieLens 100k dataset and train the model. Since there are only ratings in the MovieLens dataset, with some losses of accuracy, we binarize these ratings to zeros and ones. If a user rated an item, we consider the implicit feedback as one, otherwise as zero. The action of rating an item can be treated as a form of providing implicit feedback.  Here, we split the dataset in the `seq-aware` mode where users' latest interacted items are left out for test.
@@ -212,20 +212,17 @@ users_train, items_train, ratings_train, candidates = d2l.load_data_ml100k(
     train_data, num_users, num_items, feedback="implicit")
 users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
     test_data, num_users, num_items, feedback="implicit")
-num_workers = 0 if sys.platform.startswith("win") else 4
-train_iter = gluon.data.DataLoader(PRDataset(users_train, items_train,
-                                             candidates, num_items ), 
-                                   batch_size, True,
-                                   last_batch="rollover",
-                                   num_workers=num_workers)
+train_iter = gluon.data.DataLoader(
+    PRDataset(users_train, items_train, candidates, num_items ), batch_size,
+    True, last_batch="rollover", num_workers=d2l.get_dataloader_workers())
 ```
 
 We then create and initialize the model. we use a three-layer MLP with constant hidden size 10.
 
 ```{.python .input  n=8}
-ctx = d2l.try_all_gpus()
+devices = d2l.try_all_gpus()
 net = NeuMF(10, num_users, num_items, nums_hiddens=[10, 10, 10])
-net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
+net.initialize(ctx=devices, force_reinit=True, init=mx.init.Normal(0.01))
 ```
 
 The following code trains the model.
@@ -236,13 +233,13 @@ loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
 train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users,
-              num_items, num_epochs, ctx, evaluate_ranking, candidates)
+              num_items, num_epochs, devices, evaluate_ranking, candidates)
 ```
 
-## Summary 
+## Summary
 
 * Adding nonlinearity to matrix factorization model is beneficial for improving the model capability and effectiveness.
-* NeuMF is a combination of matrix factorization and Multilayer perceptron. The multilayer perceptron takes the concatenation of user and item embeddings as the input.
+* NeuMF is a combination of matrix factorization and multilayer perceptron. The multilayer perceptron takes the concatenation of user and item embeddings as the input.
 
 ## Exercises
 
@@ -251,6 +248,6 @@ train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users,
 * Try different optimizers, learning rate and weight decay rate.
 * Try to use hinge loss defined in the last section to optimize this model.
 
-## [Discussions](https://discuss.mxnet.io/t/5164)
-
-![](../img/qr_neumf.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/403)
+:end_tab:

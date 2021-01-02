@@ -7,7 +7,7 @@ Let us begin by considering learning problems with features that occur infrequen
 
 Imagine that we are training a language model. To get good accuracy we typically want to decrease the learning rate as we keep on training, usually at a rate of $\mathcal{O}(t^{-\frac{1}{2}})$ or slower. Now consider a model training on sparse features, i.e., features that occur only infrequently. This is common for natural language, e.g., it is a lot less likely that we will see the word *preconditioning* than *learning*. However, it is also common in other areas such as computational advertising and personalized collaborative filtering. After all, there are many things that are of interest only for a small number of people.
 
-Parameters associated with infrequent features only receive meaningful updates whenever these features occur. Given a decreasing learning rate we might end up in a situation where the parameters for common features converge rather quickly to their optimal values, whereas for infrequent features we are still short of observing them sufficiently frequently before their optimal values can be determined. In other words, the learning rate either decreases too quickly for frequent features or too slowly for infrequent ones.
+Parameters associated with infrequent features only receive meaningful updates whenever these features occur. Given a decreasing learning rate we might end up in a situation where the parameters for common features converge rather quickly to their optimal values, whereas for infrequent features we are still short of observing them sufficiently frequently before their optimal values can be determined. In other words, the learning rate either decreases too slowly for frequent features or too quickly for infrequent ones.
 
 A possible hack to redress this issue would be to count the number of times we see a particular feature and to use this as a clock for adjusting learning rates. That is, rather than choosing a learning rate of the form $\eta = \frac{\eta_0}{\sqrt{t + c}}$ we could use $\eta_i = \frac{\eta_0}{\sqrt{s(i, t) + c}}$. Here $s(i, t)$ counts the number of nonzeros for feature $i$ that we have observed up to time $t$. This is actually quite easy to implement at no meaningful overhead. However, it fails whenever we do not quite have sparsity but rather just data where the gradients are often very small and only rarely large. After all, it is unclear where one would draw the line between something that qualifies as an observed feature or not.
 
@@ -64,13 +64,32 @@ $$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$
 
 We are going to implement Adagrad using the same learning rate previously, i.e., $\eta = 0.4$. As we can see, the iterative trajectory of the independent variable is smoother. However, due to the cumulative effect of $\boldsymbol{s}_t$, the learning rate continuously decays, so the independent variable does not move as much during later stages of iteration.
 
-```{.python .input  n=6}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
 from mxnet import np, npx
 npx.set_np()
+```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import math
+import torch
+```
+
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import math
+import tensorflow as tf
+```
+
+```{.python .input}
+#@tab all
 def adagrad_2d(x1, x2, s1, s2):
     eps = 1e-6
     g1, g2 = 0.2 * x1, 4 * x2
@@ -89,7 +108,8 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 
 As we increase the learning rate to $2$ we see much better behavior. This already indicates that the decrease in learning rate might be rather aggressive, even in the noise-free case and we need to ensure that parameters converge appropriately.
 
-```{.python .input  n=10}
+```{.python .input}
+#@tab all
 eta = 2
 d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 ```
@@ -98,10 +118,10 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 
 Just like the momentum method, Adagrad needs to maintain a state variable of the same shape as the parameters.
 
-```{.python .input  n=8}
+```{.python .input}
 def init_adagrad_states(feature_dim):
-    s_w = np.zeros((feature_dim, 1))
-    s_b = np.zeros(1)
+    s_w = d2l.zeros((feature_dim, 1))
+    s_b = d2l.zeros(1)
     return (s_w, s_b)
 
 def adagrad(params, states, hyperparams):
@@ -111,10 +131,41 @@ def adagrad(params, states, hyperparams):
         p[:] -= hyperparams['lr'] * p.grad / np.sqrt(s + eps)
 ```
 
+```{.python .input}
+#@tab pytorch
+def init_adagrad_states(feature_dim):
+    s_w = d2l.zeros((feature_dim, 1))
+    s_b = d2l.zeros(1)
+    return (s_w, s_b)
+
+def adagrad(params, states, hyperparams):
+    eps = 1e-6
+    for p, s in zip(params, states):
+        with torch.no_grad():
+            s[:] += torch.square(p.grad)
+            p[:] -= hyperparams['lr'] * p.grad / torch.sqrt(s + eps)
+        p.grad.data.zero_()
+```
+
+```{.python .input}
+#@tab tensorflow
+def init_adagrad_states(feature_dim):
+    s_w = tf.Variable(d2l.zeros((feature_dim, 1)))
+    s_b = tf.Variable(d2l.zeros(1))
+    return (s_w, s_b)
+
+def adagrad(params, grads, states, hyperparams):
+    eps = 1e-6
+    for p, s, g in zip(params, states, grads):
+        s[:].assign(s + tf.math.square(g))
+        p[:].assign(p - hyperparams['lr'] * g / tf.math.sqrt(s + eps))
+```
+
 Compared to the experiment in :numref:`sec_minibatch_sgd` we use a
 larger learning rate to train the model.
 
-```{.python .input  n=9}
+```{.python .input}
+#@tab all
 data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 d2l.train_ch11(adagrad, init_adagrad_states(feature_dim),
                {'lr': 0.1}, data_iter, feature_dim);
@@ -124,8 +175,20 @@ d2l.train_ch11(adagrad, init_adagrad_states(feature_dim),
 
 Using the `Trainer` instance of the algorithm `adagrad`, we can invoke the Adagrad algorithm in Gluon.
 
-```{.python .input  n=5}
-d2l.train_gluon_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
+```{.python .input}
+d2l.train_concise_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
+```
+
+```{.python .input}
+#@tab pytorch
+trainer = torch.optim.Adagrad
+d2l.train_concise_ch11(trainer, {'lr': 0.1}, data_iter)
+```
+
+```{.python .input}
+#@tab tensorflow
+trainer = tf.keras.optimizers.Adagrad
+d2l.train_concise_ch11(trainer, {'learning_rate' : 0.1}, data_iter)
 ```
 
 ## Summary
@@ -133,7 +196,7 @@ d2l.train_gluon_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 * Adagrad decreases the learning rate dynamically on a per-coordinate basis.
 * It uses the magnitude of the gradient as a means of adjusting how quickly progress is achieved - coordinates with large gradients are compensated with a smaller learning rate.
 * Computing the exact second derivative is typically infeasible in deep learning problems due to memory and computational constraints. The gradient can be a useful proxy.
-* If the optimization problem has a rather uneven uneven structure Adagrad can help mitigate the distortion.
+* If the optimization problem has a rather uneven structure Adagrad can help mitigate the distortion.
 * Adagrad is particularly effective for sparse features where the learning rate needs to decrease more slowly for infrequently occurring terms.
 * On deep learning problems Adagrad can sometimes be too aggressive in reducing learning rates. We will discuss strategies for mitigating this in the context of :numref:`sec_adam`.
 
@@ -146,7 +209,14 @@ d2l.train_gluon_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 1. Try out Adagrad for a proper deep network, such as :numref:`sec_lenet` when applied to Fashion MNIST.
 1. How would you need to modify Adagrad to achieve a less aggressive decay in learning rate?
 
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/355)
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/2375)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1072)
+:end_tab:
 
-![](../img/qr_adagrad.svg)
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1073)
+:end_tab:

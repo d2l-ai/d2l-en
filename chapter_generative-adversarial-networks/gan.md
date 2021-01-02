@@ -1,9 +1,9 @@
 # Generative Adversarial Networks
 :label:`sec_basic_gan`
 
-Throughout most of this book, we have talked about how to make predictions. In some form or another, we used deep neural networks learned mappings from data points to labels. This kind of learning is called discriminative learning, as in, we'd like to be able to discriminate between photos cats and photos of dogs. Classifiers and regressors are both examples of discriminative learning. And neural networks trained by backpropagation have upended everything we thought we knew about discriminative learning on large complicated datasets. Classification accuracies on high-res images has gone from useless to human-level (with some caveats) in just 5-6 years. We will spare you another spiel about all the other discriminative tasks where deep neural networks do astoundingly well.
+Throughout most of this book, we have talked about how to make predictions. In some form or another, we used deep neural networks learned mappings from data examples to labels. This kind of learning is called discriminative learning, as in, we'd like to be able to discriminate between photos cats and photos of dogs. Classifiers and regressors are both examples of discriminative learning. And neural networks trained by backpropagation have upended everything we thought we knew about discriminative learning on large complicated datasets. Classification accuracies on high-res images has gone from useless to human-level (with some caveats) in just 5-6 years. We will spare you another spiel about all the other discriminative tasks where deep neural networks do astoundingly well.
 
-But there is more to machine learning than just solving discriminative tasks. For example, given a large dataset, without any labels, we might want to learn a model that concisely captures the characteristics of this data. Given such a model, we could sample synthetic data points that resemble the distribution of the training data. For example, given a large corpus of photographs of faces, we might want to be able to generate a new photorealistic image that looks like it might plausibly have come from the same dataset. This kind of learning is called generative modeling.
+But there is more to machine learning than just solving discriminative tasks. For example, given a large dataset, without any labels, we might want to learn a model that concisely captures the characteristics of this data. Given such a model, we could sample synthetic data examples that resemble the distribution of the training data. For example, given a large corpus of photographs of faces, we might want to be able to generate a new photorealistic image that looks like it might plausibly have come from the same dataset. This kind of learning is called generative modeling.
 
 Until recently, we had no method that could synthesize novel photorealistic images. But the success of deep neural networks for discriminative learning opened up new possibilities. One big trend over the last three years has been the application of discriminative deep nets to overcome challenges in problems that we do not generally think of as supervised learning problems. The recurrent neural network language models are one example of using a discriminative network (trained to predict the next character) that once trained can act as a generative model.
 
@@ -42,7 +42,7 @@ $$min_D max_G \{ -E_{x \sim \text{Data}} log D(\mathbf x) - E_{z \sim \text{Nois
 
 Many of the GANs applications are in the context of images. As a demonstration purpose, we are going to content ourselves with fitting a much simpler distribution first. We will illustrate what happens if we use GANs to build the world's most inefficient estimator of parameters for a Gaussian. Let us get started.
 
-```{.python .input  n=1}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -50,26 +50,37 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+from torch import nn
+```
+
 ## Generate some "real" data
 
 Since this is going to be the world's lamest example, we simply generate data drawn from a Gaussian.
 
-```{.python .input  n=2}
-X = np.random.normal(size=(1000, 2))
-A = np.array([[1, 2], [-0.1, 0.5]])
-b = np.array([1, 2])
-data = X.dot(A) + b
+```{.python .input}
+#@tab all
+X = d2l.normal(0.0, 1, (1000, 2))
+A = d2l.tensor([[1, 2], [-0.1, 0.5]])
+b = d2l.tensor([1, 2])
+data = d2l.matmul(X, A) + b
 ```
 
 Let us see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
 
-```{.python .input  n=3}
-d2l.set_figsize((3.5, 2.5))
-d2l.plt.scatter(data[:100, 0].asnumpy(), data[:100, 1].asnumpy());
-print("The covariance matrix is\n%s" % np.dot(A.T, A))
+```{.python .input}
+#@tab all
+d2l.set_figsize()
+d2l.plt.scatter(d2l.numpy(data[:100, 0]), d2l.numpy(data[:100, 1]));
+print(f'The covariance matrix is\n{d2l.matmul(A.T, A)}')
 ```
 
-```{.python .input  n=4}
+```{.python .input}
+#@tab all
 batch_size = 8
 data_iter = d2l.load_array((data,), batch_size)
 ```
@@ -78,27 +89,40 @@ data_iter = d2l.load_array((data,), batch_size)
 
 Our generator network will be the simplest network possible - a single layer linear model. This is since we will be driving that linear network with a Gaussian data generator. Hence, it literally only needs to learn the parameters to fake things perfectly.
 
-```{.python .input  n=5}
+```{.python .input}
 net_G = nn.Sequential()
 net_G.add(nn.Dense(2))
+```
+
+```{.python .input}
+#@tab pytorch
+net_G = nn.Sequential(nn.Linear(2, 2))
 ```
 
 ## Discriminator
 
 For the discriminator we will be a bit more discriminating: we will use an MLP with 3 layers to make things a bit more interesting.
 
-```{.python .input  n=6}
+```{.python .input}
 net_D = nn.Sequential()
 net_D.add(nn.Dense(5, activation='tanh'),
           nn.Dense(3, activation='tanh'),
           nn.Dense(1))
 ```
 
+```{.python .input}
+#@tab pytorch
+net_D = nn.Sequential(
+    nn.Linear(2, 5), nn.Tanh(),
+    nn.Linear(5, 3), nn.Tanh(),
+    nn.Linear(3, 1))
+```
+
 ## Training
 
 First we define a function to update the discriminator.
 
-```{.python .input  n=7}
+```{.python .input}
 #@save
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
@@ -108,7 +132,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     with autograd.record():
         real_Y = net_D(X)
         fake_X = net_G(Z)
-        # Do not need to compute gradient for net_G, detach it from
+        # Do not need to compute gradient for `net_G`, detach it from
         # computing gradients.
         fake_Y = net_D(fake_X.detach())
         loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
@@ -117,18 +141,39 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     return float(loss_D.sum())
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def update_D(X, Z, net_D, net_G, loss, trainer_D):
+    """Update discriminator."""
+    batch_size = X.shape[0]
+    ones = torch.ones((batch_size,), device=X.device)
+    zeros = torch.zeros((batch_size,), device=X.device)
+    trainer_D.zero_grad()
+    real_Y = net_D(X)
+    fake_X = net_G(Z)
+    # Do not need to compute gradient for `net_G`, detach it from
+    # computing gradients.
+    fake_Y = net_D(fake_X.detach())
+    loss_D = (loss(real_Y, ones.reshape(real_Y.shape)) + 
+              loss(fake_Y, zeros.reshape(fake_Y.shape))) / 2
+    loss_D.backward()
+    trainer_D.step()
+    return loss_D
+```
+
 The generator is updated similarly. Here we reuse the cross-entropy loss but change the label of the fake data from $0$ to $1$.
 
-```{.python .input  n=8}
+```{.python .input}
 #@save
-def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
+def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator."""
     batch_size = Z.shape[0]
     ones = np.ones((batch_size,), ctx=Z.ctx)
     with autograd.record():
-        # We could reuse fake_X from update_D to save computation.
+        # We could reuse `fake_X` from `update_D` to save computation
         fake_X = net_G(Z)
-        # Recomputing fake_Y is needed since net_D is changed.
+        # Recomputing `fake_Y` is needed since `net_D` is changed
         fake_Y = net_D(fake_X)
         loss_G = loss(fake_Y, ones)
     loss_G.backward()
@@ -136,9 +181,27 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     return float(loss_G.sum())
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def update_G(Z, net_D, net_G, loss, trainer_G):
+    """Update generator."""
+    batch_size = Z.shape[0]
+    ones = torch.ones((batch_size,), device=Z.device)
+    trainer_G.zero_grad()
+    # We could reuse `fake_X` from `update_D` to save computation
+    fake_X = net_G(Z)
+    # Recomputing `fake_Y` is needed since `net_D` is changed
+    fake_Y = net_D(fake_X)
+    loss_G = loss(fake_Y, ones.reshape(fake_Y.shape))
+    loss_G.backward()
+    trainer_G.step()
+    return loss_G
+```
+
 Both the discriminator and the generator performs a binary logistic regression with the cross-entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
 
-```{.python .input  n=9}
+```{.python .input}
 def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
     loss = gluon.loss.SigmoidBCELoss()
     net_D.initialize(init=init.Normal(0.02), force_reinit=True)
@@ -149,9 +212,9 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
                               'adam', {'learning_rate': lr_G})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
-                            legend=['generator', 'discriminator'])
+                            legend=['discriminator', 'generator'])
     animator.fig.subplots_adjust(hspace=0.3)
-    for epoch in range(1, num_epochs+1):
+    for epoch in range(num_epochs):
         # Train one epoch
         timer = d2l.Timer()
         metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
@@ -170,17 +233,56 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
         animator.axes[1].legend(['real', 'generated'])
         # Show the losses
         loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]
-        animator.add(epoch, (loss_D, loss_G))
-    print('loss_D %.3f, loss_G %.3f, %d examples/sec' % (
-        loss_D, loss_G, metric[2]/timer.stop()))
+        animator.add(epoch + 1, (loss_D, loss_G))
+    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '
+          f'{metric[2] / timer.stop():.1f} examples/sec')
 ```
 
-Now we specify the hyper-parameters to fit the Gaussian distribution.
+```{.python .input}
+#@tab pytorch
+def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
+    loss = nn.BCEWithLogitsLoss(reduction='sum')
+    for w in net_D.parameters():
+        nn.init.normal_(w, 0, 0.02)
+    for w in net_G.parameters():
+        nn.init.normal_(w, 0, 0.02)
+    trainer_D = torch.optim.Adam(net_D.parameters(), lr=lr_D)
+    trainer_G = torch.optim.Adam(net_G.parameters(), lr=lr_G)
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
+                            legend=['discriminator', 'generator'])
+    animator.fig.subplots_adjust(hspace=0.3)
+    for epoch in range(num_epochs):
+        # Train one epoch
+        timer = d2l.Timer()
+        metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
+        for (X,) in data_iter:
+            batch_size = X.shape[0]
+            Z = torch.normal(0, 1, size=(batch_size, latent_dim))
+            metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),
+                       update_G(Z, net_D, net_G, loss, trainer_G),
+                       batch_size)
+        # Visualize generated examples
+        Z = torch.normal(0, 1, size=(100, latent_dim))
+        fake_X = net_G(Z).detach().numpy()
+        animator.axes[1].cla()
+        animator.axes[1].scatter(data[:, 0], data[:, 1])
+        animator.axes[1].scatter(fake_X[:, 0], fake_X[:, 1])
+        animator.axes[1].legend(['real', 'generated'])
+        # Show the losses
+        loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]
+        animator.add(epoch + 1, (loss_D, loss_G))
+    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '
+          f'{metric[2] / timer.stop():.1f} examples/sec')
+```
 
-```{.python .input  n=10}
+Now we specify the hyperparameters to fit the Gaussian distribution.
+
+```{.python .input}
+#@tab all
 lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20
 train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
-      latent_dim, data[:100].asnumpy())
+      latent_dim, d2l.numpy(data[:100]))
 ```
 
 ## Summary
@@ -193,7 +295,10 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
 
 * Does an equilibrium exist where the generator wins, *i.e.* the discriminator ends up unable to distinguish the two distributions on finite samples?
 
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/408)
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/4353)
-
-![](../img/qr_gan.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1082)
+:end_tab:

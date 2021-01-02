@@ -1,12 +1,12 @@
 # Sequence-Aware Recommender Systems
 
-In previous sections, we abstract the recommendation task as a matrix completion problem without considering users' short-term behaviors. In this section, we will introduce a recommendation model that takes  the sequentially-ordered user interaction logs into account.  It is a sequence-aware recommender :cite:`Quadrana.Cremonesi.Jannach.2018` where the input is an ordered and often timestamped list of past user actions.  A number of recent literatures have demonstrated the usefulness of incorporating such information in modeling users' temporal behavioral patterns and discovering their interest drift.  
+In previous sections, we abstract the recommendation task as a matrix completion problem without considering users' short-term behaviors. In this section, we will introduce a recommendation model that takes  the sequentially-ordered user interaction logs into account.  It is a sequence-aware recommender :cite:`Quadrana.Cremonesi.Jannach.2018` where the input is an ordered and often timestamped list of past user actions.  A number of recent literatures have demonstrated the usefulness of incorporating such information in modeling users' temporal behavioral patterns and discovering their interest drift.
 
 The model we will introduce, Caser :cite:`Tang.Wang.2018`, short for convolutional sequence embedding recommendation model, adopts convolutional neural networks capture the dynamic pattern influences of users' recent activities. The main component of Caser consists of a horizontal convolutional network and a vertical convolutional network, aiming to uncover the union-level and point-level sequence patterns, respectively.  Point-level pattern indicates the impact of single item in the historical sequence on the target item, while union level pattern implies the influences of several previous actions on the subsequent target. For example, buying both milk and butter together leads to higher probability of buying flour than just buying one of them. Moreover, users' general interests, or long term preferences are also modeled in the last fully-connected layers, resulting in a more comprehensive modeling of user interests. Details of the model are described as follows.
 
 ## Model Architectures
 
-In sequence-aware recommendation system, each user is associated with a sequence of some items from the item set. Let $S^u = (S_1^u, ... S_{|S_u|}^u)$ denotes the ordered sequence. The goal of Caser is to recommend item by considering user general tastes as well as short-term intention. Suppose we take the previous $L$ items into consideration, an embedding matrix that represents the former interactions for timestep $t$ can be constructed:
+In sequence-aware recommendation system, each user is associated with a sequence of some items from the item set. Let $S^u = (S_1^u, ... S_{|S_u|}^u)$ denotes the ordered sequence. The goal of Caser is to recommend item by considering user general tastes as well as short-term intention. Suppose we take the previous $L$ items into consideration, an embedding matrix that represents the former interactions for time step $t$ can be constructed:
 
 $$
 \mathbf{E}^{(u, t)} = [ \mathbf{q}_{S_{t-L}^u} , ..., \mathbf{q}_{S_{t-2}^u}, \mathbf{q}_{S_{t-1}^u} ]^\top,
@@ -49,7 +49,7 @@ from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
 import random
-import sys
+
 npx.set_np()
 ```
 
@@ -79,7 +79,7 @@ class Caser(nn.Block):
         self.Q_prime = nn.Embedding(num_items, num_factors * 2)
         self.b = nn.Embedding(num_items, 1)
         self.dropout = nn.Dropout(drop_ratio)
-        
+
     def forward(self, user_id, seq, item_id):
         item_embs = np.expand_dims(self.Q(seq), 1)
         user_emb = self.P(user_id)
@@ -104,13 +104,13 @@ class Caser(nn.Block):
 ```
 
 ## Sequential Dataset with Negative Sampling
-To process the sequential interaction data, we need to reimplement the Dataset class. The following code creates a new dataset class named `SeqDataset`. In each sample, it outputs the user identity, her previous $L$ interacted items as a sequence and the next item she interacts as the target. The following figure demonstrates the data loading process for one user. Suppose that this user liked 8 movies, we organize these eight movies in chronological order. The latest movie is left out as the test item. For the remaining seven movies, we can get three training samples, with each sample containing a sequence of five ($L=5$) movies and its subsequent item as the target item. Negative samples are also included in the Customized dataset. 
+To process the sequential interaction data, we need to reimplement the Dataset class. The following code creates a new dataset class named `SeqDataset`. In each sample, it outputs the user identity, his previous $L$ interacted items as a sequence and the next item he interacts as the target. The following figure demonstrates the data loading process for one user. Suppose that this user liked 9 movies, we organize these nine movies in chronological order. The latest movie is left out as the test item. For the remaining eight movies, we can get three training samples, with each sample containing a sequence of five ($L=5$) movies and its subsequent item as the target item. Negative samples are also included in the Customized dataset.
 
 ![Illustration of the data generation process](../img/rec-seq-data.svg)
 
 ```{.python .input  n=5}
 class SeqDataset(gluon.data.Dataset):
-    def __init__(self, user_ids, item_ids, L, num_users, num_items, 
+    def __init__(self, user_ids, item_ids, L, num_users, num_items,
                  candidates):
         user_ids, item_ids = np.array(user_ids), np.array(item_ids)
         sort_idx = np.array(sorted(range(len(user_ids)),
@@ -135,7 +135,7 @@ class SeqDataset(gluon.data.Dataset):
                 test_users[uid], _uid = uid, uid
             self.seq_tgt[i][:] = i_seq[-1:]
             self.seq_items[i][:], self.seq_users[i] = i_seq[:L], uid
-            
+
     def _win(self, tensor, window_size, step_size=1):
         if len(tensor) - window_size >= 0:
             for i in range(len(tensor), 0, - step_size):
@@ -145,16 +145,16 @@ class SeqDataset(gluon.data.Dataset):
                     break
         else:
             yield tensor
-            
+
     def _seq(self, u_ids, i_ids, idx, max_len):
         for i in range(len(idx)):
             stop_idx = None if i >= len(idx) - 1 else int(idx[i + 1])
             for s in self._win(i_ids[int(idx[i]):stop_idx], max_len):
                 yield (int(u_ids[i]), s)
-                
+
     def __len__(self):
         return self.ns
-    
+
     def __getitem__(self, idx):
         neg = list(self.all_items - set(self.cand[int(self.seq_users[idx])]))
         i = random.randint(0, len(neg) - 1)
@@ -167,7 +167,7 @@ class SeqDataset(gluon.data.Dataset):
 Afterwards, we read and split the MovieLens 100K dataset in sequence-aware mode and load the training data with sequential dataloader implemented above.
 
 ```{.python .input  n=6}
-TARGET_NUM, L, batch_size = 1, 3, 4096
+TARGET_NUM, L, batch_size = 1, 5, 4096
 df, num_users, num_items = d2l.read_data_ml100k()
 train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items,
                                               'seq-aware')
@@ -177,10 +177,9 @@ users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
     test_data, num_users, num_items, feedback="implicit")
 train_seq_data = SeqDataset(users_train, items_train, L, num_users,
                             num_items, candidates)
-num_workers = 0 if sys.platform.startswith("win") else 4
 train_iter = gluon.data.DataLoader(train_seq_data, batch_size, True,
                                    last_batch="rollover",
-                                   num_workers=num_workers)
+                                   num_workers=d2l.get_dataloader_workers())
 test_seq_iter = train_seq_data.test_seq
 train_seq_data[0]
 ```
@@ -191,29 +190,30 @@ The training data structure is shown above. The first element is the user identi
 Now, let us train the model. We use the same setting as NeuMF, including learning rate, optimizer, and $k$, in the last section so that the results are comparable.
 
 ```{.python .input  n=7}
-ctx = d2l.try_all_gpus()
+devices = d2l.try_all_gpus()
 net = Caser(10, num_users, num_items, L)
-net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
+net.initialize(ctx=devices, force_reinit=True, init=mx.init.Normal(0.01))
 lr, num_epochs, wd, optimizer = 0.04, 8, 1e-5, 'adam'
 loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
 
 d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx, d2l.evaluate_ranking,
-                  candidates, eval_step=1)
+                  num_users, num_items, num_epochs, devices,
+                  d2l.evaluate_ranking, candidates, eval_step=1)
 ```
 
 ## Summary
-* Inferring a user's short-term and long-term interests can make prediction of the next item that she preferred more effectively.
+* Inferring a user's short-term and long-term interests can make prediction of the next item that he preferred more effectively.
 * Convolutional neural networks can be utilized to capture users' short-term interests from sequential interactions.
 
 ## Exercises
+
 * Conduct an ablation study by removing one of the horizontal and vertical convolutional networks, which component is the more important ?
-* Vary the hyper-parameter $L$. Does longer historical interactions bring higher accuracy?
+* Vary the hyperparameter $L$. Does longer historical interactions bring higher accuracy?
 * Apart from the sequence-aware recommendation task we introduced above, there is another type of sequence-aware recommendation task called session-based recommendation :cite:`Hidasi.Karatzoglou.Baltrunas.ea.2015`. Can you explain the differences between these two tasks?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5165)
-
-![](../img/qr_seqrec.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/404)
+:end_tab:

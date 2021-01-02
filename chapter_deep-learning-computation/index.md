@@ -21,7 +21,9 @@ and now often design architectures with far coarser *blocks* in mind.
 
 So far, we have introduced some basic machine learning concepts,
 ramping up to fully-functional deep learning models.
-In the last chapter, we implemented each component of a multilayer perceptron from scratch and even showed how to leverage MXNet's Gluon library
+In the last chapter,
+we implemented each component of an MLP from scratch
+and even showed how to leverage high-level APIs
 to roll out the same models effortlessly.
 To get you that far that fast, we *called upon* the libraries,
 but skipped over more advanced details about *how they work*.

@@ -3,7 +3,7 @@
 
 One of the widely used dataset for image classification is the  MNIST dataset :cite:`LeCun.Bottou.Bengio.ea.1998`.
 While it had a good run as a benchmark dataset,
-even simple models by today's standards achieve classification accuracy over 95%
+even simple models by today's standards achieve classification accuracy over 95%,
 making it unsuitable for distinguishing between stronger models and weaker ones.
 Today, MNIST serves as more of sanity checks than as a benchmark.
 To up the ante just a bit, we will focus our discussion in the coming sections
@@ -19,7 +19,6 @@ import sys
 d2l.use_svg_display()
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 %matplotlib inline
@@ -28,54 +27,79 @@ import torch
 import torchvision
 from torchvision import transforms
 from torch.utils import data
-import sys
+
 d2l.use_svg_display()
 ```
 
-## Getting the Dataset
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
 
-We can download and load the FashionMNIST dataset into memory via the the build-in functions in the framework.
+d2l.use_svg_display()
+```
+
+## Reading the Dataset
+
+We can download and read the Fashion-MNIST dataset into memory via the build-in functions in the framework.
 
 ```{.python .input}
 mnist_train = gluon.data.vision.FashionMNIST(train=True)
 mnist_test = gluon.data.vision.FashionMNIST(train=False)
 ```
 
-
 ```{.python .input}
 #@tab pytorch
-# By default pytorch torchvision datasets are of type PIL.
-# Define a transform "trans" to change the PIL to Tensor format.
+# `ToTensor` converts the image data from PIL type to 32-bit floating point
+# tensors. It divides all numbers by 255 so that all pixel values are between
+# 0 and 1
 trans = transforms.ToTensor()
-
 mnist_train = torchvision.datasets.FashionMNIST(
     root="../data", train=True, transform=trans, download=True)
 mnist_test = torchvision.datasets.FashionMNIST(
     root="../data", train=False, transform=trans, download=True)
 ```
 
-FashionMNIST consists of images from 10 categories, each represented
-by 6k images in the training set and by 1k in the test set.
+```{.python .input}
+#@tab tensorflow
+mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
+```
+
+Fashion-MNIST consists of images from 10 categories, each represented
+by 6000 images in the training dataset and by 1000 in the test dataset.
+A *test dataset* (or *test set*) is used for evaluating  model performance and not for training.
 Consequently the training set and the test set
-contain 60k and 10k images, respectively.
+contain 60000 and 10000 images, respectively.
 
 ```{.python .input}
+#@tab mxnet, pytorch
 len(mnist_train), len(mnist_test)
 ```
 
+```{.python .input}
+#@tab tensorflow
+len(mnist_train[0]), len(mnist_test[0])
+```
+
+The height and width of each input image are both 28 pixels.
+Note that the dataset consists of grayscale images, whose number of channels is 1.
+For brevity, throughout this book
+we store the shape of any image with height $h$ width $w$ pixels as $h \times w$ or ($h$, $w$).
 
 ```{.python .input}
-#@tab pytorch
-len(mnist_train), len(mnist_test)
+#@tab all
+mnist_train[0][0].shape
 ```
 
 The images in Fashion-MNIST are associated with the following categories:
-t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag and ankle boot.
+t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag, and ankle boot.
 The following function converts between numeric label indices and their names in text.
 
 ```{.python .input}
 #@tab all
 def get_fashion_mnist_labels(labels):  #@save
+    """Return text labels for the Fashion-MNIST dataset."""
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
@@ -84,16 +108,35 @@ def get_fashion_mnist_labels(labels):  #@save
 We can now create a function to visualize these examples.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet, tensorflow
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):        
-        if 'asnumpy' in dir(img): img = img.asnumpy() 
-        if 'numpy' in dir(img): img = img.numpy()
-        ax.imshow(img)
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        ax.imshow(d2l.numpy(img))
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    return axes
+```
+
+```{.python .input}
+#@tab pytorch
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
+    """Plot a list of images."""
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        if torch.is_tensor(img):
+            # Tensor Image
+            ax.imshow(img.numpy())
+        else:
+            # PIL Image
+            ax.imshow(img)
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
         if titles:
@@ -106,9 +149,10 @@ for the first few examples in the training dataset.
 
 ```{.python .input}
 X, y = mnist_train[:18]
+
+print(X.shape)
 show_images(X.squeeze(axis=-1), 2, 9, titles=get_fashion_mnist_labels(y));
 ```
-
 
 ```{.python .input}
 #@tab pytorch
@@ -116,73 +160,59 @@ X, y = next(iter(data.DataLoader(mnist_train, batch_size=18)))
 show_images(X.reshape(18, 28, 28), 2, 9, titles=get_fashion_mnist_labels(y));
 ```
 
+```{.python .input}
+#@tab tensorflow
+X = tf.constant(mnist_train[0][:18])
+y = tf.constant(mnist_train[1][:18])
+show_images(X, 2, 9, titles=get_fashion_mnist_labels(y));
+```
+
 ## Reading a Minibatch
 
 To make our life easier when reading from the training and test sets,
-we use a `DataLoader` rather than creating one from scratch,
-as we did in :numref:`sec_linear_scratch`.
-Recall that at each iteration, a `DataLoader`
+we use the built-in data iterator rather than creating one from scratch.
+Recall that at each iteration, a data loader
 reads a minibatch of data with size `batch_size` each time.
-
-During training, reading data can be a significant performance bottleneck,
-especially when our model is simple or when our computer is fast.
-A handy feature of Gluon's `DataLoader` is the ability
-to use multiple processes to speed up data reading.
-For instance, we can set aside 4 processes to read the data (via `num_workers`).
-Because this feature is not currently supported on Windows
-the following code checks the platform to make sure
-that we do not saddle our Windows-using friends
-with error messages later on.
-
-```{.python .input}
-#@tab all
-def get_dataloader_workers(num_workers=4):  #@save
-    # 0 means no additional process is used to speed up the reading of data.
-    if sys.platform.startswith('win'):
-        return 0
-    else:
-        return num_workers
-```
-
-Below, we convert the image data from uint8 to 32-bit
-floating point numbers using the `ToTensor` class.
-Additionally, the transformer will divide all numbers by 255
-so that all pixels have values between 0 and 1.
-The `ToTensor` class also moves the image channel
-from the last dimension to the first dimension
-to facilitate the convolutional neural network calculations introduced later.
-Through the `transform_first` function of the dataset,
-we apply the transformation of `ToTensor`
-to the first element of each instance (image and label).
+We also randomly shuffle the examples for the training data iterator.
 
 ```{.python .input}
 batch_size = 256
+
+def get_dataloader_workers():  #@save
+    """Use 4 processes to read the data except for Windows."""
+    return 0 if sys.platform.startswith('win') else 4
+
+# `ToTensor` converts the image data from uint8 to 32-bit floating point. It
+# divides all numbers by 255 so that all pixel values are between 0 and 1
 transformer = gluon.data.vision.transforms.ToTensor()
 train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
                                    batch_size, shuffle=True,
                                    num_workers=get_dataloader_workers())
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 batch_size = 256
-train_iter = data.DataLoader(mnist_train, batch_size, shuffle=True, 
+
+def get_dataloader_workers():  #@save
+    """Use 4 processes to read the data."""
+    return 4
+
+train_iter = data.DataLoader(mnist_train, batch_size, shuffle=True,
                              num_workers=get_dataloader_workers())
+```
+
+```{.python .input}
+#@tab tensorflow
+batch_size = 256
+train_iter = tf.data.Dataset.from_tensor_slices(
+    mnist_train).batch(batch_size).shuffle(len(mnist_train[0]))
 ```
 
 Let us look at the time it takes to read the training data.
 
 ```{.python .input}
-timer = d2l.Timer()
-for X, y in train_iter:
-    continue
-f'{timer.stop():.2f} sec'
-```
-
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 timer = d2l.Timer()
 for X, y in train_iter:
     continue
@@ -198,10 +228,11 @@ In addition, it accepts an optional argument to resize images to another shape.
 
 ```{.python .input}
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
-    """Download the Fashion-MNIST dataset and then load into memory."""
+    """Download the Fashion-MNIST dataset and then load it into memory."""
     dataset = gluon.data.vision
-    trans = [dataset.transforms.Resize(resize)] if resize else []
-    trans.append(dataset.transforms.ToTensor())
+    trans = [dataset.transforms.ToTensor()]
+    if resize:
+        trans.insert(0, dataset.transforms.Resize(resize))
     trans = dataset.transforms.Compose(trans)
     mnist_train = dataset.FashionMNIST(train=True).transform_first(trans)
     mnist_test = dataset.FashionMNIST(train=False).transform_first(trans)
@@ -211,15 +242,14 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                                   num_workers=get_dataloader_workers()))
 ```
 
-
 ```{.python .input}
 #@tab pytorch
 def load_data_fashion_mnist(batch_size, resize=None):  #@save
-    """Download the Fashion-MNIST dataset and then load into memory."""
-    trans = [transforms.Resize(resize)] if resize else []
-    trans.append(transforms.ToTensor())
+    """Download the Fashion-MNIST dataset and then load it into memory."""
+    trans = [transforms.ToTensor()]
+    if resize:
+        trans.insert(0, transforms.Resize(resize))
     trans = transforms.Compose(trans)
-
     mnist_train = torchvision.datasets.FashionMNIST(
         root="../data", train=True, transform=trans, download=True)
     mnist_test = torchvision.datasets.FashionMNIST(
@@ -230,21 +260,32 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
                             num_workers=get_dataloader_workers()))
 ```
 
-Below, we verify that image resizing works.
-
 ```{.python .input}
-train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
-for X, y in train_iter:
-    print(X.shape)
-    break
+#@tab tensorflow
+def load_data_fashion_mnist(batch_size, resize=None):   #@save
+    """Download the Fashion-MNIST dataset and then load it into memory."""
+    mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
+    # Divide all numbers by 255 so that all pixel values are between
+    # 0 and 1, add a batch dimension at the last. And cast label to int32
+    process = lambda X, y: (tf.expand_dims(X, axis=3) / 255,
+                            tf.cast(y, dtype='int32'))
+    resize_fn = lambda X, y: (
+        tf.image.resize_with_pad(X, resize, resize) if resize else X, y)
+    return (
+        tf.data.Dataset.from_tensor_slices(process(*mnist_train)).batch(
+            batch_size).shuffle(len(mnist_train[0])).map(resize_fn),
+        tf.data.Dataset.from_tensor_slices(process(*mnist_test)).batch(
+            batch_size).map(resize_fn))
 ```
 
+Below we test the image resizing feature of the `load_data_fashion_mnist` function
+by specifying the `resize` argument.
 
 ```{.python .input}
-#@tab pytorch
-train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
+#@tab all
+train_iter, test_iter = load_data_fashion_mnist(32, resize=64)
 for X, y in train_iter:
-    print(X.shape)
+    print(X.shape, X.dtype, y.shape, y.dtype)
     break
 ```
 
@@ -252,17 +293,16 @@ We are now ready to work with the Fashion-MNIST dataset in the sections that fol
 
 ## Summary
 
-* Fashion-MNIST is an apparel classification dataset consisting of images representing 10 categories.
- * We will use this dataset in subsequent sections and chapters to evaluate various classification algorithms.
-* We store the shape of each image with height $h$ width $w$ pixels as $h \times w$ or `(h, w)`.
-* Data iterators are a key component for efficient performance. Rely on well-implemented iterators that exploit multi-threading to avoid slowing down your training loop.
+* Fashion-MNIST is an apparel classification dataset consisting of images representing 10 categories. We will use this dataset in subsequent sections and chapters to evaluate various classification algorithms.
+* We store the shape of any image with height $h$ width $w$ pixels as $h \times w$ or ($h$, $w$).
+* Data iterators are a key component for efficient performance. Rely on well-implemented data iterators that exploit high-performance computing to avoid slowing down your training loop.
+
 
 ## Exercises
 
-1. Does reducing the `batch_size` (for instance, to 1) affect read performance?
-1. For non-Windows users, try modifying `num_workers` to see how it affects read performance. Plot the performance against the number of works employed.
-1. Use the framework's API document website to see which other datasets are available. 
-
+1. Does reducing the `batch_size` (for instance, to 1) affect the reading performance?
+1. The data iterator performance is important. Do you think the current implementation is fast enough? Explore various options to improve it.
+1. Check out the framework's online API documentation. Which other datasets are available?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/48)
@@ -270,4 +310,8 @@ We are now ready to work with the Fashion-MNIST dataset in the sections that fol
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/49)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/224)
 :end_tab:

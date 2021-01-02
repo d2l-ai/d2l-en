@@ -1,40 +1,52 @@
 # Densely Connected Networks (DenseNet)
 
-ResNet significantly changed the view of how to parametrize the functions in deep networks. DenseNet is to some extent the logical extension of this. To understand how to arrive at it, let us take a small detour to theory. Recall the Taylor expansion for functions. For scalars it can be written as
+ResNet significantly changed the view of how to parametrize the functions in deep networks. *DenseNet* (dense convolutional network) is to some extent the logical extension of this :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
+To understand how to arrive at it, let us take a small detour to mathematics.
 
-$$f(x) = f(0) + f'(x) x + \frac{1}{2} f''(x) x^2 + \frac{1}{6} f'''(x) x^3 + o(x^3).$$
 
-## Function Decomposition
+## From ResNet to DenseNet
 
-The key point is that it decomposes the function into increasingly higher order terms. In a similar vein, ResNet decomposes functions into
+Recall the Taylor expansion for functions. For the point $x = 0$ it can be written as
+
+$$f(x) = f(0) + f'(0) x + \frac{f''(0)}{2!}  x^2 + \frac{f'''(0)}{3!}  x^3 + \ldots.$$
+
+
+The key point is that it decomposes a function into increasingly higher order terms. In a similar vein, ResNet decomposes functions into
 
 $$f(\mathbf{x}) = \mathbf{x} + g(\mathbf{x}).$$
 
 That is, ResNet decomposes $f$ into a simple linear term and a more complex
-nonlinear one. What if we want to go beyond two terms? A solution was proposed
-by :cite:`Huang.Liu.Van-Der-Maaten.ea.2017` in the form of
-DenseNet, an architecture that reported record performance on the ImageNet
-dataset.
+nonlinear one.
+What if we want to capture (not necessarily add) information beyond two terms?
+One solution was 
+DenseNet :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
 
 ![The main difference between ResNet (left) and DenseNet (right) in cross-layer connections: use of addition and use of concatenation. ](../img/densenet-block.svg)
 :label:`fig_densenet_block`
 
-As shown in :numref:`fig_densenet_block`, the key difference between ResNet and DenseNet is that in the latter case outputs are *concatenated* rather than added. As a result we perform a mapping from $\mathbf{x}$ to its values after applying an increasingly complex sequence of functions.
+As shown in :numref:`fig_densenet_block`, the key difference between ResNet and DenseNet is that in the latter case outputs are *concatenated* (denoted by $[,]$) rather than added.
+As a result, we perform a mapping from $\mathbf{x}$ to its values after applying an increasingly complex sequence of functions:
 
-$$\mathbf{x} \to \left[\mathbf{x}, f_1(\mathbf{x}), f_2(\mathbf{x}, f_1(\mathbf{x})), f_3(\mathbf{x}, f_1(\mathbf{x}), f_2(\mathbf{x}, f_1(\mathbf{x})), \ldots\right].$$
+$$\mathbf{x} \to \left[
+\mathbf{x},
+f_1(\mathbf{x}),
+f_2([\mathbf{x}, f_1(\mathbf{x})]), f_3([\mathbf{x}, f_1(\mathbf{x}), f_2([\mathbf{x}, f_1(\mathbf{x})])]), \ldots\right].$$
 
-In the end, all these functions are combined in an MLP to reduce the number of features again. In terms of implementation this is quite simple---rather than adding terms, we concatenate them. The name DenseNet arises from the fact that the dependency graph between variables becomes quite dense. The last layer of such a chain is densely connected to all previous layers. The main components that compose a DenseNet are dense blocks and transition layers. The former defines how the inputs and outputs are concatenated, while the latter controls the number of channels so that it is not too large. The dense connections are shown in :numref:`fig_densenet`.
+In the end, all these functions are combined in MLP to reduce the number of features again. In terms of implementation this is quite simple:
+rather than adding terms, we concatenate them. The name DenseNet arises from the fact that the dependency graph between variables becomes quite dense. The last layer of such a chain is densely connected to all previous layers. The dense connections are shown in :numref:`fig_densenet`.
 
-![Dense connections in DenseNet](../img/densenet.svg)
+![Dense connections in DenseNet.](../img/densenet.svg)
 :label:`fig_densenet`
+
+
+The main components that compose a DenseNet are *dense blocks* and *transition layers*. The former define how the inputs and outputs are concatenated, while the latter control the number of channels so that it is not too large.
 
 
 ## Dense Blocks
 
 DenseNet uses the modified "batch normalization, activation, and convolution"
-architecture of ResNet (see the exercise in :numref:`sec_resnet`).
-First, we implement this architecture in the
-`conv_block` function.
+structure of ResNet (see the exercise in :numref:`sec_resnet`).
+First, we implement this convolution block structure.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -62,7 +74,30 @@ def conv_block(input_channels, num_channels):
         nn.Conv2d(input_channels, num_channels, kernel_size=3, padding=1))
 ```
 
-A dense block consists of multiple `conv_block` units, each using the same number of output channels. In the forward computation, however, we concatenate the input and output of each block on the channel dimension.
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+class ConvBlock(tf.keras.layers.Layer):
+    def __init__(self, num_channels):
+        super(ConvBlock, self).__init__()
+        self.bn = tf.keras.layers.BatchNormalization()
+        self.relu = tf.keras.layers.ReLU()
+        self.conv = tf.keras.layers.Conv2D(
+            filters=num_channels, kernel_size=(3, 3), padding='same')
+
+        self.listLayers = [self.bn, self.relu, self.conv]
+
+    def call(self, x):
+        y = x
+        for layer in self.listLayers.layers:
+            y = layer(y)
+        y = tf.keras.layers.concatenate([x,y], axis=-1)
+        return y
+```
+
+A *dense block* consists of multiple convolution blocks, each using the same number of output channels. In the forward propagation, however, we concatenate the input and output of each convolution block on the channel dimension.
 
 ```{.python .input}
 class DenseBlock(nn.Block):
@@ -89,8 +124,9 @@ class DenseBlock(nn.Module):
         layer = []
         for i in range(num_convs):
             layer.append(conv_block(
-                num_channels*i+input_channels, num_channels))
+                num_channels * i + input_channels, num_channels))
         self.net = nn.Sequential(*layer)
+
     def forward(self, X):
         for blk in self.net:
             Y = blk(X)
@@ -100,7 +136,24 @@ class DenseBlock(nn.Module):
         return X
 ```
 
-In the following example, we define a convolution block (`DenseBlock`) with two blocks of 10 output channels. When using an input with 3 channels, we will get an output with the $3+2\times 10=23$ channels. The number of convolution block channels controls the increase in the number of output channels relative to the number of input channels. This is also referred to as the growth rate.
+```{.python .input}
+#@tab tensorflow
+class DenseBlock(tf.keras.layers.Layer):
+    def __init__(self, num_convs, num_channels):
+        super(DenseBlock, self).__init__()
+        self.listLayers = []
+        for _ in range(num_convs):
+            self.listLayers.append(ConvBlock(num_channels))
+
+    def call(self, x):
+        for layer in self.listLayers.layers:
+            x = layer(x)
+        return x
+```
+
+In the following example,
+we define a `DenseBlock` instance with 2 convolution blocks of 10 output channels.
+When using an input with 3 channels, we will get an output with  $3+2\times 10=23$ channels. The number of convolution block channels controls the growth in the number of output channels relative to the number of input channels. This is also referred to as the *growth rate*.
 
 ```{.python .input}
 blk = DenseBlock(2, 10)
@@ -118,9 +171,17 @@ Y = blk(X)
 Y.shape
 ```
 
+```{.python .input}
+#@tab tensorflow
+blk = DenseBlock(2, 10)
+X = tf.random.uniform((4, 8, 8, 3))
+Y = blk(X)
+Y.shape
+```
+
 ## Transition Layers
 
-Since each dense block will increase the number of channels, adding too many of them will lead to an excessively complex model. A transition layer is used to control the complexity of the model. It reduces the number of channels by using the $1\times 1$ convolutional layer and halves the height and width of the average pooling layer with a stride of 2, further reducing the complexity of the model.
+Since each dense block will increase the number of channels, adding too many of them will lead to an excessively complex model. A *transition layer* is used to control the complexity of the model. It reduces the number of channels by using the $1\times 1$ convolutional layer and halves the height and width of the average pooling layer with a stride of 2, further reducing the complexity of the model.
 
 ```{.python .input}
 def transition_block(num_channels):
@@ -140,6 +201,23 @@ def transition_block(input_channels, num_channels):
         nn.AvgPool2d(kernel_size=2, stride=2))
 ```
 
+```{.python .input}
+#@tab tensorflow
+class TransitionBlock(tf.keras.layers.Layer):
+    def __init__(self, num_channels, **kwargs):
+        super(TransitionBlock, self).__init__(**kwargs)
+        self.batch_norm = tf.keras.layers.BatchNormalization()
+        self.relu = tf.keras.layers.ReLU()
+        self.conv = tf.keras.layers.Conv2D(num_channels, kernel_size=1)
+        self.avg_pool = tf.keras.layers.AvgPool2D(pool_size=2, strides=2)
+
+    def call(self, x):
+        x = self.batch_norm(x)
+        x = self.relu(x)
+        x = self.conv(x)
+        return self.avg_pool(x)
+```
+
 Apply a transition layer with 10 channels to the output of the dense block in the previous example.  This reduces the number of output channels to 10, and halves the height and width.
 
 ```{.python .input}
@@ -154,9 +232,15 @@ blk = transition_block(23, 10)
 blk(Y).shape
 ```
 
+```{.python .input}
+#@tab tensorflow
+blk = TransitionBlock(10)
+blk(Y).shape
+```
+
 ## DenseNet Model
 
-Next, we will construct a DenseNet model. DenseNet first uses the same single convolutional layer and maximum pooling layer as ResNet.
+Next, we will construct a DenseNet model. DenseNet first uses the same single convolutional layer and maximum pooling layer as in ResNet.
 
 ```{.python .input}
 net = nn.Sequential()
@@ -173,12 +257,24 @@ b1 = nn.Sequential(
     nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
 ```
 
-Then, similar to the four residual blocks that ResNet uses, DenseNet uses four dense blocks. Similar to ResNet, we can set the number of convolutional layers used in each dense block. Here, we set it to 4, consistent with the ResNet-18 in the previous section. Furthermore, we set the number of channels (i.e., growth rate) for the convolutional layers in the dense block to 32, so 128 channels will be added to each dense block.
+```{.python .input}
+#@tab tensorflow
+def block_1():
+    return tf.keras.Sequential([
+       tf.keras.layers.Conv2D(64, kernel_size=7, strides=2, padding='same'),
+       tf.keras.layers.BatchNormalization(),
+       tf.keras.layers.ReLU(),
+       tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same')])
+```
+
+Then, similar to the four modules made up of residual blocks that ResNet uses,
+DenseNet uses four dense blocks.
+Similar to ResNet, we can set the number of convolutional layers used in each dense block. Here, we set it to 4, consistent with the ResNet-18 model in :numref:`sec_resnet`. Furthermore, we set the number of channels (i.e., growth rate) for the convolutional layers in the dense block to 32, so 128 channels will be added to each dense block.
 
 In ResNet, the height and width are reduced between each module by a residual block with a stride of 2. Here, we use the transition layer to halve the height and width and halve the number of channels.
 
 ```{.python .input}
-# Num_channels: the current number of channels
+# `num_channels`: the current number of channels
 num_channels, growth_rate = 64, 32
 num_convs_in_dense_blocks = [4, 4, 4, 4]
 
@@ -186,7 +282,7 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
     net.add(DenseBlock(num_convs, growth_rate))
     # This is the number of output channels in the previous dense block
     num_channels += num_convs * growth_rate
-    # A transition layer that haves the number of channels is added between
+    # A transition layer that halves the number of channels is added between
     # the dense blocks
     if i != len(num_convs_in_dense_blocks) - 1:
         num_channels //= 2
@@ -195,6 +291,7 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
 
 ```{.python .input}
 #@tab pytorch
+# `num_channels`: the current number of channels
 num_channels, growth_rate = 64, 32
 num_convs_in_dense_blocks = [4, 4, 4, 4]
 blks = []
@@ -202,14 +299,34 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
     blks.append(DenseBlock(num_convs, num_channels, growth_rate))
     # This is the number of output channels in the previous dense block
     num_channels += num_convs * growth_rate
-    # A transition layer that haves the number of channels is added between
+    # A transition layer that halves the number of channels is added between
     # the dense blocks
     if i != len(num_convs_in_dense_blocks) - 1:
         blks.append(transition_block(num_channels, num_channels // 2))
         num_channels = num_channels // 2
 ```
 
-Similar to ResNet, a global pooling layer and fully connected layer are connected at the end to produce the output.
+```{.python .input}
+#@tab tensorflow
+def block_2():
+    net = block_1()
+    # `num_channels`: the current number of channels
+    num_channels, growth_rate = 64, 32
+    num_convs_in_dense_blocks = [4, 4, 4, 4]
+
+    for i, num_convs in enumerate(num_convs_in_dense_blocks):
+        net.add(DenseBlock(num_convs, growth_rate))
+        # This is the number of output channels in the previous dense block
+        num_channels += num_convs * growth_rate
+        # A transition layer that halves the number of channels is added
+        # between the dense blocks
+        if i != len(num_convs_in_dense_blocks) - 1:
+            num_channels //= 2
+            net.add(TransitionBlock(num_channels))
+    return net
+```
+
+Similar to ResNet, a global pooling layer and a fully-connected layer are connected at the end to produce the output.
 
 ```{.python .input}
 net.add(nn.BatchNorm(),
@@ -221,25 +338,31 @@ net.add(nn.BatchNorm(),
 ```{.python .input}
 #@tab pytorch
 net = nn.Sequential(
-    b1, *blks, 
+    b1, *blks,
     nn.BatchNorm2d(num_channels), nn.ReLU(),
-    nn.AdaptiveMaxPool2d((1,1)),
+    nn.AdaptiveMaxPool2d((1, 1)),
     nn.Flatten(),
     nn.Linear(num_channels, 10))
 ```
 
-## Data Acquisition and Training
+```{.python .input}
+#@tab tensorflow
+def net():
+    net = block_2()
+    net.add(tf.keras.layers.BatchNormalization())
+    net.add(tf.keras.layers.ReLU())
+    net.add(tf.keras.layers.GlobalAvgPool2D())
+    net.add(tf.keras.layers.Flatten())
+    net.add(tf.keras.layers.Dense(10))
+    return net
+```
+
+## Training
 
 Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
 
 ```{.python .input}
-lr, num_epochs, batch_size = 0.1, 10, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 lr, num_epochs, batch_size = 0.1, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
@@ -248,20 +371,18 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ## Summary
 
 * In terms of cross-layer connections, unlike ResNet, where inputs and outputs are added together, DenseNet concatenates inputs and outputs on the channel dimension.
-* The main units that compose DenseNet are dense blocks and transition layers.
+* The main components that compose DenseNet are dense blocks and transition layers.
 * We need to keep the dimensionality under control when composing the network by adding transition layers that shrink the number of channels again.
 
 ## Exercises
 
-1. Why do we use average pooling rather than max-pooling in the transition layer?
+1. Why do we use average pooling rather than maximum pooling in the transition layer?
 1. One of the advantages mentioned in the DenseNet paper is that its model parameters are smaller than those of ResNet. Why is this the case?
 1. One problem for which DenseNet has been criticized is its high memory consumption.
-    * Is this really the case? Try to change the input shape to $224\times 224$ to see the actual (GPU) memory consumption.
-    * Can you think of an alternative means of reducing the memory consumption? How would you need to change the framework?
-1. Implement the various DenseNet versions presented in Table 1 of :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
-1. Why do we not need to concatenate terms if we are just interested in $\mathbf{x}$ and $f(\mathbf{x})$ for ResNet? Why do we need this for more than two layers in DenseNet?
-1. Design a DenseNet for fully connected networks and apply it to the Housing Price prediction task.
-
+    1. Is this really the case? Try to change the input shape to $224\times 224$ to see the actual GPU memory consumption.
+    1. Can you think of an alternative means of reducing the memory consumption? How would you need to change the framework?
+1. Implement the various DenseNet versions presented in Table 1 of the DenseNet paper :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
+1. Design an MLP-based model by applying the DenseNet idea. Apply it to the housing price prediction task in :numref:`sec_kaggle_house`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/87)
@@ -269,4 +390,8 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/88)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/331)
 :end_tab:

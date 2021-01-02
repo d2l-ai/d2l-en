@@ -1,15 +1,15 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]; then
+if [ $# -ne 2 ]; then
    echo "usage:"
-   echo "  $0 store dir saved_dir"
-   echo "  $0 restore dir saved_dir"
+   echo "  $0 store dir"
+   echo "  $0 restore dir"
    exit -1
 fi
 
 cmd=$1
 dir=$2
-saved_dir=$3
+saved_dir="${dir///data/_data}"
 
 if [ $cmd == "store" ]; then
     if [ -e $dir ]; then

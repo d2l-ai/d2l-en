@@ -61,7 +61,7 @@ Applying deep learning requires simultaneously understanding
 (i) the motivations for casting a problem in a particular way;
 (ii) the mathematics of a given modeling approach;
 (iii) the optimization algorithms for fitting the models to data;
-and (iv) and the engineering required to train models efficiently,
+and (iv) the engineering required to train models efficiently,
 navigating the pitfalls of numerical computing
 and getting the most out of available hardware.
 Teaching both the critical thinking skills required to formulate problems,
@@ -256,8 +256,38 @@ We are hopeful that as the theory of deep learning progresses,
 future editions of this book will be able to provide insights
 in places the present edition cannot.
 
-:begin_tab:`mxnet`
+At times, to avoid unnecessary repetition, we encapsulate
+the frequently-imported and referred-to functions, classes, etc.
+in this book in the `d2l` package.
+For any block such as a function, a class, or multiple imports
+to be saved in the package, we will mark it with
+`#@save`. We offer a detailed overview of these functions and classes in :numref:`sec_d2l`.
+The `d2l` package is light-weight and only requires
+the following packages and modules as dependencies:
 
+```{.python .input}
+#@tab all
+#@save
+import collections
+from collections import defaultdict
+from IPython import display
+import math
+from matplotlib import pyplot as plt
+import os
+import pandas as pd
+import random
+import re
+import shutil
+import sys
+import tarfile
+import time
+import requests
+import zipfile
+import hashlib
+d2l = sys.modules[__name__]
+```
+
+:begin_tab:`mxnet`
 Most of the code in this book is based on Apache MXNet.
 MXNet is an open-source framework for deep learning
 and the preferred choice of AWS (Amazon Web Services),
@@ -270,23 +300,14 @@ In case you encounter any such problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
 
-At times, to avoid unnecessary repetition, we encapsulate
-the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l.mxnet` module.
-For any block such as a function, a class, or multiple imports
-to be saved in the package, we will mark it with
-`#@save`.
-The `d2l` package is light-weight and only requires
-the following packages and modules as dependencies:
-
+Here is how we import modules from MXNet.
 :end_tab:
 
 :begin_tab:`pytorch`
-
 Most of the code in this book is based on PyTorch.
-Pytorch is an open-source framework for deep learning, which is extremely
+PyTorch is an open-source framework for deep learning, which is extremely
 popular in the research community.
-All of the code in this book has passed tests under the the newest PyTorch.
+All of the code in this book has passed tests under the newest PyTorch.
 However, due to the rapid development of deep learning, some code
 *in the print edition* may not work properly in future versions of PyTorch.
 However, we plan to keep the online version up-to-date.
@@ -294,71 +315,49 @@ In case you encounter any such problems,
 please consult :ref:`chap_installation`
 to update your code and runtime environment.
 
-At times, to avoid unnecessary repetition, we encapsulate
-the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l.torch` module.
-For any block such as a function, a class, or multiple imports
-to be saved in the package, we will mark it with `#@save`.
-The `d2l` package is light-weight and only requires
-the following packages and modules as dependencies:
-
+Here is how we import modules from PyTorch.
 :end_tab:
 
-```{.python .input  n=1}
+:begin_tab:`tensorflow`
+Most of the code in this book is based on TensorFlow.
+TensorFlow is an open-source framework for deep learning, which is extremely
+popular in both the research community and industrial.
+All of the code in this book has passed tests under the newest TensorFlow.
+However, due to the rapid development of deep learning, some code
+*in the print edition* may not work properly in future versions of TensorFlow.
+However, we plan to keep the online version up-to-date.
+In case you encounter any such problems,
+please consult :ref:`chap_installation`
+to update your code and runtime environment.
+
+Here is how we import modules from TensorFlow.
+:end_tab:
+
+```{.python .input}
 #@save
-import collections
-from collections import defaultdict
-from IPython import display
-import math
-from matplotlib import pyplot as plt
 from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
-import os
-import pandas as pd
-import random
-import re
-import shutil
-import sys
-import tarfile
-import time
-import zipfile
-
-d2l = sys.modules[__name__]
 ```
 
-```{.python .input  n=1}
+```{.python .input}
 #@tab pytorch
 #@save
-import sys
-import collections
-from collections import defaultdict
-from matplotlib import pyplot as plt
-from IPython import display
-import math
+import numpy as np
 import torch
 import torchvision
 from torch import nn
 from torch.nn import functional as F
 from torch.utils import data
 from torchvision import transforms
-import numpy as np
-import os
-import pandas as pd
-import random
-import re
-import shutil
-import sys
-import tarfile
-import time
-import zipfile
-import requests
-import warnings
-
-d2l = sys.modules[__name__]
+from PIL import Image
 ```
 
-We offer a detailed overview of these functions and classes in :numref:`sec_d2l`.
-
+```{.python .input}
+#@tab tensorflow
+#@save
+import numpy as np
+import tensorflow as tf
+```
 
 ### Target Audience
 
@@ -389,7 +388,7 @@ you may want to peruse this [Python tutorial](http://learnpython.org/).
 Associated with this book, we have launched a discussion forum,
 located at [discuss.d2l.ai](https://discuss.d2l.ai/).
 When you have questions on any section of the book,
-you can find the associated discussion page link at the end of each chapter. 
+you can find the associated discussion page link at the end of each chapter.
 
 
 ## Acknowledgments
@@ -406,21 +405,27 @@ Rahul Agarwal, Mohamed Ali Jamaoui, Michael (Stu) Stewart, Mike Müller,
 NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki,
 topecongiro, tpdi, vermicelli, Vishaal Kapoor, Vishwesh Ravi Shrimali, YaYaB, Yuhong Chen,
 Evgeniy Smirnov, lgov, Simon Corston-Oliver, Igor Dzreyev, Ha Nguyen, pmuens,
-alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta,
+Andrei Lukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta,
 uwsd, DomKM, Lisa Oakley, Bowen Li, Aarush Ahuja, Prasanth Buddareddygari, brianhendee,
 mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya,
 Muhyun Kim, dennismalmgren, adursun, Anirudh Dagar, liqingnz, Pedro Larroy,
 lgov, ati-ozgur, Jun Wu, Matthias Blume, Lin Yuan, geogunow, Josh Gardner,
 Maximilian Böther, Rakib Islam, Leonard Lausen, Abhinav Upadhyay, rongruosong,
-Steve Sedlmeyer, ruslo, Rafael Schlatter, liusy182, Giannis Pappas, ruslo,
+Steve Sedlmeyer, Ruslan Baratov, Rafael Schlatter, liusy182, Giannis Pappas,
 ati-ozgur, qbaza, dchoi77, Adam Gerson, Phuc Le, Mark Atwood, christabella, vn09,
 Haibin Lin, jjangga0214, RichyChen, noelo, hansent, Giel Dops, dvincent1337, WhiteD3vil,
 Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk, heytitle, Peter Goetz, rigtorp,
-tiepvupsu, sfilip, mlxd, Kale-ab Tessera, Sanjar Adilov, MatteoFerrara, hsneto,
-Katarzyna Biesialska, Gregory Bruss, duythanhvn, paulaurel, graytowne, minhduc0711,
-sl7423, Jaedong Hwang, Yida Wang, cys4, clhm, JeanKaddour, austinmw, trebeljahr, tbaums,
-cuongvng, pavelkomarov, vzlamal, NotAnotherSystem, J-Arun-Mani, jancio, eldarkurtic,
-the-great-shazbot, doctorcolossus, gducharme, cclauss, Daniel-Mietchen.
+Tiep Vu, sfilip, mlxd, Kale-ab Tessera, Sanjar Adilov, MatteoFerrara, hsneto,
+Katarzyna Biesialska, Gregory Bruss, Duy–Thanh Doan, paulaurel, graytowne, Duc Pham,
+sl7423, Jaedong Hwang, Yida Wang, cys4, clhm, Jean Kaddour, austinmw, trebeljahr, tbaums,
+Cuong V. Nguyen, pavelkomarov, vzlamal, NotAnotherSystem, J-Arun-Mani, jancio, eldarkurtic,
+the-great-shazbot, doctorcolossus, gducharme, cclauss, Daniel-Mietchen, hoonose, biagiom,
+abhinavsp0730, jonathanhrandall, ysraell, Nodar Okroshiashvili, UgurKap, Jiyang Kang,
+StevenJokes, Tomer Kaftan, liweiwp, netyster, ypandya, NishantTharani, heiligerl, SportsTHU,
+Hoa Nguyen, manuel-arno-korfmann-webentwicklung, aterzis-personal, nxby, Xiaoting He, Josiah Yoder,
+mathresearch, mzz2017, jroberayalas, iluu, ghejc, BSharmi, vkramdev, simonwardjones, LakshKD,
+TalNeoran, djliden, Nikhil95, Oren Barkan, guoweis, haozhu233, pratikhack, 315930399, tayfununal,
+steinsag, charleybeller, Andrew Lumsdaine, Jiekui Zhang, Deepak Pathak, floriandonhauser, Tim Gates.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.
@@ -447,4 +452,8 @@ Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writ
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/20)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/186)
 :end_tab:

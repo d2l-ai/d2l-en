@@ -37,12 +37,12 @@ from d2l import mxnet as d2l
 from mxnet import init, gluon, np, npx
 from mxnet.gluon import nn
 import os
-import sys
+
 npx.set_np()
 ```
 
 ## Implemenation of DeepFM
-The implementation of DeepFM is similar to that of FM. We keep the FM part unchanged and use an MLP block with `relu` as the activation function. Dropout is also used to regularize the model. The number of neurons of the MLP can be adjusted with the `mlp_dims` hyper-parameter.
+The implementation of DeepFM is similar to that of FM. We keep the FM part unchanged and use an MLP block with `relu` as the activation function. Dropout is also used to regularize the model. The number of neurons of the MLP can be adjusted with the `mlp_dims` hyperparameter.
 
 ```{.python .input  n=2}
 class DeepFM(nn.Block):
@@ -73,7 +73,7 @@ class DeepFM(nn.Block):
 ```
 
 ## Training and Evaluating the Model
-The data loading process is the same as that of FM. We set the MLP component of DeepFM to a three-layered dense network with the a pyramid structure (30-20-10). All other hyper-parameters remain the same as FM.
+The data loading process is the same as that of FM. We set the MLP component of DeepFM to a three-layered dense network with the a pyramid structure (30-20-10). All other hyperparameters remain the same as FM.
 
 ```{.python .input  n=4}
 batch_size = 2048
@@ -83,23 +83,20 @@ test_data = d2l.CTRDataset(os.path.join(data_dir, 'test.csv'),
                            feat_mapper=train_data.feat_mapper,
                            defaults=train_data.defaults)
 field_dims = train_data.field_dims
-num_workers = 0 if sys.platform.startswith('win') else 4
-train_iter = gluon.data.DataLoader(train_data, shuffle=True,
-                                   last_batch='rollover',
-                                   batch_size=batch_size,
-                                   num_workers=num_workers)
-test_iter = gluon.data.DataLoader(test_data, shuffle=False,
-                                  last_batch='rollover',
-                                  batch_size=batch_size,
-                                  num_workers=num_workers)
-ctx = d2l.try_all_gpus()
+train_iter = gluon.data.DataLoader(
+    train_data, shuffle=True, last_batch='rollover', batch_size=batch_size,
+    num_workers=d2l.get_dataloader_workers())
+test_iter = gluon.data.DataLoader(
+    test_data, shuffle=False, last_batch='rollover', batch_size=batch_size,
+    num_workers=d2l.get_dataloader_workers())
+devices = d2l.try_all_gpus()
 net = DeepFM(field_dims, num_factors=10, mlp_dims=[30, 20, 10])
-net.initialize(init.Xavier(), ctx=ctx)
+net.initialize(init.Xavier(), ctx=devices)
 lr, num_epochs, optimizer = 0.01, 30, 'adam'
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {'learning_rate': lr})
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
-d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
 Compared with FM, DeepFM converges faster and achieves better performance.
@@ -109,10 +106,11 @@ Compared with FM, DeepFM converges faster and achieves better performance.
 * Integrating neural networks to FM enables it to model complex and high-order interactions. 
 * DeepFM outperforms the original FM on the advertising dataset.
 
-## Exercise
+## Exercises
+
 * Vary the structure of the MLP to check its impact on model performance.
 * Change the dataset to Criteo and compare it with the original FM model.
 
-## [Discussions](https://discuss.mxnet.io/t/5168)
-
-![](../img/qr_deepfm.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/407)
+:end_tab:

@@ -3,7 +3,7 @@
 
 Throughout the previous sections, we learned about the theory of probability and random variables.  To put this theory to work, let us introduce the *naive Bayes* classifier.  This uses nothing but probabilistic fundamentals to allow us to perform classification of digits.
 
-Learning is all about making assumptions. If we want to classify a new data point that we have never seen before we have to make some assumptions about which data points are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent from each other to simplify the computation. In this section, we will apply this model to recognize characters in images.
+Learning is all about making assumptions. If we want to classify a new data example that we have never seen before we have to make some assumptions about which data examples are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent from each other to simplify the computation. In this section, we will apply this model to recognize characters in images.
 
 ```{.python .input}
 %matplotlib inline
@@ -21,6 +21,15 @@ from d2l import torch as d2l
 import math
 import torch
 import torchvision
+d2l.use_svg_display()
+```
+
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import math
+import tensorflow as tf
 d2l.use_svg_display()
 ```
 
@@ -48,12 +57,16 @@ mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 data_transform = torchvision.transforms.Compose(
     [torchvision.transforms.ToTensor()])
 
-mnist_train = torchvision.datasets.MNIST(root='./temp', train=True,
-                                         transform=data_transform, 
-                                         download=True)
-mnist_test = torchvision.datasets.MNIST(root='./temp', train=False,
-                                        transform=data_transform, 
-                                        download=True)
+mnist_train = torchvision.datasets.MNIST(
+    root='./temp', train=True, transform=data_transform, download=True)
+mnist_test = torchvision.datasets.MNIST(
+    root='./temp', train=False, transform=data_transform, download=True)
+```
+
+```{.python .input}
+#@tab tensorflow
+((train_images, train_labels), (
+    test_images, test_labels)) = tf.keras.datasets.mnist.load_data()
 ```
 
 We can access a particular example, which contains the image and the corresponding label.
@@ -69,14 +82,16 @@ image, label = mnist_train[2]
 image.shape, label
 ```
 
+```{.python .input}
+#@tab tensorflow
+image, label = train_images[2], train_labels[2]
+image.shape, label
+```
+
 Our example, stored here in the variable `image`, corresponds to an image with a height and width of $28$ pixels.
 
 ```{.python .input}
-image.shape, image.dtype
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 image.shape, image.dtype
 ```
 
@@ -88,6 +103,11 @@ label, type(label), label.dtype
 
 ```{.python .input}
 #@tab pytorch
+label, type(label)
+```
+
+```{.python .input}
+#@tab tensorflow
 label, type(label)
 ```
 
@@ -106,14 +126,17 @@ labels = torch.tensor([mnist_train[i][1] for i in range(10,38)])
 images.shape, labels.shape
 ```
 
+```{.python .input}
+#@tab tensorflow
+images = tf.stack([train_images[i] for i in range(10, 38)], axis=0)
+labels = tf.constant([train_labels[i] for i in range(10, 38)])
+images.shape, labels.shape
+```
+
 Let us visualize these examples.
 
 ```{.python .input}
-d2l.show_images(images, 2, 9);
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab all
 d2l.show_images(images, 2, 9);
 ```
 
@@ -180,6 +203,18 @@ P_y = n_y / n_y.sum()
 P_y
 ```
 
+```{.python .input}
+#@tab tensorflow
+X = tf.stack([train_images[i] for i in range(len(train_images))], axis=0)
+Y = tf.constant([train_labels[i] for i in range(len(train_labels))])
+
+n_y = tf.Variable(tf.zeros(10))
+for y in range(10):
+    n_y[y].assign(tf.reduce_sum(tf.cast(Y == y, tf.float32)))
+P_y = n_y / tf.reduce_sum(n_y)
+P_y
+```
+
 Now on to slightly more difficult things $P_{xy}$. Since we picked black and white images, $p(x_i  \mid  y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of $y$, i.e., $n_y$. But there is something slightly troubling: certain pixels may never be black (e.g., for well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called *Laplace Smoothing*.  It may seem ad-hoc, however it may be well motivated from a Bayesian point-of-view.
 
 ```{.python .input}
@@ -197,6 +232,17 @@ n_x = torch.zeros((10, 28, 28))
 for y in range(10):
     n_x[y] = torch.tensor(X.numpy()[Y.numpy() == y].sum(axis=0))
 P_xy = (n_x + 1) / (n_y + 1).reshape(10, 1, 1)
+
+d2l.show_images(P_xy, 2, 5);
+```
+
+```{.python .input}
+#@tab tensorflow
+n_x = tf.Variable(tf.zeros((10, 28, 28)))
+for y in range(10):
+    n_x[y].assign(tf.cast(tf.reduce_sum(
+        X.numpy()[Y.numpy() == y], axis=0), tf.float32))
+P_xy = (n_x + 1) / tf.reshape((n_y + 1), (10, 1, 1))
 
 d2l.show_images(P_xy, 2, 5);
 ```
@@ -228,6 +274,18 @@ image, label = mnist_test[0]
 bayes_pred(image)
 ```
 
+```{.python .input}
+#@tab tensorflow
+def bayes_pred(x):
+    x = tf.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
+    p_xy = P_xy * x + (1 - P_xy)*(1 - x)
+    p_xy = tf.math.reduce_prod(tf.reshape(p_xy, (10, -1)), axis=1)  # p(x|y)
+    return p_xy * P_y
+
+image, label = tf.cast(train_images[0], tf.float32), train_labels[0]
+bayes_pred(image)
+```
+
 This went horribly wrong! To find out why, let us look at the per pixel probabilities. They are typically numbers between $0.001$ and $1$. We are multiplying $784$ of them. At this point it is worth mentioning that we are calculating these numbers on a computer, hence with a fixed range for the exponent. What happens is that we experience *numerical underflow*, i.e., multiplying all the small numbers leads to something even smaller until it is rounded down to zero.  We discussed this as a theoretical issue in :numref:`sec_maximum_likelihood`, but we see the phenomena clearly here in practice.
 
 As discussed in that section, we fix this by use the fact that $\log a b = \log a + \log b$, i.e., we switch to summing logarithms.
@@ -244,6 +302,13 @@ print('logarithm is normal:', 784*math.log(a))
 a = 0.1
 print('underflow:', a**784)
 print('logarithm is normal:', 784*math.log(a))
+```
+
+```{.python .input}
+#@tab tensorflow
+a = 0.1
+print('underflow:', a**784)
+print('logarithm is normal:', 784*tf.math.log(a).numpy())
 ```
 
 Since the logarithm is an increasing function, we can rewrite :eqref:`eq_naive_bayes_estimation` as
@@ -283,6 +348,23 @@ py = bayes_pred_stable(image)
 py
 ```
 
+```{.python .input}
+#@tab tensorflow
+log_P_xy = tf.math.log(P_xy)
+# TODO: Look into why this returns infs
+log_P_xy_neg = tf.math.log(1 - P_xy)
+log_P_y = tf.math.log(P_y)
+
+def bayes_pred_stable(x):
+    x = tf.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
+    p_xy = log_P_xy * x + log_P_xy_neg * (1 - x)
+    p_xy = tf.math.reduce_sum(tf.reshape(p_xy, (10, -1)), axis=1)  # p(x|y)
+    return p_xy + log_P_y
+
+py = bayes_pred_stable(image)
+py
+```
+
 We may now check if the prediction is correct.
 
 ```{.python .input}
@@ -294,6 +376,11 @@ py.argmax(axis=0) == int(label)
 ```{.python .input}
 #@tab pytorch
 py.argmax(dim=0) == label
+```
+
+```{.python .input}
+#@tab tensorflow
+tf.argmax(py, axis=0) == label
 ```
 
 If we now predict a few validation examples, we can see the Bayes
@@ -320,6 +407,20 @@ preds = predict(X)
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
+```{.python .input}
+#@tab tensorflow
+def predict(X):
+    return [tf.cast(tf.argmax(bayes_pred_stable(x), axis=0), tf.int32).numpy()
+            for x in X]
+
+X = tf.stack(
+    [tf.cast(train_images[i], tf.float32) for i in range(10, 38)], axis=0)
+y = tf.constant([train_labels[i] for i in range(10, 38)])
+preds = predict(X)
+# TODO: The preds are not correct due to issues with bayes_pred_stable()
+d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
+```
+
 Finally, let us compute the overall accuracy of the classifier.
 
 ```{.python .input}
@@ -337,6 +438,16 @@ preds = torch.tensor(predict(X), dtype=torch.int32)
 float((preds == y).sum()) / len(y)  # Validation accuracy
 ```
 
+```{.python .input}
+#@tab tensorflow
+X = tf.stack([tf.cast(train_images[i], tf.float32) for i in range(
+    len(test_images))], axis=0)
+y = tf.constant([train_labels[i] for i in range(len(test_images))])
+preds = tf.constant(predict(X), dtype=tf.int32)
+# TODO: The accuracy is not correct due to issues with bayes_pred_stable()
+tf.reduce_sum(tf.cast(preds == y, tf.float32)) / len(y)  # Validation accuracy
+```
+
 Modern deep networks achieve error rates of less than $0.01$. The relatively poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
 
 ## Summary
@@ -346,10 +457,18 @@ Modern deep networks achieve error rates of less than $0.01$. The relatively poo
 
 ## Exercises
 1. Consider the dataset $[[0,0], [0,1], [1,0], [1,1]]$ with labels given by the XOR of the two elements $[0,1,1,0]$.  What are the probabilities for a Naive Bayes classifier built on this dataset.  Does it successfully classify our points?  If not, what assumptions are violated?
-1. Suppose that we did not use Laplace smoothing when estimating probabilities and a data point arrived at testing time which contained a value never observed in training.  What would the model output?
+1. Suppose that we did not use Laplace smoothing when estimating probabilities and a data example arrived at testing time which contained a value never observed in training.  What would the model output?
 1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :cite:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.
 
 
-## [Discussions](https://discuss.mxnet.io/t/5155)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/418)
+:end_tab:
 
-![](../img/qr_naive-bayes.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1100)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1101)
+:end_tab:

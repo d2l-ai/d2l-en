@@ -1,7 +1,7 @@
 # Multivariable Calculus
 :label:`sec_multivariable_calculus`
 
-Now that we have a fairly strong understanding of derivatives of a function of a single variable, let us return to our original question where we were considering a loss function of potentially billions of weights.  
+Now that we have a fairly strong understanding of derivatives of a function of a single variable, let us return to our original question where we were considering a loss function of potentially billions of weights.
 
 ## Higher-Dimensional Differentiation
 What :numref:`sec_single_variable_calculus` tells us is that if we change a single one of these billions of weights leaving every other one fixed, we know what will happen!  This is nothing more than a function of a single variable, so we can write
@@ -15,7 +15,7 @@ Now, let us take this and change $w_2$ a little bit to $w_2 + \epsilon_2$:
 
 $$
 \begin{aligned}
-L(w_1+\epsilon_1, w_2+\epsilon_2, \ldots, w_N) & \approx L(w_1, w_2+\epsilon_2, \ldots, w_N) + \epsilon_1 \frac{\partial}{\partial w_1} L(w_1, w_2+\epsilon_2, \ldots, w_N) \\
+L(w_1+\epsilon_1, w_2+\epsilon_2, \ldots, w_N) & \approx L(w_1, w_2+\epsilon_2, \ldots, w_N) + \epsilon_1 \frac{\partial}{\partial w_1} L(w_1, w_2+\epsilon_2, \ldots, w_N+\epsilon_N) \\
 & \approx L(w_1, w_2, \ldots, w_N) \\
 & \quad + \epsilon_2\frac{\partial}{\partial w_2} L(w_1, w_2, \ldots, w_N) \\
 & \quad + \epsilon_1 \frac{\partial}{\partial w_1} L(w_1, w_2, \ldots, w_N) \\
@@ -85,7 +85,7 @@ def grad_f(x, y):
 epsilon = np.array([0.01, -0.03])
 grad_approx = f(0, np.log(2)) + epsilon.dot(grad_f(0, np.log(2)))
 true_value = f(0 + epsilon[0], np.log(2) + epsilon[1])
-"Approximation: {}, True Value: {}".format(grad_approx, true_value)
+f'approximation: {grad_approx}, true Value: {true_value}'
 ```
 
 ```{.python .input}
@@ -104,15 +104,40 @@ def grad_f(x, y):
                      torch.exp(y) / (torch.exp(x) + torch.exp(y))])
 
 epsilon = torch.tensor([0.01, -0.03])
-grad_approx = f(torch.tensor([0.]), torch.log(torch.tensor([2.]))) + epsilon.dot(
+grad_approx = f(torch.tensor([0.]), torch.log(
+    torch.tensor([2.]))) + epsilon.dot(
     grad_f(torch.tensor([0.]), torch.log(torch.tensor(2.))))
 true_value = f(torch.tensor([0.]) + epsilon[0], torch.log(
     torch.tensor([2.])) + epsilon[1])
-"Approximation: {}, True Value: {}".format(grad_approx, true_value)
+f'approximation: {grad_approx}, true Value: {true_value}'
+```
+
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from IPython import display
+from mpl_toolkits import mplot3d
+import tensorflow as tf
+import numpy as np
+
+def f(x, y):
+    return tf.math.log(tf.exp(x) + tf.exp(y))
+def grad_f(x, y):
+    return tf.constant([(tf.exp(x) / (tf.exp(x) + tf.exp(y))).numpy(),
+                        (tf.exp(y) / (tf.exp(x) + tf.exp(y))).numpy()])
+
+epsilon = tf.constant([0.01, -0.03])
+grad_approx = f(tf.constant([0.]), tf.math.log(
+    tf.constant([2.]))) + tf.tensordot(
+    epsilon, grad_f(tf.constant([0.]), tf.math.log(tf.constant(2.))), axes=1)
+true_value = f(tf.constant([0.]) + epsilon[0], tf.math.log(
+    tf.constant([2.])) + epsilon[1])
+f'approximation: {grad_approx}, true Value: {true_value}'
 ```
 
 ## Geometry of Gradients and Gradient Descent
-Consider the again :eqref:`eq_nabla_use`: 
+Consider the again :eqref:`eq_nabla_use`:
 
 $$
 L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).
@@ -128,10 +153,10 @@ Let us suppose that I want to use this to help minimize our loss $L$.  Let us un
 The only thing we do not know exactly how to do is to compute the vector $\mathbf{v}$ in the second step.  We will call such a direction the *direction of steepest descent*.  Using the geometric understanding of dot products from :numref:`sec_geometry-linear-algebraic-ops`, we see that we can rewrite :eqref:`eq_nabla_use` as
 
 $$
-L(\mathbf{w} + \mathbf{v}) \approx L(\mathbf{w}) + \mathbf{v}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}) = \|\nabla_{\mathbf{w}} L(\mathbf{w})\|\cos(\theta).
+L(\mathbf{w} + \mathbf{v}) \approx L(\mathbf{w}) + \mathbf{v}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}) = L(\mathbf{w}) + \|\nabla_{\mathbf{w}} L(\mathbf{w})\|\cos(\theta).
 $$
 
-Note that we have taken our direction to have length one for convenience, and used $\theta$ for the angle between $\mathbf{v}$ and $\nabla_{\mathbf{w}} L(\mathbf{w})$.  If we want to find the direction that decreases $L$ as rapidly as possible, we want to make this as expression as negative as possible.  The only way the direction we pick enters into this equation is through $\cos(\theta)$, and thus we wish to make this cosine as negative as possible.  Now, recalling the shape of cosine, we can make this as negative as possible by making $\cos(\theta) = -1$ or equivalently making the angle between the gradient and our chosen direction to be $\pi$ radians, or equivalently $180$ degrees.  The only way to achieve this is to head in the exact opposite direction:  pick $\mathbf{v}$ to point in the exact opposite direction to $\nabla_{\mathbf{w}} L(\mathbf{w})$!
+Note that we have taken our direction to have length one for convenience, and used $\theta$ for the angle between $\mathbf{v}$ and $\nabla_{\mathbf{w}} L(\mathbf{w})$.  If we want to find the direction that decreases $L$ as rapidly as possible, we want to make this expression as negative as possible.  The only way the direction we pick enters into this equation is through $\cos(\theta)$, and thus we wish to make this cosine as negative as possible.  Now, recalling the shape of cosine, we can make this as negative as possible by making $\cos(\theta) = -1$ or equivalently making the angle between the gradient and our chosen direction to be $\pi$ radians, or equivalently $180$ degrees.  The only way to achieve this is to head in the exact opposite direction:  pick $\mathbf{v}$ to point in the exact opposite direction to $\nabla_{\mathbf{w}} L(\mathbf{w})$!
 
 This brings us to one of the most important mathematical concepts in machine learning: the direction of steepest decent points in the direction of $-\nabla_{\mathbf{w}}L(\mathbf{w})$.  Thus our informal algorithm can be rewritten as follows.
 
@@ -144,7 +169,7 @@ This brings us to one of the most important mathematical concepts in machine lea
 This basic algorithm has been modified and adapted many ways by many researchers, but the core concept remains the same in all of them.  Use the gradient to find the direction that decreases the loss as rapidly as possible, and update the parameters to take a step in that direction.
 
 ## A Note on Mathematical Optimization
-Throughout this book, we focus squarely on numerical optimization techniques for the practical reason that all functions we encounter in the deep learning setting are too complex to minimize explicitly.  
+Throughout this book, we focus squarely on numerical optimization techniques for the practical reason that all functions we encounter in the deep learning setting are too complex to minimize explicitly.
 
 However, it is a useful exercise to consider what the geometric understanding we obtained above tells us about optimizing functions directly.
 
@@ -157,7 +182,7 @@ $$
 
 If the gradient is not zero, we know that we can take a step in the direction $-\epsilon \nabla_{\mathbf{x}} L(\mathbf{x}_0)$ to find a value of $L$ that is smaller.  Thus, if we truly are at a minimum, this cannot be the case!  We can conclude that if $\mathbf{x}_0$ is a minimum, then $\nabla_{\mathbf{x}} L(\mathbf{x}_0) = 0$.  We call points with $\nabla_{\mathbf{x}} L(\mathbf{x}_0) = 0$ *critical points*.
 
-This is nice, because in some rare settings, we *can* explicitly find all the points where the gradient is zero, and find the one with the smallest value.  
+This is nice, because in some rare settings, we *can* explicitly find all the points where the gradient is zero, and find the one with the smallest value.
 
 For a concrete example, consider the function
 $$
@@ -186,7 +211,15 @@ f = (3 * x**4) - (4 * x**3) - (12 * x**2)
 d2l.plot(x, f, 'x', 'f(x)')
 ```
 
-This highlights an important fact to know when working either theoretically or numerically: the only possible points where we can minimize (or maximize) a function will have gradient equal to zero, however, not every point with gradient zero is the true *global* minimum (or maximum).  
+```{.python .input}
+#@tab tensorflow
+x = tf.range(-2, 3, 0.01)
+f = (3 * x**4) - (4 * x**3) - (12 * x**2)
+
+d2l.plot(x, f, 'x', 'f(x)')
+```
+
+This highlights an important fact to know when working either theoretically or numerically: the only possible points where we can minimize (or maximize) a function will have gradient equal to zero, however, not every point with gradient zero is the true *global* minimum (or maximum).
 
 ## Multivariate Chain Rule
 Let us suppose that we have a function of four variables ($w, x, y$, and $z$) which we can make by composing many terms:
@@ -196,7 +229,7 @@ $$\begin{aligned}f(u, v) & = (u+v)^{2} \\u(a, b) & = (a+b)^{2}, \qquad v(a, b) =
 
 Such chains of equations are common when working with neural networks, so trying to understand how to compute gradients of such functions is key.  We can start to see visual hints of this connection in :numref:`fig_chain-1` if we take a look at what variables directly relate to one another.
 
-![The function relations above where nodes represent values and edges show functional dependence.](../img/ChainNet1.svg)
+![The function relations above where nodes represent values and edges show functional dependence.](../img/chain-net1.svg)
 :label:`fig_chain-1`
 
 Nothing stops us from just composing everything from :eqref:`eq_multi_func_def` and writing out that
@@ -218,7 +251,7 @@ $$
 If we then also wanted to compute $\frac{\partial f}{\partial x}$, we would end up with a similar equation again with many repeated terms, and many *shared* repeated terms between the two derivatives.  This represents a massive quantity of wasted work, and if we needed to compute derivatives this way, the whole deep learning revolution would have stalled out before it began!
 
 
-Let us break up the problem.  We will start by trying to understand how $f$ changes when we change $a$, essentially assuming that $w, x, y$, and $z$ all do not exist.  We will reason as we did back when we worked with the gradient for the first time.  Let us take $a$ and add a small amount $\epsilon$ to it. 
+Let us break up the problem.  We will start by trying to understand how $f$ changes when we change $a$, essentially assuming that $w, x, y$, and $z$ all do not exist.  We will reason as we did back when we worked with the gradient for the first time.  Let us take $a$ and add a small amount $\epsilon$ to it.
 
 $$
 \begin{aligned}
@@ -234,11 +267,11 @@ $$
 \frac{\partial f}{\partial a} = \frac{\partial f}{\partial u}\frac{\partial u}{\partial a}+\frac{\partial f}{\partial v}\frac{\partial v}{\partial a}.
 $$
 
-It is useful to think about the meaning of the process. We are trying to understand how a function of the form $f(u(a, b), v(a, b))$ changes its value with a change in $a$.  There are two pathways this can occur: there is the pathway where $a \rightarrow u \rightarrow f$ and where $a \rightarrow v \rightarrow f$.  We can compute both of these contributions via the chain rule: $\frac{\partial w}{\partial u} \cdot \frac{\partial u}{\partial x}$ and $\frac{\partial w}{\partial v} \cdot \frac{\partial v}{\partial x}$ respectively, and added up.  
+It is useful to think about the meaning of the process. We are trying to understand how a function of the form $f(u(a, b), v(a, b))$ changes its value with a change in $a$.  There are two pathways this can occur: there is the pathway where $a \rightarrow u \rightarrow f$ and where $a \rightarrow v \rightarrow f$.  We can compute both of these contributions via the chain rule: $\frac{\partial w}{\partial u} \cdot \frac{\partial u}{\partial x}$ and $\frac{\partial w}{\partial v} \cdot \frac{\partial v}{\partial x}$ respectively, and added up.
 
-Imagine we have a different network of functions where the functions on the right depend on those they are connected to on the left as is shown in :numref:`fig_chain-2`.
+Imagine we have a different network of functions where the functions on the right depend on those that are connected to on the left as is shown in :numref:`fig_chain-2`.
 
-![Another more subtle example of the chain rule.](../img/ChainNet2.svg)
+![Another more subtle example of the chain rule.](../img/chain-net2.svg)
 :label:`fig_chain-2`
 
 To compute something like $\frac{\partial f}{\partial y}$, we need to sum over all (in this case $3$) paths from $y$ to $f$ giving
@@ -291,7 +324,7 @@ w, x, y, z = -1, 0, -2, 1
 a, b = (w + x + y + z)**2, (w + x - y - z)**2
 u, v = (a + b)**2, (a - b)**2
 f = (u + v)**2
-print("    f at {}, {}, {}, {} is {}".format(w, x, y, z, f))
+print(f'    f at {w}, {x}, {y}, {z} is {f}')
 
 # Compute the single step partials
 df_du, df_dv = 2*(u + v), 2*(u + v)
@@ -301,7 +334,7 @@ da_dw, db_dw = 2*(w + x + y + z), 2*(w + x - y - z)
 # Compute the final result from inputs to outputs
 du_dw, dv_dw = du_da*da_dw + du_db*db_dw, dv_da*da_dw + dv_db*db_dw
 df_dw = df_du*du_dw + df_dv*dv_dw
-print("df/dw at {}, {}, {}, {} is {}".format(w, x, y, z, df_dw))
+print(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')
 ```
 
 However, note that this still does not make it easy to compute something like $\frac{\partial f}{\partial x}$.  The reason for that is the *way* we chose to apply the chain rule.  If we look at what we did above, we always kept $\partial w$ in the denominator when we could.  In this way, we chose to apply the chain rule seeing how $w$ changed every other variable.  If that is what we wanted, this would be a good idea.  However, think back to our motivation from deep learning: we want to see how every parameter changes the *loss*.  In essence, we want to apply the chain rule keeping $\partial f$ in the numerator whenever we can!
@@ -316,7 +349,7 @@ $$
 \end{aligned}
 $$
 
-Note that this application of the chain rule has us explicitly compute $\frac{\partial f}{\partial u}, \frac{\partial f}{\partial u}, \frac{\partial f}{\partial u}, \frac{\partial f}{\partial u}, \; \text{and} \; \frac{\partial f}{\partial u}$.  Nothing stops us from also including the equations:
+Note that this application of the chain rule has us explicitly compute $\frac{\partial f}{\partial u}, \frac{\partial f}{\partial v}, \frac{\partial f}{\partial a}, \frac{\partial f}{\partial b}, \; \text{and} \; \frac{\partial f}{\partial w}$.  Nothing stops us from also including the equations:
 
 $$
 \begin{aligned}
@@ -335,7 +368,7 @@ w, x, y, z = -1, 0, -2, 1
 a, b = (w + x + y + z)**2, (w + x - y - z)**2
 u, v = (a + b)**2, (a - b)**2
 f = (u + v)**2
-print(f"f at {w}, {x}, {y}, {z} is {f}")
+print(f'f at {w}, {x}, {y}, {z} is {f}')
 
 # Compute the derivative using the decomposition above
 # First compute the single step partials
@@ -351,10 +384,10 @@ df_da, df_db = df_du*du_da + df_dv*dv_da, df_du*du_db + df_dv*dv_db
 df_dw, df_dx = df_da*da_dw + df_db*db_dw, df_da*da_dx + df_db*db_dx
 df_dy, df_dz = df_da*da_dy + df_db*db_dy, df_da*da_dz + df_db*db_dz
 
-print(f"df/dw at {w}, {x}, {y}, {z} is {df_dw}")
-print(f"df/dx at {w}, {x}, {y}, {z} is {df_dx}")
-print(f"df/dy at {w}, {x}, {y}, {z} is {df_dy}")
-print(f"df/dz at {w}, {x}, {y}, {z} is {df_dz}")
+print(f'df/dw at {w}, {x}, {y}, {z} is {df_dw}')
+print(f'df/dx at {w}, {x}, {y}, {z} is {df_dx}')
+print(f'df/dy at {w}, {x}, {y}, {z} is {df_dy}')
+print(f'df/dz at {w}, {x}, {y}, {z} is {df_dz}')
 ```
 
 The fact that we compute derivatives from $f$ back towards the inputs rather than from the inputs forward to the outputs (as we did in the first code snippet above) is what gives this algorithm its name: *backpropagation*.  Note that there are two steps:
@@ -363,7 +396,7 @@ The fact that we compute derivatives from $f$ back towards the inputs rather tha
 
 This is precisely what every deep learning algorithm implements to allow the computation of the gradient of the loss with respect to every weight in the network at one pass.  It is an astonishing fact that we have such a decomposition.
 
-To see how MXNet has encapsulated this, let us take a quick look at this example.
+To see how to encapsulated this, let us take a quick look at this example.
 
 ```{.python .input}
 # Initialize as ndarrays, then attach gradients
@@ -383,17 +416,17 @@ with autograd.record():
 # Execute backward pass
 f.backward()
 
-print(f"df/dw at {w}, {x}, {y}, {z} is {w.grad}")
-print(f"df/dx at {w}, {x}, {y}, {z} is {x.grad}")
-print(f"df/dy at {w}, {x}, {y}, {z} is {y.grad}")
-print(f"df/dz at {w}, {x}, {y}, {z} is {z.grad}")
+print(f'df/dw at {w}, {x}, {y}, {z} is {w.grad}')
+print(f'df/dx at {w}, {x}, {y}, {z} is {x.grad}')
+print(f'df/dy at {w}, {x}, {y}, {z} is {y.grad}')
+print(f'df/dz at {w}, {x}, {y}, {z} is {z.grad}')
 ```
 
 ```{.python .input}
 #@tab pytorch
 # Initialize as ndarrays, then attach gradients
 w = torch.tensor([-1.], requires_grad=True)
-x = torch.tensor([0.], requires_grad=True) 
+x = torch.tensor([0.], requires_grad=True)
 y = torch.tensor([-2.], requires_grad=True)
 z = torch.tensor([1.], requires_grad=True)
 # Do the computation like usual, tracking gradients
@@ -404,14 +437,43 @@ f = (u + v)**2
 # Execute backward pass
 f.backward()
 
-print(f"df/dw at {w.data.item()}, {x.data.item()}, {y.data.item()},\
-      {z.data.item()} is {y.grad.data.item()}")
-print(f"df/dx at {w.data.item()}, {x.data.item()}, {y.data.item()},\
-      {z.data.item()} is {x.grad.data.item()}")
-print(f"df/dy at {w.data.item()}, {x.data.item()}, {y.data.item()},\
-      {z.data.item()} is {x.grad.data.item()}")
-print(f"df/dz at {w.data.item()}, {x.data.item()}, {y.data.item()},\
-      {z.data.item()} is {x.grad.data.item()}")
+print(f'df/dw at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
+      f'{z.data.item()} is {w.grad.data.item()}')
+print(f'df/dx at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
+      f'{z.data.item()} is {x.grad.data.item()}')
+print(f'df/dy at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
+      f'{z.data.item()} is {y.grad.data.item()}')
+print(f'df/dz at {w.data.item()}, {x.data.item()}, {y.data.item()}, '
+      f'{z.data.item()} is {z.grad.data.item()}')
+```
+
+```{.python .input}
+#@tab tensorflow
+# Initialize as ndarrays, then attach gradients
+w = tf.Variable(tf.constant([-1.]))
+x = tf.Variable(tf.constant([0.]))
+y = tf.Variable(tf.constant([-2.]))
+z = tf.Variable(tf.constant([1.]))
+# Do the computation like usual, tracking gradients
+with tf.GradientTape(persistent=True) as t:
+    a, b = (w + x + y + z)**2, (w + x - y - z)**2
+    u, v = (a + b)**2, (a - b)**2
+    f = (u + v)**2
+
+# Execute backward pass
+w_grad = t.gradient(f, w).numpy()
+x_grad = t.gradient(f, x).numpy()
+y_grad = t.gradient(f, y).numpy()
+z_grad = t.gradient(f, z).numpy()
+
+print(f'df/dw at {w.numpy()}, {x.numpy()}, {y.numpy()}, '
+      f'{z.numpy()} is {w_grad}')
+print(f'df/dx at {w.numpy()}, {x.numpy()}, {y.numpy()}, '
+      f'{z.numpy()} is {x_grad}')
+print(f'df/dy at {w.numpy()}, {x.numpy()}, {y.numpy()}, '
+      f'{z.numpy()} is {y_grad}')
+print(f'df/dz at {w.numpy()}, {x.numpy()}, {y.numpy()}, '
+      f'{z.numpy()} is {z_grad}')
 ```
 
 All of what we did above can be done automatically by calling `f.backwards()`.
@@ -431,7 +493,7 @@ This is traditionally assembled into a matrix called the *Hessian*:
 $$\mathbf{H}_f = \begin{bmatrix} \frac{d^2f}{dx_1dx_1} & \cdots & \frac{d^2f}{dx_1dx_n} \\ \vdots & \ddots & \vdots \\ \frac{d^2f}{dx_ndx_1} & \cdots & \frac{d^2f}{dx_ndx_n} \\ \end{bmatrix}.$$
 :eqlabel:`eq_hess_def`
 
-Not every entry of this matrix is independent.  Indeed, we can show that as long as both *mixed partials* (partial derivatives with respect to more than one variable) exist and are continuous, we can say that for any $i$, and $j$, 
+Not every entry of this matrix is independent.  Indeed, we can show that as long as both *mixed partials* (partial derivatives with respect to more than one variable) exist and are continuous, we can say that for any $i$, and $j$,
 
 $$
 \frac{d^2f}{dx_idx_j} = \frac{d^2f}{dx_jdx_i}.
@@ -447,11 +509,11 @@ $$
 \begin{aligned}
 f(0,0) & = a, \\
 \nabla f (0,0) & = \begin{bmatrix}b_1 \\ b_2\end{bmatrix}, \\
-\mathbf{H} f (0,0) & = \begin{bmatrix}2 c_{11} & c_{12} \\ c_{12} & 2c_{22}\end{bmatrix}.
+\mathbf{H} f (0,0) & = \begin{bmatrix}2 c_{11} & c_{12} \\ c_{12} & 2c_{22}\end{bmatrix},
 \end{aligned}
 $$
 
-If we from this, we see we can get our original polynomial back by saying
+we can get our original polynomial back by saying
 
 $$
 f(\mathbf{x}) = f(0) + \nabla f (0) \cdot \mathbf{x} + \frac{1}{2}\mathbf{x}^\top \mathbf{H} f (0) \mathbf{x}.
@@ -463,7 +525,7 @@ $$
 f(\mathbf{x}) = f(\mathbf{x}_0) + \nabla f (\mathbf{x}_0) \cdot (\mathbf{x}-\mathbf{x}_0) + \frac{1}{2}(\mathbf{x}-\mathbf{x}_0)^\top \mathbf{H} f (\mathbf{x}_0) (\mathbf{x}-\mathbf{x}_0).
 $$
 
-This works for any dimensional input, and provides the best approximating quadratic to any function at a point.  To give an example, let us plot the function 
+This works for any dimensional input, and provides the best approximating quadratic to any function at a point.  To give an example, let us plot the function
 
 $$
 f(x, y) = xe^{-x^2-y^2}.
@@ -477,7 +539,7 @@ $$
 And thus, with a little algebra, see that the approximating quadratic at $[-1,0]^\top$ is
 
 $$
-f(x, y) \approx e^{-1}\left(-1 - (x+1) +2(x+1)^2+2y^2\right).
+f(x, y) \approx e^{-1}\left(-1 - (x+1) +(x+1)^2+y^2\right).
 $$
 
 ```{.python .input}
@@ -486,8 +548,8 @@ x, y = np.meshgrid(np.linspace(-2, 2, 101),
                    np.linspace(-2, 2, 101), indexing='ij')
 z = x*np.exp(- x**2 - y**2)
 
-# Compute gradient and Hessian at (1, 0)
-w = np.exp(-1)*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
+# Compute approximating quadratic with gradient and Hessian at (1, 0)
+w = np.exp(-1)*(-1 - (x + 1) + (x + 1)**2 + y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
@@ -510,8 +572,34 @@ x, y = torch.meshgrid(torch.linspace(-2, 2, 101),
 
 z = x*torch.exp(- x**2 - y**2)
 
-# Compute gradient and Hessian at (1, 0)
+# Compute approximating quadratic with gradient and Hessian at (1, 0)
 w = torch.exp(torch.tensor([-1.]))*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
+
+# Plot function
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_wireframe(x.numpy(), y.numpy(), z.numpy(),
+                  **{'rstride': 10, 'cstride': 10})
+ax.plot_wireframe(x.numpy(), y.numpy(), w.numpy(),
+                  **{'rstride': 10, 'cstride': 10}, color='purple')
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y')
+d2l.set_figsize()
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+ax.set_zlim(-1, 1)
+ax.dist = 12
+```
+
+```{.python .input}
+#@tab tensorflow
+# Construct grid and compute function
+x, y = tf.meshgrid(tf.linspace(-2., 2., 101),
+                   tf.linspace(-2., 2., 101))
+
+z = x*tf.exp(- x**2 - y**2)
+
+# Compute approximating quadratic with gradient and Hessian at (1, 0)
+w = tf.exp(tf.constant([-1.]))*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
@@ -533,7 +621,7 @@ This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where
 ## A Little Matrix Calculus
 Derivatives of functions involving matrices turn out to be particularly nice.  This section can become notationally heavy, so may be skipped in a first reading, but it is useful to know how derivatives of functions involving common matrix operations are often much cleaner than one might initially anticipate, particularly given how central matrix operations are to deep learning applications.
 
-Let us begin with an example.  Suppose that we have some fixed row vector $\boldsymbol{\beta}$, and we want to take the product function $f(\mathbf{x}) = \boldsymbol{\beta}\mathbf{x}$, and understand how the dot product changes when we change $\mathbf{x}$.  
+Let us begin with an example.  Suppose that we have some fixed column vector $\boldsymbol{\beta}$, and we want to take the product function $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$, and understand how the dot product changes when we change $\mathbf{x}$.
 
 A bit of notation that will be useful when working with matrix derivatives in ML is called the *denominator layout matrix derivative* where we assemble our partial derivatives into the shape of whatever vector, matrix, or tensor is in the denominator of the differential.  In this case, we will write
 
@@ -542,10 +630,10 @@ $$
 \frac{df}{dx_1} \\
 \vdots \\
 \frac{df}{dx_n}
-\end{bmatrix}.
+\end{bmatrix},
 $$
 
-where we matched the shape of the column vector $\mathbf{x}$. 
+where we matched the shape of the column vector $\mathbf{x}$.
 
 If we write out our function into components this is
 
@@ -559,7 +647,7 @@ $$
 \frac{df}{dx_1} = \beta_1,
 $$
 
-or more generally that 
+or more generally that
 
 $$
 \frac{df}{dx_i} = \beta_i.
@@ -576,16 +664,16 @@ $$
 \beta_1 \\
 \vdots \\
 \beta_n
-\end{bmatrix} = \boldsymbol{\beta}^\top.
+\end{bmatrix} = \boldsymbol{\beta}.
 $$
 
 This illustrates a few factors about matrix calculus that we will often counter throughout this section:
 
 * First, The computations will get rather involved.
-* Second, The final results are much cleaner than the intermediate process, and will always look similar to the single variable case.  In this case, note that $\frac{d}{dx}(bx) = b$ and $\frac{d}{d\mathbf{x}} (\boldsymbol{\beta}\mathbf{x}) = \boldsymbol{\beta}^\top$ are both similar. 
+* Second, The final results are much cleaner than the intermediate process, and will always look similar to the single variable case.  In this case, note that $\frac{d}{dx}(bx) = b$ and $\frac{d}{d\mathbf{x}} (\boldsymbol{\beta}^\top\mathbf{x}) = \boldsymbol{\beta}$ are both similar.
 * Third, transposes can often appear seemingly from nowhere.  The core reason for this is the convention that we match the shape of the denominator, thus when we multiply matrices, we will need to take transposes to match back to the shape of the original term.
 
-To keep building intuition, let us try a computation that is a little harder.  Suppose that we have a column vector $\mathbf{x}$, and a square matrix $A$ and we want to compute 
+To keep building intuition, let us try a computation that is a little harder.  Suppose that we have a column vector $\mathbf{x}$, and a square matrix $A$ and we want to compute
 
 $$\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}).$$
 :eqlabel:`eq_mat_goal_1`
@@ -644,36 +732,36 @@ $$
 \frac{d}{dx}(xax) = \frac{dx}{dx}ax + xa\frac{dx}{dx} = (a+a)x.
 $$
 
-Equivalently $\frac{d}{dx}(ax^2) = 2ax = (a+a)x$.  Again, we get a result that looks rather like the single variable result but with a transpose tossed in.  
+Equivalently $\frac{d}{dx}(ax^2) = 2ax = (a+a)x$.  Again, we get a result that looks rather like the single variable result but with a transpose tossed in.
 
 At this point, the pattern should be looking rather suspicious, so let us try to figure out why.  When we take matrix derivatives like this, let us first assume that the expression we get will be another matrix expression: an expression we can write it in terms of products and sums of matrices and their transposes.  If such an expression exists, it will need to be true for all matrices.  In particular, it will need to be true of $1 \times 1$ matrices, in which case the matrix product is just the product of the numbers, the matrix sum is just the sum, and the transpose does nothing at all!  In other words, whatever expression we get *must* match the single variable expression.  This means that, with some practice, one can often guess matrix derivatives just by knowing what the associated single variable expression must look like!
 
-Let us try this out.  Suppose that $\mathbf{X}$ is a $n \times m$ matrix, $\mathbf{U}$ is an $n \times r$ and $\mathbf{V}$ is an $r \times m$.  Let us try to compute 
+Let us try this out.  Suppose that $\mathbf{X}$ is a $n \times m$ matrix, $\mathbf{U}$ is an $n \times r$ and $\mathbf{V}$ is an $r \times m$.  Let us try to compute
 
 $$\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?$$
 :eqlabel:`eq_mat_goal_2`
 
 This computation is important in an area called matrix factorization.  For us, however, it is just a derivative to compute.  Let us try to imaging what this would be for $1\times1$ matrices.  In that case, we get the expression
 
-$$ 
-\frac{d}{dv} (x-uv)^{2}= 2(x-uv)u,
+$$
+\frac{d}{dv} (x-uv)^{2}= -2(x-uv)u,
 $$
 
 where, the derivative is rather standard.  If we try to convert this back into a matrix expression we get
 
 $$
-\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= 2(\mathbf{X} - \mathbf{U}\mathbf{V})\mathbf{U}.
+\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2(\mathbf{X} - \mathbf{U}\mathbf{V})\mathbf{U}.
 $$
 
-However, if we look at this it does not quite work.  Recall that $\mathbf{X}$ is $n \times m$, as is $\mathbf{U}\mathbf{V}$, so the matrix $2(\mathbf{X} - \mathbf{U}\mathbf{V})$ is $n \times m$.  On the other hand $\mathbf{U}$ is $n \times r$, and we cannot multiply a $n \times m$ and a $n \times r$ matrix since the dimensions do not match! 
+However, if we look at this it does not quite work.  Recall that $\mathbf{X}$ is $n \times m$, as is $\mathbf{U}\mathbf{V}$, so the matrix $2(\mathbf{X} - \mathbf{U}\mathbf{V})$ is $n \times m$.  On the other hand $\mathbf{U}$ is $n \times r$, and we cannot multiply a $n \times m$ and a $n \times r$ matrix since the dimensions do not match!
 
 We want to get $\frac{d}{d\mathbf{V}}$, which is the same shape of $\mathbf{V}$, which is $r \times m$.  So somehow we need to take a $n \times m$ matrix and a $n \times r$ matrix, multiply them together (perhaps with some transposes) to get a $r \times m$. We can do this by multiplying $U^\top$ by $(\mathbf{X} - \mathbf{U}\mathbf{V})$.  Thus, we can guess the solution to :eqref:`eq_mat_goal_2` is
 
 $$
-\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= 2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
+\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
 $$
 
-To show we that this works, we would be remiss to not provide a detailed computation.  If we already believe that this rule-of-thumb works, feel free to skip past this derivation.  To compute 
+To show that this works, we would be remiss to not provide a detailed computation.  If we already believe that this rule-of-thumb works, feel free to skip past this derivation.  To compute
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^2,
@@ -688,13 +776,13 @@ $$
 Recalling that all entries of $\mathbf{X}$ and $\mathbf{U}$ are constants as far as $\frac{d}{dv_{ab}}$ is concerned, we may push the derivative inside the sum, and apply the chain rule to the square to get
 
 $$
-\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= \sum_{i, j}2\left(x_{ij} - \sum_k u_{ik}v_{kj}\right)\left(\sum_k u_{ik}\frac{dv_{kj}}{dv_{ab}} \right).
+\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= \sum_{i, j}2\left(x_{ij} - \sum_k u_{ik}v_{kj}\right)\left(-\sum_k u_{ik}\frac{dv_{kj}}{dv_{ab}} \right).
 $$
 
 As in the previous derivation, we may note that $\frac{dv_{kj}}{dv_{ab}}$ is only non-zero if the $k=a$ and $j=b$.  If either of those conditions do not hold, the term in the sum is zero, and we may freely discard it.  We see that
 
 $$
-\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= \sum_{i}2\left(x_{ib} - \sum_k u_{ik}v_{kb}\right)u_{ia}.
+\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\sum_{i}\left(x_{ib} - \sum_k u_{ik}v_{kb}\right)u_{ia}.
 $$
 
 An important subtlety here is that the requirement that $k=a$ does not occur inside the inner sum since that $k$ is a dummy variable which we are summing over inside the inner term.  For a notationally cleaner example, consider why
@@ -703,7 +791,7 @@ $$
 \frac{d}{dx_1} \left(\sum_i x_i \right)^{2}= 2\left(\sum_i x_i \right).
 $$
 
-From this point, we may start identifying components of the sum.  First, 
+From this point, we may start identifying components of the sum.  First,
 
 $$
 \sum_k u_{ik}v_{kb} = [\mathbf{U}\mathbf{V}]_{ib}.
@@ -718,25 +806,25 @@ $$
 This means we may now write our derivative as
 
 $$
-\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= 2\sum_{i}[\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}u_{ia}.
+\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\sum_{i}[\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}u_{ia}.
 $$
 
 We want this to look like the $a, b$ element of a matrix so we can use the technique as in the previous example to arrive at a matrix expression, which means that we need to exchange the order of the indices on $u_{ia}$.  If we notice that $u_{ia} = [\mathbf{U}^\top]_{ai}$, we can then write
 
 $$
-\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= 2\sum_{i} [\mathbf{U}^\top]_{ai}[\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}.
+\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\sum_{i} [\mathbf{U}^\top]_{ai}[\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}.
 $$
 
 This is a matrix product, and thus we can conclude that
 
 $$
-\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= [2\mathbf{U}^\top(\mathbf{X}-\mathbf{U}\mathbf{V})]_{ab}.
+\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2[\mathbf{U}^\top(\mathbf{X}-\mathbf{U}\mathbf{V})]_{ab}.
 $$
 
 and thus we may write the solution to :eqref:`eq_mat_goal_2`
 
 $$
-\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= 2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
+\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= -2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
 $$
 
 This matches the solution we guessed above!
@@ -750,13 +838,22 @@ It is reasonable to ask at this point, "Why can I not just write down matrix ver
 * Matrix calculus allows us to write the derivatives of matrix expressions in concise ways.
 
 ## Exercises
-1. Given a row vector $\boldsymbol{\beta}$, compute the derivatives of both $f(\mathbf{x}) = \boldsymbol{\beta}\mathbf{x}$ and $g(\mathbf{x}) = \mathbf{x}^\top\boldsymbol{\beta}^\top$.  Why do you get the same answer?
+1. Given a column vector $\boldsymbol{\beta}$, compute the derivatives of both $f(\mathbf{x}) = \boldsymbol{\beta}^\top\mathbf{x}$ and $g(\mathbf{x}) = \mathbf{x}^\top\boldsymbol{\beta}$.  Why do you get the same answer?
 2. Let $\mathbf{v}$ be an $n$ dimension vector. What is $\frac{\partial}{\partial\mathbf{v}}\|\mathbf{v}\|_2$?
 3. Let $L(x, y) = \log(e^x + e^y)$.  Compute the gradient.  What is the sum of the components of the gradient?
 4. Let $f(x, y) = x^2y + xy^2$. Show that the only critical point is $(0,0)$. By considering $f(x, x)$, determine if $(0,0)$ is a maximum, minimum, or neither.
 5. Suppose that we are minimizing a function $f(\mathbf{x}) = g(\mathbf{x}) + h(\mathbf{x})$.  How can we geometrically interpret the condition of $\nabla f = 0$ in terms of $g$ and $h$?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5150)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/413)
+:end_tab:
 
-![](../img/qr_multivariable-calculus.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1090)
+:end_tab:
+
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1091)
+:end_tab:

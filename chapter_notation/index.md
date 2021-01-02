@@ -12,7 +12,7 @@ The notation used throughout this book is summarized below.
 * $\mathsf{X}$: A tensor
 * $\mathbf{I}$: An identity matrix
 * $x_i$, $[\mathbf{x}]_i$: The $i^\mathrm{th}$ element of vector $\mathbf{x}$
-* $x_{ij}$, $[\mathbf{X}]_{ij}$: The element of matrix $\mathbf{X}$ at row $i$ and column $j$
+* $x_{ij}$, $x_{i,j}$,$[\mathbf{X}]_{ij}$, $[\mathbf{X}]_{i,j}$: The element of matrix $\mathbf{X}$ at row $i$ and column $j$
 
 
 
@@ -22,9 +22,11 @@ The notation used throughout this book is summarized below.
 
 * $\mathcal{X}$: A set
 * $\mathbb{Z}$: The set of integers
+* $\mathbb{Z}^+$: The set of positive integers
 * $\mathbb{R}$: The set of real numbers
 * $\mathbb{R}^n$: The set of $n$-dimensional vectors of real numbers
 * $\mathbb{R}^{a\times b}$: The set of matrices of real numbers with $a$ rows and $b$ columns
+* $|\mathcal{X}|$: Cardinality (number of elements) of set $\mathcal{X}$
 * $\mathcal{A}\cup\mathcal{B}$: Union of sets $\mathcal{A}$ and $\mathcal{B}$
 * $\mathcal{A}\cap\mathcal{B}$: Intersection of sets $\mathcal{A}$ and $\mathcal{B}$
 * $\mathcal{A}\setminus\mathcal{B}$: Subtraction of set $\mathcal{B}$ from set $\mathcal{A}$
@@ -42,11 +44,12 @@ The notation used throughout this book is summarized below.
 * $\odot$: Hadamard (elementwise) product
 * $[\cdot, \cdot]$: Concatenation
 * $\lvert \mathcal{X} \rvert$: Cardinality of set $\mathcal{X}$
-* $\|\cdot\|_p$: $\ell_p$ norm
-* $\|\cdot\|$: $\ell_2$ norm
+* $\|\cdot\|_p$: $L_p$ norm
+* $\|\cdot\|$: $L_2$ norm
 * $\langle \mathbf{x}, \mathbf{y} \rangle$: Dot product of vectors $\mathbf{x}$ and $\mathbf{y}$
 * $\sum$: Series addition
 * $\prod$: Series multiplication
+* $\stackrel{\mathrm{def}}{=}$: Definition
 
 
 ## Calculus

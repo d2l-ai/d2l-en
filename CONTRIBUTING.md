@@ -25,7 +25,7 @@ We look forward to receiving your pull requests for:
 To contribute, send us a pull request. For small changes, such as fixing a typo or adding a link, you can use the [GitHub Edit Button](https://blog.github.com/2011-04-26-forking-with-the-edit-button/). For larger changes:
 
 1. [Fork the repository](https://help.github.com/articles/fork-a-repo/).
-2. In your fork, make your change in a branch that's based on this repo's **master** branch.
+2. In your fork, make your change in a new branch (e.g., by [`git branch`](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)) that's based on this repo's **master** branch.
 3. Commit the change to your fork, using a clear and descriptive commit message.
 4. [Create a pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/), answering any questions in the pull request form.
 

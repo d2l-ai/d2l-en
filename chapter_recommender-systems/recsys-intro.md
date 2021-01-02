@@ -21,7 +21,7 @@ better capability in dealing with sparsity and scalability.  Many model-based CF
 
 ## Explicit Feedback and Implicit Feedback
 
-To learn the preference of users, the system shall collect feedback from them.  The feedback can be either explicit or implicit :cite:`Hu.Koren.Volinsky.2008`. For example, [IMDB](https://www.imdb.com/) collects star ratings ranging from one to ten stars for movies. YouTube provides the thumbs-up and thumbs-down buttons for users to show their preferences.  It is apparent that gathering explicit feedback requires users to indicate their interests proactively.  Nonetheless, explicit feedback is not always readily available as many users may be reluctant to rate products. Relatively speaking, implicit feedback is often readily available since it is mainly concerned with modeling implicit behavior such user clicks. As such, many recommender systems are centered on implicit feedback which indirectly reflects user's opinion through observing user behavior.  There are diverse forms of implicit feedback including purchase history, browsing history, watches and even mouse movements. For example, a user that purchased many books by the same author probably likes that author.   Note that implicit feedback is inherently noisy.  We can only *guess* their preferences and true motives. A user watched a movie does not necessarily indicate a positive view of that movie.
+To learn the preference of users, the system shall collect feedback from them.  The feedback can be either explicit or implicit :cite:`Hu.Koren.Volinsky.2008`. For example, [IMDB](https://www.imdb.com/) collects star ratings ranging from one to ten stars for movies. YouTube provides the thumbs-up and thumbs-down buttons for users to show their preferences.  It is apparent that gathering explicit feedback requires users to indicate their interests proactively.  Nonetheless, explicit feedback is not always readily available as many users may be reluctant to rate products. Relatively speaking, implicit feedback is often readily available since it is mainly concerned with modeling implicit behavior such as user clicks. As such, many recommender systems are centered on implicit feedback which indirectly reflects user's opinion through observing user behavior.  There are diverse forms of implicit feedback including purchase history, browsing history, watches and even mouse movements. For example, a user that purchased many books by the same author probably likes that author.   Note that implicit feedback is inherently noisy.  We can only *guess* their preferences and true motives. A user watched a movie does not necessarily indicate a positive view of that movie.
 
 
 
@@ -41,6 +41,4 @@ A number of recommendation tasks have been investigated in the past decades.  Ba
 1. Can you explain how recommender systems influence your daily life?
 2. What interesting recommendation tasks do you think can be investigated?
 
-## [Discussions](https://discuss.mxnet.io/t/5158)
-
-![](../img/qr_recsys-intro.svg)
+[Discussions](https://discuss.d2l.ai/t/398)

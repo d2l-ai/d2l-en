@@ -48,7 +48,7 @@ Next, click the "Launch Instance" button marked by the red box in :numref:`fig_e
 We begin by selecting a suitable AMI (AWS Machine Image). Enter "Ubuntu" in the search box (marked by the red box in :numref:`fig_ubuntu`).
 
 
-![Choose an operating system.](../img/ubuntu_new.png)
+![Choose an operating system.](../img/ubuntu-new.png)
 :width:`700px`
 :label:`fig_ubuntu`
 
@@ -110,6 +110,7 @@ If this is a new key, it must not be publicly viewable for SSH to work. Go to th
 cd /Downloads  ## if D2L_key.pem is stored in Downloads folder
 chmod 400 D2L_key.pem
 ```
+
 
 ![View instance access and startup method.](../img/chmod.png)
 :width:`400px`
@@ -223,7 +224,7 @@ conda install python=3.7 pip -y
 Finally, install MXNet and the `d2l` package. The postfix `cu101` means that this is the CUDA 10.1 variant. For different versions, say only CUDA 10.0, you would want to choose `cu100` instead.
 
 ```bash
-pip install mxnet-cu101==1.6.0
+pip install mxnet-cu101==1.7.0
 pip install git+https://github.com/d2l-ai/d2l-en
 
 ```
@@ -289,6 +290,4 @@ environments.
 1. Experiment with multi-GPU servers. How well can you scale things up?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2399)
-
-![](../img/qr_aws.svg)
+[Discussions](https://discuss.d2l.ai/t/423)

@@ -9,7 +9,7 @@ As shown in :numref:`fig_circle_area`,
 an inscribed polygon with more sides of equal length better approximates
 the circle. This process is also known as the *method of exhaustion*.
 
-![Find the area of a circle with the method of exhaustion.](../img/polygon_circle.svg)
+![Find the area of a circle with the method of exhaustion.](../img/polygon-circle.svg)
 :label:`fig_circle_area`
 
 In fact, the method of exhaustion is where *integral calculus* (will be described in :numref:`sec_integral_calculus`) originates from.
@@ -34,7 +34,7 @@ Thus we can decompose the task of fitting models into two key concerns:
 i) *optimization*: the process of fitting our models to observed data;
 ii) *generalization*: the mathematical principles and practitioners' wisdom
 that guide as to how to produce models whose validity extends
-beyond the exact set of data instances used to train them.
+beyond the exact set of data examples used to train them.
 
 To help you understand
 optimization problems and methods in later chapters,
@@ -97,6 +97,17 @@ def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+from IPython import display
+import numpy as np
+
+def f(x):
+    return 3 * x ** 2 - 4 * x
+```
+
 By setting $x=1$ and letting $h$ approach $0$,
 the numerical result of $\frac{f(x+h) - f(x)}{h}$
 in :eqref:`eq_derivative` approaches $2$.
@@ -110,7 +121,7 @@ def numerical_lim(f, x, h):
 
 h = 0.1
 for i in range(5):
-    print('h=%.5f, numerical limit=%.5f' % (h, numerical_lim(f, 1, h)))
+    print(f'h={h:.5f}, numerical limit={numerical_lim(f, 1, h):.5f}')
     h *= 0.1
 ```
 
@@ -161,6 +172,9 @@ To configure properties of the figures produced by `matplotlib`,
 we need to define a few functions.
 In the following,
 the `use_svg_display` function specifies the `matplotlib` package to output the svg figures for sharper images.
+Note that the comment `#@save` is a special mark where the following function,
+class, or statements are saved in the `d2l` package
+so later they can be directly invoked (e.g., `d2l.use_svg_display()`) without being redefined.
 
 ```{.python .input}
 #@tab all
@@ -208,14 +222,14 @@ since we will need to visualize many curves throughout the book.
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
-    """Plot data instances."""
+    """Plot data points."""
     if legend is None:
         legend = []
 
     set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
 
-    # Return True if `X` (ndarray or list) has 1 axis
+    # Return True if `X` (tensor or list) has 1 axis
     def has_one_axis(X):
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))
@@ -331,4 +345,8 @@ for any $i = 1, 2, \ldots, n$.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/33)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/197)
 :end_tab:

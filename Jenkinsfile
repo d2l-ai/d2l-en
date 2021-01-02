@@ -1,52 +1,56 @@
 stage("Build and Publish") {
-  def TASK = "d2l-en"
+  // such as d2l-en and d2l-zh
+  def REPO_NAME = env.JOB_NAME.split('/')[0]
+  // such as en and zh
+  def LANG = REPO_NAME.split('-')[1]
+  // The current branch or the branch this PR will merge into
+  def TARGET_BRANCH = env.CHANGE_TARGET ? env.CHANGE_TARGET : env.BRANCH_NAME
+  // such as d2l-en-master
+  def TASK = REPO_NAME + '-' + TARGET_BRANCH
   node {
     ws("workspace/${TASK}") {
       checkout scm
+      // conda environment
       def ENV_NAME = "${TASK}-${EXECUTOR_NUMBER}";
+      // assign two GPUs to each build
       def EID = EXECUTOR_NUMBER.toInteger()
       def CUDA_VISIBLE_DEVICES=(EID*2).toString() + ',' + (EID*2+1).toString();
 
       sh label: "Build Environment", script: """set -ex
-      rm -rf ~/miniconda3/envs/${ENV_NAME}
-      conda create -n ${ENV_NAME} pip python=3.7 -y
+      conda env update -n ${ENV_NAME} -f static/build.yml
       conda activate ${ENV_NAME}
-      # d2l
-      python setup.py develop
-      # mxnet
-      pip install mxnet-cu101==1.6.0
-      pip install git+https://github.com/d2l-ai/d2l-book
-      # pytorch
-      pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
-      pip install torchvision
-      # check
       pip list
       nvidia-smi
       """
-      
+
       sh label: "Sanity Check", script: """set -ex
       conda activate ${ENV_NAME}
-      d2lbook build outputcheck
-      d2lbook build tabcheck
+      d2lbook build outputcheck tabcheck
       """
-      
+
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
-      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
-      ./static/cache.sh restore _build/eval/data _build/data_tmp
-      ./static/clean_eval.sh
+      ./static/cache.sh restore _build/eval/data
       d2lbook build eval
-      ./static/cache.sh store _build/eval/data _build/data_tmp
+      ./static/cache.sh store _build/eval/data
       """
 
-      sh label: "Execute Notebooks [Pytorch]", script: """set -ex
+      sh label: "Execute Notebooks [PyTorch]", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
-      export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
-      ./static/cache.sh restore _build/eval_pytorch/data _build/data_pytorch_tmp
+      ./static/cache.sh restore _build/eval_pytorch/data
       d2lbook build eval --tab pytorch
-      ./static/cache.sh store _build/eval_pytorch/data _build/data_pytorch_tmp
+      ./static/cache.sh store _build/eval_pytorch/data
+      """
+
+      sh label: "Execute Notebooks [TensorFlow]", script: """set -ex
+      conda activate ${ENV_NAME}
+      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
+      ./static/cache.sh restore _build/eval_tensorflow/data
+      export TF_CPP_MIN_LOG_LEVEL=3
+      d2lbook build eval --tab tensorflow
+      ./static/cache.sh store _build/eval_tensorflow/data
       """
 
       sh label:"Build HTML", script:"""set -ex
@@ -59,17 +63,27 @@ stage("Build and Publish") {
       d2lbook build pdf
       """
 
-      sh label:"Build Package", script:"""set -ex
-      conda activate ${ENV_NAME}
-      d2lbook build pkg
-      ./static/build_whl.sh
-      """
+      if (env.BRANCH_NAME == 'release') {
+        sh label:"Release", script:"""set -ex
+        conda activate ${ENV_NAME}
+        d2lbook build pkg
+        d2lbook deploy html pdf pkg colab sagemaker --s3 s3://en.d2l.ai/
+        """
 
-      if (env.BRANCH_NAME == 'master') {
+        sh label:"Release d2l", script:"""set -ex
+        conda activate ${ENV_NAME}
+        pip install setuptools wheel twine
+        python setup.py bdist_wheel
+        # twine upload dist/*
+        """
+      } else {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
-        d2lbook deploy html pdf pkg
-      """
+        d2lbook deploy html pdf --s3 s3://preview.d2l.ai/${JOB_NAME}/
+        """
+        if (env.BRANCH_NAME.startsWith("PR-")) {
+            pullRequest.comment("Job ${JOB_NAME}/${BUILD_NUMBER} is complete. \nCheck the results at http://preview.d2l.ai/${JOB_NAME}/")
+        }
       }
     }
   }

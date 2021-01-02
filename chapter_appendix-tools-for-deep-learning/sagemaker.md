@@ -8,7 +8,7 @@ Many deep learning applications require a significant amount of computation. You
 
 First, we need to register an account at https://aws.amazon.com/. We encourage you to use two-factor authentication for additional security. It is also a good idea to set up detailed billing and spending alerts to avoid any unexpected surprises in case you forget to stop any running instance.
 Note that you will need a credit card.
-After logging into your AWS account, search for "SageMaker" (see :numref:`fig_sagemaker`) then click to open the SageMaker panel.
+After logging into your AWS account, go to your [console](http://console.aws.amazon.com/) and search for "SageMaker" (see :numref:`fig_sagemaker`) then click to open the SageMaker panel.
 
 ![Open the SageMaker panel.](../img/sagemaker.png)
 :width:`300px`
@@ -40,6 +40,10 @@ A Jupyter notebook version of this book for fitting SageMaker is available at ht
 A Jupyter notebook version of this book for fitting SageMaker is available at https://github.com/d2l-ai/d2l-pytorch-sagemaker. We can specify this GitHub repository URL to let SageMaker clone this repository during instance creation, as shown in :numref:`fig_sagemaker-create-3`.
 :end_tab:
 
+:begin_tab:`tensorflow`
+A Jupyter notebook version of this book for fitting SageMaker is available at https://github.com/d2l-ai/d2l-tensorflow-sagemaker. We can specify this GitHub repository URL to let SageMaker clone this repository during instance creation, as shown in :numref:`fig_sagemaker-create-3`.
+:end_tab:
+
 ![Specify the GitHub repository.](../img/sagemaker-create-3.png)
 :width:`400px`
 :label:`fig_sagemaker-create-3`
@@ -61,7 +65,7 @@ Then, as shown in :numref:`fig_sagemaker-jupyter`, you may navigate through the 
 :width:`400px`
 :label:`fig_sagemaker-jupyter`
 
-Running and editing Jupyter notebooks on the SagaMaker instance is similar to what we have discussed in :numref:`sec_jupyter`.
+Running and editing Jupyter notebooks on the SageMaker instance is similar to what we have discussed in :numref:`sec_jupyter`.
 After finishing your work, do not forget to stop the instance to avoid further charging, as shown in :numref:`fig_sagemaker-stop`.
 
 ![Stop a SageMaker instance.](../img/sagemaker-stop.png)
@@ -71,7 +75,18 @@ After finishing your work, do not forget to stop the instance to avoid further c
 
 ## Updating Notebooks
 
+:begin_tab:`mxnet`
 We will regularly update the notebooks in the [d2l-ai/d2l-en-sagemaker](https://github.com/d2l-ai/d2l-en-sagemaker) GitHub repository. You can simply use the `git pull` command to update to the latest version.
+:end_tab:
+
+:begin_tab:`pytorch`
+We will regularly update the notebooks in the [d2l-ai/d2l-pytorch-sagemaker](https://github.com/d2l-ai/d2l-pytorch-sagemaker) GitHub repository. You can simply use the `git pull` command to update to the latest version.
+:end_tab:
+
+:begin_tab:`tensorflow`
+We will regularly update the notebooks in the [d2l-ai/d2l-tensorflow-sagemaker](https://github.com/d2l-ai/d2l-tensorflow-sagemaker) GitHub repository. You can simply use the `git pull` command to update to the latest version.
+:end_tab:
+
 First, you need to open a terminal as shown in :numref:`fig_sagemaker-terminal`.
 
 ![Open a terminal on the SageMaker instance.](../img/sagemaker-terminal.png)
@@ -96,6 +111,14 @@ git pull
 ```
 :end_tab:
 
+:begin_tab:`tensorflow`
+```bash
+cd SageMaker/d2l-tensorflow-sagemaker/
+git reset --hard
+git pull
+```
+:end_tab:
+
 ## Summary
 
 * We can launch and stop a Jupyter server through Amazon SageMaker to run this book.
@@ -108,6 +131,4 @@ git pull
 1. Access the source code directory via the terminal.
 
 
-## [Discussions](https://discuss.mxnet.io/t/5640)
-
-![](../img/qr_sagemaker.svg)
+[Discussions](https://discuss.d2l.ai/t/422)

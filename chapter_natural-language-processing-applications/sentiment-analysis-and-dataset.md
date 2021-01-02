@@ -5,11 +5,19 @@ Text classification is a common task in natural language processing, which trans
 
 This section will focus on loading data for one of the sub-questions in this field: using text sentiment classification to analyze the emotions of the text's author. This problem is also called sentiment analysis and has a wide range of applications. For example, we can analyze user reviews of products to obtain user satisfaction statistics, or analyze user sentiments about market conditions and use it to predict future trends.
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
-from mxnet import gluon, np, npx
+from mxnet import np, npx
 import os
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+from torch import nn
+import os
 ```
 
 ## The Sentiment Analysis Dataset
@@ -20,7 +28,8 @@ We use Stanford's [Large Movie Review Dataset](https://ai.stanford.edu/~amaas/da
 
 We first download this dataset to the "../data" path and extract it to "../data/aclImdb".
 
-```{.python .input  n=2}
+```{.python .input}
+#@tab all
 #@save
 d2l.DATA_HUB['aclImdb'] = (
     'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
@@ -31,7 +40,8 @@ data_dir = d2l.download_extract('aclImdb', 'aclImdb')
 
 Next, read the training and test datasets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
 
-```{.python .input  n=3}
+```{.python .input}
+#@tab all
 #@save
 def read_imdb(data_dir, is_train):
     data, labels = [], []
@@ -55,11 +65,12 @@ for x, y in zip(train_data[0][:3], train_data[1][:3]):
 
 We use a word as a token, and then create a dictionary based on the training dataset.
 
-```{.python .input  n=4}
+```{.python .input}
+#@tab all
 train_tokens = d2l.tokenize(train_data[0], token='word')
 vocab = d2l.Vocab(train_tokens, min_freq=5, reserved_tokens=['<pad>'])
 
-d2l.set_figsize((3.5, 2.5))
+d2l.set_figsize()
 d2l.plt.hist([len(line) for line in train_tokens], bins=range(0, 1000, 50));
 ```
 
@@ -67,31 +78,42 @@ d2l.plt.hist([len(line) for line in train_tokens], bins=range(0, 1000, 50));
 
 Because the reviews have different lengths, so they cannot be directly combined into minibatches. Here we fix the length of each comment to 500 by truncating or adding "&lt;unk&gt;" indices.
 
-```{.python .input  n=5}
+```{.python .input}
+#@tab all
 num_steps = 500  # sequence length
-train_features = np.array([d2l.truncate_pad(
+train_features = d2l.tensor([d2l.truncate_pad(
     vocab[line], num_steps, vocab['<pad>']) for line in train_tokens])
-train_features.shape
+print(train_features.shape)
 ```
 
 ### Creating the Data Iterator
 
 Now, we will create a data iterator. Each iteration will return a minibatch of data.
 
-```{.python .input  n=6}
+```{.python .input}
 train_iter = d2l.load_array((train_features, train_data[1]), 64)
 
 for X, y in train_iter:
-    print('X', X.shape, 'y', y.shape)
+    print('X:', X.shape, ', y:', y.shape)
     break
-'# batches:', len(train_iter)
+print('# batches:', len(train_iter))
+```
+
+```{.python .input}
+#@tab pytorch
+train_iter = d2l.load_array((train_features, torch.tensor(train_data[1])), 64)
+
+for X, y in train_iter:
+    print('X:', X.shape, ', y:', y.shape)
+    break
+print('# batches:', len(train_iter))
 ```
 
 ## Putting All Things Together
 
 Last, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
 
-```{.python .input  n=7}
+```{.python .input}
 #@save
 def load_data_imdb(batch_size, num_steps=500):
     data_dir = d2l.download_extract('aclImdb', 'aclImdb')
@@ -101,11 +123,33 @@ def load_data_imdb(batch_size, num_steps=500):
     test_tokens = d2l.tokenize(test_data[0], token='word')
     vocab = d2l.Vocab(train_tokens, min_freq=5)
     train_features = np.array([d2l.truncate_pad(
-        vocab[line], num_steps, vocab.unk) for line in train_tokens])
+        vocab[line], num_steps, vocab['<pad>']) for line in train_tokens])
     test_features = np.array([d2l.truncate_pad(
-        vocab[line], num_steps, vocab.unk) for line in test_tokens])
+        vocab[line], num_steps, vocab['<pad>']) for line in test_tokens])
     train_iter = d2l.load_array((train_features, train_data[1]), batch_size)
     test_iter = d2l.load_array((test_features, test_data[1]), batch_size,
+                               is_train=False)
+    return train_iter, test_iter, vocab
+```
+
+```{.python .input}
+#@tab pytorch
+#@save
+def load_data_imdb(batch_size, num_steps=500):
+    data_dir = d2l.download_extract('aclImdb', 'aclImdb')
+    train_data = read_imdb(data_dir, True)
+    test_data = read_imdb(data_dir, False)
+    train_tokens = d2l.tokenize(train_data[0], token='word')
+    test_tokens = d2l.tokenize(test_data[0], token='word')
+    vocab = d2l.Vocab(train_tokens, min_freq=5)
+    train_features = torch.tensor([d2l.truncate_pad(
+        vocab[line], num_steps, vocab['<pad>']) for line in train_tokens])
+    test_features = torch.tensor([d2l.truncate_pad(
+        vocab[line], num_steps, vocab['<pad>']) for line in test_tokens])
+    train_iter = d2l.load_array((train_features, torch.tensor(train_data[1])),
+                                batch_size)
+    test_iter = d2l.load_array((test_features, torch.tensor(test_data[1])),
+                               batch_size,
                                is_train=False)
     return train_iter, test_iter, vocab
 ```
@@ -119,7 +163,11 @@ def load_data_imdb(batch_size, num_steps=500):
 
 1. Discover a different natural language dataset (such as [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html)) and build a similar data_loader function as `load_data_imdb`.
 
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/391)
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/4355)
 
-![](../img/qr_sentiment-analysis-and-dataset.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1387)
+:end_tab:

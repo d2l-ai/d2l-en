@@ -38,17 +38,17 @@ Reviewing the design of Adam its inspiration is clear. Momentum and scale are cl
 
 ## Implementation 
 
-Implementing Adam from scratch is not very daunting. For convenience we store the timestep counter $t$ in the `hyperparams` dictionary. Beyond that all is straightforward.
+Implementing Adam from scratch is not very daunting. For convenience we store the time step counter $t$ in the `hyperparams` dictionary. Beyond that all is straightforward.
 
-```{.python .input  n=2}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 
 def init_adam_states(feature_dim):
-    v_w, v_b = np.zeros((feature_dim, 1)), np.zeros(1)
-    s_w, s_b = np.zeros((feature_dim, 1)), np.zeros(1)
+    v_w, v_b = d2l.zeros((feature_dim, 1)), d2l.zeros(1)
+    s_w, s_b = d2l.zeros((feature_dim, 1)), d2l.zeros(1)
     return ((v_w, s_w), (v_b, s_b))
 
 def adam(params, states, hyperparams):
@@ -62,9 +62,59 @@ def adam(params, states, hyperparams):
     hyperparams['t'] += 1
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+
+def init_adam_states(feature_dim):
+    v_w, v_b = d2l.zeros((feature_dim, 1)), d2l.zeros(1)
+    s_w, s_b = d2l.zeros((feature_dim, 1)), d2l.zeros(1)
+    return ((v_w, s_w), (v_b, s_b))
+
+def adam(params, states, hyperparams):
+    beta1, beta2, eps = 0.9, 0.999, 1e-6
+    for p, (v, s) in zip(params, states):
+        with torch.no_grad():
+            v[:] = beta1 * v + (1 - beta1) * p.grad
+            s[:] = beta2 * s + (1 - beta2) * torch.square(p.grad)
+            v_bias_corr = v / (1 - beta1 ** hyperparams['t'])
+            s_bias_corr = s / (1 - beta2 ** hyperparams['t'])
+            p[:] -= hyperparams['lr'] * v_bias_corr / (torch.sqrt(s_bias_corr)
+                                                       + eps)
+        p.grad.data.zero_()
+    hyperparams['t'] += 1
+```
+
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+def init_adam_states(feature_dim):
+    v_w = tf.Variable(d2l.zeros((feature_dim, 1)))
+    v_b = tf.Variable(d2l.zeros(1))
+    s_w = tf.Variable(d2l.zeros((feature_dim, 1)))
+    s_b = tf.Variable(d2l.zeros(1))
+    return ((v_w, s_w), (v_b, s_b))
+
+def adam(params, grads, states, hyperparams):
+    beta1, beta2, eps = 0.9, 0.999, 1e-6
+    for p, (v, s), grad in zip(params, states, grads):
+        v[:].assign(beta1 * v  + (1 - beta1) * grad)
+        s[:].assign(beta2 * s + (1 - beta2) * tf.math.square(grad))
+        v_bias_corr = v / (1 - beta1 ** hyperparams['t'])
+        s_bias_corr = s / (1 - beta2 ** hyperparams['t'])
+        p[:].assign(p - hyperparams['lr'] * v_bias_corr  
+                    / tf.math.sqrt(s_bias_corr) + eps)
+```
+
 We are ready to use Adam to train the model. We use a learning rate of $\eta = 0.01$.
 
-```{.python .input  n=5}
+```{.python .input}
+#@tab all
 data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 d2l.train_ch11(adam, init_adam_states(feature_dim),
                {'lr': 0.01, 't': 1}, data_iter, feature_dim);
@@ -72,8 +122,20 @@ d2l.train_ch11(adam, init_adam_states(feature_dim),
 
 A more concise implementation is straightforward since `adam` is one of the algorithms provided as part of the Gluon `trainer` optimization library. Hence we only need to pass configuration parameters for an implementation in Gluon.
 
-```{.python .input  n=11}
-d2l.train_gluon_ch11('adam', {'learning_rate': 0.01}, data_iter)
+```{.python .input}
+d2l.train_concise_ch11('adam', {'learning_rate': 0.01}, data_iter)
+```
+
+```{.python .input}
+#@tab pytorch
+trainer = torch.optim.Adam
+d2l.train_concise_ch11(trainer, {'lr': 0.01}, data_iter)
+```
+
+```{.python .input}
+#@tab tensorflow
+trainer = tf.keras.optimizers.Adam
+d2l.train_concise_ch11(trainer, {'learning_rate': 0.01}, data_iter)
 ```
 
 ## Yogi
@@ -105,10 +167,50 @@ d2l.train_ch11(yogi, init_adam_states(feature_dim),
                {'lr': 0.01, 't': 1}, data_iter, feature_dim);
 ```
 
+```{.python .input}
+#@tab pytorch
+def yogi(params, states, hyperparams):
+    beta1, beta2, eps = 0.9, 0.999, 1e-3
+    for p, (v, s) in zip(params, states):
+        with torch.no_grad():
+            v[:] = beta1 * v + (1 - beta1) * p.grad
+            s[:] = s + (1 - beta2) * torch.sign(
+                torch.square(p.grad) - s) * torch.square(p.grad)
+            v_bias_corr = v / (1 - beta1 ** hyperparams['t'])
+            s_bias_corr = s / (1 - beta2 ** hyperparams['t'])
+            p[:] -= hyperparams['lr'] * v_bias_corr / (torch.sqrt(s_bias_corr)
+                                                       + eps)
+        p.grad.data.zero_()
+    hyperparams['t'] += 1
+
+data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
+d2l.train_ch11(yogi, init_adam_states(feature_dim),
+               {'lr': 0.01, 't': 1}, data_iter, feature_dim);
+```
+
+```{.python .input}
+#@tab tensorflow
+def yogi(params, grads, states, hyperparams):
+    beta1, beta2, eps = 0.9, 0.999, 1e-6
+    for p, (v, s), grad in zip(params, states, grads):
+        v[:].assign(beta1 * v  + (1 - beta1) * grad)
+        s[:].assign(s + (1 - beta2) * tf.math.sign(
+                   tf.math.square(grad) - s) * tf.math.square(grad))
+        v_bias_corr = v / (1 - beta1 ** hyperparams['t'])
+        s_bias_corr = s / (1 - beta2 ** hyperparams['t'])
+        p[:].assign(p - hyperparams['lr'] * v_bias_corr  
+                    / tf.math.sqrt(s_bias_corr) + eps)
+    hyperparams['t'] += 1
+
+data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
+d2l.train_ch11(yogi, init_adam_states(feature_dim),
+               {'lr': 0.01, 't': 1}, data_iter, feature_dim);
+```
+
 ## Summary
 
 * Adam combines features of many optimization algorithms into a fairly robust update rule. 
-* Created on the basis of RMSProp, Adam also uses EWMA on the minibatch stochastic gradient
+* Created on the basis of RMSProp, Adam also uses EWMA on the minibatch stochastic gradient.
 * Adam uses bias correction to adjust for a slow startup when estimating momentum and a second moment. 
 * For gradients with significant variance we may encounter issues with convergence. They can be amended by using larger minibatches or by switching to an improved estimate for $\mathbf{s}_t$. Yogi offers such an alternative. 
 
@@ -119,7 +221,15 @@ d2l.train_ch11(yogi, init_adam_states(feature_dim),
 1. Why do you need to reduce the learning rate $\eta$ as we converge?
 1. Try to construct a case for which Adam diverges and Yogi converges?
 
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/358)
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/2378)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1078)
+:end_tab:
 
-![](../img/qr_adam.svg)
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1079)
+:end_tab:

@@ -2,17 +2,18 @@
 :label:`chap_cnn`
 
 In earlier chapters, we came up against image data,
-for which each example consists of a 2D grid of pixels.
-Depending on whether we're handling black-and-white or color images,
+for which each example consists of a two-dimensional grid of pixels.
+Depending on whether we are handling black-and-white or color images,
 each pixel location might be associated with either
-*one* or *multiple* numerical values, respectively.
+one or multiple numerical values, respectively.
 Until now, our way of dealing with this rich structure
 was deeply unsatisfying.
 We simply discarded each image's spatial structure
-by flattening them into 1D vectors, feeding them 
-through a (fully connected) MLP.
-Because these networks invariant to the order
-of the features we could get similar results
+by flattening them into one-dimensional vectors, feeding them 
+through a fully-connected MLP.
+Because these networks are invariant to the order
+of the features,
+we could get similar results
 regardless of whether we preserve an order 
 corresponding to the spatial structure of the pixels
 or if we permute the columns of our design matrix
@@ -21,9 +22,9 @@ Preferably, we would leverage our prior knowledge
 that nearby pixels are typically related to each other,
 to build efficient models for learning from image data. 
 
-This chapter introduces convolutional neural networks (CNNs),
+This chapter introduces *convolutional neural networks* (CNNs),
 a powerful family of neural networks
-that were designed for precisely this purpose.
+that are designed for precisely this purpose.
 CNN-based architectures are now ubiquitous
 in the field of computer vision, 
 and have become so dominant
@@ -33,16 +34,16 @@ related to image recognition, object detection,
 or semantic segmentation,
 without building off of this approach.
 
-Modern *ConvNets*, as they are called colloquially
+Modern CNNs, as they are called colloquially
 owe their design to inspirations from biology, group theory,
 and a healthy dose of experimental tinkering.
 In addition to their sample efficiency in achieving accurate models,
-convolutional neural networks tend to be computationally efficient,
-both because they require fewer parameters than dense architectures
+CNNs tend to be computationally efficient,
+both because they require fewer parameters than fully-connected architectures
 and because convolutions are easy to parallelize across GPU cores.
 Consequently, practitioners often apply CNNs whenever possible,
 and increasingly they have emerged as credible competitors
-even on tasks with 1D sequence structure,
+even on tasks with a one-dimensional sequence structure,
 such as audio, text, and time series analysis,
 where recurrent neural networks are conventionally used.
 Some clever adaptations of CNNs have also brought them to bear
@@ -54,7 +55,7 @@ These include the convolutional layers themselves,
 nitty-gritty details including padding and stride,
 the pooling layers used to aggregate information
 across adjacent spatial regions,
-the use of multiple *channels* (also called *filters*) at each layer,
+the use of multiple channels  at each layer,
 and a careful discussion of the structure of modern architectures.
 We will conclude the chapter with a full working example of LeNet,
 the first convolutional network successfully deployed,

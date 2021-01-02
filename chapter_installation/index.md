@@ -40,7 +40,7 @@ Now close and re-open your current shell. You should be able to create a new
 environment as following:
 
 ```bash
-conda create --name d2l -y
+conda create --name d2l python=3.8 -y
 ```
 
 
@@ -50,7 +50,6 @@ Next, we need to download the code of this book. You can click the "All
 Notebooks" tab on the top of any HTML page to download and unzip the code.
 Alternatively, if you have `unzip` (otherwise run `sudo apt install unzip`) available:
 
-
 ```bash
 mkdir d2l-en && cd d2l-en
 curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
@@ -58,12 +57,10 @@ unzip d2l-en.zip && rm d2l-en.zip
 ```
 
 
-Now we will want to activate the `d2l` environment and install `pip`.
-Enter `y` for the queries that follow this command.
+Now we will want to activate the `d2l` environment.
 
 ```bash
 conda activate d2l
-conda install python=3.7 pip -y
 ```
 
 
@@ -77,21 +74,39 @@ If you are installing on a GPU server,
 proceed to :ref:`subsec_gpu` for instructions
 to install a GPU-supported version.
 
-Otherwise, you can install the CPU version.
+Otherwise, you can install the CPU version as follows.
 That will be more than enough horsepower to get you
 through the first few chapters but you will want
 to access GPUs before running larger models.
 
+
 :begin_tab:`mxnet`
+
 ```bash
-pip install mxnet==1.6.0
+pip install mxnet==1.7.0.post1
 ```
+
+
 :end_tab:
 
+
 :begin_tab:`pytorch`
+
 ```bash
-pip install torch==1.5.0 torchvision
+pip install torch torchvision -f https://download.pytorch.org/whl/torch_stable.html
 ```
+
+
+:end_tab:
+
+:begin_tab:`tensorflow`
+You can install TensorFlow with both CPU and GPU support via the following:
+
+```bash
+pip install tensorflow tensorflow-probability
+```
+
+
 :end_tab:
 
 
@@ -99,7 +114,8 @@ We also install the `d2l` package that encapsulates frequently used
 functions and classes in this book.
 
 ```bash
-pip install -U d2l -f https://d2l.ai/whl.html
+# -U: Upgrade all packages to the newest available version
+pip install -U d2l
 ```
 
 
@@ -112,15 +128,15 @@ jupyter notebook
 
 At this point, you can open http://localhost:8888 (it usually opens automatically) in your Web browser. Then we can run the code for each section of the book.
 Please always execute `conda activate d2l` to activate the runtime environment
-before running the code of the book or updating MXNet or the `d2l` package.
+before running the code of the book or updating the deep learning framework or the `d2l` package.
 To exit the environment, run `conda deactivate`.
 
 
 ## GPU Support
-
 :label:`subsec_gpu`
 
-By default, the deep learning framework is installed without GPU support
+:begin_tab:`mxnet`
+By default, MXNet is installed without GPU support
 to ensure that it will run on any computer (including most laptops).
 Part of this book requires or recommends running with GPU.
 If your computer has NVIDIA graphics cards and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
@@ -128,18 +144,9 @@ then you should install a GPU-enabled version.
 If you have installed the CPU-only version,
 you may need to remove it first by running:
 
-
-:begin_tab:`mxnet`
 ```bash
 pip uninstall mxnet
 ```
-:end_tab:
-
-:begin_tab:`pytorch`
-```bash
-pip uninstall torch
-```
-:end_tab:
 
 
 Then we need to find the CUDA version you installed.
@@ -147,24 +154,25 @@ You may check it through `nvcc --version` or `cat /usr/local/cuda/version.txt`.
 Assume that you have installed CUDA 10.1,
 then you can install with the following command:
 
-
-:begin_tab:`mxnet`
 ```bash
 # For Windows users
-pip install mxnet-cu101==1.6.0b20190926
+pip install mxnet-cu101==1.7.0 -f https://dist.mxnet.io/python
 
 # For Linux and macOS users
-pip install mxnet-cu101==1.6.0
+pip install mxnet-cu101==1.7.0
 ```
-:end_tab:
 
-:begin_tab:`pytorch`
-```bash
-pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
-:end_tab:
 
 You may change the last digits according to your CUDA version, e.g., `cu100` for
 CUDA 10.0 and `cu90` for CUDA 9.0.
+:end_tab:
+
+
+:begin_tab:`pytorch,tensorflow`
+By default, the deep learning framework is installed with GPU support.
+If your computer has NVIDIA GPUs and has installed [CUDA](https://developer.nvidia.com/cuda-downloads),
+then you are all set.
+:end_tab:
 
 ## Exercises
 
@@ -176,4 +184,8 @@ CUDA 10.0 and `cu90` for CUDA 9.0.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/24)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/436)
 :end_tab:

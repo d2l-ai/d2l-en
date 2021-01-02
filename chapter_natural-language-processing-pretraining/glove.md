@@ -33,9 +33,9 @@ distribution on a large number of uncommon words is likely to be inaccurate.
 ## The GloVe Model
 
 To address this, GloVe :cite:`Pennington.Socher.Manning.2014`, a word embedding model that came after word2vec, adopts
-square loss and makes three changes to the skip-gram model based on this loss.
+squared loss and makes three changes to the skip-gram model based on this loss.
 
-1. Here, we use the non-probability distribution variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ and take their logs. Therefore, we get the square loss $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
+1. Here, we use the non-probability distribution variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ and take their logs. Therefore, we get the squared loss $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
 2. We add two scalar model parameters for each word $w_i$: the bias terms $b_i$ (for central target words) and $c_i$( for context words).
 3. Replace the weight of each loss with the function $h(x_{ij})$. The weight function $h(x)$ is a monotone increasing function with the range $[0, 1]$.
 
@@ -43,7 +43,7 @@ Therefore, the goal of GloVe is to minimize the loss function.
 
 $$\sum_{i\in\mathcal{V}} \sum_{j\in\mathcal{V}} h(x_{ij}) \left(\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j - \log\,x_{ij}\right)^2.$$
 
-Here, we have a suggestion for the choice of weight function $h(x)$: when $x < c$ (e.g $c = 100$), make $h(x) = (x/c) ^\alpha$ (e.g $\alpha = 0.75$), otherwise make $h(x) = 1$. Because $h(0)=0$, the squared loss term for $x_{ij}=0$ can be simply ignored. When we use minibatch SGD for training, we conduct random sampling to get a non-zero minibatch $x_{ij}$ from each timestep and compute the gradient to update the model parameters. These non-zero $x_{ij}$ are computed in advance based on the entire dataset and they contain global statistics for the dataset. Therefore, the name GloVe is taken from "Global Vectors".
+Here, we have a suggestion for the choice of weight function $h(x)$: when $x < c$ (e.g $c = 100$), make $h(x) = (x/c) ^\alpha$ (e.g $\alpha = 0.75$), otherwise make $h(x) = 1$. Because $h(0)=0$, the squared loss term for $x_{ij}=0$ can be simply ignored. When we use minibatch SGD for training, we conduct random sampling to get a non-zero minibatch $x_{ij}$ from each time step and compute the gradient to update the model parameters. These non-zero $x_{ij}$ are computed in advance based on the entire dataset and they contain global statistics for the dataset. Therefore, the name GloVe is taken from "Global Vectors".
 
 Notice that if word $w_i$ appears in the context window of word $w_j$, then word $w_j$ will also appear in the context window of word $w_i$. Therefore, $x_{ij}=x_{ji}$. Unlike word2vec, GloVe fits the symmetric $\log\, x_{ij}$ in lieu of the asymmetric conditional probability $p_{ij}$. Therefore, the central target word vector and context word vector of any word are equivalent in GloVe. However, the two sets of word vectors that are learned by the same word may be different in the end due to different initialization values. After learning all the word vectors, GloVe will use the sum of the central target word vector and the context word vector as the final word vector for the word.
 
@@ -52,18 +52,18 @@ Notice that if word $w_i$ appears in the context window of word $w_j$, then word
 
 We can also try to understand GloVe word embedding from another perspective. We will continue the use of symbols from earlier in this section, $P(w_j \mid w_i)$ represents the conditional probability of generating context word $w_j$ with central target word $w_i$ in the dataset, and it will be recorded as $p_{ij}$. From a real example from a large corpus, here we have the following two sets of conditional probabilities with "ice" and "steam" as the central target words and the ratio between them:
 
-|$w_k$=|“solid”|“gas”|“water”|“fashion”|
+|$w_k$=|solid|gas|water|fashion|
 |--:|:-:|:-:|:-:|:-:|
-|$p_1=P(w_k\mid$ "ice" $)$|0.00019|0.000066|0.003|0.000017|
-|$p_2=P(w_k\mid$ "steam" $)$|0.000022|0.00078|0.0022|0.000018|
+|$p_1=P(w_k\mid \text{ice})$|0.00019|0.000066|0.003|0.000017|
+|$p_2=P(w_k\mid\text{steam})$|0.000022|0.00078|0.0022|0.000018|
 |$p_1/p_2$|8.9|0.085|1.36|0.96|
 
 We will be able to observe phenomena such as:
 
-* For a word $w_k$ that is related to "ice" but not to "steam", such as $w_k=$"solid", we would expect a larger conditional probability ratio, like the value 8.9 in the last row of the table above.
-* For a word $w_k$ that is related to "steam" but not to "ice", such as $w_k=$"gas", we would expect a smaller conditional probability ratio, like the value 0.085 in the last row of the table above.
-* For a word $w_k$ that is related to both "ice" and "steam", such as $w_k=$"water", we would expect a conditional probability ratio close to 1, like the value 1.36 in the last row of the table above.
-* For a word $w_k$ that is related to neither "ice" or "steam", such as $w_k=$"fashion", we would expect a conditional probability ratio close to 1, like the value 0.96 in the last row of the table above.
+* For a word $w_k$ that is related to "ice" but not to "steam", such as $w_k=\text{solid}$, we would expect a larger conditional probability ratio, like the value 8.9 in the last row of the table above.
+* For a word $w_k$ that is related to "steam" but not to "ice", such as $w_k=\text{gas}$, we would expect a smaller conditional probability ratio, like the value 0.085 in the last row of the table above.
+* For a word $w_k$ that is related to both "ice" and "steam", such as $w_k=\text{water}$, we would expect a conditional probability ratio close to 1, like the value 1.36 in the last row of the table above.
+* For a word $w_k$ that is related to neither "ice" or "steam", such as $w_k=\text{fashion}$, we would expect a conditional probability ratio close to 1, like the value 0.96 in the last row of the table above.
 
 We can see that the conditional probability ratio can represent the relationship between different words more intuitively. We can construct a word vector function to fit the conditional probability ratio more effectively. As we know, to obtain any ratio of this type requires three words $w_i$, $w_j$, and $w_k$. The conditional probability ratio with $w_i$ as the central target word is ${p_{ij}}/{p_{ik}}$. We can find a function that uses word vectors to fit this conditional probability ratio.
 
@@ -95,6 +95,4 @@ By taking the square error and weighting the left and right sides of the formula
 1. For any word, will its central target word bias term and context word bias term be equivalent to each other in GloVe? Why?
 
 
-## [Discussions](https://discuss.mxnet.io/t/2389)
-
-![](../img/qr_glove.svg)
+[Discussions](https://discuss.d2l.ai/t/385)

@@ -7,7 +7,7 @@ Entire courses, majors, theses, careers, and even departments, are devoted to pr
 
 We have already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let us get more serious now by considering the first case: distinguishing cats and dogs based on photographs. This might sound simple but it is actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
 
-![Images of varying resolutions ($10 \times 10$, $20 \times 20$, $40 \times 40$, $80 \times 80$, and $160 \times 160$ pixels).](../img/cat_dog_pixels.png)
+![Images of varying resolutions ($10 \times 10$, $20 \times 20$, $40 \times 40$, $80 \times 80$, and $160 \times 160$ pixels).](../img/cat-dog-pixels.png)
 :width:`300px`
 :label:`fig_cat_dog`
 
@@ -54,8 +54,16 @@ npx.set_np()
 %matplotlib inline
 from d2l import torch as d2l
 import torch
-import numpy as np
 from torch.distributions import multinomial
+```
+
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+import tensorflow_probability as tfp
+import numpy as np
 ```
 
 Next, we will want to be able to cast the die. In statistics we call this process
@@ -66,26 +74,9 @@ that assigns probabilities to a number of discrete choices is called the
 *distribution* later, but at a high level, think of it as just an assignment of
 probabilities to events.
 
-:begin_tab:`mxnet`
-In MXNet, we can sample from the multinomial
-distribution via the aptly named `np.random.multinomial` function.
-The function
-can be called in many ways, but we will focus on the simplest.
 To draw a single sample, we simply pass in a vector of probabilities.
-The output of the `np.random.multinomial` function is another vector of the same length:
+The output is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
-:end_tab:
-
-:begin_tab:`pytorch`
-In PyTorch, we can sample from the multinomial
-distribution via the class `Multinomial` defined in the
-`distributions.multinomial` module.
-The class
-can be called in many ways, but we will focus on the simplest.
-To draw a single sample, we simply pass in a vector of probabilities.
-The output of the `sample` method of this class  is another vector of the same length:
-its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
-:end_tab:
 
 ```{.python .input}
 fair_probs = [1.0 / 6] * 6
@@ -98,23 +89,18 @@ fair_probs = torch.ones([6]) / 6
 multinomial.Multinomial(1, fair_probs).sample()
 ```
 
-:begin_tab:`mxnet`
-If you run the sampler a bunch of times, you will find that you get out random
-values each time. As with estimating the fairness of a die, we often want to
-generate many samples from the same distribution. It would be unbearably slow to
-do this with a Python `for` loop, so `random.multinomial` supports drawing
-multiple samples at once, returning an array of independent samples in any shape
-we might desire.
-:end_tab:
+```{.python .input}
+#@tab tensorflow
+fair_probs = tf.ones(6) / 6
+tfp.distributions.Multinomial(1, fair_probs).sample()
+```
 
-:begin_tab:`pytorch`
 If you run the sampler a bunch of times, you will find that you get out random
 values each time. As with estimating the fairness of a die, we often want to
 generate many samples from the same distribution. It would be unbearably slow to
-do this with a Python `for` loop, so `multinomial.Multinomial` supports drawing
+do this with a Python `for` loop, so the function we are using supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
-:end_tab:
 
 ```{.python .input}
 np.random.multinomial(10, fair_probs)
@@ -125,20 +111,9 @@ np.random.multinomial(10, fair_probs)
 multinomial.Multinomial(10, fair_probs).sample()
 ```
 
-We can also conduct, say, 3 groups of experiments, where each group draws 10 samples, all at once.
-
 ```{.python .input}
-counts = np.random.multinomial(10, fair_probs, size=3)
-counts
-```
-
-```{.python .input}
-#@tab pytorch
-# PyTorch's Multinomial distribution doesn't offer the functionality
-# for conducting multiple experiments at once. In such case we can always
-# use numpy and later convert the ndarray to a torch tensor
-counts = torch.from_numpy(np.random.multinomial(10, fair_probs, size=3))
-counts
+#@tab tensorflow
+tfp.distributions.Multinomial(10, fair_probs).sample()
 ```
 
 Now that we know how to sample rolls of a die, we can simulate 1000 rolls. We
@@ -147,16 +122,21 @@ number was rolled.
 Specifically, we calculate the relative frequency as the estimate of the true probability.
 
 ```{.python .input}
-# Store the results as 32-bit floats for division
 counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
-counts / 1000  # Relative frequency as the estimate
+counts / 1000
 ```
 
 ```{.python .input}
 #@tab pytorch
 # Store the results as 32-bit floats for division
-counts = multinomial.Multinomial(1000, fair_probs).sample().type(torch.float32)
+counts = multinomial.Multinomial(1000, fair_probs).sample()
 counts / 1000  # Relative frequency as the estimate
+```
+
+```{.python .input}
+#@tab tensorflow
+counts = tfp.distributions.Multinomial(1000, fair_probs).sample()
+counts / 1000
 ```
 
 Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good.
@@ -181,9 +161,25 @@ d2l.plt.legend();
 
 ```{.python .input}
 #@tab pytorch
-counts = torch.from_numpy(np.random.multinomial(10, fair_probs, size=500))
-cum_counts = counts.type(torch.float32).cumsum(axis=0)
-estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
+counts = multinomial.Multinomial(10, fair_probs).sample((500,))
+cum_counts = counts.cumsum(dim=0)
+estimates = cum_counts / cum_counts.sum(dim=1, keepdims=True)
+
+d2l.set_figsize((6, 4.5))
+for i in range(6):
+    d2l.plt.plot(estimates[:, i].numpy(),
+                 label=("P(die=" + str(i + 1) + ")"))
+d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Groups of experiments')
+d2l.plt.gca().set_ylabel('Estimated probability')
+d2l.plt.legend();
+```
+
+```{.python .input}
+#@tab tensorflow
+counts = tfp.distributions.Multinomial(10, fair_probs).sample(500)
+cum_counts = tf.cumsum(counts, axis=0)
+estimates = cum_counts / tf.reduce_sum(cum_counts, axis=1, keepdims=True)
 
 d2l.set_figsize((6, 4.5))
 for i in range(6):
@@ -306,7 +302,7 @@ if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$. This is expressed as $
 ### Application
 :label:`subsec_probability_hiv_app`
 
-Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy but reporting him as diseased. Moreover,
+Let us put our skills to the test. Assume that a doctor administers an HIV test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy but reporting him as diseased. Moreover,
 it never fails to detect HIV if the patient actually has it. We use $D_1$ to indicate the diagnosis ($1$ if positive and $0$ if negative) and $H$ to denote the HIV status ($1$ if positive and $0$ if negative).
 :numref:`conditional_prob_D1` lists such conditional probabilities.
 
@@ -318,7 +314,7 @@ it never fails to detect HIV if the patient actually has it. We use $D_1$ to ind
 |$P(D_1 = 0 \mid H)$|            0 |         0.99 |
 :label:`conditional_prob_D1`
 
-Note that the column sums are all 1 (but the row sums are not), since the conditional probability needs to sum up to 1, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' theorem, we need to apply marginalization and the multiplication rule to determine
+Note that the column sums are all 1 (but the row sums are not), since the conditional probability needs to sum up to 1, just like the probability. Let us work out the probability of the patient having HIV if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' theorem, we need to apply marginalization and the multiplication rule to determine
 
 $$\begin{aligned}
 &P(D_1 = 1) \\
@@ -334,7 +330,7 @@ $$\begin{aligned}
 &P(H = 1 \mid D_1 = 1)\\ =& \frac{P(D_1=1 \mid H=1) P(H=1)}{P(D_1=1)} \\ =& 0.1306 \end{aligned}.$$
 
 In other words, there is only a 13.06% chance that the patient
-actually has AIDS, despite using a very accurate test.
+actually has HIV, despite using a very accurate test.
 As we can see, probability can be counterintuitive.
 
 What should a patient do upon receiving such terrifying news? Likely, the patient
@@ -378,7 +374,7 @@ $$\begin{aligned}
 \end{aligned}
 $$
 
-In the end, the probability of the patient having AIDS given both positive tests is
+In the end, the probability of the patient having HIV given both positive tests is
 
 $$\begin{aligned}
 &P(H = 1 \mid D_1 = 1, D_2 = 1)\\
@@ -430,7 +426,7 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 1. We conducted $m=500$ groups of experiments where each group draws $n=10$ samples. Vary $m$ and $n$. Observe and analyze the experimental results.
 1. Given two events with probability $P(\mathcal{A})$ and $P(\mathcal{B})$, compute upper and lower bounds on $P(\mathcal{A} \cup \mathcal{B})$ and $P(\mathcal{A} \cap \mathcal{B})$. (Hint: display the situation using a [Venn Diagram](https://en.wikipedia.org/wiki/Venn_diagram).)
 1. Assume that we have a sequence of random variables, say $A$, $B$, and $C$, where $B$ only depends on $A$, and $C$ only depends on $B$, can you simplify the joint probability $P(A, B, C)$? (Hint: this is a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain).)
-1. In :numref:`subsec_probability_hiv_app`, the first test is more accurate. Why not just run the first test a second time?
+1. In :numref:`subsec_probability_hiv_app`, the first test is more accurate. Why not run the first test twice rather than run both the first and second tests?
 
 
 :begin_tab:`mxnet`
@@ -439,4 +435,8 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/37)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/198)
 :end_tab:

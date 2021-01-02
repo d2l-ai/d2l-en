@@ -34,11 +34,11 @@ run(x_cpu)  # Warm-up both devices
 run(x_gpu)
 npx.waitall()  
 
-with d2l.benchmark('CPU time: %.4f sec'):
+with d2l.Benchmark('CPU time'):
     run(x_cpu)
     npx.waitall()
 
-with d2l.benchmark('GPU time: %.4f sec'):
+with d2l.Benchmark('GPU time'):
     run(x_gpu)
     npx.waitall()
 ```
@@ -46,7 +46,7 @@ with d2l.benchmark('GPU time: %.4f sec'):
 If we remove the `waitall()` between both tasks the system is free to parallelize computation on both devices automatically.
 
 ```{.python .input}
-with d2l.benchmark('CPU&GPU : %.4f sec'):
+with d2l.Benchmark('CPU & GPU'):
     run(x_cpu)
     run(x_gpu)
     npx.waitall()
@@ -62,19 +62,19 @@ In many cases we need to move data between different devices, say between CPU an
 def copy_to_cpu(x):
     return [y.copyto(npx.cpu()) for y in x]
 
-with d2l.benchmark('Run  on GPU: %.4f sec'):
+with d2l.Benchmark('Run on GPU'):
     y = run(x_gpu)
     npx.waitall()
 
-with d2l.benchmark('Copy to CPU: %.4f sec'):
+with d2l.Benchmark('Copy to CPU'):
     y_cpu = copy_to_cpu(y)
     npx.waitall()
 ```
 
-This is somewhat inefficient. Note that we could already start copying parts of `y` to the CPU while the remainder of the list is still being computed. This situatio occurs, e.g., when we compute the (backprop) gradient on a minibatch. The gradients of some of the parameters will be available earlier than that of others. Hence it works to our advantage to start using PCI-Express bus bandwidth while the GPU is still running. Removing `waitall` between both parts allows us to simulate this scenario.
+This is somewhat inefficient. Note that we could already start copying parts of `y` to the CPU while the remainder of the list is still being computed. This situation occurs, e.g., when we compute the (backprop) gradient on a minibatch. The gradients of some of the parameters will be available earlier than that of others. Hence it works to our advantage to start using PCI-Express bus bandwidth while the GPU is still running. Removing `waitall` between both parts allows us to simulate this scenario.
 
 ```{.python .input}
-with d2l.benchmark('Run on GPU and copy to CPU: %.4f sec'):
+with d2l.Benchmark('Run on GPU and copy to CPU'):
     y = run(x_gpu)
     y_cpu = copy_to_cpu(y)
     npx.waitall()
@@ -101,6 +101,6 @@ We conclude with an illustration of the computational graph and its dependencies
 1. Use a debugger such as NVIDIA's Nsight to verify that your code is efficient. 
 1. Designing computation tasks that include more complex data dependencies, and run experiments to see if you can obtain the correct results while improving performance.
 
-## [Discussions](https://discuss.mxnet.io/t/2382)
-
-![](../img/qr_auto-parallelism.svg)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/362)
+:end_tab:

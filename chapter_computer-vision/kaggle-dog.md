@@ -1,7 +1,6 @@
 # Dog Breed Identification (ImageNet Dogs) on Kaggle
 
-
-In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition’s web address is
+In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition's web address is
 
 > https://www.kaggle.com/c/dog-breed-identification
 
@@ -9,22 +8,28 @@ In this competition, we attempt to identify 120 different breeds of dogs. The da
 
 :numref:`fig_kaggle_dog` shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
-![Dog breed identification competition website. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.png)
+![Dog breed identification competition website. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.jpg)
 :width:`400px`
 :label:`fig_kaggle_dog`
 
 First, import the packages or modules required for the competition.
 
 ```{.python .input}
-import collections
 from d2l import mxnet as d2l
-import math
 from mxnet import autograd, gluon, init, npx
 from mxnet.gluon import nn
 import os
-import time
 
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import torch
+import torchvision
+from torch import nn
+import os
 ```
 
 ## Obtaining and Organizing the Dataset
@@ -44,10 +49,11 @@ You may have noticed that the above structure is quite similar to that of the CI
 
 Similarly, to make it easier to get started, we provide a small-scale sample of the dataset mentioned above, "train_valid_test_tiny.zip". If you are going to use the full dataset for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
 
-```{.python .input  n=1}
+```{.python .input}
+#@tab all
 #@save 
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
-                            '7c9b54e78c1cedaa04998f9868bc548c60101362')
+                            '0cb91d09b814ecdc07b50f31f8dcad3e81d6a86d')
 
 # If you use the full dataset downloaded for the Kaggle competition, change
 # the variable below to False
@@ -64,13 +70,15 @@ We can organize the dataset similarly to what we did in :numref:`sec_kaggle_cifa
 
 The `reorg_dog_data` function below is used to read the training data labels, segment the validation set, and organize the training set.
 
-```{.python .input  n=2}
+```{.python .input}
+#@tab all
 def reorg_dog_data(data_dir, valid_ratio):
     labels = d2l.read_csv_labels(os.path.join(data_dir, 'labels.csv'))
     d2l.reorg_train_valid(data_dir, labels, valid_ratio)
     d2l.reorg_test(data_dir)
+
     
-batch_size = 1 if demo else 128
+batch_size = 4 if demo else 128
 valid_ratio = 0.1
 reorg_dog_data(data_dir, valid_ratio)
 ```
@@ -79,7 +87,7 @@ reorg_dog_data(data_dir, valid_ratio)
 
 The size of the images in this section are larger than the images in the previous section. Here are some more image augmentation operations that might be useful.
 
-```{.python .input  n=4}
+```{.python .input}
 transform_train = gluon.data.vision.transforms.Compose([
     # Randomly crop the image to obtain an image with an area of 0.08 to 1 of
     # the original area and height to width ratio between 3/4 and 4/3. Then,
@@ -100,6 +108,27 @@ transform_train = gluon.data.vision.transforms.Compose([
                                            [0.229, 0.224, 0.225])])
 ```
 
+```{.python .input}
+#@tab pytorch
+transform_train = torchvision.transforms.Compose([
+    # Randomly crop the image to obtain an image with an area of 0.08 to 1 of
+    # the original area and height to width ratio between 3/4 and 4/3. Then,
+    # scale the image to create a new image with a height and width of 224
+    # pixels each
+    torchvision.transforms.RandomResizedCrop(224, scale=(0.08, 1.0),
+                                             ratio=(3.0/4.0, 4.0/3.0)),
+    torchvision.transforms.RandomHorizontalFlip(),
+    # Randomly change the brightness, contrast, and saturation
+    torchvision.transforms.ColorJitter(brightness=0.4,
+                                       contrast=0.4,
+                                       saturation=0.4),
+    # Add random noise
+    torchvision.transforms.ToTensor(),
+    # Standardize each channel of the image
+    torchvision.transforms.Normalize([0.485, 0.456, 0.406],
+                                     [0.229, 0.224, 0.225])])
+```
+
 During testing, we only use definite image preprocessing operations.
 
 ```{.python .input}
@@ -112,15 +141,37 @@ transform_test = gluon.data.vision.transforms.Compose([
                                            [0.229, 0.224, 0.225])])
 ```
 
+```{.python .input}
+#@tab pytorch
+transform_test = torchvision.transforms.Compose([
+    torchvision.transforms.Resize(256),
+    # Crop a square of 224 by 224 from the center of the image
+    torchvision.transforms.CenterCrop(224),
+    torchvision.transforms.ToTensor(),
+    torchvision.transforms.Normalize([0.485, 0.456, 0.406],
+                                     [0.229, 0.224, 0.225])])
+```
+
 ## Reading the Dataset
 
 As in the previous section, we can create an `ImageFolderDataset` instance to read the dataset containing the original image files.
 
-```{.python .input  n=5}
+```{.python .input}
 train_ds, valid_ds, train_valid_ds, test_ds = [
     gluon.data.vision.ImageFolderDataset(
         os.path.join(data_dir, 'train_valid_test', folder))
     for folder in ('train', 'valid', 'train_valid', 'test')]
+```
+
+```{.python .input}
+#@tab pytorch
+train_ds, train_valid_ds = [torchvision.datasets.ImageFolder(
+    os.path.join(data_dir, 'train_valid_test', folder),
+    transform=transform_train) for folder in ['train', 'train_valid']]
+
+valid_ds, test_ds = [torchvision.datasets.ImageFolder(
+    os.path.join(data_dir, 'train_valid_test', folder),
+    transform=transform_test) for folder in ['valid', 'test']]
 ```
 
 Here, we create `DataLoader` instances, just like in :numref:`sec_kaggle_cifar10`.
@@ -128,11 +179,28 @@ Here, we create `DataLoader` instances, just like in :numref:`sec_kaggle_cifar10
 ```{.python .input}
 train_iter, train_valid_iter = [gluon.data.DataLoader(
     dataset.transform_first(transform_train), batch_size, shuffle=True, 
-    last_batch='keep') for dataset in (train_ds, train_valid_ds)]
+    last_batch='discard') for dataset in (train_ds, train_valid_ds)]
 
-valid_iter, test_iter = [gluon.data.DataLoader(
-    dataset.transform_first(transform_test), batch_size, shuffle=False, 
-    last_batch='keep') for dataset in (valid_ds, test_ds)]
+valid_iter = gluon.data.DataLoader(
+    valid_ds.transform_first(transform_test), batch_size, shuffle=False, 
+    last_batch='discard')
+
+test_iter = gluon.data.DataLoader(
+    test_ds.transform_first(transform_test), batch_size, shuffle=False, 
+    last_batch='keep')
+```
+
+```{.python .input}
+#@tab pytorch
+train_iter, train_valid_iter = [torch.utils.data.DataLoader(
+    dataset, batch_size, shuffle=True, drop_last=True)
+    for dataset in (train_ds, train_valid_ds)]
+
+valid_iter = torch.utils.data.DataLoader(valid_ds, batch_size, shuffle=False,
+                                         drop_last=True)
+
+test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
+                                        drop_last=False)
 ```
 
 ## Defining the Model
@@ -155,8 +223,8 @@ model parameter gradients.
 
 You must note that, during image augmentation, we use the mean values and standard deviations of the three RGB channels for the entire ImageNet dataset for normalization. This is consistent with the normalization of the pre-trained model.
 
-```{.python .input  n=6}
-def get_net(ctx):
+```{.python .input}
+def get_net(devices):
     finetune_net = gluon.model_zoo.vision.resnet34_v2(pretrained=True)
     # Define a new output network
     finetune_net.output_new = nn.HybridSequential(prefix='')
@@ -164,9 +232,27 @@ def get_net(ctx):
     # There are 120 output categories
     finetune_net.output_new.add(nn.Dense(120))
     # Initialize the output network
-    finetune_net.output_new.initialize(init.Xavier(), ctx=ctx)
+    finetune_net.output_new.initialize(init.Xavier(), ctx=devices)
     # Distribute the model parameters to the CPUs or GPUs used for computation
-    finetune_net.collect_params().reset_ctx(ctx)
+    finetune_net.collect_params().reset_ctx(devices)
+    return finetune_net
+```
+
+```{.python .input}
+#@tab pytorch
+def get_net(devices):
+    finetune_net = nn.Sequential()
+    finetune_net.features = torchvision.models.resnet34(pretrained=True)
+    # Define a new output network
+    # There are 120 output categories
+    finetune_net.output_new = nn.Sequential(nn.Linear(1000, 256),
+                                            nn.ReLU(),
+                                            nn.Linear(256, 120))
+    # Move model to device
+    finetune_net = finetune_net.to(devices[0])
+    # Freeze feature layer params
+    for param in finetune_net.features.parameters():
+        param.requires_grad = False
     return finetune_net
 ```
 
@@ -175,83 +261,179 @@ When calculating the loss, we first use the member variable `features` to obtain
 ```{.python .input}
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
-def evaluate_loss(data_iter, net, ctx):
+def evaluate_loss(data_iter, net, devices):
     l_sum, n = 0.0, 0
-    for X, y in data_iter:
-        y = y.as_in_ctx(ctx)
-        output_features = net.features(X.as_in_ctx(ctx))
-        outputs = net.output_new(output_features)
-        l_sum += float(loss(outputs, y).sum())
-        n += y.size
+    for features, labels in data_iter:
+        X_shards, y_shards = d2l.split_batch(features, labels, devices)
+        output_features = [net.features(X_shard) for X_shard in X_shards]
+        outputs = [net.output_new(feature) for feature in output_features]
+        ls = [loss(output, y_shard).sum() for output, y_shard
+              in zip(outputs, y_shards)]
+        l_sum += sum([float(l.sum()) for l in ls])
+        n += labels.size
+    return l_sum / n
+```
+
+```{.python .input}
+#@tab pytorch
+loss = nn.CrossEntropyLoss(reduction='none')
+
+def evaluate_loss(data_iter, net, devices):
+    l_sum, n = 0.0, 0
+    for features, labels in data_iter:
+        features, labels = features.to(devices[0]), labels.to(devices[0])
+        outputs = net(features)
+        l = loss(outputs, labels)
+        l_sum = l.sum()
+        n += labels.numel()
     return l_sum / n
 ```
 
 ## Defining the Training Functions
 
-We will select the model and tune hyper-parameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
+We will select the model and tune hyperparameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
 
-```{.python .input  n=7}
-def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
+```{.python .input}
+def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           lr_decay):
     # Only train the small custom output network
     trainer = gluon.Trainer(net.output_new.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
+    num_batches, timer = len(train_iter), d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
+                            legend=['train loss', 'valid loss'])
     for epoch in range(num_epochs):
-        train_l_sum, n, start = 0.0, 0, time.time()
+        metric = d2l.Accumulator(2)
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
-        for X, y in train_iter:
-            y = y.as_in_ctx(ctx)
-            output_features = net.features(X.as_in_ctx(ctx))
+        for i, (features, labels) in enumerate(train_iter):
+            timer.start()
+            X_shards, y_shards = d2l.split_batch(features, labels, devices)
+            output_features = [net.features(X_shard) for X_shard in X_shards]
             with autograd.record():
-                outputs = net.output_new(output_features)
-                l = loss(outputs, y).sum()
-            l.backward()
+                outputs = [net.output_new(feature)
+                           for feature in output_features]
+                ls = [loss(output, y_shard).sum() for output, y_shard
+                      in zip(outputs, y_shards)]
+            for l in ls:
+                l.backward()
             trainer.step(batch_size)
-            train_l_sum += float(l)
-            n += y.size
-        time_s = "time %.2f sec" % (time.time() - start)
+            metric.add(sum([float(l.sum()) for l in ls]), labels.shape[0])
+            timer.stop()
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches, 
+                             (metric[0] / metric[1], None))
         if valid_iter is not None:
-            valid_loss = evaluate_loss(valid_iter, net, ctx)
-            epoch_s = ("epoch %d, train loss %f, valid loss %f, "
-                       % (epoch + 1, train_l_sum / n, valid_loss))
-        else:
-            epoch_s = ("epoch %d, train loss %f, "
-                       % (epoch + 1, train_l_sum / n))
-        print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
+            valid_loss = evaluate_loss(valid_iter, net, devices)
+            animator.add(epoch + 1, (None, valid_loss))
+    if valid_iter is not None:
+        print(f'train loss {metric[0] / metric[1]:.3f}, '
+              f'valid loss {valid_loss:.3f}')
+    else:
+        print(f'train loss {metric[0] / metric[1]:.3f}')
+    print(f'{metric[1] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(devices)}')
+```
+
+```{.python .input}
+#@tab pytorch
+def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
+          lr_decay):
+    # Only train the small custom output network
+    net = nn.DataParallel(net, device_ids=devices).to(devices[0])
+    trainer = torch.optim.SGD((param for param in net.parameters()
+                               if param.requires_grad), lr=lr,
+                              momentum=0.9, weight_decay=wd)
+    scheduler = torch.optim.lr_scheduler.StepLR(trainer, lr_period, lr_decay)
+    num_batches, timer = len(train_iter), d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
+                            legend=['train loss', 'valid loss'])
+    for epoch in range(num_epochs):
+        metric = d2l.Accumulator(2)
+        for i, (features, labels) in enumerate(train_iter):
+            timer.start()
+            features, labels = features.to(devices[0]), labels.to(devices[0])
+            trainer.zero_grad()
+            output = net(features)
+            l = loss(output, labels).sum()
+            l.backward()
+            trainer.step()
+            metric.add(l, labels.shape[0])
+            timer.stop()
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches, 
+                             (metric[0] / metric[1], None))
+        if valid_iter is not None:
+            valid_loss = evaluate_loss(valid_iter, net, devices)
+            animator.add(epoch + 1, (None, valid_loss))
+        scheduler.step()
+    if valid_iter is not None:
+        print(f'train loss {metric[0] / metric[1]:.3f}, '
+              f'valid loss {valid_loss:.3f}')
+    else:
+        print(f'train loss {metric[0] / metric[1]:.3f}')
+    print(f'{metric[1] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(devices)}')
 ```
 
 ## Training and Validating the Model
 
-Now, we can train and validate the model. The following hyper-parameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
+Now, we can train and validate the model. The following hyperparameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
 
-```{.python .input  n=9}
-ctx, num_epochs, lr, wd = d2l.try_gpu(), 1, 0.01, 1e-4
-lr_period, lr_decay, net = 10, 0.1, get_net(ctx)
+```{.python .input}
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.01, 1e-4
+lr_period, lr_decay, net = 10, 0.1, get_net(devices)
 net.hybridize()
-train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
+      lr_decay)
+```
+
+```{.python .input}
+#@tab pytorch
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.001, 1e-4
+lr_period, lr_decay, net = 10, 0.1, get_net(devices)
+train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
 
 ## Classifying the Testing Set and Submitting Results on Kaggle
 
-After obtaining a satisfactory model design and hyper-parameters, we use all training datasets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
+After obtaining a satisfactory model design and hyperparameters, we use all training datasets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
 
-```{.python .input  n=8}
-net = get_net(ctx)
+```{.python .input}
+net = get_net(devices)
 net.hybridize()
-train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 
 preds = []
 for data, label in test_iter:
-    output_features = net.features(data.as_in_ctx(ctx))
+    output_features = net.features(data.as_in_ctx(devices[0]))
     output = npx.softmax(net.output_new(output_features))
     preds.extend(output.asnumpy())
 ids = sorted(os.listdir(
     os.path.join(data_dir, 'train_valid_test', 'test', 'unknown')))
 with open('submission.csv', 'w') as f:
     f.write('id,' + ','.join(train_valid_ds.synsets) + '\n')
+    for i, output in zip(ids, preds):
+        f.write(i.split('.')[0] + ',' + ','.join(
+            [str(num) for num in output]) + '\n')
+```
+
+```{.python .input}
+#@tab pytorch
+net = get_net(devices)
+train(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,
+      lr_decay)
+
+preds = []
+for data, label in test_iter:
+    output = torch.nn.functional.softmax(net(data.to(devices[0])), dim=0)
+    preds.extend(output.cpu().detach().numpy())
+ids = sorted(os.listdir(
+    os.path.join(data_dir, 'train_valid_test', 'test', 'unknown')))
+with open('submission.csv', 'w') as f:
+    f.write('id,' + ','.join(train_valid_ds.classes) + '\n')
     for i, output in zip(ids, preds):
         f.write(i.split('.')[0] + ',' + ','.join(
             [str(num) for num in output]) + '\n')
@@ -274,6 +456,10 @@ method for submitting results is similar to method in
 1. Do you get better results if you use a deeper pre-trained model?
 1. Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
-## [Discussions](https://discuss.mxnet.io/t/2451)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/380)
+:end_tab:
 
-![](../img/qr_kaggle-gluon-dog.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1481)
+:end_tab:

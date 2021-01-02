@@ -5,7 +5,7 @@ One of the most commonly encountered way of thinking in machine learning is the 
 
 ## The Maximum Likelihood Principle
 
-This has a Bayesian interpretation which can be helpful to think about.  Suppose that we have a model with parameters $\boldsymbol{\theta}$ and a collection of data points $X$.  For concreteness, we can imagine that $\boldsymbol{\theta}$ is a single value representing the probability that a coin comes up heads when flipped, and $X$ is a sequence of independent coin flips.  We will look at this example in depth later.
+This has a Bayesian interpretation which can be helpful to think about.  Suppose that we have a model with parameters $\boldsymbol{\theta}$ and a collection of data examples $X$.  For concreteness, we can imagine that $\boldsymbol{\theta}$ is a single value representing the probability that a coin comes up heads when flipped, and $X$ is a sequence of independent coin flips.  We will look at this example in depth later.
 
 If we want to find the most likely value for the parameters of our model, that means we want to find
 
@@ -68,6 +68,18 @@ p = theta**9 * (1 - theta)**4.
 d2l.plot(theta, p, 'theta', 'likelihood')
 ```
 
+```{.python .input}
+#@tab tensorflow
+%matplotlib inline
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+theta = tf.range(0, 1, 0.001)
+p = theta**9 * (1 - theta)**4.
+
+d2l.plot(theta, p, 'theta', 'likelihood')
+```
+
 This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the function is flat.  Thus, we could find the maximum likelihood estimate :eqref:`eq_max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
 
 $$
@@ -83,9 +95,9 @@ This has three solutions: $0$, $1$ and $9/13$.  The first two are clearly minima
 
 ## Numerical Optimization and the Negative Log-Likelihood
 
-The previous example is nice, but what if we have billions of parameters and data points.
+The previous example is nice, but what if we have billions of parameters and data examples.
 
-First notice that, if we make the assumption that all the data points are independent, we can no longer practically consider the likelihood itself as it is a product of many probabilities.  Indeed, each probability is in $[0,1]$, say typically of value about $1/2$, and the product of $(1/2)^{1000000000}$ is far below machine precision.  We cannot work with that directly.  
+First notice that, if we make the assumption that all the data examples are independent, we can no longer practically consider the likelihood itself as it is a product of many probabilities.  Indeed, each probability is in $[0,1]$, say typically of value about $1/2$, and the product of $(1/2)^{1000000000}$ is far below machine precision.  We cannot work with that directly.  
 
 However, recall that the logarithm turns products to sums, in which case 
 
@@ -154,6 +166,26 @@ for iter in range(10):
 theta, n_H / (n_H + n_T)
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Set up our data
+n_H = 8675309
+n_T = 25624
+
+# Initialize our paramteres
+theta = tf.Variable(tf.constant(0.5))
+
+# Perform gradient descent
+lr = 0.00000000001
+for iter in range(10):
+    with tf.GradientTape() as t:
+        loss = -(n_H * tf.math.log(theta) + n_T * tf.math.log(1 - theta))
+    theta.assign_sub(lr * t.gradient(loss, theta))
+
+# Check output
+theta, n_H / (n_H + n_T)
+```
+
 Numerical convenience is only one reason people like to use negative log-likelihoods.  Indeed, there are a several reasons that it can be preferable.
 
 
@@ -195,7 +227,7 @@ $$
 H(p) = -\sum_{i} p_i \log_2(p_i),
 $$
 
-which measures the randomness of a source. Notice that this is nothing more than the average $-\log$ probability, and thus if we take our negative log-likelihood and divide by the number of data points, we get a relative of entropy known as cross-entropy.  This theoretical interpretation alone would be sufficiently compelling to motivate reporting the average negative log-likelihood over the dataset as a way of measuring model performance.
+which measures the randomness of a source. Notice that this is nothing more than the average $-\log$ probability, and thus if we take our negative log-likelihood and divide by the number of data examples, we get a relative of entropy known as cross-entropy.  This theoretical interpretation alone would be sufficiently compelling to motivate reporting the average negative log-likelihood over the dataset as a way of measuring model performance.
 
 ## Maximum Likelihood for Continuous Variables
 
@@ -247,6 +279,14 @@ Thus, we see that the maximum likelihood point of view can operate with continuo
 2. Suppose that you have a dataset of samples $\{x_i\}_{i=1}^N$ drawn from a Gaussian with unknown mean, but variance $1$.  What is the maximum likelihood estimate for the mean?
 
 
-## [Discussions](https://discuss.mxnet.io/t/5153)
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/416)
+:end_tab:
 
-![](../img/qr_maximum-likelihood.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1096)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1097)
+:end_tab:

@@ -8,8 +8,6 @@ from collections import defaultdict
 from IPython import display
 import math
 from matplotlib import pyplot as plt
-from mxnet import autograd, context, gluon, image, init, np, npx
-from mxnet.gluon import nn, rnn
 import os
 import pandas as pd
 import random
@@ -18,27 +16,25 @@ import shutil
 import sys
 import tarfile
 import time
+import requests
 import zipfile
-
+import hashlib
 d2l = sys.modules[__name__]
 
 
-# Defined in file: ./chapter_preliminaries/pandas.md
-def mkdir_if_not_exist(path):  #@save
-    if not isinstance(path, str):
-        path = os.path.join(*path)
-    if not os.path.exists(path):
-        os.makedirs(path)
+# Defined in file: ./chapter_preface/index.md
+from mxnet import autograd, context, gluon, image, init, np, npx
+from mxnet.gluon import nn, rnn
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
-def use_svg_display():  #@save
+def use_svg_display():
     """Use the svg format to display a plot in Jupyter."""
     display.set_matplotlib_formats('svg')
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
-def set_figsize(figsize=(3.5, 2.5)):  #@save
+def set_figsize(figsize=(3.5, 2.5)):
     """Set the figure size for matplotlib."""
     use_svg_display()
     d2l.plt.rcParams['figure.figsize'] = figsize
@@ -62,14 +58,14 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
-    """Plot data instances."""
+    """Plot data points."""
     if legend is None:
         legend = []
 
     set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
 
-    # Return True if `X` (ndarray or list) has 1 axis
+    # Return True if `X` (tensor or list) has 1 axis
     def has_one_axis(X):
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))
@@ -92,7 +88,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression.md
-class Timer:  #@save
+class Timer:
     """Record multiple running times."""
     def __init__(self):
         self.times = []
@@ -116,59 +112,61 @@ class Timer:  #@save
         return sum(self.times)
 
     def cumsum(self):
-        """Return the accumulated times."""
+        """Return the accumulated time."""
         return np.array(self.times).cumsum().tolist()
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def synthetic_data(w, b, num_examples):  #@save
-    """Generate y = X w + b + noise."""
-    X = np.random.normal(0, 1, (num_examples, len(w)))
-    y = np.dot(X, w) + b
-    y += np.random.normal(0, 0.01, y.shape)
-    return X, y
+def synthetic_data(w, b, num_examples):
+    """Generate y = Xw + b + noise."""
+    X = d2l.normal(0, 1, (num_examples, len(w)))
+    y = d2l.matmul(X, w) + b
+    y += d2l.normal(0, 0.01, y.shape)
+    return X, d2l.reshape(y, (-1, 1))
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def linreg(X, w, b):  #@save
-    return np.dot(X, w) + b
+def linreg(X, w, b):
+    """The linear regression model."""
+    return d2l.matmul(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def squared_loss(y_hat, y):  #@save
-    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
+def squared_loss(y_hat, y):
+    """Squared loss."""
+    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def sgd(params, lr, batch_size):  #@save
+def sgd(params, lr, batch_size):
+    """Minibatch stochastic gradient descent."""
     for param in params:
         param[:] = param - lr * param.grad / batch_size
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
-def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a Gluon data loader."""
+def load_array(data_arrays, batch_size, is_train=True):
+    """Construct a Gluon data iterator."""
     dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_fashion_mnist_labels(labels):  #@save
+def get_fashion_mnist_labels(labels):
+    """Return text labels for the Fashion-MNIST dataset."""
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):        
-        if 'asnumpy' in dir(img): img = img.asnumpy() 
-        if 'numpy' in dir(img): img = img.numpy()
-        ax.imshow(img)
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        ax.imshow(d2l.numpy(img))
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
         if titles:
@@ -177,20 +175,18 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_dataloader_workers(num_workers=4):  #@save
-    # 0 means no additional process is used to speed up the reading of data.
-    if sys.platform.startswith('win'):
-        return 0
-    else:
-        return num_workers
+def get_dataloader_workers():
+    """Use 4 processes to read the data except for Windows."""
+    return 0 if sys.platform.startswith('win') else 4
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def load_data_fashion_mnist(batch_size, resize=None):  #@save
-    """Download the Fashion-MNIST dataset and then load into memory."""
+def load_data_fashion_mnist(batch_size, resize=None):
+    """Download the Fashion-MNIST dataset and then load it into memory."""
     dataset = gluon.data.vision
-    trans = [dataset.transforms.Resize(resize)] if resize else []
-    trans.append(dataset.transforms.ToTensor())
+    trans = [dataset.transforms.ToTensor()]
+    if resize:
+        trans.insert(0, dataset.transforms.Resize(resize))
     trans = dataset.transforms.Compose(trans)
     mnist_train = dataset.FashionMNIST(train=True).transform_first(trans)
     mnist_test = dataset.FashionMNIST(train=False).transform_first(trans)
@@ -201,30 +197,31 @@ def load_data_fashion_mnist(batch_size, resize=None):  #@save
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def accuracy(y_hat, y):  #@save
-    if y_hat.shape[1] > 1:
-        return float((y_hat.argmax(axis=1).astype('float32') == y.astype(
-            'float32')).sum())
-    else:
-        return float((y_hat.astype('int32') == y.astype('int32')).sum())
+def accuracy(y_hat, y):
+    """Compute the number of correct predictions."""
+    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
+        y_hat = d2l.argmax(y_hat, axis=1)        
+    cmp = d2l.astype(y_hat, y.dtype) == y
+    return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def evaluate_accuracy(net, data_iter):  #@save
-    metric = Accumulator(2)  # num_corrected_examples, num_examples
+def evaluate_accuracy(net, data_iter):
+    """Compute the accuracy for a model on a dataset."""
+    metric = Accumulator(2)  # No. of correct predictions, no. of predictions
     for X, y in data_iter:
-        metric.add(accuracy(net(X), y), y.size)
+        metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-class Accumulator:  #@save
-    """Sum a list of numbers over time."""
+class Accumulator:
+    """For accumulating sums over `n` variables."""
     def __init__(self, n):
         self.data = [0.0] * n
 
     def add(self, *args):
-        self.data = [a+float(b) for a, b in zip(self.data, args)]
+        self.data = [a + float(b) for a, b in zip(self.data, args)]
 
     def reset(self):
         self.data = [0.0] * len(self.data)
@@ -234,8 +231,10 @@ class Accumulator:  #@save
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def train_epoch_ch3(net, train_iter, loss, updater):  #@save
-    metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
+def train_epoch_ch3(net, train_iter, loss, updater):
+    """Train a model within one epoch (defined in Chapter 3)."""
+    # Sum of training loss, sum of training accuracy, no. of examples
+    metric = Accumulator(3)
     if isinstance(updater, gluon.Trainer):
         updater = updater.step
     for X, y in train_iter:
@@ -247,28 +246,30 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
         updater(X.shape[0])
         metric.add(float(l.sum()), accuracy(y_hat, y), y.size)
     # Return training loss and training accuracy
-    return metric[0]/metric[2], metric[1]/metric[2]
+    return metric[0] / metric[2], metric[1] / metric[2]
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-class Animator:  #@save
+class Animator:
+    """For plotting data in animation."""
     def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
-                 ylim=None, xscale='linear', yscale='linear', fmts=None,
-                 nrows=1, ncols=1, figsize=(3.5, 2.5)):
-        """Incrementally plot multiple lines."""
+                 ylim=None, xscale='linear', yscale='linear',
+                 fmts=('-', 'm--', 'g-.', 'r:'), nrows=1, ncols=1,
+                 figsize=(3.5, 2.5)):
+        # Incrementally plot multiple lines
         if legend is None:
             legend = []
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1:
             self.axes = [self.axes, ]
-        # Use a lambda to capture arguments
+        # Use a lambda function to capture arguments
         self.config_axes = lambda: d2l.set_axes(
             self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
 
     def add(self, x, y):
-        """Add multiple data points into the figure."""
+        # Add multiple data points into the figure
         if not hasattr(y, "__len__"):
             y = [y]
         n = len(y)
@@ -278,8 +279,6 @@ class Animator:  #@save
             self.X = [[] for _ in range(n)]
         if not self.Y:
             self.Y = [[] for _ in range(n)]
-        if not self.fmts:
-            self.fmts = ['-'] * n
         for i, (a, b) in enumerate(zip(x, y)):
             if a is not None and b is not None:
                 self.X[i].append(a)
@@ -294,73 +293,87 @@ class Animator:  #@save
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
-    animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
-                        ylim=[0.3, 0.9],
+    """Train a model (defined in Chapter 3)."""
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
-        animator.add(epoch+1, train_metrics+(test_acc,))
+        animator.add(epoch + 1, train_metrics + (test_acc,))
+    train_loss, train_acc = train_metrics
+    assert train_loss < 0.5, train_loss
+    assert train_acc <= 1 and train_acc > 0.7, train_acc
+    assert test_acc <= 1 and test_acc > 0.7, test_acc
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def predict_ch3(net, test_iter, n=6): #@save
+def predict_ch3(net, test_iter, n=6):
+    """Predict labels (defined in Chapter 3)."""
     for X, y in test_iter:
         break
     trues = d2l.get_fashion_mnist_labels(y)
-    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
-    titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
+    preds = d2l.get_fashion_mnist_labels(d2l.argmax(net(X), axis=1))
+    titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
+    d2l.show_images(
+        d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
-def evaluate_loss(net, data_iter, loss):  #@save
+def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset."""
-    metric = d2l.Accumulator(2)  # sum_loss, num_examples
+    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
     for X, y in data_iter:
-        metric.add(loss(net(X), y).sum(), y.size)
+        l = loss(net(X), y)
+        metric.add(d2l.reduce_sum(l), d2l.size(l))
     return metric[0] / metric[1]
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 DATA_HUB = dict()
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download(name, cache_dir=os.path.join('..', 'data')):
     """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, "%s does not exist" % name
-    url, sha1 = DATA_HUB[name]
-    d2l.mkdir_if_not_exist(cache_dir)
-    return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
+    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}."
+    url, sha1_hash = DATA_HUB[name]
+    os.makedirs(cache_dir, exist_ok=True)
+    fname = os.path.join(cache_dir, url.split('/')[-1])
+    if os.path.exists(fname):
+        sha1 = hashlib.sha1()
+        with open(fname, 'rb') as f:
+            while True:
+                data = f.read(1048576)
+                if not data:
+                    break
+                sha1.update(data)
+        if sha1.hexdigest() == sha1_hash:
+            return fname  # Hit cache
+    print(f'Downloading {fname} from {url}...')
+    r = requests.get(url, stream=True, verify=True)
+    with open(fname, 'wb') as f:
+        f.write(r.content)
+    return fname
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download_extract(name, folder=None):
     """Download and extract a zip/tar file."""
     fname = download(name)
-    base_dir = os.path.dirname(fname) 
+    base_dir = os.path.dirname(fname)
     data_dir, ext = os.path.splitext(fname)
     if ext == '.zip':
         fp = zipfile.ZipFile(fname, 'r')
     elif ext in ('.tar', '.gz'):
         fp = tarfile.open(fname, 'r')
     else:
-        assert False, 'Only zip/tar files can be extracted'
+        assert False, 'Only zip/tar files can be extracted.'
     fp.extractall(base_dir)
-    if folder:
-        return os.path.join(base_dir, folder)
-    else:
-        return data_dir
+    return os.path.join(base_dir, folder) if folder else data_dir
 
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download_all():
-    """Download all files in the DATA_HUB"""
+    """Download all files in the DATA_HUB."""
     for name in DATA_HUB:
         download(name)
 
@@ -370,63 +383,64 @@ DATA_HUB['kaggle_house_train'] = (
     DATA_URL + 'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
 
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 DATA_HUB['kaggle_house_test'] = (
     DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
-def try_gpu(i=0):  #@save
+def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
     return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
 
-
-# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
-def try_all_gpus():  #@save
-    """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    ctxes = [npx.gpu(i) for i in range(npx.num_gpus())]
-    return ctxes if ctxes else [npx.cpu()]
+def try_all_gpus():
+    """Return all available GPUs, or [cpu()] if no GPU exists."""
+    devices = [npx.gpu(i) for i in range(npx.num_gpus())]
+    return devices if devices else [npx.cpu()]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
-def corr2d(X, K):  #@save
+def corr2d(X, K):
     """Compute 2D cross-correlation."""
     h, w = K.shape
-    Y = np.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    Y = d2l.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
+            Y[i, j] = d2l.reduce_sum((X[i: i + h, j: j + w] * K))
     return Y
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def evaluate_accuracy_gpu(net, data_iter, ctx=None):  #@save
-    if not ctx:  # Query the first device the first parameter is on
-        ctx = list(net.collect_params().values())[0].list_ctx()[0]
-    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
+def evaluate_accuracy_gpu(net, data_iter, device=None):
+    """Compute the accuracy for a model on a dataset using a GPU."""
+    if not device:  # Query the first device where the first parameter is on
+        device = list(net.collect_params().values())[0].list_ctx()[0]
+    # No. of correct predictions, no. of predictions
+    metric = d2l.Accumulator(2)
     for X, y in data_iter:
-        X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
-        metric.add(d2l.accuracy(net(X), y), y.size)
-    return metric[0]/metric[1]
+        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
+        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
+    return metric[0] / metric[1]
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
-    net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
+def train_ch6(net, train_iter, test_iter, num_epochs, lr,
+              device=d2l.try_gpu()):
+    """Train a model with a GPU (defined in Chapter 6)."""
+    net.initialize(force_reinit=True, ctx=device, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                             legend=['train loss', 'train acc', 'test acc'])
-    timer = d2l.Timer()
+    timer, num_batches = d2l.Timer(), len(train_iter)
     for epoch in range(num_epochs):
-        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
+        # Sum of training loss, sum of training accuracy, no. of examples
+        metric = d2l.Accumulator(3)
         for i, (X, y) in enumerate(train_iter):
             timer.start()
-            # Here is the only difference compared to train_epoch_ch3
-            X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
+            # Here is the major difference from `d2l.train_epoch_ch3`
+            X, y = X.as_in_ctx(device), y.as_in_ctx(device)
             with autograd.record():
                 y_hat = net(X)
                 l = loss(y_hat, y)
@@ -434,19 +448,22 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
             trainer.step(X.shape[0])
             metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
             timer.stop()
-            train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
-            if (i+1) % 50 == 0:
-                animator.add(epoch + i/len(train_iter),
-                             (train_loss, train_acc, None))
+            train_l = metric[0] / metric[2]
+            train_acc = metric[1] / metric[2]
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
+                             (train_l, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch+1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_loss, train_acc, test_acc))
-    print('%.1f examples/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
+        animator.add(epoch + 1, (None, None, test_acc))
+    print(f'loss {train_l:.3f}, train acc {train_acc:.3f}, '
+          f'test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(device)}')
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
-class Residual(nn.Block):  #@save
+class Residual(nn.Block):
+    """The Residual block of ResNet."""
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
         super().__init__(**kwargs)
         self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1,
@@ -472,36 +489,37 @@ class Residual(nn.Block):  #@save
 d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
                                 '090b5e7e70c295757f55df93cb0a180b9691891a')
 
-
-# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def read_time_machine():  #@save
-    """Load the time machine book into a list of sentences."""
+def read_time_machine():
+    """Load the time machine dataset into a list of text lines."""
     with open(d2l.download('time_machine'), 'r') as f:
         lines = f.readlines()
-    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
-            for line in lines]
+    return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() for line in lines]
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def tokenize(lines, token='word'):  #@save
-    """Split sentences into word or char tokens."""
+def tokenize(lines, token='word'):
+    """Split text lines into word or character tokens."""
     if token == 'word':
-        return [line.split(' ') for line in lines]
+        return [line.split() for line in lines]
     elif token == 'char':
         return [list(line) for line in lines]
     else:
-        print('ERROR: unknown token type '+token)
+        print('ERROR: unknown token type: ' + token)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-class Vocab:  #@save
-    def __init__(self, tokens, min_freq=0, reserved_tokens=None):
+class Vocab:
+    """Vocabulary for text."""
+    def __init__(self, tokens=None, min_freq=0, reserved_tokens=None):
+        if tokens is None:
+            tokens = []
         if reserved_tokens is None:
-            reserved_tokens = []
+            reserved_tokens = [] 
         # Sort according to frequencies
         counter = count_corpus(tokens)
-        self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
-        self.token_freqs.sort(key=lambda x: x[1], reverse=True)
+        self.token_freqs = sorted(counter.items(), key=lambda x: x[1],
+                                  reverse=True)
+        # The index for the unknown token is 0
         self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
         uniq_tokens += [token for token, freq in self.token_freqs
                         if freq >= min_freq and token not in uniq_tokens]
@@ -523,20 +541,24 @@ class Vocab:  #@save
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
 
-
-# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def count_corpus(sentences):  #@save
-    # Flatten a list of token lists into a list of tokens
-    tokens = [tk for line in sentences for tk in line]
+def count_corpus(tokens):
+    """Count token frequencies."""
+    # Here `tokens` is a 1D list or 2D list
+    if len(tokens) == 0 or isinstance(tokens[0], list):
+        # Flatten a list of token lists into a list of tokens
+        tokens = [token for line in tokens for token in line]
     return collections.Counter(tokens)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def load_corpus_time_machine(max_tokens=-1):  #@save
+def load_corpus_time_machine(max_tokens=-1):
+    """Return token indices and the vocabulary of the time machine dataset."""
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)
-    corpus = [vocab[tk] for line in tokens for tk in line]
+    # Since each text line in the time machine dataset is not necessarily a
+    # sentence or a paragraph, flatten all the text lines into a single list
+    corpus = [vocab[token] for line in tokens for token in line]
     if max_tokens > 0:
         corpus = corpus[:max_tokens]
     return corpus, vocab
@@ -544,51 +566,57 @@ def load_corpus_time_machine(max_tokens=-1):  #@save
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 def seq_data_iter_random(corpus, batch_size, num_steps):
-    # Offset the iterator over the data for uniform starts
-    corpus = corpus[random.randint(0, num_steps):]
-    # Subtract 1 extra since we need to account for label
-    num_examples = ((len(corpus) - 1) // num_steps)
-    example_indices = list(range(0, num_examples * num_steps, num_steps))
-    random.shuffle(example_indices)
+    """Generate a minibatch of subsequences using random sampling."""
+    # Start with a random offset (inclusive of `num_steps - 1`) to partition a
+    # sequence
+    corpus = corpus[random.randint(0, num_steps - 1):]
+    # Subtract 1 since we need to account for labels
+    num_subseqs = (len(corpus) - 1) // num_steps
+    # The starting indices for subsequences of length `num_steps`
+    initial_indices = list(range(0, num_subseqs * num_steps, num_steps))
+    # In random sampling, the subsequences from two adjacent random
+    # minibatches during iteration are not necessarily adjacent on the
+    # original sequence
+    random.shuffle(initial_indices)
 
     def data(pos):
-        # This returns a sequence of the length num_steps starting from pos
+        # Return a sequence of length `num_steps` starting from `pos`
         return corpus[pos: pos + num_steps]
 
-    # Discard half empty batches
-    num_batches = num_examples // batch_size
+    num_batches = num_subseqs // batch_size
     for i in range(0, batch_size * num_batches, batch_size):
-        # Batch_size indicates the random examples read each time
-        batch_indices = example_indices[i:(i+batch_size)]
-        X = [data(j) for j in batch_indices]
-        Y = [data(j + 1) for j in batch_indices]
-        yield np.array(X), np.array(Y)
+        # Here, `initial_indices` contains randomized starting indices for
+        # subsequences
+        initial_indices_per_batch = initial_indices[i: i + batch_size]
+        X = [data(j) for j in initial_indices_per_batch]
+        Y = [data(j + 1) for j in initial_indices_per_batch]
+        yield d2l.tensor(X), d2l.tensor(Y)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_consecutive(corpus, batch_size, num_steps):
-    # Offset for the iterator over the data for uniform starts
+def seq_data_iter_sequential(corpus, batch_size, num_steps):
+    """Generate a minibatch of subsequences using sequential partitioning."""
+    # Start with a random offset to partition a sequence
     offset = random.randint(0, num_steps)
-    # Slice out data - ignore num_steps and just wrap around
-    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = np.array(corpus[offset:offset+num_indices])
-    Ys = np.array(corpus[offset+1:offset+1+num_indices])
+    num_tokens = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = d2l.tensor(corpus[offset: offset + num_tokens])
+    Ys = d2l.tensor(corpus[offset + 1: offset + 1 + num_tokens])
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
-    for i in range(0, num_batches * num_steps, num_steps):
-        X = Xs[:, i:(i+num_steps)]
-        Y = Ys[:, i:(i+num_steps)]
+    for i in range(0, num_steps * num_batches, num_steps):
+        X = Xs[:, i: i + num_steps]
+        Y = Ys[:, i: i + num_steps]
         yield X, Y
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 class SeqDataLoader:
-    """A iterator to load sequence data."""
+    """An iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
             self.data_iter_fn = d2l.seq_data_iter_random
         else:
-            self.data_iter_fn = d2l.seq_data_iter_consecutive
+            self.data_iter_fn = d2l.seq_data_iter_sequential
         self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
         self.batch_size, self.num_steps = batch_size, num_steps
 
@@ -597,8 +625,9 @@ class SeqDataLoader:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
-                           max_tokens=10000):
+def load_data_time_machine(batch_size, num_steps,
+                           use_random_iter=False, max_tokens=10000):
+    """Return the iterator and the vocabulary of the time machine dataset."""
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
     return data_iter, data_iter.vocab
@@ -606,13 +635,12 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch:
-    """A RNN Model based on scratch implementations."""
-
-    def __init__(self, vocab_size, num_hiddens, ctx,
-                 get_params, init_state, forward):
+    """An RNN Model implemented from scratch."""
+    def __init__(self, vocab_size, num_hiddens, device, get_params,
+                 init_state, forward_fn):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
-        self.params = get_params(vocab_size, num_hiddens, ctx)
-        self.init_state, self.forward_fn = init_state, forward
+        self.params = get_params(vocab_size, num_hiddens, device)
+        self.init_state, self.forward_fn = init_state, forward_fn
 
     def __call__(self, X, state):
         X = npx.one_hot(X.T, self.vocab_size)
@@ -623,27 +651,28 @@ class RNNModelScratch:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_predicts, model, vocab, ctx):
-    state = model.begin_state(batch_size=1, ctx=ctx)
+def predict_ch8(prefix, num_preds, net, vocab, device):
+    """Generate new characters following the `prefix`."""
+    state = net.begin_state(batch_size=1, ctx=device)
     outputs = [vocab[prefix[0]]]
-
-    def get_input():
-        return np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
-    for y in prefix[1:]:  # Warmup state with prefix
-        _, state = model(get_input(), state)
+    get_input = lambda: d2l.reshape(
+        d2l.tensor([outputs[-1]], ctx=device), (1, 1))
+    for y in prefix[1:]:  # Warm-up period
+        _, state = net(get_input(), state)
         outputs.append(vocab[y])
-    for _ in range(num_predicts):  # Predict num_predicts steps
-        Y, state = model(get_input(), state)
-        outputs.append(int(Y.argmax(axis=1).reshape(1)))
+    for _ in range(num_preds):  # Predict `num_preds` steps
+        y, state = net(get_input(), state)
+        outputs.append(int(y.argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def grad_clipping(model, theta):
-    if isinstance(model, gluon.Block):
-        params = [p.data() for p in model.collect_params().values()]
+def grad_clipping(net, theta):
+    """Clip the gradient."""
+    if isinstance(net, gluon.Block):
+        params = [p.data() for p in net.collect_params().values()]
     else:
-        params = model.params
+        params = net.params
     norm = math.sqrt(sum((p.grad ** 2).sum() for p in params))
     if norm > theta:
         for param in params:
@@ -651,64 +680,61 @@ def grad_clipping(model, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater, device, use_random_iter):
+    """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
-    metric = d2l.Accumulator(2)  # loss_sum, num_examples
+    metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
     for X, Y in train_iter:
         if state is None or use_random_iter:
-            # Initialize state when either it is the first iteration or
-            # using random sampling.
-            state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
+            # Initialize `state` when either it is the first iteration or
+            # using random sampling
+            state = net.begin_state(batch_size=X.shape[0], ctx=device)
         else:
             for s in state:
                 s.detach()
         y = Y.T.reshape(-1)
-        X, y = X.as_in_ctx(ctx), y.as_in_ctx(ctx)
+        X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         with autograd.record():
-            py, state = model(X, state)
-            l = loss(py, y).mean()
+            y_hat, state = net(X, state)
+            l = loss(y_hat, y).mean()
         l.backward()
-        grad_clipping(model, 1)
-        updater(batch_size=1)  # Since used mean already
-        metric.add(l * y.size, y.size)
-    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+        grad_clipping(net, 1)
+        updater(batch_size=1)  # Since the `mean` function has been invoked
+        metric.add(l * d2l.size(y), d2l.size(y))
+    return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
+def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
               use_random_iter=False):
-    # Initialize
+    """Train a model (defined in Chapter 8)."""
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
-                            legend=['train'], xlim=[1, num_epochs])
-    if isinstance(model, gluon.Block):
-        model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
-        trainer = gluon.Trainer(model.collect_params(),
+                            legend=['train'], xlim=[10, num_epochs])
+    # Initialize
+    if isinstance(net, gluon.Block):
+        net.initialize(ctx=device, force_reinit=True,
+                         init=init.Normal(0.01))
+        trainer = gluon.Trainer(net.collect_params(),
                                 'sgd', {'learning_rate': lr})
-
-        def updater(batch_size):
-            return trainer.step(batch_size)
+        updater = lambda batch_size: trainer.step(batch_size)
     else:
-        def updater(batch_size):
-            return d2l.sgd(model.params, lr, batch_size)
-
-    def predict(prefix):
-        return predict_ch8(prefix, 50, model, vocab, ctx)
-
-    # Train and check the progress.
+        updater = lambda batch_size: d2l.sgd(net.params, lr, batch_size)
+    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, device)
+    # Train and predict
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
-            model, train_iter, loss, updater, ctx, use_random_iter)
-        if epoch % 10 == 0:
-            print(predict('time traveller'))
-            animator.add(epoch+1, [ppl])
-    print('Perplexity %.1f, %d tokens/sec on %s' % (ppl, speed, ctx))
+            net, train_iter, loss, updater, device, use_random_iter)
+        if (epoch + 1) % 10 == 0:
+            animator.add(epoch + 1, [ppl])
+    print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
     print(predict('traveller'))
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
 class RNNModel(nn.Block):
+    """The RNN model."""
     def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
         self.rnn = rnn_layer
@@ -718,9 +744,9 @@ class RNNModel(nn.Block):
     def forward(self, inputs, state):
         X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
-        # The fully connected layer will first change the shape of Y to
-        # (num_steps * batch_size, num_hiddens). Its output shape is
-        # (num_steps * batch_size, vocab_size).
+        # The fully-connected layer will first change the shape of `Y` to
+        # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
+        # (`num_steps` * `batch_size`, `vocab_size`).
         output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 
@@ -732,9 +758,8 @@ class RNNModel(nn.Block):
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
 
-
-# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def read_data_nmt():
+    """Load the English-French dataset."""
     data_dir = d2l.download_extract('fra-eng')
     with open(os.path.join(data_dir, 'fra.txt'), 'r') as f:
         return f.read()
@@ -742,17 +767,22 @@ def read_data_nmt():
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def preprocess_nmt(text):
+    """Preprocess the English-French dataset."""
     def no_space(char, prev_char):
-        return char in set(',.!') and prev_char != ' '
+        return char in set(',.!?') and prev_char != ' '
 
+    # Replace non-breaking space with space, and convert uppercase letters to
+    # lowercase ones
     text = text.replace('\u202f', ' ').replace('\xa0', ' ').lower()
-    out = [' ' + char if i > 0 and no_space(char, text[i-1]) else char
+    # Insert space between words and punctuation marks
+    out = [' ' + char if i > 0 and no_space(char, text[i - 1]) else char
            for i, char in enumerate(text)]
     return ''.join(out)
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def tokenize_nmt(text, num_examples=None):
+    """Tokenize the English-French dataset."""
     source, target = [], []
     for i, line in enumerate(text.split('\n')):
         if num_examples and i > num_examples:
@@ -766,37 +796,38 @@ def tokenize_nmt(text, num_examples=None):
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def truncate_pad(line, num_steps, padding_token):
+    """Truncate or pad sequences."""
     if len(line) > num_steps:
-        return line[:num_steps]  # Trim
+        return line[:num_steps]  # Truncate
     return line + [padding_token] * (num_steps - len(line))  # Pad
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def build_array(lines, vocab, num_steps, is_source):
+def build_array_nmt(lines, vocab, num_steps):
+    """Transform text sequences of machine translation into minibatches."""
     lines = [vocab[l] for l in lines]
-    if not is_source:
-        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
-    array = np.array([truncate_pad(
+    lines = [l + [vocab['<eos>']] for l in lines]
+    array = d2l.tensor([truncate_pad(
         l, num_steps, vocab['<pad>']) for l in lines])
-    valid_len = (array != vocab['<pad>']).sum(axis=1)
+    valid_len = d2l.reduce_sum(
+        d2l.astype(array != vocab['<pad>'], d2l.int32), 1)
     return array, valid_len
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
-def load_data_nmt(batch_size, num_steps, num_examples=1000):
+def load_data_nmt(batch_size, num_steps, num_examples=600):
+    """Return the iterator and the vocabularies of the translation dataset."""
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, 
+    src_vocab = d2l.Vocab(source, min_freq=2,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+    tgt_vocab = d2l.Vocab(target, min_freq=2,
                           reserved_tokens=['<pad>', '<bos>', '<eos>'])
-    src_array, src_valid_len = build_array(
-        source, src_vocab, num_steps, True)
-    tgt_array, tgt_valid_len = build_array(
-        target, tgt_vocab, num_steps, False)
+    src_array, src_valid_len = build_array_nmt(source, src_vocab, num_steps)
+    tgt_array, tgt_valid_len = build_array_nmt(target, tgt_vocab, num_steps)
     data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
     data_iter = d2l.load_array(data_arrays, batch_size)
-    return src_vocab, tgt_vocab, data_iter
+    return data_iter, src_vocab, tgt_vocab
 
 
 # Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
@@ -838,169 +869,225 @@ class EncoderDecoder(nn.Block):
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class Seq2SeqEncoder(d2l.Encoder):
+    """The RNN encoder for sequence to sequence learning."""
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
         super(Seq2SeqEncoder, self).__init__(**kwargs)
+        # Embedding layer
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
+        self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=dropout)
 
     def forward(self, X, *args):
-        X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
-        # RNN needs first axes to be timestep, i.e., seq_len
+        # The output `X` shape: (`batch_size`, `num_steps`, `embed_size`)
+        X = self.embedding(X)
+        # In RNN models, the first axis corresponds to time steps
         X = X.swapaxes(0, 1)
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.ctx)
-        out, state = self.rnn(X, state)
-        # out shape: (seq_len, batch_size, num_hiddens)
-        # state shape: (num_layers, batch_size, num_hiddens),
-        # where "state" contains the hidden state and the memory cell
-        return out, state
-
-
-# Defined in file: ./chapter_recurrent-modern/seq2seq.md
-class Seq2SeqDecoder(d2l.Decoder):
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
-                 dropout=0, **kwargs):
-        super(Seq2SeqDecoder, self).__init__(**kwargs)
-        self.embedding = nn.Embedding(vocab_size, embed_size)
-        self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
-        self.dense = nn.Dense(vocab_size, flatten=False)
-
-    def init_state(self, enc_outputs, *args):
-        return enc_outputs[1]
-
-    def forward(self, X, state):
-        X = self.embedding(X).swapaxes(0, 1)
-        out, state = self.rnn(X, state)
-        # Make the batch to be the first dimension to simplify loss
-        # computation
-        out = self.dense(out).swapaxes(0, 1)
-        return out, state
+        output, state = self.rnn(X, state)
+        # `output` shape: (`num_steps`, `batch_size`, `num_hiddens`)
+        # `state[0]` shape: (`num_layers`, `batch_size`, `num_hiddens`)
+        return output, state
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
-    # pred shape: (batch_size, seq_len, vocab_size)
-    # label shape: (batch_size, seq_len)
-    # valid_len shape: (batch_size, )
+    """The softmax cross-entropy loss with masks."""
+    # `pred` shape: (`batch_size`, `num_steps`, `vocab_size`)
+    # `label` shape: (`batch_size`, `num_steps`)
+    # `valid_len` shape: (`batch_size`,)
     def forward(self, pred, label, valid_len):
-        # weights shape: (batch_size, seq_len, 1)
+        # `weights` shape: (`batch_size`, `num_steps`, 1)
         weights = np.expand_dims(np.ones_like(label), axis=-1)
         weights = npx.sequence_mask(weights, valid_len, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
-    model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
-    trainer = gluon.Trainer(model.collect_params(),
-                            'adam', {'learning_rate': lr})
+def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
+    """Train a model for sequence to sequence."""
+    net.initialize(init.Xavier(), force_reinit=True, ctx=device)
+    trainer = gluon.Trainer(net.collect_params(), 'adam',
+                            {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[1, num_epochs], ylim=[0, 0.25])
-    for epoch in range(1, num_epochs + 1):
+                            xlim=[10, num_epochs])
+    for epoch in range(num_epochs):
         timer = d2l.Timer()
-        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
+        metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
         for batch in data_iter:
-            X, X_vlen, Y, Y_vlen = [x.as_in_ctx(ctx) for x in batch]
-            Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
+            X, X_valid_len, Y, Y_valid_len = [
+                x.as_in_ctx(device) for x in batch]
+            bos = np.array(
+                [tgt_vocab['<bos>']] * Y.shape[0], ctx=device).reshape(-1, 1)
+            dec_input = d2l.concat([bos, Y[:, :-1]], 1)  # Teacher forcing
             with autograd.record():
-                Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
-                l = loss(Y_hat, Y_label, Y_vlen)
+                Y_hat, _ = net(X, dec_input, X_valid_len)
+                l = loss(Y_hat, Y, Y_valid_len)
             l.backward()
-            d2l.grad_clipping(model, 1)
-            num_tokens = Y_vlen.sum()
+            d2l.grad_clipping(net, 1)
+            num_tokens = Y_valid_len.sum()
             trainer.step(num_tokens)
             metric.add(l.sum(), num_tokens)
-        if epoch % 10 == 0:
-            animator.add(epoch, (metric[0]/metric[1],))
-    print('loss %.3f, %d tokens/sec on %s ' % (
-        metric[0]/metric[1], metric[1]/timer.stop(), ctx))
+        if (epoch + 1) % 10 == 0:
+            animator.add(epoch + 1, (metric[0] / metric[1],))
+    print(f'loss {metric[0] / metric[1]:.3f}, {metric[1] / timer.stop():.1f} '
+          f'tokens/sec on {str(device)}')
 
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
-def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
-                    ctx):
-    src_tokens = src_vocab[src_sentence.lower().split(' ')]
-    enc_valid_len = np.array([len(src_tokens)], ctx=ctx)
+def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
+                    device, save_attention_weights=False):
+    """Predict for sequence to sequence."""
+    src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
+        src_vocab['<eos>']]
+    enc_valid_len = np.array([len(src_tokens)], ctx=device)
     src_tokens = d2l.truncate_pad(src_tokens, num_steps, src_vocab['<pad>'])
-    enc_X = np.array(src_tokens, ctx=ctx)
-    # Add the batch_size dimension
-    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
-                                enc_valid_len)
-    dec_state = model.decoder.init_state(enc_outputs, enc_valid_len)
-    dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=ctx), axis=0)
-    predict_tokens = []
+    # Add the batch axis
+    enc_X = np.expand_dims(np.array(src_tokens, ctx=device), axis=0)
+    enc_outputs = net.encoder(enc_X, enc_valid_len)
+    dec_state = net.decoder.init_state(enc_outputs, enc_valid_len)
+    # Add the batch axis
+    dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=device), axis=0)
+    output_seq, attention_weight_seq = [], []
     for _ in range(num_steps):
-        Y, dec_state = model.decoder(dec_X, dec_state)
-        # The token with highest score is used as the next timestep input
+        Y, dec_state = net.decoder(dec_X, dec_state)
+        # We use the token with the highest prediction likelihood as the input
+        # of the decoder at the next time step
         dec_X = Y.argmax(axis=2)
-        py = dec_X.squeeze(axis=0).astype('int32').item()
-        if py == tgt_vocab['<eos>']:
+        pred = dec_X.squeeze(axis=0).astype('int32').item()
+        # Save attention weights (to be covered later)
+        if save_attention_weights:
+            attention_weight_seq.append(net.decoder.attention_weights)
+        # Once the end-of-sequence token is predicted, the generation of the
+        # output sequence is complete
+        if pred == tgt_vocab['<eos>']:
             break
-        predict_tokens.append(py)
-    return ' '.join(tgt_vocab.to_tokens(predict_tokens))
+        output_seq.append(pred)
+    return ' '.join(tgt_vocab.to_tokens(output_seq)), attention_weight_seq
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention.md
-def masked_softmax(X, valid_len):
-    # X: 3-D tensor, valid_len: 1-D or 2-D tensor
-    if valid_len is None:
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
+def bleu(pred_seq, label_seq, k):
+    """Compute the BLEU."""
+    pred_tokens, label_tokens = pred_seq.split(' '), label_seq.split(' ')
+    len_pred, len_label = len(pred_tokens), len(label_tokens)
+    score = math.exp(min(0, 1 - len_label / len_pred))
+    for n in range(1, k + 1):
+        num_matches, label_subs = 0, collections.defaultdict(int)
+        for i in range(len_label - n + 1):
+            label_subs[''.join(label_tokens[i: i + n])] += 1
+        for i in range(len_pred - n + 1):
+            if label_subs[''.join(pred_tokens[i: i + n])] > 0:
+                num_matches += 1
+                label_subs[''.join(pred_tokens[i: i + n])] -= 1
+        score *= math.pow(num_matches / (len_pred - n + 1), math.pow(0.5, n))
+    return score
+
+
+# Defined in file: ./chapter_attention-mechanisms/attention-cues.md
+def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
+                  cmap='Reds'):
+    d2l.use_svg_display()
+    num_rows, num_cols = matrices.shape[0], matrices.shape[1]
+    fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,
+                                 sharex=True, sharey=True, squeeze=False)
+    for i, (row_axes, row_matrices) in enumerate(zip(axes, matrices)):
+        for j, (ax, matrix) in enumerate(zip(row_axes, row_matrices)):
+            pcm = ax.imshow(d2l.numpy(matrix), cmap=cmap)
+            if i == num_rows - 1:
+                ax.set_xlabel(xlabel)
+            if j == 0:
+                ax.set_ylabel(ylabel)
+            if titles:
+                ax.set_title(titles[j])
+    fig.colorbar(pcm, ax=axes, shrink=0.6);
+
+
+# Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
+def masked_softmax(X, valid_lens):
+    """Perform softmax operation by masking elements on the last axis."""
+    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    if valid_lens is None:
         return npx.softmax(X)
     else:
         shape = X.shape
-        if valid_len.ndim == 1:
-            valid_len = valid_len.repeat(shape[1], axis=0)
+        if valid_lens.ndim == 1:
+            valid_lens = valid_lens.repeat(shape[1])
         else:
-            valid_len = valid_len.reshape(-1)
-        # Fill masked elements with a large negative, whose exp is 0
-        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_len, True,
-                              axis=1, value=-1e6)
+            valid_lens = valid_lens.reshape(-1)
+        # On the last axis, replace masked elements with a very large negative
+        # value, whose exponentiation outputs 0
+        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_lens, True,
+                              value=-1e6, axis=1)
         return npx.softmax(X).reshape(shape)
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention.md
+# Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
+class AdditiveAttention(nn.Block):
+    """Additive attention."""
+    def __init__(self, num_hiddens, dropout, **kwargs):
+        super(AdditiveAttention, self).__init__(**kwargs)
+        # Use `flatten=False` to only transform the last axis so that the
+        # shapes for the other axes are kept the same
+        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.w_v = nn.Dense(1, use_bias=False, flatten=False)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, queries, keys, values, valid_lens):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # After dimension expansion, shape of `queries`: (`batch_size`, no. of
+        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
+        # no. of key-value pairs, `num_hiddens`). Sum them up with
+        # broadcasting
+        features = np.expand_dims(queries, axis=2) + np.expand_dims(
+            keys, axis=1)
+        features = np.tanh(features)
+        # There is only one output of `self.w_v`, so we remove the last
+        # one-dimensional entry from the shape. Shape of `scores`:
+        # (`batch_size`, no. of queries, no. of key-value pairs)
+        scores = np.squeeze(self.w_v(features), axis=-1)
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # dimension)
+        return npx.batch_dot(self.dropout(self.attention_weights), values)
+
+
+# Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
 class DotProductAttention(nn.Block):
+    """Scaled dot product attention."""
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
 
-    # query: (batch_size, #queries, d)
-    # key: (batch_size, #kv_pairs, d)
-    # value: (batch_size, #kv_pairs, dim_v)
-    # valid_len: either (batch_size, ) or (batch_size, xx)
-    def forward(self, query, key, value, valid_len=None):
-        d = query.shape[-1]
-        # Set transpose_b=True to swap the last two dimensions of key
-        scores = npx.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
-        attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return npx.batch_dot(attention_weights, value)
+    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
+    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
+    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+    # dimension)
+    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
+    def forward(self, queries, keys, values, valid_lens=None):
+        d = queries.shape[-1]
+        # Set `transpose_b=True` to swap the last two dimensions of `keys`
+        scores = npx.batch_dot(queries, keys, transpose_b=True) / math.sqrt(d)
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        return npx.batch_dot(self.dropout(self.attention_weights), values)
 
 
-# Defined in file: ./chapter_attention-mechanisms/attention.md
-class MLPAttention(nn.Block):
-    def __init__(self, units, dropout, **kwargs):
-        super(MLPAttention, self).__init__(**kwargs)
-        # Use flatten=True to keep query's and key's 3-D shapes
-        self.W_k = nn.Dense(units, use_bias=False, flatten=False)
-        self.W_q = nn.Dense(units, use_bias=False, flatten=False)
-        self.v = nn.Dense(1, use_bias=False, flatten=False)
-        self.dropout = nn.Dropout(dropout)
+# Defined in file: ./chapter_attention-mechanisms/bahdanau-attention.md
+class AttentionDecoder(d2l.Decoder):
+    """The base attention-based decoder interface."""
+    def __init__(self, **kwargs):
+        super(AttentionDecoder, self).__init__(**kwargs)
+
+    @property
+    def attention_weights(self):
+        raise NotImplementedError
 
 
-    def forward(self, query, key, value, valid_len):
-        query, key = self.W_q(query), self.W_k(key)
-        # Expand query to (batch_size, #querys, 1, units), and key to
-        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast
-        features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
-        features = np.tanh(features)
-        scores = np.squeeze(self.v(features), axis=-1)
-        attention_weights = self.dropout(masked_softmax(scores, valid_len))
-        return npx.batch_dot(attention_weights, value)
-
-
-# Defined in file: ./chapter_attention-mechanisms/transformer.md
+# Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
 class MultiHeadAttention(nn.Block):
-    def __init__(self, num_hiddens, num_heads, dropout, use_bias=False, **kwargs):
+    def __init__(self, num_hiddens, num_heads, dropout, use_bias=False,
+                 **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
@@ -1009,66 +1096,84 @@ class MultiHeadAttention(nn.Block):
         self.W_v = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
         self.W_o = nn.Dense(num_hiddens, use_bias=use_bias, flatten=False)
 
-    def forward(self, query, key, value, valid_len):
-        # For self-attention, query, key, and value shape:
-        # (batch_size, seq_len, dim), where seq_len is the length of input
-        # sequence. valid_len shape is either (batch_size, ) or
-        # (batch_size, seq_len).
+    def forward(self, queries, keys, values, valid_lens):
+        # Shape of `queries`, `keys`, or `values`:
+        # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`)
+        # Shape of `valid_lens`:
+        # (`batch_size`,) or (`batch_size`, no. of queries)
+        # After transposing, shape of output `queries`, `keys`, or `values`:
+        # (`batch_size` * `num_heads`, no. of queries or key-value pairs,
+        # `num_hiddens` / `num_heads`)
+        queries = transpose_qkv(self.W_q(queries), self.num_heads)
+        keys = transpose_qkv(self.W_k(keys), self.num_heads)
+        values = transpose_qkv(self.W_v(values), self.num_heads)
 
-        # Project and transpose query, key, and value from
-        # (batch_size, seq_len, num_hiddens) to
-        # (batch_size * num_heads, seq_len, num_hiddens / num_heads).
-        query = transpose_qkv(self.W_q(query), self.num_heads)
-        key = transpose_qkv(self.W_k(key), self.num_heads)
-        value = transpose_qkv(self.W_v(value), self.num_heads)
+        if valid_lens is not None:
+            # On axis 0, copy the first item (scalar or vector) for
+            # `num_heads` times, then copy the next item, and so on
+            valid_lens = valid_lens.repeat(self.num_heads, axis=0)
 
-        if valid_len is not None:
-            # Copy valid_len by num_heads times
-            if valid_len.ndim == 1:
-                valid_len = np.tile(valid_len, self.num_heads)
-            else:
-                valid_len = np.tile(valid_len, (self.num_heads, 1))
-
-        # For self-attention, output shape:
-        # (batch_size * num_heads, seq_len, num_hiddens / num_heads)
-        output = self.attention(query, key, value, valid_len)
-
-        # output_concat shape: (batch_size, seq_len, num_hiddens)
+        # Shape of `output`: (`batch_size` * `num_heads`, no. of queries,
+        # `num_hiddens` / `num_heads`)
+        output = self.attention(queries, keys, values, valid_lens)
+        
+        # Shape of `output_concat`:
+        # (`batch_size`, no. of queries, `num_hiddens`)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 
 
-# Defined in file: ./chapter_attention-mechanisms/transformer.md
+# Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
 def transpose_qkv(X, num_heads):
-    # Input X shape: (batch_size, seq_len, num_hiddens).
-    # Output X shape:
-    # (batch_size, seq_len, num_heads, num_hiddens / num_heads)
+    # Shape of input `X`:
+    # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`).
+    # Shape of output `X`:
+    # (`batch_size`, no. of queries or key-value pairs, `num_heads`,
+    # `num_hiddens` / `num_heads`)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
-    # X shape: (batch_size, num_heads, seq_len, num_hiddens / num_heads)
+    # Shape of output `X`:
+    # (`batch_size`, `num_heads`, no. of queries or key-value pairs,
+    # `num_hiddens` / `num_heads`)
     X = X.transpose(0, 2, 1, 3)
 
-    # output shape: (batch_size * num_heads, seq_len, num_hiddens / num_heads)
-    output = X.reshape(-1, X.shape[2], X.shape[3])
-    return output
+    # Shape of `output`:
+    # (`batch_size` * `num_heads`, no. of queries or key-value pairs,
+    # `num_hiddens` / `num_heads`)
+    return X.reshape(-1, X.shape[2], X.shape[3])
 
 
-
-# Defined in file: ./chapter_attention-mechanisms/transformer.md
 def transpose_output(X, num_heads):
-    # A reversed version of transpose_qkv
+    """Reverse the operation of `transpose_qkv`"""
     X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
     X = X.transpose(0, 2, 1, 3)
     return X.reshape(X.shape[0], X.shape[1], -1)
 
 
+# Defined in file: ./chapter_attention-mechanisms/self-attention-and-positional-encoding.md
+class PositionalEncoding(nn.Block):
+    def __init__(self, num_hiddens, dropout, max_len=1000):
+        super(PositionalEncoding, self).__init__()
+        self.dropout = nn.Dropout(dropout)
+        # Create a long enough `P`
+        self.P = d2l.zeros((1, max_len, num_hiddens))
+        X = d2l.arange(max_len).reshape(-1, 1) / np.power(
+            10000, np.arange(0, num_hiddens, 2) / num_hiddens)
+        self.P[:, :, 0::2] = np.sin(X)
+        self.P[:, :, 1::2] = np.cos(X)
+
+    def forward(self, X):
+        X = X + self.P[:, :X.shape[1], :].as_in_ctx(X.ctx)
+        return self.dropout(X)
+
+
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionWiseFFN(nn.Block):
-    def __init__(self, ffn_num_hiddens, pw_num_outputs, **kwargs):
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
         self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
                                activation='relu')
-        self.dense2 = nn.Dense(pw_num_outputs, flatten=False)
+        self.dense2 = nn.Dense(ffn_num_outputs, flatten=False)
 
     def forward(self, X):
         return self.dense2(self.dense1(X))
@@ -1086,35 +1191,18 @@ class AddNorm(nn.Block):
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
-class PositionalEncoding(nn.Block):
-    def __init__(self, num_hiddens, dropout, max_len=1000):
-        super(PositionalEncoding, self).__init__()
-        self.dropout = nn.Dropout(dropout)
-        # Create a long enough P
-        self.P = np.zeros((1, max_len, num_hiddens))
-        X = np.arange(0, max_len).reshape(-1, 1) / np.power(
-            10000, np.arange(0, num_hiddens, 2) / num_hiddens)
-        self.P[:, :, 0::2] = np.sin(X)
-        self.P[:, :, 1::2] = np.cos(X)
-
-    def forward(self, X):
-        X = X + self.P[:, :X.shape[1], :].as_in_ctx(X.ctx)
-        return self.dropout(X)
-
-
-# Defined in file: ./chapter_attention-mechanisms/transformer.md
 class EncoderBlock(nn.Block):
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
                  use_bias=False, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = MultiHeadAttention(num_hiddens, num_heads, dropout,
-                                            use_bias)
+        self.attention = d2l.MultiHeadAttention(
+            num_hiddens, num_heads, dropout, use_bias)
         self.addnorm1 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
         self.addnorm2 = AddNorm(dropout)
 
-    def forward(self, X, valid_len):
-        Y = self.addnorm1(X, self.attention(X, X, X, valid_len))
+    def forward(self, X, valid_lens):
+        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens))
         return self.addnorm2(Y, self.ffn(Y))
 
 
@@ -1125,16 +1213,23 @@ class TransformerEncoder(d2l.Encoder):
         super(TransformerEncoder, self).__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.embedding = nn.Embedding(vocab_size, num_hiddens)
-        self.pos_encoding = PositionalEncoding(num_hiddens, dropout)
+        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
         for _ in range(num_layers):
             self.blks.add(
-                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout, use_bias))
+                EncoderBlock(num_hiddens, ffn_num_hiddens, num_heads, dropout,
+                             use_bias))
 
-    def forward(self, X, valid_len, *args):
+    def forward(self, X, valid_lens, *args):
+        # Since positional encoding values are between -1 and 1, the embedding
+        # values are multiplied by the square root of the embedding dimension
+        # to rescale before they are summed up
         X = self.pos_encoding(self.embedding(X) * math.sqrt(self.num_hiddens))
-        for blk in self.blks:
-            X = blk(X, valid_len)
+        self.attention_weights = [None] * len(self.blks)
+        for i, blk in enumerate(self.blks):
+            X = blk(X, valid_lens)
+            self.attention_weights[
+                i] = blk.attention.attention.attention_weights
         return X
 
 
@@ -1154,16 +1249,14 @@ def train_2d(trainer, steps=20):
     for i in range(steps):
         x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
-        print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
-
-# Defined in file: ./chapter_optimization/gd.md
 def show_trace_2d(f, results):
     """Show the trace of 2D variables during optimization."""
-    d2l.set_figsize((3.5, 2.5))
+    d2l.set_figsize()
     d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
-    x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
+    x1, x2 = d2l.meshgrid(d2l.arange(-5.5, 1.0, 0.1),
+                          d2l.arange(-3.0, 1.0, 0.1))
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
@@ -1173,8 +1266,6 @@ def show_trace_2d(f, results):
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
 
-
-# Defined in file: ./chapter_optimization/minibatch-sgd.md
 def get_data_ch11(batch_size=10, n=1500):
     data = np.genfromtxt(d2l.download('airfoil'),
                          dtype=np.float32, delimiter='\t')
@@ -1209,12 +1300,12 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
+def train_concise_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     # Initialization
     net = nn.Sequential()
     net.add(nn.Dense(1))
@@ -1236,28 +1327,28 @@ def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
+    print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
 
 
 # Defined in file: ./chapter_computational-performance/hybridize.md
-class benchmark:    
-    def __init__(self, description = 'Done in %.4f sec'):
+class Benchmark:
+    def __init__(self, description='Done'):
         self.description = description
-        
+
     def __enter__(self):
         self.timer = d2l.Timer()
         return self
 
     def __exit__(self, *args):
-        print(self.description % self.timer.stop())
+        print(f'{self.description}: {self.timer.stop():.4f} sec')
 
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
-def split_batch(X, y, ctx_list):
-    """Split X and y into multiple devices specified by ctx."""
+def split_batch(X, y, devices):
+    """Split `X` and `y` into multiple devices."""
     assert X.shape[0] == y.shape[0]
-    return (gluon.utils.split_and_load(X, ctx_list),
-            gluon.utils.split_and_load(y, ctx_list))
+    return (gluon.utils.split_and_load(X, devices),
+            gluon.utils.split_and_load(y, devices))
 
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-concise.md
@@ -1289,10 +1380,10 @@ def resnet18(num_classes):
 # Defined in file: ./chapter_computational-performance/multiple-gpus-concise.md
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     # Query the list of devices
-    ctx = list(net.collect_params().values())[0].list_ctx()
+    devices = list(net.collect_params().values())[0].list_ctx()
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
-        X_shards, y_shards = split_f(features, labels, ctx)
+        X_shards, y_shards = split_f(features, labels, devices)
         # Run in parallel
         pred_shards = [net(X_shard) for X_shard in X_shards]
         metric.add(sum(float(d2l.accuracy(pred_shard, y_shard)) for
@@ -1302,9 +1393,9 @@ def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
 
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
-def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
+def train_batch_ch13(net, features, labels, loss, trainer, devices,
                      split_f=d2l.split_batch):
-    X_shards, y_shards = split_f(features, labels, ctx_list)
+    X_shards, y_shards = split_f(features, labels, devices)
     with autograd.record():
         pred_shards = [net(X_shard) for X_shard in X_shards]
         ls = [loss(pred_shard, y_shard) for pred_shard, y_shard
@@ -1322,9 +1413,9 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
-               ctx_list=d2l.try_all_gpus(), split_f=d2l.split_batch):
-    num_batches, timer = len(train_iter), d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
+               devices=d2l.try_all_gpus(), split_f=d2l.split_batch):
+    timer, num_batches = d2l.Timer(), len(train_iter)
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         # Store training_loss, training_accuracy, num_examples, num_features
@@ -1332,24 +1423,46 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
             l, acc = train_batch_ch13(
-                net, features, labels, loss, trainer, ctx_list, split_f)
+                net, features, labels, loss, trainer, devices, split_f)
             metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
-            if (i + 1) % (num_batches // 5) == 0:
-                animator.add(epoch + i / num_batches,
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                animator.add(epoch + (i + 1) / num_batches,
                              (metric[0] / metric[2], metric[1] / metric[3],
                               None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)
         animator.add(epoch + 1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        metric[0] / metric[2], metric[1] / metric[3], test_acc))
-    print('%.1f examples/sec on %s' % (
-        metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'loss {metric[0] / metric[2]:.3f}, train acc '
+          f'{metric[1] / metric[3]:.3f}, test acc {test_acc:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec on '
+          f'{str(devices)}')
 
 
 # Defined in file: ./chapter_computer-vision/fine-tuning.md
 d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip', 
                          'fba480ffa8aa7e0febbb511d181409f899b9baa5')
+
+
+# Defined in file: ./chapter_computer-vision/bounding-box.md
+def box_corner_to_center(boxes):
+    """Convert from (upper_left, bottom_right) to (center, width, height)"""
+    x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
+    cx = (x1 + x2) / 2
+    cy = (y1 + y2) / 2
+    w = x2 - x1
+    h = y2 - y1
+    boxes = d2l.stack((cx, cy, w, h), axis=-1)
+    return boxes
+
+def box_center_to_corner(boxes):
+    """Convert from (center, width, height) to (upper_left, bottom_right)"""
+    cx, cy, w, h = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
+    x1 = cx - 0.5 * w
+    y1 = cy - 0.5 * h
+    x2 = cx + 0.5 * w
+    y2 = cy + 0.5 * h
+    boxes = d2l.stack((x1, y1, x2, y2), axis=-1)
+    return boxes
 
 
 # Defined in file: ./chapter_computer-vision/bounding-box.md
@@ -1361,6 +1474,42 @@ def bbox_to_rect(bbox, color):
     return d2l.plt.Rectangle(
         xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
         fill=False, edgecolor=color, linewidth=2)
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def multibox_prior(data, sizes, ratios):
+    in_height, in_width = data.shape[-2:]
+    device, num_sizes, num_ratios = data.ctx, len(sizes), len(ratios)
+    boxes_per_pixel = (num_sizes + num_ratios - 1)
+    size_tensor = d2l.tensor(sizes, ctx=device)
+    ratio_tensor = d2l.tensor(ratios, ctx=device)
+    # Offsets are required to move the anchor to center of a pixel
+    # Since pixel (height=1, width=1), we choose to offset our centers by 0.5
+    offset_h, offset_w = 0.5, 0.5
+    steps_h = 1.0 / in_height  # Scaled steps in y axis
+    steps_w = 1.0 / in_width  # Scaled steps in x axis
+
+    # Generate all center points for the anchor boxes
+    center_h = (d2l.arange(in_height, ctx=device) + offset_h) * steps_h
+    center_w = (d2l.arange(in_width, ctx=device) + offset_w) * steps_w
+    shift_x, shift_y = d2l.meshgrid(center_w, center_h)
+    shift_x, shift_y = shift_x.reshape(-1), shift_y.reshape(-1)
+
+    # Generate boxes_per_pixel number of heights and widths which are later
+    # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
+    w = d2l.concat((size_tensor, sizes[0] * np.sqrt(ratio_tensor[1:])))\
+                * in_height / in_width / 2
+    h = d2l.concat((size_tensor, sizes[0] / np.sqrt(ratio_tensor[1:]))) / 2
+    anchor_manipulations = np.tile(d2l.stack((-w, -h, w, h)).T,
+                                   (in_height * in_width, 1))
+
+    # Each center point will have boxes_per_pixel number of anchor boxes, so
+    # generate grid of all anchor box centers with boxes_per_pixel repeats
+    out_grid = d2l.stack([shift_x, shift_y, shift_x, shift_y],
+                axis=1).repeat(boxes_per_pixel, axis=0)
+
+    output = out_grid + anchor_manipulations
+    return np.expand_dims(output, axis=0)
 
 
 # Defined in file: ./chapter_computer-vision/anchor.md
@@ -1376,7 +1525,7 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
     colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
     for i, bbox in enumerate(bboxes):
         color = colors[i % len(colors)]
-        rect = d2l.bbox_to_rect(bbox.asnumpy(), color)
+        rect = d2l.bbox_to_rect(d2l.numpy(bbox), color)
         axes.add_patch(rect)
         if labels and len(labels) > i:
             text_color = 'k' if color == 'w' else 'w'
@@ -1385,27 +1534,186 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
                       bbox=dict(facecolor=color, lw=0))
 
 
-# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
-d2l.DATA_HUB['pikachu'] = (d2l.DATA_URL + 'pikachu.zip',
-                           '68ab1bd42143c5966785eb0d7b2839df8d570190')
+# Defined in file: ./chapter_computer-vision/anchor.md
+def box_iou(boxes1, boxes2):
+    """Compute IOU between two sets of boxes of shape (N,4) and (M,4)."""
+    # Compute box areas
+    box_area = lambda boxes: ((boxes[:, 2] - boxes[:, 0]) *
+                              (boxes[:, 3] - boxes[:, 1]))
+    area1 = box_area(boxes1)
+    area2 = box_area(boxes2)
+    lt = np.maximum(boxes1[:, None, :2], boxes2[:, :2])  # [N,M,2]
+    rb = np.minimum(boxes1[:, None, 2:], boxes2[:, 2:])  # [N,M,2]
+    wh = (rb - lt).clip(min=0)  # [N,M,2]
+    inter = wh[:, :, 0] * wh[:, :, 1]  # [N,M]
+    unioun = area1[:, None] + area2 - inter
+    return inter / unioun
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def match_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
+    """Assign ground-truth bounding boxes to anchor boxes similar to them."""
+    num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]
+    # Element `x_ij` in the `i^th` row and `j^th` column is the IoU
+    # of the anchor box `anc_i` to the ground-truth bounding box `box_j`
+    jaccard = box_iou(anchors, ground_truth)
+    # Initialize the tensor to hold assigned ground truth bbox for each anchor
+    anchors_bbox_map = np.full((num_anchors,), -1, dtype=np.int32, ctx=device)
+    # Assign ground truth bounding box according to the threshold
+    max_ious, indices = np.max(jaccard, axis=1), np.argmax(jaccard, axis=1)
+    anc_i = np.nonzero(max_ious >= 0.5)[0]
+    box_j = indices[max_ious >= 0.5]
+    anchors_bbox_map[anc_i] = box_j
+    # Find the largest iou for each bbox
+    anc_i = np.argmax(jaccard, axis=0)
+    box_j = np.arange(num_gt_boxes)
+    anchors_bbox_map[anc_i] = box_j
+    return anchors_bbox_map
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def offset_boxes(anchors, assigned_bb, eps=1e-6):
+    c_anc = d2l.box_corner_to_center(anchors)
+    c_assigned_bb = d2l.box_corner_to_center(assigned_bb)
+    offset_xy = 10 * (c_assigned_bb[:, :2] - c_anc[:, :2]) / c_anc[:, 2:]
+    offset_wh = 5 * d2l.log(eps + c_assigned_bb[:, 2:] / c_anc[:, 2:])
+    offset = d2l.concat([offset_xy, offset_wh], axis=1)
+    return offset
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def multibox_target(anchors, labels):
+    batch_size, anchors = labels.shape[0], anchors.squeeze(0)
+    batch_offset, batch_mask, batch_class_labels = [], [], []
+    device, num_anchors = anchors.ctx, anchors.shape[0]
+    for i in range(batch_size):
+        label = labels[i, :, :]
+        anchors_bbox_map = match_anchor_to_bbox(label[:, 1:], anchors, device)
+        bbox_mask = np.tile((np.expand_dims((anchors_bbox_map >= 0),
+                                            axis=-1)), (1, 4)).astype('int32')
+        # Initialize class_labels and assigned bbox coordinates with zeros
+        class_labels = d2l.zeros(num_anchors, dtype=np.int32, ctx=device)
+        assigned_bb = d2l.zeros((num_anchors, 4), dtype=np.float32, ctx=device)
+        # Assign class labels to the anchor boxes using matched gt bbox labels
+        # If no gt bbox is assigned to an anchor box, then let the
+        # class_labels and assigned_bb remain zero, i.e the background class
+        indices_true = np.nonzero(anchors_bbox_map >= 0)[0]
+        bb_idx = anchors_bbox_map[indices_true]
+        class_labels[indices_true] = label[bb_idx, 0].astype('int32') + 1
+        assigned_bb[indices_true] = label[bb_idx, 1:]
+        # offset transformations
+        offset = offset_boxes(anchors, assigned_bb) * bbox_mask
+        batch_offset.append(offset.reshape(-1))
+        batch_mask.append(bbox_mask.reshape(-1))
+        batch_class_labels.append(class_labels)
+    bbox_offset = d2l.stack(batch_offset)
+    bbox_mask = d2l.stack(batch_mask)
+    class_labels = d2l.stack(batch_class_labels)
+    return (bbox_offset, bbox_mask, class_labels)
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def offset_inverse(anchors, offset_preds):
+    c_anc = d2l.box_corner_to_center(anchors)
+    c_pred_bb_xy = (offset_preds[:, :2] * c_anc[:, 2:] / 10) + c_anc[:, :2]
+    c_pred_bb_wh = d2l.exp(offset_preds[:, 2:] / 5) * c_anc[:, 2:]
+    c_pred_bb = d2l.concat((c_pred_bb_xy, c_pred_bb_wh), axis=1)
+    predicted_bb = d2l.box_center_to_corner(c_pred_bb)
+    return predicted_bb
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def nms(boxes, scores, iou_threshold):
+    # sorting scores by the descending order and return their indices
+    B = scores.argsort()[::-1]
+    keep = []  # boxes indices that will be kept
+    while B.size > 0:
+        i = B[0]
+        keep.append(i)
+        if B.size == 1: break
+        iou = box_iou(boxes[i, :].reshape(-1, 4),
+                      boxes[B[1:], :].reshape(-1, 4)).reshape(-1)
+        inds = np.nonzero(iou <= iou_threshold)[0]
+        B = B[inds + 1]
+    return np.array(keep, dtype=np.int32, ctx=boxes.ctx)
+
+def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
+                       pos_threshold=0.00999999978):
+    device, batch_size = cls_probs.ctx, cls_probs.shape[0]
+    anchors = np.squeeze(anchors, axis=0)
+    num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]
+    out = []
+    for i in range(batch_size):
+        cls_prob, offset_pred = cls_probs[i], offset_preds[i].reshape(-1, 4)
+        conf, class_id = np.max(cls_prob[1:], 0), np.argmax(cls_prob[1:], 0)
+        predicted_bb = offset_inverse(anchors, offset_pred)
+        keep = nms(predicted_bb, conf, 0.5)
+        # Find all non_keep indices and set the class_id to background
+        all_idx = np.arange(num_anchors, dtype=np.int32, ctx=device)
+        combined = d2l.concat((keep, all_idx))
+        unique, counts = np.unique(combined, return_counts=True)
+        non_keep = unique[counts == 1]
+        all_id_sorted = d2l.concat((keep, non_keep))
+        class_id[non_keep] = -1
+        class_id = class_id[all_id_sorted].astype('float32')
+        conf, predicted_bb = conf[all_id_sorted], predicted_bb[all_id_sorted]
+        # threshold to be a positive prediction
+        below_min_idx = (conf < pos_threshold)
+        class_id[below_min_idx] = -1
+        conf[below_min_idx] = 1 - conf[below_min_idx]
+        pred_info = d2l.concat((np.expand_dims(class_id, axis=1),
+                                np.expand_dims(conf, axis=1),
+                                predicted_bb), axis=1)
+        out.append(pred_info)
+    return d2l.stack(out)
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
-def load_data_pikachu(batch_size, edge_size=256):
-    """Load the pikachu dataset."""
-    data_dir = d2l.download_extract('pikachu')
-    train_iter = image.ImageDetIter(
-        path_imgrec=os.path.join(data_dir, 'train.rec'),
-        path_imgidx=os.path.join(data_dir, 'train.idx'),
-        batch_size=batch_size,
-        data_shape=(3, edge_size, edge_size),  # The shape of the output image
-        shuffle=True,  # Read the dataset in random order
-        rand_crop=1,  # The probability of random cropping is 1
-        min_object_covered=0.95, max_attempts=200)
-    val_iter = image.ImageDetIter(
-        path_imgrec=os.path.join(data_dir, 'val.rec'), batch_size=batch_size,
-        data_shape=(3, edge_size, edge_size), shuffle=False)
-    return train_iter, val_iter
+d2l.DATA_HUB['banana-detection'] = (d2l.DATA_URL + 'banana-detection.zip',
+                           '5de26c8fce5ccdea9f91267273464dc968d20d72')
+
+
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
+def read_data_bananas(is_train=True):
+    """Read the bananas dataset images and labels."""
+    data_dir = d2l.download_extract('banana-detection')
+    csv_fname = os.path.join(data_dir, 'bananas_train' if is_train
+                                    else 'bananas_val', 'label.csv')
+    csv_data = pd.read_csv(csv_fname)
+    csv_data = csv_data.set_index('img_name')
+    images, targets = [], []
+    for img_name, target in csv_data.iterrows():
+        images.append(image.imread(
+            os.path.join(data_dir, 'bananas_train' if is_train else
+                         'bananas_val', 'images', f'{img_name}')))
+        # Since all images have same object class i.e. category '0',
+        # the `label` column corresponds to the only object i.e. banana
+        # The target is as follows : (`label`, `xmin`, `ymin`, `xmax`, `ymax`)
+        targets.append(list(target))
+    return images, np.expand_dims(np.array(targets), 1) / 256
+
+
+class BananasDataset(gluon.data.Dataset):
+    def __init__(self, is_train):
+        self.features, self.labels = read_data_bananas(is_train)
+        print('read ' + str(len(self.features)) + (f' training examples' if
+              is_train else f' validation examples'))
+
+    def __getitem__(self, idx):
+        return (self.features[idx].astype('float32').transpose(2, 0, 1),
+                self.labels[idx])
+
+    def __len__(self):
+        return len(self.features)
+
+
+def load_data_bananas(batch_size):
+    """Load the bananas dataset."""
+    train_iter = gluon.data.DataLoader(BananasDataset(is_train=True),
+                                       batch_size, shuffle=True)
+    val_iter = gluon.data.DataLoader(BananasDataset(is_train=False),
+                                     batch_size)
+    return (train_iter, val_iter)
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
@@ -1423,9 +1731,9 @@ def read_voc_images(voc_dir, is_train=True):
     features, labels = [], []
     for i, fname in enumerate(images):
         features.append(image.imread(os.path.join(
-            voc_dir, 'JPEGImages', '%s.jpg' % fname)))
+            voc_dir, 'JPEGImages', f'{fname}.jpg')))
         labels.append(image.imread(os.path.join(
-            voc_dir, 'SegmentationClass', '%s.png' % fname)))
+            voc_dir, 'SegmentationClass', f'{fname}.png')))
     return features, labels
 
 
@@ -1437,8 +1745,6 @@ VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
                 [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
                 [0, 64, 128]]
 
-
-# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
                'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
                'diningtable', 'dog', 'horse', 'motorbike', 'person',
@@ -1453,8 +1759,6 @@ def build_colormap2label():
         colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
     return colormap2label
 
-
-# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def voc_label_indices(colormap, colormap2label):
     """Map an RGB color to a label."""
     colormap = colormap.astype(np.int32)
@@ -1537,11 +1841,9 @@ def read_csv_labels(fname):
 # Defined in file: ./chapter_computer-vision/kaggle-cifar10.md
 def copyfile(filename, target_dir):
     """Copy a file into a target directory."""
-    d2l.mkdir_if_not_exist(target_dir)
+    os.makedirs(target_dir, exist_ok=True)
     shutil.copy(filename, target_dir)
 
-
-# Defined in file: ./chapter_computer-vision/kaggle-cifar10.md
 def reorg_train_valid(data_dir, labels, valid_ratio):
     # The number of examples of the class with the least examples in the
     # training dataset
@@ -1577,15 +1879,13 @@ def reorg_test(data_dir):
 
 # Defined in file: ./chapter_computer-vision/kaggle-dog.md
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
-                            '7c9b54e78c1cedaa04998f9868bc548c60101362')
+                            '0cb91d09b814ecdc07b50f31f8dcad3e81d6a86d')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
                        '319d85e578af0cdc590547f26231e4e31cdf1e42')
 
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
     with open(os.path.join(data_dir, 'ptb.train.txt')) as f:
@@ -1615,8 +1915,8 @@ def subsampling(sentences, vocab):
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a
-        # "central target word - context word" pair
+        # Each sentence needs at least 2 words to form a "central target word
+        # - context word" pair
         if len(line) < 2:
             continue
         centers += line
@@ -1674,8 +1974,8 @@ def batchify(data):
         contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
         masks += [[1] * cur_len + [0] * (max_len - cur_len)]
         labels += [[1] * len(context) + [0] * (max_len - len(context))]
-    return (np.array(centers).reshape(-1, 1), np.array(contexts_negatives),
-            np.array(masks), np.array(labels))
+    return (d2l.reshape(d2l.tensor(centers), (-1, 1)), d2l.tensor(contexts_negatives),
+            d2l.tensor(masks), d2l.tensor(labels))
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
@@ -1698,22 +1998,16 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['glove.6b.50d'] = (d2l.DATA_URL + 'glove.6B.50d.zip',
-                       '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
+                                '0b8703943ccdb6eb788e6f091b8946e82231bc4d')
 
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['glove.6b.100d'] = (d2l.DATA_URL + 'glove.6B.100d.zip',
-                       'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
+                                 'cd43bfb07e44e6f27cbcc7bc9ae3d80284fdaf5a')
 
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['glove.42b.300d'] = (d2l.DATA_URL + 'glove.42B.300d.zip',
-                       'b5116e234e9eb9076672cfeabf5469f3eec904fa')
+                                  'b5116e234e9eb9076672cfeabf5469f3eec904fa')
 
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
 d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
-                       'c1816da3821ae9f43899be655002f6c723e91b88')
+                           'c1816da3821ae9f43899be655002f6c723e91b88')
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/similarity-analogy.md
@@ -1723,7 +2017,7 @@ class TokenEmbedding:
         self.idx_to_token, self.idx_to_vec = self._load_embedding(
             embedding_name)
         self.unknown_idx = 0
-        self.token_to_idx = {token: idx for idx, token in 
+        self.token_to_idx = {token: idx for idx, token in
                              enumerate(self.idx_to_token)}
 
     def _load_embedding(self, embedding_name):
@@ -1740,12 +2034,12 @@ class TokenEmbedding:
                     idx_to_token.append(token)
                     idx_to_vec.append(elems)
         idx_to_vec = [[0] * len(idx_to_vec[0])] + idx_to_vec
-        return idx_to_token, np.array(idx_to_vec)
+        return idx_to_token, d2l.tensor(idx_to_vec)
 
     def __getitem__(self, tokens):
         indices = [self.token_to_idx.get(token, self.unknown_idx)
                    for token in tokens]
-        vecs = self.idx_to_vec[np.array(indices)]
+        vecs = self.idx_to_vec[d2l.tensor(indices)]
         return vecs
 
     def __len__(self):
@@ -1781,7 +2075,7 @@ class BERTEncoder(nn.Block):
 
     def forward(self, tokens, segments, valid_lens):
         # Shape of `X` remains unchanged in the following code snippet:
-        # (batch size, max sequence length, num_hiddens)
+        # (batch size, max sequence length, `num_hiddens`)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = X + self.pos_embedding.data(ctx=X.ctx)[:, :X.shape[1], :]
         for blk in self.blks:
@@ -1805,7 +2099,7 @@ class MaskLM(nn.Block):
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
         # Suppose that `batch_size` = 2, `num_pred_positions` = 3, then
-        # `batch_idx` is np.array([0, 0, 0, 1, 1, 1])
+        # `batch_idx` is `np.array([0, 0, 0, 1, 1, 1])`
         batch_idx = np.repeat(batch_idx, num_pred_positions)
         masked_X = X[batch_idx, pred_positions]
         masked_X = masked_X.reshape((batch_size, num_pred_positions, -1))
@@ -1820,7 +2114,7 @@ class NextSentencePred(nn.Block):
         self.output = nn.Dense(2)
 
     def forward(self, X):
-        # X shape: (batch size, `num_hiddens`)
+        # `X` shape: (batch size, `num_hiddens`)
         return self.output(X)
 
 
@@ -1852,8 +2146,6 @@ d2l.DATA_HUB['wikitext-2'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/'
     'wikitext-2-v1.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
 
-
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
@@ -1870,7 +2162,7 @@ def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
         is_next = True
     else:
-        # paragraphs is a list of lists of lists
+        # `paragraphs` is a list of lists of lists
         next_sentence = random.choice(random.choice(paragraphs))
         is_next = False
     return sentence, next_sentence, is_next
@@ -1972,8 +2264,8 @@ def _pad_bert_inputs(examples, max_len, vocab):
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-dataset.md
 class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraphs, max_len):
-        # Input paragraphs[i] is a list of sentence strings representing a
-        # paragraph; while output paragraphs[i] is a list of sentences
+        # Input `paragraphs[i]` is a list of sentence strings representing a
+        # paragraph; while output `paragraphs[i]` is a list of sentences
         # representing a paragraph, where each sentence is a list of tokens
         paragraphs = [d2l.tokenize(
             paragraph, token='word') for paragraph in paragraphs]
@@ -2048,50 +2340,6 @@ def _get_batch_loss_bert(net, loss, vocab_size, tokens_X_shards,
     return mlm_ls, nsp_ls, ls
 
 
-# Defined in file: ./chapter_natural-language-processing-pretraining/bert-pretraining.md
-def train_bert(train_iter, net, loss, vocab_size, ctx, log_interval,
-               num_steps):
-    trainer = gluon.Trainer(net.collect_params(), 'adam',
-                            {'learning_rate': 1e-3})
-    step, timer = 0, d2l.Timer()
-    animator = d2l.Animator(xlabel='step', ylabel='loss',
-                            xlim=[1, num_steps], legend=['mlm', 'nsp'])
-    # Masked language modeling loss, next sentence prediction loss,
-    # no. of sentence pairs, count
-    metric = d2l.Accumulator(4)
-    num_steps_reached = False
-    while step < num_steps and not num_steps_reached:
-        for batch in train_iter:
-            (tokens_X_shards, segments_X_shards, valid_lens_x_shards,
-             pred_positions_X_shards, mlm_weights_X_shards,
-             mlm_Y_shards, nsp_y_shards) = [gluon.utils.split_and_load(
-                elem, ctx, even_split=False) for elem in batch]
-            timer.start()
-            with autograd.record():
-                mlm_ls, nsp_ls, ls = _get_batch_loss_bert(
-                    net, loss, vocab_size, tokens_X_shards, segments_X_shards,
-                    valid_lens_x_shards, pred_positions_X_shards,
-                    mlm_weights_X_shards, mlm_Y_shards, nsp_y_shards)
-            for l in ls:
-                l.backward()
-            trainer.step(1)
-            mlm_l_mean = sum([float(l) for l in mlm_ls]) / len(mlm_ls)
-            nsp_l_mean = sum([float(l) for l in nsp_ls]) / len(nsp_ls)
-            metric.add(mlm_l_mean, nsp_l_mean, batch[0].shape[0], 1)
-            timer.stop()
-            if (step + 1) % log_interval == 0:
-                animator.add(step + 1,
-                             (metric[0] / metric[3], metric[1] / metric[3]))
-            step += 1
-            if step == num_steps:
-                num_steps_reached = True
-                break
-
-    print('MLM loss %.3f, NSP loss %.3f'
-          % (metric[0] / metric[3], metric[1] / metric[3]))
-    print('%.1f sentence pairs/sec on %s' % (metric[2] / timer.sum(), ctx))
-
-
 # Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis-and-dataset.md
 d2l.DATA_HUB['aclImdb'] = (
     'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
@@ -2121,9 +2369,9 @@ def load_data_imdb(batch_size, num_steps=500):
     test_tokens = d2l.tokenize(test_data[0], token='word')
     vocab = d2l.Vocab(train_tokens, min_freq=5)
     train_features = np.array([d2l.truncate_pad(
-        vocab[line], num_steps, vocab.unk) for line in train_tokens])
+        vocab[line], num_steps, vocab['<pad>']) for line in train_tokens])
     test_features = np.array([d2l.truncate_pad(
-        vocab[line], num_steps, vocab.unk) for line in test_tokens])
+        vocab[line], num_steps, vocab['<pad>']) for line in test_tokens])
     train_iter = d2l.load_array((train_features, train_data[1]), batch_size)
     test_iter = d2l.load_array((test_features, test_data[1]), batch_size,
                                is_train=False)
@@ -2210,11 +2458,11 @@ def load_data_snli(batch_size, num_steps=50):
 
 
 # Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-attention.md
-def split_batch_multi_inputs(X, y, ctx_list):
-    """Split multi-input X and y into multiple devices specified by ctx"""
+def split_batch_multi_inputs(X, y, devices):
+    """Split multi-input `X` and `y` into multiple devices."""
     X = list(zip(*[gluon.utils.split_and_load(
-        feature, ctx_list, even_split=False) for feature in X]))
-    return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
+        feature, devices, even_split=False) for feature in X]))
+    return (X, gluon.utils.split_and_load(y, devices, even_split=False))
 
 
 # Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-attention.md
@@ -2232,8 +2480,6 @@ d2l.DATA_HUB['ml-100k'] = (
     'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
     'cd4dcac4241c8a4ad7badc7ca635da8a69dddb83')
 
-
-# Defined in file: ./chapter_recommender-systems/movielens.md
 def read_data_ml100k():
     data_dir = d2l.download_extract('ml-100k')
     names = ['user_id', 'item_id', 'rating', 'timestamp']
@@ -2310,7 +2556,7 @@ def split_and_load_ml100k(split_mode='seq-aware', feedback='explicit',
 
 # Defined in file: ./chapter_recommender-systems/mf.md
 def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
-                        ctx_list=d2l.try_all_gpus(), evaluator=None,
+                        devices=d2l.try_all_gpus(), evaluator=None,
                         **kwargs):
     timer = d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 2],
@@ -2322,28 +2568,28 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             input_data = []
             values = values if isinstance(values, list) else [values]
             for v in values:
-                input_data.append(gluon.utils.split_and_load(v, ctx_list))
+                input_data.append(gluon.utils.split_and_load(v, devices))
             train_feat = input_data[0:-1] if len(values) > 1 else input_data
             train_label = input_data[-1]
             with autograd.record():
                 preds = [net(*t) for t in zip(*train_feat)]
                 ls = [loss(p, s) for p, s in zip(preds, train_label)]
             [l.backward() for l in ls]
-            l += sum([l.asnumpy() for l in ls]).mean() / len(ctx_list)
+            l += sum([l.asnumpy() for l in ls]).mean() / len(devices)
             trainer.step(values[0].shape[0])
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
-        if len(kwargs) > 0:  # it will be used in section AutoRec.
+        if len(kwargs) > 0:  # It will be used in section AutoRec
             test_rmse = evaluator(net, test_iter, kwargs['inter_mat'],
-                                  ctx_list)
+                                  devices)
         else:
-            test_rmse = evaluator(net, test_iter, ctx_list)
+            test_rmse = evaluator(net, test_iter, devices)
         train_l = l / (i + 1)
         animator.add(epoch + 1, (train_l, test_rmse))
-    print('train loss %.3f, test RMSE %.3f'
-          % (metric[0] / metric[1], test_rmse))
-    print('%.1f examples/sec on %s'
-          % (metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'train loss {metric[0] / metric[1]:.3f}, '
+          f'test RMSE {test_rmse:.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(devices)}')
 
 
 # Defined in file: ./chapter_recommender-systems/ranking.md
@@ -2382,7 +2628,7 @@ def hit_and_auc(rankedlist, test_matrix, k):
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
 def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
-                     ctx):
+                     devices):
     ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
     all_items = set([i for i in range(num_users)])
     for u in range(num_users):
@@ -2394,12 +2640,11 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
         if seq is not None:
             x.append(seq[user_ids, :])
         x.extend([np.array(item_ids)])
-        test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x),
-                                               shuffle=False, 
-                                               last_batch="keep", 
-                                               batch_size=1024) 
+        test_data_iter = gluon.data.DataLoader(
+            gluon.data.ArrayDataset(*x), shuffle=False, last_batch="keep",
+            batch_size=1024)
         for index, values in enumerate(test_data_iter):
-            x = [gluon.utils.split_and_load(v, ctx, even_split=False) 
+            x = [gluon.utils.split_and_load(v, devices, even_split=False)
                  for v in values]
             scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
         scores = [item for sublist in scores for item in sublist]
@@ -2414,7 +2659,7 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx_list, evaluator, 
+                  num_users, num_items, num_epochs, devices, evaluator,
                   candidates, eval_step=1):
     timer, hit_rate, auc = d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
@@ -2424,14 +2669,14 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
         for i, values in enumerate(train_iter):
             input_data = []
             for v in values:
-                input_data.append(gluon.utils.split_and_load(v, ctx_list))
+                input_data.append(gluon.utils.split_and_load(v, devices))
             with autograd.record():
                 p_pos = [net(*t) for t in zip(*input_data[0:-1])]
-                p_neg = [net(*t) for t in zip(*input_data[0:-2], 
+                p_neg = [net(*t) for t in zip(*input_data[0:-2],
                                               input_data[-1])]
                 ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]
-            l += sum([l.asnumpy() for l in ls]).mean()/len(ctx_list)
+            l += sum([l.asnumpy() for l in ls]).mean()/len(devices)
             trainer.step(values[0].shape[0])
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
@@ -2439,12 +2684,12 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             if (epoch + 1) % eval_step == 0:
                 hit_rate, auc = evaluator(net, test_iter, test_seq_iter,
                                           candidates, num_users, num_items,
-                                          ctx_list)
+                                          devices)
                 animator.add(epoch + 1, (hit_rate, auc))
-    print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
-          % (metric[0] / metric[1], hit_rate, auc))
-    print('%.1f examples/sec on %s'
-          % (metric[2] * num_epochs / timer.sum(), ctx_list))
+    print(f'train loss {metric[0] / metric[1]:.3f}, '
+          f'test hit rate {float(hit_rate):.3f}, test AUC {float(auc):.3f}')
+    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
+          f'on {str(devices)}')
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
@@ -2503,7 +2748,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     with autograd.record():
         real_Y = net_D(X)
         fake_X = net_G(Z)
-        # Do not need to compute gradient for net_G, detach it from
+        # Do not need to compute gradient for `net_G`, detach it from
         # computing gradients.
         fake_Y = net_D(fake_X.detach())
         loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
@@ -2513,14 +2758,14 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 
 
 # Defined in file: ./chapter_generative-adversarial-networks/gan.md
-def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
+def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator."""
     batch_size = Z.shape[0]
     ones = np.ones((batch_size,), ctx=Z.ctx)
     with autograd.record():
-        # We could reuse fake_X from update_D to save computation.
+        # We could reuse `fake_X` from `update_D` to save computation
         fake_X = net_G(Z)
-        # Recomputing fake_Y is needed since net_D is changed.
+        # Recomputing `fake_Y` is needed since `net_D` is changed
         fake_Y = net_D(fake_X)
         loss_G = loss(fake_Y, ones)
     loss_G.backward()
@@ -2532,4 +2777,37 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+
+# Alias defined in config.ini
+size = lambda a: a.size
+transpose = lambda a: a.T
+
+ones = np.ones
+zeros = np.zeros
+arange = np.arange
+meshgrid = np.meshgrid
+sin = np.sin
+sinh = np.sinh
+cos = np.cos
+cosh = np.cosh
+tanh = np.tanh
+linspace = np.linspace
+exp = np.exp
+log = np.log
+tensor = np.array
+normal = np.random.normal
+rand = np.random.rand
+matmul = np.dot
+int32 = np.int32
+float32 = np.float32
+concat = np.concatenate
+stack = np.stack
+abs = np.abs
+eye = np.eye
+numpy = lambda x, *args, **kwargs: x.asnumpy(*args, **kwargs)
+reshape = lambda x, *args, **kwargs: x.reshape(*args, **kwargs)
+to = lambda x, *args, **kwargs: x.as_in_context(*args, **kwargs)
+reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
+argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
+astype = lambda x, *args, **kwargs: x.astype(*args, **kwargs)
 

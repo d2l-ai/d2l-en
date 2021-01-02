@@ -17,19 +17,23 @@ To facilitate the demonstration of BERT pretraining,
 we use a smaller corpus WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016`.
 
 Comparing with the PTB dataset used for pretraining word2vec in :numref:`sec_word2vec_data`,
-WikiText-2 i) retains the original punctuation, making it suitable for next sentence prediction; ii) retrains the original case and numbers; iii) is over twice larger.
+WikiText-2 i) retains the original punctuation, making it suitable for next sentence prediction; ii) retains the original case and numbers; iii) is over twice larger.
 
-```{.python .input  n=1}
-import collections
+```{.python .input}
 from d2l import mxnet as d2l
-import mxnet as mx
-from mxnet import autograd, gluon, init, np, npx
+from mxnet import gluon, np, npx
 import os
 import random
-import time
-import zipfile
 
 npx.set_np()
+```
+
+```{.python .input}
+#@tab pytorch
+from d2l import torch as d2l
+import os
+import random
+import torch
 ```
 
 In the WikiText-2 dataset,
@@ -40,7 +44,8 @@ To split sentences, we only use the period as the delimiter for simplicity.
 We leave discussions of more complex sentence splitting techniques in the exercises
 at the end of this section.
 
-```{.python .input  n=2}
+```{.python .input}
+#@tab all
 #@save
 d2l.DATA_HUB['wikitext-2'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/'
@@ -65,21 +70,22 @@ we begin by implementing helper functions for the two BERT pretraining tasks:
 next sentence prediction and masked language modeling.
 These helper functions will be invoked later
 when transforming the raw text corpus
-into the the dataset of the ideal format to pretrain BERT.
+into the dataset of the ideal format to pretrain BERT.
 
 ### Generating the Next Sentence Prediction Task
 
-According to descriptions of :label:`subsec_nsp`,
+According to descriptions of :numref:`subsec_nsp`,
 the `_get_next_sentence` function generates a training example
 for the binary classification task.
 
-```{.python .input  n=3}
+```{.python .input}
+#@tab all
 #@save
 def _get_next_sentence(sentence, next_sentence, paragraphs):
     if random.random() < 0.5:
         is_next = True
     else:
-        # paragraphs is a list of lists of lists
+        # `paragraphs` is a list of lists of lists
         next_sentence = random.choice(random.choice(paragraphs))
         is_next = False
     return sentence, next_sentence, is_next
@@ -90,7 +96,8 @@ from the input `paragraph` by invoking the `_get_next_sentence` function.
 Here `paragraph` is a list of sentences, where each sentence is a list of tokens.
 The argument `max_len` specifies the maximum length of a BERT input sequence during pretraining.
 
-```{.python .input  n=4}
+```{.python .input}
+#@tab all
 #@save
 def _get_nsp_data_from_paragraph(paragraph, paragraphs, vocab, max_len):
     nsp_data_from_paragraph = []
@@ -122,7 +129,8 @@ a special “&lt;mask&gt;” token or a random token, or remain unchanged.
 In the end, the function returns the input tokens after possible replacement,
 the token indices where predictions take place and labels for these predictions.
 
-```{.python .input  n=5}
+```{.python .input}
+#@tab all
 #@save
 def _replace_mlm_tokens(tokens, candidate_pred_positions, num_mlm_preds,
                         vocab):
@@ -160,7 +168,8 @@ as an input and returns indices of the input tokens
 the token indices where predictions take place,
 and label indices for these predictions.
 
-```{.python .input  n=6}
+```{.python .input}
+#@tab all
 #@save
 def _get_mlm_data_from_tokens(tokens, vocab):
     candidate_pred_positions = []
@@ -190,7 +199,7 @@ we still need to define a helper function `_pad_bert_inputs`
 to append the special “&lt;mask&gt;” tokens to the inputs.
 Its argument `examples` contain the outputs from the helper functions `_get_nsp_data_from_paragraph` and `_get_mlm_data_from_tokens` for the two pretraining tasks.
 
-```{.python .input  n=7}
+```{.python .input}
 #@save
 def _pad_bert_inputs(examples, max_len, vocab):
     max_num_mlm_preds = round(max_len * 0.15)
@@ -219,6 +228,37 @@ def _pad_bert_inputs(examples, max_len, vocab):
             all_mlm_weights, all_mlm_labels, nsp_labels)
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def _pad_bert_inputs(examples, max_len, vocab):
+    max_num_mlm_preds = round(max_len * 0.15)
+    all_token_ids, all_segments, valid_lens,  = [], [], []
+    all_pred_positions, all_mlm_weights, all_mlm_labels = [], [], []
+    nsp_labels = []
+    for (token_ids, pred_positions, mlm_pred_label_ids, segments,
+         is_next) in examples:
+        all_token_ids.append(torch.tensor(token_ids + [vocab['<pad>']] * (
+            max_len - len(token_ids)), dtype=torch.long))
+        all_segments.append(torch.tensor(segments + [0] * (
+            max_len - len(segments)), dtype=torch.long))
+        # `valid_lens` excludes count of '<pad>' tokens
+        valid_lens.append(torch.tensor(len(token_ids), dtype=torch.float32))
+        all_pred_positions.append(torch.tensor(pred_positions + [0] * (
+            max_num_mlm_preds - len(pred_positions)), dtype=torch.long))
+        # Predictions of padded tokens will be filtered out in the loss via
+        # multiplication of 0 weights
+        all_mlm_weights.append(
+            torch.tensor([1.0] * len(mlm_pred_label_ids) + [0.0] * (
+                max_num_mlm_preds - len(pred_positions)),
+                dtype=torch.float32))
+        all_mlm_labels.append(torch.tensor(mlm_pred_label_ids + [0] * (
+            max_num_mlm_preds - len(mlm_pred_label_ids)), dtype=torch.long))
+        nsp_labels.append(torch.tensor(is_next, dtype=torch.long))
+    return (all_token_ids, all_segments, valid_lens, all_pred_positions,
+            all_mlm_weights, all_mlm_labels, nsp_labels)
+```
+
 Putting the helper functions for
 generating training examples of the two pretraining tasks,
 and the helper function for padding inputs together,
@@ -233,12 +273,51 @@ the original byte pair encoding algorithm in :numref:`subsec_Byte_Pair_Encoding`
 For simplicity, we use the `d2l.tokenize` function for tokenization.
 Infrequent tokens that appear less than five times are filtered out.
 
-```{.python .input  n=8}
+```{.python .input}
 #@save
 class _WikiTextDataset(gluon.data.Dataset):
     def __init__(self, paragraphs, max_len):
-        # Input paragraphs[i] is a list of sentence strings representing a
-        # paragraph; while output paragraphs[i] is a list of sentences
+        # Input `paragraphs[i]` is a list of sentence strings representing a
+        # paragraph; while output `paragraphs[i]` is a list of sentences
+        # representing a paragraph, where each sentence is a list of tokens
+        paragraphs = [d2l.tokenize(
+            paragraph, token='word') for paragraph in paragraphs]
+        sentences = [sentence for paragraph in paragraphs
+                     for sentence in paragraph]
+        self.vocab = d2l.Vocab(sentences, min_freq=5, reserved_tokens=[
+            '<pad>', '<mask>', '<cls>', '<sep>'])
+        # Get data for the next sentence prediction task
+        examples = []
+        for paragraph in paragraphs:
+            examples.extend(_get_nsp_data_from_paragraph(
+                paragraph, paragraphs, self.vocab, max_len))
+        # Get data for the masked language model task
+        examples = [(_get_mlm_data_from_tokens(tokens, self.vocab)
+                      + (segments, is_next))
+                     for tokens, segments, is_next in examples]
+        # Pad inputs
+        (self.all_token_ids, self.all_segments, self.valid_lens,
+         self.all_pred_positions, self.all_mlm_weights,
+         self.all_mlm_labels, self.nsp_labels) = _pad_bert_inputs(
+            examples, max_len, self.vocab)
+
+    def __getitem__(self, idx):
+        return (self.all_token_ids[idx], self.all_segments[idx],
+                self.valid_lens[idx], self.all_pred_positions[idx],
+                self.all_mlm_weights[idx], self.all_mlm_labels[idx],
+                self.nsp_labels[idx])
+
+    def __len__(self):
+        return len(self.all_token_ids)
+```
+
+```{.python .input}
+#@tab pytorch
+#@save
+class _WikiTextDataset(torch.utils.data.Dataset):
+    def __init__(self, paragraphs, max_len):
+        # Input `paragraphs[i]` is a list of sentence strings representing a
+        # paragraph; while output `paragraphs[i]` is a list of sentences
         # representing a paragraph, where each sentence is a list of tokens
         paragraphs = [d2l.tokenize(
             paragraph, token='word') for paragraph in paragraphs]
@@ -275,7 +354,7 @@ By using the `_read_wiki` function and the `_WikiTextDataset` class,
 we define the following `load_data_wiki` to download and WikiText-2 dataset
 and generate pretraining examples from it.
 
-```{.python .input  n=9}
+```{.python .input}
 #@save
 def load_data_wiki(batch_size, max_len):
     num_workers = d2l.get_dataloader_workers()
@@ -287,12 +366,26 @@ def load_data_wiki(batch_size, max_len):
     return train_iter, train_set.vocab
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def load_data_wiki(batch_size, max_len):
+    num_workers = d2l.get_dataloader_workers()
+    data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
+    paragraphs = _read_wiki(data_dir)
+    train_set = _WikiTextDataset(paragraphs, max_len)
+    train_iter = torch.utils.data.DataLoader(train_set, batch_size,
+                                        shuffle=True, num_workers=num_workers)
+    return train_iter, train_set.vocab
+```
+
 Setting the batch size to 512 and the maximum length of a BERT input sequence to be 64,
 we print out the shapes of a minibatch of BERT pretraining examples.
 Note that in each BERT input sequence,
 $10$ ($64 \times 0.15$) positions are predicted for the masked language modeling task.
 
-```{.python .input  n=10}
+```{.python .input}
+#@tab all
 batch_size, max_len = 512, 64
 train_iter, vocab = load_data_wiki(batch_size, max_len)
 
@@ -308,7 +401,8 @@ In the end, let us take a look at the vocabulary size.
 Even after filtering out infrequent tokens,
 it is still over twice larger than that of the PTB dataset.
 
-```{.python .input  n=11}
+```{.python .input}
+#@tab all
 len(vocab)
 ```
 
@@ -323,7 +417,10 @@ len(vocab)
 1. For simplicity, the period is used as the only delimiter for splitting sentences. Try other sentence splitting techniques, such as the spaCy and NLTK. Take NLTK as an example. You need to install NLTK first: `pip install nltk`. In the code, first `import nltk`. Then, download the Punkt sentence tokenizer: `nltk.download('punkt')`. To split sentences such as `sentences = 'This is great ! Why not ?'`, invoking `nltk.tokenize.sent_tokenize(sentences)` will return a list of two sentence strings: `['This is great !', 'Why not ?']`.
 1. What is the vocabulary size if we do not filter out any infrequent token?
 
+:begin_tab:`mxnet`
+[Discussions](https://discuss.d2l.ai/t/389)
+:end_tab:
 
-## [Discussions](https://discuss.mxnet.io/t/5868)
-
-![](../img/qr_bert-dataset.svg)
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1496)
+:end_tab:

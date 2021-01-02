@@ -16,32 +16,18 @@ We will cover more data preprocessing techniques in later chapters.
 As an example, we begin by creating an artificial dataset that is stored in a
 csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other
 formats may be processed in similar ways.
-The following `mkdir_if_not_exist`
-function ensures that the directory `../data` exists. The comment `#@save`
-is a special mark where the following function,
-class, or import statements are also saved in the `d2l` package so that later we can
-directly invoke the `mkdir_if_not_exist` function without redefining it.
-
-```{.python .input}
-#@tab all
-import os
-
-def mkdir_if_not_exist(path):  #@save
-    if not isinstance(path, str):
-        path = os.path.join(*path)
-    if not os.path.exists(path):
-        os.makedirs(path)
-```
 
 Below we write the dataset row by row into a csv file.
 
 ```{.python .input}
 #@tab all
-data_file = '../data/house_tiny.csv'
-mkdir_if_not_exist('../data')
+import os
+
+os.makedirs(os.path.join('..', 'data'), exist_ok=True)
+data_file = os.path.join('..', 'data', 'house_tiny.csv')
 with open(data_file, 'w') as f:
     f.write('NumRooms,Alley,Price\n')  # Column names
-    f.write('NA,Pave,127500\n')  # Each row is a data instance
+    f.write('NA,Pave,127500\n')  # Each row represents a data example
     f.write('2,NA,106000\n')
     f.write('4,NA,178100\n')
     f.write('NA,NA,140000\n')
@@ -111,6 +97,14 @@ X, y = torch.tensor(inputs.values), torch.tensor(outputs.values)
 X, y
 ```
 
+```{.python .input}
+#@tab tensorflow
+import tensorflow as tf
+
+X, y = tf.constant(inputs.values), tf.constant(outputs.values)
+X, y
+```
+
 ## Summary
 
 * Like many other extension packages in the vast ecosystem of Python, `pandas` can work together with tensors.
@@ -124,11 +118,14 @@ Create a raw dataset with more rows and columns.
 1. Delete the column with the most missing values.
 2. Convert the preprocessed dataset to the tensor format.
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/28)
 :end_tab:
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/29)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/195)
 :end_tab:
