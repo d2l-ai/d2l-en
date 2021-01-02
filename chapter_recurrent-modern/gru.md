@@ -258,14 +258,14 @@ def get_params(vocab_size, num_hiddens, device):
 
     def _one(shape):
         return tf.Variable(tf.random.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32))
+
     def _three():
         return (_one((num_inputs, num_hiddens)),
                 _one((num_hiddens, num_hiddens)),
                 tf.Variable(tf.zeros(num_hiddens), dtype=tf.float32))
-    W_xi, W_hi, b_i = three()  # Input gate parameters
-    W_xf, W_hf, b_f = three()  # Forget gate parameters
-    W_xo, W_ho, b_o = three()  # Output gate parameters
-    W_xc, W_hc, b_c = three()  # Candidate memory cell parameters
+    W_xz, W_hz, b_z = three()  # Update gate parameters
+    W_xr, W_hr, b_r = three()  # Reset gate parameters
+    W_xh, W_hh, b_h = three()  # Candidate hidden state parameters
     # Output layer parameters
     W_hq = _one((num_hiddens, num_outputs))
     b_q = tf.Variable(tf.zeros(num_outputs), dtype=tf.float32)
