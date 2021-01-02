@@ -145,6 +145,14 @@ from torch import nn
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+```
 
 ### Initializing Model Parameters
 
@@ -205,6 +213,32 @@ def get_lstm_params(vocab_size, num_hiddens, device):
     return params
 ```
 
+```{.python .input}
+#@tab tensorflow
+def get_params(vocab_size, num_hiddens, device):
+    num_inputs = num_outputs = vocab_size
+
+    def _one(shape):
+        return tf.Variable(tf.random.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32))
+    def _three():
+        return (_one((num_inputs, num_hiddens)),
+                _one((num_hiddens, num_hiddens)),
+                tf.Variable(tf.zeros(num_hiddens), dtype=tf.float32))
+    W_xi, W_hi, b_i = three()  # Input gate parameters
+    W_xf, W_hf, b_f = three()  # Forget gate parameters
+    W_xo, W_ho, b_o = three()  # Output gate parameters
+    W_xc, W_hc, b_c = three()  # Candidate memory cell parameters
+    # Output layer parameters
+    W_hq = _one((num_hiddens, num_outputs))
+    b_q = tf.Variable(tf.zeros(num_outputs), dtype=tf.float32)
+    # Attach gradients
+    params = [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc,
+              b_c, W_hq, b_q]
+    for param in params:
+        param.requires_grad_(True)
+    return params
+```
+
 ### Defining the Model
 
 In the initialization function, the hidden state of the LSTM needs to return an *additional* memory cell with a value of 0 and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
@@ -220,6 +254,13 @@ def init_lstm_state(batch_size, num_hiddens, device):
 def init_lstm_state(batch_size, num_hiddens, device):
     return (torch.zeros((batch_size, num_hiddens), device=device),
             torch.zeros((batch_size, num_hiddens), device=device))
+```
+```{.python .input}
+#@tab tensorflow
+def init_lstm_state(batch_size, num_hiddens):
+    return (tf.zeros(shape=(batch_size, num_hiddens)), 
+            tf.zeros(shape=(batch_size, num_hiddens)))
+
 ```
 
 The actual model is defined just like what we discussed before: providing three gates and an auxiliary memory cell. Note that only the hidden state is passed to the output layer. The memory cell $\mathbf{C}_t$ does not directly participate in the output computation.
@@ -259,6 +300,24 @@ def lstm(inputs, state, params):
         Y = (H @ W_hq) + b_q
         outputs.append(Y)
     return torch.cat(outputs, dim=0), (H, C)
+```
+```{.python .input}
+#@tab tensorflow
+def lstm(inputs, state, params):
+    W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c, W_hq, b_q = params
+    (H, C) = state
+    outputs = []
+    for X in inputs:
+        X=tf.reshape(X,[-1,W_xi.shape[0]])
+        I = tf.sigmoid(tf.matmul(X, W_xi) + tf.matmul(H, W_hi) + b_i)
+        F = tf.sigmoid(tf.matmul(X, W_xf) + tf.matmul(H, W_hf) + b_f)
+        O = tf.sigmoid(tf.matmul(X, W_xo) + tf.matmul(H, W_ho) + b_o)
+        C_tilda = tf.tanh(tf.matmul(X, W_xc) + tf.matmul(H, W_hc) + b_c)
+        C = F * C + I * C_tilda
+        H = O * tf.tanh(C)
+        Y = tf.matmul(H, W_hq) + b_q
+        outputs.append(Y)
+    return outputs, (H, C)
 ```
 
 ### Training and Prediction
