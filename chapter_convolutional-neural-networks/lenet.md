@@ -250,9 +250,10 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
 #@tab pytorch
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     """Compute the accuracy for a model on a dataset using a GPU."""
-    net.eval()  # Set the model to evaluation mode
-    if not device:
-        device = next(iter(net.parameters())).device
+    if isinstance(net, torch.nn.Module):
+        net.eval()  # Set the model to evaluation mode
+        if not device:
+            device = next(iter(net.parameters())).device
     # No. of correct predictions, no. of predictions
     metric = d2l.Accumulator(2)
     for X, y in data_iter:
