@@ -203,11 +203,11 @@ Rather than iterating over the predictions with a Python for-loop
 (which tends to be inefficient),
 we can pick all elements by a single operator.
 Below, we create sample data `y_hat`
-with 2 examples of predicted probabilities over 3 classes and corresponding predictions `y`.
+with 2 examples of predicted probabilities over 3 classes and their corresponding labels `y`.
 With `y` we know that in the first example the first class is the correct prediction and
-in the second example the third class is correct.
-This means that `y` gives us the indices of the probabilities in `y_hat`:
-We pick the probability of the first class in the first example
+in the second example the third class is the ground-truth.
+Using `y` as the indices of the probabilities in `y_hat`,
+we pick the probability of the first class in the first example
 and the probability of the third class in the second example.
 
 ```{.python .input}
