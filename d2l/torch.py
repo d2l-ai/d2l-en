@@ -146,9 +146,10 @@ def squared_loss(y_hat, y):
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def sgd(params, lr, batch_size):
     """Minibatch stochastic gradient descent."""
-    for param in params:
-        param.data.sub_(lr*param.grad/batch_size)
-        param.grad.data.zero_()
+    with torch.no_grad():
+        for param in params:
+            param -= lr * param.grad / batch_size
+            param.grad.zero_()
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
@@ -442,9 +443,10 @@ def corr2d(X, K):
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def evaluate_accuracy_gpu(net, data_iter, device=None):
     """Compute the accuracy for a model on a dataset using a GPU."""
-    net.eval()  # Set the model to evaluation mode
-    if not device:
-        device = next(iter(net.parameters())).device
+    if isinstance(net, torch.nn.Module):
+        net.eval()  # Set the model to evaluation mode
+        if not device:
+            device = next(iter(net.parameters())).device
     # No. of correct predictions, no. of predictions
     metric = d2l.Accumulator(2)
     for X, y in data_iter:
@@ -1413,12 +1415,12 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
         if type(m) == nn.Linear:
             torch.nn.init.normal_(m.weight, std=0.01)
     net.apply(init_weights)
-    
+
     optimizer = trainer_fn(net.parameters(), **hyperparams)
-    
+
     loss = nn.MSELoss()
     # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
-    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss 
+    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
     # value to get L2Loss in PyTorch
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
@@ -1451,6 +1453,14 @@ class Benchmark:
 
     def __exit__(self, *args):
         print(f'{self.description}: {self.timer.stop():.4f} sec')
+
+
+# Defined in file: ./chapter_computational-performance/multiple-gpus.md
+def split_batch(X, y, devices):
+    """Split `X` and `y` into multiple devices."""
+    assert X.shape[0] == y.shape[0]
+    return (nn.parallel.scatter(X, devices),
+            nn.parallel.scatter(y, devices))
 
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-concise.md

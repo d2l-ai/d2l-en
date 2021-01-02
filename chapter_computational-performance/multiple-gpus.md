@@ -53,18 +53,27 @@ In what follows we will use :numref:`sec_lenet` as the toy network to illustrate
 ![Parallelization on multiple GPUs. From left to right - original problem, network partitioning, layer partitioning, data parallelism.](../img/splitting.svg)
 :label:`fig_splitting`
 
-```{.python .input  n=2}
+```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 npx.set_np()
 ```
 
+```{.python .input}
+#@tab pytorch
+%matplotlib inline
+from d2l import torch as d2l
+import torch
+from torch import nn
+from torch.nn import functional as F
+```
+
 ## A Toy Network
 
 We use LeNet as introduced in :numref:`sec_lenet`. We define it from scratch to illustrate parameter exchange and synchronization in detail.
 
-```{.python .input  n=10}
+```{.python .input}
 # Initialize model parameters
 scale = 0.01
 W1 = np.random.normal(scale=scale, size=(20, 1, 3, 3))
@@ -99,11 +108,43 @@ def lenet(X, params):
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```
 
+```{.python .input}
+#@tab pytorch
+# Initialize model parameters
+scale = 0.01
+W1 = torch.randn(size=(20, 1, 3, 3)) * scale
+b1 = torch.zeros(20)
+W2 = torch.randn(size=(50, 20, 5, 5)) * scale
+b2 = torch.zeros(50)
+W3 = torch.randn(size=(800, 128)) * scale
+b3 = torch.zeros(128)
+W4 = torch.randn(size=(128, 10)) * scale
+b4 = torch.zeros(10)
+params = [W1, b1, W2, b2, W3, b3, W4, b4]
+
+# Define the model
+def lenet(X, params):
+    h1_conv = F.conv2d(input=X, weight=params[0], bias=params[1])
+    h1_activation = F.relu(h1_conv)
+    h1 = F.avg_pool2d(input=h1_activation, kernel_size=(2, 2), stride=(2, 2))
+    h2_conv = F.conv2d(input=h1, weight=params[2], bias=params[3])
+    h2_activation = F.relu(h2_conv)
+    h2 = F.avg_pool2d(input=h2_activation, kernel_size=(2, 2), stride=(2, 2))
+    h2 = h2.reshape(h2.shape[0], -1)
+    h3_linear = torch.mm(h2, params[4]) + params[5]
+    h3 = F.relu(h3_linear)
+    y_hat = torch.mm(h3, params[6]) + params[7]
+    return y_hat
+
+# Cross-entropy loss function
+loss = nn.CrossEntropyLoss(reduction='none')
+```
+
 ## Data Synchronization
 
 For efficient multi-GPU training we need two basic operations: firstly we need to have the ability to distribute a list of parameters to multiple devices and to attach gradients (`get_params`). Without parameters it is impossible to evaluate the network on a GPU. Secondly, we need the ability to sum parameters across multiple devices, i.e., we need an `allreduce` function.
 
-```{.python .input  n=12}
+```{.python .input}
 def get_params(params, device):
     new_params = [p.copyto(device) for p in params]
     for p in new_params:
@@ -111,9 +152,19 @@ def get_params(params, device):
     return new_params
 ```
 
+```{.python .input}
+#@tab pytorch
+def get_params(params, device):
+    new_params = [p.clone().to(device) for p in params]
+    for p in new_params:
+        p.requires_grad_()
+    return new_params
+```
+
 Let us try it out by copying the model parameters of lenet to gpu(0).
 
-```{.python .input  n=13}
+```{.python .input}
+#@tab all
 new_params = get_params(params, d2l.try_gpu(0))
 print('b1 weight:', new_params[1])
 print('b1 grad:', new_params[1].grad)
@@ -121,7 +172,7 @@ print('b1 grad:', new_params[1].grad)
 
 Since we didn't perform any computation yet, the gradient with regard to the bias weights is still $0$. Now let us assume that we have a vector distributed across multiple GPUs. The following `allreduce` function adds up all vectors and broadcasts the result back to all GPUs. Note that for this to work we need to copy the data to the device accumulating the results.
 
-```{.python .input  n=14}
+```{.python .input}
 def allreduce(data):
     for i in range(1, len(data)):
         data[0][:] += data[i].copyto(data[0].ctx)
@@ -129,10 +180,27 @@ def allreduce(data):
         data[0].copyto(data[i])
 ```
 
+```{.python .input}
+#@tab pytorch
+def allreduce(data):
+    for i in range(1, len(data)):
+        data[0][:] += data[i].to(data[0].device)
+    for i in range(1, len(data)):
+        data[i] = data[0].to(data[i].device)
+```
+
 Let us test this by creating vectors with different values on different devices and aggregate them.
 
-```{.python .input  n=16}
+```{.python .input}
 data = [np.ones((1, 2), ctx=d2l.try_gpu(i)) * (i + 1) for i in range(2)]
+print('before allreduce:\n', data[0], '\n', data[1])
+allreduce(data)
+print('after allreduce:\n', data[0], '\n', data[1])
+```
+
+```{.python .input}
+#@tab pytorch
+data = [torch.ones((1, 2), device=d2l.try_gpu(i)) * (i + 1) for i in range(2)]
 print('before allreduce:\n', data[0], '\n', data[1])
 allreduce(data)
 print('after allreduce:\n', data[0], '\n', data[1])
@@ -142,7 +210,7 @@ print('after allreduce:\n', data[0], '\n', data[1])
 
 We need a simple utility function to distribute a minibatch evenly across multiple GPUs. For instance, on 2 GPUs we'd like to have half of the data to be copied to each of the GPUs. Since it is more convenient and more concise, we use the built-in split and load function in Gluon (to try it out on a $4 \times 5$ matrix).
 
-```{.python .input  n=8}
+```{.python .input}
 data = np.arange(20).reshape(4, 5)
 devices = [npx.gpu(0), npx.gpu(1)]
 split = gluon.utils.split_and_load(data, devices)
@@ -151,9 +219,19 @@ print('load into', devices)
 print('output:', split)
 ```
 
+```{.python .input}
+#@tab pytorch
+data = torch.arange(20).reshape(4, 5)
+devices = [torch.device('cuda:0'), torch.device('cuda:1')]
+split = nn.parallel.scatter(data, devices)
+print('input :', data)
+print('load into', devices)
+print('output:', split)
+```
+
 For later reuse we define a `split_batch` function which splits both data and labels.
 
-```{.python .input  n=9}
+```{.python .input}
 #@save
 def split_batch(X, y, devices):
     """Split `X` and `y` into multiple devices."""
@@ -162,11 +240,21 @@ def split_batch(X, y, devices):
             gluon.utils.split_and_load(y, devices))
 ```
 
+```{.python .input}
+#@tab pytorch
+#@save
+def split_batch(X, y, devices):
+    """Split `X` and `y` into multiple devices."""
+    assert X.shape[0] == y.shape[0]
+    return (nn.parallel.scatter(X, devices),
+            nn.parallel.scatter(y, devices))
+```
+
 ## Training
 
 Now we can implement multi-GPU training on a single minibatch. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs. Note that we do not need to write any specific code to achieve parallelism. Since the computational graph does not have any dependencies across devices within a minibatch, it is executed in parallel *automatically*.
 
-```{.python .input  n=10}
+```{.python .input}
 def train_batch(X, y, device_params, devices, lr):
     X_shards, y_shards = split_batch(X, y, devices)
     with autograd.record():  # Loss is calculated separately on each GPU
@@ -183,9 +271,28 @@ def train_batch(X, y, device_params, devices, lr):
         d2l.sgd(param, lr, X.shape[0])  # Here, we use a full-size batch
 ```
 
+```{.python .input}
+#@tab pytorch
+def train_batch(X, y, device_params, devices, lr):
+    X_shards, y_shards = split_batch(X, y, devices)
+    # Loss is calculated separately on each GPU
+    losses = [loss(lenet(X_shard, device_W), y_shard).sum()
+              for X_shard, y_shard, device_W in zip(
+                  X_shards, y_shards, device_params)]
+    for l in losses:  # Back Propagation is performed separately on each GPU
+        l.backward()
+    # Sum all gradients from each GPU and broadcast them to all GPUs
+    with torch.no_grad():
+        for i in range(len(device_params[0])):
+            allreduce([device_params[c][i].grad for c in range(len(devices))])
+    # The model parameters are updated separately on each GPU
+    for param in device_params:
+        d2l.sgd(param, lr, X.shape[0]) # Here, we use a full-size batch
+```
+
 Now, we can define the training function. It is slightly different from the ones used in the previous chapters: we need to allocate the GPUs and copy all the model parameters to all devices. Obviously each batch is processed using `train_batch` to deal with multiple GPUs. For convenience (and conciseness of code) we compute the accuracy on a single GPU (this is *inefficient* since the other GPUs are idle).
 
-```{.python .input  n=61}
+```{.python .input}
 def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     devices = [d2l.try_gpu(i) for i in range(num_gpus)]
@@ -209,17 +316,44 @@ def train(num_gpus, batch_size, lr):
           f'on {str(devices)}')
 ```
 
+```{.python .input}
+#@tab pytorch
+def train(num_gpus, batch_size, lr):
+    train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+    devices = [d2l.try_gpu(i) for i in range(num_gpus)]
+    # Copy model parameters to num_gpus GPUs
+    device_params = [get_params(params, d) for d in devices]
+    # num_epochs, times, acces = 10, [], []
+    num_epochs = 10
+    animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])
+    timer = d2l.Timer()
+    for epoch in range(num_epochs):
+        timer.start()
+        for X, y in train_iter:
+            # Perform multi-GPU training for a single minibatch
+            train_batch(X, y, device_params, devices, lr)
+            torch.cuda.synchronize()
+        timer.stop()
+        # Verify the model on GPU 0
+        animator.add(epoch + 1, (d2l.evaluate_accuracy_gpu(
+            lambda x: lenet(x, device_params[0]), test_iter, devices[0]),))
+    print(f'test acc: {animator.Y[0][-1]:.2f}, {timer.avg():.1f} sec/epoch '
+          f'on {str(devices)}')
+```
+
 ## Experiment
 
 Let us see how well this works on a single GPU. We use a batch size of 256 and a learning rate of 0.2.
 
-```{.python .input  n=62}
+```{.python .input}
+#@tab all
 train(num_gpus=1, batch_size=256, lr=0.2)
 ```
 
 By keeping the batch size and learning rate unchanged and changing the number of GPUs to 2, we can see that the improvement in test accuracy is roughly the same as in the results from the previous experiment. In terms of the optimization algorithms, they are identical. Unfortunately there is no meaningful speedup to be gained here: the model is simply too small; moreover we only have a small dataset, where our slightly unsophisticated approach to implementing multi-GPU training suffered from significant Python overhead. We will encounter more complex models and more sophisticated ways of parallelization going forward. Let us see what happens nonetheless for Fashion-MNIST.
 
-```{.python .input  n=13}
+```{.python .input}
+#@tab all
 train(num_gpus=2, batch_size=256, lr=0.2)
 ```
 
@@ -239,4 +373,8 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/364)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1669)
 :end_tab:
