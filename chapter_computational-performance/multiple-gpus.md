@@ -376,5 +376,5 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/364)
+[Discussions](https://discuss.d2l.ai/t/1669)
 :end_tab:
