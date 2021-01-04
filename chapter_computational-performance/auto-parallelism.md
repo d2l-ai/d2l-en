@@ -146,7 +146,14 @@ with d2l.Benchmark('Copy to CPU'):
     torch.cuda.synchronize()
 ```
 
+:begin_tab:`mxnet`
 This is somewhat inefficient. Note that we could already start copying parts of `y` to the CPU while the remainder of the list is still being computed. This situation occurs, e.g., when we compute the (backprop) gradient on a minibatch. The gradients of some of the parameters will be available earlier than that of others. Hence it works to our advantage to start using PCI-Express bus bandwidth while the GPU is still running. Removing `waitall` between both parts allows us to simulate this scenario.
+:end_tab:
+
+:begin_tab:`pytorch`
+This is somewhat inefficient. Note that we could already start copying parts of `y` to the CPU while the remainder of the list is still being computed. This situation occurs, e.g., when we compute the (backprop) gradient on a minibatch. The gradients of some of the parameters will be available earlier than that of others. Hence it works to our advantage to start using PCI-Express bus bandwidth while the GPU is still running. In PyTorch, several functions such as `to()` and `copy_()` admit an explicit `non_blocking` argument, which lets the caller bypass synchronization when it is unnecessary. Setting `non_blocking=True` allows us to simulate this scenario.
+:end_tab:
+
 
 ```{.python .input}
 with d2l.Benchmark('Run on GPU1 and copy to CPU'):
@@ -190,5 +197,5 @@ We conclude with an illustration of the computational graph and its dependencies
 :end_tab:
 
 :begin_tab:`pytorch`
-[Discussions](https://discuss.d2l.ai/t/)
+[Discussions](https://discuss.d2l.ai/t/1681)
 :end_tab:
