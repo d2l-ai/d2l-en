@@ -39,8 +39,8 @@ devices = d2l.try_all_gpus()
 def run(x):
     return [x.dot(x) for _ in range(50)]
 
-x_gpu1 = np.random.uniform(size=(6000, 6000), ctx=devices[0])
-x_gpu2 = np.random.uniform(size=(6000, 6000), ctx=devices[1])
+x_gpu1 = np.random.uniform(size=(4000, 4000), ctx=devices[0])
+x_gpu2 = np.random.uniform(size=(4000, 4000), ctx=devices[1])
 ```
 
 ```{.python .input}
@@ -49,8 +49,8 @@ devices = d2l.try_all_gpus()
 def run(x):
     return [x.mm(x) for _ in range(50)]
 
-x_gpu1 = torch.rand(size=(6000, 6000), device=devices[0])
-x_gpu2 = torch.rand(size=(6000, 6000), device=devices[1])
+x_gpu1 = torch.rand(size=(4000, 4000), device=devices[0])
+x_gpu2 = torch.rand(size=(4000, 4000), device=devices[1])
 ```
 
 
