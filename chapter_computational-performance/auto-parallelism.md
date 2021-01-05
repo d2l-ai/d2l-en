@@ -39,8 +39,8 @@ devices = d2l.try_all_gpus()
 def run(x):
     return [x.dot(x) for _ in range(50)]
 
-x_gpu1 = np.random.uniform(size=(6000, 6000), ctx=devices[0])
-x_gpu2 = np.random.uniform(size=(6000, 6000), ctx=devices[1])
+x_gpu1 = np.random.uniform(size=(4000, 4000), ctx=devices[0])
+x_gpu2 = np.random.uniform(size=(4000, 4000), ctx=devices[1])
 ```
 
 ```{.python .input}
@@ -49,11 +49,19 @@ devices = d2l.try_all_gpus()
 def run(x):
     return [x.mm(x) for _ in range(50)]
 
-x_gpu1 = torch.rand(size=(6000, 6000), device=devices[0])
-x_gpu2 = torch.rand(size=(6000, 6000), device=devices[1])
+x_gpu1 = torch.rand(size=(4000, 4000), device=devices[0])
+x_gpu2 = torch.rand(size=(4000, 4000), device=devices[1])
 ```
 
+
+:begin_tab:`mxnet`
 Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on each of them prior to measuring.
+:end_tab:
+
+:begin_tab:`pytorch`
+Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on each of them prior to measuring. `torch.cuda.synchronize()` waits for all kernels in all streams on a CUDA device to complete. It takes in a `device` argument, the device for which we need to synchronize. It uses the current device, given by `current_device()`, if the device argument is `None` (default).
+:end_tab:
+
 
 ```{.python .input}
 run(x_gpu1)  # Warm-up both devices
