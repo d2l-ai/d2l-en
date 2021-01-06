@@ -333,7 +333,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
     """Train a model with a GPU (defined in Chapter 6)."""
     def init_weights(m):
         if type(m) == nn.Linear or type(m) == nn.Conv2d:
-            torch.nn.init.xavier_uniform_(m.weight)
+            nn.init.xavier_uniform_(m.weight)
     net.apply(init_weights)
     print('training on', device)
     net.to(device)

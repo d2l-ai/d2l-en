@@ -62,7 +62,7 @@ net = nn.Sequential(nn.Flatten(), nn.Linear(784, 10))
 
 def init_weights(m):
     if type(m) == nn.Linear:
-        torch.nn.init.normal_(m.weight, std=0.01)
+        nn.init.normal_(m.weight, std=0.01)
 
 net.apply(init_weights);
 ```
