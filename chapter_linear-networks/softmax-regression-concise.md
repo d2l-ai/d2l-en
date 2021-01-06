@@ -56,19 +56,15 @@ net.initialize(init.Normal(sigma=0.01))
 
 ```{.python .input}
 #@tab pytorch
-# PyTorch does not implicitly reshape the inputs. Thus we define a layer to
-# reshape the inputs in our network
-class Reshape(torch.nn.Module):
-    def forward(self, x):
-        return x.view(-1,784)
-
-net = nn.Sequential(Reshape(), nn.Linear(784, 10))
+# PyTorch does not implicitly reshape the inputs. Thus we define the flatten
+# layer to reshape the inputs before the linear layer in our network
+net = nn.Sequential(nn.Flatten(), nn.Linear(784, 10))
 
 def init_weights(m):
     if type(m) == nn.Linear:
         torch.nn.init.normal_(m.weight, std=0.01)
 
-net.apply(init_weights)
+net.apply(init_weights);
 ```
 
 ```{.python .input}
