@@ -164,15 +164,15 @@ def get_params(vocab_size, num_hiddens):
     num_inputs = num_outputs = vocab_size
     
     def normal(shape):
-        return d2l.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32)
+        return tf.Variable(tf.random.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32))
 
     # Hidden layer parameters
-    W_xh = tf.Variable(normal((num_inputs, num_hiddens)), dtype=tf.float32)
-    W_hh = tf.Variable(normal((num_hiddens, num_hiddens)), dtype=tf.float32)
-    b_h = tf.Variable(d2l.zeros(num_hiddens), dtype=tf.float32)
+    W_xh = normal((num_inputs, num_hiddens))
+    W_hh = normal((num_hiddens, num_hiddens))
+    b_h = tf.Variable(tf.zeros(num_hiddens), dtype=tf.float32)
     # Output layer parameters
-    W_hq = tf.Variable(normal((num_hiddens, num_outputs)), dtype=tf.float32)
-    b_q = tf.Variable(d2l.zeros(num_outputs), dtype=tf.float32)
+    W_hq = normal((num_hiddens, num_outputs))
+    b_q = tf.Variable(tf.zeros(num_outputs), dtype=tf.float32)
     params = [W_xh, W_hh, b_h, W_hq, b_q]
     return params
 ```
