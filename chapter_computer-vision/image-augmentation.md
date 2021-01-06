@@ -223,8 +223,8 @@ def load_cifar10(is_train, augs, batch_size):
 ```{.python .input}
 #@tab pytorch
 def load_cifar10(is_train, augs, batch_size):
-    dataset = torchvision.datasets.CIFAR10(
-        root="../data/cifar10", train=is_train, transform=augs, download=True)
+    dataset = torchvision.datasets.CIFAR10(root="../data", train=is_train,
+                                           transform=augs, download=True)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                     shuffle=is_train, num_workers=d2l.get_dataloader_workers())
     return dataloader
