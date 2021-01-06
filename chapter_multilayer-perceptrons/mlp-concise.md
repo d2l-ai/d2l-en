@@ -55,7 +55,7 @@ def init_weights(m):
     if type(m) == nn.Linear:
         torch.nn.init.normal_(m.weight, std=0.01)
 
-net.apply(init_weights)
+net.apply(init_weights);
 ```
 
 ```{.python .input}
