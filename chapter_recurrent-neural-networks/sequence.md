@@ -192,7 +192,7 @@ loss = gluon.loss.L2Loss()
 # Function for initializing the weights of the network
 def init_weights(m):
     if type(m) == nn.Linear:
-        torch.nn.init.xavier_uniform_(m.weight)
+        nn.init.xavier_uniform_(m.weight)
 
 # A simple MLP
 def get_net():
