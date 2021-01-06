@@ -5,7 +5,7 @@
 We have compared CNNs, RNNs, and self-attention in
 :numref:`subsec_cnn-rnn-self-attention`.
 Notably,
-self-attention 
+self-attention
 enjoys both parallel computation and
 the shortest maximum path length.
 Therefore natually,
@@ -19,7 +19,7 @@ without any convolutional or recurrent layer :cite:`Vaswani.Shazeer.Parmar.ea.20
 Though originally proposed
 for sequence to sequence learning on text data,
 Transformers have been
-pervasive in a wide range of 
+pervasive in a wide range of
 modern deep learning applications,
 such as in areas of language, vision, speech, and reinforcement learning.
 
@@ -28,13 +28,13 @@ such as in areas of language, vision, speech, and reinforcement learning.
 
 As an instance of the encoder-decoder
 architecture,
-the overall architecture of 
+the overall architecture of
 the Transformer
 is presented in :numref:`fig_transformer`.
 As we can see,
 the Transformer is composed of an encoder and a decoder.
 Different from
-Bahdanau attention 
+Bahdanau attention
 for sequence to sequence learning
 in :numref:`fig_s2s_attention_details`,
 the input (source) and output (target)
@@ -49,10 +49,10 @@ that stack modules based on self-attention.
 :label:`fig_transformer`
 
 
-Now we provide an overview of the 
+Now we provide an overview of the
 Transformer architecture in :numref:`fig_transformer`.
 On a high level,
-the Transformer encoder is a stack of multiple identical layers, 
+the Transformer encoder is a stack of multiple identical layers,
 where each layer
 has two sublayers (either is denoted as $\mathrm{sublayer}$).
 The first
@@ -166,7 +166,7 @@ class PositionWiseFFN(nn.Module):
 
 The following example
 shows that the innermost dimension
-of a tensor changes to 
+of a tensor changes to
 the number of outputs in
 the positionwise feed-forward network.
 Since the same MLP transforms
@@ -198,11 +198,11 @@ followed by layer normalization.
 Both are key to effective deep architectures.
 
 In :numref:`sec_batch_norm`,
-we explained how batch normalization 
+we explained how batch normalization
 recenters and rescales across the examples within
 a minibatch.
 Layer normalization is the same as batch normalization
-except that the former 
+except that the former
 normalizes across the feature dimension.
 Despite its pervasive applications
 in computer vision,
@@ -441,7 +441,7 @@ encoder(d2l.ones((2, 100), dtype=torch.long), valid_lens).shape
 ## Decoder
 
 As shown in :numref:`fig_transformer`,
-the Transformer decoder 
+the Transformer decoder
 is composed of multiple identical layers.
 Each layer is implemented in the following
 `DecoderBlock` class,
@@ -473,7 +473,7 @@ can be used in the decoder self-attention.
 To preserve auto-regression in the decoder,
 its masked self-attention
 specifies  `dec_valid_lens` so that
-any query 
+any query
 only attends to
 all positions in the decoder
 up to the query position.
@@ -679,7 +679,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
             self._attention_weights[1][
                 i] = blk.attention2.attention.attention_weights
         return self.dense(X), state
-    
+
     @property
     def attention_weights(self):
         return self._attention_weights
@@ -864,7 +864,7 @@ for different deep learning tasks.
 * The Transformer is an instance of the encoder-decoder architecture, though either the encoder or the decoder can be used individually in practice.
 * In the Transformer, multi-head self-attention is used for representing the input sequence and the output sequence, though the decoder has to preserve the auto-regressive property via a masked version.
 * Both the residual connections and the layer normalization in the Transformer are important for training a very deep model.
-* The positionwise feed-forward network in the Transformer model transforms the representation at all the sequence positions using the same MLP. 
+* The positionwise feed-forward network in the Transformer model transforms the representation at all the sequence positions using the same MLP.
 
 
 ## Exercises
@@ -882,3 +882,4 @@ for different deep learning tasks.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1066)
 :end_tab:
+
