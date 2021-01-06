@@ -22,7 +22,7 @@
         * Without accents (``)
     * `backward` function
         * not `backward()` function
-    * for-loop
+    * "for-loop" not "for loop"
 * Terminologies
     * Consistently use
         * function (not method)
@@ -30,15 +30,13 @@
         * weight, bias, label
         * model training, model prediction (model inference)
         * training/testing/validation dataset
-        * data point (preferred)/data instance/training example/testing example/example of the dataset
+        * prefer using "data/training/testing example" over "data instance" or "data point"
     * Distinguish：
         * hyperparameter vs parameter
         * minibatch stochastic gradient descent vs stochastic gradient descent
-    * List
-        * https://github.com/mli/gluon-tutorials-zh/blob/master/TERMINOLOGY.md
 * Use numerals when they are explaining or part of code or math.
 * Acceptable abbreviations
-    * MLP, CNN, RNN, GRU, LSTM, model names (e.g., ELMo, GPT, BERT)
+    * AI, MLP, CNN, RNN, GRU, LSTM, model names (e.g., ELMo, GPT, BERT)
     * We spell out full names in most cases to be clear (e.g., NLP -> natural language processing)
 
 ## Math
@@ -76,7 +74,7 @@
             * Light：B2D9FF
             * (Try to avoid) Extra Light: CFF4FF
 * Be careful about copyright
-* matplotlib
+
 
 ## Code
 
@@ -114,10 +112,6 @@
     * For clarity, surround variable names with accents, e.g.,  # shape of `X`
 * imports
     * import alphabetically
-    * `from mxnet.gluon import data as gdata, loss as gloss, nn, utils as gutils`
-* Print outputs
-    * `epoch, lr, loss, train acc, time`
-    * Around 5 lines
 * Print variables
     * if possible use `x, y` instead of `print('x:', x, 'y:', y)` at the end of the code block
 * String
@@ -125,11 +119,8 @@
     * Use f-strings. To break a long f-string into multi-lines, just use one f-string per line.
 * Other items
     * `nd.f(x)` → `x.nd`
-    * `random_normal` → `random.normal`
-    * multiple imports
     * `.1` → `1.0`
     * 1. → `1.0`
-    * remove namescope
 
 
 ## References
@@ -137,10 +128,6 @@
 * Refer to [d2lbook](https://book.d2l.ai/user/markdown.html#cross-references) on how to add references for figure, table and equations.
 
 
-## QR Code
-
-* https://www.the-qrcode-generator.com/
-    * 75pixel, SVG
 
 ## Citations
 

@@ -38,7 +38,9 @@ Given a minibatch of examples $\mathbf{X} \in \mathbb{R}^{n \times d}$ with batc
 $$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h).$$
 :eqlabel:`rnn_h_without_state`
 
-In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer. Next, the hidden variable $\mathbf{H}$ is used as the input of the output layer. The output layer is given by
+In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer. 
+Thus, broadcasting (see :numref:`subsec_broadcasting`) is applied during the summation.
+Next, the hidden variable $\mathbf{H}$ is used as the input of the output layer. The output layer is given by
 
 $$\mathbf{O} = \mathbf{H} \mathbf{W}_{hq} + \mathbf{b}_q,$$
 
@@ -184,8 +186,10 @@ we aim to predict the next token based on
 the current and past tokens,
 thus we shift the original sequence by one token
 as the labels.
-Now we illustrate how RNNs can be used to build a language model. 
-Let the minibatch size be 1, and the sequence of the text be "machine".
+Bengio et al. first proposed
+to use a neural network for language modeling :cite:`Bengio.Ducharme.Vincent.ea.2003`.
+In the following we illustrate how RNNs can be used to build a language model.
+Let the minibatch size be one, and the sequence of the text be "machine".
 To simplify training in subsequent sections,
 we tokenize text into characters rather than words
 and consider a *character-level language model*.

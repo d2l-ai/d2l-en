@@ -111,7 +111,7 @@ npx.set_np()
 %matplotlib inline
 from d2l import torch as d2l
 import torch
-import torch.nn as nn
+from torch import nn
 ```
 
 ```{.python .input}
@@ -192,7 +192,7 @@ loss = gluon.loss.L2Loss()
 # Function for initializing the weights of the network
 def init_weights(m):
     if type(m) == nn.Linear:
-        torch.nn.init.xavier_uniform_(m.weight)
+        nn.init.xavier_uniform_(m.weight)
 
 # A simple MLP
 def get_net():
@@ -287,8 +287,7 @@ namely the *one-step-ahead prediction*.
 #@tab all
 onestep_preds = net(features)
 d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(onestep_preds)], 'time',
-         'x', legend=['data', '1-step preds'], xlim=[1, 1000],
-         figsize=(6, 3))
+         'x', legend=['data', '1-step preds'], xlim=[1, 1000], figsize=(6, 3))
 ```
 
 The one-step-ahead predictions look nice, just as we expected.
@@ -315,8 +314,8 @@ Let us see how well this goes.
 multistep_preds = d2l.zeros(T)
 multistep_preds[: n_train + tau] = x[: n_train + tau]
 for i in range(n_train + tau, T):
-    multistep_preds[i] = d2l.reshape(net(
-        multistep_preds[i - tau: i].reshape(1, -1)), 1)
+    multistep_preds[i] = net(
+        d2l.reshape(multistep_preds[i - tau: i], (1, -1)))
 ```
 
 ```{.python .input}
@@ -357,7 +356,7 @@ features = d2l.zeros((T - tau - max_steps + 1, tau + max_steps))
 # Column `i` (`i` < `tau`) are observations from `x` for time steps from
 # `i + 1` to `i + T - tau - max_steps + 1`
 for i in range(tau):
-    features[:, i] = x[i: i + T - tau - max_steps + 1].T
+    features[:, i] = x[i: i + T - tau - max_steps + 1]
 
 # Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
 # time steps from `i + 1` to `i + T - tau - max_steps + 1`
@@ -371,7 +370,7 @@ features = tf.Variable(d2l.zeros((T - tau - max_steps + 1, tau + max_steps)))
 # Column `i` (`i` < `tau`) are observations from `x` for time steps from
 # `i + 1` to `i + T - tau - max_steps + 1`
 for i in range(tau):
-    features[:, i].assign(x[i: i + T - tau - max_steps + 1].numpy().T)
+    features[:, i].assign(x[i: i + T - tau - max_steps + 1].numpy())
 
 # Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
 # time steps from `i + 1` to `i + T - tau - max_steps + 1`
@@ -397,7 +396,7 @@ While the 4-step-ahead predictions still look good, anything beyond that is almo
 * There is quite a difference in difficulty between interpolation and extrapolation. Consequently, if you have a sequence, always respect the temporal order of the data when training, i.e., never train on future data.
 * Sequence models require specialized statistical tools for estimation. Two popular choices are autoregressive models and latent-variable autoregressive models.
 * For causal models (e.g., time going forward), estimating the forward direction is typically a lot easier than the reverse direction.
-* For an observed sequence up to time step $t$, its predicted output at time step $t+k$ is the *$k$-step-ahead prediction*. As we predict further in time by increasing $k$, the errors accumulate and the quality of the prediction degrades, often dramatically.
+* For an observed sequence up to time step $t$, its predicted output at time step $t+k$ is the $k$*-step-ahead prediction*. As we predict further in time by increasing $k$, the errors accumulate and the quality of the prediction degrades, often dramatically.
 
 
 ## Exercises

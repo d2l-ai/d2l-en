@@ -27,7 +27,7 @@ To build it, we simply need to inherit
 from the base layer class and implement the forward propagation function.
 
 ```{.python .input}
-from mxnet import gluon, np, npx
+from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
@@ -43,7 +43,7 @@ class CenteredLayer(nn.Block):
 #@tab pytorch
 import torch
 from torch import nn
-import torch.nn.functional as F
+from torch.nn import functional as F
 
 class CenteredLayer(nn.Module):
     def __init__(self):
@@ -263,7 +263,6 @@ net(tf.random.uniform((2, 64)))
 1. Design a layer that takes an input and computes a tensor reduction,
    i.e., it returns $y_k = \sum_{i, j} W_{ijk} x_i x_j$.
 1. Design a layer that returns the leading half of the Fourier coefficients of the data.
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/58)

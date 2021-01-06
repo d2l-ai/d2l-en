@@ -176,7 +176,7 @@ print(segment_BPE(tokens, symbols))
 
 ## Exercises
 
-1. When there are too many subwords (for example, 6 words in English result in about $3\times 10^8$ combinations), what problems arise? Can you think of any methods to solve them? Hint: Refer to the end of section 3.2 of the fastText paper[1].
+1. When there are too many subwords (for example, 6 words in English result in about $3\times 10^8$ combinations), what problems arise? Can you think of any methods to solve them? Hint: Refer to the end of section 3.2 of the fastText paper :cite:`Bojanowski.Grave.Joulin.ea.2017`.
 1. How can you design a subword embedding model based on the continuous bag-of-words model?
 1. To get a vocabulary of size $m$, how many merging operations are needed when the initial symbol vocabulary size is $n$?
 1. How can we extend the idea of byte pair encoding to extract phrases?

@@ -539,8 +539,8 @@ class Vocab:
             reserved_tokens = [] 
         # Sort according to frequencies
         counter = count_corpus(tokens)
-        self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
-        self.token_freqs.sort(key=lambda x: x[1], reverse=True)
+        self.token_freqs = sorted(counter.items(), key=lambda x: x[1],
+                                  reverse=True)
         # The index for the unknown token is 0
         self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
         uniq_tokens += [token for token, freq in self.token_freqs
@@ -589,8 +589,9 @@ def load_corpus_time_machine(max_tokens=-1):
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 def seq_data_iter_random(corpus, batch_size, num_steps):
     """Generate a minibatch of subsequences using random sampling."""
-    # Start with a random offset to partition a sequence
-    corpus = corpus[random.randint(0, num_steps):]
+    # Start with a random offset (inclusive of `num_steps - 1`) to partition a
+    # sequence
+    corpus = corpus[random.randint(0, num_steps - 1):]
     # Subtract 1 since we need to account for labels
     num_subseqs = (len(corpus) - 1) // num_steps
     # The starting indices for subsequences of length `num_steps`
@@ -604,8 +605,8 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
         # Return a sequence of length `num_steps` starting from `pos`
         return corpus[pos: pos + num_steps]
 
-    num_subseqs_per_example = num_subseqs // batch_size
-    for i in range(0, batch_size * num_subseqs_per_example, batch_size):
+    num_batches = num_subseqs // batch_size
+    for i in range(0, batch_size * num_batches, batch_size):
         # Here, `initial_indices` contains randomized starting indices for
         # subsequences
         initial_indices_per_batch = initial_indices[i: i + batch_size]
@@ -673,16 +674,16 @@ class RNNModelScratch:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_preds, model, vocab, params):
+def predict_ch8(prefix, num_preds, net, vocab, params):
     """Generate new characters following the `prefix`."""
-    state = model.begin_state(batch_size=1)
+    state = net.begin_state(batch_size=1)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
     for y in prefix[1:]:  # Warm-up period
-        _, state = model(get_input(), state, params)
+        _, state = net(get_input(), state, params)
         outputs.append(vocab[y])
     for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = model(get_input(), state, params)
+        y, state = net(get_input(), state, params)
         outputs.append(int(y.numpy().argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
@@ -705,8 +706,7 @@ def grad_clipping(grads, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(model, train_iter, loss, updater,
-                    params, use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater, params, use_random_iter):
     """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
@@ -714,11 +714,11 @@ def train_epoch_ch8(model, train_iter, loss, updater,
         if state is None or use_random_iter:
             # Initialize `state` when either it is the first iteration or
             # using random sampling
-            state = model.begin_state(batch_size=X.shape[0])
+            state = net.begin_state(batch_size=X.shape[0])
         with tf.GradientTape(persistent=True) as g:
             g.watch(params)
-            y_hat, state= model(X, state, params)
-            y = d2l.reshape(Y, (-1))
+            y_hat, state= net(X, state, params)
+            y = d2l.reshape(tf.transpose(Y), (-1))
             l = loss(y, y_hat)
         grads = g.gradient(l, params)
         grads = grad_clipping(grads, 1)
@@ -732,7 +732,7 @@ def train_epoch_ch8(model, train_iter, loss, updater,
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
+def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
               use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
     with strategy.scope():
@@ -741,11 +741,11 @@ def train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
         updater = tf.keras.optimizers.SGD(lr)
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[10, num_epochs])
-    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, params)
+    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, params)
     # Train and predict
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
-             model, train_iter, loss, updater, params, use_random_iter)
+             net, train_iter, loss, updater, params, use_random_iter)
         if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
@@ -880,7 +880,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
     w = tf.Variable(tf.random.normal(shape=(feature_dim, 1),
                                    mean=0, stddev=0.01),trainable=True)
     b = tf.Variable(tf.zeros(1), trainable=True)
-  
+
     # Train
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
@@ -891,7 +891,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
         for X, y in data_iter:
           with tf.GradientTape() as g:
             l = tf.math.reduce_mean(loss(net(X), y))
-      
+
           dw, db = g.gradient(l, [w, b])
           trainer_fn([w, b], [dw, db], states, hyperparams)
           n += X.shape[0]
@@ -910,11 +910,11 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
     # Initialization
     net = tf.keras.Sequential()
-    net.add(tf.keras.layers.Dense(1, 
+    net.add(tf.keras.layers.Dense(1,
             kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
     optimizer = trainer_fn(**hyperparams)
     loss = tf.keras.losses.MeanSquaredError()
-    # Note: L2 Loss = 1/2 * MSE Loss. TensorFlow has MSE Loss which is 
+    # Note: L2 Loss = 1/2 * MSE Loss. TensorFlow has MSE Loss which is
     # slightly different from MXNet's L2Loss by a factor of 2. Hence we halve
     # the loss value to get L2Loss in TensorFlow
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
@@ -937,6 +937,28 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
                 animator.add(q, r)
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+
+
+# Defined in file: ./chapter_computer-vision/bounding-box.md
+def box_corner_to_center(boxes):
+    """Convert from (upper_left, bottom_right) to (center, width, height)"""
+    x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
+    cx = (x1 + x2) / 2
+    cy = (y1 + y2) / 2
+    w = x2 - x1
+    h = y2 - y1
+    boxes = d2l.stack((cx, cy, w, h), axis=-1)
+    return boxes
+
+def box_center_to_corner(boxes):
+    """Convert from (center, width, height) to (upper_left, bottom_right)"""
+    cx, cy, w, h = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
+    x1 = cx - 0.5 * w
+    y1 = cy - 0.5 * h
+    x2 = cx + 0.5 * w
+    y2 = cy + 0.5 * h
+    boxes = d2l.stack((x1, y1, x2, y2), axis=-1)
+    return boxes
 
 
 # Defined in file: ./chapter_computer-vision/bounding-box.md
@@ -964,6 +986,8 @@ cosh = tf.cosh
 tanh = tf.tanh
 linspace = tf.linspace
 exp = tf.exp
+normal = tf.random.normal
+rand = tf.random.uniform
 matmul = tf.matmul
 reduce_sum = tf.reduce_sum
 argmax = tf.argmax
@@ -975,7 +999,7 @@ float32 = tf.float32
 transpose = tf.transpose
 concat = tf.concat
 stack = tf.stack
-normal = tf.random.normal
 abs = tf.abs
+eye = tf.eye
 numpy = lambda x, *args, **kwargs: x.numpy(*args, **kwargs)
 

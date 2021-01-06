@@ -100,7 +100,7 @@ Even higher layers might represent whole objects
 like people, airplanes, dogs, or frisbees.
 Ultimately, the final hidden state learns a compact representation
 of the image that summarizes its contents
-such that data belonging to different categories be separated easily.
+such that data belonging to different categories can be easily separated.
 
 While the ultimate breakthrough for many-layered CNNs
 came in 2012, a core group of researchers had dedicated themselves

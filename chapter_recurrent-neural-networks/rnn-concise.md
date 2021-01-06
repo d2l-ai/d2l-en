@@ -202,17 +202,17 @@ Before training the model, let us make a prediction with the a model that has ra
 
 ```{.python .input}
 device = d2l.try_gpu()
-model = RNNModel(rnn_layer, len(vocab))
-model.initialize(force_reinit=True, ctx=device)
-d2l.predict_ch8('time traveller', 10, model, vocab, device)
+net = RNNModel(rnn_layer, len(vocab))
+net.initialize(force_reinit=True, ctx=device)
+d2l.predict_ch8('time traveller', 10, net, vocab, device)
 ```
 
 ```{.python .input}
 #@tab pytorch
 device = d2l.try_gpu()
-model = RNNModel(rnn_layer, vocab_size=len(vocab))
-model = model.to(device)
-d2l.predict_ch8('time traveller', 10, model, vocab, device)
+net = RNNModel(rnn_layer, vocab_size=len(vocab))
+net = net.to(device)
+d2l.predict_ch8('time traveller', 10, net, vocab, device)
 ```
 
 As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and train our model with high-level APIs.
@@ -220,7 +220,7 @@ As is quite obvious, this model does not work at all. Next, we call `train_ch8` 
 ```{.python .input}
 #@tab all
 num_epochs, lr = 500, 1
-d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+d2l.train_ch8(net, train_iter, vocab, lr, num_epochs, device)
 ```
 
 Compared with the last section, this model achieves comparable perplexity,

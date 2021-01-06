@@ -14,7 +14,7 @@ Things are a bit more subtle when it comes to single GPUs or even CPUs. These de
 
 The way to alleviate these constraints is to use a hierarchy of CPU caches which are actually fast enough to supply the processor with data. This is *the* driving force behind batching in deep learning. To keep matters simple, consider matrix-matrix multiplication, say $\mathbf{A} = \mathbf{B}\mathbf{C}$. We have a number of options for calculating $\mathbf{A}$. For instance we could try the following:
 
-1. We could compute $\mathbf{A}_{ij} = \mathbf{B}_{i,:} \mathbf{C}_{:,j}^\top$, i.e., we could compute it element-wise by means of dot products.
+1. We could compute $\mathbf{A}_{ij} = \mathbf{B}_{i,:} \mathbf{C}_{:,j}^\top$, i.e., we could compute it elementwise by means of dot products.
 1. We could compute $\mathbf{A}_{:,j} = \mathbf{B} \mathbf{C}_{:,j}^\top$, i.e., we could compute it one column at a time. Likewise we could compute $\mathbf{A}$ one row $\mathbf{A}_{i,:}$ at a time.
 1. We could simply compute $\mathbf{A} = \mathbf{B} \mathbf{C}$.
 1. We could break $\mathbf{B}$ and $\mathbf{C}$ into smaller block matrices and compute $\mathbf{A}$ one block at a time.
@@ -357,7 +357,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
     w = tf.Variable(tf.random.normal(shape=(feature_dim, 1),
                                    mean=0, stddev=0.01),trainable=True)
     b = tf.Variable(tf.zeros(1), trainable=True)
-  
+
     # Train
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
@@ -368,7 +368,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
         for X, y in data_iter:
           with tf.GradientTape() as g:
             l = tf.math.reduce_mean(loss(net(X), y))
-      
+
           dw, db = g.gradient(l, [w, b])
           trainer_fn([w, b], [dw, db], states, hyperparams)
           n += X.shape[0]
@@ -402,7 +402,7 @@ When the batch size equals 1, we use SGD for optimization. For simplicity of imp
 sgd_res = train_sgd(0.005, 1)
 ```
 
-Last, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is shorter than the time needed for SGD and the time for batch gradient descent.
+Finally, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is shorter than the time needed for SGD and the time for batch gradient descent.
 
 ```{.python .input}
 #@tab all
@@ -416,7 +416,7 @@ Reducing the batch size to 10, the time for each epoch increases because the wor
 mini2_res = train_sgd(.05, 10)
 ```
 
-Finally, we compare the time vs. loss for the preview four experiments. As can be seen, despite SGD converges faster than GD in terms of number of examples processed, it uses more time to reach the same loss than GD because that computing gradient example by example is not efficient. Minibatch SGD is able to trade-off the convergence speed and computation efficiency. A minibatch size 10 is more efficient than SGD; a minibatch size 100 even outperforms GD in terms of runtime.
+Now we can compare the time vs. loss for the previous four experiments. As can be seen, although SGD converges faster than GD in terms of number of examples processed, it uses more time to reach the same loss than GD because computing the gradient example by example is not as efficient. Minibatch SGD is able to trade-off convergence speed and computation efficiency. A minibatch size of 10 is more efficient than SGD; a minibatch size of 100 even outperforms GD in terms of runtime.
 
 ```{.python .input}
 #@tab all
@@ -468,12 +468,12 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
         if type(m) == nn.Linear:
             torch.nn.init.normal_(m.weight, std=0.01)
     net.apply(init_weights)
-    
+
     optimizer = trainer_fn(net.parameters(), **hyperparams)
-    
+
     loss = nn.MSELoss()
     # Note: L2 Loss = 1/2 * MSE Loss. PyTorch has MSE Loss which is slightly
-    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss 
+    # different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
     # value to get L2Loss in PyTorch
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
@@ -501,11 +501,11 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=4):
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
     # Initialization
     net = tf.keras.Sequential()
-    net.add(tf.keras.layers.Dense(1, 
+    net.add(tf.keras.layers.Dense(1,
             kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
     optimizer = trainer_fn(**hyperparams)
     loss = tf.keras.losses.MeanSquaredError()
-    # Note: L2 Loss = 1/2 * MSE Loss. TensorFlow has MSE Loss which is 
+    # Note: L2 Loss = 1/2 * MSE Loss. TensorFlow has MSE Loss which is
     # slightly different from MXNet's L2Loss by a factor of 2. Hence we halve
     # the loss value to get L2Loss in TensorFlow
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',

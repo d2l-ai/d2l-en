@@ -108,7 +108,7 @@ def get_fashion_mnist_labels(labels):  #@save
 We can now create a function to visualize these examples.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet, tensorflow
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
@@ -123,11 +123,34 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     return axes
 ```
 
+```{.python .input}
+#@tab pytorch
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
+    """Plot a list of images."""
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        if torch.is_tensor(img):
+            # Tensor Image
+            ax.imshow(img.numpy())
+        else:
+            # PIL Image
+            ax.imshow(img)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    return axes
+```
+
 Here are the images and their corresponding labels (in text)
 for the first few examples in the training dataset.
 
 ```{.python .input}
 X, y = mnist_train[:18]
+
+print(X.shape)
 show_images(X.squeeze(axis=-1), 2, 9, titles=get_fashion_mnist_labels(y));
 ```
 

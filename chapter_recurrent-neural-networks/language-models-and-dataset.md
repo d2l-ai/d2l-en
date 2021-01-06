@@ -149,7 +149,7 @@ import random
 ```{.python .input}
 #@tab all
 tokens = d2l.tokenize(d2l.read_time_machine())
-# Since each text line is not necessisarily a sentence or a paragraph, we
+# Since each text line is not necessarily a sentence or a paragraph, we
 # concatenate all text lines 
 corpus = [token for line in tokens for token in line]
 vocab = d2l.Vocab(corpus)
@@ -282,8 +282,9 @@ in each subsequence.
 #@tab all
 def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
     """Generate a minibatch of subsequences using random sampling."""
-    # Start with a random offset to partition a sequence
-    corpus = corpus[random.randint(0, num_steps):]
+    # Start with a random offset (inclusive of `num_steps - 1`) to partition a
+    # sequence
+    corpus = corpus[random.randint(0, num_steps - 1):]
     # Subtract 1 since we need to account for labels
     num_subseqs = (len(corpus) - 1) // num_steps
     # The starting indices for subsequences of length `num_steps`
@@ -297,8 +298,8 @@ def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
         # Return a sequence of length `num_steps` starting from `pos`
         return corpus[pos: pos + num_steps]
 
-    num_subseqs_per_example = num_subseqs // batch_size
-    for i in range(0, batch_size * num_subseqs_per_example, batch_size):
+    num_batches = num_subseqs // batch_size
+    for i in range(0, batch_size * num_batches, batch_size):
         # Here, `initial_indices` contains randomized starting indices for
         # subsequences
         initial_indices_per_batch = initial_indices[i: i + batch_size]
@@ -339,7 +340,7 @@ def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
     Ys = d2l.tensor(corpus[offset + 1: offset + 1 + num_tokens])
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
-    for i in range(0, num_batches * num_steps, num_steps):
+    for i in range(0, num_steps * num_batches, num_steps):
         X = Xs[:, i: i + num_steps]
         Y = Ys[:, i: i + num_steps]
         yield X, Y

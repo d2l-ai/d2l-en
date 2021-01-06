@@ -337,8 +337,9 @@ class MultiFactorScheduler:
         self.base_lr = base_lr
   
     def __call__(self, epoch):
-        if epoch in range(self.step[0], (self.step[1] + 1)):
-            return self.base_lr * self.factor
+        if epoch in self.step:
+            self.base_lr = self.base_lr * self.factor
+            return self.base_lr
         else:
             return self.base_lr
 

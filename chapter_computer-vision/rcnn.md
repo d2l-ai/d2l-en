@@ -60,7 +60,7 @@ forward computation on the image as a whole.
 ![Fast R-CNN model. ](../img/fast-rcnn.svg)
 :label:`fig_fast_r-cnn`
 
-:numref:`fig_fast_r-cnn` shows a Fast R-CNN model. It is primary computation
+:numref:`fig_fast_r-cnn` shows a Fast R-CNN model. Its primary computation
 steps are described below:
 
 1. Compared to an R-CNN model, a Fast R-CNN model uses the entire image as the
@@ -104,9 +104,15 @@ is the largest); 8 and 9 (9 is the largest); and 10.
 ![$2\times 2$ RoI pooling layer. ](../img/roi.svg)
 :label:`fig_roi`
 
+:begin_tab:`mxnet`
 We use the `ROIPooling` function to demonstrate the RoI pooling layer computation. Assume that the CNN extracts the feature `X` with both a height and width of 4 and only a single channel.
+:end_tab:
 
-```{.python .input  n=4}
+:begin_tab:`pytorch`
+We use the `roi_pool` function from `torchvision` to demonstrate the RoI pooling layer computation. Assume that the CNN extracts the feature `X` with both a height and width of 4 and only a single channel.
+:end_tab:
+
+```{.python .input}
 from mxnet import np, npx
 
 npx.set_np()
@@ -115,16 +121,35 @@ X = np.arange(16).reshape(1, 1, 4, 4)
 X
 ```
 
+```{.python .input}
+#@tab pytorch
+import torch
+import torchvision
+
+X = torch.arange(16.).reshape(1, 1, 4, 4)
+X
+```
+
 Assume that the height and width of the image are both 40 pixels and that selective search generates two proposed regions on the image. Each region is expressed as five elements: the region's object category and the $x, y$ coordinates of its upper-left and bottom-right corners.
 
-```{.python .input  n=5}
+```{.python .input}
 rois = np.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])
+```
+
+```{.python .input}
+#@tab pytorch
+rois = torch.Tensor([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])
 ```
 
 Because the height and width of `X` are $1/10$ of the height and width of the image, the coordinates of the two proposed regions are multiplied by 0.1 according to the `spatial_scale`, and then the RoIs are labeled on `X` as `X[:, :, 0:3, 0:3]` and `X[:, :, 1:4, 0:4]`, respectively. Finally, we divide the two RoIs into a sub-window grid and extract features with a height and width of 2.
 
-```{.python .input  n=6}
+```{.python .input}
 npx.roi_pooling(X, rois, pooled_size=(2, 2), spatial_scale=0.1)
+```
+
+```{.python .input}
+#@tab pytorch
+torchvision.ops.roi_pool(X, rois, output_size=(2, 2), spatial_scale=0.1)
 ```
 
 ## Faster R-CNN
@@ -208,7 +233,10 @@ chapter.
 
 1. Study the implementation of each model in the [GluonCV toolkit](https://github.com/dmlc/gluon-cv/) related to this section.
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/374)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/1409)
 :end_tab:

@@ -58,23 +58,6 @@ x = d2l.tensor([[1, 2, 3], [4, 5, 6]])
 embed(x)
 ```
 
-### Minibatch Multiplication
-
-We can multiply the matrices in two minibatches one by one, by the minibatch multiplication operation `batch_dot`. Suppose the first batch contains $n$ matrices $\mathbf{X}_1, \ldots, \mathbf{X}_n$ with a shape of $a\times b$, and the second batch contains $n$ matrices $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ with a shape of $b\times c$. The output of matrix multiplication on these two batches are $n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ with a shape of $a\times c$. Therefore, given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of the minibatch multiplication output is ($n$, $a$, $c$).
-
-```{.python .input}
-X = np.ones((2, 1, 4))
-Y = np.ones((2, 4, 6))
-npx.batch_dot(X, Y).shape
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.ones((2, 1, 4))
-Y = torch.ones((2, 4, 6))
-torch.bmm(X, Y).shape
-```
-
 ### Skip-gram Model Forward Calculation
 
 In forward calculation, the input of the skip-gram model contains the central target word index `center` and the concatenated context and noise word index `contexts_and_negatives`. In which, the `center` variable has the shape (batch size, 1), while the `contexts_and_negatives` variable has the shape (batch size, `max_len`). These two variables are first transformed from word indexes to word vectors by the word embedding layer, and then the output of shape (batch size, 1, `max_len`) is obtained by minibatch multiplication. Each element in the output is the inner product of the central target word vector and the context word vector or noise word vector.
