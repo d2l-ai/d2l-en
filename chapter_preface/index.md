@@ -155,7 +155,7 @@ This presents an organizational challenge.
 Some models might logically be grouped together in a single notebook.
 And some ideas might be best taught by executing several models in succession.
 On the other hand, there is a big advantage to adhering
-to a policy of *1 working example, 1 notebook*:
+to a policy of *one working example, one notebook*:
 This makes it as easy as possible for you to
 start your own research projects by leveraging our code.
 Just copy a notebook and start modifying it.
@@ -182,9 +182,9 @@ In these cases, we will often present two versions of the example:
 one where we implement everything from scratch,
 relying only on the NumPy interface and automatic differentiation,
 and another, more practical example,
-where we write succinct code using deep learning frameworks MXNet, PyTorch, and TensorFlow.
+where we write succinct code using high-level APIs of deep learning frameoworks.
 Once we have taught you how some component works,
-we can just use the framework version in subsequent tutorials.
+we can just use the high-level APIs in subsequent tutorials.
 
 
 ### Content and Structure
@@ -426,7 +426,7 @@ Hoa Nguyen, manuel-arno-korfmann-webentwicklung, aterzis-personal, nxby, Xiaotin
 mathresearch, mzz2017, jroberayalas, iluu, ghejc, BSharmi, vkramdev, simonwardjones, LakshKD,
 TalNeoran, djliden, Nikhil95, Oren Barkan, guoweis, haozhu233, pratikhack, 315930399, tayfununal,
 steinsag, charleybeller, Andrew Lumsdaine, Jiekui Zhang, Deepak Pathak, floriandonhauser, Tim Gates,
-adriaant.
+adriaant, particle1331.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.
