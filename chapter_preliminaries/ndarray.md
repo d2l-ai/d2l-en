@@ -545,7 +545,7 @@ X_var[1, 2].assign(9)
 X_var
 ```
 
-:begin_slide:`cont,keep`
+:begin_slide:`keep`
 If we want to assign multiple elements the same value,
 we simply index all of them and then assign them the value.
 :end_slide:
