@@ -1,4 +1,6 @@
+:begin_slide:`keep`
 # Data Manipulation
+:end_slide:`keep`
 :label:`sec_ndarray`
 
 In order to get anything done, we need some way to store and manipulate data.
@@ -46,7 +48,7 @@ this is for compatibility of tensor processing by other components of MXNet.
 :end_tab:
 
 :begin_tab:`pytorch`
-:begin_slide:`keep`
+:begin_slide:`keep, cont`
 To start, we import `torch`. Note that though it's called PyTorch, we should
 import `torch` instead of `pytorch`.
 :end_slide:
@@ -177,7 +179,7 @@ we could have equivalently called `x.reshape(-1, 4)` or `x.reshape(3, -1)`.
 :begin_slide:`cont`
 We can automatically have the system infer shapes, by filling in `-1`, e.g. in 
 `x.reshape(-1, 4)` or `x.reshape(3, -1)`.
-:end_slide:`cont`
+:end_slide:
 
 Typically, we will want our matrices initialized
 either with zeros, ones, some other constants,
