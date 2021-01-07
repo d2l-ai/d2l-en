@@ -182,9 +182,9 @@ In these cases, we will often present two versions of the example:
 one where we implement everything from scratch,
 relying only on the NumPy interface and automatic differentiation,
 and another, more practical example,
-where we write succinct code using Gluon.
+where we write succinct code using deep learning frameworks MXNet, PyTorch, and TensorFlow.
 Once we have taught you how some component works,
-we can just use the Gluon version in subsequent tutorials.
+we can just use the framework version in subsequent tutorials.
 
 
 ### Content and Structure
@@ -321,7 +321,7 @@ Here is how we import modules from PyTorch.
 :begin_tab:`tensorflow`
 Most of the code in this book is based on TensorFlow.
 TensorFlow is an open-source framework for deep learning, which is extremely
-popular in both the research community and industrial.
+popular in both the research community and industry.
 All of the code in this book has passed tests under the newest TensorFlow.
 However, due to the rapid development of deep learning, some code
 *in the print edition* may not work properly in future versions of TensorFlow.
