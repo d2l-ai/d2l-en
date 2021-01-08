@@ -170,6 +170,12 @@ from d2l import torch as d2l
 import torch
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
 To visualize attention weights,
 we define the `show_heatmaps` function.
 Its input `matrices` has the shape (number of rows for display, number of columns for display, number of queries, number of keys).
@@ -200,8 +206,13 @@ we consider a simple case where
 the attention weight is one only when the query and the key are the same; otherwise it is zero.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet,pytorch
 attention_weights = d2l.eye(10).reshape(1, 1, 10, 10)
+show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
+```
+```{.python .input}
+#@tab tensorflow
+attention_weights = d2l.reshape(d2l.eye(10), (1, 1, 10, 10))
 show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
 ```
 
