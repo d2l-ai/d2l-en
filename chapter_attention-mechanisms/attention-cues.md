@@ -206,7 +206,7 @@ the attention weight is one only when the query and the key are the same; otherw
 
 ```{.python .input}
 #@tab all
-attention_weights = d2l.reshape(d2l.eye(10),(1, 1, 10, 10))
+attention_weights = d2l.reshape(d2l.eye(10), (1, 1, 10, 10))
 show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
 ```
 
