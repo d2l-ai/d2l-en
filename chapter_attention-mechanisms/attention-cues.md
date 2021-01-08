@@ -169,6 +169,11 @@ npx.set_np()
 from d2l import torch as d2l
 import torch
 ```
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
 
 ```{.python .input}
 #@tab tensorflow
@@ -206,7 +211,7 @@ we consider a simple case where
 the attention weight is one only when the query and the key are the same; otherwise it is zero.
 
 ```{.python .input}
-#@tab mxnet,pytorch
+#@tab mxnet, pytorch
 attention_weights = d2l.eye(10).reshape(1, 1, 10, 10)
 show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
 ```
