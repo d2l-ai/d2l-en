@@ -173,7 +173,7 @@ for layer in net:
 
 ```{.python .input}
 #@tab pytorch
-X = torch.randn(size=(1, 1, 28, 28), dtype=torch.float32)
+X = torch.rand(size=(1, 1, 28, 28), dtype=torch.float32)
 for layer in net:
     X = layer(X)
     print(layer.__class__.__name__,'output shape: \t',X.shape)
@@ -250,9 +250,10 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
 #@tab pytorch
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     """Compute the accuracy for a model on a dataset using a GPU."""
-    net.eval()  # Set the model to evaluation mode
-    if not device:
-        device = next(iter(net.parameters())).device
+    if isinstance(net, torch.nn.Module):
+        net.eval()  # Set the model to evaluation mode
+        if not device:
+            device = next(iter(net.parameters())).device
     # No. of correct predictions, no. of predictions
     metric = d2l.Accumulator(2)
     for X, y in data_iter:
@@ -332,7 +333,7 @@ def train_ch6(net, train_iter, test_iter, num_epochs, lr,
     """Train a model with a GPU (defined in Chapter 6)."""
     def init_weights(m):
         if type(m) == nn.Linear or type(m) == nn.Conv2d:
-            torch.nn.init.xavier_uniform_(m.weight)
+            nn.init.xavier_uniform_(m.weight)
     net.apply(init_weights)
     print('training on', device)
     net.to(device)

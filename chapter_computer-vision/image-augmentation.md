@@ -180,7 +180,7 @@ d2l.show_images(gluon.data.vision.CIFAR10(
 
 ```{.python .input}
 #@tab pytorch
-all_images = torchvision.datasets.CIFAR10(train=True, root="../temp",
+all_images = torchvision.datasets.CIFAR10(train=True, root="../data",
                                           download=True)
 d2l.show_images([all_images[i][0] for i in range(32)], 4, 8, scale=0.8);
 ```
@@ -223,7 +223,7 @@ def load_cifar10(is_train, augs, batch_size):
 ```{.python .input}
 #@tab pytorch
 def load_cifar10(is_train, augs, batch_size):
-    dataset = torchvision.datasets.CIFAR10(root="../temp", train=is_train,
+    dataset = torchvision.datasets.CIFAR10(root="../data", train=is_train,
                                            transform=augs, download=True)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                     shuffle=is_train, num_workers=d2l.get_dataloader_workers())

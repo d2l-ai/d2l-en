@@ -1,7 +1,10 @@
 # Asynchronous Computation
 :label:`sec_async`
 
-Today's computers are highly parallel systems, consisting of multiple CPU cores (often multiple threads per core), multiple processing elements per GPU and often multiple GPUs per device. In short, we can process many different things at the same time, often on different devices. Unfortunately Python is not a great way of writing parallel and asynchronous code, at least not with some extra help. After all, Python is single-threaded and this is unlikely to change in the future. Deep learning frameworks such as MXNet and TensorFlow utilize an asynchronous programming model to improve performance (PyTorch uses Python's own scheduler leading to a different performance trade-off). Hence, understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and mutual dependencies. This allows us to reduce memory overhead and increase processor utilization. We begin by importing the necessary libraries.
+Today's computers are highly parallel systems, consisting of multiple CPU cores (often multiple threads per core), multiple processing elements per GPU and often multiple GPUs per device. In short, we can process many different things at the same time, often on different devices. Unfortunately Python is not a great way of writing parallel and asynchronous code, at least not with some extra help. After all, Python is single-threaded and this is unlikely to change in the future. Deep learning frameworks such as MXNet and TensorFlow utilize an asynchronous programming model to improve performance (PyTorch uses Python's own scheduler leading to a different performance trade-off).
+For PyTorch, by default, GPU operations are asynchronous. When you call a function that uses the GPU, the operations are enqueued to the particular device, but not necessarily executed until later. This allows us to execute more computations in parallel, including operations on CPU or other GPUs.
+
+Hence, understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and mutual dependencies. This allows us to reduce memory overhead and increase processor utilization. We begin by importing the necessary libraries.
 
 ```{.python .input  n=1}
 from d2l import mxnet as d2l
@@ -11,9 +14,25 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
+```{.python .input  n=1}
+#@tab pytorch
+from d2l import torch as d2l
+import numpy, os, subprocess
+import torch
+from torch import nn
+import numpy
+```
+
 ## Asynchrony via Backend
 
+:begin_tab:`mxnet`
 For a warmup consider the following toy problem - we want to generate a random matrix and multiply it. Let us do that both in NumPy and in MXNet NP to see the difference.
+:end_tab:
+
+:begin_tab:`pytorch`
+For a warmup consider the following toy problem - we want to generate a random matrix and multiply it. Let us do that both in NumPy and in PyTorch tensor to see the difference.
+Note that PyTorch `tensor` is defined on a gpu.
+:end_tab:
 
 ```{.python .input  n=2}
 with d2l.Benchmark('numpy'):
@@ -27,7 +46,39 @@ with d2l.Benchmark('mxnet.np'):
         b = np.dot(a, a)
 ```
 
+```{.python .input  n=2}
+#@tab pytorch
+# warmup for gpu computation
+device = d2l.try_gpu()
+a = torch.randn(size=(1000, 1000), device=device)
+b = torch.mm(a, a)
+
+with d2l.Benchmark('numpy'):
+    for _ in range(10):
+        a = numpy.random.normal(size=(1000, 1000))
+        b = numpy.dot(a, a)
+
+with d2l.Benchmark('torch'):
+    for _ in range(10):
+        a = torch.randn(size=(1000, 1000), device=device)
+        b = torch.mm(a, a)
+```
+
+:begin_tab:`mxnet`
 This is orders of magnitude faster. At least it seems to be so. Since both are executed on the same processor something else must be going on. Forcing MXNet to finish all computation prior to returning shows what happened previously: computation is being executed by the backend while the frontend returns control to Python.
+:end_tab:
+
+:begin_tab:`pytorch`
+This is orders of magnitude faster. At least it seems to be so.
+Numpy dot product is executed on the cpu processor while
+Pytorch matrix multiplication is executed on gpu and hence the latter
+is expected to be much faster. But the huge time difference suggests something
+else must be going on.
+By default, GPU operations are asynchronous in PyTorch.
+Forcing PyTorch to finish all computation prior to returning shows
+what happened previously: computation is being executed by the backend
+while the frontend returns control to Python.
+:end_tab:
 
 ```{.python .input  n=3}
 with d2l.Benchmark():
@@ -37,9 +88,30 @@ with d2l.Benchmark():
     npx.waitall()
 ```
 
+```{.python .input  n=3}
+#@tab pytorch
+with d2l.Benchmark():
+    for _ in range(10):
+        a = torch.randn(size=(1000, 1000), device=device)
+        b = torch.mm(a, a)
+    torch.cuda.synchronize(device)
+```
+
+:begin_tab:`mxnet`
 Broadly speaking, MXNet has a frontend for direct interaction with the users, e.g., via Python, as well as a backend used by the system to perform the computation. 
 As shown in :numref:`fig_frontends`, users can write MXNet programs in various frontend languages, such as Python, R, Scala, and C++. Regardless of the frontend programming language used, the execution of MXNet programs occurs primarily in the backend of C++ implementations. Operations issued by the frontend language are passed on to the backend for execution. 
 The backend manages its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. Hence, it is not possible to parallelize operations that depend on each other.
+:end_tab:
+
+:begin_tab:`pytorch`
+Broadly speaking, PyTorch has a frontend for direct interaction with the users, e.g., via Python, as well as a backend used by the system to perform the computation. 
+As shown in :numref:`fig_frontends`, users can write PyTorch programs in various frontend languages, such as Python and C++. Regardless of the frontend programming language used, the execution of PyTorch programs occurs primarily in the backend of C++ implementations. Operations issued by the frontend language are passed on to the backend for execution.
+The backend manages its own threads that continuously collect and execute queued tasks.
+Note that for this to work the backend must be able to keep track of the
+dependencies between various steps in the computational graph.
+Hence, it is not possible to parallelize operations that depend on each other.
+:end_tab:
+
 
 ![Programming Frontends.](../img/frontends.png)
 :width:`300px`
@@ -50,6 +122,14 @@ Let us look at another toy example to understand the dependency graph a bit bett
 ```{.python .input  n=4}
 x = np.ones((1, 2))
 y = np.ones((1, 2))
+z = x * y + 2
+z
+```
+
+```{.python .input  n=4}
+#@tab pytorch
+x = torch.ones((1, 2), device=device)
+y = torch.ones((1, 2), device=device)
 z = x * y + 2
 z
 ```

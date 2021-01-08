@@ -305,9 +305,10 @@ def sgd(params, lr, batch_size):  #@save
 #@tab pytorch
 def sgd(params, lr, batch_size):  #@save
     """Minibatch stochastic gradient descent."""
-    for param in params:
-        param.data.sub_(lr*param.grad/batch_size)
-        param.grad.data.zero_()
+    with torch.no_grad():
+        for param in params:
+            param -= lr * param.grad / batch_size
+            param.grad.zero_()
 ```
 
 ```{.python .input}
