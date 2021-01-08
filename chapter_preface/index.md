@@ -182,7 +182,7 @@ In these cases, we will often present two versions of the example:
 one where we implement everything from scratch,
 relying only on the NumPy interface and automatic differentiation,
 and another, more practical example,
-where we write succinct code using high-level APIs of deep learning frameoworks.
+where we write succinct code using high-level APIs of deep learning frameworks.
 Once we have taught you how some component works,
 we can just use the high-level APIs in subsequent tutorials.
 
