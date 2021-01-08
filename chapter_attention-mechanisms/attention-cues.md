@@ -209,6 +209,7 @@ the attention weight is one only when the query and the key are the same; otherw
 attention_weights = np.eye(10).reshape(1, 1, 10, 10)
 show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
 ```
+
 ```{.python .input}
 #@tab pytorch
 attention_weights = torch.eye(10).reshape(1, 1, 10, 10)
