@@ -157,22 +157,20 @@ where weights are uniform.
 In practice,
 attention pooling aggregates values using weighted average, where weights are computed between the given query and different keys.
 
-```python
+```{.python .input}
 import math
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
 ```
 
-
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
 ```
 
-
-```{.python .input  n=4}
+```{.python .input}
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -182,7 +180,7 @@ To visualize attention weights,
 we define the `show_heatmaps` function.
 Its input `matrices` has the shape (number of rows for display, number of columns for display, number of queries, number of keys).
 
-```{.python .input  n=5}
+```{.python .input}
 #@tab all
 #@save
 def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
@@ -207,7 +205,7 @@ For demonstration,
 we consider a simple case where
 the attention weight is one only when the query and the key are the same; otherwise it is zero.
 
-```{.python .input  n=6}
+```{.python .input}
 #@tab all
 attention_weights = d2l.reshape(d2l.eye(10),[1, 1, 10, 10])
 show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
