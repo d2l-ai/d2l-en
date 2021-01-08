@@ -201,7 +201,7 @@ npx.set_np()
 %matplotlib inline
 from d2l import torch as d2l
 import torch
-import torch.nn as nn
+from torch import nn
 import pandas as pd
 import numpy as np
 ```

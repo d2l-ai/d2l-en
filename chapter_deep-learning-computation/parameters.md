@@ -424,10 +424,10 @@ print(net[1].weight.data())
 #@tab pytorch
 def xavier(m):
     if type(m) == nn.Linear:
-        torch.nn.init.xavier_uniform_(m.weight)
+        nn.init.xavier_uniform_(m.weight)
 def init_42(m):
     if type(m) == nn.Linear:
-        torch.nn.init.constant_(m.weight, 42)
+        nn.init.constant_(m.weight, 42)
 
 net[0].apply(xavier)
 net[2].apply(init_42)

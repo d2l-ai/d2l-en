@@ -564,11 +564,11 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
     """Train a model for sequence to sequence."""
     def xavier_init_weights(m):
         if type(m) == nn.Linear:
-            torch.nn.init.xavier_uniform_(m.weight)
+            nn.init.xavier_uniform_(m.weight)
         if type(m) == nn.GRU:
             for param in m._flat_weights_names:
                 if "weight" in param:
-                    torch.nn.init.xavier_uniform_(m._parameters[param])
+                    nn.init.xavier_uniform_(m._parameters[param])
     net.apply(xavier_init_weights)
     net.to(device)
     optimizer = torch.optim.Adam(net.parameters(), lr=lr)

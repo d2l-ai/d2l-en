@@ -422,6 +422,7 @@ As you can see, each epoch takes more time due to the larger image size. As show
 1. How does the output change when you select different content and style layers?
 1. Adjust the weight hyperparameters in the loss function. Does the output retain more content or have less noise?
 1. Use different content and style images. Can you create more interesting composite images?
+1. Can we apply style transfer for text? Hint: you may refer to the survey paper by Hu et al. :cite:`Hu.Lee.Aggarwal.2020`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/378)
