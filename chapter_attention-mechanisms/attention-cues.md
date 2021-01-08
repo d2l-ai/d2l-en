@@ -169,18 +169,12 @@ npx.set_np()
 from d2l import torch as d2l
 import torch
 ```
-```{.python .input}
-#@tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-```
 
 ```{.python .input}
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
-
 To visualize attention weights,
 we define the `show_heatmaps` function.
 Its input `matrices` has the shape (number of rows for display, number of columns for display, number of queries, number of keys).
@@ -211,13 +205,8 @@ we consider a simple case where
 the attention weight is one only when the query and the key are the same; otherwise it is zero.
 
 ```{.python .input}
-#@tab mxnet, pytorch
-attention_weights = d2l.eye(10).reshape(1, 1, 10, 10)
-show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
-```
-```{.python .input}
-#@tab tensorflow
-attention_weights = d2l.reshape(d2l.eye(10), (1, 1, 10, 10))
+#@tab all
+attention_weights = d2l.reshape(d2l.eye(10),[1, 1, 10, 10])
 show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
 ```
 
@@ -236,8 +225,6 @@ we will often invoke this function to visualize attention weights.
 
 1. What can be the volitional cue when decoding a sequence token by token in machine translation? What are the nonvolitional cues and the sensory inputs?
 1. Randomly generate a $10 \times 10$ matrix and use the softmax operation to ensure each row is a valid probability distribution. Visualize the output attention weights.
-
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/1596)
