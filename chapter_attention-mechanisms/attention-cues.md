@@ -158,7 +158,6 @@ In practice,
 attention pooling aggregates values using weighted average, where weights are computed between the given query and different keys.
 
 ```{.python .input}
-import math
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
