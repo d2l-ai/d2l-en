@@ -735,8 +735,8 @@ to
 the number of $n$-grams in the predicted sequence.
 To explain,
 given a label sequence $A$, $B$, $C$, $D$, $E$, $F$,
-and a predicted sequence $A$, $B$, $B$, $C$, $D$.
-We have $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$, and $p_4 = 0$.
+and a predicted sequence $A$, $B$, $B$, $C$, $D$,
+we have $p_1 = 4/5$,  $p_2 = 3/4$, $p_3 = 1/3$, and $p_4 = 0$.
 Besides,
 let $\mathrm{len}_{\text{label}}$ and $\mathrm{len}_{\text{pred}}$
 be
