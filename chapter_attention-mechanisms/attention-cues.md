@@ -60,7 +60,7 @@ To explain how our attention is deployed in the visual world,
 a two-component framework has emerged
 and been pervasive.
 This idea dates back to William James in the 1890s,
-who is considered the "Father of American psychology" :cite:`James.2007`.
+who is considered the "father of American psychology" :cite:`James.2007`.
 In this framework,
 subjects selectively direct the spotlight of attention
 using both the *nonvolitional cue* and *volitional cue*.
@@ -231,4 +231,8 @@ we will often invoke this function to visualize attention weights.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1592)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1710)
 :end_tab:
