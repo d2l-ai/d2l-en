@@ -755,7 +755,7 @@ since matching longer $n$-grams is more difficult,
 BLEU assigns a greater weight
 to a longer $n$-gram precision.
 Specifically, when $p_n$ is fixed,
-$p_n^{1/2^n}$ increases as $n$ grows.
+$p_n^{1/2^n}$ increases as $n$ grows (the original paper uses $p_n^{1/n}$).
 Furthermore,
 since
 predicting shorter sequences
