@@ -156,9 +156,14 @@ it chains each `Block` in the list together,
 passing the output of each as the input to the next.
 Note that until now, we have been invoking our models
 via the construction `net(X)` to obtain their outputs.
-This is actually just shorthand for `net.forward(X)`,
+This is actually just shorthand for `net.__call__(X)`,
 a slick Python trick achieved via
 the `Block` class's `__call__` function.
+This `__call__`function then uses net.forward(X) and also
+executes any hooks of the model, which are functions the model requires
+to be executed during the forward or backward pass.
+In general, a model should be used with `net(X)` and not
+`net.forward(X)`, so all hooks are executed correctly.
 :end_tab:
 
 :begin_tab:`pytorch`
