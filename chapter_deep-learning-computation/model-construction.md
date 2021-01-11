@@ -186,7 +186,7 @@ the `Module` class's `__call__` function.
 This `__call__`function then uses net.forward(X) and also
 executes any hooks of the model, which are functions the model requires
 to be executed during the forward or backward pass.
-In general, a Module should be used with `net(X)` and not
+In general, a `Module` should be used with `net(X)` and not
 `net.forward(X)`, so all hooks are executed correctly.
 :end_tab:
 
