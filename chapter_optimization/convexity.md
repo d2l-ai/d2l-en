@@ -117,7 +117,7 @@ $$\begin{aligned}
     &< f(x^{\ast}) \\
 \end{aligned}$$
 
-There exists $\lambda \in [0, 1)$, such as $\lambda = [1 - \frac{p}{|x^{\ast} - x'|}$, so that $0 < |\lambda x^{\ast} + (1-\lambda) x' - x^{\ast}| \leq p$. But $f(\lambda x^{\ast} + (1-\lambda) x') < f(x^{\ast})$ which violates our local minimum statement. Therefore, there does not $x' \in X$ for which $f(x') < f(x^{\ast})$, and the local minimum $x^{\ast}$ is also the global minimum.
+There exists $\lambda \in [0, 1)$, $\lambda = 1 - \frac{p}{|x^{\ast} - x'|}$ for an example, so that $0 < |\lambda x^{\ast} + (1-\lambda) x' - x^{\ast}| \leq p$. However, because $f(\lambda x^{\ast} + (1-\lambda) x') < f(x^{\ast})$, this violates our local minimum statement. Therefore, there does not exist $x' \in X$ for which $f(x') < f(x^{\ast})$. The local minimum $x^{\ast}$ is also the global minimum.
 
 For instance, the function $f(x) = (x-1)^2$ has a local minimum for $x=1$, it is also the global minimum.
 
