@@ -107,13 +107,19 @@ This is used in variational methods. Here $y$ is typically the unobserved random
 Convex functions have a few useful properties. We describe them as follows.
 
 
-### No Local Minima
+### Local Minima is Global Minima
 
-In particular, convex functions do not have local minima. Let us assume the contrary and prove it wrong. If $x \in X$ is a local minimum there exists some neighborhood of $x$ for which $f(x)$ is the smallest value. Since $x$ is only a local minimum there has to be another $x' \in X$ for which $f(x') < f(x)$. However, by convexity the function values on the entire *line* $\lambda x + (1-\lambda) x'$ have to be less than $f(x)$ since for $\lambda \in [0, 1)$
+In particular, the local minima for convex functions is also the global minima. Let us assume the contrary and prove it wrong. If $x^{\ast} \in X$ is a local minimum such that there is a small positive value $p$ so that for $x \in X$ that satisfies $0 < |x - x^{\ast}| \leq p$ there is $f(x^{\ast}) < f(x)$. Assume there exists $x' \in X$ for which $f(x') < f(x^{\ast})$. According to the property of convexity, 
 
-$$f(x) > \lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
+$$\begin{aligned}
+    f(\lambda x^{\ast} + (1-\lambda) x') &\leq \lambda f(x^{\ast}) + (1-\lambda) f(x') \\
+    &< \lambda f(x^{\ast}) + (1-\lambda) f(x^{\ast}) \\
+    &< f(x^{\ast}) \\
+\end{aligned}$$
 
-This contradicts the assumption that $f(x)$ is a local minimum. For instance, the function $f(x) = (x+1) (x-1)^2$ has a local minimum for $x=1$. However, it is not a global minimum.
+There exists $\lambda \in [0, 1)$, such as $\lambda = [1 - \frac{p}{|x^{\ast} - x'|}$, so that $0 < |\lambda x^{\ast} + (1-\lambda) x' - x^{\ast}| \leq p$. But $f(\lambda x^{\ast} + (1-\lambda) x') < f(x^{\ast})$ which violates our local minimum statement. Therefore, there does not $x' \in X$ for which $f(x') < f(x^{\ast})$, and the local minimum $x^{\ast}$ is also the global minimum.
+
+For instance, the function $f(x) = (x-1)^2$ has a local minimum for $x=1$, it is also the global minimum.
 
 ```{.python .input}
 #@tab all
