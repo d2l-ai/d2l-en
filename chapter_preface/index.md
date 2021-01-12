@@ -425,7 +425,7 @@ StevenJokes, Tomer Kaftan, liweiwp, netyster, ypandya, NishantTharani, heiligerl
 Hoa Nguyen, manuel-arno-korfmann-webentwicklung, aterzis-personal, nxby, Xiaoting He, Josiah Yoder,
 mathresearch, mzz2017, jroberayalas, iluu, ghejc, BSharmi, vkramdev, simonwardjones, LakshKD,
 TalNeoran, djliden, Nikhil95, Oren Barkan, guoweis, haozhu233, pratikhack, 315930399, tayfununal,
-steinsag, charleybeller, Andrew Lumsdaine, Jiekui Zhang, Deepak Pathak, floriandonhauser, Tim Gates,
+steinsag, charleybeller, Andrew Lumsdaine, Jiekui Zhang, Deepak Pathak, Florian Donhauser, Tim Gates,
 Adriaan Tijsseling, Ron Medina, Gaurav Saha, Murat Semerci, [Lei Mao](https://github.com/leimao).
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
