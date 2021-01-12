@@ -123,7 +123,7 @@ For instance, the function $f(x) = (x-1)^2$ has a local minimum for $x=1$, it is
 
 ```{.python .input}
 #@tab all
-f = lambda x: (x-1)**2 * (x+1)
+f = lambda x: (x-1)**2
 d2l.set_figsize()
 d2l.plot([x, segment], [f(x), f(segment)], 'x', 'f(x)')
 ```
