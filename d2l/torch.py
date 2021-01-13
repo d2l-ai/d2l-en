@@ -1668,9 +1668,15 @@ def match_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     box_j = indices[max_ious >= 0.5]
     anchors_bbox_map[anc_i] = box_j
     # Find the largest iou for each bbox
-    anc_i = torch.argmax(jaccard, dim=0)
-    box_j = torch.arange(num_gt_boxes, device=device)
-    anchors_bbox_map[anc_i] = box_j
+    col_discard = torch.full((num_anchors,), -1)
+    row_discard = torch.full((num_gt_boxes,), -1)
+    for _ in range(num_gt_boxes):
+      max_idx = torch.argmax(jaccard)
+      gt_idx = (max_idx % num_gt_boxes).long()
+      anc_idx = (max_idx / num_gt_boxes).long()
+      anchors_bbox_map[anc_idx] = gt_idx
+      jaccard[:, gt_idx] = col_discard
+      jaccard[anc_idx, :] = row_discard
     return anchors_bbox_map
 
 
