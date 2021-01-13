@@ -1674,10 +1674,10 @@ def match_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     row_discard = torch.full((num_gt_boxes,), -1)
     for _ in range(num_gt_boxes):
       max_idx = torch.argmax(jaccard)
-      gt_idx = (max_idx % num_gt_boxes).long()
+      box_idx = (max_idx % num_gt_boxes).long()
       anc_idx = (max_idx / num_gt_boxes).long()
-      anchors_bbox_map[anc_idx] = gt_idx
-      jaccard[:, gt_idx] = col_discard
+      anchors_bbox_map[anc_idx] = box_idx
+      jaccard[:, box_idx] = col_discard
       jaccard[anc_idx, :] = row_discard
     return anchors_bbox_map
 
