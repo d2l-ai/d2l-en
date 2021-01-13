@@ -734,7 +734,7 @@ belong to which is known as the *exponential family*. The exponential family
 is a set of distributions whose density can be expressed in the following 
 form:
 
-$$p(\mathbf{x} | \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \left( \boldsymbol{\eta}^{\top} \cdot T\mathbf(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
+$$p(\mathbf{x} | \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
 :eqlabel:`eq_exp_pdf`
 
 As this definition can be a little subtle, let us examine it closely.  
