@@ -67,7 +67,6 @@ and $(0, 0, 1)$ to "dog":
 
 $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}.$$
 
-
 ## Network Architecture
 
 In order to estimate the conditional probabilities associated with all the possible classes,
@@ -105,6 +104,30 @@ Note that we have gathered all of our weights into a $3 \times 4$ matrix
 and that for features of a given data example $\mathbf{x}$,
 our outputs are given by a matrix-vector product of our weights by our input features
 plus our biases $\mathbf{b}$.
+
+
+## Parameterization Cost of Fully-Connected Layers
+:label:`subsec_parameterization-cost-fc-layers`
+
+As we will see in subsequent chapters,
+fully-connected layers are ubiquitous in deep learning.
+However, as the name suggests,
+fully-connected layers are *fully* connected
+with potentially many learnable parameters.
+Specifically,
+for any fully-connected layer
+with $d$ inputs and $q$ outputs,
+the parameterization cost is $\mathcal{O}(dq)$,
+which can be prohibitively high in practice.
+Fortunately,
+this cost 
+of transforming $d$ inputs into $q$ outputs
+can be reduced to $\mathcal{O}(\frac{dq}{n})$,
+where the hyperparameter $n$ can be flexibly specified
+by us to balance between parameter saving and model effectiveness in real-world applications :cite:`Zhang.Tay.Zhang.ea.2021`.
+
+
+
 
 
 ## Softmax Operation

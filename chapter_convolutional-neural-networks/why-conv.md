@@ -26,7 +26,9 @@ of distinguishing cats from dogs.
 Say that we do a thorough job in data collection,
 collecting an annotated dataset of one-megapixel photographs.
 This means that each input to the network has one million dimensions.
-Even an aggressive reduction to one thousand hidden dimensions
+According to our discussions of parameterization cost
+of fully-connected layers in :numref:`subsec_parameterization-cost-fc-layers`,
+even an aggressive reduction to one thousand hidden dimensions
 would require a fully-connected layer
 characterized by $10^6 \times 10^3 = 10^9$ parameters.
 Unless we have lots of GPUs, a talent

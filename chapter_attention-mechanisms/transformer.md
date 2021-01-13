@@ -874,6 +874,7 @@ for different deep learning tasks.
 1. For language modeling, should we use the Transformer encoder, decoder, or both? How to design this method?
 1. What can be challenges to Transformers if input sequences are very long? Why?
 1. How to improve computational and memory efficiency of Transformers? Hint: you may refer to the survey paper by Tay et al. :cite:`Tay.Dehghani.Bahri.ea.2020`.
+1. How can we design Transformer-based models for image classification tasks without using CNNs? Hint: you may refer to the Vision Transformer :cite:`Dosovitskiy.Beyer.Kolesnikov.ea.2021`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/348)
@@ -882,4 +883,3 @@ for different deep learning tasks.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1066)
 :end_tab:
-
