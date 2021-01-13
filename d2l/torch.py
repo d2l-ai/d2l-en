@@ -1599,6 +1599,7 @@ def multibox_prior(data, sizes, ratios):
 
     # Generate boxes_per_pixel number of heights and widths which are later
     # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
+    # cat (various sizes, first ratio) and (first size, various ratios)
     w = torch.cat((size_tensor * torch.sqrt(ratio_tensor[0]),
                    sizes[0] * torch.sqrt(ratio_tensor[1:])))\
                    * in_height / in_width
