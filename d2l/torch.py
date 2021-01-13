@@ -1599,11 +1599,13 @@ def multibox_prior(data, sizes, ratios):
 
     # Generate boxes_per_pixel number of heights and widths which are later
     # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
-    w = torch.cat((size_tensor, sizes[0] * torch.sqrt(ratio_tensor[1:])))\
-                * in_height / in_width / 2
-    h = torch.cat((size_tensor, sizes[0] / torch.sqrt(ratio_tensor[1:]))) / 2
+    w = torch.cat((size_tensor * torch.sqrt(ratio_tensor[0]),
+                   sizes[0] * torch.sqrt(ratio_tensor[1:])))\
+                   * in_height / in_width
+    h = torch.cat((size_tensor / torch.sqrt(ratio_tensor[0]),
+                   sizes[0] / torch.sqrt(ratio_tensor[1:])))
     anchor_manipulations = torch.stack((-w, -h, w, h)).T.repeat(
-                                        in_height * in_width, 1)
+                                        in_height * in_width, 1) / 2
 
     # Each center point will have boxes_per_pixel number of anchor boxes, so
     # generate grid of all anchor box centers with boxes_per_pixel repeats
