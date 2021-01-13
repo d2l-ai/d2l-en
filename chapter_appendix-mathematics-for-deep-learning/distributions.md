@@ -395,12 +395,12 @@ def F(x):
 d2l.plot(x, [F(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
-While this result is not simple, the means and variances are.  If $X \sim \mathrm{Binomial}(n, p)$, then:
+If $X \sim \mathrm{Binomial}(n, p)$, then:
 
 * $\mu_X = np$,
 * $\sigma_X^2 = np(1-p)$.
 
-This can be sampled as follows.
+This follows from the linearity of expected value over the sum of $n$ Bernoulli random variables, and the fact that the variance of the sum of independent random variables is the sum of the variances. This can be sampled as follows.
 
 ```{.python .input}
 np.random.binomial(n, p, size=(10, 10))
