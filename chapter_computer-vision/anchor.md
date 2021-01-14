@@ -65,11 +65,11 @@ def multibox_prior(data, sizes, ratios):
     # Generate boxes_per_pixel number of heights and widths which are later
     # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
     # concat (various sizes, first ratio) and (first size, various ratios)
-    w = np.concatenate((size_tensor * np.sqrt(ratio_tensor[0]),  # 𝑠 * √r
-                        sizes[0] * np.sqrt(ratio_tensor[1:])))\  # 𝑠 * √r
+    w = np.concatenate((size_tensor * np.sqrt(ratio_tensor[0]),
+                        sizes[0] * np.sqrt(ratio_tensor[1:])))\
                         * in_height / in_width  # handle rectangular inputs
-    h = np.concatenate((size_tensor / np.sqrt(ratio_tensor[0]),  # 𝑠 / √r
-                        sizes[0] / np.sqrt(ratio_tensor[1:])))  # 𝑠 / √r
+    h = np.concatenate((size_tensor / np.sqrt(ratio_tensor[0]),
+                        sizes[0] / np.sqrt(ratio_tensor[1:])))
     # Divide by 2 to get half height and half width
     anchor_manipulations = np.tile(np.stack((-w, -h, w, h)).T,
                                    (in_height * in_width, 1)) / 2
@@ -107,11 +107,11 @@ def multibox_prior(data, sizes, ratios):
     # Generate boxes_per_pixel number of heights and widths which are later
     # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
     # cat (various sizes, first ratio) and (first size, various ratios)
-    w = torch.cat((size_tensor * torch.sqrt(ratio_tensor[0]),  # 𝑠 * √r
-                   sizes[0] * torch.sqrt(ratio_tensor[1:])))\  # 𝑠 * √r
+    w = torch.cat((size_tensor * torch.sqrt(ratio_tensor[0]),
+                   sizes[0] * torch.sqrt(ratio_tensor[1:])))\
                    * in_height / in_width  # handle rectangular inputs
-    h = torch.cat((size_tensor / torch.sqrt(ratio_tensor[0]),  # 𝑠 / √r
-                   sizes[0] / torch.sqrt(ratio_tensor[1:])))  # 𝑠 / √r
+    h = torch.cat((size_tensor / torch.sqrt(ratio_tensor[0]),
+                   sizes[0] / torch.sqrt(ratio_tensor[1:])))
     # Divide by 2 to get half height and half width
     anchor_manipulations = torch.stack((-w, -h, w, h)).T.repeat(
                                         in_height * in_width, 1) / 2
