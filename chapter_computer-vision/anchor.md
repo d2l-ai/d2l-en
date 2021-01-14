@@ -674,3 +674,4 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1603)
 :end_tab:
+
