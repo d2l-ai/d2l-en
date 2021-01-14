@@ -18,6 +18,9 @@ is a simple yet complete example
 for demonstrating machine learning with attention mechanisms.
 
 ```{.python .input}
+!pip uninstall -y d2lbook
+!pip install git+https://github.com/d2l-ai/d2l-book@alias
+
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
