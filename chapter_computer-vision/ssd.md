@@ -464,7 +464,7 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
 During model training, we must generate multiscale anchor boxes (`anchors`) in the model's forward computation process and predict the category (`cls_preds`) and offset (`bbox_preds`) for each anchor box. Afterwards, we label the category (`cls_labels`) and offset (`bbox_labels`) of each generated anchor box based on the label information `Y`. Finally, we calculate the loss function using the predicted and labeled category and offset values. To simplify the code, we do not evaluate the training dataset here.
 
 ```{.python .input}
-num_epochs, timer = 20, d2l.Timer()
+num_epochs, timer = 10, d2l.Timer()
 animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                         legend=['class error', 'bbox mae'])
 for epoch in range(num_epochs):
@@ -499,7 +499,7 @@ print(f'{len(train_iter._dataset) / timer.stop():.1f} examples/sec on '
 
 ```{.python .input}
 #@tab pytorch
-num_epochs, timer = 20, d2l.Timer()
+num_epochs, timer = 10, d2l.Timer()
 animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                         legend=['class error', 'bbox mae'])
 net = net.to(device)
@@ -588,7 +588,7 @@ def display(img, output, threshold):
         bbox = [row[2:6] * np.array((w, h, w, h), ctx=row.ctx)]
         d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
 
-display(img, output, threshold=0.9)
+display(img, output, threshold=0.85)
 ```
 
 ```{.python .input}
@@ -604,7 +604,7 @@ def display(img, output, threshold):
         bbox = [row[2:6] * torch.tensor((w, h, w, h), device=row.device)]
         d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
 
-display(img, output.cpu(), threshold=0.9)
+display(img, output.cpu(), threshold=0.85)
 ```
 
 ## Summary
