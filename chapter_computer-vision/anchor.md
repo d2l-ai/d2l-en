@@ -25,7 +25,6 @@ npx.set_np()
 %matplotlib inline
 from d2l import torch as d2l
 import torch
-import torchvision
 
 torch.set_printoptions(2)
 ```
