@@ -21,7 +21,7 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       pip uninstall -y d2lbook
       pip install git+https://github.com/d2l-ai/d2l-book@alias2
-	  pip list
+      pip list
       nvidia-smi
       """
 
