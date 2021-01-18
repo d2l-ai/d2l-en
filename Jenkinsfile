@@ -21,7 +21,10 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       pip uninstall -y d2lbook
       pip install git+https://github.com/d2l-ai/d2l-book@alias2
-      pip list
+      pip install Sphinx==3.1.1
+	  pip install mxtheme==0.3.11
+	  pip install notebook==6.0.3
+	  pip list
       nvidia-smi
       """
 
