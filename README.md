@@ -2,7 +2,7 @@
 
 [![Build Status](http://ci.d2l.ai/job/d2l-en/job/master/badge/icon)](http://ci.d2l.ai/job/d2l-en/job/master/)
 
-[Book website](https://d2l.ai/) | [STAT 157 Course at UC Berkeley, Spring 2019](http://courses.d2l.ai/berkeley-stat-157/index.html) | Latest version: v0.16.0
+[Book website](https://d2l.ai/) | [STAT 157 Course at UC Berkeley, Spring 2019](http://courses.d2l.ai/berkeley-stat-157/index.html) | Latest version: v0.16.1
 
 <h5 align="center"><i>The best way to understand deep learning is learning by doing.</i></h5>
 
