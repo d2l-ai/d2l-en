@@ -42,8 +42,8 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
 
     # Return True if `X` (tensor or list) has 1 axis
     def has_one_axis(X):
-        return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
-                and not hasattr(X[0], "__len__"))
+        return (hasattr(X, "ndim") and X.ndim == 1 or
+                isinstance(X, list) and not hasattr(X[0], "__len__"))
 
     if has_one_axis(X):
         X = [X]
@@ -109,7 +109,7 @@ def linreg(X, w, b):
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def squared_loss(y_hat, y):
     """Squared loss."""
-    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -131,8 +131,9 @@ def load_array(data_arrays, batch_size, is_train=True):
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def get_fashion_mnist_labels(labels):
     """Return text labels for the Fashion-MNIST dataset."""
-    text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
-                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
+    text_labels = [
+        't-shirt', 'trouser', 'pullover', 'dress', 'coat', 'sandal', 'shirt',
+        'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
 
 
@@ -169,10 +170,14 @@ def load_data_fashion_mnist(batch_size, resize=None):
     if resize:
         trans.insert(0, transforms.Resize(resize))
     trans = transforms.Compose(trans)
-    mnist_train = torchvision.datasets.FashionMNIST(
-        root="../data", train=True, transform=trans, download=True)
-    mnist_test = torchvision.datasets.FashionMNIST(
-        root="../data", train=False, transform=trans, download=True)
+    mnist_train = torchvision.datasets.FashionMNIST(root="../data",
+                                                    train=True,
+                                                    transform=trans,
+                                                    download=True)
+    mnist_test = torchvision.datasets.FashionMNIST(root="../data",
+                                                   train=False,
+                                                   transform=trans,
+                                                   download=True)
     return (data.DataLoader(mnist_train, batch_size, shuffle=True,
                             num_workers=get_dataloader_workers()),
             data.DataLoader(mnist_test, batch_size, shuffle=False,
@@ -183,7 +188,7 @@ def load_data_fashion_mnist(batch_size, resize=None):
 def accuracy(y_hat, y):
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = d2l.argmax(y_hat, axis=1)        
+        y_hat = d2l.argmax(y_hat, axis=1)
     cmp = d2l.astype(y_hat, y.dtype) == y
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
@@ -232,8 +237,9 @@ def train_epoch_ch3(net, train_iter, loss, updater):
             updater.zero_grad()
             l.backward()
             updater.step()
-            metric.add(float(l) * len(y), accuracy(y_hat, y),
-                       y.size().numel())
+            metric.add(
+                float(l) * len(y), accuracy(y_hat, y),
+                y.size().numel())
         else:
             # Using custom built optimizer & loss criterion
             l.sum().backward()
@@ -256,10 +262,10 @@ class Animator:
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1:
-            self.axes = [self.axes, ]
+            self.axes = [self.axes,]
         # Use a lambda function to capture arguments
-        self.config_axes = lambda: d2l.set_axes(
-            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+        self.config_axes = lambda: d2l.set_axes(self.axes[
+            0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
 
     def add(self, x, y):
@@ -307,9 +313,9 @@ def predict_ch3(net, test_iter, n=6):
         break
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(d2l.argmax(net(X), axis=1))
-    titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(
-        d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
+    titles = [true + '\n' + pred for true, pred in zip(trues, preds)]
+    d2l.show_images(d2l.reshape(X[0:n], (n, 28, 28)), 1, n,
+                    titles=titles[0:n])
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-cues.md
@@ -328,7 +334,7 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                 ax.set_ylabel(ylabel)
             if titles:
                 ax.set_title(titles[j])
-    fig.colorbar(pcm, ax=axes, shrink=0.6);
+    fig.colorbar(pcm, ax=axes, shrink=0.6)
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
@@ -392,7 +398,7 @@ class DotProductAttention(nn.Module):
     def forward(self, queries, keys, values, valid_lens=None):
         d = queries.shape[-1]
         # Set `transpose_b=True` to swap the last two dimensions of `keys`
-        scores = torch.bmm(queries, keys.transpose(1,2)) / math.sqrt(d)
+        scores = torch.bmm(queries, keys.transpose(1, 2)) / math.sqrt(d)
         self.attention_weights = masked_softmax(scores, valid_lens)
         return torch.bmm(self.dropout(self.attention_weights), values)
 
@@ -435,8 +441,9 @@ class MultiHeadAttention(nn.Module):
         if valid_lens is not None:
             # On axis 0, copy the first item (scalar or vector) for
             # `num_heads` times, then copy the next item, and so on
-            valid_lens = torch.repeat_interleave(
-                valid_lens, repeats=self.num_heads, dim=0)
+            valid_lens = torch.repeat_interleave(valid_lens,
+                                                 repeats=self.num_heads,
+                                                 dim=0)
 
         # Shape of `output`: (`batch_size` * `num_heads`, no. of queries,
         # `num_hiddens` / `num_heads`)
@@ -483,8 +490,10 @@ class PositionalEncoding(nn.Module):
         # Create a long enough `P`
         self.P = d2l.zeros((1, max_len, num_hiddens))
         X = d2l.arange(max_len, dtype=torch.float32).reshape(
-            -1, 1) / torch.pow(10000, torch.arange(
-            0, num_hiddens, 2, dtype=torch.float32) / num_hiddens)
+            -1, 1) / torch.pow(
+                10000,
+                torch.arange(0, num_hiddens, 2, dtype=torch.float32) /
+                num_hiddens)
         self.P[:, :, 0::2] = torch.sin(X)
         self.P[:, :, 1::2] = torch.cos(X)
 
@@ -523,12 +532,12 @@ class EncoderBlock(nn.Module):
                  norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
                  dropout, use_bias=False, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = d2l.MultiHeadAttention(
-            key_size, query_size, value_size, num_hiddens, num_heads, dropout,
-            use_bias)
+        self.attention = d2l.MultiHeadAttention(key_size, query_size,
+                                                value_size, num_hiddens,
+                                                num_heads, dropout, use_bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
-        self.ffn = PositionWiseFFN(
-            ffn_num_input, ffn_num_hiddens, num_hiddens)
+        self.ffn = PositionWiseFFN(ffn_num_input, ffn_num_hiddens,
+                                   num_hiddens)
         self.addnorm2 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, valid_lens):
@@ -547,7 +556,8 @@ class TransformerEncoder(d2l.Encoder):
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
         self.blks = nn.Sequential()
         for i in range(num_layers):
-            self.blks.add_module("block"+str(i),
+            self.blks.add_module(
+                "block" + str(i),
                 EncoderBlock(key_size, query_size, value_size, num_hiddens,
                              norm_shape, ffn_num_input, ffn_num_hiddens,
                              num_heads, dropout, use_bias))
