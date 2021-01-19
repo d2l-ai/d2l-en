@@ -137,6 +137,14 @@ Note that these layers are both fully connected.
 Every input influences every neuron in the hidden layer,
 and each of these in turn influences
 every neuron in the output layer.
+However, as suggested by :numref:`subsec_parameterization-cost-fc-layers`,
+the parameterization cost of MLPs
+with fully-connected layers
+can be prohibitively high,
+which may motivate
+tradeoff between parameter saving and model effectiveness even without changing the input or output size :cite:`Zhang.Tay.Zhang.ea.2021`.
+
+
 
 ### From Linear to Nonlinear
 

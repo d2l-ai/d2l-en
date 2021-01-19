@@ -60,7 +60,7 @@ To explain how our attention is deployed in the visual world,
 a two-component framework has emerged
 and been pervasive.
 This idea dates back to William James in the 1890s,
-who is considered the "Father of American psychology" :cite:`James.2007`.
+who is considered the "father of American psychology" :cite:`James.2007`.
 In this framework,
 subjects selectively direct the spotlight of attention
 using both the *nonvolitional cue* and *volitional cue*.
@@ -158,7 +158,6 @@ In practice,
 attention pooling aggregates values using weighted average, where weights are computed between the given query and different keys.
 
 ```{.python .input}
-import math
 from d2l import mxnet as d2l
 from mxnet import np, npx
 npx.set_np()
@@ -170,6 +169,11 @@ from d2l import torch as d2l
 import torch
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
 To visualize attention weights,
 we define the `show_heatmaps` function.
 Its input `matrices` has the shape (number of rows for display, number of columns for display, number of queries, number of keys).
@@ -201,7 +205,7 @@ the attention weight is one only when the query and the key are the same; otherw
 
 ```{.python .input}
 #@tab all
-attention_weights = d2l.eye(10).reshape(1, 1, 10, 10)
+attention_weights = d2l.reshape(d2l.eye(10), (1, 1, 10, 10))
 show_heatmaps(attention_weights, xlabel='Keys', ylabel='Queries')
 ```
 
@@ -221,12 +225,14 @@ we will often invoke this function to visualize attention weights.
 1. What can be the volitional cue when decoding a sequence token by token in machine translation? What are the nonvolitional cues and the sensory inputs?
 1. Randomly generate a $10 \times 10$ matrix and use the softmax operation to ensure each row is a valid probability distribution. Visualize the output attention weights.
 
-
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/1596)
 :end_tab:
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1592)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/1710)
 :end_tab:

@@ -175,9 +175,7 @@ it chains each block in the list together,
 passing the output of each as the input to the next.
 Note that until now, we have been invoking our models
 via the construction `net(X)` to obtain their outputs.
-This is actually just shorthand for `net.forward(X)`,
-a slick Python trick achieved via
-the Block class's `__call__` function.
+This is actually just shorthand for `net.__call__(X)`.
 :end_tab:
 
 :begin_tab:`tensorflow`

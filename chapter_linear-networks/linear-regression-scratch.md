@@ -110,7 +110,6 @@ we can clearly observe the linear correlation between the two.
 ```{.python .input}
 #@tab all
 d2l.set_figsize()
-# The semicolon is for displaying the plot only
 d2l.plt.scatter(d2l.numpy(features[:, 1]), d2l.numpy(labels), 1);
 ```
 

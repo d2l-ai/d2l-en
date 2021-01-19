@@ -1599,11 +1599,15 @@ def multibox_prior(data, sizes, ratios):
 
     # Generate boxes_per_pixel number of heights and widths which are later
     # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
-    w = torch.cat((size_tensor, sizes[0] * torch.sqrt(ratio_tensor[1:])))\
-                * in_height / in_width / 2
-    h = torch.cat((size_tensor, sizes[0] / torch.sqrt(ratio_tensor[1:]))) / 2
+    # cat (various sizes, first ratio) and (first size, various ratios)
+    w = torch.cat((size_tensor * torch.sqrt(ratio_tensor[0]),
+                   sizes[0] * torch.sqrt(ratio_tensor[1:])))\
+                   * in_height / in_width  # handle rectangular inputs
+    h = torch.cat((size_tensor / torch.sqrt(ratio_tensor[0]),
+                   sizes[0] / torch.sqrt(ratio_tensor[1:])))
+    # Divide by 2 to get half height and half width
     anchor_manipulations = torch.stack((-w, -h, w, h)).T.repeat(
-                                        in_height * in_width, 1)
+                                        in_height * in_width, 1) / 2
 
     # Each center point will have boxes_per_pixel number of anchor boxes, so
     # generate grid of all anchor box centers with boxes_per_pixel repeats
@@ -1668,9 +1672,15 @@ def match_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     box_j = indices[max_ious >= 0.5]
     anchors_bbox_map[anc_i] = box_j
     # Find the largest iou for each bbox
-    anc_i = torch.argmax(jaccard, dim=0)
-    box_j = torch.arange(num_gt_boxes, device=device)
-    anchors_bbox_map[anc_i] = box_j
+    col_discard = torch.full((num_anchors,), -1)
+    row_discard = torch.full((num_gt_boxes,), -1)
+    for _ in range(num_gt_boxes):
+        max_idx = torch.argmax(jaccard)
+        box_idx = (max_idx % num_gt_boxes).long()
+        anc_idx = (max_idx / num_gt_boxes).long()
+        anchors_bbox_map[anc_idx] = box_idx
+        jaccard[:, box_idx] = col_discard
+        jaccard[anc_idx, :] = row_discard
     return anchors_bbox_map
 
 
