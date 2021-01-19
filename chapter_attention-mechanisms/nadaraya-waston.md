@@ -464,3 +464,4 @@ d2l.show_heatmaps(net.attention_weights.unsqueeze(0).unsqueeze(0),
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1599)
 :end_tab:
+
