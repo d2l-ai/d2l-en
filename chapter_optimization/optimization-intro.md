@@ -1,22 +1,28 @@
 # Optimization and Deep Learning
 
-In this section, we will discuss the relationship between optimization and deep learning as well as the challenges of using optimization in deep learning. For a deep learning problem, we will usually define a loss function first. Once we have the loss function, we can use an optimization algorithm in attempt to minimize the loss. In optimization, a loss function is often referred to as the objective function of the optimization problem. By tradition and convention most optimization algorithms are concerned with *minimization*. If we ever need to maximize an objective there is a simple solution: just flip the sign on the objective.
+In this section, we will discuss the relationship between optimization and deep learning as well as the challenges of using optimization in deep learning.
+For a deep learning problem, we will usually define a *loss function* first. Once we have the loss function, we can use an optimization algorithm in attempt to minimize the loss.
+In optimization, a loss function is often referred to as the *objective function* of the optimization problem. By tradition and convention most optimization algorithms are concerned with *minimization*. If we ever need to maximize an objective there is a simple solution: just flip the sign on the objective.
 
-## Optimization and Estimation
+## Goal of Optimization
 
 Although optimization provides a way to minimize the loss function for deep
 learning, in essence, the goals of optimization and deep learning are
-fundamentally different. The former is primarily concerned with minimizing an
+fundamentally different.
+The former is primarily concerned with minimizing an
 objective whereas the latter is concerned with finding a suitable model, given a
-finite amount of data.  In :numref:`sec_model_selection`,
-we discussed the difference between these two goals in detail. For instance,
+finite amount of data.
+In :numref:`sec_model_selection`,
+we discussed the difference between these two goals in detail.
+For instance,
 training error and generalization error generally differ: since the objective
 function of the optimization algorithm is usually a loss function based on the
 training dataset, the goal of optimization is to reduce the training error.
-However, the goal of statistical inference (and thus of deep learning) is to
-reduce the generalization error.  To accomplish the latter we need to pay
+However, the goal of deep learning (or more broadly, statistical inference) is to
+reduce the generalization error.
+To accomplish the latter we need to pay
 attention to overfitting in addition to using the optimization algorithm to
-reduce the training error. We begin by importing a few libraries for this chapter.
+reduce the training error.
 
 ```{.python .input}
 %matplotlib inline
@@ -44,17 +50,32 @@ from mpl_toolkits import mplot3d
 import tensorflow as tf
 ```
 
-Next we define two functions, the expected function $f$ and the
-empirical function $g$, to illustrate this issue. Here the $g$ is less smooth than $f$
-since we have only a finite amount of data.
+To illustrate the aforementioned different goals,
+let us consider 
+the empirical risk and the risk. 
+As described
+in :numref:`subsec_empirical-risk-and-risk`,
+the empirical risk
+is an average loss
+on the training dataset
+while the risk is the expected loss 
+on the entire population of data.
+Below we define two functions:
+the risk function `f`
+and the empirical risk function `g`.
+Suppose that we have only a finite amount of training data.
+As a result, here `g` is less smooth than `f`.
 
 ```{.python .input}
 #@tab all
-def f(x): return x * d2l.cos(np.pi * x)
-def g(x): return f(x) + 0.2 * d2l.cos(5 * np.pi * x)
+def f(x):
+    return x * d2l.cos(np.pi * x)
+
+def g(x):
+    return f(x) + 0.2 * d2l.cos(5 * np.pi * x)
 ```
 
-The graph below illustrates that the minimum of the training error may be at a different location than the minimum of the expected error (or of the test error).
+The graph below illustrates that the minimum of the empirical risk on a training dataset may be at a different location from the minimum of the risk (generalization error).
 
 ```{.python .input}
 #@tab all
@@ -65,8 +86,8 @@ def annotate(text, xy, xytext):  #@save
 x = d2l.arange(0.5, 1.5, 0.01)
 d2l.set_figsize((4.5, 2.5))
 d2l.plot(x, [f(x), g(x)], 'x', 'risk')
-annotate('empirical risk', (1.0, -1.2), (0.5, -1.1))
-annotate('expected risk', (1.1, -1.05), (0.95, -0.5))
+annotate('min of\nempirical risk', (1.0, -1.2), (0.5, -1.1))
+annotate('min of risk', (1.1, -1.05), (0.95, -0.5))
 ```
 
 ## Optimization Challenges in Deep Learning

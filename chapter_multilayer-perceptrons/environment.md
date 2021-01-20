@@ -301,7 +301,8 @@ The remainder of this section grows considerably more technical.
 The impatient reader could continue on to the next section
 as this material is not prerequisite to subsequent concepts.
 
-### Empirical Risk and True Risk
+### Empirical Risk and  Risk
+:label:`subsec_empirical-risk-and-risk`
 
 Let us first reflect about what exactly
 is happening during model training:
@@ -318,8 +319,8 @@ $$\mathop{\mathrm{minimize}}_f \frac{1}{n} \sum_{i=1}^n l(f(\mathbf{x}_i), y_i),
 where $l$ is the loss function
 measuring "how bad" the prediction $f(\mathbf{x}_i)$ is given the associated label $y_i$.
 Statisticians call the term in :eqref:`eq_empirical-risk-min` *empirical risk*.
-*Empirical risk* is an average loss over the training data
-to approximate the *true risk*,
+The *empirical risk* is an average loss over the training data
+to approximate the *risk*,
 which is the
 expectation of the loss over the entire population of data drawn from their true distribution
 $p(\mathbf{x},y)$:
@@ -329,13 +330,10 @@ $$E_{p(\mathbf{x}, y)} [l(f(\mathbf{x}), y)] = \int\int l(f(\mathbf{x}), y) p(\m
 
 However, in practice we typically cannot obtain the entire population of data.
 Thus, *empirical risk minimization*,
-which is minimizing empirical risk in :eqref:`eq_empirical-risk-min`,
+which is minimizing the empirical risk in :eqref:`eq_empirical-risk-min`,
 is a practical strategy for machine learning,
 with the hope to approximate
-minimizing true risk.
-
-
-
+minimizing the risk.
 
 
 
@@ -352,7 +350,7 @@ Fortunately,
 the dependency assumption means
 that the conditional distribution does not change: $p(y \mid \mathbf{x}) = q(y \mid \mathbf{x})$.
 If the source distribution $q(\mathbf{x})$ is "wrong",
-we can correct for that by using the following simple identity in true risk:
+we can correct for that by using the following simple identity in the risk:
 
 $$
 \begin{aligned}
@@ -472,7 +470,7 @@ stays the same: $q(\mathbf{x} \mid y)=p(\mathbf{x} \mid y)$.
 If the source distribution $q(y)$ is "wrong",
 we can correct for that
 according to
-the following identity in true risk
+the following identity in the risk
 as defined in
 :eqref:`eq_true-risk`:
 
@@ -682,7 +680,7 @@ that you might encounter in a career in machine learning.
 ## Summary
 
 * In many cases training and test sets do not come from the same distribution. This is called distribution shift.
-* True risk is the expectation of the loss over the entire population of data drawn from their true distribution. However, this entire population is usually unavailable. Empirical risk is an average loss over the training data to approximate the true risk. In practice, we perform empirical risk minimization.
+* The risk is the expectation of the loss over the entire population of data drawn from their true distribution. However, this entire population is usually unavailable. Empirical risk is an average loss over the training data to approximate the risk. In practice, we perform empirical risk minimization.
 * Under the corresponding assumptions, covariate and label shift can be detected and corrected for at test time. Failure to account for this bias can become problematic at test time.
 * In some cases, the environment may remember automated actions and respond in surprising ways. We must account for this possibility when building models and continue to monitor live systems, open to the possibility that our models and the environment will become entangled in unanticipated ways.
 
@@ -691,7 +689,7 @@ that you might encounter in a career in machine learning.
 1. What could happen when we change the behavior of a search engine? What might the users do? What about the advertisers?
 1. Implement a covariate shift detector. Hint: build a classifier.
 1. Implement a covariate shift corrector.
-1. Besides distribution shift, what else could affect how empirical risk approximates true risk?
+1. Besides distribution shift, what else could affect how the empirical risk approximates the risk?
 
 
 [Discussions](https://discuss.d2l.ai/t/105)
