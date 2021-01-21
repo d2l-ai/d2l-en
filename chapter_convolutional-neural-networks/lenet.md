@@ -420,7 +420,7 @@ Now let us train and evaluate the LeNet-5 model.
 ```{.python .input}
 #@tab all
 lr, num_epochs = 0.9, 10
-train_ch6(net, train_iter, test_iter, num_epochs, lr)
+train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 ```
 
 ## Summary
