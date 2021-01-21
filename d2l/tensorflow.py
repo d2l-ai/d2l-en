@@ -471,8 +471,7 @@ class TrainCallback(tf.keras.callbacks.Callback):
                   f'{str(self.device_name)}')
 
 
-def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
-              device=d2l.try_gpu()):
+def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
     """Train a model with a GPU (defined in Chapter 6)."""
     device_name = device._device_name
     strategy = tf.distribute.OneDeviceStrategy(device_name)

@@ -512,14 +512,14 @@ The main difference is the considerably larger learning rate.
 #@tab mxnet, pytorch
 lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 ```
 
 ```{.python .input}
 #@tab tensorflow
 lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 ```
 
 Let us have a look at the scale parameter `gamma`
@@ -610,7 +610,7 @@ while our custom implementation must be interpreted by Python.
 
 ```{.python .input}
 #@tab all
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 ```
 
 ## Controversy
