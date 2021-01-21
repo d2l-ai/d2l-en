@@ -12,13 +12,12 @@ stage("Build and Publish") {
       checkout scm
       // conda environment
       def ENV_NAME = "${TASK}-${EXECUTOR_NUMBER}";
-      // assign two GPUs to each build
-      def EID = EXECUTOR_NUMBER.toInteger()
-      def CUDA_VISIBLE_DEVICES=(EID*2).toString() + ',' + (EID*2+1).toString();
 
       sh label: "Build Environment", script: """set -ex
       conda env update -n ${ENV_NAME} -f static/build.yml
       conda activate ${ENV_NAME}
+      pip uninstall -y d2lbook
+      pip install git+https://github.com/d2l-ai/d2l-book@resource
       pip list
       nvidia-smi
       """
@@ -30,7 +29,6 @@ stage("Build and Publish") {
 
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
-      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       ./static/cache.sh restore _build/eval/data
       d2lbook build eval
       ./static/cache.sh store _build/eval/data
@@ -38,7 +36,6 @@ stage("Build and Publish") {
 
       sh label: "Execute Notebooks [PyTorch]", script: """set -ex
       conda activate ${ENV_NAME}
-      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       ./static/cache.sh restore _build/eval_pytorch/data
       d2lbook build eval --tab pytorch
       d2lbook build slides --tab pytorch
@@ -47,7 +44,6 @@ stage("Build and Publish") {
 
       sh label: "Execute Notebooks [TensorFlow]", script: """set -ex
       conda activate ${ENV_NAME}
-      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       ./static/cache.sh restore _build/eval_tensorflow/data
       export TF_CPP_MIN_LOG_LEVEL=3
       d2lbook build eval --tab tensorflow
