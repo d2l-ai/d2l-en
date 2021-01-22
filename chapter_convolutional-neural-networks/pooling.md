@@ -225,8 +225,18 @@ pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='same',
 pool2d(X)
 ```
 
+:begin_tab:`mxnet, tensorflow`
 Of course, we can specify an arbitrary rectangular pooling window
 and specify the padding and stride for height and width, respectively.
+:end_tab:
+
+:begin_tab:`pytorch`
+Of course, we can specify an arbitrary rectangular pooling window
+and specify the padding and stride for height and width, respectively.
+For `nn.MaxPool2D` padding should be smaller than half of the kernel_size.
+If the condition is not met, we can first pad the input using
+`nn.functional.pad` and then pass it to the pooling layer.
+:end_tab:
 
 ```{.python .input}
 pool2d = nn.MaxPool2D((2, 3), padding=(1, 2), strides=(2, 3))
@@ -235,8 +245,9 @@ pool2d(X)
 
 ```{.python .input}
 #@tab pytorch
-pool2d = nn.MaxPool2d((2, 3), padding=(1, 1), stride=(2, 3))
-pool2d(X)
+X_pad = nn.functional.pad(X, (2, 2, 1, 1))
+pool2d = nn.MaxPool2d((2, 3), stride=(2, 3))
+pool2d(X_pad)
 ```
 
 ```{.python .input}
