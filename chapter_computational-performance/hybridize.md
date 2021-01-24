@@ -125,20 +125,19 @@ net(x)
 
 ```{.python .input}
 #@tab tensorflow
-from d2l import torch as d2l
-import torch
-from torch import nn
+from d2l import tensorflow as d2l
+import tensorflow as tf
+from tensorflow.keras.layers import Dense
 
 # Factory for networks
 def get_net():
-    net = nn.Sequential(nn.Linear(512, 256),
-            nn.ReLU(),
-            nn.Linear(256, 128),
-            nn.ReLU(),
-            nn.Linear(128, 2))
+    net = tf.keras.Sequential()
+    net.add(Dense(256, input_shape = (512,), activation = "relu"))
+    net.add(Dense(128, activation = "relu"))
+    net.add(Dense(2, activation = "linear"))
     return net
 
-x = torch.randn(size=(1, 512))
+x = tf.random.normal([1,512])
 net = get_net()
 net(x)
 ```
@@ -169,7 +168,7 @@ net(x)
 
 ```{.python .input}
 #@tab tensorflow
-net = tf.function(net)
+net = tf.function(net, jit_compile=True)
 net(x)
 ```
 
@@ -183,6 +182,8 @@ By converting the model using `torch.jit.script` This seems almost too good to b
 
 :begin_tab:`tensorflow`
 Converting the model using `tf.function` gives us incredible power in tensorflow: write the same code as before and simply convert the model using `tf.function`. Once this happens the network is built as a computational graph in tensorflow's MLIR intermediate representation and is heavily optimized at the compiler level for rapid execution (we will benchmark the performance below).
+Explicitly adding the `jit_compile = True` flag enables XLA (Accelerated Linear Algebra) functionality in tensorflow. XLA can further optimize JIT compiled code in certain instances. Graph-mode execution is enabled without this explicit definition, however XLA can make certain large linear algebra operations (in the vein of those we see in deep learning applcations) much faster, particularly in a GPU environment. 
+In this case we don't notice a substantial increase between the graph-mode executed network and the XLA executed, however both are faster than the eagerly executed code. 
 :end_tab:
 
 ### Acceleration by Hybridization
@@ -213,7 +214,7 @@ Now we can invoke the network twice, once with and once without torchscript.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Now we can invoke the network twice, once executed eagerly and once with graph-mode execution.
+Now we can invoke the network three times, once executed eagerly, once with graph-mode execution, and again using JIT compiled XLA.
 :end_tab:
 
 ```{.python .input}
@@ -242,11 +243,15 @@ with Benchmark('With torchscript'):
 ```{.python .input}
 #@tab tensorflow
 net = get_net()
-with Benchmark('Eager Mode Execution'):
+with Benchmark('Eager Mode'):
     for i in range(1000): net(x)
 
 net = tf.function(net)
-with Benchmark('Graph Mode Execution'):
+with Benchmark('Graph Mode'):
+    for i in range(1000): net(x)
+
+net = tf.function(net, jit_compile = True)
+with Benchmark('Graph Mode with XLA'):
     for i in range(1000): net(x)
 ```
 
@@ -273,6 +278,11 @@ One of the benefits of compiling the models is that we can serialize (save) the 
 One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time the code is often faster than what can be achieved in imperative programming. Let us see the `save` method in action.
 :end_tab:
 
+:begin_tab:`tensorflow`
+One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages or execute a trained model on a server. At the same time the code is often faster than what can be achieved in imperative programming. The low-level API that allows us to save in tensorflow is `tf.saved_model`. 
+Let us see the `saved_model` class and subsequent methods in action.
+:end_tab:
+
 ```{.python .input}
 net.export('my_mlp')
 !ls -lh my_mlp*
@@ -281,6 +291,12 @@ net.export('my_mlp')
 ```{.python .input}
 #@tab pytorch
 net.save('my_mlp')
+!ls -lh my_mlp*
+```
+```{.python .input}
+#@tab tensorflow
+net = get_net()
+tf.saved_model.save(net, 'my_mlp')
 !ls -lh my_mlp*
 ```
 
@@ -343,7 +359,7 @@ Instead of using `ndarray` we now use the `symbol` module for `F`. Moreover, eve
 net(x)
 ```
 
-This is quite different from what we saw previously. All print statements, as defined in `hybrid_forward` are omitted. Indeed, after hybridization the execution of `net(x)` does not involve the Python interpreter any longer. This means that any spurious Python code is omitted (such as print statements) in favor of a much more streamlined execution and better performance. Instead, MXNet directly calls the C++ backend. Also note that some functions are not supported in the `symbol` module (like `asnumpy`) and operations in-place like `a += b` and `a[:] = a + b` must be rewritten as `a = a + b`. Nonetheless, compilation of models is worth the effort whenever speed matters. The benefit can range from small percentage points to more than twice the speed, depending on the complexity of the model, the speed of the CPU and the speed and number of GPUs.
+:begin_tab:`mxnet` This is quite different from what we saw previously. All print statements, as defined in `hybrid_forward` are omitted. Indeed, after hybridization the execution of `net(x)` does not involve the Python interpreter any longer. This means that any spurious Python code is omitted (such as print statements) in favor of a much more streamlined execution and better performance. Instead, MXNet directly calls the C++ backend. Also note that some functions are not supported in the `symbol` module (like `asnumpy`) and operations in-place like `a += b` and `a[:] = a + b` must be rewritten as `a = a + b`. Nonetheless, compilation of models is worth the effort whenever speed matters. The benefit can range from small percentage points to more than twice the speed, depending on the complexity of the model, the speed of the CPU and the speed and number of GPUs.
 
 ## Summary
 
