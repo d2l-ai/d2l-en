@@ -123,12 +123,37 @@ net = get_net()
 net(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import torch as d2l
+import torch
+from torch import nn
+
+# Factory for networks
+def get_net():
+    net = nn.Sequential(nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Linear(128, 2))
+    return net
+
+x = torch.randn(size=(1, 512))
+net = get_net()
+net(x)
+```
+
 :begin_tab:`mxnet`
 By calling the `hybridize` function, we are able to compile and optimize the computation in the MLP. The model's computation result remains unchanged.
 :end_tab:
 
 :begin_tab:`pytorch`
 By converting the model using `torch.jit.script` function, we are able to compile and optimize the computation in the MLP. The model's computation result remains unchanged.
+:end_tab:
+
+:begin_tab:`tensorflow`
+Formerly, all functions built in tensorflow were built as a computational graph, and therefore JIT compiled by default. However, with the release of tensorflow 2.X and eager tensors, this is no longer the default behavor. 
+We cen re-enable this functionality with tf.function. tf.function is more commonly used as a function decorator, however it is possible to call it direcly as a normal python function, shown below. The model's computation result remains unchanged.
 :end_tab:
 
 ```{.python .input}
@@ -142,12 +167,22 @@ net = torch.jit.script(net)
 net(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+net = tf.function(net)
+net(x)
+```
+
 :begin_tab:`mxnet`
 This seems almost too good to be true: simply designate a block to be `HybridSequential`, write the same code as before and invoke `hybridize`. Once this happens the network is optimized (we will benchmark the performance below). Unfortunately this does not work magically for every layer. That said, the blocks provided by Gluon are by default subclasses of `HybridBlock` and thus hybridizable. A layer will not be optimized if it inherits from the `Block` instead.
 :end_tab:
 
 :begin_tab:`pytorch`
 By converting the model using `torch.jit.script` This seems almost too good to be true: write the same code as before and simply convert the model using `torch.jit.script`. Once this happens the network is optimized (we will benchmark the performance below).
+:end_tab:
+
+:begin_tab:`tensorflow`
+Converting the model using `tf.function` gives us incredible power in tensorflow: write the same code as before and simply convert the model using `tf.function`. Once this happens the network is built as a computational graph in tensorflow's MLIR intermediate representation and is heavily optimized at the compiler level for rapid execution (we will benchmark the performance below).
 :end_tab:
 
 ### Acceleration by Hybridization
@@ -177,6 +212,10 @@ Now we can invoke the network twice, once with and once without hybridization.
 Now we can invoke the network twice, once with and once without torchscript.
 :end_tab:
 
+:begin_tab:`tensorflow`
+Now we can invoke the network twice, once executed eagerly and once with graph-mode execution.
+:end_tab:
+
 ```{.python .input}
 net = get_net()
 with Benchmark('Without hybridization'):
@@ -200,12 +239,28 @@ with Benchmark('With torchscript'):
     for i in range(1000): net(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+net = get_net()
+with Benchmark('Eager Mode Execution'):
+    for i in range(1000): net(x)
+
+net = tf.function(net)
+with Benchmark('Graph Mode Execution'):
+    for i in range(1000): net(x)
+```
+
+
 :begin_tab:`mxnet`
 As is observed in the above results, after a HybridSequential instance calls the `hybridize` function, computing performance is improved through the use of symbolic programming.
 :end_tab:
 
 :begin_tab:`pytorch`
 As is observed in the above results, after a nn.Sequential instance is scripted using the `torch.jit.script` function, computing performance is improved through the use of symbolic programming.
+:end_tab:
+
+:begin_tab:`tensorflow`
+As is observed in the above results, after a tf.keras Sequential instance is scripted using the `tf.function` function, computing performance is improved through the use of symbolic programming via graph-mode execution in tensorflow. 
 :end_tab:
 
 ### Serialization
