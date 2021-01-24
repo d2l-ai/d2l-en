@@ -79,6 +79,10 @@ In practice this means that we build models using either the `HybridBlock` or th
 As mentioned above, PyTorch is based on imperative programming and uses dynamic computation graphs. In an effort to leverage the portability and efficiency of symbolic programming, developers considered whether it would be possible to combine the benefits of both programming models. This led to a torchscript that lets users develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programs to be run when product-level computing performance and deployment are required.
 :end_tab:
 
+:begin_tab:`tensorflow`
+The imperative programming paradigm is now the default in Tensorflow 2.X, a welcome change for those new to the language. However, the same symbolic programming techniques and subsequent computational graphs still exist in tensorflow, and can be accessed by the easy-to-use `tf.function` decorator. This brought the imperative programming paradigm to tensorflow, allowed users to define more intuitive functions, then wrap them and compile them into computational graphs automatically using a feature the Tensorflow team refers to as [autograph](https://www.tensorflow.org/api_docs/python/tf/autograph).
+:end_tab:
+
 ## HybridSequential
 
 The easiest way to get a feel for how hybridization works is to consider deep networks with multiple layers. Conventionally the Python interpreter will need to execute the code for all layers to generate an instruction that can then be forwarded to a CPU or a GPU. For a single (fast) compute device this does not cause any major issues. On the other hand, if we use an advanced 8-GPU server such as an AWS P3dn.24xlarge instance Python will struggle to keep all GPUs busy. The single-threaded Python interpreter becomes the bottleneck here. Let us see how we can address this for significant parts of the code by replacing `Sequential` by `HybridSequential`. We begin by defining a simple MLP.
