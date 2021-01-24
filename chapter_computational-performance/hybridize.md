@@ -172,7 +172,7 @@ net(x)
 
 ```{.python .input}
 #@tab tensorflow
-net = tf.function(net, jit_compile=True)
+net = tf.function(net)
 net(x)
 ```
 
@@ -186,8 +186,7 @@ By converting the model using `torch.jit.script` This seems almost too good to b
 
 :begin_tab:`tensorflow`
 Converting the model using `tf.function` gives us incredible power in tensorflow: write the same code as before and simply convert the model using `tf.function`. Once this happens the network is built as a computational graph in tensorflow's MLIR intermediate representation and is heavily optimized at the compiler level for rapid execution (we will benchmark the performance below).
-Explicitly adding the `jit_compile = True` flag enables XLA (Accelerated Linear Algebra) functionality in tensorflow. XLA can further optimize JIT compiled code in certain instances. Graph-mode execution is enabled without this explicit definition, however XLA can make certain large linear algebra operations (in the vein of those we see in deep learning applcations) much faster, particularly in a GPU environment. 
-In this case we don't notice a substantial increase between the graph-mode executed network and the XLA executed, however both are faster than the eagerly executed code. 
+Explicitly adding the `jit_compile = True` flag to the `tf.function()` call enables XLA (Accelerated Linear Algebra) functionality in tensorflow. XLA can further optimize JIT compiled code in certain instances. Graph-mode execution is enabled without this explicit definition, however XLA can make certain large linear algebra operations (in the vein of those we see in deep learning applcations) much faster, particularly in a GPU environment.
 :end_tab:
 
 ### Acceleration by Hybridization
@@ -252,10 +251,6 @@ with Benchmark('Eager Mode'):
 
 net = tf.function(net)
 with Benchmark('Graph Mode'):
-    for i in range(1000): net(x)
-
-net = tf.function(net, jit_compile = True)
-with Benchmark('Graph Mode with XLA'):
     for i in range(1000): net(x)
 ```
 
