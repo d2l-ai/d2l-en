@@ -92,20 +92,28 @@ annotate('min of risk', (1.1, -1.05), (0.95, -0.5))
 
 ## Optimization Challenges in Deep Learning
 
-In this chapter, we are going to focus specifically on the performance of the
-optimization algorithm in minimizing the objective function, rather than a
-model's generalization error.  In :numref:`sec_linear_regression`
+In this chapter, we are going to focus specifically on the performance of optimization algorithms in minimizing the objective function, rather than a
+model's generalization error. 
+In :numref:`sec_linear_regression`
 we distinguished between analytical solutions and numerical solutions in
-optimization problems. In deep learning, most objective functions are
+optimization problems. 
+In deep learning, most objective functions are
 complicated and do not have analytical solutions. Instead, we must use numerical
-optimization algorithms. The optimization algorithms below all fall into this
+optimization algorithms. 
+The optimization algorithms in this chapter
+all fall into this
 category.
 
-There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points and vanishing gradients. Let us have a look at a few of them.
+There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points, and vanishing gradients. 
+Let us have a look at them.
+
 
 ### Local Minima
 
-For the objective function $f(x)$, if the value of $f(x)$ at $x$ is smaller than the values of $f(x)$ at any other points in the vicinity of $x$, then $f(x)$ could be a local minimum. If the value of $f(x)$ at $x$ is the minimum of the objective function over the entire domain, then $f(x)$ is the global minimum.
+For any objective function $f(x)$,
+if the value of $f(x)$ at $x$ is smaller than the values of $f(x)$ at any other points in the vicinity of $x$, then $f(x)$ could be a local minimum.
+If the value of $f(x)$ at $x$ is the minimum of the objective function over the entire domain,
+then $f(x)$ is the global minimum.
 
 For example, given the function
 
@@ -121,7 +129,11 @@ annotate('local minimum', (-0.3, -0.25), (-0.77, -1.0))
 annotate('global minimum', (1.1, -0.95), (0.6, 0.8))
 ```
 
-The objective function of deep learning models usually has many local optima. When the numerical solution of an optimization problem is near the local optimum, the numerical solution obtained by the final iteration may only minimize the objective function locally, rather than globally, as the gradient of the objective function's solutions approaches or becomes zero. Only some degree of noise might knock the parameter out of the local minimum. In fact, this is one of the beneficial properties of stochastic gradient descent where the natural variation of gradients over minibatches is able to dislodge the parameters from local minima.
+The objective function of deep learning models usually has many local optima. 
+When the numerical solution of an optimization problem is near the local optimum, the numerical solution obtained by the final iteration may only minimize the objective function *locally*, rather than *globally*, as the gradient of the objective function's solutions approaches or becomes zero. 
+Only some degree of noise might knock the parameter out of the local minimum. In fact, this is one of the beneficial properties of
+minibatch stochastic gradient descent where the natural variation of gradients over minibatches is able to dislodge the parameters from local minima.
+
 
 ### Saddle Points
 
