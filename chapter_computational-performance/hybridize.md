@@ -80,7 +80,7 @@ As mentioned above, PyTorch is based on imperative programming and uses dynamic 
 :end_tab:
 
 :begin_tab:`tensorflow`
-The imperative programming paradigm is now the default in Tensorflow 2.X, a welcome change for those new to the language. However, the same symbolic programming techniques and subsequent computational graphs still exist in tensorflow, and can be accessed by the easy-to-use `tf.function` decorator. This brought the imperative programming paradigm to tensorflow, allowed users to define more intuitive functions, then wrap them and compile them into computational graphs automatically using a feature the Tensorflow team refers to as [autograph](https://www.tensorflow.org/api_docs/python/tf/autograph).
+The imperative programming paradigm is now the default in Tensorflow 2, a welcoming change for those new to the language. However, the same symbolic programming techniques and subsequent computational graphs still exist in TensorFlow, and can be accessed by the easy-to-use `tf.function` decorator. This brought the imperative programming paradigm to TensorFlow, allowed users to define more intuitive functions, then wrap them and compile them into computational graphs automatically using a feature the TensorFlow team refers to as [autograph](https://www.tensorflow.org/api_docs/python/tf/autograph).
 :end_tab:
 
 ## HybridSequential
