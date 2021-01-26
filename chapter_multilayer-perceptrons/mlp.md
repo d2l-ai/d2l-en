@@ -293,6 +293,7 @@ import tensorflow as tf
 ```
 
 ## Activation Functions
+:label:`subsec:activation-functions`
 
 Activation functions decide whether a neuron should be activated or not by
 calculating the weighted sum and further adding bias with it.

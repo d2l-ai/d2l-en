@@ -137,7 +137,8 @@ minibatch stochastic gradient descent where the natural variation of gradients o
 
 ### Saddle Points
 
-Besides local minima, saddle points are another reason for gradients to vanish. A [saddle point](https://en.wikipedia.org/wiki/Saddle_point) is any location where all gradients of a function vanish but which is neither a global nor a local minimum. Consider the function $f(x) = x^3$. Its first and second derivative vanish for $x=0$. Optimization might stall at the point, even though it is not a minimum.
+Besides local minima, saddle points are another reason for gradients to vanish. A *saddle point* is any location where all gradients of a function vanish but which is neither a global nor a local minimum. 
+Consider the function $f(x) = x^3$. Its first and second derivative vanish for $x=0$. Optimization might stall at this point, even though it is not a minimum.
 
 ```{.python .input}
 #@tab all
@@ -167,7 +168,7 @@ d2l.plt.ylabel('y');
 
 We assume that the input of a function is a $k$-dimensional vector and its
 output is a scalar, so its Hessian matrix will have $k$ eigenvalues
-(refer to :numref:`sec_geometry-linear-algebraic-ops`).
+(refer to the [online appendix on eigendecompositions](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/eigendecomposition.html)).
 The solution of the
 function could be a local minimum, a local maximum, or a saddle point at a
 position where the function gradient is zero:
@@ -176,11 +177,15 @@ position where the function gradient is zero:
 * When the eigenvalues of the function's Hessian matrix at the zero-gradient position are all negative, we have a local maximum for the function.
 * When the eigenvalues of the function's Hessian matrix at the zero-gradient position are negative and positive, we have a saddle point for the function.
 
-For high-dimensional problems the likelihood that at least some of the eigenvalues are negative is quite high. This makes saddle points more likely than local minima. We will discuss some exceptions to this situation in the next section when introducing convexity. In short, convex functions are those where the eigenvalues of the Hessian are never negative. Sadly, though, most deep learning problems do not fall into this category. Nonetheless it is a great tool to study optimization algorithms.
+For high-dimensional problems the likelihood that at least *some* of the eigenvalues are negative is quite high. This makes saddle points more likely than local minima. We will discuss some exceptions to this situation in the next section when introducing convexity. In short, convex functions are those where the eigenvalues of the Hessian are never negative. Sadly, though, most deep learning problems do not fall into this category. Nonetheless it is a great tool to study optimization algorithms.
 
 ### Vanishing Gradients
 
-Probably the most insidious problem to encounter are vanishing gradients. For instance, assume that we want to minimize the function $f(x) = \tanh(x)$ and we happen to get started at $x = 4$. As we can see, the gradient of $f$ is close to nil. More specifically $f'(x) = 1 - \tanh^2(x)$ and thus $f'(4) = 0.0013$. Consequently optimization will get stuck for a long time before we make progress. This turns out to be one of the reasons that training deep learning models was quite tricky prior to the introduction of the ReLU activation function.
+Probably the most insidious problem to encounter is the vanishing gradient.
+Recall our commonly-used activation functions and their derivatives in :numref:`subsec:activation-functions`.
+For instance, assume that we want to minimize the function $f(x) = \tanh(x)$ and we happen to get started at $x = 4$. As we can see, the gradient of $f$ is close to nil.
+More specifically, $f'(x) = 1 - \tanh^2(x)$ and thus $f'(4) = 0.0013$.
+Consequently, optimization will get stuck for a long time before we make progress. This turns out to be one of the reasons that training deep learning models was quite tricky prior to the introduction of the ReLU activation function.
 
 ```{.python .input}
 #@tab all
@@ -193,7 +198,7 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
 
 ## Summary
 
-* Minimizing the training error does *not* guarantee that we find the best set of parameters to minimize the expected error.
+* Minimizing the training error does *not* guarantee that we find the best set of parameters to minimize the generalization error.
 * The optimization problems may have many local minima.
 * The problem may have even more saddle points, as generally the problems are not convex.
 * Vanishing gradients can cause optimization to stall. Often a reparameterization of the problem helps. Good initialization of the parameters can be beneficial, too.
@@ -201,17 +206,17 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
 
 ## Exercises
 
-1. Consider a simple multilayer perceptron with a single hidden layer of, say, $d$ dimensions in the hidden layer and a single output. Show that for any local minimum there are at least $d!$ equivalent solutions that behave identically.
+1. Consider a simple MLP with a single hidden layer of, say, $d$ dimensions in the hidden layer and a single output. Show that for any local minimum there are at least $d!$ equivalent solutions that behave identically.
 1. Assume that we have a symmetric random matrix $\mathbf{M}$ where the entries
    $M_{ij} = M_{ji}$ are each drawn from some probability distribution
    $p_{ij}$. Furthermore assume that $p_{ij}(x) = p_{ij}(-x)$, i.e., that the
    distribution is symmetric (see e.g., :cite:`Wigner.1958` for details).
-    * Prove that the distribution over eigenvalues is also symmetric. That is, for any eigenvector $\mathbf{v}$ the probability that the associated eigenvalue $\lambda$ satisfies $P(\lambda > 0) = P(\lambda < 0)$.
-    * Why does the above *not* imply $P(\lambda > 0) = 0.5$?
+    1. Prove that the distribution over eigenvalues is also symmetric. That is, for any eigenvector $\mathbf{v}$ the probability that the associated eigenvalue $\lambda$ satisfies $P(\lambda > 0) = P(\lambda < 0)$.
+    1. Why does the above *not* imply $P(\lambda > 0) = 0.5$?
 1. What other challenges involved in deep learning optimization can you think of?
 1. Assume that you want to balance a (real) ball on a (real) saddle.
-    * Why is this hard?
-    * Can you exploit this effect also for optimization algorithms?
+    1. Why is this hard?
+    1. Can you exploit this effect also for optimization algorithms?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/349)
