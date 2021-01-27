@@ -167,8 +167,13 @@ by padding the input and adjusting the stride.
 We can demonstrate the use of padding and strides
 in pooling layers via the built-in two-dimensional maximum pooling layer from the deep learning framework.
 We first construct an input tensor `X` whose shape has four dimensions,
-where the number of examples (batch size) and number of channels are both 1. It is important to note that tensorflow, 
-as well as other frameworks such as CNTK and Theano, prefer and are optimized for *channels last* input.
+where the number of examples (batch size) and number of channels are both 1. 
+
+:begin_tab:`tensorflow`
+It is important to note that tensorflow, 
+as well as other frameworks such as CNTK and Theano, prefer and are optimized for *channels last* input. 
+This results in outputs that differ in dimensionality from MXnet and Pytorch, but contain the same numerical values.
+:end_tab:
 
 
 ```{.python .input}
@@ -185,12 +190,18 @@ X
 ```
 
 :begin_tab:`mxnet, pytorch`
-Note in the above example the tensor size is `(batch_sz, channels, l, w)`
+Note in the above example the tensor size is `(batch_sz, channels, l, w)`. By default, the stride and the pooling window in the instance from the framework's built-in class
+have the same shape.
+Below, we use a pooling window of shape `(3, 3)`,
+so we get a stride shape of `(3, 3)` by default.
 :end_tab:
 
 
 :begin_tab:`tensorflow`
-Note in the above example the tensor size is `(batch_sz, l, w, channels)`
+Note in the above example the tensor size is `(batch_sz, l, w, channels)`. By default, the stride and the pooling window in the instance from the framework's built-in class
+have the same shape.
+Below, we use a pooling window of shape `(3, 3)`,
+so we get a stride shape of `(3, 3)` by default.
 :end_tab:
 
 By default, the stride and the pooling window in the instance from the framework's built-in class
