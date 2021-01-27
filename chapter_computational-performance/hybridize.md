@@ -278,7 +278,8 @@ One of the benefits of compiling the models is that we can serialize (save) the 
 :end_tab:
 
 :begin_tab:`tensorflow`
-One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages or execute a trained model on a server. At the same time the code is often faster than what can be achieved in imperative programming. The low-level API that allows us to save in tensorflow is `tf.saved_model`. 
+One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages or execute a trained model on a server. At the same time the code is often faster than what can be achieved in imperative programming. 
+The low-level API that allows us to save in tensorflow is `tf.saved_model`. 
 Let's see the `saved_model` instance in action.
 :end_tab:
 
