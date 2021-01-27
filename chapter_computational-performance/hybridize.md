@@ -79,6 +79,10 @@ In practice this means that we build models using either the `HybridBlock` or th
 As mentioned above, PyTorch is based on imperative programming and uses dynamic computation graphs. In an effort to leverage the portability and efficiency of symbolic programming, developers considered whether it would be possible to combine the benefits of both programming models. This led to a torchscript that lets users develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programs to be run when product-level computing performance and deployment are required.
 :end_tab:
 
+:begin_tab:`tensorflow`
+The imperative programming paradigm is now the default in Tensorflow 2, a welcoming change for those new to the language. However, the same symbolic programming techniques and subsequent computational graphs still exist in TensorFlow, and can be accessed by the easy-to-use `tf.function` decorator. This brought the imperative programming paradigm to TensorFlow, allowed users to define more intuitive functions, then wrap them and compile them into computational graphs automatically using a feature the TensorFlow team refers to as [autograph](https://www.tensorflow.org/api_docs/python/tf/autograph).
+:end_tab:
+
 ## HybridSequential
 
 The easiest way to get a feel for how hybridization works is to consider deep networks with multiple layers. Conventionally the Python interpreter will need to execute the code for all layers to generate an instruction that can then be forwarded to a CPU or a GPU. For a single (fast) compute device this does not cause any major issues. On the other hand, if we use an advanced 8-GPU server such as an AWS P3dn.24xlarge instance Python will struggle to keep all GPUs busy. The single-threaded Python interpreter becomes the bottleneck here. Let us see how we can address this for significant parts of the code by replacing `Sequential` by `HybridSequential`. We begin by defining a simple MLP.
@@ -123,12 +127,36 @@ net = get_net()
 net(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+from tensorflow.keras.layers import Dense
+
+# Factory for networks
+def get_net():
+    net = tf.keras.Sequential()
+    net.add(Dense(256, input_shape = (512,), activation = "relu"))
+    net.add(Dense(128, activation = "relu"))
+    net.add(Dense(2, activation = "linear"))
+    return net
+
+x = tf.random.normal([1,512])
+net = get_net()
+net(x)
+```
+
 :begin_tab:`mxnet`
 By calling the `hybridize` function, we are able to compile and optimize the computation in the MLP. The model's computation result remains unchanged.
 :end_tab:
 
 :begin_tab:`pytorch`
 By converting the model using `torch.jit.script` function, we are able to compile and optimize the computation in the MLP. The model's computation result remains unchanged.
+:end_tab:
+
+:begin_tab:`tensorflow`
+Formerly, all functions built in tensorflow were built as a computational graph, and therefore JIT compiled by default. However, with the release of tensorflow 2.X and eager tensors, this is no longer the default behavor. 
+We cen re-enable this functionality with tf.function. tf.function is more commonly used as a function decorator, however it is possible to call it direcly as a normal python function, shown below. The model's computation result remains unchanged.
 :end_tab:
 
 ```{.python .input}
@@ -142,12 +170,23 @@ net = torch.jit.script(net)
 net(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+net = tf.function(net)
+net(x)
+```
+
 :begin_tab:`mxnet`
 This seems almost too good to be true: simply designate a block to be `HybridSequential`, write the same code as before and invoke `hybridize`. Once this happens the network is optimized (we will benchmark the performance below). Unfortunately this does not work magically for every layer. That said, the blocks provided by Gluon are by default subclasses of `HybridBlock` and thus hybridizable. A layer will not be optimized if it inherits from the `Block` instead.
 :end_tab:
 
 :begin_tab:`pytorch`
 By converting the model using `torch.jit.script` This seems almost too good to be true: write the same code as before and simply convert the model using `torch.jit.script`. Once this happens the network is optimized (we will benchmark the performance below).
+:end_tab:
+
+:begin_tab:`tensorflow`
+Converting the model using `tf.function` gives us incredible power in TensorFlow: write the same code as before and simply convert the model using `tf.function`. Once this happens the network is built as a computational graph in TensorFlow's MLIR intermediate representation and is heavily optimized at the compiler level for rapid execution (we will benchmark the performance below).
+Explicitly adding the `jit_compile = True` flag to the `tf.function()` call enables XLA (Accelerated Linear Algebra) functionality in TensorFlow. XLA can further optimize JIT compiled code in certain instances. Graph-mode execution is enabled without this explicit definition, however XLA can make certain large linear algebra operations (in the vein of those we see in deep learning applications) much faster, particularly in a GPU environment.
 :end_tab:
 
 ### Acceleration by Hybridization
@@ -177,6 +216,10 @@ Now we can invoke the network twice, once with and once without hybridization.
 Now we can invoke the network twice, once with and once without torchscript.
 :end_tab:
 
+:begin_tab:`tensorflow`
+Now we can invoke the network three times, once executed eagerly, once with graph-mode execution, and again using JIT compiled XLA.
+:end_tab:
+
 ```{.python .input}
 net = get_net()
 with Benchmark('Without hybridization'):
@@ -200,12 +243,28 @@ with Benchmark('With torchscript'):
     for i in range(1000): net(x)
 ```
 
+```{.python .input}
+#@tab tensorflow
+net = get_net()
+with Benchmark('Eager Mode'):
+    for i in range(1000): net(x)
+
+net = tf.function(net)
+with Benchmark('Graph Mode'):
+    for i in range(1000): net(x)
+```
+
+
 :begin_tab:`mxnet`
 As is observed in the above results, after a HybridSequential instance calls the `hybridize` function, computing performance is improved through the use of symbolic programming.
 :end_tab:
 
 :begin_tab:`pytorch`
 As is observed in the above results, after a nn.Sequential instance is scripted using the `torch.jit.script` function, computing performance is improved through the use of symbolic programming.
+:end_tab:
+
+:begin_tab:`tensorflow`
+As is observed in the above results, after a tf.keras Sequential instance is scripted using the `tf.function` function, computing performance is improved through the use of symbolic programming via graph-mode execution in tensorflow. 
 :end_tab:
 
 ### Serialization
@@ -218,6 +277,12 @@ One of the benefits of compiling the models is that we can serialize (save) the 
 One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time the code is often faster than what can be achieved in imperative programming. Let us see the `save` method in action.
 :end_tab:
 
+:begin_tab:`tensorflow`
+One of the benefits of compiling the models is that we can serialize (save) the model and its parameters to disk. This allows us to store a model in a manner that is independent of the front-end language of choice. This allows us to deploy trained models to other devices and easily use other front-end programming languages or execute a trained model on a server. At the same time the code is often faster than what can be achieved in imperative programming. 
+The low-level API that allows us to save in tensorflow is `tf.saved_model`. 
+Let's see the `saved_model` instance in action.
+:end_tab:
+
 ```{.python .input}
 net.export('my_mlp')
 !ls -lh my_mlp*
@@ -226,6 +291,12 @@ net.export('my_mlp')
 ```{.python .input}
 #@tab pytorch
 net.save('my_mlp')
+!ls -lh my_mlp*
+```
+```{.python .input}
+#@tab tensorflow
+net = get_net()
+tf.saved_model.save(net, 'my_mlp')
 !ls -lh my_mlp*
 ```
 
@@ -242,7 +313,7 @@ Things are slightly more tricky when it comes to models that resemble code more 
 
 Contrary to the Block instance, which needs to use the `forward` function, for a HybridBlock instance we need to use the `hybrid_forward` function.
 
-Earlier, we demonstrated that, after calling the `hybridize` method, the model is able to achieve superior computing performance and portability. Note, though that hybridization can affect model flexibility, in particular in terms of control flow. We will illustrate how to design more general models and also how compilation will remove spurious Python elements.
+Earlier, we demonstrated that, after calling the `hybridize` function, the model is able to achieve superior computing performance and portability. Note, though that hybridization can affect model flexibility, in particular in terms of control flow. We will illustrate how to design more general models and also how compilation will remove spurious Python elements.
 :end_tab:
 
 ```{.python .input}
@@ -288,7 +359,7 @@ Instead of using `ndarray` we now use the `symbol` module for `F`. Moreover, eve
 net(x)
 ```
 
-This is quite different from what we saw previously. All print statements, as defined in `hybrid_forward` are omitted. Indeed, after hybridization the execution of `net(x)` does not involve the Python interpreter any longer. This means that any spurious Python code is omitted (such as print statements) in favor of a much more streamlined execution and better performance. Instead, MXNet directly calls the C++ backend. Also note that some functions are not supported in the `symbol` module (like `asnumpy`) and operations in-place like `a += b` and `a[:] = a + b` must be rewritten as `a = a + b`. Nonetheless, compilation of models is worth the effort whenever speed matters. The benefit can range from small percentage points to more than twice the speed, depending on the complexity of the model, the speed of the CPU and the speed and number of GPUs.
+:begin_tab:`mxnet` This is quite different from what we saw previously. All print statements, as defined in `hybrid_forward` are omitted. Indeed, after hybridization the execution of `net(x)` does not involve the Python interpreter any longer. This means that any spurious Python code is omitted (such as print statements) in favor of a much more streamlined execution and better performance. Instead, MXNet directly calls the C++ backend. Also note that some functions are not supported in the `symbol` module (like `asnumpy`) and operations in-place like `a += b` and `a[:] = a + b` must be rewritten as `a = a + b`. Nonetheless, compilation of models is worth the effort whenever speed matters. The benefit can range from small percentage points to more than twice the speed, depending on the complexity of the model, the speed of the CPU and the speed and number of GPUs.
 
 ## Summary
 
