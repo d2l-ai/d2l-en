@@ -1,43 +1,12 @@
 # Convexity
 :label:`sec_convexity`
 
-Convexity plays a vital role in the design of optimization algorithms. This is largely due to the fact that it is much easier to analyze and test algorithms in this context. In other words, if the algorithm performs poorly even in the convex setting we should not hope to see great results otherwise. Furthermore, even though the optimization problems in deep learning are generally nonconvex, they often exhibit some properties of convex ones near local minima. This can lead to exciting new optimization variants such as :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`.
-
-## Basics
-
-Let us begin with the basics.
-
-### Sets
-
-Sets are the basis of convexity. Simply put, a set $X$ in a vector space is convex if for any $a, b \in X$ the line segment connecting $a$ and $b$ is also in $X$. In mathematical terms this means that for all $\lambda \in [0, 1]$ we have
-
-$$\lambda \cdot a + (1-\lambda) \cdot b \in X \text{ whenever } a, b \in X.$$
-
-This sounds a bit abstract. Consider the picture :numref:`fig_pacman`. The first set is not convex since there are line segments that are not contained in it. The other two sets suffer no such problem.
-
-![Three shapes, the left one is nonconvex, the others are convex](../img/pacman.svg)
-:label:`fig_pacman`
-
-Definitions on their own are not particularly useful unless you can do something with them. In this case we can look at unions and intersections as shown in :numref:`fig_convex_intersect`. Assume that $X$ and $Y$ are convex sets. Then $X \cap Y$ is also convex. To see this, consider any $a, b \in X \cap Y$. Since $X$ and $Y$ are convex, the line segments connecting $a$ and $b$ are contained in both $X$ and $Y$. Given that, they also need to be contained in $X \cap Y$, thus proving our first theorem.
-
-![The intersection between two convex sets is convex](../img/convex-intersect.svg)
-:label:`fig_convex_intersect`
-
-We can strengthen this result with little effort: given convex sets $X_i$, their intersection $\cap_{i} X_i$ is convex.
-To see that the converse is not true, consider two disjoint sets $X \cap Y = \emptyset$. Now pick $a \in X$ and $b \in Y$. The line segment in :numref:`fig_nonconvex` connecting $a$ and $b$ needs to contain some part that is neither in $X$ nor $Y$, since we assumed that $X \cap Y = \emptyset$. Hence the line segment is not in $X \cup Y$ either, thus proving that in general unions of convex sets need not be convex.
-
-![The union of two convex sets need not be convex](../img/nonconvex.svg)
-:label:`fig_nonconvex`
-
-Typically the problems in deep learning are defined on convex domains. For instance $\mathbb{R}^d$ is a convex set (after all, the line between any two points in $\mathbb{R}^d$ remains in $\mathbb{R}^d$). In some cases we work with variables of bounded length, such as balls of radius $r$ as defined by $\{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\|_2 \leq r\}$.
-
-### Functions
-
-Now that we have convex sets we can introduce convex functions $f$. Given a convex set $X$ a function defined on it $f: X \to \mathbb{R}$ is convex if for all $x, x' \in X$ and for all $\lambda \in [0, 1]$ we have
-
-$$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
-
-To illustrate this let us plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
+Convexity plays a vital role in the design of optimization algorithms. 
+This is largely due to the fact that it is much easier to analyze and test algorithms in such a context. 
+In other words,
+if the algorithm performs poorly even in the convex setting,
+typically we should not hope to see great results otherwise. 
+Furthermore, even though the optimization problems in deep learning are generally nonconvex, they often exhibit some properties of convex ones near local minima. This can lead to exciting new optimization variants such as :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`.
 
 ```{.python .input}
 %matplotlib inline
@@ -65,7 +34,51 @@ from mpl_toolkits import mplot3d
 import tensorflow as tf
 ```
 
-Let us define a few functions, both convex and nonconvex.
+## Definitions
+
+Before convex analysis,
+we need to define *convex sets* and *convex functions*.
+They lead to mathematical tools that are commonly applied to machine learning.
+
+
+### Convex Sets
+
+Sets are the basis of convexity. Simply put, a set $\mathcal{X}$ in a vector space is *convex* if for any $a, b \in \mathcal{X}$ the line segment connecting $a$ and $b$ is also in $\mathcal{X}$. In mathematical terms this means that for all $\lambda \in [0, 1]$ we have
+
+$$\lambda  a + (1-\lambda)  b \in \mathcal{X} \text{ whenever } a, b \in \mathcal{X}.$$
+
+This sounds a bit abstract. Consider :numref:`fig_pacman`. The first set is not convex since there exist line segments that are not contained in it.
+The other two sets suffer no such problem.
+
+![The first set is nonconvex and the other two are convex.](../img/pacman.svg)
+:label:`fig_pacman`
+
+Definitions on their own are not particularly useful unless you can do something with them.
+In this case we can look at intersections as shown in :numref:`fig_convex_intersect`.
+Assume that $\mathcal{X}$ and $\mathcal{Y}$ are convex sets. Then $\mathcal{X} \cap \mathcal{Y}$ is also convex. To see this, consider any $a, b \in \mathcal{X} \cap \mathcal{Y}$. Since $\mathcal{X}$ and $\mathcal{Y}$ are convex, the line segments connecting $a$ and $b$ are contained in both $\mathcal{X}$ and $\mathcal{Y}$. Given that, they also need to be contained in $\mathcal{X} \cap \mathcal{Y}$, thus proving our theorem.
+
+![The intersection between two convex sets is convex.](../img/convex-intersect.svg)
+:label:`fig_convex_intersect`
+
+We can strengthen this result with little effort: given convex sets $\mathcal{X}_i$, their intersection $\cap_{i} \mathcal{X}_i$ is convex.
+To see that the converse is not true, consider two disjoint sets $\mathcal{X} \cap \mathcal{Y} = \emptyset$. Now pick $a \in \mathcal{X}$ and $b \in \mathcal{Y}$. The line segment in :numref:`fig_nonconvex` connecting $a$ and $b$ needs to contain some part that is neither in $\mathcal{X}$ nor in $\mathcal{Y}$, since we assumed that $\mathcal{X} \cap \mathcal{Y} = \emptyset$. Hence the line segment is not in $\mathcal{X} \cup \mathcal{Y}$ either, thus proving that in general unions of convex sets need not be convex.
+
+![The union of two convex sets need not be convex.](../img/nonconvex.svg)
+:label:`fig_nonconvex`
+
+Typically the problems in deep learning are defined on convex sets. For instance, $\mathbb{R}^d$,
+the set of $d$-dimensional vectors of real numbers,
+is a convex set (after all, the line between any two points in $\mathbb{R}^d$ remains in $\mathbb{R}^d$). In some cases we work with variables of bounded length, such as balls of radius $r$ as defined by $\{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\| \leq r\}$.
+
+### Convex Functions
+
+Now that we have convex sets we can introduce *convex functions* $f$.
+Given a convex set $\mathcal{X}$, a function $f: \mathcal{X} \to \mathbb{R}$ is *convex* if for all $x, x' \in \mathcal{X}$ and for all $\lambda \in [0, 1]$ we have
+
+$$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
+
+To illustrate this let us plot a few functions and check which ones satisfy the requirement.
+Below we define a few functions, both convex and nonconvex.
 
 ```{.python .input}
 #@tab all
@@ -80,26 +93,33 @@ for ax, func in zip(axes, [f, g, h]):
     d2l.plot([x, segment], [func(x), func(segment)], axes=ax)
 ```
 
-As expected, the cosine function is nonconvex, whereas the parabola and the exponential function are. Note that the requirement that $X$ is a convex set is necessary for the condition to make sense. Otherwise the outcome of $f(\lambda x + (1-\lambda) x')$ might not be well defined. Convex functions have a number of desirable properties.
+As expected, the cosine function is *nonconvex*, whereas the parabola and the exponential function are. Note that the requirement that $\mathcal{X}$ is a convex set is necessary for the condition to make sense. Otherwise the outcome of $f(\lambda x + (1-\lambda) x')$ might not be well defined.
+
 
 ### Jensen's Inequality
 
-One of the most useful tools is Jensen's inequality. It amounts to a generalization of the definition of convexity:
+Given a convex function $f$,
+one of the most useful mathematical tools
+is *Jensen's inequality*.
+It amounts to a generalization of the definition of convexity:
 
-$$\begin{aligned}
-    \sum_i \alpha_i f(x_i) & \geq f\left(\sum_i \alpha_i x_i\right)
-    \text{ and }
-    E_x[f(x)] & \geq f\left(E_x[x]\right),
-\end{aligned}$$
+$$\sum_i \alpha_i f(x_i)  \geq f\left(\sum_i \alpha_i x_i\right)    \text{ and }    E_X[f(X)]  \geq f\left(E_X[X]\right),$$
 
-where $\alpha_i$ are nonnegative real numbers such that $\sum_i \alpha_i = 1$. In other words, the expectation of a convex function is larger than the convex function of an expectation. To prove the first inequality we repeatedly apply the definition of convexity to one term in the sum at a time. The expectation can be proven by taking the limit over finite segments.
+where $\alpha_i$ are nonnegative real numbers such that $\sum_i \alpha_i = 1$ and $X$ is a random variable.
+In other words, the expectation of a convex function is no less than the convex function of an expectation, where the latter is usually a simpler expression. 
+To prove the first inequality we repeatedly apply the definition of convexity to one term in the sum at a time.
 
-One of the common applications of Jensen's inequality is with regard to the log-likelihood of partially observed random variables. That is, we use
 
-$$E_{y \sim P(y)}[-\log P(x \mid y)] \geq -\log P(x).$$
+One of the common applications of Jensen's inequality is
+to bound a more complicated expression by a simpler one.
+For example,
+its application can be
+with regard to the log-likelihood of partially observed random variables. That is, we use
 
-This follows since $\int P(y) P(x \mid y) dy = P(x)$.
-This is used in variational methods. Here $y$ is typically the unobserved random variable, $P(y)$ is the best guess of how it might be distributed and $P(x)$ is the distribution with $y$ integrated out. For instance, in clustering $y$ might be the cluster labels and $P(x \mid y)$ is the generative model when applying cluster labels.
+$$E_{Y \sim P(Y)}[-\log P(X \mid Y)] \geq -\log P(X),$$
+
+since $\int P(Y) P(X \mid Y) dY = P(X)$.
+This can be used in variational methods. Here $Y$ is typically the unobserved random variable, $P(Y)$ is the best guess of how it might be distributed, and $P(X)$ is the distribution with $Y$ integrated out. For instance, in clustering $Y$ might be the cluster labels and $P(X \mid Y)$ is the generative model when applying cluster labels.
 
 
 ## Properties
@@ -107,9 +127,9 @@ This is used in variational methods. Here $y$ is typically the unobserved random
 Convex functions have a few useful properties. We describe them as follows.
 
 
-### Local Minima is Global Minima
+### Local Minima Are Global Minima
 
-In particular, the local minima for convex functions is also the global minima. Let us assume the contrary and prove it wrong. If $x^{\ast} \in X$ is a local minimum such that there is a small positive value $p$ so that for $x \in X$ that satisfies $0 < |x - x^{\ast}| \leq p$ there is $f(x^{\ast}) < f(x)$. Assume there exists $x' \in X$ for which $f(x') < f(x^{\ast})$. According to the property of convexity, 
+In particular, the local minima for convex functions are also the global minima. Let us assume the contrary and prove it wrong. If $x^{\ast} \in \mathcal{X}$ is a local minimum such that there is a small positive value $p$ so that for $x \in \mathcal{X}$ that satisfies $0 < |x - x^{\ast}| \leq p$ there is $f(x^{\ast}) < f(x)$. Assume there exists $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. According to the property of convexity, 
 
 $$\begin{aligned}
     f(\lambda x^{\ast} + (1-\lambda) x') &\leq \lambda f(x^{\ast}) + (1-\lambda) f(x') \\
@@ -117,7 +137,7 @@ $$\begin{aligned}
     &< f(x^{\ast}) \\
 \end{aligned}$$
 
-There exists $\lambda \in [0, 1)$, $\lambda = 1 - \frac{p}{|x^{\ast} - x'|}$ for an example, so that $0 < |\lambda x^{\ast} + (1-\lambda) x' - x^{\ast}| \leq p$. However, because $f(\lambda x^{\ast} + (1-\lambda) x') < f(x^{\ast})$, this violates our local minimum statement. Therefore, there does not exist $x' \in X$ for which $f(x') < f(x^{\ast})$. The local minimum $x^{\ast}$ is also the global minimum.
+There exists $\lambda \in [0, 1)$, $\lambda = 1 - \frac{p}{|x^{\ast} - x'|}$ for an example, so that $0 < |\lambda x^{\ast} + (1-\lambda) x' - x^{\ast}| \leq p$. However, because $f(\lambda x^{\ast} + (1-\lambda) x') < f(x^{\ast})$, this violates our local minimum statement. Therefore, there does not exist $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. The local minimum $x^{\ast}$ is also the global minimum.
 
 For instance, the function $f(x) = (x-1)^2$ has a local minimum for $x=1$, it is also the global minimum.
 
@@ -134,9 +154,9 @@ The fact that the local minima for convex functions is also the global minima is
 
 Convex functions define convex sets as *below-sets*. They are defined as
 
-$$S_b := \{x | x \in X \text{ and } f(x) \leq b\}.$$
+$$S_b := \{x | x \in \mathcal{X} \text{ and } f(x) \leq b\}.$$
 
-Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \in S_b$ we need to show that $\lambda x + (1-\lambda) x' \in S_b$ as long as $\lambda \in [0, 1]$. But this follows directly from the definition of convexity since $f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b$.
+Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \in \mathcal{S}_b$ we need to show that $\lambda x + (1-\lambda) x' \in \mathcal{S}_b$ as long as $\lambda \in [0, 1]$. But this follows directly from the definition of convexity since $f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b$.
 
 Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
 
@@ -158,7 +178,7 @@ for func in [d2l.plt.xticks, d2l.plt.yticks, ax.set_zticks]:
 
 ### Derivatives and Convexity
 
-Whenever the second derivative of a function exists it is very easy to check for convexity. All we need to do is check whether $\partial_x^2 f(x) \succeq 0$, i.e., whether all of its eigenvalues are nonnegative. For instance, the function $f(\mathbf{x}) = \frac{1}{2} \|\mathbf{x}\|^2_2$ is convex since $\partial_{\mathbf{x}}^2 f = \mathbf{1}$, i.e., its derivative is the identity matrix.
+Whenever the second derivative of a function exists it is very easy to check for convexity. All we need to do is check whether $\partial_x^2 f(x) \succeq 0$, i.e., whether all of its eigenvalues are nonnegative. For instance, the function $f(\mathbf{x}) = \frac{1}{2} \|\mathbf{x}\|^2$ is convex since $\partial_{\mathbf{x}}^2 f = \mathbf{1}$, i.e., its derivative is the identity matrix.
 
 The first thing to realize is that we only need to prove this property for one-dimensional functions. After all, in general we can always define some function $g(z) = f(\mathbf{x} + z \cdot \mathbf{v})$. This function has the first and second derivatives $g' = (\partial_{\mathbf{x}} f)^\top \mathbf{v}$ and $g'' = \mathbf{v}^\top (\partial^2_{\mathbf{x}} f) \mathbf{v}$ respectively. In particular, $g'' \geq 0$ for all $\mathbf{v}$ whenever the Hessian of $f$ is positive semidefinite, i.e., whenever all of its eigenvalues are greater equal than zero. Hence back to the scalar case.
 
@@ -233,13 +253,13 @@ An alternative strategy for satisfying constraints are projections. Again, we en
 
 $$\mathbf{g} \leftarrow \mathbf{g} \cdot \mathrm{min}(1, c/\|\mathbf{g}\|).$$
 
-This turns out to be a *projection* of $g$ onto the ball of radius $c$. More generally, a projection on a (convex) set $X$ is defined as
+This turns out to be a *projection* of $g$ onto the ball of radius $c$. More generally, a projection on a (convex) set $\mathcal{X}$ is defined as
 
-$$\mathrm{Proj}_X(\mathbf{x}) = \mathop{\mathrm{argmin}}_{\mathbf{x}' \in X} \|\mathbf{x} - \mathbf{x}'\|_2.$$
+$$\mathrm{Proj}_\mathcal{X}(\mathbf{x}) = \mathop{\mathrm{argmin}}_{\mathbf{x}' \in \mathcal{X}} \|\mathbf{x} - \mathbf{x}'\|_2.$$
 
-It is thus the closest point in $X$ to $\mathbf{x}$. This sounds a bit abstract. :numref:`fig_projections` explains it somewhat more clearly. In it we have two convex sets, a circle and a diamond. Points inside the set (yellow) remain unchanged. Points outside the set (black) are mapped to the closest point inside the set (red). While for $L_2$ balls this leaves the direction unchanged, this need not be the case in general, as can be seen in the case of the diamond.
+It is thus the closest point in $\mathcal{X}$ to $\mathbf{x}$. This sounds a bit abstract. :numref:`fig_projections` explains it somewhat more clearly. In it we have two convex sets, a circle and a diamond. Points inside the set (yellow) remain unchanged. Points outside the set (black) are mapped to the closest point inside the set (red). While for $L_2$ balls this leaves the direction unchanged, this need not be the case in general, as can be seen in the case of the diamond.
 
-![Convex Projections](../img/projections.svg)
+![Convex Projections.](../img/projections.svg)
 :label:`fig_projections`
 
 One of the uses for convex projections is to compute sparse weight vectors. In this case we project $\mathbf{w}$ onto an $L_1$ ball (the latter is a generalized version of the diamond in the picture above).
@@ -257,19 +277,19 @@ In the context of deep learning the main purpose of convex functions is to motiv
 ## Exercises
 
 1. Assume that we want to verify convexity of a set by drawing all lines between points within the set and checking whether the lines are contained.
-    * Prove that it is sufficient to check only the points on the boundary.
-    * Prove that it is sufficient to check only the vertices of the set.
-1. Denote by $B_p[r] := \{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\|_p \leq r\}$ the ball of radius $r$ using the $p$-norm. Prove that $B_p[r]$ is convex for all $p \geq 1$.
+    1. Prove that it is sufficient to check only the points on the boundary.
+    1. Prove that it is sufficient to check only the vertices of the set.
+1. Denote by $\mathcal{B}_p[r] := \{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\|_p \leq r\}$ the ball of radius $r$ using the $p$-norm. Prove that $\mathcal{B}_p[r]$ is convex for all $p \geq 1$.
 1. Given convex functions $f$ and $g$ show that $\mathrm{max}(f, g)$ is convex, too. Prove that $\mathrm{min}(f, g)$ is not convex.
 1. Prove that the normalization of the softmax function is convex. More specifically prove the convexity of
     $f(x) = \log \sum_i \exp(x_i)$.
-1. Prove that linear subspaces are convex sets, i.e., $X = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$.
-1. Prove that in the case of linear subspaces with $\mathbf{b} = 0$ the projection $\mathrm{Proj}_X$ can be written as $\mathbf{M} \mathbf{x}$ for some matrix $\mathbf{M}$.
+1. Prove that linear subspaces are convex sets, i.e., $\mathcal{X} = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$.
+1. Prove that in the case of linear subspaces with $\mathbf{b} = 0$ the projection $\mathrm{Proj}_\mathcal{X}$ can be written as $\mathbf{M} \mathbf{x}$ for some matrix $\mathbf{M}$.
 1. Show that for convex twice differentiable functions $f$ we can write $f(x + \epsilon) = f(x) + \epsilon f'(x) + \frac{1}{2} \epsilon^2 f''(x + \xi)$ for some $\xi \in [0, \epsilon]$.
 1. Given a vector $\mathbf{w} \in \mathbb{R}^d$ with $\|\mathbf{w}\|_1 > 1$ compute the projection on the $\ell_1$ unit ball.
-    * As intermediate step write out the penalized objective $\|\mathbf{w} - \mathbf{w}'\|_2^2 + \lambda \|\mathbf{w}'\|_1$ and compute the solution for a given $\lambda > 0$.
-    * Can you find the 'right' value of $\lambda$ without a lot of trial and error?
-1. Given a convex set $X$ and two vectors $\mathbf{x}$ and $\mathbf{y}$ prove that projections never increase distances, i.e., $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_X(\mathbf{x}) - \mathrm{Proj}_X(\mathbf{y})\|$.
+    1. As intermediate step write out the penalized objective $\|\mathbf{w} - \mathbf{w}'\|_2^2 + \lambda \|\mathbf{w}'\|_1$ and compute the solution for a given $\lambda > 0$.
+    1. Can you find the 'right' value of $\lambda$ without a lot of trial and error?
+1. Given a convex set $\mathcal{X}$ and two vectors $\mathbf{x}$ and $\mathbf{y}$ prove that projections never increase distances, i.e., $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_\mathcal{X}(\mathbf{x}) - \mathrm{Proj}_\mathcal{X}(\mathbf{y})\|$.
 
 
 [Discussions](https://discuss.d2l.ai/t/350)
