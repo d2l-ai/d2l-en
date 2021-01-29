@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/static/logo-with-text.png" width="350">
 </div>
 
-# D2L.ai: Interactive Deep Learning Book with Multi-Framework Code, Math, and Discussions.
+# D2L.ai: Interactive Deep Learning Book with Multi-Framework Code, Math, and Discussions
 
 [![Build Status](http://ci.d2l.ai/job/d2l-en/job/master/badge/icon)](http://ci.d2l.ai/job/d2l-en/job/master/)
 
