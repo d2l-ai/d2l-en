@@ -1,4 +1,6 @@
+:begin_slide:`keep`
 # Calculus
+:end_slide:
 :label:`sec_calculus`
 
 Finding the area of a polygon had remained mysterious
@@ -53,11 +55,13 @@ we can determine how rapidly the loss would increase or decrease,
 were we to *increase* or *decrease* that parameter
 by an infinitesimally small amount.
 
+:begin_slide:`keep`
 Suppose that we have a function $f: \mathbb{R} \rightarrow \mathbb{R}$,
 whose input and output are both scalars.
 The *derivative* of $f$ is defined as
 
 $$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h},$$
+:end_slide:
 :eqlabel:`eq_derivative`
 
 if this limit exists.
@@ -71,9 +75,11 @@ with respect to $x$.
 The so-called instantaneous rate of change is based on
 the variation $h$ in $x$, which approaches $0$.
 
+:begin_slide:`keep,cont`
 To illustrate derivatives,
 let us experiment with an example.
 Define $u = f(x) = 3x^2-4x$.
+:end_slide:
 
 ```{.python .input}
 %matplotlib inline
@@ -108,9 +114,14 @@ def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
+:begin_slide:`keep`
 By setting $x=1$ and letting $h$ approach $0$,
 the numerical result of $\frac{f(x+h) - f(x)}{h}$
-in :eqref:`eq_derivative` approaches $2$.
+:end_slide:
+in :eqref:`eq_derivative`
+:begin_slide:`keep,cont`
+approaches $2$.
+:end_slide:
 Though this experiment is not a mathematical proof,
 we will see later that the derivative $u'$ is $2$ when $x=1$.
 
@@ -165,8 +176,11 @@ where the numerical result approaches $2$.
 This derivative is also the slope of the tangent line
 to the curve $u = f(x)$ when $x = 1$.
 
+:begin_slide:`keep`
 To visualize such an interpretation of derivatives,
 we will use `matplotlib`,
+:end_slide:
+
 a popular plotting library in Python.
 To configure properties of the figures produced by `matplotlib`,
 we need to define a few functions.
@@ -251,7 +265,9 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 ```
 
+:begin_slide:`keep`
 Now we can plot the function $u = f(x)$ and its tangent line $y = 2x - 3$ at $x=1$, where the coefficient $2$ is the slope of the tangent line.
+:end_slide:
 
 ```{.python .input}
 #@tab all

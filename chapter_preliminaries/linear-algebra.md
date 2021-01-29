@@ -1,4 +1,6 @@
+:begin_slide:`keep`
 # Linear Algebra
+:end_slide:
 :label:`sec_linear-algebra`
 
 
@@ -44,7 +46,9 @@ Analogously, we could write $x, y \in \{0, 1\}$
 to state that $x$ and $y$ are numbers
 whose value can only be $0$ or $1$.
 
+:begin_slide:`keep,cont`
 A scalar is represented by a tensor with just one element.
+:end_slide:
 In the next snippet, we instantiate two scalars
 and perform some familiar arithmetic operations with them,
 namely addition, multiplication, division, and exponentiation.
@@ -81,7 +85,9 @@ x + y, x * y, x / y, x**y
 
 ## Vectors
 
+:begin_slide:`keep`
 You can think of a vector as simply a list of scalar values.
+:end_slide:
 We call these values the *elements* (*entries* or *components*) of the vector.
 When our vectors represent examples from our dataset,
 their values hold some real-world significance.
@@ -131,7 +137,10 @@ $$\mathbf{x} =\begin{bmatrix}x_{1}  \\x_{2}  \\ \vdots  \\x_{n}\end{bmatrix},$$
 
 
 where $x_1, \ldots, x_n$ are elements of the vector.
-In code, we access any element by indexing into the tensor.
+In code,
+:begin_slide:`keep,cont`
+we access any element by indexing into the tensor.
+:end_slide:
 
 ```{.python .input}
 x[3]
@@ -157,8 +166,11 @@ consists of $n$ real-valued scalars,
 we can express this as $\mathbf{x} \in \mathbb{R}^n$.
 The length of a vector is commonly called the *dimension* of the vector.
 
-As with an ordinary Python array, we can access the length of a tensor
+As with an ordinary Python array,
+:begin_slide:`keep`
+we can access the length of a tensor
 by calling Python's built-in `len()` function.
+:end_slide:
 
 ```{.python .input}
 len(x)
@@ -178,7 +190,9 @@ When a tensor represents a vector (with precisely one axis),
 we can also access its length via the `.shape` attribute.
 The shape is a tuple that lists the length (dimensionality)
 along each axis of the tensor.
+:begin_slide:`keep,cont`
 For tensors with just one axis, the shape has just one element.
+:end_slide:
 
 ```{.python .input}
 x.shape
@@ -226,8 +240,10 @@ is ($m$, $n$) or $m \times n$.
 Specifically, when a matrix has the same number of rows and columns,
 its shape becomes a square; thus, it is called a *square matrix*.
 
+:begin_slide:`keep`
 We can create an $m \times n$ matrix
 by specifying a shape with two components $m$ and $n$
+:end_slide:
 when calling any of our favorite functions for instantiating a tensor.
 
 ```{.python .input}
@@ -275,7 +291,9 @@ $$
 \end{bmatrix}.
 $$
 
+:begin_slide:`keep`
 Now we access a matrix's transpose in code.
+:end_slide:
 
 ```{.python .input}
 A.T
@@ -292,8 +310,10 @@ tf.transpose(A)
 ```
 
 As a special type of the square matrix,
+:begin_slide:`keep`
 a *symmetric matrix* $\mathbf{A}$ is equal to its transpose:
 $\mathbf{A} = \mathbf{A}^\top$.
+:end_slide:
 Here we define a symmetric matrix `B`.
 
 ```{.python .input}
@@ -313,7 +333,9 @@ B = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 B
 ```
 
+:begin_slide:`keep,cont`
 Now we compare `B` with its transpose.
+:end_slide:
 
 ```{.python .input}
 B == B.T
@@ -347,12 +369,22 @@ or just data examples if no minibatch exists.
 
 ## Tensors
 
-Just as vectors generalize scalars, and matrices generalize vectors, we can build data structures with even more axes. Tensors ("tensors" in this subsection refer to algebraic objects) give us a generic way of describing $n$-dimensional arrays with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
+Just as vectors generalize scalars, and matrices generalize vectors, we can build data structures with even more axes.
+:begin_slide:`keep`
+Tensors
+:end_slide:
+("tensors" in this subsection refer to algebraic objects)
+:begin_slide:`keep,cont`
+give us a generic way of describing $n$-dimensional arrays with an arbitrary number of axes.
+:end_slide:
+Vectors, for example, are first-order tensors, and matrices are second-order tensors.
 Tensors are denoted with capital letters of a special font face
 (e.g., $\mathsf{X}$, $\mathsf{Y}$, and $\mathsf{Z}$)
 and their indexing mechanism (e.g., $x_{ijk}$ and $[\mathsf{X}]_{1, 2i-1, 3}$) is similar to that of matrices.
 
-Tensors will become more important when we start working with images, which arrive as $n$-dimensional arrays with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
+Tensors will become more important when we start working with images,
+ which arrive as $n$-dimensional arrays with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
+
 
 ```{.python .input}
 X = np.arange(24).reshape(2, 3, 4)
@@ -379,9 +411,12 @@ have some nice properties that often come in handy.
 For example, you might have noticed
 from the definition of an elementwise operation
 that any elementwise unary operation does not change the shape of its operand.
-Similarly, given any two tensors with the same shape,
+Similarly,
+:begin_slide:`keep`
+given any two tensors with the same shape,
 the result of any binary elementwise operation
 will be a tensor of that same shape.
+:end_slide:
 For example, adding two matrices of the same shape
 performs elementwise addition over these two matrices.
 
@@ -405,7 +440,11 @@ B = A  # No cloning of `A` to `B` by allocating new memory
 A, A + B
 ```
 
-Specifically, elementwise multiplication of two matrices is called their *Hadamard product* (math notation $\odot$).
+Specifically,
+:begin_slide:`keep`
+elementwise multiplication of two matrices is called their *Hadamard product*
+:end_slide:
+(math notation $\odot$).
 Consider matrix $\mathbf{B} \in \mathbb{R}^{m \times n}$ whose element of row $i$ and column $j$ is $b_{ij}$. The Hadamard product of matrices $\mathbf{A}$ (defined in :eqref:`eq_matrix_def`) and $\mathbf{B}$
 
 $$
@@ -432,7 +471,9 @@ A * B
 A * B
 ```
 
+:begin_slide:`keep`
 Multiplying or adding a tensor by a scalar also does not change the shape of the tensor,
+:end_slide:
 where each element of the operand tensor will be added or multiplied by the scalar.
 
 ```{.python .input}
@@ -459,7 +500,10 @@ a + X, (a * X).shape
 :label:`subseq_lin-alg-reduction`
 
 One useful operation that we can perform with arbitrary tensors
-is to calculate the sum of their elements.
+is to
+:begin_slide:`keep`
+calculate the sum of their elements.
+:end_slide:
 In mathematical notation, we express sums using the $\sum$ symbol.
 To express the sum of the elements in a vector $\mathbf{x}$ of length $d$,
 we write $\sum_{i=1}^d x_i$.
@@ -482,7 +526,9 @@ x = tf.range(4, dtype=tf.float32)
 x, tf.reduce_sum(x)
 ```
 
+:begin_slide:`keep`
 We can express sums over the elements of tensors of arbitrary shape.
+:end_slide:
 For example, the sum of the elements of an $m \times n$ matrix $\mathbf{A}$ could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
 ```{.python .input}
@@ -501,7 +547,9 @@ A.shape, tf.reduce_sum(A)
 
 By default, invoking the function for calculating the sum
 *reduces* a tensor along all its axes to a scalar.
+:begin_slide:`keep`
 We can also specify the axes along which the tensor is reduced via summation.
+:end_slide:
 Take matrices as an example.
 To reduce the row dimension (axis 0) by summing up elements of all the rows,
 we specify `axis=0` when invoking the function.
@@ -525,7 +573,10 @@ A_sum_axis0 = tf.reduce_sum(A, axis=0)
 A_sum_axis0, A_sum_axis0.shape
 ```
 
-Specifying `axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.
+Specifying
+:begin_slide:`keep,cont`
+`axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.
+:end_slide:
 Thus, the dimension of axis 1 of the input is lost in the output shape.
 
 ```{.python .input}
@@ -545,8 +596,10 @@ A_sum_axis1 = tf.reduce_sum(A, axis=1)
 A_sum_axis1, A_sum_axis1.shape
 ```
 
+:begin_slide:`keep`
 Reducing a matrix along both rows and columns via summation
 is equivalent to summing up all the elements of the matrix.
+:end_slide:
 
 ```{.python .input}
 A.sum(axis=[0, 1])  # Same as `A.sum()`
@@ -562,7 +615,9 @@ A.sum(axis=[0, 1])  # Same as `A.sum()`
 tf.reduce_sum(A, axis=[0, 1])  # Same as `tf.reduce_sum(A)`
 ```
 
+:begin_slide:`keep`
 A related quantity is the *mean*, which is also called the *average*.
+:end_slide:
 We calculate the mean by dividing the sum by the total number of elements.
 In code, we could just call the function for calculating the mean
 on tensors of arbitrary shape.
@@ -581,7 +636,9 @@ A.mean(), A.sum() / A.numel()
 tf.reduce_mean(A), tf.reduce_sum(A) / tf.size(A).numpy()
 ```
 
+:begin_slide:`keep,cont`
 Likewise, the function for calculating the mean can also reduce a tensor along the specified axes.
+:end_slide:
 
 ```{.python .input}
 A.mean(axis=0), A.sum(axis=0) / A.shape[0]
@@ -600,8 +657,11 @@ tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 ### Non-Reduction Sum
 :label:`subseq_lin-alg-non-reduction`
 
-However, sometimes it can be useful to keep the number of axes unchanged
+However,
+:begin_slide:`keep`
+sometimes it can be useful to keep the number of axes unchanged
 when invoking the function for calculating the sum or mean.
+:end_slide:
 
 ```{.python .input}
 sum_A = A.sum(axis=1, keepdims=True)
@@ -620,7 +680,10 @@ sum_A = tf.reduce_sum(A, axis=1, keepdims=True)
 sum_A
 ```
 
-For instance, since `sum_A` still keeps its two axes after summing each row, we can divide `A` by `sum_A` with broadcasting.
+For instance,
+:begin_slide:`keep,cont`
+since `sum_A` still keeps its two axes after summing each row, we can divide `A` by `sum_A` with broadcasting.
+:end_slide:
 
 ```{.python .input}
 A / sum_A
@@ -655,7 +718,12 @@ tf.cumsum(A, axis=0)
 
 ## Dot Products
 
-So far, we have only performed elementwise operations, sums, and averages. And if this was all we could do, linear algebra probably would not deserve its own section. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$, their *dot product* $\mathbf{x}^\top \mathbf{y}$ (or $\langle \mathbf{x}, \mathbf{y}  \rangle$) is a sum over the products of the elements at the same position: $\mathbf{x}^\top \mathbf{y} = \sum_{i=1}^{d} x_i y_i$.
+So far, we have only performed elementwise operations, sums, and averages. And if this was all we could do, linear algebra probably would not deserve its own section. However, one of the most fundamental operations is the dot product.
+Given two vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$, their *dot product* $\mathbf{x}^\top \mathbf{y}$ (or $\langle \mathbf{x}, \mathbf{y}  \rangle$) is a sum over the products of the elements at the same position: $\mathbf{x}^\top \mathbf{y} = \sum_{i=1}^{d} x_i y_i$.
+
+:begin_slide:
+The *dot product* of two vectors is a sum over the products of the elements at the same position
+:end_slide:
 
 ```{.python .input}
 y = np.ones(4)
@@ -674,7 +742,10 @@ y = tf.ones(4, dtype=tf.float32)
 x, y, tf.tensordot(x, y, axes=1)
 ```
 
-Note that we can express the dot product of two vectors equivalently by performing an elementwise multiplication and then a sum:
+Note that
+:begin_slide:`keep,cont`
+we can express the dot product of two vectors equivalently by performing an elementwise multiplication and then a sum:
+:end_slide:
 
 ```{.python .input}
 np.sum(x * y)
@@ -724,9 +795,12 @@ $$\mathbf{A}=
 
 where each $\mathbf{a}^\top_{i} \in \mathbb{R}^n$
 is a row vector representing the $i^\mathrm{th}$ row of the matrix $\mathbf{A}$.
+
+:begin_slide:`keep`
 The matrix-vector product $\mathbf{A}\mathbf{x}$
 is simply a column vector of length $m$,
 whose $i^\mathrm{th}$ element is the dot product $\mathbf{a}^\top_i \mathbf{x}$:
+:end_slide:
 
 $$
 \mathbf{A}\mathbf{x}
@@ -836,7 +910,9 @@ $$\mathbf{C} = \mathbf{AB} = \begin{bmatrix}
 \end{bmatrix}.
 $$
 
+:begin_slide:`keep`
 We can think of the matrix-matrix multiplication $\mathbf{AB}$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix.
+:end_slide:
 In the following snippet, we perform matrix multiplication on `A` and `B`.
 Here, `A` is a matrix with 5 rows and 4 columns,
 and `B` is a matrix with 4 rows and 3 columns.
@@ -906,11 +982,14 @@ In fact, the Euclidean distance is a norm:
 specifically it is the $L_2$ norm.
 Suppose that the elements in the $n$-dimensional vector
 $\mathbf{x}$ are $x_1, \ldots, x_n$.
+:begin_slide:`keep`
 The $L_2$ *norm* of $\mathbf{x}$ is the square root of the sum of the squares of the vector elements:
 
 $$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2},$$
+:end_slide:
 
-where the subscript $2$ is often omitted in $L_2$ norms, i.e., $\|\mathbf{x}\|$ is equivalent to $\|\mathbf{x}\|_2$. In code, we can calculate the $L_2$ norm of a vector as follows.
+where the subscript $2$ is often omitted in $L_2$ norms, i.e., $\|\mathbf{x}\|$ is equivalent to $\|\mathbf{x}\|_2$. In code,
+we can calculate the $L_2$ norm of a vector as follows.
 
 ```{.python .input}
 u = np.array([3, -4])
@@ -931,10 +1010,12 @@ tf.norm(u)
 
 In deep learning, we work more often
 with the squared $L_2$ norm.
+:begin_slide:`keep`
 You will also frequently encounter the $L_1$ *norm*,
 which is expressed as the sum of the absolute values of the vector elements:
 
 $$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$
+:end_slide:
 
 As compared with the $L_2$ norm,
 it is less influenced by outliers.
@@ -955,10 +1036,12 @@ torch.abs(u).sum()
 tf.reduce_sum(tf.abs(u))
 ```
 
+:begin_slide:`keep`
 Both the $L_2$ norm and the $L_1$ norm
 are special cases of the more general $L_p$ *norm*:
 
 $$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
+:end_slide:
 
 Analogous to $L_2$ norms of vectors,
 the *Frobenius norm* of a matrix $\mathbf{X} \in \mathbb{R}^{m \times n}$
