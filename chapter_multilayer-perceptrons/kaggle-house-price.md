@@ -283,8 +283,9 @@ Then, to put all features on a common scale,
 we *standardize* the data by
 rescaling features to zero mean and unit variance:
 
-$$x \leftarrow \frac{x - \mu}{\sigma}.$$
+$$x \leftarrow \frac{x - \mu}{\sigma},$$
 
+where $\mu$ and $\sigma$ denote mean and standard deviation, respectively.
 To verify that this indeed transforms
 our feature (variable) such that it has zero mean and unit variance,
 note that $E[\frac{x-\mu}{\sigma}] = \frac{\mu - \mu}{\sigma} = 0$
@@ -299,14 +300,11 @@ assigned to one feature more than on any other.
 
 ```{.python .input}
 #@tab all
-train_features = train_data.iloc[:,1:-1]
-numeric_train_features = train_features.dtypes[train_features.dtypes != 'object'].index
-m=train_features[numeric_train_features].dropna().values.mean()
-d=train_features[numeric_train_features].dropna().values.std()
-
+# If test data were inaccessible, mean and standard deviation could be 
+# calculated from training data
 numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
 all_features[numeric_features] = all_features[numeric_features].apply(
-    lambda x: (x - m) / d)
+    lambda x: (x - x.mean()) / (x.std()))
 # After standardizing the data all means vanish, hence we can set missing
 # values to 0
 all_features[numeric_features] = all_features[numeric_features].fillna(0)
