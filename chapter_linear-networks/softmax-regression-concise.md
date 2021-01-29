@@ -102,11 +102,20 @@ return value for cross-entropy.
 
 One trick to get around this is to first subtract $\max(o_k)$
 from all $o_k$ before proceeding with the softmax calculation.
-You can verify that this shifting of each $o_k$ by constant factor
-does not change the return value of softmax.
+You can see that this shifting of each $o_k$ by constant factor
+does not change the return value of softmax:
+
+$$
+\begin{aligned}
+\hat y_j & =  \frac{\exp(o_j - \max(o_k))\exp(\max(o_k))}{\sum_k \exp(o_k - \max(o_k))\exp(\max(o_k))} \\
+& = \frac{\exp(o_j - \max(o_k))}{\sum_k \exp(o_k - \max(o_k))}.
+\end{aligned}
+$$
+
+
 After the subtraction and normalization step,
-it might be possible that some $o_j$ have large negative values
-and thus that the corresponding $\exp(o_j)$ will take values close to zero.
+it might be possible that some $o_j - \max(o_k)$ have large negative values
+and thus that the corresponding $\exp(o_j - \max(o_k))$ will take values close to zero.
 These might be rounded to zero due to finite precision (i.e., *underflow*),
 making $\hat y_j$ zero and giving us `-inf` for $\log(\hat y_j)$.
 A few steps down the road in backpropagation,
@@ -121,8 +130,8 @@ By combining these two operators
 softmax and cross-entropy together,
 we can escape the numerical stability issues
 that might otherwise plague us during backpropagation.
-As shown in the equation below, we avoid calculating $\exp(o_j)$
-and can use instead $o_j$ - $\max(o_k)$ directly due to the canceling in $\log(\exp(\cdot))$.
+As shown in the equation below, we avoid calculating $\exp(o_j - \max(o_k))$
+and can use instead $o_j - \max(o_k)$ directly due to the canceling in $\log(\exp(\cdot))$:
 
 $$
 \begin{aligned}
@@ -133,7 +142,7 @@ $$
 $$
 
 We will want to keep the conventional softmax function handy
-in case we ever want to evaluate the output probabilities by our model. Thus, while this new equation is equivalent to the softmax equation shown in the last section, it avoids both the overflow and underflow issue discussed. 
+in case we ever want to evaluate the output probabilities by our model. 
 But instead of passing softmax probabilities into our new loss function,
 we will just pass the logits and compute the softmax and its log
 all at once inside the cross-entropy loss function,
