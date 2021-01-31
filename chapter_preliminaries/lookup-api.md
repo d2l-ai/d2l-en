@@ -15,8 +15,8 @@ Due to constraints on the length of this book, we cannot possibly introduce ever
 ## Finding All the Functions and Classes in a Module
 
 In order to know which functions and classes can be called in a module, we
-invoke the `dir` function. For instance, we can query all properties in the
-module for generating random numbers:
+invoke the `dir` function. For instance, (**we can query all properties in the
+module for generating random numbers**:)
 
 ```{.python .input  n=1}
 from mxnet import np
@@ -39,7 +39,7 @@ Generally, we can ignore functions that start and end with `__` (special objects
 
 ## Finding the Usage of Specific Functions and Classes
 
-For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let us explore the usage instructions for tensors' `ones` function.
+For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, (**let us explore the usage instructions for tensors' `ones` function**).
 
 ```{.python .input}
 help(np.ones)
@@ -55,7 +55,7 @@ help(torch.ones)
 help(tf.ones)
 ```
 
-From the documentation, we can see that the `ones` function creates a new tensor with the specified shape and sets all the elements to the value of 1. Whenever possible, you should run a quick test to confirm your interpretation:
+From the documentation, (**we can see that the `ones` function creates a new tensor with the specified shape and sets all the elements to the value of 1.**) Whenever possible, (**you should run a quick test to confirm your interpretation**):
 
 ```{.python .input}
 np.ones(4)
