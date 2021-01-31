@@ -3,9 +3,9 @@
 
 Now that you understand the key ideas behind linear regression,
 we can begin to work through a hands-on implementation in code.
-In this section, we will implement the entire method from scratch,
+In this section, (**we will implement the entire method from scratch,
 including the data pipeline, the model,
-the loss function, and the minibatch stochastic gradient descent optimizer.
+the loss function, and the minibatch stochastic gradient descent optimizer.**)
 While modern deep learning frameworks can automate nearly all of this work,
 implementing things from scratch is the only way
 to make sure that you really know what you are doing.
@@ -42,8 +42,8 @@ import random
 
 ## Generating the Dataset
 
-To keep things simple, we will construct an artificial dataset
-according to a linear model with additive noise.
+To keep things simple, [**we will construct an artificial dataset
+according to a linear model with additive noise.**]
 Our task will be to recover this model's parameters
 using the finite set of examples contained in our dataset.
 We will keep the data low-dimensional so we can visualize it easily.
@@ -53,12 +53,12 @@ sampled from a standard normal distribution.
 Thus our synthetic dataset will be a matrix
 $\mathbf{X}\in \mathbb{R}^{1000 \times 2}$.
 
-The true parameters generating our dataset will be
+(**The true parameters generating our dataset will be
 $\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$,
-and our synthetic labels will be assigned according
+and**) our synthetic labels will be assigned according
 to the following linear model with the noise term $\epsilon$:
 
-$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon.$$
+(**$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon.$$**)
 
 You could think of $\epsilon$ as capturing potential
 measurement errors on the features and labels.
@@ -96,8 +96,8 @@ true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
-Note that each row in `features` consists of a 2-dimensional data example
-and that each row in `labels` consists of a 1-dimensional label value (a scalar).
+Note that [**each row in `features` consists of a 2-dimensional data example
+and that each row in `labels` consists of a 1-dimensional label value (a scalar).**]
 
 ```{.python .input}
 #@tab all
@@ -124,10 +124,10 @@ to training machine learning algorithms,
 it is worth defining a utility function
 to shuffle the dataset and access it in minibatches.
 
-In the following code, we define the `data_iter` function
+In the following code, [**we define the `data_iter` function**] (~~that~~)
 to demonstrate one possible implementation of this functionality.
-The function takes a batch size, a matrix of features,
-and a vector of labels, yielding minibatches of the size `batch_size`.
+The function (**takes a batch size, a matrix of features,
+and a vector of labels, yielding minibatches of the size `batch_size`.**)
 Each minibatch consists of a tuple of features and labels.
 
 ```{.python .input}
@@ -191,8 +191,8 @@ with both data stored in files and data fed via data streams.
 
 ## Initializing Model Parameters
 
-Before we can begin optimizing our model's parameters by minibatch stochastic gradient descent,
-we need to have some parameters in the first place.
+[**Before we can begin optimizing our model's parameters by minibatch stochastic gradient descent,
+we need to have some parameters in the first place.**]
 In the following code, we initialize weights by sampling
 random numbers from a normal distribution with mean 0
 and a standard deviation of 0.01, and setting the bias to 0.
@@ -233,8 +233,8 @@ as introduced in :numref:`sec_autograd`, to compute the gradient.
 
 ## Defining the Model
 
-Next, we must define our model,
-relating its inputs and parameters to its outputs.
+[**Next, we must define our model,
+relating its inputs and parameters to its outputs.**]
 Recall that to calculate the output of the linear model,
 we simply take the matrix-vector dot product
 of the input features $\mathbf{X}$ and the model weights $\mathbf{w}$,
@@ -253,9 +253,9 @@ def linreg(X, w, b):  #@save
 
 ## Defining the Loss Function
 
-Since updating our model requires taking
+[**Since updating our model requires taking
 the gradient of our loss function,
-we ought to define the loss function first.
+we ought to define the loss function first.**]
 Here we will use the squared loss function
 as described in :numref:`sec_linear_regression`.
 In the implementation, we need to transform the true value `y`
@@ -273,12 +273,12 @@ def squared_loss(y_hat, y):  #@save
 ## Defining the Optimization Algorithm
 
 As we discussed in :numref:`sec_linear_regression`,
-linear regression has a closed-form solution.
+[**linear regression has a closed-form solution.**]
 However, this is not a book about linear regression:
 it is a book about deep learning.
-Since none of the other models that this book introduces
+(**Since none of the other models that this book introduces
 can be solved analytically, we will take this opportunity to introduce your first working example of
-minibatch stochastic gradient descent.
+minibatch stochastic gradient descent.**)
 
 
 At each step, using one minibatch randomly drawn from our dataset,
@@ -320,8 +320,8 @@ def sgd(params, grads, lr, batch_size):  #@save
 
 ## Training
 
-Now that we have all of the parts in place,
-we are ready to implement the main training loop.
+[**Now**] that we have all of the parts in place,
+(**we are ready to implement the main training loop.**)
 It is crucial that you understand this code
 because you will see nearly identical training loops
 over and over again throughout your career in deep learning.
@@ -404,9 +404,9 @@ for epoch in range(num_epochs):
 
 In this case, because we synthesized the dataset ourselves,
 we know precisely what the true parameters are.
-Thus, we can evaluate our success in training
+Thus, [**we can evaluate our success in training
 by comparing the true parameters
-with those that we learned through our training loop.
+with those that we learned through our training loop.**]
 Indeed they turn out to be very close to each other.
 
 ```{.python .input}
