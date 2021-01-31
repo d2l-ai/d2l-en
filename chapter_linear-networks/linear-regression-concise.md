@@ -13,14 +13,14 @@ In practice, because data iterators, loss functions, optimizers,
 and neural network layers
 are so common, modern libraries implement these components for us as well.
 
-In this section, we will show you how to implement
-the linear regression model from :numref:`sec_linear_scratch`
-concisely by using high-level APIs of deep learning frameworks.
+In this section, (**we will show you how to implement
+the linear regression model**) from :numref:`sec_linear_scratch`
+(**concisely by using high-level APIs of deep learning frameworks.**)
 
 
 ## Generating the Dataset
 
-To start, we will generate the same dataset as in :numref:`sec_linear_scratch`.
+(**To start, we will generate the same dataset**) as in :numref:`sec_linear_scratch`.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -52,8 +52,8 @@ features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 
 ## Reading the Dataset
 
-Rather than rolling our own iterator,
-we can call upon the existing API in a framework to read data.
+[**Rather than rolling our own iterator,
+we can call upon the existing API in a framework to read data.**]
 We pass in `features` and `labels` as arguments and specify `batch_size`
 when instantiating a data iterator object.
 Besides, the boolean value `is_train`
@@ -122,10 +122,10 @@ but you would be a lousy web developer
 if every time you needed a blog you spent a month
 reinventing the wheel.
 
-For standard operations, we can use a framework's predefined layers,
+For standard operations, [**we can use a framework's predefined layers,
 which allow us to focus especially
 on the layers used to construct the model
-rather than having to focus on the implementation.
+rather than having to focus on the implementation.**]
 We will first define a model variable `net`,
 which will refer to an instance of the `Sequential` class.
 The `Sequential` class defines a container
@@ -202,8 +202,8 @@ net.add(tf.keras.layers.Dense(1))
 
 ## Initializing Model Parameters
 
-Before using `net`, we need to initialize the model parameters,
-such as the weights and bias in the linear regression model.
+[**Before using `net`, we need to initialize the model parameters,
+such as the weights and bias in the linear regression model.**]
 Deep learning frameworks often have a predefined way to initialize the parameters.
 Here we specify that each weight parameter
 should be randomly sampled from a normal distribution
@@ -290,8 +290,8 @@ implementation of squared loss (`L2Loss`).
 :end_tab:
 
 :begin_tab:`pytorch`
-The `MSELoss` class computes the mean squared error, also known as squared $L_2$ norm.
-By default it returns the average loss over examples.
+[**The `MSELoss` class computes the mean squared error, also known as squared $L_2$ norm.
+By default it returns the average loss over examples.**]
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -335,8 +335,8 @@ Minibatch stochastic gradient descent is a standard tool
 for optimizing neural networks
 and thus PyTorch supports it alongside a number of
 variations on this algorithm in the `optim` module.
-When we instantiate an `SGD` instance,
-we will specify the parameters to optimize over
+[**When we instantiate an `SGD` instance,
+we will specify the parameters to optimize over**]
 (obtainable from our net via `net.parameters()`), with a dictionary of hyperparameters
 required by our optimization algorithm.
 Minibatch stochastic gradient descent just requires that
@@ -376,9 +376,9 @@ We did not have to individually allocate parameters,
 define our loss function, or implement minibatch stochastic gradient descent.
 Once we start working with much more complex models,
 advantages of high-level APIs will grow considerably.
-However, once we have all the basic pieces in place,
+However, [**once we have all the basic pieces in place,
 the training loop itself is strikingly similar
-to what we did when implementing everything from scratch.
+to what we did when implementing everything from scratch.**]
 
 To refresh your memory: for some number of epochs,
 we will make a complete pass over the dataset (`train_data`),
@@ -430,8 +430,8 @@ for epoch in range(num_epochs):
     print(f'epoch {epoch + 1}, loss {l:f}')
 ```
 
-Below, we compare the model parameters learned by training on finite data
-and the actual parameters that generated our dataset.
+Below, [**we compare the model parameters learned by training on finite data
+and the actual parameters that generated our dataset.**]
 To access parameters,
 we first access the layer that we need from `net`
 and then access that layer's weights and bias.
