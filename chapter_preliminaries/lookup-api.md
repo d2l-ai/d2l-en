@@ -39,7 +39,7 @@ Generally, we can ignore functions that start and end with `__` (special objects
 
 ## Finding the Usage of Specific Functions and Classes
 
-For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, (**let us explore the usage instructions for tensors' `ones` function**).
+For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, [**let us explore the usage instructions for tensors' `ones` function**].
 
 ```{.python .input}
 help(np.ones)
@@ -55,7 +55,7 @@ help(torch.ones)
 help(tf.ones)
 ```
 
-From the documentation, (**we can see that the `ones` function creates a new tensor with the specified shape and sets all the elements to the value of 1.**) Whenever possible, (**you should run a quick test to confirm your interpretation**):
+From the documentation, [**we can see that the `ones` function creates a new tensor with the specified shape and sets all the elements to the value of 1.**] Whenever possible, (**you should run a quick test to confirm your interpretation**):
 
 ```{.python .input}
 np.ones(4)
