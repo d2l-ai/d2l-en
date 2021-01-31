@@ -16,7 +16,7 @@ Due to constraints on the length of this book, we cannot possibly introduce ever
 
 In order to know which functions and classes can be called in a module, we
 invoke the `dir` function. For instance, (**we can query all properties in the
-module for generating random numbers**:)
+module for generating random numbers**):
 
 ```{.python .input  n=1}
 from mxnet import np
