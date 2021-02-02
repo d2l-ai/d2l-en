@@ -1,10 +1,13 @@
 # Concise Implementation of Softmax Regression
 :label:`sec_softmax_concise`
 
-Just as high-level APIs of deep learning frameworks
-made it much easier
-to implement linear regression in :numref:`sec_linear_concise`,
-we will find it similarly (or possibly more)
+
+
+(**Just as high-level APIs**)
+of deep learning frameworks
+(**made it much easier to implement linear regression**)
+in :numref:`sec_linear_concise`,
+(**we will find it similarly**) (~~here~~) (or possibly more)
 convenient for implementing classification models. Let us stick with the Fashion-MNIST dataset
 and keep the batch size at 256 as in :numref:`sec_softmax_scratch`.
 
@@ -37,8 +40,8 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ## Initializing Model Parameters
 
 As mentioned in :numref:`sec_softmax`,
-the output layer of softmax regression
-is a fully-connected layer.
+[**the output layer of softmax regression
+is a fully-connected layer.**]
 Therefore, to implement our model,
 we just need to add one fully-connected layer
 with 10 outputs to our `Sequential`.
@@ -142,10 +145,11 @@ $$
 $$
 
 We will want to keep the conventional softmax function handy
-in case we ever want to evaluate the output probabilities by our model. 
+in case we ever want to evaluate the output probabilities by our model.
 But instead of passing softmax probabilities into our new loss function,
-we will just pass the logits and compute the softmax and its log
-all at once inside the cross-entropy loss function,
+we will just
+[**pass the logits and compute the softmax and its log
+all at once inside the cross-entropy loss function,**]
 which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wiki/LogSumExp).
 
 ```{.python .input}
@@ -164,7 +168,7 @@ loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 
 ## Optimization Algorithm
 
-Here, we use minibatch stochastic gradient descent
+Here, we (**use minibatch stochastic gradient descent**)
 with a learning rate of 0.1 as the optimization algorithm.
 Note that this is the same as we applied in the linear regression example
 and it illustrates the general applicability of the optimizers.
@@ -185,7 +189,7 @@ trainer = tf.keras.optimizers.SGD(learning_rate=.1)
 
 ## Training
 
-Next we call the training function defined in :numref:`sec_softmax_scratch` to train the model.
+Next we [**call the training function defined**] (~~earlier~~) in :numref:`sec_softmax_scratch` to train the model.
 
 ```{.python .input}
 #@tab all
