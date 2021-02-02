@@ -395,12 +395,12 @@ def F(x):
 d2l.plot(x, [F(y) for y in x.numpy().tolist()], 'x', 'c.d.f.')
 ```
 
-While this result is not simple, the means and variances are.  If $X \sim \mathrm{Binomial}(n, p)$, then:
+If $X \sim \mathrm{Binomial}(n, p)$, then:
 
 * $\mu_X = np$,
 * $\sigma_X^2 = np(1-p)$.
 
-This can be sampled as follows.
+This follows from the linearity of expected value over the sum of $n$ Bernoulli random variables, and the fact that the variance of the sum of independent random variables is the sum of the variances. This can be sampled as follows.
 
 ```{.python .input}
 np.random.binomial(n, p, size=(10, 10))
@@ -614,7 +614,7 @@ for i in range(4):
 d2l.plt.show()
 ```
 
-One thing to note: compared to the Poisson case, we are now dividing by the standard deviation which means that we are squeezing the possible outcomes into smaller and smaller areas.  This is an indication that our limit will no longer be discrete, but rather a continuous.
+One thing to note: compared to the Poisson case, we are now dividing by the standard deviation which means that we are squeezing the possible outcomes into smaller and smaller areas.  This is an indication that our limit will no longer be discrete, but rather continuous.
 
 A derivation of what occurs is beyond the scope of this document, but the *central limit theorem* states that as $n \rightarrow \infty$, this will yield the Gaussian Distribution (or sometimes normal distribution).  More explicitly, for any $a, b$:
 
@@ -734,7 +734,7 @@ belong to which is known as the *exponential family*. The exponential family
 is a set of distributions whose density can be expressed in the following 
 form:
 
-$$p(\mathbf{x} | \mathbf{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \big{(} \eta^{\top} \cdot T\mathbf(x) - A(\mathbf{\eta}) \big{)}$$
+$$p(\mathbf{x} | \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
 :eqlabel:`eq_exp_pdf`
 
 As this definition can be a little subtle, let us examine it closely.  
@@ -743,46 +743,46 @@ First, $h(\mathbf{x})$ is known as the *underlying measure* or the
 *base measure*.  This can be viewed as an original choice of measure we are 
 modifying with our exponential weight.  
 
-Second, we have the vector $\mathbf{\eta} = (\eta_1, \eta_2, ..., \eta_l) \in 
+Second, we have the vector $\boldsymbol{\eta} = (\eta_1, \eta_2, ..., \eta_l) \in
 \mathbb{R}^l$ called the *natural parameters* or *canonical parameters*.  These
 define how the base measure will be modified.  The natural parameters enter 
 into the new measure by taking the dot product of these parameters against 
-some function $T(\cdot)$ of $\mathbf{x}= (x_1, x_2, ..., x_n) \in 
-\mathbb{R}^n$ and exponentiated. $T(\mathbf{x})= (T_1(\mathbf{x}), 
+some function $T(\cdot)$ of $\mathbf{x}= (x_1, x_2, ..., x_n) \in
+\mathbb{R}^n$ and exponentiated. The vector $T(\mathbf{x})= (T_1(\mathbf{x}),
 T_2(\mathbf{x}), ..., T_l(\mathbf{x}))$ 
-is called the *sufficient statistics* for $\eta$. This name is used since the 
+is called the *sufficient statistics* for $\boldsymbol{\eta}$. This name is used since the 
 information represented by $T(\mathbf{x})$ is sufficient to calculate the 
 probability density and no other information from the sample $\mathbf{x}$'s 
 are required.
 
-Third, we have $A(\mathbf{\eta})$, which is referred to as the *cumulant 
+Third, we have $A(\boldsymbol{\eta})$, which is referred to as the *cumulant 
 function*, which ensures that the above distribution :eqref:`eq_exp_pdf` 
 integrates to one, i.e.,
 
-$$  A(\mathbf{\eta}) = \log \left[\int h(\mathbf{x}) \cdot \mathrm{exp} 
-\big{(}\eta^{\top} \cdot T\mathbf(x) \big{)} dx \right].$$
+$$A(\boldsymbol{\eta})  = \log \left[\int h(\mathbf{x}) \cdot \mathrm{exp}
+\left(\boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) \right) d\mathbf{x} \right].$$
 
 To be concrete, let us consider the Gaussian. Assuming that $\mathbf{x}$ is 
 an univariate variable, we saw that it had a density of
 
 $$
 \begin{aligned}
-p(x | \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \mathrm{exp} 
-\Big{\{} \frac{-(x-\mu)^2}{2 \sigma^2} \Big{\}} \\
-&= \frac{1}{\sqrt{2 \pi}} \cdot \mathrm{exp} \Big{\{} \frac{\mu}{\sigma^2}x 
-- \frac{1}{2 \sigma^2} x^2 - \big{(} \frac{1}{2 \sigma^2} \mu^2 
-+ \log(\sigma) \big{)} \Big{\}} .
+p(x | \mu, \sigma) &= \frac{1}{\sqrt{2 \pi \sigma^2}} \cdot \mathrm{exp} 
+\left\{ \frac{-(x-\mu)^2}{2 \sigma^2} \right\} \\
+&= \frac{1}{\sqrt{2 \pi}} \cdot \mathrm{exp} \left\{ \frac{\mu}{\sigma^2}x
+-\frac{1}{2 \sigma^2} x^2 - \left( \frac{1}{2 \sigma^2} \mu^2
++\log(\sigma) \right) \right\}.
 \end{aligned}
 $$
 
 This matches the definition of the exponential family with:
 
 * *underlying measure*: $h(x) = \frac{1}{\sqrt{2 \pi}}$,
-* *natural parameters*: $\eta = \begin{bmatrix} \eta_1 \\ \eta_2 
-\end{bmatrix} = \begin{bmatrix} \frac{\mu}{\sigma^2} \\ 
-\frac{1}{2 \sigma^2}  \end{bmatrix}$,
+* *natural parameters*: $\boldsymbol{\eta} = \begin{bmatrix} \eta_1 \\ \eta_2
+\end{bmatrix} = \begin{bmatrix} \frac{\mu}{\sigma^2} \\
+\frac{1}{2 \sigma^2} \end{bmatrix}$,
 * *sufficient statistics*: $T(x) = \begin{bmatrix}x\\-x^2\end{bmatrix}$, and
-* *cumulant function*: $A(\eta) = \frac{1}{2 \sigma^2} \mu^2 + \log(\sigma)  
+* *cumulant function*: $A({\boldsymbol\eta}) = \frac{1}{2 \sigma^2} \mu^2 + \log(\sigma)
 = \frac{\eta_1^2}{4 \eta_2} - \frac{1}{2}\log(2 \eta_2)$.
 
 It is worth noting that the exact choice of each of above terms is somewhat 
