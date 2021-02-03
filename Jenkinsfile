@@ -24,7 +24,7 @@ stage("Build and Publish") {
       pip install tensorflow==2.3.1
       pip install tensorflow-probability==0.11.1
       # jax
-      pip install https://storage.googleapis.com/jax-releases/cuda101/jaxlib-0.1.47-cp37-none-linux_x86_64.whl
+      pip install https://storage.googleapis.com/jax-releases/cuda101/jaxlib-0.1.49-cp38-none-linux_x86_64.whl
       pip install jax
       # check
       pip list
