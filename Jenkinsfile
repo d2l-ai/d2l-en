@@ -54,6 +54,7 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval_tensorflow/data
+      export TF_CPP_MIN_LOG_LEVEL=3
       d2lbook build eval --tab tensorflow
       ./static/cache.sh store _build/eval_tensorflow/data
       """
