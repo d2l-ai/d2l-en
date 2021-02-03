@@ -4,8 +4,6 @@ stage("Build and Publish") {
     ws("workspace/${TASK}") {
       checkout scm
       def ENV_NAME = "${TASK}-${EXECUTOR_NUMBER}";
-      def EID = EXECUTOR_NUMBER.toInteger()
-      def CUDA_VISIBLE_DEVICES=(EID*2).toString() + ',' + (EID*2+1).toString();
 
       sh label: "Build Environment", script: """set -ex
       rm -rf ~/miniconda3/envs/${ENV_NAME}
@@ -38,7 +36,6 @@ stage("Build and Publish") {
 
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
-      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval/data
       d2lbook build eval
@@ -47,7 +44,6 @@ stage("Build and Publish") {
 
       sh label: "Execute Notebooks [Pytorch]", script: """set -ex
       conda activate ${ENV_NAME}
-      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval_pytorch/data
       d2lbook build eval --tab pytorch
@@ -56,7 +52,6 @@ stage("Build and Publish") {
 
       sh label: "Execute Notebooks [Tensorflow]", script: """set -ex
       conda activate ${ENV_NAME}
-      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval_tensorflow/data
       d2lbook build eval --tab tensorflow
@@ -65,7 +60,6 @@ stage("Build and Publish") {
 
       sh label: "Execute Notebooks [Jax]", script: """set -ex
       conda activate ${ENV_NAME}
-      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval_jax/data
       d2lbook build eval --tab jax
