@@ -80,7 +80,6 @@ stage("Build and Publish") {
       sh label:"Build Package", script:"""set -ex
       conda activate ${ENV_NAME}
       d2lbook build pkg
-      ./static/build_whl.sh
       """
 
       if (env.BRANCH_NAME == 'jax') {
