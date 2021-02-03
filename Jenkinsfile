@@ -9,18 +9,20 @@ stage("Build and Publish") {
 
       sh label: "Build Environment", script: """set -ex
       rm -rf ~/miniconda3/envs/${ENV_NAME}
-      conda create -n ${ENV_NAME} pip python=3.7 -y
+      conda create -n ${ENV_NAME} pip python=3.8 -y
       conda activate ${ENV_NAME}
       # d2l
       python setup.py develop
       # mxnet
-      pip install mxnet-cu101==1.6.0
+      pip install mxnet-cu101==1.7.0
+      pip uninstall -y d2lbook
       pip install git+https://github.com/d2l-ai/d2l-book
       # pytorch
-      pip install torch==1.5.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
-      pip install torchvision
+      pip install --pre torch==1.8.0.dev20201219+cu101 -f https://download.pytorch.org/whl/nightly/cu101/torch_nightly.html
+      pip install --pre torchvision==0.9.0.dev20201219+cu101 -f https://download.pytorch.org/whl/nightly/cu101/torch_nightly.html
       # tensorflow
-      pip install tensorflow
+      pip install tensorflow==2.3.1
+      pip install tensorflow-probability==0.11.1
       # jax
       pip install https://storage.googleapis.com/jax-releases/cuda101/jaxlib-0.1.47-cp37-none-linux_x86_64.whl
       pip install jax
