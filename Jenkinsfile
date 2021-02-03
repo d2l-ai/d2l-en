@@ -40,37 +40,37 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
-      ./static/cache.sh restore _build/eval/data _build/data_tmp
+      ./static/cache.sh restore _build/eval/data
       ./static/clean_eval.sh
       d2lbook build eval
-      ./static/cache.sh store _build/eval/data _build/data_tmp
+      ./static/cache.sh store _build/eval/data
       """
 
       sh label: "Execute Notebooks [Pytorch]", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
-      ./static/cache.sh restore _build/eval_pytorch/data _build/data_pytorch_tmp
+      ./static/cache.sh restore _build/eval_pytorch/data
       d2lbook build eval --tab pytorch
-      ./static/cache.sh store _build/eval_pytorch/data _build/data_pytorch_tmp
+      ./static/cache.sh store _build/eval_pytorch/data
       """
 
       sh label: "Execute Notebooks [Tensorflow]", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
-      ./static/cache.sh restore _build/eval_tensorflow/data _build/data_tensorflow_tmp
+      ./static/cache.sh restore _build/eval_tensorflow/data
       d2lbook build eval --tab tensorflow
-      ./static/cache.sh store _build/eval_tensorflow/data _build/data_tensorflow_tmp
+      ./static/cache.sh store _build/eval_tensorflow/data
       """
 
       sh label: "Execute Notebooks [Jax]", script: """set -ex
       conda activate ${ENV_NAME}
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
-      ./static/cache.sh restore _build/eval_jax/data _build/data_jax_tmp
+      ./static/cache.sh restore _build/eval_jax/data
       d2lbook build eval --tab jax
-      ./static/cache.sh store _build/eval_jax/data _build/data_jax_tmp
+      ./static/cache.sh store _build/eval_jax/data
       """
 
       sh label:"Build HTML", script:"""set -ex
