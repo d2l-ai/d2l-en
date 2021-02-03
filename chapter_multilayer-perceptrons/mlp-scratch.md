@@ -44,8 +44,8 @@ Again, we will disregard the spatial structure
 among the pixels for now,
 so we can think of this as simply a classification dataset
 with 784 input features and 10 classes.
-To begin, we will implement an MLP
-with one hidden layer and 256 hidden units.
+To begin, we will [**implement an MLP
+with one hidden layer and 256 hidden units.**]
 Note that we can regard both of these quantities
 as hyperparameters.
 Typically, we choose layer widths in powers of 2,
@@ -102,7 +102,7 @@ params = [W1, b1, W2, b2]
 ## Activation Function
 
 To make sure we know how everything works,
-we will implement the ReLU activation ourselves
+we will [**implement the ReLU activation**] ourselves
 using the maximum function rather than
 invoking the built-in `relu` function directly.
 
@@ -129,7 +129,7 @@ def relu(X):
 Because we are disregarding spatial structure,
 we `reshape` each two-dimensional image into
 a flat vector of length  `num_inputs`.
-Finally, we implement our model
+Finally, we (**implement our model**)
 with just a few lines of code.
 
 ```{.python .input}
@@ -187,8 +187,8 @@ def loss(y_hat, y):
 
 ## Training
 
-Fortunately, the training loop for MLPs
-is exactly the same as for softmax regression.
+Fortunately, [**the training loop for MLPs
+is exactly the same as for softmax regression.**]
 Leveraging the `d2l` package again,
 we call the `train_ch3` function
 (see :numref:`sec_softmax_scratch`),
@@ -216,7 +216,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
 ```
 
 To evaluate the learned model,
-we apply it on some test data.
+we [**apply it on some test data**].
 
 ```{.python .input}
 #@tab all

@@ -1,8 +1,8 @@
 # Concise Implementation of Multilayer Perceptrons
 :label:`sec_mlp_concise`
 
-As you might expect, by relying on the high-level APIs,
-we can implement MLPs even more concisely.
+As you might expect, by (**relying on the high-level APIs,
+we can implement MLPs even more concisely.**)
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -32,9 +32,9 @@ of softmax regression implementation
 the only difference is that we add
 *two* fully-connected layers
 (previously, we added *one*).
-The first is our hidden layer,
-which contains 256 hidden units
-and applies the ReLU activation function.
+The first is [**our hidden layer**],
+which (**contains 256 hidden units
+and applies the ReLU activation function**).
 The second is our output layer.
 
 ```{.python .input}
@@ -66,7 +66,7 @@ net = tf.keras.models.Sequential([
     tf.keras.layers.Dense(10)])
 ```
 
-The training loop is exactly the same
+[**The training loop**] is exactly the same
 as when we implemented softmax regression.
 This modularity enables us to separate
 matters concerning the model architecture
@@ -105,7 +105,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 ## Exercises
 
-1. Try adding different numbers of hidden layers (you may also modify the learning rate). What setting works best? 
+1. Try adding different numbers of hidden layers (you may also modify the learning rate). What setting works best?
 1. Try out different activation functions. Which one works best?
 1. Try different schemes for initializing the weights. What method works best?
 
