@@ -41,7 +41,6 @@ stage("Build and Publish") {
       export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64
       ./static/cache.sh restore _build/eval/data
-      ./static/clean_eval.sh
       d2lbook build eval
       ./static/cache.sh store _build/eval/data
       """
