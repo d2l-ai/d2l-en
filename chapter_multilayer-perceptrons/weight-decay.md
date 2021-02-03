@@ -44,13 +44,13 @@ for adjusting function complexity.
 
 ## Norms and Weight Decay
 
-We have described 
+We have described
 both the $L_2$ norm and the $L_1$ norm,
 which are special cases of the more general $L_p$ norm
 in :numref:`subsec_lin-algebra-norms`.
-*Weight decay* (commonly called $L_2$ regularization),
+(***Weight decay* (commonly called $L_2$ regularization),
 might be the most widely-used technique
-for regularizing parametric machine learning models.
+for regularizing parametric machine learning models.**)
 The technique is motivated by the basic intuition
 that among all functions $f$,
 the function $f = 0$
@@ -202,10 +202,10 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-First, we generate some data as before
+First, we [**generate some data as before**]
 
-$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
-\epsilon \sim \mathcal{N}(0, 0.01^2).$$
+(**$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
+\epsilon \sim \mathcal{N}(0, 0.01^2).$$**)
 
 We choose our label to be a linear function of our inputs,
 corrupted by Gaussian noise with zero mean and standard deviation 0.01.
@@ -229,7 +229,7 @@ In the following, we will implement weight decay from scratch,
 simply by adding the squared $L_2$ penalty
 to the original target function.
 
-### Initializing Model Parameters
+### [**Initializing Model Parameters**]
 
 First, we will define a function
 to randomly initialize our model parameters.
@@ -259,7 +259,7 @@ def init_params():
     return [w, b]
 ```
 
-### Defining $L_2$ Norm Penalty
+### (**Defining $L_2$ Norm Penalty**)
 
 Perhaps the most convenient way to implement this penalty
 is to square all terms in place and sum them up.
@@ -281,7 +281,7 @@ def l2_penalty(w):
     return tf.reduce_sum(tf.pow(w, 2)) / 2
 ```
 
-### Defining the Training Loop
+### [**Defining the Training Loop**]
 
 The following code fits a model on the training set
 and evaluates it on the test set.
@@ -355,7 +355,7 @@ def train(lambd):
     print('L2 norm of w:', tf.norm(w).numpy())
 ```
 
-### Training without Regularization
+### [**Training without Regularization**]
 
 We now run this code with `lambd = 0`,
 disabling weight decay.
@@ -368,7 +368,7 @@ test error---a textook case of overfitting.
 train(lambd=0)
 ```
 
-### Using Weight Decay
+### [**Using Weight Decay**]
 
 Below, we run with substantial weight decay.
 Note that the training error increases
@@ -381,7 +381,7 @@ we expect from regularization.
 train(lambd=3)
 ```
 
-## Concise Implementation
+## [**Concise Implementation**]
 
 Because weight decay is ubiquitous
 in neural network optimization,
@@ -502,8 +502,8 @@ def train_concise(wd):
     print('L2 norm of w:', tf.norm(net.get_weights()[0]).numpy())
 ```
 
-The plots look identical to those when
-we implemented weight decay from scratch.
+[**The plots look identical to those when
+we implemented weight decay from scratch**].
 However, they run appreciably faster
 and are easier to implement,
 a benefit that will become more

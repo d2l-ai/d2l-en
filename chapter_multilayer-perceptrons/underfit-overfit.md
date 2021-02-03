@@ -385,8 +385,8 @@ and the broad digitization of the economy.
 
 ## Polynomial Regression
 
-We can now explore these concepts interactively
-by fitting polynomials to data.
+We can now (**explore these concepts interactively
+by fitting polynomials to data.**)
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -415,10 +415,10 @@ import math
 
 ### Generating the Dataset
 
-First we need data. Given $x$, we will use the following cubic polynomial to generate the labels on training and test data:
+First we need data. Given $x$, we will [**use the following cubic polynomial to generate the labels**] on training and test data:
 
-$$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where }
-\epsilon \sim \mathcal{N}(0, 0.1^2).$$
+(**$$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where }
+\epsilon \sim \mathcal{N}(0, 0.1^2).$$**)
 
 The noise term $\epsilon$ obeys a normal distribution
 with a mean of 0 and a standard deviation of 0.1.
@@ -449,7 +449,7 @@ labels += np.random.normal(scale=0.1, size=labels.shape)
 Again, monomials stored in `poly_features`
 are rescaled by the gamma function,
 where $\Gamma(n)=(n-1)!$.
-Take a look at the first 2 samples from the generated dataset.
+[**Take a look at the first 2 samples**] from the generated dataset.
 The value 1 is technically a feature,
 namely the constant feature corresponding to the bias.
 
@@ -467,7 +467,7 @@ features[:2], poly_features[:2, :], labels[:2]
 
 ### Training and Testing the Model
 
-Let us first implement a function to evaluate the loss on a given dataset.
+Let us first [**implement a function to evaluate the loss on a given dataset**].
 
 ```{.python .input}
 #@tab mxnet, tensorflow
@@ -493,7 +493,7 @@ def evaluate_loss(net, data_iter, loss):  #@save
     return metric[0] / metric[1]
 ```
 
-Now define the training function.
+Now [**define the training function**].
 
 ```{.python .input}
 def train(train_features, test_features, train_labels, test_labels,
@@ -573,7 +573,7 @@ def train(train_features, test_features, train_labels, test_labels,
     print('weight:', net.get_weights()[0].T)
 ```
 
-### Third-Order Polynomial Function Fitting (Normal)
+### [**Third-Order Polynomial Function Fitting (Normal)**]
 
 We will begin by first using a third-order polynomial function, which is the same order as that of the data generation function.
 The results show that this model's training and test losses can be both effectively reduced.
@@ -588,7 +588,7 @@ train(poly_features[:n_train, :4], poly_features[n_train:, :4],
       labels[:n_train], labels[n_train:])
 ```
 
-### Linear Function Fitting (Underfitting)
+### [**Linear Function Fitting (Underfitting)**]
 
 Let us take another look at linear function fitting.
 After the decline in early epochs,
@@ -607,7 +607,7 @@ train(poly_features[:n_train, :2], poly_features[n_train:, :2],
       labels[:n_train], labels[n_train:])
 ```
 
-### Higher-Order Polynomial Function Fitting  (Overfitting)
+### [**Higher-Order Polynomial Function Fitting  (Overfitting)**]
 
 Now let us try to train the model
 using a polynomial of too high degree.
