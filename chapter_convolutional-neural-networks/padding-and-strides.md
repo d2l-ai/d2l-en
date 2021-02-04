@@ -203,7 +203,7 @@ comp_conv2d(conv2d, X).shape
 # Here, we use a convolution kernel with a height of 5 and a width of 3. The
 # padding numbers on either side of the height and width are 2 and 1,
 # respectively
-conv2d = tf.keras.layers.Conv2D(1, kernel_size=(5, 3), padding='valid')
+conv2d = tf.keras.layers.Conv2D(1, kernel_size=(5, 3), padding='same')
 comp_conv2d(conv2d, X).shape
 ```
 
