@@ -361,7 +361,7 @@ We now run this code with `lambd = 0`,
 disabling weight decay.
 Note that we overfit badly,
 decreasing the training error but not the
-test error---a textook case of overfitting.
+test error---a textbook case of overfitting.
 
 ```{.python .input}
 #@tab all
