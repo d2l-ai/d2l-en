@@ -170,7 +170,17 @@ $$ \hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d p(x_i  \mid  y) p(y).$$
 
 If we can estimate $\prod_i p(x_i=1  \mid  y)$ for every $i$ and $y$, and save its value in $P_{xy}[i, y]$, here $P_{xy}$ is a $d\times n$ matrix with $n$ being the number of classes and $y\in\{1, \ldots, n\}$. In addition, we estimate $p(y)$ for every $y$ and save it in $P_y[y]$, with $P_y$ a $n$-length vector. Then for any new example $\mathbf x$, we could compute
 
-$$ \hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d P_{xy}[x_i, y]P_y[y],$$
+$$ 
+\begin{aligned}
+\hat{y} 
+&= \mathrm{argmax}_y \ \prod_{i=1}^d P_y[y]
+    \begin{cases}
+        P_{xy}[i, y] & \text{for } t_i=1\\
+        1 - P_{xy}[i, y] & \text{for } t_i = 0
+    \end{cases} \\
+&= \mathrm{argmax}_y \ \prod_{i=1}^d P_y[y]\ P_{xy}[i, y]^{t_i}\, \left(1 - P_{xy}[i, y]\right)^{1-t_i},
+\end{aligned}
+$$
 :eqlabel:`eq_naive_bayes_estimation`
 
 for any $y$. So our assumption of conditional independence has taken the complexity of our model from an exponential dependence on the number of features $\mathcal{O}(2^dn)$ to a linear dependence, which is $\mathcal{O}(dn)$.
