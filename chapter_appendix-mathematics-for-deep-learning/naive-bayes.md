@@ -181,6 +181,7 @@ $$
 &= \mathrm{argmax}_y \ \prod_{i=1}^d P_y[y]\ P_{xy}[i, y]^{t_i}\, \left(1 - P_{xy}[i, y]\right)^{1-t_i},
 \end{aligned}
 $$
+
 :eqlabel:`eq_naive_bayes_estimation`
 
 for any $y$. So our assumption of conditional independence has taken the complexity of our model from an exponential dependence on the number of features $\mathcal{O}(2^dn)$ to a linear dependence, which is $\mathcal{O}(dn)$.
