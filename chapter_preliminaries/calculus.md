@@ -253,7 +253,7 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 ```
 
-[**Now we can plot the function $u = f(x)$ and its tangent line $y = 2x - 3$ at $x=1$, where the coefficient $2$ is the slope of the tangent line.**]
+Now we can [**plot the function $u = f(x)$ and its tangent line $y = 2x - 3$ at $x=1$**], where the coefficient $2$ is the slope of the tangent line.
 
 ```{.python .input}
 #@tab all

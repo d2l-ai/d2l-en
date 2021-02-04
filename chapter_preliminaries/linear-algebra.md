@@ -132,7 +132,7 @@ $$\mathbf{x} =\begin{bmatrix}x_{1}  \\x_{2}  \\ \vdots  \\x_{n}\end{bmatrix},$$
 
 where $x_1, \ldots, x_n$ are elements of the vector.
 In code,
-(**we access any element by indexing into the tensor.**)
+we (**access any element by indexing into the tensor.**)
 
 ```{.python .input}
 x[3]
@@ -159,8 +159,8 @@ we can express this as $\mathbf{x} \in \mathbb{R}^n$.
 The length of a vector is commonly called the *dimension* of the vector.
 
 As with an ordinary Python array,
-[**we can access the length of a tensor
-by calling Python's built-in `len()` function.**]
+we [**can access the length of a tensor**]
+by calling Python's built-in `len()` function.
 
 ```{.python .input}
 len(x)
@@ -228,8 +228,8 @@ is ($m$, $n$) or $m \times n$.
 Specifically, when a matrix has the same number of rows and columns,
 its shape becomes a square; thus, it is called a *square matrix*.
 
-[**We can create an $m \times n$ matrix
-by specifying a shape with two components $m$ and $n$**]
+We can [**create an $m \times n$ matrix**]
+by specifying a shape with two components $m$ and $n$
 when calling any of our favorite functions for instantiating a tensor.
 
 ```{.python .input}
@@ -277,7 +277,7 @@ $$
 \end{bmatrix}.
 $$
 
-[**Now we access a matrix's transpose in code.**]
+Now we access a (**matrix's transpose**) in code.
 
 ```{.python .input}
 A.T
@@ -315,7 +315,7 @@ B = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
 B
 ```
 
-(**Now we compare `B` with its transpose.**)
+Now we compare `B` with its transpose.
 
 
 ```{.python .input}
@@ -444,7 +444,7 @@ A * B
 A * B
 ```
 
-[**Multiplying or adding a tensor by a scalar also does not change the shape of the tensor,**]
+[**Multiplying or adding a tensor by a scalar**] also does not change the shape of the tensor,
 where each element of the operand tensor will be added or multiplied by the scalar.
 
 ```{.python .input}
@@ -472,7 +472,7 @@ a + X, (a * X).shape
 
 One useful operation that we can perform with arbitrary tensors
 is to
-[**calculate the sum of their elements.**]
+calculate [**the sum of their elements.**]
 In mathematical notation, we express sums using the $\sum$ symbol.
 To express the sum of the elements in a vector $\mathbf{x}$ of length $d$,
 we write $\sum_{i=1}^d x_i$.
@@ -495,7 +495,7 @@ x = tf.range(4, dtype=tf.float32)
 x, tf.reduce_sum(x)
 ```
 
-[**We can express sums over the elements of tensors of arbitrary shape.**]
+We can express [**sums over the elements of tensors of arbitrary shape.**]
 For example, the sum of the elements of an $m \times n$ matrix $\mathbf{A}$ could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
 ```{.python .input}
@@ -514,7 +514,7 @@ A.shape, tf.reduce_sum(A)
 
 By default, invoking the function for calculating the sum
 *reduces* a tensor along all its axes to a scalar.
-[**We can also specify the axes along which the tensor is reduced via summation.**]
+We can also [**specify the axes along which the tensor is reduced via summation.**]
 Take matrices as an example.
 To reduce the row dimension (axis 0) by summing up elements of all the rows,
 we specify `axis=0` when invoking the function.
@@ -539,7 +539,7 @@ A_sum_axis0, A_sum_axis0.shape
 ```
 
 Specifying
-(**`axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.**)
+`axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.
 Thus, the dimension of axis 1 of the input is lost in the output shape.
 
 ```{.python .input}
@@ -559,8 +559,8 @@ A_sum_axis1 = tf.reduce_sum(A, axis=1)
 A_sum_axis1, A_sum_axis1.shape
 ```
 
-[**Reducing a matrix along both rows and columns via summation
-is equivalent to summing up all the elements of the matrix.**]
+Reducing a matrix along both rows and columns via summation
+is equivalent to summing up all the elements of the matrix.
 
 ```{.python .input}
 A.sum(axis=[0, 1])  # Same as `A.sum()`
@@ -595,7 +595,7 @@ A.mean(), A.sum() / A.numel()
 tf.reduce_mean(A), tf.reduce_sum(A) / tf.size(A).numpy()
 ```
 
-(**Likewise, the function for calculating the mean can also reduce a tensor along the specified axes.**)
+Likewise, the function for calculating the mean can also reduce a tensor along the specified axes.
 
 ```{.python .input}
 A.mean(axis=0), A.sum(axis=0) / A.shape[0]
@@ -615,8 +615,8 @@ tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 :label:`subseq_lin-alg-non-reduction`
 
 However,
-[**sometimes it can be useful to keep the number of axes unchanged
-when invoking the function for calculating the sum or mean.**]
+sometimes it can be useful to [**keep the number of axes unchanged**]
+when invoking the function for calculating the sum or mean.
 
 ```{.python .input}
 sum_A = A.sum(axis=1, keepdims=True)
@@ -636,7 +636,7 @@ sum_A
 ```
 
 For instance,
-(**since `sum_A` still keeps its two axes after summing each row, we can divide `A` by `sum_A` with broadcasting.**)
+since `sum_A` still keeps its two axes after summing each row, we can (**divide `A` by `sum_A` with broadcasting.**)
 
 ```{.python .input}
 A / sum_A
@@ -652,7 +652,7 @@ A / sum_A
 A / sum_A
 ```
 
-If we want to calculate the cumulative sum of elements of `A` along some axis, say `axis=0` (row by row),
+If we want to calculate [**the cumulative sum of elements of `A` along some axis**], say `axis=0` (row by row),
 we can call the `cumsum` function. This function will not reduce the input tensor along any axis.
 
 ```{.python .input}
@@ -956,8 +956,8 @@ tf.norm(u)
 In deep learning, we work more often
 with the squared $L_2$ norm.
 
-[**You will also frequently encounter the $L_1$ *norm*,
-which is expressed as the sum of the absolute values of the vector elements:**]
+You will also frequently encounter [**the $L_1$ *norm***],
+which is expressed as the sum of the absolute values of the vector elements:
 
 (**$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$**)
 
@@ -982,16 +982,16 @@ tf.reduce_sum(tf.abs(u))
 ```
 
 
-[**Both the $L_2$ norm and the $L_1$ norm
-are special cases of the more general $L_p$ *norm*:**]
+Both the $L_2$ norm and the $L_1$ norm
+are special cases of the more general $L_p$ *norm*:
 
-(**$$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$**)
+$$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
 
 Analogous to $L_2$ norms of vectors,
-the *Frobenius norm* of a matrix $\mathbf{X} \in \mathbb{R}^{m \times n}$
+[**the *Frobenius norm* of a matrix $\mathbf{X} \in \mathbb{R}^{m \times n}$**]
 is the square root of the sum of the squares of the matrix elements:
 
-$$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$
+[**$$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$**]
 
 The Frobenius norm satisfies all the properties of vector norms.
 It behaves as if it were an $L_2$ norm of a matrix-shaped vector.
