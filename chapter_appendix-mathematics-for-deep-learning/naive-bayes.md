@@ -178,7 +178,7 @@ p(x_i = t_i \mid y) =
 \end{cases}
 $$
 
-In addition, we estimate $p(y)$ for every $y$ and save it in $P_y[y]$, with $P_y$ a $n$-length vector. Then for any new example $\mathbf t = (t_1, t_2, \ldots, t_d)$, we could compute
+In addition, we estimate $p(y)$ for every $y$ and save it in $P_y[y]$, with $P_y$ a $n$-length vector. Then, for any new example $\mathbf t = (t_1, t_2, \ldots, t_d)$, we could compute
 
 $$\begin{aligned}
 \hat{y} 
