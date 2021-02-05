@@ -328,7 +328,7 @@ print('logarithm is normal:', 784*tf.math.log(a).numpy())
 
 Since the logarithm is an increasing function, we can rewrite :eqref:`eq_naive_bayes_estimation` as
 
-$$ \hat{y} = \mathrm{argmax}_y \> \sum_{i=1}^d \log P_{xy}[x_i, y] + \log P_y[y].$$
+$$ \hat{y} = \mathrm{argmax}_y \ \log P_y[y] + \sum_{i=1}^d \Big[t_i\log P_{xy}[x_i, y] + (1-t_i) \log (1 - P_{xy}[x_i, y]) \Big].$$
 
 We can implement the following stable version:
 
