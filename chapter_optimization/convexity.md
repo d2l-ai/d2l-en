@@ -122,24 +122,42 @@ since $\int P(Y) P(X \mid Y) dY = P(X)$.
 This can be used in variational methods. Here $Y$ is typically the unobserved random variable, $P(Y)$ is the best guess of how it might be distributed, and $P(X)$ is the distribution with $Y$ integrated out. For instance, in clustering $Y$ might be the cluster labels and $P(X \mid Y)$ is the generative model when applying cluster labels.
 
 
+
 ## Properties
 
-Convex functions have a few useful properties. We describe them as follows.
+Convex functions have a few useful properties. We describe them below.
 
 
 ### Local Minima Are Global Minima
 
-In particular, the local minima for convex functions are also the global minima. Let us assume the contrary and prove it wrong. If $x^{\ast} \in \mathcal{X}$ is a local minimum such that there is a small positive value $p$ so that for $x \in \mathcal{X}$ that satisfies $0 < |x - x^{\ast}| \leq p$ there is $f(x^{\ast}) < f(x)$. Assume there exists $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. According to the property of convexity, 
+First and foremost, the local minima of convex functions are also the global minima. 
+We can prove it by contradiction as follows.
+
+Consider a convex function $f$ defined on a convex set $\mathcal{X}$.
+Suppose that $x^{\ast} \in \mathcal{X}$ is a local minimum:
+there exists a small positive value $p$ so that for $x \in \mathcal{X}$ that satisfies $0 < |x - x^{\ast}| \leq p$ we have $f(x^{\ast}) < f(x)$.
+
+Assume that the local minimum $x^{\ast}$
+is not the global minumum of $f$:
+there exists $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. 
+There also exists 
+$\lambda \in [0, 1)$ such as $\lambda = 1 - \frac{p}{|x^{\ast} - x'|}$
+so that
+$0 < |\lambda x^{\ast} + (1-\lambda) x' - x^{\ast}| \leq p$. 
+
+However,
+according to the definition of convex functions, we have
 
 $$\begin{aligned}
     f(\lambda x^{\ast} + (1-\lambda) x') &\leq \lambda f(x^{\ast}) + (1-\lambda) f(x') \\
     &< \lambda f(x^{\ast}) + (1-\lambda) f(x^{\ast}) \\
-    &< f(x^{\ast}) \\
+    &= f(x^{\ast}).
 \end{aligned}$$
 
-There exists $\lambda \in [0, 1)$, $\lambda = 1 - \frac{p}{|x^{\ast} - x'|}$ for an example, so that $0 < |\lambda x^{\ast} + (1-\lambda) x' - x^{\ast}| \leq p$. However, because $f(\lambda x^{\ast} + (1-\lambda) x') < f(x^{\ast})$, this violates our local minimum statement. Therefore, there does not exist $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. The local minimum $x^{\ast}$ is also the global minimum.
+Since $f(\lambda x^{\ast} + (1-\lambda) x') < f(x^{\ast})$, this contradicts with our statement that $x^{\ast}$ is a local minimum.
+Therefore, there does not exist $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. The local minimum $x^{\ast}$ is also the global minimum.
 
-For instance, the function $f(x) = (x-1)^2$ has a local minimum for $x=1$, it is also the global minimum.
+For instance, the convex function $f(x) = (x-1)^2$ has a local minimum at $x=1$, which is also the global minimum.
 
 ```{.python .input}
 #@tab all
