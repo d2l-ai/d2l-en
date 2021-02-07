@@ -180,15 +180,10 @@ $$
 
 In addition, we estimate $p(y)$ for every $y$ and save it in $P_y[y]$, with $P_y$ a $n$-length vector. Then, for any new example $\mathbf t = (t_1, t_2, \ldots, t_d)$, we could compute
 
-$$
-\begin{aligned}
-\hat{y} 
+$$\begin{aligned} \hat{y} 
 &= \mathrm{argmax}_y \ p(y)\prod_{i=1}^d   p(x_t = t_i \mid y)\\
-&= \mathrm{argmax}_y \ P_y[y]\prod_{i=1}^d \ P_{xy}[i, y]^{t_i}\, \left(1 - P_{xy}[i, y]\right)^{1-t_i}
-\end{aligned}
-$$
+&= \mathrm{argmax}_y \ P_y[y]\prod_{i=1}^d \ P_{xy}[i, y]^{t_i}\, \left(1 - P_{xy}[i, y]\right)^{1-t_i} \end{aligned}$$
 :eqlabel:`eq_naive_bayes_estimation`
-
 
 for any $y$. So our assumption of conditional independence has taken the complexity of our model from an exponential dependence on the number of features $\mathcal{O}(2^dn)$ to a linear dependence, which is $\mathcal{O}(dn)$.
 
