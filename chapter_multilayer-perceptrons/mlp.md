@@ -273,7 +273,7 @@ We will touch upon more rigorous arguments in subsequent chapters.
 
 
 ## Activation Functions
-:label:`subsec:activation-functions`
+:label:`subsec_activation-functions`
 
 Activation functions decide whether a neuron should be activated or not by
 calculating the weighted sum and further adding bias with it.
