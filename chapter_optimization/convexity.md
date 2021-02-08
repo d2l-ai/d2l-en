@@ -151,10 +151,10 @@ according to the definition of convex functions, we have
 $$\begin{aligned}
     f(\lambda x^{\ast} + (1-\lambda) x') &\leq \lambda f(x^{\ast}) + (1-\lambda) f(x') \\
     &< \lambda f(x^{\ast}) + (1-\lambda) f(x^{\ast}) \\
-    &= f(x^{\ast}).
+    &= f(x^{\ast}),
 \end{aligned}$$
 
-Since $f(\lambda x^{\ast} + (1-\lambda) x') < f(x^{\ast})$, this contradicts with our statement that $x^{\ast}$ is a local minimum.
+which contradicts with our statement that $x^{\ast}$ is a local minimum.
 Therefore, there does not exist $x' \in \mathcal{X}$ for which $f(x') < f(x^{\ast})$. The local minimum $x^{\ast}$ is also the global minimum.
 
 For instance, the convex function $f(x) = (x-1)^2$ has a local minimum at $x=1$, which is also the global minimum.
