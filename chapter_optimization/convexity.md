@@ -161,12 +161,14 @@ For instance, the convex function $f(x) = (x-1)^2$ has a local minimum at $x=1$,
 
 ```{.python .input}
 #@tab all
-f = lambda x: (x-1)**2
+f = lambda x: (x - 1) ** 2
 d2l.set_figsize()
 d2l.plot([x, segment], [f(x), f(segment)], 'x', 'f(x)')
 ```
 
-The fact that the local minima for convex functions is also the global minima is very convenient. It means that if we minimize functions we cannot "get stuck". Note, though, that this does not mean that there cannot be more than one global minimum or that there might even exist one. For instance, the function $f(x) = \mathrm{max}(|x|-1, 0)$ attains its minimum value over the interval $[-1, 1]$. Conversely, the function $f(x) = \exp(x)$ does not attain a minimum value on $\mathbb{R}$. For $x \to -\infty$ it asymptotes to $0$, however there is no $x$ for which $f(x) = 0$.
+The fact that the local minima for convex functions are also the global minima is very convenient. 
+It means that if we minimize functions we cannot "get stuck". 
+Note, though, that this does not mean that there cannot be more than one global minimum or that there might even exist one. For instance, the function $f(x) = \mathrm{max}(|x|-1, 0)$ attains its minimum value over the interval $[-1, 1]$. Conversely, the function $f(x) = \exp(x)$ does not attain a minimum value on $\mathbb{R}$: for $x \to -\infty$ it asymptotes to $0$, but there is no $x$ for which $f(x) = 0$.
 
 ### Convex Functions and Sets
 
