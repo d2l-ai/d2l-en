@@ -170,31 +170,24 @@ The fact that the local minima for convex functions are also the global minima i
 It means that if we minimize functions we cannot "get stuck". 
 Note, though, that this does not mean that there cannot be more than one global minimum or that there might even exist one. For instance, the function $f(x) = \mathrm{max}(|x|-1, 0)$ attains its minimum value over the interval $[-1, 1]$. Conversely, the function $f(x) = \exp(x)$ does not attain a minimum value on $\mathbb{R}$: for $x \to -\infty$ it asymptotes to $0$, but there is no $x$ for which $f(x) = 0$.
 
-### Convex Functions and Sets
+### Below Sets of Convex Functions Are Convex
 
-Convex functions define convex sets as *below-sets*. They are defined as
+We can conveniently 
+define convex sets 
+via *below sets* of convex functions.
+Concretely,
+given a convex function $f$ defined on a convex set $\mathcal{X}$,
+any below set
 
-$$S_b := \{x | x \in \mathcal{X} \text{ and } f(x) \leq b\}.$$
+$$\mathcal{S}_b := \{x | x \in \mathcal{X} \text{ and } f(x) \leq b\}$$
 
-Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \in \mathcal{S}_b$ we need to show that $\lambda x + (1-\lambda) x' \in \mathcal{S}_b$ as long as $\lambda \in [0, 1]$. But this follows directly from the definition of convexity since $f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b$.
+is convex. 
 
-Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
+Let us prove this quickly. Recall that for any $x, x' \in \mathcal{S}_b$ we need to show that $\lambda x + (1-\lambda) x' \in \mathcal{S}_b$ as long as $\lambda \in [0, 1]$. 
+Since $f(x) \leq b$ and $f(x') \leq b$,
+by the definition of convexity we have 
 
-```{.python .input}
-#@tab all
-x, y = d2l.meshgrid(
-    d2l.linspace(-1.0, 1.0, 101), d2l.linspace(-1.0, 1.0, 101))
-z = x**2 + 0.5 * d2l.cos(2 * np.pi * y)
-# Plot the 3D surface
-d2l.set_figsize((6, 4))
-ax = d2l.plt.figure().add_subplot(111, projection='3d')
-ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
-ax.contour(x, y, z, offset=-1)
-ax.set_zlim(-1, 1.5)
-# Adjust labels
-for func in [d2l.plt.xticks, d2l.plt.yticks, ax.set_zticks]:
-    func([-1, 0, 1])
-```
+$$f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b.$$
 
 ### Derivatives and Convexity
 
