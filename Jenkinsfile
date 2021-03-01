@@ -1,5 +1,12 @@
 stage("Build and Publish") {
-  def TASK = "d2l-jax"
+  // such as d2l-en and d2l-zh
+  def REPO_NAME = env.JOB_NAME.split('/')[0]
+  // such as en and zh
+  def LANG = REPO_NAME.split('-')[1]
+  // The current branch or the branch this PR will merge into
+  def TARGET_BRANCH = env.CHANGE_TARGET ? env.CHANGE_TARGET : env.BRANCH_NAME
+  // such as d2l-en-master
+  def TASK = REPO_NAME + '-' + TARGET_BRANCH
   node {
     ws("workspace/${TASK}") {
       checkout scm
@@ -85,7 +92,7 @@ stage("Build and Publish") {
       if (env.BRANCH_NAME == 'jax') {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
-        d2lbook deploy html pdf pkg
+        d2lbook deploy html pdf pkg --s3 s3://preview.d2l.ai/${JOB_NAME}/
       """
       }
     }
