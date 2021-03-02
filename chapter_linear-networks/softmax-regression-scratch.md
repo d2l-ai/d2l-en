@@ -204,8 +204,8 @@ of the predicted probability assigned to the true label.
 Rather than iterating over the predictions with a Python for-loop
 (which tends to be inefficient),
 we can pick all elements by a single operator.
-Below, we **create sample data `y_hat`
-with 2 examples of predicted probabilities over 3 classes and their corresponding labels `y`.**
+Below, we [**create sample data `y_hat`
+with 2 examples of predicted probabilities over 3 classes and their corresponding labels `y`.**]
 With `y` we know that in the first example the first class is the correct prediction and
 in the second example the third class is the ground-truth.
 [**Using `y` as the indices of the probabilities in `y_hat`,**]
