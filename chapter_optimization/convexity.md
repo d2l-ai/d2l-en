@@ -189,13 +189,20 @@ by the definition of convexity we have
 
 $$f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b.$$
 
-### Derivatives and Convexity
 
-Whenever the second derivative of a function $f$ exists it is very easy to check for convexity. All we need to do is check whether $f'' \succeq 0$, i.e., whether all of its eigenvalues are nonnegative. For instance, the function $f(\mathbf{x}) = \frac{1}{2} \|\mathbf{x}\|^2$ is convex since $d_{\mathbf{x}}^2 f = \mathbf{1}$, i.e., its derivative is the identity matrix.
+### Convexity and Second Derivatives
 
-The first thing to realize is that we only need to prove this property for one-dimensional functions. After all, in general we can always define some function $g(z) = f(\mathbf{x} + z \cdot \mathbf{v})$. This function has the first and second derivatives $g' = (\partial_{\mathbf{x}} f)^\top \mathbf{v}$ and $g'' = \mathbf{v}^\top (\partial^2_{\mathbf{x}} f) \mathbf{v}$ respectively. In particular, $g'' \geq 0$ for all $\mathbf{v}$ whenever the Hessian of $f$ is positive semidefinite, i.e., whenever all of its eigenvalues are greater equal than zero. Hence back to the scalar case.
+Whenever the second derivative of a function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ exists it is very easy to check whether $f$ is convex. 
+All we need to do is check whether the Hessian of $f$ is positive semidefinite: $\nabla^2f \succeq 0$, i.e., whether all of its eigenvalues are nonnegative. For instance, the function $f(\mathbf{x}) = \frac{1}{2} \|\mathbf{x}\|^2$ is convex since $\nabla^2 f = \mathbf{1}$, i.e., its Hessian is an identity matrix.
 
-To see that $f''(x) \geq 0$ for convex functions we use the fact that
+
+Formally, any twice-differentiable one-dimensional function $f: \mathbb{R} \rightarrow \mathbb{R}$ is convex
+if and only if its second derivative $f'' \geq 0$. For any twice-differentiable multi-dimensional function $f: \mathbb{R}^{n} \rightarrow \mathbb{R}$,
+it is convex if and only if its Hessian $\nabla^2f \succeq 0$.
+
+First, we need to prove the one-dimensional case.
+To see that 
+$f''(x) \geq 0$ for convex functions we use the fact that
 
 $$\frac{1}{2} f(x + \epsilon) + \frac{1}{2} f(x - \epsilon) \geq f\left(\frac{x + \epsilon}{2} + \frac{x - \epsilon}{2}\right) = f(x).$$
 
@@ -218,19 +225,12 @@ $$\begin{aligned}
     & \geq (b-a) f'(\alpha).
 \end{aligned}$$
 
-By geometry it follows that $f(x)$ is below the line connecting $f(a)$ and $f(b)$, thus proving convexity. We omit a more formal derivation in favor of a graph below.
 
-```{.python .input}
-#@tab all
-f = lambda x: 0.5 * x**2
-x = d2l.arange(-2, 2, 0.01)
-axb, ab = d2l.tensor([-1.5, -0.5, 1]), d2l.tensor([-1.5, 1])
-d2l.set_figsize()
-d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
-d2l.annotate('a', (-1.5, f(-1.5)), (-1.5, 1.5))
-d2l.annotate('b', (1, f(1)), (1, 1.5))
-d2l.annotate('x', (-0.5, f(-0.5)), (-1.5, f(-0.5)))
-```
+
+
+
+The first thing to realize is that we only need to prove this property for one-dimensional functions. After all, in general we can always define some function $g(z) = f(\mathbf{x} + z \cdot \mathbf{v})$. This function has the first and second derivatives $g' = (\partial_{\mathbf{x}} f)^\top \mathbf{v}$ and $g'' = \mathbf{v}^\top (\partial^2_{\mathbf{x}} f) \mathbf{v}$ respectively. In particular, $g'' \geq 0$ for all $\mathbf{v}$ whenever the Hessian of $f$ is positive semidefinite, i.e., whenever all of its eigenvalues are greater equal than zero. Hence back to the scalar case.
+
 
 ## Constraints
 
