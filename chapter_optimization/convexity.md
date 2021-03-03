@@ -220,7 +220,7 @@ $f'' \geq 0$ implies that $f$ is convex
 we use the fact that $f'' \geq 0$ implies that $f'$ is a monotonically nondecreasing function. Let $a < x < b$ be three points in $\mathbb{R}$,
 where $x = (1-\lambda)a + \lambda b$ and $\lambda \in (0, 1)$.
 According to the mean value theorem,
-there exist $\alpha \in [a, x]$ and $ \beta \in [x, b]$
+there exist $\alpha \in [a, x]$ and $\beta \in [x, b]$
 such that
 
 $$f'(\alpha) = \frac{f(x) - f(a)}{x-a} \text{ and } f'(\beta) = \frac{f(b) - f(x)}{b-x}.$$
@@ -279,7 +279,7 @@ According to the one-dimensional case,
 this holds if and only if
 $g'' = (\mathbf{x} - \mathbf{y})^\top \mathbf{H}(\mathbf{x} - \mathbf{y}) \geq 0$ ($\mathbf{H} \stackrel{\mathrm{def}}{=} \nabla^2f$)
 for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$,
-which is equivalent to $\nabla^2f \succeq 0$
+which is equivalent to $\mathbf{H} \succeq 0$
 per the definition of positive semidefinite matrices.
 
 
