@@ -193,7 +193,11 @@ $$f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b.$$
 ### Convexity and Second Derivatives
 
 Whenever the second derivative of a function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ exists it is very easy to check whether $f$ is convex. 
-All we need to do is check whether the Hessian of $f$ is positive semidefinite: $\nabla^2f \succeq 0$, i.e., whether all of its eigenvalues are nonnegative. For instance, the function $f(\mathbf{x}) = \frac{1}{2} \|\mathbf{x}\|^2$ is convex since $\nabla^2 f = \mathbf{1}$, i.e., its Hessian is an identity matrix.
+All we need to do is check whether the Hessian of $f$ is positive semidefinite: $\nabla^2f \succeq 0$, i.e., 
+denoting the Hessian matrix $\nabla^2f$ by $\mathbf{H}$,
+$\mathbf{x}^\top \mathbf{H} \mathbf{x} \geq 0$
+for all $\mathbf{x} \in \mathbb{R}^n$.
+For instance, the function $f(\mathbf{x}) = \frac{1}{2} \|\mathbf{x}\|^2$ is convex since $\nabla^2 f = \mathbf{1}$, i.e., its Hessian is an identity matrix.
 
 
 Formally, any twice-differentiable one-dimensional function $f: \mathbb{R} \rightarrow \mathbb{R}$ is convex
@@ -202,7 +206,8 @@ it is convex if and only if its Hessian $\nabla^2f \succeq 0$.
 
 First, we need to prove the one-dimensional case.
 To see that 
-$f''(x) \geq 0$ for convex functions we use the fact that
+convexity of $f$ implies 
+$f'' \geq 0$  we use the fact that
 
 $$\frac{1}{2} f(x + \epsilon) + \frac{1}{2} f(x - \epsilon) \geq f\left(\frac{x + \epsilon}{2} + \frac{x - \epsilon}{2}\right) = f(x).$$
 
@@ -210,26 +215,73 @@ Since the second derivative is given by the limit over finite differences it fol
 
 $$f''(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) + f(x - \epsilon) - 2f(x)}{\epsilon^2} \geq 0.$$
 
-To see that the converse is true we use the fact that $f'' \geq 0$ implies that $f'$ is a monotonically increasing function. Let $a < x < b$ be three points in $\mathbb{R}$. We use the mean value theorem to express
+To see that 
+$f'' \geq 0$ implies that $f$ is convex
+we use the fact that $f'' \geq 0$ implies that $f'$ is a monotonically nondecreasing function. Let $a < x < b$ be three points in $\mathbb{R}$,
+where $x = (1-\lambda)a + \lambda b$ and $\lambda \in (0, 1)$.
+According to the mean value theorem,
+there exist $\alpha \in [a, x]$ and $ \beta \in [x, b]$
+such that
 
-$$\begin{aligned}
-f(x) - f(a) & = (x-a) f'(\alpha) \text{ for some } \alpha \in [a, x] \text{ and } \\
-f(b) - f(x) & = (b-x) f'(\beta) \text{ for some } \beta \in [x, b].
-\end{aligned}$$
+$$f'(\alpha) = \frac{f(x) - f(a)}{x-a} \text{ and } f'(\beta) = \frac{f(b) - f(x)}{b-x}.$$
+
 
 By monotonicity $f'(\beta) \geq f'(\alpha)$, hence
 
-$$\begin{aligned}
-    f(b) - f(a) & = f(b) - f(x) + f(x) - f(a) \\
-    & = (b-x) f'(\beta) + (x-a) f'(\alpha) \\
-    & \geq (b-a) f'(\alpha).
+$$\frac{x-a}{b-a}f(b) + \frac{b-x}{b-a}f(a) \geq f(x).$$
+
+Since $x = (1-\lambda)a + \lambda b$,
+we have
+
+$$\lambda f(b) + (1-\lambda)f(a) \geq f((1-\lambda)a + \lambda b),$$
+
+thus proving convexity.
+
+Second, we need a lemma before 
+proving the multi-dimensional case:
+$f: \mathbb{R}^n \rightarrow \mathbb{R}$
+is convex if and only if for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$
+
+$$g(z) \stackrel{\mathrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y}) \text{ where } z \in [0,1]$$ 
+
+is convex.
+
+To prove that convexity of $f$ implies that $g$ is convex,
+we can show that for all $a, b, \lambda \in [0, 1]$ (thus
+$0 \leq \lambda a + (1-\lambda) b \leq 1$)
+
+$$\begin{aligned} &g(\lambda a + (1-\lambda) b)\\
+=&f\left(\left(\lambda a + (1-\lambda) b\right)\mathbf{x} + \left(1-\lambda a - (1-\lambda) b\right)\mathbf{y} \right)\\
+=&f\left(\lambda \left(a \mathbf{x} + (1-a)  \mathbf{y}\right)  + (1-\lambda) \left(b \mathbf{x} + (1-b)  \mathbf{y}\right) \right)\\
+\leq& \lambda f\left(a \mathbf{x} + (1-a)  \mathbf{y}\right)  + (1-\lambda) f\left(b \mathbf{x} + (1-b)  \mathbf{y}\right) \\
+=& \lambda g(a) + (1-\lambda) g(b).
+\end{aligned}$$
+
+To prove the converse,
+we can show that for 
+all $\lambda \in [0, 1]$ 
+
+$$\begin{aligned} &f(\lambda \mathbf{x} + (1-\lambda) \mathbf{y})\\
+=&g(\lambda \cdot 1 + (1-\lambda) \cdot 0)\\
+\leq& \lambda g(1)  + (1-\lambda) g(0) \\
+=& \lambda f(\mathbf{x}) + (1-\lambda) g(\mathbf{y}).
 \end{aligned}$$
 
 
+Finally,
+using the lemma above and the result of the one-dimensional case,
+the multi-dimensional case
+can be proven as follows.
+A multi-dimensional function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is convex
+if and only if for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$ $g(z) \stackrel{\mathrm{def}}{=} f(z \mathbf{x} + (1-z)  \mathbf{y})$, where $z \in [0,1]$,
+is convex.
+According to the one-dimensional case,
+this holds if and only if
+$g'' = (\mathbf{x} - \mathbf{y})^\top \mathbf{H}(\mathbf{x} - \mathbf{y}) \geq 0$ ($\mathbf{H} \stackrel{\mathrm{def}}{=} \nabla^2f$)
+for all $\mathbf{x}, \mathbf{y} \in \mathbb{R}^n$,
+which is equivalent to $\nabla^2f \succeq 0$
+per the definition of positive semidefinite matrices.
 
-
-
-The first thing to realize is that we only need to prove this property for one-dimensional functions. After all, in general we can always define some function $g(z) = f(\mathbf{x} + z \cdot \mathbf{v})$. This function has the first and second derivatives $g' = (\partial_{\mathbf{x}} f)^\top \mathbf{v}$ and $g'' = \mathbf{v}^\top (\partial^2_{\mathbf{x}} f) \mathbf{v}$ respectively. In particular, $g'' \geq 0$ for all $\mathbf{v}$ whenever the Hessian of $f$ is positive semidefinite, i.e., whenever all of its eigenvalues are greater equal than zero. Hence back to the scalar case.
 
 
 ## Constraints
