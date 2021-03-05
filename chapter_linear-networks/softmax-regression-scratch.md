@@ -405,7 +405,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             l.backward()
             updater.step()
             metric.add(float(l) * len(y), accuracy(y_hat, y),
-                       y.size().numel())
+                       y.numel())
         else:
             # Using custom built optimizer & loss criterion
             l.sum().backward()
