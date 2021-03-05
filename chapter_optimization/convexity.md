@@ -125,7 +125,7 @@ This can be used in variational methods. Here $Y$ is typically the unobserved ra
 
 ## Properties
 
-Convex functions have a few useful properties. We describe them below.
+Convex functions have many useful properties. We describe a few commonly-used ones below.
 
 
 ### Local Minima Are Global Minima
