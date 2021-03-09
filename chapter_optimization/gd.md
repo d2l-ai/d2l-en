@@ -1,7 +1,10 @@
 # Gradient Descent
 :label:`sec_gd`
 
-In this section we are going to introduce the basic concepts underlying gradient descent. This is brief by necessity. See e.g., :cite:`Boyd.Vandenberghe.2004` for an in-depth introduction to convex optimization. Although the latter is rarely used directly in deep learning, an understanding of gradient descent is key to understanding stochastic gradient descent algorithms. For instance, the optimization problem might diverge due to an overly large learning rate. This phenomenon can already be seen in gradient descent. Likewise, preconditioning is a common technique in gradient descent and carries over to more advanced algorithms. Let us start with a simple special case.
+In this section we are going to introduce the basic concepts underlying gradient descent.
+Although it is rarely used directly in deep learning, an understanding of gradient descent is key to understanding stochastic gradient descent algorithms. 
+For instance, the optimization problem might diverge due to an overly large learning rate. This phenomenon can already be seen in gradient descent. Likewise, preconditioning is a common technique in gradient descent and carries over to more advanced algorithms.
+Let us start with a simple special case.
 
 ## Gradient Descent in One Dimension
 
@@ -286,4 +289,3 @@ This algorithm converges rapidly (for an analysis and proof see e.g., :cite:`Boy
 1. Apply the algorithm above to a number of objective functions (convex or not). What happens if you rotate coordinates by $45$ degrees?
 
 [Discussions](https://discuss.d2l.ai/t/351)
-
