@@ -94,7 +94,7 @@ show_trace(results, f)
 ```
 
 ### Learning Rate
-:label:`section_gd-learningrate`
+:label:`subsec_gd-learningrate`
 
 The learning rate $\eta$ can be set by the algorithm designer. If we use a learning rate that is too small, it will cause $x$ to update very slowly, requiring more iterations to get a better solution. To show what happens in such a case, consider the progress in the same optimization problem for $\eta = 0.05$. As we can see, even after 10 steps we are still very far from the optimal solution.
 
@@ -193,26 +193,32 @@ show_trace_2d(f_2d, train_2d(gd_2d, f_grad=f_2d_grad))
 
 ## Adaptive Methods
 
-As we could see in :numref:`section_gd-learningrate`, getting the learning rate $\eta$ "just right" is tricky. If we pick it too small, we make no progress. If we pick it too large, the solution oscillates and in the worst case it might even diverge. What if we could determine $\eta$ automatically or get rid of having to select a step size at all? Second order methods that look not only at the value and gradient of the objective but also at its *curvature* can help in this case. While these methods cannot be applied to deep learning directly due to the computational cost, they provide useful intuition into how to design advanced optimization algorithms that mimic many of the desirable properties of the algorithms outlined below.
+As we could see in :numref:`subsec_gd-learningrate`, getting the learning rate $\eta$ "just right" is tricky. If we pick it too small, we make little progress. If we pick it too large, the solution oscillates and in the worst case it might even diverge. What if we could determine $\eta$ automatically or get rid of having to select a learning rate at all? 
+Second-order methods that look not only at the value and gradient of the objective function
+but also at its *curvature* can help in this case. While these methods cannot be applied to deep learning directly due to the computational cost, they provide useful intuition into how to design advanced optimization algorithms that mimic many of the desirable properties of the algorithms outlined below.
 
 
 ### Newton's Method
 
-Reviewing the Taylor expansion of $f$ there is no need to stop after the first term. In fact, we can write it as
+Reviewing the Taylor expansion of some function $f: \mathbb{R}^d \rightarrow \mathbb{R}$ there is no need to stop after the first term. In fact, we can write it as
 
-$$f(\mathbf{x} + \mathbf{\epsilon}) = f(\mathbf{x}) + \mathbf{\epsilon}^\top \nabla f(\mathbf{x}) + \frac{1}{2} \mathbf{\epsilon}^\top \nabla \nabla^\top f(\mathbf{x}) \mathbf{\epsilon} + \mathcal{O}(\|\mathbf{\epsilon}\|^3).$$
+$$f(\mathbf{x} + \boldsymbol{\epsilon}) = f(\mathbf{x}) + \boldsymbol{\epsilon}^\top \nabla f(\mathbf{x}) + \frac{1}{2} \boldsymbol{\epsilon}^\top \nabla^2 f(\mathbf{x}) \boldsymbol{\epsilon} + \mathcal{O}(\|\boldsymbol{\epsilon}\|^3).$$
 :eqlabel:`gd-hot-taylor`
 
-To avoid cumbersome notation we define $H_f := \nabla \nabla^\top f(\mathbf{x})$ to be the *Hessian* of $f$. This is a $d \times d$ matrix. For small $d$ and simple problems $H_f$ is easy to compute. For deep networks, on the other hand, $H_f$ may be prohibitively large, due to the cost of storing $\mathcal{O}(d^2)$ entries. Furthermore it may be too expensive to compute via backpropagation as we would need to apply backpropagation to the backpropagation call graph. For now let us ignore such considerations and look at what algorithm we'd get.
+To avoid cumbersome notation we define $\mathbf{H} \stackrel{\mathrm{def}}{=} \nabla^2 f(\mathbf{x})$ to be the Hessian of $f$, which is a $d \times d$ matrix. For small $d$ and simple problems $\mathbf{H}$ is easy to compute. For deep neural networks, on the other hand, $\mathbf{H}$ may be prohibitively large, due to the cost of storing $\mathcal{O}(d^2)$ entries. Furthermore it may be too expensive to compute via backpropagation. For now let us ignore such considerations and look at what algorithm we would get.
 
-After all, the minimum of $f$ satisfies $\nabla f(\mathbf{x}) = 0$. Taking derivatives of :eqref:`gd-hot-taylor` with regard to $\mathbf{\epsilon}$ and ignoring higher order terms we arrive at
+After all, the minimum of $f$ satisfies $\nabla f = 0$. 
+Following calculus rules in :numref:`subsec_calculus-grad`,
+by taking derivatives of :eqref:`gd-hot-taylor` with regard to $\boldsymbol{\epsilon}$ and ignoring higher-order terms we arrive at
 
-$$\nabla f(\mathbf{x}) + H_f \mathbf{\epsilon} = 0 \text{ and hence }
-\mathbf{\epsilon} = -H_f^{-1} \nabla f(\mathbf{x}).$$
+$$\nabla f(\mathbf{x}) + \mathbf{H} \boldsymbol{\epsilon} = 0 \text{ and hence }
+\boldsymbol{\epsilon} = -\mathbf{H}^{-1} \nabla f(\mathbf{x}).$$
 
-That is, we need to invert the Hessian $H_f$ as part of the optimization problem.
+That is, we need to invert the Hessian $\mathbf{H}$ as part of the optimization problem.
 
-For $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $H_f = 1$. Hence for any $x$ we obtain $\epsilon = -x$. In other words, a single step is sufficient to converge perfectly without the need for any adjustment! Alas, we got a bit lucky here since the Taylor expansion was exact. Let us see what happens in other problems.
+As a simple example, for $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $\mathbf{H} = 1$. Hence for any $x$ we obtain $\epsilon = -x$. In other words, a single step is *sufficient* to converge perfectly without the need for any adjustment! Alas, we got a bit lucky here since the Taylor expansion was exact. 
+
+Let us see what happens in other problems.
 
 ```{.python .input}
 #@tab all
@@ -239,7 +245,8 @@ def newton(eta=1):
 show_trace(newton(), f)
 ```
 
-Now let us see what happens when we have a *nonconvex* function, such as $f(x) = x \cos(c x)$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we would walk into the direction of *increasing* $f$. That is a fatal flaw of the algorithm. Let us see what happens in practice.
+Now let us see what happens when we have a *nonconvex* function, such as $f(x) = x \cos(c x)$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we would walk into the direction of *increasing* $f$. That is a fatal flaw of the algorithm. 
+Let us see what happens in practice.
 
 ```{.python .input}
 #@tab all

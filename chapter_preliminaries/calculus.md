@@ -280,6 +280,7 @@ $$\frac{\partial y}{\partial x_i} = \frac{\partial f}{\partial x_i} = f_{x_i} = 
 
 
 ## Gradients
+:label:`subsec_calculus-grad`
 
 We can concatenate partial derivatives of a multivariate function with respect to all its variables to obtain the *gradient* vector of the function.
 Suppose that the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. The gradient of the function $f(\mathbf{x})$ with respect to $\mathbf{x}$ is a vector of $n$ partial derivatives:
