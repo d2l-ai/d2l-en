@@ -1249,9 +1249,8 @@ def annotate(text, xy, xytext):
 
 # Defined in file: ./chapter_optimization/gd.md
 def train_2d(trainer, steps=20, f_grad=None):
-    """Optimize a 2-dim objective function with a customized trainer."""
-    # `s1` and `s2` are internal state variables and will be used later in the
-    # chapter
+    """Optimize a 2D objective function with a customized trainer."""
+    # `s1` and `s2` are internal state variables that will be used later
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
     for i in range(steps):
@@ -1260,6 +1259,7 @@ def train_2d(trainer, steps=20, f_grad=None):
         else:
             x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
+    print(f'epoch {i + 1:d}, x1: {x1:f}, x2: {x2:f}')
     return results
 
 
