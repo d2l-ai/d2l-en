@@ -52,59 +52,43 @@ This means that, on average, the stochastic gradient is a good estimate of the g
 Now, we will compare it to gradient descent by adding random noise with a mean of 0 and a variance of 1 to the gradient to simulate a SGD.
 
 ```{.python .input}
-f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
-gradf = lambda x1, x2: (2 * x1, 4 * x2)  # Gradient
+#@tab all
+def f(x1, x2):  # Objective function
+    return x1 ** 2 + 2 * x2 ** 2
 
-def sgd(x1, x2, s1, s2):
-    global lr  # Learning rate scheduler
-    (g1, g2) = gradf(x1, x2)
-    # Simulate noisy gradient
-    g1 += d2l.normal(0.0, 1, (1,))
-    g2 += d2l.normal(0.0, 1, (1,))
-    eta_t = eta * lr()  # Learning rate at time t
-    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
-
-eta = 0.1
-lr = (lambda: 1)  # Constant learning rate
-d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
+def f_grad(x1, x2):  # Gradient of the objective function
+    return 2 * x1, 4 * x2
 ```
 
 ```{.python .input}
-#@tab pytorch
-f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
-gradf = lambda x1, x2: (2 * x1, 4 * x2)  # Gradient
-
-def sgd(x1, x2, s1, s2):
+#@tab mxnet, pytorch
+def sgd(x1, x2, s1, s2, f_grad):
     global lr  # Learning rate scheduler
-    (g1, g2) = gradf(x1, x2)
+    (g1, g2) = f_grad(x1, x2)
     # Simulate noisy gradient
     g1 += d2l.normal(0.0, 1, (1,))
     g2 += d2l.normal(0.0, 1, (1,))
     eta_t = eta * lr()  # Learning rate at time t
     return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
-
-eta = 0.1
-lr = (lambda: 1)  # Constant learning rate
-d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
 ```
 
 ```{.python .input}
 #@tab tensorflow
-f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
-gradf = lambda x1, x2: (2 * x1, 4 * x2)  # Gradient
-
-def sgd(x1, x2, s1, s2):
+def sgd(x1, x2, s1, s2, f_grad):
     global lr  # Learning rate scheduler
-    (g1, g2) = gradf(x1, x2)
+    (g1, g2) = f_grad(x1, x2)
     # Simulate noisy gradient
     g1 += d2l.normal([1], 0.0, 1)
     g2 += d2l.normal([1], 0.0, 1)
     eta_t = eta * lr()  # Learning rate at time t
     return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
+```
 
+```{.python .input}
+#@tab all
 eta = 0.1
 lr = (lambda: 1)  # Constant learning rate
-d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
+d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))
 ```
 
 As we can see, the trajectory of the variables in the SGD is much more noisy than the one we observed in gradient descent in the previous section. This is due to the stochastic nature of the gradient. That is, even when we arrive near the minimum, we are still subject to the uncertainty injected by the instantaneous gradient via $\eta \nabla f_i(\mathbf{x})$. Even after 50 steps the quality is still not so good. Even worse, it will not improve after additional steps (we encourage the reader to experiment with a larger number of steps to confirm this on his own). This leaves us with the only alternative---change the learning rate $\eta$. However, if we pick this too small, we will not make any meaningful progress initially. On the other hand, if we pick it too large, we will not get a good solution, as seen above. The only way to resolve these conflicting goals is to reduce the learning rate *dynamically* as optimization progresses.
@@ -134,7 +118,7 @@ def exponential():
 
 ctr = 1
 lr = exponential  # Set up learning rate
-d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000))
+d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000, f_grad=f_grad))
 ```
 
 As expected, the variance in the parameters is significantly reduced. However, this comes at the expense of failing to converge to the optimal solution $\mathbf{x} = (0, 0)$. Even after 1000 steps are we are still very far away from the optimal solution. Indeed, the algorithm fails to converge at all. On the other hand, if we use a polynomial decay where the learning rate decays with the inverse square root of the number of steps convergence is good.
@@ -148,7 +132,7 @@ def polynomial():
 
 ctr = 1
 lr = polynomial  # Set up learning rate
-d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
+d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))
 ```
 
 There exist many more choices for how to set the learning rate. For instance, we could start with a small rate, then rapidly ramp up and then decrease it again, albeit more slowly. We could even alternate between smaller and larger learning rates. There exists a large variety of such schedules. For now let us focus on learning rate schedules for which a comprehensive theoretical analysis is possible, i.e., on learning rates in a convex setting. For general nonconvex problems it is very difficult to obtain meaningful convergence guarantees, since in general minimizing nonlinear nonconvex problems is NP hard. For a survey see e.g., the excellent [lecture notes](https://www.stat.cmu.edu/~ryantibs/convexopt-F15/lectures/26-nonconvex.pdf) of Tibshirani 2015.

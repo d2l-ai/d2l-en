@@ -1248,14 +1248,17 @@ def annotate(text, xy, xytext):
 
 
 # Defined in file: ./chapter_optimization/gd.md
-def train_2d(trainer, steps=20):
+def train_2d(trainer, steps=20, f_grad=None):
     """Optimize a 2-dim objective function with a customized trainer."""
-    # s1 and s2 are internal state variables and will
-    # be used later in the chapter
+    # `s1` and `s2` are internal state variables and will be used later in the
+    # chapter
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
     for i in range(steps):
-        x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+        if f_grad:
+            x1, x2, s1, s2 = trainer(x1, x2, s1, s2, f_grad)
+        else:
+            x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
     return results
 
@@ -2783,9 +2786,10 @@ class CTRDataset(gluon.data.Dataset):
                 i: {feat for feat, c in cnt.items() if c >= min_threshold}
                 for i, cnt in feat_cnts.items()}
             self.feat_mapper = {
-                i: {feat: idx for idx, feat in enumerate(cnt)}
-                for i, cnt in feat_mapper.items()}
-            self.defaults = {i: len(cnt) for i, cnt in feat_mapper.items()}
+                i: {feat_v: idx for idx, feat_v in enumerate(feat_values)}
+                for i, feat_values in feat_mapper.items()}
+            self.defaults = {
+                i: len(feat_values) for i, feat_values in feat_mapper.items()}
         for i, fm in self.feat_mapper.items():
             self.field_dims[i - 1] = len(fm) + 1
         self.offsets = np.array(

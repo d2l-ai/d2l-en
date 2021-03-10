@@ -56,8 +56,11 @@ import tensorflow as tf
 
 ```{.python .input}
 #@tab all
-f = lambda x: x**2  # Objective function
-f_grad = lambda x: 2 * x  # Its derivative
+def f(x):  # Objective function
+    return x ** 2
+
+def f_grad(x):  # Gradient (derivative) of the objective function
+    return 2 * x
 ```
 
 Next, we use $x=10$ as the initial value and assume $\eta=0.2$. Using gradient descent to iterate $x$ for 10 times we can see that, eventually, the value of $x$ approaches the optimal solution.
@@ -73,21 +76,21 @@ def gd(eta, f_grad):
     print('epoch 10, x:', x)
     return results
 
-res = gd(0.2, f_grad)
+results = gd(0.2, f_grad)
 ```
 
 The progress of optimizing over $x$ can be plotted as follows.
 
 ```{.python .input}
 #@tab all
-def show_trace(res, f):
-    n = max(abs(min(res)), abs(max(res)))
+def show_trace(results, f):
+    n = max(abs(min(results)), abs(max(results)))
     f_line = d2l.arange(-n, n, 0.01)
     d2l.set_figsize()
-    d2l.plot([f_line, res], [[f(x) for x in f_line], [f(x) for x in res]],
-             'x', 'f(x)', fmts=['-', '-o'])
+    d2l.plot([f_line, results], [[f(x) for x in f_line], [
+        f(x) for x in results]], 'x', 'f(x)', fmts=['-', '-o'])
 
-show_trace(res, f)
+show_trace(results, f)
 ```
 
 ### Learning Rate
@@ -114,8 +117,13 @@ To illustrate what happens for nonconvex functions consider the case of $f(x) = 
 ```{.python .input}
 #@tab all
 c = d2l.tensor(0.15 * np.pi)
-f = lambda x: x * d2l.cos(c * x)
-f_grad = lambda x: d2l.cos(c * x) - c * x * d2l.sin(c * x)
+
+def f(x):  # Objective function
+    return x * d2l.cos(c * x)
+
+def f_grad(x):  # Gradient of the objective function
+    return d2l.cos(c * x) - c * x * d2l.sin(c * x)
+
 show_trace(gd(2, f_grad), f)
 ```
 
@@ -138,14 +146,17 @@ To see how the algorithm behaves in practice let us construct an objective funct
 
 ```{.python .input}
 #@tab all
-def train_2d(trainer, steps=20):  #@save
+def train_2d(trainer, steps=20, f_grad=None):  #@save
     """Optimize a 2-dim objective function with a customized trainer."""
-    # s1 and s2 are internal state variables and will
-    # be used later in the chapter
+    # `s1` and `s2` are internal state variables and will be used later in the
+    # chapter
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
     for i in range(steps):
-        x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+        if f_grad:
+            x1, x2, s1, s2 = trainer(x1, x2, s1, s2, f_grad)
+        else:
+            x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
     return results
 
@@ -164,15 +175,18 @@ Next, we observe the trajectory of the optimization variable $\mathbf{x}$ for le
 
 ```{.python .input}
 #@tab all
-f = lambda x1, x2: x1 ** 2 + 2 * x2 ** 2  # Objective
-f_grad = lambda x1, x2: (2 * x1, 4 * x2)  # Gradient
+def f_2d(x1, x2):  # Objective function
+    return x1 ** 2 + 2 * x2 ** 2
 
-def gd(x1, x2, s1, s2):
-    (g1, g2) = f_grad(x1, x2)  # Compute gradient
-    return (x1 - eta * g1, x2 - eta * g2, 0, 0)  # Update variables
+def f_2d_grad(x1, x2):  # Gradient of the objective function
+    return (2 * x1, 4 * x2)
+
+def gd_2d(x1, x2, s1, s2, f_grad):
+    g1, g2 = f_grad(x1, x2)
+    return (x1 - eta * g1, x2 - eta * g2, 0, 0)
 
 eta = 0.1
-show_trace_2d(f, train_2d(gd))
+show_trace_2d(f_2d, train_2d(gd_2d, f_grad=f_2d_grad))
 ```
 
 ## Adaptive Methods
@@ -201,9 +215,15 @@ For $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $H_f = 1$. Hence for 
 ```{.python .input}
 #@tab all
 c = d2l.tensor(0.5)
-f = lambda x: d2l.cosh(c * x)  # Objective
-f_grad = lambda x: c * d2l.sinh(c * x)  # Derivative
-f_hess = lambda x: c**2 * d2l.cosh(c * x)  # Hessian
+
+def f(x):  # Objective function
+    return d2l.cosh(c * x)
+
+def f_grad(x):  # Gradient of the objective function
+    return c * d2l.sinh(c * x)
+
+def f_hess(x):  # Hessian of the objective function
+    return c**2 * d2l.cosh(c * x)
 
 def newton(eta=1):
     x = 10.0
@@ -222,9 +242,15 @@ Now let us see what happens when we have a *nonconvex* function, such as $f(x) =
 ```{.python .input}
 #@tab all
 c = d2l.tensor(0.15 * np.pi)
-f = lambda x: x * d2l.cos(c * x)
-f_grad = lambda x: d2l.cos(c * x) - c * x * d2l.sin(c * x)
-f_hess = lambda x: - 2 * c * d2l.sin(c * x) - x * c**2 * d2l.cos(c * x)
+
+def f(x):  # Objective function
+    return x * d2l.cos(c * x)
+
+def f_grad(x):  # Gradient of the objective function
+    return d2l.cos(c * x) - c * x * d2l.sin(c * x)
+
+def f_hess(x):  # Hessian of the objective function
+    return - 2 * c * d2l.sin(c * x) - x * c**2 * d2l.cos(c * x)
 
 show_trace(newton(), f)
 ```

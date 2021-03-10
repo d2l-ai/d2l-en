@@ -865,14 +865,17 @@ def annotate(text, xy, xytext):
 
 
 # Defined in file: ./chapter_optimization/gd.md
-def train_2d(trainer, steps=20):
+def train_2d(trainer, steps=20, f_grad=None):
     """Optimize a 2-dim objective function with a customized trainer."""
-    # s1 and s2 are internal state variables and will
-    # be used later in the chapter
+    # `s1` and `s2` are internal state variables and will be used later in the
+    # chapter
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
     for i in range(steps):
-        x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+        if f_grad:
+            x1, x2, s1, s2 = trainer(x1, x2, s1, s2, f_grad)
+        else:
+            x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
     return results
 
@@ -968,6 +971,19 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
                 animator.add(q, r)
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+
+
+# Defined in file: ./chapter_computational-performance/hybridize.md
+class Benchmark:
+    def __init__(self, description='Done'):
+        self.description = description
+
+    def __enter__(self):
+        self.timer = d2l.Timer()
+        return self
+
+    def __exit__(self, *args):
+        print(f'{self.description}: {self.timer.stop():.4f} sec')
 
 
 # Defined in file: ./chapter_computer-vision/bounding-box.md
