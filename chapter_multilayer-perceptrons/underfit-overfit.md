@@ -623,9 +623,11 @@ the complex model overfits the data.
 
 ```{.python .input}
 #@tab all
+# Suppose only the first 50 train data are available for training
+n_train_available = 50
 # Pick all the dimensions from the polynomial features
-train(poly_features[:n_train, :], poly_features[n_train:, :],
-      labels[:n_train], labels[n_train:], num_epochs=1500)
+train(poly_features[:n_train_available, :], poly_features[n_train:, :],
+      labels[:n_train_available], labels[n_train:], num_epochs=1000)
 ```
 
 In the subsequent sections, we will continue
