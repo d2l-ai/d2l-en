@@ -216,9 +216,12 @@ $$\nabla f(\mathbf{x}) + \mathbf{H} \boldsymbol{\epsilon} = 0 \text{ and hence }
 
 That is, we need to invert the Hessian $\mathbf{H}$ as part of the optimization problem.
 
-As a simple example, for $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $\mathbf{H} = 1$. Hence for any $x$ we obtain $\epsilon = -x$. In other words, a single step is *sufficient* to converge perfectly without the need for any adjustment! Alas, we got a bit lucky here since the Taylor expansion was exact. 
+As a simple example, for $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $\mathbf{H} = 1$. Hence for any $x$ we obtain $\epsilon = -x$. In other words, a *single* step is sufficient to converge perfectly without the need for any adjustment! Alas, we got a bit lucky here: the Taylor expansion was exact since $f(x+\epsilon)= \frac{1}{2} x^2 + \epsilon x + \frac{1}{2} \epsilon^2$. 
 
 Let us see what happens in other problems.
+Given a convex hyperbolic cosine function $f(x) = \cosh(cx)$ for some constant $c$, we can see that
+the global minimum at $x=0$ is reached
+after a few iterations.
 
 ```{.python .input}
 #@tab all
@@ -245,7 +248,8 @@ def newton(eta=1):
 show_trace(newton(), f)
 ```
 
-Now let us see what happens when we have a *nonconvex* function, such as $f(x) = x \cos(c x)$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we would walk into the direction of *increasing* $f$. That is a fatal flaw of the algorithm. 
+Now let us consider a *nonconvex* function, such as $f(x) = x \cos(c x)$ for some constant $c$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we may walk into the direction of *increasing* the value of $f$.
+That is a fatal flaw of the algorithm. 
 Let us see what happens in practice.
 
 ```{.python .input}
@@ -264,7 +268,8 @@ def f_hess(x):  # Hessian of the objective function
 show_trace(newton(), f)
 ```
 
-This went spectacularly wrong. How can we fix it? One way would be to "fix" the Hessian by taking its absolute value instead. Another strategy is to bring back the learning rate. This seems to defeat the purpose, but not quite. Having second order information allows us to be cautious whenever the curvature is large and to take longer steps whenever the objective is flat. Let us see how this works with a slightly smaller learning rate, say $\eta = 0.5$. As we can see, we have quite an efficient algorithm.
+This went spectacularly wrong. How can we fix it? One way would be to "fix" the Hessian by taking its absolute value instead. Another strategy is to bring back the learning rate. This seems to defeat the purpose, but not quite. Having second-order information allows us to be cautious whenever the curvature is large and to take longer steps whenever the objective function is flatter. 
+Let us see how this works with a slightly smaller learning rate, say $\eta = 0.5$. As we can see, we have quite an efficient algorithm.
 
 ```{.python .input}
 #@tab all
