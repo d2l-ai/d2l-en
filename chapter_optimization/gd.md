@@ -302,17 +302,23 @@ As an aside, optimization researchers call this *linear* convergence, whereas a 
 Note that this analysis comes with a number of caveats. 
 First, we do not really have much of a guarantee when we will reach the region of rapid convergence. Instead, we only know that once we reach it, convergence will be very quick. Second, this analysis requires that $f$ is well-behaved up to higher-order derivatives. It comes down to ensuring that $f$ does not have any "surprising" properties in terms of how it might change its values.
 
+
+
 ### Preconditioning
 
-Quite unsurprisingly computing and storing the full Hessian is very expensive. It is thus desirable to find alternatives. One way to improve matters is by avoiding to compute the Hessian in its entirety but only compute the *diagonal* entries. While this is not quite as good as the full Newton method, it is still much better than not using it. Moreover, estimates for the main diagonal elements are what drives some of the innovation in stochastic gradient descent optimization algorithms. This leads to update algorithms of the form
+Quite unsurprisingly computing and storing the full Hessian is very expensive. It is thus desirable to find alternatives. One way to improve matters is *preconditioning*. It avoids computing the Hessian in its entirety but only computes the *diagonal* entries. This leads to update algorithms of the form
 
-$$\mathbf{x} \leftarrow \mathbf{x} - \eta \mathrm{diag}(H_f)^{-1} \nabla f(\mathbf{x}).$$
+$$\mathbf{x} \leftarrow \mathbf{x} - \eta \mathrm{diag}(\mathbf{H})^{-1} \nabla f(\mathbf{x}).$$
 
-To see why this might be a good idea consider a situation where one variable denotes height in millimeters and the other one denotes height in kilometers. Assuming that for both the natural scale is in meters we have a terrible mismatch in parameterizations. Using preconditioning removes this. Effectively preconditioning with gradient descent amounts to selecting a different learning rate for each coordinate.
+
+While this is not quite as good as the full Newton's method, it is still much better than not using it. 
+To see why this might be a good idea consider a situation where one variable denotes height in millimeters and the other one denotes height in kilometers. Assuming that for both the natural scale is in meters, we have a terrible mismatch in parameterizations. Fortunately, using preconditioning removes this. Effectively preconditioning with gradient descent amounts to selecting a different learning rate for each variable (coordinate of vector $\mathbf{x}$).
+As we will see later, preconditioning drives some of the innovation in stochastic gradient descent optimization algorithms. 
+
 
 ### Gradient Descent with Line Search
 
-One of the key problems in gradient descent was that we might overshoot the goal or make insufficient progress. A simple fix for the problem is to use line search in conjunction with gradient descent. That is, we use the direction given by $\nabla f(\mathbf{x})$ and then perform binary search as to which step length $\eta$ minimizes $f(\mathbf{x} - \eta \nabla f(\mathbf{x}))$.
+One of the key problems in gradient descent is that we might overshoot the goal or make insufficient progress. A simple fix for the problem is to use line search in conjunction with gradient descent. That is, we use the direction given by $\nabla f(\mathbf{x})$ and then perform binary search as to which learning rate $\eta$ minimizes $f(\mathbf{x} - \eta \nabla f(\mathbf{x}))$.
 
 This algorithm converges rapidly (for an analysis and proof see e.g., :cite:`Boyd.Vandenberghe.2004`). However, for the purpose of deep learning this is not quite so feasible, since each step of the line search would require us to evaluate the objective function on the entire dataset. This is way too costly to accomplish.
 
@@ -322,21 +328,21 @@ This algorithm converges rapidly (for an analysis and proof see e.g., :cite:`Boy
 * Gradient descent can get stuck in local minima.
 * In high dimensions adjusting the learning rate is complicated.
 * Preconditioning can help with scale adjustment.
-* Newton's method is a lot faster *once* it has started working properly in convex problems.
+* Newton's method is a lot faster once it has started working properly in convex problems.
 * Beware of using Newton's method without any adjustments for nonconvex problems.
 
 ## Exercises
 
 1. Experiment with different learning rates and objective functions for gradient descent.
 1. Implement line search to minimize a convex function in the interval $[a, b]$.
-    * Do you need derivatives for binary search, i.e., to decide whether to pick $[a, (a+b)/2]$ or $[(a+b)/2, b]$.
-    * How rapid is the rate of convergence for the algorithm?
-    * Implement the algorithm and apply it to minimizing $\log (\exp(x) + \exp(-2*x -3))$.
+    1. Do you need derivatives for binary search, i.e., to decide whether to pick $[a, (a+b)/2]$ or $[(a+b)/2, b]$.
+    1. How rapid is the rate of convergence for the algorithm?
+    1. Implement the algorithm and apply it to minimizing $\log (\exp(x) + \exp(-2x -3))$.
 1. Design an objective function defined on $\mathbb{R}^2$ where gradient descent is exceedingly slow. Hint: scale different coordinates differently.
 1. Implement the lightweight version of Newton's method using preconditioning:
-    * Use diagonal Hessian as preconditioner.
-    * Use the absolute values of that rather than the actual (possibly signed) values.
-    * Apply this to the problem above.
+    1. Use diagonal Hessian as preconditioner.
+    1. Use the absolute values of that rather than the actual (possibly signed) values.
+    1. Apply this to the problem above.
 1. Apply the algorithm above to a number of objective functions (convex or not). What happens if you rotate coordinates by $45$ degrees?
 
 [Discussions](https://discuss.d2l.ai/t/351)
