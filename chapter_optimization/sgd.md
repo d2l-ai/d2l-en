@@ -112,9 +112,9 @@ Replacing $\eta$ with a time-dependent learning rate $\eta(t)$ adds to the compl
 
 $$
 \begin{aligned}
-    \eta(t) & = \eta_i \text{ if } t_i \leq t \leq t_{i+1}  && \mathrm{piecewise~constant} \\
-    \eta(t) & = \eta_0 \cdot e^{-\lambda t} && \mathrm{exponential decay} \\
-    \eta(t) & = \eta_0 \cdot (\beta t + 1)^{-\alpha} && \mathrm{polynomial decay}
+    \eta(t) & = \eta_i \text{ if } t_i \leq t \leq t_{i+1}  && \text{piecewise constant} \\
+    \eta(t) & = \eta_0 \cdot e^{-\lambda t} && \text{exponential decay} \\
+    \eta(t) & = \eta_0 \cdot (\beta t + 1)^{-\alpha} && \text{polynomial decay}
 \end{aligned}
 $$
 
