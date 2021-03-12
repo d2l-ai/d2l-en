@@ -1,7 +1,7 @@
 # Gradient Descent
 :label:`sec_gd`
 
-In this section we are going to introduce the basic concepts underlying gradient descent.
+In this section we are going to introduce the basic concepts underlying *gradient descent*.
 Although it is rarely used directly in deep learning, an understanding of gradient descent is key to understanding stochastic gradient descent algorithms. 
 For instance, the optimization problem might diverge due to an overly large learning rate. This phenomenon can already be seen in gradient descent. Likewise, preconditioning is a common technique in gradient descent and carries over to more advanced algorithms.
 Let us start with a simple special case.
