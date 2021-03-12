@@ -73,31 +73,32 @@ def f_grad(x1, x2):  # Gradient of the objective function
 ```{.python .input}
 #@tab mxnet, pytorch
 def sgd(x1, x2, s1, s2, f_grad):
-    global lr  # Learning rate scheduler
-    (g1, g2) = f_grad(x1, x2)
+    g1, g2 = f_grad(x1, x2)
     # Simulate noisy gradient
-    g1 += d2l.numpy(d2l.normal(0.0, 1, (1,)))
-    g2 += d2l.numpy(d2l.normal(0.0, 1, (1,)))
-    eta_t = eta * lr()  # Learning rate at iteration t
+    g1 += d2l.normal(0.0, 1, (1,))
+    g2 += d2l.normal(0.0, 1, (1,))
+    eta_t = eta * lr()
     return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)
 ```
 
 ```{.python .input}
 #@tab tensorflow
 def sgd(x1, x2, s1, s2, f_grad):
-    global lr  # Learning rate scheduler
-    (g1, g2) = f_grad(x1, x2)
+    g1, g2 = f_grad(x1, x2)
     # Simulate noisy gradient
     g1 += d2l.normal([1], 0.0, 1)
     g2 += d2l.normal([1], 0.0, 1)
-    eta_t = eta * lr()  # Learning rate at iteration t
+    eta_t = eta * lr()
     return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)
 ```
 
 ```{.python .input}
 #@tab all
+def constant_lr():
+    return 1
+
 eta = 0.1
-lr = (lambda: 1)  # Constant learning rate
+lr = constant_lr  # Constant learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))
 ```
 
@@ -121,13 +122,14 @@ In the first scenario we decrease the learning rate, e.g., whenever progress in 
 
 ```{.python .input}
 #@tab all
-def exponential():
+def exponential_lr():
+    # Global variable that is defined outside this function and updated inside
     global ctr
     ctr += 1
     return math.exp(-0.1 * ctr)
 
 ctr = 1
-lr = exponential  # Set up learning rate
+lr = exponential_lr
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000, f_grad=f_grad))
 ```
 
@@ -135,13 +137,14 @@ As expected, the variance in the parameters is significantly reduced. However, t
 
 ```{.python .input}
 #@tab all
-def polynomial():
+def polynomial_lr():
+    # Global variable that is defined outside this function and updated inside
     global ctr
     ctr += 1
-    return (1 + 0.1 * ctr)**(-0.5)
+    return (1 + 0.1 * ctr) ** (-0.5)
 
 ctr = 1
-lr = polynomial  # Set up learning rate
+lr = polynomial_lr
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50, f_grad=f_grad))
 ```
 
