@@ -73,7 +73,7 @@ def gd(eta, f_grad):
     for i in range(10):
         x -= eta * f_grad(x)
         results.append(float(x))
-    print('epoch 10, x:', x)
+    print(f'epoch 10, x: {x:f}')
     return results
 
 results = gd(0.2, f_grad)
@@ -159,7 +159,7 @@ def train_2d(trainer, steps=20, f_grad=None):  #@save
         else:
             x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
-    print(f'epoch {i + 1:d}, x1: {x1:f}, x2: {x2:f}')
+    print(f'epoch {i + 1}, x1: {float(x1):f}, x2: {float(x2):f}')
     return results
 
 def show_trace_2d(f, results):  #@save
