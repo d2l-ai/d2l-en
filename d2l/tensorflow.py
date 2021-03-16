@@ -682,7 +682,7 @@ class RNNModelScratch:
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def predict_ch8(prefix, num_preds, net, vocab, params):
     """Generate new characters following the `prefix`."""
-    state = net.begin_state(batch_size=1)
+    state = net.begin_state(batch_size=1, dtype=tf.float32)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
     for y in prefix[1:]:  # Warm-up period
@@ -720,7 +720,7 @@ def train_epoch_ch8(net, train_iter, loss, updater, params, use_random_iter):
         if state is None or use_random_iter:
             # Initialize `state` when either it is the first iteration or
             # using random sampling
-            state = net.begin_state(batch_size=X.shape[0])
+            state = net.begin_state(batch_size=X.shape[0], dtype=tf.float32)
         with tf.GradientTape(persistent=True) as g:
             g.watch(params)
             y_hat, state = net(X, state, params)
