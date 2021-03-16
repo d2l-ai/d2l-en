@@ -761,6 +761,22 @@ def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
     print(predict('traveller'))
 
 
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
+class RNNModel(tf.keras.layers.Layer):
+    def __init__(self, rnn_layer, vocab_size, **kwargs):
+        super(RNNModel, self).__init__(**kwargs)
+        self.rnn = rnn_layer
+        self.vocab_size = vocab_size
+        self.dense = tf.keras.layers.Dense(vocab_size)
+    def call(self, inputs, state, _):
+        X = tf.one_hot(tf.transpose(inputs), self.vocab_size)
+        Y,state = self.rnn(X, state)
+        output = self.dense(tf.reshape(Y, (-1, Y.shape[-1])))
+        return output, state
+    def begin_state(self, *args, **kwargs):
+        return self.rnn.cell.get_initial_state(*args, **kwargs)
+
+
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
