@@ -314,7 +314,7 @@ class RNNModelScratch: #@save
         X = tf.cast(X, tf.float32)
         return self.forward_fn(X, state, params)
 
-    def begin_state(self, batch_size):
+    def begin_state(self, batch_size, *args, **kwargs):
         return self.init_state(batch_size, self.num_hiddens)
 ```
 
