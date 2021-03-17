@@ -74,8 +74,8 @@ an initial hidden state
 for each example in the minibatch,
 whose shape is
 (number of hidden layers, batch size, number of hidden units).
-For some models 
-to be introduced later 
+For some models
+to be introduced later
 (e.g., long short-term memory),
 such a list also
 contains other information.
@@ -110,7 +110,7 @@ the updated hidden state.
 It should be emphasized that
 the "output" (`Y`) of `rnn_layer`
 does *not* involve computation of output layers:
-it refers to 
+it refers to
 the hidden state at *each* time step,
 and they can be used as the input
 to the subsequent output layer.
@@ -120,14 +120,14 @@ Besides,
 the updated hidden state (`state_new`) returned by `rnn_layer`
 refers to the hidden state
 at the *last* time step of the minibatch.
-It can be used to initialize the 
+It can be used to initialize the
 hidden state for the next minibatch within an epoch
 in sequential partitioning.
 For multiple hidden layers,
 the hidden state of each layer will be stored
 in this variable (`state_new`).
-For some models 
-to be introduced later 
+For some models
+to be introduced later
 (e.g., long short-term memory),
 this variable also
 contains other information.
@@ -154,7 +154,7 @@ Y.shape, len(state_new), state_new[0].shape
 ```
 
 Similar to :numref:`sec_rnn_scratch`,
-we define an `RNNModel` class 
+we define an `RNNModel` class
 for a complete RNN model.
 Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer.
 
@@ -214,7 +214,7 @@ class RNNModel(nn.Module):
         if not isinstance(self.rnn, nn.LSTM):
             # `nn.GRU` takes a tensor as hidden state
             return  torch.zeros((self.num_directions * self.rnn.num_layers,
-                                 batch_size, self.num_hiddens), 
+                                 batch_size, self.num_hiddens),
                                 device=device)
         else:
             # `nn.LSTM` takes a tuple of hidden states
@@ -269,8 +269,8 @@ device_name = d2l.try_gpu()._device_name
 strategy = tf.distribute.OneDeviceStrategy(device_name)
 with strategy.scope():
     model = RNNModel(rnn_layer, vocab_size=len(vocab))
-    
-get_params = lambda _, __: model.trainable_variables 
+
+get_params = lambda _, __: model.trainable_variables
 params = get_params(len(vocab), num_hiddens)
 d2l.predict_ch8('time traveller', 10, model, vocab, params)
 ```
@@ -317,4 +317,8 @@ high-level APIs of the deep learning framework.
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1053)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/2211)
 :end_tab:
