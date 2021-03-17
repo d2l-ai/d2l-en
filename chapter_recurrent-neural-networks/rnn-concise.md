@@ -235,11 +235,13 @@ class RNNModel(tf.keras.layers.Layer):
         self.rnn = rnn_layer
         self.vocab_size = vocab_size
         self.dense = tf.keras.layers.Dense(vocab_size)
-    def call(self, inputs, state, _):
+
+    def call(self, inputs, state):
         X = tf.one_hot(tf.transpose(inputs), self.vocab_size)
-        Y,state = self.rnn(X, state)
+        Y, *state = self.rnn(X, state)
         output = self.dense(tf.reshape(Y, (-1, Y.shape[-1])))
         return output, state
+
     def begin_state(self, *args, **kwargs):
         return self.rnn.cell.get_initial_state(*args, **kwargs)
 ```
@@ -270,9 +272,7 @@ strategy = tf.distribute.OneDeviceStrategy(device_name)
 with strategy.scope():
     model = RNNModel(rnn_layer, vocab_size=len(vocab))
 
-get_params = lambda _, __: model.trainable_variables
-params = get_params(len(vocab), num_hiddens)
-d2l.predict_ch8('time traveller', 10, model, vocab, params)
+d2l.predict_ch8('time traveller', 10, model, vocab)
 ```
 
 As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and train our model with high-level APIs.
@@ -291,7 +291,7 @@ d2l.train_ch8(net, train_iter, vocab, lr, num_epochs, device)
 ```{.python .input}
 #@tab tensorflow
 num_epochs, lr = 500, 1
-d2l.train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy, get_params)
+d2l.train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
 ```
 
 Compared with the last section, this model achieves comparable perplexity,
