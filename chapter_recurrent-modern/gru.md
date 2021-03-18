@@ -260,9 +260,9 @@ def get_params(vocab_size, num_hiddens):
         return d2l.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32)
 
     def three():
-        return tf.Variable(normal((num_inputs, num_hiddens)), dtype=tf.float32),\
-               tf.Variable(normal((num_hiddens, num_hiddens)), dtype=tf.float32),\
-               tf.Variable(d2l.zeros(num_hiddens), dtype=tf.float32)
+        return (tf.Variable(normal((num_inputs, num_hiddens)), dtype=tf.float32),
+                tf.Variable(normal((num_hiddens, num_hiddens)), dtype=tf.float32),
+                tf.Variable(d2l.zeros(num_hiddens), dtype=tf.float32))
     
     W_xz, W_hz, b_z = three()  # Update gate parameters
     W_xr, W_hr, b_r = three()  # Reset gate parameters
