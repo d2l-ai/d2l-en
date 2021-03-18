@@ -210,7 +210,7 @@ albeit this time with fewer lines of code than before.
 ## Exercises
 
 1. Try adjusting the hyperparameters, such as the batch size, number of epochs, and learning rate, to see what the results are.
-1. Increase the numper of epochs for training. Why might the test accuracy decrease after a while? How could we fix this?
+1. Increase the number of epochs for training. Why might the test accuracy decrease after a while? How could we fix this?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/52)
