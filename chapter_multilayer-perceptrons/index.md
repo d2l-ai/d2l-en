@@ -18,7 +18,7 @@ Throughout, we aim to give you a firm grasp not just of the concepts
 but also of the practice of using deep networks.
 At the end of this chapter,
 we apply what we have introduced so far to a real case: house price prediction.
-We put matters relating to the computational performance,
+We punt matters relating to the computational performance,
 scalability, and efficiency of our models to subsequent chapters.
 
 ```toc
