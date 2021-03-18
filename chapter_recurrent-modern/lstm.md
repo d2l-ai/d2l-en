@@ -146,6 +146,14 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
+```
+
 ### Initializing Model Parameters
 
 Next we need to define and initialize the model parameters. As previously, the hyperparameter `num_hiddens` defines the number of hidden units. We initialize weights following a Gaussian distribution with 0.01 standard deviation, and we set the biases to 0.
@@ -205,6 +213,30 @@ def get_lstm_params(vocab_size, num_hiddens, device):
     return params
 ```
 
+```{.python .input}
+#@tab tensorflow
+def get_lstm_params(vocab_size, num_hiddens):
+    num_inputs = num_outputs = vocab_size
+
+    def normal(shape):
+        return tf.Variable(tf.random.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32))
+    def three():
+        return (normal((num_inputs, num_hiddens)),
+                normal((num_hiddens, num_hiddens)),
+                tf.Variable(tf.zeros(num_hiddens), dtype=tf.float32))
+    W_xi, W_hi, b_i = three()  # Input gate parameters
+    W_xf, W_hf, b_f = three()  # Forget gate parameters
+    W_xo, W_ho, b_o = three()  # Output gate parameters
+    W_xc, W_hc, b_c = three()  # Candidate memory cell parameters
+    # Output layer parameters
+    W_hq = normal((num_hiddens, num_outputs))
+    b_q = tf.Variable(tf.zeros(num_outputs), dtype=tf.float32)
+    # Attach gradients
+    params = [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc,
+              b_c, W_hq, b_q]
+    return params
+```
+
 ### Defining the Model
 
 In the initialization function, the hidden state of the LSTM needs to return an *additional* memory cell with a value of 0 and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
@@ -220,6 +252,13 @@ def init_lstm_state(batch_size, num_hiddens, device):
 def init_lstm_state(batch_size, num_hiddens, device):
     return (torch.zeros((batch_size, num_hiddens), device=device),
             torch.zeros((batch_size, num_hiddens), device=device))
+```
+
+```{.python .input}
+#@tab tensorflow
+def init_lstm_state(batch_size, num_hiddens):
+    return (tf.zeros(shape=(batch_size, num_hiddens)),
+            tf.zeros(shape=(batch_size, num_hiddens)))
 ```
 
 The actual model is defined just like what we discussed before: providing three gates and an auxiliary memory cell. Note that only the hidden state is passed to the output layer. The memory cell $\mathbf{C}_t$ does not directly participate in the output computation.
@@ -261,17 +300,46 @@ def lstm(inputs, state, params):
     return torch.cat(outputs, dim=0), (H, C)
 ```
 
+```{.python .input}
+#@tab tensorflow
+def lstm(inputs, state, params):
+    W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc, b_c, W_hq, b_q = params
+    (H, C) = state
+    outputs = []
+    for X in inputs:
+        X=tf.reshape(X,[-1,W_xi.shape[0]])
+        I = tf.sigmoid(tf.matmul(X, W_xi) + tf.matmul(H, W_hi) + b_i)
+        F = tf.sigmoid(tf.matmul(X, W_xf) + tf.matmul(H, W_hf) + b_f)
+        O = tf.sigmoid(tf.matmul(X, W_xo) + tf.matmul(H, W_ho) + b_o)
+        C_tilda = tf.tanh(tf.matmul(X, W_xc) + tf.matmul(H, W_hc) + b_c)
+        C = F * C + I * C_tilda
+        H = O * tf.tanh(C)
+        Y = tf.matmul(H, W_hq) + b_q
+        outputs.append(Y)
+    return tf.concat(outputs, axis=0), (H,C)
+```
+
 ### Training and Prediction
 
 Let us train an LSTM as same as what we did in :numref:`sec_gru`, by instantiating the `RNNModelScratch` class as introduced in :numref:`sec_rnn_scratch`.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet, pytorch
 vocab_size, num_hiddens, device = len(vocab), 256, d2l.try_gpu()
 num_epochs, lr = 500, 1
 model = d2l.RNNModelScratch(len(vocab), num_hiddens, device, get_lstm_params,
                             init_lstm_state, lstm)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+```
+
+```{.python .input}
+#@tab tensorflow
+vocab_size, num_hiddens, device_name = len(vocab), 256, d2l.try_gpu()._device_name
+num_epochs, lr = 500, 1
+strategy = tf.distribute.OneDeviceStrategy(device_name)
+with strategy.scope():
+    model = d2l.RNNModelScratch(len(vocab), num_hiddens, init_lstm_state, lstm, get_lstm_params)
+d2l.train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
 ```
 
 ## Concise Implementation
@@ -293,6 +361,19 @@ lstm_layer = nn.LSTM(num_inputs, num_hiddens)
 model = d2l.RNNModel(lstm_layer, len(vocab))
 model = model.to(device)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
+```
+
+```{.python .input}
+#@tab tensorflow
+lstm_cell = tf.keras.layers.LSTMCell(num_hiddens,
+    kernel_initializer='glorot_uniform')
+lstm_layer = tf.keras.layers.RNN(lstm_cell, time_major=True,
+    return_sequences=True, return_state=True)
+device_name = d2l.try_gpu()._device_name
+strategy = tf.distribute.OneDeviceStrategy(device_name)
+with strategy.scope():
+    model = d2l.RNNModel(lstm_layer, vocab_size=len(vocab))
+d2l.train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
 ```
 
 LSTMs are the prototypical latent variable autoregressive model with nontrivial state control.
