@@ -11,20 +11,21 @@ and the code needed to run the book itself.
 The simplest way to get going will be to install
 [Miniconda](https://conda.io/en/latest/miniconda.html). The Python 3.x version
 is required. You can skip the following steps if conda has already been installed.
-Download the corresponding Miniconda sh file from the website
-and then execute the installation from the command line
-using `sh <FILENAME> -b`. For macOS users:
+
+Visit the Miniconda website and determine the appropriate version for your system
+based on your Python 3.x version and machine architecture.
+For example, if you're using macOS and Python 3.8 you would download the 
+file named `Miniconda3 MacOSX 64-bit bash`, navigate to the download location
+and execute the installation as follows:
 
 ```bash
-# The file name is subject to changes
 sh Miniconda3-latest-MacOSX-x86_64.sh -b
 ```
 
-
-For Linux users:
+A Linux user with Python 3.8 would download the `Miniconda3 Linux 64-bit` file 
+and execute the following at the download location:
 
 ```bash
-# The file name is subject to changes
 sh Miniconda3-latest-Linux-x86_64.sh -b
 ```
 
