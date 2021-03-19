@@ -9,7 +9,6 @@ and the code needed to run the book itself.
 ## Installing Miniconda
 
 The simplest way to get going will be to install
-The simplest way to get going will be to install
 [Miniconda](https://conda.io/en/latest/miniconda.html). The Python 3.x version
 is required. You can skip the following steps if conda has already been installed.
 
