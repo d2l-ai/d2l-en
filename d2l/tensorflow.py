@@ -666,30 +666,32 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch:
     """A RNN Model implemented from scratch."""
-    def __init__(self, vocab_size, num_hiddens, init_state, forward_fn):
+    def __init__(self, vocab_size, num_hiddens,
+                 init_state, forward_fn, get_params):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
         self.init_state, self.forward_fn = init_state, forward_fn
+        self.trainable_variables = get_params(vocab_size, num_hiddens)
 
-    def __call__(self, X, state, params):
+    def __call__(self, X, state):
         X = tf.one_hot(tf.transpose(X), self.vocab_size)
         X = tf.cast(X, tf.float32)
-        return self.forward_fn(X, state, params)
+        return self.forward_fn(X, state, self.trainable_variables)
 
-    def begin_state(self, batch_size):
+    def begin_state(self, batch_size, *args, **kwargs):
         return self.init_state(batch_size, self.num_hiddens)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_preds, net, vocab, params):
+def predict_ch8(prefix, num_preds, net, vocab):
     """Generate new characters following the `prefix`."""
     state = net.begin_state(batch_size=1, dtype=tf.float32)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
     for y in prefix[1:]:  # Warm-up period
-        _, state = net(get_input(), state, params)
+        _, state = net(get_input(), state)
         outputs.append(vocab[y])
     for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = net(get_input(), state, params)
+        y, state = net(get_input(), state)
         outputs.append(int(y.numpy().argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
@@ -712,7 +714,7 @@ def grad_clipping(grads, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(net, train_iter, loss, updater, params, use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater, use_random_iter):
     """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
@@ -722,10 +724,10 @@ def train_epoch_ch8(net, train_iter, loss, updater, params, use_random_iter):
             # using random sampling
             state = net.begin_state(batch_size=X.shape[0], dtype=tf.float32)
         with tf.GradientTape(persistent=True) as g:
-            g.watch(params)
-            y_hat, state = net(X, state, params)
+            y_hat, state = net(X, state)
             y = d2l.reshape(tf.transpose(Y), (-1))
             l = loss(y, y_hat)
+        params = net.trainable_variables
         grads = g.gradient(l, params)
         grads = grad_clipping(grads, 1)
         updater.apply_gradients(zip(grads, params))
@@ -738,20 +740,17 @@ def train_epoch_ch8(net, train_iter, loss, updater, params, use_random_iter):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
-              get_params, use_random_iter=False):
+def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy, use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
     with strategy.scope():
-        params = get_params(len(vocab), num_hiddens)
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         updater = tf.keras.optimizers.SGD(lr)
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[10, num_epochs])
-    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, params)
+    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab)
     # Train and predict
     for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater, params,
-                                     use_random_iter)
+        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater, use_random_iter)
         if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
@@ -768,11 +767,14 @@ class RNNModel(tf.keras.layers.Layer):
         self.rnn = rnn_layer
         self.vocab_size = vocab_size
         self.dense = tf.keras.layers.Dense(vocab_size)
-    def call(self, inputs, state, _):
+
+    def call(self, inputs, state):
         X = tf.one_hot(tf.transpose(inputs), self.vocab_size)
-        Y,state = self.rnn(X, state)
+        # Later RNN like `tf.keras.layers.LSTMCell` return more than two values
+        Y, *state = self.rnn(X, state)
         output = self.dense(tf.reshape(Y, (-1, Y.shape[-1])))
         return output, state
+
     def begin_state(self, *args, **kwargs):
         return self.rnn.cell.get_initial_state(*args, **kwargs)
 
