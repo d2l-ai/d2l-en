@@ -666,8 +666,8 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch:
     """A RNN Model implemented from scratch."""
-    def __init__(self, vocab_size, num_hiddens,
-                 init_state, forward_fn, get_params):
+    def __init__(self, vocab_size, num_hiddens, init_state, forward_fn,
+                 get_params):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
         self.init_state, self.forward_fn = init_state, forward_fn
         self.trainable_variables = get_params(vocab_size, num_hiddens)
@@ -740,7 +740,8 @@ def train_epoch_ch8(net, train_iter, loss, updater, use_random_iter):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy, use_random_iter=False):
+def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
+              use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
     with strategy.scope():
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -750,7 +751,8 @@ def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy, use
     predict = lambda prefix: predict_ch8(prefix, 50, net, vocab)
     # Train and predict
     for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater, use_random_iter)
+        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater,
+                                     use_random_iter)
         if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
