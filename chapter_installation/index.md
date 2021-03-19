@@ -14,15 +14,17 @@ is required. You can skip the following steps if conda has already been installe
 
 Visit the Miniconda website and determine the appropriate version for your system
 based on your Python 3.x version and machine architecture.
-For example, if you're using macOS and Python 3.8 you would download the 
-file named `Miniconda3 MacOSX 64-bit bash`, navigate to the download location
+For example, if you are using macOS and Python 3.x you would download the 
+bash script with strings "Miniconda3" and "MacOSX" in its name,
+navigate to the download location
 and execute the installation as follows:
 
 ```bash
 sh Miniconda3-latest-MacOSX-x86_64.sh -b
 ```
 
-A Linux user with Python 3.8 would download the `Miniconda3 Linux 64-bit` file 
+A Linux user with Python 3.x would download the file
+with strings "Miniconda3" and "Linux" in its name 
 and execute the following at the download location:
 
 ```bash
