@@ -283,8 +283,9 @@ Then, to put all features on a common scale,
 we *standardize* the data by
 rescaling features to zero mean and unit variance:
 
-$$x \leftarrow \frac{x - \mu}{\sigma}.$$
+$$x \leftarrow \frac{x - \mu}{\sigma},$$
 
+where $\mu$ and $\sigma$ denote mean and standard deviation, respectively.
 To verify that this indeed transforms
 our feature (variable) such that it has zero mean and unit variance,
 note that $E[\frac{x-\mu}{\sigma}] = \frac{\mu - \mu}{\sigma} = 0$
@@ -299,6 +300,8 @@ assigned to one feature more than on any other.
 
 ```{.python .input}
 #@tab all
+# If test data were inaccessible, mean and standard deviation could be 
+# calculated from training data
 numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
 all_features[numeric_features] = all_features[numeric_features].apply(
     lambda x: (x - x.mean()) / (x.std()))

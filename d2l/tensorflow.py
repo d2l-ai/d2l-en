@@ -4,21 +4,23 @@
 
 # Defined in file: ./chapter_preface/index.md
 import collections
-from collections import defaultdict
-from IPython import display
+import hashlib
 import math
-from matplotlib import pyplot as plt
 import os
-import pandas as pd
 import random
 import re
 import shutil
 import sys
 import tarfile
 import time
-import requests
 import zipfile
-import hashlib
+from collections import defaultdict
+
+import pandas as pd
+import requests
+from IPython import display
+from matplotlib import pyplot as plt
+
 d2l = sys.modules[__name__]
 
 
@@ -67,8 +69,8 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
 
     # Return True if `X` (tensor or list) has 1 axis
     def has_one_axis(X):
-        return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
-                and not hasattr(X[0], "__len__"))
+        return (hasattr(X, "ndim") and X.ndim == 1 or
+                isinstance(X, list) and not hasattr(X[0], "__len__"))
 
     if has_one_axis(X):
         X = [X]
@@ -136,14 +138,14 @@ def linreg(X, w, b):
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def squared_loss(y_hat, y):
     """Squared loss."""
-    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def sgd(params, grads, lr, batch_size):
     """Minibatch stochastic gradient descent."""
     for param, grad in zip(params, grads):
-        param.assign_sub(lr*grad/batch_size)
+        param.assign_sub(lr * grad / batch_size)
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
@@ -159,8 +161,9 @@ def load_array(data_arrays, batch_size, is_train=True):
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def get_fashion_mnist_labels(labels):
     """Return text labels for the Fashion-MNIST dataset."""
-    text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
-                   'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
+    text_labels = [
+        't-shirt', 'trouser', 'pullover', 'dress', 'coat', 'sandal', 'shirt',
+        'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
 
 
@@ -187,20 +190,20 @@ def load_data_fashion_mnist(batch_size, resize=None):
     # 0 and 1, add a batch dimension at the last. And cast label to int32
     process = lambda X, y: (tf.expand_dims(X, axis=3) / 255,
                             tf.cast(y, dtype='int32'))
-    resize_fn = lambda X, y: (
-        tf.image.resize_with_pad(X, resize, resize) if resize else X, y)
-    return (
-        tf.data.Dataset.from_tensor_slices(process(*mnist_train)).batch(
-            batch_size).shuffle(len(mnist_train[0])).map(resize_fn),
-        tf.data.Dataset.from_tensor_slices(process(*mnist_test)).batch(
-            batch_size).map(resize_fn))
+    resize_fn = lambda X, y: (tf.image.resize_with_pad(X, resize, resize)
+                              if resize else X, y)
+    return (tf.data.Dataset.from_tensor_slices(
+        process(*mnist_train)).batch(batch_size).shuffle(len(
+            mnist_train[0])).map(resize_fn),
+            tf.data.Dataset.from_tensor_slices(
+                process(*mnist_test)).batch(batch_size).map(resize_fn))
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = d2l.argmax(y_hat, axis=1)        
+        y_hat = d2l.argmax(y_hat, axis=1)
     cmp = d2l.astype(y_hat, y.dtype) == y
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 
@@ -273,10 +276,10 @@ class Animator:
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1:
-            self.axes = [self.axes, ]
+            self.axes = [self.axes,]
         # Use a lambda function to capture arguments
-        self.config_axes = lambda: d2l.set_axes(
-            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+        self.config_axes = lambda: d2l.set_axes(self.axes[
+            0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
 
     def add(self, x, y):
@@ -335,9 +338,9 @@ def predict_ch3(net, test_iter, n=6):
         break
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(d2l.argmax(net(X), axis=1))
-    titles = [true +'\n' + pred for true, pred in zip(trues, preds)]
-    d2l.show_images(
-        d2l.reshape(X[0:n], (n, 28, 28)), 1, n, titles=titles[0:n])
+    titles = [true + '\n' + pred for true, pred in zip(trues, preds)]
+    d2l.show_images(d2l.reshape(X[0:n], (n, 28, 28)), 1, n,
+                    titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
@@ -394,6 +397,7 @@ def download_extract(name, folder=None):
     fp.extractall(base_dir)
     return os.path.join(base_dir, folder) if folder else data_dir
 
+
 def download_all():
     """Download all files in the DATA_HUB."""
     for name in DATA_HUB:
@@ -401,13 +405,11 @@ def download_all():
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_train'] = (
-    DATA_URL + 'kaggle_house_pred_train.csv',
-    '585e9cc93e70b39160e7921475f9bcd7d31219ce')
+DATA_HUB['kaggle_house_train'] = (DATA_URL + 'kaggle_house_pred_train.csv',
+                                  '585e9cc93e70b39160e7921475f9bcd7d31219ce')
 
-DATA_HUB['kaggle_house_test'] = (
-    DATA_URL + 'kaggle_house_pred_test.csv',
-    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
+DATA_HUB['kaggle_house_test'] = (DATA_URL + 'kaggle_house_pred_test.csv',
+                                 'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
@@ -416,6 +418,7 @@ def try_gpu(i=0):
     if len(tf.config.experimental.list_physical_devices('GPU')) >= i + 1:
         return tf.device(f'/GPU:{i}')
     return tf.device('/CPU:0')
+
 
 def try_all_gpus():
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
@@ -431,8 +434,7 @@ def corr2d(X, K):
     Y = tf.Variable(tf.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1)))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
-            Y[i, j].assign(tf.reduce_sum(
-                X[i: i + h, j: j + w] * K))
+            Y[i, j].assign(tf.reduce_sum(X[i:i + h, j:j + w] * K))
     return Y
 
 
@@ -442,19 +444,21 @@ class TrainCallback(tf.keras.callbacks.Callback):
     def __init__(self, net, train_iter, test_iter, num_epochs, device_name):
         self.timer = d2l.Timer()
         self.animator = d2l.Animator(
-            xlabel='epoch', xlim=[1, num_epochs], legend=[
-                'train loss', 'train acc', 'test acc'])
+            xlabel='epoch', xlim=[1, num_epochs],
+            legend=['train loss', 'train acc', 'test acc'])
         self.net = net
         self.train_iter = train_iter
         self.test_iter = test_iter
         self.num_epochs = num_epochs
         self.device_name = device_name
+
     def on_epoch_begin(self, epoch, logs=None):
         self.timer.start()
+
     def on_epoch_end(self, epoch, logs):
         self.timer.stop()
-        test_acc = self.net.evaluate(
-            self.test_iter, verbose=0, return_dict=True)['accuracy']
+        test_acc = self.net.evaluate(self.test_iter, verbose=0,
+                                     return_dict=True)['accuracy']
         metrics = (logs['loss'], logs['accuracy'], test_acc)
         self.animator.add(epoch + 1, metrics)
         if epoch == self.num_epochs - 1:
@@ -466,8 +470,8 @@ class TrainCallback(tf.keras.callbacks.Callback):
             print(f'{num_examples / self.timer.avg():.1f} examples/sec on '
                   f'{str(self.device_name)}')
 
-def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr,
-              device=d2l.try_gpu()):
+
+def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
     """Train a model with a GPU (defined in Chapter 6)."""
     device_name = device._device_name
     strategy = tf.distribute.OneDeviceStrategy(device_name)
@@ -487,14 +491,14 @@ class Residual(tf.keras.Model):
     """The Residual block of ResNet."""
     def __init__(self, num_channels, use_1x1conv=False, strides=1):
         super().__init__()
-        self.conv1 = tf.keras.layers.Conv2D(
-            num_channels, padding='same', kernel_size=3, strides=strides)
-        self.conv2 = tf.keras.layers.Conv2D(
-            num_channels, kernel_size=3, padding='same')
+        self.conv1 = tf.keras.layers.Conv2D(num_channels, padding='same',
+                                            kernel_size=3, strides=strides)
+        self.conv2 = tf.keras.layers.Conv2D(num_channels, kernel_size=3,
+                                            padding='same')
         self.conv3 = None
         if use_1x1conv:
-            self.conv3 = tf.keras.layers.Conv2D(
-                num_channels, kernel_size=1, strides=strides)
+            self.conv3 = tf.keras.layers.Conv2D(num_channels, kernel_size=1,
+                                                strides=strides)
         self.bn1 = tf.keras.layers.BatchNormalization()
         self.bn2 = tf.keras.layers.BatchNormalization()
 
@@ -510,6 +514,7 @@ class Residual(tf.keras.Model):
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
                                 '090b5e7e70c295757f55df93cb0a180b9691891a')
+
 
 def read_time_machine():
     """Load the time machine dataset into a list of text lines."""
@@ -536,15 +541,16 @@ class Vocab:
         if tokens is None:
             tokens = []
         if reserved_tokens is None:
-            reserved_tokens = [] 
+            reserved_tokens = []
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[1],
                                   reverse=True)
         # The index for the unknown token is 0
         self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
-        uniq_tokens += [token for token, freq in self.token_freqs
-                        if freq >= min_freq and token not in uniq_tokens]
+        uniq_tokens += [
+            token for token, freq in self.token_freqs
+            if freq >= min_freq and token not in uniq_tokens]
         self.idx_to_token, self.token_to_idx = [], dict()
         for token in uniq_tokens:
             self.idx_to_token.append(token)
@@ -562,6 +568,7 @@ class Vocab:
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
+
 
 def count_corpus(tokens):
     """Count token frequencies."""
@@ -603,13 +610,13 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
 
     def data(pos):
         # Return a sequence of length `num_steps` starting from `pos`
-        return corpus[pos: pos + num_steps]
+        return corpus[pos:pos + num_steps]
 
     num_batches = num_subseqs // batch_size
     for i in range(0, batch_size * num_batches, batch_size):
         # Here, `initial_indices` contains randomized starting indices for
         # subsequences
-        initial_indices_per_batch = initial_indices[i: i + batch_size]
+        initial_indices_per_batch = initial_indices[i:i + batch_size]
         X = [data(j) for j in initial_indices_per_batch]
         Y = [data(j + 1) for j in initial_indices_per_batch]
         yield d2l.tensor(X), d2l.tensor(Y)
@@ -621,14 +628,14 @@ def seq_data_iter_sequential(corpus, batch_size, num_steps):
     # Start with a random offset to partition a sequence
     offset = random.randint(0, num_steps)
     num_tokens = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = d2l.tensor(corpus[offset: offset + num_tokens])
-    Ys = d2l.tensor(corpus[offset + 1: offset + 1 + num_tokens])
+    Xs = d2l.tensor(corpus[offset:offset + num_tokens])
+    Ys = d2l.tensor(corpus[offset + 1:offset + 1 + num_tokens])
     Xs = d2l.reshape(Xs, (batch_size, -1))
     Ys = d2l.reshape(Ys, (batch_size, -1))
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
-        X = Xs[:, i: i + num_steps]
-        Y = Ys[:, i: i + num_steps]
+        X = Xs[:, i:i + num_steps]
+        Y = Ys[:, i:i + num_steps]
         yield X, Y
 
 
@@ -648,42 +655,43 @@ class SeqDataLoader:
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def load_data_time_machine(batch_size, num_steps,
-                           use_random_iter=False, max_tokens=10000):
+def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
+                           max_tokens=10000):
     """Return the iterator and the vocabulary of the time machine dataset."""
-    data_iter = SeqDataLoader(
-        batch_size, num_steps, use_random_iter, max_tokens)
+    data_iter = SeqDataLoader(batch_size, num_steps, use_random_iter,
+                              max_tokens)
     return data_iter, data_iter.vocab
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch:
     """A RNN Model implemented from scratch."""
-    def __init__(self, vocab_size, num_hiddens,
-                 init_state, forward_fn):
+    def __init__(self, vocab_size, num_hiddens, init_state, forward_fn,
+                 get_params):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
         self.init_state, self.forward_fn = init_state, forward_fn
+        self.trainable_variables = get_params(vocab_size, num_hiddens)
 
-    def __call__(self, X, state, params):
+    def __call__(self, X, state):
         X = tf.one_hot(tf.transpose(X), self.vocab_size)
         X = tf.cast(X, tf.float32)
-        return self.forward_fn(X, state, params)
+        return self.forward_fn(X, state, self.trainable_variables)
 
-    def begin_state(self, batch_size):
+    def begin_state(self, batch_size, *args, **kwargs):
         return self.init_state(batch_size, self.num_hiddens)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch8(prefix, num_preds, net, vocab, params):
+def predict_ch8(prefix, num_preds, net, vocab):
     """Generate new characters following the `prefix`."""
-    state = net.begin_state(batch_size=1)
+    state = net.begin_state(batch_size=1, dtype=tf.float32)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
     for y in prefix[1:]:  # Warm-up period
-        _, state = net(get_input(), state, params)
+        _, state = net(get_input(), state)
         outputs.append(vocab[y])
     for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = net(get_input(), state, params)
+        y, state = net(get_input(), state)
         outputs.append(int(y.numpy().argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
@@ -692,8 +700,8 @@ def predict_ch8(prefix, num_preds, net, vocab, params):
 def grad_clipping(grads, theta):
     """Clip the gradient."""
     theta = tf.constant(theta, dtype=tf.float32)
-    norm = tf.math.sqrt(sum((tf.reduce_sum(grad ** 2)).numpy()
-                        for grad in grads))
+    norm = tf.math.sqrt(
+        sum((tf.reduce_sum(grad**2)).numpy() for grad in grads))
     norm = tf.cast(norm, tf.float32)
     new_grad = []
     if tf.greater(norm, theta):
@@ -706,7 +714,7 @@ def grad_clipping(grads, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(net, train_iter, loss, updater, params, use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater, use_random_iter):
     """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
@@ -714,16 +722,16 @@ def train_epoch_ch8(net, train_iter, loss, updater, params, use_random_iter):
         if state is None or use_random_iter:
             # Initialize `state` when either it is the first iteration or
             # using random sampling
-            state = net.begin_state(batch_size=X.shape[0])
+            state = net.begin_state(batch_size=X.shape[0], dtype=tf.float32)
         with tf.GradientTape(persistent=True) as g:
-            g.watch(params)
-            y_hat, state= net(X, state, params)
+            y_hat, state = net(X, state)
             y = d2l.reshape(tf.transpose(Y), (-1))
             l = loss(y, y_hat)
+        params = net.trainable_variables
         grads = g.gradient(l, params)
         grads = grad_clipping(grads, 1)
         updater.apply_gradients(zip(grads, params))
-        
+
         # Keras loss by default returns the average loss in a batch
         # l_sum = l * float(d2l.size(y)) if isinstance(
         #     loss, tf.keras.losses.Loss) else tf.reduce_sum(l)
@@ -736,16 +744,15 @@ def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
               use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
     with strategy.scope():
-        params = get_params(len(vocab), num_hiddens)
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         updater = tf.keras.optimizers.SGD(lr)
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[10, num_epochs])
-    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, params)
+    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab)
     # Train and predict
     for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(
-             net, train_iter, loss, updater, params, use_random_iter)
+        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater,
+                                     use_random_iter)
         if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
@@ -755,9 +762,29 @@ def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
     print(predict('traveller'))
 
 
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
+class RNNModel(tf.keras.layers.Layer):
+    def __init__(self, rnn_layer, vocab_size, **kwargs):
+        super(RNNModel, self).__init__(**kwargs)
+        self.rnn = rnn_layer
+        self.vocab_size = vocab_size
+        self.dense = tf.keras.layers.Dense(vocab_size)
+
+    def call(self, inputs, state):
+        X = tf.one_hot(tf.transpose(inputs), self.vocab_size)
+        # Later RNN like `tf.keras.layers.LSTMCell` return more than two values
+        Y, *state = self.rnn(X, state)
+        output = self.dense(tf.reshape(Y, (-1, Y.shape[-1])))
+        return output, state
+
+    def begin_state(self, *args, **kwargs):
+        return self.rnn.cell.get_initial_state(*args, **kwargs)
+
+
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
+
 
 def read_data_nmt():
     """Load the English-French dataset."""
@@ -776,8 +803,9 @@ def preprocess_nmt(text):
     # lowercase ones
     text = text.replace('\u202f', ' ').replace('\xa0', ' ').lower()
     # Insert space between words and punctuation marks
-    out = [' ' + char if i > 0 and no_space(char, text[i - 1]) else char
-           for i, char in enumerate(text)]
+    out = [
+        ' ' + char if i > 0 and no_space(char, text[i - 1]) else char
+        for i, char in enumerate(text)]
     return ''.join(out)
 
 
@@ -808,10 +836,10 @@ def build_array_nmt(lines, vocab, num_steps):
     """Transform text sequences of machine translation into minibatches."""
     lines = [vocab[l] for l in lines]
     lines = [l + [vocab['<eos>']] for l in lines]
-    array = d2l.tensor([truncate_pad(
-        l, num_steps, vocab['<pad>']) for l in lines])
-    valid_len = d2l.reduce_sum(
-        d2l.astype(array != vocab['<pad>'], d2l.int32), 1)
+    array = d2l.tensor([
+        truncate_pad(l, num_steps, vocab['<pad>']) for l in lines])
+    valid_len = d2l.reduce_sum(d2l.astype(array != vocab['<pad>'], d2l.int32),
+                               1)
     return array, valid_len
 
 
@@ -847,7 +875,7 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                 ax.set_ylabel(ylabel)
             if titles:
                 ax.set_title(titles[j])
-    fig.colorbar(pcm, ax=axes, shrink=0.6);
+    fig.colorbar(pcm, ax=axes, shrink=0.6)
 
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
@@ -857,16 +885,20 @@ def annotate(text, xy, xytext):
 
 
 # Defined in file: ./chapter_optimization/gd.md
-def train_2d(trainer, steps=20):
-    """Optimize a 2-dim objective function with a customized trainer."""
-    # s1 and s2 are internal state variables and will
-    # be used later in the chapter
+def train_2d(trainer, steps=20, f_grad=None):
+    """Optimize a 2D objective function with a customized trainer."""
+    # `s1` and `s2` are internal state variables that will be used later
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
     for i in range(steps):
-        x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+        if f_grad:
+            x1, x2, s1, s2 = trainer(x1, x2, s1, s2, f_grad)
+        else:
+            x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
+    print(f'epoch {i + 1}, x1: {float(x1):f}, x2: {float(x2):f}')
     return results
+
 
 def show_trace_2d(f, results):
     """Show the trace of 2D variables during optimization."""
@@ -883,21 +915,23 @@ def show_trace_2d(f, results):
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
 
+
 def get_data_ch11(batch_size=10, n=1500):
-    data = np.genfromtxt(d2l.download('airfoil'),
-                         dtype=np.float32, delimiter='\t')
+    data = np.genfromtxt(d2l.download('airfoil'), dtype=np.float32,
+                         delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
-    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
-                               batch_size, is_train=True)
-    return data_iter, data.shape[1]-1
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size,
+                               is_train=True)
+    return data_iter, data.shape[1] - 1
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def train_ch11(trainer_fn, states, hyperparams, data_iter,
-               feature_dim, num_epochs=2):
+def train_ch11(trainer_fn, states, hyperparams, data_iter, feature_dim,
+               num_epochs=2):
     # Initialization
-    w = tf.Variable(tf.random.normal(shape=(feature_dim, 1),
-                                   mean=0, stddev=0.01),trainable=True)
+    w = tf.Variable(
+        tf.random.normal(shape=(feature_dim, 1), mean=0, stddev=0.01),
+        trainable=True)
     b = tf.Variable(tf.zeros(1), trainable=True)
 
     # Train
@@ -908,19 +942,19 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
 
     for _ in range(num_epochs):
         for X, y in data_iter:
-          with tf.GradientTape() as g:
-            l = tf.math.reduce_mean(loss(net(X), y))
+            with tf.GradientTape() as g:
+                l = tf.math.reduce_mean(loss(net(X), y))
 
-          dw, db = g.gradient(l, [w, b])
-          trainer_fn([w, b], [dw, db], states, hyperparams)
-          n += X.shape[0]
-          if n % 200 == 0:
-              timer.stop()
-              p = n/X.shape[0]
-              q = p/tf.data.experimental.cardinality(data_iter).numpy()
-              r = (d2l.evaluate_loss(net, data_iter, loss),)
-              animator.add(q, r)
-              timer.start()
+            dw, db = g.gradient(l, [w, b])
+            trainer_fn([w, b], [dw, db], states, hyperparams)
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                p = n / X.shape[0]
+                q = p / tf.data.experimental.cardinality(data_iter).numpy()
+                r = (d2l.evaluate_loss(net, data_iter, loss),)
+                animator.add(q, r)
+                timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
     return timer.cumsum(), animator.Y[0]
 
@@ -929,8 +963,9 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
 def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
     # Initialization
     net = tf.keras.Sequential()
-    net.add(tf.keras.layers.Dense(1,
-            kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
+    net.add(
+        tf.keras.layers.Dense(
+            1, kernel_initializer=tf.random_normal_initializer(stddev=0.01)))
     optimizer = trainer_fn(**hyperparams)
     loss = tf.keras.losses.MeanSquaredError()
     # Note: L2 Loss = 1/2 * MSE Loss. TensorFlow has MSE Loss which is
@@ -943,19 +978,32 @@ def train_concise_ch11(trainer_fn, hyperparams, data_iter, num_epochs=2):
         for X, y in data_iter:
             with tf.GradientTape() as g:
                 out = net(X)
-                l = loss(y, out)/2
+                l = loss(y, out) / 2
                 params = net.trainable_variables
                 grads = g.gradient(l, params)
             optimizer.apply_gradients(zip(grads, params))
             n += X.shape[0]
             if n % 200 == 0:
                 timer.stop()
-                p = n/X.shape[0]
-                q = p/tf.data.experimental.cardinality(data_iter).numpy()
-                r = (d2l.evaluate_loss(net, data_iter, loss)/2,)
+                p = n / X.shape[0]
+                q = p / tf.data.experimental.cardinality(data_iter).numpy()
+                r = (d2l.evaluate_loss(net, data_iter, loss) / 2,)
                 animator.add(q, r)
                 timer.start()
     print(f'loss: {animator.Y[0][-1]:.3f}, {timer.avg():.3f} sec/epoch')
+
+
+# Defined in file: ./chapter_computational-performance/hybridize.md
+class Benchmark:
+    def __init__(self, description='Done'):
+        self.description = description
+
+    def __enter__(self):
+        self.timer = d2l.Timer()
+        return self
+
+    def __exit__(self, *args):
+        print(f'{self.description}: {self.timer.stop():.4f} sec')
 
 
 # Defined in file: ./chapter_computer-vision/bounding-box.md
@@ -968,6 +1016,7 @@ def box_corner_to_center(boxes):
     h = y2 - y1
     boxes = d2l.stack((cx, cy, w, h), axis=-1)
     return boxes
+
 
 def box_center_to_corner(boxes):
     """Convert from (center, width, height) to (upper_left, bottom_right)"""
@@ -986,9 +1035,9 @@ def bbox_to_rect(bbox, color):
     # Convert the bounding box (top-left x, top-left y, bottom-right x,
     # bottom-right y) format to matplotlib format: ((upper-left x,
     # upper-left y), width, height)
-    return d2l.plt.Rectangle(
-        xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
-        fill=False, edgecolor=color, linewidth=2)
+    return d2l.plt.Rectangle(xy=(bbox[0], bbox[1]), width=bbox[2] - bbox[0],
+                             height=bbox[3] - bbox[1], fill=False,
+                             edgecolor=color, linewidth=2)
 
 
 # Alias defined in config.ini

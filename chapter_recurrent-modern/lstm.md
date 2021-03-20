@@ -297,7 +297,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 
 LSTMs are the prototypical latent variable autoregressive model with nontrivial state control.
 Many variants thereof have been proposed over the years, e.g., multiple layers, residual connections, different types of regularization. However, training LSTMs and other sequence models (such as GRUs) are quite costly due to the long range dependency of the sequence.
-Later we will encounter alternative models such as Transformers that can be used in some cases.
+Later we will encounter alternative models such as transformers that can be used in some cases.
 
 
 ## Summary

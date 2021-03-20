@@ -6,18 +6,18 @@ receives massive sensory input,
 far exceeding what the brain can fully process.
 Fortunately,
 not all stimuli are created equal.
-Focalization and concentration of consciousness 
+Focalization and concentration of consciousness
 have enabled primates to direct attention
 to objects of interest,
-such as preys and predators, 
+such as preys and predators,
 in the complex visual environment.
-The ability of paying attention to 
+The ability of paying attention to
 only a small fraction of the information
 has evolutionary significance,
-allowing human beings 
+allowing human beings
 to live and succeed.
 
-Scientists have been studying attention 
+Scientists have been studying attention
 in the cognitive neuroscience field
 since the 19th century.
 In this chapter,
@@ -29,8 +29,8 @@ that leverage such attention cues.
 Notably, the Nadaraya-Waston kernel regression
 in 1964 is a simple demonstration of machine learning with *attention mechanisms*.
 
-Next, we will go on to introduce attention functions 
-that have been extensively used in 
+Next, we will go on to introduce attention functions
+that have been extensively used in
 the design of attention models in deep learning.
 Specifically,
 we will show how to use these functions
@@ -39,15 +39,15 @@ a groundbreaking attention model in deep learning
 that can align bidirectionally and is differentiable.
 
 In the end,
-equipped with 
+equipped with
 the more recent
 *multi-head attention*
 and *self-attention* designs,
-we will describe the *Transformer* architecture
+we will describe the *transformer* architecture
 based solely on attention mechanisms.
 Since their proposal in 2017,
-Transformers
-have been pervasive in modern 
+transformers
+have been pervasive in modern
 deep learning applications,
 such as in areas of
 language,

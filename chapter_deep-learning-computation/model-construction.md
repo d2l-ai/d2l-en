@@ -381,11 +381,11 @@ class MySequential(nn.Block):
 class MySequential(nn.Module):
     def __init__(self, *args):
         super().__init__()
-        for block in args:
-            # Here, `block` is an instance of a `Module` subclass. We save it
+        for idx, module in enumerate(args):
+            # Here, `module` is an instance of a `Module` subclass. We save it
             # in the member variable `_modules` of the `Module` class, and its
             # type is OrderedDict
-            self._modules[block] = block
+            self._modules[str(idx)] = module
 
     def forward(self, X):
         # OrderedDict guarantees that members will be traversed in the order
@@ -427,16 +427,16 @@ parameters also need to be initialized.
 :end_tab:
 
 :begin_tab:`pytorch`
-In the `__init__` method, we add every block
+In the `__init__` method, we add every module
 to the ordered dictionary `_modules` one by one.
 You might wonder why every `Module`
 possesses a `_modules` attribute
 and why we used it rather than just
 define a Python list ourselves.
 In short the chief advantage of `_modules`
-is that during our block's parameter initialization,
+is that during our module's parameter initialization,
 the system knows to look inside the `_modules`
-dictionary to find sub-blocks whose
+dictionary to find sub-modules whose
 parameters also need to be initialized.
 :end_tab:
 

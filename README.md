@@ -1,8 +1,12 @@
-# Dive into Deep Learning (D2L.ai)
+<div align="left">
+  <img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/static/logo-with-text.png" width="350">
+</div>
+
+# D2L.ai: Interactive Deep Learning Book with Multi-Framework Code, Math, and Discussions
 
 [![Build Status](http://ci.d2l.ai/job/d2l-en/job/master/badge/icon)](http://ci.d2l.ai/job/d2l-en/job/master/)
 
-[Book website](https://d2l.ai/) | [STAT 157 Course at UC Berkeley, Spring 2019](http://courses.d2l.ai/berkeley-stat-157/index.html) | Latest version: v0.16.0
+[Book website](https://d2l.ai/) | [STAT 157 Course at UC Berkeley, Spring 2019](http://courses.d2l.ai/berkeley-stat-157/index.html) | Latest version: v0.16.1
 
 <h5 align="center"><i>The best way to understand deep learning is learning by doing.</i></h5>
 

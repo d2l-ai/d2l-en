@@ -1,10 +1,13 @@
 # Concise Implementation of Softmax Regression
 :label:`sec_softmax_concise`
 
-Just as high-level APIs of deep learning frameworks
-made it much easier
-to implement linear regression in :numref:`sec_linear_concise`,
-we will find it similarly (or possibly more)
+
+
+(**Just as high-level APIs**)
+of deep learning frameworks
+(**made it much easier to implement linear regression**)
+in :numref:`sec_linear_concise`,
+(**we will find it similarly**) (~~here~~) (or possibly more)
 convenient for implementing classification models. Let us stick with the Fashion-MNIST dataset
 and keep the batch size at 256 as in :numref:`sec_softmax_scratch`.
 
@@ -37,8 +40,8 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ## Initializing Model Parameters
 
 As mentioned in :numref:`sec_softmax`,
-the output layer of softmax regression
-is a fully-connected layer.
+[**the output layer of softmax regression
+is a fully-connected layer.**]
 Therefore, to implement our model,
 we just need to add one fully-connected layer
 with 10 outputs to our `Sequential`.
@@ -102,11 +105,20 @@ return value for cross-entropy.
 
 One trick to get around this is to first subtract $\max(o_k)$
 from all $o_k$ before proceeding with the softmax calculation.
-You can verify that this shifting of each $o_k$ by constant factor
-does not change the return value of softmax.
+You can see that this shifting of each $o_k$ by constant factor
+does not change the return value of softmax:
+
+$$
+\begin{aligned}
+\hat y_j & =  \frac{\exp(o_j - \max(o_k))\exp(\max(o_k))}{\sum_k \exp(o_k - \max(o_k))\exp(\max(o_k))} \\
+& = \frac{\exp(o_j - \max(o_k))}{\sum_k \exp(o_k - \max(o_k))}.
+\end{aligned}
+$$
+
+
 After the subtraction and normalization step,
-it might be possible that some $o_j$ have large negative values
-and thus that the corresponding $\exp(o_j)$ will take values close to zero.
+it might be possible that some $o_j - \max(o_k)$ have large negative values
+and thus that the corresponding $\exp(o_j - \max(o_k))$ will take values close to zero.
 These might be rounded to zero due to finite precision (i.e., *underflow*),
 making $\hat y_j$ zero and giving us `-inf` for $\log(\hat y_j)$.
 A few steps down the road in backpropagation,
@@ -121,22 +133,23 @@ By combining these two operators
 softmax and cross-entropy together,
 we can escape the numerical stability issues
 that might otherwise plague us during backpropagation.
-As shown in the equation below, we avoid calculating $\exp(o_j)$
-and can use instead $o_j$ directly due to the canceling in $\log(\exp(\cdot))$.
+As shown in the equation below, we avoid calculating $\exp(o_j - \max(o_k))$
+and can use instead $o_j - \max(o_k)$ directly due to the canceling in $\log(\exp(\cdot))$:
 
 $$
 \begin{aligned}
-\log{(\hat y_j)} & = \log\left( \frac{\exp(o_j)}{\sum_k \exp(o_k)}\right) \\
-& = \log{(\exp(o_j))}-\log{\left( \sum_k \exp(o_k) \right)} \\
-& = o_j -\log{\left( \sum_k \exp(o_k) \right)}.
+\log{(\hat y_j)} & = \log\left( \frac{\exp(o_j - \max(o_k))}{\sum_k \exp(o_k - \max(o_k))}\right) \\
+& = \log{(\exp(o_j - \max(o_k)))}-\log{\left( \sum_k \exp(o_k - \max(o_k)) \right)} \\
+& = o_j - \max(o_k) -\log{\left( \sum_k \exp(o_k - \max(o_k)) \right)}.
 \end{aligned}
 $$
 
 We will want to keep the conventional softmax function handy
 in case we ever want to evaluate the output probabilities by our model.
 But instead of passing softmax probabilities into our new loss function,
-we will just pass the logits and compute the softmax and its log
-all at once inside the cross-entropy loss function,
+we will just
+[**pass the logits and compute the softmax and its log
+all at once inside the cross-entropy loss function,**]
 which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wiki/LogSumExp).
 
 ```{.python .input}
@@ -155,7 +168,7 @@ loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 
 ## Optimization Algorithm
 
-Here, we use minibatch stochastic gradient descent
+Here, we (**use minibatch stochastic gradient descent**)
 with a learning rate of 0.1 as the optimization algorithm.
 Note that this is the same as we applied in the linear regression example
 and it illustrates the general applicability of the optimizers.
@@ -176,7 +189,7 @@ trainer = tf.keras.optimizers.SGD(learning_rate=.1)
 
 ## Training
 
-Next we call the training function defined in :numref:`sec_softmax_scratch` to train the model.
+Next we [**call the training function defined**] (~~earlier~~) in :numref:`sec_softmax_scratch` to train the model.
 
 ```{.python .input}
 #@tab all
@@ -197,7 +210,7 @@ albeit this time with fewer lines of code than before.
 ## Exercises
 
 1. Try adjusting the hyperparameters, such as the batch size, number of epochs, and learning rate, to see what the results are.
-1. Increase the numper of epochs for training. Why might the test accuracy decrease after a while? How could we fix this?
+1. Increase the number of epochs for training. Why might the test accuracy decrease after a while? How could we fix this?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/52)

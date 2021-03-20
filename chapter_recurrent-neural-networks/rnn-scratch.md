@@ -33,7 +33,6 @@ from torch.nn import functional as F
 %matplotlib inline
 from d2l import tensorflow as d2l
 import math
-import numpy as np
 import tensorflow as tf
 ```
 
@@ -305,16 +304,17 @@ class RNNModelScratch: #@save
 class RNNModelScratch: #@save
     """A RNN Model implemented from scratch."""
     def __init__(self, vocab_size, num_hiddens,
-                 init_state, forward_fn):
+                 init_state, forward_fn, get_params):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
         self.init_state, self.forward_fn = init_state, forward_fn
+        self.trainable_variables = get_params(vocab_size, num_hiddens)
 
-    def __call__(self, X, state, params):
+    def __call__(self, X, state):
         X = tf.one_hot(tf.transpose(X), self.vocab_size)
         X = tf.cast(X, tf.float32)
-        return self.forward_fn(X, state, params)
+        return self.forward_fn(X, state, self.trainable_variables)
 
-    def begin_state(self, batch_size):
+    def begin_state(self, batch_size, *args, **kwargs):
         return self.init_state(batch_size, self.num_hiddens)
 ```
 
@@ -348,10 +348,9 @@ strategy = tf.distribute.OneDeviceStrategy(device_name)
 
 num_hiddens = 512
 with strategy.scope():
-    net = RNNModelScratch(len(vocab), num_hiddens, init_rnn_state, rnn)
+    net = RNNModelScratch(len(vocab), num_hiddens, init_rnn_state, rnn, get_params)
 state = net.begin_state(X.shape[0])
-params = get_params(len(vocab), num_hiddens)
-Y, new_state = net(X, state, params)
+Y, new_state = net(X, state)
 Y.shape, len(new_state), new_state[0].shape
 ```
 
@@ -412,16 +411,16 @@ def predict_ch8(prefix, num_preds, net, vocab, device):  #@save
 
 ```{.python .input}
 #@tab tensorflow
-def predict_ch8(prefix, num_preds, net, vocab, params):  #@save
+def predict_ch8(prefix, num_preds, net, vocab): #@save
     """Generate new characters following the `prefix`."""
-    state = net.begin_state(batch_size=1)
+    state = net.begin_state(batch_size=1, dtype=tf.float32)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: d2l.reshape(d2l.tensor([outputs[-1]]), (1, 1)).numpy()
     for y in prefix[1:]:  # Warm-up period
-        _, state = net(get_input(), state, params)
+        _, state = net(get_input(), state)
         outputs.append(vocab[y])
     for _ in range(num_preds):  # Predict `num_preds` steps
-        y, state = net(get_input(), state, params)
+        y, state = net(get_input(), state)
         outputs.append(int(y.numpy().argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
@@ -438,7 +437,7 @@ predict_ch8('time traveller ', 10, net, vocab, d2l.try_gpu())
 
 ```{.python .input}
 #@tab tensorflow
-predict_ch8('time traveller ', 10, net, vocab, params)
+predict_ch8('time traveller ', 10, net, vocab)
 ```
 
 ## Gradient Clipping
@@ -644,7 +643,7 @@ def train_epoch_ch8(net, train_iter, loss, updater, device, use_random_iter):
 ```{.python .input}
 #@tab tensorflow
 #@save
-def train_epoch_ch8(net, train_iter, loss, updater, params, use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater, use_random_iter):
     """Train a model within one epoch (defined in Chapter 8)."""
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
@@ -652,16 +651,16 @@ def train_epoch_ch8(net, train_iter, loss, updater, params, use_random_iter):
         if state is None or use_random_iter:
             # Initialize `state` when either it is the first iteration or
             # using random sampling
-            state = net.begin_state(batch_size=X.shape[0])
+            state = net.begin_state(batch_size=X.shape[0], dtype=tf.float32)
         with tf.GradientTape(persistent=True) as g:
-            g.watch(params)
-            y_hat, state= net(X, state, params)
+            y_hat, state = net(X, state)
             y = d2l.reshape(tf.transpose(Y), (-1))
             l = loss(y, y_hat)
+        params = net.trainable_variables
         grads = g.gradient(l, params)
         grads = grad_clipping(grads, 1)
         updater.apply_gradients(zip(grads, params))
-        
+
         # Keras loss by default returns the average loss in a batch
         # l_sum = l * float(d2l.size(y)) if isinstance(
         #     loss, tf.keras.losses.Loss) else tf.reduce_sum(l)
@@ -732,20 +731,17 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
 ```{.python .input}
 #@tab tensorflow
 #@save
-def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy,
-              use_random_iter=False):
+def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy, use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
     with strategy.scope():
-        params = get_params(len(vocab), num_hiddens)
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         updater = tf.keras.optimizers.SGD(lr)
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[10, num_epochs])
-    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, params)
+    predict = lambda prefix: predict_ch8(prefix, 50, net, vocab)
     # Train and predict
     for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(
-             net, train_iter, loss, updater, params, use_random_iter)
+        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater, use_random_iter)
         if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
@@ -781,8 +777,7 @@ train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
 
 ```{.python .input}
 #@tab tensorflow
-params = get_params(len(vocab_random_iter), num_hiddens)
-train_ch8(net, train_random_iter, vocab_random_iter, num_hiddens, lr,
+train_ch8(net, train_iter, vocab_random_iter, num_hiddens, lr,
           num_epochs, strategy, use_random_iter=True)
 ```
 

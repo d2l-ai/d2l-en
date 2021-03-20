@@ -1,6 +1,8 @@
 # The Image Classification Dataset
 :label:`sec_fashion_mnist`
 
+(~~The MNIST dataset is one of the widely used dataset for image classification, while it's too simple as a benchmark dataset. We will use the similar, but more complex Fashion-MNIST dataset~~)
+
 One of the widely used dataset for image classification is the  MNIST dataset :cite:`LeCun.Bottou.Bengio.ea.1998`.
 While it had a good run as a benchmark dataset,
 even simple models by today's standards achieve classification accuracy over 95%,
@@ -42,7 +44,7 @@ d2l.use_svg_display()
 
 ## Reading the Dataset
 
-We can download and read the Fashion-MNIST dataset into memory via the build-in functions in the framework.
+We can [**download and read the Fashion-MNIST dataset into memory via the build-in functions in the framework.**]
 
 ```{.python .input}
 mnist_train = gluon.data.vision.FashionMNIST(train=True)
@@ -91,6 +93,8 @@ we store the shape of any image with height $h$ width $w$ pixels as $h \times w$
 #@tab all
 mnist_train[0][0].shape
 ```
+
+[~~Two utility functions to visualize the dataset~~]
 
 The images in Fashion-MNIST are associated with the following categories:
 t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag, and ankle boot.
@@ -144,7 +148,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
     return axes
 ```
 
-Here are the images and their corresponding labels (in text)
+Here are [**the images and their corresponding labels**] (in text)
 for the first few examples in the training dataset.
 
 ```{.python .input}
@@ -172,7 +176,7 @@ show_images(X, 2, 9, titles=get_fashion_mnist_labels(y));
 To make our life easier when reading from the training and test sets,
 we use the built-in data iterator rather than creating one from scratch.
 Recall that at each iteration, a data loader
-reads a minibatch of data with size `batch_size` each time.
+[**reads a minibatch of data with size `batch_size` each time.**]
 We also randomly shuffle the examples for the training data iterator.
 
 ```{.python .input}
@@ -221,8 +225,8 @@ f'{timer.stop():.2f} sec'
 
 ## Putting All Things Together
 
-Now we define the `load_data_fashion_mnist` function
-that obtains and reads the Fashion-MNIST dataset.
+Now we define [**the `load_data_fashion_mnist` function
+that obtains and reads the Fashion-MNIST dataset.**]
 It returns the data iterators for both the training set and validation set.
 In addition, it accepts an optional argument to resize images to another shape.
 

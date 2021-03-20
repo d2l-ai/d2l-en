@@ -167,13 +167,19 @@ by padding the input and adjusting the stride.
 We can demonstrate the use of padding and strides
 in pooling layers via the built-in two-dimensional maximum pooling layer from the deep learning framework.
 We first construct an input tensor `X` whose shape has four dimensions,
-where the number of examples and number of channels are both 1.
+where the number of examples (batch size) and number of channels are both 1.
+
+:begin_tab:`tensorflow`
+It is important to note that tensorflow
+prefers and is optimized for *channels-last* input.
+:end_tab:
 
 ```{.python .input}
 #@tab mxnet, pytorch
 X = d2l.reshape(d2l.arange(16, dtype=d2l.float32), (1, 1, 4, 4))
 X
 ```
+
 
 ```{.python .input}
 #@tab tensorflow
@@ -220,13 +226,35 @@ pool2d(X)
 
 ```{.python .input}
 #@tab tensorflow
-pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='same',
+paddings = tf.constant([[0, 0], [1,0], [1,0], [0,0]])
+X_padded = tf.pad(X, paddings, "CONSTANT")
+pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='valid',
                                    strides=2)
-pool2d(X)
+pool2d(X_padded)
 ```
 
+
+
+:begin_tab:`mxnet`
 Of course, we can specify an arbitrary rectangular pooling window
 and specify the padding and stride for height and width, respectively.
+:end_tab:
+
+:begin_tab:`pytorch`
+Of course, we can specify an arbitrary rectangular pooling window
+and specify the padding and stride for height and width, respectively.
+For `nn.MaxPool2D` padding should be smaller than half of the kernel_size.
+If the condition is not met, we can first pad the input using
+`nn.functional.pad` and then pass it to the pooling layer.
+:end_tab:
+
+:begin_tab:`tensorflow`
+Of course, we can specify an arbitrary rectangular pooling window
+and specify the padding and stride for height and width, respectively.
+In TensorFlow, to implement a padding of 1 all the way around the tensor, a function designed for padding 
+must be invoked using `tf.pad`. This will implement the required padding and allow the aforementioned (3, 3) pooling with a (2, 2) stride to perform
+similar to those in PyTorch and MXNet. When padding in this way, the built-in `padding` variable must be set to `valid`.
+:end_tab:
 
 ```{.python .input}
 pool2d = nn.MaxPool2D((2, 3), padding=(1, 2), strides=(2, 3))
@@ -235,16 +263,21 @@ pool2d(X)
 
 ```{.python .input}
 #@tab pytorch
-pool2d = nn.MaxPool2d((2, 3), padding=(1, 1), stride=(2, 3))
-pool2d(X)
+X_pad = nn.functional.pad(X, (2, 2, 1, 1))
+pool2d = nn.MaxPool2d((2, 3), stride=(2, 3))
+pool2d(X_pad)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-pool2d = tf.keras.layers.MaxPool2D(pool_size=[2, 3], padding='same',
-                                   strides=(2, 3))
-pool2d(X)
+paddings = tf.constant([[0, 0], [1, 1], [2, 1], [0, 0]])
+X_padded = tf.pad(X, paddings, "CONSTANT")
+
+pool2d = tf.keras.layers.MaxPool2D(pool_size=[2, 3], padding='valid',
+                                   strides=(2,3))
+pool2d(X_padded)
 ```
+
 
 ## Multiple Channels
 
@@ -255,7 +288,12 @@ as in a convolutional layer.
 This means that the number of output channels for the pooling layer
 is the same as the number of input channels.
 Below, we will concatenate tensors `X` and `X + 1`
-on the channel dimension to construct an input with 2 channels.
+on the channel dimension to construct an input with 2 channels. 
+
+:begin_tab:`tensorflow`
+Note that this will require a 
+concatenation along the last dimension for TensorFlow due to the channels-last syntax.
+:end_tab:
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -265,7 +303,7 @@ X
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.reshape(tf.stack([X, X+1], 0), (1, 2, 4, 4))
+X = tf.concat([X, X + 1], 3)  # Concatenate along `dim=3` due to channels-last syntax
 ```
 
 As we can see, the number of output channels is still 2 after pooling.
@@ -283,9 +321,20 @@ pool2d(X)
 
 ```{.python .input}
 #@tab tensorflow
-pool2d = tf.keras.layers.MaxPool2D(3, padding='same', strides=2)
-pool2d(X)
+paddings = tf.constant([[0, 0], [1,0], [1,0], [0,0]])
+X_padded = tf.pad(X, paddings, "CONSTANT")
+pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='valid',
+                                   strides=2)
+pool2d(X_padded)
+
 ```
+
+:begin_tab:`tensorflow`
+Note that the output for the tensorflow pooling appears at first glance to be different, however 
+numerically the same results are presented as MXNet and PyTorch.
+The difference lies in the dimensionality, and reading the 
+output vertically yields the same output as the other implementations. 
+:end_tab:
 
 ## Summary
 

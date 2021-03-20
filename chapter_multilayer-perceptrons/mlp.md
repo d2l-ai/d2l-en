@@ -271,6 +271,17 @@ In fact, we can approximate many functions
 much more compactly by using deeper (vs. wider) networks.
 We will touch upon more rigorous arguments in subsequent chapters.
 
+
+## Activation Functions
+:label:`subsec_activation-functions`
+
+Activation functions decide whether a neuron should be activated or not by
+calculating the weighted sum and further adding bias with it.
+They are differentiable operators to transform input signals to outputs,
+while most of them add non-linearity.
+Because activation functions are fundamental to deep learning,
+(**let us briefly survey some common activation functions**).
+
 ```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -292,22 +303,13 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## Activation Functions
-
-Activation functions decide whether a neuron should be activated or not by
-calculating the weighted sum and further adding bias with it.
-They are differentiable operators to transform input signals to outputs,
-while most of them add non-linearity.
-Because activation functions are fundamental to deep learning,
-let us briefly survey some common activation functions.
-
 ### ReLU Function
 
 The most popular choice,
 due to both simplicity of implementation and
 its good performance on a variety of predictive tasks,
 is the *rectified linear unit* (*ReLU*).
-ReLU provides a very simple nonlinear transformation.
+[**ReLU provides a very simple nonlinear transformation**].
 Given an element $x$, the function is defined
 as the maximum of that element and $0$:
 
@@ -393,9 +395,9 @@ $$\operatorname{pReLU}(x) = \max(0, x) + \alpha \min(0, x).$$
 
 ### Sigmoid Function
 
-The *sigmoid function* transforms its inputs,
+[**The *sigmoid function* transforms its inputs**],
 for which values lie in the domain $\mathbb{R}$,
-to outputs that lie on the interval (0, 1).
+(**to outputs that lie on the interval (0, 1).**)
 For that reason, the sigmoid is
 often called a *squashing function*:
 it squashes any input in the range (-inf, inf)
@@ -489,9 +491,9 @@ d2l.plot(x.numpy(), t.gradient(y, x).numpy(), 'x', 'grad of sigmoid',
 
 ### Tanh Function
 
-Like the sigmoid function, the tanh (hyperbolic tangent)
-function also squashes its inputs,
-transforming them into elements on the interval between -1 and 1:
+Like the sigmoid function, [**the tanh (hyperbolic tangent)
+function also squashes its inputs**],
+transforming them into elements on the interval (**between -1 and 1**):
 
 $$\operatorname{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 

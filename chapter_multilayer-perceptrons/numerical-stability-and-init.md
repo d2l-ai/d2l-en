@@ -70,7 +70,7 @@ rendering learning impossible as parameters
 hardly move on each update.
 
 
-### Vanishing Gradients
+### (**Vanishing Gradients**)
 
 One frequent culprit causing the vanishing gradient problem
 is the choice of the activation function $\sigma$
@@ -127,8 +127,8 @@ d2l.plot(x.numpy(), [y.numpy(), t.gradient(y, x).numpy()],
          legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```
 
-As you can see, the sigmoid's gradient vanishes
-both when its inputs are large and when they are small.
+As you can see, (**the sigmoid's gradient vanishes
+both when its inputs are large and when they are small**).
 Moreover, when backpropagating through many layers,
 unless we are in the Goldilocks zone, where
 the inputs to many of the sigmoids are close to zero,
@@ -142,7 +142,7 @@ Consequently, ReLUs, which are more stable
 have emerged as the default choice for practitioners.
 
 
-### Exploding Gradients
+### [**Exploding Gradients**]
 
 The opposite problem, when gradients explode,
 can be similarly vexing.
@@ -237,7 +237,7 @@ and suitable regularization can further enhance stability.
 ### Default Initialization
 
 In the previous sections, e.g., in :numref:`sec_linear_concise`,
-we used a normal distribution 
+we used a normal distribution
 to initialize the values of our weights.
 If we do not specify the initialization method, the framework will
 use a default random initialization method, which often works well in practice
@@ -318,7 +318,7 @@ yields the suggestion to initialize according to
 $$U\left(-\sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}, \sqrt{\frac{6}{n_\mathrm{in} + n_\mathrm{out}}}\right).$$
 
 Though the assumption for nonexistence of nonlinearities
-in the above mathematical reasoning 
+in the above mathematical reasoning
 can be easily violated in neural networks,
 the Xavier initialization method
 turns out to work well in practice.

@@ -11,8 +11,8 @@ $$
 \hat{y}(x) = \mathbf{w}_0 + \sum_{i=1}^d \mathbf{w}_i x_i + \sum_{i=1}^d\sum_{j=i+1}^d \langle\mathbf{v}_i, \mathbf{v}_j\rangle x_i x_j
 $$
 
-where $\mathbf{w}_0 \in \mathbb{R}$ is the global bias; $\mathbf{w} \in \mathbb{R}^d$ denotes the weights of the i-th variable; $\mathbf{V} \in \mathbb{R}^{d\times k}$ represents the feature embeddings; $\mathbf{v}_i$ represents the $i^\mathrm{th}$ row of $\mathbf{V}$; $k$ is the dimensionality of latent factors; $\langle\cdot, \cdot \rangle$ is the dot product of two vectors.  $\langle \mathbf{v}_i, \mathbf{v}_j \rangle$ model the interaction between the $i^\mathrm{th}$ and $j^\mathrm{th}$ feature. Some feature interactions can be easily understood so they can be designed by experts. However, most other feature interactions are hidden in data and difficult to identify. So modeling feature interactions automatically can greatly reduce the efforts in feature engineering. It is obvious that the first two terms correspond to the linear regression model and the last term is an extension of the matrix factorization model. If the feature $i$ represents an item and the feature $j$ represents a user, the third term is exactly the dot product between user and item embeddings. It is worth noting that FM can also generalize to higher orders (degree > 2). Nevertheless, the numerical stability might weaken the generalization.  
- 
+where $\mathbf{w}_0 \in \mathbb{R}$ is the global bias; $\mathbf{w} \in \mathbb{R}^d$ denotes the weights of the i-th variable; $\mathbf{V} \in \mathbb{R}^{d\times k}$ represents the feature embeddings; $\mathbf{v}_i$ represents the $i^\mathrm{th}$ row of $\mathbf{V}$; $k$ is the dimensionality of latent factors; $\langle\cdot, \cdot \rangle$ is the dot product of two vectors.  $\langle \mathbf{v}_i, \mathbf{v}_j \rangle$ model the interaction between the $i^\mathrm{th}$ and $j^\mathrm{th}$ feature. Some feature interactions can be easily understood so they can be designed by experts. However, most other feature interactions are hidden in data and difficult to identify. So modeling feature interactions automatically can greatly reduce the efforts in feature engineering. It is obvious that the first two terms correspond to the linear regression model and the last term is an extension of the matrix factorization model. If the feature $i$ represents an item and the feature $j$ represents a user, the third term is exactly the dot product between user and item embeddings. It is worth noting that FM can also generalize to higher orders (degree > 2). Nevertheless, the numerical stability might weaken the generalization.
+
 
 ## An Efficient Optimization Criterion
 
@@ -28,9 +28,9 @@ $$
  \end{aligned}
 $$
 
-With this reformulation, the model complexity are decreased greatly. Moreover, for sparse features, only non-zero elements needs to be computed so that the overall complexity is linear to the number of non-zero features. 
+With this reformulation, the model complexity are decreased greatly. Moreover, for sparse features, only non-zero elements needs to be computed so that the overall complexity is linear to the number of non-zero features.
 
-To learn the FM model, we can use the MSE loss for regression task, the cross entropy loss for classification tasks, and the BPR loss for ranking task. Standard optimizers such as SGD and Adam are viable for optimization.
+To learn the FM model, we can use the MSE loss for regression task, the cross entropy loss for classification tasks, and the BPR loss for ranking task. Standard optimizers such as stochastic gradient descent and Adam are viable for optimization.
 
 ```{.python .input  n=2}
 from d2l import mxnet as d2l
@@ -52,7 +52,7 @@ class FM(nn.Block):
         self.embedding = nn.Embedding(num_inputs, num_factors)
         self.fc = nn.Embedding(num_inputs, 1)
         self.linear_layer = nn.Dense(1, use_bias=True)
-        
+
     def forward(self, x):
         square_of_sum = np.sum(self.embedding(x), axis=1) ** 2
         sum_of_square = np.sum(self.embedding(x) ** 2, axis=1)
@@ -96,7 +96,7 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 
 ## Summary
 
-* FM is a general framework that can be applied on a variety of tasks such as regression, classification, and ranking. 
+* FM is a general framework that can be applied on a variety of tasks such as regression, classification, and ranking.
 * Feature interaction/crossing is important for prediction tasks and the 2-way interaction can be efficiently modeled with FM.
 
 ## Exercises

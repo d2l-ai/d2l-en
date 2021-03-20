@@ -217,9 +217,9 @@ from the uniform distribution $U[0, 1]$.
 Then we can keep those nodes for which the corresponding
 sample is greater than $p$, dropping the rest.
 
-In the following code, we implement a `dropout_layer` function
+In the following code, we (**implement a `dropout_layer` function
 that drops out the elements in the tensor input `X`
-with probability `dropout`,
+with probability `dropout`**),
 rescaling the remainder as described above:
 dividing the survivors by `1.0-dropout`.
 
@@ -277,7 +277,7 @@ def dropout_layer(X, dropout):
     return tf.cast(mask, dtype=tf.float32) * X / (1.0 - dropout)
 ```
 
-We can test out the `dropout_layer` function on a few examples.
+We can [**test out the `dropout_layer` function on a few examples**].
 In the following lines of code,
 we pass our input `X` through the dropout operation,
 with probabilities 0, 0.5, and 1, respectively.
@@ -311,8 +311,8 @@ print(dropout_layer(X, 1.))
 
 Again, we work with the Fashion-MNIST dataset
 introduced in :numref:`sec_fashion_mnist`.
-We define an MLP with
-two hidden layers containing 256 units each.
+We [**define an MLP with
+two hidden layers containing 256 units each.**]
 
 ```{.python .input}
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
@@ -375,14 +375,11 @@ class Net(nn.Module):
     def __init__(self, num_inputs, num_outputs, num_hiddens1, num_hiddens2,
                  is_training = True):
         super(Net, self).__init__()
-
         self.num_inputs = num_inputs
         self.training = is_training
-
         self.lin1 = nn.Linear(num_inputs, num_hiddens1)
         self.lin2 = nn.Linear(num_hiddens1, num_hiddens2)
         self.lin3 = nn.Linear(num_hiddens2, num_outputs)
-
         self.relu = nn.ReLU()
 
     def forward(self, X):
@@ -428,7 +425,7 @@ class Net(tf.keras.Model):
 net = Net(num_outputs, num_hiddens1, num_hiddens2)
 ```
 
-### Training and Testing
+### [**Training and Testing**]
 
 This is similar to the training and testing of MLPs described previously.
 
@@ -458,7 +455,7 @@ trainer = tf.keras.optimizers.SGD(learning_rate=lr)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
-## Concise Implementation
+## [**Concise Implementation**]
 
 With high-level APIs, all we need to do is add a `Dropout` layer
 after each fully-connected layer,
@@ -517,7 +514,7 @@ net = tf.keras.models.Sequential([
 ])
 ```
 
-Next, we train and test the model.
+Next, we [**train and test the model**].
 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})

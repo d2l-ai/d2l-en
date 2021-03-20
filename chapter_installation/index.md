@@ -11,20 +11,23 @@ and the code needed to run the book itself.
 The simplest way to get going will be to install
 [Miniconda](https://conda.io/en/latest/miniconda.html). The Python 3.x version
 is required. You can skip the following steps if conda has already been installed.
-Download the corresponding Miniconda sh file from the website
-and then execute the installation from the command line
-using `sh <FILENAME> -b`. For macOS users:
+
+Visit the Miniconda website and determine the appropriate version for your system
+based on your Python 3.x version and machine architecture.
+For example, if you are using macOS and Python 3.x you would download the 
+bash script with strings "Miniconda3" and "MacOSX" in its name,
+navigate to the download location
+and execute the installation as follows:
 
 ```bash
-# The file name is subject to changes
 sh Miniconda3-latest-MacOSX-x86_64.sh -b
 ```
 
-
-For Linux users:
+A Linux user with Python 3.x would download the file
+with strings "Miniconda3" and "Linux" in its name 
+and execute the following at the download location:
 
 ```bash
-# The file name is subject to changes
 sh Miniconda3-latest-Linux-x86_64.sh -b
 ```
 
@@ -93,7 +96,7 @@ pip install mxnet==1.7.0.post1
 :begin_tab:`pytorch`
 
 ```bash
-pip install torch torchvision -f https://download.pytorch.org/whl/torch_stable.html
+pip install torch torchvision
 ```
 
 

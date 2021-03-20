@@ -1,10 +1,12 @@
 # Implementation of Softmax Regression from Scratch
 :label:`sec_softmax_scratch`
 
-Just as we implemented linear regression from scratch,
-we believe that softmax regression
-is similarly fundamental and you ought to know
-the gory details of how to implement it yourself.
+(**Just as we implemented linear regression from scratch, we believe that**)
+softmax regression
+is similarly fundamental and
+(**you ought to know the gory details of **)
+(~~softmax regression~~)
+how to implement it yourself.
 We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
 setting up a data iterator with batch size 256.
 
@@ -40,16 +42,16 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 As in our linear regression example,
 each example here will be represented by a fixed-length vector.
 Each example in the raw dataset is a $28 \times 28$ image.
-In this section, we will flatten each image,
-treating them as vectors of length 784.
+In this section, [**we will flatten each image,
+treating them as vectors of length 784.**]
 In the future, we will talk about more sophisticated strategies
 for exploiting the spatial structure in images,
 but for now we treat each pixel location as just another feature.
 
 Recall that in softmax regression,
 we have as many outputs as there are classes.
-Because our dataset has 10 classes,
-our network will have an output dimension of 10.
+(**Because our dataset has 10 classes,
+our network will have an output dimension of 10.**)
 Consequently, our weights will constitute a $784 \times 10$ matrix
 and the biases will constitute a $1 \times 10$ row vector.
 As with linear regression, we will initialize our weights `W`
@@ -90,8 +92,8 @@ Before implementing the softmax regression model,
 let us briefly review how the sum operator works
 along specific dimensions in a tensor,
 as discussed in :numref:`subseq_lin-alg-reduction` and :numref:`subseq_lin-alg-non-reduction`.
-Given a matrix `X` we can sum over all elements (by default) or only
-over elements in the same axis,
+[**Given a matrix `X` we can sum over all elements (by default) or only
+over elements in the same axis,**]
 i.e., the same column (axis 0) or the same row (axis 1).
 Note that if `X` is a tensor with shape (2, 3)
 and we sum over the columns,
@@ -113,7 +115,7 @@ X = d2l.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
 d2l.reduce_sum(X, 0, keepdims=True), d2l.reduce_sum(X, 1, keepdims=True)
 ```
 
-We are now ready to implement the softmax operation.
+We are now ready to (**implement the softmax operation**).
 Recall that softmax consists of three steps:
 i) we exponentiate each term (using `exp`);
 ii) we sum over each row (we have one row per example in the batch)
@@ -123,9 +125,9 @@ ensuring that the result sums to 1.
 Before looking at the code, let us recall
 how this looks expressed as an equation:
 
-$$
-\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.
-$$
+(**
+$$\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(\mathbf{X}_{ij})}{\sum_k \exp(\mathbf{X}_{ik})}.$$
+**)
 
 The denominator, or normalization constant,
 is also sometimes called the *partition function*
@@ -151,8 +153,8 @@ def softmax(X):
 ```
 
 As you can see, for any random input,
-we turn each element into a non-negative number.
-Moreover, each row sums up to 1,
+[**we turn each element into a non-negative number.
+Moreover, each row sums up to 1,**]
 as is required for a probability.
 
 ```{.python .input}
@@ -177,7 +179,7 @@ due to large or very small elements of the matrix.
 ## Defining the Model
 
 Now that we have defined the softmax operation,
-we can implement the softmax regression model.
+we can [**implement the softmax regression model.**]
 The below code defines how the input is mapped to the output through the network.
 Note that we flatten each original image in the batch
 into a vector using the `reshape` function
@@ -202,11 +204,11 @@ of the predicted probability assigned to the true label.
 Rather than iterating over the predictions with a Python for-loop
 (which tends to be inefficient),
 we can pick all elements by a single operator.
-Below, we create sample data `y_hat`
-with 2 examples of predicted probabilities over 3 classes and their corresponding labels `y`.
+Below, we [**create sample data `y_hat`
+with 2 examples of predicted probabilities over 3 classes and their corresponding labels `y`.**]
 With `y` we know that in the first example the first class is the correct prediction and
 in the second example the third class is the ground-truth.
-Using `y` as the indices of the probabilities in `y_hat`,
+[**Using `y` as the indices of the probabilities in `y_hat`,**]
 we pick the probability of the first class in the first example
 and the probability of the third class in the second example.
 
@@ -224,7 +226,7 @@ y = tf.constant([0, 2])
 tf.boolean_mask(y_hat, tf.one_hot(y, depth=y_hat.shape[-1]))
 ```
 
-Now we can implement the cross-entropy loss function efficiently with just one line of code.
+Now we can (**implement the cross-entropy loss function**) efficiently with just one line of code.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -263,7 +265,7 @@ To compute accuracy we do the following.
 First, if `y_hat` is a matrix,
 we assume that the second dimension stores prediction scores for each class.
 We use `argmax` to obtain the predicted class by the index for the largest entry in each row.
-Then we compare the predicted class with the ground-truth `y` elementwise.
+Then we [**compare the predicted class with the ground-truth `y` elementwise.**]
 Since the equality operator `==` is sensitive to data types,
 we convert `y_hat`'s data type to match that of `y`.
 The result is a tensor containing entries of 0 (false) and 1 (true).
@@ -274,7 +276,7 @@ Taking the sum yields the number of correct predictions.
 def accuracy(y_hat, y):  #@save
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
-        y_hat = d2l.argmax(y_hat, axis=1)        
+        y_hat = d2l.argmax(y_hat, axis=1)
     cmp = d2l.astype(y_hat, y.dtype) == y
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 ```
@@ -295,7 +297,7 @@ Therefore, the classification accuracy rate for these two examples is 0.5.
 accuracy(y_hat, y) / len(y)
 ```
 
-Similarly, we can evaluate the accuracy for any model `net` on a dataset
+[**Similarly, we can evaluate the accuracy for any model `net` on a dataset**]
 that is accessed via the data iterator `data_iter`.
 
 ```{.python .input}
@@ -343,8 +345,8 @@ class Accumulator:  #@save
         return self.data[idx]
 ```
 
-Because we initialized the `net` model with random weights,
-the accuracy of this model should be close to random guessing,
+[**Because we initialized the `net` model with random weights,
+the accuracy of this model should be close to random guessing,**]
 i.e., 0.1 for 10 classes.
 
 ```{.python .input}
@@ -354,7 +356,8 @@ evaluate_accuracy(net, test_iter)
 
 ## Training
 
-The training loop for softmax regression should look strikingly familiar
+[**The training loop**]
+for softmax regression should look strikingly familiar
 if you read through our implementation
 of linear regression in :numref:`sec_linear_scratch`.
 Here we refactor the implementation to make it reusable.
@@ -402,7 +405,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
             l.backward()
             updater.step()
             metric.add(float(l) * len(y), accuracy(y_hat, y),
-                       y.size().numel())
+                       y.numel())
         else:
             # Using custom built optimizer & loss criterion
             l.sum().backward()
@@ -444,7 +447,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):  #@save
 ```
 
 Before showing the implementation of the training function,
-we define a utility class that plot data in animation.
+we define [**a utility class that plot data in animation.**]
 Again, it aims to simplify code in the rest of the book.
 
 ```{.python .input}
@@ -490,6 +493,7 @@ class Animator:  #@save
         display.clear_output(wait=True)
 ```
 
+[~~The training function~~]
 The following training function then
 trains a model `net` on a training dataset accessed via `train_iter`
 for multiple epochs, which is specified by `num_epochs`.
@@ -515,7 +519,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):  #@save
 ```
 
 As an implementation from scratch,
-we use the minibatch stochastic gradient descent defined in :numref:`sec_linear_scratch`
+we [**use the minibatch stochastic gradient descent**] defined in :numref:`sec_linear_scratch`
 to optimize the loss function of the model with a learning rate 0.1.
 
 ```{.python .input}
@@ -540,7 +544,7 @@ class Updater():  #@save
 updater = Updater([W, b], lr=0.1)
 ```
 
-Now we train the model with 10 epochs.
+Now we [**train the model with 10 epochs.**]
 Note that both the number of epochs (`num_epochs`),
 and learning rate (`lr`) are adjustable hyperparameters.
 By changing their values, we may be able
@@ -555,7 +559,7 @@ train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 ## Prediction
 
 Now that training is complete,
-our model is ready to classify some images.
+our model is ready to [**classify some images.**]
 Given a series of images,
 we will compare their actual labels
 (first line of text output)
