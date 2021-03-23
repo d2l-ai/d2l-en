@@ -219,8 +219,8 @@ def get_lstm_params(vocab_size, num_hiddens):
     num_inputs = num_outputs = vocab_size
 
     def normal(shape):
-        return tf.Variable(tf.random.normal(shape=shape,stddev=0.01,mean=0,
-                                            dtype=tf.float32))
+        return tf.Variable(tf.random.normal(shape=shape, stddev=0.01,
+                                            mean=0, dtype=tf.float32))
     def three():
         return (normal((num_inputs, num_hiddens)),
                 normal((num_hiddens, num_hiddens)),
