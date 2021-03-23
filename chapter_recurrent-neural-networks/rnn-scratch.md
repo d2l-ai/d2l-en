@@ -412,7 +412,7 @@ def predict_ch8(prefix, num_preds, net, vocab, device):  #@save
 
 ```{.python .input}
 #@tab tensorflow
-def predict_ch8(prefix, num_preds, net, vocab): #@save
+def predict_ch8(prefix, num_preds, net, vocab):  #@save
     """Generate new characters following the `prefix`."""
     state = net.begin_state(batch_size=1, dtype=tf.float32)
     outputs = [vocab[prefix[0]]]
@@ -743,7 +743,8 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, strategy,
     predict = lambda prefix: predict_ch8(prefix, 50, net, vocab)
     # Train and predict
     for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater, use_random_iter)
+        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater,
+                                     use_random_iter)
         if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
