@@ -273,7 +273,7 @@ strategy = tf.distribute.OneDeviceStrategy(device_name)
 with strategy.scope():
     net = RNNModel(rnn_layer, vocab_size=len(vocab))
 
-d2l.predict_ch8('time traveller', 10, model, vocab)
+d2l.predict_ch8('time traveller', 10, net, vocab)
 ```
 
 As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and train our model with high-level APIs.
