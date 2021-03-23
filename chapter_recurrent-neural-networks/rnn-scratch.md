@@ -348,7 +348,8 @@ strategy = tf.distribute.OneDeviceStrategy(device_name)
 
 num_hiddens = 512
 with strategy.scope():
-    net = RNNModelScratch(len(vocab), num_hiddens, init_rnn_state, rnn, get_params)
+    net = RNNModelScratch(len(vocab), num_hiddens, init_rnn_state, rnn,
+                          get_params)
 state = net.begin_state(X.shape[0])
 Y, new_state = net(X, state)
 Y.shape, len(new_state), new_state[0].shape
@@ -771,13 +772,26 @@ Finally,
 let us check the results of using the random sampling method.
 
 ```{.python .input}
-#@tab mxnet,pytorch
+#@tab mxnet
+net = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
+                      init_rnn_state, rnn)
+train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
+          use_random_iter=True)
+```
+
+```{.python .input}
+#@tab pytorch
+net = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
+                      init_rnn_state, rnn)
 train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
           use_random_iter=True)
 ```
 
 ```{.python .input}
 #@tab tensorflow
+with strategy.scope():
+    net = RNNModelScratch(len(vocab), num_hiddens, init_rnn_state, rnn,
+                          get_params)
 train_ch8(net, train_iter, vocab_random_iter, lr, num_epochs, strategy,
           use_random_iter=True)
 ```
