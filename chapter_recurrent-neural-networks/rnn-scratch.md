@@ -731,7 +731,8 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
 ```{.python .input}
 #@tab tensorflow
 #@save
-def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy, use_random_iter=False):
+def train_ch8(net, train_iter, vocab, lr, num_epochs, strategy,
+              use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
     with strategy.scope():
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -763,7 +764,7 @@ train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 ```{.python .input}
 #@tab tensorflow
 num_epochs, lr = 500, 1
-train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
+train_ch8(net, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
 Finally,
@@ -777,8 +778,8 @@ train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
 
 ```{.python .input}
 #@tab tensorflow
-train_ch8(net, train_iter, vocab_random_iter, num_hiddens, lr,
-          num_epochs, strategy, use_random_iter=True)
+train_ch8(net, train_iter, vocab_random_iter, lr, num_epochs, strategy,
+          use_random_iter=True)
 ```
 
 While implementing the above RNN model from scratch is instructive, it is not convenient.

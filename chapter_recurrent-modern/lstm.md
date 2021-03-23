@@ -341,7 +341,7 @@ num_epochs, lr = 500, 1
 strategy = tf.distribute.OneDeviceStrategy(device_name)
 with strategy.scope():
     model = d2l.RNNModelScratch(len(vocab), num_hiddens, init_lstm_state, lstm, get_lstm_params)
-d2l.train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
 ## Concise Implementation
@@ -375,7 +375,7 @@ device_name = d2l.try_gpu()._device_name
 strategy = tf.distribute.OneDeviceStrategy(device_name)
 with strategy.scope():
     model = d2l.RNNModel(lstm_layer, vocab_size=len(vocab))
-d2l.train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
 LSTMs are the prototypical latent variable autoregressive model with nontrivial state control.
