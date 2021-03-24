@@ -57,7 +57,7 @@ that are beyond our conscious understanding
 even if our eyes manage the task effortlessly.
 *Machine learning* is the study of powerful
 techniques that can learn from experience.
-As an machine learning algorithm accumulates more experience,
+As a machine learning algorithm accumulates more experience,
 typically in the form of observational data or
 interactions with an environment, its performance improves.
 Contrast this with our deterministic e-commerce platform,
