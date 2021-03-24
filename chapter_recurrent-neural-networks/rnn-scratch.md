@@ -773,15 +773,7 @@ Finally,
 let us check the results of using the random sampling method.
 
 ```{.python .input}
-#@tab mxnet
-net = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
-                      init_rnn_state, rnn)
-train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
-          use_random_iter=True)
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet,pytorch
 net = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
                       init_rnn_state, rnn)
 train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
