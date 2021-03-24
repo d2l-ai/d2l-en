@@ -348,7 +348,8 @@ strategy = tf.distribute.OneDeviceStrategy(device_name)
 
 num_hiddens = 512
 with strategy.scope():
-    net = RNNModelScratch(len(vocab), num_hiddens, init_rnn_state, rnn, get_params)
+    net = RNNModelScratch(len(vocab), num_hiddens, init_rnn_state, rnn,
+                          get_params)
 state = net.begin_state(X.shape[0])
 Y, new_state = net(X, state)
 Y.shape, len(new_state), new_state[0].shape
@@ -411,7 +412,7 @@ def predict_ch8(prefix, num_preds, net, vocab, device):  #@save
 
 ```{.python .input}
 #@tab tensorflow
-def predict_ch8(prefix, num_preds, net, vocab): #@save
+def predict_ch8(prefix, num_preds, net, vocab):  #@save
     """Generate new characters following the `prefix`."""
     state = net.begin_state(batch_size=1, dtype=tf.float32)
     outputs = [vocab[prefix[0]]]
@@ -731,7 +732,8 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
 ```{.python .input}
 #@tab tensorflow
 #@save
-def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy, use_random_iter=False):
+def train_ch8(net, train_iter, vocab, lr, num_epochs, strategy,
+              use_random_iter=False):
     """Train a model (defined in Chapter 8)."""
     with strategy.scope():
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -741,7 +743,8 @@ def train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy, use
     predict = lambda prefix: predict_ch8(prefix, 50, net, vocab)
     # Train and predict
     for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater, use_random_iter)
+        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater,
+                                     use_random_iter)
         if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
@@ -763,22 +766,35 @@ train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 ```{.python .input}
 #@tab tensorflow
 num_epochs, lr = 500, 1
-train_ch8(net, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
+train_ch8(net, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
 Finally,
 let us check the results of using the random sampling method.
 
 ```{.python .input}
-#@tab mxnet,pytorch
+#@tab mxnet
+net = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
+                      init_rnn_state, rnn)
+train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
+          use_random_iter=True)
+```
+
+```{.python .input}
+#@tab pytorch
+net = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
+                      init_rnn_state, rnn)
 train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
           use_random_iter=True)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-train_ch8(net, train_iter, vocab_random_iter, num_hiddens, lr,
-          num_epochs, strategy, use_random_iter=True)
+with strategy.scope():
+    net = RNNModelScratch(len(vocab), num_hiddens, init_rnn_state, rnn,
+                          get_params)
+train_ch8(net, train_iter, vocab_random_iter, lr, num_epochs, strategy,
+          use_random_iter=True)
 ```
 
 While implementing the above RNN model from scratch is instructive, it is not convenient.

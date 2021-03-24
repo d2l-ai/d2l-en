@@ -271,9 +271,9 @@ d2l.predict_ch8('time traveller', 10, net, vocab, device)
 device_name = d2l.try_gpu()._device_name
 strategy = tf.distribute.OneDeviceStrategy(device_name)
 with strategy.scope():
-    model = RNNModel(rnn_layer, vocab_size=len(vocab))
+    net = RNNModel(rnn_layer, vocab_size=len(vocab))
 
-d2l.predict_ch8('time traveller', 10, model, vocab)
+d2l.predict_ch8('time traveller', 10, net, vocab)
 ```
 
 As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and train our model with high-level APIs.
@@ -292,7 +292,7 @@ d2l.train_ch8(net, train_iter, vocab, lr, num_epochs, device)
 ```{.python .input}
 #@tab tensorflow
 num_epochs, lr = 500, 1
-d2l.train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
+d2l.train_ch8(net, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
 Compared with the last section, this model achieves comparable perplexity,
