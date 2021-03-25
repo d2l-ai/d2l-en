@@ -30,7 +30,7 @@ In this section, we cover the following:
 * Parameter initialization.
 * Sharing parameters across different model components.
 
-We start by focusing on an MLP with one hidden layer.
+(**We start by focusing on an MLP with one hidden layer.**)
 
 ```{.python .input}
 from mxnet import init, np, npx
@@ -70,7 +70,7 @@ X = tf.random.uniform((2, 4))
 net(X)
 ```
 
-## Parameter Access
+## [**Parameter Access**]
 
 Let us start with how to access parameters
 from the models that you already know.
@@ -107,7 +107,7 @@ each layer's parameters,
 even in a network containing hundreds of layers.
 
 
-### Targeted Parameters
+### [**Targeted Parameters**]
 
 Note that each parameter is represented
 as an instance of the parameter class.
@@ -157,7 +157,7 @@ net[1].weight.grad()
 net[2].weight.grad == None
 ```
 
-### All Parameters at Once
+### [**All Parameters at Once**]
 
 When we need to perform operations on all parameters,
 accessing them one-by-one can grow tedious.
@@ -200,7 +200,7 @@ net.state_dict()['2.bias'].data
 net.get_weights()[1]
 ```
 
-### Collecting Parameters from Nested Blocks
+### [**Collecting Parameters from Nested Blocks**]
 
 Let us see how the parameter naming conventions work
 if we nest multiple blocks inside each other.
@@ -267,8 +267,8 @@ rgnet.add(tf.keras.layers.Dense(1))
 rgnet(X)
 ```
 
-Now that we have designed the network,
-let us see how it is organized.
+Now that [**we have designed the network,
+let us see how it is organized.**]
 
 ```{.python .input}
 print(rgnet.collect_params)
@@ -336,7 +336,7 @@ By default, Keras initializes weight matrices uniformly by drawing from a range 
 TensorFlow provides a variety of initialization methods both in the root module and the `keras.initializers` module.
 :end_tab:
 
-### Built-in Initialization
+### [**Built-in Initialization**]
 
 Let us begin by calling on built-in initializers.
 The code below initializes all weight parameters
@@ -407,7 +407,7 @@ net(X)
 net.weights[0], net.weights[1]
 ```
 
-We can also apply different initializers for certain blocks.
+[**We can also apply different initializers for certain blocks.**]
 For example, below we initialize the first layer
 with the Xavier initializer
 and initialize the second layer
@@ -452,7 +452,7 @@ print(net.layers[1].weights[0])
 print(net.layers[2].weights[0])
 ```
 
-### Custom Initialization
+### [**Custom Initialization**]
 
 Sometimes, the initialization methods we need
 are not provided by the deep learning framework.
@@ -561,7 +561,7 @@ you need to use `set_data` to avoid confusing
 the automatic differentiation mechanics.
 :end_tab:
 
-## Tied Parameters
+## [**Tied Parameters**]
 
 Often, we want to share parameters across multiple layers.
 Let us see how to do this elegantly.

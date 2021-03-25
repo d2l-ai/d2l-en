@@ -89,8 +89,8 @@ when defining our own block,
 we only need to worry about parameters
 and the forward propagation function.
 
-To begin, we revisit the code
-that we used to implement MLPs
+[**To begin, we revisit the code
+that we used to implement MLPs**]
 (:numref:`sec_mlp_concise`).
 The following code generates a network
 with one fully-connected hidden layer
@@ -165,7 +165,7 @@ the `Block` class's `__call__` function.
 In this example, we constructed
 our model by instantiating an `nn.Sequential`, with layers in the order
 that they should be executed passed as arguments.
-In short, `nn.Sequential` defines a special kind of `Module`,
+In short, (**`nn.Sequential` defines a special kind of `Module`**),
 the class that presents a block in PyTorch.
 It maintains an ordered list of constituent `Module`s.
 Note that each of the two fully-connected layers is an instance of the `Linear` class
@@ -197,7 +197,7 @@ a slick Python trick achieved via
 the Block class's `__call__` function.
 :end_tab:
 
-## A Custom Block
+## [**A Custom Block**]
 
 Perhaps the easiest way to develop intuition
 about how a block works
@@ -297,9 +297,9 @@ and training them on different data.
 Naturally, we would expect them
 to represent two different learned models.
 
-We instantiate the MLP's layers
+We [**instantiate the MLP's layers**]
 in the constructor
-and subsequently invoke these layers
+(**and subsequently invoke these layers**)
 on each call to the forward propagation function.
 Note a few key details.
 First, our customized `__init__` function
@@ -344,7 +344,7 @@ such as when addressing
 convolutional neural networks.
 
 
-## The Sequential Block
+## [**The Sequential Block**]
 
 We can now take a closer look
 at how the `Sequential` class works.
@@ -474,7 +474,7 @@ for the `Sequential` class
 (as described in :numref:`sec_mlp_concise`).
 
 
-## Executing Code in the Forward Propagation Function
+## [**Executing Code in the Forward Propagation Function**]
 
 The `Sequential` class makes model construction easy,
 allowing us to assemble new architectures
@@ -614,8 +614,8 @@ net = FixedHiddenMLP()
 net(X)
 ```
 
-We can mix and match various
-ways of assembling blocks together.
+We can [**mix and match various
+ways of assembling blocks together.**]
 In the following example, we nest blocks
 in some creative ways.
 
