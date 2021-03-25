@@ -41,9 +41,9 @@ that Yann and his colleague Leon Bottou wrote in the 1990s!
 
 ## LeNet
 
-At a high level, LeNet (LeNet-5) consists of two parts:
+At a high level, (**LeNet (LeNet-5) consists of two parts:
 (i) a convolutional encoder consisting of two convolutional layers; and
-(ii) a dense block consisting of three fully-connected layers;
+(ii) a dense block consisting of three fully-connected layers**);
 The architecture is summarized in :numref:`img_lenet`.
 
 ![Data flow in LeNet. The input is a handwritten digit, the output a probability over 10 possible outcomes.](../img/lenet.svg)
@@ -156,7 +156,7 @@ the original LeNet-5 architecture.
 By passing a single-channel (black and white)
 $28 \times 28$ image through the network
 and printing the output shape at each layer,
-we can inspect the model to make sure
+we can [**inspect the model**] to make sure
 that its operations line up with
 what we expect from :numref:`img_lenet_vert`.
 
@@ -209,7 +209,7 @@ matches the number of classes.
 ## Training
 
 Now that we have implemented the model,
-let us run an experiment to see how LeNet fares on Fashion-MNIST.
+let us [**run an experiment to see how LeNet fares on Fashion-MNIST**].
 
 ```{.python .input}
 #@tab all
@@ -226,8 +226,8 @@ If you have access to a GPU, this might be a good time
 to put it into action to speed up training.
 
 :begin_tab:`mxnet, pytorch`
-For evaluation, we need to make a slight modification
-to the `evaluate_accuracy` function that we described
+For evaluation, we need to [**make a slight modification
+to the `evaluate_accuracy` function**] that we described
 in :numref:`sec_softmax_scratch`.
 Since the full dataset is in the main memory,
 we need to copy it to the GPU memory before the model uses GPU to compute with the dataset.
@@ -267,7 +267,7 @@ def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     return metric[0] / metric[1]
 ```
 
-We also need to update our training function to deal with GPUs.
+We also need to [**update our training function to deal with GPUs.**]
 Unlike the `train_epoch_ch3` defined in :numref:`sec_softmax_scratch`,
 we now need to move each minibatch of data
 to our designated device (hopefully, the GPU)
@@ -415,7 +415,7 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
     return net
 ```
 
-Now let us train and evaluate the LeNet-5 model.
+[**Now let us train and evaluate the LeNet-5 model.**]
 
 ```{.python .input}
 #@tab all

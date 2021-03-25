@@ -92,8 +92,8 @@ That is to say, using the $2\times 2$ maximum pooling layer,
 we can still detect if the pattern recognized by the convolutional layer
 moves no more than one element in height or width.
 
-In the code below, we implement the forward propagation
-of the pooling layer in the `pool2d` function.
+In the code below, we (**implement the forward propagation
+of the pooling layer**) in the `pool2d` function.
 This function is similar to the `corr2d` function
 in :numref:`sec_conv_layer`.
 However, here we have no kernel, computing the output
@@ -143,7 +143,7 @@ def pool2d(X, pool_size, mode='max'):
     return Y
 ```
 
-We can construct the input tensor `X` in :numref:`fig_pooling` to validate the output of the two-dimensional maximum pooling layer.
+We can construct the input tensor `X` in :numref:`fig_pooling` to [**validate the output of the two-dimensional maximum pooling layer**].
 
 ```{.python .input}
 #@tab all
@@ -151,14 +151,14 @@ X = d2l.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])
 pool2d(X, (2, 2))
 ```
 
-Also, we experiment with the average pooling layer.
+Also, we experiment with (**the average pooling layer**).
 
 ```{.python .input}
 #@tab all
 pool2d(X, (2, 2), 'avg')
 ```
 
-## Padding and Stride
+## [**Padding and Stride**]
 
 As with convolutional layers, pooling layers
 can also change the output shape.
@@ -187,8 +187,8 @@ X = d2l.reshape(d2l.arange(16, dtype=d2l.float32), (1, 4, 4, 1))
 X
 ```
 
-By default, the stride and the pooling window in the instance from the framework's built-in class
-have the same shape.
+By default, (**the stride and the pooling window in the instance from the framework's built-in class
+have the same shape.**)
 Below, we use a pooling window of shape `(3, 3)`,
 so we get a stride shape of `(3, 3)` by default.
 
@@ -211,7 +211,7 @@ pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3])
 pool2d(X)
 ```
 
-The stride and padding can be manually specified.
+[**The stride and padding can be manually specified.**]
 
 ```{.python .input}
 pool2d = nn.MaxPool2D(3, padding=1, strides=2)
@@ -241,8 +241,8 @@ and specify the padding and stride for height and width, respectively.
 :end_tab:
 
 :begin_tab:`pytorch`
-Of course, we can specify an arbitrary rectangular pooling window
-and specify the padding and stride for height and width, respectively.
+Of course, we can (**specify an arbitrary rectangular pooling window
+and specify the padding and stride for height and width**), respectively.
 For `nn.MaxPool2D` padding should be smaller than half of the kernel_size.
 If the condition is not met, we can first pad the input using
 `nn.functional.pad` and then pass it to the pooling layer.
@@ -282,7 +282,7 @@ pool2d(X_padded)
 ## Multiple Channels
 
 When processing multi-channel input data,
-the pooling layer pools each input channel separately,
+[**the pooling layer pools each input channel separately**],
 rather than summing the inputs up over channels
 as in a convolutional layer.
 This means that the number of output channels for the pooling layer

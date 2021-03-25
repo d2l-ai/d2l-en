@@ -53,7 +53,7 @@ $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$
 
 
 To make sure we really understand what is going on here,
-we can implement cross-correlation operations with multiple input channels ourselves.
+we can (**implement cross-correlation operations with multiple input channels**) ourselves.
 Notice that all we are doing is performing one cross-correlation operation
 per channel and then adding up the results.
 
@@ -90,7 +90,7 @@ def corr2d_multi_in(X, K):
 
 We can construct the input tensor `X` and the kernel tensor `K`
 corresponding to the values in :numref:`fig_conv_multi_in`
-to validate the output of the cross-correlation operation.
+to (**validate the output**) of the cross-correlation operation.
 
 ```{.python .input}
 #@tab all
@@ -134,7 +134,7 @@ from the convolution kernel corresponding to that output channel
 and takes input from all channels in the input tensor.
 
 We implement a cross-correlation function
-to calculate the output of multiple channels as shown below.
+to [**calculate the output of multiple channels**] as shown below.
 
 ```{.python .input}
 #@tab all
@@ -170,7 +170,7 @@ corr2d_multi_in_out(X, K)
 
 ## $1\times 1$ Convolutional Layer
 
-At first, a $1 \times 1$ convolution, i.e., $k_h = k_w = 1$,
+At first, a [**$1 \times 1$ convolution**], i.e., $k_h = k_w = 1$,
 does not seem to make much sense.
 After all, a convolution correlates adjacent pixels.
 A $1 \times 1$ convolution obviously does not.
@@ -218,7 +218,8 @@ def corr2d_multi_in_out_1x1(X, K):
     c_o = K.shape[0]
     X = d2l.reshape(X, (c_i, h * w))
     K = d2l.reshape(K, (c_o, c_i))
-    Y = d2l.matmul(K, X)  # Matrix multiplication in the fully-connected layer
+    # Matrix multiplication in the fully-connected layer
+    Y = d2l.matmul(K, X)
     return d2l.reshape(Y, (c_o, h, w))
 ```
 

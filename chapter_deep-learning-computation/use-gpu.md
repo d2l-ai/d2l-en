@@ -336,9 +336,9 @@ print(X)
 print(Z)
 ```
 
-Now that (**the data are on the same GPU
+Now that [**the data are on the same GPU
 (both `Z` and `Y` are),
-we can add them up.**)
+we can add them up.**]
 
 ```{.python .input}
 #@tab all
@@ -461,7 +461,7 @@ When the input is a tensor on the GPU, the model will calculate the result on th
 net(X)
 ```
 
-Let us [**confirm that the model parameters are stored on the same GPU.**]
+Let us (**confirm that the model parameters are stored on the same GPU.**)
 
 ```{.python .input}
 net[0].weight.data().ctx

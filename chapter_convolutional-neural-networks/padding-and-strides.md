@@ -100,7 +100,7 @@ with the window centered on `X[i, j]`.
 
 In the following example, we create a two-dimensional convolutional layer
 with a height and width of 3
-and apply 1 pixel of padding on all sides.
+and (**apply 1 pixel of padding on all sides.**)
 Given an input with a height and width of 8,
 we find that the height and width of the output is also 8.
 
@@ -179,7 +179,7 @@ comp_conv2d(conv2d, X).shape
 
 When the height and width of the convolution kernel are different,
 we can make the output and input have the same height and width
-by setting different padding numbers for height and width.
+by [**setting different padding numbers for height and width.**]
 
 ```{.python .input}
 # Here, we use a convolution kernel with a height of 5 and a width of 3. The
@@ -248,7 +248,7 @@ Going a step further, if the input height and width
 are divisible by the strides on the height and width,
 then the output shape will be $(n_h/s_h) \times (n_w/s_w)$.
 
-Below, we set the strides on both the height and width to 2,
+Below, we [**set the strides on both the height and width to 2**],
 thus halving the input height and width.
 
 ```{.python .input}
@@ -268,7 +268,7 @@ conv2d = tf.keras.layers.Conv2D(1, kernel_size=3, padding='same', strides=2)
 comp_conv2d(conv2d, X).shape
 ```
 
-Next, we will look at a slightly more complicated example.
+Next, we will look at (**a slightly more complicated example**).
 
 ```{.python .input}
 conv2d = nn.Conv2D(1, kernel_size=(3, 5), padding=(0, 1), strides=(3, 4))
