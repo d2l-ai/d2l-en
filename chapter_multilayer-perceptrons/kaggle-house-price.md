@@ -51,7 +51,7 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 ```
 
 The following `download` function downloads a dataset,
-caches it in a local directory (`../data` by default)
+caches it in a local directory (`../data` by default),
 and returns the name of the downloaded file.
 If a file corresponding to this dataset
 already exists in the cache directory
