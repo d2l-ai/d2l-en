@@ -243,38 +243,31 @@ and specify the padding and stride for height and width, respectively.
 :begin_tab:`pytorch`
 Of course, we can (**specify an arbitrary rectangular pooling window
 and specify the padding and stride for height and width**), respectively.
-For `nn.MaxPool2D` padding should be smaller than half of the kernel_size.
-If the condition is not met, we can first pad the input using
-`nn.functional.pad` and then pass it to the pooling layer.
 :end_tab:
 
 :begin_tab:`tensorflow`
 Of course, we can specify an arbitrary rectangular pooling window
 and specify the padding and stride for height and width, respectively.
-In TensorFlow, to implement a padding of 1 all the way around the tensor, a function designed for padding 
-must be invoked using `tf.pad`. This will implement the required padding and allow the aforementioned (3, 3) pooling with a (2, 2) stride to perform
-similar to those in PyTorch and MXNet. When padding in this way, the built-in `padding` variable must be set to `valid`.
 :end_tab:
 
 ```{.python .input}
-pool2d = nn.MaxPool2D((2, 3), padding=(1, 2), strides=(2, 3))
+pool2d = nn.MaxPool2D((2, 3), padding=(0, 1), strides=(2, 3))
 pool2d(X)
 ```
 
 ```{.python .input}
 #@tab pytorch
-X_pad = nn.functional.pad(X, (2, 2, 1, 1))
-pool2d = nn.MaxPool2d((2, 3), stride=(2, 3))
-pool2d(X_pad)
+pool2d = nn.MaxPool2d((2, 3), stride=(2, 3), padding=(0, 1))
+pool2d(X)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-paddings = tf.constant([[0, 0], [1, 1], [2, 1], [0, 0]])
+paddings = tf.constant([[0, 0], [0, 0], [1, 1], [0, 0]])
 X_padded = tf.pad(X, paddings, "CONSTANT")
 
 pool2d = tf.keras.layers.MaxPool2D(pool_size=[2, 3], padding='valid',
-                                   strides=(2,3))
+                                   strides=(2, 3))
 pool2d(X_padded)
 ```
 
