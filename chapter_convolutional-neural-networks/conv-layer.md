@@ -280,9 +280,7 @@ conv2d.initialize()
 # size (number of examples in the batch) and the number of channels are both 1
 X = X.reshape(1, 1, 6, 8)
 Y = Y.reshape(1, 1, 6, 7)
-
-# Set up the learning rate
-lr = 3e-2
+lr = 3e-2  # Learning rate
 
 for i in range(10):
     with autograd.record():
@@ -306,9 +304,7 @@ conv2d = nn.Conv2d(1,1, kernel_size=(1, 2), bias=False)
 # size (number of examples in the batch) and the number of channels are both 1
 X = X.reshape((1, 1, 6, 8))
 Y = Y.reshape((1, 1, 6, 7))
-
-# Set up the learning rate
-lr = 3e-2
+lr = 3e-2  # Learning rate
 
 for i in range(10):
     Y_hat = conv2d(X)
@@ -332,9 +328,7 @@ conv2d = tf.keras.layers.Conv2D(1, (1, 2), use_bias=False)
 # size (number of examples in the batch) and the number of channels are both 1
 X = tf.reshape(X, (1, 6, 8, 1))
 Y = tf.reshape(Y, (1, 6, 7, 1))
-
-# Set up the learning rate
-lr = 3e-2
+lr = 3e-2  # Learning rate
 
 Y_hat = conv2d(X)
 for i in range(10):
