@@ -281,13 +281,16 @@ conv2d.initialize()
 X = X.reshape(1, 1, 6, 8)
 Y = Y.reshape(1, 1, 6, 7)
 
+# Set up the learning rate
+lr = 3e-2
+
 for i in range(10):
     with autograd.record():
         Y_hat = conv2d(X)
         l = (Y_hat - Y) ** 2
     l.backward()
     # Update the kernel
-    conv2d.weight.data()[:] -= 3e-2 * conv2d.weight.grad()
+    conv2d.weight.data()[:] -= lr * conv2d.weight.grad()
     if (i + 1) % 2 == 0:
         print(f'batch {i + 1}, loss {float(l.sum()):.3f}')
 ```
@@ -304,13 +307,16 @@ conv2d = nn.Conv2d(1,1, kernel_size=(1, 2), bias=False)
 X = X.reshape((1, 1, 6, 8))
 Y = Y.reshape((1, 1, 6, 7))
 
+# Set up the learning rate
+lr = 3e-2
+
 for i in range(10):
     Y_hat = conv2d(X)
     l = (Y_hat - Y) ** 2
     conv2d.zero_grad()
     l.sum().backward()
     # Update the kernel
-    conv2d.weight.data[:] -= 3e-2 * conv2d.weight.grad
+    conv2d.weight.data[:] -= lr * conv2d.weight.grad
     if (i + 1) % 2 == 0:
         print(f'batch {i + 1}, loss {l.sum():.3f}')
 ```
@@ -327,6 +333,9 @@ conv2d = tf.keras.layers.Conv2D(1, (1, 2), use_bias=False)
 X = tf.reshape(X, (1, 6, 8, 1))
 Y = tf.reshape(Y, (1, 6, 7, 1))
 
+# Set up the learning rate
+lr = 3e-2
+
 Y_hat = conv2d(X)
 for i in range(10):
     with tf.GradientTape(watch_accessed_variables=False) as g:
@@ -334,7 +343,7 @@ for i in range(10):
         Y_hat = conv2d(X)
         l = (abs(Y_hat - Y)) ** 2
         # Update the kernel
-        update = tf.multiply(3e-2, g.gradient(l, conv2d.weights[0]))
+        update = tf.multiply(lr, g.gradient(l, conv2d.weights[0]))
         weights = conv2d.get_weights()
         weights[0] = conv2d.weights[0] - update
         conv2d.set_weights(weights)
