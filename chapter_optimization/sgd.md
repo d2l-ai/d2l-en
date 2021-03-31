@@ -172,67 +172,71 @@ $$\mathbf{x}_{t+1} = \mathbf{x}_{t} - \eta_t \partial_\mathbf{x} f(\boldsymbol{\
 where $f(\boldsymbol{\xi}_t, \mathbf{x})$
 is the objective function 
 with respect to the training example $\boldsymbol{\xi}_t$
+drawn from some distribution
 at step $t$ and $\mathbf{x}$ is the model parameter.
+Denote by
 
+$$R(\mathbf{x}) = E_{\boldsymbol{\xi}}[f(\boldsymbol{\xi}, \mathbf{x})]$$
 
+the expected risk and by $R^*$ its minimum with regard to $\mathbf{x}$. Last let $\mathbf{x}^*$ be the minimizer (we assume that it exists within the domain where $\mathbf{x}$ is defined). In this case we can track the distance between the current parameter $\mathbf{x}_t$ at time $t$ and the risk minimizer $\mathbf{x}^*$ and see whether it improves over time:
 
-In particular, assume that $\boldsymbol{\xi}_t$ is drawn from some distribution $P(\boldsymbol{\xi})$ and that $f(\boldsymbol{\xi}, \mathbf{x})$ is a convex function in $\mathbf{x}$ for all $\boldsymbol{\xi}$. Last denote by
+$$\begin{aligned}    &\|\mathbf{x}_{t+1} - \mathbf{x}^*\|^2 \\ =& \|\mathbf{x}_{t} - \eta_t \partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x}) - \mathbf{x}^*\|^2 \\    =& \|\mathbf{x}_{t} - \mathbf{x}^*\|^2 + \eta_t^2 \|\partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})\|^2 - 2 \eta_t    \left\langle \mathbf{x}_t - \mathbf{x}^*, \partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})\right\rangle.   \end{aligned}$$
+:eqlabel:`eqref_sgd-L`
 
-$$R(\mathbf{x}) = E_{\boldsymbol{\xi} \sim P}[f(\boldsymbol{\xi}, \mathbf{x})]$$
-
-the expected risk and by $R^*$ its minimum with regard to $\mathbf{x}$. Last let $\mathbf{x}^*$ be the minimizer (we assume that it exists within the domain which $\mathbf{x}$ is defined). In this case we can track the distance between the current parameter $\mathbf{x}_t$ and the risk minimizer $\mathbf{x}^*$ and see whether it improves over time:
-
-$$\begin{aligned}
-    \|\mathbf{x}_{t+1} - \mathbf{x}^*\|^2 & = \|\mathbf{x}_{t} - \eta_t \partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x}) - \mathbf{x}^*\|^2 \\
-    & = \|\mathbf{x}_{t} - \mathbf{x}^*\|^2 + \eta_t^2 \|\partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})\|^2 - 2 \eta_t
-    \left\langle \mathbf{x}_t - \mathbf{x}^*, \partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})\right\rangle.
-   \end{aligned}
-$$
-
-The gradient $\partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})$ can be bounded from above by some Lipschitz constant $L$, hence we have that
+We assume that the gradient $\partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})$ is bounded  by some  constant $L$, hence we have that
 
 $$\eta_t^2 \|\partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})\|^2 \leq \eta_t^2 L^2.$$
+:eqlabel:`eqref_sgd-f-xi-xstar`
 
-We are mostly interested in how the distance between $\mathbf{x}_t$ and $\mathbf{x}^*$ changes *in expectation*. In fact, for any specific sequence of steps the distance might well increase, depending on whichever $\boldsymbol{\xi}_t$ we encounter. Hence we need to bound the inner product. By convexity we have that
+We are mostly interested in how the distance between $\mathbf{x}_t$ and $\mathbf{x}^*$ changes *in expectation*. In fact, for any specific sequence of steps the distance might well increase, depending on whichever $\boldsymbol{\xi}_t$ we encounter. Hence we need to bound the inner product. 
+Since for any convex function $f$ it holds that
+$f(\mathbf{y}) \geq f(\mathbf{x}) + \langle f'(\mathbf{x}), \mathbf{y} - \mathbf{x} \rangle$
+for all $\mathbf{x}$ and $\mathbf{y}$,
+by convexity we have
 
-$$
-f(\boldsymbol{\xi}_t, \mathbf{x}^*) \geq f(\boldsymbol{\xi}_t, \mathbf{x}_t) + \left\langle \mathbf{x}^* - \mathbf{x}_t, \partial_{\mathbf{x}} f(\boldsymbol{\xi}_t, \mathbf{x}_t) \right\rangle.
-$$
+$$f(\boldsymbol{\xi}_t, \mathbf{x}^*) \geq f(\boldsymbol{\xi}_t, \mathbf{x}_t) + \left\langle \mathbf{x}^* - \mathbf{x}_t, \partial_{\mathbf{x}} f(\boldsymbol{\xi}_t, \mathbf{x}_t) \right\rangle.$$
 
-Using both inequalities and plugging it into the above we obtain a bound on the distance between parameters at time $t+1$ as follows:
+Plugging both inequalities :eqref:`eqref_sgd-L` and :eqref:`eqref_sgd-f-xi-xstar` into :eqref:`eqref_sgd-xt-xstar` we obtain a bound on the distance between parameters at time $t+1$ as follows:
 
 $$\|\mathbf{x}_{t} - \mathbf{x}^*\|^2 - \|\mathbf{x}_{t+1} - \mathbf{x}^*\|^2 \geq 2 \eta_t (f(\boldsymbol{\xi}_t, \mathbf{x}_t) - f(\boldsymbol{\xi}_t, \mathbf{x}^*)) - \eta_t^2 L^2.$$
+:eqlabel:`eqref_sgd-xt-diff`
 
-This means that we make progress as long as the expected difference between current loss and the optimal loss outweighs $\eta_t L^2$. Since the former is bound to converge to $0$ it follows that the learning rate $\eta_t$ also needs to vanish.
+This means that we make progress as long as the  difference between current loss and the optimal loss outweighs $\eta_t L^2/2$. Since this difference is bound to converge to zero it follows that the learning rate $\eta_t$ also needs to *vanish*.
 
-Next we take expectations over this expression. This yields
+Next we take expectations over :eqref:`eqref_sgd-xt-diff`. This yields
 
-$$E_{\mathbf{x}_t}\left[\|\mathbf{x}_{t} - \mathbf{x}^*\|^2\right] - E_{\mathbf{x}_{t+1}\mid \mathbf{x}_t}\left[\|\mathbf{x}_{t+1} - \mathbf{x}^*\|^2\right] \geq 2 \eta_t [E[R[\mathbf{x}_t]] - R^*] -  \eta_t^2 L^2.$$
+$$E\left[\|\mathbf{x}_{t} - \mathbf{x}^*\|^2\right] - E\left[\|\mathbf{x}_{t+1} - \mathbf{x}^*\|^2\right] \geq 2 \eta_t [E[R(\mathbf{x}_t)] - R^*] -  \eta_t^2 L^2.$$
 
-The last step involves summing over the inequalities for $t \in \{t, \ldots, T\}$. Since the sum telescopes and by dropping the lower term we obtain
+The last step involves summing over the inequalities for $t \in \{1, \ldots, T\}$. Since the sum telescopes and by dropping the lower term we obtain
 
-$$\|\mathbf{x}_{0} - \mathbf{x}^*\|^2 \geq 2 \sum_{t=1}^T \eta_t [E[R[\mathbf{x}_t]] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
+$$\|\mathbf{x}_1 - \mathbf{x}^*\|^2 \geq 2 \left (\sum_{t=1}^T   \eta_t \right) [E[R(\mathbf{x}_t)] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
+:eqlabel:`eq_sgd-x1-xstar`
 
-Note that we exploited that $\mathbf{x}_0$ is given and thus the expectation can be dropped. Last define
+Note that we exploited that $\mathbf{x}_1$ is given and thus the expectation can be dropped. Last define
 
-$$\bar{\mathbf{x}} := \frac{\sum_{t=1}^T \eta_t \mathbf{x}_t}{\sum_{t=1}^T \eta_t}.$$
+$$\bar{\mathbf{x}} \stackrel{\mathrm{def}}{=} \frac{\sum_{t=1}^T \eta_t \mathbf{x}_t}{\sum_{t=1}^T \eta_t}.$$
 
-Then by convexity it follows that
+Since 
 
-$$\sum_t \eta_t E[R[\mathbf{x}_t]] \geq \sum \eta_t \cdot \left[E[\bar{\mathbf{x}}]\right].$$
+$$E\left(\frac{\sum_{t=1}^T \eta_t R(\mathbf{x}_t)}{\sum_{t=1}^T \eta_t}\right) = \frac{\sum_{t=1}^T \eta_t E[R(\mathbf{x}_t)]}{\sum_{t=1}^T \eta_t} = E[R(\mathbf{x}_t)],$$
 
-Plugging this into the above inequality yields the bound
+by Jensen's inequality (setting $i=t$, $\alpha_i = \eta_t/\sum_{t=1}^T \eta_t$ in :eqref:`eq_jensens-inequality`) and convexity of $R$ it follows that $E[R(\mathbf{x}_t)] \geq E[R(\bar{\mathbf{x}})]$, thus
+
+$$\sum_{t=1}^T \eta_t E[R(\mathbf{x}_t)] \geq \sum_{t=1}^T \eta_t  E\left[R(\bar{\mathbf{x}})\right].$$
+
+Plugging this into the inequality :eqref:`eq_sgd-x1-xstar` yields the bound
 
 $$
-\left[E[\bar{\mathbf{x}}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t}.
+\left[E[\bar{\mathbf{x}}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t},
 $$
 
-Here $r^2 := \|\mathbf{x}_0 - \mathbf{x}^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how rapidly the loss function changes via the Lipschitz constant $L$ and how far away from optimality the initial value is $r$. Note that the bound is in terms of $\bar{\mathbf{x}}$ rather than $\mathbf{x}_T$. This is the case since $\bar{\mathbf{x}}$ is a smoothed version of the optimization path. Now let us analyze some choices for $\eta_t$.
+where $r^2 \stackrel{\mathrm{def}}{=} \|\mathbf{x}_1 - \mathbf{x}^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how 
+the norm of stochastic gradient is bounded ($L$) and how far away from optimality the initial parameter value is ($r$). Note that the bound is in terms of $\bar{\mathbf{x}}$ rather than $\mathbf{x}_T$. This is the case since $\bar{\mathbf{x}}$ is a smoothed version of the optimization path. 
+Whenever $r, L$, and $T$ are known we can pick the learning rate $\eta = r/(L \sqrt{T})$. This yields as upper bound $rL/\sqrt{T}$. That is, we converge with rate $\mathcal{O}(1/\sqrt{T})$ to the optimal solution.
 
-* **Known Time Horizon**. Whenever $r, L$ and $T$ are known we can pick $\eta = r/L \sqrt{T}$. This yields as upper bound $r L (1 + 1/T)/2\sqrt{T} < rL/\sqrt{T}$. That is, we converge with rate $\mathcal{O}(1/\sqrt{T})$ to the optimal solution.
-* **Unknown Time Horizon**. Whenever we want to have a good solution for *any* time $T$ we can pick $\eta = \mathcal{O}(1/\sqrt{T})$. This costs us an extra logarithmic factor and it leads to an upper bound of the form $\mathcal{O}(\log T / \sqrt{T})$.
 
-Note that for strongly convex losses $f(\boldsymbol{\xi}, \mathbf{x}') \geq f(\boldsymbol{\xi}, \mathbf{x}) + \langle \mathbf{x}'-\mathbf{x}, \partial_\mathbf{x} f(\boldsymbol{\xi}, \mathbf{x}) \rangle + \frac{\lambda}{2} \|\mathbf{x}-\mathbf{x}'\|^2$ we can design even more rapidly converging optimization schedules. In fact, an exponential decay in $\eta$ leads to a bound of the form $\mathcal{O}(\log T / T)$.
+
+
 
 ## Stochastic Gradients and Finite Samples
 
@@ -252,6 +256,8 @@ A similar reasoning shows that the probability of picking a sample exactly once 
 * Problems occur when the learning rate is too small or too large. In practice  a suitable learning rate is often found only after multiple experiments.
 * When there are more examples in the training dataset, it costs more to compute each iteration for gradient descent, so stochastic gradient descent is preferred in these cases.
 * Optimality guarantees for stochastic gradient descent are in general not available in nonconvex cases since the number of local minima that require checking might well be exponential.
+
+
 
 
 ## Exercises
