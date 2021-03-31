@@ -1,5 +1,5 @@
 # Attention Pooling: Nadaraya-Watson Kernel Regression
-:label:`sec_nadaraya-waston`
+:label:`sec_nadaraya-watson`
 
 Now you know the major components of attention mechanisms under the framework in :numref:`fig_qkv`.
 To recapitulate,
@@ -109,19 +109,19 @@ Obviously,
 average pooling omits the inputs $x_i$.
 A better idea was proposed
 by Nadaraya :cite:`Nadaraya.1964`
-and Waston :cite:`Watson.1964`
+and Watson :cite:`Watson.1964`
 to weigh the outputs $y_i$ according to their input locations:
 
 $$f(x) = \sum_{i=1}^n \frac{K(x - x_i)}{\sum_{j=1}^n K(x - x_j)} y_i,$$
-:eqlabel:`eq_nadaraya-waston`
+:eqlabel:`eq_nadaraya-watson`
 
 where $K$ is a *kernel*.
-The estimator in :eqref:`eq_nadaraya-waston`
+The estimator in :eqref:`eq_nadaraya-watson`
 is called *Nadaraya-Watson kernel regression*.
 Here we will not dive into details of kernels.
 Recall the framework of attention mechanisms in :numref:`fig_qkv`.
 From the perspective of attention,
-we can rewrite :eqref:`eq_nadaraya-waston`
+we can rewrite :eqref:`eq_nadaraya-watson`
 in a more generalized form of *attention pooling*:
 
 $$f(x) = \sum_{i=1}^n \alpha(x, x_i) y_i,$$
@@ -150,17 +150,17 @@ $$
 
 Plugging the Gaussian kernel into
 :eqref:`eq_attn-pooling` and
-:eqref:`eq_nadaraya-waston` gives
+:eqref:`eq_nadaraya-watson` gives
 
 $$\begin{aligned} f(x) &=\sum_{i=1}^n \alpha(x, x_i) y_i\\ &= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}(x - x_i)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}(x - x_j)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}(x - x_i)^2\right) y_i. \end{aligned}$$
-:eqlabel:`eq_nadaraya-waston-gaussian`
+:eqlabel:`eq_nadaraya-watson-gaussian`
 
-In :eqref:`eq_nadaraya-waston-gaussian`,
+In :eqref:`eq_nadaraya-watson-gaussian`,
 a key $x_i$ that is closer to the given query $x$ will get
 *more attention* via a *larger attention weight* assigned to the key's corresponding value $y_i$.
 
 Notably, Nadaraya-Watson kernel regression is a nonparametric model;
-thus :eqref:`eq_nadaraya-waston-gaussian`
+thus :eqref:`eq_nadaraya-watson-gaussian`
 is an example of *nonparametric attention pooling*.
 In the following, we plot the prediction based on this
 nonparametric attention model.
@@ -222,18 +222,18 @@ given enough data this model converges to the optimal solution.
 Nonetheless,
 we can easily integrate learnable parameters into attention pooling.
 
-As an example, slightly different from :eqref:`eq_nadaraya-waston-gaussian`,
+As an example, slightly different from :eqref:`eq_nadaraya-watson-gaussian`,
 in the following
 the distance between the query $x$ and the key $x_i$
 is multiplied a learnable parameter $w$:
 
 
 $$\begin{aligned}f(x) &= \sum_{i=1}^n \alpha(x, x_i) y_i \\&= \sum_{i=1}^n \frac{\exp\left(-\frac{1}{2}((x - x_i)w)^2\right)}{\sum_{j=1}^n \exp\left(-\frac{1}{2}((x - x_i)w)^2\right)} y_i \\&= \sum_{i=1}^n \mathrm{softmax}\left(-\frac{1}{2}((x - x_i)w)^2\right) y_i.\end{aligned}$$
-:eqlabel:`eq_nadaraya-waston-gaussian-para`
+:eqlabel:`eq_nadaraya-watson-gaussian-para`
 
 In the rest of the section,
 we will train this model by learning the parameter of
-the attention pooling in :eqref:`eq_nadaraya-waston-gaussian-para`.
+the attention pooling in :eqref:`eq_nadaraya-watson-gaussian-para`.
 
 
 ### Batch Matrix Multiplication
@@ -283,7 +283,7 @@ Using minibatch matrix multiplication,
 below we define the parametric version
 of Nadaraya-Watson kernel regression
 based on the parametric attention pooling in
-:eqref:`eq_nadaraya-waston-gaussian-para`.
+:eqref:`eq_nadaraya-watson-gaussian-para`.
 
 ```{.python .input}
 class NWKernelRegression(nn.Block):

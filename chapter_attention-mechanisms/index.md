@@ -58,7 +58,7 @@ and reinforcement learning.
 :maxdepth: 2
 
 attention-cues
-nadaraya-waston
+nadaraya-watson
 attention-scoring-functions
 bahdanau-attention
 multihead-attention
