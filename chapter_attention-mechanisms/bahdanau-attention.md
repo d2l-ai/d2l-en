@@ -1,4 +1,5 @@
 # Bahdanau Attention
+
 :label:`sec_seq2seq_attention`
 
 We studied the machine translation
@@ -7,7 +8,7 @@ where we designed
 an encoder-decoder architecture based on two RNNs
 for sequence to sequence learning.
 Specifically,
-the RNN encoder 
+the RNN encoder
 transforms
 a variable-length sequence
 into a fixed-shape context variable,
@@ -21,7 +22,6 @@ are useful for decoding a certain token,
 the *same* context variable
 that encodes the entire input sequence
 is still used at each decoding step.
-
 
 In a separate but related
 challenge of handwriting generation for a given text sequence,
@@ -40,7 +40,7 @@ by treating the context variable as an output of attention pooling.
 
 ## Model
 
-When describing 
+When describing
 Bahdanau attention
 for the RNN encoder-decoder below,
 we will follow the same notation in
@@ -51,7 +51,7 @@ in :numref:`sec_seq2seq`
 except that
 the context variable
 $\mathbf{c}$
-in 
+in
 :eqref:`eq_seq2seq_s_t`
 is replaced by
 $\mathbf{c}_{t'}$
@@ -75,12 +75,11 @@ using the additive attention scoring function
 defined by
 :eqref:`eq_additive-attn`.
 
-
-Slightly different from 
-the vanilla RNN encoder-decoder architecture 
+Slightly different from
+the vanilla RNN encoder-decoder architecture
 in :numref:`fig_seq2seq_details`,
 the same architecture
-with Bahdanau attention is depicted in 
+with Bahdanau attention is depicted in
 :numref:`fig_s2s_attention_details`.
 
 ![Layers in an RNN encoder-decoder model with Bahdanau attention.](../img/seq2seq-attention-details.svg)
@@ -107,7 +106,7 @@ with Bahdanau attention,
 we only need to redefine the decoder.
 To visualize the learned attention weights more conveniently,
 the following `AttentionDecoder` class
-defines the base interface for 
+defines the base interface for
 decoders with attention mechanisms.
 
 ```{.python .input}
@@ -127,7 +126,7 @@ Now let us implement
 the RNN decoder with Bahdanau attention
 in the following `Seq2SeqAttentionDecoder` class.
 The state of the decoder
-is initialized with 
+is initialized with
 i) the encoder final-layer hidden states at all the time steps (as keys and values of the attention);
 ii) the encoder all-layer hidden state at the final time step (to initialize the hidden state of the decoder);
 and iii) the encoder valid length (to exclude the padding tokens in attention pooling).
@@ -237,7 +236,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         return self._attention_weights
 ```
 
-In the following, we test the implemented 
+In the following, we test the implemented
 decoder with Bahdanau attention
 using a minibatch of 4 sequence inputs
 of 7 time steps.
@@ -270,7 +269,6 @@ output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 ```
 
 ## Training
-
 
 Similar to :numref:`sec_seq2seq_training`,
 here we specify hyperparemeters,
@@ -323,14 +321,14 @@ when translating the last English sentence,
 we can see that each query assigns non-uniform weights
 over key-value pairs.
 It shows that at each decoding step,
-different parts of the input sequences 
+different parts of the input sequences
 are selectively aggregated in the attention pooling.
 
 ```{.python .input}
 # Plus one to include the end-of-sequence token
 d2l.show_heatmaps(
     attention_weights[:, :, :, :len(engs[-1].split()) + 1],
-    xlabel='Key posistions', ylabel='Query posistions')
+    xlabel='Key positions', ylabel='Query positions')
 ```
 
 ```{.python .input}
@@ -338,7 +336,7 @@ d2l.show_heatmaps(
 # Plus one to include the end-of-sequence token
 d2l.show_heatmaps(
     attention_weights[:, :, :, :len(engs[-1].split()) + 1].cpu(),
-    xlabel='Key posistions', ylabel='Query posistions')
+    xlabel='Key positions', ylabel='Query positions')
 ```
 
 ## Summary
@@ -346,12 +344,10 @@ d2l.show_heatmaps(
 * When predicting a token, if not all the input tokens are relevant, the RNN encoder-decoder with Bahdanau attention selectively aggregates different parts of the input sequence. This is achieved by treating the context variable as an output of additive attention pooling.
 * In the RNN encoder-decoder, Bahdanau attention treats the decoder hidden state at the previous time step as the query, and the encoder hidden states at all the time steps as both the keys and values.
 
-
 ## Exercises
 
 1. Replace GRU with LSTM in the experiment.
 1. Modify the experiment to replace the additive attention scoring function with the scaled dot-product. How does it influence the training efficiency?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/347)
