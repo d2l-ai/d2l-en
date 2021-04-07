@@ -53,7 +53,6 @@ x_gpu1 = torch.rand(size=(4000, 4000), device=devices[0])
 x_gpu2 = torch.rand(size=(4000, 4000), device=devices[1])
 ```
 
-
 :begin_tab:`mxnet`
 Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on each of them prior to measuring.
 :end_tab:
@@ -61,7 +60,6 @@ Now we apply the function to the data. To ensure that caching does not play a ro
 :begin_tab:`pytorch`
 Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on each of them prior to measuring. `torch.cuda.synchronize()` waits for all kernels in all streams on a CUDA device to complete. It takes in a `device` argument, the device for which we need to synchronize. It uses the current device, given by `current_device()`, if the device argument is `None` (default).
 :end_tab:
-
 
 ```{.python .input}
 run(x_gpu1)  # Warm-up both devices
@@ -161,7 +159,6 @@ This is somewhat inefficient. Note that we could already start copying parts of 
 :begin_tab:`pytorch`
 This is somewhat inefficient. Note that we could already start copying parts of `y` to the CPU while the remainder of the list is still being computed. This situation occurs, e.g., when we compute the (backprop) gradient on a minibatch. The gradients of some of the parameters will be available earlier than that of others. Hence it works to our advantage to start using PCI-Express bus bandwidth while the GPU is still running. In PyTorch, several functions such as `to()` and `copy_()` admit an explicit `non_blocking` argument, which lets the caller bypass synchronization when it is unnecessary. Setting `non_blocking=True` allows us to simulate this scenario.
 :end_tab:
-
 
 ```{.python .input}
 with d2l.Benchmark('Run on GPU1 and copy to CPU'):
