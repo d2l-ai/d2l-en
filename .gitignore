@@ -29,4 +29,3 @@ build/
 .idea
 .vscode
 .pytest_cache
-.history/
