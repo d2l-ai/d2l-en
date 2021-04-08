@@ -383,9 +383,14 @@ This is quite different from what we saw previously. All print statements, as de
 :begin_tab:`mxnet` 
 1. Add `x.asnumpy()` to the first line of the `hybrid_forward` function of the `HybridNet` class in this section. Execute the code and observe the errors you encounter. Why do they happen?
 1. What happens if we add control flow, i.e., the Python statements `if` and `for` in the `hybrid_forward` function?
+1. Review the models that interest you in the previous chapters. Can you improve their computational performance by reimplementing them?
 :end_tab:
 
+:begin_tab:`pytorch,tensorflow` 
 1. Review the models that interest you in the previous chapters. Can you improve their computational performance by reimplementing them?
+:end_tab:
+
+
 
 
 :begin_tab:`mxnet`
