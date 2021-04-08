@@ -370,6 +370,7 @@ This is quite different from what we saw previously. All print statements, as de
 
 * Imperative programming makes it easy to design new models since it is possible to write code with control flow and the ability to use a large amount of the Python software ecosystem.
 * Symbolic programming requires that we specify the program and compile it before executing it. The benefit is improved performance.
+
 :begin_tab:`mxnet` 
 * MXNet is able to combine the advantages of both approaches as needed.
 * Models constructed by the `HybridSequential` and `HybridBlock` classes are able to convert imperative programs into symbolic programs by calling the `hybridize` function.
@@ -383,6 +384,7 @@ This is quite different from what we saw previously. All print statements, as de
 1. Add `x.asnumpy()` to the first line of the `hybrid_forward` function of the `HybridNet` class in this section. Execute the code and observe the errors you encounter. Why do they happen?
 1. What happens if we add control flow, i.e., the Python statements `if` and `for` in the `hybrid_forward` function?
 :end_tab:
+
 1. Review the models that interest you in the previous chapters. Can you improve their computational performance by reimplementing them?
 
 
