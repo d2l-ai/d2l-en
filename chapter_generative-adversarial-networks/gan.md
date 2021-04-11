@@ -234,7 +234,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     grads = D_tape.gradient(loss_D, net_D.trainable_variables)
     trainer_D.apply_gradients(zip(grads, net_D.trainable_weights))
     return float(loss_D)
-  ```
+```
 
 
 The generator is updated similarly. Here we reuse the cross-entropy loss but change the label of the fake data from $0$ to $1$.
