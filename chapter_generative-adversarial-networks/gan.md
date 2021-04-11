@@ -290,7 +290,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
     grads = G_tape.gradient(loss_G, net_G.trainable_variables) 
     trainer_G.apply_gradients(zip(grads, net_G.trainable_weights))
     return float(loss_G)
-``
+```
 
 Both the discriminator and the generator performs a binary logistic regression with the cross-entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
 
@@ -408,8 +408,6 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
           f'{metric[2] / timer.stop():.1f} examples/sec')
 ```
 
-
-
 Now we specify the hyperparameters to fit the Gaussian distribution.
 
 ```{.python .input}
@@ -435,4 +433,8 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1082)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/2534)
 :end_tab:
