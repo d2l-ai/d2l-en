@@ -219,6 +219,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 ```{.python .input}
 #@tab tensorflow
 #@save
+@tf.function
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator."""
     batch_size = X.shape[0]
@@ -277,6 +278,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
 ```{.python .input}
 #@tab tensorflow
 #@save
+@tf.function
 def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator."""
     batch_size = Z.shape[0]
