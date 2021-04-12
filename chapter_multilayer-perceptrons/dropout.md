@@ -255,7 +255,7 @@ def dropout_layer(X, dropout):
     # In this case, all elements are kept
     if dropout == 0:
         return X
-    mask = (torch.Tensor(X.shape).uniform_(0, 1) > dropout).float()
+    mask = (torch.rand(X.shape) > dropout).float()
     return mask * X / (1.0 - dropout)
 ```
 
