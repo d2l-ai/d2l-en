@@ -321,10 +321,9 @@ def train(lambd):
                             xlim=[5, num_epochs], legend=['train', 'test'])
     for epoch in range(num_epochs):
         for X, y in train_iter:
-            with torch.enable_grad():
-                # The L2 norm penalty term has been added, and broadcasting
-                # makes `l2_penalty(w)` a vector whose length is `batch_size`
-                l = loss(net(X), y) + lambd * l2_penalty(w)
+            # The L2 norm penalty term has been added, and broadcasting
+            # makes `l2_penalty(w)` a vector whose length is `batch_size`
+            l = loss(net(X), y) + lambd * l2_penalty(w)
             l.sum().backward()
             d2l.sgd([w, b], lr, batch_size)
         if (epoch + 1) % 5 == 0:
@@ -464,9 +463,8 @@ def train_concise(wd):
                             xlim=[5, num_epochs], legend=['train', 'test'])
     for epoch in range(num_epochs):
         for X, y in train_iter:
-            with torch.enable_grad():
-                trainer.zero_grad()
-                l = loss(net(X), y)
+            trainer.zero_grad()
+            l = loss(net(X), y)
             l.backward()
             trainer.step()
         if (epoch + 1) % 5 == 0:
