@@ -526,7 +526,7 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         cls_prob, offset_pred = cls_probs[i], offset_preds[i].reshape(-1, 4)
         conf, class_id = np.max(cls_prob[1:], 0), np.argmax(cls_prob[1:], 0)
         predicted_bb = offset_inverse(anchors, offset_pred)
-        keep = nms(predicted_bb, conf, 0.5)
+        keep = nms(predicted_bb, conf, nms_threshold)
         # Find all non_keep indices and set the class_id to background
         all_idx = np.arange(num_anchors, dtype=np.int32, ctx=device)
         combined = d2l.concat((keep, all_idx))
@@ -575,7 +575,7 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         cls_prob, offset_pred = cls_probs[i], offset_preds[i].reshape(-1, 4)
         conf, class_id = torch.max(cls_prob[1:], 0)
         predicted_bb = offset_inverse(anchors, offset_pred)
-        keep = nms(predicted_bb, conf, 0.5)
+        keep = nms(predicted_bb, conf, nms_threshold)
         # Find all non_keep indices and set the class_id to background
         all_idx = torch.arange(num_anchors, dtype=torch.long, device=device)
         combined = torch.cat((keep, all_idx))
