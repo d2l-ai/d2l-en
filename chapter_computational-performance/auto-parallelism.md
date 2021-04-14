@@ -1,22 +1,16 @@
 # Automatic Parallelism
 :label:`sec_auto_para`
 
-:begin_tab:`mxnet`
-MXNet automatically constructs computational graphs at the backend. Using a
+
+Deep learning frameworks (e.g., MXNet and PyTorch) automatically construct computational graphs at the backend. Using a
 computational graph, the system is aware of all the dependencies,
 and can selectively execute multiple non-interdependent tasks in parallel to
 improve speed. For instance, :numref:`fig_asyncgraph` in :numref:`sec_async` initializes two variables independently. Consequently the system can choose to execute them in parallel.
-:end_tab:
 
-:begin_tab:`pytorch`
-PyTorch automatically constructs computational graphs at the backend. Using a
-computational graph, the system is aware of all the dependencies,
-and can selectively execute multiple non-interdependent tasks in parallel to
-improve speed. For instance, :numref:`fig_asyncgraph` in :numref:`sec_async` initializes two variables independently. Consequently the system can choose to execute them in parallel.
-:end_tab:
 
-Typically, a single operator will use all the computational resources on all CPUs or on a single GPU. For example, the `dot` operator will use all cores (and threads) on all CPUs, even if there are multiple CPU processors on a single machine. The same applies to a single GPU. Hence parallelization is not quite so useful single-device computers. With multiple devices things matter more. While parallelization is typically most relevant between multiple GPUs, adding the local CPU will increase performance slightly. See e.g., :cite:`Hadjis.Zhang.Mitliagkas.ea.2016` for a paper that focuses on training computer vision models combining a GPU and a CPU. With the convenience of an automatically parallelizing framework we can accomplish the same goal in a few lines of Python code. More broadly, our discussion of automatic parallel computation focuses on parallel computation using both CPUs and GPUs, as well as the parallelization of computation and communication.
-We begin by importing the required packages and modules. Note that we need at least two GPUs to run the experiments in this section.
+Typically, a single operator will use all the computational resources on all CPUs or on a single GPU. For example, the `dot` operator will use all cores (and threads) on all CPUs, even if there are multiple CPU processors on a single machine. The same applies to a single GPU. Hence parallelization is not quite so useful for single-device computers. With multiple devices things matter more. While parallelization is typically most relevant between multiple GPUs, adding the local CPU will increase performance slightly. For example, see :cite:`Hadjis.Zhang.Mitliagkas.ea.2016` that focuses on training computer vision models combining a GPU and a CPU. With the convenience of an automatically parallelizing framework we can accomplish the same goal in a few lines of Python code. More broadly, our discussion of automatic parallel computation focuses on parallel computation using both CPUs and GPUs, as well as the parallelization of computation and communication.
+
+Note that we need at least two GPUs to run the experiments in this section.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -32,7 +26,7 @@ import torch
 
 ## Parallel Computation on GPUs
 
-Let us start by defining a reference workload to test - the `run` function below performs 10 matrix-matrix multiplications on the device of our choosing using data allocated into two variables, `x_gpu1` and `x_gpu2`.
+Let us start by defining a reference workload to test: the `run` function below performs 10 matrix-matrix multiplications on the device of our choice using data allocated into two variables: `x_gpu1` and `x_gpu2`.
 
 ```{.python .input}
 devices = d2l.try_all_gpus()
@@ -54,11 +48,11 @@ x_gpu2 = torch.rand(size=(4000, 4000), device=devices[1])
 ```
 
 :begin_tab:`mxnet`
-Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on each of them prior to measuring.
+Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on either of them prior to measuring.
 :end_tab:
 
 :begin_tab:`pytorch`
-Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on each of them prior to measuring. `torch.cuda.synchronize()` waits for all kernels in all streams on a CUDA device to complete. It takes in a `device` argument, the device for which we need to synchronize. It uses the current device, given by `current_device()`, if the device argument is `None` (default).
+Now we apply the function to the data. To ensure that caching does not play a role in the results we warm up the devices by performing a single pass on either of them prior to measuring. `torch.cuda.synchronize()` waits for all kernels in all streams on a CUDA device to complete. It takes in a `device` argument, the device for which we need to synchronize. It uses the current device, given by `current_device()`, if the device argument is `None` (default).
 :end_tab:
 
 ```{.python .input}
@@ -82,21 +76,21 @@ run(x_gpu2)  # Warm-up all devices
 torch.cuda.synchronize(devices[0])
 torch.cuda.synchronize(devices[1])
 
-with d2l.Benchmark('GPU 1 time'):
+with d2l.Benchmark('GPU1 time'):
     run(x_gpu1)
     torch.cuda.synchronize(devices[0])
 
-with d2l.Benchmark('GPU 2 time'):
+with d2l.Benchmark('GPU2 time'):
     run(x_gpu2)
     torch.cuda.synchronize(devices[1])
 ```
 
 :begin_tab:`mxnet`
-If we remove the `waitall()` between both tasks the system is free to parallelize computation on both devices automatically.
+If we remove the `waitall` statement between both tasks the system is free to parallelize computation on both devices automatically.
 :end_tab:
 
 :begin_tab:`pytorch`
-If we remove the `torch.cuda.synchronize()` between both tasks the system is free to parallelize computation on both devices automatically.
+If we remove the `synchronize` statement between both tasks the system is free to parallelize computation on both devices automatically.
 :end_tab:
 
 ```{.python .input}
@@ -114,16 +108,13 @@ with d2l.Benchmark('GPU1 & GPU2'):
     torch.cuda.synchronize()
 ```
 
-:begin_tab:`mxnet`
-In the above case the total execution time is less than the sum of its parts, since MXNet automatically schedules computation on both GPU devices without the need for sophisticated code on behalf of the user.
-:end_tab:
+In the above case the total execution time is less than the sum of its parts, since the deep learning framework automatically schedules computation on both GPU devices without the need for sophisticated code on behalf of the user.
 
-:begin_tab:`pytorch`
-In the above case the total execution time is less than the sum of its parts, since PyTorch automatically schedules computation on both GPU devices without the need for sophisticated code on behalf of the user.
-:end_tab:
+
 
 ## Parallel Computation and Communication
-In many cases we need to move data between different devices, say between CPU and GPU, or between different GPUs. This occurs e.g., when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let us simulate this by computing on the GPU and then copying the results back to the CPU.
+
+In many cases we need to move data between different devices, say between the CPU and GPU, or between different GPUs. This occurs e.g., when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let us simulate this by computing on the GPU and then copying the results back to the CPU.
 
 ```{.python .input}
 def copy_to_cpu(x):
