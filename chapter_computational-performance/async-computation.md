@@ -7,7 +7,7 @@ For PyTorch, by default, GPU operations are asynchronous. When you call a functi
 
 Hence, understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and mutual dependencies. This allows us to reduce memory overhead and increase processor utilization.
 
-```{.python .input  n=1}
+```{.python .input}
 from d2l import mxnet as d2l
 import numpy, os, subprocess
 from mxnet import autograd, gluon, np, npx
@@ -15,14 +15,13 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-```python
+```{.python .input}
 #@tab pytorch
 from d2l import torch as d2l
 import numpy, os, subprocess
 import torch
 from torch import nn
 ```
-
 
 ## Asynchrony via Backend
 
@@ -35,7 +34,7 @@ For a warmup consider the following toy problem: we want to generate a random ma
 Note that PyTorch `tensor` is defined on a GPU.
 :end_tab:
 
-```{.python .input  n=2}
+```{.python .input}
 with d2l.Benchmark('numpy'):
     for _ in range(10):
         a = numpy.random.normal(size=(1000, 1000))
@@ -47,17 +46,7 @@ with d2l.Benchmark('mxnet.np'):
         b = np.dot(a, a)
 ```
 
-```{.json .output n=2}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "numpy: 0.8381 sec\nmxnet.np: 0.0116 sec\n"
- }
-]
-```
-
-```python
+```{.python .input}
 #@tab pytorch
 # Warmup for GPU computation
 device = d2l.try_gpu()
@@ -74,7 +63,6 @@ with d2l.Benchmark('torch'):
         a = torch.randn(size=(1000, 1000), device=device)
         b = torch.mm(a, a)
 ```
-
 
 :begin_tab:`mxnet`
 The benchmark output via MXNet is orders of magnitude faster. Since both are executed on the same processor something else must be going on.
@@ -93,7 +81,7 @@ what happened previously: computation is being executed by the backend
 while the frontend returns control to Python.
 :end_tab:
 
-```{.python .input  n=3}
+```{.python .input}
 with d2l.Benchmark():
     for _ in range(10):
         a = np.random.normal(size=(1000, 1000))
@@ -101,17 +89,7 @@ with d2l.Benchmark():
     npx.waitall()
 ```
 
-```{.json .output n=3}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Done: 0.6350 sec\n"
- }
-]
-```
-
-```python
+```{.python .input}
 #@tab pytorch
 with d2l.Benchmark():
     for _ in range(10):
@@ -119,7 +97,6 @@ with d2l.Benchmark():
         b = torch.mm(a, a)
     torch.cuda.synchronize(device)
 ```
-
 
 :begin_tab:`mxnet`
 Broadly speaking, MXNet has a frontend for direct interactions with users, e.g., via Python, as well as a backend used by the system to perform the computation. 
@@ -142,34 +119,20 @@ Hence, it is not possible to parallelize operations that depend on each other.
 
 Let us look at another toy example to understand the dependency graph a bit better.
 
-```{.python .input  n=4}
+```{.python .input}
 x = np.ones((1, 2))
 y = np.ones((1, 2))
 z = x * y + 2
 z
 ```
 
-```{.json .output n=4}
-[
- {
-  "data": {
-   "text/plain": "array([[3., 3.]])"
-  },
-  "execution_count": 4,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
-```python
+```{.python .input}
 #@tab pytorch
 x = torch.ones((1, 2), device=device)
 y = torch.ones((1, 2), device=device)
 z = x * y + 2
 z
 ```
-
 
 ![The backend tracks dependencies between various steps in the computational graph.](../img/asyncgraph.svg)
 :label:`fig_asyncgraph`
@@ -190,7 +153,7 @@ There are a number of operations that will force Python to wait for completion:
 Let us see how this works in practice.
 :end_tab:
 
-```{.python .input  n=5}
+```{.python .input}
 with d2l.Benchmark('waitall'):
     b = np.dot(a, a)
     npx.waitall()
@@ -200,23 +163,13 @@ with d2l.Benchmark('wait_to_read'):
     b.wait_to_read()
 ```
 
-```{.json .output n=5}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "waitall: 0.0074 sec\nwait_to_read: 0.0092 sec\n"
- }
-]
-```
-
 :begin_tab:`mxnet`
 Both operations take approximately the same time to complete. Besides the obvious blocking operations we recommend that you are aware of *implicit* blockers. Printing a variable clearly requires the variable to be available and is thus a blocker. Last, conversions to NumPy via `z.asnumpy()` and conversions to scalars via `z.item()` are blocking, since NumPy has no notion of asynchrony. It needs access to the values just like the `print` function. 
 
 Copying small amounts of data frequently from MXNet's scope to NumPy and back can destroy performance of an otherwise efficient code, since each such operation requires the computational graph to evaluate all intermediate results needed to get the relevant term *before* anything else can be done.
 :end_tab:
 
-```{.python .input  n=6}
+```{.python .input}
 with d2l.Benchmark('numpy conversion'):
     b = np.dot(a, a)
     b.asnumpy()
@@ -226,22 +179,12 @@ with d2l.Benchmark('scalar conversion'):
     b.sum().item()
 ```
 
-```{.json .output n=6}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "numpy conversion: 0.0076 sec\nscalar conversion: 0.0151 sec\n"
- }
-]
-```
-
 :begin_tab:`mxnet`
 ## Improving Computation
 On a heavily multithreaded system (even regular laptops have 4 threads or more and on multi-socket servers this number can exceed 256) the overhead of scheduling operations can become significant. This is why it is highly desirable to have computation and scheduling occur asynchronously and in parallel. To illustrate the benefit of doing so let us see what happens if we increment a variable by 1 multiple times, both in sequence or asynchronously. We simulate synchronous execution by inserting a `wait_to_read` barrier in between each addition.
 :end_tab:
 
-```{.python .input  n=7}
+```{.python .input}
 with d2l.Benchmark('synchronous'):
     for _ in range(10000):
         y = x + 1
@@ -251,16 +194,6 @@ with d2l.Benchmark('asynchronous'):
     for _ in range(10000):
         y = x + 1
     npx.waitall()
-```
-
-```{.json .output n=7}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "synchronous: 0.4388 sec\nasynchronous: 0.4301 sec\n"
- }
-]
 ```
 
 :begin_tab:`mxnet`
@@ -276,11 +209,11 @@ Assume that the durations of these three stages are $t_1, t_2$ and $t_3$, respec
 * Deep learning frameworks may decouple the Python frontend from an execution backend. This allows for fast asynchronous insertion of commands into the backend and associated parallelism.
 * Asynchrony leads to a rather responsive frontend. However, use caution not to overfill the task queue since it may lead to excessive memory consumption. It is recommended to synchronize for each minibatch to keep frontend and backend approximately synchronized.
 * Chip vendors offer sophisticated performance analysis tools to obtain a much more fine-grained insight into the efficiency of deep learning.
+:end_tab:
 
 :begin_tab:`mxnet`
 * Be aware of the fact that conversions from MXNet's memory management to Python will force the backend to wait until  the specific variable is ready. Functions such as `print`, `asnumpy` and `item` all have this effect. This can be desirable but a careless use of synchronization can ruin performance.
 :end_tab:
-
 
 ## Exercises
 
