@@ -12,7 +12,7 @@ The discussion below explains some of the rationale for these numbers and how th
 
 ## Computers
 
-Most deep learning researchers and practitioners have access to a computer with a fair amount of memory, computation, some form of an accelerator such as a GPU, or multiples thereof. It consists of the following key components:
+Most deep learning researchers and practitioners have access to a computer with a fair amount of memory, computation, some form of an accelerator such as a GPU, or multiples thereof. A computer consists of the following key components:
 
 * A processor (also referred to as a CPU) that is able to execute the programs we give it (in addition to running an operating system and many other things), typically consisting of 8 or more cores.
 * Memory (RAM) to store and retrieve the results from computation, such as weight vectors and activations, and training data.
