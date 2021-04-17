@@ -166,8 +166,6 @@ finetune_net.output.collect_params().setattr('lr_mult', 10)
 finetune_net = torchvision.models.resnet18(pretrained=True)
 finetune_net.fc = nn.Linear(finetune_net.fc.in_features, 2)
 nn.init.xavier_uniform_(finetune_net.fc.weight);
-# If `param_group=True`, the model parameters in fc layer will be updated 
-# using a learning rate ten times greater, defined in the trainer.
 ```
 
 ### Fine Tuning the Model
@@ -175,6 +173,8 @@ nn.init.xavier_uniform_(finetune_net.fc.weight);
 We first define a training function `train_fine_tuning` that uses fine tuning so it can be called multiple times.
 
 ```{.python .input}
+# If `param_group=True`, the model parameters in fc layer will be updated 
+# using a learning rate ten times greater, defined in the trainer.
 def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
     train_iter = gluon.data.DataLoader(
         train_imgs.transform_first(train_augs), batch_size, shuffle=True)
