@@ -24,6 +24,7 @@ First, import the packages or modules required for the experiment in this sectio
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, image, init, np, npx
 from mxnet.gluon import nn
+import os
 
 npx.set_np()
 ```
@@ -32,6 +33,7 @@ npx.set_np()
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
+import os
 import torch
 import torchvision
 from torch import nn
@@ -42,15 +44,25 @@ from torch import nn
 In this experiment, we will use an image with a shape of $400\times 500$ as an example.
 
 ```{.python .input}
+#@tab all
+img_path = '../img/cat1.jpg'
+if not os.path.exists(img_path):
+    print("Downloading image!")
+    url = 'https://github.com/d2l-ai/d2l-en/raw/master/img/cat1.jpg'
+    !curl -OL $url
+    img_path = 'cat1.jpg'
+```
+
+```{.python .input}
 d2l.set_figsize()
-img = image.imread('../img/cat1.jpg')
+img = image.imread(img_path)
 d2l.plt.imshow(img.asnumpy());
 ```
 
 ```{.python .input}
 #@tab pytorch
 d2l.set_figsize()
-img = d2l.Image.open('../img/cat1.jpg')
+img = d2l.Image.open(img_path)
 d2l.plt.imshow(img);
 ```
 
