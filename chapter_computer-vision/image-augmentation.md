@@ -49,7 +49,7 @@ img_path = '../img/cat1.jpg'
 if not os.path.exists(img_path):
     print("Downloading image!")
     url = 'https://github.com/d2l-ai/d2l-en/raw/master/img/cat1.jpg'
-    !curl -OL $url
+    os.system(f'curl -OL {url}')
     img_path = 'cat1.jpg'
 ```
 
