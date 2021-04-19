@@ -206,11 +206,20 @@ test_augs = torchvision.transforms.Compose([
      torchvision.transforms.ToTensor()])
 ```
 
+:begin_tab:`mxnet`
 Next, we define an auxiliary function to make it easier to read the image and
 apply image augmentation. The `transform_first` function provided by Gluon's
 dataset applies image augmentation to the first element of each training
 example (image and label), i.e., the element at the top of the image. For
 detailed descriptions of `DataLoader`, refer to :numref:`sec_fashion_mnist`.
+:end_tab:
+
+:begin_tab:`pytorch`
+Next, we define an auxiliary function to make it easier to read the image and
+apply image augmentation. The `transform` argument provided by PyTorch's
+dataset applies augmentation to transform the images. For detailed
+descriptions of `DataLoader`, refer to :numref:`sec_fashion_mnist`.
+:end_tab:
 
 ```{.python .input}
 def load_cifar10(is_train, augs, batch_size):
