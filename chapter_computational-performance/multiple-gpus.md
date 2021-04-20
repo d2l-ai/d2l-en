@@ -9,28 +9,44 @@ We assume that you are familiar with minibatch stochastic gradient descent algor
 
 ## Splitting the Problem
 
-Let us start with a simple computer vision problem and a slightly archaic network, e.g., with multiple layers of convolutions, pooling, and possibly a few dense layers in the end. That is, let us start with a network that looks quite similar to LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` or AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. Given multiple GPUs (2 if it is a desktop server, 4 on a g4dn.12xlarge, 8 on an AWS p3.16xlarge, or 16 on a p2.16xlarge), we want to partition training in a manner as to achieve good speedup while simultaneously benefitting from simple and reproducible design choices. Multiple GPUs, after all, increase both *memory* and *compute* ability. In a nutshell, we have a number of choices, given a minibatch of training data that we want to classify.
+Let us start with a simple computer vision problem and a slightly archaic network, e.g., with multiple layers of convolutions, pooling, and possibly a few fully-connected layers in the end. 
+That is, let us start with a network that looks quite similar to LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` or AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. 
+Given multiple GPUs (2 if it is a desktop server, 4 on an AWS g4dn.12xlarge instance, 8 on a p3.16xlarge, or 16 on a p2.16xlarge), we want to partition training in a manner as to achieve good speedup while simultaneously benefitting from simple and reproducible design choices. Multiple GPUs, after all, increase both *memory* and *computation* ability. In a nutshell, we have the following choices, given a minibatch of training data that we want to classify.
 
-* We could partition the network layers across multiple GPUs. That is, each GPU takes as input the data flowing into a particular layer, processes data across a number of subsequent layers and then sends the data to the next GPU.
-    * This allows us to process data with larger networks when compared to what a single GPU could handle.
-    * Memory footprint per GPU can be well controlled (it is a fraction of the total network footprint)
-    * The interface between layers (and thus GPUs) requires tight synchronization. This can be tricky, in particular if the computational workloads are not properly matched between layers. The problem is exacerbated for large numbers of GPUs.
-    * The interface between layers requires large amounts of data transfer (activations, gradients). This may overwhelm the bandwidth of the GPU buses.
-    * Compute intensive, yet sequential operations are nontrivial to partition. See e.g., :cite:`Mirhoseini.Pham.Le.ea.2017` for a best effort in this regard. It remains a difficult problem and it is unclear whether it is possible to achieve good (linear) scaling on nontrivial problems. We do not recommend it unless there is excellent framework / OS support for chaining together multiple GPUs.
-* We could split the work required by individual layers. For instance, rather than computing 64 channels on a single GPU we could split up the problem across 4 GPUs, each of which generate data for 16 channels. Likewise, for a dense layer we could split the number of output neurons. :numref:`fig_alexnet_original` illustrates this design. The figure is taken from :cite:`Krizhevsky.Sutskever.Hinton.2012` where this strategy was used to deal with GPUs that had a very small memory footprint (2GB at the time).
-    * This allows for good scaling in terms of computation, provided that the number of channels (or neurons) is not too small.
-    * Multiple GPUs can process increasingly larger networks since the memory available scales linearly.
-    * We need a *very large* number of synchronization / barrier operations since each layer depends on the results from all other layers.
-    * The amount of data that needs to be transferred is potentially even larger than when distributing layers across GPUs. We do not recommend this approach due to its bandwidth cost and complexity.
-    
+First, we could partition the network layers across multiple GPUs. That is, each GPU takes as input the data flowing into a particular layer, processes data across a number of subsequent layers and then sends the data to the next GPU.
+This allows us to process data with larger networks when compared with what a single GPU could handle.
+Besides,
+memory footprint per GPU can be well controlled (it is a fraction of the total network footprint).
+
+However, the interface between layers (and thus GPUs) requires tight synchronization. This can be tricky, in particular if the computational workloads are not properly matched between layers. The problem is exacerbated for large numbers of GPUs.
+The interface between layers also
+requires large amounts of data transfer,
+such as activations and gradients.
+This may overwhelm the bandwidth of the GPU buses.
+Moreover, compute-intensive, yet sequential operations are nontrivial to partition. See e.g., :cite:`Mirhoseini.Pham.Le.ea.2017` for a best effort in this regard. It remains a difficult problem and it is unclear whether it is possible to achieve good (linear) scaling on nontrivial problems. We do not recommend it unless there is excellent framework or operating system support for chaining together multiple GPUs.
+
+
+Second, we could split the work required by individual layers. For instance, rather than computing 64 channels on a single GPU we could split up the problem across 4 GPUs, each of which generates data for 16 channels.
+Likewise, for a fully-connected layer we could split the number of output units.
+:numref:`fig_alexnet_original` (taken from :cite:`Krizhevsky.Sutskever.Hinton.2012`)
+illustrates this design, where this strategy was used to deal with GPUs that had a very small memory footprint (2 GB at the time).
+This allows for good scaling in terms of computation, provided that the number of channels (or units) is not too small.
+Besides,
+multiple GPUs can process increasingly larger networks since the available memory scales linearly.
+
 ![Model parallelism in the original AlexNet design due to limited GPU memory.](../img/alexnet-original.svg)
 :label:`fig_alexnet_original`
+
+However,
+we need a *very large* number of synchronization or barrier operations since each layer depends on the results from all the other layers.
+Moreover, the amount of data that needs to be transferred is potentially even larger than when distributing layers across GPUs. Thus, we do not recommend this approach due to its bandwidth cost and complexity.
     
-* Lastly we could partition data across multiple GPUs. This way all GPUs perform the same type of work, albeit on different observations. Gradients are aggregated between GPUs after each minibatch.
-    * This is the simplest approach and it can be applied in any situation.
-    * Adding more GPUs does not allow us to train larger models.
-    * We only need to synchronize after each minibatch. That said, it is highly desirable to start exchanging gradients parameters already while others are still being computed.
-    * Large numbers of GPUs lead to very large minibatch sizes, thus reducing training efficiency.
+    
+Last, we could partition data across multiple GPUs. In this way all GPUs perform the same type of work, albeit on different observations. Gradients are aggregated across GPUs after each minibatch of training data.
+This is the simplest approach and it can be applied in any situation.
+We only need to synchronize after each minibatch. That said, it is highly desirable to start exchanging gradients parameters already while others are still being computed.
+Moreover, larger numbers of GPUs lead to larger minibatch sizes, thus increasing training efficiency.
+However, adding more GPUs does not allow us to train larger models.
 
 By and large, data parallelism is the most convenient way to proceed, provided that we have access to GPUs with sufficiently large memory. See also :cite:`Li.Andersen.Park.ea.2014` for a detailed description of partitioning for distributed training. GPU memory used to be a problem in the early days of deep learning. By now this issue has been resolved for all but the most unusual cases. We focus on data parallelism in what follows.
 
