@@ -80,9 +80,7 @@ In general, the training proceeds as follows:
 
 Note that in practice we *increase* the minibatch size $k$-fold when training on $k$ GPUs such that each GPU has the same amount of work to do as if we were training on a single GPU only. On a 16-GPU server this can increase the minibatch size considerably and we may have to increase the learning rate accordingly.
 Also note that batch normalization in :numref:`sec_batch_norm` needs to be adjusted, e.g., by keeping a separate batch normalization coefficient per GPU.
-In what follows we will use LeNet in :numref:`sec_lenet` as the toy network to illustrate multi-GPU training.
-
-
+In what follows we will use a toy network to illustrate multi-GPU training.
 
 ```{.python .input}
 %matplotlib inline
@@ -102,7 +100,7 @@ from torch.nn import functional as F
 
 ## A Toy Network
 
-We use LeNet as introduced in :numref:`sec_lenet`. We define it from scratch to illustrate parameter exchange and synchronization in detail.
+We use LeNet as introduced in :numref:`sec_lenet` with slight modifications. We define it from scratch to illustrate parameter exchange and synchronization in detail.
 
 ```{.python .input}
 # Initialize model parameters
