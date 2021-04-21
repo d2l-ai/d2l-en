@@ -41,7 +41,7 @@ However,
 we need a *very large* number of synchronization or barrier operations since each layer depends on the results from all the other layers.
 Moreover, the amount of data that needs to be transferred is potentially even larger than when distributing layers across GPUs. Thus, we do not recommend this approach due to its bandwidth cost and complexity.
     
-Last, we could partition data across multiple GPUs. In this way all GPUs perform the same type of work, albeit on different observations. Gradients are aggregated across GPUs after each minibatch of training data.
+Last, we could partition data across multiple GPUs. This way all GPUs perform the same type of work, albeit on different observations. Gradients are aggregated across GPUs after each minibatch of training data.
 This is the simplest approach and it can be applied in any situation.
 We only need to synchronize after each minibatch. That said, it is highly desirable to start exchanging gradients parameters already while others are still being computed.
 Moreover, larger numbers of GPUs lead to larger minibatch sizes, thus increasing training efficiency.
@@ -294,7 +294,7 @@ def train_batch(X, y, device_params, devices, lr):
         losses = [loss(lenet(X_shard, device_W), y_shard)
                   for X_shard, y_shard, device_W in zip(
                       X_shards, y_shards, device_params)]
-    for l in losses:  # Back Propagation is performed separately on each GPU
+    for l in losses:  # Backpropagation is performed separately on each GPU
         l.backward()
     # Sum all gradients from each GPU and broadcast them to all GPUs
     for i in range(len(device_params[0])):
@@ -312,7 +312,7 @@ def train_batch(X, y, device_params, devices, lr):
     losses = [loss(lenet(X_shard, device_W), y_shard).sum()
               for X_shard, y_shard, device_W in zip(
                   X_shards, y_shards, device_params)]
-    for l in losses:  # Back Propagation is performed separately on each GPU
+    for l in losses:  # Backpropagation is performed separately on each GPU
         l.backward()
     # Sum all gradients from each GPU and broadcast them to all GPUs
     with torch.no_grad():
@@ -323,15 +323,15 @@ def train_batch(X, y, device_params, devices, lr):
         d2l.sgd(param, lr, X.shape[0]) # Here, we use a full-size batch
 ```
 
-Now, we can define the training function. It is slightly different from the ones used in the previous chapters: we need to allocate the GPUs and copy all the model parameters to all devices. Obviously each batch is processed using `train_batch` to deal with multiple GPUs. For convenience (and conciseness of code) we compute the accuracy on a single GPU (this is *inefficient* since the other GPUs are idle).
+Now, we can define the training function. It is slightly different from the ones used in the previous chapters: we need to allocate the GPUs and copy all the model parameters to all the devices.
+Obviously each batch is processed using the `train_batch` function to deal with multiple GPUs. For convenience (and conciseness of code) we compute the accuracy on a single GPU, though this is *inefficient* since the other GPUs are idle.
 
 ```{.python .input}
 def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     devices = [d2l.try_gpu(i) for i in range(num_gpus)]
-    # Copy model parameters to num_gpus GPUs
+    # Copy model parameters to `num_gpus` GPUs
     device_params = [get_params(params, d) for d in devices]
-    # num_epochs, times, acces = 10, [], []
     num_epochs = 10
     animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])
     timer = d2l.Timer()
@@ -342,7 +342,7 @@ def train(num_gpus, batch_size, lr):
             train_batch(X, y, device_params, devices, lr)
             npx.waitall()
         timer.stop()
-        # Verify the model on GPU 0
+        # Evaluate the model on GPU 0
         animator.add(epoch + 1, (d2l.evaluate_accuracy_gpu(
             lambda x: lenet(x, device_params[0]), test_iter, devices[0]),))
     print(f'test acc: {animator.Y[0][-1]:.2f}, {timer.avg():.1f} sec/epoch '
@@ -354,9 +354,8 @@ def train(num_gpus, batch_size, lr):
 def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     devices = [d2l.try_gpu(i) for i in range(num_gpus)]
-    # Copy model parameters to num_gpus GPUs
+    # Copy model parameters to `num_gpus` GPUs
     device_params = [get_params(params, d) for d in devices]
-    # num_epochs, times, acces = 10, [], []
     num_epochs = 10
     animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])
     timer = d2l.Timer()
@@ -367,7 +366,7 @@ def train(num_gpus, batch_size, lr):
             train_batch(X, y, device_params, devices, lr)
             torch.cuda.synchronize()
         timer.stop()
-        # Verify the model on GPU 0
+        # Evaluate the model on GPU 0
         animator.add(epoch + 1, (d2l.evaluate_accuracy_gpu(
             lambda x: lenet(x, device_params[0]), test_iter, devices[0]),))
     print(f'test acc: {animator.Y[0][-1]:.2f}, {timer.avg():.1f} sec/epoch '
@@ -376,14 +375,18 @@ def train(num_gpus, batch_size, lr):
 
 ## Experiment
 
-Let us see how well this works on a single GPU. We use a batch size of 256 and a learning rate of 0.2.
+Let us see how well this works on a single GPU.
+We first use a batch size of 256 and a learning rate of 0.2.
 
 ```{.python .input}
 #@tab all
 train(num_gpus=1, batch_size=256, lr=0.2)
 ```
 
-By keeping the batch size and learning rate unchanged and changing the number of GPUs to 2, we can see that the improvement in test accuracy is roughly the same as in the results from the previous experiment. In terms of the optimization algorithms, they are identical. Unfortunately there is no meaningful speedup to be gained here: the model is simply too small; moreover we only have a small dataset, where our slightly unsophisticated approach to implementing multi-GPU training suffered from significant Python overhead. We will encounter more complex models and more sophisticated ways of parallelization going forward. Let us see what happens nonetheless for Fashion-MNIST.
+By keeping the batch size and learning rate unchanged and increasing the number of GPUs to 2, we can see that the test accuracy roughly stays the same compared with
+the previous experiment.
+In terms of the optimization algorithms, they are identical. Unfortunately there is no meaningful speedup to be gained here: the model is simply too small; moreover we only have a small dataset, where our slightly unsophisticated approach to implementing multi-GPU training suffered from significant Python overhead. We will encounter more complex models and more sophisticated ways of parallelization going forward.
+Let us see what happens nonetheless for Fashion-MNIST.
 
 ```{.python .input}
 #@tab all
@@ -394,14 +397,14 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 
 * There are multiple ways to split deep network training over multiple GPUs. We could split them between layers, across layers, or across data. The former two require tightly choreographed data transfers. Data parallelism is the simplest strategy.
 * Data parallel training is straightforward. However, it increases the effective minibatch size to be efficient.
-* Data is split across multiple GPUs, each GPU executes its own forward and backward operation and subsequently gradients are aggregated and results broadcast back to the GPUs.
-* Large minibatches may require a slightly increased learning rate.
+* In data parallelism, data are split across multiple GPUs, where each GPU executes its own forward and backward operation and subsequently gradients are aggregated and results are broadcast back to the GPUs.
+* We may use slightly increased learning rates for larger minibatches.
 
 ## Exercises
 
-1. When training on multiple GPUs, change the minibatch size from $b$ to $k \cdot b$, i.e., scale it up by the number of GPUs.
-1. Compare accuracy for different learning rates. How does it scale with the number of GPUs.
-1. Implement a more efficient allreduce that aggregates different parameters on different GPUs (why is this more efficient in the first place).
+1. When training on $k$ GPUs, change the minibatch size from $b$ to $k \cdot b$, i.e., scale it up by the number of GPUs.
+1. Compare accuracy for different learning rates. How does it scale with the number of GPUs?
+1. Implement a more efficient `allreduce` function that aggregates different parameters on different GPUs? Why is it more efficient?
 1. Implement multi-GPU test accuracy computation.
 
 :begin_tab:`mxnet`
