@@ -57,7 +57,7 @@ By and large, data parallelism is the most convenient way to proceed, provided t
 
 ## Data Parallelism
 
-Assume that there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently. 
+Assume that there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently though parameter values across the GPUs are identical and synchronized. 
 As an example,
 :numref:`fig_data_parallel` illustrates 
 training with
@@ -100,7 +100,7 @@ from torch.nn import functional as F
 
 ## A Toy Network
 
-We use LeNet as introduced in :numref:`sec_lenet` with slight modifications. We define it from scratch to illustrate parameter exchange and synchronization in detail.
+We use LeNet as introduced in :numref:`sec_lenet` (with slight modifications). We define it from scratch to illustrate parameter exchange and synchronization in detail.
 
 ```{.python .input}
 # Initialize model parameters
@@ -171,7 +171,9 @@ loss = nn.CrossEntropyLoss(reduction='none')
 
 ## Data Synchronization
 
-For efficient multi-GPU training we need two basic operations: firstly we need to have the ability to distribute a list of parameters to multiple devices and to attach gradients (`get_params`). Without parameters it is impossible to evaluate the network on a GPU. Secondly, we need the ability to sum parameters across multiple devices, i.e., we need an `allreduce` function.
+For efficient multi-GPU training we need two basic operations. 
+First we need to have the ability to distribute a list of parameters to multiple devices and to attach gradients (`get_params`). Without parameters it is impossible to evaluate the network on a GPU.
+Second, we need the ability to sum parameters across multiple devices, i.e., we need an `allreduce` function.
 
 ```{.python .input}
 def get_params(params, device):
@@ -190,7 +192,7 @@ def get_params(params, device):
     return new_params
 ```
 
-Let us try it out by copying the model parameters of lenet to gpu(0).
+Let us try it out by copying the model parameters to one GPU.
 
 ```{.python .input}
 #@tab all
@@ -199,7 +201,8 @@ print('b1 weight:', new_params[1])
 print('b1 grad:', new_params[1].grad)
 ```
 
-Since we didn't perform any computation yet, the gradient with regard to the bias weights is still $0$. Now let us assume that we have a vector distributed across multiple GPUs. The following `allreduce` function adds up all vectors and broadcasts the result back to all GPUs. Note that for this to work we need to copy the data to the device accumulating the results.
+Since we did not perform any computation yet, the gradient with regard to the bias parameter is still zero.
+Now let us assume that we have a vector distributed across multiple GPUs. The following `allreduce` function adds up all vectors and broadcasts the result back to all GPUs. Note that for this to work we need to copy the data to the device accumulating the results.
 
 ```{.python .input}
 def allreduce(data):
@@ -237,7 +240,8 @@ print('after allreduce:\n', data[0], '\n', data[1])
 
 ## Distributing Data
 
-We need a simple utility function to distribute a minibatch evenly across multiple GPUs. For instance, on 2 GPUs we'd like to have half of the data to be copied to each of the GPUs. Since it is more convenient and more concise, we use the built-in split and load function in Gluon (to try it out on a $4 \times 5$ matrix).
+We need a simple utility function to distribute a minibatch evenly across multiple GPUs. For instance, on two GPUs we would like to have half of the data to be copied to either of the GPUs.
+Since it is more convenient and more concise, we use the built-in function from the deep learning framework to try it out on a $4 \times 5$ matrix.
 
 ```{.python .input}
 data = np.arange(20).reshape(4, 5)
@@ -258,7 +262,7 @@ print('load into', devices)
 print('output:', split)
 ```
 
-For later reuse we define a `split_batch` function which splits both data and labels.
+For later reuse we define a `split_batch` function that splits both data and labels.
 
 ```{.python .input}
 #@save
