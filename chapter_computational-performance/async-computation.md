@@ -134,14 +134,24 @@ z = x * y + 2
 z
 ```
 
+:begin_tab:`mxnet`
 ![The backend tracks dependencies between various steps in the computational graph.](../img/asyncgraph.svg)
 :label:`fig_asyncgraph`
+:end_tab:
+
+:begin_tab:`pytorch`
+![The backend tracks dependencies between various steps in the computational graph.](../img/asyncgraph.svg)
+:label:`fig_asyncgraph`
+:end_tab:
+
 
 The code snippet above is also illustrated in :numref:`fig_asyncgraph`.
 Whenever the Python frontend thread executes one of the first three statements, it simply returns the task to the backend queue. When the last statement's results need to be *printed*, the Python frontend thread will wait for the C++ backend thread to finish computing the result of the variable `z`. One benefit of this design is that the Python frontend thread does not need to perform actual computations. Thus, there is little impact on the program's overall performance, regardless of Python's performance. :numref:`fig_threading` illustrates how frontend and backend interact.
 
 ![Interactions of the frontend and backend.](../img/threading.svg)
 :label:`fig_threading`
+
+
 
 :begin_tab:`mxnet`
 ## Barriers and Blockers
@@ -202,17 +212,22 @@ A slightly simplified interaction between the Python frontend thread and the C++
 1. The backend then receives the computation tasks from the queue and performs the actual computations.
 1. The backend then returns the computation results to the frontend.
 Assume that the durations of these three stages are $t_1, t_2$ and $t_3$, respectively. If we do not use asynchronous programming, the total time taken to perform 10000 computations is approximately $10000 (t_1+ t_2 + t_3)$. If asynchronous programming is used, the total time taken to perform 10000 computations can be reduced to $t_1 + 10000 t_2 + t_3$ (assuming $10000 t_2 > 9999t_1$), since the frontend does not have to wait for the backend to return computation results for each loop.
+:end_tab:
 
 
 ## Summary
 
+:begin_tab:`mxnet`
 * Deep learning frameworks may decouple the Python frontend from an execution backend. This allows for fast asynchronous insertion of commands into the backend and associated parallelism.
 * Asynchrony leads to a rather responsive frontend. However, use caution not to overfill the task queue since it may lead to excessive memory consumption. It is recommended to synchronize for each minibatch to keep frontend and backend approximately synchronized.
 * Chip vendors offer sophisticated performance analysis tools to obtain a much more fine-grained insight into the efficiency of deep learning.
+* Be aware of the fact that conversions from MXNet's memory management to Python will force the backend to wait until  the specific variable is ready. Functions such as `print`, `asnumpy` and `item` all have this effect. This can be desirable but a careless use of synchronization can ruin performance.
 :end_tab:
 
-:begin_tab:`mxnet`
-* Be aware of the fact that conversions from MXNet's memory management to Python will force the backend to wait until  the specific variable is ready. Functions such as `print`, `asnumpy` and `item` all have this effect. This can be desirable but a careless use of synchronization can ruin performance.
+:begin_tab:`pytorch`
+* Deep learning frameworks may decouple the Python frontend from an execution backend. This allows for fast asynchronous insertion of commands into the backend and associated parallelism.
+* Asynchrony leads to a rather responsive frontend. However, use caution not to overfill the task queue since it may lead to excessive memory consumption. It is recommended to synchronize for each minibatch to keep frontend and backend approximately synchronized.
+* Chip vendors offer sophisticated performance analysis tools to obtain a much more fine-grained insight into the efficiency of deep learning.
 :end_tab:
 
 ## Exercises
