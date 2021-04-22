@@ -247,7 +247,7 @@ class MLP(nn.Module):
     # Declare a layer with model parameters. Here, we declare two fully
     # connected layers
     def __init__(self):
-        # Call the constructor of the `MLP` parent class `Block` to perform
+        # Call the constructor of the `MLP` parent class `Module` to perform
         # the necessary initialization. In this way, other function arguments
         # can also be specified during class instantiation, such as the model
         # parameters, `params` (to be described later)
@@ -269,7 +269,7 @@ class MLP(tf.keras.Model):
     # Declare a layer with model parameters. Here, we declare two fully
     # connected layers
     def __init__(self):
-        # Call the constructor of the `MLP` parent class `Block` to perform
+        # Call the constructor of the `MLP` parent class `Model` to perform
         # the necessary initialization. In this way, other function arguments
         # can also be specified during class instantiation, such as the model
         # parameters, `params` (to be described later)
