@@ -291,10 +291,10 @@ Now we can implement multi-GPU training on a single minibatch. Its implementatio
 def train_batch(X, y, device_params, devices, lr):
     X_shards, y_shards = split_batch(X, y, devices)
     with autograd.record():  # Loss is calculated separately on each GPU
-        losses = [loss(lenet(X_shard, device_W), y_shard)
-                  for X_shard, y_shard, device_W in zip(
-                      X_shards, y_shards, device_params)]
-    for l in losses:  # Backpropagation is performed separately on each GPU
+        ls = [loss(lenet(X_shard, device_W), y_shard)
+              for X_shard, y_shard, device_W in zip(
+                  X_shards, y_shards, device_params)]
+    for l in ls:  # Backpropagation is performed separately on each GPU
         l.backward()
     # Sum all gradients from each GPU and broadcast them to all GPUs
     for i in range(len(device_params[0])):
@@ -309,10 +309,10 @@ def train_batch(X, y, device_params, devices, lr):
 def train_batch(X, y, device_params, devices, lr):
     X_shards, y_shards = split_batch(X, y, devices)
     # Loss is calculated separately on each GPU
-    losses = [loss(lenet(X_shard, device_W), y_shard).sum()
-              for X_shard, y_shard, device_W in zip(
-                  X_shards, y_shards, device_params)]
-    for l in losses:  # Backpropagation is performed separately on each GPU
+    ls = [loss(lenet(X_shard, device_W), y_shard).sum()
+          for X_shard, y_shard, device_W in zip(
+              X_shards, y_shards, device_params)]
+    for l in ls:  # Backpropagation is performed separately on each GPU
         l.backward()
     # Sum all gradients from each GPU and broadcast them to all GPUs
     with torch.no_grad():
@@ -372,8 +372,6 @@ def train(num_gpus, batch_size, lr):
     print(f'test acc: {animator.Y[0][-1]:.2f}, {timer.avg():.1f} sec/epoch '
           f'on {str(devices)}')
 ```
-
-## Experiment
 
 Let us see how well this works on a single GPU.
 We first use a batch size of 256 and a learning rate of 0.2.
