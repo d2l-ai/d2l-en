@@ -134,15 +134,9 @@ z = x * y + 2
 z
 ```
 
-:begin_tab:`mxnet`
 ![The backend tracks dependencies between various steps in the computational graph.](../img/asyncgraph.svg)
 :label:`fig_asyncgraph`
-:end_tab:
 
-:begin_tab:`pytorch`
-![The backend tracks dependencies between various steps in the computational graph.](../img/asyncgraph.svg)
-:label:`fig_asyncgraph`
-:end_tab:
 
 
 The code snippet above is also illustrated in :numref:`fig_asyncgraph`.
@@ -153,10 +147,12 @@ Whenever the Python frontend thread executes one of the first three statements, 
 
 
 
-:begin_tab:`mxnet`
+
 ## Barriers and Blockers
 
+:begin_tab:`mxnet`
 There are a number of operations that will force Python to wait for completion:
+
 * Most obviously `npx.waitall()` waits until all computation has completed, regardless of when the compute instructions were issued. In practice it is a bad idea to use this operator unless absolutely necessary since it can lead to poor performance.
 * If we just want to wait until a specific variable is available we can call `z.wait_to_read()`. In this case MXNet blocks return to Python until the variable `z` has been computed. Other computation may well continue afterwards.
 
@@ -189,8 +185,9 @@ with d2l.Benchmark('scalar conversion'):
     b.sum().item()
 ```
 
-:begin_tab:`mxnet`
 ## Improving Computation
+
+:begin_tab:`mxnet`
 On a heavily multithreaded system (even regular laptops have 4 threads or more and on multi-socket servers this number can exceed 256) the overhead of scheduling operations can become significant. This is why it is highly desirable to have computation and scheduling occur asynchronously and in parallel. To illustrate the benefit of doing so let us see what happens if we increment a variable by 1 multiple times, both in sequence or asynchronously. We simulate synchronous execution by inserting a `wait_to_read` barrier in between each addition.
 :end_tab:
 
