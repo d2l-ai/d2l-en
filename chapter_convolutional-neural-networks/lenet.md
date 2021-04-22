@@ -433,7 +433,7 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 
 ## Exercises
 
-1. Replace the average pooling with max pooling. What happens?
+1. Replace the average pooling with maximum pooling. What happens?
 1. Try to construct a more complex network based on LeNet to improve its accuracy.
     1. Adjust the convolution window size.
     1. Adjust the number of output channels.

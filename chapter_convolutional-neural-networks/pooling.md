@@ -281,10 +281,10 @@ as in a convolutional layer.
 This means that the number of output channels for the pooling layer
 is the same as the number of input channels.
 Below, we will concatenate tensors `X` and `X + 1`
-on the channel dimension to construct an input with 2 channels. 
+on the channel dimension to construct an input with 2 channels.
 
 :begin_tab:`tensorflow`
-Note that this will require a 
+Note that this will require a
 concatenation along the last dimension for TensorFlow due to the channels-last syntax.
 :end_tab:
 
@@ -323,10 +323,10 @@ pool2d(X_padded)
 ```
 
 :begin_tab:`tensorflow`
-Note that the output for the tensorflow pooling appears at first glance to be different, however 
+Note that the output for the tensorflow pooling appears at first glance to be different, however
 numerically the same results are presented as MXNet and PyTorch.
-The difference lies in the dimensionality, and reading the 
-output vertically yields the same output as the other implementations. 
+The difference lies in the dimensionality, and reading the
+output vertically yields the same output as the other implementations.
 :end_tab:
 
 ## Summary
@@ -341,7 +341,7 @@ output vertically yields the same output as the other implementations.
 ## Exercises
 
 1. Can you implement average pooling as a special case of a convolution layer? If so, do it.
-1. Can you implement max pooling as a special case of a convolution layer? If so, do it.
+1. Can you implement maximum pooling as a special case of a convolution layer? If so, do it.
 1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_h\times p_w$ with a padding of $(p_h, p_w)$ and a stride of $(s_h, s_w)$.
 1. Why do you expect maximum pooling and average pooling to work differently?
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?

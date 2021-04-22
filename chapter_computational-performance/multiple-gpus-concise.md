@@ -1,7 +1,9 @@
 # Concise Implementation for Multiple GPUs
 :label:`sec_multi_gpu_concise`
 
-Implementing parallelism from scratch for every new model is no fun. Moreover, there is significant benefit in optimizing synchronization tools for high performance. In the following we will show how to do this using Gluon. The math and the algorithms are the same as in :numref:`sec_multi_gpu`. As before we begin by importing the required modules (quite unsurprisingly you will need at least two GPUs to run this notebook).
+Implementing parallelism from scratch for every new model is no fun. Moreover, there is significant benefit in optimizing synchronization tools for high performance. In the following we will show how to do this using high-level APIs of deep learning frameworks.
+The math and the algorithms are the same as in :numref:`sec_multi_gpu`.
+Quite unsurprisingly you will need at least two GPUs to run code of this section.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -19,7 +21,9 @@ from torch import nn
 
 ## A Toy Network
 
-Let us use a slightly more meaningful network than LeNet from the previous section that's still sufficiently easy and quick to train. We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference to :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning. Moreover, we remove the max-pooling layer.
+Let us use a slightly more meaningful network than LeNet from :numref:`sec_multi_gpu` that is still sufficiently easy and quick to train. 
+We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference from :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning.
+Moreover, we remove the maximum pooling layer.
 
 ```{.python .input}
 #@save
@@ -82,25 +86,35 @@ def resnet18(num_classes, in_channels=1):
 
 ## Parameter Initialization and Logistics
 
-The `initialize` method allows us to set initial defaults for parameters on a device of our choice. For a refresher see :numref:`sec_numerical_stability`. What is particularly convenient is that it also lets us initialize the network on *multiple* devices simultaneously. Let us try how this works in practice.
+:begin_tab:`mxnet`
+The `initialize` function allows us to initialize parameters on a device of our choice.
+For a refresher on initialization methods see :numref:`sec_numerical_stability`. What is particularly convenient is that it also allows us to initialize the network on *multiple* devices simultaneously. Let us try how this works in practice.
+:end_tab:
+
+:begin_tab:`pytorch`
+We will initialize the network inside the training loop.
+For a refresher on initialization methods see :numref:`sec_numerical_stability`.
+:end_tab:
 
 ```{.python .input}
 net = resnet18(10)
-# get a list of GPUs
+# Get a list of GPUs
 devices = d2l.try_all_gpus()
-# initialize the network on all of them
+# Initialize all the parameters of the network
 net.initialize(init=init.Normal(sigma=0.01), ctx=devices)
 ```
 
 ```{.python .input}
 #@tab pytorch
 net = resnet18(10)
-# get a list of GPUs
+# Get a list of GPUs
 devices = d2l.try_all_gpus()
-# we'll initialize the network inside the training loop
+# We will initialize the network inside the training loop
 ```
 
-Using the `split_and_load` function introduced in the previous section we can divide a minibatch of data and copy portions to the list of devices provided by the context variable. The network object *automatically* uses the appropriate GPU to compute the value of the forward propagation. As before we generate 4 observations and split them over the GPUs.
+:begin_tab:`mxnet`
+Using the `split_and_load` function introduced in :numref:`sec_multi_gpu` we can divide a minibatch of data and copy portions to the list of devices provided by the `devices` variable. The network object *automatically* uses the appropriate GPU to compute the value of the forward propagation. Here we generate 4 observations and split them over the GPUs.
+:end_tab:
 
 ```{.python .input}
 x = np.random.uniform(size=(4, 1, 28, 28))
@@ -108,7 +122,10 @@ x_shards = gluon.utils.split_and_load(x, devices)
 net(x_shards[0]), net(x_shards[1])
 ```
 
-Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*. This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters do not even exist on the device. We can verify this by printing out the parameters and observing any errors that might arise.
+:begin_tab:`mxnet`
+Once data pass through the network, the corresponding parameters are initialized *on the device the data passed through*.
+This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters do not even exist on the CPU. We can verify this by printing out the parameters and observing any errors that might arise.
+:end_tab:
 
 ```{.python .input}
 weight = net[0].params.get('weight')
@@ -120,14 +137,18 @@ except RuntimeError:
 weight.data(devices[0])[0], weight.data(devices[1])[0]
 ```
 
-Lastly let us replace the code to evaluate the accuracy by one that works in parallel across multiple devices. This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a batch before invoking the network. All else is essentially identical.
+:begin_tab:`mxnet`
+Next, let us replace the code to evaluate the accuracy by one that works in parallel across multiple devices. This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a batch before invoking the network. All else is essentially identical.
+:end_tab:
 
 ```{.python .input}
 #@save
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
+    """Compute the accuracy for a model on a dataset using multiple GPUs."""
     # Query the list of devices
     devices = list(net.collect_params().values())[0].list_ctx()
-    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
+    # No. of correct predictions, no. of predictions
+    metric = d2l.Accumulator(2)
     for features, labels in data_iter:
         X_shards, y_shards = split_f(features, labels, devices)
         # Run in parallel

@@ -32,13 +32,13 @@ is a sequence of the following:
 with padding to maintain the resolution,
 (ii) a nonlinearity such as a ReLU,
 (iii) a pooling layer such
-as a max pooling layer.
+as a maximum pooling layer.
 One VGG block consists of a sequence of convolutional layers,
-followed by a max pooling layer for spatial downsampling.
+followed by a maximum pooling layer for spatial downsampling.
 In the original VGG paper :cite:`Simonyan.Zisserman.2014`,
 the authors
 employed convolutions with $3\times3$ kernels with padding of 1 (keeping height and width)
-and $2 \times 2$ max pooling with stride of 2
+and $2 \times 2$ maximum pooling with stride of 2
 (halving the resolution after each block).
 In the code below, we define a function called `vgg_block`
 to implement one VGG block.
