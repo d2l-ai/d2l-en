@@ -260,6 +260,8 @@ train(net, num_gpus=2, batch_size=512, lr=0.2)
 * Take care to initialize the networks on each device before trying to access the parameters on that device. Otherwise you will encounter an error.
 * The optimization algorithms automatically aggregate over multiple GPUs.
 
+
+
 ## Exercises
 
 :begin_tab:`mxnet`

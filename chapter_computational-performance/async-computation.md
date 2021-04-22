@@ -217,18 +217,15 @@ Assume that the durations of these three stages are $t_1, t_2$ and $t_3$, respec
 
 ## Summary
 
-:begin_tab:`mxnet`
+
 * Deep learning frameworks may decouple the Python frontend from an execution backend. This allows for fast asynchronous insertion of commands into the backend and associated parallelism.
 * Asynchrony leads to a rather responsive frontend. However, use caution not to overfill the task queue since it may lead to excessive memory consumption. It is recommended to synchronize for each minibatch to keep frontend and backend approximately synchronized.
 * Chip vendors offer sophisticated performance analysis tools to obtain a much more fine-grained insight into the efficiency of deep learning.
+
+:begin_tab:`mxnet`
 * Be aware of the fact that conversions from MXNet's memory management to Python will force the backend to wait until  the specific variable is ready. Functions such as `print`, `asnumpy` and `item` all have this effect. This can be desirable but a careless use of synchronization can ruin performance.
 :end_tab:
 
-:begin_tab:`pytorch`
-* Deep learning frameworks may decouple the Python frontend from an execution backend. This allows for fast asynchronous insertion of commands into the backend and associated parallelism.
-* Asynchrony leads to a rather responsive frontend. However, use caution not to overfill the task queue since it may lead to excessive memory consumption. It is recommended to synchronize for each minibatch to keep frontend and backend approximately synchronized.
-* Chip vendors offer sophisticated performance analysis tools to obtain a much more fine-grained insight into the efficiency of deep learning.
-:end_tab:
 
 ## Exercises
 
