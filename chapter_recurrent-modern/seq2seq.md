@@ -580,6 +580,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
         for batch in data_iter:
+            optimizer.zero_grad()
             X, X_valid_len, Y, Y_valid_len = [x.to(device) for x in batch]
             bos = torch.tensor([tgt_vocab['<bos>']] * Y.shape[0],
                                device=device).reshape(-1, 1)

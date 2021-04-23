@@ -372,7 +372,7 @@ num_epochs, lr = 500, 1
 with strategy.scope():
     model = d2l.RNNModelScratch(len(vocab), num_hiddens, init_gru_state, gru, get_params)
 
-d2l.train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
 ## Concise Implementation
@@ -410,7 +410,7 @@ strategy = tf.distribute.OneDeviceStrategy(device_name)
 with strategy.scope():
     model = d2l.RNNModel(gru_layer, vocab_size=len(vocab))
 
-d2l.train_ch8(model, train_iter, vocab, num_hiddens, lr, num_epochs, strategy)
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
 ## Summary

@@ -1024,6 +1024,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
         for batch in data_iter:
+            optimizer.zero_grad()
             X, X_valid_len, Y, Y_valid_len = [x.to(device) for x in batch]
             bos = torch.tensor([tgt_vocab['<bos>']] * Y.shape[0],
                                device=device).reshape(-1, 1)
@@ -1787,7 +1788,7 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         cls_prob, offset_pred = cls_probs[i], offset_preds[i].reshape(-1, 4)
         conf, class_id = torch.max(cls_prob[1:], 0)
         predicted_bb = offset_inverse(anchors, offset_pred)
-        keep = nms(predicted_bb, conf, 0.5)
+        keep = nms(predicted_bb, conf, nms_threshold)
         # Find all non_keep indices and set the class_id to background
         all_idx = torch.arange(num_anchors, dtype=torch.long, device=device)
         combined = torch.cat((keep, all_idx))

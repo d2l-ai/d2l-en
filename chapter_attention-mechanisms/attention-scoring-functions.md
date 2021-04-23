@@ -1,11 +1,11 @@
 # Attention Scoring Functions
 :label:`sec_attention-scoring-functions`
 
-In :numref:`sec_nadaraya-waston`,
+In :numref:`sec_nadaraya-watson`,
 we used a Gaussian kernel to model
 interactions between queries and keys.
 Treating the exponent of the Gaussian kernel
-in :eqref:`eq_nadaraya-waston-gaussian`
+in :eqref:`eq_nadaraya-watson-gaussian`
 as an *attention scoring function* (or *scoring function* for short),
 the results of this function were
 essentially fed into

@@ -23,7 +23,7 @@ gated RNNs are much more common in practice.
 We will begin by introducing two of such widely-used networks,
 namely *gated recurrent units* (GRUs) and *long short-term memory* (LSTM).
 Furthermore, we will expand the RNN architecture
-with a single undirectional hidden layer
+with a single unidirectional hidden layer
 that has been discussed so far.
 We will describe deep architectures with
 multiple hidden layers,

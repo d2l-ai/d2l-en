@@ -14,7 +14,7 @@ Thus it is time to learn how to load and store
 both individual weight vectors and entire models.
 This section addresses both issues.
 
-## Loading and Saving Tensors
+## (**Loading and Saving Tensors**)
 
 For individual tensors, we can directly
 invoke the `load` and `save` functions
@@ -69,7 +69,7 @@ x2 = np.load('x-file.npy', allow_pickle=True)
 x2
 ```
 
-We can store a list of tensors and read them back into memory.
+We can [**store a list of tensors and read them back into memory.**]
 
 ```{.python .input}
 y = np.zeros(4)
@@ -94,8 +94,8 @@ x2, y2 = np.load('xy-files.npy', allow_pickle=True)
 (x2, y2)
 ```
 
-We can even write and read a dictionary that maps
-from strings to tensors.
+We can even [**write and read a dictionary that maps
+from strings to tensors.**]
 This is convenient when we want
 to read or write all the weights in a model.
 
@@ -122,7 +122,7 @@ mydict2 = np.load('mydict.npy', allow_pickle=True)
 mydict2
 ```
 
-## Loading and Saving Model Parameters
+## [**Loading and Saving Model Parameters**]
 
 Saving individual weight vectors (or other tensors) is useful,
 but it gets very tedious if we want to save
@@ -140,7 +140,7 @@ hence they cannot be serialized as naturally.
 Thus, in order to reinstate a model, we need
 to generate the architecture in code
 and then load the parameters from disk.
-Let us start with our familiar MLP.
+(**Let us start with our familiar MLP.**)
 
 ```{.python .input}
 class MLP(nn.Block):
@@ -193,7 +193,7 @@ X = tf.random.uniform((2, 20))
 Y = net(X)
 ```
 
-Next, we store the parameters of the model as a file with the name "mlp.params".
+Next, we [**store the parameters of the model as a file**] with the name "mlp.params".
 
 ```{.python .input}
 net.save_parameters('mlp.params')
@@ -212,7 +212,7 @@ net.save_weights('mlp.params')
 To recover the model, we instantiate a clone
 of the original MLP model.
 Instead of randomly initializing the model parameters,
-we read the parameters stored in the file directly.
+we [**read the parameters stored in the file directly**].
 
 ```{.python .input}
 clone = MLP()

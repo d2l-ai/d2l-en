@@ -92,8 +92,8 @@ That is to say, using the $2\times 2$ maximum pooling layer,
 we can still detect if the pattern recognized by the convolutional layer
 moves no more than one element in height or width.
 
-In the code below, we implement the forward propagation
-of the pooling layer in the `pool2d` function.
+In the code below, we (**implement the forward propagation
+of the pooling layer**) in the `pool2d` function.
 This function is similar to the `corr2d` function
 in :numref:`sec_conv_layer`.
 However, here we have no kernel, computing the output
@@ -143,7 +143,7 @@ def pool2d(X, pool_size, mode='max'):
     return Y
 ```
 
-We can construct the input tensor `X` in :numref:`fig_pooling` to validate the output of the two-dimensional maximum pooling layer.
+We can construct the input tensor `X` in :numref:`fig_pooling` to [**validate the output of the two-dimensional maximum pooling layer**].
 
 ```{.python .input}
 #@tab all
@@ -151,14 +151,14 @@ X = d2l.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]])
 pool2d(X, (2, 2))
 ```
 
-Also, we experiment with the average pooling layer.
+Also, we experiment with (**the average pooling layer**).
 
 ```{.python .input}
 #@tab all
 pool2d(X, (2, 2), 'avg')
 ```
 
-## Padding and Stride
+## [**Padding and Stride**]
 
 As with convolutional layers, pooling layers
 can also change the output shape.
@@ -187,8 +187,8 @@ X = d2l.reshape(d2l.arange(16, dtype=d2l.float32), (1, 4, 4, 1))
 X
 ```
 
-By default, the stride and the pooling window in the instance from the framework's built-in class
-have the same shape.
+By default, (**the stride and the pooling window in the instance from the framework's built-in class
+have the same shape.**)
 Below, we use a pooling window of shape `(3, 3)`,
 so we get a stride shape of `(3, 3)` by default.
 
@@ -211,7 +211,7 @@ pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3])
 pool2d(X)
 ```
 
-The stride and padding can be manually specified.
+[**The stride and padding can be manually specified.**]
 
 ```{.python .input}
 pool2d = nn.MaxPool2D(3, padding=1, strides=2)
@@ -241,40 +241,33 @@ and specify the padding and stride for height and width, respectively.
 :end_tab:
 
 :begin_tab:`pytorch`
-Of course, we can specify an arbitrary rectangular pooling window
-and specify the padding and stride for height and width, respectively.
-For `nn.MaxPool2D` padding should be smaller than half of the kernel_size.
-If the condition is not met, we can first pad the input using
-`nn.functional.pad` and then pass it to the pooling layer.
+Of course, we can (**specify an arbitrary rectangular pooling window
+and specify the padding and stride for height and width**), respectively.
 :end_tab:
 
 :begin_tab:`tensorflow`
 Of course, we can specify an arbitrary rectangular pooling window
 and specify the padding and stride for height and width, respectively.
-In TensorFlow, to implement a padding of 1 all the way around the tensor, a function designed for padding 
-must be invoked using `tf.pad`. This will implement the required padding and allow the aforementioned (3, 3) pooling with a (2, 2) stride to perform
-similar to those in PyTorch and MXNet. When padding in this way, the built-in `padding` variable must be set to `valid`.
 :end_tab:
 
 ```{.python .input}
-pool2d = nn.MaxPool2D((2, 3), padding=(1, 2), strides=(2, 3))
+pool2d = nn.MaxPool2D((2, 3), padding=(0, 1), strides=(2, 3))
 pool2d(X)
 ```
 
 ```{.python .input}
 #@tab pytorch
-X_pad = nn.functional.pad(X, (2, 2, 1, 1))
-pool2d = nn.MaxPool2d((2, 3), stride=(2, 3))
-pool2d(X_pad)
+pool2d = nn.MaxPool2d((2, 3), stride=(2, 3), padding=(0, 1))
+pool2d(X)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-paddings = tf.constant([[0, 0], [1, 1], [2, 1], [0, 0]])
+paddings = tf.constant([[0, 0], [0, 0], [1, 1], [0, 0]])
 X_padded = tf.pad(X, paddings, "CONSTANT")
 
 pool2d = tf.keras.layers.MaxPool2D(pool_size=[2, 3], padding='valid',
-                                   strides=(2,3))
+                                   strides=(2, 3))
 pool2d(X_padded)
 ```
 
@@ -282,16 +275,16 @@ pool2d(X_padded)
 ## Multiple Channels
 
 When processing multi-channel input data,
-the pooling layer pools each input channel separately,
+[**the pooling layer pools each input channel separately**],
 rather than summing the inputs up over channels
 as in a convolutional layer.
 This means that the number of output channels for the pooling layer
 is the same as the number of input channels.
 Below, we will concatenate tensors `X` and `X + 1`
-on the channel dimension to construct an input with 2 channels. 
+on the channel dimension to construct an input with 2 channels.
 
 :begin_tab:`tensorflow`
-Note that this will require a 
+Note that this will require a
 concatenation along the last dimension for TensorFlow due to the channels-last syntax.
 :end_tab:
 
@@ -330,10 +323,10 @@ pool2d(X_padded)
 ```
 
 :begin_tab:`tensorflow`
-Note that the output for the tensorflow pooling appears at first glance to be different, however 
+Note that the output for the tensorflow pooling appears at first glance to be different, however
 numerically the same results are presented as MXNet and PyTorch.
-The difference lies in the dimensionality, and reading the 
-output vertically yields the same output as the other implementations. 
+The difference lies in the dimensionality, and reading the
+output vertically yields the same output as the other implementations.
 :end_tab:
 
 ## Summary
@@ -348,7 +341,7 @@ output vertically yields the same output as the other implementations.
 ## Exercises
 
 1. Can you implement average pooling as a special case of a convolution layer? If so, do it.
-1. Can you implement max pooling as a special case of a convolution layer? If so, do it.
+1. Can you implement maximum pooling as a special case of a convolution layer? If so, do it.
 1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_h\times p_w$ with a padding of $(p_h, p_w)$ and a stride of $(s_h, s_w)$.
 1. Why do you expect maximum pooling and average pooling to work differently?
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?

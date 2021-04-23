@@ -186,7 +186,7 @@ for iter in range(10):
 theta, n_H / (n_H + n_T)
 ```
 
-Numerical convenience is only one reason people like to use negative log-likelihoods.  Indeed, there are a several reasons that it can be preferable.
+Numerical convenience is not the only reason why people like to use negative log-likelihoods. There are several other reasons why it is preferable.
 
 
 

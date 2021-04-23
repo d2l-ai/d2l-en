@@ -104,6 +104,7 @@ is *Jensen's inequality*.
 It amounts to a generalization of the definition of convexity:
 
 $$\sum_i \alpha_i f(x_i)  \geq f\left(\sum_i \alpha_i x_i\right)    \text{ and }    E_X[f(X)]  \geq f\left(E_X[X]\right),$$
+:eqlabel:`eq_jensens-inequality`
 
 where $\alpha_i$ are nonnegative real numbers such that $\sum_i \alpha_i = 1$ and $X$ is a random variable.
 In other words, the expectation of a convex function is no less than the convex function of an expectation, where the latter is usually a simpler expression. 

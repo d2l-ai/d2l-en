@@ -28,8 +28,8 @@ in your career as a data scientist.
 
 Throughout the book, we will train and test models
 on various downloaded datasets.
-Here, we implement several utility functions
-to facilitate data downloading.
+Here, we (**implement several utility functions
+to facilitate data downloading**).
 First, we maintain a dictionary `DATA_HUB`
 that maps a string (the *name* of the dataset)
 to a tuple containing both the URL to locate the dataset
@@ -51,7 +51,7 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 ```
 
 The following `download` function downloads a dataset,
-caching it in a local directory (`../data` by default)
+caches it in a local directory (`../data` by default),
 and returns the name of the downloaded file.
 If a file corresponding to this dataset
 already exists in the cache directory
@@ -174,8 +174,8 @@ in :numref:`fig_house_pricing`
 has links to download the data.
 
 
-To get started, we will read in and process the data
-using `pandas`, which we have introduced in :numref:`sec_pandas`.
+To get started, we will [**read in and process the data
+using `pandas`**], which we have introduced in :numref:`sec_pandas`.
 So, you will want to make sure that you have `pandas` installed
 before proceeding further.
 Fortunately, if you are reading in Jupyter,
@@ -251,19 +251,19 @@ print(train_data.shape)
 print(test_data.shape)
 ```
 
-Let us take a look at the first four and last two features
-as well as the label (SalePrice) from the first four examples.
+Let us [**take a look at the first four and last two features
+as well as the label (SalePrice)**] from the first four examples.
 
 ```{.python .input}
 #@tab all
 print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
-We can see that in each example, the first feature is the ID.
+We can see that in each example, (**the first feature is the ID.**)
 This helps the model identify each training example.
 While this is convenient, it does not carry
 any information for prediction purposes.
-Hence, we remove it from the dataset
+Hence, (**we remove it from the dataset**)
 before feeding the data into the model.
 
 ```{.python .input}
@@ -277,11 +277,11 @@ As stated above, we have a wide variety of data types.
 We will need to preprocess the data before we can start modeling.
 Let us start with the numerical features.
 First, we apply a heuristic,
-replacing all missing values
-by the corresponding feature's mean.
+[**replacing all missing values
+by the corresponding feature's mean.**]
 Then, to put all features on a common scale,
-we *standardize* the data by
-rescaling features to zero mean and unit variance:
+we (***standardize* the data by
+rescaling features to zero mean and unit variance**):
 
 $$x \leftarrow \frac{x - \mu}{\sigma},$$
 
@@ -310,9 +310,9 @@ all_features[numeric_features] = all_features[numeric_features].apply(
 all_features[numeric_features] = all_features[numeric_features].fillna(0)
 ```
 
-Next we deal with discrete values.
+[**Next we deal with discrete values.**]
 This includes features such as "MSZoning".
-We replace them by a one-hot encoding
+(**We replace them by a one-hot encoding**)
 in the same way that we previously transformed
 multiclass labels into vectors (see :numref:`subsec_classification-problem`).
 For instance, "MSZoning" assumes the values "RL" and "RM".
@@ -335,8 +335,8 @@ all_features.shape
 You can see that this conversion increases
 the number of features from 79 to 331.
 Finally, via the `values` attribute,
-we can extract the NumPy format from the `pandas` format
-and convert it into the tensor
+we can [**extract the NumPy format from the `pandas` format
+and convert it into the tensor**]
 representation for training.
 
 ```{.python .input}
@@ -348,7 +348,7 @@ train_labels = d2l.tensor(
     train_data.SalePrice.values.reshape(-1, 1), dtype=d2l.float32)
 ```
 
-## Training
+## [**Training**]
 
 To get started we train a linear model with squared loss.
 Not surprisingly, our linear model will not lead
@@ -397,8 +397,8 @@ def get_net():
 With house prices, as with stock prices,
 we care about relative quantities
 more than absolute quantities.
-Thus we tend to care more about
-the relative error $\frac{y - \hat{y}}{y}$
+Thus [**we tend to care more about
+the relative error $\frac{y - \hat{y}}{y}$**]
 than about the absolute error $y - \hat{y}$.
 For instance, if our prediction is off by USD 100,000
 when estimating the price of a house in Rural Ohio,
@@ -409,8 +409,8 @@ in Los Altos Hills, California,
 this might represent a stunningly accurate prediction
 (there, the median house price exceeds 4 million USD).
 
-One way to address this problem is to
-measure the discrepancy in the logarithm of the price estimates.
+(**One way to address this problem is to
+measure the discrepancy in the logarithm of the price estimates.**)
 In fact, this is also the official error measure
 used by the competition to evaluate the quality of submissions.
 After all, a small value $\delta$ for $|\log y - \log \hat{y}| \leq \delta$
@@ -448,9 +448,9 @@ def log_rmse(y_true, y_pred):
         tf.math.log(y_true), tf.math.log(clipped_preds))))
 ```
 
-Unlike in previous sections, our training functions
+Unlike in previous sections, [**our training functions
 will rely on the Adam optimizer
-(we will describe it in greater detail later).
+(we will describe it in greater detail later)**].
 The main appeal of this optimizer is that,
 despite doing no better (and sometimes worse)
 given unlimited resources for hyperparameter optimization,
@@ -524,7 +524,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
 
 ## $K$-Fold Cross-Validation
 
-You might recall that we introduced $K$-fold cross-validation
+You might recall that we introduced [**$K$-fold cross-validation**]
 in the section where we discussed how to deal
 with model selection (:numref:`sec_model_selection`).
 We will put this to good use to select the model design
@@ -559,7 +559,7 @@ def get_k_fold_data(k, i, X, y):
     return X_train, y_train, X_valid, y_valid
 ```
 
-The training and verification error averages are returned
+[**The training and verification error averages are returned**]
 when we train $K$ times in the $K$-fold cross-validation.
 
 ```{.python .input}
@@ -583,7 +583,7 @@ def k_fold(k, X_train, y_train, num_epochs, learning_rate, weight_decay,
     return train_l_sum / k, valid_l_sum / k
 ```
 
-## Model Selection
+## [**Model Selection**]
 
 In this example, we pick an untuned set of hyperparameters
 and leave it up to the reader to improve the model.
@@ -616,7 +616,7 @@ Less overfitting might indicate that our data can support a more powerful model.
 Massive overfitting might suggest that we can gain
 by incorporating regularization techniques.
 
-##  Submitting Predictions on Kaggle
+##  [**Submitting Predictions on Kaggle**]
 
 Now that we know what a good choice of hyperparameters should be,
 we might as well use all the data to train on it

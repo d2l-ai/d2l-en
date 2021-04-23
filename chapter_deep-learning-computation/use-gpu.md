@@ -21,7 +21,7 @@ Then, download the [NVIDIA driver and CUDA](https://developer.nvidia.com/cuda-do
 and follow the prompts to set the appropriate path.
 Once these preparations are complete,
 the `nvidia-smi` command can be used
-to view the graphics card information.
+to (**view the graphics card information**).
 
 ```{.python .input}
 #@tab all
@@ -95,7 +95,7 @@ Almost all other sections do *not* require multiple GPUs.
 Instead, this is simply to illustrate
 how data flow between different devices.
 
-## Computing Devices
+## [**Computing Devices**]
 
 We can specify devices, such as CPUs and GPUs,
 for storage and calculation.
@@ -152,7 +152,7 @@ import tensorflow as tf
 tf.device('/CPU:0'), tf.device('/GPU:0'), tf.device('/GPU:1')
 ```
 
-We can query the number of available GPUs.
+We can (**query the number of available GPUs.**)
 
 ```{.python .input}
 npx.num_gpus()
@@ -168,8 +168,8 @@ torch.cuda.device_count()
 len(tf.config.experimental.list_physical_devices('GPU'))
 ```
 
-Now we define two convenient functions that allow us
-to run code even if the requested GPUs do not exist.
+Now we [**define two convenient functions that allow us
+to run code even if the requested GPUs do not exist.**]
 
 ```{.python .input}
 def try_gpu(i=0):  #@save
@@ -221,7 +221,7 @@ try_gpu(), try_gpu(10), try_all_gpus()
 ## Tensors and GPUs
 
 By default, tensors are created on the CPU.
-We can query the device where the tensor is located.
+We can [**query the device where the tensor is located.**]
 
 ```{.python .input}
 x = np.array([1, 2, 3])
@@ -251,7 +251,7 @@ or even how to decide where to perform the computation.
 
 ### Storage on the GPU
 
-There are several ways to store a tensor on the GPU.
+There are several ways to [**store a tensor on the GPU.**]
 For example, we can specify a storage device when creating a tensor.
 Next, we create the tensor variable `X` on the first `gpu`.
 The tensor created on a GPU only consumes the memory of this GPU.
@@ -276,7 +276,7 @@ with try_gpu():
 X
 ```
 
-Assuming that you have at least two GPUs, the following code will create a random tensor on the second GPU.
+Assuming that you have at least two GPUs, the following code will (**create a random tensor on the second GPU.**)
 
 ```{.python .input}
 Y = np.random.uniform(size=(2, 3), ctx=try_gpu(1))
@@ -298,8 +298,8 @@ Y
 
 ### Copying
 
-If we want to compute `X + Y`,
-we need to decide where to perform this operation.
+[**If we want to compute `X + Y`,
+we need to decide where to perform this operation.**]
 For instance, as shown in :numref:`fig_copyto`,
 we can transfer `X` to the second GPU
 and perform the operation there.
@@ -336,9 +336,9 @@ print(X)
 print(Z)
 ```
 
-Now that the data are on the same GPU
+Now that [**the data are on the same GPU
 (both `Z` and `Y` are),
-we can add them up.
+we can add them up.**]
 
 ```{.python .input}
 #@tab all
@@ -425,7 +425,7 @@ Even worse, it is now subject to the dreaded global interpreter lock
 that makes everything wait for Python to complete.
 
 
-## Neural Networks and GPUs
+## [**Neural Networks and GPUs**]
 
 Similarly, a neural network model can specify devices.
 The following code puts the model parameters on the GPU.
@@ -461,7 +461,7 @@ When the input is a tensor on the GPU, the model will calculate the result on th
 net(X)
 ```
 
-Let us confirm that the model parameters are stored on the same GPU.
+Let us (**confirm that the model parameters are stored on the same GPU.**)
 
 ```{.python .input}
 net[0].weight.data().ctx
