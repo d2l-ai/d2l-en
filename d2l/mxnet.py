@@ -1390,9 +1390,11 @@ def resnet18(num_classes):
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-concise.md
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
+    """Compute the accuracy for a model on a dataset using multiple GPUs."""
     # Query the list of devices
     devices = list(net.collect_params().values())[0].list_ctx()
-    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
+    # No. of correct predictions, no. of predictions
+    metric = d2l.Accumulator(2)
     for features, labels in data_iter:
         X_shards, y_shards = split_f(features, labels, devices)
         # Run in parallel
