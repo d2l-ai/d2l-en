@@ -63,8 +63,8 @@ x + y, x * y, x / y, x ** y
 #@tab pytorch
 import torch
 
-x = torch.tensor([3.0])
-y = torch.tensor([2.0])
+x = torch.tensor(3.0)
+y = torch.tensor(2.0)
 
 x + y, x * y, x / y, x**y
 ```
@@ -73,8 +73,8 @@ x + y, x * y, x / y, x**y
 #@tab tensorflow
 import tensorflow as tf
 
-x = tf.constant([3.0])
-y = tf.constant([2.0])
+x = tf.constant(3.0)
+y = tf.constant(2.0)
 
 x + y, x * y, x / y, x**y
 ```
