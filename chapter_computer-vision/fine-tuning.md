@@ -139,7 +139,19 @@ pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
 pretrained_net = torchvision.models.resnet18(pretrained=True)
 ```
 
-The pre-trained source model instance contains two member variables: `features` and `output`. The former contains all layers of the model, except the output layer, and the latter is the output layer of the model. The main purpose of this division is to facilitate the fine tuning of the model parameters of all layers except the output layer. The member variable `output` of source model is given below. As a fully connected layer, it transforms ResNet's final global average pooling layer output into 1000 class output on the ImageNet dataset.
+```{.python .input}
+pretrained_net
+```
+
+:begin_tab:`mxnet`
+The pre-trained source model instance contains two member variables: `features` and `output`. The former contains all layers of the model, except the output layer, and the latter is the output layer of the model. The main purpose of this division is to facilitate the fine tuning of the model parameters of all layers except the output layer. The member variable `output` of source model is given below.
+:end_tab:
+
+:begin_tab:`pytorch`
+The pre-trained source model instance contains a number of feature layers and an output layer `fc`. The main purpose of this division is to facilitate the fine tuning of the model parameters of all layers except the output layer. The member variable `fc` of source model is given below.
+:end_tab:
+
+As a fully connected layer, it transforms ResNet's final global average pooling layer output into 1000 class output on the ImageNet dataset.
 
 ```{.python .input}
 pretrained_net.output
@@ -150,7 +162,15 @@ pretrained_net.output
 pretrained_net.fc
 ```
 
-We then build a new neural network to use as the target model. It is defined in the same way as the pre-trained source model, but the final number of outputs is equal to the number of categories in the target dataset. In the code below, the model parameters in the member variable `features` of the target model instance `finetune_net` are initialized to model parameters of the corresponding layer of the source model. Because the model parameters in `features` are obtained by pre-training on the ImageNet dataset, it is good enough. Therefore, we generally only need to use small learning rates to "fine-tune" these parameters. In contrast, model parameters in the member variable `output` are randomly initialized and generally require a larger learning rate to learn from scratch. Assume the learning rate in the `Trainer` instance is $\eta$ and use a learning rate of $10\eta$ to update the model parameters in the member variable `output`.
+We then build a new neural network to use as the target model. It is defined in the same way as the pre-trained source model, but the final number of outputs is equal to the number of categories in the target dataset.
+
+:begin_tab:`mxnet`
+In the code below, the model parameters in the member variable `features` of the target model instance `finetune_net` are initialized to model parameters of the corresponding layer of the source model. Because the model parameters in `features` are obtained by pre-training on the ImageNet dataset, it is good enough. Therefore, we generally only need to use small learning rates to "fine-tune" these parameters. In contrast, model parameters in the member variable `output` are randomly initialized and generally require a larger learning rate to learn from scratch. Assume the learning rate in the `Trainer` instance is $\eta$ and use a learning rate of $10\eta$ to update the model parameters in the member variable `output`.
+:end_tab:
+
+:begin_tab:`pytorch`
+In the code below, the model parameters in the feature layers of the target model instance `finetune_net` are initialized to model parameters of the corresponding layer of the source model. Because the model parameters in the layers before `fc` are obtained by pre-training on the ImageNet dataset, it is good enough. Therefore, we generally only need to use small learning rates to "fine-tune" these parameters. In contrast, model parameters in the member variable `fc` are randomly initialized and generally require a larger learning rate to learn from scratch. Assume the learning rate in the `Trainer` instance is $\eta$ and use a learning rate of $10\eta$ to update the model parameters in the member variable `fc`.
+:end_tab:
 
 ```{.python .input}
 finetune_net = gluon.model_zoo.vision.resnet18_v2(classes=2)
