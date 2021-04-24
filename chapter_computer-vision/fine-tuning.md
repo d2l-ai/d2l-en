@@ -139,10 +139,6 @@ pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
 pretrained_net = torchvision.models.resnet18(pretrained=True)
 ```
 
-```{.python .input}
-pretrained_net
-```
-
 :begin_tab:`mxnet`
 The pre-trained source model instance contains two member variables: `features` and `output`. The former contains all layers of the model, except the output layer, and the latter is the output layer of the model. The main purpose of this division is to facilitate the fine tuning of the model parameters of all layers except the output layer. The member variable `output` of source model is given below.
 :end_tab:
