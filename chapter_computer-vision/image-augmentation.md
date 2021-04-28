@@ -1,23 +1,27 @@
 # Image Augmentation
 :label:`sec_image_augmentation`
 
-
-We mentioned that large-scale datasets are prerequisites for the successful
-application of deep neural networks in
-:numref:`sec_alexnet`. Image augmentation technology expands the scale of training datasets
-by making a series of random changes to the training images to produce similar,
-but different, training examples. Another way to explain image augmentation is
-that randomly changing training examples can reduce a model's dependence on
-certain properties, thereby improving its capability for generalization. For
-example, we can crop the images in different ways, so that the objects of
-interest appear in different positions, reducing the model's dependence on the
-position where objects appear. We can also adjust the brightness, color, and
-other factors to reduce model's sensitivity to color. It can be said that image
-augmentation technology contributed greatly to the success of AlexNet. In this
-section, we will discuss this technology, which is widely used in computer
-vision.
-
-First, import the packages or modules required for the experiment in this section.
+In :numref:`sec_alexnet`, 
+we mentioned that large datasets 
+are a prerequisite
+for the success of
+deep neural networks
+in various applications.
+*Image augmentation* 
+generates similar but distinct training examples
+after a series of random changes to the training images, thereby expanding the size of the training set.
+Alternatively,
+image augmentation can be motivated
+by the fact that 
+random tweaks of training examples 
+allow models to less rely on
+certain attributes, thereby improving their generalization ability.
+For example, we can crop an image in different ways to make the object of interest appear in different positions, thereby reducing the dependence of a model on the position of the object. 
+We can also adjust factors such as brightness and color to reduce a model's sensitivity to color.
+It is probably true
+that image augmentation was indispensable
+for the success of AlexNet at that time.
+In this section we will discuss this widely used technique in computer vision.
 
 ```{.python .input}
 %matplotlib inline
@@ -37,9 +41,9 @@ import torchvision
 from torch import nn
 ```
 
-## Common Image Augmentation Method
+## Common Image Augmentation Methods
 
-In this experiment, we will use an image with a shape of $400\times 500$ as an example.
+In our investigation of common image augmentation methods, we will use the following $400\times 500$ image an example.
 
 ```{.python .input}
 d2l.set_figsize()
@@ -54,7 +58,7 @@ img = d2l.Image.open('../img/cat1.jpg')
 d2l.plt.imshow(img);
 ```
 
-Most image augmentation methods have a certain degree of randomness. To make it easier for us to observe the effect of image augmentation, we next define the auxiliary function `apply`. This function runs the image augmentation method `aug` multiple times on the input image `img` and shows all results.
+Most image augmentation methods have a certain degree of randomness. To make it easier for us to observe the effect of image augmentation, next we define an auxiliary function `apply`. This function runs the image augmentation method `aug` multiple times on the input image `img` and shows all the results.
 
 ```{.python .input}
 #@tab all
@@ -65,7 +69,11 @@ def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
 
 ### Flipping and Cropping
 
-Flipping the image left and right usually does not change the category of the object. This is one of the earliest and most widely used methods of image augmentation. Next, we use the `transforms` module to create the `RandomFlipLeftRight` instance, which introduces a 50% chance that the image is flipped left and right.
+Flipping the image left and right usually does not change the category of the object. 
+This is one of the earliest and most widely used methods of image augmentation.
+Next, we use the `transforms` module to create the `RandomFlipLeftRight` instance, which flips
+an image left and right with a 50% chance.
+
 
 ```{.python .input}
 apply(img, gluon.data.vision.transforms.RandomFlipLeftRight())
@@ -76,7 +84,9 @@ apply(img, gluon.data.vision.transforms.RandomFlipLeftRight())
 apply(img, torchvision.transforms.RandomHorizontalFlip())
 ```
 
-Flipping up and down is not as commonly used as flipping left and right. However, at least for this example image, flipping up and down does not hinder recognition. Next, we create a `RandomFlipTopBottom` instance for a 50% chance of flipping the image up and down.
+Flipping up and down is not as common as flipping left and right. But at least for this example image, flipping up and down does not hinder recognition.
+Next, we create a `RandomFlipTopBottom` instance to flip
+an image up and down with a 50% chance.
 
 ```{.python .input}
 apply(img, gluon.data.vision.transforms.RandomFlipTopBottom())
@@ -87,16 +97,13 @@ apply(img, gluon.data.vision.transforms.RandomFlipTopBottom())
 apply(img, torchvision.transforms.RandomVerticalFlip())
 ```
 
-In the example image we used, the cat is in the middle of the image, but this
-may not be the case for all images. In
-:numref:`sec_pooling`,
-we explained that the pooling layer can reduce the sensitivity of the
-convolutional layer to the target location. In addition, we can make objects
-appear at different positions in the image in different proportions by randomly
-cropping the image. This can also reduce the sensitivity of the model to the
-target position.
+In the example image we used, the cat is in the middle of the image, but this may not be the case in general. 
+In :numref:`sec_pooling`, we explained that the pooling layer can reduce the sensitivity of a convolutional layer to the target position.
+In addition, we can also randomly crop the image to make objects appear in different positions in the image at different scales, which can also reduce the sensitivity of a model to the target position.
 
-In the following code, we randomly crop a region with an area of 10% to 100% of the original area, and the ratio of width to height of the region is randomly selected from between 0.5 and 2. Then, the width and height of the region are both scaled to 200 pixels. Unless otherwise stated, the random number between $a$ and $b$ in this section refers to a continuous value obtained by uniform sampling in the interval $[a, b]$.
+In the code below, we randomly crop an area with an area of $10\% \sim 100\%$ of the original area each time, and the ratio of width to height of this area is randomly selected from $0.5 \sim 2$. Then, the width and height of the region are both scaled to 200 pixels. 
+Unless otherwise specified, the random number between $a$ and $b$ in this section refers to a continuous value obtained by random and uniform sampling from the interval $[a, b]$.
+
 
 ```{.python .input}
 shape_aug = gluon.data.vision.transforms.RandomResizedCrop(
@@ -111,7 +118,7 @@ shape_aug = torchvision.transforms.RandomResizedCrop(
 apply(img, shape_aug)
 ```
 
-### Changing the Color
+### Changing Colors
 
 Another augmentation method is changing colors. We can change four aspects of the image color: brightness, contrast, saturation, and hue. In the example below, we randomly change the brightness of the image to a value between 50% ($1-0.5$) and 150% ($1+0.5$) of the original image.
 
@@ -152,9 +159,11 @@ color_aug = torchvision.transforms.ColorJitter(
 apply(img, color_aug)
 ```
 
-### Overlying Multiple Image Augmentation Methods
+### Combining Multiple Image Augmentation Methods
 
-In practice, we will overlay multiple image augmentation methods. We can overlay the different image augmentation methods defined above and apply them to each image by using a `Compose` instance.
+In practice, we will combine multiple image augmentation methods. 
+For example,
+we can combine the different image augmentation methods defined above and apply them to each image via a `Compose` instance.
 
 ```{.python .input}
 augs = gluon.data.vision.transforms.Compose([
@@ -169,9 +178,13 @@ augs = torchvision.transforms.Compose([
 apply(img, augs)
 ```
 
-## Using an Image Augmentation Training Model
+## Training with Image Augmentation
 
-Next, we will look at how to apply image augmentation in actual training. Here, we use the CIFAR-10 dataset, instead of the Fashion-MNIST dataset we have been using. This is because the position and size of the objects in the Fashion-MNIST dataset have been normalized, and the differences in color and size of the objects in CIFAR-10 dataset are more significant. The first 32 training images in the CIFAR-10 dataset are shown below.
+Let us train a model with image augmentation.
+Here we use the CIFAR-10 dataset instead of the Fashion-MNIST dataset that we used before. 
+This is because the position and size of the objects in the Fashion-MNIST dataset have been normalized, while the color and size of the objects in the CIFAR-10 dataset have more significant differences. 
+The first 32 training images in the CIFAR-10 dataset are shown below.
+
 
 ```{.python .input}
 d2l.show_images(gluon.data.vision.CIFAR10(
@@ -185,7 +198,13 @@ all_images = torchvision.datasets.CIFAR10(train=True, root="../data",
 d2l.show_images([all_images[i][0] for i in range(32)], 4, 8, scale=0.8);
 ```
 
-In order to obtain definitive results during prediction, we usually only apply image augmentation to the training example, and do not use image augmentation with random operations during prediction. Here, we only use the simplest random left-right flipping method. In addition, we use a `ToTensor` instance to convert minibatch images into the format required by MXNet, i.e., 32-bit floating point numbers with the shape of (batch size, number of channels, height, width) and value range between 0 and 1.
+In order to obtain a definite result when predicting, we usually only apply image augmentation to training samples, and do not use image augmentation with random operations when predicting. Here we only use the simplest random left and right flip. In addition, we use the ToTensor instance to convert the small batch of images into the format required by MXNet, that is, the shape is (batch size, number of channels, height, width), the value range is between 0 and 1, and the type is a 32-bit floating point number.
+
+
+In order to obtain definitive results during prediction, we usually only apply image augmentation to the training example, and do not use image augmentation with random operations during prediction. 
+Here we only use the simplest random left-right flipping method. In addition, we use a `ToTensor` instance to convert a minibatch of images into the format required by the deep learning framework, i.e., 
+32-bit floating point numbers between 0 and 1 with the shape of (batch size, number of channels, height, width).
+
 
 ```{.python .input}
 train_augs = gluon.data.vision.transforms.Compose([
@@ -207,18 +226,22 @@ test_augs = torchvision.transforms.Compose([
 ```
 
 :begin_tab:`mxnet`
-Next, we define an auxiliary function to make it easier to read the image and
-apply image augmentation. The `transform_first` function provided by Gluon's
-dataset applies image augmentation to the first element of each training
-example (image and label), i.e., the element at the top of the image. For
-detailed descriptions of `DataLoader`, refer to :numref:`sec_fashion_mnist`.
+Next, we define an auxiliary function to facilitate reading the image and
+applying image augmentation. 
+The `transform_first` function provided by Gluon's
+datasets applies image augmentation to the first element of each training
+example (image and label), i.e., the image. 
+For
+a detailed introduction to `DataLoader`, please refer to :numref:`sec_fashion_mnist`.
 :end_tab:
 
 :begin_tab:`pytorch`
-Next, we define an auxiliary function to make it easier to read the image and
-apply image augmentation. The `transform` argument provided by PyTorch's
-dataset applies augmentation to transform the images. For detailed
-descriptions of `DataLoader`, refer to :numref:`sec_fashion_mnist`.
+Next, we define an auxiliary function to facilitate reading the image and
+applying image augmentation. 
+The `transform` argument provided by PyTorch's
+dataset applies augmentation to transform the images.
+For
+a detailed introduction to `DataLoader`, please refer to :numref:`sec_fashion_mnist`.
 :end_tab:
 
 ```{.python .input}
@@ -239,13 +262,15 @@ def load_cifar10(is_train, augs, batch_size):
     return dataloader
 ```
 
-### Using a Multi-GPU Training Model
+### Multi-GPU Training
 
-We train the ResNet-18 model described in :numref:`sec_resnet` on the
-CIFAR-10 dataset. We will also apply the methods described in
-:numref:`sec_multi_gpu_concise` and use a multi-GPU training model.
-
-Next, we define the training function to train and evaluate the model using multiple GPUs.
+We train the ResNet-18 model from
+:numref:`sec_resnet` on the
+CIFAR-10 dataset.
+Recall the introduction to
+multi-GPU training in :numref:`sec_multi_gpu_concise`.
+In the following,
+we define a function to train and evaluate the model using multiple GPUs.
 
 ```{.python .input}
 #@save
@@ -258,7 +283,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, devices,
               in zip(pred_shards, y_shards)]
     for l in ls:
         l.backward()
-    # The True flag allows parameters with stale gradients, which is useful
+    # The `True` flag allows parameters with stale gradients, which is useful
     # later (e.g., in fine-tuning BERT)
     trainer.step(labels.shape[0], ignore_stale_grad=True)
     train_loss_sum = sum([float(l.sum()) for l in ls])
@@ -272,7 +297,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, devices,
 #@save
 def train_batch_ch13(net, X, y, loss, trainer, devices):
     if isinstance(X, list):
-        # Required for BERT Fine-tuning (to be covered later)
+        # Required for BERT fine-tuning (to be covered later)
         X = [x.to(devices[0]) for x in X]
     else:
         X = X.to(devices[0])
@@ -296,7 +321,8 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
-        # Store training_loss, training_accuracy, num_examples, num_features
+        # Sum of training loss, sum of training accuracy, no. of examples,
+        # no. of predictions
         metric = d2l.Accumulator(4)
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
@@ -326,7 +352,8 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                             legend=['train loss', 'train acc', 'test acc'])
     net = nn.DataParallel(net, device_ids=devices).to(devices[0])
     for epoch in range(num_epochs):
-        # Store training_loss, training_accuracy, num_examples, num_features
+        # Sum of training loss, sum of training accuracy, no. of examples,
+        # no. of predictions
         metric = d2l.Accumulator(4)
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
@@ -346,7 +373,11 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
           f'{str(devices)}')
 ```
 
-Now, we can define the `train_with_data_aug` function to use image augmentation to train the model. This function obtains all available GPUs and uses Adam as the optimization algorithm for training. It then applies image augmentation to the training dataset, and finally calls the `train_ch13` function just defined to train and evaluate the model.
+Now we can define the `train_with_data_aug` function to train the model with image augmentation.
+This function gets all available GPUs, 
+uses Adam as the optimization algorithm,
+applies image augmentation to the training dataset,
+and finally calls the `train_ch13` function just defined to train and evaluate the model.
 
 ```{.python .input}
 batch_size, devices, net = 256, d2l.try_all_gpus(), d2l.resnet18(10)
@@ -379,7 +410,7 @@ def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
     train_ch13(net, train_iter, test_iter, loss, trainer, 10, devices)
 ```
 
-Now we train the model using image augmentation of random flipping left and right.
+Let us train the model using image augmentation based on random left-right flipping.
 
 ```{.python .input}
 #@tab all
@@ -388,15 +419,16 @@ train_with_data_aug(train_augs, test_augs, net)
 
 ## Summary
 
-* Image augmentation generates random images based on existing training data to cope with overfitting.
-* In order to obtain definitive results during prediction, we usually only apply image augmentation to the training example, and do not use image augmentation with random operations during prediction.
-* We can obtain classes related to image augmentation from Gluon's `transforms` module.
+* Image augmentation generates random images based on existing training data to improve the generalization ability of models.
+* In order to obtain definitive results during prediction, we usually only apply image augmentation to training examples, and do not use image augmentation with random operations during prediction.
+* Deep learning frameworks provide many different image augmentation methods, which can be applied simultaneously.
+
 
 ## Exercises
 
-1. Train the model without using image augmentation: `train_with_data_aug(no_aug, no_aug)`. Compare training and testing accuracy when using and not using image augmentation. Can this comparative experiment support the argument that image augmentation can mitigate overfitting? Why?
-1. Add different image augmentation methods in model training based on the CIFAR-10 dataset. Observe the implementation results.
-1. With reference to the MXNet documentation, what other image augmentation methods are provided in Gluon's `transforms` module?
+1. Train the model without using image augmentation: `train_with_data_aug(test_augs, test_augs)`. Compare training and testing accuracy when using and not using image augmentation. Can this comparative experiment support the argument that image augmentation can mitigate overfitting? Why?
+1. Combine multiple different image augmentation methods in model training on the CIFAR-10 dataset. Does it improve test accuracy? 
+1. Refer to the online documentation of the deep learning framework. What other image augmentation methods does it also provide?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/367)
