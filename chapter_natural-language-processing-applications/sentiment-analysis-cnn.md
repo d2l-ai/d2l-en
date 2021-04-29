@@ -226,9 +226,9 @@ def init_weights(m):
 net.apply(init_weights);
 ```
 
-### Load Pre-trained Word Vectors
+### Load Pretrained Word Vectors
 
-As in the previous section, load pre-trained 100-dimensional GloVe word vectors and initialize the embedding layers `embedding` and `constant_embedding`. Here, the former participates in training while the latter has a fixed weight.
+As in the previous section, load pretrained 100-dimensional GloVe word vectors and initialize the embedding layers `embedding` and `constant_embedding`. Here, the former participates in training while the latter has a fixed weight.
 
 ```{.python .input}
 glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
@@ -289,7 +289,7 @@ d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 ## Exercises
 
 1. Tune the hyperparameters and compare the two sentiment analysis methods, using recurrent neural networks and using convolutional neural networks, as regards accuracy and operational efficiency.
-1. Can you further improve the accuracy of the model on the test set by using the three methods introduced in the previous section: tuning hyperparameters, using larger pre-trained word vectors, and using the spaCy word tokenization tool?
+1. Can you further improve the accuracy of the model on the test set by using the three methods introduced in the previous section: tuning hyperparameters, using larger pretrained word vectors, and using the spaCy word tokenization tool?
 1. What other natural language processing tasks can you use textCNN for?
 1. Add positional encoding in the input representations. Does it improve the performance?
 

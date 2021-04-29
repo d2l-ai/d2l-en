@@ -41,7 +41,7 @@ Here, we demonstrate the most basic design of a fully convolutional network mode
 ![Fully convolutional network. ](../img/fcn.svg)
 :label:`fig_fcn`
 
-Below, we use a ResNet-18 model pre-trained on the ImageNet dataset to extract image features and record the network instance as `pretrained_net`. As you can see, the last two layers of the model member variable `features` are the global average pooling layer `GlobalAvgPool2D` and example flattening layer `Flatten`. The `output` module contains the fully connected layer used for output. These layers are not required for a fully convolutional network.
+Below, we use a ResNet-18 model pretrained on the ImageNet dataset to extract image features and record the network instance as `pretrained_net`. As you can see, the last two layers of the model member variable `features` are the global average pooling layer `GlobalAvgPool2D` and example flattening layer `Flatten`. The `output` module contains the fully connected layer used for output. These layers are not required for a fully convolutional network.
 
 ```{.python .input}
 pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
@@ -54,7 +54,7 @@ pretrained_net = torchvision.models.resnet18(pretrained=True)
 pretrained_net.layer4[1], pretrained_net.avgpool, pretrained_net.fc
 ```
 
-Next, we create the fully convolutional network instance `net`. It duplicates all the neural layers except the last two layers of the instance member variable `features` of `pretrained_net` and the model parameters obtained after pre-training.
+Next, we create the fully convolutional network instance `net`. It duplicates all the neural layers except the last two layers of the instance member variable `features` of `pretrained_net` and the model parameters obtained after pretraining.
 
 ```{.python .input}
 net = nn.HybridSequential()

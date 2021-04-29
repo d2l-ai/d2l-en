@@ -208,20 +208,20 @@ test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
 The dataset for this competition is a subset of the ImageNet data
 set. Therefore, we can use the approach discussed in
 :numref:`sec_fine_tuning`
-to select a model pre-trained on the
+to select a model pretrained on the
 entire ImageNet dataset and use it to extract image features to be input in the
-custom small-scale output network. Gluon provides a wide range of pre-trained
-models. Here, we will use the pre-trained ResNet-34 model. Because the
-competition dataset is a subset of the pre-training dataset, we simply reuse
-the input of the pre-trained model's output layer, i.e., the extracted
+custom small-scale output network. Gluon provides a wide range of pretrained
+models. Here, we will use the pretrained ResNet-34 model. Because the
+competition dataset is a subset of the pretraining dataset, we simply reuse
+the input of the pretrained model's output layer, i.e., the extracted
 features. Then, we can replace the original output layer with a small custom
 output network that can be trained, such as two fully connected layers in a
 series. Different from the experiment in
-:numref:`sec_fine_tuning`, here, we do not retrain the pre-trained model used for feature
+:numref:`sec_fine_tuning`, here, we do not retrain the pretrained model used for feature
 extraction. This reduces the training time and the memory required to store
 model parameter gradients.
 
-You must note that, during image augmentation, we use the mean values and standard deviations of the three RGB channels for the entire ImageNet dataset for normalization. This is consistent with the normalization of the pre-trained model.
+You must note that, during image augmentation, we use the mean values and standard deviations of the three RGB channels for the entire ImageNet dataset for normalization. This is consistent with the normalization of the pretrained model.
 
 ```{.python .input}
 def get_net(devices):
@@ -256,7 +256,7 @@ def get_net(devices):
     return finetune_net
 ```
 
-When calculating the loss, we first use the member variable `features` to obtain the input of the pre-trained model's output layer, i.e., the extracted feature. Then, we use this feature as the input for our small custom output network and compute the output.
+When calculating the loss, we first use the member variable `features` to obtain the input of the pretrained model's output layer, i.e., the extracted feature. Then, we use this feature as the input for our small custom output network and compute the output.
 
 ```{.python .input}
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -447,13 +447,13 @@ method for submitting results is similar to method in
 
 ## Summary
 
-* We can use a model pre-trained on the ImageNet dataset to extract features and only train a small custom output network. This will allow us to classify a subset of the ImageNet dataset with lower computing and storage overhead.
+* We can use a model pretrained on the ImageNet dataset to extract features and only train a small custom output network. This will allow us to classify a subset of the ImageNet dataset with lower computing and storage overhead.
 
 
 ## Exercises
 
 1. When using the entire Kaggle dataset, what kind of results do you get when you increase the `batch_size` (batch size) and `num_epochs` (number of epochs)?
-1. Do you get better results if you use a deeper pre-trained model?
+1. Do you get better results if you use a deeper pretrained model?
 1. Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
 :begin_tab:`mxnet`
