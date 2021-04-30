@@ -43,12 +43,19 @@ In this section, we will introduce a common technique in transfer learning: *fin
 ![Fine tuning.](../img/finetune.svg)
 :label:`fig_finetune`
 
+When target datasets are much smaller than source datasets, fine-tuning helps to improve models' generalization ability.
+
 
 ## Hot Dog Recognition
 
-Next, we will use a specific example for practice: hot dog recognition. We will fine-tune the ResNet model trained on the ImageNet dataset based on a small dataset. This small dataset contains thousands of images, some of which contain hot dogs. We will use the model obtained by fine tuning to identify whether an image contains a hot dog.
-
-First, import the packages and modules required for the experiment.  Gluon's `model_zoo` package provides a common pretrained model. If you want to get more pretrained models for computer vision, you can use the [GluonCV Toolkit](https://gluon-cv.mxnet.io).
+Let us demonstrate fine-tuning via a concrete case:
+hot dog recognition. 
+We will fine-tune a ResNet model on a small dataset,
+which was pretrained on the ImageNet dataset.
+This small dataset consists of
+thousands of images with and without hot dogs.
+We will use the fine-tuned model to recognize 
+hot dogs from images.
 
 ```{.python .input}
 %matplotlib inline
