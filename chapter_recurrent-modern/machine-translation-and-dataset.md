@@ -219,7 +219,7 @@ src_vocab = d2l.Vocab(source, min_freq=2,
 len(src_vocab)
 ```
 
-## Loading the Dataset
+## Reading the Dataset
 :label:`subsec_mt_data_loading`
 
 Recall that in language modeling

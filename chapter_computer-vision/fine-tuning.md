@@ -32,6 +32,9 @@ These similar features may
 also be effective for recognizing chairs.
 
 
+## Steps
+
+
 In this section, we will introduce a common technique in transfer learning: *fine-tuning*. As shown in :numref:`fig_finetune`, fine-tuning consists of the following four steps:
 
 
@@ -77,22 +80,29 @@ import torchvision
 import os
 ```
 
-### Obtaining the Dataset
+### Reading the Dataset
 
-The hot dog dataset we use was taken from online images and contains $1,400$ positive images containing hot dogs and the same number of negative images containing other foods. $1,000$ images of various classes are used for training and the rest are used for testing.
+The hot dog dataset we use was taken from online images.
+This dataset consists of
+1400 positive-class images containing hot dogs,
+and as many negative-class images containing other foods.
+1000 images of both classes are used for training and the rest are for testing.
 
-We first download the compressed dataset and get two folders `hotdog/train` and `hotdog/test`. Both folders have `hotdog` and `not-hotdog` category subfolders, each of which has corresponding image files.
+
+After unzipping the downloaded dataset,
+we obtain two folders `hotdog/train` and `hotdog/test`. Both folders have `hotdog` and `not-hotdog` subfolders, either of which contains images of
+the corresponding class.
 
 ```{.python .input}
 #@tab all
 #@save
-d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip', 
+d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL + 'hotdog.zip', 
                          'fba480ffa8aa7e0febbb511d181409f899b9baa5')
 
 data_dir = d2l.download_extract('hotdog')
 ```
 
-We create two `ImageFolderDataset` instances to read all the image files in the training dataset and testing dataset, respectively.
+We create two instances to read all the image files in the training and testing datasets, respectively.
 
 ```{.python .input}
 train_imgs = gluon.data.vision.ImageFolderDataset(
@@ -116,11 +126,19 @@ not_hotdogs = [train_imgs[-i - 1][0] for i in range(8)]
 d2l.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
 ```
 
-During training, we first crop a random area with random size and random aspect ratio from the image and then scale the area to an input with a height and width of 224 pixels. During testing, we scale the height and width of images to 256 pixels, and then crop the center area with height and width of 224 pixels to use as the input. In addition, we normalize the values of the three RGB (red, green, and blue) color channels. The average of all values of the channel is subtracted from each value and then the result is divided by the standard deviation of all values of the channel to produce the output.
+During training, we first crop a random area of random size and random aspect ratio from the image,
+and then scale this area
+to a $224 \times 224$ input image. 
+During testing, we scale both the height and width of an image to 256 pixels, and then crop a central $224 \times 224$ area as input.
+In addition, 
+for the three RGB (red, green, and blue) color channels
+we *standardize* their values channel by channel.
+Concretely,
+the mean value of a channel is subtracted from each value of that channel and then the result is divided by the standard deviation of that channel.
 
 ```{.python .input}
-# We specify the mean and variance of the three RGB channels to normalize the
-# image channel
+# Specify the means and standard deviations of the three RGB channels to
+# standardize each channel
 normalize = gluon.data.vision.transforms.Normalize(
     [0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 
@@ -139,8 +157,8 @@ test_augs = gluon.data.vision.transforms.Compose([
 
 ```{.python .input}
 #@tab pytorch
-# We specify the mean and variance of the three RGB channels to normalize the
-# image channel
+# Specify the means and standard deviations of the three RGB channels to
+# standardize each channel
 normalize = torchvision.transforms.Normalize(
     [0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 
@@ -159,7 +177,9 @@ test_augs = torchvision.transforms.Compose([
 
 ### Defining and Initializing the Model
 
-We use ResNet-18, which was pretrained on the ImageNet dataset, as the source model. Here, we specify `pretrained=True` to automatically download and load the pretrained model parameters. The first time they are used, the model parameters need to be downloaded from the Internet.
+We use ResNet-18, which was pretrained on the ImageNet dataset, as the source model. Here, we specify `pretrained=True` to automatically download the pretrained model parameters. 
+If this model is used for the first time,
+Internet connection is required for download.
 
 ```{.python .input}
 pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
@@ -171,14 +191,14 @@ pretrained_net = torchvision.models.resnet18(pretrained=True)
 ```
 
 :begin_tab:`mxnet`
-The pretrained source model instance contains two member variables: `features` and `output`. The former contains all layers of the model, except the output layer, and the latter is the output layer of the model. The main purpose of this division is to facilitate the fine tuning of the model parameters of all layers except the output layer. The member variable `output` of source model is given below.
+The pretrained source model instance contains two member variables: `features` and `output`. The former contains all layers of the model except the output layer, and the latter is the output layer of the model. 
+The main purpose of this division is to facilitate the fine-tuning of model parameters of all layers but the output layer. The member variable `output` of source model is shown below.
 :end_tab:
 
 :begin_tab:`pytorch`
-The pretrained source model instance contains a number of feature layers and an output layer `fc`. The main purpose of this division is to facilitate the fine tuning of the model parameters of all layers except the output layer. The member variable `fc` of source model is given below.
+The pretrained source model instance contains a number of feature layers and an output layer `fc`.
+The main purpose of this division is to facilitate the fine-tuning of model parameters of all layers but the output layer. The member variable `fc` of source model is given below.
 :end_tab:
-
-As a fully connected layer, it transforms ResNet's final global average pooling layer output into 1000 class output on the ImageNet dataset.
 
 ```{.python .input}
 pretrained_net.output
@@ -188,6 +208,8 @@ pretrained_net.output
 #@tab pytorch
 pretrained_net.fc
 ```
+
+As a fully-connected layer, it transforms ResNet's final global average pooling outputs into 1000 class outputs of the ImageNet dataset.
 
 We then build a new neural network to use as the target model. It is defined in the same way as the pretrained source model, but the final number of outputs is equal to the number of categories in the target dataset.
 
