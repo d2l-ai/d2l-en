@@ -39,7 +39,7 @@ In this section, we will introduce a common technique in transfer learning: *fin
 
 
 1. Pretrain a neural network model, i.e., the *source model*, on a source dataset (e.g., the ImageNet dataset).
-1. Create a new neural network model, i.e., the *target model*. This replicates all model designs and their parameters on the source model except the output layer. We assume that these model parameters contain the knowledge learned from the source dataset and this knowledge will also be applicable to the target dataset. We also assume that the output layer of the source model is closely related to the labels of the source dataset; thus it is not used in the target model.
+1. Create a new neural network model, i.e., the *target model*. This copies all model designs and their parameters on the source model except the output layer. We assume that these model parameters contain the knowledge learned from the source dataset and this knowledge will also be applicable to the target dataset. We also assume that the output layer of the source model is closely related to the labels of the source dataset; thus it is not used in the target model.
 1. Add an output layer to the target model, whose number of outputs is the number of categories in the target dataset. Then randomly initialize the model parameters of this layer.
 1. Train the target model on the target dataset, such as a chair dataset. The output layer will be trained from scratch, while the parameters of all the other layers are fine-tuned based on the parameters of the source model.
 
@@ -210,23 +210,33 @@ pretrained_net.fc
 ```
 
 As a fully-connected layer, it transforms ResNet's final global average pooling outputs into 1000 class outputs of the ImageNet dataset.
+We then construct a new neural network as the target model. It is defined in the same way as the pretrained source model except that
+its number of outputs in the final layer
+is set to
+the number of classes in the target dataset (rather than 1000).
 
-We then build a new neural network to use as the target model. It is defined in the same way as the pretrained source model, but the final number of outputs is equal to the number of categories in the target dataset.
 
-:begin_tab:`mxnet`
-In the code below, the model parameters in the member variable `features` of the target model instance `finetune_net` are initialized to model parameters of the corresponding layer of the source model. Because the model parameters in `features` are obtained by pretraining on the ImageNet dataset, it is good enough. Therefore, we generally only need to use small learning rates to "fine-tune" these parameters. In contrast, model parameters in the member variable `output` are randomly initialized and generally require a larger learning rate to learn from scratch. Assume the learning rate in the `Trainer` instance is $\eta$ and use a learning rate of $10\eta$ to update the model parameters in the member variable `output`.
-:end_tab:
 
-:begin_tab:`pytorch`
-In the code below, the model parameters in the feature layers of the target model instance `finetune_net` are initialized to model parameters of the corresponding layer of the source model. Because the model parameters in the layers before `fc` are obtained by pretraining on the ImageNet dataset, it is good enough. Therefore, we generally only need to use small learning rates to "fine-tune" these parameters. In contrast, model parameters in the member variable `fc` are randomly initialized and generally require a larger learning rate to learn from scratch. Assume the learning rate in the `Trainer` instance is $\eta$ and use a learning rate of $10\eta$ to update the model parameters in the member variable `fc`.
-:end_tab:
+
+In the following code, the model parameters in the member variable features of the target model instance finetune_net are initialized to the model parameters of the corresponding layer of the source model. Since the model parameters in the features are pre-trained on the ImageNet data set and are good enough, generally only a small learning rate is needed to fine-tune these parameters. 
+
+The model parameters in the member variable output are initialized randomly, and generally require a larger learning rate to train from scratch. Assuming that the learning rate in the Trainer instance is η, we set the learning rate of the model parameters in the member variable output to be 10η in the iteration.
+
+
+In the code below, the model parameters before the output layer of the target model instance `finetune_net` are initialized to model parameters of the corresponding layers from the source model.
+Since these model parameters were obtained via pretraining on ImageNet, 
+they are effective.
+Therefore, we can only use 
+a small learning rate to *fine-tune* such pretrained parameters.
+In contrast, model parameters in the output layer are randomly initialized and generally require a larger learning rate to be learned from scratch.
+Let the base learning rate be $\eta$, a learning rate of $10\eta$ will be used to iterate the model parameters in the output layer.
 
 ```{.python .input}
 finetune_net = gluon.model_zoo.vision.resnet18_v2(classes=2)
 finetune_net.features = pretrained_net.features
 finetune_net.output.initialize(init.Xavier())
-# The model parameters in output will be updated using a learning rate ten
-# times greater
+# The model parameters in the output layer will be iterated using a learning
+# rate ten times greater
 finetune_net.output.collect_params().setattr('lr_mult', 10)
 ```
 
@@ -237,13 +247,11 @@ finetune_net.fc = nn.Linear(finetune_net.fc.in_features, 2)
 nn.init.xavier_uniform_(finetune_net.fc.weight);
 ```
 
-### Fine Tuning the Model
+### Fine-Tuning the Model
 
-We first define a training function `train_fine_tuning` that uses fine tuning so it can be called multiple times.
+First, we define a training function `train_fine_tuning` that uses fine-tuning so it can be called multiple times.
 
 ```{.python .input}
-# If `param_group=True`, the model parameters in fc layer will be updated 
-# using a learning rate ten times greater, defined in the trainer.
 def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
     train_iter = gluon.data.DataLoader(
         train_imgs.transform_first(train_augs), batch_size, shuffle=True)
@@ -261,6 +269,8 @@ def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
 
 ```{.python .input}
 #@tab pytorch
+# If `param_group=True`, the model parameters in the output layer will be
+# updated using a learning rate ten times greater
 def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5,
                       param_group=True):
     train_iter = torch.utils.data.DataLoader(torchvision.datasets.ImageFolder(
@@ -285,7 +295,8 @@ def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5,
                    devices)
 ```
 
-We set the learning rate in the `Trainer` instance to a smaller value, such as 0.01, in order to fine-tune the model parameters obtained in pretraining. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.
+We set the base learning rate to a small value
+in order to *fine-tune* the model parameters obtained via pretraining. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.
 
 ```{.python .input}
 train_fine_tuning(finetune_net, 0.01)
@@ -311,22 +322,22 @@ scratch_net.fc = nn.Linear(scratch_net.fc.in_features, 2)
 train_fine_tuning(scratch_net, 5e-4, param_group=False)
 ```
 
-As you can see, the fine-tuned model tends to achieve higher precision in the same epoch because the initial values of the parameters are better.
+As we can see, the fine-tuned model tends to perform better for the same epoch
+because its initial parameter values are more effective.
 
 
 ## Summary
 
-
-* Transfer learning migrates the knowledge learned from the source dataset to the target dataset. Fine tuning is a common technique for transfer learning.
-* The target model replicates all model designs and their parameters on the source model, except the output layer, and fine-tunes these parameters based on the target dataset. In contrast, the output layer of the target model needs to be trained from scratch.
-* Generally, fine tuning parameters use a smaller learning rate, while training the output layer from scratch can use a larger learning rate.
+* Transfer learning transfers knowledge learned from the source dataset to the target dataset. Fine-tuning is a common technique for transfer learning.
+* The target model copies all model designs with their parameters from the source model except the output layer, and fine-tunes these parameters based on the target dataset. In contrast, the output layer of the target model needs to be trained from scratch.
+* Generally, fine-tuning parameters uses a smaller learning rate, while training the output layer from scratch can use a larger learning rate.
 
 
 ## Exercises
 
-1. Keep increasing the learning rate of `finetune_net`. How does the precision of the model change?
-2. Further tune the hyperparameters of `finetune_net` and `scratch_net` in the comparative experiment. Do they still have different precisions?
-3. Set the parameters in `finetune_net.features` to the parameters of the source model and do not update them during training. What will happen? You can use the following code.
+1. Keep increasing the learning rate of `finetune_net`. How does the accuracy of the model change?
+2. Further adjust hyperparameters of `finetune_net` and `scratch_net` in the comparative experiment. Do they still differ in accuracy?
+3. Set the parameters before the output layer of `finetune_net` to those of the source model and do *not* update them during training. How does the accuracy of the model change? You can use the following code.
 
 ```{.python .input}
 finetune_net.features.collect_params().setattr('grad_req', 'null')
@@ -338,7 +349,7 @@ for param in finetune_net.parameters():
     param.requires_grad = False
 ```
 
-4. In fact, there is also a "hotdog" class in the `ImageNet` dataset. Its corresponding weight parameter at the output layer can be obtained by using the following code. How can we use this parameter?
+4. In fact, there is a "hotdog" class in the `ImageNet` dataset. Its corresponding weight parameter in the output layer can be obtained via the following code. How can we leverage this weight parameter?
 
 ```{.python .input}
 weight = pretrained_net.output.weight
