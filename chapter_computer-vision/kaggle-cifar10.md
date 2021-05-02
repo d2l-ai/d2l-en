@@ -1,24 +1,32 @@
 # Image Classification (CIFAR-10) on Kaggle
 :label:`sec_kaggle_cifar10`
 
-So far, we have been using Gluon's `data` package to directly obtain image datasets in the tensor format. In practice, however, image datasets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to the tensor format step by step.
+So far, we have been using high-level APIs of deep learning frameworks to directly obtain image datasets in tensor format. 
+However, custom image datasets 
+often come in the form of image files.
+In this section, we will start from 
+original image files, 
+and organize, read, then transform them
+into tensor format step by step.
 
-We performed an experiment on the CIFAR-10 dataset in :numref:`sec_image_augmentation`.
-This is an important data
-set in the computer vision field. Now, we will apply the knowledge we learned in
-the previous sections in order to participate in the Kaggle competition, which
-addresses CIFAR-10 image classification problems. The competition's web address
-is
+We experimented with the CIFAR-10 dataset in :numref:`sec_image_augmentation`,
+which is an important dataset in computer vision.
+In this section,
+we will apply the knowledge we learned 
+in previous sections
+to practice the Kaggle competition of
+CIFAR-10 image classification. 
+The web address of the competition is 
 
 > https://www.kaggle.com/c/cifar-10
 
-:numref:`fig_kaggle_cifar10` shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
+:numref:`fig_kaggle_cifar10` shows the information on the competition's webpage.
+In order to submit the results, 
+you need to register a Kaggle account.
 
-![CIFAR-10 image classification competition webpage information. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-cifar10.png)
+![CIFAR-10 image classification competition webpage information. The competition dataset can be obtained by clicking the "Data" tab.](../img/kaggle-cifar10.png)
 :width:`600px`
 :label:`fig_kaggle_cifar10`
-
-First, import the packages or modules required for the competition.
 
 ```{.python .input}
 import collections
