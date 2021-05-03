@@ -76,16 +76,18 @@ The upper left corner of :numref:`fig_kaggle_cifar10` shows some images of airpl
 
 ### Downloading the Dataset
 
-After logging in to Kaggle, we can click on the "Data" tab on the CIFAR-10 image classification competition webpage shown in :numref:`fig_kaggle_cifar10` and download the dataset by clicking the "Download All" button. After unzipping the downloaded file in `../data`, and unzipping `train.7z` and `test.7z` inside it, you will find the entire dataset in the following paths:
+After logging in to Kaggle, we can click the "Data" tab on the CIFAR-10 image classification competition webpage shown in :numref:`fig_kaggle_cifar10` and download the dataset by clicking the "Download All" button.
+After unzipping the downloaded file in `../data`, and unzipping `train.7z` and `test.7z` inside it, you will find the entire dataset in the following paths:
 
-* ../data/cifar-10/train/[1-50000].png
-* ../data/cifar-10/test/[1-300000].png
-* ../data/cifar-10/trainLabels.csv
-* ../data/cifar-10/sampleSubmission.csv
+* `../data/cifar-10/train/[1-50000].png`
+* `../data/cifar-10/test/[1-300000].png`
+* `../data/cifar-10/trainLabels.csv`
+* `../data/cifar-10/sampleSubmission.csv`
 
-Here folders `train` and `test` contain the training and testing images respectively, `trainLabels.csv` has labels for the training images, and `sample_submission.csv` is a sample of submission.
+where the `train` and `test` directories contain the training and testing images, respectively, `trainLabels.csv` provides labels for the training images, and `sample_submission.csv` is a sample submission file.
 
-To make it easier to get started, we provide a small-scale sample of the dataset: it contains the first $1000$ training images and $5$ random testing images.
+To make it easier to get started, we provide a small-scale sample of the dataset that
+contains the first 1000 training images and 5 random testing images.
 To use the full dataset of the Kaggle competition, you need to set the following `demo` variable to `False`.
 
 ```{.python .input}
@@ -106,13 +108,16 @@ else:
 
 ### Organizing the Dataset
 
-We need to organize datasets to facilitate model training and testing. Let us first read the labels from the csv file. The following function returns a dictionary that maps the filename without extension to its label.
+We need to organize datasets to facilitate model training and testing. 
+Let us first read the labels from the csv file.
+The following function returns a dictionary that maps
+the non-extension part of the filename to its label.
 
 ```{.python .input}
 #@tab all
 #@save
 def read_csv_labels(fname):
-    """Read fname to return a name to label dictionary."""
+    """Read `fname` to return a filename to label dictionary."""
     with open(fname, 'r') as f:
         # Skip the file header line (column name)
         lines = f.readlines()[1:]
@@ -124,7 +129,16 @@ print('# training examples:', len(labels))
 print('# classes:', len(set(labels.values())))
 ```
 
-Next, we define the `reorg_train_valid` function to segment the validation set from the original training set. The argument `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set. In particular, let $n$ be the number of images of the class with the least examples, and $r$ be the ratio, then we will use $\max(\lfloor nr\rfloor,1)$ images for each class as the validation set.  Let us use `valid_ratio=0.1` as an example. Since the original training set has $50,000$ images, there will be $45,000$ images used for training and stored in the path "`train_valid_test/train`" when tuning hyperparameters, while the other $5,000$ images will be stored as validation set in the path "`train_valid_test/valid`". After organizing the data, images of the same class will be placed under the same folder so that we can read them later.
+Next, we define the `reorg_train_valid` function to split the validation set out of the original training set.
+The argument `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set.
+More concretely,
+let $n$ be the number of images of the class with the least examples, and $r$ be the ratio. 
+The validation set will split out
+$\max(\lfloor nr\rfloor,1)$ images for each class.
+Let us use `valid_ratio=0.1` as an example. Since the original training set has 50000 images,
+there will be 45000 images used for training in the path `train_valid_test/train`,
+while the other 5000 images will be split out
+as validation set in the path `train_valid_test/valid`. After organizing the dataset, images of the same class will be placed under the same folder.
 
 ```{.python .input}
 #@tab all
@@ -136,7 +150,7 @@ def copyfile(filename, target_dir):
 
 #@save
 def reorg_train_valid(data_dir, labels, valid_ratio):
-    # The number of examples of the class with the least examples in the
+    # The number of examples of the class that has the fewest examples in the
     # training dataset
     n = collections.Counter(labels.values()).most_common()[-1][1]
     # The number of examples per class for the validation set
@@ -145,22 +159,19 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
     for train_file in os.listdir(os.path.join(data_dir, 'train')):
         label = labels[train_file.split('.')[0]]
         fname = os.path.join(data_dir, 'train', train_file)
-        # Copy to train_valid_test/train_valid with a subfolder per class
         copyfile(fname, os.path.join(data_dir, 'train_valid_test',
                                      'train_valid', label))
         if label not in label_count or label_count[label] < n_valid_per_label:
-            # Copy to train_valid_test/valid
             copyfile(fname, os.path.join(data_dir, 'train_valid_test',
                                          'valid', label))
             label_count[label] = label_count.get(label, 0) + 1
         else:
-            # Copy to train_valid_test/train
             copyfile(fname, os.path.join(data_dir, 'train_valid_test',
                                          'train', label))
     return n_valid_per_label
 ```
 
-The `reorg_test` function below is used to organize the testing set to facilitate the reading during prediction.
+The `reorg_test` function below organizes the testing set for data loading during prediction.
 
 ```{.python .input}
 #@tab all
@@ -172,7 +183,8 @@ def reorg_test(data_dir):
                               'unknown'))
 ```
 
-Finally, we use a function to call the previously defined `read_csv_labels`, `reorg_train_valid`, and `reorg_test` functions.
+Finally, we use a function to invoke
+the `read_csv_labels`, `reorg_train_valid`, and `reorg_test` functions defined above.
 
 ```{.python .input}
 #@tab all
@@ -182,7 +194,11 @@ def reorg_cifar10_data(data_dir, valid_ratio):
     reorg_test(data_dir)
 ```
 
-We only set the batch size to $4$ for the demo dataset. During actual training and testing, the complete dataset of the Kaggle competition should be used and `batch_size` should be set to a larger integer, such as $128$. We use $10\%$ of the training examples as the validation set for tuning hyperparameters.
+Here we only set the batch size to 4 for the small-scale sample of the dataset.
+When training and testing
+the complete dataset of the Kaggle competition,
+`batch_size` should be set to a larger integer, such as 128.
+We split out 10% of the training examples as the validation set for tuning hyperparameters.
 
 ```{.python .input}
 #@tab all
