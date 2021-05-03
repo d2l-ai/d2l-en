@@ -56,7 +56,23 @@ import shutil
 
 ## Obtaining and Organizing the Dataset
 
-The competition data is divided into a training set and testing set. The training set contains $50,000$ images. The testing set contains $300,000$ images, of which $10,000$ images are used for scoring, while the other $290,000$ non-scoring images are included to prevent the manual labeling of the testing set and the submission of labeling results. The image formats in both datasets are PNG, with heights and widths of 32 pixels and three color channels (RGB). The images cover $10$ categories: planes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks. The upper-left corner of :numref:`fig_kaggle_cifar10` shows some images of planes, cars, and birds in the dataset.
+The competition dataset is divided into 
+a training set and a test set,
+which contain 50000 and 300000 images, respectively.
+In the test set,
+10000 images will be used for evaluation, 
+while the remaining 290000 images will not 
+be evaluated: 
+they are included just
+to make it hard
+to cheat with
+*manually* labeled results of the test set.
+The images in this dataset
+are all png color (RGB channels) image files,
+whose height and width are both 32 pixels.
+The images cover a total of 10 categories, namely airplanes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks.
+The upper left corner of :numref:`fig_kaggle_cifar10` shows some images of airplanes, cars, and birds in the dataset.
+
 
 ### Downloading the Dataset
 
