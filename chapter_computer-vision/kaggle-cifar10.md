@@ -5,7 +5,7 @@ So far, we have been using high-level APIs of deep learning frameworks to direct
 However, custom image datasets 
 often come in the form of image files.
 In this section, we will start from 
-original image files, 
+raw image files, 
 and organize, read, then transform them
 into tensor format step by step.
 
@@ -209,21 +209,23 @@ reorg_cifar10_data(data_dir, valid_ratio)
 
 ## Image Augmentation
 
-To cope with overfitting, we use image augmentation. For example, by adding `transforms.RandomFlipLeftRight()`, the images can be flipped at random. We can also perform normalization for the three RGB channels of color images using `transforms.Normalize()`. Below, we list some of these operations that you can choose to use or modify depending on requirements.
+We use image augmentation to address overfitting.
+For example, images can be flipped horizontally at random during training.
+We can also perform standardization for the three RGB channels of color images. Below lists some of these operations that you can tweak.
 
 ```{.python .input}
 transform_train = gluon.data.vision.transforms.Compose([
-    # Magnify the image to a square of 40 pixels in both height and width
+    # Scale the image up to a square of 40 pixels in both height and width
     gluon.data.vision.transforms.Resize(40),
     # Randomly crop a square image of 40 pixels in both height and width to
     # produce a small square of 0.64 to 1 times the area of the original
-    # image, and then shrink it to a square of 32 pixels in both height and
+    # image, and then scale it to a square of 32 pixels in both height and
     # width
     gluon.data.vision.transforms.RandomResizedCrop(32, scale=(0.64, 1.0),
                                                    ratio=(1.0, 1.0)),
     gluon.data.vision.transforms.RandomFlipLeftRight(),
     gluon.data.vision.transforms.ToTensor(),
-    # Normalize each channel of the image
+    # Standardize each channel of the image
     gluon.data.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],
                                            [0.2023, 0.1994, 0.2010])])
 ```
@@ -231,22 +233,25 @@ transform_train = gluon.data.vision.transforms.Compose([
 ```{.python .input}
 #@tab pytorch
 transform_train = torchvision.transforms.Compose([
-    # Magnify the image to a square of 40 pixels in both height and width
+    # Scale the image up to a square of 40 pixels in both height and width
     torchvision.transforms.Resize(40),
     # Randomly crop a square image of 40 pixels in both height and width to
     # produce a small square of 0.64 to 1 times the area of the original
-    # image, and then shrink it to a square of 32 pixels in both height and
+    # image, and then scale it to a square of 32 pixels in both height and
     # width
     torchvision.transforms.RandomResizedCrop(32, scale=(0.64, 1.0),
                                                    ratio=(1.0, 1.0)),
     torchvision.transforms.RandomHorizontalFlip(),
     torchvision.transforms.ToTensor(),
-    # Normalize each channel of the image
+    # Standardize each channel of the image
     torchvision.transforms.Normalize([0.4914, 0.4822, 0.4465],
-                                           [0.2023, 0.1994, 0.2010])])
+                                     [0.2023, 0.1994, 0.2010])])
 ```
 
-In order to ensure the certainty of the output during testing, we only perform normalization on the image.
+During testing,
+we only perform standardization on images
+so as to
+remove randomness in the evaluation results.
 
 ```{.python .input}
 transform_test = gluon.data.vision.transforms.Compose([
@@ -260,12 +265,12 @@ transform_test = gluon.data.vision.transforms.Compose([
 transform_test = torchvision.transforms.Compose([
     torchvision.transforms.ToTensor(),
     torchvision.transforms.Normalize([0.4914, 0.4822, 0.4465],
-                                           [0.2023, 0.1994, 0.2010])])
+                                     [0.2023, 0.1994, 0.2010])])
 ```
 
 ## Reading the Dataset
 
-Next, we can create the `ImageFolderDataset` instance to read the organized dataset containing the original image files, where each example includes the image and label.
+Next, we read the organized dataset consisting of raw image files. Each example includes an image and a label.
 
 ```{.python .input}
 train_ds, valid_ds, train_valid_ds, test_ds = [
@@ -285,7 +290,13 @@ valid_ds, test_ds = [torchvision.datasets.ImageFolder(
     transform=transform_test) for folder in ['valid', 'test']]
 ```
 
-We specify the defined image augmentation operation in `DataLoader`. During training, we only use the validation set to evaluate the model, so we need to ensure the certainty of the output. During prediction, we will train the model on the combined training set and validation set to make full use of all labelled data.
+During training,
+we need to specify all the image augmentation operations defined above.
+When the validation set
+is used for model evaluation during hyperparameter tuning,
+no randomness from image augmentation should be introduced.
+Before final prediction,
+we train the model on the combined training set and validation set to make full use of all the labeled data.
 
 ```{.python .input}
 train_iter, train_valid_iter = [gluon.data.DataLoader(
@@ -316,9 +327,12 @@ test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
 
 ## Defining the Model
 
+:begin_tab:`mxnet`
 Here, we build the residual blocks based on the `HybridBlock` class, which is
-slightly different than the implementation described in
-:numref:`sec_resnet`. This is done to improve execution efficiency.
+slightly different from the implementation described in
+:numref:`sec_resnet`.
+This is for improving computational efficiency.
+:end_tab:
 
 ```{.python .input}
 class Residual(nn.HybridBlock):
@@ -343,7 +357,9 @@ class Residual(nn.HybridBlock):
         return F.npx.relu(Y + X)
 ```
 
+:begin_tab:`mxnet`
 Next, we define the ResNet-18 model.
+:end_tab:
 
 ```{.python .input}
 def resnet18(num_classes):
@@ -368,7 +384,14 @@ def resnet18(num_classes):
     return net
 ```
 
-The CIFAR-10 image classification challenge uses 10 categories. We will perform Xavier random initialization on the model before training begins.
+:begin_tab:`mxnet`
+We use Xavier initialization described in :numref:`subsec_xavier` before training begins.
+:end_tab:
+
+:begin_tab:`pytorch`
+We define the ResNet-18 model described in
+:numref:`sec_resnet`.
+:end_tab:
 
 ```{.python .input}
 def get_net(devices):
@@ -384,16 +407,16 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 #@tab pytorch
 def get_net():
     num_classes = 10
-    # PyTorch doesn't have the notion of hybrid model
     net = d2l.resnet18(num_classes, 3)
     return net
 
 loss = nn.CrossEntropyLoss(reduction="none")
 ```
 
-## Defining the Training Functions
+## Defining the Training Function
 
-We will select the model and tune hyperparameters according to the model's performance on the validation set. Next, we define the model training function `train`. We record the training time of each epoch, which helps us compare the time costs of different models.
+We will select models and tune hyperparameters according to the model's performance on the validation set. 
+In the following, we define the model training function `train`.
 
 ```{.python .input}
 def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
@@ -474,7 +497,11 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
 
 ## Training and Validating the Model
 
-Now, we can train and validate the model. The following hyperparameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 50 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 50 epochs. For simplicity, we only train one epoch here.
+Now, we can train and validate the model.
+All the following hyperparameters can be tuned.
+For example, we can increase the number of epochs.
+When `lr_period` and `lr_decay` are set to 50 and 0.1, respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 50 epochs. Just for demonstration,
+we only train one epoch here.
 
 ```{.python .input}
 devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.1, 5e-4
@@ -494,7 +521,8 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
 
 ## Classifying the Testing Set and Submitting Results on Kaggle
 
-After obtaining a satisfactory model design and hyperparameters, we use all training datasets (including validation sets) to retrain the model and classify the testing set.
+After obtaining a promising model with hyperparameters,
+we use all the labeled data (including the validation set) to retrain the model and classify the testing set.
 
 ```{.python .input}
 net, preds = get_net(devices), []
@@ -528,21 +556,30 @@ df['label'] = df['label'].apply(lambda x: train_valid_ds.classes[x])
 df.to_csv('submission.csv', index=False)
 ```
 
-After executing the above code, we will get a "submission.csv" file. The format
-of this file is consistent with the Kaggle competition requirements. The method
-for submitting results is similar to method in :numref:`sec_kaggle_house`.
+The above code
+will generate a `submission.csv` file,
+whose format
+meets the requirement of the Kaggle competition.
+The method
+for submitting results to Kaggle
+is similar to that in :numref:`sec_kaggle_house`.
 
 ## Summary
 
-* We can create an `ImageFolderDataset` instance to read the dataset containing the original image files.
-* We can use convolutional neural networks, image augmentation, and hybrid programming to take part in an image classification competition.
+* We can read datasets containing raw image files after organizing them into the required format.
+:begin_tab:`mxnet`
+* We can use convolutional neural networks, image augmentation, and hybrid programing in an image classification competition.
+:end_tab:
+:begin_tab:`pytorch`
+* We can use convolutional neural networks and image augmentation in an image classification competition.
+:end_tab:
 
 
 ## Exercises
 
-1. Use the complete CIFAR-10 dataset for the Kaggle competition. Change the `batch_size` and number of epochs `num_epochs` to 128 and 100, respectively.  See what accuracy and ranking you can achieve in this competition.
-1. What accuracy can you achieve when not using image augmentation?
-1. Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
+1. Use the complete CIFAR-10 dataset for this Kaggle competition. Change the `batch_size` and number of epochs `num_epochs` to 128 and 100, respectively.  See what accuracy and ranking you can achieve in this competition. Can you further improve them?
+1. What accuracy can you get when not using image augmentation?
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/379)
