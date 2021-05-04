@@ -16,9 +16,7 @@ we will apply the knowledge we learned
 in previous sections
 to practice the Kaggle competition of
 CIFAR-10 image classification. 
-The web address of the competition is 
-
-> https://www.kaggle.com/c/cifar-10
+The web address of the competition is https://www.kaggle.com/c/cifar-10
 
 :numref:`fig_kaggle_cifar10` shows the information on the competition's webpage.
 In order to submit the results, 

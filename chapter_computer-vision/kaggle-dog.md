@@ -1,18 +1,23 @@
 # Dog Breed Identification (ImageNet Dogs) on Kaggle
 
-In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition's web address is
+In this section, we will practice
+the dog breed identification problem on
+Kaggle. The web address of this competition is https://www.kaggle.com/c/dog-breed-identification
 
-> https://www.kaggle.com/c/dog-breed-identification
+In this competition,
+120 different breeds of dogs will be recognized.
+In fact,
+the dataset for this competition is
+a subset of the ImageNet dataset.
+Unlike the images in the CIFAR-10 dataset in :numref:`sec_kaggle_cifar10`, 
+the images in the ImageNet dataset are both higher and wider in varying dimensions.
+:numref:`fig_kaggle_dog` shows the information on the competition's webpage. You need a Kaggle account
+to submit your results.
 
-In this competition, we attempt to identify 120 different breeds of dogs. The dataset used in this competition is actually a subset of the famous ImageNet dataset. Different from the images in the CIFAR-10 dataset used in the previous section, the images in the ImageNet dataset are higher and wider and their dimensions are inconsistent.
 
-:numref:`fig_kaggle_dog` shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
-
-![Dog breed identification competition website. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.jpg)
+![The dog breed identification competition website. The competition dataset can be obtained by clicking the "Data" tab.](../img/kaggle-dog.jpg)
 :width:`400px`
 :label:`fig_kaggle_dog`
-
-First, import the packages or modules required for the competition.
 
 ```{.python .input}
 from d2l import mxnet as d2l
