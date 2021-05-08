@@ -1,9 +1,23 @@
 # Anchor Boxes
 :label:`sec_anchor`
 
-Object detection algorithms usually sample a large number of regions in the input image, determine whether these regions contain objects of interest, and adjust the edges of the regions so as to predict the ground-truth bounding box of the target more accurately. Different models may use different region sampling methods. Here, we introduce one such method: it generates multiple bounding boxes with different sizes and aspect ratios while centering on each pixel. These bounding boxes are called anchor boxes. We will practice object detection based on anchor boxes in the following sections.
 
-First, we modify the printing accuracy. Because printing tensors actually calls the print function, the floating-point numbers in tensors printed in this section are more concise.
+Object detection algorithms usually
+sample a large number of regions in the input image, determine whether these regions contain
+objects of interest, and adjust the boundaries
+of the regions so as to predict the
+*ground-truth bounding boxes*
+of the objects more accurately.
+Different models may adopt
+different region sampling schemes. 
+Here we introduce one of such methods:
+it generates multiple bounding boxes with varying sizes and aspect ratios centered on each pixel. 
+These bounding boxes are called *anchor boxes*.
+We will design an object detection model
+based on anchor boxes in :numref:`sec_ssd`.
+
+First, let us modify the printing accuracy
+just for more concise outputs.
 
 ```{.python .input}
 %matplotlib inline
