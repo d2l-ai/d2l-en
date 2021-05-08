@@ -51,7 +51,7 @@ build deep neural networks.
 
 
 
-## Residual Blocks
+## (**Residual Blocks**)
 
 Let us focus on a local part of a neural network, as depicted in :numref:`fig_residual_block`. Denote the input by $\mathbf{x}$.
 We assume that the desired underlying mapping we want to obtain by learning is $f(\mathbf{x})$, to be used as the input to the activation function on the top.
@@ -180,7 +180,7 @@ This code generates two types of networks: one where we add the input to the out
 ![ResNet block with and without $1 \times 1$ convolution.](../img/resnet-block.svg)
 :label:`fig_resnet_block`
 
-Now let us look at a situation where the input and output are of the same shape.
+Now let us look at [**a situation where the input and output are of the same shape**].
 
 ```{.python .input}
 blk = Residual(3)
@@ -205,7 +205,7 @@ Y = blk(X)
 Y.shape
 ```
 
-We also have the option to halve the output height and width while increasing the number of output channels.
+We also have the option to [**halve the output height and width while increasing the number of output channels**].
 
 ```{.python .input}
 blk = Residual(6, use_1x1conv=True, strides=2)
@@ -225,7 +225,7 @@ blk = Residual(6, use_1x1conv=True, strides=2)
 blk(X).shape
 ```
 
-## ResNet Model
+## [**ResNet Model**]
 
 The first two layers of ResNet are the same as those of the GoogLeNet we described before: the $7\times 7$ convolutional layer with 64 output channels and a stride of 2 is followed by the $3\times 3$ maximum pooling layer with a stride of 2. The difference is the batch normalization layer added after each convolutional layer in ResNet.
 
@@ -371,7 +371,7 @@ By configuring different numbers of channels and residual blocks in the module, 
 ![The ResNet-18 architecture.](../img/resnet18.svg)
 :label:`fig_resnet18`
 
-Before training ResNet, let us observe how the input shape changes across different modules in ResNet. As in all the previous architectures, the resolution decreases while the number of channels increases up until the point where a global average pooling layer aggregates all features.
+Before training ResNet, let us [**observe how the input shape changes across different modules in ResNet**]. As in all the previous architectures, the resolution decreases while the number of channels increases up until the point where a global average pooling layer aggregates all features.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 224, 224))
@@ -397,7 +397,7 @@ for layer in net().layers:
     print(layer.__class__.__name__,'output shape:\t', X.shape)
 ```
 
-## Training
+## [**Training**]
 
 We train ResNet on the Fashion-MNIST dataset, just like before.
 

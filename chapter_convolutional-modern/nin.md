@@ -16,7 +16,7 @@ They were proposed based on a very simple insight:
 to use an MLP on the channels for each pixel separately :cite:`Lin.Chen.Yan.2013`.
 
 
-## NiN Blocks
+## (**NiN Blocks**)
 
 Recall that the inputs and outputs of convolutional layers
 consist of four-dimensional tensors with axes
@@ -89,7 +89,7 @@ def nin_block(num_channels, kernel_size, strides, padding):
                                activation='relu')])
 ```
 
-## NiN Model
+## [**NiN Model**]
 
 The original NiN network was proposed shortly after AlexNet
 and clearly draws some inspiration.
@@ -165,7 +165,7 @@ def net():
         ])
 ```
 
-We create a data example to see the output shape of each block.
+We create a data example to see [**the output shape of each block**].
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 224, 224))
@@ -191,7 +191,7 @@ for layer in net().layers:
     print(layer.__class__.__name__,'output shape:\t', X.shape)
 ```
 
-## Training
+## [**Training**]
 
 As before we use Fashion-MNIST to train the model.
 NiN's training is similar to that for AlexNet and VGG.
