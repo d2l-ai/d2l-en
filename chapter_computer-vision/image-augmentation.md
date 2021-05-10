@@ -198,15 +198,10 @@ all_images = torchvision.datasets.CIFAR10(train=True, root="../data",
 d2l.show_images([all_images[i][0] for i in range(32)], 4, 8, scale=0.8);
 ```
 
-:begin_tab:`mxnet`
-In order to obtain a definite result when predicting, we usually only apply image augmentation to training samples, and do not use image augmentation with random operations when predicting. Here we only use the simplest random left and right flip. In addition, we use the ToTensor instance to convert the small batch of images into the format required by MXNet, that is, the shape is (batch size, number of channels, height, width), the value range is between 0 and 1, and the type is a 32-bit floating point number.
-:end_tab:
-
-:begin_tab:`pytorch`
-In order to obtain definitive results during prediction, we usually only apply image augmentation to the training example, and do not use image augmentation with random operations during prediction. 
+In order to obtain definitive results during prediction, we usually only apply image augmentation to training examples, and do not use image augmentation with random operations during prediction. 
 Here we only use the simplest random left-right flipping method. In addition, we use a `ToTensor` instance to convert a minibatch of images into the format required by the deep learning framework, i.e., 
 32-bit floating point numbers between 0 and 1 with the shape of (batch size, number of channels, height, width).
-:end_tab:
+
 
 
 ```{.python .input}
