@@ -39,15 +39,29 @@ torch.set_printoptions(2)
 
 ## Generating Multiple Anchor Boxes
 
-Assume that the input image has a height of $h$ and width of $w$. We generate anchor boxes with different shapes centered on each pixel of the image. Assume the size is $s\in (0, 1]$, the aspect ratio is $r > 0$, and the width and height of the anchor box are $ws\sqrt{r}$ and $hs/\sqrt{r}$, respectively.  When the center position is given, an anchor box with known width and height is determined.
+Suppose that the input image has a height of $h$ and width of $w$. 
+We generate anchor boxes with different shapes centered on each pixel of the image.
+Let the size be $s\in (0, 1]$ and
+the aspect ratio is $r > 0$. 
+Then the width and height of the anchor box are $ws\sqrt{r}$ and $hs/\sqrt{r}$, respectively. 
+Note that when the center position is given, an anchor box with known width and height is determined.
 
-Below we set a set of sizes $s_1,\ldots, s_n$ and a set of aspect ratios $r_1,\ldots, r_m$. If we use a combination of all sizes and aspect ratios with each pixel as the center, the input image will have a total of $whnm$ anchor boxes. Although these anchor boxes may cover all ground-truth bounding boxes, the computational complexity is often excessive. Therefore, we are usually only interested in a combination containing $s_1$ or $r_1$ sizes and aspect ratios, that is:
+To generate multiple anchor boxes with different shapes,
+let us set a series of sizes
+$s_1,\ldots, s_n$ and 
+a series of aspect ratios $r_1,\ldots, r_m$.
+When using all the combinations of these sizes and aspect ratios with each pixel as the center,
+the input image will have a total of $whnm$ anchor boxes. Although these anchor boxes may cover all the
+ground-truth bounding boxes, the computational complexity is easily too high.
+In practice,
+we can only consider those combinations
+containing $s_1$ or $r_1$:
 
 $$(s_1, r_1), (s_1, r_2), \ldots, (s_1, r_m), (s_2, r_1), (s_3, r_1), \ldots, (s_n, r_1).$$
 
-That is, the number of anchor boxes centered on the same pixel is $n+m-1$. For the entire input image, we will generate a total of $wh(n+m-1)$ anchor boxes.
+That is to say, the number of anchor boxes centered on the same pixel is $n+m-1$. For the entire input image, we will generate a total of $wh(n+m-1)$ anchor boxes.
 
-The above method of generating anchor boxes has been implemented in the `multibox_prior` function. We specify the input, a set of sizes, and a set of aspect ratios, and this function will return all the anchor boxes entered.
+The above method of generating anchor boxes is implemented in the following `multibox_prior` function. We specify the input image, a list of sizes, and a list of aspect ratios, then this function will return all the anchor boxes.
 
 ```{.python .input}
 #@save
@@ -57,11 +71,11 @@ def multibox_prior(data, sizes, ratios):
     boxes_per_pixel = (num_sizes + num_ratios - 1)
     size_tensor = d2l.tensor(sizes, ctx=device)
     ratio_tensor = d2l.tensor(ratios, ctx=device)
-    # Offsets are required to move the anchor to center of a pixel
-    # Since pixel (height=1, width=1), we choose to offset our centers by 0.5
+    # Offsets are required to move the anchor to the center of a pixel. Since
+    # a pixel has height=1 and width=1, we choose to offset our centers by 0.5
     offset_h, offset_w = 0.5, 0.5
-    steps_h = 1.0 / in_height  # Scaled steps in y axis
-    steps_w = 1.0 / in_width  # Scaled steps in x axis
+    steps_h = 1.0 / in_height  # Scaled steps in y-axis
+    steps_w = 1.0 / in_width  # Scaled steps in x-axis
 
     # Generate all center points for the anchor boxes
     center_h = (d2l.arange(in_height, ctx=device) + offset_h) * steps_h
@@ -69,23 +83,21 @@ def multibox_prior(data, sizes, ratios):
     shift_x, shift_y = d2l.meshgrid(center_w, center_h)
     shift_x, shift_y = shift_x.reshape(-1), shift_y.reshape(-1)
 
-    # Generate boxes_per_pixel number of heights and widths which are later
+    # Generate `boxes_per_pixel` number of heights and widths that are later
     # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
-    # concat (various sizes, first ratio) and (first size, various ratios)
     w = np.concatenate((size_tensor * np.sqrt(ratio_tensor[0]),
-                        sizes[0] * np.sqrt(ratio_tensor[1:])))\
-                        * in_height / in_width  # handle rectangular inputs
+                        sizes[0] * np.sqrt(ratio_tensor[1:]))) \
+                        * in_height / in_width  # Handle rectangular inputs
     h = np.concatenate((size_tensor / np.sqrt(ratio_tensor[0]),
                         sizes[0] / np.sqrt(ratio_tensor[1:])))
     # Divide by 2 to get half height and half width
     anchor_manipulations = np.tile(np.stack((-w, -h, w, h)).T,
                                    (in_height * in_width, 1)) / 2
 
-    # Each center point will have boxes_per_pixel number of anchor boxes, so
-    # generate grid of all anchor box centers with boxes_per_pixel repeats
+    # Each center point will have `boxes_per_pixel` number of anchor boxes, so
+    # generate a grid of all anchor box centers with `boxes_per_pixel` repeats
     out_grid = d2l.stack([shift_x, shift_y, shift_x, shift_y],
-                axis=1).repeat(boxes_per_pixel, axis=0)
-
+                         axis=1).repeat(boxes_per_pixel, axis=0)
     output = out_grid + anchor_manipulations
     return np.expand_dims(output, axis=0)
 ```
@@ -99,8 +111,8 @@ def multibox_prior(data, sizes, ratios):
     boxes_per_pixel = (num_sizes + num_ratios - 1)
     size_tensor = d2l.tensor(sizes, device=device)
     ratio_tensor = d2l.tensor(ratios, device=device)
-    # Offsets are required to move the anchor to center of a pixel
-    # Since pixel (height=1, width=1), we choose to offset our centers by 0.5
+    # Offsets are required to move the anchor to the center of a pixel. Since
+    # a pixel has height=1 and width=1, we choose to offset our centers by 0.5
     offset_h, offset_w = 0.5, 0.5
     steps_h = 1.0 / in_height  # Scaled steps in y axis
     steps_w = 1.0 / in_width  # Scaled steps in x axis
@@ -111,33 +123,31 @@ def multibox_prior(data, sizes, ratios):
     shift_y, shift_x = torch.meshgrid(center_h, center_w)
     shift_y, shift_x = shift_y.reshape(-1), shift_x.reshape(-1)
 
-    # Generate boxes_per_pixel number of heights and widths which are later
+    # Generate `boxes_per_pixel` number of heights and widths that are later
     # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
-    # cat (various sizes, first ratio) and (first size, various ratios)
     w = torch.cat((size_tensor * torch.sqrt(ratio_tensor[0]),
                    sizes[0] * torch.sqrt(ratio_tensor[1:])))\
-                   * in_height / in_width  # handle rectangular inputs
+                   * in_height / in_width  # Handle rectangular inputs
     h = torch.cat((size_tensor / torch.sqrt(ratio_tensor[0]),
                    sizes[0] / torch.sqrt(ratio_tensor[1:])))
     # Divide by 2 to get half height and half width
     anchor_manipulations = torch.stack((-w, -h, w, h)).T.repeat(
                                         in_height * in_width, 1) / 2
 
-    # Each center point will have boxes_per_pixel number of anchor boxes, so
-    # generate grid of all anchor box centers with boxes_per_pixel repeats
+    # Each center point will have `boxes_per_pixel` number of anchor boxes, so
+    # generate a grid of all anchor box centers with `boxes_per_pixel` repeats
     out_grid = torch.stack([shift_x, shift_y, shift_x, shift_y],
                 dim=1).repeat_interleave(boxes_per_pixel, dim=0)
-
     output = out_grid + anchor_manipulations
     return output.unsqueeze(0)
 ```
 
-We can see that the shape of the returned anchor box variable `y` is
+We can see that the shape of the returned anchor box variable `Y` is
 (batch size, number of anchor boxes, 4).
 
 ```{.python .input}
 img = image.imread('../img/catdog.jpg').asnumpy()
-h, w = img.shape[0:2]
+h, w = img.shape[:2]
 
 print(h, w)
 X = np.random.uniform(size=(1, 3, h, w))  # Construct input data
@@ -148,7 +158,7 @@ Y.shape
 ```{.python .input}
 #@tab pytorch
 img = d2l.plt.imread('../img/catdog.jpg')
-h, w = img.shape[0:2]
+h, w = img.shape[:2]
 
 print(h, w)
 X = torch.rand(size=(1, 3, h, w))  # Construct input data
@@ -156,7 +166,12 @@ Y = multibox_prior(X, sizes=[0.75, 0.5, 0.25], ratios=[1, 2, 0.5])
 Y.shape
 ```
 
-After changing the shape of the anchor box variable `y` to (image height, image width, number of anchor boxes centered on the same pixel, 4), we can obtain all the anchor boxes centered on a specified pixel position. In the following example, we access the first anchor box centered on (250, 250). It has four elements: the $x, y$ axis coordinates in the upper-left corner and the $x, y$ axis coordinates in the lower-right corner of the anchor box. The coordinate values of the $x$ and $y$ axis are divided by the width and height of the image, respectively, so the value range is between 0 and 1.
+After changing the shape of the anchor box variable `Y` to (image height, image width, number of anchor boxes centered on the same pixel, 4),
+we can obtain all the anchor boxes centered on a specified pixel position.
+In the following,
+we access the first anchor box centered on (250, 250). It has four elements: the $(x, y)$-axis coordinates at the upper-left corner and the $(x, y)$-axis coordinates at the lower-right corner of the anchor box.
+The coordinate values of both axes
+are divided by the width and height of the image, respectively; thus, the value range is between 0 and 1.
 
 ```{.python .input}
 #@tab all
@@ -164,7 +179,8 @@ boxes = Y.reshape(h, w, 5, 4)
 boxes[250, 250, 0, :]
 ```
 
-In order to describe all anchor boxes centered on one pixel in the image, we first define the `show_bboxes` function to draw multiple bounding boxes on the image.
+In order to show all the anchor boxes centered on one pixel in the image,
+we define the following `show_bboxes` function to draw multiple bounding boxes on the image.
 
 ```{.python .input}
 #@tab all
@@ -190,7 +206,13 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
                       bbox=dict(facecolor=color, lw=0))
 ```
 
-As we just saw, the coordinate values of the $x$ and $y$ axis in the variable `boxes` have been divided by the width and height of the image, respectively. When drawing images, we need to restore the original coordinate values of the anchor boxes and therefore define the variable `bbox_scale`. Now, we can draw all the anchor boxes centered on (250, 250) in the image. As you can see, the blue anchor box with a size of 0.75 and an aspect ratio of 1 covers the dog in the image well.
+As we just saw, the coordinate values of the $x$ and $y$ axes in the variable `boxes` have been divided by the width and height of the image, respectively.
+When drawing anchor boxes,
+we need to restore their original coordinate values;
+thus, we define variable `bbox_scale` below. 
+Now, we can draw all the anchor boxes centered on (250, 250) in the image.
+As you can see, the blue anchor box with a size of 0.75 and an aspect ratio of 1 more accurately
+covers the dog in the image.
 
 ```{.python .input}
 #@tab all
