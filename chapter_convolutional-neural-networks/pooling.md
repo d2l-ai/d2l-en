@@ -56,7 +56,7 @@ and *average pooling*, respectively.
 
 In both cases, as with the cross-correlation operator,
 we can think of the pooling window
-as starting from the top left of the input tensor
+as starting from the upper-left of the input tensor
 and sliding across the input tensor from left to right and top to bottom.
 At each location that the pooling window hits,
 it computes the maximum or average

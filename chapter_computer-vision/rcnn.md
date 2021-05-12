@@ -130,7 +130,7 @@ X = torch.arange(16.).reshape(1, 1, 4, 4)
 X
 ```
 
-Assume that the height and width of the image are both 40 pixels and that selective search generates two proposed regions on the image. Each region is expressed as five elements: the region's object category and the $x, y$ coordinates of its upper-left and bottom-right corners.
+Assume that the height and width of the image are both 40 pixels and that selective search generates two proposed regions on the image. Each region is expressed as five elements: the region's object category and the $x, y$ coordinates of its upper-left and lower-right corners.
 
 ```{.python .input}
 rois = np.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])

@@ -1,25 +1,25 @@
 # Image Classification (CIFAR-10) on Kaggle
 :label:`sec_kaggle_cifar10`
 
-So far, we have been using high-level APIs of deep learning frameworks to directly obtain image datasets in tensor format. 
-However, custom image datasets 
+So far, we have been using high-level APIs of deep learning frameworks to directly obtain image datasets in tensor format.
+However, custom image datasets
 often come in the form of image files.
-In this section, we will start from 
-raw image files, 
+In this section, we will start from
+raw image files,
 and organize, read, then transform them
 into tensor format step by step.
 
 We experimented with the CIFAR-10 dataset in :numref:`sec_image_augmentation`,
 which is an important dataset in computer vision.
 In this section,
-we will apply the knowledge we learned 
+we will apply the knowledge we learned
 in previous sections
 to practice the Kaggle competition of
-CIFAR-10 image classification. 
+CIFAR-10 image classification.
 The web address of the competition is https://www.kaggle.com/c/cifar-10
 
 :numref:`fig_kaggle_cifar10` shows the information on the competition's webpage.
-In order to submit the results, 
+In order to submit the results,
 you need to register a Kaggle account.
 
 ![CIFAR-10 image classification competition webpage information. The competition dataset can be obtained by clicking the "Data" tab.](../img/kaggle-cifar10.png)
@@ -54,13 +54,13 @@ import shutil
 
 ## Obtaining and Organizing the Dataset
 
-The competition dataset is divided into 
+The competition dataset is divided into
 a training set and a test set,
 which contain 50000 and 300000 images, respectively.
 In the test set,
-10000 images will be used for evaluation, 
-while the remaining 290000 images will not 
-be evaluated: 
+10000 images will be used for evaluation,
+while the remaining 290000 images will not
+be evaluated:
 they are included just
 to make it hard
 to cheat with
@@ -69,7 +69,7 @@ The images in this dataset
 are all png color (RGB channels) image files,
 whose height and width are both 32 pixels.
 The images cover a total of 10 categories, namely airplanes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks.
-The upper left corner of :numref:`fig_kaggle_cifar10` shows some images of airplanes, cars, and birds in the dataset.
+The upper-left corner of :numref:`fig_kaggle_cifar10` shows some images of airplanes, cars, and birds in the dataset.
 
 
 ### Downloading the Dataset
@@ -106,7 +106,7 @@ else:
 
 ### Organizing the Dataset
 
-We need to organize datasets to facilitate model training and testing. 
+We need to organize datasets to facilitate model training and testing.
 Let us first read the labels from the csv file.
 The following function returns a dictionary that maps
 the non-extension part of the filename to its label.
@@ -130,7 +130,7 @@ print('# classes:', len(set(labels.values())))
 Next, we define the `reorg_train_valid` function to split the validation set out of the original training set.
 The argument `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set.
 More concretely,
-let $n$ be the number of images of the class with the least examples, and $r$ be the ratio. 
+let $n$ be the number of images of the class with the least examples, and $r$ be the ratio.
 The validation set will split out
 $\max(\lfloor nr\rfloor,1)$ images for each class.
 Let us use `valid_ratio=0.1` as an example. Since the original training set has 50000 images,
@@ -413,7 +413,7 @@ loss = nn.CrossEntropyLoss(reduction="none")
 
 ## Defining the Training Function
 
-We will select models and tune hyperparameters according to the model's performance on the validation set. 
+We will select models and tune hyperparameters according to the model's performance on the validation set.
 In the following, we define the model training function `train`.
 
 ```{.python .input}
