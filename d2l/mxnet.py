@@ -1418,7 +1418,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, devices,
             for pred_shard, y_shard in zip(pred_shards, y_shards)]
     for l in ls:
         l.backward()
-    # The True flag allows parameters with stale gradients, which is useful
+    # The `True` flag allows parameters with stale gradients, which is useful
     # later (e.g., in fine-tuning BERT)
     trainer.step(labels.shape[0], ignore_stale_grad=True)
     train_loss_sum = sum([float(l.sum()) for l in ls])
@@ -1435,7 +1435,8 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
-        # Store training_loss, training_accuracy, num_examples, num_features
+        # Sum of training loss, sum of training accuracy, no. of examples,
+        # no. of predictions
         metric = d2l.Accumulator(4)
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
@@ -1462,7 +1463,7 @@ d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL + 'hotdog.zip',
 
 # Defined in file: ./chapter_computer-vision/bounding-box.md
 def box_corner_to_center(boxes):
-    """Convert from (upper_left, bottom_right) to (center, width, height)"""
+    """Convert from (upper-left, lower-right) to (center, width, height)."""
     x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
     cx = (x1 + x2) / 2
     cy = (y1 + y2) / 2
@@ -1473,7 +1474,7 @@ def box_corner_to_center(boxes):
 
 
 def box_center_to_corner(boxes):
-    """Convert from (center, width, height) to (upper_left, bottom_right)"""
+    """Convert from (center, width, height) to (upper-left, lower-right)."""
     cx, cy, w, h = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
     x1 = cx - 0.5 * w
     y1 = cy - 0.5 * h
@@ -1486,8 +1487,8 @@ def box_center_to_corner(boxes):
 # Defined in file: ./chapter_computer-vision/bounding-box.md
 def bbox_to_rect(bbox, color):
     """Convert bounding box to matplotlib format."""
-    # Convert the bounding box (top-left x, top-left y, bottom-right x,
-    # bottom-right y) format to matplotlib format: ((upper-left x,
+    # Convert the bounding box (upper-left x, upper-left y, lower-right x,
+    # lower-right y) format to the matplotlib format: ((upper-left x,
     # upper-left y), width, height)
     return d2l.plt.Rectangle(xy=(bbox[0], bbox[1]), width=bbox[2] - bbox[0],
                              height=bbox[3] - bbox[1], fill=False,
@@ -1501,11 +1502,11 @@ def multibox_prior(data, sizes, ratios):
     boxes_per_pixel = (num_sizes + num_ratios - 1)
     size_tensor = d2l.tensor(sizes, ctx=device)
     ratio_tensor = d2l.tensor(ratios, ctx=device)
-    # Offsets are required to move the anchor to center of a pixel
-    # Since pixel (height=1, width=1), we choose to offset our centers by 0.5
+    # Offsets are required to move the anchor to the center of a pixel. Since
+    # a pixel has height=1 and width=1, we choose to offset our centers by 0.5
     offset_h, offset_w = 0.5, 0.5
-    steps_h = 1.0 / in_height  # Scaled steps in y axis
-    steps_w = 1.0 / in_width  # Scaled steps in x axis
+    steps_h = 1.0 / in_height  # Scaled steps in y-axis
+    steps_w = 1.0 / in_width  # Scaled steps in x-axis
 
     # Generate all center points for the anchor boxes
     center_h = (d2l.arange(in_height, ctx=device) + offset_h) * steps_h
@@ -1513,23 +1514,21 @@ def multibox_prior(data, sizes, ratios):
     shift_x, shift_y = d2l.meshgrid(center_w, center_h)
     shift_x, shift_y = shift_x.reshape(-1), shift_y.reshape(-1)
 
-    # Generate boxes_per_pixel number of heights and widths which are later
+    # Generate `boxes_per_pixel` number of heights and widths that are later
     # used to create anchor box corner coordinates (xmin, xmax, ymin, ymax)
-    # concat (various sizes, first ratio) and (first size, various ratios)
     w = np.concatenate((size_tensor * np.sqrt(ratio_tensor[0]),
-                        sizes[0] * np.sqrt(ratio_tensor[1:])))\
-                        * in_height / in_width  # handle rectangular inputs
+                        sizes[0] * np.sqrt(ratio_tensor[1:]))) \
+                        * in_height / in_width  # Handle rectangular inputs
     h = np.concatenate((size_tensor / np.sqrt(ratio_tensor[0]),
                         sizes[0] / np.sqrt(ratio_tensor[1:])))
     # Divide by 2 to get half height and half width
     anchor_manipulations = np.tile(
         np.stack((-w, -h, w, h)).T, (in_height * in_width, 1)) / 2
 
-    # Each center point will have boxes_per_pixel number of anchor boxes, so
-    # generate grid of all anchor box centers with boxes_per_pixel repeats
+    # Each center point will have `boxes_per_pixel` number of anchor boxes, so
+    # generate a grid of all anchor box centers with `boxes_per_pixel` repeats
     out_grid = d2l.stack([shift_x, shift_y, shift_x, shift_y],
                          axis=1).repeat(boxes_per_pixel, axis=0)
-
     output = out_grid + anchor_manipulations
     return np.expand_dims(output, axis=0)
 
@@ -1559,22 +1558,26 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 
 # Defined in file: ./chapter_computer-vision/anchor.md
 def box_iou(boxes1, boxes2):
-    """Compute IOU between two sets of boxes of shape (N,4) and (M,4)."""
-    # Compute box areas
+    """Compute pairwise IoU across two lists of anchor or bounding boxes."""
     box_area = lambda boxes: ((boxes[:, 2] - boxes[:, 0]) *
                               (boxes[:, 3] - boxes[:, 1]))
-    area1 = box_area(boxes1)
-    area2 = box_area(boxes2)
-    lt = np.maximum(boxes1[:, None, :2], boxes2[:, :2])  # [N,M,2]
-    rb = np.minimum(boxes1[:, None, 2:], boxes2[:, 2:])  # [N,M,2]
-    wh = (rb - lt).clip(min=0)  # [N,M,2]
-    inter = wh[:, :, 0] * wh[:, :, 1]  # [N,M]
-    unioun = area1[:, None] + area2 - inter
-    return inter / unioun
+    # Shape of `boxes1`, `boxes2`, `areas1`, `areas2`: (no. of boxes1, 4),
+    # (no. of boxes2, 4), (no. of boxes1,), (no. of boxes2,)
+    areas1 = box_area(boxes1)
+    areas2 = box_area(boxes2)
+    # Shape of `inter_upperlefts`, `inter_lowerrights`, `inters`: (no. of
+    # boxes1, no. of boxes2, 2)
+    inter_upperlefts = np.maximum(boxes1[:, None, :2], boxes2[:, :2])
+    inter_lowerrights = np.minimum(boxes1[:, None, 2:], boxes2[:, 2:])
+    inters = (inter_lowerrights - inter_upperlefts).clip(min=0)
+    # Shape of `inter_areas` and `union_areas`: (no. of boxes1, no. of boxes2)
+    inter_areas = inters[:, :, 0] * inters[:, :, 1]
+    union_areas = areas1[:, None] + areas2 - inter_areas
+    return inter_areas / union_areas
 
 
 # Defined in file: ./chapter_computer-vision/anchor.md
-def match_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
+def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     """Assign ground-truth bounding boxes to anchor boxes similar to them."""
     num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]
     # Element `x_ij` in the `i^th` row and `j^th` column is the IoU
@@ -1617,7 +1620,8 @@ def multibox_target(anchors, labels):
     device, num_anchors = anchors.ctx, anchors.shape[0]
     for i in range(batch_size):
         label = labels[i, :, :]
-        anchors_bbox_map = match_anchor_to_bbox(label[:, 1:], anchors, device)
+        anchors_bbox_map = assign_anchor_to_bbox(label[:, 1:], anchors,
+                                                 device)
         bbox_mask = np.tile((np.expand_dims(
             (anchors_bbox_map >= 0), axis=-1)), (1, 4)).astype('int32')
         # Initialize class_labels and assigned bbox coordinates with zeros
@@ -1868,7 +1872,7 @@ d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL + 'kaggle_cifar10_tiny.zip',
 
 # Defined in file: ./chapter_computer-vision/kaggle-cifar10.md
 def read_csv_labels(fname):
-    """Read fname to return a name to label dictionary."""
+    """Read `fname` to return a filename to label dictionary."""
     with open(fname, 'r') as f:
         # Skip the file header line (column name)
         lines = f.readlines()[1:]
@@ -1884,7 +1888,7 @@ def copyfile(filename, target_dir):
 
 
 def reorg_train_valid(data_dir, labels, valid_ratio):
-    # The number of examples of the class with the least examples in the
+    # The number of examples of the class that has the fewest examples in the
     # training dataset
     n = collections.Counter(labels.values()).most_common()[-1][1]
     # The number of examples per class for the validation set
@@ -1893,18 +1897,15 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
     for train_file in os.listdir(os.path.join(data_dir, 'train')):
         label = labels[train_file.split('.')[0]]
         fname = os.path.join(data_dir, 'train', train_file)
-        # Copy to train_valid_test/train_valid with a subfolder per class
         copyfile(
             fname,
             os.path.join(data_dir, 'train_valid_test', 'train_valid', label))
         if label not in label_count or label_count[label] < n_valid_per_label:
-            # Copy to train_valid_test/valid
             copyfile(
                 fname,
                 os.path.join(data_dir, 'train_valid_test', 'valid', label))
             label_count[label] = label_count.get(label, 0) + 1
         else:
-            # Copy to train_valid_test/train
             copyfile(
                 fname,
                 os.path.join(data_dir, 'train_valid_test', 'train', label))

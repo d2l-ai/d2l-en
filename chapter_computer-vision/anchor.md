@@ -11,7 +11,7 @@ of the objects more accurately.
 Different models may adopt
 different region sampling schemes. 
 Here we introduce one of such methods:
-it generates multiple bounding boxes with varying sizes and aspect ratios centered on each pixel. 
+it generates multiple bounding boxes with varying scales and aspect ratios centered on each pixel. 
 These bounding boxes are called *anchor boxes*.
 We will design an object detection model
 based on anchor boxes in :numref:`sec_ssd`.
@@ -41,16 +41,16 @@ torch.set_printoptions(2)
 
 Suppose that the input image has a height of $h$ and width of $w$. 
 We generate anchor boxes with different shapes centered on each pixel of the image.
-Let the size be $s\in (0, 1]$ and
-the aspect ratio is $r > 0$. 
+Let the *scale* be $s\in (0, 1]$ and
+the *aspect ratio* (ratio of width to height) is $r > 0$. 
 Then the width and height of the anchor box are $ws\sqrt{r}$ and $hs/\sqrt{r}$, respectively. 
 Note that when the center position is given, an anchor box with known width and height is determined.
 
 To generate multiple anchor boxes with different shapes,
-let us set a series of sizes
+let us set a series of scales
 $s_1,\ldots, s_n$ and 
 a series of aspect ratios $r_1,\ldots, r_m$.
-When using all the combinations of these sizes and aspect ratios with each pixel as the center,
+When using all the combinations of these scales and aspect ratios with each pixel as the center,
 the input image will have a total of $whnm$ anchor boxes. Although these anchor boxes may cover all the
 ground-truth bounding boxes, the computational complexity is easily too high.
 In practice,
@@ -61,7 +61,7 @@ $$(s_1, r_1), (s_1, r_2), \ldots, (s_1, r_m), (s_2, r_1), (s_3, r_1), \ldots, (s
 
 That is to say, the number of anchor boxes centered on the same pixel is $n+m-1$. For the entire input image, we will generate a total of $wh(n+m-1)$ anchor boxes.
 
-The above method of generating anchor boxes is implemented in the following `multibox_prior` function. We specify the input image, a list of sizes, and a list of aspect ratios, then this function will return all the anchor boxes.
+The above method of generating anchor boxes is implemented in the following `multibox_prior` function. We specify the input image, a list of scales, and a list of aspect ratios, then this function will return all the anchor boxes.
 
 ```{.python .input}
 #@save
@@ -211,8 +211,8 @@ When drawing anchor boxes,
 we need to restore their original coordinate values;
 thus, we define variable `bbox_scale` below. 
 Now, we can draw all the anchor boxes centered on (250, 250) in the image.
-As you can see, the blue anchor box with a size of 0.75 and an aspect ratio of 1 well
-covers the dog in the image.
+As you can see, the blue anchor box with a scale of 0.75 and an aspect ratio of 1 well
+surrounds the dog in the image.
 
 ```{.python .input}
 #@tab all
@@ -226,7 +226,7 @@ show_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,
 
 ## Intersection over Union (IoU)
 
-We just mentioned that an anchor box "well" covers the dog in the image.
+We just mentioned that an anchor box "well" surrounds the dog in the image.
 If the ground-truth bounding box of the object is known, how can "well" here be quantified?
 Intuitively, we can measure the similarity between
 the anchor box and the ground-truth bounding box.
@@ -292,16 +292,43 @@ def box_iou(boxes1, boxes2):
     return inter_areas / union_areas
 ```
 
-## Labeling Training Set Anchor Boxes
+## Labeling Anchor Boxes in Training Data
 
 
-In the training set, we consider each anchor box as a training example. In order to train the object detection model, we need to mark two types of labels for each anchor box: first, the category of the target contained in the anchor box (category) and, second, the offset of the ground-truth bounding box relative to the anchor box (offset). In object detection, we first generate multiple anchor boxes, predict the categories and offsets for each anchor box, adjust the anchor box position according to the predicted offset to obtain the bounding boxes to be used for prediction, and finally filter out the prediction bounding boxes that need to be output.
+In a training dataset,
+we consider each anchor box as a training example.
+In order to train an object detection model,
+we need *class* and *offset* labels for each anchor box,
+where the former is
+the class of the object surrounded by the anchor box
+and the latter is the offset
+of the ground-truth bounding box relative to the anchor box.
+During the prediction,
+for each image
+we generate multiple anchor boxes,
+predict classes and offsets for all the anchor boxes,
+adjust their positions according to the predicted offsets to obtain the predicted bounding boxes,
+and finally only output those 
+predicted bounding boxes that satisfy certain criteria.
 
 
-We know that, in the object detection training set, each image is labelled with the location of the ground-truth bounding box and the category of the target contained. After the anchor boxes are generated, we primarily label anchor boxes based on the location and category information of the ground-truth bounding boxes similar to the anchor boxes. So how do we assign ground-truth bounding boxes to anchor boxes similar to them?
+As we know, an object detection training set
+comes with labels for
+locations of *ground-truth bounding boxes*
+and classes of their surrounded objects.
+To label any generated *anchor box*,
+we refer to the labeled
+location and class of its *assigned* ground-truth bounding box that is closet to the anchor box.
+In the following,
+we describe an algorithm for assigning
+closest ground-truth bounding boxes to anchor boxes. 
 
+### Assigning Ground-Truth Bounding Boxes to Anchor Boxes
 
-Assume that the anchor boxes in the image are $A_1, A_2, \ldots, A_{n_a}$ and the ground-truth bounding boxes are $B_1, B_2, \ldots, B_{n_b}$ and $n_a \geq n_b$. Define matrix $\mathbf{X} \in \mathbb{R}^{n_a \times n_b}$, where element $x_{ij}$ in the $i^\mathrm{th}$ row and $j^\mathrm{th}$ column is the IoU of the anchor box $A_i$ to the ground-truth bounding box $B_j$.
+Given an image,
+suppose that the anchor boxes are $A_1, A_2, \ldots, A_{n_a}$ and the ground-truth bounding boxes are $B_1, B_2, \ldots, B_{n_b}$, where $n_a \geq n_b$.
+Define a matrix $\mathbf{X} \in \mathbb{R}^{n_a \times n_b}$, whose element $x_{ij}$ in the $i^\mathrm{th}$ row and $j^\mathrm{th}$ column is the IoU of the anchor box $A_i$ and the ground-truth bounding box $B_j$.
+
 First, we find the largest element in the matrix $\mathbf{X}$ and record the row index and column index of the element as $i_1,j_1$. We assign the ground-truth bounding box $B_{j_1}$ to the anchor box $A_{i_1}$. Obviously, anchor box $A_{i_1}$ and ground-truth bounding box $B_{j_1}$ have the highest similarity among all the "anchor box--ground-truth bounding box" pairings. Next, discard all elements in the $i_1$th row and the $j_1$th column in the matrix $\mathbf{X}$. Find the largest remaining element in the matrix $\mathbf{X}$ and record the row index and column index of the element as $i_2,j_2$. We assign ground-truth bounding box $B_{j_2}$ to anchor box $A_{i_2}$ and then discard all elements in the $i_2$th row and the $j_2$th column in the matrix $\mathbf{X}$. At this point, elements in two rows and two columns in the matrix $\mathbf{X}$ have been discarded.
 
 
@@ -316,7 +343,7 @@ As shown in :numref:`fig_anchor_label` (left), assuming that the maximum value i
 
 ```{.python .input}
 #@save
-def match_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
+def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     """Assign ground-truth bounding boxes to anchor boxes similar to them."""
     num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]
     # Element `x_ij` in the `i^th` row and `j^th` column is the IoU
@@ -345,7 +372,7 @@ def match_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
 ```{.python .input}
 #@tab pytorch
 #@save
-def match_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
+def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     """Assign ground-truth bounding boxes to anchor boxes similar to them."""
     num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]
     # Element `x_ij` in the `i^th` row and `j^th` column is the IoU
@@ -372,7 +399,9 @@ def match_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     return anchors_bbox_map
 ```
 
-Now we can label the categories and offsets of the anchor boxes. If an anchor box $A$ is assigned ground-truth bounding box $B$, the category of the anchor box $A$ is set to the category of $B$. And the offset of the anchor box $A$ is set according to the relative position of the central coordinates of $B$ and $A$ and the relative sizes of the two boxes. Because the positions and sizes of various boxes in the dataset may vary, these relative positions and relative sizes usually require some special transformations to make the offset distribution more uniform and easier to fit. Assume the center coordinates of anchor box $A$ and its assigned ground-truth bounding box $B$ are $(x_a, y_a), (x_b, y_b)$, the widths of $A$ and $B$ are $w_a, w_b$, and their heights are $h_a, h_b$, respectively. In this case, a common technique is to label the offset of $A$ as
+### Labeling Classes and Offsets
+
+Now we can label the classes and offsets of the anchor boxes. If an anchor box $A$ is assigned ground-truth bounding box $B$, the class of the anchor box $A$ is set to the class of $B$. And the offset of the anchor box $A$ is set according to the relative position of the central coordinates of $B$ and $A$ and the relative sizes of the two boxes. Because the positions and sizes of various boxes in the dataset may vary, these relative positions and relative sizes usually require some special transformations to make the offset distribution more uniform and easier to fit. Assume the center coordinates of anchor box $A$ and its assigned ground-truth bounding box $B$ are $(x_a, y_a), (x_b, y_b)$, the widths of $A$ and $B$ are $w_a, w_b$, and their heights are $h_a, h_b$, respectively. In this case, a common technique is to label the offset of $A$ as
 
 $$\left( \frac{ \frac{x_b - x_a}{w_a} - \mu_x }{\sigma_x},
 \frac{ \frac{y_b - y_a}{h_a} - \mu_y }{\sigma_y},
@@ -381,7 +410,7 @@ $$\left( \frac{ \frac{x_b - x_a}{w_a} - \mu_x }{\sigma_x},
 
 The default values of the constant are $\mu_x = \mu_y = \mu_w = \mu_h = 0, \sigma_x=\sigma_y=0.1, and \sigma_w=\sigma_h=0.2$.
 This transformation is implemented below in the `offset_boxes` function.
-If an anchor box is not assigned a ground-truth bounding box, we only need to set the category of the anchor box to background. Anchor boxes whose category is background are often referred to as negative anchor boxes, and the rest are referred to as positive anchor boxes.
+If an anchor box is not assigned a ground-truth bounding box, we only need to set the class of the anchor box to background. Anchor boxes whose class is background are often referred to as negative anchor boxes, and the rest are referred to as positive anchor boxes.
 
 ```{.python .input}
 #@tab all
@@ -403,12 +432,14 @@ def multibox_target(anchors, labels):
     device, num_anchors = anchors.ctx, anchors.shape[0]
     for i in range(batch_size):
         label = labels[i, :, :]
-        anchors_bbox_map = match_anchor_to_bbox(label[:, 1:], anchors, device)
+        anchors_bbox_map = assign_anchor_to_bbox(
+            label[:, 1:], anchors, device)
         bbox_mask = np.tile((np.expand_dims((anchors_bbox_map >= 0),
                                             axis=-1)), (1, 4)).astype('int32')
         # Initialize class_labels and assigned bbox coordinates with zeros
         class_labels = d2l.zeros(num_anchors, dtype=np.int32, ctx=device)
-        assigned_bb = d2l.zeros((num_anchors, 4), dtype=np.float32, ctx=device)
+        assigned_bb = d2l.zeros((num_anchors, 4), dtype=np.float32,
+                                ctx=device)
         # Assign class labels to the anchor boxes using matched gt bbox labels
         # If no gt bbox is assigned to an anchor box, then let the
         # class_labels and assigned_bb remain zero, i.e the background class
@@ -436,8 +467,10 @@ def multibox_target(anchors, labels):
     device, num_anchors = anchors.device, anchors.shape[0]
     for i in range(batch_size):
         label = labels[i, :, :]
-        anchors_bbox_map = match_anchor_to_bbox(label[:, 1:], anchors, device)
-        bbox_mask = ((anchors_bbox_map >= 0).float().unsqueeze(-1)).repeat(1, 4)
+        anchors_bbox_map = assign_anchor_to_bbox(
+            label[:, 1:], anchors, device)
+        bbox_mask = ((anchors_bbox_map >= 0).float().unsqueeze(-1)).repeat(
+            1, 4)
         # Initialize class_labels and assigned bbox coordinates with zeros
         class_labels = torch.zeros(num_anchors, dtype=torch.long,
                                    device=device)
@@ -461,7 +494,7 @@ def multibox_target(anchors, labels):
     return (bbox_offset, bbox_mask, class_labels)
 ```
 
-Below we demonstrate a detailed example. We define ground-truth bounding boxes for the cat and dog in the read image, where the first element is category (0 for dog, 1 for cat) and the remaining four elements are the $x, y$ axis coordinates at top-left corner and $x, y$ axis coordinates at lower-right corner (the value range is between 0 and 1). Here, we construct five anchor boxes to be labeled by the coordinates of the upper-left corner and the lower-right corner, which are recorded as $A_0, \ldots, A_4$, respectively (the index in the program starts from 0). First, draw the positions of these anchor boxes and the ground-truth bounding boxes in the image.
+Below we demonstrate a detailed example. We define ground-truth bounding boxes for the cat and dog in the read image, where the first element is class (0 for dog, 1 for cat) and the remaining four elements are the $x, y$ axis coordinates at top-left corner and $x, y$ axis coordinates at lower-right corner (the value range is between 0 and 1). Here, we construct five anchor boxes to be labeled by the coordinates of the upper-left corner and the lower-right corner, which are recorded as $A_0, \ldots, A_4$, respectively (the index in the program starts from 0). First, draw the positions of these anchor boxes and the ground-truth bounding boxes in the image.
 
 ```{.python .input}
 #@tab all
@@ -476,14 +509,14 @@ show_bboxes(fig.axes, ground_truth[:, 1:] * bbox_scale, ['dog', 'cat'], 'k')
 show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 ```
 
-We can label categories and offsets for anchor boxes by using the `multibox_target` function. This function sets the background category to 0 and increments the integer index of the target category from zero by 1 (1 for dog and 2 for cat).
+We can label classes and offsets for anchor boxes by using the `multibox_target` function. This function sets the background class to 0 and increments the integer index of the target class from zero by 1 (1 for dog and 2 for cat).
 
 :begin_tab:`mxnet`
-We add example dimensions to the anchor boxes and ground-truth bounding boxes and construct random predicted results with a shape of (batch size, number of categories including background, number of anchor boxes) by using the `expand_dims` function.
+We add example dimensions to the anchor boxes and ground-truth bounding boxes and construct random predicted results with a shape of (batch size, number of classes including background, number of anchor boxes) by using the `expand_dims` function.
 :end_tab:
 
 :begin_tab:`pytorch`
-We add example dimensions to the anchor boxes and ground-truth bounding boxes and construct random predicted results with a shape of (batch size, number of categories including background, number of anchor boxes) by using the `unsqueeze` function.
+We add example dimensions to the anchor boxes and ground-truth bounding boxes and construct random predicted results with a shape of (batch size, number of classes including background, number of anchor boxes) by using the `unsqueeze` function.
 :end_tab:
 
 ```{.python .input}
@@ -497,14 +530,14 @@ labels = multibox_target(anchors.unsqueeze(dim=0),
                          ground_truth.unsqueeze(dim=0))
 ```
 
-There are three items in the returned result, all of which are in the tensor format. The third item is represented by the category labeled for the anchor box.
+There are three items in the returned result, all of which are in the tensor format. The third item is represented by the class labeled for the anchor box.
 
 ```{.python .input}
 #@tab all
 labels[2]
 ```
 
-We analyze these labelled categories based on positions of anchor boxes and ground-truth bounding boxes in the image. First, in all "anchor box--ground-truth bounding box" pairs, the IoU of anchor box $A_4$ to the ground-truth bounding box of the cat is the largest, so the category of anchor box $A_4$ is labeled as cat. Without considering anchor box $A_4$ or the ground-truth bounding box of the cat, in the remaining "anchor box--ground-truth bounding box" pairs, the pair with the largest IoU is anchor box $A_1$ and the ground-truth bounding box of the dog, so the category of anchor box $A_1$ is labeled as dog. Next, traverse the remaining three unlabeled anchor boxes. The category of the ground-truth bounding box with the largest IoU with anchor box $A_0$ is dog, but the IoU is smaller than the threshold (the default is 0.5), so the category is labeled as background; the category of the ground-truth bounding box with the largest IoU with anchor box $A_2$ is cat and the IoU is greater than the threshold, so the category is labeled as cat; the category of the ground-truth bounding box with the largest IoU with anchor box $A_3$ is cat, but the IoU is smaller than the threshold, so the category is labeled as background.
+We analyze these labeled classes based on positions of anchor boxes and ground-truth bounding boxes in the image. First, in all "anchor box--ground-truth bounding box" pairs, the IoU of anchor box $A_4$ to the ground-truth bounding box of the cat is the largest, so the class of anchor box $A_4$ is labeled as cat. Without considering anchor box $A_4$ or the ground-truth bounding box of the cat, in the remaining "anchor box--ground-truth bounding box" pairs, the pair with the largest IoU is anchor box $A_1$ and the ground-truth bounding box of the dog, so the class of anchor box $A_1$ is labeled as dog. Next, traverse the remaining three unlabeled anchor boxes. The class of the ground-truth bounding box with the largest IoU with anchor box $A_0$ is dog, but the IoU is smaller than the threshold (the default is 0.5), so the class is labeled as background; the class of the ground-truth bounding box with the largest IoU with anchor box $A_2$ is cat and the IoU is greater than the threshold, so the class is labeled as cat; the class of the ground-truth bounding box with the largest IoU with anchor box $A_3$ is cat, but the IoU is smaller than the threshold, so the class is labeled as background.
 
 
 The second item of the return value is a mask variable, with the shape of (batch size, four times the number of anchor boxes). The elements in the mask variable correspond one-to-one with the four offset values of each anchor box.
@@ -524,7 +557,7 @@ labels[0]
 
 ## Bounding Boxes for Prediction
 
-During model prediction phase, we first generate multiple anchor boxes for the image and then predict categories and offsets for these anchor boxes one by one. Then, we obtain prediction bounding boxes based on anchor boxes and their predicted offsets.
+During model prediction phase, we first generate multiple anchor boxes for the image and then predict classes and offsets for these anchor boxes one by one. Then, we obtain prediction bounding boxes based on anchor boxes and their predicted offsets.
 
 Below we implement function `offset_inverse` which takes in anchors and
 offset predictions as inputs and applies inverse offset transformations to
@@ -544,7 +577,7 @@ def offset_inverse(anchors, offset_preds):
 
 When there are many anchor boxes, many similar prediction bounding boxes may be output for the same target. To simplify the results, we can remove similar prediction bounding boxes. A commonly used method is called non-maximum suppression (NMS).
 
-Let us take a look at how NMS works. For a prediction bounding box $B$, the model calculates the predicted probability for each category. Assume the largest predicted probability is $p$, the category corresponding to this probability is the predicted category of $B$. We also refer to $p$ as the confidence level of prediction bounding box $B$. On the same image, we sort the prediction bounding boxes with predicted categories other than background by confidence level from high to low, and obtain the list $L$. Select the prediction bounding box $B_1$ with highest confidence level from $L$ as a baseline and remove all non-benchmark prediction bounding boxes with an IoU with $B_1$ greater than a certain threshold from $L$. The threshold here is a preset hyperparameter. At this point, $L$ retains the prediction bounding box with the highest confidence level and removes other prediction bounding boxes similar to it.
+Let us take a look at how NMS works. For a prediction bounding box $B$, the model calculates the predicted probability for each class. Assume the largest predicted probability is $p$, the class corresponding to this probability is the predicted class of $B$. We also refer to $p$ as the confidence level of prediction bounding box $B$. On the same image, we sort the prediction bounding boxes with predicted classes other than background by confidence level from high to low, and obtain the list $L$. Select the prediction bounding box $B_1$ with highest confidence level from $L$ as a baseline and remove all non-benchmark prediction bounding boxes with an IoU with $B_1$ greater than a certain threshold from $L$. The threshold here is a preset hyperparameter. At this point, $L$ retains the prediction bounding box with the highest confidence level and removes other prediction bounding boxes similar to it.
 Next, select the prediction bounding box $B_2$ with the second highest confidence level from $L$ as a baseline, and remove all non-benchmark prediction bounding boxes with an IoU with $B_2$ greater than a certain threshold from $L$. Repeat this process until all prediction bounding boxes in $L$ have been used as a baseline. At this time, the IoU of any pair of prediction bounding boxes in $L$ is less than the threshold. Finally, output all prediction bounding boxes in the list $L$.
 
 ```{.python .input}
@@ -644,7 +677,7 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
     return d2l.stack(out)
 ```
 
-Next, we will look at a detailed example. First, construct four anchor boxes. For the sake of simplicity, we assume that predicted offsets are all 0. This means that the prediction bounding boxes are anchor boxes. Finally, we construct a predicted probability for each category.
+Next, we will look at a detailed example. First, construct four anchor boxes. For the sake of simplicity, we assume that predicted offsets are all 0. This means that the prediction bounding boxes are anchor boxes. Finally, we construct a predicted probability for each class.
 
 ```{.python .input}
 #@tab all
@@ -665,7 +698,7 @@ show_bboxes(fig.axes, anchors * bbox_scale,
             ['dog=0.9', 'dog=0.8', 'dog=0.7', 'cat=0.9'])
 ```
 
-We use the `multibox_detection` function to perform NMS and set the threshold to 0.5. This adds an example dimension to the tensor input. We can see that the shape of the returned result is (batch size, number of anchor boxes, 6). The 6 elements of each row represent the output information for the same prediction bounding box. The first element is the predicted category index, which starts from 0 (0 is dog, 1 is cat). The value -1 indicates background or removal in NMS. The second element is the confidence level of prediction bounding box. The remaining four elements are the $x, y$ axis coordinates of the upper-left corner and the $x, y$ axis coordinates of the lower-right corner of the prediction bounding box (the value range is between 0 and 1).
+We use the `multibox_detection` function to perform NMS and set the threshold to 0.5. This adds an example dimension to the tensor input. We can see that the shape of the returned result is (batch size, number of anchor boxes, 6). The 6 elements of each row represent the output information for the same prediction bounding box. The first element is the predicted class index, which starts from 0 (0 is dog, 1 is cat). The value -1 indicates background or removal in NMS. The second element is the confidence level of prediction bounding box. The remaining four elements are the $x, y$ axis coordinates of the upper-left corner and the $x, y$ axis coordinates of the lower-right corner of the prediction bounding box (the value range is between 0 and 1).
 
 ```{.python .input}
 output = multibox_detection(
@@ -685,7 +718,7 @@ output = multibox_detection(cls_probs.unsqueeze(dim=0),
 output
 ```
 
-We remove the prediction bounding boxes of category -1 and visualize the results retained by NMS.
+We remove the prediction bounding boxes of class -1 and visualize the results retained by NMS.
 
 ```{.python .input}
 #@tab all
@@ -704,7 +737,7 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 
 * We generate multiple anchor boxes with different sizes and aspect ratios, centered on each pixel.
 * IoU, also called Jaccard index, measures the similarity of two bounding boxes. It is the ratio of the intersecting area to the union area of two bounding boxes.
-* In the training set, we mark two types of labels for each anchor box: one is the category of the target contained in the anchor box and the other is the offset of the ground-truth bounding box relative to the anchor box.
+* In the training set, we mark two types of labels for each anchor box: one is the class of the target contained in the anchor box and the other is the offset of the ground-truth bounding box relative to the anchor box.
 * When predicting, we can use non-maximum suppression (NMS) to remove similar prediction bounding boxes, thereby simplifying the results.
 
 ## Exercises
