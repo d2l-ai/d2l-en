@@ -327,40 +327,64 @@ closest ground-truth bounding boxes to anchor boxes.
 
 Given an image,
 suppose that the anchor boxes are $A_1, A_2, \ldots, A_{n_a}$ and the ground-truth bounding boxes are $B_1, B_2, \ldots, B_{n_b}$, where $n_a \geq n_b$.
-Define a matrix $\mathbf{X} \in \mathbb{R}^{n_a \times n_b}$, whose element $x_{ij}$ in the $i^\mathrm{th}$ row and $j^\mathrm{th}$ column is the IoU of the anchor box $A_i$ and the ground-truth bounding box $B_j$.
+Let us define a matrix $\mathbf{X} \in \mathbb{R}^{n_a \times n_b}$, whose element $x_{ij}$ in the $i^\mathrm{th}$ row and $j^\mathrm{th}$ column is the IoU of the anchor box $A_i$ and the ground-truth bounding box $B_j$.
 
-First, we find the largest element in the matrix $\mathbf{X}$ and record the row index and column index of the element as $i_1,j_1$. We assign the ground-truth bounding box $B_{j_1}$ to the anchor box $A_{i_1}$. Obviously, anchor box $A_{i_1}$ and ground-truth bounding box $B_{j_1}$ have the highest similarity among all the "anchor box--ground-truth bounding box" pairings. Next, discard all elements in the $i_1$th row and the $j_1$th column in the matrix $\mathbf{X}$. Find the largest remaining element in the matrix $\mathbf{X}$ and record the row index and column index of the element as $i_2,j_2$. We assign ground-truth bounding box $B_{j_2}$ to anchor box $A_{i_2}$ and then discard all elements in the $i_2$th row and the $j_2$th column in the matrix $\mathbf{X}$. At this point, elements in two rows and two columns in the matrix $\mathbf{X}$ have been discarded.
+First, find the largest element in matrix $\mathbf{X}$ and denote its row and column indices as $i_1$ and $j_1$, respectively.
+Then the ground-truth bounding box $B_{j_1}$
+is assigned to the anchor box $A_{i_1}$.
+This is quite intuitive because
+$A_{i_1}$ and $B_{j_1}$ are the closet among
+all the pairs of anchor boxes and ground-truth bounding boxes.
+After the first assignment,
+discard all the elements in the ${i_1}^\mathrm{th}$ row and the ${j_1}^\mathrm{th}$ column in matrix $\mathbf{X}$. 
 
+Next, find the largest of the remaining elements in matrix $\mathbf{X}$ and denote its row and column indices as $i_2$ and $j_2$, respectively. 
+We assign ground-truth bounding box $B_{j_2}$ to anchor box $A_{i_2}$ and discard all the elements in the ${i_2}^\mathrm{th}$ row and the ${j_2}^\mathrm{th}$ column in matrix $\mathbf{X}$.
 
-We proceed until all elements in the $n_b$ column in the matrix $\mathbf{X}$ are discarded. At this time, we have assigned a ground-truth bounding box to each of the $n_b$ anchor boxes.
-Next, we only traverse the remaining $n_a - n_b$ anchor boxes. Given anchor box $A_i$, find the bounding box $B_j$ with the largest IoU with $A_i$ according to the $i^\mathrm{th}$ row of the matrix $\mathbf{X}$, and only assign ground-truth bounding box $B_j$ to anchor box $A_i$ when the IoU is greater than the predetermined threshold.
+At this point, elements in two rows and two columns in  matrix $\mathbf{X}$ have been discarded.
+We proceed until all elements in $n_b$ columns in matrix $\mathbf{X}$ are discarded. 
+At this time, we have assigned a ground-truth bounding box to each of $n_b$ anchor boxes.
 
+Finally, we only need to traverse through
+the remaining $n_a - n_b$ anchor boxes.
+For example,
+given any anchor box $A_i$, find the ground-truth bounding box $B_j$ with the largest IoU with $A_i$ throughout the $i^\mathrm{th}$ row of matrix $\mathbf{X}$,
+and assign $B_j$ to $A_i$ only if this IoU is greater than a predefined threshold.
 
-As shown in :numref:`fig_anchor_label` (left), assuming that the maximum value in the matrix $\mathbf{X}$ is $x_{23}$, we will assign ground-truth bounding box $B_3$ to anchor box $A_2$. Then, we discard all the elements in row 2 and column 3 of the matrix, find the largest element $x_{71}$ of the remaining shaded area, and assign ground-truth bounding box $B_1$ to anchor box $A_7$. Then, as shown in :numref:`fig_anchor_label`  (middle), discard all the elements in row 7 and column 1 of the matrix, find the largest element $x_{54}$ of the remaining shaded area, and assign ground-truth bounding box $B_4$ to anchor box $A_5$.  Finally, as shown in :numref:`fig_anchor_label` (right), discard all the elements in row 5 and column 4 of the matrix, find the largest element $x_{92}$ of the remaining shaded area, and assign ground-truth bounding box $B_2$ to anchor box $A_9$.  After that, we only need to traverse the remaining anchor boxes of $A_1, A_3, A_4, A_6, A_8$ and determine whether to assign ground-truth bounding boxes to the remaining anchor boxes according to the threshold.
+Let us illustrate the above algorithm using a concrete
+example.
+As shown in :numref:`fig_anchor_label` (left), assuming that the maximum value in matrix $\mathbf{X}$ is $x_{23}$, we assign the ground-truth bounding box $B_3$ to the anchor box $A_2$.
+Then, we discard all the elements in row 2 and column 3 of the matrix, find the largest $x_{71}$ in the remaining  elements (shaded area), and assign the ground-truth bounding box $B_1$ to the anchor box $A_7$. 
+Next, as shown in :numref:`fig_anchor_label` (middle), discard all the elements in row 7 and column 1 of the matrix, find the largest $x_{54}$ in the remaining  elements (shaded area), and assign the ground-truth bounding box $B_4$ to the anchor box $A_5$. 
+Finally, as shown in :numref:`fig_anchor_label` (right), discard all the elements in row 5 and column 4 of the matrix, find the largest $x_{92}$ in the remaining elements (shaded area), and assign the ground-truth bounding box $B_2$ to the anchor box $A_9$.
+After that, we only need to traverse through
+the remaining anchor boxes $A_1, A_3, A_4, A_6, A_8$ and determine whether to assign them ground-truth bounding boxes according to the threshold.
 
-![Assign ground-truth bounding boxes to anchor boxes. ](../img/anchor-label.svg)
+![Assigning ground-truth bounding boxes to anchor boxes.](../img/anchor-label.svg)
 :label:`fig_anchor_label`
+
+This algorithm is implemented in the following `assign_anchor_to_bbox` function.
 
 ```{.python .input}
 #@save
 def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
-    """Assign ground-truth bounding boxes to anchor boxes similar to them."""
+    """Assign closest ground-truth bounding boxes to anchor boxes."""
     num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]
-    # Element `x_ij` in the `i^th` row and `j^th` column is the IoU
-    # of the anchor box `anc_i` to the ground-truth bounding box `box_j`
+    # Element x_ij in the i-th row and j-th column is the IoU of the anchor
+    # box i and the ground-truth bounding box j
     jaccard = box_iou(anchors, ground_truth)
-    # Initialize the tensor to hold assigned ground truth bbox for each anchor
+    # Initialize the tensor to hold the assigned ground-truth bounding box for
+    # each anchor
     anchors_bbox_map = np.full((num_anchors,), -1, dtype=np.int32, ctx=device)
-    # Assign ground truth bounding box according to the threshold
+    # Assign ground-truth bounding boxes according to the threshold
     max_ious, indices = np.max(jaccard, axis=1), np.argmax(jaccard, axis=1)
     anc_i = np.nonzero(max_ious >= 0.5)[0]
     box_j = indices[max_ious >= 0.5]
     anchors_bbox_map[anc_i] = box_j
-    # Find the largest iou for each bbox
     col_discard = np.full((num_anchors,), -1)
     row_discard = np.full((num_gt_boxes,), -1)
     for _ in range(num_gt_boxes):
-        max_idx = np.argmax(jaccard)
+        max_idx = np.argmax(jaccard)  # Find the largest IoU
         box_idx = (max_idx % num_gt_boxes).astype('int32')
         anc_idx = (max_idx / num_gt_boxes).astype('int32')
         anchors_bbox_map[anc_idx] = box_idx
@@ -373,24 +397,24 @@ def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
 #@tab pytorch
 #@save
 def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
-    """Assign ground-truth bounding boxes to anchor boxes similar to them."""
+    """Assign closest ground-truth bounding boxes to anchor boxes."""
     num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]
-    # Element `x_ij` in the `i^th` row and `j^th` column is the IoU
-    # of the anchor box `anc_i` to the ground-truth bounding box `box_j`
+    # Element x_ij in the i-th row and j-th column is the IoU of the anchor
+    # box i and the ground-truth bounding box j
     jaccard = box_iou(anchors, ground_truth)
-    # Initialize the tensor to hold assigned ground truth bbox for each anchor
+    # Initialize the tensor to hold the assigned ground-truth bounding box for
+    # each anchor
     anchors_bbox_map = torch.full((num_anchors,), -1, dtype=torch.long,
                                   device=device)
-    # Assign ground truth bounding box according to the threshold
+    # Assign ground-truth bounding boxes according to the threshold
     max_ious, indices = torch.max(jaccard, dim=1)
     anc_i = torch.nonzero(max_ious >= 0.5).reshape(-1)
     box_j = indices[max_ious >= 0.5]
     anchors_bbox_map[anc_i] = box_j
-    # Find the largest iou for each bbox
     col_discard = torch.full((num_anchors,), -1)
     row_discard = torch.full((num_gt_boxes,), -1)
     for _ in range(num_gt_boxes):
-        max_idx = torch.argmax(jaccard)
+        max_idx = torch.argmax(jaccard)  # Find the largest IoU
         box_idx = (max_idx % num_gt_boxes).long()
         anc_idx = (max_idx / num_gt_boxes).long()
         anchors_bbox_map[anc_idx] = box_idx
@@ -493,6 +517,8 @@ def multibox_target(anchors, labels):
     class_labels = torch.stack(batch_class_labels)
     return (bbox_offset, bbox_mask, class_labels)
 ```
+
+### A Toy Example
 
 Below we demonstrate a detailed example. We define ground-truth bounding boxes for the cat and dog in the read image, where the first element is class (0 for dog, 1 for cat) and the remaining four elements are the $x, y$ axis coordinates at top-left corner and $x, y$ axis coordinates at lower-right corner (the value range is between 0 and 1). Here, we construct five anchor boxes to be labeled by the coordinates of the upper-left corner and the lower-right corner, which are recorded as $A_0, \ldots, A_4$, respectively (the index in the program starts from 0). First, draw the positions of these anchor boxes and the ground-truth bounding boxes in the image.
 
