@@ -211,7 +211,7 @@ When drawing anchor boxes,
 we need to restore their original coordinate values;
 thus, we define variable `bbox_scale` below. 
 Now, we can draw all the anchor boxes centered on (250, 250) in the image.
-As you can see, the blue anchor box with a size of 0.75 and an aspect ratio of 1 more accurately
+As you can see, the blue anchor box with a size of 0.75 and an aspect ratio of 1 well
 covers the dog in the image.
 
 ```{.python .input}
@@ -224,54 +224,72 @@ show_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,
              's=0.75, r=0.5'])
 ```
 
-## Intersection over Union
+## Intersection over Union (IoU)
 
-We just mentioned that the anchor box covers the dog in the image well. If the ground-truth bounding box of the target is known, how can "well" here be quantified? An intuitive method is to measure the similarity between anchor boxes and the ground-truth bounding box. We know that the Jaccard index can measure the similarity between two sets. Given sets $\mathcal{A}$ and $\mathcal{B}$, their Jaccard index is the size of their intersection divided by the size of their union:
+We just mentioned that an anchor box "well" covers the dog in the image.
+If the ground-truth bounding box of the object is known, how can "well" here be quantified?
+Intuitively, we can measure the similarity between
+the anchor box and the ground-truth bounding box.
+We know that the *Jaccard index* can measure the similarity between two sets. Given sets $\mathcal{A}$ and $\mathcal{B}$, their Jaccard index is the size of their intersection divided by the size of their union:
 
 $$J(\mathcal{A},\mathcal{B}) = \frac{\left|\mathcal{A} \cap \mathcal{B}\right|}{\left| \mathcal{A} \cup \mathcal{B}\right|}.$$
 
 
-In fact, we can consider the pixel area of a bounding box as a collection of pixels. In this way, we can measure the similarity of the two bounding boxes by the Jaccard index of their pixel sets. When we measure the similarity of two bounding boxes, we usually refer the Jaccard index as intersection over union (IoU), which is the ratio of the intersecting area to the union area of the two bounding boxes, as shown in :numref:`fig_iou`. The value range of IoU is between 0 and 1: 0 means that there are no overlapping pixels between the two bounding boxes, while 1 indicates that the two bounding boxes are equal.
+In fact, we can consider the pixel area of any bounding box as a set of pixels. 
+In this way, we can measure the similarity of the two bounding boxes by the Jaccard index of their pixel sets. For two bounding boxes, we usually refer their Jaccard index as *intersection over union* (*IoU*), which is the ratio of their intersection area to their union area, as shown in :numref:`fig_iou`.
+The range of an IoU is between 0 and 1:
+0 means that two bounding boxes do not overlap at all,
+while 1 indicates that the two bounding boxes are equal.
 
-![IoU is the ratio of the intersecting area to the union area of two bounding boxes.  ](../img/iou.svg)
+![IoU is the ratio of the intersection area to the union area of two bounding boxes.](../img/iou.svg)
 :label:`fig_iou`
 
-
 For the remainder of this section, we will use IoU to measure the similarity between anchor boxes and ground-truth bounding boxes, and between different anchor boxes.
+Given two lists of anchor or bounding boxes,
+the following `box_iou` computes their pairwise IoU
+across these two lists.
 
 ```{.python .input}
 #@save
 def box_iou(boxes1, boxes2):
-    """Compute IOU between two sets of boxes of shape (N,4) and (M,4)."""
-    # Compute box areas
+    """Compute pairwise IoU across two lists of anchor or bounding boxes."""
     box_area = lambda boxes: ((boxes[:, 2] - boxes[:, 0]) *
                               (boxes[:, 3] - boxes[:, 1]))
-    area1 = box_area(boxes1)
-    area2 = box_area(boxes2)
-    lt = np.maximum(boxes1[:, None, :2], boxes2[:, :2])  # [N,M,2]
-    rb = np.minimum(boxes1[:, None, 2:], boxes2[:, 2:])  # [N,M,2]
-    wh = (rb - lt).clip(min=0)  # [N,M,2]
-    inter = wh[:, :, 0] * wh[:, :, 1]  # [N,M]
-    unioun = area1[:, None] + area2 - inter
-    return inter / unioun
+    # Shape of `boxes1`, `boxes2`, `areas1`, `areas2`: (no. of boxes1, 4),
+    # (no. of boxes2, 4), (no. of boxes1,), (no. of boxes2,)
+    areas1 = box_area(boxes1)
+    areas2 = box_area(boxes2)
+    # Shape of `inter_upperlefts`, `inter_lowerrights`, `inters`: (no. of
+    # boxes1, no. of boxes2, 2)
+    inter_upperlefts = np.maximum(boxes1[:, None, :2], boxes2[:, :2])
+    inter_lowerrights = np.minimum(boxes1[:, None, 2:], boxes2[:, 2:])
+    inters = (inter_lowerrights - inter_upperlefts).clip(min=0)
+    # Shape of `inter_areas` and `union_areas`: (no. of boxes1, no. of boxes2)
+    inter_areas = inters[:, :, 0] * inters[:, :, 1]
+    union_areas = areas1[:, None] + areas2 - inter_areas
+    return inter_areas / union_areas
 ```
 
 ```{.python .input}
 #@tab pytorch
 #@save
 def box_iou(boxes1, boxes2):
-    """Compute IOU between two sets of boxes of shape (N,4) and (M,4)."""
-    # Compute box areas
+    """Compute pairwise IoU across two lists of boxes."""
     box_area = lambda boxes: ((boxes[:, 2] - boxes[:, 0]) *
                               (boxes[:, 3] - boxes[:, 1]))
-    area1 = box_area(boxes1)
-    area2 = box_area(boxes2)
-    lt = torch.max(boxes1[:, None, :2], boxes2[:, :2])  # [N,M,2]
-    rb = torch.min(boxes1[:, None, 2:], boxes2[:, 2:])  # [N,M,2]
-    wh = (rb - lt).clamp(min=0)  # [N,M,2]
-    inter = wh[:, :, 0] * wh[:, :, 1]  # [N,M]
-    unioun = area1[:, None] + area2 - inter
-    return inter / unioun
+    # Shape of `boxes1`, `boxes2`, `areas1`, `areas2`: (no. of boxes1, 4),
+    # (no. of boxes2, 4), (no. of boxes1,), (no. of boxes2,)
+    areas1 = box_area(boxes1)
+    areas2 = box_area(boxes2)
+    # Shape of `inter_upperlefts`, `inter_lowerrights`, `inters`: (no. of
+    # boxes1, no. of boxes2, 2)
+    inter_upperlefts = torch.max(boxes1[:, None, :2], boxes2[:, :2])
+    inter_lowerrights = torch.min(boxes1[:, None, 2:], boxes2[:, 2:])
+    inters = (inter_lowerrights - inter_upperlefts).clamp(min=0)
+    # Shape of `inter_areas` and `union_areas`: (no. of boxes1, no. of boxes2)
+    inter_areas = inters[:, :, 0] * inters[:, :, 1]
+    union_areas = areas1[:, None] + areas2 - inter_areas
+    return inter_areas / union_areas
 ```
 
 ## Labeling Training Set Anchor Boxes

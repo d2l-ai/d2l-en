@@ -76,7 +76,7 @@ d2l.plt.imshow(img);
 
 In object detection,
 we usually use a *bounding box* to describe the spatial location of an object.
-The bounding box is rectangular, which is determined by the $x$ and $y$ coordinates of the upper-left corner of the rectangle and the such coordinates of the lower right corner. 
+The bounding box is rectangular, which is determined by the $x$ and $y$ coordinates of the upper-left corner of the rectangle and the such coordinates of the lower-right corner. 
 Another commonly used bounding box representation is the $(x, y)$-axis
 coordinates of the bounding box center, and the width and height of the box.
 
@@ -92,7 +92,7 @@ or a two-dimensional tensor of shape ($n$, 4), where $n$ is the number of boundi
 #@tab all
 #@save
 def box_corner_to_center(boxes):
-    """Convert from (upper-left, bottom-right) to (center, width, height)."""
+    """Convert from (upper-left, lower-right) to (center, width, height)."""
     x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
     cx = (x1 + x2) / 2
     cy = (y1 + y2) / 2
@@ -103,7 +103,7 @@ def box_corner_to_center(boxes):
 
 #@save
 def box_center_to_corner(boxes):
-    """Convert from (center, width, height) to (upper-left, bottom-right)."""
+    """Convert from (center, width, height) to (upper-left, lower-right)."""
     cx, cy, w, h = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
     x1 = cx - 0.5 * w
     y1 = cy - 0.5 * h
@@ -117,7 +117,7 @@ We will define the bounding boxes of the dog and the cat in the image based
 on the coordinate information.
 The origin of the coordinates in the image
 is the upper-left corner of the image, and to the right and down are the
-positive directions of the $x$ and $y$ axis, respectively.
+positive directions of the $x$ and $y$ axes, respectively.
 
 ```{.python .input}
 #@tab all
@@ -142,8 +142,8 @@ Before drawing, we will define a helper function `bbox_to_rect`. It represents t
 #@save
 def bbox_to_rect(bbox, color):
     """Convert bounding box to matplotlib format."""
-    # Convert the bounding box (upper-left x, upper-left y, bottom-right x,
-    # bottom-right y) format to the matplotlib format: ((upper-left x,
+    # Convert the bounding box (upper-left x, upper-left y, lower-right x,
+    # lower-right y) format to the matplotlib format: ((upper-left x,
     # upper-left y), width, height)
     return d2l.plt.Rectangle(
         xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
