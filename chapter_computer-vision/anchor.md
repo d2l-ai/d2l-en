@@ -24,7 +24,7 @@ just for more concise outputs.
 from d2l import mxnet as d2l
 from mxnet import gluon, image, np, npx
 
-np.set_printoptions(2)
+np.set_printoptions(2)  # Simplify printing accuracy
 npx.set_np()
 ```
 
@@ -34,7 +34,7 @@ npx.set_np()
 from d2l import torch as d2l
 import torch
 
-torch.set_printoptions(2)
+torch.set_printoptions(2)  # Simplify printing accuracy
 ```
 
 ## Generating Multiple Anchor Boxes
@@ -66,6 +66,7 @@ The above method of generating anchor boxes is implemented in the following `mul
 ```{.python .input}
 #@save
 def multibox_prior(data, sizes, ratios):
+    """Generate anchor boxes with different shapes centered on each pixel."""
     in_height, in_width = data.shape[-2:]
     device, num_sizes, num_ratios = data.ctx, len(sizes), len(ratios)
     boxes_per_pixel = (num_sizes + num_ratios - 1)
@@ -106,6 +107,7 @@ def multibox_prior(data, sizes, ratios):
 #@tab pytorch
 #@save
 def multibox_prior(data, sizes, ratios):
+    """Generate anchor boxes with different shapes centered on each pixel."""
     in_height, in_width = data.shape[-2:]
     device, num_sizes, num_ratios = data.device, len(sizes), len(ratios)
     boxes_per_pixel = (num_sizes + num_ratios - 1)
@@ -274,7 +276,7 @@ def box_iou(boxes1, boxes2):
 #@tab pytorch
 #@save
 def box_iou(boxes1, boxes2):
-    """Compute pairwise IoU across two lists of boxes."""
+    """Compute pairwise IoU across two lists of anchor or bounding boxes."""
     box_area = lambda boxes: ((boxes[:, 2] - boxes[:, 0]) *
                               (boxes[:, 3] - boxes[:, 1]))
     # Shape of `boxes1`, `boxes2`, `areas1`, `areas2`: (no. of boxes1, 4),
@@ -425,21 +427,44 @@ def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
 
 ### Labeling Classes and Offsets
 
-Now we can label the classes and offsets of the anchor boxes. If an anchor box $A$ is assigned ground-truth bounding box $B$, the class of the anchor box $A$ is set to the class of $B$. And the offset of the anchor box $A$ is set according to the relative position of the central coordinates of $B$ and $A$ and the relative sizes of the two boxes. Because the positions and sizes of various boxes in the dataset may vary, these relative positions and relative sizes usually require some special transformations to make the offset distribution more uniform and easier to fit. Assume the center coordinates of anchor box $A$ and its assigned ground-truth bounding box $B$ are $(x_a, y_a), (x_b, y_b)$, the widths of $A$ and $B$ are $w_a, w_b$, and their heights are $h_a, h_b$, respectively. In this case, a common technique is to label the offset of $A$ as
+Now we can label the class and offset for each anchor box. Suppose that an anchor box $A$ is assigned
+a ground-truth bounding box $B$. 
+On one hand,
+the class of the anchor box $A$ will be
+labeled as that of $B$.
+On the other hand,
+the offset of the anchor box $A$ 
+will be labeled according to the 
+relative position between
+the central coordinates of $B$ and $A$
+together with the relative size between
+these two boxes.
+Given varying
+positions and sizes of different boxes in the dataset,
+we can apply transformations
+to those relative positions and sizes
+that may lead to 
+more uniformly distributed offsets
+that are easier to fit.
+Here we describe a common transformation.
+Given the central coordinates of $A$ and $B$ as $(x_a, y_a)$ and $(x_b, y_b)$, 
+their widths as $w_a$ and $w_b$, 
+and their heights as $h_a$ and $h_b$, respectively. 
+We may label the offset of $A$ as
 
 $$\left( \frac{ \frac{x_b - x_a}{w_a} - \mu_x }{\sigma_x},
 \frac{ \frac{y_b - y_a}{h_a} - \mu_y }{\sigma_y},
 \frac{ \log \frac{w_b}{w_a} - \mu_w }{\sigma_w},
 \frac{ \log \frac{h_b}{h_a} - \mu_h }{\sigma_h}\right),$$
 
-The default values of the constant are $\mu_x = \mu_y = \mu_w = \mu_h = 0, \sigma_x=\sigma_y=0.1, and \sigma_w=\sigma_h=0.2$.
+where default values of the constants are $\mu_x = \mu_y = \mu_w = \mu_h = 0, \sigma_x=\sigma_y=0.1$, and $\sigma_w=\sigma_h=0.2$.
 This transformation is implemented below in the `offset_boxes` function.
-If an anchor box is not assigned a ground-truth bounding box, we only need to set the class of the anchor box to background. Anchor boxes whose class is background are often referred to as negative anchor boxes, and the rest are referred to as positive anchor boxes.
 
 ```{.python .input}
 #@tab all
 #@save
 def offset_boxes(anchors, assigned_bb, eps=1e-6):
+    """Transform for anchor box offsets."""
     c_anc = d2l.box_corner_to_center(anchors)
     c_assigned_bb = d2l.box_corner_to_center(assigned_bb)
     offset_xy = 10 * (c_assigned_bb[:, :2] - c_anc[:, :2]) / c_anc[:, 2:]
@@ -448,9 +473,17 @@ def offset_boxes(anchors, assigned_bb, eps=1e-6):
     return offset
 ```
 
+If an anchor box is not assigned a ground-truth bounding box, we just label the class of the anchor box as "background".
+Anchor boxes whose classes are background are often referred to as *negative* anchor boxes,
+and the rest are called *positive* anchor boxes.
+We implement the following `multibox_target` function
+to label classes and offsets for anchor boxes (the `anchors` argument) using ground-truth bounding boxes (the `labels` argument).
+This function sets the background class to zero and increments the integer index of a new class by one.
+
 ```{.python .input}
 #@save
 def multibox_target(anchors, labels):
+    """Label anchor boxes using ground-truth bounding boxes."""
     batch_size, anchors = labels.shape[0], anchors.squeeze(0)
     batch_offset, batch_mask, batch_class_labels = [], [], []
     device, num_anchors = anchors.ctx, anchors.shape[0]
@@ -460,18 +493,19 @@ def multibox_target(anchors, labels):
             label[:, 1:], anchors, device)
         bbox_mask = np.tile((np.expand_dims((anchors_bbox_map >= 0),
                                             axis=-1)), (1, 4)).astype('int32')
-        # Initialize class_labels and assigned bbox coordinates with zeros
+        # Initialize class labels and assigned bounding box coordinates with
+        # zeros
         class_labels = d2l.zeros(num_anchors, dtype=np.int32, ctx=device)
         assigned_bb = d2l.zeros((num_anchors, 4), dtype=np.float32,
                                 ctx=device)
-        # Assign class labels to the anchor boxes using matched gt bbox labels
-        # If no gt bbox is assigned to an anchor box, then let the
-        # class_labels and assigned_bb remain zero, i.e the background class
+        # Label classes of anchor boxes using their assigned ground-truth
+        # bounding boxes. If an anchor box is not assigned any, we label its
+        # class as background (the value remains zero)
         indices_true = np.nonzero(anchors_bbox_map >= 0)[0]
         bb_idx = anchors_bbox_map[indices_true]
         class_labels[indices_true] = label[bb_idx, 0].astype('int32') + 1
         assigned_bb[indices_true] = label[bb_idx, 1:]
-        # offset transformations
+        # Offset transformation
         offset = offset_boxes(anchors, assigned_bb) * bbox_mask
         batch_offset.append(offset.reshape(-1))
         batch_mask.append(bbox_mask.reshape(-1))
@@ -486,6 +520,7 @@ def multibox_target(anchors, labels):
 #@tab pytorch
 #@save
 def multibox_target(anchors, labels):
+    """Label anchor boxes using ground-truth bounding boxes."""
     batch_size, anchors = labels.shape[0], anchors.squeeze(0)
     batch_offset, batch_mask, batch_class_labels = [], [], []
     device, num_anchors = anchors.device, anchors.shape[0]
@@ -495,19 +530,20 @@ def multibox_target(anchors, labels):
             label[:, 1:], anchors, device)
         bbox_mask = ((anchors_bbox_map >= 0).float().unsqueeze(-1)).repeat(
             1, 4)
-        # Initialize class_labels and assigned bbox coordinates with zeros
+        # Initialize class labels and assigned bounding box coordinates with
+        # zeros
         class_labels = torch.zeros(num_anchors, dtype=torch.long,
                                    device=device)
         assigned_bb = torch.zeros((num_anchors, 4), dtype=torch.float32,
                                   device=device)
-        # Assign class labels to the anchor boxes using matched gt bbox labels
-        # If no gt bbox is assigned to an anchor box, then let the
-        # class_labels and assigned_bb remain zero, i.e the background class
+        # Label classes of anchor boxes using their assigned ground-truth
+        # bounding boxes. If an anchor box is not assigned any, we label its
+        # class as background (the value remains zero)
         indices_true = torch.nonzero(anchors_bbox_map >= 0)
         bb_idx = anchors_bbox_map[indices_true]
         class_labels[indices_true] = label[bb_idx, 0].long() + 1
         assigned_bb[indices_true] = label[bb_idx, 1:]
-        # offset transformations
+        # Offset transformation
         offset = offset_boxes(anchors, assigned_bb) * bbox_mask
         batch_offset.append(offset.reshape(-1))
         batch_mask.append(bbox_mask.reshape(-1))
@@ -535,7 +571,10 @@ show_bboxes(fig.axes, ground_truth[:, 1:] * bbox_scale, ['dog', 'cat'], 'k')
 show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 ```
 
-We can label classes and offsets for anchor boxes by using the `multibox_target` function. This function sets the background class to 0 and increments the integer index of the target class from zero by 1 (1 for dog and 2 for cat).
+We can label classes and offsets for anchor boxes by using the `multibox_target` function. 
+In this example, the integer indices of
+the background, dog, and cat classes
+are 0, 1, and 2, respectively. 
 
 :begin_tab:`mxnet`
 We add example dimensions to the anchor boxes and ground-truth bounding boxes and construct random predicted results with a shape of (batch size, number of classes including background, number of anchor boxes) by using the `expand_dims` function.

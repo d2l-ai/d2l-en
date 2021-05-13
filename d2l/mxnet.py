@@ -1497,6 +1497,7 @@ def bbox_to_rect(bbox, color):
 
 # Defined in file: ./chapter_computer-vision/anchor.md
 def multibox_prior(data, sizes, ratios):
+    """Generate anchor boxes with different shapes centered on each pixel."""
     in_height, in_width = data.shape[-2:]
     device, num_sizes, num_ratios = data.ctx, len(sizes), len(ratios)
     boxes_per_pixel = (num_sizes + num_ratios - 1)
@@ -1578,23 +1579,23 @@ def box_iou(boxes1, boxes2):
 
 # Defined in file: ./chapter_computer-vision/anchor.md
 def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
-    """Assign ground-truth bounding boxes to anchor boxes similar to them."""
+    """Assign closest ground-truth bounding boxes to anchor boxes."""
     num_anchors, num_gt_boxes = anchors.shape[0], ground_truth.shape[0]
-    # Element `x_ij` in the `i^th` row and `j^th` column is the IoU
-    # of the anchor box `anc_i` to the ground-truth bounding box `box_j`
+    # Element x_ij in the i-th row and j-th column is the IoU of the anchor
+    # box i and the ground-truth bounding box j
     jaccard = box_iou(anchors, ground_truth)
-    # Initialize the tensor to hold assigned ground truth bbox for each anchor
+    # Initialize the tensor to hold the assigned ground-truth bounding box for
+    # each anchor
     anchors_bbox_map = np.full((num_anchors,), -1, dtype=np.int32, ctx=device)
-    # Assign ground truth bounding box according to the threshold
+    # Assign ground-truth bounding boxes according to the threshold
     max_ious, indices = np.max(jaccard, axis=1), np.argmax(jaccard, axis=1)
     anc_i = np.nonzero(max_ious >= 0.5)[0]
     box_j = indices[max_ious >= 0.5]
     anchors_bbox_map[anc_i] = box_j
-    # Find the largest iou for each bbox
     col_discard = np.full((num_anchors,), -1)
     row_discard = np.full((num_gt_boxes,), -1)
     for _ in range(num_gt_boxes):
-        max_idx = np.argmax(jaccard)
+        max_idx = np.argmax(jaccard)  # Find the largest IoU
         box_idx = (max_idx % num_gt_boxes).astype('int32')
         anc_idx = (max_idx / num_gt_boxes).astype('int32')
         anchors_bbox_map[anc_idx] = box_idx
@@ -1605,6 +1606,7 @@ def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
 
 # Defined in file: ./chapter_computer-vision/anchor.md
 def offset_boxes(anchors, assigned_bb, eps=1e-6):
+    """Transform for anchor box offsets."""
     c_anc = d2l.box_corner_to_center(anchors)
     c_assigned_bb = d2l.box_corner_to_center(assigned_bb)
     offset_xy = 10 * (c_assigned_bb[:, :2] - c_anc[:, :2]) / c_anc[:, 2:]
@@ -1615,6 +1617,7 @@ def offset_boxes(anchors, assigned_bb, eps=1e-6):
 
 # Defined in file: ./chapter_computer-vision/anchor.md
 def multibox_target(anchors, labels):
+    """Label anchor boxes using ground-truth bounding boxes."""
     batch_size, anchors = labels.shape[0], anchors.squeeze(0)
     batch_offset, batch_mask, batch_class_labels = [], [], []
     device, num_anchors = anchors.ctx, anchors.shape[0]
@@ -1624,18 +1627,19 @@ def multibox_target(anchors, labels):
                                                  device)
         bbox_mask = np.tile((np.expand_dims(
             (anchors_bbox_map >= 0), axis=-1)), (1, 4)).astype('int32')
-        # Initialize class_labels and assigned bbox coordinates with zeros
+        # Initialize class labels and assigned bounding box coordinates with
+        # zeros
         class_labels = d2l.zeros(num_anchors, dtype=np.int32, ctx=device)
         assigned_bb = d2l.zeros((num_anchors, 4), dtype=np.float32,
                                 ctx=device)
-        # Assign class labels to the anchor boxes using matched gt bbox labels
-        # If no gt bbox is assigned to an anchor box, then let the
-        # class_labels and assigned_bb remain zero, i.e the background class
+        # Label classes of anchor boxes using their assigned ground-truth
+        # bounding boxes. If an anchor box is not assigned any, we label its
+        # class as background (the value remains zero)
         indices_true = np.nonzero(anchors_bbox_map >= 0)[0]
         bb_idx = anchors_bbox_map[indices_true]
         class_labels[indices_true] = label[bb_idx, 0].astype('int32') + 1
         assigned_bb[indices_true] = label[bb_idx, 1:]
-        # offset transformations
+        # Offset transformation
         offset = offset_boxes(anchors, assigned_bb) * bbox_mask
         batch_offset.append(offset.reshape(-1))
         batch_mask.append(bbox_mask.reshape(-1))
