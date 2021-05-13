@@ -54,8 +54,10 @@ mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 
 ```{.python .input}
 #@tab pytorch
-data_transform = torchvision.transforms.Compose(
-    [torchvision.transforms.ToTensor()])
+data_transform = torchvision.transforms.Compose([
+    torchvision.transforms.ToTensor(),
+    lambda x: torch.floor(x * 255 / 128).squeeze(dim=0)
+])
 
 mnist_train = torchvision.datasets.MNIST(
     root='./temp', train=True, transform=data_transform, download=True)
@@ -120,9 +122,8 @@ images.shape, labels.shape
 
 ```{.python .input}
 #@tab pytorch
-images = torch.stack([mnist_train[i][0] for i in range(10,38)], 
-                     dim=1).squeeze(0)
-labels = torch.tensor([mnist_train[i][1] for i in range(10,38)])
+images = torch.stack([mnist_train[i][0] for i in range(10, 38)], dim=0)
+labels = torch.tensor([mnist_train[i][1] for i in range(10, 38)])
 images.shape, labels.shape
 ```
 
@@ -202,8 +203,7 @@ P_y
 
 ```{.python .input}
 #@tab pytorch
-X = torch.stack([mnist_train[i][0] for i in range(len(mnist_train))], 
-                dim=1).squeeze(0)
+X = torch.stack([mnist_train[i][0] for i in range(len(mnist_train))], dim=0)
 Y = torch.tensor([mnist_train[i][1] for i in range(len(mnist_train))])
 
 n_y = torch.zeros(10)
@@ -411,8 +411,8 @@ def predict(X):
     return [bayes_pred_stable(x).argmax(dim=0).type(torch.int32).item() 
             for x in X]
 
-X = torch.stack([mnist_train[i][0] for i in range(10,38)], dim=1).squeeze(0)
-y = torch.tensor([mnist_train[i][1] for i in range(10,38)])
+X = torch.stack([mnist_test[i][0] for i in range(18)], dim=0)
+y = torch.tensor([mnist_test[i][1] for i in range(18)])
 preds = predict(X)
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
@@ -441,9 +441,8 @@ float((preds == y).sum()) / len(y)  # Validation accuracy
 
 ```{.python .input}
 #@tab pytorch
-X = torch.stack([mnist_train[i][0] for i in range(len(mnist_test))], 
-                dim=1).squeeze(0)
-y = torch.tensor([mnist_train[i][1] for i in range(len(mnist_test))])
+X = torch.stack([mnist_test[i][0] for i in range(len(mnist_test))], dim=0)
+y = torch.tensor([mnist_test[i][1] for i in range(len(mnist_test))])
 preds = torch.tensor(predict(X), dtype=torch.int32)
 float((preds == y).sum()) / len(y)  # Validation accuracy
 ```
@@ -469,7 +468,6 @@ Modern deep networks achieve error rates of less than $0.01$. The relatively poo
 1. Consider the dataset $[[0,0], [0,1], [1,0], [1,1]]$ with labels given by the XOR of the two elements $[0,1,1,0]$.  What are the probabilities for a Naive Bayes classifier built on this dataset.  Does it successfully classify our points?  If not, what assumptions are violated?
 1. Suppose that we did not use Laplace smoothing when estimating probabilities and a data example arrived at testing time which contained a value never observed in training.  What would the model output?
 1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :cite:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/418)
