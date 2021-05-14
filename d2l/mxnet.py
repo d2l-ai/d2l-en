@@ -1652,12 +1652,13 @@ def multibox_target(anchors, labels):
 
 # Defined in file: ./chapter_computer-vision/anchor.md
 def offset_inverse(anchors, offset_preds):
-    c_anc = d2l.box_corner_to_center(anchors)
-    c_pred_bb_xy = (offset_preds[:, :2] * c_anc[:, 2:] / 10) + c_anc[:, :2]
-    c_pred_bb_wh = d2l.exp(offset_preds[:, 2:] / 5) * c_anc[:, 2:]
-    c_pred_bb = d2l.concat((c_pred_bb_xy, c_pred_bb_wh), axis=1)
-    predicted_bb = d2l.box_center_to_corner(c_pred_bb)
-    return predicted_bb
+    """Predict bounding boxes based on anchor boxes with predicted offsets."""
+    anc = d2l.box_corner_to_center(anchors)
+    pred_bbox_xy = (offset_preds[:, :2] * anc[:, 2:] / 10) + anc[:, :2]
+    pred_bbox_wh = d2l.exp(offset_preds[:, 2:] / 5) * anc[:, 2:]
+    pred_bbox = d2l.concat((pred_bbox_xy, pred_bbox_wh), axis=1)
+    predicted_bbox = d2l.box_center_to_corner(pred_bbox)
+    return predicted_bbox
 
 
 # Defined in file: ./chapter_computer-vision/anchor.md

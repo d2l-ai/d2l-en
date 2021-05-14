@@ -652,11 +652,15 @@ Note that the offsets of negative-class anchor boxes are labeled as zeros.
 labels[0]
 ```
 
-## Bounding Boxes for Prediction
+## Predicting and Outputting Bounding Boxes
 
-During model prediction phase, we first generate multiple anchor boxes for the image and then predict classes and offsets for these anchor boxes one by one. Then, we obtain prediction bounding boxes based on anchor boxes and their predicted offsets.
-
-Below we implement function `offset_inverse` which takes in anchors and
+During prediction,
+we generate multiple anchor boxes for the image and predict classes and offsets for each of them.
+A *predicted bounding box*
+is thus obtained according to 
+an anchor box with its predicted offset.
+Below we implement the `offset_inverse` function
+that takes in anchors and
 offset predictions as inputs and applies inverse offset transformations to
 return the predicted bounding box coordinates.
 
@@ -664,12 +668,13 @@ return the predicted bounding box coordinates.
 #@tab all
 #@save
 def offset_inverse(anchors, offset_preds):
-    c_anc = d2l.box_corner_to_center(anchors)
-    c_pred_bb_xy = (offset_preds[:, :2] * c_anc[:, 2:] / 10) + c_anc[:, :2]
-    c_pred_bb_wh = d2l.exp(offset_preds[:, 2:] / 5) * c_anc[:, 2:]
-    c_pred_bb = d2l.concat((c_pred_bb_xy, c_pred_bb_wh), axis=1)
-    predicted_bb = d2l.box_center_to_corner(c_pred_bb)
-    return predicted_bb
+    """Predict bounding boxes based on anchor boxes with predicted offsets."""
+    anc = d2l.box_corner_to_center(anchors)
+    pred_bbox_xy = (offset_preds[:, :2] * anc[:, 2:] / 10) + anc[:, :2]
+    pred_bbox_wh = d2l.exp(offset_preds[:, 2:] / 5) * anc[:, 2:]
+    pred_bbox = d2l.concat((pred_bbox_xy, pred_bbox_wh), axis=1)
+    predicted_bbox = d2l.box_center_to_corner(pred_bbox)
+    return predicted_bbox
 ```
 
 When there are many anchor boxes, many similar prediction bounding boxes may be output for the same target. To simplify the results, we can remove similar prediction bounding boxes. A commonly used method is called non-maximum suppression (NMS).
