@@ -554,9 +554,22 @@ def multibox_target(anchors, labels):
     return (bbox_offset, bbox_mask, class_labels)
 ```
 
-### A Toy Example
+### An Example
 
-Below we demonstrate a detailed example. We define ground-truth bounding boxes for the cat and dog in the read image, where the first element is class (0 for dog, 1 for cat) and the remaining four elements are the $x, y$ axis coordinates at top-left corner and $x, y$ axis coordinates at lower-right corner (the value range is between 0 and 1). Here, we construct five anchor boxes to be labeled by the coordinates of the upper-left corner and the lower-right corner, which are recorded as $A_0, \ldots, A_4$, respectively (the index in the program starts from 0). First, draw the positions of these anchor boxes and the ground-truth bounding boxes in the image.
+Let us illustrate anchor box labeling
+via a concrete example.
+We define ground-truth bounding boxes for the dog and cat in the loaded image,
+where the first element is the class (0 for dog and 1 for cat) and the remaining four elements are the
+$(x, y)$-axis coordinates
+at the upper-left corner and the lower-right corner
+(range is between 0 and 1). 
+We also construct five anchor boxes to be labeled
+using the coordinates of
+the upper-left corner and the lower-right corner:
+$A_0, \ldots, A_4$ (the index starts from 0).
+Then we plot these ground-truth bounding boxes 
+and anchor boxes 
+in the image.
 
 ```{.python .input}
 #@tab all
@@ -571,18 +584,14 @@ show_bboxes(fig.axes, ground_truth[:, 1:] * bbox_scale, ['dog', 'cat'], 'k')
 show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 ```
 
-We can label classes and offsets for anchor boxes by using the `multibox_target` function. 
-In this example, the integer indices of
+Using the `multibox_target` function defined above,
+we can label classes and offsets
+of these anchor boxes based on
+the ground-truth bounding boxes for the dog and cat.
+In this example, indices of
 the background, dog, and cat classes
 are 0, 1, and 2, respectively. 
-
-:begin_tab:`mxnet`
-We add example dimensions to the anchor boxes and ground-truth bounding boxes and construct random predicted results with a shape of (batch size, number of classes including background, number of anchor boxes) by using the `expand_dims` function.
-:end_tab:
-
-:begin_tab:`pytorch`
-We add example dimensions to the anchor boxes and ground-truth bounding boxes and construct random predicted results with a shape of (batch size, number of classes including background, number of anchor boxes) by using the `unsqueeze` function.
-:end_tab:
+Below we add an dimension for examples of anchor boxes and ground-truth bounding boxes.
 
 ```{.python .input}
 labels = multibox_target(np.expand_dims(anchors, axis=0),
@@ -595,25 +604,48 @@ labels = multibox_target(anchors.unsqueeze(dim=0),
                          ground_truth.unsqueeze(dim=0))
 ```
 
-There are three items in the returned result, all of which are in the tensor format. The third item is represented by the class labeled for the anchor box.
+There are three items in the returned result, all of which are in the tensor format.
+The third item contains the labeled classes of the input anchor boxes.
+
+Let us analyze the returned class labels below based on
+anchor box and ground-truth bounding box positions in the image.
+First, among all the pairs of anchor boxes
+and ground-truth bounding boxes,
+the IoU of the anchor box $A_4$ and the ground-truth bounding box of the cat is the largest. 
+Thus, the class of $A_4$ is labeled as the cat.
+Taking out 
+pairs containing $A_4$ or the ground-truth bounding box of the cat, among the rest 
+the pair of the anchor box $A_1$ and the ground-truth bounding box of the dog has the largest IoU.
+So the class of $A_1$ is labeled as the dog.
+Next, we need to traverse through the remaining three unlabeled anchor boxes: $A_0$, $A_2$, and $A_3$.
+For $A_0$,
+the class of the ground-truth bounding box with the largest IoU is the dog,
+but the IoU is below the predefined threshold (0.5),
+so the class is labeled as background;
+for $A_2$,
+the class of the ground-truth bounding box with the largest IoU is the cat and the IoU exceeds the threshold, so the class is labeled as the cat;
+for $A_3$,
+the class of the ground-truth bounding box with the largest IoU is the cat, but the value is below the threshold, so the class is labeled as background.
 
 ```{.python .input}
 #@tab all
 labels[2]
 ```
 
-We analyze these labeled classes based on positions of anchor boxes and ground-truth bounding boxes in the image. First, in all "anchor box--ground-truth bounding box" pairs, the IoU of anchor box $A_4$ to the ground-truth bounding box of the cat is the largest, so the class of anchor box $A_4$ is labeled as cat. Without considering anchor box $A_4$ or the ground-truth bounding box of the cat, in the remaining "anchor box--ground-truth bounding box" pairs, the pair with the largest IoU is anchor box $A_1$ and the ground-truth bounding box of the dog, so the class of anchor box $A_1$ is labeled as dog. Next, traverse the remaining three unlabeled anchor boxes. The class of the ground-truth bounding box with the largest IoU with anchor box $A_0$ is dog, but the IoU is smaller than the threshold (the default is 0.5), so the class is labeled as background; the class of the ground-truth bounding box with the largest IoU with anchor box $A_2$ is cat and the IoU is greater than the threshold, so the class is labeled as cat; the class of the ground-truth bounding box with the largest IoU with anchor box $A_3$ is cat, but the IoU is smaller than the threshold, so the class is labeled as background.
-
-
-The second item of the return value is a mask variable, with the shape of (batch size, four times the number of anchor boxes). The elements in the mask variable correspond one-to-one with the four offset values of each anchor box.
-Because we do not care about background detection, offsets of the negative class should not affect the target function. By multiplying by element, the 0 in the mask variable can filter out negative class offsets before calculating target function.
+The second returned item is a mask variable of the shape (batch size, four times the number of anchor boxes).
+Every four elements in the mask variable 
+correspond to the four offset values of each anchor box.
+Since we do not care about background detection,
+offsets of this negative class should not affect the objective function.
+Through elementwise multiplications, zeros in the mask variable will filter out negative class offsets before calculating the objective function.
 
 ```{.python .input}
 #@tab all
 labels[1]
 ```
 
-The first item returned is the four offset values labeled for each anchor box, with the offsets of negative class anchor boxes labeled as 0.
+The first returned item contains the four offset values labeled for each anchor box.
+Note that the offsets of negative-class anchor boxes are labeled as zeros.
 
 ```{.python .input}
 #@tab all
