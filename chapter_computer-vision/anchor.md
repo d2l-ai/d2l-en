@@ -706,7 +706,9 @@ def nms(boxes, scores, iou_threshold):
         inds = np.nonzero(iou <= iou_threshold)[0]
         B = B[inds + 1]
     return np.array(keep, dtype=np.int32, ctx=boxes.ctx)
+```
 
+```{.python .input}
 #@tab pytorch
 #@save
 def nms(boxes, scores, iou_threshold):
@@ -764,7 +766,9 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
                                 predicted_bb), axis=1)
         out.append(pred_info)
     return d2l.stack(out)
+```
 
+```{.python .input}
 #@tab pytorch
 #@save
 def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
@@ -815,7 +819,7 @@ anchors = d2l.tensor([[0.1, 0.08, 0.52, 0.92], [0.08, 0.2, 0.56, 0.95],
 offset_preds = d2l.tensor([0] * d2l.size(anchors))
 cls_probs = d2l.tensor([[0] * 4,  # Predicted background likelihood 
                       [0.9, 0.8, 0.7, 0.1],  # Predicted dog likelihood 
-                      [0.1, 0.2, 0.3, 0.9]])  # Predicted cat likelihood 
+                      [0.1, 0.2, 0.3, 0.9]])  # Predicted cat likelihood
 ```
 
 We can plot these predicted bounding boxes with their confidence on the image.
