@@ -173,7 +173,7 @@ we can obtain all the anchor boxes centered on a specified pixel position.
 In the following,
 we access the first anchor box centered on (250, 250). It has four elements: the $(x, y)$-axis coordinates at the upper-left corner and the $(x, y)$-axis coordinates at the lower-right corner of the anchor box.
 The coordinate values of both axes
-are divided by the width and height of the image, respectively; thus, the value range is between 0 and 1.
+are divided by the width and height of the image, respectively; thus, the range is between 0 and 1.
 
 ```{.python .input}
 #@tab all
@@ -295,6 +295,7 @@ def box_iou(boxes1, boxes2):
 ```
 
 ## Labeling Anchor Boxes in Training Data
+:label:`subsec_labeling-anchor-boxes`
 
 
 In a training dataset,
@@ -302,7 +303,7 @@ we consider each anchor box as a training example.
 In order to train an object detection model,
 we need *class* and *offset* labels for each anchor box,
 where the former is
-the class of the object surrounded by the anchor box
+the class of the object relevant to the anchor box
 and the latter is the offset
 of the ground-truth bounding box relative to the anchor box.
 During the prediction,
@@ -329,29 +330,12 @@ closest ground-truth bounding boxes to anchor boxes.
 
 Given an image,
 suppose that the anchor boxes are $A_1, A_2, \ldots, A_{n_a}$ and the ground-truth bounding boxes are $B_1, B_2, \ldots, B_{n_b}$, where $n_a \geq n_b$.
-Let us define a matrix $\mathbf{X} \in \mathbb{R}^{n_a \times n_b}$, whose element $x_{ij}$ in the $i^\mathrm{th}$ row and $j^\mathrm{th}$ column is the IoU of the anchor box $A_i$ and the ground-truth bounding box $B_j$.
+Let us define a matrix $\mathbf{X} \in \mathbb{R}^{n_a \times n_b}$, whose element $x_{ij}$ in the $i^\mathrm{th}$ row and $j^\mathrm{th}$ column is the IoU of the anchor box $A_i$ and the ground-truth bounding box $B_j$. The algorithm consists of the following steps:
 
-First, find the largest element in matrix $\mathbf{X}$ and denote its row and column indices as $i_1$ and $j_1$, respectively.
-Then the ground-truth bounding box $B_{j_1}$
-is assigned to the anchor box $A_{i_1}$.
-This is quite intuitive because
-$A_{i_1}$ and $B_{j_1}$ are the closet among
-all the pairs of anchor boxes and ground-truth bounding boxes.
-After the first assignment,
-discard all the elements in the ${i_1}^\mathrm{th}$ row and the ${j_1}^\mathrm{th}$ column in matrix $\mathbf{X}$. 
-
-Next, find the largest of the remaining elements in matrix $\mathbf{X}$ and denote its row and column indices as $i_2$ and $j_2$, respectively. 
-We assign ground-truth bounding box $B_{j_2}$ to anchor box $A_{i_2}$ and discard all the elements in the ${i_2}^\mathrm{th}$ row and the ${j_2}^\mathrm{th}$ column in matrix $\mathbf{X}$.
-
-At this point, elements in two rows and two columns in  matrix $\mathbf{X}$ have been discarded.
-We proceed until all elements in $n_b$ columns in matrix $\mathbf{X}$ are discarded. 
-At this time, we have assigned a ground-truth bounding box to each of $n_b$ anchor boxes.
-
-Finally, we only need to traverse through
-the remaining $n_a - n_b$ anchor boxes.
-For example,
-given any anchor box $A_i$, find the ground-truth bounding box $B_j$ with the largest IoU with $A_i$ throughout the $i^\mathrm{th}$ row of matrix $\mathbf{X}$,
-and assign $B_j$ to $A_i$ only if this IoU is greater than a predefined threshold.
+1. Find the largest element in matrix $\mathbf{X}$ and denote its row and column indices as $i_1$ and $j_1$, respectively. Then the ground-truth bounding box $B_{j_1}$ is assigned to the anchor box $A_{i_1}$. This is quite intuitive because $A_{i_1}$ and $B_{j_1}$ are the closet among all the pairs of anchor boxes and ground-truth bounding boxes. After the first assignment, discard all the elements in the ${i_1}^\mathrm{th}$ row and the ${j_1}^\mathrm{th}$ column in matrix $\mathbf{X}$. 
+1. Find the largest of the remaining elements in matrix $\mathbf{X}$ and denote its row and column indices as $i_2$ and $j_2$, respectively. We assign ground-truth bounding box $B_{j_2}$ to anchor box $A_{i_2}$ and discard all the elements in the ${i_2}^\mathrm{th}$ row and the ${j_2}^\mathrm{th}$ column in matrix $\mathbf{X}$.
+1. At this point, elements in two rows and two columns in  matrix $\mathbf{X}$ have been discarded. We proceed until all elements in $n_b$ columns in matrix $\mathbf{X}$ are discarded. At this time, we have assigned a ground-truth bounding box to each of $n_b$ anchor boxes.
+1. Only traverse through the remaining $n_a - n_b$ anchor boxes. For example, given any anchor box $A_i$, find the ground-truth bounding box $B_j$ with the largest IoU with $A_i$ throughout the $i^\mathrm{th}$ row of matrix $\mathbf{X}$, and assign $B_j$ to $A_i$ only if this IoU is greater than a predefined threshold.
 
 Let us illustrate the above algorithm using a concrete
 example.
@@ -652,7 +636,8 @@ Note that the offsets of negative-class anchor boxes are labeled as zeros.
 labels[0]
 ```
 
-## Predicting and Outputting Bounding Boxes
+## Predicting Bounding Boxes with Non-Maximum Suppression
+:label:`subsec_predicting-bounding-boxes-nms`
 
 During prediction,
 we generate multiple anchor boxes for the image and predict classes and offsets for each of them.
@@ -677,17 +662,41 @@ def offset_inverse(anchors, offset_preds):
     return predicted_bbox
 ```
 
-When there are many anchor boxes, many similar prediction bounding boxes may be output for the same target. To simplify the results, we can remove similar prediction bounding boxes. A commonly used method is called non-maximum suppression (NMS).
+When there are many anchor boxes,
+many similar (with significant overlap)
+predicted bounding boxes 
+can be potentially output for surrounding the same object.
+To simplify the output,
+we can merge similar predicted bounding boxes
+that belong to the same object
+by using *non-maximum suppression* (NMS).
 
-Let us take a look at how NMS works. For a prediction bounding box $B$, the model calculates the predicted probability for each class. Assume the largest predicted probability is $p$, the class corresponding to this probability is the predicted class of $B$. We also refer to $p$ as the confidence level of prediction bounding box $B$. On the same image, we sort the prediction bounding boxes with predicted classes other than background by confidence level from high to low, and obtain the list $L$. Select the prediction bounding box $B_1$ with highest confidence level from $L$ as a baseline and remove all non-benchmark prediction bounding boxes with an IoU with $B_1$ greater than a certain threshold from $L$. The threshold here is a preset hyperparameter. At this point, $L$ retains the prediction bounding box with the highest confidence level and removes other prediction bounding boxes similar to it.
-Next, select the prediction bounding box $B_2$ with the second highest confidence level from $L$ as a baseline, and remove all non-benchmark prediction bounding boxes with an IoU with $B_2$ greater than a certain threshold from $L$. Repeat this process until all prediction bounding boxes in $L$ have been used as a baseline. At this time, the IoU of any pair of prediction bounding boxes in $L$ is less than the threshold. Finally, output all prediction bounding boxes in the list $L$.
+Here is how non-maximum suppression works.
+For a predicted bounding box $B$,
+the object detection model calculates the predicted likelihood
+for each class.
+Denoting by $p$ the largest predicted likelihood,
+the class corresponding to this probability is the predicted class for $B$.
+Specifically, we refer to $p$ as the *confidence* (score) of the predicted bounding box $B$.
+On the same image,
+all the predicted non-background bounding boxes 
+are sorted by confidence in descending order
+to generate a list $L$.
+Then we manipulate the sorted list $L$ in the following steps:
+
+1. Select the predicted bounding box $B_1$ with the highest confidence from $L$ as a basis and remove all non-basis predicted bounding boxes whose IoU with $B_1$ exceeds a predefined threshold $\epsilon$ from $L$. At this point, $L$ keeps the predicted bounding box with the highest confidence but drops others that are too similar to it. In a nutshell, those with *non-maximum* confidence scores are *suppressed*.
+1. Select the predicted bounding box $B_2$ with the second highest confidence from $L$ as another basis and remove all non-basis predicted bounding boxes whose IoU with $B_2$ exceeds $\epsilon$ from $L$.
+1. Repeat the above process until all the predicted bounding boxes in $L$ have been used as a basis. At this time, the IoU of any pair of predicted bounding boxes in $L$ is below the threshold $\epsilon$; thus, no pair is too similar with each other. 
+1. Output all the predicted bounding boxes in the list $L$.
+
+The following `nms` function sorts confidence scores in descending order and returns their indices.
 
 ```{.python .input}
 #@save
 def nms(boxes, scores, iou_threshold):
-    # sorting scores by the descending order and return their indices
+    """Sort confidence scores of predicted bounding boxes."""
     B = scores.argsort()[::-1]
-    keep = []  # boxes indices that will be kept
+    keep = []  # Indices of predicted bounding boxes that will be kept
     while B.size > 0:
         i = B[0]
         keep.append(i)
@@ -698,45 +707,12 @@ def nms(boxes, scores, iou_threshold):
         B = B[inds + 1]
     return np.array(keep, dtype=np.int32, ctx=boxes.ctx)
 
-#@save
-def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
-                       pos_threshold=0.00999999978):
-    device, batch_size = cls_probs.ctx, cls_probs.shape[0]
-    anchors = np.squeeze(anchors, axis=0)
-    num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]
-    out = []
-    for i in range(batch_size):
-        cls_prob, offset_pred = cls_probs[i], offset_preds[i].reshape(-1, 4)
-        conf, class_id = np.max(cls_prob[1:], 0), np.argmax(cls_prob[1:], 0)
-        predicted_bb = offset_inverse(anchors, offset_pred)
-        keep = nms(predicted_bb, conf, nms_threshold)
-        # Find all non_keep indices and set the class_id to background
-        all_idx = np.arange(num_anchors, dtype=np.int32, ctx=device)
-        combined = d2l.concat((keep, all_idx))
-        unique, counts = np.unique(combined, return_counts=True)
-        non_keep = unique[counts == 1]
-        all_id_sorted = d2l.concat((keep, non_keep))
-        class_id[non_keep] = -1
-        class_id = class_id[all_id_sorted].astype('float32')
-        conf, predicted_bb = conf[all_id_sorted], predicted_bb[all_id_sorted]
-        # threshold to be a positive prediction
-        below_min_idx = (conf < pos_threshold)
-        class_id[below_min_idx] = -1
-        conf[below_min_idx] = 1 - conf[below_min_idx]
-        pred_info = d2l.concat((np.expand_dims(class_id, axis=1),
-                                np.expand_dims(conf, axis=1),
-                                predicted_bb), axis=1)
-        out.append(pred_info)
-    return d2l.stack(out)
-```
-
-```{.python .input}
 #@tab pytorch
 #@save
 def nms(boxes, scores, iou_threshold):
-    # sorting scores by the descending order and return their indices
+    """Sort confidence scores of predicted bounding boxes."""
     B = torch.argsort(scores, dim=-1, descending=True)
-    keep = []  # boxes indices that will be kept
+    keep = []  # Indices of predicted bounding boxes that will be kept
     while B.numel() > 0:
         i = B[0]
         keep.append(i)
@@ -746,10 +722,54 @@ def nms(boxes, scores, iou_threshold):
         inds = torch.nonzero(iou <= iou_threshold).reshape(-1)
         B = B[inds + 1]
     return d2l.tensor(keep, device=boxes.device)
+```
 
+We define the following `multibox_detection`
+to apply non-maximum suppression
+to predicting bounding boxes.
+Do not worry if you find the implementation
+a bit complicated: we will show how it works
+with a concrete example right after the implementation.
+
+```{.python .input}
 #@save
 def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
-                       pos_threshold=0.00999999978):
+                       pos_threshold=0.009999999):
+    """Predict bounding boxes using non-maximum suppression."""
+    device, batch_size = cls_probs.ctx, cls_probs.shape[0]
+    anchors = np.squeeze(anchors, axis=0)
+    num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]
+    out = []
+    for i in range(batch_size):
+        cls_prob, offset_pred = cls_probs[i], offset_preds[i].reshape(-1, 4)
+        conf, class_id = np.max(cls_prob[1:], 0), np.argmax(cls_prob[1:], 0)
+        predicted_bb = offset_inverse(anchors, offset_pred)
+        keep = nms(predicted_bb, conf, nms_threshold)
+        # Find all non-`keep` indices and set the class to background
+        all_idx = np.arange(num_anchors, dtype=np.int32, ctx=device)
+        combined = d2l.concat((keep, all_idx))
+        unique, counts = np.unique(combined, return_counts=True)
+        non_keep = unique[counts == 1]
+        all_id_sorted = d2l.concat((keep, non_keep))
+        class_id[non_keep] = -1
+        class_id = class_id[all_id_sorted].astype('float32')
+        conf, predicted_bb = conf[all_id_sorted], predicted_bb[all_id_sorted]
+        # Here `pos_threshold` is a threshold for positive (non-background)
+        # predictions
+        below_min_idx = (conf < pos_threshold)
+        class_id[below_min_idx] = -1
+        conf[below_min_idx] = 1 - conf[below_min_idx]
+        pred_info = d2l.concat((np.expand_dims(class_id, axis=1),
+                                np.expand_dims(conf, axis=1),
+                                predicted_bb), axis=1)
+        out.append(pred_info)
+    return d2l.stack(out)
+
+#@tab pytorch
+#@save
+def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
+                       pos_threshold=0.009999999):
+    """Predict bounding boxes using non-maximum suppression."""
     device, batch_size = cls_probs.device, cls_probs.shape[0]
     anchors = anchors.squeeze(0)
     num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]
@@ -759,7 +779,7 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         conf, class_id = torch.max(cls_prob[1:], 0)
         predicted_bb = offset_inverse(anchors, offset_pred)
         keep = nms(predicted_bb, conf, nms_threshold)
-        # Find all non_keep indices and set the class_id to background
+        # Find all non-`keep` indices and set the class to background
         all_idx = torch.arange(num_anchors, dtype=torch.long, device=device)
         combined = torch.cat((keep, all_idx))
         uniques, counts = combined.unique(return_counts=True)
@@ -768,7 +788,8 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         class_id[non_keep] = -1
         class_id = class_id[all_id_sorted]
         conf, predicted_bb = conf[all_id_sorted], predicted_bb[all_id_sorted]
-        # threshold to be a positive prediction
+        # Here `pos_threshold` is a threshold for positive (non-background)
+        # predictions
         below_min_idx = (conf < pos_threshold)
         class_id[below_min_idx] = -1
         conf[below_min_idx] = 1 - conf[below_min_idx]
@@ -779,19 +800,25 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
     return d2l.stack(out)
 ```
 
-Next, we will look at a detailed example. First, construct four anchor boxes. For the sake of simplicity, we assume that predicted offsets are all 0. This means that the prediction bounding boxes are anchor boxes. Finally, we construct a predicted probability for each class.
+Now let us apply the above implementations
+to a concrete example with four anchor boxes.
+For simplicity, we assume that the
+predicted offsets are all zeros.
+This means that the predicted bounding boxes are anchor boxes. 
+For each class among the background, dog, and cat,
+we also define its predicted likelihood.
 
 ```{.python .input}
 #@tab all
 anchors = d2l.tensor([[0.1, 0.08, 0.52, 0.92], [0.08, 0.2, 0.56, 0.95],
-                    [0.15, 0.3, 0.62, 0.91], [0.55, 0.2, 0.9, 0.88]])
+                      [0.15, 0.3, 0.62, 0.91], [0.55, 0.2, 0.9, 0.88]])
 offset_preds = d2l.tensor([0] * d2l.size(anchors))
-cls_probs = d2l.tensor([[0] * 4,  # Predicted probability for background
-                      [0.9, 0.8, 0.7, 0.1],  # Predicted probability for dog
-                      [0.1, 0.2, 0.3, 0.9]])  # Predicted probability for cat
+cls_probs = d2l.tensor([[0] * 4,  # Predicted background likelihood 
+                      [0.9, 0.8, 0.7, 0.1],  # Predicted dog likelihood 
+                      [0.1, 0.2, 0.3, 0.9]])  # Predicted cat likelihood 
 ```
 
-Print prediction bounding boxes and their confidence levels on the image.
+We can plot these predicted bounding boxes with their confidence on the image.
 
 ```{.python .input}
 #@tab all
@@ -800,14 +827,26 @@ show_bboxes(fig.axes, anchors * bbox_scale,
             ['dog=0.9', 'dog=0.8', 'dog=0.7', 'cat=0.9'])
 ```
 
-We use the `multibox_detection` function to perform NMS and set the threshold to 0.5. This adds an example dimension to the tensor input. We can see that the shape of the returned result is (batch size, number of anchor boxes, 6). The 6 elements of each row represent the output information for the same prediction bounding box. The first element is the predicted class index, which starts from 0 (0 is dog, 1 is cat). The value -1 indicates background or removal in NMS. The second element is the confidence level of prediction bounding box. The remaining four elements are the $x, y$ axis coordinates of the upper-left corner and the $x, y$ axis coordinates of the lower-right corner of the prediction bounding box (the value range is between 0 and 1).
+Now we can invoke the `multibox_detection` function
+to perform non-maximum suppression,
+where the threshold is set to 0.5.
+Note that we add
+a dimension for examples in the tensor input.
+
+We can see that the shape of the returned result is
+(batch size, number of anchor boxes, 6).
+The six elements in the innermost dimension
+gives the output information for the same predicted bounding box.
+The first element is the predicted class index, which starts from 0 (0 is dog and 1 is cat). The value -1 indicates background or removal in non-maximum suppression.
+The second element is the confidence of the predicted bounding box.
+The remaining four elements are the $(x, y)$-axis coordinates of the upper-left corner and 
+the lower-right corner of the predicted bounding box, respectively (range is between 0 and 1).
 
 ```{.python .input}
-output = multibox_detection(
-    np.expand_dims(cls_probs, axis=0),
-    np.expand_dims(offset_preds, axis=0),
-    np.expand_dims(anchors, axis=0),
-    nms_threshold=0.5)
+output = multibox_detection(np.expand_dims(cls_probs, axis=0),
+                            np.expand_dims(offset_preds, axis=0),
+                            np.expand_dims(anchors, axis=0),
+                            nms_threshold=0.5)
 output
 ```
 
@@ -820,7 +859,10 @@ output = multibox_detection(cls_probs.unsqueeze(dim=0),
 output
 ```
 
-We remove the prediction bounding boxes of class -1 and visualize the results retained by NMS.
+After removing those predicted bounding boxes
+of class -1, 
+we can output the final predicted bounding box
+kept by non-maximum suppression.
 
 ```{.python .input}
 #@tab all
@@ -832,22 +874,27 @@ for i in d2l.numpy(output[0]):
     show_bboxes(fig.axes, [d2l.tensor(i[2:]) * bbox_scale], label)
 ```
 
-In practice, we can remove prediction bounding boxes with lower confidence levels before performing NMS, thereby reducing the amount of computation for NMS. We can also filter the output of NMS, for example, by only retaining results with higher confidence levels as the final output.
+In practice, we can remove predicted bounding boxes with lower confidence even before performing non-maximum suppression, thereby reducing computation in this algorithm.
+We may also post-process the output of non-maximum suppression, for example, by only keeping
+results with higher confidence
+in the final output.
 
 
 ## Summary
 
-* We generate multiple anchor boxes with different sizes and aspect ratios, centered on each pixel.
-* IoU, also called Jaccard index, measures the similarity of two bounding boxes. It is the ratio of the intersecting area to the union area of two bounding boxes.
-* In the training set, we mark two types of labels for each anchor box: one is the class of the target contained in the anchor box and the other is the offset of the ground-truth bounding box relative to the anchor box.
-* When predicting, we can use non-maximum suppression (NMS) to remove similar prediction bounding boxes, thereby simplifying the results.
+* We generate anchor boxes with different shapes centered on each pixel of the image.
+* Intersection over union (IoU), also known as Jaccard index, measures the similarity of two bounding boxes. It is the ratio of their intersection area to their union area.
+* In a training set, we need two types of labels for each anchor box. One is the class of the object relevant to the anchor box and the other is the offset of the ground-truth bounding box relative to the anchor box.
+* During prediction, we can use non-maximum suppression (NMS) to remove similar predicted bounding boxes, thereby simplifying the output.
+
 
 ## Exercises
 
-1. Change the `sizes` and `ratios` values in the `multibox_prior` function and observe the changes to the generated anchor boxes.
-1. Construct two bounding boxes with an IoU of 0.5, and observe their coincidence.
-1. Verify the output of offset `labels[0]` by marking the anchor box offsets as defined in this section (the constant is the default value).
-1. Modify the variable `anchors` in the "Labeling Training Set Anchor Boxes" and "Output Bounding Boxes for Prediction" sections. How do the results change?
+1. Change values of `sizes` and `ratios` in the `multibox_prior` function. What are the changes to the generated anchor boxes?
+1. Construct and visualize two bounding boxes with an IoU of 0.5. How do they overlap with each other?
+1. Modify the variable `anchors` in :numref:`subsec_labeling-anchor-boxes` and :numref:`subsec_predicting-bounding-boxes-nms`. How do the results change?
+1. Non-maximum suppression is a greedy algorithm that suppresses predicted bounding boxes by *removing* them. Is it possible that some of these removed ones are actually useful? How can this algorithm be modified to suppress *softly*? You may refer to Soft-NMS :cite:`Bodla.Singh.Chellappa.ea.2017`.
+1. Rather than being hand-crafted, can non-maximum suppression be learned?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/370)
