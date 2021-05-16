@@ -148,6 +148,7 @@ def copyfile(filename, target_dir):
 
 #@save
 def reorg_train_valid(data_dir, labels, valid_ratio):
+    """Split the validation set out of the original training set."""
     # The number of examples of the class that has the fewest examples in the
     # training dataset
     n = collections.Counter(labels.values()).most_common()[-1][1]
@@ -175,6 +176,7 @@ The `reorg_test` function below organizes the testing set for data loading durin
 #@tab all
 #@save
 def reorg_test(data_dir):
+    """Organize the testing set for data loading during prediction."""
     for test_file in os.listdir(os.path.join(data_dir, 'test')):
         copyfile(os.path.join(data_dir, 'test', test_file),
                  os.path.join(data_dir, 'train_valid_test', 'test',

@@ -74,7 +74,6 @@ This is one of the earliest and most widely used methods of image augmentation.
 Next, we use the `transforms` module to create the `RandomFlipLeftRight` instance, which flips
 an image left and right with a 50% chance.
 
-
 ```{.python .input}
 apply(img, gluon.data.vision.transforms.RandomFlipLeftRight())
 ```
@@ -103,7 +102,6 @@ In addition, we can also randomly crop the image to make objects appear in diffe
 
 In the code below, we randomly crop an area with an area of $10\% \sim 100\%$ of the original area each time, and the ratio of width to height of this area is randomly selected from $0.5 \sim 2$. Then, the width and height of the region are both scaled to 200 pixels. 
 Unless otherwise specified, the random number between $a$ and $b$ in this section refers to a continuous value obtained by random and uniform sampling from the interval $[a, b]$.
-
 
 ```{.python .input}
 shape_aug = gluon.data.vision.transforms.RandomResizedCrop(
@@ -185,7 +183,6 @@ Here we use the CIFAR-10 dataset instead of the Fashion-MNIST dataset that we us
 This is because the position and size of the objects in the Fashion-MNIST dataset have been normalized, while the color and size of the objects in the CIFAR-10 dataset have more significant differences. 
 The first 32 training images in the CIFAR-10 dataset are shown below.
 
-
 ```{.python .input}
 d2l.show_images(gluon.data.vision.CIFAR10(
     train=True)[0:32][0], 4, 8, scale=0.8);
@@ -201,8 +198,6 @@ d2l.show_images([all_images[i][0] for i in range(32)], 4, 8, scale=0.8);
 In order to obtain definitive results during prediction, we usually only apply image augmentation to training examples, and do not use image augmentation with random operations during prediction. 
 Here we only use the simplest random left-right flipping method. In addition, we use a `ToTensor` instance to convert a minibatch of images into the format required by the deep learning framework, i.e., 
 32-bit floating point numbers between 0 and 1 with the shape of (batch size, number of channels, height, width).
-
-
 
 ```{.python .input}
 train_augs = gluon.data.vision.transforms.Compose([
@@ -274,6 +269,7 @@ we define a function to train and evaluate the model using multiple GPUs.
 #@save
 def train_batch_ch13(net, features, labels, loss, trainer, devices,
                      split_f=d2l.split_batch):
+    """Train for a minibatch with mutiple GPUs (defined in Chapter 13)."""
     X_shards, y_shards = split_f(features, labels, devices)
     with autograd.record():
         pred_shards = [net(X_shard) for X_shard in X_shards]
@@ -294,6 +290,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, devices,
 #@tab pytorch
 #@save
 def train_batch_ch13(net, X, y, loss, trainer, devices):
+    """Train for a minibatch with mutiple GPUs (defined in Chapter 13)."""
     if isinstance(X, list):
         # Required for BERT fine-tuning (to be covered later)
         X = [x.to(devices[0]) for x in X]
@@ -315,6 +312,7 @@ def train_batch_ch13(net, X, y, loss, trainer, devices):
 #@save
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus(), split_f=d2l.split_batch):
+    """Train a model with mutiple GPUs (defined in Chapter 13)."""
     timer, num_batches = d2l.Timer(), len(train_iter)
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
@@ -345,6 +343,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
 #@save
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus()):
+    """Train a model with mutiple GPUs (defined in Chapter 13)."""
     timer, num_batches = d2l.Timer(), len(train_iter)
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])

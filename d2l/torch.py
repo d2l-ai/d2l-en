@@ -1518,6 +1518,7 @@ def resnet18(num_classes, in_channels=1):
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_batch_ch13(net, X, y, loss, trainer, devices):
+    """Train for a minibatch with mutiple GPUs (defined in Chapter 13)."""
     if isinstance(X, list):
         # Required for BERT fine-tuning (to be covered later)
         X = [x.to(devices[0]) for x in X]
@@ -1538,6 +1539,7 @@ def train_batch_ch13(net, X, y, loss, trainer, devices):
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus()):
+    """Train a model with mutiple GPUs (defined in Chapter 13)."""
     timer, num_batches = d2l.Timer(), len(train_iter)
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
@@ -2008,6 +2010,7 @@ def copyfile(filename, target_dir):
 
 
 def reorg_train_valid(data_dir, labels, valid_ratio):
+    """Split the validation set out of the original training set."""
     # The number of examples of the class that has the fewest examples in the
     # training dataset
     n = collections.Counter(labels.values()).most_common()[-1][1]
@@ -2034,6 +2037,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
 
 # Defined in file: ./chapter_computer-vision/kaggle-cifar10.md
 def reorg_test(data_dir):
+    """Organize the testing set for data loading during prediction."""
     for test_file in os.listdir(os.path.join(data_dir, 'test')):
         copyfile(
             os.path.join(data_dir, 'test', test_file),

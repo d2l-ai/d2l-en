@@ -1410,6 +1410,7 @@ def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_batch_ch13(net, features, labels, loss, trainer, devices,
                      split_f=d2l.split_batch):
+    """Train for a minibatch with mutiple GPUs (defined in Chapter 13)."""
     X_shards, y_shards = split_f(features, labels, devices)
     with autograd.record():
         pred_shards = [net(X_shard) for X_shard in X_shards]
@@ -1431,6 +1432,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, devices,
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                devices=d2l.try_all_gpus(), split_f=d2l.split_batch):
+    """Train a model with mutiple GPUs (defined in Chapter 13)."""
     timer, num_batches = d2l.Timer(), len(train_iter)
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
@@ -1896,6 +1898,7 @@ def copyfile(filename, target_dir):
 
 
 def reorg_train_valid(data_dir, labels, valid_ratio):
+    """Split the validation set out of the original training set."""
     # The number of examples of the class that has the fewest examples in the
     # training dataset
     n = collections.Counter(labels.values()).most_common()[-1][1]
@@ -1922,6 +1925,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
 
 # Defined in file: ./chapter_computer-vision/kaggle-cifar10.md
 def reorg_test(data_dir):
+    """Organize the testing set for data loading during prediction."""
     for test_file in os.listdir(os.path.join(data_dir, 'test')):
         copyfile(
             os.path.join(data_dir, 'test', test_file),
