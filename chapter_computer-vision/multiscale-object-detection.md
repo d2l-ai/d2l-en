@@ -46,7 +46,7 @@ from mxnet import image, np, npx
 npx.set_np()
 
 img = image.imread('../img/catdog.jpg')
-h, w = img.shape[0:2]
+h, w = img.shape[:2]
 h, w
 ```
 
@@ -57,13 +57,15 @@ from d2l import torch as d2l
 import torch
 
 img = d2l.plt.imread('../img/catdog.jpg')
-h, w = img.shape[0:2]
+h, w = img.shape[:2]
 h, w
 ```
 
-In :numref:`sec_conv_layer`, the 2D array output of the convolutional neural network (CNN) is called
-a feature map.  We can determine the midpoints of anchor boxes uniformly sampled
-on any image by defining the shape of the feature map.
+Recall that in :numref:`sec_conv_layer`
+we call the two-dimensional array output of 
+a convolutional layer a feature map.
+By defining the shape of a feature map,
+we can determine centers of uniformly sampled anchor boxes  on any image.
 
 The function `display_anchors` is defined below.  We are going to generate anchor boxes `anchors` centered on each unit (pixel) on the feature map `fmap`.  Since the coordinates of axes $x$ and $y$ in anchor boxes `anchors` have been divided by the width and height of the feature map `fmap`, values between 0 and 1 can be used to represent relative positions of anchor boxes in the feature map.  Since the midpoints of anchor boxes `anchors` overlap with all the units on feature map `fmap`, the relative spatial positions of the midpoints of the `anchors` on any image must have a uniform distribution.  Specifically, when the width and height of the feature map are set to `fmap_w` and `fmap_h` respectively, the function will conduct uniform sampling for `fmap_h` rows and `fmap_w` columns of pixels and use them as midpoints to generate anchor boxes with size `s` (we assume that the length of list `s` is 1) and different aspect ratios (`ratios`).
 
