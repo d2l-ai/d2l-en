@@ -1773,9 +1773,9 @@ def offset_inverse(anchors, offset_preds):
 
 # Defined in file: ./chapter_computer-vision/anchor.md
 def nms(boxes, scores, iou_threshold):
-    # sorting scores by the descending order and return their indices
+    """Sort confidence scores of predicted bounding boxes."""
     B = torch.argsort(scores, dim=-1, descending=True)
-    keep = []  # boxes indices that will be kept
+    keep = []  # Indices of predicted bounding boxes that will be kept
     while B.numel() > 0:
         i = B[0]
         keep.append(i)
@@ -1787,8 +1787,10 @@ def nms(boxes, scores, iou_threshold):
     return d2l.tensor(keep, device=boxes.device)
 
 
+# Defined in file: ./chapter_computer-vision/anchor.md
 def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
-                       pos_threshold=0.00999999978):
+                       pos_threshold=0.009999999):
+    """Predict bounding boxes using non-maximum suppression."""
     device, batch_size = cls_probs.device, cls_probs.shape[0]
     anchors = anchors.squeeze(0)
     num_classes, num_anchors = cls_probs.shape[1], cls_probs.shape[2]
@@ -1798,7 +1800,7 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         conf, class_id = torch.max(cls_prob[1:], 0)
         predicted_bb = offset_inverse(anchors, offset_pred)
         keep = nms(predicted_bb, conf, nms_threshold)
-        # Find all non_keep indices and set the class_id to background
+        # Find all non-`keep` indices and set the class to background
         all_idx = torch.arange(num_anchors, dtype=torch.long, device=device)
         combined = torch.cat((keep, all_idx))
         uniques, counts = combined.unique(return_counts=True)
@@ -1807,7 +1809,8 @@ def multibox_detection(cls_probs, offset_preds, anchors, nms_threshold=0.5,
         class_id[non_keep] = -1
         class_id = class_id[all_id_sorted]
         conf, predicted_bb = conf[all_id_sorted], predicted_bb[all_id_sorted]
-        # threshold to be a positive prediction
+        # Here `pos_threshold` is a threshold for positive (non-background)
+        # predictions
         below_min_idx = (conf < pos_threshold)
         class_id[below_min_idx] = -1
         conf[below_min_idx] = 1 - conf[below_min_idx]
