@@ -1,10 +1,42 @@
 # Multiscale Object Detection
 
-In :numref:`sec_anchor`, we generated multiple anchor boxes centered on each pixel of the input image.  These anchor boxes are used to sample different regions of the input image. However, if anchor boxes are generated centered on each pixel of the image, soon there will be too many anchor boxes for us to compute. For example, we assume that the input image has a height and a width of 561 and 728 pixels respectively. If five different shapes of anchor boxes are generated centered on each pixel, over two million anchor boxes ($561 \times 728 \times 5$) need to be predicted and labeled on the image.
+In :numref:`sec_anchor`,
+we generated multiple anchor boxes centered on each pixel of an input image. 
+Essentially these anchor boxes 
+represent samples of
+different regions of the image.
+However, 
+we may end up with too many anchor boxes to compute
+if they are generated for *every* pixel.
+Think of a $561 \times 728$ input image.
+If five anchor boxes 
+with varying shapes
+are generated for each pixel as their center,
+over two million anchor boxes ($561 \times 728 \times 5$) need to be labeled and predicted on the image.
 
-It is not difficult to reduce the number of anchor boxes.  An easy way is to apply uniform sampling on a small portion of pixels from the input image and generate anchor boxes centered on the sampled pixels. In addition, we can generate anchor boxes of varied numbers and sizes on multiple scales. Notice that smaller objects are more likely to be positioned on the image than larger ones.  Here, we will use a simple example: Objects with shapes of $1 \times 1$, $1 \times 2$, and $2 \times 2$ may have 4, 2, and 1 possible position(s) on an image with the shape $2 \times 2$. Therefore, when using smaller anchor boxes to detect smaller objects, we can sample more regions; when using larger anchor boxes to detect larger objects, we can sample fewer regions.
+You may realize that
+it is not difficult to reduce anchor boxes on an image.
+For instance, we can just 
+uniformly sample a small portion of pixels
+from the input image
+to generate anchor boxes centered on them.
+In addition, 
+under different scales
+we can generate different numbers of anchor boxes
+of different sizes.
+Intuitively,
+smaller objects are more likely
+to appear on an image than larger ones.
+As an example,
+$1 \times 1$, $1 \times 2$, and $2 \times 2$ objects 
+can appear on a $2 \times 2$ image
+in 4, 2, and 1 possible ways, respectively.
+Therefore, when using smaller anchor boxes to detect smaller objects, we can sample more regions,
+while for larger objects we can sample fewer regions.
 
-To demonstrate how to generate anchor boxes on multiple scales, let us read an image first.  It has a height and width of $561 \times 728$ pixels.
+To demonstrate how to generate anchor boxes
+under multiple scales, let us read an image.
+Its height and width are 561 and 728 pixels, respectively.
 
 ```{.python .input}
 %matplotlib inline
