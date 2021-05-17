@@ -1,12 +1,22 @@
-# Single Shot Multibox Detection (SSD)
+# Single Shot Multibox Detection
 :label:`sec_ssd`
 
-In the previous few sections, we have introduced bounding boxes, anchor boxes,
-multiscale object detection, and datasets. Now, we will use this background
-knowledge to construct an object detection model: single shot multibox detection
-(SSD) :cite:`Liu.Anguelov.Erhan.ea.2016`. This quick and easy model is already
-widely used. Some of the design concepts and implementation details of this
-model are also applicable to other object detection models.
+In :numref:`sec_bbox`--:numref:`sec_object-detection-dataset`, 
+we introduced bounding boxes, anchor boxes,
+multiscale object detection, and the dataset for object detection.
+Now we are ready to use such background
+knowledge to design an object detection model:
+single shot multibox detection
+(SSD) :cite:`Liu.Anguelov.Erhan.ea.2016`.
+This model is simple, fast, and widely used.
+Although this is just one of vast amounts of
+object detection models,
+some of the design principles
+and implementation details in this section
+are also applicable to other models.
+
+
+
 
 
 ## Model

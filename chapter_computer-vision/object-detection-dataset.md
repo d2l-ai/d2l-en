@@ -1,14 +1,15 @@
 # The Object Detection Dataset
-
+:label:`sec_object-detection-dataset`
 
 There is no small dataset such as MNIST and Fashion-MNIST in the field of object detection.
 In order to quickly demonstrate object detection models,
-we collected a small dataset.
+we collected and labeled a small dataset.
 First, we took photos of free bananas from our office
-and generated generated
+and generated
 1000 banana images with different rotations and sizes.
 Then we placed each banana image
 at a random position on some background image.
+In the end, we labeled bounding boxes for those bananas on the images.
 
 
 ## Downloading the Dataset
