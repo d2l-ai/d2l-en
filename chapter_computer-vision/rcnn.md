@@ -13,10 +13,10 @@ our discussion to the designs of these models.
 ## R-CNNs
 
 R-CNN models first select several proposed regions from an image (for example,
-anchor boxes are one type of selection method) and then label their categories
+anchor boxes are one type of selection method) and then label their classes
 and bounding boxes (e.g., offsets). Then, they use a CNN to perform forward
 computation to extract features from each proposed area. Afterwards, we use the
-features of each proposed region to predict their categories and bounding
+features of each proposed region to predict their classes and bounding
 boxes. :numref:`fig_r-cnn` shows an R-CNN model.
 
 ![R-CNN model. ](../img/r-cnn.svg)
@@ -28,16 +28,16 @@ Specifically, R-CNNs are composed of four main parts:
    high-quality proposed regions
    :cite:`Uijlings.Van-De-Sande.Gevers.ea.2013`. These proposed regions are
    generally selected on multiple scales and have different shapes and
-   sizes. The category and ground-truth bounding box of each proposed region is
+   sizes. The class and ground-truth bounding box of each proposed region is
    labeled.
 1. A pretrained CNN is selected and placed, in truncated form, before the
    output layer. It transforms each proposed region into the input dimensions
    required by the network and uses forward computation to output the features
    extracted from the proposed regions.
-1. The features and labeled category of each proposed region are combined as an
+1. The features and labeled class of each proposed region are combined as an
    example to train multiple support vector machines for object
    classification. Here, each support vector machine is used to determine
-   whether an example belongs to a certain category.
+   whether an example belongs to a certain class.
 1. The features and labeled bounding box of each proposed region are combined as
    an example to train a linear regression model for ground-truth bounding box
    prediction.
@@ -77,11 +77,11 @@ steps are described below:
    shape $n \times c \times h_2 \times w_2$.
 1. A fully connected layer is used to transform the output shape to $n \times
    d$, where $d$ is determined by the model design.
-1. During category prediction, the shape of the fully connected layer output is
+1. During class prediction, the shape of the fully connected layer output is
    again transformed to $n \times q$ and we use softmax regression ($q$ is the
-   number of categories). During bounding box prediction, the shape of the fully
+   number of classes). During bounding box prediction, the shape of the fully
    connected layer output is again transformed to $n \times 4$. This means that
-   we predict the category and bounding box for each proposed region.
+   we predict the class and bounding box for each proposed region.
 
 The RoI pooling layer in Fast R-CNN is somewhat different from the pooling
 layers we have discussed before. In a normal pooling layer, we set the pooling
@@ -130,7 +130,7 @@ X = torch.arange(16.).reshape(1, 1, 4, 4)
 X
 ```
 
-Assume that the height and width of the image are both 40 pixels and that selective search generates two proposed regions on the image. Each region is expressed as five elements: the region's object category and the $x, y$ coordinates of its upper-left and lower-right corners.
+Assume that the height and width of the image are both 40 pixels and that selective search generates two proposed regions on the image. Each region is expressed as five elements: the region's object class and the $x, y$ coordinates of its upper-left and lower-right corners.
 
 ```{.python .input}
 rois = np.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])
@@ -174,18 +174,18 @@ below:
 1. We use each element in the feature map as a center to generate multiple
    anchor boxes of different sizes and aspect ratios and then label them.
 1. We use the features of the elements of length $c$ at the center on the anchor
-   boxes to predict the binary category (object or background) and bounding box
+   boxes to predict the binary class (object or background) and bounding box
    for their respective anchor boxes.
 1. Then, we use non-maximum suppression to remove similar bounding box results
-   that correspond to category predictions of "object". Finally, we output the
+   that correspond to class predictions of "object". Finally, we output the
    predicted bounding boxes as the proposed regions required by the RoI pooling
    layer.
 
 
 It is worth noting that, as a part of the Faster R-CNN model, the region
 proposal network is trained together with the rest of the model. In addition,
-the Faster R-CNN object functions include the category and bounding box
-predictions in object detection, as well as the binary category and bounding box
+the Faster R-CNN object functions include the class and bounding box
+predictions in object detection, as well as the binary class and bounding box
 predictions for the anchor boxes in the region proposal network. Finally, the
 region proposal network can learn how to generate high-quality proposed regions,
 which reduces the number of proposed regions while maintaining the precision of
@@ -204,7 +204,7 @@ R-CNN model. Mask R-CNN models replace the RoI pooling layer with an RoI
 alignment layer. This allows the use of bilinear interpolation to retain spatial
 information on feature maps, making Mask R-CNN better suited for pixel-level
 predictions. The RoI alignment layer outputs feature maps of the same shape for
-all RoIs. This not only predicts the categories and bounding boxes of RoIs, but
+all RoIs. This not only predicts the classes and bounding boxes of RoIs, but
 allows us to use an additional fully convolutional network to predict the
 pixel-level positions of objects. We will describe how to use fully
 convolutional networks to predict pixel-level semantics in images later in this
@@ -216,7 +216,7 @@ chapter.
 
 * An R-CNN model selects several proposed regions and uses a CNN to perform
   forward computation and extract the features from each proposed region. It
-  then uses these features to predict the categories and bounding boxes of
+  then uses these features to predict the classes and bounding boxes of
   proposed regions.
 * Fast R-CNN improves on the R-CNN by only performing CNN forward computation on
   the image as a whole. It introduces an RoI pooling layer to extract features
