@@ -1830,7 +1830,7 @@ d2l.DATA_HUB['banana-detection'] = (
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 def read_data_bananas(is_train=True):
-    """Read the bananas dataset images and labels."""
+    """Read the banana detection dataset images and labels."""
     data_dir = d2l.download_extract('banana-detection')
     csv_fname = os.path.join(data_dir,
                              'bananas_train' if is_train else 'bananas_val',
@@ -1844,14 +1844,16 @@ def read_data_bananas(is_train=True):
                 os.path.join(data_dir,
                              'bananas_train' if is_train else 'bananas_val',
                              'images', f'{img_name}')))
-        # Since all images have same object class i.e. category '0',
-        # the `label` column corresponds to the only object i.e. banana
-        # The target is as follows : (`label`, `xmin`, `ymin`, `xmax`, `ymax`)
+        # Here `target` contains (class, upper-left x, upper-left y,
+        # lower-right x, lower-right y), where all the images have the same
+        # banana class (index 0)
         targets.append(list(target))
     return images, torch.tensor(targets).unsqueeze(1) / 256
 
 
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 class BananasDataset(torch.utils.data.Dataset):
+    """A customized dataset to load the banana detection dataset."""
     def __init__(self, is_train):
         self.features, self.labels = read_data_bananas(is_train)
         print('read ' + str(len(self.features)) + (
@@ -1864,13 +1866,14 @@ class BananasDataset(torch.utils.data.Dataset):
         return len(self.features)
 
 
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 def load_data_bananas(batch_size):
-    """Load the bananas dataset."""
+    """Load the banana detection dataset."""
     train_iter = torch.utils.data.DataLoader(BananasDataset(is_train=True),
                                              batch_size, shuffle=True)
     val_iter = torch.utils.data.DataLoader(BananasDataset(is_train=False),
                                            batch_size)
-    return (train_iter, val_iter)
+    return train_iter, val_iter
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
