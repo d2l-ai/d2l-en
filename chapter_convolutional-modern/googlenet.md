@@ -17,7 +17,7 @@ omit a few ad-hoc features that were added to stabilize training
 but are unnecessary now with better training algorithms available.
 
 
-## Inception Blocks
+## (**Inception Blocks**)
 
 The basic convolutional block in GoogLeNet is called an *Inception block*,
 likely named due to a quote from the movie *Inception* ("We need to go deeper"),
@@ -158,7 +158,7 @@ At the same time, we can allocate different amounts of parameters
 for different filters.
 
 
-## GoogLeNet Model
+## [**GoogLeNet Model**]
 
 As shown in :numref:`fig_inception_full`, GoogLeNet uses a stack of a total of 9 inception blocks
 and global average pooling to generate its estimates.
@@ -212,6 +212,7 @@ b2.add(nn.Conv2D(64, kernel_size=1, activation='relu'),
 b2 = nn.Sequential(nn.Conv2d(64, 64, kernel_size=1),
                    nn.ReLU(),
                    nn.Conv2d(64, 192, kernel_size=3, padding=1),
+                   nn.ReLU(),
                    nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
 ```
 
@@ -360,8 +361,8 @@ def net():
 
 The GoogLeNet model is computationally complex,
 so it is not as easy to modify the number of channels as in VGG.
-To have a reasonable training time on Fashion-MNIST,
-we reduce the input height and width from 224 to 96.
+[**To have a reasonable training time on Fashion-MNIST,
+we reduce the input height and width from 224 to 96.**]
 This simplifies the computation.
 The changes in the shape of the output
 between the various modules are demonstrated below.
@@ -390,7 +391,7 @@ for layer in net().layers:
     print(layer.__class__.__name__, 'output shape:\t', X.shape)
 ```
 
-## Training
+## [**Training**]
 
 As before, we train our model using the Fashion-MNIST dataset.
  We transform it to $96 \times 96$ pixel resolution

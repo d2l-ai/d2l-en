@@ -30,7 +30,7 @@ Specifically, R-CNNs are composed of four main parts:
    generally selected on multiple scales and have different shapes and
    sizes. The category and ground-truth bounding box of each proposed region is
    labeled.
-1. A pre-trained CNN is selected and placed, in truncated form, before the
+1. A pretrained CNN is selected and placed, in truncated form, before the
    output layer. It transforms each proposed region into the input dimensions
    required by the network and uses forward computation to output the features
    extracted from the proposed regions.
@@ -42,7 +42,7 @@ Specifically, R-CNNs are composed of four main parts:
    an example to train a linear regression model for ground-truth bounding box
    prediction.
 
-Although R-CNN models use pre-trained CNNs to effectively extract image
+Although R-CNN models use pretrained CNNs to effectively extract image
 features, the main downside is the slow speed. As you can imagine, we can select
 thousands of proposed regions from a single image, requiring thousands of
 forward computations from the CNN to perform object detection. This massive
@@ -130,7 +130,7 @@ X = torch.arange(16.).reshape(1, 1, 4, 4)
 X
 ```
 
-Assume that the height and width of the image are both 40 pixels and that selective search generates two proposed regions on the image. Each region is expressed as five elements: the region's object category and the $x, y$ coordinates of its upper-left and bottom-right corners.
+Assume that the height and width of the image are both 40 pixels and that selective search generates two proposed regions on the image. Each region is expressed as five elements: the region's object category and the $x, y$ coordinates of its upper-left and lower-right corners.
 
 ```{.python .input}
 rois = np.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])

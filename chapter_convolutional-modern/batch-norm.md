@@ -208,7 +208,7 @@ and then fix them at prediction time.
 Consequently, batch normalization behaves differently during training and at test time.
 Recall that dropout also exhibits this characteristic.
 
-## Implementation from Scratch
+## (**Implementation from Scratch**)
 
 Below, we implement a batch normalization layer with tensors from scratch.
 
@@ -300,7 +300,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps):
     return Y
 ```
 
-We can now create a proper `BatchNorm` layer.
+We can now [**create a proper `BatchNorm` layer.**]
 Our layer will maintain proper parameters
 for scale `gamma` and shift `beta`,
 both of which will be updated in the course of training.
@@ -438,7 +438,7 @@ class BatchNorm(tf.keras.layers.Layer):
         return output
 ```
 
-## Applying Batch Normalization in LeNet
+## [**Applying Batch Normalization in LeNet**]
 
 To see how to apply `BatchNorm` in context,
 below we apply it to a traditional LeNet model (:numref:`sec_lenet`).
@@ -504,7 +504,7 @@ def net():
     )
 ```
 
-As before, we will train our network on the Fashion-MNIST dataset.
+As before, we will [**train our network on the Fashion-MNIST dataset**].
 This code is virtually identical to that when we first trained LeNet (:numref:`sec_lenet`).
 The main difference is the considerably larger learning rate.
 
@@ -522,8 +522,8 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 net = d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 ```
 
-Let us have a look at the scale parameter `gamma`
-and the shift parameter `beta` learned
+Let us [**have a look at the scale parameter `gamma`
+and the shift parameter `beta`**] learned
 from the first batch normalization layer.
 
 ```{.python .input}
@@ -540,7 +540,7 @@ net[1].gamma.reshape((-1,)), net[1].beta.reshape((-1,))
 tf.reshape(net.layers[1].gamma, (-1,)), tf.reshape(net.layers[1].beta, (-1,))
 ```
 
-## Concise Implementation
+## [**Concise Implementation**]
 
 Compared with the `BatchNorm` class,
 which we just defined ourselves,
@@ -603,7 +603,7 @@ def net():
     ])
 ```
 
-Below, we use the same hyperparameters to train our model.
+Below, we [**use the same hyperparameters to train our model.**]
 Note that as usual, the high-level API variant runs much faster
 because its code has been compiled to C++ or CUDA
 while our custom implementation must be interpreted by Python.

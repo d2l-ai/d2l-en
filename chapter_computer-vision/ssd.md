@@ -1,4 +1,5 @@
 # Single Shot Multibox Detection (SSD)
+:label:`sec_ssd`
 
 In the previous few sections, we have introduced bounding boxes, anchor boxes,
 multiscale object detection, and datasets. Now, we will use this background

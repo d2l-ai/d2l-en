@@ -444,7 +444,7 @@ net = tf.keras.models.Sequential([
         activation=tf.nn.relu,
         kernel_initializer=tf.keras.initializers.GlorotUniform()),
     tf.keras.layers.Dense(
-        1, kernel_initializer=tf.keras.initializers.Constant(1)),
+        1, kernel_initializer=tf.keras.initializers.Constant(42)),
 ])
 
 net(X)

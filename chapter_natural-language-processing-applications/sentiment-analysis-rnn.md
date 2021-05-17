@@ -4,7 +4,7 @@
 
 Similar to search synonyms and analogies, text classification is also a
 downstream application of word embedding. In this section, we will apply
-pre-trained word vectors (GloVe) and bidirectional recurrent neural networks with
+pretrained word vectors (GloVe) and bidirectional recurrent neural networks with
 multiple hidden layers :cite:`Maas.Daly.Pham.ea.2011`, as shown in :numref:`fig_nlp-map-sa-rnn`. We will use the model to
 determine whether a text sequence of indefinite length contains positive or
 negative emotion. 
@@ -133,9 +133,9 @@ def init_weights(m):
 net.apply(init_weights);
 ```
 
-### Loading Pre-trained Word Vectors
+### Loading Pretrained Word Vectors
 
-Because the training dataset for sentiment classification is not very large, in order to deal with overfitting, we will directly use word vectors pre-trained on a larger corpus as the feature vectors of all words. Here, we load a 100-dimensional GloVe word vector for each word in the dictionary `vocab`.
+Because the training dataset for sentiment classification is not very large, in order to deal with overfitting, we will directly use word vectors pretrained on a larger corpus as the feature vectors of all words. Here, we load a 100-dimensional GloVe word vector for each word in the dictionary `vocab`.
 
 ```{.python .input}
 #@tab all
@@ -150,7 +150,7 @@ embeds = glove_embedding[vocab.idx_to_token]
 embeds.shape
 ```
 
-Then, we will use these word vectors as feature vectors for each word in the reviews. Note that the dimensions of the pre-trained word vectors need to be consistent with the embedding layer output size `embed_size` in the created model. In addition, we no longer update these word vectors during training.
+Then, we will use these word vectors as feature vectors for each word in the reviews. Note that the dimensions of the pretrained word vectors need to be consistent with the embedding layer output size `embed_size` in the created model. In addition, we no longer update these word vectors during training.
 
 ```{.python .input}
 net.embedding.weight.set_data(embeds)
@@ -216,13 +216,13 @@ predict_sentiment(net, vocab, 'this movie is so bad')
 ## Summary
 
 * Text classification transforms a sequence of text of indefinite length into a category of text. This is a downstream application of word embedding.
-* We can apply pre-trained word vectors and recurrent neural networks to classify the emotions in a text.
+* We can apply pretrained word vectors and recurrent neural networks to classify the emotions in a text.
 
 
 ## Exercises
 
 1. Increase the number of epochs. What accuracy rate can you achieve on the training and testing datasets? What about trying to re-tune other hyperparameters?
-1. Will using larger pre-trained word vectors, such as 300-dimensional GloVe word vectors, improve classification accuracy?
+1. Will using larger pretrained word vectors, such as 300-dimensional GloVe word vectors, improve classification accuracy?
 1. Can we improve the classification accuracy by using the spaCy word tokenization tool? You need to install spaCy: `pip install spacy` and install the English package: `python -m spacy download en`. In the code, first import spacy: `import spacy`. Then, load the spacy English package: `spacy_en = spacy.load('en')`. Finally, define the function `def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)]` and replace the original `tokenizer` function. It should be noted that GloVe's word vector uses "-" to connect each word when storing noun phrases. For example, the phrase "new york" is represented as "new-york" in GloVe. After using spaCy tokenization, "new york" may be stored as "new york".
 
 :begin_tab:`mxnet`

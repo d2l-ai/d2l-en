@@ -146,7 +146,7 @@ def knn(W, x, k):
     return topk, [cos[int(i)] for i in topk]
 ```
 
-Then, we search for synonyms by pre-training the word vector instance `embed`.
+Then, we search for synonyms by pretraining the word vector instance `embed`.
 
 ```{.python .input}
 #@tab all
@@ -218,8 +218,8 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 
 ## Summary
 
-* Word vectors pre-trained on a large-scale corpus can often be applied to downstream natural language processing tasks.
-* We can use pre-trained word vectors to seek synonyms and analogies.
+* Word vectors pretrained on a large-scale corpus can often be applied to downstream natural language processing tasks.
+* We can use pretrained word vectors to seek synonyms and analogies.
 
 
 ## Exercises

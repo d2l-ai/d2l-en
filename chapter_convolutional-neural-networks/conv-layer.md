@@ -300,7 +300,7 @@ for i in range(10):
 conv2d = nn.Conv2d(1,1, kernel_size=(1, 2), bias=False)
 
 # The two-dimensional convolutional layer uses four-dimensional input and
-# output in the format of (example channel, height, width), where the batch
+# output in the format of (example, channel, height, width), where the batch
 # size (number of examples in the batch) and the number of channels are both 1
 X = X.reshape((1, 1, 6, 8))
 Y = Y.reshape((1, 1, 6, 7))
@@ -324,7 +324,7 @@ for i in range(10):
 conv2d = tf.keras.layers.Conv2D(1, (1, 2), use_bias=False)
 
 # The two-dimensional convolutional layer uses four-dimensional input and
-# output in the format of (example channel, height, width), where the batch
+# output in the format of (example, height, width, channel), where the batch
 # size (number of examples in the batch) and the number of channels are both 1
 X = tf.reshape(X, (1, 6, 8, 1))
 Y = tf.reshape(Y, (1, 6, 7, 1))

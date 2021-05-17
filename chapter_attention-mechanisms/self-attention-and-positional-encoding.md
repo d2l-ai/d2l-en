@@ -3,7 +3,7 @@
 
 In deep learning,
 we often use CNNs or RNNs to encode a sequence.
-Now with attention mechanisms.
+Now with attention mechanisms,
 imagine that we feed a sequence of tokens
 into attention pooling
 so that

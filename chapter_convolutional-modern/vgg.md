@@ -24,7 +24,7 @@ It is easy to implement these repeated structures in code
 with any modern deep learning framework by using loops and subroutines.
 
 
-## VGG Blocks
+## (**VGG Blocks**)
 
 The basic building block of classic CNNs
 is a sequence of the following:
@@ -101,7 +101,7 @@ def vgg_block(num_convs, num_channels):
     return blk
 ```
 
-## VGG Network
+## [**VGG Network**]
 
 Like AlexNet and LeNet,
 the VGG Network can be partitioned into two parts:
@@ -195,7 +195,7 @@ net = vgg(conv_arch)
 ```
 
 Next, we will construct a single-channel data example
-with a height and width of 224 to observe the output shape of each layer.
+with a height and width of 224 to [**observe the output shape of each layer**].
 
 ```{.python .input}
 net.initialize()
@@ -228,8 +228,8 @@ for processing by the fully-connected part of the network.
 
 ## Training
 
-Since VGG-11 is more computationally-heavy than AlexNet
-we construct a network with a smaller number of channels.
+[**Since VGG-11 is more computationally-heavy than AlexNet
+we construct a network with a smaller number of channels.**]
 This is more than sufficient for training on Fashion-MNIST.
 
 ```{.python .input}
@@ -250,7 +250,7 @@ net = lambda: vgg(small_conv_arch)
 ```
 
 Apart from using a slightly larger learning rate,
-the model training process is similar to that of AlexNet in :numref:`sec_alexnet`.
+the [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`.
 
 ```{.python .input}
 #@tab all

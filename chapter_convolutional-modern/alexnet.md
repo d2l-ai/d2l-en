@@ -398,7 +398,7 @@ def net():
     ])
 ```
 
-We construct a single-channel data example with both height and width of 224 to observe the output shape of each layer. It matches the AlexNet architecture in :numref:`fig_alexnet`.
+We [**construct a single-channel data example**] with both height and width of 224 (**to observe the output shape of each layer**). It matches the AlexNet architecture in :numref:`fig_alexnet`.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 224, 224))
@@ -429,10 +429,10 @@ for layer in net().layers:
 Although AlexNet is trained on ImageNet in the paper, we use Fashion-MNIST here
 since training an ImageNet model to convergence could take hours or days
 even on a modern GPU.
-One of the problems with applying AlexNet directly on Fashion-MNIST
-is that its images have lower resolution ($28 \times 28$ pixels)
-than ImageNet images.
-To make things work, we upsample them to $224 \times 224$
+One of the problems with applying AlexNet directly on [**Fashion-MNIST**]
+is that its (**images have lower resolution**) ($28 \times 28$ pixels)
+(**than ImageNet images.**)
+To make things work, (**we upsample them to $224 \times 224$**)
 (generally not a smart practice,
 but we do it here to be faithful to the AlexNet architecture).
 We perform this resizing with the `resize` argument in the `d2l.load_data_fashion_mnist` function.
@@ -445,7 +445,7 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 
 ## Training
 
-Now, we can start training AlexNet.
+Now, we can [**start training AlexNet.**]
 Compared with LeNet in :numref:`sec_lenet`,
 the main change here is the use of a smaller learning rate
 and much slower training due to the deeper and wider network,

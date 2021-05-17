@@ -1,9 +1,27 @@
 # Computer Vision
 :label:`chap_cv`
 
-Many applications in the area of computer vision are closely related to our daily lives, now and in the future, whether medical diagnostics, driverless vehicles, camera monitoring, or smart filters. In recent years, deep learning technology has greatly enhanced computer vision systems' performance. It can be said that the most advanced computer vision applications are nearly inseparable from deep learning.
+Whether it is medical diagnosis, self-driving vehicles, camera monitoring, or smart filters, many applications in the field of computer vision are closely related to our current and future lives. 
+In recent years, deep learning has been
+the transformative power for advancing the performance of computer vision systems.
+It can be said that the most advanced computer vision applications are almost inseparable from deep learning.
+In view of this, this chapter will focus on the field of computer vision, and investigate methods and applications that have recently been influential in academia and industry.
 
-We have introduced deep learning models commonly used in the area of computer vision in the chapter "Convolutional Neural Networks" and have practiced simple image classification tasks. In this chapter, we will introduce image augmentation and fine tuning methods and apply them to image classification. Then, we will explore various methods of object detection. After that, we will learn how to use fully convolutional networks to perform semantic segmentation on images. Then, we explain how to use style transfer technology to generate images that look like the cover of this book. Finally, we will perform practice exercises on two important computer vision datasets to review the content of this chapter and the previous chapters.
+
+In :numref:`chap_cnn` and :numref:`chap_modern_cnn`, we studied various convolutional neural networks that are
+commonly used in computer vision, and applied them
+to simple image classification tasks. 
+At the beginning of this chapter, we will describe
+two methods that 
+may improve model generalization, namely *image augmentation* and *fine-tuning*,
+and apply them to image classification. 
+Since deep neural networks can effectively represent images in multiple levels, 
+such layerwise representations have been successfully 
+used in various computer vision tasks such as *object detection*, *semantic segmentation*, and *style transfer*. 
+Following the key idea of leveraging layerwise representations in computer vision,
+we will begin with major components and techniques for object detection. Next, we will show how to use *fully convolutional networks* for semantic segmentation of images. Then we will explain how to use style transfer techniques to generate images like the cover of this book.
+In the end, we conclude this chapter
+by applying the materials of this chapter and several previous chapters on two popular computer vision benchmark datasets.
 
 ```toc
 :maxdepth: 2
