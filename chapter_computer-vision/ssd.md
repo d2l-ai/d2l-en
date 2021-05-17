@@ -18,7 +18,6 @@ are also applicable to other models.
 
 
 
-
 ## Model
 
 :numref:`fig_ssd` shows the design of an SSD model. The model's main components
