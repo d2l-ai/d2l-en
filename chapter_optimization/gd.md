@@ -148,16 +148,16 @@ To begin with, we need two more helper functions. The first uses an update funct
 
 ```{.python .input}
 #@tab all
-def train_2d(trainer, steps=20, f_grad=None):  #@save
+def train_2d(trainer, steps=20, f_grad=None, eta=None):  #@save
     """Optimize a 2D objective function with a customized trainer."""
     # `s1` and `s2` are internal state variables that will be used later
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
     for i in range(steps):
         if f_grad:
-            x1, x2, s1, s2 = trainer(x1, x2, s1, s2, f_grad)
+            x1, x2, s1, s2 = trainer(x1, x2, s1, s2, f_grad, eta)
         else:
-            x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+            x1, x2, s1, s2 = trainer(x1, x2, s1, s2, eta)
         results.append((x1, x2))
     print(f'epoch {i + 1}, x1: {float(x1):f}, x2: {float(x2):f}')
     return results
@@ -183,12 +183,12 @@ def f_2d(x1, x2):  # Objective function
 def f_2d_grad(x1, x2):  # Gradient of the objective function
     return (2 * x1, 4 * x2)
 
-def gd_2d(x1, x2, s1, s2, f_grad):
+def gd_2d(x1, x2, s1, s2, f_grad, eta):
     g1, g2 = f_grad(x1, x2)
     return (x1 - eta * g1, x2 - eta * g2, 0, 0)
 
 eta = 0.1
-show_trace_2d(f_2d, train_2d(gd_2d, f_grad=f_2d_grad))
+show_trace_2d(f_2d, train_2d(gd_2d, f_grad=f_2d_grad, eta=eta))
 ```
 
 ## Adaptive Methods
