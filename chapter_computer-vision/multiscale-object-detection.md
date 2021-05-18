@@ -1,4 +1,6 @@
 # Multiscale Object Detection
+:label:`sec_multiscale-object-detection`
+
 
 In :numref:`sec_anchor`,
 we generated multiple anchor boxes centered on each pixel of an input image. 
@@ -199,6 +201,14 @@ For example, we can design a neural network where
 units of feature maps that are closer to the output layer
 have wider receptive fields,
 so they can detect larger objects from the input image.
+
+In a nutshell, we can leverage
+layerwise representations of images at multiple levels
+by deep neural networks
+in multiscale object detection.
+We will show how this works through a concrete example
+in :numref:`sec_ssd`.
+
 
 
 

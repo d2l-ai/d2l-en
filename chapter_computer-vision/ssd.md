@@ -16,37 +16,70 @@ and implementation details in this section
 are also applicable to other models.
 
 
-
-
 ## Model
 
-:numref:`fig_ssd` shows the design of an SSD model. The model's main components
-are a base network block and several multiscale feature blocks connected in a
-series. Here, the base network block is used to extract features of original
-images, and it generally takes the form of a deep convolutional neural
-network. The paper on SSDs chooses to place a truncated VGG before the
-classification layer :cite:`Liu.Anguelov.Erhan.ea.2016`, but this is now
-commonly replaced by ResNet. We can design the base network so that it outputs
-larger heights and widths. In this way, more anchor boxes are generated based on
-this feature map, allowing us to detect smaller objects. Next, each multiscale
-feature block reduces the height and width of the feature map provided by the
-previous layer (for example, it may reduce the sizes by half). The blocks then
-use each element in the feature map to expand the receptive field on the input
-image. In this way, the closer a multiscale feature block is to the top of
-:numref:`fig_ssd` the smaller its output feature map, and the fewer the anchor
-boxes that are generated based on the feature map. In addition, the closer a
-feature block is to the top, the larger the receptive field of each element in
-the feature map and the better suited it is to detect larger objects. As the SSD
-generates different numbers of anchor boxes of different sizes based on the base
-network block and each multiscale feature block and then predicts the classes
-and offsets (i.e., predicted bounding boxes) of the anchor boxes in order to
-detect objects of different sizes, SSD is a multiscale object detection model.
+:numref:`fig_ssd` provides an overview of 
+the design of single-shot multibox detection. 
+This model mainly consists of
+a base network
+followed by
+several multiscale feature map blocks.
+The base network
+is for extracting features from the input image,
+so it can use a deep CNN.
+For example,
+the original single-shot multibox detection paper
+adopts a VGG network truncated before the
+classification layer :cite:`Liu.Anguelov.Erhan.ea.2016`,
+while ResNet has also been commonly used.
+Through our design
+we can make the base network output
+larger feature maps
+so as to generate more anchor boxes 
+for detecting smaller objects.
+Subsequently,
+each multiscale feature map block
+reduces (e.g., by half)
+the height and width of the feature maps
+from the previous block,
+and enables each unit
+of the feature maps 
+to increase its receptive field on the input image.
 
-![The SSD is composed of a base network block and several multiscale feature blocks connected in a series. ](../img/ssd.svg)
+
+Recall the design
+of multiscale object detection
+through layerwise representations of images by
+deep neural networks
+in :numref:`sec_multiscale-object-detection`.
+Since
+multiscale feature maps closer to the top of :numref:`fig_ssd`
+are smaller but have larger receptive fields,
+they are suitable for detecting
+fewer but larger objects.
+
+In a nutshell,
+via its base network and several multiscale feature map blocks,
+single-shot multibox detection
+generates a varying number of anchor boxes with different sizes,
+and detects varying-size objects
+by predicting classes and offsets
+of these anchor boxes (thus the bounding boxes);
+thus, this is a multiscale object detection model.
+
+
+
+
+![As a multiscale object detection model, single-shot multibox detection mainly consists of a base network followed by several multiscale feature map blocks.](../img/ssd.svg)
 :label:`fig_ssd`
 
 
-Next, we will describe the implementation of the modules in :numref:`fig_ssd`. First, we need to discuss the implementation of class prediction and bounding box prediction.
+In the following,
+we will describe the implementation details
+of different blocks in :numref:`fig_ssd`. To begin with, we discuss how to implement
+the class and bounding box prediction.
+
+
 
 ### Class Prediction Layer
 
