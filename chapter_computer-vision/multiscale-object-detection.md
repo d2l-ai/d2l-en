@@ -205,7 +205,7 @@ so they can detect larger objects from the input image.
 In a nutshell, we can leverage
 layerwise representations of images at multiple levels
 by deep neural networks
-in multiscale object detection.
+for multiscale object detection.
 We will show how this works through a concrete example
 in :numref:`sec_ssd`.
 
@@ -217,6 +217,7 @@ in :numref:`sec_ssd`.
 * At multiple scales, we can generate anchor boxes with different sizes to detect objects with different sizes.
 * By defining the shape of feature maps, we can determine centers of uniformly sampled anchor boxes on any image.
 * We use the information of the input image in a certain receptive field to predict the classes and offsets of the anchor boxes that are close to that receptive field on the input image.
+* Through deep learning, we can leverage its layerwise representations of images at multiple levels for multiscale object detection.
 
 
 ## Exercises
