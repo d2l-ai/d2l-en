@@ -68,8 +68,6 @@ of these anchor boxes (thus the bounding boxes);
 thus, this is a multiscale object detection model.
 
 
-
-
 ![As a multiscale object detection model, single-shot multibox detection mainly consists of a base network followed by several multiscale feature map blocks.](../img/ssd.svg)
 :label:`fig_ssd`
 
@@ -83,30 +81,51 @@ the class and bounding box prediction.
 
 ### Class Prediction Layer
 
-Set the number of object classes to $q$. In this case, the number of anchor
-box classes is $q+1$, with 0 indicating an anchor box that only contains
-background. For a certain scale, set the height and width of the feature map to
-$h$ and $w$, respectively. If we use each element as the center to generate $a$
-anchor boxes, we need to classify a total of $hwa$ anchor boxes. If we use a
-fully connected layer (FCN) for the output, this will likely result in an
-excessive number of model parameters. Recall how we used convolutional layer
-channels to output class predictions in :numref:`sec_nin`. SSD uses the
-same method to reduce the model complexity.
+Let the number of object classes be $q$.
+Then anchor boxes have $q+1$ classes,
+where class 0 is background.
+At some scale,
+suppose that the height and width of feature maps
+are $h$ and $w$, respectively.
+When $a$ anchor boxes
+are generated with
+each spatial position of these feature maps as their center,
+a total of $hwa$ anchor boxes need to be classified.
+This often makes classification with fully-connected layers infeasible due to likely
+heavy parameterization costs.
+Recall how we used channels of
+convolutional layers
+to predict classes in :numref:`sec_nin`.
+Single-shot multibox detection uses the
+same technique to reduce model complexity.
 
-Specifically, the class prediction layer uses a convolutional layer that
-maintains the input height and width. Thus, the output and input have a
-one-to-one correspondence to the spatial coordinates along the width and height
-of the feature map. Assuming that the output and input have the same spatial
-coordinates $(x, y)$, the channel for the coordinates $(x, y)$ on the output
-feature map contains the class predictions for all anchor boxes generated
-using the input feature map coordinates $(x, y)$ as the center. Therefore, there
-are $a(q+1)$ output channels, with the output channels indexed as $i(q+1) + j$
-($0 \leq j \leq q$) representing the predictions of the class index $j$ for
-the anchor box index $i$.
+Specifically,
+the class prediction layer uses a convolutional layer
+without altering width or height of feature maps.
+In this way,
+there can be a one-to-one correspondence
+between outputs and inputs
+at the same spatial dimensions (width and height)
+of feature maps.
+More concretely,
+channels of the output feature maps
+at any spatial position ($x$, $y$)
+represent class predictions
+for all the anchor boxes centered on
+($x$, $y$) of the input feature maps.
+To produce valid predictions,
+there must be $a(q+1)$ output channels,
+where for the same spatial position
+the output channel with index $i(q+1) + j$
+represents the prediction of
+the class $j$ ($0 \leq j \leq q$)
+for the anchor box $i$ ($0 \leq i < a$).
 
-Now, we will define a class prediction layer of this type. After we specify
-the parameters $a$ and $q$, it uses a $3\times3$ convolutional layer with a
-padding of 1. The heights and widths of the input and output of this
+Below we define such a class prediction layer,
+specifying $a$ and $q$ via arguments `num_anchors` and `num_classes`, respectively.
+This layer uses a $3\times3$ convolutional layer with a
+padding of 1.
+The width and height of the input and output of this
 convolutional layer remain unchanged.
 
 ```{.python .input}
@@ -138,7 +157,9 @@ def cls_predictor(num_inputs, num_anchors, num_classes):
 
 ### Bounding Box Prediction Layer
 
-The design of the bounding box prediction layer is similar to that of the class prediction layer. The only difference is that, here, we need to predict 4 offsets for each anchor box, rather than $q+1$ classes.
+The design of the bounding box prediction layer is similar to that of the class prediction layer.
+The only difference lies in the number of outputs for each anchor box: 
+here we need to predict four offsets rather than $q+1$ classes.
 
 ```{.python .input}
 def bbox_predictor(num_anchors):
