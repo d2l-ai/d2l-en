@@ -174,9 +174,33 @@ def bbox_predictor(num_inputs, num_anchors):
 
 ### Concatenating Predictions for Multiple Scales
 
-As we mentioned, SSD uses feature maps based on multiple scales to generate anchor boxes and predict their classes and offsets. Because the shapes and number of anchor boxes centered on the same element differ for the feature maps of different scales, the prediction outputs at different scales may have different shapes.
+As we mentioned, single-shot multibox detection
+uses multiscale feature maps to generate anchor boxes and predict their classes and offsets.
+At different scales,
+the shapes of feature maps
+or the numbers of anchor boxes centered on the same unit
+may vary.
+Therefore,
+shapes of the prediction outputs
+at different scales may vary.
 
-In the following example, we use the same batch of data to construct feature maps of two different scales, `Y1` and `Y2`. Here, `Y2` has half the height and half the width of `Y1`. Using class prediction as an example, we assume that each element in the `Y1` and `Y2` feature maps generates five (Y1) or three (Y2) anchor boxes. When there are 10 object classes, the number of class prediction output channels is either $5\times(10+1)=55$ or $3\times(10+1)=33$. The format of the prediction output is (batch size, number of channels, height, width). As you can see, except for the batch size, the sizes of the other dimensions are different. Therefore, we must transform them into a consistent format and concatenate the predictions of the multiple scales to facilitate subsequent computation.
+In the following example,
+we construct feature maps at two different scales,
+`Y1` and `Y2`,
+for the same minibatch,
+where the height and width of `Y2`
+are half of those of `Y1`.
+Let us take class prediction as an example.
+Suppose that
+5 and 3 anchor boxes
+are generated for every unit in `Y1` and `Y2`, respectively.
+Suppose further that
+the number of object classes is 10.
+For feature maps `Y1` and `Y2`
+the numbers of channels in the class prediction outputs
+are $5\times(10+1)=55$ and $3\times(10+1)=33$, respectively,
+where either output shape is
+(batch size, number of channels, height, width).
 
 ```{.python .input}
 def forward(x, block):
