@@ -209,7 +209,7 @@ def forward(x, block):
 
 Y1 = forward(np.zeros((2, 8, 20, 20)), cls_predictor(5, 10))
 Y2 = forward(np.zeros((2, 16, 10, 10)), cls_predictor(3, 10))
-(Y1.shape, Y2.shape)
+Y1.shape, Y2.shape
 ```
 
 ```{.python .input}
@@ -219,10 +219,25 @@ def forward(x, block):
 
 Y1 = forward(torch.zeros((2, 8, 20, 20)), cls_predictor(8, 5, 10))
 Y2 = forward(torch.zeros((2, 16, 10, 10)), cls_predictor(16, 3, 10))
-(Y1.shape, Y2.shape)
+Y1.shape, Y2.shape
 ```
 
-The channel dimension contains the predictions for all anchor boxes with the same center. We first move the channel dimension to the final dimension. Because the batch size is the same for all scales, we can convert the prediction results to binary format (batch size, height $\times$ width $\times$ number of channels) to facilitate subsequent concatenation on the $1^{\mathrm{st}}$ dimension.
+As we can see, except for the batch size dimension, 
+the other three dimensions all have different sizes.
+To concatenate these two prediction outputs for more efficient computation,
+we will transform these tensors into a more consistent format.
+
+Note that
+the channel dimension holds the predictions for
+anchor boxes with the same center.
+We first move this dimension to the innermost.
+Since the batch size remains the same for different scales,
+we can transform the prediction output
+into a two-dimensional tensor
+with shape (batch size, height $\times$ width $\times$ number of channels).
+Then we can concatenate
+such outputs at different scales
+along dimension 1.
 
 ```{.python .input}
 def flatten_pred(pred):
@@ -241,7 +256,10 @@ def concat_preds(preds):
     return torch.cat([flatten_pred(p) for p in preds], dim=1)
 ```
 
-Thus, regardless of the different shapes of `Y1` and `Y2`, we can still concatenate the prediction results for the two different scales of the same batch.
+In this way,
+even though `Y1` and `Y2` have different sizes
+in channels, heights, and widths,
+we can still concatenate these two prediction outputs at two different scales for the same minibatch.
 
 ```{.python .input}
 #@tab all
