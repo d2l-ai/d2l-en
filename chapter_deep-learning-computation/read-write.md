@@ -47,7 +47,7 @@ import tensorflow as tf
 import numpy as np
 
 x = tf.range(4)
-np.save("x-file.npy", x)
+np.save('x-file.npy', x)
 ```
 
 We can now read the data from the stored file back into memory.
@@ -59,7 +59,7 @@ x2
 
 ```{.python .input}
 #@tab pytorch
-x2 = torch.load("x-file")
+x2 = torch.load('x-file')
 x2
 ```
 
@@ -222,14 +222,14 @@ clone.load_parameters('mlp.params')
 ```{.python .input}
 #@tab pytorch
 clone = MLP()
-clone.load_state_dict(torch.load("mlp.params"))
+clone.load_state_dict(torch.load('mlp.params'))
 clone.eval()
 ```
 
 ```{.python .input}
 #@tab tensorflow
 clone = MLP()
-clone.load_weights("mlp.params")
+clone.load_weights('mlp.params')
 ```
 
 Since both instances have the same model parameters,
