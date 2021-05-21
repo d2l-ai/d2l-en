@@ -222,8 +222,10 @@ in :numref:`sec_ssd`.
 
 ## Exercises
 
+1. According to our discussions in :numref:`sec_alexnet`, deep neural networks learn hierarchical features with increasing levels of abstraction for images. In multiscale object detection, do feature maps at different scales correspond to different levels of abstraction? Why or why not?
 1. At the first scale (`fmap_w=4, fmap_h=4`) in the experiments in :numref:`subsec_multiscale-anchor-boxes`, generate uniformly distributed anchor boxes that may overlap.
 1. Given a feature map variable with shape $1 \times c \times h \times w$, where $c$, $h$, and $w$ are the number of channels, height, and width of the feature maps, respectively. How can you transform this variable into the classes and offsets of anchor boxes? What is the shape of the output?
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/371)
