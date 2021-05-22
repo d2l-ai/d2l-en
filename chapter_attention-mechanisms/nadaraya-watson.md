@@ -77,7 +77,7 @@ x_train = tf.sort(tf.random.uniform(shape = (n_train,), maxval = 5))
 def f(x):
     return 2 * d2l.sin(x) + x**0.8
 
-y_train = f(x_train) + d2l.normal(mean = 0.0, stddev = 0.5, shape = (n_train,))  # Training outputs
+y_train = f(x_train) + d2l.normal((n_train,), 0.0, 0.5)  # Training outputs
 x_test = d2l.arange(0, 5, 0.1)  # Testing examples
 y_truth = f(x_test)  # Ground-truth outputs for the testing examples
 n_test = len(x_test)  # No. of testing examples
