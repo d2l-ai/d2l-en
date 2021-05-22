@@ -73,7 +73,30 @@ x_train = tf.sort(tf.random.uniform(shape = (n_train,), maxval = 5))
 ```
 
 ```{.python .input}
-#@tab all
+def f(x):
+    return 2 * d2l.sin(x) + x**0.8
+
+y_train = f(x_train) + d2l.normal(0.0, 0.5, (n_train,))  # Training outputs
+x_test = d2l.arange(0, 5, 0.1)  # Testing examples
+y_truth = f(x_test)  # Ground-truth outputs for the testing examples
+n_test = len(x_test)  # No. of testing examples
+n_test
+```
+
+```{.python .input}
+#@tab pytorch
+def f(x):
+    return 2 * d2l.sin(x) + x**0.8
+
+y_train = f(x_train) + d2l.normal(0.0, 0.5, (n_train,))  # Training outputs
+x_test = d2l.arange(0, 5, 0.1)  # Testing examples
+y_truth = f(x_test)  # Ground-truth outputs for the testing examples
+n_test = len(x_test)  # No. of testing examples
+n_test
+```
+
+```{.python .input}
+#@tab tensorflow
 def f(x):
     return 2 * d2l.sin(x) + x**0.8
 
