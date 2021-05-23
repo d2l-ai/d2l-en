@@ -58,25 +58,59 @@ import torch
 from torch import nn
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
 ## Generate some "real" data
 
 Since this is going to be the world's lamest example, we simply generate data drawn from a Gaussian.
 
 ```{.python .input}
-#@tab all
 X = d2l.normal(0.0, 1, (1000, 2))
 A = d2l.tensor([[1, 2], [-0.1, 0.5]])
 b = d2l.tensor([1, 2])
 data = d2l.matmul(X, A) + b
 ```
 
+```{.python .input}
+#@tab pytorch
+X = d2l.normal(0.0, 1, (1000, 2))
+A = d2l.tensor([[1, 2], [-0.1, 0.5]])
+b = d2l.tensor([1, 2])
+data = d2l.matmul(X, A) + b
+```
+
+```{.python .input}
+#@tab tensorflow
+X = d2l.normal((1000, 2), 0.1, 1)
+A = d2l.tensor([[1, 2], [-0.1, 0.5]])
+b = d2l.tensor([1, 2], tf.float32)
+data = d2l.matmul(X, A) + b
+```
+
 Let us see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
 
 ```{.python .input}
-#@tab all
 d2l.set_figsize()
 d2l.plt.scatter(d2l.numpy(data[:100, 0]), d2l.numpy(data[:100, 1]));
 print(f'The covariance matrix is\n{d2l.matmul(A.T, A)}')
+```
+
+```{.python .input}
+#@tab pytorch
+d2l.set_figsize()
+d2l.plt.scatter(d2l.numpy(data[:100, 0]), d2l.numpy(data[:100, 1]));
+print(f'The covariance matrix is\n{d2l.matmul(A.T, A)}')
+```
+
+```{.python .input}
+#@tab tensorflow
+d2l.set_figsize()
+d2l.plt.scatter(d2l.numpy(data[:100, 0]), d2l.numpy(data[:100, 1]));
+print(f'The covariance matrix is\n{tf.matmul(A, A, transpose_a = True)}')
 ```
 
 ```{.python .input}
@@ -99,6 +133,11 @@ net_G.add(nn.Dense(2))
 net_G = nn.Sequential(nn.Linear(2, 2))
 ```
 
+```{.python .input}
+#@tab tensorflow
+net_G = tf.keras.layers.Dense(2)
+```
+
 ## Discriminator
 
 For the discriminator we will be a bit more discriminating: we will use an MLP with 3 layers to make things a bit more interesting.
@@ -116,6 +155,15 @@ net_D = nn.Sequential(
     nn.Linear(2, 5), nn.Tanh(),
     nn.Linear(5, 3), nn.Tanh(),
     nn.Linear(3, 1))
+```
+
+```{.python .input}
+#@tab tensorflow
+net_D = tf.keras.models.Sequential([
+    tf.keras.layers.Dense(5, activation = "tanh", input_shape = (2,)),
+    tf.keras.layers.Dense(3, activation = "tanh"),
+    tf.keras.layers.Dense(1)
+])
 ```
 
 ## Training
@@ -162,6 +210,26 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     return loss_D
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+def update_D(X, Z, net_D, net_G, loss, optimizer_D):
+    """Update discriminator."""
+    batch_size = X.shape[0]
+    ones = tf.ones((batch_size,)) # Labels corresponding to real data
+    zeros = tf.zeros((batch_size,)) # Labels corresponding to fake data
+    # Do not need to compute gradient for `net_G`, so it's outside GradientTape
+    fake_X = net_G(Z)
+    with tf.GradientTape() as tape:
+        real_Y = net_D(X)
+        fake_Y = net_D(fake_X)
+        # We multiply the loss by batch_size to match PyTorch's BCEWithLogitsLoss
+        loss_D = (loss(ones, tf.squeeze(real_Y)) + loss(zeros, tf.squeeze(fake_Y))) * batch_size / 2
+    grads_D = tape.gradient(loss_D, net_D.trainable_variables)
+    optimizer_D.apply_gradients(zip(grads_D, net_D.trainable_variables))
+    return loss_D
+```
+
 The generator is updated similarly. Here we reuse the cross-entropy loss but change the label of the fake data from $0$ to $1$.
 
 ```{.python .input}
@@ -196,6 +264,25 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
     loss_G = loss(fake_Y, ones.reshape(fake_Y.shape))
     loss_G.backward()
     trainer_G.step()
+    return loss_G
+```
+
+```{.python .input}
+#@tab tensorflow
+#@save
+def update_G(Z, net_D, net_G, loss, optimizer_G):
+    """Update generator."""
+    batch_size = Z.shape[0]
+    ones = tf.ones((batch_size,))
+    with tf.GradientTape() as tape:
+        # We could reuse `fake_X` from `update_D` to save computation
+        fake_X = net_G(Z)
+        # Recomputing `fake_Y` is needed since `net_D` is changed
+        fake_Y = net_D(fake_X)
+        # We multiply the loss by batch_size to match PyTorch's BCEWithLogits loss
+        loss_G = loss(ones, tf.squeeze(fake_Y)) * batch_size
+    grads_G = tape.gradient(loss_G, net_G.trainable_variables)
+    optimizer_G.apply_gradients(zip(grads_G, net_G.trainable_variables))
     return loss_G
 ```
 
@@ -272,6 +359,44 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
         # Show the losses
         loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]
         animator.add(epoch + 1, (loss_D, loss_G))
+    print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '
+          f'{metric[2] / timer.stop():.1f} examples/sec')
+```
+
+```{.python .input}
+#@tab tensorflow
+def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
+    loss = tf.keras.losses.BinaryCrossentropy(from_logits=True, reduction = tf.keras.losses.Reduction.SUM)
+    for w in net_D.trainable_variables:
+        w.assign(tf.random.normal(mean = 0, stddev = 0.02, shape = w.shape))
+    for w in net_G.trainable_variables:
+        w.assign(tf.random.normal(mean = 0, stddev = 0.02, shape = w.shape))
+    optimizer_D = tf.keras.optimizers.Adam(learning_rate= lr_D)
+    optimizer_G = tf.keras.optimizers.Adam(learning_rate= lr_G)
+    animator = d2l.Animator(xlabel = "epoch", ylabel = "loss", xlim = [1, num_epochs],
+                            nrows = 2, figsize = (5, 5), legend = ["discriminator", "generator"])
+    animator.fig.subplots_adjust(hspace = 0.3)
+    for epoch in range(num_epochs):
+        # Train one epoch
+        timer = d2l.Timer()
+        metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
+        for (X,) in data_iter:
+            batch_size = X.shape[0]
+            Z = tf.random.normal(mean = 0, stddev = 1, shape = (batch_size, latent_dim))
+            metric.add(update_D(X, Z, net_D, net_G, loss, optimizer_D),
+                       update_G(Z, net_D, net_G, loss, optimizer_G), batch_size)
+        # Visualize generated examples
+        Z = tf.random.normal(mean = 0, stddev = 1, shape = (100, latent_dim))
+        fake_X = net_G(Z)
+        animator.axes[1].cla()
+        animator.axes[1].scatter(data[:, 0], data[:, 1])
+        animator.axes[1].scatter(fake_X[:, 0], fake_X[:, 1])
+        animator.axes[1].legend(["real", "generated"])
+        
+        # Show the losses
+        loss_D, loss_G = metric[0] / metric[2], metric[1] / metric[2]
+        animator.add(epoch + 1, (loss_D, loss_G))
+        
     print(f'loss_D {loss_D:.3f}, loss_G {loss_G:.3f}, '
           f'{metric[2] / timer.stop():.1f} examples/sec')
 ```
