@@ -85,7 +85,7 @@ data = d2l.matmul(X, A) + b
 
 ```{.python .input}
 #@tab tensorflow
-X = d2l.normal((1000, 2), 0.1, 1)
+X = d2l.normal((1000, 2), 0.0, 1)
 A = d2l.tensor([[1, 2], [-0.1, 0.5]])
 b = d2l.tensor([1, 2], tf.float32)
 data = d2l.matmul(X, A) + b
