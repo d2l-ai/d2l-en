@@ -32,6 +32,13 @@ import torch
 from torch import nn
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+tf.random.set_seed(seed = 1322)
+```
+
 ## Generating the Dataset
 
 To keep things simple,
@@ -60,11 +67,40 @@ x_train, _ = torch.sort(d2l.rand(n_train) * 5)   # Training inputs
 ```
 
 ```{.python .input}
-#@tab all
+#@tab tensorflow
+n_train = 50
+x_train = tf.sort(tf.random.uniform(shape = (n_train,), maxval = 5))
+```
+
+```{.python .input}
 def f(x):
     return 2 * d2l.sin(x) + x**0.8
 
 y_train = f(x_train) + d2l.normal(0.0, 0.5, (n_train,))  # Training outputs
+x_test = d2l.arange(0, 5, 0.1)  # Testing examples
+y_truth = f(x_test)  # Ground-truth outputs for the testing examples
+n_test = len(x_test)  # No. of testing examples
+n_test
+```
+
+```{.python .input}
+#@tab pytorch
+def f(x):
+    return 2 * d2l.sin(x) + x**0.8
+
+y_train = f(x_train) + d2l.normal(0.0, 0.5, (n_train,))  # Training outputs
+x_test = d2l.arange(0, 5, 0.1)  # Testing examples
+y_truth = f(x_test)  # Ground-truth outputs for the testing examples
+n_test = len(x_test)  # No. of testing examples
+n_test
+```
+
+```{.python .input}
+#@tab tensorflow
+def f(x):
+    return 2 * d2l.sin(x) + x**0.8
+
+y_train = f(x_train) + d2l.normal((n_train,), 0.0, 0.5)  # Training outputs
 x_test = d2l.arange(0, 5, 0.1)  # Testing examples
 y_truth = f(x_test)  # Ground-truth outputs for the testing examples
 n_test = len(x_test)  # No. of testing examples
@@ -100,6 +136,12 @@ plot_kernel_reg(y_hat)
 ```{.python .input}
 #@tab pytorch
 y_hat = torch.repeat_interleave(y_train.mean(), n_test)
+plot_kernel_reg(y_hat)
+```
+
+```{.python .input}
+#@tab tensorflow
+y_hat = tf.repeat(tf.reduce_mean(y_train), repeats = n_test)
 plot_kernel_reg(y_hat)
 ```
 
@@ -195,6 +237,20 @@ y_hat = d2l.matmul(attention_weights, y_train)
 plot_kernel_reg(y_hat)
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Shape of `X_repeat`: (`n_test`, `n_train`), where each row contains the 
+# same testing inputs (i.e., same queries)
+X_repeat = tf.repeat(tf.expand_dims(x_train, axis = 0), repeats = n_train, axis = 0)
+# Note that `x_train` contains the keys. Shape of `attention_weights`:
+# (`n_test`, `n_train`), where each row contains attention weights to be
+# assigned among the values (`y_train`) given each query
+attention_weights = tf.nn.softmax(-(X_repeat - tf.expand_dims(x_train, axis = 1))**2/2, axis = 1)
+# Each element of `y_hat` is weighted average of values, where weights are attention weights
+y_hat = tf.matmul(attention_weights, tf.expand_dims(y_train, axis = 1))
+plot_kernel_reg(y_hat)
+```
+
 Now let us take a look at the attention weights.
 Here testing inputs are queries while training inputs are keys.
 Since both inputs are sorted,
@@ -210,6 +266,13 @@ d2l.show_heatmaps(np.expand_dims(np.expand_dims(attention_weights, 0), 0),
 ```{.python .input}
 #@tab pytorch
 d2l.show_heatmaps(attention_weights.unsqueeze(0).unsqueeze(0),
+                  xlabel='Sorted training inputs',
+                  ylabel='Sorted testing inputs')
+```
+
+```{.python .input}
+#@tab tensorflow
+d2l.show_heatmaps(tf.expand_dims(tf.expand_dims(attention_weights, axis = 0), axis = 0),
                   xlabel='Sorted training inputs',
                   ylabel='Sorted testing inputs')
 ```
@@ -262,6 +325,13 @@ Y = d2l.ones((2, 4, 6))
 torch.bmm(X, Y).shape
 ```
 
+```{.python .input}
+#@tab tensorflow
+X = tf.ones((2, 1, 4))
+Y = tf.ones((2, 4, 6))
+tf.matmul(X, Y).shape
+```
+
 In the context of attention mechanisms, we can use minibatch matrix multiplication to compute weighted averages of values in a minibatch.
 
 ```{.python .input}
@@ -275,6 +345,13 @@ npx.batch_dot(np.expand_dims(weights, 1), np.expand_dims(values, -1))
 weights = d2l.ones((2, 10)) * 0.1
 values = d2l.reshape(d2l.arange(20.0), (2, 10))
 torch.bmm(weights.unsqueeze(1), values.unsqueeze(-1))
+```
+
+```{.python .input}
+#@tab tensorflow
+weights = tf.ones((2, 10)) * 0.1
+values = tf.reshape(tf.range(20.0), shape = (2, 10))
+tf.matmul(tf.expand_dims(weights, axis = 1), tf.expand_dims(values, axis = -1)).numpy()
 ```
 
 ### Defining the Model
@@ -322,6 +399,22 @@ class NWKernelRegression(nn.Module):
                          values.unsqueeze(-1)).reshape(-1)
 ```
 
+```{.python .input}
+#@tab tensorflow
+class NWKernelRegression(tf.keras.layers.Layer):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.w = tf.Variable(initial_value = tf.random.uniform(shape = (1,)))
+        
+    def call(self, queries, keys, values, **kwargs):
+        # For training queries are `x_train`. Keys are distance of taining data for each point. Values are `y_train`.
+        # Shape of the output `queries` and `attention_weights`: (no. of queries, no. of key-value pairs)
+        queries = tf.repeat(tf.expand_dims(queries, axis = 1), repeats = keys.shape[1], axis = 1)
+        self.attention_weights = tf.nn.softmax(-((queries - keys) * self.w)**2 /2, axis = 1)
+        # Shape of `values`: (no. of queries, no. of key-value pairs)
+        return tf.squeeze(tf.matmul(tf.expand_dims(self.attention_weights, axis = 1), tf.expand_dims(values, axis = -1)))
+```
+
 ### Training
 
 In the following, we transform the training dataset
@@ -358,6 +451,20 @@ keys = d2l.reshape(X_tile[(1 - d2l.eye(n_train)).type(torch.bool)],
 # Shape of `values`: ('n_train', 'n_train' - 1)
 values = d2l.reshape(Y_tile[(1 - d2l.eye(n_train)).type(torch.bool)],
                      (n_train, -1))
+```
+
+```{.python .input}
+#@tab tensorflow
+# Shape of `X_tile`: (`n_train`, `n_train`), where each column contains the
+# same training inputs
+X_tile = tf.repeat(tf.expand_dims(x_train, axis = 0), repeats = n_train, axis = 0)
+# Shape of `Y_tile`: (`n_train`, `n_train`), where each column contains the
+# same training outputs
+Y_tile = tf.repeat(tf.expand_dims(y_train, axis = 0), repeats = n_train, axis = 0)
+# Shape of `keys`: ('n_train', 'n_train' - 1)
+keys = tf.reshape(X_tile[tf.cast(1 - tf.eye(n_train), dtype = tf.bool)], shape = (n_train, -1))
+# Shape of `values`: ('n_train', 'n_train' - 1)
+values = tf.reshape(Y_tile[tf.cast(1 - tf.eye(n_train), dtype = tf.bool)], shape = (n_train, -1))
 ```
 
 Using the squared loss and stochastic gradient descent,
@@ -397,6 +504,23 @@ for epoch in range(5):
     animator.add(epoch + 1, float(l.sum()))
 ```
 
+```{.python .input}
+#@tab tensorflow
+net = NWKernelRegression()
+loss_object = tf.keras.losses.MeanSquaredError()
+optimizer = tf.keras.optimizers.SGD(learning_rate = 0.5)
+animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, 5])
+
+
+for epoch in range(5):
+    with tf.GradientTape() as t:
+        loss = loss_object(y_train, net(x_train, keys, values))/2 * len(y_train) # To be consistent with d2l book
+    grads = t.gradient(loss, net.trainable_variables)
+    optimizer.apply_gradients(zip(grads, net.trainable_variables))
+    print(f'epoch {epoch + 1}, loss {float(loss):.6f}')
+    animator.add(epoch + 1, float(loss))
+```
+
 After training the parametric attention model,
 we can plot its prediction.
 Trying to fit the training dataset with noise,
@@ -424,6 +548,17 @@ y_hat = net(x_test, keys, values).unsqueeze(1).detach()
 plot_kernel_reg(y_hat)
 ```
 
+```{.python .input}
+#@tab tensorflow
+# Shape of `keys`: (`n_test`, `n_train`), where each column contains the same
+# training inputs (i.e., same keys)
+keys = tf.repeat(tf.expand_dims(x_train, axis = 0), repeats = n_test, axis = 0)
+# Shape of `value`: (`n_test`, `n_train`)
+values = tf.repeat(tf.expand_dims(y_train, axis = 0), repeats = n_test, axis = 0)
+y_hat = net(x_test, keys, values)
+plot_kernel_reg(y_hat)
+```
+
 Comparing with nonparametric attention pooling,
 the region with large attention weights becomes sharper
 in the learnable and parametric setting.
@@ -441,6 +576,13 @@ d2l.show_heatmaps(net.attention_weights.unsqueeze(0).unsqueeze(0),
                   ylabel='Sorted testing inputs')
 ```
 
+```{.python .input}
+#@tab tensorflow
+d2l.show_heatmaps(tf.expand_dims(tf.expand_dims(net.attention_weights, axis = 0), axis = 0),
+                  xlabel='Sorted training inputs',
+                  ylabel='Sorted testing inputs')
+```
+
 ## Summary
 
 * Nadaraya-Watson kernel regression is an example of machine learning with attention mechanisms.
@@ -454,8 +596,6 @@ d2l.show_heatmaps(net.attention_weights.unsqueeze(0).unsqueeze(0),
 1. What is the value of our learned $w$ in the parametric attention pooling experiment? Why does it make the weighted region sharper when visualizing the attention weights?
 1. How can we add hyperparameters to nonparametric Nadaraya-Watson kernel regression to predict better?
 1. Design another parametric attention pooling for the kernel regression of this section. Train this new model and visualize its attention weights.
-
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/1598)
