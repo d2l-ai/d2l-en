@@ -185,7 +185,7 @@ In the end, we obtain the set of final candidate output sequences based on these
 Then
 we choose the sequence with the highest of the following score as the output sequence:
 
-$$ \frac{1}{L^\alpha} \log P(y_1, \ldots, y_{L}) = \frac{1}{L^\alpha} \sum_{t'=1}^L \log P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
+$$ \frac{1}{L^\alpha} \log P(y_1, \ldots, y_{L}\mid \mathbf{c}) = \frac{1}{L^\alpha} \sum_{t'=1}^L \log P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
 :eqlabel:`eq_beam-search-score`
 
 where $L$ is the length of the final candidate sequence and $\alpha$ is usually set to 0.75. 
