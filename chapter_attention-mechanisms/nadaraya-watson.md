@@ -36,7 +36,7 @@ from torch import nn
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-tf.random.set_seed(seed = 1322)
+tf.random.set_seed(seed=1322)
 ```
 
 ## Generating the Dataset
@@ -69,7 +69,7 @@ x_train, _ = torch.sort(d2l.rand(n_train) * 5)   # Training inputs
 ```{.python .input}
 #@tab tensorflow
 n_train = 50
-x_train = tf.sort(tf.random.uniform(shape = (n_train,), maxval = 5))
+x_train = tf.sort(tf.random.uniform(shape=(n_train,), maxval=5))
 ```
 
 ```{.python .input}
@@ -141,7 +141,7 @@ plot_kernel_reg(y_hat)
 
 ```{.python .input}
 #@tab tensorflow
-y_hat = tf.repeat(tf.reduce_mean(y_train), repeats = n_test)
+y_hat = tf.repeat(tf.reduce_mean(y_train), repeats=n_test)
 plot_kernel_reg(y_hat)
 ```
 
@@ -241,13 +241,13 @@ plot_kernel_reg(y_hat)
 #@tab tensorflow
 # Shape of `X_repeat`: (`n_test`, `n_train`), where each row contains the 
 # same testing inputs (i.e., same queries)
-X_repeat = tf.repeat(tf.expand_dims(x_train, axis = 0), repeats = n_train, axis = 0)
+X_repeat = tf.repeat(tf.expand_dims(x_train, axis=0), repeats=n_train, axis=0)
 # Note that `x_train` contains the keys. Shape of `attention_weights`:
 # (`n_test`, `n_train`), where each row contains attention weights to be
 # assigned among the values (`y_train`) given each query
-attention_weights = tf.nn.softmax(-(X_repeat - tf.expand_dims(x_train, axis = 1))**2/2, axis = 1)
+attention_weights = tf.nn.softmax(-(X_repeat - tf.expand_dims(x_train, axis=1))**2/2, axis=1)
 # Each element of `y_hat` is weighted average of values, where weights are attention weights
-y_hat = tf.matmul(attention_weights, tf.expand_dims(y_train, axis = 1))
+y_hat = tf.matmul(attention_weights, tf.expand_dims(y_train, axis=1))
 plot_kernel_reg(y_hat)
 ```
 
@@ -272,7 +272,7 @@ d2l.show_heatmaps(attention_weights.unsqueeze(0).unsqueeze(0),
 
 ```{.python .input}
 #@tab tensorflow
-d2l.show_heatmaps(tf.expand_dims(tf.expand_dims(attention_weights, axis = 0), axis = 0),
+d2l.show_heatmaps(tf.expand_dims(tf.expand_dims(attention_weights, axis=0), axis=0),
                   xlabel='Sorted training inputs',
                   ylabel='Sorted testing inputs')
 ```
@@ -351,7 +351,7 @@ torch.bmm(weights.unsqueeze(1), values.unsqueeze(-1))
 #@tab tensorflow
 weights = tf.ones((2, 10)) * 0.1
 values = tf.reshape(tf.range(20.0), shape = (2, 10))
-tf.matmul(tf.expand_dims(weights, axis = 1), tf.expand_dims(values, axis = -1)).numpy()
+tf.matmul(tf.expand_dims(weights, axis=1), tf.expand_dims(values, axis=-1)).numpy()
 ```
 
 ### Defining the Model
@@ -404,15 +404,15 @@ class NWKernelRegression(nn.Module):
 class NWKernelRegression(tf.keras.layers.Layer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.w = tf.Variable(initial_value = tf.random.uniform(shape = (1,)))
+        self.w = tf.Variable(initial_value=tf.random.uniform(shape=(1,)))
         
     def call(self, queries, keys, values, **kwargs):
         # For training queries are `x_train`. Keys are distance of taining data for each point. Values are `y_train`.
         # Shape of the output `queries` and `attention_weights`: (no. of queries, no. of key-value pairs)
-        queries = tf.repeat(tf.expand_dims(queries, axis = 1), repeats = keys.shape[1], axis = 1)
-        self.attention_weights = tf.nn.softmax(-((queries - keys) * self.w)**2 /2, axis = 1)
+        queries = tf.repeat(tf.expand_dims(queries, axis=1), repeats=keys.shape[1], axis=1)
+        self.attention_weights = tf.nn.softmax(-((queries - keys) * self.w)**2 /2, axis =1)
         # Shape of `values`: (no. of queries, no. of key-value pairs)
-        return tf.squeeze(tf.matmul(tf.expand_dims(self.attention_weights, axis = 1), tf.expand_dims(values, axis = -1)))
+        return tf.squeeze(tf.matmul(tf.expand_dims(self.attention_weights, axis=1), tf.expand_dims(values, axis=-1)))
 ```
 
 ### Training
@@ -457,14 +457,14 @@ values = d2l.reshape(Y_tile[(1 - d2l.eye(n_train)).type(torch.bool)],
 #@tab tensorflow
 # Shape of `X_tile`: (`n_train`, `n_train`), where each column contains the
 # same training inputs
-X_tile = tf.repeat(tf.expand_dims(x_train, axis = 0), repeats = n_train, axis = 0)
+X_tile = tf.repeat(tf.expand_dims(x_train, axis=0), repeats=n_train, axis=0)
 # Shape of `Y_tile`: (`n_train`, `n_train`), where each column contains the
 # same training outputs
-Y_tile = tf.repeat(tf.expand_dims(y_train, axis = 0), repeats = n_train, axis = 0)
+Y_tile = tf.repeat(tf.expand_dims(y_train, axis=0), repeats=n_train, axis=0)
 # Shape of `keys`: ('n_train', 'n_train' - 1)
-keys = tf.reshape(X_tile[tf.cast(1 - tf.eye(n_train), dtype = tf.bool)], shape = (n_train, -1))
+keys = tf.reshape(X_tile[tf.cast(1 - tf.eye(n_train), dtype=tf.bool)], shape=(n_train, -1))
 # Shape of `values`: ('n_train', 'n_train' - 1)
-values = tf.reshape(Y_tile[tf.cast(1 - tf.eye(n_train), dtype = tf.bool)], shape = (n_train, -1))
+values = tf.reshape(Y_tile[tf.cast(1 - tf.eye(n_train), dtype=tf.bool)], shape=(n_train, -1))
 ```
 
 Using the squared loss and stochastic gradient descent,
@@ -508,7 +508,7 @@ for epoch in range(5):
 #@tab tensorflow
 net = NWKernelRegression()
 loss_object = tf.keras.losses.MeanSquaredError()
-optimizer = tf.keras.optimizers.SGD(learning_rate = 0.5)
+optimizer = tf.keras.optimizers.SGD(learning_rate=0.5)
 animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, 5])
 
 
@@ -552,9 +552,9 @@ plot_kernel_reg(y_hat)
 #@tab tensorflow
 # Shape of `keys`: (`n_test`, `n_train`), where each column contains the same
 # training inputs (i.e., same keys)
-keys = tf.repeat(tf.expand_dims(x_train, axis = 0), repeats = n_test, axis = 0)
+keys = tf.repeat(tf.expand_dims(x_train, axis=0), repeats=n_test, axis=0)
 # Shape of `value`: (`n_test`, `n_train`)
-values = tf.repeat(tf.expand_dims(y_train, axis = 0), repeats = n_test, axis = 0)
+values = tf.repeat(tf.expand_dims(y_train, axis=0), repeats=n_test, axis=0)
 y_hat = net(x_test, keys, values)
 plot_kernel_reg(y_hat)
 ```
@@ -578,7 +578,7 @@ d2l.show_heatmaps(net.attention_weights.unsqueeze(0).unsqueeze(0),
 
 ```{.python .input}
 #@tab tensorflow
-d2l.show_heatmaps(tf.expand_dims(tf.expand_dims(net.attention_weights, axis = 0), axis = 0),
+d2l.show_heatmaps(tf.expand_dims(tf.expand_dims(net.attention_weights, axis=0), axis=0),
                   xlabel='Sorted training inputs',
                   ylabel='Sorted testing inputs')
 ```
