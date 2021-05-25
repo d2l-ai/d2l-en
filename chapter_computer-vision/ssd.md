@@ -324,7 +324,13 @@ forward(torch.zeros((2, 3, 20, 20)), down_sample_blk(3, 10)).shape
 
 ### Base Network Block
 
-The base network block is used to extract features from original images. To simplify the computation, we will construct a small base network. This network consists of three height and width downsample blocks connected in a series, so it doubles the number of channels at each step. When we input an original image with the shape $256\times256$, the base network block outputs a feature map with the shape $32 \times 32$.
+The base network block is used to extract features from input images.
+For simplicity,
+we construct a small base network
+consisting of three downsampling blocks 
+that double the number of channels at each block.
+Given a $256\times256$ input image,
+this base network block outputs $32 \times 32$ feature maps ($256/2^3=32$).
 
 ```{.python .input}
 def base_net():
