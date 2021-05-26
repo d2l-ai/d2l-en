@@ -167,9 +167,7 @@ This derivative is also the slope of the tangent line
 to the curve $u = f(x)$ when $x = 1$.
 
 [**To visualize such an interpretation of derivatives,
-we will use `matplotlib`,**]
-
-a popular plotting library in Python.
+we will use `matplotlib`,**] a popular plotting library in Python.
 To configure properties of the figures produced by `matplotlib`,
 we need to define a few functions.
 In the following,
