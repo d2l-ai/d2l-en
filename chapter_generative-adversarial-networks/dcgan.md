@@ -121,6 +121,7 @@ for X, y in data_iter:
 ```
 
 ```{.python .input}
+#@tab tensorflow
 d2l.set_figsize(figsize = (4, 4))
 for X, y in data_iter.take(1):
     imgs = X[:20, :, :, :] / 2 + 0.5
