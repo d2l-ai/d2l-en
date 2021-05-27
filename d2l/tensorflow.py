@@ -987,7 +987,9 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
                     save_attention_weights=False):
-    """Predict for sequence to sequence."""
+    """Predict for sequence to sequence.
+    **Note**: We don't need the `device` argument in TF as TF uses available device automatically.
+    """
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
         src_vocab['<eos>']]
     enc_valid_len = tf.constant([len(src_tokens)])

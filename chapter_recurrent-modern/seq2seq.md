@@ -879,7 +879,9 @@ def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
 #@tab tensorflow
 #@save
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps, save_attention_weights = False):
-    """Predict for sequence to sequence."""
+    """Predict for sequence to sequence.
+    **Note**: We don't need the `device` argument in TF as TF uses available device automatically.
+    """
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
         src_vocab['<eos>']]
     enc_valid_len = tf.constant([len(src_tokens)])
@@ -990,12 +992,30 @@ to translate a few English sentences into French
 and compute the BLEU of the results.
 
 ```{.python .input}
-#@tab all
 engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 for eng, fra in zip(engs, fras):
     translation, attention_weight_seq = predict_seq2seq(
         net, eng, src_vocab, tgt_vocab, num_steps, device)
+    print(f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
+```
+
+```{.python .input}
+#@tab pytorch
+engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
+fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
+for eng, fra in zip(engs, fras):
+    translation, attention_weight_seq = predict_seq2seq(
+        net, eng, src_vocab, tgt_vocab, num_steps, device)
+    print(f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
+```
+
+```{.python .input}
+#@tab tensorflow
+engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
+fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
+for eng, fra in zip(engs, fras):
+    translation, attention_weight_seq = predict_seq2seq(net, eng, src_vocab, tgt_vocab, num_steps)
     print(f'{eng} => {translation}, bleu {bleu(translation, fra, k=2):.3f}')
 ```
 
