@@ -92,11 +92,12 @@ data_iter = torch.utils.data.DataLoader(
 
 ```{.python .input}
 #@tab tensorflow
-transformer = tf.keras.Sequential([
-    tf.keras.layers.experimental.preprocessing.Rescaling(1./255),
-    tf.keras.layers.experimental.preprocessing.Normalization(mean = 0.5, variance = 0.25)
-])
-data_iter = pokemon.map(lambda x, y: (transformer(x), y), num_parallel_calls= tf.data.AUTOTUNE)
+def transform_func(X):
+    X = X / 255.
+    X = (X - 0.5) / (0.5)
+    return X
+
+data_iter = pokemon.map(lambda x, y: (transform_func(x), y), num_parallel_calls= tf.data.AUTOTUNE)
 data_iter = data_iter.cache().shuffle(buffer_size = 1000).prefetch(buffer_size = tf.data.AUTOTUNE)
 ```
 
