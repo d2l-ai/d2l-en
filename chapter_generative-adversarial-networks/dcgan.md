@@ -97,8 +97,9 @@ def transform_func(X):
     X = (X - 0.5) / (0.5)
     return X
 
-data_iter = pokemon.map(lambda x, y: (transform_func(x), y), num_parallel_calls= tf.data.AUTOTUNE)
-data_iter = data_iter.cache().shuffle(buffer_size = 1000).prefetch(buffer_size = tf.data.AUTOTUNE)
+data_iter = pokemon.map(lambda x, y: (transform_func(x), y),
+                        num_parallel_calls= tf.data.experimental.AUTOTUNE) # For TF>=2.4 use `tf.data.AUTOTUNE`
+data_iter = data_iter.cache().shuffle(buffer_size = 1000).prefetch(buffer_size = tf.data.experimental.AUTOTUNE)
 ```
 
 Let us visualize the first 20 images.
