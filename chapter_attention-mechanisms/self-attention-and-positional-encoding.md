@@ -36,6 +36,13 @@ import torch
 from torch import nn
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import numpy as np
+import tensorflow as tf
+```
+
 ## Self-Attention
 
 Given a sequence of input tokens
@@ -70,10 +77,30 @@ attention.eval()
 ```
 
 ```{.python .input}
-#@tab all
+#@tab tensorflow
+num_hiddens, num_heads = 100, 5
+attention = d2l.MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
+                                   num_hiddens, num_heads, 0.5)
+```
+
+```{.python .input}
 batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
 attention(X, X, X, valid_lens).shape
+```
+
+```{.python .input}
+#@tab pytorch
+batch_size, num_queries, valid_lens = 2, 4, d2l.tensor([3, 2])
+X = d2l.ones((batch_size, num_queries, num_hiddens))
+attention(X, X, X, valid_lens).shape
+```
+
+```{.python .input}
+#@tab tensorflow
+batch_size, num_queries, valid_lens = 2, 4, tf.constant([3, 2])
+X = tf.ones((batch_size, num_queries, num_hiddens))
+attention(X, X, X, valid_lens, training = False).shape
 ```
 
 ## Comparing CNNs, RNNs, and Self-Attention
@@ -234,6 +261,25 @@ class PositionalEncoding(nn.Module):
         return self.dropout(X)
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+class PositionalEncoding(tf.keras.layers.Layer):
+    def __init__(self, num_hiddens, dropout, max_len = 1000):
+        super().__init__()
+        self.dropout = tf.keras.layers.Dropout(dropout)
+        # Create a long enough `P`
+        self.P = np.zeros((1, max_len, num_hiddens))
+        X = np.arange(max_len, dtype = np.float32).reshape(
+            -1,1)/np.power(10000, np.arange(0, num_hiddens, 2, dtype = np.float32) / num_hiddens)
+        self.P[:, :, 0::2] = np.sin(X)
+        self.P[:, :, 1::2] = np.cos(X)
+        
+    def call(self, X, **kwargs):
+        X = X + self.P[:, :X.shape[1], :]
+        return self.dropout(X, **kwargs)
+```
+
 In the positional embedding matrix $\mathbf{P}$,
 rows correspond to positions within a sequence
 and columns represent different positional encoding dimensions.
@@ -267,6 +313,16 @@ X = pos_encoding(d2l.zeros((1, num_steps, encoding_dim)))
 P = pos_encoding.P[:, :X.shape[1], :]
 d2l.plot(d2l.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
          figsize=(6, 2.5), legend=["Col %d" % d for d in d2l.arange(6, 10)])
+```
+
+```{.python .input}
+#@tab tensorflow
+encoding_dim, num_steps = 32, 60
+pos_encoding = PositionalEncoding(encoding_dim, 0)
+X = pos_encoding(tf.zeros((1, num_steps, encoding_dim)), training = False)
+P = pos_encoding.P[:, :X.shape[1], :]
+d2l.plot(np.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
+         figsize=(6, 2.5), legend=["Col %d" % d for d in np.arange(6, 10)])
 ```
 
 ### Absolute Positional Information
@@ -304,6 +360,13 @@ d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
 ```{.python .input}
 #@tab pytorch
 P = P[0, :, :].unsqueeze(0).unsqueeze(0)
+d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
+                  ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
+```
+
+```{.python .input}
+#@tab tensorflow
+P = tf.expand_dims(tf.expand_dims(P[0, :, :], axis = 0), axis = 0)
 d2l.show_heatmaps(P, xlabel='Column (encoding dimension)',
                   ylabel='Row (position)', figsize=(3.5, 4), cmap='Blues')
 ```
