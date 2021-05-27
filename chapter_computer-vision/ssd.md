@@ -266,9 +266,25 @@ we can still concatenate these two prediction outputs at two different scales fo
 concat_preds([Y1, Y2]).shape
 ```
 
-### Height and Width Downsample Block
+### Downsampling Block
 
-For multiscale object detection, we define the following `down_sample_blk` block, which reduces the height and width by 50%. This block consists of two $3\times3$ convolutional layers with a padding of 1 and a $2\times2$ maximum pooling layer with a stride of 2 connected in a series. As we know, $3\times3$ convolutional layers with a padding of 1 do not change the shape of feature maps. However, the subsequent pooling layer directly reduces the size of the feature map by half. Because $1\times 2+(3-1)+(3-1)=6$, each element in the output feature map has a receptive field on the input feature map of the shape $6\times6$. As you can see, the height and width downsample block enlarges the receptive field of each element in the output feature map.
+In order to detect objects at multiple scales,
+we define the following downsampling block `down_sample_blk` that
+halves the height and width of input feature maps.
+In fact,
+this block applies the design of VGG blocks
+in :numref:`subsec_vgg-blocks`.
+More concretely,
+each downsampling consists of 
+two $3\times3$ convolutional layers with padding of 1
+followed by a $2\times2$ maximum pooling layer with stride of 2.
+As we know, $3\times3$ convolutional layers with padding of 1 do not change the shape of feature maps.
+However, the subsequent $2\times2$ maximum pooling  reduces the height and width of input feature maps by half.
+For both input and output feature maps of this downsampling block,
+because $1\times 2+(3-1)+(3-1)=6$,
+each unit in the output
+has a $6\times6$ receptive field on the input.
+Therefore, the downsampling block enlarges the receptive field of each unit in its output feature maps.
 
 ```{.python .input}
 def down_sample_blk(num_channels):
@@ -295,7 +311,7 @@ def down_sample_blk(in_channels, out_channels):
     return nn.Sequential(*blk)
 ```
 
-By testing forward computation in the height and width downsample block, we can see that it changes the number of input channels and halves the height and width.
+In the following example, our constructed downsampling block changes the number of input channels and halves the height and width of the input feature maps.
 
 ```{.python .input}
 forward(np.zeros((2, 3, 20, 20)), down_sample_blk(10)).shape
@@ -308,7 +324,13 @@ forward(torch.zeros((2, 3, 20, 20)), down_sample_blk(3, 10)).shape
 
 ### Base Network Block
 
-The base network block is used to extract features from original images. To simplify the computation, we will construct a small base network. This network consists of three height and width downsample blocks connected in a series, so it doubles the number of channels at each step. When we input an original image with the shape $256\times256$, the base network block outputs a feature map with the shape $32 \times 32$.
+The base network block is used to extract features from input images.
+For simplicity,
+we construct a small base network
+consisting of three downsampling blocks 
+that double the number of channels at each block.
+Given a $256\times256$ input image,
+this base network block outputs $32 \times 32$ feature maps ($256/2^3=32$).
 
 ```{.python .input}
 def base_net():
