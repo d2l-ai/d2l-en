@@ -561,8 +561,9 @@ def cross_entropy(y_hat, y):
 ```{.python .input}
 #@tab tensorflow
 def cross_entropy(y_hat, y):
-    ce = -tf.math.log(y_hat[:, :len(y)])
-    return tf.reduce_mean(ce)
+    # `tf.gather_nd` is used to select specific indices of a tensor.
+    ce = -tf.math.log(tf.gather_nd(y_hat, indices = [[i, j] for i, j in zip(range(len(y_hat)), y)]))
+    return tf.reduce_mean(ce).numpy()
 ```
 
 Now define two tensors for the labels and predictions, and calculate the cross entropy loss of them.
@@ -662,12 +663,12 @@ loss
 ```{.python .input}
 #@tab tensorflow
 def nll_loss(y_hat, y):
-    # Convert labels to binary class matrix.
-    y = tf.keras.utils.to_categorical(y, num_classes=3)
-    # Since tf.keras.losses.binary_crossentropy returns the mean
-    # over the last axis, we calculate the sum here.
-    return tf.reduce_sum(
-        tf.keras.losses.binary_crossentropy(y, y_hat, from_logits=True))
+    # Convert labels to one-hot vectors.
+    y = tf.keras.utils.to_categorical(y, num_classes= y_hat.shape[1])
+    # We will not calculate Negative log likelihood (NLL) from the definition. Rather, we will follow a circular argument.
+    # Because NLL is same as `cross_entropy`, if we calculate cross_entropy that would give us NLL. 
+    cross_entropy = tf.keras.losses.CategoricalCrossentropy(from_logits = True, reduction = tf.keras.losses.Reduction.NONE)
+    return tf.reduce_mean(cross_entropy(y, y_hat)).numpy()
 
 loss = nll_loss(tf.math.log(preds), labels)
 loss
@@ -691,7 +692,6 @@ loss
     * Still being unhappy with the result, you replace the typesetter by a high quality language model. The language model can currently obtain a perplexity as low as $15$ points per word. The character *perplexity* of a language model is defined as the inverse of the geometric mean of a set of probabilities, each probability is corresponding to a character in the word. To be specific, if the length of a given word is $l$, then  $\mathrm{PPL}(\text{word}) = \left[\prod_i p(\text{character}_i)\right]^{ -\frac{1}{l}} = \exp \left[ - \frac{1}{l} \sum_i{\log p(\text{character}_i)} \right].$  Assume that the test word has 4.5 letters, how many bits of randomness per character do you observe now?
 1. Explain intuitively why $I(X, Y) = H(X) - H(X|Y)$.  Then, show this is true by expressing both sides as an expectation with respect to the joint distribution.
 1. What is the KL Divergence between the two Gaussian distributions $\mathcal{N}(\mu_1, \sigma_1^2)$ and $\mathcal{N}(\mu_2, \sigma_2^2)$?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/420)
