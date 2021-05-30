@@ -404,7 +404,15 @@ def get_blk(i):
     return blk
 ```
 
-Now, we will define the forward computation process for each module. In contrast to the previously-described convolutional neural networks, this module not only returns feature map `Y` output by convolutional computation, but also the anchor boxes of the current scale generated from `Y` and their predicted classes and offsets.
+Now we define the forward propagation
+for each block.
+Different from 
+in image classification tasks,
+outputs here include
+(i) CNN feature maps `Y`,
+(ii) anchor boxes generated using `Y` at the current scale,
+and (iii) classes and offsets predicted (based on `Y`)
+for these anchor boxes.
 
 ```{.python .input}
 def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
@@ -425,7 +433,25 @@ def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
     return (Y, anchors, cls_preds, bbox_preds)
 ```
 
-As we mentioned, the closer a multiscale feature block is to the top in :numref:`fig_ssd`, the larger the objects it detects and the larger the anchor boxes it must generate. Here, we first divide the interval from 0.2 to 1.05 into five equal parts to determine the sizes of smaller anchor boxes at different scales: 0.2, 0.37, 0.54, etc. Then, according to $\sqrt{0.2 \times 0.37} = 0.272$, $\sqrt{0.37 \times 0.54} = 0.447$, and similar formulas, we determine the sizes of larger anchor boxes at the different scales.
+Recall that 
+in :numref:`fig_ssd`
+a multiscale feature map block
+that is closer to the top
+is for detecting larger objects;
+thus, it needs to generate larger anchor boxes.
+In the above forward propagation,
+at each multiscale feature map block
+we pass in a list of two scale values
+via the `sizes` argument
+of the invoked `multibox_prior` function (described in :numref:`sec_anchor`).
+In the following,
+the interval between 0.2 and 1.05
+is split evenly
+into five sections to determine the
+smaller scale values at the five blocks: 0.2, 0.37, 0.54, 0.71, and 0.88.
+Then their larger scale values
+are given by
+$\sqrt{0.2 \times 0.37} = 0.272$, $\sqrt{0.37 \times 0.54} = 0.447$, and so on.
 
 ```{.python .input}
 #@tab all
@@ -435,7 +461,7 @@ ratios = [[1, 2, 0.5]] * 5
 num_anchors = len(sizes[0]) + len(ratios[0]) - 1
 ```
 
-Now, we can define the complete model, `TinySSD`.
+Now we can define the complete model `TinySSD` as follows.
 
 ```{.python .input}
 class TinySSD(nn.Block):
@@ -443,7 +469,7 @@ class TinySSD(nn.Block):
         super(TinySSD, self).__init__(**kwargs)
         self.num_classes = num_classes
         for i in range(5):
-            # The assignment statement is self.blk_i = get_blk(i)
+            # Equivalent to the assignment statement `self.blk_i = get_blk(i)`
             setattr(self, f'blk_{i}', get_blk(i))
             setattr(self, f'cls_{i}', cls_predictor(num_anchors, num_classes))
             setattr(self, f'bbox_{i}', bbox_predictor(num_anchors))
@@ -451,12 +477,10 @@ class TinySSD(nn.Block):
     def forward(self, X):
         anchors, cls_preds, bbox_preds = [None] * 5, [None] * 5, [None] * 5
         for i in range(5):
-            # getattr(self, 'blk_%d' % i) accesses self.blk_i
+            # Here `getattr(self, 'blk_%d' % i)` accesses `self.blk_i`
             X, anchors[i], cls_preds[i], bbox_preds[i] = blk_forward(
                 X, getattr(self, f'blk_{i}'), sizes[i], ratios[i],
                 getattr(self, f'cls_{i}'), getattr(self, f'bbox_{i}'))
-        # In the reshape function, 0 indicates that the batch size remains
-        # unchanged
         anchors = np.concatenate(anchors, axis=1)
         cls_preds = concat_preds(cls_preds)
         cls_preds = cls_preds.reshape(
@@ -473,7 +497,7 @@ class TinySSD(nn.Module):
         self.num_classes = num_classes
         idx_to_in_channels = [64, 128, 128, 128, 128]
         for i in range(5):
-            # The assignment statement is self.blk_i = get_blk(i)
+            # Equivalent to the assignment statement `self.blk_i = get_blk(i)`
             setattr(self, f'blk_{i}', get_blk(i))
             setattr(self, f'cls_{i}', cls_predictor(idx_to_in_channels[i],
                                                     num_anchors, num_classes))
@@ -483,12 +507,10 @@ class TinySSD(nn.Module):
     def forward(self, X):
         anchors, cls_preds, bbox_preds = [None] * 5, [None] * 5, [None] * 5
         for i in range(5):
-            # getattr(self, 'blk_%d' % i) accesses self.blk_i
+            # Here `getattr(self, 'blk_%d' % i)` accesses `self.blk_i`
             X, anchors[i], cls_preds[i], bbox_preds[i] = blk_forward(
                 X, getattr(self, f'blk_{i}'), sizes[i], ratios[i],
                 getattr(self, f'cls_{i}'), getattr(self, f'bbox_{i}'))
-        # In the reshape function, 0 indicates that the batch size remains
-        # unchanged
         anchors = torch.cat(anchors, dim=1)
         cls_preds = concat_preds(cls_preds)
         cls_preds = cls_preds.reshape(
@@ -497,7 +519,21 @@ class TinySSD(nn.Module):
         return anchors, cls_preds, bbox_preds
 ```
 
-We now create an SSD model instance and use it to perform forward computation on image minibatch `X`, which has a height and width of 256 pixels. As we verified previously, the first module outputs a feature map with the shape $32 \times 32$. Because modules two to four are height and width downsample blocks, module five is a global pooling layer, and each element in the feature map is used as the center for 4 anchor boxes, a total of $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ anchor boxes are generated for each image at the five scales.
+We create a model instance
+and use it to perform forward propagation
+on a minibatch of $256 \times 256$ images `X`.
+
+As shown earlier in this section,
+the first block outputs $32 \times 32$ feature maps.
+Recall that
+the second to fourth downsampling blocks
+halve the height and width
+and the fifth block uses global pooling.
+Since 4 anchor boxes 
+are generated for each unit along spatial dimensions
+of feature maps,
+at all the five scales
+a total of $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ anchor boxes are generated for each image.
 
 ```{.python .input}
 net = TinySSD(num_classes=1)
