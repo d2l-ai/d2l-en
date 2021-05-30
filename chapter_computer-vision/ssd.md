@@ -275,7 +275,7 @@ In fact,
 this block applies the design of VGG blocks
 in :numref:`subsec_vgg-blocks`.
 More concretely,
-each downsampling consists of 
+each downsampling block consists of 
 two $3\times3$ convolutional layers with padding of 1
 followed by a $2\times2$ maximum pooling layer with stride of 2.
 As we know, $3\times3$ convolutional layers with padding of 1 do not change the shape of feature maps.
@@ -356,12 +356,28 @@ forward(torch.zeros((2, 3, 256, 256)), base_net()).shape
 
 ### The Complete Model
 
-The SSD model contains a total of five modules. Each module outputs a feature
-map used to generate anchor boxes and predict the classes and offsets of
-these anchor boxes. The first module is the base network block, modules two to
-four are height and width downsample blocks, and the fifth module is a global
-maximum pooling layer that reduces the height and width to 1. Therefore, modules
-two to five are all multiscale feature blocks shown in :numref:`fig_ssd`.
+
+The complete
+single shot multibox detection model
+consists of five blocks.
+The feature maps produced by each block
+are used for both
+(i) generating anchor boxes
+and (ii) predicting classes and offsets of these anchor boxes.
+Among these five blocks,
+the first one
+is the base network block,
+the second to the fourth are
+downsampling blocks,
+and the last block
+uses global maximum pooling
+to reduce both the height and width to 1.
+Technically,
+the second to the fifth blocks
+are all
+those
+multiscale feature map blocks
+in :numref:`fig_ssd`.
 
 ```{.python .input}
 def get_blk(i):
