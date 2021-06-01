@@ -647,8 +647,9 @@ def calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels, bbox_masks):
 
 We can use accuracy to evaluate the classification results.
 Due to the used $L_1$ norm loss for the offsets,
-we use the *mean absolute error* to evaluate the bounding box prediction results.
-These results are obtained 
+we use the *mean absolute error* to evaluate the
+predicted bounding boxes.
+These prediction results are obtained 
 from the generated anchor boxes and the
 predicted offsets for them.
 
@@ -761,7 +762,14 @@ print(f'{len(train_iter.dataset) / timer.stop():.1f} examples/sec on '
 
 ## Prediction
 
-In the prediction stage, we want to detect all objects of interest in the image. Below, we read the test image and transform its size. Then, we convert it to the four-dimensional format required by the convolutional layer.
+During prediction, 
+the goal is to detect all the objects of interest
+on the image.
+Below
+we read and resize a test image,
+converting it to
+a four-dimensional tensor that is 
+required by convolutional layers.
 
 ```{.python .input}
 img = image.imread('../img/banana.jpg')
@@ -772,10 +780,15 @@ X = np.expand_dims(feature.transpose(2, 0, 1), axis=0)
 ```{.python .input}
 #@tab pytorch
 X = torchvision.io.read_image('../img/banana.jpg').unsqueeze(0).float()
-img = X.squeeze(0).permute(1,2,0).long()
+img = X.squeeze(0).permute(1, 2, 0).long()
 ```
 
-Using the `multibox_detection` function, we predict the bounding boxes based on the anchor boxes and their predicted offsets. Then, we use non-maximum suppression to remove similar bounding boxes.
+Using the `multibox_detection` function below,
+the predicted bounding boxes
+are obtained 
+from the anchor boxes and their predicted offsets.
+Then non-maximum suppression is used 
+to remove similar predicted bounding boxes.
 
 ```{.python .input}
 def predict(X):
@@ -801,7 +814,10 @@ def predict(X):
 output = predict(X)
 ```
 
-Finally, we take all the bounding boxes with a confidence level of at least 0.9 and display them as the final output.
+Finally, we display
+all the predicted bounding boxes with 
+confidence 0.9 or above
+as the output.
 
 ```{.python .input}
 def display(img, output, threshold):
