@@ -852,19 +852,14 @@ display(img, output.cpu(), threshold=0.9)
 
 ## Summary
 
-* SSD is a multiscale object detection model. This model generates different numbers of anchor boxes of different sizes based on the base network block and each multiscale feature block and predicts the classes and offsets of the anchor boxes to detect objects of different sizes.
-* During SSD model training, the loss function is calculated using the predicted and labeled class and offset values.
+* Single shot multibox detection is a multiscale object detection model. Via its base network and several multiscale feature map blocks, single-shot multibox detection generates a varying number of anchor boxes with different sizes, and detects varying-size objects by predicting classes and offsets of these anchor boxes (thus the bounding boxes).
+* When training the single-shot multibox detection model, the loss function is calculated based on the predicted and labeled values of the anchor box classes and offsets.
 
 
 
 ## Exercises
 
-1. Due to space limitations, we have ignored some of the implementation details of the SSD model in this experiment. Can you further improve the model in the following areas?
-
-
-### Loss Function
-
-A. For the predicted offsets, replace $L_1$ norm loss with $L_1$ regularization loss. This loss function uses a square function around zero for greater smoothness. This is the regularized area controlled by the hyperparameter $\sigma$:
+1. Can you improve the single-shot multibox detection by improving the loss function? For example, replace $L_1$ norm loss with smooth $L_1$ norm loss for the predicted offsets. This loss function uses a square function around zero for smoothness, which is controlled by the hyperparameter $\sigma$:
 
 $$
 f(x) =
@@ -874,7 +869,7 @@ f(x) =
     \end{cases}
 $$
 
-When $\sigma$ is large, this loss is similar to the $L_1$ norm loss. When the value is small, the loss function is smoother.
+When $\sigma$ is very large, this loss is similar to the $L_1$ norm loss. When its value is smaller, the loss function is smoother.
 
 ```{.python .input}
 sigmas = [10, 1, 0.5]
@@ -910,15 +905,18 @@ for l, s in zip(lines, sigmas):
 d2l.plt.legend();
 ```
 
-In the experiment, we used cross-entropy loss for class prediction. Now,
-assume that the prediction probability of the actual class $j$ is $p_j$ and
-the cross-entropy loss is $-\log p_j$. We can also use the focal loss
-:cite:`Lin.Goyal.Girshick.ea.2017`. Given the positive hyperparameters $\gamma$
-and $\alpha$, this loss is defined as:
+Besides, in the experiment we used cross-entropy loss for class prediction:
+denoting by $p_j$ the predicted probability for the ground-truth class $j$, the cross-entropy loss is $-\log p_j$. We can also use the focal loss
+:cite:`Lin.Goyal.Girshick.ea.2017`: given hyperparameters $\gamma > 0$
+and $\alpha > 0$, this loss is defined as:
 
 $$ - \alpha (1-p_j)^{\gamma} \log p_j.$$
 
-As you can see, by increasing $\gamma$, we can effectively reduce the loss when the probability of predicting the correct class is high.
+As we can see, increasing $\gamma$
+can effectively reduce the relative loss
+for well-classified examples (e.g., $p_j > 0.5$)
+so the training
+can focus more on those difficult examples that are misclassified.
 
 ```{.python .input}
 def focal_loss(gamma, x):
@@ -942,15 +940,13 @@ for l, gamma in zip(lines, [0, 1, 5]):
 d2l.plt.legend();
 ```
 
-### Training and Prediction
+2. Due to space limitations, we have omitted some implementation details of the single shot multibox detection model in this section. Can you further improve the model in the following aspects:
+  1. When an object is much smaller compared with the image, the model could resize the input image bigger.
+  1. There are typically a vast number of negative anchor boxes. To make the class distribution more balanced, we could downsample negative anchor boxes.
+  1. In the loss function, assign different weight hyperparameters to the class loss and the offset loss.
+  1. Use other methods to evaluate the object detection model, such as those in the single shot multibox detection paper :cite:`Liu.Anguelov.Erhan.ea.2016`.
+  
 
-B. When an object is relatively large compared to the image, the model normally adopts a larger input image size.
-
-C. This generally produces a large number of negative anchor boxes when labeling anchor box classes. We can sample the negative anchor boxes to better balance the data classes. To do this, we can define a `negative_mining_ratio` parameter in the `multibox_target` function.
-
-D. Assign hyperparameters with different weights to the anchor box class loss and positive anchor box offset loss in the loss function.
-
-E. Refer to the SSD paper. What methods can be used to evaluate the precision of object detection models :cite:`Liu.Anguelov.Erhan.ea.2016`?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/373)
