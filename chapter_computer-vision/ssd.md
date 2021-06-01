@@ -941,10 +941,10 @@ d2l.plt.legend();
 ```
 
 2. Due to space limitations, we have omitted some implementation details of the single shot multibox detection model in this section. Can you further improve the model in the following aspects:
-  1. When an object is much smaller compared with the image, the model could resize the input image bigger.
-  1. There are typically a vast number of negative anchor boxes. To make the class distribution more balanced, we could downsample negative anchor boxes.
-  1. In the loss function, assign different weight hyperparameters to the class loss and the offset loss.
-  1. Use other methods to evaluate the object detection model, such as those in the single shot multibox detection paper :cite:`Liu.Anguelov.Erhan.ea.2016`.
+    1. When an object is much smaller compared with the image, the model could resize the input image bigger.
+    1. There are typically a vast number of negative anchor boxes. To make the class distribution more balanced, we could downsample negative anchor boxes.
+    1. In the loss function, assign different weight hyperparameters to the class loss and the offset loss.
+    1. Use other methods to evaluate the object detection model, such as those in the single shot multibox detection paper :cite:`Liu.Anguelov.Erhan.ea.2016`.
   
 
 
