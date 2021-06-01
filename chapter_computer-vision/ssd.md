@@ -559,11 +559,17 @@ print('output bbox preds:', bbox_preds.shape)
 
 ## Training
 
-Now, we will explain, step by step, how to train the SSD model for object detection.
+Now we will explain 
+how to train the single shot multibox detection model
+for object detection.
 
-### Data Reading and Initialization
 
-We read the banana detection dataset we created in the previous section.
+### Reading the Dataset and Initializing the Model
+
+To begin with,
+let us read 
+the banana detection dataset
+described in :numref:`sec_object-detection-dataset`.
 
 ```{.python .input}
 #@tab all
@@ -571,7 +577,9 @@ batch_size = 32
 train_iter, _ = d2l.load_data_bananas(batch_size)
 ```
 
-There is 1 class in the banana detection dataset. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
+There is only one class in the banana detection dataset. After defining the model,
+we need to initialize its parameters and define
+the optimization algorithm.
 
 ```{.python .input}
 device, net = d2l.try_gpu(), TinySSD(num_classes=1)
@@ -588,7 +596,30 @@ trainer = torch.optim.SGD(net.parameters(), lr=0.2, weight_decay=5e-4)
 
 ### Defining Loss and Evaluation Functions
 
-Object detection is subject to two types of losses. The first is anchor box class loss. For this, we can simply reuse the cross-entropy loss function we used in image classification. The second loss is positive anchor box offset loss. Offset prediction is a normalization problem. However, here, we do not use the squared loss introduced previously. Rather, we use the $L_1$ norm loss, which is the absolute value of the difference between the predicted value and the ground-truth value. The mask variable `bbox_masks` removes negative anchor boxes and padding anchor boxes from the loss calculation. Finally, we add the anchor box class and offset losses to find the final loss function for the model.
+Object detection has two types of losses.
+The first loss concerns classes of anchor boxes:
+its computation
+can simply reuse 
+the cross-entropy loss function
+that we used for image classification.
+The second loss
+concerns offsets of positive (non-background) anchor boxes:
+this is a regression problem.
+For this regression problem,
+however,
+here we do not use the squared loss
+described in :numref:`subsec_normal_distribution_and_squared_loss`.
+Instead,
+we use the $L_1$ norm loss,
+the absolute value of the difference between
+the prediction and the ground-truth.
+The mask variable `bbox_masks` filters out
+negative anchor boxes and illegal (padded)
+anchor boxes in the loss calculation.
+In the end, we sum up
+the anchor box class loss
+and the anchor box offset loss
+to obtain the loss function for the model.
 
 ```{.python .input}
 cls_loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -614,12 +645,17 @@ def calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels, bbox_masks):
     return cls + bbox
 ```
 
-We can use the accuracy rate to evaluate the classification results. As we use the $L_1$ norm loss, we will use the average absolute error to evaluate the bounding box prediction results.
+We can use accuracy to evaluate the classification results.
+Due to the used $L_1$ norm loss for the offsets,
+we use the *mean absolute error* to evaluate the bounding box prediction results.
+These results are obtained 
+from the generated anchor boxes and the
+predicted offsets for them.
 
 ```{.python .input}
 def cls_eval(cls_preds, cls_labels):
-    # Because the class prediction results are placed in the final
-    # dimension, argmax must specify this dimension
+    # Because the class prediction results are on the final dimension,
+    # `argmax` needs to specify this dimension
     return float((cls_preds.argmax(axis=-1).astype(
         cls_labels.dtype) == cls_labels).sum())
 
@@ -630,8 +666,8 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
 ```{.python .input}
 #@tab pytorch
 def cls_eval(cls_preds, cls_labels):
-    # Because the class prediction results are placed in the final
-    # dimension, argmax must specify this dimension
+    # Because the class prediction results are on the final dimension,
+    # `argmax` needs to specify this dimension
     return float((cls_preds.argmax(dim=-1).type(
         cls_labels.dtype) == cls_labels).sum())
 
@@ -641,28 +677,38 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
 
 ### Training the Model
 
-During model training, we must generate multiscale anchor boxes (`anchors`) in the model's forward computation process and predict the class (`cls_preds`) and offset (`bbox_preds`) for each anchor box. Afterwards, we label the class (`cls_labels`) and offset (`bbox_labels`) of each generated anchor box based on the label information `Y`. Finally, we calculate the loss function using the predicted and labeled class and offset values. To simplify the code, we do not evaluate the training dataset here.
+When training the model,
+we need to generate multiscale anchor boxes (`anchors`)
+and predict their classes (`cls_preds`) and offsets (`bbox_preds`) in the forward propagation.
+Then we label the classes (`cls_labels`) and offsets (`bbox_labels`) of such generated anchor boxes
+based on the label information `Y`.
+Finally, we calculate the loss function
+using the predicted and labeled values
+of the classes and offsets.
+For concise implementations,
+evaluation of the test dataset is omitted here.
 
 ```{.python .input}
 num_epochs, timer = 20, d2l.Timer()
 animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                         legend=['class error', 'bbox mae'])
 for epoch in range(num_epochs):
-    # accuracy_sum, mae_sum, num_examples, num_labels
+    # Sum of training accuracy, no. of examples in sum of training accuracy,
+    # Sum of absolute error, no. of examples in sum of absolute error
     metric = d2l.Accumulator(4)
     for features, target in train_iter:
         timer.start()
         X = features.as_in_ctx(device)
         Y = target.as_in_ctx(device)
         with autograd.record():
-            # Generate multiscale anchor boxes and predict the class and
-            # offset of each
+            # Generate multiscale anchor boxes and predict their classes and
+            # offsets
             anchors, cls_preds, bbox_preds = net(X)
-            # Label the class and offset of each anchor box
+            # Label the classes and offsets of these anchor boxes
             bbox_labels, bbox_masks, cls_labels = d2l.multibox_target(anchors,
                                                                       Y)
             # Calculate the loss function using the predicted and labeled
-            # class and offset values
+            # values of the classes and offsets
             l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,
                           bbox_masks)
         l.backward()
@@ -684,20 +730,21 @@ animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                         legend=['class error', 'bbox mae'])
 net = net.to(device)
 for epoch in range(num_epochs):
-    # accuracy_sum, mae_sum, num_examples, num_labels
+    # Sum of training accuracy, no. of examples in sum of training accuracy,
+    # Sum of absolute error, no. of examples in sum of absolute error
     metric = d2l.Accumulator(4)
     net.train()
     for features, target in train_iter:
         timer.start()
         trainer.zero_grad()
         X, Y = features.to(device), target.to(device)
-        # Generate multiscale anchor boxes and predict the class and
-        # offset of each
+        # Generate multiscale anchor boxes and predict their classes and
+        # offsets
         anchors, cls_preds, bbox_preds = net(X)
-        # Label the class and offset of each anchor box
+        # Label the classes and offsets of these anchor boxes
         bbox_labels, bbox_masks, cls_labels = d2l.multibox_target(anchors, Y)
-        # Calculate the loss function using the predicted and labeled
-        # class and offset values
+        # Calculate the loss function using the predicted and labeled values
+        # of the classes and offsets
         l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,
                       bbox_masks)
         l.mean().backward()
