@@ -276,24 +276,17 @@ in subsequent sections of this chapter.
 
 ## Summary
 
-* An R-CNN model selects several proposed regions and uses a CNN to perform
-  forward computation and extract the features from each proposed region. It
-  then uses these features to predict the classes and bounding boxes of
-  proposed regions.
-* Fast R-CNN improves on the R-CNN by only performing CNN forward computation on
-  the image as a whole. It introduces a region of interest pooling layer to extract features
-  of the same shape from regions of interest of different shapes.
-* Faster R-CNN replaces the selective search used in Fast R-CNN with a region
-  proposal network. This reduces the number of proposed regions generated, while
-  ensuring precise object detection.
-* Mask R-CNN uses the same basic structure as Faster R-CNN, but adds a fully
-  convolution layer to help locate objects at the pixel level and further
-  improve the precision of object detection.
+
+* The R-CNN extracts many region proposals from the input image, uses a CNN to perform forward propagation on each region proposal to extract its features, then uses these features to predict the class and bounding box of this region proposal.
+* One of the major improvements of  the fast R-CNN from the R-CNN is that the CNN forward propagation is only performed on  the entire image. It also introduces the region of interest pooling layer, so that features of the same shape can be further extracted for regions of interest that have different shapes.
+* The faster R-CNN replaces the selective search used in the fast R-CNN with a jointly trained region proposal network, so that the former can stay accurate in object detection with a reduced number of region proposals.
+* Based on the faster R-CNN, the mask R-CNN additionally introduces a fully convolutional network, so as to leverage pixel-level labels to further improve the accuracy of object detection.
 
 
 ## Exercises
 
-1. Study the implementation of each model in the [GluonCV toolkit](https://github.com/dmlc/gluon-cv/) related to this section.
+1. Can we frame object detection as a single regression problem, such as predicting bounding boxes and class probabilities? You may refer to the design of the YOLO model :cite:`Redmon.Divvala.Girshick.ea.2016`.
+1. Compare single shot multibox detection with the methods introduced in this section. What are their major differences? You may refer to Figure 2 of :cite:`Zhao.Zheng.Xu.ea.2019`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/374)
