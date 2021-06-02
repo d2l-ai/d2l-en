@@ -25,6 +25,7 @@ with any modern deep learning framework by using loops and subroutines.
 
 
 ## (**VGG Blocks**)
+:label:`subsec_vgg-blocks`
 
 The basic building block of classic CNNs
 is a sequence of the following:

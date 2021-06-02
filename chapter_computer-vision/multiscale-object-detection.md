@@ -1,4 +1,6 @@
 # Multiscale Object Detection
+:label:`sec_multiscale-object-detection`
+
 
 In :numref:`sec_anchor`,
 we generated multiple anchor boxes centered on each pixel of an input image. 
@@ -90,7 +92,7 @@ the following function will *uniformly* sample
 pixels in `fmap_h` rows and `fmap_w` columns
 on any input image.
 Centered on these uniformly sampled pixels,
-anchor boxes of size `s` (assuming the length of the list `s` is 1) and different aspect ratios (`ratios`)
+anchor boxes of scale `s` (assuming the length of the list `s` is 1) and different aspect ratios (`ratios`)
 will be generated.
 
 ```{.python .input}
@@ -200,6 +202,14 @@ units of feature maps that are closer to the output layer
 have wider receptive fields,
 so they can detect larger objects from the input image.
 
+In a nutshell, we can leverage
+layerwise representations of images at multiple levels
+by deep neural networks
+for multiscale object detection.
+We will show how this works through a concrete example
+in :numref:`sec_ssd`.
+
+
 
 
 ## Summary
@@ -207,12 +217,15 @@ so they can detect larger objects from the input image.
 * At multiple scales, we can generate anchor boxes with different sizes to detect objects with different sizes.
 * By defining the shape of feature maps, we can determine centers of uniformly sampled anchor boxes on any image.
 * We use the information of the input image in a certain receptive field to predict the classes and offsets of the anchor boxes that are close to that receptive field on the input image.
+* Through deep learning, we can leverage its layerwise representations of images at multiple levels for multiscale object detection.
 
 
 ## Exercises
 
+1. According to our discussions in :numref:`sec_alexnet`, deep neural networks learn hierarchical features with increasing levels of abstraction for images. In multiscale object detection, do feature maps at different scales correspond to different levels of abstraction? Why or why not?
 1. At the first scale (`fmap_w=4, fmap_h=4`) in the experiments in :numref:`subsec_multiscale-anchor-boxes`, generate uniformly distributed anchor boxes that may overlap.
 1. Given a feature map variable with shape $1 \times c \times h \times w$, where $c$, $h$, and $w$ are the number of channels, height, and width of the feature maps, respectively. How can you transform this variable into the classes and offsets of anchor boxes? What is the shape of the output?
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/371)

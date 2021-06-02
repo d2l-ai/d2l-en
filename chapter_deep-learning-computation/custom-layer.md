@@ -190,8 +190,15 @@ class MyDense(tf.keras.Model):
         return tf.nn.relu(linear)
 ```
 
+:begin_tab:`mxnet, tensorflow`
 Next, we instantiate the `MyDense` class
 and access its model parameters.
+:end_tab:
+
+:begin_tab:`pytorch`
+Next, we instantiate the `MyLinear` class
+and access its model parameters.
+:end_tab:
 
 ```{.python .input}
 dense = MyDense(units=3, in_units=5)
@@ -200,8 +207,8 @@ dense.params
 
 ```{.python .input}
 #@tab pytorch
-dense = MyLinear(5, 3)
-dense.weight
+linear = MyLinear(5, 3)
+linear.weight
 ```
 
 ```{.python .input}
@@ -220,7 +227,7 @@ dense(np.random.uniform(size=(2, 5)))
 
 ```{.python .input}
 #@tab pytorch
-dense(torch.rand(2, 5))
+linear(torch.rand(2, 5))
 ```
 
 ```{.python .input}

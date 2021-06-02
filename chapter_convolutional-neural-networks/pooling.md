@@ -180,7 +180,6 @@ X = d2l.reshape(d2l.arange(16, dtype=d2l.float32), (1, 1, 4, 4))
 X
 ```
 
-
 ```{.python .input}
 #@tab tensorflow
 X = d2l.reshape(d2l.arange(16, dtype=d2l.float32), (1, 4, 4, 1))
@@ -233,8 +232,6 @@ pool2d = tf.keras.layers.MaxPool2D(pool_size=[3, 3], padding='valid',
 pool2d(X_padded)
 ```
 
-
-
 :begin_tab:`mxnet`
 Of course, we can specify an arbitrary rectangular pooling window
 and specify the padding and stride for height and width, respectively.
@@ -270,7 +267,6 @@ pool2d = tf.keras.layers.MaxPool2D(pool_size=[2, 3], padding='valid',
                                    strides=(2, 3))
 pool2d(X_padded)
 ```
-
 
 ## Multiple Channels
 

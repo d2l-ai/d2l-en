@@ -1,70 +1,131 @@
-# Single Shot Multibox Detection (SSD)
+# Single Shot Multibox Detection
 :label:`sec_ssd`
 
-In the previous few sections, we have introduced bounding boxes, anchor boxes,
-multiscale object detection, and datasets. Now, we will use this background
-knowledge to construct an object detection model: single shot multibox detection
-(SSD) :cite:`Liu.Anguelov.Erhan.ea.2016`. This quick and easy model is already
-widely used. Some of the design concepts and implementation details of this
-model are also applicable to other object detection models.
+In :numref:`sec_bbox`--:numref:`sec_object-detection-dataset`,
+we introduced bounding boxes, anchor boxes,
+multiscale object detection, and the dataset for object detection.
+Now we are ready to use such background
+knowledge to design an object detection model:
+single shot multibox detection
+(SSD) :cite:`Liu.Anguelov.Erhan.ea.2016`.
+This model is simple, fast, and widely used.
+Although this is just one of vast amounts of
+object detection models,
+some of the design principles
+and implementation details in this section
+are also applicable to other models.
 
 
 ## Model
 
-:numref:`fig_ssd` shows the design of an SSD model. The model's main components
-are a base network block and several multiscale feature blocks connected in a
-series. Here, the base network block is used to extract features of original
-images, and it generally takes the form of a deep convolutional neural
-network. The paper on SSDs chooses to place a truncated VGG before the
-classification layer :cite:`Liu.Anguelov.Erhan.ea.2016`, but this is now
-commonly replaced by ResNet. We can design the base network so that it outputs
-larger heights and widths. In this way, more anchor boxes are generated based on
-this feature map, allowing us to detect smaller objects. Next, each multiscale
-feature block reduces the height and width of the feature map provided by the
-previous layer (for example, it may reduce the sizes by half). The blocks then
-use each element in the feature map to expand the receptive field on the input
-image. In this way, the closer a multiscale feature block is to the top of
-:numref:`fig_ssd` the smaller its output feature map, and the fewer the anchor
-boxes that are generated based on the feature map. In addition, the closer a
-feature block is to the top, the larger the receptive field of each element in
-the feature map and the better suited it is to detect larger objects. As the SSD
-generates different numbers of anchor boxes of different sizes based on the base
-network block and each multiscale feature block and then predicts the categories
-and offsets (i.e., predicted bounding boxes) of the anchor boxes in order to
-detect objects of different sizes, SSD is a multiscale object detection model.
+:numref:`fig_ssd` provides an overview of 
+the design of single-shot multibox detection. 
+This model mainly consists of
+a base network
+followed by
+several multiscale feature map blocks.
+The base network
+is for extracting features from the input image,
+so it can use a deep CNN.
+For example,
+the original single-shot multibox detection paper
+adopts a VGG network truncated before the
+classification layer :cite:`Liu.Anguelov.Erhan.ea.2016`,
+while ResNet has also been commonly used.
+Through our design
+we can make the base network output
+larger feature maps
+so as to generate more anchor boxes 
+for detecting smaller objects.
+Subsequently,
+each multiscale feature map block
+reduces (e.g., by half)
+the height and width of the feature maps
+from the previous block,
+and enables each unit
+of the feature maps 
+to increase its receptive field on the input image.
 
-![The SSD is composed of a base network block and several multiscale feature blocks connected in a series. ](../img/ssd.svg)
+
+Recall the design
+of multiscale object detection
+through layerwise representations of images by
+deep neural networks
+in :numref:`sec_multiscale-object-detection`.
+Since
+multiscale feature maps closer to the top of :numref:`fig_ssd`
+are smaller but have larger receptive fields,
+they are suitable for detecting
+fewer but larger objects.
+
+In a nutshell,
+via its base network and several multiscale feature map blocks,
+single-shot multibox detection
+generates a varying number of anchor boxes with different sizes,
+and detects varying-size objects
+by predicting classes and offsets
+of these anchor boxes (thus the bounding boxes);
+thus, this is a multiscale object detection model.
+
+
+![As a multiscale object detection model, single-shot multibox detection mainly consists of a base network followed by several multiscale feature map blocks.](../img/ssd.svg)
 :label:`fig_ssd`
 
 
-Next, we will describe the implementation of the modules in :numref:`fig_ssd`. First, we need to discuss the implementation of category prediction and bounding box prediction.
+In the following,
+we will describe the implementation details
+of different blocks in :numref:`fig_ssd`. To begin with, we discuss how to implement
+the class and bounding box prediction.
 
-### Category Prediction Layer
 
-Set the number of object categories to $q$. In this case, the number of anchor
-box categories is $q+1$, with 0 indicating an anchor box that only contains
-background. For a certain scale, set the height and width of the feature map to
-$h$ and $w$, respectively. If we use each element as the center to generate $a$
-anchor boxes, we need to classify a total of $hwa$ anchor boxes. If we use a
-fully connected layer (FCN) for the output, this will likely result in an
-excessive number of model parameters. Recall how we used convolutional layer
-channels to output category predictions in :numref:`sec_nin`. SSD uses the
-same method to reduce the model complexity.
 
-Specifically, the category prediction layer uses a convolutional layer that
-maintains the input height and width. Thus, the output and input have a
-one-to-one correspondence to the spatial coordinates along the width and height
-of the feature map. Assuming that the output and input have the same spatial
-coordinates $(x, y)$, the channel for the coordinates $(x, y)$ on the output
-feature map contains the category predictions for all anchor boxes generated
-using the input feature map coordinates $(x, y)$ as the center. Therefore, there
-are $a(q+1)$ output channels, with the output channels indexed as $i(q+1) + j$
-($0 \leq j \leq q$) representing the predictions of the category index $j$ for
-the anchor box index $i$.
+### Class Prediction Layer
 
-Now, we will define a category prediction layer of this type. After we specify
-the parameters $a$ and $q$, it uses a $3\times3$ convolutional layer with a
-padding of 1. The heights and widths of the input and output of this
+Let the number of object classes be $q$.
+Then anchor boxes have $q+1$ classes,
+where class 0 is background.
+At some scale,
+suppose that the height and width of feature maps
+are $h$ and $w$, respectively.
+When $a$ anchor boxes
+are generated with
+each spatial position of these feature maps as their center,
+a total of $hwa$ anchor boxes need to be classified.
+This often makes classification with fully-connected layers infeasible due to likely
+heavy parameterization costs.
+Recall how we used channels of
+convolutional layers
+to predict classes in :numref:`sec_nin`.
+Single-shot multibox detection uses the
+same technique to reduce model complexity.
+
+Specifically,
+the class prediction layer uses a convolutional layer
+without altering width or height of feature maps.
+In this way,
+there can be a one-to-one correspondence
+between outputs and inputs
+at the same spatial dimensions (width and height)
+of feature maps.
+More concretely,
+channels of the output feature maps
+at any spatial position ($x$, $y$)
+represent class predictions
+for all the anchor boxes centered on
+($x$, $y$) of the input feature maps.
+To produce valid predictions,
+there must be $a(q+1)$ output channels,
+where for the same spatial position
+the output channel with index $i(q+1) + j$
+represents the prediction of
+the class $j$ ($0 \leq j \leq q$)
+for the anchor box $i$ ($0 \leq i < a$).
+
+Below we define such a class prediction layer,
+specifying $a$ and $q$ via arguments `num_anchors` and `num_classes`, respectively.
+This layer uses a $3\times3$ convolutional layer with a
+padding of 1.
+The width and height of the input and output of this
 convolutional layer remain unchanged.
 
 ```{.python .input}
@@ -96,7 +157,9 @@ def cls_predictor(num_inputs, num_anchors, num_classes):
 
 ### Bounding Box Prediction Layer
 
-The design of the bounding box prediction layer is similar to that of the category prediction layer. The only difference is that, here, we need to predict 4 offsets for each anchor box, rather than $q+1$ categories.
+The design of the bounding box prediction layer is similar to that of the class prediction layer.
+The only difference lies in the number of outputs for each anchor box: 
+here we need to predict four offsets rather than $q+1$ classes.
 
 ```{.python .input}
 def bbox_predictor(num_anchors):
@@ -111,9 +174,33 @@ def bbox_predictor(num_inputs, num_anchors):
 
 ### Concatenating Predictions for Multiple Scales
 
-As we mentioned, SSD uses feature maps based on multiple scales to generate anchor boxes and predict their categories and offsets. Because the shapes and number of anchor boxes centered on the same element differ for the feature maps of different scales, the prediction outputs at different scales may have different shapes.
+As we mentioned, single-shot multibox detection
+uses multiscale feature maps to generate anchor boxes and predict their classes and offsets.
+At different scales,
+the shapes of feature maps
+or the numbers of anchor boxes centered on the same unit
+may vary.
+Therefore,
+shapes of the prediction outputs
+at different scales may vary.
 
-In the following example, we use the same batch of data to construct feature maps of two different scales, `Y1` and `Y2`. Here, `Y2` has half the height and half the width of `Y1`. Using category prediction as an example, we assume that each element in the `Y1` and `Y2` feature maps generates five (Y1) or three (Y2) anchor boxes. When there are 10 object categories, the number of category prediction output channels is either $5\times(10+1)=55$ or $3\times(10+1)=33$. The format of the prediction output is (batch size, number of channels, height, width). As you can see, except for the batch size, the sizes of the other dimensions are different. Therefore, we must transform them into a consistent format and concatenate the predictions of the multiple scales to facilitate subsequent computation.
+In the following example,
+we construct feature maps at two different scales,
+`Y1` and `Y2`,
+for the same minibatch,
+where the height and width of `Y2`
+are half of those of `Y1`.
+Let us take class prediction as an example.
+Suppose that
+5 and 3 anchor boxes
+are generated for every unit in `Y1` and `Y2`, respectively.
+Suppose further that
+the number of object classes is 10.
+For feature maps `Y1` and `Y2`
+the numbers of channels in the class prediction outputs
+are $5\times(10+1)=55$ and $3\times(10+1)=33$, respectively,
+where either output shape is
+(batch size, number of channels, height, width).
 
 ```{.python .input}
 def forward(x, block):
@@ -122,7 +209,7 @@ def forward(x, block):
 
 Y1 = forward(np.zeros((2, 8, 20, 20)), cls_predictor(5, 10))
 Y2 = forward(np.zeros((2, 16, 10, 10)), cls_predictor(3, 10))
-(Y1.shape, Y2.shape)
+Y1.shape, Y2.shape
 ```
 
 ```{.python .input}
@@ -132,10 +219,25 @@ def forward(x, block):
 
 Y1 = forward(torch.zeros((2, 8, 20, 20)), cls_predictor(8, 5, 10))
 Y2 = forward(torch.zeros((2, 16, 10, 10)), cls_predictor(16, 3, 10))
-(Y1.shape, Y2.shape)
+Y1.shape, Y2.shape
 ```
 
-The channel dimension contains the predictions for all anchor boxes with the same center. We first move the channel dimension to the final dimension. Because the batch size is the same for all scales, we can convert the prediction results to binary format (batch size, height $\times$ width $\times$ number of channels) to facilitate subsequent concatenation on the $1^{\mathrm{st}}$ dimension.
+As we can see, except for the batch size dimension, 
+the other three dimensions all have different sizes.
+To concatenate these two prediction outputs for more efficient computation,
+we will transform these tensors into a more consistent format.
+
+Note that
+the channel dimension holds the predictions for
+anchor boxes with the same center.
+We first move this dimension to the innermost.
+Since the batch size remains the same for different scales,
+we can transform the prediction output
+into a two-dimensional tensor
+with shape (batch size, height $\times$ width $\times$ number of channels).
+Then we can concatenate
+such outputs at different scales
+along dimension 1.
 
 ```{.python .input}
 def flatten_pred(pred):
@@ -154,16 +256,35 @@ def concat_preds(preds):
     return torch.cat([flatten_pred(p) for p in preds], dim=1)
 ```
 
-Thus, regardless of the different shapes of `Y1` and `Y2`, we can still concatenate the prediction results for the two different scales of the same batch.
+In this way,
+even though `Y1` and `Y2` have different sizes
+in channels, heights, and widths,
+we can still concatenate these two prediction outputs at two different scales for the same minibatch.
 
 ```{.python .input}
 #@tab all
 concat_preds([Y1, Y2]).shape
 ```
 
-### Height and Width Downsample Block
+### Downsampling Block
 
-For multiscale object detection, we define the following `down_sample_blk` block, which reduces the height and width by 50%. This block consists of two $3\times3$ convolutional layers with a padding of 1 and a $2\times2$ maximum pooling layer with a stride of 2 connected in a series. As we know, $3\times3$ convolutional layers with a padding of 1 do not change the shape of feature maps. However, the subsequent pooling layer directly reduces the size of the feature map by half. Because $1\times 2+(3-1)+(3-1)=6$, each element in the output feature map has a receptive field on the input feature map of the shape $6\times6$. As you can see, the height and width downsample block enlarges the receptive field of each element in the output feature map.
+In order to detect objects at multiple scales,
+we define the following downsampling block `down_sample_blk` that
+halves the height and width of input feature maps.
+In fact,
+this block applies the design of VGG blocks
+in :numref:`subsec_vgg-blocks`.
+More concretely,
+each downsampling block consists of 
+two $3\times3$ convolutional layers with padding of 1
+followed by a $2\times2$ maximum pooling layer with stride of 2.
+As we know, $3\times3$ convolutional layers with padding of 1 do not change the shape of feature maps.
+However, the subsequent $2\times2$ maximum pooling  reduces the height and width of input feature maps by half.
+For both input and output feature maps of this downsampling block,
+because $1\times 2+(3-1)+(3-1)=6$,
+each unit in the output
+has a $6\times6$ receptive field on the input.
+Therefore, the downsampling block enlarges the receptive field of each unit in its output feature maps.
 
 ```{.python .input}
 def down_sample_blk(num_channels):
@@ -190,7 +311,7 @@ def down_sample_blk(in_channels, out_channels):
     return nn.Sequential(*blk)
 ```
 
-By testing forward computation in the height and width downsample block, we can see that it changes the number of input channels and halves the height and width.
+In the following example, our constructed downsampling block changes the number of input channels and halves the height and width of the input feature maps.
 
 ```{.python .input}
 forward(np.zeros((2, 3, 20, 20)), down_sample_blk(10)).shape
@@ -203,7 +324,13 @@ forward(torch.zeros((2, 3, 20, 20)), down_sample_blk(3, 10)).shape
 
 ### Base Network Block
 
-The base network block is used to extract features from original images. To simplify the computation, we will construct a small base network. This network consists of three height and width downsample blocks connected in a series, so it doubles the number of channels at each step. When we input an original image with the shape $256\times256$, the base network block outputs a feature map with the shape $32 \times 32$.
+The base network block is used to extract features from input images.
+For simplicity,
+we construct a small base network
+consisting of three downsampling blocks 
+that double the number of channels at each block.
+Given a $256\times256$ input image,
+this base network block outputs $32 \times 32$ feature maps ($256/2^3=32$).
 
 ```{.python .input}
 def base_net():
@@ -229,12 +356,28 @@ forward(torch.zeros((2, 3, 256, 256)), base_net()).shape
 
 ### The Complete Model
 
-The SSD model contains a total of five modules. Each module outputs a feature
-map used to generate anchor boxes and predict the categories and offsets of
-these anchor boxes. The first module is the base network block, modules two to
-four are height and width downsample blocks, and the fifth module is a global
-maximum pooling layer that reduces the height and width to 1. Therefore, modules
-two to five are all multiscale feature blocks shown in :numref:`fig_ssd`.
+
+The complete
+single shot multibox detection model
+consists of five blocks.
+The feature maps produced by each block
+are used for both
+(i) generating anchor boxes
+and (ii) predicting classes and offsets of these anchor boxes.
+Among these five blocks,
+the first one
+is the base network block,
+the second to the fourth are
+downsampling blocks,
+and the last block
+uses global maximum pooling
+to reduce both the height and width to 1.
+Technically,
+the second to the fifth blocks
+are all
+those
+multiscale feature map blocks
+in :numref:`fig_ssd`.
 
 ```{.python .input}
 def get_blk(i):
@@ -261,7 +404,15 @@ def get_blk(i):
     return blk
 ```
 
-Now, we will define the forward computation process for each module. In contrast to the previously-described convolutional neural networks, this module not only returns feature map `Y` output by convolutional computation, but also the anchor boxes of the current scale generated from `Y` and their predicted categories and offsets.
+Now we define the forward propagation
+for each block.
+Different from 
+in image classification tasks,
+outputs here include
+(i) CNN feature maps `Y`,
+(ii) anchor boxes generated using `Y` at the current scale,
+and (iii) classes and offsets predicted (based on `Y`)
+for these anchor boxes.
 
 ```{.python .input}
 def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
@@ -282,7 +433,25 @@ def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
     return (Y, anchors, cls_preds, bbox_preds)
 ```
 
-As we mentioned, the closer a multiscale feature block is to the top in :numref:`fig_ssd`, the larger the objects it detects and the larger the anchor boxes it must generate. Here, we first divide the interval from 0.2 to 1.05 into five equal parts to determine the sizes of smaller anchor boxes at different scales: 0.2, 0.37, 0.54, etc. Then, according to $\sqrt{0.2 \times 0.37} = 0.272$, $\sqrt{0.37 \times 0.54} = 0.447$, and similar formulas, we determine the sizes of larger anchor boxes at the different scales.
+Recall that 
+in :numref:`fig_ssd`
+a multiscale feature map block
+that is closer to the top
+is for detecting larger objects;
+thus, it needs to generate larger anchor boxes.
+In the above forward propagation,
+at each multiscale feature map block
+we pass in a list of two scale values
+via the `sizes` argument
+of the invoked `multibox_prior` function (described in :numref:`sec_anchor`).
+In the following,
+the interval between 0.2 and 1.05
+is split evenly
+into five sections to determine the
+smaller scale values at the five blocks: 0.2, 0.37, 0.54, 0.71, and 0.88.
+Then their larger scale values
+are given by
+$\sqrt{0.2 \times 0.37} = 0.272$, $\sqrt{0.37 \times 0.54} = 0.447$, and so on.
 
 ```{.python .input}
 #@tab all
@@ -292,7 +461,7 @@ ratios = [[1, 2, 0.5]] * 5
 num_anchors = len(sizes[0]) + len(ratios[0]) - 1
 ```
 
-Now, we can define the complete model, `TinySSD`.
+Now we can define the complete model `TinySSD` as follows.
 
 ```{.python .input}
 class TinySSD(nn.Block):
@@ -300,7 +469,7 @@ class TinySSD(nn.Block):
         super(TinySSD, self).__init__(**kwargs)
         self.num_classes = num_classes
         for i in range(5):
-            # The assignment statement is self.blk_i = get_blk(i)
+            # Equivalent to the assignment statement `self.blk_i = get_blk(i)`
             setattr(self, f'blk_{i}', get_blk(i))
             setattr(self, f'cls_{i}', cls_predictor(num_anchors, num_classes))
             setattr(self, f'bbox_{i}', bbox_predictor(num_anchors))
@@ -308,12 +477,10 @@ class TinySSD(nn.Block):
     def forward(self, X):
         anchors, cls_preds, bbox_preds = [None] * 5, [None] * 5, [None] * 5
         for i in range(5):
-            # getattr(self, 'blk_%d' % i) accesses self.blk_i
+            # Here `getattr(self, 'blk_%d' % i)` accesses `self.blk_i`
             X, anchors[i], cls_preds[i], bbox_preds[i] = blk_forward(
                 X, getattr(self, f'blk_{i}'), sizes[i], ratios[i],
                 getattr(self, f'cls_{i}'), getattr(self, f'bbox_{i}'))
-        # In the reshape function, 0 indicates that the batch size remains
-        # unchanged
         anchors = np.concatenate(anchors, axis=1)
         cls_preds = concat_preds(cls_preds)
         cls_preds = cls_preds.reshape(
@@ -330,7 +497,7 @@ class TinySSD(nn.Module):
         self.num_classes = num_classes
         idx_to_in_channels = [64, 128, 128, 128, 128]
         for i in range(5):
-            # The assignment statement is self.blk_i = get_blk(i)
+            # Equivalent to the assignment statement `self.blk_i = get_blk(i)`
             setattr(self, f'blk_{i}', get_blk(i))
             setattr(self, f'cls_{i}', cls_predictor(idx_to_in_channels[i],
                                                     num_anchors, num_classes))
@@ -340,12 +507,10 @@ class TinySSD(nn.Module):
     def forward(self, X):
         anchors, cls_preds, bbox_preds = [None] * 5, [None] * 5, [None] * 5
         for i in range(5):
-            # getattr(self, 'blk_%d' % i) accesses self.blk_i
+            # Here `getattr(self, 'blk_%d' % i)` accesses `self.blk_i`
             X, anchors[i], cls_preds[i], bbox_preds[i] = blk_forward(
                 X, getattr(self, f'blk_{i}'), sizes[i], ratios[i],
                 getattr(self, f'cls_{i}'), getattr(self, f'bbox_{i}'))
-        # In the reshape function, 0 indicates that the batch size remains
-        # unchanged
         anchors = torch.cat(anchors, dim=1)
         cls_preds = concat_preds(cls_preds)
         cls_preds = cls_preds.reshape(
@@ -354,7 +519,21 @@ class TinySSD(nn.Module):
         return anchors, cls_preds, bbox_preds
 ```
 
-We now create an SSD model instance and use it to perform forward computation on image minibatch `X`, which has a height and width of 256 pixels. As we verified previously, the first module outputs a feature map with the shape $32 \times 32$. Because modules two to four are height and width downsample blocks, module five is a global pooling layer, and each element in the feature map is used as the center for 4 anchor boxes, a total of $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ anchor boxes are generated for each image at the five scales.
+We create a model instance
+and use it to perform forward propagation
+on a minibatch of $256 \times 256$ images `X`.
+
+As shown earlier in this section,
+the first block outputs $32 \times 32$ feature maps.
+Recall that
+the second to fourth downsampling blocks
+halve the height and width
+and the fifth block uses global pooling.
+Since 4 anchor boxes 
+are generated for each unit along spatial dimensions
+of feature maps,
+at all the five scales
+a total of $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ anchor boxes are generated for each image.
 
 ```{.python .input}
 net = TinySSD(num_classes=1)
@@ -380,11 +559,17 @@ print('output bbox preds:', bbox_preds.shape)
 
 ## Training
 
-Now, we will explain, step by step, how to train the SSD model for object detection.
+Now we will explain 
+how to train the single shot multibox detection model
+for object detection.
 
-### Data Reading and Initialization
 
-We read the banana detection dataset we created in the previous section.
+### Reading the Dataset and Initializing the Model
+
+To begin with,
+let us read 
+the banana detection dataset
+described in :numref:`sec_object-detection-dataset`.
 
 ```{.python .input}
 #@tab all
@@ -392,7 +577,9 @@ batch_size = 32
 train_iter, _ = d2l.load_data_bananas(batch_size)
 ```
 
-There is 1 category in the banana detection dataset. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
+There is only one class in the banana detection dataset. After defining the model,
+we need to initialize its parameters and define
+the optimization algorithm.
 
 ```{.python .input}
 device, net = d2l.try_gpu(), TinySSD(num_classes=1)
@@ -409,7 +596,30 @@ trainer = torch.optim.SGD(net.parameters(), lr=0.2, weight_decay=5e-4)
 
 ### Defining Loss and Evaluation Functions
 
-Object detection is subject to two types of losses. The first is anchor box category loss. For this, we can simply reuse the cross-entropy loss function we used in image classification. The second loss is positive anchor box offset loss. Offset prediction is a normalization problem. However, here, we do not use the squared loss introduced previously. Rather, we use the $L_1$ norm loss, which is the absolute value of the difference between the predicted value and the ground-truth value. The mask variable `bbox_masks` removes negative anchor boxes and padding anchor boxes from the loss calculation. Finally, we add the anchor box category and offset losses to find the final loss function for the model.
+Object detection has two types of losses.
+The first loss concerns classes of anchor boxes:
+its computation
+can simply reuse 
+the cross-entropy loss function
+that we used for image classification.
+The second loss
+concerns offsets of positive (non-background) anchor boxes:
+this is a regression problem.
+For this regression problem,
+however,
+here we do not use the squared loss
+described in :numref:`subsec_normal_distribution_and_squared_loss`.
+Instead,
+we use the $L_1$ norm loss,
+the absolute value of the difference between
+the prediction and the ground-truth.
+The mask variable `bbox_masks` filters out
+negative anchor boxes and illegal (padded)
+anchor boxes in the loss calculation.
+In the end, we sum up
+the anchor box class loss
+and the anchor box offset loss
+to obtain the loss function for the model.
 
 ```{.python .input}
 cls_loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -435,12 +645,18 @@ def calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels, bbox_masks):
     return cls + bbox
 ```
 
-We can use the accuracy rate to evaluate the classification results. As we use the $L_1$ norm loss, we will use the average absolute error to evaluate the bounding box prediction results.
+We can use accuracy to evaluate the classification results.
+Due to the used $L_1$ norm loss for the offsets,
+we use the *mean absolute error* to evaluate the
+predicted bounding boxes.
+These prediction results are obtained 
+from the generated anchor boxes and the
+predicted offsets for them.
 
 ```{.python .input}
 def cls_eval(cls_preds, cls_labels):
-    # Because the category prediction results are placed in the final
-    # dimension, argmax must specify this dimension
+    # Because the class prediction results are on the final dimension,
+    # `argmax` needs to specify this dimension
     return float((cls_preds.argmax(axis=-1).astype(
         cls_labels.dtype) == cls_labels).sum())
 
@@ -451,8 +667,8 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
 ```{.python .input}
 #@tab pytorch
 def cls_eval(cls_preds, cls_labels):
-    # Because the category prediction results are placed in the final
-    # dimension, argmax must specify this dimension
+    # Because the class prediction results are on the final dimension,
+    # `argmax` needs to specify this dimension
     return float((cls_preds.argmax(dim=-1).type(
         cls_labels.dtype) == cls_labels).sum())
 
@@ -462,28 +678,38 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
 
 ### Training the Model
 
-During model training, we must generate multiscale anchor boxes (`anchors`) in the model's forward computation process and predict the category (`cls_preds`) and offset (`bbox_preds`) for each anchor box. Afterwards, we label the category (`cls_labels`) and offset (`bbox_labels`) of each generated anchor box based on the label information `Y`. Finally, we calculate the loss function using the predicted and labeled category and offset values. To simplify the code, we do not evaluate the training dataset here.
+When training the model,
+we need to generate multiscale anchor boxes (`anchors`)
+and predict their classes (`cls_preds`) and offsets (`bbox_preds`) in the forward propagation.
+Then we label the classes (`cls_labels`) and offsets (`bbox_labels`) of such generated anchor boxes
+based on the label information `Y`.
+Finally, we calculate the loss function
+using the predicted and labeled values
+of the classes and offsets.
+For concise implementations,
+evaluation of the test dataset is omitted here.
 
 ```{.python .input}
 num_epochs, timer = 20, d2l.Timer()
 animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                         legend=['class error', 'bbox mae'])
 for epoch in range(num_epochs):
-    # accuracy_sum, mae_sum, num_examples, num_labels
+    # Sum of training accuracy, no. of examples in sum of training accuracy,
+    # Sum of absolute error, no. of examples in sum of absolute error
     metric = d2l.Accumulator(4)
     for features, target in train_iter:
         timer.start()
         X = features.as_in_ctx(device)
         Y = target.as_in_ctx(device)
         with autograd.record():
-            # Generate multiscale anchor boxes and predict the category and
-            # offset of each
+            # Generate multiscale anchor boxes and predict their classes and
+            # offsets
             anchors, cls_preds, bbox_preds = net(X)
-            # Label the category and offset of each anchor box
+            # Label the classes and offsets of these anchor boxes
             bbox_labels, bbox_masks, cls_labels = d2l.multibox_target(anchors,
                                                                       Y)
             # Calculate the loss function using the predicted and labeled
-            # category and offset values
+            # values of the classes and offsets
             l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,
                           bbox_masks)
         l.backward()
@@ -505,20 +731,21 @@ animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
                         legend=['class error', 'bbox mae'])
 net = net.to(device)
 for epoch in range(num_epochs):
-    # accuracy_sum, mae_sum, num_examples, num_labels
+    # Sum of training accuracy, no. of examples in sum of training accuracy,
+    # Sum of absolute error, no. of examples in sum of absolute error
     metric = d2l.Accumulator(4)
     net.train()
     for features, target in train_iter:
         timer.start()
         trainer.zero_grad()
         X, Y = features.to(device), target.to(device)
-        # Generate multiscale anchor boxes and predict the category and
-        # offset of each
+        # Generate multiscale anchor boxes and predict their classes and
+        # offsets
         anchors, cls_preds, bbox_preds = net(X)
-        # Label the category and offset of each anchor box
+        # Label the classes and offsets of these anchor boxes
         bbox_labels, bbox_masks, cls_labels = d2l.multibox_target(anchors, Y)
-        # Calculate the loss function using the predicted and labeled
-        # category and offset values
+        # Calculate the loss function using the predicted and labeled values
+        # of the classes and offsets
         l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,
                       bbox_masks)
         l.mean().backward()
@@ -535,7 +762,14 @@ print(f'{len(train_iter.dataset) / timer.stop():.1f} examples/sec on '
 
 ## Prediction
 
-In the prediction stage, we want to detect all objects of interest in the image. Below, we read the test image and transform its size. Then, we convert it to the four-dimensional format required by the convolutional layer.
+During prediction, 
+the goal is to detect all the objects of interest
+on the image.
+Below
+we read and resize a test image,
+converting it to
+a four-dimensional tensor that is 
+required by convolutional layers.
 
 ```{.python .input}
 img = image.imread('../img/banana.jpg')
@@ -546,10 +780,15 @@ X = np.expand_dims(feature.transpose(2, 0, 1), axis=0)
 ```{.python .input}
 #@tab pytorch
 X = torchvision.io.read_image('../img/banana.jpg').unsqueeze(0).float()
-img = X.squeeze(0).permute(1,2,0).long()
+img = X.squeeze(0).permute(1, 2, 0).long()
 ```
 
-Using the `multibox_detection` function, we predict the bounding boxes based on the anchor boxes and their predicted offsets. Then, we use non-maximum suppression to remove similar bounding boxes.
+Using the `multibox_detection` function below,
+the predicted bounding boxes
+are obtained 
+from the anchor boxes and their predicted offsets.
+Then non-maximum suppression is used 
+to remove similar predicted bounding boxes.
 
 ```{.python .input}
 def predict(X):
@@ -575,7 +814,10 @@ def predict(X):
 output = predict(X)
 ```
 
-Finally, we take all the bounding boxes with a confidence level of at least 0.9 and display them as the final output.
+Finally, we display
+all the predicted bounding boxes with 
+confidence 0.9 or above
+as the output.
 
 ```{.python .input}
 def display(img, output, threshold):
@@ -610,19 +852,14 @@ display(img, output.cpu(), threshold=0.9)
 
 ## Summary
 
-* SSD is a multiscale object detection model. This model generates different numbers of anchor boxes of different sizes based on the base network block and each multiscale feature block and predicts the categories and offsets of the anchor boxes to detect objects of different sizes.
-* During SSD model training, the loss function is calculated using the predicted and labeled category and offset values.
+* Single shot multibox detection is a multiscale object detection model. Via its base network and several multiscale feature map blocks, single-shot multibox detection generates a varying number of anchor boxes with different sizes, and detects varying-size objects by predicting classes and offsets of these anchor boxes (thus the bounding boxes).
+* When training the single-shot multibox detection model, the loss function is calculated based on the predicted and labeled values of the anchor box classes and offsets.
 
 
 
 ## Exercises
 
-1. Due to space limitations, we have ignored some of the implementation details of the SSD model in this experiment. Can you further improve the model in the following areas?
-
-
-### Loss Function
-
-A. For the predicted offsets, replace $L_1$ norm loss with $L_1$ regularization loss. This loss function uses a square function around zero for greater smoothness. This is the regularized area controlled by the hyperparameter $\sigma$:
+1. Can you improve the single-shot multibox detection by improving the loss function? For example, replace $L_1$ norm loss with smooth $L_1$ norm loss for the predicted offsets. This loss function uses a square function around zero for smoothness, which is controlled by the hyperparameter $\sigma$:
 
 $$
 f(x) =
@@ -632,7 +869,7 @@ f(x) =
     \end{cases}
 $$
 
-When $\sigma$ is large, this loss is similar to the $L_1$ norm loss. When the value is small, the loss function is smoother.
+When $\sigma$ is very large, this loss is similar to the $L_1$ norm loss. When its value is smaller, the loss function is smoother.
 
 ```{.python .input}
 sigmas = [10, 1, 0.5]
@@ -668,15 +905,18 @@ for l, s in zip(lines, sigmas):
 d2l.plt.legend();
 ```
 
-In the experiment, we used cross-entropy loss for category prediction. Now,
-assume that the prediction probability of the actual category $j$ is $p_j$ and
-the cross-entropy loss is $-\log p_j$. We can also use the focal loss
-:cite:`Lin.Goyal.Girshick.ea.2017`. Given the positive hyperparameters $\gamma$
-and $\alpha$, this loss is defined as:
+Besides, in the experiment we used cross-entropy loss for class prediction:
+denoting by $p_j$ the predicted probability for the ground-truth class $j$, the cross-entropy loss is $-\log p_j$. We can also use the focal loss
+:cite:`Lin.Goyal.Girshick.ea.2017`: given hyperparameters $\gamma > 0$
+and $\alpha > 0$, this loss is defined as:
 
 $$ - \alpha (1-p_j)^{\gamma} \log p_j.$$
 
-As you can see, by increasing $\gamma$, we can effectively reduce the loss when the probability of predicting the correct category is high.
+As we can see, increasing $\gamma$
+can effectively reduce the relative loss
+for well-classified examples (e.g., $p_j > 0.5$)
+so the training
+can focus more on those difficult examples that are misclassified.
 
 ```{.python .input}
 def focal_loss(gamma, x):
@@ -700,15 +940,13 @@ for l, gamma in zip(lines, [0, 1, 5]):
 d2l.plt.legend();
 ```
 
-### Training and Prediction
+2. Due to space limitations, we have omitted some implementation details of the single shot multibox detection model in this section. Can you further improve the model in the following aspects:
+    1. When an object is much smaller compared with the image, the model could resize the input image bigger.
+    1. There are typically a vast number of negative anchor boxes. To make the class distribution more balanced, we could downsample negative anchor boxes.
+    1. In the loss function, assign different weight hyperparameters to the class loss and the offset loss.
+    1. Use other methods to evaluate the object detection model, such as those in the single shot multibox detection paper :cite:`Liu.Anguelov.Erhan.ea.2016`.
+  
 
-B. When an object is relatively large compared to the image, the model normally adopts a larger input image size.
-
-C. This generally produces a large number of negative anchor boxes when labeling anchor box categories. We can sample the negative anchor boxes to better balance the data categories. To do this, we can define a `negative_mining_ratio` parameter in the `multibox_target` function.
-
-D. Assign hyperparameters with different weights to the anchor box category loss and positive anchor box offset loss in the loss function.
-
-E. Refer to the SSD paper. What methods can be used to evaluate the precision of object detection models :cite:`Liu.Anguelov.Erhan.ea.2016`?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/373)
