@@ -20,41 +20,43 @@ focus on the design of these models.
 
 ## R-CNNs
 
-R-CNN models first select several proposed regions from an image (for example,
-anchor boxes are one type of selection method) and then label their classes
-and bounding boxes (e.g., offsets). Then, they use a CNN to perform forward
-computation to extract features from each proposed area. Afterwards, we use the
-features of each proposed region to predict their classes and bounding
-boxes. :numref:`fig_r-cnn` shows an R-CNN model.
 
-![R-CNN model. ](../img/r-cnn.svg)
+The R-CNN first extracts
+many (e.g., 2000) *region proposals*
+from the input image
+(e.g., anchor boxes can also be considered
+as region proposals),
+labeling their classes and bounding boxes (e.g., offsets).
+Then a CNN is used to 
+perform forward propagation on each region proposal
+to extract its features.
+Next, features of each region proposal
+are used for
+predicting the class and bounding box
+of this region proposal.
+:numref:`fig_r-cnn` shows the R-CNN model.
+
+
+![The R-CNN model.](../img/r-cnn.svg)
 :label:`fig_r-cnn`
 
-Specifically, R-CNNs are composed of four main parts:
+More concretely, the R-CNN consists of the following four steps:
 
-1. Selective search is performed on the input image to select multiple
-   high-quality proposed regions
-   :cite:`Uijlings.Van-De-Sande.Gevers.ea.2013`. These proposed regions are
-   generally selected on multiple scales and have different shapes and
-   sizes. The class and ground-truth bounding box of each proposed region is
-   labeled.
-1. A pretrained CNN is selected and placed, in truncated form, before the
-   output layer. It transforms each proposed region into the input dimensions
-   required by the network and uses forward computation to output the features
-   extracted from the proposed regions.
-1. The features and labeled class of each proposed region are combined as an
-   example to train multiple support vector machines for object
-   classification. Here, each support vector machine is used to determine
-   whether an example belongs to a certain class.
-1. The features and labeled bounding box of each proposed region are combined as
-   an example to train a linear regression model for ground-truth bounding box
-   prediction.
+1. Perform *selective search* to extract multiple high-quality region proposals on the input image :cite:`Uijlings.Van-De-Sande.Gevers.ea.2013`. These proposed regions are usually selected at multiple scales with different shapes and sizes. Each region proposal will be labeled with a class and a ground-truth bounding box.
+1. Choose a pretrained CNN and truncate it before the output layer. Resize each region proposal to the input size required by the network, and output the extracted features for the region proposal through forward propagation. 
+1. Take the extracted features and labeled class of each region proposal as an example. Train multiple support vector machines to classify objects, where each support vector machine individually determines whether the example contains a specific class.
+1. Take the extracted features and labeled bounding box of each region proposal as an example. Train a linear regression model to predict the ground-truth bounding box.
 
-Although R-CNN models use pretrained CNNs to effectively extract image
-features, the main downside is the slow speed. As you can imagine, we can select
-thousands of proposed regions from a single image, requiring thousands of
-forward computations from the CNN to perform object detection. This massive
-computing load means that R-CNNs are not widely used in actual applications.
+
+Although the R-CNN model uses pretrained CNNs to effectively extract image features, 
+it is slow.
+Imagine that we select
+thousands of region proposals from a single input image:
+this requires thousands of
+CNN forward propagations to perform object detection.
+This massive
+computing load makes it infeasible to
+widely use R-CNNs in real-world applications.
 
 
 ## Fast R-CNN
@@ -65,7 +67,7 @@ of overlap, independent feature extraction results in a high volume of
 repetitive computations. Fast R-CNN improves on the R-CNN by only performing CNN
 forward computation on the image as a whole.
 
-![Fast R-CNN model. ](../img/fast-rcnn.svg)
+![The fast R-CNN model.](../img/fast-rcnn.svg)
 :label:`fig_fast_r-cnn`
 
 :numref:`fig_fast_r-cnn` shows a Fast R-CNN model. Its primary computation
@@ -109,7 +111,7 @@ single $2\times 2$ output. When we divide the region into four sub-windows, they
 respectively contain the elements 0, 1, 4, and 5 (5 is the largest); 2 and 6 (6
 is the largest); 8 and 9 (9 is the largest); and 10.
 
-![$2\times 2$ RoI pooling layer. ](../img/roi.svg)
+![A $2\times 2$ RoI pooling layer.](../img/roi.svg)
 :label:`fig_roi`
 
 :begin_tab:`mxnet`
@@ -165,7 +167,7 @@ torchvision.ops.roi_pool(X, rois, output_size=(2, 2), spatial_scale=0.1)
 In order to obtain precise object detection results, Fast R-CNN generally requires that many proposed regions be generated in selective search. Faster R-CNN replaces selective search with a region proposal network. This reduces the number of proposed regions generated, while ensuring precise object detection.
 
 
-![Faster R-CNN model. ](../img/faster-rcnn.svg)
+![The faster R-CNN model.](../img/faster-rcnn.svg)
 :label:`fig_faster_r-cnn`
 
 
@@ -204,7 +206,7 @@ object detection.
 
 If training data is labeled with the pixel-level positions of each object in an image, a Mask R-CNN model can effectively use these detailed labels to further improve the precision of object detection.
 
-![Mask R-CNN model. ](../img/mask-rcnn.svg)
+![The mask R-CNN model.](../img/mask-rcnn.svg)
 :label:`fig_mask_r-cnn`
 
 As shown in :numref:`fig_mask_r-cnn`, Mask R-CNN is a modification to the Faster
