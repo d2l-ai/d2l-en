@@ -184,42 +184,56 @@ torchvision.ops.roi_pool(X, rois, output_size=(2, 2), spatial_scale=0.1)
 
 ## Faster R-CNN
 
-In order to obtain precise object detection results, Fast R-CNN generally requires that many proposed regions be generated in selective search. Faster R-CNN replaces selective search with a region proposal network. This reduces the number of proposed regions generated, while ensuring precise object detection.
+To be more accurate in object detection,
+the fast R-CNN model
+usually has to generate 
+a lot of region proposals in selective search.
+To reduce region proposals
+without loss of accuracy,
+the *faster R-CNN*
+proposes to replace selective search with a *region proposal network*.
+
 
 
 ![The faster R-CNN model.](../img/faster-rcnn.svg)
 :label:`fig_faster_r-cnn`
 
 
-:numref:`fig_faster_r-cnn` shows a *Faster R-CNN* model. Compared to Fast R-CNN,
-Faster R-CNN only changes the method for generating proposed regions from
-selective search to region proposal network. The other parts of the model remain
-unchanged. The detailed region proposal network computation process is described
-below:
+:numref:`fig_faster_r-cnn` shows the faster R-CNN model. Compared with the fast R-CNN,
+the faster R-CNN only changes
+the region proposal method
+from selective search to a region proposal network.
+The rest of the model remain
+unchanged.
+The region proposal network 
+works in the following steps:
 
-1. We use a $3\times 3$ convolutional layer with a padding of 1 to transform the
-   CNN output and set the number of output channels to $c$. This way, each
-   element in the feature map the CNN extracts from the image is a new feature
-   with a length of $c$.
-1. We use each element in the feature map as a center to generate multiple
-   anchor boxes of different sizes and aspect ratios and then label them.
-1. We use the features of the elements of length $c$ at the center on the anchor
-   boxes to predict the binary class (object or background) and bounding box
-   for their respective anchor boxes.
-1. Then, we use non-maximum suppression to remove similar bounding box results
-   that correspond to class predictions of "object". Finally, we output the
-   predicted bounding boxes as the proposed regions required by the RoI pooling
-   layer.
+1. Use a $3\times 3$ convolutional layer with padding of 1 to transform the CNN output to a new output with $c$ channels. In this way, each unit along the spatial dimensions of the CNN-extracted feature maps gets a new feature vector of length $c$.
+1. Centered on each pixel of the feature maps, generate multiple anchor boxes of different scales and aspect ratios and label them.
+1. Using the length-$c$ feature vector at the center of each anchor box, predict the binary class (background or objects) and bounding box for this anchor box.
+1. Consider those predicted bounding boxes whose  predicted classes are objects. Remove overlapped results using non-maximum suppression. The remaining  predicted bounding boxes for objects are the region proposals required by the RoI pooling layer.
 
 
-It is worth noting that, as a part of the Faster R-CNN model, the region
-proposal network is trained together with the rest of the model. In addition,
-the Faster R-CNN object functions include the class and bounding box
-predictions in object detection, as well as the binary class and bounding box
-predictions for the anchor boxes in the region proposal network. Finally, the
-region proposal network can learn how to generate high-quality proposed regions,
-which reduces the number of proposed regions while maintaining the precision of
-object detection.
+
+It is worth noting that, 
+as part of the faster R-CNN model,
+the region
+proposal network is jointly trained
+with the rest of the model. 
+In other words, the objective function of 
+the faster R-CNN includes
+not only the class and bounding box prediction
+in object detection,
+but also the binary class and bounding box prediction
+of anchor boxes in the region proposal network.
+As a result of the end-to-end training,
+the region proposal network learns
+how to generate high-quality region proposals,
+so as to stay accurate in object detection
+with a reduced number of region proposals
+that are learned from data.
+
+
 
 
 ## Mask R-CNN
