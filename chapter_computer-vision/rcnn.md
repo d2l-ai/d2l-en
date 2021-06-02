@@ -27,6 +27,7 @@ from the input image
 (e.g., anchor boxes can also be considered
 as region proposals),
 labeling their classes and bounding boxes (e.g., offsets).
+:cite:`Girshick.Donahue.Darrell.ea.2014`
 Then a CNN is used to 
 perform forward propagation on each region proposal
 to extract its features.
@@ -73,7 +74,7 @@ the *fast R-CNN* from the
 R-CNN is that 
 the CNN forward propagation
 is only performed on 
-the entire image.
+the entire image :cite:`Girshick.2015`. 
 
 ![The fast R-CNN model.](../img/fast-rcnn.svg)
 :label:`fig_fast_r-cnn`
@@ -87,14 +88,14 @@ the entire image.
 1. Predict the class and bounding box for each of the $n$ region proposals. More concretely, in class and bounding box prediction, transform the fully-connected layer output into an output of shape $n \times q$ ($q$ is the number of classes) and an output of shape $n \times 4$, respectively. The class prediction uses softmax regression.
 
 
-The RoI pooling layer proposed in the fast R-CNN is different from the pooling layer introduced in :numref:`sec_pooling`. 
+The region of interest pooling layer proposed in the fast R-CNN is different from the pooling layer introduced in :numref:`sec_pooling`. 
 In the pooling layer,
 we indirectly control the output shape
 by specifying sizes of
 the pooling window, padding, and stride.
 In contrast,
 we can directly specify the output shape
-in the RoI pooling layer.
+in the region of interest pooling layer.
 
 For example, let us specify
 the output height and width 
@@ -107,7 +108,7 @@ where the shape of each subwindow is approximately
 $(h/h_2) \times (w/w_2)$.
 In practice,
 the height and width of any subwindow shall be rounded up, and the largest element shall be used as the output of the subwindow.
-Therefore, the RoI pooling layer can extract features of the same shape 
+Therefore, the region of interest pooling layer can extract features of the same shape 
 even when regions of interest have different shapes.
 
 
@@ -116,7 +117,7 @@ in :numref:`fig_roi`,
 the upper-left $3\times 3$ region of interest 
 is selected on a $4 \times 4$ input.
 For this region of interest,
-we use a $2\times 2$ RoI pooling layer to obtain
+we use a $2\times 2$ region of interest pooling layer to obtain
 a $2\times 2$ output.
 Note that 
 each of the four divided subwindows
@@ -126,10 +127,10 @@ contains elements
 8 and 9 (9 is the maximum);
 and 10.
 
-![A $2\times 2$ RoI pooling layer.](../img/roi.svg)
+![A $2\times 2$ region of interest pooling layer.](../img/roi.svg)
 :label:`fig_roi`
 
-Below we demonstrate the computation of the RoI pooling layer. Suppose that the height and width of the CNN-extracted features `X` are both 4, and there is only a single channel.
+Below we demonstrate the computation of the region of interest pooling layer. Suppose that the height and width of the CNN-extracted features `X` are both 4, and there is only a single channel.
 
 ```{.python .input}
 from mxnet import np, npx
@@ -168,7 +169,7 @@ Because the height and width of `X` are $1/10$ of the height and width of the in
 the coordinates of the two region proposals
 are multiplied by 0.1 according to the specified `spatial_scale` argument.
 Then the two regions of interest are marked on `X` as `X[:, :, 0:3, 0:3]` and `X[:, :, 1:4, 0:4]`, respectively. 
-Finally in the $2\times 2$ RoI pooling,
+Finally in the $2\times 2$ region of interest pooling,
 each region of interest is divided
 into a grid of sub-windows to
 further extract features of the same shape $2\times 2$.
@@ -191,7 +192,7 @@ a lot of region proposals in selective search.
 To reduce region proposals
 without loss of accuracy,
 the *faster R-CNN*
-proposes to replace selective search with a *region proposal network*.
+proposes to replace selective search with a *region proposal network* :cite:`Ren.He.Girshick.ea.2015`.
 
 
 
@@ -211,7 +212,7 @@ works in the following steps:
 1. Use a $3\times 3$ convolutional layer with padding of 1 to transform the CNN output to a new output with $c$ channels. In this way, each unit along the spatial dimensions of the CNN-extracted feature maps gets a new feature vector of length $c$.
 1. Centered on each pixel of the feature maps, generate multiple anchor boxes of different scales and aspect ratios and label them.
 1. Using the length-$c$ feature vector at the center of each anchor box, predict the binary class (background or objects) and bounding box for this anchor box.
-1. Consider those predicted bounding boxes whose  predicted classes are objects. Remove overlapped results using non-maximum suppression. The remaining  predicted bounding boxes for objects are the region proposals required by the RoI pooling layer.
+1. Consider those predicted bounding boxes whose  predicted classes are objects. Remove overlapped results using non-maximum suppression. The remaining  predicted bounding boxes for objects are the region proposals required by the region of interest pooling layer.
 
 
 
@@ -238,21 +239,38 @@ that are learned from data.
 
 ## Mask R-CNN
 
-If training data is labeled with the pixel-level positions of each object in an image, a *Mask R-CNN* model can effectively use these detailed labels to further improve the precision of object detection.
+In the training dataset,
+if pixel-level positions of object 
+are also labeled on images, 
+the *mask R-CNN* can effectively leverage
+such detailed labels 
+to further improve the accuracy of object detection :cite:`He.Gkioxari.Dollar.ea.2017`.
+
 
 ![The mask R-CNN model.](../img/mask-rcnn.svg)
 :label:`fig_mask_r-cnn`
 
-As shown in :numref:`fig_mask_r-cnn`, Mask R-CNN is a modification to the Faster
-R-CNN model. Mask R-CNN models replace the RoI pooling layer with an RoI
-alignment layer. This allows the use of bilinear interpolation to retain spatial
-information on feature maps, making Mask R-CNN better suited for pixel-level
-predictions. The RoI alignment layer outputs feature maps of the same shape for
-all RoIs. This not only predicts the classes and bounding boxes of RoIs, but
-allows us to use an additional fully convolutional network to predict the
-pixel-level positions of objects. We will describe how to use fully
-convolutional networks to predict pixel-level semantics in images later in this
-chapter.
+As shown in :numref:`fig_mask_r-cnn`, 
+the mask R-CNN
+is modified based on the faster R-CNN. 
+Specifically,
+the mask R-CNN replaces the
+region of interest pooling layer with the
+*region of interest (RoI) alignment* layer. 
+This region of interest alignment layer
+uses bilinear interpolation
+to preserve the spatial information on the feature maps, which is more suitable for pixel-level prediction.
+The output of this layer
+contains feature maps of the same shape
+for all the regions of interest. 
+They are used
+to predict 
+not only the class and bounding box for each region of interest,
+but also the pixel-level position of the object through an additional fully convolutional network.
+More details on using a fully convolutional network to predict pixel-level semantics of an image 
+will be provided
+in subsequent sections of this chapter.
+
 
 
 
@@ -263,8 +281,8 @@ chapter.
   then uses these features to predict the classes and bounding boxes of
   proposed regions.
 * Fast R-CNN improves on the R-CNN by only performing CNN forward computation on
-  the image as a whole. It introduces an RoI pooling layer to extract features
-  of the same shape from RoIs of different shapes.
+  the image as a whole. It introduces a region of interest pooling layer to extract features
+  of the same shape from regions of interest of different shapes.
 * Faster R-CNN replaces the selective search used in Fast R-CNN with a region
   proposal network. This reduces the number of proposed regions generated, while
   ensuring precise object detection.
