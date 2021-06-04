@@ -16,7 +16,7 @@ we will apply the knowledge we learned
 in previous sections
 to practice the Kaggle competition of
 CIFAR-10 image classification.
-The web address of the competition is https://www.kaggle.com/c/cifar-10
+(**The web address of the competition is https://www.kaggle.com/c/cifar-10**)
 
 :numref:`fig_kaggle_cifar10` shows the information on the competition's webpage.
 In order to submit the results,
@@ -84,8 +84,8 @@ After unzipping the downloaded file in `../data`, and unzipping `train.7z` and `
 
 where the `train` and `test` directories contain the training and testing images, respectively, `trainLabels.csv` provides labels for the training images, and `sample_submission.csv` is a sample submission file.
 
-To make it easier to get started, we provide a small-scale sample of the dataset that
-contains the first 1000 training images and 5 random testing images.
+To make it easier to get started, [**we provide a small-scale sample of the dataset that
+contains the first 1000 training images and 5 random testing images.**]
 To use the full dataset of the Kaggle competition, you need to set the following `demo` variable to `False`.
 
 ```{.python .input}
@@ -104,7 +104,7 @@ else:
     data_dir = '../data/cifar-10/'
 ```
 
-### Organizing the Dataset
+### [**Organizing the Dataset**]
 
 We need to organize datasets to facilitate model training and testing.
 Let us first read the labels from the csv file.
@@ -127,7 +127,7 @@ print('# training examples:', len(labels))
 print('# classes:', len(set(labels.values())))
 ```
 
-Next, we define the `reorg_train_valid` function to split the validation set out of the original training set.
+Next, we define the `reorg_train_valid` function to [**split the validation set out of the original training set.**]
 The argument `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set.
 More concretely,
 let $n$ be the number of images of the class with the least examples, and $r$ be the ratio.
@@ -170,7 +170,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
     return n_valid_per_label
 ```
 
-The `reorg_test` function below organizes the testing set for data loading during prediction.
+The `reorg_test` function below [**organizes the testing set for data loading during prediction.**]
 
 ```{.python .input}
 #@tab all
@@ -183,8 +183,8 @@ def reorg_test(data_dir):
                               'unknown'))
 ```
 
-Finally, we use a function to invoke
-the `read_csv_labels`, `reorg_train_valid`, and `reorg_test` functions defined above.
+Finally, we use a function to [**invoke**]
+the `read_csv_labels`, `reorg_train_valid`, and `reorg_test` (**functions defined above.**)
 
 ```{.python .input}
 #@tab all
@@ -207,7 +207,7 @@ valid_ratio = 0.1
 reorg_cifar10_data(data_dir, valid_ratio)
 ```
 
-## Image Augmentation
+## [**Image Augmentation**]
 
 We use image augmentation to address overfitting.
 For example, images can be flipped horizontally at random during training.
@@ -270,7 +270,7 @@ transform_test = torchvision.transforms.Compose([
 
 ## Reading the Dataset
 
-Next, we read the organized dataset consisting of raw image files. Each example includes an image and a label.
+Next, we [**read the organized dataset consisting of raw image files**]. Each example includes an image and a label.
 
 ```{.python .input}
 train_ds, valid_ds, train_valid_ds, test_ds = [
@@ -291,7 +291,7 @@ valid_ds, test_ds = [torchvision.datasets.ImageFolder(
 ```
 
 During training,
-we need to specify all the image augmentation operations defined above.
+we need to [**specify all the image augmentation operations defined above**].
 When the validation set
 is used for model evaluation during hyperparameter tuning,
 no randomness from image augmentation should be introduced.
@@ -325,7 +325,7 @@ test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
                                         drop_last=False)
 ```
 
-## Defining the Model
+## Defining the [**Model**]
 
 :begin_tab:`mxnet`
 Here, we build the residual blocks based on the `HybridBlock` class, which is
@@ -413,7 +413,7 @@ def get_net():
 loss = nn.CrossEntropyLoss(reduction="none")
 ```
 
-## Defining the Training Function
+## Defining the [**Training Function**]
 
 We will select models and tune hyperparameters according to the model's performance on the validation set.
 In the following, we define the model training function `train`.
@@ -495,7 +495,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           f'on {str(devices)}')
 ```
 
-## Training and Validating the Model
+## [**Training and Validating the Model**]
 
 Now, we can train and validate the model.
 All the following hyperparameters can be tuned.
@@ -519,7 +519,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
 
-## Classifying the Testing Set and Submitting Results on Kaggle
+## [**Classifying the Testing Set**] and Submitting Results on Kaggle
 
 After obtaining a promising model with hyperparameters,
 we use all the labeled data (including the validation set) to retrain the model and classify the testing set.
