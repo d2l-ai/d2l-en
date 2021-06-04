@@ -69,7 +69,7 @@ def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
 
 ### Flipping and Cropping
 
-Flipping the image left and right usually does not change the category of the object. 
+[**Flipping the image left and right**] usually does not change the category of the object. 
 This is one of the earliest and most widely used methods of image augmentation.
 Next, we use the `transforms` module to create the `RandomFlipLeftRight` instance, which flips
 an image left and right with a 50% chance.
@@ -83,7 +83,7 @@ apply(img, gluon.data.vision.transforms.RandomFlipLeftRight())
 apply(img, torchvision.transforms.RandomHorizontalFlip())
 ```
 
-Flipping up and down is not as common as flipping left and right. But at least for this example image, flipping up and down does not hinder recognition.
+[**Flipping up and down**] is not as common as flipping left and right. But at least for this example image, flipping up and down does not hinder recognition.
 Next, we create a `RandomFlipTopBottom` instance to flip
 an image up and down with a 50% chance.
 
@@ -100,7 +100,7 @@ In the example image we used, the cat is in the middle of the image, but this ma
 In :numref:`sec_pooling`, we explained that the pooling layer can reduce the sensitivity of a convolutional layer to the target position.
 In addition, we can also randomly crop the image to make objects appear in different positions in the image at different scales, which can also reduce the sensitivity of a model to the target position.
 
-In the code below, we randomly crop an area with an area of $10\% \sim 100\%$ of the original area each time, and the ratio of width to height of this area is randomly selected from $0.5 \sim 2$. Then, the width and height of the region are both scaled to 200 pixels. 
+In the code below, we [**randomly crop**] an area with an area of $10\% \sim 100\%$ of the original area each time, and the ratio of width to height of this area is randomly selected from $0.5 \sim 2$. Then, the width and height of the region are both scaled to 200 pixels. 
 Unless otherwise specified, the random number between $a$ and $b$ in this section refers to a continuous value obtained by random and uniform sampling from the interval $[a, b]$.
 
 ```{.python .input}
@@ -118,7 +118,7 @@ apply(img, shape_aug)
 
 ### Changing Colors
 
-Another augmentation method is changing colors. We can change four aspects of the image color: brightness, contrast, saturation, and hue. In the example below, we randomly change the brightness of the image to a value between 50% ($1-0.5$) and 150% ($1+0.5$) of the original image.
+Another augmentation method is changing colors. We can change four aspects of the image color: brightness, contrast, saturation, and hue. In the example below, we [**randomly change the brightness**] of the image to a value between 50% ($1-0.5$) and 150% ($1+0.5$) of the original image.
 
 ```{.python .input}
 apply(img, gluon.data.vision.transforms.RandomBrightness(0.5))
@@ -130,7 +130,7 @@ apply(img, torchvision.transforms.ColorJitter(
     brightness=0.5, contrast=0, saturation=0, hue=0))
 ```
 
-Similarly, we can randomly change the hue of the image.
+Similarly, we can [**randomly change the hue**] of the image.
 
 ```{.python .input}
 apply(img, gluon.data.vision.transforms.RandomHue(0.5))
@@ -142,7 +142,7 @@ apply(img, torchvision.transforms.ColorJitter(
     brightness=0, contrast=0, saturation=0, hue=0.5))
 ```
 
-We can also create a `RandomColorJitter` instance and set how to randomly change the `brightness`, `contrast`, `saturation`, and `hue` of the image at the same time.
+We can also create a `RandomColorJitter` instance and set how to [**randomly change the `brightness`, `contrast`, `saturation`, and `hue` of the image at the same time**].
 
 ```{.python .input}
 color_aug = gluon.data.vision.transforms.RandomColorJitter(
@@ -159,7 +159,7 @@ apply(img, color_aug)
 
 ### Combining Multiple Image Augmentation Methods
 
-In practice, we will combine multiple image augmentation methods. 
+In practice, we will [**combine multiple image augmentation methods**]. 
 For example,
 we can combine the different image augmentation methods defined above and apply them to each image via a `Compose` instance.
 
@@ -176,7 +176,7 @@ augs = torchvision.transforms.Compose([
 apply(img, augs)
 ```
 
-## Training with Image Augmentation
+## [**Training with Image Augmentation**]
 
 Let us train a model with image augmentation.
 Here we use the CIFAR-10 dataset instead of the Fashion-MNIST dataset that we used before. 
@@ -196,7 +196,7 @@ d2l.show_images([all_images[i][0] for i in range(32)], 4, 8, scale=0.8);
 ```
 
 In order to obtain definitive results during prediction, we usually only apply image augmentation to training examples, and do not use image augmentation with random operations during prediction. 
-Here we only use the simplest random left-right flipping method. In addition, we use a `ToTensor` instance to convert a minibatch of images into the format required by the deep learning framework, i.e., 
+[**Here we only use the simplest random left-right flipping method**]. In addition, we use a `ToTensor` instance to convert a minibatch of images into the format required by the deep learning framework, i.e., 
 32-bit floating point numbers between 0 and 1 with the shape of (batch size, number of channels, height, width).
 
 ```{.python .input}
@@ -229,8 +229,8 @@ a detailed introduction to `DataLoader`, please refer to :numref:`sec_fashion_mn
 :end_tab:
 
 :begin_tab:`pytorch`
-Next, we define an auxiliary function to facilitate reading the image and
-applying image augmentation. 
+Next, we [**define an auxiliary function to facilitate reading the image and
+applying image augmentation**]. 
 The `transform` argument provided by PyTorch's
 dataset applies augmentation to transform the images.
 For
@@ -263,7 +263,7 @@ CIFAR-10 dataset.
 Recall the introduction to
 multi-GPU training in :numref:`sec_multi_gpu_concise`.
 In the following,
-we define a function to train and evaluate the model using multiple GPUs.
+[**we define a function to train and evaluate the model using multiple GPUs**].
 
 ```{.python .input}
 #@save
@@ -370,7 +370,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
           f'{str(devices)}')
 ```
 
-Now we can define the `train_with_data_aug` function to train the model with image augmentation.
+Now we can [**define the `train_with_data_aug` function to train the model with image augmentation**].
 This function gets all available GPUs, 
 uses Adam as the optimization algorithm,
 applies image augmentation to the training dataset,
@@ -407,7 +407,7 @@ def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
     train_ch13(net, train_iter, test_iter, loss, trainer, 10, devices)
 ```
 
-Let us train the model using image augmentation based on random left-right flipping.
+Let us [**train the model**] using image augmentation based on random left-right flipping.
 
 ```{.python .input}
 #@tab all

@@ -82,7 +82,7 @@ import os
 
 ### Reading the Dataset
 
-The hot dog dataset we use was taken from online images.
+[**The hot dog dataset we use was taken from online images**].
 This dataset consists of
 1400 positive-class images containing hot dogs,
 and as many negative-class images containing other foods.
@@ -117,7 +117,7 @@ train_imgs = torchvision.datasets.ImageFolder(os.path.join(data_dir, 'train'))
 test_imgs = torchvision.datasets.ImageFolder(os.path.join(data_dir, 'test'))
 ```
 
-The first 8 positive examples and the last 8 negative images are shown below. As you can see, the images vary in size and aspect ratio.
+The first 8 positive examples and the last 8 negative images are shown below. As you can see, [**the images vary in size and aspect ratio**].
 
 ```{.python .input}
 #@tab all
@@ -135,6 +135,8 @@ for the three RGB (red, green, and blue) color channels
 we *standardize* their values channel by channel.
 Concretely,
 the mean value of a channel is subtracted from each value of that channel and then the result is divided by the standard deviation of that channel.
+
+[~~Data augmentations~~]
 
 ```{.python .input}
 # Specify the means and standard deviations of the three RGB channels to
@@ -175,7 +177,7 @@ test_augs = torchvision.transforms.Compose([
     normalize])
 ```
 
-### Defining and Initializing the Model
+### [**Defining and Initializing the Model**]
 
 We use ResNet-18, which was pretrained on the ImageNet dataset, as the source model. Here, we specify `pretrained=True` to automatically download the pretrained model parameters. 
 If this model is used for the first time,
@@ -247,7 +249,7 @@ finetune_net.fc = nn.Linear(finetune_net.fc.in_features, 2)
 nn.init.xavier_uniform_(finetune_net.fc.weight);
 ```
 
-### Fine-Tuning the Model
+### [**Fine-Tuning the Model**]
 
 First, we define a training function `train_fine_tuning` that uses fine-tuning so it can be called multiple times.
 
@@ -295,7 +297,7 @@ def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5,
                    devices)
 ```
 
-We set the base learning rate to a small value
+We [**set the base learning rate to a small value**]
 in order to *fine-tune* the model parameters obtained via pretraining. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.
 
 ```{.python .input}
