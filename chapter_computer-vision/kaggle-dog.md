@@ -346,8 +346,11 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
     trainer = gluon.Trainer(net.output_new.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
     num_batches, timer = len(train_iter), d2l.Timer()
+    legend = ['train loss']
+    if valid_iter is not None:
+        legend.append('valid loss')
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
-                            legend=['train loss', 'valid loss'])
+                            legend=legend)
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(2)
         if epoch > 0 and epoch % lr_period == 0:
@@ -372,13 +375,11 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
         if valid_iter is not None:
             valid_loss = evaluate_loss(valid_iter, net, devices)
             animator.add(epoch + 1, (None, valid_loss))
+    measures = f'train loss {metric[0] / metric[1]:.3f}'
     if valid_iter is not None:
-        print(f'train loss {metric[0] / metric[1]:.3f}, '
-              f'valid loss {valid_loss:.3f}')
-    else:
-        print(f'train loss {metric[0] / metric[1]:.3f}')
-    print(f'{metric[1] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(devices)}')
+        measures += f', valid loss {valid_loss:.3f}'
+    print(measures + f'\n{metric[1] * num_epochs / timer.sum():.1f}'
+          f' examples/sec on {str(devices)}')
 ```
 
 ```{.python .input}
