@@ -95,7 +95,7 @@ def reorg_dog_data(data_dir, valid_ratio):
     d2l.reorg_test(data_dir)
 
 
-batch_size = 4 if demo else 128
+batch_size = 32 if demo else 128
 valid_ratio = 0.1
 reorg_dog_data(data_dir, valid_ratio)
 ```
@@ -427,11 +427,11 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
 
 Now we can train and validate the model.
 The following hyperparameters are all tunable.
-For example, the number of epochs can be increased. Because `lr_period` and `lr_decay` are set to 10 and 0.1, respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
+For example, the number of epochs can be increased. Because `lr_period` and `lr_decay` are set to 2 and 0.9, respectively, the learning rate of the optimization algorithm will be multiplied by 0.9 after every 2 epochs.
 
 ```{.python .input}
-devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.01, 1e-4
-lr_period, lr_decay, net = 10, 0.1, get_net(devices)
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 0.005, 1e-4
+lr_period, lr_decay, net = 2, 0.9, get_net(devices)
 net.hybridize()
 train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
@@ -507,7 +507,7 @@ to Kaggle in the same way described in :numref:`sec_kaggle_house`.
 
 ## Exercises
 
-1. When using the fill Kaggle competition dataset, what results can you achieve when you increase the `batch_size` (batch size) and `num_epochs` (number of epochs)?
+1. When using the full Kaggle competition dataset, what results can you achieve when you increase `batch_size` (batch size) and `num_epochs` (number of epochs) while setting some other hyperparameters as `lr = 0.01`, `lr_period = 10`, and `lr_decay = 0.1`?
 1. Do you get better results if you use a deeper pretrained model? How do you tune hyperparameters? Can you further improve the results?
 
 :begin_tab:`mxnet`
