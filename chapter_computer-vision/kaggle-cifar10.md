@@ -194,7 +194,7 @@ def reorg_cifar10_data(data_dir, valid_ratio):
     reorg_test(data_dir)
 ```
 
-Here we only set the batch size to 4 for the small-scale sample of the dataset.
+Here we only set the batch size to 32 for the small-scale sample of the dataset.
 When training and testing
 the complete dataset of the Kaggle competition,
 `batch_size` should be set to a larger integer, such as 128.
@@ -202,7 +202,7 @@ We split out 10% of the training examples as the validation set for tuning hyper
 
 ```{.python .input}
 #@tab all
-batch_size = 4 if demo else 128
+batch_size = 32 if demo else 128
 valid_ratio = 0.1
 reorg_cifar10_data(data_dir, valid_ratio)
 ```
@@ -500,12 +500,12 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
 Now, we can train and validate the model.
 All the following hyperparameters can be tuned.
 For example, we can increase the number of epochs.
-When `lr_period` and `lr_decay` are set to 50 and 0.1, respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 50 epochs. Just for demonstration,
-we only train 5 epochs here.
+When `lr_period` and `lr_decay` are set to 4 and 0.9, respectively, the learning rate of the optimization algorithm will be multiplied by 0.9 after every 4 epochs. Just for ease of demonstration,
+we only train 20 epochs here.
 
 ```{.python .input}
-devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.1, 5e-4
-lr_period, lr_decay, net = 50, 0.1, get_net(devices)
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 20, 0.02, 5e-4
+lr_period, lr_decay, net = 4, 0.9, get_net(devices)
 net.hybridize()
 train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
@@ -578,7 +578,7 @@ is similar to that in :numref:`sec_kaggle_house`.
 
 ## Exercises
 
-1. Use the complete CIFAR-10 dataset for this Kaggle competition. Change the `batch_size` and number of epochs `num_epochs` to 128 and 100, respectively.  See what accuracy and ranking you can achieve in this competition. Can you further improve them?
+1. Use the complete CIFAR-10 dataset for this Kaggle competition. Set hyperparameters such as `batch_size = 128`, `num_epochs = 100`, `lr = 0.1`, `lr_period = 50`, `lr_decay = 0.1`.  See what accuracy and ranking you can achieve in this competition. Can you further improve them?
 1. What accuracy can you get when not using image augmentation?
 
 :begin_tab:`mxnet`
