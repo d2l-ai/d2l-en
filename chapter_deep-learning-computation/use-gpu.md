@@ -117,14 +117,14 @@ Also, `gpu(0)` and `gpu()` are equivalent.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the CPU and GPU can be indicated by `torch.device('cpu')` and `torch.cuda.device('cuda')`.
+In PyTorch, the CPU and GPU can be indicated by `torch.device('cpu')` and `torch.device('cuda')`.
 It should be noted that the `cpu` device
 means all physical CPUs and memory.
 This means that PyTorch's calculations
 will try to use all CPU cores.
 However, a `gpu` device only represents one card
 and the corresponding memory.
-If there are multiple GPUs, we use `torch.cuda.device(f'cuda:{i}')`
+If there are multiple GPUs, we use `torch.device(f'cuda:{i}')`
 to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0).
 Also, `gpu:0` and `gpu` are equivalent.
 :end_tab:
@@ -142,7 +142,7 @@ npx.cpu(), npx.gpu(), npx.gpu(1)
 import torch
 from torch import nn
 
-torch.device('cpu'), torch.cuda.device('cuda'), torch.cuda.device('cuda:1')
+torch.device('cpu'), torch.device('cuda'), torch.device('cuda:1')
 ```
 
 ```{.python .input}
