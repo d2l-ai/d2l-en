@@ -501,7 +501,7 @@ Now, we can train and validate the model.
 All the following hyperparameters can be tuned.
 For example, we can increase the number of epochs.
 When `lr_period` and `lr_decay` are set to 50 and 0.1, respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 50 epochs. Just for demonstration,
-we only train one epoch here.
+we only train 5 epochs here.
 
 ```{.python .input}
 devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.1, 5e-4
@@ -567,19 +567,19 @@ is similar to that in :numref:`sec_kaggle_house`.
 ## Summary
 
 * We can read datasets containing raw image files after organizing them into the required format.
+
 :begin_tab:`mxnet`
 * We can use convolutional neural networks, image augmentation, and hybrid programing in an image classification competition.
 :end_tab:
+
 :begin_tab:`pytorch`
 * We can use convolutional neural networks and image augmentation in an image classification competition.
 :end_tab:
-
 
 ## Exercises
 
 1. Use the complete CIFAR-10 dataset for this Kaggle competition. Change the `batch_size` and number of epochs `num_epochs` to 128 and 100, respectively.  See what accuracy and ranking you can achieve in this competition. Can you further improve them?
 1. What accuracy can you get when not using image augmentation?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/379)
