@@ -92,7 +92,7 @@ the following function will *uniformly* sample
 pixels in `fmap_h` rows and `fmap_w` columns
 on any input image.
 Centered on these uniformly sampled pixels,
-anchor boxes of size `s` (assuming the length of the list `s` is 1) and different aspect ratios (`ratios`)
+anchor boxes of scale `s` (assuming the length of the list `s` is 1) and different aspect ratios (`ratios`)
 will be generated.
 
 ```{.python .input}
