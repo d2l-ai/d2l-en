@@ -110,7 +110,7 @@ print(f'The covariance matrix is\n{d2l.matmul(A.T, A)}')
 #@tab tensorflow
 d2l.set_figsize()
 d2l.plt.scatter(d2l.numpy(data[:100, 0]), d2l.numpy(data[:100, 1]));
-print(f'The covariance matrix is\n{tf.matmul(A, A, transpose_a = True)}')
+print(f'The covariance matrix is\n{tf.matmul(A, A, transpose_a=True)}')
 ```
 
 ```{.python .input}
@@ -160,8 +160,8 @@ net_D = nn.Sequential(
 ```{.python .input}
 #@tab tensorflow
 net_D = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(5, activation = "tanh", input_shape = (2,)),
-    tf.keras.layers.Dense(3, activation = "tanh"),
+    tf.keras.layers.Dense(5, activation="tanh", input_shape=(2,)),
+    tf.keras.layers.Dense(3, activation="tanh"),
     tf.keras.layers.Dense(1)
 ])
 ```
@@ -366,27 +366,27 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
 ```{.python .input}
 #@tab tensorflow
 def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
-    loss = tf.keras.losses.BinaryCrossentropy(from_logits=True, reduction = tf.keras.losses.Reduction.SUM)
+    loss = tf.keras.losses.BinaryCrossentropy(from_logits=True, reduction=tf.keras.losses.Reduction.SUM)
     for w in net_D.trainable_variables:
-        w.assign(tf.random.normal(mean = 0, stddev = 0.02, shape = w.shape))
+        w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))
     for w in net_G.trainable_variables:
-        w.assign(tf.random.normal(mean = 0, stddev = 0.02, shape = w.shape))
-    optimizer_D = tf.keras.optimizers.Adam(learning_rate= lr_D)
-    optimizer_G = tf.keras.optimizers.Adam(learning_rate= lr_G)
-    animator = d2l.Animator(xlabel = "epoch", ylabel = "loss", xlim = [1, num_epochs],
-                            nrows = 2, figsize = (5, 5), legend = ["discriminator", "generator"])
-    animator.fig.subplots_adjust(hspace = 0.3)
+        w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))
+    optimizer_D = tf.keras.optimizers.Adam(learning_rate=lr_D)
+    optimizer_G = tf.keras.optimizers.Adam(learning_rate=lr_G)
+    animator = d2l.Animator(xlabel="epoch", ylabel="loss", xlim=[1, num_epochs],
+                            nrows=2, figsize=(5, 5), legend=["discriminator", "generator"])
+    animator.fig.subplots_adjust(hspace=0.3)
     for epoch in range(num_epochs):
         # Train one epoch
         timer = d2l.Timer()
         metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
         for (X,) in data_iter:
             batch_size = X.shape[0]
-            Z = tf.random.normal(mean = 0, stddev = 1, shape = (batch_size, latent_dim))
+            Z = tf.random.normal(mean=0, stddev=1, shape=(batch_size, latent_dim))
             metric.add(update_D(X, Z, net_D, net_G, loss, optimizer_D),
                        update_G(Z, net_D, net_G, loss, optimizer_G), batch_size)
         # Visualize generated examples
-        Z = tf.random.normal(mean = 0, stddev = 1, shape = (100, latent_dim))
+        Z = tf.random.normal(mean=0, stddev=1, shape=(100, latent_dim))
         fake_X = net_G(Z)
         animator.axes[1].cla()
         animator.axes[1].scatter(data[:, 0], data[:, 1])

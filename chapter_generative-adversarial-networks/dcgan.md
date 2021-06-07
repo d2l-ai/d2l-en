@@ -59,7 +59,7 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
 
 data_dir = d2l.download_extract('pokemon')
 batch_size = 256
-pokemon = tf.keras.preprocessing.image_dataset_from_directory(data_dir, batch_size = batch_size, image_size = (64, 64))
+pokemon = tf.keras.preprocessing.image_dataset_from_directory(data_dir, batch_size=batch_size, image_size=(64, 64))
 ```
 
 We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0, 1]$, while our generator will use the tanh function to obtain outputs in $[-1, 1]$. Therefore we normalize the data with $0.5$ mean and $0.5$ standard deviation to match the value range.
@@ -98,8 +98,8 @@ def transform_func(X):
     return X
 
 # For TF>=2.4 use `num_parallel_calls = tf.data.AUTOTUNE`
-data_iter = pokemon.map(lambda x, y: (transform_func(x), y), num_parallel_calls= tf.data.experimental.AUTOTUNE)
-data_iter = data_iter.cache().shuffle(buffer_size = 1000).prefetch(buffer_size = tf.data.experimental.AUTOTUNE)
+data_iter = pokemon.map(lambda x, y: (transform_func(x), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
+data_iter = data_iter.cache().shuffle(buffer_size=1000).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 ```
 
 Let us visualize the first 20 images.
@@ -124,10 +124,10 @@ for X, y in data_iter:
 
 ```{.python .input}
 #@tab tensorflow
-d2l.set_figsize(figsize = (4, 4))
+d2l.set_figsize(figsize=(4, 4))
 for X, y in data_iter.take(1):
     imgs = X[:20, :, :, :] / 2 + 0.5
-    d2l.show_images(imgs, num_rows = 4, num_cols = 5)
+    d2l.show_images(imgs, num_rows=4, num_cols=5)
 ```
 
 ## The Generator
@@ -166,9 +166,9 @@ class G_block(nn.Module):
 ```{.python .input}
 #@tab tensorflow
 class G_block(tf.keras.layers.Layer):
-    def __init__(self, out_channels, kernel_size = 4, strides = 2, padding = "same", **kwargs):
+    def __init__(self, out_channels, kernel_size=4, strides=2, padding="same", **kwargs):
         super().__init__(**kwargs)
-        self.conv2d_trans = tf.keras.layers.Conv2DTranspose(out_channels, kernel_size, strides, padding, use_bias = False)
+        self.conv2d_trans = tf.keras.layers.Conv2DTranspose(out_channels, kernel_size, strides, padding, use_bias=False)
         self.batch_norm = tf.keras.layers.BatchNormalization()
         self.activation = tf.keras.layers.ReLU()
         
@@ -227,7 +227,7 @@ g_blk(x).shape
 ```{.python .input}
 #@tab tensorflow
 x = tf.zeros((2, 1, 1, 3))
-g_blk = G_block(20, strides = 1, padding= "valid") # `padding = "valid"` corresponds to no padding
+g_blk = G_block(20, strides=1, padding="valid") # `padding="valid"` corresponds to no padding
 g_blk(x).shape
 ```
 
@@ -263,12 +263,12 @@ net_G = nn.Sequential(
 #@tab tensorflow
 n_G = 64
 net_G = tf.keras.Sequential([
-    G_block(out_channels = n_G * 8, strides = 1, padding = "valid"),  # Output: (4, 4, 64 * 8)
-    G_block(out_channels = n_G * 4), # Output: (8, 8, 64 * 4)
-    G_block(out_channels = n_G * 2), # Output: (16, 16, 64 * 2)
-    G_block(out_channels = n_G), # Output: (32, 32, 64)
-    tf.keras.layers.Conv2DTranspose(3, kernel_size = 4, strides = 2, padding = "same",
-                                    use_bias = False, activation = "tanh") # Output: (64, 64, 3)
+    G_block(out_channels=n_G*8, strides=1, padding="valid"),  # Output: (4, 4, 64 * 8)
+    G_block(out_channels=n_G*4), # Output: (8, 8, 64 * 4)
+    G_block(out_channels=n_G*2), # Output: (16, 16, 64 * 2)
+    G_block(out_channels=n_G), # Output: (32, 32, 64)
+    tf.keras.layers.Conv2DTranspose(3, kernel_size=4, strides=2, padding="same",
+                                    use_bias=False, activation="tanh") # Output: (64, 64, 3)
 ])
 ```
 
@@ -357,9 +357,9 @@ class D_block(nn.Module):
 ```{.python .input}
 #@tab tensorflow
 class D_block(tf.keras.layers.Layer):
-    def __init__(self, out_channels, kernel_size = 4, strides = 2, padding = "same", alpha = 0.2, **kwargs):
+    def __init__(self, out_channels, kernel_size=4, strides=2, padding="same", alpha=0.2, **kwargs):
         super().__init__(**kwargs)
-        self.conv2d = tf.keras.layers.Conv2D(out_channels, kernel_size, strides, padding, use_bias = False)
+        self.conv2d = tf.keras.layers.Conv2D(out_channels, kernel_size, strides, padding, use_bias=False)
         self.batch_norm = tf.keras.layers.BatchNormalization()
         self.activation = tf.keras.layers.LeakyReLU(alpha)
         
@@ -427,10 +427,10 @@ net_D = nn.Sequential(
 n_D = 64
 net_D = tf.keras.Sequential([
     D_block(n_D), # Output: (32, 32, 64)
-    D_block(out_channels = n_D * 2), # Output: (16, 16, 64 * 2)
-    D_block(out_channels = n_D * 4), # Output: (8, 8, 64 * 4)
-    D_block(out_channels = n_D * 8), # Outupt: (4, 4, 64 * 64)
-    tf.keras.layers.Conv2D(1, kernel_size = 4, use_bias = False) # Output: (1, 1, 1)
+    D_block(out_channels=n_D*2), # Output: (16, 16, 64 * 2)
+    D_block(out_channels=n_D*4), # Output: (8, 8, 64 * 4)
+    D_block(out_channels=n_D*8), # Outupt: (4, 4, 64 * 64)
+    tf.keras.layers.Conv2D(1, kernel_size=4, use_bias=False) # Output: (1, 1, 1)
 ])
 ```
 
@@ -545,13 +545,13 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
 
 ```{.python .input}
 #@tab tensorflow
-def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device = d2l.try_gpu()):
-    loss = tf.keras.losses.BinaryCrossentropy(from_logits=True, reduction = tf.keras.losses.Reduction.SUM)
+def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gpu()):
+    loss = tf.keras.losses.BinaryCrossentropy(from_logits=True, reduction=tf.keras.losses.Reduction.SUM)
     
     for w in net_D.trainable_variables:
-        w.assign(tf.random.normal(mean = 0, stddev = 0.02, shape = w.shape))
+        w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))
     for w in net_G.trainable_variables:
-        w.assign(tf.random.normal(mean = 0, stddev = 0.02, shape = w.shape))
+        w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))
     
     optimizer_hp = {"lr": lr, "beta_1": 0.5, "beta_2": 0.999}
     optimizer_D = tf.keras.optimizers.Adam(**optimizer_hp)
@@ -559,7 +559,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device = d2l.try_
     
     animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, num_epochs], nrows=2,
                             figsize=(5, 5), legend=['discriminator', 'generator'])
-    animator.fig.subplots_adjust(hspace = 0.3)
+    animator.fig.subplots_adjust(hspace=0.3)
     
     for epoch in range(1, num_epochs + 1):
         # Train one epoch
@@ -573,11 +573,11 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device = d2l.try_
                        batch_size)
             
         # Show generated examples
-        Z = tf.random.normal(mean = 0, stddev = 1, shape = (21, 1, 1, latent_dim))
+        Z = tf.random.normal(mean=0, stddev=1, shape=(21, 1, 1, latent_dim))
         # Normalize the synthetic data to N(0, 1)
         fake_x = net_G(Z) / 2 + 0.5
-        imgs = tf.concat([tf.concat([fake_x[i * 7 + j] for j in range(7)], axis = 1) 
-                          for i in range(len(fake_x) // 7)], axis = 0)
+        imgs = tf.concat([tf.concat([fake_x[i * 7 + j] for j in range(7)], axis=1) 
+                          for i in range(len(fake_x) // 7)], axis=0)
         animator.axes[1].cla()
         animator.axes[1].imshow(imgs)
         # Show the losses
