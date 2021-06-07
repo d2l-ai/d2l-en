@@ -70,9 +70,10 @@ mnist_test = torchvision.datasets.MNIST(
 ((train_images, train_labels), (
     test_images, test_labels)) = tf.keras.datasets.mnist.load_data()
 
-# Original pixel values of MNIST range from 0-255 (as the digits are stored as uint8). For this section,
-# pixel values that are greater than 128 (in the original image) are converted to 1 and
-# values that are less than 128 are converted to 0. Why? See section 18.9.2 and 18.9.3.
+# Original pixel values of MNIST range from 0-255 (as the digits are stored as uint8). 
+# For this section, pixel values that are greater than 128 (in the original image) are 
+# converted to 1 and values that are less than 128 are converted to 0. Why? See section
+# 18.9.2 and 18.9.3.
 train_images = tf.floor(tf.constant(train_images / 128, dtype = tf.float32))
 test_images = tf.floor(tf.constant(test_images / 128, dtype = tf.float32))
 
