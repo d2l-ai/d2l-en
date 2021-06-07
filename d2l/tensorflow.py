@@ -1455,6 +1455,47 @@ def bbox_to_rect(bbox, color):
                              edgecolor=color, linewidth=2)
 
 
+# Defined in file: ./chapter_generative-adversarial-networks/gan.md
+def update_D(X, Z, net_D, net_G, loss, optimizer_D):
+    """Update discriminator."""
+    batch_size = X.shape[0]
+    ones = tf.ones((batch_size,))  # Labels corresponding to real data
+    zeros = tf.zeros((batch_size,))  # Labels corresponding to fake data
+    # Do not need to compute gradient for `net_G`, so it's outside GradientTape
+    fake_X = net_G(Z)
+    with tf.GradientTape() as tape:
+        real_Y = net_D(X)
+        fake_Y = net_D(fake_X)
+        # We multiply the loss by batch_size to match PyTorch's BCEWithLogitsLoss
+        loss_D = (loss(ones, tf.squeeze(real_Y)) +
+                  loss(zeros, tf.squeeze(fake_Y))) * batch_size / 2
+    grads_D = tape.gradient(loss_D, net_D.trainable_variables)
+    optimizer_D.apply_gradients(zip(grads_D, net_D.trainable_variables))
+    return loss_D
+
+
+# Defined in file: ./chapter_generative-adversarial-networks/gan.md
+def update_G(Z, net_D, net_G, loss, optimizer_G):
+    """Update generator."""
+    batch_size = Z.shape[0]
+    ones = tf.ones((batch_size,))
+    with tf.GradientTape() as tape:
+        # We could reuse `fake_X` from `update_D` to save computation
+        fake_X = net_G(Z)
+        # Recomputing `fake_Y` is needed since `net_D` is changed
+        fake_Y = net_D(fake_X)
+        # We multiply the loss by batch_size to match PyTorch's BCEWithLogits loss
+        loss_G = loss(ones, tf.squeeze(fake_Y)) * batch_size
+    grads_G = tape.gradient(loss_G, net_G.trainable_variables)
+    optimizer_G.apply_gradients(zip(grads_G, net_G.trainable_variables))
+    return loss_G
+
+
+# Defined in file: ./chapter_generative-adversarial-networks/dcgan.md
+d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
+                           'c065c0e2593b8b161a2d7873e42418bf6a21106c')
+
+
 # Alias defined in config.ini
 size = lambda a: tf.size(a).numpy()
 
