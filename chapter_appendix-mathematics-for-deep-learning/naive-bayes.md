@@ -69,6 +69,16 @@ mnist_test = torchvision.datasets.MNIST(
 #@tab tensorflow
 ((train_images, train_labels), (
     test_images, test_labels)) = tf.keras.datasets.mnist.load_data()
+
+# Original pixel values of MNIST range from 0-255 (as the digits are stored as uint8). 
+# For this section, pixel values that are greater than 128 (in the original image) are 
+# converted to 1 and values that are less than 128 are converted to 0. Why? See section
+# 18.9.2 and 18.9.3.
+train_images = tf.floor(tf.constant(train_images / 128, dtype = tf.float32))
+test_images = tf.floor(tf.constant(test_images / 128, dtype = tf.float32))
+
+train_labels = tf.constant(train_labels, dtype = tf.int32)
+test_labels = tf.constant(test_labels, dtype = tf.int32)
 ```
 
 We can access a particular example, which contains the image and the corresponding label.
@@ -87,7 +97,7 @@ image.shape, label
 ```{.python .input}
 #@tab tensorflow
 image, label = train_images[2], train_labels[2]
-image.shape, label
+image.shape, label.numpy()
 ```
 
 Our example, stored here in the variable `image`, corresponds to an image with a height and width of $28$ pixels.
@@ -110,7 +120,7 @@ label, type(label)
 
 ```{.python .input}
 #@tab tensorflow
-label, type(label)
+label.numpy(), label.dtype
 ```
 
 We can also access multiple examples at the same time.
@@ -130,7 +140,7 @@ images.shape, labels.shape
 ```{.python .input}
 #@tab tensorflow
 images = tf.stack([train_images[i] for i in range(10, 38)], axis=0)
-labels = tf.constant([train_labels[i] for i in range(10, 38)])
+labels = tf.constant([train_labels[i].numpy() for i in range(10, 38)])
 images.shape, labels.shape
 ```
 
@@ -215,8 +225,8 @@ P_y
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.stack([train_images[i] for i in range(len(train_images))], axis=0)
-Y = tf.constant([train_labels[i] for i in range(len(train_labels))])
+X = train_images
+Y = train_labels
 
 n_y = tf.Variable(tf.zeros(10))
 for y in range(10):
@@ -292,7 +302,7 @@ def bayes_pred(x):
     p_xy = tf.math.reduce_prod(tf.reshape(p_xy, (10, -1)), axis=1)  # p(x|y)
     return p_xy * P_y
 
-image, label = tf.cast(train_images[0], tf.float32), train_labels[0]
+image, label = train_images[0], train_labels[0]
 bayes_pred(image)
 ```
 
@@ -361,7 +371,6 @@ py
 ```{.python .input}
 #@tab tensorflow
 log_P_xy = tf.math.log(P_xy)
-# TODO: Look into why this returns infs
 log_P_xy_neg = tf.math.log(1 - P_xy)
 log_P_y = tf.math.log(P_y)
 
@@ -390,7 +399,7 @@ py.argmax(dim=0) == label
 
 ```{.python .input}
 #@tab tensorflow
-tf.argmax(py, axis=0) == label
+tf.argmax(py, axis=0, output_type = tf.int32) == label
 ```
 
 If we now predict a few validation examples, we can see the Bayes
@@ -420,14 +429,12 @@ d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```{.python .input}
 #@tab tensorflow
 def predict(X):
-    return [tf.cast(tf.argmax(bayes_pred_stable(x), axis=0), tf.int32).numpy()
+    return [tf.argmax(bayes_pred_stable(x), axis=0, output_type = tf.int32).numpy()
             for x in X]
 
-X = tf.stack(
-    [tf.cast(train_images[i], tf.float32) for i in range(10, 38)], axis=0)
-y = tf.constant([train_labels[i] for i in range(10, 38)])
+X = tf.stack([train_images[i] for i in range(10, 38)], axis=0)
+y = tf.constant([train_labels[i].numpy() for i in range(10, 38)])
 preds = predict(X)
-# TODO: The preds are not correct due to issues with bayes_pred_stable()
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
@@ -449,12 +456,10 @@ float((preds == y).sum()) / len(y)  # Validation accuracy
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.stack([tf.cast(train_images[i], tf.float32) for i in range(
-    len(test_images))], axis=0)
-y = tf.constant([train_labels[i] for i in range(len(test_images))])
+X = test_images
+y = test_labels
 preds = tf.constant(predict(X), dtype=tf.int32)
-# TODO: The accuracy is not correct due to issues with bayes_pred_stable()
-tf.reduce_sum(tf.cast(preds == y, tf.float32)) / len(y)  # Validation accuracy
+tf.reduce_sum(tf.cast(preds == y, tf.float32)).numpy() / len(y)  # Validation accuracy
 ```
 
 Modern deep networks achieve error rates of less than $0.01$. The relatively poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
