@@ -274,8 +274,8 @@ print('layer norm:', ln(X), '\nbatch norm:', bn(X))
 #@tab tensorflow
 ln = tf.keras.layers.LayerNormalization()
 bn = tf.keras.layers.BatchNormalization()
-X = tf.constant([[1, 2], [2, 3]], dtype = tf.float32)
-print('layer norm:', ln(X), '\nbatch norm:', bn(X, training = True))
+X = tf.constant([[1, 2], [2, 3]], dtype=tf.float32)
+print('layer norm:', ln(X), '\nbatch norm:', bn(X, training=True))
 ```
 
 Now we can implement the `AddNorm` class
@@ -340,7 +340,7 @@ add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 ```{.python .input}
 #@tab tensorflow
 add_norm = AddNorm([1, 2], 0.5) # Normalized_shape is: [i for i in range(len(input.shape))][1:]
-add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)), training = False).shape
+add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)), training=False).shape
 ```
 
 ## Encoder
@@ -397,7 +397,7 @@ class EncoderBlock(nn.Module):
 #@save
 class EncoderBlock(tf.keras.layers.Layer):
     def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias = False, **kwargs):
+                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False, **kwargs):
         super().__init__(**kwargs)
         self.attention = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens,
                                                 num_heads, dropout, bias)
@@ -437,7 +437,7 @@ X = tf.ones((2, 100, 24))
 valid_lens = tf.constant([3, 2])
 norm_shape = [i for i in range(len(X.shape))][1:]
 encoder_blk = EncoderBlock(24, 24, 24, 24, norm_shape, 48, 8, 0.5)
-encoder_blk(X, valid_lens, training = False).shape
+encoder_blk(X, valid_lens, training=False).shape
 ```
 
 In the following transformer encoder implementation,
@@ -512,7 +512,7 @@ class TransformerEncoder(d2l.Encoder):
 #@save
 class TransformerEncoder(d2l.Encoder):
     def __init__(self, vocab_size, key_size, query_size, value_size, num_hiddens, norm_shape,
-                 ffn_num_hiddens, num_heads, num_layers, dropout, bias = False, **kwargs):
+                 ffn_num_hiddens, num_heads, num_layers, dropout, bias=False, **kwargs):
         super().__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
@@ -524,7 +524,7 @@ class TransformerEncoder(d2l.Encoder):
         # Since positional encoding values are between -1 and 1, the embedding
         # values are multiplied by the square root of the embedding dimension
         # to rescale before they are summed up
-        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(tf.cast(self.num_hiddens, dtype = tf.float32)), **kwargs)
+        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(tf.cast(self.num_hiddens, dtype=tf.float32)), **kwargs)
         self.attention_weights = [None] * len(self.blks)
         for i, blk in enumerate(self.blks):
             X = blk(X, valid_lens, **kwargs)
@@ -553,7 +553,7 @@ encoder(d2l.ones((2, 100), dtype=torch.long), valid_lens).shape
 ```{.python .input}
 #@tab tensorflow
 encoder = TransformerEncoder(200, 24, 24, 24, 24, [1, 2], 48, 8, 2, 0.5)
-encoder(tf.ones((2, 100)), valid_lens, training = False).shape
+encoder(tf.ones((2, 100)), valid_lens, training=False).shape
 ```
 
 ## Decoder
@@ -719,14 +719,14 @@ class DecoderBlock(tf.keras.layers.Layer):
         if state[2][self.i] is None:
             key_values = X
         else:
-            key_values = tf.concat((state[2][self.i], X), axis = 1)
+            key_values = tf.concat((state[2][self.i], X), axis=1)
         state[2][self.i] = key_values
         if kwargs["training"]:
             batch_size, num_steps, _ = X.shape
             # Shape of `dec_valid_lens`: (`batch_size`, `num_steps`), where
             # every row is [1, 2, ..., `num_steps`]
             dec_valid_lens = tf.repeat(tf.reshape(tf.range(1, num_steps + 1),
-                                                 shape = (-1, num_steps)), repeats = batch_size, axis = 0)
+                                                 shape=(-1, num_steps)), repeats=batch_size, axis=0)
 
         else:
             dec_valid_lens = None
@@ -768,7 +768,7 @@ decoder_blk(X, state)[0].shape
 decoder_blk = DecoderBlock(24, 24, 24, 24, [1, 2], 48, 8, 0.5, 0)
 X = tf.ones((2, 100, 24))
 state = [encoder_blk(X, valid_lens), valid_lens, [None]]
-decoder_blk(X, state, training = False)[0].shape
+decoder_blk(X, state, training=False)[0].shape
 ```
 
 Now we construct the entire transformer decoder
@@ -875,7 +875,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
         return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
     
     def call(self, X, state, **kwargs):
-        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(tf.cast(self.num_hiddens, dtype = tf.float32)), **kwargs)
+        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(tf.cast(self.num_hiddens, dtype=tf.float32)), **kwargs)
         self._attention_weights = [[None] * len(self.blks) for _ in range(2)]  # 2 Attention layers in decoder
         for i, blk in enumerate(self.blks):
             X, state = blk(X, state, **kwargs)
@@ -1078,8 +1078,8 @@ dec_attention_weights_2d = [head[0] for step in dec_attention_weight_seq for att
                             for blk in attn for head in blk]
 dec_attention_weights_filled = tf.convert_to_tensor(
     np.asarray(pd.DataFrame(dec_attention_weights_2d).fillna(0.0).values).astype(np.float32))
-dec_attention_weights = tf.reshape(dec_attention_weights_filled, shape = (-1, 2, num_layers, num_heads, num_steps))
-dec_self_attention_weights, dec_inter_attention_weights = tf.transpose(dec_attention_weights, perm = (1, 2, 3, 0, 4))
+dec_attention_weights = tf.reshape(dec_attention_weights_filled, shape=(-1, 2, num_layers, num_heads, num_steps))
+dec_self_attention_weights, dec_inter_attention_weights = tf.transpose(dec_attention_weights, perm=(1, 2, 3, 0, 4))
 print(dec_self_attention_weights.shape, dec_inter_attention_weights.shape)
 ```
 

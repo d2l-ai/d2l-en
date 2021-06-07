@@ -205,14 +205,14 @@ class MultiHeadAttention(nn.Module):
 #@save
 class MultiHeadAttention(tf.keras.layers.Layer):
     def __init__(self, key_size, query_size, value_size, num_hiddens,
-                 num_heads, dropout, bias = False, **kwargs):
+                 num_heads, dropout, bias=False, **kwargs):
         super().__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
-        self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias = bias)
-        self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias = bias)
-        self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias = bias)
-        self.W_o = tf.keras.layers.Dense(num_hiddens, use_bias = bias)
+        self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
+        self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
+        self.W_v = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
+        self.W_o = tf.keras.layers.Dense(num_hiddens, use_bias=bias)
     
     def call(self, queries, keys, values, valid_lens, **kwargs):
         # Shape of `queries`, `keys`, or `values`:
@@ -229,7 +229,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         if valid_lens is not None:
             # On axis 0, copy the first item (scalar or vector) for
             # `num_heads` times, then copy the next item, and so on
-            valid_lens = tf.repeat(valid_lens, repeats = self.num_heads, axis = 0)
+            valid_lens = tf.repeat(valid_lens, repeats=self.num_heads, axis=0)
             
         # Shape of `output`: (`batch_size` * `num_heads`, no. of queries, `num_hiddens` / `num_heads`)
         output = self.attention(queries, keys, values, valid_lens, **kwargs)
@@ -312,24 +312,24 @@ def transpose_qkv(X, num_heads):
     # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`).
     # Shape of output `X`:
     # (`batch_size`, no. of queries or key-value pairs, `num_heads`, `num_hiddens` / `num_heads`)
-    X = tf.reshape(X, shape = (X.shape[0], X.shape[1], num_heads, -1))
+    X = tf.reshape(X, shape=(X.shape[0], X.shape[1], num_heads, -1))
 
     # Shape of output `X`:
     # (`batch_size`, `num_heads`, no. of queries or key-value pairs,
     # `num_hiddens` / `num_heads`)
-    X = tf.transpose(X, perm = (0, 2, 1, 3))
+    X = tf.transpose(X, perm=(0, 2, 1, 3))
 
     # Shape of `output`:
     # (`batch_size` * `num_heads`, no. of queries or key-value pairs, `num_hiddens` / `num_heads`)
-    return tf.reshape(X, shape = (-1, X.shape[2], X.shape[3]))
+    return tf.reshape(X, shape=(-1, X.shape[2], X.shape[3]))
 
 
 #@save
 def transpose_output(X, num_heads):
     """Reverse the operation of `transpose_qkv`"""
-    X = tf.reshape(X, shape = (-1, num_heads, X.shape[1], X.shape[2]))
-    X = tf.transpose(X, perm = (0, 2, 1, 3))
-    return tf.reshape(X, shape = (X.shape[0], X.shape[1], -1))
+    X = tf.reshape(X, shape=(-1, num_heads, X.shape[1], X.shape[2]))
+    X = tf.transpose(X, perm=(0, 2, 1, 3))
+    return tf.reshape(X, shape=(X.shape[0], X.shape[1], -1))
 ```
 
 Let us test our implemented `MultiHeadAttention` class
@@ -379,7 +379,7 @@ attention(X, Y, Y, valid_lens).shape
 batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, tf.constant([3, 2])
 X = tf.ones((batch_size, num_queries, num_hiddens))
 Y = tf.ones((batch_size, num_kvpairs, num_hiddens))
-attention(X, Y, Y, valid_lens, training = False).shape
+attention(X, Y, Y, valid_lens, training=False).shape
 ```
 
 ## Summary

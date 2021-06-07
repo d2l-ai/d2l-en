@@ -245,13 +245,13 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
 ```{.python .input}
 #@tab tensorflow
 class Seq2SeqAttentionDecoder(AttentionDecoder):
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, dropout = 0, **kwargs):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, dropout=0, **kwargs):
         super().__init__(**kwargs)
         self.attention = d2l.AdditiveAttention(num_hiddens, num_hiddens, num_hiddens, dropout)
         self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
-        self.rnn = tf.keras.layers.RNN(tf.keras.layers.StackedRNNCells([tf.keras.layers.GRUCell(num_hiddens, dropout = dropout)
+        self.rnn = tf.keras.layers.RNN(tf.keras.layers.StackedRNNCells([tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
                                                                         for _ in range(num_layers)]),
-                                      return_sequences = True, return_state = True)
+                                      return_sequences=True, return_state=True)
         self.dense = tf.keras.layers.Dense(vocab_size)
         
     def init_state(self, enc_outputs, enc_valid_lens, *args):
@@ -266,21 +266,21 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         enc_outputs, hidden_state, enc_valid_lens = state
         # Shape of the output `X`: (`num_steps`, `batch_size`, `embed_size`)
         X = self.embedding(X) # Input `X` has shape: (`batch_size`, `num_steps`)
-        X = tf.transpose(X, perm = (1, 0, 2))
+        X = tf.transpose(X, perm=(1, 0, 2))
         outputs, self._attention_weights = [], []
         for x in X:
             # Shape of `query`: (`batch_size`, 1, `num_hiddens`)
-            query = tf.expand_dims(hidden_state[-1], axis = 1)
+            query = tf.expand_dims(hidden_state[-1], axis=1)
             # Shape of `context`: (`batch_size, 1, `num_hiddens`)
             context = self.attention(query, enc_outputs, enc_outputs, enc_valid_lens, **kwargs)
             # Concatenate on the feature dimension
-            x = tf.concat((context, tf.expand_dims(x, axis = 1)), axis = -1)
+            x = tf.concat((context, tf.expand_dims(x, axis=1)), axis=-1)
             out = self.rnn(x, hidden_state, **kwargs)
             hidden_state = out[1:]
             outputs.append(out[0])
             self._attention_weights.append(self.attention.attention_weights)
         # After fully-connected layer transformation, shape of `outputs`: (`batch_size`, `num_steps`, `vocab_size`)
-        outputs = self.dense(tf.concat(outputs, axis = 1))
+        outputs = self.dense(tf.concat(outputs, axis=1))
         return outputs, [enc_outputs, hidden_state, enc_valid_lens]
     
     @property
@@ -322,11 +322,11 @@ output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 
 ```{.python .input}
 #@tab tensorflow
-encoder = d2l.Seq2SeqEncoder(vocab_size = 10, embed_size = 8, num_hiddens = 16, num_layers = 2)
-decoder = Seq2SeqAttentionDecoder(vocab_size = 10, embed_size = 8, num_hiddens = 16, num_layers = 2)
+encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16, num_layers=2)
+decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16, num_layers=2)
 X = tf.zeros((4,7))
-state = decoder.init_state(encoder(X, training = False), None)
-output, state = decoder(X, state, training = False)
+state = decoder.init_state(encoder(X, training=False), None)
+output, state = decoder(X, state, training=False)
 print(output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape)
 ```
 
@@ -406,8 +406,8 @@ attention_weights = d2l.reshape(
 
 ```{.python .input}
 #@tab tensorflow
-attention_weights = tf.reshape(tf.concat([step[0][0][0] for step in dec_attention_weight_seq], axis = 0), 
-                               shape = (1, 1, -1, num_steps))
+attention_weights = tf.reshape(tf.concat([step[0][0][0] for step in dec_attention_weight_seq], axis=0), 
+                               shape=(1, 1, -1, num_steps))
 ```
 
 By visualizing the attention weights
