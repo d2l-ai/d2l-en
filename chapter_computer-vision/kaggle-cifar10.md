@@ -16,7 +16,7 @@ we will apply the knowledge we learned
 in previous sections
 to practice the Kaggle competition of
 CIFAR-10 image classification.
-The web address of the competition is https://www.kaggle.com/c/cifar-10
+(**The web address of the competition is https://www.kaggle.com/c/cifar-10**)
 
 :numref:`fig_kaggle_cifar10` shows the information on the competition's webpage.
 In order to submit the results,
@@ -84,8 +84,8 @@ After unzipping the downloaded file in `../data`, and unzipping `train.7z` and `
 
 where the `train` and `test` directories contain the training and testing images, respectively, `trainLabels.csv` provides labels for the training images, and `sample_submission.csv` is a sample submission file.
 
-To make it easier to get started, we provide a small-scale sample of the dataset that
-contains the first 1000 training images and 5 random testing images.
+To make it easier to get started, [**we provide a small-scale sample of the dataset that
+contains the first 1000 training images and 5 random testing images.**]
 To use the full dataset of the Kaggle competition, you need to set the following `demo` variable to `False`.
 
 ```{.python .input}
@@ -104,7 +104,7 @@ else:
     data_dir = '../data/cifar-10/'
 ```
 
-### Organizing the Dataset
+### [**Organizing the Dataset**]
 
 We need to organize datasets to facilitate model training and testing.
 Let us first read the labels from the csv file.
@@ -127,7 +127,7 @@ print('# training examples:', len(labels))
 print('# classes:', len(set(labels.values())))
 ```
 
-Next, we define the `reorg_train_valid` function to split the validation set out of the original training set.
+Next, we define the `reorg_train_valid` function to [**split the validation set out of the original training set.**]
 The argument `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set.
 More concretely,
 let $n$ be the number of images of the class with the least examples, and $r$ be the ratio.
@@ -170,7 +170,7 @@ def reorg_train_valid(data_dir, labels, valid_ratio):
     return n_valid_per_label
 ```
 
-The `reorg_test` function below organizes the testing set for data loading during prediction.
+The `reorg_test` function below [**organizes the testing set for data loading during prediction.**]
 
 ```{.python .input}
 #@tab all
@@ -183,8 +183,8 @@ def reorg_test(data_dir):
                               'unknown'))
 ```
 
-Finally, we use a function to invoke
-the `read_csv_labels`, `reorg_train_valid`, and `reorg_test` functions defined above.
+Finally, we use a function to [**invoke**]
+the `read_csv_labels`, `reorg_train_valid`, and `reorg_test` (**functions defined above.**)
 
 ```{.python .input}
 #@tab all
@@ -194,7 +194,7 @@ def reorg_cifar10_data(data_dir, valid_ratio):
     reorg_test(data_dir)
 ```
 
-Here we only set the batch size to 4 for the small-scale sample of the dataset.
+Here we only set the batch size to 32 for the small-scale sample of the dataset.
 When training and testing
 the complete dataset of the Kaggle competition,
 `batch_size` should be set to a larger integer, such as 128.
@@ -202,12 +202,12 @@ We split out 10% of the training examples as the validation set for tuning hyper
 
 ```{.python .input}
 #@tab all
-batch_size = 4 if demo else 128
+batch_size = 32 if demo else 128
 valid_ratio = 0.1
 reorg_cifar10_data(data_dir, valid_ratio)
 ```
 
-## Image Augmentation
+## [**Image Augmentation**]
 
 We use image augmentation to address overfitting.
 For example, images can be flipped horizontally at random during training.
@@ -270,7 +270,7 @@ transform_test = torchvision.transforms.Compose([
 
 ## Reading the Dataset
 
-Next, we read the organized dataset consisting of raw image files. Each example includes an image and a label.
+Next, we [**read the organized dataset consisting of raw image files**]. Each example includes an image and a label.
 
 ```{.python .input}
 train_ds, valid_ds, train_valid_ds, test_ds = [
@@ -291,7 +291,7 @@ valid_ds, test_ds = [torchvision.datasets.ImageFolder(
 ```
 
 During training,
-we need to specify all the image augmentation operations defined above.
+we need to [**specify all the image augmentation operations defined above**].
 When the validation set
 is used for model evaluation during hyperparameter tuning,
 no randomness from image augmentation should be introduced.
@@ -325,7 +325,7 @@ test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
                                         drop_last=False)
 ```
 
-## Defining the Model
+## Defining the [**Model**]
 
 :begin_tab:`mxnet`
 Here, we build the residual blocks based on the `HybridBlock` class, which is
@@ -413,7 +413,7 @@ def get_net():
 loss = nn.CrossEntropyLoss(reduction="none")
 ```
 
-## Defining the Training Function
+## Defining the [**Training Function**]
 
 We will select models and tune hyperparameters according to the model's performance on the validation set.
 In the following, we define the model training function `train`.
@@ -424,8 +424,11 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
     num_batches, timer = len(train_iter), d2l.Timer()
+    legend = ['train loss', 'train acc']
+    if valid_iter is not None:
+        legend.append('valid acc')
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
-                            legend=['train loss', 'train acc', 'valid acc'])
+                            legend=legend)
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(3)
         if epoch > 0 and epoch % lr_period == 0:
@@ -445,15 +448,12 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
             valid_acc = d2l.evaluate_accuracy_gpus(net, valid_iter,
                                                    d2l.split_batch)
             animator.add(epoch + 1, (None, None, valid_acc))
+    measures = (f'train loss {metric[0] / metric[2]:.3f}, '
+                f'train acc {metric[1] / metric[2]:.3f}')
     if valid_iter is not None:
-        print(f'loss {metric[0] / metric[2]:.3f}, '
-              f'train acc {metric[1] / metric[2]:.3f}, '
-              f'valid acc {valid_acc:.3f}')
-    else:
-        print(f'loss {metric[0] / metric[2]:.3f}, '
-              f'train acc {metric[1] / metric[2]:.3f}')
-    print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(devices)}')
+        measures += f', valid acc {valid_acc:.3f}'
+    print(measures + f'\n{metric[2] * num_epochs / timer.sum():.1f}'
+          f' examples/sec on {str(devices)}')
 ```
 
 ```{.python .input}
@@ -495,17 +495,17 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           f'on {str(devices)}')
 ```
 
-## Training and Validating the Model
+## [**Training and Validating the Model**]
 
 Now, we can train and validate the model.
 All the following hyperparameters can be tuned.
 For example, we can increase the number of epochs.
-When `lr_period` and `lr_decay` are set to 50 and 0.1, respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 50 epochs. Just for demonstration,
-we only train one epoch here.
+When `lr_period` and `lr_decay` are set to 4 and 0.9, respectively, the learning rate of the optimization algorithm will be multiplied by 0.9 after every 4 epochs. Just for ease of demonstration,
+we only train 20 epochs here.
 
 ```{.python .input}
-devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.1, 5e-4
-lr_period, lr_decay, net = 50, 0.1, get_net(devices)
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 20, 0.02, 5e-4
+lr_period, lr_decay, net = 4, 0.9, get_net(devices)
 net.hybridize()
 train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
@@ -519,7 +519,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
 
-## Classifying the Testing Set and Submitting Results on Kaggle
+## [**Classifying the Testing Set**] and Submitting Results on Kaggle
 
 After obtaining a promising model with hyperparameters,
 we use all the labeled data (including the validation set) to retrain the model and classify the testing set.
@@ -567,19 +567,19 @@ is similar to that in :numref:`sec_kaggle_house`.
 ## Summary
 
 * We can read datasets containing raw image files after organizing them into the required format.
+
 :begin_tab:`mxnet`
 * We can use convolutional neural networks, image augmentation, and hybrid programing in an image classification competition.
 :end_tab:
+
 :begin_tab:`pytorch`
 * We can use convolutional neural networks and image augmentation in an image classification competition.
 :end_tab:
 
-
 ## Exercises
 
-1. Use the complete CIFAR-10 dataset for this Kaggle competition. Change the `batch_size` and number of epochs `num_epochs` to 128 and 100, respectively.  See what accuracy and ranking you can achieve in this competition. Can you further improve them?
+1. Use the complete CIFAR-10 dataset for this Kaggle competition. Set hyperparameters as `batch_size = 128`, `num_epochs = 100`, `lr = 0.1`, `lr_period = 50`, and `lr_decay = 0.1`.  See what accuracy and ranking you can achieve in this competition. Can you further improve them?
 1. What accuracy can you get when not using image augmentation?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/379)

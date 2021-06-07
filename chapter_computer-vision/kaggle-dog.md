@@ -2,7 +2,7 @@
 
 In this section, we will practice
 the dog breed identification problem on
-Kaggle. The web address of this competition is https://www.kaggle.com/c/dog-breed-identification
+Kaggle. (**The web address of this competition is https://www.kaggle.com/c/dog-breed-identification**)
 
 In this competition,
 120 different breeds of dogs will be recognized.
@@ -61,7 +61,7 @@ After unzipping the downloaded file in `../data`, you will find the entire datas
 You may have noticed that the above structure is
 similar to that of the CIFAR-10 competition in :numref:`sec_kaggle_cifar10`, where folders `train/` and `test/` contain training and testing dog images, respectively, and `labels.csv` contains
 the labels for the training images.
-Similarly, to make it easier to get started, we provide a small sample of the dataset mentioned above: `train_valid_test_tiny.zip`.
+Similarly, to make it easier to get started, [**we provide a small sample of the dataset**] mentioned above: `train_valid_test_tiny.zip`.
 If you are going to use the full dataset for the Kaggle competition, you need to change the `demo` variable below to `False`.
 
 ```{.python .input}
@@ -79,7 +79,7 @@ else:
     data_dir = os.path.join('..', 'data', 'dog-breed-identification')
 ```
 
-### Organizing the Dataset
+### [**Organizing the Dataset**]
 
 We can organize the dataset similarly to what we did in :numref:`sec_kaggle_cifar10`, namely splitting out
 a validation set from the original training set, and moving images into subfolders grouped by labels.
@@ -95,12 +95,12 @@ def reorg_dog_data(data_dir, valid_ratio):
     d2l.reorg_test(data_dir)
 
 
-batch_size = 4 if demo else 128
+batch_size = 32 if demo else 128
 valid_ratio = 0.1
 reorg_dog_data(data_dir, valid_ratio)
 ```
 
-## Image Augmentation
+## [**Image Augmentation**]
 
 Recall that this dog breed dataset
 is a subset of the ImageNet dataset,
@@ -176,7 +176,7 @@ transform_test = torchvision.transforms.Compose([
                                      [0.229, 0.224, 0.225])])
 ```
 
-## Reading the Dataset
+## [**Reading the Dataset**]
 
 As in :numref:`sec_kaggle_cifar10`,
 we can read the organized dataset
@@ -231,7 +231,7 @@ test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
                                         drop_last=False)
 ```
 
-## Fine-Tuning a Pretrained Model
+## [**Fine-Tuning a Pretrained Model**]
 
 Again,
 the dataset for this competition is a subset of the ImageNet dataset. 
@@ -299,7 +299,7 @@ def get_net(devices):
     return finetune_net
 ```
 
-Before calculating the loss,
+Before [**calculating the loss**],
 we first obtain the input of the pretrained model's output layer, i.e., the extracted feature.
 Then we use this feature as the input for our small custom output network to calculate the loss.
 
@@ -334,7 +334,7 @@ def evaluate_loss(data_iter, net, devices):
     return l_sum / n
 ```
 
-## Defining the Training Function
+## Defining [**the Training Function**]
 
 We will select the model and tune hyperparameters according to the model's performance on the validation set. The model training function `train` only
 iterates parameters of the small custom output network.
@@ -346,8 +346,11 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
     trainer = gluon.Trainer(net.output_new.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
     num_batches, timer = len(train_iter), d2l.Timer()
+    legend = ['train loss']
+    if valid_iter is not None:
+        legend.append('valid loss')
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
-                            legend=['train loss', 'valid loss'])
+                            legend=legend)
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(2)
         if epoch > 0 and epoch % lr_period == 0:
@@ -372,13 +375,11 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
         if valid_iter is not None:
             valid_loss = evaluate_loss(valid_iter, net, devices)
             animator.add(epoch + 1, (None, valid_loss))
+    measures = f'train loss {metric[0] / metric[1]:.3f}'
     if valid_iter is not None:
-        print(f'train loss {metric[0] / metric[1]:.3f}, '
-              f'valid loss {valid_loss:.3f}')
-    else:
-        print(f'train loss {metric[0] / metric[1]:.3f}')
-    print(f'{metric[1] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(devices)}')
+        measures += f', valid loss {valid_loss:.3f}'
+    print(measures + f'\n{metric[1] * num_epochs / timer.sum():.1f}'
+          f' examples/sec on {str(devices)}')
 ```
 
 ```{.python .input}
@@ -422,15 +423,15 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
           f'on {str(devices)}')
 ```
 
-## Training and Validating the Model
+## [**Training and Validating the Model**]
 
 Now we can train and validate the model.
 The following hyperparameters are all tunable.
-For example, the number of epochs can be increased. Because `lr_period` and `lr_decay` are set to 10 and 0.1, respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
+For example, the number of epochs can be increased. Because `lr_period` and `lr_decay` are set to 2 and 0.9, respectively, the learning rate of the optimization algorithm will be multiplied by 0.9 after every 2 epochs.
 
 ```{.python .input}
-devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.01, 1e-4
-lr_period, lr_decay, net = 10, 0.1, get_net(devices)
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 0.005, 1e-4
+lr_period, lr_decay, net = 2, 0.9, get_net(devices)
 net.hybridize()
 train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
@@ -444,7 +445,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
 
-## Classifying the Testing Set and Submitting Results on Kaggle
+## [**Classifying the Testing Set**] and Submitting Results on Kaggle
 
 
 Similar to the final step in :numref:`sec_kaggle_cifar10`,
@@ -506,7 +507,7 @@ to Kaggle in the same way described in :numref:`sec_kaggle_house`.
 
 ## Exercises
 
-1. When using the fill Kaggle competition dataset, what results can you achieve when you increase the `batch_size` (batch size) and `num_epochs` (number of epochs)?
+1. When using the full Kaggle competition dataset, what results can you achieve when you increase `batch_size` (batch size) and `num_epochs` (number of epochs) while setting some other hyperparameters as `lr = 0.01`, `lr_period = 10`, and `lr_decay = 0.1`?
 1. Do you get better results if you use a deeper pretrained model? How do you tune hyperparameters? Can you further improve the results?
 
 :begin_tab:`mxnet`
