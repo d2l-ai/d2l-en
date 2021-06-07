@@ -207,7 +207,7 @@ then event $\mathcal{A}$ has occurred.
 That is to say, if $3$ dots faced up after rolling a die, since $3 \in \{1, 3, 5\}$,
 we can say that the event "seeing an odd number" has occurred.
 
-Formally, *probability* can be thought of a function that maps a set to a real value.
+Formally, *probability* can be thought of as a function that maps a set to a real value.
 The probability of an event $\mathcal{A}$ in the given sample space $\mathcal{S}$,
 denoted as $P(\mathcal{A})$, satisfies the following properties:
 
