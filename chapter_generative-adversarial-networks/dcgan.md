@@ -585,20 +585,16 @@ We train the model with a small number of epochs just for demonstration.
 For better performance,
 the variable `num_epochs` can be set to a larger number.
 
-```{.python .input}
-latent_dim, lr, num_epochs = 100, 0.005, 20
-train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
-```
 
 ```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 latent_dim, lr, num_epochs = 100, 0.005, 20
 train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-latent_dim, lr, num_epochs = 100, 0.0005, 40  # We have changed the learning rate and number of epochs 
+latent_dim, lr, num_epochs = 100, 0.0005, 40
 train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ```
 
