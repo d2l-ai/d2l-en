@@ -15,6 +15,7 @@ import tarfile
 import time
 import zipfile
 from collections import defaultdict
+
 import pandas as pd
 import requests
 from IPython import display
@@ -374,6 +375,7 @@ def download_extract(name, folder=None):
     fp.extractall(base_dir)
     return os.path.join(base_dir, folder) if folder else data_dir
 
+
 def download_all():
     """Download all files in the DATA_HUB."""
     for name in DATA_HUB:
@@ -392,6 +394,7 @@ DATA_HUB['kaggle_house_test'] = (DATA_URL + 'kaggle_house_pred_test.csv',
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
     return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
+
 
 def try_all_gpus():
     """Return all available GPUs, or [cpu()] if no GPU exists."""
@@ -488,6 +491,7 @@ class Residual(nn.Block):
 d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
                                 '090b5e7e70c295757f55df93cb0a180b9691891a')
 
+
 def read_time_machine():
     """Load the time machine dataset into a list of text lines."""
     with open(d2l.download('time_machine'), 'r') as f:
@@ -540,6 +544,7 @@ class Vocab:
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
+
 
 def count_corpus(tokens):
     """Count token frequencies."""
@@ -756,6 +761,7 @@ class RNNModel(nn.Block):
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
+
 
 def read_data_nmt():
     """Load the English-French dataset."""
@@ -1001,7 +1007,7 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                 ax.set_ylabel(ylabel)
             if titles:
                 ax.set_title(titles[j])
-    fig.colorbar(pcm, ax=axes, shrink=0.6);
+    fig.colorbar(pcm, ax=axes, shrink=0.6)
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
@@ -1143,6 +1149,7 @@ def transpose_qkv(X, num_heads):
     # `num_hiddens` / `num_heads`)
     return X.reshape(-1, X.shape[2], X.shape[3])
 
+
 def transpose_output(X, num_heads):
     """Reverse the operation of `transpose_qkv`"""
     X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
@@ -1255,6 +1262,7 @@ def train_2d(trainer, steps=20, f_grad=None):
     print(f'epoch {i + 1}, x1: {float(x1):f}, x2: {float(x2):f}')
     return results
 
+
 def show_trace_2d(f, results):
     """Show the trace of 2D variables during optimization."""
     d2l.set_figsize()
@@ -1269,6 +1277,7 @@ def show_trace_2d(f, results):
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
+
 
 def get_data_ch11(batch_size=10, n=1500):
     data = np.genfromtxt(d2l.download('airfoil'), dtype=np.float32,
@@ -1464,6 +1473,7 @@ def box_corner_to_center(boxes):
     h = y2 - y1
     boxes = d2l.stack((cx, cy, w, h), axis=-1)
     return boxes
+
 
 def box_center_to_corner(boxes):
     """Convert from (center, width, height) to (upper-left, lower-right)."""
@@ -1803,6 +1813,7 @@ def build_colormap2label():
                        colormap[2]] = i
     return colormap2label
 
+
 def voc_label_indices(colormap, colormap2label):
     """Map an RGB color to a label."""
     colormap = colormap.astype(np.int32)
@@ -1888,6 +1899,7 @@ def copyfile(filename, target_dir):
     os.makedirs(target_dir, exist_ok=True)
     shutil.copy(filename, target_dir)
 
+
 def reorg_train_valid(data_dir, labels, valid_ratio):
     """Split the validation set out of the original training set."""
     # The number of examples of the class that has the fewest examples in the
@@ -1931,6 +1943,7 @@ d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
                        '319d85e578af0cdc590547f26231e4e31cdf1e42')
+
 
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
@@ -2194,6 +2207,7 @@ class BERTModel(nn.Block):
 d2l.DATA_HUB['wikitext-2'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/'
     'wikitext-2-v1.zip', '3c914d17d80b1459be871a5039ac23e752a53cbe')
+
 
 def _read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
@@ -2543,6 +2557,7 @@ def predict_snli(net, vocab, premise, hypothesis):
 d2l.DATA_HUB['ml-100k'] = (
     'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
     'cd4dcac4241c8a4ad7badc7ca635da8a69dddb83')
+
 
 def read_data_ml100k():
     data_dir = d2l.download_extract('ml-100k')

@@ -15,6 +15,7 @@ import tarfile
 import time
 import zipfile
 from collections import defaultdict
+
 import pandas as pd
 import requests
 from IPython import display
@@ -396,6 +397,7 @@ def download_extract(name, folder=None):
     fp.extractall(base_dir)
     return os.path.join(base_dir, folder) if folder else data_dir
 
+
 def download_all():
     """Download all files in the DATA_HUB."""
     for name in DATA_HUB:
@@ -416,6 +418,7 @@ def try_gpu(i=0):
     if len(tf.config.experimental.list_physical_devices('GPU')) >= i + 1:
         return tf.device(f'/GPU:{i}')
     return tf.device('/CPU:0')
+
 
 def try_all_gpus():
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
@@ -467,6 +470,7 @@ class TrainCallback(tf.keras.callbacks.Callback):
             print(f'{num_examples / self.timer.avg():.1f} examples/sec on '
                   f'{str(self.device_name)}')
 
+
 def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
     """Train a model with a GPU (defined in Chapter 6)."""
     device_name = device._device_name
@@ -510,6 +514,7 @@ class Residual(tf.keras.Model):
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
                                 '090b5e7e70c295757f55df93cb0a180b9691891a')
+
 
 def read_time_machine():
     """Load the time machine dataset into a list of text lines."""
@@ -563,6 +568,7 @@ class Vocab:
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
+
 
 def count_corpus(tokens):
     """Count token frequencies."""
@@ -782,6 +788,7 @@ class RNNModel(tf.keras.layers.Layer):
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
                            '94646ad1522d915e7b0f9296181140edcf86a4f5')
+
 
 def read_data_nmt():
     """Load the English-French dataset."""
@@ -1055,7 +1062,7 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                 ax.set_ylabel(ylabel)
             if titles:
                 ax.set_title(titles[j])
-    fig.colorbar(pcm, ax=axes, shrink=0.6);
+    fig.colorbar(pcm, ax=axes, shrink=0.6)
 
 
 # Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
@@ -1199,6 +1206,7 @@ def transpose_qkv(X, num_heads):
     # (`batch_size` * `num_heads`, no. of queries or key-value pairs, `num_hiddens` / `num_heads`)
     return tf.reshape(X, shape=(-1, X.shape[2], X.shape[3]))
 
+
 def transpose_output(X, num_heads):
     """Reverse the operation of `transpose_qkv`"""
     X = tf.reshape(X, shape=(-1, num_heads, X.shape[1], X.shape[2]))
@@ -1317,6 +1325,7 @@ def train_2d(trainer, steps=20, f_grad=None):
     print(f'epoch {i + 1}, x1: {float(x1):f}, x2: {float(x2):f}')
     return results
 
+
 def show_trace_2d(f, results):
     """Show the trace of 2D variables during optimization."""
     d2l.set_figsize()
@@ -1331,6 +1340,7 @@ def show_trace_2d(f, results):
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
                            '76e5be1548fd8222e5074cf0faae75edff8cf93f')
+
 
 def get_data_ch11(batch_size=10, n=1500):
     data = np.genfromtxt(d2l.download('airfoil'), dtype=np.float32,
@@ -1432,6 +1442,7 @@ def box_corner_to_center(boxes):
     h = y2 - y1
     boxes = d2l.stack((cx, cy, w, h), axis=-1)
     return boxes
+
 
 def box_center_to_corner(boxes):
     """Convert from (center, width, height) to (upper-left, lower-right)."""

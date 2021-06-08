@@ -59,7 +59,8 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
 
 data_dir = d2l.download_extract('pokemon')
 batch_size = 256
-pokemon = tf.keras.preprocessing.image_dataset_from_directory(data_dir, batch_size=batch_size, image_size=(64, 64))
+pokemon = tf.keras.preprocessing.image_dataset_from_directory(
+    data_dir, batch_size=batch_size, image_size=(64, 64))
 ```
 
 We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0, 1]$, while our generator will use the tanh function to obtain outputs in $[-1, 1]$. Therefore we normalize the data with $0.5$ mean and $0.5$ standard deviation to match the value range.
@@ -98,8 +99,10 @@ def transform_func(X):
     return X
 
 # For TF>=2.4 use `num_parallel_calls = tf.data.AUTOTUNE`
-data_iter = pokemon.map(lambda x, y: (transform_func(x), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
-data_iter = data_iter.cache().shuffle(buffer_size=1000).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+data_iter = pokemon.map(lambda x, y: (transform_func(x), y),
+                        num_parallel_calls=tf.data.experimental.AUTOTUNE)
+data_iter = data_iter.cache().shuffle(buffer_size=1000).prefetch(
+    buffer_size=tf.data.experimental.AUTOTUNE)
 ```
 
 Let us visualize the first 20 images.
@@ -166,9 +169,11 @@ class G_block(nn.Module):
 ```{.python .input}
 #@tab tensorflow
 class G_block(tf.keras.layers.Layer):
-    def __init__(self, out_channels, kernel_size=4, strides=2, padding="same", **kwargs):
+    def __init__(self, out_channels, kernel_size=4, strides=2, padding="same",
+                 **kwargs):
         super().__init__(**kwargs)
-        self.conv2d_trans = tf.keras.layers.Conv2DTranspose(out_channels, kernel_size, strides, padding, use_bias=False)
+        self.conv2d_trans = tf.keras.layers.Conv2DTranspose(
+            out_channels, kernel_size, strides, padding, use_bias=False)
         self.batch_norm = tf.keras.layers.BatchNormalization()
         self.activation = tf.keras.layers.ReLU()
         
@@ -203,7 +208,7 @@ g_blk(x).shape
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.zeros((2, 16, 16, 3))   # Channel last convention
+x = tf.zeros((2, 16, 16, 3))  # Channel last convention
 g_blk = G_block(20)
 g_blk(x).shape
 ```
@@ -227,7 +232,8 @@ g_blk(x).shape
 ```{.python .input}
 #@tab tensorflow
 x = tf.zeros((2, 1, 1, 3))
-g_blk = G_block(20, strides=1, padding="valid") # `padding="valid"` corresponds to no padding
+# `padding="valid"` corresponds to no padding
+g_blk = G_block(20, strides=1, padding="valid")
 g_blk(x).shape
 ```
 
@@ -263,12 +269,15 @@ net_G = nn.Sequential(
 #@tab tensorflow
 n_G = 64
 net_G = tf.keras.Sequential([
-    G_block(out_channels=n_G*8, strides=1, padding="valid"),  # Output: (4, 4, 64 * 8)
+    # Output: (4, 4, 64 * 8)
+    G_block(out_channels=n_G*8, strides=1, padding="valid"),
     G_block(out_channels=n_G*4), # Output: (8, 8, 64 * 4)
     G_block(out_channels=n_G*2), # Output: (16, 16, 64 * 2)
     G_block(out_channels=n_G), # Output: (32, 32, 64)
-    tf.keras.layers.Conv2DTranspose(3, kernel_size=4, strides=2, padding="same",
-                                    use_bias=False, activation="tanh") # Output: (64, 64, 3)
+    # Output: (64, 64, 3)
+    tf.keras.layers.Conv2DTranspose(
+        3, kernel_size=4, strides=2, padding="same", use_bias=False,
+        activation="tanh") 
 ])
 ```
 
@@ -288,7 +297,7 @@ net_G(x).shape
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.zeros((1, 1, 1, 100))  # 1 batch, image width = 1, image height = 1, image depth (channels) = 100
+x = tf.zeros((1, 1, 1, 100))
 net_G(x).shape
 ```
 
@@ -299,7 +308,6 @@ The discriminator is a normal convolutional network network except that it uses 
 $$\textrm{leaky ReLU}(x) = \begin{cases}x & \text{if}\ x > 0\\ \alpha x &\text{otherwise}\end{cases}.$$
 
 As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if $\alpha=1$. For $\alpha \in (0, 1)$, leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the "dying ReLU" problem that a neuron might always output a negative value and therefore cannot make any progress since the gradient of ReLU is 0.
-
 
 ```{.python .input}
 #@tab mxnet,pytorch
@@ -351,9 +359,11 @@ class D_block(nn.Module):
 ```{.python .input}
 #@tab tensorflow
 class D_block(tf.keras.layers.Layer):
-    def __init__(self, out_channels, kernel_size=4, strides=2, padding="same", alpha=0.2, **kwargs):
+    def __init__(self, out_channels, kernel_size=4, strides=2, padding="same",
+                 alpha=0.2, **kwargs):
         super().__init__(**kwargs)
-        self.conv2d = tf.keras.layers.Conv2D(out_channels, kernel_size, strides, padding, use_bias=False)
+        self.conv2d = tf.keras.layers.Conv2D(out_channels, kernel_size,
+                                             strides, padding, use_bias=False)
         self.batch_norm = tf.keras.layers.BatchNormalization()
         self.activation = tf.keras.layers.LeakyReLU(alpha)
         
@@ -424,7 +434,8 @@ net_D = tf.keras.Sequential([
     D_block(out_channels=n_D*2), # Output: (16, 16, 64 * 2)
     D_block(out_channels=n_D*4), # Output: (8, 8, 64 * 4)
     D_block(out_channels=n_D*8), # Outupt: (4, 4, 64 * 64)
-    tf.keras.layers.Conv2D(1, kernel_size=4, use_bias=False) # Output: (1, 1, 1)
+    # Output: (1, 1, 1)
+    tf.keras.layers.Conv2D(1, kernel_size=4, use_bias=False)
 ])
 ```
 
@@ -539,8 +550,10 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
 
 ```{.python .input}
 #@tab tensorflow
-def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gpu()):
-    loss = tf.keras.losses.BinaryCrossentropy(from_logits=True, reduction=tf.keras.losses.Reduction.SUM)
+def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
+          device=d2l.try_gpu()):
+    loss = tf.keras.losses.BinaryCrossentropy(
+        from_logits=True, reduction=tf.keras.losses.Reduction.SUM)
     
     for w in net_D.trainable_variables:
         w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))
@@ -551,8 +564,9 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gp
     optimizer_D = tf.keras.optimizers.Adam(**optimizer_hp)
     optimizer_G = tf.keras.optimizers.Adam(**optimizer_hp)
     
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, num_epochs], nrows=2,
-                            figsize=(5, 5), legend=['discriminator', 'generator'])
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
+                            legend=['discriminator', 'generator'])
     animator.fig.subplots_adjust(hspace=0.3)
     
     for epoch in range(1, num_epochs + 1):
@@ -561,7 +575,8 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gp
         metric = d2l.Accumulator(3) # loss_D, loss_G, num_examples
         for X, _ in data_iter:
             batch_size = X.shape[0]
-            Z = tf.random.normal(mean = 0, stddev = 1, shape = (batch_size, 1, 1, latent_dim))
+            Z = tf.random.normal(mean=0, stddev=1,
+                                 shape=(batch_size, 1, 1, latent_dim))
             metric.add(d2l.update_D(X, Z, net_D, net_G, loss, optimizer_D),
                        d2l.update_G(Z, net_D, net_G, loss, optimizer_G),
                        batch_size)
@@ -570,7 +585,8 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gp
         Z = tf.random.normal(mean=0, stddev=1, shape=(21, 1, 1, latent_dim))
         # Normalize the synthetic data to N(0, 1)
         fake_x = net_G(Z) / 2 + 0.5
-        imgs = tf.concat([tf.concat([fake_x[i * 7 + j] for j in range(7)], axis=1) 
+        imgs = tf.concat([tf.concat([fake_x[i * 7 + j] for j in range(7)],
+                                    axis=1) 
                           for i in range(len(fake_x) // 7)], axis=0)
         animator.axes[1].cla()
         animator.axes[1].imshow(imgs)
@@ -584,7 +600,6 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, device=d2l.try_gp
 We train the model with a small number of epochs just for demonstration.
 For better performance,
 the variable `num_epochs` can be set to a larger number.
-
 
 ```{.python .input}
 #@tab mxnet, pytorch

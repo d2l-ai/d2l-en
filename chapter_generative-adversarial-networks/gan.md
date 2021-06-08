@@ -64,19 +64,12 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## Generate some "real" data
+## Generate Some "Real" Data
 
 Since this is going to be the world's lamest example, we simply generate data drawn from a Gaussian.
 
 ```{.python .input}
-X = d2l.normal(0.0, 1, (1000, 2))
-A = d2l.tensor([[1, 2], [-0.1, 0.5]])
-b = d2l.tensor([1, 2])
-data = d2l.matmul(X, A) + b
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 X = d2l.normal(0.0, 1, (1000, 2))
 A = d2l.tensor([[1, 2], [-0.1, 0.5]])
 b = d2l.tensor([1, 2])
@@ -94,13 +87,7 @@ data = d2l.matmul(X, A) + b
 Let us see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
 
 ```{.python .input}
-d2l.set_figsize()
-d2l.plt.scatter(d2l.numpy(data[:100, 0]), d2l.numpy(data[:100, 1]));
-print(f'The covariance matrix is\n{d2l.matmul(A.T, A)}')
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 d2l.set_figsize()
 d2l.plt.scatter(d2l.numpy(data[:100, 0]), d2l.numpy(data[:100, 1]));
 print(f'The covariance matrix is\n{d2l.matmul(A.T, A)}')
@@ -224,7 +211,8 @@ def update_D(X, Z, net_D, net_G, loss, optimizer_D):
         real_Y = net_D(X)
         fake_Y = net_D(fake_X)
         # We multiply the loss by batch_size to match PyTorch's BCEWithLogitsLoss
-        loss_D = (loss(ones, tf.squeeze(real_Y)) + loss(zeros, tf.squeeze(fake_Y))) * batch_size / 2
+        loss_D = (loss(ones, tf.squeeze(real_Y)) + loss(
+            zeros, tf.squeeze(fake_Y))) * batch_size / 2
     grads_D = tape.gradient(loss_D, net_D.trainable_variables)
     optimizer_D.apply_gradients(zip(grads_D, net_D.trainable_variables))
     return loss_D
@@ -366,15 +354,17 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
 ```{.python .input}
 #@tab tensorflow
 def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
-    loss = tf.keras.losses.BinaryCrossentropy(from_logits=True, reduction=tf.keras.losses.Reduction.SUM)
+    loss = tf.keras.losses.BinaryCrossentropy(
+        from_logits=True, reduction=tf.keras.losses.Reduction.SUM)
     for w in net_D.trainable_variables:
         w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))
     for w in net_G.trainable_variables:
         w.assign(tf.random.normal(mean=0, stddev=0.02, shape=w.shape))
     optimizer_D = tf.keras.optimizers.Adam(learning_rate=lr_D)
     optimizer_G = tf.keras.optimizers.Adam(learning_rate=lr_G)
-    animator = d2l.Animator(xlabel="epoch", ylabel="loss", xlim=[1, num_epochs],
-                            nrows=2, figsize=(5, 5), legend=["discriminator", "generator"])
+    animator = d2l.Animator(
+        xlabel="epoch", ylabel="loss", xlim=[1, num_epochs], nrows=2,
+        figsize=(5, 5), legend=["discriminator", "generator"])
     animator.fig.subplots_adjust(hspace=0.3)
     for epoch in range(num_epochs):
         # Train one epoch
@@ -382,9 +372,11 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
         metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
         for (X,) in data_iter:
             batch_size = X.shape[0]
-            Z = tf.random.normal(mean=0, stddev=1, shape=(batch_size, latent_dim))
+            Z = tf.random.normal(
+                mean=0, stddev=1, shape=(batch_size, latent_dim))
             metric.add(update_D(X, Z, net_D, net_G, loss, optimizer_D),
-                       update_G(Z, net_D, net_G, loss, optimizer_G), batch_size)
+                       update_G(Z, net_D, net_G, loss, optimizer_G),
+                       batch_size)
         # Visualize generated examples
         Z = tf.random.normal(mean=0, stddev=1, shape=(100, latent_dim))
         fake_X = net_G(Z)
