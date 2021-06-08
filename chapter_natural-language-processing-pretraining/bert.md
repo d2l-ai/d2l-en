@@ -587,7 +587,7 @@ class BERTModel(nn.Module):
 * ELMo encodes context bidirectionally but uses task-specific architectures (however, it is practically non-trivial to craft a specific architecture for every natural language processing task); while GPT is task-agnostic but encodes context left-to-right.
 * BERT combines the best of both worlds: it encodes context bidirectionally and requires minimal architecture changes for a wide range of natural language processing tasks.
 * The embeddings of the BERT input sequence are the sum of the token embeddings, segment embeddings, and positional embeddings.
-* Pretraining BERT is composed of two tasks: masked language modeling and next sentence prediction. The former is able to encode bidirectional context for representing words, while the later explicitly models the logical relationship between text pairs.
+* Pretraining BERT is composed of two tasks: masked language modeling and next sentence prediction. The former is able to encode bidirectional context for representing words, while the latter explicitly models the logical relationship between text pairs.
 
 
 ## Exercises
