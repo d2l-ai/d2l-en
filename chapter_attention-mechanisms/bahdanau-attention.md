@@ -386,7 +386,7 @@ for eng, fra in zip(engs, fras):
     translation, dec_attention_weight_seq = d2l.predict_seq2seq(
         net, eng, src_vocab, tgt_vocab, num_steps, True)
     print(f'{eng} => {translation}, ',
-          f'bleu {d2l.bleu(fra, translation, k=2):.3f}')
+          f'bleu {d2l.bleu(translation, fra, k=2):.3f}')
 ```
 
 ```{.python .input}
