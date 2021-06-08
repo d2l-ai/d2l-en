@@ -1,5 +1,5 @@
 # Region-based CNNs (R-CNNs)
-
+:label:`sec_rcnn`
 
 Besides single shot multibox detection
 described in :numref:`sec_ssd`,

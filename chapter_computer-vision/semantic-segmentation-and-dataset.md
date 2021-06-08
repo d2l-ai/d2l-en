@@ -1,9 +1,26 @@
 # Semantic Segmentation and the Dataset
 :label:`sec_semantic_segmentation`
 
-In our discussion of object detection issues in the previous sections, we only used rectangular bounding boxes to label and predict objects in images. In this section, we will look at semantic segmentation, which attempts to segment images into regions with different semantic categories. These semantic regions label and predict objects at the pixel level. :numref:`fig_segmentation` shows a semantically-segmented image, with areas labeled "dog", "cat", and "background". As you can see, compared to object detection, semantic segmentation labels areas with pixel-level borders, for significantly greater precision.
+When discussing object detection tasks
+in :numref:`sec_bbox`--:numref:`sec_rcnn`,
+rectangular bounding boxes
+are used to label and predict objects in images.
+This section will discuss the problem of *semantic segmentation*,
+which focuses on how to segment an image into regions belonging to different semantic classes.
+Different from object detection,
+semantic segmentation
+recognizes and understands
+what are in images in pixel level:
+its labeling and prediction of semantic regions are
+in pixel level.
+:numref:`fig_segmentation` shows the labels
+of the dog, cat, and background of the image in semantic segmentation.
+Compared with in object detection,
+the pixel-level borders labeled
+in semantic segmentation are obviously more fine-grained.
 
-![Semantically-segmented image, with areas labeled "dog", "cat", and "background". ](../img/segmentation.svg)
+
+![Labels of the dog, cat, and background of the image in semantic segmentation.](../img/segmentation.svg)
 :label:`fig_segmentation`
 
 
