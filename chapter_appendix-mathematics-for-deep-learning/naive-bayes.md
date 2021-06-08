@@ -70,10 +70,10 @@ mnist_test = torchvision.datasets.MNIST(
 ((train_images, train_labels), (
     test_images, test_labels)) = tf.keras.datasets.mnist.load_data()
 
-# Original pixel values of MNIST range from 0-255 (as the digits are stored as uint8). 
-# For this section, pixel values that are greater than 128 (in the original image) are 
-# converted to 1 and values that are less than 128 are converted to 0. Why? See section
-# 18.9.2 and 18.9.3.
+# Original pixel values of MNIST range from 0-255 (as the digits are stored as
+# uint8). For this section, pixel values that are greater than 128 (in the
+# original image) are converted to 1 and values that are less than 128 are
+# converted to 0. See section 18.9.2 and 18.9.3 for why
 train_images = tf.floor(tf.constant(train_images / 128, dtype = tf.float32))
 test_images = tf.floor(tf.constant(test_images / 128, dtype = tf.float32))
 
@@ -387,8 +387,8 @@ py
 We may now check if the prediction is correct.
 
 ```{.python .input}
-# Convert label which is a scalar tensor of int32 dtype
-# to a Python scalar integer for comparison
+# Convert label which is a scalar tensor of int32 dtype to a Python scalar
+# integer for comparison
 py.argmax(axis=0) == int(label)
 ```
 
@@ -429,7 +429,8 @@ d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```{.python .input}
 #@tab tensorflow
 def predict(X):
-    return [tf.argmax(bayes_pred_stable(x), axis=0, output_type = tf.int32).numpy()
+    return [tf.argmax(
+        bayes_pred_stable(x), axis=0, output_type = tf.int32).numpy()
             for x in X]
 
 X = tf.stack([train_images[i] for i in range(10, 38)], axis=0)
@@ -459,7 +460,8 @@ float((preds == y).sum()) / len(y)  # Validation accuracy
 X = test_images
 y = test_labels
 preds = tf.constant(predict(X), dtype=tf.int32)
-tf.reduce_sum(tf.cast(preds == y, tf.float32)).numpy() / len(y)  # Validation accuracy
+# Validation accuracy
+tf.reduce_sum(tf.cast(preds == y, tf.float32)).numpy() / len(y)
 ```
 
 Modern deep networks achieve error rates of less than $0.01$. The relatively poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
