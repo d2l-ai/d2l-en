@@ -118,7 +118,7 @@ We can define entropy as below.
 ```{.python .input}
 def entropy(p):
     entropy = - p * np.log2(p)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(entropy.as_nd_ndarray())
     return out
 
@@ -129,7 +129,7 @@ entropy(np.array([0.1, 0.5, 0.1, 0.3]))
 #@tab pytorch
 def entropy(p):
     entropy = - p * torch.log2(p)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(entropy)
     return out
 
@@ -202,7 +202,7 @@ Let us implement joint entropy from scratch.
 ```{.python .input}
 def joint_entropy(p_xy):
     joint_ent = -p_xy * np.log2(p_xy)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(joint_ent.as_nd_ndarray())
     return out
 
@@ -213,7 +213,7 @@ joint_entropy(np.array([[0.1, 0.5], [0.1, 0.3]]))
 #@tab pytorch
 def joint_entropy(p_xy):
     joint_ent = -p_xy * torch.log2(p_xy)
-    # nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(joint_ent)
     return out
 
@@ -224,7 +224,7 @@ joint_entropy(torch.tensor([[0.1, 0.5], [0.1, 0.3]]))
 #@tab tensorflow
 def joint_entropy(p_xy):
     joint_ent = -p_xy * log2(p_xy)
-    # nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(joint_ent)
     return out
 
@@ -264,7 +264,7 @@ Now, let us implement conditional entropy :eqref:`eq_cond_ent_def` from scratch.
 def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * np.log2(p_y_given_x)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(cond_ent.as_nd_ndarray())
     return out
 
@@ -276,7 +276,7 @@ conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2, 0.8]))
 def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * torch.log2(p_y_given_x)
-    # nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(cond_ent)
     return out
 
@@ -289,7 +289,7 @@ conditional_entropy(torch.tensor([[0.1, 0.5], [0.2, 0.3]]),
 def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * log2(p_y_given_x)
-    # nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(cond_ent)
     return out
 
@@ -331,7 +331,7 @@ Now, let us implement mutual information from scratch.
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = p_xy * np.log2(p)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(mutual.as_nd_ndarray())
     return out
 
@@ -344,7 +344,7 @@ mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]),
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = p_xy * torch.log2(p)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(mutual)
     return out
 
@@ -357,7 +357,7 @@ mutual_information(torch.tensor([[0.1, 0.5], [0.1, 0.3]]),
 def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = p_xy * log2(p)
-    # Operator nansum will sum up the non-nan number
+    # Operator `nansum` will sum up the non-nan number
     out = nansum(mutual)
     return out
 
@@ -562,7 +562,8 @@ def cross_entropy(y_hat, y):
 #@tab tensorflow
 def cross_entropy(y_hat, y):
     # `tf.gather_nd` is used to select specific indices of a tensor.
-    ce = -tf.math.log(tf.gather_nd(y_hat, indices = [[i, j] for i, j in zip(range(len(y_hat)), y)]))
+    ce = -tf.math.log(tf.gather_nd(y_hat, indices = [[i, j] for i, j in zip(
+        range(len(y_hat)), y)]))
     return tf.reduce_mean(ce).numpy()
 ```
 
@@ -653,8 +654,8 @@ nll_loss.get()
 
 ```{.python .input}
 #@tab pytorch
-# Implementation of CrossEntropy loss in pytorch combines nn.LogSoftmax() and
-# nn.NLLLoss()
+# Implementation of cross-entropy loss in PyTorch combines `nn.LogSoftmax()`
+# and `nn.NLLLoss()`
 nll_loss = NLLLoss()
 loss = nll_loss(torch.log(preds), labels)
 loss
@@ -665,9 +666,11 @@ loss
 def nll_loss(y_hat, y):
     # Convert labels to one-hot vectors.
     y = tf.keras.utils.to_categorical(y, num_classes= y_hat.shape[1])
-    # We will not calculate Negative log likelihood (NLL) from the definition. Rather, we will follow a circular argument.
-    # Because NLL is same as `cross_entropy`, if we calculate cross_entropy that would give us NLL. 
-    cross_entropy = tf.keras.losses.CategoricalCrossentropy(from_logits = True, reduction = tf.keras.losses.Reduction.NONE)
+    # We will not calculate Negative log likelihood (NLL) from the definition.
+    # Rather, we will follow a circular argument. Because NLL is same as
+    # `cross_entropy`, if we calculate cross_entropy that would give us NLL
+    cross_entropy = tf.keras.losses.CategoricalCrossentropy(
+        from_logits = True, reduction = tf.keras.losses.Reduction.NONE)
     return tf.reduce_mean(cross_entropy(y, y_hat)).numpy()
 
 loss = nll_loss(tf.math.log(preds), labels)
