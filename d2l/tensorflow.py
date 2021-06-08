@@ -925,12 +925,7 @@ class Seq2SeqEncoder(d2l.Encoder):
 
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def sequence_mask(X, valid_len, value=0):
-    """Mask irrelevant entries in sequences.
-    Argument:
-        X: either a 2D or 3D tensor
-        valid_len: 1D tensor
-        value: value to be substitued for mask
-    """
+    """Mask irrelevant entries in sequences."""
     maxlen = X.shape[1]
     mask = tf.range(start=0, limit=maxlen,
                     dtype=tf.float32)[None, :] < tf.cast(
@@ -968,7 +963,6 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
     optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
     animator = d2l.Animator(xlabel="epoch", ylabel="loss",
                             xlim=[10, num_epochs])
-
     for epoch in range(num_epochs):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
@@ -994,9 +988,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
 # Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def predict_seq2seq(net, src_sentence, src_vocab, tgt_vocab, num_steps,
                     save_attention_weights=False):
-    """Predict for sequence to sequence.
-    **Note**: We don't need the `device` argument in TF as TF uses available device automatically.
-    """
+    """Predict for sequence to sequence."""
     src_tokens = src_vocab[src_sentence.lower().split(' ')] + [
         src_vocab['<eos>']]
     enc_valid_len = tf.constant([len(src_tokens)])
