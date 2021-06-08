@@ -949,10 +949,12 @@ key_size, query_size, value_size = 32, 32, 32
 norm_shape = [2]
 
 train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
-encoder = TransformerEncoder(len(src_vocab), key_size, query_size, value_size, num_hiddens,
-                             norm_shape, ffn_num_hiddens, num_heads, num_layers, dropout)
-decoder = TransformerDecoder(len(tgt_vocab), key_size, query_size, value_size, num_hiddens,
-                             norm_shape, ffn_num_hiddens, num_heads, num_layers, dropout)
+encoder = TransformerEncoder(
+    len(src_vocab), key_size, query_size, value_size, num_hiddens, norm_shape,
+    ffn_num_hiddens, num_heads, num_layers, dropout)
+decoder = TransformerDecoder(
+    len(tgt_vocab), key_size, query_size, value_size, num_hiddens, norm_shape,
+    ffn_num_hiddens, num_heads, num_layers, dropout)
 net = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
@@ -962,17 +964,7 @@ we use the transformer model
 to translate a few English sentences into French and compute their BLEU scores.
 
 ```{.python .input}
-engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
-fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
-for eng, fra in zip(engs, fras):
-    translation, dec_attention_weight_seq = d2l.predict_seq2seq(
-        net, eng, src_vocab, tgt_vocab, num_steps, device, True)
-    print(f'{eng} => {translation}, ',
-          f'bleu {d2l.bleu(translation, fra, k=2):.3f}')
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 for eng, fra in zip(engs, fras):
@@ -987,8 +979,10 @@ for eng, fra in zip(engs, fras):
 engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 for eng, fra in zip(engs, fras):
-    translation, dec_attention_weight_seq = d2l.predict_seq2seq(net, eng, src_vocab, tgt_vocab, num_steps, True)
-    print(f'{eng} => {translation}, ', f'bleu {d2l.bleu(fra, translation, k=2):.3f}')
+    translation, dec_attention_weight_seq = d2l.predict_seq2seq(
+        net, eng, src_vocab, tgt_vocab, num_steps, True)
+    print(f'{eng} => {translation}, ',
+          f'bleu {d2l.bleu(fra, translation, k=2):.3f}')
 ```
 
 Let us visualize the transformer attention weights when translating the last English sentence into French.
@@ -1015,6 +1009,7 @@ Each head independently attends
 based on a separate representation subspaces of queries, keys, and values.
 
 ```{.python .input}
+#@tab mxnet, tensorflow
 d2l.show_heatmaps(
     enc_attention_weights, xlabel='Key positions', ylabel='Query positions',
     titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))
@@ -1026,12 +1021,6 @@ d2l.show_heatmaps(
     enc_attention_weights.cpu(), xlabel='Key positions',
     ylabel='Query positions', titles=['Head %d' % i for i in range(1, 5)],
     figsize=(7, 3.5))
-```
-
-```{.python .input}
-#@tab tensorflow
-d2l.show_heatmaps(enc_attention_weights, xlabel='Key positions', ylabel='Query positions',
-                  titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))
 ```
 
 To visualize both the decoder self-attention weights and the encoder-decoder attention weights,
@@ -1074,12 +1063,16 @@ dec_self_attention_weights.shape, dec_inter_attention_weights.shape
 
 ```{.python .input}
 #@tab tensorflow
-dec_attention_weights_2d = [head[0] for step in dec_attention_weight_seq for attn in step 
+dec_attention_weights_2d = [head[0] for step in dec_attention_weight_seq
+                            for attn in step 
                             for blk in attn for head in blk]
 dec_attention_weights_filled = tf.convert_to_tensor(
-    np.asarray(pd.DataFrame(dec_attention_weights_2d).fillna(0.0).values).astype(np.float32))
-dec_attention_weights = tf.reshape(dec_attention_weights_filled, shape=(-1, 2, num_layers, num_heads, num_steps))
-dec_self_attention_weights, dec_inter_attention_weights = tf.transpose(dec_attention_weights, perm=(1, 2, 3, 0, 4))
+    np.asarray(pd.DataFrame(dec_attention_weights_2d).fillna(
+        0.0).values).astype(np.float32))
+dec_attention_weights = tf.reshape(dec_attention_weights_filled, shape=(
+    -1, 2, num_layers, num_heads, num_steps))
+dec_self_attention_weights, dec_inter_attention_weights = tf.transpose(
+    dec_attention_weights, perm=(1, 2, 3, 0, 4))
 print(dec_self_attention_weights.shape, dec_inter_attention_weights.shape)
 ```
 

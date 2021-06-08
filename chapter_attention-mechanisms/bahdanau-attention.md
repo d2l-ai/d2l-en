@@ -245,12 +245,15 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
 ```{.python .input}
 #@tab tensorflow
 class Seq2SeqAttentionDecoder(AttentionDecoder):
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, dropout=0, **kwargs):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0, **kwargs):
         super().__init__(**kwargs)
-        self.attention = d2l.AdditiveAttention(num_hiddens, num_hiddens, num_hiddens, dropout)
+        self.attention = d2l.AdditiveAttention(num_hiddens, num_hiddens,
+                                               num_hiddens, dropout)
         self.embedding = tf.keras.layers.Embedding(vocab_size, embed_size)
-        self.rnn = tf.keras.layers.RNN(tf.keras.layers.StackedRNNCells([tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
-                                                                        for _ in range(num_layers)]),
+        self.rnn = tf.keras.layers.RNN(tf.keras.layers.StackedRNNCells(
+            [tf.keras.layers.GRUCell(num_hiddens, dropout=dropout)
+             for _ in range(num_layers)]),
                                       return_sequences=True, return_state=True)
         self.dense = tf.keras.layers.Dense(vocab_size)
         
@@ -272,14 +275,16 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
             # Shape of `query`: (`batch_size`, 1, `num_hiddens`)
             query = tf.expand_dims(hidden_state[-1], axis=1)
             # Shape of `context`: (`batch_size, 1, `num_hiddens`)
-            context = self.attention(query, enc_outputs, enc_outputs, enc_valid_lens, **kwargs)
+            context = self.attention(query, enc_outputs, enc_outputs,
+                                     enc_valid_lens, **kwargs)
             # Concatenate on the feature dimension
             x = tf.concat((context, tf.expand_dims(x, axis=1)), axis=-1)
             out = self.rnn(x, hidden_state, **kwargs)
             hidden_state = out[1:]
             outputs.append(out[0])
             self._attention_weights.append(self.attention.attention_weights)
-        # After fully-connected layer transformation, shape of `outputs`: (`batch_size`, `num_steps`, `vocab_size`)
+        # After fully-connected layer transformation, shape of `outputs`:
+        # (`batch_size`, `num_steps`, `vocab_size`)
         outputs = self.dense(tf.concat(outputs, axis=1))
         return outputs, [enc_outputs, hidden_state, enc_valid_lens]
     
@@ -322,12 +327,14 @@ output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 
 ```{.python .input}
 #@tab tensorflow
-encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16, num_layers=2)
-decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16, num_layers=2)
-X = tf.zeros((4,7))
+encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
+                             num_layers=2)
+decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, num_hiddens=16,
+                                  num_layers=2)
+X = tf.zeros((4, 7))
 state = decoder.init_state(encoder(X, training=False), None)
 output, state = decoder(X, state, training=False)
-print(output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape)
+output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 ```
 
 ## Training
@@ -361,17 +368,7 @@ we use it to translate a few English sentences
 into French and compute their BLEU scores.
 
 ```{.python .input}
-engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
-fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
-for eng, fra in zip(engs, fras):
-    translation, dec_attention_weight_seq = d2l.predict_seq2seq(
-        net, eng, src_vocab, tgt_vocab, num_steps, device, True)
-    print(f'{eng} => {translation}, ',
-          f'bleu {d2l.bleu(translation, fra, k=2):.3f}')
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 for eng, fra in zip(engs, fras):
@@ -386,28 +383,17 @@ for eng, fra in zip(engs, fras):
 engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 for eng, fra in zip(engs, fras):
-    translation, dec_attention_weight_seq = d2l.predict_seq2seq(net, eng, src_vocab, tgt_vocab, num_steps, True)
+    translation, dec_attention_weight_seq = d2l.predict_seq2seq(
+        net, eng, src_vocab, tgt_vocab, num_steps, True)
     print(f'{eng} => {translation}, ',
           f'bleu {d2l.bleu(fra, translation, k=2):.3f}')
 ```
 
 ```{.python .input}
+#@tab all
 attention_weights = d2l.reshape(
     d2l.concat([step[0][0][0] for step in dec_attention_weight_seq], 0),
     (1, 1, -1, num_steps))
-```
-
-```{.python .input}
-#@tab pytorch
-attention_weights = d2l.reshape(
-    d2l.concat([step[0][0][0] for step in dec_attention_weight_seq], 0),
-    (1, 1, -1, num_steps))
-```
-
-```{.python .input}
-#@tab tensorflow
-attention_weights = tf.reshape(tf.concat([step[0][0][0] for step in dec_attention_weight_seq], axis=0), 
-                               shape=(1, 1, -1, num_steps))
 ```
 
 By visualizing the attention weights

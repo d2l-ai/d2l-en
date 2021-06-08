@@ -1067,13 +1067,7 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
 
 # Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
 def masked_softmax(X, valid_lens):
-    """Perform softmax operation by masking elements on the last axis.
-    Arguments:
-        X: 3D tensor
-        valid_lens: 1D or 2D tensor
-                    When valid_lens is 1D, its `len(valid_lens)` should be same as `X.shape[0]`.
-                    When valid_lens is 2D, `valid_lens.shape` should be same as `X.shape[:2]`.
-    """
+    """Perform softmax operation by masking elements on the last axis."""
     # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
     if valid_lens is None:
         return tf.nn.softmax(X, axis=-1)

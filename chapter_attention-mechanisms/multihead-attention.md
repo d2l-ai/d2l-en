@@ -360,14 +360,7 @@ attention = MultiHeadAttention(num_hiddens, num_hiddens, num_hiddens,
 ```
 
 ```{.python .input}
-batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
-X = d2l.ones((batch_size, num_queries, num_hiddens))
-Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
-attention(X, Y, Y, valid_lens).shape
-```
-
-```{.python .input}
-#@tab pytorch
+#@tab mxnet, pytorch
 batch_size, num_queries, num_kvpairs, valid_lens = 2, 4, 6, d2l.tensor([3, 2])
 X = d2l.ones((batch_size, num_queries, num_hiddens))
 Y = d2l.ones((batch_size, num_kvpairs, num_hiddens))
