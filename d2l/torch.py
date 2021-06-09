@@ -1916,8 +1916,8 @@ VOC_CLASSES = [
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-def build_colormap2label():
-    """Build an RGB color to label mapping for segmentation."""
+def voc_colormap2label():
+    """Build the mapping from RGB to class indices for VOC labels."""
     colormap2label = torch.zeros(256**3, dtype=torch.long)
     for i, colormap in enumerate(VOC_COLORMAP):
         colormap2label[(colormap[0] * 256 + colormap[1]) * 256 +
@@ -1926,7 +1926,7 @@ def build_colormap2label():
 
 
 def voc_label_indices(colormap, colormap2label):
-    """Map an RGB color to a label."""
+    """Map any RGB values in VOC labels to their class indices."""
     colormap = colormap.permute(1, 2, 0).numpy().astype('int32')
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256 +
            colormap[:, :, 2])
@@ -1955,7 +1955,7 @@ class VOCSegDataset(torch.utils.data.Dataset):
             self.normalize_image(feature)
             for feature in self.filter(features)]
         self.labels = self.filter(labels)
-        self.colormap2label = build_colormap2label()
+        self.colormap2label = voc_colormap2label()
         print('read ' + str(len(self.features)) + ' examples')
 
     def normalize_image(self, img):

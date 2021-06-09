@@ -39,7 +39,10 @@ distinguish them from semantic segmentation as follows.
 
 ## The Pascal VOC2012 Semantic Segmentation Dataset
 
-In the semantic segmentation field, one important dataset is [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/). To better understand this dataset, we must first import the package or module needed for the experiment.
+On of the most important semantic segmentation dataset
+is [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/).
+In the following,
+we will take a look at this dataset.
 
 ```{.python .input}
 %matplotlib inline
@@ -59,9 +62,9 @@ import torchvision
 import os
 ```
 
-The original site might be unstable, so we download the data from a mirror site.
-The archive is about 2 GB, so it will take some time to download.
-After you decompress the archive, the dataset is located in the `../data/VOCdevkit/VOC2012` path.
+The tar file of the dataset is about 2 GB,
+so it may take a while to download the file.
+The extracted dataset is located at `../data/VOCdevkit/VOC2012`.
 
 ```{.python .input}
 #@tab all
@@ -72,8 +75,18 @@ d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
 voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
 ```
 
-Go to `../data/VOCdevkit/VOC2012` to see the different parts of the dataset.
-The `ImageSets/Segmentation` path contains text files that specify the training and testing examples. The `JPEGImages` and `SegmentationClass` paths contain the example input images and labels, respectively. These labels are also in image format, with the same dimensions as the input images to which they correspond. In the labels, pixels with the same color belong to the same semantic category. The `read_voc_images` function defined below reads all input images and labels to the memory.
+After entering the path `../data/VOCdevkit/VOC2012`,
+we can see the different components of the dataset.
+The `ImageSets/Segmentation` path contains text files
+that specify training and test samples,
+while the `JPEGImages` and `SegmentationClass` paths
+store the input image and label for each example, respectively.
+The label here is also in the image format,
+with the same size
+as its labeled input image.
+Besides,
+pixels with the same color in any label image belong to the same semantic class.
+The following defines the `read_voc_images` function to read all the input images and labels into the memory.
 
 ```{.python .input}
 #@save
@@ -115,7 +128,8 @@ def read_voc_images(voc_dir, is_train=True):
 train_features, train_labels = read_voc_images(voc_dir, True)
 ```
 
-We draw the first five input images and their labels. In the label images, white represents borders and black represents the background. Other colors correspond to different categories.
+We draw the first five input images and their labels.
+In the label images, white and black represent borders and  background, respectively, while the other colors correspond to different classes.
 
 ```{.python .input}
 n = 5
@@ -131,7 +145,9 @@ imgs = [img.permute(1,2,0) for img in imgs]
 d2l.show_images(imgs, 2, n);
 ```
 
-Next, we list each RGB color value in the labels and the categories they label.
+Next, we enumerate
+the RGB color values and class names
+for all the labels in this dataset.
 
 ```{.python .input}
 #@tab all
@@ -150,20 +166,28 @@ VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
                'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
 ```
 
-After defining the two constants above, we can easily find the category index for each pixel in the labels.
+With the two constants defined above,
+we can conveniently
+find the class index for each pixel in a label.
+We define the `voc_colormap2label` function
+to build the mapping from the above RGB color values
+to class indices,
+and the `voc_label_indices` function
+to map any RGB values to their class indices in this Pascal VOC2012 dataset.
 
 ```{.python .input}
 #@save
-def build_colormap2label():
-    """Build an RGB color to label mapping for segmentation."""
+def voc_colormap2label():
+    """Build the mapping from RGB to class indices for VOC labels."""
     colormap2label = np.zeros(256 ** 3)
     for i, colormap in enumerate(VOC_COLORMAP):
-        colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
+        colormap2label[
+            (colormap[0] * 256 + colormap[1]) * 256 + colormap[2]] = i
     return colormap2label
 
 #@save
 def voc_label_indices(colormap, colormap2label):
-    """Map an RGB color to a label."""
+    """Map any RGB values in VOC labels to their class indices."""
     colormap = colormap.astype(np.int32)
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
            + colormap[:, :, 2])
@@ -173,27 +197,30 @@ def voc_label_indices(colormap, colormap2label):
 ```{.python .input}
 #@tab pytorch
 #@save
-def build_colormap2label():
-    """Build an RGB color to label mapping for segmentation."""
+def voc_colormap2label():
+    """Build the mapping from RGB to class indices for VOC labels."""
     colormap2label = torch.zeros(256 ** 3, dtype=torch.long)
     for i, colormap in enumerate(VOC_COLORMAP):
-        colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
+        colormap2label[
+            (colormap[0] * 256 + colormap[1]) * 256 + colormap[2]] = i
     return colormap2label
 
 #@save
 def voc_label_indices(colormap, colormap2label):
-    """Map an RGB color to a label."""
-    colormap = colormap.permute(1,2,0).numpy().astype('int32')
+    """Map any RGB values in VOC labels to their class indices."""
+    colormap = colormap.permute(1, 2, 0).numpy().astype('int32')
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
            + colormap[:, :, 2])
     return colormap2label[idx]
 ```
 
-For example, in the first example image, the category index for the front part of the airplane is 1 and the index for the background is 0.
+For example, in the first example image,
+the class index for the front part of the airplane is 1,
+while the background index is 0.
 
 ```{.python .input}
 #@tab all
-y = voc_label_indices(train_labels[0], build_colormap2label())
+y = voc_label_indices(train_labels[0], voc_colormap2label())
 y[105:115, 130:140], VOC_CLASSES[1]
 ```
 
@@ -247,7 +274,6 @@ We use the inherited `Dataset` class provided by Gluon to customize the semantic
 #@save
 class VOCSegDataset(gluon.data.Dataset):
     """A customized dataset to load VOC dataset."""
-
     def __init__(self, is_train, crop_size, voc_dir):
         self.rgb_mean = np.array([0.485, 0.456, 0.406])
         self.rgb_std = np.array([0.229, 0.224, 0.225])
@@ -256,7 +282,7 @@ class VOCSegDataset(gluon.data.Dataset):
         self.features = [self.normalize_image(feature)
                          for feature in self.filter(features)]
         self.labels = self.filter(labels)
-        self.colormap2label = build_colormap2label()
+        self.colormap2label = voc_colormap2label()
         print('read ' + str(len(self.features)) + ' examples')
 
     def normalize_image(self, img):
@@ -291,7 +317,7 @@ class VOCSegDataset(torch.utils.data.Dataset):
         self.features = [self.normalize_image(feature)
                          for feature in self.filter(features)]
         self.labels = self.filter(labels)
-        self.colormap2label = build_colormap2label()
+        self.colormap2label = voc_colormap2label()
         print('read ' + str(len(self.features)) + ' examples')
 
     def normalize_image(self, img):
