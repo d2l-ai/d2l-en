@@ -6,7 +6,7 @@ in :numref:`sec_bbox`--:numref:`sec_rcnn`,
 rectangular bounding boxes
 are used to label and predict objects in images.
 This section will discuss the problem of *semantic segmentation*,
-which focuses on how to segment an image into regions belonging to different semantic classes.
+which focuses on how to divide an image into regions belonging to different semantic classes.
 Different from object detection,
 semantic segmentation
 recognizes and understands
@@ -32,7 +32,7 @@ namely image segmentation and instance segmentation.
 We will briefly
 distinguish them from semantic segmentation as follows.
 
-* *Image segmentation* segments an image into several constituent regions. The methods for this type of problem usually make use of the correlation between pixels in the image. It does not need label information about image pixels during training, and it cannot guarantee that the segmented regions will have the semantics that we hope to obtain during prediction. Taking the image in :numref:`fig_segmentation` as input, image segmentation may segment the dog into two regions: one covers the mouth and eyes which are mainly black, and the other covers the rest of the body which is mainly yellow.
+* *Image segmentation* divides an image into several constituent regions. The methods for this type of problem usually make use of the correlation between pixels in the image. It does not need label information about image pixels during training, and it cannot guarantee that the segmented regions will have the semantics that we hope to obtain during prediction. Taking the image in :numref:`fig_segmentation` as input, image segmentation may divide the dog into two regions: one covers the mouth and eyes which are mainly black, and the other covers the rest of the body which is mainly yellow.
 * *Instance segmentation* is also called *simultaneous detection and segmentation*. It studies how to recognize the pixel-level regions of each object instance in an image. Different from semantic segmentation, instance segmentation needs to distinguish not only semantics, but also different object instances. For example, if there are two dogs in the image, instance segmentation needs to distinguish which of the two dogs a pixel belongs to.
 
 
@@ -226,12 +226,23 @@ y[105:115, 130:140], VOC_CLASSES[1]
 
 ### Data Preprocessing
 
-In the preceding chapters, we scaled images to make them fit the input shape of the model. In semantic segmentation, this method would require us to re-map the predicted pixel categories back to the original-size input image. It would be very difficult to do this precisely, especially in segmented regions with different semantics. To avoid this problem, we crop the images to set dimensions and do not scale them. Specifically, we use the random cropping method used in image augmentation to crop the same region from input images and their labels.
+In previous experiments
+such as in :numref:`sec_alexnet`--:numref:`sec_googlenet`,
+images are rescaled 
+to fit the model's required input shape.
+However, in semantic segmentation,
+doing so 
+requires rescaling the predicted pixel classes
+back to the original shape of the input image.
+Such rescaling may be inaccurate,
+especially for segmented regions with different classes. To avoid this issue,
+we crop the image to a *fixed* shape instead of rescaling. Specifically, using random cropping from image augmentation, we crop the same area of
+the input image and the label.
 
 ```{.python .input}
 #@save
 def voc_rand_crop(feature, label, height, width):
-    """Randomly crop for both feature and label images."""
+    """Randomly crop both feature and label images."""
     feature, rect = image.random_crop(feature, (width, height))
     label = image.fixed_crop(label, *rect)
     return feature, label
@@ -241,9 +252,9 @@ def voc_rand_crop(feature, label, height, width):
 #@tab pytorch
 #@save
 def voc_rand_crop(feature, label, height, width):
-    """Randomly crop for both feature and label images."""
-    rect = torchvision.transforms.RandomCrop.get_params(feature,
-                                                        (height, width))
+    """Randomly crop both feature and label images."""
+    rect = torchvision.transforms.RandomCrop.get_params(
+        feature, (height, width))
     feature = torchvision.transforms.functional.crop(feature, *rect)
     label = torchvision.transforms.functional.crop(label, *rect)
     return feature, label
@@ -262,18 +273,28 @@ imgs = []
 for _ in range(n):
     imgs += voc_rand_crop(train_features[0], train_labels[0], 200, 300)
 
-imgs = [img.permute(1,2,0) for img in imgs]
+imgs = [img.permute(1, 2, 0) for img in imgs]
 d2l.show_images(imgs[::2] + imgs[1::2], 2, n);
 ```
 
-### Dataset Classes for Custom Semantic Segmentation
+### Custom Semantic Segmentation Dataset Class
 
-We use the inherited `Dataset` class provided by Gluon to customize the semantic segmentation dataset class `VOCSegDataset`. By implementing the `__getitem__` function, we can arbitrarily access the input image with the index `idx` and the category indexes for each of its pixels from the dataset. As some images in the dataset may be smaller than the output dimensions specified for random cropping, we must remove these example by using a custom `filter` function. In addition, we define the `normalize_image` function to normalize each of the three RGB channels of the input images.
+We define a custom semantic segmentation dataset class `VOCSegDataset` by inheriting the `Dataset` class provided by high-level APIs.
+By implementing the `__getitem__` function,
+we can arbitrarily access the input image indexed as `idx` in the dataset and the class index of each pixel in this image.
+Since some images in the dataset
+have a smaller size
+than the output size of random cropping,
+these examples are filtered out
+by a custom `filter` function.
+In addition, we also
+define the `normalize_image` function to
+standardize the values of the three RGB channels of input images.
 
 ```{.python .input}
 #@save
 class VOCSegDataset(gluon.data.Dataset):
-    """A customized dataset to load VOC dataset."""
+    """A customized dataset to load the VOC dataset."""
     def __init__(self, is_train, crop_size, voc_dir):
         self.rgb_mean = np.array([0.485, 0.456, 0.406])
         self.rgb_std = np.array([0.229, 0.224, 0.225])
@@ -307,7 +328,7 @@ class VOCSegDataset(gluon.data.Dataset):
 #@tab pytorch
 #@save
 class VOCSegDataset(torch.utils.data.Dataset):
-    """A customized dataset to load VOC dataset."""
+    """A customized dataset to load the VOC dataset."""
 
     def __init__(self, is_train, crop_size, voc_dir):
         self.transform = torchvision.transforms.Normalize(
@@ -339,7 +360,12 @@ class VOCSegDataset(torch.utils.data.Dataset):
 
 ### Reading the Dataset
 
-Using the custom `VOCSegDataset` class, we create the training set and testing set instances. We assume the random cropping operation output images in the shape $320\times 480$. Below, we can see the number of examples retained in the training and testing sets.
+We use the custom `VOCSegDatase`t class to
+create instances of the training set and test set, respectively.
+Suppose that
+we specify that the output shape of randomly cropped images is $320\times 480$.
+Below we can view the number of examples
+that are retained in the training set and test set.
 
 ```{.python .input}
 #@tab all
@@ -348,7 +374,10 @@ voc_train = VOCSegDataset(True, crop_size, voc_dir)
 voc_test = VOCSegDataset(False, crop_size, voc_dir)
 ```
 
-We set the batch size to 64 and define the iterators for the training and testing sets. Print the shape of the first minibatch. In contrast to image classification and object recognition, labels here are three-dimensional arrays.
+Setting the batch size to 64,
+we define the data loader for the training set.
+Let us print the shape of the first minibatch.
+Different from in image classification or object detection, labels here are three-dimensional tensors.
 
 ```{.python .input}
 batch_size = 64
@@ -375,12 +404,14 @@ for X, Y in train_iter:
 
 ### Putting All Things Together
 
-Finally, we define a function `load_data_voc` that  downloads and loads this dataset, and then returns the data iterators.
+Finally, we define the following `load_data_voc` function
+to download and read the Pascal VOC2012 semantic segmentation dataset. 
+It returns data loaders for both the training and test datasets.
 
 ```{.python .input}
 #@save
 def load_data_voc(batch_size, crop_size):
-    """Download and load the VOC2012 semantic dataset."""
+    """Load the VOC semantic segmentation dataset."""
     voc_dir = d2l.download_extract('voc2012', os.path.join(
         'VOCdevkit', 'VOC2012'))
     num_workers = d2l.get_dataloader_workers()
@@ -397,7 +428,7 @@ def load_data_voc(batch_size, crop_size):
 #@tab pytorch
 #@save
 def load_data_voc(batch_size, crop_size):
-    """Download and load the VOC2012 semantic dataset."""
+    """Load the VOC semantic segmentation dataset."""
     voc_dir = d2l.download_extract('voc2012', os.path.join(
         'VOCdevkit', 'VOC2012'))
     num_workers = d2l.get_dataloader_workers()
@@ -412,13 +443,16 @@ def load_data_voc(batch_size, crop_size):
 
 ## Summary
 
-* Semantic segmentation looks at how images can be segmented into regions with different semantic categories.
-* In the semantic segmentation field, one important dataset is Pascal VOC2012.
-* Because the input images and labels in semantic segmentation have a one-to-one correspondence at the pixel level, we randomly crop them to a fixed size, rather than scaling them.
+* Semantic segmentation recognizes and understands what are in an image in pixel level by dividing the image into regions belonging to different semantic classes.
+* On of the most important semantic segmentation dataset is Pascal VOC2012.
+* In semantic segmentation, since the input image and  label correspond one-to-one on the pixel, the input image is randomly cropped to a fixed shape rather than rescaled.
+
 
 ## Exercises
 
-1. Recall the content we covered in :numref:`sec_image_augmentation`. Which of the image augmentation methods used in image classification would be hard to use in semantic segmentation?
+1. How can semantic segmentation be applied in autonomous vehicles and medical image diagnostics? Can you think of other applications? 
+1. Recall the descriptions of data augmentation in :numref:`sec_image_augmentation`. Which of the image augmentation methods used in image classification would be infeasible to be applied in semantic segmentation?
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/375)
