@@ -69,8 +69,8 @@ Verify the results in :numref:`fig_trans_conv`.
 
 ```{.python .input}
 #@tab all
-X = d2l.tensor([[0., 1], [2, 3]])
-K = d2l.tensor([[0., 1], [2, 3]])
+X = d2l.tensor([[0.0, 1.0], [2.0, 3.0]])
+K = d2l.tensor([[0.0, 1.0], [2.0, 3.0]])
 trans_conv(X, K)
 ```
 
@@ -114,7 +114,10 @@ tconv.weight.data = K
 tconv(X)
 ```
 
-Similarly, strides are applied to outputs as well.
+Similarly, strides are applied to outputs as well as illustrated in :numref:`fig_trans_conv_stride2`.
+
+![Transposed convolution layer with a $2\times 2$ kernel with stride 2.](../img/trans_conv_stride2.svg)
+:label:`fig_trans_conv_stride2`
 
 ```{.python .input}
 tconv = nn.Conv2DTranspose(1, kernel_size=2, strides=2)
@@ -158,7 +161,7 @@ The transposed convolution takes its name from the matrix transposition. In fact
 ```{.python .input}
 #@tab all
 X = d2l.arange(9.0).reshape(3, 3)
-K = d2l.tensor([[1, 2], [3, 4]])
+K = d2l.tensor([[1.0, 2.0], [3.0, 4.0]])
 Y = d2l.corr2d(X, K)
 Y
 ```
@@ -188,7 +191,7 @@ We can implement transposed convolution as a matrix multiplication as well by re
 
 ```{.python .input}
 #@tab all
-X = d2l.tensor([[1.0, 2], [3, 4]])
+X = d2l.tensor([[1.0, 2.0], [3.0, 4.0]])
 Y = trans_conv(X, K)
 Y == d2l.matmul(W.T, d2l.reshape(X, -1)).reshape(3, 3)
 ```
