@@ -158,7 +158,7 @@ The transposed convolution takes its name from the matrix transposition. In fact
 ```{.python .input}
 #@tab all
 X = d2l.arange(9.0).reshape(3, 3)
-K = d2l.tensor([[0, 1], [2, 3]])
+K = d2l.tensor([[1, 2], [3, 4]])
 Y = d2l.corr2d(X, K)
 Y
 ```
@@ -180,27 +180,17 @@ W
 Then the convolution operator can be implemented by matrix multiplication with proper reshaping.
 
 ```{.python .input}
-Y == np.dot(W, X.reshape(-1)).reshape(2, 2)
-```
-
-```{.python .input}
-#@tab pytorch
-Y == torch.mv(W, X.reshape(-1)).reshape(2, 2)
+#@tab all
+Y == d2l.matmul(W, d2l.reshape(X, -1)).reshape(2, 2)
 ```
 
 We can implement transposed convolution as a matrix multiplication as well by reusing `kernel2matrix`. To reuse the generated $W$, we construct a $2\times 2$ input, so the corresponding weight matrix will have a shape $(9, 4)$, which is $W^\top$. Let us verify the results.
 
 ```{.python .input}
-X = np.array([[0, 1], [2, 3]])
+#@tab all
+X = d2l.tensor([[1.0, 2], [3, 4]])
 Y = trans_conv(X, K)
-Y == np.dot(W.T, X.reshape(-1)).reshape(3, 3)
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.tensor([[0.0, 1], [2, 3]])
-Y = trans_conv(X, K)
-Y == torch.mv(W.T, X.reshape(-1)).reshape(3, 3)
+Y == d2l.matmul(W.T, d2l.reshape(X, -1)).reshape(3, 3)
 ```
 
 ## Summary
