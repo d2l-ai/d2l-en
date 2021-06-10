@@ -360,7 +360,7 @@ a clever idea and contribute an implementation to deep learning frameworks.
 1. Can you design other cases where a neural network might exhibit symmetry requiring breaking besides the permutation symmetry in an MLP's layers?
 1. Can we initialize all weight parameters in linear regression or in softmax regression to the same value?
 1. Look up analytic bounds on the eigenvalues of the product of two matrices. What does this tell you about ensuring that gradients are well conditioned?
-1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on layer-wise adaptive rate scaling  for inspiration :cite:`You.Gitman.Ginsburg.2017`.
+1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on layerwise adaptive rate scaling  for inspiration :cite:`You.Gitman.Ginsburg.2017`.
 
 
 :begin_tab:`mxnet`

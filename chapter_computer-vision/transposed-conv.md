@@ -1,8 +1,32 @@
 # Transposed Convolution
 :label:`sec_transposed_conv`
 
-The layers we introduced so far for convolutional neural networks, including
-convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`), often reduce the input width and height, or keep them unchanged. Applications such as semantic segmentation (:numref:`sec_semantic_segmentation`) and generative adversarial networks (:numref:`sec_dcgan`), however, require to predict values for each pixel and therefore needs to increase input width and height. Transposed convolution, also named fractionally-strided convolution :cite:`Dumoulin.Visin.2016` or deconvolution :cite:`Long.Shelhamer.Darrell.2015`, serves this purpose.
+The CNN layers we have seen so far,
+such as convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`),
+typically reduce (downsample) the spatial dimensions (height and width) of the input,
+or keep them unchanged.
+In semantic segmentation
+that classifies at pixel-level,
+it will be convenient if
+the spatial dimensions of the
+input and output are the same.
+For example,
+the channel dimension at one output pixel 
+can hold the classification results
+for the input pixel at the same spatial position.
+
+
+To achieve this, especially after 
+the spatial dimensions are reduced by CNN layers,
+we can use another type
+of CNN layers
+that can increase (upsample) the spatial dimensions
+of intermediate feature maps.
+In this section,
+we will introduce 
+*transposed convolution*, which is also called *fractionally-strided convolution* :cite:`Dumoulin.Visin.2016`, 
+for reversing downsampling operations
+by the convolution.
 
 ```{.python .input}
 from mxnet import np, npx, init

@@ -1824,7 +1824,7 @@ def voc_label_indices(colormap, colormap2label):
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def voc_rand_crop(feature, label, height, width):
-    """Randomly crop for both feature and label images."""
+    """Randomly crop both feature and label images."""
     feature, rect = image.random_crop(feature, (width, height))
     label = image.fixed_crop(label, *rect)
     return feature, label
@@ -1832,7 +1832,7 @@ def voc_rand_crop(feature, label, height, width):
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 class VOCSegDataset(gluon.data.Dataset):
-    """A customized dataset to load VOC dataset."""
+    """A customized dataset to load the VOC dataset."""
     def __init__(self, is_train, crop_size, voc_dir):
         self.rgb_mean = np.array([0.485, 0.456, 0.406])
         self.rgb_std = np.array([0.229, 0.224, 0.225])
@@ -1865,7 +1865,7 @@ class VOCSegDataset(gluon.data.Dataset):
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def load_data_voc(batch_size, crop_size):
-    """Download and load the VOC2012 semantic dataset."""
+    """Load the VOC semantic segmentation dataset."""
     voc_dir = d2l.download_extract('voc2012',
                                    os.path.join('VOCdevkit', 'VOC2012'))
     num_workers = d2l.get_dataloader_workers()
