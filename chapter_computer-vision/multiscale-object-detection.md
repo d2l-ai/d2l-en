@@ -74,7 +74,7 @@ we can determine centers of uniformly sampled anchor boxes  on any image.
 
 
 The `display_anchors` function is defined below.
-We generate anchor boxes (`anchors`) on the feature map (`fmap`) with each unit (pixel) as the anchor box center.
+[**We generate anchor boxes (`anchors`) on the feature map (`fmap`) with each unit (pixel) as the anchor box center.**]
 Since the $(x, y)$-axis coordinate values
 in the anchor boxes (`anchors`) have been divided by the width and height of the feature map (`fmap`),
 these values are between 0 and 1,
@@ -118,8 +118,8 @@ def display_anchors(fmap_w, fmap_h, s):
                     anchors[0] * bbox_scale)
 ```
 
-First, let us consider
-detection of small objects.
+First, let us [**consider
+detection of small objects**].
 In order to make it easier to distinguish when displayed, the anchor boxes with different centers here do not overlap:
 the anchor box scale is set to 0.15
 and the height and width of the feature map are set to 4. We can see
@@ -130,7 +130,7 @@ that the centers of the anchor boxes in 4 rows and 4 columns on the image are un
 display_anchors(fmap_w=4, fmap_h=4, s=[0.15])
 ```
 
-We move on to reduce the height and width of the feature map by half and use larger anchor boxes to detect larger objects. When the scale is set to 0.4, 
+We move on to [**reduce the height and width of the feature map by half and use larger anchor boxes to detect larger objects**]. When the scale is set to 0.4, 
 some anchor boxes will overlap with each other.
 
 ```{.python .input}
@@ -138,7 +138,7 @@ some anchor boxes will overlap with each other.
 display_anchors(fmap_w=2, fmap_h=2, s=[0.4])
 ```
 
-Finally, we further reduce the height and width of the feature map by half and increase the anchor box scale to 0.8. Now the center of the anchor box is the center of the image.
+Finally, we [**further reduce the height and width of the feature map by half and increase the anchor box scale to 0.8**]. Now the center of the anchor box is the center of the image.
 
 ```{.python .input}
 #@tab all

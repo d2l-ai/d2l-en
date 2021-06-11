@@ -83,7 +83,7 @@ how transposed convolution with a $2\times 2$ kernel is computed for a $2\times 
 :label:`fig_trans_conv`
 
 
-We can implement this basic transposed convolution operation `trans_conv` for a input matrix `X` and a kernel matrix `K`.
+We can (**implement this basic transposed convolution operation**) `trans_conv` for a input matrix `X` and a kernel matrix `K`.
 
 ```{.python .input}
 #@tab all
@@ -103,7 +103,7 @@ the transposed convolution
 via the kernel, thereby
 producing an output
 that is larger than the input.
-We can construct the input tensor `X` and the kernel tensor `K` from :numref:`fig_trans_conv` to validate the output of the above implementation of the basic two-dimensional transposed convolution operation.
+We can construct the input tensor `X` and the kernel tensor `K` from :numref:`fig_trans_conv` to [**validate the output of the above implementation**] of the basic two-dimensional transposed convolution operation.
 
 ```{.python .input}
 #@tab all
@@ -115,7 +115,7 @@ trans_conv(X, K)
 Alternatively,
 when the input `X` and kernel `K` are both
 four-dimensional tensors,
-we can use high-level APIs to obtain the same results.
+we can [**use high-level APIs to obtain the same results**].
 
 ```{.python .input}
 X, K = X.reshape(1, 1, 2, 2), K.reshape(1, 1, 2, 2)
@@ -132,7 +132,7 @@ tconv.weight.data = K
 tconv(X)
 ```
 
-## Padding, Strides, and Multiple Channels
+## [**Padding, Strides, and Multiple Channels**]
 
 Different from in the regular convolution
 where padding is applied to input,
@@ -224,7 +224,7 @@ tconv = nn.ConvTranspose2d(20, 10, kernel_size=5, padding=2, stride=3)
 tconv(conv(X)).shape == X.shape
 ```
 
-## Connection to Matrix Transposition
+## [**Connection to Matrix Transposition**]
 :label:`subsec-connection-to-mat-transposition`
 
 The transposed convolution is named after

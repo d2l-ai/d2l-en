@@ -20,7 +20,7 @@ First, we initialize the composite image. For example, we can initialize it as t
 
 Next, we will perform an experiment to help us better understand the technical details of style transfer.
 
-## Reading the Content and Style Images
+## [**Reading the Content and Style Images**]
 
 First, we read the content and style images. By printing out the image coordinate axes, we can see that they have different dimensions.
 
@@ -61,7 +61,7 @@ style_img = d2l.Image.open('../img/autumn-oak.jpg')
 d2l.plt.imshow(style_img);
 ```
 
-## Preprocessing and Postprocessing
+## [**Preprocessing and Postprocessing**]
 
 Below, we define the functions for image preprocessing and postprocessing. The `preprocess` function normalizes each of the three RGB channels of the input images and transforms the results to a format that can be input to the CNN. The `postprocess` function restores the pixel values in the output image to their original values before normalization. Because the image printing function requires that each pixel has a floating point value from 0 to 1, we use the `clip` function to replace values smaller than 0 or greater than 1 with 0 or 1, respectively.
 
@@ -97,7 +97,7 @@ def postprocess(img):
     return torchvision.transforms.ToPILImage()(img.permute(2, 0, 1))
 ```
 
-## Extracting Features
+## [**Extracting Features**]
 
 We use the VGG-19 model pretrained on the ImageNet dataset to extract image features[1].
 
@@ -174,7 +174,7 @@ def get_styles(image_shape, device):
     return style_X, styles_Y
 ```
 
-## Defining the Loss Function
+## [**Defining the Loss Function**]
 
 Next, we will look at the loss function used for style transfer. The loss function includes the content loss, style loss, and total variation loss.
 
@@ -238,7 +238,7 @@ def tv_loss(Y_hat):
 
 ### Loss Function
 
-The loss function for style transfer is the weighted sum of the content loss, style loss, and total variance loss. By adjusting these weight hyperparameters, we can balance the retained content, transferred style, and noise reduction in the composite image according to their relative importance.
+[**The loss function for style transfer is the weighted sum of the content loss, style loss, and total variance loss**]. By adjusting these weight hyperparameters, we can balance the retained content, transferred style, and noise reduction in the composite image according to their relative importance.
 
 ```{.python .input}
 #@tab all
@@ -256,7 +256,7 @@ def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
     return contents_l, styles_l, tv_l, l
 ```
 
-## Creating and Initializing the Composite Image
+## [**Creating and Initializing the Composite Image**]
 
 In style transfer, the composite image is the only variable that needs to be updated. Therefore, we can define a simple model, `GeneratedImage`, and treat the composite image as a model parameter. In the model, forward computation only returns the model parameter.
 
@@ -303,7 +303,7 @@ def get_inits(X, device, lr, styles_Y):
     return gen_img(), styles_Y_gram, trainer
 ```
 
-## Training
+## [**Training**]
 
 During model training, we constantly extract the content and style features of
 the composite image and calculate the loss function. Recall our discussion of
@@ -362,7 +362,7 @@ def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
     return X
 ```
 
-Next, we start to train the model. First, we set the height and width of the content and style images to 150 by 225 pixels. We use the content image to initialize the composite image.
+Next, we [**start to train the model**]. First, we set the height and width of the content and style images to 150 by 225 pixels. We use the content image to initialize the composite image.
 
 ```{.python .input}
 device, image_shape = d2l.try_gpu(), (225, 150)
@@ -383,7 +383,7 @@ output = train(content_X, contents_Y, styles_Y, device, 0.01, 500, 200)
 
 As you can see, the composite image retains the scenery and objects of the content image, while introducing the color of the style image. Because the image is relatively small, the details are a bit fuzzy.
 
-To obtain a clearer composite image, we train the model using a larger image size: $900 \times 600$. We increase the height and width of the image used before by a factor of four and initialize a larger composite image.
+To [**obtain a clearer composite image**], we train the model using a larger image size: $900 \times 600$. We increase the height and width of the image used before by a factor of four and initialize a larger composite image.
 
 ```{.python .input}
 image_shape = (900, 600)
