@@ -329,7 +329,7 @@ def evaluate_loss(data_iter, net, devices):
         features, labels = features.to(devices[0]), labels.to(devices[0])
         outputs = net(features)
         l = loss(outputs, labels)
-        l_sum = l.sum()
+        l_sum += l.sum()
         n += labels.numel()
     return l_sum / n
 ```
@@ -393,8 +393,11 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
                               momentum=0.9, weight_decay=wd)
     scheduler = torch.optim.lr_scheduler.StepLR(trainer, lr_period, lr_decay)
     num_batches, timer = len(train_iter), d2l.Timer()
+    legend = ['train loss']
+    if valid_iter is not None:
+        legend.append('valid loss')
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs],
-                            legend=['train loss', 'valid loss'])
+                            legend=legend)
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(2)
         for i, (features, labels) in enumerate(train_iter):
@@ -410,17 +413,15 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
             if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
                 animator.add(epoch + (i + 1) / num_batches, 
                              (metric[0] / metric[1], None))
+        measures = f'train loss {metric[0] / metric[1]:.3f}'
         if valid_iter is not None:
             valid_loss = evaluate_loss(valid_iter, net, devices)
-            animator.add(epoch + 1, (None, valid_loss))
+            animator.add(epoch + 1, (None, valid_loss.detach()))
         scheduler.step()
     if valid_iter is not None:
-        print(f'train loss {metric[0] / metric[1]:.3f}, '
-              f'valid loss {valid_loss:.3f}')
-    else:
-        print(f'train loss {metric[0] / metric[1]:.3f}')
-    print(f'{metric[1] * num_epochs / timer.sum():.1f} examples/sec '
-          f'on {str(devices)}')
+        measures += f', valid loss {valid_loss:.3f}'
+    print(measures + f'\n{metric[1] * num_epochs / timer.sum():.1f}'
+          f' examples/sec on {str(devices)}')
 ```
 
 ## [**Training and Validating the Model**]
@@ -430,7 +431,7 @@ The following hyperparameters are all tunable.
 For example, the number of epochs can be increased. Because `lr_period` and `lr_decay` are set to 2 and 0.9, respectively, the learning rate of the optimization algorithm will be multiplied by 0.9 after every 2 epochs.
 
 ```{.python .input}
-devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 0.005, 1e-4
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 5e-3, 1e-4
 lr_period, lr_decay, net = 2, 0.9, get_net(devices)
 net.hybridize()
 train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
@@ -439,8 +440,8 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
 
 ```{.python .input}
 #@tab pytorch
-devices, num_epochs, lr, wd = d2l.try_all_gpus(), 5, 0.001, 1e-4
-lr_period, lr_decay, net = 10, 0.1, get_net(devices)
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 1e-4, 1e-4
+lr_period, lr_decay, net = 2, 0.9, get_net(devices)
 train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
 ```
