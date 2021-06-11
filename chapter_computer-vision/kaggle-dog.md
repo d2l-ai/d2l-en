@@ -329,7 +329,7 @@ def evaluate_loss(data_iter, net, devices):
         features, labels = features.to(devices[0]), labels.to(devices[0])
         outputs = net(features)
         l = loss(outputs, labels)
-        l_sum = l.sum()
+        l_sum += l.sum()
         n += labels.numel()
     return l_sum / n
 ```
