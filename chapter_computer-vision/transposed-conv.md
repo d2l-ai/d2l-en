@@ -43,14 +43,47 @@ from torch import nn
 from d2l import torch as d2l
 ```
 
-## Basic 2D Transposed Convolution
+## Basic Operation
 
-Let us consider a basic case that both input and output channels are 1, with 0 padding and 1 stride. :numref:`fig_trans_conv` illustrates how transposed convolution with a $2\times 2$ kernel is computed on the $2\times 2$ input matrix.
+Ignoring channels for now,
+let us begin with
+the basic transposed convolution operation
+with stride of 1 and no padding.
+Suppose that
+we are given a 
+$n_h \times n_w$ input tensor
+and a $k_h \times k_w$ kernel.
+Sliding the kernel window with stride of 1
+for $n_w$ times in each row
+and $n_h$ times in each column
+yields 
+a total of $n_h n_w$ intermediate results.
+Each intermediate result is
+a $(n_h + k_h - 1) \times (n_w + k_w - 1)$
+tensor that are initialized as zeros.
+To compute each intermediate tensor,
+each element in the input tensor
+is multiplied by the kernel
+so that the resulting $k_h \times k_w$ tensor
+replaces a portion in
+each intermediate tensor.
+Note that
+the position of the replaced portion in each
+intermediate tensor corresponds to the position of the element
+in the input tensor used for the computation.
+In the end, all the intermediate results
+are summed over to produce the output.
 
-![Transposed convolution layer with a $2\times 2$ kernel.](../img/trans_conv.svg)
+As an example,
+:numref:`fig_trans_conv` illustrates
+how transposed convolution with a $2\times 2$ kernel is computed for a $2\times 2$ input tensor.
+
+
+![Transposed convolution with a $2\times 2$ kernel. The shaded portions are a portion of an intermediate tensor as well as the input and kernel tensor elements used for the  computation.](../img/trans_conv.svg)
 :label:`fig_trans_conv`
 
-We can implement this operation by giving matrix kernel $K$ and matrix input $X$.
+
+We can implement this basic transposed convolution operation `trans_conv` for a input matrix `X` and a kernel matrix `K`.
 
 ```{.python .input}
 #@tab all
@@ -63,9 +96,14 @@ def trans_conv(X, K):
     return Y
 ```
 
-Remember the convolution computes results by `Y[i, j] = (X[i: i + h, j: j + w] * K).sum()` (refer to `corr2d` in :numref:`sec_conv_layer`), which summarizes input values through the kernel. While the transposed convolution broadcasts input values through the kernel, which results in a larger output shape.
-
-Verify the results in :numref:`fig_trans_conv`.
+In contrast to the regular convolution (in :numref:`sec_conv_layer`) that *reduces* input elements
+via the kernel,
+the transposed convolution
+*broadcasts* input elements 
+via the kernel, thereby
+producing an output
+that is larger than the input.
+We can construct the input tensor `X` and the kernel tensor `K` from :numref:`fig_trans_conv` to validate the output of the above implementation of the basic two-dimensional transposed convolution operation.
 
 ```{.python .input}
 #@tab all
@@ -74,13 +112,10 @@ K = d2l.tensor([[0.0, 1.0], [2.0, 3.0]])
 trans_conv(X, K)
 ```
 
-:begin_tab:`mxnet`
-Or we can use `nn.Conv2DTranspose` to obtain the same results. As `nn.Conv2D`, both input and kernel should be 4-D tensors.
-:end_tab:
-
-:begin_tab:`pytorch`
-Or we can use `nn.ConvTranspose2d` to obtain the same results. As `nn.Conv2d`, both input and kernel should be 4-D tensors.
-:end_tab:
+Alternatively,
+when the input `X` and kernel `K` are both
+four-dimensional tensors,
+we can use high-level APIs to obtain the same results.
 
 ```{.python .input}
 X, K = X.reshape(1, 1, 2, 2), K.reshape(1, 1, 2, 2)
