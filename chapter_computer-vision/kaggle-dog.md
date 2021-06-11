@@ -431,7 +431,7 @@ The following hyperparameters are all tunable.
 For example, the number of epochs can be increased. Because `lr_period` and `lr_decay` are set to 2 and 0.9, respectively, the learning rate of the optimization algorithm will be multiplied by 0.9 after every 2 epochs.
 
 ```{.python .input}
-devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 0.005, 1e-4
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 5e-3, 1e-4
 lr_period, lr_decay, net = 2, 0.9, get_net(devices)
 net.hybridize()
 train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
@@ -440,7 +440,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
 
 ```{.python .input}
 #@tab pytorch
-devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 0.0001, 1e-4
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 10, 1e-4, 1e-4
 lr_period, lr_decay, net = 2, 0.9, get_net(devices)
 train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
       lr_decay)
