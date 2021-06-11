@@ -132,9 +132,18 @@ tconv.weight.data = K
 tconv(X)
 ```
 
-## Padding, Strides, and Channels
+## Padding, Strides, and Multiple Channels
 
-We apply padding elements to the input in convolution, while they are applied to the output in transposed convolution. A $1\times 1$ padding means we first compute the output as normal, then remove the first/last rows and columns.
+Different from in the regular convolution
+where padding is applied to input,
+it is applied to output
+in the transposed convolution.
+For example,
+when specifying the padding number
+on either side of the height and width 
+as 1,
+the first and last rows and columns
+will be removed from the transposed convolution output.
 
 ```{.python .input}
 tconv = nn.Conv2DTranspose(1, kernel_size=2, padding=1)
@@ -149,10 +158,22 @@ tconv.weight.data = K
 tconv(X)
 ```
 
-Similarly, strides are applied to outputs as well as illustrated in :numref:`fig_trans_conv_stride2`.
+In the transposed convolution,
+strides are specified for intermediate results (thus output), not for input.
+Using the same input and kernel tensors
+from :numref:`fig_trans_conv`,
+changing the stride from 1 to 2
+increases both the height and weight
+of intermediate tensors, hence the output tensor
+in :numref:`fig_trans_conv_stride2`.
 
-![Transposed convolution layer with a $2\times 2$ kernel with stride 2.](../img/trans_conv_stride2.svg)
+
+![Transposed convolution with a $2\times 2$ kernel with stride of 2. The shaded portions are a portion of an intermediate tensor as well as the input and kernel tensor elements used for the  computation.](../img/trans_conv_stride2.svg)
 :label:`fig_trans_conv_stride2`
+
+
+
+The following code snippet can validate the transposed convolution output for stride of 2 in :numref:`fig_trans_conv_stride2`.
 
 ```{.python .input}
 tconv = nn.Conv2DTranspose(1, kernel_size=2, strides=2)
@@ -167,10 +188,26 @@ tconv.weight.data = K
 tconv(X)
 ```
 
-The multi-channel extension of the transposed convolution is the same as the convolution. When the input has multiple channels, denoted by $c_i$, the transposed convolution assigns a $k_h\times k_w$ kernel matrix to each input channel. If the output has a channel size $c_o$, then we have a $c_i\times k_h\times k_w$ kernel for each output channel.
+For multiple input and output channels,
+the transposed convolution
+works in the same way as the regular convolution.
+Suppose that
+the input has $c_i$ channels,
+and that the transposed convolution
+assigns a $k_h\times k_w$ kernel tensor
+to each input channel.
+When multiple output channels 
+are specified,
+we will have a $c_i\times k_h\times k_w$ kernel for each output channel.
 
 
-As a result, if we feed $X$ into a convolutional layer $f$ to compute $Y=f(X)$ and create a transposed convolution layer $g$ with the same hyperparameters as $f$ except for the output channel set to be the channel size of $X$, then $g(Y)$ should has the same shape as $X$. Let us verify this statement.
+
+
+As in all, if we feed $\mathsf{X}$ into a convolutional layer $f$ to output $\mathsf{Y}=f(\mathsf{X})$ and create a transposed convolution layer $g$ with the same hyperparameters as $f$ except 
+for the number of output channels 
+being the number of channels in $\mathsf{X}$,
+then $g(Y)$ will have the same shape as $\mathsf{X}$.
+This can be illustrated in the following example.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 10, 16, 16))
