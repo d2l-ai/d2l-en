@@ -201,8 +201,6 @@ are specified,
 we will have a $c_i\times k_h\times k_w$ kernel for each output channel.
 
 
-
-
 As in all, if we feed $\mathsf{X}$ into a convolutional layer $f$ to output $\mathsf{Y}=f(\mathsf{X})$ and create a transposed convolution layer $g$ with the same hyperparameters as $f$ except 
 for the number of output channels 
 being the number of channels in $\mathsf{X}$,
@@ -226,9 +224,16 @@ tconv = nn.ConvTranspose2d(20, 10, kernel_size=5, padding=2, stride=3)
 tconv(conv(X)).shape == X.shape
 ```
 
-## Analogy to Matrix Transposition
+## Connection to Matrix Transposition
+:label:`subsec-connection-to-mat-transposition`
 
-The transposed convolution takes its name from the matrix transposition. In fact, convolution operations can also be achieved by matrix multiplication. In the example below, we define a $3\times 3$ input $X$ with a $2\times 2$ kernel $K$, and then use `corr2d` to compute the convolution output.
+The transposed convolution is named after
+the matrix transposition.
+To explain,
+let us first
+see how to implement convolutions
+using matrix multiplications.
+In the example below, we define a $3\times 3$ input `X` and a $2\times 2$ convolution kernel `K`, and then use the `corr2d` function to compute the convolution output `Y`.
 
 ```{.python .input}
 #@tab all
@@ -238,7 +243,12 @@ Y = d2l.corr2d(X, K)
 Y
 ```
 
-Next, we rewrite convolution kernel $K$ as a matrix $W$. Its shape will be $(4, 9)$, where the $i^\mathrm{th}$ row present applying the kernel to the input to generate the $i^\mathrm{th}$ output element.
+Next, we rewrite the convolution kernel `K` as
+a sparse weight matrix `W`
+containing a lot of zeros. 
+The shape of the weight matrix is ($4$, $9$),
+where the non-zero elements come from
+the convolution kernel `K`.
 
 ```{.python .input}
 #@tab all
@@ -252,31 +262,69 @@ W = kernel2matrix(K)
 W
 ```
 
-Then the convolution operator can be implemented by matrix multiplication with proper reshaping.
+Concatenate the input `X` row by row to get a vector of length 9. Then the matrix multiplication of `W` and the vectorized `X` gives a vector of length 4.
+After reshaping it, we can obtain the same result `Y`
+from the original convolution operation above:
+we just implemented convolutions using matrix multiplications.
 
 ```{.python .input}
 #@tab all
 Y == d2l.matmul(W, d2l.reshape(X, -1)).reshape(2, 2)
 ```
 
-We can implement transposed convolution as a matrix multiplication as well by reusing `kernel2matrix`. To reuse the generated $W$, we construct a $2\times 2$ input, so the corresponding weight matrix will have a shape $(9, 4)$, which is $W^\top$. Let us verify the results.
+Likewise, we can implement transposed convolutions using
+matrix multiplications.
+In the following example,
+we take the $2 \times 2$ output `Y` from the above
+regular convolution
+as the input to the transposed convolution.
+To implement this operation by multiplying matrices,
+we only need to transpose the weight matrix `W`
+with the new shape $(9, 4)$.
 
 ```{.python .input}
 #@tab all
-X = d2l.tensor([[1.0, 2.0], [3.0, 4.0]])
-Y = trans_conv(X, K)
-Y == d2l.matmul(W.T, d2l.reshape(X, -1)).reshape(3, 3)
+Z = trans_conv(Y, K)
+Z == d2l.matmul(W.T, d2l.reshape(Y, -1)).reshape(3, 3)
 ```
+
+Consider implementing the convolution
+by multiplying matrices.
+Given an input vector $\mathbf{x}$
+and a weight matrix $\mathbf{W}$,
+the forward propagation function of the convolution
+can be implemented
+by multiplying its input with the weight matrix
+and outputting a vector 
+$\mathbf{y}=\mathbf{W}\mathbf{x}$.
+Since backpropagation
+follows the chain rule
+and $\nabla_{\mathbf{x}}\mathbf{y}=\mathbf{W}^\top$,
+the backpropagation function of the convolution
+can be implemented
+by multiplying its input with the 
+transposed weight matrix $\mathbf{W}^\top$.
+Therefore, 
+the transposed convolutional layer
+can just exchange the forward propagation function
+and the backpropagation function of the convolutional layer:
+its forward propagation  
+and backpropagation functions
+multiply their input vector with 
+$\mathbf{W}^\top$ and $\mathbf{W}$, respectively.
+
 
 ## Summary
 
-* Compared to convolutions that reduce inputs through kernels, transposed convolutions broadcast inputs.
-* If a convolution layer reduces the input width and height by $n_w$ and $h_h$ time, respectively. Then a transposed convolution layer with the same kernel sizes, padding and strides will increase the input width and height by $n_w$ and $n_h$, respectively.
-* We can implement convolution operations by the matrix multiplication, the corresponding transposed convolutions can be done by transposed matrix multiplication.
+* In contrast to the regular convolution that reduces input elements via the kernel, the transposed convolution broadcasts input elements via the kernel, thereby producing an output that is larger than the input.
+* If we feed $\mathsf{X}$ into a convolutional layer $f$ to output $\mathsf{Y}=f(\mathsf{X})$ and create a transposed convolution layer $g$ with the same hyperparameters as $f$ except for the number of output channels being the number of channels in $\mathsf{X}$, then $g(Y)$ will have the same shape as $\mathsf{X}$.
+* We can implement convolutions using matrix multiplications. The transposed convolutional layer can just exchange the forward propagation function and the backpropagation function of the convolutional layer.
+
 
 ## Exercises
 
-1. Is it efficient to use matrix multiplication to implement convolution operations? Why?
+1. In :numref:`subsec-connection-to-mat-transposition`, the convolution input `X` and the transposed convolution output `Z` have the same shape. Do they have the same value? Why?
+1. Is it efficient to use matrix multiplications to implement convolutions? Why?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/376)
