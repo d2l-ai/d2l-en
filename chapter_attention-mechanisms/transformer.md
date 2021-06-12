@@ -128,11 +128,6 @@ from d2l import tensorflow as d2l
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-
-gpus = tf.config.list_physical_devices("GPU")
-if gpus:
-    for gpu in gpus:
-        tf.config.experimental.set_memory_growth(gpu, True)
 ```
 
 ## Positionwise Feed-Forward Networks
