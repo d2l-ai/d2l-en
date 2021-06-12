@@ -31,7 +31,7 @@ that you will build on as you progress through the book.
 Do not worry if you struggle to grok some of
 the mathematical concepts or library functions.
 The following sections will revisit this material
-in the context of practical examples and it will sink.
+in the context of practical examples and it will sink in.
 On the other hand, if you already have some background
 and want to go deeper into the mathematical content, just skip this section.
 
