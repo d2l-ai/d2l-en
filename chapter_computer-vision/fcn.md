@@ -1,19 +1,30 @@
 # Fully Convolutional Networks (FCN)
 :label:`sec_fcn`
 
-We previously discussed semantic segmentation using each pixel in an image for
-category prediction. A fully convolutional network (FCN)
-:cite:`Long.Shelhamer.Darrell.2015` uses a convolutional neural network to
-transform image pixels to pixel categories. Unlike the convolutional neural
-networks previously introduced, an FCN transforms the height and width of the
-intermediate layer feature map back to the size of input image through the
-transposed convolution layer, so that the predictions have a one-to-one
-correspondence with input image in spatial dimension (height and width). Given a
-position on the spatial dimension, the output of the channel dimension will be a
-category prediction of the pixel corresponding to the location.
-
-We will first import the package or module needed for the experiment and then
-explain the transposed convolution layer.
+As discussed in :numref:`sec_semantic_segmentation`,
+semantic segmentation
+classifies images in pixel level.
+A fully convolutional network (FCN)
+uses a convolutional neural network to
+transform image pixels to pixel classes :cite:`Long.Shelhamer.Darrell.2015`.
+Unlike the CNNs that we encountered earlier
+for image classification 
+or object detection,
+an FCN
+transforms 
+the height and width of intermediate feature maps
+back to those of the input image:
+this is achieved by
+the transposed convolution layer
+introduced in :numref:`sec_transposed_conv`.
+As a result,
+the classification output
+and the input image 
+have a one-to-one correspondence 
+in pixel level:
+the channel dimension at any output pixel 
+holds the classification results
+for the input pixel at the same spatial position.
 
 ```{.python .input}
 %matplotlib inline
@@ -34,7 +45,7 @@ from torch import nn
 from torch.nn import functional as F
 ```
 
-## Constructing a Model
+## The Model
 
 Here, we demonstrate the most basic design of a fully convolutional network model. As shown in :numref:`fig_fcn`, the fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolution layer :numref:`sec_transposed_conv`. The model output has the same height and width as the input image and has a one-to-one correspondence in spatial positions. The final output channel contains the category prediction of the pixel of the corresponding spatial position.
 
