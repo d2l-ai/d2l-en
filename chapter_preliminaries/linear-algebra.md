@@ -148,6 +148,11 @@ x[3]
 x[3]
 ```
 
+Note that in :numref:`eq_vec_def`, the subscripts begin at $1$ rather than $0$; 
+this convention, called *one-based indexing*, and is commonly used when writing mathematical equations. 
+Python, on the other hand, like most programming languages, uses *zero-based indexing*;
+in zero-based indexing, the first element of a vector is at subscript $0$.
+
 ### Length, Dimensionality, and Shape
 
 Let us revisit some concepts from :numref:`sec_ndarray`.
