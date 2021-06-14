@@ -149,9 +149,39 @@ net.add_module('transpose_conv', nn.ConvTranspose2d(num_classes, num_classes,
                                     kernel_size=64, padding=16, stride=32))
 ```
 
-## [**Initializing the Transposed Convolution Layer**]
+## [**Initializing Transposed Convolution Layers**]
 
-We already know that the transposed convolution layer can magnify a feature map. In image processing, sometimes we need to magnify the image, i.e., upsampling. There are many methods for upsampling, and one common method is bilinear interpolation. Simply speaking, in order to get the pixel of the output image at the coordinates $(x, y)$, the coordinates are first mapped to the coordinates of the input image $(x', y')$. This can be done based on the ratio of the size of three input to the size of the output. The mapped values $x'$ and $y'$ are usually real numbers. Then, we find the four pixels closest to the coordinate $(x', y')$ on the input image. Finally, the pixels of the output image at coordinates $(x, y)$ are calculated based on these four pixels on the input image and their relative distances to $(x', y')$. Upsampling by bilinear interpolation can be implemented by transposed convolution layer of the convolution kernel constructed using the following `bilinear_kernel` function. Due to space limitations, we only give the implementation of the `bilinear_kernel` function and will not discuss the principles of the algorithm.
+
+We already know that
+transposed convolutional layers can increase
+the height and width of
+feature maps.
+In image processing, we may need to scale up
+an image, i.e., *upsampling*.
+*Bilinear interpolation*
+is one of the commonly used upsampling techniques.
+It is also often used for initializing transposed convolutional layers.
+
+To explain bilinear interpolation,
+say that 
+given an input image
+we want to 
+calculate each pixel 
+of the upsampled output image.
+In order to calculate the pixel of the output image
+at coordinate $(x, y)$, 
+first map $(x, y)$ to coordinate $(x', y')$ on the input image, for example, according to the ratio of the input size to the output size. 
+Note that the mapped $x′$ and $y′$ are real numbers. 
+Then, find the four pixels closest to coordinate
+$(x', y')$ on the input image. 
+Finally, the pixel of the output image at coordinate $(x, y)$ is calculated based on these four closest pixels
+on the input image and their relative distance from $(x', y')$. 
+
+The upsampling of bilinear interpolation
+can be implemented by the transposed convolution layer 
+with the kernel constructed by the following `bilinear_kernel` function. 
+Due to space limitations, we only provide the implementation of the `bilinear_kernel` function below
+without discussions on its algorithm design.
 
 ```{.python .input}
 def bilinear_kernel(in_channels, out_channels, kernel_size):
