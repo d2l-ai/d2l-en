@@ -15,7 +15,7 @@ transforms
 the height and width of intermediate feature maps
 back to those of the input image:
 this is achieved by
-the transposed convolution layer
+the transposed convolutional layer
 introduced in :numref:`sec_transposed_conv`.
 As a result,
 the classification output
@@ -149,7 +149,7 @@ net.add_module('transpose_conv', nn.ConvTranspose2d(num_classes, num_classes,
                                     kernel_size=64, padding=16, stride=32))
 ```
 
-## [**Initializing Transposed Convolution Layers**]
+## [**Initializing Transposed Convolutional Layers**]
 
 
 We already know that
@@ -177,8 +177,8 @@ $(x', y')$ on the input image.
 Finally, the pixel of the output image at coordinate $(x, y)$ is calculated based on these four closest pixels
 on the input image and their relative distance from $(x', y')$. 
 
-The upsampling of bilinear interpolation
-can be implemented by the transposed convolution layer 
+Upsampling of bilinear interpolation
+can be implemented by the transposed convolutional layer 
 with the kernel constructed by the following `bilinear_kernel` function. 
 Due to space limitations, we only provide the implementation of the `bilinear_kernel` function below
 without discussions on its algorithm design.
@@ -217,7 +217,11 @@ def bilinear_kernel(in_channels, out_channels, kernel_size):
     return weight
 ```
 
-Now, we will [**experiment with bilinear interpolation upsampling**] implemented by transposed convolution layers. Construct a transposed convolution layer that magnifies height and width of input by a factor of 2 and initialize its convolution kernel with the `bilinear_kernel` function.
+Let us [**experiment with upsampling of bilinear interpolation**] 
+that is implemented by a transposed convolutional layer. 
+We construct a transposed convolutional layer that 
+doubles the height and weight,
+and initialize its kernel with the `bilinear_kernel` function.
 
 ```{.python .input}
 conv_trans = nn.Conv2DTranspose(3, kernel_size=4, padding=1, strides=2)
@@ -231,7 +235,7 @@ conv_trans = nn.ConvTranspose2d(3, 3, kernel_size=4, padding=1, stride=2,
 conv_trans.weight.data.copy_(bilinear_kernel(3, 3, 4));
 ```
 
-Read the image `X` and record the result of upsampling as `Y`. In order to print the image, we need to adjust the position of the channel dimension.
+Read the image `X` and assign the upsampling output to `Y`. In order to print the image, we need to adjust the position of the channel dimension.
 
 ```{.python .input}
 img = image.imread('../img/catdog.jpg')
@@ -248,7 +252,9 @@ Y = conv_trans(X)
 out_img = Y[0].permute(1, 2, 0).detach()
 ```
 
-As you can see, the transposed convolution layer magnifies both the height and width of the image by a factor of 2. It is worth mentioning that, besides to the difference in coordinate scale, the image magnified by bilinear interpolation and original image printed in :numref:`sec_bbox` look the same.
+As we can see, the transposed convolutional layer increases both the height and width of the image by a factor of two.
+Except for the different scales in coordinates,
+the image scaled up by bilinear interpolation and the original image printed in :numref:`sec_bbox` look the same.
 
 ```{.python .input}
 d2l.set_figsize()
@@ -267,7 +273,7 @@ print('output image shape:', out_img.shape)
 d2l.plt.imshow(out_img);
 ```
 
-In a fully convolutional network, we [**initialize the transposed convolution layer for upsampled bilinear interpolation. For a $1\times 1$ convolution layer, we use Xavier for randomly initialization.**]
+In a fully convolutional network, we [**initialize the transposed convolutional layer with upsampling of bilinear interpolation. For the $1\times 1$ convolutional layer, we use Xavier initialization.**]
 
 ```{.python .input}
 W = bilinear_kernel(num_classes, num_classes, 64)
@@ -293,7 +299,7 @@ train_iter, test_iter = d2l.load_data_voc(batch_size, crop_size)
 
 ## [**Training**]
 
-Now we can start training the model. The loss function and accuracy calculation here are not substantially different from those used in image classification. Because we use the channel of the transposed convolution layer to predict pixel categories, the `axis=1` (channel dimension) option is specified in `SoftmaxCrossEntropyLoss`. In addition, the model calculates the accuracy based on whether the prediction category of each pixel is correct.
+Now we can start training the model. The loss function and accuracy calculation here are not substantially different from those used in image classification. Because we use the channel of the transposed convolutional layer to predict pixel categories, the `axis=1` (channel dimension) option is specified in `SoftmaxCrossEntropyLoss`. In addition, the model calculates the accuracy based on whether the prediction category of each pixel is correct.
 
 ```{.python .input}
 num_epochs, lr, wd, devices = 5, 0.1, 1e-3, d2l.try_all_gpus()
@@ -351,7 +357,7 @@ def label2image(pred):
     return colormap[X, :]
 ```
 
-The size and shape of the images in the test dataset vary. Because the model uses a transposed convolution layer with a stride of 32, when the height or width of the input image is not divisible by 32, the height or width of the transposed convolution layer output deviates from the size of the input image. In order to solve this problem, we can crop multiple rectangular areas in the image with heights and widths as integer multiples of 32, and then perform forward computation on the pixels in these areas. When combined, these areas must completely cover the input image. When a pixel is covered by multiple areas, the average of the transposed convolution layer output in the forward computation of the different areas can be used as an input for the softmax operation to predict the category.
+The size and shape of the images in the test dataset vary. Because the model uses a transposed convolutional layer with a stride of 32, when the height or width of the input image is not divisible by 32, the height or width of the transposed convolutional layer output deviates from the size of the input image. In order to solve this problem, we can crop multiple rectangular areas in the image with heights and widths as integer multiples of 32, and then perform forward computation on the pixels in these areas. When combined, these areas must completely cover the input image. When a pixel is covered by multiple areas, the average of the transposed convolutional layer output in the forward computation of the different areas can be used as an input for the softmax operation to predict the category.
 
 For the sake of simplicity, we only read a few large test images and crop an area with a shape of $320\times480$ from the top-left corner of the image. Only this area is used for prediction. For the input image, we print the cropped area first, then print the predicted result, and finally print the labeled category.
 
@@ -384,13 +390,13 @@ d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
 
 ## Summary
 
-* The fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolution layer to output the category of each pixel.
-* In a fully convolutional network, we initialize the transposed convolution layer for upsampled bilinear interpolation.
+* The fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolutional layer to output the category of each pixel.
+* In a fully convolutional network, we initialize the transposed convolutional layer for upsampled bilinear interpolation.
 
 
 ## Exercises
 
-1. If we use Xavier to randomly initialize the transposed convolution layer, what will happen to the result?
+1. If we use Xavier to randomly initialize the transposed convolutional layer, what will happen to the result?
 1. Can you further improve the accuracy of the model by tuning the hyperparameters?
 1. Predict the categories of all pixels in the test image.
 1. The outputs of some intermediate layers of the convolutional neural network are also used in the paper on fully convolutional networks :cite:`Long.Shelhamer.Darrell.2015`. Try to implement this idea.
