@@ -211,7 +211,7 @@ comp_conv2d(conv2d, X).shape
 
 When computing the cross-correlation,
 we start with the convolution window
-at the top-left corner of the input tensor,
+at the upper-left corner of the input tensor,
 and then slide it over all locations both down and to the right.
 In previous examples, we default to sliding one element at a time.
 However, sometimes, either for computational efficiency

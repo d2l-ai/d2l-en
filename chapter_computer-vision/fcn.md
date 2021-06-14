@@ -289,7 +289,11 @@ net.transpose_conv.weight.data.copy_(W);
 
 ## [**Reading the Dataset**]
 
-We read the dataset using the method described in the previous section. Here, we specify shape of the randomly cropped output image as $320\times 480$, so both the height and width are divisible by 32.
+We read
+the semantic segmentation dataset
+as introduced in :numref:`sec_semantic_segmentation`. 
+The output image shape of random cropping is
+specified as $320\times 480$: both the height and width are divisible by $32$.
 
 ```{.python .input}
 #@tab all
@@ -299,7 +303,18 @@ train_iter, test_iter = d2l.load_data_voc(batch_size, crop_size)
 
 ## [**Training**]
 
-Now we can start training the model. The loss function and accuracy calculation here are not substantially different from those used in image classification. Because we use the channel of the transposed convolutional layer to predict pixel categories, the `axis=1` (channel dimension) option is specified in `SoftmaxCrossEntropyLoss`. In addition, the model calculates the accuracy based on whether the prediction category of each pixel is correct.
+
+Now we can train our constructed
+fully convolutional network. 
+The loss function and accuracy calculation here
+are not essentially different from those in image classification of earlier chapters. 
+Because we use the output channel of the
+transposed convolutional layer to
+predict the class for each pixel,
+the channel dimension is specified in the loss calculation.
+In addition, the accuracy is calculated
+based on correctness
+of the predicted class for all the pixels.
 
 ```{.python .input}
 num_epochs, lr, wd, devices = 5, 0.1, 1e-3, d2l.try_all_gpus()
@@ -322,7 +337,10 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 
 ## [**Prediction**]
 
-During predicting, we need to standardize the input image in each channel and transform them into the four-dimensional input format required by the convolutional neural network.
+
+When predicting, we need to standardize the input image
+in each channel and transform the image into the four-dimensional input format required by the CNN.
+
 
 ```{.python .input}
 def predict(img):
@@ -340,7 +358,7 @@ def predict(img):
     return pred.reshape(pred.shape[1], pred.shape[2])
 ```
 
-To [**visualize the predicted categories**] for each pixel, we map the predicted categories back to their labeled colors in the dataset.
+To [**visualize the predicted class**] of each pixel, we map the predicted class back to its label color in the dataset.
 
 ```{.python .input}
 def label2image(pred):
@@ -357,9 +375,31 @@ def label2image(pred):
     return colormap[X, :]
 ```
 
-The size and shape of the images in the test dataset vary. Because the model uses a transposed convolutional layer with a stride of 32, when the height or width of the input image is not divisible by 32, the height or width of the transposed convolutional layer output deviates from the size of the input image. In order to solve this problem, we can crop multiple rectangular areas in the image with heights and widths as integer multiples of 32, and then perform forward computation on the pixels in these areas. When combined, these areas must completely cover the input image. When a pixel is covered by multiple areas, the average of the transposed convolutional layer output in the forward computation of the different areas can be used as an input for the softmax operation to predict the category.
+Images in the test dataset vary in size and shape.
+Since the model uses a transposed convolutional layer with stride of 32,
+when the height or width of an input image is indivisible by 32,
+the output height or width of the
+transposed convolutional layer will deviate from the shape of the input image.
+In order to address this issue,
+we can crop multiple rectangular areas with height and width that are integer multiples of 32 in the image,
+and perform forward propagation
+on the pixels in these areas separately.
+Note that
+the union of these rectangular areas needs to completely cover the input image.
+When a pixel is covered by multiple rectangular areas,
+the average of the transposed convolution outputs
+in separate areas for this same pixel
+can be input to
+the softmax operation
+to predict the class.
 
-For the sake of simplicity, we only read a few large test images and crop an area with a shape of $320\times480$ from the top-left corner of the image. Only this area is used for prediction. For the input image, we print the cropped area first, then print the predicted result, and finally print the labeled category.
+
+For simplicity, we only read a few larger test images,
+and crop a $320\times480$ area for prediction starting from the upper-left corner of an image.
+For these test images, we
+print their cropped areas,
+prediction results,
+and ground-truth row by row.
 
 ```{.python .input}
 voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
@@ -390,16 +430,16 @@ d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
 
 ## Summary
 
-* The fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolutional layer to output the category of each pixel.
-* In a fully convolutional network, we initialize the transposed convolutional layer for upsampled bilinear interpolation.
+* The fully convolutional network first uses a CNN to extract image features, then transforms the number of channels into the number of classes via a $1\times 1$ convolutional layer, and finally transforms the height and width of the feature maps to those of the input image via the transposed convolution.
+* In a fully convolutional network, we can use upsampling of bilinear interpolation to initialize the transposed convolutional layer.
 
 
 ## Exercises
 
-1. If we use Xavier to randomly initialize the transposed convolutional layer, what will happen to the result?
+1. If we use Xavier initialization for the transposed convolutional layer in the experiment, how does the result change?
 1. Can you further improve the accuracy of the model by tuning the hyperparameters?
-1. Predict the categories of all pixels in the test image.
-1. The outputs of some intermediate layers of the convolutional neural network are also used in the paper on fully convolutional networks :cite:`Long.Shelhamer.Darrell.2015`. Try to implement this idea.
+1. Predict the classes of all pixels in test images.
+1. The original fully convolutional network paper also uses outputs of some intermediate CNN layers :cite:`Long.Shelhamer.Darrell.2015`. Try to implement this idea.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/377)
