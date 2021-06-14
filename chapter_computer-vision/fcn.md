@@ -1,4 +1,4 @@
-# Fully Convolutional Networks (FCN)
+# Fully Convolutional Networks
 :label:`sec_fcn`
 
 As discussed in :numref:`sec_semantic_segmentation`,
@@ -10,7 +10,7 @@ transform image pixels to pixel classes :cite:`Long.Shelhamer.Darrell.2015`.
 Unlike the CNNs that we encountered earlier
 for image classification 
 or object detection,
-an FCN
+a fully convolutional network
 transforms 
 the height and width of intermediate feature maps
 back to those of the input image:
@@ -47,25 +47,50 @@ from torch.nn import functional as F
 
 ## The Model
 
-Here, we demonstrate the most basic design of a fully convolutional network model. As shown in :numref:`fig_fcn`, the fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolution layer :numref:`sec_transposed_conv`. The model output has the same height and width as the input image and has a one-to-one correspondence in spatial positions. The final output channel contains the category prediction of the pixel of the corresponding spatial position.
+Here we describe the basic design of the fully convolutional network model. 
+As shown in :numref:`fig_fcn`,
+this model first uses a CNN to extract image features,
+then transforms the number of channels into
+the number of classes
+via a $1\times 1$ convolutional layer,
+and finally transforms the height and width of
+the feature maps
+to those
+of the input image via
+the transposed convolution introduced in :numref:`sec_transposed_conv`. 
+As a result,
+the model output has the same height and width as the input image,
+where the output channel contains the predicted classes
+for the input pixel at the same spatial position.
 
-![Fully convolutional network. ](../img/fcn.svg)
+
+![Fully convolutional network.](../img/fcn.svg)
 :label:`fig_fcn`
 
-Below, we [**use a ResNet-18 model pretrained on the ImageNet dataset to extract image features**] and record the network instance as `pretrained_net`. As you can see, the last two layers of the model member variable `features` are the global average pooling layer `GlobalAvgPool2D` and example flattening layer `Flatten`. The `output` module contains the fully connected layer used for output. These layers are not required for a fully convolutional network.
+Below, we [**use a ResNet-18 model pretrained on the ImageNet dataset to extract image features**]
+and denote the model instance as `pretrained_net`.
+The last few layers of this model
+include a global average pooling layer
+and a fully-connected layer:
+they are not needed
+in the fully convolutional network.
 
 ```{.python .input}
 pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
-pretrained_net.features[-4:], pretrained_net.output
+pretrained_net.features[-3:], pretrained_net.output
 ```
 
 ```{.python .input}
 #@tab pytorch
 pretrained_net = torchvision.models.resnet18(pretrained=True)
-pretrained_net.layer4[1], pretrained_net.avgpool, pretrained_net.fc
+list(pretrained_net.children())[-3:]
 ```
 
-Next, we [**create the fully convolutional network instance `net`**]. It duplicates all the neural layers except the last two layers of the instance member variable `features` of `pretrained_net` and the model parameters obtained after pretraining.
+Next, we [**create the fully convolutional network instance `net`**].
+It copies all the pretrained layers in the ResNet-18
+except for the final global average pooling layer
+and the fully-connected layer that are closest
+to the output.
 
 ```{.python .input}
 net = nn.HybridSequential()
@@ -78,7 +103,9 @@ for layer in pretrained_net.features[:-2]:
 net = nn.Sequential(*list(pretrained_net.children())[:-2])
 ```
 
-Given an input of a height and width of 320 and 480 respectively, the forward computation of `net` will reduce the height and width of the input to $1/32$ of the original, i.e., 10 and 15.
+Given an input with height and width of 320 and 480 respectively,
+the forward propagation of `net`
+reduces the input height and width to 1/32 of the original, namely 10 and 15.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 3, 320, 480))
@@ -91,19 +118,21 @@ X = torch.rand(size=(1, 3, 320, 480))
 net(X).shape
 ```
 
-Next, we [**transform the number of output channels to the number of categories of
-Pascal VOC2012 (21) through the $1\times 1$ convolution layer.**] Finally, we need
-to (**magnify the height and width of the feature map by a factor of 32**) to change
-them back to the height and width of the input image. Recall the calculation
-method for the convolution layer output shape described in
-:numref:`sec_padding`. Because
-$(320-64+16\times2+32)/32=10$ and $(480-64+16\times2+32)/32=15$, we construct a
-transposed convolution layer with a stride of 32 and set the height and width of
-the convolution kernel to 64 and the padding to 16. It is not difficult to see
-that, if the stride is $s$, the padding is $s/2$ (assuming $s/2$ is an integer),
-and the height and width of the convolution kernel are $2s$, the transposed
-convolution kernel will magnify both the height and width of the input by a
-factor of $s$.
+Next, we [**use a $1\times 1$ convolutional layer to transform the number of output channels into the number of classes (21) of the Pascal VOC2012 dataset.**]
+Finally, we need to (**increase the height and width of the feature maps by 32 times**) to change them back to the height and width of the input image. 
+Recall how to calculate 
+the output shape of a convolutional layer in :numref:`sec_padding`. 
+Since $(320-64+16\times2+32)/32=10$ and $(480-64+16\times2+32)/32=15$, we construct a transposed convolutional layer with stride of $32$, 
+setting
+the height and width of the kernel
+to $64$, the padding to $16$.
+In general,
+we can see that
+for stride $s$,
+padding $s/2$ (assuming $s/2$ is an integer),
+and the height and width of the kernel $2s$, 
+the transposed convolution will increase
+the height and width of the input by $s$ times.
 
 ```{.python .input}
 num_classes = 21
