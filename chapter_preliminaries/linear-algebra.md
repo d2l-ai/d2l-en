@@ -792,7 +792,7 @@ must be the same as the dimension of `x` (its length).
 
 :begin_tab:`tensorflow`
 Expressing matrix-vector products in code with tensors, we use
-the `mv` function. When we call `tf.linalg.matvec(A, x)` with a
+the `matvec` function. When we call `tf.linalg.matvec(A, x)` with a
 matrix `A` and a vector `x`, the matrix-vector product is
 performed. Note that the column dimension of `A` (its length along dim 1)
 must be the same as the dimension of `x` (its length).
