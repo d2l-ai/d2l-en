@@ -1,15 +1,47 @@
 # Neural Style Transfer
 
-If you use social sharing apps or happen to be an amateur photographer, you are familiar with filters. Filters can alter the color styles of photos to make the background sharper or people's faces whiter. However, a filter generally can only change one aspect of a photo. To create the ideal photo, you often need to try many different filter combinations. This process is as complex as tuning the hyperparameters of a model.
+If you are a photography enthusiast, 
+you may be familiar with the filter.
+It can change the color style of photos 
+so that landscape photos become sharper
+or portrait photos have whitened skins.
+However,
+one filter usually only changes
+one aspect of the photo. 
+To apply an ideal style
+to a photo,
+you probably need to 
+try many different filter combinations.
+This process is
+as complex as tuning the hyperparameters of a model.
 
-In this section, we will discuss how we can use convolution neural networks
-(CNNs) to automatically apply the style of one image to another image, an
-operation known as style transfer :cite:`Gatys.Ecker.Bethge.2016`. Here, we need two input images, one content image and one style image. We use a neural network to alter the content image so that its style mirrors that of the style image. In :numref:`fig_style_transfer`, the content image is a landscape photo the author took in Mount Rainier National Part near Seattle. The style image is an oil painting of oak trees in autumn. The output composite image retains the overall shapes of the objects in the content image, but applies the oil painting brushwork of the style image and makes the overall color more vivid.
 
-![Content and style input images and composite image produced by style transfer. ](../img/style-transfer.svg)
+
+In this section, we will
+leverage layerwise representations of a CNN
+to automatically apply the style of one image
+to another image, i.e., *style transfer* :cite:`Gatys.Ecker.Bethge.2016`.
+This task needs two input images:
+one is the *content image* and
+the other is the *style image*.
+We will use neural networks
+to modify the content image
+to make it close to the style image in style.
+For example,
+the content image in :numref:`fig_style_transfer` is a landscape photo taken by us
+in Mount Rainier National Park in the suburbs of Seattle, while the style image is an oil painting
+with the theme of autumn oak trees.
+In the output synthesized image,
+the oil brush strokes of the style image
+are applied, leading to more vivid colors,
+while preserving the main shape of the objects
+in the content image.
+
+![Given content and style images, style transfer outputs a synthesized image.](../img/style-transfer.svg)
 :label:`fig_style_transfer`
 
-## Technique
+
+## Method
 
 The CNN-based style transfer model is shown in :numref:`fig_style_transfer_model`.
 First, we initialize the composite image. For example, we can initialize it as the content image. This composite image is the only variable that needs to be updated in the style transfer process, i.e., the model parameter to be updated in style transfer. Then, we select a pretrained CNN to extract image features. These model parameters do not need to be updated during training. The deep CNN uses multiple neural layers that successively extract image features. We can select the output of certain layers to use as content features or style features. If we use the structure in :numref:`fig_style_transfer_model`, the pretrained neural network contains three convolutional layers. The second layer outputs the image content features, while the outputs of the first and third layers are used as style features. Next, we use forward propagation (in the direction of the solid lines) to compute the style transfer loss function and backward propagation (in the direction of the dotted lines) to update the model parameter, constantly updating the composite image. The loss functions used in style transfer generally have three parts: 1. Content loss is used to make the composite image approximate the content image as regards content features. 2. Style loss is used to make the composite image approximate the style image in terms of style features. 3. Total variation loss helps reduce the noise in the composite image. Finally, after we finish training the model, we output the style transfer model parameters to obtain the final composite image.
