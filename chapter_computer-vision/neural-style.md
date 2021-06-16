@@ -40,17 +40,42 @@ in the content image.
 ![Given content and style images, style transfer outputs a synthesized image.](../img/style-transfer.svg)
 :label:`fig_style_transfer`
 
-
 ## Method
 
-The CNN-based style transfer model is shown in :numref:`fig_style_transfer_model`.
-First, we initialize the composite image. For example, we can initialize it as the content image. This composite image is the only variable that needs to be updated in the style transfer process, i.e., the model parameter to be updated in style transfer. Then, we select a pretrained CNN to extract image features. These model parameters do not need to be updated during training. The deep CNN uses multiple neural layers that successively extract image features. We can select the output of certain layers to use as content features or style features. If we use the structure in :numref:`fig_style_transfer_model`, the pretrained neural network contains three convolutional layers. The second layer outputs the image content features, while the outputs of the first and third layers are used as style features. Next, we use forward propagation (in the direction of the solid lines) to compute the style transfer loss function and backward propagation (in the direction of the dotted lines) to update the model parameter, constantly updating the composite image. The loss functions used in style transfer generally have three parts: 1. Content loss is used to make the composite image approximate the content image as regards content features. 2. Style loss is used to make the composite image approximate the style image in terms of style features. 3. Total variation loss helps reduce the noise in the composite image. Finally, after we finish training the model, we output the style transfer model parameters to obtain the final composite image.
+:numref:`fig_style_transfer_model` illustrates
+the CNN-based style transfer method :cite:`Gatys.Ecker.Bethge.2016`.
+First, we initialize the synthesized image,
+for example, into the content image. 
+This synthesized image is the only variable that needs to be updated during the style transfer process,
+i.e., the model parameters to be updated during training. 
+Then we choose a pretrained CNN
+to extract image features and freeze its
+model parameters during training. 
+This deep CNN uses multiple layers
+to extract
+hierarchical features for images.
+We can choose the output of some of these layers as content features or style features.
+Take :numref:`fig_style_transfer_model` as an example.
+The pretrained neural network here has 3 convolutional layers,
+where the second layer outputs the content features,
+and the first and third layers output the style features. 
 
 ![CNN-based style transfer process. Solid lines show the direction of forward propagation and dotted lines show backward propagation. ](../img/neural-style.svg)
 :label:`fig_style_transfer_model`
 
+Next, we calculate the loss function of style transfer through forward propagation (direction of solid arrows), and update the model parameters (the synthesized image for output) through backpropagation (direction of dashed arrows).
+The loss function commonly used in style transfer consists of three parts:
+(i) *content loss* makes the synthesized image and the content image close in content features;
+(ii) *style loss* makes the synthesized image and style image close in style features;
+and (iii) *total variation loss* helps to reduce the noise in the synthesized image.
+Finally, when the model training is over, we output the model parameters of the style transfer to generate
+the final synthesized image.
 
-Next, we will perform an experiment to help us better understand the technical details of style transfer.
+
+
+In the following,
+we will explain the technical details of style transfer via a concrete experiment.
+
 
 ## [**Reading the Content and Style Images**]
 
