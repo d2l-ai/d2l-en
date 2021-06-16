@@ -506,7 +506,7 @@ def net():
 
 As before, we will [**train our network on the Fashion-MNIST dataset**].
 This code is virtually identical to that when we first trained LeNet (:numref:`sec_lenet`).
-The main difference is the considerably larger learning rate.
+The main difference is the larger learning rate.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -546,7 +546,7 @@ Compared with the `BatchNorm` class,
 which we just defined ourselves,
 we can use the `BatchNorm` class defined in high-level APIs from the deep learning framework directly.
 The code looks virtually identical
-to the application our implementation above.
+to our implementation above.
 
 ```{.python .input}
 net = nn.Sequential()
