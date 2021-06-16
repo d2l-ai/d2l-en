@@ -43,7 +43,7 @@ in the content image.
 ## Method
 
 :numref:`fig_style_transfer_model` illustrates
-the CNN-based style transfer method :cite:`Gatys.Ecker.Bethge.2016`.
+the CNN-based style transfer method with a simplified example.
 First, we initialize the synthesized image,
 for example, into the content image. 
 This synthesized image is the only variable that needs to be updated during the style transfer process,
@@ -164,7 +164,7 @@ def postprocess(img):
 
 ## [**Extracting Features**]
 
-We use the VGG-19 model pretrained on the ImageNet dataset to extract image features[1].
+We use the VGG-19 model pretrained on the ImageNet dataset to extract image features :cite:`Gatys.Ecker.Bethge.2016`.
 
 ```{.python .input}
 pretrained_net = gluon.model_zoo.vision.vgg19(pretrained=True)
@@ -175,14 +175,28 @@ pretrained_net = gluon.model_zoo.vision.vgg19(pretrained=True)
 pretrained_net = torchvision.models.vgg19(pretrained=True)
 ```
 
-To extract image content and style features, we can select the outputs of certain layers in the VGG network. In general, the closer an output is to the input layer, the easier it is to extract image detail information. The farther away an output is, the easier it is to extract global information. To prevent the composite image from retaining too many details from the content image, we select a VGG network layer near the output layer to output the image content features. This layer is called the content layer. We also select the outputs of different layers from the VGG network for matching local and global styles. These are called the style layers. As we mentioned in :numref:`sec_vgg`, VGG networks have five convolutional blocks. In this experiment, we select the last convolutional layer of the fourth convolutional block as the content layer and the first layer of each block as style layers. We can obtain the indexes for these layers by printing the `pretrained_net` instance.
+In order to extract the content features and style features of the image, we can select the output of certain layers in the VGG network.
+Generally speaking, the closer to the input layer, the easier to extract details of the image, and vice versa, the easier to extract the global information of the image. In order to avoid excessively
+retaining the details of the content image in the synthesized image,
+we choose a VGG layer that is closer to the output as the *content layer* to output the content features of the image.
+We also select the output of different VGG layers for extracting local and global style features.
+These layers are also called *style layers*.
+As mentioned in :numref:`sec_vgg`,
+the VGG network uses 5 convolutional blocks.
+In the experiment, we choose the last convolutional layer of the fourth convolutional block as the content layer, and the first convolutional layer of each convolutional block as the style layer.
+The indices of these layers can be obtained by printing the `pretrained_net` instance.
 
 ```{.python .input}
 #@tab all
 style_layers, content_layers = [0, 5, 10, 19, 28], [25]
 ```
 
-During feature extraction, we only need to use all the VGG layers from the input layer to the content or style layer nearest the output layer. Below, we build a new network, `net`, which only retains the layers in the VGG network we need to use. We then use `net` to extract features.
+When extracting features using VGG layers,
+we only need to use all those
+from the input layer to the content layer or style layer that is closest to the output layer.
+Let us construct a new network instance `net`, which only retains all the VGG layers to be
+used for feature extraction.
+
 
 ```{.python .input}
 net = nn.Sequential()
@@ -196,7 +210,12 @@ net = nn.Sequential(*[pretrained_net.features[i] for i in
                       range(max(content_layers + style_layers) + 1)])
 ```
 
-Given input `X`, if we simply call the forward computation `net(X)`, we can only obtain the output of the last layer. Because we also need the outputs of the intermediate layers, we need to perform layer-by-layer computation and retain the content and style layer outputs.
+Given the input `X`, if we simply invoke
+the forward propagation `net(X)`, we can only get the output of the last layer.
+Since we also need the outputs of intermediate layers,
+we need to perform layer-by-layer computation and keep
+the content and style layer outputs.
+
 
 ```{.python .input}
 #@tab all
@@ -212,7 +231,16 @@ def extract_features(X, content_layers, style_layers):
     return contents, styles
 ```
 
-Next, we define two functions: The `get_contents` function obtains the content features extracted from the content image, while the `get_styles` function obtains the style features extracted from the style image. Because we do not need to change the parameters of the pretrained VGG model during training, we can extract the content features from the content image and style features from the style image before the start of training. As the composite image is the model parameter that must be updated during style transfer, we can only call the `extract_features` function during training to extract the content and style features of the composite image.
+Two functions are defined below:
+the `get_contents` function extracts content features from the content image,
+and the `get_styles` function extracts style features from the style image.
+Since there is no need to update the model parameters of the pretrained VGG during training,
+we can extract the content and the style features
+even before the training starts.
+Since the synthesized image 
+is a set of model parameters to be updated
+for style transfer,
+we can only extract the content and style features of the synthesized image by calling the `extract_features` function during training.
 
 ```{.python .input}
 def get_contents(image_shape, device):
