@@ -79,7 +79,10 @@ we will explain the technical details of style transfer via a concrete experimen
 
 ## [**Reading the Content and Style Images**]
 
-First, we read the content and style images. By printing out the image coordinate axes, we can see that they have different dimensions.
+First, we read the content and style images. 
+From their printed coordinate axes,
+we can tell that these images have different sizes.
+
 
 ```{.python .input}
 %matplotlib inline
@@ -120,7 +123,12 @@ d2l.plt.imshow(style_img);
 
 ## [**Preprocessing and Postprocessing**]
 
-Below, we define the functions for image preprocessing and postprocessing. The `preprocess` function normalizes each of the three RGB channels of the input images and transforms the results to a format that can be input to the CNN. The `postprocess` function restores the pixel values in the output image to their original values before normalization. Because the image printing function requires that each pixel has a floating point value from 0 to 1, we use the `clip` function to replace values smaller than 0 or greater than 1 with 0 or 1, respectively.
+Below, we define two functions for preprocessing and postprocessing images. 
+The `preprocess` function standardizes
+each of the three RGB channels of the input image and transforms the results into the CNN input format.
+The `postprocess` function restores the pixel values in the output image to their original values before standardization.
+Since the image printing function requires that each pixel has a floating point value from 0 to 1,
+we replace any value smaller than 0 or greater than 1 with 0 or 1, respectively.
 
 ```{.python .input}
 rgb_mean = np.array([0.485, 0.456, 0.406])
