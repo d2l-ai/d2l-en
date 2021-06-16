@@ -232,8 +232,10 @@ def evaluate_accuracy(net, data_iter):
     if isinstance(net, torch.nn.Module):
         net.eval()  # Set the model to evaluation mode
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
-    for X, y in data_iter:
-        metric.add(accuracy(net(X), y), d2l.size(y))
+
+    with torch.no_grad():
+        for X, y in data_iter:
+            metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
@@ -455,14 +457,16 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):
             device = next(iter(net.parameters())).device
     # No. of correct predictions, no. of predictions
     metric = d2l.Accumulator(2)
-    for X, y in data_iter:
-        if isinstance(X, list):
-            # Required for BERT Fine-tuning (to be covered later)
-            X = [x.to(device) for x in X]
-        else:
-            X = X.to(device)
-        y = y.to(device)
-        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
+
+    with torch.no_grad():
+        for X, y in data_iter:
+            if isinstance(X, list):
+                # Required for BERT Fine-tuning (to be covered later)
+                X = [x.to(device) for x in X]
+            else:
+                X = X.to(device)
+            y = y.to(device)
+            metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
