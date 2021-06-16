@@ -313,7 +313,7 @@ The model is decomposed into a (large binary) parameter file and a JSON descript
 ```
 
 :begin_tab:`mxnet`
-Earlier, we demonstrated that, after calling the `hybridize` function, the model is able to achieve superior computing performance and portability. Note that hybridization can affect model flexibility, in particular in terms of control flow. 
+Earlier, we demonstrated that, after calling the `hybridize` function, the model is able to achieve superior computing performance and portability. Note, though that hybridization can affect model flexibility, in particular in terms of control flow. 
 
 Besides, contrary to the `Block` instance, which needs to use the `forward` function, for a `HybridBlock` instance we need to use the `hybrid_forward` function.
 :end_tab:
