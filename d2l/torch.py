@@ -1105,6 +1105,7 @@ def bleu(pred_seq, label_seq, k):
 # Defined in file: ./chapter_attention-mechanisms/attention-cues.md
 def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
+    """Show heatmaps of matrices."""
     d2l.use_svg_display()
     num_rows, num_cols = matrices.shape[0], matrices.shape[1]
     fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,
@@ -1142,6 +1143,7 @@ def masked_softmax(X, valid_lens):
 
 # Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
 class AdditiveAttention(nn.Module):
+    """Additive attention."""
     def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
         self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
@@ -1200,6 +1202,7 @@ class AttentionDecoder(d2l.Decoder):
 
 # Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
 class MultiHeadAttention(nn.Module):
+    """Multi-head attention."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  num_heads, dropout, bias=False, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
@@ -1241,6 +1244,7 @@ class MultiHeadAttention(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
 def transpose_qkv(X, num_heads):
+    """Transposition for parallel computation of multiple attention heads."""
     # Shape of input `X`:
     # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`).
     # Shape of output `X`:
@@ -1260,7 +1264,7 @@ def transpose_qkv(X, num_heads):
 
 
 def transpose_output(X, num_heads):
-    """Reverse the operation of `transpose_qkv`"""
+    """Reverse the operation of `transpose_qkv`."""
     X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
     X = X.permute(0, 2, 1, 3)
     return X.reshape(X.shape[0], X.shape[1], -1)
@@ -1268,6 +1272,7 @@ def transpose_output(X, num_heads):
 
 # Defined in file: ./chapter_attention-mechanisms/self-attention-and-positional-encoding.md
 class PositionalEncoding(nn.Module):
+    """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
@@ -1288,6 +1293,7 @@ class PositionalEncoding(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionWiseFFN(nn.Module):
+    """Positionwise feed-forward network."""
     def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs,
                  **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
@@ -1301,6 +1307,7 @@ class PositionWiseFFN(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class AddNorm(nn.Module):
+    """Residual connection followed by layer normalization."""
     def __init__(self, normalized_shape, dropout, **kwargs):
         super(AddNorm, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
@@ -1312,6 +1319,7 @@ class AddNorm(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class EncoderBlock(nn.Module):
+    """Transformer encoder block."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
                  dropout, use_bias=False, **kwargs):
@@ -1331,6 +1339,7 @@ class EncoderBlock(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class TransformerEncoder(d2l.Encoder):
+    """Transformer encoder."""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
                  num_heads, num_layers, dropout, use_bias=False, **kwargs):

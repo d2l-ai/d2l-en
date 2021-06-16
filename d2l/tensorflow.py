@@ -1041,6 +1041,7 @@ def bleu(pred_seq, label_seq, k):
 # Defined in file: ./chapter_attention-mechanisms/attention-cues.md
 def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
+    """Show heatmaps of matrices."""
     d2l.use_svg_display()
     num_rows, num_cols = matrices.shape[0], matrices.shape[1]
     fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,
@@ -1079,6 +1080,7 @@ def masked_softmax(X, valid_lens):
 
 # Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
 class AdditiveAttention(tf.keras.layers.Layer):
+    """Additive attention."""
     def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
         super().__init__(**kwargs)
         self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=False)
@@ -1140,6 +1142,7 @@ class AttentionDecoder(d2l.Decoder):
 
 # Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
 class MultiHeadAttention(tf.keras.layers.Layer):
+    """Multi-head attention."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  num_heads, dropout, bias=False, **kwargs):
         super().__init__(**kwargs)
@@ -1177,10 +1180,12 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 
 # Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
 def transpose_qkv(X, num_heads):
+    """Transposition for parallel computation of multiple attention heads."""
     # Shape of input `X`:
     # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`).
     # Shape of output `X`:
-    # (`batch_size`, no. of queries or key-value pairs, `num_heads`, `num_hiddens` / `num_heads`)
+    # (`batch_size`, no. of queries or key-value pairs, `num_heads`,
+    # `num_hiddens` / `num_heads`)
     X = tf.reshape(X, shape=(X.shape[0], X.shape[1], num_heads, -1))
 
     # Shape of output `X`:
@@ -1189,12 +1194,13 @@ def transpose_qkv(X, num_heads):
     X = tf.transpose(X, perm=(0, 2, 1, 3))
 
     # Shape of `output`:
-    # (`batch_size` * `num_heads`, no. of queries or key-value pairs, `num_hiddens` / `num_heads`)
+    # (`batch_size` * `num_heads`, no. of queries or key-value pairs,
+    # `num_hiddens` / `num_heads`)
     return tf.reshape(X, shape=(-1, X.shape[2], X.shape[3]))
 
 
 def transpose_output(X, num_heads):
-    """Reverse the operation of `transpose_qkv`"""
+    """Reverse the operation of `transpose_qkv`."""
     X = tf.reshape(X, shape=(-1, num_heads, X.shape[1], X.shape[2]))
     X = tf.transpose(X, perm=(0, 2, 1, 3))
     return tf.reshape(X, shape=(X.shape[0], X.shape[1], -1))
@@ -1202,6 +1208,7 @@ def transpose_output(X, num_heads):
 
 # Defined in file: ./chapter_attention-mechanisms/self-attention-and-positional-encoding.md
 class PositionalEncoding(tf.keras.layers.Layer):
+    """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super().__init__()
         self.dropout = tf.keras.layers.Dropout(dropout)
@@ -1220,6 +1227,7 @@ class PositionalEncoding(tf.keras.layers.Layer):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionWiseFFN(tf.keras.layers.Layer):
+    """Positionwise feed-forward network."""
     def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
         super().__init__(*kwargs)
         self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)
@@ -1232,6 +1240,7 @@ class PositionWiseFFN(tf.keras.layers.Layer):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class AddNorm(tf.keras.layers.Layer):
+    """Residual connection followed by layer normalization."""
     def __init__(self, normalized_shape, dropout, **kwargs):
         super().__init__(**kwargs)
         self.dropout = tf.keras.layers.Dropout(dropout)
@@ -1243,6 +1252,7 @@ class AddNorm(tf.keras.layers.Layer):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class EncoderBlock(tf.keras.layers.Layer):
+    """Transformer encoder block."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False,
                  **kwargs):
@@ -1262,6 +1272,7 @@ class EncoderBlock(tf.keras.layers.Layer):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class TransformerEncoder(d2l.Encoder):
+    """Transformer encoder."""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
                  num_layers, dropout, bias=False, **kwargs):

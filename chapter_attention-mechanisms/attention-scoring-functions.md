@@ -275,6 +275,7 @@ class AdditiveAttention(nn.Block):
 #@tab pytorch
 #@save
 class AdditiveAttention(nn.Module):
+    """Additive attention."""
     def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
         self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
@@ -304,6 +305,7 @@ class AdditiveAttention(nn.Module):
 #@tab tensorflow
 #@save
 class AdditiveAttention(tf.keras.layers.Layer):
+    """Additive attention."""
     def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
         super().__init__(**kwargs)
         self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=False)
@@ -317,7 +319,8 @@ class AdditiveAttention(tf.keras.layers.Layer):
         # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
         # no. of key-value pairs, `num_hiddens`). Sum them up with
         # broadcasting
-        features = tf.expand_dims(queries, axis=2) + tf.expand_dims(keys, axis=1)
+        features = tf.expand_dims(queries, axis=2) + tf.expand_dims(
+            keys, axis=1)
         features = tf.nn.tanh(features)
         # There is only one output of `self.w_v`, so we remove the last
         # one-dimensional entry from the shape. Shape of `scores`:
@@ -326,7 +329,8 @@ class AdditiveAttention(tf.keras.layers.Layer):
         self.attention_weights = masked_softmax(scores, valid_lens)
         # Shape of `values`: (`batch_size`, no. of key-value pairs, value
         # dimension)
-        return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
+        return tf.matmul(self.dropout(
+            self.attention_weights, **kwargs), values)
 ```
 
 Let us demonstrate the above `AdditiveAttention` class
@@ -367,7 +371,8 @@ attention(queries, keys, values, valid_lens)
 #@tab tensorflow
 queries, keys = tf.random.normal(shape=(2, 1, 20)), tf.ones((2, 10, 2))
 # The two value matrices in the `values` minibatch are identical
-values = tf.repeat(tf.reshape(tf.range(40, dtype=tf.float32), shape=(1, 10, 4)), repeats=2, axis=0)
+values = tf.repeat(tf.reshape(
+    tf.range(40, dtype=tf.float32), shape=(1, 10, 4)), repeats=2, axis=0)
 valid_lens = tf.constant([2, 6])
 
 attention = AdditiveAttention(key_size=2, query_size=20, num_hiddens=8,
@@ -488,7 +493,8 @@ class DotProductAttention(tf.keras.layers.Layer):
     # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
     def call(self, queries, keys, values, valid_lens, **kwargs):
         d = queries.shape[-1]
-        scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(tf.cast(d, dtype=tf.float32))
+        scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
+            tf.cast(d, dtype=tf.float32))
         self.attention_weights = masked_softmax(scores, valid_lens)
         return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
 ```

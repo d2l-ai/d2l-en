@@ -152,6 +152,7 @@ an output tensor of shape
 ```{.python .input}
 #@save
 class PositionWiseFFN(nn.Block):
+    """Positionwise feed-forward network."""
     def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
         self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
@@ -166,6 +167,7 @@ class PositionWiseFFN(nn.Block):
 #@tab pytorch
 #@save
 class PositionWiseFFN(nn.Module):
+    """Positionwise feed-forward network."""
     def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs,
                  **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
@@ -181,6 +183,7 @@ class PositionWiseFFN(nn.Module):
 #@tab tensorflow
 #@save
 class PositionWiseFFN(tf.keras.layers.Layer):
+    """Positionwise feed-forward network."""
     def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
         super().__init__(*kwargs)
         self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)
@@ -285,6 +288,7 @@ Dropout is also applied for regularization.
 ```{.python .input}
 #@save
 class AddNorm(nn.Block):
+    """Residual connection followed by layer normalization."""
     def __init__(self, dropout, **kwargs):
         super(AddNorm, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
@@ -298,6 +302,7 @@ class AddNorm(nn.Block):
 #@tab pytorch
 #@save
 class AddNorm(nn.Module):
+    """Residual connection followed by layer normalization."""
     def __init__(self, normalized_shape, dropout, **kwargs):
         super(AddNorm, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
@@ -311,6 +316,7 @@ class AddNorm(nn.Module):
 #@tab tensorflow
 #@save
 class AddNorm(tf.keras.layers.Layer):
+    """Residual connection followed by layer normalization."""
     def __init__(self, normalized_shape, dropout, **kwargs):
         super().__init__(**kwargs)
         self.dropout = tf.keras.layers.Dropout(dropout)
@@ -357,6 +363,7 @@ around both sublayers.
 ```{.python .input}
 #@save
 class EncoderBlock(nn.Block):
+    """Transformer encoder block."""
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
                  use_bias=False, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
@@ -375,6 +382,7 @@ class EncoderBlock(nn.Block):
 #@tab pytorch
 #@save
 class EncoderBlock(nn.Module):
+    """Transformer encoder block."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
                  dropout, use_bias=False, **kwargs):
@@ -396,6 +404,7 @@ class EncoderBlock(nn.Module):
 #@tab tensorflow
 #@save
 class EncoderBlock(tf.keras.layers.Layer):
+    """Transformer encoder block."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False, **kwargs):
         super().__init__(**kwargs)
@@ -451,6 +460,7 @@ to rescale before summing up the input embedding and the positional encoding.
 ```{.python .input}
 #@save
 class TransformerEncoder(d2l.Encoder):
+    """Transformer encoder."""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
                  num_heads, num_layers, dropout, use_bias=False, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
@@ -480,6 +490,7 @@ class TransformerEncoder(d2l.Encoder):
 #@tab pytorch
 #@save
 class TransformerEncoder(d2l.Encoder):
+    """Transformer encoder."""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
                  num_heads, num_layers, dropout, use_bias=False, **kwargs):
@@ -511,24 +522,30 @@ class TransformerEncoder(d2l.Encoder):
 #@tab tensorflow
 #@save
 class TransformerEncoder(d2l.Encoder):
-    def __init__(self, vocab_size, key_size, query_size, value_size, num_hiddens, norm_shape,
-                 ffn_num_hiddens, num_heads, num_layers, dropout, bias=False, **kwargs):
+    """Transformer encoder."""
+    def __init__(self, vocab_size, key_size, query_size, value_size,
+                 num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
+                 num_layers, dropout, bias=False, **kwargs):
         super().__init__(**kwargs)
         self.num_hiddens = num_hiddens
         self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
         self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
-        self.blks = [EncoderBlock(key_size, query_size, value_size, num_hiddens, norm_shape,
-                                  ffn_num_hiddens, num_heads, dropout, bias) for _ in range(num_layers)]
+        self.blks = [EncoderBlock(
+            key_size, query_size, value_size, num_hiddens, norm_shape,
+            ffn_num_hiddens, num_heads, dropout, bias) for _ in range(
+            num_layers)]
         
     def call(self, X, valid_lens, **kwargs):
         # Since positional encoding values are between -1 and 1, the embedding
         # values are multiplied by the square root of the embedding dimension
         # to rescale before they are summed up
-        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(tf.cast(self.num_hiddens, dtype=tf.float32)), **kwargs)
+        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(
+            tf.cast(self.num_hiddens, dtype=tf.float32)), **kwargs)
         self.attention_weights = [None] * len(self.blks)
         for i, blk in enumerate(self.blks):
             X = blk(X, valid_lens, **kwargs)
-            self.attention_weights[i] = blk.attention.attention.attention_weights
+            self.attention_weights[
+                i] = blk.attention.attention.attention_weights
         return X
 ```
 
