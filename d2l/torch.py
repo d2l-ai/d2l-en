@@ -2127,7 +2127,7 @@ class RandomGenerator:
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def get_negatives(all_contexts, corpus, K):
     counter = d2l.count_corpus(corpus)
-    sampling_weights = [counter[key]**0.75 for key in counter.keys()]
+    sampling_weights = [count**0.75 for count in counter.values()]
     all_negatives, generator = [], RandomGenerator(sampling_weights)
     for contexts in all_contexts:
         negatives = []
