@@ -317,7 +317,6 @@ B
 
 Now we compare `B` with its transpose.
 
-
 ```{.python .input}
 B == B.T
 ```
@@ -361,7 +360,6 @@ and their indexing mechanism (e.g., $x_{ijk}$ and $[\mathsf{X}]_{1, 2i-1, 3}$) i
 
 Tensors will become more important when we start working with images,
  which arrive as $n$-dimensional arrays with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
-
 
 ```{.python .input}
 X = np.arange(24).reshape(2, 3, 4)
@@ -777,12 +775,30 @@ to describe the most intensive calculations
 required when computing each layer in a neural network
 given the values of the previous layer.
 
+:begin_tab:`mxnet`
 Expressing matrix-vector products in code with tensors,
 we use the same `dot` function as for dot products.
 When we call `np.dot(A, x)` with a matrix `A` and a vector `x`,
 the matrix-vector product is performed.
 Note that the column dimension of `A` (its length along axis 1)
 must be the same as the dimension of `x` (its length).
+:end_tab:
+
+:begin_tab:`pytorch`
+Expressing matrix-vector products in code with tensors, we use
+the `mv` function. When we call `torch.mv(A, x)` with a matrix
+`A` and a vector `x`, the matrix-vector product is performed.
+Note that the column dimension of `A` (its length along axis 1)
+must be the same as the dimension of `x` (its length).
+:end_tab:
+
+:begin_tab:`tensorflow`
+Expressing matrix-vector products in code with tensors, we use
+the `matvec` function. When we call `tf.linalg.matvec(A, x)` with a
+matrix `A` and a vector `x`, the matrix-vector product is
+performed. Note that the column dimension of `A` (its length along axis 1)
+must be the same as the dimension of `x` (its length).
+:end_tab:
 
 ```{.python .input}
 A.shape, x.shape, np.dot(A, x)
@@ -981,7 +997,6 @@ torch.abs(u).sum()
 tf.reduce_sum(tf.abs(u))
 ```
 
-
 Both the $L_2$ norm and the $L_1$ norm
 are special cases of the more general $L_p$ *norm*:
 
@@ -1079,7 +1094,6 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 1. When traveling between two points in Manhattan, what is the distance that you need to cover in terms of the coordinates, i.e., in terms of avenues and streets? Can you travel diagonally?
 1. Consider a tensor with shape (2, 3, 4). What are the shapes of the summation outputs along axis 0, 1, and 2?
 1. Feed a tensor with 3 or more axes to the `linalg.norm` function and observe its output. What does this function compute for tensors of arbitrary shape?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/30)
