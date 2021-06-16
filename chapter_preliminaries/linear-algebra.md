@@ -672,6 +672,8 @@ tf.cumsum(A, axis=0)
 So far, we have only performed elementwise operations, sums, and averages. And if this was all we could do, linear algebra probably would not deserve its own section. However, one of the most fundamental operations is the dot product.
 Given two vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$, their *dot product* $\mathbf{x}^\top \mathbf{y}$ (or $\langle \mathbf{x}, \mathbf{y}  \rangle$) is a sum over the products of the elements at the same position: $\mathbf{x}^\top \mathbf{y} = \sum_{i=1}^{d} x_i y_i$.
 
+[~~The *dot product* of two vectors is a sum over the products of the elements at the same position~~]
+
 ```{.python .input}
 y = np.ones(4)
 x, y, np.dot(x, y)
@@ -786,7 +788,7 @@ must be the same as the dimension of `x` (its length).
 Expressing matrix-vector products in code with tensors, we use
 the `mv` function. When we call `torch.mv(A, x)` with a matrix
 `A` and a vector `x`, the matrix-vector product is performed.
-Note that the column dimension of `A` (its length along dim 1)
+Note that the column dimension of `A` (its length along axis 1)
 must be the same as the dimension of `x` (its length).
 :end_tab:
 
@@ -794,7 +796,7 @@ must be the same as the dimension of `x` (its length).
 Expressing matrix-vector products in code with tensors, we use
 the `matvec` function. When we call `tf.linalg.matvec(A, x)` with a
 matrix `A` and a vector `x`, the matrix-vector product is
-performed. Note that the column dimension of `A` (its length along dim 1)
+performed. Note that the column dimension of `A` (its length along axis 1)
 must be the same as the dimension of `x` (its length).
 :end_tab:
 
