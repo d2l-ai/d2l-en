@@ -394,14 +394,15 @@ def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
     return contents_l, styles_l, tv_l, l
 ```
 
-## [**Creating and Initializing the Composite Image**]
+## [**Creating and Initializing the Synthesized Image**]
 
-In style transfer, the composite image is the only variable that needs to be updated. Therefore, we can define a simple model, `GeneratedImage`, and treat the composite image as a model parameter. In the model, forward computation only returns the model parameter.
+In style transfer,
+the synthesized image is the only variable that needs to be updated. Therefore, we can define a simple model, `SynthesizedImage`, and treat the synthesized image as a model parameter. In the model, forward computation only returns the model parameter.
 
 ```{.python .input}
-class GeneratedImage(nn.Block):
+class SynthesizedImage(nn.Block):
     def __init__(self, img_shape, **kwargs):
-        super(GeneratedImage, self).__init__(**kwargs)
+        super(SynthesizedImage, self).__init__(**kwargs)
         self.weight = self.params.get('weight', shape=img_shape)
 
     def forward(self):
@@ -410,20 +411,20 @@ class GeneratedImage(nn.Block):
 
 ```{.python .input}
 #@tab pytorch
-class GeneratedImage(nn.Module):
+class SynthesizedImage(nn.Module):
     def __init__(self, img_shape, **kwargs):
-        super(GeneratedImage, self).__init__(**kwargs)
+        super(SynthesizedImage, self).__init__(**kwargs)
         self.weight = nn.Parameter(torch.rand(*img_shape))
 
     def forward(self):
         return self.weight
 ```
 
-Next, we define the `get_inits` function. This function creates a composite image model instance and initializes it to the image `X`. The Gram matrix for the various style layers of the style image, `styles_Y_gram`, is computed prior to training.
+Next, we define the `get_inits` function. This function creates a synthesized image model instance and initializes it to the image `X`. The Gram matrix for the various style layers of the style image, `styles_Y_gram`, is computed prior to training.
 
 ```{.python .input}
 def get_inits(X, device, lr, styles_Y):
-    gen_img = GeneratedImage(X.shape)
+    gen_img = SynthesizedImage(X.shape)
     gen_img.initialize(init.Constant(X), ctx=device, force_reinit=True)
     trainer = gluon.Trainer(gen_img.collect_params(), 'adam',
                             {'learning_rate': lr})
@@ -434,7 +435,7 @@ def get_inits(X, device, lr, styles_Y):
 ```{.python .input}
 #@tab pytorch
 def get_inits(X, device, lr, styles_Y):
-    gen_img = GeneratedImage(X.shape).to(device)
+    gen_img = SynthesizedImage(X.shape).to(device)
     gen_img.weight.data.copy_(X.data)
     trainer = torch.optim.Adam(gen_img.parameters(), lr=lr)
     styles_Y_gram = [gram(Y) for Y in styles_Y]
@@ -444,7 +445,7 @@ def get_inits(X, device, lr, styles_Y):
 ## [**Training**]
 
 During model training, we constantly extract the content and style features of
-the composite image and calculate the loss function. Recall our discussion of
+the synthesized image and calculate the loss function. Recall our discussion of
 how synchronization functions force the front end to wait for computation
 results in :numref:`sec_async`. Because we only call the `asnumpy` synchronization function every 10
 epochs, the process may occupy a great deal of memory. Therefore, we call the
@@ -500,7 +501,7 @@ def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
     return X
 ```
 
-Next, we [**start to train the model**]. First, we set the height and width of the content and style images to 150 by 225 pixels. We use the content image to initialize the composite image.
+Next, we [**start to train the model**]. First, we set the height and width of the content and style images to 150 by 225 pixels. We use the content image to initialize the synthesized image.
 
 ```{.python .input}
 device, image_shape = d2l.try_gpu(), (225, 150)
@@ -519,9 +520,9 @@ _, styles_Y = get_styles(image_shape, device)
 output = train(content_X, contents_Y, styles_Y, device, 0.01, 500, 200)
 ```
 
-As you can see, the composite image retains the scenery and objects of the content image, while introducing the color of the style image. Because the image is relatively small, the details are a bit fuzzy.
+As you can see, the synthesized image retains the scenery and objects of the content image, while introducing the color of the style image. Because the image is relatively small, the details are a bit fuzzy.
 
-To [**obtain a clearer composite image**], we train the model using a larger image size: $900 \times 600$. We increase the height and width of the image used before by a factor of four and initialize a larger composite image.
+To [**obtain a clearer synthesized image**], we train the model using a larger image size: $900 \times 600$. We increase the height and width of the image used before by a factor of four and initialize a larger synthesized image.
 
 ```{.python .input}
 image_shape = (900, 600)
@@ -542,16 +543,16 @@ output = train(X, content_Y, style_Y, device, 0.01, 300, 100)
 d2l.plt.imsave('../img/neural-style.jpg', postprocess(output))
 ```
 
-As you can see, each epoch takes more time due to the larger image size. As shown in :numref:`fig_style_transfer_large`, the composite image produced retains more detail due to its larger size. The composite image not only has large blocks of color like the style image, but these blocks even have the subtle texture of brush strokes.
+As you can see, each epoch takes more time due to the larger image size. As shown in :numref:`fig_style_transfer_large`, the synthesized image produced retains more detail due to its larger size. The synthesized image not only has large blocks of color like the style image, but these blocks even have the subtle texture of brush strokes.
 
-![$900 \times 600$ composite image. ](../img/neural-style.jpg)
+![$900 \times 600$ synthesized image. ](../img/neural-style.jpg)
 :width:`500px`
 :label:`fig_style_transfer_large`
 
 ## Summary
 
-* The loss functions used in style transfer generally have three parts: 1. Content loss is used to make the composite image approximate the content image as regards content features. 2. Style loss is used to make the composite image approximate the style image in terms of style features. 3. Total variation loss helps reduce the noise in the composite image.
-* We can use a pretrained CNN to extract image features and minimize the loss function to continuously update the composite image.
+* The loss functions used in style transfer generally have three parts: 1. Content loss is used to make the synthesized image approximate the content image as regards content features. 2. Style loss is used to make the synthesized image approximate the style image in terms of style features. 3. Total variation loss helps reduce the noise in the synthesized image.
+* We can use a pretrained CNN to extract image features and minimize the loss function to continuously update the synthesized image.
 * We use a Gram matrix to represent the style output by the style layers.
 
 
@@ -559,7 +560,7 @@ As you can see, each epoch takes more time due to the larger image size. As show
 
 1. How does the output change when you select different content and style layers?
 1. Adjust the weight hyperparameters in the loss function. Does the output retain more content or have less noise?
-1. Use different content and style images. Can you create more interesting composite images?
+1. Use different content and style images. Can you create more interesting synthesized images?
 1. Can we apply style transfer for text? Hint: you may refer to the survey paper by Hu et al. :cite:`Hu.Lee.Aggarwal.2020`.
 
 :begin_tab:`mxnet`
