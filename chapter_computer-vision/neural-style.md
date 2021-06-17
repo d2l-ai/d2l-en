@@ -83,7 +83,6 @@ First, we read the content and style images.
 From their printed coordinate axes,
 we can tell that these images have different sizes.
 
-
 ```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -197,7 +196,6 @@ from the input layer to the content layer or style layer that is closest to the 
 Let us construct a new network instance `net`, which only retains all the VGG layers to be
 used for feature extraction.
 
-
 ```{.python .input}
 net = nn.Sequential()
 for i in range(max(content_layers + style_layers) + 1):
@@ -215,7 +213,6 @@ the forward propagation `net(X)`, we can only get the output of the last layer.
 Since we also need the outputs of intermediate layers,
 we need to perform layer-by-layer computation and keep
 the content and style layer outputs.
-
 
 ```{.python .input}
 #@tab all
@@ -269,11 +266,19 @@ def get_styles(image_shape, device):
 
 ## [**Defining the Loss Function**]
 
-Next, we will look at the loss function used for style transfer. The loss function includes the content loss, style loss, and total variation loss.
+Now we will describe the loss function for style transfer. The loss function consists of
+the content loss, style loss, and total variation loss.
 
 ### Content Loss
 
-Similar to the loss function used in linear regression, content loss uses a square error function to measure the difference in content features between the composite image and content image. The two inputs of the square error function are both content layer outputs obtained from the `extract_features` function.
+Similar to the loss function in linear regression,
+the content loss measures the difference
+in content features
+between the synthesized image and the content image via 
+the squared loss function.
+The two inputs of the squared loss function
+are both
+outputs of the content layer computed by the `extract_features` function.
 
 ```{.python .input}
 def content_loss(Y_hat, Y):
@@ -283,15 +288,40 @@ def content_loss(Y_hat, Y):
 ```{.python .input}
 #@tab pytorch
 def content_loss(Y_hat, Y):
-    # we 'detach' the target content from the tree used
-    # to dynamically compute the gradient: this is a stated value,
-    # not a variable. Otherwise the loss will throw an error.
+    # We detach the target content from the tree used to dynamically compute
+    # the gradient: this is a stated value, not a variable. Otherwise the loss
+    # will throw an error.
     return torch.square(Y_hat - Y.detach()).mean()
 ```
 
 ### Style Loss
 
-Style loss, similar to content loss, uses a square error function to measure the difference in style between the composite image and style image. To express the styles output by the style layers, we first use the `extract_features` function to compute the style layer output. Assuming that the output has 1 example, $c$ channels, and a height and width of $h$ and $w$, we can transform the output into the matrix $\mathbf{X}$, which has $c$ rows and $h \cdot w$ columns. You can think of matrix $\mathbf{X}$ as the combination of the $c$ vectors $\mathbf{x}_1, \ldots, \mathbf{x}_c$, which have a length of $hw$. Here, the vector $\mathbf{x}_i$ represents the style feature of channel $i$. In the Gram matrix of these vectors $\mathbf{X}\mathbf{X}^\top \in \mathbb{R}^{c \times c}$, element $x_{ij}$ in row $i$ column $j$ is the inner product of vectors $\mathbf{x}_i$ and $\mathbf{x}_j$. It represents the correlation of the style features of channels $i$ and $j$. We use this type of Gram matrix to represent the style output by the style layers. You must note that, when the $h \cdot w$ value is large, this often leads to large values in the Gram matrix. In addition, the height and width of the Gram matrix are both the number of channels $c$. To ensure that the style loss is not affected by the size of these values, we define the `gram` function below to divide the Gram matrix by the number of its elements, i.e., $c \cdot h \cdot w$.
+Style loss, similar to content loss,
+also uses the squared loss function to measure the difference in style between the synthesized image and the style image. 
+To express the style output of any style layer,
+we first use the `extract_features` function to
+compute the style layer output. 
+Suppose that the output has 
+1 example, $c$ channels, 
+height $h$, and width $w$,
+we can transform this output into 
+matrix $\mathbf{X}$ with $c$ rows and $hw$ columns.
+This matrix can be thought of as
+the concatenation of 
+$c$ vectors $\mathbf{x}_1, \ldots, \mathbf{x}_c$, 
+each of which has a length of $hw$. 
+Here, vector $\mathbf{x}_i$ represents the style feature of channel $i$. 
+
+In the *Gram matrix* of these vectors $\mathbf{X}\mathbf{X}^\top \in \mathbb{R}^{c \times c}$, element $x_{ij}$ in row $i$ and column $j$ is the inner product of vectors $\mathbf{x}_i$ and $\mathbf{x}_j$.
+It represents the correlation of the style features of channels $i$ and $j$. 
+We use this Gram matrix to represent the style output of any style layer. 
+Note that when the value of $hw$ is larger, 
+it likely leads to larger values in the Gram matrix. 
+Note also that the height and width of the Gram matrix are both the number of channels $c$. 
+To allow style loss not to be affected
+by these values,
+the `gram` function below divides
+the Gram matrix by the number of its elements, i.e., $chw$.
 
 ```{.python .input}
 #@tab all
@@ -301,7 +331,11 @@ def gram(X):
     return d2l.matmul(X, X.T) / (num_channels * n)
 ```
 
-Naturally, the two Gram matrix inputs of the square error function for style loss are taken from the composite image and style image style layer outputs. Here, we assume that the Gram matrix of the style image, `gram_Y`, has been computed in advance.
+Obviously,
+the two Gram matrix inputs of the squared loss function for style loss are based on 
+the style layer outputs for 
+the synthesized image and the style image.
+It is assumed here that the Gram matrix `gram_Y` based on the style image has been precomputed.
 
 ```{.python .input}
 def style_loss(Y_hat, gram_Y):
@@ -314,13 +348,19 @@ def style_loss(Y_hat, gram_Y):
     return torch.square(gram(Y_hat) - gram_Y.detach()).mean()
 ```
 
-### Total Variance Loss
+### Total Variation Loss
 
-Sometimes, the composite images we learn have a lot of high-frequency noise, particularly bright or dark pixels. One common noise reduction method is total variation denoising. We assume that $x_{i, j}$ represents the pixel value at the coordinate $(i, j)$, so the total variance loss is:
+Sometimes, the learned synthesized image
+has a lot of high-frequency noise, 
+i.e., particularly bright or dark pixels.
+One common noise reduction method is 
+*total variation denoising*. 
+Denote by $x_{i, j}$ the pixel value at coordinate $(i, j)$.
+Reducing total variation loss
 
-$$\sum_{i, j} \left|x_{i, j} - x_{i+1, j}\right| + \left|x_{i, j} - x_{i, j+1}\right|.$$
+$$\sum_{i, j} \left|x_{i, j} - x_{i+1, j}\right| + \left|x_{i, j} - x_{i, j+1}\right|$$
 
-We try to make the values of neighboring pixels as similar as possible.
+makes values of neighboring pixels on the synthesized image closer.
 
 ```{.python .input}
 #@tab all
@@ -331,7 +371,12 @@ def tv_loss(Y_hat):
 
 ### Loss Function
 
-[**The loss function for style transfer is the weighted sum of the content loss, style loss, and total variance loss**]. By adjusting these weight hyperparameters, we can balance the retained content, transferred style, and noise reduction in the composite image according to their relative importance.
+[**The loss function of style transfer is the weighted sum of content loss, style loss, and total variation loss**].
+By adjusting these weight hyperparameters,
+we can balance among
+content retention, 
+style transfer,
+and noise reduction on the synthesized image.
 
 ```{.python .input}
 #@tab all
