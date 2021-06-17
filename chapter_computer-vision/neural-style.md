@@ -538,9 +538,9 @@ Some of these blocks even have the subtle texture of brush strokes.
 
 ## Summary
 
-* The loss functions used in style transfer generally have three parts: 1. Content loss is used to make the synthesized image approximate the content image as regards content features. 2. Style loss is used to make the synthesized image approximate the style image in terms of style features. 3. Total variation loss helps reduce the noise in the synthesized image.
-* We can use a pretrained CNN to extract image features and minimize the loss function to continuously update the synthesized image.
-* We use a Gram matrix to represent the style output by the style layers.
+* The loss function commonly used in style transfer consists of three parts: (i) content loss makes the synthesized image and the content image close in content features; (ii) style loss makes the synthesized image and style image close in style features; and (iii) total variation loss helps to reduce the noise in the synthesized image.
+* We can use a pretrained CNN to extract image features and minimize the loss function to continuously update the synthesized image as model parameters during training.
+* We use Gram matrices to represent the style outputs from the style layers.
 
 
 ## Exercises
