@@ -5,7 +5,7 @@ Contributions by [readers](https://github.com/d2l-ai/d2l-en/graphs/contributors)
 
 ## Minor Text Changes
 
-The most common contributions are editing one sentence or fixing typos. We recommend you to find the source file in the [github repo](https://github.com/d2l-ai/d2l-en) and edit the file directly. For example, you can search the file through the [Find file](https://github.com/d2l-ai/d2l-en/find/master) button (:numref:`fig_edit_file`) to locate the source file, which is a markdown file. Then you click the "Edit this file" button on the top-right corner to make your changes in the markdown file.
+The most common contributions are editing one sentence or fixing typos. We recommend you to find the source file in the [github repo](https://github.com/d2l-ai/d2l-en) and edit the file directly. For example, you can search the file through the [Find file](https://github.com/d2l-ai/d2l-en/find/master) button (:numref:`fig_edit_file`) to locate the source file, which is a markdown file. Then you click the "Edit this file" button on the upper-right corner to make your changes in the markdown file.
 
 ![Edit the file on Github.](../img/edit-file.png)
 :width:`300px`
@@ -63,14 +63,14 @@ The Git open source book describes [how to install Git](https://git-scm.com/book
 
 ### Logging in to GitHub
 
-Enter the [address](https://github.com/d2l-ai/d2l-en/) of the book's code repository in your browser. Click on the `Fork` button in the red box at the top-right of :numref:`fig_git_fork`, to make a copy of the repository of this book. This is now *your copy* and you can change it any way you want.
+Enter the [address](https://github.com/d2l-ai/d2l-en/) of the book's code repository in your browser. Click on the `Fork` button in the red box at the upper-right of :numref:`fig_git_fork`, to make a copy of the repository of this book. This is now *your copy* and you can change it any way you want.
 
 ![The code repository page.](../img/git-fork.png)
 :width:`700px`
 :label:`fig_git_fork`
 
 
-Now, the code repository of this book will be forked (i.e., copied) to your username, such as `astonzhang/d2l-en` shown at the top-left of the screenshot :numref:`fig_git_forked`.
+Now, the code repository of this book will be forked (i.e., copied) to your username, such as `astonzhang/d2l-en` shown at the upper-left of the screenshot :numref:`fig_git_forked`.
 
 ![Fork the code repository.](../img/git-forked.png)
 :width:`700px`

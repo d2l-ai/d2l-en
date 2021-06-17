@@ -79,7 +79,7 @@ the class and bounding box prediction.
 
 
 
-### Class Prediction Layer
+### (**Class Prediction Layer**)
 
 Let the number of object classes be $q$.
 Then anchor boxes have $q+1$ classes,
@@ -155,7 +155,7 @@ def cls_predictor(num_inputs, num_anchors, num_classes):
                      kernel_size=3, padding=1)
 ```
 
-### Bounding Box Prediction Layer
+### (**Bounding Box Prediction Layer**)
 
 The design of the bounding box prediction layer is similar to that of the class prediction layer.
 The only difference lies in the number of outputs for each anchor box: 
@@ -172,7 +172,7 @@ def bbox_predictor(num_inputs, num_anchors):
     return nn.Conv2d(num_inputs, num_anchors * 4, kernel_size=3, padding=1)
 ```
 
-### Concatenating Predictions for Multiple Scales
+### [**Concatenating Predictions for Multiple Scales**]
 
 As we mentioned, single-shot multibox detection
 uses multiscale feature maps to generate anchor boxes and predict their classes and offsets.
@@ -266,7 +266,7 @@ we can still concatenate these two prediction outputs at two different scales fo
 concat_preds([Y1, Y2]).shape
 ```
 
-### Downsampling Block
+### [**Downsampling Block**]
 
 In order to detect objects at multiple scales,
 we define the following downsampling block `down_sample_blk` that
@@ -322,7 +322,7 @@ forward(np.zeros((2, 3, 20, 20)), down_sample_blk(10)).shape
 forward(torch.zeros((2, 3, 20, 20)), down_sample_blk(3, 10)).shape
 ```
 
-### Base Network Block
+### [**Base Network Block**]
 
 The base network block is used to extract features from input images.
 For simplicity,
@@ -357,9 +357,9 @@ forward(torch.zeros((2, 3, 256, 256)), base_net()).shape
 ### The Complete Model
 
 
-The complete
+[**The complete
 single shot multibox detection model
-consists of five blocks.
+consists of five blocks.**]
 The feature maps produced by each block
 are used for both
 (i) generating anchor boxes
@@ -404,7 +404,7 @@ def get_blk(i):
     return blk
 ```
 
-Now we define the forward propagation
+Now we [**define the forward propagation**]
 for each block.
 Different from 
 in image classification tasks,
@@ -453,6 +453,8 @@ Then their larger scale values
 are given by
 $\sqrt{0.2 \times 0.37} = 0.272$, $\sqrt{0.37 \times 0.54} = 0.447$, and so on.
 
+[~~Hyperparameters for each block~~]
+
 ```{.python .input}
 #@tab all
 sizes = [[0.2, 0.272], [0.37, 0.447], [0.54, 0.619], [0.71, 0.79],
@@ -461,7 +463,7 @@ ratios = [[1, 2, 0.5]] * 5
 num_anchors = len(sizes[0]) + len(ratios[0]) - 1
 ```
 
-Now we can define the complete model `TinySSD` as follows.
+Now we can [**define the complete model**] `TinySSD` as follows.
 
 ```{.python .input}
 class TinySSD(nn.Block):
@@ -519,8 +521,8 @@ class TinySSD(nn.Module):
         return anchors, cls_preds, bbox_preds
 ```
 
-We create a model instance
-and use it to perform forward propagation
+We [**create a model instance
+and use it to perform forward propagation**]
 on a minibatch of $256 \times 256$ images `X`.
 
 As shown earlier in this section,
@@ -567,8 +569,8 @@ for object detection.
 ### Reading the Dataset and Initializing the Model
 
 To begin with,
-let us read 
-the banana detection dataset
+let us [**read 
+the banana detection dataset**]
 described in :numref:`sec_object-detection-dataset`.
 
 ```{.python .input}
@@ -578,8 +580,8 @@ train_iter, _ = d2l.load_data_bananas(batch_size)
 ```
 
 There is only one class in the banana detection dataset. After defining the model,
-we need to initialize its parameters and define
-the optimization algorithm.
+we need to (**initialize its parameters and define
+the optimization algorithm**).
 
 ```{.python .input}
 device, net = d2l.try_gpu(), TinySSD(num_classes=1)
@@ -594,7 +596,7 @@ device, net = d2l.try_gpu(), TinySSD(num_classes=1)
 trainer = torch.optim.SGD(net.parameters(), lr=0.2, weight_decay=5e-4)
 ```
 
-### Defining Loss and Evaluation Functions
+### [**Defining Loss and Evaluation Functions**]
 
 Object detection has two types of losses.
 The first loss concerns classes of anchor boxes:
@@ -676,7 +678,7 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
     return float((torch.abs((bbox_labels - bbox_preds) * bbox_masks)).sum())
 ```
 
-### Training the Model
+### [**Training the Model**]
 
 When training the model,
 we need to generate multiscale anchor boxes (`anchors`)
@@ -760,7 +762,7 @@ print(f'{len(train_iter.dataset) / timer.stop():.1f} examples/sec on '
       f'{str(device)}')
 ```
 
-## Prediction
+## [**Prediction**]
 
 During prediction, 
 the goal is to detect all the objects of interest
@@ -814,9 +816,9 @@ def predict(X):
 output = predict(X)
 ```
 
-Finally, we display
+Finally, we [**display
 all the predicted bounding boxes with 
-confidence 0.9 or above
+confidence 0.9 or above**]
 as the output.
 
 ```{.python .input}

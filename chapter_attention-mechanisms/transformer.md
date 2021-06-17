@@ -122,6 +122,14 @@ import torch
 from torch import nn
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+```
+
 ## Positionwise Feed-Forward Networks
 
 The positionwise feed-forward network
@@ -139,6 +147,7 @@ an output tensor of shape
 ```{.python .input}
 #@save
 class PositionWiseFFN(nn.Block):
+    """Positionwise feed-forward network."""
     def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
         self.dense1 = nn.Dense(ffn_num_hiddens, flatten=False,
@@ -153,6 +162,7 @@ class PositionWiseFFN(nn.Block):
 #@tab pytorch
 #@save
 class PositionWiseFFN(nn.Module):
+    """Positionwise feed-forward network."""
     def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs,
                  **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
@@ -161,6 +171,21 @@ class PositionWiseFFN(nn.Module):
         self.dense2 = nn.Linear(ffn_num_hiddens, ffn_num_outputs)
 
     def forward(self, X):
+        return self.dense2(self.relu(self.dense1(X)))
+```
+
+```{.python .input}
+#@tab tensorflow
+#@save
+class PositionWiseFFN(tf.keras.layers.Layer):
+    """Positionwise feed-forward network."""
+    def __init__(self, ffn_num_hiddens, ffn_num_outputs, **kwargs):
+        super().__init__(*kwargs)
+        self.dense1 = tf.keras.layers.Dense(ffn_num_hiddens)
+        self.relu = tf.keras.layers.ReLU()
+        self.dense2 = tf.keras.layers.Dense(ffn_num_outputs)
+
+    def call(self, X):
         return self.dense2(self.relu(self.dense1(X)))
 ```
 
@@ -185,6 +210,12 @@ ffn(np.ones((2, 3, 4)))[0]
 ffn = PositionWiseFFN(4, 4, 8)
 ffn.eval()
 ffn(d2l.ones((2, 3, 4)))[0]
+```
+
+```{.python .input}
+#@tab tensorflow
+ffn = PositionWiseFFN(4, 8)
+ffn(tf.ones((2, 3, 4)))[0]
 ```
 
 ## Residual Connection and Layer Normalization
@@ -237,6 +268,14 @@ X = d2l.tensor([[1, 2], [2, 3]], dtype=torch.float32)
 print('layer norm:', ln(X), '\nbatch norm:', bn(X))
 ```
 
+```{.python .input}
+#@tab tensorflow
+ln = tf.keras.layers.LayerNormalization()
+bn = tf.keras.layers.BatchNormalization()
+X = tf.constant([[1, 2], [2, 3]], dtype=tf.float32)
+print('layer norm:', ln(X), '\nbatch norm:', bn(X, training=True))
+```
+
 Now we can implement the `AddNorm` class
 using a residual connection followed by layer normalization.
 Dropout is also applied for regularization.
@@ -244,6 +283,7 @@ Dropout is also applied for regularization.
 ```{.python .input}
 #@save
 class AddNorm(nn.Block):
+    """Residual connection followed by layer normalization."""
     def __init__(self, dropout, **kwargs):
         super(AddNorm, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
@@ -257,6 +297,7 @@ class AddNorm(nn.Block):
 #@tab pytorch
 #@save
 class AddNorm(nn.Module):
+    """Residual connection followed by layer normalization."""
     def __init__(self, normalized_shape, dropout, **kwargs):
         super(AddNorm, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
@@ -264,6 +305,20 @@ class AddNorm(nn.Module):
 
     def forward(self, X, Y):
         return self.ln(self.dropout(Y) + X)
+```
+
+```{.python .input}
+#@tab tensorflow
+#@save
+class AddNorm(tf.keras.layers.Layer):
+    """Residual connection followed by layer normalization."""
+    def __init__(self, normalized_shape, dropout, **kwargs):
+        super().__init__(**kwargs)
+        self.dropout = tf.keras.layers.Dropout(dropout)
+        self.ln = tf.keras.layers.LayerNormalization(normalized_shape)
+        
+    def call(self, X, Y, **kwargs):
+        return self.ln(self.dropout(Y, **kwargs) + X)
 ```
 
 The residual connection requires that
@@ -283,6 +338,12 @@ add_norm.eval()
 add_norm(d2l.ones((2, 3, 4)), d2l.ones((2, 3, 4))).shape
 ```
 
+```{.python .input}
+#@tab tensorflow
+add_norm = AddNorm([1, 2], 0.5) # Normalized_shape is: [i for i in range(len(input.shape))][1:]
+add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)), training=False).shape
+```
+
 ## Encoder
 
 With all the essential components to assemble
@@ -297,6 +358,7 @@ around both sublayers.
 ```{.python .input}
 #@save
 class EncoderBlock(nn.Block):
+    """Transformer encoder block."""
     def __init__(self, num_hiddens, ffn_num_hiddens, num_heads, dropout,
                  use_bias=False, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
@@ -315,6 +377,7 @@ class EncoderBlock(nn.Block):
 #@tab pytorch
 #@save
 class EncoderBlock(nn.Module):
+    """Transformer encoder block."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
                  dropout, use_bias=False, **kwargs):
@@ -330,6 +393,25 @@ class EncoderBlock(nn.Module):
     def forward(self, X, valid_lens):
         Y = self.addnorm1(X, self.attention(X, X, X, valid_lens))
         return self.addnorm2(Y, self.ffn(Y))
+```
+
+```{.python .input}
+#@tab tensorflow
+#@save
+class EncoderBlock(tf.keras.layers.Layer):
+    """Transformer encoder block."""
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 norm_shape, ffn_num_hiddens, num_heads, dropout, bias=False, **kwargs):
+        super().__init__(**kwargs)
+        self.attention = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens,
+                                                num_heads, dropout, bias)
+        self.addnorm1 = AddNorm(norm_shape, dropout)
+        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
+        self.addnorm2 = AddNorm(norm_shape, dropout)
+        
+    def call(self, X, valid_lens, **kwargs):
+        Y = self.addnorm1(X, self.attention(X, X, X, valid_lens, **kwargs), **kwargs)
+        return self.addnorm2(Y, self.ffn(Y), **kwargs)
 ```
 
 As we can see,
@@ -353,6 +435,15 @@ encoder_blk.eval()
 encoder_blk(X, valid_lens).shape
 ```
 
+```{.python .input}
+#@tab tensorflow
+X = tf.ones((2, 100, 24))
+valid_lens = tf.constant([3, 2])
+norm_shape = [i for i in range(len(X.shape))][1:]
+encoder_blk = EncoderBlock(24, 24, 24, 24, norm_shape, 48, 8, 0.5)
+encoder_blk(X, valid_lens, training=False).shape
+```
+
 In the following transformer encoder implementation,
 we stack `num_layers` instances of the above `EncoderBlock` classes.
 Since we use the fixed positional encoding
@@ -364,6 +455,7 @@ to rescale before summing up the input embedding and the positional encoding.
 ```{.python .input}
 #@save
 class TransformerEncoder(d2l.Encoder):
+    """Transformer encoder."""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens,
                  num_heads, num_layers, dropout, use_bias=False, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
@@ -393,6 +485,7 @@ class TransformerEncoder(d2l.Encoder):
 #@tab pytorch
 #@save
 class TransformerEncoder(d2l.Encoder):
+    """Transformer encoder."""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
                  num_heads, num_layers, dropout, use_bias=False, **kwargs):
@@ -420,6 +513,37 @@ class TransformerEncoder(d2l.Encoder):
         return X
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+class TransformerEncoder(d2l.Encoder):
+    """Transformer encoder."""
+    def __init__(self, vocab_size, key_size, query_size, value_size,
+                 num_hiddens, norm_shape, ffn_num_hiddens, num_heads,
+                 num_layers, dropout, bias=False, **kwargs):
+        super().__init__(**kwargs)
+        self.num_hiddens = num_hiddens
+        self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
+        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
+        self.blks = [EncoderBlock(
+            key_size, query_size, value_size, num_hiddens, norm_shape,
+            ffn_num_hiddens, num_heads, dropout, bias) for _ in range(
+            num_layers)]
+        
+    def call(self, X, valid_lens, **kwargs):
+        # Since positional encoding values are between -1 and 1, the embedding
+        # values are multiplied by the square root of the embedding dimension
+        # to rescale before they are summed up
+        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(
+            tf.cast(self.num_hiddens, dtype=tf.float32)), **kwargs)
+        self.attention_weights = [None] * len(self.blks)
+        for i, blk in enumerate(self.blks):
+            X = blk(X, valid_lens, **kwargs)
+            self.attention_weights[
+                i] = blk.attention.attention.attention_weights
+        return X
+```
+
 Below we specify hyperparameters to create a two-layer transformer encoder.
 The shape of the transformer encoder output
 is (batch size, number of time steps, `num_hiddens`).
@@ -436,6 +560,12 @@ encoder = TransformerEncoder(
     200, 24, 24, 24, 24, [100, 24], 24, 48, 8, 2, 0.5)
 encoder.eval()
 encoder(d2l.ones((2, 100), dtype=torch.long), valid_lens).shape
+```
+
+```{.python .input}
+#@tab tensorflow
+encoder = TransformerEncoder(200, 24, 24, 24, 24, [1, 2], 48, 8, 2, 0.5)
+encoder(tf.ones((2, 100)), valid_lens, training=False).shape
 ```
 
 ## Decoder
@@ -576,6 +706,52 @@ class DecoderBlock(nn.Module):
         return self.addnorm3(Z, self.ffn(Z)), state
 ```
 
+```{.python .input}
+#@tab tensorflow
+class DecoderBlock(tf.keras.layers.Layer):
+    # The `i`-th block in the decoder
+    def __init__(self, key_size, query_size, value_size, num_hiddens,
+                 norm_shape, ffn_num_hiddens, num_heads, dropout, i, **kwargs):
+        super().__init__(**kwargs)
+        self.i = i
+        self.attention1 = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens, num_heads, dropout)
+        self.addnorm1 = AddNorm(norm_shape, dropout)
+        self.attention2 = d2l.MultiHeadAttention(key_size, query_size, value_size, num_hiddens, num_heads, dropout)
+        self.addnorm2 = AddNorm(norm_shape, dropout)
+        self.ffn = PositionWiseFFN(ffn_num_hiddens, num_hiddens)
+        self.addnorm3 = AddNorm(norm_shape, dropout)
+        
+    def call(self, X, state, **kwargs):
+        enc_outputs, enc_valid_lens = state[0], state[1]
+        # During training, all the tokens of any output sequence are processed
+        # at the same time, so `state[2][self.i]` is `None` as initialized.
+        # When decoding any output sequence token by token during prediction,
+        # `state[2][self.i]` contains representations of the decoded output at
+        # the `i`-th block up to the current time step
+        if state[2][self.i] is None:
+            key_values = X
+        else:
+            key_values = tf.concat((state[2][self.i], X), axis=1)
+        state[2][self.i] = key_values
+        if kwargs["training"]:
+            batch_size, num_steps, _ = X.shape
+            # Shape of `dec_valid_lens`: (`batch_size`, `num_steps`), where
+            # every row is [1, 2, ..., `num_steps`]
+            dec_valid_lens = tf.repeat(tf.reshape(tf.range(1, num_steps + 1),
+                                                 shape=(-1, num_steps)), repeats=batch_size, axis=0)
+
+        else:
+            dec_valid_lens = None
+            
+        # Self-attention
+        X2 = self.attention1(X, key_values, key_values, dec_valid_lens, **kwargs)
+        Y = self.addnorm1(X, X2, **kwargs)
+        # Encoder-decoder attention. Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`)
+        Y2 = self.attention2(Y, enc_outputs, enc_outputs, enc_valid_lens, **kwargs)
+        Z = self.addnorm2(Y, Y2, **kwargs)
+        return self.addnorm3(Z, self.ffn(Z), **kwargs), state
+```
+
 To facilitate scaled dot-product operations
 in the encoder-decoder attention
 and addition operations in the residual connections,
@@ -597,6 +773,14 @@ decoder_blk.eval()
 X = d2l.ones((2, 100, 24))
 state = [encoder_blk(X, valid_lens), valid_lens, [None]]
 decoder_blk(X, state)[0].shape
+```
+
+```{.python .input}
+#@tab tensorflow
+decoder_blk = DecoderBlock(24, 24, 24, 24, [1, 2], 48, 8, 0.5, 0)
+X = tf.ones((2, 100, 24))
+state = [encoder_blk(X, valid_lens), valid_lens, [None]]
+decoder_blk(X, state, training=False)[0].shape
 ```
 
 Now we construct the entire transformer decoder
@@ -685,6 +869,39 @@ class TransformerDecoder(d2l.AttentionDecoder):
         return self._attention_weights
 ```
 
+```{.python .input}
+#@tab tensorflow
+class TransformerDecoder(d2l.AttentionDecoder):
+    def __init__(self, vocab_size, key_size, query_size, value_size,
+                 num_hiddens, norm_shape, ffn_num_hidens, num_heads, num_layers, dropout, **kwargs):
+        super().__init__(**kwargs)
+        self.num_hiddens = num_hiddens
+        self.num_layers = num_layers
+        self.embedding = tf.keras.layers.Embedding(vocab_size, num_hiddens)
+        self.pos_encoding = d2l.PositionalEncoding(num_hiddens, dropout)
+        self.blks = [DecoderBlock(key_size, query_size, value_size, num_hiddens, norm_shape,
+                                  ffn_num_hiddens, num_heads, dropout, i) for i in range(num_layers)]
+        self.dense = tf.keras.layers.Dense(vocab_size)
+        
+    def init_state(self, enc_outputs, enc_valid_lens, *args):
+        return [enc_outputs, enc_valid_lens, [None] * self.num_layers]
+    
+    def call(self, X, state, **kwargs):
+        X = self.pos_encoding(self.embedding(X) * tf.math.sqrt(tf.cast(self.num_hiddens, dtype=tf.float32)), **kwargs)
+        self._attention_weights = [[None] * len(self.blks) for _ in range(2)]  # 2 Attention layers in decoder
+        for i, blk in enumerate(self.blks):
+            X, state = blk(X, state, **kwargs)
+            # Decoder self-attention weights
+            self._attention_weights[0][i] = blk.attention1.attention.attention_weights
+            # Encoder-decoder attention weights
+            self._attention_weights[1][i] = blk.attention2.attention.attention_weights
+        return self.dense(X), state
+    
+    @property
+    def attention_weights(self):
+        return self._attention_weights
+```
+
 ## Training
 
 Let us instantiate an encoder-decoder model
@@ -735,17 +952,47 @@ net = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
+```{.python .input}
+#@tab tensorflow
+num_hiddens, num_layers, dropout, batch_size, num_steps = 32, 2, 0.1, 64, 10
+lr, num_epochs, device = 0.005, 200, d2l.try_gpu()
+ffn_num_hiddens, num_heads = 64, 4
+key_size, query_size, value_size = 32, 32, 32
+norm_shape = [2]
+
+train_iter, src_vocab, tgt_vocab = d2l.load_data_nmt(batch_size, num_steps)
+encoder = TransformerEncoder(
+    len(src_vocab), key_size, query_size, value_size, num_hiddens, norm_shape,
+    ffn_num_hiddens, num_heads, num_layers, dropout)
+decoder = TransformerDecoder(
+    len(tgt_vocab), key_size, query_size, value_size, num_hiddens, norm_shape,
+    ffn_num_hiddens, num_heads, num_layers, dropout)
+net = d2l.EncoderDecoder(encoder, decoder)
+d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
+```
+
 After training,
 we use the transformer model
 to translate a few English sentences into French and compute their BLEU scores.
 
 ```{.python .input}
-#@tab all
+#@tab mxnet, pytorch
 engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
 fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
 for eng, fra in zip(engs, fras):
     translation, dec_attention_weight_seq = d2l.predict_seq2seq(
         net, eng, src_vocab, tgt_vocab, num_steps, device, True)
+    print(f'{eng} => {translation}, ',
+          f'bleu {d2l.bleu(translation, fra, k=2):.3f}')
+```
+
+```{.python .input}
+#@tab tensorflow
+engs = ['go .', "i lost .", 'he\'s calm .', 'i\'m home .']
+fras = ['va !', 'j\'ai perdu .', 'il est calme .', 'je suis chez moi .']
+for eng, fra in zip(engs, fras):
+    translation, dec_attention_weight_seq = d2l.predict_seq2seq(
+        net, eng, src_vocab, tgt_vocab, num_steps, True)
     print(f'{eng} => {translation}, ',
           f'bleu {d2l.bleu(translation, fra, k=2):.3f}')
 ```
@@ -774,6 +1021,7 @@ Each head independently attends
 based on a separate representation subspaces of queries, keys, and values.
 
 ```{.python .input}
+#@tab mxnet, tensorflow
 d2l.show_heatmaps(
     enc_attention_weights, xlabel='Key positions', ylabel='Query positions',
     titles=['Head %d' % i for i in range(1, 5)], figsize=(7, 3.5))
@@ -823,6 +1071,21 @@ dec_attention_weights = d2l.reshape(dec_attention_weights_filled,
 dec_self_attention_weights, dec_inter_attention_weights = \
     dec_attention_weights.permute(1, 2, 3, 0, 4)
 dec_self_attention_weights.shape, dec_inter_attention_weights.shape
+```
+
+```{.python .input}
+#@tab tensorflow
+dec_attention_weights_2d = [head[0] for step in dec_attention_weight_seq
+                            for attn in step 
+                            for blk in attn for head in blk]
+dec_attention_weights_filled = tf.convert_to_tensor(
+    np.asarray(pd.DataFrame(dec_attention_weights_2d).fillna(
+        0.0).values).astype(np.float32))
+dec_attention_weights = tf.reshape(dec_attention_weights_filled, shape=(
+    -1, 2, num_layers, num_heads, num_steps))
+dec_self_attention_weights, dec_inter_attention_weights = tf.transpose(
+    dec_attention_weights, perm=(1, 2, 3, 0, 4))
+print(dec_self_attention_weights.shape, dec_inter_attention_weights.shape)
 ```
 
 Due to the auto-regressive property of the decoder self-attention,

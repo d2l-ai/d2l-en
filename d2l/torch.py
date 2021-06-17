@@ -232,8 +232,10 @@ def evaluate_accuracy(net, data_iter):
     if isinstance(net, torch.nn.Module):
         net.eval()  # Set the model to evaluation mode
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
-    for X, y in data_iter:
-        metric.add(accuracy(net(X), y), d2l.size(y))
+
+    with torch.no_grad():
+        for X, y in data_iter:
+            metric.add(accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
@@ -455,14 +457,16 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):
             device = next(iter(net.parameters())).device
     # No. of correct predictions, no. of predictions
     metric = d2l.Accumulator(2)
-    for X, y in data_iter:
-        if isinstance(X, list):
-            # Required for BERT Fine-tuning (to be covered later)
-            X = [x.to(device) for x in X]
-        else:
-            X = X.to(device)
-        y = y.to(device)
-        metric.add(d2l.accuracy(net(X), y), d2l.size(y))
+
+    with torch.no_grad():
+        for X, y in data_iter:
+            if isinstance(X, list):
+                # Required for BERT Fine-tuning (to be covered later)
+                X = [x.to(device) for x in X]
+            else:
+                X = X.to(device)
+            y = y.to(device)
+            metric.add(d2l.accuracy(net(X), y), d2l.size(y))
     return metric[0] / metric[1]
 
 
@@ -1101,6 +1105,7 @@ def bleu(pred_seq, label_seq, k):
 # Defined in file: ./chapter_attention-mechanisms/attention-cues.md
 def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
+    """Show heatmaps of matrices."""
     d2l.use_svg_display()
     num_rows, num_cols = matrices.shape[0], matrices.shape[1]
     fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,
@@ -1138,6 +1143,7 @@ def masked_softmax(X, valid_lens):
 
 # Defined in file: ./chapter_attention-mechanisms/attention-scoring-functions.md
 class AdditiveAttention(nn.Module):
+    """Additive attention."""
     def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
         self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
@@ -1196,6 +1202,7 @@ class AttentionDecoder(d2l.Decoder):
 
 # Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
 class MultiHeadAttention(nn.Module):
+    """Multi-head attention."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  num_heads, dropout, bias=False, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
@@ -1237,6 +1244,7 @@ class MultiHeadAttention(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/multihead-attention.md
 def transpose_qkv(X, num_heads):
+    """Transposition for parallel computation of multiple attention heads."""
     # Shape of input `X`:
     # (`batch_size`, no. of queries or key-value pairs, `num_hiddens`).
     # Shape of output `X`:
@@ -1256,7 +1264,7 @@ def transpose_qkv(X, num_heads):
 
 
 def transpose_output(X, num_heads):
-    """Reverse the operation of `transpose_qkv`"""
+    """Reverse the operation of `transpose_qkv`."""
     X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
     X = X.permute(0, 2, 1, 3)
     return X.reshape(X.shape[0], X.shape[1], -1)
@@ -1264,6 +1272,7 @@ def transpose_output(X, num_heads):
 
 # Defined in file: ./chapter_attention-mechanisms/self-attention-and-positional-encoding.md
 class PositionalEncoding(nn.Module):
+    """Positional encoding."""
     def __init__(self, num_hiddens, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
@@ -1284,6 +1293,7 @@ class PositionalEncoding(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionWiseFFN(nn.Module):
+    """Positionwise feed-forward network."""
     def __init__(self, ffn_num_input, ffn_num_hiddens, ffn_num_outputs,
                  **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
@@ -1297,6 +1307,7 @@ class PositionWiseFFN(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class AddNorm(nn.Module):
+    """Residual connection followed by layer normalization."""
     def __init__(self, normalized_shape, dropout, **kwargs):
         super(AddNorm, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
@@ -1308,6 +1319,7 @@ class AddNorm(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class EncoderBlock(nn.Module):
+    """Transformer encoder block."""
     def __init__(self, key_size, query_size, value_size, num_hiddens,
                  norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
                  dropout, use_bias=False, **kwargs):
@@ -1327,6 +1339,7 @@ class EncoderBlock(nn.Module):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class TransformerEncoder(d2l.Encoder):
+    """Transformer encoder."""
     def __init__(self, vocab_size, key_size, query_size, value_size,
                  num_hiddens, norm_shape, ffn_num_input, ffn_num_hiddens,
                  num_heads, num_layers, dropout, use_bias=False, **kwargs):
@@ -1916,8 +1929,8 @@ VOC_CLASSES = [
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-def build_colormap2label():
-    """Build an RGB color to label mapping for segmentation."""
+def voc_colormap2label():
+    """Build the mapping from RGB to class indices for VOC labels."""
     colormap2label = torch.zeros(256**3, dtype=torch.long)
     for i, colormap in enumerate(VOC_COLORMAP):
         colormap2label[(colormap[0] * 256 + colormap[1]) * 256 +
@@ -1926,7 +1939,7 @@ def build_colormap2label():
 
 
 def voc_label_indices(colormap, colormap2label):
-    """Map an RGB color to a label."""
+    """Map any RGB values in VOC labels to their class indices."""
     colormap = colormap.permute(1, 2, 0).numpy().astype('int32')
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256 +
            colormap[:, :, 2])
@@ -1935,7 +1948,7 @@ def voc_label_indices(colormap, colormap2label):
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def voc_rand_crop(feature, label, height, width):
-    """Randomly crop for both feature and label images."""
+    """Randomly crop both feature and label images."""
     rect = torchvision.transforms.RandomCrop.get_params(
         feature, (height, width))
     feature = torchvision.transforms.functional.crop(feature, *rect)
@@ -1945,7 +1958,7 @@ def voc_rand_crop(feature, label, height, width):
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 class VOCSegDataset(torch.utils.data.Dataset):
-    """A customized dataset to load VOC dataset."""
+    """A customized dataset to load the VOC dataset."""
     def __init__(self, is_train, crop_size, voc_dir):
         self.transform = torchvision.transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -1955,7 +1968,7 @@ class VOCSegDataset(torch.utils.data.Dataset):
             self.normalize_image(feature)
             for feature in self.filter(features)]
         self.labels = self.filter(labels)
-        self.colormap2label = build_colormap2label()
+        self.colormap2label = voc_colormap2label()
         print('read ' + str(len(self.features)) + ' examples')
 
     def normalize_image(self, img):
@@ -1977,7 +1990,7 @@ class VOCSegDataset(torch.utils.data.Dataset):
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def load_data_voc(batch_size, crop_size):
-    """Download and load the VOC2012 semantic dataset."""
+    """Load the VOC semantic segmentation dataset."""
     voc_dir = d2l.download_extract('voc2012',
                                    os.path.join('VOCdevkit', 'VOC2012'))
     num_workers = d2l.get_dataloader_workers()
@@ -2123,7 +2136,7 @@ class RandomGenerator:
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def get_negatives(all_contexts, corpus, K):
     counter = d2l.count_corpus(corpus)
-    sampling_weights = [counter[i]**0.75 for i in range(len(counter))]
+    sampling_weights = [count**0.75 for count in counter.values()]
     all_negatives, generator = [], RandomGenerator(sampling_weights)
     for contexts in all_contexts:
         negatives = []

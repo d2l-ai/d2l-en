@@ -81,6 +81,12 @@ import torch
 from torch import nn
 ```
 
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
+import tensorflow as tf
+```
+
 ## Masked Softmax Operation
 
 As we just mentioned,
@@ -145,6 +151,27 @@ def masked_softmax(X, valid_lens):
         return nn.functional.softmax(X.reshape(shape), dim=-1)
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+def masked_softmax(X, valid_lens):
+    """Perform softmax operation by masking elements on the last axis."""
+    # `X`: 3D tensor, `valid_lens`: 1D or 2D tensor
+    if valid_lens is None:
+        return tf.nn.softmax(X, axis=-1)
+    else:
+        shape = X.shape
+        if len(valid_lens.shape) == 1:
+            valid_lens = tf.repeat(valid_lens, repeats=shape[1])
+            
+        else:
+            valid_lens = tf.reshape(valid_lens, shape=-1)
+        # On the last axis, replace masked elements with a very large negative
+        # value, whose exponentiation outputs 0    
+        X = d2l.sequence_mask(tf.reshape(X, shape=(-1, shape[-1])), valid_lens, value=-1e6)    
+        return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1)
+```
+
 To demonstrate how this function works,
 consider a minibatch of two $2 \times 4$ matrix examples,
 where the valid lengths for these two examples
@@ -162,6 +189,11 @@ masked_softmax(np.random.uniform(size=(2, 2, 4)), d2l.tensor([2, 3]))
 masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3]))
 ```
 
+```{.python .input}
+#@tab tensorflow
+masked_softmax(tf.random.uniform(shape=(2, 2, 4)), tf.constant([2, 3]))
+```
+
 Similarly, we can also
 use a two-dimensional tensor
 to specify valid lengths
@@ -175,6 +207,11 @@ masked_softmax(np.random.uniform(size=(2, 2, 4)),
 ```{.python .input}
 #@tab pytorch
 masked_softmax(torch.rand(2, 2, 4), d2l.tensor([[1, 3], [2, 4]]))
+```
+
+```{.python .input}
+#@tab tensorflow
+masked_softmax(tf.random.uniform((2, 2, 4)), tf.constant([[1, 3], [2, 4]]))
 ```
 
 ## Additive Attention
@@ -238,6 +275,7 @@ class AdditiveAttention(nn.Block):
 #@tab pytorch
 #@save
 class AdditiveAttention(nn.Module):
+    """Additive attention."""
     def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
         super(AdditiveAttention, self).__init__(**kwargs)
         self.W_k = nn.Linear(key_size, num_hiddens, bias=False)
@@ -261,6 +299,38 @@ class AdditiveAttention(nn.Module):
         # Shape of `values`: (`batch_size`, no. of key-value pairs, value
         # dimension)
         return torch.bmm(self.dropout(self.attention_weights), values)
+```
+
+```{.python .input}
+#@tab tensorflow
+#@save
+class AdditiveAttention(tf.keras.layers.Layer):
+    """Additive attention."""
+    def __init__(self, key_size, query_size, num_hiddens, dropout, **kwargs):
+        super().__init__(**kwargs)
+        self.W_k = tf.keras.layers.Dense(num_hiddens, use_bias=False)
+        self.W_q = tf.keras.layers.Dense(num_hiddens, use_bias=False)
+        self.w_v = tf.keras.layers.Dense(1, use_bias=False)
+        self.dropout = tf.keras.layers.Dropout(dropout)
+        
+    def call(self, queries, keys, values, valid_lens, **kwargs):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # After dimension expansion, shape of `queries`: (`batch_size`, no. of
+        # queries, 1, `num_hiddens`) and shape of `keys`: (`batch_size`, 1,
+        # no. of key-value pairs, `num_hiddens`). Sum them up with
+        # broadcasting
+        features = tf.expand_dims(queries, axis=2) + tf.expand_dims(
+            keys, axis=1)
+        features = tf.nn.tanh(features)
+        # There is only one output of `self.w_v`, so we remove the last
+        # one-dimensional entry from the shape. Shape of `scores`:
+        # (`batch_size`, no. of queries, no. of key-value pairs)
+        scores = tf.squeeze(self.w_v(features), axis=-1)
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+        # dimension)
+        return tf.matmul(self.dropout(
+            self.attention_weights, **kwargs), values)
 ```
 
 Let us demonstrate the above `AdditiveAttention` class
@@ -295,6 +365,19 @@ attention = AdditiveAttention(key_size=2, query_size=20, num_hiddens=8,
                               dropout=0.1)
 attention.eval()
 attention(queries, keys, values, valid_lens)
+```
+
+```{.python .input}
+#@tab tensorflow
+queries, keys = tf.random.normal(shape=(2, 1, 20)), tf.ones((2, 10, 2))
+# The two value matrices in the `values` minibatch are identical
+values = tf.repeat(tf.reshape(
+    tf.range(40, dtype=tf.float32), shape=(1, 10, 4)), repeats=2, axis=0)
+valid_lens = tf.constant([2, 6])
+
+attention = AdditiveAttention(key_size=2, query_size=20, num_hiddens=8,
+                              dropout=0.1)
+attention(queries, keys, values, valid_lens, training=False)
 ```
 
 Although additive attention contains learnable parameters,
@@ -394,6 +477,28 @@ class DotProductAttention(nn.Module):
         return torch.bmm(self.dropout(self.attention_weights), values)
 ```
 
+```{.python .input}
+#@tab tensorflow
+#@save
+class DotProductAttention(tf.keras.layers.Layer):
+    """Scaled dot product attention."""
+    def __init__(self, dropout, **kwargs):
+        super().__init__(**kwargs)
+        self.dropout = tf.keras.layers.Dropout(dropout)
+        
+    # Shape of `queries`: (`batch_size`, no. of queries, `d`)
+    # Shape of `keys`: (`batch_size`, no. of key-value pairs, `d`)
+    # Shape of `values`: (`batch_size`, no. of key-value pairs, value
+    # dimension)
+    # Shape of `valid_lens`: (`batch_size`,) or (`batch_size`, no. of queries)
+    def call(self, queries, keys, values, valid_lens, **kwargs):
+        d = queries.shape[-1]
+        scores = tf.matmul(queries, keys, transpose_b=True)/tf.math.sqrt(
+            tf.cast(d, dtype=tf.float32))
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
+```
+
 To demonstrate the above `DotProductAttention` class,
 we use the same keys, values, and valid lengths from the earlier toy example
 for additive attention.
@@ -414,6 +519,13 @@ queries = d2l.normal(0, 1, (2, 1, 2))
 attention = DotProductAttention(dropout=0.5)
 attention.eval()
 attention(queries, keys, values, valid_lens)
+```
+
+```{.python .input}
+#@tab tensorflow
+queries = tf.random.normal(shape=(2, 1, 2))
+attention = DotProductAttention(dropout=0.5)
+attention(queries, keys, values, valid_lens, training=False)
 ```
 
 Same as in the additive attention demonstration,

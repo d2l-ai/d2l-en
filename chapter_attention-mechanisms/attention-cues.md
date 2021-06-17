@@ -174,6 +174,7 @@ import torch
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
+
 To visualize attention weights,
 we define the `show_heatmaps` function.
 Its input `matrices` has the shape (number of rows for display, number of columns for display, number of queries, number of keys).
@@ -183,6 +184,7 @@ Its input `matrices` has the shape (number of rows for display, number of column
 #@save
 def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(2.5, 2.5),
                   cmap='Reds'):
+    """Show heatmaps of matrices."""
     d2l.use_svg_display()
     num_rows, num_cols = matrices.shape[0], matrices.shape[1]
     fig, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize,

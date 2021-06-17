@@ -34,7 +34,7 @@ is given by the height and width of the kernel
 
 In the two-dimensional cross-correlation operation,
 we begin with the convolution window positioned
-at the top-left corner of the input tensor
+at the upper-left corner of the input tensor
 and slide it across the input tensor,
 both from left to right and top to bottom.
 When the convolution window slides to a certain position,
@@ -62,7 +62,7 @@ we can only properly compute the cross-correlation
 for locations where the kernel fits wholly within the image,
 the output size is given by the input size $n_h \times n_w$
 minus the size of the convolution kernel $k_h \times k_w$
-via 
+via
 
 $$(n_h-k_h+1) \times (n_w-k_w+1).$$
 
@@ -192,7 +192,7 @@ or a $h \times w$ convolution kernel,
 the height and width of the convolution kernel are $h$ and $w$, respectively.
 We also refer to
 a convolutional layer with a $h \times w$
-convolution kernel simply as a $h \times w$ convolutional layer. 
+convolution kernel simply as a $h \times w$ convolutional layer.
 
 
 ## Object Edge Detection in Images
@@ -369,7 +369,7 @@ to the kernel tensor `K` we defined earlier.
 Recall our observation from :numref:`sec_why-conv` of the correspondence
 between the cross-correlation and convolution operations.
 Here let us continue to consider two-dimensional convolutional layers.
-What if such layers 
+What if such layers
 perform strict convolution operations
 as defined in :eqref:`eq_2d-conv-discrete`
 instead of cross-correlations?
@@ -383,10 +383,10 @@ either the strict convolution operations
 or the cross-correlation operations.
 
 To illustrate this, suppose that a convolutional layer performs *cross-correlation* and learns the kernel in :numref:`fig_correlation`, which is denoted as the matrix $\mathbf{K}$ here.
-Assuming that other conditions remain unchanged, 
+Assuming that other conditions remain unchanged,
 when this layer performs strict *convolution* instead,
 the learned kernel $\mathbf{K}'$ will be the same as $\mathbf{K}$
-after $\mathbf{K}'$ is 
+after $\mathbf{K}'$ is
 flipped both horizontally and vertically.
 That is to say,
 when the convolutional layer
@@ -441,7 +441,7 @@ on $\mathbf{Y}$ includes all the four elements of $\mathbf{Y}$,
 while
 the receptive field
 on the input includes all the nine input elements.
-Thus, 
+Thus,
 when any element in a feature map
 needs a larger receptive field
 to detect input features over a broader area,

@@ -203,7 +203,7 @@ generator = RandomGenerator([2, 3, 4])
 #@save
 def get_negatives(all_contexts, corpus, K):
     counter = d2l.count_corpus(corpus)
-    sampling_weights = [counter[i]**0.75 for i in range(len(counter))]
+    sampling_weights = [count**0.75 for count in counter.values()]
     all_negatives, generator = [], RandomGenerator(sampling_weights)
     for contexts in all_contexts:
         negatives = []
@@ -343,6 +343,3 @@ for batch in data_iter:
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1330)
 :end_tab:
-
-
-

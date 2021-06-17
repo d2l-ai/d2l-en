@@ -451,11 +451,11 @@ net = nn.Sequential()
 net.add(nn.Conv2D(6, kernel_size=5),
         BatchNorm(6, num_dims=4),
         nn.Activation('sigmoid'),
-        nn.MaxPool2D(pool_size=2, strides=2),
+        nn.AvgPool2D(pool_size=2, strides=2),
         nn.Conv2D(16, kernel_size=5),
         BatchNorm(16, num_dims=4),
         nn.Activation('sigmoid'),
-        nn.MaxPool2D(pool_size=2, strides=2),
+        nn.AvgPool2D(pool_size=2, strides=2),
         nn.Dense(120),
         BatchNorm(120, num_dims=2),
         nn.Activation('sigmoid'),
@@ -469,9 +469,9 @@ net.add(nn.Conv2D(6, kernel_size=5),
 #@tab pytorch
 net = nn.Sequential(
     nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4), nn.Sigmoid(),
-    nn.MaxPool2d(kernel_size=2, stride=2),
+    nn.AvgPool2d(kernel_size=2, stride=2),
     nn.Conv2d(6, 16, kernel_size=5), BatchNorm(16, num_dims=4), nn.Sigmoid(),
-    nn.MaxPool2d(kernel_size=2, stride=2), nn.Flatten(),
+    nn.AvgPool2d(kernel_size=2, stride=2), nn.Flatten(),
     nn.Linear(16*4*4, 120), BatchNorm(120, num_dims=2), nn.Sigmoid(),
     nn.Linear(120, 84), BatchNorm(84, num_dims=2), nn.Sigmoid(),
     nn.Linear(84, 10))
@@ -488,11 +488,11 @@ def net():
                                input_shape=(28, 28, 1)),
         BatchNorm(),
         tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Conv2D(filters=16, kernel_size=5),
         BatchNorm(),
         tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(120),
         BatchNorm(),
@@ -506,7 +506,7 @@ def net():
 
 As before, we will [**train our network on the Fashion-MNIST dataset**].
 This code is virtually identical to that when we first trained LeNet (:numref:`sec_lenet`).
-The main difference is the considerably larger learning rate.
+The main difference is the larger learning rate.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -546,18 +546,18 @@ Compared with the `BatchNorm` class,
 which we just defined ourselves,
 we can use the `BatchNorm` class defined in high-level APIs from the deep learning framework directly.
 The code looks virtually identical
-to the application our implementation above.
+to our implementation above.
 
 ```{.python .input}
 net = nn.Sequential()
 net.add(nn.Conv2D(6, kernel_size=5),
         nn.BatchNorm(),
         nn.Activation('sigmoid'),
-        nn.MaxPool2D(pool_size=2, strides=2),
+        nn.AvgPool2D(pool_size=2, strides=2),
         nn.Conv2D(16, kernel_size=5),
         nn.BatchNorm(),
         nn.Activation('sigmoid'),
-        nn.MaxPool2D(pool_size=2, strides=2),
+        nn.AvgPool2D(pool_size=2, strides=2),
         nn.Dense(120),
         nn.BatchNorm(),
         nn.Activation('sigmoid'),
@@ -571,9 +571,9 @@ net.add(nn.Conv2D(6, kernel_size=5),
 #@tab pytorch
 net = nn.Sequential(
     nn.Conv2d(1, 6, kernel_size=5), nn.BatchNorm2d(6), nn.Sigmoid(),
-    nn.MaxPool2d(kernel_size=2, stride=2),
+    nn.AvgPool2d(kernel_size=2, stride=2),
     nn.Conv2d(6, 16, kernel_size=5), nn.BatchNorm2d(16), nn.Sigmoid(),
-    nn.MaxPool2d(kernel_size=2, stride=2), nn.Flatten(),
+    nn.AvgPool2d(kernel_size=2, stride=2), nn.Flatten(),
     nn.Linear(256, 120), nn.BatchNorm1d(120), nn.Sigmoid(),
     nn.Linear(120, 84), nn.BatchNorm1d(84), nn.Sigmoid(),
     nn.Linear(84, 10))
@@ -587,11 +587,11 @@ def net():
                                input_shape=(28, 28, 1)),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Conv2D(filters=16, kernel_size=5),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Activation('sigmoid'),
-        tf.keras.layers.MaxPool2D(pool_size=2, strides=2),
+        tf.keras.layers.AvgPool2D(pool_size=2, strides=2),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(120),
         tf.keras.layers.BatchNormalization(),

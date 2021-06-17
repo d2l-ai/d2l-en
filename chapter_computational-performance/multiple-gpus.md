@@ -26,7 +26,7 @@ This may overwhelm the bandwidth of the GPU buses.
 Moreover, compute-intensive, yet sequential operations are nontrivial to partition. See e.g., :cite:`Mirhoseini.Pham.Le.ea.2017` for a best effort in this regard. It remains a difficult problem and it is unclear whether it is possible to achieve good (linear) scaling on nontrivial problems. We do not recommend it unless there is excellent framework or operating system support for chaining together multiple GPUs.
 
 
-Second, we could split the work layer-wise. For instance, rather than computing 64 channels on a single GPU we could split up the problem across 4 GPUs, each of which generates data for 16 channels.
+Second, we could split the work layerwise. For instance, rather than computing 64 channels on a single GPU we could split up the problem across 4 GPUs, each of which generates data for 16 channels.
 Likewise, for a fully-connected layer we could split the number of output units.
 :numref:`fig_alexnet_original` (taken from :cite:`Krizhevsky.Sutskever.Hinton.2012`)
 illustrates this design, where this strategy was used to deal with GPUs that had a very small memory footprint (2 GB at the time).
@@ -48,7 +48,7 @@ Moreover, larger numbers of GPUs lead to larger minibatch sizes, thus increasing
 However, adding more GPUs does not allow us to train larger models.
 
 
-![Parallelization on multiple GPUs. From left to right: original problem, network partitioning, layer-wise partitioning, data parallelism.](../img/splitting.svg)
+![Parallelization on multiple GPUs. From left to right: original problem, network partitioning, layerwise partitioning, data parallelism.](../img/splitting.svg)
 :label:`fig_splitting`
 
 
@@ -186,7 +186,7 @@ def get_params(params, device):
 ```{.python .input}
 #@tab pytorch
 def get_params(params, device):
-    new_params = [p.clone().to(device) for p in params]
+    new_params = [p.to(device) for p in params]
     for p in new_params:
         p.requires_grad_()
     return new_params
