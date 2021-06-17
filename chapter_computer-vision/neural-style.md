@@ -390,14 +390,16 @@ def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
         styles_Y_hat, styles_Y_gram)]
     tv_l = tv_loss(X) * tv_weight
     # Add up all the losses
-    l = sum(styles_l + contents_l + [tv_l])
+    l = sum(10 * styles_l + contents_l + [tv_l])
     return contents_l, styles_l, tv_l, l
 ```
 
-## [**Creating and Initializing the Synthesized Image**]
+## [**Initializing the Synthesized Image**]
 
 In style transfer,
-the synthesized image is the only variable that needs to be updated. Therefore, we can define a simple model, `SynthesizedImage`, and treat the synthesized image as a model parameter. In the model, forward computation only returns the model parameter.
+the synthesized image is the only variable that needs to be updated during training.
+Thus, we can define a simple model, `SynthesizedImage`, and treat the synthesized image as the model parameters.
+In this model, forward propagation just returns the model parameters.
 
 ```{.python .input}
 class SynthesizedImage(nn.Block):
@@ -420,7 +422,9 @@ class SynthesizedImage(nn.Module):
         return self.weight
 ```
 
-Next, we define the `get_inits` function. This function creates a synthesized image model instance and initializes it to the image `X`. The Gram matrix for the various style layers of the style image, `styles_Y_gram`, is computed prior to training.
+Next, we define the `get_inits` function.
+This function creates a synthesized image model instance and initializes it to the image `X`.
+Gram matrices for the style image at various style layers, `styles_Y_gram`, are computed prior to training.
 
 ```{.python .input}
 def get_inits(X, device, lr, styles_Y):
@@ -444,18 +448,17 @@ def get_inits(X, device, lr, styles_Y):
 
 ## [**Training**]
 
-During model training, we constantly extract the content and style features of
-the synthesized image and calculate the loss function. Recall our discussion of
-how synchronization functions force the front end to wait for computation
-results in :numref:`sec_async`. Because we only call the `asnumpy` synchronization function every 10
-epochs, the process may occupy a great deal of memory. Therefore, we call the
-`waitall` synchronization function during every epoch.
+
+When training the model for style transfer,
+we continuously extract 
+content features and style features of the synthesized image, and calculate the loss function.
+Below defines the training loop.
 
 ```{.python .input}
 def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
     X, styles_Y_gram, trainer = get_inits(X, device, lr, styles_Y)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[10, num_epochs],
+                            xlim=[10, num_epochs], ylim=[0, 20],
                             legend=['content', 'style', 'TV'],
                             ncols=2, figsize=(7, 2.5))
     for epoch in range(num_epochs):
@@ -466,9 +469,8 @@ def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
                 X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram)
         l.backward()
         trainer.step(1)
-        npx.waitall()
         if (epoch + 1) % lr_decay_epoch == 0:
-            trainer.set_learning_rate(trainer.learning_rate * 0.1)
+            trainer.set_learning_rate(trainer.learning_rate * 0.8)
         if (epoch + 1) % 10 == 0:
             animator.axes[1].imshow(postprocess(X).asnumpy())
             animator.add(epoch + 1, [float(sum(contents_l)),
@@ -480,7 +482,7 @@ def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
 #@tab pytorch
 def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
     X, styles_Y_gram, trainer = get_inits(X, device, lr, styles_Y)
-    scheduler = torch.optim.lr_scheduler.StepLR(trainer, lr_decay_epoch)
+    scheduler = torch.optim.lr_scheduler.StepLR(trainer, lr_decay_epoch, 0.8)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[10, num_epochs],
                             legend=['content', 'style', 'TV'],
@@ -501,53 +503,38 @@ def train(X, contents_Y, styles_Y, device, lr, num_epochs, lr_decay_epoch):
     return X
 ```
 
-Next, we [**start to train the model**]. First, we set the height and width of the content and style images to 150 by 225 pixels. We use the content image to initialize the synthesized image.
+Now we [**start to train the model**].
+We rescale the height and width of the content and style images to 300 by 450 pixels.
+We use the content image to initialize the synthesized image.
 
 ```{.python .input}
-device, image_shape = d2l.try_gpu(), (225, 150)
+device, image_shape = d2l.try_gpu(), (450, 300)
 net.collect_params().reset_ctx(device)
 content_X, contents_Y = get_contents(image_shape, device)
 _, styles_Y = get_styles(image_shape, device)
-output = train(content_X, contents_Y, styles_Y, device, 0.01, 500, 200)
+output = train(content_X, contents_Y, styles_Y, device, 0.9, 500, 50)
 ```
 
 ```{.python .input}
 #@tab pytorch
-device, image_shape = d2l.try_gpu(), (150, 225) # PIL Image (h, w)
+device, image_shape = d2l.try_gpu(), (300, 450)  # PIL Image (h, w)
 net = net.to(device)
 content_X, contents_Y = get_contents(image_shape, device)
 _, styles_Y = get_styles(image_shape, device)
-output = train(content_X, contents_Y, styles_Y, device, 0.01, 500, 200)
+output = train(content_X, contents_Y, styles_Y, device, 0.3, 500, 50)
 ```
 
-As you can see, the synthesized image retains the scenery and objects of the content image, while introducing the color of the style image. Because the image is relatively small, the details are a bit fuzzy.
+We can see that the synthesized image
+retains the scenery and objects of the content image,
+and transfers the color of the style image
+at the same time.
+For example,
+the synthesized image has blocks of color like
+those in the style image. 
+Some of these blocks even have the subtle texture of brush strokes.
 
-To [**obtain a clearer synthesized image**], we train the model using a larger image size: $900 \times 600$. We increase the height and width of the image used before by a factor of four and initialize a larger synthesized image.
 
-```{.python .input}
-image_shape = (900, 600)
-_, content_Y = get_contents(image_shape, device)
-_, style_Y = get_styles(image_shape, device)
-X = preprocess(postprocess(output) * 255, image_shape)
-output = train(X, content_Y, style_Y, device, 0.01, 300, 100)
-d2l.plt.imsave('../img/neural-style.jpg', postprocess(output).asnumpy())
-```
 
-```{.python .input}
-#@tab pytorch
-image_shape = (600, 900) # PIL Image (h, w)
-_, content_Y = get_contents(image_shape, device)
-_, style_Y = get_styles(image_shape, device)
-X = preprocess(postprocess(output), image_shape).to(device)
-output = train(X, content_Y, style_Y, device, 0.01, 300, 100)
-d2l.plt.imsave('../img/neural-style.jpg', postprocess(output))
-```
-
-As you can see, each epoch takes more time due to the larger image size. As shown in :numref:`fig_style_transfer_large`, the synthesized image produced retains more detail due to its larger size. The synthesized image not only has large blocks of color like the style image, but these blocks even have the subtle texture of brush strokes.
-
-![$900 \times 600$ synthesized image. ](../img/neural-style.jpg)
-:width:`500px`
-:label:`fig_style_transfer_large`
 
 ## Summary
 
@@ -561,7 +548,7 @@ As you can see, each epoch takes more time due to the larger image size. As show
 1. How does the output change when you select different content and style layers?
 1. Adjust the weight hyperparameters in the loss function. Does the output retain more content or have less noise?
 1. Use different content and style images. Can you create more interesting synthesized images?
-1. Can we apply style transfer for text? Hint: you may refer to the survey paper by Hu et al. :cite:`Hu.Lee.Aggarwal.2020`.
+1. Can we apply style transfer for text? Hint: you may refer to the survey paper by Hu et al. :cite:`Hu.Lee.Aggarwal.ea.2020`.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/378)
