@@ -71,8 +71,7 @@ to the dense block,
 we must flatten each example in the minibatch.
 In other words, we take this four-dimensional input and transform it
 into the two-dimensional input expected by fully-connected layers:
-as a reminder, the two-dimensional representation that we desire
-has uses the first dimension to index examples in the minibatch
+as a reminder, the two-dimensional representation that we desire uses the first dimension to index examples in the minibatch
 and the second to give the flat vector representation of each example.
 LeNet's dense block has three fully-connected layers,
 with 120, 84, and 10 outputs, respectively.
