@@ -112,20 +112,15 @@ from d2l import torch as d2l
 import torch
 from torch import nn
 
-class Reshape(torch.nn.Module):
-    def forward(self, x):
-        return x.view(-1, 1, 28, 28)
-
-net = torch.nn.Sequential(
-    Reshape(),
-    nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2),
-    nn.Conv2d(6, 16, kernel_size=5), nn.Sigmoid(),
-    nn.AvgPool2d(kernel_size=2, stride=2),
-    nn.Flatten(),
-    nn.Linear(16 * 5 * 5, 120), nn.Sigmoid(),
-    nn.Linear(120, 84), nn.Sigmoid(),
-    nn.Linear(84, 10))
+net = nn.Sequential(
+  nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.Sigmoid(),
+  nn.AvgPool2d(kernel_size=2, stride=2),
+  nn.Conv2d(6, 16, kernel_size=5), nn.Sigmoid(),
+  nn.AvgPool2d(kernel_size=2, stride=2),
+  nn.Flatten(),
+  nn.Linear(16 * 5 * 5, 120), nn.Sigmoid(),
+  nn.Linear(120, 84), nn.Sigmoid(),
+  nn.Linear(84, 10))
 ```
 
 ```{.python .input}
@@ -249,13 +244,13 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
 #@tab pytorch
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     """Compute the accuracy for a model on a dataset using a GPU."""
-    if isinstance(net, torch.nn.Module):
+    if isinstance(net, nn.Module):
         net.eval()  # Set the model to evaluation mode
         if not device:
             device = next(iter(net.parameters())).device
     # No. of correct predictions, no. of predictions
     metric = d2l.Accumulator(2)
-    
+
     with torch.no_grad():
         for X, y in data_iter:
             if isinstance(X, list):
