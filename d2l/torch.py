@@ -451,7 +451,7 @@ def corr2d(X, K):
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def evaluate_accuracy_gpu(net, data_iter, device=None):
     """Compute the accuracy for a model on a dataset using a GPU."""
-    if isinstance(net, torch.nn.Module):
+    if isinstance(net, nn.Module):
         net.eval()  # Set the model to evaluation mode
         if not device:
             device = next(iter(net.parameters())).device
