@@ -73,7 +73,7 @@ print(lines[10])
 
 The following `tokenize` function
 takes a list (`lines`) as the input,
-where each list is a text sequence (e.g., a text line).
+where each element is a text sequence (e.g., a text line).
 Each text sequence is split into a list of tokens.
 A *token* is the basic unit in text.
 In the end,
