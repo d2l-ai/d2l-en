@@ -580,7 +580,7 @@ In code, we could just call the function for calculating the mean
 on tensors of arbitrary shape.
 
 ```{.python .input}
-A.mean(), A.sum() / A.size
+A.mean(), A.sum() / A.size()
 ```
 
 ```{.python .input}
