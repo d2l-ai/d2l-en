@@ -22,9 +22,12 @@ generally regarded as outmoded.
 
 In just the past five years, deep learning has taken the world by surprise,
 driving rapid progress in such diverse fields 
-as diverse as computer vision, natural language processing, 
+as computer vision, natural language processing, 
 automatic speech recognition, reinforcement learning, 
-biomedical informatics, and has even catalyzed developments 
+and biomedical informatics.
+Moreover, the success of deep learning
+on so many tasks of practical interest
+has even catalyzed developments 
 in theoretical machine learning and statistics.
 With these advances in hand, 
 we can now build cars that drive themselves
@@ -70,9 +73,13 @@ Applying deep learning requires simultaneously understanding
 (i) the motivations for casting a problem in a particular way;
 (ii) the mathematical form of a given model;
 (iii) the optimization algorithms for fitting the models to data;
-(iv) the basic statistical principles and intuitions 
-that help us to extract generalizable insights from data;
-and (v) the engineering required to train models efficiently,
+(iv) the statistical principles that tell us 
+when we should expect our models 
+to generalize to unseen data
+and practical methods for certifying 
+that they have, in fact, generalized;
+and (v) the engineering techniques
+required to train models efficiently,
 navigating the pitfalls of numerical computing
 and getting the most out of available hardware.
 Teaching both the critical thinking skills 
@@ -109,11 +116,16 @@ e.g., the engaging blog posts
 published on the website [Distill](http://distill.pub), or personal blogs,
 they only covered selected topics in deep learning,
 and often lacked associated code.
-On the other hand, while several deep learning textbooks have emerged---e.g., :cite:`Goodfellow.Bengio.Courville.2016`, which offers a comprehensive survey of the concepts behind deep learning---these 
+On the other hand, while several deep learning textbooks 
+have emerged---e.g., :cite:`Goodfellow.Bengio.Courville.2016`, 
+which offers a comprehensive survey 
+on the basics of deep learning---these 
 resources do not marry the descriptions
 to realizations of the concepts in code,
-sometimes leaving readers clueless as to how to implement them.
-Moreover, too many resources are hidden behind the paywalls
+sometimes leaving readers clueless 
+as to how to implement them.
+Moreover, too many resources 
+are hidden behind the paywalls
 of commercial course providers.
 
 We set out to create a resource that could
@@ -454,7 +466,8 @@ Linear Analysis by Bela Bollobas :cite:`Bollobas.1999`
 covers linear algebra and functional analysis in great depth.
 All of Statistics :cite:`Wasserman.2013` 
 provides a marvelous introduction to statistics.
-Joe Blitzsteins books and [courses](https://projects.iq.harvard.edu/stat110/home) 
+Joe Blitzstein's [books](https://www.amazon.com/Introduction-Probability-Chapman-Statistical-Science/dp/1138369918) 
+and [courses](https://projects.iq.harvard.edu/stat110/home) 
 on probability and inference are pegagogical gems.
 And if you have not used Python before,
 you may want to peruse this [Python tutorial](http://learnpython.org/).
@@ -511,7 +524,9 @@ Parthe Pandit, Ishan Kumar, HomunculusK, Lane Schwartz, varadgunjal, Jason Wiene
 Shreshtha13, eigen-arnav.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
-Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.
+Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. 
+Without the available time, resources, discussions with colleagues, 
+and continuous encouragement, this book would not have happened.
 
 
 ## Summary
