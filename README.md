@@ -62,11 +62,11 @@ Our goal is to offer a resource that could
 If you find this book useful, please star (★) this repository or cite this book using the following bibtex entry:
 
 ```
-@book{zhang2020dive,
+@article{zhang2021dive,
     title={Dive into Deep Learning},
-    author={Aston Zhang and Zachary C. Lipton and Mu Li and Alexander J. Smola},
-    note={\url{https://d2l.ai}},
-    year={2020}
+    author={Zhang, Aston and Lipton, Zachary C. and Li, Mu and Smola, Alexander J.},
+    journal={arXiv preprint arXiv:2106.11342},
+    year={2021}
 }
 ```
 
