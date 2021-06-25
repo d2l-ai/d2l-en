@@ -116,11 +116,16 @@ e.g., the engaging blog posts
 published on the website [Distill](http://distill.pub), or personal blogs,
 they only covered selected topics in deep learning,
 and often lacked associated code.
-On the other hand, while several deep learning textbooks have emerged---e.g., :cite:`Goodfellow.Bengio.Courville.2016`, which offers a comprehensive survey of the concepts behind deep learning---these 
+On the other hand, while several deep learning textbooks 
+have emerged---e.g., :cite:`Goodfellow.Bengio.Courville.2016`, 
+which offers a comprehensive survey 
+on the basics of deep learning---these 
 resources do not marry the descriptions
 to realizations of the concepts in code,
-sometimes leaving readers clueless as to how to implement them.
-Moreover, too many resources are hidden behind the paywalls
+sometimes leaving readers clueless 
+as to how to implement them.
+Moreover, too many resources 
+are hidden behind the paywalls
 of commercial course providers.
 
 We set out to create a resource that could
