@@ -71,8 +71,7 @@ to the dense block,
 we must flatten each example in the minibatch.
 In other words, we take this four-dimensional input and transform it
 into the two-dimensional input expected by fully-connected layers:
-as a reminder, the two-dimensional representation that we desire
-has uses the first dimension to index examples in the minibatch
+as a reminder, the two-dimensional representation that we desire uses the first dimension to index examples in the minibatch
 and the second to give the flat vector representation of each example.
 LeNet's dense block has three fully-connected layers,
 with 120, 84, and 10 outputs, respectively.
@@ -113,12 +112,7 @@ from d2l import torch as d2l
 import torch
 from torch import nn
 
-class Reshape(torch.nn.Module):
-    def forward(self, x):
-        return x.view(-1, 1, 28, 28)
-
-net = torch.nn.Sequential(
-    Reshape(),
+net = nn.Sequential(
     nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.Sigmoid(),
     nn.AvgPool2d(kernel_size=2, stride=2),
     nn.Conv2d(6, 16, kernel_size=5), nn.Sigmoid(),
@@ -250,13 +244,13 @@ def evaluate_accuracy_gpu(net, data_iter, device=None):  #@save
 #@tab pytorch
 def evaluate_accuracy_gpu(net, data_iter, device=None): #@save
     """Compute the accuracy for a model on a dataset using a GPU."""
-    if isinstance(net, torch.nn.Module):
+    if isinstance(net, nn.Module):
         net.eval()  # Set the model to evaluation mode
         if not device:
             device = next(iter(net.parameters())).device
     # No. of correct predictions, no. of predictions
     metric = d2l.Accumulator(2)
-    
+
     with torch.no_grad():
         for X, y in data_iter:
             if isinstance(X, list):
