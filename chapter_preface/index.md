@@ -466,7 +466,8 @@ Linear Analysis by Bela Bollobas :cite:`Bollobas.1999`
 covers linear algebra and functional analysis in great depth.
 All of Statistics :cite:`Wasserman.2013` 
 provides a marvelous introduction to statistics.
-Joe Blitzsteins books and [courses](https://projects.iq.harvard.edu/stat110/home) 
+Joe Blitzstein's [books](https://www.amazon.com/Introduction-Probability-Chapman-Statistical-Science/dp/1138369918) 
+and [courses](https://projects.iq.harvard.edu/stat110/home) 
 on probability and inference are pegagogical gems.
 And if you have not used Python before,
 you may want to peruse this [Python tutorial](http://learnpython.org/).
@@ -523,7 +524,9 @@ Parthe Pandit, Ishan Kumar, HomunculusK, Lane Schwartz, varadgunjal, Jason Wiene
 Shreshtha13, eigen-arnav.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
-Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.
+Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. 
+Without the available time, resources, discussions with colleagues, 
+and continuous encouragement, this book would not have happened.
 
 
 ## Summary
