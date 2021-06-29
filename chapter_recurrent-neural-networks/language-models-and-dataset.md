@@ -181,7 +181,7 @@ which is equivalent to
 $$\log n_i = -\alpha \log i + c,$$
 
 where $\alpha$ is the exponent that characterizes the distribution and $c$ is a constant.
-This should already give us pause if we want to model words by count statistics and smoothing.
+This should already give us pause if we want to model words by counting statistics and smoothing.
 After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But what about the other word combinations, such as bigrams, trigrams, and beyond?
 Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
 
