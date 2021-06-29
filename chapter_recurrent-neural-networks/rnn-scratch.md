@@ -58,7 +58,7 @@ The easiest representation is called *one-hot encoding*,
 which is introduced
 in :numref:`subsec_classification-problem`.
 
-In a nutshell, we map each index to a different unit vector: assume that the number of different tokens in the vocabulary is $N$ (`len(vocab)`) and the token indices range from 0 to $N-1$.
+In a nutshell, we map each index to a different unit vector: assume that the number of different tokens in the vocabulary is $N$ (`len(vocab)`) and the token indices range from $0$ to $N-1$.
 If the index of a token is the integer $i$, then we create a vector of all 0s with a length of $N$ and set the element at position $i$ to 1.
 This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
 

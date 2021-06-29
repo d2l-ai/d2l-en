@@ -14,32 +14,37 @@ word embedding has gradually become
 the basic knowledge of natural language processing.
 
 
-## Why Not Use One-hot Vectors?
+## One-Hot Vectors Are a Bad Choice
 
-We used one-hot vectors to represent words (characters are words) in
-:numref:`sec_rnn_scratch` .
-Recall that when we assume the number of different words in a
-dictionary (the dictionary size) is $N$, each word can correspond one-to-one
-with consecutive integers from 0 to $N-1$. These integers that correspond to
-words are called the indices of the words.  We assume that the index of a word
-is $i$. In order to get the one-hot vector representation of the word, we create
-a vector of all 0s with a length of $N$ and set element $i$ to 1. In this way,
-each word is represented as a vector of length $N$ that can be used directly by
-the neural network.
+We used one-hot vectors to represent words (characters are words) in :numref:`sec_rnn_scratch`.
+Suppose that the number of different words in the dictionary (the dictionary size) is $N$,
+and each word corresponds to 
+a different integer (index) from $0$ to $N−1$.
+To obtain the one-hot vector representation
+for any word with index $i$,
+we create a length-$N$ vector with all 0s
+and set the element at position $i$ to 1.
+In this way, each word is represented as a vector of length $N$, and it
+can be used directly by neural networks.
 
-Although one-hot word vectors are easy to construct, they are usually not a good choice. One of the major reasons is that the one-hot word vectors cannot accurately express the similarity between different words, such as the cosine similarity that we commonly use. For the vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$, their cosine similarities are the cosines of the angles between them:
+
+Although one-hot word vectors are easy to construct,
+they are usually not a good choice.
+A main reason is that one-hot word vectors cannot accurately express the similarity between different words, such as the *cosine similarity* that we often use. 
+For vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$, their cosine similarity is the cosine of the angle between them:
+
 
 $$\frac{\mathbf{x}^\top \mathbf{y}}{\|\mathbf{x}\| \|\mathbf{y}\|} \in [-1, 1].$$
 
-Since the cosine similarity between the one-hot vectors of any two different words is 0, it is difficult to use the one-hot vector to accurately represent the similarity between multiple different words.
 
-[Word2vec](https://code.google.com/archive/p/word2vec/) is a tool that we came
-up with to solve the problem above.  It represents each word with a
-fixed-length vector and uses these vectors to better indicate the similarity and
-analogy relationships between different words. The Word2vec tool contains two
-models: skip-gram :cite:`Mikolov.Sutskever.Chen.ea.2013` and continuous bag of
-words (CBOW) :cite:`Mikolov.Chen.Corrado.ea.2013`. Next, we will take a
-look at the two models and their training methods.
+Since the cosine similarity between one-hot vectors of any two different words is 0, 
+one-hot vectors cannot encode similarities among words.
+
+
+The [word2vec](https://code.google.com/archive/p/word2vec/) tool was proposed to address the above issue. 
+It represents each word as a fixed-length vector, and  these vectors can better express the similarity and analogy relationship among different words. 
+The word2vec tool contains two models, namely *skip-gram* :cite:`Mikolov.Sutskever.Chen.ea.2013`  and *continuous bag of words* (CBOW) :cite:`Mikolov.Chen.Corrado.ea.2013`. In the following, we will introduce these two models and their training methods.
+
 
 
 ## The Skip-Gram Model
