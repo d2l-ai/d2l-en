@@ -1,7 +1,18 @@
 # Word Embedding (word2vec)
 :label:`sec_word2vec`
 
-A natural language is a complex system that we use to express meanings. In this system, words are the basic unit of linguistic meaning. As its name implies, a word vector is a vector used to represent a word. It can also be thought of as the feature vector of a word. The technique of mapping words to vectors of real numbers is also known as word embedding. Over the last few years, word embedding has gradually become basic knowledge in natural language processing.
+
+Natural language is a complex system used to express meanings. 
+In this system, words are the basic unit of the meaning.
+As the name implies,
+*word vectors* are vectors used to represent words,
+and can also be considered as feature vectors or representations of words.
+The technique of mapping words to real vectors 
+is called *word embedding*.
+In recent years,
+word embedding has gradually become
+the basic knowledge of natural language processing.
+
 
 ## Why Not Use One-hot Vectors?
 
