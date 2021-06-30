@@ -53,8 +53,8 @@ Let us choose "loves" as the *center word* and set the context window size to 2.
 As shown in :numref:`fig_skip_gram`, 
 given the center word "loves",
 the skip-gram model considers
-the conditional probability for generating the *context words* "the", "man", "his", and "son"
-(no more than 2 words away from the center word):
+the conditional probability for generating the *context words*: "the", "man", "his", and "son",
+which are no more than 2 words away from the center word:
 
 $$P(\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}\mid\textrm{"loves"}).$$
 
@@ -69,8 +69,9 @@ $$P(\textrm{"the"}\mid\textrm{"loves"})\cdot P(\textrm{"man"}\mid\textrm{"loves"
 ![The skip-gram model considers the conditional probability of generating context words given a center word. ](../img/skip-gram.svg)
 :label:`fig_skip_gram`
 
-In the skip-gram model, each word is represented as two $d$-dimensional vectors, 
-which are used to calculate conditional probabilities.
+In the skip-gram model, each word 
+has two $d$-dimensional-vector representations
+for calculating conditional probabilities.
 More concretely,
 for any word with index $i$ in the dictionary,
 denote by $\mathbf{v}_i\in\mathbb{R}^d$
@@ -83,6 +84,7 @@ a softmax operation on vector inner products:
 
 
 $$P(w_o \mid w_c) = \frac{\text{exp}(\mathbf{u}_o^\top \mathbf{v}_c)}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)},$$
+:eqlabel:`eq_skip-gram-softmax`
 
 where the vocabulary index set $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$. 
 Given a text sequence of length $T$, where the word at time step $t$ is denoted as $w^{(t)}$.
@@ -101,18 +103,30 @@ where any time step that is less than $1$ or greater than $T$ can be omitted.
 
 ### Training
 
-The skip-gram model parameters are the center word vector and context word vector for each individual word.  In the training process, we are going to learn the model parameters by maximizing the likelihood function, which is also known as maximum likelihood estimation. This is equivalent to minimizing the following loss function:
+The skip-gram model parameters are the center word vector and context word vector for each word in the vocabulary.
+In training, we learn the model parameters by maximizing the likelihood function (i.e., maximum likelihood estimation). This is equivalent to minimizing the following loss function:
 
 $$ - \sum_{t=1}^{T} \sum_{-m \leq j \leq m,\ j \neq 0} \text{log}\, P(w^{(t+j)} \mid w^{(t)}).$$
 
-
-If we use the SGD, in each iteration we are going to pick a shorter subsequence through random sampling to compute the loss for that subsequence, and then compute the gradient to update the model parameters. The key of gradient computation is to compute the gradient of the logarithmic conditional probability for the center word vector and the context word vector. By definition, we first have
+When using stochastic gradient descent to minimize the loss, 
+in each iteration
+we can
+randomly sample a shorter subsequence to calculate the (stochastic) gradient for this subsequence to update the model parameters. 
+To calculate this (stochastic) gradient,
+we need to obtain
+the gradients of 
+the log-probability with respect to the center word vector and the context word vector.
+In general, according to :eqref:`eq_skip-gram-softmax`
+the log-probability
+involving any pair of the center word $w_c$ and 
+the context word $w_o$ is
 
 
 $$\log P(w_o \mid w_c) =
 \mathbf{u}_o^\top \mathbf{v}_c - \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right).$$
 
-Through differentiation, we can get the gradient $\mathbf{v}_c$ from the formula above.
+Through differentiation, we can obtain its gradient 
+with respect to the center word vector $\mathbf{v}_c$ as
 
 $$
 \begin{aligned}
@@ -123,9 +137,15 @@ $$
 \end{aligned}
 $$
 
-Its computation obtains the conditional probability for all the words in the dictionary given the center word $w_c$. We then use the same method to obtain the gradients for other word vectors.
+Note that this calculation requires the conditional probabilities of all words in the dictionary with $w_c$ as the center word.
+The gradients for the other word vectors can be obtained in the same way.
 
-After the training, for any word in the dictionary with index $i$, we are going to get its two word vector sets $\mathbf{v}_i$ and $\mathbf{u}_i$.  In applications of natural language processing, the center word vector in the skip-gram model is generally used as the representation vector of a word.
+
+After training, for any word with index $i$ in the dictionary, we obtain both word vectors 
+$\mathbf{v}_i$ (as the center word) and $\mathbf{u}_i$ (as the context word).
+In natural language processing applications, the center word vectors of the skip-gram model are typically
+used as the word representations.
+
 
 
 ## The Continuous Bag of Words (CBOW) Model
