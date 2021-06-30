@@ -49,44 +49,64 @@ The word2vec tool contains two models, namely *skip-gram* :cite:`Mikolov.Sutskev
 
 The skip-gram model assumes that a word can be used to generate its surrounding words in a text sequence.
 Take the text sequence "the", "man", "loves", "his", "son" as an example. 
-Let us choose "loves" as the *central word* and set the context window size to 2.
+Let us choose "loves" as the *center word* and set the context window size to 2.
 As shown in :numref:`fig_skip_gram`, 
-given the central word "loves",
-the skip-gram model is interested in
+given the center word "loves",
+the skip-gram model considers
 the conditional probability for generating the *context words* "the", "man", "his", and "son"
-(no more than 2 words away from the central word):
+(no more than 2 words away from the center word):
 
 $$P(\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}\mid\textrm{"loves"}).$$
 
 Assume that 
 the context words are independently generated
-given the central word (i.e., conditional independence).
+given the center word (i.e., conditional independence).
 In this case, the above conditional probability
 can be rewritten as
 
 $$P(\textrm{"the"}\mid\textrm{"loves"})\cdot P(\textrm{"man"}\mid\textrm{"loves"})\cdot P(\textrm{"his"}\mid\textrm{"loves"})\cdot P(\textrm{"son"}\mid\textrm{"loves"}).$$
 
-![The skip-gram model is interested in the conditional probability of generating context words given a central word. ](../img/skip-gram.svg)
+![The skip-gram model considers the conditional probability of generating context words given a center word. ](../img/skip-gram.svg)
 :label:`fig_skip_gram`
 
-In the skip-gram model, each word is represented as two $d$-dimension vectors, which are used to compute the conditional probability. We assume that the word is indexed as $i$ in the dictionary, its vector is represented as $\mathbf{v}_i\in\mathbb{R}^d$ when it is the central target word, and $\mathbf{u}_i\in\mathbb{R}^d$ when it is a context word.  Let the central target word $w_c$ and context word $w_o$ be indexed as $c$ and $o$ respectively in the dictionary. The conditional probability of generating the context word for the given central target word can be obtained by performing a softmax operation on the vector inner product:
+In the skip-gram model, each word is represented as two $d$-dimensional vectors, 
+which are used to calculate conditional probabilities.
+More concretely,
+for any word with index $i$ in the dictionary,
+denote by $\mathbf{v}_i\in\mathbb{R}^d$
+and $\mathbf{u}_i\in\mathbb{R}^d$
+its two vectors
+when used as a center word and a context word, respectively.
+The conditional probability of generating any
+context word $w_o$ (with index $o$ in the dictionary) given the center word $w_c$ (with index $c$ in the dictionary) can be modeled by
+a softmax operation on vector inner products: 
+
 
 $$P(w_o \mid w_c) = \frac{\text{exp}(\mathbf{u}_o^\top \mathbf{v}_c)}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)},$$
 
-where vocabulary index set $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$. Assume that a text sequence of length $T$ is given, where the word at time step $t$ is denoted as $w^{(t)}$. Assume that context words are independently generated given center words. When context window size is $m$, the likelihood function of the skip-gram model is the joint probability of generating all the context words given any center word
+where the vocabulary index set $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$. 
+Given a text sequence of length $T$, where the word at time step $t$ is denoted as $w^{(t)}$.
+Assume that
+context words are independently generated 
+given any center word.
+For context window size $m$,
+the likelihood function of the skip-gram model
+is the probability of generating all context words
+given any center word:
+
 
 $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(w^{(t+j)} \mid w^{(t)}),$$
 
-Here, any time step that is less than 1 or greater than $T$ can be ignored.
+where any time step that is less than $1$ or greater than $T$ can be omitted.
 
 ### Training
 
-The skip-gram model parameters are the central target word vector and context word vector for each individual word.  In the training process, we are going to learn the model parameters by maximizing the likelihood function, which is also known as maximum likelihood estimation. This is equivalent to minimizing the following loss function:
+The skip-gram model parameters are the center word vector and context word vector for each individual word.  In the training process, we are going to learn the model parameters by maximizing the likelihood function, which is also known as maximum likelihood estimation. This is equivalent to minimizing the following loss function:
 
 $$ - \sum_{t=1}^{T} \sum_{-m \leq j \leq m,\ j \neq 0} \text{log}\, P(w^{(t+j)} \mid w^{(t)}).$$
 
 
-If we use the SGD, in each iteration we are going to pick a shorter subsequence through random sampling to compute the loss for that subsequence, and then compute the gradient to update the model parameters. The key of gradient computation is to compute the gradient of the logarithmic conditional probability for the central word vector and the context word vector. By definition, we first have
+If we use the SGD, in each iteration we are going to pick a shorter subsequence through random sampling to compute the loss for that subsequence, and then compute the gradient to update the model parameters. The key of gradient computation is to compute the gradient of the logarithmic conditional probability for the center word vector and the context word vector. By definition, we first have
 
 
 $$\log P(w_o \mid w_c) =
@@ -103,21 +123,21 @@ $$
 \end{aligned}
 $$
 
-Its computation obtains the conditional probability for all the words in the dictionary given the central target word $w_c$. We then use the same method to obtain the gradients for other word vectors.
+Its computation obtains the conditional probability for all the words in the dictionary given the center word $w_c$. We then use the same method to obtain the gradients for other word vectors.
 
-After the training, for any word in the dictionary with index $i$, we are going to get its two word vector sets $\mathbf{v}_i$ and $\mathbf{u}_i$.  In applications of natural language processing, the central target word vector in the skip-gram model is generally used as the representation vector of a word.
+After the training, for any word in the dictionary with index $i$, we are going to get its two word vector sets $\mathbf{v}_i$ and $\mathbf{u}_i$.  In applications of natural language processing, the center word vector in the skip-gram model is generally used as the representation vector of a word.
 
 
 ## The Continuous Bag of Words (CBOW) Model
 
-The continuous bag of words (CBOW) model is similar to the skip-gram model. The biggest difference is that the CBOW model assumes that the central target word is generated based on the context words before and after it in the text sequence. With the same text sequence "the", "man", "loves", "his" and "son", in which "loves" is the central target word, given a context window size of 2, the CBOW model is concerned with the conditional probability of generating the target word "loves" based on the context words "the", "man", "his" and "son"(as shown in :numref:`fig_cbow`), such as
+The continuous bag of words (CBOW) model is similar to the skip-gram model. The biggest difference is that the CBOW model assumes that the center word is generated based on the context words before and after it in the text sequence. With the same text sequence "the", "man", "loves", "his" and "son", in which "loves" is the center word, given a context window size of 2, the CBOW model is concerned with the conditional probability of generating the target word "loves" based on the context words "the", "man", "his" and "son"(as shown in :numref:`fig_cbow`), such as
 
 $$P(\textrm{"loves"}\mid\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}).$$
 
-![The CBOW model cares about the conditional probability of generating the central target word from given context words.  ](../img/cbow.svg)
+![The CBOW model cares about the conditional probability of generating the center word from given context words.  ](../img/cbow.svg)
 :label:`fig_cbow`
 
-Since there are multiple context words in the CBOW model, we will average their word vectors and then use the same method as the skip-gram model to compute the conditional probability. We assume that $\mathbf{v_i}\in\mathbb{R}^d$ and $\mathbf{u_i}\in\mathbb{R}^d$ are the context word vector and central target word vector of the word with index $i$ in the dictionary (notice that the symbols are opposite to the ones in the skip-gram model). Let central target word $w_c$ be indexed as $c$, and context words $w_{o_1}, \ldots, w_{o_{2m}}$ be indexed as $o_1, \ldots, o_{2m}$ in the dictionary. Thus, the conditional probability of generating a central target word from the given context word is
+Since there are multiple context words in the CBOW model, we will average their word vectors and then use the same method as the skip-gram model to compute the conditional probability. We assume that $\mathbf{v_i}\in\mathbb{R}^d$ and $\mathbf{u_i}\in\mathbb{R}^d$ are the context word vector and center word vector of the word with index $i$ in the dictionary (notice that the symbols are opposite to the ones in the skip-gram model). Let center word $w_c$ be indexed as $c$, and context words $w_{o_1}, \ldots, w_{o_{2m}}$ be indexed as $o_1, \ldots, o_{2m}$ in the dictionary. Thus, the conditional probability of generating a center word from the given context word is
 
 $$P(w_c \mid w_{o_1}, \ldots, w_{o_{2m}}) = \frac{\text{exp}\left(\frac{1}{2m}\mathbf{u}_c^\top (\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}}) \right)}{ \sum_{i \in \mathcal{V}} \text{exp}\left(\frac{1}{2m}\mathbf{u}_i^\top (\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}}) \right)}.$$
 
@@ -126,7 +146,7 @@ For brevity, denote $\mathcal{W}_o= \{w_{o_1}, \ldots, w_{o_{2m}}\}$, and $\bar{
 
 $$P(w_c \mid \mathcal{W}_o) = \frac{\exp\left(\mathbf{u}_c^\top \bar{\mathbf{v}}_o\right)}{\sum_{i \in \mathcal{V}} \exp\left(\mathbf{u}_i^\top \bar{\mathbf{v}}_o\right)}.$$
 
-Given a text sequence of length $T$, we assume that the word at time step $t$ is $w^{(t)}$, and the context window size is $m$.  The likelihood function of the CBOW model is the probability of generating any central target word from the context words.
+Given a text sequence of length $T$, we assume that the word at time step $t$ is $w^{(t)}$, and the context window size is $m$.  The likelihood function of the CBOW model is the probability of generating any center word from the context words.
 
 $$ \prod_{t=1}^{T}  P(w^{(t)} \mid  w^{(t-m)}, \ldots, w^{(t-1)}, w^{(t+1)}, \ldots, w^{(t+m)}).$$
 
@@ -149,7 +169,7 @@ We then use the same method to obtain the gradients for other word vectors. Unli
 ## Summary
 
 * A word vector is a vector used to represent a word. The technique of mapping words to vectors of real numbers is also known as word embedding.
-* Word2vec includes both the continuous bag of words (CBOW) and skip-gram models. The skip-gram model assumes that context words are generated based on the central target word. The CBOW model assumes that the central target word is generated based on the context words.
+* Word2vec includes both the continuous bag of words (CBOW) and skip-gram models. The skip-gram model assumes that context words are generated based on the center word. The CBOW model assumes that the center word is generated based on the context words.
 
 
 ## Exercises
