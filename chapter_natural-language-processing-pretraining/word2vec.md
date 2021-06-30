@@ -45,19 +45,28 @@ The [word2vec](https://code.google.com/archive/p/word2vec/) tool was proposed to
 It represents each word as a fixed-length vector, and  these vectors can better express the similarity and analogy relationship among different words. 
 The word2vec tool contains two models, namely *skip-gram* :cite:`Mikolov.Sutskever.Chen.ea.2013`  and *continuous bag of words* (CBOW) :cite:`Mikolov.Chen.Corrado.ea.2013`. In the following, we will introduce these two models and their training methods.
 
-
-
 ## The Skip-Gram Model
 
-The skip-gram model assumes that a word can be used to generate the words that surround it in a text sequence. For example, we assume that the text sequence is "the", "man", "loves", "his", and "son". We use "loves" as the central target word and set the context window size to 2. As shown in :numref:`fig_skip_gram`, given the central target word "loves", the skip-gram model is concerned with the conditional probability for generating the context words, "the", "man", "his" and "son", that are within a distance of no more than 2 words, which is
+The skip-gram model assumes that a word can be used to generate its surrounding words in a text sequence.
+Take the text sequence "the", "man", "loves", "his", "son" as an example. 
+Let us choose "loves" as the *central word* and set the context window size to 2.
+As shown in :numref:`fig_skip_gram`, 
+given the central word "loves",
+the skip-gram model is interested in
+the conditional probability for generating the *context words* "the", "man", "his", and "son"
+(no more than 2 words away from the central word):
 
 $$P(\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}\mid\textrm{"loves"}).$$
 
-We assume that, given the central target word, the context words are generated independently of each other. In this case, the formula above can be rewritten as
+Assume that 
+the context words are independently generated
+given the central word (i.e., conditional independence).
+In this case, the above conditional probability
+can be rewritten as
 
 $$P(\textrm{"the"}\mid\textrm{"loves"})\cdot P(\textrm{"man"}\mid\textrm{"loves"})\cdot P(\textrm{"his"}\mid\textrm{"loves"})\cdot P(\textrm{"son"}\mid\textrm{"loves"}).$$
 
-![The skip-gram model cares about the conditional probability of generating context words for a given central target word. ](../img/skip-gram.svg)
+![The skip-gram model is interested in the conditional probability of generating context words given a central word. ](../img/skip-gram.svg)
 :label:`fig_skip_gram`
 
 In the skip-gram model, each word is represented as two $d$-dimension vectors, which are used to compute the conditional probability. We assume that the word is indexed as $i$ in the dictionary, its vector is represented as $\mathbf{v}_i\in\mathbb{R}^d$ when it is the central target word, and $\mathbf{u}_i\in\mathbb{R}^d$ when it is a context word.  Let the central target word $w_c$ and context word $w_o$ be indexed as $c$ and $o$ respectively in the dictionary. The conditional probability of generating the context word for the given central target word can be obtained by performing a softmax operation on the vector inner product:
@@ -70,7 +79,7 @@ $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(w^{(t+j)} \mid w^{(t)})
 
 Here, any time step that is less than 1 or greater than $T$ can be ignored.
 
-### Skip-Gram Model Training
+### Training
 
 The skip-gram model parameters are the central target word vector and context word vector for each individual word.  In the training process, we are going to learn the model parameters by maximizing the likelihood function, which is also known as maximum likelihood estimation. This is equivalent to minimizing the following loss function:
 
@@ -121,7 +130,7 @@ Given a text sequence of length $T$, we assume that the word at time step $t$ is
 
 $$ \prod_{t=1}^{T}  P(w^{(t)} \mid  w^{(t-m)}, \ldots, w^{(t-1)}, w^{(t+1)}, \ldots, w^{(t+m)}).$$
 
-### CBOW Model Training
+### Training
 
 CBOW model training is quite similar to skip-gram model training.  The maximum likelihood estimation of the CBOW model is equivalent to minimizing the loss function.
 
