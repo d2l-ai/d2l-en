@@ -115,9 +115,9 @@ randomly sample a shorter subsequence to calculate the (stochastic) gradient for
 To calculate this (stochastic) gradient,
 we need to obtain
 the gradients of 
-the log-probability with respect to the center word vector and the context word vector.
+the log conditional probability with respect to the center word vector and the context word vector.
 In general, according to :eqref:`eq_skip-gram-softmax`
-the log-probability
+the log conditional probability
 involving any pair of the center word $w_c$ and 
 the context word $w_o$ is
 
