@@ -47,7 +47,7 @@ The word2vec tool contains two models, namely *skip-gram* :cite:`Mikolov.Sutskev
 
 ## The Skip-Gram Model
 
-The skip-gram model assumes that a word can be used to generate its surrounding words in a text sequence.
+The *skip-gram* model assumes that a word can be used to generate its surrounding words in a text sequence.
 Take the text sequence "the", "man", "loves", "his", "son" as an example. 
 Let us choose "loves" as the *center word* and set the context window size to 2.
 As shown in :numref:`fig_skip_gram`, 
@@ -66,7 +66,7 @@ can be rewritten as
 
 $$P(\textrm{"the"}\mid\textrm{"loves"})\cdot P(\textrm{"man"}\mid\textrm{"loves"})\cdot P(\textrm{"his"}\mid\textrm{"loves"})\cdot P(\textrm{"son"}\mid\textrm{"loves"}).$$
 
-![The skip-gram model considers the conditional probability of generating context words given a center word. ](../img/skip-gram.svg)
+![The skip-gram model considers the conditional probability of generating the surrounding context words given a center word.](../img/skip-gram.svg)
 :label:`fig_skip_gram`
 
 In the skip-gram model, each word 
@@ -77,7 +77,7 @@ for any word with index $i$ in the dictionary,
 denote by $\mathbf{v}_i\in\mathbb{R}^d$
 and $\mathbf{u}_i\in\mathbb{R}^d$
 its two vectors
-when used as a center word and a context word, respectively.
+when used as a *center* word and a *context* word, respectively.
 The conditional probability of generating any
 context word $w_o$ (with index $o$ in the dictionary) given the center word $w_c$ (with index $c$ in the dictionary) can be modeled by
 a softmax operation on vector inner products: 
@@ -146,27 +146,57 @@ $\mathbf{v}_i$ (as the center word) and $\mathbf{u}_i$ (as the context word).
 In natural language processing applications, the center word vectors of the skip-gram model are typically
 used as the word representations.
 
-
-
 ## The Continuous Bag of Words (CBOW) Model
 
-The continuous bag of words (CBOW) model is similar to the skip-gram model. The biggest difference is that the CBOW model assumes that the center word is generated based on the context words before and after it in the text sequence. With the same text sequence "the", "man", "loves", "his" and "son", in which "loves" is the center word, given a context window size of 2, the CBOW model is concerned with the conditional probability of generating the target word "loves" based on the context words "the", "man", "his" and "son"(as shown in :numref:`fig_cbow`), such as
+
+The *continuous bag of words* (CBOW) model is similar to the skip-gram model. 
+The major difference 
+from the skip-gram model is that
+the continuous bag of words model
+assumes that a center word is generated
+based on its surrounding context words in the text sequence.
+For example,
+in the same text sequence "the", "man", "loves", "his", and "son", with "loves" as the center word and the context window size being 2, 
+the continuous bag of words model 
+considers 
+the conditional probability of generating the center word "loves" based on the context words "the", "man", "his" and "son" (as shown in :numref:`fig_cbow`), which is
 
 $$P(\textrm{"loves"}\mid\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}).$$
 
-![The CBOW model cares about the conditional probability of generating the center word from given context words.  ](../img/cbow.svg)
-:label:`fig_cbow`
+![The continuous bag of words model considers the conditional probability of generating the center word given its surrounding context words.](../img/cbow.svg)
+:eqlabel:`fig_cbow`
 
-Since there are multiple context words in the CBOW model, we will average their word vectors and then use the same method as the skip-gram model to compute the conditional probability. We assume that $\mathbf{v_i}\in\mathbb{R}^d$ and $\mathbf{u_i}\in\mathbb{R}^d$ are the context word vector and center word vector of the word with index $i$ in the dictionary (notice that the symbols are opposite to the ones in the skip-gram model). Let center word $w_c$ be indexed as $c$, and context words $w_{o_1}, \ldots, w_{o_{2m}}$ be indexed as $o_1, \ldots, o_{2m}$ in the dictionary. Thus, the conditional probability of generating a center word from the given context word is
+
+Since there are multiple context words
+in the continuous bag of words model,
+these context word vectors are averaged
+in the calculation of the conditional probability.
+Specifically,
+for any word with index $i$ in the dictionary,
+denote by $\mathbf{v}_i\in\mathbb{R}^d$
+and $\mathbf{u}_i\in\mathbb{R}^d$
+its two vectors
+when used as a *context* word and a *center* word
+(meanings are switched in the skip-gram model), respectively.
+The conditional probability of generating any
+center word $w_c$ (with index $c$ in the dictionary) given its surrounding context words $w_{o_1}, \ldots, w_{o_{2m}}$ (with index $o_1, \ldots, o_{2m}$ in the dictionary) can be modeled by
+
+
 
 $$P(w_c \mid w_{o_1}, \ldots, w_{o_{2m}}) = \frac{\text{exp}\left(\frac{1}{2m}\mathbf{u}_c^\top (\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}}) \right)}{ \sum_{i \in \mathcal{V}} \text{exp}\left(\frac{1}{2m}\mathbf{u}_i^\top (\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}}) \right)}.$$
+:eqlabel:`fig_cbow-full`
 
 
-For brevity, denote $\mathcal{W}_o= \{w_{o_1}, \ldots, w_{o_{2m}}\}$, and $\bar{\mathbf{v}}_o = \left(\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}} \right)/(2m)$. The equation above can be simplified as
+For brevity, let $\mathcal{W}_o= \{w_{o_1}, \ldots, w_{o_{2m}}\}$ and $\bar{\mathbf{v}}_o = \left(\mathbf{v}_{o_1} + \ldots, + \mathbf{v}_{o_{2m}} \right)/(2m)$. Then :eqref:`fig_cbow-full` can be simplified as
 
 $$P(w_c \mid \mathcal{W}_o) = \frac{\exp\left(\mathbf{u}_c^\top \bar{\mathbf{v}}_o\right)}{\sum_{i \in \mathcal{V}} \exp\left(\mathbf{u}_i^\top \bar{\mathbf{v}}_o\right)}.$$
 
-Given a text sequence of length $T$, we assume that the word at time step $t$ is $w^{(t)}$, and the context window size is $m$.  The likelihood function of the CBOW model is the probability of generating any center word from the context words.
+Given a text sequence of length $T$, where the word at time step $t$ is denoted as $w^{(t)}$.
+For context window size $m$,
+the likelihood function of the continuous bag of words model
+is the probability of generating all center words
+given their context words:
+
 
 $$ \prod_{t=1}^{T}  P(w^{(t)} \mid  w^{(t-m)}, \ldots, w^{(t-1)}, w^{(t+1)}, \ldots, w^{(t+m)}).$$
 
