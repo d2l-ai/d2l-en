@@ -1,24 +1,56 @@
 # Approximate Training
 :label:`sec_approx_train`
 
-Recall content of the last section.  The core feature of the skip-gram model is the use of softmax operations to compute the conditional probability of generating context word $w_o$ based on the given central target word $w_c$.
+Recall what we have discussed in :numref:`sec_word2vec`.
+The main idea of the skip-gram model is 
+using softmax operations to calculate
+the conditional probability of
+generating a context word $w_o$
+based on the given center word $w_c$:
 
-$$P(w_o \mid w_c) = \frac{\text{exp}(\mathbf{u}_o^\top \mathbf{v}_c)}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)}.$$
+$$P(w_o \mid w_c) = \frac{\text{exp}(\mathbf{u}_o^\top \mathbf{v}_c)}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)},$$
 
-The logarithmic loss corresponding to the conditional probability is given as
+whose corresponding logarithmic loss is given by
 
-$$-\log P(w_o \mid w_c) =
--\mathbf{u}_o^\top \mathbf{v}_c + \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right).$$
+$$-\log P(w_o \mid w_c) = -\mathbf{u}_o^\top \mathbf{v}_c + \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right).$$
+:eqlabel:`eq_approx-training-log-skipgram`
 
 
-Because the softmax operation has considered that the context word could be any word in the dictionary $\mathcal{V}$, the loss mentioned above actually includes the sum of the number of items in the dictionary size. From the last section, we know that for both the skip-gram model and CBOW model, because they both get the conditional probability using a softmax operation, the gradient computation for each step contains the sum of the number of items in the dictionary size. For larger dictionaries with hundreds of thousands or even millions of words, the overhead for computing each gradient may be too high.  In order to reduce such computational complexity, we will introduce two approximate training methods in this section: negative sampling and hierarchical softmax. Since there is no major difference between the skip-gram model and the CBOW model, we will only use the skip-gram model as an example to introduce these two training methods in this section.
+Due to the nature of the softmax operation,
+since a context word may be anyone in the 
+dictionary $\mathcal{V}$,
+:eqref:`eq_approx-training-log-skipgram`
+contains the summation 
+of items as many as the entire size of the vocabulary.
+As a result,
+the gradient calculation
+for the skip-gram model
+in :eqref:`skip-gram-grad`
+and that
+for the continuous bag-of-words model
+in :eqref:`eq_cbow-gradient`
+both contain
+the "big" summation.
+For a large dictionary with
+hundreds of thousands or millions of words, 
+the computational cost 
+for calculating such gradients
+is huge.
+
+In order to reduce the aforementioned computational complexity, this section will introduce two approximate training methods: 
+*negative sampling* and *hierarchical softmax*.
+Due to the similarity
+between the skip-gram model and
+the continuous bag of words model, 
+we will just take the skip-gram model as an example
+to describe these two approximate training methods.
 
 
 
 ## Negative Sampling
 :label:`subsec_negative-sampling`
 
-Negative sampling modifies the original objective function. Given a context window for the central target word $w_c$, we will treat it as an event for context word $w_o$ to appear in the context window and compute the probability of this event from
+Negative sampling modifies the original objective function. Given a context window for the center word $w_c$, we will treat it as an event for context word $w_o$ to appear in the context window and compute the probability of this event from
 
 $$P(D=1\mid w_c, w_o) = \sigma(\mathbf{u}_o^\top \mathbf{v}_c),$$
 
@@ -30,7 +62,7 @@ We will first consider training the word vector by maximizing the joint probabil
 
 $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(D=1\mid w^{(t)}, w^{(t+j)}).$$
 
-However, the events included in the model only consider positive examples. In this case, only when all the word vectors are equal and their values approach infinity can the joint probability above be maximized to 1. Obviously, such word vectors are meaningless. Negative sampling makes the objective function more meaningful by sampling with an addition of negative examples. Assume that event $P$ occurs when context word $w_o$ appears in the context window of central target word $w_c$, and we sample $K$ words that do not appear in the context window according to the distribution $P(w)$ to act as noise words. We assume the event for noise word $w_k$($k=1, \ldots, K$) to not appear in the context window of central target word $w_c$ is $N_k$. Suppose that events $P$ and $N_1, \ldots, N_K$ for both positive and negative examples are independent of each other. By considering negative sampling, we can rewrite the joint probability above, which only considers the positive examples, as
+However, the events included in the model only consider positive examples. In this case, only when all the word vectors are equal and their values approach infinity can the joint probability above be maximized to 1. Obviously, such word vectors are meaningless. Negative sampling makes the objective function more meaningful by sampling with an addition of negative examples. Assume that event $P$ occurs when context word $w_o$ appears in the context window of center word $w_c$, and we sample $K$ words that do not appear in the context window according to the distribution $P(w)$ to act as noise words. We assume the event for noise word $w_k$($k=1, \ldots, K$) to not appear in the context window of center word $w_c$ is $N_k$. Suppose that events $P$ and $N_1, \ldots, N_K$ for both positive and negative examples are independent of each other. By considering negative sampling, we can rewrite the joint probability above, which only considers the positive examples, as
 
 $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(w^{(t+j)} \mid w^{(t)}),$$
 
@@ -68,7 +100,7 @@ Now, we will compute the conditional probability of generating word $w_3$ based 
 
 $$P(w_3 \mid w_c) = \sigma(\mathbf{u}_{n(w_3, 1)}^\top \mathbf{v}_c) \cdot \sigma(-\mathbf{u}_{n(w_3, 2)}^\top \mathbf{v}_c) \cdot \sigma(\mathbf{u}_{n(w_3, 3)}^\top \mathbf{v}_c).$$
 
-Because $\sigma(x)+\sigma(-x) = 1$, the condition that the sum of the conditional probability of any word generated based on the given central target word $w_c$ in dictionary $\mathcal{V}$ be 1 will also suffice:
+Because $\sigma(x)+\sigma(-x) = 1$, the condition that the sum of the conditional probability of any word generated based on the given center word $w_c$ in dictionary $\mathcal{V}$ be 1 will also suffice:
 
 $$\sum_{w \in \mathcal{V}} P(w \mid w_c) = 1.$$
 
