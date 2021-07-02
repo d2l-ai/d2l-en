@@ -146,6 +146,7 @@ $\mathbf{v}_i$ (as the center word) and $\mathbf{u}_i$ (as the context word).
 In natural language processing applications, the center word vectors of the skip-gram model are typically
 used as the word representations.
 
+
 ## The Continuous Bag of Words (CBOW) Model
 
 
@@ -202,7 +203,13 @@ $$ \prod_{t=1}^{T}  P(w^{(t)} \mid  w^{(t-m)}, \ldots, w^{(t-1)}, w^{(t+1)}, \ld
 
 ### Training
 
-CBOW model training is quite similar to skip-gram model training.  The maximum likelihood estimation of the CBOW model is equivalent to minimizing the loss function.
+Training continuous bag of words models 
+is almost the same as 
+training skip-gram models. 
+The maximum likelihood estimation of the 
+continuous bag of words model is equivalent to minimizing the following loss function:
+
+
 
 $$  -\sum_{t=1}^T  \text{log}\, P(w^{(t)} \mid  w^{(t-m)}, \ldots, w^{(t-1)}, w^{(t+1)}, \ldots, w^{(t+m)}).$$
 
@@ -210,24 +217,35 @@ Notice that
 
 $$\log\,P(w_c \mid \mathcal{W}_o) = \mathbf{u}_c^\top \bar{\mathbf{v}}_o - \log\,\left(\sum_{i \in \mathcal{V}} \exp\left(\mathbf{u}_i^\top \bar{\mathbf{v}}_o\right)\right).$$
 
-Through differentiation, we can compute the logarithm of the conditional probability of the gradient of any context word vector $\mathbf{v}_{o_i}$($i = 1, \ldots, 2m$) in the formula above.
+Through differentiation, we can obtain its gradient 
+with respect to any context word vector $\mathbf{v}_{o_i}$($i = 1, \ldots, 2m$) 
+as
+
 
 $$\frac{\partial \log\, P(w_c \mid \mathcal{W}_o)}{\partial \mathbf{v}_{o_i}} = \frac{1}{2m} \left(\mathbf{u}_c - \sum_{j \in \mathcal{V}} \frac{\exp(\mathbf{u}_j^\top \bar{\mathbf{v}}_o)\mathbf{u}_j}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \bar{\mathbf{v}}_o)} \right) = \frac{1}{2m}\left(\mathbf{u}_c - \sum_{j \in \mathcal{V}} P(w_j \mid \mathcal{W}_o) \mathbf{u}_j \right).$$
 
-We then use the same method to obtain the gradients for other word vectors. Unlike the skip-gram model, we usually use the context word vector as the representation vector for a word in the CBOW model.
+
+The gradients for the other word vectors can be obtained in the same way.
+Unlike the skip-gram model, 
+the continuous bag of words model
+typically
+uses context word vectors as the word representations.
+
+
+
 
 ## Summary
 
-* A word vector is a vector used to represent a word. The technique of mapping words to vectors of real numbers is also known as word embedding.
-* Word2vec includes both the continuous bag of words (CBOW) and skip-gram models. The skip-gram model assumes that context words are generated based on the center word. The CBOW model assumes that the center word is generated based on the context words.
+* Word vectors are vectors used to represent words, and can also be considered as feature vectors or representations of words. The technique of mapping words to real vectors is called word embedding.
+* The word2vec tool contains both the skip-gram  and continuous bag of words models.
+* The skip-gram model assumes that a word can be used to generate its surrounding words in a text sequence; while the continuous bag of words model assumes that a center word is generated based on its surrounding context words.
+
 
 
 ## Exercises
 
-1. What is the computational complexity of each gradient? If the dictionary contains a large volume of words, what problems will this cause?
-1. There are some fixed phrases in the English language which consist of multiple words, such as "new york". How can you train their word vectors? Hint: See section 4 in the Word2vec paper :cite:`Mikolov.Sutskever.Chen.ea.2013`.
-1. Use the skip-gram model as an example to think about the design of a word2vec model. What is the relationship between the inner product of two word vectors and the cosine similarity in the skip-gram model? For a pair of words with close semantical meaning, why it is likely for their word vector cosine similarity to be high?
-
-
+1. What is the computational complexity for calculating each gradient? What could be the issue if the dictionary size is huge?
+1. Some fixed phrases in English consist of multiple words, such as "new york". How to train their word vectors? Hint: See section 4 in the word2vec paper :cite:`Mikolov.Sutskever.Chen.ea.2013`.
+1. Let us reflect on the word2vec design by taking the skip-gram model as an example. What is the relationship between the inner product of two word vectors in the skip-gram model and the cosine similarity? For a pair of words with similar semantics, why may the cosine similarity of their word vectors (trained by the skip-gram model) be high?
 
 [Discussions](https://discuss.d2l.ai/t/381)
