@@ -6,7 +6,7 @@ When we entered the field, machine learning
 did not command headlines in daily newspapers.
 Our parents had no idea what machine learning was,
 let alone why we might prefer it to a career in medicine or law.
-Machine learning was a blue skies academic discipline
+Machine learning was a blue-sky academic discipline
 whose industrial significance was limited
 to a narrow set of real-world applications,
 including speech recognition and computer vision.
@@ -103,7 +103,7 @@ We found plenty of code examples for
 how to use a given deep learning framework
 (e.g., how to do basic numerical computing with matrices in TensorFlow)
 or for implementing particular techniques
-(e.g., code snippets for LeNet, AlexNet, ResNets, etc)
+(e.g., code snippets for LeNet, AlexNet, ResNets, etc.)
 scattered across various blog posts and GitHub repositories.
 However, these examples typically focused on
 *how* to implement a given approach,
@@ -452,7 +452,7 @@ requires some mathematics and programming,
 but we will only assume that you come in with some basics,
 including modest amounts of linear algebra, 
 calculus, probability, and Python programming.
-Just in case you for get the basics,
+Just in case you forget the basics,
 the Appendix provides a refresher 
 on most of the mathematics 
 you will find in this book.
@@ -468,7 +468,7 @@ All of Statistics :cite:`Wasserman.2013`
 provides a marvelous introduction to statistics.
 Joe Blitzstein's [books](https://www.amazon.com/Introduction-Probability-Chapman-Statistical-Science/dp/1138369918) 
 and [courses](https://projects.iq.harvard.edu/stat110/home) 
-on probability and inference are pegagogical gems.
+on probability and inference are pedagogical gems.
 And if you have not used Python before,
 you may want to peruse this [Python tutorial](http://learnpython.org/).
 
