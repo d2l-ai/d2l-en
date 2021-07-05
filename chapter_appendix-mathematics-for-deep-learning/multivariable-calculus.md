@@ -137,7 +137,7 @@ f'approximation: {grad_approx}, true Value: {true_value}'
 ```
 
 ## Geometry of Gradients and Gradient Descent
-Consider the again :eqref:`eq_nabla_use`:
+Consider the expression from :eqref:`eq_nabla_use` again:
 
 $$
 L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).
