@@ -122,17 +122,17 @@ involving any pair of the center word $w_c$ and
 the context word $w_o$ is
 
 
-$$\log P(w_o \mid w_c) =
-\mathbf{u}_o^\top \mathbf{v}_c - \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right).$$
+$$\log P(w_o \mid w_c) =\mathbf{u}_o^\top \mathbf{v}_c - \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right).$$
+:eqlabel:`eq_skip-gram-log`
 
 Through differentiation, we can obtain its gradient 
 with respect to the center word vector $\mathbf{v}_c$ as
 
 $$\begin{aligned}\frac{\partial \text{log}\, P(w_o \mid w_c)}{\partial \mathbf{v}_c}&= \mathbf{u}_o - \frac{\sum_{j \in \mathcal{V}} \exp(\mathbf{u}_j^\top \mathbf{v}_c)\mathbf{u}_j}{\sum_{i \in \mathcal{V}} \exp(\mathbf{u}_i^\top \mathbf{v}_c)}\\&= \mathbf{u}_o - \sum_{j \in \mathcal{V}} \left(\frac{\text{exp}(\mathbf{u}_j^\top \mathbf{v}_c)}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)}\right) \mathbf{u}_j\\&= \mathbf{u}_o - \sum_{j \in \mathcal{V}} P(w_j \mid w_c) \mathbf{u}_j.\end{aligned}$$
-:eqlabel:`skip-gram-grad`
+:eqlabel:`eq_skip-gram-grad`
 
 
-Note that the calculation in :eqref:`skip-gram-grad` requires the conditional probabilities of all words in the dictionary with $w_c$ as the center word.
+Note that the calculation in :eqref:`eq_skip-gram-grad` requires the conditional probabilities of all words in the dictionary with $w_c$ as the center word.
 The gradients for the other word vectors can be obtained in the same way.
 
 

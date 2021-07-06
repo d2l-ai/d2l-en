@@ -1,31 +1,27 @@
 # Approximate Training
 :label:`sec_approx_train`
 
-Recall what we have discussed in :numref:`sec_word2vec`.
+Recall our discussions in :numref:`sec_word2vec`.
 The main idea of the skip-gram model is 
 using softmax operations to calculate
 the conditional probability of
 generating a context word $w_o$
-based on the given center word $w_c$:
-
-$$P(w_o \mid w_c) = \frac{\text{exp}(\mathbf{u}_o^\top \mathbf{v}_c)}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)},$$
-
+based on the given center word $w_c$
+in :eqref:`eq_skip-gram-softmax`,
 whose corresponding logarithmic loss is given by
-
-$$-\log P(w_o \mid w_c) = -\mathbf{u}_o^\top \mathbf{v}_c + \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right).$$
-:eqlabel:`eq_approx-training-log-skipgram`
+the opposite of :eqref:`eq_skip-gram-log`.
 
 
 Due to the nature of the softmax operation,
 since a context word may be anyone in the 
 dictionary $\mathcal{V}$,
-:eqref:`eq_approx-training-log-skipgram`
+the opposite of :eqref:`eq_skip-gram-log`
 contains the summation 
 of items as many as the entire size of the vocabulary.
-As a result,
+Consequently,
 the gradient calculation
 for the skip-gram model
-in :eqref:`skip-gram-grad`
+in :eqref:`eq_skip-gram-grad`
 and that
 for the continuous bag-of-words model
 in :eqref:`eq_cbow-gradient`
@@ -65,6 +61,7 @@ $$P(D=1\mid w_c, w_o) = \sigma(\mathbf{u}_o^\top \mathbf{v}_c),$$
 where $\sigma$ uses the definition of the sigmoid activation function:
 
 $$\sigma(x) = \frac{1}{1+\exp(-x)}.$$
+:eqlabel:`eq_sigma-f`
 
 Let us begin by 
 maximizing the joint probability of
@@ -159,37 +156,83 @@ at each training step with negative sampling
 is smaller.
 
 
+
+
 ## Hierarchical Softmax
 
-*Hierarchical softmax* is another type of approximate training method: it uses a binary tree for data structure as illustrated in :numref:`fig_hi_softmax`, with the leaf nodes of the tree representing every word in the dictionary $\mathcal{V}$.
+As an alternative approximate training method,
+*hierarchical softmax* 
+uses the binary tree,
+a data structure
+illustrated in :numref:`fig_hi_softmax`, 
+where each leaf node
+of the tree represents
+a word in dictionary $\mathcal{V}$.
 
-![Hierarchical Softmax. Each leaf node of the tree represents a word in the dictionary. ](../img/hi-softmax.svg)
+![Hierarchical softmax for approximate training, where each leaf node of the tree represents a word in the dictionary.](../img/hi-softmax.svg)
 :label:`fig_hi_softmax`
 
-We assume that $L(w)$ is the number of nodes on the path (including the root and leaf nodes) from the root node of the binary tree to the leaf node of word $w$. Let $n(w, j)$ be the $j^\mathrm{th}$ node on this path, with the context word vector $\mathbf{u}_{n(w, j)}$. We use :numref:`fig_hi_softmax` as an example, so $L(w_3) = 4$. Hierarchical softmax will approximate the conditional probability in the skip-gram model as
+Denote by $L(w)$ 
+the number of nodes (including both ends)
+on the path 
+from the root node to the leaf node representing word $w$
+in the binary tree. 
+Let $n(w,j)$ be the $j^\mathrm{th}$ node on this path, 
+with its context word vector being
+$\mathbf{u}_{n(w, j)}$. 
+For example,
+$L(w_3) = 4$ in  :numref:`fig_hi_softmax`. 
+Hierarchical softmax approximates the conditional probability in :eqref:`eq_skip-gram-softmax` as
+
 
 $$P(w_o \mid w_c) = \prod_{j=1}^{L(w_o)-1} \sigma\left( [\![  n(w_o, j+1) = \text{leftChild}(n(w_o, j)) ]\!] \cdot \mathbf{u}_{n(w_o, j)}^\top \mathbf{v}_c\right),$$
 
-Here the $\sigma$ function has the same definition as the sigmoid activation function, and $\text{leftChild}(n)$ is the left child node of node $n$. If $x$ is true, $[\![x]\!] = 1$; otherwise $[\![x]\!] = -1$.
-Now, we will compute the conditional probability of generating word $w_3$ based on the given word $w_c$ in :numref:`fig_hi_softmax`. We need to find the inner product of word vector $\mathbf{v}_c$ (for word $w_c$) and each non-leaf node vector on the path from the root node to $w_3$. Because, in the binary tree, the path from the root node to leaf node $w_3$ needs to be traversed left, right, and left again (the path with the bold line in :numref:`fig_hi_softmax`), we get
+where function $\sigma$
+is defined in :eqref:`eq_sigma-f`,
+and $\text{leftChild}(n)$ is the left child node of node $n$: if $x$ is true, $[\![x]\!] = 1$; otherwise $[\![x]\!] = -1$.
+
+To illustrate,
+let us calculate
+the conditional probability 
+of generating word $w_3$
+given word $w_c$ in :numref:`fig_hi_softmax`.
+This requires inner products
+between the word vector
+$\mathbf{v}_c$ of $w_c$
+and
+non-leaf node vectors
+on the path (the path in bold in :numref:`fig_hi_softmax`) from the root to $w_3$,
+which is traversed left, right, then left:
+
 
 $$P(w_3 \mid w_c) = \sigma(\mathbf{u}_{n(w_3, 1)}^\top \mathbf{v}_c) \cdot \sigma(-\mathbf{u}_{n(w_3, 2)}^\top \mathbf{v}_c) \cdot \sigma(\mathbf{u}_{n(w_3, 3)}^\top \mathbf{v}_c).$$
 
-Because $\sigma(x)+\sigma(-x) = 1$, the condition that the sum of the conditional probability of any word generated based on the given center word $w_c$ in dictionary $\mathcal{V}$ be 1 will also suffice:
+Since $\sigma(x)+\sigma(-x) = 1$,
+it holds that
+the conditional probabilities of 
+generating all the words in 
+dictionary $\mathcal{V}$
+based on any word $w_c$
+sum up to one:
 
 $$\sum_{w \in \mathcal{V}} P(w \mid w_c) = 1.$$
+:eqlabel:`eq_hi-softmax-sum-one`
 
-In addition, because the order of magnitude for $L(w_o)-1$ is $\mathcal{O}(\text{log}_2|\mathcal{V}|)$, when the size of dictionary $\mathcal{V}$ is large, the computational overhead for each step in the hierarchical softmax training is greatly reduced compared to situations where we do not use approximate training.
+Fortunately, since $L(w_o)-1$ is on the order of $\mathcal{O}(\text{log}_2|\mathcal{V}|)$ due to the binary tree structure, 
+when the dictionary size $\mathcal{V}$ is huge, 
+the computational cost for  each training step using hierarchical softmax 
+is significantly reduced compared with that 
+without approximate training.
 
 ## Summary
 
-* Negative sampling constructs the loss function by considering independent events that contain both positive and negative examples. The gradient computational overhead for each step in the training process is linearly related to the number of noise words we sample.
-* Hierarchical softmax uses a binary tree and constructs the loss function based on the path from the root node to the leaf node. The gradient computational overhead for each step in the training process is related to the logarithm of the dictionary size.
+* Negative sampling constructs the loss function by considering mutually independent events that involve both positive and negative examples. The computational cost for training is linearly dependent on the number of noise words at each step.
+* Hierarchical softmax constructs the loss function using  the path from the root node to the leaf node in the binary tree. The computational cost for training is dependent on the logarithm of the dictionary size at each step.
 
 ## Exercises
 
-1. Before reading the next section, think about how we should sample noise words in negative sampling.
-1. What makes the last formula in this section hold?
-1. How can we apply negative sampling and hierarchical softmax in the skip-gram model?
+1. How can we sample noise words in negative sampling?
+1. Verify that :eqref:`eq_hi-softmax-sum-one` holds.
+1. How to train the continuous bag of words model using negative sampling and hierarchical softmax, respectively?
 
 [Discussions](https://discuss.d2l.ai/t/382)
