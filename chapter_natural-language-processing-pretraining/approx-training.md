@@ -30,12 +30,15 @@ and that
 for the continuous bag-of-words model
 in :eqref:`eq_cbow-gradient`
 both contain
-the "big" summation.
-For a large dictionary with
-hundreds of thousands or millions of words, 
+the summation.
+Unfortunately,
 the computational cost 
-for calculating such gradients
-is huge.
+for such gradients
+that sum over
+a large dictionary
+(often with
+hundreds of thousands or millions of words) 
+is huge!
 
 In order to reduce the aforementioned computational complexity, this section will introduce two approximate training methods: 
 *negative sampling* and *hierarchical softmax*.
@@ -46,21 +49,37 @@ we will just take the skip-gram model as an example
 to describe these two approximate training methods.
 
 
-
 ## Negative Sampling
 :label:`subsec_negative-sampling`
 
-Negative sampling modifies the original objective function. Given a context window for the center word $w_c$, we will treat it as an event for context word $w_o$ to appear in the context window and compute the probability of this event from
+
+*Negative sampling* modifies the original objective function.
+Given the context window of a center word $w_c$, 
+the fact that any (context) word $w_o$
+comes from this context window
+is considered as an event with the probability
+modeled by
+
 
 $$P(D=1\mid w_c, w_o) = \sigma(\mathbf{u}_o^\top \mathbf{v}_c),$$
 
-Here, the $\sigma$ function has the same definition as the sigmoid activation function:
+where $\sigma$ uses the definition of the sigmoid activation function:
 
 $$\sigma(x) = \frac{1}{1+\exp(-x)}.$$
 
-We will first consider training the word vector by maximizing the joint probability of all events in the text sequence. Given a text sequence of length $T$, we assume that the word at time step $t$ is $w^{(t)}$ and the context window size is $m$. Now we consider maximizing the joint probability
+Let us begin by 
+maximizing the joint probability of
+all such events in text sequences 
+to train word embeddings. 
+Specifically, 
+given a text sequence of length $T$, 
+denote by $w^{(t)}$ the word at time step $t$ 
+and let the context window size be $m$, 
+consider maximizing the joint probability
+
 
 $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(D=1\mid w^{(t)}, w^{(t+j)}).$$
+
 
 However, the events included in the model only consider positive examples. In this case, only when all the word vectors are equal and their values approach infinity can the joint probability above be maximized to 1. Obviously, such word vectors are meaningless. Negative sampling makes the objective function more meaningful by sampling with an addition of negative examples. Assume that event $P$ occurs when context word $w_o$ appears in the context window of center word $w_c$, and we sample $K$ words that do not appear in the context window according to the distribution $P(w)$ to act as noise words. We assume the event for noise word $w_k$($k=1, \ldots, K$) to not appear in the context window of center word $w_c$ is $N_k$. Suppose that events $P$ and $N_1, \ldots, N_K$ for both positive and negative examples are independent of each other. By considering negative sampling, we can rewrite the joint probability above, which only considers the positive examples, as
 
@@ -86,7 +105,7 @@ Here, the gradient computation in each step of the training is no longer related
 
 ## Hierarchical Softmax
 
-Hierarchical softmax is another type of approximate training method. It uses a binary tree for data structure as illustrated in :numref:`fig_hi_softmax`, with the leaf nodes of the tree representing every word in the dictionary $\mathcal{V}$.
+*Hierarchical softmax* is another type of approximate training method: it uses a binary tree for data structure as illustrated in :numref:`fig_hi_softmax`, with the leaf nodes of the tree representing every word in the dictionary $\mathcal{V}$.
 
 ![Hierarchical Softmax. Each leaf node of the tree represents a word in the dictionary. ](../img/hi-softmax.svg)
 :label:`fig_hi_softmax`
