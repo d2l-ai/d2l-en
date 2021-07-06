@@ -48,12 +48,11 @@ the continuous bag of words model,
 we will just take the skip-gram model as an example
 to describe these two approximate training methods.
 
-
 ## Negative Sampling
 :label:`subsec_negative-sampling`
 
 
-*Negative sampling* modifies the original objective function.
+Negative sampling modifies the original objective function.
 Given the context window of a center word $w_c$, 
 the fact that any (context) word $w_o$
 comes from this context window
@@ -79,17 +78,64 @@ consider maximizing the joint probability
 
 
 $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(D=1\mid w^{(t)}, w^{(t+j)}).$$
+:eqlabel:`eq-negative-sample-pos`
 
 
-However, the events included in the model only consider positive examples. In this case, only when all the word vectors are equal and their values approach infinity can the joint probability above be maximized to 1. Obviously, such word vectors are meaningless. Negative sampling makes the objective function more meaningful by sampling with an addition of negative examples. Assume that event $P$ occurs when context word $w_o$ appears in the context window of center word $w_c$, and we sample $K$ words that do not appear in the context window according to the distribution $P(w)$ to act as noise words. We assume the event for noise word $w_k$($k=1, \ldots, K$) to not appear in the context window of center word $w_c$ is $N_k$. Suppose that events $P$ and $N_1, \ldots, N_K$ for both positive and negative examples are independent of each other. By considering negative sampling, we can rewrite the joint probability above, which only considers the positive examples, as
+However, 
+:eqref:`eq-negative-sample-pos`
+only considers those events
+that involve positive examples.
+As a result,
+the joint probability in
+:eqref:`eq-negative-sample-pos`
+is maximized to 1
+only if all the word vectors are equal to infinity.
+Of course,
+such results are meaningless.
+To make the objective function
+more meaningful,
+*negative sampling* 
+adds negative examples sampled
+from a predefined distribution.
+
+Denote by $S$
+the event that
+a context word $w_o$ comes from
+the context window of a center word $w_c$.
+For this event involving $w_o$,
+from a predefined distribution $P(w)$
+sample $K$ *noise words*
+that are not from this context window.
+Denote by $N_k$
+the event that
+a noise word $w_k$ ($k=1, \ldots, K$) 
+does not come from 
+the context window of $w_c$.
+Assume that
+these events involving 
+both the positive example and negative examples
+$S, N_1, \ldots, N_K$ are mutually independent.
+Negative sampling
+rewrites the joint probability (involving only positive examples)
+in :eqref:`eq-negative-sample-pos`
+as 
 
 $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(w^{(t+j)} \mid w^{(t)}),$$
 
-Here, the conditional probability is approximated to be
+where the conditional probability is approximated through
+events $S, N_1, \ldots, N_K$:
+
 $$ P(w^{(t+j)} \mid w^{(t)}) =P(D=1\mid w^{(t)}, w^{(t+j)})\prod_{k=1,\ w_k \sim P(w)}^K P(D=0\mid w^{(t)}, w_k).$$
+:eqlabel:`eq-negative-sample-conditional-prob`
 
-
-Let the text sequence index of word $w^{(t)}$ at time step $t$ be $i_t$ and $h_k$ for noise word $w_k$ in the dictionary. The logarithmic loss for the conditional probability above is
+Denote by 
+$i_t$ and $h_k$
+the indices of
+a word $w^{(t)}$ at time step $t$
+of a text sequence
+and a noise word $w_k$,
+respectively.
+The logarithmic loss with respect to the conditional probabilities in :eqref:`eq-negative-sample-conditional-prob` is
 
 $$
 \begin{aligned}
@@ -100,7 +146,17 @@ $$
 \end{aligned}
 $$
 
-Here, the gradient computation in each step of the training is no longer related to the dictionary size, but linearly related to $K$. When $K$ takes a smaller constant, the negative sampling has a lower computational overhead for each step.
+
+We can see that
+now the computational cost for gradients
+at each training step
+has nothing to do with the dictionary size,
+but linearly depends on $K$.
+When setting the hyperparameter $K$
+to a smaller value,
+the computational cost for gradients
+at each training step with negative sampling
+is smaller.
 
 
 ## Hierarchical Softmax

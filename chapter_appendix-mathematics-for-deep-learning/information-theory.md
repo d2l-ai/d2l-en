@@ -666,7 +666,7 @@ loss
 def nll_loss(y_hat, y):
     # Convert labels to one-hot vectors.
     y = tf.keras.utils.to_categorical(y, num_classes= y_hat.shape[1])
-    # We will not calculate Negative log likelihood (NLL) from the definition.
+    # We will not calculate negative log-likelihood from the definition.
     # Rather, we will follow a circular argument. Because NLL is same as
     # `cross_entropy`, if we calculate cross_entropy that would give us NLL
     cross_entropy = tf.keras.losses.CategoricalCrossentropy(
