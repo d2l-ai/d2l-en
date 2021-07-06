@@ -1,11 +1,20 @@
-# The Dataset for Pretraining Word Embedding
+# The Dataset for Pretraining Word Embeddings
 :label:`sec_word2vec_data`
 
-In this section, we will introduce how to preprocess a dataset with
-negative sampling :numref:`sec_approx_train` and load into minibatches for
-word2vec training. The dataset we use is [Penn Tree Bank (PTB)]( https://catalog.ldc.upenn.edu/LDC99T42), which is a small but commonly-used corpus. It takes samples from Wall Street Journal articles and includes training sets, validation sets, and test sets.
-
-First, import the packages and modules required for the experiment.
+Now that we know the technical details of 
+the word2vec models and approximate training methods,
+let us walk through their implementations. 
+Specifically,
+we will take the skip-gram model in :numref:`sec_word2vec`
+and negative sampling in :numref:`sec_approx_train`
+as an example.
+In this section,
+we begin with the dataset
+for pretraining the word embedding model:
+the original format of the data
+will be transformed
+into minibatches
+that can be iterated over during training.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -24,9 +33,17 @@ import os
 import random
 ```
 
-## Reading and Preprocessing the Dataset
+## Reading the Dataset
 
-This dataset has already been preprocessed. Each line of the dataset acts as a sentence. All the words in a sentence are separated by spaces. In the word embedding task, each word is a token.
+The dataset that we use here
+is [Penn Tree Bank (PTB)]( https://catalog.ldc.upenn.edu/LDC99T42). 
+This corpus is sampled
+from Wall Street Journal articles,
+split into training, validation, and test sets.
+In the original format,
+each line of the text file
+represents a sentence of words that are separated by spaces.
+Here we treat each word as a token.
 
 ```{.python .input}
 #@tab all
@@ -37,6 +54,7 @@ d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
 #@save
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
+    # Read the training set.
     with open(os.path.join(data_dir, 'ptb.train.txt')) as f:
         raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
@@ -45,7 +63,13 @@ sentences = read_ptb()
 f'# sentences: {len(sentences)}'
 ```
 
-Next we build a vocabulary with words appeared not greater than 10 times mapped into a "&lt;unk&gt;" token. Note that the preprocessed PTB data also contains "&lt;unk&gt;" tokens presenting rare words.
+After reading the training set,
+we build a vocabulary for the corpus,
+where any word that appears 
+less than 10 times is replaced by 
+the "&lt;unk&gt;" token.
+Note that the original dataset
+also contains "&lt;unk&gt;" tokens that represent rare (unknown) words.
 
 ```{.python .input}
 #@tab all
