@@ -38,7 +38,6 @@ The notation used throughout this book is summarized below.
 * $f(\cdot)$: A function
 * $\log(\cdot)$: The natural logarithm
 * $\exp(\cdot)$: The exponential function
-* $\mathbf{1}_\mathcal{X}$: The indicator function
 * $\mathbf{(\cdot)}^\top$: Transpose of a vector or a matrix
 * $\mathbf{X}^{-1}$: Inverse of matrix $\mathbf{X}$
 * $\odot$: Hadamard (elementwise) product
