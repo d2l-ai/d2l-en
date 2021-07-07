@@ -181,7 +181,19 @@ corpus[:3]
 
 ## Extracting Center Words and Context Words
 
-We use words with a distance from the center word not exceeding the context window size as the context words of the given center target word. The following definition function extracts all the center words and their context words. It uniformly and randomly samples an integer to be used as the context window size between integer 1 and the `max_window_size` (maximum context window).
+
+The following `get_centers_and_contexts`
+function extracts all the 
+center words and their context words
+from `corpus`.
+It uniformly samples an integer between 1 and `max_window_size`
+at random as the context window size.
+For any center word,
+those words 
+whose distance from it
+does not exceed the sampled
+context window size
+are its context words.
 
 ```{.python .input}
 #@tab all
@@ -189,12 +201,12 @@ We use words with a distance from the center word not exceeding the context wind
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a "center word
-        # - context word" pair
+        # Each sentence needs at least 2 words to form a "center word--context
+        # word" pair
         if len(line) < 2:
             continue
         centers += line
-        for i in range(len(line)):  # Context window centered at i
+        for i in range(len(line)):  # Context window centered at `i`
             window_size = random.randint(1, max_window_size)
             indices = list(range(max(0, i - window_size),
                                  min(len(line), i + 1 + window_size)))
@@ -204,7 +216,9 @@ def get_centers_and_contexts(corpus, max_window_size):
     return centers, contexts
 ```
 
-Next, we create an artificial dataset containing two sentences of 7 and 3 words, respectively. Assume the maximum context window is 2 and print all the center words and their context words.
+Next, we create an artificial dataset containing two sentences of 7 and 3 words, respectively. 
+Let the maximum context window size be 2 
+and print all the center words and their context words.
 
 ```{.python .input}
 #@tab all
@@ -214,12 +228,14 @@ for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
     print('center', center, 'has contexts', context)
 ```
 
-We set the maximum context window size to 5. The following extracts all the center words and their context words in the dataset.
+When training on the PTB dataset,
+we set the maximum context window size to 5. 
+The following extracts all the center words and their context words in the dataset.
 
 ```{.python .input}
 #@tab all
 all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
-f'# center-context pairs: {len(all_centers)}'
+f'# center-context pairs: {sum([len(contexts) for contexts in all_contexts])}'
 ```
 
 ## Negative Sampling
