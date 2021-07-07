@@ -884,6 +884,19 @@ def tokenize_nmt(text, num_examples=None):
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
+    """Plot the histogram for list length pairs."""
+    d2l.set_figsize()
+    _, _, patches = d2l.plt.hist([[len(l) for l in xlist],
+                                  [len(l) for l in ylist]])
+    d2l.plt.xlabel(xlabel)
+    d2l.plt.ylabel(ylabel)
+    for patch in patches[1].patches:
+        patch.set_hatch('/')
+    d2l.plt.legend(legend)
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def truncate_pad(line, num_steps, padding_token):
     """Truncate or pad sequences."""
     if len(line) > num_steps:
@@ -2072,34 +2085,32 @@ d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
 
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
+    # Read the training set.
     with open(os.path.join(data_dir, 'ptb.train.txt')) as f:
         raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
-def subsampling(sentences, vocab):
-    # Map low frequency words into <unk>
-    sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line]
+def subsample(sentences, vocab):
+    sentences = [[vocab.idx_to_token[vocab[token]] for token in line]
                  for line in sentences]
-    # Count the frequency for each word
     counter = d2l.count_corpus(sentences)
     num_tokens = sum(counter.values())
 
-    # Return True if to keep this token during subsampling
+    # Return `True` if `token` is kept during subsampling
     def keep(token):
         return (random.uniform(0, 1) < math.sqrt(
             1e-4 / counter[token] * num_tokens))
 
-    # Now do the subsampling
-    return [[tk for tk in line if keep(tk)] for line in sentences]
+    return [[token for token in line if keep(token)] for line in sentences]
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a "central target word
+        # Each sentence needs at least 2 words to form a "center word
         # - context word" pair
         if len(line) < 2:
             continue
@@ -2109,7 +2120,7 @@ def get_centers_and_contexts(corpus, max_window_size):
             indices = list(
                 range(max(0, i - window_size),
                       min(len(line), i + 1 + window_size)))
-            # Exclude the central target word from the context words
+            # Exclude the center word from the context words
             indices.remove(i)
             contexts.append([line[idx] for idx in indices])
     return centers, contexts
@@ -2169,7 +2180,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
-    subsampled = subsampling(sentences, vocab)
+    subsampled = subsample(sentences, vocab)
     corpus = [vocab[line] for line in subsampled]
     all_centers, all_contexts = get_centers_and_contexts(
         corpus, max_window_size)

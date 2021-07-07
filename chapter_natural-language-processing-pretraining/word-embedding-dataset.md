@@ -79,44 +79,76 @@ f'vocab size: {len(vocab)}'
 
 ## Subsampling
 
-In text data, there are generally some words that appear at high frequencies, such "the", "a", and "in" in English. Generally speaking, in a context window, it is better to train the word embedding model when a word (such as "chip") and a lower-frequency word (such as "microprocessor") appear at the same time, rather than when a word appears with a higher-frequency word (such as "the"). Therefore, when training the word embedding model, we can perform subsampling on the words :cite:`Mikolov.Sutskever.Chen.ea.2013`. Specifically, each indexed word $w_i$ in the dataset will drop out at a certain probability. The dropout probability is given as:
+Text data
+typically have high-frequency words
+such as "the", "a", and "in":
+they may even occur billions of times in
+very large corpora.
+However,
+these words often co-occur
+with many different words in
+context windows, providing little useful signals.
+For instance,
+consider the word "chip" in a context window:
+intuitively
+its co-occurrence with a low-frequency word "intel"
+is more useful in training
+than 
+the co-occurrence with a high-frequency word "a".
+Moreover, training with vast amounts of (high-frequency) words
+is slow.
+Thus, when training word embedding models, 
+high-frequency words can be *subsampled* :cite:`Mikolov.Sutskever.Chen.ea.2013`.
+Specifically, 
+each indexed word $w_i$ 
+in the dataset will be discarded with probability
+
 
 $$ P(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
 
-Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number of words in the dataset, and the constant $t$ is a hyperparameter (set to $10^{-4}$ in this experiment). As we can see, it is only possible to drop out the word $w_i$ in subsampling when $f(w_i) > t$. The higher the word's frequency, the higher its dropout probability.
+where $f(w_i)$ is the ratio of 
+the number of words $w_i$
+to the total number of words in the dataset, 
+and the constant $t$ is a hyperparameter
+($10^{-4}$ in the experiment). 
+We can see that only when
+the relative frequency
+$f(w_i) > t$  can the (high-frequency) word $w_i$ be discarded, 
+and the higher the relative frequency of the word, 
+the greater the probability of being discarded.
 
 ```{.python .input}
 #@tab all
 #@save
-def subsampling(sentences, vocab):
-    # Map low frequency words into <unk>
-    sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line]
+def subsample(sentences, vocab):
+    sentences = [[vocab.idx_to_token[vocab[token]] for token in line]
                  for line in sentences]
-    # Count the frequency for each word
     counter = d2l.count_corpus(sentences)
     num_tokens = sum(counter.values())
 
-    # Return True if to keep this token during subsampling
+    # Return `True` if `token` is kept during subsampling
     def keep(token):
         return(random.uniform(0, 1) <
                math.sqrt(1e-4 / counter[token] * num_tokens))
 
-    # Now do the subsampling
-    return [[tk for tk in line if keep(tk)] for line in sentences]
+    return [[token for token in line if keep(token)] for line in sentences]
 
-subsampled = subsampling(sentences, vocab)
+subsampled = subsample(sentences, vocab)
 ```
 
-Compare the sequence lengths before and after sampling, we can see subsampling significantly reduced the sequence length.
+The following code snippet 
+plots the histogram of
+the number of tokens per sentence
+before and after subsampling.
+As expected, 
+subsampling significantly shortens sentences
+by dropping high-frequency words,
+which will lead to training speedup.
 
 ```{.python .input}
 #@tab all
-d2l.set_figsize()
-d2l.plt.hist([[len(line) for line in sentences],
-              [len(line) for line in subsampled]])
-d2l.plt.xlabel('# tokens per sentence')
-d2l.plt.ylabel('count')
-d2l.plt.legend(['origin', 'subsampled']);
+d2l.show_list_len_pair_hist(['origin', 'subsampled'], '# tokens per sentence',
+                            'count', sentences, subsampled);
 ```
 
 For individual tokens, the sampling rate of the high-frequency word "the" is less than 1/20.
@@ -125,34 +157,31 @@ For individual tokens, the sampling rate of the high-frequency word "the" is les
 #@tab all
 def compare_counts(token):
     return (f'# of "{token}": '
-            f'before={sum([line.count(token) for line in sentences])}, '
-            f'after={sum([line.count(token) for line in subsampled])}')
+            f'before={sum([l.count(token) for l in sentences])}, '
+            f'after={sum([l.count(token) for l in subsampled])}')
 
 compare_counts('the')
 ```
 
-But the low-frequency word "join" is completely preserved.
+In contrast, 
+low-frequency words "join" are completely kept.
 
 ```{.python .input}
 #@tab all
 compare_counts('join')
 ```
 
-Last, we map each token into an index to construct the corpus.
+After subsampling, we map tokens to their indices for the corpus.
 
 ```{.python .input}
 #@tab all
-corpus = [vocab[line] for line in subsampled]
-corpus[0:3]
+corpus = [vocab[l] for l in subsampled]
+corpus[:3]
 ```
 
-## Loading the Dataset
+## Extracting Center Words and Context Words
 
-Next we read the corpus with token indicies into data batches for training.
-
-### Extracting Central Target Words and Context Words
-
-We use words with a distance from the central target word not exceeding the context window size as the context words of the given center target word. The following definition function extracts all the central target words and their context words. It uniformly and randomly samples an integer to be used as the context window size between integer 1 and the `max_window_size` (maximum context window).
+We use words with a distance from the center word not exceeding the context window size as the context words of the given center target word. The following definition function extracts all the center words and their context words. It uniformly and randomly samples an integer to be used as the context window size between integer 1 and the `max_window_size` (maximum context window).
 
 ```{.python .input}
 #@tab all
@@ -160,7 +189,7 @@ We use words with a distance from the central target word not exceeding the cont
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a "central target word
+        # Each sentence needs at least 2 words to form a "center word
         # - context word" pair
         if len(line) < 2:
             continue
@@ -169,13 +198,13 @@ def get_centers_and_contexts(corpus, max_window_size):
             window_size = random.randint(1, max_window_size)
             indices = list(range(max(0, i - window_size),
                                  min(len(line), i + 1 + window_size)))
-            # Exclude the central target word from the context words
+            # Exclude the center word from the context words
             indices.remove(i)
             contexts.append([line[idx] for idx in indices])
     return centers, contexts
 ```
 
-Next, we create an artificial dataset containing two sentences of 7 and 3 words, respectively. Assume the maximum context window is 2 and print all the central target words and their context words.
+Next, we create an artificial dataset containing two sentences of 7 and 3 words, respectively. Assume the maximum context window is 2 and print all the center words and their context words.
 
 ```{.python .input}
 #@tab all
@@ -185,7 +214,7 @@ for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
     print('center', center, 'has contexts', context)
 ```
 
-We set the maximum context window size to 5. The following extracts all the central target words and their context words in the dataset.
+We set the maximum context window size to 5. The following extracts all the center words and their context words in the dataset.
 
 ```{.python .input}
 #@tab all
@@ -193,7 +222,7 @@ all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
 f'# center-context pairs: {len(all_centers)}'
 ```
 
-### Negative Sampling
+## Negative Sampling
 
 We use negative sampling for approximate training. For a central and context word pair, we randomly sample $K$ noise words ($K=5$ in the experiment). According to the suggestion in the Word2vec paper, the noise word sampling probability $P(w)$ is the ratio of the word frequency of $w$ to the total word frequency raised to the power of 0.75 :cite:`Mikolov.Sutskever.Chen.ea.2013`.
 
@@ -242,13 +271,13 @@ def get_negatives(all_contexts, corpus, K):
 all_negatives = get_negatives(all_contexts, corpus, 5)
 ```
 
-### Reading into Batches
+## Loading in Batches
 
-We extract all central target words `all_centers`, and the context words `all_contexts` and noise words `all_negatives` of each central target word from the dataset. We will read them in random minibatches.
+We extract all center words `all_centers`, and the context words `all_contexts` and noise words `all_negatives` of each center word from the dataset. We will read them in random minibatches.
 
 In a minibatch of data, the $i^\mathrm{th}$ example includes a central word and its corresponding $n_i$ context words and $m_i$ noise words. Since the context window size of each example may be different, the sum of context words and noise words, $n_i+m_i$, will be different. When constructing a minibatch, we concatenate the context words and noise words of each example, and add 0s for padding until the length of the concatenations are the same, that is, the length of all concatenations is $\max_i n_i+m_i$(`max_len`). In order to avoid the effect of padding on the loss function calculation, we construct the mask variable `masks`, each element of which corresponds to an element in the concatenation of context and noise words, `contexts_negatives`. When an element in the variable `contexts_negatives` is a padding, the element in the mask variable `masks` at the same position will be 0. Otherwise, it takes the value 1. In order to distinguish between positive and negative examples, we also need to distinguish the context words from the noise words in the `contexts_negatives` variable. Based on the construction of the mask variable, we only need to create a label variable `labels` with the same shape as the `contexts_negatives` variable and set the elements corresponding to context words (positive examples) to 1, and the rest to 0.
 
-Next, we will implement the minibatch reading function `batchify`. Its minibatch input `data` is a list whose length is the batch size, each element of which contains central target words `center`, context words `context`, and noise words `negative`. The minibatch data returned by this function conforms to the format we need, for example, it includes the mask variable.
+Next, we will implement the minibatch reading function `batchify`. Its minibatch input `data` is a list whose length is the batch size, each element of which contains center words `center`, context words `context`, and noise words `negative`. The minibatch data returned by this function conforms to the format we need, for example, it includes the mask variable.
 
 ```{.python .input}
 #@tab all
@@ -291,7 +320,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
-    subsampled = subsampling(sentences, vocab)
+    subsampled = subsample(sentences, vocab)
     corpus = [vocab[line] for line in subsampled]
     all_centers, all_contexts = get_centers_and_contexts(
         corpus, max_window_size)
@@ -311,7 +340,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
-    subsampled = subsampling(sentences, vocab)
+    subsampled = subsample(sentences, vocab)
     corpus = [vocab[line] for line in subsampled]
     all_centers, all_contexts = get_centers_and_contexts(
         corpus, max_window_size)
@@ -362,7 +391,6 @@ for batch in data_iter:
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/383)
 :end_tab:
-
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1330)

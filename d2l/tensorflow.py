@@ -828,6 +828,19 @@ def tokenize_nmt(text, num_examples=None):
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
+def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
+    """Plot the histogram for list length pairs."""
+    d2l.set_figsize()
+    _, _, patches = d2l.plt.hist([[len(l) for l in xlist],
+                                  [len(l) for l in ylist]])
+    d2l.plt.xlabel(xlabel)
+    d2l.plt.ylabel(ylabel)
+    for patch in patches[1].patches:
+        patch.set_hatch('/')
+    d2l.plt.legend(legend)
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation-and-dataset.md
 def truncate_pad(line, num_steps, padding_token):
     """Truncate or pad sequences."""
     if len(line) > num_steps:
