@@ -6,7 +6,7 @@ When we entered the field, machine learning
 did not command headlines in daily newspapers.
 Our parents had no idea what machine learning was,
 let alone why we might prefer it to a career in medicine or law.
-Machine learning was a blue-sky academic discipline
+Machine learning was a blue skies academic discipline
 whose industrial significance was limited
 to a narrow set of real-world applications,
 including speech recognition and computer vision.
