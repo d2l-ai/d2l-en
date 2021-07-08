@@ -189,14 +189,16 @@ we define the following `show_bboxes` function to draw multiple bounding boxes o
 #@save
 def show_bboxes(axes, bboxes, labels=None, colors=None):
     """Show bounding boxes."""
-    def _make_list(obj, default_values=None):
+
+    def make_list(obj, default_values=None):
         if obj is None:
             obj = default_values
         elif not isinstance(obj, (list, tuple)):
             obj = [obj]
         return obj
-    labels = _make_list(labels)
-    colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
+
+    labels = make_list(labels)
+    colors = make_list(colors, ['b', 'g', 'r', 'm', 'c'])
     for i, bbox in enumerate(bboxes):
         color = colors[i % len(colors)]
         rect = d2l.bbox_to_rect(d2l.numpy(bbox), color)

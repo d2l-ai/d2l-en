@@ -378,7 +378,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     all_negatives = get_negatives(
         all_contexts, vocab, counter, num_noise_words)
 
-    class _PTBDataset(torch.utils.data.Dataset):
+    class PTBDataset(torch.utils.data.Dataset):
         def __init__(self, centers, contexts, negatives):
             assert len(centers) == len(contexts) == len(negatives)
             self.centers = centers
@@ -392,8 +392,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
         def __len__(self):
             return len(self.centers)
 
-    dataset = _PTBDataset(
-        all_centers, all_contexts, all_negatives)
+    dataset = PTBDataset(all_centers, all_contexts, all_negatives)
 
     data_iter = torch.utils.data.DataLoader(dataset, batch_size, shuffle=True,
                                       collate_fn=batchify,
