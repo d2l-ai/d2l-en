@@ -77,10 +77,6 @@ vocab = d2l.Vocab(sentences, min_freq=10)
 f'vocab size: {len(vocab)}'
 ```
 
-```{.python .input}
-vocab['mips', 'intel', 'microprocessor', 'chips']
-```
-
 ## Subsampling
 
 Text data
