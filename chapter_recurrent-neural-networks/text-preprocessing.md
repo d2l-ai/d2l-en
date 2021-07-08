@@ -147,7 +147,7 @@ class Vocab:  #@save
         return [self.idx_to_token[index] for index in indices]
     
     @property
-    def unk(self):
+    def unk(self):  # Index for the unknown token
         return 0
 
 def count_corpus(tokens):  #@save

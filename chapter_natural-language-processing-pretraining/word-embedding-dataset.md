@@ -77,6 +77,10 @@ vocab = d2l.Vocab(sentences, min_freq=10)
 f'vocab size: {len(vocab)}'
 ```
 
+```{.python .input}
+vocab['mips', 'intel', 'microprocessor', 'chips']
+```
+
 ## Subsampling
 
 Text data
@@ -121,8 +125,8 @@ the greater the probability of being discarded.
 #@tab all
 #@save
 def subsample(sentences, vocab):
-    # A raw token may be replaced by the '<unk>' token based on `vocab`
-    sentences = [[vocab.idx_to_token[vocab[token]] for token in line]
+    # Exclude unknown tokens '<unk>'
+    sentences = [[token for token in line if vocab[token] != vocab.unk]
                  for line in sentences]
     counter = d2l.count_corpus(sentences)
     num_tokens = sum(counter.values())
@@ -177,7 +181,7 @@ After subsampling, we map tokens to their indices for the corpus.
 
 ```{.python .input}
 #@tab all
-corpus = [vocab[l] for l in subsampled]
+corpus = [vocab[line] for line in subsampled]
 corpus[:3]
 ```
 
@@ -270,6 +274,7 @@ class RandomGenerator:
 
     def draw(self):
         if self.i == len(self.candidates):
+            # Cache `k` random sampling results
             self.candidates = random.choices(
                 self.population, self.sampling_weights, k=10000)
             self.i = 0
@@ -285,7 +290,7 @@ generator = RandomGenerator([2, 3, 4])
 #@save
 def get_negatives(all_contexts, vocab, counter, K):
     # Sampling weights for words with indices 0, 1, ... in the vocabulary
-    sampling_weights = [counter[vocab.idx_to_token[i]]**0.75
+    sampling_weights = [counter[vocab.to_tokens(i)]**0.75
                         for i in range(len(counter))]
     all_negatives, generator = [], RandomGenerator(sampling_weights)
     for contexts in all_contexts:
@@ -321,8 +326,8 @@ def batchify(data):
         contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
         masks += [[1] * cur_len + [0] * (max_len - cur_len)]
         labels += [[1] * len(context) + [0] * (max_len - len(context))]
-    return (d2l.reshape(d2l.tensor(centers), (-1, 1)), d2l.tensor(contexts_negatives),
-            d2l.tensor(masks), d2l.tensor(labels))
+    return (d2l.reshape(d2l.tensor(centers), (-1, 1)), d2l.tensor(
+        contexts_negatives), d2l.tensor(masks), d2l.tensor(labels))
 ```
 
 Construct two simple examples:
@@ -347,7 +352,6 @@ Last, we define the `load_data_ptb` function that read the PTB dataset and retur
 ```{.python .input}
 #@save
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
-    num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
     subsampled, counter = subsample(sentences, vocab)
@@ -358,9 +362,9 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
         all_contexts, vocab, counter, num_noise_words)
     dataset = gluon.data.ArrayDataset(
         all_centers, all_contexts, all_negatives)
-    data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
-                                      batchify_fn=batchify,
-                                      num_workers=num_workers)
+    data_iter = gluon.data.DataLoader(
+        dataset, batch_size, shuffle=True,batchify_fn=batchify,
+        num_workers=d2l.get_dataloader_workers())
     return data_iter, vocab
 ```
 
