@@ -127,7 +127,7 @@ def subsample(sentences, vocab):
     counter = d2l.count_corpus(sentences)
     num_tokens = sum(counter.values())
 
-    # Return `True` if `token` is kept during subsampling
+    # Return True if `token` is kept during subsampling
     def keep(token):
         return(random.uniform(0, 1) <
                math.sqrt(1e-4 / counter[token] * num_tokens))
