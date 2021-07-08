@@ -520,13 +520,13 @@ class Vocab:
             reserved_tokens = []
         # Sort according to frequencies
         counter = count_corpus(tokens)
-        token_freqs = sorted(counter.items(), key=lambda x: x[1],
-                             reverse=True)
+        _token_freqs = sorted(counter.items(), key=lambda x: x[1],
+                              reverse=True)
         # The index for the unknown token is 0
         self.idx_to_token = ['<unk>'] + reserved_tokens
         self.token_to_idx = {
             token: idx for idx, token in enumerate(self.idx_to_token)}
-        for token, freq in token_freqs:
+        for token, freq in _token_freqs:
             if freq < min_freq:
                 break
             if token not in self.token_to_idx:
@@ -549,6 +549,10 @@ class Vocab:
     @property
     def unk(self):  # Index for the unknown token
         return 0
+
+    @property
+    def token_freqs(self):
+        return _token_freqs
 
 
 def count_corpus(tokens):
