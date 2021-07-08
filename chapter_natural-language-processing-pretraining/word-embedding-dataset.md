@@ -121,6 +121,7 @@ the greater the probability of being discarded.
 #@tab all
 #@save
 def subsample(sentences, vocab):
+    # A raw token may be replaced by the '<unk>' token based on `vocab`
     sentences = [[vocab.idx_to_token[vocab[token]] for token in line]
                  for line in sentences]
     counter = d2l.count_corpus(sentences)
@@ -131,9 +132,10 @@ def subsample(sentences, vocab):
         return(random.uniform(0, 1) <
                math.sqrt(1e-4 / counter[token] * num_tokens))
 
-    return [[token for token in line if keep(token)] for line in sentences]
+    return ([[token for token in line if keep(token)] for line in sentences],
+            counter)
 
-subsampled = subsample(sentences, vocab)
+subsampled, counter = subsample(sentences, vocab)
 ```
 
 The following code snippet 
@@ -240,7 +242,18 @@ f'# center-context pairs: {sum([len(contexts) for contexts in all_contexts])}'
 
 ## Negative Sampling
 
-We use negative sampling for approximate training. For a central and context word pair, we randomly sample $K$ noise words ($K=5$ in the experiment). According to the suggestion in the Word2vec paper, the noise word sampling probability $P(w)$ is the ratio of the word frequency of $w$ to the total word frequency raised to the power of 0.75 :cite:`Mikolov.Sutskever.Chen.ea.2013`.
+
+We use negative sampling for approximate training. 
+For a pair of center word and context word, 
+we randomly sample `K` (5 in the experiment) noise words. According to the suggestions in the word2vec paper,
+the sampling probability $P(w)$ of 
+a noise word $w$
+is 
+set to its relative frequency 
+in the dictionary
+raised to 
+the power of 0.75 :cite:`Mikolov.Sutskever.Chen.ea.2013`.
+
 
 We first define a class to draw a candidate according to the sampling weights. It caches a 10000 size random number bank instead of calling `random.choices` every time.
 
@@ -248,7 +261,7 @@ We first define a class to draw a candidate according to the sampling weights. I
 #@tab all
 #@save
 class RandomGenerator:
-    """Draw a random int in [0, n] according to n sampling weights."""
+    """Draw a random integer in [0, n) according to n sampling weights."""
     def __init__(self, sampling_weights):
         self.population = list(range(len(sampling_weights)))
         self.sampling_weights = sampling_weights
@@ -261,7 +274,7 @@ class RandomGenerator:
                 self.population, self.sampling_weights, k=10000)
             self.i = 0
         self.i += 1
-        return self.candidates[self.i-1]
+        return self.candidates[self.i - 1]
 
 generator = RandomGenerator([2, 3, 4])
 [generator.draw() for _ in range(10)]
@@ -270,9 +283,10 @@ generator = RandomGenerator([2, 3, 4])
 ```{.python .input}
 #@tab all
 #@save
-def get_negatives(all_contexts, corpus, K):
-    counter = d2l.count_corpus(corpus)
-    sampling_weights = [count**0.75 for count in counter.values()]
+def get_negatives(all_contexts, vocab, counter, K):
+    # Sampling weights for words with indices 0, 1, ... in the vocabulary
+    sampling_weights = [counter[vocab.idx_to_token[i]]**0.75
+                        for i in range(len(counter))]
     all_negatives, generator = [], RandomGenerator(sampling_weights)
     for contexts in all_contexts:
         negatives = []
@@ -284,7 +298,7 @@ def get_negatives(all_contexts, corpus, K):
         all_negatives.append(negatives)
     return all_negatives
 
-all_negatives = get_negatives(all_contexts, corpus, 5)
+all_negatives = get_negatives(all_contexts, vocab, counter, 5)
 ```
 
 ## Loading in Batches
@@ -336,11 +350,12 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
-    subsampled = subsample(sentences, vocab)
+    subsampled, counter = subsample(sentences, vocab)
     corpus = [vocab[line] for line in subsampled]
     all_centers, all_contexts = get_centers_and_contexts(
         corpus, max_window_size)
-    all_negatives = get_negatives(all_contexts, corpus, num_noise_words)
+    all_negatives = get_negatives(
+        all_contexts, vocab, counter, num_noise_words)
     dataset = gluon.data.ArrayDataset(
         all_centers, all_contexts, all_negatives)
     data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
@@ -356,13 +371,14 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
-    subsampled = subsample(sentences, vocab)
+    subsampled, counter = subsample(sentences, vocab)
     corpus = [vocab[line] for line in subsampled]
     all_centers, all_contexts = get_centers_and_contexts(
         corpus, max_window_size)
-    all_negatives = get_negatives(all_contexts, corpus, num_noise_words)
+    all_negatives = get_negatives(
+        all_contexts, vocab, counter, num_noise_words)
 
-    class PTBDataset(torch.utils.data.Dataset):
+    class _PTBDataset(torch.utils.data.Dataset):
         def __init__(self, centers, contexts, negatives):
             assert len(centers) == len(contexts) == len(negatives)
             self.centers = centers
@@ -370,12 +386,13 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
             self.negatives = negatives
 
         def __getitem__(self, index):
-            return (self.centers[index], self.contexts[index], self.negatives[index])
+            return (self.centers[index], self.contexts[index],
+                    self.negatives[index])
 
         def __len__(self):
             return len(self.centers)
 
-    dataset = PTBDataset(
+    dataset = _PTBDataset(
         all_centers, all_contexts, all_negatives)
 
     data_iter = torch.utils.data.DataLoader(dataset, batch_size, shuffle=True,

@@ -2093,6 +2093,7 @@ def read_ptb():
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def subsample(sentences, vocab):
+    # A raw token may be replaced by the '<unk>' token based on `vocab`
     sentences = [[vocab.idx_to_token[vocab[token]] for token in line]
                  for line in sentences]
     counter = d2l.count_corpus(sentences)
@@ -2103,19 +2104,20 @@ def subsample(sentences, vocab):
         return (random.uniform(0, 1) < math.sqrt(
             1e-4 / counter[token] * num_tokens))
 
-    return [[token for token in line if keep(token)] for line in sentences]
+    return ([[token for token in line if keep(token)]
+             for line in sentences], counter)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a "center word
-        # - context word" pair
+        # Each sentence needs at least 2 words to form a "center word--context
+        # word" pair
         if len(line) < 2:
             continue
         centers += line
-        for i in range(len(line)):  # Context window centered at i
+        for i in range(len(line)):  # Context window centered at `i`
             window_size = random.randint(1, max_window_size)
             indices = list(
                 range(max(0, i - window_size),
@@ -2128,7 +2130,7 @@ def get_centers_and_contexts(corpus, max_window_size):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 class RandomGenerator:
-    """Draw a random int in [0, n] according to n sampling weights."""
+    """Draw a random integer in [0, n) according to n sampling weights."""
     def __init__(self, sampling_weights):
         self.population = list(range(len(sampling_weights)))
         self.sampling_weights = sampling_weights
@@ -2145,9 +2147,10 @@ class RandomGenerator:
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
-def get_negatives(all_contexts, corpus, K):
-    counter = d2l.count_corpus(corpus)
-    sampling_weights = [count**0.75 for count in counter.values()]
+def get_negatives(all_contexts, vocab, counter, K):
+    # Sampling weights for words with indices 0, 1, ... in the vocabulary
+    sampling_weights = [
+        counter[vocab.idx_to_token[i]]**0.75 for i in range(len(counter))]
     all_negatives, generator = [], RandomGenerator(sampling_weights)
     for contexts in all_contexts:
         negatives = []
@@ -2180,13 +2183,14 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
-    subsampled = subsample(sentences, vocab)
+    subsampled, counter = subsample(sentences, vocab)
     corpus = [vocab[line] for line in subsampled]
     all_centers, all_contexts = get_centers_and_contexts(
         corpus, max_window_size)
-    all_negatives = get_negatives(all_contexts, corpus, num_noise_words)
+    all_negatives = get_negatives(all_contexts, vocab, counter,
+                                  num_noise_words)
 
-    class PTBDataset(torch.utils.data.Dataset):
+    class _PTBDataset(torch.utils.data.Dataset):
         def __init__(self, centers, contexts, negatives):
             assert len(centers) == len(contexts) == len(negatives)
             self.centers = centers
@@ -2200,7 +2204,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
         def __len__(self):
             return len(self.centers)
 
-    dataset = PTBDataset(all_centers, all_contexts, all_negatives)
+    dataset = _PTBDataset(all_centers, all_contexts, all_negatives)
 
     data_iter = torch.utils.data.DataLoader(dataset, batch_size, shuffle=True,
                                             collate_fn=batchify,
