@@ -2000,8 +2000,8 @@ def subsample(sentences, vocab):
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a "center word--context
-        # word" pair
+        # To form a "center word--context word" pair, each sentence needs to
+        # have at least 2 words
         if len(line) < 2:
             continue
         centers += line
@@ -2018,9 +2018,10 @@ def get_centers_and_contexts(corpus, max_window_size):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 class RandomGenerator:
-    """Draw a random integer in [0, n) according to n sampling weights."""
+    """Randomly draw among {1, ..., n} according to n sampling weights."""
     def __init__(self, sampling_weights):
-        self.population = list(range(len(sampling_weights)))
+        # Exclude
+        self.population = list(range(1, len(sampling_weights) + 1))
         self.sampling_weights = sampling_weights
         self.candidates = []
         self.i = 0
@@ -2037,9 +2038,10 @@ class RandomGenerator:
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def get_negatives(all_contexts, vocab, counter, K):
-    # Sampling weights for words with indices 0, 1, ... in the vocabulary
+    # Sampling weights for words with indices 1, 2, ... (index 0 is the
+    # excluded unknown token) in the vocabulary
     sampling_weights = [
-        counter[vocab.to_tokens(i)]**0.75 for i in range(len(counter))]
+        counter[vocab.to_tokens(i)]**0.75 for i in range(1, len(vocab))]
     all_negatives, generator = [], RandomGenerator(sampling_weights)
     for contexts in all_contexts:
         negatives = []

@@ -203,8 +203,8 @@ are its context words.
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a "center word--context
-        # word" pair
+        # To form a "center word--context word" pair, each sentence needs to
+        # have at least 2 words
         if len(line) < 2:
             continue
         centers += line
@@ -242,28 +242,21 @@ f'# center-context pairs: {sum([len(contexts) for contexts in all_contexts])}'
 
 ## Negative Sampling
 
-
 We use negative sampling for approximate training. 
-For a pair of center word and context word, 
-we randomly sample `K` (5 in the experiment) noise words. According to the suggestions in the word2vec paper,
-the sampling probability $P(w)$ of 
-a noise word $w$
-is 
-set to its relative frequency 
-in the dictionary
-raised to 
-the power of 0.75 :cite:`Mikolov.Sutskever.Chen.ea.2013`.
-
-
-We first define a class to draw a candidate according to the sampling weights. It caches a 10000 size random number bank instead of calling `random.choices` every time.
+To sample noise words according to 
+a predefined distribution,
+we define the following `RandomGenerator` class,
+where the (possibly unnormalized) sampling distribution is passed
+via the argument `sampling_weights`.
 
 ```{.python .input}
 #@tab all
 #@save
 class RandomGenerator:
-    """Draw a random integer in [0, n) according to n sampling weights."""
+    """Randomly draw among {1, ..., n} according to n sampling weights."""
     def __init__(self, sampling_weights):
-        self.population = list(range(len(sampling_weights)))
+        # Exclude 
+        self.population = list(range(1, len(sampling_weights) + 1))
         self.sampling_weights = sampling_weights
         self.candidates = []
         self.i = 0
@@ -276,18 +269,36 @@ class RandomGenerator:
             self.i = 0
         self.i += 1
         return self.candidates[self.i - 1]
+```
 
+For example, 
+we can draw 10 random variables $X$
+among indices 1, 2, and 3
+with sampling probabilities $P(X=1)=2/9, P(X=2)=3/9$, and $P(X=3)=4/9$ as follows.
+
+```{.python .input}
 generator = RandomGenerator([2, 3, 4])
 [generator.draw() for _ in range(10)]
 ```
+
+For a pair of center word and context word, 
+we randomly sample `K` (5 in the experiment) noise words. According to the suggestions in the word2vec paper,
+the sampling probability $P(w)$ of 
+a noise word $w$
+is 
+set to its relative frequency 
+in the dictionary
+raised to 
+the power of 0.75 :cite:`Mikolov.Sutskever.Chen.ea.2013`.
 
 ```{.python .input}
 #@tab all
 #@save
 def get_negatives(all_contexts, vocab, counter, K):
-    # Sampling weights for words with indices 0, 1, ... in the vocabulary
+    # Sampling weights for words with indices 1, 2, ... (index 0 is the
+    # excluded unknown token) in the vocabulary
     sampling_weights = [counter[vocab.to_tokens(i)]**0.75
-                        for i in range(len(counter))]
+                        for i in range(1, len(vocab))]
     all_negatives, generator = [], RandomGenerator(sampling_weights)
     for contexts in all_contexts:
         negatives = []

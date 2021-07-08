@@ -240,7 +240,7 @@ def get_similar_tokens(query_token, k, embed):
     cos = np.dot(W, x) / np.sqrt(np.sum(W * W, axis=1) * np.sum(x * x) + 1e-9)
     topk = npx.topk(cos, k=k+1, ret_typ='indices').asnumpy().astype('int32')
     for i in topk[1:]:  # Remove the input words
-        print(f'cosine sim={float(cos[i]):.3f}: {vocab.idx_to_token[i]}')
+        print(f'cosine sim={float(cos[i]):.3f}: {vocab.to_tokens(i)}')
 
 get_similar_tokens('chip', 3, net[0])
 ```
@@ -255,7 +255,7 @@ def get_similar_tokens(query_token, k, embed):
                                       torch.sum(x * x) + 1e-9)
     topk = torch.topk(cos, k=k+1)[1].cpu().numpy().astype('int32')
     for i in topk[1:]:  # Remove the input words
-        print(f'cosine sim={float(cos[i]):.3f}: {vocab.idx_to_token[i]}')
+        print(f'cosine sim={float(cos[i]):.3f}: {vocab.to_tokens(i)}')
 
 get_similar_tokens('chip', 3, net[0])
 ```
