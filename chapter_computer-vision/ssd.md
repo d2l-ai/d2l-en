@@ -79,7 +79,7 @@ the class and bounding box prediction.
 
 
 
-### (**Class Prediction Layer**)
+### [**Class Prediction Layer**]
 
 Let the number of object classes be $q$.
 Then anchor boxes have $q+1$ classes,

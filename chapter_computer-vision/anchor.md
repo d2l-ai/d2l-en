@@ -409,7 +409,7 @@ def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     return anchors_bbox_map
 ```
 
-### [**Labeling Classes and Offsets**]
+### Labeling Classes and Offsets
 
 Now we can label the class and offset for each anchor box. Suppose that an anchor box $A$ is assigned
 a ground-truth bounding box $B$. 
@@ -431,7 +431,7 @@ that may lead to
 more uniformly distributed offsets
 that are easier to fit.
 Here we describe a common transformation.
-Given the central coordinates of $A$ and $B$ as $(x_a, y_a)$ and $(x_b, y_b)$, 
+[**Given the central coordinates of $A$ and $B$ as $(x_a, y_a)$ and $(x_b, y_b)$, 
 their widths as $w_a$ and $w_b$, 
 and their heights as $h_a$ and $h_b$, respectively. 
 We may label the offset of $A$ as
@@ -440,7 +440,7 @@ $$\left( \frac{ \frac{x_b - x_a}{w_a} - \mu_x }{\sigma_x},
 \frac{ \frac{y_b - y_a}{h_a} - \mu_y }{\sigma_y},
 \frac{ \log \frac{w_b}{w_a} - \mu_w }{\sigma_w},
 \frac{ \log \frac{h_b}{h_a} - \mu_h }{\sigma_h}\right),$$
-
+**]
 where default values of the constants are $\mu_x = \mu_y = \mu_w = \mu_h = 0, \sigma_x=\sigma_y=0.1$, and $\sigma_w=\sigma_h=0.2$.
 This transformation is implemented below in the `offset_boxes` function.
 
@@ -461,7 +461,7 @@ If an anchor box is not assigned a ground-truth bounding box, we just label the 
 Anchor boxes whose classes are background are often referred to as *negative* anchor boxes,
 and the rest are called *positive* anchor boxes.
 We implement the following `multibox_target` function
-to label classes and offsets for anchor boxes (the `anchors` argument) using ground-truth bounding boxes (the `labels` argument).
+to [**label classes and offsets for anchor boxes**] (the `anchors` argument) using ground-truth bounding boxes (the `labels` argument).
 This function sets the background class to zero and increments the integer index of a new class by one.
 
 ```{.python .input}
