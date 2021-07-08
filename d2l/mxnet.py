@@ -520,17 +520,18 @@ class Vocab:
             reserved_tokens = []
         # Sort according to frequencies
         counter = count_corpus(tokens)
-        self.token_freqs = sorted(counter.items(), key=lambda x: x[1],
-                                  reverse=True)
+        token_freqs = sorted(counter.items(), key=lambda x: x[1],
+                             reverse=True)
         # The index for the unknown token is 0
-        self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
-        uniq_tokens += [
-            token for token, freq in self.token_freqs
-            if freq >= min_freq and token not in uniq_tokens]
-        self.idx_to_token, self.token_to_idx = [], dict()
-        for token in uniq_tokens:
-            self.idx_to_token.append(token)
-            self.token_to_idx[token] = len(self.idx_to_token) - 1
+        self.idx_to_token = ['<unk>'] + reserved_tokens
+        self.token_to_idx = {
+            token: idx for idx, token in enumerate(self.idx_to_token)}
+        for token, freq in token_freqs:
+            if freq < min_freq:
+                break
+            if token not in self.token_to_idx:
+                self.idx_to_token.append(token)
+                self.token_to_idx[token] = len(self.idx_to_token) - 1
 
     def __len__(self):
         return len(self.idx_to_token)
@@ -544,6 +545,10 @@ class Vocab:
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
+
+    @property
+    def unk(self):  # Index for the unknown token
+        return 0
 
 
 def count_corpus(tokens):
@@ -1560,15 +1565,15 @@ def multibox_prior(data, sizes, ratios):
 # Defined in file: ./chapter_computer-vision/anchor.md
 def show_bboxes(axes, bboxes, labels=None, colors=None):
     """Show bounding boxes."""
-    def _make_list(obj, default_values=None):
+    def make_list(obj, default_values=None):
         if obj is None:
             obj = default_values
         elif not isinstance(obj, (list, tuple)):
             obj = [obj]
         return obj
 
-    labels = _make_list(labels)
-    colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
+    labels = make_list(labels)
+    colors = make_list(colors, ['b', 'g', 'r', 'm', 'c'])
     for i, bbox in enumerate(bboxes):
         color = colors[i % len(colors)]
         rect = d2l.bbox_to_rect(d2l.numpy(bbox), color)
@@ -1976,13 +1981,13 @@ def read_ptb():
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def subsample(sentences, vocab):
-    # A raw token may be replaced by the '<unk>' token based on `vocab`
-    sentences = [[vocab.idx_to_token[vocab[token]] for token in line]
+    # Exclude unknown tokens '<unk>'
+    sentences = [[token for token in line if vocab[token] != vocab.unk]
                  for line in sentences]
     counter = d2l.count_corpus(sentences)
     num_tokens = sum(counter.values())
 
-    # Return `True` if `token` is kept during subsampling
+    # Return True if `token` is kept during subsampling
     def keep(token):
         return (random.uniform(0, 1) < math.sqrt(
             1e-4 / counter[token] * num_tokens))
@@ -1995,8 +2000,8 @@ def subsample(sentences, vocab):
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a "center word--context
-        # word" pair
+        # To form a "center word--context word" pair, each sentence needs to
+        # have at least 2 words
         if len(line) < 2:
             continue
         centers += line
@@ -2013,15 +2018,17 @@ def get_centers_and_contexts(corpus, max_window_size):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 class RandomGenerator:
-    """Draw a random integer in [0, n) according to n sampling weights."""
+    """Randomly draw among {1, ..., n} according to n sampling weights."""
     def __init__(self, sampling_weights):
-        self.population = list(range(len(sampling_weights)))
+        # Exclude
+        self.population = list(range(1, len(sampling_weights) + 1))
         self.sampling_weights = sampling_weights
         self.candidates = []
         self.i = 0
 
     def draw(self):
         if self.i == len(self.candidates):
+            # Cache `k` random sampling results
             self.candidates = random.choices(self.population,
                                              self.sampling_weights, k=10000)
             self.i = 0
@@ -2031,9 +2038,10 @@ class RandomGenerator:
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def get_negatives(all_contexts, vocab, counter, K):
-    # Sampling weights for words with indices 0, 1, ... in the vocabulary
+    # Sampling weights for words with indices 1, 2, ... (index 0 is the
+    # excluded unknown token) in the vocabulary
     sampling_weights = [
-        counter[vocab.idx_to_token[i]]**0.75 for i in range(len(counter))]
+        counter[vocab.to_tokens(i)]**0.75 for i in range(1, len(vocab))]
     all_negatives, generator = [], RandomGenerator(sampling_weights)
     for contexts in all_contexts:
         negatives = []
@@ -2063,7 +2071,6 @@ def batchify(data):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
-    num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
     subsampled, counter = subsample(sentences, vocab)
@@ -2074,9 +2081,9 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
                                   num_noise_words)
     dataset = gluon.data.ArrayDataset(all_centers, all_contexts,
                                       all_negatives)
-    data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
-                                      batchify_fn=batchify,
-                                      num_workers=num_workers)
+    data_iter = gluon.data.DataLoader(
+        dataset, batch_size, shuffle=True, batchify_fn=batchify,
+        num_workers=d2l.get_dataloader_workers())
     return data_iter, vocab
 
 

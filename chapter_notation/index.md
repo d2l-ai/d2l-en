@@ -62,7 +62,7 @@ The notation used throughout this book is summarized below.
 ## Probability and Information Theory
 
 * $P(\cdot)$: Probability distribution
-* $z \sim P$: Random variable $z$ has probability distribution $P$
+* $Z \sim P$: Random variable $Z$ has probability distribution $P$
 * $P(X \mid Y)$: Conditional probability of $X \mid Y$
 * $p(x)$: Probability density function
 * ${E}_{x} [f(x)]$: Expectation of $f$ with respect to $x$

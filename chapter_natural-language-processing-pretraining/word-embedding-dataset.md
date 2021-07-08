@@ -121,13 +121,13 @@ the greater the probability of being discarded.
 #@tab all
 #@save
 def subsample(sentences, vocab):
-    # A raw token may be replaced by the '<unk>' token based on `vocab`
-    sentences = [[vocab.idx_to_token[vocab[token]] for token in line]
+    # Exclude unknown tokens '<unk>'
+    sentences = [[token for token in line if vocab[token] != vocab.unk]
                  for line in sentences]
     counter = d2l.count_corpus(sentences)
     num_tokens = sum(counter.values())
 
-    # Return `True` if `token` is kept during subsampling
+    # Return True if `token` is kept during subsampling
     def keep(token):
         return(random.uniform(0, 1) <
                math.sqrt(1e-4 / counter[token] * num_tokens))
@@ -177,7 +177,7 @@ After subsampling, we map tokens to their indices for the corpus.
 
 ```{.python .input}
 #@tab all
-corpus = [vocab[l] for l in subsampled]
+corpus = [vocab[line] for line in subsampled]
 corpus[:3]
 ```
 
@@ -203,8 +203,8 @@ are its context words.
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
-        # Each sentence needs at least 2 words to form a "center word--context
-        # word" pair
+        # To form a "center word--context word" pair, each sentence needs to
+        # have at least 2 words
         if len(line) < 2:
             continue
         centers += line
@@ -242,8 +242,45 @@ f'# center-context pairs: {sum([len(contexts) for contexts in all_contexts])}'
 
 ## Negative Sampling
 
-
 We use negative sampling for approximate training. 
+To sample noise words according to 
+a predefined distribution,
+we define the following `RandomGenerator` class,
+where the (possibly unnormalized) sampling distribution is passed
+via the argument `sampling_weights`.
+
+```{.python .input}
+#@tab all
+#@save
+class RandomGenerator:
+    """Randomly draw among {1, ..., n} according to n sampling weights."""
+    def __init__(self, sampling_weights):
+        # Exclude 
+        self.population = list(range(1, len(sampling_weights) + 1))
+        self.sampling_weights = sampling_weights
+        self.candidates = []
+        self.i = 0
+
+    def draw(self):
+        if self.i == len(self.candidates):
+            # Cache `k` random sampling results
+            self.candidates = random.choices(
+                self.population, self.sampling_weights, k=10000)
+            self.i = 0
+        self.i += 1
+        return self.candidates[self.i - 1]
+```
+
+For example, 
+we can draw 10 random variables $X$
+among indices 1, 2, and 3
+with sampling probabilities $P(X=1)=2/9, P(X=2)=3/9$, and $P(X=3)=4/9$ as follows.
+
+```{.python .input}
+generator = RandomGenerator([2, 3, 4])
+[generator.draw() for _ in range(10)]
+```
+
 For a pair of center word and context word, 
 we randomly sample `K` (5 in the experiment) noise words. According to the suggestions in the word2vec paper,
 the sampling probability $P(w)$ of 
@@ -254,39 +291,14 @@ in the dictionary
 raised to 
 the power of 0.75 :cite:`Mikolov.Sutskever.Chen.ea.2013`.
 
-
-We first define a class to draw a candidate according to the sampling weights. It caches a 10000 size random number bank instead of calling `random.choices` every time.
-
-```{.python .input}
-#@tab all
-#@save
-class RandomGenerator:
-    """Draw a random integer in [0, n) according to n sampling weights."""
-    def __init__(self, sampling_weights):
-        self.population = list(range(len(sampling_weights)))
-        self.sampling_weights = sampling_weights
-        self.candidates = []
-        self.i = 0
-
-    def draw(self):
-        if self.i == len(self.candidates):
-            self.candidates = random.choices(
-                self.population, self.sampling_weights, k=10000)
-            self.i = 0
-        self.i += 1
-        return self.candidates[self.i - 1]
-
-generator = RandomGenerator([2, 3, 4])
-[generator.draw() for _ in range(10)]
-```
-
 ```{.python .input}
 #@tab all
 #@save
 def get_negatives(all_contexts, vocab, counter, K):
-    # Sampling weights for words with indices 0, 1, ... in the vocabulary
-    sampling_weights = [counter[vocab.idx_to_token[i]]**0.75
-                        for i in range(len(counter))]
+    # Sampling weights for words with indices 1, 2, ... (index 0 is the
+    # excluded unknown token) in the vocabulary
+    sampling_weights = [counter[vocab.to_tokens(i)]**0.75
+                        for i in range(1, len(vocab))]
     all_negatives, generator = [], RandomGenerator(sampling_weights)
     for contexts in all_contexts:
         negatives = []
@@ -321,8 +333,8 @@ def batchify(data):
         contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
         masks += [[1] * cur_len + [0] * (max_len - cur_len)]
         labels += [[1] * len(context) + [0] * (max_len - len(context))]
-    return (d2l.reshape(d2l.tensor(centers), (-1, 1)), d2l.tensor(contexts_negatives),
-            d2l.tensor(masks), d2l.tensor(labels))
+    return (d2l.reshape(d2l.tensor(centers), (-1, 1)), d2l.tensor(
+        contexts_negatives), d2l.tensor(masks), d2l.tensor(labels))
 ```
 
 Construct two simple examples:
@@ -347,7 +359,6 @@ Last, we define the `load_data_ptb` function that read the PTB dataset and retur
 ```{.python .input}
 #@save
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
-    num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
     subsampled, counter = subsample(sentences, vocab)
@@ -358,9 +369,9 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
         all_contexts, vocab, counter, num_noise_words)
     dataset = gluon.data.ArrayDataset(
         all_centers, all_contexts, all_negatives)
-    data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
-                                      batchify_fn=batchify,
-                                      num_workers=num_workers)
+    data_iter = gluon.data.DataLoader(
+        dataset, batch_size, shuffle=True,batchify_fn=batchify,
+        num_workers=d2l.get_dataloader_workers())
     return data_iter, vocab
 ```
 
@@ -378,7 +389,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     all_negatives = get_negatives(
         all_contexts, vocab, counter, num_noise_words)
 
-    class _PTBDataset(torch.utils.data.Dataset):
+    class PTBDataset(torch.utils.data.Dataset):
         def __init__(self, centers, contexts, negatives):
             assert len(centers) == len(contexts) == len(negatives)
             self.centers = centers
@@ -392,8 +403,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
         def __len__(self):
             return len(self.centers)
 
-    dataset = _PTBDataset(
-        all_centers, all_contexts, all_negatives)
+    dataset = PTBDataset(all_centers, all_contexts, all_negatives)
 
     data_iter = torch.utils.data.DataLoader(dataset, batch_size, shuffle=True,
                                       collate_fn=batchify,
