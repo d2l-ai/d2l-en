@@ -37,7 +37,7 @@ in subsequent sections,
 this section will convert this architecture
 into an interface that will be implemented later.
 
-## Encoder
+## (**Encoder**)
 
 In the encoder interface,
 we just specify that
@@ -86,7 +86,7 @@ class Encoder(tf.keras.layers.Layer):
         raise NotImplementedError
 ```
 
-## Decoder
+## [**Decoder**]
 
 In the following decoder interface,
 we add an additional `init_state` function
@@ -147,7 +147,7 @@ class Decoder(tf.keras.layers.Layer):
         raise NotImplementedError
 ```
 
-## Putting the Encoder and Decoder Together
+## [**Putting the Encoder and Decoder Together**]
 
 In the end,
 the encoder-decoder architecture

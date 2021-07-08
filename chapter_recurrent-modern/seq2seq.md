@@ -136,7 +136,7 @@ We can also construct encoders using bidirectional RNNs. In this case, a hidden 
 the subsequence before and after the time step (including the input at the current time step), which encodes the information of the entire sequence.
 
 
-Now let us implement the RNN encoder.
+Now let us [**implement the RNN encoder**].
 Note that we use an *embedding layer*
 to obtain the feature vector for each token in the input sequence.
 The weight
@@ -226,7 +226,7 @@ class Seq2SeqEncoder(d2l.Encoder):
 The returned variables of recurrent layers
 have been explained in :numref:`sec_rnn-concise`.
 Let us still use a concrete example
-to illustrate the above encoder implementation.
+to [**illustrate the above encoder implementation.**]
 Below
 we instantiate a two-layer GRU encoder
 whose number of hidden units is 16.
@@ -289,7 +289,7 @@ state.shape
 len(state), [element.shape for element in state]
 ```
 
-## Decoder
+## [**Decoder**]
 :label:`sec_seq2seq_decoder`
 
 As we just mentioned,
@@ -422,7 +422,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         return output, rnn_output[1:]
 ```
 
-To illustrate the implemented decoder,
+To [**illustrate the implemented decoder**],
 below we instantiate it with the same hyperparameters from the aforementioned encoder.
 As we can see, the output shape of the decoder becomes (batch size, number of time steps, vocabulary size),
 where the last dimension of the tensor stores the predicted token distribution.
@@ -480,7 +480,7 @@ should be excluded from loss calculations.
 To this end,
 we can use the following
 `sequence_mask` function
-to mask irrelevant entries with zero values
+to [**mask irrelevant entries with zero values**]
 so later
 multiplication of any irrelevant prediction
 with zero equals to zero.
@@ -530,8 +530,8 @@ X = tf.constant([[1, 2, 3], [4, 5, 6]])
 sequence_mask(X, tf.constant([1, 2]))
 ```
 
-We can also mask all the entries across the last
-few axes.
+(**We can also mask all the entries across the last
+few axes.**)
 If you like, you may even specify
 to replace such entries with a non-zero value.
 
@@ -552,8 +552,8 @@ X = tf.ones((2,3,4))
 sequence_mask(X, tf.constant([1, 2]), value=-1)
 ```
 
-Now we can extend the softmax cross-entropy loss
-to allow the masking of irrelevant predictions.
+Now we can [**extend the softmax cross-entropy loss
+to allow the masking of irrelevant predictions.**]
 Initially,
 masks for all the predicted tokens are set to one.
 Once the valid length is given,
@@ -618,7 +618,7 @@ class MaskedSoftmaxCELoss(tf.keras.losses.Loss):
         return weighted_loss
 ```
 
-For a sanity check, we can create three identical sequences.
+For [**a sanity check**], we can create three identical sequences.
 Then we can
 specify that the valid lengths of these sequences
 are 4, 2, and 0, respectively.
@@ -645,7 +645,7 @@ loss = MaskedSoftmaxCELoss(tf.constant([4, 2, 0]))
 loss(tf.ones((3,4), dtype = tf.int32), tf.ones((3, 4, 10))).numpy()
 ```
 
-## Training
+## [**Training**]
 :label:`sec_seq2seq_training`
 
 In the following training loop,
@@ -764,7 +764,7 @@ def train_seq2seq(net, data_iter, lr, num_epochs, tgt_vocab, device):
           f'tokens/sec on {str(device)}')
 ```
 
-Now we can create and train an RNN encoder-decoder model
+Now we can [**create and train an RNN encoder-decoder model**]
 for sequence to sequence learning on the machine translation dataset.
 
 ```{.python .input}
@@ -782,7 +782,7 @@ net = d2l.EncoderDecoder(encoder, decoder)
 train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
-## Prediction
+## [**Prediction**]
 
 To predict the output sequence
 token by token,
@@ -966,7 +966,7 @@ For example, when $k=2$,
 given the label sequence $A$, $B$, $C$, $D$, $E$, $F$ and the predicted sequence $A$, $B$,
 although $p_1 = p_2 = 1$, the penalty factor $\exp(1-6/2) \approx 0.14$ lowers the BLEU.
 
-We implement the BLEU measure as follows.
+We [**implement the BLEU measure**] as follows.
 
 ```{.python .input}
 #@tab all
@@ -989,7 +989,7 @@ def bleu(pred_seq, label_seq, k):  #@save
 
 In the end,
 we use the trained RNN encoder-decoder
-to translate a few English sentences into French
+to [**translate a few English sentences into French**]
 and compute the BLEU of the results.
 
 ```{.python .input}
