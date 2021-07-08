@@ -571,15 +571,19 @@ class Vocab:
             tokens = []
         if reserved_tokens is None:
             reserved_tokens = []
+        # Here `tokens` is a 1D list or 2D list
+        if len(tokens) == 0 or isinstance(tokens[0], list):
+            # Flatten a list of token lists into a list of tokens
+            tokens = [token for line in tokens for token in line]
+        self._counter = collections.Counter(tokens)
         # Sort according to frequencies
-        counter = count_corpus(tokens)
-        _token_freqs = sorted(counter.items(), key=lambda x: x[1],
-                              reverse=True)
+        token_freqs = sorted(self._counter.items(), key=lambda x: x[1],
+                             reverse=True)
         # The index for the unknown token is 0
         self.idx_to_token = ['<unk>'] + reserved_tokens
         self.token_to_idx = {
             token: idx for idx, token in enumerate(self.idx_to_token)}
-        for token, freq in _token_freqs:
+        for token, freq in token_freqs:
             if freq < min_freq:
                 break
             if token not in self.token_to_idx:
@@ -604,17 +608,8 @@ class Vocab:
         return 0
 
     @property
-    def token_freqs(self):
-        return _token_freqs
-
-
-def count_corpus(tokens):
-    """Count token frequencies."""
-    # Here `tokens` is a 1D list or 2D list
-    if len(tokens) == 0 or isinstance(tokens[0], list):
-        # Flatten a list of token lists into a list of tokens
-        tokens = [token for line in tokens for token in line]
-    return collections.Counter(tokens)
+    def counter(self):
+        return self._counter
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
