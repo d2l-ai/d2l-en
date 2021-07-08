@@ -37,7 +37,7 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-## Defining the Model
+## [**Defining the Model**]
 
 High-level APIs provide implementations of recurrent neural networks.
 We construct the recurrent neural network layer `rnn_layer` with a single hidden layer and 256 hidden units.
@@ -82,7 +82,7 @@ contains other information.
 :end_tab:
 
 :begin_tab:`pytorch`
-We use a tensor to initialize the hidden state,
+We (**use a tensor to initialize the hidden state**),
 whose shape is
 (number of hidden layers, batch size, number of hidden units).
 :end_tab:
@@ -104,9 +104,9 @@ state = rnn_cell.get_initial_state(batch_size=batch_size, dtype=tf.float32)
 state.shape
 ```
 
-With a hidden state and an input,
+[**With a hidden state and an input,
 we can compute the output with
-the updated hidden state.
+the updated hidden state.**]
 It should be emphasized that
 the "output" (`Y`) of `rnn_layer`
 does *not* involve computation of output layers:
@@ -154,8 +154,8 @@ Y.shape, len(state_new), state_new[0].shape
 ```
 
 Similar to :numref:`sec_rnn_scratch`,
-we define an `RNNModel` class
-for a complete RNN model.
+[**we define an `RNNModel` class
+for a complete RNN model.**]
 Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer.
 
 ```{.python .input}
@@ -249,7 +249,7 @@ class RNNModel(tf.keras.layers.Layer):
 
 ## Training and Predicting
 
-Before training the model, let us make a prediction with the a model that has random weights.
+Before training the model, let us [**make a prediction with the a model that has random weights.**]
 
 ```{.python .input}
 device = d2l.try_gpu()
@@ -276,7 +276,7 @@ with strategy.scope():
 d2l.predict_ch8('time traveller', 10, net, vocab)
 ```
 
-As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and train our model with high-level APIs.
+As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and [**train our model with high-level APIs**].
 
 ```{.python .input}
 num_epochs, lr = 500, 1

@@ -48,7 +48,7 @@ import re
 To get started we load text from H. G. Wells' [*The Time Machine*](http://www.gutenberg.org/ebooks/35).
 This is a fairly small corpus of just over 30000 words, but for the purpose of what we want to illustrate this is just fine.
 More realistic document collections contain many billions of words.
-The following function reads the dataset into a list of text lines, where each line is a string.
+The following function (**reads the dataset into a list of text lines**), where each line is a string.
 For simplicity, here we ignore punctuation and capitalization.
 
 ```{.python .input}
@@ -74,7 +74,7 @@ print(lines[10])
 The following `tokenize` function
 takes a list (`lines`) as the input,
 where each element is a text sequence (e.g., a text line).
-Each text sequence is split into a list of tokens.
+[**Each text sequence is split into a list of tokens**].
 A *token* is the basic unit in text.
 In the end,
 a list of token lists are returned,
@@ -99,7 +99,7 @@ for i in range(11):
 ## Vocabulary
 
 The string type of the token is inconvenient to be used by models, which take numerical inputs.
-Now let us build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0.
+Now let us [**build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0**].
 To do so, we first count the unique tokens in all the documents from the training set,
 namely a *corpus*,
 and then assign a numerical index to each unique token according to its frequency.
@@ -153,7 +153,7 @@ def count_corpus(tokens):  #@save
     return collections.Counter(tokens)
 ```
 
-We construct a vocabulary using the time machine dataset as the corpus. 
+We [**construct a vocabulary**] using the time machine dataset as the corpus. 
 Then we print the first few frequent tokens with their indices.
 
 ```{.python .input}
@@ -162,7 +162,7 @@ vocab = Vocab(tokens)
 print(list(vocab.token_to_idx.items())[:10])
 ```
 
-Now we can convert each text line into a list of numerical indices.
+Now we can (**convert each text line into a list of numerical indices**).
 
 ```{.python .input}
 #@tab all
@@ -173,7 +173,7 @@ for i in [0, 10]:
 
 ## Putting All Things Together
 
-Using the above functions, we package everything into the `load_corpus_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of the time machine corpus.
+Using the above functions, we [**package everything into the `load_corpus_time_machine` function**], which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of the time machine corpus.
 The modifications we did here are:
 i) we tokenize text into characters, not words, to simplify the training in later sections;
 ii) `corpus` is a single list, not a list of token lists, since each text line in the time machine dataset is not necessarily a sentence or a paragraph.
