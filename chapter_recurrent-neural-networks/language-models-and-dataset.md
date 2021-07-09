@@ -153,9 +153,7 @@ tokens = d2l.tokenize(d2l.read_time_machine())
 # concatenate all text lines 
 corpus = [token for line in tokens for token in line]
 vocab = d2l.Vocab(corpus)
-vocab_token_freqs = sorted(vocab.counter.items(), key=lambda x: x[1],
-                           reverse=True)
-vocab_token_freqs[:10]
+vocab.token_freqs[:10]
 ```
 
 As we can see, (**the most popular words are**) actually quite boring to look at.
@@ -165,7 +163,7 @@ Besides, it is quite clear that the word frequency decays rather rapidly. The $1
 
 ```{.python .input}
 #@tab all
-freqs = [freq for token, freq in vocab_token_freqs]
+freqs = [freq for token, freq in vocab.token_freqs]
 d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
          xscale='log', yscale='log')
 ```
@@ -191,9 +189,7 @@ Let us see whether the bigram frequency behaves in the same manner as the unigra
 #@tab all
 bigram_tokens = [pair for pair in zip(corpus[:-1], corpus[1:])]
 bigram_vocab = d2l.Vocab(bigram_tokens)
-bigram_vocab_token_freqs = sorted(bigram_vocab.counter.items(),
-                                  key=lambda x: x[1], reverse=True)
-bigram_vocab_token_freqs[:10]
+bigram_vocab.token_freqs[:10]
 ```
 
 One thing is notable here. Out of the ten most frequent word pairs, nine are composed of both stop words and only one is relevant to the actual book---"the time". Furthermore, let us see whether the trigram frequency behaves in the same manner.
@@ -203,17 +199,15 @@ One thing is notable here. Out of the ten most frequent word pairs, nine are com
 trigram_tokens = [triple for triple in zip(
     corpus[:-2], corpus[1:-1], corpus[2:])]
 trigram_vocab = d2l.Vocab(trigram_tokens)
-trigram_vocab_token_freqs = sorted(trigram_vocab.counter.items(),
-                                   key=lambda x: x[1], reverse=True)
-trigram_vocab_token_freqs[:10]
+trigram_vocab.token_freqs[:10]
 ```
 
 Last, let us [**visualize the token frequency**] among these three models: unigrams, bigrams, and trigrams.
 
 ```{.python .input}
 #@tab all
-bigram_freqs = [freq for token, freq in bigram_vocab_token_freqs]
-trigram_freqs = [freq for token, freq in trigram_vocab_token_freqs]
+bigram_freqs = [freq for token, freq in bigram_vocab.token_freqs]
+trigram_freqs = [freq for token, freq in trigram_vocab.token_freqs]
 d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token: x',
          ylabel='frequency: n(x)', xscale='log', yscale='log',
          legend=['unigram', 'bigram', 'trigram'])

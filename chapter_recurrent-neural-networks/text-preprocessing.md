@@ -118,19 +118,15 @@ class Vocab:  #@save
             tokens = []
         if reserved_tokens is None:
             reserved_tokens = [] 
-        # Here `tokens` is a 1D list or 2D list
-        if len(tokens) == 0 or isinstance(tokens[0], list):
-            # Flatten a list of token lists into a list of tokens
-            tokens = [token for line in tokens for token in line]
-        self._counter = collections.Counter(tokens)
         # Sort according to frequencies
-        token_freqs = sorted(self._counter.items(), key=lambda x: x[1],
-                             reverse=True)
+        counter = count_corpus(tokens)
+        self._token_freqs = sorted(counter.items(), key=lambda x: x[1],
+                                   reverse=True)
         # The index for the unknown token is 0
         self.idx_to_token = ['<unk>'] + reserved_tokens
         self.token_to_idx = {token: idx
                              for idx, token in enumerate(self.idx_to_token)}
-        for token, freq in token_freqs:
+        for token, freq in self._token_freqs:
             if freq < min_freq:
                 break
             if token not in self.token_to_idx:
@@ -155,8 +151,16 @@ class Vocab:  #@save
         return 0
     
     @property
-    def counter(self):
-        return self._counter
+    def token_freqs(self):  # Index for the unknown token
+        return self._token_freqs
+    
+def count_corpus(tokens):  #@save
+    """Count token frequencies."""
+    # Here `tokens` is a 1D list or 2D list
+    if len(tokens) == 0 or isinstance(tokens[0], list):
+        # Flatten a list of token lists into a list of tokens
+        tokens = [token for line in tokens for token in line]
+    return collections.Counter(tokens)
 ```
 
 We [**construct a vocabulary**] using the time machine dataset as the corpus. 
