@@ -1,10 +1,18 @@
 # Pretraining word2vec
 :label:`sec_word2vec_pretraining`
 
-In this section, we will train a skip-gram model defined in
-:numref:`sec_word2vec`.
 
-First, import the packages and modules required for the experiment, and load the PTB dataset.
+We go on to implement the skip-gram
+model defined in
+:numref:`sec_word2vec`.
+Then 
+we will pretrain word2vec using negative sampling
+on the PTB dataset.
+First of all,
+let us obtain the data iterator
+and the vocabulary for this dataset
+by calling the `d2l.load_data_ptb`
+function, which was described in :numref:`sec_word2vec_data`
 
 ```{.python .input}
 from d2l import mxnet as d2l
