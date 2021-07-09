@@ -637,7 +637,7 @@ computation(X, Y)
 
 ## Conversion to Other Python Objects
 :begin_tab:`mxnet, tensorflow`
-[**Converting to a NumPy array**], or vice versa, is easy.
+[**Converting to a NumPy tensor (`ndarray`)**], or vice versa, is easy.
 The converted result does not share memory.
 This minor inconvenience is actually quite important:
 when you perform operations on the CPU or on GPUs,
@@ -647,7 +647,7 @@ with the same chunk of memory.
 :end_tab:
 
 :begin_tab:`pytorch`
-[**Converting to a NumPy array**], or vice versa, is easy.
+[**Converting to a NumPy tensor (`ndarray`)**], or vice versa, is easy.
 The torch Tensor and numpy array will share their underlying memory
 locations, and changing one through an in-place operation will also
 change the other.
