@@ -138,7 +138,7 @@ class BananasDataset(torch.utils.data.Dataset):
 
 Finally, we define
 the `load_data_bananas` function to [**return two
-data loader instances for both the training and test sets.**]
+data iterator instances for both the training and test sets.**]
 For the test dataset,
 there is no need to read it in random order.
 
@@ -165,7 +165,7 @@ def load_data_bananas(batch_size):
     return train_iter, val_iter
 ```
 
-Let us [**read a minibatch and print the shapes of 
+Let us [**read a minibatch and print the shapes of
 both images and labels**] in this minibatch.
 The shape of the image minibatch,
 (batch size, number of channels, height, width),
@@ -181,7 +181,7 @@ it requires that all the image examples
 contain the same number of bounding boxes to form a minibatch via concatenation.
 In general,
 images may have a varying number of bounding boxes;
-thus, 
+thus,
 images with fewer than $m$ bounding boxes
 will be padded with illegal bounding boxes
 until $m$ is reached.

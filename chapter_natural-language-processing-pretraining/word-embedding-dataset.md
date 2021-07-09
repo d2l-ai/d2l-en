@@ -315,18 +315,54 @@ all_negatives = get_negatives(all_contexts, vocab, counter, 5)
 
 ## Loading Training Examples in Minibatches
 
-After extracting
+After
 all the center words
 together with their
-context words and sampled noise words,
-we will load training examples
-in minibatches as described below.
+context words and sampled noise words are extracted,
+they will be transformed into 
+minibatches of examples
+that can be iteratively loaded
+during training.
+
 
 
 In a minibatch,
-the $i^\mathrm{th}$ example includes a central word and its corresponding $n_i$ context words and $m_i$ noise words. Since the context window size of each example may be different, the sum of context words and noise words, $n_i+m_i$, will be different. When constructing a minibatch, we concatenate the context words and noise words of each example, and add 0s for padding until the length of the concatenations are the same, that is, the length of all concatenations is $\max_i n_i+m_i$(`max_len`). In order to avoid the effect of padding on the loss function calculation, we construct the mask variable `masks`, each element of which corresponds to an element in the concatenation of context and noise words, `contexts_negatives`. When an element in the variable `contexts_negatives` is a padding, the element in the mask variable `masks` at the same position will be 0. Otherwise, it takes the value 1. In order to distinguish between positive and negative examples, we also need to distinguish the context words from the noise words in the `contexts_negatives` variable. Based on the construction of the mask variable, we only need to create a label variable `labels` with the same shape as the `contexts_negatives` variable and set the elements corresponding to context words (positive examples) to 1, and the rest to 0.
+the $i^\mathrm{th}$ example includes a center word
+and its $n_i$ context words and $m_i$ noise words. 
+Due to varying context window sizes,
+$n_i+m_i$ varies for different $i$.
+Thus,
+for each example
+we concatenate its context words and noise words in 
+the `contexts_negatives` variable,
+and pad zeros until the concatenation length
+reaches $\max_i n_i+m_i$(`max_len`).
+To exclude paddings
+in the calculation of the loss,
+we define a mask variable `masks`.
+There is a one-to-one correspondence
+between elements in `masks` and elements in `contexts_negatives`,
+where zeros (otherwise ones) in `masks` correspond to paddings in `contexts_negatives`.
 
-Next, we will implement the minibatch reading function `batchify`. Its minibatch input `data` is a list whose length is the batch size, each element of which contains center words `center`, context words `context`, and noise words `negative`. The minibatch data returned by this function conforms to the format we need, for example, it includes the mask variable.
+
+To distinguish between positive and negative examples,
+we separate context words from noise words in  `contexts_negatives` via a `labels` variable. 
+Similar to `masks`,
+there is also a one-to-one correspondence
+between elements in `labels` and elements in `contexts_negatives`,
+where ones (otherwise zeros) in `labels` correspond to context words (positive examples) in `contexts_negatives`.
+
+
+The above idea is implemented in the following `batchify` function.
+Its input `data` is a list with length
+equal to the batch size,
+where each element is an example
+consisting of
+the center word `center`, its context words `context`, and its noise words `negative`.
+This function returns 
+a minibatch that can be loaded for calculations 
+during training,
+such as including the mask variable.
 
 ```{.python .input}
 #@tab all
@@ -344,7 +380,7 @@ def batchify(data):
         contexts_negatives), d2l.tensor(masks), d2l.tensor(labels))
 ```
 
-Construct two simple examples:
+Let us test this function using a minibatch of two examples.
 
 ```{.python .input}
 #@tab all
@@ -357,11 +393,9 @@ for name, data in zip(names, batch):
     print(name, '=', data)
 ```
 
-We use the `batchify` function just defined to specify the minibatch reading method in the `DataLoader` instance.
-
 ## Putting All Things Together
 
-Last, we define the `load_data_ptb` function that read the PTB dataset and return the data iterator.
+Last, we define the `load_data_ptb` function that reads the PTB dataset and returns the data iterator.
 
 ```{.python .input}
 #@save

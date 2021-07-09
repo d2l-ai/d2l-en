@@ -26,8 +26,9 @@ without *expensive* labeling efforts!
 
 As we will see in this chapter,
 when treating each word or subword as an individual token,
-the representation of each token can be pretrained on a large corpus,
-using word2vec, GloVe, or subword embedding models.
+the representation of each token can be pretrained
+using word2vec, GloVe, or subword embedding models
+on large corpora.
 After pretraining, representation of each token can be a vector,
 however, it remains the same no matter what the context is.
 For instance, the vector representation of "bank" is the same
