@@ -53,6 +53,7 @@ d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
 
 #@save
 def read_ptb():
+    """Load the PTB dataset into a list of text lines."""
     data_dir = d2l.download_extract('ptb')
     # Read the training set.
     with open(os.path.join(data_dir, 'ptb.train.txt')) as f:
@@ -121,6 +122,7 @@ the greater the probability of being discarded.
 #@tab all
 #@save
 def subsample(sentences, vocab):
+    """Subsample high-frequency words."""
     # Exclude unknown tokens '<unk>'
     sentences = [[token for token in line if vocab[token] != vocab.unk]
                  for line in sentences]
@@ -201,6 +203,7 @@ are its context words.
 #@tab all
 #@save
 def get_centers_and_contexts(corpus, max_window_size):
+    """Return center words and context words in skip-gram."""
     centers, contexts = [], []
     for line in corpus:
         # To form a "center word--context word" pair, each sentence needs to
@@ -295,6 +298,7 @@ the power of 0.75 :cite:`Mikolov.Sutskever.Chen.ea.2013`.
 #@tab all
 #@save
 def get_negatives(all_contexts, vocab, counter, K):
+    """Return noise words in negative sampling."""
     # Sampling weights for words with indices 1, 2, ... (index 0 is the
     # excluded unknown token) in the vocabulary
     sampling_weights = [counter[vocab.to_tokens(i)]**0.75
@@ -368,6 +372,7 @@ such as including the mask variable.
 #@tab all
 #@save
 def batchify(data):
+    """Return a minibatch of examples for skip-gram with negative sampling."""
     max_len = max(len(c) + len(n) for _, c, n in data)
     centers, contexts_negatives, masks, labels = [], [], [], []
     for center, context, negative in data:
@@ -395,11 +400,12 @@ for name, data in zip(names, batch):
 
 ## Putting All Things Together
 
-Last, we define the `load_data_ptb` function that reads the PTB dataset and returns the data iterator.
+Last, we define the `load_data_ptb` function that reads the PTB dataset and returns the data iterator and the vocabulary.
 
 ```{.python .input}
 #@save
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
+    """Download the PTB dataset and then load it into memory."""
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
     subsampled, counter = subsample(sentences, vocab)
@@ -420,6 +426,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 #@tab pytorch
 #@save
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
+    """Download the PTB dataset and then load it into memory."""
     num_workers = d2l.get_dataloader_workers()
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
@@ -465,12 +472,17 @@ for batch in data_iter:
 
 ## Summary
 
-* Subsampling attempts to minimize the impact of high-frequency words on the training of a word embedding model.
-* We can pad examples of different lengths to create minibatches with examples of all the same length and use mask variables to distinguish between padding and non-padding elements, so that only non-padding elements participate in the calculation of the loss function.
+* High-frequency words may not be so useful in training. We can subsample them for speedup in training.
+* For computational efficiency, we load examples in minibatches. We can define other variables to distinguish paddings from non-paddings, and positive examples from negative ones.
+
+
 
 ## Exercises
 
-1. We use the `batchify` function to specify the minibatch reading method in the `DataLoader` instance and print the shape of each variable in the first batch read. How should these shapes be calculated?
+1. How does the running time of code in this section changes if not using subsampling?
+1. The `RandomGenerator` class caches `k` random sampling results. Set `k` to other values and see how it affects the data loading speed.
+
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/383)
