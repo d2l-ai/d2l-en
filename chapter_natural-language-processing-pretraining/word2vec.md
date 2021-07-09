@@ -41,9 +41,23 @@ Since the cosine similarity between one-hot vectors of any two different words i
 one-hot vectors cannot encode similarities among words.
 
 
+## Self-Supervised word2vec
+
 The [word2vec](https://code.google.com/archive/p/word2vec/) tool was proposed to address the above issue. 
-It represents each word as a fixed-length vector, and  these vectors can better express the similarity and analogy relationship among different words. 
-The word2vec tool contains two models, namely *skip-gram* :cite:`Mikolov.Sutskever.Chen.ea.2013`  and *continuous bag of words* (CBOW) :cite:`Mikolov.Chen.Corrado.ea.2013`. In the following, we will introduce these two models and their training methods.
+It maps each word to a fixed-length vector, and  these vectors can better express the similarity and analogy relationship among different words. 
+The word2vec tool contains two models, namely *skip-gram* :cite:`Mikolov.Sutskever.Chen.ea.2013`  and *continuous bag of words* (CBOW) :cite:`Mikolov.Chen.Corrado.ea.2013`. 
+For semantically meaningful representations,
+their training relies on
+conditional probabilities
+that can be viewed as predicting
+some words using some of their surrounding words
+in corpora.
+Since supervision comes from the data without labels,
+both skip-gram and continuous bag of words
+are self-supervised models.
+
+In the following, we will introduce these two models and their training methods.
+
 
 ## The Skip-Gram Model
 

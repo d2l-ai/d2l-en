@@ -9,9 +9,23 @@ Given rich text in social media, chat apps, emails, product reviews, news articl
 *Natural language processing* studies interactions between computers and humans using natural languages.
 In practice, it is very common to use natural language processing techniques to process and analyze text (human natural language) data, such as language models in :numref:`sec_language_model` and machine translation models in :numref:`sec_machine_translation`.
 
-To understand text, we can begin with its representation,
-such as treating each word or subword as an individual (text) token.
+To understand text, we can begin by learning
+its representations.
+Leveraging the existing text sequences
+from large corpora,
+*self-supervised learning*
+has been extensively
+used to pretrain text representations,
+such as by predicting some hidden part of the text
+using some other part of their surrounding text.
+In this way,
+models learn through supervision
+from *massive* text data
+without *expensive* labeling efforts!
+
+
 As we will see in this chapter,
+when treating each word or subword as an individual token,
 the representation of each token can be pretrained on a large corpus,
 using word2vec, GloVe, or subword embedding models.
 After pretraining, representation of each token can be a vector,
@@ -23,7 +37,7 @@ and
 "go to the bank to sit down".
 Thus, many more recent pretraining models adapt representation of the same token
 to different contexts.
-Among them is BERT, a much deeper model based on the transformer encoder.
+Among them is BERT, a much deeper self-supervised model based on the transformer encoder.
 In this chapter, we will focus on how to pretrain such representations for text,
 as highlighted in :numref:`fig_nlp-map-pretrain`.
 
