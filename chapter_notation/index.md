@@ -84,7 +84,7 @@ represent scalar values.
 * $X \perp Y$: random variables $X$ and $Y$ are independent
 * $X \perp Y \mid Z$: random variables  $X$  and  $Y$ are conditionally independent given $Z$
 * $\sigma_X$: standard deviation of random variable $X$
-* $\mathrm{Var}(X)$: variance of random variable $X$ qual to $\sigma^2_X$
+* $\mathrm{Var}(X)$: variance of random variable $X$, equal to $\sigma^2_X$
 * $\mathrm{Cov}(X, Y)$: covariance of random variables $X$ and $Y$
 * $\rho(X, Y)$: the Pearson correlation coefficient between $X$ and $Y$, equals $\frac{\mathrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
 * $H(X)$: Entropy of random variable $X$
