@@ -91,10 +91,4 @@ represent scalar values.
 * $D_{\mathrm{KL}}(P\|Q)$: the KL-divergence (or relative entropy) from distribution $Q$ to distribution $P$
 
 
-
-## Complexity
-
-* $\mathcal{O}$: Big O notation
-
-
 [Discussions](https://discuss.d2l.ai/t/25)
