@@ -59,8 +59,8 @@ represent scalar values.
 * $\|\cdot\|_p$: $L_p$ norm
 * $\|\cdot\|$: $L_2$ norm
 * $\langle \mathbf{x}, \mathbf{y} \rangle$: dot product of vectors $\mathbf{x}$ and $\mathbf{y}$
-* $\sum_i=1^n$: summation over collection with indices ranging from $1$ to $n$
-* $\prod$: product over collection with indices ranging from $1$ to $n$
+* $\sum: summation over a collection of elements
+* $\prod$: product over a collection of elements
 * $\stackrel{\mathrm{def}}{=}$: an equality asserted as a definition of the symbol on the left-hand side
 
 
@@ -87,7 +87,7 @@ represent scalar values.
 * $\mathrm{Var}(X)$: variance of random variable $X$, equal to $\sigma^2_X$
 * $\mathrm{Cov}(X, Y)$: covariance of random variables $X$ and $Y$
 * $\rho(X, Y)$: the Pearson correlation coefficient between $X$ and $Y$, equals $\frac{\mathrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
-* $H(X)$: Entropy of random variable $X$
+* $H(X)$: entropy of random variable $X$
 * $D_{\mathrm{KL}}(P\|Q)$: the KL-divergence (or relative entropy) from distribution $Q$ to distribution $P$
 
 
