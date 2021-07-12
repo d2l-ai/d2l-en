@@ -1,7 +1,7 @@
 # Notation
 :label:`chap_notation`
 
-Throughout this book, we adhere to the following notatinoal conventions.
+Throughout this book, we adhere to the following notational conventions.
 Note that some of these symbols are placeholders,
 while others refer to specific objects.
 As a general rule of thumb, 
