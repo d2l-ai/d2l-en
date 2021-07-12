@@ -9,7 +9,7 @@ In this competition,
 In fact,
 the dataset for this competition is
 a subset of the ImageNet dataset.
-Unlike the images in the CIFAR-10 dataset in :numref:`sec_kaggle_cifar10`, 
+Unlike the images in the CIFAR-10 dataset in :numref:`sec_kaggle_cifar10`,
 the images in the ImageNet dataset are both higher and wider in varying dimensions.
 :numref:`fig_kaggle_dog` shows the information on the competition's webpage. You need a Kaggle account
 to submit your results.
@@ -49,8 +49,8 @@ such as Labradors, Poodles, Dachshunds, Samoyeds, Huskies, Chihuahuas, and Yorks
 ### Downloading the Dataset
 
 After logging into Kaggle,
-you can click on the "Data" tab on the 
-competition webpage shown in :numref:`fig_kaggle_dog` and download the dataset by clicking the "Download All" button. 
+you can click on the "Data" tab on the
+competition webpage shown in :numref:`fig_kaggle_dog` and download the dataset by clicking the "Download All" button.
 After unzipping the downloaded file in `../data`, you will find the entire dataset in the following paths:
 
 * ../data/dog-breed-identification/labels.csv
@@ -66,7 +66,7 @@ If you are going to use the full dataset for the Kaggle competition, you need to
 
 ```{.python .input}
 #@tab all
-#@save 
+#@save
 d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '0cb91d09b814ecdc07b50f31f8dcad3e81d6a86d')
 
@@ -107,7 +107,7 @@ is a subset of the ImageNet dataset,
 whose images
 are larger than those of the CIFAR-10 dataset
 in :numref:`sec_kaggle_cifar10`.
-The following 
+The following
 lists a few image augmentation operations
 that might be useful for relatively larger images.
 
@@ -200,21 +200,21 @@ valid_ds, test_ds = [torchvision.datasets.ImageFolder(
     transform=transform_test) for folder in ['valid', 'test']]
 ```
 
-Below we create data loader instances
+Below we create data iterator instances
 the same way
 as in :numref:`sec_kaggle_cifar10`.
 
 ```{.python .input}
 train_iter, train_valid_iter = [gluon.data.DataLoader(
-    dataset.transform_first(transform_train), batch_size, shuffle=True, 
+    dataset.transform_first(transform_train), batch_size, shuffle=True,
     last_batch='discard') for dataset in (train_ds, train_valid_ds)]
 
 valid_iter = gluon.data.DataLoader(
-    valid_ds.transform_first(transform_test), batch_size, shuffle=False, 
+    valid_ds.transform_first(transform_test), batch_size, shuffle=False,
     last_batch='discard')
 
 test_iter = gluon.data.DataLoader(
-    test_ds.transform_first(transform_test), batch_size, shuffle=False, 
+    test_ds.transform_first(transform_test), batch_size, shuffle=False,
     last_batch='keep')
 ```
 
@@ -234,12 +234,12 @@ test_iter = torch.utils.data.DataLoader(test_ds, batch_size, shuffle=False,
 ## [**Fine-Tuning a Pretrained Model**]
 
 Again,
-the dataset for this competition is a subset of the ImageNet dataset. 
+the dataset for this competition is a subset of the ImageNet dataset.
 Therefore, we can use the approach discussed in
 :numref:`sec_fine_tuning`
 to select a model pretrained on the
 full ImageNet dataset and use it to extract image features to be fed into a
-custom small-scale output network. 
+custom small-scale output network.
 High-level APIs of deep learning frameworks
 provide a wide range of models
 pretrained on the ImageNet dataset.
@@ -254,8 +254,8 @@ output network that can be trained,
 such as stacking two
 fully-connected layers.
 Different from the experiment in
-:numref:`sec_fine_tuning`, 
-the following does 
+:numref:`sec_fine_tuning`,
+the following does
 not retrain the pretrained model used for feature
 extraction. This reduces training time and
 memory for storing gradients.
@@ -263,7 +263,7 @@ memory for storing gradients.
 Recall that we
 standardized images using
 the means and standard deviations of the three RGB channels for the full ImageNet dataset.
-In fact, 
+In fact,
 this is also consistent with the standardization operation
 by the pretrained model on ImageNet.
 
@@ -370,7 +370,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
             metric.add(sum([float(l.sum()) for l in ls]), labels.shape[0])
             timer.stop()
             if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
-                animator.add(epoch + (i + 1) / num_batches, 
+                animator.add(epoch + (i + 1) / num_batches,
                              (metric[0] / metric[1], None))
         if valid_iter is not None:
             valid_loss = evaluate_loss(valid_iter, net, devices)
@@ -411,7 +411,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,
             metric.add(l, labels.shape[0])
             timer.stop()
             if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
-                animator.add(epoch + (i + 1) / num_batches, 
+                animator.add(epoch + (i + 1) / num_batches,
                              (metric[0] / metric[1], None))
         measures = f'train loss {metric[0] / metric[1]:.3f}'
         if valid_iter is not None:
@@ -495,14 +495,14 @@ with open('submission.csv', 'w') as f:
 
 The above code
 will generate a `submission.csv` file
-to be submitted 
+to be submitted
 to Kaggle in the same way described in :numref:`sec_kaggle_house`.
 
 
 ## Summary
 
 
-* Images in the ImageNet dataset are larger (with varying dimensions) than CIFAR-10 images. We may modify image augmentation operations for tasks on a different dataset. 
+* Images in the ImageNet dataset are larger (with varying dimensions) than CIFAR-10 images. We may modify image augmentation operations for tasks on a different dataset.
 * To classify a subset of the ImageNet dataset, we can leverage pre-trained models on the full ImageNet dataset to extract features and only train a custom small-scale output network. This will lead to less computational time and memory cost.
 
 

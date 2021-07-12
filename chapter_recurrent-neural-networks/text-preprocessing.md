@@ -48,7 +48,7 @@ import re
 To get started we load text from H. G. Wells' [*The Time Machine*](http://www.gutenberg.org/ebooks/35).
 This is a fairly small corpus of just over 30000 words, but for the purpose of what we want to illustrate this is just fine.
 More realistic document collections contain many billions of words.
-The following function reads the dataset into a list of text lines, where each line is a string.
+The following function (**reads the dataset into a list of text lines**), where each line is a string.
 For simplicity, here we ignore punctuation and capitalization.
 
 ```{.python .input}
@@ -74,7 +74,7 @@ print(lines[10])
 The following `tokenize` function
 takes a list (`lines`) as the input,
 where each element is a text sequence (e.g., a text line).
-Each text sequence is split into a list of tokens.
+[**Each text sequence is split into a list of tokens**].
 A *token* is the basic unit in text.
 In the end,
 a list of token lists are returned,
@@ -99,7 +99,7 @@ for i in range(11):
 ## Vocabulary
 
 The string type of the token is inconvenient to be used by models, which take numerical inputs.
-Now let us build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0.
+Now let us [**build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0**].
 To do so, we first count the unique tokens in all the documents from the training set,
 namely a *corpus*,
 and then assign a numerical index to each unique token according to its frequency.
@@ -120,16 +120,18 @@ class Vocab:  #@save
             reserved_tokens = [] 
         # Sort according to frequencies
         counter = count_corpus(tokens)
-        self.token_freqs = sorted(counter.items(), key=lambda x: x[1],
-                                  reverse=True)
+        self._token_freqs = sorted(counter.items(), key=lambda x: x[1],
+                                   reverse=True)
         # The index for the unknown token is 0
-        self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
-        uniq_tokens += [token for token, freq in self.token_freqs
-                        if freq >= min_freq and token not in uniq_tokens]
-        self.idx_to_token, self.token_to_idx = [], dict()
-        for token in uniq_tokens:
-            self.idx_to_token.append(token)
-            self.token_to_idx[token] = len(self.idx_to_token) - 1
+        self.idx_to_token = ['<unk>'] + reserved_tokens
+        self.token_to_idx = {token: idx
+                             for idx, token in enumerate(self.idx_to_token)}
+        for token, freq in self._token_freqs:
+            if freq < min_freq:
+                break
+            if token not in self.token_to_idx:
+                self.idx_to_token.append(token)
+                self.token_to_idx[token] = len(self.idx_to_token) - 1
 
     def __len__(self):
         return len(self.idx_to_token)
@@ -143,7 +145,15 @@ class Vocab:  #@save
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
-
+    
+    @property
+    def unk(self):  # Index for the unknown token
+        return 0
+    
+    @property
+    def token_freqs(self):  # Index for the unknown token
+        return self._token_freqs
+    
 def count_corpus(tokens):  #@save
     """Count token frequencies."""
     # Here `tokens` is a 1D list or 2D list
@@ -153,7 +163,7 @@ def count_corpus(tokens):  #@save
     return collections.Counter(tokens)
 ```
 
-We construct a vocabulary using the time machine dataset as the corpus. 
+We [**construct a vocabulary**] using the time machine dataset as the corpus. 
 Then we print the first few frequent tokens with their indices.
 
 ```{.python .input}
@@ -162,7 +172,7 @@ vocab = Vocab(tokens)
 print(list(vocab.token_to_idx.items())[:10])
 ```
 
-Now we can convert each text line into a list of numerical indices.
+Now we can (**convert each text line into a list of numerical indices**).
 
 ```{.python .input}
 #@tab all
@@ -173,7 +183,7 @@ for i in [0, 10]:
 
 ## Putting All Things Together
 
-Using the above functions, we package everything into the `load_corpus_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of the time machine corpus.
+Using the above functions, we [**package everything into the `load_corpus_time_machine` function**], which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of the time machine corpus.
 The modifications we did here are:
 i) we tokenize text into characters, not words, to simplify the training in later sections;
 ii) `corpus` is a single list, not a list of token lists, since each text line in the time machine dataset is not necessarily a sentence or a paragraph.

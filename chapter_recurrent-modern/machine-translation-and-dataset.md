@@ -79,7 +79,7 @@ import tensorflow as tf
 import os
 ```
 
-## Downloading and Preprocessing the Dataset
+## [**Downloading and Preprocessing the Dataset**]
 
 To begin with,
 we download an English-French dataset
@@ -113,7 +113,7 @@ print(raw_text[:75])
 ```
 
 After downloading the dataset,
-we proceed with several preprocessing steps
+we [**proceed with several preprocessing steps**]
 for the raw text data.
 For instance,
 we replace non-breaking space with space,
@@ -140,7 +140,7 @@ text = preprocess_nmt(raw_text)
 print(text[:80])
 ```
 
-## Tokenization
+## [**Tokenization**]
 
 Different from character-level tokenization
 in :numref:`sec_language_model`,
@@ -176,22 +176,29 @@ source, target = tokenize_nmt(text)
 source[:6], target[:6]
 ```
 
-Let us plot the histogram of the number of tokens per text sequence.
+Let us [**plot the histogram of the number of tokens per text sequence.**]
 In this simple English-French dataset,
 most of the text sequences have fewer than 20 tokens.
 
 ```{.python .input}
 #@tab all
-d2l.set_figsize()
-_, _, patches = d2l.plt.hist(
-    [[len(l) for l in source], [len(l) for l in target]],
-    label=['source', 'target'])
-for patch in patches[1].patches:
-    patch.set_hatch('/')
-d2l.plt.legend(loc='upper right');
+#@save
+def show_list_len_pair_hist(legend, xlabel, ylabel, xlist, ylist):
+    """Plot the histogram for list length pairs."""
+    d2l.set_figsize()
+    _, _, patches = d2l.plt.hist(
+        [[len(l) for l in xlist], [len(l) for l in ylist]])
+    d2l.plt.xlabel(xlabel)
+    d2l.plt.ylabel(ylabel)
+    for patch in patches[1].patches:
+        patch.set_hatch('/')
+    d2l.plt.legend(legend)
+
+show_list_len_pair_hist(['source', 'target'], '# tokens per sequence',
+                        'count', source, target);
 ```
 
-## Vocabulary
+## [**Vocabulary**]
 
 Since the machine translation dataset
 consists of pairs of languages,
@@ -223,10 +230,10 @@ len(src_vocab)
 :label:`subsec_mt_data_loading`
 
 Recall that in language modeling
-each sequence example,
+[**each sequence example**],
 either a segment of one sentence
 or a span over multiple sentences,
-has a fixed length.
+(**has a fixed length.**)
 This was specified by the `num_steps`
 (number of time steps or tokens) argument in :numref:`sec_language_model`.
 In machine translation, each example is
@@ -251,7 +258,7 @@ will have the same length
 to be loaded in minibatches of the same shape.
 
 The following `truncate_pad` function
-truncates or pads text sequences as described before.
+(**truncates or pads text sequences**) as described before.
 
 ```{.python .input}
 #@tab all
@@ -265,8 +272,8 @@ def truncate_pad(line, num_steps, padding_token):
 truncate_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])
 ```
 
-Now we define a function to transform
-text sequences into minibatches for training.
+Now we define a function to [**transform
+text sequences into minibatches for training.**]
 We append the special “&lt;eos&gt;” token
 to the end of every sequence to indicate the
 end of the sequence.
@@ -298,7 +305,7 @@ def build_array_nmt(lines, vocab, num_steps):
     return array, valid_len
 ```
 
-## Putting All Things Together
+## [**Putting All Things Together**]
 
 Finally, we define the `load_data_nmt` function
 to return the data iterator, together with
@@ -322,7 +329,7 @@ def load_data_nmt(batch_size, num_steps, num_examples=600):
     return data_iter, src_vocab, tgt_vocab
 ```
 
-Let us read the first minibatch from the English-French dataset.
+Let us [**read the first minibatch from the English-French dataset.**]
 
 ```{.python .input}
 #@tab all

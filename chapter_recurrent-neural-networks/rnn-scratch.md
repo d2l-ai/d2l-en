@@ -48,7 +48,7 @@ train_random_iter, vocab_random_iter = d2l.load_data_time_machine(
     batch_size, num_steps, use_random_iter=True)
 ```
 
-## One-Hot Encoding
+## [**One-Hot Encoding**]
 
 Recall that each token is represented as a numerical index in `train_iter`.
 Feeding these indices directly to a neural network might make it hard to
@@ -76,8 +76,8 @@ F.one_hot(torch.tensor([0, 2]), len(vocab))
 tf.one_hot(tf.constant([0, 2]), len(vocab))
 ```
 
-The shape of the minibatch that we sample each time is (batch size, number of time steps).
-The `one_hot` function transforms such a minibatch into a three-dimensional tensor with the last dimension equals to the vocabulary size (`len(vocab)`).
+(**The shape of the minibatch**) that we sample each time (**is (batch size, number of time steps).
+The `one_hot` function transforms such a minibatch into a three-dimensional tensor with the last dimension equals to the vocabulary size (`len(vocab)`).**)
 We often transpose the input so that we will obtain an
 output of shape
 (number of time steps, batch size, vocabulary size).
@@ -106,8 +106,8 @@ tf.one_hot(tf.transpose(X), 28).shape
 
 ## Initializing the Model Parameters
 
-Next, we initialize the model parameters for
-the RNN model.
+Next, we [**initialize the model parameters for
+the RNN model**].
 The number of hidden units `num_hiddens` is a tunable hyperparameter.
 When training language models,
 the inputs and outputs are from the same vocabulary.
@@ -179,8 +179,8 @@ def get_params(vocab_size, num_hiddens):
 ## RNN Model
 
 To define an RNN model,
-we first need an `init_rnn_state` function
-to return the hidden state at initialization.
+we first need [**an `init_rnn_state` function
+to return the hidden state at initialization.**]
 It returns a tensor filled with 0 and with a shape of (batch size, number of hidden units).
 Using tuples makes it easier to handle situations where the hidden state contains multiple variables,
 which we will encounter in later sections.
@@ -202,8 +202,8 @@ def init_rnn_state(batch_size, num_hiddens):
     return (d2l.zeros((batch_size, num_hiddens)), )
 ```
 
-The following `rnn` function defines how to compute the hidden state and output
-at a time step.
+[**The following `rnn` function defines how to compute the hidden state and output
+at a time step.**]
 Note that
 the RNN model
 loops through the outermost dimension of `inputs`
@@ -262,7 +262,7 @@ def rnn(inputs, state, params):
 ```
 
 With all the needed functions being defined,
-next we create a class to wrap these functions and store parameters for an RNN model implemented from scratch.
+next we [**create a class to wrap these functions and store parameters**] for an RNN model implemented from scratch.
 
 ```{.python .input}
 class RNNModelScratch:  #@save
@@ -318,7 +318,7 @@ class RNNModelScratch: #@save
         return self.init_state(batch_size, self.num_hiddens)
 ```
 
-Let us check whether the outputs have the correct shapes, e.g., to ensure that the dimensionality of the hidden state remains unchanged.
+Let us [**check whether the outputs have the correct shapes**], e.g., to ensure that the dimensionality of the hidden state remains unchanged.
 
 ```{.python .input}
 #@tab mxnet
@@ -360,9 +360,9 @@ We can see that the output shape is (number of time steps $\times$ batch size, v
 
 ## Prediction
 
-Let us first define the prediction function
+Let us [**first define the prediction function
 to generate new characters following
-the user-provided `prefix`,
+the user-provided `prefix`**],
 which is a string containing several characters.
 When looping through these beginning characters in `prefix`,
 we keep passing the hidden state
@@ -441,7 +441,7 @@ predict_ch8('time traveller ', 10, net, vocab, d2l.try_gpu())
 predict_ch8('time traveller ', 10, net, vocab)
 ```
 
-## Gradient Clipping
+## [**Gradient Clipping**]
 
 For a sequence of length $T$,
 we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $\mathcal{O}(T)$ during backpropagation.
@@ -478,7 +478,7 @@ it limits the extent to which things can go wrong if we move in the wrong direct
 
 Sometimes the gradients can be quite large and the optimization algorithm may fail to converge. We could address this by reducing the learning rate $\eta$. But what if we only *rarely* get large gradients? In this case such an approach may appear entirely unwarranted. One popular alternative is to clip the gradient $\mathbf{g}$ by projecting them back to a ball of a given radius, say $\theta$ via
 
-$$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$
+(**$$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$**)
 
 By doing so we know that the gradient norm never exceeds $\theta$ and that the
 updated gradient is entirely aligned with the original direction of $\mathbf{g}$.
@@ -543,7 +543,7 @@ def grad_clipping(grads, theta):  #@save
 ## Training
 
 Before training the model,
-let us define a function to train the model in one epoch. It differs from how we train the model of :numref:`sec_softmax_scratch` in three places:
+let us [**define a function to train the model in one epoch**]. It differs from how we train the model of :numref:`sec_softmax_scratch` in three places:
 
 1. Different sampling methods for sequential data (random sampling and sequential partitioning) will result in differences in the initialization of hidden states.
 1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
@@ -673,10 +673,10 @@ def train_epoch_ch8(net, train_iter, loss, updater, use_random_iter):
     return math.exp(metric[0] / metric[1]), metric[1] / timer.stop()
 ```
 
-The training function supports
+[**The training function supports
 an RNN model implemented
 either from scratch
-or using high-level APIs.
+or using high-level APIs.**]
 
 ```{.python .input}
 def train_ch8(net, train_iter, vocab, lr, num_epochs, device,  #@save
@@ -758,7 +758,7 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, strategy,
     print(predict('traveller'))
 ```
 
-Now we can train the RNN model.
+[**Now we can train the RNN model.**]
 Since we only use 10000 tokens in the dataset, the model needs more epochs to converge better.
 
 ```{.python .input}
@@ -773,8 +773,8 @@ num_epochs, lr = 500, 1
 train_ch8(net, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
-Finally,
-let us check the results of using the random sampling method.
+[**Finally,
+let us check the results of using the random sampling method.**]
 
 ```{.python .input}
 #@tab mxnet,pytorch

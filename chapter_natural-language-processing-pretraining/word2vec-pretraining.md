@@ -1,10 +1,18 @@
 # Pretraining word2vec
 :label:`sec_word2vec_pretraining`
 
-In this section, we will train a skip-gram model defined in
-:numref:`sec_word2vec`.
 
-First, import the packages and modules required for the experiment, and load the PTB dataset.
+We go on to implement the skip-gram
+model defined in
+:numref:`sec_word2vec`.
+Then 
+we will pretrain word2vec using negative sampling
+on the PTB dataset.
+First of all,
+let us obtain the data iterator
+and the vocabulary for this dataset
+by calling the `d2l.load_data_ptb`
+function, which was described in :numref:`sec_word2vec_data`
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -47,7 +55,7 @@ embed.weight
 #@tab pytorch
 embed = nn.Embedding(num_embeddings=20, embedding_dim=4)
 print(f'Parameter embedding_weight ({embed.weight.shape}, '
-      'dtype={embed.weight.dtype})')
+      f'dtype={embed.weight.dtype})')
 ```
 
 The input of the embedding layer is the index of the word. When we enter the index $i$ of a word, the embedding layer returns the $i^\mathrm{th}$ row of the weight matrix as its word vector. Below we enter an index of shape ($2$, $3$) into the embedding layer. Because the dimension of the word vector is 4, we obtain a word vector of shape ($2$, $3$, $4$).
@@ -224,7 +232,7 @@ Now, we can train a skip-gram model using negative sampling.
 
 ```{.python .input}
 #@tab all
-lr, num_epochs = 0.01, 5
+lr, num_epochs = 0.002, 5
 train(net, data_iter, lr, num_epochs)
 ```
 
@@ -240,7 +248,7 @@ def get_similar_tokens(query_token, k, embed):
     cos = np.dot(W, x) / np.sqrt(np.sum(W * W, axis=1) * np.sum(x * x) + 1e-9)
     topk = npx.topk(cos, k=k+1, ret_typ='indices').asnumpy().astype('int32')
     for i in topk[1:]:  # Remove the input words
-        print(f'cosine sim={float(cos[i]):.3f}: {vocab.idx_to_token[i]}')
+        print(f'cosine sim={float(cos[i]):.3f}: {vocab.to_tokens(i)}')
 
 get_similar_tokens('chip', 3, net[0])
 ```
@@ -255,7 +263,7 @@ def get_similar_tokens(query_token, k, embed):
                                       torch.sum(x * x) + 1e-9)
     topk = torch.topk(cos, k=k+1)[1].cpu().numpy().astype('int32')
     for i in topk[1:]:  # Remove the input words
-        print(f'cosine sim={float(cos[i]):.3f}: {vocab.idx_to_token[i]}')
+        print(f'cosine sim={float(cos[i]):.3f}: {vocab.to_tokens(i)}')
 
 get_similar_tokens('chip', 3, net[0])
 ```

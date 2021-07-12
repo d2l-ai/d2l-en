@@ -192,7 +192,7 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-### Initializing Model Parameters
+### (**Initializing Model Parameters**)
 
 The next step is to initialize the model parameters.
 We draw the weights from a Gaussian distribution
@@ -276,7 +276,7 @@ def get_params(vocab_size, num_hiddens):
 
 ### Defining the Model
 
-Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns a tensor with a shape (batch size, number of hidden units) whose values are all zeros.
+Now we will define [**the hidden state initialization function**] `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns a tensor with a shape (batch size, number of hidden units) whose values are all zeros.
 
 ```{.python .input}
 def init_gru_state(batch_size, num_hiddens, device):
@@ -295,7 +295,7 @@ def init_gru_state(batch_size, num_hiddens):
     return (d2l.zeros((batch_size, num_hiddens)), )
 ```
 
-Now we are ready to define the GRU model.
+Now we are ready to [**define the GRU model**].
 Its structure is the same as that of the basic RNN cell, except that the update equations are more complex.
 
 ```{.python .input}
@@ -348,7 +348,7 @@ def gru(inputs, state, params):
 
 ### Training and Prediction
 
-Training and prediction work in exactly the same manner as in :numref:`sec_rnn_scratch`.
+[**Training**] and prediction work in exactly the same manner as in :numref:`sec_rnn_scratch`.
 After training,
 we print out the perplexity on the training set
 and the predicted sequence following
@@ -375,7 +375,7 @@ with strategy.scope():
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
-## Concise Implementation
+## [**Concise Implementation**]
 
 In high-level APIs,
 we can directly

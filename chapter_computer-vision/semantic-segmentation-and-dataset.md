@@ -28,7 +28,7 @@ in semantic segmentation are obviously more fine-grained.
 
 There are also two important tasks
 in the field of computer vision that are similar to semantic segmentation,
-namely image segmentation and instance segmentation. 
+namely image segmentation and instance segmentation.
 We will briefly
 distinguish them from semantic segmentation as follows.
 
@@ -228,10 +228,10 @@ y[105:115, 130:140], VOC_CLASSES[1]
 
 In previous experiments
 such as in :numref:`sec_alexnet`--:numref:`sec_googlenet`,
-images are rescaled 
+images are rescaled
 to fit the model's required input shape.
 However, in semantic segmentation,
-doing so 
+doing so
 requires rescaling the predicted pixel classes
 back to the original shape of the input image.
 Such rescaling may be inaccurate,
@@ -375,7 +375,7 @@ voc_test = VOCSegDataset(False, crop_size, voc_dir)
 ```
 
 Setting the batch size to 64,
-we define the data loader for the training set.
+we define the data iterator for the training set.
 Let us print the shape of the first minibatch.
 Different from in image classification or object detection, labels here are three-dimensional tensors.
 
@@ -405,8 +405,8 @@ for X, Y in train_iter:
 ### [**Putting All Things Together**]
 
 Finally, we define the following `load_data_voc` function
-to download and read the Pascal VOC2012 semantic segmentation dataset. 
-It returns data loaders for both the training and test datasets.
+to download and read the Pascal VOC2012 semantic segmentation dataset.
+It returns data iterators for both the training and test datasets.
 
 ```{.python .input}
 #@save
@@ -450,7 +450,7 @@ def load_data_voc(batch_size, crop_size):
 
 ## Exercises
 
-1. How can semantic segmentation be applied in autonomous vehicles and medical image diagnostics? Can you think of other applications? 
+1. How can semantic segmentation be applied in autonomous vehicles and medical image diagnostics? Can you think of other applications?
 1. Recall the descriptions of data augmentation in :numref:`sec_image_augmentation`. Which of the image augmentation methods used in image classification would be infeasible to be applied in semantic segmentation?
 
 

@@ -99,8 +99,8 @@ while the additional output layer will be trained from scratch.
 
 
 BERT further improved the state of the art on eleven natural language processing tasks
-under broad categories of i) single text classification (e.g., sentiment analysis), ii) text pair classification (e.g., natural language inference),
-iii) question answering, iv) text tagging (e.g., named entity recognition).
+under broad categories of (i) single text classification (e.g., sentiment analysis), (ii) text pair classification (e.g., natural language inference),
+(iii) question answering, (iv) text tagging (e.g., named entity recognition).
 All proposed in 2018,
 from context-sensitive ELMo to task-agnostic GPT and BERT,
 conceptually simple yet empirically powerful pretraining of deep representations for natural languages have revolutionized solutions to various natural language processing tasks.
@@ -305,7 +305,7 @@ As illustrated in :numref:`sec_language_model`,
 a language model predicts a token using the context on its left.
 To encode context bidirectionally for representing each token,
 BERT randomly masks tokens and uses tokens from the bidirectional context to
-predict the masked tokens.
+predict the masked tokens in a self-supervised fashion.
 This task is referred to as a *masked language model*.
 
 In this pretraining task,

@@ -41,9 +41,23 @@ Since the cosine similarity between one-hot vectors of any two different words i
 one-hot vectors cannot encode similarities among words.
 
 
+## Self-Supervised word2vec
+
 The [word2vec](https://code.google.com/archive/p/word2vec/) tool was proposed to address the above issue. 
-It represents each word as a fixed-length vector, and  these vectors can better express the similarity and analogy relationship among different words. 
-The word2vec tool contains two models, namely *skip-gram* :cite:`Mikolov.Sutskever.Chen.ea.2013`  and *continuous bag of words* (CBOW) :cite:`Mikolov.Chen.Corrado.ea.2013`. In the following, we will introduce these two models and their training methods.
+It maps each word to a fixed-length vector, and  these vectors can better express the similarity and analogy relationship among different words. 
+The word2vec tool contains two models, namely *skip-gram* :cite:`Mikolov.Sutskever.Chen.ea.2013`  and *continuous bag of words* (CBOW) :cite:`Mikolov.Chen.Corrado.ea.2013`. 
+For semantically meaningful representations,
+their training relies on
+conditional probabilities
+that can be viewed as predicting
+some words using some of their surrounding words
+in corpora.
+Since supervision comes from the data without labels,
+both skip-gram and continuous bag of words
+are self-supervised models.
+
+In the following, we will introduce these two models and their training methods.
+
 
 ## The Skip-Gram Model
 
@@ -122,17 +136,17 @@ involving any pair of the center word $w_c$ and
 the context word $w_o$ is
 
 
-$$\log P(w_o \mid w_c) =
-\mathbf{u}_o^\top \mathbf{v}_c - \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right).$$
+$$\log P(w_o \mid w_c) =\mathbf{u}_o^\top \mathbf{v}_c - \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right).$$
+:eqlabel:`eq_skip-gram-log`
 
 Through differentiation, we can obtain its gradient 
 with respect to the center word vector $\mathbf{v}_c$ as
 
 $$\begin{aligned}\frac{\partial \text{log}\, P(w_o \mid w_c)}{\partial \mathbf{v}_c}&= \mathbf{u}_o - \frac{\sum_{j \in \mathcal{V}} \exp(\mathbf{u}_j^\top \mathbf{v}_c)\mathbf{u}_j}{\sum_{i \in \mathcal{V}} \exp(\mathbf{u}_i^\top \mathbf{v}_c)}\\&= \mathbf{u}_o - \sum_{j \in \mathcal{V}} \left(\frac{\text{exp}(\mathbf{u}_j^\top \mathbf{v}_c)}{ \sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)}\right) \mathbf{u}_j\\&= \mathbf{u}_o - \sum_{j \in \mathcal{V}} P(w_j \mid w_c) \mathbf{u}_j.\end{aligned}$$
-:eqlabel:`skip-gram-grad`
+:eqlabel:`eq_skip-gram-grad`
 
 
-Note that the calculation in :eqref:`skip-gram-grad` requires the conditional probabilities of all words in the dictionary with $w_c$ as the center word.
+Note that the calculation in :eqref:`eq_skip-gram-grad` requires the conditional probabilities of all words in the dictionary with $w_c$ as the center word.
 The gradients for the other word vectors can be obtained in the same way.
 
 

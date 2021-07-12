@@ -956,8 +956,7 @@ real-world knowledge and the prior state of the conversation
 across long temporal distances.
 These are active areas of research.
 
-
-### Unsupervised learning
+### Unsupervised and Self-Supervised Learning
 
 All the examples so far were related to supervised learning,
 i.e., situations where we feed the model a giant dataset
@@ -1011,14 +1010,39 @@ For instance, if we have demographic data
 about house prices, pollution, crime, location,
 education, and salaries, can we discover
 how they are related simply based on empirical data?
-The fields concerned with *causality* and
-*probabilistic graphical models* address this problem.
+The fields concerned with *causality* and *probabilistic graphical models* address this problem.
 * Another important and exciting recent development in unsupervised learning
 is the advent of *generative adversarial networks*.
 These give us a procedural way to synthesize data,
 even complicated structured data like images and audio.
 The underlying statistical mechanisms are tests
 to check whether real and fake data are the same.
+
+As a form of unsupervised learning,
+*self-supervised learning*
+leverages unlabeled data 
+to provide supervision in training,
+such as by
+predicting some withheld part of the data
+using other parts.
+For text,
+we can train models 
+to "fill in the blanks"
+by predicting randomly masked words
+using their surrounding words (contexts)
+in big corpora without any labeling effort :cite:`Devlin.Chang.Lee.ea.2018`!
+For images,
+we may train models
+to tell the relative position
+between two cropped regions
+of the same image :cite:`Doersch.Gupta.Efros.2015`.
+In these two examples of self-supervised learning,
+training models to predict
+possible words and relative positions
+are both classification tasks
+(from supervised learning).
+
+
 
 ### Interacting with an Environment
 
