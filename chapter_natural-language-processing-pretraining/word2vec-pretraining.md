@@ -5,7 +5,7 @@
 We go on to implement the skip-gram
 model defined in
 :numref:`sec_word2vec`.
-Then 
+Then
 we will pretrain word2vec using negative sampling
 on the PTB dataset.
 First of all,
@@ -38,12 +38,22 @@ data_iter, vocab = d2l.load_data_ptb(batch_size, max_window_size,
 
 ## The Skip-Gram Model
 
-We will implement the skip-gram model by using embedding layers and minibatch multiplication. These methods are also often used to implement other natural language processing applications.
+We implement the skip-gram model
+by using embedding layers and batch matrix multiplications.
+First, let us review
+how embedding layers work.
+
 
 ### Embedding Layer
 
 As described in :numref:`sec_seq2seq`,
-The layer in which the obtained word is embedded is called the embedding layer, which can be obtained by creating an `nn.Embedding` instance in high-level APIs. The weight of the embedding layer is a matrix whose number of rows is the dictionary size (`input_dim`) and whose number of columns is the dimension of each word vector (`output_dim`). We set the dictionary size to $20$ and the word vector dimension to $4$.
+an embedding layer
+maps a token's index to its feature vector.
+The weight of this layer
+is a matrix whose number of rows equals to
+the dictionary size (`input_dim`) and
+number of columns equals to
+the vector dimension for each token (`output_dim`).
 
 ```{.python .input}
 embed = nn.Embedding(input_dim=20, output_dim=4)
@@ -58,7 +68,19 @@ print(f'Parameter embedding_weight ({embed.weight.shape}, '
       f'dtype={embed.weight.dtype})')
 ```
 
-The input of the embedding layer is the index of the word. When we enter the index $i$ of a word, the embedding layer returns the $i^\mathrm{th}$ row of the weight matrix as its word vector. Below we enter an index of shape ($2$, $3$) into the embedding layer. Because the dimension of the word vector is 4, we obtain a word vector of shape ($2$, $3$, $4$).
+The input of an embedding layer is the
+index of a token (word).
+For any token index $i$,
+its vector representation
+can be obtained from
+the $i^\mathrm{th}$ row of the weight matrix
+in the embedding layer.
+Since the vector dimension (`output_dim`)
+was set to 4,
+the embedding layer
+returns vectors with shape (2, 3, 4)
+for a minibatch of token indices with shape
+(2, 3).
 
 ```{.python .input}
 #@tab all
@@ -66,9 +88,27 @@ x = d2l.tensor([[1, 2, 3], [4, 5, 6]])
 embed(x)
 ```
 
-### Skip-gram Model Forward Calculation
+### Defining the Forward Propagation
 
-In forward calculation, the input of the skip-gram model contains the central target word index `center` and the concatenated context and noise word index `contexts_and_negatives`. In which, the `center` variable has the shape (batch size, 1), while the `contexts_and_negatives` variable has the shape (batch size, `max_len`). These two variables are first transformed from word indexes to word vectors by the word embedding layer, and then the output of shape (batch size, 1, `max_len`) is obtained by minibatch multiplication. Each element in the output is the inner product of the central target word vector and the context word vector or noise word vector.
+In the forward propagation,
+the input of the skip-gram model
+includes
+the center word indices `center`
+of shape (batch size, 1)
+and
+the concatenated context and noise word indices `contexts_and_negatives`
+of shape (batch size, `max_len`),
+where `max_len`
+is defined
+in :numref:`subsec_word2vec-minibatch-loading`.
+These two variables are first transformed from the
+token indices into vectors via the embedding layer,
+then their batch matrix multiplication
+(described in :numref:`subsec_batch_dot`)
+returns
+an output of shape (batch size, 1, `max_len`).
+Each element in the output is the dot product of
+a center word vector and a context or noise word vector.
 
 ```{.python .input}
 def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
@@ -87,7 +127,7 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
     return pred
 ```
 
-Verify that the output shape should be (batch size, 1, `max_len`).
+Let us print the output shape of this `skip_gram` function for some example inputs.
 
 ```{.python .input}
 skip_gram(np.ones((2, 1)), np.ones((2, 4)), embed, embed).shape

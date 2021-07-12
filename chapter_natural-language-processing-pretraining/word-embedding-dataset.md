@@ -318,6 +318,7 @@ all_negatives = get_negatives(all_contexts, vocab, counter, 5)
 ```
 
 ## Loading Training Examples in Minibatches
+:label:`subsec_word2vec-minibatch-loading`
 
 After
 all the center words
@@ -340,7 +341,7 @@ for each example
 we concatenate its context words and noise words in 
 the `contexts_negatives` variable,
 and pad zeros until the concatenation length
-reaches $\max_i n_i+m_i$(`max_len`).
+reaches $\max_i n_i+m_i$ (`max_len`).
 To exclude paddings
 in the calculation of the loss,
 we define a mask variable `masks`.
