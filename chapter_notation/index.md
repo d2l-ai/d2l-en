@@ -59,7 +59,7 @@ represent scalar values.
 * $\|\cdot\|_p$: $L_p$ norm
 * $\|\cdot\|$: $L_2$ norm
 * $\langle \mathbf{x}, \mathbf{y} \rangle$: dot product of vectors $\mathbf{x}$ and $\mathbf{y}$
-* $\sum: summation over a collection of elements
+* $\sum$: summation over a collection of elements
 * $\prod$: product over a collection of elements
 * $\stackrel{\mathrm{def}}{=}$: an equality asserted as a definition of the symbol on the left-hand side
 
