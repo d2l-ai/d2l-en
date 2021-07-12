@@ -169,7 +169,7 @@ to encode text sequences.
 
 
 
-## Training a Bidirectional RNN for a Wrong Application
+## (**Training a Bidirectional RNN for a Wrong Application**)
 
 If we were to ignore all advice regarding the fact that bidirectional RNNs use past and future data and simply apply it to language models, 
 we will get estimates with acceptable perplexity. Nonetheless, the ability of the model to predict future tokens is severely compromised as the experiment below illustrates. 

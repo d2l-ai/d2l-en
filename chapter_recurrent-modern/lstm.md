@@ -154,7 +154,7 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-### Initializing Model Parameters
+### [**Initializing Model Parameters**]
 
 Next we need to define and initialize the model parameters. As previously, the hyperparameter `num_hiddens` defines the number of hidden units. We initialize weights following a Gaussian distribution with 0.01 standard deviation, and we set the biases to 0.
 
@@ -241,7 +241,7 @@ def get_lstm_params(vocab_size, num_hiddens):
 
 ### Defining the Model
 
-In the initialization function, the hidden state of the LSTM needs to return an *additional* memory cell with a value of 0 and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
+In [**the initialization function**], the hidden state of the LSTM needs to return an *additional* memory cell with a value of 0 and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
 
 ```{.python .input}
 def init_lstm_state(batch_size, num_hiddens, device):
@@ -263,7 +263,7 @@ def init_lstm_state(batch_size, num_hiddens):
             tf.zeros(shape=(batch_size, num_hiddens)))
 ```
 
-The actual model is defined just like what we discussed before: providing three gates and an auxiliary memory cell. Note that only the hidden state is passed to the output layer. The memory cell $\mathbf{C}_t$ does not directly participate in the output computation.
+[**The actual model**] is defined just like what we discussed before: providing three gates and an auxiliary memory cell. Note that only the hidden state is passed to the output layer. The memory cell $\mathbf{C}_t$ does not directly participate in the output computation.
 
 ```{.python .input}
 def lstm(inputs, state, params):
@@ -321,7 +321,7 @@ def lstm(inputs, state, params):
     return tf.concat(outputs, axis=0), (H,C)
 ```
 
-### Training and Prediction
+### [**Training**] and Prediction
 
 Let us train an LSTM as same as what we did in :numref:`sec_gru`, by instantiating the `RNNModelScratch` class as introduced in :numref:`sec_rnn_scratch`.
 
@@ -344,7 +344,7 @@ with strategy.scope():
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
-## Concise Implementation
+## [**Concise Implementation**]
 
 Using high-level APIs,
 we can directly instantiate an `LSTM` model.

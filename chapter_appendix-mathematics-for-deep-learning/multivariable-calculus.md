@@ -9,7 +9,7 @@ What :numref:`sec_single_variable_calculus` tells us is that if we change a sing
 $$L(w_1+\epsilon_1, w_2, \ldots, w_N) \approx L(w_1, w_2, \ldots, w_N) + \epsilon_1 \frac{d}{dw_1} L(w_1, w_2, \ldots, w_N).$$
 :eqlabel:`eq_part_der`
 
-We will call the derivative in one variable while fixing the other the *partial derivative*, and we will use the notation $\frac{\partial}{\partial w_1}$ for the derivative in :eqref:`eq_part_der`.
+We will call the derivative in one variable while fixing the other variables the *partial derivative*, and we will use the notation $\frac{\partial}{\partial w_1}$ for the derivative in :eqref:`eq_part_der`.
 
 Now, let us take this and change $w_2$ a little bit to $w_2 + \epsilon_2$:
 
@@ -137,7 +137,7 @@ f'approximation: {grad_approx}, true Value: {true_value}'
 ```
 
 ## Geometry of Gradients and Gradient Descent
-Consider the again :eqref:`eq_nabla_use`:
+Consider the expression from :eqref:`eq_nabla_use` again:
 
 $$
 L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).

@@ -50,7 +50,8 @@ represent scalar values.
 * $\log(\cdot)$: the natural logarithm (base $e$)
 * $\log_2(\cdot)$: logarithm with base $2$
 * $\exp(\cdot)$: the exponential function
-* $\mathbf{1}_{\mathcal{X}}(z)$: the indicator function, evaluates to $1$ if the element $z$ belongs to the set $\mathcal{X}$ and $0$ otherwise
+* $\mathbf{1}(\cdot)$: the indicator function, evaluates to $1$ if the boolean argument is true and $0$ otherwise
+* $\mathbf{1}_{\mathcal{X}}(z)$: the set-membership indicator function, evaluates to $1$ if the element $z$ belongs to the set $\mathcal{X}$ and $0$ otherwise
 * $\mathbf{(\cdot)}^\top$: transpose of a vector or a matrix
 * $\mathbf{X}^{-1}$: inverse of matrix $\mathbf{X}$
 * $\odot$: Hadamard (elementwise) product
