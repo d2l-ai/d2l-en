@@ -88,7 +88,7 @@ represent scalar values.
 * $\mathrm{Cov}(X, Y)$: covariance of random variables $X$ and $Y$
 * $\rho(X, Y)$: the Pearson correlation coefficient between $X$ and $Y$, equals $\frac{\mathrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
 * $H(X)$: Entropy of random variable $X$
-* $D_{\mathrm{KL}}(P\|Q)$: the KL-divergence (or relative entropy) from distribution $Q$ to distribution $P$---measures the cost incurred for coding samples from $P$ with a scheme optimized for $Q$.
+* $D_{\mathrm{KL}}(P\|Q)$: the KL-divergence (or relative entropy) from distribution $Q$ to distribution $P$
 
 
 
