@@ -408,7 +408,7 @@ mlm_Y_hat.shape
 ```
 
 With the ground truth labels `mlm_Y` of the predicted tokens `mlm_Y_hat` under masks,
-we can calculate the cross entropy loss of the masked language model task in BERT pretraining.
+we can calculate the cross-entropy loss of the masked language model task in BERT pretraining.
 
 ```{.python .input}
 mlm_Y = np.array([[7, 8, 9], [10, 20, 30]])
