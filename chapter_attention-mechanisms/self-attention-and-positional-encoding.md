@@ -280,7 +280,7 @@ class PositionalEncoding(tf.keras.layers.Layer):
 
 In the positional embedding matrix $\mathbf{P}$,
 [**rows correspond to positions within a sequence
-and columns represent different positional encoding dimensions**]
+and columns represent different positional encoding dimensions**].
 In the example below,
 we can see that
 the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$
