@@ -1,7 +1,36 @@
 # Word Embedding with Global Vectors (GloVe)
 :label:`sec_glove`
 
-First, we should review the skip-gram model in word2vec.  The conditional probability $P(w_j\mid w_i)$ expressed in the skip-gram model using the softmax operation will be recorded as $q_{ij}$, that is:
+
+Word-word co-occurrences 
+within context windows
+may carry rich semantic information.
+For example,
+in a large corpus
+word "solid" is
+more likely to co-occur
+with "ice" than "steam",
+but word "gas"
+probably co-occur with "steam"
+more frequently than "ice".
+Besides,
+global statistics
+of such co-occurrences
+can be precomputed:
+this can lead to more efficient training.
+To leverage statistical
+information in the entire corpus
+for word embedding,
+let us first revisit
+the skip-gram model in :numref:`subsec_skip-gram`,
+interpreting it
+from the perspective of global statistics
+of co-occurrences.
+
+
+## Skip-Gram with Global Statistics
+
+The conditional probability $P(w_j\mid w_i)$ expressed in the skip-gram model using the softmax operation will be recorded as $q_{ij}$, that is:
 
 $$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \text{exp}(\mathbf{u}_k^\top \mathbf{v}_i)},$$
 

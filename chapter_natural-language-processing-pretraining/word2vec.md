@@ -60,6 +60,7 @@ In the following, we will introduce these two models and their training methods.
 
 
 ## The Skip-Gram Model
+:label:`subsec_skip-gram`
 
 The *skip-gram* model assumes that a word can be used to generate its surrounding words in a text sequence.
 Take the text sequence "the", "man", "loves", "his", "son" as an example.
