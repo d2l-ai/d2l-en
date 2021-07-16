@@ -857,7 +857,7 @@ For example,
 we considered predicting house prices from a fixed set of features: square footage, number of bedrooms,
 number of bathrooms, walking time to downtown.
 We also discussed mapping from an image (of fixed dimension)
-to the predicted probabilities that it belongs to each
+to the predicted probabilities that it assigns to each
 of a fixed number of classes, or taking a user ID and a product ID,
 and predicting a star rating. In these cases,
 once we feed our fixed-length input
@@ -1127,7 +1127,7 @@ Finally, the agent receives a reward from the environment.
 This process is illustrated in :numref:`fig_rl-environment`.
 The agent then receives a subsequent observation,
 and chooses a subsequent action, and so on.
-The behavior of an reinforcement learning agent is governed by a policy.
+The behavior of a reinforcement learning agent is governed by a policy.
 In short, a *policy* is just a function that maps
 from observations of the environment to actions.
 The goal of reinforcement learning is to produce a good policy.
