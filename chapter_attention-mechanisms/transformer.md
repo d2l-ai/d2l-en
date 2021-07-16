@@ -130,7 +130,7 @@ import pandas as pd
 import tensorflow as tf
 ```
 
-## Positionwise Feed-Forward Networks
+## [**Positionwise Feed-Forward Networks**]
 
 The positionwise feed-forward network
 transforms
@@ -190,8 +190,8 @@ class PositionWiseFFN(tf.keras.layers.Layer):
 ```
 
 The following example
-shows that the innermost dimension
-of a tensor changes to
+shows that [**the innermost dimension
+of a tensor changes**] to
 the number of outputs in
 the positionwise feed-forward network.
 Since the same MLP transforms
@@ -245,8 +245,8 @@ tasks, whose inputs are often
 variable-length sequences.
 
 The following code snippet
-compares the normalization across different dimensions
-by layer normalization and batch normalization.
+[**compares the normalization across different dimensions
+by layer normalization and batch normalization**].
 
 ```{.python .input}
 ln = nn.LayerNorm()
@@ -277,7 +277,7 @@ print('layer norm:', ln(X), '\nbatch norm:', bn(X, training=True))
 ```
 
 Now we can implement the `AddNorm` class
-using a residual connection followed by layer normalization.
+[**using a residual connection followed by layer normalization**].
 Dropout is also applied for regularization.
 
 ```{.python .input}
@@ -323,7 +323,7 @@ class AddNorm(tf.keras.layers.Layer):
 
 The residual connection requires that
 the two inputs are of the same shape
-so that the output tensor also has the same shape after the addition operation.
+so that [**the output tensor also has the same shape after the addition operation**].
 
 ```{.python .input}
 add_norm = AddNorm(0.5)
@@ -349,7 +349,7 @@ add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)), training=False).shape
 With all the essential components to assemble
 the transformer encoder,
 let us start by
-implementing a single layer within the encoder.
+implementing [**a single layer within the encoder**].
 The following `EncoderBlock` class
 contains two sublayers: multi-head self-attention and positionwise feed-forward networks,
 where a residual connection followed by layer normalization is employed
@@ -415,8 +415,8 @@ class EncoderBlock(tf.keras.layers.Layer):
 ```
 
 As we can see,
-any layer in the transformer encoder
-does not change the shape of its input.
+[**any layer in the transformer encoder
+does not change the shape of its input.**]
 
 ```{.python .input}
 X = d2l.ones((2, 100, 24))
@@ -444,7 +444,7 @@ encoder_blk = EncoderBlock(24, 24, 24, 24, norm_shape, 48, 8, 0.5)
 encoder_blk(X, valid_lens, training=False).shape
 ```
 
-In the following transformer encoder implementation,
+In the following [**transformer encoder**] implementation,
 we stack `num_layers` instances of the above `EncoderBlock` classes.
 Since we use the fixed positional encoding
 whose values are always between -1 and 1,
@@ -544,7 +544,7 @@ class TransformerEncoder(d2l.Encoder):
         return X
 ```
 
-Below we specify hyperparameters to create a two-layer transformer encoder.
+Below we specify hyperparameters to [**create a two-layer transformer encoder**].
 The shape of the transformer encoder output
 is (batch size, number of time steps, `num_hiddens`).
 
@@ -571,8 +571,8 @@ encoder(tf.ones((2, 100)), valid_lens, training=False).shape
 ## Decoder
 
 As shown in :numref:`fig_transformer`,
-the transformer decoder
-is composed of multiple identical layers.
+[**the transformer decoder
+is composed of multiple identical layers**].
 Each layer is implemented in the following
 `DecoderBlock` class,
 which contains three sublayers:
@@ -755,8 +755,8 @@ class DecoderBlock(tf.keras.layers.Layer):
 To facilitate scaled dot-product operations
 in the encoder-decoder attention
 and addition operations in the residual connections,
-the feature dimension (`num_hiddens`) of the decoder is
-the same as that of the encoder.
+[**the feature dimension (`num_hiddens`) of the decoder is
+the same as that of the encoder.**]
 
 ```{.python .input}
 decoder_blk = DecoderBlock(24, 48, 8, 0.5, 0)
@@ -783,7 +783,7 @@ state = [encoder_blk(X, valid_lens), valid_lens, [None]]
 decoder_blk(X, state, training=False)[0].shape
 ```
 
-Now we construct the entire transformer decoder
+Now we [**construct the entire transformer decoder**]
 composed of `num_layers` instances of `DecoderBlock`.
 In the end,
 a fully-connected layer computes the prediction
@@ -902,7 +902,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
         return self._attention_weights
 ```
 
-## Training
+## [**Training**]
 
 Let us instantiate an encoder-decoder model
 by following the transformer architecture.
@@ -973,7 +973,7 @@ d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 
 After training,
 we use the transformer model
-to translate a few English sentences into French and compute their BLEU scores.
+to [**translate a few English sentences**] into French and compute their BLEU scores.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -997,7 +997,7 @@ for eng, fra in zip(engs, fras):
           f'bleu {d2l.bleu(translation, fra, k=2):.3f}')
 ```
 
-Let us visualize the transformer attention weights when translating the last English sentence into French.
+Let us [**visualize the transformer attention weights**] when translating the last English sentence into French.
 The shape of the encoder self-attention weights
 is (number of encoder layers, number of attention heads, `num_steps` or number of queries, `num_steps` or number of key-value pairs).
 
@@ -1035,8 +1035,8 @@ d2l.show_heatmaps(
     figsize=(7, 3.5))
 ```
 
-To visualize both the decoder self-attention weights and the encoder-decoder attention weights,
-we need more data manipulations.
+[**To visualize both the decoder self-attention weights and the encoder-decoder attention weights,
+we need more data manipulations.**]
 For example,
 we fill the masked attention weights with zero.
 Note that
@@ -1102,8 +1102,8 @@ d2l.show_heatmaps(
 
 Similar to the case in the encoder self-attention,
 via the specified valid length of the input sequence,
-no query from the output sequence
-attends to those padding tokens from the input sequence.
+[**no query from the output sequence
+attends to those padding tokens from the input sequence.**]
 
 ```{.python .input}
 #@tab all

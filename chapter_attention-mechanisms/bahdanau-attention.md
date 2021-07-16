@@ -112,8 +112,8 @@ with Bahdanau attention,
 we only need to redefine the decoder.
 To visualize the learned attention weights more conveniently,
 the following `AttentionDecoder` class
-defines the base interface for
-decoders with attention mechanisms.
+defines [**the base interface for
+decoders with attention mechanisms**].
 
 ```{.python .input}
 #@tab all
@@ -128,8 +128,8 @@ class AttentionDecoder(d2l.Decoder):
         raise NotImplementedError
 ```
 
-Now let us implement
-the RNN decoder with Bahdanau attention
+Now let us [**implement
+the RNN decoder with Bahdanau attention**]
 in the following `Seq2SeqAttentionDecoder` class.
 The state of the decoder
 is initialized with
@@ -293,8 +293,8 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         return self._attention_weights
 ```
 
-In the following, we test the implemented
-decoder with Bahdanau attention
+In the following, we [**test the implemented
+decoder**] with Bahdanau attention
 using a minibatch of 4 sequence inputs
 of 7 time steps.
 
@@ -337,7 +337,7 @@ output, state = decoder(X, state, training=False)
 output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 ```
 
-## Training
+## [**Training**]
 
 Similar to :numref:`sec_seq2seq_training`,
 here we specify hyperparemeters,
@@ -364,7 +364,7 @@ d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 After the model is trained,
-we use it to translate a few English sentences
+we use it to [**translate a few English sentences**]
 into French and compute their BLEU scores.
 
 ```{.python .input}
@@ -396,7 +396,7 @@ attention_weights = d2l.reshape(
     (1, 1, -1, num_steps))
 ```
 
-By visualizing the attention weights
+By [**visualizing the attention weights**]
 when translating the last English sentence,
 we can see that each query assigns non-uniform weights
 over key-value pairs.

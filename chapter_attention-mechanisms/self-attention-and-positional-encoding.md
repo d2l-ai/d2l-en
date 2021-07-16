@@ -43,7 +43,7 @@ import numpy as np
 import tensorflow as tf
 ```
 
-## Self-Attention
+## [**Self-Attention**]
 
 Given a sequence of input tokens
 $\mathbf{x}_1, \ldots, \mathbf{x}_n$ where any $\mathbf{x}_i \in \mathbb{R}^d$ ($1 \leq i \leq n$),
@@ -178,7 +178,7 @@ makes self-attention prohibitively slow for very long sequences.
 
 
 
-## Positional Encoding
+## [**Positional Encoding**]
 :label:`subsec_positional-encoding`
 
 
@@ -279,8 +279,8 @@ class PositionalEncoding(tf.keras.layers.Layer):
 ```
 
 In the positional embedding matrix $\mathbf{P}$,
-rows correspond to positions within a sequence
-and columns represent different positional encoding dimensions.
+[**rows correspond to positions within a sequence
+and columns represent different positional encoding dimensions**]
 In the example below,
 we can see that
 the $6^{\mathrm{th}}$ and the $7^{\mathrm{th}}$
@@ -327,7 +327,7 @@ d2l.plot(np.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
 
 To see how the monotonically decreased frequency
 along the encoding dimension relates to absolute positional information,
-let us print out the binary representations of $0, 1, \ldots, 7$.
+let us print out [**the binary representations**] of $0, 1, \ldots, 7$.
 As we can see,
 the lowest bit, the second-lowest bit, and the third-lowest bit alternate on every number, every two numbers, and every four numbers, respectively.
 
@@ -341,8 +341,8 @@ In binary representations,
 a higher bit has a lower frequency than a lower bit.
 Similarly,
 as demonstrated in the heat map below,
-the positional encoding decreases
-frequencies along the encoding dimension
+[**the positional encoding decreases
+frequencies along the encoding dimension**]
 by using trigonometric functions.
 Since the outputs are float numbers,
 such continuous representations
