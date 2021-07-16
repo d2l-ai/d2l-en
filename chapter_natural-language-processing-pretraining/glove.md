@@ -11,7 +11,7 @@ word "solid" is
 more likely to co-occur
 with "ice" than "steam",
 but word "gas"
-probably co-occur with "steam"
+probably co-occurs with "steam"
 more frequently than "ice".
 Besides,
 global statistics
@@ -23,20 +23,52 @@ information in the entire corpus
 for word embedding,
 let us first revisit
 the skip-gram model in :numref:`subsec_skip-gram`,
-interpreting it
+but interpreting it
 from the perspective of global statistics
 of co-occurrences.
 
-
 ## Skip-Gram with Global Statistics
 
-The conditional probability $P(w_j\mid w_i)$ expressed in the skip-gram model using the softmax operation will be recorded as $q_{ij}$, that is:
+Denoting by $q_{ij}$
+the conditional probability
+$P(w_j\mid w_i)$
+of word $w_j$ given word $w_i$
+in the skip-gram model,
+we have
 
 $$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \text{exp}(\mathbf{u}_k^\top \mathbf{v}_i)},$$
 
-where $\mathbf{v}_i$ and $\mathbf{u}_i$ are the vector representations of word $w_i$ of index $i$ as the center word and context word respectively, and $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$ is the vocabulary index set.
+where 
+for any index $i$
+vectors $\mathbf{v}_i$ and $\mathbf{u}_i$
+represent word $w_i$
+as the center word and context word,
+respectively, and $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$ 
+is the index set of the vocabulary.
 
-For word $w_i$, it may appear in the dataset for multiple times. We collect all the context words every time when $w_i$ is a center word and keep duplicates, denoted as multiset $\mathcal{C}_i$. The number of an element in a multiset is called the multiplicity of the element. For instance, suppose that word $w_i$ appears twice in the dataset: the context windows when these two $w_i$ become center words in the text sequence contain context word indices $2, 1, 5, 2$ and $2, 3, 2, 1$. Then, multiset $\mathcal{C}_i = \{1, 1, 2, 2, 2, 2, 3, 5\}$, where multiplicity of element 1 is 2, multiplicity of element 2 is 4, and multiplicities of elements 3 and 5 are both 1. Denote multiplicity of element $j$ in multiset $\mathcal{C}_i$ as $x_{ij}$: it is the number of word $w_j$ in all the context windows for center word $w_i$ in the entire dataset. As a result, the loss function of the skip-gram model can be expressed in a different way:
+Consider word $w_i$
+that may occur multiple times
+in the dataset (corpus).
+In the entire dataset,
+all the context words
+wherever $w_i$ is taken as their center word
+form a *multiset* $\mathcal{C}_i$
+of word indices
+that *allows for multiple instances of the same element*.
+For any element,
+its number of instances is called its *multiplicity*.
+To illustrate with an example,
+suppose that word $w_i$ occurs twice in the dataset
+and indices of the context words
+that take $w_i$ as their center word
+in the two context windows
+are 
+$k, j, m, k$ and $k, l, k, j$.
+Thus, multiset $\mathcal{C}_i = \{j, j, k, k, k, k, l, m\}$, where 
+multiplicities of elements $j, k, l, m$
+are 2, 4, 1, 1, respectively.
+
+Now let us denote multiplicity of element $j$ in multiset $\mathcal{C}_i$ as $x_{ij}$: it is the number of word $w_j$ in all the context windows for center word $w_i$ in the entire dataset. As a result, the loss function of the skip-gram model can be expressed in a different way:
 
 $$-\sum_{i\in\mathcal{V}}\sum_{j\in\mathcal{V}} x_{ij} \log\,q_{ij}.$$
 
