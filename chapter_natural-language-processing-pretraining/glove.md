@@ -14,7 +14,7 @@ but word "gas"
 probably co-occurs with "steam"
 more frequently than "ice".
 Besides,
-global statistics
+global corpus statistics
 of such co-occurrences
 can be precomputed:
 this can lead to more efficient training.
@@ -24,10 +24,10 @@ for word embedding,
 let us first revisit
 the skip-gram model in :numref:`subsec_skip-gram`,
 but interpreting it
-from the perspective of global statistics
-of co-occurrences.
+using global corpus statistics
+such as co-occurrence counts.
 
-## Skip-Gram with Global Statistics
+## Skip-Gram with Global Corpus Statistics
 
 Denoting by $q_{ij}$
 the conditional probability
@@ -48,8 +48,8 @@ is the index set of the vocabulary.
 
 Consider word $w_i$
 that may occur multiple times
-in the dataset (corpus).
-In the entire dataset,
+in the corpus.
+In the entire corpus,
 all the context words
 wherever $w_i$ is taken as their center word
 form a *multiset* $\mathcal{C}_i$
@@ -58,7 +58,7 @@ that *allows for multiple instances of the same element*.
 For any element,
 its number of instances is called its *multiplicity*.
 To illustrate with an example,
-suppose that word $w_i$ occurs twice in the dataset
+suppose that word $w_i$ occurs twice in the corpus
 and indices of the context words
 that take $w_i$ as their center word
 in the two context windows
@@ -68,13 +68,34 @@ Thus, multiset $\mathcal{C}_i = \{j, j, k, k, k, k, l, m\}$, where
 multiplicities of elements $j, k, l, m$
 are 2, 4, 1, 1, respectively.
 
-Now let us denote multiplicity of element $j$ in multiset $\mathcal{C}_i$ as $x_{ij}$: it is the number of word $w_j$ in all the context windows for center word $w_i$ in the entire dataset. As a result, the loss function of the skip-gram model can be expressed in a different way:
+Now let us denote the multiplicity of element $j$ in
+multiset $\mathcal{C}_i$ as $x_{ij}$.
+This is the global co-occurrence count 
+of word $w_j$ (as the context word)
+and word $w_i$ (as the center word)
+in the same context window
+in the entire corpus.
+Using such global corpus statistics,
+the loss function of the skip-gram model 
+is equivalent to
 
 $$-\sum_{i\in\mathcal{V}}\sum_{j\in\mathcal{V}} x_{ij} \log\,q_{ij}.$$
+:eqlabel:`eq_skipgram-x_ij`
 
-We add up the number of all the context words for the central target word $w_i$ to get $x_i$, and record the conditional probability $x_{ij}/x_i$ for generating context word $w_j$ based on central target word $w_i$ as $p_{ij}$. We can rewrite the loss function of the skip-gram model as
+We further denote by 
+$x_i \stackrel{\mathrm{def}}{=} |\mathcal{C}_i|$
+the number of all the context words
+in the context windows
+where $w_i$ occurs as their center word.
+Letting $p_{ij}$
+be the conditional probability
+$x_{ij}/x_i$ for generating
+context word $w_j$ given center word $w_i$,
+:eqref:`eq_skipgram-x_ij`
+is rewritten as
 
 $$-\sum_{i\in\mathcal{V}} x_i \sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}.$$
+:eqlabel:`eq_skipgram-p_ij`
 
 In the formula above, $\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ computes the conditional probability distribution $p_{ij}$ for context word generation based on the central target word $w_i$ and the cross-entropy of conditional probability distribution $q_{ij}$ predicted by the model.  The loss function is weighted using the sum of the number of context words with the central target word $w_i$.  If we minimize the loss function from the formula above, we will be able to allow the predicted conditional probability distribution to approach as close as possible to the true conditional probability distribution.
 
@@ -85,7 +106,7 @@ the cost of letting the
 model prediction $q_{ij}$ become the legal probability distribution has the sum
 of all items in the entire dictionary in its denominator. This can easily lead
 to excessive computational overhead. On the other hand, there are often a lot of
-uncommon words in the dictionary, and they appear rarely in the dataset. In the
+uncommon words in the dictionary, and they appear rarely in the corpus. In the
 cross-entropy loss function, the final prediction of the conditional probability
 distribution on a large number of uncommon words is likely to be inaccurate.
 
@@ -104,14 +125,14 @@ Therefore, the goal of GloVe is to minimize the loss function.
 
 $$\sum_{i\in\mathcal{V}} \sum_{j\in\mathcal{V}} h(x_{ij}) \left(\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j - \log\,x_{ij}\right)^2.$$
 
-Here, we have a suggestion for the choice of weight function $h(x)$: when $x < c$ (e.g $c = 100$), make $h(x) = (x/c) ^\alpha$ (e.g $\alpha = 0.75$), otherwise make $h(x) = 1$. Because $h(0)=0$, the squared loss term for $x_{ij}=0$ can be simply ignored. When we use minibatch SGD for training, we conduct random sampling to get a non-zero minibatch $x_{ij}$ from each time step and compute the gradient to update the model parameters. These non-zero $x_{ij}$ are computed in advance based on the entire dataset and they contain global statistics for the dataset. Therefore, the name GloVe is taken from "Global Vectors".
+Here, we have a suggestion for the choice of weight function $h(x)$: when $x < c$ (e.g $c = 100$), make $h(x) = (x/c) ^\alpha$ (e.g $\alpha = 0.75$), otherwise make $h(x) = 1$. Because $h(0)=0$, the squared loss term for $x_{ij}=0$ can be simply ignored. When we use minibatch SGD for training, we conduct random sampling to get a non-zero minibatch $x_{ij}$ from each time step and compute the gradient to update the model parameters. These non-zero $x_{ij}$ are computed in advance based on the entire corpus and they contain global statistics for the corpus. Therefore, the name GloVe is taken from "Global Vectors".
 
 Notice that if word $w_i$ appears in the context window of word $w_j$, then word $w_j$ will also appear in the context window of word $w_i$. Therefore, $x_{ij}=x_{ji}$. Unlike word2vec, GloVe fits the symmetric $\log\, x_{ij}$ in lieu of the asymmetric conditional probability $p_{ij}$. Therefore, the central target word vector and context word vector of any word are equivalent in GloVe. However, the two sets of word vectors that are learned by the same word may be different in the end due to different initialization values. After learning all the word vectors, GloVe will use the sum of the central target word vector and the context word vector as the final word vector for the word.
 
 
 ## Understanding GloVe from Conditional Probability Ratios
 
-We can also try to understand GloVe word embedding from another perspective. We will continue the use of symbols from earlier in this section, $P(w_j \mid w_i)$ represents the conditional probability of generating context word $w_j$ with central target word $w_i$ in the dataset, and it will be recorded as $p_{ij}$. From a real example from a large corpus, here we have the following two sets of conditional probabilities with "ice" and "steam" as the central target words and the ratio between them:
+We can also try to understand GloVe word embedding from another perspective. We will continue the use of symbols from earlier in this section, $P(w_j \mid w_i)$ represents the conditional probability of generating context word $w_j$ with central target word $w_i$ in the corpus, and it will be recorded as $p_{ij}$. From a real example from a large corpus, here we have the following two sets of conditional probabilities with "ice" and "steam" as the central target words and the ratio between them:
 
 |$w_k$=|solid|gas|water|fashion|
 |--:|:-:|:-:|:-:|:-:|
@@ -143,7 +164,7 @@ By taking the square error and weighting the left and right sides of the formula
 
 ## Summary
 
-* In some cases, the cross-entropy loss function may have a disadvantage. GloVe uses squared loss and the word vector to fit global statistics computed in advance based on the entire dataset.
+* In some cases, the cross-entropy loss function may have a disadvantage. GloVe uses squared loss and the word vector to fit global statistics computed in advance based on the entire corpus.
 * The central target word vector and context word vector of any word are equivalent in GloVe.
 
 
