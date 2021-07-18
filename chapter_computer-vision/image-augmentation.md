@@ -74,6 +74,7 @@ def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
 This is one of the earliest and most widely used methods of image augmentation.
 Next, we use the `transforms` module to create the `RandomFlipLeftRight` instance, which flips
 an image left and right with a 50% chance.
+:end_tab:
 
 :begin_tab:`pytorch`
 [**Flipping the image left and right**] usually does not change the category of the object. 
