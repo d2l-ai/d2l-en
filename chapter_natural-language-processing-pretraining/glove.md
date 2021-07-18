@@ -82,33 +82,56 @@ is equivalent to
 $$-\sum_{i\in\mathcal{V}}\sum_{j\in\mathcal{V}} x_{ij} \log\,q_{ij}.$$
 :eqlabel:`eq_skipgram-x_ij`
 
-We further denote by 
-$x_i \stackrel{\mathrm{def}}{=} |\mathcal{C}_i|$
+We further denote by
+$x_i$
 the number of all the context words
 in the context windows
-where $w_i$ occurs as their center word.
+where $w_i$ occurs as their center word,
+which is equivalent to $|\mathcal{C}_i|$.
 Letting $p_{ij}$
 be the conditional probability
 $x_{ij}/x_i$ for generating
 context word $w_j$ given center word $w_i$,
 :eqref:`eq_skipgram-x_ij`
-is rewritten as
+can be rewritten as
 
 $$-\sum_{i\in\mathcal{V}} x_i \sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}.$$
 :eqlabel:`eq_skipgram-p_ij`
 
-In :eqref:`eq_skipgram-p_ij`, $\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ computes the conditional probability distribution $p_{ij}$ for context word generation based on the central target word $w_i$ and the cross-entropy of conditional probability distribution $q_{ij}$ predicted by the model.  The loss function is weighted using the sum of the number of context words with the central target word $w_i$.  If we minimize the loss function from the formula above, we will be able to allow the predicted conditional probability distribution to approach as close as possible to the true conditional probability distribution.
+In :eqref:`eq_skipgram-p_ij`, $-\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ calculates
+the cross-entropy 
+of
+the conditional distribution $p_{ij}$
+of global corpus statistics
+and
+the
+conditional distribution $q_{ij}$
+of model predictions.
+This loss
+is also weighted by $x_i$ as explained above.
+Minimizing the loss function in 
+:eqref:`eq_skipgram-p_ij`
+will allow
+the predicted conditional distribution
+to get close to
+the conditional distribution
+from the global corpus statistics.
 
-However, although the most common type of loss function, the cross-entropy loss
-function is sometimes not a good choice. On the one hand, as we mentioned in
-:numref:`sec_approx_train`
-the cost of letting the
-model prediction $q_{ij}$ become the legal probability distribution has the sum
-of all items in the entire dictionary in its denominator. This can easily lead
-to excessive computational overhead. On the other hand, there are often a lot of
-uncommon words in the dictionary, and they appear rarely in the corpus. In the
-cross-entropy loss function, the final prediction of the conditional probability
-distribution on a large number of uncommon words is likely to be inaccurate.
+
+Though being commonly used
+for measuring the distance
+between probability distributions,
+the cross-entropy loss function may not be a good choice here. 
+On one hand, as we mentioned in :numref:`sec_approx_train`, 
+the cost of properly normalizing $q_{ij}$
+results in the sum over the entire vocabulary,
+which can be computationally expensive.
+On the other hand, 
+a large number of rare 
+events from a large corpus
+are often modeled by the cross-entropy loss
+to be assigned with
+too much weight.
 
 
 
