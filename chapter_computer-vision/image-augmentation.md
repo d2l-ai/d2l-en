@@ -69,9 +69,16 @@ def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
 
 ### Flipping and Cropping
 
+:begin_tab:`mxnet`
 [**Flipping the image left and right**] usually does not change the category of the object. 
 This is one of the earliest and most widely used methods of image augmentation.
 Next, we use the `transforms` module to create the `RandomFlipLeftRight` instance, which flips
+an image left and right with a 50% chance.
+
+:begin_tab:`pytorch`
+[**Flipping the image left and right**] usually does not change the category of the object. 
+This is one of the earliest and most widely used methods of image augmentation.
+Next, we use the `transforms` module to create the `RandomHorizontalFlip` instance, which flips
 an image left and right with a 50% chance.
 
 ```{.python .input}
@@ -83,8 +90,14 @@ apply(img, gluon.data.vision.transforms.RandomFlipLeftRight())
 apply(img, torchvision.transforms.RandomHorizontalFlip())
 ```
 
+:begin_tab:`mxnet`
 [**Flipping up and down**] is not as common as flipping left and right. But at least for this example image, flipping up and down does not hinder recognition.
 Next, we create a `RandomFlipTopBottom` instance to flip
+an image up and down with a 50% chance.
+
+:begin_tab:`pytorch`
+[**Flipping up and down**] is not as common as flipping left and right. But at least for this example image, flipping up and down does not hinder recognition.
+Next, we create a `RandomVerticalFlip` instance to flip
 an image up and down with a 50% chance.
 
 ```{.python .input}
