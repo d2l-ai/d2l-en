@@ -96,6 +96,7 @@ apply(img, torchvision.transforms.RandomHorizontalFlip())
 [**Flipping up and down**] is not as common as flipping left and right. But at least for this example image, flipping up and down does not hinder recognition.
 Next, we create a `RandomFlipTopBottom` instance to flip
 an image up and down with a 50% chance.
+:end_tab:
 
 :begin_tab:`pytorch`
 [**Flipping up and down**] is not as common as flipping left and right. But at least for this example image, flipping up and down does not hinder recognition.
