@@ -97,7 +97,7 @@ is rewritten as
 $$-\sum_{i\in\mathcal{V}} x_i \sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}.$$
 :eqlabel:`eq_skipgram-p_ij`
 
-In the formula above, $\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ computes the conditional probability distribution $p_{ij}$ for context word generation based on the central target word $w_i$ and the cross-entropy of conditional probability distribution $q_{ij}$ predicted by the model.  The loss function is weighted using the sum of the number of context words with the central target word $w_i$.  If we minimize the loss function from the formula above, we will be able to allow the predicted conditional probability distribution to approach as close as possible to the true conditional probability distribution.
+In :eqref:`eq_skipgram-p_ij`, $\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ computes the conditional probability distribution $p_{ij}$ for context word generation based on the central target word $w_i$ and the cross-entropy of conditional probability distribution $q_{ij}$ predicted by the model.  The loss function is weighted using the sum of the number of context words with the central target word $w_i$.  If we minimize the loss function from the formula above, we will be able to allow the predicted conditional probability distribution to approach as close as possible to the true conditional probability distribution.
 
 However, although the most common type of loss function, the cross-entropy loss
 function is sometimes not a good choice. On the one hand, as we mentioned in
