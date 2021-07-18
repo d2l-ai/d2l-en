@@ -81,6 +81,7 @@ an image left and right with a 50% chance.
 This is one of the earliest and most widely used methods of image augmentation.
 Next, we use the `transforms` module to create the `RandomHorizontalFlip` instance, which flips
 an image left and right with a 50% chance.
+:end_tab:
 
 ```{.python .input}
 apply(img, gluon.data.vision.transforms.RandomFlipLeftRight())
