@@ -15,7 +15,7 @@ which will be covered later
 in :numref:`chap_nlp_app`.
 To demonstrate 
 semantics of pretrained word vectors
-from large corpora,
+from large corpora in a straightforward way,
 let us apply them
 in the word similarity and analogy tasks.
 
@@ -37,7 +37,7 @@ import os
 
 ## Loading Pretrained Word Vectors
 
-Below lists pretrained GloVe embeddings of dimensions 50, 100, and 300,
+Below lists pretrained GloVe embeddings of dimension 50, 100, and 300,
 which can be downloaded from the [GloVe website](https://nlp.stanford.edu/projects/glove/).
 The pretrained fastText embeddings are available in multiple languages.
 Here we consider one English version (300-dimensional "wiki.en") that can be downloaded from the
@@ -62,7 +62,7 @@ d2l.DATA_HUB['wiki.en'] = (d2l.DATA_URL + 'wiki.en.zip',
                            'c1816da3821ae9f43899be655002f6c723e91b88')
 ```
 
-We define the following `TokenEmbedding` class to load the above pretrained Glove and fastText embeddings.
+To load these pretrained GloVe and fastText embeddings, we define the following `TokenEmbedding` class.
 
 ```{.python .input}
 #@tab all
@@ -102,21 +102,26 @@ class TokenEmbedding:
         return len(self.idx_to_token)
 ```
 
-Next, we use 50-dimensional GloVe embeddings pretrained on a subset of the Wikipedia. The corresponding word embedding is automatically downloaded the first time we create a pretrained word embedding instance.
+Below we load the
+50-dimensional GloVe embeddings
+(pretrained on a Wikipedia subset).
+When creating the `TokenEmbedding` instance,
+the specified embedding file has to be downloaded if it
+was not yet.
 
 ```{.python .input}
 #@tab all
 glove_6b50d = TokenEmbedding('glove.6b.50d')
 ```
 
-Output the dictionary size. The dictionary contains $400,000$ words and a special unknown token.
+Output the vocabulary size. The vocabulary contains $400,000$ words (tokens) and a special unknown token.
 
 ```{.python .input}
 #@tab all
 len(glove_6b50d)
 ```
 
-We can use a word to get its index in the dictionary, or we can get the word from its index.
+We can get the index of a word in the vocabulary, and vice versa.
 
 ```{.python .input}
 #@tab all
