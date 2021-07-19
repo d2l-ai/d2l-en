@@ -94,7 +94,7 @@ called *byte pair encoding* (BPE) to extract subwords :cite:`Sennrich.Haddow.Bir
 
 Byte pair encoding performs a statistical analysis of the training dataset to discover common symbols within a word,
 such as consecutive characters of arbitrary length.
-Starting from symbols of length $1$,
+Starting from symbols of length 1,
 byte pair encoding iteratively merges the most frequent pair of consecutive symbols to produce new longer symbols.
 Note that for efficiency, pairs crossing word boundaries are not considered.
 In the end, we can use such symbols as subwords to segment words.
@@ -226,17 +226,16 @@ print(segment_BPE(tokens, symbols))
 
 ## Summary
 
-* FastText proposes a subword embedding method. Based on the skip-gram model in word2vec, it represents the central word vector as the sum of the subword vectors of the word.
-* Subword embedding utilizes the principles of morphology, which usually improves the quality of representations of uncommon words.
+* The fastText model proposes a subword embedding approach. Based on the skip-gram model in word2vec, it represents a center word as the sum of its subword vectors.
 * Byte pair encoding performs a statistical analysis of the training dataset to discover common symbols within a word. As a greedy approach, byte pair encoding iteratively merges the most frequent pair of consecutive symbols.
-
+* Subword embedding may improve the quality of representations of rare words and out-of-dictionary words.
 
 ## Exercises
 
-1. When there are too many subwords (for example, 6 words in English result in about $3\times 10^8$ combinations), what problems arise? Can you think of any methods to solve them? Hint: refer to the end of Section 3.2 of the fastText paper :cite:`Bojanowski.Grave.Joulin.ea.2017`.
-1. How can you design a subword embedding model based on the continuous bag-of-words model?
+1. As an example, there are about $3\times 10^8$ possible  $6$-grams in English. What is the issue when there are too many subwords? How to address the issue? Hint: refer to the end of Section 3.2 of the fastText paper :cite:`Bojanowski.Grave.Joulin.ea.2017`.
+1. How to design a subword embedding model based on the continuous bag-of-words model?
 1. To get a vocabulary of size $m$, how many merging operations are needed when the initial symbol vocabulary size is $n$?
-1. How can we extend the idea of byte pair encoding to extract phrases?
+1. How to extend the idea of byte pair encoding to extract phrases?
 
 
 
