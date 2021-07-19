@@ -26,28 +26,62 @@ the internal structure of words
 was neither explored in word2vec
 nor in GloVe.
 
+## The fastText Model
 
-## fastText
+Recall how words are represented in word2vec.
+In both the skip-gram model
+and the continuous bag-of-words model,
+different inflected forms of the same word
+are directly represented by different vectors
+without shared parameters.
+To use morphological information,
+the *fastText* model
+proposed a *subword embedding* approach,
+where a subword is a character $n$-gram :cite:`Bojanowski.Grave.Joulin.ea.2017`.
+Instead of learning word-level vector representations,
+fastText can be considered as
+the subword-level skip-gram,
+where each *center word* is represented by the sum of 
+its subword vectors.
 
-In word2vec, we did not directly use morphology information.  In both the
-skip-gram model and continuous bag-of-words model, we use different vectors to
-represent words with different forms. For example, "dog" and "dogs" are
-represented by two different vectors, while the relationship between these two
-vectors is not directly represented in the model. In view of this, fastText :cite:`Bojanowski.Grave.Joulin.ea.2017`
-proposes the method of subword embedding, thereby attempting to introduce
-morphological information in the skip-gram model in word2vec.
+Let us illustrate how to obtain 
+subwords for each center word in fastText
+using the word "where".
+First, add special characters “&lt;” and “&gt;” 
+at the beginning and end of the word to distinguish prefixes and suffixes from other subwords. 
+Then, extract character $n$-grams from the word.
+For example, when $n=3$,
+we obtain all subwords of length 3: "&lt;wh", "whe", "her", "ere", "re&gt;", and the special subword "&lt;where&gt;".
 
-In fastText, each central word is represented as a collection of subwords. Below we use the word "where" as an example to understand how subwords are formed. First, we add the special characters “&lt;” and “&gt;” at the beginning and end of the word to distinguish the subwords used as prefixes and suffixes. Then, we treat the word as a sequence of characters to extract the $n$-grams. For example, when $n=3$, we can get all subwords with a length of $3$:
 
-$$\textrm{"<wh"}, \ \textrm{"whe"}, \ \textrm{"her"}, \ \textrm{"ere"}, \ \textrm{"re>"},$$
+In fastText, for any word $w$,
+denote by $\mathcal{G}_w$
+the union of all its subwords of length between 3 and 6
+and its special subword.
+The vocabulary 
+is the union of the subwords of all words.
+Letting $\mathbf{z}_g$
+be the vector of subword $g$ in the dictionary,
+the vector $\mathbf{v}_w$ for 
+word $w$ as a center word
+in the skip-gram model
+is the sum of its subword vectors:
 
-and the special subword $\textrm{"<where>"}$.
+$$\mathbf{v}_w = \sum_{g\in\mathcal{G}_w} \mathbf{z}_g.$$
 
-In fastText, for a word $w$, we record the union of all its subwords with length of $3$ to $6$ and special subwords as $\mathcal{G}_w$. Thus, the dictionary is the union of the collection of subwords of all words. Assume the vector of the subword $g$ in the dictionary is $\mathbf{z}_g$. Then, the central word vector $\mathbf{u}_w$ for the word $w$ in the skip-gram model can be expressed as
+The rest of fastText is the same as the skip-gram model. Compared with the skip-gram model, 
+the vocabulary in fastText is larger,
+resulting in more model parameters. 
+Besides, 
+to calculate the representation of a word,
+all its subword vectors
+have to be summed,
+leading to higher computational complexity.
+However,
+thanks to shared parameters from subwords among words with similar structures,
+rare words and even out-of-vocabulary words
+may obtain better vector representations in fastText.
 
-$$\mathbf{u}_w = \sum_{g\in\mathcal{G}_w} \mathbf{z}_g.$$
-
-The rest of the fastText process is consistent with the skip-gram model, so it is not repeated here. As we can see, compared with the skip-gram model, the dictionary in fastText is larger, resulting in more model parameters. Also, the vector of one word requires the summation of all subword vectors, which results in higher computation complexity. However, we can obtain better vectors for more uncommon complex words, even words not existing in the dictionary, by looking at other words with similar structures.
 
 
 ## Byte Pair Encoding

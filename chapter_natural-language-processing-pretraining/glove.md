@@ -137,7 +137,7 @@ too much weight.
 ## The GloVe Model
 
 In view of this,
-the GloVe model makes three changes
+the *GloVe* model makes three changes
 to the skip-gram model based on squared loss :cite:`Pennington.Socher.Manning.2014`:
 
 1. Use variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ 
