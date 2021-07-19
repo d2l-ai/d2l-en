@@ -1,13 +1,23 @@
-# Finding Synonyms and Analogies
+# Word Similarity and Analogy
 :label:`sec_synonyms`
 
-In :numref:`sec_word2vec_pretraining` we trained a word2vec word embedding model
-on a small-scale dataset and searched for synonyms using the cosine similarity
-of word vectors. In practice, word vectors pretrained on a large-scale corpus
-can often be applied to downstream natural language processing tasks. This
-section will demonstrate how to use these pretrained word vectors to find
-synonyms and analogies. We will continue to apply pretrained word vectors in
-subsequent sections.
+In :numref:`sec_word2vec_pretraining`, 
+we trained a word2vec model on a small dataset, 
+and applied it
+to find semantically similar words 
+for an input word.
+In practice,
+word vectors that are pretrained
+on large corpora can be
+applied to downstream
+natural language processing tasks,
+which will be covered later
+in :numref:`chap_nlp_app`.
+To demonstrate 
+semantics of pretrained word vectors
+from large corpora,
+let us apply them
+in the word similarity and analogy tasks.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -25,7 +35,7 @@ from torch import nn
 import os
 ```
 
-## Using Pretrained Word Vectors
+## Loading Pretrained Word Vectors
 
 Below lists pretrained GloVe embeddings of dimensions 50, 100, and 300,
 which can be downloaded from the [GloVe website](https://nlp.stanford.edu/projects/glove/).
