@@ -114,7 +114,7 @@ was not yet.
 glove_6b50d = TokenEmbedding('glove.6b.50d')
 ```
 
-Output the vocabulary size. The vocabulary contains $400,000$ words (tokens) and a special unknown token.
+Output the vocabulary size. The vocabulary contains 400000 words (tokens) and a special unknown token.
 
 ```{.python .input}
 #@tab all
