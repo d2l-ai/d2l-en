@@ -133,24 +133,54 @@ are often modeled by the cross-entropy loss
 to be assigned with
 too much weight.
 
-
-
 ## The GloVe Model
 
-To address this, GloVe :cite:`Pennington.Socher.Manning.2014`, a word embedding model that came after word2vec, adopts
-squared loss and makes three changes to the skip-gram model based on this loss.
+In view of this,
+the GloVe model makes three changes
+to the skip-gram model based on squared loss :cite:`Pennington.Socher.Manning.2014`:
 
-1. Here, we use the non-probability distribution variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ and take their logs. Therefore, we get the squared loss $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
-2. We add two scalar model parameters for each word $w_i$: the bias terms $b_i$ (for central target words) and $c_i$( for context words).
-3. Replace the weight of each loss with the function $h(x_{ij})$. The weight function $h(x)$ is a monotone increasing function with the range $[0, 1]$.
+1. Use variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ 
+that are not probability distributions
+and take the log of both, so the squared loss term is $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
+2. Add two scalar model parameters for each word $w_i$: the center word bias $b_i$ and the context word bias $c_i$.
+3. Replace the weight of each loss term with the weight function $h(x_{ij})$, where $h(x)$ is increasing in the interval of $[0, 1]$.
 
-Therefore, the goal of GloVe is to minimize the loss function.
+Putting all things together, training GloVe is to minimize the following loss function:
 
 $$\sum_{i\in\mathcal{V}} \sum_{j\in\mathcal{V}} h(x_{ij}) \left(\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j - \log\,x_{ij}\right)^2.$$
 
-Here, we have a suggestion for the choice of weight function $h(x)$: when $x < c$ (e.g $c = 100$), make $h(x) = (x/c) ^\alpha$ (e.g $\alpha = 0.75$), otherwise make $h(x) = 1$. Because $h(0)=0$, the squared loss term for $x_{ij}=0$ can be simply ignored. When we use minibatch SGD for training, we conduct random sampling to get a non-zero minibatch $x_{ij}$ from each time step and compute the gradient to update the model parameters. These non-zero $x_{ij}$ are computed in advance based on the entire corpus and they contain global statistics for the corpus. Therefore, the name GloVe is taken from "Global Vectors".
+For the weight function, a suggested choice is: 
+$h(x) = (x/c) ^\alpha$ (e.g $\alpha = 0.75$) if $x < c$ (e.g., $c = 100$); otherwise $h(x) = 1$.
+In this case,
+because $h(0)=0$,
+the squared loss term for any $x_{ij}=0$ can be omitted
+for computational efficiency.
+For example,
+when using minibatch stochastic gradient descent for training, 
+at each iteration
+we randomly sample a minibatch of *non-zero* $x_{ij}$ 
+to calculate gradients
+and update the model parameters. 
+Note that these non-zero $x_{ij}$ are precomputed 
+global corpus statistics;
+thus, the model is called GloVe
+for *Global Vectors*.
 
-Notice that if word $w_i$ appears in the context window of word $w_j$, then word $w_j$ will also appear in the context window of word $w_i$. Therefore, $x_{ij}=x_{ji}$. Unlike word2vec, GloVe fits the symmetric $\log\, x_{ij}$ in lieu of the asymmetric conditional probability $p_{ij}$. Therefore, the central target word vector and context word vector of any word are equivalent in GloVe. However, the two sets of word vectors that are learned by the same word may be different in the end due to different initialization values. After learning all the word vectors, GloVe will use the sum of the central target word vector and the context word vector as the final word vector for the word.
+It should be emphasized that
+if word $w_i$ appears in the context window of 
+word $w_j$, then *vice versa*. 
+Therefore, $x_{ij}=x_{ji}$. 
+Unlike word2vec
+that fits the asymmetric conditional probability
+$p_{ij}$,
+GloVe fits the symmetric $\log(x_{ij})$.
+Therefore, the center word vector and
+the context word vector of any word are theoretically equivalent in the GloVe model. 
+However in practice, owing to different initialization values,
+the same word may still get different values
+in these two vectors after training:
+GloVe sums them up as the output vector.
+
 
 
 ## Understanding GloVe from Conditional Probability Ratios
