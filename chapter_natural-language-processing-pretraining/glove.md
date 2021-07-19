@@ -142,13 +142,14 @@ to the skip-gram model based on squared loss :cite:`Pennington.Socher.Manning.20
 
 1. Use variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ 
 that are not probability distributions
-and take the log of both, so the squared loss term is $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
+and take the logarithm of both, so the squared loss term is $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
 2. Add two scalar model parameters for each word $w_i$: the center word bias $b_i$ and the context word bias $c_i$.
 3. Replace the weight of each loss term with the weight function $h(x_{ij})$, where $h(x)$ is increasing in the interval of $[0, 1]$.
 
 Putting all things together, training GloVe is to minimize the following loss function:
 
 $$\sum_{i\in\mathcal{V}} \sum_{j\in\mathcal{V}} h(x_{ij}) \left(\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j - \log\,x_{ij}\right)^2.$$
+:eqlabel:`eq_glove-loss`
 
 For the weight function, a suggested choice is: 
 $h(x) = (x/c) ^\alpha$ (e.g $\alpha = 0.75$) if $x < c$ (e.g., $c = 100$); otherwise $h(x) = 1$.
@@ -174,9 +175,9 @@ Therefore, $x_{ij}=x_{ji}$.
 Unlike word2vec
 that fits the asymmetric conditional probability
 $p_{ij}$,
-GloVe fits the symmetric $\log(x_{ij})$.
+GloVe fits the symmetric $\log \, x_{ij}$.
 Therefore, the center word vector and
-the context word vector of any word are theoretically equivalent in the GloVe model. 
+the context word vector of any word are mathematically equivalent in the GloVe model. 
 However in practice, owing to different initialization values,
 the same word may still get different values
 in these two vectors after training:
@@ -217,34 +218,68 @@ We can observe the following from :numref:`tab_glove`:
 
 
 
-We can see that the conditional probability ratio can represent the relationship between different words more intuitively. We can construct a word vector function to fit the conditional probability ratio more effectively. As we know, to obtain any ratio of this type requires three words $w_i$, $w_j$, and $w_k$. The conditional probability ratio with $w_i$ as the central target word is ${p_{ij}}/{p_{ik}}$. We can find a function that uses word vectors to fit this conditional probability ratio.
+
+It can be seen that the ratio
+of co-occurrence probabilities
+can intuitively express
+the relationship between words. 
+Thus, we can design a function
+of three word vectors
+to fit this ratio.
+For the ratio of co-occurrence probabilities
+${p_{ij}}/{p_{ik}}$
+with $w_i$ being the center word
+and $w_j$ and $w_k$ being the context words,
+we want to fit this ratio
+using some function $f$:
 
 $$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) \approx \frac{p_{ij}}{p_{ik}}.$$
+:eqlabel:`eq_glove-f`
 
-The possible design of function $f$ here will not be unique. We only need to consider a more reasonable possibility. Notice that the conditional probability ratio is a scalar, we can limit $f$ to be a scalar function: $f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = f\left((\mathbf{u}_j - \mathbf{u}_k)^\top {\mathbf{v}}_i\right)$. After exchanging index $j$ with $k$, we will be able to see that function $f$ satisfies the condition $f(x)f(-x)=1$, so one possibility could be $f(x)=\exp(x)$. Thus:
+Among many possible designs for $f$,
+we only pick a reasonable choice in the following.
+Since the ratio of co-occurrence probabilities
+is a scalar,
+we require that
+$f$ be a scalar function, such as
+$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = f\left((\mathbf{u}_j - \mathbf{u}_k)^\top {\mathbf{v}}_i\right)$. 
+Switching word indices
+$j$ and $k$ in :eqref:`eq_glove-f`,
+it must hold that
+$f(x)f(-x)=1$,
+so one possibility is $f(x)=\exp(x)$,
+i.e., 
 
 $$f(\mathbf{u}_j, \mathbf{u}_k, {\mathbf{v}}_i) = \frac{\exp\left(\mathbf{u}_j^\top {\mathbf{v}}_i\right)}{\exp\left(\mathbf{u}_k^\top {\mathbf{v}}_i\right)} \approx \frac{p_{ij}}{p_{ik}}.$$
 
-One possibility that satisfies the right side of the approximation sign is $\exp\left(\mathbf{u}_j^\top {\mathbf{v}}_i\right) \approx \alpha p_{ij}$, where $\alpha$ is a constant. Considering that $p_{ij}=x_{ij}/x_i$, after taking the logarithm we get $\mathbf{u}_j^\top {\mathbf{v}}_i \approx \log\,\alpha + \log\,x_{ij} - \log\,x_i$. We use additional bias terms to fit $- \log\, \alpha + \log\, x_i$, such as the central target word bias term $b_i$ and context word bias term $c_j$:
+Now let us pick
+$\exp\left(\mathbf{u}_j^\top {\mathbf{v}}_i\right) \approx \alpha p_{ij}$,
+where $\alpha$ is a constant.
+Since $p_{ij}=x_{ij}/x_i$, after taking the logarithm on both sides we get $\mathbf{u}_j^\top {\mathbf{v}}_i \approx \log\,\alpha + \log\,x_{ij} - \log\,x_i$. 
+We may use additional bias terms to fit $- \log\, \alpha + \log\, x_i$, such as the center word bias $b_i$ and the context word bias $c_j$:
 
-$$\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j \approx \log(x_{ij}).$$
+$$\mathbf{u}_j^\top \mathbf{v}_i + b_i + c_j \approx \log\, x_{ij}.$$
+:eqlabel:`eq_glove-square`
 
-By taking the square error and weighting the left and right sides of the formula above, we can get the loss function of GloVe.
+Measuring the squared error of
+:eqref:`eq_glove-square` with weights,
+the GloVe loss function in
+:eqref:`eq_glove-loss` is obtained.
+
 
 
 ## Summary
 
-* In some cases, the cross-entropy loss function may have a disadvantage. GloVe uses squared loss and the word vector to fit global statistics computed in advance based on the entire corpus.
-* The central target word vector and context word vector of any word are equivalent in GloVe.
+* The skip-gram model can be interpreted using global corpus statistics such as word-word co-occurrence counts.
+* The cross-entropy loss may not be a good choice for measuring the difference of two probability distributions, especially for a large corpus. GloVe uses squared loss to fit precomputed global corpus statistics.
+* The center word vector and the context word vector are mathematically equivalent for any word in GloVe.
+* GloVe can be interpreted from the ratio of word-word co-occurrence probabilities.
 
 
 ## Exercises
 
-1. If a word appears in the context window of another word, how can we use the
-  distance between them in the text sequence to redesign the method for
-  computing the conditional probability $p_{ij}$? Hint: See section 4.2 from the
-  paper GloVe :cite:`Pennington.Socher.Manning.2014`.
-1. For any word, will its central target word bias term and context word bias term be equivalent to each other in GloVe? Why?
+1. If words $w_i$ and $w_j$ co-occur in the same context window, how can we use their   distance in the text sequence to redesign the method for  calculating the conditional probability $p_{ij}$? Hint: see Section 4.2 of the GloVe paper :cite:`Pennington.Socher.Manning.2014`.
+1. For any word, are its center word bias  and context word bias mathematically equivalent in GloVe? Why?
 
 
 [Discussions](https://discuss.d2l.ai/t/385)
