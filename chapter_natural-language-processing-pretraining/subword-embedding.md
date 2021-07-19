@@ -1,7 +1,30 @@
 # Subword Embedding
 :label:`sec_fasttext`
 
-English words usually have internal structures and formation methods. For example, we can deduce the relationship between "dog", "dogs", and "dogcatcher" by their spelling. All these words have the same root, "dog", but they use different suffixes to change the meaning of the word. Moreover, this association can be extended to other words. For example, the relationship between "dog" and "dogs" is just like the relationship between "cat" and "cats". The relationship between "boy" and "boyfriend" is just like the relationship between "girl" and "girlfriend". This characteristic is not unique to English. In French and Spanish, a lot of verbs can have more than 40 different forms depending on the context. In Finnish, a noun may have more than 15 forms. In fact, morphology, which is an important branch of linguistics, studies the internal structure and formation of words.
+In English,
+words such as
+"helps", "helped", and "helping" are 
+inflected forms of the same word "help".
+The relationship 
+between "dog" and "dogs"
+is the same as 
+that between "cat" and "cats",
+and 
+the relationship 
+between "boy" and "boyfriend"
+is the same as 
+that between "girl" and "girlfriend".
+In other languages
+such as French and Spanish,
+many verbs have over 40 inflected forms,
+while in Finnish,
+a noun may have up to 15 cases.
+In linguistics,
+morphology studies word formation and word relationships.
+However,
+the internal structure of words
+was neither explored in word2vec
+nor in GloVe.
 
 
 ## fastText
