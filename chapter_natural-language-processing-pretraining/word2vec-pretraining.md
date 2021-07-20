@@ -311,6 +311,8 @@ train(net, data_iter, lr, num_epochs)
 ```
 
 ## Applying Word Embeddings
+:label:`subsec_apply-word-embed`
+
 
 After training the word2vec model,
 we can use the cosine similarity

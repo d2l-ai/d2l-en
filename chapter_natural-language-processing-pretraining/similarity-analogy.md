@@ -130,20 +130,25 @@ glove_6b50d.token_to_idx['beautiful'], glove_6b50d.idx_to_token[3367]
 
 ## Applying Pretrained Word Vectors
 
-Below, we demonstrate the application of pretrained word vectors, using GloVe as an example.
+Using the loaded GloVe vectors,
+we will demonstrate their semantics
+by applying them
+in the following word similarity and analogy tasks.
 
-### Finding Synonyms
 
-Here, we re-implement the algorithm used to search for synonyms by cosine
-similarity introduced in :numref:`sec_word2vec`
+### Word Similarity
 
-In order to reuse the logic for seeking the $k$ nearest neighbors when
-seeking analogies, we encapsulate this part of the logic separately in the `knn`
+Similar to :numref:`subsec_apply-word-embed`,
+in order to find semantically similar words
+for an input word
+based on cosine similarities between
+word vectors,
+we implement the following `knn`
 ($k$-nearest neighbors) function.
 
 ```{.python .input}
 def knn(W, x, k):
-    # The added 1e-9 is for numerical stability
+    # Add 1e-9 for numerical stability
     cos = np.dot(W, x.reshape(-1,)) / (
         np.sqrt(np.sum(W * W, axis=1) + 1e-9) * np.sqrt((x * x).sum()))
     topk = npx.topk(cos, k=k, ret_typ='indices')
@@ -153,7 +158,7 @@ def knn(W, x, k):
 ```{.python .input}
 #@tab pytorch
 def knn(W, x, k):
-    # The added 1e-9 is for numerical stability
+    # Add 1e-9 for numerical stability
     cos = torch.mv(W, x.reshape(-1,)) / (
         torch.sqrt(torch.sum(W * W, axis=1) + 1e-9) *
         torch.sqrt((x * x).sum()))
@@ -161,24 +166,34 @@ def knn(W, x, k):
     return topk, [cos[int(i)] for i in topk]
 ```
 
-Then, we search for synonyms by pretraining the word vector instance `embed`.
+Then, we 
+search for similar words
+using the pretrained word vectors 
+from the `TokenEmbedding` instance `embed`.
 
 ```{.python .input}
 #@tab all
 def get_similar_tokens(query_token, k, embed):
     topk, cos = knn(embed.idx_to_vec, embed[[query_token]], k + 1)
-    for i, c in zip(topk[1:], cos[1:]):  # Remove input words
+    for i, c in zip(topk[1:], cos[1:]):  # Exclude the input word
         print(f'cosine sim={float(c):.3f}: {embed.idx_to_token[int(i)]}')
 ```
 
-The dictionary of pretrained word vector instance `glove_6b50d` already created contains 400,000 words and a special unknown token. Excluding input words and unknown words, we search for the three words that are the most similar in meaning to "chip".
+The vocabulary of the pretrained word vectors
+in `glove_6b50d` contains 400000 words and a special unknown token. 
+Excluding the input word and unknown token,
+among this vocabulary
+let us find 
+three most semantically similar words
+to word "chip".
 
 ```{.python .input}
 #@tab all
 get_similar_tokens('chip', 3, glove_6b50d)
 ```
 
-Next, we search for the synonyms of "baby" and "beautiful".
+Below outputs similar words
+to "baby" and "beautiful".
 
 ```{.python .input}
 #@tab all
@@ -190,7 +205,7 @@ get_similar_tokens('baby', 3, glove_6b50d)
 get_similar_tokens('beautiful', 3, glove_6b50d)
 ```
 
-### Finding Analogies
+### Word Analogy
 
 In addition to seeking synonyms, we can also use the pretrained word vector to seek the analogies between words. For example, “man”:“woman”::“son”:“daughter” is an example of analogy, “man” is to “woman” as “son” is to “daughter”. The problem of seeking analogies can be defined as follows: for four words in the analogical relationship $a : b :: c : d$, given the first three words, $a$, $b$ and $c$, we want to find $d$. Assume the word vector for the word $w$ is $\text{vec}(w)$. To solve the analogy problem, we need to find the word vector that is most similar to the result vector of $\text{vec}(c)+\text{vec}(b)-\text{vec}(a)$.
 
