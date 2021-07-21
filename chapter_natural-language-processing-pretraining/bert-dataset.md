@@ -17,7 +17,7 @@ To facilitate the demonstration of BERT pretraining,
 we use a smaller corpus WikiText-2 :cite:`Merity.Xiong.Bradbury.ea.2016`.
 
 Comparing with the PTB dataset used for pretraining word2vec in :numref:`sec_word2vec_data`,
-WikiText-2 i) retains the original punctuation, making it suitable for next sentence prediction; ii) retains the original case and numbers; iii) is over twice larger.
+WikiText-2 (i) retains the original punctuation, making it suitable for next sentence prediction; (ii) retains the original case and numbers; (iii) is over twice larger.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -267,7 +267,7 @@ By implementing the `__getitem__ `function,
 we can arbitrarily access the pretraining (masked language modeling and next sentence prediction) examples 
 generated from a pair of sentences from the WikiText-2 corpus.
 
-The original BERT model uses WordPiece embeddings whose vocabulary size is 30,000 :cite:`Wu.Schuster.Chen.ea.2016`.
+The original BERT model uses WordPiece embeddings whose vocabulary size is 30000 :cite:`Wu.Schuster.Chen.ea.2016`.
 The tokenization method of WordPiece is a slight modification of
 the original byte pair encoding algorithm in :numref:`subsec_Byte_Pair_Encoding`.
 For simplicity, we use the `d2l.tokenize` function for tokenization.

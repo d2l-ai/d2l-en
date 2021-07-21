@@ -244,7 +244,7 @@ class BERTEncoder(nn.Module):
         return X
 ```
 
-Suppose that the vocabulary size is 10,000.
+Suppose that the vocabulary size is 10000.
 To demonstrate forward inference of `BERTEncoder`,
 let us create an instance of it and initialize its parameters.
 

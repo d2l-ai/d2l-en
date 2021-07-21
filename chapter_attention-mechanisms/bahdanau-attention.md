@@ -133,9 +133,9 @@ the RNN decoder with Bahdanau attention**]
 in the following `Seq2SeqAttentionDecoder` class.
 The state of the decoder
 is initialized with
-i) the encoder final-layer hidden states at all the time steps (as keys and values of the attention);
-ii) the encoder all-layer hidden state at the final time step (to initialize the hidden state of the decoder);
-and iii) the encoder valid length (to exclude the padding tokens in attention pooling).
+(i) the encoder final-layer hidden states at all the time steps (as keys and values of the attention);
+(ii) the encoder all-layer hidden state at the final time step (to initialize the hidden state of the decoder);
+and (iii) the encoder valid length (to exclude the padding tokens in attention pooling).
 At each decoding time step,
 the decoder final-layer hidden state at the previous time step is used as the query of the attention.
 As a result, both the attention output
@@ -236,7 +236,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         outputs = self.dense(torch.cat(outputs, dim=0))
         return outputs.permute(1, 0, 2), [enc_outputs, hidden_state,
                                           enc_valid_lens]
-    
+
     @property
     def attention_weights(self):
         return self._attention_weights
@@ -256,13 +256,13 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
              for _ in range(num_layers)]),
                                       return_sequences=True, return_state=True)
         self.dense = tf.keras.layers.Dense(vocab_size)
-        
+
     def init_state(self, enc_outputs, enc_valid_lens, *args):
         # Shape of `outputs`: (`batch_size`, `num_steps`, `num_hiddens`).
         # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`, `num_hiddens`)
         outputs, hidden_state = enc_outputs
         return (outputs, hidden_state, enc_valid_lens)
-    
+
     def call(self, X, state, **kwargs):
         # Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`).
         # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`, `num_hiddens`)
@@ -287,7 +287,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         # (`batch_size`, `num_steps`, `vocab_size`)
         outputs = self.dense(tf.concat(outputs, axis=1))
         return outputs, [enc_outputs, hidden_state, enc_valid_lens]
-    
+
     @property
     def attention_weights(self):
         return self._attention_weights
