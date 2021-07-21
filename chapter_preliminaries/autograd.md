@@ -108,7 +108,7 @@ y
 ```
 
 Since `x` is a vector of length 4,
-an dot product of `x` and `x` is performed,
+a dot product of `x` and `x` is performed,
 yielding the scalar output that we assign to `y`.
 Next, [**we can automatically calculate the gradient of `y`
 with respect to each component of `x`**]
@@ -160,7 +160,7 @@ x.grad  # Overwritten by the newly calculated gradient
 
 ```{.python .input}
 #@tab pytorch
-# PyTorch accumulates the gradient in default, we need to clear the previous
+# PyTorch accumulates the gradient by default, we need to clear the previous
 # values
 x.grad.zero_()
 y = x.sum()
@@ -374,7 +374,7 @@ We can now analyze the `f` function defined above.
 Note that it is piecewise linear in its input `a`.
 In other words, for any `a` there exists some constant scalar `k`
 such that `f(a) = k * a`, where the value of `k` depends on the input `a`.
-Consequently `d / a` allows us to verify that the gradient is correct.
+Consequently, `d / a` allows us to verify that the gradient is correct.
 
 ```{.python .input}
 a.grad == d / a
@@ -399,7 +399,7 @@ d_grad == d / a
 
 1. Why is the second derivative much more expensive to compute than the first derivative?
 1. After running the function for backpropagation, immediately run it again and see what happens.
-1. In the control flow example where we calculate the derivative of `d` with respect to `a`, what would happen if we changed the variable `a` to a random vector or matrix. At this point, the result of the calculation `f(a)` is no longer a scalar. What happens to the result? How do we analyze this?
+1. In the control flow example where we calculate the derivative of `d` with respect to `a`, what would happen if we changed the variable `a` to a random vector or matrix? At this point, the result of the calculation `f(a)` is no longer a scalar. What happens to the result? How do we analyze this?
 1. Redesign an example of finding the gradient of the control flow. Run and analyze the result.
 1. Let $f(x) = \sin(x)$. Plot $f(x)$ and $\frac{df(x)}{dx}$, where the latter is computed without exploiting that $f'(x) = \cos(x)$.
 
