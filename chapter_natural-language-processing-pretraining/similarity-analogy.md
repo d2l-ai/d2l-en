@@ -207,7 +207,23 @@ get_similar_tokens('beautiful', 3, glove_6b50d)
 
 ### Word Analogy
 
-In addition to seeking synonyms, we can also use the pretrained word vector to seek the analogies between words. For example, “man”:“woman”::“son”:“daughter” is an example of analogy, “man” is to “woman” as “son” is to “daughter”. The problem of seeking analogies can be defined as follows: for four words in the analogical relationship $a : b :: c : d$, given the first three words, $a$, $b$ and $c$, we want to find $d$. Assume the word vector for the word $w$ is $\text{vec}(w)$. To solve the analogy problem, we need to find the word vector that is most similar to the result vector of $\text{vec}(c)+\text{vec}(b)-\text{vec}(a)$.
+Besides finding similar words,
+we can also apply word vectors
+to word analogy tasks.
+For example,
+“man”:“woman”::“son”:“daughter”
+is the form of a word analogy:
+“man” is to “woman” as “son” is to “daughter”.
+Specifically,
+the word analogy completion task
+can be defined as:
+for a word analogy 
+$a : b :: c : d$, given the first three words $a$, $b$ and $c$, find $d$. 
+Denote the vector of word $w$ by $\text{vec}(w)$. 
+To complete the analogy,
+we will find the word 
+whose vector is most similar
+to the result of $\text{vec}(c)+\text{vec}(b)-\text{vec}(a)$.
 
 ```{.python .input}
 #@tab all
@@ -218,28 +234,40 @@ def get_analogy(token_a, token_b, token_c, embed):
     return embed.idx_to_token[int(topk[0])]  # Remove unknown words
 ```
 
-Verify the "male-female" analogy.
+Let us verify the "male-female" analogy using the loaded word vectors.
 
 ```{.python .input}
 #@tab all
 get_analogy('man', 'woman', 'son', glove_6b50d)
 ```
 
-“Capital-country” analogy: "beijing" is to "china" as "tokyo" is to what? The answer should be "japan".
+Below completes a
+“capital-country” analogy: 
+“beijing”:“china”::“tokyo”:“japan”.
+This demonstrates 
+semantics in the pretrained word vectors.
 
 ```{.python .input}
 #@tab all
 get_analogy('beijing', 'china', 'tokyo', glove_6b50d)
 ```
 
-"Adjective-superlative adjective" analogy: "bad" is to "worst" as "big" is to what? The answer should be "biggest".
+For the
+“adjective-superlative adjective” analogy
+such as 
+“bad”:“worst”::“big”:“biggest”,
+we can see that the pretrained word vectors
+may capture the syntactic information.
 
 ```{.python .input}
 #@tab all
 get_analogy('bad', 'worst', 'big', glove_6b50d)
 ```
 
-"Present tense verb-past tense verb" analogy: "do" is to "did" as "go" is to what? The answer should be "went".
+To show the captured notion
+of past tense in the pretrained word vectors,
+we can test the syntax using the
+"present tense-past tense" analogy: “do”:“did”::“go”:“went”.
 
 ```{.python .input}
 #@tab all
@@ -248,14 +276,14 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 
 ## Summary
 
-* Word vectors pretrained on a large-scale corpus can often be applied to downstream natural language processing tasks.
-* We can use pretrained word vectors to seek synonyms and analogies.
+* In practice, word vectors that are pretrained on large corpora can be applied to downstream natural language processing tasks.
+* Pretrained word vectors can be applied to the word similarity and analogy tasks.
 
 
 ## Exercises
 
 1. Test the fastText results using `TokenEmbedding('wiki.en')`.
-1. If the dictionary is extremely large, how can we accelerate finding synonyms and analogies?
+1. When the vocabulary is extremely large, how can we find similar words or complete a word analogy faster?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/387)
