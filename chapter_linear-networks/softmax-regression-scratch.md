@@ -117,10 +117,10 @@ d2l.reduce_sum(X, 0, keepdims=True), d2l.reduce_sum(X, 1, keepdims=True)
 
 We are now ready to (**implement the softmax operation**).
 Recall that softmax consists of three steps:
-i) we exponentiate each term (using `exp`);
-ii) we sum over each row (we have one row per example in the batch)
+(i) we exponentiate each term (using `exp`);
+(ii) we sum over each row (we have one row per example in the batch)
 to get the normalization constant for each example;
-iii) we divide each row by its normalization constant,
+(iii) we divide each row by its normalization constant,
 ensuring that the result sums to 1.
 Before looking at the code, let us recall
 how this looks expressed as an equation:
@@ -317,7 +317,7 @@ def evaluate_accuracy(net, data_iter):  #@save
     if isinstance(net, torch.nn.Module):
         net.eval()  # Set the model to evaluation mode
     metric = Accumulator(2)  # No. of correct predictions, no. of predictions
-    
+
     with torch.no_grad():
         for X, y in data_iter:
             metric.add(accuracy(net(X), y), d2l.size(y))

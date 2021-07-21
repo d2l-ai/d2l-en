@@ -2,7 +2,7 @@
 :label:`sec_text_preprocessing`
 
 We have reviewed and evaluated
-statistical tools 
+statistical tools
 and prediction challenges
 for sequence data.
 Such data can take many forms.
@@ -117,7 +117,7 @@ class Vocab:  #@save
         if tokens is None:
             tokens = []
         if reserved_tokens is None:
-            reserved_tokens = [] 
+            reserved_tokens = []
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self._token_freqs = sorted(counter.items(), key=lambda x: x[1],
@@ -145,15 +145,15 @@ class Vocab:  #@save
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
-    
+
     @property
     def unk(self):  # Index for the unknown token
         return 0
-    
+
     @property
     def token_freqs(self):  # Index for the unknown token
         return self._token_freqs
-    
+
 def count_corpus(tokens):  #@save
     """Count token frequencies."""
     # Here `tokens` is a 1D list or 2D list
@@ -163,7 +163,7 @@ def count_corpus(tokens):  #@save
     return collections.Counter(tokens)
 ```
 
-We [**construct a vocabulary**] using the time machine dataset as the corpus. 
+We [**construct a vocabulary**] using the time machine dataset as the corpus.
 Then we print the first few frequent tokens with their indices.
 
 ```{.python .input}
@@ -185,8 +185,8 @@ for i in [0, 10]:
 
 Using the above functions, we [**package everything into the `load_corpus_time_machine` function**], which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of the time machine corpus.
 The modifications we did here are:
-i) we tokenize text into characters, not words, to simplify the training in later sections;
-ii) `corpus` is a single list, not a list of token lists, since each text line in the time machine dataset is not necessarily a sentence or a paragraph.
+(i) we tokenize text into characters, not words, to simplify the training in later sections;
+(ii) `corpus` is a single list, not a list of token lists, since each text line in the time machine dataset is not necessarily a sentence or a paragraph.
 
 ```{.python .input}
 #@tab all
@@ -215,6 +215,6 @@ len(corpus), len(vocab)
 ## Exercises
 
 1. Tokenization is a key preprocessing step. It varies for different languages. Try to find another three commonly used methods to tokenize text.
-1. In the experiment of this section, tokenize text into words and vary the `min_freq` arguments of the `Vocab` instance. How does this affect the vocabulary size? 
+1. In the experiment of this section, tokenize text into words and vary the `min_freq` arguments of the `Vocab` instance. How does this affect the vocabulary size?
 
 [Discussions](https://discuss.d2l.ai/t/115)

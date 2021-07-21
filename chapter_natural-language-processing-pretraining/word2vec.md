@@ -256,7 +256,7 @@ uses context word vectors as the word representations.
 ## Exercises
 
 1. What is the computational complexity for calculating each gradient? What could be the issue if the dictionary size is huge?
-1. Some fixed phrases in English consist of multiple words, such as "new york". How to train their word vectors? Hint: See section 4 in the word2vec paper :cite:`Mikolov.Sutskever.Chen.ea.2013`.
+1. Some fixed phrases in English consist of multiple words, such as "new york". How to train their word vectors? Hint: see Section 4 in the word2vec paper :cite:`Mikolov.Sutskever.Chen.ea.2013`.
 1. Let us reflect on the word2vec design by taking the skip-gram model as an example. What is the relationship between the dot product of two word vectors in the skip-gram model and the cosine similarity? For a pair of words with similar semantics, why may the cosine similarity of their word vectors (trained by the skip-gram model) be high?
 
 [Discussions](https://discuss.d2l.ai/t/381)

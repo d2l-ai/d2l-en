@@ -85,8 +85,8 @@ representations**):
 `box_corner_to_center` converts from the two-corner
 representation to the center-width-height presentation,
 and `box_center_to_corner` vice versa.
-The input argument `boxes` can be either a tensor of length 4,
-or a two-dimensional tensor of shape ($n$, 4), where $n$ is the number of bounding boxes.
+The input argument `boxes` should be a two-dimensional tensor of
+shape ($n$, 4), where $n$ is the number of bounding boxes.
 
 ```{.python .input}
 #@tab all
