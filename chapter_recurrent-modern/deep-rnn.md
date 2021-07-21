@@ -110,7 +110,7 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 The architectural decisions such as choosing hyperparameters are very similar to those of :numref:`sec_lstm`. 
 We pick the same number of inputs and outputs as we have distinct tokens, i.e., `vocab_size`.
 The number of hidden units is still 256.
-The only difference is that we now select a nontrivial number of hidden layers by specifying the value of `num_layers`.
+The only difference is that we now (**select a nontrivial number of hidden layers by specifying the value of `num_layers`.**)
 
 ```{.python .input}
 vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
@@ -143,7 +143,7 @@ with strategy.scope():
     model = d2l.RNNModel(lstm_layer, len(vocab))
 ```
 
-## Training and Prediction
+## [**Training**] and Prediction
 
 Since now we instantiate two layers with the LSTM model, this rather more complex architecture slows down training considerably.
 

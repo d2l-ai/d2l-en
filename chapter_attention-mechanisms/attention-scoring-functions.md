@@ -87,7 +87,7 @@ from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
-## Masked Softmax Operation
+## [**Masked Softmax Operation**]
 
 As we just mentioned,
 a softmax operation is used to
@@ -172,7 +172,7 @@ def masked_softmax(X, valid_lens):
         return tf.nn.softmax(tf.reshape(X, shape=shape), axis=-1)
 ```
 
-To demonstrate how this function works,
+To [**demonstrate how this function works**],
 consider a minibatch of two $2 \times 4$ matrix examples,
 where the valid lengths for these two examples
 are two and three, respectively.
@@ -214,7 +214,7 @@ masked_softmax(torch.rand(2, 2, 4), d2l.tensor([[1, 3], [2, 4]]))
 masked_softmax(tf.random.uniform((2, 2, 4)), tf.constant([[1, 3], [2, 4]]))
 ```
 
-## Additive Attention
+## [**Additive Attention**]
 :label:`subsec_additive-attention`
 
 In general,
@@ -333,7 +333,7 @@ class AdditiveAttention(tf.keras.layers.Layer):
             self.attention_weights, **kwargs), values)
 ```
 
-Let us demonstrate the above `AdditiveAttention` class
+Let us [**demonstrate the above `AdditiveAttention` class**]
 with a toy example,
 where shapes (batch size, number of steps or sequence length in tokens, feature size)
 of queries, keys, and values
@@ -382,7 +382,7 @@ attention(queries, keys, values, valid_lens, training=False)
 
 Although additive attention contains learnable parameters,
 since every key is the same in this example,
-the attention weights are uniform,
+[**the attention weights**] are uniform,
 determined by the specified valid lengths.
 
 ```{.python .input}
@@ -391,7 +391,7 @@ d2l.show_heatmaps(d2l.reshape(attention.attention_weights, (1, 1, 2, 10)),
                   xlabel='Keys', ylabel='Queries')
 ```
 
-## Scaled Dot-Product Attention
+## [**Scaled Dot-Product Attention**]
 
 A more computationally efficient
 design for the scoring function can be
@@ -499,7 +499,7 @@ class DotProductAttention(tf.keras.layers.Layer):
         return tf.matmul(self.dropout(self.attention_weights, **kwargs), values)
 ```
 
-To demonstrate the above `DotProductAttention` class,
+To [**demonstrate the above `DotProductAttention` class**],
 we use the same keys, values, and valid lengths from the earlier toy example
 for additive attention.
 For the dot product operation,
@@ -531,7 +531,7 @@ attention(queries, keys, values, valid_lens, training=False)
 Same as in the additive attention demonstration,
 since `keys` contains the same element
 that cannot be differentiated by any query,
-uniform attention weights are obtained.
+[**uniform attention weights**] are obtained.
 
 ```{.python .input}
 #@tab all

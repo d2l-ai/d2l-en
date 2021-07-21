@@ -99,8 +99,8 @@ while the additional output layer will be trained from scratch.
 
 
 BERT further improved the state of the art on eleven natural language processing tasks
-under broad categories of i) single text classification (e.g., sentiment analysis), ii) text pair classification (e.g., natural language inference),
-iii) question answering, iv) text tagging (e.g., named entity recognition).
+under broad categories of (i) single text classification (e.g., sentiment analysis), (ii) text pair classification (e.g., natural language inference),
+(iii) question answering, (iv) text tagging (e.g., named entity recognition).
 All proposed in 2018,
 from context-sensitive ELMo to task-agnostic GPT and BERT,
 conceptually simple yet empirically powerful pretraining of deep representations for natural languages have revolutionized solutions to various natural language processing tasks.
@@ -159,6 +159,7 @@ and their corresponding segment IDs.
 #@tab all
 #@save
 def get_tokens_and_segments(tokens_a, tokens_b=None):
+    """Get tokens of the BERT input sequence and their segment IDs."""
     tokens = ['<cls>'] + tokens_a + ['<sep>']
     # 0 and 1 are marking segment A and B, respectively
     segments = [0] * (len(tokens_a) + 2)
@@ -189,6 +190,7 @@ segment embeddings and learnable positional embeddings.
 ```{.python .input}
 #@save
 class BERTEncoder(nn.Block):
+    """BERT encoder."""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                  num_layers, dropout, max_len=1000, **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
@@ -217,6 +219,7 @@ class BERTEncoder(nn.Block):
 #@tab pytorch
 #@save
 class BERTEncoder(nn.Module):
+    """BERT encoder."""
     def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_input,
                  ffn_num_hiddens, num_heads, num_layers, dropout,
                  max_len=1000, key_size=768, query_size=768, value_size=768,
@@ -244,7 +247,7 @@ class BERTEncoder(nn.Module):
         return X
 ```
 
-Suppose that the vocabulary size is 10,000.
+Suppose that the vocabulary size is 10000.
 To demonstrate forward inference of `BERTEncoder`,
 let us create an instance of it and initialize its parameters.
 
@@ -305,7 +308,7 @@ As illustrated in :numref:`sec_language_model`,
 a language model predicts a token using the context on its left.
 To encode context bidirectionally for representing each token,
 BERT randomly masks tokens and uses tokens from the bidirectional context to
-predict the masked tokens.
+predict the masked tokens in a self-supervised fashion.
 This task is referred to as a *masked language model*.
 
 In this pretraining task,
@@ -335,6 +338,7 @@ The output is the prediction results at these positions.
 ```{.python .input}
 #@save
 class MaskLM(nn.Block):
+    """The masked language model task of BERT."""
     def __init__(self, vocab_size, num_hiddens, **kwargs):
         super(MaskLM, self).__init__(**kwargs)
         self.mlp = nn.Sequential()
@@ -361,6 +365,7 @@ class MaskLM(nn.Block):
 #@tab pytorch
 #@save
 class MaskLM(nn.Module):
+    """The masked language model task of BERT."""
     def __init__(self, vocab_size, num_hiddens, num_inputs=768, **kwargs):
         super(MaskLM, self).__init__(**kwargs)
         self.mlp = nn.Sequential(nn.Linear(num_inputs, num_hiddens),
@@ -408,7 +413,7 @@ mlm_Y_hat.shape
 ```
 
 With the ground truth labels `mlm_Y` of the predicted tokens `mlm_Y_hat` under masks,
-we can calculate the cross entropy loss of the masked language model task in BERT pretraining.
+we can calculate the cross-entropy loss of the masked language model task in BERT pretraining.
 
 ```{.python .input}
 mlm_Y = np.array([[7, 8, 9], [10, 20, 30]])
@@ -449,6 +454,7 @@ where `X` is the output of the MLP hidden layer whose input is the encoded “&l
 ```{.python .input}
 #@save
 class NextSentencePred(nn.Block):
+    """The next sentence prediction task of BERT."""
     def __init__(self, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
         self.output = nn.Dense(2)
@@ -462,6 +468,7 @@ class NextSentencePred(nn.Block):
 #@tab pytorch
 #@save
 class NextSentencePred(nn.Module):
+    """The next sentence prediction task of BERT."""
     def __init__(self, num_inputs, **kwargs):
         super(NextSentencePred, self).__init__(**kwargs)
         self.output = nn.Linear(num_inputs, 2)
@@ -528,6 +535,7 @@ and next sentence predictions `nsp_Y_hat`.
 ```{.python .input}
 #@save
 class BERTModel(nn.Block):
+    """The BERT model."""
     def __init__(self, vocab_size, num_hiddens, ffn_num_hiddens, num_heads,
                  num_layers, dropout, max_len=1000):
         super(BERTModel, self).__init__()
@@ -553,6 +561,7 @@ class BERTModel(nn.Block):
 #@tab pytorch
 #@save
 class BERTModel(nn.Module):
+    """The BERT model."""
     def __init__(self, vocab_size, num_hiddens, norm_shape, ffn_num_input,
                  ffn_num_hiddens, num_heads, num_layers, dropout,
                  max_len=1000, key_size=768, query_size=768, value_size=768,

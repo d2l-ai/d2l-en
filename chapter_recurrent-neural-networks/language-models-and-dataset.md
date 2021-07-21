@@ -156,10 +156,10 @@ vocab = d2l.Vocab(corpus)
 vocab.token_freqs[:10]
 ```
 
-As we can see, the most popular words are actually quite boring to look at.
-They are often referred to as *stop words* and thus filtered out.
+As we can see, (**the most popular words are**) actually quite boring to look at.
+They are often referred to as (***stop words***) and thus filtered out.
 Nonetheless, they still carry meaning and we will still use them.
-Besides, it is quite clear that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea, we plot the figure of the word frequency.
+Besides, it is quite clear that the word frequency decays rather rapidly. The $10^{\mathrm{th}}$ most frequent word is less than $1/5$ as common as the most popular one. To get a better idea, we [**plot the figure of the word frequency**].
 
 ```{.python .input}
 #@tab all
@@ -181,8 +181,8 @@ which is equivalent to
 $$\log n_i = -\alpha \log i + c,$$
 
 where $\alpha$ is the exponent that characterizes the distribution and $c$ is a constant.
-This should already give us pause if we want to model words by count statistics and smoothing.
-After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But what about the other word combinations, such as bigrams, trigrams, and beyond?
+This should already give us pause if we want to model words by counting statistics and smoothing.
+After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But [**what about the other word combinations, such as bigrams, trigrams**], and beyond?
 Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
 
 ```{.python .input}
@@ -202,7 +202,7 @@ trigram_vocab = d2l.Vocab(trigram_tokens)
 trigram_vocab.token_freqs[:10]
 ```
 
-Last, let us visualize the token frequency among these three models: unigrams, bigrams, and trigrams.
+Last, let us [**visualize the token frequency**] among these three models: unigrams, bigrams, and trigrams.
 
 ```{.python .input}
 #@tab all
@@ -230,7 +230,7 @@ Now let us describe general strategies.
 Before introducing the model,
 let us assume that we will use a neural network to train a language model,
 where the network processes a minibatch of sequences with predefined length, say $n$ time steps, at a time.
-Now the question is how to read minibatches of features and labels at random.
+Now the question is how to [**read minibatches of features and labels at random.**]
 
 To begin with,
 since a text sequence can be arbitrarily long,
@@ -266,7 +266,7 @@ we describe how to accomplish this for both
 
 ### Random Sampling
 
-In random sampling, each example is a subsequence arbitrarily captured on the original long sequence.
+(**In random sampling, each example is a subsequence arbitrarily captured on the original long sequence.**)
 The subsequences from two adjacent random minibatches
 during iteration
 are not necessarily adjacent on the original sequence.
@@ -308,7 +308,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):  #@save
         yield d2l.tensor(X), d2l.tensor(Y)
 ```
 
-Let us manually generate a sequence from 0 to 34.
+Let us [**manually generate a sequence from 0 to 34.**]
 We assume that
 the batch size and numbers of time steps are 2 and 5,
 respectively.
@@ -323,10 +323,10 @@ for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=5):
 
 ### Sequential Partitioning
 
-In addition to random sampling of the original sequence, we can also ensure that 
+In addition to random sampling of the original sequence, [**we can also ensure that 
 the subsequences from two adjacent minibatches
 during iteration
-are adjacent on the original sequence.
+are adjacent on the original sequence.**]
 This strategy preserves the order of split subsequences when iterating over minibatches, hence is called sequential partitioning.
 
 ```{.python .input}
@@ -365,7 +365,7 @@ def seq_data_iter_sequential(corpus, batch_size, num_steps):  #@save
 ```
 
 Using the same settings,
-let us print features `X` and labels `Y` for each minibatch of subsequences read by sequential partitioning.
+let us [**print features `X` and labels `Y` for each minibatch**] of subsequences read by sequential partitioning.
 Note that
 the subsequences from two adjacent minibatches
 during iteration
@@ -395,7 +395,7 @@ class SeqDataLoader:  #@save
         return self.data_iter_fn(self.corpus, self.batch_size, self.num_steps)
 ```
 
-Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other other functions with the `load_data` prefix, such as `d2l.load_data_fashion_mnist` defined in :numref:`sec_fashion_mnist`.
+[**Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary**], so we can use it similarly as other other functions with the `load_data` prefix, such as `d2l.load_data_fashion_mnist` defined in :numref:`sec_fashion_mnist`.
 
 ```{.python .input}
 #@tab all

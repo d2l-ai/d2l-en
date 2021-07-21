@@ -31,8 +31,8 @@ is producing a model that performs well on data
 that we have never seen before.
 But we can only fit the model to data that we can actually see.
 Thus we can decompose the task of fitting models into two key concerns:
-i) *optimization*: the process of fitting our models to observed data;
-ii) *generalization*: the mathematical principles and practitioners' wisdom
+(i) *optimization*: the process of fitting our models to observed data;
+(ii) *generalization*: the mathematical principles and practitioners' wisdom
 that guide as to how to produce models whose validity extends
 beyond the exact set of data examples used to train them.
 

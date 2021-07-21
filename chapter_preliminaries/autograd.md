@@ -108,7 +108,7 @@ y
 ```
 
 Since `x` is a vector of length 4,
-an inner product of `x` and `x` is performed,
+an dot product of `x` and `x` is performed,
 yielding the scalar output that we assign to `y`.
 Next, [**we can automatically calculate the gradient of `y`
 with respect to each component of `x`**]

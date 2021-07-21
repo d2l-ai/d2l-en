@@ -96,7 +96,7 @@ We are barely scratching the surface of it.
 After reviewing so many statistical tools,
 let us try this out in practice.
 We begin by generating some data.
-To keep things simple we generate our sequence data by using a sine function with some additive noise for time steps $1, 2, \ldots, 1000$.
+To keep things simple we (**generate our sequence data by using a sine function with some additive noise for time steps $1, 2, \ldots, 1000$.**)
 
 ```{.python .input}
 %matplotlib inline
@@ -138,7 +138,7 @@ d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
 Next, we need to turn such a sequence into features and labels that our model can train on.
-Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.
+Based on the embedding dimension $\tau$ we [**map the data into pairs $y_t = x_t$ and $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.**]
 The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for the first $\tau$ of them.
 A simple fix, in particular if the sequence is long,
 is to discard those few terms.
@@ -171,8 +171,8 @@ train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
 ```
 
-Here we keep the architecture fairly simple:
-just an MLP with two fully-connected layers, ReLU activation, and squared loss.
+Here we [**keep the architecture fairly simple:
+just an MLP**] with two fully-connected layers, ReLU activation, and squared loss.
 
 ```{.python .input}
 # A simple MLP
@@ -221,7 +221,7 @@ def get_net():
 loss = tf.keras.losses.MeanSquaredError()
 ```
 
-Now we are ready to train the model. The code below is essentially identical to the training loop in previous sections,
+Now we are ready to [**train the model**]. The code below is essentially identical to the training loop in previous sections,
 such as :numref:`sec_linear_concise`.
 Thus, we will not delve into much detail.
 
@@ -280,7 +280,7 @@ train(net, train_iter, loss, 5, 0.01)
 
 ## Prediction
 
-Since the training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens just in the next time step,
+Since the training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to [**predict what happens just in the next time step**],
 namely the *one-step-ahead prediction*.
 
 ```{.python .input}
@@ -306,7 +306,7 @@ $$
 $$
 
 Generally, for an observed sequence up to $x_t$, its predicted output $\hat{x}_{t+k}$ at time step $t+k$ is called the $k$*-step-ahead prediction*. Since we have observed up to $x_{604}$, its $k$-step-ahead prediction is $\hat{x}_{604+k}$.
-In other words, we will have to use our own predictions to make multistep-ahead predictions.
+In other words, we will have to [**use our own predictions to make multistep-ahead predictions**].
 Let us see how well this goes.
 
 ```{.python .input}
@@ -342,7 +342,7 @@ This is ultimately due to the fact that the errors build up.
 Let us say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$.
 Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + c \epsilon_1$ for some constant $c$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon. For instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that the accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
 
-Let us take a closer look at the difficulties in $k$-step-ahead predictions
+Let us [**take a closer look at the difficulties in $k$-step-ahead predictions**]
 by computing predictions on the entire sequence for $k = 1, 4, 16, 64$.
 
 ```{.python .input}

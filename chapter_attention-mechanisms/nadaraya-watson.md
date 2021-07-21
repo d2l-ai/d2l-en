@@ -39,7 +39,7 @@ import tensorflow as tf
 tf.random.set_seed(seed=1322)
 ```
 
-## Generating the Dataset
+## [**Generating the Dataset**]
 
 To keep things simple,
 let us consider the following regression problem:
@@ -145,7 +145,7 @@ y_hat = tf.repeat(tf.reduce_mean(y_train), repeats=n_test)
 plot_kernel_reg(y_hat)
 ```
 
-## Nonparametric Attention Pooling
+## [**Nonparametric Attention Pooling**]
 
 Obviously,
 average pooling omits the inputs $x_i$.
@@ -251,7 +251,7 @@ y_hat = tf.matmul(attention_weights, tf.expand_dims(y_train, axis=1))
 plot_kernel_reg(y_hat)
 ```
 
-Now let us take a look at the attention weights.
+Now let us take a look at the [**attention weights**].
 Here testing inputs are queries while training inputs are keys.
 Since both inputs are sorted,
 we can see that the closer the query-key pair is,
@@ -277,7 +277,7 @@ d2l.show_heatmaps(tf.expand_dims(tf.expand_dims(attention_weights, axis=0), axis
                   ylabel='Sorted testing inputs')
 ```
 
-## Parametric Attention Pooling
+## **Parametric Attention Pooling**
 
 Nonparametric Nadaraya-Watson kernel regression
 enjoys the *consistency* benefit:
@@ -310,7 +310,7 @@ provided by deep learning frameworks.
 
 Suppose that the first minibatch contains $n$ matrices $\mathbf{X}_1, \ldots, \mathbf{X}_n$ of shape $a\times b$, and the second minibatch contains $n$ matrices $\mathbf{Y}_1, \ldots, \mathbf{Y}_n$ of shape $b\times c$. Their batch matrix multiplication
 results in
-$n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ of shape $a\times c$. Therefore, given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of their batch matrix multiplication output is ($n$, $a$, $c$).
+$n$ matrices $\mathbf{X}_1\mathbf{Y}_1, \ldots, \mathbf{X}_n\mathbf{Y}_n$ of shape $a\times c$. Therefore, [**given two tensors of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of their batch matrix multiplication output is ($n$, $a$, $c$).**]
 
 ```{.python .input}
 X = d2l.ones((2, 1, 4))
@@ -332,7 +332,7 @@ Y = tf.ones((2, 4, 6))
 tf.matmul(X, Y).shape
 ```
 
-In the context of attention mechanisms, we can use minibatch matrix multiplication to compute weighted averages of values in a minibatch.
+In the context of attention mechanisms, we can [**use minibatch matrix multiplication to compute weighted averages of values in a minibatch.**]
 
 ```{.python .input}
 weights = d2l.ones((2, 10)) * 0.1
@@ -359,7 +359,7 @@ tf.matmul(tf.expand_dims(weights, axis=1), tf.expand_dims(values, axis=-1)).nump
 Using minibatch matrix multiplication,
 below we define the parametric version
 of Nadaraya-Watson kernel regression
-based on the parametric attention pooling in
+based on the [**parametric attention pooling**] in
 :eqref:`eq_nadaraya-watson-gaussian-para`.
 
 ```{.python .input}
@@ -417,8 +417,8 @@ class NWKernelRegression(tf.keras.layers.Layer):
 
 ### Training
 
-In the following, we transform the training dataset
-to keys and values to train the attention model.
+In the following, we [**transform the training dataset
+to keys and values**] to train the attention model.
 In the parametric attention pooling,
 any training input takes key-value pairs from all the training examples except for itself to predict its output.
 
@@ -468,7 +468,7 @@ values = tf.reshape(Y_tile[tf.cast(1 - tf.eye(n_train), dtype=tf.bool)], shape=(
 ```
 
 Using the squared loss and stochastic gradient descent,
-we train the parametric attention model.
+we [**train the parametric attention model**].
 
 ```{.python .input}
 net = NWKernelRegression()
@@ -522,7 +522,7 @@ for epoch in range(5):
 ```
 
 After training the parametric attention model,
-we can plot its prediction.
+we can [**plot its prediction**].
 Trying to fit the training dataset with noise,
 the predicted line is less smooth
 than its nonparametric counterpart that was plotted earlier.
@@ -560,7 +560,7 @@ plot_kernel_reg(y_hat)
 ```
 
 Comparing with nonparametric attention pooling,
-the region with large attention weights becomes sharper
+[**the region with large attention weights becomes sharper**]
 in the learnable and parametric setting.
 
 ```{.python .input}
