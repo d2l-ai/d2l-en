@@ -273,6 +273,7 @@ class Animator:
 
     def add(self, x, y):
         # Add multiple data points into the figure
+        display.clear_output(wait=True)
         if not hasattr(y, "__len__"):
             y = [y]
         n = len(y)
@@ -291,7 +292,6 @@ class Animator:
             self.axes[0].plot(x, y, fmt)
         self.config_axes()
         display.display(self.fig)
-        display.clear_output(wait=True)
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
