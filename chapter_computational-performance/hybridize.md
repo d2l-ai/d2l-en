@@ -195,12 +195,13 @@ Explicitly adding the `jit_compile = True` flag to the `tf.function()` call enab
 
 ### Acceleration by Hybridization
 
-To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let us define a function to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance.
+To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let us define a class to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance.
 
 ```{.python .input}
 #@tab all
 #@save
 class Benchmark:
+    """For measuring running time."""
     def __init__(self, description='Done'):
         self.description = description
 

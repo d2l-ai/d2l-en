@@ -357,6 +357,7 @@ and generate pretraining examples from it.
 ```{.python .input}
 #@save
 def load_data_wiki(batch_size, max_len):
+    """Load the WikiText-2 dataset."""
     num_workers = d2l.get_dataloader_workers()
     data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
     paragraphs = _read_wiki(data_dir)
@@ -370,6 +371,7 @@ def load_data_wiki(batch_size, max_len):
 #@tab pytorch
 #@save
 def load_data_wiki(batch_size, max_len):
+    """Load the WikiText-2 dataset."""
     num_workers = d2l.get_dataloader_workers()
     data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
     paragraphs = _read_wiki(data_dir)
