@@ -1,9 +1,36 @@
 # Sentiment Analysis and the Dataset
 :label:`sec_sentiment`
 
-Text classification is a common task in natural language processing, which transforms a sequence of text of indefinite length into a category of text. It is similar to the image classification, the most frequently used application in this book, e.g., :numref:`sec_naive_bayes`. The only difference is that, rather than an image, text classification's example is a text sentence.
 
-This section will focus on loading data for one of the sub-questions in this field: using text sentiment classification to analyze the emotions of the text's author. This problem is also called sentiment analysis and has a wide range of applications. For example, we can analyze user reviews of products to obtain user satisfaction statistics, or analyze user sentiments about market conditions and use it to predict future trends.
+With the proliferation of online social media
+and review platforms,
+a plethora of
+opinionated data
+have been logged,
+bearing great potential for
+supporting decision making processes.
+*Sentiment analysis*
+studies people's sentiments
+in their produced text,
+such as product reviews,
+blog comments,
+and
+forum discussions.
+It enjoys wide applications
+to fields as diverse as 
+politics (e.g., analysis of public sentiments towards policies),
+finance (e.g., analysis of sentiments of the market),
+and 
+marketing (e.g., product research and brand management).
+
+Since sentiments
+can be categorized
+as discrete polarities or scales (e.g., positive, neutral, and negative),
+we can consider 
+sentiment analysis 
+as a text classification task,
+which transforms a varying-length text sequence
+into a fixed-length text category.
 
 ```{.python .input}
 from d2l import mxnet as d2l
