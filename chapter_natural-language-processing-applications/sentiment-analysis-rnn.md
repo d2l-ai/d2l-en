@@ -2,12 +2,22 @@
 :label:`sec_sentiment_rnn`
 
 
-Similar to search synonyms and analogies, text classification is also a
-downstream application of word embedding. In this section, we will apply
-pretrained word vectors (GloVe) and bidirectional recurrent neural networks with
-multiple hidden layers :cite:`Maas.Daly.Pham.ea.2011`, as shown in :numref:`fig_nlp-map-sa-rnn`. We will use the model to
-determine whether a text sequence of indefinite length contains positive or
-negative emotion. 
+Like word similarity and analogy tasks,
+we can also apply pretrained word vectors
+to sentiment analysis.
+As a specific example
+illustrated in :numref:`fig_nlp-map-sa-rnn`,
+we will represent each token
+using the pretrained GloVe model,
+and feed these token representations
+into a multi-layer bidirectional RNN
+to obtain the text sequence representation,
+which will
+be transformed into 
+sentiment analysis outputs :cite:`Maas.Daly.Pham.ea.2011`.
+For the same downstream application,
+we will consider a different architectural
+choice later.
 
 ![This section feeds pretrained GloVe to an RNN-based architecture for sentiment analysis.](../img/nlp-map-sa-rnn.svg)
 :label:`fig_nlp-map-sa-rnn`
