@@ -129,7 +129,6 @@ the preprocessing step
 for the machine translation dataset
 in :numref:`sec_machine_translation`.
 
-
 ```{.python .input}
 #@tab all
 num_steps = 500  # sequence length

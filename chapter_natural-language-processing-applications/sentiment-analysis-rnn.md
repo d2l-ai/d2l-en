@@ -5,6 +5,13 @@
 Like word similarity and analogy tasks,
 we can also apply pretrained word vectors
 to sentiment analysis.
+Since the IMDb review dataset
+in :numref:`sec_sentiment`
+is not very big,
+using text representations
+that were pretrained
+on large-scale corpora
+may reduce overfitting of the model.
 As a specific example
 illustrated in :numref:`fig_nlp-map-sa-rnn`,
 we will represent each token
@@ -158,14 +165,15 @@ net.apply(init_weights);
 
 ## Loading Pretrained Word Vectors
 
-Because the training dataset for sentiment classification is not very large, in order to deal with overfitting, we will directly use word vectors pretrained on a larger corpus as the feature vectors of all words. Here, we load a 100-dimensional GloVe word vector for each word in the dictionary `vocab`.
+Below we load the pretrained 100-dimensional (needs to be consistent with `embed_size`) GloVe embeddings for tokens in the vocabulary.
 
 ```{.python .input}
 #@tab all
 glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
 ```
 
-Query the word vectors that in our vocabulary.
+Print the shape of the vectors
+for all the tokens in the vocabulary.
 
 ```{.python .input}
 #@tab all
@@ -173,7 +181,11 @@ embeds = glove_embedding[vocab.idx_to_token]
 embeds.shape
 ```
 
-Then, we will use these word vectors as feature vectors for each word in the reviews. Note that the dimensions of the pretrained word vectors need to be consistent with the embedding layer output size `embed_size` in the created model. In addition, we no longer update these word vectors during training.
+We use these pretrained
+word vectors
+to represent tokens in the reviews
+and will not update
+these vectors during training.
 
 ```{.python .input}
 net.embedding.weight.set_data(embeds)
@@ -188,7 +200,7 @@ net.embedding.weight.requires_grad = False
 
 ## Training and Evaluating the Model
 
-Now, we can start training.
+Now we can train the bidirectional RNN for sentiment analysis.
 
 ```{.python .input}
 lr, num_epochs = 0.01, 5
@@ -205,7 +217,7 @@ loss = nn.CrossEntropyLoss(reduction="none")
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-Finally, define the prediction function.
+We define the following function to predict the sentiment of a text sequence using the trained model `net`.
 
 ```{.python .input}
 #@save
@@ -224,7 +236,7 @@ def predict_sentiment(net, vocab, sentence):
     return 'positive' if label == 1 else 'negative'
 ```
 
-Then, use the trained model to classify the sentiments of two simple sentences.
+Finally, let us use the trained model to predict the sentiment for two simple sentences.
 
 ```{.python .input}
 #@tab all
@@ -238,15 +250,16 @@ predict_sentiment(net, vocab, 'this movie is so bad')
 
 ## Summary
 
-* Text classification transforms a sequence of text of indefinite length into a category of text. This is a downstream application of word embedding.
-* We can apply pretrained word vectors and recurrent neural networks to classify the emotions in a text.
+* Pretrained word vectors can represent individual tokens in a text sequence.
+* Bidirectional RNNs can represent a text sequence, such as via the concatenation of its hidden states at the initial and final time steps. This single text representation can be transformed into categories using a fully-connected layer.
+
 
 
 ## Exercises
 
-1. Increase the number of epochs. What accuracy rate can you achieve on the training and testing datasets? What about trying to re-tune other hyperparameters?
-1. Will using larger pretrained word vectors, such as 300-dimensional GloVe word vectors, improve classification accuracy?
-1. Can we improve the classification accuracy by using the spaCy word tokenization tool? You need to install spaCy: `pip install spacy` and install the English package: `python -m spacy download en`. In the code, first import spacy: `import spacy`. Then, load the spacy English package: `spacy_en = spacy.load('en')`. Finally, define the function `def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)]` and replace the original `tokenizer` function. It should be noted that GloVe's word vector uses "-" to connect each word when storing noun phrases. For example, the phrase "new york" is represented as "new-york" in GloVe. After using spaCy tokenization, "new york" may be stored as "new york".
+1. Increase the number of epochs. Can you improve the training and testing accuracies? How about tuning other hyperparameters?
+1. Use larger pretrained word vectors, such as 300-dimensional GloVe embeddings. Does it improve classification accuracy?
+1. Can we improve the classification accuracy by using the spaCy tokenization? You need to install spaCy (`pip install spacy`) and install the English package (`python -m spacy download en`). In the code, first, import spaCy (`import spacy`). Then, load the spaCy English package (`spacy_en = spacy.load('en')`). Finally, define the function `def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)]` and replace the original `tokenizer` function. Note the different forms of phrase tokens in GloVe and spaCy. For example, the phrase token "new york" takes the form of "new-york" in GloVe and the form of "new york" after the spaCy tokenization.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/392)

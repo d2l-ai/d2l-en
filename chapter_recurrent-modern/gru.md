@@ -88,7 +88,7 @@ $$
 where $\mathbf{W}_{xr}, \mathbf{W}_{xz} \in \mathbb{R}^{d \times h}$ and
 $\mathbf{W}_{hr}, \mathbf{W}_{hz} \in \mathbb{R}^{h \times h}$ are weight
 parameters and $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h}$ are
-biases. 
+biases.
 Note that broadcasting (see :numref:`subsec_broadcasting`) is triggered during the summation.
 We use sigmoid functions (as introduced in :numref:`sec_mlp`) to transform input values to the interval $(0, 1)$.
 
@@ -255,7 +255,7 @@ def get_params(vocab_size, num_hiddens, device):
 #@tab tensorflow
 def get_params(vocab_size, num_hiddens):
     num_inputs = num_outputs = vocab_size
-    
+
     def normal(shape):
         return d2l.normal(shape=shape,stddev=0.01,mean=0,dtype=tf.float32)
 
@@ -263,7 +263,7 @@ def get_params(vocab_size, num_hiddens):
         return (tf.Variable(normal((num_inputs, num_hiddens)), dtype=tf.float32),
                 tf.Variable(normal((num_hiddens, num_hiddens)), dtype=tf.float32),
                 tf.Variable(d2l.zeros(num_hiddens), dtype=tf.float32))
-    
+
     W_xz, W_hz, b_z = three()  # Update gate parameters
     W_xr, W_hr, b_r = three()  # Reset gate parameters
     W_xh, W_hh, b_h = three()  # Candidate hidden state parameters
@@ -346,7 +346,7 @@ def gru(inputs, state, params):
     return tf.concat(outputs, axis=0), (H,)
 ```
 
-### Training and Prediction
+### Training and Predicting
 
 [**Training**] and prediction work in exactly the same manner as in :numref:`sec_rnn_scratch`.
 After training,
