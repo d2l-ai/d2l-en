@@ -25,12 +25,21 @@ marketing (e.g., product research and brand management).
 
 Since sentiments
 can be categorized
-as discrete polarities or scales (e.g., positive, neutral, and negative),
+as discrete polarities or scales (e.g., positive and negative),
 we can consider 
 sentiment analysis 
 as a text classification task,
 which transforms a varying-length text sequence
 into a fixed-length text category.
+In this chapter,
+we will use Stanford's [large movie review dataset](https://ai.stanford.edu/~amaas/data/sentiment/)
+for sentiment analysis. 
+It consists of a training set and a testing set, 
+either containing 25000 movie reviews downloaded from IMDb.
+In both datasets, 
+there are equal number of 
+"positive" and "negative" labels,
+indicating different sentiment polarities.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -47,13 +56,10 @@ from torch import nn
 import os
 ```
 
-## The Sentiment Analysis Dataset
+##  Reading the Dataset
 
-We use Stanford's [Large Movie Review Dataset](https://ai.stanford.edu/~amaas/data/sentiment/) as the dataset for sentiment analysis. This dataset is divided into two datasets for training and testing purposes, each containing 25,000 movie reviews downloaded from IMDb. In each dataset, the number of comments labeled as "positive" and "negative" is equal.
-
-###  Reading the Dataset
-
-We first download this dataset to the "../data" path and extract it to "../data/aclImdb".
+First, download and extract this IMDb review dataset
+in the path `../data/aclImdb`.
 
 ```{.python .input}
 #@tab all
@@ -65,12 +71,13 @@ d2l.DATA_HUB['aclImdb'] = (
 data_dir = d2l.download_extract('aclImdb', 'aclImdb')
 ```
 
-Next, read the training and test datasets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
+Next, read the training and test datasets. Each example is a review and its label: 1 for "positive" and 0 for "negative".
 
 ```{.python .input}
 #@tab all
 #@save
 def read_imdb(data_dir, is_train):
+    """Read the IMDb review dataset text sequences and labels."""
     data, labels = [], []
     for label in ('pos', 'neg'):
         folder_name = os.path.join(data_dir, 'train' if is_train else 'test',
@@ -88,22 +95,40 @@ for x, y in zip(train_data[0][:3], train_data[1][:3]):
     print('label:', y, 'review:', x[0:60])
 ```
 
-### Tokenization and Vocabulary
+## Preprocessing the Dataset
 
-We use a word as a token, and then create a dictionary based on the training dataset.
+Treating each word as a token
+and filtering out words that appear less than 5 times,
+we create a vocabulary out of the training dataset.
 
 ```{.python .input}
 #@tab all
 train_tokens = d2l.tokenize(train_data[0], token='word')
 vocab = d2l.Vocab(train_tokens, min_freq=5, reserved_tokens=['<pad>'])
+```
 
+After tokenization,
+let us plot the histogram of
+review lengths in tokens.
+
+```{.python .input}
+#@tab all
 d2l.set_figsize()
+d2l.plt.xlabel('# tokens per review')
+d2l.plt.ylabel('count')
 d2l.plt.hist([len(line) for line in train_tokens], bins=range(0, 1000, 50));
 ```
 
-### Padding to the Same Length
+As we expected,
+the reviews have varying lengths.
+To process
+a minibatch of such reviews at each time,
+we set the length of each review to 500 with truncation and padding,
+which is similar to 
+the preprocessing step 
+for the machine translation dataset
+in :numref:`sec_machine_translation`.
 
-Because the reviews have different lengths, so they cannot be directly combined into minibatches. Here we fix the length of each comment to 500 by truncating or adding "&lt;unk&gt;" indices.
 
 ```{.python .input}
 #@tab all
@@ -113,9 +138,10 @@ train_features = d2l.tensor([d2l.truncate_pad(
 print(train_features.shape)
 ```
 
-### Creating the Data Iterator
+## Creating Data Iterators
 
-Now, we will create a data iterator. Each iteration will return a minibatch of data.
+Now we can create data iterators.
+At each iteration, a minibatch of examples are returned.
 
 ```{.python .input}
 train_iter = d2l.load_array((train_features, train_data[1]), 64)
@@ -138,11 +164,13 @@ print('# batches:', len(train_iter))
 
 ## Putting All Things Together
 
-Last, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
+Last, we wrap up the above steps into the `load_data_imdb` function.
+It returns training and test data iterators and the vocabulary of the IMDb review dataset.
 
 ```{.python .input}
 #@save
 def load_data_imdb(batch_size, num_steps=500):
+    """Return data iterators and the vocabulary of the IMDb review dataset."""
     data_dir = d2l.download_extract('aclImdb', 'aclImdb')
     train_data = read_imdb(data_dir, True)
     test_data = read_imdb(data_dir, False)
@@ -163,6 +191,7 @@ def load_data_imdb(batch_size, num_steps=500):
 #@tab pytorch
 #@save
 def load_data_imdb(batch_size, num_steps=500):
+    """Return data iterators and the vocabulary of the IMDb review dataset."""
     data_dir = d2l.download_extract('aclImdb', 'aclImdb')
     train_data = read_imdb(data_dir, True)
     test_data = read_imdb(data_dir, False)
@@ -183,17 +212,21 @@ def load_data_imdb(batch_size, num_steps=500):
 
 ## Summary
 
-* Text classification can classify a text sequence into a category.
-* To classify a text sentiment, we load an IMDb dataset and tokenize its words. Then we pad the text sequence for short reviews and create a data iterator.
+* Sentiment analysis studies people's sentiments in their produced text, which is considered as a text classification problem that transforms a varying-length text sequence
+into a fixed-length text category.
+* After preprocessing, we can load Stanford's large movie review dataset (IMDb review dataset) into data iterators with a vocabulary.
+
 
 ## Exercises
 
-1. Discover a different natural language dataset (such as [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html)) and build a similar data_loader function as `load_data_imdb`.
+
+1. What hyperparameters in this section can we modify to accelerate training sentiment analysis models?
+1. Can you implement a function to load the dataset of [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html) into data iterators and labels for sentiment analysis?
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/391)
 :end_tab:
-
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1387)
