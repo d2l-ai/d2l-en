@@ -262,8 +262,11 @@ Now, we implement this module. Note that special processing has been performed o
 def resnet_block(num_channels, num_residuals, first_block=False):
     blk = nn.Sequential()
     for i in range(num_residuals):
-        if i == 0 and not first_block:
-            blk.add(Residual(num_channels, use_1x1conv=True, strides=2))
+        if i == 0:                
+            if first_block:
+                blk.add(Residual(num_channels, use_1x1conv=True))  # strides=1
+            else:
+                blk.add(Residual(num_channels, use_1x1conv=True, strides=2))
         else:
             blk.add(Residual(num_channels))
     return blk
@@ -275,9 +278,11 @@ def resnet_block(input_channels, num_channels, num_residuals,
                  first_block=False):
     blk = []
     for i in range(num_residuals):
-        if i == 0 and not first_block:
-            blk.append(Residual(input_channels, num_channels,
-                                use_1x1conv=True, strides=2))
+        if i == 0:           
+            if first_block:
+                blk.add(Residual(input_channels, num_channels, use_1x1conv=True))  # strides=1
+            else:
+                blk.add(Residual(input_channels, num_channels, use_1x1conv=True, strides=2))
         else:
             blk.append(Residual(num_channels, num_channels))
     return blk
@@ -291,9 +296,11 @@ class ResnetBlock(tf.keras.layers.Layer):
         super(ResnetBlock, self).__init__(**kwargs)
         self.residual_layers = []
         for i in range(num_residuals):
-            if i == 0 and not first_block:
-                self.residual_layers.append(
-                    Residual(num_channels, use_1x1conv=True, strides=2))
+            if i == 0:                
+                if first_block:
+                    self.residual_layers.add(Residual(num_channels, use_1x1conv=True))  # strides=1
+                else:
+                    self.residual_layers.add(Residual(num_channels, use_1x1conv=True, strides=2))
             else:
                 self.residual_layers.append(Residual(num_channels))
 
