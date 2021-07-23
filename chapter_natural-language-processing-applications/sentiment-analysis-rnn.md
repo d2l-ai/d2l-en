@@ -10,7 +10,7 @@ illustrated in :numref:`fig_nlp-map-sa-rnn`,
 we will represent each token
 using the pretrained GloVe model,
 and feed these token representations
-into a multi-layer bidirectional RNN
+into a multilayer bidirectional RNN
 to obtain the text sequence representation,
 which will
 be transformed into 
@@ -42,18 +42,30 @@ batch_size = 64
 train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 ```
 
-## Using a Recurrent Neural Network Model
+## Representing Single Text with RNNs
 
-In this model, each word first obtains a feature vector from the embedding
-layer. Then, we further encode the feature sequence using a bidirectional
-recurrent neural network to obtain sequence information. Finally, we transform
-the encoded sequence information to output through the fully connected
-layer. Specifically, we can concatenate hidden states of bidirectional
-long-short term memory in the initial time step and final time step and pass it
-to the output layer classification as encoded feature sequence information. In
-the `BiRNN` class implemented below, the `Embedding` instance is the embedding
-layer, the `LSTM` instance is the hidden layer for sequence encoding, and the
-`Dense` instance is the output layer for generated classification results.
+In text classifications tasks,
+such as sentiment analysis,
+a varying-length text sequence 
+will be transformed into fixed-length categories.
+In the following `BiRNN` class,
+while each token of a text sequence
+gets its individual
+pretrained GloVe
+representation via the embedding layer
+(`self.embedding`),
+the entire sequence
+is encoded by a bidirectional RNN (`self.encoder`).
+More concretely,
+the hidden states (at the last layer)
+of the bidirectional LSTM
+at both the initial and final time steps
+are concatenated 
+as the representation of the text sequence.
+This single text representation
+is then transformed into output categories
+by a fully-connected layer (`self.decoder`)
+with two outputs ("positive" and "negative").
 
 ```{.python .input}
 class BiRNN(nn.Block):
@@ -61,26 +73,25 @@ class BiRNN(nn.Block):
                  num_layers, **kwargs):
         super(BiRNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        # Set `bidirectional` to True to get a bidirectional recurrent neural
-        # network
+        # Set `bidirectional` to True to get a bidirectional RNN
         self.encoder = rnn.LSTM(num_hiddens, num_layers=num_layers,
                                 bidirectional=True, input_size=embed_size)
         self.decoder = nn.Dense(2)
 
     def forward(self, inputs):
-        # The shape of `inputs` is (batch size, no. of words). Because LSTM
-        # needs to use sequence as the first dimension, the input is
-        # transformed and the word feature is then extracted. The output shape
-        # is (no. of words, batch size, word vector dimension).
+        # The shape of `inputs` is (batch size, no. of time steps). Because
+        # LSTM requires its input's first dimension to be the temporal
+        # dimension, the input is transposed before obtaining token
+        # representations. The output shape is (no. of time steps, batch size,
+        # word vector dimension)
         embeddings = self.embedding(inputs.T)
-        # Since the input (embeddings) is the only argument passed into
-        # rnn.LSTM, it only returns the hidden states of the last hidden layer
-        # at different time step (outputs). The shape of `outputs` is
-        # (no. of words, batch size, 2 * no. of hidden units).
+        # Returns hidden states of the last hidden layer at different time
+        # steps. The shape of `outputs` is (no. of time steps, batch size,
+        # 2 * no. of hidden units)
         outputs = self.encoder(embeddings)
-        # Concatenate the hidden states of the initial time step and final
-        # time step to use as the input of the fully connected layer. Its
-        # shape is (batch size, 4 * no. of hidden units)
+        # Concatenate the hidden states at the initial and final time steps as
+        # the input of the fully-connected layer. Its shape is (batch size,
+        # 4 * no. of hidden units)
         encoding = np.concatenate((outputs[0], outputs[-1]), axis=1)
         outs = self.decoder(encoding)
         return outs
@@ -93,46 +104,48 @@ class BiRNN(nn.Module):
                  num_layers, **kwargs):
         super(BiRNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        # Set `bidirectional` to True to get a bidirectional recurrent neural
-        # network
+        # Set `bidirectional` to True to get a bidirectional RNN
         self.encoder = nn.LSTM(embed_size, num_hiddens, num_layers=num_layers,
                                 bidirectional=True)
-        self.decoder = nn.Linear(4*num_hiddens, 2)
+        self.decoder = nn.Linear(4 * num_hiddens, 2)
 
     def forward(self, inputs):
-        # The shape of `inputs` is (batch size, no. of words). Because LSTM
-        # needs to use sequence as the first dimension, the input is
-        # transformed and the word feature is then extracted. The output shape
-        # is (no. of words, batch size, word vector dimension).
+        # The shape of `inputs` is (batch size, no. of time steps). Because
+        # LSTM requires its input's first dimension to be the temporal
+        # dimension, the input is transposed before obtaining token
+        # representations. The output shape is (no. of time steps, batch size,
+        # word vector dimension)
         embeddings = self.embedding(inputs.T)
-        # Since the input (embeddings) is the only argument passed into
-        # nn.LSTM, both h_0 and c_0 default to zero.
-        # we only use the hidden states of the last hidden layer
-        # at different time step (outputs). The shape of `outputs` is
-        # (no. of words, batch size, 2 * no. of hidden units).
         self.encoder.flatten_parameters()
+        # Returns hidden states of the last hidden layer at different time
+        # steps. The shape of `outputs` is (no. of time steps, batch size,
+        # 2 * no. of hidden units)
         outputs, _ = self.encoder(embeddings)
         # Concatenate the hidden states of the initial time step and final
         # time step to use as the input of the fully connected layer. Its
         # shape is (batch size, 4 * no. of hidden units)
         encoding = torch.cat((outputs[0], outputs[-1]), dim=1)
+        # Concatenate the hidden states at the initial and final time steps as
+        # the input of the fully-connected layer. Its shape is (batch size,
+        # 4 * no. of hidden units)
         outs = self.decoder(encoding)
         return outs
 ```
 
-Create a bidirectional recurrent neural network with two hidden layers.
+Let us construct a bidirectional RNN with two hidden layers to represent single text for sentiment analysis.
 
 ```{.python .input}
+#@tab all
 embed_size, num_hiddens, num_layers, devices = 100, 100, 2, d2l.try_all_gpus()
 net = BiRNN(len(vocab), embed_size, num_hiddens, num_layers)
+```
+
+```{.python .input}
 net.initialize(init.Xavier(), ctx=devices)
 ```
 
 ```{.python .input}
 #@tab pytorch
-embed_size, num_hiddens, num_layers, devices = 100, 100, 2, d2l.try_all_gpus()
-net = BiRNN(len(vocab), embed_size, num_hiddens, num_layers)
-
 def init_weights(m):
     if type(m) == nn.Linear:
         nn.init.xavier_uniform_(m.weight)
@@ -143,7 +156,7 @@ def init_weights(m):
 net.apply(init_weights);
 ```
 
-### Loading Pretrained Word Vectors
+## Loading Pretrained Word Vectors
 
 Because the training dataset for sentiment classification is not very large, in order to deal with overfitting, we will directly use word vectors pretrained on a larger corpus as the feature vectors of all words. Here, we load a 100-dimensional GloVe word vector for each word in the dictionary `vocab`.
 
@@ -173,7 +186,7 @@ net.embedding.weight.data.copy_(embeds)
 net.embedding.weight.requires_grad = False
 ```
 
-### Training and Evaluating the Model
+## Training and Evaluating the Model
 
 Now, we can start training.
 
