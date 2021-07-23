@@ -1,22 +1,42 @@
 # Sentiment Analysis: Using Convolutional Neural Networks 
 :label:`sec_sentiment_cnn`
 
-In :numref:`chap_cnn`, we explored how to process
-two-dimensional image data with two-dimensional convolutional neural
-networks. In the previous language models and text classification tasks, we
-treated text data as a time series with only one dimension, and naturally, we
-used recurrent neural networks to process such data. In fact, we can also treat
-text as a one-dimensional image, so that we can use one-dimensional
-convolutional neural networks to capture associations between adjacent
-words. 
-As described in :numref:`fig_nlp-map-sa-cnn`
-This section describes a groundbreaking approach to applying
-convolutional neural networks to sentiment analysis: textCNN :cite:`Kim.2014`.
+
+In :numref:`chap_cnn`,
+we investigated mechanisms
+for processing
+two-dimensional image data
+with two-dimensional CNNs,
+which were applied to
+local features such as adjacent pixels.
+Though originally 
+designed for computer vision,
+CNNs are also widely used
+for natural language processing.
+Simply put,
+just think of any text sequence
+as a one-dimensional image.
+In this way,
+one-dimensional CNNs
+can process local features
+such as $n$-grams in text.
+
+In this section,
+we will use the *textCNN* model
+to demonstrate
+how to design a CNN architecture
+for representing single text :cite:`Kim.2014`.
+Compared with 
+:numref:`fig_nlp-map-sa-rnn`
+that uses an RNN architecture with GloVe pretraining
+for sentiment analysis,
+the only difference in :numref:`fig_nlp-map-sa-cnn`
+lies in
+the choice of the architecture.
+
 
 ![This section feeds pretrained GloVe to a CNN-based architecture for sentiment analysis.](../img/nlp-map-sa-cnn.svg)
 :label:`fig_nlp-map-sa-cnn`
-
-First, import the packages and modules required for the experiment.
 
 ```{.python .input}
 from d2l import mxnet as d2l
