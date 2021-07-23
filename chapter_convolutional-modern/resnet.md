@@ -264,7 +264,7 @@ def resnet_block(num_channels, num_residuals, first_block=False):
     for i in range(num_residuals):
         if i == 0:                
             if first_block:
-                blk.add(Residual(num_channels, use_1x1conv=True))   # strides=1
+                blk.add(Residual(num_channels, use_1x1conv=True))  # strides=1
             else:
                 blk.add(Residual(num_channels, use_1x1conv=True, strides=2))
         else:
