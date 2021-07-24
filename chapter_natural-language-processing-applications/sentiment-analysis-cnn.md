@@ -58,14 +58,34 @@ batch_size = 64
 train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 ```
 
-## One-Dimensional Convolutional Layer
+## One-Dimensional Convolutions
 
-Before introducing the model, let us explain how a one-dimensional convolutional layer works. Like a two-dimensional convolutional layer, a one-dimensional convolutional layer uses a one-dimensional cross-correlation operation. In the one-dimensional cross-correlation operation, the convolution window starts from the leftmost side of the input array and slides on the input array from left to right successively. When the convolution window slides to a certain position, the input subarray in the window and kernel array are multiplied and summed by element to get the element at the corresponding location in the output array. As shown in :numref:`fig_conv1d`, the input is a one-dimensional array with a width of 7 and the width of the kernel array is 2. As we can see, the output width is $7-2+1=6$ and the first element is obtained by performing multiplication by element on the leftmost input subarray with a width of 2 and kernel array and then summing the results.
+Before introducing the model, 
+let us see how a one-dimensional convolution works.
+Bear in mind that it is just a special case
+of a two-dimensional convolution
+based on the cross-correlation operation.
 
-![One-dimensional cross-correlation operation. The shaded parts are the first output element as well as the input and kernel array elements used in its calculation: $0\times1+1\times2=2$. ](../img/conv1d.svg)
+![One-dimensional cross-correlation operation. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times1+1\times2=2$.](../img/conv1d.svg)
 :label:`fig_conv1d`
 
-Next, we implement one-dimensional cross-correlation in the `corr1d` function. It accepts the input array `X` and kernel array `K` and outputs the array `Y`.
+As shown in :numref:`fig_conv1d`,
+in the one-dimensional case,
+the convolution window
+slides from left to right
+across the input tensor.
+During sliding,
+the input subtensor (e.g., $0$ and $1$ in :numref:`fig_conv1d`) contained in the convolution window
+at a certain position
+and the kernel tensor (e.g., $1$ and $2$ in :numref:`fig_conv1d`) are multiplied elementwise.
+The sum of these multiplications
+gives the single scalar value (e.g., $0\times1+1\times2=2$ in :numref:`fig_conv1d`)
+at the corresponding position of the output tensor.
+
+We implement one-dimensional cross-correlation in the following `corr1d` function. 
+Given an input tensor `X`
+and a kernel tensor `K`,
+it returns the output tensor `Y`.
 
 ```{.python .input}
 #@tab all
@@ -77,7 +97,7 @@ def corr1d(X, K):
     return Y
 ```
 
-Now, we will reproduce the results of the one-dimensional cross-correlation operation in :numref:`fig_conv1d`.
+We can construct the input tensor `X` and the kernel tensor `K` from :numref:`fig_conv1d` to validate the output of the above one-dimensional cross-correlation implementation.
 
 ```{.python .input}
 #@tab all
@@ -85,19 +105,28 @@ X, K = d2l.tensor([0, 1, 2, 3, 4, 5, 6]), d2l.tensor([1, 2])
 corr1d(X, K)
 ```
 
-The one-dimensional cross-correlation operation for multiple input channels is also similar to the two-dimensional cross-correlation operation for multiple input channels. On each channel, it performs the one-dimensional cross-correlation operation on the kernel and its corresponding input and adds the results of the channels to get the output. :numref:`fig_conv1d_channel` shows a one-dimensional cross-correlation operation with three input channels.
+For any
+one-dimensional input with multiple channels,
+the convolution kernel
+needs to have the same number of input channels.
+Then for each channel, 
+perform a cross-correlation operation on the one-dimensional tensor of the input and the one-dimensional tensor of the convolution kernel, 
+summing the results over all the channels
+to produce the one-dimensional output tensor.
+:numref:`fig_conv1d_channel` shows a one-dimensional cross-correlation operation with 3 input channels.
 
-![One-dimensional cross-correlation operation with three input channels. The shaded parts are the first output element as well as the input and kernel array elements used in its calculation: $0\times1+1\times2+1\times3+2\times4+2\times(-1)+3\times(-3)=2$. ](../img/conv1d-channel.svg)
+![One-dimensional cross-correlation operation with 3 input channels. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $0\times1+1\times2+1\times3+2\times4+2\times(-1)+3\times(-3)=2$.](../img/conv1d-channel.svg)
 :label:`fig_conv1d_channel`
 
-Now, we reproduce the results of the one-dimensional cross-correlation operation with multi-input channel in :numref:`fig_conv1d_channel`.
+
+We can implement the one-dimensional cross-correlation operation for multiple input channels
+and validate the results in :numref:`fig_conv1d_channel`.
 
 ```{.python .input}
 #@tab all
 def corr1d_multi_in(X, K):
-    # First, we traverse along the 0th dimension (channel dimension) of `X`
-    # and `K`. Then, we add them together by using * to turn the result list
-    # into a positional argument of the `add_n` function
+    # First, iterate through the 0th dimension (channel dimension) of `X` and
+    # `K`. Then, add them together
     return sum(corr1d(x, k) for x, k in zip(X, K))
 
 X = d2l.tensor([[0, 1, 2, 3, 4, 5, 6],
@@ -107,29 +136,43 @@ K = d2l.tensor([[1, 2], [3, 4], [-1, -3]])
 corr1d_multi_in(X, K)
 ```
 
-The definition of a two-dimensional cross-correlation operation tells us that a one-dimensional cross-correlation operation with multiple input channels can be regarded as a two-dimensional cross-correlation operation with a single input channel. As shown in :numref:`fig_conv1d_2d`, we can also present the one-dimensional cross-correlation operation with multiple input channels in :numref:`fig_conv1d_channel` as the equivalent two-dimensional cross-correlation operation with a single input channel. Here, the height of the kernel is equal to the height of the input.
+Note that
+multi-input-channel one-dimensional cross-correlations
+are equivalent
+to 
+single-input-channel 
+two-dimensional cross-correlations.
+To illustrate,
+an equivalent form of
+the multi-input-channel one-dimensional cross-correlation
+in :numref:`fig_conv1d_channel`
+is 
+the 
+single-input-channel 
+two-dimensional cross-correlation
+in :numref:`fig_conv1d_2d`,
+where the height of the convolution kernel
+has to be the same as that of the input tensor.
 
-![Two-dimensional cross-correlation operation with a single input channel. The highlighted parts are the first output element and the input and kernel array elements used in its calculation: $2\times(-1)+3\times(-3)+1\times3+2\times4+0\times1+1\times2=2$. ](../img/conv1d-2d.svg)
+
+![Two-dimensional cross-correlation operation with a single input channel. The shaded portions are the first output element as well as the input and kernel tensor elements used for the output computation: $2\times(-1)+3\times(-3)+1\times3+2\times4+0\times1+1\times2=2$.](../img/conv1d-2d.svg)
 :label:`fig_conv1d_2d`
 
-Both the outputs in :numref:`fig_conv1d` and :numref:`fig_conv1d_channel` have only one channel. We
-discussed how to specify multiple output channels in a two-dimensional
-convolutional layer in
-:numref:`sec_channels`.
-Similarly,
-we can also specify multiple output channels in the one-dimensional
-convolutional layer to extend the model parameters in the convolutional layer.
+Both the outputs in :numref:`fig_conv1d` and :numref:`fig_conv1d_channel` have only one channel.
+Same as two-dimensional convolutions with multiple output channels described in :numref:`subsec_multi-output-channels`,
+we can also specify multiple output channels
+for one-dimensional convolutions.
 
 
-## Max-Over-Time Pooling Layer
+## Max-Over-Time Pooling
 
 Similarly, we have a one-dimensional pooling layer. The max-over-time pooling layer used in TextCNN actually corresponds to a one-dimensional global maximum pooling layer. Assuming that the input contains multiple channels, and each channel consists of values on different time steps, the output of each channel will be the largest value of all time steps in the channel. Therefore, the input of the max-over-time pooling layer can have different time steps on each channel.
 
 To improve computing performance, we often combine timing examples of different lengths into a minibatch and make the lengths of each timing example in the batch consistent by appending special characters (such as 0) to the end of shorter examples. Naturally, the added special characters have no intrinsic meaning. Because the main purpose of the max-over-time pooling layer is to capture the most important features of timing, it usually allows the model to be unaffected by the manually added characters.
 
-## The TextCNN Model
+## The textCNN Model
 
-TextCNN mainly uses a one-dimensional convolutional layer and max-over-time pooling layer. Suppose the input text sequence consists of $n$ words, and each word is represented by a $d$-dimension word vector. Then the input example has a width of $n$, a height of 1, and $d$ input channels. The calculation of textCNN can be mainly divided into the following steps:
+The textCNN model mainly uses a one-dimensional convolutional layer and max-over-time pooling layer. Suppose the input text sequence consists of $n$ words, and each word is represented by a $d$-dimension word vector. Then the input example has a width of $n$, a height of 1, and $d$ input channels. The calculation of textCNN can be mainly divided into the following steps:
 
 1. Define multiple one-dimensional convolution kernels and use them to perform convolution calculations on the inputs. Convolution kernels with different widths may capture the correlation of different numbers of adjacent words.
 2. Perform max-over-time pooling on all output channels, and then concatenate the pooling output values of these channels in a vector.
