@@ -221,18 +221,20 @@ We define the following function to predict the sentiment of a text sequence usi
 
 ```{.python .input}
 #@save
-def predict_sentiment(net, vocab, sentence):
-    sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
-    label = np.argmax(net(sentence.reshape(1, -1)), axis=1)
+def predict_sentiment(net, vocab, sequence):
+    """Predict the sentiment of a text sequence."""
+    sequence = np.array(vocab[sequence.split()], ctx=d2l.try_gpu())
+    label = np.argmax(net(sequence.reshape(1, -1)), axis=1)
     return 'positive' if label == 1 else 'negative'
 ```
 
 ```{.python .input}
 #@tab pytorch
 #@save
-def predict_sentiment(net, vocab, sentence):
-    sentence = torch.tensor(vocab[sentence.split()], device=d2l.try_gpu())
-    label = torch.argmax(net(sentence.reshape(1, -1)), dim=1)
+def predict_sentiment(net, vocab, sequence):
+    """Predict the sentiment of a text sequence."""
+    sequence = torch.tensor(vocab[sequence.split()], device=d2l.try_gpu())
+    label = torch.argmax(net(sequence.reshape(1, -1)), dim=1)
     return 'positive' if label == 1 else 'negative'
 ```
 
