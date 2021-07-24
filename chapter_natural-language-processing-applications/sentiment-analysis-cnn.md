@@ -233,9 +233,17 @@ into a 2-dimensional output vector
 for binary sentiment predictions.
 
 
-### Defining the textCNN Model
 
-Next, we will implement a textCNN model. Compared with the previous section, in addition to replacing the recurrent neural network with a one-dimensional convolutional layer, here we use two embedding layers, one with a fixed weight and another that participates in training.
+### Defining the Model
+
+We implement the textCNN model in the following class.
+Compared with the bidirectional RNN model in
+:numref:`sec_sentiment_rnn`,
+besides
+replacing recurrent layers with convolutional layers,
+we also use two embedding layers:
+one with trainable weights and the other 
+with fixed weights.
 
 ```{.python .input}
 class TextCNN(nn.Block):
@@ -243,12 +251,12 @@ class TextCNN(nn.Block):
                  **kwargs):
         super(TextCNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        # The embedding layer does not participate in training
+        # The embedding layer not to be trained
         self.constant_embedding = nn.Embedding(vocab_size, embed_size)
         self.dropout = nn.Dropout(0.5)
         self.decoder = nn.Dense(2)
-        # The max-over-time pooling layer has no weight, so it can share an
-        # instance
+        # The max-over-time pooling layer has no parameters, so this instance
+        # can be shared
         self.pool = nn.GlobalMaxPool1D()
         # Create multiple one-dimensional convolutional layers
         self.convs = nn.Sequential()
@@ -256,23 +264,19 @@ class TextCNN(nn.Block):
             self.convs.add(nn.Conv1D(c, k, activation='relu'))
 
     def forward(self, inputs):
-        # Concatenate the output of two embedding layers with shape of
-        # (batch size, no. of words, word vector dimension) by word vector
+        # Concatenate two embedding layer outputs with shape (batch size, no.
+        # of tokens, token vector dimension) along vectors
         embeddings = np.concatenate((
             self.embedding(inputs), self.constant_embedding(inputs)), axis=2)
-        # According to the input format required by Conv1D, the word vector
-        # dimension, that is, the channel dimension of the one-dimensional
-        # convolutional layer, is transformed into the previous dimension
+        # Per the input format of one-dimensional convolutional layers,
+        # rearrange the tensor so that the second dimension stores channels
         embeddings = embeddings.transpose(0, 2, 1)
         # For each one-dimensional convolutional layer, after max-over-time
-        # pooling, an ndarray with the shape of (batch size, channel size, 1)
-        # can be obtained. Use the flatten function to remove the last
-        # dimension and then concatenate on the channel dimension
+        # pooling, a tensor of shape (batch size, no. of channels, 1) is
+        # obtained. Remove the last dimension and concatenate along channels
         encoding = np.concatenate([
             np.squeeze(self.pool(conv(embeddings)), axis=-1)
             for conv in self.convs], axis=1)
-        # After applying the dropout method, use a fully connected layer to
-        # obtain the output
         outputs = self.decoder(self.dropout(encoding))
         return outputs
 ```
@@ -284,12 +288,12 @@ class TextCNN(nn.Module):
                  **kwargs):
         super(TextCNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
-        # The embedding layer does not participate in training
+        # The embedding layer not to be trained
         self.constant_embedding = nn.Embedding(vocab_size, embed_size)
         self.dropout = nn.Dropout(0.5)
         self.decoder = nn.Linear(sum(num_channels), 2)
-        # The max-over-time pooling layer has no weight, so it can share an
-        # instance
+        # The max-over-time pooling layer has no parameters, so this instance
+        # can be shared
         self.pool = nn.AdaptiveAvgPool1d(1)
         self.relu = nn.ReLU()
         # Create multiple one-dimensional convolutional layers
@@ -298,28 +302,25 @@ class TextCNN(nn.Module):
             self.convs.append(nn.Conv1d(2 * embed_size, c, k))
 
     def forward(self, inputs):
-        # Concatenate the output of two embedding layers with shape of
-        # (batch size, no. of words, word vector dimension) by word vector
+        # Concatenate two embedding layer outputs with shape (batch size, no.
+        # of tokens, token vector dimension) along vectors
         embeddings = torch.cat((
             self.embedding(inputs), self.constant_embedding(inputs)), dim=2)
-        # According to the input format required by Conv1d, the word vector
-        # dimension, that is, the channel dimension of the one-dimensional
-        # convolutional layer, is transformed into the previous dimension
+        # Per the input format of one-dimensional convolutional layers,
+        # rearrange the tensor so that the second dimension stores channels
         embeddings = embeddings.permute(0, 2, 1)
         # For each one-dimensional convolutional layer, after max-over-time
-        # pooling, a tensor with the shape of (batch size, channel size, 1)
-        # can be obtained. Use the flatten function to remove the last
-        # dimension and then concatenate on the channel dimension
+        # pooling, a tensor of shape (batch size, no. of channels, 1) is
+        # obtained. Remove the last dimension and concatenate along channels
         encoding = torch.cat([
             torch.squeeze(self.relu(self.pool(conv(embeddings))), dim=-1)
             for conv in self.convs], dim=1)
-        # After applying the dropout method, use a fully connected layer to
-        # obtain the output
         outputs = self.decoder(self.dropout(encoding))
         return outputs
 ```
 
-Create a TextCNN instance. It has 3 convolutional layers with kernel widths of 3, 4, and 5, all with 100 output channels.
+Let us create a textCNN instance. 
+It has 3 convolutional layers with kernel widths of 3, 4, and 5, all with 100 output channels.
 
 ```{.python .input}
 embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
@@ -343,7 +344,13 @@ net.apply(init_weights);
 
 ### Loading Pretrained Word Vectors
 
-As in the previous section, load pretrained 100-dimensional GloVe word vectors and initialize the embedding layers `embedding` and `constant_embedding`. Here, the former participates in training while the latter has a fixed weight.
+Same as :numref:`sec_sentiment_rnn`,
+we load pretrained 100-dimensional GloVe embeddings
+as the initialized token representations.
+These token representations (embedding weights)
+will be trained in `embedding`
+and fixed in `constant_embedding`.
+
 
 ```{.python .input}
 glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
@@ -364,7 +371,7 @@ net.constant_embedding.weight.requires_grad = False
 
 ### Training and Evaluating the Model
 
-Now we can train the model.
+Now we can train the textCNN model for sentiment analysis.
 
 ```{.python .input}
 lr, num_epochs = 0.001, 5
@@ -381,7 +388,7 @@ loss = nn.CrossEntropyLoss(reduction="none")
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 ```
 
-Below, we use the trained model to classify sentiments of two simple sentences.
+Below we use the trained model to predict the sentiment for two simple sentences.
 
 ```{.python .input}
 #@tab all
@@ -395,18 +402,17 @@ d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 
 ## Summary
 
-* We can use one-dimensional convolution to process and analyze timing data.
-* A one-dimensional cross-correlation operation with multiple input channels can be regarded as a two-dimensional cross-correlation operation with a single input channel.
-* The input of the max-over-time pooling layer can have different numbers of time steps on each channel.
-* TextCNN mainly uses a one-dimensional convolutional layer and max-over-time pooling layer.
+* One-dimensional CNNs can process local features such as $n$-grams in text.
+* Multi-input-channel one-dimensional cross-correlations are equivalent to single-input-channel two-dimensional cross-correlations.
+* The max-over-time pooling allows different numbers of time steps at different channels.
+* The textCNN model transforms individual token representations into downstream application outputs using one-dimensional convolutional layers and max-over-time pooling layers.
 
 
 ## Exercises
 
-1. Tune the hyperparameters and compare the two sentiment analysis methods, using recurrent neural networks and using convolutional neural networks, as regards accuracy and operational efficiency.
-1. Can you further improve the accuracy of the model on the test set by using the three methods introduced in the previous section: tuning hyperparameters, using larger pretrained word vectors, and using the spaCy word tokenization tool?
-1. What other natural language processing tasks can you use textCNN for?
-1. Add positional encoding in the input representations. Does it improve the performance?
+1. Tune hyperparameters and compare the two architectures for sentiment analysis in :numref:`sec_sentiment_rnn` and in this section, such as in classification accuracy and computational efficiency.
+1. Can you further improve the classification accuracy of the model by using the methods introduced in the exercises of :numref:`sec_sentiment_rnn`?
+1. Add positional encoding in the input representations. Does it improve the classification accuracy?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/393)
