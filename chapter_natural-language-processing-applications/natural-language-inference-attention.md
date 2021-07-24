@@ -11,15 +11,15 @@ In this section, we will describe and implement this attention-based method (wit
 
 ## The Model
 
-Simpler than preserving the order of words in premises and hypotheses,
-we can just align words in one text sequence to every word in the other, and vice versa,
+Simpler than preserving the order of tokens in premises and hypotheses,
+we can just align tokens in one text sequence to every token in the other, and vice versa,
 then compare and aggregate such information to predict the logical relationships
 between premises and hypotheses.
-Similar to alignment of words between source and target sentences in machine translation,
-the alignment of words between premises and hypotheses
+Similar to alignment of tokens between source and target sentences in machine translation,
+the alignment of tokens between premises and hypotheses
 can be neatly accomplished by attention mechanisms.
 
-![Natural language inference using attention mechanisms. ](../img/nli-attention.svg)
+![Natural language inference using attention mechanisms.](../img/nli-attention.svg)
 :label:`fig_nli_attention`
 
 :numref:`fig_nli_attention` depicts the natural language inference method using attention mechanisms.
@@ -44,7 +44,7 @@ from torch.nn import functional as F
 
 ### Attending
 
-The first step is to align words in one text sequence to each word in the other sequence.
+The first step is to align tokens in one text sequence to each token in the other sequence.
 Suppose that the premise is "i do need sleep" and the hypothesis is "i am tired".
 Due to semantical similarity,
 we may wish to align "i" in the hypothesis with "i" in the premise,
@@ -52,14 +52,14 @@ and align "tired" in the hypothesis with "sleep" in the premise.
 Likewise, we may wish to align "i" in the premise with "i" in the hypothesis,
 and align "need" and "sleep" in the premise with "tired" in the hypothesis.
 Note that such alignment is *soft* using weighted average,
-where ideally large weights are associated with the words to be aligned.
+where ideally large weights are associated with the tokens to be aligned.
 For ease of demonstration, :numref:`fig_nli_attention` shows such alignment in a *hard* way.
 
 Now we describe the soft alignment using attention mechanisms in more detail.
 Denote by $\mathbf{A} = (\mathbf{a}_1, \ldots, \mathbf{a}_m)$
 and $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ the premise and hypothesis,
-whose number of words are $m$ and $n$, respectively,
-where $\mathbf{a}_i, \mathbf{b}_j \in \mathbb{R}^{d}$ ($i = 1, \ldots, m, j = 1, \ldots, n$) is a $d$-dimensional word embedding vector.
+whose number of tokens are $m$ and $n$, respectively,
+where $\mathbf{a}_i, \mathbf{b}_j \in \mathbb{R}^{d}$ ($i = 1, \ldots, m, j = 1, \ldots, n$) is a $d$-dimensional word vector.
 For soft alignment, we compute the attention weights $e_{ij} \in \mathbb{R}$ as
 
 $$e_{ij} = f(\mathbf{a}_i)^\top f(\mathbf{b}_j),$$
@@ -102,14 +102,14 @@ This *decomposition* trick leads to only $m + n$ applications (linear complexity
 
 
 Normalizing the attention weights in :eqref:`eq_nli_e`,
-we compute the weighted average of all the word embeddings in the hypothesis
-to obtain representation of the hypothesis that is softly aligned with the word indexed by $i$ in the premise:
+we compute the weighted average of all the token vectors in the hypothesis
+to obtain representation of the hypothesis that is softly aligned with the token indexed by $i$ in the premise:
 
 $$
 \boldsymbol{\beta}_i = \sum_{j=1}^{n}\frac{\exp(e_{ij})}{ \sum_{k=1}^{n} \exp(e_{ik})} \mathbf{b}_j.
 $$
 
-Likewise, we compute soft alignment of premise words for each word indexed by $j$ in the hypothesis:
+Likewise, we compute soft alignment of premise tokens for each token indexed by $j$ in the hypothesis:
 
 $$
 \boldsymbol{\alpha}_j = \sum_{i=1}^{m}\frac{\exp(e_{ij})}{ \sum_{k=1}^{m} \exp(e_{kj})} \mathbf{a}_i.
@@ -124,21 +124,21 @@ class Attend(nn.Block):
         self.f = mlp(num_hiddens=num_hiddens, flatten=False)
 
     def forward(self, A, B):
-        # Shape of `A`/`B`: (b`atch_size`, no. of words in sequence A/B,
+        # Shape of `A`/`B`: (b`atch_size`, no. of tokens in sequence A/B,
         # `embed_size`)
-        # Shape of `f_A`/`f_B`: (`batch_size`, no. of words in sequence A/B,
+        # Shape of `f_A`/`f_B`: (`batch_size`, no. of tokens in sequence A/B,
         # `num_hiddens`)
         f_A = self.f(A)
         f_B = self.f(B)
-        # Shape of `e`: (`batch_size`, no. of words in sequence A,
-        # no. of words in sequence B)
+        # Shape of `e`: (`batch_size`, no. of tokens in sequence A,
+        # no. of tokens in sequence B)
         e = npx.batch_dot(f_A, f_B, transpose_b=True)
-        # Shape of `beta`: (`batch_size`, no. of words in sequence A,
-        # `embed_size`), where sequence B is softly aligned with each word
+        # Shape of `beta`: (`batch_size`, no. of tokens in sequence A,
+        # `embed_size`), where sequence B is softly aligned with each token
         # (axis 1 of `beta`) in sequence A
         beta = npx.batch_dot(npx.softmax(e), B)
-        # Shape of `alpha`: (`batch_size`, no. of words in sequence B,
-        # `embed_size`), where sequence A is softly aligned with each word
+        # Shape of `alpha`: (`batch_size`, no. of tokens in sequence B,
+        # `embed_size`), where sequence A is softly aligned with each token
         # (axis 1 of `alpha`) in sequence B
         alpha = npx.batch_dot(npx.softmax(e.transpose(0, 2, 1)), A)
         return beta, alpha
@@ -152,21 +152,21 @@ class Attend(nn.Module):
         self.f = mlp(num_inputs, num_hiddens, flatten=False)
 
     def forward(self, A, B):
-        # Shape of `A`/`B`: (`batch_size`, no. of words in sequence A/B,
+        # Shape of `A`/`B`: (`batch_size`, no. of tokens in sequence A/B,
         # `embed_size`)
-        # Shape of `f_A`/`f_B`: (`batch_size`, no. of words in sequence A/B,
+        # Shape of `f_A`/`f_B`: (`batch_size`, no. of tokens in sequence A/B,
         # `num_hiddens`)
         f_A = self.f(A)
         f_B = self.f(B)
-        # Shape of `e`: (`batch_size`, no. of words in sequence A,
-        # no. of words in sequence B)
+        # Shape of `e`: (`batch_size`, no. of tokens in sequence A,
+        # no. of tokens in sequence B)
         e = torch.bmm(f_A, f_B.permute(0, 2, 1))
-        # Shape of `beta`: (`batch_size`, no. of words in sequence A,
-        # `embed_size`), where sequence B is softly aligned with each word
+        # Shape of `beta`: (`batch_size`, no. of tokens in sequence A,
+        # `embed_size`), where sequence B is softly aligned with each token
         # (axis 1 of `beta`) in sequence A
         beta = torch.bmm(F.softmax(e, dim=-1), B)
-        # Shape of `alpha`: (`batch_size`, no. of words in sequence B,
-        # `embed_size`), where sequence A is softly aligned with each word
+        # Shape of `alpha`: (`batch_size`, no. of tokens in sequence B,
+        # `embed_size`), where sequence A is softly aligned with each token
         # (axis 1 of `alpha`) in sequence B
         alpha = torch.bmm(F.softmax(e.permute(0, 2, 1), dim=-1), A)
         return beta, alpha
@@ -174,20 +174,20 @@ class Attend(nn.Module):
 
 ### Comparing
 
-In the next step, we compare a word in one sequence with the other sequence that is softly aligned with that word.
-Note that in soft alignment, all the words from one sequence, though with probably different attention weights, will be compared with a word in the other sequence.
-For easy of demonstration, :numref:`fig_nli_attention` pairs words with aligned words in a *hard* way.
+In the next step, we compare a token in one sequence with the other sequence that is softly aligned with that token.
+Note that in soft alignment, all the tokens from one sequence, though with probably different attention weights, will be compared with a token in the other sequence.
+For easy of demonstration, :numref:`fig_nli_attention` pairs tokens with aligned tokens in a *hard* way.
 For example, suppose that the attending step determines that "need" and "sleep" in the premise are both aligned with "tired" in the hypothesis, the pair "tired--need sleep" will be compared.
 
-In the comparing step, we feed the concatenation (operator $[\cdot, \cdot]$) of words from one sequence and aligned words from the other sequence into a function $g$ (an MLP):
+In the comparing step, we feed the concatenation (operator $[\cdot, \cdot]$) of tokens from one sequence and aligned tokens from the other sequence into a function $g$ (an MLP):
 
 $$\mathbf{v}_{A,i} = g([\mathbf{a}_i, \boldsymbol{\beta}_i]), i = 1, \ldots, m\\ \mathbf{v}_{B,j} = g([\mathbf{b}_j, \boldsymbol{\alpha}_j]), j = 1, \ldots, n.$$
 
 :eqlabel:`eq_nli_v_ab`
 
 
-In :eqref:`eq_nli_v_ab`, $\mathbf{v}_{A,i}$ is the comparison between word $i$ in the premise and all the hypothesis words that are softly aligned with word $i$;
-while $\mathbf{v}_{B,j}$ is the comparison between word $j$ in the hypothesis and all the premise words that are softly aligned with word $j$.
+In :eqref:`eq_nli_v_ab`, $\mathbf{v}_{A,i}$ is the comparison between token $i$ in the premise and all the hypothesis tokens that are softly aligned with token $i$;
+while $\mathbf{v}_{B,j}$ is the comparison between token $j$ in the hypothesis and all the premise tokens that are softly aligned with token $j$.
 The following `Compare` class defines such as comparing step.
 
 ```{.python .input}
@@ -331,9 +331,9 @@ train_iter, test_iter, vocab = d2l.load_data_snli(batch_size, num_steps)
 
 ### Creating the Model
 
-We use the pretrained $100$-dimensional GloVe embedding to represent the input tokens.
-Thus, we predefine the dimension of vectors $\mathbf{a}_i$ and $\mathbf{b}_j$ in :eqref:`eq_nli_e` as $100$.
-The output dimension of functions $f$ in :eqref:`eq_nli_e` and $g$ in :eqref:`eq_nli_v_ab` is set to $200$.
+We use the pretrained 100-dimensional GloVe embedding to represent the input tokens.
+Thus, we predefine the dimension of vectors $\mathbf{a}_i$ and $\mathbf{b}_j$ in :eqref:`eq_nli_e` as 100.
+The output dimension of functions $f$ in :eqref:`eq_nli_e` and $g$ in :eqref:`eq_nli_v_ab` is set to 200.
 Then we create a model instance, initialize its parameters,
 and load the GloVe embedding to initialize vectors of input tokens.
 
@@ -427,16 +427,16 @@ predict_snli(net, vocab, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 ## Summary
 
 * The decomposable attention model consists of three steps for predicting the logical relationships between premises and hypotheses: attending, comparing, and aggregating.
-* With attention mechanisms, we can align words in one text sequence to every word in the other, and vice versa. Such alignment is soft using weighted average, where ideally large weights are associated with the words to be aligned.
+* With attention mechanisms, we can align tokens in one text sequence to every token in the other, and vice versa. Such alignment is soft using weighted average, where ideally large weights are associated with the tokens to be aligned.
 * The decomposition trick leads to a more desirable linear complexity than quadratic complexity when computing attention weights.
-* We can use pretrained word embedding as the input representation for downstream natural language processing task such as natural language inference.
+* We can use pretrained word vectors as the input representation for downstream natural language processing task such as natural language inference.
 
 
 ## Exercises
 
 1. Train the model with other combinations of hyperparameters. Can you get better accuracy on the test set?
 1. What are major drawbacks of the decomposable attention model for natural language inference?
-1. Suppose that we want to get the level of semantical similarity (e.g., a continuous value between $0$ and $1$) for any pair of sentences. How shall we collect and label the dataset? Can you design a model with attention mechanisms?
+1. Suppose that we want to get the level of semantical similarity (e.g., a continuous value between 0 and 1) for any pair of sentences. How shall we collect and label the dataset? Can you design a model with attention mechanisms?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/395)
