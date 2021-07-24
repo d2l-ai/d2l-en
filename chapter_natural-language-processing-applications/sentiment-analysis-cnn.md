@@ -168,7 +168,8 @@ for one-dimensional convolutions.
 Similarly, we can use pooling
 to extract the highest value
 from sequence representations
-as the most important feature.
+as the most important feature
+across time steps.
 The *max-over-time pooling* used in textCNN 
 works like
 the one-dimensional global maximum pooling
@@ -184,19 +185,55 @@ the max-over-time pooling
 allows different numbers of time steps
 at different channels.
 
-
 ## The textCNN Model
 
-The textCNN model mainly uses a one-dimensional convolutional layer and max-over-time pooling layer. Suppose the input text sequence consists of $n$ words, and each word is represented by a $d$-dimension word vector. Then the input example has a width of $n$, a height of 1, and $d$ input channels. The calculation of textCNN can be mainly divided into the following steps:
+Using the one-dimensional convolution
+and max-over-time pooling,
+the textCNN model
+takes individual pretrained token representations
+as the input,
+then obtains and transforms sequence representations
+for the downstream application.
 
-1. Define multiple one-dimensional convolution kernels and use them to perform convolution calculations on the inputs. Convolution kernels with different widths may capture the correlation of different numbers of adjacent words.
-2. Perform max-over-time pooling on all output channels, and then concatenate the pooling output values of these channels in a vector.
-3. The concatenated vector is transformed into the output for each category through the fully connected layer. A dropout layer can be used in this step to deal with overfitting.
+For a single text sequence
+with $n$ tokens represented by 
+$d$-dimensional vectors,
+the width, height, and number of channels
+of the input tensor
+are $n$, $1$, and $d$, respectively.
+The textCNN model transforms the input
+into the output as follows:
 
-![TextCNN design. ](../img/textcnn.svg)
+1. Define multiple one-dimensional convolution kernels and perform convolution operations separately on the inputs. Convolution kernels with different widths may capture local features among different numbers of adjacent tokens.
+1. Perform max-over-time pooling on all the output channels, and then concatenate all the scalar pooling outputs as a vector.
+1. Transform the concatenated vector into the output categories using the fully-connected layer. Dropout can be used for reducing overfitting.
+
+![The model architecture of textCNN.](../img/textcnn.svg)
 :label:`fig_conv1d_textcnn`
 
-:numref:`fig_conv1d_textcnn` gives an example to illustrate the textCNN. The input here is a sentence with 11 words, with each word represented by a 6-dimensional word vector. Therefore, the input sequence has a width of 11 and 6 input channels. We assume there are two one-dimensional convolution kernels with widths of 2 and 4, and 4 and 5 output channels, respectively. Therefore, after one-dimensional convolution calculation, the width of the four output channels is $11-2+1=10$, while the width of the other five channels is $11-4+1=8$. Even though the width of each channel is different, we can still perform max-over-time pooling for each channel and concatenate the pooling outputs of the 9 channels into a 9-dimensional vector. Finally, we use a fully connected layer to transform the 9-dimensional vector into a 2-dimensional output: positive sentiment and negative sentiment predictions.
+:numref:`fig_conv1d_textcnn` 
+illustrates the model architecture of textCNN
+with a concrete example.
+The input is a sentence with 11 tokens,
+where
+each token is represented by a 6-dimensional vectors.
+So we have a 6-channel input with width 11.
+Define
+two one-dimensional convolution kernels
+of widths 2 and 4,
+with 4 and 5 output channels, respectively.
+They produce
+4 output channels with width $11-2+1=10$
+and 5 output channels with width $11-4+1=8$.
+Despite different widths of these 9 channels,
+the max-over-time pooling
+gives a concatenated 9-dimensional vector,
+which is finally transformed
+into a 2-dimensional output vector
+for binary sentiment predictions.
+
+
+### Defining the textCNN Model
 
 Next, we will implement a textCNN model. Compared with the previous section, in addition to replacing the recurrent neural network with a one-dimensional convolutional layer, here we use two embedding layers, one with a fixed weight and another that participates in training.
 
@@ -304,7 +341,7 @@ def init_weights(m):
 net.apply(init_weights);
 ```
 
-### Load Pretrained Word Vectors
+### Loading Pretrained Word Vectors
 
 As in the previous section, load pretrained 100-dimensional GloVe word vectors and initialize the embedding layers `embedding` and `constant_embedding`. Here, the former participates in training while the latter has a fixed weight.
 
@@ -325,7 +362,7 @@ net.constant_embedding.weight.data.copy_(embeds)
 net.constant_embedding.weight.requires_grad = False
 ```
 
-### Train and Evaluate the Model
+### Training and Evaluating the Model
 
 Now we can train the model.
 
