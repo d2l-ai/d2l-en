@@ -163,12 +163,27 @@ Same as two-dimensional convolutions with multiple output channels described in 
 we can also specify multiple output channels
 for one-dimensional convolutions.
 
-
 ## Max-Over-Time Pooling
 
-Similarly, we have a one-dimensional pooling layer. The max-over-time pooling layer used in TextCNN actually corresponds to a one-dimensional global maximum pooling layer. Assuming that the input contains multiple channels, and each channel consists of values on different time steps, the output of each channel will be the largest value of all time steps in the channel. Therefore, the input of the max-over-time pooling layer can have different time steps on each channel.
+Similarly, we can use pooling
+to extract the highest value
+from sequence representations
+as the most important feature.
+The *max-over-time pooling* used in textCNN 
+works like
+the one-dimensional global maximum pooling
+:cite:`Collobert.Weston.Bottou.ea.2011`. 
+For a multi-channel input
+where each channel stores values
+at different time steps,
+the output at each channel
+is the maximum value 
+for that channel.
+Note that
+the max-over-time pooling
+allows different numbers of time steps
+at different channels.
 
-To improve computing performance, we often combine timing examples of different lengths into a minibatch and make the lengths of each timing example in the batch consistent by appending special characters (such as 0) to the end of shorter examples. Naturally, the added special characters have no intrinsic meaning. Because the main purpose of the max-over-time pooling layer is to capture the most important features of timing, it usually allows the model to be unaffected by the manually added characters.
 
 ## The textCNN Model
 
