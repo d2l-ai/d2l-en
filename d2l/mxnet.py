@@ -2468,6 +2468,7 @@ d2l.DATA_HUB['aclImdb'] = (
 
 # Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis-and-dataset.md
 def read_imdb(data_dir, is_train):
+    """Read the IMDb review dataset text sequences and labels."""
     data, labels = [], []
     for label in ('pos', 'neg'):
         folder_name = os.path.join(data_dir, 'train' if is_train else 'test',
@@ -2482,6 +2483,7 @@ def read_imdb(data_dir, is_train):
 
 # Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis-and-dataset.md
 def load_data_imdb(batch_size, num_steps=500):
+    """Return data iterators and the vocabulary of the IMDb review dataset."""
     data_dir = d2l.download_extract('aclImdb', 'aclImdb')
     train_data = read_imdb(data_dir, True)
     test_data = read_imdb(data_dir, False)
@@ -2501,9 +2503,10 @@ def load_data_imdb(batch_size, num_steps=500):
 
 
 # Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis-rnn.md
-def predict_sentiment(net, vocab, sentence):
-    sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
-    label = np.argmax(net(sentence.reshape(1, -1)), axis=1)
+def predict_sentiment(net, vocab, sequence):
+    """Predict the sentiment of a text sequence."""
+    sequence = np.array(vocab[sequence.split()], ctx=d2l.try_gpu())
+    label = np.argmax(net(sequence.reshape(1, -1)), axis=1)
     return 'positive' if label == 1 else 'negative'
 
 
@@ -2591,6 +2594,7 @@ def split_batch_multi_inputs(X, y, devices):
 
 # Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-attention.md
 def predict_snli(net, vocab, premise, hypothesis):
+    """Predict the logical relationship between the premise and hypothesis."""
     premise = np.array(vocab[premise], ctx=d2l.try_gpu())
     hypothesis = np.array(vocab[hypothesis], ctx=d2l.try_gpu())
     label = np.argmax(

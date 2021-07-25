@@ -48,7 +48,7 @@ To study this problem, we will begin by investigating a popular natural language
 
 ## The Stanford Natural Language Inference (SNLI) Dataset
 
-Stanford Natural Language Inference (SNLI) Corpus is a collection of over $500,000$ labeled English sentence pairs :cite:`Bowman.Angeli.Potts.ea.2015`.
+Stanford Natural Language Inference (SNLI) Corpus is a collection of over 500000 labeled English sentence pairs :cite:`Bowman.Angeli.Potts.ea.2015`.
 We download and store the extracted SNLI dataset in the path `../data/snli_1.0`.
 
 ```{.python .input}
@@ -110,7 +110,7 @@ def read_snli(data_dir, is_train):
     return premises, hypotheses, labels
 ```
 
-Now let us print the first $3$ pairs of premise and hypothesis, as well as their labels ("0", "1", and "2" correspond to "entailment", "contradiction", and "neutral", respectively ).
+Now let us print the first 3 pairs of premise and hypothesis, as well as their labels ("0", "1", and "2" correspond to "entailment", "contradiction", and "neutral", respectively ).
 
 ```{.python .input}
 #@tab all
@@ -121,8 +121,8 @@ for x0, x1, y in zip(train_data[0][:3], train_data[1][:3], train_data[2][:3]):
     print('label:', y)
 ```
 
-The training set has about $550,000$ pairs,
-and the testing set has about $10,000$ pairs.
+The training set has about 550000 pairs,
+and the testing set has about 10000 pairs.
 The following shows that 
 the three labels "entailment", "contradiction", and "neutral" are balanced in 
 both the training set and the testing set.
@@ -246,7 +246,7 @@ def load_data_snli(batch_size, num_steps=50):
     return train_iter, test_iter, train_set.vocab
 ```
 
-Here we set the batch size to $128$ and sequence length to $50$,
+Here we set the batch size to 128 and sequence length to 50,
 and invoke the `load_data_snli` function to get the data iterators and vocabulary.
 Then we print the vocabulary size.
 
@@ -258,7 +258,7 @@ len(vocab)
 
 Now we print the shape of the first minibatch.
 Contrary to sentiment analysis,
-we have $2$ inputs `X[0]` and `X[1]` representing pairs of premises and hypotheses.
+we have two inputs `X[0]` and `X[1]` representing pairs of premises and hypotheses.
 
 ```{.python .input}
 #@tab all

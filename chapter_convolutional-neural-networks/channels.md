@@ -102,6 +102,7 @@ corr2d_multi_in(X, K)
 ```
 
 ## Multiple Output Channels
+:label:`subsec_multi-output-channels`
 
 Regardless of the number of input channels,
 so far we always ended up with one output channel.

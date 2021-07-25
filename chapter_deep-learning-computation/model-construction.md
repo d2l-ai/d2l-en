@@ -206,12 +206,28 @@ Before we implement our own custom block,
 we briefly summarize the basic functionality
 that each block must provide:
 
+:begin_tab:`mxnet, tensorflow`
+
 1. Ingest input data as arguments to its forward propagation function.
-1. Generate an output by having the forward propagation function return a value. Note that the output may have a different shape from the input. For example, the first fully-connected layer in our model above ingests an      input of arbitrary dimension but returns an output of dimension 256.
+1. Generate an output by having the forward propagation function return a value. Note that the output may have a different shape from the input. For example, the first fully-connected layer in our model above ingests an input of arbitrary dimension but returns an output of dimension 256.
 1. Calculate the gradient of its output with respect to its input, which can be accessed via its backpropagation function. Typically this happens automatically.
 1. Store and provide access to those parameters necessary
    to execute the forward propagation computation.
 1. Initialize model parameters as needed.
+
+:end_tab:
+
+:begin_tab:`pytorch`
+
+1. Ingest input data as arguments to its forward propagation function.
+1. Generate an output by having the forward propagation function return a value. Note that the output may have a different shape from the input. For example, the first fully-connected layer in our model above ingests an input of dimension 20 but returns an output of dimension 256.
+1. Calculate the gradient of its output with respect to its input, which can be accessed via its backpropagation function. Typically this happens automatically.
+1. Store and provide access to those parameters necessary
+   to execute the forward propagation computation.
+1. Initialize model parameters as needed.
+
+:end_tab:
+
 
 In the following snippet,
 we code up a block from scratch

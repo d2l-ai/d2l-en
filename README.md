@@ -34,6 +34,8 @@ Our goal is to offer a resource that could
 
 ## Cool Papers Using D2L
 
+1. [**Descending through a Crowded Valley--Benchmarking Deep Learning Optimizers**](https://arxiv.org/pdf/2007.01547.pdf). R. Schmidt, F. Schneider, P. Hennig. *International Conference on Machine Learning, 2021*
+
 1. [**Universal Average-Case Optimality of Polyak Momentum**](https://arxiv.org/pdf/2002.04664.pdf). D. Scieur, F. Pedregosan. *International Conference on Machine Learning, 2020*
 
 1. [**2D Digital Image Correlation and Region-Based Convolutional Neural Network in Monitoring and Evaluation of Surface Cracks in Concrete Structural Elements**](https://www.mdpi.com/1996-1944/13/16/3527/pdf). M. Słoński, M. Tekieli. *Materials, 2020*
@@ -42,11 +44,9 @@ Our goal is to offer a resource that could
 
 1. [**Detecting Human Driver Inattentive and Aggressive Driving Behavior Using Deep Learning: Recent Advances, Requirements and Open Challenges**](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9107077). M. Alkinani, W. Khan, Q. Arshad. *IEEE Access, 2020*
 
-1. [**Diagnosing Parkinson by Using Deep Autoencoder Neural Network**](https://link.springer.com/chapter/10.1007/978-981-15-6325-6_5). U. Kose, O. Deperlioglu, J. Alzubi, B. Patrut. *Deep Learning for Medical Decision Support Systems, 2020*
-
 <details><summary>more</summary>
 
-1. [**Descending through a Crowded Valley--Benchmarking Deep Learning Optimizers**](https://arxiv.org/pdf/2007.01547.pdf). R. Schmidt, F. Schneider, P. Hennig.
+1. [**Diagnosing Parkinson by Using Deep Autoencoder Neural Network**](https://link.springer.com/chapter/10.1007/978-981-15-6325-6_5). U. Kose, O. Deperlioglu, J. Alzubi, B. Patrut. *Deep Learning for Medical Decision Support Systems, 2020*
 
 1. [**Deep Learning Architectures for Medical Diagnosis**](https://link.springer.com/chapter/10.1007/978-981-15-6325-6_2). U. Kose, O. Deperlioglu, J. Alzubi, B. Patrut. *Deep Learning for Medical Decision Support Systems, 2020*
 
