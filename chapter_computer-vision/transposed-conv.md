@@ -308,7 +308,7 @@ Therefore,
 the transposed convolutional layer
 can just exchange the forward propagation function
 and the backpropagation function of the convolutional layer:
-its forward propagation  
+its forward propagation 
 and backpropagation functions
 multiply their input vector with 
 $\mathbf{W}^\top$ and $\mathbf{W}$, respectively.
