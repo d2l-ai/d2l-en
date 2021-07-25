@@ -1,11 +1,16 @@
 # Introduction
 :label:`chap_introduction`
 
-Until recently, nearly every computer program that we interact with daily
-was coded by software developers from first principles.
-Say that we wanted to write an application to manage an e-commerce platform.
-After huddling around a whiteboard for a few hours to ponder the problem,
-we would come up with the broad strokes of a working solution that might probably look something like this:
+Until recently, nearly every computer program 
+that you might interact with on an ordinary day
+was coded up as a rigid set of rules 
+specifying precisely how it should behave.
+Say that we wanted to write an application 
+to manage an e-commerce platform.
+After huddling around a whiteboard
+for a few hours to ponder the problem,
+we might settle on the broad strokes 
+of a working solution, for example:
 (i) users interact with the application through an interface
 running in a web browser or mobile application;
 (ii) our application interacts with a commercial-grade database engine
@@ -13,60 +18,88 @@ to keep track of each user's state and maintain records
 of historical transactions; 
 and (iii) at the heart of our application,
 the *business logic* (you might say, the *brains*) of our application
-spells out in methodical detail the appropriate action
-that our program should take in every conceivable circumstance.
+spells out in methodical a set of rules that map every 
+conceivable circumstance to the corresponding action
+that our program should take. 
 
 To build the brains of our application,
-we would have to step through every possible corner case
-that we anticipate encountering, devising appropriate rules.
-Each time a customer clicks to add an item to their shopping cart,
-we add an entry to the shopping cart database table,
-associating that user's ID with the requested product's ID.
-While few developers ever get it completely right the first time
+we might enumerate all the common events
+that our program should handle.
+For example, whenever a customer clicks 
+to add an item to their shopping cart,
+our program should add an entry 
+to the shopping cart database table,
+associating that user's ID 
+with the requested product's ID.
+We might then attempt to step through 
+every possible corner case,
+testing the appropriateness of our rules
+and making any necessary modifications.
+What happens if a user 
+initiates a purchase with an empty cart? 
+While few developers ever get it 
+completely right the first time
 (it might take some test runs to work out the kinks),
-for the most part, we could write such a program from first principles
-and confidently launch it 
+for the most part, we can write such programs 
+and confidently launch them 
 *before* ever seeing a real customer.
-Our ability to design automated systems from first principles
+Our ability to manually design automated systems
 that drive functioning products and systems, 
 often in novel situations,
 is a remarkable cognitive feat.
-And when you are able to devise solutions that work $100\%$ of the time,
-you should not be using machine learning.
+And when you are able to devise solutions 
+that work $100\%$ of the time,
+you typically should not be 
+worrying about machine learning.
 
-Fortunately for the growing community of machine learning scientists,
+Fortunately for the growing community 
+of machine learning scientists,
 many tasks that we would like to automate
 do not bend so easily to human ingenuity.
-Imagine huddling around the whiteboard with the smartest minds you know,
-but this time you are tackling one of the following problems:
+Imagine huddling around the whiteboard 
+with the smartest minds you know,
+but this time you are tackling 
+one of the following problems:
 
 * Write a program that predicts tomorrow's weather given geographic information, satellite images, and a trailing window of past weather.
-* Write a program that takes in a question, expressed in free-form text, and  answers it correctly.
-* Write a program that given an image can identify all the people it contains,  drawing outlines around each.
-* Write a program that presents users with products that they are likely to   enjoy but unlikely, in the natural course of browsing, to encounter.
+* Write a program that takes in a factoid question, expressed in free-form text, and  answers it correctly.
+* Write a program that, given an image, identifies all of people depicted in it and draws outlines around each.
+* Write a program that presents users with products that they are likely to enjoy but unlikely, in the natural course of browsing, to encounter.
 
-In each of these cases, even elite programmers
-are incapable of coding up solutions from scratch.
-The reasons for this can vary. Sometimes the program
-that we are looking for follows a pattern that changes over time,
-and we need our programs to adapt.
-In other cases, the relationship (say between pixels,
+For these problems,
+even elite programmers would struggle
+to code up solutions from scratch.
+The reasons can vary. 
+Sometimes the program that we are looking for 
+follows a pattern that changes over time,
+so there is no fixed right answer! 
+In such cases, any successful solution 
+must adapt gracefully to a changing world. 
+At other times, the relationship (say between pixels,
 and abstract categories) may be too complicated,
 requiring thousands or millions of computations
-that are beyond our conscious understanding
-even if our eyes manage the task effortlessly.
-*Machine learning* is the study of powerful
-techniques that can learn from experience.
+and following unknown principles. 
+As in image recognition, 
+the steps to perform a task
+often lie beyond our conscious understanding,
+even when our subconscious cognitive processes 
+can execute the task with ease. 
+
+
+*Machine learning* is the study of algorithms
+that can learn from experience.
 As a machine learning algorithm accumulates more experience,
-typically in the form of observational data or
-interactions with an environment, its performance improves.
+typically in the form of observational data 
+or interactions with an environment, 
+its performance improves.
 Contrast this with our deterministic e-commerce platform,
-which performs according to the same business logic,
+which follows the same business logic,
 no matter how much experience accrues,
 until the developers themselves learn and decide
 that it is time to update the software.
-In this book, we will teach you the fundamentals of machine learning,
-and focus in particular on *deep learning*, 
+In this book, we will teach you 
+the fundamentals of machine learning,
+focusing in particular on *deep learning*, 
 a powerful set of techniques
 driving innovations in areas as diverse as computer vision,
 natural language processing, healthcare, and genomics.
