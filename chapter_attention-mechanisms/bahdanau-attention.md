@@ -112,8 +112,8 @@ with Bahdanau attention,
 we only need to redefine the decoder.
 To visualize the learned attention weights more conveniently,
 the following `AttentionDecoder` class
-defines the base interface for
-decoders with attention mechanisms.
+defines [**the base interface for
+decoders with attention mechanisms**].
 
 ```{.python .input}
 #@tab all
@@ -128,14 +128,14 @@ class AttentionDecoder(d2l.Decoder):
         raise NotImplementedError
 ```
 
-Now let us implement
-the RNN decoder with Bahdanau attention
+Now let us [**implement
+the RNN decoder with Bahdanau attention**]
 in the following `Seq2SeqAttentionDecoder` class.
 The state of the decoder
 is initialized with
-i) the encoder final-layer hidden states at all the time steps (as keys and values of the attention);
-ii) the encoder all-layer hidden state at the final time step (to initialize the hidden state of the decoder);
-and iii) the encoder valid length (to exclude the padding tokens in attention pooling).
+(i) the encoder final-layer hidden states at all the time steps (as keys and values of the attention);
+(ii) the encoder all-layer hidden state at the final time step (to initialize the hidden state of the decoder);
+and (iii) the encoder valid length (to exclude the padding tokens in attention pooling).
 At each decoding time step,
 the decoder final-layer hidden state at the previous time step is used as the query of the attention.
 As a result, both the attention output
@@ -236,7 +236,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         outputs = self.dense(torch.cat(outputs, dim=0))
         return outputs.permute(1, 0, 2), [enc_outputs, hidden_state,
                                           enc_valid_lens]
-    
+
     @property
     def attention_weights(self):
         return self._attention_weights
@@ -256,13 +256,13 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
              for _ in range(num_layers)]),
                                       return_sequences=True, return_state=True)
         self.dense = tf.keras.layers.Dense(vocab_size)
-        
+
     def init_state(self, enc_outputs, enc_valid_lens, *args):
         # Shape of `outputs`: (`batch_size`, `num_steps`, `num_hiddens`).
         # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`, `num_hiddens`)
         outputs, hidden_state = enc_outputs
         return (outputs, hidden_state, enc_valid_lens)
-    
+
     def call(self, X, state, **kwargs):
         # Shape of `enc_outputs`: (`batch_size`, `num_steps`, `num_hiddens`).
         # Shape of `hidden_state[0]`: (`num_layers`, `batch_size`, `num_hiddens`)
@@ -287,14 +287,14 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
         # (`batch_size`, `num_steps`, `vocab_size`)
         outputs = self.dense(tf.concat(outputs, axis=1))
         return outputs, [enc_outputs, hidden_state, enc_valid_lens]
-    
+
     @property
     def attention_weights(self):
         return self._attention_weights
 ```
 
-In the following, we test the implemented
-decoder with Bahdanau attention
+In the following, we [**test the implemented
+decoder**] with Bahdanau attention
 using a minibatch of 4 sequence inputs
 of 7 time steps.
 
@@ -337,7 +337,7 @@ output, state = decoder(X, state, training=False)
 output.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 ```
 
-## Training
+## [**Training**]
 
 Similar to :numref:`sec_seq2seq_training`,
 here we specify hyperparemeters,
@@ -364,7 +364,7 @@ d2l.train_seq2seq(net, train_iter, lr, num_epochs, tgt_vocab, device)
 ```
 
 After the model is trained,
-we use it to translate a few English sentences
+we use it to [**translate a few English sentences**]
 into French and compute their BLEU scores.
 
 ```{.python .input}
@@ -396,7 +396,7 @@ attention_weights = d2l.reshape(
     (1, 1, -1, num_steps))
 ```
 
-By visualizing the attention weights
+By [**visualizing the attention weights**]
 when translating the last English sentence,
 we can see that each query assigns non-uniform weights
 over key-value pairs.
@@ -430,6 +430,7 @@ d2l.show_heatmaps(attention_weights[:, :, :, :len(engs[-1].split()) + 1],
 
 * When predicting a token, if not all the input tokens are relevant, the RNN encoder-decoder with Bahdanau attention selectively aggregates different parts of the input sequence. This is achieved by treating the context variable as an output of additive attention pooling.
 * In the RNN encoder-decoder, Bahdanau attention treats the decoder hidden state at the previous time step as the query, and the encoder hidden states at all the time steps as both the keys and values.
+
 
 ## Exercises
 

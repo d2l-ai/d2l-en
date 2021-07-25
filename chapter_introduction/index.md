@@ -839,7 +839,7 @@ e.g., for retail products, music, and news recommendation.
 
 In some cases, customers provide explicit feedback communicating
 how much they liked a particular product
-(e.g., the product ratings and reviews on Amazon, IMDb, and GoodReads).
+(e.g., the product ratings and reviews on Amazon, IMDb, and Goodreads).
 In some other cases, they provide implicit feedback,
 e.g., by skipping titles on a playlist,
 which might indicate dissatisfaction but might just indicate

@@ -38,7 +38,7 @@ Given a minibatch of examples $\mathbf{X} \in \mathbb{R}^{n \times d}$ with batc
 $$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h).$$
 :eqlabel:`rnn_h_without_state`
 
-In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer. 
+In :eqref:`rnn_h_without_state`, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, the bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer.
 Thus, broadcasting (see :numref:`subsec_broadcasting`) is applied during the summation.
 Next, the hidden variable $\mathbf{H}$ is used as the input of the output layer. The output layer is given by
 
@@ -77,7 +77,7 @@ based on recurrent computation are named
 *recurrent neural networks*.
 Layers that perform
 the computation of :eqref:`rnn_h_with_state`
-in RNNs 
+in RNNs
 are called *recurrent layers*.
 
 
@@ -95,7 +95,7 @@ of the hidden layer,
 together with the weights $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$
 and the bias $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$
 of the output layer.
-It is worth mentioning that 
+It is worth mentioning that
 even at different time steps,
 RNNs always use these model parameters.
 Therefore, the parameterization cost of an RNN
@@ -104,8 +104,8 @@ does not grow as the number of time steps increases.
 :numref:`fig_rnn` illustrates the computational logic of an RNN at three adjacent time steps.
 At any time step $t$,
 the computation of the hidden state can be treated as:
-i) concatenating the input $\mathbf{X}_t$ at the current time step $t$ and the hidden state $\mathbf{H}_{t-1}$ at the previous time step $t-1$;
-ii) feeding the concatenation result into a fully-connected layer with the activation function $\phi$.
+(i) concatenating the input $\mathbf{X}_t$ at the current time step $t$ and the hidden state $\mathbf{H}_{t-1}$ at the previous time step $t-1$;
+(ii) feeding the concatenation result into a fully-connected layer with the activation function $\phi$.
 The output of such a fully-connected layer is the hidden state $\mathbf{H}_t$ of the current time step $t$.
 In this case,
 the model parameters are the concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$, and a bias of $\mathbf{b}_h$, all from :eqref:`rnn_h_with_state`.
@@ -164,7 +164,7 @@ d2l.matmul(X, W_xh) + d2l.matmul(H, W_hh)
 
 Now we concatenate the matrices `X` and `H`
 along columns (axis 1),
-and the matrices 
+and the matrices
 `W_xh` and `W_hh` along rows (axis 0).
 These two concatenations
 result in
@@ -230,7 +230,7 @@ hence evaluating the model on Tolstoy's magnum opus
 *War and Peace* will inevitably produce a much smaller likelihood than, say, on Saint-Exupery's novella *The Little Prince*. What is missing is the equivalent of an average.
 
 Information theory comes handy here.
-We have defined entropy, surprisal, and cross-entropy 
+We have defined entropy, surprisal, and cross-entropy
 when we introduced the softmax regression
 (:numref:`subsec_info_theory_basics`)
 and more of information theory is discussed in the [online appendix on information theory](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/information-theory.html).

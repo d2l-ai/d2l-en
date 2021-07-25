@@ -2,7 +2,7 @@
 :label:`sec_approx_train`
 
 Recall our discussions in :numref:`sec_word2vec`.
-The main idea of the skip-gram model is 
+The main idea of the skip-gram model is
 using softmax operations to calculate
 the conditional probability of
 generating a context word $w_o$
@@ -13,10 +13,10 @@ the opposite of :eqref:`eq_skip-gram-log`.
 
 
 Due to the nature of the softmax operation,
-since a context word may be anyone in the 
+since a context word may be anyone in the
 dictionary $\mathcal{V}$,
 the opposite of :eqref:`eq_skip-gram-log`
-contains the summation 
+contains the summation
 of items as many as the entire size of the vocabulary.
 Consequently,
 the gradient calculation
@@ -28,19 +28,19 @@ in :eqref:`eq_cbow-gradient`
 both contain
 the summation.
 Unfortunately,
-the computational cost 
+the computational cost
 for such gradients
 that sum over
 a large dictionary
 (often with
-hundreds of thousands or millions of words) 
+hundreds of thousands or millions of words)
 is huge!
 
-In order to reduce the aforementioned computational complexity, this section will introduce two approximate training methods: 
+In order to reduce the aforementioned computational complexity, this section will introduce two approximate training methods:
 *negative sampling* and *hierarchical softmax*.
 Due to the similarity
 between the skip-gram model and
-the continuous bag of words model, 
+the continuous bag of words model,
 we will just take the skip-gram model as an example
 to describe these two approximate training methods.
 
@@ -49,7 +49,7 @@ to describe these two approximate training methods.
 
 
 Negative sampling modifies the original objective function.
-Given the context window of a center word $w_c$, 
+Given the context window of a center word $w_c$,
 the fact that any (context) word $w_o$
 comes from this context window
 is considered as an event with the probability
@@ -63,14 +63,14 @@ where $\sigma$ uses the definition of the sigmoid activation function:
 $$\sigma(x) = \frac{1}{1+\exp(-x)}.$$
 :eqlabel:`eq_sigma-f`
 
-Let us begin by 
+Let us begin by
 maximizing the joint probability of
-all such events in text sequences 
-to train word embeddings. 
-Specifically, 
-given a text sequence of length $T$, 
-denote by $w^{(t)}$ the word at time step $t$ 
-and let the context window size be $m$, 
+all such events in text sequences
+to train word embeddings.
+Specifically,
+given a text sequence of length $T$,
+denote by $w^{(t)}$ the word at time step $t$
+and let the context window size be $m$,
 consider maximizing the joint probability
 
 
@@ -78,7 +78,7 @@ $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(D=1\mid w^{(t)}, w^{(t+
 :eqlabel:`eq-negative-sample-pos`
 
 
-However, 
+However,
 :eqref:`eq-negative-sample-pos`
 only considers those events
 that involve positive examples.
@@ -91,7 +91,7 @@ Of course,
 such results are meaningless.
 To make the objective function
 more meaningful,
-*negative sampling* 
+*negative sampling*
 adds negative examples sampled
 from a predefined distribution.
 
@@ -105,17 +105,17 @@ sample $K$ *noise words*
 that are not from this context window.
 Denote by $N_k$
 the event that
-a noise word $w_k$ ($k=1, \ldots, K$) 
-does not come from 
+a noise word $w_k$ ($k=1, \ldots, K$)
+does not come from
 the context window of $w_c$.
 Assume that
-these events involving 
+these events involving
 both the positive example and negative examples
 $S, N_1, \ldots, N_K$ are mutually independent.
 Negative sampling
 rewrites the joint probability (involving only positive examples)
 in :eqref:`eq-negative-sample-pos`
-as 
+as
 
 $$ \prod_{t=1}^{T} \prod_{-m \leq j \leq m,\ j \neq 0} P(w^{(t+j)} \mid w^{(t)}),$$
 
@@ -125,7 +125,7 @@ events $S, N_1, \ldots, N_K$:
 $$ P(w^{(t+j)} \mid w^{(t)}) =P(D=1\mid w^{(t)}, w^{(t+j)})\prod_{k=1,\ w_k \sim P(w)}^K P(D=0\mid w^{(t)}, w_k).$$
 :eqlabel:`eq-negative-sample-conditional-prob`
 
-Denote by 
+Denote by
 $i_t$ and $h_k$
 the indices of
 a word $w^{(t)}$ at time step $t$
@@ -161,10 +161,10 @@ is smaller.
 ## Hierarchical Softmax
 
 As an alternative approximate training method,
-*hierarchical softmax* 
+*hierarchical softmax*
 uses the binary tree,
 a data structure
-illustrated in :numref:`fig_hi_softmax`, 
+illustrated in :numref:`fig_hi_softmax`,
 where each leaf node
 of the tree represents
 a word in dictionary $\mathcal{V}$.
@@ -172,16 +172,16 @@ a word in dictionary $\mathcal{V}$.
 ![Hierarchical softmax for approximate training, where each leaf node of the tree represents a word in the dictionary.](../img/hi-softmax.svg)
 :label:`fig_hi_softmax`
 
-Denote by $L(w)$ 
+Denote by $L(w)$
 the number of nodes (including both ends)
-on the path 
+on the path
 from the root node to the leaf node representing word $w$
-in the binary tree. 
-Let $n(w,j)$ be the $j^\mathrm{th}$ node on this path, 
+in the binary tree.
+Let $n(w,j)$ be the $j^\mathrm{th}$ node on this path,
 with its context word vector being
-$\mathbf{u}_{n(w, j)}$. 
+$\mathbf{u}_{n(w, j)}$.
 For example,
-$L(w_3) = 4$ in  :numref:`fig_hi_softmax`. 
+$L(w_3) = 4$ in  :numref:`fig_hi_softmax`.
 Hierarchical softmax approximates the conditional probability in :eqref:`eq_skip-gram-softmax` as
 
 
@@ -193,10 +193,10 @@ and $\text{leftChild}(n)$ is the left child node of node $n$: if $x$ is true, $[
 
 To illustrate,
 let us calculate
-the conditional probability 
+the conditional probability
 of generating word $w_3$
 given word $w_c$ in :numref:`fig_hi_softmax`.
-This requires inner products
+This requires dot products
 between the word vector
 $\mathbf{v}_c$ of $w_c$
 and
@@ -209,8 +209,8 @@ $$P(w_3 \mid w_c) = \sigma(\mathbf{u}_{n(w_3, 1)}^\top \mathbf{v}_c) \cdot \sigm
 
 Since $\sigma(x)+\sigma(-x) = 1$,
 it holds that
-the conditional probabilities of 
-generating all the words in 
+the conditional probabilities of
+generating all the words in
 dictionary $\mathcal{V}$
 based on any word $w_c$
 sum up to one:
@@ -218,10 +218,10 @@ sum up to one:
 $$\sum_{w \in \mathcal{V}} P(w \mid w_c) = 1.$$
 :eqlabel:`eq_hi-softmax-sum-one`
 
-Fortunately, since $L(w_o)-1$ is on the order of $\mathcal{O}(\text{log}_2|\mathcal{V}|)$ due to the binary tree structure, 
-when the dictionary size $\mathcal{V}$ is huge, 
-the computational cost for  each training step using hierarchical softmax 
-is significantly reduced compared with that 
+Fortunately, since $L(w_o)-1$ is on the order of $\mathcal{O}(\text{log}_2|\mathcal{V}|)$ due to the binary tree structure,
+when the dictionary size $\mathcal{V}$ is huge,
+the computational cost for  each training step using hierarchical softmax
+is significantly reduced compared with that
 without approximate training.
 
 ## Summary

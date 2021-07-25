@@ -1,7 +1,7 @@
 # Notation
 :label:`chap_notation`
 
-Throughout this book, we adhere to the following notatinoal conventions.
+Throughout this book, we adhere to the following notational conventions.
 Note that some of these symbols are placeholders,
 while others refer to specific objects.
 As a general rule of thumb, 
@@ -27,7 +27,6 @@ represent scalar values.
 
 
 
-
 ## Set Theory
 
 
@@ -41,6 +40,7 @@ represent scalar values.
 * $\mathcal{A}\cup\mathcal{B}$: union of sets $\mathcal{A}$ and $\mathcal{B}$
 * $\mathcal{A}\cap\mathcal{B}$: intersection of sets $\mathcal{A}$ and $\mathcal{B}$
 * $\mathcal{A}\setminus\mathcal{B}$: set subtraction of $\mathcal{B}$ from $\mathcal{A}$ (contains only those elements of $\mathcal{A}$ that do not belong to $\mathcal{B}$)
+
 
 
 ## Functions and Operators
@@ -59,9 +59,10 @@ represent scalar values.
 * $\|\cdot\|_p$: $L_p$ norm
 * $\|\cdot\|$: $L_2$ norm
 * $\langle \mathbf{x}, \mathbf{y} \rangle$: dot product of vectors $\mathbf{x}$ and $\mathbf{y}$
-* $\sum: summation over a collection of elements
+* $\sum$: summation over a collection of elements
 * $\prod$: product over a collection of elements
 * $\stackrel{\mathrm{def}}{=}$: an equality asserted as a definition of the symbol on the left-hand side
+
 
 
 ## Calculus
@@ -71,6 +72,8 @@ represent scalar values.
 * $\nabla_{\mathbf{x}} y$: gradient of $y$ with respect to $\mathbf{x}$
 * $\int_a^b f(x) \;dx$: definite integral of $f$ from $a$ to $b$ with respect to $x$
 * $\int f(x) \;dx$: indefinite integral of $f$ with respect to $x$
+
+
 
 ## Probability and Information Theory
 
@@ -89,6 +92,7 @@ represent scalar values.
 * $\rho(X, Y)$: the Pearson correlation coefficient between $X$ and $Y$, equals $\frac{\mathrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
 * $H(X)$: entropy of random variable $X$
 * $D_{\mathrm{KL}}(P\|Q)$: the KL-divergence (or relative entropy) from distribution $Q$ to distribution $P$
+
 
 
 [Discussions](https://discuss.d2l.ai/t/25)

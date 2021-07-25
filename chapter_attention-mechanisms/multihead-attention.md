@@ -103,8 +103,8 @@ import tensorflow as tf
 ## Implementation
 
 In our implementation,
-we choose the scaled dot-product attention
-for each head of the multi-head attention.
+we [**choose the scaled dot-product attention
+for each head**] of the multi-head attention.
 To avoid significant growth
 of computational cost and parameterization cost,
 we set
@@ -242,7 +242,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         return self.W_o(output_concat)
 ```
 
-To allow for parallel computation of multiple heads,
+To allow for [**parallel computation of multiple heads**],
 the above `MultiHeadAttention` class uses two transposition functions as defined below.
 Specifically,
 the `transpose_output` function reverses the operation
@@ -340,7 +340,7 @@ def transpose_output(X, num_heads):
     return tf.reshape(X, shape=(X.shape[0], X.shape[1], -1))
 ```
 
-Let us test our implemented `MultiHeadAttention` class
+Let us [**test our implemented**] `MultiHeadAttention` class
 using a toy example where keys and values are the same.
 As a result,
 the shape of the multi-head attention output

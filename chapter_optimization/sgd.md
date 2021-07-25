@@ -34,9 +34,9 @@ import tensorflow as tf
 
 ## Stochastic Gradient Updates
 
-In deep learning, the objective function is usually the average of the loss functions for each example in the training dataset. 
+In deep learning, the objective function is usually the average of the loss functions for each example in the training dataset.
 Given a training dataset of $n$ examples,
-we assume that $f_i(\mathbf{x})$ is the loss function 
+we assume that $f_i(\mathbf{x})$ is the loss function
 with respect to the training example of index $i$,
 where $\mathbf{x}$ is the parameter vector.
 Then we arrive at the objective function
@@ -118,7 +118,7 @@ $$
 \end{aligned}
 $$
 
-In the first *piecewise constant* scenario we decrease the learning rate, e.g., whenever progress in optimization stalls. This is a common strategy for training deep networks. Alternatively we could decrease it much more aggressively by an *exponential decay*. Unfortunately this often leads to premature stopping before the algorithm has converged. A popular choice is *polynomial decay* with $\alpha = 0.5$. In the case of convex optimization there are a number of proofs that show that this rate is well behaved. 
+In the first *piecewise constant* scenario we decrease the learning rate, e.g., whenever progress in optimization stalls. This is a common strategy for training deep networks. Alternatively we could decrease it much more aggressively by an *exponential decay*. Unfortunately this often leads to premature stopping before the algorithm has converged. A popular choice is *polynomial decay* with $\alpha = 0.5$. In the case of convex optimization there are a number of proofs that show that this rate is well behaved.
 
 Let us see what the exponential decay looks like in practice.
 
@@ -157,9 +157,9 @@ There exist many more choices for how to set the learning rate. For instance, we
 ## Convergence Analysis for Convex Objectives
 
 The following convergence analysis of stochastic gradient descent for convex objective functions
-is optional and primarily serves to convey more intuition about the problem. 
+is optional and primarily serves to convey more intuition about the problem.
 We limit ourselves to one of the simplest proofs :cite:`Nesterov.Vial.2000`.
-Significantly more advanced proof techniques exist, e.g., whenever the objective function is particularly well behaved. 
+Significantly more advanced proof techniques exist, e.g., whenever the objective function is particularly well behaved.
 
 
 Suppose that the objective function $f(\boldsymbol{\xi}, \mathbf{x})$ is convex in $\mathbf{x}$
@@ -170,7 +170,7 @@ we consider the stochastic gradient descent update:
 $$\mathbf{x}_{t+1} = \mathbf{x}_{t} - \eta_t \partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x}),$$
 
 where $f(\boldsymbol{\xi}_t, \mathbf{x})$
-is the objective function 
+is the objective function
 with respect to the training example $\boldsymbol{\xi}_t$
 drawn from some distribution
 at step $t$ and $\mathbf{x}$ is the model parameter.
@@ -189,7 +189,7 @@ $$\eta_t^2 \|\partial_\mathbf{x} f(\boldsymbol{\xi}_t, \mathbf{x})\|^2 \leq \eta
 :eqlabel:`eq_sgd-L`
 
 
-We are mostly interested in how the distance between $\mathbf{x}_t$ and $\mathbf{x}^*$ changes *in expectation*. In fact, for any specific sequence of steps the distance might well increase, depending on whichever $\boldsymbol{\xi}_t$ we encounter. Hence we need to bound the inner product. 
+We are mostly interested in how the distance between $\mathbf{x}_t$ and $\mathbf{x}^*$ changes *in expectation*. In fact, for any specific sequence of steps the distance might well increase, depending on whichever $\boldsymbol{\xi}_t$ we encounter. Hence we need to bound the dot product.
 Since for any convex function $f$ it holds that
 $f(\mathbf{y}) \geq f(\mathbf{x}) + \langle f'(\mathbf{x}), \mathbf{y} - \mathbf{x} \rangle$
 for all $\mathbf{x}$ and $\mathbf{y}$,
@@ -218,7 +218,7 @@ Note that we exploited that $\mathbf{x}_1$ is given and thus the expectation can
 
 $$\bar{\mathbf{x}} \stackrel{\mathrm{def}}{=} \frac{\sum_{t=1}^T \eta_t \mathbf{x}_t}{\sum_{t=1}^T \eta_t}.$$
 
-Since 
+Since
 
 $$E\left(\frac{\sum_{t=1}^T \eta_t R(\mathbf{x}_t)}{\sum_{t=1}^T \eta_t}\right) = \frac{\sum_{t=1}^T \eta_t E[R(\mathbf{x}_t)]}{\sum_{t=1}^T \eta_t} = E[R(\mathbf{x}_t)],$$
 
@@ -232,8 +232,8 @@ $$
 \left[E[\bar{\mathbf{x}}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t},
 $$
 
-where $r^2 \stackrel{\mathrm{def}}{=} \|\mathbf{x}_1 - \mathbf{x}^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how 
-the norm of stochastic gradient is bounded ($L$) and how far away from optimality the initial parameter value is ($r$). Note that the bound is in terms of $\bar{\mathbf{x}}$ rather than $\mathbf{x}_T$. This is the case since $\bar{\mathbf{x}}$ is a smoothed version of the optimization path. 
+where $r^2 \stackrel{\mathrm{def}}{=} \|\mathbf{x}_1 - \mathbf{x}^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how
+the norm of stochastic gradient is bounded ($L$) and how far away from optimality the initial parameter value is ($r$). Note that the bound is in terms of $\bar{\mathbf{x}}$ rather than $\mathbf{x}_T$. This is the case since $\bar{\mathbf{x}}$ is a smoothed version of the optimization path.
 Whenever $r, L$, and $T$ are known we can pick the learning rate $\eta = r/(L \sqrt{T})$. This yields as upper bound $rL/\sqrt{T}$. That is, we converge with rate $\mathcal{O}(1/\sqrt{T})$ to the optimal solution.
 
 
@@ -250,9 +250,9 @@ However, this is not really what we did. In the toy examples in the current sect
 
 $$P(\mathrm{choose~} i) = 1 - P(\mathrm{omit~} i) = 1 - (1-1/n)^n \approx 1-e^{-1} \approx 0.63.$$
 
-A similar reasoning shows that the probability of picking some sample (i.e., training example) *exactly once* is given by 
+A similar reasoning shows that the probability of picking some sample (i.e., training example) *exactly once* is given by
 
-$${n \choose 1} \frac{1}{n} \left(1-\frac{1}{n}\right)^{n-1} = \frac{n}{n-1} \left(1-\frac{1}{n}\right)^{n} \approx e^{-1} \approx 0.37.$$ 
+$${n \choose 1} \frac{1}{n} \left(1-\frac{1}{n}\right)^{n-1} = \frac{n}{n-1} \left(1-\frac{1}{n}\right)^{n} \approx e^{-1} \approx 0.37.$$
 
 This leads to an increased variance and decreased data efficiency relative to sampling *without replacement*. Hence, in practice we perform the latter (and this is the default choice throughout this book). Last note that repeated passes through the training dataset traverse it in a *different* random order.
 

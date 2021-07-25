@@ -1,16 +1,16 @@
 # Neural Style Transfer
 
-If you are a photography enthusiast, 
+If you are a photography enthusiast,
 you may be familiar with the filter.
-It can change the color style of photos 
+It can change the color style of photos
 so that landscape photos become sharper
 or portrait photos have whitened skins.
 However,
 one filter usually only changes
-one aspect of the photo. 
+one aspect of the photo.
 To apply an ideal style
 to a photo,
-you probably need to 
+you probably need to
 try many different filter combinations.
 This process is
 as complex as tuning the hyperparameters of a model.
@@ -45,12 +45,12 @@ in the content image.
 :numref:`fig_style_transfer_model` illustrates
 the CNN-based style transfer method with a simplified example.
 First, we initialize the synthesized image,
-for example, into the content image. 
+for example, into the content image.
 This synthesized image is the only variable that needs to be updated during the style transfer process,
-i.e., the model parameters to be updated during training. 
+i.e., the model parameters to be updated during training.
 Then we choose a pretrained CNN
 to extract image features and freeze its
-model parameters during training. 
+model parameters during training.
 This deep CNN uses multiple layers
 to extract
 hierarchical features for images.
@@ -58,7 +58,7 @@ We can choose the output of some of these layers as content features or style fe
 Take :numref:`fig_style_transfer_model` as an example.
 The pretrained neural network here has 3 convolutional layers,
 where the second layer outputs the content features,
-and the first and third layers output the style features. 
+and the first and third layers output the style features.
 
 ![CNN-based style transfer process. Solid lines show the direction of forward propagation and dotted lines show backward propagation. ](../img/neural-style.svg)
 :label:`fig_style_transfer_model`
@@ -79,7 +79,7 @@ we will explain the technical details of style transfer via a concrete experimen
 
 ## [**Reading the Content and Style Images**]
 
-First, we read the content and style images. 
+First, we read the content and style images.
 From their printed coordinate axes,
 we can tell that these images have different sizes.
 
@@ -122,7 +122,7 @@ d2l.plt.imshow(style_img);
 
 ## [**Preprocessing and Postprocessing**]
 
-Below, we define two functions for preprocessing and postprocessing images. 
+Below, we define two functions for preprocessing and postprocessing images.
 The `preprocess` function standardizes
 each of the three RGB channels of the input image and transforms the results into the CNN input format.
 The `postprocess` function restores the pixel values in the output image to their original values before standardization.
@@ -234,7 +234,7 @@ and the `get_styles` function extracts style features from the style image.
 Since there is no need to update the model parameters of the pretrained VGG during training,
 we can extract the content and the style features
 even before the training starts.
-Since the synthesized image 
+Since the synthesized image
 is a set of model parameters to be updated
 for style transfer,
 we can only extract the content and style features of the synthesized image by calling the `extract_features` function during training.
@@ -274,7 +274,7 @@ the content loss, style loss, and total variation loss.
 Similar to the loss function in linear regression,
 the content loss measures the difference
 in content features
-between the synthesized image and the content image via 
+between the synthesized image and the content image via
 the squared loss function.
 The two inputs of the squared loss function
 are both
@@ -297,27 +297,27 @@ def content_loss(Y_hat, Y):
 ### Style Loss
 
 Style loss, similar to content loss,
-also uses the squared loss function to measure the difference in style between the synthesized image and the style image. 
+also uses the squared loss function to measure the difference in style between the synthesized image and the style image.
 To express the style output of any style layer,
 we first use the `extract_features` function to
-compute the style layer output. 
-Suppose that the output has 
-1 example, $c$ channels, 
+compute the style layer output.
+Suppose that the output has
+1 example, $c$ channels,
 height $h$, and width $w$,
-we can transform this output into 
+we can transform this output into
 matrix $\mathbf{X}$ with $c$ rows and $hw$ columns.
 This matrix can be thought of as
-the concatenation of 
-$c$ vectors $\mathbf{x}_1, \ldots, \mathbf{x}_c$, 
-each of which has a length of $hw$. 
-Here, vector $\mathbf{x}_i$ represents the style feature of channel $i$. 
+the concatenation of
+$c$ vectors $\mathbf{x}_1, \ldots, \mathbf{x}_c$,
+each of which has a length of $hw$.
+Here, vector $\mathbf{x}_i$ represents the style feature of channel $i$.
 
-In the *Gram matrix* of these vectors $\mathbf{X}\mathbf{X}^\top \in \mathbb{R}^{c \times c}$, element $x_{ij}$ in row $i$ and column $j$ is the inner product of vectors $\mathbf{x}_i$ and $\mathbf{x}_j$.
-It represents the correlation of the style features of channels $i$ and $j$. 
-We use this Gram matrix to represent the style output of any style layer. 
-Note that when the value of $hw$ is larger, 
-it likely leads to larger values in the Gram matrix. 
-Note also that the height and width of the Gram matrix are both the number of channels $c$. 
+In the *Gram matrix* of these vectors $\mathbf{X}\mathbf{X}^\top \in \mathbb{R}^{c \times c}$, element $x_{ij}$ in row $i$ and column $j$ is the dot product of vectors $\mathbf{x}_i$ and $\mathbf{x}_j$.
+It represents the correlation of the style features of channels $i$ and $j$.
+We use this Gram matrix to represent the style output of any style layer.
+Note that when the value of $hw$ is larger,
+it likely leads to larger values in the Gram matrix.
+Note also that the height and width of the Gram matrix are both the number of channels $c$.
 To allow style loss not to be affected
 by these values,
 the `gram` function below divides
@@ -332,8 +332,8 @@ def gram(X):
 ```
 
 Obviously,
-the two Gram matrix inputs of the squared loss function for style loss are based on 
-the style layer outputs for 
+the two Gram matrix inputs of the squared loss function for style loss are based on
+the style layer outputs for
 the synthesized image and the style image.
 It is assumed here that the Gram matrix `gram_Y` based on the style image has been precomputed.
 
@@ -351,10 +351,10 @@ def style_loss(Y_hat, gram_Y):
 ### Total Variation Loss
 
 Sometimes, the learned synthesized image
-has a lot of high-frequency noise, 
+has a lot of high-frequency noise,
 i.e., particularly bright or dark pixels.
-One common noise reduction method is 
-*total variation denoising*. 
+One common noise reduction method is
+*total variation denoising*.
 Denote by $x_{i, j}$ the pixel value at coordinate $(i, j)$.
 Reducing total variation loss
 
@@ -374,7 +374,7 @@ def tv_loss(Y_hat):
 [**The loss function of style transfer is the weighted sum of content loss, style loss, and total variation loss**].
 By adjusting these weight hyperparameters,
 we can balance among
-content retention, 
+content retention,
 style transfer,
 and noise reduction on the synthesized image.
 
@@ -450,7 +450,7 @@ def get_inits(X, device, lr, styles_Y):
 
 
 When training the model for style transfer,
-we continuously extract 
+we continuously extract
 content features and style features of the synthesized image, and calculate the loss function.
 Below defines the training loop.
 
@@ -530,7 +530,7 @@ and transfers the color of the style image
 at the same time.
 For example,
 the synthesized image has blocks of color like
-those in the style image. 
+those in the style image.
 Some of these blocks even have the subtle texture of brush strokes.
 
 
