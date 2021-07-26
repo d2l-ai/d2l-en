@@ -1,0 +1,5 @@
+.globaltoc ul:first-of-type li.toctree-l1 .link-wrapper>a {
+    padding-left: 1em;
+    text-align: right;
+    padding-right: 8px;
+}
