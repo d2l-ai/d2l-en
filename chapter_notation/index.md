@@ -27,7 +27,6 @@ represent scalar values.
 
 
 
-
 ## Set Theory
 
 
@@ -41,6 +40,7 @@ represent scalar values.
 * $\mathcal{A}\cup\mathcal{B}$: union of sets $\mathcal{A}$ and $\mathcal{B}$
 * $\mathcal{A}\cap\mathcal{B}$: intersection of sets $\mathcal{A}$ and $\mathcal{B}$
 * $\mathcal{A}\setminus\mathcal{B}$: set subtraction of $\mathcal{B}$ from $\mathcal{A}$ (contains only those elements of $\mathcal{A}$ that do not belong to $\mathcal{B}$)
+
 
 
 ## Functions and Operators
@@ -64,6 +64,7 @@ represent scalar values.
 * $\stackrel{\mathrm{def}}{=}$: an equality asserted as a definition of the symbol on the left-hand side
 
 
+
 ## Calculus
 
 * $\frac{dy}{dx}$: derivative of $y$ with respect to $x$
@@ -71,6 +72,8 @@ represent scalar values.
 * $\nabla_{\mathbf{x}} y$: gradient of $y$ with respect to $\mathbf{x}$
 * $\int_a^b f(x) \;dx$: definite integral of $f$ from $a$ to $b$ with respect to $x$
 * $\int f(x) \;dx$: indefinite integral of $f$ with respect to $x$
+
+
 
 ## Probability and Information Theory
 
@@ -89,6 +92,7 @@ represent scalar values.
 * $\rho(X, Y)$: the Pearson correlation coefficient between $X$ and $Y$, equals $\frac{\mathrm{Cov}(X, Y)}{\sigma_X \sigma_Y}$
 * $H(X)$: entropy of random variable $X$
 * $D_{\mathrm{KL}}(P\|Q)$: the KL-divergence (or relative entropy) from distribution $Q$ to distribution $P$
+
 
 
 [Discussions](https://discuss.d2l.ai/t/25)

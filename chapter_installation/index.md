@@ -1,23 +1,23 @@
 # Installation
 :label:`chap_installation`
 
-In order to get you up and running for hands-on learning experience,
-we need to set you up with an environment 
-for running Python, Jupyter notebooks, the relevant libraries, 
+In order to get up and running,
+we will need an environment for running Python,
+Jupyter notebooks, the relevant libraries, 
 and the code needed to run the book itself.
 
 ## Installing Miniconda
 
-The simplest way to get going will be to install
+Your simplest option is to install
 [Miniconda](https://conda.io/en/latest/miniconda.html). 
-The Python 3.x version is required. 
+Note that the Python 3.x version is required. 
 You can skip the following steps 
 if your machine already has conda installed.
 
 Visit the Miniconda website and determine 
 the appropriate version for your system
 based on your Python 3.x version and machine architecture.
-For example, if you are using macOS and Python 3.x 
+For example, if you are using macOS and Python 3.x,
 you would download the bash script 
 whose name contains the strings "Miniconda3" and "MacOSX",
 navigate to the download location,
