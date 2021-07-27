@@ -57,12 +57,12 @@ For brevity, practitioners
 often assign the alias `tf`.
 :end_tab:
 
-```{.python .input  n=9}
+```{.python .input}
 from mxnet import np, npx
 npx.set_np()
 ```
 
-```{.python .input  n=13}
+```{.python .input  n=2}
 #@tab pytorch
 import torch
 ```
@@ -125,23 +125,10 @@ x = np.arange(12)
 x
 ```
 
-```{.python .input  n=14}
+```{.python .input}
 #@tab pytorch
 x = torch.arange(12)
 x
-```
-
-```{.json .output n=14}
-[
- {
-  "data": {
-   "text/plain": "tensor([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11])"
-  },
-  "execution_count": 14,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -178,22 +165,9 @@ in a tensor via the `tf.size` function.
 x.size
 ```
 
-```{.python .input  n=15}
+```{.python .input}
 #@tab pytorch
 x.numel()
-```
-
-```{.json .output n=15}
-[
- {
-  "data": {
-   "text/plain": "12"
-  },
-  "execution_count": 15,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -224,23 +198,10 @@ but reconfigures them into a matrix
 with indices along the last axis changing fastest
 and the first axis changing slowest.
 
-```{.python .input  n=16}
+```{.python .input}
 #@tab mxnet, pytorch
 X = x.reshape(3, 4)
 X
-```
-
-```{.json .output n=16}
-[
- {
-  "data": {
-   "text/plain": "tensor([[ 0,  1,  2,  3],\n        [ 4,  5,  6,  7],\n        [ 8,  9, 10, 11]])"
-  },
-  "execution_count": 16,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -271,22 +232,9 @@ and a shape of (2, 3, 4) via the `zeros` function.
 np.zeros((2, 3, 4))
 ```
 
-```{.python .input  n=17}
+```{.python .input}
 #@tab pytorch
 torch.zeros((2, 3, 4))
-```
-
-```{.json .output n=17}
-[
- {
-  "data": {
-   "text/plain": "tensor([[[0., 0., 0., 0.],\n         [0., 0., 0., 0.],\n         [0., 0., 0., 0.]],\n\n        [[0., 0., 0., 0.],\n         [0., 0., 0., 0.],\n         [0., 0., 0., 0.]]])"
-  },
-  "execution_count": 17,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -301,22 +249,9 @@ with all ones by invoking `ones`.
 np.ones((2, 3, 4))
 ```
 
-```{.python .input  n=18}
+```{.python .input}
 #@tab pytorch
 torch.ones((2, 3, 4))
-```
-
-```{.json .output n=18}
-[
- {
-  "data": {
-   "text/plain": "tensor([[[1., 1., 1., 1.],\n         [1., 1., 1., 1.],\n         [1., 1., 1., 1.]],\n\n        [[1., 1., 1., 1.],\n         [1., 1., 1., 1.],\n         [1., 1., 1., 1.]]])"
-  },
-  "execution_count": 18,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -338,22 +273,9 @@ with mean 0 and standard deviation 1.
 np.random.normal(0, 1, size=(3, 4))
 ```
 
-```{.python .input  n=19}
+```{.python .input}
 #@tab pytorch
 torch.randn(3, 4)
-```
-
-```{.json .output n=19}
-[
- {
-  "data": {
-   "text/plain": "tensor([[ 0.0237, -1.8547, -0.2081, -1.2484],\n        [-0.1939, -1.3150, -0.5424, -0.9634],\n        [-0.0506, -0.2141, -0.1872, -0.4991]])"
-  },
-  "execution_count": 19,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -373,22 +295,9 @@ and the inner list to axis 1.
 np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
 
-```{.python .input  n=20}
+```{.python .input}
 #@tab pytorch
 torch.tensor([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
-```
-
-```{.json .output n=20}
-[
- {
-  "data": {
-   "text/plain": "tensor([[2, 1, 4, 3],\n        [1, 2, 3, 4],\n        [4, 3, 2, 1]])"
-  },
-  "execution_count": 20,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -411,22 +320,9 @@ the first index *but not the last*.
 Thus, [**`[-1]` selects the last element and `[1:3]`
 selects the second and the third elements**]:
 
-```{.python .input  n=21}
+```{.python .input}
 #@tab all
 X[-1], X[1:3]
-```
-
-```{.json .output n=21}
-[
- {
-  "data": {
-   "text/plain": "(tensor([ 8,  9, 10, 11]),\n tensor([[ 4,  5,  6,  7],\n         [ 8,  9, 10, 11]]))"
-  },
-  "execution_count": 21,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 :begin_tab:`mxnet, pytorch`
@@ -465,23 +361,10 @@ While we discussed indexing for matrices,
 this obviously also works for vectors
 and for tensors of more than 2 dimensions.
 
-```{.python .input  n=22}
+```{.python .input}
 #@tab mxnet, pytorch
 X[0:2, :] = 12
 X
-```
-
-```{.json .output n=22}
-[
- {
-  "data": {
-   "text/plain": "tensor([[12, 12, 12, 12],\n        [12, 12, 12, 12],\n        [ 8,  9, 10, 11]])"
-  },
-  "execution_count": 22,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -521,22 +404,9 @@ including unary operators like $log(x)$ and $e^x$.
 np.log(x), np.exp(x)
 ```
 
-```{.python .input  n=27}
+```{.python .input}
 #@tab pytorch
 torch.log(x), torch.exp(x)
-```
-
-```{.json .output n=27}
-[
- {
-  "data": {
-   "text/plain": "(tensor([0.0000, 0.6931, 1.3863, 2.0794]),\n tensor([2.7183e+00, 7.3891e+00, 5.4598e+01, 2.9810e+03]))"
-  },
-  "execution_count": 27,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -567,43 +437,17 @@ and exponentiation (`**`)
 have all been *lifted* to elementwise operations
 for identically-shaped tensors of arbitrary shape.
 
-```{.python .input  n=23}
+```{.python .input}
 x = np.array([1, 2, 4, 8])
 y = np.array([2, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y  
 ```
 
-```{.json .output n=23}
-[
- {
-  "data": {
-   "text/plain": "(array([ 3.,  4.,  6., 10.]),\n array([-1.,  0.,  2.,  6.]),\n array([ 2.,  4.,  8., 16.]),\n array([0.5, 1. , 2. , 4. ]),\n array([ 1.,  4., 16., 64.]))"
-  },
-  "execution_count": 23,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
-```{.python .input  n=24}
+```{.python .input}
 #@tab pytorch
 x = torch.tensor([1.0, 2, 4, 8])
 y = torch.tensor([2, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y  
-```
-
-```{.json .output n=24}
-[
- {
-  "data": {
-   "text/plain": "(tensor([ 3.,  4.,  6., 10.]),\n tensor([-1.,  0.,  2.,  6.]),\n tensor([ 2.,  4.,  8., 16.]),\n tensor([0.5000, 1.0000, 2.0000, 4.0000]),\n tensor([ 1.,  4., 16., 64.]))"
-  },
-  "execution_count": 24,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -637,24 +481,11 @@ Y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 np.concatenate([X, Y], axis=0), np.concatenate([X, Y], axis=1)
 ```
 
-```{.python .input  n=29}
+```{.python .input}
 #@tab pytorch
 X = torch.arange(12, dtype=torch.float32).reshape((3,4))
 Y = torch.tensor([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 torch.cat((X, Y), dim=0), torch.cat((X, Y), dim=1)
-```
-
-```{.json .output n=29}
-[
- {
-  "data": {
-   "text/plain": "(tensor([[ 0.,  1.,  2.,  3.],\n         [ 4.,  5.,  6.,  7.],\n         [ 8.,  9., 10., 11.],\n         [ 2.,  1.,  4.,  3.],\n         [ 1.,  2.,  3.,  4.],\n         [ 4.,  3.,  2.,  1.]]),\n tensor([[ 0.,  1.,  2.,  3.,  2.,  1.,  4.,  3.],\n         [ 4.,  5.,  6.,  7.,  1.,  2.,  3.,  4.],\n         [ 8.,  9., 10., 11.,  4.,  3.,  2.,  1.]]))"
-  },
-  "execution_count": 29,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -671,42 +502,16 @@ For each position `i,j`, if `X[i,j]` and `Y[i,j]` are equal,
 then the corresponding entry in the result takes value `1`,
 otherwise it takes value `0`.
 
-```{.python .input  n=30}
+```{.python .input}
 #@tab all
 X == Y
 ```
 
-```{.json .output n=30}
-[
- {
-  "data": {
-   "text/plain": "tensor([[False,  True, False,  True],\n        [False, False, False, False],\n        [False, False, False, False]])"
-  },
-  "execution_count": 30,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 [**Summing all the elements in the tensor**] yields a tensor with only one element.
 
-```{.python .input  n=31}
+```{.python .input}
 #@tab mxnet, pytorch
 X.sum()
-```
-
-```{.json .output n=31}
-[
- {
-  "data": {
-   "text/plain": "tensor(66.)"
-  },
-  "execution_count": 31,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -739,24 +544,11 @@ b = np.arange(2).reshape(1, 2)
 a, b
 ```
 
-```{.python .input  n=32}
+```{.python .input}
 #@tab pytorch
 a = torch.arange(3).reshape((3, 1))
 b = torch.arange(2).reshape((1, 2))
 a, b
-```
-
-```{.json .output n=32}
-[
- {
-  "data": {
-   "text/plain": "(tensor([[0],\n         [1],\n         [2]]),\n tensor([[0, 1]]))"
-  },
-  "execution_count": 32,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -774,22 +566,9 @@ by replicating matrix `a` along the columns
 and matrix `b` along the rows
 before adding them elementwise.
 
-```{.python .input  n=33}
+```{.python .input}
 #@tab all
 a + b
-```
-
-```{.json .output n=33}
-[
- {
-  "data": {
-   "text/plain": "tensor([[0, 1],\n        [1, 2],\n        [2, 3]])"
-  },
-  "execution_count": 33,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Saving Memory
@@ -808,24 +587,11 @@ That's because Python first evaluates `Y + X`,
 allocating new memory for the result 
 and then points `Y` to this new location in memory.
 
-```{.python .input  n=34}
+```{.python .input}
 #@tab all
 before = id(Y)
 Y = Y + X
 id(Y) == before
-```
-
-```{.json .output n=34}
-[
- {
-  "data": {
-   "text/plain": "False"
-  },
-  "execution_count": 34,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 This might be undesirable for two reasons.
@@ -911,24 +677,11 @@ and to re-use prior allocations that are no longer needed.
 This minimizes the memory overhead of TensorFlow computations.
 :end_tab:
 
-```{.python .input  n=35}
+```{.python .input}
 #@tab mxnet, pytorch
 before = id(X)
 X += Y
 id(X) == before
-```
-
-```{.json .output n=35}
-[
- {
-  "data": {
-   "text/plain": "True"
-  },
-  "execution_count": 35,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
