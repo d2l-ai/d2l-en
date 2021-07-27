@@ -8,7 +8,7 @@ you will need a few survival skills:
 and preprocessing data from a variety of sources;
 (iii) knowledge of the basic linear algebraic operations
 that we apply to high-dimensional data elements;
-(iv) just enough calculus to deterine
+(iv) just enough calculus to determine
 which direction to adjust each parameter
 in order to decrease the loss function;
 (v) the ability to automatically compute derivatives
