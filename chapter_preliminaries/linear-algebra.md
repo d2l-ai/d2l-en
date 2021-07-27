@@ -537,7 +537,7 @@ A.sum(axis=[0, 1]) == A.sum() # Same as `A.sum()`
 
 ```{.python .input}
 #@tab tensorflow
-tf.reduce_sum(A, axis=[0, 1])  tf.reduce_sum(A) # Same as `tf.reduce_sum(A)`
+tf.reduce_sum(A, axis=[0, 1]), tf.reduce_sum(A) # Same as `tf.reduce_sum(A)`
 ```
 
 [**A related quantity is the *mean*, also called the *average*.**]
@@ -578,7 +578,7 @@ tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 :label:`subseq_lin-alg-non-reduction`
 
 Sometimes it can be useful to [**keep the number of axes unchanged**]
-when invoking the function for calculating the sum or mean. This matters for instance when we want to use the broadcast mechanism. 
+when invoking the function for calculating the sum or mean. This matters for instance when we want to use the broadcast mechanism.
 
 ```{.python .input}
 sum_A = A.sum(axis=1, keepdims=True)
@@ -892,7 +892,7 @@ As such, norms encode different ways of measuring the length of a vector. The (r
 
 (**$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2}.$$**)
 
-The method `norm` lets us compute it easily. 
+The method `norm` lets us compute it easily.
 
 ```{.python .input}
 u = np.array([3, -4])
@@ -915,7 +915,7 @@ Another popular norm is [**the $L_1$ *norm***]. The associated metric is also kn
 
 (**$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$**)
 
-Compared to the $L_2$ norm, it is less sensitive to outliers, since large values do not get emphasized by squaring them. To compute the $L_1$ norm we compse the absolute value function with a sum over all elements. 
+Compared to the $L_2$ norm, it is less sensitive to outliers, since large values do not get emphasized by squaring them. To compute the $L_1$ norm we compse the absolute value function with a sum over all elements.
 
 ```{.python .input}
 np.abs(u).sum()
@@ -1030,7 +1030,3 @@ For now, the following will suffice:
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/196)
 :end_tab:
-
-```{.python .input}
-
-```
