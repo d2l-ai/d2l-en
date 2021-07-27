@@ -759,7 +759,7 @@ a, a.item(), float(a), int(a)
 
 ## Summary
 
-* The main interface to store and manipulate data for deep learning is the tensor. It provides a variety of functionalities including basic mathematics operations, broadcasting, indexing, slicing, memory saving, and conversion to other Python objects.
+* The main interface to store and manipulate data for deep learning is the tensor. It provides a variety of functionalities including construction routines; indexing and slicing; basic mathematics operations; broadcasting; memory-efficient assignment; and conversion to and from other Python objects.
 
 
 ## Exercises
