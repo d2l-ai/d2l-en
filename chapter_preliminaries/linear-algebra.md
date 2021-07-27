@@ -1,36 +1,28 @@
 # Linear Algebra
 :label:`sec_linear-algebra`
 
-
-Now that you can store and manipulate data,
-let us briefly review the subset of basic linear algebra
+Now that we know how to load and manipulate data, 
+let us briefly review the basic tools from linear algebra
 that you will need to understand and implement
-most of models covered in this book.
-Below, we introduce the basic mathematical objects, arithmetic,
-and operations in linear algebra,
-expressing each of them through mathematical notation
-and the corresponding implementation in code.
+the models covered in this book. 
 
 ## Scalars
 
-If you never studied linear algebra or machine learning,
-then your past experience with math probably consisted
-of thinking about one number at a time.
-And, if you ever balanced a checkbook
-or even paid for dinner at a restaurant
-then you already know how to do basic things
-like adding and multiplying pairs of numbers.
-For example, the temperature in Palo Alto is $52$ degrees Fahrenheit.
+Depending on your past experience with linear algebra and machine learning, 
+you might only be familiar with handling one number at a time. 
+Even paying at a restaurant requires basic operations such as 
+adding and multiplying pairs of numbers.
+
 Formally, we call values consisting
 of just one numerical quantity *scalars*.
+For example, the temperature in Palo Alto is a balmy $72$ degrees Fahrenheit.
 If you wanted to convert this value to Celsius
-(the metric system's more sensible temperature scale),
-you would evaluate the expression $c = \frac{5}{9}(f - 32)$, setting $f$ to $52$.
-In this equation, each of the terms---$5$, $9$, and $32$---are scalar values.
+you would evaluate the expression $c = \frac{5}{9}(f - 32)$, setting $f$ to $72$.
+In this equation, each of the terms---$5$, $9$, and $32$---are scalar *values*.
 The placeholders $c$ and $f$ are called *variables*
 and they represent unknown scalar values.
 
-In this book, we adopt the mathematical notation
+In this book, we adopt the notation
 where scalar variables are denoted
 by ordinary lower-cased letters (e.g., $x$, $y$, and $z$).
 We denote the space of all (continuous) *real-valued* scalars by $\mathbb{R}$.
@@ -38,15 +30,15 @@ For expedience, we will punt on rigorous definitions
 of what precisely *space* is,
 but just remember for now that the expression $x \in \mathbb{R}$
 is a formal way to say that $x$ is a real-valued scalar.
-The symbol $\in$ can be pronounced "in"
-and simply denotes membership in a set.
+The symbol $\in$ (pronounced "in")
+simply denotes membership in a set.
 Analogously, we could write $x, y \in \{0, 1\}$
 to state that $x$ and $y$ are numbers
 whose value can only be $0$ or $1$.
 
 (**A scalar is represented by a tensor with just one element.**)
 In the next snippet, we instantiate two scalars
-and perform some familiar arithmetic operations with them,
+and perform some familiar arithmetic operations,
 namely addition, multiplication, division, and exponentiation.
 
 ```{.python .input}
@@ -81,7 +73,7 @@ x + y, x * y, x / y, x**y
 
 ## Vectors
 
-[**You can think of a vector as simply a list of scalar values.**]
+[**You can think of a vector as simply a fixed-length list of scalar values.**]
 We call these values the *elements* (*entries* or *components*) of the vector.
 When our vectors represent examples from our dataset,
 their values hold some real-world significance.
@@ -94,70 +86,61 @@ If we were studying the risk of heart attacks hospital patients potentially face
 we might represent each patient by a vector
 whose components capture their most recent vital signs,
 cholesterol levels, minutes of exercise per day, etc.
-In math notation, we will usually denote vectors as bold-faced,
-lower-cased letters (e.g., $\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z})$.
+We will usually denote vectors as bold-faced,
+lower-cased letters, such as $\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z}$.
 
 We work with vectors via one-dimensional tensors.
-In general tensors can have arbitrary lengths,
+In general, tensors can have arbitrary but fixed lengths,
 subject to the memory limits of your machine.
 
 ```{.python .input}
-x = np.arange(4)
+x = np.arange(3)
 x
 ```
 
 ```{.python .input}
 #@tab pytorch
-x = torch.arange(4)
+x = torch.arange(3)
 x
 ```
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.range(4)
+x = tf.range(3)
 x
 ```
 
-We can refer to any element of a vector by using a subscript.
-For example, we can refer to the $i^\mathrm{th}$ element of $\mathbf{x}$ by $x_i$.
-Note that the element $x_i$ is a scalar,
-so we do not bold-face the font when referring to it.
-Extensive literature considers column vectors to be the default
-orientation of vectors, so does this book.
-In math, a vector $\mathbf{x}$ can be written as
+We can refer to an element of a vector by using a subscript.
+For example, $x_2$ denotes the second element of $\mathbf{x}$. Since $x_2$ is a scalar,
+we will not use bold-face when referring to it. A common convention for vectors is to write them as elements stacked vertically, also referred to as column notation.
 
-$$\mathbf{x} =\begin{bmatrix}x_{1}  \\x_{2}  \\ \vdots  \\x_{n}\end{bmatrix},$$
+$$\mathbf{x} =\begin{bmatrix}x_{1}  \\ \vdots  \\x_{n}\end{bmatrix},$$
 :eqlabel:`eq_vec_def`
 
-
-where $x_1, \ldots, x_n$ are elements of the vector.
-In code,
+Here $x_1, \ldots, x_n$ are elements of the vector. Later on, we will also horizontally arranged vector entries, commonly known as row notation. In code,
 we (**access any element by indexing into the tensor.**)
 
 ```{.python .input}
-x[3]
+x[2]
 ```
 
 ```{.python .input}
 #@tab pytorch
-x[3]
+x[2]
 ```
 
 ```{.python .input}
 #@tab tensorflow
-x[3]
+x[2]
 ```
-
-### Length, Dimensionality, and Shape
 
 Let us revisit some concepts from :numref:`sec_ndarray`.
 A vector is just an array of numbers.
 And just as every array has a length, so does every vector.
-In math notation, if we want to say that a vector $\mathbf{x}$
+If we want to say that a vector $\mathbf{x}$
 consists of $n$ real-valued scalars,
 we can express this as $\mathbf{x} \in \mathbb{R}^n$.
 The length of a vector is commonly called the *dimension* of the vector.
-
 As with an ordinary Python array,
 we [**can access the length of a tensor**]
 by calling Python's built-in `len()` function.
@@ -198,7 +181,7 @@ x.shape
 
 Note that the word "dimension" tends to get overloaded
 in these contexts and this tends to confuse people.
-To clarify, we use the dimensionality of a *vector* or an *axis*
+To clarify, we use the dimensionality of a *vector* or of an *axis*
 to refer to its length, i.e., the number of elements of a vector or an axis.
 However, we use the dimensionality of a tensor
 to refer to the number of axes that a tensor has.
@@ -213,8 +196,7 @@ matrices generalize vectors from order one to order two.
 Matrices, which we will typically denote with bold-faced, capital letters
 (e.g., $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$),
 are represented in code as tensors with two axes.
-
-In math notation, we use $\mathbf{A} \in \mathbb{R}^{m \times n}$
+We use $\mathbf{A} \in \mathbb{R}^{m \times n}$
 to express that the matrix $\mathbf{A}$ consists of $m$ rows and $n$ columns of real-valued scalars.
 Visually, we can illustrate any matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$ as a table,
 where each element $a_{ij}$ belongs to the $i^{\mathrm{th}}$ row and $j^{\mathrm{th}}$ column:
@@ -227,25 +209,24 @@ For any $\mathbf{A} \in \mathbb{R}^{m \times n}$, the shape of $\mathbf{A}$
 is ($m$, $n$) or $m \times n$.
 Specifically, when a matrix has the same number of rows and columns,
 its shape becomes a square; thus, it is called a *square matrix*.
-
 We can [**create an $m \times n$ matrix**]
 by specifying a shape with two components $m$ and $n$
 when calling any of our favorite functions for instantiating a tensor.
 
 ```{.python .input}
-A = np.arange(20).reshape(5, 4)
+A = np.arange(6).reshape(3, 2)
 A
 ```
 
 ```{.python .input}
 #@tab pytorch
-A = torch.arange(20).reshape(5, 4)
+A = torch.arange(6).reshape(3, 2)
 A
 ```
 
 ```{.python .input}
 #@tab tensorflow
-A = tf.reshape(tf.range(20), (5, 4))
+A = tf.reshape(tf.range(6), (3, 2))
 A
 ```
 
@@ -296,52 +277,47 @@ tf.transpose(A)
 As a special type of the square matrix,
 [**a *symmetric matrix* $\mathbf{A}$ is equal to its transpose:
 $\mathbf{A} = \mathbf{A}^\top$.**]
-Here we define a symmetric matrix `B`.
 
 ```{.python .input}
-B = np.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
-B
+A = np.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
+A
 ```
 
 ```{.python .input}
 #@tab pytorch
-B = torch.tensor([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
-B
+A = torch.tensor([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
+A
 ```
 
 ```{.python .input}
 #@tab tensorflow
-B = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
-B
+A = tf.constant([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
+A
 ```
 
-Now we compare `B` with its transpose.
+Now we compare `A` to its transpose.
 
 ```{.python .input}
-B == B.T
+A == A.T
 ```
 
 ```{.python .input}
 #@tab pytorch
-B == B.T
+A == A.T
 ```
 
 ```{.python .input}
 #@tab tensorflow
-B == tf.transpose(B)
+A == tf.transpose(A)
 ```
 
-Matrices are useful data structures:
-they allow us to organize data that have different modalities of variation.
+Matrices are useful data structures to organize data. 
 For example, rows in our matrix might correspond to different houses (data examples),
 while columns might correspond to different attributes.
-This should sound familiar if you have ever used spreadsheet software or
-have read :numref:`sec_pandas`.
-Thus, although the default orientation of a single vector is a column vector,
-in a matrix that represents a tabular dataset,
-it is more conventional to treat each data example as a row vector in the matrix.
-And, as we will see in later chapters,
-this convention will enable common deep learning practices.
+This should sound familiar if you used spreadsheets before or
+read :numref:`sec_pandas`. In this view each column corresponds to an attribute vector 
+and each row vector is a data example.
+Organizing data by row vectors is common in deep learning practice. 
 For example, along the outermost axis of a tensor,
 we can access or enumerate minibatches of data examples,
 or just data examples if no minibatch exists.
@@ -362,29 +338,24 @@ Tensors will become more important when we start working with images,
  which arrive as $n$-dimensional arrays with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
 
 ```{.python .input}
-X = np.arange(24).reshape(2, 3, 4)
-X
+np.arange(24).reshape(2, 3, 4)
 ```
 
 ```{.python .input}
 #@tab pytorch
-X = torch.arange(24).reshape(2, 3, 4)
-X
+torch.arange(24).reshape(2, 3, 4)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-X = tf.reshape(tf.range(24), (2, 3, 4))
-X
+tf.reshape(tf.range(24), (2, 3, 4))
 ```
 
 ## Basic Properties of Tensor Arithmetic
 
-Scalars, vectors, matrices, and tensors ("tensors" in this subsection refer to algebraic objects)
+Scalars, vectors, matrices, and tensors ("tensors" in this section refer to algebraic objects)
 of an arbitrary number of axes
-have some nice properties that often come in handy.
-For example, you might have noticed
-from the definition of an elementwise operation
+have some handy properties. For example, you might have noticed
 that any elementwise unary operation does not change the shape of its operand.
 Similarly,
 [**given any two tensors with the same shape,
@@ -394,21 +365,21 @@ For example, adding two matrices of the same shape
 performs elementwise addition over these two matrices.
 
 ```{.python .input}
-A = np.arange(20).reshape(5, 4)
+A = np.arange(6).reshape(2, 3)
 B = A.copy()  # Assign a copy of `A` to `B` by allocating new memory
 A, A + B
 ```
 
 ```{.python .input}
 #@tab pytorch
-A = torch.arange(20, dtype=torch.float32).reshape(5, 4)
+A = torch.arange(6, dtype=torch.float32).reshape(2, 3)
 B = A.clone()  # Assign a copy of `A` to `B` by allocating new memory
 A, A + B
 ```
 
 ```{.python .input}
 #@tab tensorflow
-A = tf.reshape(tf.range(20, dtype=tf.float32), (5, 4))
+A = tf.reshape(tf.range(6, dtype=tf.float32), (2, 3))
 B = A  # No cloning of `A` to `B` by allocating new memory
 A, A + B
 ```
@@ -442,7 +413,7 @@ A * B
 A * B
 ```
 
-[**Multiplying or adding a tensor by a scalar**] also does not change the shape of the tensor,
+[**Multiplying or adding a tensor to a scalar**] also leaves the shape of the tensor unchanged,
 where each element of the operand tensor will be added or multiplied by the scalar.
 
 ```{.python .input}
@@ -471,25 +442,23 @@ a + X, (a * X).shape
 One useful operation that we can perform with arbitrary tensors
 is to
 calculate [**the sum of their elements.**]
-In mathematical notation, we express sums using the $\sum$ symbol.
-To express the sum of the elements in a vector $\mathbf{x}$ of length $d$,
-we write $\sum_{i=1}^d x_i$.
-In code, we can just call the function for calculating the sum.
+To express the sum of the elements in a vector $\mathbf{x}$ of length $n$,
+we write $\sum_{i=1}^n x_i$. There's a simple function for it:
 
 ```{.python .input}
-x = np.arange(4)
+x = np.arange(3)
 x, x.sum()
 ```
 
 ```{.python .input}
 #@tab pytorch
-x = torch.arange(4, dtype=torch.float32)
+x = torch.arange(3, dtype=torch.float32)
 x, x.sum()
 ```
 
 ```{.python .input}
 #@tab tensorflow
-x = tf.range(4, dtype=tf.float32)
+x = tf.range(3, dtype=tf.float32)
 x, tf.reduce_sum(x)
 ```
 
@@ -514,10 +483,9 @@ By default, invoking the function for calculating the sum
 *reduces* a tensor along all its axes to a scalar.
 We can also [**specify the axes along which the tensor is reduced via summation.**]
 Take matrices as an example.
-To reduce the row dimension (axis 0) by summing up elements of all the rows,
-we specify `axis=0` when invoking the function.
+To sum over all elements along the row dimension (axis 0) we specify `axis=0` in `sum`.
 Since the input matrix reduces along axis 0 to generate the output vector,
-the dimension of axis 0 of the input is lost in the output shape.
+the dimension of axis 0 of the input is omitted in the output.
 
 ```{.python .input}
 A_sum_axis0 = A.sum(axis=0)
@@ -536,9 +504,7 @@ A_sum_axis0 = tf.reduce_sum(A, axis=0)
 A_sum_axis0, A_sum_axis0.shape
 ```
 
-Specifying
-`axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.
-Thus, the dimension of axis 1 of the input is lost in the output shape.
+Specifying `axis=1` will reduce the column dimension (axis 1) by summing up elements of all the columns.
 
 ```{.python .input}
 A_sum_axis1 = A.sum(axis=1)
@@ -561,23 +527,22 @@ Reducing a matrix along both rows and columns via summation
 is equivalent to summing up all the elements of the matrix.
 
 ```{.python .input}
-A.sum(axis=[0, 1])  # Same as `A.sum()`
+A.sum(axis=[0, 1]) == A.sum() # Same as `A.sum()`
 ```
 
 ```{.python .input}
 #@tab pytorch
-A.sum(axis=[0, 1])  # Same as `A.sum()`
+A.sum(axis=[0, 1]) == A.sum() # Same as `A.sum()`
 ```
 
 ```{.python .input}
 #@tab tensorflow
-tf.reduce_sum(A, axis=[0, 1])  # Same as `tf.reduce_sum(A)`
+tf.reduce_sum(A, axis=[0, 1]), tf.reduce_sum(A) # Same as `tf.reduce_sum(A)`
 ```
 
-[**A related quantity is the *mean*, which is also called the *average*.**]
+[**A related quantity is the *mean*, also called the *average*.**]
 We calculate the mean by dividing the sum by the total number of elements.
-In code, we could just call the function for calculating the mean
-on tensors of arbitrary shape.
+Since computing the `mean` is a commonly used operation, there is a function for that. It works just like `sum`.
 
 ```{.python .input}
 A.mean(), A.sum() / A.size
@@ -609,32 +574,31 @@ A.mean(axis=0), A.sum(axis=0) / A.shape[0]
 tf.reduce_mean(A, axis=0), tf.reduce_sum(A, axis=0) / A.shape[0]
 ```
 
-### Non-Reduction Sum
+## Non-Reduction Sum
 :label:`subseq_lin-alg-non-reduction`
 
-However,
-sometimes it can be useful to [**keep the number of axes unchanged**]
-when invoking the function for calculating the sum or mean.
+Sometimes it can be useful to [**keep the number of axes unchanged**]
+when invoking the function for calculating the sum or mean. This matters for instance when we want to use the broadcast mechanism.
 
 ```{.python .input}
 sum_A = A.sum(axis=1, keepdims=True)
-sum_A
+sum_A, sum_A.shape
 ```
 
 ```{.python .input}
 #@tab pytorch
 sum_A = A.sum(axis=1, keepdims=True)
-sum_A
+sum_A, sum_A.shape
 ```
 
 ```{.python .input}
 #@tab tensorflow
 sum_A = tf.reduce_sum(A, axis=1, keepdims=True)
-sum_A
+sum_A, sum_A.shape
 ```
 
 For instance,
-since `sum_A` still keeps its two axes after summing each row, we can (**divide `A` by `sum_A` with broadcasting.**)
+since `sum_A` still keeps its two axes after summing each row, we can (**divide `A` by `sum_A` with broadcasting**) to create a matrix where each row sums up to $1$.
 
 ```{.python .input}
 A / sum_A
@@ -651,7 +615,7 @@ A / sum_A
 ```
 
 If we want to calculate [**the cumulative sum of elements of `A` along some axis**], say `axis=0` (row by row),
-we can call the `cumsum` function. This function will not reduce the input tensor along any axis.
+we can call the `cumsum` function. By design, this function will not reduce the input tensor along any axis.
 
 ```{.python .input}
 A.cumsum(axis=0)
@@ -669,25 +633,25 @@ tf.cumsum(A, axis=0)
 
 ## Dot Products
 
-So far, we have only performed elementwise operations, sums, and averages. And if this was all we could do, linear algebra probably would not deserve its own section. However, one of the most fundamental operations is the dot product.
+So far, we have only performed elementwise operations, sums, and averages. And if this was all we could do, linear algebra probably would not deserve its own section. One of the most fundamental operations is the dot product.
 Given two vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$, their *dot product* $\mathbf{x}^\top \mathbf{y}$ (or $\langle \mathbf{x}, \mathbf{y}  \rangle$) is a sum over the products of the elements at the same position: $\mathbf{x}^\top \mathbf{y} = \sum_{i=1}^{d} x_i y_i$.
 
 [~~The *dot product* of two vectors is a sum over the products of the elements at the same position~~]
 
 ```{.python .input}
-y = np.ones(4)
+y = np.ones(3)
 x, y, np.dot(x, y)
 ```
 
 ```{.python .input}
 #@tab pytorch
-y = torch.ones(4, dtype = torch.float32)
+y = torch.ones(3, dtype = torch.float32)
 x, y, torch.dot(x, y)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-y = tf.ones(4, dtype=tf.float32)
+y = tf.ones(3, dtype=tf.float32)
 x, y, tf.tensordot(x, y, axes=1)
 ```
 
@@ -710,13 +674,13 @@ tf.reduce_sum(x * y)
 
 Dot products are useful in a wide range of contexts.
 For example, given some set of values,
-denoted by a vector $\mathbf{x}  \in \mathbb{R}^d$
-and a set of weights denoted by $\mathbf{w} \in \mathbb{R}^d$,
+denoted by a vector $\mathbf{x}  \in \mathbb{R}^n$
+and a set of weights denoted by $\mathbf{w} \in \mathbb{R}^n$,
 the weighted sum of the values in $\mathbf{x}$
 according to the weights $\mathbf{w}$
 could be expressed as the dot product $\mathbf{x}^\top \mathbf{w}$.
 When the weights are non-negative
-and sum to one (i.e., $\left(\sum_{i=1}^{d} {w_i} = 1\right)$),
+and sum to one, i.e., $\left(\sum_{i=1}^{n} {w_i} = 1\right)$,
 the dot product expresses a *weighted average*.
 After normalizing two vectors to have the unit length,
 the dot products express the cosine of the angle between them.
@@ -789,7 +753,10 @@ Expressing matrix-vector products in code with tensors, we use
 the `mv` function. When we call `torch.mv(A, x)` with a matrix
 `A` and a vector `x`, the matrix-vector product is performed.
 Note that the column dimension of `A` (its length along axis 1)
-must be the same as the dimension of `x` (its length).
+must be the same as the dimension of `x` (its length). 
+PyTorch has a convenience operator `@` that can be used in place of 
+matrix-vector and also matrix-matrix products. In our context this means
+that we can write `A@x` instead, thus greatly simplifying notation. 
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -806,7 +773,7 @@ A.shape, x.shape, np.dot(A, x)
 
 ```{.python .input}
 #@tab pytorch
-A.shape, x.shape, torch.mv(A, x)
+A.shape, x.shape, torch.mv(A, x), A@x
 ```
 
 ```{.python .input}
@@ -816,7 +783,7 @@ A.shape, x.shape, tf.linalg.matvec(A, x)
 
 ## Matrix-Matrix Multiplication
 
-If you have gotten the hang of dot products and matrix-vector products,
+If you've gotten the hang of dot products and matrix-vector products,
 then *matrix-matrix multiplication* should be straightforward.
 
 Say that we have two matrices $\mathbf{A} \in \mathbb{R}^{n \times k}$ and $\mathbf{B} \in \mathbb{R}^{k \times m}$:
@@ -873,26 +840,26 @@ $$\mathbf{C} = \mathbf{AB} = \begin{bmatrix}
 \end{bmatrix}.
 $$
 
-[**We can think of the matrix-matrix multiplication $\mathbf{AB}$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix.**]
+[**We can think of the matrix-matrix multiplication $\mathbf{AB}$ as simply performing $m$ matrix-vector products or $m \times n$ dot products and stitching the results together to form an $n \times m$ matrix.**]
 In the following snippet, we perform matrix multiplication on `A` and `B`.
 Here, `A` is a matrix with 5 rows and 4 columns,
 and `B` is a matrix with 4 rows and 3 columns.
-After multiplication, we obtain a matrix with 5 rows and 3 columns.
+After multiplication, we obtain a matrix with 2 rows and 3 columns.
 
 ```{.python .input}
-B = np.ones(shape=(4, 3))
+B = np.ones(shape=(3, 3))
 np.dot(A, B)
 ```
 
 ```{.python .input}
 #@tab pytorch
-B = torch.ones(4, 3)
-torch.mm(A, B)
+B = torch.ones(3, 3)
+torch.mm(A, B), A@B
 ```
 
 ```{.python .input}
 #@tab tensorflow
-B = tf.ones((4, 3), tf.float32)
+B = tf.ones((3, 3), tf.float32)
 tf.matmul(A, B)
 ```
 
@@ -903,54 +870,29 @@ Matrix-matrix multiplication can be simply called *matrix multiplication*, and s
 :label:`subsec_lin-algebra-norms`
 
 Some of the most useful operators in linear algebra are *norms*.
-Informally, the norm of a vector tells us how *big* a vector is.
-The notion of *size* under consideration here
+Informally, the norm of a vector tells us how *big* a vector is. 
+For instance, the $\ell_2$ norm in $\mathbb{R}^3$ measures the length of a vector in three dimensions. 
+As such, the notion of *size* under consideration here
 concerns not dimensionality
-but rather the magnitude of the components.
+but rather the magnitude of the components. 
 
-In linear algebra, a vector norm is a function $f$ that maps a vector
-to a scalar, satisfying a handful of properties.
-Given any vector $\mathbf{x}$,
-the first property says
-that if we scale all the elements of a vector
-by a constant factor $\alpha$,
-its norm also scales by the *absolute value*
-of the same constant factor:
+A norm is a function $\| \cdot \|$ that maps a vector
+to a scalar, satisfying the following three properties:
 
-$$f(\alpha \mathbf{x}) = |\alpha| f(\mathbf{x}).$$
+1. Given any vector $\mathbf{x}$, if we scale (all elements of) the vector 
+   by a scalar $\alpha \in \mathbb{R}$, its norm scales accordingly:
+   $$\|\alpha \mathbf{x}\| = |\alpha| \|\mathbf{x}\|$$
+2. For any vectors $\mathbf{x}$ and $\mathbf{y}$ norms satisfy the 
+   triangle inequality
+   $$\|\mathbf{x} + \mathbf{y}\| \leq \|\mathbf{x}\| + \|\mathbf{y}\|.$$
+3. The norm of a vector is nonnegative and it only vanishes if the vector is zero. That is, 
+   $$\|\mathbf{x}\| > 0 \text{ for all } \mathbf{x} \neq 0.$$
 
+As such, norms encode different ways of measuring the length of a vector. The (regular) Euclidean norm amounts to the square root of the sum of squares of the vector elements. Hence we can write [**The $L_2$ *norm***] as
 
-The second property is the familiar triangle inequality:
+(**$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2}.$$**)
 
-$$f(\mathbf{x} + \mathbf{y}) \leq f(\mathbf{x}) + f(\mathbf{y}).$$
-
-
-The third property simply says that the norm must be non-negative:
-
-$$f(\mathbf{x}) \geq 0.$$
-
-That makes sense, as in most contexts the smallest *size* for anything is 0.
-The final property requires that the smallest norm is achieved and only achieved
-by a vector consisting of all zeros.
-
-$$\forall i, [\mathbf{x}]_i = 0 \Leftrightarrow f(\mathbf{x})=0.$$
-
-You might notice that norms sound a lot like measures of distance.
-And if you remember Euclidean distances
-(think Pythagoras' theorem) from grade school,
-then the concepts of non-negativity and the triangle inequality might ring a bell.
-In fact, the Euclidean distance is a norm:
-specifically it is the $L_2$ norm.
-Suppose that the elements in the $n$-dimensional vector
-$\mathbf{x}$ are $x_1, \ldots, x_n$.
-
-[**The $L_2$ *norm* of $\mathbf{x}$ is the square root of the sum of the squares of the vector elements:**]
-
-(**$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2},$$**)
-
-
-where the subscript $2$ is often omitted in $L_2$ norms, i.e., $\|\mathbf{x}\|$ is equivalent to $\|\mathbf{x}\|_2$. In code,
-we can calculate the $L_2$ norm of a vector as follows.
+The method `norm` lets us compute it easily.
 
 ```{.python .input}
 u = np.array([3, -4])
@@ -969,19 +911,11 @@ u = tf.constant([3.0, -4.0])
 tf.norm(u)
 ```
 
-In deep learning, we work more often
-with the squared $L_2$ norm.
-
-You will also frequently encounter [**the $L_1$ *norm***],
-which is expressed as the sum of the absolute values of the vector elements:
+Another popular norm is [**the $L_1$ *norm***]. The associated metric is also known as the Manhattan distance. The norm is defined as the sum of the absolute values of the vector elements:
 
 (**$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$**)
 
-
-As compared with the $L_2$ norm,
-it is less influenced by outliers.
-To calculate the $L_1$ norm, we compose
-the absolute value function with a sum over the elements.
+Compared to the $L_2$ norm, it is less sensitive to outliers, since large values do not get emphasized by squaring them. To compute the $L_1$ norm we compse the absolute value function with a sum over all elements.
 
 ```{.python .input}
 np.abs(u).sum()
@@ -1002,13 +936,12 @@ are special cases of the more general $L_p$ *norm*:
 
 $$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
 
-Analogous to $L_2$ norms of vectors,
-[**the *Frobenius norm* of a matrix $\mathbf{X} \in \mathbb{R}^{m \times n}$**]
-is the square root of the sum of the squares of the matrix elements:
+In the case of matrices, matters are more complicated. After all, matrices can be viewed both as collections of individual entries *and* as objects that operate on vectors and transform them into other vectors. For instance, we can ask by how much longer the matrix-vector product $\mathbf{X} \mathbf{v}$ could be relative to $\mathbf{v}$. This line of thought leads to a norm that equals the absolute value of the largest eigenvector of a matrix. For now we choose something that is a lot easier to compute:
+[**the *Frobenius norm* of a matrix $\mathbf{X} \in \mathbb{R}^{m \times n}$**].
+It is the square root of the sum of the squares of the matrix elements:
 
 [**$$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$**]
 
-The Frobenius norm satisfies all the properties of vector norms.
 It behaves as if it were an $L_2$ norm of a matrix-shaped vector.
 Invoking the following function will calculate the Frobenius norm of a matrix.
 
@@ -1026,25 +959,18 @@ torch.norm(torch.ones((4, 9)))
 tf.norm(tf.ones((4, 9)))
 ```
 
-### Norms and Objectives
-:label:`subsec_norms_and_objectives`
-
 While we do not want to get too far ahead of ourselves,
 we can plant some intuition already about why these concepts are useful.
 In deep learning, we are often trying to solve optimization problems:
 *maximize* the probability assigned to observed data;
+*maximize* the revenue associated with a recommender model; 
 *minimize* the distance between predictions
-and the ground-truth observations.
-Assign vector representations to items (like words, products, or news articles)
-such that the distance between similar items is minimized,
-and the distance between dissimilar items is maximized.
-Oftentimes, the objectives, perhaps the most important components
-of deep learning algorithms (besides the data),
-are expressed as norms.
+and the ground-truth observations; 
+*minimize* the distance between representations of photos of the same person while *maximizing* the distance between representations of photos of different persons. 
+Oftentimes, the objectives of deep learning algorithms, which are arguably some of the most important components of a model, are expressed as norms. 
 
 
-
-## More on Linear Algebra
+## Summary
 
 In just this section,
 we have taught you all the linear algebra
@@ -1067,33 +993,31 @@ So while we reserve the right to introduce more mathematics much later on,
 we will wrap up this section here.
 
 If you are eager to learn more about linear algebra,
-you may refer to either the
-[online appendix on linear algebraic operations](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/geometry-linear-algebraic-ops.html)
-or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008`.
+you may refer to either a number of excellent books and online resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008` or read more in our
+[appendix on linear algebra](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/geometry-linear-algebraic-ops.html).
 
-
-
-## Summary
-
-* Scalars, vectors, matrices, and tensors are basic mathematical objects in linear algebra.
-* Vectors generalize scalars, and matrices generalize vectors.
+For now, the following will suffice:
+* Scalars, vectors, matrices, and tensors of are the basic mathematical objects used in linear algebra. In particular, vectors generalize scalars, matrices generalize vectors, and lastly, tensors generalize matrices. 
 * Scalars, vectors, matrices, and tensors have zero, one, two, and an arbitrary number of axes, respectively.
-* A tensor can be reduced along the specified axes by `sum` and `mean`.
-* Elementwise multiplication of two matrices is called their Hadamard product. It is different from matrix multiplication.
+* A tensor can be sliced or it can be reduced along the specified axes by operations such as `sum` and `mean`.
+* Elementwise multiplication of two matrices is called their Hadamard product. It is different from matrix multiplication both in terms of effect (elementwise) and speed (quadratic rather than cubic time to compute).
 * In deep learning, we often work with norms such as the $L_1$ norm, the $L_2$ norm, and the Frobenius norm.
-* We can perform a variety of operations over scalars, vectors, matrices, and tensors.
+
 
 ## Exercises
 
-1. Prove that the transpose of a matrix $\mathbf{A}$'s transpose is $\mathbf{A}$: $(\mathbf{A}^\top)^\top = \mathbf{A}$.
-1. Given two matrices $\mathbf{A}$ and $\mathbf{B}$, show that the sum of transposes is equal to the transpose of a sum: $\mathbf{A}^\top + \mathbf{B}^\top = (\mathbf{A} + \mathbf{B})^\top$.
-1. Given any square matrix $\mathbf{A}$, is $\mathbf{A} + \mathbf{A}^\top$ always symmetric? Why?
-1. We defined the tensor `X` of shape (2, 3, 4) in this section. What is the output of `len(X)`?
+1. Prove that the transpose of the transpose of a matrix is the matrix itself: $(\mathbf{A}^\top)^\top = \mathbf{A}$.
+1. Given two matrices $\mathbf{A}$ and $\mathbf{B}$, show that sum and transposition commute: $\mathbf{A}^\top + \mathbf{B}^\top = (\mathbf{A} + \mathbf{B})^\top$.
+1. Given any square matrix $\mathbf{A}$, is $\mathbf{A} + \mathbf{A}^\top$ always symmetric? Can you prove the result by using only the result of the previous two exercises?
+1. We defined the tensor `X` of shape (2, 3, 4) in this section. What is the output of `len(X)`? Write your answer without implementing any code, then check your answer using code. 
 1. For a tensor `X` of arbitrary shape, does `len(X)` always correspond to the length of a certain axis of `X`? What is that axis?
 1. Run `A / A.sum(axis=1)` and see what happens. Can you analyze the reason?
-1. When traveling between two points in Manhattan, what is the distance that you need to cover in terms of the coordinates, i.e., in terms of avenues and streets? Can you travel diagonally?
+1. When traveling between two points in downtown Manhattan, what is the distance that you need to cover in terms of the coordinates, i.e., in terms of avenues and streets? Can you travel diagonally?
 1. Consider a tensor with shape (2, 3, 4). What are the shapes of the summation outputs along axis 0, 1, and 2?
 1. Feed a tensor with 3 or more axes to the `linalg.norm` function and observe its output. What does this function compute for tensors of arbitrary shape?
+1. Define three large matrices, say $\mathbf{A} \in \mathbb{R}^{2^{10} \times 2^{16}}$, $\mathbf{B} \in \mathbb{R}^{2^{16} \times 2^{5}}$ and $\mathbf{C} \in \mathbb{R}^{2^{5} \times 2^{14}}$, for instance initialized with Gaussian random variables. You want to compute the product $\mathbf{A} \mathbf{B} \mathbf{C}$. Is there any difference in memory footprint and speed, depending on whether you compute $(\mathbf{A} \mathbf{B}) \mathbf{C}$ or $\mathbf{A} (\mathbf{B} \mathbf{C})$. Why?
+1. Define three large matrices, say $\mathbf{A} \in \mathbb{R}^{2^{10} \times 2^{16}}$, $\mathbf{B} \in \mathbb{R}^{2^{16} \times 2^{5}}$ and $\mathbf{C} \in \mathbb{R}^{2^{5} \times 2^{16}}$. Is there any difference in speed depending on whether you compute $\mathbf{A} \mathbf{B}$ or $\mathbf{A} \mathbf{C}^\top$? Why? What changes if you initialize $\mathbf{C} = \mathbf{B}^\top$ without cloning memory? Why?
+1. Define three matrices, say $\mathbf{A}, \mathbf{B}, \mathbf{C} \in \mathbb{R}^{100 \times 200}$. Constitute a tensor with 3 axes by stacking $[\mathbf{A}, \mathbf{B}, \mathbf{C}]$. What is the dimensionality? Slice out the second coordinate of the third axis to recover $\mathbf{B}$. Check that your answer is correct.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/30)

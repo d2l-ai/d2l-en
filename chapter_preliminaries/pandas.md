@@ -1,25 +1,24 @@
 # Data Preprocessing
 :label:`sec_pandas`
 
-So far we have introduced a variety of techniques for manipulating data that are already stored in tensors.
-To apply deep learning to solving real-world problems,
-we often begin with preprocessing raw data, rather than those nicely prepared data in the tensor format.
-Among popular data analytic tools in Python, the `pandas` package is commonly used.
-Like many other extension packages in the vast ecosystem of Python,
-`pandas` can work together with tensors.
-So, we will briefly walk through steps for preprocessing raw data with `pandas`
-and converting them into the tensor format.
-We will cover more data preprocessing techniques in later chapters.
+So far, we have been working with synthetic data
+that arrived in the form of a tensor.
+However, when we apply deep learning in the wild,
+we typically need to deal with messy data
+corresponding to real-world records 
+and stored in a variety of formats.
+The [Pandas library](https://pandas.pydata.org/) is a popular tool 
+for data import and preprocessing. 
+The following, while no substitute for a proper [Pandas tutorial](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html), will show you 
+how to read raw data in `pandas` and convert it into tensors. 
+
 
 ## Reading the Dataset
 
-As an example,
-we begin by (**creating an artificial dataset that is stored in a
-csv (comma-separated values) file**)
-`../data/house_tiny.csv`. Data stored in other
-formats may be processed in similar ways.
-
-Below we write the dataset row by row into a csv file.
+Let's begin by (**creating an artificial dataset that is stored in a
+CSV (comma-separated values) file**)
+`../data/house_tiny.csv`. Our dataset has four rows and three columns, where each row describes the number of rooms ("NumRooms"), the alley type ("Alley"), and the price ("Price") of a house. Data stored in other
+formats may be processed similarly.
 
 ```{.python .input}
 #@tab all
@@ -28,62 +27,53 @@ import os
 os.makedirs(os.path.join('..', 'data'), exist_ok=True)
 data_file = os.path.join('..', 'data', 'house_tiny.csv')
 with open(data_file, 'w') as f:
-    f.write('NumRooms,Alley,Price\n')  # Column names
-    f.write('NA,Pave,127500\n')  # Each row represents a data example
-    f.write('2,NA,106000\n')
-    f.write('4,NA,178100\n')
-    f.write('NA,NA,140000\n')
+    f.write('''NumRooms,Alley,Price
+NA,Pave,127500
+2,NA,106000
+4,NA,178100
+NA,NA,140000''')
 ```
 
-To [**load the raw dataset from the created csv file**],
-we import the `pandas` package and invoke the `read_csv` function.
-This dataset has four rows and three columns, where each row describes the number of rooms ("NumRooms"), the alley type ("Alley"), and the price ("Price") of a house.
+To [**load the raw dataset from the created CSV file**],
+we import `pandas` and use its `read_csv` function.
 
 ```{.python .input}
 #@tab all
-# If pandas is not installed, just uncomment the following line:
-# !pip install pandas
 import pandas as pd
 
 data = pd.read_csv(data_file)
 print(data)
 ```
 
-## Handling Missing Data
+## Data Preparation
 
-Note that "NaN" entries are missing values.
-To handle missing data, typical methods include *imputation* and *deletion*,
-where imputation replaces missing values with substituted ones,
-while deletion ignores missing values. Here we will consider imputation.
+The first step is to separate inputs from outputs. We can accomplish this by selecting the relevant columns. We can do this by selecting column names or by using integer-location based indexing (`iloc`). Once this is done, we need to address the "NaN" entries, since they represent missing values. This can be handled, e.g. via *imputation* and *deletion*. Imputation replaces missing values with an estimate of their value, whereas deletion simply ignores them (or even the entire data column). Let's have a look at imputation. 
 
-By integer-location based indexing (`iloc`), we split `data` into `inputs` and `outputs`,
-where the former takes the first two columns while the latter only keeps the last column.
-For numerical values in `inputs` that are missing,
-we [**replace the "NaN" entries with the mean value of the same column.**]
+[**For categorical or discrete values in `inputs`, we consider "NaN" as a category.**]
+Since the "Alley" column only takes two types of categorical values "Pave" and "NaN",
+`pandas` can automatically convert this column into two columns "Alley_Pave" and "Alley_nan".
+A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan" to 1 and 0 respectively. The converse holds for a row with a missing alley type. In short, we are treating NaN as just another category when dealing with categorical inputs. 
 
 ```{.python .input}
 #@tab all
 inputs, outputs = data.iloc[:, 0:2], data.iloc[:, 2]
-inputs = inputs.fillna(inputs.mean())
+inputs = pd.get_dummies(inputs, dummy_na=True)
 print(inputs)
 ```
 
-[**For categorical or discrete values in `inputs`, we consider "NaN" as a category.**]
-Since the "Alley" column only takes two types of categorical values "Pave" and "NaN",
-`pandas` can automatically convert this column to two columns "Alley_Pave" and "Alley_nan".
-A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan" to 1 and 0.
-A row with a missing alley type will set their values to 0 and 1.
+For missing numerical values 
+we [**replace the "NaN" entries with the mean value of the same column**] to obtain a usable representation of the inputs. 
 
 ```{.python .input}
 #@tab all
-inputs = pd.get_dummies(inputs, dummy_na=True)
+inputs = inputs.fillna(inputs.mean())
 print(inputs)
 ```
 
 ## Conversion to the Tensor Format
 
-Now that [**all the entries in `inputs` and `outputs` are numerical, they can be converted to the tensor format.**]
-Once data are in this format, they can be further manipulated with those tensor functionalities that we have introduced in :numref:`sec_ndarray`.
+Now that [**all the entries in `inputs` and `outputs` are numerical, they can be converted into tensors.**]
+Once data is in this format, we can use the tools we introduced in :numref:`sec_ndarray`.
 
 ```{.python .input}
 from mxnet import np
@@ -110,16 +100,19 @@ X, y
 
 ## Summary
 
-* Like many other extension packages in the vast ecosystem of Python, `pandas` can work together with tensors.
-* Imputation and deletion can be used to handle missing data.
+We barely scratched the surface of what is possible, namely how to partition data columns and how to deal with missing variables in their most basic form. Later on, we will pick up more data processing skills in :ref:`sec_kaggle_house`. The relevant part for now is that we can easily convert tensors from Pandas into tensors managed by the framework of our choice. 
 
+Going beyond basics, consider a situation where the data is not readily available in the form of a single CSV file but rather, it needs to be constituted from multiple individual tables. For instance, users might have their address data stored in one table and their purchase data in another one. Much talent is required to generate representations that are effective for machine learning. Beyond table joins, we also need to deal with datatypes beyond categorical and numeric. For instance, some data might consist of strings, others of images, yet others of audio data, annotations or point clouds. In all of these settings different tools and efficient algorithms are required to load the data in a way that data import itself does not become the bottleneck of the machine learning pipeline. We will encounter a number of such problems later in computer vision and natural language processing. 
+
+A key aspect of good data analysis and processing is to address data quality. For instance, we might have outliers, faulty measurements from sensors, transmission and recording errors, etc.; They need to be resolved before feeding the data into any model. Tools for visualization such as [Seaborn](https://seaborn.pydata.org/), [Bokeh](https://docs.bokeh.org/) or [Matplotlib](https://matplotlib.org/) can be very useful. While this is beyond the scope of this book, we will pick up some more data processing skills in :ref:`sec_kaggle_house`.
 
 ## Exercises
 
-Create a raw dataset with more rows and columns.
-
-1. Delete the column with the most missing values.
-2. Convert the preprocessed dataset to the tensor format.
+1. Try loading datasets, e.g., Abalone from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets.php) and inspect their properties. What fraction of them has missing values? What fraction of the variables is numerical, categorical, text?
+2. Try out indexing and selecting data columns by name rather than by column number. The Pandas documentation on [indexing](https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html) has further details on how to do this.
+3. How large a dataset do you think you could load this way? What might be the limitations? Hint: consider the time to read the data, representation, processing, memory footprint, etc.; Try this out on your laptop. What changes if you try it out on a server? 
+4. How would you deal with data that has a very large number of categories? What if the category labels are all unique? Should you include the latter?
+5. What alternatives to Pandas can you think of? How about loading NumPy [tensors from file](https://numpy.org/doc/stable/reference/generated/numpy.load.html)? Check out [Pillow](https://python-pillow.org/), the Python Image Library for processing images. 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/28)
@@ -132,3 +125,7 @@ Create a raw dataset with more rows and columns.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/195)
 :end_tab:
+
+```{.python .input}
+
+```
