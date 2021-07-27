@@ -701,11 +701,11 @@ $$
 
 will be approximately Gaussian.  There are additional requirements needed to make it work, most commonly $E[X^4] < \infty$, but the philosophy is clear.
 
-The central limit theorem is the reason that the Gaussian is fundamental to probability, statistics, and machine learning.  Whenever we can say that something we measured is a sum of many small independent contributions, we can assume that the thing being measured will be close to Gaussian.  
+The central limit theorem is the reason why the Gaussian is fundamental to probability, statistics, and machine learning.  Whenever we can say that something we measured is a sum of many small independent contributions, we can assume that the thing being measured will be close to Gaussian.  
 
 There are many more fascinating properties of Gaussians, and we would like to discuss one more here.  The Gaussian is what is known as a *maximum entropy distribution*.  We will get into entropy more deeply in :numref:`sec_information_theory`, however all we need to know at this point is that it is a measure of randomness.  In a rigorous mathematical sense, we can think of the Gaussian as the *most* random choice of random variable with fixed mean and variance.  Thus, if we know that our random variable has some mean and variance, the Gaussian is in a sense the most conservative choice of distribution we can make.
 
-To close the section, Let us recall that if $X \sim \mathcal{N}(\mu, \sigma^2)$, then:
+To close the section, let us recall that if $X \sim \mathcal{N}(\mu, \sigma^2)$, then:
 
 * $\mu_X = \mu$,
 * $\sigma_X^2 = \sigma^2$.
