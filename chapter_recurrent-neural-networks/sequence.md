@@ -138,12 +138,10 @@ d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
 Next, we need to turn such a sequence into features and labels that our model can train on.
-Based on the embedding dimension $\tau$ we [**map the data into pairs $y_t = x_t$ and $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.**]
-The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for the first $\tau$ of them.
-A simple fix, in particular if the sequence is long,
-is to discard those few terms.
-Alternatively we could pad the sequence with zeros.
-Here we only use the first 600 feature-label pairs for training.
+Using a Markov assumption that $x_t$ depends only on the past $\tau$ examples, 
+we [**construct examples $y_t = x_t$ and $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.**]
+The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for $y_1, \ldots, y_\tau$. We could pad  
+the sequences with zeros for the first $\tau$ examples. Here we simply drop them to create $T - \tau$ examples, with a feature dimension of $\tau$. 
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -152,6 +150,7 @@ features = d2l.zeros((T - tau, tau))
 for i in range(tau):
     features[:, i] = x[i: T - tau + i]
 labels = d2l.reshape(x[tau:], (-1, 1))
+features.shape, labels.shape
 ```
 
 ```{.python .input}
@@ -161,21 +160,23 @@ features = tf.Variable(d2l.zeros((T - tau, tau)))
 for i in range(tau):
     features[:, i].assign(x[i: T - tau + i])
 labels = d2l.reshape(x[tau:], (-1, 1))
+features.shape, labels.shape
 ```
+
+We (**create a data iterator on the first 600 examples**), 
+that roughly covers a period of the sin function. 
 
 ```{.python .input}
 #@tab all
 batch_size, n_train = 16, 600
-# Only the first `n_train` examples are used for training
 train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
 ```
 
-Here we [**keep the architecture fairly simple:
-just an MLP**] with two fully-connected layers, ReLU activation, and squared loss.
+The model we use is fairly simple: 
+[**just a single hidden layer MLP with ReLU activation, and squared loss**].
 
 ```{.python .input}
-# A simple MLP
 def get_net():
     net = nn.Sequential()
     net.add(nn.Dense(10, activation='relu'),
@@ -183,47 +184,32 @@ def get_net():
     net.initialize(init.Xavier())
     return net
 
-# Square loss
 loss = gluon.loss.L2Loss()
 ```
 
 ```{.python .input}
 #@tab pytorch
-# Function for initializing the weights of the network
-def init_weights(m):
-    if type(m) == nn.Linear:
-        nn.init.xavier_uniform_(m.weight)
-
-# A simple MLP
 def get_net():
     net = nn.Sequential(nn.Linear(4, 10),
                         nn.ReLU(),
                         nn.Linear(10, 1))
-    net.apply(init_weights)
     return net
 
-# Square loss
 loss = nn.MSELoss()
 ```
 
 ```{.python .input}
 #@tab tensorflow
-# Vanilla MLP architecture
 def get_net():
     net = tf.keras.Sequential([tf.keras.layers.Dense(10, activation='relu'),
                               tf.keras.layers.Dense(1)])
     return net
 
-# Least mean squares loss
-# Note: L2 Loss = 1/2 * MSE Loss. TensorFlow has MSE Loss that is slightly
-# different from MXNet's L2Loss by a factor of 2. Hence we halve the loss
-# value to get L2Loss in TF
 loss = tf.keras.losses.MeanSquaredError()
 ```
 
 Now we are ready to [**train the model**]. The code below is essentially identical to the training loop in previous sections,
 such as :numref:`sec_linear_concise`.
-Thus, we will not delve into much detail.
 
 ```{.python .input}
 def train(net, train_iter, loss, epochs, lr):
@@ -235,7 +221,7 @@ def train(net, train_iter, loss, epochs, lr):
                 l = loss(net(X), y)
             l.backward()
             trainer.step(batch_size)
-        print(f'epoch {epoch + 1}, '
+        print(f'epoch {epoch+1}, '
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
@@ -259,20 +245,7 @@ net = get_net()
 train(net, train_iter, loss, 5, 0.01)
 ```
 
-```{.python .input}
-#@tab tensorflow
-def train(net, train_iter, loss, epochs, lr):
-    trainer = tf.keras.optimizers.Adam()
-    for epoch in range(epochs):
-        for X, y in train_iter:
-            with tf.GradientTape() as g:
-                out = net(X)
-                l = loss(y, out) / 2
-                params = net.trainable_variables
-                grads = g.gradient(l, params)
-            trainer.apply_gradients(zip(grads, params))
-        print(f'epoch {epoch + 1}, '
-              f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
+## Predictions
 
 net = get_net()
 train(net, train_iter, loss, 5, 0.01)
@@ -280,21 +253,20 @@ train(net, train_iter, loss, 5, 0.01)
 
 ## Prediction
 
-Since the training loss is small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to [**predict what happens just in the next time step**],
+Let us see how well the model predicts. The first thing to check is [**predicting what happens just in the next time step**],
 namely the *one-step-ahead prediction*.
 
 ```{.python .input}
 #@tab all
 onestep_preds = net(features)
 d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(onestep_preds)], 'time',
-         'x', legend=['data', '1-step preds'], xlim=[1, 1000], figsize=(6, 3))
+         'x', legend=['data', '1-step preds'], xlim=[1, 1000], figsize=(5, 2))
 ```
 
-The one-step-ahead predictions look nice, just as we expected.
-Even beyond 604 (`n_train + tau`) observations the predictions still look trustworthy.
+The one-step-ahead predictions look nice. Even near the end $t=1000$ the predictions still look trustworthy.
 However, there is just one little problem to this:
-if we observe sequence data only until time step 604, we cannot hope to receive the inputs for all the future one-step-ahead predictions.
-Instead, we need to work our way forward one step at a time:
+if we observe sequence data only until time step 604 (`n_train+tau`), the examples in the training data, we cannot hope to receive the inputs for all the future one-step-ahead predictions.
+Instead, we need to use the predicted values as inputs for these future predictions:
 
 $$
 \hat{x}_{605} = f(x_{601}, x_{602}, x_{603}, x_{604}), \\
@@ -305,27 +277,8 @@ $$
 \ldots
 $$
 
-Generally, for an observed sequence up to $x_t$, its predicted output $\hat{x}_{t+k}$ at time step $t+k$ is called the $k$*-step-ahead prediction*. Since we have observed up to $x_{604}$, its $k$-step-ahead prediction is $\hat{x}_{604+k}$.
-In other words, we will have to [**use our own predictions to make multistep-ahead predictions**].
+Generally, for an observed sequence $x_1, \ldots, x_t$, its predicted output $\hat{x}_{t+k}$ at time step $t+k$ is called the $k$*-step-ahead prediction*. Since we have observed up to $x_{604}$, its $k$-step-ahead prediction is $\hat{x}_{604+k}$.
 Let us see how well this goes.
-
-```{.python .input}
-#@tab mxnet, pytorch
-multistep_preds = d2l.zeros(T)
-multistep_preds[: n_train + tau] = x[: n_train + tau]
-for i in range(n_train + tau, T):
-    multistep_preds[i] = net(
-        d2l.reshape(multistep_preds[i - tau: i], (1, -1)))
-```
-
-```{.python .input}
-#@tab tensorflow
-multistep_preds = tf.Variable(d2l.zeros(T))
-multistep_preds[:n_train + tau].assign(x[:n_train + tau])
-for i in range(n_train + tau, T):
-    multistep_preds[i].assign(d2l.reshape(net(
-        d2l.reshape(multistep_preds[i - tau: i], (1, -1))), ()))
-```
 
 ```{.python .input}
 #@tab all
@@ -333,7 +286,7 @@ d2l.plot([time, time[tau:], time[n_train + tau:]],
          [d2l.numpy(x), d2l.numpy(onestep_preds),
           d2l.numpy(multistep_preds[n_train + tau:])], 'time',
          'x', legend=['data', '1-step preds', 'multistep preds'],
-         xlim=[1, 1000], figsize=(6, 3))
+         xlim=[1, 1000], figsize=(5, 2))
 ```
 
 As the above example shows, this is a spectacular failure. The predictions decay to a constant pretty quickly after a few prediction steps.
@@ -346,50 +299,41 @@ Let us [**take a closer look at the difficulties in $k$-step-ahead predictions**
 by computing predictions on the entire sequence for $k = 1, 4, 16, 64$.
 
 ```{.python .input}
-#@tab all
-max_steps = 64
-```
-
-```{.python .input}
 #@tab mxnet, pytorch
-features = d2l.zeros((T - tau - max_steps + 1, tau + max_steps))
-# Column `i` (`i` < `tau`) are observations from `x` for time steps from
-# `i + 1` to `i + T - tau - max_steps + 1`
-for i in range(tau):
-    features[:, i] = x[i: i + T - tau - max_steps + 1]
-
-# Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
-# time steps from `i + 1` to `i + T - tau - max_steps + 1`
-for i in range(tau, tau + max_steps):
-    features[:, i] = d2l.reshape(net(features[:, i - tau: i]), -1)
+def k_step_pred(k):
+    features = d2l.zeros((T - tau - k + 1, tau + k))
+    for i in range(tau):
+        features[:, i] = x[i: i + T - tau - k + 1]
+    # column i+tau stores the i-step-ahead prediction
+    for i in range(k):
+        features[:, i+tau] = d2l.reshape(net(features[:, i: i+tau]), -1)
+    return features[:, -1]
 ```
 
 ```{.python .input}
 #@tab tensorflow
-features = tf.Variable(d2l.zeros((T - tau - max_steps + 1, tau + max_steps)))
-# Column `i` (`i` < `tau`) are observations from `x` for time steps from
-# `i + 1` to `i + T - tau - max_steps + 1`
-for i in range(tau):
-    features[:, i].assign(x[i: i + T - tau - max_steps + 1].numpy())
-
-# Column `i` (`i` >= `tau`) are the (`i - tau + 1`)-step-ahead predictions for
-# time steps from `i + 1` to `i + T - tau - max_steps + 1`
-for i in range(tau, tau + max_steps):
-    features[:, i].assign(d2l.reshape(net((features[:, i - tau: i])), -1))
+def k_step_pred(k):
+    features = tf.Variable(d2l.zeros((T - tau - k + 1, tau + k)))
+    for i in range(tau):
+        features[:, i].assign(x[i: i + T - tau - k + 1].numpy())
+    # column i+tau stores the i-step-ahead prediction
+    for i in range(k):
+        features[:, i+tau].assign(
+            d2l.reshape(net((features[:, i: i+tau])), -1))
+    return features[:, -1]
 ```
 
 ```{.python .input}
 #@tab all
 steps = (1, 4, 16, 64)
-d2l.plot([time[tau + i - 1: T - max_steps + i] for i in steps],
-         [d2l.numpy(features[:, tau + i - 1]) for i in steps], 'time', 'x',
-         legend=[f'{i}-step preds' for i in steps], xlim=[5, 1000],
+d2l.plot([time[tau + k - 1:] for k in steps],
+         [d2l.numpy(k_step_pred(k)) for k in steps], 'time', 'x',
+         legend=[f'{k}-step preds' for k in steps], xlim=[5, 1000],
          figsize=(6, 3))
 ```
 
 This clearly illustrates how the quality of the prediction changes as we try to predict further into the future.
 While the 4-step-ahead predictions still look good, anything beyond that is almost useless.
-
 
 ## Summary
 
@@ -397,8 +341,7 @@ While the 4-step-ahead predictions still look good, anything beyond that is almo
 * Sequence models require specialized statistical tools for estimation. Two popular choices are autoregressive models and latent-variable autoregressive models.
 * For causal models (e.g., time going forward), estimating the forward direction is typically a lot easier than the reverse direction.
 * For an observed sequence up to time step $t$, its predicted output at time step $t+k$ is the $k$*-step-ahead prediction*. As we predict further in time by increasing $k$, the errors accumulate and the quality of the prediction degrades, often dramatically.
-
-
+ 
 ## Exercises
 
 1. Improve the model in the experiment of this section.
