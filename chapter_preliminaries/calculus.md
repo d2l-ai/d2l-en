@@ -91,19 +91,13 @@ $$f'(x) = y' = \frac{dy}{dx} = \frac{df}{dx} = \frac{d}{dx} f(x) = Df(x) = D_x f
 
 where symbols $\frac{d}{dx}$ and $D$ are *differentiation operators*.
 We can use the following rules to differentiate common functions:
-$$\begin{align}
-\frac{d}{dx} C & = 0 && \text{$C$ is a constant} \\
-\frac{d}{dx} x^n & = n x^{n-1} && \text{for } n \neq 0 \\
-\frac{d}{dx} e^x & = e^x \\
-\frac{d}{dx} \ln x & = x^{-1}
-\end{align}$$
+
+$$\begin{aligned} \frac{d}{dx} C & = 0 && \text{$C$ is a constant} \\ \frac{d}{dx} x^n & = n x^{n-1} && \text{for } n \neq 0 \\ \frac{d}{dx} e^x & = e^x \\ \frac{d}{dx} \ln x & = x^{-1} \end{aligned}$$
+
 To differentiate functions obtained by composition of the above (and similar functions) the following rules are handy. We assume below that $f$ and $g$ are both differentiable and that $c$ is constant. We have
-$$\begin{align}
-\frac{d}{dx} [C f(x)] & = C \frac{d}{dx} f(x) && \text{Constant multiple rule} \\
-\frac{d}{dx} [f(x) + g(x)] & = \frac{d}{dx} f(x) + \frac{d}{dx} g(x) && \text{Sum rule} \\
-\frac{d}{dx} [f(x) g(x)] & = f(x) \frac{d}{dx} g(x) + g(x) \frac{d}{dx} f(x) && \text{Product rule} \\
-\frac{d}{dx} \frac{f(x)}{g(x)} & = \frac{g(x) \frac{d}{dx} f(x) - f(x) \frac{d}{dx} g(x)}{g^2(x)} && \text{Quotient rule}
-\end{align}$$
+
+$$\begin{aligned} \frac{d}{dx} [C f(x)] & = C \frac{d}{dx} f(x) && \text{Constant multiple rule} \\ \frac{d}{dx} [f(x) + g(x)] & = \frac{d}{dx} f(x) + \frac{d}{dx} g(x) && \text{Sum rule} \\ \frac{d}{dx} [f(x) g(x)] & = f(x) \frac{d}{dx} g(x) + g(x) \frac{d}{dx} f(x) && \text{Product rule} \\ \frac{d}{dx} \frac{f(x)}{g(x)} & = \frac{g(x) \frac{d}{dx} f(x) - f(x) \frac{d}{dx} g(x)}{g^2(x)} && \text{Quotient rule} \end{aligned}$$
+
 Using this we can apply the rules to find the derivative of $3 x^2 - 4x$ via
 $$\frac{d}{dx} [3 x^2 - 4x] = 3 \frac{d}{dx} x^2 - 4 \frac{d}{dx} x = 6x - 4.$$
 Plugging in $x = 1$ shows that, indeed, the derivative is $2$ at this location. Note that by construction derivatives tell us the *slope* of a function at a particular location.  
