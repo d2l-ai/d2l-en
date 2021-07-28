@@ -2,14 +2,14 @@
 :label:`sec_pandas`
 
 So far, we have been working with synthetic data
-that arrived in the form of a tensor.
+that arrived in the form of tensors.
 However, when we apply deep learning in the wild,
 we typically need to deal with messy data
 corresponding to real-world records 
 and stored in a variety of formats.
-The [Pandas library](https://pandas.pydata.org/) is a popular tool 
-for data import and preprocessing. 
-The following, while no substitute for a proper [Pandas tutorial](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html), will show you 
+The [*pandas* library](https://pandas.pydata.org/) is a popular tool 
+for data loading and preprocessing. 
+The following, while no substitute for a proper [*pandas* tutorial](https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html), will show you 
 how to read raw data in `pandas` and convert it into tensors. 
 
 
@@ -28,10 +28,10 @@ os.makedirs(os.path.join('..', 'data'), exist_ok=True)
 data_file = os.path.join('..', 'data', 'house_tiny.csv')
 with open(data_file, 'w') as f:
     f.write('''NumRooms,Alley,Price
-NA,Pave,127500
-2,NA,106000
-4,NA,178100
-NA,NA,140000''')
+        NA,Pave,127500
+        2,NA,106000
+        4,NA,178100
+        NA,NA,140000''')
 ```
 
 To [**load the raw dataset from the created CSV file**],
@@ -52,7 +52,7 @@ The first step is to separate inputs from outputs. We can accomplish this by sel
 [**For categorical or discrete values in `inputs`, we consider "NaN" as a category.**]
 Since the "Alley" column only takes two types of categorical values "Pave" and "NaN",
 `pandas` can automatically convert this column into two columns "Alley_Pave" and "Alley_nan".
-A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan" to 1 and 0 respectively. The converse holds for a row with a missing alley type. In short, we are treating NaN as just another category when dealing with categorical inputs. 
+A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan" to 1 and 0 respectively. The converse holds for a row with a missing alley type. In short, we are treating NaN as just another category when dealing with categorical inputs.
 
 ```{.python .input}
 #@tab all
@@ -62,7 +62,7 @@ print(inputs)
 ```
 
 For missing numerical values 
-we [**replace the "NaN" entries with the mean value of the same column**] to obtain a usable representation of the inputs. 
+we [**replace the "NaN" entries with the mean value of the same column**] to obtain a usable representation of the inputs.
 
 ```{.python .input}
 #@tab all
@@ -125,7 +125,3 @@ A key aspect of good data analysis and processing is to address data quality. Fo
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/195)
 :end_tab:
-
-```{.python .input}
-
-```
