@@ -138,10 +138,14 @@ d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
 Next, we need to turn such a sequence into features and labels that our model can train on.
-Using a Markov assumption that $x_t$ depends only on the past $\tau$ examples,
-we [**construct examples $y_t = x_t$ and $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.**]
-The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for $y_1, \ldots, y_\tau$. We could pad
-the sequences with zeros for the first $\tau$ examples. Here we simply drop them to create $T - \tau$ examples, with a feature dimension of $\tau$.
+With a Markov assumption that $x_t$ only depends on observations at the past $\tau$ time steps,
+we [**construct examples with labels $y_t = x_t$ and features $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.**]
+The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for $y_1, \ldots, y_\tau$. 
+While we could pad the first $\tau$ sequences with zeros,
+to keep things simple, we drop them for now. 
+The resulting dataset contains $T - \tau$ examples,
+where each input to the model
+has sequence length $\tau$.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -164,7 +168,7 @@ features.shape, labels.shape
 ```
 
 We (**create a data iterator on the first 600 examples**),
-that roughly covers a period of the sin function.
+covering a period of the sine function.
 
 ```{.python .input}
 #@tab all
@@ -173,8 +177,8 @@ train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
 ```
 
-The model we use is fairly simple:
-[**just a single hidden layer MLP with ReLU activation, and squared loss**].
+The model is simple:
+[**a single-hidden-layer MLP with the ReLU activation and squared loss**].
 
 ```{.python .input}
 def get_net():
@@ -221,7 +225,7 @@ def train(net, train_iter, loss, epochs, lr):
                 l = loss(net(X), y)
             l.backward()
             trainer.step(batch_size)
-        print(f'epoch {epoch+1}, '
+        print(f'epoch {epoch + 1}, '
               f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
@@ -270,6 +274,34 @@ Let us see how well the model predicts. The first thing to check is [**predictin
 namely the *one-step-ahead prediction*.
 
 ```{.python .input}
+#@tab all
+onestep_preds = net(features)
+d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(onestep_preds)], 'time',
+         'x', legend=['data', '1-step preds'], xlim=[1, 1000], figsize=(6, 3))
+```
+
+The one-step-ahead predictions look nice. Even near the end $t=1000$ the predictions still look trustworthy.
+However, there is just one little problem to this:
+if we observe sequence data only until time step 604 (`n_train + tau`), 
+we cannot hope to receive the inputs for all the future one-step-ahead predictions.
+Instead, we need to use earlier predictions as input to our model for these future predictions, one step at a time:
+
+$$
+\hat{x}_{605} = f(x_{601}, x_{602}, x_{603}, x_{604}), \\
+\hat{x}_{606} = f(x_{602}, x_{603}, x_{604}, \hat{x}_{605}), \\
+\hat{x}_{607} = f(x_{603}, x_{604}, \hat{x}_{605}, \hat{x}_{606}),\\
+\hat{x}_{608} = f(x_{604}, \hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}),\\
+\hat{x}_{609} = f(\hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}, \hat{x}_{608}),\\
+\ldots
+$$
+
+Generally, for an observed sequence $x_1, \ldots, x_t$, its predicted output $\hat{x}_{t+k}$ at time step $t+k$ is called the $k$*-step-ahead prediction*. Since we have observed up to $x_{604}$, its $k$-step-ahead prediction is $\hat{x}_{604+k}$.
+In other words, we will have to 
+keep on
+using our own predictions to make multistep-ahead predictions.
+Let us see how well this goes.
+
+```{.python .input}
 #@tab mxnet, pytorch
 multistep_preds = d2l.zeros(T)
 multistep_preds[: n_train + tau] = x[: n_train + tau]
@@ -289,35 +321,11 @@ for i in range(n_train + tau, T):
 
 ```{.python .input}
 #@tab all
-onestep_preds = net(features)
-d2l.plot([time, time[tau:]], [d2l.numpy(x), d2l.numpy(onestep_preds)], 'time',
-         'x', legend=['data', '1-step preds'], xlim=[1, 1000], figsize=(5, 2))
-```
-
-The one-step-ahead predictions look nice. Even near the end $t=1000$ the predictions still look trustworthy.
-However, there is just one little problem to this:
-if we observe sequence data only until time step 604 (`n_train+tau`), the examples in the training data, we cannot hope to receive the inputs for all the future one-step-ahead predictions.
-Instead, we need to use the predicted values as inputs for these future predictions:
-
-$$
-\hat{x}_{605} = f(x_{601}, x_{602}, x_{603}, x_{604}), \\
-\hat{x}_{606} = f(x_{602}, x_{603}, x_{604}, \hat{x}_{605}), \\
-\hat{x}_{607} = f(x_{603}, x_{604}, \hat{x}_{605}, \hat{x}_{606}),\\
-\hat{x}_{608} = f(x_{604}, \hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}),\\
-\hat{x}_{609} = f(\hat{x}_{605}, \hat{x}_{606}, \hat{x}_{607}, \hat{x}_{608}),\\
-\ldots
-$$
-
-Generally, for an observed sequence $x_1, \ldots, x_t$, its predicted output $\hat{x}_{t+k}$ at time step $t+k$ is called the $k$*-step-ahead prediction*. Since we have observed up to $x_{604}$, its $k$-step-ahead prediction is $\hat{x}_{604+k}$.
-Let us see how well this goes.
-
-```{.python .input}
-#@tab all
 d2l.plot([time, time[tau:], time[n_train + tau:]],
          [d2l.numpy(x), d2l.numpy(onestep_preds),
           d2l.numpy(multistep_preds[n_train + tau:])], 'time',
          'x', legend=['data', '1-step preds', 'multistep preds'],
-         xlim=[1, 1000], figsize=(5, 2))
+         xlim=[1, 1000], figsize=(6, 3))
 ```
 
 As the above example shows, this is a spectacular failure. The predictions decay to a constant pretty quickly after a few prediction steps.
