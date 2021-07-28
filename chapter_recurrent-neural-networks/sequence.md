@@ -343,7 +343,7 @@ def k_step_pred(k):
     features = d2l.zeros((T - tau - k + 1, tau + k))
     for i in range(tau):
         features[:, i] = x[i: i + T - tau - k + 1]
-    # column i+tau stores the i-step-ahead prediction
+    # Column `i + tau` stores the `i + 1`-step-ahead predictions
     for i in range(k):
         features[:, i+tau] = d2l.reshape(net(features[:, i: i+tau]), -1)
     return features[:, -1]
@@ -355,7 +355,7 @@ def k_step_pred(k):
     features = tf.Variable(d2l.zeros((T - tau - k + 1, tau + k)))
     for i in range(tau):
         features[:, i].assign(x[i: i + T - tau - k + 1].numpy())
-    # column i+tau stores the i-step-ahead prediction
+    # Column `i + tau` stores the `i + 1`-step-ahead predictions
     for i in range(k):
         features[:, i+tau].assign(
             d2l.reshape(net((features[:, i: i+tau])), -1))
