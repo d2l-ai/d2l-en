@@ -79,7 +79,7 @@ Below, we tokenize our lines into words.
 #@tab all
 def tokenize(lines, token='word'):  #@save
     """Split text lines into word or character tokens."""
-    assert token in ('word', 'char'), 'unknown token type: ' + token
+    assert token in ('word', 'char'), 'Unknown token type: ' + token
     return [line.split() if token == 'word' else list(line) for line in lines]
 
 tokens = tokenize(lines)
@@ -108,14 +108,14 @@ with a list of reserved tokens.
 class Vocab:  #@save
     """Vocabulary for text."""
     def __init__(self, tokens=[], min_freq=0, reserved_tokens=[]):
-        # Expand a list of list into a list if needed
+        # Flatten a 2D list if needed
         if tokens and isinstance(tokens[0], list):
             tokens = [token for line in tokens for token in line]
         # Count token frequencies
         counter = collections.Counter(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[1],
                                   reverse=True)
-        # The list of unique tokens. Sorting it for a deterministic mapping
+        # The list of unique tokens
         self.idx_to_token = list(sorted(set(['<unk>'] + reserved_tokens + [
             token for token, freq in self.token_freqs if freq >= min_freq])))
         self.token_to_idx = {token: idx
@@ -135,7 +135,7 @@ class Vocab:  #@save
         return [self.idx_to_token[index] for index in indices]
 ```
 
-We can now construct the vocabulary for our dataset, 
+We can now [**construct the vocabulary**] for our dataset, 
 using it to convert each text line 
 from a list of tokens into a list of indices.
 Note that we have not lost any information
@@ -165,7 +165,8 @@ def load_corpus_time_machine(max_tokens=None):  #@save
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)
     corpus = [vocab[token] for line in tokens for token in line]
-    if max_tokens and max_tokens > 0: corpus = corpus[:max_tokens]
+    if max_tokens and max_tokens > 0:
+        corpus = corpus[:max_tokens]
     return corpus, vocab
 
 corpus, vocab = load_corpus_time_machine()
