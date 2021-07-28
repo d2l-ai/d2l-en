@@ -138,10 +138,10 @@ d2l.plot(time, [x], 'time', 'x', xlim=[1, 1000], figsize=(6, 3))
 ```
 
 Next, we need to turn such a sequence into features and labels that our model can train on.
-Using a Markov assumption that $x_t$ depends only on the past $\tau$ examples, 
+Using a Markov assumption that $x_t$ depends only on the past $\tau$ examples,
 we [**construct examples $y_t = x_t$ and $\mathbf{x}_t = [x_{t-\tau}, \ldots, x_{t-1}]$.**]
-The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for $y_1, \ldots, y_\tau$. We could pad  
-the sequences with zeros for the first $\tau$ examples. Here we simply drop them to create $T - \tau$ examples, with a feature dimension of $\tau$. 
+The astute reader might have noticed that this gives us $\tau$ fewer data examples, since we do not have sufficient history for $y_1, \ldots, y_\tau$. We could pad
+the sequences with zeros for the first $\tau$ examples. Here we simply drop them to create $T - \tau$ examples, with a feature dimension of $\tau$.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -163,8 +163,8 @@ labels = d2l.reshape(x[tau:], (-1, 1))
 features.shape, labels.shape
 ```
 
-We (**create a data iterator on the first 600 examples**), 
-that roughly covers a period of the sin function. 
+We (**create a data iterator on the first 600 examples**),
+that roughly covers a period of the sin function.
 
 ```{.python .input}
 #@tab all
@@ -173,7 +173,7 @@ train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
 ```
 
-The model we use is fairly simple: 
+The model we use is fairly simple:
 [**just a single hidden layer MLP with ReLU activation, and squared loss**].
 
 ```{.python .input}
@@ -245,7 +245,20 @@ net = get_net()
 train(net, train_iter, loss, 5, 0.01)
 ```
 
-## Predictions
+```{.python .input}
+#@tab tensorflow
+def train(net, train_iter, loss, epochs, lr):
+    trainer = tf.keras.optimizers.Adam()
+    for epoch in range(epochs):
+        for X, y in train_iter:
+            with tf.GradientTape() as g:
+                out = net(X)
+                l = loss(y, out) / 2
+                params = net.trainable_variables
+                grads = g.gradient(l, params)
+            trainer.apply_gradients(zip(grads, params))
+        print(f'epoch {epoch + 1}, '
+              f'loss: {d2l.evaluate_loss(net, train_iter, loss):f}')
 
 net = get_net()
 train(net, train_iter, loss, 5, 0.01)
@@ -255,6 +268,24 @@ train(net, train_iter, loss, 5, 0.01)
 
 Let us see how well the model predicts. The first thing to check is [**predicting what happens just in the next time step**],
 namely the *one-step-ahead prediction*.
+
+```{.python .input}
+#@tab mxnet, pytorch
+multistep_preds = d2l.zeros(T)
+multistep_preds[: n_train + tau] = x[: n_train + tau]
+for i in range(n_train + tau, T):
+    multistep_preds[i] = net(
+        d2l.reshape(multistep_preds[i - tau: i], (1, -1)))
+```
+
+```{.python .input}
+#@tab tensorflow
+multistep_preds = tf.Variable(d2l.zeros(T))
+multistep_preds[:n_train + tau].assign(x[:n_train + tau])
+for i in range(n_train + tau, T):
+    multistep_preds[i].assign(d2l.reshape(net(
+        d2l.reshape(multistep_preds[i - tau: i], (1, -1))), ()))
+```
 
 ```{.python .input}
 #@tab all
@@ -341,7 +372,7 @@ While the 4-step-ahead predictions still look good, anything beyond that is almo
 * Sequence models require specialized statistical tools for estimation. Two popular choices are autoregressive models and latent-variable autoregressive models.
 * For causal models (e.g., time going forward), estimating the forward direction is typically a lot easier than the reverse direction.
 * For an observed sequence up to time step $t$, its predicted output at time step $t+k$ is the $k$*-step-ahead prediction*. As we predict further in time by increasing $k$, the errors accumulate and the quality of the prediction degrades, often dramatically.
- 
+
 ## Exercises
 
 1. Improve the model in the experiment of this section.
