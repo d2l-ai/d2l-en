@@ -1,54 +1,22 @@
 # Calculus
 :label:`sec_calculus`
 
-Finding the area of a polygon had remained mysterious
-until at least 2,500 years ago, when ancient Greeks divided a polygon into triangles and summed their areas.
-To find the area of curved shapes, such as a circle,
-ancient Greeks inscribed polygons in such shapes.
-As shown in :numref:`fig_circle_area`,
-an inscribed polygon with more sides of equal length better approximates
-the circle. This process is also known as the *method of exhaustion*.
+Finding the area of a circle remained a mystery until in ancient Greece mathematicians decided to inscribe a circle with polygons of increasing number of vertices: Consider :numref:`fig_circle_area`. For a polygon with $n$ vertices we obtain $n$ triangles. The height of each triangle approaches the radius $r$ as we partition the circle more finely. At the same time, the base of it approaches $2 \pi r/n$, since the ratio between arc and secant approaches 1 for a large number of vertices. As such, the area approaches $n \cdot r \cdot \frac{1}{2} (2 \pi r/n) = \pi r^2$. 
 
-![Find the area of a circle with the method of exhaustion.](../img/polygon-circle.svg)
+![Finding the area of a circle as a limit procedure.](../img/polygon-circle.svg)
 :label:`fig_circle_area`
 
-In fact, the method of exhaustion is where *integral calculus* (will be described in :numref:`sec_integral_calculus`) originates from.
-More than 2,000 years later,
-the other branch of calculus, *differential calculus*,
-was invented.
-Among the most critical applications of differential calculus,
-optimization problems consider how to do something *the best*.
-As discussed in :numref:`subsec_norms_and_objectives`,
-such problems are ubiquitous in deep learning.
+This limiting procedure leads to both *differential calculus* and *integral calculus* (:numref:`sec_integral_calculus`). The former can help us solve optimization problems for finding *the best* set of parameters. Such problems are ubiquitous in deep learning. After all, in order to do well, we *train* models, updating them successively to perform better on the data that we are given for training. This is largely a problem of *optimization*. 
 
-In deep learning, we *train* models, updating them successively
-so that they get better and better as they see more and more data.
-Usually, getting better means minimizing a *loss function*,
-a score that answers the question "how *bad* is our model?"
-This question is more subtle than it appears.
-Ultimately, what we really care about
-is producing a model that performs well on data
-that we have never seen before.
-But we can only fit the model to data that we can actually see.
-Thus we can decompose the task of fitting models into two key concerns:
-(i) *optimization*: the process of fitting our models to observed data;
-(ii) *generalization*: the mathematical principles and practitioners' wisdom
-that guide as to how to produce models whose validity extends
-beyond the exact set of data examples used to train them.
-
-To help you understand
-optimization problems and methods in later chapters,
-here we give a very brief primer on differential calculus
-that is commonly used in deep learning.
+Note, though, that ultimately our goal is to do well on new data. The latter also involves the problem of *generalization* from previously seen to unseen data. We relegate this discussion to the following chapters when we design effective models for deep learning. In what follows, we give you a minimalist primer on differential calculus. 
 
 ## Derivatives and Differentiation
 
-We begin by addressing the calculation of derivatives,
-a crucial step in nearly all deep learning optimization algorithms.
-In deep learning, we typically choose loss functions
-that are differentiable with respect to our model's parameters.
-Put simply, this means that for each parameter,
-we can determine how rapidly the loss would increase or decrease,
+Computing derivatives is a crucial step in nearly all deep learning optimization algorithms.
+To facilitate that, we typically choose loss functions
+that are differentiable with respect to the model parameters.
+Put simply, computing derivatives means that for each parameter,
+we can accurately determine how rapidly the loss would increase or decrease,
 were we to *increase* or *decrease* that parameter
 by an infinitesimally small amount.
 
@@ -56,23 +24,18 @@ Suppose that we have a function $f: \mathbb{R} \rightarrow \mathbb{R}$,
 whose input and output are both scalars.
 [**The *derivative* of $f$ is defined as**]
 
-
 (**$$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h},$$**)
 :eqlabel:`eq_derivative`
 
 if this limit exists.
 If $f'(a)$ exists,
 $f$ is said to be *differentiable* at $a$.
-If $f$ is differentiable at every number of an interval,
-then this function is differentiable on this interval.
+If $f$ is differentiable everywhere on a set, say $[a,b]$, 
+then $f$ is referred to as differentiable on this set.
 We can interpret the derivative $f'(x)$ in :eqref:`eq_derivative`
 as the *instantaneous* rate of change of $f(x)$
 with respect to $x$.
-The so-called instantaneous rate of change is based on
-the variation $h$ in $x$, which approaches $0$.
-
-To illustrate derivatives,
-let us experiment with an example.
+For more intuition let us experiment with an example.
 (**Define $u = f(x) = 3x^2-4x$.**)
 
 ```{.python .input}
@@ -113,68 +76,36 @@ the numerical result of $\frac{f(x+h) - f(x)}{h}$**]
 in :eqref:`eq_derivative`
 (**approaches $2$.**)
 Though this experiment is not a mathematical proof,
-we will see later that the derivative $u'$ is $2$ when $x=1$.
+we will see later see that indeed $f'(1) = 2$.
 
 ```{.python .input}
 #@tab all
-def numerical_lim(f, x, h):
-    return (f(x + h) - f(x)) / h
-
-h = 0.1
-for i in range(5):
-    print(f'h={h:.5f}, numerical limit={numerical_lim(f, 1, h):.5f}')
-    h *= 0.1
+for h in 10.0**np.arange(-1, -6, -1):
+    print(f'h={h:.5f}, numerical limit={(f(1+h)-f(1))/h:.5f}')
 ```
 
 Let us familiarize ourselves with a few equivalent notations for derivatives.
-Given $y = f(x)$, where $x$ and $y$ are the independent variable and the dependent variable of the function $f$, respectively. The following expressions are equivalent:
+Given $y = f(x)$ the following expressions are equivalent:
 
 $$f'(x) = y' = \frac{dy}{dx} = \frac{df}{dx} = \frac{d}{dx} f(x) = Df(x) = D_x f(x),$$
 
-where symbols $\frac{d}{dx}$ and $D$ are *differentiation operators* that indicate operation of *differentiation*.
+where symbols $\frac{d}{dx}$ and $D$ are *differentiation operators*.
 We can use the following rules to differentiate common functions:
 
-* $DC = 0$ ($C$ is a constant),
-* $Dx^n = nx^{n-1}$ (the *power rule*, $n$ is any real number),
-* $De^x = e^x$,
-* $D\ln(x) = 1/x.$
+$$\begin{aligned} \frac{d}{dx} C & = 0 && \text{$C$ is a constant} \\ \frac{d}{dx} x^n & = n x^{n-1} && \text{for } n \neq 0 \\ \frac{d}{dx} e^x & = e^x \\ \frac{d}{dx} \ln x & = x^{-1} \end{aligned}$$
 
-To differentiate a function that is formed from a few simpler functions such as the above common functions,
-the following rules can be handy for us.
-Suppose that functions $f$ and $g$ are both differentiable and $C$ is a constant,
-we have the *constant multiple rule*
+To differentiate functions obtained by composition of the above (and similar functions) the following rules are handy. We assume below that $f$ and $g$ are both differentiable and that $c$ is constant. We have
 
-$$\frac{d}{dx} [Cf(x)] = C \frac{d}{dx} f(x),$$
+$$\begin{aligned} \frac{d}{dx} [C f(x)] & = C \frac{d}{dx} f(x) && \text{Constant multiple rule} \\ \frac{d}{dx} [f(x) + g(x)] & = \frac{d}{dx} f(x) + \frac{d}{dx} g(x) && \text{Sum rule} \\ \frac{d}{dx} [f(x) g(x)] & = f(x) \frac{d}{dx} g(x) + g(x) \frac{d}{dx} f(x) && \text{Product rule} \\ \frac{d}{dx} \frac{f(x)}{g(x)} & = \frac{g(x) \frac{d}{dx} f(x) - f(x) \frac{d}{dx} g(x)}{g^2(x)} && \text{Quotient rule} \end{aligned}$$
 
-the *sum rule*
+Using this we can apply the rules to find the derivative of $3 x^2 - 4x$ via
+$$\frac{d}{dx} [3 x^2 - 4x] = 3 \frac{d}{dx} x^2 - 4 \frac{d}{dx} x = 6x - 4.$$
+Plugging in $x = 1$ shows that, indeed, the derivative is $2$ at this location. Note that by construction derivatives tell us the *slope* of a function at a particular location.  
 
-$$\frac{d}{dx} [f(x) + g(x)] = \frac{d}{dx} f(x) + \frac{d}{dx} g(x),$$
+## Visualization Utilities
 
-the *product rule*
-
-$$\frac{d}{dx} [f(x)g(x)] = f(x) \frac{d}{dx} [g(x)] + g(x) \frac{d}{dx} [f(x)],$$
-
-and the *quotient rule*
-
-$$\frac{d}{dx} \left[\frac{f(x)}{g(x)}\right] = \frac{g(x) \frac{d}{dx} [f(x)] - f(x) \frac{d}{dx} [g(x)]}{[g(x)]^2}.$$
-
-Now we can apply a few of the above rules to find
-$u' = f'(x) = 3 \frac{d}{dx} x^2-4\frac{d}{dx}x = 6x-4$.
-Thus, by setting $x = 1$, we have $u' = 2$:
-this is supported by our earlier experiment in this section
-where the numerical result approaches $2$.
-This derivative is also the slope of the tangent line
-to the curve $u = f(x)$ when $x = 1$.
-
-[**To visualize such an interpretation of derivatives,
-we will use `matplotlib`,**] a popular plotting library in Python.
-To configure properties of the figures produced by `matplotlib`,
-we need to define a few functions.
-In the following,
-the `use_svg_display` function specifies the `matplotlib` package to output the svg figures for sharper images.
-Note that the comment `#@save` is a special mark where the following function,
-class, or statements are saved in the `d2l` package
-so later they can be directly invoked (e.g., `d2l.use_svg_display()`) without being redefined.
+[**To visualize slopes defined by derivatives we will use `matplotlib`,**] a popular plotting library in Python.
+We need to define a few functions. As its name indicates, `use_svg_display` tells `matplotlib` to output graphics in SVG format for crisper images. The comment `#@save` is a special modifier that allows us to save the subsequent function, class, or statements in the `d2l` package such that it can be invoked later without being redefined, e.g., via `d2l.use_svg_display()`. 
 
 ```{.python .input}
 #@tab all
@@ -183,7 +114,7 @@ def use_svg_display():  #@save
     display.set_matplotlib_formats('svg')
 ```
 
-We define the `set_figsize` function to specify the figure sizes. Note that here we directly use `d2l.plt` since the import statement `from matplotlib import pyplot as plt` has been marked for being saved in the `d2l` package in the preface.
+The eponymous `set_figsize` function specifies figure sizes. We use `d2l.plt` as plotting funtion since since the import statement `from matplotlib import pyplot as plt` was marked via `#@save` in the `d2l` package in the preface.
 
 ```{.python .input}
 #@tab all
@@ -200,54 +131,44 @@ The following `set_axes` function sets properties of axes of figures produced by
 #@save
 def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
-    axes.set_xlabel(xlabel)
-    axes.set_ylabel(ylabel)
-    axes.set_xscale(xscale)
-    axes.set_yscale(yscale)
-    axes.set_xlim(xlim)
-    axes.set_ylim(ylim)
+    axes.set_xlabel(xlabel), axes.set_ylabel(ylabel)
+    axes.set_xscale(xscale), axes.set_yscale(yscale)
+    axes.set_xlim(xlim),     axes.set_ylim(ylim)
     if legend:
         axes.legend(legend)
     axes.grid()
 ```
 
 With these three functions for figure configurations,
-we define the `plot` function
-to plot multiple curves succinctly
+we define the `plot` function to plot multiple curves succinctly
 since we will need to visualize many curves throughout the book.
+Much of the work goes into ensuring that sizes and shapes of inputs match. 
 
 ```{.python .input}
 #@tab all
 #@save
-def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
+def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
          ylim=None, xscale='linear', yscale='linear',
          fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
     """Plot data points."""
-    if legend is None:
-        legend = []
 
-    set_figsize(figsize)
-    axes = axes if axes else d2l.plt.gca()
-
-    # Return True if `X` (tensor or list) has 1 axis
-    def has_one_axis(X):
+    def has_one_axis(X):  # True if `X` (tensor or list) has 1 axis
         return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
                 and not hasattr(X[0], "__len__"))
-
-    if has_one_axis(X):
-        X = [X]
+    
+    if has_one_axis(X): X = [X]
     if Y is None:
         X, Y = [[]] * len(X), X
     elif has_one_axis(Y):
         Y = [Y]
     if len(X) != len(Y):
         X = X * len(Y)
+        
+    set_figsize(figsize)
+    if axes is None: axes = d2l.plt.gca()
     axes.cla()
     for x, y, fmt in zip(X, Y, fmts):
-        if len(x):
-            axes.plot(x, y, fmt)
-        else:
-            axes.plot(y, fmt)
+        axes.plot(x,y,fmt) if len(x) else axes.plot(y,fmt)
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 ```
 
@@ -259,12 +180,12 @@ x = np.arange(0, 3, 0.1)
 plot(x, [f(x), 2 * x - 3], 'x', 'f(x)', legend=['f(x)', 'Tangent line (x=1)'])
 ```
 
-## Partial Derivatives
+## Partial Derivatives and Gradients
+:label:`subsec_calculus-grad`
 
-So far we have dealt with the differentiation of functions of just one variable.
+Back to math. So far we dealt with the differentiation of functions of just one variable.
 In deep learning, functions often depend on *many* variables.
-Thus, we need to extend the ideas of differentiation to these *multivariate* functions.
-
+Thus, we need to extend the ideas of differentiation to *multivariate* functions.
 
 Let $y = f(x_1, x_2, \ldots, x_n)$ be a function with $n$ variables. The *partial derivative* of $y$ with respect to its $i^\mathrm{th}$  parameter $x_i$ is
 
@@ -274,71 +195,60 @@ $$ \frac{\partial y}{\partial x_i} = \lim_{h \rightarrow 0} \frac{f(x_1, \ldots,
 To calculate $\frac{\partial y}{\partial x_i}$, we can simply treat $x_1, \ldots, x_{i-1}, x_{i+1}, \ldots, x_n$ as constants and calculate the derivative of $y$ with respect to $x_i$.
 For notation of partial derivatives, the following are equivalent:
 
-$$\frac{\partial y}{\partial x_i} = \frac{\partial f}{\partial x_i} = f_{x_i} = f_i = D_i f = D_{x_i} f.$$
-
-
-## Gradients
-:label:`subsec_calculus-grad`
+$$\frac{\partial y}{\partial x_i} = \frac{\partial f}{\partial x_i} = \partial_{x_i} f = \partial_i f = f_{x_i} = f_i = D_i f = D_{x_i} f.$$
 
 We can concatenate partial derivatives of a multivariate function with respect to all its variables to obtain the *gradient* vector of the function.
-Suppose that the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. The gradient of the function $f(\mathbf{x})$ with respect to $\mathbf{x}$ is a vector of $n$ partial derivatives:
+Suppose that the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. The gradient of the function $f$ with respect to $\mathbf{x}$ is a vector of $n$ partial derivatives:
 
-$$\nabla_{\mathbf{x}} f(\mathbf{x}) = \bigg[\frac{\partial f(\mathbf{x})}{\partial x_1}, \frac{\partial f(\mathbf{x})}{\partial x_2}, \ldots, \frac{\partial f(\mathbf{x})}{\partial x_n}\bigg]^\top,$$
+$$\nabla_{\mathbf{x}} f(\mathbf{x}) = \left[\partial_{x_1} f(\mathbf{x}), \partial_{x_2} f(\mathbf{x}), \ldots
+\partial_{x_n} f(\mathbf{x})\right]^\top.$$ 
 
-where $\nabla_{\mathbf{x}} f(\mathbf{x})$ is often replaced by $\nabla f(\mathbf{x})$ when there is no ambiguity.
+Here $\nabla_{\mathbf{x}} f(\mathbf{x})$ is typically replaced by $\nabla f(\mathbf{x})$ when there is no ambiguity.
+The following rules are often used when differentiating multivariate functions:
 
-Let $\mathbf{x}$ be an $n$-dimensional vector, the following rules are often used when differentiating multivariate functions:
+* For all $\mathbf{A} \in \mathbb{R}^{m \times n}$ we have $\nabla_{\mathbf{x}} \mathbf{A} \mathbf{x} = \mathbf{A}^\top$ and $\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A}  = \mathbf{A}$.
+* For square matrices $\mathbf{A} \in \mathbb{R}^{n \times n}$ we have that $\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A} \mathbf{x}  = (\mathbf{A} + \mathbf{A}^\top)\mathbf{x}$ and in particular
+$\nabla_{\mathbf{x}} \|\mathbf{x} \|^2 = \nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{x} = 2\mathbf{x}$.
 
-* For all $\mathbf{A} \in \mathbb{R}^{m \times n}$, $\nabla_{\mathbf{x}} \mathbf{A} \mathbf{x} = \mathbf{A}^\top$,
-* For all  $\mathbf{A} \in \mathbb{R}^{n \times m}$, $\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A}  = \mathbf{A}$,
-* For all  $\mathbf{A} \in \mathbb{R}^{n \times n}$, $\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A} \mathbf{x}  = (\mathbf{A} + \mathbf{A}^\top)\mathbf{x}$,
-* $\nabla_{\mathbf{x}} \|\mathbf{x} \|^2 = \nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{x} = 2\mathbf{x}$.
-
-Similarly, for any matrix $\mathbf{X}$, we have $\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}$. As we will see later, gradients are useful for designing optimization algorithms in deep learning.
-
+Similarly, for any matrix $\mathbf{X}$, we have $\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}$. 
 
 ## Chain Rule
 
-However, such gradients can be hard to find.
-This is because multivariate functions in deep learning are often *composite*,
-so we may not apply any of the aforementioned rules to differentiate these functions.
-Fortunately, the *chain rule* enables us to differentiate composite functions.
-
-Let us first consider functions of a single variable.
-Suppose that functions $y=f(u)$ and $u=g(x)$ are both differentiable, then the chain rule states that
+Gradients can be hard to find in deep learning, since most interesting functions are concatenations of other functions. As such we may not apply any of the aforementioned rules to differentiate these functions.
+Fortunately, the *chain rule* (in Latin 'catena' means chain) takes care of this. Let's start with a single variable. 
+Suppose that functions $y=f(u)$ and $u=g(x)$ are both differentiable, then the chain rule states that for $y = f(g(x))$ we have
 
 $$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}.$$
 
-Now let us turn our attention to a more general scenario
-where functions have an arbitrary number of variables.
-Suppose that the differentiable function $y$ has variables
-$u_1, u_2, \ldots, u_m$, where each differentiable function $u_i$
-has variables $x_1, x_2, \ldots, x_n$.
-Note that $y$ is a function of $x_1, x_2, \ldots, x_n$.
-Then the chain rule gives
+Next consider functions with an arbitrary number of variables.
+Suppose that $y = f(\mathbf{u})$ has variables
+$u_1, u_2, \ldots, u_m$, where each $u_i = g_i(\mathbf{x})$ 
+has variables $x_1, x_2, \ldots, x_n$, in short 
+$\mathbf{u} = g(\mathbf{x})$. Then the chain rule reads as follows:
 
-$$\frac{dy}{dx_i} = \frac{dy}{du_1} \frac{du_1}{dx_i} + \frac{dy}{du_2} \frac{du_2}{dx_i} + \cdots + \frac{dy}{du_m} \frac{du_m}{dx_i}$$
+$$\frac{dy}{dx_i} = \frac{dy}{du_1} \frac{du_1}{dx_i} + \frac{dy}{du_2} \frac{du_2}{dx_i} + \cdots + \frac{dy}{du_m} \frac{du_m}{dx_i} \text{ and thus }
+\nabla_{\mathbf{x}} y = \nabla_{\mathbf{u}} y \cdot \nabla_{x} \mathbf{u}$$
 
-for any $i = 1, 2, \ldots, n$.
-
-
+Note that $\nabla_{x} \mathbf{u}$ is a *matrix* since it contains the derivative of a vector with regard to a vector. As such, evaluating the gradient requires us to compute a vector-matrix product. This is one of the key reasons why linear algebra is such an integral building block in building deep learning systems. 
 
 ## Summary
 
+So far be barely scratched the surface of what differential calculus can do. That said, there are a number of pieces that come into focus: firstly, the composition rules for differentiation allow one to compute the derivatives of functions mechanically by rote application. Hence, there's no need for creativity. In particular, the derivatives can be computed *automatically* by an autograd library. Second, the process of computing derivatives requires us to multiply matrices as we trace the dependency graph of variables from input to output. In particular, this graph is traversed in a *forward* direction when we evaluate a function and in a *backwards* direction when we compute gradients. Later chapters will formalize this as backpropagation. 
 
-* Differential calculus and integral calculus are two branches of calculus, where the former can be applied to the ubiquitous optimization problems in deep learning.
-* A derivative can be interpreted as the instantaneous rate of change of a function with respect to its variable. It is also the slope of the tangent line to the curve of the function.
-* A gradient is a vector whose components are the partial derivatives of a multivariate function with respect to all its variables.
-* The chain rule enables us to differentiate composite functions.
-
-
+From the viewpoint of optimization, gradients allow us to identify how we should be changing parameters of a model in such a way that it performs better, e.g., by reducing the value of a loss function or by increasing the reward associated with an action. This forms the centerpiece of many optimization algorithms that we will encounter throughout this book. 
 
 ## Exercises
 
-1. Plot the function $y = f(x) = x^3 - \frac{1}{x}$ and its tangent line when $x = 1$.
+1. So far we took the rules for derivatives for granted. Using the definition and limits prove the properties for a) $f(x) = c$, b) $f(x) = x^n$, c) $f(x) = e^x$ and d) $f(x) = \ln x$.
+1. In the same vein, prove the product, sum, and quotient rule from first principles. 
+1. Prove that the constant multiple rule follows as a special case of the product rule. 
+1. Calculate the derivative of $f(x) = x^x$. 
+1. What does it mean that $f'(x) = 0$ for some $x$? Give an example of a function $f$ and a location $x$ for which this might hold. 
+1. Plot the function $y = f(x) = x^3 - \frac{1}{x}$ and plot its tangent line at $x = 1$.
 1. Find the gradient of the function $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$.
-1. What is the gradient of the function $f(\mathbf{x}) = \|\mathbf{x}\|_2$?
+1. What is the gradient of the function $f(\mathbf{x}) = \|\mathbf{x}\|_2$? What happens for $\mathbf{x} = 0$?
 1. Can you write out the chain rule for the case where $u = f(x, y, z)$ and $x = x(a, b)$, $y = y(a, b)$, and $z = z(a, b)$?
+1. Given a function $f(x)$ that is invertible, compute the derivative of its inverse $f^{-1}(x)$. Here we have that $f^{-1}(f(x)) = x$ and conversely $f(f^{-1}(y)) = y$. Hint: use these properties in your derivation. 
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/32)
@@ -351,3 +261,7 @@ for any $i = 1, 2, \ldots, n$.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/197)
 :end_tab:
+
+```{.python .input}
+
+```
