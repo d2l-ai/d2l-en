@@ -91,7 +91,7 @@ Multinomial(1, fair_probs).sample()
 ```{.python .input}
 #@tab tensorflow
 fair_probs = tf.ones(6) / 6
-tfd.multinomial(1, fair_probs).sample()
+tfd.Multinomial(1, fair_probs).sample()
 ```
 
 Each time you run the sampler you will receive a new random value that will likely
@@ -110,7 +110,7 @@ Multinomial(10, fair_probs).sample()
 
 ```{.python .input}
 #@tab tensorflow
-tfd.multinomial(10, fair_probs).sample()
+tfd.Multinomial(10, fair_probs).sample()
 ```
 
 Even though we drew the samples from a fair dice, the numbers don't look particularly even
@@ -130,7 +130,7 @@ counts / 1000  # Relative frequency as the estimate
 
 ```{.python .input}
 #@tab tensorflow
-counts = tdf.multinomial(1000, fair_probs).sample()
+counts = tfd.Multinomial(1000, fair_probs).sample()
 counts / 1000
 ```
 
@@ -168,7 +168,7 @@ d2l.plt.legend();
 
 ```{.python .input  n=7}
 #@tab tensorflow
-counts = tfd.multinomial(1, fair_probs).sample(5000)
+counts = tfd.Multinomial(1, fair_probs).sample(5000)
 cum_counts = tf.cumsum(counts, axis=0)
 estimates = cum_counts / tf.reduce_sum(cum_counts, axis=1, keepdims=True)
 estimates = estimates.numpy()
