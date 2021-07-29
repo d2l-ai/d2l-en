@@ -5,9 +5,15 @@ We provide three base classes, inspired by pytorch lightning:
 - `Module` contains the neural network, loss, and optimization method
 - `Trainer` provide a fit function to train the model
 
-The goal is to improve reusablity. For example, all chapter can use `trainer = d2l.Trainer(...); trainer.fit(model, data)` to train the model. No need to reimplement everywhere. Though we may still show how to implement the Trainer for GPU, multi-GPU, with hidden state, ... but every chapter calls `d2l.Trainer`, instead of `train_ch3`. 
+The goal is to improve reusablity. For example, all chapter can use `trainer = d2l.Trainer(...); trainer.fit(model, data)` to train the model. No need to reimplement everywhere. Though we may still show how to implement the Trainer for GPU, multi-GPU, with hidden state, ... but every chapter calls `d2l.Trainer`, instead of `train_ch3`.
 
 Some utility functions, can move to appendix.
+
+
+```{.python .input}
+#@tab all
+# a place holder
+```
 
 ```{.python .input}
 #@tab pytorch
@@ -89,7 +95,7 @@ draw.draw({'x':2, 'w':5})
 
 ```
 
-##  Data API 
+##  Data API
 
 ```{.python .input}
 #@tab pytorch
@@ -109,7 +115,7 @@ class DataModule(HyperParameters):
         """Returns the dataloader for the validation dataset."""
 ```
 
-Example: the Image Classification Dataset 
+Example: the Image Classification Dataset
 
 ```{.python .input}
 #@tab pytorch
