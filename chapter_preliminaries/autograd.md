@@ -1,25 +1,38 @@
 # Automatic Differentiation
 :label:`sec_autograd`
 
-As explained in :numref:`sec_calculus`,
-differentiation is a crucial step in nearly all deep learning optimization algorithms.
-While the calculations for taking these derivatives are straightforward,
-working out the updates by hand can tedious and error-prone, particularly for complex models.
+Recall from :numref:`sec_calculus` 
+that calculating derivatives is the crucial step
+in all of the optimization algorithms
+that we will use to train deep networks.
+While the calculations are straightforward,
+working them out by hand can tedious and error-prone, 
+problems that only grow 
+as our models become more complex.
 
-Deep learning frameworks expedite this work via *automatic differentiation*. 
-Based on our designed model the system builds a *computational graph*. 
-This allows us to track which data is needed for a given output. 
-Automatic differentiation enables the system to backpropagate gradients.
-Here, *backpropagation* simply means to trace through the computational graph,
-filling in the partial derivatives with respect to each parameter. 
+Fortunately all modern deep learning frameworks
+take this work off of our plates
+by offering *automatic differentiation*
+(often shortened to *autograd*). 
+As we pass data through each successive function,
+the framework builds a *computational graph* 
+that tracks how each value depends on others.
+To calculate derivatives, 
+automatic differentiation packages 
+then work backwards through this graph
+applying the chain rule. 
+The computational algorithm for applying the chain rule
+this fashion is called *backpropagation*.
 
-While automatic differentiation, or in short, autograd, has gained significant 
-prominence over the past decade, it has a long history. One of the first references is the work by 
-:cite:`wengert1964simple` who introduced automatic differentiation over half a century ago. The
-description of backpropagation of the form that is used in deep learning systems did not 
-happen until the PhD thesis of :cite:`speelpenning1980compiling`. More modern descriptions 
-can be found in the work of :cite:`griewank1989automatic` who put autograd on a comprehensive footing. 
-While by now backpropagation is the default choice in computing gradients, it is by far not the only option. For instance Julia employs forward propagation :cite:`revels2016forward`. We will discuss this in some more detail after we've introduced the basics.
+While autograd libraries become 
+hot concerns over the past decade,
+they have a long history. 
+In fact the earliest references to autograd
+date back over half of a century :cite:`wengert1964simple`.
+The core ideas behind modern backpropagation
+date to a PhD thesis from 1980 :cite:`speelpenning1980compiling`
+and were further developed in the late 1980s :cite:`griewank1989automatic`.
+While gradient-based is the default choice in computing gradients, it is by far not the only option. For instance Julia employs forward propagation :cite:`revels2016forward`. We will discuss this in some more detail after we've introduced the basics.
 
 
 ## A Simple Function
@@ -342,7 +355,7 @@ def f(a):
     return c
 ```
 
-Let us compute the gradient. Since the input is a random variable, we cannot predict the flow a priori. It is only by executing `f(a)` that we know which operations will be carried out, and how frequently. 
+Let us compute the gradient. Since the input is a random variable, we cannot predict the flow a priori. It is only by executing `f(a)` that we know which operations will be carried out, and how frequently.
 
 ```{.python .input}
 a = np.random.normal()
@@ -416,7 +429,3 @@ For now, it is sufficient for us to remember the basics: attach gradients to tho
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/200)
 :end_tab:
-
-```{.python .input}
-
-```
