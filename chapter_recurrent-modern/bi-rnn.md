@@ -190,7 +190,7 @@ vocab_size, num_hiddens, num_layers = len(vocab), 256, 2
 lstm_layer = rnn.LSTM(num_hiddens, num_layers, bidirectional=True)
 model = d2l.RNNModel(lstm_layer, len(vocab))
 # Train the model
-num_epochs, lr = 500, 1
+num_epochs, lr = 500, 2
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
@@ -210,7 +210,7 @@ lstm_layer = nn.LSTM(num_inputs, num_hiddens, num_layers, bidirectional=True)
 model = d2l.RNNModel(lstm_layer, len(vocab))
 model = model.to(device)
 # Train the model
-num_epochs, lr = 500, 1
+num_epochs, lr = 500, 2
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 

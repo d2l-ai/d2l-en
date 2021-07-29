@@ -279,19 +279,14 @@ d2l.predict_ch8('time traveller', 10, net, vocab)
 As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyperparameters defined in :numref:`sec_rnn_scratch` and [**train our model with high-level APIs**].
 
 ```{.python .input}
-num_epochs, lr = 500, 1
-d2l.train_ch8(net, train_iter, vocab, lr, num_epochs, device)
-```
-
-```{.python .input}
-#@tab pytorch
-num_epochs, lr = 500, 1
+#@tab mxnet,pytorch
+num_epochs, lr = 500, 1.5
 d2l.train_ch8(net, train_iter, vocab, lr, num_epochs, device)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-num_epochs, lr = 500, 1
+num_epochs, lr = 500, 1.5
 d2l.train_ch8(net, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
@@ -311,7 +306,6 @@ high-level APIs of the deep learning framework.
 1. Can you make the RNN model overfit using the high-level APIs?
 1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?
 1. Implement the autoregressive model of :numref:`sec_sequence` using an RNN.
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/335)

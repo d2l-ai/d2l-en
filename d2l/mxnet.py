@@ -661,7 +661,6 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device):
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
-    print(predict('traveller'))
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md

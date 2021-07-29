@@ -352,12 +352,12 @@ def gru(inputs, state, params):
 After training,
 we print out the perplexity on the training set
 and the predicted sequence following
-the provided prefixes "time traveller" and "traveller", respectively.
+the provided prefix "time traveller".
 
 ```{.python .input}
 #@tab mxnet, pytorch
 vocab_size, num_hiddens, device = len(vocab), 256, d2l.try_gpu()
-num_epochs, lr = 500, 1
+num_epochs, lr = 500, 2
 model = d2l.RNNModelScratch(len(vocab), num_hiddens, device, get_params,
                             init_gru_state, gru)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
@@ -365,12 +365,14 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 
 ```{.python .input}
 #@tab tensorflow
-vocab_size, num_hiddens, device_name = len(vocab), 256, d2l.try_gpu()._device_name
-# defining tensorflow training strategy
+vocab_size, num_hiddens = len(vocab), 256
+device_name = d2l.try_gpu()._device_name
+# Define the training strategy
 strategy = tf.distribute.OneDeviceStrategy(device_name)
-num_epochs, lr = 500, 1
+num_epochs, lr = 500, 2
 with strategy.scope():
-    model = d2l.RNNModelScratch(len(vocab), num_hiddens, init_gru_state, gru, get_params)
+    model = d2l.RNNModelScratch(
+        len(vocab), num_hiddens, init_gru_state, gru, get_params)
 
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 ```
