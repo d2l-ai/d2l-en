@@ -312,6 +312,7 @@ high-level APIs of the deep learning framework.
 1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?
 1. Implement the autoregressive model of :numref:`sec_sequence` using an RNN.
 
+
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/335)
 :end_tab:

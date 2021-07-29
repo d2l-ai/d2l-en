@@ -65,10 +65,10 @@ In general we have the *forward recursion* as
 
 $$\pi_{t+1}(h_{t+1}) = \sum_{h_t} \pi_t(h_t) P(x_t \mid h_t) P(h_{t+1} \mid h_t).$$
 
-The recursion is initialized as $\pi_1(h_1) = P(h_1)$. In abstract terms this can be written as $\pi_{t+1} = f(\pi_t, x_t)$, where $f$ is some learnable function. This looks very much like the update equation in the latent variable models we discussed so far in the context of RNNs! 
+The recursion is initialized as $\pi_1(h_1) = P(h_1)$. In abstract terms this can be written as $\pi_{t+1} = f(\pi_t, x_t)$, where $f$ is some learnable function. This looks very much like the update equation in the latent variable models we discussed so far in the context of RNNs!
 
 Entirely analogously to the forward recursion,
-we can also 
+we can also
 sum over the same set of latent variables with a backward recursion. This yields:
 
 $$\begin{aligned}
@@ -88,11 +88,11 @@ We can thus write the *backward recursion* as
 
 $$\rho_{t-1}(h_{t-1})= \sum_{h_{t}} P(h_{t} \mid h_{t-1}) P(x_{t} \mid h_{t}) \rho_{t}(h_{t}),$$
 
-with initialization $\rho_T(h_T) = 1$. 
+with initialization $\rho_T(h_T) = 1$.
 Both the forward and backward recursions allow us to sum over $T$ latent variables in $\mathcal{O}(kT)$ (linear) time over all values of $(h_1, \ldots, h_T)$ rather than in exponential time.
 This is one of the great benefits of the probabilistic inference with graphical models.
-It is 
-also a very special instance of 
+It is
+also a very special instance of
 a general message passing algorithm :cite:`Aji.McEliece.2000`.
 Combining both forward and backward recursions, we are able to compute
 
@@ -104,27 +104,27 @@ See the introductory chapter of the book on sequential Monte Carlo algorithms fo
 
 ## Bidirectional Model
 
-If we want to have a mechanism in RNNs that offers comparable look-ahead ability as in hidden Markov models, we need to modify the RNN design that we have seen so far. Fortunately, this is easy conceptually. Instead of running an RNN only in the forward mode starting from the first token, we start another one from the last token running from back to front. 
+If we want to have a mechanism in RNNs that offers comparable look-ahead ability as in hidden Markov models, we need to modify the RNN design that we have seen so far. Fortunately, this is easy conceptually. Instead of running an RNN only in the forward mode starting from the first token, we start another one from the last token running from back to front.
 *Bidirectional RNNs* add a hidden layer that passes information in a backward direction to more flexibly process such information. :numref:`fig_birnn` illustrates the architecture of a bidirectional RNN with a single hidden layer.
 
 ![Architecture of a bidirectional RNN.](../img/birnn.svg)
 :label:`fig_birnn`
 
-In fact, this is not too dissimilar to the forward and backward recursions in the dynamic programing of hidden Markov models. 
+In fact, this is not too dissimilar to the forward and backward recursions in the dynamic programing of hidden Markov models.
 The main distinction is that in the previous case these equations had a specific statistical meaning.
-Now they are devoid of such easily accessible interpretations and we can just treat them as 
+Now they are devoid of such easily accessible interpretations and we can just treat them as
 generic and learnable functions.
 This transition epitomizes many of the principles guiding the design of modern deep networks: first, use the type of functional dependencies of classical statistical models, and then parameterize them in a generic form.
 
 
 ### Definition
 
-Bidirectional RNNs were introduced by :cite:`Schuster.Paliwal.1997`. 
+Bidirectional RNNs were introduced by :cite:`Schuster.Paliwal.1997`.
 For a detailed discussion of the various architectures see also the paper :cite:`Graves.Schmidhuber.2005`.
 Let us look at the specifics of such a network.
 
 
-For any time step $t$, 
+For any time step $t$,
 given a minibatch input $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs in each example: $d$) and let the hidden layer activation function be $\phi$. In the bidirectional architecture, we assume that the forward and backward hidden states for this time step are $\overrightarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ and $\overleftarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$, respectively,
 where $h$ is the number of hidden units.
 The forward and backward hidden state updates are as follows:
@@ -151,12 +151,12 @@ Here, the weight matrix $\mathbf{W}_{hq} \in \mathbb{R}^{2h \times q}$ and the b
 
 ### Computational Cost and Applications
 
-One of the key features of a bidirectional RNN is that information from both ends of the sequence is used to estimate the output. That is, we use information from both future and past observations to predict the current one. 
+One of the key features of a bidirectional RNN is that information from both ends of the sequence is used to estimate the output. That is, we use information from both future and past observations to predict the current one.
 In the case of next token prediction this is not quite what we want.
 After all, we do not have the luxury of knowing the next to next token when predicting the next one. Hence, if we were to use a bidirectional RNN naively we would not get a very good accuracy: during training we have past and future data to estimate the present. During test time we only have past data and thus poor accuracy. We will illustrate this in an experiment below.
 
 To add insult to injury, bidirectional RNNs are also exceedingly slow.
-The main reasons for this are that 
+The main reasons for this are that
 the forward propagation
 requires both forward and backward recursions
 in bidirectional layers
@@ -171,8 +171,8 @@ to encode text sequences.
 
 ## (**Training a Bidirectional RNN for a Wrong Application**)
 
-If we were to ignore all advice regarding the fact that bidirectional RNNs use past and future data and simply apply it to language models, 
-we will get estimates with acceptable perplexity. Nonetheless, the ability of the model to predict future tokens is severely compromised as the experiment below illustrates. 
+If we were to ignore all advice regarding the fact that bidirectional RNNs use past and future data and simply apply it to language models,
+we will get estimates with acceptable perplexity. Nonetheless, the ability of the model to predict future tokens is severely compromised as the experiment below illustrates.
 Despite reasonable perplexity, it only generates gibberish even after many iterations.
 We include the code below as a cautionary example against using them in the wrong context.
 
@@ -214,10 +214,10 @@ num_epochs, lr = 500, 1
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```
 
-The output is clearly unsatisfactory for the reasons described above. 
+The output is clearly unsatisfactory for the reasons described above.
 For a
 discussion of more effective uses of bidirectional RNNs, please see the sentiment
-analysis application 
+analysis application
 in :numref:`sec_sentiment_rnn`.
 
 ## Summary
@@ -232,7 +232,6 @@ in :numref:`sec_sentiment_rnn`.
 1. If the different directions use a different number of hidden units, how will the shape of $\mathbf{H}_t$ change?
 1. Design a bidirectional RNN with multiple hidden layers.
 1. Polysemy is common in natural languages. For example, the word "bank" has different meanings in contexts “i went to the bank to deposit cash” and “i went to the bank to sit down”. How can we design a neural network model such that given a context sequence and a word, a vector representation of the word in the context will be returned? What type of neural architectures is preferred for handling polysemy?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/339)

@@ -139,14 +139,12 @@ class Vocab:  #@save
         return self.token_to_idx['<unk>']
 ```
 
-
 We can now [**construct the vocabulary**] for our dataset, 
 using it to convert each text line 
 from a list of tokens into a list of indices.
 Note that we have not lost any information
 and can easily convert our dataset 
 back to its original (string) representation.
-
 
 ```{.python .input}
 #@tab all

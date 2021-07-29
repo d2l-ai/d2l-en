@@ -42,12 +42,6 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-```{.python .input}
-#@tab tensorflow
-train_random_iter, vocab_random_iter = d2l.load_data_time_machine(
-    batch_size, num_steps, use_random_iter=True)
-```
-
 ## [**One-Hot Encoding**]
 
 Recall that each token is represented as a numerical index in `train_iter`.
@@ -545,35 +539,10 @@ def grad_clipping(grads, theta):  #@save
 Before training the model,
 let us [**define a function to train the model in one epoch**]. It differs from how we train the model of :numref:`sec_softmax_scratch` in three places:
 
-1. Different sampling methods for sequential data (random sampling and sequential partitioning) will result in differences in the initialization of hidden states.
+1. We iterate over sequential data with random sampling, where we re-initialize the hidden state for each iteration.
 1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.
 1. We use perplexity to evaluate the model. As discussed in :numref:`subsec_perplexity`, this ensures that sequences of different length are comparable.
 
-
-Specifically,
-when sequential partitioning is used, we initialize the hidden state only at the beginning of each epoch.
-Since the $i^\mathrm{th}$ subsequence example  in the next minibatch is adjacent to the current $i^\mathrm{th}$ subsequence example,
-the hidden state at the end of the current minibatch
-will be
-used to initialize
-the hidden state at the beginning of the next minibatch.
-In this way,
-historical information of the sequence
-stored in the hidden state
-might flow over
-adjacent subsequences within an epoch.
-However, the computation of the hidden state
-at any point depends on all the previous minibatches
-in the same epoch,
-which complicates the gradient computation.
-To reduce computational cost,
-we detach the gradient before processing any minibatch
-so that the gradient computation of the hidden state
-is always limited to
-the time steps in one minibatch. 
-
-When using the random sampling,
-we need to re-initialize the hidden state for each iteration since each example is sampled with a random position.
 Same as the `train_epoch_ch3` function in :numref:`sec_softmax_scratch`,
 `updater` is a general function
 to update the model parameters.
@@ -582,18 +551,13 @@ a deep learning framework.
 
 ```{.python .input}
 #@save
-def train_epoch_ch8(net, train_iter, loss, updater, device, use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater, device):
     """Train a model within one epoch (defined in Chapter 8)."""
-    state, timer = None, d2l.Timer()
+    timer = d2l.Timer()
     metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
     for X, Y in train_iter:
-        if state is None or use_random_iter:
-            # Initialize `state` when either it is the first iteration or
-            # using random sampling
-            state = net.begin_state(batch_size=X.shape[0], ctx=device)
-        else:
-            for s in state:
-                s.detach()
+        # With random sampling, initialize state for each iteration
+        state = net.begin_state(batch_size=X.shape[0], ctx=device)
         y = Y.T.reshape(-1)
         X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         with autograd.record():
@@ -609,24 +573,13 @@ def train_epoch_ch8(net, train_iter, loss, updater, device, use_random_iter):
 ```{.python .input}
 #@tab pytorch
 #@save
-def train_epoch_ch8(net, train_iter, loss, updater, device, use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater, device):
     """Train a net within one epoch (defined in Chapter 8)."""
-    state, timer = None, d2l.Timer()
+    timer = d2l.Timer()
     metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
     for X, Y in train_iter:
-        if state is None or use_random_iter:
-            # Initialize `state` when either it is the first iteration or
-            # using random sampling
-            state = net.begin_state(batch_size=X.shape[0], device=device)
-        else:
-            if isinstance(net, nn.Module) and not isinstance(state, tuple):
-                # `state` is a tensor for `nn.GRU`
-                state.detach_()
-            else:
-                # `state` is a tuple of tensors for `nn.LSTM` and
-                # for our custom scratch implementation 
-                for s in state:
-                    s.detach_()
+        # With random sampling, initialize state for each iteration
+        state = net.begin_state(batch_size=X.shape[0], device=device)
         y = Y.T.reshape(-1)
         X, y = X.to(device), y.to(device)
         y_hat, state = net(X, state)
@@ -648,15 +601,13 @@ def train_epoch_ch8(net, train_iter, loss, updater, device, use_random_iter):
 ```{.python .input}
 #@tab tensorflow
 #@save
-def train_epoch_ch8(net, train_iter, loss, updater, use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater):
     """Train a model within one epoch (defined in Chapter 8)."""
-    state, timer = None, d2l.Timer()
+    timer = d2l.Timer()
     metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
     for X, Y in train_iter:
-        if state is None or use_random_iter:
-            # Initialize `state` when either it is the first iteration or
-            # using random sampling
-            state = net.begin_state(batch_size=X.shape[0], dtype=tf.float32)
+        # With random sampling, initialize state for each iteration
+        state = net.begin_state(batch_size=X.shape[0], dtype=tf.float32)
         with tf.GradientTape(persistent=True) as g:
             y_hat, state = net(X, state)
             y = d2l.reshape(tf.transpose(Y), (-1))
@@ -679,8 +630,7 @@ either from scratch
 or using high-level APIs.**]
 
 ```{.python .input}
-def train_ch8(net, train_iter, vocab, lr, num_epochs, device,  #@save
-              use_random_iter=False):
+def train_ch8(net, train_iter, vocab, lr, num_epochs, device):  #@save
     """Train a model (defined in Chapter 8)."""
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
@@ -698,7 +648,7 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device,  #@save
     # Train and predict
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
-            net, train_iter, loss, updater, device, use_random_iter)
+            net, train_iter, loss, updater, device)
         if (epoch + 1) % 10 == 0:
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
@@ -709,8 +659,7 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device,  #@save
 ```{.python .input}
 #@tab pytorch
 #@save
-def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
-              use_random_iter=False):
+def train_ch8(net, train_iter, vocab, lr, num_epochs, device):
     """Train a model (defined in Chapter 8)."""
     loss = nn.CrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
@@ -724,7 +673,7 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
     # Train and predict
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
-            net, train_iter, loss, updater, device, use_random_iter)
+            net, train_iter, loss, updater, device)
         if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
@@ -736,8 +685,7 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
 ```{.python .input}
 #@tab tensorflow
 #@save
-def train_ch8(net, train_iter, vocab, lr, num_epochs, strategy,
-              use_random_iter=False):
+def train_ch8(net, train_iter, vocab, lr, num_epochs, strategy):
     """Train a model (defined in Chapter 8)."""
     with strategy.scope():
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -747,8 +695,7 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, strategy,
     predict = lambda prefix: predict_ch8(prefix, 50, net, vocab)
     # Train and predict
     for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater,
-                                     use_random_iter)
+        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater)
         if (epoch + 1) % 10 == 0:
             print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
@@ -773,26 +720,6 @@ num_epochs, lr = 500, 1
 train_ch8(net, train_iter, vocab, lr, num_epochs, strategy)
 ```
 
-[**Finally,
-let us check the results of using the random sampling method.**]
-
-```{.python .input}
-#@tab mxnet,pytorch
-net = RNNModelScratch(len(vocab), num_hiddens, d2l.try_gpu(), get_params,
-                      init_rnn_state, rnn)
-train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu(),
-          use_random_iter=True)
-```
-
-```{.python .input}
-#@tab tensorflow
-with strategy.scope():
-    net = RNNModelScratch(len(vocab), num_hiddens, init_rnn_state, rnn,
-                          get_params)
-train_ch8(net, train_iter, vocab_random_iter, lr, num_epochs, strategy,
-          use_random_iter=True)
-```
-
 While implementing the above RNN model from scratch is instructive, it is not convenient.
 In the next section we will see how to improve the RNN model,
 such as how to make it easier to implement
@@ -803,8 +730,7 @@ and make it run faster.
 
 * We can train an RNN-based character-level language model to generate text following the user-provided text prefix.
 * A simple RNN language model consists of input encoding, RNN modeling, and output generation.
-* RNN models need state initialization for training, though random sampling and sequential partitioning use different ways.
-* When using sequential partitioning, we need to detach the gradient to reduce computational cost.
+* We iterate over sequential data with random sampling, where we re-initialize the RNN hidden state for each iteration.
 * A warm-up period allows a model to update itself (e.g., obtain a better hidden state than its initialized value) before making any prediction.
 * Gradient clipping prevents gradient explosion, but it cannot fix vanishing gradients.
 
@@ -820,7 +746,6 @@ and make it run faster.
     * What happens?
     * Bias the model towards more likely outputs, e.g., by sampling from $q(x_t \mid x_{t-1}, \ldots, x_1) \propto P(x_t \mid x_{t-1}, \ldots, x_1)^\alpha$ for $\alpha > 1$.
 1. Run the code in this section without clipping the gradient. What happens?
-1. Change sequential partitioning so that it does not separate hidden states from the computational graph. Does the running time change? How about the perplexity?
 1. Replace the activation function used in this section with ReLU and repeat the experiments in this section. Do we still need gradient clipping? Why?
 
 :begin_tab:`mxnet`

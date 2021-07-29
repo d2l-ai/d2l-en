@@ -428,7 +428,6 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 1. Compare runtime, perplexity, and the output strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
 1. What happens if you implement only parts of a GRU, e.g., with only a reset gate or only an update gate?
 
-
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/342)
 :end_tab:
