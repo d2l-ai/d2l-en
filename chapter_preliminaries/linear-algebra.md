@@ -1,10 +1,11 @@
 # Linear Algebra
 :label:`sec_linear-algebra`
 
-By now, we can load data into tensors,
-and manipulate them with basic mathematical operations.
-To take the next step towards building sophisticated models,
-we must pick up a few tools from linear algebra. 
+By now, we can load datasets into tensors
+and manipulate these tensors 
+with basic mathematical operations.
+To start build sophisticated models,
+we will also need a few tools from linear algebra. 
 This section offers a gentle introduction 
 to the most essential concepts,
 starting from scalar arithmetic
