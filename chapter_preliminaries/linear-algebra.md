@@ -209,10 +209,10 @@ The expression $\mathbf{A} \in \mathbb{R}^{m \times n}$
 indicates that a matrix $\mathbf{A}$ 
 contains $m \times n$ real-valued scalars,
 arranged as $m$ rows and $n$ columns.
-Visually, we can illustrate any matrix 
-$\mathbf{A} \in \mathbb{R}^{m \times n}$ as a table.
-To refer to an individual element we subscript 
-both the row and column indices, e.g.,
+When $m = n$, we say that a matrix is *square*.
+Visually, we can illustrate any matrix as a table.
+To refer to an individual element,
+we subscript both the row and column indices, e.g.,
 $a_{ij}$ is the value that belongs to $\mathbf{A}$'s
 $i^{\mathrm{th}}$ row and $j^{\mathrm{th}}$ column:
 
@@ -220,9 +220,8 @@ $$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22
 :eqlabel:`eq_matrix_def`
 
 
-We implement any matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$
+In code, we represent a matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$
 by a $2^{\mathrm{nd}}$-order tensor with shape ($m$, $n$).
-When $m = n$, we say that a matrix is *square*.
 In code, [**we can convert any appropriately sized tensor 
 into an $m \times n$ matrix**] via `reshape` 
 by specifying the desired shape:
