@@ -43,7 +43,7 @@ large numbers* tell us that as the number of tosses grows this estimate will dra
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
-from mxnet.np.random import multinomial
+from mxnet.numpy.random import multinomial
 npx.set_np()
 ```
 
@@ -140,7 +140,6 @@ Because we generated the data from a fair die, we know that each outcome has tru
 counts = multinomial(1, fair_probs, size=5000)
 cum_counts = counts.astype(np.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
-estimates = estimates.asnumpy()
 
 d2l.set_figsize((6, 4.5))
 for i in range(6):
@@ -437,7 +436,3 @@ Lastly, we introduced a first set of nontrivial questions about the effect of a 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/198)
 :end_tab:
-
-```{.python .input}
-
-```
