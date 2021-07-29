@@ -17,6 +17,7 @@ providing the basis for more complex techniques in the rest of the book.
 linear-regression
 linear-regression-scratch
 linear-regression-concise
+api
 softmax-regression
 image-classification-dataset
 softmax-regression-scratch
