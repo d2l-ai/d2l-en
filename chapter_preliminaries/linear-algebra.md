@@ -105,7 +105,7 @@ We denote vectors by bold lowercase letters,
 
 Vectors are implemented as $1^{\mathrm{st}}-order tensors.
 In general, such tensors can have arbitrary lengths,
-subject memory limitations.
+subject to memory limitations.
 
 ```{.python .input}
 x = np.arange(3)
@@ -126,8 +126,8 @@ x
 
 We can refer to an element of a vector by using a subscript.
 For example, $x_2$ denotes the second element of $\mathbf{x}$. 
-Since $x_2$ is a scalar, it is not bolded.
-By default we visualize vectors 
+Since $x_2$ is a scalar, we do not bold it.
+By default, we visualize vectors 
 by stacking their elements vertically.
 
 $$\mathbf{x} =\begin{bmatrix}x_{1}  \\ \vdots  \\x_{n}\end{bmatrix},$$
@@ -136,7 +136,7 @@ $$\mathbf{x} =\begin{bmatrix}x_{1}  \\ \vdots  \\x_{n}\end{bmatrix},$$
 Here $x_1, \ldots, x_n$ are elements of the vector.
 Later on, we will distinguish between such *column vectors*
 and *row vectors* whose elements are stacked horizontally.
-In code, we (**access a vector's elements via indexing.**)
+Recall that [**we access a tensor's elements via indexing.**)
 
 ```{.python .input}
 x[2]
@@ -155,8 +155,8 @@ x[2]
 To indicate that a vector contains $n$ elements,
 we write $\mathbf{x} \in \mathbb{R}^n$.
 Formally, we call $n$ the *dimensionality* of the vector.
-[**In code, this corresponds to the length of a tensor**],
-which we can access via Python's built-in `len()` function.
+[**In code, this corresponds to the tensor's length**],
+accessible via Python's built-in `len()` function.
 
 ```{.python .input}
 len(x)
@@ -191,11 +191,12 @@ x.shape
 ```
 
 Oftentimes, the word "dimension" gets overloaded
-to mean both the number of axes and the length
-along a articular axis.
-To avoid this confusion, we use *dimensionality* 
-exclusively to refer to the number of components 
-and use *order* to refer to the number of axes.
+to mean both the number of axes 
+and the length along a articular axis.
+To avoid this confusion, 
+we use *order* to refer to the number of axes
+and *dimensionality* exclusively to refer 
+to the number of components.
 
 
 ## Matrices
@@ -223,9 +224,9 @@ $$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22
 
 In code, we represent a matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$
 by a $2^{\mathrm{nd}}$-order tensor with shape ($m$, $n$).
-In code, [**we can convert any appropriately sized tensor 
-into an $m \times n$ matrix**] via `reshape` 
-by specifying the desired shape:
+[**We can convert any appropriately size $m \times n$ tensor 
+into an $m \times n$ matrix**] 
+by passing the desired shape to `reshape`:
 
 ```{.python .input}
 A = np.arange(6).reshape(3, 2)
@@ -310,14 +311,17 @@ and columns correspond to distinct attributes.
 ## Tensors
 
 While you can go far in your machine learning journey
-with only scalars, vectors and matrices,
+with only scalars, vectors, and matrices,
 eventually you may need to work with 
 higher order [**tensors**].
-Tensors are (**give us a generic way to describe 
-$n^{\mathrm{th}}$ order extensions.**)
-Note that objects of the *tensor class*,
-which can have arbitrary numbers of axes
-are called "tensors" for precisely this reason.
+Tensors (**give us a generic way to describe 
+extensions to $n^{\mathrm{th}}$ order arrays.**)
+We call software objects of the *tensor class* "tensors"
+precisely because they too can have arbitrary numbers of axes.
+While it may be confusing to use the word
+*tensor* for both the mathematical object
+and its realization in code,
+our meaning should usually be clear from context.
 We denote general tensors by capital letters 
 with a special font face
 (e.g., $\mathsf{X}$, $\mathsf{Y}$, and $\mathsf{Z}$)
@@ -603,8 +607,9 @@ sum_A = tf.reduce_sum(A, axis=1, keepdims=True)
 sum_A, sum_A.shape
 ```
 
-For instance,
-since `sum_A` still keeps its two axes after summing each row, we can (**divide `A` by `sum_A` with broadcasting**) to create a matrix where each row sums up to $1$.
+For instance, since `sum_A` keeps its two axes after summing each row,
+we can (**divide `A` by `sum_A` with broadcasting**) 
+to create a matrix where each row sums up to $1$.
 
 ```{.python .input}
 A / sum_A
@@ -1062,9 +1067,12 @@ For a more advanced crash course, consider checking out
 or our [online appendix on linear algebra](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/geometry-linear-algebraic-ops.html).
 
 To recap:
-* Scalars, vectors, matrices, and tensors are the basic mathematical objects used in linear algebra and have zero, one, two, and an arbitrary number of axes, respectively.
-* Tensors can be sliced or reduced along specified axes via indexing, or operations such as `sum` and `mean`, respectively.
-* Elementwise products of matrices are called Hadamard products. 
+* Scalars, vectors, matrices, and tensors are 
+  the basic mathematical objects used in linear algebra 
+  and have zero, one, two, and an arbitrary number of axes, respectively.
+* Tensors can be sliced or reduced along specified axes 
+  via indexing, or operations such as `sum` and `mean`, respectively.
+* Elementwise products are called Hadamard products. 
   By contrast, dot products, matrix-vector products, and matrix-matrix products 
   are not elementwise operations and in general return objects 
   that have different shapes than the operands. 
