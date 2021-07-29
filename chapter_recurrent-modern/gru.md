@@ -161,7 +161,7 @@ In summary, GRUs have the following two distinguishing features:
 
 ## Implementation from Scratch
 
-To gain a better understanding of the GRU model, let us implement it from scratch. We begin by reading the time machine dataset that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below.
+To gain a better understanding of the GRU model, let us implement it from scratch. We begin by reading *The Time Machine* dataset that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below.
 
 ```{.python .input}
 from d2l import mxnet as d2l
