@@ -1,14 +1,14 @@
 # Documentation
 :begin_tab:`mxnet`
-Due to constraints on the length of this book, we cannot possibly introduce every single MXNet function and class (and you probably would not want us to). The API documentation and additional tutorials and examples provide plenty of documentation beyond the book. In this section we provide you with some guidance to exploring the MXNet API.
+Due to constraints on the length of this book, we cannot possibly introduce every single MXNet function and class (and you probably would not want us to). The [API documentation](https://mxnet.apache.org/versions/1.8.0/api) and additional [tutorials](https://mxnet.apache.org/versions/1.5.0/tutorials/index.html) and examples provide plenty of documentation beyond the book. In this section we provide you with some guidance to exploring the MXNet API.
 :end_tab:
 
 :begin_tab:`pytorch`
-Due to constraints on the length of this book, we cannot possibly introduce every single PyTorch function and class (and you probably would not want us to). The API documentation and additional tutorials and examples provide plenty of documentation beyond the book. In this section we provide you with some guidance to exploring the PyTorch API.
+Due to constraints on the length of this book, we cannot possibly introduce every single PyTorch function and class (and you probably would not want us to). The [API documentation](https://pytorch.org/docs/stable/index.html) and additional [tutorials](https://pytorch.org/tutorials/beginner/basics/intro.html) and examples provide plenty of documentation beyond the book. In this section we provide you with some guidance to exploring the PyTorch API.
 :end_tab:
 
 :begin_tab:`tensorflow`
-Due to constraints on the length of this book, we cannot possibly introduce every single TensorFlow function and class (and you probably would not want us to). The API documentation and additional tutorials and examples provide plenty of documentation beyond the book. In this section we provide you with some guidance to exploring the TensorFlow API.
+Due to constraints on the length of this book, we cannot possibly introduce every single TensorFlow function and class (and you probably would not want us to). The [API documentation](https://www.tensorflow.org/api_docs) and additional [tutorials](https://www.tensorflow.org/tutorials) and examples provide plenty of documentation beyond the book. In this section we provide you with some guidance to exploring the TensorFlow API.
 :end_tab:
 
 
