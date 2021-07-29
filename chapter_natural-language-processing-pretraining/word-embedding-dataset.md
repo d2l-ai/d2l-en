@@ -17,6 +17,7 @@ into minibatches
 that can be iterated over during training.
 
 ```{.python .input}
+import collections
 from d2l import mxnet as d2l
 import math
 from mxnet import gluon, np
@@ -26,6 +27,7 @@ import random
 
 ```{.python .input}
 #@tab pytorch
+import collections
 from d2l import torch as d2l
 import math
 import torch
@@ -55,7 +57,7 @@ d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
 def read_ptb():
     """Load the PTB dataset into a list of text lines."""
     data_dir = d2l.download_extract('ptb')
-    # Read the training set.
+    # Read the training set
     with open(os.path.join(data_dir, 'ptb.train.txt')) as f:
         raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
@@ -123,10 +125,11 @@ the greater the probability of being discarded.
 #@save
 def subsample(sentences, vocab):
     """Subsample high-frequency words."""
-    # Exclude unknown tokens '<unk>'
+    # Exclude unknown tokens ('<unk>')
     sentences = [[token for token in line if vocab[token] != vocab.unk]
                  for line in sentences]
-    counter = d2l.count_corpus(sentences)
+    counter = collections.Counter([
+        token for line in sentences for token in line])
     num_tokens = sum(counter.values())
 
     # Return True if `token` is kept during subsampling
@@ -483,8 +486,6 @@ for batch in data_iter:
 1. How does the running time of code in this section changes if not using subsampling?
 1. The `RandomGenerator` class caches `k` random sampling results. Set `k` to other values and see how it affects the data loading speed.
 1. What other hyperparameters in the code of this section may affect the data loading speed?
-
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/383)

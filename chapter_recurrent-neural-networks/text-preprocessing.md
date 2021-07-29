@@ -126,13 +126,17 @@ class Vocab:  #@save
 
     def __getitem__(self, tokens):
         if not isinstance(tokens, (list, tuple)):
-            return self.token_to_idx.get(tokens, self.token_to_idx['<unk>'])
+            return self.token_to_idx.get(tokens, self.unk)
         return [self.__getitem__(token) for token in tokens]
 
     def to_tokens(self, indices):
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
+    
+    @property
+    def unk(self):  # Index for the unknown token
+        return self.token_to_idx['<unk>']
 ```
 
 We can now [**construct the vocabulary**] for our dataset, 
