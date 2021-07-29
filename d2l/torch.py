@@ -1,3 +1,7 @@
+USE_MXNET = False
+USE_PYTORCH = True
+USE_TENSORFLOW = False
+
 #################   WARNING   ################
 # The below part is generated automatically through:
 #    d2lbook build lib
@@ -51,47 +55,36 @@ def set_figsize(figsize=(3.5, 2.5)):
 # Defined in file: ./chapter_preliminaries/calculus.md
 def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
-    axes.set_xlabel(xlabel)
-    axes.set_ylabel(ylabel)
-    axes.set_xscale(xscale)
-    axes.set_yscale(yscale)
-    axes.set_xlim(xlim)
-    axes.set_ylim(ylim)
+    axes.set_xlabel(xlabel), axes.set_ylabel(ylabel)
+    axes.set_xscale(xscale), axes.set_yscale(yscale)
+    axes.set_xlim(xlim), axes.set_ylim(ylim)
     if legend:
         axes.legend(legend)
     axes.grid()
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
-def plot(X, Y=None, xlabel=None, ylabel=None, legend=None, xlim=None,
-         ylim=None, xscale='linear', yscale='linear',
-         fmts=('-', 'm--', 'g-.', 'r:'), figsize=(3.5, 2.5), axes=None):
+def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None, ylim=None,
+         xscale='linear', yscale='linear', fmts=('-', 'm--', 'g-.', 'r:'),
+         figsize=(3.5, 2.5), axes=None):
     """Plot data points."""
-    if legend is None:
-        legend = []
-
-    set_figsize(figsize)
-    axes = axes if axes else d2l.plt.gca()
-
-    # Return True if `X` (tensor or list) has 1 axis
-    def has_one_axis(X):
+    def has_one_axis(X):  # True if `X` (tensor or list) has 1 axis
         return (hasattr(X, "ndim") and X.ndim == 1 or
                 isinstance(X, list) and not hasattr(X[0], "__len__"))
 
-    if has_one_axis(X):
-        X = [X]
+    if has_one_axis(X): X = [X]
     if Y is None:
         X, Y = [[]] * len(X), X
     elif has_one_axis(Y):
         Y = [Y]
     if len(X) != len(Y):
         X = X * len(Y)
+
+    set_figsize(figsize)
+    if axes is None: axes = d2l.plt.gca()
     axes.cla()
     for x, y, fmt in zip(X, Y, fmts):
-        if len(x):
-            axes.plot(x, y, fmt)
-        else:
-            axes.plot(y, fmt)
+        axes.plot(x, y, fmt) if len(x) else axes.plot(y, fmt)
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 
 
@@ -334,9 +327,6 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         test_acc = evaluate_accuracy(net, test_iter)
         animator.add(epoch + 1, train_metrics + (test_acc,))
     train_loss, train_acc = train_metrics
-    assert train_loss < 0.5, train_loss
-    assert train_acc <= 1 and train_acc > 0.7, train_acc
-    assert test_acc <= 1 and test_acc > 0.7, test_acc
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -552,36 +542,29 @@ def read_time_machine():
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def tokenize(lines, token='word'):
     """Split text lines into word or character tokens."""
-    if token == 'word':
-        return [line.split() for line in lines]
-    elif token == 'char':
-        return [list(line) for line in lines]
-    else:
-        print('ERROR: unknown token type: ' + token)
+    assert token in ('word', 'char'), 'Unknown token type: ' + token
+    return [line.split() if token == 'word' else list(line) for line in lines]
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 class Vocab:
     """Vocabulary for text."""
-    def __init__(self, tokens=None, min_freq=0, reserved_tokens=None):
-        if tokens is None:
-            tokens = []
-        if reserved_tokens is None:
-            reserved_tokens = []
-        # Sort according to frequencies
-        counter = count_corpus(tokens)
-        self._token_freqs = sorted(counter.items(), key=lambda x: x[1],
-                                   reverse=True)
-        # The index for the unknown token is 0
-        self.idx_to_token = ['<unk>'] + reserved_tokens
+    def __init__(self, tokens=[], min_freq=0, reserved_tokens=[]):
+        # Flatten a 2D list if needed
+        if tokens and isinstance(tokens[0], list):
+            tokens = [token for line in tokens for token in line]
+        # Count token frequencies
+        counter = collections.Counter(tokens)
+        self.token_freqs = sorted(counter.items(), key=lambda x: x[1],
+                                  reverse=True)
+        # The list of unique tokens
+        self.idx_to_token = list(
+            sorted(
+                set(['<unk>'] + reserved_tokens + [
+                    token for token, freq in self.token_freqs
+                    if freq >= min_freq])))
         self.token_to_idx = {
             token: idx for idx, token in enumerate(self.idx_to_token)}
-        for token, freq in self._token_freqs:
-            if freq < min_freq:
-                break
-            if token not in self.token_to_idx:
-                self.idx_to_token.append(token)
-                self.token_to_idx[token] = len(self.idx_to_token) - 1
 
     def __len__(self):
         return len(self.idx_to_token)
@@ -598,31 +581,17 @@ class Vocab:
 
     @property
     def unk(self):  # Index for the unknown token
-        return 0
-
-    @property
-    def token_freqs(self):  # Index for the unknown token
-        return self._token_freqs
-
-def count_corpus(tokens):
-    """Count token frequencies."""
-    # Here `tokens` is a 1D list or 2D list
-    if len(tokens) == 0 or isinstance(tokens[0], list):
-        # Flatten a list of token lists into a list of tokens
-        tokens = [token for line in tokens for token in line]
-    return collections.Counter(tokens)
+        return self.token_to_idx['<unk>']
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def load_corpus_time_machine(max_tokens=-1):
-    """Return token indices and the vocabulary of The Time Machine dataset."""
+def load_corpus_time_machine(max_tokens=None):
+    """Return token indices and the vocabulary of the time machine dataset."""
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)
-    # Since each text line in The Time Machine dataset is not necessarily a
-    # sentence or a paragraph, flatten all the text lines into a single list
     corpus = [vocab[token] for line in tokens for token in line]
-    if max_tokens > 0:
+    if max_tokens and max_tokens > 0:
         corpus = corpus[:max_tokens]
     return corpus, vocab
 
@@ -2045,7 +2014,7 @@ d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
 def read_ptb():
     """Load the PTB dataset into a list of text lines."""
     data_dir = d2l.download_extract('ptb')
-    # Read the training set.
+    # Read the training set
     with open(os.path.join(data_dir, 'ptb.train.txt')) as f:
         raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
@@ -2054,10 +2023,11 @@ def read_ptb():
 # Defined in file: ./chapter_natural-language-processing-pretraining/word-embedding-dataset.md
 def subsample(sentences, vocab):
     """Subsample high-frequency words."""
-    # Exclude unknown tokens '<unk>'
+    # Exclude unknown tokens ('<unk>')
     sentences = [[token for token in line if vocab[token] != vocab.unk]
                  for line in sentences]
-    counter = d2l.count_corpus(sentences)
+    counter = collections.Counter([
+        token for line in sentences for token in line])
     num_tokens = sum(counter.values())
 
     # Return True if `token` is kept during subsampling
