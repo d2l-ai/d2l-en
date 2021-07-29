@@ -43,7 +43,7 @@ large numbers* tell us that as the number of tosses grows this estimate will dra
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx
-from np.random import multinomial
+from mxnet.np.random import multinomial
 npx.set_np()
 ```
 

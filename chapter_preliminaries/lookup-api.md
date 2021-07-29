@@ -12,7 +12,7 @@ Due to constraints on the length of this book, we cannot possibly introduce ever
 :end_tab:
 
 
-## Finding All the Functions and Classes in a Module
+## Functions and Classes in a Module
 
 In order to know which functions and classes can be called in a module, we
 invoke the `dir` function. For instance, we can (**query all properties in the
@@ -37,7 +37,7 @@ print(dir(tf.random))
 
 Generally, we can ignore functions that start and end with `__` (special objects in Python) or functions that start with a single `_`(usually internal functions). Based on the remaining function or attribute names, we might hazard a guess that this module offers various methods for generating random numbers, including sampling from the uniform distribution (`uniform`), normal distribution (`normal`), and multinomial distribution  (`multinomial`).
 
-## Finding the Usage of Specific Functions and Classes
+## Specific Functions and Classes
 
 For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let us [**explore the usage instructions for tensors' `ones` function**].
 
@@ -78,17 +78,7 @@ window. In addition, if we use two question marks, such as
 `list??`, the Python code implementing the function will also be
 displayed.
 
-
-## Summary
-
-* The official documentation provides plenty of descriptions and examples that are beyond this book.
-* We can look up documentation for the usage of an API by calling the `dir` and `help` functions, or `?` and `??` in Jupyter notebooks.
-
-
-## Exercises
-
-1. Look up the documentation for any function or class in the deep learning framework. Can you also find the documentation on the official website of the framework?
-
+The official documentation provides plenty of descriptions and examples that are beyond this book. Our emphasis lies on covering important use cases that will allow you to get started quickly with practical problems, rather than completeness of coverage. We also encourage you to study the source code of the libraries to see examples of high quality implementations for production code. By doing this you will become a better engineer in addition to becoming a better scientist.
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/38)
@@ -101,3 +91,7 @@ displayed.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/199)
 :end_tab:
+
+```{.python .input}
+
+```
