@@ -6,7 +6,7 @@ this is not convenient or fast.
 This section will show how to implement the same language model more efficiently
 using functions provided by high-level APIs
 of a deep learning framework.
-We begin as before by reading the time machine dataset.
+We begin as before by reading *The Time Machine* dataset.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -311,6 +311,7 @@ high-level APIs of the deep learning framework.
 1. Can you make the RNN model overfit using the high-level APIs?
 1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?
 1. Implement the autoregressive model of :numref:`sec_sequence` using an RNN.
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/335)

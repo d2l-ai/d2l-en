@@ -480,7 +480,7 @@ d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
                                 '090b5e7e70c295757f55df93cb0a180b9691891a')
 
 def read_time_machine():
-    """Load the time machine dataset into a list of text lines."""
+    """Load The Time Machine dataset into a list of text lines."""
     with open(d2l.download('time_machine'), 'r') as f:
         lines = f.readlines()
     return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() for line in lines]
@@ -544,72 +544,33 @@ def load_corpus_time_machine(max_tokens=None):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_random(corpus, batch_size, num_steps):
-    """Generate a minibatch of subsequences using random sampling."""
-    # Start with a random offset (inclusive of `num_steps - 1`) to partition a
-    # sequence
-    corpus = corpus[random.randint(0, num_steps - 1):]
-    # Subtract 1 since we need to account for labels
-    num_subseqs = (len(corpus) - 1) // num_steps
-    # The starting indices for subsequences of length `num_steps`
-    initial_indices = list(range(0, num_subseqs * num_steps, num_steps))
-    # In random sampling, the subsequences from two adjacent random
-    # minibatches during iteration are not necessarily adjacent on the
-    # original sequence
-    random.shuffle(initial_indices)
-
-    def data(pos):
-        # Return a sequence of length `num_steps` starting from `pos`
-        return corpus[pos:pos + num_steps]
-
-    num_batches = num_subseqs // batch_size
-    for i in range(0, batch_size * num_batches, batch_size):
-        # Here, `initial_indices` contains randomized starting indices for
-        # subsequences
-        initial_indices_per_batch = initial_indices[i:i + batch_size]
-        X = [data(j) for j in initial_indices_per_batch]
-        Y = [data(j + 1) for j in initial_indices_per_batch]
-        yield d2l.tensor(X), d2l.tensor(Y)
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def seq_data_iter_sequential(corpus, batch_size, num_steps):
-    """Generate a minibatch of subsequences using sequential partitioning."""
-    # Start with a random offset to partition a sequence
-    offset = random.randint(0, num_steps)
-    num_tokens = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = d2l.tensor(corpus[offset:offset + num_tokens])
-    Ys = d2l.tensor(corpus[offset + 1:offset + 1 + num_tokens])
-    Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
-    num_batches = Xs.shape[1] // num_steps
-    for i in range(0, num_steps * num_batches, num_steps):
-        X = Xs[:, i:i + num_steps]
-        Y = Ys[:, i:i + num_steps]
-        yield X, Y
-
-
-# Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 class SeqDataLoader:
-    """An iterator to load sequence data."""
-    def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
-        if use_random_iter:
-            self.data_iter_fn = d2l.seq_data_iter_random
-        else:
-            self.data_iter_fn = d2l.seq_data_iter_sequential
-        self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
-        self.batch_size, self.num_steps = batch_size, num_steps
+    """The sequence data iterator generating minibatches of subsequences."""
+    def __init__(self, corpus, batch_size, num_steps):
+        self.corpus, self.b, self.n = corpus, batch_size, num_steps
 
     def __iter__(self):
-        return self.data_iter_fn(self.corpus, self.batch_size, self.num_steps)
+        # Randomly drop the first d tokens.
+        corpus = self.corpus[random.randint(0, self.n - 1):]
+        # No. of subsequences. Subtract 1 to account for labels.
+        m = (len(corpus) - 1) // self.n
+        # The starting indices for input sequences.
+        initial_indices = list(range(0, m * self.n, self.n))
+        random.shuffle(initial_indices)
+        for i in range(0, m // self.b):
+            # The randomized starting indices for this minibatch.
+            batch_indicies = initial_indices[i * self.b:(i + 1) * self.b]
+            X = [corpus[j:j + self.n] for j in batch_indicies]
+            Y = [corpus[j + 1:j + 1 + self.n] for j in batch_indicies]
+            yield d2l.tensor(X), d2l.tensor(Y)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
-def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
-                           max_tokens=10000):
+def load_data_time_machine(batch_size, num_steps, max_tokens=10000):
     """Return the iterator and the vocabulary of the time machine dataset."""
-    data_iter = SeqDataLoader(batch_size, num_steps, use_random_iter,
-                              max_tokens)
-    return data_iter, data_iter.vocab
+    corpus, vocab = d2l.load_corpus_time_machine(max_tokens)
+    data_iter = SeqDataLoader(corpus, batch_size, num_steps)
+    return data_iter, vocab
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
@@ -659,18 +620,13 @@ def grad_clipping(net, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(net, train_iter, loss, updater, device, use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater, device):
     """Train a model within one epoch (defined in Chapter 8)."""
-    state, timer = None, d2l.Timer()
+    timer = d2l.Timer()
     metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
     for X, Y in train_iter:
-        if state is None or use_random_iter:
-            # Initialize `state` when either it is the first iteration or
-            # using random sampling
-            state = net.begin_state(batch_size=X.shape[0], ctx=device)
-        else:
-            for s in state:
-                s.detach()
+        # With random sampling, initialize state for each iteration
+        state = net.begin_state(batch_size=X.shape[0], ctx=device)
         y = Y.T.reshape(-1)
         X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         with autograd.record():
@@ -684,8 +640,7 @@ def train_epoch_ch8(net, train_iter, loss, updater, device, use_random_iter):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
-              use_random_iter=False):
+def train_ch8(net, train_iter, vocab, lr, num_epochs, device):
     """Train a model (defined in Chapter 8)."""
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
@@ -701,8 +656,7 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
     predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, device)
     # Train and predict
     for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater, device,
-                                     use_random_iter)
+        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater, device)
         if (epoch + 1) % 10 == 0:
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')

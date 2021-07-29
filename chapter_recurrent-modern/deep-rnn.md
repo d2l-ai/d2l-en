@@ -15,7 +15,7 @@ we could stack multiple layers of RNNs on top of each other. This results in a f
 due to the combination of several simple layers. In particular, data might be relevant at different levels of the stack. For instance, we might want to keep high-level data about financial market conditions (bear or bull market) available, whereas at a lower level we only record shorter-term temporal dynamics.
 
 
-Beyond all the above abstract discussion 
+Beyond all the above abstract discussion
 it is probably easiest to understand the family of models we are interested in by reviewing :numref:`fig_deep_rnn`. It describes a deep RNN with $L$ hidden layers.
 Each hidden state is continuously passed to both the next time step of the current layer and the current time step of the next layer.
 
@@ -24,8 +24,8 @@ Each hidden state is continuously passed to both the next time step of the curre
 
 ## Functional Dependencies
 
-We can formalize the 
-functional dependencies 
+We can formalize the
+functional dependencies
 within the  deep architecture
 of $L$ hidden layers
 depicted in :numref:`fig_deep_rnn`.
@@ -38,10 +38,10 @@ $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of i
 At the same time step,
 let
 the hidden state of the $l^\mathrm{th}$ hidden layer  ($l=1,\ldots,L$) be $\mathbf{H}_t^{(l)}  \in \mathbb{R}^{n \times h}$ (number of hidden units: $h$)
-and 
+and
 the output layer variable be $\mathbf{O}_t \in \mathbb{R}^{n \times q}$ (number of outputs: $q$).
 Setting $\mathbf{H}_t^{(0)} = \mathbf{X}_t$,
-the hidden state of 
+the hidden state of
 the $l^\mathrm{th}$ hidden layer
 that uses the activation function $\phi_l$
 is expressed as follows:
@@ -49,7 +49,7 @@ is expressed as follows:
 $$\mathbf{H}_t^{(l)} = \phi_l(\mathbf{H}_t^{(l-1)} \mathbf{W}_{xh}^{(l)} + \mathbf{H}_{t-1}^{(l)} \mathbf{W}_{hh}^{(l)}  + \mathbf{b}_h^{(l)}),$$
 :eqlabel:`eq_deep_rnn_H`
 
-where the weights $\mathbf{W}_{xh}^{(l)} \in \mathbb{R}^{h \times h}$ and $\mathbf{W}_{hh}^{(l)} \in \mathbb{R}^{h \times h}$, together with 
+where the weights $\mathbf{W}_{xh}^{(l)} \in \mathbb{R}^{h \times h}$ and $\mathbf{W}_{hh}^{(l)} \in \mathbb{R}^{h \times h}$, together with
 the bias $\mathbf{b}_h^{(l)} \in \mathbb{R}^{1 \times h}$, are the model parameters of
 the $l^\mathrm{th}$ hidden layer.
 
@@ -64,8 +64,8 @@ Just as with MLPs, the number of hidden layers $L$ and the number of hidden unit
 In other words, they can be tuned or specified by us.
 In addition, we can easily
 get a deep gated RNN
-by replacing 
-the hidden state computation in 
+by replacing
+the hidden state computation in
 :eqref:`eq_deep_rnn_H`
 with that from a GRU or an LSTM.
 
@@ -76,7 +76,7 @@ Fortunately many of the logistical details required to implement multiple layers
 To keep things simple we only illustrate the implementation using such built-in functionalities.
 Let us take an LSTM model as an example.
 The code is very similar to the one we used previously in :numref:`sec_lstm`.
-In fact, the only difference is that we specify the number of layers explicitly rather than picking the default of a single layer. 
+In fact, the only difference is that we specify the number of layers explicitly rather than picking the default of a single layer.
 As usual, we begin by loading the dataset.
 
 ```{.python .input}
@@ -107,7 +107,7 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-The architectural decisions such as choosing hyperparameters are very similar to those of :numref:`sec_lstm`. 
+The architectural decisions such as choosing hyperparameters are very similar to those of :numref:`sec_lstm`.
 We pick the same number of inputs and outputs as we have distinct tokens, i.e., `vocab_size`.
 The number of hidden units is still 256.
 The only difference is that we now (**select a nontrivial number of hidden layers by specifying the value of `num_layers`.**)
@@ -171,6 +171,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 2. Replace the LSTM by a GRU and compare the accuracy and training speed.
 3. Increase the training data to include multiple books. How low can you go on the perplexity scale?
 4. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/340)

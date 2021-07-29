@@ -124,7 +124,7 @@ Whenever the output gate approximates 1 we effectively pass all memory informati
 
 Now let us implement an LSTM from scratch.
 As same as the experiments in :numref:`sec_rnn_scratch`,
-we first load the time machine dataset.
+we first load *The Time Machine* dataset.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -397,6 +397,7 @@ Later we will encounter alternative models such as transformers that can be used
 1. Compare the computational cost for GRUs, LSTMs, and regular RNNs for a given hidden dimension. Pay special attention to the training and inference cost.
 1. Since the candidate memory cell ensures that the value range is between $-1$ and $1$ by  using the $\tanh$ function, why does the hidden state need to use the $\tanh$ function again to ensure that the output value range is between $-1$ and $1$?
 1. Implement an LSTM model for time series prediction rather than character sequence prediction.
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/343)

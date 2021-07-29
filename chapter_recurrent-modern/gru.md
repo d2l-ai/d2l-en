@@ -161,7 +161,7 @@ In summary, GRUs have the following two distinguishing features:
 
 ## Implementation from Scratch
 
-To gain a better understanding of the GRU model, let us implement it from scratch. We begin by reading the time machine dataset that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below.
+To gain a better understanding of the GRU model, let us implement it from scratch. We begin by reading *The Time Machine* dataset that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -427,7 +427,6 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 1. Adjust the hyperparameters and analyze the their influence on running time, perplexity, and the output sequence.
 1. Compare runtime, perplexity, and the output strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
 1. What happens if you implement only parts of a GRU, e.g., with only a reset gate or only an update gate?
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/342)
