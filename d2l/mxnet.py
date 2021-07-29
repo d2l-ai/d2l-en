@@ -545,14 +545,14 @@ def load_corpus_time_machine(max_tokens=None):
 
 # Defined in file: ./chapter_recurrent-neural-networks/language-models-and-dataset.md
 class SeqDataLoader:
-    """An sequence data iterator generates minibatches by random sampling."""
+    """The sequence data iterator generating minibatches of subsequences."""
     def __init__(self, corpus, batch_size, num_steps):
         self.corpus, self.b, self.n = corpus, batch_size, num_steps
 
     def __iter__(self):
-        # Randomly drop d head tokens.
+        # Randomly drop the first d tokens.
         corpus = self.corpus[random.randint(0, self.n - 1):]
-        # Subtract 1 since we need to account for labels
+        # No. of subsequences. Subtract 1 to account for labels.
         m = (len(corpus) - 1) // self.n
         # The starting indices for input sequences.
         initial_indices = list(range(0, m * self.n, self.n))
@@ -620,18 +620,13 @@ def grad_clipping(net, theta):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch8(net, train_iter, loss, updater, device, use_random_iter):
+def train_epoch_ch8(net, train_iter, loss, updater, device):
     """Train a model within one epoch (defined in Chapter 8)."""
-    state, timer = None, d2l.Timer()
+    timer = d2l.Timer()
     metric = d2l.Accumulator(2)  # Sum of training loss, no. of tokens
     for X, Y in train_iter:
-        if state is None or use_random_iter:
-            # Initialize `state` when either it is the first iteration or
-            # using random sampling
-            state = net.begin_state(batch_size=X.shape[0], ctx=device)
-        else:
-            for s in state:
-                s.detach()
+        # With random sampling, initialize state for each iteration
+        state = net.begin_state(batch_size=X.shape[0], ctx=device)
         y = Y.T.reshape(-1)
         X, y = X.as_in_ctx(device), y.as_in_ctx(device)
         with autograd.record():
@@ -645,8 +640,7 @@ def train_epoch_ch8(net, train_iter, loss, updater, device, use_random_iter):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
-              use_random_iter=False):
+def train_ch8(net, train_iter, vocab, lr, num_epochs, device):
     """Train a model (defined in Chapter 8)."""
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
@@ -662,8 +656,7 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device,
     predict = lambda prefix: predict_ch8(prefix, 50, net, vocab, device)
     # Train and predict
     for epoch in range(num_epochs):
-        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater, device,
-                                     use_random_iter)
+        ppl, speed = train_epoch_ch8(net, train_iter, loss, updater, device)
         if (epoch + 1) % 10 == 0:
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
