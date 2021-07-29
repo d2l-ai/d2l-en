@@ -8,8 +8,8 @@ is to estimate the joint probability of the whole sequence:
 $$P(x_1, x_2, \ldots, x_T),$$
 
 where statistical tools
-introduced in :numref:`sec_sequence`
-can be useful.
+in :numref:`sec_sequence`
+can be applied.
 
 Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one token at a time $x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1)$.
 Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments.
@@ -28,7 +28,7 @@ Before introducing the model,
 let us assume that it
 processes a minibatch of sequences with predefined length
 at a time.
-Now the question is how to [**read minibatches of features and labels at random.**]
+Now the question is how to [**read minibatches of input sequences and label sequences at random.**]
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -56,45 +56,73 @@ import random
 corpus, vocab = d2l.load_corpus_time_machine()
 ```
 
-## Generating Minibatches
+## Partitioning Sequences
 
-Now the dataset is presented as a sequence of token indicies in `corpus`. Next we need to partition it into subsequences with the same number tokens, denoted by $n$. The simplest way is sampling a $n$ length subsequence at a random starting position each time. But here we follow the convention of the book to read (almost) every examples in the dataset once for each epoch, and also guarantee that we can cover all possible $n$ length subsequences. Our solution is that, at the beginning of each epoch, we drop the first $d$ tokens, where $d\in [0,n)$ is uniformly randomly sampled. Then we partition the remaining sequence into $m=\lfloor (T-d)/n \rfloor $ subsequences. Denote by $\mathbf x^t = [x_t, \ldots, x_{t+n}]$ the $n$ length subsequence starting from $x_t$. Our partition strategy will result in $m$ sequences, $\mathbf x^d, \mathbf x^{d+n}, \ldots, \mathbf x^{d+nm}.$  
+Now the dataset takes the form of a sequence of $T$ token indices in `corpus`.
+We will
+partition it
+into subsequences, where each subsequence has $n$ tokens (time steps).
+To iterate over 
+(almost) all the tokens of the entire dataset 
+for each epoch
+and obtain all possible length-$n$ subsequences,
+we can introduce randomness.
+More concretely,
+at the beginning of each epoch,
+discard the first $d$ tokens,
+where $d\in [0,n)$ is uniformly sampled at random.
+The rest of the sequence
+is then partitioned
+into $m=\lfloor (T-d)/n \rfloor$ subsequences.
+Denote by $\mathbf x_t = [x_t, \ldots, x_{t+n-1}]$ the length-$n$ subsequence starting from token $x_t$ at time step $t$. 
+The resulting $m$ partitioned subsequences
+are 
+$\mathbf x_d, \mathbf x_{d+n}, \ldots, \mathbf x_{d+n(m-1)}.$
+Each subsequence will be used as an input sequence into the language model.
 
-![Generating 5 pairs of input sequence and label sequence with a sequence length of 4.](../img/lang-model-data.svg) 
+
+For language modeling,
+the target is to predict the next token based on what tokens we have seen so far, hence the labels are the original sequence, shifted by one token.
+The label sequence for any input sequence $\mathbf x_t$
+is $\mathbf x_{t+1}$ with length $n$.
+
+![Obtaining 5 pairs of input sequences and label sequences from partitioned length-5 subsequences.](../img/lang-model-data.svg) 
 :label:`fig_lang_model_data`
 
-Each subsequence will be used as an input sequence  into the language model. Its corresponding label will also be a $n$ length sequence. In particular, if the input sequence is $\mathbf x^t$, then the label sequence is $\mathbf x^{t+1}$. It means that the $i$-th  element in the label sequence is the token after the $i$ element in the input sequence. :numref:`fig_lang_model_data` shows an example of generating 5 pairs of input sequence and label sequence with $n=4$ and $d=2$. Note that, in the autoregressive model introduced in :numref:`sec_sequence`, the label for the input sequence $\mathbf x^t$ is $x_{t+n+1}$, so the model performs one prediction for each example. While here our model needs to predict $n$ times, as there are $n$ labels in each label sequence. 
-
-The last thing is grouping examples into minibatches.  There are two common strategies. One is random sampling, in which we randomly sample $b$ examples to form a minibatch. The other one is making the $i$-th example in the minibatch is the following subsequence of the $i$-th example in the previous minibatch. In other words, if the input sequence for the latter is $\mathbf x^t$, then we use $\mathbf x^{t+n}$ as the input sequence for the former. 
+:numref:`fig_lang_model_data` shows an example of obtaining 5 pairs of input sequences and label sequences with $n=5$ and $d=2$. 
 
 
 ## [**Random Sampling**]
 
-We will use the random sampling strategy to train our neural networks. Let's implement this strategy. 
-The following data loader randomly generates a minibatch from the data each time.
-Here, the argument `batch_size` specifies the number of subsequence examples $b$ in each minibatch
-and `num_steps` is the subsequence length $n$.
+
+To train language models,
+we will randomly sample 
+pairs of input sequences and label sequences
+in minibatches.
+The following data loader randomly generates a minibatch from the dataset each time.
+The argument `batch_size` specifies the number of subsequence examples (`self.b`) in each minibatch
+and `num_steps` is the subsequence length in tokens (`self.n`).
 
 ```{.python .input}
 #@tab all
 class SeqDataLoader:  #@save
-    """An sequence data iterator generates minibatches by random sampling."""
+    """The sequence data iterator generating minibatches of subsequences."""
     def __init__(self, corpus, batch_size, num_steps):
         self.corpus, self.b, self.n = corpus, batch_size, num_steps
 
     def __iter__(self):
-        # Randomly drop d head tokens.
+        # Randomly drop the first d tokens.
         corpus = self.corpus[random.randint(0, self.n - 1):]
-        # Subtract 1 since we need to account for labels
-        m = (len(corpus) - 1) // self.n
+        # No. of subsequences. Subtract 1 to account for labels.
+        m = (len(corpus)-1) // self.n
         # The starting indices for input sequences.
-        initial_indices = list(range(0, m * self.n, self.n))
+        initial_indices = list(range(0, m*self.n, self.n))
         random.shuffle(initial_indices)
         for i in range(0, m // self.b):
             # The randomized starting indices for this minibatch.
-            batch_indicies = initial_indices[i * self.b: (i+1) * self.b]
-            X = [corpus[j : j + self.n] for j in batch_indicies]
-            Y = [corpus[j + 1 : j + 1 + self.n] for j in batch_indicies]
+            batch_indicies = initial_indices[i*self.b : (i+1) * self.b]
+            X = [corpus[j : j+self.n] for j in batch_indicies]
+            Y = [corpus[j+1 : j+1+self.n] for j in batch_indicies]
             yield d2l.tensor(X), d2l.tensor(Y)
 ```
 
@@ -114,8 +142,7 @@ for X, Y in SeqDataLoader(list(range(35)), batch_size=3, num_steps=5):
 
 ```{.python .input}
 #@tab all
-def load_data_time_machine(batch_size, num_steps,  #@save
-                           max_tokens=10000):
+def load_data_time_machine(batch_size, num_steps, max_tokens=10000):  #@save
     """Return the iterator and the vocabulary of the time machine dataset."""
     corpus, vocab = d2l.load_corpus_time_machine(max_tokens)
     data_iter = SeqDataLoader(corpus, batch_size, num_steps)
@@ -124,19 +151,17 @@ def load_data_time_machine(batch_size, num_steps,  #@save
 
 ## Summary
 
-* Language models estimate the joint probability of a text sequence
-* The main choices for reading long sequences are random sampling and sequential partitioning. The latter can ensure that the subsequences from two adjacent minibatches during iteration are adjacent on the original sequence.
+* Language models estimate the joint probability of a text sequence.
+* To train language models, we can randomly sample pairs of input sequences and label sequences in minibatches.
 
 
 ## Exercises
 
 1. How would you model a dialogue?
 1. What other methods can you think of for reading long sequence data?
-1. Consider the random offset that we use for reading long sequences.
-    1. Why is it a good idea to have a random offset?
+1. Consider our method for discarding a uniformly random number of the first few tokens at the beginning of each epoch.
     1. Does it really lead to a perfectly uniform distribution over the sequences on the document?
-    1. What would you have to do to make things even more uniform?
-1. How to modify `SeqDataLoader` to implement the sequential partitioning strategy?    
+    1. What would you have to do to make things even more uniform? 
 1. If we want a sequence example to be a complete sentence, what kind of problem does this introduce in minibatch sampling? How can we fix the problem?
 
 :begin_tab:`mxnet`
