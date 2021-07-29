@@ -124,7 +124,7 @@ Whenever the output gate approximates 1 we effectively pass all memory informati
 
 Now let us implement an LSTM from scratch.
 As same as the experiments in :numref:`sec_rnn_scratch`,
-we first load the time machine dataset.
+we first load *The Time Machine* dataset.
 
 ```{.python .input}
 from d2l import mxnet as d2l

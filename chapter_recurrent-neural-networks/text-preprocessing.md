@@ -58,7 +58,7 @@ d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
                                 '090b5e7e70c295757f55df93cb0a180b9691891a')
 
 def read_time_machine():  #@save
-    """Load the time machine dataset into a list of text lines."""
+    """Load The Time Machine dataset into a list of text lines."""
     with open(d2l.download('time_machine'), 'r') as f:
         lines = f.readlines()
     return [re.sub('[^A-Za-z]+', ' ', line).strip().lower() for line in lines]
@@ -163,7 +163,7 @@ def count_corpus(tokens):  #@save
     return collections.Counter(tokens)
 ```
 
-We [**construct a vocabulary**] using the time machine dataset as the corpus.
+We [**construct a vocabulary**] using *The Time Machine* dataset as the corpus.
 Then we print the first few frequent tokens with their indices.
 
 ```{.python .input}
@@ -183,19 +183,19 @@ for i in [0, 10]:
 
 ## Putting All Things Together
 
-Using the above functions, we [**package everything into the `load_corpus_time_machine` function**], which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of the time machine corpus.
+Using the above functions, we [**package everything into the `load_corpus_time_machine` function**], which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of *The Time Machine* corpus.
 The modifications we did here are:
 (i) we tokenize text into characters, not words, to simplify the training in later sections;
-(ii) `corpus` is a single list, not a list of token lists, since each text line in the time machine dataset is not necessarily a sentence or a paragraph.
+(ii) `corpus` is a single list, not a list of token lists, since each text line in *The Time Machine* dataset is not necessarily a sentence or a paragraph.
 
 ```{.python .input}
 #@tab all
 def load_corpus_time_machine(max_tokens=-1):  #@save
-    """Return token indices and the vocabulary of the time machine dataset."""
+    """Return token indices and the vocabulary of The Time Machine dataset."""
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)
-    # Since each text line in the time machine dataset is not necessarily a
+    # Since each text line in The Time Machine dataset is not necessarily a
     # sentence or a paragraph, flatten all the text lines into a single list
     corpus = [vocab[token] for line in tokens for token in line]
     if max_tokens > 0:

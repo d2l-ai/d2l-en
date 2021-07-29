@@ -1,12 +1,17 @@
 # The Language Model Dataset
 :label:`sec_language_model`
 
-In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, where these tokens can be viewed as a sequence of discrete observations, such as words or characters. Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$. 
-As discussed in :numref:`sec_sequence`, we can estimate the joint probability of the whole sequence 
+In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, where these tokens can be viewed as a sequence of discrete observations, such as words or characters. Assume that the tokens in a text sequence of length $T$ are in turn $x_1, x_2, \ldots, x_T$.
+The goal of *language models*
+is to estimate the joint probability of the whole sequence:
 
-$$P(x_1, x_2, \ldots, x_T).$$
+$$P(x_1, x_2, \ldots, x_T),$$
 
-This is the goal of a *language model*. Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one token at a time $x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1)$.
+where statistical tools
+introduced in :numref:`sec_sequence`
+can be useful.
+
+Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one token at a time $x_t \sim P(x_t \mid x_{t-1}, \ldots, x_1)$.
 Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments.
 Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
 
@@ -17,7 +22,13 @@ which is easily resolved through a language model that rejects the second transl
 Likewise, in a document summarization algorithm
 it is worthwhile knowing that "dog bites man" is much more frequent than "man bites dog", or that "I want to eat grandma" is a rather disturbing statement, whereas "I want to eat, grandma" is much more benign.
 
-In the following chapters, we will use neural networks to train language models. In this chapter, we will focus on generating minibatches of sequences with a predefined length for training. Let's first load *The Time Machine* dataset.
+In the rest of the chapter, we focus on  using neural networks for language modeling
+based on *The Time Machine* dataset.
+Before introducing the model,
+let us assume that it
+processes a minibatch of sequences with predefined length
+at a time.
+Now the question is how to [**read minibatches of features and labels at random.**]
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -62,7 +73,7 @@ The last thing is grouping examples into minibatches.  There are two common stra
 We will use the random sampling strategy to train our neural networks. Let's implement this strategy. 
 The following data loader randomly generates a minibatch from the data each time.
 Here, the argument `batch_size` specifies the number of subsequence examples $b$ in each minibatch
-and `num_steps` is the subsequence length $n$. 
+and `num_steps` is the subsequence length $n$.
 
 ```{.python .input}
 #@tab all

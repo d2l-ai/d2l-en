@@ -6,7 +6,7 @@ this is not convenient or fast.
 This section will show how to implement the same language model more efficiently
 using functions provided by high-level APIs
 of a deep learning framework.
-We begin as before by reading the time machine dataset.
+We begin as before by reading *The Time Machine* dataset.
 
 ```{.python .input}
 from d2l import mxnet as d2l
