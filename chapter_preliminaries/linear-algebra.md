@@ -136,7 +136,7 @@ $$\mathbf{x} =\begin{bmatrix}x_{1}  \\ \vdots  \\x_{n}\end{bmatrix},$$
 Here $x_1, \ldots, x_n$ are elements of the vector.
 Later on, we will distinguish between such *column vectors*
 and *row vectors* whose elements are stacked horizontally.
-Recall that [**we access a tensor's elements via indexing.**)
+Recall that [**we access a tensor's elements via indexing.**]
 
 ```{.python .input}
 x[2]
@@ -342,7 +342,7 @@ where distinct images are indexed
 along the first axis.
 Higher order tensors are constructed analagously 
 to vectors and matrices,
-by growing the number of shape components. 
+by growing the number of shape components.
 
 ```{.python .input}
 np.arange(24).reshape(2, 3, 4)
