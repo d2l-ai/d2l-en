@@ -15,9 +15,9 @@ providing the basis for more complex techniques in the rest of the book.
 :maxdepth: 2
 
 linear-regression
+api
 linear-regression-scratch
 linear-regression-concise
-api
 softmax-regression
 image-classification-dataset
 softmax-regression-scratch
