@@ -8,11 +8,9 @@ def _unnumber_chaps_and_secs(lines):
         UNNUMBERED = {'\\section{Summary',
                       '\\section{Exercise',
                       '\\section{Exercises',
-                      '\\section{Discussions',
                       '\\subsection{Summary',
                       '\\subsection{Exercise',
-                      '\\subsection{Exercises',
-                      '\\subsection{Discussions'}
+                      '\\subsection{Exercises'}
         for unnum in UNNUMBERED:
             if l.startswith(unnum):
                 return True
@@ -102,7 +100,7 @@ def main():
 
     _unnumber_chaps_and_secs(lines)
     _sec_to_chap(lines)
-    lines = _delete_discussions_title(lines)
+    #lines = _delete_discussions_title(lines)
 
     with open(tex_file, 'w') as f:
         f.write('\n'.join(lines))
