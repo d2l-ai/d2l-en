@@ -3,7 +3,7 @@
 
 For a long time, how to calculate 
 the area of a circle remained a mystery.
-Then, the anceient Greek mathematician Archimedes
+Then, the ancient Greek mathematician Archimedes
 came up with the clever idea 
 to inscribe a series of polygons 
 with increasing numbers of vertices
@@ -64,7 +64,7 @@ or converge to a some value)
 as a specified variable 
 approaches a particular value.
 This limit tells us what 
-the ratio between a peturbation $h$
+the ratio between a perturbation $h$
 and the change in the function value 
 $f(x + h) - f(x)$ converges to 
 as we shrink its size to zero.
@@ -320,7 +320,7 @@ we have $\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}$.
 ## Chain Rule
 
 In deep learning, the gradients of concern
-are often difficult to caclulate
+are often difficult to calculate
 because we are working with 
 deeply nested functions 
 (of functions (of functions...)).
@@ -362,7 +362,7 @@ in building deep learning systems.
 While we have just scratched the surface of a deep topic,
 a number of concepts already come into focus: 
 first, the composition rules for differentiation 
-allow us to compute the derivatives of complex functinos
+allow us to compute the derivatives of complex functions
 *automatically* by rote application.
 This task requires no creativity and thus 
 we can focus our cognitive powers elsewhere.
@@ -379,7 +379,7 @@ a computational procedure for applying the chain rule.
 From the viewpoint of optimization, gradients allow us 
 to determine how to move the parameters of a model
 in order to lower the loss,
-and each step of the optization algorithms used 
+and each step of the optimization algorithms used 
 throughout this book will require calculating the gradient.
 
 ## Exercises
