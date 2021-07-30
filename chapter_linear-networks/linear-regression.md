@@ -54,7 +54,7 @@ are called *weights*, and $b$ is called a *bias*
 The weights determine the influence of each feature
 on our prediction. The bias determines the value of the estimate when all features are zero.
 Even though we will never see any newly-built homes with zero area,
-we still need the bias, lest we limit the expressivity of our model. For instance, the property value of a house is also determined by the land it is built on. 
+we still need the bias, lest we limit the expressiveness of our model. For instance, the property value of a house is also determined by the land it is built on. 
 
 Given a dataset, our goal is to choose
 the weights $\mathbf{w}$ and the bias $b$ such that on average,
@@ -228,71 +228,72 @@ The other extreme is to consider only a single example at a time and to take
 update steps based on one observation at a time. The resulting algorithm, 
 *Stochastic Gradient Descent* (SGD) can be an effective 
 strategy \cite{bottou2010large}, even for large datasets. Unfortunately, SGD
-has a number of drawbacks, when implemented on modern CPUs or GPUs. 
+has drawbacks, both computational and statistical. One problem arises from the 
+fact that processors are a lot faster
+multiplying and adding numbers than they are at moving data from main memory to 
+processor cache. It is up to an order of magnitude more efficient to 
+perform a matrix-vector multiplication than a corresponding number of 
+vector-vector operations. This means that it can take a lot longer to process
+one sample at a time compared to a full batch. A second problem is that some of
+the layers, such as Batch Normalization which is described in :ref:`sec_batch_norm`, 
+only work well when we have access to more than one observation at a time.
 
-xxx
+The solution to both problems is to pick an intermediate strategy: rather than taking a 
+full batch or only a single sample at a time we take a *minibatch* of observations :cite:`li2014efficient`. The
+specific choice of the size of said minibatch depends on many factors, such as the amount
+of memory, the number of accelerators, the choice of layers, and the total dataset size. 
+Despite all of that, a number between 32 and 256, preferably a multiple of a large power 
+of $2$, is a good start. This leads us to *minibatch stochastic gradient descent*:
 
-Thus, we will often settle for sampling a random minibatch of examples
-every time we need to compute the update,
-a variant called *minibatch stochastic gradient descent*.
-
-In each iteration, we first randomly sample a minibatch $\mathcal{B}$
+In its most basic form, in each iteration, we first randomly sample a minibatch $\mathcal{B}$
 consisting of a fixed number of training examples.
 We then compute the derivative (gradient) of the average loss
 on the minibatch with regard to the model parameters.
-Finally, we multiply the gradient by a predetermined positive value $\eta$
+Finally, we multiply the gradient by a predetermined small positive value $\eta$, 
+referred to as the *learning rate*,
 and subtract the resulting term from the current parameter values.
-
-We can express the update mathematically as follows
-($\partial$ denotes the partial derivative):
+We can express the update as follows:
 
 $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{(\mathbf{w},b)} l^{(i)}(\mathbf{w},b).$$
 
-
-To summarize, steps of the algorithm are the following:
-(i) we initialize the values of the model parameters, typically at random;
-(ii) we iteratively sample random minibatches from the data,
+In summary, minibatch SGD proceeds as follows: 
+(i) initialize the values of the model parameters, typically at random;
+(ii) iteratively sample random minibatches from the data,
 updating the parameters in the direction of the negative gradient.
 For quadratic losses and affine transformations,
 we can write this out explicitly as follows:
 
-$$\begin{aligned} \mathbf{w} &\leftarrow \mathbf{w} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\ b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
+$$\begin{aligned} 
+\mathbf{w} & \leftarrow \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) & = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)\\ 
+b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  & = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
 :eqlabel:`eq_linreg_batch_update`
 
-
-Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors in :eqref:`eq_linreg_batch_update`.
-Here, the more elegant vector notation makes the math
-much more readable than expressing things in terms of coefficients,
-say $w_1, w_2, \ldots, w_d$.
-The set cardinality
-$|\mathcal{B}|$ represents
-the number of examples in each minibatch (the *batch size*)
-and $\eta$ denotes the *learning rate*.
-We emphasize that the values of the batch size and learning rate
-are manually pre-specified and not typically learned through model training.
-These parameters that are tunable but not updated
+Since we pick a minibatch $\mathcal{B}$ we need to normalize by its size
+$|\mathcal{B}|$. Frequently minibatch size and learning rate are user-defined. 
+Such tunable parameters that are not updated 
 in the training loop are called *hyperparameters*.
-*Hyperparameter tuning* is the process by which hyperparameters are chosen,
-and typically requires that we adjust them
-based on the results of the training loop
-as assessed on a separate *validation dataset* (or *validation set*).
+They can be tuned automatically by a number of techniques, such as Bayesian Optimization
+:cite:`frazier2018tutorial`. In the end, the quality of the solution is 
+typically assessed on a separate *validation dataset* (or *validation set*).
 
 After training for some predetermined number of iterations
 (or until some other stopping criteria are met),
 we record the estimated model parameters,
 denoted $\hat{\mathbf{w}}, \hat{b}$.
 Note that even if our function is truly linear and noiseless,
-these parameters will not be the exact minimizers of the loss
-because, although the algorithm converges slowly towards the minimizers
-it cannot achieve it exactly in a finite number of steps.
+these parameters will not be the exact minimizers of the loss, or even deterministic. 
+Although the algorithm converges slowly towards the minimizers
+it typically cannot achieve it exactly in a finite number of steps. Moreover, the minibatches $\mathcal{B}$ 
+used to update the parameters are chosen at random. This breaks determinism.
 
-Linear regression happens to be a learning problem where there is only one minimum
-over the entire domain.
-However, for more complicated models, like deep networks,
+Linear regression, just like other convex models, happens to be a learning problem 
+with a global minimum. In most cases (as long as $\mathbf{X}^\top \mathbf{X}$ is invertible) 
+where there is only one minimum. 
+However, for most deep networks,
 the loss surfaces contain many minima.
 Fortunately, for reasons that are not yet fully understood,
 deep learning practitioners seldom struggle to find parameters
-that minimize the loss *on training sets*.
+that minimize the loss *on training sets* :cite:`izmailov2018averaging,frankle2018lottery`.
 The more formidable task is to find parameters
 that will achieve low loss on data
 that we have not seen before,
@@ -300,16 +301,19 @@ a challenge called *generalization*.
 We return to these topics throughout the book.
 
 
-### Making Predictions with the Learned Model
+### Predictions
 
-
-Given the learned linear regression model
+Given the model
 $\hat{\mathbf{w}}^\top \mathbf{x} + \hat{b}$,
 we can now estimate the price of a new house
-(not contained in the training data)
+(not contained in the training data),
 given its area $x_1$ and age $x_2$.
-Estimating targets given features is
-commonly called *prediction* or *inference*.
+
+In deep learning this process is often referred 
+as *prediction* or *inference*. While the latter is 
+emerging as standard jargon in deep learning (e.g., the [MLPerf](http://mlperf.org/) 
+benchmark has a training and an inference section), 
+it 
 
 We will try to stick with *prediction* because
 calling this step *inference*,
@@ -329,7 +333,7 @@ Doing this efficiently requires that (**we**) (~~should~~) (**vectorize the calc
 and leverage fast linear algebra libraries
 rather than writing costly for-loops in Python.**)
 
-```{.python .input}
+```{.python .input  n=1}
 %matplotlib inline
 from d2l import mxnet as d2l
 import math
@@ -337,7 +341,7 @@ from mxnet import np
 import time
 ```
 
-```{.python .input}
+```{.python .input  n=1}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
@@ -364,7 +368,7 @@ containing all ones.
 In one method we will loop over the vectors with a Python for-loop.
 In the other method we will rely on a single call to `+`.
 
-```{.python .input}
+```{.python .input  n=2}
 #@tab all
 n = 10000
 a = d2l.ones(n)
@@ -375,7 +379,7 @@ Now we can benchmark the workloads.
 First, [**we add them, one coordinate at a time,
 using a for-loop.**]
 
-```{.python .input}
+```{.python .input  n=3}
 #@tab mxnet, pytorch
 c = d2l.zeros(n)
 t = time.time()
@@ -395,7 +399,7 @@ f'{time.time() - t:.5f} sec'
 
 (**Alternatively, we rely on the reloaded `+` operator to compute the elementwise sum.**)
 
-```{.python .input}
+```{.python .input  n=4}
 #@tab all
 t = time.time()
 d = a + b
@@ -429,7 +433,7 @@ $$p(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (x - \m
 
 Below [**we define a Python function to compute the normal distribution**].
 
-```{.python .input}
+```{.python .input  n=3}
 #@tab all
 def normal(x, mu, sigma):
     p = 1 / math.sqrt(2 * math.pi * sigma**2)
@@ -438,7 +442,7 @@ def normal(x, mu, sigma):
 
 We can now (**visualize the normal distributions**).
 
-```{.python .input}
+```{.python .input  n=8}
 #@tab all
 # Use numpy again for visualization
 x = np.arange(-7, 7, 0.01)
@@ -625,8 +629,7 @@ statistics, and computer science.
 [Discussions](https://discuss.d2l.ai/t/259)
 :end_tab:
 
-FIXME: will move timer to a later chapter... 
-
+FIXME: will move timer to a later chapter...
 
 ```{.python .input}
 #@tab all
