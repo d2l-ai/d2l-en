@@ -188,4 +188,14 @@ len(corpus), len(vocab)
 1. Tokenization is a key preprocessing step. It varies for different languages. Try to find another three commonly used methods to tokenize text.
 1. In the experiment of this section, tokenize text into words and vary the `min_freq` arguments of the `Vocab` instance. How does this affect the vocabulary size?
 
+:begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/115)
+:end_tab:
+
+:begin_tab:`pytorch`
+[Discussions](https://discuss.d2l.ai/t/3857)
+:end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/3858)
+:end_tab:
