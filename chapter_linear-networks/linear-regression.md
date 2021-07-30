@@ -1,87 +1,60 @@
 # Linear Regression
 :label:`sec_linear_regression`
 
-*Regression* refers to a set of methods for modeling
-the relationship between one or more independent variables
-and a dependent variable.
-In the natural sciences and social sciences,
-the purpose of regression is most often to
-*characterize* the relationship between the inputs and outputs.
-Machine learning, on the other hand,
-is most often concerned with *prediction*.
-
 Regression problems pop up whenever we want to predict a numerical value.
 Common examples include predicting prices (of homes, stocks, etc.),
-predicting length of stay (for patients in the hospital),
+predicting the length of stay (for patients in the hospital),
 demand forecasting (for retail sales), among countless others.
 Not every prediction problem is a classic regression problem.
-In subsequent sections, we will introduce classification problems,
+Later on, we will introduce classification problems,
 where the goal is to predict membership among a set of categories.
 
 
-## Basic Elements of Linear Regression
+## Basics
 
 *Linear regression* may be both the simplest
 and most popular among the standard tools to regression.
-Dating back to the dawn of the 19th century,
+Dating back to the dawn of the 19th century :cite:`legendre1805memoire,gauss1809theoria`,
 linear regression flows from a few simple assumptions.
-First, we assume that the relationship between
-the independent variables $\mathbf{x}$ and the dependent variable $y$ is linear,
+First, we assume that the relationship between the features $\mathbf{x}$ and the targets $y$ is linear,
 i.e., that $y$ can be expressed as a weighted sum
-of the elements in $\mathbf{x}$,
-given some noise on the observations.
-Second, we assume that any noise is well-behaved
-(following a Gaussian distribution).
+of the elements in $\mathbf{x}$ plus some observation noise. 
+Second, we assume that any noise is well-behaved, such as following a Gaussian distribution.
 
-To motivate the approach, let us start with a running example.
 Suppose that we wish to estimate the prices of houses (in dollars)
 based on their area (in square feet) and age (in years).
-To actually develop a model for predicting house prices,
-we would need to get our hands on a dataset
-consisting of sales for which we know
-the sale price, area, and age for each home.
+To develop a model for predicting house prices,
+we need to get our hands on data consisting of sales, including the sales price, area, and age for each home. 
 In the terminology of machine learning,
 the dataset is called a *training dataset* or *training set*,
-and each row (here the data corresponding to one sale)
-is called an *example* (or *data point*, *data instance*, *sample*).
+and each row (containing the data corresponding to one sale)
+is called an *example* (or *data point*, *instance*, *sample*).
 The thing we are trying to predict (price)
 is called a *label* (or *target*).
-The independent variables (age and area)
+The variables (age and area)
 upon which the predictions are based
 are called *features* (or *covariates*).
 
 Typically, we will use $n$ to denote
-the number of examples in our dataset.
-We index the data examples by $i$, denoting each input
-as $\mathbf{x}^{(i)} = [x_1^{(i)}, x_2^{(i)}]^\top$
-and the corresponding label as $y^{(i)}$.
+the number of examples in our dataset. We use superscripts to enumerate samples and targets, and subscripts to index coordinates. $\mathbf{x}^{(i)}$ denotes the $i$-th sample and $x_j^{(i)}$ denotes its $j$-th coordinate. 
 
 
-### Linear Model
+### Model
 :label:`subsec_linear_model`
 
-The linearity assumption just says that the target (price)
+At the heart of every solution is a model that describes how features can be transformed into estimates of targets. Since we use a linear model this means that we assume that the target (price)
 can be expressed as a weighted sum of the features (area and age):
 
 $$\mathrm{price} = w_{\mathrm{area}} \cdot \mathrm{area} + w_{\mathrm{age}} \cdot \mathrm{age} + b.$$
 :eqlabel:`eq_price-area`
 
-In :eqref:`eq_price-area`, $w_{\mathrm{area}}$ and $w_{\mathrm{age}}$
+Here $w_{\mathrm{area}}$ and $w_{\mathrm{age}}$
 are called *weights*, and $b$ is called a *bias*
-(also called an *offset* or *intercept*).
+(or *offset* or *intercept*).
 The weights determine the influence of each feature
-on our prediction and the bias just says
-what value the predicted price should take
-when all of the features take value 0.
-Even if we will never see any homes with zero area,
-or that are precisely zero years old,
-we still need the bias or else we will
-limit the expressivity of our model.
-Strictly speaking, :eqref:`eq_price-area` is an *affine transformation*
-of input features,
-which is characterized by
-a *linear transformation* of features via weighted sum, combined with
-a *translation* via the added bias.
+on our prediction. The bias determines the value of the estimate when all features are zero.
+Even though we will never see any newly-built homes with zero area,
+we still need the bias, lest we limit the expressivity of our model. For instance, the property value of a house is also determined by the land it is built on. 
 
 Given a dataset, our goal is to choose
 the weights $\mathbf{w}$ and the bias $b$ such that on average,
@@ -92,12 +65,11 @@ is determined by the affine transformation of input features
 are *linear models*,
 where the affine transformation is specified by the chosen weights and bias.
 
-
 In disciplines where it is common to focus
 on datasets with just a few features,
-explicitly expressing models long-form like this is common.
+explicitly expressing models long-form like in :eqref:`eq_price-area` is common.
 In machine learning, we usually work with high-dimensional datasets,
-so it is more convenient to employ linear algebra notation.
+so it is more convenient to employ more compact linear algebra notation.
 When our inputs consist of $d$ features,
 we express our prediction $\hat{y}$ (in general the "hat" symbol denotes estimates) as
 
@@ -123,7 +95,7 @@ can be expressed via the matrix-vector product:
 
 $${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b,$$
 
-where broadcasting (see :numref:`subsec_broadcasting`) is applied during the summation.
+where broadcasting (:numref:`subsec_broadcasting`) is applied during the summation.
 Given features of a training dataset $\mathbf{X}$
 and corresponding (known) labels $\mathbf{y}$,
 the goal of linear regression is to find
@@ -131,7 +103,6 @@ the weight vector $\mathbf{w}$ and the bias term $b$
 that given features of a new data example
 sampled from the same distribution as $\mathbf{X}$,
 the new example's label will (in expectation) be predicted with the lowest error.
-
 
 Even if we believe that the best model for
 predicting $y$ given $\mathbf{x}$ is linear,
@@ -153,7 +124,7 @@ and (ii) a procedure for updating the model to improve its quality.
 
 ### Loss Function
 
-Before we start thinking about how to *fit* data with our model,
+Before we start thinking about *how* to fit data with our model,
 we need to determine a measure of *fitness*.
 The *loss function* quantifies the distance
 between the *real* and *predicted* value of the target.
@@ -183,7 +154,8 @@ as shown in :numref:`fig_fit_linreg`.
 Note that large differences between
 estimates $\hat{y}^{(i)}$ and observations $y^{(i)}$
 lead to even larger contributions to the loss,
-due to the quadratic dependence.
+due to the quadratic dependence (this can be a double-edge sword. While it encourages
+the model to avoid large errors it can also lead to excessive sensitivity to anomalous data).
 To measure the quality of a model on the entire dataset of $n$ examples,
 we simply average (or equivalently, sum)
 the losses on the training set.
@@ -207,7 +179,16 @@ Then our prediction problem is to minimize $\|\mathbf{y} - \mathbf{X}\mathbf{w}\
 There is just one critical point on the loss surface
 and it corresponds to the minimum of the loss over the entire domain.
 Taking the derivative of the loss with respect to $\mathbf{w}$
-and setting it equal to zero yields the analytic (closed-form) solution:
+and setting it equal to zero yields:
+
+$$\begin{aligned}
+    \partial_{\mathbf{w}} \|\mathbf{y} - \mathbf{X}\mathbf{w}\|^2 = 
+    2 \mathbf{X}^\top (\mathbf{X} \mathbf{w} - \mathbf{y}) = 0
+    \text{ and hence }
+    \mathbf{X}^\top \mathbf{y} = \mathbf{X}^\top \mathbf{X} \mathbf{w}
+\end{aligned}$$
+
+Solving for $\mathbf{w}$ provides us with the optimal solution for the optimization problem. Note that this only exists if the matrix $\mathbf X^\top \mathbf X$ is invertible, i.e., if the design matrix covers a sufficiently rich space :cite:`golub1996matrix`. 
 
 $$\mathbf{w}^* = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf{y}.$$
 
@@ -216,10 +197,9 @@ may admit analytic solutions,
 you should not get used to such good fortune.
 Although analytic solutions allow for nice mathematical analysis,
 the requirement of an analytic solution is so restrictive
-that it would exclude all of deep learning.
+that it would exclude almost all exciting aspects of deep learning.
 
-
-### Minibatch Stochastic Gradient Descent
+### Stochastic Gradient Descent
 
 Even in cases where we cannot solve the models analytically,
 it turns out that we can still train models effectively in practice.
@@ -239,7 +219,19 @@ consists of taking the derivative of the loss function,
 which is an average of the losses computed
 on every single example in the dataset.
 In practice, this can be extremely slow:
-we must pass over the entire dataset before making a single update.
+we must pass over the entire dataset before making a single update, 
+even if the update steps might be very powerful :cite:`liu1989limited`.
+Even worse, if there is a lot of redundancy in the training data, 
+the benefit of a full update is even lower. 
+
+The other extreme is to consider only a single example at a time and to take
+update steps based on one observation at a time. The resulting algorithm, 
+*Stochastic Gradient Descent* (SGD) can be an effective 
+strategy \cite{bottou2010large}, even for large datasets. Unfortunately, SGD
+has a number of drawbacks, when implemented on modern CPUs or GPUs. 
+
+xxx
+
 Thus, we will often settle for sampling a random minibatch of examples
 every time we need to compute the update,
 a variant called *minibatch stochastic gradient descent*.
