@@ -278,7 +278,7 @@ class RNNModelScratch:  #@save
 ```{.python .input}
 #@tab pytorch
 class RNNModelScratch: #@save
-    """A RNN Model implemented from scratch."""
+    """An RNN Model implemented from scratch."""
     def __init__(self, vocab_size, num_hiddens, device,
                  get_params, init_state, forward_fn):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -296,7 +296,7 @@ class RNNModelScratch: #@save
 ```{.python .input}
 #@tab tensorflow
 class RNNModelScratch: #@save
-    """A RNN Model implemented from scratch."""
+    """An RNN Model implemented from scratch."""
     def __init__(self, vocab_size, num_hiddens,
                  init_state, forward_fn, get_params):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -653,7 +653,6 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device):  #@save
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
-    print(predict('traveller'))
 ```
 
 ```{.python .input}
@@ -675,11 +674,9 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, device):
         ppl, speed = train_epoch_ch8(
             net, train_iter, loss, updater, device)
         if (epoch + 1) % 10 == 0:
-            print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
-    print(predict('traveller'))
 ```
 
 ```{.python .input}
@@ -697,12 +694,10 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, strategy):
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(net, train_iter, loss, updater)
         if (epoch + 1) % 10 == 0:
-            print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
     device = d2l.try_gpu()._device_name
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
-    print(predict('traveller'))
 ```
 
 [**Now we can train the RNN model.**]
@@ -710,13 +705,13 @@ Since we only use 10000 tokens in the dataset, the model needs more epochs to co
 
 ```{.python .input}
 #@tab mxnet,pytorch
-num_epochs, lr = 500, 1
+num_epochs, lr = 500, 1.5
 train_ch8(net, train_iter, vocab, lr, num_epochs, d2l.try_gpu())
 ```
 
 ```{.python .input}
 #@tab tensorflow
-num_epochs, lr = 500, 1
+num_epochs, lr = 500, 1.5
 train_ch8(net, train_iter, vocab, lr, num_epochs, strategy)
 ```
 

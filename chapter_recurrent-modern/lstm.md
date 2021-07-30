@@ -328,7 +328,7 @@ Let us train an LSTM as same as what we did in :numref:`sec_gru`, by instantiati
 ```{.python .input}
 #@tab mxnet, pytorch
 vocab_size, num_hiddens, device = len(vocab), 256, d2l.try_gpu()
-num_epochs, lr = 500, 1
+num_epochs, lr = 500, 2
 model = d2l.RNNModelScratch(len(vocab), num_hiddens, device, get_lstm_params,
                             init_lstm_state, lstm)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
@@ -337,7 +337,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, device)
 ```{.python .input}
 #@tab tensorflow
 vocab_size, num_hiddens, device_name = len(vocab), 256, d2l.try_gpu()._device_name
-num_epochs, lr = 500, 1
+num_epochs, lr = 500, 2
 strategy = tf.distribute.OneDeviceStrategy(device_name)
 with strategy.scope():
     model = d2l.RNNModelScratch(len(vocab), num_hiddens, init_lstm_state, lstm, get_lstm_params)
@@ -397,7 +397,6 @@ Later we will encounter alternative models such as transformers that can be used
 1. Compare the computational cost for GRUs, LSTMs, and regular RNNs for a given hidden dimension. Pay special attention to the training and inference cost.
 1. Since the candidate memory cell ensures that the value range is between $-1$ and $1$ by  using the $\tanh$ function, why does the hidden state need to use the $\tanh$ function again to ensure that the output value range is between $-1$ and $1$?
 1. Implement an LSTM model for time series prediction rather than character sequence prediction.
-
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/343)

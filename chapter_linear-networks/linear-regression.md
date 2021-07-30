@@ -371,39 +371,6 @@ a = d2l.ones(n)
 b = d2l.ones(n)
 ```
 
-Since we will benchmark the running time frequently in this book,
-[**let us define a timer**].
-
-```{.python .input}
-#@tab all
-class Timer:  #@save
-    """Record multiple running times."""
-    def __init__(self):
-        self.times = []
-        self.start()
-
-    def start(self):
-        """Start the timer."""
-        self.tik = time.time()
-
-    def stop(self):
-        """Stop the timer and record the time in a list."""
-        self.times.append(time.time() - self.tik)
-        return self.times[-1]
-
-    def avg(self):
-        """Return the average time."""
-        return sum(self.times) / len(self.times)
-
-    def sum(self):
-        """Return the sum of time."""
-        return sum(self.times)
-
-    def cumsum(self):
-        """Return the accumulated time."""
-        return np.array(self.times).cumsum().tolist()
-```
-
 Now we can benchmark the workloads.
 First, [**we add them, one coordinate at a time,
 using a for-loop.**]
@@ -411,28 +378,28 @@ using a for-loop.**]
 ```{.python .input}
 #@tab mxnet, pytorch
 c = d2l.zeros(n)
-timer = Timer()
+t = time.time()
 for i in range(n):
     c[i] = a[i] + b[i]
-f'{timer.stop():.5f} sec'
+f'{time.time() - t:.5f} sec'
 ```
 
 ```{.python .input}
 #@tab tensorflow
 c = tf.Variable(d2l.zeros(n))
-timer = Timer()
+t = time.time()
 for i in range(n):
     c[i].assign(a[i] + b[i])
-f'{timer.stop():.5f} sec'
+f'{time.time() - t:.5f} sec'
 ```
 
 (**Alternatively, we rely on the reloaded `+` operator to compute the elementwise sum.**)
 
 ```{.python .input}
 #@tab all
-timer.start()
+t = time.time()
 d = a + b
-f'{timer.stop():.5f} sec'
+f'{time.time() - t:.5f} sec'
 ```
 
 You probably noticed that the second method
@@ -657,3 +624,36 @@ statistics, and computer science.
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/259)
 :end_tab:
+
+FIXME: will move timer to a later chapter... 
+
+
+```{.python .input}
+#@tab all
+class Timer:  #@save
+    """Record multiple running times."""
+    def __init__(self):
+        self.times = []
+        self.start()
+
+    def start(self):
+        """Start the timer."""
+        self.tik = time.time()
+
+    def stop(self):
+        """Stop the timer and record the time in a list."""
+        self.times.append(time.time() - self.tik)
+        return self.times[-1]
+
+    def avg(self):
+        """Return the average time."""
+        return sum(self.times) / len(self.times)
+
+    def sum(self):
+        """Return the sum of time."""
+        return sum(self.times)
+
+    def cumsum(self):
+        """Return the accumulated time."""
+        return np.array(self.times).cumsum().tolist()
+```

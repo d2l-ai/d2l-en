@@ -598,7 +598,7 @@ def load_data_time_machine(batch_size, num_steps, max_tokens=10000):
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch:
-    """A RNN Model implemented from scratch."""
+    """An RNN Model implemented from scratch."""
     def __init__(self, vocab_size, num_hiddens, init_state, forward_fn,
                  get_params):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -687,12 +687,10 @@ def train_ch8(net, train_iter, vocab, lr, num_epochs, strategy):
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(net, train_iter, loss, updater)
         if (epoch + 1) % 10 == 0:
-            print(predict('time traveller'))
             animator.add(epoch + 1, [ppl])
     device = d2l.try_gpu()._device_name
     print(f'perplexity {ppl:.1f}, {speed:.1f} tokens/sec on {str(device)}')
     print(predict('time traveller'))
-    print(predict('traveller'))
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-concise.md
