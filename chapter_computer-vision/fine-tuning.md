@@ -220,9 +220,9 @@ the number of classes in the target dataset (rather than 1000).
 
 
 
-In the following code, the model parameters in the member variable features of the target model instance finetune_net are initialized to the model parameters of the corresponding layer of the source model. Since the model parameters in the features are pre-trained on the ImageNet data set and are good enough, generally only a small learning rate is needed to fine-tune these parameters. 
+In the following code, the model parameters in the member variable features of the target model instance `finetune_net` are initialized to the model parameters of the corresponding layer of the source model. Since the model parameters in the features are pre-trained on the ImageNet data set and are good enough, generally only a small learning rate is needed to fine-tune these parameters. 
 
-The model parameters in the member variable output are initialized randomly, and generally require a larger learning rate to train from scratch. Assuming that the learning rate in the Trainer instance is η, we set the learning rate of the model parameters in the member variable output to be 10η in the iteration.
+The model parameters in the member variable output are initialized randomly, and generally require a larger learning rate to train from scratch. Assuming that the learning rate in the Trainer instance is $\eta$, we set the learning rate of the model parameters in the member variable output to be $10\eta$ in the iteration.
 
 
 In the code below, the model parameters before the output layer of the target model instance `finetune_net` are initialized to model parameters of the corresponding layers from the source model.
