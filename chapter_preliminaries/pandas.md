@@ -21,8 +21,7 @@ Comma-separated values (CSV) files are ubiquitous
 for storing tabular (spreadsheet-like) data.
 Here, each line corresponds to one record
 and consists of several (comma-separated) fields, e.g.,
-"Albert Einstein, March 14 1879, Ulm, Federal polytechnic school,
-Accomplishments in the field of gravitational physics".
+"Albert Einstein,March 14 1879,Ulm,Federal polytechnic school,Accomplishments in the field of gravitational physics".
 To demonstrate how to load CSV files with `pandas`, 
 we (**create a CSV file below**) `../data/house_tiny.csv`. 
 This file represents a dataset of homes,
@@ -62,14 +61,14 @@ given some set of *input* values.
 Our first step in processing the dataset
 is to separate out columns corresponding
 to input versus target values. 
-We can selecting columns either by name or
+We can select columns either by name or
 via integer-location based indexing (`iloc`).
 
 You might have noticed that `pandas` replaced
 all CSV entries with value `NA`
-with a special "NaN" (*not a number*) value. 
+with a special `NaN` (*not a number*) value. 
 This can also happen whenever an entry is empty,
-e.g. "3,,,270000".
+e.g., "3,,,270000".
 These are called *missing values* 
 and they are the "bed bugs" of data science,
 a persistent menace that you will confront
@@ -83,15 +82,15 @@ while deletion simply discards
 either those rows or those columns
 that contain missing values. 
 
-Here are some commom imputation heuristics.
+Here are some common imputation heuristics.
 [**For categorical input fields, 
-we can treat "NaN" as a category.**]
-Since the "RoofType" column takes values "Slate" and "NaN",
+we can treat `NaN` as a category.**]
+Since the `RoofType` column takes values `Slate` and `NaN`,
 `pandas` can convert this column 
 into two columns `RoofType_Slate` and `RoofType_nan`.
 A row whose alley type is `Slate` will set values 
-of `RoofType_Slate` and `RoofType_nan` to 1 and 0, respectively. 
-The converse holds for a row with a missing RoofType value.
+of `RoofType_Slate` and `RoofType_nan` to 1 and 0, respectively.
+The converse holds for a row with a missing `RoofType` value.
 
 ```{.python .input}
 #@tab all
@@ -144,7 +143,7 @@ X, y
 You now know how to partition data columns, 
 impute missing variables, 
 and load `pandas` data into tensors. 
-In :ref:`sec_kaggle_house`, you will
+In :numref:`sec_kaggle_house`, you will
 pick up some more data processing skills. 
 While this crash course kept things simple,
 data processing can get hairy.
@@ -154,12 +153,12 @@ extracted from a relational database.
 For instance, in an e-commerce application,
 customer addresses might live in one table
 and purchase data in another.
-Moreover, pracitioners face myriad data types
+Moreover, practitioners face myriad data types
 beyond categorical and numeric. 
 Other data types include text strings, images,
 audio data, and point clouds. 
 Oftentimes, advanced tools and efficient algorithms 
-are required to prefent data processing form becoming
+are required to prevent data processing from becoming
 the biggest bottleneck in the machine learning pipeline. 
 These problems will arise when we get to 
 computer vision and natural language processing. 
