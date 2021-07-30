@@ -444,3 +444,7 @@ d2l.show_heatmaps(attention_weights[:, :, :, :len(engs[-1].split()) + 1],
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1065)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/3868)
+:end_tab:
