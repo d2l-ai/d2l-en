@@ -631,7 +631,7 @@ a way to store your model parameters.
 We can assign the result of an operation
 to a `Variable` with `assign`.
 To illustrate this concept, 
-we overwrite the valeus of `Variable` `Z`
+we overwrite the values of `Variable` `Z`
 after initializing it, using `zeros_like`,
 to have the same shape as `Y`.
 :end_tab:
