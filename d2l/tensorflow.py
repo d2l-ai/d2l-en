@@ -10,6 +10,7 @@ USE_TENSORFLOW = True
 # Defined in file: ./chapter_preface/index.md
 import collections
 import hashlib
+import inspect
 import math
 import os
 import random
@@ -123,12 +124,6 @@ def synthetic_data(w, b, num_examples):
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def linreg(X, w, b):
-    """The linear regression model."""
-    return d2l.matmul(X, w) + b
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def squared_loss(y_hat, y):
     """Squared loss."""
     return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
@@ -139,6 +134,12 @@ def sgd(params, grads, lr, batch_size):
     """Minibatch stochastic gradient descent."""
     for param, grad in zip(params, grads):
         param.assign_sub(lr * grad / batch_size)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+def linreg(X, w, b):
+    """The linear regression model."""
+    return d2l.matmul(X, w) + b
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md

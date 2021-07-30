@@ -10,6 +10,7 @@ USE_TENSORFLOW = False
 # Defined in file: ./chapter_preface/index.md
 import collections
 import hashlib
+import inspect
 import math
 import os
 import random
@@ -117,6 +118,106 @@ class Timer:
         return np.array(self.times).cumsum().tolist()
 
 
+# Defined in file: ./chapter_linear-networks/api.md
+def add_to_class(Class):
+    def wrapper(obj):
+        setattr(Class, obj.__name__, obj)
+
+    return wrapper
+
+
+# Defined in file: ./chapter_linear-networks/api.md
+class HyperParameters:
+    def save_hyperparameters(self, ignore=[]):
+        raise NotImplemented
+
+
+# Defined in file: ./chapter_linear-networks/api.md
+class ProgressBoard(d2l.HyperParameters):
+    """Plot data points in animation."""
+    def __init__(self, x, xlabel=None, ylabel=None, xlim=None, ylim=None,
+                 xscale='linear', yscale='linear', ls=['-', '--', '-.', ':'],
+                 colors=['C0', 'C1', 'C2',
+                         'C3'], fig=None, axes=None, figsize=(3.5, 2.5)):
+        self.save_hyperparameters()
+        self.points = []
+        self.lines = {}
+
+    def draw(self, points, every_n=1):
+        raise NotImplemented
+
+
+# Defined in file: ./chapter_linear-networks/api.md
+class Module(d2l.nn_Module, d2l.HyperParameters):
+    def __init__(self):
+        super().__init__()
+        self.board = ProgressBoard(x='step')
+
+    def training_step(self, batch, batch_idx):
+        raise NotImplemented
+
+    def validaton_step(self):
+        return None
+
+    def configure_optimizers(self):
+        raise NotImplemented
+
+
+# Defined in file: ./chapter_linear-networks/api.md
+class DataModule(d2l.HyperParameters):
+    def __init__(self, root='../data', num_workers=4):
+        self.save_hyperparameters()
+
+    def train_dataloader(self):
+        """Returns the dataloader for the training dataset."""
+        raise NotImplemented
+
+    def val_dataloader(self):
+        """Returns the dataloader for the validation dataset."""
+
+
+# Defined in file: ./chapter_linear-networks/api.md
+class Trainer(d2l.HyperParameters):
+    def __init__(self, max_epochs):
+        self.save_hyperparameters()
+
+    def fit(self, model, data):
+        raise NotImplemented
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+class SyntheticRegressionData(d2l.DataModule):
+    def __init__(self, w, b, num_examples=1000, batch_size=8):
+        super().__init__()
+        self.save_hyperparameters()
+        self.X = d2l.normal(0, 1, (num_examples, len(w)))
+        y = d2l.matmul(self.X, w) + b + d2l.normal(0, 0.01, (num_examples,))
+        self.y = d2l.reshape(y, (-1, 1))
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+def squared_loss(y_hat, y):
+    """Squared loss."""
+    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+class SGD(d2l.HyperParameters):
+    def __init__(self, params, lr):
+        """Minibatch stochastic gradient descent."""
+        self.save_hyperparameters()
+
+    def step(self):
+        with torch.no_grad():
+            for param in self.params:
+                param -= self.lr * param.grad
+
+    def zero_grad(self):
+        for param in self.params:
+            if param.grad is not None:
+                param.grad.zero_()
+
+
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):
     """Generate y = Xw + b + noise."""
@@ -130,21 +231,6 @@ def synthetic_data(w, b, num_examples):
 def linreg(X, w, b):
     """The linear regression model."""
     return d2l.matmul(X, w) + b
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def squared_loss(y_hat, y):
-    """Squared loss."""
-    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def sgd(params, lr, batch_size):
-    """Minibatch stochastic gradient descent."""
-    with torch.no_grad():
-        for param in params:
-            param -= lr * param.grad / batch_size
-            param.grad.zero_()
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
@@ -2672,8 +2758,64 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 
-# Alias defined in config.ini
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+@d2l.add_to_class(d2l.HyperParameters)
+def save_hyperparameters(self, ignore=[]):
+    """Save function arguments into class attributes."""
+    frame = inspect.currentframe().f_back
+    _, _, _, local_vars = inspect.getargvalues(frame)
+    self.hparams = {
+        k: v for k, v in local_vars.items()
+        if k not in set(ignore + ['self'])}
+    for k, v in self.hparams.items():
+        setattr(self, k, v)
 
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+@d2l.add_to_class(d2l.ProgressBoard)
+def _update_lines(self):
+    lines = {}
+    for p in self.points:
+        x = float(p[self.x])
+        for k, v in p.items():
+            if k == self.x: continue
+            if k not in lines:
+                lines[k] = ([], [])
+            lines[k][0].append(x)
+            lines[k][1].append(float(v))
+    for k, v in lines.items():
+        if k not in self.lines:
+            self.lines[k] = ([], [])
+        self.lines[k][0].append(v[0][-1])
+        self.lines[k][1].append(sum(v[1]) / len(v[1]))
+    self.points = []
+
+@d2l.add_to_class(d2l.ProgressBoard)
+def draw(self, points, every_n=1):
+    assert self.x in points, 'must specify the x-axis value'
+    self.points.append(points)
+    if len(self.points) != every_n:
+        return
+    self._update_lines()
+    d2l.use_svg_display()
+    if self.fig is None:
+        self.fig = d2l.plt.figure(figsize=self.figsize)
+    for (k, v), ls, color in zip(self.lines.items(), self.ls, self.colors):
+        d2l.plt.plot(v[0], v[1], linestyle=ls, color=color, label=k)
+    axes = self.axes if self.axes else d2l.plt.gca()
+    if self.xlim: axes.set_xlim(self.xlim)
+    if self.ylim: axes.set_ylim(self.ylim)
+    if not self.xlabel: self.xlabel = self.x
+    axes.set_xlabel(self.xlabel)
+    axes.set_ylabel(self.ylabel)
+    axes.legend(self.lines.keys())
+    axes.grid()
+    display.display(self.fig)
+    display.clear_output(wait=True)
+
+
+# Alias defined in config.ini
+nn_Module = nn.Module
 
 ones = torch.ones
 zeros = torch.zeros
