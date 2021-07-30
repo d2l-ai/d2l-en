@@ -179,3 +179,8 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, strategy)
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1058)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/3862)
+:end_tab:
+
