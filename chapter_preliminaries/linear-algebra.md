@@ -4,7 +4,7 @@
 By now, we can load datasets into tensors
 and manipulate these tensors 
 with basic mathematical operations.
-To start build sophisticated models,
+To start building sophisticated models,
 we will also need a few tools from linear algebra. 
 This section offers a gentle introduction 
 to the most essential concepts,
@@ -16,7 +16,8 @@ and ramping up to matrix multiplication.
 ## Scalars
 
 
-Most everyday math consists of manipulating 
+Most everyday mathematics
+consists of manipulating 
 numbers one at a time.
 Formally, we call these values *scalars*.
 For example, the temperature in Palo Alto 
@@ -103,7 +104,7 @@ minutes of exercise per day, etc.
 We denote vectors by bold lowercase letters, 
 (e.g., $\mathbf{x}$, $\mathbf{y}$, and $\mathbf{z}$).
 
-Vectors are implemented as $1^{\mathrm{st}}-order tensors.
+Vectors are implemented as $1^{\mathrm{st}}$-order tensors.
 In general, such tensors can have arbitrary lengths,
 subject to memory limitations.
 
@@ -156,7 +157,7 @@ To indicate that a vector contains $n$ elements,
 we write $\mathbf{x} \in \mathbb{R}^n$.
 Formally, we call $n$ the *dimensionality* of the vector.
 [**In code, this corresponds to the tensor's length**],
-accessible via Python's built-in `len()` function.
+accessible via Python's built-in `len` function.
 
 ```{.python .input}
 len(x)
@@ -172,7 +173,7 @@ len(x)
 len(x)
 ```
 
-We can also access the length via the `.shape` attribute.
+We can also access the length via the `shape` attribute.
 The shape is a tuple that indicates a tensor's length along each axis.
 (**Tensors with just one axis have shapes with just one element.**)
 
@@ -206,7 +207,7 @@ and vectors are $1^{\mathrm{st}}$-order tensors,
 matrices are $2^{\mathrm{nd}}$-order tensors.
 We denote matrices by bold capital letters
 (e.g., $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$),
-and represent thim in code by tensors with two axes.
+and represent them in code by tensors with two axes.
 The expression $\mathbf{A} \in \mathbb{R}^{m \times n}$
 indicates that a matrix $\mathbf{A}$ 
 contains $m \times n$ real-valued scalars,
@@ -313,9 +314,9 @@ and columns correspond to distinct attributes.
 While you can go far in your machine learning journey
 with only scalars, vectors, and matrices,
 eventually you may need to work with 
-higher order [**tensors**].
+higher-order [**tensors**].
 Tensors (**give us a generic way to describe 
-extensions to $n^{\mathrm{th}}$ order arrays.**)
+extensions to $n^{\mathrm{th}}$-order arrays.**)
 We call software objects of the *tensor class* "tensors"
 precisely because they too can have arbitrary numbers of axes.
 While it may be confusing to use the word
@@ -331,16 +332,16 @@ follows naturally from that of matrices.
 
 Tensors will become more important 
 when we start working with images.
-Each image arrives as a $3^{\mathrm{rd}}$ order tensor
+Each image arrives as a $3^{\mathrm{rd}}$-order tensor
 with axes corresponding to the height, width, and *channel*.
 At each spatial location, the intensities 
 of each color (red, green, and blue)
 are stacked along the channel. 
 Moreover a collection of images is represented 
-in code by a $4^{\mathrm{th}}$ order tensor,
+in code by a $4^{\mathrm{th}}$-order tensor,
 where distinct images are indexed
 along the first axis.
-Higher order tensors are constructed analagously 
+Higher-order tensors are constructed analogously 
 to vectors and matrices,
 by growing the number of shape components.
 
@@ -361,9 +362,9 @@ tf.reshape(tf.range(24), (2, 3, 4))
 ## Basic Properties of Tensor Arithmetic
 
 Scalars, vectors, matrices, 
-and higher order tensors
+and higher-order tensors
 all have some handy properties. 
-For example elementwise operation
+For example, elementwise operations
 produce outputs that have the 
 same shape as their operands.
 
@@ -489,7 +490,7 @@ A.shape, tf.reduce_sum(A)
 
 By default, invoking the sum function
 *reduces* a tensor along all of its axes,
-eventualy producing a scalar.
+eventually producing a scalar.
 Our libraries also allow us to [**specify the axes 
 along which the tensor should be reduced.**]
 To sum over all elements along the rows (axis 0),
@@ -550,7 +551,7 @@ We calculate the mean by dividing the sum
 by the total number of elements.
 Because computing the mean is so common,
 it gets a dedicated library function 
-that works analagously to `sum`.
+that works analogously to `sum`.
 
 ```{.python .input}
 A.mean(), A.sum() / A.size
@@ -711,9 +712,9 @@ Later in this section, we will formally introduce this notion of *length*.
 Now that we know how to calculate dot products,
 we can begin to understand the *product*
 between an $m \times n$ matrix $\mathbf{A}$ 
-and an $n$-dimensional vector $\mathbf{x}.
+and an $n$-dimensional vector $\mathbf{x}$.
 To start off, we visualize our matrix
-in terms of its row vectors.
+in terms of its row vectors
 
 $$\mathbf{A}=
 \begin{bmatrix}
@@ -833,7 +834,7 @@ the row vector representing the $i^\mathrm{th}$ row
 of the matrix $\mathbf{A}$
 and let $\mathbf{b}_{j} \in \mathbb{R}^k$ denote 
 the column vector from the $j^\mathrm{th}$ column 
-of the matrix $\mathbf{B}$.
+of the matrix $\mathbf{B}$:
 
 $$\mathbf{A}=
 \begin{bmatrix}
@@ -912,8 +913,7 @@ Some of the most useful operators in linear algebra are *norms*.
 Informally, the norm of a vector tells us how *big* it is. 
 For instance, the $\ell_2$ norm measures
 the (Euclidean) length of a vector.
-Here, we are employing a notion of *size*  
-that concerns the magnitude a vector's components
+Here, we are employing a notion of *size* that concerns the magnitude a vector's components
 (not its dimensionality). 
 
 A norm is a function $\| \cdot \|$ that maps a vector
@@ -921,7 +921,7 @@ to a scalar and satisfies the following three properties:
 
 1. Given any vector $\mathbf{x}$, if we scale (all elements of) the vector 
    by a scalar $\alpha \in \mathbb{R}$, its norm scales accordingly:
-   $$\|\alpha \mathbf{x}\| = |\alpha| \|\mathbf{x}\|$$
+   $$\|\alpha \mathbf{x}\| = |\alpha| \|\mathbf{x}\|.$$
 2. For any vectors $\mathbf{x}$ and $\mathbf{y}$:
    norms satisfy the triangle inequality:
    $$\|\mathbf{x} + \mathbf{y}\| \leq \|\mathbf{x}\| + \|\mathbf{y}\|.$$
@@ -930,8 +930,8 @@ to a scalar and satisfies the following three properties:
 
 Many functions are valid norms and different norms 
 encode different notions of size. 
-The Euclidean norm that we all learned in gradeschool geometry
-when calculating the hypoteneuse of right triangle
+The Euclidean norm that we all learned in elementary school geometry
+when calculating the hypotenuse of right triangle
 is the square root of the sum of squares of a vector's elements.
 Formally, this is called [**the $L_2$ *norm***] and expressed as
 
@@ -1001,7 +1001,7 @@ of a matrix's elements:
 
 [**$$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$**]
 
-The Forbenius norm behaves as if it were 
+The Frobenius norm behaves as if it were 
 an $L_2$ norm of a matrix-shaped vector.
 Invoking the following function will calculate 
 the Frobenius norm of a matrix.
@@ -1036,7 +1036,7 @@ the objectives of deep learning algorithms,
 are often expressed as norms. 
 
 
-## Summary
+## Discussion
 
 In this section, we reviewed all the linear algebra
 that you will need to understand
@@ -1067,6 +1067,7 @@ For a more advanced crash course, consider checking out
 or our [online appendix on linear algebra](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/geometry-linear-algebraic-ops.html).
 
 To recap:
+
 * Scalars, vectors, matrices, and tensors are 
   the basic mathematical objects used in linear algebra 
   and have zero, one, two, and an arbitrary number of axes, respectively.
@@ -1078,7 +1079,7 @@ To recap:
   that have different shapes than the operands. 
 * Compared to Hadamard products, matrix-matrix products 
   take considerably longer to compute (cubic rather than quadratic time).
-* Norms capture various notions of the *size* of a vector, 
+* Norms capture various notions of the magnitude of a vector, 
   and are commonly applied to the difference of two vectors 
   to measure their distance.
  * Common vector norms include the $L_1$ and $L_2$ norms, 
