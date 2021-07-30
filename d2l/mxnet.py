@@ -172,13 +172,13 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         self.board = ProgressBoard(x='step')
 
     def training_step(self, batch, batch_idx):
-        raise NotImplemented
+        raise NotImplementedError
 
     def validaton_step(self):
-        return None
+        pass
 
     def configure_optimizers(self):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 # Defined in file: ./chapter_linear-networks/api.md
@@ -187,11 +187,10 @@ class DataModule(d2l.HyperParameters):
         self.save_hyperparameters()
 
     def train_dataloader(self):
-        """Returns the dataloader for the training dataset."""
-        raise NotImplemented
+        raise NotImplementedError
 
     def val_dataloader(self):
-        """Returns the dataloader for the validation dataset."""
+        pass
 
 
 # Defined in file: ./chapter_linear-networks/api.md
@@ -200,7 +199,7 @@ class Trainer(d2l.HyperParameters):
         self.save_hyperparameters()
 
     def fit(self, model, data):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -240,27 +239,6 @@ class SGD(d2l.HyperParameters):
     def step(self):
         for param in self.params:
             param -= self.lr * param.grad
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def synthetic_data(w, b, num_examples):
-    """Generate y = Xw + b + noise."""
-    X = d2l.normal(0, 1, (num_examples, len(w)))
-    y = d2l.matmul(X, w) + b
-    y += d2l.normal(0, 0.01, y.shape)
-    return X, d2l.reshape(y, (-1, 1))
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def linreg(X, w, b):
-    """The linear regression model."""
-    return d2l.matmul(X, w) + b
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def squared_loss(y_hat, y):
-    """Squared loss."""
-    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
@@ -3027,6 +3005,35 @@ def fit(self, model, data):
             else:
                 optim.step()
             self.train_batch_idx += 1
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+def load_array(data_arrays, batch_size, is_train=True):
+    """Construct a Gluon data iterator."""
+    dataset = gluon.data.ArrayDataset(*data_arrays)
+    return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
+
+def synthetic_data(w, b, num_examples):
+    """Generate y = Xw + b + noise."""
+    X = d2l.normal(0, 1, (num_examples, len(w)))
+    y = d2l.matmul(X, w) + b
+    y += d2l.normal(0, 0.01, y.shape)
+    return X, d2l.reshape(y, (-1, 1))
+
+def sgd(params, lr, batch_size):
+    """Minibatch stochastic gradient descent."""
+    for param in params:
+        param[:] = param - lr * param.grad / batch_size
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+def linreg(X, w, b):
+    """The linear regression model."""
+    return d2l.matmul(X, w) + b
+
+def squared_loss(y_hat, y):
+    """Squared loss."""
+    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
 
 
 # Alias defined in config.ini

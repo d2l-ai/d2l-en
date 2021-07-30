@@ -104,16 +104,6 @@ and that each row in `labels` consists of a 1-dimensional label value (a scalar)
 print('features:', data.X[0],'\nlabel:', data.y[0])
 ```
 
-By generating a scatter plot using the second feature `features[:, 1]` and `labels`,
-we can clearly observe the linear correlation between the two.
-
-```{.python .input}
-#@tab all
-d2l.set_figsize()
-# The semicolon is for displaying the plot only
-d2l.plt.scatter(d2l.numpy(data.X[:, 1]), d2l.numpy(data.y), 1);
-```
-
 ## Reading the Dataset
 
 Recall that training models consists of
@@ -173,9 +163,8 @@ Likewise, our minibatch of labels will have a shape given by `batch_size`.
 
 ```{.python .input}
 #@tab all
-for X, y in data.train_dataloader():
-    print(X, '\n', y)
-    break
+X, y = next(iter(data.train_dataloader()))
+print('X shape:', X.shape, '\ny shape:', y.shape)
 ```
 
 As we run the iteration, we obtain distinct minibatches
@@ -189,7 +178,7 @@ are considerably more efficient and they can deal
 with both data stored in files and data fed via data streams.
 
 
-## Initializing Model Parameters
+## Defining the Model
 
 [**Before we can begin optimizing our model's parameters**] by minibatch stochastic gradient descent,
 (**we need to have some parameters in the first place.**)
@@ -243,9 +232,6 @@ Since nobody wants to compute gradients explicitly
 (this is tedious and error prone),
 we use automatic differentiation,
 as introduced in :numref:`sec_autograd`, to compute the gradient.
-
-
-## Defining the Model
 
 Next, we must [**define our model,
 relating its inputs and parameters to its outputs.**]
@@ -528,37 +514,3 @@ that lead to highly accurate prediction.
 :end_tab:
 
 TODO, remove the below deprecated code
-
-```{.python .input}
-#@tab mxnet, pytorch
-def synthetic_data(w, b, num_examples):  #@save
-    """Generate y = Xw + b + noise."""
-    X = d2l.normal(0, 1, (num_examples, len(w)))
-    y = d2l.matmul(X, w) + b
-    y += d2l.normal(0, 0.01, y.shape)
-    return X, d2l.reshape(y, (-1, 1))
-```
-
-```{.python .input}
-#@tab all
-def linreg(X, w, b):  #@save
-    """The linear regression model."""
-    return d2l.matmul(X, w) + b
-```
-
-```{.python .input}
-#@tab pytorch
-def sgd(params, lr, batch_size):
-    """Minibatch stochastic gradient descent."""
-    with torch.no_grad():
-        for param in params:
-            param -= lr * param.grad / batch_size
-            param.grad.zero_()
-```
-
-```{.python .input}
-#@tab all
-def squared_loss(y_hat, y):  #@save
-    """Squared loss."""
-    return (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
-```
