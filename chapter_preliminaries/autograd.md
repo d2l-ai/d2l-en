@@ -264,7 +264,7 @@ For example, we often have a vector
 representing the value of our loss function
 calculated separately for each among
 a *batch* of training examples.
-Here, just want to (**sum up the grdients
+Here, just want to (**sum up the gradients
 computed individually for each example**).
 
 :begin_tab:`mxnet`
@@ -278,7 +278,7 @@ $\partial_{\mathbf{x}} \sum_i y_i$.
 
 :begin_tab:`pytorch`
 Because deep learning frameworks vary 
-in how they inperpret gradients 
+in how they interpret gradients 
 non-scalar tensors,
 PyTorch takes some steps to avoid confusion.
 Invoking `backward` on a non-scalar elicits an error 
@@ -383,11 +383,11 @@ x_grad == u
 ```
 
 Note that while this procedure
-detatches `y`'s ancestors
+detaches `y`'s ancestors
 from the graph leading to `z`, 
 the computational graph leading to `y` 
 persists and thus we can calculate
-the gradient of `y` with respect to `x`. 
+the gradient of `y` with respect to `x`.
 
 ```{.python .input}
 y.backward()
@@ -501,7 +501,7 @@ it is a *linear* function of `a`
 with piecewise defined scale. 
 As such, `f(a) / a` is a vector of constant entries 
 and, moreover, `f(a) / a` needs to match 
-the gradient of `f(a)` with respect to `a`. 
+the gradient of `f(a)` with respect to `a`.
 
 ```{.python .input}
 a.grad == d / a
@@ -546,7 +546,7 @@ Here, tools from compilers and graph manipulation
 are leveraged to compute results 
 in the most expedient and memory-efficient manner. 
 
-For now, try to remember these basics: (i) attach gradients to those variables with respect to which we desire derivatives; (ii) record the computation of the target value; (iii) execute the backpropagation frunction; and  (iv) access the resulting gradient.
+For now, try to remember these basics: (i) attach gradients to those variables with respect to which we desire derivatives; (ii) record the computation of the target value; (iii) execute the backpropagation function; and  (iv) access the resulting gradient.
 
 
 ## Exercises
@@ -554,7 +554,7 @@ For now, try to remember these basics: (i) attach gradients to those variables w
 1. Why is the second derivative much more expensive to compute than the first derivative?
 1. After running the function for backpropagation, immediately run it again and see what happens. Why?
 1. In the control flow example where we calculate the derivative of `d` with respect to `a`, what would happen if we changed the variable `a` to a random vector or a matrix? At this point, the result of the calculation `f(a)` is no longer a scalar. What happens to the result? How do we analyze this?
-1. Let $f(x) = \sin(x)$. Plot the graph of $f$ and of its derivative $f'$. Do not exploit the fact that $f'(x) = \cos(x)$ but rather use automatic differentiation to gete the result. 
+1. Let $f(x) = \sin(x)$. Plot the graph of $f$ and of its derivative $f'$. Do not exploit the fact that $f'(x) = \cos(x)$ but rather use automatic differentiation to get the result. 
 1. Let $f(x) = ((\log x^2) \cdot \sin x) + x^{-1}$. Write out a dependency graph tracing results from $x$ to $f(x)$. 
 1. Use the chain rule to compute the derivative $\frac{df}{dx}$ of the aforementioned function, placing each term on the dependency graph that you constructed previously. 
 1. Given the graph and the intermediate derivative results, you have a number of options when computing the gradient. Evaluate the result once starting from $x$ to $f$ and once from $f$ tracing back to $x$. The path from $x$ to $f$ is commonly known as *forward differentiation*, whereas the path from $f$ to $x$ is known as backwards differentiation. 
