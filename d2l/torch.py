@@ -2,6 +2,36 @@ USE_MXNET = False
 USE_PYTORCH = True
 USE_TENSORFLOW = False
 
+import collections
+import hashlib
+import inspect
+import math
+import os
+import random
+import re
+import shutil
+import sys
+import tarfile
+import time
+import zipfile
+from collections import defaultdict
+import pandas as pd
+import requests
+from IPython import display
+from matplotlib import pyplot as plt
+
+import numpy as np
+import torch
+import torchvision
+from PIL import Image
+from torch import nn
+from torch.nn import functional as F
+from torch.utils import data
+from torchvision import transforms
+
+d2l = sys.modules[__name__]
+nn_Module = nn.Module
+
 #################   WARNING   ################
 # The below part is generated automatically through:
 #    d2lbook build lib
