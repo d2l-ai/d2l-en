@@ -128,7 +128,7 @@ def f(x):
 ```
 
 [**Setting $x=1$, $\frac{f(x+h) - f(x)}{h}$**] (**approaches $2$
-as as $h$ approach $0$.**)
+as as $h$ approaches $0$.**)
 While this experiment lacks 
 the rigor of a mathematical proof,
 we will see later see that indeed $f'(1) = 2$.
@@ -155,11 +155,14 @@ The following rules come in handy
 for working with compositions 
 of any differentiable functions 
 $f$ and $g$, and constant $c$.
+
 $$\begin{aligned} \frac{d}{dx} [C f(x)] & = C \frac{d}{dx} f(x) && \text{Constant multiple rule} \\ \frac{d}{dx} [f(x) + g(x)] & = \frac{d}{dx} f(x) + \frac{d}{dx} g(x) && \text{Sum rule} \\ \frac{d}{dx} [f(x) g(x)] & = f(x) \frac{d}{dx} g(x) + g(x) \frac{d}{dx} f(x) && \text{Product rule} \\ \frac{d}{dx} \frac{f(x)}{g(x)} & = \frac{g(x) \frac{d}{dx} f(x) - f(x) \frac{d}{dx} g(x)}{g^2(x)} && \text{Quotient rule} \end{aligned}$$
 
 Using this, we can apply the rules 
 to find the derivative of $3 x^2 - 4x$ via
+
 $$\frac{d}{dx} [3 x^2 - 4x] = 3 \frac{d}{dx} x^2 - 4 \frac{d}{dx} x = 6x - 4.$$
+
 Plugging in $x = 1$ shows that, indeed, 
 the derivative is $2$ at this location. 
 Note that derivatives tell us 
@@ -336,7 +339,7 @@ The chain rule states that
 $$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}.$$
 
 Turning back to multivariate functions,
-Suppose that $y = f(\mathbf{u})$ has variables
+suppose that $y = f(\mathbf{u})$ has variables
 $u_1, u_2, \ldots, u_m$, 
 where each $u_i = g_i(\mathbf{x})$ 
 has variables $x_1, x_2, \ldots, x_n$,
@@ -344,7 +347,7 @@ i.e.,  $\mathbf{u} = g(\mathbf{x})$.
 Then the chain rule states that
 
 $$\frac{dy}{dx_i} = \frac{dy}{du_1} \frac{du_1}{dx_i} + \frac{dy}{du_2} \frac{du_2}{dx_i} + \cdots + \frac{dy}{du_m} \frac{du_m}{dx_i} \text{ and thus }
-\nabla_{\mathbf{x}} y = \nabla_{\mathbf{u}} y \cdot \nabla_{x} \mathbf{u}$$
+\nabla_{\mathbf{x}} y = \nabla_{\mathbf{u}} y \cdot \nabla_{x} \mathbf{u}.$$
 
 Note that $\nabla_{x} \mathbf{u}$ is a *matrix*
 because it contains the derivative of a vector 
@@ -398,7 +401,7 @@ throughout this book will require calculating the gradient.
 1. Find the gradient of the function 
    $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$.
 1. What is the gradient of the function 
-   $f(\mathbf{x}) = \|\mathbf{x}\|_2$? What happens for $\mathbf{x} = 0$?
+   $f(\mathbf{x}) = \|\mathbf{x}\|_2$? What happens for $\mathbf{x} = \mathbf{0}$?
 1. Can you write out the chain rule for the case 
    where $u = f(x, y, z)$ and $x = x(a, b)$, $y = y(a, b)$, and $z = z(a, b)$?
 1. Given a function $f(x)$ that is invertible, 
