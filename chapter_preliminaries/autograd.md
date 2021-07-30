@@ -56,38 +56,12 @@ x = np.arange(4.0)
 x
 ```
 
-```{.json .output n=1}
-[
- {
-  "data": {
-   "text/plain": "array([0., 1., 2., 3.])"
-  },
-  "execution_count": 1,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
-```{.python .input  n=2}
+```{.python .input  n=7}
 #@tab pytorch
 import torch
 
 x = torch.arange(4.0)
 x
-```
-
-```{.json .output n=2}
-[
- {
-  "data": {
-   "text/plain": "tensor([0., 1., 2., 3.])"
-  },
-  "execution_count": 2,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -113,7 +87,7 @@ with respect to a vector $\mathbf{x}$
 is vector-valued and has 
 the same shape as $\mathbf{x}$.
 
-```{.python .input  n=3}
+```{.python .input  n=8}
 # We allocate memory for a tensor's gradient by invoking `attach_grad`
 x.attach_grad()
 # After we calculate a gradient taken with respect to `x`, we will be able to
@@ -121,23 +95,7 @@ x.attach_grad()
 x.grad
 ```
 
-```{.json .output n=3}
-[
- {
-  "ename": "AttributeError",
-  "evalue": "'Tensor' object has no attribute 'attach_grad'",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
-   "\u001b[0;32m<ipython-input-3-3c0c9c5b5955>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;31m# We allocate memory for a tensor's gradient by invoking `attach_grad`\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 2\u001b[0;31m \u001b[0mx\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mattach_grad\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      3\u001b[0m \u001b[0;31m# After we calculate a gradient taken with respect to `x`, we will be able to\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;31m# access it via the `grad` attribute, whose values are initialized with 0s\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0mx\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgrad\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;31mAttributeError\u001b[0m: 'Tensor' object has no attribute 'attach_grad'"
-  ]
- }
-]
-```
-
-```{.python .input  n=4}
+```{.python .input  n=9}
 #@tab pytorch
 x.requires_grad_(True)  # Better create `x = torch.arange(4.0, requires_grad=True)`
 x.grad                  # The default value is None
@@ -157,40 +115,10 @@ with autograd.record():
 y
 ```
 
-```{.json .output n=10}
-[
- {
-  "ename": "AssertionError",
-  "evalue": "Argument a must have NDArray type, but got tensor([0., 1., 2., 3.], requires_grad=True)",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[0;31mAssertionError\u001b[0m                            Traceback (most recent call last)",
-   "\u001b[0;32m<ipython-input-10-381b25cef5aa>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;31m# Our code is inside an `autograd.record` scope to build the computational graph\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      2\u001b[0m \u001b[0;32mwith\u001b[0m \u001b[0mautograd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mrecord\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 3\u001b[0;31m     \u001b[0my\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;36m2\u001b[0m \u001b[0;34m*\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdot\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mx\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mx\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      4\u001b[0m \u001b[0my\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;32m~/.conda/envs/d2l_pytorch/lib/python3.8/site-packages/mxnet/ndarray/register.py\u001b[0m in \u001b[0;36mdot\u001b[0;34m(a, b, out, name, **kwargs)\u001b[0m\n",
-   "\u001b[0;31mAssertionError\u001b[0m: Argument a must have NDArray type, but got tensor([0., 1., 2., 3.], requires_grad=True)"
-  ]
- }
-]
-```
-
-```{.python .input  n=5}
+```{.python .input  n=11}
 #@tab pytorch
 y = 2 * torch.dot(x, x)
 y
-```
-
-```{.json .output n=5}
-[
- {
-  "data": {
-   "text/plain": "tensor(28., grad_fn=<MulBackward0>)"
-  },
-  "execution_count": 5,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -228,23 +156,10 @@ y.backward()
 x.grad
 ```
 
-```{.python .input  n=6}
+```{.python .input  n=12}
 #@tab pytorch
 y.backward()
 x.grad
-```
-
-```{.json .output n=6}
-[
- {
-  "data": {
-   "text/plain": "tensor([ 0.,  4.,  8., 12.])"
-  },
-  "execution_count": 6,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -262,35 +177,9 @@ and the expected result are identical.
 x.grad == 4 * x
 ```
 
-```{.json .output n=13}
-[
- {
-  "data": {
-   "text/plain": "tensor([True, True, True, True])"
-  },
-  "execution_count": 13,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
-```{.python .input  n=7}
+```{.python .input  n=14}
 #@tab pytorch
 x.grad == 4 * x
-```
-
-```{.json .output n=7}
-[
- {
-  "data": {
-   "text/plain": "tensor([True, True, True, True])"
-  },
-  "execution_count": 7,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -337,25 +226,12 @@ y.backward()
 x.grad  # Overwritten by the newly calculated gradient
 ```
 
-```{.python .input  n=8}
+```{.python .input  n=20}
 #@tab pytorch
 x.grad.zero_()  # Reset gradient
 y = x.sum()
 y.backward()
 x.grad
-```
-
-```{.json .output n=8}
-[
- {
-  "data": {
-   "text/plain": "tensor([1., 1., 1., 1.])"
-  },
-  "execution_count": 8,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -482,7 +358,7 @@ z.backward()
 x.grad == u
 ```
 
-```{.python .input  n=9}
+```{.python .input  n=21}
 #@tab pytorch
 x.grad.zero_()
 y = x * x
@@ -491,19 +367,6 @@ z = u * x
 
 z.sum().backward()
 x.grad == u
-```
-
-```{.json .output n=9}
-[
- {
-  "data": {
-   "text/plain": "tensor([True, True, True, True])"
-  },
-  "execution_count": 9,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -531,24 +394,11 @@ y.backward()
 x.grad == 2 * x
 ```
 
-```{.python .input  n=10}
+```{.python .input}
 #@tab pytorch
 x.grad.zero_()
 y.sum().backward()
 x.grad == 2 * x
-```
-
-```{.json .output n=10}
-[
- {
-  "data": {
-   "text/plain": "tensor([True, True, True, True])"
-  },
-  "execution_count": 10,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ```{.python .input}
@@ -628,27 +478,11 @@ with autograd.record():
 d.backward()
 ```
 
-```{.python .input  n=11}
+```{.python .input}
 #@tab pytorch
 a = torch.randn(size=(), requires_grad=True)
 d = f(a)
 d.backward()
-```
-
-```{.json .output n=11}
-[
- {
-  "ename": "NameError",
-  "evalue": "name 'f' is not defined",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[0;31mNameError\u001b[0m                                 Traceback (most recent call last)",
-   "\u001b[0;32m<ipython-input-11-e822c9132c20>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;31m#@tab pytorch\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      2\u001b[0m \u001b[0ma\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mtorch\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mrandn\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0msize\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrequires_grad\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 3\u001b[0;31m \u001b[0md\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mf\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0ma\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      4\u001b[0m \u001b[0md\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mbackward\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;31mNameError\u001b[0m: name 'f' is not defined"
-  ]
- }
-]
 ```
 
 ```{.python .input}
@@ -712,10 +546,7 @@ Here, tools from compilers and graph manipulation
 are leveraged to compute results 
 in the most expedient and memory-efficient manner. 
 
-For now, try to remember these basics: 
- Attach gradients to those variables with respect to which we desire derivatives.
- * Then record the computation of the target value, execute the backpropagation frunction, 
-   and access the resulting gradient. 
+For now, try to remember these basics: (i) attach gradients to those variables with respect to which we desire derivatives; (ii) record the computation of the target value; (iii) execute the backpropagation frunction; and  (iv) access the resulting gradient.
 
 
 ## Exercises
@@ -740,7 +571,3 @@ For now, try to remember these basics:
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/200)
 :end_tab:
-
-```{.python .input}
-
-```
