@@ -24,12 +24,28 @@ import random
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=1}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
 import torch
 import random
+```
+
+```{.json .output n=1}
+[
+ {
+  "ename": "ModuleNotFoundError",
+  "evalue": "No module named 'd2l'",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[0;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
+   "\u001b[0;32m<ipython-input-1-1961364282d7>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;31m#@tab pytorch\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      2\u001b[0m \u001b[0mget_ipython\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mrun_line_magic\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'matplotlib'\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m'inline'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 3\u001b[0;31m \u001b[0;32mfrom\u001b[0m \u001b[0md2l\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mtorch\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      4\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mtorch\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mrandom\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;31mModuleNotFoundError\u001b[0m: No module named 'd2l'"
+  ]
+ }
+]
 ```
 
 ```{.python .input}
