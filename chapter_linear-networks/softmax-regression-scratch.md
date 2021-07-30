@@ -4,7 +4,7 @@
 (**Just as we implemented linear regression from scratch, we believe that**)
 softmax regression
 is similarly fundamental and
-(**you ought to know the gory details of **)
+(**you ought to know the gory details of**)
 (~~softmax regression~~)
 how to implement it yourself.
 We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
