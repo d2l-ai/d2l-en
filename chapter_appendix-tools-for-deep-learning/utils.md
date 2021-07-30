@@ -182,7 +182,7 @@ def synthetic_data(w, b, num_examples):  #@save
     y += d2l.normal(0, 0.01, y.shape)
     return X, d2l.reshape(y, (-1, 1))
 
-def sgd(params, lr, batch_size):
+def sgd(params, lr, batch_size): #@save
     """Minibatch stochastic gradient descent."""
     with torch.no_grad():
         for param in params:

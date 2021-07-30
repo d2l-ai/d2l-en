@@ -2871,6 +2871,13 @@ def synthetic_data(w, b, num_examples):
     y += d2l.normal(0, 0.01, y.shape)
     return X, d2l.reshape(y, (-1, 1))
 
+def sgd(params, lr, batch_size):
+    """Minibatch stochastic gradient descent."""
+    with torch.no_grad():
+        for param in params:
+            param -= lr * param.grad / batch_size
+            param.grad.zero_()
+
 
 # Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
 def linreg(X, w, b):
