@@ -5,10 +5,8 @@ import sys
 
 def _unnumber_chaps_and_secs(lines):
     def _startswith_unnumbered(l):
-        UNNUMBERED = {'\\section{Summary',
-                      '\\section{Exercise',
+        UNNUMBERED = {'\\section{Exercise',
                       '\\section{Exercises',
-                      '\\subsection{Summary',
                       '\\subsection{Exercise',
                       '\\subsection{Exercises'}
         for unnum in UNNUMBERED:

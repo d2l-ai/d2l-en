@@ -217,21 +217,13 @@ its number of outputs in the final layer
 is set to
 the number of classes in the target dataset (rather than 1000).
 
-
-
-
-In the following code, the model parameters in the member variable features of the target model instance finetune_net are initialized to the model parameters of the corresponding layer of the source model. Since the model parameters in the features are pre-trained on the ImageNet data set and are good enough, generally only a small learning rate is needed to fine-tune these parameters. 
-
-The model parameters in the member variable output are initialized randomly, and generally require a larger learning rate to train from scratch. Assuming that the learning rate in the Trainer instance is η, we set the learning rate of the model parameters in the member variable output to be 10η in the iteration.
-
-
 In the code below, the model parameters before the output layer of the target model instance `finetune_net` are initialized to model parameters of the corresponding layers from the source model.
 Since these model parameters were obtained via pretraining on ImageNet, 
 they are effective.
 Therefore, we can only use 
 a small learning rate to *fine-tune* such pretrained parameters.
 In contrast, model parameters in the output layer are randomly initialized and generally require a larger learning rate to be learned from scratch.
-Let the base learning rate be $\eta$, a learning rate of $10\eta$ will be used to iterate the model parameters in the output layer.
+Letting the base learning rate be $\eta$, a learning rate of $10\eta$ will be used to iterate the model parameters in the output layer.
 
 ```{.python .input}
 finetune_net = gluon.model_zoo.vision.resnet18_v2(classes=2)
