@@ -26,6 +26,13 @@ from torch import nn
 
 ```
 
+```{.python .input}
+#@tab tensorflow
+import time
+from d2l import torch as d2l
+import tensorflow as tf
+```
+
 ## Utilities
 
 Let's first introduce utility functions and classes. We will adopt the object-oriented programming that is common for Python libraries. It's, however, used less in notebooks where we often introduce keep a code block short for readability. The first one is function that allows us to register a function to a class so we can split class methods into multiple code blocks. 

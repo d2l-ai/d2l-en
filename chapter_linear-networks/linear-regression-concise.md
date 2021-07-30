@@ -33,7 +33,6 @@ npx.set_np()
 from d2l import torch as d2l
 import numpy as np
 import torch
-from torch.utils import data
 ```
 
 ```{.python .input}
@@ -41,13 +40,6 @@ from torch.utils import data
 from d2l import tensorflow as d2l
 import numpy as np
 import tensorflow as tf
-```
-
-```{.python .input}
-#@tab all
-true_w = d2l.tensor([2, -3.4])
-true_b = 4.2
-features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
 
 ## Reading the Dataset
@@ -62,35 +54,31 @@ we want the data iterator object to shuffle the data
 on each epoch (pass through the dataset).
 
 ```{.python .input}
-def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a Gluon data iterator."""
-    dataset = gluon.data.ArrayDataset(*data_arrays)
-    return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
+@d2l.add_to_class(d2l.SyntheticRegressionData)  #@save
+def train_dataloader(self):
+    dataset = gluon.data.ArrayDataset(self.X, self.y)
+    return gluon.data.DataLoader(dataset, self.batch_size, shuffle=True)
 ```
 
 ```{.python .input}
 #@tab pytorch
-def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a PyTorch data iterator."""
-    dataset = data.TensorDataset(*data_arrays)
-    return data.DataLoader(dataset, batch_size, shuffle=is_train)
+@d2l.add_to_class(d2l.SyntheticRegressionData)  #@save
+def train_dataloader(self):
+    dataset = torch.utils.data.TensorDataset(self.X, self.y)
+    return torch.utils.data.DataLoader(dataset, self.batch_size, shuffle=True)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-def load_array(data_arrays, batch_size, is_train=True):  #@save
-    """Construct a TensorFlow data iterator."""
-    dataset = tf.data.Dataset.from_tensor_slices(data_arrays)
-    if is_train:
-        dataset = dataset.shuffle(buffer_size=1000)
-    dataset = dataset.batch(batch_size)
-    return dataset
+@d2l.add_to_class(d2l.SyntheticRegressionData)  #@save
+def train_dataloader(self):
+    return tf.data.Dataset.from_tensor_slices(
+        (self.X, self.y)).shuffle(buffer_size=1000).batch(self.batch_size)
 ```
 
 ```{.python .input}
 #@tab all
-batch_size = 10
-data_iter = load_array((features, labels), batch_size)
+data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 ```
 
 Now we can use `data_iter` in much the same way as we called
@@ -102,7 +90,7 @@ here we use `iter` to construct a Python iterator and use `next` to obtain the f
 
 ```{.python .input}
 #@tab all
-next(iter(data_iter))
+next(iter(data.train_dataloader()))
 ```
 
 ## Defining the Model
@@ -182,22 +170,36 @@ We will describe how this works in more detail later.
 ```{.python .input}
 # `nn` is an abbreviation for neural networks
 from mxnet.gluon import nn
-net = nn.Sequential()
-net.add(nn.Dense(1))
+
+class LinearRegression(d2l.Module):  #@save
+    def __init__(self, num_inputs, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Dense(num_outputs)
+        self.net.initialize()
 ```
 
 ```{.python .input}
 #@tab pytorch
 # `nn` is an abbreviation for neural networks
 from torch import nn
-net = nn.Sequential(nn.Linear(2, 1))
+
+class LinearRegression(d2l.Module):  #@save
+    def __init__(self, num_inputs, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Linear(num_inputs, num_outputs)
 ```
 
 ```{.python .input}
 #@tab tensorflow
 # `keras` is the high-level API for TensorFlow
-net = tf.keras.Sequential()
-net.add(tf.keras.layers.Dense(1))
+
+class LinearRegression(d2l.Module):  #@save
+    def __init__(self, num_inputs, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = tf.keras.layers.Dense(num_outputs)
 ```
 
 ## Initializing Model Parameters
@@ -232,21 +234,15 @@ The `initializers` module in TensorFlow provides various methods for model param
 :end_tab:
 
 ```{.python .input}
-from mxnet import init
-net.initialize(init.Normal(sigma=0.01))
-```
-
-```{.python .input}
-#@tab pytorch
-net[0].weight.data.normal_(0, 0.01)
-net[0].bias.data.fill_(0)
+#from mxnet import init
+#net.initialize(init.Normal(sigma=0.01))
 ```
 
 ```{.python .input}
 #@tab tensorflow
-initializer = tf.initializers.RandomNormal(stddev=0.01)
-net = tf.keras.Sequential()
-net.add(tf.keras.layers.Dense(1, kernel_initializer=initializer))
+#initializer = tf.initializers.RandomNormal(stddev=0.01)
+#net = tf.keras.Sequential()
+#net.add(tf.keras.layers.Dense(1, kernel_initializer=initializer))
 ```
 
 :begin_tab:`mxnet`
@@ -304,17 +300,48 @@ By default it returns the average loss over examples.
 :end_tab:
 
 ```{.python .input}
-loss = gluon.loss.L2Loss()
+#@tab mxnet, pytorch
+@d2l.add_to_class(LinearRegression)
+def forward(self, X):
+    """The linear regression model."""
+    return self.net(X)
+```
+
+```{.python .input}
+@d2l.add_to_class(LinearRegression)
+def training_step(self, batch, batch_idx):
+    X, y = batch
+    loss = gluon.loss.L2Loss()
+    l = loss(self(X), y).mean()
+    self.board.draw({'step':batch_idx, 'loss':l}, every_n=10)
+    return l
 ```
 
 ```{.python .input}
 #@tab pytorch
-loss = nn.MSELoss()
+@d2l.add_to_class(LinearRegression)
+def training_step(self, batch, batch_idx):
+    X, y = batch
+    loss = nn.MSELoss()
+    l = loss(self(X), y)
+    self.board.draw({'step':batch_idx, 'loss':l}, every_n=10)
+    return l
 ```
 
 ```{.python .input}
 #@tab tensorflow
-loss = tf.keras.losses.MeanSquaredError()
+@d2l.add_to_class(LinearRegression)
+def call(self, X):
+    """The linear regression model."""
+    return self.net(X)
+
+@d2l.add_to_class(LinearRegression)
+def training_step(self, batch, batch_idx):
+    X, y = batch
+    loss = tf.keras.losses.MeanSquaredError()
+    l = loss(self(X), y)
+    self.board.draw({'step':batch_idx, 'loss':l}, every_n=10)
+    return l
 ```
 
 ## Defining the Optimization Algorithm
@@ -357,18 +384,24 @@ we set the value `learning_rate`, which is set to 0.03 here.
 :end_tab:
 
 ```{.python .input}
-from mxnet import gluon
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})
+@d2l.add_to_class(LinearRegression)
+def configure_optimizers(self):
+    return gluon.Trainer(self.collect_params(),
+                         'sgd', {'learning_rate': self.lr})
 ```
 
 ```{.python .input}
 #@tab pytorch
-trainer = torch.optim.SGD(net.parameters(), lr=0.03)
+@d2l.add_to_class(LinearRegression)
+def configure_optimizers(self):
+    return torch.optim.SGD(self.parameters(), self.lr)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-trainer = tf.keras.optimizers.SGD(learning_rate=0.03)
+@d2l.add_to_class(LinearRegression)
+def configure_optimizers(self):
+    return tf.keras.optimizers.SGD(self.lr)
 ```
 
 ## Training
@@ -397,41 +430,10 @@ For each minibatch, we go through the following ritual:
 For good measure, we compute the loss after each epoch and print it to monitor progress.
 
 ```{.python .input}
-num_epochs = 3
-for epoch in range(num_epochs):
-    for X, y in data_iter:
-        with autograd.record():
-            l = loss(net(X), y)
-        l.backward()
-        trainer.step(batch_size)
-    l = loss(net(features), labels)
-    print(f'epoch {epoch + 1}, loss {l.mean().asnumpy():f}')
-```
-
-```{.python .input}
-#@tab pytorch
-num_epochs = 3
-for epoch in range(num_epochs):
-    for X, y in data_iter:
-        l = loss(net(X) ,y)
-        trainer.zero_grad()
-        l.backward()
-        trainer.step()
-    l = loss(net(features), labels)
-    print(f'epoch {epoch + 1}, loss {l:f}')
-```
-
-```{.python .input}
-#@tab tensorflow
-num_epochs = 3
-for epoch in range(num_epochs):
-    for X, y in data_iter:
-        with tf.GradientTape() as tape:
-            l = loss(net(X, training=True), y)
-        grads = tape.gradient(l, net.trainable_variables)
-        trainer.apply_gradients(zip(grads, net.trainable_variables))
-    l = loss(net(features), labels)
-    print(f'epoch {epoch + 1}, loss {l:f}')
+#@tab all
+model = LinearRegression(2, 1, lr=0.03)
+trainer = d2l.Trainer(3)
+trainer.fit(model, data)
 ```
 
 Below, we [**compare the model parameters learned by training on finite data
@@ -444,26 +446,26 @@ note that our estimated parameters are
 close to their ground-truth counterparts.
 
 ```{.python .input}
-w = net[0].weight.data()
-print(f'error in estimating w: {true_w - d2l.reshape(w, true_w.shape)}')
-b = net[0].bias.data()
-print(f'error in estimating b: {true_b - b}')
+w = model.net.weight.data()
+b = model.net.bias.data()
 ```
 
 ```{.python .input}
 #@tab pytorch
-w = net[0].weight.data
-print('error in estimating w:', true_w - d2l.reshape(w, true_w.shape))
-b = net[0].bias.data
-print('error in estimating b:', true_b - b)
+w = model.net.weight.data
+b = model.net.bias.data
 ```
 
 ```{.python .input}
 #@tab tensorflow
-w = net.get_weights()[0]
-print('error in estimating w', true_w - d2l.reshape(w, true_w.shape))
-b = net.get_weights()[1]
-print('error in estimating b', true_b - b)
+w = model.get_weights()[0]
+b = model.get_weights()[1]
+```
+
+```{.python .input}
+#@tab all
+print(f'error in estimating w: {data.w - d2l.reshape(w, data.w.shape)}')
+print(f'error in estimating b: {data.b - b}')
 ```
 
 ## Summary

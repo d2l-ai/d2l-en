@@ -226,9 +226,10 @@ class SyntheticRegressionData(d2l.DataModule):
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def squared_loss(y_hat, y):
+def mse(y_hat, y):
     """Squared loss."""
-    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
+    loss = (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
+    return d2l.reduce_mean(loss)
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -238,9 +239,8 @@ class SGD(d2l.HyperParameters):
         self.save_hyperparameters()
 
     def step(self):
-        with torch.no_grad():
-            for param in self.params:
-                param -= self.lr * param.grad
+        for param in self.params:
+            param -= self.lr * param.grad
 
     def zero_grad(self):
         for param in self.params:
@@ -263,11 +263,25 @@ def linreg(X, w, b):
     return d2l.matmul(X, w) + b
 
 
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+def squared_loss(y_hat, y):
+    """Squared loss."""
+    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
+
+
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
-def load_array(data_arrays, batch_size, is_train=True):
-    """Construct a PyTorch data iterator."""
-    dataset = data.TensorDataset(*data_arrays)
-    return data.DataLoader(dataset, batch_size, shuffle=is_train)
+@d2l.add_to_class(d2l.SyntheticRegressionData)
+def train_dataloader(self):
+    dataset = torch.utils.data.TensorDataset(self.X, self.y)
+    return torch.utils.data.DataLoader(dataset, self.batch_size, shuffle=True)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+class LinearRegression(d2l.Module):
+    def __init__(self, num_inputs, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Linear(num_inputs, num_outputs)
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
@@ -2844,6 +2858,28 @@ def draw(self, points, every_n=1):
     display.clear_output(wait=True)
 
 
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+@d2l.add_to_class(d2l.Trainer)
+def fit(self, model, data):
+    train_dataloader = data.train_dataloader()
+    val_dataloader = data.val_dataloader()
+    self.train_batch_idx = 0
+    optim = model.configure_optimizers()
+    try:
+        model.board.xlim = [0, len(train_dataloader) * self.max_epochs]
+    except:
+        pass
+
+    for epoch in range(self.max_epochs):
+        for batch in train_dataloader:
+            loss = model.training_step(batch, self.train_batch_idx)
+            optim.zero_grad()
+            with torch.no_grad():
+                loss.backward()
+                optim.step()
+            self.train_batch_idx += 1
+
+
 # Alias defined in config.ini
 nn_Module = nn.Module
 
@@ -2877,4 +2913,5 @@ reduce_sum = lambda x, *args, **kwargs: x.sum(*args, **kwargs)
 argmax = lambda x, *args, **kwargs: x.argmax(*args, **kwargs)
 astype = lambda x, *args, **kwargs: x.type(*args, **kwargs)
 transpose = lambda x, *args, **kwargs: x.t(*args, **kwargs)
+reduce_mean = lambda x, *args, **kwargs: x.mean(*args, **kwargs)
 

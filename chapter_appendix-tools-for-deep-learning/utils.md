@@ -8,13 +8,21 @@ This section contains the implementations of utility functions and classes used 
 import inspect
 from d2l import mxnet as d2l
 from IPython import display
+from mxnet import autograd, np, npx
+import random
+npx.set_np()
 ```
 
-```{.python .input  n=2}
+```{.python .input}
 #@tab pytorch
 import inspect
 from d2l import torch as d2l
 from IPython import display
+```
+
+```{.python .input}
+#@tab tensorflow
+from d2l import tensorflow as d2l
 ```
 
 hyper parameters 
@@ -34,7 +42,7 @@ def save_hyperparameters(self, ignore=[]):
 
 progress bar
 
-```{.python .input  n=3}
+```{.python .input}
 #@tab all
 @d2l.add_to_class(d2l.ProgressBoard)  #@save
 def _update_lines(self):
@@ -84,6 +92,25 @@ trainer
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit(self, model, data):
     train_dataloader = data.train_dataloader()
+    self.train_batch_idx = 0
+    optim = model.configure_optimizers()
+    for epoch in range(self.max_epochs):
+        for batch in train_dataloader:
+            with autograd.record():
+                loss = model.training_step(batch, self.train_batch_idx)
+            loss.backward()
+            if isinstance(optim, gluon.Trainer):
+                optim.step(1)
+            else:
+                optim.step()
+            self.train_batch_idx += 1
+```
+
+```{.python .input}
+#@tab pytorch
+@d2l.add_to_class(d2l.Trainer)  #@save
+def fit(self, model, data):
+    train_dataloader = data.train_dataloader()
     val_dataloader = data.val_dataloader()
     self.train_batch_idx = 0
     optim = model.configure_optimizers()
@@ -99,5 +126,21 @@ def fit(self, model, data):
             with torch.no_grad():
                 loss.backward()
                 optim.step()
+            self.train_batch_idx += 1
+```
+
+```{.python .input}
+#@tab tensorflow
+@d2l.add_to_class(d2l.Trainer)  #@save
+def fit(self, model, data):
+    train_dataloader = data.train_dataloader()
+    self.train_batch_idx = 0
+    optim = model.configure_optimizers()
+    for epoch in range(self.max_epochs):
+        for batch in train_dataloader:
+            with tf.GradientTape() as tape:
+                loss = model.training_step(batch, self.train_batch_idx)
+            grads = tape.gradient(loss, model.trainable_variables)
+            optim.apply_gradients(zip(grads, model.trainable_variables))
             self.train_batch_idx += 1
 ```

@@ -24,6 +24,7 @@ import numpy as np
 import tensorflow as tf
 
 d2l = sys.modules[__name__]
+nn_Module = tf.keras.Model
 
 #################   WARNING   ################
 # The below part is generated automatically through:
@@ -135,28 +136,99 @@ class Timer:
         return np.array(self.times).cumsum().tolist()
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def synthetic_data(w, b, num_examples):
-    """Generate y = Xw + b + noise."""
-    X = d2l.zeros((num_examples, w.shape[0]))
-    X += tf.random.normal(shape=X.shape)
-    y = d2l.matmul(X, tf.reshape(w, (-1, 1))) + b
-    y += tf.random.normal(shape=y.shape, stddev=0.01)
-    y = d2l.reshape(y, (-1, 1))
-    return X, y
+# Defined in file: ./chapter_linear-networks/api.md
+def add_to_class(Class):
+    def wrapper(obj):
+        setattr(Class, obj.__name__, obj)
+
+    return wrapper
+
+
+# Defined in file: ./chapter_linear-networks/api.md
+class HyperParameters:
+    def save_hyperparameters(self, ignore=[]):
+        raise NotImplemented
+
+
+# Defined in file: ./chapter_linear-networks/api.md
+class ProgressBoard(d2l.HyperParameters):
+    """Plot data points in animation."""
+    def __init__(self, x, xlabel=None, ylabel=None, xlim=None, ylim=None,
+                 xscale='linear', yscale='linear', ls=['-', '--', '-.', ':'],
+                 colors=['C0', 'C1', 'C2',
+                         'C3'], fig=None, axes=None, figsize=(3.5, 2.5)):
+        self.save_hyperparameters()
+        self.points = []
+        self.lines = {}
+
+    def draw(self, points, every_n=1):
+        raise NotImplemented
+
+
+# Defined in file: ./chapter_linear-networks/api.md
+class Module(d2l.nn_Module, d2l.HyperParameters):
+    def __init__(self):
+        super().__init__()
+        self.board = ProgressBoard(x='step')
+
+    def training_step(self, batch, batch_idx):
+        raise NotImplemented
+
+    def validaton_step(self):
+        return None
+
+    def configure_optimizers(self):
+        raise NotImplemented
+
+
+# Defined in file: ./chapter_linear-networks/api.md
+class DataModule(d2l.HyperParameters):
+    def __init__(self, root='../data', num_workers=4):
+        self.save_hyperparameters()
+
+    def train_dataloader(self):
+        """Returns the dataloader for the training dataset."""
+        raise NotImplemented
+
+    def val_dataloader(self):
+        """Returns the dataloader for the validation dataset."""
+
+
+# Defined in file: ./chapter_linear-networks/api.md
+class Trainer(d2l.HyperParameters):
+    def __init__(self, max_epochs):
+        self.save_hyperparameters()
+
+    def fit(self, model, data):
+        raise NotImplemented
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def squared_loss(y_hat, y):
+class SyntheticRegressionData(d2l.DataModule):
+    def __init__(self, w, b, num_examples=1000, batch_size=8):
+        super().__init__()
+        self.save_hyperparameters()
+        self.X = tf.random.normal((num_examples, w.shape[0]))
+        y = d2l.matmul(self.X, tf.reshape(w, (-1, 1))) + b
+        self.y = y + tf.random.normal(y.shape, stddev=0.01)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+def mse(y_hat, y):
     """Squared loss."""
-    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
+    loss = (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
+    return d2l.reduce_mean(loss)
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def sgd(params, grads, lr, batch_size):
-    """Minibatch stochastic gradient descent."""
-    for param, grad in zip(params, grads):
-        param.assign_sub(lr * grad / batch_size)
+class SGD(d2l.HyperParameters):
+    def __init__(self, lr):
+        """Minibatch stochastic gradient descent."""
+        self.save_hyperparameters()
+
+    def apply_gradients(self, grads_and_vars):
+        for grad, param in grads_and_vars:
+            param.assign_sub(self.lr * grad)
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -165,14 +237,25 @@ def linreg(X, w, b):
     return d2l.matmul(X, w) + b
 
 
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+def squared_loss(y_hat, y):
+    """Squared loss."""
+    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
+
+
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
-def load_array(data_arrays, batch_size, is_train=True):
-    """Construct a TensorFlow data iterator."""
-    dataset = tf.data.Dataset.from_tensor_slices(data_arrays)
-    if is_train:
-        dataset = dataset.shuffle(buffer_size=1000)
-    dataset = dataset.batch(batch_size)
-    return dataset
+@d2l.add_to_class(d2l.SyntheticRegressionData)
+def train_dataloader(self):
+    return tf.data.Dataset.from_tensor_slices(
+        (self.X, self.y)).shuffle(buffer_size=1000).batch(self.batch_size)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+class LinearRegression(d2l.Module):
+    def __init__(self, num_inputs, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = tf.keras.layers.Dense(num_outputs)
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
@@ -1464,6 +1547,77 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+@d2l.add_to_class(d2l.HyperParameters)
+def save_hyperparameters(self, ignore=[]):
+    """Save function arguments into class attributes."""
+    frame = inspect.currentframe().f_back
+    _, _, _, local_vars = inspect.getargvalues(frame)
+    self.hparams = {
+        k: v for k, v in local_vars.items()
+        if k not in set(ignore + ['self'])}
+    for k, v in self.hparams.items():
+        setattr(self, k, v)
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+@d2l.add_to_class(d2l.ProgressBoard)
+def _update_lines(self):
+    lines = {}
+    for p in self.points:
+        x = float(p[self.x])
+        for k, v in p.items():
+            if k == self.x: continue
+            if k not in lines:
+                lines[k] = ([], [])
+            lines[k][0].append(x)
+            lines[k][1].append(float(v))
+    for k, v in lines.items():
+        if k not in self.lines:
+            self.lines[k] = ([], [])
+        self.lines[k][0].append(v[0][-1])
+        self.lines[k][1].append(sum(v[1]) / len(v[1]))
+    self.points = []
+
+@d2l.add_to_class(d2l.ProgressBoard)
+def draw(self, points, every_n=1):
+    assert self.x in points, 'must specify the x-axis value'
+    self.points.append(points)
+    if len(self.points) != every_n:
+        return
+    self._update_lines()
+    d2l.use_svg_display()
+    if self.fig is None:
+        self.fig = d2l.plt.figure(figsize=self.figsize)
+    for (k, v), ls, color in zip(self.lines.items(), self.ls, self.colors):
+        d2l.plt.plot(v[0], v[1], linestyle=ls, color=color, label=k)
+    axes = self.axes if self.axes else d2l.plt.gca()
+    if self.xlim: axes.set_xlim(self.xlim)
+    if self.ylim: axes.set_ylim(self.ylim)
+    if not self.xlabel: self.xlabel = self.x
+    axes.set_xlabel(self.xlabel)
+    axes.set_ylabel(self.ylabel)
+    axes.legend(self.lines.keys())
+    axes.grid()
+    display.display(self.fig)
+    display.clear_output(wait=True)
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+@d2l.add_to_class(d2l.Trainer)
+def fit(self, model, data):
+    train_dataloader = data.train_dataloader()
+    self.train_batch_idx = 0
+    optim = model.configure_optimizers()
+    for epoch in range(self.max_epochs):
+        for batch in train_dataloader:
+            with tf.GradientTape() as tape:
+                loss = model.training_step(batch, self.train_batch_idx)
+            grads = tape.gradient(loss, model.trainable_variables)
+            optim.apply_gradients(zip(grads, model.trainable_variables))
+            self.train_batch_idx += 1
+
+
 # Alias defined in config.ini
 size = lambda a: tf.size(a).numpy()
 
@@ -1482,6 +1636,7 @@ normal = tf.random.normal
 rand = tf.random.uniform
 matmul = tf.matmul
 reduce_sum = tf.reduce_sum
+reduce_mean = tf.reduce_mean
 argmax = tf.argmax
 tensor = tf.constant
 arange = tf.range
