@@ -340,6 +340,7 @@ the following dependencies:
 ```{.python .input}
 #@tab all
 #@save
+import inspect
 import collections
 from collections import defaultdict
 from IPython import display
