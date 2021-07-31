@@ -246,44 +246,37 @@ class LinearRegression(d2l.Module):
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_fashion_mnist_labels(labels):
-    """Return text labels for the Fashion-MNIST dataset."""
-    text_labels = [
+class FashionMNIST(d2l.DataModule):
+    def __init__(self, batch_size=32, resize=(28, 28)):
+        super().__init__()
+        self.save_hyperparameters()
+        self.train, self.val = tf.keras.datasets.fashion_mnist.load_data()
+
+
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+def text_labels(self, indices):
+    """Return text labels."""
+    labels = [
         't-shirt', 'trouser', 'pullover', 'dress', 'coat', 'sandal', 'shirt',
         'sneaker', 'bag', 'ankle boot']
-    return [text_labels[int(i)] for i in labels]
+    return [labels[int(i)] for i in indices]
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""
-    figsize = (num_cols * scale, num_rows * scale)
-    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
-    axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):
-        ax.imshow(d2l.numpy(img))
-        ax.axes.get_xaxis().set_visible(False)
-        ax.axes.get_yaxis().set_visible(False)
-        if titles:
-            ax.set_title(titles[i])
-    return axes
+    raise NotImplementedError
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def load_data_fashion_mnist(batch_size, resize=None):
-    """Download the Fashion-MNIST dataset and then load it into memory."""
-    mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
-    # Divide all numbers by 255 so that all pixel values are between
-    # 0 and 1, add a batch dimension at the last. And cast label to int32
-    process = lambda X, y: (tf.expand_dims(X, axis=3) / 255,
-                            tf.cast(y, dtype='int32'))
-    resize_fn = lambda X, y: (tf.image.resize_with_pad(X, resize, resize)
-                              if resize else X, y)
-    return (tf.data.Dataset.from_tensor_slices(
-        process(*mnist_train)).batch(batch_size).shuffle(len(
-            mnist_train[0])).map(resize_fn),
-            tf.data.Dataset.from_tensor_slices(
-                process(*mnist_test)).batch(batch_size).map(resize_fn))
+@d2l.add_to_class(FashionMNIST)
+def train_dataloader(self):
+    return tf.data.Dataset.from_tensor_slices(self.train).batch(
+        self.batch_size).shuffle(len(self.train[0]))
+
+@d2l.add_to_class(FashionMNIST)
+def val_dataloader(self):
+    return tf.data.Dataset.from_tensor_slices(self.val).batch(self.batch_size)
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -1628,6 +1621,21 @@ def sgd(params, grads, lr, batch_size):
     for param, grad in zip(params, grads):
         param.assign_sub(lr * grad / batch_size)
 
+def load_data_fashion_mnist(batch_size, resize=None):
+    """Download the Fashion-MNIST dataset and then load it into memory."""
+    mnist_train, mnist_test = tf.keras.datasets.fashion_mnist.load_data()
+    # Divide all numbers by 255 so that all pixel values are between
+    # 0 and 1, add a batch dimension at the last. And cast label to int32
+    process = lambda X, y: (tf.expand_dims(X, axis=3) / 255,
+                            tf.cast(y, dtype='int32'))
+    resize_fn = lambda X, y: (tf.image.resize_with_pad(X, resize, resize)
+                              if resize else X, y)
+    return (tf.data.Dataset.from_tensor_slices(
+        process(*mnist_train)).batch(batch_size).shuffle(len(
+            mnist_train[0])).map(resize_fn),
+            tf.data.Dataset.from_tensor_slices(
+                process(*mnist_test)).batch(batch_size).map(resize_fn))
+
 
 # Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
 def linreg(X, w, b):
@@ -1637,6 +1645,30 @@ def linreg(X, w, b):
 def squared_loss(y_hat, y):
     """Squared loss."""
     return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
+
+def get_fashion_mnist_labels(labels):
+    """Return text labels for the Fashion-MNIST dataset."""
+    text_labels = [
+        't-shirt', 'trouser', 'pullover', 'dress', 'coat', 'sandal', 'shirt',
+        'sneaker', 'bag', 'ankle boot']
+    return [text_labels[int(i)] for i in labels]
+
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
+    """Plot a list of images."""
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        try:
+            img = d2l.numpy(img)
+        except:
+            pass
+        ax.imshow(img)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    return axes
 
 
 # Alias defined in config.ini
