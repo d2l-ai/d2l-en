@@ -421,3 +421,7 @@ where the $2\times 2$ projection matrix does not depend on any position index $i
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1652)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/3870)
+:end_tab:

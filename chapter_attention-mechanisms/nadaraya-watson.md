@@ -604,3 +604,7 @@ d2l.show_heatmaps(tf.expand_dims(tf.expand_dims(net.attention_weights, axis=0), 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1599)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/3866)
+:end_tab:

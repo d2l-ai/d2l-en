@@ -405,3 +405,8 @@ Later we will encounter alternative models such as transformers that can be used
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1057)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/3861)
+:end_tab:
+
