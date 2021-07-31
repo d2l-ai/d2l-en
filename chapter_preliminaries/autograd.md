@@ -6,8 +6,8 @@ that calculating derivatives is the crucial step
 in all of the optimization algorithms
 that we will use to train deep networks.
 While the calculations are straightforward,
-working them out by hand can tedious and error-prone, 
-problems that only grow 
+working them out by hand can be tedious and error-prone, 
+and this problem only grows
 as our models become more complex.
 
 Fortunately all modern deep learning frameworks
@@ -228,7 +228,7 @@ x.grad  # Overwritten by the newly calculated gradient
 
 ```{.python .input  n=20}
 #@tab pytorch
-x.grad.zero_()  # Reset gradient
+x.grad.zero_()  # Reset the gradient
 y = x.sum()
 y.backward()
 x.grad
@@ -264,7 +264,7 @@ For example, we often have a vector
 representing the value of our loss function
 calculated separately for each among
 a *batch* of training examples.
-Here, just want to (**sum up the gradients
+Here, we just want to (**sum up the gradients
 computed individually for each example**).
 
 :begin_tab:`mxnet`
@@ -278,7 +278,7 @@ $\partial_{\mathbf{x}} \sum_i y_i$.
 
 :begin_tab:`pytorch`
 Because deep learning frameworks vary 
-in how they interpret gradients 
+in how they interpret gradients of
 non-scalar tensors,
 PyTorch takes some steps to avoid confusion.
 Invoking `backward` on a non-scalar elicits an error 
@@ -344,7 +344,7 @@ but whose *provenance* (how it was created)
 has been wiped out.
 Thus `u` has no ancestors in the graph
 and gradients to not flow through `u` to `x`.
-For example taking the gradient of `z = x * u`
+For example, taking the gradient of `z = x * u`
 will yield the result `x`,
 (not `3 * x * x` as you might have 
 expected since `z = x * x * x`).
@@ -408,8 +408,8 @@ t.gradient(y, x) == 2 * x
 
 ## Gradients and Python Control Flow
 
-So far we reviewed cases where the path from input to result 
-was well-defined via a function such as $z = x^3$.  
+So far we reviewed cases where the path from input to output 
+was well-defined via a function such as `z = x * x * x`.
 Programming offers us a lot more freedom in how we compute results. 
 For instance, we can make them depend on auxiliary variables 
 or condition choices on intermediate results. 
@@ -461,7 +461,7 @@ def f(a):
     return c
 ```
 
-Below we call this function with a random variable as input 
+Below, we call this function, passing in a random value as input.
 Since the input is a random variable, 
 we do not know what form 
 the computational graph will take.
@@ -517,7 +517,7 @@ a.grad == d / a
 d_grad == d / a
 ```
 
-Dynamic control flow is very common in Deep Learning. 
+Dynamic control flow is very common in deep learning. 
 For instance, when processing text, the computational graph
 depends on the length of the input. 
 In these cases, automatic differentiation 
@@ -529,7 +529,7 @@ since it is impossible to compute the gradient a priori.
 
 You've now gotten a taste of the power of automatic differentiation. 
 The development of libraries for calculating derivatives
-both automatically, and efficiently 
+both automatically and efficiently 
 has been a massive productivity booster
 for deep learning practitioners,
 liberating them to focus on loftier concerns.

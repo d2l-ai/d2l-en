@@ -53,14 +53,12 @@ Formally, for functions $f: \mathbb{R} \rightarrow \mathbb{R}$,
 that map from scalars to scalars,
 [**the *derivative* of $f$ at a point $x$ is defined as**]
 
-(**$$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h},$$**)
+(**$$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h}.$$**)
 :eqlabel:`eq_derivative`
 
 This term on the right hand side is called a *limit* 
 and it tells us what happens 
 to the value of an expression
-(doesit blow up to infinity 
-or converge to a some value)
 as a specified variable 
 approaches a particular value.
 This limit tells us what 
@@ -70,8 +68,8 @@ $f(x + h) - f(x)$ converges to
 as we shrink its size to zero.
 
 When $f'(x)$ exists, $f$ is said 
-to be *differentiable* at $a$.
-And when $f'(x)$ exists for all $x$
+to be *differentiable* at $x$;
+and when $f'(x)$ exists for all $x$
 on a set, e.g., the interval $[a,b]$, 
 we say that $f$ is differentiable on this set.
 Not all functions are differentiable,
@@ -85,12 +83,9 @@ we often optimize a differentiable *surrogate* instead.
 
 
 We can interpret the derivative 
-$f'(x)$ in :eqref:`eq_derivative`
+$f'(x)$
 as the *instantaneous* rate of change 
 of $f(x)$ with respect to $x$.
-
-
-
 Let's develop some intuition with an example.
 (**Define $u = f(x) = 3x^2-4x$.**)
 
@@ -131,7 +126,7 @@ def f(x):
 as as $h$ approaches $0$.**)
 While this experiment lacks 
 the rigor of a mathematical proof,
-we will see later see that indeed $f'(1) = 2$.
+we will soon see that indeed $f'(1) = 2$.
 
 ```{.python .input}
 #@tab all
@@ -149,12 +144,12 @@ Below, we present the derivatives of some common functions:
 
 $$\begin{aligned} \frac{d}{dx} C & = 0 && \text{for any constant $C$} \\ \frac{d}{dx} x^n & = n x^{n-1} && \text{for } n \neq 0 \\ \frac{d}{dx} e^x & = e^x \\ \frac{d}{dx} \ln x & = x^{-1} \end{aligned}$$
 
-Functions composes from differentiable functions 
+Functions composed from differentiable functions 
 are often themselves differentiable.
 The following rules come in handy 
 for working with compositions 
 of any differentiable functions 
-$f$ and $g$, and constant $c$.
+$f$ and $g$, and constant $C$.
 
 $$\begin{aligned} \frac{d}{dx} [C f(x)] & = C \frac{d}{dx} f(x) && \text{Constant multiple rule} \\ \frac{d}{dx} [f(x) + g(x)] & = \frac{d}{dx} f(x) + \frac{d}{dx} g(x) && \text{Sum rule} \\ \frac{d}{dx} [f(x) g(x)] & = f(x) \frac{d}{dx} g(x) + g(x) \frac{d}{dx} f(x) && \text{Product rule} \\ \frac{d}{dx} \frac{f(x)}{g(x)} & = \frac{g(x) \frac{d}{dx} f(x) - f(x) \frac{d}{dx} g(x)}{g^2(x)} && \text{Quotient rule} \end{aligned}$$
 
@@ -177,7 +172,7 @@ As its name indicates, `use_svg_display`
 tells `matplotlib` to output graphics 
 in SVG format for crisper images. 
 The comment `#@save` is a special modifier 
-that allows us to save the subsequent function, 
+that allows us to save any function, 
 class, or other code block to the `d2l` package 
 so that we can invoke it later 
 without repeating the code, 
@@ -347,9 +342,9 @@ i.e.,  $\mathbf{u} = g(\mathbf{x})$.
 Then the chain rule states that
 
 $$\frac{dy}{dx_i} = \frac{dy}{du_1} \frac{du_1}{dx_i} + \frac{dy}{du_2} \frac{du_2}{dx_i} + \cdots + \frac{dy}{du_m} \frac{du_m}{dx_i} \text{ and thus }
-\nabla_{\mathbf{x}} y = \nabla_{\mathbf{u}} y \cdot \nabla_{x} \mathbf{u}.$$
+\nabla_{\mathbf{x}} y = \langle \nabla_{\mathbf{u}} y, \nabla_{\mathbf{x}} \mathbf{u}\rangle.$$
 
-Note that $\nabla_{x} \mathbf{u}$ is a *matrix*
+Note that $\nabla_{\mathbf{x}} \mathbf{u}$ is a *matrix*
 because it contains the derivative of a vector 
 with respect to a vector.
 Thus, evaluating the gradient requires 
@@ -364,9 +359,9 @@ in building deep learning systems.
 
 While we have just scratched the surface of a deep topic,
 a number of concepts already come into focus: 
-first, the composition rules for differentiation 
-allow us to compute the derivatives of complex functions
-*automatically* by rote application.
+first, the composition rules for differentiation
+can be applied mindlessly, enabling
+us to compute gradients *automatically*.
 This task requires no creativity and thus 
 we can focus our cognitive powers elsewhere.
 Second, computing the derivatives of vector-valued functions 
@@ -376,7 +371,7 @@ In particular, this graph is traversed in a *forward* direction
 when we evaluate a function 
 and in a *backwards* direction 
 when we compute gradients. 
-Later chapters will formalize introduce backpropagation,
+Later chapters will formally introduce backpropagation,
 a computational procedure for applying the chain rule.
 
 From the viewpoint of optimization, gradients allow us 
@@ -389,7 +384,7 @@ throughout this book will require calculating the gradient.
 
 1. So far we took the rules for derivatives for granted. 
    Using the definition and limits prove the properties 
-   for a) $f(x) = c$, b) $f(x) = x^n$, c) $f(x) = e^x$ and d) $f(x) = \ln x$.
+   for (i) $f(x) = c$, (ii) $f(x) = x^n$, (iii) $f(x) = e^x$ and (iv) $f(x) = \log x$.
 1. In the same vein, prove the product, sum, and quotient rule from first principles. 
 1. Prove that the constant multiple rule follows as a special case of the product rule. 
 1. Calculate the derivative of $f(x) = x^x$. 
