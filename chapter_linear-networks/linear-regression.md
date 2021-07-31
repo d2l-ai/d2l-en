@@ -261,11 +261,11 @@ In summary, minibatch SGD proceeds as follows:
 (ii) iteratively sample random minibatches from the data,
 updating the parameters in the direction of the negative gradient.
 For quadratic losses and affine transformations,
-we can write this out explicitly as follows:
+this has a closed-form expansion:
 
 $$\begin{aligned} 
-\mathbf{w} & \leftarrow \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) & = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)\\ 
-b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  & = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
+\mathbf{w} & \leftarrow \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) && = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)\\ 
+b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  && = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
 :eqlabel:`eq_linreg_batch_update`
 
 Since we pick a minibatch $\mathcal{B}$ we need to normalize by its size
@@ -576,28 +576,27 @@ statistics, computer science and many other fields.
 
 ## Summary
 
-
-
-* Key ingredients in a machine learning model are training data, a loss function, an optimization algorithm, and quite obviously, the model itself.
-* Vectorizing makes everything better (mostly math) and faster (mostly code).
-* Minimizing an objective function and performing maximum likelihood estimation can mean the same thing.
-* Linear regression models are neural networks, too.
-
+This section covered a significant amount of material ranging from our first model, a linear network with squared loss to optimization, computational considerations, connections to statistics, and lastly, how all of this relates to biology. While the very content is quite simple, often bordering on the trivial (very few statistical models still content themselves with linear models), it has, in a nutshell, all the components that we will be covering throughout the remainder of the book: the linear model will be replaced by an increasingly complex and sophisticated set of networks with parameter initializations, connections and transformations. In the same way, the loss function will become more specialized for the particular problem that we will study, ranging from object detection to machine translation, inpainting and time-series prediction. The simple minibatch SGD algorithm will see a number of extensions to cover momentum, clipping to prevent divergence and a great deal of optimizations for computational efficiency and distributed training. Computation will come to the fore when we want to use high performance GPUs, in particular when it comes to keeping all processing elements of such devices busy. As such, this first step into linear regression, while simple, will take us far. 
 
 ## Exercises
 
 1. Assume that we have some data $x_1, \ldots, x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
-    1. Find a analytic solution for the optimal value of $b$.
+    1. Find an analytic solution for the optimal value of $b$.
     1. How does this problem and its solution relate to the normal distribution?
-1. Derive the analytic solution to the optimization problem for linear regression with squared error. To keep things simple, you can omit the bias $b$ from the problem (we can do this in principled fashion by adding one column to $\mathbf X$ consisting of all ones).
-    1. Write out the optimization problem in matrix and vector notation (treat all the data as a single matrix, and all the target values as a single vector).
-    1. Compute the gradient of the loss with respect to $w$.
-    1. Find the analytic solution by setting the gradient equal to zero and solving the matrix equation.
-    1. When might this be better than using stochastic gradient descent? When might this method break?
+    1. What if we change the loss from $\sum_i (x_i - b)^2$ to $\sum_i |x_i-b|$? Can you find the optimal solution for $b$?
+1. Prove that the affine functions that can be expressed by $\mathbf{x}^\top \mathbf{w} + b$ are equivalent to linear functions on $(\mathbf{x}, 1)$. 
+1. Assume that you want to find quadratic functions of $\mathbf{x}$, i.e.\ $f(\mathbf{x}) = b + \sum_i w_i x_i + \sum_{j \leq i} w_{ij} x_{i} x_{j}$. How would you formulate this in a deep network? 
+1. Recall that one of the conditions for the linear regression problem to be solvable was that the design matrix $\mathbf{X}^\top \mathbf{X}$ has full rank. 
+    1. What happens if this is not the case? 
+    1. How could you fix it? What happens if you add a small amount of coordinate-wise independent Gaussian noise to all entries of $\mathbf{X}$?
+    1. What is the expected value of the design matrix $\mathbf{X}^\top \mathbf{X}$ in this case? 
+    1. What happens with stochastic gradient descent when $\mathbf{X}^\top \mathbf{X}$ doesn't have full rank? 
 1. Assume that the noise model governing the additive noise $\epsilon$ is the exponential distribution. That is, $p(\epsilon) = \frac{1}{2} \exp(-|\epsilon|)$.
     1. Write out the negative log-likelihood of the data under the model $-\log P(\mathbf y \mid \mathbf X)$.
     1. Can you find a closed form solution?
     1. Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint: what happens near the stationary point as we keep on updating the parameters)? Can you fix this?
+1. Assume that we want to design a Neural Network with two layers by composing two linear layers. That is, the output of the first layer becomes the input of the second layer. Why would such a naive composition not work?
+
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/40)
