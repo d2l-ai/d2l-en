@@ -313,16 +313,12 @@ In deep learning this process is often referred
 as *prediction* or *inference*. While the latter is 
 emerging as standard jargon in deep learning (e.g., the [MLPerf](http://mlperf.org/) 
 benchmark has a training and an inference section), 
-it 
-
-We will try to stick with *prediction* because
-calling this step *inference*,
-despite emerging as standard jargon in deep learning,
-is somewhat of a misnomer.
+it is somewhat of a misnomer.
 In statistics, *inference* more often denotes
 estimating parameters based on a dataset.
 This misuse of terminology is a common source of confusion
-when deep learning practitioners talk to statisticians.
+when deep learning practitioners talk to statisticians. 
+In the following we will stick to *prediction* whenever possible. 
 
 
 ## Vectorization for Speed
@@ -363,10 +359,10 @@ import time
 
 To illustrate why this matters so much,
 we can (**consider two methods for adding vectors.**)
-To start we instantiate two 10000-dimensional vectors
+To start we instantiate two 10,000-dimensional vectors
 containing all ones.
-In one method we will loop over the vectors with a Python for-loop.
-In the other method we will rely on a single call to `+`.
+In one method we loop over the vectors with a Python for-loop.
+In the other method we rely on a single call to `+`.
 
 ```{.python .input  n=2}
 #@tab all
@@ -406,12 +402,12 @@ d = a + b
 f'{time.time() - t:.5f} sec'
 ```
 
-You probably noticed that the second method
+The second method
 is dramatically faster than the first.
 Vectorizing code often yields order-of-magnitude speedups.
 Moreover, we push more of the mathematics to the library
 and need not write as many calculations ourselves,
-reducing the potential for errors.
+reducing the potential for errors and increasing portability of the code.
 
 ## The Normal Distribution and Squared Loss
 :label:`subsec_normal_distribution_and_squared_loss`
@@ -420,8 +416,10 @@ While you can already get your hands dirty using only the information above,
 in the following we can more formally motivate the squared loss objective
 via assumptions about the distribution of noise.
 
-Linear regression was invented by Gauss in 1795,
-who also discovered the normal distribution (also called the *Gaussian*).
+Linear regression was invented by Gauss and Legendre at the turn of the 19th 
+century (whether it was Gauss or Legendre who had the idea first became 
+the source of a high-profile academic dispute). Regardless, 
+Gauss also discovered the normal distribution (also called the *Gaussian*).
 It turns out that the connection between
 the normal distribution and linear regression
 runs deeper than common parentage.
@@ -431,13 +429,14 @@ is given as
 
 $$p(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (x - \mu)^2\right).$$
 
-Below [**we define a Python function to compute the normal distribution**].
+Below [**we define a
+function to compute the normal distribution**].
 
 ```{.python .input  n=3}
 #@tab all
 def normal(x, mu, sigma):
     p = 1 / math.sqrt(2 * math.pi * sigma**2)
-    return p * np.exp(-0.5 / sigma**2 * (x - mu)**2)
+    return p * np.exp(-0.5 * (x - mu)**2 / sigma**2)
 ```
 
 We can now (**visualize the normal distributions**).
@@ -458,7 +457,7 @@ As we can see, changing the mean corresponds to a shift along the $x$-axis,
 and increasing the variance spreads the distribution out, lowering its peak.
 
 One way to motivate linear regression with the mean squared error loss function (or simply squared loss)
-is to formally assume that observations arise from noisy observations,
+is to assume that observations arise from noisy measurements,
 where the noise is normally distributed as follows:
 
 $$y = \mathbf{w}^\top \mathbf{x} + b + \epsilon \text{ where } \epsilon \sim \mathcal{N}(0, \sigma^2).$$
@@ -466,93 +465,78 @@ $$y = \mathbf{w}^\top \mathbf{x} + b + \epsilon \text{ where } \epsilon \sim \ma
 Thus, we can now write out the *likelihood*
 of seeing a particular $y$ for a given $\mathbf{x}$ via
 
-$$P(y \mid \mathbf{x}) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (y - \mathbf{w}^\top \mathbf{x} - b)^2\right).$$
+$$P(y | \mathbf{x}) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (y - \mathbf{w}^\top \mathbf{x} - b)^2\right).$$
 
-Now, according to the principle of maximum likelihood,
+As such, the likelihood factorizes. Now, according to the principle of maximum likelihood,
 the best values of parameters $\mathbf{w}$ and $b$ are those
 that maximize the *likelihood* of the entire dataset:
 
-$$P(\mathbf y \mid \mathbf X) = \prod_{i=1}^{n} p(y^{(i)}|\mathbf{x}^{(i)}).$$
+$$P(\mathbf y|\mathbf X) = \prod_{i=1}^{n} p(y^{(i)}|\mathbf{x}^{(i)}).$$
 
-Estimators chosen according to the principle of maximum likelihood
+The equality follows since all pairs $(\mathbf{x}^{(i)}, y^{(i)})$ were drawn independently
+of each other. Estimators chosen according to the principle of maximum likelihood
 are called *maximum likelihood estimators*.
 While, maximizing the product of many exponential functions,
 might look difficult,
 we can simplify things significantly, without changing the objective,
-by maximizing the log of the likelihood instead.
+by maximizing the logarithm of the likelihood instead.
 For historical reasons, optimizations are more often expressed
 as minimization rather than maximization.
-So, without changing anything we can minimize the *negative log-likelihood*
-$-\log P(\mathbf y \mid \mathbf X)$.
+So, without changing anything we can *minimize* the *negative log-likelihood*
+$-\log P(\mathbf y \mid \mathbf X)$. 
 Working out the mathematics gives us:
 
-$$-\log P(\mathbf y \mid \mathbf X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) + \frac{1}{2 \sigma^2} \left(y^{(i)} - \mathbf{w}^\top \mathbf{x}^{(i)} - b\right)^2.$$
+$$-\log P(\mathbf y | \mathbf X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) + \frac{1}{2 \sigma^2} \left(y^{(i)} - \mathbf{w}^\top \mathbf{x}^{(i)} - b\right)^2.$$
 
-Now we just need one more assumption that $\sigma$ is some fixed constant.
-Thus we can ignore the first term because
-it does not depend on $\mathbf{w}$ or $b$.
-Now the second term is identical to the squared error loss introduced earlier,
+If we assume that $\sigma$ is fixed, we can ignore the first term, as it does not 
+depend on $\mathbf{w}$ or $b$.
+The second term is identical to the squared error loss introduced earlier,
 except for the multiplicative constant $\frac{1}{\sigma^2}$.
-Fortunately, the solution does not depend on $\sigma$.
+Fortunately, the solution does not depend on $\sigma$ either.
 It follows that minimizing the mean squared error
 is equivalent to maximum likelihood estimation
 of a linear model under the assumption of additive Gaussian noise.
 
-## From Linear Regression to Deep Networks
+## Deep Networks
 
 So far we only talked about linear models.
 While neural networks cover a much richer family of models,
-we can begin thinking of the linear model
-as a neural network by expressing it in the language of neural networks.
-To begin, let us start by rewriting things in a "layer" notation.
+we can begin by expressing the linear model in the language of neural networks.
+Let's begin by rewriting things in a "layer" notation.
 
-### Neural Network Diagram
+### Layers
 
-Deep learning practitioners like to draw diagrams
-to visualize what is happening in their models.
-In :numref:`fig_single_neuron`,
-we depict our linear regression model as a neural network.
-Note that these diagrams highlight the connectivity pattern
+:numref:`fig_single_neuron` depicts linear regression as a neural network.
+The diagram highlights the connectivity pattern
 such as how each input is connected to the output,
-but not the values taken by the weights or biases.
+but not the specific values taken by the weights or biases.
 
 ![Linear regression is a single-layer neural network.](../img/singleneuron.svg)
 :label:`fig_single_neuron`
 
-For the neural network shown in :numref:`fig_single_neuron`,
-the inputs are $x_1, \ldots, x_d$,
-so the *number of inputs* (or *feature dimensionality*) in the input layer is $d$.
-The output of the network in :numref:`fig_single_neuron` is $o_1$,
-so the *number of outputs* in the output layer is 1.
-Note that the input values are all *given*
-and there is just a single *computed* neuron.
+The inputs are $x_1, \ldots, x_d$. We refer to $d$ as the *number of inputs* or *feature dimensionality* in the input layer. The output of the network is $o_1$, so the *number of outputs* in the output layer is 1.
+Note that the input values are all *given*. There is just a single *computed* neuron.
 Focusing on where computation takes place,
 conventionally we do not consider the input layer when counting layers.
 That is to say,
 the *number of layers* for the neural network in :numref:`fig_single_neuron` is 1.
-We can think of linear regression models as neural networks
-consisting of just a single artificial neuron,
-or as single-layer neural networks.
+Moreover, in linear regression every input is connected to every output. 
+We can thus regard the the corresponding layer as a *fully-connected layer* or *dense layer*. 
 
-Since for linear regression, every input is connected
-to every output (in this case there is only one output),
-we can regard this transformation (the output layer in :numref:`fig_single_neuron`)
-as a *fully-connected layer* or *dense layer*.
-We will talk a lot more about networks composed of such layers
-in the next chapter.
+In summary, we can think of linear regression as a single-layer fully-connected neural network.
+We will encounter networks composed of many such layers in the next chapter.
 
 
 ### Biology
 
-Since linear regression (invented in 1795)
-predates computational neuroscience,
+Since linear regression predates computational neuroscience,
 it might seem anachronistic to describe
 linear regression as a neural network.
-To see why linear models were a natural place to begin
-when the cyberneticists/neurophysiologists
+Nonetheless, they were a natural place to start 
+when the cyberneticists and neurophysiologists
 Warren McCulloch and Walter Pitts began to develop
-models of artificial neurons,
-consider the cartoonish picture
+models of artificial neurons. 
+Consider the cartoonish picture
 of a biological neuron in :numref:`fig_Neuron`, consisting of
 *dendrites* (input terminals),
 the *nucleus* (CPU), the *axon* (output wire),
@@ -563,38 +547,36 @@ enabling connections to other neurons via *synapses*.
 :label:`fig_Neuron`
 
 Information $x_i$ arriving from other neurons
-(or environmental sensors such as the retina)
-is received in the dendrites.
-In particular, that information is weighted by *synaptic weights* $w_i$
-determining the effect of the inputs
-(e.g., activation or inhibition via the product $x_i w_i$).
+(or environmental sensors) is received in the dendrites.
+In particular, that information is weighted by *synaptic weights* $w_i$,
+determining the effect of the inputs, e.g., activation or inhibition via the product $x_i w_i$.
 The weighted inputs arriving from multiple sources
-are aggregated in the nucleus as a weighted sum $y = \sum_i x_i w_i + b$,
-and this information is then sent for further processing in the axon $y$,
-typically after some nonlinear processing via $\sigma(y)$.
-From there it either reaches its destination (e.g., a muscle)
-or is fed into another neuron via its dendrites.
+are aggregated in the nucleus as a weighted sum $y = \sum_i x_i w_i + b$, 
+possibly subject to some nonlinear postprocessing via $\sigma(y)$. 
+This information is then sent via the axon to the axon terminals, where it reaches its destination 
+(e.g., an actuator such as a muscle) or it is 
+fed into another neuron via its dendrites.
 
 Certainly, the high-level idea that many such units
-could be cobbled together with the right connectivity
+could be combined with the right connectivity
 and right learning algorithm,
 to produce far more interesting and complex behavior
 than any one neuron alone could express
 owes to our study of real biological neural systems.
 
 At the same time, most research in deep learning today
-draws little direct inspiration in neuroscience.
-We invoke Stuart Russell and Peter Norvig who,
-in their classic AI text book
-*Artificial Intelligence: A Modern Approach* :cite:`Russell.Norvig.2016`,
-pointed out that although airplanes might have been *inspired* by birds,
+draws inspiration from a much wider source. 
+We invoke Stuart Russell and Peter Norvig :cite:`Russell.Norvig.2016`
+who pointed out that although airplanes might have been *inspired* by birds,
 ornithology has not been the primary driver
 of aeronautics innovation for some centuries.
 Likewise, inspiration in deep learning these days
-comes in equal or greater measure from mathematics,
-statistics, and computer science.
+comes in equal or greater measure from mathematics, linguistics, psychology, 
+statistics, computer science and many other fields.
 
 ## Summary
+
+
 
 * Key ingredients in a machine learning model are training data, a loss function, an optimization algorithm, and quite obviously, the model itself.
 * Vectorizing makes everything better (mostly math) and faster (mostly code).
