@@ -12,9 +12,12 @@ to make sure that you really know what you are doing.
 Moreover, when it comes time to customize models,
 defining our own layers or loss functions,
 understanding how things work under the hood will prove handy.
-In this section, we will rely only on tensors and auto differentiation.
-Afterwards, we will introduce a more concise implementation,
-taking advantage of bells and whistles of deep learning frameworks.
+In this section, we will rely only on tensors and automatic differentiation.
+For elegance of implementation we use a modular API inspired in its structure 
+by [PyTorch Lightning](https://www.pytorchlightning.ai/). 
+Later on, we will introduce a more concise implementation,
+taking advantage of bells and whistles of deep learning frameworks while sharing
+same overall structure as what follows below.
 
 ```{.python .input}
 %matplotlib inline
