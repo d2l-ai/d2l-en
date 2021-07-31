@@ -1037,3 +1037,8 @@ for eng, fra in zip(engs, fras):
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1062)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/3865)
+:end_tab:
+

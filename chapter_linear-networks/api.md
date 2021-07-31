@@ -8,11 +8,11 @@ It will make you easier to read our code and even use it in your projects.
 
 Through this book we will use minibatch stochastic gradient decent to train our models. 
 It opens the door for us to adopt a consistent API design. In particular, we organize our code
-into three parts: data, model, and training. 
-
+into three parts: data, model, and training.
 
 ```{.python .input}
 import time
+import numpy as np
 from d2l import mxnet as d2l
 from mxnet.gluon import nn
 ```
@@ -20,6 +20,7 @@ from mxnet.gluon import nn
 ```{.python .input}
 #@tab pytorch
 import time
+import numpy as np
 from d2l import torch as d2l
 import torch
 from torch import nn
@@ -29,13 +30,14 @@ from torch import nn
 ```{.python .input}
 #@tab tensorflow
 import time
+import numpy as np
 from d2l import torch as d2l
 import tensorflow as tf
 ```
 
 ## Utilities
 
-Let's first introduce utility functions and classes. We will adopt the object-oriented programming that is common for Python libraries. It's, however, used less in notebooks where we often introduce keep a code block short for readability. The first one is function that allows us to register a function to a class so we can split class methods into multiple code blocks. 
+Let's first introduce utility functions and classes. We will adopt the object-oriented programming that is common for Python libraries. It's, however, used less in notebooks where we often introduce keep a code block short for readability. The first one is function that allows us to register a function to a class so we can split class methods into multiple code blocks.
 
 ```{.python .input}
 #@tab all
@@ -45,7 +47,7 @@ def add_to_class(Class):  #@save
     return wrapper
 ```
 
-For example, if we plan to implement a class `A` with a method `do`. Instead of having code for both `A` and `do` in the same code block, we can first declare the class `A` and construct an instance `a`. 
+For example, if we plan to implement a class `A` with a method `do`. Instead of having code for both `A` and `do` in the same code block, we can first declare the class `A` and construct an instance `a`.
 
 ```{.python .input}
 #@tab all
@@ -56,13 +58,13 @@ class A:
 a = A()
 ```
 
-Next we define the class method `do` as we do normally but not in the class `A`'s scope. Instead, we decorate this function by `add_to_class` with class `A` as its argument. Then we can see that the instance `a` we created in the last block has this method. 
+Next we define the class method `do` as we do normally but not in the class `A`'s scope. Instead, we decorate this function by `add_to_class` with class `A` as its argument. Then we can see that the instance `a` we created in the last block has this method.
 
 ```{.python .input}
 #@tab all
 @add_to_class(A)
 def do(self):
-    print('class attribute `a` is', self.a)
+    print('class attribute "a" is', self.a)
 
 a.do()
 ```
@@ -107,16 +109,13 @@ class ProgressBoard(d2l.HyperParameters):  #@save
         raise NotImplemented
 ```
 
-Take an example. The `every_n` argument draw a point in the plot for every $n$ points passed to `draw`. The draw point is the averaged value. 
+Take an example. The `every_n` argument draw a point in the plot for every $n$ points passed to `draw`. The draw point is the averaged value.
 
 ```{.python .input}
 #@tab all
-points = [{'x':1, 'y1':2, 'y2':3}, {'x':2, 'y1':3, 'y2':4},
-          {'x':3, 'y1':2, 'y2':3}, {'x':4, 'y1':3, 'y2':4}]
 board = d2l.ProgressBoard(x='x')
-for p in points:
-    board.draw(p)
-    time.sleep(1)
+for x in np.arange(0, 6, 0.05):
+    board.draw({'x':x, 'sin':np.sin(x), 'cos':np.cos(x)}, every_n=10)
 ```
 
 ## Model
@@ -135,13 +134,13 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
         self.board = ProgressBoard(x='step')
 
     def training_step(self, batch, batch_idx):
-        raise NotImplemented
+        raise NotImplementedError
 
     def validaton_step(self):
-        return None
+        pass
 
     def configure_optimizers(self):
-        raise NotImplemented
+        raise NotImplementedError
 ```
 
 ##  Data
@@ -153,18 +152,17 @@ class DataModule(d2l.HyperParameters):  #@save
         self.save_hyperparameters()
 
     def train_dataloader(self):
-        """Returns the dataloader for the training dataset."""
-        raise NotImplemented
+        raise NotImplementedError
 
     def val_dataloader(self):
-        """Returns the dataloader for the validation dataset."""
+        pass
 ```
 
 ## Training API
 
 We can construct a trainer by specifying the maximal number of epochs. Our fully functional trainer allows other options such as the number of GPUs, here we keep it simple and will discuss it later.
 
-The `fit` method accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. 
+The `fit` method accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`.
 
 ```{.python .input}
 #@tab all
@@ -173,5 +171,5 @@ class Trainer(d2l.HyperParameters):  #@save
         self.save_hyperparameters()
 
     def fit(self, model, data):
-        raise NotImplemented
+        raise NotImplementedError
 ```

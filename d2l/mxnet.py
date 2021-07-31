@@ -172,13 +172,13 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
         self.board = ProgressBoard(x='step')
 
     def training_step(self, batch, batch_idx):
-        raise NotImplemented
+        raise NotImplementedError
 
     def validaton_step(self):
-        return None
+        pass
 
     def configure_optimizers(self):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 # Defined in file: ./chapter_linear-networks/api.md
@@ -187,11 +187,10 @@ class DataModule(d2l.HyperParameters):
         self.save_hyperparameters()
 
     def train_dataloader(self):
-        """Returns the dataloader for the training dataset."""
-        raise NotImplemented
+        raise NotImplementedError
 
     def val_dataloader(self):
-        """Returns the dataloader for the validation dataset."""
+        pass
 
 
 # Defined in file: ./chapter_linear-networks/api.md
@@ -200,7 +199,7 @@ class Trainer(d2l.HyperParameters):
         self.save_hyperparameters()
 
     def fit(self, model, data):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -242,27 +241,6 @@ class SGD(d2l.HyperParameters):
             param -= self.lr * param.grad
 
 
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def synthetic_data(w, b, num_examples):
-    """Generate y = Xw + b + noise."""
-    X = d2l.normal(0, 1, (num_examples, len(w)))
-    y = d2l.matmul(X, w) + b
-    y += d2l.normal(0, 0.01, y.shape)
-    return X, d2l.reshape(y, (-1, 1))
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def linreg(X, w, b):
-    """The linear regression model."""
-    return d2l.matmul(X, w) + b
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def squared_loss(y_hat, y):
-    """Squared loss."""
-    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
-
-
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 @d2l.add_to_class(d2l.SyntheticRegressionData)
 def train_dataloader(self):
@@ -280,49 +258,43 @@ class LinearRegression(d2l.Module):
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_fashion_mnist_labels(labels):
-    """Return text labels for the Fashion-MNIST dataset."""
-    text_labels = [
+class FashionMNIST(d2l.DataModule):
+    def __init__(self, batch_size=32, resize=(28, 28)):
+        super().__init__()
+        self.save_hyperparameters()
+        self.train = gluon.data.vision.FashionMNIST(train=True)
+        self.val = gluon.data.vision.FashionMNIST(train=False)
+
+
+# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+def text_labels(self, indices):
+    """Return text labels."""
+    labels = [
         't-shirt', 'trouser', 'pullover', 'dress', 'coat', 'sandal', 'shirt',
         'sneaker', 'bag', 'ankle boot']
-    return [text_labels[int(i)] for i in labels]
+    return [labels[int(i)] for i in indices]
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""
-    figsize = (num_cols * scale, num_rows * scale)
-    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
-    axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):
-        ax.imshow(d2l.numpy(img))
-        ax.axes.get_xaxis().set_visible(False)
-        ax.axes.get_yaxis().set_visible(False)
-        if titles:
-            ax.set_title(titles[i])
-    return axes
+    raise NotImplementedError
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def get_dataloader_workers():
-    """Use 4 processes to read the data except for Windows."""
-    return 0 if sys.platform.startswith('win') else 4
+@d2l.add_to_class(FashionMNIST)
+def train_dataloader(self):
+    trans = gluon.data.vision.transforms.ToTensor()
+    return gluon.data.DataLoader(self.train.transform_first(trans),
+                                 self.batch_size, shuffle=True,
+                                 num_workers=self.num_workers)
 
-
-# Defined in file: ./chapter_linear-networks/image-classification-dataset.md
-def load_data_fashion_mnist(batch_size, resize=None):
-    """Download the Fashion-MNIST dataset and then load it into memory."""
-    dataset = gluon.data.vision
-    trans = [dataset.transforms.ToTensor()]
-    if resize:
-        trans.insert(0, dataset.transforms.Resize(resize))
-    trans = dataset.transforms.Compose(trans)
-    mnist_train = dataset.FashionMNIST(train=True).transform_first(trans)
-    mnist_test = dataset.FashionMNIST(train=False).transform_first(trans)
-    return (gluon.data.DataLoader(mnist_train, batch_size, shuffle=True,
-                                  num_workers=get_dataloader_workers()),
-            gluon.data.DataLoader(mnist_test, batch_size, shuffle=False,
-                                  num_workers=get_dataloader_workers()))
+@d2l.add_to_class(FashionMNIST)
+def val_dataloader(self):
+    trans = gluon.data.vision.transforms.ToTensor()
+    return gluon.data.DataLoader(self.val.transform_first(trans),
+                                 self.batch_size, shuffle=False,
+                                 num_workers=self.num_workers)
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -3027,6 +2999,77 @@ def fit(self, model, data):
             else:
                 optim.step()
             self.train_batch_idx += 1
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+def load_array(data_arrays, batch_size, is_train=True):
+    """Construct a Gluon data iterator."""
+    dataset = gluon.data.ArrayDataset(*data_arrays)
+    return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
+
+def synthetic_data(w, b, num_examples):
+    """Generate y = Xw + b + noise."""
+    X = d2l.normal(0, 1, (num_examples, len(w)))
+    y = d2l.matmul(X, w) + b
+    y += d2l.normal(0, 0.01, y.shape)
+    return X, d2l.reshape(y, (-1, 1))
+
+def sgd(params, lr, batch_size):
+    """Minibatch stochastic gradient descent."""
+    for param in params:
+        param[:] = param - lr * param.grad / batch_size
+
+def get_dataloader_workers():
+    """Use 4 processes to read the data except for Windows."""
+    return 0 if sys.platform.startswith('win') else 4
+
+def load_data_fashion_mnist(batch_size, resize=None):
+    """Download the Fashion-MNIST dataset and then load it into memory."""
+    dataset = gluon.data.vision
+    trans = [dataset.transforms.ToTensor()]
+    if resize:
+        trans.insert(0, dataset.transforms.Resize(resize))
+    trans = dataset.transforms.Compose(trans)
+    mnist_train = dataset.FashionMNIST(train=True).transform_first(trans)
+    mnist_test = dataset.FashionMNIST(train=False).transform_first(trans)
+    return (gluon.data.DataLoader(mnist_train, batch_size, shuffle=True,
+                                  num_workers=get_dataloader_workers()),
+            gluon.data.DataLoader(mnist_test, batch_size, shuffle=False,
+                                  num_workers=get_dataloader_workers()))
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+def linreg(X, w, b):
+    """The linear regression model."""
+    return d2l.matmul(X, w) + b
+
+def squared_loss(y_hat, y):
+    """Squared loss."""
+    return (y_hat - d2l.reshape(y, y_hat.shape))**2 / 2
+
+def get_fashion_mnist_labels(labels):
+    """Return text labels for the Fashion-MNIST dataset."""
+    text_labels = [
+        't-shirt', 'trouser', 'pullover', 'dress', 'coat', 'sandal', 'shirt',
+        'sneaker', 'bag', 'ankle boot']
+    return [text_labels[int(i)] for i in labels]
+
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
+    """Plot a list of images."""
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        try:
+            img = d2l.numpy(img)
+        except:
+            pass
+        ax.imshow(img)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    return axes
 
 
 # Alias defined in config.ini

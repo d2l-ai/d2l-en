@@ -234,3 +234,8 @@ this encoder-decoder architecture.
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1061)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/3864)
+:end_tab:
+

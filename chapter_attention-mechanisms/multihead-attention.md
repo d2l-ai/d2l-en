@@ -402,3 +402,7 @@ attention(X, Y, Y, valid_lens, training=False).shape
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/1635)
 :end_tab:
+
+:begin_tab:`tensorflow`
+[Discussions](https://discuss.d2l.ai/t/3869)
+:end_tab:
