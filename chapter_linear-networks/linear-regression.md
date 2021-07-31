@@ -227,7 +227,7 @@ the benefit of a full update is even lower.
 The other extreme is to consider only a single example at a time and to take
 update steps based on one observation at a time. The resulting algorithm, 
 *Stochastic Gradient Descent* (SGD) can be an effective 
-strategy \cite{bottou2010large}, even for large datasets. Unfortunately, SGD
+strategy :cite:`bottou2010large`, even for large datasets. Unfortunately, SGD
 has drawbacks, both computational and statistical. One problem arises from the 
 fact that processors are a lot faster
 multiplying and adding numbers than they are at moving data from main memory to 
@@ -263,9 +263,7 @@ updating the parameters in the direction of the negative gradient.
 For quadratic losses and affine transformations,
 this has a closed-form expansion:
 
-$$\begin{aligned} 
-\mathbf{w} & \leftarrow \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) && = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)\\ 
-b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  && = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
+$$\begin{aligned} \mathbf{w} & \leftarrow \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) && = \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)\\ b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  && = b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right). \end{aligned}$$
 :eqlabel:`eq_linreg_batch_update`
 
 Since we pick a minibatch $\mathcal{B}$ we need to normalize by its size
@@ -416,9 +414,9 @@ While you can already get your hands dirty using only the information above,
 in the following we can more formally motivate the squared loss objective
 via assumptions about the distribution of noise.
 
-Linear regression was invented by Gauss and Legendre at the turn of the 19th 
-century (whether it was Gauss or Legendre who had the idea first became 
-the source of a high-profile academic dispute). Regardless, 
+Linear regression was invented at the turn of the 19th 
+century. Whether it was Gauss or Legendre who had the idea first became 
+the source of a high-profile academic dispute. Regardless, 
 Gauss also discovered the normal distribution (also called the *Gaussian*).
 It turns out that the connection between
 the normal distribution and linear regression
