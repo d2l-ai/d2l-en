@@ -24,7 +24,7 @@ import random
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=1}
 #@tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
