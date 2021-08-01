@@ -786,7 +786,7 @@ decoder_blk(X, state, training=False)[0].shape
 Now we [**construct the entire transformer decoder**]
 composed of `num_layers` instances of `DecoderBlock`.
 In the end,
-a fully-connected layer computes the prediction
+a fully connected layer computes the prediction
 for all the `vocab_size` possible output tokens.
 Both of the decoder self-attention weights
 and the encoder-decoder attention weights

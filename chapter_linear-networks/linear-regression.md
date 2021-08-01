@@ -519,9 +519,9 @@ conventionally we do not consider the input layer when counting layers.
 That is to say,
 the *number of layers* for the neural network in :numref:`fig_single_neuron` is 1.
 Moreover, in linear regression every input is connected to every output. 
-We can thus regard the the corresponding layer as a *fully-connected layer* or *dense layer*. 
+We can thus regard the the corresponding layer as a *fully connected layer* or *dense layer*. 
 
-In summary, we can think of linear regression as a single-layer fully-connected neural network.
+In summary, we can think of linear regression as a single-layer fully connected neural network.
 We will encounter networks composed of many such layers in the next chapter.
 
 

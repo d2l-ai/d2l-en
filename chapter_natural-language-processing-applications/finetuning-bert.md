@@ -36,7 +36,7 @@ such as text tagging and question answering
 and shed light on how BERT can represent their inputs and get transformed into output labels.
 During fine-tuning,
 the "minimal architecture changes" required by BERT across different applications
-are the extra fully-connected layers.
+are the extra fully connected layers.
 During supervised learning of a downstream application,
 parameters of the extra layers are learned from scratch while
 all the parameters in the pretrained BERT model are fine-tuned.
@@ -65,7 +65,7 @@ in single text classification applications,
 the BERT representation of the special classification token 
 “&lt;cls&gt;” encodes the information of the entire input text sequence.
 As the representation of the input single text,
-it will be fed into a small MLP consisting of fully-connected (dense) layers
+it will be fed into a small MLP consisting of fully connected (dense) layers
 to output the distribution of all the discrete label values.
 
 
@@ -121,7 +121,7 @@ is illustrated in :numref:`fig_bert-tagging`.
 Comparing with :numref:`fig_bert-one-seq`,
 the only distinction lies in that
 in text tagging, the BERT representation of *every token* of the input text
-is fed into the same extra fully-connected layers to output the label of the token,
+is fed into the same extra fully connected layers to output the label of the token,
 such as a part-of-speech tag.
 
 
@@ -150,7 +150,7 @@ the question and passage are packed as
 the first and second text sequence, respectively,
 in the input of BERT.
 To predict the position of the start of the text span,
-the same additional fully-connected layer will transform
+the same additional fully connected layer will transform
 the BERT representation of any token from the passage of position $i$
 into a scalar score $s_i$.
 Such scores of all the passage tokens
@@ -160,11 +160,11 @@ so that each token position $i$ in the passage is assigned
 a probability $p_i$ of being the start of the text span.
 Predicting the end of the text span
 is the same as above, except that
-parameters in its additional fully-connected layer
+parameters in its additional fully connected layer
 are independent from those for predicting the start.
 When predicting the end,
 any passage token of position $i$
-is transformed by the same fully-connected layer
+is transformed by the same fully connected layer
 into a scalar score $e_i$.
 :numref:`fig_bert-qa`
 depicts fine-tuning BERT for question answering.
@@ -180,7 +180,7 @@ and output the span with the highest score.
 
 ## Summary
 
-* BERT requires minimal architecture changes (extra fully-connected layers) for sequence-level and token-level natural language processing applications, such as single text classification (e.g., sentiment analysis and testing linguistic acceptability), text pair classification or regression (e.g., natural language inference and semantic textual similarity), text tagging (e.g., part-of-speech tagging), and question answering.
+* BERT requires minimal architecture changes (extra fully connected layers) for sequence-level and token-level natural language processing applications, such as single text classification (e.g., sentiment analysis and testing linguistic acceptability), text pair classification or regression (e.g., natural language inference and semantic textual similarity), text tagging (e.g., part-of-speech tagging), and question answering.
 * During supervised learning of a downstream application, parameters of the extra layers are learned from scratch while all the parameters in the pretrained BERT model are fine-tuned.
 
 

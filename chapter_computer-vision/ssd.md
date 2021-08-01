@@ -91,7 +91,7 @@ When $a$ anchor boxes
 are generated with
 each spatial position of these feature maps as their center,
 a total of $hwa$ anchor boxes need to be classified.
-This often makes classification with fully-connected layers infeasible due to likely
+This often makes classification with fully connected layers infeasible due to likely
 heavy parameterization costs.
 Recall how we used channels of
 convolutional layers

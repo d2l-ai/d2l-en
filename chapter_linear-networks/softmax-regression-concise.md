@@ -41,9 +41,9 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 As mentioned in :numref:`sec_softmax`,
 [**the output layer of softmax regression
-is a fully-connected layer.**]
+is a fully connected layer.**]
 Therefore, to implement our model,
-we just need to add one fully-connected layer
+we just need to add one fully connected layer
 with 10 outputs to our `Sequential`.
 Again, here, the `Sequential` is not really necessary,
 but we might as well form the habit since it will be ubiquitous

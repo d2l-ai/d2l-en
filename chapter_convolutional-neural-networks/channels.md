@@ -195,7 +195,7 @@ Each element in the output is derived
 from a linear combination of elements *at the same position*
 in the input image.
 You could think of the $1\times 1$ convolutional layer
-as constituting a fully-connected layer applied at every single pixel location
+as constituting a fully connected layer applied at every single pixel location
 to transform the $c_i$ corresponding input values into $c_o$ output values.
 Because this is still a convolutional layer,
 the weights are tied across pixel location.
@@ -208,7 +208,7 @@ Thus the $1\times 1$ convolutional layer requires $c_o\times c_i$ weights
 
 Let us check whether this works in practice:
 we implement a $1 \times 1$ convolution
-using a fully-connected layer.
+using a fully connected layer.
 The only thing is that we need to make some adjustments
 to the data shape before and after the matrix multiplication.
 
@@ -219,7 +219,7 @@ def corr2d_multi_in_out_1x1(X, K):
     c_o = K.shape[0]
     X = d2l.reshape(X, (c_i, h * w))
     K = d2l.reshape(K, (c_o, c_i))
-    # Matrix multiplication in the fully-connected layer
+    # Matrix multiplication in the fully connected layer
     Y = d2l.matmul(K, X)
     return d2l.reshape(Y, (c_o, h, w))
 ```
@@ -250,7 +250,7 @@ assert float(d2l.reduce_sum(d2l.abs(Y1 - Y2))) < 1e-6
 ## Summary
 
 * Multiple channels can be used to extend the model parameters of the convolutional layer.
-* The $1\times 1$ convolutional layer is equivalent to the fully-connected layer, when applied on a per pixel basis.
+* The $1\times 1$ convolutional layer is equivalent to the fully connected layer, when applied on a per pixel basis.
 * The $1\times 1$ convolutional layer is typically used to adjust the number of channels between network layers and to control model complexity.
 
 

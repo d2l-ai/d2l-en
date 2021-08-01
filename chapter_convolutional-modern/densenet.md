@@ -326,7 +326,7 @@ def block_2():
     return net
 ```
 
-Similar to ResNet, a global pooling layer and a fully-connected layer are connected at the end to produce the output.
+Similar to ResNet, a global pooling layer and a fully connected layer are connected at the end to produce the output.
 
 ```{.python .input}
 net.add(nn.BatchNorm(),

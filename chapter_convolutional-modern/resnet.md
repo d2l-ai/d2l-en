@@ -67,7 +67,7 @@ If the identity mapping $f(\mathbf{x}) = \mathbf{x}$ is the desired underlying m
 the residual mapping is easier to learn:
 we only need to push the weights and biases
 of the
-upper weight layer (e.g., fully-connected layer and convolutional layer)
+upper weight layer (e.g., fully connected layer and convolutional layer)
 within the dotted-line box
 to zero.
 The right figure in :numref:`fig_residual_block` illustrates the  *residual block* of ResNet,
@@ -328,7 +328,7 @@ b4 = ResnetBlock(256, 2)
 b5 = ResnetBlock(512, 2)
 ```
 
-Finally, just like GoogLeNet, we add a global average pooling layer, followed by the fully-connected layer output.
+Finally, just like GoogLeNet, we add a global average pooling layer, followed by the fully connected layer output.
 
 ```{.python .input}
 net.add(nn.GlobalAvgPool2D(), nn.Dense(10))
@@ -365,7 +365,7 @@ def net():
         tf.keras.layers.Dense(units=10)])
 ```
 
-There are 4 convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first $7\times 7$ convolutional layer and the final fully-connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18.
+There are 4 convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first $7\times 7$ convolutional layer and the final fully connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18.
 By configuring different numbers of channels and residual blocks in the module, we can create different ResNet models, such as the deeper 152-layer ResNet-152. Although the main architecture of ResNet is similar to that of GoogLeNet, ResNet's structure is simpler and easier to modify. All these factors have resulted in the rapid and widespread use of ResNet. :numref:`fig_resnet18` depicts the full ResNet-18.
 
 ![The ResNet-18 architecture.](../img/resnet18.svg)

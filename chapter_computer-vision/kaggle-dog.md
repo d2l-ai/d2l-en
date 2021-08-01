@@ -252,7 +252,7 @@ features).
 Then we can replace the original output layer with a small custom
 output network that can be trained,
 such as stacking two
-fully-connected layers.
+fully connected layers.
 Different from the experiment in
 :numref:`sec_fine_tuning`,
 the following does

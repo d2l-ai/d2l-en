@@ -252,7 +252,7 @@ for moderate problem sizes.
 :label:`subsec_xavier`
 
 Let us look at the scale distribution of
-an output (e.g., a hidden variable) $o_{i}$ for some fully-connected layer
+an output (e.g., a hidden variable) $o_{i}$ for some fully connected layer
 *without nonlinearities*.
 With $n_\mathrm{in}$ inputs $x_j$
 and their associated weights $w_{ij}$ for this layer,

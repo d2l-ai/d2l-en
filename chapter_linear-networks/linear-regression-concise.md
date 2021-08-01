@@ -129,12 +129,12 @@ we will use it anyway just to familiarize you
 with the most standard workflow.
 
 Recall the architecture of a single-layer network as shown in :numref:`fig_single_neuron`.
-The layer is said to be *fully-connected*
+The layer is said to be *fully connected*
 because each of its inputs is connected to each of its outputs
 by means of a matrix-vector multiplication.
 
 :begin_tab:`mxnet`
-In Gluon, the fully-connected layer is defined in the `Dense` class.
+In Gluon, the fully connected layer is defined in the `Dense` class.
 Since we only want to generate a single scalar output,
 we set that number to 1.
 
@@ -150,11 +150,11 @@ We will describe how this works in more detail later.
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the fully-connected layer is defined in the `Linear` class. Note that we passed two arguments into `nn.Linear`. The first one specifies the input feature dimension, which is 2, and the second one is the output feature dimension, which is a single scalar and therefore 1.
+In PyTorch, the fully connected layer is defined in the `Linear` class. Note that we passed two arguments into `nn.Linear`. The first one specifies the input feature dimension, which is 2, and the second one is the output feature dimension, which is a single scalar and therefore 1.
 :end_tab:
 
 :begin_tab:`tensorflow`
-In Keras, the fully-connected layer is defined in the `Dense` class. Since we only want to generate a single scalar output, we set that number to 1.
+In Keras, the fully connected layer is defined in the `Dense` class. Since we only want to generate a single scalar output, we set that number to 1.
 
 It is worth noting that, for convenience,
 Keras does not require us to specify

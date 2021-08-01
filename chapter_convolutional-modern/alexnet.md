@@ -231,7 +231,7 @@ The design philosophies of AlexNet and LeNet are very similar,
 but there are also significant differences.
 First, AlexNet is much deeper than the comparatively small LeNet5.
 AlexNet consists of eight layers: five convolutional layers,
-two fully-connected hidden layers, and one fully-connected output layer. Second, AlexNet used the ReLU instead of the sigmoid
+two fully connected hidden layers, and one fully connected output layer. Second, AlexNet used the ReLU instead of the sigmoid
 as its activation function.
 Let us delve into the details below.
 
@@ -249,9 +249,9 @@ the network adds maximum pooling layers
 with a window shape of $3\times3$ and a stride of 2.
 Moreover, AlexNet has ten times more convolution channels than LeNet.
 
-After the last convolutional layer there are two fully-connected layers
+After the last convolutional layer there are two fully connected layers
 with 4096 outputs.
-These two huge fully-connected layers produce model parameters of nearly 1 GB.
+These two huge fully connected layers produce model parameters of nearly 1 GB.
 Due to the limited memory in early GPUs,
 the original AlexNet used a dual data stream design,
 so that each of their two GPUs could be responsible
@@ -268,7 +268,7 @@ Besides, AlexNet changed the sigmoid activation function to a simpler ReLU activ
 
 ### Capacity Control and Preprocessing
 
-AlexNet controls the model complexity of the fully-connected layer
+AlexNet controls the model complexity of the fully connected layer
 by dropout (:numref:`sec_dropout`),
 while LeNet only uses weight decay.
 To augment the data even further, the training loop of AlexNet
@@ -303,7 +303,7 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
         nn.Conv2D(384, kernel_size=3, padding=1, activation='relu'),
         nn.Conv2D(256, kernel_size=3, padding=1, activation='relu'),
         nn.MaxPool2D(pool_size=3, strides=2),
-        # Here, the number of outputs of the fully-connected layer is several
+        # Here, the number of outputs of the fully connected layer is several
         # times larger than that in LeNet. Use the dropout layer to mitigate
         # overfitting
         nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
@@ -340,7 +340,7 @@ net = nn.Sequential(
     nn.Conv2d(384, 256, kernel_size=3, padding=1), nn.ReLU(),
     nn.MaxPool2d(kernel_size=3, stride=2),
     nn.Flatten(),
-    # Here, the number of outputs of the fully-connected layer is several
+    # Here, the number of outputs of the fully connected layer is several
     # times larger than that in LeNet. Use the dropout layer to mitigate
     # overfitting
     nn.Linear(6400, 4096), nn.ReLU(),
@@ -385,7 +385,7 @@ def net():
                                activation='relu'),
         tf.keras.layers.MaxPool2D(pool_size=3, strides=2),
         tf.keras.layers.Flatten(),
-        # Here, the number of outputs of the fully-connected layer is several
+        # Here, the number of outputs of the fully connected layer is several
         # times larger than that in LeNet. Use the dropout layer to mitigate
         # overfitting
         tf.keras.layers.Dense(4096, activation='relu'),

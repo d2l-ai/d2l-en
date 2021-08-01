@@ -79,7 +79,7 @@ we can first access any layer by indexing
 into the model as though it were a list.
 Each layer's parameters are conveniently
 located in its attribute.
-We can inspect the parameters of the second fully-connected layer as follows.
+We can inspect the parameters of the second fully connected layer as follows.
 
 ```{.python .input}
 print(net[1].params)
@@ -96,7 +96,7 @@ print(net.layers[2].weights)
 ```
 
 The output tells us a few important things.
-First, this fully-connected layer
+First, this fully connected layer
 contains two parameters,
 corresponding to that layer's
 weights and biases, respectively.
@@ -165,7 +165,7 @@ The situation can grow especially unwieldy
 when we work with more complex blocks (e.g., nested blocks),
 since we would need to recurse
 through the entire tree to extract
-each sub-block's parameters. Below we demonstrate accessing the parameters of the first fully-connected layer vs. accessing all layers.
+each sub-block's parameters. Below we demonstrate accessing the parameters of the first fully connected layer vs. accessing all layers.
 
 ```{.python .input}
 print(net[0].collect_params())

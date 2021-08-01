@@ -71,7 +71,7 @@ Below, we [**use a ResNet-18 model pretrained on the ImageNet dataset to extract
 and denote the model instance as `pretrained_net`.
 The last few layers of this model
 include a global average pooling layer
-and a fully-connected layer:
+and a fully connected layer:
 they are not needed
 in the fully convolutional network.
 
@@ -89,7 +89,7 @@ list(pretrained_net.children())[-3:]
 Next, we [**create the fully convolutional network instance `net`**].
 It copies all the pretrained layers in the ResNet-18
 except for the final global average pooling layer
-and the fully-connected layer that are closest
+and the fully connected layer that are closest
 to the output.
 
 ```{.python .input}

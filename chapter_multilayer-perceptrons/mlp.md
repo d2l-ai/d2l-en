@@ -112,7 +112,7 @@ We can overcome these limitations of linear models
 and handle a more general class of functions
 by incorporating one or more hidden layers.
 The easiest way to do this is to stack
-many fully-connected layers on top of each other.
+many fully connected layers on top of each other.
 Each layer feeds into the layer above it,
 until we generate outputs.
 We can think of the first $L-1$ layers
@@ -139,7 +139,7 @@ and each of these in turn influences
 every neuron in the output layer.
 However, as suggested by :numref:`subsec_parameterization-cost-fc-layers`,
 the parameterization cost of MLPs
-with fully-connected layers
+with fully connected layers
 can be prohibitively high,
 which may motivate
 tradeoff between parameter saving and model effectiveness even without changing the input or output size :cite:`Zhang.Tay.Zhang.ea.2021`.
@@ -566,7 +566,7 @@ thousands of lines of C and Fortran.
 
 ## Summary
 
-* MLP adds one or multiple fully-connected hidden layers between the output and input layers and transforms the output of the hidden layer via an activation function.
+* MLP adds one or multiple fully connected hidden layers between the output and input layers and transforms the output of the hidden layer via an activation function.
 * Commonly-used activation functions include the ReLU function, the sigmoid function, and the tanh function.
 
 

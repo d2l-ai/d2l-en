@@ -179,7 +179,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
             out, hidden_state = self.rnn(x.swapaxes(0, 1), hidden_state)
             outputs.append(out)
             self._attention_weights.append(self.attention.attention_weights)
-        # After fully-connected layer transformation, shape of `outputs`:
+        # After fully connected layer transformation, shape of `outputs`:
         # (`num_steps`, `batch_size`, `vocab_size`)
         outputs = self.dense(np.concatenate(outputs, axis=0))
         return outputs.swapaxes(0, 1), [enc_outputs, hidden_state,
@@ -231,7 +231,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
             out, hidden_state = self.rnn(x.permute(1, 0, 2), hidden_state)
             outputs.append(out)
             self._attention_weights.append(self.attention.attention_weights)
-        # After fully-connected layer transformation, shape of `outputs`:
+        # After fully connected layer transformation, shape of `outputs`:
         # (`num_steps`, `batch_size`, `vocab_size`)
         outputs = self.dense(torch.cat(outputs, dim=0))
         return outputs.permute(1, 0, 2), [enc_outputs, hidden_state,
@@ -283,7 +283,7 @@ class Seq2SeqAttentionDecoder(AttentionDecoder):
             hidden_state = out[1:]
             outputs.append(out[0])
             self._attention_weights.append(self.attention.attention_weights)
-        # After fully-connected layer transformation, shape of `outputs`:
+        # After fully connected layer transformation, shape of `outputs`:
         # (`batch_size`, `num_steps`, `vocab_size`)
         outputs = self.dense(tf.concat(outputs, axis=1))
         return outputs, [enc_outputs, hidden_state, enc_valid_lens]

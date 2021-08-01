@@ -141,7 +141,7 @@ We are now ready to take a look at how batch normalization works in practice.
 
 ## Batch Normalization Layers
 
-Batch normalization implementations for fully-connected layers
+Batch normalization implementations for fully connected layers
 and convolutional layers are slightly different.
 We discuss both cases below.
 Recall that one key differences between batch normalization and other layers
@@ -149,17 +149,17 @@ is that because batch normalization operates on a full minibatch at a time,
 we cannot just ignore the batch dimension
 as we did before when introducing other layers.
 
-### Fully-Connected Layers
+### Fully Connected Layers
 
-When applying batch normalization to fully-connected layers,
+When applying batch normalization to fully connected layers,
 the original paper inserts batch normalization after the affine transformation
 and before the nonlinear activation function (later applications may insert batch normalization right after activation functions) :cite:`Ioffe.Szegedy.2015`.
-Denoting the input to the fully-connected layer by $\mathbf{x}$,
+Denoting the input to the fully connected layer by $\mathbf{x}$,
 the affine transformation
 by $\mathbf{W}\mathbf{x} + \mathbf{b}$ (with the weight parameter $\mathbf{W}$ and the bias parameter $\mathbf{b}$),
 and the activation function by $\phi$,
 we can express the computation of a batch-normalization-enabled,
-fully-connected layer output $\mathbf{h}$ as follows:
+fully connected layer output $\mathbf{h}$ as follows:
 
 $$\mathbf{h} = \phi(\mathrm{BN}(\mathbf{W}\mathbf{x} + \mathbf{b}) ).$$
 
@@ -228,7 +228,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     else:
         assert len(X.shape) in (2, 4)
         if len(X.shape) == 2:
-            # When using a fully-connected layer, calculate the mean and
+            # When using a fully connected layer, calculate the mean and
             # variance on the feature dimension
             mean = X.mean(axis=0)
             var = ((X - mean) ** 2).mean(axis=0)
@@ -265,7 +265,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     else:
         assert len(X.shape) in (2, 4)
         if len(X.shape) == 2:
-            # When using a fully-connected layer, calculate the mean and
+            # When using a fully connected layer, calculate the mean and
             # variance on the feature dimension
             mean = X.mean(dim=0)
             var = ((X - mean) ** 2).mean(dim=0)
@@ -324,9 +324,9 @@ Do not worry, the high-level batch normalization APIs in the deep learning frame
 
 ```{.python .input}
 class BatchNorm(nn.Block):
-    # `num_features`: the number of outputs for a fully-connected layer
+    # `num_features`: the number of outputs for a fully connected layer
     # or the number of output channels for a convolutional layer. `num_dims`:
-    # 2 for a fully-connected layer and 4 for a convolutional layer
+    # 2 for a fully connected layer and 4 for a convolutional layer
     def __init__(self, num_features, num_dims, **kwargs):
         super().__init__(**kwargs)
         if num_dims == 2:
@@ -357,9 +357,9 @@ class BatchNorm(nn.Block):
 ```{.python .input}
 #@tab pytorch
 class BatchNorm(nn.Module):
-    # `num_features`: the number of outputs for a fully-connected layer
+    # `num_features`: the number of outputs for a fully connected layer
     # or the number of output channels for a convolutional layer. `num_dims`:
-    # 2 for a fully-connected layer and 4 for a convolutional layer
+    # 2 for a fully connected layer and 4 for a convolutional layer
     def __init__(self, num_features, num_dims):
         super().__init__()
         if num_dims == 2:
@@ -443,7 +443,7 @@ class BatchNorm(tf.keras.layers.Layer):
 To see how to apply `BatchNorm` in context,
 below we apply it to a traditional LeNet model (:numref:`sec_lenet`).
 Recall that batch normalization is applied
-after the convolutional layers or fully-connected layers
+after the convolutional layers or fully connected layers
 but before the corresponding activation functions.
 
 ```{.python .input}
@@ -683,13 +683,13 @@ tens of thousands of citations.
 ## Summary
 
 * During model training, batch normalization continuously adjusts the intermediate output of the neural network by utilizing the mean and standard deviation of the minibatch, so that the values of the intermediate output in each layer throughout the neural network are more stable.
-* The batch normalization methods for fully-connected layers and convolutional layers are slightly different.
+* The batch normalization methods for fully connected layers and convolutional layers are slightly different.
 * Like a dropout layer, batch normalization layers have different computation results in training mode and prediction mode.
 * Batch normalization has many beneficial side effects, primarily that of regularization. On the other hand, the original motivation of reducing internal covariate shift seems not to be a valid explanation.
 
 ## Exercises
 
-1. Can we remove the bias parameter from the fully-connected layer or the convolutional layer before the batch normalization? Why?
+1. Can we remove the bias parameter from the fully connected layer or the convolutional layer before the batch normalization? Why?
 1. Compare the learning rates for LeNet with and without batch normalization.
     1. Plot the increase in training and test accuracy.
     1. How large can you make the learning rate?

@@ -206,7 +206,7 @@ into the output as follows:
 
 1. Define multiple one-dimensional convolution kernels and perform convolution operations separately on the inputs. Convolution kernels with different widths may capture local features among different numbers of adjacent tokens.
 1. Perform max-over-time pooling on all the output channels, and then concatenate all the scalar pooling outputs as a vector.
-1. Transform the concatenated vector into the output categories using the fully-connected layer. Dropout can be used for reducing overfitting.
+1. Transform the concatenated vector into the output categories using the fully connected layer. Dropout can be used for reducing overfitting.
 
 ![The model architecture of textCNN.](../img/textcnn.svg)
 :label:`fig_conv1d_textcnn`

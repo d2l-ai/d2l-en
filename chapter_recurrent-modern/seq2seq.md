@@ -331,7 +331,7 @@ To further incorporate the encoded input sequence information,
 the context variable is concatenated
 with the decoder input at all the time steps.
 To predict the probability distribution of the output token,
-a fully-connected layer is used to transform
+a fully connected layer is used to transform
 the hidden state at the final layer of the RNN decoder.
 
 ```{.python .input}

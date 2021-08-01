@@ -9,7 +9,7 @@ We assume that you are familiar with minibatch stochastic gradient descent algor
 
 ## Splitting the Problem
 
-Let us start with a simple computer vision problem and a slightly archaic network, e.g., with multiple layers of convolutions, pooling, and possibly a few fully-connected layers in the end. 
+Let us start with a simple computer vision problem and a slightly archaic network, e.g., with multiple layers of convolutions, pooling, and possibly a few fully connected layers in the end. 
 That is, let us start with a network that looks quite similar to LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` or AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. 
 Given multiple GPUs (2 if it is a desktop server, 4 on an AWS g4dn.12xlarge instance, 8 on a p3.16xlarge, or 16 on a p2.16xlarge), we want to partition training in a manner as to achieve good speedup while simultaneously benefitting from simple and reproducible design choices. Multiple GPUs, after all, increase both *memory* and *computation* ability. In a nutshell, we have the following choices, given a minibatch of training data that we want to classify.
 
@@ -27,7 +27,7 @@ Moreover, compute-intensive, yet sequential operations are nontrivial to partiti
 
 
 Second, we could split the work layerwise. For instance, rather than computing 64 channels on a single GPU we could split up the problem across 4 GPUs, each of which generates data for 16 channels.
-Likewise, for a fully-connected layer we could split the number of output units.
+Likewise, for a fully connected layer we could split the number of output units.
 :numref:`fig_alexnet_original` (taken from :cite:`Krizhevsky.Sutskever.Hinton.2012`)
 illustrates this design, where this strategy was used to deal with GPUs that had a very small memory footprint (2 GB at the time).
 This allows for good scaling in terms of computation, provided that the number of channels (or units) is not too small.

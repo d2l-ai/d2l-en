@@ -138,7 +138,7 @@ sharing, saving, and loading model parameters.
 This way, among other benefits, we will not need to write
 custom serialization routines for every custom layer.
 
-Now let us implement our own version of the  fully-connected layer.
+Now let us implement our own version of the  fully connected layer.
 Recall that this layer requires two parameters,
 one to represent the weight and the other for the bias.
 In this implementation, we bake in the ReLU activation as a default.
@@ -236,7 +236,7 @@ dense(tf.random.uniform((2, 5)))
 ```
 
 We can also (**construct models using custom layers.**)
-Once we have that we can use it just like the built-in fully-connected layer.
+Once we have that we can use it just like the built-in fully connected layer.
 
 ```{.python .input}
 net = nn.Sequential()
