@@ -16,8 +16,8 @@ In this section, we will rely only on tensors and automatic differentiation.
 For elegance of implementation we use a modular API inspired in its structure 
 by [PyTorch Lightning](https://www.pytorchlightning.ai/). 
 Later on, we will introduce a more concise implementation,
-taking advantage of bells and whistles of deep learning frameworks while sharing
-same overall structure as what follows below.
+taking advantage of bells and whistles of deep learning frameworks while retaining 
+the structure of what follows below.
 
 ```{.python .input}
 %matplotlib inline
@@ -45,30 +45,27 @@ import random
 
 ## Generating the Dataset
 
-To keep things simple, we will [**construct an artificial dataset
+To keep things simple, we [**construct an artificial dataset
 according to a linear model with additive noise.**]
-Our task will be to recover this model's parameters
-using the finite set of examples contained in our dataset.
-We will keep the data low-dimensional so we can visualize it easily.
-In the following code snippet, we generate a dataset
-containing 1000 examples, each consisting of 2 features
-sampled from a standard normal distribution.
-Thus our synthetic dataset will be a matrix
+Our task will be to recover the model parameters
+using the finite number of samples in our dataset. 
+We keep the data low-dimensional so we can visualize it easily.
+In the following code snippet, we generate 
+1000 examples, each consisting of 2 features
+drawn from a standard normal distribution.
+Thus the matrix of features is
 $\mathbf{X}\in \mathbb{R}^{1000 \times 2}$.
 
-(**The true parameters generating our dataset will be
-$\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$,
-and**) our synthetic labels will be assigned according
-to the following linear model with the noise term $\epsilon$:
+(**The true parameters generating our true targets are
+$\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$.**) 
+These are corrupted by additive noise $\epsilon$, drawn independently for each $\mathbf{x}$. 
+As such, the synthetic labels satisfy: 
 
 (**$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon.$$**)
 
-You could think of $\epsilon$ as capturing potential
-measurement errors on the features and labels.
-We will assume that the standard assumptions hold and thus
-that $\epsilon$ obeys a normal distribution with mean of 0.
-To make our problem easy, we will set its standard deviation to 0.01.
-The following code generates our synthetic dataset.
+For convenience we assume that $\epsilon$ arises from a normal distribution with mean of 0.
+To make our problem easy, we will set its standard deviation to $\sigma = 0.01$.
+The following code generates the synthetic dataset.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -99,8 +96,7 @@ true_b = 4.2
 data = SyntheticRegressionData(true_w, true_b)
 ```
 
-Note that [**each row in `features` consists of a 2-dimensional data example
-and that each row in `labels` consists of a 1-dimensional label value (a scalar).**]
+[**Each row in `features` consists of a vector in $\mathbb{R}^2$ and each row in `labels` is a scalar.**]
 
 ```{.python .input}
 #@tab all
@@ -109,7 +105,7 @@ print('features:', data.X[0],'\nlabel:', data.y[0])
 
 ## Reading the Dataset
 
-Recall that training models consists of
+Training models consists of
 making multiple passes over the dataset,
 grabbing one minibatch of examples at a time,
 and using them to update our model.
@@ -120,8 +116,8 @@ to shuffle the dataset and access it in minibatches.
 
 In the following code, we [**define the `data_iter` function**] (~~that~~)
 to demonstrate one possible implementation of this functionality.
-The function (**takes a batch size, a matrix of features,
-and a vector of labels, yielding minibatches of the size `batch_size`.**)
+It (**takes a batch size, a matrix of features,
+and a vector of labels, yielding minibatches of size `batch_size`.**)
 Each minibatch consists of a tuple of features and labels.
 
 ```{.python .input}
@@ -150,19 +146,16 @@ def train_dataloader(self):
         yield tf.gather(self.X, j), tf.gather(self.y, j)
 ```
 
-In general, note that we want to use reasonably sized minibatches
-to take advantage of the GPU hardware,
-which excels at parallelizing operations.
-Because each example can be fed through our models in parallel
+In general we want to use reasonably sized minibatches
+to take advantage of the GPU, as it excels at parallel computation. 
+Since examples can be fed through our models in parallel
 and the gradient of the loss function for each example can also be taken in parallel,
 GPUs allow us to process hundreds of examples in scarcely more time
 than it might take to process just a single example.
 
-To build some intuition, let us read and print
-the first small batch of data examples.
-The shape of the features in each minibatch tells us
-both the minibatch size and the number of input features.
-Likewise, our minibatch of labels will have a shape given by `batch_size`.
+To build some intuition, let us inspect the first minibatch of 
+data. Each minibatch of features provides us both with its size and the dimensionality of input features. 
+Likewise, our minibatch of labels will have a matching shape given by `batch_size`.
 
 ```{.python .input}
 #@tab all
@@ -170,24 +163,30 @@ X, y = next(iter(data.train_dataloader()))
 print('X shape:', X.shape, '\ny shape:', y.shape)
 ```
 
+While seemingly quite innocuous, the invocation of `iter(data.train_dataloader())` 
+illustrates the power of Python's object oriented design. We ended up adding 
+a method to the `SyntheticRegressionData` class *after* creating the `data` 
+object. Nonetheless, the object benefits from the a-posteriori addition of 
+functionality to the class. 
+
 As we run the iteration, we obtain distinct minibatches
-successively until the entire dataset has been exhausted (try this).
+until the entire dataset has been exhausted (try this).
 While the iteration implemented above is good for didactic purposes,
 it is inefficient in ways that might get us in trouble on real problems.
 For example, it requires that we load all the data in memory
 and that we perform lots of random memory access.
 The built-in iterators implemented in a deep learning framework
 are considerably more efficient and they can deal
-with both data stored in files and data fed via data streams.
-
+with sources such as data stored in files, data received via a stream, or data 
+generated/processed on the fly.
 
 ## Defining the Model
 
-[**Before we can begin optimizing our model's parameters**] by minibatch stochastic gradient descent,
+[**Before we can begin optimizing our model's parameters**] by minibatch SGD,
 (**we need to have some parameters in the first place.**)
-In the following code, we initialize weights by sampling
+In the following we initialize weights by drawing
 random numbers from a normal distribution with mean 0
-and a standard deviation of 0.01, and setting the bias to 0.
+and a standard deviation of 0.01. Moreover we set the bias to 0.
 
 ```{.python .input}
 class LinearRegressionScratch(d2l.Module):  #@save
@@ -225,7 +224,7 @@ class LinearRegressionScratch(d2l.Module):
 
 After initializing our parameters,
 our next task is to update them until
-they fit our data sufficiently well.
+they fit the data sufficiently well.
 Each update requires taking the gradient
 of our loss function with respect to the parameters.
 Given this gradient, we can update each parameter
@@ -234,17 +233,16 @@ in the direction that may reduce the loss.
 Since nobody wants to compute gradients explicitly
 (this is tedious and error prone),
 we use automatic differentiation,
-as introduced in :numref:`sec_autograd`, to compute the gradient.
+as introduced in :numref:`sec_autograd`.
 
 Next, we must [**define our model,
 relating its inputs and parameters to its outputs.**]
-Recall that to calculate the output of the linear model,
-we simply take the matrix-vector dot product
+For our linear model we simply take the matrix-vector product
 of the input features $\mathbf{X}$ and the model weights $\mathbf{w}$,
 and add the offset $b$ to each example.
-Note that below $\mathbf{Xw}$  is a vector and $b$ is a scalar.
-Recall the broadcasting mechanism as described in :numref:`subsec_broadcasting`.
-When we add a vector and a scalar,
+$\mathbf{Xw}$ is a vector and $b$ is a scalar.
+Due to the broadcasting mechanism of :numref:`subsec_broadcasting`,
+when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
 ```{.python .input}
@@ -268,8 +266,8 @@ def call(self, X):
 Since [**updating our model requires taking
 the gradient of our loss function,**]
 we ought to (**define the loss function first.**)
-Here we will use the squared loss function
-as described in :numref:`sec_linear_regression`.
+Here we use the squared loss function
+of :numref:`sec_linear_regression`.
 In the implementation, we need to transform the true value `y`
 into the predicted value's shape `y_hat`.
 The result returned by the following function
@@ -295,26 +293,24 @@ def training_step(self, batch, batch_idx):
 
 ## Defining the Optimization Algorithm
 
-As we discussed in :numref:`sec_linear_regression`,
+As discussed in :numref:`sec_linear_regression`,
 linear regression has a closed-form solution.
-However, this is not a book about linear regression:
-it is a book about deep learning.
-Since none of the other models that this book introduces
-can be solved analytically, we will take this opportunity to introduce your first working example of
-minibatch stochastic gradient descent.
-[~~Despite linear regression has a closed-form solution, other models in this book don't. Here we introduce minibatch stochastic gradient descent.~~]
-
-At each step, using one minibatch randomly drawn from our dataset,
-we will estimate the gradient of the loss with respect to our parameters.
-Next, we will update our parameters
+However, our goal here is to illustrate how to
+use minibatch SGD. Hence we will take this opportunity
+to introduce your first working example of SGD.
+At each step, using a minibatch randomly drawn from our dataset,
+we estimate the gradient of the loss with respect to the parameters.
+Next, we update the parameters
 in the direction that may reduce the loss.
-The following code applies the minibatch stochastic gradient descent update,
-given a set of parameters, a learning rate, and a batch size.
-The size of the update step is determined by the learning rate `lr`.
-Because our loss is calculated as a sum over the minibatch of examples,
-we normalize our step size by the batch size (`batch_size`),
+
+The following code applies the update, given a set of parameters, a learning rate `lr`, and a batch size.
+Since the loss is calculated as a sum over the minibatch 
+we normalize the step size by the `batch_size`,
 so that the magnitude of a typical step size
-does not depend heavily on our choice of the batch size.
+does not depend on our choice of the batch size. 
+In later chapters we will investigate how learning rates should be adjusted 
+for very large minibatches as they arise in distributed large scale learning. 
+For now, though, we can ignore this dependency. 
 
 ```{.python .input}
 class SGD(d2l.HyperParameters):  #@save
@@ -372,20 +368,17 @@ def configure_optimizers(self):
 
 ## Training
 
-Now that we have all of the parts in place,
+Now that we have all of the parts in place (parameters, data, loss function, model, and optimizer),
 we are ready to [**implement the main training loop.**]
-It is crucial that you understand this code
-because you will see nearly identical training loops
-over and over again throughout your career in deep learning.
+It is crucial that you understand this code well 
+since it the archetype of almost all training loops in deep learning.
 
-In each iteration, we will grab a minibatch of training examples,
+In each iteration, we grab a minibatch of training examples,
 and pass them through our model to obtain a set of predictions.
 After calculating the loss, we initiate the backwards pass through the network,
 storing the gradients with respect to each parameter.
 Finally, we will call the optimization algorithm `sgd`
-to update the model parameters.
-
-In summary, we will execute the following loop:
+to update the model parameters. In summary, we will execute the following loop:
 
 * Initialize parameters $(\mathbf{w}, b)$
 * Repeat until done
@@ -393,17 +386,16 @@ In summary, we will execute the following loop:
     * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
 
 In each *epoch*,
-we will iterate through the entire dataset
-(using the `data_iter` function) once
-passing through every example in the training dataset
+we will iterate through the entire dataset, 
+using the `data_iter` function, passing once
+through every example in the training set
 (assuming that the number of examples is divisible by the batch size).
 The number of epochs `num_epochs` and the learning rate `lr` are both hyperparameters,
 which we set here to 3 and 0.03, respectively.
-Unfortunately, setting hyperparameters is tricky
-and requires some adjustment by trial and error.
-We elide these details for now but revise them
-later in
-:numref:`chap_optimization`.
+In general, setting hyperparameters is tricky
+and requires some adjustment for different problems and 
+network architectures. We elide these details for now but revise them 
+later in :numref:`chap_optimization`.
 
 ```{.python .input}
 #@tab pytorch
@@ -454,6 +446,8 @@ def fit(self, model, data):
             self.train_batch_idx += 1
 ```
 
+Note the general pattern of taking a minibatch `batch`, computing the `loss`, followed by a gradient computation and lastly, the application of the gradient to the set of model parameters via an optimizer `optim`. The majority of deep learning training algorithms follows this pattern. Now that we defined the training loop, let's use it. 
+
 ```{.python .input}
 #@tab all
 model = LinearRegressionScratch(2, 1, lr=0.03)
@@ -478,31 +472,48 @@ Note that we should not take it for granted
 that we are able to recover the parameters perfectly.
 However, in machine learning, we are typically less concerned
 with recovering true underlying parameters,
-and more concerned with parameters that lead to highly accurate prediction.
+and more concerned with parameters that lead to highly accurate prediction :cite:`vapnik1992principles`.
 Fortunately, even on difficult optimization problems,
 stochastic gradient descent can often find remarkably good solutions,
 owing partly to the fact that, for deep networks,
 there exist many configurations of the parameters
-that lead to highly accurate prediction.
+that lead to highly accurate prediction. Likewise, the stochastic nature of 
+optimization ensures that are less likely to get 'stuck' in shallow local minima. 
 
 
 ## Summary
 
-* We saw how a deep network can be implemented and optimized from scratch, using just tensors and auto differentiation, without any need for defining layers or fancy optimizers.
-* This section only scratches the surface of what is possible. In the following sections, we will describe additional models based on the concepts that we have just introduced and learn how to implement them more concisely.
+In this section we took a significant step forward towards designing deep learning systems by implementing
+the the canonical structure of a training loop. In this process we built a data loader, a model, a loss function, an optimization procedure and a visualization and monitoring tool. We did this by composing a Python object that contains all relevant parts for training a model. While none of what we implemented is efficient, it is still sufficient to solve a small toy problem quickly. In the next sections we will see how to do this a) more concisely and b) more efficiently such that we can use the GPUs in our computer to their full extent. Once we are comfortable with that, we graduate to more advanced network architectures, specific datasets, and optimizers in the subsequent chapters. 
 
 
 ## Exercises
 
-1. What would happen if we were to initialize the weights to zero. Would the algorithm still work?
-1. Assume that you are
-   [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up
-   with a model between voltage and current. Can you use auto differentiation to learn the parameters of your model?
-1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object using spectral energy density?
-1. What are the problems you might encounter if you wanted to  compute the second derivatives? How would you fix them?
-1.  Why is the `reshape` function needed in the `squared_loss` function?
-1. Experiment using different learning rates to find out how fast the loss function value drops.
-1. If the number of examples cannot be divided by the batch size, what happens to the `data_iter` function's behavior?
+1. What would happen if we were to initialize the weights to zero. Would the algorithm still work? What if we 
+   initialized the parameters with variance $1,000$ rather than $0.01$?
+1. Assume that you are [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up
+   with a model for resistors that relates voltage and current. Can you use automatic 
+   differentiation to learn the parameters of your model?
+1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object 
+   using spectral energy density? For reference, the spectral density $B$ of radiation emanating from a black body is
+   $B(\lambda, T) = \frac{2 hc^2}{\lambda^5} \cdot \left(\exp \frac{h c}{\lambda k T} - 1\right)^{-1}$. Here 
+   $\lambda$ is the wavelength, $T$ the temperature, $c$ the speed of light, $h$ Planck's quantum, and $k$ the 
+   Boltzmann constant. You measure the energy for different wavelengths $\lambda$ and you now need to fit the spectral 
+   density curve to Planck's law. 
+1. What are the problems you might encounter if you wanted to compute the second derivatives of the loss? How would 
+   you fix them? 
+1. Why is the `reshape` function needed in the `squared_loss` function?
+1. Experiment using different learning rates to find out how quickly the loss function value drops. Can you reduce the 
+   error by increasing the number of epochs of training?
+1. If the number of examples cannot be divided by the batch size, what happens to `data_iter` at the end of an epoch?
+1. Try implementing a different loss function, such as the absolute value loss `(y_hat - d2l.reshape(y, y_hat.shape)).abs().sum()`.
+    1. Check what happens for regular data.
+    1. Check whether there is a difference in behavior if you actively perturb some entries of $\mathbf{y}$, 
+       such as $y_5 = 10,000$. 
+    1. Can you think of a cheap solution for combining the best aspects of squared loss and absolute value loss? 
+       Hint: how can you avoid really large gradient values?
+1. Why do we need to reshuffle the dataset? Can you design a case where a maliciously dataset would break the 
+   optimization algorithm otherwise?
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/42)
