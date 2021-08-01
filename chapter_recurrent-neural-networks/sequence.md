@@ -29,7 +29,7 @@ We need statistical tools and new deep neural network architectures to deal with
 :label:`fig_ftse100`
 
 
-Let us denote the prices by $x_t$, i.e., at *time step* $t \in \mathbb{Z}^+$ we observe price $x_t$.
+Let's denote the prices by $x_t$, i.e., at *time step* $t \in \mathbb{Z}^+$ we observe price $x_t$.
 Note that for sequences in this text,
 $t$ will typically be discrete and vary over integers or its subset.
 Suppose that
@@ -94,7 +94,7 @@ We are barely scratching the surface of it.
 ## Training
 
 After reviewing so many statistical tools,
-let us try this out in practice.
+let's try this out in practice.
 We begin by generating some data.
 To keep things simple we (**generate our sequence data by using a sine function with some additive noise for time steps $1, 2, \ldots, 1000$.**)
 
@@ -270,7 +270,7 @@ train(net, train_iter, loss, 5, 0.01)
 
 ## Prediction
 
-Let us see how well the model predicts. The first thing to check is [**predicting what happens just in the next time step**],
+Let's see how well the model predicts. The first thing to check is [**predicting what happens just in the next time step**],
 namely the *one-step-ahead prediction*.
 
 ```{.python .input}
@@ -299,7 +299,7 @@ Generally, for an observed sequence $x_1, \ldots, x_t$, its predicted output $\h
 In other words, we will have to 
 keep on
 using our own predictions to make multistep-ahead predictions.
-Let us see how well this goes.
+Let's see how well this goes.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -331,10 +331,10 @@ d2l.plot([time, time[tau:], time[n_train + tau:]],
 As the above example shows, this is a spectacular failure. The predictions decay to a constant pretty quickly after a few prediction steps.
 Why did the algorithm work so poorly?
 This is ultimately due to the fact that the errors build up.
-Let us say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$.
+Let's say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$.
 Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + c \epsilon_1$ for some constant $c$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon. For instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that the accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
 
-Let us [**take a closer look at the difficulties in $k$-step-ahead predictions**]
+Let's [**take a closer look at the difficulties in $k$-step-ahead predictions**]
 by computing predictions on the entire sequence for $k = 1, 4, 16, 64$.
 
 ```{.python .input}

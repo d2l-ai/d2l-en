@@ -25,7 +25,7 @@ it is worthwhile knowing that "dog bites man" is much more frequent than "man bi
 In the rest of the chapter, we focus on  using neural networks for language modeling
 based on *The Time Machine* dataset.
 Before introducing the model,
-let us assume that it
+let's assume that it
 processes a minibatch of sequences with predefined length
 at a time.
 Now the question is how to [**read minibatches of input sequences and label sequences at random.**]
@@ -126,7 +126,7 @@ class SeqDataLoader:  #@save
             yield d2l.tensor(X), d2l.tensor(Y)
 ```
 
-Let us [**manually generate a sequence from 0 to 34.**]
+Let's [**manually generate a sequence from 0 to 34.**]
 We assume that
 the batch size and numbers of time steps are 3 and 5,
 respectively.

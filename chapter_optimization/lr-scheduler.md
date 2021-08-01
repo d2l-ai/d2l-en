@@ -180,7 +180,7 @@ def train(net_fn, train_iter, test_iter, num_epochs, lr,
     return net
 ```
 
-Let us have a look at what happens if we invoke this algorithm with default settings, such as a learning rate of $0.3$ and train for $30$ iterations. Note how the training accuracy keeps on increasing while progress in terms of test accuracy stalls beyond a point. The gap between both curves indicates overfitting.
+Let's have a look at what happens if we invoke this algorithm with default settings, such as a learning rate of $0.3$ and train for $30$ iterations. Note how the training accuracy keeps on increasing while progress in terms of test accuracy stalls beyond a point. The gap between both curves indicates overfitting.
 
 ```{.python .input}
 lr, num_epochs = 0.3, 30
@@ -227,7 +227,7 @@ dummy_model.compile(tf.keras.optimizers.SGD(learning_rate=lr), loss='mse')
 print(f'learning rate is now ,', dummy_model.optimizer.lr.numpy())
 ```
 
-More generally we want to define a scheduler. When invoked with the number of updates it returns the appropriate value of the learning rate. Let us define a simple one that sets the learning rate to $\eta = \eta_0 (t + 1)^{-\frac{1}{2}}$.
+More generally we want to define a scheduler. When invoked with the number of updates it returns the appropriate value of the learning rate. Let's define a simple one that sets the learning rate to $\eta = \eta_0 (t + 1)^{-\frac{1}{2}}$.
 
 ```{.python .input}
 #@tab all
@@ -239,7 +239,7 @@ class SquareRootScheduler:
         return self.lr * pow(num_update + 1.0, -0.5)
 ```
 
-Let us plot its behavior over a range of values.
+Let's plot its behavior over a range of values.
 
 ```{.python .input}
 #@tab all
@@ -247,7 +247,7 @@ scheduler = SquareRootScheduler(lr=0.1)
 d2l.plot(d2l.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
-Now let us see how this plays out for training on Fashion-MNIST. We simply provide the scheduler as an additional argument to the training algorithm.
+Now let's see how this plays out for training on Fashion-MNIST. We simply provide the scheduler as an additional argument to the training algorithm.
 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd',

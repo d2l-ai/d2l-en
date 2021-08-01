@@ -30,12 +30,12 @@ Consider a deep network with $L$ layers,
 input $\mathbf{x}$ and output $\mathbf{o}$.
 With each layer $l$ defined by a transformation $f_l$
 parameterized by weights $\mathbf{W}^{(l)}$,
-whose hidden variable is $\mathbf{h}^{(l)}$ (let $\mathbf{h}^{(0)} = \mathbf{x}$),
+whose hidden layer output is $\mathbf{h}^{(l)}$ (let $\mathbf{h}^{(0)} = \mathbf{x}$),
 our network can be expressed as:
 
 $$\mathbf{h}^{(l)} = f_l (\mathbf{h}^{(l-1)}) \text{ and thus } \mathbf{o} = f_L \circ \ldots \circ f_1(\mathbf{x}).$$
 
-If all the hidden variables and the input are vectors,
+If all the hidden layer output and the input are vectors,
 we can write the gradient of $\mathbf{o}$ with respect to
 any set of parameters $\mathbf{W}^{(l)}$ as follows:
 
@@ -82,7 +82,7 @@ Since early artificial neural networks were inspired
 by biological neural networks,
 the idea of neurons that fire either *fully* or *not at all*
 (like biological neurons) seemed appealing.
-Let us take a closer look at the sigmoid
+Let's take a closer look at the sigmoid
 to see why it can cause vanishing gradients.
 
 ```{.python .input}
@@ -251,8 +251,8 @@ for moderate problem sizes.
 ### Xavier Initialization
 :label:`subsec_xavier`
 
-Let us look at the scale distribution of
-an output (e.g., a hidden variable) $o_{i}$ for some fully connected layer
+Let's look at the scale distribution of
+an output $o_{i}$ for some fully connected layer
 *without nonlinearities*.
 With $n_\mathrm{in}$ inputs $x_j$
 and their associated weights $w_{ij}$ for this layer,
@@ -262,11 +262,11 @@ $$o_{i} = \sum_{j=1}^{n_\mathrm{in}} w_{ij} x_j.$$
 
 The weights $w_{ij}$ are all drawn
 independently from the same distribution.
-Furthermore, let us assume that this distribution
+Furthermore, let's assume that this distribution
 has zero mean and variance $\sigma^2$.
 Note that this does not mean that the distribution has to be Gaussian,
 just that the mean and variance need to exist.
-For now, let us assume that the inputs to the layer $x_j$
+For now, let's assume that the inputs to the layer $x_j$
 also have zero mean and variance $\gamma^2$
 and that they are independent of $w_{ij}$ and independent of each other.
 In this case, we can compute the mean and variance of $o_i$ as follows:

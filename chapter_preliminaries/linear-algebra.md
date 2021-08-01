@@ -911,7 +911,7 @@ and should not be confused with the Hadamard product.
 
 Some of the most useful operators in linear algebra are *norms*.
 Informally, the norm of a vector tells us how *big* it is. 
-For instance, the $\ell_2$ norm measures
+For instance, the $\\ell_2$ norm measures
 the (Euclidean) length of a vector.
 Here, we are employing a notion of *size* that concerns the magnitude a vector's components
 (not its dimensionality). 
@@ -933,11 +933,11 @@ encode different notions of size.
 The Euclidean norm that we all learned in elementary school geometry
 when calculating the hypotenuse of right triangle
 is the square root of the sum of squares of a vector's elements.
-Formally, this is called [**the $L_2$ *norm***] and expressed as
+Formally, this is called [**the $\ell_2$ *norm***] and expressed as
 
 (**$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2}.$$**)
 
-The method `norm` calculates the $L_2$ norm.
+The method `norm` calculates the $\ell_2$ norm.
 
 ```{.python .input}
 u = np.array([3, -4])
@@ -956,15 +956,15 @@ u = tf.constant([3.0, -4.0])
 tf.norm(u)
 ```
 
-[**The $L_1$ norm**] is also popular 
+[**The $\ell_1$ norm**] is also popular 
 and the associated metric is called the Manhattan distance. 
-By definition, the $L_1$ norm sums 
+By definition, the $\ell_1$ norm sums 
 the absolute values of a vector's elements:
 
 (**$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$**)
 
-Compared to the $L_2$ norm, it is less sensitive to outliers.
-To compute the $L_1$ norm, 
+Compared to the $\ell_2$ norm, it is less sensitive to outliers.
+To compute the $\ell_1$ norm, 
 we compose the absolute value
 with the sum operation.
 
@@ -982,8 +982,8 @@ torch.abs(u).sum()
 tf.reduce_sum(tf.abs(u))
 ```
 
-Both the $L_2$ and $L_1$ norms are special cases
-of the more general $L_p$ *norms*:
+Both the $\ell_2$ and $\ell_1$ norms are special cases
+of the more general $\ell_p$ *norms*:
 
 $$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
 
@@ -1002,7 +1002,7 @@ of a matrix's elements:
 [**$$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$**]
 
 The Frobenius norm behaves as if it were 
-an $L_2$ norm of a matrix-shaped vector.
+an $\ell_2$ norm of a matrix-shaped vector.
 Invoking the following function will calculate 
 the Frobenius norm of a matrix.
 
@@ -1082,7 +1082,7 @@ To recap:
 * Norms capture various notions of the magnitude of a vector, 
   and are commonly applied to the difference of two vectors 
   to measure their distance.
- * Common vector norms include the $L_1$ and $L_2$ norms, 
+ * Common vector norms include the $\ell_1$ and $\ell_2$ norms, 
    and common matrix norms include the *spectral* and *Frobenius* norms.
 
 

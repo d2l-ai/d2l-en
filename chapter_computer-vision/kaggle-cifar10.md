@@ -107,7 +107,7 @@ else:
 ### [**Organizing the Dataset**]
 
 We need to organize datasets to facilitate model training and testing.
-Let us first read the labels from the csv file.
+Let's first read the labels from the csv file.
 The following function returns a dictionary that maps
 the non-extension part of the filename to its label.
 
@@ -133,7 +133,7 @@ More concretely,
 let $n$ be the number of images of the class with the least examples, and $r$ be the ratio.
 The validation set will split out
 $\max(\lfloor nr\rfloor,1)$ images for each class.
-Let us use `valid_ratio=0.1` as an example. Since the original training set has 50000 images,
+Let's use `valid_ratio=0.1` as an example. Since the original training set has 50000 images,
 there will be 45000 images used for training in the path `train_valid_test/train`,
 while the other 5000 images will be split out
 as validation set in the path `train_valid_test/valid`. After organizing the dataset, images of the same class will be placed under the same folder.

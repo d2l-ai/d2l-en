@@ -3,7 +3,7 @@
 
 Now that we know the technical details of 
 the word2vec models and approximate training methods,
-let us walk through their implementations. 
+let's walk through their implementations. 
 Specifically,
 we will take the skip-gram model in :numref:`sec_word2vec`
 and negative sampling in :numref:`sec_approx_train`
@@ -389,7 +389,7 @@ def batchify(data):
         contexts_negatives), d2l.tensor(masks), d2l.tensor(labels))
 ```
 
-Let us test this function using a minibatch of two examples.
+Let's test this function using a minibatch of two examples.
 
 ```{.python .input}
 #@tab all
@@ -463,7 +463,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     return data_iter, vocab
 ```
 
-Let us print the first minibatch of the data iterator.
+Let's print the first minibatch of the data iterator.
 
 ```{.python .input}
 #@tab all

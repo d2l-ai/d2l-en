@@ -279,6 +279,7 @@ class FashionMNIST(d2l.DataModule):
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+@d2l.add_to_class(FashionMNIST)
 def text_labels(self, indices):
     """Return text labels."""
     labels = [

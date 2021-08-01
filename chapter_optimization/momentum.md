@@ -20,7 +20,7 @@ It would be nice if we could benefit from the effect of variance reduction even 
 
 $$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \mathbf{g}_{t, t-1}$$
 
-for some $\beta \in (0, 1)$. This effectively replaces the instantaneous gradient by one that's been averaged over multiple *past* gradients. $\mathbf{v}$ is called *momentum*. It accumulates past gradients similar to how a heavy ball rolling down the objective function landscape integrates over past forces. To see what is happening in more detail let us expand $\mathbf{v}_t$ recursively into
+for some $\beta \in (0, 1)$. This effectively replaces the instantaneous gradient by one that's been averaged over multiple *past* gradients. $\mathbf{v}$ is called *momentum*. It accumulates past gradients similar to how a heavy ball rolling down the objective function landscape integrates over past forces. To see what is happening in more detail let's expand $\mathbf{v}_t$ recursively into
 
 $$\begin{aligned}
 \mathbf{v}_t = \beta^2 \mathbf{v}_{t-2} + \beta \mathbf{g}_{t-1, t-2} + \mathbf{g}_{t, t-1}
@@ -39,7 +39,7 @@ To get a better understanding of the geometric properties of the momentum method
 
 $$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$
 
-As before $f$ has its minimum at $(0, 0)$. This function is *very* flat in the direction of $x_1$. Let us see what happens when we perform gradient descent as before on this new function. We pick a learning rate of $0.4$.
+As before $f$ has its minimum at $(0, 0)$. This function is *very* flat in the direction of $x_1$. Let's see what happens when we perform gradient descent as before on this new function. We pick a learning rate of $0.4$.
 
 ```{.python .input}
 %matplotlib inline
@@ -107,7 +107,7 @@ $$
 \end{aligned}
 $$
 
-Note that for $\beta = 0$ we recover regular gradient descent. Before delving deeper into the mathematical properties let us have a quick look at how the algorithm behaves in practice.
+Note that for $\beta = 0$ we recover regular gradient descent. Before delving deeper into the mathematical properties let's have a quick look at how the algorithm behaves in practice.
 
 ```{.python .input}
 #@tab all
@@ -120,7 +120,7 @@ eta, beta = 0.6, 0.5
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
 
-As we can see, even with the same learning rate that we used before, momentum still converges well. Let us see what happens when we decrease the momentum parameter. Halving it to $\beta = 0.25$ leads to a trajectory that barely converges at all. Nonetheless, it is a lot better than without momentum (when the solution diverges).
+As we can see, even with the same learning rate that we used before, momentum still converges well. Let's see what happens when we decrease the momentum parameter. Halving it to $\beta = 0.25$ leads to a trajectory that barely converges at all. Nonetheless, it is a lot better than without momentum (when the solution diverges).
 
 ```{.python .input}
 #@tab all
@@ -128,7 +128,7 @@ eta, beta = 0.6, 0.25
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
 
-Note that we can combine momentum with stochastic gradient descent and in particular, minibatch stochastic gradient descent. The only change is that in that case we replace the gradients $\mathbf{g}_{t, t-1}$ with $\mathbf{g}_t$. Last, for convenience we initialize $\mathbf{v}_0 = 0$ at time $t=0$. Let us look at what leaky averaging actually does to the updates.
+Note that we can combine momentum with stochastic gradient descent and in particular, minibatch stochastic gradient descent. The only change is that in that case we replace the gradients $\mathbf{g}_{t, t-1}$ with $\mathbf{g}_t$. Last, for convenience we initialize $\mathbf{v}_0 = 0$ at time $t=0$. Let's look at what leaky averaging actually does to the updates.
 
 ### Effective Sample Weight
 
@@ -147,7 +147,7 @@ d2l.plt.legend();
 
 ## Practical Experiments
 
-Let us see how momentum works in practice, i.e., when used within the context of a proper optimizer. For this we need a somewhat more scalable implementation.
+Let's see how momentum works in practice, i.e., when used within the context of a proper optimizer. For this we need a somewhat more scalable implementation.
 
 ### Implementation from Scratch
 
@@ -194,7 +194,7 @@ def sgd_momentum(params, grads, states, hyperparams):
             p[:].assign(p - hyperparams['lr'] * v)
 ```
 
-Let us see how this works in practice.
+Let's see how this works in practice.
 
 ```{.python .input}
 #@tab all
@@ -279,7 +279,7 @@ In doing this we just proved the following theorem: Gradient Descent with and wi
 
 ### Scalar Functions
 
-Given the above result let us see what happens when we minimize the function $f(x) = \frac{\lambda}{2} x^2$. For gradient descent we have
+Given the above result let's see what happens when we minimize the function $f(x) = \frac{\lambda}{2} x^2$. For gradient descent we have
 
 $$x_{t+1} = x_t - \eta \lambda x_t = (1 - \eta \lambda) x_t.$$
 

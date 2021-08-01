@@ -195,7 +195,7 @@ apply(img, augs)
 
 ## [**Training with Image Augmentation**]
 
-Let us train a model with image augmentation.
+Let's train a model with image augmentation.
 Here we use the CIFAR-10 dataset instead of the Fashion-MNIST dataset that we used before. 
 This is because the position and size of the objects in the Fashion-MNIST dataset have been normalized, while the color and size of the objects in the CIFAR-10 dataset have more significant differences. 
 The first 32 training images in the CIFAR-10 dataset are shown below.
@@ -424,7 +424,7 @@ def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
     train_ch13(net, train_iter, test_iter, loss, trainer, 10, devices)
 ```
 
-Let us [**train the model**] using image augmentation based on random left-right flipping.
+Let's [**train the model**] using image augmentation based on random left-right flipping.
 
 ```{.python .input}
 #@tab all

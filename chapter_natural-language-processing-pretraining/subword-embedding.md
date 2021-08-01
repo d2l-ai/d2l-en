@@ -44,7 +44,7 @@ the subword-level skip-gram,
 where each *center word* is represented by the sum of 
 its subword vectors.
 
-Let us illustrate how to obtain 
+Let's illustrate how to obtain 
 subwords for each center word in fastText
 using the word "where".
 First, add special characters “&lt;” and “&gt;” 

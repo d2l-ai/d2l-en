@@ -8,7 +8,7 @@ of deep learning frameworks
 (**made it much easier to implement linear regression**)
 in :numref:`sec_linear_concise`,
 (**we will find it similarly**) (~~here~~) (or possibly more)
-convenient for implementing classification models. Let us stick with the Fashion-MNIST dataset
+convenient for implementing classification models. Let's stick with the Fashion-MNIST dataset
 and keep the batch size at 256 as in :numref:`sec_softmax_scratch`.
 
 ```{.python .input}

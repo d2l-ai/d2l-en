@@ -100,7 +100,7 @@ attention(X, X, X, valid_lens, training=False).shape
 ## Comparing CNNs, RNNs, and Self-Attention
 :label:`subsec_cnn-rnn-self-attention`
 
-Let us
+Let's
 compare architectures for mapping
 a sequence of $n$ tokens
 to another sequence of equal length,
@@ -215,7 +215,7 @@ At first glance,
 this trigonometric-function
 design looks weird.
 Before explanations of this design,
-let us first implement it in the following `PositionalEncoding` class.
+let's first implement it in the following `PositionalEncoding` class.
 
 ```{.python .input}
 #@save
@@ -327,7 +327,7 @@ d2l.plot(np.arange(num_steps), P[0, :, 6:10].T, xlabel='Row (position)',
 
 To see how the monotonically decreased frequency
 along the encoding dimension relates to absolute positional information,
-let us print out [**the binary representations**] of $0, 1, \ldots, 7$.
+let's print out [**the binary representations**] of $0, 1, \ldots, 7$.
 As we can see,
 the lowest bit, the second-lowest bit, and the third-lowest bit alternate on every number, every two numbers, and every four numbers, respectively.
 

@@ -376,7 +376,7 @@ voc_test = VOCSegDataset(False, crop_size, voc_dir)
 
 Setting the batch size to 64,
 we define the data iterator for the training set.
-Let us print the shape of the first minibatch.
+Let's print the shape of the first minibatch.
 Different from in image classification or object detection, labels here are three-dimensional tensors.
 
 ```{.python .input}

@@ -13,7 +13,7 @@ Clearly the end of the phrase (if available) conveys significant information abo
 A sequence model that is incapable of taking advantage of this will perform poorly on related tasks.
 For instance, to do well in named entity recognition (e.g., to recognize whether "Green" refers to "Mr. Green" or to the color)
 longer-range context is equally vital.
-To get some inspiration for addressing the problem let us take a detour to probabilistic graphical models.
+To get some inspiration for addressing the problem let's take a detour to probabilistic graphical models.
 
 
 ## Dynamic Programming in Hidden Markov Models
@@ -121,7 +121,7 @@ This transition epitomizes many of the principles guiding the design of modern d
 
 Bidirectional RNNs were introduced by :cite:`Schuster.Paliwal.1997`.
 For a detailed discussion of the various architectures see also the paper :cite:`Graves.Schmidhuber.2005`.
-Let us look at the specifics of such a network.
+Let's look at the specifics of such a network.
 
 
 For any time step $t$,

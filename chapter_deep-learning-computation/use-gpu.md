@@ -461,7 +461,7 @@ When the input is a tensor on the GPU, the model will calculate the result on th
 net(X)
 ```
 
-Let us (**confirm that the model parameters are stored on the same GPU.**)
+Let's (**confirm that the model parameters are stored on the same GPU.**)
 
 ```{.python .input}
 net[0].weight.data().ctx

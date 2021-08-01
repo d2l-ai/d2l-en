@@ -97,7 +97,7 @@ In contrast,
 we can directly specify the output shape
 in the region of interest pooling layer.
 
-For example, let us specify
+For example, let's specify
 the output height and width 
 for each region as $h_2$ and $w_2$, respectively.
 For any region of interest window
@@ -150,7 +150,7 @@ X = torch.arange(16.).reshape(1, 1, 4, 4)
 X
 ```
 
-Let us further suppose
+Let's further suppose
 that  the height and width of the input image are both 40 pixels and that selective search generates two region proposals on this image.
 Each region proposal
 is expressed as five elements:

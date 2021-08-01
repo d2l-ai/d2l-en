@@ -220,7 +220,7 @@ ffn(tf.ones((2, 3, 4)))[0]
 
 ## Residual Connection and Layer Normalization
 
-Now let us focus on
+Now let's focus on
 the "add & norm" component in :numref:`fig_transformer`.
 As we described at the beginning
 of this section,
@@ -348,7 +348,7 @@ add_norm(tf.ones((2, 3, 4)), tf.ones((2, 3, 4)), training=False).shape
 
 With all the essential components to assemble
 the transformer encoder,
-let us start by
+let's start by
 implementing [**a single layer within the encoder**].
 The following `EncoderBlock` class
 contains two sublayers: multi-head self-attention and positionwise feed-forward networks,
@@ -904,7 +904,7 @@ class TransformerDecoder(d2l.AttentionDecoder):
 
 ## [**Training**]
 
-Let us instantiate an encoder-decoder model
+Let's instantiate an encoder-decoder model
 by following the transformer architecture.
 Here we specify that
 both the transformer encoder and the transformer decoder
@@ -997,7 +997,7 @@ for eng, fra in zip(engs, fras):
           f'bleu {d2l.bleu(translation, fra, k=2):.3f}')
 ```
 
-Let us [**visualize the transformer attention weights**] when translating the last English sentence into French.
+Let's [**visualize the transformer attention weights**] when translating the last English sentence into French.
 The shape of the encoder self-attention weights
 is (number of encoder layers, number of attention heads, `num_steps` or number of queries, `num_steps` or number of key-value pairs).
 

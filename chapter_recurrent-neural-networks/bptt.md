@@ -143,7 +143,7 @@ with
 $$\frac{\partial h_t}{\partial w_h}=\frac{\partial f(x_{t},h_{t-1},w_h)}{\partial w_h}+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t} \frac{\partial f(x_{j},h_{j-1},w_h)}{\partial h_{j-1}} \right) \frac{\partial f(x_{i},h_{i-1},w_h)}{\partial w_h}.$$
 :eqlabel:`eq_bptt_partial_ht_wh_gen`
 
-While we can use the chain rule to compute $\partial h_t/\partial w_h$ recursively, this chain can get very long whenever $t$ is large. Let us discuss a number of strategies for dealing with this problem.
+While we can use the chain rule to compute $\partial h_t/\partial w_h$ recursively, this chain can get very long whenever $t$ is large. Let's discuss a number of strategies for dealing with this problem.
 
 ### Full Computation ### 
 
@@ -213,7 +213,7 @@ Third, we actually *want* models that have only a short range of interactions. H
 ## Backpropagation Through Time in Detail
 
 After discussing the general principle,
-let us discuss backpropagation through time in detail.
+let's discuss backpropagation through time in detail.
 Different from the analysis in
 :numref:`subsec_bptt_analysis`,
 in the following
