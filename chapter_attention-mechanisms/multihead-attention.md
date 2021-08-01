@@ -47,7 +47,7 @@ describes multi-head attention.
 ## Model
 
 Before providing the implementation of multi-head attention,
-let us formalize this model mathematically.
+let's formalize this model mathematically.
 Given a query $\mathbf{q} \in \mathbb{R}^{d_q}$,
 a key $\mathbf{k} \in \mathbb{R}^{d_k}$,
 and a value $\mathbf{v} \in \mathbb{R}^{d_v}$,
@@ -340,7 +340,7 @@ def transpose_output(X, num_heads):
     return tf.reshape(X, shape=(X.shape[0], X.shape[1], -1))
 ```
 
-Let us [**test our implemented**] `MultiHeadAttention` class
+Let's [**test our implemented**] `MultiHeadAttention` class
 using a toy example where keys and values are the same.
 As a result,
 the shape of the multi-head attention output

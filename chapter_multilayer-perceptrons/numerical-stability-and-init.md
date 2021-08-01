@@ -82,7 +82,7 @@ Since early artificial neural networks were inspired
 by biological neural networks,
 the idea of neurons that fire either *fully* or *not at all*
 (like biological neurons) seemed appealing.
-Let us take a closer look at the sigmoid
+Let's take a closer look at the sigmoid
 to see why it can cause vanishing gradients.
 
 ```{.python .input}
@@ -251,7 +251,7 @@ for moderate problem sizes.
 ### Xavier Initialization
 :label:`subsec_xavier`
 
-Let us look at the scale distribution of
+Let's look at the scale distribution of
 an output $o_{i}$ for some fully connected layer
 *without nonlinearities*.
 With $n_\mathrm{in}$ inputs $x_j$
@@ -262,11 +262,11 @@ $$o_{i} = \sum_{j=1}^{n_\mathrm{in}} w_{ij} x_j.$$
 
 The weights $w_{ij}$ are all drawn
 independently from the same distribution.
-Furthermore, let us assume that this distribution
+Furthermore, let's assume that this distribution
 has zero mean and variance $\sigma^2$.
 Note that this does not mean that the distribution has to be Gaussian,
 just that the mean and variance need to exist.
-For now, let us assume that the inputs to the layer $x_j$
+For now, let's assume that the inputs to the layer $x_j$
 also have zero mean and variance $\gamma^2$
 and that they are independent of $w_{ij}$ and independent of each other.
 In this case, we can compute the mean and variance of $o_i$ as follows:

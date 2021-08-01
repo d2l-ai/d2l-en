@@ -190,7 +190,7 @@ we construct feature maps at two different scales,
 for the same minibatch,
 where the height and width of `Y2`
 are half of those of `Y1`.
-Let us take class prediction as an example.
+Let's take class prediction as an example.
 Suppose that
 5 and 3 anchor boxes
 are generated for every unit in `Y1` and `Y2`, respectively.
@@ -569,7 +569,7 @@ for object detection.
 ### Reading the Dataset and Initializing the Model
 
 To begin with,
-let us [**read 
+let's [**read 
 the banana detection dataset**]
 described in :numref:`sec_object-detection-dataset`.
 

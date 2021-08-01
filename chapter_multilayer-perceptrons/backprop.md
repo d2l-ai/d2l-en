@@ -46,7 +46,7 @@ of funk virtuoso James Brown,
 you must "pay the cost to be the boss".
 
 
-For the sake of simplicity, let us assume
+For the sake of simplicity, let's assume
 that the input example is $\mathbf{x}\in \mathbb{R}^d$
 and that our hidden layer does not include a bias term.
 Here the intermediate variable is:

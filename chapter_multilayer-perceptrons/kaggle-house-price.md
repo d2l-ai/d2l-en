@@ -251,7 +251,7 @@ print(train_data.shape)
 print(test_data.shape)
 ```
 
-Let us [**take a look at the first four and last two features
+Let's [**take a look at the first four and last two features
 as well as the label (SalePrice)**] from the first four examples.
 
 ```{.python .input}
@@ -275,7 +275,7 @@ all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 
 As stated above, we have a wide variety of data types.
 We will need to preprocess the data before we can start modeling.
-Let us start with the numerical features.
+Let's start with the numerical features.
 First, we apply a heuristic,
 [**replacing all missing values
 by the corresponding feature's mean.**]

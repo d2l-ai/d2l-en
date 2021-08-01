@@ -31,7 +31,7 @@ and they can only be computed by looking at data at previous time steps.
 
 ## Neural Networks without Hidden States
 
-Let us take a look at an MLP with a single hidden layer.
+Let's take a look at an MLP with a single hidden layer.
 Let the hidden layer's activation function be $\phi$.
 Given a minibatch of examples $\mathbf{X} \in \mathbb{R}^{n \times d}$ with batch size $n$ and $d$ inputs, the hidden layer output $\mathbf{H} \in \mathbb{R}^{n \times h}$ is calculated as
 
@@ -52,7 +52,7 @@ Suffice it to say that we can pick feature-label pairs at random and learn the p
 ## Recurrent Neural Networks with Hidden States
 :label:`subsec_rnn_w_hidden_states`
 
-Matters are entirely different when we have hidden states. Let us look at the structure in some more detail.
+Matters are entirely different when we have hidden states. Let's look at the structure in some more detail.
 
 Assume that we have
 a minibatch of inputs
@@ -209,7 +209,7 @@ In practice, each token is represented by a $d$-dimensional vector, and we use a
 ## Perplexity
 :label:`subsec_perplexity`
 
-Last, let us discuss about how to measure the language model quality, which will be used to evaluate our RNN-based models in the subsequent sections.
+Last, let's discuss about how to measure the language model quality, which will be used to evaluate our RNN-based models in the subsequent sections.
 One way is to check how surprising the text is.
 A good language model is able to predict with
 high-accuracy tokens that what we will see next.
@@ -249,7 +249,7 @@ This makes the performance on documents of different lengths comparable. For his
 
 $$\exp\left(-\frac{1}{n} \sum_{t=1}^n \log P(x_t \mid x_{t-1}, \ldots, x_1)\right).$$
 
-Perplexity can be best understood as the harmonic mean of the number of real choices that we have when deciding which token to pick next. Let us look at a number of cases:
+Perplexity can be best understood as the harmonic mean of the number of real choices that we have when deciding which token to pick next. Let's look at a number of cases:
 
 * In the best case scenario, the model always perfectly estimates the probability of the label token as 1. In this case the perplexity of the model is 1.
 * In the worst case scenario, the model always predicts the probability of the label token as 0. In this situation, the perplexity is positive infinity.

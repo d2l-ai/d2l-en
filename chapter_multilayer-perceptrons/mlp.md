@@ -279,7 +279,7 @@ calculating the weighted sum and further adding bias with it.
 They are differentiable operators to transform input signals to outputs,
 while most of them add non-linearity.
 Because activation functions are fundamental to deep learning,
-(**let us briefly survey some common activation functions**).
+(**let's briefly survey some common activation functions**).
 
 ```{.python .input}
 %matplotlib inline

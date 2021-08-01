@@ -40,7 +40,7 @@ Therefore, when using smaller anchor boxes to detect smaller objects, we can sam
 while for larger objects we can sample fewer regions.
 
 To demonstrate how to generate anchor boxes
-at multiple scales, let us read an image.
+at multiple scales, let's read an image.
 Its height and width are 561 and 728 pixels, respectively.
 
 ```{.python .input}
@@ -118,7 +118,7 @@ def display_anchors(fmap_w, fmap_h, s):
                     anchors[0] * bbox_scale)
 ```
 
-First, let us [**consider
+First, let's [**consider
 detection of small objects**].
 In order to make it easier to distinguish when displayed, the anchor boxes with different centers here do not overlap:
 the anchor box scale is set to 0.15

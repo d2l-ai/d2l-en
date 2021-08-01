@@ -61,7 +61,7 @@ train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 ## One-Dimensional Convolutions
 
 Before introducing the model, 
-let us see how a one-dimensional convolution works.
+let's see how a one-dimensional convolution works.
 Bear in mind that it is just a special case
 of a two-dimensional convolution
 based on the cross-correlation operation.
@@ -319,7 +319,7 @@ class TextCNN(nn.Module):
         return outputs
 ```
 
-Let us create a textCNN instance. 
+Let's create a textCNN instance. 
 It has 3 convolutional layers with kernel widths of 3, 4, and 5, all with 100 output channels.
 
 ```{.python .input}

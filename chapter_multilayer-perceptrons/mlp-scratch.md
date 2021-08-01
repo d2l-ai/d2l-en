@@ -3,7 +3,7 @@
 
 Now that we have characterized
 multilayer perceptrons (MLPs) mathematically,
-let us try to implement one ourselves. To compare against our previous results
+let's try to implement one ourselves. To compare against our previous results
 achieved with softmax regression
 (:numref:`sec_softmax_scratch`),
 we will continue to work with

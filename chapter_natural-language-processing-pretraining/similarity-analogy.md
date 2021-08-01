@@ -16,7 +16,7 @@ in :numref:`chap_nlp_app`.
 To demonstrate 
 semantics of pretrained word vectors
 from large corpora in a straightforward way,
-let us apply them
+let's apply them
 in the word similarity and analogy tasks.
 
 ```{.python .input}
@@ -183,7 +183,7 @@ The vocabulary of the pretrained word vectors
 in `glove_6b50d` contains 400000 words and a special unknown token. 
 Excluding the input word and unknown token,
 among this vocabulary
-let us find 
+let's find 
 three most semantically similar words
 to word "chip".
 
@@ -234,7 +234,7 @@ def get_analogy(token_a, token_b, token_c, embed):
     return embed.idx_to_token[int(topk[0])]  # Remove unknown words
 ```
 
-Let us verify the "male-female" analogy using the loaded word vectors.
+Let's verify the "male-female" analogy using the loaded word vectors.
 
 ```{.python .input}
 #@tab all

@@ -77,7 +77,7 @@ Given a convex set $\mathcal{X}$, a function $f: \mathcal{X} \to \mathbb{R}$ is 
 
 $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
-To illustrate this let us plot a few functions and check which ones satisfy the requirement.
+To illustrate this let's plot a few functions and check which ones satisfy the requirement.
 Below we define a few functions, both convex and nonconvex.
 
 ```{.python .input}
@@ -184,7 +184,7 @@ $$\mathcal{S}_b := \{x | x \in \mathcal{X} \text{ and } f(x) \leq b\}$$
 
 is convex. 
 
-Let us prove this quickly. Recall that for any $x, x' \in \mathcal{S}_b$ we need to show that $\lambda x + (1-\lambda) x' \in \mathcal{S}_b$ as long as $\lambda \in [0, 1]$. 
+Let's prove this quickly. Recall that for any $x, x' \in \mathcal{S}_b$ we need to show that $\lambda x + (1-\lambda) x' \in \mathcal{S}_b$ as long as $\lambda \in [0, 1]$. 
 Since $f(x) \leq b$ and $f(x') \leq b$,
 by the definition of convexity we have 
 

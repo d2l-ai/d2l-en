@@ -102,7 +102,7 @@ and using the mean squared loss: they are common for regression.
 
 ## Text Tagging
 
-Now let us consider token-level tasks, such as *text tagging*,
+Now let's consider token-level tasks, such as *text tagging*,
 where each token is assigned a label.
 Among text tagging tasks,
 *part-of-speech tagging* assigns each word a part-of-speech tag (e.g., adjective and determiner)
@@ -187,7 +187,7 @@ and output the span with the highest score.
 
 ## Exercises
 
-1. Let us design a search engine algorithm for news articles. When the system receives an query (e.g., "oil industry during the coronavirus outbreak"), it should return a ranked list of news articles that are most relevant to the query. Suppose that we have a huge pool of news articles and a large number of queries. To simplify the problem, suppose that the most relevant article has been labeled for each query. How can we apply negative sampling (see :numref:`subsec_negative-sampling`) and BERT in the algorithm design?
+1. Let's design a search engine algorithm for news articles. When the system receives an query (e.g., "oil industry during the coronavirus outbreak"), it should return a ranked list of news articles that are most relevant to the query. Suppose that we have a huge pool of news articles and a large number of queries. To simplify the problem, suppose that the most relevant article has been labeled for each query. How can we apply negative sampling (see :numref:`subsec_negative-sampling`) and BERT in the algorithm design?
 1. How can we leverage BERT in training language models?
 1. Can we leverage BERT in machine translation?
 

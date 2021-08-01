@@ -134,7 +134,7 @@ boxes = d2l.tensor((dog_bbox, cat_bbox))
 box_center_to_corner(box_corner_to_center(boxes)) == boxes
 ```
 
-Let us [**draw the bounding boxes in the image**] to check if they are accurate.
+Let's [**draw the bounding boxes in the image**] to check if they are accurate.
 Before drawing, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of the  `matplotlib` package.
 
 ```{.python .input}

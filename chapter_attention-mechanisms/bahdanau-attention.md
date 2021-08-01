@@ -128,7 +128,7 @@ class AttentionDecoder(d2l.Decoder):
         raise NotImplementedError
 ```
 
-Now let us [**implement
+Now let's [**implement
 the RNN decoder with Bahdanau attention**]
 in the following `Seq2SeqAttentionDecoder` class.
 The state of the decoder

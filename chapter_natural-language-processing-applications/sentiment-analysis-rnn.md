@@ -139,7 +139,7 @@ class BiRNN(nn.Module):
         return outs
 ```
 
-Let us construct a bidirectional RNN with two hidden layers to represent single text for sentiment analysis.
+Let's construct a bidirectional RNN with two hidden layers to represent single text for sentiment analysis.
 
 ```{.python .input}
 #@tab all
@@ -238,7 +238,7 @@ def predict_sentiment(net, vocab, sequence):
     return 'positive' if label == 1 else 'negative'
 ```
 
-Finally, let us use the trained model to predict the sentiment for two simple sentences.
+Finally, let's use the trained model to predict the sentiment for two simple sentences.
 
 ```{.python .input}
 #@tab all

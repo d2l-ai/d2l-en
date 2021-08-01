@@ -12,7 +12,7 @@ then compare this strategy with other alternatives:
 *exhaustive search* and *beam search*.
 
 Before a formal introduction to greedy search,
-let us formalize the search problem
+let's formalize the search problem
 using
 the same mathematical notation from :numref:`sec_seq2seq`.
 At any time step $t'$, 
@@ -28,7 +28,7 @@ $\mathcal{Y}$ (it contains "&lt;eos&gt;")
 the output vocabulary.
 So the cardinality $\left|\mathcal{Y}\right|$ of this vocabulary set
 is the vocabulary size.
-Let us also specify the maximum number of tokens
+Let's also specify the maximum number of tokens
 of an output sequence as $T'$.
 As a result,
 our goal is to search for an ideal output
@@ -42,7 +42,7 @@ in the actual output.
 
 ## Greedy Search
 
-First, let us take a look at 
+First, let's take a look at 
 a simple strategy: *greedy search*.
 This strategy has been used to predict sequences in :numref:`sec_seq2seq`.
 In greedy search,
@@ -70,7 +70,7 @@ by greedy search.
 ![At each time step, greedy search selects the token with the highest conditional probability.](../img/s2s-prob1.svg)
 :label:`fig_s2s-prob1`
 
-Let us illustrate it with an example.
+Let's illustrate it with an example.
 Suppose that there are four tokens 
 "A", "B", "C", and "&lt;eos&gt;" in the output dictionary.
 In :numref:`fig_s2s-prob1`,
@@ -85,7 +85,7 @@ The conditional probability of this output sequence is $0.5\times0.4\times0.4\ti
 :label:`fig_s2s-prob2`
 
 
-Next, let us look at another example 
+Next, let's look at another example 
 in :numref:`fig_s2s-prob2`. 
 Unlike in :numref:`fig_s2s-prob1`, 
 at time step 2

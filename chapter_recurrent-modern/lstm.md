@@ -34,7 +34,7 @@ the content of the cell, governed by a *forget gate*.
 The motivation for such a
 design is the same as that of GRUs,
 namely to be able to decide when to remember and
-when to ignore inputs in the hidden state via a dedicated mechanism. Let us see
+when to ignore inputs in the hidden state via a dedicated mechanism. Let's see
 how this works in practice.
 
 
@@ -122,7 +122,7 @@ Whenever the output gate approximates 1 we effectively pass all memory informati
 
 ## Implementation from Scratch
 
-Now let us implement an LSTM from scratch.
+Now let's implement an LSTM from scratch.
 As same as the experiments in :numref:`sec_rnn_scratch`,
 we first load *The Time Machine* dataset.
 
@@ -323,7 +323,7 @@ def lstm(inputs, state, params):
 
 ### [**Training**] and Prediction
 
-Let us train an LSTM as same as what we did in :numref:`sec_gru`, by instantiating the `RNNModelScratch` class as introduced in :numref:`sec_rnn_scratch`.
+Let's train an LSTM as same as what we did in :numref:`sec_gru`, by instantiating the `RNNModelScratch` class as introduced in :numref:`sec_rnn_scratch`.
 
 ```{.python .input}
 #@tab mxnet, pytorch

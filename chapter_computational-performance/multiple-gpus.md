@@ -9,8 +9,8 @@ We assume that you are familiar with minibatch stochastic gradient descent algor
 
 ## Splitting the Problem
 
-Let us start with a simple computer vision problem and a slightly archaic network, e.g., with multiple layers of convolutions, pooling, and possibly a few fully connected layers in the end. 
-That is, let us start with a network that looks quite similar to LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` or AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. 
+Let's start with a simple computer vision problem and a slightly archaic network, e.g., with multiple layers of convolutions, pooling, and possibly a few fully connected layers in the end. 
+That is, let's start with a network that looks quite similar to LeNet :cite:`LeCun.Bottou.Bengio.ea.1998` or AlexNet :cite:`Krizhevsky.Sutskever.Hinton.2012`. 
 Given multiple GPUs (2 if it is a desktop server, 4 on an AWS g4dn.12xlarge instance, 8 on a p3.16xlarge, or 16 on a p2.16xlarge), we want to partition training in a manner as to achieve good speedup while simultaneously benefitting from simple and reproducible design choices. Multiple GPUs, after all, increase both *memory* and *computation* ability. In a nutshell, we have the following choices, given a minibatch of training data that we want to classify.
 
 First, we could partition the network across multiple GPUs. That is, each GPU takes as input the data flowing into a particular layer, processes data across a number of subsequent layers and then sends the data to the next GPU.
@@ -192,7 +192,7 @@ def get_params(params, device):
     return new_params
 ```
 
-Let us try it out by copying the model parameters to one GPU.
+Let's try it out by copying the model parameters to one GPU.
 
 ```{.python .input}
 #@tab all
@@ -202,7 +202,7 @@ print('b1 grad:', new_params[1].grad)
 ```
 
 Since we did not perform any computation yet, the gradient with regard to the bias parameter is still zero.
-Now let us assume that we have a vector distributed across multiple GPUs. The following [**`allreduce` function adds up all vectors and broadcasts the result back to all GPUs**]. Note that for this to work we need to copy the data to the device accumulating the results.
+Now let's assume that we have a vector distributed across multiple GPUs. The following [**`allreduce` function adds up all vectors and broadcasts the result back to all GPUs**]. Note that for this to work we need to copy the data to the device accumulating the results.
 
 ```{.python .input}
 def allreduce(data):
@@ -221,7 +221,7 @@ def allreduce(data):
         data[i] = data[0].to(data[i].device)
 ```
 
-Let us test this by creating vectors with different values on different devices and aggregate them.
+Let's test this by creating vectors with different values on different devices and aggregate them.
 
 ```{.python .input}
 data = [np.ones((1, 2), ctx=d2l.try_gpu(i)) * (i + 1) for i in range(2)]
@@ -373,7 +373,7 @@ def train(num_gpus, batch_size, lr):
           f'on {str(devices)}')
 ```
 
-Let us see how well this works [**on a single GPU**].
+Let's see how well this works [**on a single GPU**].
 We first use a batch size of 256 and a learning rate of 0.2.
 
 ```{.python .input}
@@ -384,7 +384,7 @@ train(num_gpus=1, batch_size=256, lr=0.2)
 By keeping the batch size and learning rate unchanged and [**increasing the number of GPUs to 2**], we can see that the test accuracy roughly stays the same compared with
 the previous experiment.
 In terms of the optimization algorithms, they are identical. Unfortunately there is no meaningful speedup to be gained here: the model is simply too small; moreover we only have a small dataset, where our slightly unsophisticated approach to implementing multi-GPU training suffered from significant Python overhead. We will encounter more complex models and more sophisticated ways of parallelization going forward.
-Let us see what happens nonetheless for Fashion-MNIST.
+Let's see what happens nonetheless for Fashion-MNIST.
 
 ```{.python .input}
 #@tab all

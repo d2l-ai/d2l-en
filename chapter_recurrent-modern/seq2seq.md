@@ -105,7 +105,7 @@ the encoder transforms an input sequence of variable length into a fixed-shape *
 As depicted in :numref:`fig_seq2seq`,
 we can use an RNN to design the encoder.
 
-Let us consider a sequence example (batch size: 1).
+Let's consider a sequence example (batch size: 1).
 Suppose that
 the input sequence is $x_1, \ldots, x_T$, such that $x_t$ is the $t^{\mathrm{th}}$ token in the input text sequence.
 At time step $t$, the RNN transforms
@@ -136,7 +136,7 @@ We can also construct encoders using bidirectional RNNs. In this case, a hidden 
 the subsequence before and after the time step (including the input at the current time step), which encodes the information of the entire sequence.
 
 
-Now let us [**implement the RNN encoder**].
+Now let's [**implement the RNN encoder**].
 Note that we use an *embedding layer*
 to obtain the feature vector for each token in the input sequence.
 The weight
@@ -225,7 +225,7 @@ class Seq2SeqEncoder(d2l.Encoder):
 
 The returned variables of recurrent layers
 have been explained in :numref:`sec_rnn-concise`.
-Let us still use a concrete example
+Let's still use a concrete example
 to [**illustrate the above encoder implementation.**]
 Below
 we instantiate a two-layer GRU encoder
