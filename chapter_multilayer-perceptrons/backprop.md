@@ -31,7 +31,7 @@ techniques and their implementations,
 we rely on some basic mathematics and computational graphs.
 To start, we focus our exposition on
 a one-hidden-layer MLP
-with weight decay ($L_2$ regularization).
+with weight decay ($\ell_2$ regularization).
 
 ## Forward Propagation
 
@@ -79,7 +79,7 @@ for a single data example,
 
 $$L = l(\mathbf{o}, y).$$
 
-According to the definition of $L_2$ regularization,
+According to the definition of $\ell_2$ regularization,
 given the hyperparameter $\lambda$,
 the regularization term is
 
@@ -87,7 +87,7 @@ $$s = \frac{\lambda}{2} \left(\|\mathbf{W}^{(1)}\|_F^2 + \|\mathbf{W}^{(2)}\|_F^
 :eqlabel:`eq_forward-s`
 
 where the Frobenius norm of the matrix
-is simply the $L_2$ norm applied
+is simply the $\ell_2$ norm applied
 after flattening the matrix into a vector.
 Finally, the model's regularized loss
 on a given data example is:

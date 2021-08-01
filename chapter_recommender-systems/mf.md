@@ -94,7 +94,7 @@ def evaluator(net, test_iter, devices):
 ## Training and Evaluating the Model
 
 
-In the training function, we adopt the $L_2$ loss with weight decay. The weight decay mechanism has the same effect as the $L_2$ regularization.
+In the training function, we adopt the $\ell_2$ loss with weight decay. The weight decay mechanism has the same effect as the $\ell_2$ regularization.
 
 ```{.python .input  n=4}
 #@save

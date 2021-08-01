@@ -56,8 +56,8 @@ represent scalar values.
 * $\mathbf{X}^{-1}$: inverse of matrix $\mathbf{X}$
 * $\odot$: Hadamard (elementwise) product
 * $[\cdot, \cdot]$: concatenation
-* $\|\cdot\|_p$: $L_p$ norm
-* $\|\cdot\|$: $L_2$ norm
+* $\|\cdot\|_p$: $\ell_p$ norm
+* $\|\cdot\|$: $\ell_2$ norm
 * $\langle \mathbf{x}, \mathbf{y} \rangle$: dot product of vectors $\mathbf{x}$ and $\mathbf{y}$
 * $\sum$: summation over a collection of elements
 * $\prod$: product over a collection of elements

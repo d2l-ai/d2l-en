@@ -606,7 +606,7 @@ through a fully connected layer.
 Note that before returning the output,
 our model did something unusual.
 We ran a while-loop, testing
-on the condition its $L_1$ norm is larger than $1$,
+on the condition its $\ell_1$ norm is larger than $1$,
 and dividing our output vector by $2$
 until it satisfied the condition.
 Finally, we returned the sum of the entries in `X`.

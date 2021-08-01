@@ -612,7 +612,7 @@ however,
 here we do not use the squared loss
 described in :numref:`subsec_normal_distribution_and_squared_loss`.
 Instead,
-we use the $L_1$ norm loss,
+we use the $\ell_1$ norm loss,
 the absolute value of the difference between
 the prediction and the ground-truth.
 The mask variable `bbox_masks` filters out
@@ -648,7 +648,7 @@ def calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels, bbox_masks):
 ```
 
 We can use accuracy to evaluate the classification results.
-Due to the used $L_1$ norm loss for the offsets,
+Due to the used $\ell_1$ norm loss for the offsets,
 we use the *mean absolute error* to evaluate the
 predicted bounding boxes.
 These prediction results are obtained 
@@ -861,7 +861,7 @@ display(img, output.cpu(), threshold=0.9)
 
 ## Exercises
 
-1. Can you improve the single-shot multibox detection by improving the loss function? For example, replace $L_1$ norm loss with smooth $L_1$ norm loss for the predicted offsets. This loss function uses a square function around zero for smoothness, which is controlled by the hyperparameter $\sigma$:
+1. Can you improve the single-shot multibox detection by improving the loss function? For example, replace $\ell_1$ norm loss with smooth $\ell_1$ norm loss for the predicted offsets. This loss function uses a square function around zero for smoothness, which is controlled by the hyperparameter $\sigma$:
 
 $$
 f(x) =
@@ -871,7 +871,7 @@ f(x) =
     \end{cases}
 $$
 
-When $\sigma$ is very large, this loss is similar to the $L_1$ norm loss. When its value is smaller, the loss function is smoother.
+When $\sigma$ is very large, this loss is similar to the $\ell_1$ norm loss. When its value is smaller, the loss function is smoother.
 
 ```{.python .input}
 sigmas = [10, 1, 0.5]

@@ -338,10 +338,10 @@ The mathematical definition of projections may sound a bit abstract. :numref:`fi
 Points inside both sets (yellow) remain unchanged during projections. 
 Points outside both sets (black) are projected to 
 the points inside the sets (red) that are closet to the original points (black).
-While for $L_2$ balls this leaves the direction unchanged, this need not be the case in general, as can be seen in the case of the diamond.
+While for $\ell_2$ balls this leaves the direction unchanged, this need not be the case in general, as can be seen in the case of the diamond.
 
 
-One of the uses for convex projections is to compute sparse weight vectors. In this case we project weight vectors onto an $L_1$ ball,
+One of the uses for convex projections is to compute sparse weight vectors. In this case we project weight vectors onto an $\ell_1$ ball,
 which is a generalized version of the diamond case in :numref:`fig_projections`.
 
 
@@ -368,7 +368,7 @@ In the context of deep learning the main purpose of convex functions is to motiv
 1. Prove that linear subspaces, i.e., $\mathcal{X} = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$, are convex sets.
 1. Prove that in the case of linear subspaces with $\mathbf{b} = \mathbf{0}$ the projection $\mathrm{Proj}_\mathcal{X}$ can be written as $\mathbf{M} \mathbf{x}$ for some matrix $\mathbf{M}$.
 1. Show that for  twice-differentiable convex functions $f$ we can write $f(x + \epsilon) = f(x) + \epsilon f'(x) + \frac{1}{2} \epsilon^2 f''(x + \xi)$ for some $\xi \in [0, \epsilon]$.
-1. Given a vector $\mathbf{w} \in \mathbb{R}^d$ with $\|\mathbf{w}\|_1 > 1$ compute the projection on the $L_1$ unit ball.
+1. Given a vector $\mathbf{w} \in \mathbb{R}^d$ with $\|\mathbf{w}\|_1 > 1$ compute the projection on the $\ell_1$ unit ball.
     1. As an intermediate step write out the penalized objective $\|\mathbf{w} - \mathbf{w}'\|^2 + \lambda \|\mathbf{w}'\|_1$ and compute the solution for a given $\lambda > 0$.
     1. Can you find the "right" value of $\lambda$ without a lot of trial and error?
 1. Given a convex set $\mathcal{X}$ and two vectors $\mathbf{x}$ and $\mathbf{y}$, prove that projections never increase distances, i.e., $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_\mathcal{X}(\mathbf{x}) - \mathrm{Proj}_\mathcal{X}(\mathbf{y})\|$.
