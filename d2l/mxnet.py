@@ -267,6 +267,7 @@ class FashionMNIST(d2l.DataModule):
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
+@d2l.add_to_class(FashionMNIST)
 def text_labels(self, indices):
     """Return text labels."""
     labels = [
@@ -780,7 +781,7 @@ class RNNModel(nn.Block):
     def forward(self, inputs, state):
         X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
-        # The fully-connected layer will first change the shape of `Y` to
+        # The fully connected layer will first change the shape of `Y` to
         # (`num_steps` * `batch_size`, `num_hiddens`). Its output shape is
         # (`num_steps` * `batch_size`, `vocab_size`).
         output = self.dense(Y.reshape(-1, Y.shape[-1]))

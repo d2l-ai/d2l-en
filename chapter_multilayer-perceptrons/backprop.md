@@ -62,7 +62,7 @@ we obtain our hidden activation vector of length $h$,
 
 $$\mathbf{h}= \phi (\mathbf{z}).$$
 
-The hidden variable $\mathbf{h}$
+The hidden layer output $\mathbf{h}$
 is also an intermediate variable.
 Assuming that the parameters of the output layer
 only possess a weight of
@@ -200,7 +200,7 @@ $$\frac{\partial J}{\partial \mathbf{W}^{(2)}}= \text{prod}\left(\frac{\partial 
 To obtain the gradient with respect to $\mathbf{W}^{(1)}$
 we need to continue backpropagation
 along the output layer to the hidden layer.
-The gradient with respect to the hidden layer's outputs
+The gradient with respect to the hidden layer output
 $\partial J/\partial \mathbf{h} \in \mathbb{R}^h$ is given by
 
 
@@ -254,7 +254,7 @@ They are given by the optimization algorithm according to backpropagation in the
 On the other hand,
 the gradient calculation for the parameter
 :eqref:`eq_backprop-J-h` during backpropagation
-depends on the current value of the hidden variable $\mathbf{h}$,
+depends on the current value of the hidden layer output $\mathbf{h}$,
 which is given by forward propagation.
 
 

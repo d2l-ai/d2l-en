@@ -30,12 +30,12 @@ Consider a deep network with $L$ layers,
 input $\mathbf{x}$ and output $\mathbf{o}$.
 With each layer $l$ defined by a transformation $f_l$
 parameterized by weights $\mathbf{W}^{(l)}$,
-whose hidden variable is $\mathbf{h}^{(l)}$ (let $\mathbf{h}^{(0)} = \mathbf{x}$),
+whose hidden layer output is $\mathbf{h}^{(l)}$ (let $\mathbf{h}^{(0)} = \mathbf{x}$),
 our network can be expressed as:
 
 $$\mathbf{h}^{(l)} = f_l (\mathbf{h}^{(l-1)}) \text{ and thus } \mathbf{o} = f_L \circ \ldots \circ f_1(\mathbf{x}).$$
 
-If all the hidden variables and the input are vectors,
+If all the hidden layer output and the input are vectors,
 we can write the gradient of $\mathbf{o}$ with respect to
 any set of parameters $\mathbf{W}^{(l)}$ as follows:
 
@@ -252,7 +252,7 @@ for moderate problem sizes.
 :label:`subsec_xavier`
 
 Let us look at the scale distribution of
-an output (e.g., a hidden variable) $o_{i}$ for some fully connected layer
+an output $o_{i}$ for some fully connected layer
 *without nonlinearities*.
 With $n_\mathrm{in}$ inputs $x_j$
 and their associated weights $w_{ij}$ for this layer,
