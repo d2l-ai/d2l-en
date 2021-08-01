@@ -72,7 +72,7 @@ net(X)
 
 ## [**Parameter Access**]
 
-Let us start with how to access parameters
+Let's start with how to access parameters
 from the models that you already know.
 When a model is defined via the `Sequential` class,
 we can first access any layer by indexing
@@ -202,7 +202,7 @@ net.get_weights()[1]
 
 ### [**Collecting Parameters from Nested Blocks**]
 
-Let us see how the parameter naming conventions work
+Let's see how the parameter naming conventions work
 if we nest multiple blocks inside each other.
 For that we first define a function that produces blocks
 (a block factory, so to speak) and then
@@ -268,7 +268,7 @@ rgnet(X)
 ```
 
 Now that [**we have designed the network,
-let us see how it is organized.**]
+let's see how it is organized.**]
 
 ```{.python .input}
 print(rgnet.collect_params)
@@ -310,7 +310,7 @@ rgnet.layers[0].layers[1].layers[1].weights[1]
 ## Parameter Initialization
 
 Now that we know how to access the parameters,
-let us look at how to initialize them properly.
+let's look at how to initialize them properly.
 We discussed the need for proper initialization in :numref:`sec_numerical_stability`.
 The deep learning framework provides default random initializations to its layers.
 However, we often want to initialize our weights
@@ -338,7 +338,7 @@ TensorFlow provides a variety of initialization methods both in the root module 
 
 ### [**Built-in Initialization**]
 
-Let us begin by calling on built-in initializers.
+Let's begin by calling on built-in initializers.
 The code below initializes all weight parameters
 as Gaussian random variables
 with standard deviation 0.01, while bias parameters cleared to zero.
@@ -564,7 +564,7 @@ the automatic differentiation mechanics.
 ## [**Tied Parameters**]
 
 Often, we want to share parameters across multiple layers.
-Let us see how to do this elegantly.
+Let's see how to do this elegantly.
 In the following we allocate a dense layer
 and then use its parameters specifically
 to set those of another layer.

@@ -4,7 +4,7 @@
 In :numref:`sec_weight_decay`,
 we introduced the classical approach
 to regularizing statistical models
-by penalizing the $L_2$ norm of the weights.
+by penalizing the $\ell_2$ norm of the weights.
 In probabilistic terms, we could justify this technique
 by arguing that we have assumed a prior belief
 that weights take values from
@@ -74,7 +74,7 @@ empirically improve the generalization of deep nets.
 
 ## Robustness through Perturbations
 
-Let us think briefly about what we
+Let's think briefly about what we
 expect from a good predictive model.
 We want it to peform well on unseen data.
 Classical generalization theory
@@ -87,7 +87,7 @@ We explored this when discussing the
 monomial basis functions of linear models
 in :numref:`sec_model_selection`.
 Additionally, as we saw when discussing weight decay
-($L_2$ regularization) in :numref:`sec_weight_decay`,
+($\ell_2$ regularization) in :numref:`sec_weight_decay`,
 the (inverse) norm of the parameters also
 represents a useful measure of simplicity.
 Another useful notion of simplicity is smoothness,

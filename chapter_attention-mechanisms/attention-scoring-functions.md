@@ -333,7 +333,7 @@ class AdditiveAttention(tf.keras.layers.Layer):
             self.attention_weights, **kwargs), values)
 ```
 
-Let us [**demonstrate the above `AdditiveAttention` class**]
+Let's [**demonstrate the above `AdditiveAttention` class**]
 with a toy example,
 where shapes (batch size, number of steps or sequence length in tokens, feature size)
 of queries, keys, and values

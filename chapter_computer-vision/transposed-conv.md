@@ -46,7 +46,7 @@ from d2l import torch as d2l
 ## Basic Operation
 
 Ignoring channels for now,
-let us begin with
+let's begin with
 the basic transposed convolution operation
 with stride of 1 and no padding.
 Suppose that
@@ -230,7 +230,7 @@ tconv(conv(X)).shape == X.shape
 The transposed convolution is named after
 the matrix transposition.
 To explain,
-let us first
+let's first
 see how to implement convolutions
 using matrix multiplications.
 In the example below, we define a $3\times 3$ input `X` and a $2\times 2$ convolution kernel `K`, and then use the `corr2d` function to compute the convolution output `Y`.

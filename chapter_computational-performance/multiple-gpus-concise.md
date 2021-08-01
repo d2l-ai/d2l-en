@@ -21,7 +21,7 @@ from torch import nn
 
 ## [**A Toy Network**]
 
-Let us use a slightly more meaningful network than LeNet from :numref:`sec_multi_gpu` that is still sufficiently easy and quick to train.
+Let's use a slightly more meaningful network than LeNet from :numref:`sec_multi_gpu` that is still sufficiently easy and quick to train.
 We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference from :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning.
 Moreover, we remove the maximum pooling layer.
 
@@ -88,7 +88,7 @@ def resnet18(num_classes, in_channels=1):
 
 :begin_tab:`mxnet`
 The `initialize` function allows us to initialize parameters on a device of our choice.
-For a refresher on initialization methods see :numref:`sec_numerical_stability`. What is particularly convenient is that it also allows us to initialize the network on *multiple* devices simultaneously. Let us try how this works in practice.
+For a refresher on initialization methods see :numref:`sec_numerical_stability`. What is particularly convenient is that it also allows us to initialize the network on *multiple* devices simultaneously. Let's try how this works in practice.
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -138,7 +138,7 @@ weight.data(devices[0])[0], weight.data(devices[1])[0]
 ```
 
 :begin_tab:`mxnet`
-Next, let us replace the code to [**evaluate the accuracy**] by one that works (**in parallel across multiple devices**). This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a minibatch before invoking the network. All else is essentially identical.
+Next, let's replace the code to [**evaluate the accuracy**] by one that works (**in parallel across multiple devices**). This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a minibatch before invoking the network. All else is essentially identical.
 :end_tab:
 
 ```{.python .input}
@@ -227,7 +227,7 @@ def train(net, num_gpus, batch_size, lr):
           f'on {str(devices)}')
 ```
 
-Let us see how this works in practice. As a warm-up we [**train the network on a single GPU.**]
+Let's see how this works in practice. As a warm-up we [**train the network on a single GPU.**]
 
 ```{.python .input}
 train(num_gpus=1, batch_size=256, lr=0.1)

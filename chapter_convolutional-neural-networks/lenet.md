@@ -203,7 +203,7 @@ matches the number of classes.
 ## Training
 
 Now that we have implemented the model,
-let us [**run an experiment to see how LeNet fares on Fashion-MNIST**].
+let's [**run an experiment to see how LeNet fares on Fashion-MNIST**].
 
 ```{.python .input}
 #@tab all
@@ -411,7 +411,7 @@ def train_ch6(net_fn, train_iter, test_iter, num_epochs, lr, device):
     return net
 ```
 
-[**Now let us train and evaluate the LeNet-5 model.**]
+[**Now let's train and evaluate the LeNet-5 model.**]
 
 ```{.python .input}
 #@tab all

@@ -399,7 +399,7 @@ for (tokens_X, segments_X, valid_lens_x, pred_positions_X, mlm_weights_X,
     break
 ```
 
-In the end, let us take a look at the vocabulary size.
+In the end, let's take a look at the vocabulary size.
 Even after filtering out infrequent tokens,
 it is still over twice larger than that of the PTB dataset.
 

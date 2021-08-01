@@ -140,7 +140,7 @@ hence they cannot be serialized as naturally.
 Thus, in order to reinstate a model, we need
 to generate the architecture in code
 and then load the parameters from disk.
-(**Let us start with our familiar MLP.**)
+(**Let's start with our familiar MLP.**)
 
 ```{.python .input}
 class MLP(nn.Block):
@@ -234,7 +234,7 @@ clone.load_weights('mlp.params')
 
 Since both instances have the same model parameters,
 the computational result of the same input `X` should be the same.
-Let us verify this.
+Let's verify this.
 
 ```{.python .input}
 Y_clone = clone(X)

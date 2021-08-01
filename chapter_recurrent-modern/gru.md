@@ -6,7 +6,7 @@ we discussed how gradients are calculated
 in RNNs.
 In particular we found that long products of matrices can lead
 to vanishing or exploding gradients.
-Let us briefly think about what such
+Let's briefly think about what such
 gradient anomalies mean in practice:
 
 * We might encounter a situation where an early observation is highly
@@ -33,7 +33,7 @@ will discuss in :numref:`sec_lstm`. The gated recurrent unit (GRU)
 :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` is a slightly more streamlined
 variant that often offers comparable performance and is significantly faster to
 compute  :cite:`Chung.Gulcehre.Cho.ea.2014`.
-Due to its simplicity, let us start with the GRU.
+Due to its simplicity, let's start with the GRU.
 
 ## Gated Hidden State
 
@@ -94,7 +94,7 @@ We use sigmoid functions (as introduced in :numref:`sec_mlp`) to transform input
 
 ### Candidate Hidden State
 
-Next, let us
+Next, let's
 integrate the reset gate $\mathbf{R}_t$ with
 the regular latent state updating mechanism
 in :eqref:`rnn_h_with_state`.
@@ -161,7 +161,7 @@ In summary, GRUs have the following two distinguishing features:
 
 ## Implementation from Scratch
 
-To gain a better understanding of the GRU model, let us implement it from scratch. We begin by reading *The Time Machine* dataset that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below.
+To gain a better understanding of the GRU model, let's implement it from scratch. We begin by reading *The Time Machine* dataset that we used in :numref:`sec_rnn_scratch`. The code for reading the dataset is given below.
 
 ```{.python .input}
 from d2l import mxnet as d2l

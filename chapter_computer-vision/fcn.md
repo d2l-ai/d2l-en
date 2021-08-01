@@ -217,7 +217,7 @@ def bilinear_kernel(in_channels, out_channels, kernel_size):
     return weight
 ```
 
-Let us [**experiment with upsampling of bilinear interpolation**] 
+Let's [**experiment with upsampling of bilinear interpolation**] 
 that is implemented by a transposed convolutional layer. 
 We construct a transposed convolutional layer that 
 doubles the height and weight,

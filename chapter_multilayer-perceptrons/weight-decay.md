@@ -45,10 +45,10 @@ for adjusting function complexity.
 ## Norms and Weight Decay
 
 We have described
-both the $L_2$ norm and the $L_1$ norm,
-which are special cases of the more general $L_p$ norm
+both the $\ell_2$ norm and the $\ell_1$ norm,
+which are special cases of the more general $\ell_p$ norm
 in :numref:`subsec_lin-algebra-norms`.
-(***Weight decay* (commonly called $L_2$ regularization),
+(***Weight decay* (commonly called $\ell_2$ regularization),
 might be the most widely-used technique
 for regularizing parametric machine learning models.**)
 The technique is motivated by the basic intuition
@@ -83,7 +83,7 @@ on minimizing the weight norm $\| \mathbf{w} \|^2$
 vs. minimizing the training error.
 That is exactly what we want.
 To illustrate things in code,
-let us revive our previous example
+let's revive our previous example
 from :numref:`sec_linear_regression` for linear regression.
 There, our loss was given by
 
@@ -112,23 +112,23 @@ for the update looks nice and simple.
 The astute reader might wonder why we work with the squared
 norm and not the standard norm (i.e., the Euclidean distance).
 We do this for computational convenience.
-By squaring the $L_2$ norm, we remove the square root,
+By squaring the $\ell_2$ norm, we remove the square root,
 leaving the sum of squares of
 each component of the weight vector.
 This makes the derivative of the penalty easy to compute: the sum of derivatives equals the derivative of the sum.
 
 
-Moreover, you might ask why we work with the $L_2$ norm
-in the first place and not, say, the $L_1$ norm.
+Moreover, you might ask why we work with the $\ell_2$ norm
+in the first place and not, say, the $\ell_1$ norm.
 In fact, other choices are valid and
 popular throughout statistics.
-While $L_2$-regularized linear models constitute
+While $\ell_2$-regularized linear models constitute
 the classic *ridge regression* algorithm,
-$L_1$-regularized linear regression
+$\ell_1$-regularized linear regression
 is a similarly fundamental model in statistics, which is popularly known as *lasso regression*.
 
 
-One reason to work with the $L_2$ norm
+One reason to work with the $\ell_2$ norm
 is that it places an outsize penalty
 on large components of the weight vector.
 This biases our learning algorithm
@@ -136,7 +136,7 @@ towards models that distribute weight evenly
 across a larger number of features.
 In practice, this might make them more robust
 to measurement error in a single variable.
-By contrast, $L_1$ penalties lead to models
+By contrast, $\ell_1$ penalties lead to models
 that concentrate weights on a small set of features by clearing the other weights to zero.
 This is called *feature selection*,
 which may be desirable for other reasons.
@@ -144,7 +144,7 @@ which may be desirable for other reasons.
 
 Using the same notation in :eqref:`eq_linreg_batch_update`,
 the minibatch stochastic gradient descent updates
-for $L_2$-regularized regression follow:
+for $\ell_2$-regularized regression follow:
 
 $$
 \begin{aligned}
@@ -226,7 +226,7 @@ test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 ## Implementation from Scratch
 
 In the following, we will implement weight decay from scratch,
-simply by adding the squared $L_2$ penalty
+simply by adding the squared $\ell_2$ penalty
 to the original target function.
 
 ### [**Initializing Model Parameters**]
@@ -259,7 +259,7 @@ def init_params():
     return [w, b]
 ```
 
-### (**Defining $L_2$ Norm Penalty**)
+### (**Defining $\ell_2$ Norm Penalty**)
 
 Perhaps the most convenient way to implement this penalty
 is to square all terms in place and sum them up.
@@ -417,7 +417,7 @@ the weight, so the bias parameter $b$ will not decay.
 :end_tab:
 
 :begin_tab:`tensorflow`
-In the following code, we create an $L_2$ regularizer with
+In the following code, we create an $\ell_2$ regularizer with
 the weight decay hyperparameter `wd` and apply it to the layer
 through the `kernel_regularizer` argument.
 :end_tab:
@@ -532,7 +532,7 @@ of applying weight decay on all layers of a deep network.
 ## Summary
 
 * Regularization is a common method for dealing with overfitting. It adds a penalty term to the loss function on the training set to reduce the complexity of the learned model.
-* One particular choice for keeping the model simple is weight decay using an $L_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
+* One particular choice for keeping the model simple is weight decay using an $\ell_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
 * The weight decay functionality is provided in optimizers from deep learning frameworks.
 * Different sets of parameters can have different update behaviors within the same training loop.
 
@@ -542,7 +542,7 @@ of applying weight decay on all layers of a deep network.
 
 1. Experiment with the value of $\lambda$ in the estimation problem in this section. Plot training and test accuracy as a function of $\lambda$. What do you observe?
 1. Use a validation set to find the optimal value of $\lambda$. Is it really the optimal value? Does this matter?
-1. What would the update equations look like if instead of $\|\mathbf{w}\|^2$ we used $\sum_i |w_i|$ as our penalty of choice ($L_1$ regularization)?
+1. What would the update equations look like if instead of $\|\mathbf{w}\|^2$ we used $\sum_i |w_i|$ as our penalty of choice ($\ell_1$ regularization)?
 1. We know that $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Can you find a similar equation for matrices (see the Frobenius norm in :numref:`subsec_lin-algebra-norms`)?
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?

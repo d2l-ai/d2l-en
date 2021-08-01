@@ -65,7 +65,7 @@ class CenteredLayer(tf.keras.Model):
         return inputs - tf.reduce_mean(inputs)
 ```
 
-Let us verify that our layer works as intended by feeding some data through it.
+Let's verify that our layer works as intended by feeding some data through it.
 
 ```{.python .input}
 layer = CenteredLayer()
@@ -129,7 +129,7 @@ tf.reduce_mean(Y)
 ## [**Layers with Parameters**]
 
 Now that we know how to define simple layers,
-let us move on to defining layers with parameters
+let's move on to defining layers with parameters
 that can be adjusted through training.
 We can use built-in functions to create parameters, which
 provide some basic housekeeping functionality.
@@ -138,7 +138,7 @@ sharing, saving, and loading model parameters.
 This way, among other benefits, we will not need to write
 custom serialization routines for every custom layer.
 
-Now let us implement our own version of the  fully connected layer.
+Now let's implement our own version of the  fully connected layer.
 Recall that this layer requires two parameters,
 one to represent the weight and the other for the bias.
 In this implementation, we bake in the ReLU activation as a default.

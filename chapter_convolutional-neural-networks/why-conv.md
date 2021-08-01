@@ -21,7 +21,7 @@ may be the best that we can do.
 However, for high-dimensional perceptual data,
 such structure-less networks can grow unwieldy.
 
-For instance, let us return to our running example
+For instance, let's return to our running example
 of distinguishing cats from dogs.
 Say that we do a thorough job in data collection,
 collecting an annotated dataset of one-megapixel photographs.
@@ -105,7 +105,7 @@ of a neural network architecture suitable for computer vision:
    Eventually, these local representations can be aggregated
    to make predictions at the whole image level.
 
-Let us see how this translates into mathematics.
+Let's see how this translates into mathematics.
 
 
 
@@ -149,7 +149,7 @@ centered around $(i, j)$ and weighted by $[\mathsf{V}]_{i, j, a, b}$.
 
 ### Translation Invariance
 
-Now let us invoke the first principle
+Now let's invoke the first principle
 established above: translation invariance.
 This implies that a shift in the input $\mathbf{X}$
 should simply lead to a shift in the hidden representation $\mathbf{H}$.
@@ -170,7 +170,7 @@ We have made significant progress!
 
 ###  Locality
 
-Now let us invoke the second principle: locality.
+Now let's invoke the second principle: locality.
 As motivated above, we believe that we should not have
 to look very far away from location $(i, j)$
 in order to glean relevant information
@@ -246,7 +246,7 @@ We will come back to this in the following section.
 
 ## "Where's Waldo" Revisited
 
-Returning to our Waldo detector, let us see what this looks like.
+Returning to our Waldo detector, let's see what this looks like.
 The convolutional layer picks windows of a given size
 and weighs intensities according to the filter $\mathsf{V}$, as demonstrated in :numref:`fig_waldo_mask`.
 We might aim to learn a model so that

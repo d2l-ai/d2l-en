@@ -312,7 +312,7 @@ class RNNModelScratch: #@save
         return self.init_state(batch_size, self.num_hiddens)
 ```
 
-Let us [**check whether the outputs have the correct shapes**], e.g., to ensure that the dimensionality of the hidden state remains unchanged.
+Let's [**check whether the outputs have the correct shapes**], e.g., to ensure that the dimensionality of the hidden state remains unchanged.
 
 ```{.python .input}
 #@tab mxnet
@@ -354,7 +354,7 @@ We can see that the output shape is (number of time steps $\times$ batch size, v
 
 ## Prediction
 
-Let us [**first define the prediction function
+Let's [**first define the prediction function
 to generate new characters following
 the user-provided `prefix`**],
 which is a string containing several characters.
@@ -452,7 +452,7 @@ with $\eta > 0$ as the learning rate,
 in one iteration we update
 $\mathbf{x}$
 as $\mathbf{x} - \eta \mathbf{g}$.
-Let us further assume that the objective function $f$
+Let's further assume that the objective function $f$
 is well behaved, say, *Lipschitz continuous* with constant $L$.
 That is to say,
 for any $\mathbf{x}$ and $\mathbf{y}$ we have
@@ -537,7 +537,7 @@ def grad_clipping(grads, theta):  #@save
 ## Training
 
 Before training the model,
-let us [**define a function to train the model in one epoch**]. It differs from how we train the model of :numref:`sec_softmax_scratch` in three places:
+let's [**define a function to train the model in one epoch**]. It differs from how we train the model of :numref:`sec_softmax_scratch` in three places:
 
 1. We iterate over sequential data with random sampling, where we re-initialize the hidden state for each iteration.
 1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process.

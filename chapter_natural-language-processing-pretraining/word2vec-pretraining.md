@@ -9,7 +9,7 @@ Then
 we will pretrain word2vec using negative sampling
 on the PTB dataset.
 First of all,
-let us obtain the data iterator
+let's obtain the data iterator
 and the vocabulary for this dataset
 by calling the `d2l.load_data_ptb`
 function, which was described in :numref:`sec_word2vec_data`
@@ -42,7 +42,7 @@ data_iter, vocab = d2l.load_data_ptb(batch_size, max_window_size,
 
 We implement the skip-gram model
 by using embedding layers and batch matrix multiplications.
-First, let us review
+First, let's review
 how embedding layers work.
 
 
@@ -131,7 +131,7 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
     return pred
 ```
 
-Let us print the output shape of this `skip_gram` function for some example inputs.
+Let's print the output shape of this `skip_gram` function for some example inputs.
 
 ```{.python .input}
 skip_gram(np.ones((2, 1)), np.ones((2, 4)), embed, embed).shape
@@ -146,7 +146,7 @@ skip_gram(torch.ones((2, 1), dtype=torch.long),
 ## Training
 
 Before training the skip-gram model with negative sampling,
-let us first define its loss function.
+let's first define its loss function.
 
 
 ### Binary Cross-Entropy Loss
