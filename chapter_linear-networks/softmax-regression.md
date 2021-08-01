@@ -120,7 +120,7 @@ with $d$ inputs and $q$ outputs,
 the parameterization cost is $\mathcal{O}(dq)$,
 which can be prohibitively high in practice.
 Fortunately,
-this cost 
+this cost
 of transforming $d$ inputs into $q$ outputs
 can be reduced to $\mathcal{O}(\frac{dq}{n})$,
 where the hyperparameter $n$ can be flexibly specified
@@ -329,7 +329,7 @@ but an entire distribution over outcomes.
 We can use the same representation as before for the label $\mathbf{y}$.
 The only difference is that rather than a vector containing only binary entries,
 say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$.
-The math that we used previously to define the loss $l$
+The mathematics that we used previously to define the loss $l$
 in :eqref:`eq_l_cross_entropy`
 still works out fine,
 just that the interpretation is slightly more general.

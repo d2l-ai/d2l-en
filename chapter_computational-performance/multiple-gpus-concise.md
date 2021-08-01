@@ -2,7 +2,7 @@
 :label:`sec_multi_gpu_concise`
 
 Implementing parallelism from scratch for every new model is no fun. Moreover, there is significant benefit in optimizing synchronization tools for high performance. In the following we will show how to do this using high-level APIs of deep learning frameworks.
-The math and the algorithms are the same as in :numref:`sec_multi_gpu`.
+The mathematics and the algorithms are the same as in :numref:`sec_multi_gpu`.
 Quite unsurprisingly you will need at least two GPUs to run code of this section.
 
 ```{.python .input}
@@ -21,7 +21,7 @@ from torch import nn
 
 ## [**A Toy Network**]
 
-Let us use a slightly more meaningful network than LeNet from :numref:`sec_multi_gpu` that is still sufficiently easy and quick to train. 
+Let us use a slightly more meaningful network than LeNet from :numref:`sec_multi_gpu` that is still sufficiently easy and quick to train.
 We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference from :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning.
 Moreover, we remove the maximum pooling layer.
 
@@ -238,7 +238,7 @@ train(num_gpus=1, batch_size=256, lr=0.1)
 train(net, num_gpus=1, batch_size=256, lr=0.1)
 ```
 
-Next we [**use 2 GPUs for training**]. Compared with LeNet 
+Next we [**use 2 GPUs for training**]. Compared with LeNet
 evaluated in :numref:`sec_multi_gpu`,
 the model for ResNet-18 is considerably more complex. This is where parallelization shows its advantage. The time for computation is meaningfully larger than the time for synchronizing parameters. This improves scalability since the overhead for parallelization is less relevant.
 

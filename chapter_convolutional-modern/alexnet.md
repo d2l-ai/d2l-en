@@ -151,7 +151,7 @@ in making deep learning feasible.
 These chips had long been developed for accelerating
 graphics processing to benefit computer games.
 In particular, they were optimized for high throughput $4 \times 4$ matrix-vector products, which are needed for many computer graphics tasks.
-Fortunately, this math is strikingly similar
+Fortunately, this mathematics is strikingly similar
 to that required to calculate convolutional layers.
 Around that time, NVIDIA and ATI had begun optimizing GPUs
 for general computing operations,
