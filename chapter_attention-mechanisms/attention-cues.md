@@ -113,13 +113,13 @@ To begin with, consider the simpler case where only
 nonvolitional cues are available.
 To bias selection over sensory inputs,
 we can simply use
-a parameterized fully-connected layer
+a parameterized fully connected layer
 or even non-parameterized
 max or average pooling.
 
 Therefore,
 what sets attention mechanisms
-apart from those fully-connected layers
+apart from those fully connected layers
 or pooling layers
 is the inclusion of the volitional cues.
 In the context of attention mechanisms,
@@ -218,7 +218,7 @@ we will often invoke this function to visualize attention weights.
 
 * Human attention is a limited, valuable, and scarce resource.
 * Subjects selectively direct attention using both the nonvolitional and volitional cues. The former is based on saliency and the latter is task-dependent.
-* Attention mechanisms are different from fully-connected layers or pooling layers due to inclusion of the volitional cues.
+* Attention mechanisms are different from fully connected layers or pooling layers due to inclusion of the volitional cues.
 * Attention mechanisms bias selection over values (sensory inputs) via attention pooling, which incorporates queries (volitional cues) and keys (nonvolitional cues). Keys and values are paired.
 * We can visualize attention weights between queries and keys.
 

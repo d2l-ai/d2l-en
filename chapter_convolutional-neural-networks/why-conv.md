@@ -1,4 +1,4 @@
-# From Fully-Connected Layers to Convolutions
+# From Fully Connected Layers to Convolutions
 :label:`sec_why-conv`
 
 To this day,
@@ -27,9 +27,9 @@ Say that we do a thorough job in data collection,
 collecting an annotated dataset of one-megapixel photographs.
 This means that each input to the network has one million dimensions.
 According to our discussions of parameterization cost
-of fully-connected layers in :numref:`subsec_parameterization-cost-fc-layers`,
+of fully connected layers in :numref:`subsec_parameterization-cost-fc-layers`,
 even an aggressive reduction to one thousand hidden dimensions
-would require a fully-connected layer
+would require a fully connected layer
 characterized by $10^6 \times 10^3 = 10^9$ parameters.
 Unless we have lots of GPUs, a talent
 for distributed optimization,
@@ -130,7 +130,7 @@ we would switch from using weight matrices
 to representing our parameters
 as fourth-order weight tensors $\mathsf{W}$.
 Suppose that $\mathbf{U}$ contains biases,
-we could formally express the fully-connected layer as
+we could formally express the fully connected layer as
 
 $$\begin{aligned} \left[\mathbf{H}\right]_{i, j} &= [\mathbf{U}]_{i, j} + \sum_k \sum_l[\mathsf{W}]_{i, j, k, l}  [\mathbf{X}]_{k, l}\\ &=  [\mathbf{U}]_{i, j} +
 \sum_a \sum_b [\mathsf{V}]_{i, j, a, b}  [\mathbf{X}]_{i+a, j+b}.\end{aligned},$$
@@ -189,7 +189,7 @@ In the deep learning research community,
 $\mathbf{V}$ is referred to as a *convolution kernel*,
 a *filter*, or simply the layer's *weights* that are often learnable parameters.
 When the local region is small,
-the difference as compared with a fully-connected network can be dramatic.
+the difference as compared with a fully connected network can be dramatic.
 While previously, we might have required billions of parameters
 to represent just a single layer in an image-processing network,
 we now typically need just a few hundred, without
@@ -320,7 +320,7 @@ We turn to these issues in the remainder of the chapter.
 
 * Translation invariance in images implies that all patches of an image will be treated in the same manner.
 * Locality means that only a small neighborhood of pixels will be used to compute the corresponding hidden representations.
-* In image processing, convolutional layers typically require many fewer parameters than fully-connected layers.
+* In image processing, convolutional layers typically require many fewer parameters than fully connected layers.
 * CNNS are a special family of neural networks that contain convolutional layers.
 * Channels on input and output allow our model to capture multiple aspects of an image  at each spatial location.
 

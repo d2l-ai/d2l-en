@@ -137,7 +137,7 @@ The two parameters of a convolutional layer
 are the kernel and the scalar bias.
 When training models based on convolutional layers,
 we typically initialize the kernels randomly,
-just as we would with a fully-connected layer.
+just as we would with a fully connected layer.
 
 We are now ready to [**implement a two-dimensional convolutional layer**]
 based on the `corr2d` function defined above.

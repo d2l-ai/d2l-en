@@ -284,7 +284,7 @@ test_iter = torch.utils.data.DataLoader(test_set, batch_size,
 
 As :numref:`fig_bert-two-seqs` indicates,
 fine-tuning BERT for natural language inference
-requires only an extra MLP consisting of two fully-connected layers
+requires only an extra MLP consisting of two fully connected layers
 (see `self.hidden` and `self.output` in the following `BERTClassifier` class).
 This MLP transforms the
 BERT representation of the special “&lt;cls&gt;” token,

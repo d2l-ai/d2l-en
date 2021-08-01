@@ -33,7 +33,7 @@ This design
 is called *multi-head attention*,
 where each of the $h$ attention pooling outputs
 is a *head* :cite:`Vaswani.Shazeer.Parmar.ea.2017`.
-Using fully-connected layers
+Using fully connected layers
 to perform learnable linear transformations,
 :numref:`fig_multi-head-attention`
 describes multi-head attention.

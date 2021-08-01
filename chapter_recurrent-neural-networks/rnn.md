@@ -105,13 +105,13 @@ does not grow as the number of time steps increases.
 At any time step $t$,
 the computation of the hidden state can be treated as:
 (i) concatenating the input $\mathbf{X}_t$ at the current time step $t$ and the hidden state $\mathbf{H}_{t-1}$ at the previous time step $t-1$;
-(ii) feeding the concatenation result into a fully-connected layer with the activation function $\phi$.
-The output of such a fully-connected layer is the hidden state $\mathbf{H}_t$ of the current time step $t$.
+(ii) feeding the concatenation result into a fully connected layer with the activation function $\phi$.
+The output of such a fully connected layer is the hidden state $\mathbf{H}_t$ of the current time step $t$.
 In this case,
 the model parameters are the concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$, and a bias of $\mathbf{b}_h$, all from :eqref:`rnn_h_with_state`.
 The hidden state of the current time step $t$, $\mathbf{H}_t$, will participate in computing the hidden state $\mathbf{H}_{t+1}$ of the next time step $t+1$.
 What is more, $\mathbf{H}_t$ will also be
-fed into the fully-connected output layer
+fed into the fully connected output layer
 to compute the output
 $\mathbf{O}_t$ of the current time step $t$.
 

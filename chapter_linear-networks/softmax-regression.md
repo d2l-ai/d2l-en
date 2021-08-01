@@ -91,7 +91,7 @@ We can depict this calculation with the neural network diagram shown in :numref:
 Just as in linear regression, softmax regression is also a single-layer neural network.
 And since the calculation of each output, $o_1, o_2$, and $o_3$,
 depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$,
-the output layer of softmax regression can also be described as fully-connected layer.
+the output layer of softmax regression can also be described as fully connected layer.
 
 ![Softmax regression is a single-layer neural network.](../img/softmaxreg.svg)
 :label:`fig_softmaxreg`
@@ -106,21 +106,21 @@ our outputs are given by a matrix-vector product of our weights by our input fea
 plus our biases $\mathbf{b}$.
 
 
-## Parameterization Cost of Fully-Connected Layers
+## Parameterization Cost of Fully Connected Layers
 :label:`subsec_parameterization-cost-fc-layers`
 
 As we will see in subsequent chapters,
-fully-connected layers are ubiquitous in deep learning.
+fully connected layers are ubiquitous in deep learning.
 However, as the name suggests,
-fully-connected layers are *fully* connected
+fully connected layers are *fully* connected
 with potentially many learnable parameters.
 Specifically,
-for any fully-connected layer
+for any fully connected layer
 with $d$ inputs and $q$ outputs,
 the parameterization cost is $\mathcal{O}(dq)$,
 which can be prohibitively high in practice.
 Fortunately,
-this cost 
+this cost
 of transforming $d$ inputs into $q$ outputs
 can be reduced to $\mathcal{O}(\frac{dq}{n})$,
 where the hyperparameter $n$ can be flexibly specified
@@ -329,7 +329,7 @@ but an entire distribution over outcomes.
 We can use the same representation as before for the label $\mathbf{y}$.
 The only difference is that rather than a vector containing only binary entries,
 say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$.
-The math that we used previously to define the loss $l$
+The mathematics that we used previously to define the loss $l$
 in :eqref:`eq_l_cross_entropy`
 still works out fine,
 just that the interpretation is slightly more general.

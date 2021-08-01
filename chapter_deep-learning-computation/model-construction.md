@@ -93,9 +93,9 @@ and the forward propagation function.
 that we used to implement MLPs**]
 (:numref:`sec_mlp_concise`).
 The following code generates a network
-with one fully-connected hidden layer
+with one fully connected hidden layer
 with 256 units and ReLU activation,
-followed by a fully-connected output layer
+followed by a fully connected output layer
 with 10 units (no activation function).
 
 ```{.python .input}
@@ -168,7 +168,7 @@ that they should be executed passed as arguments.
 In short, (**`nn.Sequential` defines a special kind of `Module`**),
 the class that presents a block in PyTorch.
 It maintains an ordered list of constituent `Module`s.
-Note that each of the two fully-connected layers is an instance of the `Linear` class
+Note that each of the two fully connected layers is an instance of the `Linear` class
 which is itself a subclass of `Module`.
 The forward propagation (`forward`) function is also remarkably simple:
 it chains each block in the list together,
@@ -185,7 +185,7 @@ that they should be executed passed as arguments.
 In short, `Sequential` defines a special kind of `keras.Model`,
 the class that presents a block in Keras.
 It maintains an ordered list of constituent `Model`s.
-Note that each of the two fully-connected layers is an instance of the `Dense` class
+Note that each of the two fully connected layers is an instance of the `Dense` class
 which is itself a subclass of `Model`.
 The forward propagation (`call`) function is also remarkably simple:
 it chains each block in the list together,
@@ -209,7 +209,7 @@ that each block must provide:
 :begin_tab:`mxnet, tensorflow`
 
 1. Ingest input data as arguments to its forward propagation function.
-1. Generate an output by having the forward propagation function return a value. Note that the output may have a different shape from the input. For example, the first fully-connected layer in our model above ingests an input of arbitrary dimension but returns an output of dimension 256.
+1. Generate an output by having the forward propagation function return a value. Note that the output may have a different shape from the input. For example, the first fully connected layer in our model above ingests an input of arbitrary dimension but returns an output of dimension 256.
 1. Calculate the gradient of its output with respect to its input, which can be accessed via its backpropagation function. Typically this happens automatically.
 1. Store and provide access to those parameters necessary
    to execute the forward propagation computation.
@@ -220,7 +220,7 @@ that each block must provide:
 :begin_tab:`pytorch`
 
 1. Ingest input data as arguments to its forward propagation function.
-1. Generate an output by having the forward propagation function return a value. Note that the output may have a different shape from the input. For example, the first fully-connected layer in our model above ingests an input of dimension 20 but returns an output of dimension 256.
+1. Generate an output by having the forward propagation function return a value. Note that the output may have a different shape from the input. For example, the first fully connected layer in our model above ingests an input of dimension 20 but returns an output of dimension 256.
 1. Calculate the gradient of its output with respect to its input, which can be accessed via its backpropagation function. Typically this happens automatically.
 1. Store and provide access to those parameters necessary
    to execute the forward propagation computation.
@@ -241,7 +241,7 @@ supplying only our own constructor (the `__init__` function in Python) and the f
 ```{.python .input}
 class MLP(nn.Block):
     # Declare a layer with model parameters. Here, we declare two
-    # fully-connected layers
+    # fully connected layers
     def __init__(self, **kwargs):
         # Call the constructor of the `MLP` parent class `Block` to perform
         # the necessary initialization. In this way, other function arguments
@@ -323,7 +323,7 @@ invokes the parent class's `__init__` function
 via `super().__init__()`
 sparing us the pain of restating
 boilerplate code applicable to most blocks.
-We then instantiate our two fully-connected layers,
+We then instantiate our two fully connected layers,
 assigning them to `self.hidden` and `self.out`.
 Note that unless we implement a new operator,
 we need not worry about the backpropagation function
@@ -351,7 +351,7 @@ net(X)
 
 A key virtue of the block abstraction is its versatility.
 We can subclass a block to create layers
-(such as the fully-connected layer class),
+(such as the fully connected layer class),
 entire models (such as the `MLP` class above),
 or various components of intermediate complexity.
 We exploit this versatility
@@ -536,8 +536,8 @@ class FixedHiddenMLP(nn.Block):
         # Use the created constant parameters, as well as the `relu` and `dot`
         # functions
         X = npx.relu(np.dot(X, self.rand_weight.data()) + 1)
-        # Reuse the fully-connected layer. This is equivalent to sharing
-        # parameters with two fully-connected layers
+        # Reuse the fully connected layer. This is equivalent to sharing
+        # parameters with two fully connected layers
         X = self.dense(X)
         # Control flow
         while np.abs(X).sum() > 1:
@@ -560,8 +560,8 @@ class FixedHiddenMLP(nn.Module):
         # Use the created constant parameters, as well as the `relu` and `mm`
         # functions
         X = F.relu(torch.mm(X, self.rand_weight) + 1)
-        # Reuse the fully-connected layer. This is equivalent to sharing
-        # parameters with two fully-connected layers
+        # Reuse the fully connected layer. This is equivalent to sharing
+        # parameters with two fully connected layers
         X = self.linear(X)
         # Control flow
         while X.abs().sum() > 1:
@@ -585,8 +585,8 @@ class FixedHiddenMLP(tf.keras.Model):
         # Use the created constant parameters, as well as the `relu` and
         # `matmul` functions
         X = tf.nn.relu(tf.matmul(X, self.rand_weight) + 1)
-        # Reuse the fully-connected layer. This is equivalent to sharing
-        # parameters with two fully-connected layers
+        # Reuse the fully connected layer. This is equivalent to sharing
+        # parameters with two fully connected layers
         X = self.dense(X)
         # Control flow
         while tf.reduce_sum(tf.math.abs(X)) > 1:
@@ -601,7 +601,7 @@ at instantiation and are thereafter constant.
 This weight is not a model parameter
 and thus it is never updated by backpropagation.
 The network then passes the output of this "fixed" layer
-through a fully-connected layer.
+through a fully connected layer.
 
 Note that before returning the output,
 our model did something unusual.

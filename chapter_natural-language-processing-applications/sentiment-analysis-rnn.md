@@ -71,7 +71,7 @@ are concatenated
 as the representation of the text sequence.
 This single text representation
 is then transformed into output categories
-by a fully-connected layer (`self.decoder`)
+by a fully connected layer (`self.decoder`)
 with two outputs ("positive" and "negative").
 
 ```{.python .input}
@@ -97,7 +97,7 @@ class BiRNN(nn.Block):
         # 2 * no. of hidden units)
         outputs = self.encoder(embeddings)
         # Concatenate the hidden states at the initial and final time steps as
-        # the input of the fully-connected layer. Its shape is (batch size,
+        # the input of the fully connected layer. Its shape is (batch size,
         # 4 * no. of hidden units)
         encoding = np.concatenate((outputs[0], outputs[-1]), axis=1)
         outs = self.decoder(encoding)
@@ -133,7 +133,7 @@ class BiRNN(nn.Module):
         # shape is (batch size, 4 * no. of hidden units)
         encoding = torch.cat((outputs[0], outputs[-1]), dim=1)
         # Concatenate the hidden states at the initial and final time steps as
-        # the input of the fully-connected layer. Its shape is (batch size,
+        # the input of the fully connected layer. Its shape is (batch size,
         # 4 * no. of hidden units)
         outs = self.decoder(encoding)
         return outs
@@ -253,7 +253,7 @@ predict_sentiment(net, vocab, 'this movie is so bad')
 ## Summary
 
 * Pretrained word vectors can represent individual tokens in a text sequence.
-* Bidirectional RNNs can represent a text sequence, such as via the concatenation of its hidden states at the initial and final time steps. This single text representation can be transformed into categories using a fully-connected layer.
+* Bidirectional RNNs can represent a text sequence, such as via the concatenation of its hidden states at the initial and final time steps. This single text representation can be transformed into categories using a fully connected layer.
 
 
 

@@ -66,7 +66,7 @@ the reset and update gates in a GRU, given the input
 of the current time step
 and the hidden state of the previous time step.
 The outputs of two gates
-are given by two fully-connected layers
+are given by two fully connected layers
 with a sigmoid activation function.
 
 ![Computing the reset gate and the update gate in a GRU model.](../img/gru-1.svg)

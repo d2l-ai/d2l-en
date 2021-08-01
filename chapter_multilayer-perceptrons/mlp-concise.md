@@ -30,7 +30,7 @@ As compared with our concise implementation
 of softmax regression implementation
 (:numref:`sec_softmax_concise`),
 the only difference is that we add
-*two* fully-connected layers
+*two* fully connected layers
 (previously, we added *one*).
 The first is [**our hidden layer**],
 which (**contains 256 hidden units

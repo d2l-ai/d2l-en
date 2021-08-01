@@ -211,7 +211,7 @@ pretrained_net.output
 pretrained_net.fc
 ```
 
-As a fully-connected layer, it transforms ResNet's final global average pooling outputs into 1000 class outputs of the ImageNet dataset.
+As a fully connected layer, it transforms ResNet's final global average pooling outputs into 1000 class outputs of the ImageNet dataset.
 We then construct a new neural network as the target model. It is defined in the same way as the pretrained source model except that
 its number of outputs in the final layer
 is set to

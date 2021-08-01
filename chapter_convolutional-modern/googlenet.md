@@ -166,7 +166,7 @@ Maximum pooling between inception blocks reduces the dimensionality.
 The first module is similar to AlexNet and LeNet.
 The stack of blocks is inherited from VGG
 and the global average pooling avoids
-a stack of fully-connected layers at the end.
+a stack of fully connected layers at the end.
 
 ![The GoogLeNet architecture.](../img/inception-full.svg)
 :label:`fig_inception_full`
@@ -319,7 +319,7 @@ It should be noted that the fifth block is followed by the output layer.
 This block uses the global average pooling layer
 to change the height and width of each channel to 1, just as in NiN.
 Finally, we turn the output into a two-dimensional array
-followed by a fully-connected layer
+followed by a fully connected layer
 whose number of outputs is the number of label classes.
 
 ```{.python .input}

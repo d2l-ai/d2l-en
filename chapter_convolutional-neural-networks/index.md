@@ -10,7 +10,7 @@ Until now, our way of dealing with this rich structure
 was deeply unsatisfying.
 We simply discarded each image's spatial structure
 by flattening them into one-dimensional vectors, feeding them 
-through a fully-connected MLP.
+through a fully connected MLP.
 Because these networks are invariant to the order
 of the features,
 we could get similar results
@@ -39,7 +39,7 @@ owe their design to inspirations from biology, group theory,
 and a healthy dose of experimental tinkering.
 In addition to their sample efficiency in achieving accurate models,
 CNNs tend to be computationally efficient,
-both because they require fewer parameters than fully-connected architectures
+both because they require fewer parameters than fully connected architectures
 and because convolutions are easy to parallelize across GPU cores.
 Consequently, practitioners often apply CNNs whenever possible,
 and increasingly they have emerged as credible competitors

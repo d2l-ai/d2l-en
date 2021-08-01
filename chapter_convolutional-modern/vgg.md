@@ -107,7 +107,7 @@ def vgg_block(num_convs, num_channels):
 Like AlexNet and LeNet,
 the VGG Network can be partitioned into two parts:
 the first consisting mostly of convolutional and pooling layers
-and the second consisting of fully-connected layers.
+and the second consisting of fully connected layers.
 This is depicted in :numref:`fig_vgg`.
 
 ![From AlexNet to VGG that is designed from building blocks.](../img/vgg.svg)
@@ -122,7 +122,7 @@ where each contains two values: the number of convolutional layers
 and the number of output channels,
 which are precisely the arguments required to call
 the `vgg_block` function.
-The fully-connected part of the VGG network is identical to that covered in AlexNet.
+The fully connected part of the VGG network is identical to that covered in AlexNet.
 
 The original VGG network had 5 convolutional blocks,
 among which the first two have one convolutional layer each
@@ -131,7 +131,7 @@ The first block has 64 output channels
 and each subsequent block doubles the number of output channels,
 until that number reaches 512.
 Since this network uses 8 convolutional layers
-and 3 fully-connected layers, it is often called VGG-11.
+and 3 fully connected layers, it is often called VGG-11.
 
 ```{.python .input}
 #@tab all
@@ -146,7 +146,7 @@ def vgg(conv_arch):
     # The convolutional part
     for (num_convs, num_channels) in conv_arch:
         net.add(vgg_block(num_convs, num_channels))
-    # The fully-connected part
+    # The fully connected part
     net.add(nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
             nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
             nn.Dense(10))
@@ -167,7 +167,7 @@ def vgg(conv_arch):
 
     return nn.Sequential(
         *conv_blks, nn.Flatten(),
-        # The fully-connected part
+        # The fully connected part
         nn.Linear(out_channels * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5),
         nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
         nn.Linear(4096, 10))
@@ -182,7 +182,7 @@ def vgg(conv_arch):
     # The convulational part
     for (num_convs, num_channels) in conv_arch:
         net.add(vgg_block(num_convs, num_channels))
-    # The fully-connected part
+    # The fully connected part
     net.add(tf.keras.models.Sequential([
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(4096, activation='relu'),
@@ -225,7 +225,7 @@ for blk in net.layers:
 As you can see, we halve height and width at each block,
 finally reaching a height and width of 7
 before flattening the representations
-for processing by the fully-connected part of the network.
+for processing by the fully connected part of the network.
 
 ## Training
 

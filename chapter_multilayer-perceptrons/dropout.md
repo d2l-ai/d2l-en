@@ -458,7 +458,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ## [**Concise Implementation**]
 
 With high-level APIs, all we need to do is add a `Dropout` layer
-after each fully-connected layer,
+after each fully connected layer,
 passing in the dropout probability
 as the only argument to its constructor.
 During training, the `Dropout` layer will randomly

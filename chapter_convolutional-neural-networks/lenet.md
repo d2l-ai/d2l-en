@@ -12,10 +12,10 @@ to pictures of clothing in the Fashion-MNIST dataset.
 To make such data amenable to softmax regression and MLPs,
 we first flattened each image from a $28\times28$ matrix
 into a fixed-length $784$-dimensional vector,
-and thereafter processed them with fully-connected layers.
+and thereafter processed them with fully connected layers.
 Now that we have a handle on convolutional layers,
 we can retain the spatial structure in our images.
-As an additional benefit of replacing fully-connected layers with convolutional layers,
+As an additional benefit of replacing fully connected layers with convolutional layers,
 we will enjoy more parsimonious models that require far fewer parameters.
 
 In this section, we will introduce *LeNet*,
@@ -43,7 +43,7 @@ that Yann and his colleague Leon Bottou wrote in the 1990s!
 
 At a high level, (**LeNet (LeNet-5) consists of two parts:
 (i) a convolutional encoder consisting of two convolutional layers; and
-(ii) a dense block consisting of three fully-connected layers**);
+(ii) a dense block consisting of three fully connected layers**);
 The architecture is summarized in :numref:`img_lenet`.
 
 ![Data flow in LeNet. The input is a handwritten digit, the output a probability over 10 possible outcomes.](../img/lenet.svg)
@@ -70,10 +70,10 @@ In order to pass output from the convolutional block
 to the dense block,
 we must flatten each example in the minibatch.
 In other words, we take this four-dimensional input and transform it
-into the two-dimensional input expected by fully-connected layers:
+into the two-dimensional input expected by fully connected layers:
 as a reminder, the two-dimensional representation that we desire uses the first dimension to index examples in the minibatch
 and the second to give the flat vector representation of each example.
-LeNet's dense block has three fully-connected layers,
+LeNet's dense block has three fully connected layers,
 with 120, 84, and 10 outputs, respectively.
 Because we are still performing classification,
 the 10-dimensional output layer corresponds
@@ -194,7 +194,7 @@ the number of channels increases layer-over-layer
 from 1 in the input to 6 after the first convolutional layer
 and 16 after the second convolutional layer.
 However, each pooling layer halves the height and width.
-Finally, each fully-connected layer reduces dimensionality,
+Finally, each fully connected layer reduces dimensionality,
 finally emitting an output whose dimension
 matches the number of classes.
 
@@ -424,7 +424,7 @@ train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 * A CNN is a network that employs convolutional layers.
 * In a CNN, we interleave convolutions, nonlinearities, and (often) pooling operations.
 * In a CNN, convolutional layers are typically arranged so that they gradually decrease the spatial resolution of the representations, while increasing the number of channels.
-* In traditional CNNs, the representations encoded by the convolutional blocks are processed by one or more fully-connected layers prior to emitting output.
+* In traditional CNNs, the representations encoded by the convolutional blocks are processed by one or more fully connected layers prior to emitting output.
 * LeNet was arguably the first successful deployment of such a network.
 
 ## Exercises
