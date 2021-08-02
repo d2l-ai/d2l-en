@@ -12,7 +12,10 @@ If you want to predict the number of dollars (price)
 at which a house will be sold,
 or the number of wins a baseball team might have,
 or the number of days that a patient will remain hospitalized before being discharged,
-then you are probably looking for a regression model.
+then you are probably looking for a regression model. Note, though, that even within
+regression models there are important distinctions. For instance, the price of a house
+will never be negative and changes might often be *relative* to its baseline price. As such, 
+it might be more effective to regress on the logarithm of the price. 
 
 In practice, we are more often interested in *classification*:
 asking not "how much" but "which one":
