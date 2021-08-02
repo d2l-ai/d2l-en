@@ -594,7 +594,16 @@ This section covered a significant amount of material ranging from our first mod
     1. Can you find a closed form solution?
     1. Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint: what happens near the stationary point as we keep on updating the parameters)? Can you fix this?
 1. Assume that we want to design a Neural Network with two layers by composing two linear layers. That is, the output of the first layer becomes the input of the second layer. Why would such a naive composition not work?
-
+1. What happens if you want to use regression for realistic price estimation of houses or stock prices? 
+    1. Show that the additive Gaussian noise assumption is not appropriate. Hint: can we have negative prices? What about fluctuations?
+    1. Why would regression to the logarithm of the price be much better, i.e., $y = \log \mathrm{price}$? 
+    1. What do you need to worry about when dealing with pennystock, i.e., stock with very low prices? Hint: can you trade at all possible prices? Why is this a bigger problem for cheap stock?
+    1. For more information review the celebrated Black-Scholes model for option pricing :cite:`black1973pricing`.
+1. Suppose we want to use regression to estimate the *number* of apples sold in a grocery store. 
+    1. What are the problems with a Gaussian additive noise model? Hint: you are selling apples, not oil. 
+    1. The [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution) captures distributions over counts. It is given by $p(k|\lambda) = \lambda^k e^{-\lambda}/k!$. Here $\lambda$ is the rate function and $k$ is the number of events you see. Prove that $\lambda$ is the expected value of counts $k$.
+    1. Design a loss function associated with the Poisson distribution. 
+    1. Design a loss function for estimating $\log \lambda$ instead.  
 
 :begin_tab:`mxnet`
 [Discussions](https://discuss.d2l.ai/t/40)
