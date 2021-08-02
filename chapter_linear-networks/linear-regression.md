@@ -275,7 +275,7 @@ They can be tuned automatically by a number of techniques, such as Bayesian Opti
 typically assessed on a separate *validation dataset* (or *validation set*).
 
 After training for some predetermined number of iterations
-(or until some other stopping criteria(s) are met),
+(or until some other stopping criterion is met),
 we record the estimated model parameters,
 denoted $\hat{\mathbf{w}}, \hat{b}$.
 Note that even if our function is truly linear and noiseless,
