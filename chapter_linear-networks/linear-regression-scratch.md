@@ -153,9 +153,10 @@ and the gradient of the loss function for each example can also be taken in para
 GPUs allow us to process hundreds of examples in scarcely more time
 than it might take to process just a single example.
 
-To build some intuition, let us inspect the first minibatch of 
+To build some intuition, let's inspect the first minibatch of 
 data. Each minibatch of features provides us both with its size and the dimensionality of input features. 
 Likewise, our minibatch of labels will have a matching shape given by `batch_size`.
+
 
 ```{.python .input}
 #@tab all
