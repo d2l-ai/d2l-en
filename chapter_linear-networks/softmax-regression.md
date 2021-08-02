@@ -162,7 +162,7 @@ To interpret our outputs as probabilities,
 we must guarantee that (even on new data),
 they will be nonnegative and sum up to 1.
 Moreover, we need a training objective that encourages
-the model to faithfully estimate probabilities.
+the model to estimate probabilities faithfully.
 Of all instances when a classifier outputs 0.5,
 we hope that half of those examples
 will actually belong to the predicted class.
