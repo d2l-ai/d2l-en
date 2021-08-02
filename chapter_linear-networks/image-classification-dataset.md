@@ -45,7 +45,7 @@ d2l.use_svg_display()
 
 ## Reading the Dataset
 
-We can [**download and read the Fashion-MNIST dataset into memory via the build-in functions in the framework.**]
+We can [**download and read the Fashion-MNIST dataset into memory via the built-in functions in the framework.**]
 
 ```{.python .input}
 class FashionMNIST(d2l.DataModule):  #@save
