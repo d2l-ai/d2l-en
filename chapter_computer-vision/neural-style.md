@@ -193,7 +193,7 @@ style_layers, content_layers = [0, 5, 10, 19, 28], [25]
 When extracting features using VGG layers,
 we only need to use all those
 from the input layer to the content layer or style layer that is closest to the output layer.
-Let us construct a new network instance `net`, which only retains all the VGG layers to be
+Let's construct a new network instance `net`, which only retains all the VGG layers to be
 used for feature extraction.
 
 ```{.python .input}

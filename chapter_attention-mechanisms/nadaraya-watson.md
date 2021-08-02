@@ -42,7 +42,7 @@ tf.random.set_seed(seed=1322)
 ## [**Generating the Dataset**]
 
 To keep things simple,
-let us consider the following regression problem:
+let's consider the following regression problem:
 given a dataset of input-output pairs $\{(x_1, y_1), \ldots, (x_n, y_n)\}$,
 how to learn $f$ to predict the output $\hat{y} = f(x)$ for any new input $x$?
 
@@ -251,7 +251,7 @@ y_hat = tf.matmul(attention_weights, tf.expand_dims(y_train, axis=1))
 plot_kernel_reg(y_hat)
 ```
 
-Now let us take a look at the [**attention weights**].
+Now let's take a look at the [**attention weights**].
 Here testing inputs are queries while training inputs are keys.
 Since both inputs are sorted,
 we can see that the closer the query-key pair is,

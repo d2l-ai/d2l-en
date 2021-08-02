@@ -89,7 +89,7 @@ b = tf.Variable(tf.zeros(num_outputs))
 ## Defining the Softmax Operation
 
 Before implementing the softmax regression model,
-let us briefly review how the sum operator works
+let's briefly review how the sum operator works
 along specific dimensions in a tensor,
 as discussed in :numref:`subseq_lin-alg-reduction` and :numref:`subseq_lin-alg-non-reduction`.
 [**Given a matrix `X` we can sum over all elements (by default) or only
@@ -122,7 +122,7 @@ Recall that softmax consists of three steps:
 to get the normalization constant for each example;
 (iii) we divide each row by its normalization constant,
 ensuring that the result sums to 1.
-Before looking at the code, let us recall
+Before looking at the code, let's recall
 how this looks expressed as an equation:
 
 (**

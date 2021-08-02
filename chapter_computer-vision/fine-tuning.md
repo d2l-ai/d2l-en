@@ -51,7 +51,7 @@ When target datasets are much smaller than source datasets, fine-tuning helps to
 
 ## Hot Dog Recognition
 
-Let us demonstrate fine-tuning via a concrete case:
+Let's demonstrate fine-tuning via a concrete case:
 hot dog recognition. 
 We will fine-tune a ResNet model on a small dataset,
 which was pretrained on the ImageNet dataset.

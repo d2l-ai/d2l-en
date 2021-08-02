@@ -39,7 +39,7 @@ Next, we go deeper into the mechanics of initialization.
 
 ## Instantiating a Network
 
-To begin, let us instantiate an MLP.
+To begin, let's instantiate an MLP.
 
 ```{.python .input}
 from mxnet import np, npx
@@ -89,7 +89,7 @@ that the parameter dimension remains unknown.
 At this point, attempts to access `net[0].weight.data()`
 would trigger a runtime error stating that the network
 must be initialized before the parameters can be accessed.
-Now let us see what happens when we attempt to initialize
+Now let's see what happens when we attempt to initialize
 parameters via the `initialize` function.
 :end_tab:
 
@@ -113,7 +113,7 @@ Instead, this call registers to MXNet that we wish
 to initialize the parameters.
 :end_tab:
 
-Next let us pass data through the network
+Next let's pass data through the network
 to make the framework finally initialize parameters.
 
 ```{.python .input}

@@ -108,7 +108,7 @@ vocab = d2l.Vocab(train_tokens, min_freq=5, reserved_tokens=['<pad>'])
 ```
 
 After tokenization,
-let us plot the histogram of
+let's plot the histogram of
 review lengths in tokens.
 
 ```{.python .input}

@@ -74,7 +74,7 @@ with that from a GRU or an LSTM.
 
 Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in high-level APIs.
 To keep things simple we only illustrate the implementation using such built-in functionalities.
-Let us take an LSTM model as an example.
+Let's take an LSTM model as an example.
 The code is very similar to the one we used previously in :numref:`sec_lstm`.
 In fact, the only difference is that we specify the number of layers explicitly rather than picking the default of a single layer.
 As usual, we begin by loading the dataset.

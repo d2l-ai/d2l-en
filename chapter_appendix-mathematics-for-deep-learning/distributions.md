@@ -1,7 +1,7 @@
 # Distributions
 :label:`sec_distributions`
 
-Now that we have learned how to work with probability in both the discrete and the continuous setting, let us get to know some of the common distributions encountered.  Depending on the area of machine learning, we may need to be familiar with vastly more of these, or for some areas of deep learning potentially none at all.  This is, however, a good basic list to be familiar with.  Let us first import some common libraries.
+Now that we have learned how to work with probability in both the discrete and the continuous setting, let's get to know some of the common distributions encountered.  Depending on the area of machine learning, we may need to be familiar with vastly more of these, or for some areas of deep learning potentially none at all.  This is, however, a good basic list to be familiar with.  Let's first import some common libraries.
 
 ```{.python .input}
 %matplotlib inline
@@ -60,7 +60,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function :eqref:`eq_bernoulli_cdf`.
+Now, let's plot the cumulative distribution function :eqref:`eq_bernoulli_cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 2, 0.01)
@@ -125,7 +125,7 @@ The cumulative distribution function is
 $$F(x) = \begin{cases} 0 & x < 1, \\ \frac{k}{n} & k \le x < k+1 \text{ with } 1 \le k < n, \\ 1 & x >= n . \end{cases}$$
 :eqlabel:`eq_discrete_uniform_cdf`
 
-Let us first plot the probability mass function.
+Let's first plot the probability mass function.
 
 ```{.python .input}
 #@tab all
@@ -137,7 +137,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function :eqref:`eq_discrete_uniform_cdf`.
+Now, let's plot the cumulative distribution function :eqref:`eq_discrete_uniform_cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 6, 0.01)
@@ -191,7 +191,7 @@ tf.random.uniform((10, 10), 1, n, dtype=tf.int32)
 
 ## Continuous Uniform
 
-Next, let us discuss the continuous uniform distribution. The idea behind this random variable is that if we increase the $n$ in the discrete uniform distribution, and then scale it to fit within the interval $[a, b]$, we will approach a continuous random variable that just picks an arbitrary value in $[a, b]$ all with equal probability.  We will denote this distribution as
+Next, let's discuss the continuous uniform distribution. The idea behind this random variable is that if we increase the $n$ in the discrete uniform distribution, and then scale it to fit within the interval $[a, b]$, we will approach a continuous random variable that just picks an arbitrary value in $[a, b]$ all with equal probability.  We will denote this distribution as
 
 $$
 X \sim U(a, b).
@@ -207,7 +207,7 @@ The cumulative distribution function is
 $$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a, b], \\ 1 & x >= b . \end{cases}$$
 :eqlabel:`eq_cont_uniform_cdf`
 
-Let us first plot the probability density function :eqref:`eq_cont_uniform_pdf`.
+Let's first plot the probability density function :eqref:`eq_cont_uniform_pdf`.
 
 ```{.python .input}
 a, b = 1, 3
@@ -236,7 +236,7 @@ p = tf.cast(x > a, tf.float32) * tf.cast(x < b, tf.float32) / (b - a)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-Now, let us plot the cumulative distribution function :eqref:`eq_cont_uniform_cdf`.
+Now, let's plot the cumulative distribution function :eqref:`eq_cont_uniform_cdf`.
 
 ```{.python .input}
 def F(x):
@@ -284,9 +284,9 @@ We can sample an array of arbitrary shape from a uniform random variable as foll
 
 ## Binomial
 
-Let us make things a little more complex and examine the *binomial* random variable.  This random variable originates from performing a sequence of $n$ independent experiments, each of which has probability $p$ of succeeding, and asking how many successes we expect to see.
+Let's make things a little more complex and examine the *binomial* random variable.  This random variable originates from performing a sequence of $n$ independent experiments, each of which has probability $p$ of succeeding, and asking how many successes we expect to see.
 
-Let us express this mathematically.  Each experiment is an independent random variable $X_i$ where we will use $1$ to encode success, and $0$ to encode failure.  Since each is an independent coin flip which is successful with probability $p$, we can say that $X_i \sim \mathrm{Bernoulli}(p)$.  Then, the binomial random variable is
+Let's express this mathematically.  Each experiment is an independent random variable $X_i$ where we will use $1$ to encode success, and $0$ to encode failure.  Since each is an independent coin flip which is successful with probability $p$, we can say that $X_i \sim \mathrm{Bernoulli}(p)$.  Then, the binomial random variable is
 
 $$
 X = \sum_{i=1}^n X_i.
@@ -303,7 +303,7 @@ To get the cumulative distribution function, we need to notice that getting exac
 $$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \text{ with } 0 \le k < n, \\ 1 & x >= n . \end{cases}$$
 :eqlabel:`eq_binomial_cdf`
 
-Let us first plot the probability mass function.
+Let's first plot the probability mass function.
 
 ```{.python .input}
 n, p = 10, 0.2
@@ -361,7 +361,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function :eqref:`eq_binomial_cdf`.
+Now, let's plot the cumulative distribution function :eqref:`eq_binomial_cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 11, 0.01)
@@ -419,7 +419,7 @@ m.sample(sample_shape=(10, 10))
 ```
 
 ## Poisson
-Let us now perform a thought experiment.  We are standing at a bus stop and we want to know how many buses will arrive in the next minute.  Let us start by considering $X^{(1)} \sim \mathrm{Bernoulli}(p)$ which is simply the probability that a bus arrives in the one minute window.  For bus stops far from an urban center, this might be a pretty good approximation.  We may never see more than one bus in a minute.
+Let's now perform a thought experiment.  We are standing at a bus stop and we want to know how many buses will arrive in the next minute.  Let's start by considering $X^{(1)} \sim \mathrm{Bernoulli}(p)$ which is simply the probability that a bus arrives in the one minute window.  For bus stops far from an urban center, this might be a pretty good approximation.  We may never see more than one bus in a minute.
 
 However, if we are in a busy area, it is possible or even likely that two buses will arrive.  We can model this by splitting our random variable into two parts for the first 30 seconds, or the second 30 seconds.  In this case we can write
 
@@ -429,7 +429,7 @@ $$
 
 where $X^{(2)}$ is the total sum, and $X^{(2)}_i \sim \mathrm{Bernoulli}(p/2)$.  The total distribution is then $X^{(2)} \sim \mathrm{Binomial}(2, p/2)$.
 
-Why stop here?  Let us continue to split that minute into $n$ parts.  By the same reasoning as above, we see that
+Why stop here?  Let's continue to split that minute into $n$ parts.  By the same reasoning as above, we see that
 
 $$X^{(n)} \sim \mathrm{Binomial}(n, p/n).$$
 :eqlabel:`eq_eq_poisson_approx`
@@ -450,7 +450,7 @@ We may sum this probability mass function to get the cumulative distribution fun
 $$F(x) = \begin{cases} 0 & x < 0, \\ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \text{ with } 0 \le k. \end{cases}$$
 :eqlabel:`eq_poisson_cdf`
 
-Let us first plot the probability mass function :eqref:`eq_poisson_mass`.
+Let's first plot the probability mass function :eqref:`eq_poisson_mass`.
 
 ```{.python .input}
 lam = 5.0
@@ -492,7 +492,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function :eqref:`eq_poisson_cdf`.
+Now, let's plot the cumulative distribution function :eqref:`eq_poisson_cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 21, 0.01)
@@ -547,9 +547,9 @@ m.sample((10, 10))
 ```
 
 ## Gaussian
-Now Let us try a different, but related experiment.  Let us say we again are performing $n$ independent $\mathrm{Bernoulli}(p)$ measurements $X_i$.  The distribution of the sum of these is $X^{(n)} \sim \mathrm{Binomial}(n, p)$.  Rather than taking a limit as $n$ increases and $p$ decreases, Let us fix $p$, and then send $n \rightarrow \infty$.  In this case $\mu_{X^{(n)}} = np \rightarrow \infty$ and $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, so there is no reason to think this limit should be well defined.
+Now Let's try a different, but related experiment.  Let's say we again are performing $n$ independent $\mathrm{Bernoulli}(p)$ measurements $X_i$.  The distribution of the sum of these is $X^{(n)} \sim \mathrm{Binomial}(n, p)$.  Rather than taking a limit as $n$ increases and $p$ decreases, Let's fix $p$, and then send $n \rightarrow \infty$.  In this case $\mu_{X^{(n)}} = np \rightarrow \infty$ and $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, so there is no reason to think this limit should be well defined.
 
-However, not all hope is lost!  Let us just make the mean and variance be well behaved by defining
+However, not all hope is lost!  Let's just make the mean and variance be well behaved by defining
 
 $$
 Y^{(n)} = \frac{X^{(n)} - \mu_{X^{(n)}}}{\sigma_{X^{(n)}}}.
@@ -627,7 +627,7 @@ where we say a random variable is normally distributed with given mean $\mu$ and
 $$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$
 :eqlabel:`eq_gaussian_pdf`
 
-Let us first plot the probability density function :eqref:`eq_gaussian_pdf`.
+Let's first plot the probability density function :eqref:`eq_gaussian_pdf`.
 
 ```{.python .input}
 mu, sigma = 0, 1
@@ -660,7 +660,7 @@ p = 1 / tf.sqrt(2 * tf.pi * sigma**2) * tf.exp(
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-Now, let us plot the cumulative distribution function.  It is beyond the scope of this appendix, but the Gaussian c.d.f. does not have a closed-form formula in terms of more elementary functions.  We will use `erf` which provides a way to compute this integral numerically.
+Now, let's plot the cumulative distribution function.  It is beyond the scope of this appendix, but the Gaussian c.d.f. does not have a closed-form formula in terms of more elementary functions.  We will use `erf` which provides a way to compute this integral numerically.
 
 ```{.python .input}
 def phi(x):
@@ -705,7 +705,7 @@ The central limit theorem is the reason why the Gaussian is fundamental to proba
 
 There are many more fascinating properties of Gaussians, and we would like to discuss one more here.  The Gaussian is what is known as a *maximum entropy distribution*.  We will get into entropy more deeply in :numref:`sec_information_theory`, however all we need to know at this point is that it is a measure of randomness.  In a rigorous mathematical sense, we can think of the Gaussian as the *most* random choice of random variable with fixed mean and variance.  Thus, if we know that our random variable has some mean and variance, the Gaussian is in a sense the most conservative choice of distribution we can make.
 
-To close the section, let us recall that if $X \sim \mathcal{N}(\mu, \sigma^2)$, then:
+To close the section, let's recall that if $X \sim \mathcal{N}(\mu, \sigma^2)$, then:
 
 * $\mu_X = \mu$,
 * $\sigma_X^2 = \sigma^2$.
@@ -737,7 +737,7 @@ form:
 $$p(\mathbf{x} | \boldsymbol{\eta}) = h(\mathbf{x}) \cdot \mathrm{exp} \left( \boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) - A(\boldsymbol{\eta}) \right)$$
 :eqlabel:`eq_exp_pdf`
 
-As this definition can be a little subtle, let us examine it closely.  
+As this definition can be a little subtle, let's examine it closely.  
 
 First, $h(\mathbf{x})$ is known as the *underlying measure* or the 
 *base measure*.  This can be viewed as an original choice of measure we are 
@@ -762,7 +762,7 @@ integrates to one, i.e.,
 $$A(\boldsymbol{\eta})  = \log \left[\int h(\mathbf{x}) \cdot \mathrm{exp}
 \left(\boldsymbol{\eta}^{\top} \cdot T(\mathbf{x}) \right) d\mathbf{x} \right].$$
 
-To be concrete, let us consider the Gaussian. Assuming that $\mathbf{x}$ is 
+To be concrete, let's consider the Gaussian. Assuming that $\mathbf{x}$ is 
 an univariate variable, we saw that it had a density of
 
 $$

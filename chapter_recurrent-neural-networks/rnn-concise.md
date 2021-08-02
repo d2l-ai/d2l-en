@@ -249,7 +249,7 @@ class RNNModel(tf.keras.layers.Layer):
 
 ## Training and Predicting
 
-Before training the model, let us [**make a prediction with the a model that has random weights.**]
+Before training the model, let's [**make a prediction with the a model that has random weights.**]
 
 ```{.python .input}
 device = d2l.try_gpu()

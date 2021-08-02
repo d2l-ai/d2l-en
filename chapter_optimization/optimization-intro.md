@@ -51,7 +51,7 @@ import tensorflow as tf
 ```
 
 To illustrate the aforementioned different goals,
-let us consider 
+let's consider 
 the empirical risk and the risk. 
 As described
 in :numref:`subsec_empirical-risk-and-risk`,
@@ -105,7 +105,7 @@ all fall into this
 category.
 
 There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points, and vanishing gradients. 
-Let us have a look at them.
+Let's have a look at them.
 
 
 ### Local Minima

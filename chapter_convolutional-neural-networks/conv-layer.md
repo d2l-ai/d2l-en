@@ -18,7 +18,7 @@ in such a layer, an input tensor
 and a kernel tensor are combined
 to produce an output tensor through a (**cross-correlation operation.**)
 
-Let us ignore channels for now and see how this works
+Let's ignore channels for now and see how this works
 with two-dimensional data and hidden representations.
 In :numref:`fig_correlation`,
 the input is a two-dimensional tensor
@@ -197,7 +197,7 @@ convolution kernel simply as a $h \times w$ convolutional layer.
 
 ## Object Edge Detection in Images
 
-Let us take a moment to parse [**a simple application of a convolutional layer:
+Let's take a moment to parse [**a simple application of a convolutional layer:
 detecting the edge of an object in an image**]
 by finding the location of the pixel change.
 First, we construct an "image" of $6\times 8$ pixels.
@@ -256,7 +256,7 @@ and consider successive layers of convolutions,
 it might be impossible to specify
 precisely what each filter should be doing manually.
 
-Now let us see whether we can [**learn the kernel that generated `Y` from `X`**]
+Now let's see whether we can [**learn the kernel that generated `Y` from `X`**]
 by looking at the input--output pairs only.
 We first construct a convolutional layer
 and initialize its kernel as a random tensor.
@@ -368,7 +368,7 @@ to the kernel tensor `K` we defined earlier.
 
 Recall our observation from :numref:`sec_why-conv` of the correspondence
 between the cross-correlation and convolution operations.
-Here let us continue to consider two-dimensional convolutional layers.
+Here let's continue to consider two-dimensional convolutional layers.
 What if such layers
 perform strict convolution operations
 as defined in :eqref:`eq_2d-conv-discrete`
@@ -424,12 +424,12 @@ during the forward propagation.
 Note that the receptive field
 may be larger than the actual size of the input.
 
-Let us continue to use :numref:`fig_correlation` to explain the receptive field.
+Let's continue to use :numref:`fig_correlation` to explain the receptive field.
 Given the $2 \times 2$ convolution kernel,
 the receptive field of the shaded output element (of value $19$)
 is
 the four elements in the shaded portion of the input.
-Now let us denote the $2 \times 2$
+Now let's denote the $2 \times 2$
 output as $\mathbf{Y}$
 and consider a deeper CNN
 with an additional $2 \times 2$ convolutional layer that takes $\mathbf{Y}$

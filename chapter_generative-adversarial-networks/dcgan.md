@@ -105,7 +105,7 @@ data_iter = data_iter.cache().shuffle(buffer_size=1000).prefetch(
     buffer_size=tf.data.experimental.AUTOTUNE)
 ```
 
-Let us visualize the first 20 images.
+Let's visualize the first 20 images.
 
 ```{.python .input}
 d2l.set_figsize((4, 4))

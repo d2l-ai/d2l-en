@@ -18,7 +18,7 @@ After logging into your AWS account, go to your [console](http://console.aws.ama
 
 ## Creating a SageMaker Instance
 
-Next, let us create a notebook instance as described in :numref:`fig_sagemaker-create`.
+Next, let's create a notebook instance as described in :numref:`fig_sagemaker-create`.
 
 ![Create a SageMaker instance.](../img/sagemaker-create.png)
 :width:`400px`

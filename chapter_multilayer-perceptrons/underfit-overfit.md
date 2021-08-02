@@ -467,7 +467,7 @@ features[:2], poly_features[:2, :], labels[:2]
 
 ### Training and Testing the Model
 
-Let us first [**implement a function to evaluate the loss on a given dataset**].
+Let's first [**implement a function to evaluate the loss on a given dataset**].
 
 ```{.python .input}
 #@tab mxnet, tensorflow
@@ -590,7 +590,7 @@ train(poly_features[:n_train, :4], poly_features[n_train:, :4],
 
 ### [**Linear Function Fitting (Underfitting)**]
 
-Let us take another look at linear function fitting.
+Let's take another look at linear function fitting.
 After the decline in early epochs,
 it becomes difficult to further decrease
 this model's training loss.
@@ -609,7 +609,7 @@ train(poly_features[:n_train, :2], poly_features[n_train:, :2],
 
 ### [**Higher-Order Polynomial Function Fitting  (Overfitting)**]
 
-Now let us try to train the model
+Now let's try to train the model
 using a polynomial of too high degree.
 Here, there are insufficient data to learn that
 the higher-degree coefficients should have values close to zero.

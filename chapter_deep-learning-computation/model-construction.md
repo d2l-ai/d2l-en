@@ -300,7 +300,7 @@ class MLP(tf.keras.Model):
         return self.out(self.hidden((X)))
 ```
 
-Let us first focus on the forward propagation function.
+Let's first focus on the forward propagation function.
 Note that it takes `X` as the input,
 calculates the hidden representation
 with the activation function applied,
@@ -329,7 +329,7 @@ Note that unless we implement a new operator,
 we need not worry about the backpropagation function
 or parameter initialization.
 The system will generate these functions automatically.
-Let us try this out.
+Let's try this out.
 
 ```{.python .input}
 net = MLP()
@@ -606,7 +606,7 @@ through a fully connected layer.
 Note that before returning the output,
 our model did something unusual.
 We ran a while-loop, testing
-on the condition its $L_1$ norm is larger than $1$,
+on the condition its $\ell_1$ norm is larger than $1$,
 and dividing our output vector by $2$
 until it satisfied the condition.
 Finally, we returned the sum of the entries in `X`.

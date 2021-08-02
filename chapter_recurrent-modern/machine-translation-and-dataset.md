@@ -176,7 +176,7 @@ source, target = tokenize_nmt(text)
 source[:6], target[:6]
 ```
 
-Let us [**plot the histogram of the number of tokens per text sequence.**]
+Let's [**plot the histogram of the number of tokens per text sequence.**]
 In this simple English-French dataset,
 most of the text sequences have fewer than 20 tokens.
 
@@ -329,7 +329,7 @@ def load_data_nmt(batch_size, num_steps, num_examples=600):
     return data_iter, src_vocab, tgt_vocab
 ```
 
-Let us [**read the first minibatch from the English-French dataset.**]
+Let's [**read the first minibatch from the English-French dataset.**]
 
 ```{.python .input}
 #@tab all

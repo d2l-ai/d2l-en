@@ -304,7 +304,7 @@ as this material is not prerequisite to subsequent concepts.
 ### Empirical Risk and  Risk
 :label:`subsec_empirical-risk-and-risk`
 
-Let us first reflect about what exactly
+Let's first reflect about what exactly
 is happening during model training:
 we iterate over features and associated labels
 of training data

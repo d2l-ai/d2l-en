@@ -26,7 +26,7 @@ import torch
 
 ## Parallel Computation on GPUs
 
-Let us start by defining a reference workload to test: the `run` function below performs 10 matrix-matrix multiplications on the device of our choice using data allocated into two variables: `x_gpu1` and `x_gpu2`.
+Let's start by defining a reference workload to test: the `run` function below performs 10 matrix-matrix multiplications on the device of our choice using data allocated into two variables: `x_gpu1` and `x_gpu2`.
 
 ```{.python .input}
 devices = d2l.try_all_gpus()
@@ -116,7 +116,7 @@ In the above case the total execution time is less than the sum of its parts, si
 
 In many cases we need to move data between different devices, say between the CPU and GPU, or between different GPUs. 
 For instance,
-this occurs when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let us simulate this by computing on the GPU and then copying the results back to the CPU.
+this occurs when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let's simulate this by computing on the GPU and then copying the results back to the CPU.
 
 ```{.python .input}
 def copy_to_cpu(x):

@@ -207,7 +207,7 @@ def val_dataloader(self):
         self.val).batch(self.batch_size)
 ```
 
-Let us look at the time it takes to read the training data.
+Let's look at the time it takes to read the training data.
 
 ```{.python .input}
 #@tab all

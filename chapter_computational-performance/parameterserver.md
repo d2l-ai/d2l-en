@@ -9,7 +9,7 @@ The core idea of the parameter server was introduced in :cite:`Smola.Narayanamur
 
 ## Data-Parallel Training
 
-Let us review the data parallel training approach to distributed training. We will use this to the exclusion of all others in this section since it is significantly simpler to implement in practice. There are virtually no use cases (besides deep learning on graphs) where any other strategy for parallelism is preferred since GPUs have plenty of memory nowadays. :numref:`fig_parameterserver` describes the variant of data parallelism that we implemented in :numref:`sec_multi_gpu`. The key aspect in it is that the aggregation of gradients occurs on GPU 0 before the updated parameters are rebroadcast to all GPUs.
+Let's review the data parallel training approach to distributed training. We will use this to the exclusion of all others in this section since it is significantly simpler to implement in practice. There are virtually no use cases (besides deep learning on graphs) where any other strategy for parallelism is preferred since GPUs have plenty of memory nowadays. :numref:`fig_parameterserver` describes the variant of data parallelism that we implemented in :numref:`sec_multi_gpu`. The key aspect in it is that the aggregation of gradients occurs on GPU 0 before the updated parameters are rebroadcast to all GPUs.
 
 ![Left: single GPU training. Right: a variant of multi-GPU training: (1) we compute loss and gradient, (2) all gradients are aggregated on one GPU, (3) parameter update happens and the parameters are re-distributed to all GPUs.](../img/ps.svg)
 :label:`fig_parameterserver`
@@ -24,7 +24,7 @@ Since the CPUs have too few PCIe lanes to connect to all GPUs directly (e.g., co
 ![A 4-way GPU server.](../img/bw-hierarchy.svg)
 :label:`fig_bw_hierarchy`
 
-For the sake of the argument let us assume that the gradients are of 160 MB. In this case it takes 30 ms to send the gradients from all 3 remaining GPUs to the fourth one (each transfer takes 10 ms = 160 MB / 16 GB/s). Adding another 30 ms to transmit the weight vectors back we arrive at a total of 60 ms.
+For the sake of the argument let's assume that the gradients are of 160 MB. In this case it takes 30 ms to send the gradients from all 3 remaining GPUs to the fourth one (each transfer takes 10 ms = 160 MB / 16 GB/s). Adding another 30 ms to transmit the weight vectors back we arrive at a total of 60 ms.
 If we send all data to the CPU we incur a penalty of 40 ms since *each* of the four GPUs needs to send the data to the CPU, yielding a total of 80 ms. Lastly assume that we are able to split the gradients into 4 parts of 40 MB each. Now we can aggregate each of the parts on a different GPU *simultaneously* since the PCIe switch offers a full-bandwidth operation between all links. Instead of 30 ms this takes 7.5 ms, yielding a total of 15 ms for a synchronization operation. In short, depending on how we synchronize parameters the same operation can take anywhere from 15 ms to 80 ms. :numref:`fig_ps_distributed` depicts the different strategies for exchanging parameters.
 
 ![Parameter synchronization strategies.](../img/ps-distributed.svg)
