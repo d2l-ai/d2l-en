@@ -24,7 +24,6 @@ import numpy as np
 from d2l import torch as d2l
 import torch
 from torch import nn
-
 ```
 
 ```{.python .input}
@@ -97,13 +96,11 @@ The third one is a plot board with animation. Again, implementation is deferred 
 #@tab all
 class ProgressBoard(d2l.HyperParameters):  #@save
     """Plot data points in animation."""
-    def __init__(self, x, xlabel=None, ylabel=None, xlim=None,
+    def __init__(self, xlabel=None, ylabel=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear',
                  ls=['-', '--', '-.', ':'], colors=['C0', 'C1', 'C2', 'C3'],
                  fig=None, axes=None, figsize=(3.5, 2.5)):
         self.save_hyperparameters()
-        self.points = []
-        self.lines = {}
 
     def draw(self, points, every_n=1):
         raise NotImplemented
@@ -113,9 +110,10 @@ Take an example. The `every_n` argument draw a point in the plot for every $n$ p
 
 ```{.python .input}
 #@tab all
-board = d2l.ProgressBoard(x='x')
-for x in np.arange(0, 6, 0.05):
-    board.draw({'x':x, 'sin':np.sin(x), 'cos':np.cos(x)}, every_n=10)
+board = d2l.ProgressBoard('x')
+for x in np.arange(0, 10, 0.05):
+    board.draw(x, np.sin(x), 'sin', every_n=5)
+    board.draw(x, np.cos(x), 'cos', every_n=10)
 ```
 
 ## Model
@@ -127,20 +125,42 @@ The `configure_optimizers` method returns the optimization method, or a list of 
 TODO, explain why inherent the `nn` class
 
 ```{.python .input}
-#@tab all
+#@tab mxnet, pytorch
+class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
+    def __init__(self):
+        super().__init__()
+        self.board = ProgressBoard()
+        self.trainer = None
+        
+    def training_step(self, batch):
+        raise NotImplementedError
+
+    def validaton_step(self, batch):
+        pass
+    
+    def configure_optimizers(self):
+        raise NotImplementedError
+```
+
+```{.python .input}
+#@tab tensorflow
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
     def __init__(self):
         super().__init__()
         self.board = ProgressBoard(x='step')
-
-    def training_step(self, batch, batch_idx):
+        self.trainer = None
+        
+    def call(self, *args, **kwargs):
+        return self.forward(*args, **kwargs)
+    
+    def training_step(self, batch):
         raise NotImplementedError
 
-    def validaton_step(self):
+    def validaton_step(self, batch):
         pass
 
     def configure_optimizers(self):
-        raise NotImplementedError
+        raise NotImplementedError        
 ```
 
 ##  Data
@@ -170,6 +190,23 @@ class Trainer(d2l.HyperParameters):  #@save
     def __init__(self, max_epochs):
         self.save_hyperparameters()
 
-    def fit(self, model, data):
+    def prepare_data(self, data):
+        self.train_dataloader = data.train_dataloader()
+        self.val_dataloader = data.val_dataloader()
+        
+    def reset_counters(self):
+        self.epoch = 0
+        self.train_batch_idx = 0
+        self.val_batch_idx = 0
+        try:            
+            self.num_train_batches = len(self.train_dataloader)
+        except:
+            self.num_train_batches = 0
+        try:            
+            self.num_val_batches = len(self.val_dataloader)
+        except:
+            self.num_val_batches = 0
+        
+    def fit(self, model, data_module):
         raise NotImplementedError
 ```
