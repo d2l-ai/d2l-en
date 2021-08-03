@@ -6,6 +6,7 @@ This section contains the implementations of utility functions and classes used 
 
 ```{.python .input}
 import inspect
+import collections
 from d2l import mxnet as d2l
 from IPython import display
 from mxnet import autograd, np, npx
@@ -13,15 +14,17 @@ import random
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=1}
 #@tab pytorch
 import inspect
+import collections
 from d2l import torch as d2l
 from IPython import display
 ```
 
 ```{.python .input}
 #@tab tensorflow
+import collections
 from d2l import tensorflow as d2l
 ```
 
@@ -42,108 +45,59 @@ def save_hyperparameters(self, ignore=[]):
 
 progress bar
 
-```{.python .input}
+```{.python .input  n=22}
 #@tab all
 @d2l.add_to_class(d2l.ProgressBoard)  #@save
-def _update_lines(self):
-    lines = {}
-    for p in self.points:
-        x = float(p[self.x])
-        for k, v in p.items():
-            if k == self.x: continue
-            if k not in lines:
-                lines[k] = ([], [])
-            lines[k][0].append(x)
-            lines[k][1].append(float(v))
-    for k, v in lines.items():
-        if k not in self.lines:
-            self.lines[k] = ([], [])
-        self.lines[k][0].append(v[0][-1])
-        self.lines[k][1].append(sum(v[1])/len(v[1]))
-    self.points = []
-
-@d2l.add_to_class(d2l.ProgressBoard)  #@save
-def draw(self, points, every_n=1):
-    assert self.x in points, 'must specify the x-axis value'
-    self.points.append(points)
-    if len(self.points) != every_n:
-        return
-    self._update_lines()
+def draw(self, x, y, label, every_n=1):
+    Point = collections.namedtuple('Point', ['x', 'y'])
+    if not hasattr(self, 'points'):
+        self.points = collections.OrderedDict()
+        self.lines = collections.OrderedDict()
+    if label not in self.points:
+        self.points[label] = []
+        self.lines[label] = []    
+    points = self.points[label]
+    line = self.lines[label]
+    points.append(Point(x, y))
+    if len(points) != every_n:
+        return    
+    mean = lambda x: sum(x) / len(x)
+    line.append(Point(mean([p.x for p in points]), 
+                      mean([p.y for p in points])))
+    points.clear()
     d2l.use_svg_display()
     if self.fig is None:
         self.fig = d2l.plt.figure(figsize=self.figsize)
-    for (k, v), ls, color in zip(self.lines.items(), self.ls, self.colors):
-        d2l.plt.plot(v[0], v[1], linestyle=ls, color=color, label=k)
+    plt_lines, labels = [], []
+    for (k, v), ls, color in zip(self.lines.items(), self.ls, self.colors):        
+        plt_lines.append(d2l.plt.plot([p.x for p in v], [p.y for p in v], 
+                                      linestyle=ls, color=color)[0])
+        labels.append(k)        
     axes = self.axes if self.axes else d2l.plt.gca()
     if self.xlim: axes.set_xlim(self.xlim)
     if self.ylim: axes.set_ylim(self.ylim)
-    if not self.xlabel: self.xlabel = self.x
+    if not self.xlabel: self.xlabel = self.x    
     axes.set_xlabel(self.xlabel)
     axes.set_ylabel(self.ylabel)
-    axes.legend(self.lines.keys())
-    axes.grid()
+    axes.legend(plt_lines, labels)    
     display.display(self.fig)
     display.clear_output(wait=True)
+
+
+
+```
+
+```{.python .input}
+import numpy as np 
+#@tab all
+board = d2l.ProgressBoard()
+board.xlabel = 'x'
+for x in np.arange(0, 10, 0.05):
+    board.draw(x, np.sin(x), 'sin', every_n=10)
+    board.draw(x, np.cos(x), 'cos', every_n=20)
 ```
 
 trainer
-
-```{.python .input}
-@d2l.add_to_class(d2l.Trainer)  #@save
-def fit(self, model, data):
-    train_dataloader = data.train_dataloader()
-    self.train_batch_idx = 0
-    optim = model.configure_optimizers()
-    for epoch in range(self.max_epochs):
-        for batch in train_dataloader:
-            with autograd.record():
-                loss = model.training_step(batch, self.train_batch_idx)
-            loss.backward()
-            if isinstance(optim, gluon.Trainer):
-                optim.step(1)
-            else:
-                optim.step()
-            self.train_batch_idx += 1
-```
-
-```{.python .input}
-#@tab pytorch
-@d2l.add_to_class(d2l.Trainer)  #@save
-def fit(self, model, data):
-    train_dataloader = data.train_dataloader()
-    val_dataloader = data.val_dataloader()
-    self.train_batch_idx = 0
-    optim = model.configure_optimizers()
-    try:
-        model.board.xlim = [0, len(train_dataloader) * self.max_epochs]
-    except:
-        pass
-
-    for epoch in range(self.max_epochs):
-        for batch in train_dataloader:
-            loss = model.training_step(batch, self.train_batch_idx)
-            optim.zero_grad()
-            with torch.no_grad():
-                loss.backward()
-                optim.step()
-            self.train_batch_idx += 1
-```
-
-```{.python .input}
-#@tab tensorflow
-@d2l.add_to_class(d2l.Trainer)  #@save
-def fit(self, model, data):
-    train_dataloader = data.train_dataloader()
-    self.train_batch_idx = 0
-    optim = model.configure_optimizers()
-    for epoch in range(self.max_epochs):
-        for batch in train_dataloader:
-            with tf.GradientTape() as tape:
-                loss = model.training_step(batch, self.train_batch_idx)
-            grads = tape.gradient(loss, model.trainable_variables)
-            optim.apply_gradients(zip(grads, model.trainable_variables))
-            self.train_batch_idx += 1
-```
 
 a bunch of functions that will be deprecated
 
@@ -302,4 +256,69 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):  #@save
         if titles:
             ax.set_title(titles[i])
     return axes
+
+#@tab all
+class Animator:  #@save
+    """For plotting data in animation."""
+    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
+                 ylim=None, xscale='linear', yscale='linear',
+                 fmts=('-', 'm--', 'g-.', 'r:'), nrows=1, ncols=1,
+                 figsize=(3.5, 2.5)):
+        # Incrementally plot multiple lines
+        if legend is None:
+            legend = []
+        d2l.use_svg_display()
+        self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
+        if nrows * ncols == 1:
+            self.axes = [self.axes, ]
+        # Use a lambda function to capture arguments
+        self.config_axes = lambda: d2l.set_axes(
+            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+        self.X, self.Y, self.fmts = None, None, fmts
+
+    def add(self, x, y):
+        # Add multiple data points into the figure
+        if not hasattr(y, "__len__"):
+            y = [y]
+        n = len(y)
+        if not hasattr(x, "__len__"):
+            x = [x] * n
+        if not self.X:
+            self.X = [[] for _ in range(n)]
+        if not self.Y:
+            self.Y = [[] for _ in range(n)]
+        for i, (a, b) in enumerate(zip(x, y)):
+            if a is not None and b is not None:
+                self.X[i].append(a)
+                self.Y[i].append(b)
+        self.axes[0].cla()
+        for x, y, fmt in zip(self.X, self.Y, self.fmts):
+            self.axes[0].plot(x, y, fmt)
+        self.config_axes()
+        display.display(self.fig)
+        display.clear_output(wait=True)
+        
+#@tab all
+class Accumulator:  #@save
+    """For accumulating sums over `n` variables."""
+    def __init__(self, n):
+        self.data = [0.0] * n
+
+    def add(self, *args):
+        self.data = [a + float(b) for a, b in zip(self.data, args)]
+
+    def reset(self):
+        self.data = [0.0] * len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx]        
+    
+    
+#@tab all
+def accuracy(y_hat, y):  #@save
+    """Compute the number of correct predictions."""
+    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
+        y_hat = d2l.argmax(y_hat, axis=1)
+    cmp = d2l.astype(y_hat, y.dtype) == y
+    return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
 ```

@@ -130,7 +130,6 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
     def __init__(self):
         super().__init__()
         self.board = ProgressBoard()
-        self.trainer = None
         
     def training_step(self, batch):
         raise NotImplementedError
@@ -147,11 +146,13 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
     def __init__(self):
         super().__init__()
-        self.board = ProgressBoard(x='step')
-        self.trainer = None
+        self.board = ProgressBoard()
+        self.training = None
         
-    def call(self, *args, **kwargs):
-        return self.forward(*args, **kwargs)
+    def call(self, inputs, training=None):
+        if training is not None:
+            self.training = training
+        return self.forward(inputs)
     
     def training_step(self, batch):
         raise NotImplementedError
