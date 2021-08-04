@@ -138,9 +138,10 @@ def mse(y_hat, y):  #@save
 @d2l.add_to_class(LinearRegressionScratch)
 def training_step(self, batch):
     X, y = batch
-    l = mse(self(X), y)
-    self.board.xlabel = 'step'
-    self.board.draw(self.trainer.train_batch_idx, l, 'loss', every_n=10)
+    l = mse(self(X), y)    
+    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
+    self.board.xlabel = 'epoch'
+    self.board.draw(epoch, l, 'loss', every_n=10)
     return l
 ```
 
@@ -280,7 +281,7 @@ def fit_epoch(self, model, optim):
     model.eval()
     for batch in self.val_dataloader:
         with torch.no_grad():
-            model.validaton_step(batch)
+            model.validation_step(batch)
         self.val_batch_idx += 1
 ```
 
@@ -297,7 +298,7 @@ def fit_epoch(self, model, optim):
     if self.val_dataloader is None:
         return
     for batch in self.val_dataloader:
-        model.validaton_step(batch)
+        model.validation_step(batch)
         self.val_batch_idx += 1
 ```
 

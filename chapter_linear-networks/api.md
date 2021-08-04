@@ -194,19 +194,14 @@ class Trainer(d2l.HyperParameters):  #@save
     def prepare_data(self, data):
         self.train_dataloader = data.train_dataloader()
         self.val_dataloader = data.val_dataloader()
+        self.num_train_batches = len(self.train_dataloader)
+        self.num_val_batches = (len(self.val_dataloader)  
+                                if self.val_dataloader is not None else 0)
         
     def reset_counters(self):
         self.epoch = 0
         self.train_batch_idx = 0
-        self.val_batch_idx = 0
-        try:            
-            self.num_train_batches = len(self.train_dataloader)
-        except:
-            self.num_train_batches = 0
-        try:            
-            self.num_val_batches = len(self.val_dataloader)
-        except:
-            self.num_val_batches = 0
+        self.val_batch_idx = 0        
         
     def fit(self, model, data_module):
         raise NotImplementedError

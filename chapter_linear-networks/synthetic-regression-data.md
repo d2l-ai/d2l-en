@@ -212,5 +212,9 @@ next(iter(data.train_dataloader()))
 One benefit is that it has `__len__`
 
 ```{.python .input}
+#@tab all
 len(data.train_dataloader())
 ```
+
+## Summary
+

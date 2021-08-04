@@ -17,6 +17,7 @@ dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017.
 import time
 from d2l import mxnet as d2l
 from mxnet import gluon, npx
+from mxnet.gluon.data.vision import transforms
 npx.set_np()
 
 d2l.use_svg_display()
@@ -50,17 +51,21 @@ We can [**download and read the Fashion-MNIST dataset into memory via the build-
 
 ```{.python .input}
 class FashionMNIST(d2l.DataModule):  #@save
-    def __init__(self, batch_size=32, resize=(28, 28)):
+    def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
         self.save_hyperparameters()
-        self.train = gluon.data.vision.FashionMNIST(train=True)
-        self.val = gluon.data.vision.FashionMNIST(train=False)
+        trans = transforms.Compose([transforms.Resize(resize),
+                                    transforms.ToTensor()])      
+        self.train = gluon.data.vision.FashionMNIST(
+            train=True).transform_first(trans)
+        self.val = gluon.data.vision.FashionMNIST(
+            train=False).transform_first(trans)
 ```
 
 ```{.python .input}
 #@tab pytorch
 class FashionMNIST(d2l.DataModule):  #@save
-    def __init__(self, batch_size=32, resize=(28, 28)):
+    def __init__(self, batch_size=64, resize=(28,28)):
         super().__init__()
         self.save_hyperparameters()
         trans = transforms.Compose([transforms.Resize(resize),
@@ -74,7 +79,7 @@ class FashionMNIST(d2l.DataModule):  #@save
 ```{.python .input}
 #@tab tensorflow
 class FashionMNIST(d2l.DataModule):  #@save
-    def __init__(self, batch_size=32, resize=(28, 28)):
+    def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
         self.save_hyperparameters()
         self.train, self.val = tf.keras.datasets.fashion_mnist.load_data()
@@ -88,13 +93,13 @@ contain 60000 and 10000 images, respectively.
 
 ```{.python .input}
 #@tab mxnet, pytorch
-data = FashionMNIST()
+data = FashionMNIST(resize=(32,32))
 len(data.train), len(data.val)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-data = FashionMNIST()
+data = FashionMNIST(resize=(32,32))
 len(data.train[0]), len(data.val[0])
 ```
 
@@ -135,17 +140,13 @@ We also randomly shuffle the examples for the training data iterator.
 ```{.python .input}
 @d2l.add_to_class(FashionMNIST)  #@save
 def train_dataloader(self):
-    trans = gluon.data.vision.transforms.ToTensor()
-    return gluon.data.DataLoader(
-        self.train.transform_first(trans), self.batch_size,
-        shuffle=True, num_workers=self.num_workers)
+    return gluon.data.DataLoader(self.train, self.batch_size, shuffle=True, 
+                                 num_workers=self.num_workers)
 
 @d2l.add_to_class(FashionMNIST)  #@save
 def val_dataloader(self):
-    trans = gluon.data.vision.transforms.ToTensor()
-    return gluon.data.DataLoader(
-        self.val.transform_first(trans), self.batch_size,
-        shuffle=False, num_workers=self.num_workers)
+    return gluon.data.DataLoader(self.val, self.batch_size, shuffle=False, 
+                                 num_workers=self.num_workers)
 ```
 
 ```{.python .input}
@@ -166,14 +167,26 @@ def val_dataloader(self):
 ```{.python .input}
 #@tab tensorflow
 @d2l.add_to_class(FashionMNIST)  #@save
+def process(self, data, shuffle):
+    process = lambda X, y: (tf.expand_dims(X, axis=3) / 255,
+                            tf.cast(y, dtype='int32'))
+    resize_fn = lambda X, y: (tf.image.resize_with_pad(X, *self.resize), y)
+    dataloader = tf.data.Dataset.from_tensor_slices(
+        process(*data)).batch(self.batch_size).map(resize_fn)
+    return dataloader if not shuffle else dataloader.shuffle(len(data[0]))
+    
+@d2l.add_to_class(FashionMNIST)  #@save
 def train_dataloader(self):
-    return tf.data.Dataset.from_tensor_slices(
-        self.train).batch(self.batch_size).shuffle(len(self.train[0]))
+    return self.process(self.train, shuffle=True)
 
 @d2l.add_to_class(FashionMNIST)  #@save
 def val_dataloader(self):
-    return tf.data.Dataset.from_tensor_slices(
-        self.val).batch(self.batch_size)
+    return self.process(self.train, shuffle=False)
+```
+
+```{.python .input}
+X, y = next(iter(data.train_dataloader()))
+print(X.shape, X.dtype, y.shape, y.dtype)
 ```
 
 Let's look at the time it takes to read the training data.
@@ -203,7 +216,7 @@ for the first few examples in the training dataset.
 ```{.python .input}
 #@tab mxnet, pytorch
 @d2l.add_to_class(FashionMNIST)  #@save
-def visualize(self, batch, nrows=2, ncols=9, labels=[]):
+def visualize(self, batch, nrows=1, ncols=8, labels=[]):
     X, y = batch
     if not labels:
         labels = self.text_labels(y)
@@ -213,7 +226,7 @@ def visualize(self, batch, nrows=2, ncols=9, labels=[]):
 ```{.python .input}
 #@tab tensorflow
 @d2l.add_to_class(FashionMNIST)  #@save
-def visualize(self, batch, nrows=2, ncols=9, labels=[]):
+def visualize(self, batch, nrows=1, ncols=8, labels=[]):
     X, y = batch
     if not labels:
         labels = self.text_labels(y)

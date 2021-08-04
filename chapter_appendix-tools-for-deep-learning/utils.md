@@ -24,6 +24,8 @@ from IPython import display
 
 ```{.python .input}
 #@tab tensorflow
+import inspect
+from IPython import display
 import collections
 from d2l import tensorflow as d2l
 ```
@@ -221,6 +223,16 @@ def load_data_fashion_mnist(batch_size, resize=None):   #@save
             batch_size).shuffle(len(mnist_train[0])).map(resize_fn),
         tf.data.Dataset.from_tensor_slices(process(*mnist_test)).batch(
             batch_size).map(resize_fn))
+```
+
+```{.python .input}
+#@tab mxnet, tensorflow
+def evaluate_accuracy(net, data_iter):  #@save
+    """Compute the accuracy for a model on a dataset."""
+    metric = Accumulator(2)  # No. of correct predictions, no. of predictions
+    for X, y in data_iter:
+        metric.add(accuracy(net(X), y), d2l.size(y))
+    return metric[0] / metric[1]
 ```
 
 ```{.python .input}

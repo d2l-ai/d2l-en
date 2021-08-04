@@ -43,16 +43,6 @@ import numpy as np
 import tensorflow as tf
 ```
 
-```{.json .output n=1}
-[
- {
-  "name": "stderr",
-  "output_type": "stream",
-  "text": "2021-08-03 23:37:47.514813: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1\n"
- }
-]
-```
-
 ## Defining the Model
 
 When we implemented linear regression from scratch
@@ -204,8 +194,9 @@ def training_step(self, batch):
     X, y = batch
     loss = nn.MSELoss()
     l = loss(self(X), y)
-    self.board.xlabel = 'step'
-    self.board.draw(self.trainer.train_batch_idx, l, 'loss', every_n=10)
+    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
+    self.board.xlabel = 'epoch'
+    self.board.draw(epoch, l, 'train_loss', every_n=50)
     return l
 ```
 
