@@ -3,12 +3,7 @@
 
 Now that we have characterized
 multilayer perceptrons (MLPs) mathematically,
-let's try to implement one ourselves. To compare against our previous results
-achieved with softmax regression
-(:numref:`sec_softmax_scratch`),
-we will continue to work with
-the Fashion-MNIST image classification dataset
-(:numref:`sec_fashion_mnist`).
+let's try to implement one ourselves. 
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -27,12 +22,6 @@ from torch import nn
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-```
-
-```{.python .input}
-#@tab all
-batch_size = 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
 ## Initializing Model Parameters
@@ -59,44 +48,53 @@ As always, we allocate memory
 for the gradients of the loss with respect to these parameters.
 
 ```{.python .input}
-num_inputs, num_outputs, num_hiddens = 784, 10, 256
-
-W1 = np.random.normal(scale=0.01, size=(num_inputs, num_hiddens))
-b1 = np.zeros(num_hiddens)
-W2 = np.random.normal(scale=0.01, size=(num_hiddens, num_outputs))
-b2 = np.zeros(num_outputs)
-params = [W1, b1, W2, b2]
-
-for param in params:
-    param.attach_grad()
+#@tab mxnet
+class MLPScratch(d2l.Classification):
+    def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        self.W1 = np.random.randn(num_inputs, num_hiddens) * sigma
+        self.b1 = np.zeros(num_hiddens)
+        self.W2 = np.random.randn(num_hiddens, num_outputs) * sigma
+        self.b2 = np.zeros(num_outputs)
+        self._params = [self.W1, self.b1, self.W2, self.b2]
+        for param in self._params:
+            param.attach_grad()
+            
+    def collect_params(self):
+        return self._params
 ```
 
 ```{.python .input}
 #@tab pytorch
-num_inputs, num_outputs, num_hiddens = 784, 10, 256
+class MLPScratch(d2l.Classification):
+    def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        self.W1 = torch.randn(num_inputs, num_hiddens) * sigma
+        self.b1 = torch.zeros(num_hiddens)
+        self.W2 = torch.randn(num_hiddens, num_outputs) * sigma
+        self.b2 = torch.zeros(num_outputs)
+        self._params = [self.W1, self.b1, self.W2, self.b2]
+        for param in self._params:
+            param.requires_grad_()
 
-W1 = nn.Parameter(torch.randn(
-    num_inputs, num_hiddens, requires_grad=True) * 0.01)
-b1 = nn.Parameter(torch.zeros(num_hiddens, requires_grad=True))
-W2 = nn.Parameter(torch.randn(
-    num_hiddens, num_outputs, requires_grad=True) * 0.01)
-b2 = nn.Parameter(torch.zeros(num_outputs, requires_grad=True))
-
-params = [W1, b1, W2, b2]
+    def parameters(self):
+        return self._params
 ```
 
 ```{.python .input}
 #@tab tensorflow
-num_inputs, num_outputs, num_hiddens = 784, 10, 256
-
-W1 = tf.Variable(tf.random.normal(
-    shape=(num_inputs, num_hiddens), mean=0, stddev=0.01))
-b1 = tf.Variable(tf.zeros(num_hiddens))
-W2 = tf.Variable(tf.random.normal(
-    shape=(num_hiddens, num_outputs), mean=0, stddev=0.01))
-b2 = tf.Variable(tf.random.normal([num_outputs], stddev=.01))
-
-params = [W1, b1, W2, b2]
+class MLPScratch(d2l.Classification):
+    def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        self.W1 = tf.Variable(
+            tf.random.normal((num_inputs, num_hiddens)) * sigma)
+        self.b1 = tf.Variable(tf.zeros(num_hiddens))
+        self.W2 = tf.Variable(
+            tf.random.normal((num_hiddens, num_outputs)) * sigma)
+        self.b2 = tf.Variable(tf.zeros(num_outputs))
 ```
 
 ## Activation Function
@@ -119,7 +117,7 @@ def relu(X):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+#@tab tensorflow 
 def relu(X):
     return tf.math.maximum(X, 0)
 ```
@@ -133,94 +131,24 @@ Finally, we (**implement our model**)
 with just a few lines of code.
 
 ```{.python .input}
-def net(X):
-    X = d2l.reshape(X, (-1, num_inputs))
-    H = relu(np.dot(X, W1) + b1)
-    return np.dot(H, W2) + b2
-```
-
-```{.python .input}
-#@tab pytorch
-def net(X):
-    X = d2l.reshape(X, (-1, num_inputs))
-    H = relu(X@W1 + b1)  # Here '@' stands for matrix multiplication
-    return (H@W2 + b2)
-```
-
-```{.python .input}
-#@tab tensorflow
-def net(X):
-    X = d2l.reshape(X, (-1, num_inputs))
-    H = relu(tf.matmul(X, W1) + b1)
-    return tf.matmul(H, W2) + b2
-```
-
-## Loss Function
-
-To ensure numerical stability,
-and because we already implemented
-the softmax function from scratch
-(:numref:`sec_softmax_scratch`),
-we leverage the integrated function from high-level APIs
-for calculating the softmax and cross-entropy loss.
-Recall our earlier discussion of these intricacies
-in :numref:`subsec_softmax-implementation-revisited`.
-We encourage the interested reader
-to examine the source code for the loss function
-to deepen their knowledge of implementation details.
-
-```{.python .input}
-loss = gluon.loss.SoftmaxCrossEntropyLoss()
-```
-
-```{.python .input}
-#@tab pytorch
-loss = nn.CrossEntropyLoss()
-```
-
-```{.python .input}
-#@tab tensorflow
-def loss(y_hat, y):
-    return tf.losses.sparse_categorical_crossentropy(
-        y, y_hat, from_logits=True)
+#@tab all
+@d2l.add_to_class(MLPScratch)    
+def forward(self, X):
+    X = d2l.reshape(X, (-1, self.num_inputs))
+    H = relu(d2l.matmul(X, self.W1) + self.b1)
+    return d2l.matmul(H, self.W2) + self.b2
 ```
 
 ## Training
 
 Fortunately, [**the training loop for MLPs
 is exactly the same as for softmax regression.**]
-Leveraging the `d2l` package again,
-we call the `train_ch3` function
-(see :numref:`sec_softmax_scratch`),
-setting the number of epochs to 10
-and the learning rate to 0.1.
 
 ```{.python .input}
-num_epochs, lr = 10, 0.1
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
-              lambda batch_size: d2l.sgd(params, lr, batch_size))
-```
-
-```{.python .input}
-#@tab pytorch
-num_epochs, lr = 10, 0.1
-updater = torch.optim.SGD(params, lr=lr)
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
-```
-
-```{.python .input}
-#@tab tensorflow
-num_epochs, lr = 10, 0.1
-updater = d2l.Updater([W1, W2, b1, b2], lr)
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
-```
-
-To evaluate the learned model,
-we [**apply it on some test data**].
-
-```{.python .input}
-#@tab all
-d2l.predict_ch3(net, test_iter)
+model = MLPScratch(num_inputs=784, num_outputs=10, num_hiddens=256, lr=0.1)
+data = d2l.FashionMNIST(batch_size=256)
+trainer = d2l.Trainer(max_epochs=10)
+trainer.fit(model, data)
 ```
 
 ## Summary

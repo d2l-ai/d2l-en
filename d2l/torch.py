@@ -173,7 +173,7 @@ class ProgressBoard(d2l.HyperParameters):
                  fig=None, axes=None, figsize=(3.5, 2.5)):
         self.save_hyperparameters()
 
-    def draw(self, points, every_n=1):
+    def draw(self, x, y, label, every_n=1):
         raise NotImplemented
 
 
@@ -182,13 +182,13 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
     def __init__(self):
         super().__init__()
         self.board = ProgressBoard()
-        
+
     def training_step(self, batch):
         raise NotImplementedError
 
     def validaton_step(self, batch):
         pass
-    
+
     def configure_optimizers(self):
         raise NotImplementedError
 
@@ -214,15 +214,15 @@ class Trainer(d2l.HyperParameters):
         self.train_dataloader = data.train_dataloader()
         self.val_dataloader = data.val_dataloader()
         self.num_train_batches = len(self.train_dataloader)
-        self.num_val_batches = (len(self.val_dataloader)  
+        self.num_val_batches = (len(self.val_dataloader)
                                 if self.val_dataloader is not None else 0)
-        
+
     def reset_counters(self):
         self.epoch = 0
         self.train_batch_idx = 0
-        self.val_batch_idx = 0        
-        
-    def fit(self, model, data_module):
+        self.val_batch_idx = 0
+
+    def fit(self, model, data):
         raise NotImplementedError
 
 
@@ -345,17 +345,14 @@ def visualize(self, batch, nrows=1, ncols=8, labels=[]):
 class Classification(d2l.Module):
     def __init__(self):
         super().__init__()
-
-
-# Defined in file: ./chapter_linear-networks/classification.md
-@d2l.add_to_class(Classification)
-def training_step(self, batch):
-    X, y = batch
-    l = self.loss(self(X), y)
-    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
-    self.board.xlabel = 'epoch'
-    self.board.draw(epoch, l, 'train_loss', every_n=50)
-    return l
+        
+    def training_step(self, batch):
+        X, y = batch
+        l = self.loss(self(X), y)
+        epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
+        self.board.xlabel = 'epoch'
+        self.board.draw(epoch, l, 'train_loss', every_n=50)
+        return l
 
 
 # Defined in file: ./chapter_linear-networks/classification.md
@@ -371,6 +368,12 @@ def validation_step(self, batch):
 
 # Defined in file: ./chapter_linear-networks/classification.md
 @d2l.add_to_class(Classification)
+def configure_optimizers(self):
+    return torch.optim.SGD(self.parameters(), lr=self.lr)
+
+
+# Defined in file: ./chapter_linear-networks/classification.md
+@d2l.add_to_class(Classification)
 def accuracy(self, y_hat, y):
     """Compute the number of correct predictions."""
     if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
@@ -379,10 +382,11 @@ def accuracy(self, y_hat, y):
     return d2l.reduce_mean(d2l.astype(cmp, d2l.float32))
 
 
-# Defined in file: ./chapter_linear-networks/classification.md
-@d2l.add_to_class(Classification)
-def configure_optimizers(self):
-    return torch.optim.SGD(self.parameters(), lr=self.lr)
+# Defined in file: ./chapter_linear-networks/softmax-regression-concise.md
+@d2l.add_to_class(d2l.Classification)
+def loss(self, y_hat, y):
+    l = nn.CrossEntropyLoss()
+    return l(y_hat, y)
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md

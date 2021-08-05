@@ -1,11 +1,11 @@
 # The D2L APIs
 :label:`sec_d2l_apis`
 
-The linear regression model is one of the simplest machine learning models. 
+The linear regression model is one of the simplest machine learning models.
 Training this model, however, shares the same components as other model trainings in the rest of this book.
 Therefore,
-before diving into the code implementation, 
-let us first explain how we organize our code through this book. 
+before diving into the code implementation,
+let us first explain how we organize our code through this book.
 It will make you easier to read our code and even use it in your projects.
 
 The foundation of our code consists of three classes: `Module` for models, losses and optimization methods, `DataModule` for training and validation data loaders, and `Trainer` glues `Module` and `DataModule` to train the models on various hardware. Most code in the rest of this book is in subclasses of `Module` and `DataModule`.
@@ -37,7 +37,7 @@ import tensorflow as tf
 ## Utilities
 
 
-Let's first introduce utility functions and classes. 
+Let's first introduce utility functions and classes.
 We will adopt the object-oriented programming that is common for Python libraries. It's, however, used less in notebooks where we often keep a code block short for readability. The first utility function allows to register a function to a class defined in a previous code block. So now we can split the implementation of a class into multiple code blocks.
 
 ```{.python .input}
@@ -104,7 +104,7 @@ class ProgressBoard(d2l.HyperParameters):  #@save
                  fig=None, axes=None, figsize=(3.5, 2.5)):
         self.save_hyperparameters()
 
-    def draw(x, y, label, every_n=1):
+    def draw(self, x, y, label, every_n=1):
         raise NotImplemented
 ```
 
@@ -120,7 +120,7 @@ for x in np.arange(0, 10, 0.05):
 
 ## Model
 
-The `Module` class  is the base class of all models we will implement. Minimally we need to define three methods. The `__init__` method stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, the `configure_optimizers` method returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation metrics. 
+The `Module` class  is the base class of all models we will implement. Minimally we need to define three methods. The `__init__` method stores the learnable parameters, the `training_step` method accepts a data batch to return the loss value, the `configure_optimizers` method returns the optimization method, or a list of them, that is used to update the learnable parameters. Optionally we can define `validation_step` to report the evaluation metrics.
 Sometimes we put the code to compute the outputs into a separate `forward` method to make it more reusable.
 
 ```{.python .input}
@@ -129,13 +129,13 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
     def __init__(self):
         super().__init__()
         self.board = ProgressBoard()
-        
+
     def training_step(self, batch):
         raise NotImplementedError
 
     def validaton_step(self, batch):
         pass
-    
+
     def configure_optimizers(self):
         raise NotImplementedError
 ```
@@ -147,12 +147,12 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
         super().__init__()
         self.board = ProgressBoard()
         self.training = None
-        
+
     def call(self, inputs, training=None):
         if training is not None:
             self.training = training
         return self.forward(inputs)
-    
+
     def training_step(self, batch):
         raise NotImplementedError
 
@@ -164,23 +164,23 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 ```
 
 :begin_tab:`mxnet`
-You may notice that `Module` is a subclass of `nn.Block`, the base class of neural network in Gluon. 
+You may notice that `Module` is a subclass of `nn.Block`, the base class of neural network in Gluon.
 It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this function by `a(X)`. In other words, it calls the `forward` method in the build-in `__call__` method. You can find more usages about `nn.Block` in :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`pytorch`
-You may notice that `Module` is a subclass of `nn.Module`, the base class of neural network in PyTorch. 
+You may notice that `Module` is a subclass of `nn.Module`, the base class of neural network in PyTorch.
 It provides convenient features to handle neural networks. For example, if we define a `forward` method, such as `forward(self, X)`, then for an instance `a` we can invoke this function by `a(X)`. In other words, it calls the `forward` method in the build-in `__call__` method. You can find more usages about `nn.Block` in :numref:`sec_model_construction`.
 :end_tab:
 
 :begin_tab:`tensorflow`
-You may notice that `Module` is a subclass of `tf.keras.Model`, the base class of neural network in TensorFlow. 
+You may notice that `Module` is a subclass of `tf.keras.Model`, the base class of neural network in TensorFlow.
 It provides convenient features to handle neural networks. For example, it calls the `call` method in the build-in `__call__` method. Here we redirect `call` to the `forward` function, and saving its argument as a class attribute. We do it to make our code is more similar across different framework implementations.
 :end_tab:
 
 ##  Data
 
-The `DataModule` class is the base class for data. We often have the `__init__` function to prepare data, such as downloading and preprocessing the data. The `train_dataloader` returns the data loader for the training dataset. A data loader is a generator that yields a data batch each time. A data batch is then feed into the `training_step` method of `Module` to compute loss. There is an optional `val_dataloader` to return the validation dataset loader, 
+The `DataModule` class is the base class for data. We often have the `__init__` function to prepare data, such as downloading and preprocessing the data. The `train_dataloader` returns the data loader for the training dataset. A data loader is a generator that yields a data batch each time. A data batch is then feed into the `training_step` method of `Module` to compute loss. There is an optional `val_dataloader` to return the validation dataset loader,
 which yields data batches for the `validation_step` method in `Module`.
 
 ```{.python .input}
@@ -209,7 +209,7 @@ class DataModule(d2l.HyperParameters):  #@save
         pass
 ```
 
-## Training 
+## Training
 
 The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterate the data by `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
 
@@ -223,14 +223,14 @@ class Trainer(d2l.HyperParameters):  #@save
         self.train_dataloader = data.train_dataloader()
         self.val_dataloader = data.val_dataloader()
         self.num_train_batches = len(self.train_dataloader)
-        self.num_val_batches = (len(self.val_dataloader)  
+        self.num_val_batches = (len(self.val_dataloader)
                                 if self.val_dataloader is not None else 0)
-        
+
     def reset_counters(self):
         self.epoch = 0
         self.train_batch_idx = 0
-        self.val_batch_idx = 0        
-        
+        self.val_batch_idx = 0
+
     def fit(self, model, data):
         raise NotImplementedError
 ```

@@ -8,7 +8,7 @@ of deep learning frameworks
 made it much easier to implement linear regression
 in :numref:`sec_linear_concise`,
 we will find it similarly (or possibly more)
-convenient for implementing classification models. 
+convenient for implementing classification models.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -163,7 +163,7 @@ which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wi
 
 ```{.python .input}
 #@tab mxnet
-@d2l.add_to_class(SoftmaxRegression)
+@d2l.add_to_class(d2l.Classification)  #@save
 def loss(self, y_hat, y):
     l = gluon.loss.SoftmaxCrossEntropyLoss()
     return l(y_hat, y).mean()
@@ -171,16 +171,15 @@ def loss(self, y_hat, y):
 
 ```{.python .input}
 #@tab pytorch
-@d2l.add_to_class(SoftmaxRegression)
+@d2l.add_to_class(d2l.Classification)  #@save
 def loss(self, y_hat, y):
     l = nn.CrossEntropyLoss()
     return l(y_hat, y)
-
 ```
 
 ```{.python .input}
 #@tab tensorflow
-@d2l.add_to_class(SoftmaxRegression)
+@d2l.add_to_class(d2l.Classification)  #@save
 def loss(self, y_hat, y):
     l = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     return l(y, y_hat)
