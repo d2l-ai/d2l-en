@@ -62,7 +62,7 @@ But general classification problems do not come with natural orderings among the
 Fortunately, statisticians long ago invented a simple way
 to represent categorical data: the *one-hot encoding*.
 A one-hot encoding is a vector with as many components as we have categories.
-The component corresponding to particular instance's category is set to 1
+The component corresponding to a particular instance's category is set to 1
 and all other components are set to 0.
 In our case, a label $y$ would be a three-dimensional vector,
 with $(1, 0, 0)$ corresponding to "cat", $(0, 1, 0)$ to "chicken",
@@ -165,7 +165,7 @@ To interpret our outputs as probabilities,
 we must guarantee that (even on new data),
 they will be nonnegative and sum up to 1.
 Moreover, we need a training objective that encourages
-the model to estimate faithfully probabilities.
+the model to estimate probabilities faithfully.
 Of all instances when a classifier outputs 0.5,
 we hope that half of those examples
 will actually belong to the predicted class.

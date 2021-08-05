@@ -32,50 +32,43 @@ import tensorflow as tf
 ```
 
 ```{.python .input}
-#@tab all
-batch_size = 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-```
-
-## Initializing Model Parameters
-
-As mentioned in :numref:`sec_softmax`,
-[**the output layer of softmax regression
-is a fully connected layer.**]
-Therefore, to implement our model,
-we just need to add one fully connected layer
-with 10 outputs to our `Sequential`.
-Again, here, the `Sequential` is not really necessary,
-but we might as well form the habit since it will be ubiquitous
-when implementing deep models.
-Again, we initialize the weights at random
-with zero mean and standard deviation 0.01.
-
-```{.python .input}
-net = nn.Sequential()
-net.add(nn.Dense(10))
-net.initialize(init.Normal(sigma=0.01))
+#@tab mxnet
+class SoftmaxRegression(d2l.Classification):
+    def __init__(self, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Dense(num_outputs)
+        self.net.initialize()
+        
+    def forward(self, X):
+        return self.net(X)
 ```
 
 ```{.python .input}
 #@tab pytorch
-# PyTorch does not implicitly reshape the inputs. Thus we define the flatten
-# layer to reshape the inputs before the linear layer in our network
-net = nn.Sequential(nn.Flatten(), nn.Linear(784, 10))
+class SoftmaxRegression(d2l.Classification):
+    def __init__(self, num_inputs, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential(nn.Flatten(), 
+                                 nn.Linear(num_inputs, num_outputs))        
 
-def init_weights(m):
-    if type(m) == nn.Linear:
-        nn.init.normal_(m.weight, std=0.01)
-
-net.apply(init_weights);
+    def forward(self, X):
+        return self.net(X)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-net = tf.keras.models.Sequential()
-net.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
-weight_initializer = tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.01)
-net.add(tf.keras.layers.Dense(10, kernel_initializer=weight_initializer))
+class SoftmaxRegression(d2l.Classification):
+    def __init__(self, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = tf.keras.models.Sequential()
+        self.net.add(tf.keras.layers.Flatten())
+        self.net.add(tf.keras.layers.Dense(num_outputs))
+
+    def forward(self, X):
+        return self.net(X)
 ```
 
 ## Softmax Implementation Revisited
@@ -153,38 +146,29 @@ all at once inside the cross-entropy loss function,**]
 which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wiki/LogSumExp).
 
 ```{.python .input}
-loss = gluon.loss.SoftmaxCrossEntropyLoss()
+#@tab mxnet
+@d2l.add_to_class(SoftmaxRegression)
+def loss(self, y_hat, y):
+    l = gluon.loss.SoftmaxCrossEntropyLoss()
+    return l(y_hat, y).mean()
 ```
 
 ```{.python .input}
 #@tab pytorch
-loss = nn.CrossEntropyLoss()
+@d2l.add_to_class(SoftmaxRegression)
+def loss(self, y_hat, y):
+    l = nn.CrossEntropyLoss()
+    return l(y_hat, y)
+
 ```
 
 ```{.python .input}
 #@tab tensorflow
-loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-```
+@d2l.add_to_class(SoftmaxRegression)
+def loss(self, y_hat, y):
+    l = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    return l(y, y_hat)
 
-## Optimization Algorithm
-
-Here, we (**use minibatch stochastic gradient descent**)
-with a learning rate of 0.1 as the optimization algorithm.
-Note that this is the same as we applied in the linear regression example
-and it illustrates the general applicability of the optimizers.
-
-```{.python .input}
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})
-```
-
-```{.python .input}
-#@tab pytorch
-trainer = torch.optim.SGD(net.parameters(), lr=0.1)
-```
-
-```{.python .input}
-#@tab tensorflow
-trainer = tf.keras.optimizers.SGD(learning_rate=.1)
 ```
 
 ## Training
@@ -192,9 +176,20 @@ trainer = tf.keras.optimizers.SGD(learning_rate=.1)
 Next we [**call the training function defined**] (~~earlier~~) in :numref:`sec_softmax_scratch` to train the model.
 
 ```{.python .input}
+#@tab pytorch
+model = SoftmaxRegression(num_inputs=784, num_outputs=10, lr=0.1)
+```
+
+```{.python .input}
+#@tab mxnet, tensorflow
+model = SoftmaxRegression(num_outputs=10, lr=0.1)
+```
+
+```{.python .input}
 #@tab all
-num_epochs = 10
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+data = d2l.FashionMNIST(batch_size=256)
+trainer = d2l.Trainer(max_epochs=10)
+trainer.fit(model, data)
 ```
 
 As before, this algorithm converges to a solution

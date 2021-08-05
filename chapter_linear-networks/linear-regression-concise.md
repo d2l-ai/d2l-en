@@ -1,17 +1,17 @@
 # Concise Implementation of Linear Regression
 :label:`sec_linear_concise`
 
-Deep Learning has witnessed a Cambrian Explosion of sorts over the past decade. 
-The sheer number of techniques, applications and algorithms by far surpasses the 
+Deep Learning has witnessed a Cambrian Explosion of sorts over the past decade.
+The sheer number of techniques, applications and algorithms by far surpasses the
 progress of previous decades. This is due to a fortuitous combination of multiple
-factors, not the least due to the ease of implementation offered by a number 
-of open source deep learning frameworks. Caffe, DistBelief and Theano arguably represent the 
-first generation of such models :cite:`jia2014caffe,dean2012large,bergstra2010theano` that 
+factors, not the least due to the ease of implementation offered by a number
+of open source deep learning frameworks. Caffe, DistBelief and Theano arguably represent the
+first generation of such models :cite:`jia2014caffe,dean2012large,bergstra2010theano` that
 widespread adoption. In contrast to earlier (seminal) work such as SN2 (Simulateur Neuristique)
 which provided a Lisp-like programming experience
-:cite:`bottou1989cun` modern frameworks offer automatic differentiation and the convenience 
+:cite:`bottou1989cun` modern frameworks offer automatic differentiation and the convenience
 of Python. Frameworks allow us to automate and modularize
-the repetitive work of implementing gradient-based learning algorithms. 
+the repetitive work of implementing gradient-based learning algorithms.
 
 In :numref:`sec_linear_scratch`, we relied only on
 (i) tensors for data storage and linear algebra;
@@ -36,63 +36,11 @@ import numpy as np
 import torch
 ```
 
-```{.python .input}
+```{.python .input  n=1}
 #@tab tensorflow
 from d2l import tensorflow as d2l
 import numpy as np
 import tensorflow as tf
-```
-
-## Data
-
-To start, we generate the same dataset as in :numref:`sec_linear_scratch`.
-Rather than writing our own iterator,
-we can [**call the existing API in a framework to read data.**]
-We pass `features` and `labels` as arguments and specify `batch_size`
-when instantiating a data iterator object.
-The boolean value `is_train`
-indicates whether or not
-we want the data iterator object to shuffle the data
-on each epoch (pass through the dataset).
-
-```{.python .input}
-@d2l.add_to_class(d2l.SyntheticRegressionData)  #@save
-def train_dataloader(self):
-    dataset = gluon.data.ArrayDataset(self.X, self.y)
-    return gluon.data.DataLoader(dataset, self.batch_size, shuffle=True)
-```
-
-```{.python .input}
-#@tab pytorch
-@d2l.add_to_class(d2l.SyntheticRegressionData)  #@save
-def train_dataloader(self):
-    dataset = torch.utils.data.TensorDataset(self.X, self.y)
-    return torch.utils.data.DataLoader(dataset, self.batch_size, shuffle=True)
-```
-
-```{.python .input}
-#@tab tensorflow
-@d2l.add_to_class(d2l.SyntheticRegressionData)  #@save
-def train_dataloader(self):
-    return tf.data.Dataset.from_tensor_slices(
-        (self.X, self.y)).shuffle(buffer_size=1000).batch(self.batch_size)
-```
-
-```{.python .input}
-#@tab all
-data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2, batch_size=4)
-```
-
-Now we can use `data_iter` in much the same way as we called
-the `data_iter` function in :numref:`sec_linear_scratch`.
-To verify that it is working, we can read and print
-the first minibatch of examples.
-Comparing with :numref:`sec_linear_scratch`,
-here we use `iter` to construct a Python iterator and use `next` to obtain the first item from the iterator.
-
-```{.python .input}
-#@tab all
-next(iter(data.train_dataloader()))
 ```
 
 ## Defining the Model
@@ -112,7 +60,7 @@ but you would be a lousy web developer
 if you spent a month reinventing the wheel.
 
 For standard operations, we can [**use a framework's predefined layers,**]
-which allow us to focus 
+which allow us to focus
 on the layers used to construct the model
 rather than worrying about their implementation.
 We will first define a model `net`,
@@ -123,10 +71,10 @@ Given input data, a `Sequential` instance passes it through
 the first layer, in turn passing the output
 as the second layer's input and so forth.
 For now our model consists of only one layer (we are implementing a linear model after all).
-As such, we do not really need `Sequential`. 
+As such, we do not really need `Sequential`.
 But since nearly all of our future models
 will involve multiple layers,
-we use it anyway just to familiarize ourselves 
+we use it anyway just to familiarize ourselves
 with the workflow.
 
 Recall the architecture of a single-layer network as described in :numref:`fig_single_neuron`.
@@ -144,7 +92,7 @@ Hence we don't need to tell Gluon
 how many inputs go into this linear layer.
 When we first pass data through our model,
 e.g., when we execute `net(X)` later,
-Gluon will automatically infer the number of inputs to each layer and 
+Gluon will automatically infer the number of inputs to each layer and
 thus instantiate the correct model.
 We will describe how this works in more detail later.
 :end_tab:
@@ -172,10 +120,10 @@ We will describe how this works in more detail later.
 from mxnet.gluon import nn
 
 class LinearRegression(d2l.Module):  #@save
-    def __init__(self, num_inputs, num_outputs, lr):
+    def __init__(self, lr):
         super().__init__()
         self.save_hyperparameters()
-        self.net = nn.Dense(num_outputs)
+        self.net = nn.Dense(1)
         self.net.initialize()
 ```
 
@@ -185,113 +133,34 @@ class LinearRegression(d2l.Module):  #@save
 from torch import nn
 
 class LinearRegression(d2l.Module):  #@save
-    def __init__(self, num_inputs, num_outputs, lr):
+    def __init__(self, num_inputs, lr):
         super().__init__()
         self.save_hyperparameters()
-        self.net = nn.Linear(num_inputs, num_outputs)
+        self.net = nn.Linear(num_inputs, 1)
 ```
 
-```{.python .input}
+```{.python .input  n=2}
 #@tab tensorflow
 # `keras` is the high-level API for TensorFlow
 
 class LinearRegression(d2l.Module):  #@save
-    def __init__(self, num_inputs, num_outputs, lr):
+    def __init__(self, lr):
         super().__init__()
         self.save_hyperparameters()
-        self.net = tf.keras.layers.Dense(num_outputs)
+        self.net = tf.keras.layers.Dense(1)
 ```
-
-## Initializing Model Parameters
-
-Before using `net`, we need to (**initialize the model parameters,**)
-such as the weights and bias in the linear regression model.
-Deep learning frameworks often have a predefined way to initialize the parameters.
-Here we specify that each weight parameter
-should be randomly sampled from a normal distribution
-with mean 0 and standard deviation 0.01.
-The bias parameter will be initialized to zero.
-
-:begin_tab:`mxnet`
-We will import the `initializer` module from MXNet.
-This module provides various methods for model parameter initialization.
-Gluon makes `init` available as a shortcut (abbreviation)
-to access the `initializer` package.
-We only specify how to initialize the weight by calling `init.Normal(sigma=0.01)`.
-Bias parameters are initialized to zero by default.
-:end_tab:
-
-:begin_tab:`pytorch`
-As we have specified the input and output dimensions when constructing `nn.Linear`,
-now we can access the parameters directly to specify their initial values.
-We first locate the layer by `net[0]`, which is the first layer in the network,
-and then use the `weight.data` and `bias.data` methods to access the parameters.
-Next we use the replace methods `normal_` and `fill_` to overwrite parameter values.
-:end_tab:
-
-:begin_tab:`tensorflow`
-The `initializers` module in TensorFlow provides various methods for model parameter initialization. The easiest way to specify the initialization method in Keras is when creating the layer by specifying `kernel_initializer`. Here we recreate `net` again.
-:end_tab:
-
-```{.python .input}
-#from mxnet import init
-#net.initialize(init.Normal(sigma=0.01))
-```
-
-```{.python .input}
-#@tab tensorflow
-#initializer = tf.initializers.RandomNormal(stddev=0.01)
-#net = tf.keras.Sequential()
-#net.add(tf.keras.layers.Dense(1, kernel_initializer=initializer))
-```
-
-:begin_tab:`mxnet`
-The code above may look straightforward but you should note
-that something strange is happening here.
-We are initializing parameters for a network
-even though Gluon does not yet know
-how many dimensions the input will have!
-It might be 2 as in our example or it might be 2000.
-Gluon lets us get away with this because behind the scene,
-the initialization is actually *deferred*.
-The real initialization will take place only
-when we for the first time attempt to pass data through the network.
-Just be careful to remember that since the parameters
-have not been initialized yet,
-we cannot access or manipulate them.
-:end_tab:
-
-:begin_tab:`pytorch`
-
-:end_tab:
-
-:begin_tab:`tensorflow`
-The code above may look straightforward but you should note
-that something strange is happening here.
-We are initializing parameters for a network
-even though Keras does not yet know
-how many dimensions the input will have!
-It might be 2 as in our example or it might be 2000.
-Keras lets us get away with this because behind the scenes,
-the initialization is actually *deferred*.
-The real initialization will take place only
-when we for the first time attempt to pass data through the network.
-Just be careful to remember that since the parameters
-have not been initialized yet,
-we cannot access or manipulate them.
-:end_tab:
 
 ## Loss Function
 
 :begin_tab:`mxnet`
-The `loss` module defines many useful loss functions. For speed and convenience 
-we forgo implementing our own and choose the built-in `loss.L2Loss` instead. $L_2$ loss is a bit 
-of a misnomer, albeit a pervasive one in deep learning, since we are simply computing the mean squared error, i.e., the squared distance between estimates and labels. It has very little to do with the space of Lebesque-measurable functions, denoted by $L_2$ in mathematics. 
+The `loss` module defines many useful loss functions. For speed and convenience
+we forgo implementing our own and choose the built-in `loss.L2Loss` instead. $L_2$ loss is a bit
+of a misnomer, albeit a pervasive one in deep learning, since we are simply computing the mean squared error, i.e., the squared distance between estimates and labels. It has very little to do with the space of Lebesque-measurable functions, denoted by $L_2$ in mathematics.
 :end_tab:
 
 :begin_tab:`pytorch`
 [**The `MSELoss` class computes the mean squared error.**]
-By default it returns the average loss over examples. It is faster (and easier to use) than implementing our own. 
+By default it returns the average loss over examples. It is faster (and easier to use) than implementing our own.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -309,38 +178,42 @@ def forward(self, X):
 
 ```{.python .input}
 @d2l.add_to_class(LinearRegression)
-def training_step(self, batch, batch_idx):
+def training_step(self, batch):
     X, y = batch
     loss = gluon.loss.L2Loss()
     l = loss(self(X), y).mean()
-    self.board.draw({'step':batch_idx, 'loss':l}, every_n=10)
+    self.board.xlabel = 'step'
+    self.board.draw(self.trainer.train_batch_idx, l, 'loss', every_n=10)
     return l
 ```
 
 ```{.python .input}
 #@tab pytorch
 @d2l.add_to_class(LinearRegression)
-def training_step(self, batch, batch_idx):
+def training_step(self, batch):
     X, y = batch
     loss = nn.MSELoss()
     l = loss(self(X), y)
-    self.board.draw({'step':batch_idx, 'loss':l}, every_n=10)
+    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
+    self.board.xlabel = 'epoch'
+    self.board.draw(epoch, l, 'train_loss', every_n=50)
     return l
 ```
 
-```{.python .input}
+```{.python .input  n=3}
 #@tab tensorflow
 @d2l.add_to_class(LinearRegression)
-def call(self, X):
+def forward(self, X):
     """The linear regression model."""
     return self.net(X)
 
 @d2l.add_to_class(LinearRegression)
-def training_step(self, batch, batch_idx):
+def training_step(self, batch):
     X, y = batch
     loss = tf.keras.losses.MeanSquaredError()
     l = loss(self(X), y)
-    self.board.draw({'step':batch_idx, 'loss':l}, every_n=10)
+    self.board.xlabel = 'step'
+    self.board.draw(self.trainer.train_batch_idx, l, 'loss', every_n=10)
     return l
 ```
 
@@ -352,7 +225,7 @@ for optimizing neural networks
 and thus Gluon supports it alongside a number of
 variations on this algorithm through its `Trainer` class.
 When we instantiate `Trainer`,
-we specify the parameters to optimize over, 
+we specify the parameters to optimize over,
 obtainable from our model `net` via `net.collect_params()`,
 the optimization algorithm we wish to use (`sgd`),
 and a dictionary of hyperparameters
@@ -367,8 +240,8 @@ for optimizing neural networks
 and thus PyTorch supports it alongside a number of
 variations on this algorithm in the `optim` module.
 When we (**instantiate an `SGD` instance,**)
-we specify the parameters to optimize over, 
-obtainable from our net via `net.parameters()`, 
+we specify the parameters to optimize over,
+obtainable from our net via `net.parameters()`,
 with a dictionary of hyperparameters
 required by our optimization algorithm.
 Minibatch SGD just requires that
@@ -421,27 +294,37 @@ to the one we obtained by implementing everything from scratch.**]
 For some number of epochs,
 we will make a pass over the dataset (`train_data`),
 iteratively grabbing a minibatch of inputs
-and labels at a time. For each minibatch, the `fit` function of the trainer goes 
+and labels at a time. For each minibatch, the `fit` function of the trainer goes
 through the following steps:
 
 * Generate predictions by calling `net(X)` and calculate the loss `l` (the forward propagation).
 * Calculate gradients by running the backpropagation.
 * Update the model parameters by invoking our optimizer.
 
-For good measure, it also computes the loss after each epoch and print it to monitor progress. 
+For good measure, it also computes the loss after each epoch and print it to monitor progress.
+
+```{.python .input}
+#@tab pytorch
+model = LinearRegression(2, lr=0.03)
+```
+
+```{.python .input}
+#@tab mxnet, tensorflow
+model = LinearRegression(lr=0.03)
+```
 
 ```{.python .input}
 #@tab all
-model = LinearRegression(2, 1, lr=0.03)
-trainer = d2l.Trainer(3)
+data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
+trainer = d2l.Trainer(max_epochs=3)
 trainer.fit(model, data)
 ```
 
 As we can see, the algorithm converges very quickly, yielding an even lower loss
 than before, even though we implemented the same model. The solution for this mystery
-can be found in the SGD solver. As we will see in :ref:`chap_optimization`, the SGD solver 
-doesn't implement a vanilla Stochastic Gradient Descent algorithm but adds a number of improvements to 
-make it more robust and accelerate convergence. 
+can be found in the SGD solver. As we will see in :ref:`chap_optimization`, the SGD solver
+doesn't implement a vanilla Stochastic Gradient Descent algorithm but adds a number of improvements to
+make it more robust and accelerate convergence.
 
 Below, we [**compare the model parameters learned by training on finite data
 and the actual parameters**] that generated our dataset.
@@ -477,17 +360,17 @@ print(f'error in estimating b: {data.b - b}')
 
 ## Summary
 
-This section contains the first 'modern' implementation of a deep network that we encounter. By modern, we 
+This section contains the first 'modern' implementation of a deep network that we encounter. By modern, we
 mean an implementation that uses many of the conveniences afforded by a modern deep learning framework, such as Gluon, JAX, Keras, PyTorch, or Tensorflow :cite:`abadi2016tensorflow,paszke2019pytorch,frostig2018compiling,chen2015mxnet`. More to the point, we used framework-defaults for loading data, defining a layer, a loss function, an optimizer and a training loop. Whenever the framework provides all necessary features, this is the recommended way to proceed, since these components are typically heavily optimized. At the same time, we urge you not to forget that these modules *can* be implemented directly. This matters particularly for researchers at the bleeding edge of model development where not all components for a new model will not exist already in the researcher's Lego toolkit.
 
 :begin_tab:`mxnet`
 In Gluon, the `data` module provides tools for data processing, the `nn` module defines a large number of neural network layers, and the `loss` module defines many common loss functions. Moreover, the `initializer` gives access
-to many choices for parameter initialization. Conveniently for the user, 
+to many choices for parameter initialization. Conveniently for the user,
 dimensionality and storage are automatically inferred. A consequence of this lazy initialization is that you must not attempt to access parameters before they have been instantiated (and initialized).
 :end_tab:
 
 :begin_tab:`pytorch`
-In PyTorch, the `data` module provides tools for data processing, the `nn` module defines a large number of neural network layers and common loss functions. We can initialize the parameters by replacing their values with methods ending with `_`. Note that we need to specify the input dimensions of the network. While this is trivial for now, it can have significant knock-on effects when we want to design complex networks with many layers. Careful considerations of how to parametrize these networks is needed to allow portability. 
+In PyTorch, the `data` module provides tools for data processing, the `nn` module defines a large number of neural network layers and common loss functions. We can initialize the parameters by replacing their values with methods ending with `_`. Note that we need to specify the input dimensions of the network. While this is trivial for now, it can have significant knock-on effects when we want to design complex networks with many layers. Careful considerations of how to parametrize these networks is needed to allow portability.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -496,15 +379,15 @@ In TensorFlow, the `data` module provides tools for data processing, the `keras`
 
 ## Exercises
 
-1. How would you need to change the learning rate if you replace the aggregate loss over the minibatch 
+1. How would you need to change the learning rate if you replace the aggregate loss over the minibatch
    with an average over the loss on the minibatch?
-1. Review the framework documentation to see which loss functions are provided. In particular, 
+1. Review the framework documentation to see which loss functions are provided. In particular,
    replace the squared loss with Huber's robust loss function. That is, use the loss function
    $$l(y,y') = \begin{cases}|y-y'| -\frac{\sigma}{2} & \text{ if } |y-y'| > \sigma \\ \frac{1}{2 \sigma} (y-y')^2 & \text{ otherwise}\end{cases}$$
-1. How do you access the gradient of the linear part of the model, i.e., 
+1. How do you access the gradient of the linear part of the model, i.e.,
 1. How does the solution change if you change the learning rate and the number of epochs? Does it keep on improving?
 1. How does the solution change as you change the amount of data generated. $\sin x$
-    1. Plot the estimation error for $\hat{\mathbf{w}} - \mathbf{w}$ and $\hat{b} - b$ as a function of the amount of data. Hint: increase the amount of data logarithmically rather than linearly, i.e. 5, 10, 20, 50 ... 10,000 rather than 1,000, 2,000 ... 10,000. 
+    1. Plot the estimation error for $\hat{\mathbf{w}} - \mathbf{w}$ and $\hat{b} - b$ as a function of the amount of data. Hint: increase the amount of data logarithmically rather than linearly, i.e. 5, 10, 20, 50 ... 10,000 rather than 1,000, 2,000 ... 10,000.
     2. Why is the suggestion in the hint appropriate?
 
 
@@ -519,7 +402,3 @@ In TensorFlow, the `data` module provides tools for data processing, the `keras`
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/204)
 :end_tab:
-
-```{.python .input}
-
-```
