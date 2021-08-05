@@ -211,7 +211,7 @@ class DataModule(d2l.HyperParameters):  #@save
 
 ## Training 
 
-The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterate the data by `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters. 
+The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterate the data by `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
 
 ```{.python .input}
 #@tab all
@@ -238,4 +238,3 @@ class Trainer(d2l.HyperParameters):  #@save
 ## Summary
 
 - Most code in this book will be organized into `Trainer` and subclasses of `Module` and `DataModule`.
-

@@ -1,11 +1,10 @@
 # Linear Regression Implementation from Scratch
 :label:`sec_linear_scratch`
 
-Now that you understand the key ideas behind linear regression,
-we can begin to work through a hands-on implementation in code.
+Now we can begin to work through a hands-on implementation of linear regression in code. 
 In this section, (**we will implement the entire method from scratch,
-including the data pipeline, the model,
-the loss function, and the minibatch stochastic gradient descent optimizer.**)
+including the model,
+the loss function, the minibatch stochastic gradient descent optimizer, and the training function.**)
 While modern deep learning frameworks can automate nearly all of this work,
 implementing things from scratch is the only way
 to make sure that you really know what you are doing.
@@ -13,8 +12,6 @@ Moreover, when it comes time to customize models,
 defining our own layers or loss functions,
 understanding how things work under the hood will prove handy.
 In this section, we will rely only on tensors and automatic differentiation.
-For elegance of implementation we use a modular API inspired in its structure
-by [PyTorch Lightning](https://www.pytorchlightning.ai/).
 Later on, we will introduce a more concise implementation,
 taking advantage of bells and whistles of deep learning frameworks while retaining
 the structure of what follows below.
@@ -46,14 +43,16 @@ import tensorflow as tf
 (**we need to have some parameters in the first place.**)
 In the following we initialize weights by drawing
 random numbers from a normal distribution with mean 0
-and a standard deviation of 0.01. Moreover we set the bias to 0.
+and a standard deviation of 0.01. 
+The magic number 0.01 often works well in practice, but you can definitely specify a different value through the argument `sigma`.
+Moreover we set the bias to 0.
 
 ```{.python .input}
 class LinearRegressionScratch(d2l.Module):  #@save
-    def __init__(self, num_inputs, lr):
+    def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.w = d2l.normal(0, 0.01, size=(num_inputs, 1))
+        self.w = d2l.normal(0, sigma, size=(num_inputs, 1))
         self.b = d2l.zeros(1)
         self.w.attach_grad()
         self.b.attach_grad()
@@ -62,10 +61,10 @@ class LinearRegressionScratch(d2l.Module):  #@save
 ```{.python .input}
 #@tab pytorch
 class LinearRegressionScratch(d2l.Module):
-    def __init__(self, num_inputs, lr):
+    def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.w = torch.normal(0, 0.01, size=(num_inputs, 1),
+        self.w = torch.normal(0, sigma, size=(num_inputs, 1),
                               requires_grad=True)
         self.b = torch.zeros(1, requires_grad=True)
 ```
@@ -73,10 +72,10 @@ class LinearRegressionScratch(d2l.Module):
 ```{.python .input}
 #@tab tensorflow
 class LinearRegressionScratch(d2l.Module):
-    def __init__(self, num_inputs, lr):
+    def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        w = tf.random.normal((num_inputs, 1), 0, 0.01)
+        w = tf.random.normal((num_inputs, 1), 0, sigma)
         b = tf.zeros(1)
         self.w = tf.Variable(w, trainable=True)
         self.b = tf.Variable(b, trainable=True)
@@ -85,15 +84,6 @@ class LinearRegressionScratch(d2l.Module):
 After initializing our parameters,
 our next task is to update them until
 they fit the data sufficiently well.
-Each update requires taking the gradient
-of our loss function with respect to the parameters.
-Given this gradient, we can update each parameter
-in the direction that may reduce the loss.
-
-Since nobody wants to compute gradients explicitly
-(this is tedious and error prone),
-we use automatic differentiation,
-as introduced in :numref:`sec_autograd`.
 
 Next, we must [**define our model,
 relating its inputs and parameters to its outputs.**]
@@ -123,7 +113,8 @@ of :numref:`sec_linear_regression`.
 In the implementation, we need to transform the true value `y`
 into the predicted value's shape `y_hat`.
 The result returned by the following function
-will also have the same shape as `y_hat`.
+will also have the same shape as `y_hat`. 
+We also return the averaged loss value among all examples in the minibatch.  
 
 ```{.python .input}
 #@tab all
@@ -132,6 +123,9 @@ def mse(y_hat, y):  #@save
     loss = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
     return d2l.reduce_mean(loss)
 ```
+
+In a training step, we predict the value and then return the loss compared to the ground truth. 
+We draw the loss value in our progress plot, and average every 10 points for a smoother plot.  
 
 ```{.python .input}
 #@tab all
@@ -157,14 +151,25 @@ we estimate the gradient of the loss with respect to the parameters.
 Next, we update the parameters
 in the direction that may reduce the loss.
 
-The following code applies the update, given a set of parameters, a learning rate `lr`, and a batch size.
-Since the loss is calculated as a sum over the minibatch
-we normalize the step size by the `batch_size`,
-so that the magnitude of a typical step size
-does not depend on our choice of the batch size.
+The following code applies the update, given a set of parameters, a learning rate `lr`.
+Since our loss is computed as an average over the minibatch, we don't need to adjust the 
+learning rate against the batch size. 
 In later chapters we will investigate how learning rates should be adjusted
 for very large minibatches as they arise in distributed large scale learning.
 For now, though, we can ignore this dependency.
+
+:begin_tab:`mxnet`
+We define our `SGD` class to have a similar API as the built-in SGD optimizer. We update the parameters in the `step` method. It accepts a `batch_size` argument that can be ignored.
+:end_tab:
+
+:begin_tab:`pytorch`
+We define our `SGD` class to have a similar API as the built-in SGD optimizer. We update the parameters in the `step` method. The `zero_grad` method set all gradients to 0, which must be run before a backward step. 
+:end_tab:
+
+:begin_tab:`tensorflow`
+We define our `SGD` class to have a similar API as the built-in SGD optimizer. We update the parameters in the `apply_gradients` method. It accepts a list of parameter and gradient pairs. 
+:end_tab:
+
 
 ```{.python .input}
 class SGD(d2l.HyperParameters):  #@save
@@ -206,6 +211,8 @@ class SGD(d2l.HyperParameters):
             param.assign_sub(self.lr * grad)
 ```
 
+Then we let the `configure_optimizers` method return an instance of the `SGD` class.
+
 ```{.python .input}
 #@tab mxnet, pytorch
 @d2l.add_to_class(LinearRegressionScratch)
@@ -222,34 +229,12 @@ def configure_optimizers(self):
 
 ## Training
 
-Now that we have all of the parts in place (parameters, data, loss function, model, and optimizer),
+Now that we have all of the parts in place (parameters, loss function, model, and optimizer),
 we are ready to [**implement the main training loop.**]
 It is crucial that you understand this code well
 since it the archetype of almost all training loops in deep learning.
 
-In each iteration, we grab a minibatch of training examples,
-and pass them through our model to obtain a set of predictions.
-After calculating the loss, we initiate the backwards pass through the network,
-storing the gradients with respect to each parameter.
-Finally, we will call the optimization algorithm `sgd`
-to update the model parameters. In summary, we will execute the following loop:
-
-* Initialize parameters $(\mathbf{w}, b)$
-* Repeat until done
-    * Compute gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
-    * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
-
-In each *epoch*,
-we will iterate through the entire dataset,
-using the `data_iter` function, passing once
-through every example in the training set
-(assuming that the number of examples is divisible by the batch size).
-The number of epochs `num_epochs` and the learning rate `lr` are both hyperparameters,
-which we set here to 3 and 0.03, respectively.
-In general, setting hyperparameters is tricky
-and requires some adjustment for different problems and
-network architectures. We elide these details for now but revise them
-later in :numref:`chap_optimization`.
+In the `fit` method, we first get the training dataloader and validation dataloader from the argument `data`, reset all counters to 0, and obtain the optimizer. Then we train the model by `max_epochs` epochs.
 
 ```{.python .input}
 #@tab all
@@ -263,6 +248,23 @@ def fit(self, model, data):
     for self.epoch in range(self.max_epochs):
         self.fit_epoch(model, optim)
 ```
+
+In each *epoch*,
+we will iterate through the entire training dataset, passing once
+through every example
+(assuming that the number of examples is divisible by the batch size). 
+
+In each iteration, we grab a minibatch of training examples,
+and compute its loss through the model's `training_step` method. Next we compute the gradients with respect to each parameter. 
+Finally, we will call the optimization algorithm
+to update the model parameters. In summary, we will execute the following loop:
+
+* Initialize parameters $(\mathbf{w}, b)$
+* Repeat until done
+    * Compute gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
+    * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
+ 
+Recall that the synthetic regression dataset we generated in :numref:`sec_synthetic_data` doesn't provide a validation dataset. In most cases, however, we will use a validation dataset to measure our model quality. Here we pass the validation dataloader once in each epoch to measure the model performance. 
 
 ```{.python .input}
 #@tab pytorch
@@ -321,7 +323,12 @@ def fit_epoch(self, model, optim):
         self.val_batch_idx += 1
 ```
 
-Note the general pattern of taking a minibatch `batch`, computing the `loss`, followed by a gradient computation and lastly, the application of the gradient to the set of model parameters via an optimizer `optim`. The majority of deep learning training algorithms follows this pattern. Now that we defined the training loop, let's use it.
+Now we are ready to train the model. We first construct a synthetic dataset, and then model 
+with a learning rate `lr=0.03`. Next we fit the model with `max_epochs=3`. Both  the number of epochs and the learning rate are hyperparameters.
+In general, setting hyperparameters is tricky
+and requires some adjustment for different problems and
+network architectures. We elide these details for now but revise them
+later in :numref:`chap_optimization`.
 
 ```{.python .input}
 #@tab all
@@ -331,7 +338,7 @@ trainer = d2l.Trainer(max_epochs=3)
 trainer.fit(model, data)
 ```
 
-In this case, because we synthesized the dataset ourselves,
+Because we synthesized the dataset ourselves,
 we know precisely what the true parameters are.
 Thus, we can [**evaluate our success in training
 by comparing the true parameters
@@ -403,4 +410,3 @@ the the canonical structure of a training loop. In this process we built a data 
 [Discussions](https://discuss.d2l.ai/t/201)
 :end_tab:
 
-TODO, remove the below deprecated code

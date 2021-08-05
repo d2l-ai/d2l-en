@@ -1,7 +1,7 @@
 # Synthetic Regression Data
 :label:`synthetic_data`
 
-In this section, we will construct an artificial dataset according to a linear model with additive noise. We will use it to train the linear model. 
+In this section, we will construct an artificial dataset according to a linear model with additive noise. We will use it to train the linear model.
 
 ```{.python .input}
 %matplotlib inline
@@ -151,8 +151,7 @@ generated/processed on the fly. Next let's try to implement the same function us
 ## Concise Implementation of Loading Data
 
 Rather than writing our own iterator,
-we can [**call the existing API in a framework to load data.**] We first create a dataset with `X` and `y`, then specify the `batch_size`, and let the data loader to shuffle examples. 
-
+we can [**call the existing API in a framework to load data.**] We first create a dataset with `X` and `y`, then specify the `batch_size`, and let the data loader to shuffle examples.
 
 ```{.python .input}
 @d2l.add_to_class(SyntheticRegressionData)  #@save
@@ -177,14 +176,14 @@ def train_dataloader(self):
         buffer_size=self.num_examples).batch(self.batch_size)
 ```
 
-The usage is much the same way as before. 
+The usage is much the same way as before.
 
 ```{.python .input  n=4}
 #@tab all
 next(iter(data.train_dataloader()))
 ```
 
-Additional benefit is that the framework API implemented the built-in `__len__` method, so we can get the length, i.e. the number of batches.  
+Additional benefit is that the framework API implemented the built-in `__len__` method, so we can get the length, i.e. the number of batches.
 
 ```{.python .input}
 #@tab all
