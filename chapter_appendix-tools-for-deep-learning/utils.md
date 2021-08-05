@@ -81,6 +81,8 @@ def draw(self, x, y, label, every_n=1):
     if not self.xlabel: self.xlabel = self.x    
     axes.set_xlabel(self.xlabel)
     axes.set_ylabel(self.ylabel)
+    axes.set_xscale(self.xscale)
+    axes.set_yscale(self.yscale)
     axes.legend(plt_lines, labels)    
     display.display(self.fig)
     display.clear_output(wait=True)

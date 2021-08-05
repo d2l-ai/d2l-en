@@ -228,19 +228,31 @@ class Trainer(d2l.HyperParameters):
 
 # Defined in file: ./chapter_linear-networks/synthetic-regression-data.md
 class SyntheticRegressionData(d2l.DataModule):
-    def __init__(self, w, b, noise=0.01, num_examples=1000, batch_size=8):
+    def __init__(self, w, b, noise=0.01, num_examples=1000, 
+                 batch_size=8):
         super().__init__()
-        self.save_hyperparameters()
-        self.X = d2l.normal(0, 1, (num_examples, len(w)))
-        y = d2l.matmul(self.X, w) + b + d2l.normal(0, noise, (num_examples,))
-        self.y = d2l.reshape(y, (-1, 1))
+        self.save_hyperparameters()        
+        self.X = d2l.randn(num_examples, len(w))
+        noise = d2l.randn(num_examples, 1) * noise
+        self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 
 
 # Defined in file: ./chapter_linear-networks/synthetic-regression-data.md
+def tensorloader(tensors, batch_size, shuffle):
+    dataset = torch.utils.data.TensorDataset(*tensors)
+    return torch.utils.data.DataLoader(dataset, batch_size, shuffle=shuffle)
 @d2l.add_to_class(SyntheticRegressionData)
 def train_dataloader(self):
-    dataset = torch.utils.data.TensorDataset(self.X, self.y)
-    return torch.utils.data.DataLoader(dataset, self.batch_size, shuffle=True)
+    return tensorloader((self.X, self.y), self.batch_size, shuffle=True)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+class LinearRegressionScratch(d2l.Module):
+    def __init__(self, num_inputs, lr, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        self.w = d2l.randn(num_inputs, 1, requires_grad=True)
+        self.b = d2l.zeros(1, requires_grad=True)
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -248,6 +260,22 @@ def mse(y_hat, y):
     """Squared loss."""
     loss = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
     return d2l.reduce_mean(loss)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+class SGD(d2l.HyperParameters):
+    def __init__(self, params, lr):
+        """Minibatch stochastic gradient descent."""
+        self.save_hyperparameters()
+
+    def step(self):
+        for param in self.params:
+            param -= self.lr * param.grad
+
+    def zero_grad(self):
+        for param in self.params:
+            if param.grad is not None:
+                param.grad.zero_()
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -288,6 +316,41 @@ class LinearRegression(d2l.Module):
         super().__init__()
         self.save_hyperparameters()
         self.net = nn.Linear(num_inputs, 1)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def forward(self, X):
+    """The linear regression model."""
+    return self.net(X)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def loss(self, y_hat, y):
+    fn = nn.MSELoss()
+    return fn(y_hat, y)
+@d2l.add_to_class(LinearRegression)
+def training_step(self, batch):
+    X, y = batch
+    l = self.loss(self(X), y)
+    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
+    self.board.xlabel = 'epoch'
+    self.board.yscale = 'log'
+    self.board.draw(epoch, l, 'train_loss', every_n=10)
+    return l
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def configure_optimizers(self):
+    return torch.optim.SGD(self.parameters(), self.lr)        
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def get_w_b(self):    
+    return (self.net.weight.data, self.net.bias.data)
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
@@ -390,15 +453,12 @@ def loss(self, y_hat, y):
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
-def evaluate_loss(net, data_iter, loss):
-    """Evaluate the loss of a model on the given dataset."""
-    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
-    for X, y in data_iter:
-        out = net(X)
-        y = d2l.reshape(y, out.shape)
-        l = loss(out, y)
-        metric.add(d2l.reduce_sum(l), d2l.size(l))
-    return metric[0] / metric[1]
+@d2l.add_to_class(d2l.LinearRegression)
+def validation_step(self, batch):
+    X, y = batch
+    l = self.loss(self(X), y)
+    self.board.draw(self.trainer.epoch+1, l, 'val_loss',
+                    every_n=self.trainer.num_val_batches)
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
@@ -2758,6 +2818,8 @@ def draw(self, x, y, label, every_n=1):
     if not self.xlabel: self.xlabel = self.x    
     axes.set_xlabel(self.xlabel)
     axes.set_ylabel(self.ylabel)
+    axes.set_xscale(self.xscale)
+    axes.set_yscale(self.yscale)
     axes.legend(plt_lines, labels)    
     display.display(self.fig)
     display.clear_output(wait=True)
@@ -2918,6 +2980,7 @@ exp = torch.exp
 log = torch.log
 normal = torch.normal
 rand = torch.rand
+randn = torch.randn
 matmul = torch.matmul
 int32 = torch.int32
 float32 = torch.float32

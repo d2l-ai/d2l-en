@@ -185,6 +185,7 @@ def val_dataloader(self):
 ```
 
 ```{.python .input}
+#@tab all
 X, y = next(iter(data.train_dataloader()))
 print(X.shape, X.dtype, y.shape, y.dtype)
 ```
@@ -214,29 +215,19 @@ Here are [**the images and their corresponding labels**] (in text)
 for the first few examples in the training dataset.
 
 ```{.python .input}
-#@tab mxnet, pytorch
-@d2l.add_to_class(FashionMNIST)  #@save
-def visualize(self, batch, nrows=1, ncols=8, labels=[]):
-    X, y = batch
-    if not labels:
-        labels = self.text_labels(y)
-    d2l.show_images(X.squeeze(1), nrows, ncols, titles=labels)
-```
-
-```{.python .input}
-#@tab tensorflow
-@d2l.add_to_class(FashionMNIST)  #@save
-def visualize(self, batch, nrows=1, ncols=8, labels=[]):
-    X, y = batch
-    if not labels:
-        labels = self.text_labels(y)
-    d2l.show_images(X, nrows, ncols, titles=labels)
-```
-
-```{.python .input}
 #@tab all
+@d2l.add_to_class(FashionMNIST)  #@save
+def visualize(self, batch, nrows=1, ncols=8, labels=[]):
+    X, y = batch
+    if not labels:
+        labels = self.text_labels(y)
+    if d2l.USE_MXNET or d2l.USE_PYTORCH:
+        d2l.show_images(X.squeeze(1), nrows, ncols, titles=labels)
+    if d2l.USE_TENSORFLOW:
+        d2l.show_images(X, nrows, ncols, titles=labels)
+        
 batch = next(iter(data.val_dataloader()))
-data.visualize(batch)
+data.visualize(batch)        
 ```
 
 We are now ready to work with the Fashion-MNIST dataset in the sections that follow.

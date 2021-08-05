@@ -48,37 +48,24 @@ The magic number 0.01 often works well in practice, but you can definitely speci
 Moreover we set the bias to 0.
 
 ```{.python .input}
+#@tab all
 class LinearRegressionScratch(d2l.Module):  #@save
     def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.w = d2l.normal(0, sigma, size=(num_inputs, 1))
-        self.b = d2l.zeros(1)
-        self.w.attach_grad()
-        self.b.attach_grad()
-```
-
-```{.python .input}
-#@tab pytorch
-class LinearRegressionScratch(d2l.Module):
-    def __init__(self, num_inputs, lr, sigma=0.01):
-        super().__init__()
-        self.save_hyperparameters()
-        self.w = torch.normal(0, sigma, size=(num_inputs, 1),
-                              requires_grad=True)
-        self.b = torch.zeros(1, requires_grad=True)
-```
-
-```{.python .input}
-#@tab tensorflow
-class LinearRegressionScratch(d2l.Module):
-    def __init__(self, num_inputs, lr, sigma=0.01):
-        super().__init__()
-        self.save_hyperparameters()
-        w = tf.random.normal((num_inputs, 1), 0, sigma)
-        b = tf.zeros(1)
-        self.w = tf.Variable(w, trainable=True)
-        self.b = tf.Variable(b, trainable=True)
+        if d2l.USE_MXNET:
+            self.w = d2l.randn(num_inputs, 1) * sigma
+            self.b = d2l.zeros(1)
+            self.w.attach_grad()
+            self.b.attach_grad()
+        if d2l.USE_PYTORCH:
+            self.w = d2l.randn(num_inputs, 1, requires_grad=True)
+            self.b = d2l.zeros(1, requires_grad=True)
+        if d2l.USE_TENSORFLOW:
+            w = tf.random.normal((num_inputs, 1)) * sigma
+            b = tf.zeros(1)
+            self.w = tf.Variable(w, trainable=True)
+            self.b = tf.Variable(b, trainable=True)
 ```
 
 After initializing our parameters,
@@ -114,7 +101,7 @@ In the implementation, we need to transform the true value `y`
 into the predicted value's shape `y_hat`.
 The result returned by the following function
 will also have the same shape as `y_hat`. 
-We also return the averaged loss value among all examples in the minibatch.  
+We also return the averaged loss value among all examples in the minibatch.
 
 ```{.python .input}
 #@tab all
@@ -125,7 +112,7 @@ def mse(y_hat, y):  #@save
 ```
 
 In a training step, we predict the value and then return the loss compared to the ground truth. 
-We draw the loss value in our progress plot, and average every 10 points for a smoother plot.  
+We draw the loss value in our progress plot, and average every 10 points for a smoother plot.
 
 ```{.python .input}
 #@tab all
@@ -135,6 +122,7 @@ def training_step(self, batch):
     l = mse(self(X), y)    
     epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
     self.board.xlabel = 'epoch'
+    self.board.yscale = 'log'
     self.board.draw(epoch, l, 'loss', every_n=10)
     return l
 ```
@@ -170,61 +158,51 @@ We define our `SGD` class to have a similar API as the built-in SGD optimizer. W
 We define our `SGD` class to have a similar API as the built-in SGD optimizer. We update the parameters in the `apply_gradients` method. It accepts a list of parameter and gradient pairs. 
 :end_tab:
 
-
 ```{.python .input}
+#@tab mxnet, pytorch
 class SGD(d2l.HyperParameters):  #@save
     def __init__(self, params, lr):
         """Minibatch stochastic gradient descent."""
         self.save_hyperparameters()
 
-    def step(self, _):
-        for param in self.params:
-            param -= self.lr * param.grad
-```
+    if d2l.USE_MXNET:
+        def step(self, _):
+            for param in self.params:
+                param -= self.lr * param.grad
+    
+    if d2l.USE_PYTORCH:
+        def step(self):
+            for param in self.params:
+                param -= self.lr * param.grad
 
-```{.python .input}
-#@tab pytorch
-class SGD(d2l.HyperParameters):
-    def __init__(self, params, lr):
-        """Minibatch stochastic gradient descent."""
-        self.save_hyperparameters()
-
-    def step(self):
-        for param in self.params:
-            param -= self.lr * param.grad
-
-    def zero_grad(self):
-        for param in self.params:
-            if param.grad is not None:
-                param.grad.zero_()
+        def zero_grad(self):
+            for param in self.params:
+                if param.grad is not None:
+                    param.grad.zero_()
 ```
 
 ```{.python .input}
 #@tab tensorflow
-class SGD(d2l.HyperParameters):
+class SGD(d2l.HyperParameters):  #@save
     def __init__(self, lr):
         """Minibatch stochastic gradient descent."""
         self.save_hyperparameters()
-
+    
     def apply_gradients(self, grads_and_vars):
         for grad, param in grads_and_vars:
-            param.assign_sub(self.lr * grad)
+            param.assign_sub(self.lr * grad)        
 ```
 
 Then we let the `configure_optimizers` method return an instance of the `SGD` class.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab all
 @d2l.add_to_class(LinearRegressionScratch)
 def configure_optimizers(self):
-    return SGD([self.w, self.b], self.lr)
-```
-
-```{.python .input}
-#@tab tensorflow
-@d2l.add_to_class(LinearRegressionScratch)
-def configure_optimizers(self):
-    return SGD(self.lr)
+    if d2l.USE_MXNET or d2l.USE_PYTORCH:
+        return SGD([self.w, self.b], self.lr)
+    if d2l.USE_TENSORFLOW:
+        return SGD(self.lr)
 ```
 
 ## Training
@@ -264,7 +242,7 @@ to update the model parameters. In summary, we will execute the following loop:
     * Compute gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
     * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
  
-Recall that the synthetic regression dataset we generated in :numref:`sec_synthetic_data` doesn't provide a validation dataset. In most cases, however, we will use a validation dataset to measure our model quality. Here we pass the validation dataloader once in each epoch to measure the model performance. 
+Recall that the synthetic regression dataset we generated in :numref:`sec_synthetic_data` doesn't provide a validation dataset. In most cases, however, we will use a validation dataset to measure our model quality. Here we pass the validation dataloader once in each epoch to measure the model performance.
 
 ```{.python .input}
 #@tab pytorch
@@ -409,4 +387,3 @@ the the canonical structure of a training loop. In this process we built a data 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/201)
 :end_tab:
-

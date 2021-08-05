@@ -1,7 +1,7 @@
 # The Base Classification Model
 :label:`sec_classification`
 
-You may have noticed that our from scratch and concise implementation of linear regression are very similar to each other. The implementation of softmax regression will be similar as well. A large part of of models in this book is about classification. In this section, we will provide a base class for classification models to simplify our future code. 
+You may have noticed that our from scratch and concise implementation of linear regression are very similar to each other. The implementation of softmax regression will be similar as well. A large part of of models in this book is about classification. In this section, we will provide a base class for classification models to simplify our future code.
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -24,7 +24,7 @@ from IPython import display
 
 ## The `Classification` Class
 
-We define the `Classification` class in the following code block. It provides a `training_step` that is almost identical to the linear regression except for we compute loss through the `loss` method that will be defined in the future. 
+We define the `Classification` class in the following code block. It provides a `training_step` that is almost identical to the linear regression except for we compute loss through the `loss` method that will be defined in the future.
 
 ```{.python .input}
 #@tab all
@@ -41,7 +41,7 @@ class Classification(d2l.Module):  #@save
         return l
 ```
 
-We often use a validation dataset to measure model quality. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. Note that we draw points for every `num_val_batches` batches, so it means we report the averaged loss and accuracy on the whole validation datasets. These average numbers are not exact correct if the last batch contains less examples, but we ignore this tiny difference for code simplicity. 
+We often use a validation dataset to measure model quality. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. Note that we draw points for every `num_val_batches` batches, so it means we report the averaged loss and accuracy on the whole validation datasets. These average numbers are not exact correct if the last batch contains less examples, but we ignore this tiny difference for code simplicity.
 
 ```{.python .input}
 #@tab all
@@ -55,7 +55,7 @@ def validation_step(self, batch):
                         every_n=self.trainer.num_val_batches)
 ```
 
-Again, we use minibatch SGD as the optimizer. 
+Again, we use minibatch SGD as the optimizer.
 
 ```{.python .input}
 #@tab mxnet
@@ -121,4 +121,3 @@ def accuracy(self, y_hat, y):
 ## Summary
 
 - The `Classification` class contains shared methods for classification models. We only need to define the model, compute the predictions, and the loss function for future models
-

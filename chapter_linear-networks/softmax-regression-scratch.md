@@ -268,7 +268,6 @@ and the predictions from the model
 
 ```{.python .input}
 #@tab all
-
 wrong = d2l.astype(preds, y.dtype) != y
 X, y, preds = X[wrong], y[wrong], preds[wrong]
 labels = [a+'\n'+b for a, b in zip(

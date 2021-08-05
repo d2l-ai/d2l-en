@@ -222,19 +222,35 @@ class Trainer(d2l.HyperParameters):
 
 # Defined in file: ./chapter_linear-networks/synthetic-regression-data.md
 class SyntheticRegressionData(d2l.DataModule):
-    def __init__(self, w, b, noise=0.01, num_examples=1000, batch_size=8):
+    def __init__(self, w, b, noise=0.01, num_examples=1000, 
+                 batch_size=8):
         super().__init__()
-        self.save_hyperparameters()
+        self.save_hyperparameters()        
         self.X = tf.random.normal((num_examples, w.shape[0]))
-        y = d2l.matmul(self.X, tf.reshape(w, (-1, 1))) + b
-        self.y = y + tf.random.normal(y.shape, 0, noise)
+        noise = tf.random.normal((num_examples, 1)) * noise            
+        self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 
 
 # Defined in file: ./chapter_linear-networks/synthetic-regression-data.md
+def tensorloader(tensors, batch_size, shuffle):
+    shuffle_buffer = tensors[0].shape[0] if shuffle else 1
+    return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
+        buffer_size=shuffle_buffer).batch(self.batch_size)        
+
 @d2l.add_to_class(SyntheticRegressionData)
 def train_dataloader(self):
-    return tf.data.Dataset.from_tensor_slices((self.X, self.y)).shuffle(
-        buffer_size=self.num_examples).batch(self.batch_size)
+    return tensorloader((self.X, self.y), self.batch_size, shuffle=True)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+class LinearRegressionScratch(d2l.Module):
+    def __init__(self, num_inputs, lr, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        w = tf.random.normal((num_inputs, 1)) * sigma
+        b = tf.zeros(1)
+        self.w = tf.Variable(w, trainable=True)
+        self.b = tf.Variable(b, trainable=True)
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -242,6 +258,17 @@ def mse(y_hat, y):
     """Squared loss."""
     loss = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
     return d2l.reduce_mean(loss)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+class SGD(d2l.HyperParameters):
+    def __init__(self, lr):
+        """Minibatch stochastic gradient descent."""
+        self.save_hyperparameters()
+    
+    def apply_gradients(self, grads_and_vars):
+        for grad, param in grads_and_vars:
+            param.assign_sub(self.lr * grad)        
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -280,6 +307,43 @@ class LinearRegression(d2l.Module):
         super().__init__()
         self.save_hyperparameters()
         self.net = tf.keras.layers.Dense(1)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def forward(self, X):
+    """The linear regression model."""
+    return self.net(X)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def loss(self, y_hat, y):
+    fn = tf.keras.losses.MeanSquaredError()
+    return fn(y, y_hat)    
+    
+@d2l.add_to_class(LinearRegression)
+def training_step(self, batch):
+    X, y = batch
+    l = self.loss(self(X), y)
+    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
+    self.board.xlabel = 'epoch'
+    self.board.yscale = 'log'
+    self.board.draw(epoch, l, 'train_loss', every_n=10)
+    return l
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def configure_optimizers(self):
+    return tf.keras.optimizers.SGD(self.lr)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-concise.md
+@d2l.add_to_class(LinearRegression)
+def get_w_b(self):    
+    return (self.get_weights()[0], self.get_weights()[1])
+
 
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
@@ -331,6 +395,7 @@ def visualize(self, batch, nrows=1, ncols=8, labels=[]):
     if not labels:
         labels = self.text_labels(y)
     d2l.show_images(X, nrows, ncols, titles=labels)
+    
 
 
 # Defined in file: ./chapter_linear-networks/classification.md
@@ -382,13 +447,12 @@ def loss(self, y_hat, y):
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
-def evaluate_loss(net, data_iter, loss):
-    """Evaluate the loss of a model on the given dataset."""
-    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
-    for X, y in data_iter:
-        l = loss(net(X), y)
-        metric.add(d2l.reduce_sum(l), d2l.size(l))
-    return metric[0] / metric[1]
+@d2l.add_to_class(d2l.LinearRegression)
+def validation_step(self, batch):
+    X, y = batch
+    l = self.loss(self(X), y)
+    self.board.draw(self.trainer.epoch+1, l, 'val_loss',
+                    every_n=self.trainer.num_val_batches)
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
@@ -1528,6 +1592,8 @@ def draw(self, x, y, label, every_n=1):
     if not self.xlabel: self.xlabel = self.x    
     axes.set_xlabel(self.xlabel)
     axes.set_ylabel(self.ylabel)
+    axes.set_xscale(self.xscale)
+    axes.set_yscale(self.yscale)
     axes.legend(plt_lines, labels)    
     display.display(self.fig)
     display.clear_output(wait=True)
