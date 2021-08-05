@@ -1,6 +1,8 @@
 # Synthetic Regression Data
 :label:`synthetic_data`
 
+In this section, we will construct an artificial dataset according to a linear model with additive noise. We will use it to train the linear model. 
+
 ```{.python .input}
 %matplotlib inline
 from d2l import mxnet as d2l
@@ -27,10 +29,6 @@ import random
 
 ## Generating the Dataset
 
-To keep things simple, we [**construct an artificial dataset
-according to a linear model with additive noise.**]
-Our task will be to recover the model parameters
-using the finite number of samples in our dataset.
 We keep the data low-dimensional so we can visualize it easily.
 In the following code snippet, we generate
 1000 examples, each consisting of 2 features
@@ -38,16 +36,14 @@ drawn from a standard normal distribution.
 Thus the matrix of features is
 $\mathbf{X}\in \mathbb{R}^{1000 \times 2}$.
 
-(**The true parameters generating our true targets are
-$\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$.**)
-These are corrupted by additive noise $\epsilon$, drawn independently for each $\mathbf{x}$.
-As such, the synthetic labels satisfy:
+The synthetic labels are corrupted by additive noise $\epsilon$, drawn independently for each $\mathbf{x}$:
 
 (**$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon.$$**)
 
 For convenience we assume that $\epsilon$ arises from a normal distribution with mean of 0.
 To make our problem easy, we will set its standard deviation to $\sigma = 0.01$.
-The following code generates the synthetic dataset.
+
+We put the code into the `__init__` method of a subclass of `DataModule`, and allow the hyper-parameters configurable. The addition `batch_size` will be used later.
 
 ```{.python .input}
 #@tab mxnet, pytorch
@@ -71,11 +67,12 @@ class SyntheticRegressionData(d2l.DataModule):  #@save
         self.y = y + tf.random.normal(y.shape, 0, noise)
 ```
 
+We set the true parameters to 
+$\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$ to generate the data
+
 ```{.python .input}
 #@tab all
-w = d2l.tensor([2, -3.4])
-b = 4.2
-data = SyntheticRegressionData(w, b)
+data = SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 ```
 
 [**Each row in `features` consists of a vector in $\mathbb{R}^2$ and each row in `labels` is a scalar.**]
@@ -91,12 +88,8 @@ Training models consists of
 making multiple passes over the dataset,
 grabbing one minibatch of examples at a time,
 and using them to update our model.
-Since this process is so fundamental
-to training machine learning algorithms,
-it is worth defining a utility function
-to shuffle the dataset and access it in minibatches.
 
-In the following code, we [**define the `data_iter` function**] (~~that~~)
+In the following code, we [**define the `train_dataloader` function**] 
 to demonstrate one possible implementation of this functionality.
 It (**takes a batch size, a matrix of features,
 and a vector of labels, yielding minibatches of size `batch_size`.**)
@@ -128,13 +121,6 @@ def train_dataloader(self):
         yield tf.gather(self.X, j), tf.gather(self.y, j)
 ```
 
-In general we want to use reasonably sized minibatches
-to take advantage of the GPU, as it excels at parallel computation.
-Since examples can be fed through our models in parallel
-and the gradient of the loss function for each example can also be taken in parallel,
-GPUs allow us to process hundreds of examples in scarcely more time
-than it might take to process just a single example.
-
 To build some intuition, let's inspect the first minibatch of
 data. Each minibatch of features provides us both with its size and the dimensionality of input features.
 Likewise, our minibatch of labels will have a matching shape given by `batch_size`.
@@ -160,19 +146,13 @@ and that we perform lots of random memory access.
 The built-in iterators implemented in a deep learning framework
 are considerably more efficient and they can deal
 with sources such as data stored in files, data received via a stream, or data
-generated/processed on the fly.
+generated/processed on the fly. Next let's try to implement the same function using built-in iterators.
 
 ## Concise Implementation of Loading Data
 
-To start, we generate the same dataset as in :numref:`sec_linear_scratch`.
 Rather than writing our own iterator,
-we can [**call the existing API in a framework to read data.**]
-We pass `features` and `labels` as arguments and specify `batch_size`
-when instantiating a data iterator object.
-The boolean value `is_train`
-indicates whether or not
-we want the data iterator object to shuffle the data
-on each epoch (pass through the dataset).
+we can [**call the existing API in a framework to load data.**] We first create a dataset with `X` and `y`, then specify the `batch_size`, and let the data loader to shuffle examples. 
+
 
 ```{.python .input}
 @d2l.add_to_class(SyntheticRegressionData)  #@save
@@ -193,23 +173,18 @@ def train_dataloader(self):
 #@tab tensorflow
 @d2l.add_to_class(SyntheticRegressionData)  #@save
 def train_dataloader(self):
-    return tf.data.Dataset.from_tensor_slices(
-        (self.X, self.y)).shuffle(buffer_size=1000).batch(self.batch_size)
+    return tf.data.Dataset.from_tensor_slices((self.X, self.y)).shuffle(
+        buffer_size=self.num_examples).batch(self.batch_size)
 ```
 
-Now we can use `data_iter` in much the same way as we called
-the `data_iter` function in :numref:`sec_linear_scratch`.
-To verify that it is working, we can read and print
-the first minibatch of examples.
-Comparing with :numref:`sec_linear_scratch`,
-here we use `iter` to construct a Python iterator and use `next` to obtain the first item from the iterator.
+The usage is much the same way as before. 
 
 ```{.python .input  n=4}
 #@tab all
 next(iter(data.train_dataloader()))
 ```
 
-One benefit is that it has `__len__`
+Additional benefit is that the framework API implemented the built-in `__len__` method, so we can get the length, i.e. the number of batches.  
 
 ```{.python .input}
 #@tab all
@@ -218,3 +193,10 @@ len(data.train_dataloader())
 
 ## Summary
 
+- We can use a Python generator to yield a batch as a data loader.
+- We can use framework's APIs to build a dataset and then load it by batches
+
+## Exercises
+
+1. What will happen if the number of examples cannot be divided by the batch size. How to change this behavior by specifying a different argument by using framework's API.
+2. What if we want to generate a huge dataset, such as both the length of `w` and `num_examples` are very big numbers, that cannot hold in memory?
