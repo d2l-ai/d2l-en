@@ -15,15 +15,19 @@ or the number of days that a patient will remain hospitalized before being disch
 then you are probably looking for a regression model. Note, though, that even within
 regression models there are important distinctions. For instance, the price of a house
 will never be negative and changes might often be *relative* to its baseline price. As such, 
-it might be more effective to regress on the logarithm of the price. 
+it might be more effective to regress on the logarithm of the price. Likewise, the number of days a 
+patient spends in hospital is a *discrete nonnegative* random variable. As such, least mean squares 
+might not be an ideal approach either. As we can see, there's a lot more to estimation than just
+minimizing squared errors. 
 
-In practice, we are more often interested in *classification*:
+In this section we encounter a novel concept: *classification*. It deals with 
 asking not "how much" but "which one":
 
 * Does this email belong in the spam folder or the inbox?
 * Is this customer more likely *to sign up* or *not to sign up* for a subscription service?
 * Does this image depict a donkey, a dog, a cat, or a rooster?
 * Which movie is Aston most likely to watch next?
+* Which section of the book are you going to read next?
 
 Colloquially, machine learning practitioners
 overload the word *classification*
