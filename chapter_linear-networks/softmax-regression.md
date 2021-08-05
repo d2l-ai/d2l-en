@@ -398,7 +398,7 @@ by someone who knows the true probability,
 then you might be wondering, what is cross-entropy?
 The cross-entropy *from* $P$ *to* $Q$, denoted $H(P, Q)$,
 is the expected surprisal of an observer with subjective probabilities $Q$
-upon seeing data that were actually generated according to probabilities $P$.
+upon seeing data that was actually generated according to probabilities $P$.
 The lowest possible cross-entropy is achieved when $P=Q$.
 In this case, the cross-entropy from $P$ to $Q$ is $H(P, P)= H(P)$.
 

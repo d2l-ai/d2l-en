@@ -12,7 +12,7 @@ Imagine that you are watching movies on Netflix. As a good Netflix user, you dec
 
 In short, movie ratings are anything but stationary. Thus, using temporal dynamics
 led to more accurate movie recommendations :cite:`Koren.2009`.
-Of course, sequence data are not just about movie ratings. The following gives more illustrations.
+Of course, sequence data is not just about movie ratings. The following gives more illustrations.
 
 * Many users have highly particular behavior when it comes to the time when they open apps. For instance, social media apps are much more popular after school with students. Stock market trading apps are more commonly used when the markets are open.
 * It is much harder to predict tomorrow's stock prices than to fill in the blanks for a stock price we missed yesterday, even though both are just a matter of estimating one number. After all, foresight is so much harder than hindsight. In statistics, the former (predicting beyond the known observations) is called *extrapolation* whereas the latter (estimating between the existing observations) is called *interpolation*.

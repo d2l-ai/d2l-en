@@ -27,8 +27,7 @@ Moreover, compute-intensive, yet sequential operations are nontrivial to partiti
 
 
 Second, we could split the work layerwise. For instance, rather than computing 64 channels on a single GPU we could split up the problem across 4 GPUs, each of which generates data for 16 channels.
-Likewise, for a fully connected layer we could split the number of output units.
-:numref:`fig_alexnet_original` (taken from :cite:`Krizhevsky.Sutskever.Hinton.2012`)
+Likewise, for a fully connected layer we could split the number of output units. :numref:`fig_alexnet_original` (taken from :cite:`Krizhevsky.Sutskever.Hinton.2012`)
 illustrates this design, where this strategy was used to deal with GPUs that had a very small memory footprint (2 GB at the time).
 This allows for good scaling in terms of computation, provided that the number of channels (or units) is not too small.
 Besides,
@@ -395,7 +394,7 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 
 * There are multiple ways to split deep network training over multiple GPUs. We could split them between layers, across layers, or across data. The former two require tightly choreographed data transfers. Data parallelism is the simplest strategy.
 * Data parallel training is straightforward. However, it increases the effective minibatch size to be efficient.
-* In data parallelism, data are split across multiple GPUs, where each GPU executes its own forward and backward operation and subsequently gradients are aggregated and results are broadcast back to the GPUs.
+* In data parallelism, data is split across multiple GPUs, where each GPU executes its own forward and backward operation and subsequently gradients are aggregated and results are broadcast back to the GPUs.
 * We may use slightly increased learning rates for larger minibatches.
 
 ## Exercises

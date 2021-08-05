@@ -627,10 +627,10 @@ for i in range(1, 100):
 d2l.plot(tf.range(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
-## Conclusions
+## Discussion
 
 We now see exactly what we hoped for!
-After normalizing the matrices by the principle eigenvalue,
+After normalizing the matrices by the principal eigenvalue,
 we see that the random data does not explode as before,
 but rather eventually equilibrates to a specific value.
 It would be nice to be able to do these things from first principles,

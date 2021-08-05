@@ -294,7 +294,7 @@ given a standard set of features such as
 age, vital signs, and diagnoses.
 
 When every example is characterized by the same number of numerical values,
-we say that the data consist of fixed-length vectors
+we say that the data consists of fixed-length vectors
 and we describe the constant length of the vectors
 as the *dimensionality* of the data.
 As you might imagine, fixed-length can be a convenient property.
@@ -309,7 +309,7 @@ to all show up with the same resolution or shape.
 For images, we might consider cropping them all to a standard size,
 but that strategy only gets us so far.
 We risk losing information in the cropped out portions.
-Moreover, text data resist fixed-length representations even more stubbornly.
+Moreover, text data resists fixed-length representations even more stubbornly.
 Consider the customer reviews left on e-commerce sites
 such as Amazon, IMDB, and TripAdvisor.
 Some are short: "it stinks!". 
@@ -329,7 +329,7 @@ but are no better than traditional approaches.
 
 Finally, it is not enough to have lots of data and to process it cleverly.
 We need the *right* data. 
-If the data are full of mistakes,
+If the data is full of mistakes,
 or if the chosen features are not predictive
 of the target quantity of interest, 
 learning is going to fail.
@@ -344,8 +344,8 @@ are unrepresented in the training data.
 Imagine applying a skin cancer recognition system in the wild
 that had never seen black skin before.
 Failure can also occur when the data
-do not merely under-represent some groups
-but reflect societal prejudices.
+does not merely under-represent some groups
+but reflects societal prejudices.
 For example, 
 if past hiring decisions are used to train a predictive model
 that will be used to screen resumes,
@@ -1080,7 +1080,7 @@ are both classification tasks
 ### Interacting with an Environment
 
 So far, we have not discussed where data actually
-come from,
+comes from,
 or what actually happens when a machine learning model generates an output.
 That is because supervised learning and unsupervised learning
 do not address these issues in a very sophisticated way.
@@ -1661,7 +1661,7 @@ natural language processing, medical informatics, and other application areas,
 offering a unified set of tools for tackling diverse problems.
 
 Beyond end-to-end training, 
-we are experiencing a transition from parametric statistical descriptions to fully nonparametric models. When data are scarce, one needs to rely on simplifying assumptions about reality in order to obtain useful models. When data are abundant, this can be replaced by nonparametric models that fit reality more accurately. To some extent, this mirrors the progress that physics experienced in the middle of the previous century with the availability of computers. Rather than solving parametric approximations of how electrons behave by hand, one can now resort to numerical simulations of the associated partial differential equations. This has led to much more accurate models, albeit often at the expense of explainability.
+we are experiencing a transition from parametric statistical descriptions to fully nonparametric models. When data is scarce, one needs to rely on simplifying assumptions about reality in order to obtain useful models. When data is abundant, this can be replaced by nonparametric models that fit reality more accurately. To some extent, this mirrors the progress that physics experienced in the middle of the previous century with the availability of computers. Rather than solving parametric approximations of how electrons behave by hand, one can now resort to numerical simulations of the associated partial differential equations. This has led to much more accurate models, albeit often at the expense of explainability.
 
 Another difference to previous work is the acceptance of suboptimal solutions, dealing with nonconvex nonlinear optimization problems, and the willingness to try things before proving them. This newfound empiricism in dealing with statistical problems, combined with a rapid influx of talent has led to rapid progress of practical algorithms, albeit in many cases at the expense of modifying and re-inventing tools that existed for decades.
 

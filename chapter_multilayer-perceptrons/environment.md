@@ -4,7 +4,7 @@ In the previous sections, we worked through
 a number of hands-on applications of machine learning,
 fitting models to a variety of datasets.
 And yet, we never stopped to contemplate
-either where data come from in the first place
+either where data comes from in the first place
 or what we plan to ultimately do
 with the outputs from our models.
 Too often, machine learning developers
@@ -63,7 +63,7 @@ To begin, we stick with the passive prediction setting
 considering the various ways that data distributions might shift
 and what might be done to salvage model performance.
 In one classic setup, we assume that our training data
-were sampled from some distribution $p_S(\mathbf{x},y)$
+was sampled from some distribution $p_S(\mathbf{x},y)$
 but that our test data will consist
 of unlabeled examples drawn from
 some different distribution $p_T(\mathbf{x},y)$.
@@ -240,7 +240,7 @@ In short, they wasted a significant sum of money.
 Say a company wanted to leverage machine learning
 for developing self-driving cars.
 One key component here is a roadside detector.
-Since real annotated data are expensive to get,
+Since real annotated data is expensive to get,
 they had the (smart and questionable) idea
 to use synthetic data from a game rendering engine
 as additional training data.
@@ -279,7 +279,7 @@ Below are some typical cases.
 
 ### More Anecdotes
 
-* We build a face detector. It works well on all benchmarks. Unfortunately it fails on test data---the offending examples are close-ups where the face fills the entire image (no such data were in the training set).
+* We build a face detector. It works well on all benchmarks. Unfortunately it fails on test data---the offending examples are close-ups where the face fills the entire image (no such data was in the training set).
 * We build a Web search engine for the US market and want to deploy it in the UK.
 * We train an image classifier by compiling a large dataset where each among a large set of classes is equally represented in the dataset, say 1000 categories, represented by 1000 images each. Then we deploy the system in the real world, where the actual label distribution of photographs is decidedly non-uniform.
 
@@ -521,7 +521,7 @@ where our model predicted $i$.
 
 It turns out that under some mild conditions---if
 our classifier was reasonably accurate in the first place,
-and if the target data contain only categories
+and if the target data contains only categories
 that we have seen before,
 and if the label shift assumption holds in the first place
 (the strongest assumption here),
