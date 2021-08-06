@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Model Selection, Underfitting, and Overfitting
 :label:`sec_model_selection`
 
@@ -389,6 +394,7 @@ We can now (**explore these concepts interactively
 by fitting polynomials to data.**)
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
@@ -397,7 +403,7 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
@@ -405,7 +411,7 @@ import math
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 import math
@@ -428,16 +434,16 @@ It allows us to avoid very large values for large exponents $i$.
 We will synthesize 100 samples each for the training set and test set.
 
 ```{.python .input}
-#@tab all
+%%tab all
 class Data(d2l.DataModule):
     def __init__(self, num_train, num_val, num_inputs, batch_size):
         self.save_hyperparameters()        
         p, n = max(3, self.num_inputs), num_train + num_val
         w = d2l.tensor([1.2, -3.4, 5.6] + [0]*(p-3))
-        if d2l.USE_MXNET or d2l.USE_PYTORCH:
+        if tab.selected('mxnet') or tab.selected('pytorch'):
             x = d2l.randn(n, 1)
             noise = d2l.randn(n, 1) * 0.1
-        if d2l.USE_TENSORFLOW:
+        if tab.selected('tensorflow'):
             x = d2l.normal((n, 1))
             noise = d2l.normal((n, 1)) * 0.1
         X = d2l.concat([x ** (i+1) / math.gamma(i+2) for i in range(p)], 1)
@@ -455,7 +461,7 @@ class Data(d2l.DataModule):
 We will reuse the linear regression model defined in :numref:`sec_linear_concise`. Recall that we didn't implement the validation step yet, here we register the `validation_step` method.
 
 ```{.python .input}
-#@tab all
+%%tab all
 @d2l.add_to_class(d2l.LinearRegression)  #@save
 def validation_step(self, batch):
     X, y = batch
@@ -480,11 +486,11 @@ The learned model parameters are also close
 to the true values $w = [1.2, -3.4, 5.6], b=5$.
 
 ```{.python .input}
-#@tab all
+%%tab all
 def train(p):
-    if d2l.USE_MXNET or d2l.USE_TENSORFLOW:
+    if tab.selected('mxnet') or tab.selected('tensorflow'):
         model = d2l.LinearRegression(lr=0.01)
-    if d2l.USE_PYTORCH:
+    if tab.selected('pytorch'):
         model = d2l.LinearRegression(p, lr=0.01)
     model.board.ylim = [1, 1e2]
     data = Data(200, 200, p, 20)
@@ -508,7 +514,7 @@ When used to fit nonlinear patterns
 linear models are liable to underfit.
 
 ```{.python .input}
-#@tab all
+%%tab all
 train(p=1)
 ```
 
@@ -527,7 +533,7 @@ It shows that
 the complex model overfits the data.
 
 ```{.python .input}
-#@tab all
+%%tab all
 train(p=10)
 ```
 

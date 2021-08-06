@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Weight Decay
 :label:`sec_weight_decay`
 
@@ -180,6 +185,7 @@ weight decay
 through a simple synthetic example.
 
 ```{.python .input}
+%%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -188,7 +194,7 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
 import torch
@@ -196,7 +202,7 @@ from torch import nn
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -214,15 +220,15 @@ we can increase the dimensionality of our problem to $d = 200$
 and work with a small training set containing only 20 examples.
 
 ```{.python .input}
-#@tab all
+%%tab all
 class Data(d2l.DataModule):
     def __init__(self, num_train, num_val, num_inputs, batch_size):
         self.save_hyperparameters()                
         n = num_train + num_val 
-        if d2l.USE_MXNET or d2l.USE_PYTORCH:
+        if tab.selected('mxnet') or tab.selected('pytorch'):
             self.X = d2l.randn(n, num_inputs)
             noise = d2l.randn(n, 1) * 0.01
-        if d2l.USE_TENSORFLOW:
+        if tab.selected('tensorflow'):
             self.X = d2l.normal((n, num_inputs))
             noise = d2l.normal((n, 1)) * 0.1
         w, b = d2l.ones((num_inputs, 1)) * 0.01, 0.05
@@ -249,16 +255,15 @@ Perhaps the most convenient way to implement this penalty
 is to square all terms in place and sum them up.
 
 ```{.python .input}
-#@tab all
+%%tab all
 def l2_penalty(w):
     return d2l.reduce_sum(w**2) / 2
 ```
 
 ### Defining the Model
 
-
 ```{.python .input}
-#@tab all
+%%tab all
 class WeightDecayScratch(d2l.LinearRegressionScratch):
     def __init__(self, num_inputs, lambd, lr, sigma=0.01):
         super().__init__(num_inputs, lr, sigma)
@@ -269,7 +274,7 @@ class WeightDecayScratch(d2l.LinearRegressionScratch):
 ```
 
 ```{.python .input}
-#@tab all
+%%tab all
 @d2l.add_to_class(d2l.LinearRegressionScratch)  #@save
 def validation_step(self, batch):
     X, y = batch
@@ -280,7 +285,7 @@ def validation_step(self, batch):
 ```
 
 ```{.python .input}
-#@tab all
+%%tab all
 data = Data(num_train=20, num_val=100, num_inputs=200, batch_size=5)
 trainer = d2l.Trainer(max_epochs=10)
 
@@ -300,7 +305,7 @@ decreasing the training error but not the
 test error---a textbook case of overfitting.
 
 ```{.python .input}
-#@tab all
+%%tab all
 train_scratch(0)
 ```
 
@@ -313,7 +318,7 @@ This is precisely the effect
 we expect from regularization.
 
 ```{.python .input}
-#@tab all
+%%tab all
 train_scratch(3)
 ```
 
@@ -360,7 +365,7 @@ through the `kernel_regularizer` argument.
 :end_tab:
 
 ```{.python .input}
-#@tab mxnet
+%%tab mxnet
 class WeightDecay(d2l.LinearRegression):
     def __init__(self, wd, lr):
         super().__init__(lr)
@@ -373,7 +378,7 @@ class WeightDecay(d2l.LinearRegression):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 class WeightDecay(d2l.LinearRegression):
     def __init__(self, num_inputs, wd, lr):
         super().__init__(num_inputs, lr)
@@ -386,7 +391,7 @@ class WeightDecay(d2l.LinearRegression):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class WeightDecay(d2l.LinearRegression):
     def __init__(self, wd, lr):
         super().__init__(lr)
@@ -406,10 +411,10 @@ a benefit that will become more
 pronounced for larger problems.
 
 ```{.python .input}
-#@tab all
-if d2l.USE_MXNET or d2l.USE_TENSORFLOW:    
+%%tab all
+if tab.selected('mxnet') or tab.selected('tensorflow'):    
     model = WeightDecay(wd=3, lr=0.003)
-if d2l.USE_PYTORCH:
+if tab.selected('pytorch'):
     model = WeightDecay(num_inputs=200, wd=3, lr=0.003)
     
 model.board.ylim = [1e-3, 1]
