@@ -1,25 +1,31 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Implementation of Multilayer Perceptrons from Scratch
 :label:`sec_mlp_scratch`
 
 Now that we have characterized
 multilayer perceptrons (MLPs) mathematically,
-let's try to implement one ourselves. 
+let's try to implement one ourselves.
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
@@ -48,7 +54,7 @@ As always, we allocate memory
 for the gradients of the loss with respect to these parameters.
 
 ```{.python .input}
-#@tab mxnet
+%%tab mxnet
 class MLPScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
         super().__init__()
@@ -66,7 +72,7 @@ class MLPScratch(d2l.Classification):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 class MLPScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
         super().__init__()
@@ -84,7 +90,7 @@ class MLPScratch(d2l.Classification):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class MLPScratch(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr, sigma=0.01):
         super().__init__()
@@ -105,19 +111,20 @@ using the maximum function rather than
 invoking the built-in `relu` function directly.
 
 ```{.python .input}
+%%tab mxnet
 def relu(X):
     return np.maximum(X, 0)
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 def relu(X):
     a = torch.zeros_like(X)
     return torch.max(X, a)
 ```
 
 ```{.python .input}
-#@tab tensorflow 
+%%tab tensorflow 
 def relu(X):
     return tf.math.maximum(X, 0)
 ```
@@ -131,7 +138,7 @@ Finally, we (**implement our model**)
 with just a few lines of code.
 
 ```{.python .input}
-#@tab all
+%%tab all
 @d2l.add_to_class(MLPScratch)    
 def forward(self, X):
     X = d2l.reshape(X, (-1, self.num_inputs))
@@ -145,6 +152,7 @@ Fortunately, [**the training loop for MLPs
 is exactly the same as for softmax regression.**]
 
 ```{.python .input}
+%%tab all
 model = MLPScratch(num_inputs=784, num_outputs=10, num_hiddens=256, lr=0.1)
 data = d2l.FashionMNIST(batch_size=256)
 trainer = d2l.Trainer(max_epochs=10)

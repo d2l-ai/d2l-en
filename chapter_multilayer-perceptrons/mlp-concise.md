@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Concise Implementation of Multilayer Perceptrons
 :label:`sec_mlp_concise`
 
@@ -5,6 +10,7 @@ As you might expect, by (**relying on the high-level APIs,
 we can implement MLPs even more concisely.**)
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, init, npx
 from mxnet.gluon import nn
@@ -12,14 +18,14 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
@@ -36,6 +42,7 @@ The first is [**our hidden layer**],
 the second is our output layer.
 
 ```{.python .input}
+%%tab mxnet
 class MLP(d2l.Classification):
     def __init__(self, num_outputs, num_hiddens, lr):
         super().__init__()
@@ -50,7 +57,7 @@ class MLP(d2l.Classification):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 class MLP(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, num_hiddens, lr):
         super().__init__()
@@ -65,7 +72,7 @@ class MLP(d2l.Classification):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class MLP(d2l.Classification):
     def __init__(self, num_outputs, num_hiddens, lr):
         super().__init__()
@@ -86,17 +93,11 @@ matters concerning the model architecture
 from orthogonal considerations.
 
 ```{.python .input}
-#@tab mxnet, tensorflow
-model = MLP(num_outputs=10, num_hiddens=256, lr=0.1)
-```
-
-```{.python .input}
-#@tab pytorch
-model = MLP(num_inputs=784, num_outputs=10, num_hiddens=256, lr=0.1)
-```
-
-```{.python .input}
-#@tab all
+%%tab all
+if tab.selected(['mxnet', 'tensorflow']):
+    model = MLP(num_outputs=10, num_hiddens=256, lr=0.1)
+if tab.selected(['pytorch']):
+    model = MLP(num_inputs=784, num_outputs=10, num_hiddens=256, lr=0.1)
 data = d2l.FashionMNIST(batch_size=256)
 trainer = d2l.Trainer(max_epochs=10)
 trainer.fit(model, data)
