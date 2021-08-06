@@ -16,6 +16,7 @@ It will make you easier to read our code and even use it in your projects.
 The foundation of our code consists of three classes: `Module` for models, losses and optimization methods, `DataModule` for training and validation data loaders, and `Trainer` glues `Module` and `DataModule` to train the models on various hardware. Most code in the rest of this book is in subclasses of `Module` and `DataModule`.
 
 ```{.python .input}
+%%tab mxnet
 import time
 import numpy as np
 from d2l import mxnet as d2l

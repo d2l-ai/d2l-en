@@ -13,6 +13,7 @@ you ought to know the gory details of
 how to implement it yourself.
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon
 npx.set_np()

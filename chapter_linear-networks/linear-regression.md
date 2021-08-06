@@ -333,6 +333,7 @@ and leverage fast linear algebra libraries
 rather than writing costly for-loops in Python.**)
 
 ```{.python .input  n=1}
+%%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 import math

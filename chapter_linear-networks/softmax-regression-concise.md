@@ -16,6 +16,7 @@ we will find it similarly (or possibly more)
 convenient for implementing classification models.
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, init, npx
 from mxnet.gluon import nn

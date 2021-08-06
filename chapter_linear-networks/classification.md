@@ -9,6 +9,7 @@ tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
 You may have noticed that our from scratch and concise implementation of linear regression are very similar to each other. The implementation of softmax regression will be similar as well. A large part of of models in this book is about classification. In this section, we will provide a base class for classification models to simplify our future code.
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon
 npx.set_np()

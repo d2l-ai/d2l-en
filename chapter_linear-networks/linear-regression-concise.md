@@ -29,6 +29,7 @@ the linear regression model**) from :numref:`sec_linear_scratch`
 (**concisely by using high-level APIs**) of deep learning frameworks.
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn

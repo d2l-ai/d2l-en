@@ -18,6 +18,7 @@ on the qualitatively similar, but comparatively complex Fashion-MNIST
 dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017.
 
 ```{.python .input}
+%%tab mxnet
 %matplotlib inline
 import time
 from d2l import mxnet as d2l
@@ -55,6 +56,7 @@ d2l.use_svg_display()
 We can [**download and read the Fashion-MNIST dataset into memory via the built-in functions in the framework.**]
 
 ```{.python .input}
+%%tab mxnet
 class FashionMNIST(d2l.DataModule):  #@save
     def __init__(self, batch_size=64, resize=(28, 28)):
         super().__init__()
