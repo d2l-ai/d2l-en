@@ -1,3 +1,8 @@
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # The Base Classification Model
 :label:`sec_classification`
 
@@ -10,13 +15,13 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 from IPython import display
@@ -27,11 +32,11 @@ from IPython import display
 We define the `Classification` class in the following code block. It provides a `training_step` that is almost identical to the linear regression except for we compute loss through the `loss` method that will be defined in the future.
 
 ```{.python .input}
-#@tab all
+%%tab all
 class Classification(d2l.Module):  #@save
     def __init__(self):
         super().__init__()
-        
+
     def training_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
@@ -44,7 +49,7 @@ class Classification(d2l.Module):  #@save
 We often use a validation dataset to measure model quality. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. Note that we draw points for every `num_val_batches` batches, so it means we report the averaged loss and accuracy on the whole validation datasets. These average numbers are not exact correct if the last batch contains less examples, but we ignore this tiny difference for code simplicity.
 
 ```{.python .input}
-#@tab all
+%%tab all
 @d2l.add_to_class(Classification)  #@save
 def validation_step(self, batch):
     X, y = batch
@@ -58,7 +63,7 @@ def validation_step(self, batch):
 Again, we use minibatch SGD as the optimizer.
 
 ```{.python .input}
-#@tab mxnet
+%%tab mxnet
 @d2l.add_to_class(Classification)  #@save
 def configure_optimizers(self):
     params = self.collect_params()
@@ -68,14 +73,14 @@ def configure_optimizers(self):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 @d2l.add_to_class(Classification)  #@save
 def configure_optimizers(self):
     return torch.optim.SGD(self.parameters(), lr=self.lr)
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 @d2l.add_to_class(Classification)  #@save
 def configure_optimizers(self):
     return tf.keras.optimizers.SGD(self.lr)
@@ -108,7 +113,7 @@ The result is a tensor containing entries of 0 (false) and 1 (true).
 Taking the sum yields the number of correct predictions.
 
 ```{.python .input}
-#@tab all
+%%tab all
 @d2l.add_to_class(Classification)  #@save
 def accuracy(self, y_hat, y):
     """Compute the number of correct predictions."""

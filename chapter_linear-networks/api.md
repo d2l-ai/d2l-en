@@ -1,3 +1,8 @@
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # The D2L APIs
 :label:`sec_d2l_apis`
 
@@ -18,7 +23,7 @@ from mxnet.gluon import nn
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 import time
 import numpy as np
 from d2l import torch as d2l
@@ -27,7 +32,7 @@ from torch import nn
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 import time
 import numpy as np
 from d2l import torch as d2l
@@ -41,7 +46,7 @@ Let's first introduce utility functions and classes.
 We will adopt the object-oriented programming that is common for Python libraries. It's, however, used less in notebooks where we often keep a code block short for readability. The first utility function allows to register a function to a class defined in a previous code block. So now we can split the implementation of a class into multiple code blocks.
 
 ```{.python .input}
-#@tab all
+%%tab all
 def add_to_class(Class):  #@save
     def wrapper(obj):
         setattr(Class, obj.__name__, obj)
@@ -51,7 +56,7 @@ def add_to_class(Class):  #@save
 Let's give an example for how to use it. If we plan to implement a class `A` with a method `do`. Instead of having code for both `A` and `do` in the same code block, we can first declare the class `A` and construct an instance `a`.
 
 ```{.python .input}
-#@tab all
+%%tab all
 class A:
     def __init__(self):
         self.a = 1
@@ -62,7 +67,7 @@ a = A()
 Next we define the class method `do` as we do normally but not in the class `A`'s scope. Instead, we decorate this function by `add_to_class` with class `A` as its argument. Then we can see that the instance `a` we created in the last block has this method.
 
 ```{.python .input}
-#@tab all
+%%tab all
 @add_to_class(A)
 def do(self):
     print('class attribute "a" is', self.a)
@@ -73,7 +78,7 @@ a.do()
 The second one is a utility class that saves all arguments in a class's `__init__` methods as class attributes.
 
 ```{.python .input}
-#@tab all
+%%tab all
 class HyperParameters:  #@save
     def save_hyperparameters(self, ignore=[]):
         raise NotImplemented
@@ -82,7 +87,7 @@ class HyperParameters:  #@save
 We defer its implementation into :numref:`sec_utils`. To use it, we can have our class be a subclass of `HyperParameters` and call `save_hyperparameters` in the `__init__` method. For example
 
 ```{.python .input}
-#@tab all
+%%tab all
 class B(d2l.HyperParameters):  # call the one saved in d2l with code implementation.
     def __init__(self, a, b, c):
         self.save_hyperparameters(ignore=['c'])
@@ -95,7 +100,7 @@ B(a=1, b=2, c=3);
 The last one is a class to plot points in animation. We will use it to show the training progress. Again, implementation is deferred to :numref:`sec_utils`. The draw function plots a point `(x, y)` in the figure, with `label` specific the legend. The optional `every_n` smooths the line by only showing $1/n$ points in the figure, whose values are averaged from the $n$ neighbor points in the original figure.
 
 ```{.python .input}
-#@tab all
+%%tab all
 class ProgressBoard(d2l.HyperParameters):  #@save
     """Plot data points in animation."""
     def __init__(self, xlabel=None, ylabel=None, xlim=None,
@@ -111,7 +116,7 @@ class ProgressBoard(d2l.HyperParameters):  #@save
 The following example, we draw `sin` and `cos` with a different smoothness. If you run this code block, you will see the lines grow in an animation.
 
 ```{.python .input}
-#@tab all
+%%tab all
 board = d2l.ProgressBoard('x')
 for x in np.arange(0, 10, 0.05):
     board.draw(x, np.sin(x), 'sin', every_n=5)
@@ -124,7 +129,7 @@ The `Module` class  is the base class of all models we will implement. Minimally
 Sometimes we put the code to compute the outputs into a separate `forward` method to make it more reusable.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
     def __init__(self):
         super().__init__()
@@ -141,7 +146,7 @@ class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
     def __init__(self):
         super().__init__()
@@ -184,7 +189,7 @@ The `DataModule` class is the base class for data. We often have the `__init__` 
 which yields data batches for the `validation_step` method in `Module`.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab mxnet, pytorch
 class DataModule(d2l.HyperParameters):  #@save
     def __init__(self, root='../data', num_workers=4):
         self.save_hyperparameters()
@@ -197,7 +202,7 @@ class DataModule(d2l.HyperParameters):  #@save
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 class DataModule(d2l.HyperParameters):  #@save
     def __init__(self, root='../data'):
         self.save_hyperparameters()
@@ -214,7 +219,7 @@ class DataModule(d2l.HyperParameters):  #@save
 The `Trainer` class trains the learnable parameters in the `Module` class with data specified in `DataModule`. The key method is `fit`, which accepts two arguments: `model`, an instance of `Module`, and `data`, an instance of `DataModule`. It then iterate the data by `max_epochs` times to train the model. As before, we will defer the implementation of this function to later chapters.
 
 ```{.python .input}
-#@tab all
+%%tab all
 class Trainer(d2l.HyperParameters):  #@save
     def __init__(self, max_epochs):
         self.save_hyperparameters()

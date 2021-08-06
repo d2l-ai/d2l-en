@@ -58,10 +58,10 @@ class SyntheticRegressionData(d2l.DataModule):  #@save
                  batch_size=8):
         super().__init__()
         self.save_hyperparameters()        
-        if d2l.USE_PYTORCH or d2l.USE_MXNET:                
+        if tab.selected('pytorch') or tab.selected('mxnet'):                
             self.X = d2l.randn(num_examples, len(w))
             noise = d2l.randn(num_examples, 1) * noise
-        if d2l.USE_TENSORFLOW:
+        if tab.selected('tensorflow'):
             self.X = tf.random.normal((num_examples, w.shape[0]))
             noise = tf.random.normal((num_examples, 1)) * noise            
         self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
@@ -103,11 +103,11 @@ def train_dataloader(self):
     # The examples are read at random, in no particular order
     random.shuffle(indices)
     for i in range(0, self.num_examples, self.batch_size):
-        if d2l.USE_MXNET or d2l.USE_PYTORCH:
+        if tab.selected('mxnet') or tab.selected('pytorch'):
             batch_indices = d2l.tensor(
                 indices[i: min(i + self.batch_size, self.num_examples)])
             yield self.X[batch_indices], self.y[batch_indices]
-        if d2l.USE_TENSORFLOW:
+        if tab.selected('tensorflow'):
             j = tf.constant(indices[
                 i : min(i+self.batch_size, self.num_examples)])
             yield tf.gather(self.X, j), tf.gather(self.y, j)            
@@ -148,13 +148,13 @@ we can [**call the existing API in a framework to load data.**] We first create 
 ```{.python .input}
 %%tab all
 def tensorloader(tensors, batch_size, shuffle):  #@save
-    if d2l.USE_MXNET:
+    if tab.selected('mxnet'):
         dataset = gluon.data.ArrayDataset(*tensors)
         return gluon.data.DataLoader(dataset, batch_size, shuffle=shuffle)        
-    if d2l.USE_PYTORCH:
+    if tab.selected('pytorch'):
         dataset = torch.utils.data.TensorDataset(*tensors)
         return torch.utils.data.DataLoader(dataset, batch_size, shuffle=shuffle)
-    if d2l.USE_TENSORFLOW:
+    if tab.selected('tensorflow'):
         shuffle_buffer = tensors[0].shape[0] if shuffle else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
             buffer_size=shuffle_buffer).batch(batch_size)        

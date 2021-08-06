@@ -1,3 +1,8 @@
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Concise Implementation of Linear Regression
 :label:`sec_linear_concise`
 
@@ -31,7 +36,7 @@ npx.set_np()
 ```
 
 ```{.python .input  n=1}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import numpy as np
 import torch
@@ -39,7 +44,7 @@ from torch import nn
 ```
 
 ```{.python .input  n=1}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import numpy as np
 import tensorflow as tf
@@ -102,20 +107,20 @@ We will describe how this works in more detail later.
 :end_tab:
 
 ```{.python .input}
-#@tab mxnet, tensorflow
+%%tab mxnet, tensorflow
 class LinearRegression(d2l.Module):  #@save
     def __init__(self, lr):
         super().__init__()
         self.save_hyperparameters()
-        if d2l.USE_MXNET:
+        if tab.selected('mxnet'):
             self.net = nn.Dense(1)
             self.net.initialize()
-        if d2l.USE_TENSORFLOW:
+        if tab.selected('tensorflow'):
             self.net = tf.keras.layers.Dense(1)
 ```
 
 ```{.python .input  n=2}
-#@tab pytorch
+%%tab pytorch
 class LinearRegression(d2l.Module):  #@save
     def __init__(self, num_inputs, lr):
         super().__init__()
@@ -126,7 +131,7 @@ class LinearRegression(d2l.Module):  #@save
 In the forward method, we just evoke the built-in `__call__` function of the predefined layers to compute the outputs.
 
 ```{.python .input  n=3}
-#@tab all
+%%tab all
 @d2l.add_to_class(LinearRegression)  #@save
 def forward(self, X):
     """The linear regression model."""
@@ -152,19 +157,19 @@ By default it returns the average loss over examples.
 :end_tab:
 
 ```{.python .input  n=3}
-#@tab all
+%%tab all
 @d2l.add_to_class(LinearRegression)  #@save
 def loss(self, y_hat, y):
-    if d2l.USE_MXNET:
+    if tab.selected('mxnet'):
         fn = gluon.loss.L2Loss()
         return fn(y_hat, y).mean()
-    if d2l.USE_PYTORCH:
+    if tab.selected('pytorch'):
         fn = nn.MSELoss()
         return fn(y_hat, y)
-    if d2l.USE_TENSORFLOW:        
+    if tab.selected('tensorflow'):
         fn = tf.keras.losses.MeanSquaredError()
-        return fn(y, y_hat)    
-        
+        return fn(y, y_hat)
+
 @d2l.add_to_class(LinearRegression)  #@save
 def training_step(self, batch):
     X, y = batch
@@ -182,9 +187,9 @@ def training_step(self, batch):
 Minibatch SGD is a standard tool
 for optimizing neural networks
 and thus Gluon supports it alongside a number of
-variations on this algorithm through its `Trainer` class. 
-Note that Gluon's `Trainer` class stands for the optimization algorithm, 
-while the `Trainer` class we created in :numref:`sec_d2l_apis` contains the training function, 
+variations on this algorithm through its `Trainer` class.
+Note that Gluon's `Trainer` class stands for the optimization algorithm,
+while the `Trainer` class we created in :numref:`sec_d2l_apis` contains the training function,
 i.e., repeatedly call the optimizer to update the model parameters.
 When we instantiate `Trainer`,
 we specify the parameters to optimize over,
@@ -215,15 +220,15 @@ variations on this algorithm in the `optimizers` module.
 :end_tab:
 
 ```{.python .input  n=5}
-#@tab all
+%%tab all
 @d2l.add_to_class(LinearRegression)  #@save
 def configure_optimizers(self):
-    if d2l.USE_MXNET:
+    if tab.selected('mxnet'):
         return gluon.Trainer(self.collect_params(),
                              'sgd', {'learning_rate': self.lr})
-    if d2l.USE_PYTORCH:
-        return torch.optim.SGD(self.parameters(), self.lr)        
-    if d2l.USE_TENSORFLOW: 
+    if tab.selected('pytorch'):
+        return torch.optim.SGD(self.parameters(), self.lr)
+    if tab.selected('tensorflow'):
         return tf.keras.optimizers.SGD(self.lr)
 ```
 
@@ -237,15 +242,15 @@ define our loss function, or implement minibatch SGD.
 Once we start working with much more complex models,
 the advantages of the high-level API will grow considerably.
 Now that we have all the basic pieces in place,
-[**the training loop itself is the same 
-to the one we obtained by implementing everything from scratch.**] 
+[**the training loop itself is the same
+to the one we obtained by implementing everything from scratch.**]
 So we just call the `fit` method defined :numref:`sec_linear_scratch` to train our model.
 
 ```{.python .input}
-#@tab all
-if d2l.USE_MXNET or d2l.USE_TENSORFLOW:
+%%tab all
+if tab.selected('mxnet') or tab.selected('tensorflow'):
     model = LinearRegression(lr=0.03)
-if d2l.USE_PYTORCH:
+if tab.selected('pytorch'):
     model = LinearRegression(2, lr=0.03)
 data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 trainer = d2l.Trainer(max_epochs=3)
@@ -262,16 +267,16 @@ note that our estimated parameters are
 close to their true counterparts.
 
 ```{.python .input}
-#@tab all
+%%tab all
 @d2l.add_to_class(LinearRegression)  #@save
-def get_w_b(self):    
-    if d2l.USE_MXNET:
+def get_w_b(self):
+    if tab.selected('mxnet'):
         return (self.net.weight.data(), self.net.bias.data())
-    if d2l.USE_PYTORCH:
+    if tab.selected('pytorch'):
         return (self.net.weight.data, self.net.bias.data)
-    if d2l.USE_TENSORFLOW:
+    if tab.selected('tensorflow'):
         return (self.get_weights()[0], self.get_weights()[1])
-    
+
 w, b = model.get_w_b()
 print(f'error in estimating w: {data.w - d2l.reshape(w, data.w.shape)}')
 print(f'error in estimating b: {data.b - b}')

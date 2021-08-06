@@ -1,3 +1,8 @@
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Concise Implementation of Softmax Regression
 :label:`sec_softmax_concise`
 
@@ -18,21 +23,21 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
 
 ## Defining the Model
 
-As we did in :numref:`sec_linear_concise`, we construct the fully-connected layer using the built-in layer, and invoke the built-in `__call__` method in `forward`. 
+As we did in :numref:`sec_linear_concise`, we construct the fully-connected layer using the built-in layer, and invoke the built-in `__call__` method in `forward`.
 
 :begin_tab:`mxnet`
 Even though the input `X` is a 4-D tensor, this built-in `Dense` layer will automatically convert `X` into a 2-D tensor by keeping the first dimension size unchanged.
@@ -48,32 +53,32 @@ We use a flatten layer to convert the 4-D tensor `X` to 2-D by keeping the first
 :end_tab:
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 class SoftmaxRegression(d2l.Classification):
     def __init__(self, num_inputs, num_outputs, lr):
         super().__init__()
         self.save_hyperparameters()
-        self.net = nn.Sequential(nn.Flatten(), 
-                                 nn.Linear(num_inputs, num_outputs))        
+        self.net = nn.Sequential(nn.Flatten(),
+                                 nn.Linear(num_inputs, num_outputs))
 
     def forward(self, X):
         return self.net(X)
 ```
 
 ```{.python .input}
-#@tab mxnet, tensorflow
+%%tab mxnet, tensorflow
 class SoftmaxRegression(d2l.Classification):
     def __init__(self, num_outputs, lr):
         super().__init__()
         self.save_hyperparameters()
-        if d2l.USE_MXNET:
+        if tab.selected('mxnet'):
             self.net = nn.Dense(num_outputs)
             self.net.initialize()
-        if d2l.USE_TENSORFLOW:
+        if tab.selected('tensorflow'):
             self.net = tf.keras.models.Sequential()
             self.net.add(tf.keras.layers.Flatten())
-            self.net.add(tf.keras.layers.Dense(num_outputs))            
-        
+            self.net.add(tf.keras.layers.Dense(num_outputs))
+
     def forward(self, X):
         return self.net(X)
 ```
@@ -153,7 +158,7 @@ all at once inside the cross-entropy loss function,**]
 which does smart things like the ["LogSumExp trick"](https://en.wikipedia.org/wiki/LogSumExp).
 
 ```{.python .input}
-#@tab mxnet
+%%tab mxnet
 @d2l.add_to_class(d2l.Classification)  #@save
 def loss(self, y_hat, y):
     l = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -161,7 +166,7 @@ def loss(self, y_hat, y):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 @d2l.add_to_class(d2l.Classification)  #@save
 def loss(self, y_hat, y):
     l = nn.CrossEntropyLoss()
@@ -169,7 +174,7 @@ def loss(self, y_hat, y):
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 @d2l.add_to_class(d2l.Classification)  #@save
 def loss(self, y_hat, y):
     l = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -182,17 +187,17 @@ def loss(self, y_hat, y):
 Next we train our model.
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 model = SoftmaxRegression(num_inputs=784, num_outputs=10, lr=0.1)
 ```
 
 ```{.python .input}
-#@tab mxnet, tensorflow
+%%tab mxnet, tensorflow
 model = SoftmaxRegression(num_outputs=10, lr=0.1)
 ```
 
 ```{.python .input}
-#@tab all
+%%tab all
 data = d2l.FashionMNIST(batch_size=256)
 trainer = d2l.Trainer(max_epochs=10)
 trainer.fit(model, data)
