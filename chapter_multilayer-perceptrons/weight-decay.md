@@ -215,12 +215,26 @@ and work with a small training set containing only 20 examples.
 
 ```{.python .input}
 #@tab all
-n_train, n_test, num_inputs, batch_size = 20, 100, 200, 5
-true_w, true_b = d2l.ones((num_inputs, 1)) * 0.01, 0.05
-train_data = d2l.synthetic_data(true_w, true_b, n_train)
-train_iter = d2l.load_array(train_data, batch_size)
-test_data = d2l.synthetic_data(true_w, true_b, n_test)
-test_iter = d2l.load_array(test_data, batch_size, is_train=False)
+class Data(d2l.DataModule):
+    def __init__(self, num_train, num_val, num_inputs, batch_size):
+        self.save_hyperparameters()                
+        n = num_train + num_val 
+        if d2l.USE_MXNET or d2l.USE_PYTORCH:
+            self.X = d2l.randn(n, num_inputs)
+            noise = d2l.randn(n, 1) * 0.01
+        if d2l.USE_TENSORFLOW:
+            self.X = d2l.normal((n, num_inputs))
+            noise = d2l.normal((n, 1)) * 0.1
+        w, b = d2l.ones((num_inputs, 1)) * 0.01, 0.05
+        self.y = d2l.matmul(self.X, w) + b
+        
+    def train_dataloader(self):
+        data = (self.X[:self.num_train], self.y[:self.num_train])
+        return d2l.tensorloader(data, self.batch_size, shuffle=True)
+    
+    def val_dataloader(self):
+        data = (self.X[self.num_train:], self.y[self.num_train:])
+        return d2l.tensorloader(data, self.batch_size, shuffle=False)
 ```
 
 ## Implementation from Scratch
@@ -229,129 +243,52 @@ In the following, we will implement weight decay from scratch,
 simply by adding the squared $\ell_2$ penalty
 to the original target function.
 
-### [**Initializing Model Parameters**]
-
-First, we will define a function
-to randomly initialize our model parameters.
-
-```{.python .input}
-def init_params():
-    w = np.random.normal(scale=1, size=(num_inputs, 1))
-    b = np.zeros(1)
-    w.attach_grad()
-    b.attach_grad()
-    return [w, b]
-```
-
-```{.python .input}
-#@tab pytorch
-def init_params():
-    w = torch.normal(0, 1, size=(num_inputs, 1), requires_grad=True)
-    b = torch.zeros(1, requires_grad=True)
-    return [w, b]
-```
-
-```{.python .input}
-#@tab tensorflow
-def init_params():
-    w = tf.Variable(tf.random.normal(mean=1, shape=(num_inputs, 1)))
-    b = tf.Variable(tf.zeros(shape=(1, )))
-    return [w, b]
-```
-
 ### (**Defining $\ell_2$ Norm Penalty**)
 
 Perhaps the most convenient way to implement this penalty
 is to square all terms in place and sum them up.
 
 ```{.python .input}
+#@tab all
 def l2_penalty(w):
-    return (w**2).sum() / 2
+    return d2l.reduce_sum(w**2) / 2
+```
+
+### Defining the Model
+
+
+```{.python .input}
+#@tab all
+class WeightDecayScratch(d2l.LinearRegressionScratch):
+    def __init__(self, num_inputs, lambd, lr, sigma=0.01):
+        super().__init__(num_inputs, lr, sigma)
+        self.save_hyperparameters()
+        
+    def loss(self, y_hat, y):
+        return super().loss(y_hat, y) + self.lambd * l2_penalty(self.w)        
 ```
 
 ```{.python .input}
-#@tab pytorch
-def l2_penalty(w):
-    return torch.sum(w.pow(2)) / 2
+#@tab all
+@d2l.add_to_class(d2l.LinearRegressionScratch)  #@save
+def validation_step(self, batch):
+    X, y = batch
+    l = self.loss(self(X), y)
+    self.board.draw(self.trainer.epoch+1, l, 'val_loss',
+                    every_n=self.trainer.num_val_batches)
+
 ```
 
 ```{.python .input}
-#@tab tensorflow
-def l2_penalty(w):
-    return tf.reduce_sum(tf.pow(w, 2)) / 2
-```
+#@tab all
+data = Data(num_train=20, num_val=100, num_inputs=200, batch_size=5)
+trainer = d2l.Trainer(max_epochs=10)
 
-### [**Defining the Training Loop**]
-
-The following code fits a model on the training set
-and evaluates it on the test set.
-The linear network and the squared loss
-have not changed since :numref:`chap_linear`,
-so we will just import them via `d2l.linreg` and `d2l.squared_loss`.
-The only change here is that our loss now includes the penalty term.
-
-```{.python .input}
-def train(lambd):
-    w, b = init_params()
-    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
-    num_epochs, lr = 100, 0.003
-    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[5, num_epochs], legend=['train', 'test'])
-    for epoch in range(num_epochs):
-        for X, y in train_iter:
-            with autograd.record():
-                # The L2 norm penalty term has been added, and broadcasting
-                # makes `l2_penalty(w)` a vector whose length is `batch_size`
-                l = loss(net(X), y) + lambd * l2_penalty(w)
-            l.backward()
-            d2l.sgd([w, b], lr, batch_size)
-        if (epoch + 1) % 5 == 0:
-            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
-                                     d2l.evaluate_loss(net, test_iter, loss)))
-    print('L2 norm of w:', np.linalg.norm(w))
-```
-
-```{.python .input}
-#@tab pytorch
-def train(lambd):
-    w, b = init_params()
-    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
-    num_epochs, lr = 100, 0.003
-    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[5, num_epochs], legend=['train', 'test'])
-    for epoch in range(num_epochs):
-        for X, y in train_iter:
-            # The L2 norm penalty term has been added, and broadcasting
-            # makes `l2_penalty(w)` a vector whose length is `batch_size`
-            l = loss(net(X), y) + lambd * l2_penalty(w)
-            l.sum().backward()
-            d2l.sgd([w, b], lr, batch_size)
-        if (epoch + 1) % 5 == 0:
-            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
-                                     d2l.evaluate_loss(net, test_iter, loss)))
-    print('L2 norm of w:', torch.norm(w).item())
-```
-
-```{.python .input}
-#@tab tensorflow
-def train(lambd):
-    w, b = init_params()
-    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
-    num_epochs, lr = 100, 0.003
-    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[5, num_epochs], legend=['train', 'test'])
-    for epoch in range(num_epochs):
-        for X, y in train_iter:
-            with tf.GradientTape() as tape:
-                # The L2 norm penalty term has been added, and broadcasting
-                # makes `l2_penalty(w)` a vector whose length is `batch_size`
-                l = loss(net(X), y) + lambd * l2_penalty(w)
-            grads = tape.gradient(l, [w, b])
-            d2l.sgd([w, b], grads, lr, batch_size)
-        if (epoch + 1) % 5 == 0:
-            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
-                                     d2l.evaluate_loss(net, test_iter, loss)))
-    print('L2 norm of w:', tf.norm(w).numpy())
+def train_scratch(lambd):    
+    model = WeightDecayScratch(num_inputs=200, lambd=lambd, lr=0.003)
+    model.board.ylim = [1e-3, 1]
+    trainer.fit(model, data)
+    print('L2 norm of w:', float(l2_penalty(model.w)))
 ```
 
 ### [**Training without Regularization**]
@@ -364,7 +301,7 @@ test error---a textbook case of overfitting.
 
 ```{.python .input}
 #@tab all
-train(lambd=0)
+train_scratch(0)
 ```
 
 ### [**Using Weight Decay**]
@@ -377,7 +314,7 @@ we expect from regularization.
 
 ```{.python .input}
 #@tab all
-train(lambd=3)
+train_scratch(3)
 ```
 
 ## [**Concise Implementation**]
@@ -423,81 +360,42 @@ through the `kernel_regularizer` argument.
 :end_tab:
 
 ```{.python .input}
-def train_concise(wd):
-    net = nn.Sequential()
-    net.add(nn.Dense(1))
-    net.initialize(init.Normal(sigma=1))
-    loss = gluon.loss.L2Loss()
-    num_epochs, lr = 100, 0.003
-    trainer = gluon.Trainer(net.collect_params(), 'sgd',
-                            {'learning_rate': lr, 'wd': wd})
-    # The bias parameter has not decayed. Bias names generally end with "bias"
-    net.collect_params('.*bias').setattr('wd_mult', 0)
-    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[5, num_epochs], legend=['train', 'test'])
-    for epoch in range(num_epochs):
-        for X, y in train_iter:
-            with autograd.record():
-                l = loss(net(X), y)
-            l.backward()
-            trainer.step(batch_size)
-        if (epoch + 1) % 5 == 0:
-            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
-                                     d2l.evaluate_loss(net, test_iter, loss)))
-    print('L2 norm of w:', np.linalg.norm(net[0].weight.data()))
+#@tab mxnet
+class WeightDecay(d2l.LinearRegression):
+    def __init__(self, wd, lr):
+        super().__init__(lr)
+        self.save_hyperparameters()
+        
+    def configure_optimizers(self):
+        self.collect_params('.*bias').setattr('wd_mult', 0)
+        return gluon.Trainer(self.collect_params(),
+                             'sgd', {'learning_rate': self.lr})
 ```
 
 ```{.python .input}
 #@tab pytorch
-def train_concise(wd):
-    net = nn.Sequential(nn.Linear(num_inputs, 1))
-    for param in net.parameters():
-        param.data.normal_()
-    loss = nn.MSELoss()
-    num_epochs, lr = 100, 0.003
-    # The bias parameter has not decayed
-    trainer = torch.optim.SGD([
-        {"params":net[0].weight,'weight_decay': wd},
-        {"params":net[0].bias}], lr=lr)
-    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[5, num_epochs], legend=['train', 'test'])
-    for epoch in range(num_epochs):
-        for X, y in train_iter:
-            trainer.zero_grad()
-            l = loss(net(X), y)
-            l.backward()
-            trainer.step()
-        if (epoch + 1) % 5 == 0:
-            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
-                                     d2l.evaluate_loss(net, test_iter, loss)))
-    print('L2 norm of w:', net[0].weight.norm().item())
+class WeightDecay(d2l.LinearRegression):
+    def __init__(self, num_inputs, wd, lr):
+        super().__init__(num_inputs, lr)
+        self.save_hyperparameters()
+        
+    def configure_optimizers(self):
+        return torch.optim.SGD([
+            {"params":self.net.weight,'weight_decay': self.wd},
+            {"params":self.net.bias}], lr=self.lr)
 ```
 
 ```{.python .input}
 #@tab tensorflow
-def train_concise(wd):
-    net = tf.keras.models.Sequential()
-    net.add(tf.keras.layers.Dense(
-        1, kernel_regularizer=tf.keras.regularizers.l2(wd)))
-    net.build(input_shape=(1, num_inputs))
-    w, b = net.trainable_variables
-    loss = tf.keras.losses.MeanSquaredError()
-    num_epochs, lr = 100, 0.003
-    trainer = tf.keras.optimizers.SGD(learning_rate=lr)
-    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
-                            xlim=[5, num_epochs], legend=['train', 'test'])
-    for epoch in range(num_epochs):
-        for X, y in train_iter:
-            with tf.GradientTape() as tape:
-                # `tf.keras` requires retrieving and adding the losses from
-                # layers manually for custom training loop.
-                l = loss(net(X), y) + net.losses
-            grads = tape.gradient(l, net.trainable_variables)
-            trainer.apply_gradients(zip(grads, net.trainable_variables))
-        if (epoch + 1) % 5 == 0:
-            animator.add(epoch + 1, (d2l.evaluate_loss(net, train_iter, loss),
-                                     d2l.evaluate_loss(net, test_iter, loss)))
-    print('L2 norm of w:', tf.norm(net.get_weights()[0]).numpy())
+class WeightDecay(d2l.LinearRegression):
+    def __init__(self, wd, lr):
+        super().__init__(lr)
+        self.save_hyperparameters()
+        self.net = tf.keras.layers.Dense(
+            1, kernel_regularizer=tf.keras.regularizers.l2(wd))
+        
+    def loss(self, y_hat, y):
+        return super().loss(y_hat, y) + net.losses
 ```
 
 [**The plots look identical to those when
@@ -509,12 +407,14 @@ pronounced for larger problems.
 
 ```{.python .input}
 #@tab all
-train_concise(0)
-```
-
-```{.python .input}
-#@tab all
-train_concise(3)
+if d2l.USE_MXNET or d2l.USE_TENSORFLOW:    
+    model = WeightDecay(wd=3, lr=0.003)
+if d2l.USE_PYTORCH:
+    model = WeightDecay(num_inputs=200, wd=3, lr=0.003)
+    
+model.board.ylim = [1e-3, 1]
+trainer.fit(model, data)
+print('L2 norm of w:', float(l2_penalty(model.get_w_b()[0]))) 
 ```
 
 So far, we only touched upon one notion of

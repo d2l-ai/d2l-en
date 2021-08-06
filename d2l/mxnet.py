@@ -247,10 +247,29 @@ class LinearRegressionScratch(d2l.Module):
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-def mse(y_hat, y):
-    """Squared loss."""
-    loss = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
-    return d2l.reduce_mean(loss)
+@d2l.add_to_class(LinearRegressionScratch)
+def forward(self, X):
+    """The linear regression model."""
+    return d2l.matmul(X, self.w) + self.b
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+@d2l.add_to_class(LinearRegressionScratch)
+def loss(self, y_hat, y):
+    l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+    return d2l.reduce_mean(l)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+@d2l.add_to_class(LinearRegressionScratch)
+def training_step(self, batch):
+    X, y = batch
+    l = self.loss(self(X), y)    
+    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
+    self.board.xlabel = 'epoch'
+    self.board.yscale = 'log'
+    self.board.draw(epoch, l, 'loss', every_n=10)
+    return l
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -262,6 +281,12 @@ class SGD(d2l.HyperParameters):
     def step(self, _):
         for param in self.params:
             param -= self.lr * param.grad
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
+@d2l.add_to_class(LinearRegressionScratch)
+def configure_optimizers(self):
+    return SGD([self.w, self.b], self.lr)
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -439,6 +464,15 @@ def loss(self, y_hat, y):
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
 @d2l.add_to_class(d2l.LinearRegression)
+def validation_step(self, batch):
+    X, y = batch
+    l = self.loss(self(X), y)
+    self.board.draw(self.trainer.epoch+1, l, 'val_loss',
+                    every_n=self.trainer.num_val_batches)
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/weight-decay.md
+@d2l.add_to_class(d2l.LinearRegressionScratch)
 def validation_step(self, batch):
     X, y = batch
     l = self.loss(self(X), y)

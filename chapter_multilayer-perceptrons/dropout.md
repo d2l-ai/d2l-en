@@ -223,7 +223,7 @@ with probability `dropout`**),
 rescaling the remainder as described above:
 dividing the survivors by `1.0-dropout`.
 
-```{.python .input}
+```{.python .input  n=5}
 from d2l import mxnet as d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
@@ -231,17 +231,12 @@ npx.set_np()
 
 def dropout_layer(X, dropout):
     assert 0 <= dropout <= 1
-    # In this case, all elements are dropped out
-    if dropout == 1:
-        return np.zeros_like(X)
-    # In this case, all elements are kept
-    if dropout == 0:
-        return X
+    if dropout == 1: return np.zeros_like(X)
     mask = np.random.uniform(0, 1, X.shape) > dropout
     return mask.astype(np.float32) * X / (1.0 - dropout)
 ```
 
-```{.python .input}
+```{.python .input  n=7}
 #@tab pytorch
 from d2l import torch as d2l
 import torch
@@ -249,12 +244,7 @@ from torch import nn
 
 def dropout_layer(X, dropout):
     assert 0 <= dropout <= 1
-    # In this case, all elements are dropped out
-    if dropout == 1:
-        return torch.zeros_like(X)
-    # In this case, all elements are kept
-    if dropout == 0:
-        return X
+    if dropout == 1: return torch.zeros_like(X)
     mask = (torch.rand(X.shape) > dropout).float()
     return mask * X / (1.0 - dropout)
 ```
@@ -266,12 +256,7 @@ import tensorflow as tf
 
 def dropout_layer(X, dropout):
     assert 0 <= dropout <= 1
-    # In this case, all elements are dropped out
-    if dropout == 1:
-        return tf.zeros_like(X)
-    # In this case, all elements are kept
-    if dropout == 0:
-        return X
+    if dropout == 1: return tf.zeros_like(X)
     mask = tf.random.uniform(
         shape=tf.shape(X), minval=0, maxval=1) < 1 - dropout
     return tf.cast(mask, dtype=tf.float32) * X / (1.0 - dropout)
@@ -282,11 +267,21 @@ In the following lines of code,
 we pass our input `X` through the dropout operation,
 with probabilities 0, 0.5, and 1, respectively.
 
-```{.python .input}
+```{.python .input  n=6}
 X = np.arange(16).reshape(2, 8)
 print(dropout_layer(X, 0))
 print(dropout_layer(X, 0.5))
 print(dropout_layer(X, 1))
+```
+
+```{.json .output n=6}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "[[ 0.  1.  2.  3.  4.  5.  6.  7.]\n [ 8.  9. 10. 11. 12. 13. 14. 15.]]\n[[ 0.  0.  4.  0.  0.  0. 12.  0.]\n [16.  0. 20.  0. 24. 26. 28.  0.]]\n[[0. 0. 0. 0. 0. 0. 0. 0.]\n [0. 0. 0. 0. 0. 0. 0. 0.]]\n"
+ }
+]
 ```
 
 ```{.python .input}
@@ -315,6 +310,18 @@ We [**define an MLP with
 two hidden layers containing 256 units each.**]
 
 ```{.python .input}
+class MLPScratch(d2l.Classification):
+    def __init__(self, num_inputs=784, num_outputs=10, num_hiddens1=256, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential()
+        self.net.add(nn.Dense(num_hiddens, activation='relu'),
+                     nn.Dense(num_outputs))
+        self.net.initialize()
+
+    def forward(self, X):
+        return self.net(X)    
+    
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
 
 W1 = np.random.normal(scale=0.01, size=(num_inputs, num_hiddens1))

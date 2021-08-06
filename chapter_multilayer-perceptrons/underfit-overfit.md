@@ -430,19 +430,19 @@ We will synthesize 100 samples each for the training set and test set.
 ```{.python .input}
 #@tab all
 class Data(d2l.DataModule):
-    def __init__(self, num_train, num_val, num_features, batch_size):
+    def __init__(self, num_train, num_val, num_inputs, batch_size):
         self.save_hyperparameters()        
-        p, n = max(3, self.num_features), num_train + num_val
+        p, n = max(3, self.num_inputs), num_train + num_val
         w = d2l.tensor([1.2, -3.4, 5.6] + [0]*(p-3))
         if d2l.USE_MXNET or d2l.USE_PYTORCH:
             x = d2l.randn(n, 1)
             noise = d2l.randn(n, 1) * 0.1
         if d2l.USE_TENSORFLOW:
             x = d2l.normal((n, 1))
-            noise = d2l.normal(n, 1) * 0.1
+            noise = d2l.normal((n, 1)) * 0.1
         X = d2l.concat([x ** (i+1) / math.gamma(i+2) for i in range(p)], 1)
         self.y = d2l.matmul(X, d2l.reshape(w, (-1, 1))) + noise
-        self.X = X[:,:num_features]
+        self.X = X[:,:num_inputs]
         
     def train_dataloader(self):
         data = (self.X[:self.num_train], self.y[:self.num_train])

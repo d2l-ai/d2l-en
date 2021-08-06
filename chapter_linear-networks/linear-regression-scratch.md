@@ -84,7 +84,7 @@ the scalar is added to each component of the vector.
 
 ```{.python .input}
 #@tab all
-@d2l.add_to_class(LinearRegressionScratch)
+@d2l.add_to_class(LinearRegressionScratch)  #@save
 def forward(self, X):
     """The linear regression model."""
     return d2l.matmul(X, self.w) + self.b
@@ -105,10 +105,10 @@ We also return the averaged loss value among all examples in the minibatch.
 
 ```{.python .input}
 #@tab all
-def mse(y_hat, y):  #@save
-    """Squared loss."""
-    loss = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
-    return d2l.reduce_mean(loss)
+@d2l.add_to_class(LinearRegressionScratch)  #@save
+def loss(self, y_hat, y):
+    l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+    return d2l.reduce_mean(l)
 ```
 
 In a training step, we predict the value and then return the loss compared to the ground truth. 
@@ -116,10 +116,10 @@ We draw the loss value in our progress plot, and average every 10 points for a s
 
 ```{.python .input}
 #@tab all
-@d2l.add_to_class(LinearRegressionScratch)
+@d2l.add_to_class(LinearRegressionScratch)  #@save
 def training_step(self, batch):
     X, y = batch
-    l = mse(self(X), y)    
+    l = self.loss(self(X), y)    
     epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
     self.board.xlabel = 'epoch'
     self.board.yscale = 'log'
@@ -197,7 +197,7 @@ Then we let the `configure_optimizers` method return an instance of the `SGD` cl
 
 ```{.python .input}
 #@tab all
-@d2l.add_to_class(LinearRegressionScratch)
+@d2l.add_to_class(LinearRegressionScratch)  #@save
 def configure_optimizers(self):
     if d2l.USE_MXNET or d2l.USE_PYTORCH:
         return SGD([self.w, self.b], self.lr)

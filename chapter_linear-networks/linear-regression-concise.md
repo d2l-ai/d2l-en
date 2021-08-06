@@ -277,8 +277,6 @@ print(f'error in estimating w: {data.w - d2l.reshape(w, data.w.shape)}')
 print(f'error in estimating b: {data.b - b}')
 ```
 
-
-
 ## Summary
 
 This section contains the first 'modern' implementation of a deep network that we encounter. By modern, we

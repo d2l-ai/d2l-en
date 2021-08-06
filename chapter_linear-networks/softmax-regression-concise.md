@@ -48,7 +48,20 @@ We use a flatten layer to convert the 4-D tensor `X` to 2-D by keeping the first
 :end_tab:
 
 ```{.python .input}
-#@tab all
+#@tab pytorch
+class SoftmaxRegression(d2l.Classification):
+    def __init__(self, num_inputs, num_outputs, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential(nn.Flatten(), 
+                                 nn.Linear(num_inputs, num_outputs))        
+
+    def forward(self, X):
+        return self.net(X)
+```
+
+```{.python .input}
+#@tab mxnet, tensorflow
 class SoftmaxRegression(d2l.Classification):
     def __init__(self, num_outputs, lr):
         super().__init__()
@@ -56,9 +69,6 @@ class SoftmaxRegression(d2l.Classification):
         if d2l.USE_MXNET:
             self.net = nn.Dense(num_outputs)
             self.net.initialize()
-        if d2l.USE_PYTORCH:
-            self.net = nn.Sequential(nn.Flatten(), 
-                                     nn.Linear(num_inputs, num_outputs))        
         if d2l.USE_TENSORFLOW:
             self.net = tf.keras.models.Sequential()
             self.net.add(tf.keras.layers.Flatten())
