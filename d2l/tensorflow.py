@@ -345,8 +345,8 @@ def forward(self, X):
 @d2l.add_to_class(LinearRegression)
 def loss(self, y_hat, y):
     fn = tf.keras.losses.MeanSquaredError()
-    return fn(y, y_hat)    
-    
+    return fn(y, y_hat)
+
 @d2l.add_to_class(LinearRegression)
 def training_step(self, batch):
     X, y = batch
@@ -366,7 +366,7 @@ def configure_optimizers(self):
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 @d2l.add_to_class(LinearRegression)
-def get_w_b(self):    
+def get_w_b(self):
     return (self.get_weights()[0], self.get_weights()[1])
 
 
@@ -397,7 +397,7 @@ def process(self, data, shuffle):
     dataloader = tf.data.Dataset.from_tensor_slices(
         process(*data)).batch(self.batch_size).map(resize_fn)
     return dataloader if not shuffle else dataloader.shuffle(len(data[0]))
-    
+
 @d2l.add_to_class(FashionMNIST)
 def train_dataloader(self):
     return self.process(self.train, shuffle=True)
@@ -420,14 +420,17 @@ def visualize(self, batch, nrows=1, ncols=8, labels=[]):
     if not labels:
         labels = self.text_labels(y)
     d2l.show_images(X, nrows, ncols, titles=labels)
-    
+
 
 
 # Defined in file: ./chapter_linear-networks/classification.md
 class Classification(d2l.Module):
     def __init__(self):
         super().__init__()
-        
+
+    def forward(self, X):
+        return self.net(X)
+    
     def training_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)

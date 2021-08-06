@@ -369,12 +369,12 @@ def training_step(self, batch):
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 @d2l.add_to_class(LinearRegression)
 def configure_optimizers(self):
-    return torch.optim.SGD(self.parameters(), self.lr)        
+    return torch.optim.SGD(self.parameters(), self.lr)
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 @d2l.add_to_class(LinearRegression)
-def get_w_b(self):    
+def get_w_b(self):
     return (self.net.weight.data, self.net.bias.data)
 
 
@@ -433,7 +433,10 @@ def visualize(self, batch, nrows=1, ncols=8, labels=[]):
 class Classification(d2l.Module):
     def __init__(self):
         super().__init__()
-        
+
+    def forward(self, X):
+        return self.net(X)
+    
     def training_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)

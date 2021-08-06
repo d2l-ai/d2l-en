@@ -38,6 +38,9 @@ class Classification(d2l.Module):  #@save
     def __init__(self):
         super().__init__()
 
+    def forward(self, X):
+        return self.net(X)
+    
     def training_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)

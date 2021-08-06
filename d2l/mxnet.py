@@ -358,7 +358,7 @@ def configure_optimizers(self):
 
 # Defined in file: ./chapter_linear-networks/linear-regression-concise.md
 @d2l.add_to_class(LinearRegression)
-def get_w_b(self):    
+def get_w_b(self):
     return (self.net.weight.data(), self.net.bias.data())
 
 
@@ -368,7 +368,7 @@ class FashionMNIST(d2l.DataModule):
         super().__init__()
         self.save_hyperparameters()
         trans = transforms.Compose([transforms.Resize(resize),
-                                    transforms.ToTensor()])      
+                                    transforms.ToTensor()])
         self.train = gluon.data.vision.FashionMNIST(
             train=True).transform_first(trans)
         self.val = gluon.data.vision.FashionMNIST(
@@ -387,12 +387,12 @@ def text_labels(self, indices):
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 @d2l.add_to_class(FashionMNIST)
 def train_dataloader(self):
-    return gluon.data.DataLoader(self.train, self.batch_size, shuffle=True, 
+    return gluon.data.DataLoader(self.train, self.batch_size, shuffle=True,
                                  num_workers=self.num_workers)
 
 @d2l.add_to_class(FashionMNIST)
 def val_dataloader(self):
-    return gluon.data.DataLoader(self.val, self.batch_size, shuffle=False, 
+    return gluon.data.DataLoader(self.val, self.batch_size, shuffle=False,
                                  num_workers=self.num_workers)
 
 
@@ -415,7 +415,10 @@ def visualize(self, batch, nrows=1, ncols=8, labels=[]):
 class Classification(d2l.Module):
     def __init__(self):
         super().__init__()
-        
+
+    def forward(self, X):
+        return self.net(X)
+    
     def training_step(self, batch):
         X, y = batch
         l = self.loss(self(X), y)
