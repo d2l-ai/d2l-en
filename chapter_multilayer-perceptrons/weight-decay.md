@@ -101,7 +101,7 @@ via the *regularization constant* $\lambda$,
 a non-negative hyperparameter
 that we fit using validation data:
 
-$$L(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2,$$
+$$L(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2.$$
 
 For $\lambda = 0$, we recover our original loss function.
 For $\lambda > 0$, we restrict the size of $\| \mathbf{w} \|$.

@@ -371,7 +371,7 @@ Fixing our model, the fewer samples we have in the training dataset,
 the more likely (and more severely) we are to encounter overfitting.
 As we increase the amount of training data,
 the generalization error typically decreases.
-Moreover, in general, more data never hurt.
+Moreover, in general, more data never hurts.
 For a fixed task and data distribution,
 there is typically a relationship between model complexity and dataset size.
 Given more data, we might profitably attempt to fit a more complex model.
@@ -611,7 +611,7 @@ train(poly_features[:n_train, :2], poly_features[n_train:, :2],
 
 Now let's try to train the model
 using a polynomial of too high degree.
-Here, there are insufficient data to learn that
+Here, there is insufficient data to learn that
 the higher-degree coefficients should have values close to zero.
 As a result, our overly-complex model
 is so susceptible that it is being influenced

@@ -351,7 +351,6 @@ These token representations (embedding weights)
 will be trained in `embedding`
 and fixed in `constant_embedding`.
 
-
 ```{.python .input}
 glove_embedding = d2l.TokenEmbedding('glove.6b.100d')
 embeds = glove_embedding[vocab.idx_to_token]

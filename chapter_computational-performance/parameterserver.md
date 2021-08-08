@@ -60,7 +60,7 @@ Note that there is a common misconception that ring synchronization is fundament
 Distributed training on multiple machines adds a further challenge: we need to communicate with servers that are only connected across a comparatively lower bandwidth fabric that can be over an order of magnitude slower in some cases. 
 Synchronization across devices is tricky. After all, different machines running training code will have subtly different speed. Hence we need to *synchronize* them if we want to use synchronous distributed optimization. :numref:`fig_ps_multimachine` illustrates how distributed parallel training occurs.
 
-1. A (different) batch of data are read on each machine, split across multiple GPUs and transferred to GPU memory. There predictions and gradients are computed on each GPU batch separately.
+1. A (different) batch of data is read on each machine, split across multiple GPUs and transferred to GPU memory. There predictions and gradients are computed on each GPU batch separately.
 2. The gradients from all local GPUs are aggregated on one GPU (or parts of it are aggregated over different GPUs).
 3. The gradients are sent to the CPUs.
 4. The CPUs send the gradients to a central parameter server which aggregates all the gradients.

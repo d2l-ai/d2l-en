@@ -19,7 +19,7 @@ at convolution kernels with multiple input and multiple output channels.
 
 ## Multiple Input Channels
 
-When the input data contain multiple channels,
+When the input data contains multiple channels,
 we need to construct a convolution kernel
 with the same number of input channels as the input data,
 so that it can perform cross-correlation with the input data.

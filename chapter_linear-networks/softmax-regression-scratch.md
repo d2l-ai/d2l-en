@@ -234,16 +234,11 @@ def loss(self, y_hat, y):
 
 ## Training
 
-[**The training loop**]
-for softmax regression should look strikingly familiar
-if you read through our implementation
-of linear regression in :numref:`sec_linear_scratch`.
-Here we refactor the implementation to make it reusable.
-First, we define a function to train for one epoch.
-Note that `updater` is a general function to update the model parameters,
-which accepts the batch size as an argument.
-It can be either a wrapper of the `d2l.sgd` function
-or a framework's built-in optimization function.
+We can reuse again the `fit` method defined in :numref:`sec_linear_scratch`. We [**train the model with 10 epochs.**]
+Note that both the number of epochs (`max_epochs`), the minibatch size (`batch_size`)
+and learning rate (`lr`) are adjustable hyperparameters.
+By changing their values, we may be able
+to increase the classification accuracy of the model.
 
 ```{.python .input}
 #@tab all
@@ -253,43 +248,27 @@ trainer = d2l.Trainer(max_epochs=10)
 trainer.fit(model, data)
 ```
 
-[~~The training function~~]
-The following training function then
-trains a model `net` on a training dataset accessed via `train_iter`
-for multiple epochs, which is specified by `num_epochs`.
-At the end of each epoch,
-the model is evaluated on a testing dataset accessed via `test_iter`.
-We will leverage the `Animator` class to visualize
-the training progress.
-
-As an implementation from scratch,
-we [**use the minibatch stochastic gradient descent**] defined in :numref:`sec_linear_scratch`
-to optimize the loss function of the model with a learning rate 0.1.
-
-Now we [**train the model with 10 epochs.**]
-Note that both the number of epochs (`num_epochs`),
-and learning rate (`lr`) are adjustable hyperparameters.
-By changing their values, we may be able
-to increase the classification accuracy of the model.
-
 ## Prediction
 
 Now that training is complete,
 our model is ready to [**classify some images.**]
-Given a series of images,
-we will compare their actual labels
+
+```{.python .input}
+#@tab all
+X, y = next(iter(data.val_dataloader()))
+preds = d2l.argmax(model(X), axis=1)
+preds.shape
+```
+
+We are more interested the images we predict wrong. We visualize them by 
+comparing their actual labels
 (first line of text output)
 and the predictions from the model
 (second line of text output).
 
 ```{.python .input}
 #@tab all
-X, y = next(iter(data.val_dataloader()))
-preds = d2l.argmax(model(X), axis=1)
-```
 
-```{.python .input}
-#@tab all
 wrong = d2l.astype(preds, y.dtype) != y
 X, y, preds = X[wrong], y[wrong], preds[wrong]
 labels = [a+'\n'+b for a, b in zip(
@@ -321,4 +300,3 @@ data.visualize([X, y], labels=labels)
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/225)
 :end_tab:
-

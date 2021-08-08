@@ -3,13 +3,12 @@
 
 
 
-(**Just as high-level APIs**)
+Just as high-level APIs
 of deep learning frameworks
-(**made it much easier to implement linear regression**)
+made it much easier to implement linear regression
 in :numref:`sec_linear_concise`,
-(**we will find it similarly**) (~~here~~) (or possibly more)
-convenient for implementing classification models. Let's stick with the Fashion-MNIST dataset
-and keep the batch size at 256 as in :numref:`sec_softmax_scratch`.
+we will find it similarly (or possibly more)
+convenient for implementing classification models. 
 
 ```{.python .input}
 from d2l import mxnet as d2l
@@ -30,6 +29,23 @@ from torch import nn
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
+
+## Defining the Model
+
+As we did in :numref:`sec_linear_concise`, we construct the fully-connected layer using the built-in layer, and invoke the built-in `__call__` method in `forward`. 
+
+:begin_tab:`mxnet`
+Even though the input `X` is a 4-D tensor, this built-in `Dense` layer will automatically convert `X` into a 2-D tensor by keeping the first dimension size unchanged.
+:end_tab:
+
+:begin_tab:`pytorch`
+We use a flatten layer to convert the 4-D tensor `X` to 2-D by keeping the first dimension size unchanged.
+
+:end_tab:
+
+:begin_tab:`tensorflow`
+We use a flatten layer to convert the 4-D tensor `X` to 2-D by keeping the first dimension size unchanged.
+:end_tab:
 
 ```{.python .input}
 #@tab mxnet
@@ -173,7 +189,7 @@ def loss(self, y_hat, y):
 
 ## Training
 
-Next we [**call the training function defined**] (~~earlier~~) in :numref:`sec_softmax_scratch` to train the model.
+Next we train our model.
 
 ```{.python .input}
 #@tab pytorch
