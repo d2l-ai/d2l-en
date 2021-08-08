@@ -9,7 +9,7 @@ we are ready to put all this knowledge into practice
 by participating in a Kaggle competition.
 The house price prediction competition
 is a great place to start.
-The data are fairly generic and do not exhibit exotic structure
+The data is fairly generic and do not exhibit exotic structure
 that might require specialized models (as audio or video might).
 This dataset, collected by Bart de Cock in 2011 :cite:`De-Cock.2011`,
 covers house prices in Ames, IA from the period of 2006--2010.
@@ -160,7 +160,7 @@ is represented by an integer,
 the roof type by discrete categorical assignments,
 and other features by floating point numbers.
 And here is where reality complicates things:
-for some examples, some data are altogether missing
+for some examples, some data is altogether missing
 with the missing value marked simply as "na".
 The price of each house is included
 for the training set only
@@ -674,7 +674,7 @@ The steps are quite simple:
 
 ## Summary
 
-* Real data often contain a mix of different data types and need to be preprocessed.
+* Real data often contains a mix of different data types and need to be preprocessed.
 * Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
 * Transforming categorical features into indicator features allows us to treat them like one-hot vectors.
 * We can use $K$-fold cross-validation to select the model and adjust the hyperparameters.

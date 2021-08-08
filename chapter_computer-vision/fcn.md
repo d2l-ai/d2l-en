@@ -341,7 +341,6 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, devices)
 When predicting, we need to standardize the input image
 in each channel and transform the image into the four-dimensional input format required by the CNN.
 
-
 ```{.python .input}
 def predict(img):
     X = test_iter._dataset.normalize_image(img)

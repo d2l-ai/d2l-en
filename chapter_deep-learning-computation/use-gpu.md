@@ -256,7 +256,7 @@ For example, we can specify a storage device when creating a tensor.
 Next, we create the tensor variable `X` on the first `gpu`.
 The tensor created on a GPU only consumes the memory of this GPU.
 We can use the `nvidia-smi` command to view GPU memory usage.
-In general, we need to make sure that we do not create data that exceed the GPU memory limit.
+In general, we need to make sure that we do not create data that exceeds the GPU memory limit.
 
 ```{.python .input}
 X = np.ones((2, 3), ctx=try_gpu())
@@ -313,8 +313,6 @@ we need to move `X` there before we can add the two.
 ![Copy data to perform an operation on the same device.](../img/copyto.svg)
 :label:`fig_copyto`
 
-
-
 ```{.python .input}
 Z = X.copyto(try_gpu(1))
 print(X)
@@ -336,7 +334,7 @@ print(X)
 print(Z)
 ```
 
-Now that [**the data are on the same GPU
+Now that [**the data is on the same GPU
 (both `Z` and `Y` are),
 we can add them up.**]
 
@@ -482,8 +480,8 @@ In short, as long as all data and parameters are on the same device, we can lear
 ## Summary
 
 * We can specify devices for storage and calculation, such as the CPU or GPU.
-  By default, data are created in the main memory
-  and then use the CPU for calculations.
+  By default, data is created in the main memory
+  and then uses the CPU for calculations.
 * The deep learning framework requires all input data for calculation
   to be on the same device,
   be it CPU or the same GPU.

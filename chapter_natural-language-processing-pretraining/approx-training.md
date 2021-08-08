@@ -12,6 +12,7 @@ whose corresponding logarithmic loss is given by
 the opposite of :eqref:`eq_skip-gram-log`.
 
 
+
 Due to the nature of the softmax operation,
 since a context word may be anyone in the
 dictionary $\mathcal{V}$,

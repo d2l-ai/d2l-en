@@ -1,10 +1,11 @@
-# The Classification Module
+# The Base Classification Model
 :label:`sec_classification`
+
+You may have noticed that our from scratch and concise implementation of linear regression are very similar to each other. The implementation of softmax regression will be similar as well. A large part of of models in this book is about classification. In this section, we will provide a base class for classification models to simplify our future code. 
 
 ```{.python .input}
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx, gluon
-from IPython import display
 npx.set_np()
 ```
 
@@ -21,7 +22,66 @@ import tensorflow as tf
 from IPython import display
 ```
 
-## Classification
+## The `Classification` Class
+
+We define the `Classification` class in the following code block. It provides a `training_step` that is almost identical to the linear regression except for we compute loss through the `loss` method that will be defined in the future. 
+
+```{.python .input}
+#@tab all
+class Classification(d2l.Module):  #@save
+    def __init__(self):
+        super().__init__()
+        
+    def training_step(self, batch):
+        X, y = batch
+        l = self.loss(self(X), y)
+        epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
+        self.board.xlabel = 'epoch'
+        self.board.draw(epoch, l, 'train_loss', every_n=50)
+        return l
+```
+
+We often use a validation dataset to measure model quality. In the `validation_step` we report both the loss value and the classification accuracy on a validation batch. Note that we draw points for every `num_val_batches` batches, so it means we report the averaged loss and accuracy on the whole validation datasets. These average numbers are not exact correct if the last batch contains less examples, but we ignore this tiny difference for code simplicity. 
+
+```{.python .input}
+#@tab all
+@d2l.add_to_class(Classification)  #@save
+def validation_step(self, batch):
+    X, y = batch
+    y_hat = self(X)
+    for k, v in (('val_loss', self.loss(y_hat, y)),
+                 ('val_acc', self.accuracy(y_hat, y))):
+        self.board.draw(self.trainer.epoch+1, v, k,
+                        every_n=self.trainer.num_val_batches)
+```
+
+Again, we use minibatch SGD as the optimizer. 
+
+```{.python .input}
+#@tab mxnet
+@d2l.add_to_class(Classification)  #@save
+def configure_optimizers(self):
+    params = self.collect_params()
+    if isinstance(params, (tuple, list)):
+        return d2l.SGD(params, self.lr)
+    return gluon.Trainer(params,  'sgd', {'learning_rate': self.lr})
+```
+
+```{.python .input}
+#@tab pytorch
+@d2l.add_to_class(Classification)  #@save
+def configure_optimizers(self):
+    return torch.optim.SGD(self.parameters(), lr=self.lr)
+```
+
+```{.python .input}
+#@tab tensorflow
+@d2l.add_to_class(Classification)  #@save
+def configure_optimizers(self):
+    return tf.keras.optimizers.SGD(self.lr)
+```
+
+## Accuracy
 
 Given the predicted probability distribution `y_hat`,
 we typically choose the class with the highest predicted probability
@@ -49,37 +109,6 @@ Taking the sum yields the number of correct predictions.
 
 ```{.python .input}
 #@tab all
-class Classification(d2l.Module):  #@save
-    def __init__(self):
-        super().__init__()
-```
-
-```{.python .input}
-#@tab all
-@d2l.add_to_class(Classification)  #@save
-def training_step(self, batch):
-    X, y = batch
-    l = self.loss(self(X), y)
-    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
-    self.board.xlabel = 'epoch'
-    self.board.draw(epoch, l, 'train_loss', every_n=50)
-    return l
-```
-
-```{.python .input}
-#@tab all
-@d2l.add_to_class(Classification)  #@save
-def validation_step(self, batch):
-    X, y = batch
-    y_hat = self(X)
-    for k, v in (('val_loss', self.loss(y_hat, y)),
-                 ('val_acc', self.accuracy(y_hat, y))):
-        self.board.draw(self.trainer.epoch+1, v, k,
-                        every_n=self.trainer.num_val_batches)
-```
-
-```{.python .input}
-#@tab all
 @d2l.add_to_class(Classification)  #@save
 def accuracy(self, y_hat, y):
     """Compute the number of correct predictions."""
@@ -89,26 +118,7 @@ def accuracy(self, y_hat, y):
     return d2l.reduce_mean(d2l.astype(cmp, d2l.float32))
 ```
 
-```{.python .input}
-#@tab mxnet
-@d2l.add_to_class(Classification)  #@save
-def configure_optimizers(self):
-    params = self.collect_params()
-    if isinstance(params, (tuple, list)):
-        return d2l.SGD(params, self.lr)
-    return gluon.Trainer(params,  'sgd', {'learning_rate': self.lr})
-```
+## Summary
 
-```{.python .input}
-#@tab pytorch
-@d2l.add_to_class(Classification)  #@save
-def configure_optimizers(self):
-    return torch.optim.SGD(self.parameters(), lr=self.lr)
-```
+- The `Classification` class contains shared methods for classification models. We only need to define the model, compute the predictions, and the loss function for future models
 
-```{.python .input}
-#@tab tensorflow
-@d2l.add_to_class(Classification)  #@save
-def configure_optimizers(self):
-    return tf.keras.optimizers.SGD(self.lr)
-```

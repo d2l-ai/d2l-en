@@ -6,7 +6,7 @@ With the proliferation of online social media
 and review platforms,
 a plethora of
 opinionated data
-have been logged,
+has been logged,
 bearing great potential for
 supporting decision making processes.
 *Sentiment analysis*

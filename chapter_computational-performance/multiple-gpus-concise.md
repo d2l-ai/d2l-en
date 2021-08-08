@@ -123,7 +123,7 @@ net(x_shards[0]), net(x_shards[1])
 ```
 
 :begin_tab:`mxnet`
-Once data pass through the network, the corresponding parameters are initialized *on the device the data passed through*.
+Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*.
 This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters do not even exist on the CPU. We can verify this by printing out the parameters and observing any errors that might arise.
 :end_tab:
 
@@ -256,7 +256,7 @@ train(net, num_gpus=2, batch_size=512, lr=0.2)
 :begin_tab:`mxnet`
 * Gluon provides primitives for model initialization across multiple devices by providing a context list.
 :end_tab:
-* Data are automatically evaluated on the devices where the data can be found.
+* Data is automatically evaluated on the devices where the data can be found.
 * Take care to initialize the networks on each device before trying to access the parameters on that device. Otherwise you will encounter an error.
 * The optimization algorithms automatically aggregate over multiple GPUs.
 

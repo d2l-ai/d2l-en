@@ -29,7 +29,7 @@ from mxnet import autograd, gluon, np, npx
 npx.set_np()
 ```
 
-```{.python .input}
+```{.python .input  n=1}
 #@tab pytorch
 from d2l import torch as d2l
 import numpy as np
@@ -63,20 +63,6 @@ For standard operations, we can [**use a framework's predefined layers,**]
 which allow us to focus
 on the layers used to construct the model
 rather than worrying about their implementation.
-We will first define a model `net`,
-which will refer to an instance of the `Sequential` class.
-The `Sequential` class defines a container
-for several layers that will be chained together.
-Given input data, a `Sequential` instance passes it through
-the first layer, in turn passing the output
-as the second layer's input and so forth.
-For now our model consists of only one layer (we are implementing a linear model after all).
-As such, we do not really need `Sequential`.
-But since nearly all of our future models
-will involve multiple layers,
-we use it anyway just to familiarize ourselves
-with the workflow.
-
 Recall the architecture of a single-layer network as described in :numref:`fig_single_neuron`.
 The layer is called *fully connected*, since each of its inputs is connected to each of its outputs
 by means of a matrix-vector multiplication.
@@ -102,9 +88,7 @@ In PyTorch, the fully connected layer is defined in the `Linear` class. Note tha
 :end_tab:
 
 :begin_tab:`tensorflow`
-In Keras, the fully connected layer is defined in the `Dense` class. Since we only want to generate a single scalar output, we set that number to 1.
-
-It is worth noting that, for convenience,
+In Keras, the fully connected layer is defined in the `Dense` class. Since we only want to generate a single scalar output, we set that number to 1. It is worth noting that, for convenience,
 Keras does not require us to specify
 the input shape for each layer.
 We don't need to tell Keras
@@ -127,7 +111,7 @@ class LinearRegression(d2l.Module):  #@save
         self.net.initialize()
 ```
 
-```{.python .input}
+```{.python .input  n=2}
 #@tab pytorch
 # `nn` is an abbreviation for neural networks
 from torch import nn
@@ -142,7 +126,6 @@ class LinearRegression(d2l.Module):  #@save
 ```{.python .input  n=2}
 #@tab tensorflow
 # `keras` is the high-level API for TensorFlow
-
 class LinearRegression(d2l.Module):  #@save
     def __init__(self, lr):
         super().__init__()
@@ -150,12 +133,30 @@ class LinearRegression(d2l.Module):  #@save
         self.net = tf.keras.layers.Dense(1)
 ```
 
+In the forward method, we just evoke the built-in `__call__` function of the predefined layers to compute the outputs.
+
+```{.python .input  n=3}
+#@tab mxnet, pytorch
+@d2l.add_to_class(LinearRegression)
+def forward(self, X):
+    """The linear regression model."""
+    return self.net(X)
+```
+
+```{.python .input}
+#@tab tensorflow
+@d2l.add_to_class(LinearRegression)
+def forward(self, X):
+    """The linear regression model."""
+    return self.net(X)
+```
+
 ## Loss Function
 
 :begin_tab:`mxnet`
 The `loss` module defines many useful loss functions. For speed and convenience
 we forgo implementing our own and choose the built-in `loss.L2Loss` instead. $L_2$ loss is a bit
-of a misnomer, albeit a pervasive one in deep learning, since we are simply computing the mean squared error, i.e., the squared distance between estimates and labels. It has very little to do with the space of Lebesque-measurable functions, denoted by $L_2$ in mathematics.
+of a misnomer, albeit a pervasive one in deep learning, since we are simply computing the mean squared error, i.e., the squared distance between estimates and labels. It has very little to do with the space of Lebesque-measurable functions, denoted by $L_2$ in mathematics. Not that it returns the loss value for each example, we use `mean` to get the averaged loss value in a minibatch.
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -169,14 +170,6 @@ By default it returns the average loss over examples.
 :end_tab:
 
 ```{.python .input}
-#@tab mxnet, pytorch
-@d2l.add_to_class(LinearRegression)
-def forward(self, X):
-    """The linear regression model."""
-    return self.net(X)
-```
-
-```{.python .input}
 @d2l.add_to_class(LinearRegression)
 def training_step(self, batch):
     X, y = batch
@@ -187,7 +180,7 @@ def training_step(self, batch):
     return l
 ```
 
-```{.python .input}
+```{.python .input  n=4}
 #@tab pytorch
 @d2l.add_to_class(LinearRegression)
 def training_step(self, batch):
@@ -202,11 +195,6 @@ def training_step(self, batch):
 
 ```{.python .input  n=3}
 #@tab tensorflow
-@d2l.add_to_class(LinearRegression)
-def forward(self, X):
-    """The linear regression model."""
-    return self.net(X)
-
 @d2l.add_to_class(LinearRegression)
 def training_step(self, batch):
     X, y = batch
@@ -223,15 +211,17 @@ def training_step(self, batch):
 Minibatch SGD is a standard tool
 for optimizing neural networks
 and thus Gluon supports it alongside a number of
-variations on this algorithm through its `Trainer` class.
+variations on this algorithm through its `Trainer` class. 
+Note that Gluon's `Trainer` class stands for the optimization algorithm, 
+while the `Trainer` class we created in :numref:`sec_d2l_apis` contains the training function, 
+i.e., repeatedly call the optimizer to update the model parameters.
 When we instantiate `Trainer`,
 we specify the parameters to optimize over,
 obtainable from our model `net` via `net.collect_params()`,
 the optimization algorithm we wish to use (`sgd`),
 and a dictionary of hyperparameters
 required by our optimization algorithm.
-Minibatch stochastic gradient descent just requires that
-we set the value `learning_rate`. We use 0.03.
+
 :end_tab:
 
 :begin_tab:`pytorch`
@@ -244,8 +234,6 @@ we specify the parameters to optimize over,
 obtainable from our net via `net.parameters()`,
 with a dictionary of hyperparameters
 required by our optimization algorithm.
-Minibatch SGD just requires that
-we set the learning rate `lr`. We use 0.03.
 :end_tab:
 
 :begin_tab:`tensorflow`
@@ -253,8 +241,6 @@ Minibatch SGD is a standard tool
 for optimizing neural networks
 and thus Keras supports it alongside a number of
 variations on this algorithm in the `optimizers` module.
-Minibatch SGD just requires that
-we set the value `learning_rate`. We use 0.03.
 :end_tab:
 
 ```{.python .input}
@@ -264,7 +250,7 @@ def configure_optimizers(self):
                          'sgd', {'learning_rate': self.lr})
 ```
 
-```{.python .input}
+```{.python .input  n=5}
 #@tab pytorch
 @d2l.add_to_class(LinearRegression)
 def configure_optimizers(self):
@@ -288,20 +274,9 @@ define our loss function, or implement minibatch SGD.
 Once we start working with much more complex models,
 the advantages of the high-level API will grow considerably.
 Now that we have all the basic pieces in place,
-[**the training loop itself is strikingly similar
-to the one we obtained by implementing everything from scratch.**]
-
-For some number of epochs,
-we will make a pass over the dataset (`train_data`),
-iteratively grabbing a minibatch of inputs
-and labels at a time. For each minibatch, the `fit` function of the trainer goes
-through the following steps:
-
-* Generate predictions by calling `net(X)` and calculate the loss `l` (the forward propagation).
-* Calculate gradients by running the backpropagation.
-* Update the model parameters by invoking our optimizer.
-
-For good measure, it also computes the loss after each epoch and print it to monitor progress.
+[**the training loop itself is the same 
+to the one we obtained by implementing everything from scratch.**] 
+So we just call the `fit` method defined :numref:`sec_linear_scratch` to train our model.
 
 ```{.python .input}
 #@tab pytorch
@@ -319,12 +294,6 @@ data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 trainer = d2l.Trainer(max_epochs=3)
 trainer.fit(model, data)
 ```
-
-As we can see, the algorithm converges very quickly, yielding an even lower loss
-than before, even though we implemented the same model. The solution for this mystery
-can be found in the SGD solver. As we will see in :ref:`chap_optimization`, the SGD solver
-doesn't implement a vanilla Stochastic Gradient Descent algorithm but adds a number of improvements to
-make it more robust and accelerate convergence.
 
 Below, we [**compare the model parameters learned by training on finite data
 and the actual parameters**] that generated our dataset.
