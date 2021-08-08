@@ -20,8 +20,9 @@ patient spends in hospital is a *discrete nonnegative* random variable. As such,
 might not be an ideal approach either. As we can see, there's a lot more to estimation than just
 minimizing squared errors. 
 
-In this section we encounter a novel concept: *classification*. It deals with 
-asking not "how much" but "which one":
+In fact, there's a lot more to machine learning than just regression. 
+In this section we encounter a novel concept: *classification*. 
+It deals with asking not "how much" but "which one":
 
 * Does this email belong in the spam folder or the inbox?
 * Is this customer more likely *to sign up* or *not to sign up* for a subscription service?
@@ -38,13 +39,18 @@ and (ii) those where we wish to make soft assignments,
 i.e., to assess the probability that each category applies.
 The distinction tends to get blurred, in part,
 because often, even when we only care about hard assignments,
-we still use models that make soft assignments.
+we still use models that make soft assignments. 
 
+Even more, there are cases
+where more than one label might be true. For instance, a news article might 
+simultaneously cover the topics of entertainment, business, and space flight, 
+but not the topics of medicine or sports. As such, categorizing it into one of the above categories on their own would not be very useful. This problem is commonly 
+known as [multi-label classification](https://en.wikipedia.org/wiki/Multi-label_classification). See :cite:`tsoumakas2007multi` for an overview and :cite:`huang2015bidirectional` for an effective algorithm when tagging images.
 
-## Classification Problem
+## Classification
 :label:`subsec_classification-problem`
 
-To get our feet wet, let's start off with
+To get our feet wet, let's start with
 a simple image classification problem.
 Here, each input consists of a $2\times2$ grayscale image.
 We can represent each pixel value with a single scalar,
@@ -59,10 +65,11 @@ where the integers represent $\{\text{dog}, \text{cat}, \text{chicken}\}$ respec
 This is a great way of *storing* such information on a computer.
 If the categories had some natural ordering among them,
 say if we were trying to predict $\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adult}, \text{geriatric}\}$,
-then it might even make sense to cast this problem as regression
-and keep the labels in this format.
+then it might even make sense to cast this as an [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression) problem 
+and keep the labels in this format. See e.g., :cite:`moon2010intervalrank` for an
+overview of different types of ranking loss functions and :cite:`beutel2014cobafi` for a Bayesian approach. 
 
-But general classification problems do not come with natural orderings among the classes.
+In general, classification problems do not come with natural orderings among the classes.
 Fortunately, statisticians long ago invented a simple way
 to represent categorical data: the *one-hot encoding*.
 A one-hot encoding is a vector with as many components as we have categories.
@@ -74,17 +81,16 @@ and $(0, 0, 1)$ to "dog":
 
 $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}.$$
 
-## Network Architecture
+### Linear Model
 
 In order to estimate the conditional probabilities associated with all the possible classes,
 we need a model with multiple outputs, one per class.
 To address classification with linear models,
-we will need as many affine functions as we have outputs.
-Each output will correspond to its own affine function.
+we will need as many affine functions as we have outputs. Strictly speaking, we only need one fewer, since the last category has to be the difference between $1$ and the sum of the other categories but for reasons of symmetry we use a slightly redundant parametrization. 
+Each output corresponds to its own affine function.
 In our case, since we have 4 features and 3 possible output categories,
-we will need 12 scalars to represent the weights ($w$ with subscripts),
-and 3 scalars to represent the biases ($b$ with subscripts).
-We compute these three *logits*, $o_1, o_2$, and $o_3$, for each input:
+we need 12 scalars to represent the weights ($w$ with subscripts),
+and 3 scalars to represent the biases ($b$ with subscripts). This yields:
 
 $$
 \begin{aligned}
@@ -94,156 +100,86 @@ o_3 &= x_1 w_{31} + x_2 w_{32} + x_3 w_{33} + x_4 w_{34} + b_3.
 \end{aligned}
 $$
 
-We can depict this calculation with the neural network diagram shown in :numref:`fig_softmaxreg`.
-Just as in linear regression, softmax regression is also a single-layer neural network.
+The corresponding neural network diagram is shown in :numref:`fig_softmaxreg`.
+Just as in linear regression, we use a single-layer neural network.
 And since the calculation of each output, $o_1, o_2$, and $o_3$,
 depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$,
-the output layer of softmax regression can also be described as fully connected layer.
+the output layer can also be described as fully connected layer.
 
 ![Softmax regression is a single-layer neural network.](../img/softmaxreg.svg)
 :label:`fig_softmaxreg`
 
-To express the model more compactly, we can use linear algebra notation.
-In vector form, we arrive at
-$\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$,
-a form better suited both for mathematics, and for writing code.
-Note that we have gathered all of our weights into a $3 \times 4$ matrix
-and that for features of a given data example $\mathbf{x}$,
-our outputs are given by a matrix-vector product of our weights by our input features
-plus our biases $\mathbf{b}$.
+For a more concise notation we use vectors and matrices. 
+$\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$ is 
+much better suited for mathematics and code.
+Note that we have gathered all of our weights into a $3 \times 4$ matrix and all biases
+$\mathbf{b} \in \mathbb{R}^3$ in a vector.
 
 
-## Parameterization Cost of Fully Connected Layers
-:label:`subsec_parameterization-cost-fc-layers`
-
-As we will see in subsequent chapters,
-fully connected layers are ubiquitous in deep learning.
-However, as the name suggests,
-fully connected layers are *fully* connected
-with potentially many learnable parameters.
-Specifically,
-for any fully connected layer
-with $d$ inputs and $q$ outputs,
-the parameterization cost is $\mathcal{O}(dq)$,
-which can be prohibitively high in practice.
-Fortunately,
-this cost
-of transforming $d$ inputs into $q$ outputs
-can be reduced to $\mathcal{O}(\frac{dq}{n})$,
-where the hyperparameter $n$ can be flexibly specified
-by us to balance between parameter saving and model effectiveness in real-world applications :cite:`Zhang.Tay.Zhang.ea.2021`.
-
-
-
-
-
-## Softmax Operation
+### The Softmax
 :label:`subsec_softmax_operation`
 
-The main approach that we are going to take here
-is to interpret the outputs of our model as probabilities.
-We will optimize our parameters to produce probabilities
-that maximize the likelihood of the observed data.
-Then, to generate predictions, we will set a threshold,
-for example, choosing the label with the maximum predicted probabilities.
+Assuming a suitable loss function, we could try to minimize the 
+difference between $\mathbf{o}$ and the labels $\mathbf{y}$ directly. 
+While it turns out that treating classification as a vector-valued 
+regression problem is surprisingly well-behaved (it is statistically
+consistent), it is nonetheless lacking in many regards:
 
-Put formally, we would like any output $\hat{y}_j$
-to be interpreted as the probability
-that a given item belongs to class $j$.
-Then we can choose the class with the largest output value
-as our prediction $\operatorname*{argmax}_j y_j$.
-For example, if $\hat{y}_1$, $\hat{y}_2$, and $\hat{y}_3$
-are 0.1, 0.8, and 0.1, respectively,
-then we predict category 2, which (in our example) represents "chicken".
+* There is no guarantee that the outputs $o_i$ sum up to $1$ in
+  in the way we expect probabilities to behave. 
+* There is no guarantee that the outputs $o_i$ are even nonnegative,
+  even if their outputs sum to $1$, or that they do not exceed $1$.
+  
+Both aspects render the estimation problem difficult to solve and the
+solution very brittle to outliers. For instance, if we assume that there 
+is a positive linear dependency between the number of bedrooms and the likelihood
+that someone will buy a house, the probability might exceed $1$ when
+it comes to buying a mansion! As such, we need a mechanism to 'squish' 
+the outputs. 
 
-You might be tempted to suggest that we interpret
-the logits $o$ directly as our outputs of interest.
-However, there are some problems with directly
-interpreting the output of the linear layer as a probability.
-On one hand,
-nothing constrains these numbers to sum to 1.
-On the other hand, depending on the inputs, they can take negative values.
-These violate basic axioms of probability presented in :numref:`sec_prob`
+There are many ways how to accomplish this goal. For instance, we could 
+assume that the outputs $\mathbf{o}$ are corrupted versions of $\mathbf{y}$,
+where the corruption occurs by means of adding noise $\mathbf{\epsilon}$ 
+drawn from a normal distribution. In other words, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$ where $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$. This 
+is the so-called *probit model* :cite:`XXXX`. While appealing, it doesn't
+work quite as well or lead to a particularly nice optimization problem, 
+when compared to the softmax. 
 
-To interpret our outputs as probabilities,
-we must guarantee that (even on new data),
-they will be nonnegative and sum up to 1.
-Moreover, we need a training objective that encourages
-the model to estimate probabilities faithfully.
-Of all instances when a classifier outputs 0.5,
-we hope that half of those examples
-will actually belong to the predicted class.
-This is a property called *calibration*.
+A desirable property for mapping $\mathbf{o}$ into a vector of probabilities
+is that a larger value in $o_i$ would correspond to a larger value for class 
+$i$. Combined with nonnegativity we could use for instance $p(y = i) \propto \exp o_i$. 
+This does indeed satisfy the requirement that the conditional class probability 
+increases with increasing $o_i$ and that the probabilities are all nonnegative. 
+Unfortunately it fails to satisfy the key requirement of normalization. This can
+be accomplished by normalizing the sum via:
 
-The *softmax function*, invented in 1959 by the social scientist
-R. Duncan Luce in the context of *choice models*,
-does precisely this.
-To transform our logits such that they become nonnegative and sum to 1,
-while requiring that the model remains differentiable,
-we first exponentiate each logit (ensuring non-negativity)
-and then divide by their sum (ensuring that they sum to 1):
-
-$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o})\quad \text{where}\quad \hat{y}_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}. $$
+$$\hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}$$
 :eqlabel:`eq_softmax_y_and_o`
 
-It is easy to see $\hat{y}_1 + \hat{y}_2 + \hat{y}_3 = 1$
-with $0 \leq \hat{y}_j \leq 1$ for all $j$.
-Thus, $\hat{\mathbf{y}}$ is a proper probability distribution
-whose element values can be interpreted accordingly.
-Note that the softmax operation does not change the ordering among the logits $\mathbf{o}$,
-which are simply the pre-softmax values
-that determine the probabilities assigned to each class.
-Therefore, during prediction we can still pick out the most likely class by
+While somewhat of a misnomer, the mapping from $\mathbf{o}$ to $\hat{\mathbf{y}}$
+is often referred to as a softmax in deep learning. We write $\hat{\mathbf{y}} = \operatorname*{softmax} \mathbf{o}$. Note that by monotonicity of the exponential 
+function, the largest coordinate of $\mathbf{o}$
+also corresponds to the most likely class according to $\hat{\mathbf{y}}$. 
 
 $$
 \operatorname*{argmax}_j \hat y_j = \operatorname*{argmax}_j o_j.
 $$
 
-Although softmax is a nonlinear function,
-the outputs of softmax regression are still *determined* by
-an affine transformation of input features;
-thus, softmax regression is a linear model.
-
-
-
-## Vectorization for Minibatches
-:label:`subsec_softmax_vectorization`
-
-To improve computational efficiency and take advantage of GPUs,
-we typically carry out vector calculations for minibatches of data.
-Assume that we are given a minibatch $\mathbf{X}$ of examples
-with feature dimensionality (number of inputs) $d$ and batch size $n$.
-Moreover, assume that we have $q$ categories in the output.
-Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$,
-weights $\mathbf{W} \in \mathbb{R}^{d \times q}$,
-and the bias satisfies $\mathbf{b} \in \mathbb{R}^{1\times q}$.
-
-$$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
-:eqlabel:`eq_minibatch_softmax_reg`
-
-This accelerates the dominant operation into
-a matrix-matrix product $\mathbf{X} \mathbf{W}$
-vs. the matrix-vector products we would be executing
-if we processed one example at a time.
-Since each row in $\mathbf{X}$ represents a data example,
-the softmax operation itself can be computed *rowwise*:
-for each row of $\mathbf{O}$, exponentiate all entries and then normalize them by the sum.
-Triggering broadcasting during the summation $\mathbf{X} \mathbf{W} + \mathbf{b}$ in :eqref:`eq_minibatch_softmax_reg`,
-both the minibatch logits $\mathbf{O}$ and output probabilities $\hat{\mathbf{Y}}$
-are $n \times q$ matrices.
-
 ## Loss Function
 
-Next, we need a loss function to measure
-the quality of our predicted probabilities.
+Now that we have a mapping from features $\mathbf{x}$ to probabilities 
+$\mathbf{\hat{y}}$, we need a way to optimize the accuracy of this mapping. 
 We will rely on maximum likelihood estimation,
 the very same concept that we encountered
 when providing a probabilistic justification
-for the mean squared error objective in linear regression
-(:numref:`subsec_normal_distribution_and_squared_loss`).
+for the mean squared error loss in 
+:ref:`subsec_normal_distribution_and_squared_loss`.
 
 
 ### Log-Likelihood
+
+Given 
+
 
 The softmax function gives us a vector $\hat{\mathbf{y}}$,
 which we can interpret as estimated conditional probabilities
@@ -347,6 +283,31 @@ We can demystify the name by introducing just the basics of information theory.
 If you wish to understand more details of information theory,
 you may further refer to the [online appendix on information theory](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/information-theory.html).
 
+## Vectorization
+:label:`subsec_softmax_vectorization`
+
+To improve computational efficiency and take advantage of GPUs,
+we typically carry out vector calculations for minibatches of data.
+Assume that we are given a minibatch $\mathbf{X}$ of examples
+with feature dimensionality (number of inputs) $d$ and batch size $n$.
+Moreover, assume that we have $q$ categories in the output.
+Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$,
+weights $\mathbf{W} \in \mathbb{R}^{d \times q}$,
+and the bias satisfies $\mathbf{b} \in \mathbb{R}^{1\times q}$.
+
+$$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
+:eqlabel:`eq_minibatch_softmax_reg`
+
+This accelerates the dominant operation into
+a matrix-matrix product $\mathbf{X} \mathbf{W}$
+vs. the matrix-vector products we would be executing
+if we processed one example at a time.
+Since each row in $\mathbf{X}$ represents a data example,
+the softmax operation itself can be computed *rowwise*:
+for each row of $\mathbf{O}$, exponentiate all entries and then normalize them by the sum.
+Triggering broadcasting during the summation $\mathbf{X} \mathbf{W} + \mathbf{b}$ in :eqref:`eq_minibatch_softmax_reg`,
+both the minibatch logits $\mathbf{O}$ and output probabilities $\hat{\mathbf{Y}}$
+are $n \times q$ matrices.
 
 
 ## Information Theory Basics
@@ -425,6 +386,29 @@ In the next part of the experiment,
 we will use *accuracy* to evaluate the model's performance.
 This is equal to the ratio between the number of correct predictions and the total number of predictions.
 
+## The Cost of Fully Connected Layers
+:label:`subsec_parameterization-cost-fc-layers`
+
+As we will see in subsequent chapters,
+fully connected layers are ubiquitous in deep learning.
+However, as the name suggests,
+fully connected layers are *fully* connected
+with potentially many learnable parameters.
+Specifically,
+for any fully connected layer
+with $d$ inputs and $q$ outputs,
+the parameterization cost is $\mathcal{O}(dq)$,
+which can be prohibitively high in practice.
+Fortunately,
+this cost
+of transforming $d$ inputs into $q$ outputs
+can be reduced to $\mathcal{O}(\frac{dq}{n})$,
+where the hyperparameter $n$ can be flexibly specified
+by us to balance between parameter saving and model effectiveness in real-world applications :cite:`Zhang.Tay.Zhang.ea.2021`.
+
+
+
+
 
 ## Summary
 
@@ -448,3 +432,7 @@ This is equal to the ratio between the number of correct predictions and the tot
     1. Extend this to more than two numbers.
 
 [Discussions](https://discuss.d2l.ai/t/46)
+
+```{.python .input}
+
+```
