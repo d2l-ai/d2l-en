@@ -232,7 +232,7 @@ conv_trans.initialize(init.Constant(bilinear_kernel(3, 3, 4)))
 #@tab pytorch
 conv_trans = nn.ConvTranspose2d(3, 3, kernel_size=4, padding=1, stride=2,
                                 bias=False)
-conv_trans.weight.data.copy_(bilinear_kernel(3, 3, 4));
+conv_trans.weight.data.copy_(bilinear_kernel(3, 3, 4))
 ```
 
 Read the image `X` and assign the upsampling output to `Y`. In order to print the image, we need to adjust the position of the channel dimension.
@@ -259,18 +259,18 @@ the image scaled up by bilinear interpolation and the original image printed in 
 ```{.python .input}
 d2l.set_figsize()
 print('input image shape:', img.shape)
-d2l.plt.imshow(img.asnumpy());
+d2l.plt.imshow(img.asnumpy())
 print('output image shape:', out_img.shape)
-d2l.plt.imshow(out_img.asnumpy());
+d2l.plt.imshow(out_img.asnumpy())
 ```
 
 ```{.python .input}
 #@tab pytorch
 d2l.set_figsize()
 print('input image shape:', img.permute(1, 2, 0).shape)
-d2l.plt.imshow(img.permute(1, 2, 0));
+d2l.plt.imshow(img.permute(1, 2, 0))
 print('output image shape:', out_img.shape)
-d2l.plt.imshow(out_img);
+d2l.plt.imshow(out_img)
 ```
 
 In a fully convolutional network, we [**initialize the transposed convolutional layer with upsampling of bilinear interpolation. For the $1\times 1$ convolutional layer, we use Xavier initialization.**]
@@ -284,7 +284,7 @@ net[-2].initialize(init=init.Xavier())
 ```{.python .input}
 #@tab pytorch
 W = bilinear_kernel(num_classes, num_classes, 64)
-net.transpose_conv.weight.data.copy_(W);
+net.transpose_conv.weight.data.copy_(W)
 ```
 
 ## [**Reading the Dataset**]
@@ -409,7 +409,7 @@ for i in range(n):
     X = image.fixed_crop(test_images[i], *crop_rect)
     pred = label2image(predict(X))
     imgs += [X, pred, image.fixed_crop(test_labels[i], *crop_rect)]
-d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
+d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2)
 ```
 
 ```{.python .input}
@@ -424,7 +424,7 @@ for i in range(n):
     imgs += [X.permute(1,2,0), pred.cpu(),
              torchvision.transforms.functional.crop(
                  test_labels[i], *crop_rect).permute(1,2,0)]
-d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
+d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2)
 ```
 
 ## Summary
