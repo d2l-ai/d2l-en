@@ -400,7 +400,7 @@ class WeightDecay(d2l.LinearRegression):
             1, kernel_regularizer=tf.keras.regularizers.l2(wd))
         
     def loss(self, y_hat, y):
-        return super().loss(y_hat, y) + net.losses
+        return super().loss(y_hat, y) + self.net.losses
 ```
 
 [**The plots look identical to those when
