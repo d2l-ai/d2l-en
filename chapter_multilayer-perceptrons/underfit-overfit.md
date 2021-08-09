@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Model Selection, Underfitting, and Overfitting
 :label:`sec_model_selection`
 
@@ -389,6 +394,7 @@ We can now (**explore these concepts interactively
 by fitting polynomials to data.**)
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
@@ -397,19 +403,17 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
-import numpy as np
 import math
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
-import numpy as np
 import math
 ```
 
@@ -430,20 +434,25 @@ It allows us to avoid very large values for large exponents $i$.
 We will synthesize 100 samples each for the training set and test set.
 
 ```{.python .input}
-#@tab all
-max_degree = 20  # Maximum degree of the polynomial
-n_train, n_test = 100, 100  # Training and test dataset sizes
-true_w = np.zeros(max_degree)  # Allocate lots of empty space
-true_w[0:4] = np.array([5, 1.2, -3.4, 5.6])
-
-features = np.random.normal(size=(n_train + n_test, 1))
-np.random.shuffle(features)
-poly_features = np.power(features, np.arange(max_degree).reshape(1, -1))
-for i in range(max_degree):
-    poly_features[:, i] /= math.gamma(i + 1)  # `gamma(n)` = (n-1)!
-# Shape of `labels`: (`n_train` + `n_test`,)
-labels = np.dot(poly_features, true_w)
-labels += np.random.normal(scale=0.1, size=labels.shape)
+%%tab all
+class Data(d2l.DataModule):
+    def __init__(self, num_train, num_val, num_inputs, batch_size):
+        self.save_hyperparameters()        
+        p, n = max(3, self.num_inputs), num_train + num_val
+        w = d2l.tensor([1.2, -3.4, 5.6] + [0]*(p-3))
+        if tab.selected('mxnet') or tab.selected('pytorch'):
+            x = d2l.randn(n, 1)
+            noise = d2l.randn(n, 1) * 0.1
+        if tab.selected('tensorflow'):
+            x = d2l.normal((n, 1))
+            noise = d2l.normal((n, 1)) * 0.1
+        X = d2l.concat([x ** (i+1) / math.gamma(i+2) for i in range(p)], 1)
+        self.y = d2l.matmul(X, d2l.reshape(w, (-1, 1))) + noise
+        self.X = X[:,:num_inputs]
+        
+    def get_dataloader(self, train):
+        i = slice(0, self.num_train) if train else slice(self.num_train, None)
+        return self.get_tensorloader([self.X, self.y], train, i)
 ```
 
 Again, monomials stored in `poly_features`
@@ -453,139 +462,27 @@ where $\Gamma(n)=(n-1)!$.
 The value 1 is technically a feature,
 namely the constant feature corresponding to the bias.
 
-```{.python .input}
-#@tab pytorch, tensorflow
-# Convert from NumPy ndarrays to tensors
-true_w, features, poly_features, labels = [d2l.tensor(x, dtype=
-    d2l.float32) for x in [true_w, features, poly_features, labels]]
-```
-
-```{.python .input}
-#@tab all
-features[:2], poly_features[:2, :], labels[:2]
-```
-
-### Training and Testing the Model
-
-Let's first [**implement a function to evaluate the loss on a given dataset**].
-
-```{.python .input}
-#@tab mxnet, tensorflow
-def evaluate_loss(net, data_iter, loss):  #@save
-    """Evaluate the loss of a model on the given dataset."""
-    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
-    for X, y in data_iter:
-        l = loss(net(X), y)
-        metric.add(d2l.reduce_sum(l), d2l.size(l))
-    return metric[0] / metric[1]
-```
-
-```{.python .input}
-#@tab pytorch
-def evaluate_loss(net, data_iter, loss):  #@save
-    """Evaluate the loss of a model on the given dataset."""
-    metric = d2l.Accumulator(2)  # Sum of losses, no. of examples
-    for X, y in data_iter:
-        out = net(X)
-        y = d2l.reshape(y, out.shape)
-        l = loss(out, y)
-        metric.add(d2l.reduce_sum(l), d2l.size(l))
-    return metric[0] / metric[1]
-```
-
-Now [**define the training function**].
-
-```{.python .input}
-def train(train_features, test_features, train_labels, test_labels,
-          num_epochs=400):
-    loss = gluon.loss.L2Loss()
-    net = nn.Sequential()
-    # Switch off the bias since we already catered for it in the polynomial
-    # features
-    net.add(nn.Dense(1, use_bias=False))
-    net.initialize()
-    batch_size = min(10, train_labels.shape[0])
-    train_iter = d2l.load_array((train_features, train_labels), batch_size)
-    test_iter = d2l.load_array((test_features, test_labels), batch_size,
-                               is_train=False)
-    trainer = gluon.Trainer(net.collect_params(), 'sgd',
-                            {'learning_rate': 0.01})
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
-                            xlim=[1, num_epochs], ylim=[1e-3, 1e2],
-                            legend=['train', 'test'])
-    for epoch in range(num_epochs):
-        d2l.train_epoch_ch3(net, train_iter, loss, trainer)
-        if epoch == 0 or (epoch + 1) % 20 == 0:
-            animator.add(epoch + 1, (evaluate_loss(net, train_iter, loss),
-                                     evaluate_loss(net, test_iter, loss)))
-    print('weight:', net[0].weight.data().asnumpy())
-```
-
-```{.python .input}
-#@tab pytorch
-def train(train_features, test_features, train_labels, test_labels,
-          num_epochs=400):
-    loss = nn.MSELoss()
-    input_shape = train_features.shape[-1]
-    # Switch off the bias since we already catered for it in the polynomial
-    # features
-    net = nn.Sequential(nn.Linear(input_shape, 1, bias=False))
-    batch_size = min(10, train_labels.shape[0])
-    train_iter = d2l.load_array((train_features, train_labels.reshape(-1,1)),
-                                batch_size)
-    test_iter = d2l.load_array((test_features, test_labels.reshape(-1,1)),
-                               batch_size, is_train=False)
-    trainer = torch.optim.SGD(net.parameters(), lr=0.01)
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
-                            xlim=[1, num_epochs], ylim=[1e-3, 1e2],
-                            legend=['train', 'test'])
-    for epoch in range(num_epochs):
-        d2l.train_epoch_ch3(net, train_iter, loss, trainer)
-        if epoch == 0 or (epoch + 1) % 20 == 0:
-            animator.add(epoch + 1, (evaluate_loss(net, train_iter, loss),
-                                     evaluate_loss(net, test_iter, loss)))
-    print('weight:', net[0].weight.data.numpy())
-```
-
-```{.python .input}
-#@tab tensorflow
-def train(train_features, test_features, train_labels, test_labels,
-          num_epochs=400):
-    loss = tf.losses.MeanSquaredError()
-    input_shape = train_features.shape[-1]
-    # Switch off the bias since we already catered for it in the polynomial
-    # features
-    net = tf.keras.Sequential()
-    net.add(tf.keras.layers.Dense(1, use_bias=False))
-    batch_size = min(10, train_labels.shape[0])
-    train_iter = d2l.load_array((train_features, train_labels), batch_size)
-    test_iter = d2l.load_array((test_features, test_labels), batch_size,
-                               is_train=False)
-    trainer = tf.keras.optimizers.SGD(learning_rate=.01)
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
-                            xlim=[1, num_epochs], ylim=[1e-3, 1e2],
-                            legend=['train', 'test'])
-    for epoch in range(num_epochs):
-        d2l.train_epoch_ch3(net, train_iter, loss, trainer)
-        if epoch == 0 or (epoch + 1) % 20 == 0:
-            animator.add(epoch + 1, (evaluate_loss(net, train_iter, loss),
-                                     evaluate_loss(net, test_iter, loss)))
-    print('weight:', net.get_weights()[0].T)
-```
-
 ### [**Third-Order Polynomial Function Fitting (Normal)**]
 
 We will begin by first using a third-order polynomial function, which is the same order as that of the data generation function.
 The results show that this model's training and test losses can be both effectively reduced.
 The learned model parameters are also close
-to the true values $w = [5, 1.2, -3.4, 5.6]$.
+to the true values $w = [1.2, -3.4, 5.6], b=5$.
 
 ```{.python .input}
-#@tab all
-# Pick the first four dimensions, i.e., 1, x, x^2/2!, x^3/3! from the
-# polynomial features
-train(poly_features[:n_train, :4], poly_features[n_train:, :4],
-      labels[:n_train], labels[n_train:])
+%%tab all
+def train(p):
+    if tab.selected('mxnet') or tab.selected('tensorflow'):
+        model = d2l.LinearRegression(lr=0.01)
+    if tab.selected('pytorch'):
+        model = d2l.LinearRegression(p, lr=0.01)
+    model.board.ylim = [1, 1e2]
+    data = Data(200, 200, p, 20)
+    trainer = d2l.Trainer(max_epochs=10)
+    trainer.fit(model, data)
+    print(model.get_w_b())
+    
+train(p=3)
 ```
 
 ### [**Linear Function Fitting (Underfitting)**]
@@ -601,10 +498,8 @@ When used to fit nonlinear patterns
 linear models are liable to underfit.
 
 ```{.python .input}
-#@tab all
-# Pick the first two dimensions, i.e., 1, x, from the polynomial features
-train(poly_features[:n_train, :2], poly_features[n_train:, :2],
-      labels[:n_train], labels[n_train:])
+%%tab all
+train(p=1)
 ```
 
 ### [**Higher-Order Polynomial Function Fitting  (Overfitting)**]
@@ -622,10 +517,8 @@ It shows that
 the complex model overfits the data.
 
 ```{.python .input}
-#@tab all
-# Pick all the dimensions from the polynomial features
-train(poly_features[:n_train, :], poly_features[n_train:, :],
-      labels[:n_train], labels[n_train:], num_epochs=1500)
+%%tab all
+train(p=10)
 ```
 
 In the subsequent sections, we will continue
