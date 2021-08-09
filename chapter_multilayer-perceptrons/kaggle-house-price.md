@@ -279,21 +279,14 @@ data.train.shape
 %%tab all
 
 @d2l.add_to_class(KaggleHouse)
-def dataloader(self, df, shuffle):
+def get_dataloader(self, train):
     label = 'SalePrice'
-    if label not in df: return
-    tensor = lambda x: d2l.tensor(x.values, dtype=d2l.float32)
-    data = (tensor(df.drop(columns=[label])),  # X
-            d2l.reshape(d2l.log(tensor(df[label])), (-1,1))) # Y
-    return d2l.tensorloader(data, self.batch_size, shuffle=shuffle)
-
-@d2l.add_to_class(KaggleHouse)
-def train_dataloader(self):
-    return self.dataloader(self.train, shuffle=True)
-
-@d2l.add_to_class(KaggleHouse)
-def val_dataloader(self):
-    return self.dataloader(self.val, shuffle=True)
+    data = self.train if train else self.val
+    if label not in data: return
+    get_tensor = lambda x: d2l.tensor(x.values, dtype=d2l.float32)
+    tensors = (get_tensor(data.drop(columns=[label])),  # X
+               d2l.reshape(d2l.log(get_tensor(data[label])), (-1, 1))) # Y
+    return self.get_tensorloader(tensors, train)
 ```
 
 ## Defining Model
