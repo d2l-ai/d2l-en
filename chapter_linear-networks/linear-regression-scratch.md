@@ -1,3 +1,8 @@
+```{.python .input  n=1}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Linear Regression Implementation from Scratch
 :label:`sec_linear_scratch`
 
@@ -16,22 +21,23 @@ Later on, we will introduce a more concise implementation,
 taking advantage of bells and whistles of deep learning frameworks while retaining
 the structure of what follows below.
 
-```{.python .input}
+```{.python .input  n=2}
+%%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import autograd, np, npx
 npx.set_np()
 ```
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=3}
+%%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
 import torch
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=4}
+%%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -47,38 +53,25 @@ and a standard deviation of 0.01.
 The magic number 0.01 often works well in practice, but you can definitely specify a different value through the argument `sigma`.
 Moreover we set the bias to 0.
 
-```{.python .input}
+```{.python .input  n=5}
+%%tab all
 class LinearRegressionScratch(d2l.Module):  #@save
     def __init__(self, num_inputs, lr, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.w = d2l.normal(0, sigma, size=(num_inputs, 1))
-        self.b = d2l.zeros(1)
-        self.w.attach_grad()
-        self.b.attach_grad()
-```
-
-```{.python .input}
-#@tab pytorch
-class LinearRegressionScratch(d2l.Module):
-    def __init__(self, num_inputs, lr, sigma=0.01):
-        super().__init__()
-        self.save_hyperparameters()
-        self.w = torch.normal(0, sigma, size=(num_inputs, 1),
-                              requires_grad=True)
-        self.b = torch.zeros(1, requires_grad=True)
-```
-
-```{.python .input}
-#@tab tensorflow
-class LinearRegressionScratch(d2l.Module):
-    def __init__(self, num_inputs, lr, sigma=0.01):
-        super().__init__()
-        self.save_hyperparameters()
-        w = tf.random.normal((num_inputs, 1), 0, sigma)
-        b = tf.zeros(1)
-        self.w = tf.Variable(w, trainable=True)
-        self.b = tf.Variable(b, trainable=True)
+        if tab.selected('mxnet'):
+            self.w = d2l.randn(num_inputs, 1) * sigma
+            self.b = d2l.zeros(1)
+            self.w.attach_grad()
+            self.b.attach_grad()
+        if tab.selected('pytorch'):
+            self.w = d2l.randn(num_inputs, 1, requires_grad=True)
+            self.b = d2l.zeros(1, requires_grad=True)
+        if tab.selected('tensorflow'):
+            w = tf.random.normal((num_inputs, 1)) * sigma
+            b = tf.zeros(1)
+            self.w = tf.Variable(w, trainable=True)
+            self.b = tf.Variable(b, trainable=True)
 ```
 
 After initializing our parameters,
@@ -95,9 +88,9 @@ Due to the broadcasting mechanism of :numref:`subsec_broadcasting`,
 when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
-```{.python .input}
-#@tab all
-@d2l.add_to_class(LinearRegressionScratch)
+```{.python .input  n=6}
+%%tab all
+@d2l.add_to_class(LinearRegressionScratch)  #@save
 def forward(self, X):
     """The linear regression model."""
     return d2l.matmul(X, self.w) + self.b
@@ -114,29 +107,14 @@ In the implementation, we need to transform the true value `y`
 into the predicted value's shape `y_hat`.
 The result returned by the following function
 will also have the same shape as `y_hat`. 
-We also return the averaged loss value among all examples in the minibatch.  
+We also return the averaged loss value among all examples in the minibatch.
 
-```{.python .input}
-#@tab all
-def mse(y_hat, y):  #@save
-    """Squared loss."""
-    loss = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
-    return d2l.reduce_mean(loss)
-```
-
-In a training step, we predict the value and then return the loss compared to the ground truth. 
-We draw the loss value in our progress plot, and average every 10 points for a smoother plot.  
-
-```{.python .input}
-#@tab all
-@d2l.add_to_class(LinearRegressionScratch)
-def training_step(self, batch):
-    X, y = batch
-    l = mse(self(X), y)    
-    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
-    self.board.xlabel = 'epoch'
-    self.board.draw(epoch, l, 'loss', every_n=10)
-    return l
+```{.python .input  n=7}
+%%tab all
+@d2l.add_to_class(LinearRegressionScratch)  #@save
+def loss(self, y_hat, y):
+    l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
+    return d2l.reduce_mean(l)
 ```
 
 ## Defining the Optimization Algorithm
@@ -170,61 +148,51 @@ We define our `SGD` class to have a similar API as the built-in SGD optimizer. W
 We define our `SGD` class to have a similar API as the built-in SGD optimizer. We update the parameters in the `apply_gradients` method. It accepts a list of parameter and gradient pairs. 
 :end_tab:
 
-
-```{.python .input}
+```{.python .input  n=8}
+%%tab mxnet, pytorch
 class SGD(d2l.HyperParameters):  #@save
     def __init__(self, params, lr):
         """Minibatch stochastic gradient descent."""
         self.save_hyperparameters()
 
-    def step(self, _):
-        for param in self.params:
-            param -= self.lr * param.grad
+    if tab.selected('mxnet'):
+        def step(self, _):
+            for param in self.params:
+                param -= self.lr * param.grad
+    
+    if tab.selected('pytorch'):
+        def step(self):
+            for param in self.params:
+                param -= self.lr * param.grad
+
+        def zero_grad(self):
+            for param in self.params:
+                if param.grad is not None:
+                    param.grad.zero_()
 ```
 
-```{.python .input}
-#@tab pytorch
-class SGD(d2l.HyperParameters):
-    def __init__(self, params, lr):
-        """Minibatch stochastic gradient descent."""
-        self.save_hyperparameters()
-
-    def step(self):
-        for param in self.params:
-            param -= self.lr * param.grad
-
-    def zero_grad(self):
-        for param in self.params:
-            if param.grad is not None:
-                param.grad.zero_()
-```
-
-```{.python .input}
-#@tab tensorflow
-class SGD(d2l.HyperParameters):
+```{.python .input  n=9}
+%%tab tensorflow
+class SGD(d2l.HyperParameters):  #@save
     def __init__(self, lr):
         """Minibatch stochastic gradient descent."""
         self.save_hyperparameters()
-
+    
     def apply_gradients(self, grads_and_vars):
         for grad, param in grads_and_vars:
-            param.assign_sub(self.lr * grad)
+            param.assign_sub(self.lr * grad)        
 ```
 
 Then we let the `configure_optimizers` method return an instance of the `SGD` class.
 
-```{.python .input}
-#@tab mxnet, pytorch
-@d2l.add_to_class(LinearRegressionScratch)
+```{.python .input  n=10}
+%%tab all
+@d2l.add_to_class(LinearRegressionScratch)  #@save
 def configure_optimizers(self):
-    return SGD([self.w, self.b], self.lr)
-```
-
-```{.python .input}
-#@tab tensorflow
-@d2l.add_to_class(LinearRegressionScratch)
-def configure_optimizers(self):
-    return SGD(self.lr)
+    if tab.selected('mxnet') or tab.selected('pytorch'):
+        return SGD([self.w, self.b], self.lr)
+    if tab.selected('tensorflow'):
+        return SGD(self.lr)
 ```
 
 ## Training
@@ -236,8 +204,8 @@ since it the archetype of almost all training loops in deep learning.
 
 In the `fit` method, we first get the training dataloader and validation dataloader from the argument `data`, reset all counters to 0, and obtain the optimizer. Then we train the model by `max_epochs` epochs.
 
-```{.python .input}
-#@tab all
+```{.python .input  n=11}
+%%tab all
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit(self, model, data):
     model.trainer = self
@@ -264,10 +232,10 @@ to update the model parameters. In summary, we will execute the following loop:
     * Compute gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} l(\mathbf{x}^{(i)}, y^{(i)}, \mathbf{w}, b)$
     * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
  
-Recall that the synthetic regression dataset we generated in :numref:`sec_synthetic_data` doesn't provide a validation dataset. In most cases, however, we will use a validation dataset to measure our model quality. Here we pass the validation dataloader once in each epoch to measure the model performance. 
+Recall that the synthetic regression dataset we generated in :numref:`sec_synthetic_data` doesn't provide a validation dataset. In most cases, however, we will use a validation dataset to measure our model quality. Here we pass the validation dataloader once in each epoch to measure the model performance.
 
-```{.python .input}
-#@tab pytorch
+```{.python .input  n=12}
+%%tab pytorch
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self, model, optim):
     model.train()        
@@ -287,8 +255,8 @@ def fit_epoch(self, model, optim):
         self.val_batch_idx += 1
 ```
 
-```{.python .input}
-#@tab mxnet
+```{.python .input  n=13}
+%%tab mxnet
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self, model, optim):
     for batch in self.train_dataloader:
@@ -304,8 +272,8 @@ def fit_epoch(self, model, optim):
         self.val_batch_idx += 1
 ```
 
-```{.python .input}
-#@tab tensorflow
+```{.python .input  n=14}
+%%tab tensorflow
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self, model, optim):
     model.training = True
@@ -330,8 +298,8 @@ and requires some adjustment for different problems and
 network architectures. We elide these details for now but revise them
 later in :numref:`chap_optimization`.
 
-```{.python .input}
-#@tab all
+```{.python .input  n=15}
+%%tab all
 model = LinearRegressionScratch(2, lr=0.03)
 data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 trainer = d2l.Trainer(max_epochs=3)
@@ -345,8 +313,8 @@ by comparing the true parameters
 with those that we learned**] through our training loop.
 Indeed they turn out to be very close to each other.
 
-```{.python .input}
-#@tab all
+```{.python .input  n=16}
+%%tab all
 print(f'error in estimating w: {data.w - d2l.reshape(model.w, data.w.shape)}')
 print(f'error in estimating b: {data.b - model.b}')
 ```
@@ -409,4 +377,3 @@ the the canonical structure of a training loop. In this process we built a data 
 :begin_tab:`tensorflow`
 [Discussions](https://discuss.d2l.ai/t/201)
 :end_tab:
-

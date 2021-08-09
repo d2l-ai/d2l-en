@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Concise Implementation of Multilayer Perceptrons
 :label:`sec_mlp_concise`
 
@@ -5,6 +10,7 @@ As you might expect, by (**relying on the high-level APIs,
 we can implement MLPs even more concisely.**)
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
 from mxnet import gluon, init, npx
 from mxnet.gluon import nn
@@ -12,14 +18,14 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 from d2l import tensorflow as d2l
 import tensorflow as tf
 ```
@@ -33,37 +39,42 @@ the only difference is that we add
 *two* fully connected layers
 (previously, we added *one*).
 The first is [**our hidden layer**],
-which (**contains 256 hidden units
-and applies the ReLU activation function**).
-The second is our output layer.
+the second is our output layer.
 
 ```{.python .input}
-net = nn.Sequential()
-net.add(nn.Dense(256, activation='relu'),
-        nn.Dense(10))
-net.initialize(init.Normal(sigma=0.01))
+%%tab mxnet
+class MLP(d2l.Classification):
+    def __init__(self, num_outputs, num_hiddens, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential()
+        self.net.add(nn.Dense(num_hiddens, activation='relu'),
+                     nn.Dense(num_outputs))
+        self.net.initialize()
 ```
 
 ```{.python .input}
-#@tab pytorch
-net = nn.Sequential(nn.Flatten(),
-                    nn.Linear(784, 256),
-                    nn.ReLU(),
-                    nn.Linear(256, 10))
-
-def init_weights(m):
-    if type(m) == nn.Linear:
-        nn.init.normal_(m.weight, std=0.01)
-
-net.apply(init_weights);
+%%tab pytorch
+class MLP(d2l.Classification):
+    def __init__(self, num_inputs, num_outputs, num_hiddens, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = nn.Sequential(nn.Flatten(),
+                                 nn.Linear(num_inputs, num_hiddens),
+                                 nn.ReLU(),
+                                 nn.Linear(num_hiddens, num_outputs))
 ```
 
 ```{.python .input}
-#@tab tensorflow
-net = tf.keras.models.Sequential([
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(256, activation='relu'),
-    tf.keras.layers.Dense(10)])
+%%tab tensorflow
+class MLP(d2l.Classification):
+    def __init__(self, num_outputs, num_hiddens, lr):
+        super().__init__()
+        self.save_hyperparameters()
+        self.net = tf.keras.models.Sequential([
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(num_hiddens, activation='relu'),
+            tf.keras.layers.Dense(num_outputs)])  
 ```
 
 [**The training loop**] is exactly the same
@@ -73,29 +84,14 @@ matters concerning the model architecture
 from orthogonal considerations.
 
 ```{.python .input}
-batch_size, lr, num_epochs = 256, 0.1, 10
-loss = gluon.loss.SoftmaxCrossEntropyLoss()
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-```
-
-```{.python .input}
-#@tab pytorch
-batch_size, lr, num_epochs = 256, 0.1, 10
-loss = nn.CrossEntropyLoss()
-trainer = torch.optim.SGD(net.parameters(), lr=lr)
-```
-
-```{.python .input}
-#@tab tensorflow
-batch_size, lr, num_epochs = 256, 0.1, 10
-loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-trainer = tf.keras.optimizers.SGD(learning_rate=lr)
-```
-
-```{.python .input}
-#@tab all
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
+%%tab all
+if tab.selected(['mxnet', 'tensorflow']):
+    model = MLP(num_outputs=10, num_hiddens=256, lr=0.1)
+if tab.selected(['pytorch']):
+    model = MLP(num_inputs=784, num_outputs=10, num_hiddens=256, lr=0.1)
+data = d2l.FashionMNIST(batch_size=256)
+trainer = d2l.Trainer(max_epochs=10)
+trainer.fit(model, data)
 ```
 
 ## Summary

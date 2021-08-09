@@ -1,9 +1,15 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Synthetic Regression Data
 :label:`synthetic_data`
 
 In this section, we will construct an artificial dataset according to a linear model with additive noise. We will use it to train the linear model.
 
 ```{.python .input}
+%%tab mxnet
 %matplotlib inline
 from d2l import mxnet as d2l
 from mxnet import np, npx, gluon
@@ -12,7 +18,7 @@ npx.set_np()
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 %matplotlib inline
 from d2l import torch as d2l
 import torch
@@ -20,7 +26,7 @@ import random
 ```
 
 ```{.python .input}
-#@tab tensorflow
+%%tab tensorflow
 %matplotlib inline
 from d2l import tensorflow as d2l
 import tensorflow as tf
@@ -46,39 +52,34 @@ To make our problem easy, we will set its standard deviation to $\sigma = 0.01$.
 We put the code into the `__init__` method of a subclass of `DataModule`, and allow the hyper-parameters configurable. The addition `batch_size` will be used later.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab all
 class SyntheticRegressionData(d2l.DataModule):  #@save
-    def __init__(self, w, b, noise=0.01, num_examples=1000, batch_size=8):
+    def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000, 
+                 batch_size=32):
         super().__init__()
         self.save_hyperparameters()
-        self.X = d2l.normal(0, 1, (num_examples, len(w)))
-        y = d2l.matmul(self.X, w) + b + d2l.normal(0, noise, (num_examples,))
-        self.y = d2l.reshape(y, (-1, 1))
-```
-
-```{.python .input}
-#@tab tensorflow
-class SyntheticRegressionData(d2l.DataModule):  #@save
-    def __init__(self, w, b, noise=0.01, num_examples=1000, batch_size=8):
-        super().__init__()
-        self.save_hyperparameters()
-        self.X = tf.random.normal((num_examples, w.shape[0]))
-        y = d2l.matmul(self.X, tf.reshape(w, (-1, 1))) + b
-        self.y = y + tf.random.normal(y.shape, 0, noise)
+        n = num_train + num_val
+        if tab.selected('pytorch') or tab.selected('mxnet'):                
+            self.X = d2l.randn(n, len(w))
+            noise = d2l.randn(n, 1) * noise
+        if tab.selected('tensorflow'):
+            self.X = tf.random.normal((n, w.shape[0]))
+            noise = tf.random.normal((n, 1)) * noise            
+        self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 ```
 
 We set the true parameters to 
 $\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$ to generate the data
 
 ```{.python .input}
-#@tab all
+%%tab all
 data = SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
 ```
 
 [**Each row in `features` consists of a vector in $\mathbb{R}^2$ and each row in `labels` is a scalar.**]
 
 ```{.python .input}
-#@tab all
+%%tab all
 print('features:', data.X[0],'\nlabel:', data.y[0])
 ```
 
@@ -96,29 +97,22 @@ and a vector of labels, yielding minibatches of size `batch_size`.**)
 Each minibatch consists of a tuple of features and labels.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+%%tab all
 @d2l.add_to_class(SyntheticRegressionData)
-def train_dataloader(self):
-    indices = list(range(self.num_examples))
-    # The examples are read at random, in no particular order
-    random.shuffle(indices)
-    for i in range(0, self.num_examples, self.batch_size):
-        batch_indices = d2l.tensor(
-            indices[i: min(i + self.batch_size, self.num_examples)])
-        yield self.X[batch_indices], self.y[batch_indices]
-```
-
-```{.python .input}
-#@tab tensorflow
-@d2l.add_to_class(SyntheticRegressionData)
-def train_dataloader(self):
-    indices = list(range(self.num_examples))
-    # The examples are read at random, in no particular order
-    random.shuffle(indices)
-    for i in range(0, self.num_examples, self.batch_size):
-        j = tf.constant(indices[
-            i : min(i+self.batch_size, self.num_examples)])
-        yield tf.gather(self.X, j), tf.gather(self.y, j)
+def get_dataloader(self, train):
+    if train:
+        indices = list(range(0, self.num_train))
+        # The examples are read at random, in no particular order
+        random.shuffle(indices)
+    else:
+        indices = list(range(self.num_train, self.num_train+self.num_val))
+    for i in range(0, len(indices), self.batch_size):
+        if tab.selected('mxnet') or tab.selected('pytorch'):
+            batch_indices = d2l.tensor(indices[i: i + self.batch_size])
+            yield self.X[batch_indices], self.y[batch_indices]
+        if tab.selected('tensorflow'):
+            j = tf.constant(indices[i : i+self.batch_size])
+            yield tf.gather(self.X, j), tf.gather(self.y, j)            
 ```
 
 To build some intuition, let's inspect the first minibatch of
@@ -126,7 +120,7 @@ data. Each minibatch of features provides us both with its size and the dimensio
 Likewise, our minibatch of labels will have a matching shape given by `batch_size`.
 
 ```{.python .input}
-#@tab all
+%%tab all
 X, y = next(iter(data.train_dataloader()))
 print('X shape:', X.shape, '\ny shape:', y.shape)
 ```
@@ -154,39 +148,40 @@ Rather than writing our own iterator,
 we can [**call the existing API in a framework to load data.**] We first create a dataset with `X` and `y`, then specify the `batch_size`, and let the data loader to shuffle examples.
 
 ```{.python .input}
-@d2l.add_to_class(SyntheticRegressionData)  #@save
-def train_dataloader(self):
-    dataset = gluon.data.ArrayDataset(self.X, self.y)
-    return gluon.data.DataLoader(dataset, self.batch_size, shuffle=True)
-```
+%%tab all
+@d2l.add_to_class(d2l.DataModule)  #@save
+def get_tensorloader(self, tensors, train, indices=slice(0,None)):
+    tensors = tuple(a[indices] for a in tensors)
+    if tab.selected('mxnet'):
+        dataset = gluon.data.ArrayDataset(*tensors)
+        return gluon.data.DataLoader(dataset, self.batch_size, shuffle=train)
+    if tab.selected('pytorch'):
+        dataset = torch.utils.data.TensorDataset(*tensors)
+        return torch.utils.data.DataLoader(dataset, self.batch_size, shuffle=train)
+    if tab.selected('tensorflow'):
+        shuffle_buffer = tensors[0].shape[0] if train else 1
+        return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
+            buffer_size=shuffle_buffer).batch(self.batch_size)
 
-```{.python .input}
-#@tab pytorch
 @d2l.add_to_class(SyntheticRegressionData)  #@save
-def train_dataloader(self):
-    dataset = torch.utils.data.TensorDataset(self.X, self.y)
-    return torch.utils.data.DataLoader(dataset, self.batch_size, shuffle=True)
-```
-
-```{.python .input  n=2}
-#@tab tensorflow
-@d2l.add_to_class(SyntheticRegressionData)  #@save
-def train_dataloader(self):
-    return tf.data.Dataset.from_tensor_slices((self.X, self.y)).shuffle(
-        buffer_size=self.num_examples).batch(self.batch_size)
+def get_dataloader(self, train):
+    i = slice(0, self.num_train) if train else slice(self.num_train, None)
+    return self.get_tensorloader((self.X, self.y), train, i)
+        
 ```
 
 The usage is much the same way as before.
 
 ```{.python .input  n=4}
-#@tab all
-next(iter(data.train_dataloader()))
+%%tab all
+X, y = next(iter(data.train_dataloader()))
+print('X shape:', X.shape, '\ny shape:', y.shape)
 ```
 
 Additional benefit is that the framework API implemented the built-in `__len__` method, so we can get the length, i.e. the number of batches.
 
 ```{.python .input}
-#@tab all
+%%tab all
 len(data.train_dataloader())
 ```
 
