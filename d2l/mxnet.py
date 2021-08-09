@@ -2,6 +2,9 @@ USE_MXNET = True
 USE_PYTORCH = False
 USE_TENSORFLOW = False
 
+DATA_HUB = dict()
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+
 import collections
 import hashlib
 import inspect
@@ -159,7 +162,7 @@ class ProgressBoard(d2l.HyperParameters):
     def __init__(self, xlabel=None, ylabel=None, xlim=None,
                  ylim=None, xscale='linear', yscale='linear',
                  ls=['-', '--', '-.', ':'], colors=['C0', 'C1', 'C2', 'C3'],
-                 fig=None, axes=None, figsize=(3.5, 2.5)):
+                 fig=None, axes=None, figsize=(3.5, 2.5), display=True):
         self.save_hyperparameters()
 
     def draw(self, x, y, label, every_n=1):
@@ -484,63 +487,18 @@ def validation_step(self, batch):
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB = dict()
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download(name, cache_dir=os.path.join('..', 'data')):
-    """Download a file inserted into DATA_HUB, return the local filename."""
-    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}."
-    url, sha1_hash = DATA_HUB[name]
-    os.makedirs(cache_dir, exist_ok=True)
-    fname = os.path.join(cache_dir, url.split('/')[-1])
-    if os.path.exists(fname):
-        sha1 = hashlib.sha1()
-        with open(fname, 'rb') as f:
-            while True:
-                data = f.read(1048576)
-                if not data:
-                    break
-                sha1.update(data)
-        if sha1.hexdigest() == sha1_hash:
-            return fname  # Hit cache
-    print(f'Downloading {fname} from {url}...')
-    r = requests.get(url, stream=True, verify=True)
-    with open(fname, 'wb') as f:
-        f.write(r.content)
-    return fname
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def download_extract(name, folder=None):
+def extract(filename, folder=None):
     """Download and extract a zip/tar file."""
-    fname = download(name)
-    base_dir = os.path.dirname(fname)
-    data_dir, ext = os.path.splitext(fname)
+    base_dir = os.path.dirname(filename)
+    _, ext = os.path.splitext(fname)
+    assert ext in ('.zip', '.tar', '.gz'), 'Only support zip/tar files.'
     if ext == '.zip':
-        fp = zipfile.ZipFile(fname, 'r')
-    elif ext in ('.tar', '.gz'):
-        fp = tarfile.open(fname, 'r')
+        fp = zipfile.ZipFile(filename, 'r')
     else:
-        assert False, 'Only zip/tar files can be extracted.'
-    fp.extractall(base_dir)
-    return os.path.join(base_dir, folder) if folder else data_dir
-
-def download_all():
-    """Download all files in the DATA_HUB."""
-    for name in DATA_HUB:
-        download(name)
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-DATA_HUB['kaggle_house_train'] = (
-    DATA_URL + 'kaggle_house_pred_train.csv',
-    '585e9cc93e70b39160e7921475f9bcd7d31219ce')
-
-DATA_HUB['kaggle_house_test'] = (
-    DATA_URL + 'kaggle_house_pred_test.csv',
-    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
+        fp = tarfile.open(filename, 'r')
+    if folder is None:
+        folder = base_dir
+    fp.extractall(folder)
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
@@ -2991,14 +2949,14 @@ def save_hyperparameters(self, ignore=[]):
 @d2l.add_to_class(d2l.ProgressBoard)
 def draw(self, x, y, label, every_n=1):
     Point = collections.namedtuple('Point', ['x', 'y'])
-    if not hasattr(self, 'points'):
-        self.points = collections.OrderedDict()
-        self.lines = collections.OrderedDict()
-    if label not in self.points:
-        self.points[label] = []
-        self.lines[label] = []    
-    points = self.points[label]
-    line = self.lines[label]
+    if not hasattr(self, 'raw_points'):
+        self.raw_points = collections.OrderedDict()
+        self.data = collections.OrderedDict()
+    if label not in self.raw_points:
+        self.raw_points[label] = []
+        self.data[label] = []    
+    points = self.raw_points[label]
+    line = self.data[label]
     points.append(Point(x, y))
     if len(points) != every_n:
         return    
@@ -3006,11 +2964,13 @@ def draw(self, x, y, label, every_n=1):
     line.append(Point(mean([p.x for p in points]), 
                       mean([p.y for p in points])))
     points.clear()
+    if not self.display: 
+        return
     d2l.use_svg_display()
     if self.fig is None:
         self.fig = d2l.plt.figure(figsize=self.figsize)
     plt_lines, labels = [], []
-    for (k, v), ls, color in zip(self.lines.items(), self.ls, self.colors):        
+    for (k, v), ls, color in zip(self.data.items(), self.ls, self.colors):        
         plt_lines.append(d2l.plt.plot([p.x for p in v], [p.y for p in v], 
                                       linestyle=ls, color=color)[0])
         labels.append(k)        
@@ -3168,6 +3128,45 @@ def accuracy(y_hat, y):
         y_hat = d2l.argmax(y_hat, axis=1)
     cmp = d2l.astype(y_hat, y.dtype) == y
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+def download_old(name, cache_dir=os.path.join('..', 'data')):
+    """Download a file inserted into DATA_HUB, return the local filename."""
+    assert name in DATA_HUB, f"{name} does not exist in {DATA_HUB}."
+    url, sha1_hash = DATA_HUB[name]
+    os.makedirs(cache_dir, exist_ok=True)
+    fname = os.path.join(cache_dir, url.split('/')[-1])
+    if os.path.exists(fname):
+        sha1 = hashlib.sha1()
+        with open(fname, 'rb') as f:
+            while True:
+                data = f.read(1048576)
+                if not data:
+                    break
+                sha1.update(data)
+        if sha1.hexdigest() == sha1_hash:
+            return fname  # Hit cache
+    print(f'Downloading {fname} from {url}...')
+    r = requests.get(url, stream=True, verify=True)
+    with open(fname, 'wb') as f:
+        f.write(r.content)
+    return fname
+
+def download_extract(name, folder=None):
+    """Download and extract a zip/tar file."""
+    fname = download(name)
+    base_dir = os.path.dirname(fname)
+    data_dir, ext = os.path.splitext(fname)
+    if ext == '.zip':
+        fp = zipfile.ZipFile(fname, 'r')
+    elif ext in ('.tar', '.gz'):
+        fp = tarfile.open(fname, 'r')
+    else:
+        assert False, 'Only zip/tar files can be extracted.'
+    fp.extractall(base_dir)
+    return os.path.join(base_dir, folder) if folder else data_dir
+
 
 
 # Alias defined in config.ini
