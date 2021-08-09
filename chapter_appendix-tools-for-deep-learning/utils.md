@@ -349,7 +349,7 @@ import zipfile
 import tarfile
 import hashlib
 
-def download(url, folder, sha1_hash=None):  #@save
+def download(url, folder='../data', sha1_hash=None):  #@save
     if not url.startswith('http'):
         # back compatability
         url, sha1_hash = DATA_HUB[url]

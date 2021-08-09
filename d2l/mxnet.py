@@ -3116,7 +3116,7 @@ def accuracy(y_hat, y):
 
 
 # Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
-def download(url, folder, sha1_hash=None):
+def download(url, folder='../data', sha1_hash=None):
     if not url.startswith('http'):
         # back compatability
         url, sha1_hash = DATA_HUB[url]
