@@ -66,8 +66,8 @@ This is a great way of *storing* such information on a computer.
 If the categories had some natural ordering among them,
 say if we were trying to predict $\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adult}, \text{geriatric}\}$,
 then it might even make sense to cast this as an [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression) problem 
-and keep the labels in this format. See e.g., :cite:`moon2010intervalrank` for an
-overview of different types of ranking loss functions and :cite:`beutel2014cobafi` for a Bayesian approach. 
+and keep the labels in this format. See :cite:`moon2010intervalrank` for an
+overview of different types of ranking loss functions and :cite:`beutel2014cobafi` for a Bayesian approach that addresses responses with more than one mode. 
 
 In general, classification problems do not come with natural orderings among the classes.
 Fortunately, statisticians long ago invented a simple way
@@ -141,29 +141,46 @@ There are many ways how to accomplish this goal. For instance, we could
 assume that the outputs $\mathbf{o}$ are corrupted versions of $\mathbf{y}$,
 where the corruption occurs by means of adding noise $\mathbf{\epsilon}$ 
 drawn from a normal distribution. In other words, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$ where $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$. This 
-is the so-called *probit model* :cite:`XXXX`. While appealing, it doesn't
+is the so-called [probit model](https://en.wikipedia.org/wiki/Probit_model), 
+first introduced by :cite:`fechner1860elemente`. While appealing, it doesn't
 work quite as well or lead to a particularly nice optimization problem, 
 when compared to the softmax. 
 
 A desirable property for mapping $\mathbf{o}$ into a vector of probabilities
 is that a larger value in $o_i$ would correspond to a larger value for class 
-$i$. Combined with nonnegativity we could use for instance $p(y = i) \propto \exp o_i$. 
+$i$. In particular, we want that the largest value $o_i$ corresponds to the 
+most likely class $i$. One way to accomplish this goal (and to ensure 
+nonnegativity) is to use an exponential function $p(y = i) \propto \exp o_i$. 
 This does indeed satisfy the requirement that the conditional class probability 
-increases with increasing $o_i$ and that the probabilities are all nonnegative. 
+increases with increasing $o_i$, it is monotonic, and all probabilities are nonnegative. 
 Unfortunately it fails to satisfy the key requirement of normalization. This can
-be accomplished by normalizing the sum via:
+be fixed via:
 
 $$\hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}$$
 :eqlabel:`eq_softmax_y_and_o`
 
-While somewhat of a misnomer, the mapping from $\mathbf{o}$ to $\hat{\mathbf{y}}$
-is often referred to as a softmax in deep learning. We write $\hat{\mathbf{y}} = \operatorname*{softmax} \mathbf{o}$. Note that by monotonicity of the exponential 
-function, the largest coordinate of $\mathbf{o}$
+The mapping from $\mathbf{o}$ to $\hat{\mathbf{y}}$
+is commonly referred to as a softmax. We write 
+$\hat{\mathbf{y}} = \operatorname*{softmax} \mathbf{o}$. 
+By construction, the largest coordinate of $\mathbf{o}$
 also corresponds to the most likely class according to $\hat{\mathbf{y}}$. 
 
 $$
 \operatorname*{argmax}_j \hat y_j = \operatorname*{argmax}_j o_j.
 $$
+
+The idea of a softmax dates back to Gibbs, who adapted ideas from physics 
+:cite:`gibbs1902elementary`. Dating even further back, Boltzmann, the father of
+modern thermodynamics, used this trick
+to model a distribution over energy states in gas molecules. In 
+particular, he discovered that the prevalence of a state of energy in a 
+thermodynamic ensemble, such as the molecules in a gas, is proportional to 
+$\exp(-E/kT)$. Here $E$ is the energy of a state, $T$ is the temperature and 
+$k$ is the Boltzmann constant. When statisticians talk about increasing or decreasing
+the 'temperature' of a statistical system, they refer to changing $T$ in order to favor
+lower or higher energy states. Following Gibbs' idea, energy equates to error. 
+Energy-based models :cite:`ranzato2007unified` use this point of view when describing 
+problems in Deep Learning. 
 
 ## Loss Function
 
@@ -175,34 +192,29 @@ when providing a probabilistic justification
 for the mean squared error loss in 
 :ref:`subsec_normal_distribution_and_squared_loss`.
 
-
 ### Log-Likelihood
 
-Given 
-
-
 The softmax function gives us a vector $\hat{\mathbf{y}}$,
-which we can interpret as estimated conditional probabilities
-of each class given any input $\mathbf{x}$, e.g.,
-$\hat{y}_1$ = $P(y=\text{cat} \mid \mathbf{x})$.
-Suppose that the entire dataset $\{\mathbf{X}, \mathbf{Y}\}$ has $n$ examples,
-where the example indexed by $i$
-consists of a feature vector $\mathbf{x}^{(i)}$ and a one-hot label vector $\mathbf{y}^{(i)}$.
+which we can interpret as (estimated) conditional probabilities
+of each class, given any input $\mathbf{x}$, such as 
+$\hat{y}_1$ = $P(y=\text{cat} | \mathbf{x})$. In the following 
+we assume that for a dataset with features $\mathbf{X}$ the labels $\mathbf{Y}$ 
+are represented using a one-hot encoding label vector. 
 We can compare the estimates with reality
 by checking how probable the actual classes are
 according to our model, given the features:
 
 $$
-P(\mathbf{Y} \mid \mathbf{X}) = \prod_{i=1}^n P(\mathbf{y}^{(i)} \mid \mathbf{x}^{(i)}).
+P(\mathbf{Y} | \mathbf{X}) = \prod_{i=1}^n P(\mathbf{y}^{(i)} | \mathbf{x}^{(i)}).
 $$
 
-According to maximum likelihood estimation,
-we maximize $P(\mathbf{Y} \mid \mathbf{X})$,
-which is
-equivalent to minimizing the negative log-likelihood:
+We are allowed to use the factorization since we assume that each label  
+is drawn independently from its respective distribution $p(\mathbf{y}|\mathbf{x}^{(i)})$.
+Since maximizing the product of terms if awkward, we take the negative logarithm to 
+obtain the equivalent problem of minimizing the negative log-likelihood:
 
 $$
--\log P(\mathbf{Y} \mid \mathbf{X}) = \sum_{i=1}^n -\log P(\mathbf{y}^{(i)} \mid \mathbf{x}^{(i)})
+-\log P(\mathbf{Y} | \mathbf{X}) = \sum_{i=1}^n -\log P(\mathbf{y}^{(i)} | \mathbf{x}^{(i)})
 = \sum_{i=1}^n l(\mathbf{y}^{(i)}, \hat{\mathbf{y}}^{(i)}),
 $$
 
@@ -215,20 +227,15 @@ $$ l(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_{j=1}^q y_j \log \hat{y}_j. $$
 For reasons explained later on, the loss function in :eqref:`eq_l_cross_entropy`
 is commonly called the *cross-entropy loss*.
 Since $\mathbf{y}$ is a one-hot vector of length $q$,
-the sum over all its coordinates $j$ vanishes for all but one term.
-Since all $\hat{y}_j$ are predicted probabilities,
-their logarithm is never larger than $0$.
-Consequently, the loss function cannot be minimized any further
-if we correctly predict the actual label with *certainty*,
-i.e., if the predicted probability $P(\mathbf{y} \mid \mathbf{x}) = 1$ for the actual label $\mathbf{y}$.
-Note that this is often impossible.
-For example, there might be label noise in the dataset
-(some examples may be mislabeled).
-It may also not be possible when the input features
-are not sufficiently informative
-to classify every example perfectly.
+the sum over all its coordinates $j$ vanishes for all but one term. Note that 
+the loss $l(\mathbf{y}, \hat{\mathbf{y}})$ is bounded from below by $0$ whenever
+$\hat{y}$ is a probability vector: no single entry is larger than $1$, hence 
+their negative logarithm cannot be lower than $0$. $l(\mathbf{y}, \hat{\mathbf{y}}) = 0$
+only occurs if we predict the actual label with *certainty*. This (almost) never happens, 
+not the least due to the fact that a prediction error would incur infinite loss ($-\log 0 = \infty$). 
 
-### Softmax and Derivatives
+
+### Softmax and Cross-Entropy Loss
 :label:`subsec_softmax_and_derivatives`
 
 Since the softmax and the corresponding loss are so common,
@@ -240,8 +247,8 @@ and using the definition of the softmax we obtain:
 $$
 \begin{aligned}
 l(\mathbf{y}, \hat{\mathbf{y}}) &=  - \sum_{j=1}^q y_j \log \frac{\exp(o_j)}{\sum_{k=1}^q \exp(o_k)} \\
-&= \sum_{j=1}^q y_j \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j\\
-&= \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j.
+&= \sum_{j=1}^q y_j \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j
+= \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j.
 \end{aligned}
 $$
 
@@ -265,14 +272,12 @@ In any exponential family (see the
 the gradients of the log-likelihood are given by precisely this term.
 This fact makes computing gradients easy in practice.
 
-### Cross-Entropy Loss
-
 Now consider the case where we observe not just a single outcome
 but an entire distribution over outcomes.
 We can use the same representation as before for the label $\mathbf{y}$.
 The only difference is that rather than a vector containing only binary entries,
 say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$.
-The mathematics that we used previously to define the loss $l$
+The math that we used previously to define the loss $l$
 in :eqref:`eq_l_cross_entropy`
 still works out fine,
 just that the interpretation is slightly more general.
@@ -280,49 +285,49 @@ It is the expected value of the loss for a distribution over labels.
 This loss is called the *cross-entropy loss* and it is
 one of the most commonly used losses for classification problems.
 We can demystify the name by introducing just the basics of information theory.
-If you wish to understand more details of information theory,
-you may further refer to the [online appendix on information theory](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/information-theory.html).
+In a nutshell, it measures the number of bits to encode what we see $\mathbf{y}$ 
+relative to what we predict that should happen $\hat{\mathbf{y}}$. 
+We provide a very basic explanation at the end of the current section. For further 
+details on information theory see :ref:`sec_information_theory` or in this classic :cite:`cover1999elements`.
 
-## Vectorization
+### Vectorization
 :label:`subsec_softmax_vectorization`
 
-To improve computational efficiency and take advantage of GPUs,
-we typically carry out vector calculations for minibatches of data.
-Assume that we are given a minibatch $\mathbf{X}$ of examples
-with feature dimensionality (number of inputs) $d$ and batch size $n$.
+To improve computational efficiency we vectorize calculations in minibatches of data. 
+Assume that we are given a minibatch $\mathbf{X} \in \mathbb{R}^{n \times d}$ 
+of $n$ features with dimensionality (number of inputs) $d$.
 Moreover, assume that we have $q$ categories in the output.
-Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$,
-weights $\mathbf{W} \in \mathbb{R}^{d \times q}$,
+Then the weights satisfy $\mathbf{W} \in \mathbb{R}^{d \times q}$
 and the bias satisfies $\mathbf{b} \in \mathbb{R}^{1\times q}$.
 
 $$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
 :eqlabel:`eq_minibatch_softmax_reg`
 
 This accelerates the dominant operation into
-a matrix-matrix product $\mathbf{X} \mathbf{W}$
-vs. the matrix-vector products we would be executing
-if we processed one example at a time.
-Since each row in $\mathbf{X}$ represents a data example,
+a matrix-matrix product $\mathbf{X} \mathbf{W}$. 
+Moreover, since each row in $\mathbf{X}$ represents a data example,
 the softmax operation itself can be computed *rowwise*:
 for each row of $\mathbf{O}$, exponentiate all entries and then normalize them by the sum.
-Triggering broadcasting during the summation $\mathbf{X} \mathbf{W} + \mathbf{b}$ in :eqref:`eq_minibatch_softmax_reg`,
-both the minibatch logits $\mathbf{O}$ and output probabilities $\hat{\mathbf{Y}}$
-are $n \times q$ matrices.
-
+Note, though, that care must be taken to avoid exponentiating and taking logarithms of large 
+numbers since this can cause numerical overflow or underflow. Deep Learning Frameworks 
+take care of this automatically. 
 
 ## Information Theory Basics
 :label:`subsec_info_theory_basics`
 
+Many deep learning papers use intuition and terms from information theory. 
+To make sense of them, we need some common language. This is a survival guide. For more 
+see :ref:`sec_information_theory`. 
 *Information theory* deals with the problem of encoding, decoding, transmitting,
-and manipulating information (also known as data) in as concise form as possible.
-
+and manipulating information (also known as data). 
 
 ### Entropy
 
-The central idea in information theory is to quantify the information content in data.
-This quantity places a hard limit on our ability to compress the data.
-In information theory, this quantity is called the *entropy* of a distribution $P$,
-and it is captured by the following equation:
+The central idea in information theory is to quantify the 
+amount of information contained in data. This places a  
+limit on our ability to compress data. For instance, the sequence 
+'111111111111111' is easily compressed into '15 times the digit 1'. 
+For a distribution $P$ its *entropy* is defined as:
 
 $$H[P] = \sum_j - P(j) \log P(j).$$
 :eqlabel:`eq_softmax_reg_entropy`
