@@ -450,25 +450,9 @@ class Data(d2l.DataModule):
         self.y = d2l.matmul(X, d2l.reshape(w, (-1, 1))) + noise
         self.X = X[:,:num_inputs]
         
-    def train_dataloader(self):
-        data = (self.X[:self.num_train], self.y[:self.num_train])
-        return d2l.tensorloader(data, self.batch_size, shuffle=True)    
-    def val_dataloader(self):
-        data = (self.X[self.num_train:], self.y[self.num_train:])
-        return d2l.tensorloader(data, self.batch_size, shuffle=False)
-```
-
-We will reuse the linear regression model defined in :numref:`sec_linear_concise`. Recall that we didn't implement the validation step yet, here we register the `validation_step` method.
-
-```{.python .input}
-%%tab all
-@d2l.add_to_class(d2l.LinearRegression)  #@save
-def validation_step(self, batch):
-    X, y = batch
-    l = self.loss(self(X), y)
-    self.board.draw(self.trainer.epoch+1, l, 'val_loss',
-                    every_n=self.trainer.num_val_batches)
-
+    def get_dataloader(self, train):
+        i = slice(0, self.num_train) if train else slice(self.num_train, None)
+        return self.get_tensorloader([self.X, self.y], train, i)
 ```
 
 Again, monomials stored in `poly_features`

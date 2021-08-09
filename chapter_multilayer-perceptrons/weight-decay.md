@@ -233,14 +233,10 @@ class Data(d2l.DataModule):
             noise = d2l.normal((n, 1)) * 0.1
         w, b = d2l.ones((num_inputs, 1)) * 0.01, 0.05
         self.y = d2l.matmul(self.X, w) + b
-        
-    def train_dataloader(self):
-        data = (self.X[:self.num_train], self.y[:self.num_train])
-        return d2l.tensorloader(data, self.batch_size, shuffle=True)
-    
-    def val_dataloader(self):
-        data = (self.X[self.num_train:], self.y[self.num_train:])
-        return d2l.tensorloader(data, self.batch_size, shuffle=False)
+
+    def get_dataloader(self, train):
+        i = slice(0, self.num_train) if train else slice(self.num_train, None)
+        return self.get_tensorloader([self.X, self.y], train, i)
 ```
 
 ## Implementation from Scratch
@@ -271,17 +267,6 @@ class WeightDecayScratch(d2l.LinearRegressionScratch):
         
     def loss(self, y_hat, y):
         return super().loss(y_hat, y) + self.lambd * l2_penalty(self.w)        
-```
-
-```{.python .input}
-%%tab all
-@d2l.add_to_class(d2l.LinearRegressionScratch)  #@save
-def validation_step(self, batch):
-    X, y = batch
-    l = self.loss(self(X), y)
-    self.board.draw(self.trainer.epoch+1, l, 'val_loss',
-                    every_n=self.trainer.num_val_batches)
-
 ```
 
 ```{.python .input}

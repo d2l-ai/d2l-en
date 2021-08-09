@@ -117,22 +117,6 @@ def loss(self, y_hat, y):
     return d2l.reduce_mean(l)
 ```
 
-In a training step, we predict the value and then return the loss compared to the ground truth. 
-We draw the loss value in our progress plot, and average every 10 points for a smoother plot.
-
-```{.python .input  n=8}
-%%tab all
-@d2l.add_to_class(LinearRegressionScratch)  #@save
-def training_step(self, batch):
-    X, y = batch
-    l = self.loss(self(X), y)    
-    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
-    self.board.xlabel = 'epoch'
-    self.board.yscale = 'log'
-    self.board.draw(epoch, l, 'loss', every_n=10)
-    return l
-```
-
 ## Defining the Optimization Algorithm
 
 As discussed in :numref:`sec_linear_regression`,
@@ -164,7 +148,7 @@ We define our `SGD` class to have a similar API as the built-in SGD optimizer. W
 We define our `SGD` class to have a similar API as the built-in SGD optimizer. We update the parameters in the `apply_gradients` method. It accepts a list of parameter and gradient pairs. 
 :end_tab:
 
-```{.python .input  n=9}
+```{.python .input  n=8}
 %%tab mxnet, pytorch
 class SGD(d2l.HyperParameters):  #@save
     def __init__(self, params, lr):
@@ -187,7 +171,7 @@ class SGD(d2l.HyperParameters):  #@save
                     param.grad.zero_()
 ```
 
-```{.python .input  n=10}
+```{.python .input  n=9}
 %%tab tensorflow
 class SGD(d2l.HyperParameters):  #@save
     def __init__(self, lr):
@@ -201,7 +185,7 @@ class SGD(d2l.HyperParameters):  #@save
 
 Then we let the `configure_optimizers` method return an instance of the `SGD` class.
 
-```{.python .input  n=11}
+```{.python .input  n=10}
 %%tab all
 @d2l.add_to_class(LinearRegressionScratch)  #@save
 def configure_optimizers(self):
@@ -220,7 +204,7 @@ since it the archetype of almost all training loops in deep learning.
 
 In the `fit` method, we first get the training dataloader and validation dataloader from the argument `data`, reset all counters to 0, and obtain the optimizer. Then we train the model by `max_epochs` epochs.
 
-```{.python .input  n=12}
+```{.python .input  n=11}
 %%tab all
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit(self, model, data):
@@ -250,7 +234,7 @@ to update the model parameters. In summary, we will execute the following loop:
  
 Recall that the synthetic regression dataset we generated in :numref:`sec_synthetic_data` doesn't provide a validation dataset. In most cases, however, we will use a validation dataset to measure our model quality. Here we pass the validation dataloader once in each epoch to measure the model performance.
 
-```{.python .input  n=13}
+```{.python .input  n=12}
 %%tab pytorch
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self, model, optim):
@@ -271,7 +255,7 @@ def fit_epoch(self, model, optim):
         self.val_batch_idx += 1
 ```
 
-```{.python .input  n=14}
+```{.python .input  n=13}
 %%tab mxnet
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self, model, optim):
@@ -288,7 +272,7 @@ def fit_epoch(self, model, optim):
         self.val_batch_idx += 1
 ```
 
-```{.python .input  n=15}
+```{.python .input  n=14}
 %%tab tensorflow
 @d2l.add_to_class(d2l.Trainer)  #@save
 def fit_epoch(self, model, optim):
@@ -314,7 +298,7 @@ and requires some adjustment for different problems and
 network architectures. We elide these details for now but revise them
 later in :numref:`chap_optimization`.
 
-```{.python .input  n=16}
+```{.python .input  n=15}
 %%tab all
 model = LinearRegressionScratch(2, lr=0.03)
 data = d2l.SyntheticRegressionData(w=d2l.tensor([2, -3.4]), b=4.2)
@@ -329,7 +313,7 @@ by comparing the true parameters
 with those that we learned**] through our training loop.
 Indeed they turn out to be very close to each other.
 
-```{.python .input  n=17}
+```{.python .input  n=16}
 %%tab all
 print(f'error in estimating w: {data.w - d2l.reshape(model.w, data.w.shape)}')
 print(f'error in estimating b: {data.b - model.b}')

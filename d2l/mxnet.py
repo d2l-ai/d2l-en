@@ -174,12 +174,30 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
     def __init__(self):
         super().__init__()
         self.board = ProgressBoard()
-
-    def training_step(self, batch):
+    def loss(self, y_hat, y):
         raise NotImplementedError
+        
+    def forward(self, X):
+        assert hasattr(self, 'net'), 'No neural network is defined'
+        return self.net(X)
+    
+    def training_step(self, batch):
+        X, y = batch
+        l = self.loss(self(X), y)
+        # Draw progress
+        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        num_train = self.trainer.num_train_batches
+        self.board.xlabel = 'epoch'
+        self.board.draw(self.trainer.train_batch_idx / num_train, l, 
+                        'train_loss', every_n=num_train // 5)
+        return l
 
-    def validaton_step(self, batch):
-        pass
+    def validation_step(self, batch):
+        X, y = batch
+        l = self.loss(self(X), y)
+        # Draw progress
+        self.board.draw(self.trainer.epoch+1, l, 'val_loss', 
+                        every_n=self.trainer.num_val_batches)
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -189,12 +207,15 @@ class Module(d2l.nn_Module, d2l.HyperParameters):
 class DataModule(d2l.HyperParameters):
     def __init__(self, root='../data', num_workers=4):
         self.save_hyperparameters()
-
-    def train_dataloader(self):
+        
+    def get_dataloader(self, train):
         raise NotImplementedError
+        
+    def train_dataloader(self):
+        return self.get_dataloader(train=True)
 
     def val_dataloader(self):
-        pass
+        return self.get_dataloader(train=False)
 
 
 # Defined in file: ./chapter_linear-networks/api.md
@@ -220,22 +241,27 @@ class Trainer(d2l.HyperParameters):
 
 # Defined in file: ./chapter_linear-networks/synthetic-regression-data.md
 class SyntheticRegressionData(d2l.DataModule):
-    def __init__(self, w, b, noise=0.01, num_examples=1000, 
-                 batch_size=8):
+    def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000, 
+                 batch_size=32):
         super().__init__()
-        self.save_hyperparameters()        
-        self.X = d2l.randn(num_examples, len(w))
-        noise = d2l.randn(num_examples, 1) * noise
+        self.save_hyperparameters()
+        n = num_train + num_val
+        self.X = d2l.randn(n, len(w))
+        noise = d2l.randn(n, 1) * noise
         self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 
 
 # Defined in file: ./chapter_linear-networks/synthetic-regression-data.md
-def tensorloader(tensors, batch_size, shuffle):
+@d2l.add_to_class(d2l.DataModule)
+def get_tensorloader(self, tensors, train, indices=slice(0,None)):
+    tensors = tuple(a[indices] for a in tensors)
     dataset = gluon.data.ArrayDataset(*tensors)
-    return gluon.data.DataLoader(dataset, batch_size, shuffle=shuffle)        
+    return gluon.data.DataLoader(dataset, self.batch_size, shuffle=train)
 @d2l.add_to_class(SyntheticRegressionData)
-def train_dataloader(self):
-    return tensorloader((self.X, self.y), self.batch_size, shuffle=True)
+def get_dataloader(self, train):
+    i = slice(0, self.num_train) if train else slice(self.num_train, None)
+    return self.get_tensorloader((self.X, self.y), train, i)
+        
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -261,18 +287,6 @@ def forward(self, X):
 def loss(self, y_hat, y):
     l = (y_hat - d2l.reshape(y, y_hat.shape)) ** 2 / 2
     return d2l.reduce_mean(l)
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
-@d2l.add_to_class(LinearRegressionScratch)
-def training_step(self, batch):
-    X, y = batch
-    l = self.loss(self(X), y)    
-    epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
-    self.board.xlabel = 'epoch'
-    self.board.yscale = 'log'
-    self.board.draw(epoch, l, 'loss', every_n=10)
-    return l
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
@@ -389,13 +403,9 @@ def text_labels(self, indices):
 
 # Defined in file: ./chapter_linear-networks/image-classification-dataset.md
 @d2l.add_to_class(FashionMNIST)
-def train_dataloader(self):
-    return gluon.data.DataLoader(self.train, self.batch_size, shuffle=True,
-                                 num_workers=self.num_workers)
-
-@d2l.add_to_class(FashionMNIST)
-def val_dataloader(self):
-    return gluon.data.DataLoader(self.val, self.batch_size, shuffle=False,
+def get_dataloader(self, train):
+    data = self.train if train else self.val
+    return gluon.data.DataLoader(data, self.batch_size, shuffle=train,
                                  num_workers=self.num_workers)
 
 
@@ -416,34 +426,17 @@ def visualize(self, batch, nrows=1, ncols=8, labels=[]):
 
 # Defined in file: ./chapter_linear-networks/classification.md
 class Classification(d2l.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, X):
-        return self.net(X)
-    
-    def training_step(self, batch):
+    def validation_step(self, batch):
         X, y = batch
-        l = self.loss(self(X), y)
-        epoch = self.trainer.train_batch_idx / self.trainer.num_train_batches
-        self.board.xlabel = 'epoch'
-        self.board.draw(epoch, l, 'train_loss', every_n=50)
-        return l
+        y_hat = self(X)
+        for k, v in (('val_loss', self.loss(y_hat, y)),
+                     ('val_acc', self.accuracy(y_hat, y))):
+            self.board.draw(self.trainer.epoch+1, v, k,
+                            every_n=self.trainer.num_val_batches)    
 
 
 # Defined in file: ./chapter_linear-networks/classification.md
-@d2l.add_to_class(Classification)
-def validation_step(self, batch):
-    X, y = batch
-    y_hat = self(X)
-    for k, v in (('val_loss', self.loss(y_hat, y)),
-                 ('val_acc', self.accuracy(y_hat, y))):
-        self.board.draw(self.trainer.epoch+1, v, k,
-                        every_n=self.trainer.num_val_batches)
-
-
-# Defined in file: ./chapter_linear-networks/classification.md
-@d2l.add_to_class(Classification)
+@d2l.add_to_class(d2l.Module)
 def configure_optimizers(self):
     params = self.collect_params()
     if isinstance(params, (tuple, list)):
@@ -466,24 +459,6 @@ def accuracy(self, y_hat, y):
 def loss(self, y_hat, y):
     l = gluon.loss.SoftmaxCrossEntropyLoss()
     return l(y_hat, y).mean()
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
-@d2l.add_to_class(d2l.LinearRegression)
-def validation_step(self, batch):
-    X, y = batch
-    l = self.loss(self(X), y)
-    self.board.draw(self.trainer.epoch+1, l, 'val_loss',
-                    every_n=self.trainer.num_val_batches)
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/weight-decay.md
-@d2l.add_to_class(d2l.LinearRegressionScratch)
-def validation_step(self, batch):
-    X, y = batch
-    l = self.loss(self(X), y)
-    self.board.draw(self.trainer.epoch+1, l, 'val_loss',
-                    every_n=self.trainer.num_val_batches)
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md

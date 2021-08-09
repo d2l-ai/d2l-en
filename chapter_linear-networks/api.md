@@ -130,40 +130,44 @@ The `Module` class  is the base class of all models we will implement. Minimally
 Sometimes we put the code to compute the outputs into a separate `forward` method to make it more reusable.
 
 ```{.python .input}
-%%tab mxnet, pytorch
+%%tab all
 class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
     def __init__(self):
         super().__init__()
         self.board = ProgressBoard()
+        if tab.selected('tensorflow'):
+            self.training = None
+
+    def loss(self, y_hat, y):
+        raise NotImplementedError
+        
+    def forward(self, X):
+        assert hasattr(self, 'net'), 'No neural network is defined'
+        return self.net(X)
+    
+    if tab.selected('tensorflow'):
+        def call(self, X, training=None):
+            if training is not None:
+                self.training = training
+            return self.forward(X)
 
     def training_step(self, batch):
-        raise NotImplementedError
+        X, y = batch
+        l = self.loss(self(X), y)
+        # Draw progress
+        assert hasattr(self, 'trainer'), 'trainer is not inited'
+        num_train = self.trainer.num_train_batches
+        self.board.xlabel = 'epoch'
+        self.board.draw(self.trainer.train_batch_idx / num_train, l, 
+                        'train_loss', every_n=num_train // 5)
+        return l
 
-    def validaton_step(self, batch):
-        pass
-
-    def configure_optimizers(self):
-        raise NotImplementedError
-```
-
-```{.python .input}
-%%tab tensorflow
-class Module(d2l.nn_Module, d2l.HyperParameters):  #@save
-    def __init__(self):
-        super().__init__()
-        self.board = ProgressBoard()
-        self.training = None
-
-    def call(self, inputs, training=None):
-        if training is not None:
-            self.training = training
-        return self.forward(inputs)
-
-    def training_step(self, batch):
-        raise NotImplementedError
-
-    def validaton_step(self, batch):
-        pass
+    def validation_step(self, batch):
+        X, y = batch
+        l = self.loss(self(X), y)
+        # Draw progress
+        self.board.draw(self.trainer.epoch+1, l, 'val_loss', 
+                        every_n=self.trainer.num_val_batches)
 
     def configure_optimizers(self):
         raise NotImplementedError
@@ -190,29 +194,24 @@ The `DataModule` class is the base class for data. We often have the `__init__` 
 which yields data batches for the `validation_step` method in `Module`.
 
 ```{.python .input}
-%%tab mxnet, pytorch
+%%tab all
 class DataModule(d2l.HyperParameters):  #@save
-    def __init__(self, root='../data', num_workers=4):
-        self.save_hyperparameters()
+    if tab.selected('mxnet', 'pytorch'):
+        def __init__(self, root='../data', num_workers=4):
+            self.save_hyperparameters()
+            
+    if tab.selected('tensorflow'):
+        def __init__(self, root='../data'):
+            self.save_hyperparameters()
 
-    def train_dataloader(self):
+    def get_dataloader(self, train):
         raise NotImplementedError
+        
+    def train_dataloader(self):
+        return self.get_dataloader(train=True)
 
     def val_dataloader(self):
-        pass
-```
-
-```{.python .input}
-%%tab tensorflow
-class DataModule(d2l.HyperParameters):  #@save
-    def __init__(self, root='../data'):
-        self.save_hyperparameters()
-
-    def train_dataloader(self):
-        raise NotImplementedError
-
-    def val_dataloader(self):
-        pass
+        return self.get_dataloader(train=False)
 ```
 
 ## Training

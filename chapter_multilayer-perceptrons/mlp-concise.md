@@ -51,9 +51,6 @@ class MLP(d2l.Classification):
         self.net.add(nn.Dense(num_hiddens, activation='relu'),
                      nn.Dense(num_outputs))
         self.net.initialize()
-
-    def forward(self, X):
-        return self.net(X)    
 ```
 
 ```{.python .input}
@@ -66,9 +63,6 @@ class MLP(d2l.Classification):
                                  nn.Linear(num_inputs, num_hiddens),
                                  nn.ReLU(),
                                  nn.Linear(num_hiddens, num_outputs))
-
-    def forward(self, X):
-        return self.net(X)
 ```
 
 ```{.python .input}
@@ -80,10 +74,7 @@ class MLP(d2l.Classification):
         self.net = tf.keras.models.Sequential([
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(num_hiddens, activation='relu'),
-            tf.keras.layers.Dense(num_outputs)])
-        
-    def forward(self, X):
-        return self.net(X)    
+            tf.keras.layers.Dense(num_outputs)])  
 ```
 
 [**The training loop**] is exactly the same

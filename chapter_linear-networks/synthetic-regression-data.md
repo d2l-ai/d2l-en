@@ -54,16 +54,17 @@ We put the code into the `__init__` method of a subclass of `DataModule`, and al
 ```{.python .input}
 %%tab all
 class SyntheticRegressionData(d2l.DataModule):  #@save
-    def __init__(self, w, b, noise=0.01, num_examples=1000, 
-                 batch_size=8):
+    def __init__(self, w, b, noise=0.01, num_train=1000, num_val=1000, 
+                 batch_size=32):
         super().__init__()
-        self.save_hyperparameters()        
+        self.save_hyperparameters()
+        n = num_train + num_val
         if tab.selected('pytorch') or tab.selected('mxnet'):                
-            self.X = d2l.randn(num_examples, len(w))
-            noise = d2l.randn(num_examples, 1) * noise
+            self.X = d2l.randn(n, len(w))
+            noise = d2l.randn(n, 1) * noise
         if tab.selected('tensorflow'):
-            self.X = tf.random.normal((num_examples, w.shape[0]))
-            noise = tf.random.normal((num_examples, 1)) * noise            
+            self.X = tf.random.normal((n, w.shape[0]))
+            noise = tf.random.normal((n, 1)) * noise            
         self.y = d2l.matmul(self.X, d2l.reshape(w, (-1, 1))) + b + noise
 ```
 
@@ -98,18 +99,19 @@ Each minibatch consists of a tuple of features and labels.
 ```{.python .input}
 %%tab all
 @d2l.add_to_class(SyntheticRegressionData)
-def train_dataloader(self):
-    indices = list(range(self.num_examples))
-    # The examples are read at random, in no particular order
-    random.shuffle(indices)
-    for i in range(0, self.num_examples, self.batch_size):
+def get_dataloader(self, train):
+    if train:
+        indices = list(range(0, self.num_train))
+        # The examples are read at random, in no particular order
+        random.shuffle(indices)
+    else:
+        indices = list(range(self.num_train, self.num_train+self.num_val))
+    for i in range(0, len(indices), self.batch_size):
         if tab.selected('mxnet') or tab.selected('pytorch'):
-            batch_indices = d2l.tensor(
-                indices[i: min(i + self.batch_size, self.num_examples)])
+            batch_indices = d2l.tensor(indices[i: i + self.batch_size])
             yield self.X[batch_indices], self.y[batch_indices]
         if tab.selected('tensorflow'):
-            j = tf.constant(indices[
-                i : min(i+self.batch_size, self.num_examples)])
+            j = tf.constant(indices[i : i+self.batch_size])
             yield tf.gather(self.X, j), tf.gather(self.y, j)            
 ```
 
@@ -147,28 +149,33 @@ we can [**call the existing API in a framework to load data.**] We first create 
 
 ```{.python .input}
 %%tab all
-def tensorloader(tensors, batch_size, shuffle):  #@save
+@d2l.add_to_class(d2l.DataModule)  #@save
+def get_tensorloader(self, tensors, train, indices=slice(0,None)):
+    tensors = tuple(a[indices] for a in tensors)
     if tab.selected('mxnet'):
         dataset = gluon.data.ArrayDataset(*tensors)
-        return gluon.data.DataLoader(dataset, batch_size, shuffle=shuffle)        
+        return gluon.data.DataLoader(dataset, self.batch_size, shuffle=train)
     if tab.selected('pytorch'):
         dataset = torch.utils.data.TensorDataset(*tensors)
-        return torch.utils.data.DataLoader(dataset, batch_size, shuffle=shuffle)
+        return torch.utils.data.DataLoader(dataset, self.batch_size, shuffle=train)
     if tab.selected('tensorflow'):
-        shuffle_buffer = tensors[0].shape[0] if shuffle else 1
+        shuffle_buffer = tensors[0].shape[0] if train else 1
         return tf.data.Dataset.from_tensor_slices(tensors).shuffle(
-            buffer_size=shuffle_buffer).batch(batch_size)        
+            buffer_size=shuffle_buffer).batch(self.batch_size)
 
 @d2l.add_to_class(SyntheticRegressionData)  #@save
-def train_dataloader(self):
-    return tensorloader((self.X, self.y), self.batch_size, shuffle=True)
+def get_dataloader(self, train):
+    i = slice(0, self.num_train) if train else slice(self.num_train, None)
+    return self.get_tensorloader((self.X, self.y), train, i)
+        
 ```
 
 The usage is much the same way as before.
 
 ```{.python .input  n=4}
 %%tab all
-next(iter(data.train_dataloader()))
+X, y = next(iter(data.train_dataloader()))
+print('X shape:', X.shape, '\ny shape:', y.shape)
 ```
 
 Additional benefit is that the framework API implemented the built-in `__len__` method, so we can get the length, i.e. the number of batches.

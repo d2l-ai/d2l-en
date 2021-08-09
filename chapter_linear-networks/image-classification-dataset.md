@@ -145,50 +145,34 @@ Recall that at each iteration, a data iterator
 We also randomly shuffle the examples for the training data iterator.
 
 ```{.python .input}
+%%tab mxnet
 @d2l.add_to_class(FashionMNIST)  #@save
-def train_dataloader(self):
-    return gluon.data.DataLoader(self.train, self.batch_size, shuffle=True,
-                                 num_workers=self.num_workers)
-
-@d2l.add_to_class(FashionMNIST)  #@save
-def val_dataloader(self):
-    return gluon.data.DataLoader(self.val, self.batch_size, shuffle=False,
+def get_dataloader(self, train):
+    data = self.train if train else self.val
+    return gluon.data.DataLoader(data, self.batch_size, shuffle=train,
                                  num_workers=self.num_workers)
 ```
 
 ```{.python .input}
 %%tab pytorch
 @d2l.add_to_class(FashionMNIST)  #@save
-def train_dataloader(self):
-    return torch.utils.data.DataLoader(
-        self.train, self.batch_size, shuffle=True,
-        num_workers=self.num_workers)
-
-@d2l.add_to_class(FashionMNIST)  #@save
-def val_dataloader(self):
-    return torch.utils.data.DataLoader(
-        self.val, self.batch_size, shuffle=False,
-        num_workers=self.num_workers)
+def get_dataloader(self, train):
+    data = self.train if train else self.val
+    return torch.utils.data.DataLoader(data, self.batch_size, shuffle=train,
+                                       num_workers=self.num_workers)
 ```
 
 ```{.python .input}
 %%tab tensorflow
 @d2l.add_to_class(FashionMNIST)  #@save
-def process(self, data, shuffle):
+def get_dataloader(self, train):
+    data = self.train if train else self.val
     process = lambda X, y: (tf.expand_dims(X, axis=3) / 255,
                             tf.cast(y, dtype='int32'))
     resize_fn = lambda X, y: (tf.image.resize_with_pad(X, *self.resize), y)
-    dataloader = tf.data.Dataset.from_tensor_slices(
-        process(*data)).batch(self.batch_size).map(resize_fn)
-    return dataloader if not shuffle else dataloader.shuffle(len(data[0]))
-
-@d2l.add_to_class(FashionMNIST)  #@save
-def train_dataloader(self):
-    return self.process(self.train, shuffle=True)
-
-@d2l.add_to_class(FashionMNIST)  #@save
-def val_dataloader(self):
-    return self.process(self.train, shuffle=False)
+    shuffle_buf = len(data[0]) if train else 1
+    return tf.data.Dataset.from_tensor_slices(process(*data)).batch(
+        self.batch_size).map(resize_fn).shuffle(shuffle_buf)
 ```
 
 ```{.python .input}
