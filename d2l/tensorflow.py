@@ -495,21 +495,6 @@ def validation_step(self, batch):
                     every_n=self.trainer.num_val_batches)
 
 
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def extract(filename, folder=None):
-    """Download and extract a zip/tar file."""
-    base_dir = os.path.dirname(filename)
-    _, ext = os.path.splitext(fname)
-    assert ext in ('.zip', '.tar', '.gz'), 'Only support zip/tar files.'
-    if ext == '.zip':
-        fp = zipfile.ZipFile(filename, 'r')
-    else:
-        fp = tarfile.open(filename, 'r')
-    if folder is None:
-        folder = base_dir
-    fp.extractall(folder)
-
-
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
@@ -1740,6 +1725,47 @@ def accuracy(y_hat, y):
         y_hat = d2l.argmax(y_hat, axis=1)
     cmp = d2l.astype(y_hat, y.dtype) == y
     return float(d2l.reduce_sum(d2l.astype(cmp, y.dtype)))
+
+
+# Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md
+def download(url, folder, sha1_hash=None):
+    if not url.startswith('http'):
+        # back compatability
+        url, sha1_hash = DATA_HUB[url]
+
+    os.makedirs(folder, exist_ok=True)
+    fname = os.path.join(folder, url.split('/')[-1])
+    # check if hit cache
+    if os.path.exists(fname) and sha1_hash:
+        sha1 = hashlib.sha1()
+        with open(fname, 'rb') as f:
+            while True:
+                data = f.read(1048576)
+                if not data:
+                    break
+                sha1.update(data)
+        if sha1.hexdigest() == sha1_hash:
+            return fname
+    # download
+    print(f'Downloading {fname} from {url}...')
+    r = requests.get(url, stream=True, verify=True)
+    with open(fname, 'wb') as f:
+        f.write(r.content)
+    return fname
+
+def extract(filename, folder=None):
+    """Download and extract a zip/tar file."""
+    base_dir = os.path.dirname(filename)
+    _, ext = os.path.splitext(fname)
+    assert ext in ('.zip', '.tar', '.gz'), 'Only support zip/tar files.'
+    if ext == '.zip':
+        fp = zipfile.ZipFile(filename, 'r')
+    else:
+        fp = tarfile.open(filename, 'r')
+    if folder is None:
+        folder = base_dir
+    fp.extractall(folder)
+    
 
 
 # Defined in file: ./chapter_appendix-tools-for-deep-learning/utils.md

@@ -46,53 +46,6 @@ def extract(filename, folder):
     """Extract a zip/tar file into folder."""
 ```
 
-```{.python .input  n=6}
-%%tab all
-import os
-import requests
-import zipfile
-import tarfile
-import hashlib
-
-def download(url, folder, sha1_hash=None):
-    if not url.startswith('http'):
-        # back compatability
-        url, sha1_hash = DATA_HUB[url]
-
-    os.makedirs(folder, exist_ok=True)
-    fname = os.path.join(folder, url.split('/')[-1])
-    # check if hit cache
-    if os.path.exists(fname) and sha1_hash:
-        sha1 = hashlib.sha1()
-        with open(fname, 'rb') as f:
-            while True:
-                data = f.read(1048576)
-                if not data:
-                    break
-                sha1.update(data)
-        if sha1.hexdigest() == sha1_hash:
-            return fname
-    # download
-    print(f'Downloading {fname} from {url}...')
-    r = requests.get(url, stream=True, verify=True)
-    with open(fname, 'wb') as f:
-        f.write(r.content)
-    return fname
-
-def extract(filename, folder=None):  #@save
-    """Download and extract a zip/tar file."""
-    base_dir = os.path.dirname(filename)
-    _, ext = os.path.splitext(fname)
-    assert ext in ('.zip', '.tar', '.gz'), 'Only support zip/tar files.'
-    if ext == '.zip':
-        fp = zipfile.ZipFile(filename, 'r')
-    else:
-        fp = tarfile.open(filename, 'r')
-    if folder is None:
-        folder = base_dir
-    fp.extractall(folder)
-```
-
 ## Kaggle
 
 [Kaggle](https://www.kaggle.com) is a popular platform
@@ -213,10 +166,10 @@ class KaggleHouse(d2l.DataModule):
         super().__init__()
         self.save_hyperparameters()
         if self.train is None:
-            self.raw_train = pd.read_csv(download(
+            self.raw_train = pd.read_csv(d2l.download(
                 d2l.DATA_URL + 'kaggle_house_pred_train.csv', self.root,
                 sha1_hash='585e9cc93e70b39160e7921475f9bcd7d31219ce'))
-            self.raw_val = pd.read_csv(download(
+            self.raw_val = pd.read_csv(d2l.download(
                 d2l.DATA_URL + 'kaggle_house_pred_test.csv', self.root,
                 sha1_hash='fa19780a7b011d9b009e8bff8e99922a8ee2eb90'))
 ```
