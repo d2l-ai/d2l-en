@@ -42,7 +42,7 @@ from torch import nn
 import os
 ```
 
-## Loading Pretrained BERT
+## [**Loading Pretrained BERT**]
 
 We have explained how to pretrain BERT on the WikiText-2 dataset in
 :numref:`sec_bert-dataset` and :numref:`sec_bert-pretraining`
@@ -71,7 +71,7 @@ d2l.DATA_HUB['bert.small'] = (d2l.DATA_URL + 'bert.small.torch.zip',
 
 Either pretrained BERT model contains a "vocab.json" file that defines the vocabulary set
 and a "pretrained.params" file of the pretrained parameters.
-We implement the following `load_pretrained_model` function to load pretrained BERT parameters.
+We implement the following `load_pretrained_model` function to [**load pretrained BERT parameters**].
 
 ```{.python .input}
 def load_pretrained_model(pretrained_model, num_hiddens, ffn_num_hiddens,
@@ -124,7 +124,7 @@ bert, vocab = load_pretrained_model(
     num_layers=2, dropout=0.1, max_len=512, devices=devices)
 ```
 
-## The Dataset for Fine-Tuning BERT
+## [**The Dataset for Fine-Tuning BERT**]
 
 For the downstream task natural language inference on the SNLI dataset,
 we define a customized dataset class `SNLIBERTDataset`.
@@ -248,7 +248,7 @@ class SNLIBERTDataset(torch.utils.data.Dataset):
 ```
 
 After downloading the SNLI dataset,
-we generate training and testing examples
+we [**generate training and testing examples**]
 by instantiating the `SNLIBERTDataset` class.
 Such examples will be read in minibatches during training and testing
 of natural language inference.
@@ -286,10 +286,10 @@ As :numref:`fig_bert-two-seqs` indicates,
 fine-tuning BERT for natural language inference
 requires only an extra MLP consisting of two fully connected layers
 (see `self.hidden` and `self.output` in the following `BERTClassifier` class).
-This MLP transforms the
-BERT representation of the special “&lt;cls&gt;” token,
+[**This MLP transforms the
+BERT representation of the special “&lt;cls&gt;” token**],
 which encodes the information of both the premise and the hypothesis,
-into three outputs of natural language inference:
+(**into three outputs of natural language inference**):
 entailment, contradiction, and neutral.
 
 ```{.python .input}
@@ -356,7 +356,7 @@ To allow parameters with stale gradients,
 the flag `ignore_stale_grad=True` is set in the `step` function of `d2l.train_batch_ch13`.
 We use this function to train and evaluate the model `net` using the training set
 (`train_iter`) and the testing set (`test_iter`) of SNLI.
-Due to the limited computational resources, the training and testing accuracy
+Due to the limited computational resources, [**the training**] and testing accuracy
 can be further improved: we leave its discussions in the exercises.
 
 ```{.python .input}
