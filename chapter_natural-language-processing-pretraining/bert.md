@@ -125,7 +125,7 @@ import torch
 from torch import nn
 ```
 
-## Input Representation
+## [**Input Representation**]
 :label:`subsec_bert_input_rep`
 
 In natural language processing,
@@ -182,7 +182,7 @@ of the token embeddings, segment embeddings, and positional embeddings.
 of the token embeddings, segment embeddings, and positional embeddings.](../img/bert-input.svg)
 :label:`fig_bert-input`
 
-The following `BERTEncoder` class is similar to the `TransformerEncoder` class
+The following [**`BERTEncoder` class**] is similar to the `TransformerEncoder` class
 as implemented in :numref:`sec_transformer`.
 Different from `TransformerEncoder`, `BERTEncoder` uses
 segment embeddings and learnable positional embeddings.
@@ -248,7 +248,7 @@ class BERTEncoder(nn.Module):
 ```
 
 Suppose that the vocabulary size is 10000.
-To demonstrate forward inference of `BERTEncoder`,
+To demonstrate forward [**inference of `BERTEncoder`**],
 let's create an instance of it and initialize its parameters.
 
 ```{.python .input}
@@ -301,7 +301,7 @@ for pretraining BERT.
 The pretraining is composed of the following two tasks:
 masked language modeling and next sentence prediction.
 
-### Masked Language Modeling
+### [**Masked Language Modeling**]
 :label:`subsec_mlm`
 
 As illustrated in :numref:`sec_language_model`,
@@ -387,7 +387,7 @@ class MaskLM(nn.Module):
         return mlm_Y_hat
 ```
 
-To demonstrate the forward inference of `MaskLM`,
+To demonstrate [**the forward inference of `MaskLM`**],
 we create its instance `mlm` and initialize it.
 Recall that `encoded_X` from the forward inference of `BERTEncoder`
 represents 2 BERT input sequences.
@@ -430,7 +430,7 @@ mlm_l = loss(mlm_Y_hat.reshape((-1, vocab_size)), mlm_Y.reshape(-1))
 mlm_l.shape
 ```
 
-### Next Sentence Prediction
+### [**Next Sentence Prediction**]
 :label:`subsec_nsp`
 
 Although masked language modeling is able to encode bidirectional context
@@ -478,7 +478,7 @@ class NextSentencePred(nn.Module):
         return self.output(X)
 ```
 
-We can see that the forward inference of an `NextSentencePred` instance
+We can see that [**the forward inference of an `NextSentencePred`**] instance
 returns binary predictions for each BERT input sequence.
 
 ```{.python .input}
@@ -522,7 +522,7 @@ These two text corpora are huge:
 they have 800 million words and 2.5 billion words, respectively.
 
 
-## Putting All Things Together
+## [**Putting All Things Together**]
 
 When pretraining BERT, the final loss function is a linear combination of
 both the loss functions for masked language modeling and next sentence prediction.
