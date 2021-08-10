@@ -136,7 +136,7 @@ class VGG(d2l.Classification):
         if tab.selected('pytorch'):
             conv_blks = []
             in_channels = 1
-            for (num_convs, out_channels) in conv_arch:
+            for (num_convs, out_channels) in arch:
                 conv_blks.append(vgg_block(num_convs, in_channels, out_channels))
                 in_channels = out_channels
             self.net = nn.Sequential(
@@ -145,7 +145,6 @@ class VGG(d2l.Classification):
                 nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
                 nn.Linear(4096, 10))
 ```
-
 
 The original VGG network had 5 convolutional blocks,
 among which the first two have one convolutional layer each
