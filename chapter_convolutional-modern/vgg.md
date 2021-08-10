@@ -1,3 +1,8 @@
+```{.python .input}
+%load_ext d2lbook.tab
+tab.interact_select(['mxnet', 'pytorch', 'tensorflow'])
+```
+
 # Networks Using Blocks (VGG)
 :label:`sec_vgg`
 
@@ -44,7 +49,7 @@ and $2 \times 2$ maximum pooling with stride of 2
 In the code below, we define a function called `vgg_block`
 to implement one VGG block.
 
-:begin_tab:`mxnet,tensorflow`
+:begin_tab:`mxnet`
 The function takes two arguments
 corresponding to the number of convolutional layers `num_convs`
 and the number of output channels `num_channels`.
@@ -57,8 +62,9 @@ and the number of output channels `out_channels`.
 :end_tab:
 
 ```{.python .input}
+%%tab mxnet
 from d2l import mxnet as d2l
-from mxnet import np, npx
+from mxnet import np, npx, init
 from mxnet.gluon import nn
 npx.set_np()
 
@@ -72,7 +78,7 @@ def vgg_block(num_convs, num_channels):
 ```
 
 ```{.python .input}
-#@tab pytorch
+%%tab pytorch
 from d2l import torch as d2l
 import torch
 from torch import nn
@@ -86,20 +92,6 @@ def vgg_block(num_convs, in_channels, out_channels):
         in_channels = out_channels
     layers.append(nn.MaxPool2d(kernel_size=2,stride=2))
     return nn.Sequential(*layers)
-```
-
-```{.python .input}
-#@tab tensorflow
-from d2l import tensorflow as d2l
-import tensorflow as tf
-
-def vgg_block(num_convs, num_channels):
-    blk = tf.keras.models.Sequential()
-    for _ in range(num_convs):
-        blk.add(tf.keras.layers.Conv2D(num_channels,kernel_size=3,
-                                    padding='same',activation='relu'))
-    blk.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
-    return blk
 ```
 
 ## [**VGG Network**]
@@ -124,6 +116,36 @@ which are precisely the arguments required to call
 the `vgg_block` function.
 The fully connected part of the VGG network is identical to that covered in AlexNet.
 
+
+The following code implements VGG-11. This is a simple matter of executing a for-loop over `conv_arch`.
+
+```{.python .input}
+%%tab all
+class VGG(d2l.Classification):
+    def __init__(self, arch, lr=0.1):
+        super().__init__()
+        self.save_hyperparameters()
+        if tab.selected('mxnet'):
+            self.net = nn.Sequential()
+            for (num_convs, num_channels) in arch:
+                self.net.add(vgg_block(num_convs, num_channels))
+            self.net.add(nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
+                         nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
+                         nn.Dense(10))
+            self.net.initialize(init.Xavier())
+        if tab.selected('pytorch'):
+            conv_blks = []
+            in_channels = 1
+            for (num_convs, out_channels) in arch:
+                conv_blks.append(vgg_block(num_convs, in_channels, out_channels))
+                in_channels = out_channels
+            self.net = nn.Sequential(
+                *conv_blks, nn.Flatten(),
+                nn.Linear(out_channels * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5),
+                nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
+                nn.Linear(4096, 10))
+```
+
 The original VGG network had 5 convolutional blocks,
 among which the first two have one convolutional layer each
 and the latter three contain two convolutional layers each.
@@ -134,92 +156,12 @@ Since this network uses 8 convolutional layers
 and 3 fully connected layers, it is often called VGG-11.
 
 ```{.python .input}
-#@tab all
-conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))
-```
-
-The following code implements VGG-11. This is a simple matter of executing a for-loop over `conv_arch`.
-
-```{.python .input}
-def vgg(conv_arch):
-    net = nn.Sequential()
-    # The convolutional part
-    for (num_convs, num_channels) in conv_arch:
-        net.add(vgg_block(num_convs, num_channels))
-    # The fully connected part
-    net.add(nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
-            nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
-            nn.Dense(10))
-    return net
-
-net = vgg(conv_arch)
-```
-
-```{.python .input}
-#@tab pytorch
-def vgg(conv_arch):
-    conv_blks = []
-    in_channels = 1
-    # The convolutional part
-    for (num_convs, out_channels) in conv_arch:
-        conv_blks.append(vgg_block(num_convs, in_channels, out_channels))
-        in_channels = out_channels
-
-    return nn.Sequential(
-        *conv_blks, nn.Flatten(),
-        # The fully connected part
-        nn.Linear(out_channels * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5),
-        nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
-        nn.Linear(4096, 10))
-
-net = vgg(conv_arch)
-```
-
-```{.python .input}
-#@tab tensorflow
-def vgg(conv_arch):
-    net = tf.keras.models.Sequential()
-    # The convulational part
-    for (num_convs, num_channels) in conv_arch:
-        net.add(vgg_block(num_convs, num_channels))
-    # The fully connected part
-    net.add(tf.keras.models.Sequential([
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(4096, activation='relu'),
-        tf.keras.layers.Dropout(0.5),
-        tf.keras.layers.Dense(4096, activation='relu'),
-        tf.keras.layers.Dropout(0.5),
-        tf.keras.layers.Dense(10)]))
-    return net
-
-net = vgg(conv_arch)
-```
-
-Next, we will construct a single-channel data example
-with a height and width of 224 to [**observe the output shape of each layer**].
-
-```{.python .input}
-net.initialize()
-X = np.random.uniform(size=(1, 1, 224, 224))
-for blk in net:
-    X = blk(X)
-    print(blk.name, 'output shape:\t', X.shape)
-```
-
-```{.python .input}
-#@tab pytorch
-X = torch.randn(size=(1, 1, 224, 224))
-for blk in net:
+%%tab all
+vgg_11 = VGG(arch=((1, 64), (1, 128), (2, 256), (2, 512), (2, 512)))
+X = d2l.randn(1, 1, 224, 224)
+for blk in vgg_11.net:
     X = blk(X)
     print(blk.__class__.__name__,'output shape:\t',X.shape)
-```
-
-```{.python .input}
-#@tab tensorflow
-X = tf.random.uniform((1, 224, 224, 1))
-for blk in net.layers:
-    X = blk(X)
-    print(blk.__class__.__name__,'output shape:\t', X.shape)
 ```
 
 As you can see, we halve height and width at each block,
@@ -233,31 +175,15 @@ for processing by the fully connected part of the network.
 we construct a network with a smaller number of channels.**]
 This is more than sufficient for training on Fashion-MNIST.
 
-```{.python .input}
-#@tab mxnet, pytorch
-ratio = 4
-small_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]
-net = vgg(small_conv_arch)
-```
-
-```{.python .input}
-#@tab tensorflow
-ratio = 4
-small_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]
-# Recall that this has to be a function that will be passed to
-# `d2l.train_ch6()` so that model building/compiling need to be within
-# `strategy.scope()` in order to utilize the CPU/GPU devices that we have
-net = lambda: vgg(small_conv_arch)
-```
-
 Apart from using a slightly larger learning rate,
 the [**model training**] process is similar to that of AlexNet in :numref:`sec_alexnet`.
 
 ```{.python .input}
-#@tab all
-lr, num_epochs, batch_size = 0.05, 10, 128
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+%%tab all
+model = VGG(arch=((1, 16), (1, 32), (2, 64), (2, 128), (2, 128)), lr=0.05)
+trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
+data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
+trainer.fit(model, data)
 ```
 
 ## Summary
@@ -279,8 +205,4 @@ d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 
 :begin_tab:`pytorch`
 [Discussions](https://discuss.d2l.ai/t/78)
-:end_tab:
-
-:begin_tab:`tensorflow`
-[Discussions](https://discuss.d2l.ai/t/277)
 :end_tab:
