@@ -148,6 +148,7 @@ npx.set_np()
 %%tab pytorch
 from d2l import torch as d2l
 import torch
+from torch import nn
 ```
 
 ```{.python .input}

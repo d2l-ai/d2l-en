@@ -150,7 +150,7 @@ NiN's training is similar to that for AlexNet and VGG.
 
 ```{.python .input}
 #@tab all
-model = AlexNet(lr=0.1)
+model = NiN(lr=0.1)
 trainer = d2l.Trainer(max_epochs=10, num_gpus=1)
 data = d2l.FashionMNIST(batch_size=128, resize=(224, 224))
 trainer.fit(model, data)

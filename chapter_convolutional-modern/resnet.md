@@ -173,6 +173,7 @@ blk(X).shape
 We also have the option to [**halve the output height and width while increasing the number of output channels**].
 
 ```{.python .input}
+%%tab all
 if tab.selected('mxnet'):
     blk = Residual(6, use_1x1conv=True, strides=2)
     blk.initialize()
@@ -200,15 +201,6 @@ class ResNet(d2l.Classification):
                 nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
                 nn.BatchNorm2d(64), nn.ReLU(),
                 nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
-```
-
-```{.python .input}
-
-```
-
-```{.python .input}
-#@tab pytorch
-
 ```
 
 GoogLeNet uses four modules made up of Inception blocks.
@@ -278,6 +270,7 @@ By configuring different numbers of channels and residual blocks in the module, 
 Before training ResNet, let's [**observe how the input shape changes across different modules in ResNet**]. As in all the previous architectures, the resolution decreases while the number of channels increases up until the point where a global average pooling layer aggregates all features.
 
 ```{.python .input}
+#@tab all
 class ResNet18(ResNet):
     def __init__(self, num_classes=10, lr=0.1):
         if tab.selected('mxnet'):
