@@ -106,7 +106,7 @@ We denote vectors by bold lowercase letters,
 
 Vectors are implemented as $1^{\mathrm{st}}$-order tensors.
 In general, such tensors can have arbitrary lengths,
-subject to memory limitations.
+subject to memory limitations. Caution: in Python, like in most programming languages, vector indices start at $0$, also known as *zero-based indexing*, whereas in linear algebra subscripts begin at $1$ (one-based indexing). 
 
 ```{.python .input}
 x = np.arange(3)

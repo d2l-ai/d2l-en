@@ -12,15 +12,23 @@ If you want to predict the number of dollars (price)
 at which a house will be sold,
 or the number of wins a baseball team might have,
 or the number of days that a patient will remain hospitalized before being discharged,
-then you are probably looking for a regression model.
+then you are probably looking for a regression model. Note, though, that even within
+regression models there are important distinctions. For instance, the price of a house
+will never be negative and changes might often be *relative* to its baseline price. As such, 
+it might be more effective to regress on the logarithm of the price. Likewise, the number of days a 
+patient spends in hospital is a *discrete nonnegative* random variable. As such, least mean squares 
+might not be an ideal approach either. As we can see, there's a lot more to estimation than just
+minimizing squared errors. 
 
-In practice, we are more often interested in *classification*:
-asking not "how much" but "which one":
+In fact, there's a lot more to machine learning than just regression. 
+In this section we encounter a novel concept: *classification*. 
+It deals with asking not "how much" but "which one":
 
 * Does this email belong in the spam folder or the inbox?
 * Is this customer more likely *to sign up* or *not to sign up* for a subscription service?
 * Does this image depict a donkey, a dog, a cat, or a rooster?
 * Which movie is Aston most likely to watch next?
+* Which section of the book are you going to read next?
 
 Colloquially, machine learning practitioners
 overload the word *classification*
@@ -31,13 +39,18 @@ and (ii) those where we wish to make soft assignments,
 i.e., to assess the probability that each category applies.
 The distinction tends to get blurred, in part,
 because often, even when we only care about hard assignments,
-we still use models that make soft assignments.
+we still use models that make soft assignments. 
 
+Even more, there are cases
+where more than one label might be true. For instance, a news article might 
+simultaneously cover the topics of entertainment, business, and space flight, 
+but not the topics of medicine or sports. As such, categorizing it into one of the above categories on their own would not be very useful. This problem is commonly 
+known as [multi-label classification](https://en.wikipedia.org/wiki/Multi-label_classification). See :cite:`tsoumakas2007multi` for an overview and :cite:`huang2015bidirectional` for an effective algorithm when tagging images.
 
-## Classification Problem
+## Classification
 :label:`subsec_classification-problem`
 
-To get our feet wet, let's start off with
+To get our feet wet, let's start with
 a simple image classification problem.
 Here, each input consists of a $2\times2$ grayscale image.
 We can represent each pixel value with a single scalar,
@@ -52,10 +65,11 @@ where the integers represent $\{\text{dog}, \text{cat}, \text{chicken}\}$ respec
 This is a great way of *storing* such information on a computer.
 If the categories had some natural ordering among them,
 say if we were trying to predict $\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adult}, \text{geriatric}\}$,
-then it might even make sense to cast this problem as regression
-and keep the labels in this format.
+then it might even make sense to cast this as an [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression) problem 
+and keep the labels in this format. See :cite:`moon2010intervalrank` for an
+overview of different types of ranking loss functions and :cite:`beutel2014cobafi` for a Bayesian approach that addresses responses with more than one mode. 
 
-But general classification problems do not come with natural orderings among the classes.
+In general, classification problems do not come with natural orderings among the classes.
 Fortunately, statisticians long ago invented a simple way
 to represent categorical data: the *one-hot encoding*.
 A one-hot encoding is a vector with as many components as we have categories.
@@ -67,17 +81,16 @@ and $(0, 0, 1)$ to "dog":
 
 $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}.$$
 
-## Network Architecture
+### Linear Model
 
 In order to estimate the conditional probabilities associated with all the possible classes,
 we need a model with multiple outputs, one per class.
 To address classification with linear models,
-we will need as many affine functions as we have outputs.
-Each output will correspond to its own affine function.
+we will need as many affine functions as we have outputs. Strictly speaking, we only need one fewer, since the last category has to be the difference between $1$ and the sum of the other categories but for reasons of symmetry we use a slightly redundant parametrization. 
+Each output corresponds to its own affine function.
 In our case, since we have 4 features and 3 possible output categories,
-we will need 12 scalars to represent the weights ($w$ with subscripts),
-and 3 scalars to represent the biases ($b$ with subscripts).
-We compute these three *logits*, $o_1, o_2$, and $o_3$, for each input:
+we need 12 scalars to represent the weights ($w$ with subscripts),
+and 3 scalars to represent the biases ($b$ with subscripts). This yields:
 
 $$
 \begin{aligned}
@@ -87,179 +100,121 @@ o_3 &= x_1 w_{31} + x_2 w_{32} + x_3 w_{33} + x_4 w_{34} + b_3.
 \end{aligned}
 $$
 
-We can depict this calculation with the neural network diagram shown in :numref:`fig_softmaxreg`.
-Just as in linear regression, softmax regression is also a single-layer neural network.
+The corresponding neural network diagram is shown in :numref:`fig_softmaxreg`.
+Just as in linear regression, we use a single-layer neural network.
 And since the calculation of each output, $o_1, o_2$, and $o_3$,
 depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$,
-the output layer of softmax regression can also be described as fully connected layer.
+the output layer can also be described as fully connected layer.
 
 ![Softmax regression is a single-layer neural network.](../img/softmaxreg.svg)
 :label:`fig_softmaxreg`
 
-To express the model more compactly, we can use linear algebra notation.
-In vector form, we arrive at
-$\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$,
-a form better suited both for mathematics, and for writing code.
-Note that we have gathered all of our weights into a $3 \times 4$ matrix
-and that for features of a given data example $\mathbf{x}$,
-our outputs are given by a matrix-vector product of our weights by our input features
-plus our biases $\mathbf{b}$.
+For a more concise notation we use vectors and matrices. 
+$\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$ is 
+much better suited for mathematics and code.
+Note that we have gathered all of our weights into a $3 \times 4$ matrix and all biases
+$\mathbf{b} \in \mathbb{R}^3$ in a vector.
 
 
-## Parameterization Cost of Fully Connected Layers
-:label:`subsec_parameterization-cost-fc-layers`
-
-As we will see in subsequent chapters,
-fully connected layers are ubiquitous in deep learning.
-However, as the name suggests,
-fully connected layers are *fully* connected
-with potentially many learnable parameters.
-Specifically,
-for any fully connected layer
-with $d$ inputs and $q$ outputs,
-the parameterization cost is $\mathcal{O}(dq)$,
-which can be prohibitively high in practice.
-Fortunately,
-this cost
-of transforming $d$ inputs into $q$ outputs
-can be reduced to $\mathcal{O}(\frac{dq}{n})$,
-where the hyperparameter $n$ can be flexibly specified
-by us to balance between parameter saving and model effectiveness in real-world applications :cite:`Zhang.Tay.Zhang.ea.2021`.
-
-
-
-
-
-## Softmax Operation
+### The Softmax
 :label:`subsec_softmax_operation`
 
-The main approach that we are going to take here
-is to interpret the outputs of our model as probabilities.
-We will optimize our parameters to produce probabilities
-that maximize the likelihood of the observed data.
-Then, to generate predictions, we will set a threshold,
-for example, choosing the label with the maximum predicted probabilities.
+Assuming a suitable loss function, we could try to minimize the 
+difference between $\mathbf{o}$ and the labels $\mathbf{y}$ directly. 
+While it turns out that treating classification as a vector-valued 
+regression problem is surprisingly well-behaved (it is statistically
+consistent), it is nonetheless lacking in many regards:
 
-Put formally, we would like any output $\hat{y}_j$
-to be interpreted as the probability
-that a given item belongs to class $j$.
-Then we can choose the class with the largest output value
-as our prediction $\operatorname*{argmax}_j y_j$.
-For example, if $\hat{y}_1$, $\hat{y}_2$, and $\hat{y}_3$
-are 0.1, 0.8, and 0.1, respectively,
-then we predict category 2, which (in our example) represents "chicken".
+* There is no guarantee that the outputs $o_i$ sum up to $1$ in
+  in the way we expect probabilities to behave. 
+* There is no guarantee that the outputs $o_i$ are even nonnegative,
+  even if their outputs sum to $1$, or that they do not exceed $1$.
+  
+Both aspects render the estimation problem difficult to solve and the
+solution very brittle to outliers. For instance, if we assume that there 
+is a positive linear dependency between the number of bedrooms and the likelihood
+that someone will buy a house, the probability might exceed $1$ when
+it comes to buying a mansion! As such, we need a mechanism to 'squish' 
+the outputs. 
 
-You might be tempted to suggest that we interpret
-the logits $o$ directly as our outputs of interest.
-However, there are some problems with directly
-interpreting the output of the linear layer as a probability.
-On one hand,
-nothing constrains these numbers to sum to 1.
-On the other hand, depending on the inputs, they can take negative values.
-These violate basic axioms of probability presented in :numref:`sec_prob`
+There are many ways how to accomplish this goal. For instance, we could 
+assume that the outputs $\mathbf{o}$ are corrupted versions of $\mathbf{y}$,
+where the corruption occurs by means of adding noise $\mathbf{\epsilon}$ 
+drawn from a normal distribution. In other words, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$ where $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$. This 
+is the so-called [probit model](https://en.wikipedia.org/wiki/Probit_model), 
+first introduced by :cite:`fechner1860elemente`. While appealing, it doesn't
+work quite as well or lead to a particularly nice optimization problem, 
+when compared to the softmax. 
 
-To interpret our outputs as probabilities,
-we must guarantee that (even on new data),
-they will be nonnegative and sum up to 1.
-Moreover, we need a training objective that encourages
-the model to estimate probabilities faithfully.
-Of all instances when a classifier outputs 0.5,
-we hope that half of those examples
-will actually belong to the predicted class.
-This is a property called *calibration*.
+A desirable property for mapping $\mathbf{o}$ into a vector of probabilities
+is that a larger value in $o_i$ would correspond to a larger value for class 
+$i$. In particular, we want that the largest value $o_i$ corresponds to the 
+most likely class $i$. One way to accomplish this goal (and to ensure 
+nonnegativity) is to use an exponential function $p(y = i) \propto \exp o_i$. 
+This does indeed satisfy the requirement that the conditional class probability 
+increases with increasing $o_i$, it is monotonic, and all probabilities are nonnegative. 
+Unfortunately it fails to satisfy the key requirement of normalization. This can
+be fixed via:
 
-The *softmax function*, invented in 1959 by the social scientist
-R. Duncan Luce in the context of *choice models*,
-does precisely this.
-To transform our logits such that they become nonnegative and sum to 1,
-while requiring that the model remains differentiable,
-we first exponentiate each logit (ensuring non-negativity)
-and then divide by their sum (ensuring that they sum to 1):
-
-$$\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o})\quad \text{where}\quad \hat{y}_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}. $$
+$$\hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}$$
 :eqlabel:`eq_softmax_y_and_o`
 
-It is easy to see $\hat{y}_1 + \hat{y}_2 + \hat{y}_3 = 1$
-with $0 \leq \hat{y}_j \leq 1$ for all $j$.
-Thus, $\hat{\mathbf{y}}$ is a proper probability distribution
-whose element values can be interpreted accordingly.
-Note that the softmax operation does not change the ordering among the logits $\mathbf{o}$,
-which are simply the pre-softmax values
-that determine the probabilities assigned to each class.
-Therefore, during prediction we can still pick out the most likely class by
+The mapping from $\mathbf{o}$ to $\hat{\mathbf{y}}$
+is commonly referred to as a softmax. We write 
+$\hat{\mathbf{y}} = \operatorname*{softmax} \mathbf{o}$. 
+By construction, the largest coordinate of $\mathbf{o}$
+also corresponds to the most likely class according to $\hat{\mathbf{y}}$. 
 
 $$
 \operatorname*{argmax}_j \hat y_j = \operatorname*{argmax}_j o_j.
 $$
 
-Although softmax is a nonlinear function,
-the outputs of softmax regression are still *determined* by
-an affine transformation of input features;
-thus, softmax regression is a linear model.
-
-
-
-## Vectorization for Minibatches
-:label:`subsec_softmax_vectorization`
-
-To improve computational efficiency and take advantage of GPUs,
-we typically carry out vector calculations for minibatches of data.
-Assume that we are given a minibatch $\mathbf{X}$ of examples
-with feature dimensionality (number of inputs) $d$ and batch size $n$.
-Moreover, assume that we have $q$ categories in the output.
-Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$,
-weights $\mathbf{W} \in \mathbb{R}^{d \times q}$,
-and the bias satisfies $\mathbf{b} \in \mathbb{R}^{1\times q}$.
-
-$$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
-:eqlabel:`eq_minibatch_softmax_reg`
-
-This accelerates the dominant operation into
-a matrix-matrix product $\mathbf{X} \mathbf{W}$
-vs. the matrix-vector products we would be executing
-if we processed one example at a time.
-Since each row in $\mathbf{X}$ represents a data example,
-the softmax operation itself can be computed *rowwise*:
-for each row of $\mathbf{O}$, exponentiate all entries and then normalize them by the sum.
-Triggering broadcasting during the summation $\mathbf{X} \mathbf{W} + \mathbf{b}$ in :eqref:`eq_minibatch_softmax_reg`,
-both the minibatch logits $\mathbf{O}$ and output probabilities $\hat{\mathbf{Y}}$
-are $n \times q$ matrices.
+The idea of a softmax dates back to Gibbs, who adapted ideas from physics 
+:cite:`gibbs1902elementary`. Dating even further back, Boltzmann, the father of
+modern thermodynamics, used this trick
+to model a distribution over energy states in gas molecules. In 
+particular, he discovered that the prevalence of a state of energy in a 
+thermodynamic ensemble, such as the molecules in a gas, is proportional to 
+$\exp(-E/kT)$. Here $E$ is the energy of a state, $T$ is the temperature and 
+$k$ is the Boltzmann constant. When statisticians talk about increasing or decreasing
+the 'temperature' of a statistical system, they refer to changing $T$ in order to favor
+lower or higher energy states. Following Gibbs' idea, energy equates to error. 
+Energy-based models :cite:`ranzato2007unified` use this point of view when describing 
+problems in Deep Learning. 
 
 ## Loss Function
 
-Next, we need a loss function to measure
-the quality of our predicted probabilities.
+Now that we have a mapping from features $\mathbf{x}$ to probabilities 
+$\mathbf{\hat{y}}$, we need a way to optimize the accuracy of this mapping. 
 We will rely on maximum likelihood estimation,
 the very same concept that we encountered
 when providing a probabilistic justification
-for the mean squared error objective in linear regression
-(:numref:`subsec_normal_distribution_and_squared_loss`).
-
+for the mean squared error loss in 
+:ref:`subsec_normal_distribution_and_squared_loss`.
 
 ### Log-Likelihood
 
 The softmax function gives us a vector $\hat{\mathbf{y}}$,
-which we can interpret as estimated conditional probabilities
-of each class given any input $\mathbf{x}$, e.g.,
-$\hat{y}_1$ = $P(y=\text{cat} \mid \mathbf{x})$.
-Suppose that the entire dataset $\{\mathbf{X}, \mathbf{Y}\}$ has $n$ examples,
-where the example indexed by $i$
-consists of a feature vector $\mathbf{x}^{(i)}$ and a one-hot label vector $\mathbf{y}^{(i)}$.
+which we can interpret as (estimated) conditional probabilities
+of each class, given any input $\mathbf{x}$, such as 
+$\hat{y}_1$ = $P(y=\text{cat} | \mathbf{x})$. In the following 
+we assume that for a dataset with features $\mathbf{X}$ the labels $\mathbf{Y}$ 
+are represented using a one-hot encoding label vector. 
 We can compare the estimates with reality
 by checking how probable the actual classes are
 according to our model, given the features:
 
 $$
-P(\mathbf{Y} \mid \mathbf{X}) = \prod_{i=1}^n P(\mathbf{y}^{(i)} \mid \mathbf{x}^{(i)}).
+P(\mathbf{Y} | \mathbf{X}) = \prod_{i=1}^n P(\mathbf{y}^{(i)} | \mathbf{x}^{(i)}).
 $$
 
-According to maximum likelihood estimation,
-we maximize $P(\mathbf{Y} \mid \mathbf{X})$,
-which is
-equivalent to minimizing the negative log-likelihood:
+We are allowed to use the factorization since we assume that each label  
+is drawn independently from its respective distribution $p(\mathbf{y}|\mathbf{x}^{(i)})$.
+Since maximizing the product of terms if awkward, we take the negative logarithm to 
+obtain the equivalent problem of minimizing the negative log-likelihood:
 
 $$
--\log P(\mathbf{Y} \mid \mathbf{X}) = \sum_{i=1}^n -\log P(\mathbf{y}^{(i)} \mid \mathbf{x}^{(i)})
+-\log P(\mathbf{Y} | \mathbf{X}) = \sum_{i=1}^n -\log P(\mathbf{y}^{(i)} | \mathbf{x}^{(i)})
 = \sum_{i=1}^n l(\mathbf{y}^{(i)}, \hat{\mathbf{y}}^{(i)}),
 $$
 
@@ -272,20 +227,15 @@ $$ l(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_{j=1}^q y_j \log \hat{y}_j. $$
 For reasons explained later on, the loss function in :eqref:`eq_l_cross_entropy`
 is commonly called the *cross-entropy loss*.
 Since $\mathbf{y}$ is a one-hot vector of length $q$,
-the sum over all its coordinates $j$ vanishes for all but one term.
-Since all $\hat{y}_j$ are predicted probabilities,
-their logarithm is never larger than $0$.
-Consequently, the loss function cannot be minimized any further
-if we correctly predict the actual label with *certainty*,
-i.e., if the predicted probability $P(\mathbf{y} \mid \mathbf{x}) = 1$ for the actual label $\mathbf{y}$.
-Note that this is often impossible.
-For example, there might be label noise in the dataset
-(some examples may be mislabeled).
-It may also not be possible when the input features
-are not sufficiently informative
-to classify every example perfectly.
+the sum over all its coordinates $j$ vanishes for all but one term. Note that 
+the loss $l(\mathbf{y}, \hat{\mathbf{y}})$ is bounded from below by $0$ whenever
+$\hat{y}$ is a probability vector: no single entry is larger than $1$, hence 
+their negative logarithm cannot be lower than $0$. $l(\mathbf{y}, \hat{\mathbf{y}}) = 0$
+only occurs if we predict the actual label with *certainty*. This (almost) never happens, 
+not the least due to the fact that a prediction error would incur infinite loss ($-\log 0 = \infty$). 
 
-### Softmax and Derivatives
+
+### Softmax and Cross-Entropy Loss
 :label:`subsec_softmax_and_derivatives`
 
 Since the softmax and the corresponding loss are so common,
@@ -297,8 +247,8 @@ and using the definition of the softmax we obtain:
 $$
 \begin{aligned}
 l(\mathbf{y}, \hat{\mathbf{y}}) &=  - \sum_{j=1}^q y_j \log \frac{\exp(o_j)}{\sum_{k=1}^q \exp(o_k)} \\
-&= \sum_{j=1}^q y_j \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j\\
-&= \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j.
+&= \sum_{j=1}^q y_j \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j
+= \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j.
 \end{aligned}
 $$
 
@@ -322,14 +272,12 @@ In any exponential family (see the
 the gradients of the log-likelihood are given by precisely this term.
 This fact makes computing gradients easy in practice.
 
-### Cross-Entropy Loss
-
 Now consider the case where we observe not just a single outcome
 but an entire distribution over outcomes.
 We can use the same representation as before for the label $\mathbf{y}$.
 The only difference is that rather than a vector containing only binary entries,
 say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$.
-The mathematics that we used previously to define the loss $l$
+The math that we used previously to define the loss $l$
 in :eqref:`eq_l_cross_entropy`
 still works out fine,
 just that the interpretation is slightly more general.
@@ -337,31 +285,393 @@ It is the expected value of the loss for a distribution over labels.
 This loss is called the *cross-entropy loss* and it is
 one of the most commonly used losses for classification problems.
 We can demystify the name by introducing just the basics of information theory.
-If you wish to understand more details of information theory,
-you may further refer to the [online appendix on information theory](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/information-theory.html).
+In a nutshell, it measures the number of bits to encode what we see $\mathbf{y}$ 
+relative to what we predict that should happen $\hat{\mathbf{y}}$. 
+We provide a very basic explanation at the end of the current section. For further 
+details on information theory see :ref:`sec_information_theory` or in this classic :cite:`cover1999elements`.
 
+### Vectorization
+:label:`subsec_softmax_vectorization`
 
+To improve computational efficiency we vectorize calculations in minibatches of data. 
+Assume that we are given a minibatch $\mathbf{X} \in \mathbb{R}^{n \times d}$ 
+of $n$ features with dimensionality (number of inputs) $d$.
+Moreover, assume that we have $q$ categories in the output.
+Then the weights satisfy $\mathbf{W} \in \mathbb{R}^{d \times q}$
+and the bias satisfies $\mathbf{b} \in \mathbb{R}^{1\times q}$.
+
+$$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
+:eqlabel:`eq_minibatch_softmax_reg`
+
+This accelerates the dominant operation into
+a matrix-matrix product $\mathbf{X} \mathbf{W}$. 
+Moreover, since each row in $\mathbf{X}$ represents a data example,
+the softmax operation itself can be computed *rowwise*:
+for each row of $\mathbf{O}$, exponentiate all entries and then normalize them by the sum.
+Note, though, that care must be taken to avoid exponentiating and taking logarithms of large 
+numbers since this can cause numerical overflow or underflow. Deep Learning Frameworks 
+take care of this automatically. 
 
 ## Information Theory Basics
 :label:`subsec_info_theory_basics`
 
+Many deep learning papers use intuition and terms from information theory. 
+To make sense of them, we need some common language. This is a survival guide. For more 
+see :ref:`sec_information_theory`. 
 *Information theory* deals with the problem of encoding, decoding, transmitting,
-and manipulating information (also known as data) in as concise form as possible.
-
+and manipulating information (also known as data). 
 
 ### Entropy
 
-The central idea in information theory is to quantify the information content in data.
-This quantity places a hard limit on our ability to compress the data.
-In information theory, this quantity is called the *entropy* of a distribution $P$,
-and it is captured by the following equation:
+The central idea in information theory is to quantify the 
+amount of information contained in data. This places a  
+limit on our ability to compress data. For instance, the sequenc
+
+# Softmax Regression
+:label:`sec_softmax`
+
+In :numref:`sec_linear_regression`, we introduced linear regression,
+working through implementations from scratch in :numref:`sec_linear_scratch`
+and again using high-level APIs of a deep learning framework
+in :numref:`sec_linear_concise` to do the heavy lifting.
+
+Regression is the hammer we reach for when
+we want to answer *how much?* or *how many?* questions.
+If you want to predict the number of dollars (price)
+at which a house will be sold,
+or the number of wins a baseball team might have,
+or the number of days that a patient will remain hospitalized before being discharged,
+then you are probably looking for a regression model. Note, though, that even within
+regression models there are important distinctions. For instance, the price of a house
+will never be negative and changes might often be *relative* to its baseline price. As such, 
+it might be more effective to regress on the logarithm of the price. Likewise, the number of days a 
+patient spends in hospital is a *discrete nonnegative* random variable. As such, least mean squares 
+might not be an ideal approach either. As we can see, there's a lot more to estimation than just
+minimizing squared errors. 
+
+In fact, there's a lot more to machine learning than just regression. 
+In this section we encounter a novel concept: *classification*. 
+It deals with asking not "how much" but "which one":
+
+* Does this email belong in the spam folder or the inbox?
+* Is this customer more likely *to sign up* or *not to sign up* for a subscription service?
+* Does this image depict a donkey, a dog, a cat, or a rooster?
+* Which movie is Aston most likely to watch next?
+* Which section of the book are you going to read next?
+
+Colloquially, machine learning practitioners
+overload the word *classification*
+to describe two subtly different problems:
+(i) those where we are interested only in
+hard assignments of examples to categories (classes);
+and (ii) those where we wish to make soft assignments,
+i.e., to assess the probability that each category applies.
+The distinction tends to get blurred, in part,
+because often, even when we only care about hard assignments,
+we still use models that make soft assignments. 
+
+Even more, there are cases
+where more than one label might be true. For instance, a news article might 
+simultaneously cover the topics of entertainment, business, and space flight, 
+but not the topics of medicine or sports. As such, categorizing it into one of the above categories on their own would not be very useful. This problem is commonly 
+known as [multi-label classification](https://en.wikipedia.org/wiki/Multi-label_classification). See :cite:`tsoumakas2007multi` for an overview and :cite:`huang2015bidirectional` for an effective algorithm when tagging images.
+
+## Classification
+:label:`subsec_classification-problem`
+
+To get our feet wet, let's start with
+a simple image classification problem.
+Here, each input consists of a $2\times2$ grayscale image.
+We can represent each pixel value with a single scalar,
+giving us four features $x_1, x_2, x_3, x_4$.
+Further, let's assume that each image belongs to one
+among the categories "cat", "chicken", and "dog".
+
+Next, we have to choose how to represent the labels.
+We have two obvious choices.
+Perhaps the most natural impulse would be to choose $y \in \{1, 2, 3\}$,
+where the integers represent $\{\text{dog}, \text{cat}, \text{chicken}\}$ respectively.
+This is a great way of *storing* such information on a computer.
+If the categories had some natural ordering among them,
+say if we were trying to predict $\{\text{baby}, \text{toddler}, \text{adolescent}, \text{young adult}, \text{adult}, \text{geriatric}\}$,
+then it might even make sense to cast this as an [ordinal regression](https://en.wikipedia.org/wiki/Ordinal_regression) problem 
+and keep the labels in this format. See :cite:`moon2010intervalrank` for an
+overview of different types of ranking loss functions and :cite:`beutel2014cobafi` for a Bayesian approach that addresses responses with more than one mode. 
+
+In general, classification problems do not come with natural orderings among the classes.
+Fortunately, statisticians long ago invented a simple way
+to represent categorical data: the *one-hot encoding*.
+A one-hot encoding is a vector with as many components as we have categories.
+The component corresponding to a particular instance's category is set to 1
+and all other components are set to 0.
+In our case, a label $y$ would be a three-dimensional vector,
+with $(1, 0, 0)$ corresponding to "cat", $(0, 1, 0)$ to "chicken",
+and $(0, 0, 1)$ to "dog":
+
+$$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}.$$
+
+### Linear Model
+
+In order to estimate the conditional probabilities associated with all the possible classes,
+we need a model with multiple outputs, one per class.
+To address classification with linear models,
+we will need as many affine functions as we have outputs. Strictly speaking, we only need one fewer, since the last category has to be the difference between $1$ and the sum of the other categories but for reasons of symmetry we use a slightly redundant parametrization. 
+Each output corresponds to its own affine function.
+In our case, since we have 4 features and 3 possible output categories,
+we need 12 scalars to represent the weights ($w$ with subscripts),
+and 3 scalars to represent the biases ($b$ with subscripts). This yields:
+
+$$
+\begin{aligned}
+o_1 &= x_1 w_{11} + x_2 w_{12} + x_3 w_{13} + x_4 w_{14} + b_1,\\
+o_2 &= x_1 w_{21} + x_2 w_{22} + x_3 w_{23} + x_4 w_{24} + b_2,\\
+o_3 &= x_1 w_{31} + x_2 w_{32} + x_3 w_{33} + x_4 w_{34} + b_3.
+\end{aligned}
+$$
+
+The corresponding neural network diagram is shown in :numref:`fig_softmaxreg`.
+Just as in linear regression, we use a single-layer neural network.
+And since the calculation of each output, $o_1, o_2$, and $o_3$,
+depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$,
+the output layer can also be described as fully connected layer.
+
+![Softmax regression is a single-layer neural network.](../img/softmaxreg.svg)
+:label:`fig_softmaxreg`
+
+For a more concise notation we use vectors and matrices. 
+$\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$ is 
+much better suited for mathematics and code.
+Note that we have gathered all of our weights into a $3 \times 4$ matrix and all biases
+$\mathbf{b} \in \mathbb{R}^3$ in a vector.
+
+
+### The Softmax
+:label:`subsec_softmax_operation`
+
+Assuming a suitable loss function, we could try to minimize the 
+difference between $\mathbf{o}$ and the labels $\mathbf{y}$ directly. 
+While it turns out that treating classification as a vector-valued 
+regression problem is surprisingly well-behaved (it is statistically
+consistent), it is nonetheless lacking in many regards:
+
+* There is no guarantee that the outputs $o_i$ sum up to $1$ in
+  in the way we expect probabilities to behave. 
+* There is no guarantee that the outputs $o_i$ are even nonnegative,
+  even if their outputs sum to $1$, or that they do not exceed $1$.
+  
+Both aspects render the estimation problem difficult to solve and the
+solution very brittle to outliers. For instance, if we assume that there 
+is a positive linear dependency between the number of bedrooms and the likelihood
+that someone will buy a house, the probability might exceed $1$ when
+it comes to buying a mansion! As such, we need a mechanism to 'squish' 
+the outputs. 
+
+There are many ways how to accomplish this goal. For instance, we could 
+assume that the outputs $\mathbf{o}$ are corrupted versions of $\mathbf{y}$,
+where the corruption occurs by means of adding noise $\mathbf{\epsilon}$ 
+drawn from a normal distribution. In other words, $\mathbf{y} = \mathbf{o} + \mathbf{\epsilon}$ where $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$. This 
+is the so-called [probit model](https://en.wikipedia.org/wiki/Probit_model), 
+first introduced by :cite:`fechner1860elemente`. While appealing, it doesn't
+work quite as well or lead to a particularly nice optimization problem, 
+when compared to the softmax. 
+
+A desirable property for mapping $\mathbf{o}$ into a vector of probabilities
+is that a larger value in $o_i$ would correspond to a larger value for class 
+$i$. In particular, we want that the largest value $o_i$ corresponds to the 
+most likely class $i$. One way to accomplish this goal (and to ensure 
+nonnegativity) is to use an exponential function $p(y = i) \propto \exp o_i$. 
+This does indeed satisfy the requirement that the conditional class probability 
+increases with increasing $o_i$, it is monotonic, and all probabilities are nonnegative. 
+Unfortunately it fails to satisfy the key requirement of normalization. This can
+be fixed via:
+
+$$\hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}$$
+:eqlabel:`eq_softmax_y_and_o`
+
+The mapping from $\mathbf{o}$ to $\hat{\mathbf{y}}$
+is commonly referred to as a softmax. We write 
+$\hat{\mathbf{y}} = \operatorname*{softmax} \mathbf{o}$. 
+By construction, the largest coordinate of $\mathbf{o}$
+also corresponds to the most likely class according to $\hat{\mathbf{y}}$. 
+
+$$
+\operatorname*{argmax}_j \hat y_j = \operatorname*{argmax}_j o_j.
+$$
+
+The idea of a softmax dates back to Gibbs, who adapted ideas from physics 
+:cite:`gibbs1902elementary`. Dating even further back, Boltzmann, the father of
+modern thermodynamics, used this trick
+to model a distribution over energy states in gas molecules. In 
+particular, he discovered that the prevalence of a state of energy in a 
+thermodynamic ensemble, such as the molecules in a gas, is proportional to 
+$\exp(-E/kT)$. Here $E$ is the energy of a state, $T$ is the temperature and 
+$k$ is the Boltzmann constant. When statisticians talk about increasing or decreasing
+the 'temperature' of a statistical system, they refer to changing $T$ in order to favor
+lower or higher energy states. Following Gibbs' idea, energy equates to error. 
+Energy-based models :cite:`ranzato2007unified` use this point of view when describing 
+problems in Deep Learning. 
+
+### Model Prediction and Evaluation
+
+Once we have a model that generates outputs $\hat{\mathbf{y}}$ via the softmax, 
+we can use it to read off the probability of each output class.
+Normally, we use the class with the highest predicted probability as the output class.
+The prediction is correct if it is consistent with the actual class (label).
+For most of the book we will use the term *accuracy* to refer to a model's performance.
+It equals the ratio between the number of correct predictions and the total number of predictions.
+
+## Loss Function
+
+Now that we have a mapping from features $\mathbf{x}$ to probabilities 
+$\mathbf{\hat{y}}$, we need a way to optimize the accuracy of this mapping. 
+We will rely on maximum likelihood estimation,
+the very same concept that we encountered
+when providing a probabilistic justification
+for the mean squared error loss in 
+:ref:`subsec_normal_distribution_and_squared_loss`.
+
+### Log-Likelihood
+
+The softmax function gives us a vector $\hat{\mathbf{y}}$,
+which we can interpret as (estimated) conditional probabilities
+of each class, given any input $\mathbf{x}$, such as 
+$\hat{y}_1$ = $P(y=\text{cat} | \mathbf{x})$. In the following 
+we assume that for a dataset with features $\mathbf{X}$ the labels $\mathbf{Y}$ 
+are represented using a one-hot encoding label vector. 
+We can compare the estimates with reality
+by checking how probable the actual classes are
+according to our model, given the features:
+
+$$
+P(\mathbf{Y} | \mathbf{X}) = \prod_{i=1}^n P(\mathbf{y}^{(i)} | \mathbf{x}^{(i)}).
+$$
+
+We are allowed to use the factorization since we assume that each label  
+is drawn independently from its respective distribution $p(\mathbf{y}|\mathbf{x}^{(i)})$.
+Since maximizing the product of terms if awkward, we take the negative logarithm to 
+obtain the equivalent problem of minimizing the negative log-likelihood:
+
+$$
+-\log P(\mathbf{Y} | \mathbf{X}) = \sum_{i=1}^n -\log P(\mathbf{y}^{(i)} | \mathbf{x}^{(i)})
+= \sum_{i=1}^n l(\mathbf{y}^{(i)}, \hat{\mathbf{y}}^{(i)}),
+$$
+
+where for any pair of label $\mathbf{y}$ and model prediction $\hat{\mathbf{y}}$ over $q$ classes,
+the loss function $l$ is
+
+$$ l(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_{j=1}^q y_j \log \hat{y}_j. $$
+:eqlabel:`eq_l_cross_entropy`
+
+For reasons explained later on, the loss function in :eqref:`eq_l_cross_entropy`
+is commonly called the *cross-entropy loss*.
+Since $\mathbf{y}$ is a one-hot vector of length $q$,
+the sum over all its coordinates $j$ vanishes for all but one term. Note that 
+the loss $l(\mathbf{y}, \hat{\mathbf{y}})$ is bounded from below by $0$ whenever
+$\hat{y}$ is a probability vector: no single entry is larger than $1$, hence 
+their negative logarithm cannot be lower than $0$. $l(\mathbf{y}, \hat{\mathbf{y}}) = 0$
+only occurs if we predict the actual label with *certainty*. This (almost) never happens, 
+not the least due to the fact that a prediction error would incur infinite loss ($-\log 0 = \infty$). 
+
+
+### Softmax and Cross-Entropy Loss
+:label:`subsec_softmax_and_derivatives`
+
+Since the softmax and the corresponding loss are so common,
+it is worth understanding a bit better how it is computed.
+Plugging :eqref:`eq_softmax_y_and_o` into the definition of the loss
+in :eqref:`eq_l_cross_entropy`
+and using the definition of the softmax we obtain:
+
+$$
+\begin{aligned}
+l(\mathbf{y}, \hat{\mathbf{y}}) &=  - \sum_{j=1}^q y_j \log \frac{\exp(o_j)}{\sum_{k=1}^q \exp(o_k)} \\
+&= \sum_{j=1}^q y_j \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j
+= \log \sum_{k=1}^q \exp(o_k) - \sum_{j=1}^q y_j o_j.
+\end{aligned}
+$$
+
+To understand a bit better what is going on,
+consider the derivative with respect to any logit $o_j$. We get
+
+$$
+\partial_{o_j} l(\mathbf{y}, \hat{\mathbf{y}}) = \frac{\exp(o_j)}{\sum_{k=1}^q \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j.
+$$
+
+In other words, the derivative is the difference
+between the probability assigned by our model,
+as expressed by the softmax operation,
+and what actually happened, as expressed by elements in the one-hot label vector.
+In this sense, it is very similar to what we saw in regression,
+where the gradient was the difference
+between the observation $y$ and estimate $\hat{y}$.
+This is not coincidence.
+In any exponential family (see the
+[online appendix on distributions](https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/distributions.html)) model,
+the gradients of the log-likelihood are given by precisely this term.
+This fact makes computing gradients easy in practice.
+
+Now consider the case where we observe not just a single outcome
+but an entire distribution over outcomes.
+We can use the same representation as before for the label $\mathbf{y}$.
+The only difference is that rather than a vector containing only binary entries,
+say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$.
+The math that we used previously to define the loss $l$
+in :eqref:`eq_l_cross_entropy`
+still works out fine,
+just that the interpretation is slightly more general.
+It is the expected value of the loss for a distribution over labels.
+This loss is called the *cross-entropy loss* and it is
+one of the most commonly used losses for classification problems.
+We can demystify the name by introducing just the basics of information theory.
+In a nutshell, it measures the number of bits to encode what we see $\mathbf{y}$ 
+relative to what we predict that should happen $\hat{\mathbf{y}}$. 
+We provide a very basic explanation at the end of the current section. For further 
+details on information theory see :ref:`sec_information_theory` or in this classic :cite:`cover1999elements`.
+
+### Vectorization
+:label:`subsec_softmax_vectorization`
+
+To improve computational efficiency we vectorize calculations in minibatches of data. 
+Assume that we are given a minibatch $\mathbf{X} \in \mathbb{R}^{n \times d}$ 
+of $n$ features with dimensionality (number of inputs) $d$.
+Moreover, assume that we have $q$ categories in the output.
+Then the weights satisfy $\mathbf{W} \in \mathbb{R}^{d \times q}$
+and the bias satisfies $\mathbf{b} \in \mathbb{R}^{1\times q}$.
+
+$$ \begin{aligned} \mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\ \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}). \end{aligned} $$
+:eqlabel:`eq_minibatch_softmax_reg`
+
+This accelerates the dominant operation into
+a matrix-matrix product $\mathbf{X} \mathbf{W}$. 
+Moreover, since each row in $\mathbf{X}$ represents a data example,
+the softmax operation itself can be computed *rowwise*:
+for each row of $\mathbf{O}$, exponentiate all entries and then normalize them by the sum.
+Note, though, that care must be taken to avoid exponentiating and taking logarithms of large 
+numbers since this can cause numerical overflow or underflow. Deep Learning Frameworks 
+take care of this automatically. 
+
+## Information Theory Basics
+:label:`subsec_info_theory_basics`
+
+Many deep learning papers use intuition and terms from information theory. 
+To make sense of them, we need some common language. This is a survival guide. For more 
+see :ref:`sec_information_theory`. 
+*Information theory* deals with the problem of encoding, decoding, transmitting,
+and manipulating information (also known as data). 
+
+### Entropy
+
+The central idea in information theory is to quantify the 
+amount of information contained in data. This places a  
+limit on our ability to compress data. 
+For a distribution $P$ its *entropy* is defined as:
 
 $$H[P] = \sum_j - P(j) \log P(j).$$
 :eqlabel:`eq_softmax_reg_entropy`
 
 One of the fundamental theorems of information theory states
 that in order to encode data drawn randomly from the distribution $P$,
-we need at least $H[P]$ "nats" to encode it.
+we need at least $H[P]$ "nats" to encode it :cite:`shannon1948mathematical`.
 If you wonder what a "nat" is, it is the equivalent of bit
 but when using a code with base $e$ rather than one with base 2.
 Thus, one nat is $\frac{1}{\log(2)} \approx 1.44$ bit.
@@ -393,37 +703,69 @@ that truly match the data-generating process.
 
 ### Cross-Entropy Revisited
 
-So if entropy is level of surprise experienced
+So if entropy is the level of surprise experienced
 by someone who knows the true probability,
 then you might be wondering, what is cross-entropy?
 The cross-entropy *from* $P$ *to* $Q$, denoted $H(P, Q)$,
 is the expected surprisal of an observer with subjective probabilities $Q$
-upon seeing data that was actually generated according to probabilities $P$.
+upon seeing data that was actually generated according to probabilities $P$. 
+This is given by $H(P, Q) := \sum_j - P(j) \log Q(j)$. 
 The lowest possible cross-entropy is achieved when $P=Q$.
 In this case, the cross-entropy from $P$ to $Q$ is $H(P, P)= H(P)$.
 
 In short, we can think of the cross-entropy classification objective
 in two ways: (i) as maximizing the likelihood of the observed data;
 and (ii) as minimizing our surprisal (and thus the number of bits)
-required to communicate the labels.
+required to communicate the labels. 
 
 
-## Model Prediction and Evaluation
+## The Cost of Fully Connected Layers
+:label:`subsec_parameterization-cost-fc-layers`
 
-After training the softmax regression model, given any example features,
-we can predict the probability of each output class.
-Normally, we use the class with the highest predicted probability as the output class.
-The prediction is correct if it is consistent with the actual class (label).
-In the next part of the experiment,
-we will use *accuracy* to evaluate the model's performance.
-This is equal to the ratio between the number of correct predictions and the total number of predictions.
+As we will see in subsequent chapters,
+fully connected layers are ubiquitous in deep learning.
+However, as the name suggests,
+fully connected layers are *fully* connected
+with potentially many learnable parameters.
+Specifically,
+for any fully connected layer
+with $d$ inputs and $q$ outputs,
+the parameterization cost is $\mathcal{O}(dq)$,
+which can be prohibitively high in practice.
+Fortunately,
+this cost
+of transforming $d$ inputs into $q$ outputs
+can be reduced to $\mathcal{O}(\frac{dq}{n})$,
+where the hyperparameter $n$ can be flexibly specified
+by us to balance between parameter saving and model effectiveness in real-world applications :cite:`Zhang.Tay.Zhang.ea.2021`.
 
+## Summary and Discussion
 
-## Summary
+In this section we encountered the first nontrivial loss function, allowing us to 
+optimize over *discrete* output spaces. Key in its design was that we took a 
+probabilistic approach, treating discrete categories as instances of draws from a 
+probability distribution. As a side effect, we encountered the softmax, a 
+versatile parametrization for probability distributions. We saw that its derivative 
+behaves very similarly to that of a regression function, namely by taking the difference
+between the expected behavior and its prediction. And, while we were only able to 
+scratch the very surface of it, we encountered exciting connections to statistical 
+physics and information theory. The present section doesn't do the subject justice
+but we hope that we managed to whet your appetite to learn more, both in the appendix 
+and by reading a proper textbook. 
 
-* The softmax operation takes a vector and maps it into probabilities.
-* Softmax regression applies to classification problems. It uses the probability distribution of the output class in the softmax operation.
-* Cross-entropy is a good measure of the difference between two probability distributions. It measures the number of bits needed to encode the data given our model.
+Among many things, we omitted to discuss the computational cost of such models, be it for
+regression or classification. Specifically, for any fully connected layer
+with $d$ inputs and $q$ outputs, the parameterization and computational cost 
+is $\mathcal{O}(dq)$, which can be prohibitively high in practice.
+Fortunately, this cost of transforming $d$ inputs into $q$ outputs
+can be reduced through approximation and compression. For instance Deep Fried Convnets :cite:`yang2015deep` uses a combination of permutations, Fourier transforms and scaling 
+to reduce the cost from quadratic to log-linear. Similar techniques work for more advanced 
+structural matrix approximations :cite:`sindhwani2015structured`. Lastly, we can use 
+quaternion-like decompositions to reduce the cost to $\mathcal{O}(\frac{dq}{n})$, again if
+we are willing to trade off a small amount of accuracy for computational and storage cost
+:cite:`Zhang.Tay.Zhang.ea.2021` based on a compression factor $n$. This is an active area of research. What makes it challenging is that we do not necessarily strive for the most 
+compact representation or the smallest number of floating point operations but rather for the 
+solution that can be executed most efficiently on modern GPUs. 
 
 ## Exercises
 
@@ -433,11 +775,33 @@ This is equal to the ratio between the number of correct predictions and the tot
 1. Assume that we have three classes which occur with equal probability, i.e., the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
     1. What is the problem if we try to design a binary code for it?
     1. Can you design a better code? Hint: what happens if we try to encode two independent observations? What if we encode $n$ observations jointly?
-1. Softmax is a misnomer for the mapping introduced above (but everyone in deep learning uses it). The real softmax is defined as $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
+1. When encoding signals transmitted over a physical wire, engineers don't always use binary codes. For instance, [PAM-3](https://en.wikipedia.org/wiki/Ternary_signal) uses three signal levels $\{-1, 0, 1\}$ as opposed to two levels $\{0, 1\}$. How many ternary units do you need to transmit an integer in the range $\{0, \ldots, 7\}$? Why might this be a better idea in terms of electronics?
+1. The [Bradley-Terry model](https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model) uses
+a logistic model to capture preferences. For a user to choose between apples and oranges one 
+assumes scores $o_{\mathrm{apple}}$ and $o_{\mathrm{orange}}$. Our requirements are that larger scores should lead to a higher likelihood in choosing the associated item and that
+the item with the largest score is the most likely one to be chosen :cite:`bradley1952rank`. 
+    1. Prove that the softmax satisfies this requirement. 
+    1. What happens if you want to allow for a default option of choosing neither apples nor oranges? Hint: now the user has 3 choices. 
+1. Softmax derives its name from the following mapping: $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$. 
     1. Prove that $\mathrm{RealSoftMax}(a, b) > \mathrm{max}(a, b)$.
+    1. How small can you make the difference between both functions? Hint: without loss of 
+    generality you can set $b = 0$ and $a \geq b$.
     1. Prove that this holds for $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b)$, provided that $\lambda > 0$.
     1. Show that for $\lambda \to \infty$ we have $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a, b)$.
     1. What does the soft-min look like?
     1. Extend this to more than two numbers.
+1. The function $g(\mathbf{x}) := \log \sum_i \exp x_i$ is sometimes also referred to as the [log-partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics)). 
+    1. Prove that the function is convex. Hint: to do so, use the fact that the first derivative amounts to the probabilities from the softmax function and show that the second derivative is the variance. 
+    1. Show that $g$ is translation invariant, i.e., $g(\mathbf{x} + b) = g(\mathbf{x})$. 
+    1. What happens if some of the coordinates $x_i$ are very large? What happens if they're all very small? 
+    1. Show that if we choose $b = \mathrm{max}_i x_i$ we end up with a numerically stable implementation. 
+1. Assume that we have some probability distribution $P$. Suppose we pick another distribution $Q$ with $Q(i) \propto P(i)^\alpha$ for $\alpha > 0$. 
+    1. Which choice of $\alpha$ corresponds to doubling the temperature? Which choice corresponds to halving it?
+    1. What happens if we let the temperature converge to $0$? 
+    1. What happens if we let the temperature converge to $\infty$?
 
 [Discussions](https://discuss.d2l.ai/t/46)
+
+```{.python .input}
+
+```
